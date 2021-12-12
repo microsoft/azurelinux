@@ -1,0 +1,13 @@
+diff --git a/tests/test_transport.py b/tests/test_transport.py
+index d045aaf..cbcdecd 100644
+--- a/tests/test_transport.py
++++ b/tests/test_transport.py
+@@ -140,7 +140,7 @@ and I'm all out of gum."""),
+         ("", {}, "\n\n\n\n\n\n"),
+         ("", {}, u("\u4E2D\u539F\u5343\u519B\u9010\u848B"))))
+     def test_string_representation_with_message(self, url, headers, message):
+-        for key, value in headers.items():
++        for key, value in list(headers.items()):
+             old_key = key
+             if isinstance(key, text_type):
+                 key = key.encode("utf-8")

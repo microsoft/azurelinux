@@ -1,0 +1,29 @@
+From 6fe0ace32f9fa13eac5081c9fb95361bf5033c1e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 16 May 2017 13:15:56 +0200
+Subject: [PATCH] Drop useless build-time dependencies
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index e2a0095..0c89aeb 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -15,8 +15,6 @@ build_requires 'Test::Builder::Tester' =
+ perl_version '5.007003';
+ 
+ license 'perl';
+-githubmeta;
+-author_tests('xt');
+ readme_from 'lib/Test/utf8.pm';
+ 
+ repository 'https://github.com/2shortplanks/Test-utf8';
+-- 
+2.9.4
+

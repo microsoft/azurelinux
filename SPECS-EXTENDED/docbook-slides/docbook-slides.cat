@@ -1,0 +1,14 @@
+-- BEGIN OASIS TR 9401:1997 catalog for docbook-slides V3.4.0 --
+OVERRIDE YES
+PUBLIC "-//Norman Walsh//DTD Slides XML V3.4.0//EN"         "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides.dtd"
+PUBLIC "-//Norman Walsh//DTD Slides Custom XML V3.4.0//EN"  "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides-custom.dtd"
+PUBLIC "-//Norman Walsh//DTD Slides Full XML V3.4.0//EN"    "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides-full.dtd"
+
+SYSTEM "http://docbook.sourceforge.net/release/slides/3.4.0/schema/dtd/slides.dtd"              "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides.dtd"
+SYSTEM "http://docbook.sourceforge.net/release/slides/3.4.0/schema/dtd/slides-custom.dtd"       "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides-custom.dtd"      
+SYSTEM "http://docbook.sourceforge.net/release/slides/3.4.0/schema/dtd/slides-full.dtd"         "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides-full.dtd"
+
+SYSTEM "http://docbook.sourceforge.net/release/slides/current/schema/dtd/slides.dtd"            "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides.dtd"
+SYSTEM "http://docbook.sourceforge.net/release/slides/current/schema/dtd/slides-custom.dtd"     "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides-custom.dtd"
+SYSTEM "http://docbook.sourceforge.net/release/slides/current/schema/dtd/slides-full.dtd"       "/usr/share/xml/docbook/slides/3.4.0/schema/dtd/slides-full.dtd"
+-- END OASIS TR 9401:1997 catalog for docbook-slides V3.4.0 --

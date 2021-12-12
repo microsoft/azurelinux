@@ -1,0 +1,21 @@
+# User Mikael Berthe <mikael.berthe@lilotux.net>
+# Date 1194544713 -3600
+Fix file transfers with recent Sametime servers
+
+It seems that the last guint32_get() fails when Meanwhile receives
+the FT offer.
+I think we can skip it -- works for me but I can't check it with an
+older server.
+
+diff -r 4aabc56c0e5f src/srvc_ft.c
+--- a/src/srvc_ft.c	Tue Nov 06 11:46:26 2007 +0100
++++ b/src/srvc_ft.c	Thu Nov 08 18:58:33 2007 +0100
+@@ -142,7 +142,7 @@ static void recv_channelCreate(struct mw
+   mwString_get(b, &fnm); /* offered filename */
+   mwString_get(b, &txt); /* offering message */
+   guint32_get(b, &size); /* size of offered file */
+-  guint32_get(b, &junk); /* unknown */
++  /* guint32_get(b, &junk); */ /* unknown */
+   /* and we just skip an unknown guint16 at the end */
+ 
+   b_err = mwGetBuffer_error(b);

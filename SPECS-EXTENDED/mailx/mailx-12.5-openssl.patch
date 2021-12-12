@@ -1,0 +1,41 @@
+diff --git a/openssl.c b/openssl.c
+index b4e33fc..9d1eaf4 100644
+--- a/openssl.c
++++ b/openssl.c
+@@ -136,6 +136,7 @@ ssl_rand_init(void)
+ 	int state = 0;
+ 
+ 	if ((cp = value("ssl-rand-egd")) != NULL) {
++#ifndef OPENSSL_NO_EGD
+ 		cp = expand(cp);
+ 		if (RAND_egd(cp) == -1) {
+ 			fprintf(stderr, catgets(catd, CATSET, 245,
+@@ -143,6 +144,9 @@ ssl_rand_init(void)
+ 					cp);
+ 		} else
+ 			state = 1;
++#else
++		fprintf(stderr, "entropy daemon not available\n");
++#endif
+ 	} else if ((cp = value("ssl-rand-file")) != NULL) {
+ 		cp = expand(cp);
+ 		if (RAND_load_file(cp, 1024) == -1) {
+@@ -216,9 +220,16 @@ ssl_select_method(const char *uhp)
+ 
+ 	cp = ssl_method_string(uhp);
+ 	if (cp != NULL) {
+-		if (equal(cp, "ssl2"))
++		if (equal(cp, "ssl2")) {
++#if OPENSSL_VERSION_NUMBER < 0x10100000
+ 			method = SSLv2_client_method();
+-		else if (equal(cp, "ssl3"))
++#else
++	/* SSLv2 support was removed in OpenSSL 1.1.0 */
++			fprintf(stderr, catgets(catd, CATSET, 244,
++					"Unsupported SSL method \"%s\"\n"), cp);
++			method = SSLv23_client_method();
++#endif
++		} else if (equal(cp, "ssl3"))
+ 			method = SSLv3_client_method();
+ 		else if (equal(cp, "tls1"))
+ 			method = TLSv1_client_method();

@@ -1,0 +1,45 @@
+From b8c7b36d3b8be16593f554964cf2f852c21b5c2c Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Wed, 4 Nov 2020 16:12:25 +0100
+Subject: [PATCH] protocol-native: do version check on HELLO
+
+Always do the version check on HELLO because the connection could
+have been moved from a v3 portal to a v0 client (like chrome)
+
+Fixes #270
+---
+ src/modules/module-protocol-native/connection.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/src/modules/module-protocol-native/connection.c b/src/modules/module-protocol-native/connection.c
+index 84fad68f..1807833a 100644
+--- a/src/modules/module-protocol-native/connection.c
++++ b/src/modules/module-protocol-native/connection.c
+@@ -72,7 +72,6 @@ struct impl {
+ 
+ 	uint32_t version;
+ 	size_t hdr_size;
+-	unsigned int checked:1;
+ };
+ 
+ /** \endcond */
+@@ -319,7 +318,7 @@ static int prepare_packet(struct pw_protocol_native_connection *conn, struct buf
+ 	buf->msg.opcode = p[1] >> 24;
+ 	len = p[1] & 0xffffff;
+ 
+-	if (!impl->checked) {
++	if (buf->msg.id == 0 && buf->msg.opcode == 1) {
+ 		if (p[3] >= 4) {
+ 			pw_log_warn("old version detected");
+ 			impl->version = 0;
+@@ -331,7 +330,6 @@ static int prepare_packet(struct pw_protocol_native_connection *conn, struct buf
+ 		spa_hook_list_call(&conn->listener_list,
+ 				struct pw_protocol_native_connection_events,
+ 				start, 0, impl->version);
+-		impl->checked = 1;
+ 	}
+ 	if (impl->version >= 3) {
+ 		buf->msg.seq = p[2];
+-- 
+2.26.2
+

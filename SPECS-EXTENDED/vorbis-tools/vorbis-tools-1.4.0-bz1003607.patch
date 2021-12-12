@@ -1,0 +1,26 @@
+From 1fbd20941836aa4df17d0f6b44fef4d655ff5fc2 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 3 Sep 2013 12:28:32 +0200
+Subject: [PATCH] vcut: fix an off-by-one error in submit_headers_to_stream()
+
+Bug: https://bugzilla.redhat.com/1003607
+---
+ vcut/vcut.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/vcut/vcut.c b/vcut/vcut.c
+index d7ba699..17426b9 100644
+--- a/vcut/vcut.c
++++ b/vcut/vcut.c
+@@ -178,7 +178,7 @@ static int submit_headers_to_stream(vcut_state *s)
+ 	for(i=0;i<4;i++)
+ 	{
+ 		ogg_packet p;
+-		if(i < 4)  /* a header packet */
++		if(i < 3)  /* a header packet */
+ 		{
+ 			p.bytes = vs->headers[i].length;
+ 			p.packet = vs->headers[i].packet;
+-- 
+1.7.1
+

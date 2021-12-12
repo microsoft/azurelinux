@@ -1,0 +1,95 @@
+--- byte-buddy/pom.xml.orig	2018-11-22 17:18:25.000000000 +0000
++++ byte-buddy/pom.xml	2018-11-30 17:48:48.655978937 +0000
+@@ -26,8 +26,6 @@
+     -->
+ 
+     <properties>
+-        <shade.source>org.objectweb.asm</shade.source>
+-        <shade.target>net.bytebuddy.jar.asm</shade.target>
+         <packages.list>
+             net.bytebuddy,
+             net.bytebuddy.agent.builder,
+@@ -61,10 +59,7 @@
+             net.bytebuddy.pool,
+             net.bytebuddy.utility,
+             net.bytebuddy.utility.privilege,
+-            net.bytebuddy.utility.visitor,
+-            ${shade.target},
+-            ${shade.target}.signature,
+-            ${shade.target}.commons
++            net.bytebuddy.utility.visitor
+         </packages.list>
+     </properties>
+ 
+@@ -77,7 +72,17 @@
+         <dependency>
+             <groupId>${project.groupId}</groupId>
+             <artifactId>byte-buddy-dep</artifactId>
+-            <version>${project.version}</version>
++	    <version>${project.version}</version>
++        </dependency>
++        <dependency>
++            <groupId>org.ow2.asm</groupId>
++            <artifactId>asm</artifactId>
++            <version>${version.asm}</version>
++        </dependency>
++        <dependency>
++            <groupId>org.ow2.asm</groupId>
++            <artifactId>asm-commons</artifactId>
++            <version>${version.asm}</version>
+         </dependency>
+     </dependencies>
+ 
+@@ -99,47 +104,19 @@
+                             <createDependencyReducedPom>true</createDependencyReducedPom>
+                             <createSourcesJar>true</createSourcesJar>
+                             <shadeSourcesContent>true</shadeSourcesContent>
+-                            <relocations>
+-                                <relocation>
+-                                    <pattern>${shade.source}</pattern>
+-                                    <shadedPattern>${shade.target}</shadedPattern>
+-                                </relocation>
+-                            </relocations>
+-                            <filters>
+-                                <filter>
+-                                    <artifact>org.ow2.asm:asm-commons</artifact>
+-                                    <includes>
+-                                        <include>org/objectweb/asm/commons/Remapper.class</include>
+-                                        <include>org/objectweb/asm/commons/SimpleRemapper.class</include>
+-                                        <include>org/objectweb/asm/commons/ClassRemapper.class</include>
+-                                        <include>org/objectweb/asm/commons/AnnotationRemapper.class</include>
+-                                        <include>org/objectweb/asm/commons/FieldRemapper.class</include>
+-                                        <include>org/objectweb/asm/commons/MethodRemapper.class</include>
+-                                        <include>org/objectweb/asm/commons/ModuleRemapper.class</include>
+-                                        <include>org/objectweb/asm/commons/SignatureRemapper.class</include>
+-                                    </includes>
+-                                </filter>
+-                            </filters>
+                             <transformers>
+                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                     <mainClass>net.bytebuddy.build.Plugin$Engine$Default</mainClass>
+                                 </transformer>
+                             </transformers>
++                            <artifactSet>
++                                <excludes>
++                                    <exclude>org.ow2.asm:*</exclude>
++                                </excludes>
++                            </artifactSet>
+                         </configuration>
+                     </execution>
+                 </executions>
+-                <dependencies>
+-                    <dependency>
+-                        <groupId>org.ow2.asm</groupId>
+-                        <artifactId>asm</artifactId>
+-                        <version>${version.asm}</version>
+-                    </dependency>
+-                    <dependency>
+-                        <groupId>org.ow2.asm</groupId>
+-                        <artifactId>asm-commons</artifactId>
+-                        <version>${version.asm}</version>
+-                    </dependency>
+-                </dependencies>
+             </plugin>
+             <!-- Disable pitest as it fails for empty modules -->
+             <plugin>

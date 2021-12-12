@@ -1,0 +1,14 @@
+diff -up pyxdg-0.26/xdg/Menu.py.getTypefix pyxdg-0.26/xdg/Menu.py
+--- pyxdg-0.26/xdg/Menu.py.getTypefix	2018-11-01 11:37:50.561645188 -0400
++++ pyxdg-0.26/xdg/Menu.py	2018-11-30 11:33:10.728729275 -0500
+@@ -994,8 +994,8 @@ class XMLMenuBuilder(object):
+                     menuentry = MenuEntry(directory, dir)
+                     if not menu.Directory:
+                         menu.Directory = menuentry
+-                    elif menuentry.Type == MenuEntry.TYPE_SYSTEM:
+-                        if menu.Directory.Type == MenuEntry.TYPE_USER:
++                    elif menuentry.getType() == MenuEntry.TYPE_SYSTEM:
++                        if menu.Directory.getType() == MenuEntry.TYPE_USER:
+                             menu.Directory.Original = menuentry
+             if menu.Directory:
+                 break

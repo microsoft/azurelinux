@@ -1,0 +1,4 @@
+-exportcontents: \
+               org.jvnet.hk2.generator; \
+               org.jvnet.hk2.generator.maven; \
+               version=${project.osgi.version}

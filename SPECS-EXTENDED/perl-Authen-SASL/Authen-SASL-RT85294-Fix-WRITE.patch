@@ -1,0 +1,13 @@
+diff -up Authen-SASL-2.16/lib/Authen/SASL/Perl.pm.orig Authen-SASL-2.16/lib/Authen/SASL/Perl.pm
+--- Authen-SASL-2.16/lib/Authen/SASL/Perl.pm.orig	2012-09-04 18:00:31.000000000 +0200
++++ Authen-SASL-2.16/lib/Authen/SASL/Perl.pm	2014-06-04 09:51:34.654310724 +0200
+@@ -323,6 +323,9 @@ sub securesocket {
+ 
+     my $fh = $self->{fh};
+ 
++    # Fix for BZ#965739, RT#85294
++    $len = length($_[1]) if $len > length($_[1]);
++
+     # put on wire in peer-sized chunks
+     my $bsz = $self->{sndbufsz};
+     while ($len > 0) {

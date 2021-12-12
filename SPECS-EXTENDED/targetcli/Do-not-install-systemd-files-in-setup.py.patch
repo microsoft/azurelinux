@@ -1,0 +1,26 @@
+From 88da522778fc6a7b256cda7f960912b439290538 Mon Sep 17 00:00:00 2001
+From: Matt Coleman <matt@datto.com>
+Date: Fri, 19 Jun 2020 19:06:24 -0400
+Subject: [PATCH] Do not install systemd files in setup.py
+
+setuptools should not perform OS-specific actions such as installing systemd units.
+OS-specific actions should be handled by the package manager.
+---
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 4518165..8dff55e 100755
+--- a/setup.py
++++ b/setup.py
+@@ -34,7 +34,6 @@ setup(
+                'scripts/targetcli',
+                'daemon/targetclid'
+               ],
+-    data_files = [('/lib/systemd/system', ['systemd/targetclid.socket', 'systemd/targetclid.service'])],
+     classifiers = [
+         "Programming Language :: Python",
+         "Programming Language :: Python :: 3",
+-- 
+2.27.0
+

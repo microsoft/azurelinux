@@ -1,0 +1,71 @@
+From febe70f7ca78926660a7d11607a35f663165322a Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Tue, 31 Mar 2020 17:01:29 +0100
+Subject: [PATCH 3/6] disallow deserialization of ex serializable tags
+
+---
+ .../xmlrpc/parser/SerializableParser.java     |  8 ++++++
+ .../java/org/apache/xmlrpc/test/BaseTest.java | 28 -------------------
+ 2 files changed, 8 insertions(+), 28 deletions(-)
+
+diff --git a/common/src/main/java/org/apache/xmlrpc/parser/SerializableParser.java b/common/src/main/java/org/apache/xmlrpc/parser/SerializableParser.java
+index 18f25ac..c8bb7ed 100644
+--- a/common/src/main/java/org/apache/xmlrpc/parser/SerializableParser.java
++++ b/common/src/main/java/org/apache/xmlrpc/parser/SerializableParser.java
+@@ -29,6 +29,14 @@ import org.apache.xmlrpc.XmlRpcException;
+  */
+ public class SerializableParser extends ByteArrayParser {
+ 	public Object getResult() throws XmlRpcException {
++                if (!"1".equals(System.getProperty("org.apache.xmlrpc.allowInsecureDeserialization"))) {
++                    throw new UnsupportedOperationException(
++                            "Deserialization of ex:serializable objects is vulnerable to " +
++                            "remote execution attacks and is disabled by default. " +
++                            "If you are sure the source data is trusted, you can enable " +
++                            "it by setting org.apache.xmlrpc.allowInsecureDeserialization " +
++                            "JVM property to 1");
++                }
+ 		try {
+ 			byte[] res = (byte[]) super.getResult();
+ 			ByteArrayInputStream bais = new ByteArrayInputStream(res);
+diff --git a/server/src/test/java/org/apache/xmlrpc/test/BaseTest.java b/server/src/test/java/org/apache/xmlrpc/test/BaseTest.java
+index 16699a6..6ad4b5e 100644
+--- a/server/src/test/java/org/apache/xmlrpc/test/BaseTest.java
++++ b/server/src/test/java/org/apache/xmlrpc/test/BaseTest.java
+@@ -805,34 +805,6 @@ public class BaseTest extends XmlRpcTestCase {
+ 		assertTrue(ok);
+ 	}
+ 
+-	/** Test, whether we can invoke a method, passing an instance of
+-	 * {@link java.io.Serializable} as a parameter.
+-	 * @throws Exception The test failed.
+-	 */
+-	public void testSerializableParam() throws Exception {
+-		for (int i = 0;  i < providers.length;  i++) {
+-			testSerializableParam(providers[i]);
+-		}
+-	}
+-
+-	private void testSerializableParam(ClientProvider pProvider) throws Exception {
+-		final String methodName = "Remote.serializableParam";
+-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+-		cal.set(2005, 5, 23, 8, 4, 0);
+-		cal.set(Calendar.MILLISECOND, 5);
+-		final Object[] params = new Object[]{new Remote.CalendarWrapper(cal)};
+-		final XmlRpcClient client = pProvider.getClient();
+-		Object result = client.execute(getExConfig(pProvider), methodName, params);
+-		assertEquals(new Long(cal.getTime().getTime()), result);
+-		boolean ok = false;
+-		try {
+-			client.execute(getConfig(pProvider), methodName, params);
+-		} catch (XmlRpcExtensionException e) {
+-			ok = true;
+-		}
+-		assertTrue(ok);
+-	}
+-
+ 	/** Tests, whether we can invoke a method, passing an instance of
+      * {@link Calendar} as a parameter.
+      * @throws Exception The test failed.
+-- 
+2.26.0.rc2
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
+<policyconfig>
+  <vendor>The PCSC-lite Project</vendor>
+  <vendor_url>http://pcsclite.alioth.debian.org/</vendor_url>
+<!--  <icon_name>smart-card</icon_name> -->
+
+  <action id="org.debian.pcsc-lite.access_pcsc">
+    <description>Access to the PC/SC daemon</description>
+    <message>Authentication is required to access the PC/SC daemon</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+
+  <action id="org.debian.pcsc-lite.access_card">
+    <description>Access to the smart card</description>
+    <message>Authentication is required to access the smart card</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+
+</policyconfig>

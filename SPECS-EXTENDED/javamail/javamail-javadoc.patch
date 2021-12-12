@@ -1,0 +1,10 @@
+--- javamail-JAVAMAIL-1_5_2/build.xml	2014-05-03 00:52:03.000000000 +0200
++++ javamail-JAVAMAIL-1_5_2/build.xml	2019-01-21 12:35:28.859613463 +0100
+@@ -573,6 +573,7 @@
+             author="false"
+             version="false"
+             use="true"
++            source="${javac.source}"
+             overview="${release.dir}/javadoc/overview.html"
+             windowtitle="JavaMail API documentation"
+             doctitle="JavaMail API documentation">

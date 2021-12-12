@@ -1,0 +1,13 @@
+--- netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.bigendian	2005-09-07 15:42:11.000000000 +0200
++++ netkit-rusers-0.17/rpc.rstatd/rstat_proc.c	2005-09-07 15:43:29.000000000 +0200
+@@ -805,8 +805,8 @@
+ 
+ /* ======================================= */
+ 
+-	gettimeofday((struct timeval *)&stats_all.s3.curtime,
+-		(struct timezone *) 0);
++	stats_all.s3.curtime.tv_sec = tm.tv_sec;
++	stats_all.s3.curtime.tv_usec = tm.tv_usec;
+ 	alarm(1);
+ 	errno = save_errno;
+ }

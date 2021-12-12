@@ -1,0 +1,20 @@
+--- jing-trang-20091111/datatype-sample/build.xml~	2001-09-22 07:10:47.000000000 +0300
++++ jing-trang-20091111/datatype-sample/build.xml	2010-11-30 22:49:33.352540838 +0200
+@@ -1,7 +1,7 @@
+ <project name="RELAX NG Datatype Sample" default="jar" basedir=".">
+ 
+ <property name="build.dir" value="build"/>
+-<property name="jing.jar" value="jing.jar"/>
++<property name="datatype.jar" value="/usr/share/java/relaxngDatatype.jar"/>
+ 
+ <target name="init">
+   <mkdir dir="${build.dir}"/>
+@@ -9,7 +9,7 @@
+ 
+ <target name="compile" depends="init">
+   <mkdir dir="${build.dir}/classes"/>
+-  <javac srcdir="src" destdir="${build.dir}/classes" classpath="${jing.jar}"/>
++  <javac srcdir="src" destdir="${build.dir}/classes" classpath="${datatype.jar}"/>
+ </target>
+ 
+ <target name="jar" depends="compile">

@@ -1,0 +1,46 @@
+diff -up v4l-utils-1.18.0/lib/include/libdvbv5/desc_t2_delivery.h.me v4l-utils-1.18.0/lib/include/libdvbv5/desc_t2_delivery.h
+--- v4l-utils-1.18.0/lib/include/libdvbv5/desc_t2_delivery.h.me	2020-02-25 16:30:27.384727764 +0100
++++ v4l-utils-1.18.0/lib/include/libdvbv5/desc_t2_delivery.h	2020-02-25 16:30:38.872831694 +0100
+@@ -215,7 +215,7 @@ extern const unsigned dvbt2_transmission
+  * @brief converts from internal representation to string the SISO_MISO
+  *	  field of dvb_desc_t2_delivery:SISO_MISO field.
+  */
+-const char *siso_miso[4];
++extern const char *siso_miso[4];
+ 
+ #ifdef __cplusplus
+ }
+diff -up v4l-utils-1.18.0/lib/libdvbv5/dvb-v5.h.me v4l-utils-1.18.0/lib/libdvbv5/dvb-v5.h
+--- v4l-utils-1.18.0/lib/libdvbv5/dvb-v5.h.me	2020-02-25 16:28:38.513742866 +0100
++++ v4l-utils-1.18.0/lib/libdvbv5/dvb-v5.h	2020-02-25 16:29:31.495222165 +0100
+@@ -14,17 +14,17 @@ struct fe_status_name {
+ 	char *name;
+ };
+ extern struct fe_status_name fe_status_name[8];
+-const char *fe_code_rate_name[14];
+-const char *fe_modulation_name[15];
+-const char *fe_transmission_mode_name[10];
+-const unsigned fe_bandwidth_name[8];
+-const char *fe_guard_interval_name[12];
+-const char *fe_hierarchy_name[6];
+-const char *fe_voltage_name[4];
+-const char *fe_tone_name[3];
+-const char *fe_inversion_name[4];
+-const char *fe_pilot_name[4];
+-const char *fe_rolloff_name[5];
+-const char *dvb_v5_name[72];
+-const char *delivery_system_name[20];
++extern const char *fe_code_rate_name[14];
++extern const char *fe_modulation_name[15];
++extern const char *fe_transmission_mode_name[10];
++extern const unsigned fe_bandwidth_name[8];
++extern const char *fe_guard_interval_name[12];
++extern const char *fe_hierarchy_name[6];
++extern const char *fe_voltage_name[4];
++extern const char *fe_tone_name[3];
++extern const char *fe_inversion_name[4];
++extern const char *fe_pilot_name[4];
++extern const char *fe_rolloff_name[5];
++extern const char *dvb_v5_name[72];
++extern const char *delivery_system_name[20];
+ #endif

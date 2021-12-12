@@ -1,0 +1,39 @@
+--- libIDL-0.8.6/libIDL-config-2.in.multilib	2002-09-19 21:05:16.000000000 -0400
++++ libIDL-0.8.6/libIDL-config-2.in	2006-05-23 14:52:15.000000000 -0400
+@@ -1,8 +1,11 @@
+ #! /bin/sh
+ 
+-prefix=@prefix@
+-exec_prefix=@exec_prefix@
++name=libIDL-2.0
++prefix=`pkg-config --variable prefix $name`
++exec_prefix=`pkg-config --variable exec_prefix $name`
+ exec_prefix_set=no
++includedir=`pkg-config --variable includedir $name`
++libdir=`pkg-config --variable libdir $name`
+ 
+ usage()
+ {
+@@ -46,11 +49,11 @@
+       echo_exec_prefix=yes
+       ;;
+     --version)
+-      echo @LIBIDL_VERSION@
++      pkg-config --modversion $name
+       exit 0
+       ;;
+     --cflags)
+-      includes="-I@includedir@/libIDL-2.0"
++      includes="-I$includedir/libIDL-2.0"
+       echo_cflags=yes
+       ;;
+     --libs)
+@@ -75,7 +78,7 @@
+ 	all_flags="$all_flags $includes $cflags `pkg-config --cflags glib-2.0`"
+ fi
+ if test "$echo_libs" = "yes"; then
+-	all_flags="$all_flags -L@libdir@ -lIDL-2 `pkg-config --libs glib-2.0`"
++	all_flags="$all_flags -L$libdir -lIDL-2 `pkg-config --libs glib-2.0`"
+ fi
+ 
+ # Straight out any possible duplicates, but be careful to

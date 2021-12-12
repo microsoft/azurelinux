@@ -1,0 +1,11 @@
+--- XML-Handler-YAWriter-0.23/YAWriter.pm.orig	2012-11-21 10:22:40.587864541 +0100
++++ XML-Handler-YAWriter-0.23/YAWriter.pm	2012-11-21 10:24:20.070389227 +0100
+@@ -267,6 +267,8 @@ sub print {
+ 
+ 1;
+ 
++=encoding utf8
++
+ =head1 NAME
+ 
+ XML::Handler::YAWriter - Yet another Perl SAX XML Writer

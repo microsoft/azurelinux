@@ -1,0 +1,15 @@
+diff --git a/lib/format/ataraid/pdc.c.raid10_failure b/lib/format/ataraid/pdc.c
+index b0bb652..8b14d71 100644
+--- a/lib/format/ataraid/pdc.c
++++ b/lib/format/ataraid/pdc.c
+@@ -490,7 +490,9 @@ devices(struct raid_dev *rd, void *context)
+ 	if (context && pdc->raid.type != PDC_T_SPAN)
+ 		*((uint64_t *) context) += rd->sectors;
+ 
+-	return pdc->raid.total_disks;
++	return is_raid10(pdc) ?
++	       pdc->raid.total_disks / 2 :
++	       pdc->raid.total_disks;
+ }
+ 
+ static int

@@ -1,0 +1,77 @@
+diff -up jbigkit-2.1/pbmtools/pbmtojbg85.c.warnings jbigkit-2.1/pbmtools/pbmtojbg85.c
+--- jbigkit-2.1/pbmtools/pbmtojbg85.c.warnings	2008-08-26 00:26:39.000000000 +0200
++++ jbigkit-2.1/pbmtools/pbmtojbg85.c	2012-07-17 16:24:56.741332942 +0200
+@@ -72,9 +72,12 @@ static unsigned long getint(FILE *f)
+       while ((c = getc(f)) != EOF && !(c == 13 || c == 10)) ;
+   if (c != EOF) {
+     ungetc(c, f);
+-    fscanf(f, "%lu", &i);
++    if (fscanf(f, "%lu", &i) != 1) {
++      /* should never fail, since c must be a digit */
++      fprintf(stderr, "Unexpected failure reading digit '%c'\n", c);
++      exit(1);
++    }
+   }
+-
+   return i;
+ }
+ 
+@@ -239,7 +242,9 @@ int main (int argc, char **argv)
+       break;
+     case '4':
+       /* PBM raw binary format */
+-      fread(next_line, bpl, 1, fin);
++      if (fread(next_line, bpl, 1, fin) != 1) {
++	/* silence compiler warnings; ferror/feof checked below */
++      }
+       break;
+     default:
+       fprintf(stderr, "Unsupported PBM type P%c!\n", type);
+diff -up jbigkit-2.1/pbmtools/pbmtojbg.c.warnings jbigkit-2.1/pbmtools/pbmtojbg.c
+--- jbigkit-2.1/pbmtools/pbmtojbg.c.warnings	2008-07-16 22:59:41.000000000 +0200
++++ jbigkit-2.1/pbmtools/pbmtojbg.c	2012-07-17 16:23:46.584285686 +0200
+@@ -88,7 +88,11 @@ static unsigned long getint(FILE *f)
+       while ((c = getc(f)) != EOF && !(c == 13 || c == 10)) ;
+   if (c != EOF) {
+     ungetc(c, f);
+-    fscanf(f, "%lu", &i);
++    if (fscanf(f, "%lu", &i) != 1) {
++      /* should never fail, since c must be a digit */
++      fprintf(stderr, "Unexpected failure reading digit '%c'\n", c);
++      exit(1);
++    }
+   }
+ 
+   return i;
+@@ -302,7 +306,9 @@ int main (int argc, char **argv)
+     break;
+   case '4':
+     /* PBM raw binary format */
+-    fread(bitmap[0], bitmap_size, 1, fin);
++    if (fread(bitmap[0], bitmap_size, 1, fin) != 1) {
++      /* silence compiler warnings; ferror/feof checked below */
++    }
+     break;
+   case '2':
+   case '5':
+@@ -314,8 +320,18 @@ int main (int argc, char **argv)
+ 	for (j = 0; j < bpp; j++)
+ 	  image[x * bpp + (bpp - 1) - j] = v >> (j * 8);
+       }
+-    } else
+-      fread(image, width * height, bpp, fin);
++    } else {
++      if (fread(image, width * height, bpp, fin) != (size_t) bpp) {
++	if (ferror(fin)) {
++	  fprintf(stderr, "Problem while reading input file '%s", fnin);
++	  perror("'");
++	  exit(1);
++	} else {
++	  fprintf(stderr, "Unexpected end of input file '%s'!\n", fnin);
++	  exit(1);
++	}
++      }
++    }
+     jbg_split_planes(width, height, planes, encode_planes, image, bitmap,
+ 		     use_graycode);
+     free(image);

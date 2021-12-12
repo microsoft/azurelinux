@@ -1,0 +1,11 @@
+diff -up sblim-cmpi-base-1.6.1/OSBase_OperatingSystemStatisticalData.c.orig sblim-cmpi-base-1.6.1/OSBase_OperatingSystemStatisticalData.c
+--- sblim-cmpi-base-1.6.1/OSBase_OperatingSystemStatisticalData.c.orig	2012-05-10 13:19:42.628416721 +0200
++++ sblim-cmpi-base-1.6.1/OSBase_OperatingSystemStatisticalData.c	2012-05-10 13:20:38.331706857 +0200
+@@ -250,7 +250,6 @@ int get_cpu_queue_data_26(struct os_stat
+         } else {
+             _OSBASE_TRACE(1,("get_cpu_queue_data_26(): could not find cpu info"));
+         }
+-        fclose(f);
+     } else {
+         _OSBASE_TRACE(1,("get_cpu_queue_data_26(): could not open %s: %s",DATA_FILE,strerror(errno)));
+     }

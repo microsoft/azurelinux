@@ -1,0 +1,52 @@
+diff --git a/configure.ac b/configure.ac
+index c0f02df..b76c8f5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -188,7 +188,8 @@ AC_EGREP_CPP(yes,
+ ], AC_NOTE(- you have a SVR4 system) AC_DEFINE(SVR4) svr4=1)
+ if test -n "$svr4" ; then
+ oldlibs="$LIBS"
+-LIBS="$LIBS -lelf"
++# Humm we don't actually need to link against libelf for Linux
++LIBS="$LIBS"
+ AC_CHECKING(SVR4)
+ AC_TRY_LINK([#include <utmpx.h>
+ ],,
+@@ -626,14 +627,10 @@ dnl
+ AC_CHECKING(for tgetent)
+ AC_TRY_LINK(,tgetent((char *)0, (char *)0);,,
+ olibs="$LIBS"
+-LIBS="-lcurses $olibs"
+-AC_CHECKING(libcurses)
++LIBS="-ltinfo $olibs"
++AC_CHECKING(libtinfo)
+ AC_TRY_LINK(,[
+-#ifdef __hpux
+-__sorry_hpux_libcurses_is_totally_broken_in_10_10();
+-#else
+ tgetent((char *)0, (char *)0);
+-#endif
+ ],,
+ LIBS="-ltermcap $olibs"
+ AC_CHECKING(libtermcap)
+@@ -658,7 +655,7 @@ AC_MSG_ERROR(!!! no tgetent - no screen)))))))))
+ AC_TRY_RUN([
+ main()
+ {
+- exit(strcmp(tgoto("%p1%d", 0, 1), "1") ? 0 : 1);
++    return 1;
+ }], AC_NOTE(- you use the termcap database),
+ AC_NOTE(- you use the terminfo database) AC_DEFINE(TERMINFO),
+ AC_NOTE(- skipping check because we are cross compiling; assuming terminfo database is used) AC_DEFINE(TERMINFO))
+@@ -864,11 +861,6 @@ fi
+ dnl
+ dnl    ****  loadav  ****
+ dnl
+-if test "$cross_compiling" = no ; then
+-AC_CHECKING(for libutil(s))
+-test -f /usr/lib/libutils.a && LIBS="$LIBS -lutils"
+-test -f /usr/lib/libutil.a && LIBS="$LIBS -lutil"
+-fi
+ 
+ AC_CHECKING(getloadavg)
+ AC_TRY_LINK(,[getloadavg((double *)0, 0);],

@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "kxml-2.3.0-OSGI-MANIFEST.MF": "6b189e00852208949187f5948f8e9e105b9c0cf383e3c0bff297e1cdb98a3f3b",
+  "kxml-2.3.0-clean.tar.gz": "913ccbc6a6b6ca9cbb0b529ee6ab6c5a0a805a47ab75c2f0611c67b35b64ef16",
+  "kxml2-2.3.0.pom": "31ce606f4e9518936299bb0d27c978fa61e185fd1de7c9874fe959a53e34a685",
+  "kxml2-min-2.3.0.pom": "de06be3d5601c7a1559270d405ee3bccc4788932153066f05a3d752e31385e86"
+ }
+}

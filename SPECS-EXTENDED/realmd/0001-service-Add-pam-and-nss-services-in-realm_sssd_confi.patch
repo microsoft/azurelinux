@@ -1,0 +1,98 @@
+From 9d5b6f5c88df582fb94edcf5cc05a8cfaa63cf6a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fabiano=20Fid=C3=AAncio?= <fidencio@redhat.com>
+Date: Tue, 25 Apr 2017 07:20:17 +0200
+Subject: [PATCH] service: Add "pam" and "nss" services in
+ realm_sssd_config_add_domain()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+realm_sssd_config_add_domain() must setup the services line in sssd.conf
+otherwise SSSD won't be able to start any of its services.
+
+It's a regression caused by 402cbab which leaves SSSD with no services
+line when joining to an ad client doing "realm join ad.example".
+
+https://bugs.freedesktop.org/show_bug.cgi?id=98479
+
+Signed-off-by: Fabiano Fidêncio <fidencio@redhat.com>
+---
+ service/realm-sssd-ad.c     | 3 ++-
+ service/realm-sssd-config.c | 2 ++
+ service/realm-sssd-ipa.c    | 3 ++-
+ tests/test-sssd-config.c    | 4 ++--
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/service/realm-sssd-ad.c b/service/realm-sssd-ad.c
+index 5fa81ce..8543ca8 100644
+--- a/service/realm-sssd-ad.c
++++ b/service/realm-sssd-ad.c
+@@ -207,7 +207,8 @@ configure_sssd_for_domain (RealmIniConfig *config,
+ 	                                    "ldap_sasl_authid", authid,
+ 	                                    NULL);
+ 
+-	realm_ini_config_set_list_diff (config, "sssd", "services", ", ", services, NULL);
++	if (ret)
++		ret = realm_ini_config_change_list (config, "sssd", "services", ", ", services, NULL, error);
+ 
+ 	g_free (authid);
+ 	g_string_free (realmd_tags, TRUE);
+diff --git a/service/realm-sssd-config.c b/service/realm-sssd-config.c
+index d4398b9..140d7dc 100644
+--- a/service/realm-sssd-config.c
++++ b/service/realm-sssd-config.c
+@@ -130,6 +130,7 @@ realm_sssd_config_add_domain (RealmIniConfig *config,
+ 	gchar **already;
+ 	gboolean ret;
+ 	gchar *section;
++	const gchar *services[] = { "nss", "pam", NULL };
+ 	va_list va;
+ 	gint i;
+ 
+@@ -154,6 +155,7 @@ realm_sssd_config_add_domain (RealmIniConfig *config,
+ 	g_strfreev (already);
+ 
+ 	/* Setup a default sssd section */
++	realm_ini_config_set_list_diff (config, "sssd", "services", ", ", services, NULL);
+ 	if (!realm_ini_config_have (config, "sssd", "config_file_version"))
+ 		realm_ini_config_set (config, "sssd", "config_file_version", "2", NULL);
+ 
+diff --git a/service/realm-sssd-ipa.c b/service/realm-sssd-ipa.c
+index 001870d..ff1dc8a 100644
+--- a/service/realm-sssd-ipa.c
++++ b/service/realm-sssd-ipa.c
+@@ -208,7 +208,8 @@ on_ipa_client_do_restart (GObject *source,
+ 		                                 "realmd_tags", realmd_tags,
+ 		                                 NULL);
+ 
+-		realm_ini_config_set_list_diff (config, "sssd", "services", ", ", services, NULL);
++		if (error == NULL)
++			realm_ini_config_change_list (config, "sssd", "services", ", ", services, NULL, &error);
+ 
+ 		g_free (home);
+ 	}
+diff --git a/tests/test-sssd-config.c b/tests/test-sssd-config.c
+index 892b9d5..59eab75 100644
+--- a/tests/test-sssd-config.c
++++ b/tests/test-sssd-config.c
+@@ -90,7 +90,7 @@ test_add_domain (Test *test,
+                  gconstpointer unused)
+ {
+ 	const gchar *data = "[domain/one]\nval=1\n[sssd]\ndomains=one";
+-	const gchar *check = "[domain/one]\nval=1\n[sssd]\ndomains = one, two\nconfig_file_version = 2\n\n[domain/two]\ndos = 2\n";
++	const gchar *check = "[domain/one]\nval=1\n[sssd]\ndomains = one, two\nconfig_file_version = 2\nservices = nss, pam\n\n[domain/two]\ndos = 2\n";
+ 	GError *error = NULL;
+ 	gchar *output;
+ 	gboolean ret;
+@@ -140,7 +140,7 @@ static void
+ test_add_domain_only (Test *test,
+                       gconstpointer unused)
+ {
+-	const gchar *check = "\n[sssd]\ndomains = two\nconfig_file_version = 2\n\n[domain/two]\ndos = 2\n";
++	const gchar *check = "\n[sssd]\ndomains = two\nconfig_file_version = 2\nservices = nss, pam\n\n[domain/two]\ndos = 2\n";
+ 	GError *error = NULL;
+ 	gchar *output;
+ 	gboolean ret;
+-- 
+2.9.3
+

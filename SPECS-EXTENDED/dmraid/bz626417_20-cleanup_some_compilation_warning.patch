@@ -1,0 +1,63 @@
+--- a/lib/events/libdmraid-events-isw.c	
++++ a/lib/events/libdmraid-events-isw.c	
+@@ -101,13 +101,12 @@ enum rebuild_type { REBUILD_START, REBUILD_END };
+ static const char *default_dmraid_events_lib = "libdmraid-events.so";
+ static const char *sys_dm_dm = "dm-";
+ static const char *sys_block_path = "/sys/block/";
+-static const char *sys_dm_path = "/sys/block/dm-";
++//static const char *sys_dm_path = "/sys/block/dm-";
+ static const char *sys_scsi_path = "/sys/class/scsi_device/";
+ static const char *sys_slaves_dir = "/slaves";
+ static const char *sys_scsi_dev_blk = "/device/block";
+ static const char sys_scsi_dev_blk_delims[] = { '/', ':' };
+ static const char *sys_dev_dir = "/dev";
+-static const char *syslog_ident = "libdmraid-events";
+ 
+ /* Logging. */
+ enum log_type { LOG_NAMES, LOG_PORTS, LOG_OPEN_FAILURE, LOG_NONE };
+@@ -1534,7 +1533,7 @@ int register_device(const char *rs_name, const char *uuid,
+ 	/* FIXME: need to run first to get syslog() to work. */
+ 	_check_sgpio();
+ 
+-	rs_name = basename(rs_name);
++	rs_name = basename((char *)rs_name);
+ 
+ 	/* Check for double registration attempt. */
+ 	pthread_mutex_lock(&_register_mutex);
+@@ -1595,7 +1594,7 @@ int unregister_device(const char *rs_name, const char *uuid,
+ {
+ 	struct dso_raid_set *prev, *rs;
+ 
+-	rs_name = basename(rs_name);
++	rs_name = basename((char *)rs_name);
+ 
+ 	pthread_mutex_lock(&_register_mutex);
+ 
+--- a/lib/format/ataraid/isw.c	
++++ a/lib/format/ataraid/isw.c	
+@@ -1250,7 +1250,7 @@ static int
+ isw_metadata_handler(struct lib_context *lc, enum handler_commands command,
+ 		     struct handler_info *info, void *context)
+ {
+-	int idx, ret = 0;
++	int ret = 0;
+ 	struct raid_set *rs = context;
+ 	struct raid_dev *rd = list_entry(rs->devs.next, struct raid_dev, devs);
+ 	struct isw *isw, *new_isw;
+--- a/lib/register/dmreg.c	
++++ a/lib/register/dmreg.c	
+@@ -427,12 +427,12 @@ static int _validate_dev_and_dso_names(char *dev_name, char *dso_name)
+  * Function removes unnecassary path to the DSO library
+  * (leaves only library name)
+  */
+-char * dso_lib_name_prepare(char * dso_path) 
++char *dso_lib_name_prepare(char *dso_path) 
+ {
+ 	char *ptr = NULL;
+ 	char *lib_name = dso_path;
+ 
+-	while (ptr = strchr(lib_name, '/'))
++	while ((ptr = strchr(lib_name, '/')) != NULL)
+ 	    lib_name = ptr + 1;
+ 	
+ 	return lib_name;

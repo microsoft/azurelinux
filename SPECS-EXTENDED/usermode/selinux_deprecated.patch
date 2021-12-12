@@ -1,0 +1,49 @@
+diff --git a/userhelper.c b/userhelper.c
+index 4177c89..f2afde7 100644
+--- a/userhelper.c
++++ b/userhelper.c
+@@ -48,8 +48,6 @@
+ 
+ #ifdef WITH_SELINUX
+ #include <selinux/selinux.h>
+-#include <selinux/flask.h>
+-#include <selinux/av_permissions.h>
+ #endif
+ 
+ #include "shvar.h"
+@@ -111,7 +109,7 @@ static int checkAccess(unsigned int selaccess) {
+     struct av_decision avd;
+     int retval = security_compute_av(user_context,
+ 				     user_context,
+-				     SECCLASS_PASSWD,
++				     string_to_security_class("passwd"),
+ 				     selaccess,
+ 				     &avd);
+ 	  
+@@ -2267,7 +2265,8 @@ main(int argc, char **argv)
+ 	const char *new_home_phone;
+ 	const char *new_shell;
+ #ifdef WITH_SELINUX
+-	unsigned perm;
++	security_class_t class;
++	access_vector_t perm;
+ #endif
+ 
+ 	/* State variable we pass around. */
+@@ -2426,12 +2425,13 @@ main(int argc, char **argv)
+ 			user_name = g_strdup(argv[optind]);
+ 
+ #ifdef WITH_SELINUX
++			class = string_to_security_class("passwd");
+ 			if (c_flag) 
+-			  perm = PASSWD__PASSWD;
++			  perm = string_to_av_perm(class, "passwd");
+ 			else if (s_flag)
+-			  perm = PASSWD__CHSH;
++			  perm = string_to_av_perm(class, "chsh");
+ 			else
+-			  perm = PASSWD__CHFN;
++			  perm = string_to_av_perm(class, "chfn");
+ 
+ 			if (is_selinux_enabled() > 0 &&
+ 			    checkAccess(perm)!= 0) {

@@ -1,0 +1,15 @@
+[Unit]
+Description=Port reservation utility
+After=sockets.target
+Before=basic.target shutdown.target
+Conflicts=shutdown.target
+DefaultDependencies=no
+
+[Service]
+Type=forking
+PIDFile=/var/run/portreserve.pid
+ExecStart=/sbin/portreserve
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

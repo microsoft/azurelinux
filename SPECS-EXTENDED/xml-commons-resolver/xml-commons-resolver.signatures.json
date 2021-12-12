@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "xml-commons-resolver-1.2.tar.gz": "55dbe7bd56452c175320ce9a97b752252c5537427221323c72e9b9c1ac221efe",
+  "xml-commons-resolver-CatalogManager.properties": "06f9e55db5e7519a53de9321b8e6457e8643612b7b681bbe836134a002277e35",
+  "xml-commons-resolver-pom.xml": "581d5e1783ddd7b5da1365b778dc12f79671a4309d74221c4fbd935988987a9b",
+  "xml-commons-resolver-resolver.1": "e19e0f091572b18a09a224a173169cc126351b75d005d538f4880a14d44d5073",
+  "xml-commons-resolver-xparse.1": "2c0bb9b05b104d72610bb1912339621dd055b6a92da92ee5f66d828f65ee61ef",
+  "xml-commons-resolver-xread.1": "d6fb0a27b6bbfdab3e2e690fbfa77005143c630dc4e58e8fc7d98067b118f641"
+ }
+}

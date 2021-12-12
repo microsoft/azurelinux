@@ -1,0 +1,50 @@
+diff -up pegasus/Makefile.ReleaseTest.orig pegasus/Makefile.ReleaseTest
+--- pegasus/Makefile.ReleaseTest.orig	2013-07-01 12:55:50.000000000 +0200
++++ pegasus/Makefile.ReleaseTest	2015-05-18 14:28:22.642686363 +0200
+@@ -128,6 +128,7 @@ POSTSTARTTEST_CMDS = \
+    $(PEGASUS_TEST_DIR)/bin/TestIndicationStressTest@@IndicationStressTestClass@@test/TestProvider@@cleanup
+ 
+ ifeq ($(PEGASUS_USE_NET_SNMP),true)
++   POSTSTARTTEST_CMDS_NO_SNMP := $(POSTSTARTTEST_CMDS)
+    POSTSTARTTEST_CMDS += \
+    $(PEGASUS_TEST_DIR)/bin/TestSnmpHandler@@setup@@WQL \
+    $(PEGASUS_TEST_DIR)/bin/TestSnmpHandler@@run@@4@@2 \
+@@ -212,10 +213,21 @@ createMakefile_poststarttests:
+ 	@$(ECHO-E) "poststarttests:" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "\t@$(MAKE) -s poststarttests_internal\n" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "poststarttests_internal:" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++ifeq ($(PEGASUS_USE_NET_SNMP),true)
++	@$(foreach i, $(POSTSTARTTEST_CMDS_NO_SNMP), $(ECHO-E) "\t$(subst @@, ,$(i))" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile;)
++else
+ 	@$(foreach i, $(POSTSTARTTEST_CMDS), $(ECHO-E) "\t$(subst @@, ,$(i))" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile;)
+ 	@$(ECHO-E) "" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++endif
+ 
+ createMakefile_tests:
++ifeq ($(PEGASUS_USE_NET_SNMP),true)
++	@$(ECHO-E) "\t/usr/share/Pegasus/test/bin/TestSnmpHandler setup WQL" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++	@$(ECHO-E) "\t/usr/share/Pegasus/test/bin/TestSnmpHandler run 4 2" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++	@$(ECHO-E) "\t/usr/share/Pegasus/test/bin/TestSnmpHandler cleanup" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++	@$(ECHO-E) "\t/usr/share/Pegasus/test/bin/TestSnmpHandler removelog" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++	@$(ECHO-E) "" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++endif
+ 	@$(ECHO-E) "###############################################################################" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "# The tests target stops the cimserver, runs the unit tests, starts the" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "# cimserver, and runs the poststarttests and local TestClient." >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+@@ -276,6 +288,8 @@ createMakefile_setupTEST:
+                    >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "\t@mv $(PEGASUS_TEST_REPOSITORY_DIR)/$(PEGASUS_TEST_REPOSITORY_NAME) $(PEGASUS_REPOSITORY_PARENT_DIR)/repository" \
+                    >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++	@$(ECHO-E) "\t@mv /etc/snmp/snmptrapd.conf /etc/snmp/snmptrapd.conf.bak" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++	@$(ECHO-E) "\t@cp /usr/share/Pegasus/test/snmptrapd.conf /etc/snmp/snmptrapd.conf" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "\t@make cimstart" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "\t@make create_providerlinks" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "else" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+@@ -293,6 +307,7 @@ createMakefile_unsetupTEST:
+                    >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "\t@mv $(PEGASUS_REPOSITORY_PARENT_DIR)/repository.bak $(PEGASUS_REPOSITORY_PARENT_DIR)/repository" \
+                    >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
++	@$(ECHO-E) "\t@mv /etc/snmp/snmptrapd.conf.bak /etc/snmp/snmptrapd.conf" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "endif" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "\t@make remove_providerlinks" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile
+ 	@$(ECHO-E) "" >> $(PEGASUS_STAGING_DIR)$(PEGASUS_TEST_DIR)/Makefile

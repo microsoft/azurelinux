@@ -1,0 +1,44 @@
+From 043eedaffcb5ad59b5b1ab9c707476a27df8685d Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Fri, 4 Mar 2016 10:41:45 -0500
+Subject: [PATCH] Generate a password-less NSS database
+
+---
+ gencert.in | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/gencert.in b/gencert.in
+index 0fd1c67..659a9fc 100755
+--- a/gencert.in
++++ b/gencert.in
+@@ -115,7 +115,7 @@ done
+ echo "TEST = $TEST"
+ echo "SNI = $SNI"
+ 
+-echo "httptest" > $DEST/pw.txt
++echo -e "\n" > $DEST/pw.txt
+ 
+ function generate_server_sni_cert {
+     hostname=$1
+@@ -172,8 +172,7 @@ function generate_server_sni_cert {
+ 
+ echo ""
+ echo "#####################################################################"
+-echo "Generating new server certificate and key database. The password"
+-echo "is httptest"
++echo "Generating new server certificate and key database."
+ echo "#####################################################################"
+ $CERTUTIL -N -d $DBDIR -f $DEST/pw.txt
+ 
+@@ -328,8 +327,4 @@ echo "#####################################################################"
+ rm $DEST/pw.txt
+ rm $DEST/noise
+ 
+-echo ""
+-echo "The database password is httptest"
+-echo ""
+-
+ exit 0
+-- 
+2.5.0
+

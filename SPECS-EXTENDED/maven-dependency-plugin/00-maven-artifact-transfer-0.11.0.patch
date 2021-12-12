@@ -1,0 +1,339 @@
+diff --git a/pom.xml b/pom.xml
+index a87684b..fc3666e 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -228,7 +228,7 @@ under the License.
+     <dependency>
+       <groupId>org.apache.maven.shared</groupId>
+       <artifactId>maven-artifact-transfer</artifactId>
+-      <version>0.9.1</version>
++      <version>0.11.0</version>
+     </dependency>
+     <dependency>
+       <groupId>org.apache.maven.shared</groupId>
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/GetMojo.java b/src/main/java/org/apache/maven/plugins/dependency/GetMojo.java
+index a734f94..d434e64 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/GetMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/GetMojo.java
+@@ -41,14 +41,14 @@ import org.apache.maven.plugins.annotations.Mojo;
+ import org.apache.maven.plugins.annotations.Parameter;
+ import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.ProjectBuildingRequest;
+-import org.apache.maven.shared.artifact.ArtifactCoordinate;
+-import org.apache.maven.shared.artifact.DefaultArtifactCoordinate;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
+-import org.apache.maven.shared.dependencies.DefaultDependableCoordinate;
+-import org.apache.maven.shared.dependencies.DependableCoordinate;
+-import org.apache.maven.shared.dependencies.resolve.DependencyResolver;
+-import org.apache.maven.shared.dependencies.resolve.DependencyResolverException;
++import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.dependencies.DefaultDependableCoordinate;
++import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
++import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
++import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
+ import org.codehaus.plexus.util.StringUtils;
+ 
+ /**
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/PurgeLocalRepositoryMojo.java b/src/main/java/org/apache/maven/plugins/dependency/PurgeLocalRepositoryMojo.java
+index da2a11d..22f16f3 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/PurgeLocalRepositoryMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/PurgeLocalRepositoryMojo.java
+@@ -39,16 +39,13 @@ import org.apache.maven.execution.MavenSession;
+ import org.apache.maven.model.Dependency;
+ import org.apache.maven.plugin.AbstractMojo;
+ import org.apache.maven.plugin.MojoExecution;
++import org.apache.maven.plugin.MojoExecution.Source;
+ import org.apache.maven.plugin.MojoExecutionException;
+ import org.apache.maven.plugin.MojoFailureException;
+-import org.apache.maven.plugin.MojoExecution.Source;
+ import org.apache.maven.plugins.annotations.Component;
+ import org.apache.maven.plugins.annotations.Mojo;
+ import org.apache.maven.plugins.annotations.Parameter;
+ import org.apache.maven.project.MavenProject;
+-import org.apache.maven.shared.dependencies.resolve.DependencyResolver;
+-import org.apache.maven.shared.dependencies.resolve.DependencyResolverException;
+-import org.apache.maven.shared.artifact.DefaultArtifactCoordinate;
+ import org.apache.maven.shared.artifact.filter.resolve.AbstractFilter;
+ import org.apache.maven.shared.artifact.filter.resolve.AndFilter;
+ import org.apache.maven.shared.artifact.filter.resolve.Node;
+@@ -57,9 +54,13 @@ import org.apache.maven.shared.artifact.filter.resolve.PatternInclusionsFilter;
+ import org.apache.maven.shared.artifact.filter.resolve.ScopeFilter;
+ import org.apache.maven.shared.artifact.filter.resolve.TransformableFilter;
+ import org.apache.maven.shared.artifact.filter.resolve.transform.ArtifactIncludeFilterTransformer;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResult;
++import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.TransferUtils;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
++import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
++import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
+ import org.codehaus.plexus.util.FileUtils;
+ import org.codehaus.plexus.util.StringUtils;
+ 
+@@ -666,7 +667,7 @@ public class PurgeLocalRepositoryMojo
+             {
+                 //CHECKSTYLE_OFF: LineLength
+                 artifactResolver.resolveArtifact( session.getProjectBuildingRequest(),
+-                                                  org.apache.maven.shared.artifact.TransferUtils.toArtifactCoordinate( artifact ) );
++                                                  TransferUtils.toArtifactCoordinate( artifact ) );
+                 //CHECKSTYLE_ON: LineLength
+             }
+             catch ( ArtifactResolverException e )
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/fromConfiguration/AbstractFromConfigurationMojo.java b/src/main/java/org/apache/maven/plugins/dependency/fromConfiguration/AbstractFromConfigurationMojo.java
+index 3bebdee..377923c 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/fromConfiguration/AbstractFromConfigurationMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/fromConfiguration/AbstractFromConfigurationMojo.java
+@@ -36,11 +36,11 @@ import org.apache.maven.plugins.dependency.utils.DependencyUtil;
+ import org.apache.maven.plugins.dependency.utils.filters.ArtifactItemFilter;
+ import org.apache.maven.project.MavenProject;
+ import org.apache.maven.project.ProjectBuildingRequest;
+-import org.apache.maven.shared.artifact.DefaultArtifactCoordinate;
+ import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterException;
+-import org.apache.maven.shared.repository.RepositoryManager;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.repository.RepositoryManager;
+ import org.codehaus.plexus.util.StringUtils;
+ 
+ /**
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/fromConfiguration/ArtifactItem.java b/src/main/java/org/apache/maven/plugins/dependency/fromConfiguration/ArtifactItem.java
+index db215ce..2e978c3 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/fromConfiguration/ArtifactItem.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/fromConfiguration/ArtifactItem.java
+@@ -24,7 +24,7 @@ import java.io.File;
+ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.artifact.ArtifactUtils;
+ import org.apache.maven.plugins.dependency.utils.DependencyUtil;
+-import org.apache.maven.shared.dependencies.DependableCoordinate;
++import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
+ import org.codehaus.plexus.util.StringUtils;
+ 
+ /**
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/AbstractDependencyFilterMojo.java b/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/AbstractDependencyFilterMojo.java
+index ae68cb3..03c6c54 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/AbstractDependencyFilterMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/AbstractDependencyFilterMojo.java
+@@ -39,7 +39,6 @@ import org.apache.maven.project.MavenProject;
+ import org.apache.maven.project.ProjectBuilder;
+ import org.apache.maven.project.ProjectBuildingException;
+ import org.apache.maven.project.ProjectBuildingRequest;
+-import org.apache.maven.shared.artifact.ArtifactCoordinate;
+ import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterException;
+ import org.apache.maven.shared.artifact.filter.collection.ArtifactIdFilter;
+ import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
+@@ -49,10 +48,11 @@ import org.apache.maven.shared.artifact.filter.collection.GroupIdFilter;
+ import org.apache.maven.shared.artifact.filter.collection.ProjectTransitivityFilter;
+ import org.apache.maven.shared.artifact.filter.collection.ScopeFilter;
+ import org.apache.maven.shared.artifact.filter.collection.TypeFilter;
+-import org.apache.maven.shared.repository.RepositoryManager;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
+-import org.apache.maven.shared.dependencies.resolve.DependencyResolver;
++import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
++import org.apache.maven.shared.transfer.repository.RepositoryManager;
+ import org.codehaus.plexus.util.StringUtils;
+ 
+ /**
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/BuildClasspathMojo.java b/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/BuildClasspathMojo.java
+index d6458b3..f0a7cfd 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/BuildClasspathMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/BuildClasspathMojo.java
+@@ -19,20 +19,6 @@ package org.apache.maven.plugins.dependency.fromDependencies;
+  * under the License.
+  */
+ 
+-import org.apache.maven.artifact.Artifact;
+-import org.apache.maven.plugin.MojoExecutionException;
+-import org.apache.maven.plugins.dependency.utils.DependencyUtil;
+-import org.apache.maven.plugins.annotations.Component;
+-import org.apache.maven.plugins.annotations.LifecyclePhase;
+-import org.apache.maven.plugins.annotations.Mojo;
+-import org.apache.maven.plugins.annotations.Parameter;
+-import org.apache.maven.plugins.annotations.ResolutionScope;
+-import org.apache.maven.project.MavenProjectHelper;
+-import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
+-import org.apache.maven.shared.repository.RepositoryManager;
+-import org.codehaus.plexus.util.IOUtil;
+-import org.codehaus.plexus.util.StringUtils;
+-
+ import java.io.BufferedReader;
+ import java.io.BufferedWriter;
+ import java.io.File;
+@@ -48,6 +34,20 @@ import java.util.Set;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+ 
++import org.apache.maven.artifact.Artifact;
++import org.apache.maven.plugin.MojoExecutionException;
++import org.apache.maven.plugins.annotations.Component;
++import org.apache.maven.plugins.annotations.LifecyclePhase;
++import org.apache.maven.plugins.annotations.Mojo;
++import org.apache.maven.plugins.annotations.Parameter;
++import org.apache.maven.plugins.annotations.ResolutionScope;
++import org.apache.maven.plugins.dependency.utils.DependencyUtil;
++import org.apache.maven.project.MavenProjectHelper;
++import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
++import org.apache.maven.shared.transfer.repository.RepositoryManager;
++import org.codehaus.plexus.util.IOUtil;
++import org.codehaus.plexus.util.StringUtils;
++
+ /**
+  * This goal will output a classpath string of dependencies from the local repository to a file or log.
+  *
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/CopyDependenciesMojo.java b/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/CopyDependenciesMojo.java
+index 239f1c9..296fee9 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/CopyDependenciesMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/fromDependencies/CopyDependenciesMojo.java
+@@ -19,28 +19,28 @@ package org.apache.maven.plugins.dependency.fromDependencies;
+  * under the License.
+  */
+ 
++import java.io.File;
++import java.util.Collections;
++import java.util.Map;
++import java.util.Set;
++
+ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+ import org.apache.maven.plugin.MojoExecutionException;
+-import org.apache.maven.plugins.dependency.utils.DependencyStatusSets;
+-import org.apache.maven.plugins.dependency.utils.DependencyUtil;
+-import org.apache.maven.plugins.dependency.utils.filters.DestFileFilter;
+ import org.apache.maven.plugins.annotations.Component;
+ import org.apache.maven.plugins.annotations.LifecyclePhase;
+ import org.apache.maven.plugins.annotations.Mojo;
+ import org.apache.maven.plugins.annotations.Parameter;
+ import org.apache.maven.plugins.annotations.ResolutionScope;
++import org.apache.maven.plugins.dependency.utils.DependencyStatusSets;
++import org.apache.maven.plugins.dependency.utils.DependencyUtil;
++import org.apache.maven.plugins.dependency.utils.filters.DestFileFilter;
+ import org.apache.maven.project.ProjectBuildingRequest;
+-import org.apache.maven.shared.artifact.DefaultArtifactCoordinate;
+ import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
+-import org.apache.maven.shared.artifact.install.ArtifactInstaller;
+-import org.apache.maven.shared.artifact.install.ArtifactInstallerException;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
+-
+-import java.io.File;
+-import java.util.Collections;
+-import java.util.Map;
+-import java.util.Set;
++import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
++import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+ 
+ /**
+  * Goal that copies the project dependencies from the repository to a defined location.
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/resolvers/AbstractResolveMojo.java b/src/main/java/org/apache/maven/plugins/dependency/resolvers/AbstractResolveMojo.java
+index 8e50105..6947b59 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/resolvers/AbstractResolveMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/resolvers/AbstractResolveMojo.java
+@@ -34,9 +34,9 @@ import org.apache.maven.shared.artifact.filter.collection.ClassifierFilter;
+ import org.apache.maven.shared.artifact.filter.collection.FilterArtifacts;
+ import org.apache.maven.shared.artifact.filter.collection.GroupIdFilter;
+ import org.apache.maven.shared.artifact.filter.collection.TypeFilter;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResult;
+-import org.apache.maven.shared.dependencies.DependableCoordinate;
+-import org.apache.maven.shared.dependencies.resolve.DependencyResolverException;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
++import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
++import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
+ 
+ /**
+  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/resolvers/ListRepositoriesMojo.java b/src/main/java/org/apache/maven/plugins/dependency/resolvers/ListRepositoriesMojo.java
+index b930c3f..deed8d3 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/resolvers/ListRepositoriesMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/resolvers/ListRepositoriesMojo.java
+@@ -21,13 +21,13 @@ package org.apache.maven.plugins.dependency.resolvers;
+ 
+ import org.apache.maven.artifact.repository.ArtifactRepository;
+ import org.apache.maven.plugin.MojoExecutionException;
+-import org.apache.maven.plugins.dependency.AbstractDependencyMojo;
+ import org.apache.maven.plugins.annotations.Component;
+ import org.apache.maven.plugins.annotations.Mojo;
+ import org.apache.maven.plugins.annotations.ResolutionScope;
+-import org.apache.maven.shared.dependencies.collect.CollectorResult;
+-import org.apache.maven.shared.dependencies.collect.DependencyCollector;
+-import org.apache.maven.shared.dependencies.collect.DependencyCollectorException;
++import org.apache.maven.plugins.dependency.AbstractDependencyMojo;
++import org.apache.maven.shared.transfer.dependencies.collect.CollectorResult;
++import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector;
++import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
+ 
+ /**
+  * Goal that resolves all project dependencies and then lists the repositories used by the build and by the transitive
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/resolvers/ResolvePluginsMojo.java b/src/main/java/org/apache/maven/plugins/dependency/resolvers/ResolvePluginsMojo.java
+index c0aad2b..e7874ec 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/resolvers/ResolvePluginsMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/resolvers/ResolvePluginsMojo.java
+@@ -36,9 +36,9 @@ import org.apache.maven.project.ProjectBuildingRequest;
+ import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterException;
+ import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
+ import org.apache.maven.shared.artifact.filter.collection.FilterArtifacts;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
+-import org.apache.maven.shared.dependencies.DefaultDependableCoordinate;
+-import org.apache.maven.shared.dependencies.resolve.DependencyResolverException;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.dependencies.DefaultDependableCoordinate;
++import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
+ 
+ /**
+  * Goal that resolves all project plugins and reports and their dependencies.
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/utils/translators/ArtifactTranslator.java b/src/main/java/org/apache/maven/plugins/dependency/utils/translators/ArtifactTranslator.java
+index c51d9fc..ec9f6d5 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/utils/translators/ArtifactTranslator.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/utils/translators/ArtifactTranslator.java
+@@ -23,7 +23,7 @@ import java.util.Set;
+ 
+ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.plugin.logging.Log;
+-import org.apache.maven.shared.artifact.ArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
+ 
+ /**
+  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/utils/translators/ClassifierTypeTranslator.java b/src/main/java/org/apache/maven/plugins/dependency/utils/translators/ClassifierTypeTranslator.java
+index f31f523..41f51bc 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/utils/translators/ClassifierTypeTranslator.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/utils/translators/ClassifierTypeTranslator.java
+@@ -26,8 +26,8 @@ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.artifact.handler.ArtifactHandler;
+ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+ import org.apache.maven.plugin.logging.Log;
+-import org.apache.maven.shared.artifact.ArtifactCoordinate;
+-import org.apache.maven.shared.artifact.DefaultArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
++import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
+ import org.codehaus.plexus.util.StringUtils;
+ 
+ /**
+diff --git a/src/test/java/org/apache/maven/plugins/dependency/utils/translators/TestClassifierTypeTranslator.java b/src/test/java/org/apache/maven/plugins/dependency/utils/translators/TestClassifierTypeTranslator.java
+index cec0197..add9dd3 100644
+--- a/src/test/java/org/apache/maven/plugins/dependency/utils/translators/TestClassifierTypeTranslator.java
++++ b/src/test/java/org/apache/maven/plugins/dependency/utils/translators/TestClassifierTypeTranslator.java
+@@ -38,8 +38,8 @@ import org.apache.maven.plugin.testing.stubs.StubArtifactRepository;
+ import org.apache.maven.plugins.dependency.AbstractDependencyMojoTestCase;
+ import org.apache.maven.plugins.dependency.testUtils.DependencyArtifactStubFactory;
+ import org.apache.maven.project.ProjectBuildingRequest;
+-import org.apache.maven.shared.artifact.ArtifactCoordinate;
+-import org.apache.maven.shared.repository.RepositoryManager;
++import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
++import org.apache.maven.shared.transfer.repository.RepositoryManager;
+ import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
+ import org.sonatype.aether.util.DefaultRepositorySystemSession;
+ 

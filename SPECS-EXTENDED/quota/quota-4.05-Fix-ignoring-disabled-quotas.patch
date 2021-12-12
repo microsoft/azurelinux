@@ -1,0 +1,53 @@
+From 514cfb367e9c673c9c18b84a9c9c94ea84b91112 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 21 Feb 2020 10:00:05 +0100
+Subject: [PATCH] Fix ignoring disabled quotas
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+"quota" command ignores file systems without enabled quotas. (In
+contrast to "quota -f".) This works for local file systems and it used
+to work for NFS file system until this commit:
+
+    commit 4cd287f3fa3838a31eb6636366f8ce26ee6e1425
+    Author: Jan Kara <jack@suse.cz>
+    Date:   Tue May 28 10:52:49 2019 +0200
+
+        rpc: Clarify error message when cannot connect to rpc.rquotad
+
+        Currently when RPC rquota service is not registered, we report somewhat
+        confusing "No such file of directory" error. For other errors when
+        creating rquota request we report "Connection refused". There's no big
+        difference for user between these errors and neither of them tells what
+        really happened. So just unify handling of these errors and report more
+        general error telling the user where the problem is.
+
+that broke it. "quota" command now reports an error whenever at least
+one NFS-mounted file system has disabled the quotas. This renders the
+tool unusable.
+
+This patch readds an exception for the ENOENT errno that was removed
+with the commit probably by a mistake.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ quotaops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/quotaops.c b/quotaops.c
+index 1a8d7fe..0daa8ec 100644
+--- a/quotaops.c
++++ b/quotaops.c
+@@ -127,7 +127,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int ignore_noquo
+ 			char *estr;
+ 
+ 			/* If rpc.rquotad is not running, filesystem might be just without quotas... */
+-			if (ignore_noquota && errno == ECONNREFUSED)
++			if (ignore_noquota && (errno == ENOENT || errno == ECONNREFUSED))
+ 				continue;
+ 
+ 			if (errno == ECONNREFUSED) {
+-- 
+2.21.1
+

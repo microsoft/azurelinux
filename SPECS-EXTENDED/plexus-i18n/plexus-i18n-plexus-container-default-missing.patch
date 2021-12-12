@@ -1,0 +1,15 @@
+diff -Naur plexus-i18n-1.0-beta-10.orig/pom.xml plexus-i18n-1.0-beta-10/pom.xml
+--- plexus-i18n-1.0-beta-10.orig/pom.xml	2012-03-06 15:41:05.000000000 +0100
++++ plexus-i18n-1.0-beta-10/pom.xml	2012-03-06 15:54:20.383999743 +0100
+@@ -50,6 +50,11 @@
+       <artifactId>plexus-utils</artifactId>
+       <version>1.4.5</version>
+     </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-container-default</artifactId>
++      <version>1.0-alpha-9-stable-1</version>
++    </dependency>
+   </dependencies>
+ 
+   <scm>

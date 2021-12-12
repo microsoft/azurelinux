@@ -1,0 +1,13 @@
+Index: os-prober/linux-boot-probes/mounted/common/90fallback
+===================================================================
+--- os-prober.orig/linux-boot-probes/mounted/common/90fallback
++++ os-prober/linux-boot-probes/mounted/common/90fallback
+@@ -33,7 +33,7 @@ for kernpat in /vmlinuz /vmlinux /boot/v
+ 			# Dracut initramfses are named differently again.
+ 			initrdname3=$(echo "$kernfile" | sed "s/vmlinu[zx]/initramfs\*/" | sed 's/$/.img/')
+ 			# And Gentoo's also
+-			initrdname4=$(echo "$kernfile" | sed "s/kernel/initramfs\*/")
++			initrdname4=$(echo "$kernfile" | sed "s/kernel\|vmlinu[zx]/initramfs\*/")
+ 			foundinitrd=0
+ 			for initrd in $(eval ls "$initrdname" "$initrdname1" "$initrdname2" "$initrdname3" "$initrdname4" 2>/dev/null); do
+ 				if [ "$initrd" != "$kernfile" ] && [ -f "$initrd" ] && [ ! -L "$initrd" ]; then

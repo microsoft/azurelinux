@@ -1,0 +1,195 @@
+From d4e0a07a24c16b38de58c14a38b418c63106ad09 Mon Sep 17 00:00:00 2001
+From: Lukas Slebodnik <lslebodn@fedoraproject.org>
+Date: Sat, 24 Aug 2019 16:46:30 +0200
+Subject: [PATCH] [PATCH] wafsamba: Fix few SyntaxWarnings caused by regular 
+ expressions
+
+./buildtools/wafsamba/samba_utils.py:258: SyntaxWarning: invalid escape sequence \$
+  lst = re.split('(\$\{\w+\})', string)
+./buildtools/wafsamba/samba_utils.py:261: SyntaxWarning: invalid escape sequence \$
+  if re.match('\$\{\w+\}', v):
+./buildtools/wafsamba/samba_cross.py:80: SyntaxWarning: invalid escape sequence \(
+  m = re.match('\(\s*(-?\d+)\s*,\s*\"(.*)\"\s*\)', ans)
+./buildtools/wafsamba/samba_conftests.py:400: SyntaxWarning: invalid escape sequence \s
+  m = re.search('MAN%sEXT\s+=\s+(\w+)' % section, man)
+./buildtools/wafsamba/samba_abi.py:24: SyntaxWarning: invalid escape sequence \$
+  sig = re.sub('^\$[0-9]+\s=\s\{(.+)\}$', r'\1', sig)
+./buildtools/wafsamba/samba_abi.py:25: SyntaxWarning: invalid escape sequence \$
+  sig = re.sub('^\$[0-9]+\s=\s\{(.+)\}(\s0x[0-9a-f]+\s<\w+>)+$', r'\1', sig)
+./buildtools/wafsamba/samba_abi.py:26: SyntaxWarning: invalid escape sequence \$
+  sig = re.sub('^\$[0-9]+\s=\s(0x[0-9a-f]+)\s?(<\w+>)?$', r'\1', sig)
+./buildtools/wafsamba/samba_abi.py:33: SyntaxWarning: invalid escape sequence \*
+  m = m.replace('*', '\*')
+./buildtools/wafsamba/samba_abi.py:44: SyntaxWarning: invalid escape sequence \s
+  sig = re.sub(',\s\.\.\.', '', sig)
+./buildtools/wafsamba/samba_headers.py:22: SyntaxWarning: invalid escape sequence \s
+  re_header = re.compile('^\s*#\s*include[ \t]*"([^"]+)"', re.I | re.M)
+./buildtools/wafsamba/symbols.py:122: SyntaxWarning: invalid escape sequence \[
+  re_sharedlib = re.compile(b'Shared library: \[(.*)\]')
+./buildtools/wafsamba/symbols.py:124: SyntaxWarning: invalid escape sequence \[
+  re_rpath     = re.compile(b'Library (rpath|runpath): \[(.*)\]')
+./buildtools/wafsamba/pkgconfig.py:12: SyntaxWarning: invalid escape sequence \w
+  a = re.split('(@\w+@)', s)
+./buildtools/wafsamba/pkgconfig.py:17: SyntaxWarning: invalid escape sequence \w
+  if re.match('@\w+@', v):
+./buildtools/wafsamba/configure_file.py:16: SyntaxWarning: invalid escape sequence \w
+  a = re.split('(@\w+@)', s)
+./buildtools/wafsamba/configure_file.py:19: SyntaxWarning: invalid escape sequence \w
+  if re.match('@\w+@', v):
+---
+ buildtools/wafsamba/configure_file.py  |  4 ++--
+ buildtools/wafsamba/pkgconfig.py       |  4 ++--
+ buildtools/wafsamba/samba_abi.py       | 12 ++++++------
+ buildtools/wafsamba/samba_conftests.py |  2 +-
+ buildtools/wafsamba/samba_cross.py     |  2 +-
+ buildtools/wafsamba/samba_headers.py   |  2 +-
+ buildtools/wafsamba/samba_utils.py     |  4 ++--
+ buildtools/wafsamba/symbols.py         |  4 ++--
+ 8 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/buildtools/wafsamba/configure_file.py b/buildtools/wafsamba/configure_file.py
+index 6ad43546249fba7b4c0a037035e8574e7a9d2753..98a58a4604513e3633317e73299c1c9280c250d2 100644
+--- a/buildtools/wafsamba/configure_file.py
++++ b/buildtools/wafsamba/configure_file.py
+@@ -13,10 +13,10 @@ def subst_at_vars(task):
+     s = task.inputs[0].read()
+ 
+     # split on the vars
+-    a = re.split('(@\w+@)', s)
++    a = re.split(r'(@\w+@)', s)
+     out = []
+     for v in a:
+-        if re.match('@\w+@', v):
++        if re.match(r'@\w+@', v):
+             vname = v[1:-1]
+             if not vname in task.env and vname.upper() in task.env:
+                 vname = vname.upper()
+diff --git a/buildtools/wafsamba/pkgconfig.py b/buildtools/wafsamba/pkgconfig.py
+index b83d5f382a58352bb3318b594aa2b45fc02d87d5..b77bd618c8903789c7ba9e64a6972a4e080f1821 100644
+--- a/buildtools/wafsamba/pkgconfig.py
++++ b/buildtools/wafsamba/pkgconfig.py
+@@ -9,12 +9,12 @@ def subst_at_vars(task):
+ 
+     s = task.inputs[0].read()
+     # split on the vars
+-    a = re.split('(@\w+@)', s)
++    a = re.split(r'(@\w+@)', s)
+     out = []
+     done_var = {}
+     back_sub = [ ('PREFIX', '${prefix}'), ('EXEC_PREFIX', '${exec_prefix}')]
+     for v in a:
+-        if re.match('@\w+@', v):
++        if re.match(r'@\w+@', v):
+             vname = v[1:-1]
+             if not vname in task.env and vname.upper() in task.env:
+                 vname = vname.upper()
+diff --git a/buildtools/wafsamba/samba_abi.py b/buildtools/wafsamba/samba_abi.py
+index 5e7686da3d68b1ebcd842b8a319a5997fa9cf600..761667fcfe1f3937be22c8261b45dcb3979ae4cd 100644
+--- a/buildtools/wafsamba/samba_abi.py
++++ b/buildtools/wafsamba/samba_abi.py
+@@ -21,16 +21,16 @@ version_key = lambda x: list(map(int, x.split(".")))
+ def normalise_signature(sig):
+     '''normalise a signature from gdb'''
+     sig = sig.strip()
+-    sig = re.sub('^\$[0-9]+\s=\s\{(.+)\}$', r'\1', sig)
+-    sig = re.sub('^\$[0-9]+\s=\s\{(.+)\}(\s0x[0-9a-f]+\s<\w+>)+$', r'\1', sig)
+-    sig = re.sub('^\$[0-9]+\s=\s(0x[0-9a-f]+)\s?(<\w+>)?$', r'\1', sig)
+-    sig = re.sub('0x[0-9a-f]+', '0xXXXX', sig)
++    sig = re.sub(r'^\$[0-9]+\s=\s\{(.+)\}$', r'\1', sig)
++    sig = re.sub(r'^\$[0-9]+\s=\s\{(.+)\}(\s0x[0-9a-f]+\s<\w+>)+$', r'\1', sig)
++    sig = re.sub(r'^\$[0-9]+\s=\s(0x[0-9a-f]+)\s?(<\w+>)?$', r'\1', sig)
++    sig = re.sub(r'0x[0-9a-f]+', '0xXXXX', sig)
+     sig = re.sub('", <incomplete sequence (\\\\[a-z0-9]+)>', r'\1"', sig)
+ 
+     for t in abi_type_maps:
+         # we need to cope with non-word characters in mapped types
+         m = t
+-        m = m.replace('*', '\*')
++        m = m.replace('*', r'\*')
+         if m[-1].isalnum() or m[-1] == '_':
+             m += '\\b'
+         if m[0].isalnum() or m[0] == '_':
+@@ -41,7 +41,7 @@ def normalise_signature(sig):
+ 
+ def normalise_varargs(sig):
+     '''cope with older versions of gdb'''
+-    sig = re.sub(',\s\.\.\.', '', sig)
++    sig = re.sub(r',\s\.\.\.', '', sig)
+     return sig
+ 
+ 
+diff --git a/buildtools/wafsamba/samba_conftests.py b/buildtools/wafsamba/samba_conftests.py
+index ef632ba903369e4211991f17a3b204bcd96c3a2f..63e50567860ff890b00b0ce6c7607c917b7329d1 100644
+--- a/buildtools/wafsamba/samba_conftests.py
++++ b/buildtools/wafsamba/samba_conftests.py
+@@ -397,7 +397,7 @@ WriteMakefile(
+ 
+     if section:
+         man = Utils.readf(os.path.join(bdir,'Makefile'))
+-        m = re.search('MAN%sEXT\s+=\s+(\w+)' % section, man)
++        m = re.search(r'MAN%sEXT\s+=\s+(\w+)' % section, man)
+         if not m:
+             conf.end_msg('not found', color='YELLOW')
+             return
+diff --git a/buildtools/wafsamba/samba_cross.py b/buildtools/wafsamba/samba_cross.py
+index 8863c2c53e7d7dd9317c9233f0085ffd0eea6b2f..34793902fba884cf2d8358bf4315dc98027266b6 100644
+--- a/buildtools/wafsamba/samba_cross.py
++++ b/buildtools/wafsamba/samba_cross.py
+@@ -77,7 +77,7 @@ def cross_answer(ca_file, msg):
+                 f.close()
+                 return (0, ans.strip("'"))
+             else:
+-                m = re.match('\(\s*(-?\d+)\s*,\s*\"(.*)\"\s*\)', ans)
++                m = re.match(r'\(\s*(-?\d+)\s*,\s*\"(.*)\"\s*\)', ans)
+                 if m:
+                     f.close()
+                     return (int(m.group(1)), m.group(2))
+diff --git a/buildtools/wafsamba/samba_headers.py b/buildtools/wafsamba/samba_headers.py
+index a268c011c5d8e406e0d763554c55668cfb5388bc..c8bee19010978a04460b0637fcc8fd484a699ea8 100644
+--- a/buildtools/wafsamba/samba_headers.py
++++ b/buildtools/wafsamba/samba_headers.py
+@@ -19,7 +19,7 @@ def header_install_path(header, header_path):
+     return ''
+ 
+ 
+-re_header = re.compile('^\s*#\s*include[ \t]*"([^"]+)"', re.I | re.M)
++re_header = re.compile(r'^\s*#\s*include[ \t]*"([^"]+)"', re.I | re.M)
+ 
+ # a dictionary mapping source header paths to public header paths
+ header_map = {}
+diff --git a/buildtools/wafsamba/samba_utils.py b/buildtools/wafsamba/samba_utils.py
+index ad97de1859ba24c4afd5106b4f9694b0dc855643..75c9794ec40f327ef8ccf9aa33fafd6ed6181e3b 100644
+--- a/buildtools/wafsamba/samba_utils.py
++++ b/buildtools/wafsamba/samba_utils.py
+@@ -255,10 +255,10 @@ def TO_LIST(str, delimiter=None):
+ 
+ def subst_vars_error(string, env):
+     '''substitute vars, throw an error if a variable is not defined'''
+-    lst = re.split('(\$\{\w+\})', string)
++    lst = re.split(r'(\$\{\w+\})', string)
+     out = []
+     for v in lst:
+-        if re.match('\$\{\w+\}', v):
++        if re.match(r'\$\{\w+\}', v):
+             vname = v[2:-1]
+             if not vname in env:
+                 raise KeyError("Failed to find variable %s in %s in env %s <%s>" % (vname, string, env.__class__, str(env)))
+diff --git a/buildtools/wafsamba/symbols.py b/buildtools/wafsamba/symbols.py
+index 3eca3d46bd71cf0780b3c8e36a26b96bd3aa3b83..73e8ca8ce53ef5d956ac58e14a2403dd49f01109 100644
+--- a/buildtools/wafsamba/symbols.py
++++ b/buildtools/wafsamba/symbols.py
+@@ -119,9 +119,9 @@ def find_ldd_path(bld, libname, binary):
+ 
+ 
+ # some regular expressions for parsing readelf output
+-re_sharedlib = re.compile(b'Shared library: \[(.*)\]')
++re_sharedlib = re.compile(r'Shared library: \[(.*)\]')
+ # output from readelf could be `Library rpath` or `Libray runpath`
+-re_rpath     = re.compile(b'Library (rpath|runpath): \[(.*)\]')
++re_rpath     = re.compile(r'Library (rpath|runpath): \[(.*)\]')
+ 
+ def get_libs(bld, binname):
+     '''find the list of linked libraries for any binary or library
+-- 
+2.23.0.rc2
+

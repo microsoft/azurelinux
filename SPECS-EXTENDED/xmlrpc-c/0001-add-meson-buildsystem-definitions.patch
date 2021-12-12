@@ -1,0 +1,1668 @@
+From 0fa42d185e8770a49df5c0820159a25cb402a0b8 Mon Sep 17 00:00:00 2001
+From: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+Date: Sun, 18 Dec 2016 10:24:31 +0100
+Subject: [PATCH 1/2] add meson buildsystem definitions
+
+Signed-off-by: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+---
+ include/meson.build                 |   3 +
+ include/xmlrpc-c/config.h.in        |  41 +++++++
+ include/xmlrpc-c/lnsfr.sh           |   9 ++
+ include/xmlrpc-c/meson.build        |  87 ++++++++++++++
+ lib/abyss++/meson.build             |  43 +++++++
+ lib/abyss/meson.build               |   1 +
+ lib/abyss/src/meson.build           |  66 +++++++++++
+ lib/curl_transport/meson.build      |  16 +++
+ lib/expat/gennmtab/meson.build      |   4 +
+ lib/expat/meson.build               |  15 +++
+ lib/expat/xmlparse/meson.build      |  21 ++++
+ lib/expat/xmltok/meson.build        |  32 ++++++
+ lib/libutil++/meson.build           |  28 +++++
+ lib/libutil/meson.build             |  41 +++++++
+ lib/meson.build                     |  27 +++++
+ lib/openssl/meson.build             |  27 +++++
+ lib/util/meson.build                |  20 ++++
+ meson.build                         | 209 +++++++++++++++++++++++++++++++++
+ meson_options.txt                   |  13 +++
+ src/cpp/meson.build                 | 223 ++++++++++++++++++++++++++++++++++++
+ src/meson.build                     | 190 ++++++++++++++++++++++++++++++
+ tools/lib/meson.build               |   5 +
+ tools/meson.build                   |  17 +++
+ tools/xml-rpc-api2cpp/meson.build   |  21 ++++
+ tools/xml-rpc-api2txt/meson.build   |   2 +
+ tools/xml/meson.build               |  15 +++
+ tools/xmlrpc/meson.build            |  20 ++++
+ tools/xmlrpc_cpp_proxy/meson.build  |  19 +++
+ tools/xmlrpc_dumpserver/meson.build |  23 ++++
+ tools/xmlrpc_pstream/meson.build    |  21 ++++
+ tools/xmlrpc_transport/meson.build  |  18 +++
+ transport_config.h.in               |   4 +
+ xmlrpc-c-config                     | 114 ++++++++++++++++++
+ 33 files changed, 1395 insertions(+)
+ create mode 100644 include/meson.build
+ create mode 100644 include/xmlrpc-c/config.h.in
+ create mode 100755 include/xmlrpc-c/lnsfr.sh
+ create mode 100644 include/xmlrpc-c/meson.build
+ create mode 100644 lib/abyss++/meson.build
+ create mode 100644 lib/abyss/meson.build
+ create mode 100644 lib/abyss/src/meson.build
+ create mode 100644 lib/curl_transport/meson.build
+ create mode 100644 lib/expat/gennmtab/meson.build
+ create mode 100644 lib/expat/meson.build
+ create mode 100644 lib/expat/xmlparse/meson.build
+ create mode 100644 lib/expat/xmltok/meson.build
+ create mode 100644 lib/libutil++/meson.build
+ create mode 100644 lib/libutil/meson.build
+ create mode 100644 lib/meson.build
+ create mode 100644 lib/openssl/meson.build
+ create mode 100644 lib/util/meson.build
+ create mode 100644 meson.build
+ create mode 100644 meson_options.txt
+ create mode 100644 src/cpp/meson.build
+ create mode 100644 src/meson.build
+ create mode 100644 tools/lib/meson.build
+ create mode 100644 tools/meson.build
+ create mode 100644 tools/xml-rpc-api2cpp/meson.build
+ create mode 100644 tools/xml-rpc-api2txt/meson.build
+ create mode 100644 tools/xml/meson.build
+ create mode 100644 tools/xmlrpc/meson.build
+ create mode 100644 tools/xmlrpc_cpp_proxy/meson.build
+ create mode 100644 tools/xmlrpc_dumpserver/meson.build
+ create mode 100644 tools/xmlrpc_pstream/meson.build
+ create mode 100644 tools/xmlrpc_transport/meson.build
+ create mode 100644 transport_config.h.in
+ create mode 100755 xmlrpc-c-config
+
+diff --git a/include/meson.build b/include/meson.build
+new file mode 100644
+index 00000000..ec0964c0
+--- /dev/null
++++ b/include/meson.build
+@@ -0,0 +1,3 @@
++hdr_incdir = include_directories('.')
++
++subdir('xmlrpc-c')
+diff --git a/include/xmlrpc-c/config.h.in b/include/xmlrpc-c/config.h.in
+new file mode 100644
+index 00000000..e8a633e7
+--- /dev/null
++++ b/include/xmlrpc-c/config.h.in
+@@ -0,0 +1,41 @@
++#ifndef XMLRPC_C_CONFIG_H_INCULDED
++#define XMLRPC_C_CONFIG_H_INCLUDED
++
++/* This file, part of XML-RPC For C/C++, is meant to 
++   define characteristics of this particular installation 
++   that the other <xmlrpc-c/...> header files need in 
++   order to compile correctly when #included in Xmlrpc-c
++   user code.
++
++   Those header files #include this one.
++*/
++#define XMLRPC_HAVE_WCHAR @HAVE_WCHAR_H_DEFINE@
++#ifdef _WIN32
++  /* SOCKET is a type defined by <winsock.h>.  Anyone who
++     uses XMLRPC_SOCKET on a WIN32 system must #include
++     <winsock.h>
++  */
++  #define XMLRPC_SOCKET SOCKET
++  #define XMLRPC_HAVE_TIMEVAL 0
++  #define XMLRPC_HAVE_TIMESPEC 0
++  #define XMLRPC_HAVE_PTHREAD 0
++  #define XMLRPC_HAVE_WINTHREAD 1
++#else
++  #define XMLRPC_SOCKET int
++  #define XMLRPC_HAVE_TIMEVAL 1
++  #define XMLRPC_HAVE_TIMESPEC 1
++  #define XMLRPC_HAVE_PTHREAD 1
++  #define XMLRPC_HAVE_WINTHREAD 0
++#endif
++
++#if defined(_MSC_VER)
++  /* Newer MSVC has long long, but MSVC 6 does not */
++  #define XMLRPC_INT64 __int64
++  #define XMLRPC_PRId64 "I64"
++  #define XMLRPC_INT32 __int32
++#else
++  #define XMLRPC_INT64 long long
++  #define XMLRPC_PRId64 "lld"
++  #define XMLRPC_INT32 int
++#endif
++#endif
+diff --git a/include/xmlrpc-c/lnsfr.sh b/include/xmlrpc-c/lnsfr.sh
+new file mode 100755
+index 00000000..83f231b7
+--- /dev/null
++++ b/include/xmlrpc-c/lnsfr.sh
+@@ -0,0 +1,9 @@
++#!/bin/sh -efu
++
++if [ "$#" != 2 ]; then
++  exit 1
++fi
++
++tgt="$1"; shift
++src="$1"; shift
++ln -sfr "${DESTDIR}${tgt}" "${DESTDIR}${src}"
+diff --git a/include/xmlrpc-c/meson.build b/include/xmlrpc-c/meson.build
+new file mode 100644
+index 00000000..761acfd4
+--- /dev/null
++++ b/include/xmlrpc-c/meson.build
+@@ -0,0 +1,87 @@
++config_h = configure_file(input : 'config.h.in',
++                          output : 'config.h',
++                          configuration : conf)
++
++compat_links = [
++  [ 'oldxmlrpc.h',         'xmlrpc.h'                   ],
++  [ 'server.h',            'xmlrpc_server.h'            ],
++  [ 'server_abyss.h',      'xmlrpc_abyss.h'             ],
++  [ 'server_w32httpsys.h', 'xmlrpc_server_w32httpsys.h' ],
++]
++
++hdrs = [
++  join_paths(meson.current_build_dir(), 'config.h'), # config_h,
++  'inttypes.h',
++  'c_util.h',
++  'util.h',
++  'base.h',
++  'json.h',
++  'abyss.h',
++  'abyss_unixsock.h',
++  'abyss_winsock.h',
++  'server.h',
++  'server_abyss.h',
++  'server_w32httpsys.h',
++  'oldxmlrpc.h',
++]
++if get_option('cplusplus')
++  hdrs += [
++    'oldcppwrapper.hpp',
++    'girerr.hpp',
++    'girmem.hpp',
++    'base.hpp',
++    'base64.hpp',
++    'timeout.hpp',
++    'xml.hpp',
++    'registry.hpp',
++    'server_abyss.hpp',
++    'packetsocket.hpp',
++    'server_pstream.hpp',
++    'AbyssEnvironment.hpp',
++    'AbyssServer.hpp',
++    'abyss_reqhandler_xmlrpc.hpp',
++    'AbyssChanSwitch.hpp',
++    'AbyssChanSwitchUnix.hpp',
++  ]
++  compat_links += [
++    ['oldcppwrapper.hpp', 'XmlRpcCpp.h'],
++  ]
++endif
++if build_client
++  hdrs += [
++    'client.h',
++    'transport.h',
++    'client_global.h',
++  ]
++  compat_links += [
++    ['client.h', 'xmlrpc_client.h'],
++  ]
++  if get_option('cplusplus')
++    hdrs += [
++      'client.hpp',
++      'client_transport.hpp',
++      'client_simple.hpp',
++    ]
++  endif
++endif
++if get_option('cgi-server')
++  hdrs += [
++    'server_cgi.h',
++  ]
++  compat_links += [
++    ['server_cgi.h', 'xmlrpc_cgi.h'],
++  ]
++endif
++if get_option('abyss-openssl')
++  hdrs += [
++    'openssl_thread.h',
++  ]
++endif
++
++install_headers(hdrs, subdir : meson.project_name())
++# Install old names of header files for backward compatibility
++foreach compat_link : compat_links
++  tgt = join_paths(get_option('prefix'), get_option('includedir'), meson.project_name(), compat_link[0])
++  src = join_paths(get_option('prefix'), get_option('includedir'), compat_link[1])
++  meson.add_install_script('lnsfr.sh', tgt, src)
++endforeach
+diff --git a/lib/abyss++/meson.build b/lib/abyss++/meson.build
+new file mode 100644
+index 00000000..19f04cc3
+--- /dev/null
++++ b/lib/abyss++/meson.build
+@@ -0,0 +1,43 @@
++if host_machine.system() == 'windows'
++  abysspp_chan_switch = 'AbyssChanSwitchWin.cpp'
++else
++  abysspp_chan_switch = ['AbyssChanSwitchUnix.cpp']
++  if get_option('abyss-openssl')
++    abysspp_chan_switch += ['AbyssChanSwitchOpenSsl.cpp']
++  endif
++endif
++
++libxmlrpc_abysspp = library(
++  'xmlrpc_abyss++',
++  sources : [
++    'AbyssServer.cpp',
++    'AbyssChanSwitch.cpp',
++    'AbyssEnvironment.cpp',
++    abysspp_chan_switch,
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : [
++    libxmlrpc_abyss,
++    libxmlrpc_util,
++    libxmlrpc_utilpp,
++  ],
++  dependencies : [
++    socket,
++  ],
++  soversion : 8,
++  version : '8.@0@'.format(version_minor),
++  install : true,
++)
++
++pkgg.generate(
++  name : 'xmlrpc_abyss++',
++  description : 'Xmlrpc-c Abyss HTTP C++ library',
++  version : meson.project_version(),
++  requires_private : ['xmlrpc_abyss', 'xmlrpc_util', 'xmlrpc_util++'],
++  libraries : libxmlrpc_abysspp,
++  install : true,
++)
+diff --git a/lib/abyss/meson.build b/lib/abyss/meson.build
+new file mode 100644
+index 00000000..9537275d
+--- /dev/null
++++ b/lib/abyss/meson.build
+@@ -0,0 +1 @@
++subdir('src')
+diff --git a/lib/abyss/src/meson.build b/lib/abyss/src/meson.build
+new file mode 100644
+index 00000000..daa91fce
+--- /dev/null
++++ b/lib/abyss/src/meson.build
+@@ -0,0 +1,66 @@
++abyss_deps = [socket]
++if host_machine.system() == 'windows'
++  abyss_socket = 'socket_win.c'
++  abyss_thread = 'thread_windows.c'
++  abyss_deps += [threads]
++else
++  abyss_socket = ['socket_unix.c']
++  if get_option('abyss-openssl')
++    abyss_socket += ['socket_openssl.c']
++    abyss_deps += [openssl]
++  endif
++  abyss_socket += ['sockutil.c']
++
++  if get_option('abyss-threads')
++    abyss_thread = 'thread_pthread.c'
++    abyss_deps += [threads]
++  else
++    abyss_thread = 'thread_fork.c'
++  endif
++endif
++
++libxmlrpc_abyss = library(
++  'xmlrpc_abyss',
++  sources : [
++    'channel.c',
++    'chanswitch.c',
++    'conf.c',
++    'conn.c',
++    'data.c',
++    'date.c',
++    'file.c',
++    'handler.c',
++    'http.c',
++    'init.c',
++    'response.c',
++    'server.c',
++    'session.c',
++    'sessionReadRequest.c',
++    'socket.c',
++    abyss_socket,
++    'token.c',
++    abyss_thread,
++    'trace.c',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : [
++    libxmlrpc_util,
++  ],
++  dependencies : abyss_deps,
++  soversion : 3,
++  version : '3.@0@'.format(version_minor),
++  install : true,
++)
++
++pkgg.generate(
++  name : 'xmlrpc_abyss',
++  description : 'Xmlrpc-c Abyss HTTP C library',
++  version : meson.project_version(),
++  libraries : libxmlrpc_abyss,
++  requires_private : 'xmlrpc_util',
++  install : true,
++)
+diff --git a/lib/curl_transport/meson.build b/lib/curl_transport/meson.build
+new file mode 100644
+index 00000000..f5ff3040
+--- /dev/null
++++ b/lib/curl_transport/meson.build
+@@ -0,0 +1,16 @@
++libcurl = dependency('libcurl')
++if libcurl.version().version_compare('<7.16.0')
++  xmlrpc_curl_cargs = ['-DNEED_CURL_TYPES_H']
++else
++  xmlrpc_curl_cargs = []
++endif
++xmlrpc_curl_transport = declare_dependency(
++  include_directories : include_directories('.'),
++  sources : [
++    'xmlrpc_curl_transport.c',
++    'curltransaction.c',
++    'curlmulti.c',
++  ],
++  compile_args : xmlrpc_curl_cargs,
++  dependencies : libcurl,
++)
+diff --git a/lib/expat/gennmtab/meson.build b/lib/expat/gennmtab/meson.build
+new file mode 100644
+index 00000000..94764c22
+--- /dev/null
++++ b/lib/expat/gennmtab/meson.build
+@@ -0,0 +1,4 @@
++gennmtab = executable(
++  'gennmtab', 'gennmtab.c',
++  include_directories : top_incdir,
++)
+diff --git a/lib/expat/meson.build b/lib/expat/meson.build
+new file mode 100644
+index 00000000..df9ca84c
+--- /dev/null
++++ b/lib/expat/meson.build
+@@ -0,0 +1,15 @@
++subdir('gennmtab')
++subdir('xmltok')
++subdir('xmlparse')
++
++pkgg.generate(
++  name : 'xmlrpc_expat',
++  description : 'Xmlrpc-c XML parsing library',
++  version : meson.project_version(),
++  requires_private: 'xmlrpc_util',
++  libraries : [
++    libxmlrpc_xmlparse,
++    libxmlrpc_xmltok,
++  ],
++  install : true,
++)
+diff --git a/lib/expat/xmlparse/meson.build b/lib/expat/xmlparse/meson.build
+new file mode 100644
+index 00000000..39c0bf26
+--- /dev/null
++++ b/lib/expat/xmlparse/meson.build
+@@ -0,0 +1,21 @@
++xmlparse_incdir = include_directories('.')
++
++libxmlrpc_xmlparse = library(
++  'xmlrpc_xmlparse',
++  sources : [
++    'xmlparse.c',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++    xmltok_incdir,
++  ],
++  link_with : [
++    libxmlrpc_util,
++    libxmlrpc_xmltok,
++  ],
++  soversion : '3',
++  version : '3.@0@'.format(version_minor),
++  install : true,
++)
+diff --git a/lib/expat/xmltok/meson.build b/lib/expat/xmltok/meson.build
+new file mode 100644
+index 00000000..6629719c
+--- /dev/null
++++ b/lib/expat/xmltok/meson.build
+@@ -0,0 +1,32 @@
++nametab = custom_target(
++  'nametab.h',
++  output : 'nametab.h',
++  command : gennmtab,
++  capture : true,
++)
++
++if host_machine.endian() == 'big'
++  xmltok_endian_flag = '-DXML_BYTE_ORDER=21'
++else
++  xmltok_endian_flag = '-DXML_BYTE_ORDER=12'
++endif
++
++libxmlrpc_xmltok = library(
++  'xmlrpc_xmltok',
++  sources : [
++    'xmltok.c',
++    'xmlrole.c',
++    nametab,
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  c_args : [xmltok_endian_flag],
++  soversion : '3',
++  version : '3.@0@'.format(version_minor),
++  install : true,
++)
++
++xmltok_incdir = include_directories('.')
+diff --git a/lib/libutil++/meson.build b/lib/libutil++/meson.build
+new file mode 100644
+index 00000000..9764c08d
+--- /dev/null
++++ b/lib/libutil++/meson.build
+@@ -0,0 +1,28 @@
++libxmlrpc_utilpp = library(
++  'xmlrpc_util++',
++  sources : [
++    'Lock.cpp',
++    'base64.cpp',
++    'env_wrap.cpp',
++    'girerr.cpp',
++    'girmem.cpp',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : libxmlrpc_util,
++  soversion : '8',
++  version : '8.@0@'.format(version_minor),
++  install : true,
++)
++
++pkgg.generate(
++  name : 'xmlrpc_util++',
++  description : 'Xmlrpc-c C++ utility functions library',
++  version : meson.project_version(),
++  requires_private : 'xmlrpc_util',
++  libraries : libxmlrpc_utilpp,
++  install : true,
++)
+diff --git a/lib/libutil/meson.build b/lib/libutil/meson.build
+new file mode 100644
+index 00000000..bb1cc67d
+--- /dev/null
++++ b/lib/libutil/meson.build
+@@ -0,0 +1,41 @@
++# FIXME: it's default already to 1 in xmlrpc_config.h
++util_lock_pthread = ['lock_pthread.c']
++# TODO: handle mscvrt.dll properly
++util_lock_windows = [] # lock_windows.c
++
++libxmlrpc_util = library(
++  'xmlrpc_util',
++  sources : [
++    'asprintf.c',
++    'base64.c',
++    'error.c',
++    'lock_platform.c',
++    util_lock_pthread,
++    util_lock_windows,
++    'lock_none.c',
++    'make_printable.c',
++    'memblock.c',
++    'mempool.c',
++    'select.c',
++    'sleep.c',
++    'string_number.c',
++    'time.c',
++    'utf8.c',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  soversion : 4,
++  version : '4.@0@'.format(version_minor),
++  install : true,
++)
++
++pkgg.generate(
++  name : 'xmlrpc_util',
++  description : 'Xmlrpc-c utility functions library',
++  version : meson.project_version(),
++  libraries : libxmlrpc_util,
++  install : true,
++)
+diff --git a/lib/meson.build b/lib/meson.build
+new file mode 100644
+index 00000000..e78c1f83
+--- /dev/null
++++ b/lib/meson.build
+@@ -0,0 +1,27 @@
++subdir('util')
++subdir('libutil')
++if get_option('cplusplus')
++  subdir('libutil++')
++endif
++if get_option('abyss-server')
++  subdir('abyss')
++  if get_option('cplusplus')
++    subdir('abyss++')
++  endif
++endif
++if get_option('wininet-client')
++  subdir('wininet_transport')
++endif
++if get_option('curl-client')
++  subdir('curl_transport')
++endif
++if get_option('libwww-client')
++  subdir('libwww_transport')
++endif
++if not get_option('libxml2-backend')
++  subdir('expat')
++endif
++
++if openssl.found()
++  subdir('openssl')
++endif
+diff --git a/lib/openssl/meson.build b/lib/openssl/meson.build
+new file mode 100644
+index 00000000..f65a4dc1
+--- /dev/null
++++ b/lib/openssl/meson.build
+@@ -0,0 +1,27 @@
++libxmlrpc_openssl = library(
++  'xmlrpc_openssl',
++  sources : [
++    'xmlrpc_openssl_thread.c',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : [
++    libxmlrpc_util,
++  ],
++  dependencies : openssl,
++  soversion : '1',
++  version : '1.@0@'.format(version_minor),
++  install : true,
++)
++
++pkgg.generate(
++  name : 'xmlrpc_openssl',
++  description : 'Openssl convenience function from Xmlrpc-c package',
++  version : meson.project_version(),
++  requires_private : 'xmlrpc_util',
++  libraries : libxmlrpc_openssl,
++  install : true,
++)
+diff --git a/lib/util/meson.build b/lib/util/meson.build
+new file mode 100644
+index 00000000..4cae4926
+--- /dev/null
++++ b/lib/util/meson.build
+@@ -0,0 +1,20 @@
++util_incdir = include_directories('include')
++util_casprintf_dep = declare_dependency(
++  include_directories : util_incdir,
++  sources : 'casprintf.c',
++)
++util_dep = declare_dependency(
++  dependencies : util_casprintf_dep,
++  sources : [
++    'cmdline_parser.c',
++    'getoptx.c',
++    'string_parser.c',
++    'stripcaseeq.c',
++  ],
++)
++if get_option('cplusplus')
++  util_cpp_dep = declare_dependency(
++    dependencies : util_dep,
++    sources : 'cmdline_parser_cpp.cpp',
++  )
++endif
+diff --git a/meson.build b/meson.build
+new file mode 100644
+index 00000000..52a0f0eb
+--- /dev/null
++++ b/meson.build
+@@ -0,0 +1,209 @@
++project('xmlrpc-c', 'c',
++        version : '1.51.0',
++        default_options : [
++          'b_asneeded=true',
++          'b_lundef=true',
++          'warning_level=1',
++        ],
++        meson_version : '>=0.36.0')
++
++version_array = meson.project_version().split('.')
++version_major = version_array[0].to_int()
++version_minor = version_array[1].to_int()
++version_point = version_array[2].to_int()
++
++# version.h
++version_conf = configuration_data()
++version_conf.set_quoted('XMLRPC_C_VERSION', meson.project_version())
++version_conf.set('XMLRPC_VERSION_MAJOR', version_major)
++version_conf.set('XMLRPC_VERSION_MINOR', version_minor)
++version_conf.set('XMLRPC_VERSION_POINT', version_point)
++configure_file(output : 'version.h', configuration : version_conf)
++
++if get_option('wininet-client') or get_option('libwww-client')
++  error('only curl-client is implemented yet')
++endif
++
++if get_option('cplusplus')
++  add_languages('cpp')
++endif
++
++cc = meson.get_compiler('c')
++cxx = meson.get_compiler('cpp')
++
++optflags = [
++  '-Wno-uninitialized',
++  '-Wundef',
++  '-Wno-unknown-pragmas',
++]
++cflags = [
++  '-Wmissing-declarations',
++  '-Wstrict-prototypes',
++  '-Wmissing-prototypes',
++  '-Wimplicit',
++] + optflags
++cxxflags = [
++  '-Wsynth',
++] + optflags
++foreach cflag : cflags
++  if cc.has_argument(cflag)
++    add_project_arguments(cflag, language : 'c')
++  endif
++endforeach
++foreach cxxflag : cxxflags
++  if cxx.has_argument(cxxflag)
++    add_project_arguments(cxxflag, language : 'cpp')
++  endif
++endforeach
++
++pkgg = import('pkgconfig')
++
++if not cc.has_function('vsnprintf')
++  error('your C library does not provide vsnprintf')
++endif
++if not cc.has_header('stdarg.h')
++  error('stdarg.h is required to build this library')
++endif
++
++conf = configuration_data()
++
++check_headers = [
++  'wchar.h',
++  'sys/filio.h',  # Needed by Abyss on Solaris
++  'sys/ioctl.h',  # Needed by Abyss on Solaris
++  'sys/select.h',
++]
++check_functions = [
++  'wcsncmp',      # Unicode function needed by test suites
++  'setgroups',    # CygWin doesn't provide setgroups
++  'asprintf',
++  'setenv',
++  'strtoll',
++  'strtoull',
++  'strtoq',
++  'strtouq',
++  '__strtoll',
++  '__strtoull',
++  '_strtoui64',
++  'pselect',      # uclib doesn't have pselect
++  'gettimeofday', # Windows doesn't have gettimeofday
++  'localtime_r',  # Windows doesn't have localtime_r
++  'gmtime_r',     # Windows doesn't have gmtime_r
++  'strcasecmp',   # Windows doesn't have strcasecmp
++  'stricmp',
++  '_stricmp',
++]
++
++foreach hdr : check_headers
++  if cc.has_header(hdr)
++    conf.set('HAVE_@0@_DEFINE'.format(hdr.to_upper().underscorify()), 1)
++  else
++    conf.set('HAVE_@0@_DEFINE'.format(hdr.to_upper().underscorify()), 0)
++  endif
++endforeach
++foreach func : check_functions
++  if cc.has_function(func)
++    conf.set('HAVE_@0@_DEFINE'.format(func.to_upper()), 1)
++  else
++    conf.set('HAVE_@0@_DEFINE'.format(func.to_upper()), 0)
++  endif
++endforeach
++
++if not cc.compiles('''
++#include <stdarg.h>
++
++int
++main ()
++{
++  va_list list1, list2;
++  list1 = list2;
++  return 0;
++}
++               ''')
++  conf.set('VA_LIST_IS_ARRAY_DEFINE', 1)
++else
++  conf.set('VA_LIST_IS_ARRAY_DEFINE', 0)
++endif
++
++if cc.compiles('int x __attribute__((__unused__));')
++  conf.set('ATTR_UNUSED', '__attribute__((__unused__))')
++else
++  conf.set('ATTR_UNUSED', '')
++endif
++
++if host_machine.system() == 'windows'
++  conf.set('DIRECTORY_SEPARATOR', '\\')
++else
++  conf.set('DIRECTORY_SEPARATOR', '/')
++endif
++
++openssl = dependency('openssl', required : get_option('abyss-openssl'))
++if get_option('abyss-openssl')
++  conf.set('HAVE_ABYSS_OPENSSL_DEFINE', 1)
++else
++  conf.set('HAVE_ABYSS_OPENSSL_DEFINE', 0)
++endif
++
++if get_option('libwww-ssl')
++  conf.set('HAVE_LIBWWW_SSL_DEFINE', 1)
++else
++  conf.set('HAVE_LIBWWW_SSL_DEFINE', 0)
++endif
++
++configure_file(input : 'xmlrpc_config.h.in', output : 'xmlrpc_config.h', configuration : conf)
++
++ncurses = cc.find_library('ncurses', required : false)
++readline = cc.find_library('readline', required : false)
++
++build_xmlrpc_pstream = false
++
++if not get_option('wininet-client') and not get_option('curl-client') and not get_option('libwww-client')
++  build_client = false
++  build_tools = false
++  message('We are not building any client XML transport, therefore WE WILL NOT BUILD THE CLIENT LIBRARY')
++else
++  build_client = true
++  if ncurses.found() and readline.found()
++    build_xmlrpc_pstream = true
++  endif
++  build_tools = true
++  # transport_config.h
++  transport_conf = configuration_data()
++  if get_option('wininet-client')
++    transport_conf.set('MUST_BUILD_WININET_CLIENT', 1)
++    transport_conf.set_quoted('XMLRPC_DEFAULT_TRANSPORT', 'wininet')
++  else
++    transport_conf.set('MUST_BUILD_WININET_CLIENT', 0)
++  endif
++  if get_option('curl-client')
++    transport_conf.set('MUST_BUILD_CURL_CLIENT', 1)
++    transport_conf.set_quoted('XMLRPC_DEFAULT_TRANSPORT', 'curl')
++  else
++    transport_conf.set('MUST_BUILD_CURL_CLIENT', 0)
++  endif
++  if get_option('libwww-client')
++    transport_conf.set('MUST_BUILD_LIBWWW_CLIENT', 1)
++    transport_conf.set_quoted('XMLRPC_DEFAULT_TRANSPORT', 'libwww')
++  else
++    transport_conf.set('MUST_BUILD_LIBWWW_CLIENT', 0)
++  endif
++  configure_file(input : 'transport_config.h.in', output : 'transport_config.h', configuration : transport_conf)
++endif
++
++threads = dependency('threads')
++socket = cc.find_library('socket', required : false)
++
++if get_option('libxml2-backend')
++  libxml2 = dependency('libxml-2.0')
++endif
++
++top_incdir = include_directories('.')
++
++subdir('include')
++subdir('lib')
++subdir('src')
++if build_tools
++  subdir('tools')
++endif
++
++install_data('xmlrpc-c-config', install_dir : get_option('bindir'))
+diff --git a/meson_options.txt b/meson_options.txt
+new file mode 100644
+index 00000000..4e2c1607
+--- /dev/null
++++ b/meson_options.txt
+@@ -0,0 +1,13 @@
++option('wininet-client',  type : 'boolean', value : false, description : 'Build the Wininet client XML transport')
++option('curl-client',     type : 'boolean', value : true,  description : 'Build the Curl client XML transport')
++option('libwww-client',   type : 'boolean', value : false, description : 'Build the Libwww client XML transport')
++
++option('abyss-server',    type : 'boolean', value : true,  description : 'Build the Abyss server module')
++option('abyss-threads',   type:  'boolean', value : true,  description : 'Use fork in Abyss instead of pthreads')
++option('abyss-openssl',   type:  'boolean', value : true,  description : 'Build Abyss Openssl channel function')
++option('cgi-server',      type : 'boolean', value : true,  description : 'Build the CGI server module')
++
++option('cplusplus',       type : 'boolean', value : true,  description : 'Build the C++ wrapper classes or tools')
++
++option('libwww-ssl',      type : 'boolean', value : false, description : 'Use SSL with libwww')
++option('libxml2-backend', type : 'boolean', value : false, description : 'Use libxml2 instead of built-in expat')
+diff --git a/src/cpp/meson.build b/src/cpp/meson.build
+new file mode 100644
+index 00000000..f0fd74f6
+--- /dev/null
++++ b/src/cpp/meson.build
+@@ -0,0 +1,223 @@
++libxmlrpc_cpp = library(
++  'xmlrpc_cpp',
++  sources : [
++    'XmlRpcCpp.cpp',
++  ],
++  include_directories : [
++    hdr_incdir,
++  ],
++  link_with : [
++    libxmlrpc,
++    libxmlrpc_util,
++    libxmlrpc_server,
++  ],
++  soversion : 8,
++  version : '8.@0@'.format(version_minor),
++  install : true,
++)
++
++libxmlrpcpp = library(
++  'xmlrpc++',
++  sources : [
++    'fault.cpp',
++    'global.cpp',
++    'outcome.cpp',
++    'param_list.cpp',
++    'value.cpp',
++    'xml.cpp',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : [
++    libxmlrpc,
++    libxmlrpc_util,
++    libxmlrpc_utilpp,
++  ],
++  soversion : 8,
++  version : '8.@0@'.format(version_minor),
++  install : true,
++)
++pkgg.generate(
++  name : 'xmlrpc++',
++  description : 'Xmlrpc-c basic XML-RPC C++ library',
++  version : meson.project_version(),
++  requires_private : ['xmlrpc', 'xmlrpc_util', 'xmlrpc_util++'],
++  libraries : libxmlrpcpp,
++  install : true,
++)
++
++libxmlrpc_serverpp = library(
++  'xmlrpc_server++',
++  sources : [
++    'registry.cpp',
++  ],
++  include_directories : [
++    hdr_incdir,
++  ],
++  link_with : [
++    libxmlrpc,
++    libxmlrpcpp,
++    libxmlrpc_server,
++    libxmlrpc_util,
++    libxmlrpc_utilpp,
++  ],
++  soversion : 8,
++  version : '8.@0@'.format(version_minor),
++  install : true,
++)
++pkgg.generate(
++  name : 'xmlrpc_server++',
++  description : 'Xmlrpc-c XML-RPC server C++ library',
++  version : meson.project_version(),
++  requires_private : ['xmlrpc', 'xmlrpc++', 'xmlrpc_server', 'xmlrpc_util', 'xmlrpc_util++'],
++  libraries : libxmlrpc_serverpp,
++  install : true,
++)
++
++if get_option('abyss-server')
++  libxmlrpc_server_abysspp = library(
++    'xmlrpc_server_abyss++',
++    sources : [
++      'server_abyss.cpp',
++      'abyss_reqhandler_xmlrpc.cpp',
++    ],
++    include_directories : [
++      top_incdir,
++      hdr_incdir,
++      util_incdir,
++    ],
++    link_with : [
++      libxmlrpc_abyss,
++      libxmlrpc_abysspp,
++      libxmlrpc_serverpp,
++      libxmlrpc_server_abyss,
++      libxmlrpc_util,
++      libxmlrpc_utilpp,
++    ],
++    soversion : 8,
++    version : '8.@0@'.format(version_minor),
++    install : true,
++  )
++  pkgg.generate(
++    name : 'xmlrpc_server_abyss++',
++    description : 'Xmlrpc-c Abyss XML-RPC server C++ library',
++    version : meson.project_version(),
++    requires_private : ['xmlrpc_abyss', 'xmlrpc_abyss++', 'xmlrpc_server++', 'xmlrpc_server_abyss', 'xmlrpc_util', 'xmlrpc_util++'],
++    libraries : libxmlrpc_server_abysspp,
++    install : true,
++  )
++endif
++
++if get_option('cgi-server')
++  libxmlrpc_server_cgipp = library(
++    'xmlrpc_server_cgi++',
++    sources : [
++      'server_cgi.cpp',
++    ],
++    include_directories : [
++      top_incdir,
++      hdr_incdir,
++    ],
++    link_with : [
++      libxmlrpc,
++      libxmlrpcpp,
++      libxmlrpc_serverpp,
++      libxmlrpc_utilpp,
++    ],
++    soversion : 8,
++    version : '8.@0@'.format(version_minor),
++    install : true,
++  )
++endif
++
++libxmlrpc_packetsocket = library(
++  'xmlrpc_packetsocket',
++  sources : [
++    'packetsocket.cpp',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : [
++    libxmlrpcpp,
++    libxmlrpc_utilpp,
++  ],
++  soversion : 8,
++  version : '8.@0@'.format(version_minor),
++  install : true,
++)
++
++if build_xmlrpc_pstream
++  libxmlrpc_server_pstreampp = library(
++    'xmlrpc_server_pstream++',
++    sources : [
++      'server_pstream_conn.cpp',
++      'server_pstream.cpp',
++    ],
++    include_directories : [
++      top_incdir,
++      hdr_incdir,
++    ],
++    link_with : [
++      libxmlrpcpp,
++      libxmlrpc_serverpp,
++      libxmlrpc_packetsocket,
++      libxmlrpc_utilpp,
++    ],
++    soversion : 8,
++    version : '8.@0@'.format(version_minor),
++    install : true,
++  )
++  pkgg.generate(
++    name : 'xmlrpc_server_pstream',
++    description : 'Xmlrpc-c packet-stream XML-RPC server library',
++    version : meson.project_version(),
++    requires_private : ['xmlrpc++', 'xmlrpc_server++', 'xmlrpc_util++'],
++    libraries : [libxmlrpc_server_pstreampp, libxmlrpc_packetsocket],
++    install : true,
++  )
++endif
++
++if build_client
++  libxmlrpc_clientpp = library(
++    'xmlrpc_client++',
++    sources : [
++      'client.cpp',
++      'client_simple.cpp',
++      'curl.cpp',
++      'libwww.cpp',
++      'wininet.cpp',
++      'pstream.cpp',
++    ],
++    include_directories : [
++      top_incdir,
++      hdr_incdir,
++      util_incdir,
++    ],
++    link_with : [
++      libxmlrpc,
++      libxmlrpcpp,
++      libxmlrpc_client,
++      libxmlrpc_packetsocket,
++      libxmlrpc_util,
++      libxmlrpc_utilpp,
++    ],
++    soversion : 8,
++    version : '8.@0@'.format(version_minor),
++    install : true,
++  )
++  pkgg.generate(
++    name : 'xmlrpc_client++',
++    description : 'Xmlrpc-c XML-RPC client C++ library',
++    version : meson.project_version(),
++    requires_private : ['xmlrpc', 'xmlrpc++', 'xmlrpc_client', 'xmlrpc_util', 'xmlrpc_util++'],
++    libraries : libxmlrpc_clientpp,
++    libraries_private : libxmlrpc_packetsocket,
++    install : true,
++  )
++endif
+diff --git a/src/meson.build b/src/meson.build
+new file mode 100644
+index 00000000..8dd22486
+--- /dev/null
++++ b/src/meson.build
+@@ -0,0 +1,190 @@
++xmlrpc_deps = []
++xmlrpc_incs = []
++xmlrpc_libs = [libxmlrpc_util]
++xmlrpc_pkgconfig_req = ['xmlrpc_util']
++# TODO: handle clients
++
++if get_option('libxml2-backend')
++  xmlrpc_xml_parser = 'xmlrpc_libxml2.c'
++  xmlrpc_deps += [libxml2]
++  xmlrpc_pkgconfig_req += ['libxml-2.0']
++else
++  xmlrpc_xml_parser = 'xmlrpc_expat.c'
++  xmlrpc_incs += [xmlparse_incdir]
++  xmlrpc_libs += [libxmlrpc_xmlparse]
++  xmlrpc_pkgconfig_req += ['xmlrpc_expat']
++endif
++
++libxmlrpc = library(
++  'xmlrpc',
++  sources : [
++    'base_global.c',
++    'double.c',
++    'json.c',
++    'parse_datetime.c',
++    'parse_value.c',
++    'resource.c',
++    'trace.c',
++    'version.c',
++    'xmlrpc_data.c',
++    'xmlrpc_datetime.c',
++    'xmlrpc_string.c',
++    'xmlrpc_array.c',
++    'xmlrpc_struct.c',
++    'xmlrpc_build.c',
++    'xmlrpc_decompose.c',
++    xmlrpc_xml_parser,
++    'xmlrpc_parse.c',
++    'xmlrpc_serialize.c',
++    'xmlrpc_authcookie.c',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ] + xmlrpc_incs,
++  link_with : xmlrpc_libs,
++  dependencies : xmlrpc_deps,
++  soversion : 3,
++  version : '3.@0@'.format(version_minor),
++  install : true,
++)
++pkgg.generate(
++  name : 'xmlrpc',
++  description : 'Xmlrpc-c basic XML-RPC library',
++  version : meson.project_version(),
++  requires_private : xmlrpc_pkgconfig_req,
++  libraries : libxmlrpc,
++  install : true,
++)
++
++libxmlrpc_server = library(
++  'xmlrpc_server',
++  sources : [
++    'registry.c',
++    'method.c',
++    'system_method.c',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : [
++    libxmlrpc,
++    libxmlrpc_util,
++  ],
++  soversion : 3,
++  version : '3.@0@'.format(version_minor),
++  install : true,
++)
++pkgg.generate(
++  name : 'xmlrpc_server',
++  description : 'Xmlrpc-c XML-RPC server library',
++  version : meson.project_version(),
++  requires_private : ['xmlrpc', 'xmlrpc_util'],
++  libraries : libxmlrpc_server,
++  install : true,
++)
++
++if get_option('abyss-server')
++  libxmlrpc_server_abyss = library(
++    'xmlrpc_server_abyss',
++    sources : [
++      'xmlrpc_server_abyss.c',
++      'abyss_handler.c',
++    ],
++    include_directories : [
++      top_incdir,
++      hdr_incdir,
++      util_incdir,
++    ],
++    link_with : [
++      libxmlrpc,
++      libxmlrpc_server,
++      libxmlrpc_abyss,
++      libxmlrpc_util,
++    ],
++    soversion : 3,
++    version : '3.@0@'.format(version_minor),
++    install : true,
++  )
++  pkgg.generate(
++    name : 'xmlrpc_server_abyss',
++    description : 'Xmlrpc-c Abyss XML-RPC server library',
++    version : meson.project_version(),
++    requires_private : ['xmlrpc', 'xmlrpc_server', 'xmlrpc_abyss', 'xmlrpc_util'],
++    libraries : libxmlrpc_server_abyss,
++    install : true,
++  )
++endif
++
++if get_option('cgi-server')
++  libxmlrpc_server_cgi = library(
++    'xmlrpc_server_cgi',
++    sources : [
++      'xmlrpc_server_cgi.c',
++    ],
++    include_directories : [
++      top_incdir,
++      hdr_incdir,
++      util_incdir,
++    ],
++    link_with : [
++      libxmlrpc,
++      libxmlrpc_server,
++      libxmlrpc_util,
++    ],
++    soversion : 3,
++    version : '3.@0@'.format(version_minor),
++    install : true,
++  )
++  pkgg.generate(
++    name : 'xmlrpc_server_cgi',
++    description : 'Xmlrpc-c CGI XML-RPC server library',
++    version : meson.project_version(),
++    requires_private : ['xmlrpc', 'xmlrpc_server', 'xmlrpc_util'],
++    libraries : libxmlrpc_server_cgi,
++    install : true,
++  )
++endif
++
++if build_client
++  xmlrpc_client_transports = []
++  if get_option('curl-client')
++    xmlrpc_client_transports += [xmlrpc_curl_transport]
++  endif
++  libxmlrpc_client = library(
++    'xmlrpc_client',
++    sources : [
++      'xmlrpc_client.c',
++      'xmlrpc_client_global.c',
++      'xmlrpc_server_info.c',
++    ],
++    include_directories : [
++      top_incdir,
++      hdr_incdir,
++      util_incdir,
++    ],
++    link_with : [
++      libxmlrpc,
++      libxmlrpc_util,
++    ],
++    dependencies : xmlrpc_client_transports,
++    soversion : 3,
++    version : '3.@0@'.format(version_minor),
++    install : true,
++  )
++  pkgg.generate(
++    name : 'xmlrpc_client',
++    description : 'Xmlrpc-c XML-RPC client library',
++    version : meson.project_version(),
++    requires_private : ['xmlrpc', 'xmlrpc_util'],
++    libraries : libxmlrpc_client,
++    install : true,
++  )
++endif
++
++if get_option('cplusplus')
++  subdir('cpp')
++endif
+diff --git a/tools/lib/meson.build b/tools/lib/meson.build
+new file mode 100644
+index 00000000..fc6929b8
+--- /dev/null
++++ b/tools/lib/meson.build
+@@ -0,0 +1,5 @@
++dumpvalue = declare_dependency(
++  include_directories : include_directories('include'),
++  sources : 'dumpvalue.c',
++  link_with : [libxmlrpc_util, libxmlrpc],
++)
+diff --git a/tools/meson.build b/tools/meson.build
+new file mode 100644
+index 00000000..f48a28f9
+--- /dev/null
++++ b/tools/meson.build
+@@ -0,0 +1,17 @@
++subdir('lib')
++subdir('xml')
++if build_client
++  subdir('xmlrpc')
++  subdir('xmlrpc_transport')
++  if get_option('cplusplus')
++    subdir('xml-rpc-api2cpp')
++    subdir('xml-rpc-api2txt')
++    subdir('xmlrpc_cpp_proxy')
++    if build_xmlrpc_pstream
++      subdir('xmlrpc_pstream')
++    endif
++  endif
++endif
++if get_option('cplusplus')
++  subdir('xmlrpc_dumpserver')
++endif
+diff --git a/tools/xml-rpc-api2cpp/meson.build b/tools/xml-rpc-api2cpp/meson.build
+new file mode 100644
+index 00000000..ec01212f
+--- /dev/null
++++ b/tools/xml-rpc-api2cpp/meson.build
+@@ -0,0 +1,21 @@
++executable(
++  'xml-rpc-api2cpp',
++  sources : [
++    'xml-rpc-api2cpp.cpp',
++    'DataType.cpp',
++    'XmlRpcFunction.cpp',
++    'XmlRpcClass.cpp',
++    'SystemProxy.cpp',
++  ],
++  include_directories : [
++    hdr_incdir,
++  ],
++  link_with : [
++    libxmlrpc,
++    libxmlrpc_client,
++    libxmlrpc_cpp,
++    libxmlrpc_util,
++  ],
++  install : true,
++)
++install_man('xml-rpc-api2cpp.1')
+diff --git a/tools/xml-rpc-api2txt/meson.build b/tools/xml-rpc-api2txt/meson.build
+new file mode 100644
+index 00000000..2a0a61e8
+--- /dev/null
++++ b/tools/xml-rpc-api2txt/meson.build
+@@ -0,0 +1,2 @@
++install_data('xml-rpc-api2txt', install_dir : get_option('bindir'))
++install_man('xml-rpc-api2txt.1')
+diff --git a/tools/xml/meson.build b/tools/xml/meson.build
+new file mode 100644
+index 00000000..2d856c60
+--- /dev/null
++++ b/tools/xml/meson.build
+@@ -0,0 +1,15 @@
++executable(
++  'xmlrpc_parsecall',
++  sources : [
++    'xmlrpc_parsecall.c',
++  ],
++  dependencies : [
++    util_casprintf_dep,
++    dumpvalue,
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++  ],
++  install : true,
++)
+diff --git a/tools/xmlrpc/meson.build b/tools/xmlrpc/meson.build
+new file mode 100644
+index 00000000..e1e8d552
+--- /dev/null
++++ b/tools/xmlrpc/meson.build
+@@ -0,0 +1,20 @@
++executable(
++  'xmlrpc',
++  sources : [
++    'xmlrpc.c',
++  ],
++  dependencies : [
++    dumpvalue,
++    util_dep,
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : [
++    libxmlrpc,
++    libxmlrpc_client,
++  ],
++  install : true,
++)
+diff --git a/tools/xmlrpc_cpp_proxy/meson.build b/tools/xmlrpc_cpp_proxy/meson.build
+new file mode 100644
+index 00000000..f3fc9988
+--- /dev/null
++++ b/tools/xmlrpc_cpp_proxy/meson.build
+@@ -0,0 +1,19 @@
++executable(
++  'xmlrpc_cpp_proxy',
++  sources : [
++    'xmlrpc_cpp_proxy.cpp',
++    'xmlrpcMethod.cpp',
++    'xmlrpcType.cpp',
++    'proxyClass.cpp',
++    'systemProxy.cpp',
++  ],
++  include_directories : [
++    hdr_incdir,
++  ],
++  link_with : [
++    libxmlrpcpp,
++    libxmlrpc_clientpp,
++    libxmlrpc_utilpp,
++  ],
++  install : true,
++)
+diff --git a/tools/xmlrpc_dumpserver/meson.build b/tools/xmlrpc_dumpserver/meson.build
+new file mode 100644
+index 00000000..b7aa7cfc
+--- /dev/null
++++ b/tools/xmlrpc_dumpserver/meson.build
+@@ -0,0 +1,23 @@
++executable(
++  'xmlrpc_dumpserver',
++  sources : [
++    'xmlrpc_dumpserver.c',
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++    util_incdir,
++  ],
++  link_with : [
++    libxmlrpc,
++    libxmlrpc_server,
++    libxmlrpc_server_abyss,
++    libxmlrpc_util,
++  ],
++  dependencies : [
++    util_dep,
++    util_casprintf_dep,
++    dumpvalue,
++  ],
++  install : true,
++)
+diff --git a/tools/xmlrpc_pstream/meson.build b/tools/xmlrpc_pstream/meson.build
+new file mode 100644
+index 00000000..9cd3eb85
+--- /dev/null
++++ b/tools/xmlrpc_pstream/meson.build
+@@ -0,0 +1,21 @@
++executable(
++  'xmlrpc_pstream',
++  sources : [
++    'xmlrpc_pstream.cpp',
++  ],
++  dependencies : [
++    dumpvalue,
++    util_cpp_dep,
++    readline,
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++  ],
++  link_with : [
++    libxmlrpcpp,
++    libxmlrpc_clientpp,
++    libxmlrpc_utilpp,
++  ],
++  install : true,
++)
+diff --git a/tools/xmlrpc_transport/meson.build b/tools/xmlrpc_transport/meson.build
+new file mode 100644
+index 00000000..cbb6f835
+--- /dev/null
++++ b/tools/xmlrpc_transport/meson.build
+@@ -0,0 +1,18 @@
++executable(
++  'xmlrpc_transport',
++  sources : [
++    'xmlrpc_transport.c',
++  ],
++  dependencies : [
++    util_dep,
++  ],
++  include_directories : [
++    top_incdir,
++    hdr_incdir,
++  ],
++  link_with : [
++    libxmlrpc_client,
++    libxmlrpc_util,
++  ],
++  install : true,
++)
+diff --git a/transport_config.h.in b/transport_config.h.in
+new file mode 100644
+index 00000000..687fdaf2
+--- /dev/null
++++ b/transport_config.h.in
+@@ -0,0 +1,4 @@
++#define MUST_BUILD_WININET_CLIENT @MUST_BUILD_WININET_CLIENT@
++#define MUST_BUILD_CURL_CLIENT @MUST_BUILD_CURL_CLIENT@
++#define MUST_BUILD_LIBWWW_CLIENT @MUST_BUILD_LIBWWW_CLIENT@
++static const char * const XMLRPC_DEFAULT_TRANSPORT = @XMLRPC_DEFAULT_TRANSPORT@;
+diff --git a/xmlrpc-c-config b/xmlrpc-c-config
+new file mode 100755
+index 00000000..25f95194
+--- /dev/null
++++ b/xmlrpc-c-config
+@@ -0,0 +1,114 @@
++#!/bin/sh
++
++comp=
++
++need_cxx=
++need_client=
++need_server=
++need_abyss_server=
++need_pstream=
++need_packetsocket=
++need_cgi=
++need_abyss=
++need_openssl=
++
++show_help() {
++    cat <<EOF
++Usage: xmlrpc-c-config <feature> ... <option> ...
++
++The features are:
++  c++            legacy C++ wrapper API
++  c++2           modern C++ API
++  client         client functions
++  cgi-server     CGI-based server functions
++  abyss-server   ABYSS-based server functions
++  pstream-server pstream-based server functions
++  server-util    basic server functions (implied by *-server)
++  abyss          Abyss HTTP server (not necessary with abyss-server)
++  openssl        Openssl convenience functions
++
++Options are:
++  --version      The version number of the package
++  --features     List all features (aka modules) currently installed
++  --cflags       C compiler flags to use when '#include'ing package headers
++  --libs         Libraries and flags to use when linking programs normally
++  --ldadd        Libraries to use with automake
++  --ldflags      Flags to use with automake & libtool
++  --prefix       The prefix under which the package was installed
++EOF
++    exit $1
++}
++
++test $# -ne 0 || show_help 1 >&2
++
++while test $# -gt 0; do
++    case $1 in
++      (c++)                  comp="$comp xmlrpc_cpp";;
++      (server-util)          need_server=1;;
++      (cgi-server)           need_cgi=1;;
++      (c++2)                 need_cxx=1;;
++      (abyss-server)         need_abyss_server=1;;
++      (pstream-server)       need_pstream=1;;
++      (packetsocket)         need_packetsocket=1;;
++      (client|libwww-client) need_client=1;;
++      (abyss)                need_abyss=1;;
++      (openssl)              need_openssl=1;;
++      (--help) show_help 0;;
++      (--) shift; break;;
++      (--*) break;;
++      (*)
++      echo "Unrecognized token '$1'"
++      exit 1
++      ;;
++    esac
++    shift
++done
++
++if test -z "$need_cxx"; then
++    test -z "$need_client"       || comp="$comp xmlrpc_client"
++    test -z "$need_abyss_server" || comp="$comp xmlrpc_server_abyss"
++    test -z "$need_abyss"        || comp="$comp xmlrpc_abyss"
++    test -z "$need_server"       || comp="$comp xmlrpc_server"
++    test -z "$need_cgi"          || comp="$comp xmlrpc_server_cgi"
++else
++    test -z "$need_client"       || comp="$comp xmlrpc_client++"
++    test -z "$need_abyss_server" || comp="$comp xmlrpc_server_abyss++"
++    test -z "$need_abyss"        || comp="$comp xmlrpc_abyss++"
++    test -z "$need_server"       || comp="$comp xmlrpc_server++"
++    test -z "$need_cgi"          || comp="$comp xmlrpc_server_cgi++"
++fi
++
++test -z "$need_packetsocket" || comp="$comp xmlrpc_packetsocket"
++test -z "$need_pstream"      || comp="$comp xmlrpc_server_pstream++"
++test -z "$need_openssl"      || comp="$comp xmlrpc_openssl"
++test -n "$comp"              || comp="xmlrpc xmlrpc_util"
++
++case $1 in
++  (--features|--modules)
++  echo "c++ abyss-server curl-client"
++  exit 0
++  ;;
++  (--version)
++  comp=xmlrpc
++  set -- --modversion
++  ;;
++  (--exec-prefix)
++  comp=xmlrpc
++  set -- --variable=prefix
++  ;;
++  (--*dir|--prefix)
++  comp=xmlrpc
++  set -- --variable=${1##--}
++  ;;
++  (--ldflags)
++  set -- --libs-only-L
++  ;;
++  (--ldadd)
++  set -- --libs-only-l
++  ;;
++  (--cflags)
++  set -- "$1"
++  ;;
++esac
++
++exec pkg-config "$@" $comp

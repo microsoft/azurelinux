@@ -1,0 +1,23 @@
+diff --git a/build.xml b/build.xml
+index 54d43fe..ed57763 100644
+--- a/build.xml
++++ b/build.xml
+@@ -13,17 +13,8 @@
+ 
+     <target name="generator" description="Build code generator tool">
+         <java-to-jar srcdir="hamcrest-generator/src/main/java"
+-                     modulename="hamcrest-generator-nodeps"
++                     modulename="hamcrest-generator"
+                      classpath="lib/generator/qdox.jar"/>
+-
+-        <!-- Bundle QDox classes in hamcrest-generator.jar using JarJar to place classes under a different package -->
+-        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/generator/jarjar.jar"/>
+-        <jarjar jarfile="build/hamcrest-generator-${version}.jar">
+-            <zipfileset src="build/hamcrest-generator-nodeps-${version}.jar"/>
+-            <zipfileset src="lib/generator/qdox.jar"/>
+-            <rule pattern="com.thoughtworks.qdox.**" result="org.hamcrest.generator.qdox.@1"/>
+-        </jarjar>
+-        <copy file="build/hamcrest-generator-nodeps-${version}-sources.jar" tofile="build/hamcrest-generator-${version}-sources.jar"/>
+     </target>
+ 
+     <target name="core" depends="generator" description="Build core Hamcrest library">

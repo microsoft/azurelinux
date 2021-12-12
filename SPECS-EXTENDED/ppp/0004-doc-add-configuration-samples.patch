@@ -1,0 +1,341 @@
+From d7faeb88f684c8b2ae193b2c5b5b358ac757fcfa Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Fri, 4 Apr 2014 11:39:09 +0200
+Subject: [PATCH 04/27] doc: add configuration samples
+
+---
+ sample/auth-down     |  17 ++++++
+ sample/auth-up       |  17 ++++++
+ sample/ip-down       |  22 ++++++++
+ sample/ip-up         |  23 ++++++++
+ sample/options       | 153 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ sample/options.ttyXX |  14 +++++
+ sample/pap-secrets   |  28 ++++++++++
+ 7 files changed, 274 insertions(+)
+ create mode 100644 sample/auth-down
+ create mode 100644 sample/auth-up
+ create mode 100644 sample/ip-down
+ create mode 100644 sample/ip-up
+ create mode 100644 sample/options
+ create mode 100644 sample/options.ttyXX
+ create mode 100644 sample/pap-secrets
+
+diff --git a/sample/auth-down b/sample/auth-down
+new file mode 100644
+index 0000000..edde65d
+--- /dev/null
++++ b/sample/auth-down
+@@ -0,0 +1,17 @@
++#!/bin/sh
++#
++# A program or script which is executed after the remote system
++# successfully authenticates itself. It is executed with the parameters
++# <interface-name> <peer-name> <user-name> <tty-device> <speed>
++#
++
++#
++# The environment is cleared before executing this script
++# so the path must be reset
++#
++PATH=/usr/sbin:/sbin:/usr/bin:/bin
++export PATH
++
++echo auth-down `date +'%y/%m/%d %T'` $* >> /var/log/pppstats
++
++# last line
+diff --git a/sample/auth-up b/sample/auth-up
+new file mode 100644
+index 0000000..54722a3
+--- /dev/null
++++ b/sample/auth-up
+@@ -0,0 +1,17 @@
++#!/bin/sh
++#
++# A program or script which is executed after the remote system
++# successfully authenticates itself. It is executed with the parameters
++# <interface-name> <peer-name> <user-name> <tty-device> <speed>
++#
++
++#
++# The environment is cleared before executing this script
++# so the path must be reset
++#
++PATH=/usr/sbin:/sbin:/usr/bin:/bin
++export PATH
++
++echo auth-up `date +'%y/%m/%d %T'` $* >> /var/log/pppstats
++
++# last line
+diff --git a/sample/ip-down b/sample/ip-down
+new file mode 100644
+index 0000000..b771fb6
+--- /dev/null
++++ b/sample/ip-down
+@@ -0,0 +1,22 @@
++#!/bin/sh
++#
++# This script is run by the pppd _after_ the link is brought down.
++# It should be used to delete routes, unset IP addresses etc.
++#
++# This script is called with the following arguments:
++#    Arg  Name               Example
++#    $1   Interface name     ppp0
++#    $2   The tty            ttyS1
++#    $3   The link speed     38400
++#    $4   Local IP number    12.34.56.78
++#    $5   Peer  IP number    12.34.56.99
++#
++
++#
++# The  environment is cleared before executing this script
++# so the path must be reset
++#
++PATH=/usr/sbin:/sbin:/usr/bin:/bin
++export PATH
++
++# last line
+diff --git a/sample/ip-up b/sample/ip-up
+new file mode 100644
+index 0000000..7ce7c8d
+--- /dev/null
++++ b/sample/ip-up
+@@ -0,0 +1,23 @@
++#!/bin/sh
++#
++# This script is run by the pppd after the link is established.
++# It should be used to add routes, set IP address, run the mailq
++# etc.
++#
++# This script is called with the following arguments:
++#    Arg  Name               Example
++#    $1   Interface name     ppp0
++#    $2   The tty            ttyS1
++#    $3   The link speed     38400
++#    $4   Local IP number    12.34.56.78
++#    $5   Peer  IP number    12.34.56.99
++#
++
++#
++# The  environment is cleared before executing this script
++# so the path must be reset
++#
++PATH=/usr/sbin:/sbin:/usr/bin:/bin
++export PATH
++
++# last line
+diff --git a/sample/options b/sample/options
+new file mode 100644
+index 0000000..8d0a3f9
+--- /dev/null
++++ b/sample/options
+@@ -0,0 +1,153 @@
++# /etc/ppp/options
++
++# The name of this server. Often, the FQDN is used here.
++#name <host>
++
++# Enforce the use of the hostname as the name of the local system for
++# authentication purposes (overrides the name option).
++usehostname
++
++# If no local IP address is given, pppd will use the first IP address
++# that belongs to the local hostname. If "noipdefault" is given, this
++# is disabled and the peer will have to supply an IP address.
++noipdefault
++
++# With this option, pppd will accept the peer's idea of our local IP
++# address, even if the local IP address was specified in an option.
++#ipcp-accept-local
++
++# With this option, pppd will accept the peer's idea of its (remote) IP
++# address, even if the remote IP address was specified in an option.
++#ipcp-accept-remote
++
++# Specify which DNS Servers the incoming Win95 or WinNT Connection should use
++# Two Servers can be remotely configured
++#ms-dns 192.168.1.1
++#ms-dns 192.168.1.2
++
++# Specify which WINS Servers the incoming connection Win95 or WinNT should use
++#wins-addr 192.168.1.50
++#wins-addr 192.168.1.51
++
++# enable this on a server that already has a permanent default route
++#nodefaultroute
++
++# Run the executable or shell command specified after pppd has terminated
++# the link.  This script could, for example, issue commands to the modem
++# to cause it to hang up if hardware modem control signals were not
++# available.
++# If mgetty is running, it will reset the modem anyway. So there is no need
++# to do it here.
++#disconnect "chat -- \d+++\d\c OK ath0 OK"
++
++# Increase debugging level (same as -d). The debug output is written
++# to syslog LOG_LOCAL2.
++debug
++
++# Enable debugging code in the kernel-level PPP driver.  The argument n
++# is a number which is the sum of the following values: 1 to enable
++# general debug messages, 2 to request that the contents of received
++# packets be printed, and 4 to request that the contents of transmitted
++# packets be printed.
++#kdebug n
++
++# Require the peer to authenticate itself before allowing network
++# packets to be sent or received.
++# Please do not disable this setting. It is expected to be standard in
++# future releases of pppd. Use the call option (see manpage) to disable
++# authentication for specific peers.
++#auth
++
++# authentication can either be pap or chap. As most people only want to
++# use pap, you can also disable chap:
++#require-pap
++#refuse-chap
++
++# Use hardware flow control (i.e. RTS/CTS) to control the flow of data
++# on the serial port.
++crtscts
++
++# Specifies that pppd should use a UUCP-style lock on the serial device
++# to ensure exclusive access to the device.
++lock
++
++# Use the modem control lines.
++modem
++
++# async character map -- 32-bit hex; each bit is a character
++# that needs to be escaped for pppd to receive it.  0x00000001
++# represents '\x01', and 0x80000000 represents '\x1f'.
++# To allow pppd to work over a rlogin/telnet connection, ou should escape
++# XON (^Q), XOFF  (^S) and ^]: (The peer should use "escape ff".)
++#asyncmap  200a0000
++asyncmap 0
++
++# Specifies that certain characters should be escaped on transmission
++# (regardless of whether the peer requests them to be escaped with its
++# async control character map).  The characters to be escaped are
++# specified as a list of hex numbers separated by commas.  Note that
++# almost any character can be specified for the escape option, unlike
++# the asyncmap option which only allows control characters to be
++# specified.  The characters which may not be escaped are those with hex
++# values 0x20 - 0x3f or 0x5e.
++#escape 11,13,ff
++
++# Set the MRU [Maximum Receive Unit] value to <n> for negotiation.  pppd
++# will ask the peer to send packets of no more than <n> bytes. The
++# minimum MRU value is 128.  The default MRU value is 1500.  A value of
++# 296 is recommended for slow links (40 bytes for TCP/IP header + 256
++# bytes of data).
++#mru 542
++
++# Set the MTU [Maximum Transmit Unit] value to <n>. Unless the peer
++# requests a smaller value via MRU negotiation, pppd will request that
++# the kernel networking code send data packets of no more than n bytes
++# through the PPP network interface.
++#mtu <n>
++
++# Set the interface netmask to <n>, a 32 bit netmask in "decimal dot"
++# notation (e.g. 255.255.255.0).
++#netmask 255.255.255.0
++
++# Don't fork to become a background process (otherwise pppd will do so
++# if a serial device is specified).
++nodetach
++
++# Set the assumed name of the remote system for authentication purposes
++# to <n>.
++#remotename <n>
++
++# Add an entry to this system's ARP [Address Resolution Protocol]
++# table with the IP address of the peer and the Ethernet address of this
++# system. {proxyarp,noproxyarp}
++proxyarp
++
++# Use the system password database for authenticating the peer using
++# PAP. Note: mgetty already provides this option. If this is specified
++# then dialin from users using a script under Linux to fire up ppp wont work.
++#login
++
++# If this option is given, pppd will send an LCP echo-request frame to
++# the peer every n seconds. Under Linux, the echo-request is sent when
++# no packets have been received from the peer for n seconds. Normally
++# the peer should respond to the echo-request by sending an echo-reply.
++# This option can be used with the lcp-echo-failure option to detect
++# that the peer is no longer connected.
++lcp-echo-interval 30
++
++# If this option is given, pppd will presume the peer to be dead if n
++# LCP echo-requests are sent without receiving a valid LCP echo-reply.
++# If this happens, pppd will terminate the connection.  Use of this
++# option requires a non-zero value for the lcp-echo-interval parameter.
++# This option can be used to enable pppd to terminate after the physical
++# connection has been broken (e.g., the modem has hung up) in
++# situations where no hardware modem control lines are available.
++lcp-echo-failure 4
++
++# Specifies that pppd should disconnect if the link is idle for n seconds.
++idle 600
++
++# Disable the IPXCP and IPX protocols.
++noipx
++
++# ---<End of File>---
+diff --git a/sample/options.ttyXX b/sample/options.ttyXX
+new file mode 100644
+index 0000000..d4202f5
+--- /dev/null
++++ b/sample/options.ttyXX
+@@ -0,0 +1,14 @@
++# If you need to set up multiple serial lines then copy this file to
++# options.<ttyname> for each tty with a modem on it.
++#
++# The options.tty file will assign an IP address to each PPP connection
++# as it comes up. They must all be distinct!
++#
++# Example:
++# options.ttyS1		for com2 under DOS.
++#
++# Edit the following line so that the first IP address
++# mentioned is the ip address of the serial port while the second
++# is the IP address of your host
++#
++hostname-s1:hostname
+diff --git a/sample/pap-secrets b/sample/pap-secrets
+new file mode 100644
+index 0000000..098971b
+--- /dev/null
++++ b/sample/pap-secrets
+@@ -0,0 +1,28 @@
++# Secrets for authentication using PAP
++# client	server	secret			IP addresses
++
++# OUTBOUND CONNECTIONS
++# Here you should add your userid password to connect to your providers via
++# pap. The * means that the password is to be used for ANY host you connect
++# to. Thus you do not have to worry about the foreign machine name. Just
++# replace password with your password.
++# If you have different providers with different passwords then you better
++# remove the following line.
++#hostname	*	password
++
++# INBOUND CONNECTIONS
++#client		hostname	<password>	192.168.1.1
++
++# If you add "auth login -chap +pap" to /etc/mgetty+sendfax/login.config,
++# all users in /etc/passwd can use their password for pap-authentication.
++#
++# Every regular user can use PPP and has to use passwords from /etc/passwd
++#*	hostname	""
++# UserIDs that cannot use PPP at all. Check your /etc/passwd and add any
++# other accounts that should not be able to use pppd! Replace hostname
++# with your local hostname.
++#guest		hostname	"*"	-
++#master		hostname	"*"	-
++#root		hostname	"*"	-
++#support	hostname	"*"	-
++#stats		hostname	"*"	-
+-- 
+1.8.3.1
+

@@ -1,0 +1,33 @@
+From 2f2adbedfff4d846e039d06ef932c867a8616523 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 12 May 2016 08:28:17 +0200
+Subject: [PATCH 1/2] Port to plexus-utils 3.0.24
+
+---
+ .../apache/maven/doxia/siterenderer/DefaultSiteRenderer.java   | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/doxia-site-renderer/src/main/java/org/apache/maven/doxia/siterenderer/DefaultSiteRenderer.java b/doxia-site-renderer/src/main/java/org/apache/maven/doxia/siterenderer/DefaultSiteRenderer.java
+index 9bc3ef2..c31688d 100644
+--- a/doxia-site-renderer/src/main/java/org/apache/maven/doxia/siterenderer/DefaultSiteRenderer.java
++++ b/doxia-site-renderer/src/main/java/org/apache/maven/doxia/siterenderer/DefaultSiteRenderer.java
+@@ -559,7 +559,15 @@ public class DefaultSiteRenderer
+         // doxiaSiteRendererVersion
+         InputStream inputStream = this.getClass().getResourceAsStream( "/META-INF/"
+             + "maven/org.apache.maven.doxia/doxia-site-renderer/pom.properties" );
+-        Properties properties = PropertyUtils.loadProperties( inputStream );
++        Properties properties;
++        try
++        {
++            properties = PropertyUtils.loadProperties( inputStream );
++        }
++        catch ( IOException exc )
++        {
++            properties = null;
++        }
+         if ( inputStream == null )
+         {
+             getLogger().debug( "pom.properties for doxia-site-renderer could not be found." );
+-- 
+2.9.3
+

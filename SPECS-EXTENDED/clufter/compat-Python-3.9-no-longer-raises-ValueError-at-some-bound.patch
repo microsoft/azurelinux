@@ -1,0 +1,119 @@
+From 2b1b834972a8834410d9e0c348c9aeda07c010af Mon Sep 17 00:00:00 2001
+From: Jan Pokorný <jpokorny@redhat.com>
+Date: Jan 18 2020 00:06:11 +0000
+Subject: compat: Python 3.9 no longer raises ValueError at some boundary imports
+
+
+References:
+https://docs.python.org/3.9/whatsnew/3.9.html#changes-in-the-python-api
+
+Signed-off-by: Jan Pokorný <jpokorny@redhat.com>
+
+---
+
+diff --git a/filters/cluster/__init__.py b/filters/cluster/__init__.py
+index ee33a32..e3cac49 100644
+--- a/filters/cluster/__init__.py
++++ b/filters/cluster/__init__.py
+@@ -1,5 +1,5 @@
+ # -*- coding: UTF-8 -*-
+-# Copyright 2017 Red Hat, Inc.
++# Copyright 2020 Red Hat, Inc.
+ # Part of clufter project
+ # Licensed under GPLv2+ (a copy included | http://gnu.org/licenses/gpl-2.0.txt)
+ __author__ = "Jan Pokorný <jpokorny @at@ Red Hat .dot. com>"
+@@ -8,7 +8,7 @@ __author__ = "Jan Pokorný <jpokorny @at@ Red Hat .dot. com>"
+ try:
+     from ....utils_2to3 import bytes_enc, str_enc
+     from ....utils_xslt import xslt_is_member
+-except ValueError:  # Value?
++except (ImportError, ValueError):
+     from ...utils_2to3 import bytes_enc, str_enc
+     from ...utils_xslt import xslt_is_member
+ 
+@@ -234,7 +234,7 @@ from time import time
+ try:
+     from ....utils import lazystring
+     from ....utils_prog import getenv_namespaced
+-except ValueError:  # Value?
++except (ImportError, ValueError):
+     from ...utils import lazystring
+     from ...utils_prog import getenv_namespaced
+ 
+@@ -323,7 +323,7 @@ ccs2needlexml = lazystring(lambda: ('''\
+ try:
+     from .... import package_name, version
+     from ....utils_xslt import xslt_id_friendly
+-except ValueError:
++except (ImportError, ValueError):
+     from ... import package_name, version
+     from ...utils_xslt import xslt_id_friendly
+ ccsflat2cibprelude_self_id = ' '.join((package_name(), version))
+@@ -492,7 +492,7 @@ ccsflat2cibprelude = ('''\
+ # following 2nd chance import is to allow direct usage context (testing, etc.)
+ try:
+     from ....utils_xslt import xslt_is_member
+-except ValueError:  # Value?
++except (ImportError, ValueError):
+     from ...utils_xslt import xslt_is_member
+ 
+ ccs_revitalize_fa_domain = tuple(
+@@ -673,7 +673,7 @@ ccs_obfuscate_identifiers = '''\
+ # following 2nd chance import is to allow direct usage context (testing, etc.)
+ try:
+     from ....filters._2pcscmd import coro2pcscmd
+-except ValueError:  # Value?
++except (ImportError, ValueError):
+     from ...filters._2pcscmd import coro2pcscmd
+ 
+ ccspcmk2pcscmd = coro2pcscmd(cman='', node='clusternode', totem='')
+diff --git a/filters/cluster/rm/_fs.py b/filters/cluster/rm/_fs.py
+index 8e588fa..9387845 100644
+--- a/filters/cluster/rm/_fs.py
++++ b/filters/cluster/rm/_fs.py
+@@ -1,5 +1,5 @@
+ # -*- coding: UTF-8 -*-
+-# Copyright 2017 Red Hat, Inc.
++# Copyright 2020 Red Hat, Inc.
+ # Part of clufter project
+ # Licensed under GPLv2+ (a copy included | http://gnu.org/licenses/gpl-2.0.txt)
+ __author__ = "Jan Pokorný <jpokorny @at@ Red Hat .dot. com>"
+@@ -7,7 +7,7 @@ __author__ = "Jan Pokorný <jpokorny @at@ Red Hat .dot. com>"
+ # following 2nd chance import is to allow direct usage context (testing, etc.)
+ try:
+     from ....utils_xslt import xslt_is_member
+-except ValueError:  # Value?
++except (ImportError, ValueError):
+     from ...utils_xslt import xslt_is_member
+ 
+ ###
+@@ -18,7 +18,7 @@ except ValueError:  # Value?
+ 
+ try:
+     from ....utils_cib import ResourceSpec
+-except ValueError:
++except (ImportError, ValueError):
+     from ...utils_cib import ResourceSpec
+ 
+ ccsflat2cibprelude = ('''
+diff --git a/filters/corosync/__init__.py b/filters/corosync/__init__.py
+index cff1a2a..611955d 100644
+--- a/filters/corosync/__init__.py
++++ b/filters/corosync/__init__.py
+@@ -1,5 +1,5 @@
+ # -*- coding: UTF-8 -*-
+-# Copyright 2015 Red Hat, Inc.
++# Copyright 2020 Red Hat, Inc.
+ # Part of clufter project
+ # Licensed under GPLv2+ (a copy included | http://gnu.org/licenses/gpl-2.0.txt)
+ __author__ = "Jan Pokorný <jpokorny @at@ Red Hat .dot. com>"
+@@ -9,7 +9,7 @@ __author__ = "Jan Pokorný <jpokorny @at@ Red Hat .dot. com>"
+ # following 2nd chance import is to allow direct usage context (testing, etc.)
+ try:
+     from ....filters._2pcscmd import coro2pcscmd
+-except ValueError:  # Value?
++except (ImportError, ValueError):
+     from ...filters._2pcscmd import coro2pcscmd
+ 
+ needlexml2pcscmd = coro2pcscmd(node='', quorum='', totem='')
+

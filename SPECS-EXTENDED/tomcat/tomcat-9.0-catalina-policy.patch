@@ -1,0 +1,20 @@
+--- conf/catalina.policy.orig	2020-04-22 14:51:13.734893403 -0400
++++ conf/catalina.policy	2020-04-22 15:14:57.609677967 -0400
+@@ -51,6 +51,17 @@ grant codeBase "file:${java.home}/lib/ex
+ };
+ 
+ 
++// ========== RHEL SPECIFIC CODE PERMISSIONS =======================================
++
++
++// Allowing everything in /usr/share/java allows too many unknowns to be permitted
++// Specifying the individual jars that tomcat needs to function with the security manager
++// is the safest way forward.
++grant codeBase "file:/usr/share/java/ecj/ecj.jar" {
++        permission java.security.AllPermission;
++};
++
++
+ // ========== CATALINA CODE PERMISSIONS =======================================
+ 
+ 

@@ -1,0 +1,32 @@
+From 242878ac1cefd1ef99c2e5d84a794f72e49e28be Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Fri, 23 Oct 2009 13:12:16 +0200
+Subject: [PATCH] Repair reattach of kernel driver if it was unbound
+
+Drah in the header for USBDEVFS_CONNECT.
+
+Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
+---
+ libgphoto2_port/usb/libusb.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/libgphoto2_port/usb/libusb.c b/libgphoto2_port/usb/libusb.c
+index d1535a5..c8a63f1 100644
+--- a/libgphoto2_port/usb/libusb.c
++++ b/libgphoto2_port/usb/libusb.c
+@@ -38,6 +38,12 @@
+ #include <gphoto2/gphoto2-port-result.h>
+ #include <gphoto2/gphoto2-port-log.h>
+ 
++#if defined(LIBUSB_HAS_GET_DRIVER_NP) && defined(LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP)
++/* Pull in USBDEVFS_CONNECT */
++#include <sys/ioctl.h>
++#include <linux/usbdevice_fs.h>
++#endif
++
+ #ifdef ENABLE_NLS
+ #  include <libintl.h>
+ #  undef _
+-- 
+1.6.5.rc2
+

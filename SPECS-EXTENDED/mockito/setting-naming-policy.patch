@@ -1,0 +1,34 @@
+From 04e36a01e93c3b79caa9f7e9e8573fe2a0d65d1a Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Thu, 5 Dec 2013 16:53:36 +0100
+Subject: [PATCH] Setting naming policy
+
+Signed-off-by: Michael Simacek <msimacek@redhat.com>
+---
+ src/org/mockito/internal/creation/cglib/CGLIBHacker.java | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/org/mockito/internal/creation/cglib/CGLIBHacker.java b/src/org/mockito/internal/creation/cglib/CGLIBHacker.java
+index 172f744..de53ab1 100644
+--- a/src/org/mockito/internal/creation/cglib/CGLIBHacker.java
++++ b/src/org/mockito/internal/creation/cglib/CGLIBHacker.java
+@@ -20,6 +20,9 @@ public class CGLIBHacker implements Serializable {
+             Field createInfoField = reflectOnCreateInfo(methodProxy);
+             createInfoField.setAccessible(true);
+             Object createInfo = createInfoField.get(methodProxy);
++            if (createInfo == null) {
++                return;
++            }
+             Field namingPolicyField = createInfo.getClass().getDeclaredField("namingPolicy");
+             namingPolicyField.setAccessible(true);
+             if (namingPolicyField.get(createInfo) == null) {
+@@ -43,4 +46,4 @@ public class CGLIBHacker implements Serializable {
+         }
+         return cglibMethodProxyClass.getDeclaredField("createInfo");
+     }
+-}
+\ No newline at end of file
++}
+-- 
+1.8.3.1
+

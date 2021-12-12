@@ -1,0 +1,51 @@
+diff --git a/doxia-modules/build.xml b/doxia-modules/build.xml
+--- a/doxia-modules/build.xml
++++ b/doxia-modules/build.xml
+@@ -11,7 +11,6 @@
+     <ant antfile="build.xml" dir="doxia-module-confluence" target="clean"/>
+     <ant antfile="build.xml" dir="doxia-module-docbook-simple" target="clean"/>
+     <ant antfile="build.xml" dir="doxia-module-fml" target="clean"/>
+-    <ant antfile="build.xml" dir="doxia-module-fo" target="clean"/>
+     <ant antfile="build.xml" dir="doxia-module-latex" target="clean"/>
+     <ant antfile="build.xml" dir="doxia-module-rtf" target="clean"/>
+     <ant antfile="build.xml" dir="doxia-module-twiki" target="clean"/>
+@@ -29,7 +28,6 @@
+     <ant antfile="build.xml" dir="doxia-module-confluence" target="compile"/>
+     <ant antfile="build.xml" dir="doxia-module-docbook-simple" target="compile"/>
+     <ant antfile="build.xml" dir="doxia-module-fml" target="compile"/>
+-    <ant antfile="build.xml" dir="doxia-module-fo" target="compile"/>
+     <ant antfile="build.xml" dir="doxia-module-latex" target="compile"/>
+     <ant antfile="build.xml" dir="doxia-module-rtf" target="compile"/>
+     <ant antfile="build.xml" dir="doxia-module-twiki" target="compile"/>
+@@ -47,7 +45,6 @@
+     <ant antfile="build.xml" dir="doxia-module-confluence" target="compile-tests"/>
+     <ant antfile="build.xml" dir="doxia-module-docbook-simple" target="compile-tests"/>
+     <ant antfile="build.xml" dir="doxia-module-fml" target="compile-tests"/>
+-    <ant antfile="build.xml" dir="doxia-module-fo" target="compile-tests"/>
+     <ant antfile="build.xml" dir="doxia-module-latex" target="compile-tests"/>
+     <ant antfile="build.xml" dir="doxia-module-rtf" target="compile-tests"/>
+     <ant antfile="build.xml" dir="doxia-module-twiki" target="compile-tests"/>
+@@ -65,7 +62,6 @@
+     <ant antfile="build.xml" dir="doxia-module-confluence" target="test"/>
+     <ant antfile="build.xml" dir="doxia-module-docbook-simple" target="test"/>
+     <ant antfile="build.xml" dir="doxia-module-fml" target="test"/>
+-    <ant antfile="build.xml" dir="doxia-module-fo" target="test"/>
+     <ant antfile="build.xml" dir="doxia-module-latex" target="test"/>
+     <ant antfile="build.xml" dir="doxia-module-rtf" target="test"/>
+     <ant antfile="build.xml" dir="doxia-module-twiki" target="test"/>
+@@ -83,7 +79,6 @@
+     <ant antfile="build.xml" dir="doxia-module-confluence" target="javadoc"/>
+     <ant antfile="build.xml" dir="doxia-module-docbook-simple" target="javadoc"/>
+     <ant antfile="build.xml" dir="doxia-module-fml" target="javadoc"/>
+-    <ant antfile="build.xml" dir="doxia-module-fo" target="javadoc"/>
+     <ant antfile="build.xml" dir="doxia-module-latex" target="javadoc"/>
+     <ant antfile="build.xml" dir="doxia-module-rtf" target="javadoc"/>
+     <ant antfile="build.xml" dir="doxia-module-twiki" target="javadoc"/>
+@@ -101,7 +96,6 @@
+     <ant antfile="build.xml" dir="doxia-module-confluence" target="package"/>
+     <ant antfile="build.xml" dir="doxia-module-docbook-simple" target="package"/>
+     <ant antfile="build.xml" dir="doxia-module-fml" target="package"/>
+-    <ant antfile="build.xml" dir="doxia-module-fo" target="package"/>
+     <ant antfile="build.xml" dir="doxia-module-latex" target="package"/>
+     <ant antfile="build.xml" dir="doxia-module-rtf" target="package"/>
+     <ant antfile="build.xml" dir="doxia-module-twiki" target="package"/>

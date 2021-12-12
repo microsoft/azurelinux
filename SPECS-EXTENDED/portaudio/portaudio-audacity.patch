@@ -1,0 +1,188 @@
+diff -wruN portaudio/include/pa_unix_oss.h portaudio-v19/include/pa_unix_oss.h
+--- portaudio/include/pa_unix_oss.h	1969-12-31 18:00:00.000000000 -0600
++++ portaudio-v19/include/pa_unix_oss.h	2012-12-14 22:34:14.290247100 -0600
+@@ -0,0 +1,52 @@
++#ifndef PA_UNIX_OSS_H
++#define PA_UNIX_OSS_H
++
++/*
++ * $Id: portaudio.patch,v 1.10 2009-06-30 04:52:59 llucius Exp $
++ * PortAudio Portable Real-Time Audio Library
++ * OSS-specific extensions
++ *
++ * Copyright (c) 1999-2000 Ross Bencina and Phil Burk
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files
++ * (the "Software"), to deal in the Software without restriction,
++ * including without limitation the rights to use, copy, modify, merge,
++ * publish, distribute, sublicense, and/or sell copies of the Software,
++ * and to permit persons to whom the Software is furnished to do so,
++ * subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * Any person wishing to distribute modifications to the Software is
++ * requested to send the modifications to the original developer so that
++ * they can be incorporated into the canonical version.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
++ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
++ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
++ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++/** @file
++ * OSS-specific PortAudio API extension header file.
++ */
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++const char *PaOSS_GetStreamInputDevice( PaStream *s );
++
++const char *PaOSS_GetStreamOutputDevice( PaStream *s );
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+diff -wruN portaudio/include/portaudio.h portaudio-v19/include/portaudio.h
+--- portaudio/include/portaudio.h	2012-08-31 19:10:13.000000000 -0500
++++ portaudio-v19/include/portaudio.h	2012-12-14 22:34:14.368247200 -0600
+@@ -1146,6 +1146,15 @@
+ signed long Pa_GetStreamWriteAvailable( PaStream* stream );
+ 
+ 
++/** Retrieve the host type handling an open stream.
++
++ @return Returns a non-negative value representing the host API type
++ handling an open stream or, a PaErrorCode (which are always negative)
++ if PortAudio is not initialized or an error is encountered.
++*/
++PaHostApiTypeId Pa_GetStreamHostApiType( PaStream* stream );
++
++
+ /* Miscellaneous utilities */
+ 
+ 
+diff -wruN portaudio/src/common/pa_front.c portaudio-v19/src/common/pa_front.c
+--- portaudio/src/common/pa_front.c	2012-12-04 12:39:48.000000000 -0600
++++ portaudio-v19/src/common/pa_front.c	2012-12-14 09:44:34.604344800 -0600
+@@ -1216,8 +1216,10 @@
+                                   hostApiInputParametersPtr, hostApiOutputParametersPtr,
+                                   sampleRate, framesPerBuffer, streamFlags, streamCallback, userData );
+ 
+-    if( result == paNoError )
++    if( result == paNoError ) {
+         AddOpenStream( *stream );
++        PA_STREAM_REP(*stream)->hostApiType = hostApi->info.type;
++    }
+ 
+ 
+     PA_LOGAPI(("Pa_OpenStream returned:\n" ));
+@@ -1729,6 +1731,32 @@
+     return result;
+ }
+ 
++PaHostApiTypeId Pa_GetStreamHostApiType( PaStream* stream )
++{
++    PaError error = PaUtil_ValidateStreamPointer( stream );
++    PaHostApiTypeId result;
++
++#ifdef PA_LOG_API_CALLS
++    PaUtil_DebugPrint("Pa_GetStreamHostApiType called:\n" );
++    PaUtil_DebugPrint("\tPaStream* stream: 0x%p\n", stream );
++#endif
++
++    if( error == paNoError )
++    {
++        result = PA_STREAM_REP(stream)->hostApiType;
++    }
++    else
++    {
++        result = (PaHostApiTypeId) error;
++    }
++
++#ifdef PA_LOG_API_CALLS
++    PaUtil_DebugPrint("Pa_GetStreamHostApiType returned:\n" );
++    PaUtil_DebugPrint("\tPaError: %d ( %s )\n\n", result, Pa_GetErrorText( result ) );
++#endif
++
++    return result;
++}
+ 
+ PaError Pa_GetSampleSize( PaSampleFormat format )
+ {
+diff -wruN portaudio/src/common/pa_stream.c portaudio-v19/src/common/pa_stream.c
+--- portaudio/src/common/pa_stream.c	2008-02-15 01:50:33.000000000 -0600
++++ portaudio-v19/src/common/pa_stream.c	2012-12-14 09:44:34.607345000 -0600
+@@ -93,6 +93,8 @@
+     streamRepresentation->streamInfo.inputLatency = 0.;
+     streamRepresentation->streamInfo.outputLatency = 0.;
+     streamRepresentation->streamInfo.sampleRate = 0.;
++
++    streamRepresentation->hostApiType = 0;
+ }
+ 
+ 
+diff -wruN portaudio/src/common/pa_stream.h portaudio-v19/src/common/pa_stream.h
+--- portaudio/src/common/pa_stream.h	2008-02-15 01:50:33.000000000 -0600
++++ portaudio-v19/src/common/pa_stream.h	2012-12-14 09:44:34.610345200 -0600
+@@ -152,6 +152,7 @@
+     PaStreamFinishedCallback *streamFinishedCallback;
+     void *userData;
+     PaStreamInfo streamInfo;
++    PaHostApiTypeId hostApiType;
+ } PaUtilStreamRepresentation;
+ 
+ 
+diff -wruN portaudio/src/hostapi/oss/pa_unix_oss.c portaudio-v19/src/hostapi/oss/pa_unix_oss.c
+--- portaudio/src/hostapi/oss/pa_unix_oss.c	2011-05-02 12:07:11.000000000 -0500
++++ portaudio-v19/src/hostapi/oss/pa_unix_oss.c	2012-12-14 09:44:34.625346000 -0600
+@@ -2028,3 +2028,26 @@
+ #endif
+ }
+ 
++const char *PaOSS_GetStreamInputDevice( PaStream* s )
++{
++    PaOssStream *stream = (PaOssStream*)s;
++
++    if( stream->capture )
++    {
++      return stream->capture->devName;
++    }
++
++   return NULL;
++}
++
++const char *PaOSS_GetStreamOutputDevice( PaStream* s )
++{
++    PaOssStream *stream = (PaOssStream*)s;
++
++    if( stream->playback )
++    {
++      return stream->playback->devName;
++    }
++
++   return NULL;
++}
+diff -up portaudio/configure.in~ portaudio/configure.in
+--- portaudio/configure.in~	2013-04-07 12:20:18.000000000 +0200
++++ portaudio/configure.in	2013-05-04 15:14:14.356191153 +0200
+@@ -387,7 +387,7 @@ case "${host_os}" in
+            DLL_LIBS="$DLL_LIBS -lasound"
+            LIBS="$LIBS -lasound"
+            OTHER_OBJS="$OTHER_OBJS src/hostapi/alsa/pa_linux_alsa.o"
+-           INCLUDES="$INCLUDES pa_linux_alsa.h"
++           INCLUDES="$INCLUDES pa_linux_alsa.h pa_unix_oss.h"
+            AC_DEFINE(PA_USE_ALSA,1)
+         fi
+ 

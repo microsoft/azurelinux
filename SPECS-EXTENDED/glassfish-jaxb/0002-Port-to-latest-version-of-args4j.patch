@@ -1,0 +1,159 @@
+From 23b7ecb1e748f79c28af927ae8dc4c7e66fe20cf Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Fri, 10 May 2019 10:41:07 +0100
+Subject: [PATCH 2/2] Port to latest version of args4j
+
+---
+ .../main/java/com/sun/tools/txw2/Main.java    | 69 +++++++++++--------
+ 1 file changed, 42 insertions(+), 27 deletions(-)
+
+diff --git a/txw/compiler/src/main/java/com/sun/tools/txw2/Main.java b/txw/compiler/src/main/java/com/sun/tools/txw2/Main.java
+index 3c8cc84..3f1a092 100644
+--- a/txw/compiler/src/main/java/com/sun/tools/txw2/Main.java
++++ b/txw/compiler/src/main/java/com/sun/tools/txw2/Main.java
+@@ -43,10 +43,10 @@ package com.sun.tools.txw2;
+ import com.sun.codemodel.writer.FileCodeWriter;
+ import com.sun.codemodel.writer.SingleStreamCodeWriter;
+ import com.sun.tools.txw2.model.NodeSet;
++import org.kohsuke.args4j.Argument;
++import org.kohsuke.args4j.Option;
+ import org.kohsuke.args4j.CmdLineException;
+ import org.kohsuke.args4j.CmdLineParser;
+-import org.kohsuke.args4j.opts.BooleanOption;
+-import org.kohsuke.args4j.opts.StringOption;
+ import org.kohsuke.rngom.parse.IllegalSchemaException;
+ import org.kohsuke.rngom.parse.Parseable;
+ import org.kohsuke.rngom.parse.compact.CompactParseable;
+@@ -60,6 +60,8 @@ import java.io.File;
+ import java.io.IOException;
+ import java.net.MalformedURLException;
+ import java.util.Properties;
++import java.util.List;
++import java.util.ArrayList;
+ 
+ /**
+  * Programatic entry point to the TXW compiler.
+@@ -73,26 +75,39 @@ public class Main {
+         this.opts = opts;
+     }
+ 
+-    public static void main(String[] args) {
+-        System.exit(run(args));
++    public static class Options {
++        @Argument
++        public List<String> arguments = new ArrayList<String>();
++
++        @Option(name="-o")
++        public String output;
++
++        @Option(name="-p")
++        public String pkg;
++
++        @Option(name="-c")
++        public boolean compact;
++
++        @Option(name="-x")
++        public boolean xml;
++
++        @Option(name="-xsd")
++        public boolean xsd;
++
++        @Option(name="-h")
++        public boolean chain;
+     }
+ 
+-    public static class Options {
+-        public StringOption output = new StringOption("-o");
+-        public StringOption pkg = new StringOption("-p");
+-        public BooleanOption compact = new BooleanOption("-c");
+-        public BooleanOption xml = new BooleanOption("-x");
+-        public BooleanOption xsd = new BooleanOption("-xsd");
+-        public BooleanOption chain = new BooleanOption("-h");
++    public static void main(String[] args) {
++        System.exit(run(args));
+     }
+ 
+     public static int run(String[] args) {
+         Options opts = new Options();
+-        CmdLineParser parser = new CmdLineParser();
+-        parser.addOptionClass(opts);
++        CmdLineParser parser = new CmdLineParser(opts);
+ 
+         try {
+-            parser.parse(args);
++            parser.parseArgument(args);
+         } catch (CmdLineException e) {
+             System.out.println(e.getMessage());
+             printUsage();
+@@ -102,9 +117,9 @@ public class Main {
+         TxwOptions topts = new TxwOptions();
+         topts.errorListener = new ConsoleErrorReporter(System.out);
+ 
+-        if(opts.output.value!=null) {
++        if(opts.output != null) {
+             try {
+-                topts.codeWriter = new FileCodeWriter(new File(opts.output.value));
++                topts.codeWriter = new FileCodeWriter(new File(opts.output));
+             } catch( IOException e ) {
+                 System.out.println(e.getMessage());
+                 printUsage();
+@@ -114,12 +129,12 @@ public class Main {
+             topts.codeWriter = new SingleStreamCodeWriter(System.out);
+         }
+ 
+-        if(opts.chain.isOn()) {
++        if(opts.chain) {
+             topts.chainMethod = true;
+         }
+ 
+-        if(opts.pkg.value!=null) {
+-            topts._package = topts.codeModel._package(opts.pkg.value);
++        if(opts.pkg != null) {
++            topts._package = topts.codeModel._package(opts.pkg);
+         } else {
+             topts._package = topts.codeModel.rootPackage();
+         }
+@@ -146,21 +161,21 @@ public class Main {
+      * out of the specified schema file.
+      */
+     private static SchemaBuilder makeSourceSchema(CmdLineParser parser, Options opts, ErrorHandler eh) throws MalformedURLException {
+-        File f = new File((String)parser.getArguments().get(0));
++        File f = new File(opts.arguments.get(0));
+         final InputSource in = new InputSource(f.toURL().toExternalForm());
+ 
+-        if(opts.xsd.isOff() && opts.xml.isOff() && opts.compact.isOff()) {
++        if(!opts.xsd && !opts.xml && !opts.compact) {
+             // auto detect
+             if(in.getSystemId().endsWith(".rnc"))
+-                opts.compact.value=true;
++                opts.compact = true;
+             else
+             if(in.getSystemId().endsWith(".rng"))
+-                opts.xml.value=true;
++                opts.xml = true;
+             else
+-                opts.xsd.value=true;
++                opts.xsd = true;
+         }
+ 
+-        if(opts.xsd.isOn())
++        if(opts.xsd)
+             return new XmlSchemaLoader(in);
+ 
+         final Parseable parseable = makeRELAXNGSource(opts, in, eh, f);
+@@ -169,10 +184,10 @@ public class Main {
+     }
+ 
+     private static Parseable makeRELAXNGSource(Options opts, final InputSource in, ErrorHandler eh, File f) {
+-        if(opts.compact.isOn())
++        if(opts.compact)
+             return new CompactParseable(in,eh);
+ 
+-        if(opts.xml.isOn())
++        if(opts.xml)
+             return new SAXParseable(in,eh);
+ 
+         // otherwise sniff from the file extension
+-- 
+2.20.1
+

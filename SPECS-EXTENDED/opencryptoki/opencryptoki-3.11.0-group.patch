@@ -1,0 +1,31 @@
+diff -up opencryptoki-3.11.0/usr/lib/api/shrd_mem.c.in.me opencryptoki-3.11.0/usr/lib/api/shrd_mem.c.in
+--- opencryptoki-3.11.0/usr/lib/api/shrd_mem.c.in.me	2019-01-31 10:42:23.325797012 +0100
++++ opencryptoki-3.11.0/usr/lib/api/shrd_mem.c.in	2019-01-31 10:52:17.585191667 +0100
+@@ -55,9 +55,11 @@ void *attach_shared_memory()
+     int shmid;
+     char *shmp;
+     struct stat statbuf;
++#if 0
+     struct group *grp;
+     struct passwd *pw, *epw;
+     uid_t uid, euid;
++#endif
+ 
+ #if !(MMAP)
+     // Really should fstat the tok_path, since it will be the actual
+@@ -69,6 +71,7 @@ void *attach_shared_memory()
+         return NULL;
+     }
+ 
++#if 0
+     uid = getuid();
+     euid = geteuid();
+     // only check group membership if not root user
+@@ -102,6 +105,7 @@ void *attach_shared_memory()
+             return NULL;
+         }
+     }
++#endif
+ 
+     Anchor->shm_tok = ftok(TOK_PATH, 'b');
+ 

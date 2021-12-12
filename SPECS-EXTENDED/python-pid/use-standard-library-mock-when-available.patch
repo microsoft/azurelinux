@@ -1,0 +1,16 @@
+diff --git a/tests/test_pid.py b/tests/test_pid.py
+index 7c57c46..e36c29e 100644
+--- a/tests/test_pid.py
++++ b/tests/test_pid.py
+@@ -2,7 +2,10 @@
+ import os.path
+ import signal
+ from contextlib import contextmanager
+-from mock import patch
++try:
++    from unittest.mock import patch
++except ImportError:
++    from mock import patch
+ 
+ import pid
+ 

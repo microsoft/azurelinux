@@ -1,0 +1,21 @@
+--- disruptor-3.3.2/src/test/java/com/lmax/disruptor/BatchEventProcessorTest.java	2015-02-25 10:09:57.000000000 +0100
++++ disruptor-3.3.2/src/test/java/com/lmax/disruptor/BatchEventProcessorTest.java.jmock	2015-06-03 15:52:43.997446568 +0200
+@@ -23,6 +23,7 @@
+ import org.jmock.api.Action;
+ import org.jmock.api.Invocation;
+ import org.jmock.integration.junit4.JMock;
++import org.jmock.lib.concurrent.Synchroniser;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ 
+@@ -35,7 +36,9 @@
+ @RunWith(JMock.class)
+ public final class BatchEventProcessorTest
+ {
+-    private final Mockery context = new Mockery();
++    private final Mockery context = new Mockery() {{
++        setThreadingPolicy(new Synchroniser());
++    }};
+     private final Sequence lifecycleSequence = context.sequence("lifecycleSequence");
+     private final CountDownLatch latch = new CountDownLatch(1);
+ 

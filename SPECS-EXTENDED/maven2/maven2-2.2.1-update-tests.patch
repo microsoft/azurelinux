@@ -1,0 +1,17 @@
+diff -up ./maven-project/src/test/java/org/apache/maven/project/validation/DefaultModelValidatorTest.java.sav ./maven-project/src/test/java/org/apache/maven/project/validation/DefaultModelValidatorTest.java
+--- ./maven-project/src/test/java/org/apache/maven/project/validation/DefaultModelValidatorTest.java.sav	2009-11-19 14:47:31.000000000 -0500
++++ ./maven-project/src/test/java/org/apache/maven/project/validation/DefaultModelValidatorTest.java	2009-11-19 14:48:41.000000000 -0500
+@@ -73,11 +73,9 @@ public class DefaultModelValidatorTest
+     {
+         ModelValidationResult result = validate( "invalid-ids-pom.xml" );
+ 
+-        assertEquals( 2, result.getMessageCount() );
+-
+-        assertEquals( "'groupId' with value 'o/a/m' does not match a valid id pattern.", result.getMessage( 0 ) );
++        assertEquals( 1, result.getMessageCount() );
+ 
+-        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid id pattern.", result.getMessage( 1 ) );
++        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid id pattern.", result.getMessage( 0 ) );
+     }
+ 
+     public void testMissingType()

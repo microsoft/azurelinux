@@ -1,0 +1,18 @@
+diff -up xterm-323/xterm.desktop.desk xterm-323/xterm.desktop
+--- xterm-323/xterm.desktop.desk	2016-03-08 14:32:15.633422051 +0100
++++ xterm-323/xterm.desktop	2016-03-08 14:33:31.231604288 +0100
+@@ -32,12 +32,12 @@
+ # -----------------------------------------------------------------------------
+ [Desktop Entry]
+ Name=XTerm
+-#GenericName=Terminal
++GenericName=Terminal
+ Comment=standard terminal emulator for the X window system
+ Exec=xterm
+ Terminal=false
+ Type=Application
+ Encoding=UTF-8
+-Icon=xterm-color_48x48
++Icon=xterm-color
+ Categories=System;TerminalEmulator;
+ Keywords=shell;prompt;command;commandline;cmd;

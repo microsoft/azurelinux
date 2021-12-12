@@ -1,0 +1,43 @@
+diff --git a/lib/misc/lib_context.c b/lib/misc/lib_context.c
+index f1995e1..00023e7 100644
+--- a/lib/misc/lib_context.c
++++ b/lib/misc/lib_context.c
+@@ -138,25 +138,30 @@ init_paths(struct lib_context *lc, void *arg)
+ static void
+ init_version(struct lib_context *lc, void *arg)
+ {
+-	lc->version.text = DMRAID_LIB_VERSION;
++	static char version[80];
++
++	lc->version.text = version;
+ 	lc->version.date = DMRAID_LIB_DATE;
+ 	lc->version.v.major = DMRAID_LIB_MAJOR_VERSION;
+ 	lc->version.v.minor = DMRAID_LIB_MINOR_VERSION;
+ 	lc->version.v.sub_minor = DMRAID_LIB_SUBMINOR_VERSION;
+ 	lc->version.v.suffix = DMRAID_LIB_VERSION_SUFFIX;
++	snprintf(version, sizeof(version), "%d.%d.%d.%s",
++		 lc->version.v.major, lc->version.v.minor,
++		 lc->version.v.sub_minor, lc->version.v.suffix);
+ }
+ 
+ /* Put init functions into an array because of the potentially growing list. */
+ struct init_fn {
+ 	void (*func) (struct lib_context * lc, void *arg);
+ } init_fn[] = {
+-	{
+-	init_options}, {
+-	init_cmd}, {
+-	init_lists}, {
+-	init_mode}, {
+-	init_paths}, {
+-init_version},};
++	{ init_options},
++	{ init_cmd},
++	{ init_lists},
++	{ init_mode},
++	{ init_paths},
++	{ init_version},
++};
+ 
+ struct lib_context *
+ alloc_lib_context(char **argv)

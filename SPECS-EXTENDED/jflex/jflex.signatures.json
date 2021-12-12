@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "jflex-1.4.3.tar.bz2": "5837eb7c72c265dacc638ad29f6df6da2161247130b34846a6955e131ee08f31",
+  "jflex.script": "92451ee99a6227df578a344febcf3a8ac0ec1cf138e36a7c3412e59e0f191efd",
+  "jpackage-bootstrap-prepare.sh": "e4d63ab303013608a4e1159d3da7b9c7bac5e7322ec7df217eac3775e8b6fbec"
+ }
+}

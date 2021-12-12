@@ -1,0 +1,11 @@
+--- gson-gson-parent-2.8.1/gson/bnd.bnd.orig	2017-08-29 11:07:29.630655005 +0100
++++ gson-gson-parent-2.8.1/gson/bnd.bnd	2017-08-29 11:08:29.592075069 +0100
+@@ -11,4 +11,7 @@
+     com.google.gson,\
+     com.google.gson.annotations,\
+     com.google.gson.reflect,\
+-    com.google.gson.stream
++    com.google.gson.stream,\
++    com.google.gson.internal;x-internal:=true,\
++    com.google.gson.internal.bind;x-internal:=true,\
++    com.google.gson.internal.bind.util;x-internal:=true

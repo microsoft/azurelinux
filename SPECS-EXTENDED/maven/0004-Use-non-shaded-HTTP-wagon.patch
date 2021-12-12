@@ -1,0 +1,51 @@
+From c8933d155694ce37b1d4be59a744c8f7cbde6bb5 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 1 Jul 2019 09:51:56 +0200
+Subject: [PATCH 4/4] Use non-shaded HTTP wagon
+
+---
+ apache-maven/pom.xml | 15 ---------------
+ pom.xml              |  1 -
+ 2 files changed, 16 deletions(-)
+
+diff --git a/apache-maven/pom.xml b/apache-maven/pom.xml
+index 2686570af..d22ae121d 100644
+--- a/apache-maven/pom.xml
++++ b/apache-maven/pom.xml
+@@ -63,21 +63,6 @@ under the License.
+     <dependency>
+       <groupId>org.apache.maven.wagon</groupId>
+       <artifactId>wagon-http</artifactId>
+-      <classifier>shaded</classifier>
+-      <exclusions>
+-        <exclusion>
+-          <groupId>org.apache.httpcomponents</groupId>
+-          <artifactId>httpclient</artifactId>
+-        </exclusion>
+-        <exclusion>
+-          <groupId>org.apache.httpcomponents</groupId>
+-          <artifactId>httpcore</artifactId>
+-        </exclusion>
+-        <exclusion>
+-          <groupId>org.apache.maven.wagon</groupId>
+-          <artifactId>wagon-http-shared</artifactId>
+-        </exclusion>
+-      </exclusions>
+     </dependency>
+     <dependency>
+       <!-- this is included in Wagon Http
+diff --git a/pom.xml b/pom.xml
+index 237cdc39e..85436c54d 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -328,7 +328,6 @@ under the License.
+         <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-http</artifactId>
+         <version>${wagonVersion}</version>
+-        <classifier>shaded</classifier>
+         <exclusions>
+           <exclusion>
+             <groupId>commons-logging</groupId>
+-- 
+2.21.0
+

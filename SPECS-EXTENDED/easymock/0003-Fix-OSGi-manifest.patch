@@ -1,0 +1,28 @@
+From fa908a1748cb3090d677a63db4986ffc57acbf1e Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 1 Jun 2016 09:31:44 +0200
+Subject: [PATCH 3/3] Fix OSGi manifest
+
+Resolves: rhbz#1341052
+---
+ core/pom.xml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/core/pom.xml b/core/pom.xml
+index 5ed6adb..ea6d015 100644
+--- a/core/pom.xml
++++ b/core/pom.xml
+@@ -100,8 +100,9 @@
+         <extensions>true</extensions>
+         <configuration>
+           <instructions>
+-            <Export-Package>org.easymock.internal.*;poweruser=true;mandatory:=poweruser</Export-Package>
++            <Export-Package>org.easymock,org.easymock.internal.*;poweruser=true;mandatory:=poweruser</Export-Package>
+             <Import-Package>org.easymock,org.easymock.internal;poweruser=true,net.sf.cglib.core,net.sf.cglib.proxy,net.sf.cglib.reflect,org.objectweb.asm,org.objenesis;resolution:=optional</Import-Package>
++	    <_nouses>true</_nouses>
+           </instructions>
+         </configuration>
+         <executions>
+-- 
+2.13.5
+

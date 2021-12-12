@@ -1,0 +1,11 @@
+diff -up ./ypxfr/ypxfr.c.ypxfr-zeroresp ./ypxfr/ypxfr.c
+--- ./ypxfr/ypxfr.c.ypxfr-zeroresp	2013-04-10 16:43:21.000000000 +0200
++++ ./ypxfr/ypxfr.c	2013-05-06 18:31:36.875476520 +0200
+@@ -415,6 +415,7 @@ ypxfr (char *map, char *source_host, cha
+   time_t masterOrderNum;
+   int result;
+ 
++  memset(&resp_val, '\0', sizeof(resp_val));
+   /* Name of the map file */
+   if (strlen (path_ypdb) + strlen (target_domain) + strlen (map) + 3 < MAXPATHLEN)
+     sprintf (dbName_orig, "%s/%s/%s", path_ypdb, target_domain, map);

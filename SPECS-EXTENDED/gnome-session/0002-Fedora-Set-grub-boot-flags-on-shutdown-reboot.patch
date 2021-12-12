@@ -1,0 +1,58 @@
+From 5314490a7e5ce5770059363a84e13e87f3d9669c Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Tue, 14 Aug 2018 14:49:59 +0200
+Subject: [PATCH 2/2] Fedora: Set grub boot-flags on shutdown / reboot
+
+Fedora's grub will automatically hide the boot-menu if the previous
+boot has set the boot_success flag in grub's environment. This happens
+automatically 30 seconds after login.
+
+But if the user shuts down or reboots from the system-menu before then
+(e.g. directly from gdm) then the boot_success flag gets not set. If
+a reboot / shutdown is initiated through gnome-session then the user
+is successfully interacting with the system, so set the boot_success
+flag from gnome_session for this case to fix reboot from gdm leading to
+the boot-menu not being hidden.
+
+Likewise implement ConfirmedRebootMenu handling in a Fedora specific
+way (for now) by setting the menu_show_once grub bootflag in this case.
+---
+ gnome-session/gsm-manager.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/gnome-session/gsm-manager.c b/gnome-session/gsm-manager.c
+index e0c05d82..b4d50936 100644
+--- a/gnome-session/gsm-manager.c
++++ b/gnome-session/gsm-manager.c
+@@ -3842,14 +3842,27 @@ do_query_end_session_exit (GsmManager *manager)
+                 break;
+         case GSM_MANAGER_LOGOUT_REBOOT:
+         case GSM_MANAGER_LOGOUT_REBOOT_INTERACT:
++                /*
++                 * Fedora specific patch to make sure the boot-menu does not
++                 * show when it is configured to auto-hide and a reboot is
++                 * initiated directly from gdm.
++                 */
++                system("/usr/sbin/grub2-set-bootflag boot_success");
+                 reboot = TRUE;
+                 break;
+         case GSM_MANAGER_LOGOUT_REBOOT_TO_BOOT_OPTIONS:
+-                /* FIXME tell bootmanager to show menu on next boot */
++                /* Fedora specific implementation to show the menu on next boot */
++                system("/usr/sbin/grub2-set-bootflag menu_show_once");
+                 reboot = TRUE;
+                 break;
+         case GSM_MANAGER_LOGOUT_SHUTDOWN:
+         case GSM_MANAGER_LOGOUT_SHUTDOWN_INTERACT:
++                /*
++                 * Fedora specific patch to make sure the boot-menu does not
++                 * show when it is configured to auto-hide and a shutdown is
++                 * initiated directly from gdm.
++                 */
++                system("/usr/sbin/grub2-set-bootflag boot_success");
+                 shutdown = TRUE;
+                 break;
+         default:
+-- 
+2.23.0
+

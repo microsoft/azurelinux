@@ -1,0 +1,93 @@
+diff --git a/ivy.xml b/ivy.xml
+index d448897..7d8896a 100644
+--- a/ivy.xml
++++ b/ivy.xml
+@@ -50,8 +50,8 @@
+ 		<dependency org="com.jcraft" name="jsch.agentproxy" rev="0.0.6" conf="default,sftp->default"/>
+ 		<dependency org="com.jcraft" name="jsch.agentproxy.connector-factory" rev="0.0.6" conf="default,sftp->default"/>
+ 		<dependency org="com.jcraft" name="jsch.agentproxy.jsch" rev="0.0.6" conf="default,sftp->default"/>
+-		<dependency org="org.bouncycastle" name="bcpg-jdk14" rev="1.45" conf="default"/>
+-        <dependency org="org.bouncycastle" name="bcprov-jdk14" rev="1.45" conf="default"/>
++		<dependency org="org.bouncycastle" name="bcpg-jdk15on" rev="1.52" conf="default"/>
++        <dependency org="org.bouncycastle" name="bcprov-jdk15on" rev="1.52" conf="default"/>
+ 
+ 		<!-- Test dependencies -->
+ 		<dependency org="junit" name="junit" rev="3.8.2" conf="test->default"/>
+diff --git a/src/java/org/apache/ivy/plugins/signer/bouncycastle/OpenPGPSignatureGenerator.java b/src/java/org/apache/ivy/plugins/signer/bouncycastle/OpenPGPSignatureGenerator.java
+index af7beae..bec8ae4 100644
+--- a/src/java/org/apache/ivy/plugins/signer/bouncycastle/OpenPGPSignatureGenerator.java
++++ b/src/java/org/apache/ivy/plugins/signer/bouncycastle/OpenPGPSignatureGenerator.java
+@@ -23,16 +23,18 @@ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.OutputStream;
+-import java.security.NoSuchAlgorithmException;
+-import java.security.NoSuchProviderException;
+ import java.security.Security;
+-import java.security.SignatureException;
+ import java.util.Iterator;
+ 
+ import org.apache.ivy.plugins.signer.SignatureGenerator;
+ import org.bouncycastle.bcpg.ArmoredOutputStream;
+ import org.bouncycastle.bcpg.BCPGOutputStream;
+ import org.bouncycastle.jce.provider.BouncyCastleProvider;
++import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
++import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
++import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder;
++import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
++import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
+ import org.bouncycastle.openpgp.PGPException;
+ import org.bouncycastle.openpgp.PGPPrivateKey;
+ import org.bouncycastle.openpgp.PGPSecretKey;
+@@ -101,11 +103,13 @@ public class OpenPGPSignatureGenerator implements SignatureGenerator {
+                 pgpSec = readSecretKey(keyIn);
+             }
+ 
+-            PGPPrivateKey pgpPrivKey = pgpSec.extractPrivateKey(password.toCharArray(),
+-                BouncyCastleProvider.PROVIDER_NAME);
+-            PGPSignatureGenerator sGen = new PGPSignatureGenerator(pgpSec.getPublicKey()
+-                    .getAlgorithm(), PGPUtil.SHA1, BouncyCastleProvider.PROVIDER_NAME);
+-            sGen.initSign(PGPSignature.BINARY_DOCUMENT, pgpPrivKey);
++            PBESecretKeyDecryptor decryptor = new BcPBESecretKeyDecryptorBuilder(
++                new BcPGPDigestCalculatorProvider()).build(password.toCharArray());
++            PGPPrivateKey pgpPrivKey = pgpSec.extractPrivateKey(decryptor);
++            PGPSignatureGenerator sGen = new PGPSignatureGenerator(
++                new BcPGPContentSignerBuilder(pgpSec.getPublicKey()
++                    .getAlgorithm(), PGPUtil.SHA1));
++            sGen.init(PGPSignature.BINARY_DOCUMENT, pgpPrivKey);
+ 
+             in = new FileInputStream(src);
+             out = new BCPGOutputStream(new ArmoredOutputStream(new FileOutputStream(dest)));
+@@ -116,22 +120,10 @@ public class OpenPGPSignatureGenerator implements SignatureGenerator {
+             }
+ 
+             sGen.generate().encode(out);
+-        } catch (SignatureException e) {
+-            IOException ioexc = new IOException();
+-            ioexc.initCause(e);
+-            throw ioexc;
+         } catch (PGPException e) {
+             IOException ioexc = new IOException();
+             ioexc.initCause(e);
+             throw ioexc;
+-        } catch (NoSuchAlgorithmException e) {
+-            IOException ioexc = new IOException();
+-            ioexc.initCause(e);
+-            throw ioexc;
+-        } catch (NoSuchProviderException e) {
+-            IOException ioexc = new IOException();
+-            ioexc.initCause(e);
+-            throw ioexc;
+         } finally {
+             if (out != null) {
+                 try {
+@@ -156,7 +148,8 @@ public class OpenPGPSignatureGenerator implements SignatureGenerator {
+ 
+     private PGPSecretKey readSecretKey(InputStream in) throws IOException, PGPException {
+         in = PGPUtil.getDecoderStream(in);
+-        PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(in);
++        PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(in,
++            new BcKeyFingerprintCalculator());
+ 
+         PGPSecretKey key = null;
+         for (Iterator it = pgpSec.getKeyRings(); key == null && it.hasNext();) {

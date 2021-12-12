@@ -1,0 +1,13 @@
+{
+ "Signatures": {
+  "mdadm-4.1.tar.xz": "ab7688842908d3583a704d491956f31324c3a5fc9f6a04653cb75d19f1934f4a",
+  "mdadm-raid-check-sysconfig": "78a8b6301ea32b28c7f1144f9123fb761043f5d37d3aec8a2deab0ebe0d59a81",
+  "mdadm.conf": "6382e48282297663adbe1b1db55c1554d27badd8ab0ee5a4d2e1bbf880f62af3",
+  "mdadm.rules": "369473e14909a89f3f9301328310dcfe380c73735c81abe3b8586c3be7d43e98",
+  "mdadm_event.conf": "3be891aeb2aeb7e9b5b3264b316dd618291290f359f38308c6b6b663e986f692",
+  "mdmonitor.service": "253e54419cac222f1395bca1ceea35f488ec094cd9f33bb08fc063212e18abf5",
+  "raid-check": "b226cfa78f4d294f9c3989d23674622a634c50ee233d4a30e1a456cc35994c31",
+  "raid-check.service": "7c8e454444d3e4d457cddf7a057bdc8951f1bdbf5be629eb8901651769693f3e",
+  "raid-check.timer": "5bd8c868b38541b46e12b3af5a621cc94630346c69987696434cbc944bf161b1"
+ }
+}

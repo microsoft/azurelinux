@@ -1,0 +1,102 @@
+#!/bin/bash
+# *** DO NOT MODIFY THIS FILE ***
+#
+# /etc/mail/spamassassin/channel.d/*.conf
+#     Place files here to add custom channels.
+#
+
+# Proceed with sa-update if spam daemon is running or forced in /etc/sysconfig/sa-update
+unset SAUPDATE OPTIONS DEBUG NOTIFY_UPD
+[ -f /etc/sysconfig/sa-update ] && . /etc/sysconfig/sa-update
+[ "$SAUPDATE" = "no" ] && exit 0
+for daemon in mimedefang spamd amavisd spampd; do
+    /usr/bin/pgrep -f $daemon >& /dev/null
+    [ $? -eq 0 ] && SAUPDATE=yes
+done
+
+# Skip sa-update if daemon not detected
+[ -z "$SAUPDATE" ] && exit 0
+
+# sa-update must create keyring
+if [ ! -d /etc/mail/spamassassin/sa-update-keys ]; then
+    sa-update
+fi
+
+# Initialize Channels and Keys
+CHANNELLIST=""
+KEYLIST=""
+# Process each channel defined in /etc/mail/spamassassin/channel.d/
+for file in /etc/mail/spamassassin/channel.d/*.conf; do
+    [ ! -f "$file" ] && continue
+    # Validate config file
+    PREFIXES="CHANNELURL KEYID BEGIN"
+    for prefix in $PREFIXES; do
+        if ! grep -q "$prefix" $file; then
+            echo "ERROR: $file missing $prefix"
+            exit 255
+        fi
+    done
+    . "$file"
+    #echo "CHANNELURL=$CHANNELURL"
+    #echo "KEYID=$KEYID"
+    CHANNELLIST="$CHANNELLIST $CHANNELURL"
+    KEYLIST="$KEYLIST $KEYID"
+    sa-update --import "$file"
+done
+
+# Sleep random amount of time before proceeding to avoid overwhelming the servers
+sleep $(expr $RANDOM % 7200)
+
+unset arglist
+# Run sa-update on each channel, restart spam daemon if success
+for channel in $CHANNELLIST; do
+    arglist="$arglist --channel $channel"
+done
+for keyid in $KEYLIST; do
+    arglist="$arglist --gpgkey $keyid"
+done
+/usr/bin/sa-update $OPTIONS $arglist
+status=$?
+now=`date +"%d-%b-%Y %T"`
+# cron runs this script tee /var/log/sa-update.log
+# We want to always write to the log, but only send mail
+# as configured.  
+if [ $status -eq 0 ]; then
+        if [ -n "$DEBUG" -o -n "$NOTIFY_UPD" ]; then
+	    echo "$now: SpamAssassin: Update processed successfully" 
+	else
+            echo "$now: SpamAssassin: Update processed successfully" >>/var/log/sa-update.log
+	fi
+	if [ -f /usr/bin/systemctl ]; then
+		systemctl condrestart spamassassin.service >& /dev/null
+		[ -f /usr/lib/systemd/system/amavisd.service ] && systemctl condrestart amavisd.service >& /dev/null
+		systemctl --quiet is-active mimedefang.service; [ $? -eq 0 ] && systemctl reload mimedefang.service >& /dev/null
+		[ -f /usr/lib/systemd/system/spampd.service ] && systemctl condrestart spampd.service >& /dev/null
+	else
+		service spamassassin condrestart >& /dev/null
+		[ -f /etc/rc.d/init.d/amavisd ] && service amavisd-new condrestart >& /dev/null
+		[ -f /etc/rc.d/init.d/mimedefang ]  && service mimedefang condrestart >& /dev/null
+		[ -f /etc/rc.d/init.d/spampd ] && service spampd condrestart >& /dev/null
+	fi
+	
+        exit $status
+fi
+if [ $status -eq 1 ]; then
+        if [ -n "$DEBUG" ]; then
+	    echo "$now: SpamAssassin: No update available"
+	else
+            echo "$now: SpamAssassin: No update available" >>/var/log/sa-update.log
+	fi
+        exit $status
+fi
+if [ $status -eq 2 ]; then
+        echo "$now: SpamAssassin: Problem applying update - pre files failed lint check"
+        exit $status
+fi
+if [ $status -eq 4 ]; then
+        echo "$now: SpamAssassin: Update available, but download or extract failed"
+        exit $status
+fi
+
+echo "$now: SpamAssassin: Unknown error code $status from sa-update"
+exit $status

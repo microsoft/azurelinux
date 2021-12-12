@@ -1,0 +1,24 @@
+From 964905dc09406a55097d9c644b45bbec6944170a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Tue, 12 Jun 2018 13:43:47 +0200
+Subject: [PATCH] Allow to run tests from versioned folder
+
+If I download and unpack lesscpy-0.13.0 the tests from within
+were failing, because the 0.13.0 got split. this fixes it.
+---
+ test/core.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/core.py b/test/core.py
+index 438ec54..63e3689 100644
+--- a/test/core.py
++++ b/test/core.py
+@@ -24,7 +24,7 @@ def find_and_load_cases(cls, less_dir, css_dir, less_files=None, css_minimized=T
+     else:
+         LESS = glob.glob(os.path.join(_less_path, '*.less'))
+     for less in LESS:
+-        lessf = less.split('.')[0].split('/')[-1]
++        lessf = less.rpartition('.')[0].split('/')[-1]
+         css = os.path.join(_css_path, lessf + '.css')
+         if css_minimized:
+             mincss = os.path.join(_css_path, lessf + '.min.css')

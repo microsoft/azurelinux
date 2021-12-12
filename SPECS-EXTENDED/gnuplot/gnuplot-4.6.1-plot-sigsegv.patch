@@ -1,0 +1,21 @@
+diff -upr gnuplot-4.6.0.orig/src/gplt_x11.c gnuplot-4.6.0/src/gplt_x11.c
+--- gnuplot-4.6.0.orig/src/gplt_x11.c	2012-07-18 18:55:31.000000000 +0200
++++ gnuplot-4.6.0/src/gplt_x11.c	2012-07-19 12:08:21.177967583 +0200
+@@ -4338,7 +4338,7 @@ process_event(XEvent *event)
+ #endif	/* DISABLE_SPACE_RAISES_CONSOLE */
+ 
+ 	    case 'm': /* Toggle mouse display, but only if we control the window here */
+-		if (((plot != current_plot) && (!modifier_mask))
++		if ((plot && (plot != current_plot) && (!modifier_mask))
+ #ifdef PIPE_IPC
+ 		    || pipe_died
+ #endif
+@@ -4374,7 +4374,7 @@ process_event(XEvent *event)
+ 	    gp_exec_event(GE_keypress,                               \
+ 		(int)RevX(event->xkey.x), (int)RevY(event->xkey.y),  \
+ 		gp_keysym, 0, plot->plot_number);                    \
+-	} else {                                                     \
++	} else if (plot) {                                                     \
+ 	    gp_exec_event(GE_keypress_old,                              \
+ 		(int)RevX(event->xkey.x), (int)RevY(event->xkey.y),  \
+ 		gp_keysym, 0, plot->plot_number);                    \

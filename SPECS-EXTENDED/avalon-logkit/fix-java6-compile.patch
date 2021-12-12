@@ -1,0 +1,13 @@
+--- src/java/org/apache/log/output/db/DefaultDataSource.java.sav	2005-08-29 21:03:50.000000000 +0300
++++ src/java/org/apache/log/output/db/DefaultDataSource.java	2010-11-09 21:05:58.775055594 +0200
+@@ -111,4 +111,10 @@ public class DefaultDataSource
+     {
+         m_logWriter = logWriter;
+     }
++    
++    public boolean isWrapperFor(Class<?> iface) {
++    	return false;
++    }
++
++    public <T> T unwrap(java.lang.Class<T> iface) {return null;}
+ }

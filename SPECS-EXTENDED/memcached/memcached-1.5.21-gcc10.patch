@@ -1,0 +1,32 @@
+commit 85fa7f7eb112163ac791af8e52a85bfa28e261dc
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Fri Jan 24 08:59:15 2020 +0100
+
+    Make memcached gcc 10 compliant
+
+diff --git a/hash.c b/hash.c
+index a0c3036..b5ff28a 100644
+--- a/hash.c
++++ b/hash.c
+@@ -4,6 +4,8 @@
+ #include "jenkins_hash.h"
+ #include "murmur3_hash.h"
+ 
++hash_func hash;
++
+ int hash_init(enum hashfunc_type type) {
+     switch(type) {
+         case JENKINS_HASH:
+diff --git a/hash.h b/hash.h
+index 059d1e2..3b2a984 100644
+--- a/hash.h
++++ b/hash.h
+@@ -2,7 +2,7 @@
+ #define    HASH_H
+ 
+ typedef uint32_t (*hash_func)(const void *key, size_t length);
+-hash_func hash;
++extern hash_func hash;
+ 
+ enum hashfunc_type {
+     JENKINS_HASH=0, MURMUR3_HASH

@@ -1,0 +1,12 @@
+diff -urNp docbook-utils-0.6.14-orig/bin/jw.in docbook-utils-0.6.14/bin/jw.in
+--- docbook-utils-0.6.14-orig/bin/jw.in	2010-05-31 16:21:46.379401250 +0200
++++ docbook-utils-0.6.14/bin/jw.in	2010-05-31 16:23:55.348413466 +0200
+@@ -438,5 +438,7 @@ cd "$SGML_CURRENT_DIRECTORY"
+ if [ $SGML_RETURN -gt 0 ]
+ then exit `expr 7 + $SGML_RETURN`
+ fi
+-echo "Done."
++#Final echo commented out, it causes manpage noise when generating some
++#manpages with new perl(#513271, #587012)
++#echo "Done."
+ exit 0

@@ -1,0 +1,30 @@
+From 3bdeed02505c9bbacb3b64a97ddcb1de967153b7 Mon Sep 17 00:00:00 2001
+From: Willem Toorop <willem@nlnetlabs.nl>
+Date: Thu, 27 Apr 2017 00:25:20 +0200
+Subject: [PATCH] bugfix #1257: Free after reallocing to 0 size
+
+Thanks Stephan Zeisberg
+---
+ str2host.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/str2host.c b/str2host.c
+index b274b17..f2a317b 100644
+--- a/str2host.c
++++ b/str2host.c
+@@ -1525,8 +1525,10 @@ ldns_str2rdf_long_str(ldns_rdf **rd, const char *str)
+ 	if (! str) {
+ 		return LDNS_STATUS_SYNTAX_BAD_ESCAPE;
+ 	}
+-	length = (size_t)(dp - data);
+-
++	if (!(length = (size_t)(dp - data))) {
++		LDNS_FREE(data);
++		return LDNS_STATUS_SYNTAX_EMPTY;
++	}
+ 	/* Lose the overmeasure */
+ 	data = LDNS_XREALLOC(dp = data, uint8_t, length);
+ 	if (! data) {
+-- 
+2.9.5
+

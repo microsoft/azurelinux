@@ -1,0 +1,197 @@
+From 0bfe44b6e0041210859c91e1589d5dc45c3991de Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 6 Nov 2018 18:35:19 +0100
+Subject: [PATCH] elinks: fix programming mistakes detected by static analysis
+
+---
+ src/bfu/menu.c                |  1 +
+ src/bfu/msgbox.c              |  1 +
+ src/config/conf.c             |  5 ++++-
+ src/dialogs/options.c         |  3 ++-
+ src/intl/gettext/loadmsgcat.c | 14 ++++++++++++--
+ src/protocol/ftp/ftp.c        |  8 +++++++-
+ src/scripting/lua/core.c      |  8 ++++++--
+ src/terminal/event.c          |  2 +-
+ src/util/string.c             |  2 +-
+ 9 files changed, 35 insertions(+), 9 deletions(-)
+
+diff --git a/src/bfu/menu.c b/src/bfu/menu.c
+index 74b60d7..07285b7 100644
+--- a/src/bfu/menu.c
++++ b/src/bfu/menu.c
+@@ -125,6 +125,7 @@ do_menu_selected(struct terminal *term, struct menu_item *items,
+ 		refresh_hotkeys(term, menu);
+ 		add_window(term, menu_handler, menu);
+ 	} else {
++		/* FIXME: This will cause BAD_FREE when called from do_setup_menu() */
+ 		free_menu_items(items);
+ 	}
+ }
+diff --git a/src/bfu/msgbox.c b/src/bfu/msgbox.c
+index d7af62b..f272459 100644
+--- a/src/bfu/msgbox.c
++++ b/src/bfu/msgbox.c
+@@ -103,6 +103,7 @@ msg_text_do(unsigned char *format, va_list ap)
+ 	VA_COPY(ap2, ap);
+ 
+ 	infolen = vsnprintf(NULL, 0, format, ap2);
++	va_end(ap2);
+ 	info = mem_alloc(infolen + 1);
+ 	if (!info) return NULL;
+ 
+diff --git a/src/config/conf.c b/src/config/conf.c
+index 12bba7c..e879ea5 100644
+--- a/src/config/conf.c
++++ b/src/config/conf.c
+@@ -702,7 +702,10 @@ read_config_file(unsigned char *name)
+ 	if (fd < 0) return NULL;
+ 	set_bin(fd);
+ 
+-	if (!init_string(&string)) return NULL;
++	if (!init_string(&string)) {
++		close(fd);
++		return NULL;
++	}
+ 
+ 	while ((r = safe_read(fd, cfg_buffer, FILE_BUF)) > 0) {
+ 		int i;
+diff --git a/src/dialogs/options.c b/src/dialogs/options.c
+index f40d07d..a3a0a8b 100644
+--- a/src/dialogs/options.c
++++ b/src/dialogs/options.c
+@@ -125,8 +125,9 @@ push_ok_button(struct dialog_data *dlg_data, struct widget_data *button)
+ static widget_handler_status_T
+ push_save_button(struct dialog_data *dlg_data, struct widget_data *button)
+ {
++	struct terminal *term = dlg_data->win->term;
+ 	push_ok_button(dlg_data, button);
+-	write_config(dlg_data->win->term);
++	write_config(term);
+ 
+ 	return EVENT_PROCESSED;
+ }
+diff --git a/src/intl/gettext/loadmsgcat.c b/src/intl/gettext/loadmsgcat.c
+index 0eac283..1be7b2b 100644
+--- a/src/intl/gettext/loadmsgcat.c
++++ b/src/intl/gettext/loadmsgcat.c
+@@ -312,8 +312,10 @@ source_success:
+ 		unsigned char *read_ptr;
+ 
+ 		data = (struct mo_file_header *) malloc(size);
+-		if (data == NULL)
++		if (data == NULL) {
++			close(fd);
+ 			return;
++		}
+ 
+ 		to_read = size;
+ 		read_ptr = (unsigned char *) data;
+@@ -321,6 +323,7 @@ source_success:
+ 			ssize_t nb = safe_read(fd, read_ptr, to_read);
+ 
+ 			if (nb <= 0) {
++				free(data);
+ 				close(fd);
+ 				return;
+ 			}
+@@ -345,8 +348,15 @@ source_success:
+ 	}
+ 
+ 	domain = (struct loaded_domain *) malloc(sizeof(struct loaded_domain));
+-	if (domain == NULL)
++	if (domain == NULL) {
++#ifdef LOADMSGCAT_USE_MMAP
++		if (use_mmap)
++			munmap((void *) data, size);
++		else
++#endif
++			free(data);
+ 		return;
++	}
+ 	domain_file->data = domain;
+ 
+ 	domain->data = (unsigned char *) data;
+diff --git a/src/protocol/ftp/ftp.c b/src/protocol/ftp/ftp.c
+index 10c9e28..fe3b7f0 100644
+--- a/src/protocol/ftp/ftp.c
++++ b/src/protocol/ftp/ftp.c
+@@ -926,11 +926,17 @@ ftp_data_connect(struct connection *conn, int pf, struct sockaddr_storage *sa,
+ 	}
+ 
+ 	fd = socket(pf, SOCK_STREAM, 0);
+-	if (fd < 0 || set_nonblocking_fd(fd) < 0) {
++	if (fd < 0) {
+ 		abort_connection(conn, connection_state(S_FTP_ERROR));
+ 		return -1;
+ 	}
+ 
++	if (set_nonblocking_fd(fd) < 0) {
++		abort_connection(conn, connection_state(S_FTP_ERROR));
++		close(fd);
++		return -1;
++	}
++
+ 	set_ip_tos_throughput(fd);
+ 
+ 	conn->data_socket->fd = fd;
+diff --git a/src/scripting/lua/core.c b/src/scripting/lua/core.c
+index 1c4dbbc..f86bf0d 100644
+--- a/src/scripting/lua/core.c
++++ b/src/scripting/lua/core.c
+@@ -207,12 +207,16 @@ l_pipe_read(LS)
+ 		if (l > 0) {
+ 			unsigned char *news = mem_realloc(s, len + l);
+ 
+-			if (!news) goto lua_error;
++			if (!news) {
++				pclose(fp);
++				goto lua_error;
++			}
+ 			s = news;
+ 			memcpy(s + len, buf, l);
+ 			len += l;
+ 
+-		} else if (l < 0) {
++		} else {
++			pclose(fp);
+ 			goto lua_error;
+ 		}
+ 	}
+diff --git a/src/terminal/event.c b/src/terminal/event.c
+index 9ad90df..d0de6f0 100644
+--- a/src/terminal/event.c
++++ b/src/terminal/event.c
+@@ -251,13 +251,13 @@ handle_interlink_event(struct terminal *term, struct interlink_event *ilev)
+ 		/* Either the initialization of the first session failed or we
+ 		 * are doing a remote session so quit.*/
+ 		if (!decode_session_info(term, info)) {
+-			destroy_terminal(term);
+ 			/* Make sure the user is notified if the initialization
+ 			 * of the first session fails. */
+ 			if (program.terminate) {
+ 				usrerror(_("Failed to create session.", term));
+ 				program.retval = RET_FATAL;
+ 			}
++			destroy_terminal(term);
+ 			return 0;
+ 		}
+ 
+diff --git a/src/util/string.c b/src/util/string.c
+index 604a00d..833fb9b 100644
+--- a/src/util/string.c
++++ b/src/util/string.c
+@@ -417,10 +417,10 @@ add_file_to_string(struct string *string, const unsigned char *filename)
+ 	string->length += fread(string->source + string->length, 1,
+ 	                        (size_t) filelen, file);
+ 	string->source[string->length] = 0;
+-	fclose(file);
+ 
+ 	if (string->length != newlength) goto err;
+ 
++	fclose(file);
+ 	return string;
+ 
+ err:
+-- 
+2.17.2
+

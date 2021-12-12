@@ -1,0 +1,1721 @@
+diff -uNr telnet/Makefile telnet.obsd-cvs/Makefile
+--- telnet/Makefile	Mon Jul 27 18:25:13 1998
++++ telnet.obsd-cvs/Makefile	Sat Mar 10 10:54:26 2001
+@@ -36,22 +36,20 @@
+ 
+ PROG=	telnet
+ 
+-CFLAGS+=-DTERMCAP -DKLUDGELINEMODE -DUSE_TERMIO -DSKEY -Dunix
+-CFLAGS+=-DENV_HACK -D_USE_OLD_CURSES_
++CFLAGS+=-DKLUDGELINEMODE -DUSE_TERMIO -DENV_HACK -DSKEY -Dunix
+ CFLAGS+=-I${.CURDIR}/../../lib
+-LDADD+=	-locurses -ltelnet
+-DPADD=	${LIBOLDCURSES} ${LIBTELNET}
++LDADD+=	-lcurses -ltelnet
++DPADD=	${LIBCURSES} ${LIBTELNET
+ 
+ SRCS=	authenc.c commands.c main.c network.c ring.c sys_bsd.c telnet.c \
+ 	terminal.c tn3270.c utilities.c
+ 
+ .include <bsd.own.mk> # for KERBEROS
+ 
+-.if (${KERBEROS} == "yes")
++.if (${KERBEROS:L} == "yes")
+ CFLAGS+=-DENCRYPTION -DAUTHENTICATION -DKRB4
+ LDADD+= -lkrb -ldes
+ DPADD+= ${LIBDES} ${LIBKRB}
+ .endif
+ 
+ .include <bsd.prog.mk>
+-
+diff -uNr telnet/commands.c telnet.obsd-cvs/commands.c
+--- telnet/commands.c	Fri Apr  9 02:30:20 1999
++++ telnet.obsd-cvs/commands.c	Sat Mar 10 10:51:22 2001
+@@ -1,4 +1,4 @@
+-/*	$OpenBSD: commands.c,v 1.20 1999/01/04 07:55:05 art Exp $	*/
++/*	$OpenBSD: commands.c,v 1.34 2000/11/08 21:49:44 aaron Exp $	*/
+ /*	$NetBSD: commands.c,v 1.14 1996/03/24 22:03:48 jtk Exp $	*/
+ 
+ /*
+@@ -69,7 +69,7 @@
+ 	int status;
+ 
+ 	if(argc != 3) {
+-		printf("%s sequence challenge\n", argv[0]);
++		printf("usage: %s sequence challenge\n", argv[0]);
+ 		return 0;
+ 	}
+ 
+@@ -2175,17 +2175,19 @@
+     int gotmachine = 0;
+     int l1 = strlen(m1);
+     int l2 = strlen(m2);
+-    char m1save[64];
++    char m1save[MAXHOSTNAMELEN];
+ 
+     if (skiprc)
+ 	return;
+ 
+-    strcpy(m1save, m1);
++    strncpy(m1save, m1, sizeof(m1save));
+     m1 = m1save;
+ 
+     if (rcname[0] == 0) {
+ 	char *home = getenv("HOME");
+ 
++	if (home == NULL || *home == '\0')
++	    return;
+ 	snprintf (rcname, sizeof(rcname), "%s/.telnetrc",
+ 		  home ? home : "");
+     }
+@@ -2248,15 +2250,9 @@
+     int
+ tn(int argc, char *argv[])
+ {
+-    struct hostent *host = 0, *alias = 0;
+-#if defined(AF_INET6)
+-    struct sockaddr_in6 sin6;
+-#endif
++    struct addrinfo hints, *res, *res0;
++    int error;
+     struct sockaddr_in sin;
+-    struct sockaddr_in ladr;
+-    struct sockaddr *sa;
+-    int sa_size;
+-    struct servent *sp = 0;
+     unsigned long temp;
+ #if !defined(__linux__)
+     extern char *inet_ntoa();
+@@ -2266,15 +2262,18 @@
+     int srlen;
+ #endif
+     char *cmd, *hostp = 0, *portp = 0, *user = 0, *aliasp = 0;
+-    int family, port = 0;
+-
++    int retry;
++#ifdef NI_WITHSCOPEID
++    const int niflags = NI_NUMERICHOST | NI_WITHSCOPEID;
++#else
++    const int niflags = NI_NUMERICHOST;
++#endif
++    
+     /* clear the socket address prior to use */
+     memset((char *)&sin, 0, sizeof(sin));
+ 
+     if (connected) {
+ 	printf("?Already connected to %s\r\n", hostname);
+-	seteuid(getuid());
+-	setuid(getuid());
+ 	return 0;
+     }
+     if (argc < 2) {
+@@ -2324,8 +2323,6 @@
+ 	}
+     usage:
+ 	printf("usage: %s [-l user] [-a] host-name [port]\r\n", cmd);
+-	seteuid(getuid());
+-	setuid(getuid());
+ 	return 0;
+     }
+     if (hostp == 0)
+@@ -2340,185 +2337,80 @@
+ 	temp = sourceroute(hostp, &srp, &srlen);
+ 	if (temp == 0) {
+ 	    herror(srp);
+-	    seteuid(getuid());
+-	    setuid(getuid());
+ 	    return 0;
+ 	} else if (temp == -1) {
+ 	    printf("Bad source route option: %s\r\n", hostp);
+-	    seteuid(getuid());
+-	    setuid(getuid());
+ 	    return 0;
+ 	} else {
+ 	    abort();
+ 	}
+-    } else {
+-#endif
+-	memset (&sin, 0, sizeof(sin));
+-#if defined(HAVE_INET_PTON) && defined(AF_INET6)
+-	memset (&sin6, 0, sizeof(sin6));
+-
+-	if(inet_pton(AF_INET6, hostp, &sin6.sin6_addr)) {
+-	    sin6.sin6_family = family = AF_INET6;
+-	    sa = (struct sockaddr *)&sin6;
+-	    sa_size = sizeof(sin6);
+-	    strcpy(_hostname, hostp);
+-	    hostname =_hostname;
+-	} else
+-#endif
+-	    if(inet_aton(hostp, &sin.sin_addr)){
+-		sin.sin_family = family = AF_INET;
+-		sa = (struct sockaddr *)&sin;
+-		sa_size = sizeof(sin);
+-		strcpy(_hostname, hostp);
+-		hostname = _hostname;
+-	    } else {
+-#ifdef HAVE_GETHOSTBYNAME2
+-		host = gethostbyname2(hostp, AF_INET6);
+-		if(host == NULL)
+-		    host = gethostbyname2(hostp, AF_INET);
+-#else
+-		host = gethostbyname(hostp);
+-#endif
+-		if (host) {
+-		    strncpy(_hostname, host->h_name, sizeof(_hostname));
+-		    family = host->h_addrtype;
+-
+-		    switch(family) {
+-		    case AF_INET:
+-			memset(&sin, 0, sizeof(sin));
+-			sa_size = sizeof(sin);
+-			sa = (struct sockaddr *)&sin;
+-			sin.sin_family = family;
+-
+-			memcpy(&sin.sin_addr, *host->h_addr_list, sizeof(struct in_addr));
+-			break;
+-#if defined(AF_INET6) && defined(HAVE_STRUCT_SOCKADDR_IN6)
+-		    case AF_INET6:
+-			memset(&sin6, 0, sizeof(sin6));
+-			sa_size = sizeof(sin6);
+-			sa = (struct sockaddr *)&sin6;
+-			sin6.sin6_family = family;
+-			memcpy(&sin6.sin6_addr, *host->h_addr_list, sizeof(struct in6_addr));
+-			break;
+-#endif
+-		    default:
+-			fprintf(stderr, "Bad address family: %d\n", family);
+-			return 0;
+-		    }
+-		    
+-		    _hostname[sizeof(_hostname)-1] = '\0';
+-		    hostname = _hostname;
+-		} else {
+-		    herror(hostp);
+-		    seteuid(getuid());
+-		    setuid(getuid());
+-		    return 0;
+-		}
+-	    }
+-#if	defined(IP_OPTIONS) && defined(IPPROTO_IP)
+-    }
++    } else
+ #endif
+-    if (portp) {
+-	if (*portp == '-') {
+-	    portp++;
+-	    telnetport = 1;
+-	} else
+-	    telnetport = 0;
+-	port = atoi(portp);
+-	if (port == 0) {
+-	    sp = getservbyname(portp, "tcp");
+-	    if (sp)
+-		port = sp->s_port;
+-	    else {
+-		printf("%s: bad port number\r\n", portp);
+-		seteuid(getuid());
+-		setuid(getuid());
+-		return 0;
+-	    }
+-	} else {
+-	    port = htons(port);
+-	}
+-    } else {
+-	if (sp == 0) {
+-	    sp = getservbyname("telnet", "tcp");
+-	    if (sp == 0) {
+-		fprintf(stderr, "telnet: tcp/telnet: unknown service\r\n");
+-		seteuid(getuid());
+-		setuid(getuid());
+-		return 0;
+-	    }
+-	    port = sp->s_port;
++    {
++	hostname = hostp;
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = PF_UNSPEC;
++	hints.ai_socktype = SOCK_STREAM;
++	hints.ai_flags = AI_CANONNAME;
++	if (portp == NULL) {
++		portp = "telnet";
++	} else if (*portp == '-') {
++		portp++;
++		telnetport = 1;
++	}
++	h_errno = 0;
++	error = getaddrinfo(hostp, portp, &hints, &res0);
++	if (error) {
++	    if (error == EAI_SERVICE)
++	        warnx("%s: bad port", portp);
++	    else
++		warnx("%s: %s", hostp, gai_strerror(error));
++	   if (h_errno)
++		herror(hostp);
++	   return 0;
+ 	}
+-	telnetport = 1;
+     }
+-    switch(family) {
+-    case AF_INET:
+-	sin.sin_port = port;
+-	printf("Trying %s...\r\n", inet_ntoa(sin.sin_addr));
+-	break;
+-#if defined(AF_INET6) && defined(HAVE_STRUCT_SOCKADDR_IN6)
+-    case AF_INET6: {
+-#ifndef INET6_ADDRSTRLEN
+-#define INET6_ADDRSTRLEN 46 
+-#endif
+ 
+-	char buf[INET6_ADDRSTRLEN];
+-
+-	sin6.sin6_port = port;
+-#ifdef HAVE_INET_NTOP
+-	printf("Trying %s...\r\n", inet_ntop(AF_INET6,
+-					     &sin6.sin6_addr,
+-					     buf,
+-					     sizeof(buf)));
+-#endif
+-	break;
+-    }
+-#endif
+-    default:
+-	abort();
+-    }
+-
+-    do {
+-	net = socket(family, SOCK_STREAM, 0);
+-	seteuid(getuid());
+-	setuid(getuid());
+-	if (net < 0) {
+-	    perror("telnet: socket");
+-	    return 0;
++    net = -1;
++    retry = 0;
++    for (res = res0; res; res = res->ai_next) {
++	if (1 /* retry */) {
++	    char hbuf[NI_MAXHOST];
++	    
++	    if (getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf),
++	            NULL, 0, niflags) != 0) {
++		strcpy(hbuf, "(invalid)");
++	    }
++	    printf("Trying %s...\r\n", hbuf);
+ 	}
++	net = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
++	if (net < 0)
++	    continue;
++	    
+ 	if (aliasp) {
+-	    memset ((caddr_t)&ladr, 0, sizeof (ladr));
+-	    temp = inet_addr(aliasp);
+-	    if (temp != INADDR_NONE) {
+-	        ladr.sin_addr.s_addr = temp;
+-	        ladr.sin_family = AF_INET;
+-	        alias = gethostbyaddr((char *)&temp, sizeof(temp), AF_INET);
+-	    } else {
+-	        alias = gethostbyname(aliasp);
+-	        if (alias) {
+-		    ladr.sin_family = alias->h_addrtype;
+-#if	defined(h_addr)		/* In 4.3, this is a #define */
+-		    memmove((caddr_t)&ladr.sin_addr,
+-			alias->h_addr_list[0], alias->h_length);
+-#else	/* defined(h_addr) */
+-		    memmove((caddr_t)&ladr.sin_addr, alias->h_addr,
+-			alias->h_length);
+-#endif	/* defined(h_addr) */
+-	        } else {
+-		    herror(aliasp);
+-		    return 0;
+-	        }
++	    struct addrinfo ahints, *ares;
++	    memset(&ahints, 0, sizeof(ahints));
++	    ahints.ai_family = PF_UNSPEC;
++	    ahints.ai_socktype = SOCK_STREAM;
++	    ahints.ai_flags = AI_PASSIVE;
++	    error = getaddrinfo(aliasp, "0", &ahints, &ares);
++	    if (error) {
++	        warn("%s: %s", aliasp, gai_strerror(error));
++	        close(net);
++	        freeaddrinfo(ares);
++	        continue;
+ 	    }
+-            ladr.sin_port = htons(0);
+-  
+-            if (bind (net, (struct sockaddr *)&ladr, sizeof(ladr)) < 0) {
+-                perror(aliasp);; 
++	    if (bind(net, ares->ai_addr, ares->ai_addrlen) < 0) {
++	        perror(aliasp);
+                 (void) close(net);   /* dump descriptor */
+-		return 0;
++		freeaddrinfo(ares);
++		continue;
+             }
++	    freeaddrinfo(ares);
+         }
+  #if	defined(IP_OPTIONS) && defined(IPPROTO_IP)
+-	if (srp && setsockopt(net, IPPROTO_IP, IP_OPTIONS, (char *)srp, srlen) < 0)
++	if (srp && res->ai_family == AF_INET
++	 && setsockopt(net, IPPROTO_IP, IP_OPTIONS, (char *)srp, srlen) < 0)
+ 		perror("setsockopt (IP_OPTIONS)");
+ #endif
+ #if	defined(IPPROTO_IP) && defined(IP_TOS)
+@@ -2542,65 +2434,32 @@
+ 		perror("setsockopt (SO_DEBUG)");
+ 	}
+ 
+-	if (connect(net, sa, sa_size) < 0) {
+-	    int retry = 0;
+-
+-	    if (host && host->h_addr_list[1]) {
+-		int oerrno = errno;
+-	        retry = 1;
+-
+-		switch(family) {
+-		case AF_INET :
+-		    fprintf(stderr, "telnet: connect to address %s: ",
+-			    inet_ntoa(sin.sin_addr));
+-		    ++host->h_addr_list;
+-		    memcpy(&sin.sin_addr, *host->h_addr_list, sizeof(struct in_addr));
+-		    break;
+-#if defined(AF_INET6) && defined(HAVE_STRUCT_SOCKADDR_IN6)
+-		case AF_INET6: {
+-		    char buf[INET6_ADDRSTRLEN];
+-
+-		    fprintf(stderr, "telnet: connect to address %s: ",
+-			    inet_ntop(AF_INET6, &sin6.sin6_addr, buf,
+-				      sizeof(buf)));
+-		    ++host->h_addr_list;
+-		    memcpy(&sin6.sin6_addr, *host->h_addr_list, sizeof(struct in6_addr));
+-		    break;
+-		}
+-#endif
+-		default:
+-		    abort();
+-		}
+-                   
+-		errno = oerrno;
+-		perror(NULL);
+-
+-		switch(family) {
+-		case AF_INET :
+-			printf("Trying %s...\r\n", inet_ntoa(sin.sin_addr));
+-			break;
+-#if defined(AF_INET6) && defined(HAVE_STRUCT_SOCKADDR_IN6)
+-		case AF_INET6: {
+-		    printf("Trying %s...\r\n", inet_ntop(AF_INET6,
+-					     &sin6.sin6_addr,
+-					     buf,
+-					     sizeof(buf)));
+-		    break;
+-		}
+-#endif
+-		}
+-		
+-		(void) NetClose(net);
+-		continue;
++	if (connect(net, res->ai_addr, res->ai_addrlen) < 0) {
++	    char hbuf[NI_MAXHOST];
++	    
++	    if (getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf),
++		    NULL, 0, NI_NUMERICHOST) != 0) {
++	        strcpy(hbuf, "(invalid)");
+ 	    }
+-	    perror("telnet: Unable to connect to remote host");
+-	    return 0;
++	    fprintf(stderr, "telnet: connect to address %s: %s\n", hbuf,
++	        strerror(errno));
++	
++	    close(net);
++	    net = -1;
++	    retry++;
++	    continue;
+ 	}
++
+ 	connected++;
+ #if	defined(AUTHENTICATION) || defined(ENCRYPTION)
+ 	auth_encrypt_connect(connected);
+ #endif	/* defined(AUTHENTICATION) */
+-    } while (connected == 0);
++	break;
++    }
++    freeaddrinfo(res0);
++    if (net < 0) {
++        return 0;
++    }
+     cmdrc(hostp, hostname);
+     if (autologin && user == NULL) {
+ 	struct passwd *pw;
+@@ -2652,6 +2511,9 @@
+         encrypthelp[] = "turn on (off) encryption ('encrypt ?' for more)",
+ #endif
+ 	zhelp[] =	"suspend telnet",
++#ifdef SKEY
++	skeyhelp[] =	"compute response to s/key challenge",
++#endif
+ 	shellhelp[] =	"invoke a subshell",
+ 	envhelp[] =	"change environment variables ('environ ?' for more)",
+ 	modestring[] = "try to enter line or character mode ('mode ?' for more)";
+@@ -2690,7 +2552,7 @@
+ 	{ "environ",	envhelp,	env_cmd,	0 },
+ 	{ "?",		helphelp,	help,		0 },
+ #if	defined(SKEY)
+-	{ "skey",	NULL,		skey_calc,	0 },
++	{ "skey",	skeyhelp,	skey_calc,	0 },
+ #endif		
+ 	{ 0,		0,		0,		0 }
+ };
+diff -uNr telnet/externs.h telnet.obsd-cvs/externs.h
+--- telnet/externs.h	Mon Feb  8 22:56:11 1999
++++ telnet.obsd-cvs/externs.h	Sat Mar 10 10:54:35 2001
+@@ -1,4 +1,4 @@
+-/*	$OpenBSD: externs.h,v 1.4 1998/03/12 17:31:32 deraadt Exp $	*/
++/*	$OpenBSD: externs.h,v 1.5 1998/03/12 2001/01/22 11:03:38 fgsch Exp $	*/
+ /* $KTH: externs.h,v 1.16 1997/11/29 02:28:35 joda Exp $ */
+ 
+ /*
+@@ -447,7 +447,7 @@
+     *Ibackp,           /* Oldest byte of 3270 data */
+     Ibuf[],            /* 3270 buffer */
+     *Ifrontp,          /* Where next 3270 byte goes */
+-    tline[],
++    tline[200],
+     *transcom;         /* Transparent command */
+ 
+ extern int
+diff -uNr telnet/main.c telnet.obsd-cvs/main.c
+--- telnet/main.c	Wed Apr  7 23:23:35 1999
++++ telnet.obsd-cvs/main.c	Sat Mar 10 09:59:35 2001
+@@ -1,4 +1,4 @@
+-/*	$OpenBSD: main.c,v 1.7 1998/05/15 03:16:38 art Exp $	*/
++/*	$OpenBSD: main.c,v 1.10 2001/01/21 22:46:37 aaron Exp $	*/
+ /*	$NetBSD: main.c,v 1.5 1996/02/28 21:04:05 thorpej Exp $	*/
+ 
+ /*
+@@ -81,10 +81,10 @@
+ 	    prompt,
+ #ifdef	AUTHENTICATION
+ 	    "[-8] [-E] [-K] [-L] [-S tos] [-X atype] [-a] [-c] [-d] [-e char]",
+-	    "\n\t[-k realm] [-l user] [-f/-F] [-n tracefile] [-b hostalias ]",
++	    "\n\t[-k realm] [-l user] [-f/-F] [-n tracefile] [-b hostalias ] ",
+ #else
+ 	    "[-8] [-E] [-L] [-S tos] [-a] [-c] [-d] [-e char] [-l user]",
+-	    "\n\t[-n tracefile] [-b hostalias ]",
++	    "\n\t[-n tracefile] [-b hostalias ] ",
+ #endif
+ #if defined(TN3270) && defined(unix)
+ # ifdef AUTHENTICATION
+@@ -95,13 +95,11 @@
+ #else
+ 	    "[-r] ",
+ #endif
++	    "\n\r "
+ #ifdef ENCRYPTION
+-	    "[-x] [host-name [port]]"
+-#else
+-
+-	    "[host-name [port]]"
++	    "[-x] " 
+ #endif
+-	);
++	    "[host-name [port]]");
+ 	exit(1);
+ }
+ 
+@@ -276,8 +274,8 @@
+ 			break;
+ 		case 't':
+ #if defined(TN3270) && defined(unix)
++			(void)strncpy(tline, optarg, sizeof(tline));
+ 			transcom = tline;
+-			(void)strcpy(transcom, optarg);
+ #else
+ 			fprintf(stderr,
+ 			   "%s: Warning: -t ignored, no TN3270 support.\n",
+diff -uNr telnet/sys_bsd.c telnet.obsd-cvs/sys_bsd.c
+--- telnet/sys_bsd.c	Wed Apr  7 21:38:31 1999
++++ telnet.obsd-cvs/sys_bsd.c	Sat Mar 10 10:55:18 2001
+@@ -1,4 +1,4 @@
+-/*	$OpenBSD: sys_bsd.c,v 1.6 1998/12/28 11:13:51 deraadt Exp $	*/
++/*	$OpenBSD: sys_bsd.c,v 1.8 2000/10/10 15:41:10 millert Exp $	*/
+ /*	$NetBSD: sys_bsd.c,v 1.11 1996/02/28 21:04:10 thorpej Exp $	*/
+ 
+ /*
+@@ -35,6 +35,7 @@
+  */
+ 
+ #include "telnet_locl.h"
++#include <err.h>
+ 
+ /*
+  * The following routines try to encapsulate what is system dependent
+@@ -198,9 +199,10 @@
+ TerminalFlushOutput(void)
+ {
+ #ifdef	TIOCFLUSH
+-    (void) ioctl(fileno(stdout), TIOCFLUSH, (char *) 0);
++    int com = FWRITE;
++    (void) ioctl(fileno(stdout), TIOCFLUSH, (int *) &com);
+ #else
+-    (void) ioctl(fileno(stdout), TCFLSH, (char *) 0);
++    (void) ioctl(fileno(stdout), TCFLSH, (int *) 0);
+ #endif
+ }
+ 
+diff -uNr telnet/telnet.c telnet.obsd-cvs/telnet.c
+--- telnet/telnet.c	Wed Apr  7 23:22:14 1999
++++ telnet.obsd-cvs/telnet.c	Sat Mar 10 11:02:34 2001
+@@ -1,4 +1,4 @@
+-/*	$OpenBSD: telnet.c,v 1.6 1998/07/27 15:29:29 millert Exp $	*/
++/*	$OpenBSD: telnet.c,v 1.11 2000/11/10 15:33:13 provos millert Exp $	*/
+ /*	$NetBSD: telnet.c,v 1.7 1996/02/28 21:04:15 thorpej Exp $	*/
+ 
+ /*
+@@ -35,6 +35,8 @@
+  */
+ 
+ #include "telnet_locl.h"
++#include <curses.h>
++#include <term.h>
+ 
+ #define        strip(x) (eight ? (x) : ((x) & 0x7f))
+ 
+@@ -523,10 +525,9 @@
+ }
+ 
+ /*
+- * Given a buffer returned by tgetent(), this routine will turn
+- * the pipe seperated list of names in the buffer into an array
+- * of pointers to null terminated names.  We toss out any bad,
+- * duplicate, or verbose names (names with spaces).
++ * This routine will turn a pipe seperated list of names in the buffer
++ * into an array of pointers to NUL terminated names.  We toss out any
++ * bad, duplicate, or verbose names (names with spaces).
+  */
+ 
+ int is_unique P((char *, char **, char **));
+@@ -554,7 +555,7 @@
+ 	/*
+ 	 * Count up the number of names.
+ 	 */
+-	for (n = 1, cp = buf; *cp && *cp != ':'; cp++) {
++	for (n = 1, cp = buf; *cp; cp++) {
+ 		if (*cp == '|')
+ 			n++;
+ 	}
+@@ -659,25 +660,6 @@
+ 	return (1);
+ }
+ 
+-static char termbuf[1024];
+-
+-int telnet_setupterm	P((char *tname, int fd, int *errp)); /* XXX move elsewhere */
+-	/*ARGSUSED*/
+-	int
+-telnet_setupterm(char *tname, int fd, int *errp)
+-{
+-	(void)fd;
+-	if (tgetent(termbuf, tname) == 1) {
+-		termbuf[1023] = '\0';
+-		if (errp)
+-			*errp = 1;
+-		return(0);
+-	}
+-	if (errp)
+-		*errp = 0;
+-	return(-1);
+-}
+-
+ int resettermname = 1;
+ 
+ char *gettermname P((void));	/* XXX move elsewhere */
+@@ -687,15 +669,15 @@
+ 	char *tname;
+ 	static char **tnamep = 0;
+ 	static char **next;
+-	int err;
++	int errret;
+ 
+ 	if (resettermname) {
+ 		resettermname = 0;
+ 		if (tnamep && tnamep != unknown)
+ 			free(tnamep);
+ 		if ((tname = (char *)env_getvalue((unsigned char *)"TERM")) &&
+-				(telnet_setupterm(tname, 1, &err) == 0)) {
+-			tnamep = mklist(termbuf, tname);
++				(setupterm(tname, 1, &errret) == 0)) {
++			tnamep = mklist(ttytype, tname);
+ 		} else {
+ 			if (tname && ((int)strlen(tname) <= 40)) {
+ 				unknown[0] = tname;
+@@ -1482,10 +1464,15 @@
+ 	void
+ env_opt_start(void)
+ {
+-	if (opt_reply)
+-		opt_reply = (unsigned char *)realloc(opt_reply, OPT_REPLY_SIZE);
+-	else
+-		opt_reply = (unsigned char *)malloc(OPT_REPLY_SIZE);
++	unsigned char *p;
++	
++	if (opt_reply) {
++		p = (unsigned char *)realloc(opt_reply, OPT_REPLY_SIZE);
++		if (p == NULL)
++			free(opt_reply);
++	} else
++		p = (unsigned char *)malloc(OPT_REPLY_SIZE);
++	opt_reply = p;	
+ 	if (opt_reply == NULL) {
+ /*@*/		printf("env_opt_start: malloc()/realloc() failed!!!\n");
+ 		opt_reply = opt_replyp = opt_replyend = NULL;
+@@ -1532,9 +1519,13 @@
+ 				strlen((char *)ep) + 6 > opt_replyend)
+ 	{
+ 		int len;
++		unsigned char *p;
+ 		opt_replyend += OPT_REPLY_SIZE;
+ 		len = opt_replyend - opt_reply;
+-		opt_reply = (unsigned char *)realloc(opt_reply, len);
++		p = (unsigned char *)realloc(opt_reply, len);
++		if (p == NULL)
++			free(opt_reply);
++		opt_reply = p;
+ 		if (opt_reply == NULL) {
+ /*@*/			printf("env_opt_add: realloc() failed!!!\n");
+ 			opt_reply = opt_replyp = opt_replyend = NULL;
+@@ -1945,7 +1936,7 @@
+ 				command(0, "z\n", 2);
+ 				continue;
+ 			}
+-			if (sc == escape) {
++			if (sc == escape && escape != _POSIX_VDISABLE) {
+ 				command(0, (char *)tbp, tcc);
+ 				bol = 1;
+ 				count += tcc;
+@@ -1962,7 +1953,7 @@
+ 		}
+ 		if ((sc == '\n') || (sc == '\r'))
+ 			bol = 1;
+-	} else if (sc == escape) {
++	} else if (sc == escape && escape != _POSIX_VDISABLE) {
+ 	    /*
+ 	     * Double escape is a pass through of a single escape character.
+ 	     */
+diff -uNr telnet/telnet_locl.h telnet.obsd-cvs/telnet_locl.h
+--- telnet/telnet_locl.h	Thu Mar 12 06:57:44 1998
++++ telnet.obsd-cvs/telnet_locl.h	Sat Mar 10 11:12:37 2001
+@@ -1,4 +1,4 @@
+-/*	$OpenBSD: telnet_locl.h,v 1.1 1998/03/12 04:57:44 art Exp $	*/
++/*	$OpenBSD: telnet_locl.h,v 1.2 1999/12/11 09:08:09 itojun Exp $	*/
+ /* $KTH: telnet_locl.h,v 1.13 1997/11/03 21:37:55 assar Exp $ */
+ 
+ /*
+@@ -86,7 +86,5 @@
+ #include "defines.h"
+ #include "types.h"
+ 
+-#undef AF_INET6 /* XXX - it has not been tested and it doesn't exist yet */
+-
+ /* prototypes */
+ 
+diff -uNr libtelnet/kerberos.c libtelnet.obsd-cvs/kerberos.c
+--- libtelnet/kerberos.c	Mon Feb  8 23:38:17 1999
++++ libtelnet.obsd-cvs/kerberos.c	Sat Mar 10 11:11:03 2001
+@@ -320,11 +320,10 @@
+ 	    char ts[MAXPATHLEN];
+ 	    struct passwd *pw = getpwnam(UserNameRequested);
+ 
+-	    if(pw){
++	    if (pw) {
+ 		snprintf(ts, sizeof(ts),
+-			 "%s%u",
+-			 TKT_ROOT,
+-			 (unsigned)pw->pw_uid);
++			"%s%u", TKT_ROOT, (unsigned)pw->pw_uid);
++		/* XXX allocation failure? */
+ 		setenv("KRBTKFILE", ts, 1);
+ 	    }
+ 	    Data(ap, KRB_ACCEPT, NULL, 0);
+@@ -609,16 +608,26 @@
+ {
+     unsigned char *p = buf;
+     
+-    p += krb_put_nir(cred->service, cred->instance, cred->realm, p);
++    memcpy (p, cred->service, ANAME_SZ);
++    p += ANAME_SZ;
++    memcpy (p, cred->instance, INST_SZ);
++    p += INST_SZ;
++    memcpy (p, cred->realm, REALM_SZ);
++    p += REALM_SZ;
+     memcpy(p, cred->session, 8);
+     p += 8;
+     *p++ = cred->lifetime;
+     *p++ = cred->kvno;
+-    p += krb_put_int(cred->ticket_st.length, p, 4);
++    p += krb_put_int(cred->ticket_st.length, p, 4, 4);
+     memcpy(p, cred->ticket_st.dat, cred->ticket_st.length);
+     p += cred->ticket_st.length;
+-    p += krb_put_int(cred->issue_date, p, 4);
+-    p += krb_put_nir(cred->pname, cred->pinst, NULL, p);
++    p += krb_put_int(cred->issue_date, p, 4, 4);
++    strncpy (cred->pname, p, ANAME_SZ);
++    cred->pname[ANAME_SZ - 1] = '\0';
++    p += ANAME_SZ;
++    strncpy (cred->pinst, p, INST_SZ);
++    cred->pinst[INST_SZ - 1] = '\0';
++    p += INST_SZ;
+     return p - buf;
+ }
+ 
+@@ -627,7 +636,16 @@
+ {
+     unsigned char *p = buf;
+ 
+-    p += krb_get_nir(p, cred->service, cred->instance, cred->realm);
++    strncpy (cred->service, p, ANAME_SZ);
++    cred->service[ANAME_SZ - 1] = '\0';
++    p += ANAME_SZ;
++    strncpy (cred->instance, p, INST_SZ);
++    cred->instance[INST_SZ - 1] = '\0';
++    p += INST_SZ;
++    strncpy (cred->realm, p, REALM_SZ);
++    cred->realm[REALM_SZ - 1] = '\0';
++    p += REALM_SZ;
++
+     memcpy(cred->session, p, 8);
+     p += 8;
+     cred->lifetime = *p++;
+@@ -636,7 +654,10 @@
+     memcpy(cred->ticket_st.dat, p, cred->ticket_st.length);
+     cred->ticket_st.mbz = 0;
+     p += krb_get_int(p, (u_int32_t *)&cred->issue_date, 4, 0);
+-    p += krb_get_nir(p, cred->pname, cred->pinst, NULL);
++    p += krb_get_nir(p, 
++		    cred->pname, sizeof(cred->pname),
++		    cred->pinst, sizeof(cred->pinst),
++		    NULL, 0);
+     return 0;
+ }
+ 
+--- telnet/telnet.1	Thu Nov 12 01:01:46 1998
++++ telnet.obsd-cvs/telnet.1	Thu Nov  9 19:52:41 2000
+@@ -1,4 +1,4 @@
+-.\"	$OpenBSD: telnet.1,v 1.14 1998/11/11 23:01:46 aaron Exp $
++.\"	$OpenBSD: telnet.1,v 1.27 2000/11/09 17:52:41 aaron Exp $
+ .\"	$NetBSD: telnet.1,v 1.5 1996/02/28 21:04:12 thorpej Exp $
+ .\"
+ .\" Copyright (c) 1983, 1990, 1993
+@@ -36,45 +36,34 @@
+ .\"
+ .Dd February 3, 1994
+ .Dt TELNET 1
+-.Os BSD 4.2
++.Os
+ .Sh NAME
+ .Nm telnet
+-.Nd user interface to the 
++.Nd user interface to the
+ .Tn TELNET
+ protocol
+ .Sh SYNOPSIS
+ .Nm telnet
+-.Op Fl 8
+-.Op Fl E
+-.Op Fl F
+-.Op Fl K
+-.Op Fl L
+-.Op Fl S Ar tos
++.Op Fl 8EFKLacdfrx
+ .Op Fl X Ar authtype
+-.Op Fl a
+ .Op Fl b Ar hostalias
+-.Op Fl c
+-.Op Fl d
+ .Op Fl e Ar escapechar
+-.Op Fl f
+ .Op Fl k Ar realm
+ .Op Fl l Ar user
+ .Op Fl n Ar tracefile
+-.Op Fl r
+-.Op Fl x
+ .Oo
+ .Ar host
+ .Op Ar port
+ .Oc
+ .Sh DESCRIPTION
+ The
+-.Nm telnet
++.Nm
+ command
+-is used to communicate with another host using the 
++is used to communicate with another host using the
+ .Tn TELNET
+ protocol.
+ If
+-.Nm telnet
++.Nm
+ is invoked without the
+ .Ar host
+ argument, it enters command mode,
+@@ -85,11 +74,11 @@
+ .Ic open
+ command with those arguments.
+ .Pp
+-Options:
+-.Bl -tag -width indent
++The options are as follows:
++.Bl -tag -width Ds
+ .It Fl 8
+-Specifies an 8-bit data path.  This causes an attempt to
+-negotiate the
++Specifies an 8-bit data path.
++This causes an attempt to negotiate the
+ .Dv TELNET BINARY
+ option on both input and output.
+ .It Fl E
+@@ -103,18 +92,9 @@
+ .It Fl K
+ Specifies no automatic login to the remote system.
+ .It Fl L
+-Specifies an 8-bit data path on output.  This causes the
+-BINARY option to be negotiated on output.
+-.It Fl S Ar tos
+-Sets the IP type-of-service (TOS) option for the telnet
+-connection to the value
+-.Ar tos ,
+-which can be a numeric TOS value
+-or, on systems that support it, a symbolic
+-TOS name found in the
+-.Pa /etc/iptos
+-file.
+-.It Fl X Ar atype 
++Specifies an 8-bit data path on output.
++This causes the BINARY option to be negotiated on output.
++.It Fl X Ar atype
+ Disables the
+ .Ar atype
+ type of authentication.
+@@ -144,7 +124,8 @@
+ .It Fl c
+ Disables the reading of the user's
+ .Pa \&.telnetrc
+-file.  (See the
++file.
++(See the
+ .Ic toggle skiprc
+ command on this man page.)
+ .It Fl d
+@@ -152,7 +133,7 @@
+ .Ic debug
+ toggle to
+ .Dv TRUE .
+-.It Fl e Ar escapechar 
++.It Fl e Ar escapechar
+ Sets the initial
+ .Nm
+ escape character to
+@@ -169,14 +150,14 @@
+ If Kerberos authentication is being used, the
+ .Fl k
+ option requests that
+-.Nm telnet
++.Nm
+ obtain tickets for the remote host in
+ realm
+ .Ar realm
+ instead of the remote host's realm, as determined
+ by
+ .Xr krb_realmofhost 3 .
+-.It Fl l Ar user 
++.It Fl l Ar user
+ When connecting to the remote system, if the remote system
+ understands the
+ .Ev ENVIRON
+@@ -189,7 +170,7 @@
+ This option may also be used with the
+ .Ic open
+ command.
+-.It Fl n Ar tracefile 
++.It Fl n Ar tracefile
+ Opens
+ .Ar tracefile
+ for recording trace information.
+@@ -210,35 +191,38 @@
+ Indicates the official name, an alias, or the Internet address
+ of a remote host.
+ .It Ar port
+-Indicates a port number (address of an application).  If a number is
+-not specified, the default
+-.Nm telnet
++Indicates a port number (address of an application).
++If a number is not specified, the default
++.Nm
+ port is used.
+ .El
+ .Pp
+-When in rlogin mode, a line of the form ~.  disconnects from the
++When in rlogin mode, a line of the form ~.
++disconnects from the
+ remote host; ~ is the telnet escape character.
+ Similarly, the line ~^Z suspends the telnet session.
+ The line ~^] escapes to the normal telnet escape prompt.
+ .Pp
+ Once a connection has been opened,
+-.Nm telnet
++.Nm
+ will attempt to enable the
+ .Dv TELNET LINEMODE
+ option.
+ If this fails,
+-.Nm telnet
++.Nm
+ will revert to one of two input modes:
+ either ``character at a time''
+ or ``old line by line''
+ depending on what the remote system supports.
+ .Pp
+-When 
++When
+ .Dv LINEMODE
+ is enabled, character processing is done on the
+-local system, under the control of the remote system.  When input
++local system, under the control of the remote system.
++When input
+ editing or character echoing is to be disabled, the remote system
+-will relay that information.  The remote system will also relay
++will relay that information.
++The remote system will also relay
+ changes to any special characters that happen on the remote
+ system, so that they can take effect on the local system.
+ .Pp
+@@ -252,7 +236,7 @@
+ (this would mostly be used to enter passwords
+ without the password being echoed).
+ .Pp
+-If the 
++If the
+ .Dv LINEMODE
+ option is enabled, or if the
+ .Ic localchars
+@@ -267,7 +251,7 @@
+ characters are trapped locally, and sent as
+ .Tn TELNET
+ protocol sequences to the remote side.
+-If 
++If
+ .Dv LINEMODE
+ has ever been enabled, then the user's
+ .Ic susp
+@@ -278,9 +262,9 @@
+ protocol sequences,
+ and
+ .Ic quit
+-is sent as a 
++is sent as a
+ .Dv TELNET ABORT
+-instead of 
++instead of
+ .Dv BREAK .
+ There are options (see
+ .Ic toggle
+@@ -296,17 +280,26 @@
+ (in the case of
+ .Ic quit
+ and
+-.Ic intr  ) .
++.Ic intr ) .
+ .Pp
+ While connected to a remote host,
+-.Nm telnet
++.Nm
+ command mode may be entered by typing the
+-.Nm telnet
++.Nm
+ ``escape character'' (initially ``^]'').
+ When in command mode, the normal terminal editing conventions are available.
++Note that the escape character will return to the command mode of the initial
++invocation of
++.Nm
++that has the controlling terminal.
++Use the
++.Cm send escape
++command to switch to command mode in subsequent
++.Nm
++processes on remote hosts.
+ .Pp
+ The following
+-.Nm telnet
++.Nm
+ commands are available.
+ Only enough of each command to uniquely identify it need be typed
+ (this is also true for arguments to the
+@@ -320,26 +313,28 @@
+ .Ic display
+ commands).
+ .Bl -tag -width "mode type"
+-.It Ic auth Ar argument Op Ar ... 
++.It Ic auth Ar argument Op Ar ...
+ The
+ .Ic auth
+ command manipulates the information sent through the
+ .Dv TELNET AUTHENTICATE
+-option.  Valid arguments for the
+-auth command are as follows:
++option.
++Valid arguments for the
++.Ic auth
++command are as follows:
+ .Bl -tag -width "disable type"
+ .It Ic disable Ar type
+ Disables the specified
+ .Ar type
+-of authentication.  To
+-obtain a list of available types, use the
++of authentication.
++To obtain a list of available types, use the
+ .Ic auth disable \&?
+ command.
+ .It Ic enable Ar type
+ Enables the specified
+ .Ar type
+-of authentication.  To
+-obtain a list of available types, use the
++of authentication.
++To obtain a list of available types, use the
+ .Ic auth enable \&?
+ command.
+ .It Ic status
+@@ -350,7 +345,7 @@
+ Close a
+ .Tn TELNET
+ session and return to command mode.
+-.It Ic display Ar argument Op Ar ... 
++.It Ic display Ar argument Op Ar ...
+ Displays all, or some, of the
+ .Ic set
+ and
+@@ -368,26 +363,27 @@
+ .It Ic disable Ar type Ic [input|output]
+ Disables the specified
+ .Ar type
+-of encryption.  If you
+-omit
++of encryption.
++If you omit
+ .Ic input
+ and
+ .Ic output ,
+ both input and output
+-are disabled.  To obtain a list of available
+-types, use the
++are disabled.
++To obtain a list of available types, use the
+ .Ic encrypt disable \&?
+ command.
+ .It Ic enable Ar type Ic [input|output]
+ Enables the specified
+ .Ar type
+-of encryption.  If you
+-omit
++of encryption.
++If you omit
+ .Ic input
+ and
+ .Ic output ,
+ both input and output are
+-enabled.  To obtain a list of available types, use the
++enabled.
++To obtain a list of available types, use the
+ .Ic encrypt enable \&?
+ command.
+ .It Ic input
+@@ -407,18 +403,20 @@
+ .Ic encrypt stop output
+ command.
+ .It Ic start Ic [input|output]
+-Attempts to start encryption.  If you omit
++Attempts to start encryption.
++If you omit
+ .Ic input
+ and
+-.Ic output,
+-both input and output are enabled.  To
+-obtain a list of available types, use the
++.Ic output ,
++both input and output are enabled.
++To obtain a list of available types, use the
+ .Ic encrypt enable \&?
+ command.
+ .It Ic status
+ Lists the current status of encryption.
+ .It Ic stop Ic [input|output]
+-Stops encryption.  If you omit
++Stops encryption.
++If you omit
+ .Ic input
+ and
+ .Ic output ,
+@@ -431,7 +429,7 @@
+ .Ic encrypt stop
+ commands.
+ .El
+-.It Ic environ Ar arguments Op Ar ... 
++.It Ic environ Ar arguments Op Ar ...
+ The
+ .Ic environ
+ command is used to manipulate the
+@@ -456,7 +454,7 @@
+ .Ic environ
+ command are:
+ .Bl -tag -width Fl
+-.It Ic define Ar variable value 
++.It Ic define Ar variable value
+ Define the variable
+ .Ar variable
+ to have a value of
+@@ -466,15 +464,15 @@
+ .Ar value
+ may be enclosed in single or double quotes so
+ that tabs and spaces may be included.
+-.It Ic undefine Ar variable 
++.It Ic undefine Ar variable
+ Remove
+ .Ar variable
+ from the list of environment variables.
+-.It Ic export Ar variable 
++.It Ic export Ar variable
+ Mark the variable
+ .Ar variable
+ to be exported to the remote side.
+-.It Ic unexport Ar variable 
++.It Ic unexport Ar variable
+ Mark the variable
+ .Ar variable
+ to not be exported unless
+@@ -508,7 +506,7 @@
+ suspending a user's session for later reattachment,
+ the logout argument indicates that you
+ should terminate the session immediately.
+-.It Ic mode Ar type 
++.It Ic mode Ar type
+ .Ar type
+ is one of several options, depending on the state of the
+ .Tn TELNET
+@@ -529,40 +527,40 @@
+ option, or, if the remote side does not understand the
+ .Dv LINEMODE
+ option, then attempt to enter ``old-line-by-line'' mode.
+-.It Ic isig Pq Ic \-isig 
+-Attempt to enable (disable) the 
++.It Ic isig Pq Ic \-isig
++Attempt to enable (disable) the
+ .Dv TRAPSIG
+-mode of the 
++mode of the
+ .Dv LINEMODE
+ option.
+-This requires that the 
++This requires that the
+ .Dv LINEMODE
+ option be enabled.
+-.It Ic edit Pq Ic \-edit 
+-Attempt to enable (disable) the 
++.It Ic edit Pq Ic \-edit
++Attempt to enable (disable) the
+ .Dv EDIT
+-mode of the 
++mode of the
+ .Dv LINEMODE
+ option.
+-This requires that the 
++This requires that the
+ .Dv LINEMODE
+ option be enabled.
+-.It Ic softtabs Pq Ic \-softtabs 
+-Attempt to enable (disable) the 
++.It Ic softtabs Pq Ic \-softtabs
++Attempt to enable (disable) the
+ .Dv SOFT_TAB
+-mode of the 
++mode of the
+ .Dv LINEMODE
+ option.
+-This requires that the 
++This requires that the
+ .Dv LINEMODE
+ option be enabled.
+-.It Ic litecho Pq Ic \-litecho 
+-Attempt to enable (disable) the 
++.It Ic litecho Pq Ic \-litecho
++Attempt to enable (disable) the
+ .Dv LIT_ECHO
+-mode of the 
++mode of the
+ .Dv LINEMODE
+ option.
+-This requires that the 
++This requires that the
+ .Dv LINEMODE
+ option be enabled.
+ .It Ic \&?
+@@ -579,7 +577,7 @@
+ Open a connection to the named host.
+ If no port number
+ is specified,
+-.Nm telnet
++.Nm
+ will attempt to contact a
+ .Tn TELNET
+ server at the default port.
+@@ -594,24 +592,29 @@
+ .Ev ENVIRON
+ option.
+ When connecting to a non-standard port,
+-.Nm telnet
++.Nm
+ omits any automatic initiation of
+ .Tn TELNET
+-options.  When the port number is preceded by a minus sign,
++options.
++When the port number is preceded by a minus sign,
+ the initial option negotiation is done.
+ After establishing a connection, the file
+ .Pa \&.telnetrc
+ in the
+-user's home directory is opened.  Lines beginning with a ``#'' are
+-comment lines.  Blank lines are ignored.  Lines that begin
+-without white space are the start of a machine entry.  The
+-first thing on the line is the name of the machine that is
+-being connected to.  The rest of the line, and successive
+-lines that begin with white space are assumed to be
+-.Nm telnet
++user's home directory is opened.
++Lines beginning with a ``#'' are
++comment lines.
++Blank lines are ignored.
++Lines that begin
++without whitespace are the start of a machine entry.
++The first thing on the line is the name of the machine that is
++being connected to.
++The rest of the line, and successive
++lines that begin with whitespace are assumed to be
++.Nm
+ commands and are processed as if they had been typed
+ in manually to the
+-.Nm telnet
++.Nm
+ command prompt.
+ .It Ic quit
+ Close any open
+@@ -619,7 +622,7 @@
+ session and exit
+ .Nm telnet .
+ An end-of-file (in command mode) will also close a session and exit.
+-.It Ic send Ar arguments 
++.It Ic send Ar arguments
+ Sends one or more special character sequences to the remote host.
+ The following are the arguments which may be specified
+ (more than one argument may be specified at a time):
+@@ -673,7 +676,7 @@
+ sequence.
+ .It Ic escape
+ Sends the current
+-.Nm telnet
++.Nm
+ escape character (initially ``^]'').
+ .It Ic ga
+ Sends the
+@@ -788,12 +791,12 @@
+ .Ic send
+ command.
+ .El
+-.It Ic set Ar argument value 
+-.It Ic unset Ar argument value 
++.It Ic set Ar argument value
++.It Ic unset Ar argument value
+ The
+ .Ic set
+ command will set any one of a number of
+-.Nm telnet
++.Nm
+ variables to a specific value or to
+ .Dv TRUE .
+ The special value
+@@ -811,7 +814,8 @@
+ .Ic display
+ command.
+ The variables which may be set or unset, but not toggled, are
+-listed here.  In addition, any of the variables for the
++listed here.
++In addition, any of the variables for the
+ .Ic toggle
+ command may be explicitly set or unset using
+ the
+@@ -832,7 +836,8 @@
+ sequence (see
+ .Ic send ayt
+ preceding) is sent to the
+-remote host.  The initial value for the "Are You There"
++remote host.
++The initial value for the "Are You There"
+ character is the terminal's status character.
+ .It Ic echo
+ This is the value (initially ``^E'') which, when in
+@@ -841,7 +846,7 @@
+ echoing of entered characters (for entering, say, a password).
+ .It Ic eof
+ If
+-.Nm telnet
++.Nm
+ is operating in
+ .Dv LINEMODE
+ or ``old line by line'' mode, entering this character
+@@ -854,7 +859,7 @@
+ character.
+ .It Ic erase
+ If
+-.Nm telnet
++.Nm
+ is in
+ .Ic localchars
+ mode (see
+@@ -862,7 +867,7 @@
+ .Ic localchars
+ below),
+ and if
+-.Nm telnet
++.Nm
+ is operating in ``character at a time'' mode, then when this
+ character is typed, a
+ .Dv TELNET EC
+@@ -879,14 +884,14 @@
+ character.
+ .It Ic escape
+ This is the
+-.Nm telnet
++.Nm
+ escape character (initially ``^['') which causes entry
+ into
+-.Nm telnet
++.Nm
+ command mode (when connected to a remote system).
+ .It Ic flushoutput
+ If
+-.Nm telnet
++.Nm
+ is in
+ .Ic localchars
+ mode (see
+@@ -916,12 +921,13 @@
+ .Dv LINEMODE ,
+ these are the
+ characters that, when typed, cause partial lines to be
+-forwarded to the remote system.  The initial value for
++forwarded to the remote system.
++The initial value for
+ the forwarding characters are taken from the terminal's
+ eol and eol2 characters.
+ .It Ic interrupt
+ If
+-.Nm telnet
++.Nm
+ is in
+ .Ic localchars
+ mode (see
+@@ -945,7 +951,7 @@
+ character.
+ .It Ic kill
+ If
+-.Nm telnet
++.Nm
+ is in
+ .Ic localchars
+ mode (see
+@@ -953,7 +959,7 @@
+ .Ic localchars
+ below),
+ and if
+-.Nm telnet
++.Nm
+ is operating in ``character at a time'' mode, then when this
+ character is typed, a
+ .Dv TELNET EL
+@@ -970,7 +976,7 @@
+ character.
+ .It Ic lnext
+ If
+-.Nm telnet
++.Nm
+ is operating in
+ .Dv LINEMODE
+ or ``old line by line'' mode, then this character is taken to
+@@ -985,7 +991,7 @@
+ character.
+ .It Ic quit
+ If
+-.Nm telnet
++.Nm
+ is in
+ .Ic localchars
+ mode (see
+@@ -1009,7 +1015,7 @@
+ character.
+ .It Ic reprint
+ If
+-.Nm telnet
++.Nm
+ is operating in
+ .Dv LINEMODE
+ or old line by line'' mode, then this character is taken to
+@@ -1031,8 +1037,9 @@
+ This character, at the beginning of a line, followed by
+ a "." closes the connection; when followed by a ^Z it
+ suspends the
+-.Nm telnet
+-command.  The initial state is to
++.Nm
++command.
++The initial state is to
+ disable the
+ .Ic rlogin
+ escape character.
+@@ -1066,7 +1073,7 @@
+ character.
+ .It Ic susp
+ If
+-.Nm telnet
++.Nm
+ is in
+ .Ic localchars
+ mode, or
+@@ -1093,12 +1100,13 @@
+ .Ic option
+ tracing being
+ .Dv TRUE ,
+-will be written.  If it is set to
++will be written.
++If it is set to
+ .Dq Fl ,
+ then tracing information will be written to standard output (the default).
+ .It Ic worderase
+ If
+-.Nm telnet
++.Nm
+ is operating in
+ .Dv LINEMODE
+ or ``old line by line'' mode, then this character is taken to
+@@ -1117,25 +1125,32 @@
+ .Pq Ic unset
+ commands.
+ .El
+-.It Ic slc Ar state 
++.It Ic skey Ar sequence challenge
++The
++.Ic skey
++command computes a response to the S/Key challenge.
++See
++.Xr skey 1
++for more information on the S/Key system.
++.It Ic slc Ar state
+ The
+ .Ic slc
+ command (Set Local Characters) is used to set
+ or change the state of the special
+-characters when the 
++characters when the
+ .Dv TELNET LINEMODE
+ option has
+-been enabled.  Special characters are characters that get
+-mapped to 
++been enabled.
++Special characters are characters that get mapped to
+ .Tn TELNET
+ commands sequences (like
+ .Ic ip
+ or
+-.Ic quit  )
++.Ic quit )
+ or line editing characters (like
+ .Ic erase
+ and
+-.Ic kill  ) .
++.Ic kill ) .
+ By default, the local special characters are exported.
+ .Bl -tag -width Fl
+ .It Ic check
+@@ -1144,15 +1159,15 @@
+ character settings, and if there are any discrepancies with
+ the local side, the local side will switch to the remote value.
+ .It Ic export
+-Switch to the local defaults for the special characters.  The
+-local default characters are those of the local terminal at
++Switch to the local defaults for the special characters.
++The local default characters are those of the local terminal at
+ the time when
+-.Nm telnet
++.Nm
+ was started.
+ .It Ic import
+ Switch to the remote defaults for the special characters.
+ The remote default characters are those of the remote system
+-at the time when the 
++at the time when the
+ .Tn TELNET
+ connection was established.
+ .It Ic \&?
+@@ -1165,13 +1180,13 @@
+ .Nm telnet .
+ This includes the peer one is connected to, as well
+ as the current mode.
+-.It Ic toggle Ar arguments Op Ar ... 
++.It Ic toggle Ar arguments Op Ar ...
+ Toggle (between
+ .Dv TRUE
+ and
+ .Dv FALSE )
+ various flags that control how
+-.Nm telnet
++.Nm
+ responds to events.
+ These flags may be set explicitly to
+ .Dv TRUE
+@@ -1206,7 +1221,7 @@
+ sequences; see
+ .Ic set
+ above for details),
+-.Nm telnet
++.Nm
+ refuses to display any data on the user's terminal
+ until the remote system acknowledges (via a
+ .Dv TELNET TIMING MARK
+@@ -1220,13 +1235,14 @@
+ done an "stty noflsh", otherwise
+ .Dv FALSE
+ (see
+-.Xr stty  1  ) .
++.Xr stty 1 ) .
+ .It Ic autodecrypt
+ When the
+ .Dv TELNET ENCRYPT
+ option is negotiated, by
+ default the actual encryption (decryption) of the data
+-stream does not start automatically.  The
++stream does not start automatically.
++The
+ .Ic autoencrypt
+ .Pq Ic autodecrypt
+ command states that encryption of the
+@@ -1238,7 +1254,8 @@
+ .Dv TELNET AUTHENTICATION
+ option
+ .Tn TELNET
+-attempts to use it to perform automatic authentication.  If the
++attempts to use it to perform automatic authentication.
++If the
+ .Dv AUTHENTICATION
+ option is not supported, the user's login
+ name are propagated through the
+@@ -1314,7 +1331,7 @@
+ The initial value for this toggle is
+ .Dv FALSE .
+ .It Ic debug
+-Toggles socket level debugging (useful only to the super-user).
++Toggles socket level debugging (useful only to the superuser).
+ The initial value for this toggle is
+ .Dv FALSE .
+ .It Ic encdebug
+@@ -1340,7 +1357,7 @@
+ .Ic brk ,
+ .Ic ec ,
+ and
+-.Ic el  ;
++.Ic el ;
+ see
+ .Ic send
+ above).
+@@ -1379,7 +1396,7 @@
+ .Dv FALSE .
+ .It Ic options
+ Toggles the display of some internal
+-.Nm telnet
++.Nm
+ protocol processing (having to do with
+ .Tn TELNET
+ options).
+@@ -1404,8 +1421,8 @@
+ skips the reading of the
+ .Pa \&.telnetrc
+ file in the user's home
+-directory when connections are opened.  The initial
+-value for this toggle is
++directory when connections are opened.
++The initial value for this toggle is
+ .Dv FALSE .
+ .It Ic termdata
+ Toggles the display of all terminal data (in hexadecimal format).
+@@ -1416,9 +1433,10 @@
+ .Ic verbose_encrypt
+ toggle is
+ .Dv TRUE ,
+-.Nm telnet
++.Nm
+ prints out a message each time encryption is enabled or
+-disabled.  The initial value for this toggle is
++disabled.
++The initial value for this toggle is
+ .Dv FALSE .
+ .It Ic \&?
+ Displays the legal
+@@ -1430,22 +1448,24 @@
+ .Nm telnet .
+ This command only works when the user is using the
+ .Xr csh 1 .
+-.It Ic \&! Op Ar command 
++.It Ic \&! Op Ar command
+ Execute a single command in a subshell on the local
+-system.  If
++system.
++If
+ .Ar command
+ is omitted, then an interactive
+ subshell is invoked.
+-.It Ic \&? Op Ar command 
+-Get help.  With no arguments,
+-.Nm telnet
++.It Ic \&? Op Ar command
++Get help.
++With no arguments,
++.Nm
+ prints a help summary.
+ If a command is specified,
+-.Nm telnet
++.Nm
+ will print the help information for just that command.
+ .El
+ .Sh ENVIRONMENT
+-.Nm telnet
++.Nm
+ uses at least the
+ .Ev HOME ,
+ .Ev SHELL ,
+@@ -1464,16 +1484,18 @@
+ .El
+ .Sh HISTORY
+ The
+-.Nm telnet
++.Nm
+ command appeared in
+ .Bx 4.2 .
+ .Sh NOTES
+ On some remote systems, echo has to be turned off manually when in
+ ``old line by line'' mode.
+ .Pp
+-In ``old line by line'' mode or 
++In ``old line by line'' mode or
+ .Dv LINEMODE
+ the terminal's
+ .Ic eof
+ character is only recognized (and sent to the remote system)
+ when it is the first character on a line.
++.Pp
++Source routing is not supported yet for IPv6.

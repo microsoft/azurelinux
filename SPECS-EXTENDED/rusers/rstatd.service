@@ -1,0 +1,13 @@
+[Unit]
+Description=Remote Machine Performance Metrics Gatherer
+Requires=network.target rpcbind.service
+After=rpcbind.service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/rpc.rstatd
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,75 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jdom</groupId>
+	<artifactId>jdom</artifactId>
+	<packaging>jar</packaging>
+	
+	<name>JDOM</name>
+	<version>1.1.3</version>
+	
+	<description>
+		A complete, Java-based solution for accessing, manipulating, 
+		and outputting XML data
+	</description>
+	<url>http://www.jdom.org</url>
+
+    <organization>
+        <name>JDOM</name>
+        <url>http://www.jdom.org</url>
+    </organization>
+
+    <mailingLists>
+        <mailingList>
+            <name>JDOM-interest Mailing List</name>
+            <post>jdom-interest@jdom.org</post>
+            <archive>http://jdom.markmail.org/</archive>
+        </mailingList>
+    </mailingLists>
+
+	<licenses>
+		<license>
+			<name>Similar to Apache License but with the acknowledgment clause removed</name>
+			<url>https://raw.github.com/hunterhacker/jdom/master/LICENSE.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>git@github.com:/hunterhacker/jdom</url>
+		<connection>scm:git:git@github.com:hunterhacker/jdom</connection>
+		<developerConnection>scm:git:git@github.com:hunterhacker/jdom</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>hunterhacker</id>
+			<name>Jason Hunter</name>
+			<email>jhunter@servlets.com</email>
+		</developer>
+		<developer>
+			<id>rolfl</id>
+			<name>Rolf Lear</name>
+			<email>jdom@tuis.net</email>
+		</developer>
+	</developers>
+	
+	<dependencies>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.1.3</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.10.0</version>
+			<optional>true</optional>
+		</dependency>
+
+	</dependencies>
+	
+	<properties>
+		<jdk.version>1.2</jdk.version>
+	</properties>
+</project>

@@ -1,0 +1,9 @@
+diff -up Module-Install-AutoLicense-0.10/Makefile.PL.orig Module-Install-AutoLicense-0.10/Makefile.PL
+--- Module-Install-AutoLicense-0.10/Makefile.PL.orig	2017-02-20 12:26:05.593011837 +0100
++++ Module-Install-AutoLicense-0.10/Makefile.PL	2017-02-20 12:27:11.288726594 +0100
+@@ -1,4 +1,5 @@
+ use if ! ( grep { $_ eq '.' } @INC ), qw[lib .];
++use lib './lib';
+ use strict;
+ use inc::Module::Install;
+ use Config;

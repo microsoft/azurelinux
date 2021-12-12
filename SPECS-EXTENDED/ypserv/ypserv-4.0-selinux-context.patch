@@ -1,0 +1,144 @@
+diff -up ypserv-5bfba760283060087aefeb417342bcc66d349b2e/configure.ac.selinux-context ypserv-5bfba760283060087aefeb417342bcc66d349b2e/configure.ac
+--- ypserv-5bfba760283060087aefeb417342bcc66d349b2e/configure.ac.selinux-context	2018-06-13 15:08:56.011432773 +0200
++++ ypserv-5bfba760283060087aefeb417342bcc66d349b2e/configure.ac	2018-06-13 15:08:56.017432861 +0200
+@@ -240,6 +240,26 @@ then
+   exit
+ fi
+ 
++AC_ARG_WITH(selinux,
++    [AC_HELP_STRING([--with-selinux@<:@=yes|no@:>@],[Enables SELinux support [no]])],
++
++  [ if test "$withval" = "yes"; then
++    AC_CHECK_HEADERS([selinux/selinux.h], [],
++        [AC_MSG_ERROR([Missing SELinux header files])])
++    AC_CHECK_LIB(selinux, setfilecon_raw, [],
++        [AC_MSG_ERROR([Missing or incorrect SELinux library])])
++    AC_CHECK_LIB(selinux, getfilecon_raw, [],
++        [AC_MSG_ERROR([Missing or incorrect SELinux library])])
++    AC_CHECK_LIB(selinux, freecon, [],
++          [AC_MSG_ERROR([Missing or incorrect SELinux library])])
++  fi
++ ],[])
++
++AC_SUBST(with_selinux)
++if test "$with_selinux" = "yes"; then
++      AC_DEFINE(WITH_SELINUX, 1, [Define to 1 if SELinux support is enabled])
++fi
++
+ AC_CHECK_LIB(crypt,crypt,LIBCRYPT="-lcrypt",LIBCRYPT="")
+ AC_CHECK_HEADERS(crypt.h)
+ AC_SUBST(LIBCRYPT)
+diff -up ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.yppasswdd/Makefile.am.selinux-context ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.yppasswdd/Makefile.am
+--- ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.yppasswdd/Makefile.am.selinux-context	2016-11-22 16:40:13.000000000 +0100
++++ ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.yppasswdd/Makefile.am	2018-06-13 15:08:56.017432861 +0200
+@@ -24,7 +24,7 @@ sbin_PROGRAMS = rpc.yppasswdd
+ 
+ rpc_yppasswdd_SOURCES = update.c yppasswd_xdr.c yppasswdd.c
+ 
+-rpc_yppasswdd_LDADD =  @PIE_LDFLAGS@ $(top_builddir)/lib/libyp.a $(LIBDBM) $(LIBCRYPT) @SYSTEMD_LIBS@ @NSL_LIBS@ @TIRPC_LIBS@
++rpc_yppasswdd_LDADD =  @PIE_LDFLAGS@ $(top_builddir)/lib/libyp.a $(LIBDBM) $(LIBCRYPT) @SYSTEMD_LIBS@ @NSL_LIBS@ @TIRPC_LIBS@ $(LIBSELINUX)
+ rpc_yppasswdd_CFLAGS = @PIE_CFLAGS@ @SYSTEMD_CFLAGS@ @NSL_CFLAGS@ @TIRPC_CFLAGS@
+ 
+ if ENABLE_REGENERATE_MAN
+diff -up ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.yppasswdd/update.c.selinux-context ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.yppasswdd/update.c
+--- ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.yppasswdd/update.c.selinux-context	2016-11-22 16:40:13.000000000 +0100
++++ ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.yppasswdd/update.c	2018-07-20 12:01:14.874866767 +0200
+@@ -41,6 +41,10 @@
+ #include "yppwd_local.h"
+ #include "log_msg.h"
+ 
++#ifdef WITH_SELINUX
++#include <selinux/selinux.h>
++#endif /* WITH_SELINUX */
++
+ #ifndef CHECKROOT
+ /* Set to 0 if you don't want to check against the root password
+    of the NIS master server. */
+@@ -460,6 +464,9 @@ update_files (yppasswd *yppw, int *shado
+   FILE *oldpf = NULL, *newpf = NULL, *oldsf = NULL, *newsf = NULL;
+   struct stat passwd_stat, shadow_stat;
+   char *rootpass = "x";
++#ifdef WITH_SELINUX
++  char  *pSelCon = NULL;
++#endif /* WITH_SELINUX */
+ 
+ #if CHECKROOT
+   if ((pw = getpwnam ("root")) != NULL)
+@@ -520,6 +527,39 @@ update_files (yppasswd *yppw, int *shado
+       return 1;
+     }
+ 
++#ifdef WITH_SELINUX
++  if (is_selinux_enabled() == 1)
++    {
++      /* Get selinux context of the original file */
++      if (getfilecon_raw(path_passwd, &pSelCon) < 0)
++        {
++          log_msg ("update %.12s (uid=%d) failed",
++               yppw->newpw.pw_name, yppw->newpw.pw_uid);
++          log_msg ("Can't get selinux context %s: %m", path_passwd);
++          freecon(pSelCon);
++          fclose (oldpf);
++          fclose (newpf);
++          unlink (path_passwd_tmp);
++          return 1;
++        }
++
++      /* Set selinux context for tmp file */
++      if (setfilecon_raw(path_passwd_tmp, pSelCon))
++        {
++          log_msg ("update %.12s (uid=%d) failed",
++               yppw->newpw.pw_name, yppw->newpw.pw_uid);
++          log_msg ("Can't set selinux context %s: %m", path_passwd_tmp);
++          freecon(pSelCon);
++          fclose (oldpf);
++          fclose (newpf);
++          unlink (path_passwd_tmp);
++          return 1;
++        }
++      freecon(pSelCon);
++      pSelCon=NULL;
++    }
++#    endif /* WITH_SELINUX  */
++
+   /* Open the shadow file for reading. */
+   if ((oldsf = fopen (path_shadow, "r")) != NULL)
+     {
+@@ -558,6 +598,37 @@ update_files (yppasswd *yppw, int *shado
+ 	  fclose (oldpf);
+ 	  return 1;
+ 	}
++#ifdef WITH_SELINUX
++      if (is_selinux_enabled() == 1)
++        {
++          if (getfilecon_raw(path_shadow, &pSelCon) < 0)
++          {
++                  log_msg ("update %.12s (uid=%d) failed",
++                       yppw->newpw.pw_name, yppw->newpw.pw_uid);
++                  log_msg ("Can't get selinux context %s: %m", path_shadow);
++              freecon(pSelCon);
++                  fclose (newsf);
++                  fclose (oldsf);
++                  fclose (newpf);
++                  fclose (oldpf);
++                  return 1;
++          }
++          if (setfilecon_raw(path_shadow_tmp, pSelCon))
++                {
++                  log_msg ("update %.12s (uid=%d) failed",
++                       yppw->newpw.pw_name, yppw->newpw.pw_uid);
++                  log_msg ("Can't set selinux context %s: %m", path_shadow_tmp);
++              freecon(pSelCon);
++                  fclose (newsf);
++                  fclose (oldsf);
++                  fclose (newpf);
++                  fclose (oldpf);
++                  return 1;
++                }
++          freecon(pSelCon);
++          pSelCon=NULL;
++        }
++#endif /* WITH_SELINUX */
+     }
+ 
+   /* Loop over all passwd entries */

@@ -1,0 +1,797 @@
+#!/bin/bash
+#
+# grubby wrapper to manage BootLoaderSpec files
+#
+#
+# Copyright 2018 Red Hat, Inc.  All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+readonly SCRIPTNAME="${0##*/}"
+
+CMDLINE_LINUX_DEBUG=" systemd.log_level=debug systemd.log_target=kmsg"
+LINUX_DEBUG_VERSION_POSTFIX="_with_debugging"
+LINUX_DEBUG_TITLE_POSTFIX=" with debugging"
+
+declare -a bls_file
+declare -a bls_title
+declare -a bls_version
+declare -a bls_linux
+declare -a bls_initrd
+declare -a bls_options
+declare -a bls_id
+
+[[ -f /etc/sysconfig/kernel ]] && . /etc/sysconfig/kernel
+[[ -f /etc/os-release ]] && . /etc/os-release
+read MACHINE_ID < /etc/machine-id
+arch=$(uname -m)
+
+if [[ $arch = 's390' || $arch = 's390x' ]]; then
+    bootloader="zipl"
+else
+    bootloader="grub2"
+fi
+
+print_error() {
+    echo "$1" >&2
+    exit 1
+}
+
+print_info() {
+    echo "$1" >&2
+}
+
+if [[ ${#} = 0 ]]; then
+    print_error "no action specified"
+fi
+
+get_bls_value() {
+    local bls="$1" && shift
+    local key="$1" && shift
+
+    echo "$(grep "^${key}[ \t]" "${bls}" | sed -e "s!^${key}[ \t]*!!")"
+}
+
+set_bls_value() {
+    local bls="$1" && shift
+    local key="$1" && shift
+    local value="$1" && shift
+
+    value=$(echo $value | sed -e 's/\//\\\//g')
+    sed -i -e "s/^${key}.*/${key} ${value}/" "${bls}"
+}
+
+append_bls_value() {
+    local bls="$1" && shift
+    local key="$1" && shift
+    local value="$1" && shift
+
+    old_value="$(get_bls_value "${bls}" ${key})"
+    set_bls_value "${bls}" "${key}" "${old_value}${value}"
+}
+
+get_bls_values() {
+    count=0
+    local -a files
+    local IFS=$'\n'
+    files=($(for bls in ${blsdir}/*.conf ; do
+        if ! [[ -e "${bls}" ]] ; then
+            continue
+        fi
+        bls="${bls%.conf}"
+        bls="${bls##*/}"
+        echo "${bls}"
+    done | /usr/libexec/grubby/rpm-sort -c rpmnvrcmp 2>/dev/null | tac)) || :
+
+    for bls in "${files[@]}" ; do
+        blspath="${blsdir}/${bls}.conf"
+        bls_file[$count]="${blspath}"
+        bls_title[$count]="$(get_bls_value ${blspath} title)"
+        bls_version[$count]="$(get_bls_value ${blspath} version)"
+        bls_linux[$count]="$(get_bls_value ${blspath} linux)"
+        bls_initrd[$count]="$(get_bls_value ${blspath} initrd)"
+        bls_options[$count]="$(get_bls_value ${blspath} options)"
+        bls_id[$count]="${bls}"
+
+        count=$((count+1))
+    done
+}
+
+get_default_index() {
+    local default=""
+    local index="-1"
+    local title=""
+    local version=""
+    if [[ $bootloader = "grub2" ]]; then
+	default="$(grep '^saved_entry=' ${env} | sed -e 's/^saved_entry=//')"
+    else
+	default="$(grep '^default=' ${zipl_config} | sed -e 's/^default=//')"
+    fi
+
+    if [[ -z $default ]]; then
+	index=0
+    elif [[ $default =~ ^[0-9]+$ ]]; then
+	index="$default"
+    fi
+
+    for i in ${!bls_file[@]}; do
+        if [[ $i -eq $index ]]; then
+            echo $i
+            return
+        fi
+
+        if [[ $default = ${bls_id[$i]} || $default = ${bls_title[$i]} ]]; then
+            echo $i
+            return
+        fi
+    done
+}
+
+display_default_value() {
+    local prefix=$(get_prefix)
+
+    case "$display_default" in
+        kernel)
+            echo "${prefix}${bls_linux[$default_index]}"
+            exit 0
+            ;;
+        index)
+            echo "$default_index"
+            exit 0
+            ;;
+        title)
+            echo "${bls_title[$default_index]}"
+            exit 0
+            ;;
+    esac
+}
+
+param_to_indexes() {
+    local param="$1"
+    local indexes=""
+
+    if [[ $param = "ALL" ]]; then
+        for i in ${!bls_file[@]}; do
+            indexes="$indexes $i"
+        done
+        echo -n $indexes
+        return
+    fi
+
+    if [[ $param = "DEFAULT" ]]; then
+        echo -n $default_index
+        return
+    fi
+
+    for i in ${!bls_file[@]}; do
+        if [[ $param = "${bls_linux[$i]}" || "/${param##*/}" = "${bls_linux[$i]}" ]]; then
+            indexes="$indexes $i"
+        fi
+
+        if [[ $param = "TITLE=${bls_title[$i]}" ]]; then
+            indexes="$indexes $i"
+        fi
+
+	if [[ $param = $i ]]; then
+	    indexes="$indexes $i"
+	fi
+    done
+
+    if [[ -n $indexes ]]; then
+        echo -n $indexes
+        return
+    fi
+
+    echo -n "-1"
+}
+
+get_prefix() {
+    if [[ $bootloader = grub2 ]] && mountpoint -q /boot; then
+	echo "/boot"
+    else
+	echo ""
+    fi
+}
+
+expand_var() {
+    local var=$1
+
+    if [[ $bootloader == "grub2" ]]; then
+        local value="$(grub2-editenv "${env}" list | grep ${var##$} | sed -e "s/${var##$}=//")"
+        value="$(echo ${value} | sed -e 's/\//\\\//g')"
+        if [[ -n $value ]]; then
+            var="$value"
+        fi
+    fi
+
+    echo $var
+}
+
+has_kernelopts()
+{
+    local args=${bls_options[$1]}
+    local opts=(${args})
+
+    for opt in ${opts[*]}; do
+        [[ $opt = "\$kernelopts" ]] && echo "true"
+    done
+
+    echo "false"
+}
+
+get_bls_args() {
+    local args=${bls_options[$1]}
+    local opts=(${args})
+
+    for opt in ${opts[*]}; do
+        if [[ $opt =~ ^\$ ]]; then
+            value="$(expand_var $opt)"
+            args="$(echo ${args} | sed -e "s/${opt}/${value}/")"
+        fi
+    done
+
+    echo ${args}
+}
+
+display_info_values() {
+    local indexes=($(param_to_indexes "$1"))
+    local prefix=$(get_prefix)
+
+    if [[ $indexes = "-1" ]]; then
+        print_error "The param $1 is incorrect"
+    fi
+
+    for i in ${indexes[*]}; do
+        local root=""
+        local value=""
+        local args="$(get_bls_args "$i")"
+
+        local opts=(${args})
+
+        for opt in ${opts[*]}; do
+            if echo $opt | grep -q "^root="; then
+                root="$(echo $opt | sed -e 's/root=//')"
+                value="$(echo ${opt} | sed -e 's/\//\\\//g')"
+                args="$(echo ${args} | sed -e "s/${value}[ \t]*//")"
+                break
+            fi
+        done
+
+        echo "index=$i"
+        echo "kernel=\"${prefix}${bls_linux[$i]}\""
+        echo "args=\"${args}\""
+
+        if [[ -n $root ]]; then
+            echo "root=\"${root}\""
+        fi
+
+        echo "initrd=\"${prefix}${bls_initrd[$i]}\""
+        echo "title=\"${bls_title[$i]}\""
+        echo "id=\"${bls_id[$i]}\""
+    done
+    exit 0
+}
+
+mkbls() {
+    local kernel=$1 && shift
+    local kernelver=$1 && shift
+    local datetime=$1 && shift
+
+    local debugname=""
+    local flavor=""
+    local prefix=""
+
+    if [[ $(get_prefix) = "" ]]; then
+	prefix="/boot"
+    fi
+
+    if [[ $kernelver == *\+* ]] ; then
+        local flavor=-"${kernelver##*+}"
+        if [[ $flavor == "-debug" ]]; then
+            local debugname="with debugging"
+	    local debugid="-debug"
+        fi
+    fi
+
+    cat <<EOF
+title ${NAME} (${kernelver}) ${VERSION}${debugname}
+version ${kernelver}${debugid}
+linux ${kernel}
+initrd ${prefix}/initramfs-${kernelver}.img
+options \$kernelopts
+id ${ID}-${datetime}-${kernelver}${debugid}
+grub_users \$grub_users
+grub_arg --unrestricted
+grub_class kernel${flavor}
+EOF
+}
+
+unset_default_bls()
+{
+    if [[ $bootloader = grub2 ]]; then
+        grub2-editenv "${env}" unset saved_entry
+    else
+        sed -i -e "/^default=.*/d" "${zipl_config}"
+    fi
+}
+
+remove_bls_fragment() {
+    local indexes=($(param_to_indexes "$1"))
+
+    if [[ $indexes = "-1" ]]; then
+	print_error "The param $(get_prefix)$1 is incorrect"
+    fi
+
+    for i in "${indexes[@]}"; do
+        if [[ $default_index = $i ]]; then
+            unset_default_bls
+        fi
+        rm -f "${bls_file[$i]}"
+    done
+
+    get_bls_values
+
+    update_grubcfg
+}
+
+get_custom_bls_filename() {
+    local kernelver=$1
+    local bls_target="${blsdir}/${MACHINE_ID}-${kernelver}.conf"
+    count=0
+    local -a files
+    local IFS=$'\n'
+
+    prefix="${bls_target%%.conf}"
+    prefix="${bls_target%%${arch}}"
+    prefix="${prefix%.*}"
+
+    last=($(for bls in ${prefix}.*~custom*.conf ; do
+        if ! [[ -e "${bls}" ]] ; then
+            continue
+        fi
+        bls="${bls##${prefix}.}"
+        bls="${bls%%~custom*}"
+        echo "${bls}"
+    done | tail -n1)) || :
+
+    if [[ -z $last ]]; then
+        last="0"
+    else
+        last=$((last+1))
+    fi
+
+    echo "${bls_target}" | sed -e "s!${prefix}!${prefix}.${last}~custom!"
+}
+
+add_bls_fragment() {
+    local kernel="$1" && shift
+    local title="$1" && shift
+    local options="$1" && shift
+    local initrd="$1" && shift
+    local extra_initrd="$1" && shift
+
+    if [[ $kernel = *"vmlinuz-"* ]]; then
+	kernelver="${kernel##*/vmlinuz-}"
+	prefix="vmlinuz-"
+    else
+	kernelver="${kernel##*/}"
+    fi
+
+    if [[ ! -f "/boot/${prefix}${kernelver}" ]] &&
+       [[ $bad_image != "true" ]]; then
+        print_error "The ${kernelver} kernel isn't installed in the machine"
+    fi
+
+    if [[ -z $title ]]; then
+	print_error "The kernel title must be specified"
+    fi
+
+    if [[ ! -d $blsdir ]]; then
+        install -m 700 -d "${blsdir}"
+    fi
+
+    bls_target="${blsdir}/${MACHINE_ID}-${kernelver}.conf"
+
+    if [[ -e ${bls_target} ]]; then
+        bls_target="$(get_custom_bls_filename "${kernelver}")"
+        print_info "An entry for kernel ${kernelver} already exists, adding ${bls_target}"
+    fi
+
+    kernel_dir="/lib/modules/${kernelver}"
+    if [[ -d $kernel_dir ]]; then
+        datetime="$(date -u +%Y%m%d%H%M%S -d "$(stat -c '%y' "${kernel_dir}")")"
+    else
+        datetime=0
+    fi
+    mkbls "${kernel}" "${kernelver}" "${datetime}" > "${bls_target}"
+
+    if [[ -n $title ]]; then
+        set_bls_value "${bls_target}" "title" "${title}"
+    fi
+
+    if [[ -n $options ]]; then
+        set_bls_value "${bls_target}" "options" "${options}"
+    fi
+
+    if [[ -n $initrd ]]; then
+        set_bls_value "${bls_target}" "initrd" "${initrd}"
+    fi
+
+    if [[ -n $extra_initrd ]]; then
+        append_bls_value "${bls_target}" "initrd" "${extra_initrd}"
+    fi
+
+    if [[ $MAKEDEBUG = "yes" ]]; then
+        bls_debug="$(echo ${bls_target} | sed -e "s/${kernelver}/${kernelver}~debug/")"
+        cp -aT  "${bls_target}" "${bls_debug}"
+        append_bls_value "${bls_debug}" "title" "${LINUX_DEBUG_TITLE_POSTFIX}"
+        append_bls_value "${bls_debug}" "version" "${LINUX_DEBUG_VERSION_POSTFIX}"
+        append_bls_value "${bls_debug}" "options" "${CMDLINE_LINUX_DEBUG}"
+        blsid="$(get_bls_value ${bls_debug} "id" | sed -e "s/${kernelver}/${kernelver}~debug/")"
+        set_bls_value "${bls_debug}" "id" "${blsid}"
+    fi
+
+    get_bls_values
+
+    if [[ $make_default = "true" ]]; then
+        set_default_bls "TITLE=${title}"
+    fi
+
+    update_grubcfg
+
+    exit 0
+}
+
+update_args() {
+    local args=$1 && shift
+    local remove_args=($1) && shift
+    local add_args=($1) && shift
+
+    for arg in ${remove_args[*]}; do
+        if [[ $arg = *"="* ]]; then
+            arg=$(echo $arg | sed -e 's/\//\\\//g')
+            args="$(echo $args | sed -E "s/(^|[[:space:]])$arg([[:space:]]|$)/ /")"
+        else
+            args="$(echo $args | sed -E "s/(^|[[:space:]])$arg(([[:space:]]|$)|([=][^ ]*([$]*)))/ /g")"
+        fi
+    done
+
+    for arg in ${add_args[*]}; do
+        arg=${arg%=*}
+        args="$(echo $args | sed -E "s/(^|[[:space:]])$arg(([[:space:]]|$)|([=][^ ]*([$]*)))/ /g")"
+    done
+
+    for arg in ${add_args[*]}; do
+        args="$args $arg"
+    done
+
+    echo ${args}
+}
+
+update_bls_fragment() {
+    local param="$1"
+    local indexes=($(param_to_indexes "$1")) && shift
+    local remove_args=$1 && shift
+    local add_args=$1 && shift
+    local initrd=$1 && shift
+    local opts
+
+    if [[ $indexes = "-1" ]]; then
+        print_error "The param $(get_prefix)${param} is incorrect"
+    fi
+
+    if [[ $param = "ALL" && $bootloader = grub2 ]] && [[ -n $remove_args || -n $add_args ]]; then
+        local old_args="$(grub2-editenv "${env}" list | grep kernelopts | sed -e "s/kernelopts=//")"
+        opts="$(update_args "${old_args}" "${remove_args}" "${add_args}")"
+        grub2-editenv "${env}" set kernelopts="${opts}"
+    elif [[ $bootloader = grub2 ]]; then
+        opts="$(grub2-editenv "${env}" list | grep kernelopts | sed -e "s/kernelopts=//")"
+    fi
+
+    for i in ${indexes[*]}; do
+	if [[ -n $remove_args || -n $add_args ]]; then
+            local old_args="$(get_bls_args "$i")"
+            local new_args="$(update_args "${old_args}" "${remove_args}" "${add_args}")"
+
+            if [[ $param != "ALL" || "$(has_kernelopts "$i")" = "false" ]]; then
+                set_bls_value "${bls_file[$i]}" "options" "${new_args}"
+            fi
+
+            if [[ $bootloader = grub2 && "$(has_kernelopts "$i")" = "false" && $opts = $new_args ]]; then
+                set_bls_value "${bls_file[$i]}" "options" "\$kernelopts"
+            fi
+	fi
+
+	if [[ -n $initrd ]]; then
+	    set_bls_value "${bls_file[$i]}" "initrd" "${initrd}"
+	fi
+    done
+
+    update_grubcfg
+}
+
+set_default_bls() {
+    local index=($(param_to_indexes "$1"))
+
+    if [[ $index = "-1" ]]; then
+        print_error "The param $1 is incorrect"
+    fi
+
+    if [[ $bootloader = grub2 ]]; then
+        grub2-editenv "${env}" set saved_entry="${bls_id[$index]}"
+    else
+        local default="${bls_title[$index]}"
+        local current="$(grep '^default=' ${zipl_config} | sed -e 's/^default=//')"
+        if [[ -n $current ]]; then
+            sed -i -e "s,^default=.*,default=${default}," "${zipl_config}"
+        else
+            echo "default=${default}" >> "${zipl_config}"
+        fi
+    fi
+
+    print_info "The default is ${bls_file[$index]} with index $index and kernel $(get_prefix)${bls_linux[$index]}"
+}
+
+remove_var_prefix() {
+    local prefix="$1"
+
+    [ -z "${prefix}" ] && return
+
+    if [[ -n $remove_kernel && $remove_kernel =~ ^/ ]]; then
+       remove_kernel="/${remove_kernel##${prefix}/}"
+    fi
+
+    if [[ -n $initrd ]]; then
+	initrd="/${initrd##${prefix}/}"
+    fi
+
+    if [[ -n $extra_initrd ]]; then
+	extra_initrd=" /${extra_initrd##${prefix}/}"
+    fi
+
+    if [[ -n $kernel ]]; then
+	kernel="/${kernel##${prefix}/}"
+    fi
+
+    if [[ -n $update_kernel && $update_kernel =~ ^/ ]]; then
+	update_kernel="/${update_kernel##${prefix}/}"
+    fi
+}
+
+update_grubcfg()
+{
+    if [[ $arch = 'ppc64' || $arch = 'ppc64le' ]]; then
+	grub2-mkconfig --no-grubenv-update -o "${grub_config}" >& /dev/null
+    fi
+}
+
+print_usage()
+{
+    cat <<EOF
+Usage: grubby [OPTION...]
+      --add-kernel=kernel-path            add an entry for the specified kernel
+      --args=args                         default arguments for the new kernel or new arguments for kernel being updated)
+      --bad-image-okay                    don't sanity check images in boot entries (for testing only)
+  -c, --config-file=path                  path to grub config file to update ("-" for stdin)
+      --copy-default                      use the default boot entry as a template for the new entry being added; if the default is not a linux image, or if the kernel referenced by the default image does not exist, the
+                                          first linux entry whose kernel does exist is used as the template
+      --default-kernel                    display the path of the default kernel
+      --default-index                     display the index of the default kernel
+      --default-title                     display the title of the default kernel
+      --env=path                          path for environment data
+      --grub2                             configure grub2 bootloader
+      --info=kernel-path                  display boot information for specified kernel
+      --initrd=initrd-path                initrd image for the new kernel
+  -i, --extra-initrd=initrd-path          auxiliary initrd image for things other than the new kernel
+      --make-default                      make the newly added entry the default boot entry
+      --remove-args=STRING                remove kernel arguments
+      --remove-kernel=kernel-path         remove all entries for the specified kernel
+      --set-default=kernel-path           make the first entry referencing the specified kernel the default
+      --set-default-index=entry-index     make the given entry index the default entry
+      --title=entry-title                 title to use for the new kernel entry
+      --update-kernel=kernel-path         updated information for the specified kernel
+      --zipl                              configure zipl bootloader
+  -b, --bls-directory                     path to directory containing the BootLoaderSpec fragment files
+
+Help options:
+  -?, --help                              Show this help message
+
+EOF
+}
+
+OPTS="$(getopt -o c:i:b:? --long help,add-kernel:,args:,bad-image-okay,\
+config-file:,copy-default,default-kernel,default-index,default-title,env:,\
+grub2,info:,initrd:,extra-initrd:,make-default,remove-args:,\
+remove-kernel:,set-default:,set-default-index:,title:,update-kernel:,zipl,\
+bls-directory:,add-kernel:,add-multiboot:,mbargs:,mounts:,boot-filesystem:,\
+bootloader-probe,debug,devtree,devtreedir:,elilo,efi,extlinux,grub,lilo,\
+output-file:,remove-mbargs:,remove-multiboot:,silo,yaboot -n ${SCRIPTNAME} -- "$@")"
+
+[[ $? = 0 ]] || exit 1
+
+eval set -- "$OPTS"
+
+while [ ${#} -gt 0 ]; do
+    case "$1" in
+        --help|-h)
+            print_usage
+            exit 0
+            ;;
+        --add-kernel)
+            kernel="${2}"
+            shift
+            ;;
+        --args)
+            args="${2}"
+            shift
+            ;;
+        --bad-image-okay)
+            bad_image=true
+            ;;
+        --config-file|-c)
+            grub_config="${2}"
+            zipl_config="${2}"
+            shift
+            ;;
+        --copy-default)
+            copy_default=true
+            ;;
+        --default-kernel)
+            display_default="kernel"
+            ;;
+        --default-index)
+            display_default="index"
+            ;;
+        --default-title)
+            display_default="title"
+            ;;
+        --env)
+            env="${2}"
+            shift
+            ;;
+        --grub2)
+            bootloader="grub2"
+            ;;
+        --info)
+            display_info="${2}"
+            shift
+            ;;
+        --initrd)
+            initrd="${2}"
+            shift
+            ;;
+        --extra-initrd|-i)
+            extra_initrd=" /${2}"
+            shift
+            ;;
+        --make-default)
+            make_default=true
+            ;;
+        --remove-args)
+            remove_args="${2}"
+            shift
+            ;;
+        --remove-kernel)
+            remove_kernel="${2}"
+            shift
+            ;;
+        --set-default)
+            set_default="${2}"
+            shift
+            ;;
+        --set-default-index)
+            set_default="${2}"
+            shift
+            ;;
+        --title)
+            title="${2}"
+            shift
+            ;;
+        --update-kernel)
+            update_kernel="${2}"
+            shift
+            ;;
+        --zipl)
+            bootloader="zipl"
+            ;;
+        --bls-directory|-b)
+            blsdir="${2}"
+	    shift
+	    ;;
+        --add-kernel|--add-multiboot|--mbargs|--mounts|--boot-filesystem|\
+        --bootloader-probe|--debug|--devtree|--devtreedir|--elilo|--efi|\
+        --extlinux|--grub|--lilo|--output-file|--remove-mbargs|--silo|\
+        --remove-multiboot|--slilo|--yaboot)
+            echo
+            echo "${SCRIPTNAME}: the option \"${1}\" was deprecated" >&2
+            echo "Try '${SCRIPTNAME} --help' to list supported options" >&2
+            echo
+	    exit 1
+	    ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo
+            echo "${SCRIPTNAME}: invalid option \"${1}\"" >&2
+            echo "Try '${SCRIPTNAME} --help' for more information" >&2
+            echo
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+if [[ -z $update_kernel && -z $kernel ]] && [[ -n $args || -n $remove_args ]]; then
+    print_error "no action specified"
+fi
+
+if [[ -z $blsdir ]]; then
+    blsdir="/boot/loader/entries"
+fi
+
+if [[ -z $env ]]; then
+    env="/boot/grub2/grubenv"
+fi
+
+if [[ -z $zipl_config ]]; then
+    zipl_config="/etc/zipl.conf"
+fi
+
+if [[ -z $grub_config ]]; then
+    grub_config="/boot/grub2/grub.cfg"
+fi
+
+get_bls_values
+
+default_index="$(get_default_index)"
+
+if [[ -n $display_default ]]; then
+    display_default_value
+fi
+
+if [[ -n $display_info ]]; then
+    display_info_values "${display_info}"
+fi
+
+remove_var_prefix "$(get_prefix)"
+
+if [[ -n $kernel ]]; then
+    if [[ $copy_default = "true" ]]; then
+	opts="${bls_options[$default_index]}"
+	if [[ -n $args ]]; then
+	    opts="${opts} ${args}"
+	fi
+    else
+	opts="${args}"
+    fi
+
+    add_bls_fragment "${kernel}" "${title}" "${opts}" "${initrd}" \
+                     "${extra_initrd}"
+fi
+
+if [[ -n $remove_kernel ]]; then
+    remove_bls_fragment "${remove_kernel}"
+fi
+
+if [[ -n $update_kernel ]]; then
+    update_bls_fragment "${update_kernel}" "${remove_args}" "${args}" "${initrd}"
+fi
+
+if [[ -n $set_default ]]; then
+    set_default_bls "${set_default}"
+fi
+
+exit 0

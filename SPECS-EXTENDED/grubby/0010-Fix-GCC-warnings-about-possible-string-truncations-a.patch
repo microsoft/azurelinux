@@ -1,0 +1,104 @@
+From 00241c65a5c0b4bb32a847a6abb5a86d0c704a8f Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 5 Feb 2019 20:08:43 +0100
+Subject: [PATCH] Fix GCC warnings about possible string truncations and buffer
+ overflows
+
+Building with -Werror=stringop-truncation and -Werror=stringop-overflow
+leads to GCC complaining about possible string truncation and overflows.
+
+Fix this by using memcpy(), explicitly calculating the buffers lenghts
+and set a NUL byte terminator after copying the buffers.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ grubby.c | 35 +++++++++++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 8 deletions(-)
+
+diff --git a/grubby.c b/grubby.c
+index 96d252a0a83..5ca689539cf 100644
+--- a/grubby.c
++++ b/grubby.c
+@@ -459,20 +459,26 @@ char *grub2ExtractTitle(struct singleLine * line) {
+     snprintf(result, resultMaxSize, "%s", ++current);
+     
+     i++;
++    int result_len = 0;
+     for (; i < line->numElements; ++i) {
+ 	current = line->elements[i].item;
+ 	current_len = strlen(current);
+ 	current_indent = line->elements[i].indent;
+ 	current_indent_len = strlen(current_indent);
+ 
+-	strncat(result, current_indent, current_indent_len);
++	memcpy(result + result_len, current_indent, current_indent_len);
++	result_len += current_indent_len;
++
+ 	if (!isquote(current[current_len-1])) {
+-	    strncat(result, current, current_len);
++	    memcpy(result + result_len, current_indent, current_indent_len);
++	    result_len += current_len;
+ 	} else {
+-	    strncat(result, current, current_len - 1);
++	    memcpy(result + result_len, current_indent, current_indent_len);
++	    result_len += (current_len - 1);
+ 	    break;
+ 	}
+     }
++    result[result_len] = '\0';
+     return result;
+ }
+ 
+@@ -1281,6 +1287,7 @@ static struct grubConfig * readConfig(const char * inName,
+ 	    extras = malloc(len + 1);
+ 	    *extras = '\0';
+ 
++	    int buf_len = 0;
+ 	    /* get title. */
+ 	    for (int i = 0; i < line->numElements; i++) {
+ 		if (!strcmp(line->elements[i].item, "menuentry"))
+@@ -1292,13 +1299,18 @@ static struct grubConfig * readConfig(const char * inName,
+ 
+ 		len = strlen(title);
+ 	        if (isquote(title[len-1])) {
+-		    strncat(buf, title,len-1);
++		    memcpy(buf + buf_len, title, len - 1);
++		    buf_len += (len - 1);
+ 		    break;
+ 		} else {
+-		    strcat(buf, title);
+-		    strcat(buf, line->elements[i].indent);
++		    memcpy(buf + buf_len, title, len);
++		    buf_len += len;
++		    len = strlen(line->elements[i].indent);
++		    memcpy(buf + buf_len, line->elements[i].indent, len);
++		    buf_len += len;
+ 		}
+ 	    }
++	    buf[buf_len] = '\0';
+ 
+ 	    /* get extras */
+ 	    int count = 0;
+@@ -4494,10 +4506,17 @@ int main(int argc, const char ** argv) {
+ 	exit(1);
+     }
+     saved_command_line[0] = '\0';
++    int cmdline_len = 0, arg_len;
+     for (int j = 1; j < argc; j++) {
+-	strcat(saved_command_line, argv[j]);
+-	strncat(saved_command_line, j == argc -1 ? "" : " ", 1);
++	arg_len = strlen(argv[j]);
++	memcpy(saved_command_line + cmdline_len, argv[j], arg_len);
++	cmdline_len += arg_len;
++	if (j != argc - 1) {
++	    memcpy(saved_command_line + cmdline_len, " ", 1);
++	    cmdline_len++;
++	}
+     }
++    saved_command_line[cmdline_len] = '\0';
+ 
+     optCon = poptGetContext("grubby", argc, argv, options, 0);
+     poptReadDefaultConfig(optCon, 1);
+-- 
+2.20.1
+

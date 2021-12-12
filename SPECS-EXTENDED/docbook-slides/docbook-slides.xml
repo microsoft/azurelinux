@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD XML Catalogs V1.0//EN"
+"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+
+<!-- XML package catalog for docbook-slides -->
+
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
+
+  <delegatePublic publicIdStartString="-//Norman Walsh//DTD Slides" 
+    catalog="file:///usr/share/xml/docbook/slides/3.4.0/catalog.xml"/>
+
+  <delegateSystem systemIdStartString="http://docbook.sourceforge.net/release/slides/3.4.0/" 
+    catalog="file:///usr/share/xml/docbook/slides/3.4.0/catalog.xml"/>
+
+  <delegateURI uriStartString="http://docbook.sourceforge.net/release/slides/3.4.0/" 
+    catalog="file:///usr/share/xml/docbook/slides/3.4.0/catalog.xml"/>
+
+  <delegateSystem systemIdStartString="http://docbook.sourceforge.net/release/slides/current/" 
+    catalog="file:///usr/share/xml/docbook/slides/3.4.0/catalog.xml"/>
+
+  <delegateURI uriStartString="http://docbook.sourceforge.net/release/slides/current/" 
+    catalog="file:///usr/share/xml/docbook/slides/3.4.0/catalog.xml"/>
+
+</catalog>

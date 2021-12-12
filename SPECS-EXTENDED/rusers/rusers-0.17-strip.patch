@@ -1,0 +1,44 @@
+--- netkit-rusers-0.17/rup/Makefile.strip	Sun Dec 12 19:05:04 1999
++++ netkit-rusers-0.17/rup/Makefile	Wed Jun 19 17:08:45 2002
+@@ -22,7 +22,7 @@
+ rup.o: ../version.h
+ 
+ install: rup
+-	install -s -m$(BINMODE) rup $(INSTALLROOT)$(BINDIR)
++	install -m$(BINMODE) rup $(INSTALLROOT)$(BINDIR)
+ 	install -m$(MANMODE) rup.1 $(INSTALLROOT)$(MANDIR)/man1
+ 
+ clean:
+--- netkit-rusers-0.17/rpc.rusersd/Makefile.strip	Sun Dec 12 19:05:03 1999
++++ netkit-rusers-0.17/rpc.rusersd/Makefile	Wed Jun 19 17:09:15 2002
+@@ -22,7 +22,7 @@
+ 	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
+ 
+ install: rusersd
+-	install -s -m$(DAEMONMODE) rusersd $(INSTALLROOT)$(SBINDIR)/rpc.rusersd
++	install -m$(DAEMONMODE) rusersd $(INSTALLROOT)$(SBINDIR)/rpc.rusersd
+ 	install -m$(MANMODE) rpc.rusersd.8 $(INSTALLROOT)$(MANDIR)/man8
+ 	ln -sf rpc.rusersd.8 $(INSTALLROOT)$(MANDIR)/man8/rusersd.8
+ 
+--- netkit-rusers-0.17/rusers/Makefile.strip	Sun Dec 12 19:05:04 1999
++++ netkit-rusers-0.17/rusers/Makefile	Wed Jun 19 17:09:33 2002
+@@ -20,7 +20,7 @@
+ 	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
+ 
+ install: rusers
+-	install -s -m$(BINMODE) rusers $(INSTALLROOT)$(BINDIR)
++	install -m$(BINMODE) rusers $(INSTALLROOT)$(BINDIR)
+ 	install -m$(MANMODE) rusers.1 $(INSTALLROOT)$(MANDIR)/man1
+ 
+ clean:
+--- netkit-rusers-0.17/rpc.rstatd/GNUmakefile.strip	Sun Mar 14 20:21:52 1999
++++ netkit-rusers-0.17/rpc.rstatd/GNUmakefile	Wed Jun 19 17:10:01 2002
+@@ -20,7 +20,7 @@
+ 	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
+ 
+ install: rstatd
+-	install -s -m$(DAEMONMODE) rstatd $(INSTALLROOT)$(SBINDIR)/rpc.rstatd
++	install -m$(DAEMONMODE) rstatd $(INSTALLROOT)$(SBINDIR)/rpc.rstatd
+ 	install -m$(MANMODE) rpc.rstatd.8 $(INSTALLROOT)$(MANDIR)/man8
+ 	ln -sf rpc.rstatd.8 $(INSTALLROOT)$(MANDIR)/man8/rstatd.8
+ 

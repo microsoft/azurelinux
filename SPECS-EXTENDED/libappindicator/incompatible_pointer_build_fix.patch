@@ -1,0 +1,12 @@
+diff -up libappindicator-12.10.0/src/app-indicator.c.build_fix libappindicator-12.10.0/src/app-indicator.c
+--- libappindicator-12.10.0/src/app-indicator.c.build_fix	2018-04-10 14:43:57.134400594 +0200
++++ libappindicator-12.10.0/src/app-indicator.c	2018-04-10 14:45:34.655448722 +0200
+@@ -2196,7 +2196,7 @@ app_indicator_set_secondary_activate_tar
+ 
+ 	g_return_if_fail (GTK_IS_WIDGET (menuitem));
+ 
+-	priv->sec_activate_target = g_object_ref(G_OBJECT(menuitem));
++	priv->sec_activate_target = g_object_ref(menuitem);
+ 	priv->sec_activate_enabled = widget_is_menu_child(self, menuitem);
+ 	g_signal_connect(menuitem, "parent-set", G_CALLBACK(sec_activate_target_parent_changed), self);
+ }

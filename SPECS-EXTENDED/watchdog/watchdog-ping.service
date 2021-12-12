@@ -1,0 +1,11 @@
+[Unit]
+Description=watchdog daemon for use with ping test / network dependency
+After=network.target
+Conflicts=watchdog.service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/watchdog
+
+[Install]
+WantedBy=multi-user.target

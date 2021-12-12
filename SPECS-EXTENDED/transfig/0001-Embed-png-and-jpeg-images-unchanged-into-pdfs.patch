@@ -1,0 +1,77 @@
+From 841c88cdd31eece97a929fbc01902a33d6168b00 Mon Sep 17 00:00:00 2001
+From: Thomas Loimer <thomas.loimer@tuwien.ac.at>
+Date: Sun, 10 Nov 2019 22:53:23 +0100
+Subject: [PATCH 1/8] Embed png and jpeg images unchanged into pdfs
+
+Before, with the "-dAutoFilterColorImages=false -dColorImageFilter=/DCTEncode"
+switches to pdf, png-files were re-encoded to jpegs.
+---
+ CHANGES              | 9 ++++++++-
+ fig2dev/dev/genpdf.c | 6 ++----
+ version.m4           | 6 +++---
+ 3 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/CHANGES b/CHANGES
+index 2a9c1fb..2cdfda0 100644
+--- a/CHANGES
++++ b/CHANGES
+@@ -2,7 +2,14 @@ Changes to fig2dev
+ ===============================================================================
+ Version 3.2
+ ===============================================================================
+-Patchlevel 7b (Oct 2019)
++Patchlevel Xx (Xxx 20xx)
++
++BUGS FIXED:
++	o Embed images in pdfs with their original compression type, i.e., leave
++	  the gs switch "-dAutoFilterColorImages" at its default value "true".
++
++-------------------------------------
++Patchlevel 7b (Nov 2019)
+ 
+ NEW FEATURES:
+ 	o A X color database is not needed, but can be provided. The location of
+diff --git a/fig2dev/dev/genpdf.c b/fig2dev/dev/genpdf.c
+index d5b3a5a..1ddaa40 100644
+--- a/fig2dev/dev/genpdf.c
++++ b/fig2dev/dev/genpdf.c
+@@ -91,10 +91,8 @@ genpdf_start(F_compound *objects)
+ 	 */
+ 	/* -o ... is equivalent to -dBATCH -dNOPAUSE, see ghostscript Use.htm
+ 	   and -dBATCH is equivalent to -c quit */
+-	sprintf(com, "%s -q -sAutoRotatePages=None "
+-		"-dAutoFilterColorImages=false -dColorImageFilter=/DCTEncode "
+-		"-sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -o '%s' -",
+-		GSEXE, ofile);
++	sprintf(com, "%s -q -sAutoRotatePages=None -sDEVICE=pdfwrite "
++			"-dPDFSETTINGS=/prepress -o '%s' -", GSEXE, ofile);
+ 	(void) signal(SIGPIPE, pdf_broken_pipe);
+ 	if ((tfp = popen(com, "w")) == 0) {
+ 		fprintf(stderr, "fig2dev: Cannot open pipe to ghostscript\n");
+diff --git a/version.m4 b/version.m4
+index faf88ad..fa546d9 100644
+--- a/version.m4
++++ b/version.m4
+@@ -2,7 +2,7 @@ dnl Fig2dev: Translate Fig code to various Devices
+ dnl Copyright (c) 1991 by Micah Beck
+ dnl Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
+ dnl Parts Copyright (c) 1989-2015 by Brian V. Smith
+-dnl Parts Copyright (c) 2015-2018 by Thomas Loimer
++dnl Parts Copyright (c) 2015-2019 by Thomas Loimer
+ dnl
+ dnl Any party obtaining a copy of these files is granted, free of charge, a
+ dnl full and unrestricted irrevocable, world-wide, paid up, royalty-free,
+@@ -22,8 +22,8 @@ dnl Thus, configure.ac can remain unchanged between different versions.
+ dnl The values in this file are set by update_version_m4 if
+ dnl ./configure is called with --enable_versioning.
+ 
+-m4_define([FIG_VERSION], [3.2.7b])
++m4_define([FIG_VERSION], [3.2.7b-dev])
+ 
+ dnl AC_INIT does not have access to shell variables.
+ dnl Therefore, define RELEASEDATE as a macro.
+-m4_define([RELEASEDATE], [Oct 2019])
++m4_define([RELEASEDATE], [Nov 2019])
+-- 
+2.24.1
+

@@ -1,0 +1,27 @@
+From dc708430bf5fd31d29da2e7e6b5fd20fe593e106 Mon Sep 17 00:00:00 2001
+From: Michael Kuron <mkuron@users.noreply.github.com>
+Date: Thu, 14 Feb 2019 15:55:31 +0100
+Subject: [PATCH] mpi::detail::c_data needs to check for empty vectors
+
+If the standard library is configured to do range checks (-D _GLIBCXX_ASSERTIONS), accessing the zeroth element of a vector to get its address triggers an assertion.
+---
+ include/boost/mpi/detail/antiques.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/boost/mpi/detail/antiques.hpp b/include/boost/mpi/detail/antiques.hpp
+index 0bd235b2..93b8efe9 100644
+--- a/include/boost/mpi/detail/antiques.hpp
++++ b/include/boost/mpi/detail/antiques.hpp
+@@ -19,10 +19,10 @@ namespace detail {
+   // serve as an incentive to get rid of this when those compilers 
+   // are dropped.
+   template <typename T, typename A>
+-  T* c_data(std::vector<T,A>& v) { return &(v[0]); }
++  T* c_data(std::vector<T,A>& v) { if (v.empty()) return NULL; return &(v[0]); }
+ 
+   template <typename T, typename A>
+-  T const* c_data(std::vector<T,A> const& v) { return &(v[0]); }
++  T const* c_data(std::vector<T,A> const& v) { if (v.empty()) return NULL; return &(v[0]); }
+ 
+   // Some old MPI implementation (OpenMPI 1.6 for example) have non 
+   // conforming API w.r.t. constness.

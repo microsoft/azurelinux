@@ -1,0 +1,17 @@
+diff -up ./conf_post.h.confpost ./conf_post.h
+--- ./conf_post.h.confpost	2012-04-17 15:47:28.000000000 +0200
++++ ./conf_post.h	2013-05-06 18:34:54.274640856 +0200
+@@ -8,3 +8,13 @@
+ #define HAVE_COMPAT_LIBGDBM
+ #endif
+ 
++/* Define common preprocessor symbol for HAVE_LIBGDBM and HAVE_LIBQDBM, since
++ * libraries gdbm and qdbm have same symbol names. */
++#undef HAVE_COMPAT_LIBGDBM
++#ifdef HAVE_LIBGDBM
++#define HAVE_COMPAT_LIBGDBM
++#endif
++#ifdef HAVE_LIBQDBM
++#define HAVE_COMPAT_LIBGDBM
++#endif
++

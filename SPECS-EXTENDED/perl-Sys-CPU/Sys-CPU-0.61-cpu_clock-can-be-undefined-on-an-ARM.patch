@@ -1,0 +1,50 @@
+From ceaef15d1391e37623aaf18d6614a4bbf35a3607 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 6 May 2014 09:12:16 +0200
+Subject: [PATCH 2/2] cpu_clock can be undefined on an ARM
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some ARM boards do not publish CPU clock.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 1 +
+ t/Sys-CPU.t | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 910c77a..4e72025 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -13,4 +13,5 @@ WriteMakefile(
+     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
+     'INC'		=> '', # e.g., '-I/usr/include/other'
+     'dynamic_lib'       => {OTHERLDFLAGS => $extra_arg},
++    'BUILD_REQUIRES'    => {'Config' => 0 },
+ );
+diff --git a/t/Sys-CPU.t b/t/Sys-CPU.t
+index 9edaaa3..4246b22 100755
+--- a/t/Sys-CPU.t
++++ b/t/Sys-CPU.t
+@@ -8,6 +8,7 @@
+ 
+ BEGIN { $| = 1; print "1..4\n"; }
+ END {print "not ok 1\n" unless $loaded;}
++use Config;
+ use Sys::CPU;
+ $loaded = 1;
+ print "ok 1\n";
+@@ -24,6 +25,8 @@ if (defined($speed)) {
+     print "ok 3 (CPU Speed : $speed)\n";
+ } elsif ( $^O eq 'MSWin32'){
+     print "ok 3 (CPU Speed: test skipped on MSWin32)\n";
++} elsif ($Config{archname} =~ /^(arm|aarch64)/ ) {
++    print "ok 3 (CPU Speed: test skipped on ARM and AArch64)\n";
+ } else  {
+     print "not ok 3 (cpu_clock undefined (ok if Win9x))\n";
+ }
+-- 
+1.9.3
+

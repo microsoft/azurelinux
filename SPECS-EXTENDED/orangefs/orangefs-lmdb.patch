@@ -1,0 +1,19 @@
+diff -Naur orangefs-2.9.6/configure.ac orangefs-2.9.6-patch/configure.ac
+--- orangefs-2.9.6/configure.ac	2017-08-28 19:51:02.633385000 +0000
++++ orangefs-2.9.6-patch/configure.ac	2017-09-27 20:27:14.606000000 +0000
+@@ -1890,7 +1890,6 @@
+ src/apps/admin/module.mk
+ src/apps/admin/pvfs2-config
+ src/apps/devel/module.mk
+-src/apps/devel/lmdb/module.mk
+ src/apps/karma/module.mk
+ src/apps/vis/module.mk
+ src/apps/fuse/module.mk
+@@ -1914,7 +1913,6 @@
+ src/common/security/module.mk
+ src/common/hash/module.mk
+ src/common/token-utils/module.mk
+-src/common/lmdb/module.mk
+ src/io/bmi/module.mk
+ src/io/bmi/bmi_tcp/module.mk
+ src/io/bmi/bmi_gm/module.mk

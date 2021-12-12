@@ -1,0 +1,74 @@
+--- libgphoto2-2.4.1/gphoto2-config.in.pkgcfg	2007-07-27 02:36:23.000000000 +0200
++++ libgphoto2-2.4.1/gphoto2-config.in	2007-07-31 12:21:14.000000000 +0200
+@@ -1,11 +1,5 @@
+ #! /bin/sh
+ 
+-# leave these definitions here
+-# they are required for correct interpolation of
+-# @libdir@ and @includedir@ later on
+-prefix="@prefix@"
+-exec_prefix="@exec_prefix@"
+-
+ usage()
+ {
+     cat <<EOF
+@@ -13,7 +7,7 @@ Usage: gphoto2-config [OPTION]
+ 
+ Known values for OPTION are:
+ 
+-  --prefix=DIR		change libgphoto2 prefix [default ${prefix}]
++  --prefix		print libgphoto2 prefix
+   --libs		print library linking information
+   --cflags		print pre-processor and compiler flags
+   --help		display this help and exit
+@@ -55,11 +49,11 @@ while test $# -gt 0; do
+ 	;;
+ 
+     --cflags)
+-       	echo "-I@includedir@/gphoto2"
++       	pkg-config --cflags libgphoto2
+        	;;
+ 
+     --libs)
+-        echo "-L@libdir@" -lgphoto2 -lgphoto2_port -lm
++        pkg-config --libs libgphoto2
+        	;;
+ 
+     *)
+--- libgphoto2-2.4.1/libgphoto2_port/gphoto2-port-config.in.pkgcfg	2007-07-27 02:36:16.000000000 +0200
++++ libgphoto2-2.4.1/libgphoto2_port/gphoto2-port-config.in	2007-07-31 12:21:14.000000000 +0200
+@@ -1,11 +1,5 @@
+ #! /bin/sh
+ 
+-# leave these definitions here
+-# they are required for correct interpolation of
+-# @libdir@ and @includedir@ later on
+-prefix="@prefix@"
+-exec_prefix="@exec_prefix@"
+-
+ usage()
+ {
+     cat <<EOF
+@@ -13,7 +7,7 @@ Usage: gphoto2-port-config [OPTION]
+ 
+ Known values for OPTION are:
+ 
+-  --prefix=DIR		change libgphoto2-port prefix [default ${prefix}]
++  --prefix		print libgphoto2-port prefix
+   --libs		print library linking information
+   --cflags		print pre-processor and compiler flags
+   --help		display this help and exit
+@@ -55,11 +49,11 @@ while test $# -gt 0; do
+ 	;;
+ 
+     --cflags)
+-       	echo "-I@includedir@/gphoto2"
++       	pkg-config --cflags libgphoto2_port
+        	;;
+ 
+     --libs)
+-       	echo "-L@libdir@" -lgphoto2_port
++       	pkg-config --libs libgphoto2_port
+        	;;
+ 
+     *)

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache</groupId>
+    <artifactId>apache-resource-bundles</artifactId>
+    <version>2</version>
+  </parent>
+  <artifactId>apache-jar-resource-bundle</artifactId>
+  <name>Apache JAR Resource Bundle</name>
+  <version>1.4</version>
+  <inceptionYear>2006</inceptionYear>
+  <description>
+    An archive which contains templates for generating the necessary license files and notices for all Apache releases.
+  </description>
+
+  <scm>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/maven/resources/tags/apache-jar-resource-bundle-1.4</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/resources/tags/apache-jar-resource-bundle-1.4</developerConnection>
+    <url>https://svn.apache.org/repos/asf/maven/resources/tags/apache-jar-resource-bundle-1.4</url>
+  </scm>
+</project>

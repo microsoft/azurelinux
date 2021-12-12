@@ -1,0 +1,12 @@
+diff -ur netkit-telnet-0.17/telnetd/setproctitle.c netkit-telnet-0.17.new/telnetd/setproctitle.c
+--- netkit-telnet-0.17/telnetd/setproctitle.c	1999-12-11 00:06:39.000000000 +0100
++++ netkit-telnet-0.17.new/telnetd/setproctitle.c	2004-06-28 16:48:51.153514392 +0200
+@@ -139,7 +139,7 @@
+ 	(void) strcpy(Argv[0], buf);
+ 	p = &Argv[0][i];
+ 	while (p < LastArgv)
+-		*p++ = ' ';
++		*p++ = '\0';
+ 	Argv[1] = NULL;
+ }
+ 

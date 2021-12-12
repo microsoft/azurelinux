@@ -1,0 +1,13 @@
+[Unit]
+Description=Remote Machine Logged In User Identfier 
+Requires=network.target rpcbind.service
+After=rpcbind.service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/rpc.rusersd
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+

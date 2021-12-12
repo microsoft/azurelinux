@@ -1,0 +1,41 @@
+From c9c13747e575fe2ce398cec200284d0318aaece3 Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@gnome.org>
+Date: Wed, 29 Apr 2020 13:44:41 -0500
+Subject: [PATCH] Revert "Shutdown the daemon on idle by default"
+
+This reverts commit 0c84d71509e851db20445c747529bd7d3724f081.
+
+This broke the end session dialog in GNOME Shell.
+
+I thought I had that fixed by changing GNOME Shell to autostart
+PackageKit when it is not already running:
+
+https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/1104
+
+But turns out, there are more problems. The update fails if the user has
+used dnf since PackageKit last quit, a scenario I did not test. It also
+results in GNOME Software getting confused about what software is
+installed and what software is not. The issues are discussed here:
+
+https://gitlab.gnome.org/GNOME/gnome-shell/-/merge_requests/1227#note_784327
+
+It's still desirable to shut down automatically, but it requires more
+planning. And shutting down GNOME Software itself is frankly more
+important, since it uses a lot more RAM than packagekitd.
+---
+ src/pk-main.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/pk-main.c b/src/pk-main.c
+index 7a0bbd199..5791c5fef 100644
+--- a/src/pk-main.c
++++ b/src/pk-main.c
+@@ -178,8 +178,6 @@ main (int argc, char *argv[])
+ 
+ 	/* after how long do we timeout? */
+ 	exit_idle_time = g_key_file_get_integer (conf, "Daemon", "ShutdownTimeout", NULL);
+-	if (exit_idle_time == 0)
+-		exit_idle_time = 300;
+ 	g_debug ("daemon shutdown set to %i seconds", exit_idle_time);
+ 
+ 	/* override the backend name */

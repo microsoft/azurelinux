@@ -1,0 +1,16 @@
+diff -up pinfo-0.6.9/src/pinforc.in.xdg pinfo-0.6.9/src/pinforc.in
+--- pinfo-0.6.9/src/pinforc.in.xdg	2006-03-09 20:44:37.000000000 +0100
++++ pinfo-0.6.9/src/pinforc.in	2007-10-03 18:35:21.000000000 +0200
+@@ -85,9 +85,9 @@ QUIT-CONFIRM-DEFAULT=no
+ CLEAR-SCREEN-AT-EXIT=true
+ CALL-READLINE-HISTORY=true
+ STDERR-REDIRECTION="2> /dev/null"
+-HTTPVIEWER=lynx
+-FTPVIEWER=lynx
+-MAILEDITOR=clear; mail
++HTTPVIEWER=xdg-open
++FTPVIEWER=xdg-open
++MAILEDITOR=xdg-email
+ PRINTUTILITY=lpr
+ MANLINKS=1:8:2:3:4:5:6:7:9:n:p:o:3X11:3Xt:3x:3X
+ SAFE-USER=nobody

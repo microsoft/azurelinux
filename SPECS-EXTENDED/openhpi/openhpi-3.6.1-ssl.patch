@@ -1,0 +1,10 @@
+diff -up openhpi-3.6.1/ssl/Makefile.am.than openhpi-3.6.1/ssl/Makefile.am
+--- openhpi-3.6.1/ssl/Makefile.am.than	2017-02-21 12:21:12.114814698 -0500
++++ openhpi-3.6.1/ssl/Makefile.am	2017-02-21 12:22:44.576454262 -0500
+@@ -19,5 +19,5 @@ lib_LTLIBRARIES		= libopenhpi_ssl.la
+ libopenhpi_ssl_la_SOURCES = oh_ssl.c oh_ssl.h
+ 
+ libopenhpi_ssl_la_LDFLAGS = -version-info @HPI_LIB_VERSION@
+-libopenhpi_ssl_la_LIBADD  = @CRYPTO_LIB@
++libopenhpi_ssl_la_LIBADD  = -lssl @CRYPTO_LIB@
+ 

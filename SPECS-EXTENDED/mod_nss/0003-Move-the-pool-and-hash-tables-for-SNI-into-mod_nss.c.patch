@@ -1,0 +1,79 @@
+From 9b26424413277dd662d59179ba737bb782251456 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Thu, 30 Jan 2020 15:02:52 +0000
+Subject: [PATCH] Move the pool and hash tables for SNI into mod_nss.c
+
+The variable was effectively being re-declared with every
+import of mod_nss.h. Use extern instead.
+---
+ mod_nss.c         | 5 +++++
+ mod_nss.h         | 4 ----
+ nss_engine_init.c | 5 +++++
+ nss_util.c        | 4 ++++
+ 4 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/mod_nss.c b/mod_nss.c
+index 3b38b8a..b132ec5 100644
+--- a/mod_nss.c
++++ b/mod_nss.c
+@@ -17,6 +17,11 @@
+ #include <assert.h>
+ #include "sslerr.h"
+ 
++/* pool and hash to store ServerName and NSSNickname pairs for SNI */
++apr_pool_t *mp;
++apr_hash_t *ht;
++
++
+ /*
+  *  the table of configuration directives we provide
+  */
+diff --git a/mod_nss.h b/mod_nss.h
+index 5fed982..1feb438 100644
+--- a/mod_nss.h
++++ b/mod_nss.h
+@@ -370,10 +370,6 @@ typedef struct {
+  * for cipher definitions see nss_engine_cipher.h
+  */
+ 
+-/* pool and hash to store ServerName and NSSNickname pairs for SNI */
+-apr_pool_t *mp;
+-apr_hash_t *ht;
+-
+ /* Compatibility between Apache 2.0.x and 2.2.x. The numeric version of
+  * the version first appeared in Apache 2.0.56-dev. I picked 2.0.55 as it
+  * is the last version without this define. This is used for more than just
+diff --git a/nss_engine_init.c b/nss_engine_init.c
+index bbaf237..84fbdb9 100644
+--- a/nss_engine_init.c
++++ b/nss_engine_init.c
+@@ -52,6 +52,11 @@ static char *version_components[] = {
+     NULL
+ };
+ 
++/* pool and hash to store ServerName and NSSNickname pairs for SNI */
++extern apr_pool_t *mp;
++extern apr_hash_t *ht;
++
++
+ /* See if a uid or gid can read a file or directory at a given path.
+  *
+  * Return 0 on failure or file doesn't exist
+diff --git a/nss_util.c b/nss_util.c
+index cbe65de..c63a69b 100644
+--- a/nss_util.c
++++ b/nss_util.c
+@@ -17,6 +17,10 @@
+ #include "ap_mpm.h"
+ #include "apr_thread_mutex.h"
+ 
++/* pool and hash to store ServerName and NSSNickname pairs for SNI */
++extern apr_pool_t *mp;
++extern apr_hash_t *ht;
++
+ /*  _________________________________________________________________
+ **
+ **  Utility Functions
+-- 
+2.25.0
+

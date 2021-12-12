@@ -1,0 +1,16 @@
+diff -up Switch-2.17/Switch.pm.fixme Switch-2.17/Switch.pm
+--- Switch-2.17/Switch.pm.fixme	2014-06-10 13:03:40.395988520 -0400
++++ Switch-2.17/Switch.pm	2014-06-10 13:04:50.909488953 -0400
+@@ -25,9 +25,11 @@ my ($Perl5, $Perl6) = (0,0);
+ 
+ sub import
+ {
++	my ($class) = @_;
++	my $self = bless {}, $class;
+ 	$fallthrough = grep /\bfallthrough\b/, @_;
+ 	$offset = (caller)[2]+1;
+-	filter_add({}) unless @_>1 && $_[1] eq 'noimport';
++	filter_add($self) unless @_>1 && $_[1] eq 'noimport';
+ 	my $pkg = caller;
+ 	no strict 'refs';
+ 	for ( qw( on_defined on_exists ) )

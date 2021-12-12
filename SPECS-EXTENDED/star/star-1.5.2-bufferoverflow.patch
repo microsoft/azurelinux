@@ -1,0 +1,22 @@
+diff --git a/star/longnames.c b/star/longnames.c
+index 33cbe2a..9d2e303 100644
+--- a/star/longnames.c
++++ b/star/longnames.c
+@@ -155,7 +155,7 @@ name_to_tcb(info, ptb)
+ 		if (add)
+ 			strcatl(ptb->ndbuf.t_name, name, "/", (char *)NULL);
+ 		else
+-			strcpy(ptb->ndbuf.t_name, name);
++			strncpy(ptb->ndbuf.t_name, name, props.pr_maxsname);
+ 		return (TRUE);
+ 	}
+ 
+@@ -198,7 +198,7 @@ name_to_tcb(info, ptb)
+ 	if (add)
+ 		strcatl(ptb->ndbuf.t_name, &np[1], "/", (char *)NULL);
+ 	else
+-		strcpy(ptb->ndbuf.t_name, &np[1]);
++		strncpy(ptb->ndbuf.t_name, &np[1], props.pr_maxsname);
+ 	strncpy(ptb->dbuf.t_prefix, name, np - name);
+ 	info->f_flags |= F_SPLIT_NAME;
+ 	return (TRUE);

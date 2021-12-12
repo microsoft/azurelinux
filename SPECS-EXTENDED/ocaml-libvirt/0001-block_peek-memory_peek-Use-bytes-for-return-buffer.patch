@@ -1,0 +1,74 @@
+From 29709872404fad20a9822c43a831f30b7b09f34a Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Sun, 19 Jan 2020 12:58:17 +0000
+Subject: [PATCH 1/3] block_peek, memory_peek: Use bytes for return buffer.
+
+Strings are immutable in modern OCaml.
+---
+ libvirt/libvirt.ml          | 4 ++--
+ libvirt/libvirt.mli         | 4 ++--
+ libvirt/libvirt_c_oneoffs.c | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/libvirt/libvirt.ml b/libvirt/libvirt.ml
+index 7f9d0e4..bdb9460 100644
+--- a/libvirt/libvirt.ml
++++ b/libvirt/libvirt.ml
+@@ -731,8 +731,8 @@ struct
+   external migrate : [>`W] t -> [>`W] Connect.t -> migrate_flag list -> ?dname:string -> ?uri:string -> ?bandwidth:int -> unit -> rw t = "ocaml_libvirt_domain_migrate_bytecode" "ocaml_libvirt_domain_migrate_native"
+   external block_stats : [>`R] t -> string -> block_stats = "ocaml_libvirt_domain_block_stats"
+   external interface_stats : [>`R] t -> string -> interface_stats = "ocaml_libvirt_domain_interface_stats"
+-  external block_peek : [>`W] t -> string -> int64 -> int -> string -> int -> unit = "ocaml_libvirt_domain_block_peek_bytecode" "ocaml_libvirt_domain_block_peek_native"
+-  external memory_peek : [>`W] t -> memory_flag list -> int64 -> int -> string -> int -> unit = "ocaml_libvirt_domain_memory_peek_bytecode" "ocaml_libvirt_domain_memory_peek_native"
++  external block_peek : [>`W] t -> string -> int64 -> int -> bytes -> int -> unit = "ocaml_libvirt_domain_block_peek_bytecode" "ocaml_libvirt_domain_block_peek_native"
++  external memory_peek : [>`W] t -> memory_flag list -> int64 -> int -> bytes -> int -> unit = "ocaml_libvirt_domain_memory_peek_bytecode" "ocaml_libvirt_domain_memory_peek_native"
+ 
+   external get_all_domain_stats : [>`R] Connect.t -> stats_type list -> get_all_domain_stats_flag list -> domain_stats_record array = "ocaml_libvirt_domain_get_all_domain_stats"
+ 
+diff --git a/libvirt/libvirt.mli b/libvirt/libvirt.mli
+index 0d74199..7900392 100644
+--- a/libvirt/libvirt.mli
++++ b/libvirt/libvirt.mli
+@@ -708,7 +708,7 @@ sig
+   val interface_stats : [>`R] t -> string -> interface_stats
+     (** Returns network interface stats. *)
+ 
+-  val block_peek : [>`W] t -> string -> int64 -> int -> string -> int -> unit
++  val block_peek : [>`W] t -> string -> int64 -> int -> bytes -> int -> unit
+     (** [block_peek dom path offset size buf boff] reads [size] bytes at
+ 	[offset] in the domain's [path] block device.
+ 
+@@ -717,7 +717,7 @@ sig
+ 
+ 	See also {!max_peek}. *)
+   val memory_peek : [>`W] t -> memory_flag list -> int64 -> int ->
+-    string -> int -> unit
++    bytes -> int -> unit
+     (** [memory_peek dom Virtual offset size] reads [size] bytes
+ 	at [offset] in the domain's virtual memory.
+ 
+diff --git a/libvirt/libvirt_c_oneoffs.c b/libvirt/libvirt_c_oneoffs.c
+index 40384e8..8468c73 100644
+--- a/libvirt/libvirt_c_oneoffs.c
++++ b/libvirt/libvirt_c_oneoffs.c
+@@ -1057,7 +1057,7 @@ ocaml_libvirt_domain_block_peek_native (value domv, value pathv, value offsetv,
+   const char *path = String_val (pathv);
+   unsigned long long offset = Int64_val (offsetv);
+   size_t size = Int_val (sizev);
+-  char *buffer = String_val (bufferv);
++  unsigned char *buffer = Bytes_val (bufferv);
+   int boff = Int_val (boffv);
+   int r;
+ 
+@@ -1089,7 +1089,7 @@ ocaml_libvirt_domain_memory_peek_native (value domv, value flagsv, value offsetv
+   int flags = 0;
+   unsigned long long offset = Int64_val (offsetv);
+   size_t size = Int_val (sizev);
+-  char *buffer = String_val (bufferv);
++  unsigned char *buffer = Bytes_val (bufferv);
+   int boff = Int_val (boffv);
+   int r;
+ 
+-- 
+2.24.1
+

@@ -1,0 +1,667 @@
+From 64b336a47365eb0ee91a917d6b98c6c695775a36 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 16 Oct 2014 15:49:01 -0500
+Subject: [PATCH] RH: add mpathconf
+
+mpathconf is a program (largely based on lvmcomf) to help users
+configure /etc/multipath.conf and enable or disable multipathing.  It
+has a couple of built-in options that can be set directly from the
+command line.  But, mostly it is used to get a multipath.conf file
+with the OS defaults, and to enable and disable multipathing via
+a single command.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/config.c |   2 +
+ multipath/Makefile    |   5 +
+ multipath/mpathconf   | 464 ++++++++++++++++++++++++++++++++++++++++++
+ multipath/mpathconf.8 | 119 +++++++++++
+ 4 files changed, 590 insertions(+)
+ create mode 100644 multipath/mpathconf
+ create mode 100644 multipath/mpathconf.8
+
+diff --git a/libmultipath/config.c b/libmultipath/config.c
+index c36bc69c..fcd17dd4 100644
+--- a/libmultipath/config.c
++++ b/libmultipath/config.c
+@@ -746,6 +746,8 @@ load_config (char * file)
+ 		factorize_hwtable(conf->hwtable, builtin_hwtable_size, file);
+ 	} else {
+ 		condlog(0, "/etc/multipath.conf does not exist, blacklisting all devices.");
++		condlog(0, "You can run \"/sbin/mpathconf --enable\" to create");
++		condlog(0, "/etc/multipath.conf. See man mpathconf(8) for more details");
+ 		if (conf->blist_devnode == NULL) {
+ 			conf->blist_devnode = vector_alloc();
+ 			if (!conf->blist_devnode) {
+diff --git a/multipath/Makefile b/multipath/Makefile
+index b9bbb3cf..e720c7f6 100644
+--- a/multipath/Makefile
++++ b/multipath/Makefile
+@@ -18,10 +18,12 @@ $(EXEC): $(OBJS) $(multipathdir)/libmultipath.so $(mpathcmddir)/libmpathcmd.so
+ 	$(CC) $(CFLAGS) $(OBJS) -o $(EXEC) $(LDFLAGS) $(LIBDEPS)
+ 	$(GZIP) $(EXEC).8 > $(EXEC).8.gz
+ 	$(GZIP) $(EXEC).conf.5 > $(EXEC).conf.5.gz
++	$(GZIP) mpathconf.8 > mpathconf.8.gz
+ 
+ install:
+ 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(bindir)
+ 	$(INSTALL_PROGRAM) -m 755 $(EXEC) $(DESTDIR)$(bindir)/
++	$(INSTALL_PROGRAM) -m 755 mpathconf $(DESTDIR)$(bindir)/
+ 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(udevrulesdir)
+ 	$(INSTALL_PROGRAM) -m 644 11-dm-mpath.rules $(DESTDIR)$(udevrulesdir)
+ 	$(INSTALL_PROGRAM) -m 644 $(EXEC).rules $(DESTDIR)$(libudevdir)/rules.d/62-multipath.rules
+@@ -29,13 +31,16 @@ install:
+ 	$(INSTALL_PROGRAM) -m 644 $(EXEC).8.gz $(DESTDIR)$(man8dir)
+ 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(man5dir)
+ 	$(INSTALL_PROGRAM) -m 644 $(EXEC).conf.5.gz $(DESTDIR)$(man5dir)
++	$(INSTALL_PROGRAM) -m 644 mpathconf.8.gz $(DESTDIR)$(man8dir)
+ 
+ uninstall:
+ 	$(RM) $(DESTDIR)$(bindir)/$(EXEC)
+ 	$(RM) $(DESTDIR)$(udevrulesdir)/11-dm-mpath.rules
+ 	$(RM) $(DESTDIR)$(libudevdir)/rules.d/62-multipath.rules
++	$(RM) $(DESTDIR)$(bindir)/mpathconf
+ 	$(RM) $(DESTDIR)$(man8dir)/$(EXEC).8.gz
+ 	$(RM) $(DESTDIR)$(man5dir)/$(EXEC).conf.5.gz
++	$(RM) $(DESTDIR)$(man8dir)/mpathconf.8.gz
+ 
+ clean: dep_clean
+ 	$(RM) core *.o $(EXEC) *.gz
+diff --git a/multipath/mpathconf b/multipath/mpathconf
+new file mode 100644
+index 00000000..e8391347
+--- /dev/null
++++ b/multipath/mpathconf
+@@ -0,0 +1,464 @@
++#!/bin/bash
++#
++# Copyright (C) 2010 Red Hat, Inc. All rights reserved.
++#
++# This file is part of the device-mapper-multipath package.
++#
++# This copyrighted material is made available to anyone wishing to use,
++# modify, copy, or redistribute it subject to the terms and conditions
++# of the GNU General Public License v.2.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software Foundation,
++# Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++
++#
++# Simple editting of /etc/multipath.conf
++# This program was largely ripped off from lvmconf
++#
++
++unset ENABLE FIND FRIENDLY MODULE MULTIPATHD HAVE_DISABLE HAVE_WWID_DISABLE HAVE_FIND HAVE_BLACKLIST HAVE_EXCEPTIONS HAVE_DEFAULTS HAVE_FRIENDLY HAVE_MULTIPATHD HAVE_MODULE HAVE_OUTFILE SHOW_STATUS CHANGED_CONFIG WWID_LIST
++
++DEFAULT_CONFIG="# device-mapper-multipath configuration file
++
++# For a complete list of the default configuration values, run either:
++# # multipath -t
++# or
++# # multipathd show config
++
++# For a list of configuration options with descriptions, see the
++# multipath.conf man page.
++
++defaults {
++	user_friendly_names yes
++	find_multipaths yes
++}
++
++blacklist_exceptions {
++        property \"(SCSI_IDENT_|ID_WWN)\"
++}"
++
++CONFIGFILE="/etc/multipath.conf"
++OUTPUTFILE="/etc/multipath.conf"
++MULTIPATHDIR="/etc/multipath"
++TMPFILE="/etc/multipath/.multipath.conf.tmp"
++WWIDS=0
++
++function usage
++{
++	echo "usage: $0 <command>"
++	echo ""
++	echo "Commands:"
++	echo "Enable: --enable "
++	echo "Disable: --disable"
++	echo "Only allow certain wwids (instead of enable): --allow <WWID>"
++	echo "Set user_friendly_names (Default y): --user_friendly_names <y|n>"
++	echo "Set find_multipaths (Default y): --find_multipaths <y|n>"
++	echo "Load the dm-multipath modules on enable (Default y): --with_module <y|n>"
++	echo "start/stop/reload multipathd (Default n): --with_multipathd <y|n>"
++	echo "select output file (Default /etc/multipath.conf): --outfile <FILE>"
++	echo ""
++}
++
++function add_wwid
++{
++	INDEX=0
++	while [ "$INDEX" -lt "$WWIDS" ] ; do
++		if [ "$1" = "${WWID_LIST[$INDEX]}" ] ; then
++			return
++		fi
++		((INDEX++))
++	done
++	WWID_LIST[$WWIDS]="$1"
++	((WWIDS++))
++}
++
++function get_dm_deps
++{
++	shift 3
++	while [ -n "$1" -a -n "$2" ]; do
++		MAJOR=$(echo $1 | tr -d '(,')
++		MINOR=$(echo $2 | tr -d ')')
++		UUID=`dmsetup info -c --noheadings -o uuid -j $MAJOR -m $MINOR  2> /dev/null`
++		if [ -n "$UUID" ] ; then
++			set_dm_wwid $UUID
++		fi
++		shift 2
++	done
++}
++
++function set_dm_wwid
++{
++	if [[ "$1" =~ ^part[[:digit:]]+-mpath- ]] ; then
++		add_wwid "${1##part*-mpath-}"
++	elif [[ "$1" =~ ^mpath- ]] ; then
++		add_wwid "${1##mpath-}"
++	else
++		get_dm_deps `dmsetup deps -u $1`
++	fi
++}
++
++function set_wwid
++{
++	UUID=""
++	if [[ "$1" =~ ^[[:digit:]]+:[[:digit:]]+$ ]] ; then
++		MAJOR=${1%%:*}
++		MINOR=${1##*:}
++		UUID=`dmsetup info -c --noheadings -o uuid -j $MAJOR -m $MINOR  2> /dev/null`
++	else
++		UUID=`dmsetup info -c --noheadings -o uuid $1 2> /dev/null`
++	fi
++	if [ -n "$UUID" ] ; then
++		set_dm_wwid $UUID
++	else
++		add_wwid "$1"
++	fi
++}
++
++function parse_args
++{
++	while [ -n "$1" ]; do
++		case $1 in
++			--enable)
++				ENABLE=1
++				shift
++				;;
++			--disable)
++				ENABLE=0
++				shift
++				;;
++			--allow)
++				ENABLE=2
++				if [ -n "$2" ]; then
++					set_wwid $2
++					shift 2
++				else
++					usage
++					exit 1
++				fi
++				;;
++			--user_friendly_names)
++				if [ -n "$2" ]; then
++					FRIENDLY=$2
++					shift 2
++				else
++					usage
++					exit 1
++				fi
++				;;
++			--find_multipaths)
++				if [ -n "$2" ]; then
++					FIND=$2
++					shift 2
++				else
++					usage
++					exit 1
++				fi
++				;;
++			--with_module)
++				if [ -n "$2" ]; then
++					MODULE=$2
++					shift 2
++				else
++					usage
++					exit 1
++				fi
++				;;
++			--with_multipathd)
++				if [ -n "$2" ]; then
++					MULTIPATHD=$2
++					shift 2
++				else
++					usage
++					exit 1
++				fi
++				;;
++			--outfile)
++				if [ -n "$2" ]; then
++					OUTPUTFILE=$2
++					HAVE_OUTFILE=1
++					shift 2
++				else
++					usage
++					exit 1
++				fi
++				;;
++			*)
++				usage
++				exit
++		esac
++	done
++}
++
++function validate_args
++{
++	if [ "$ENABLE" = "0" ] && [ -n "$FRIENDLY" -o -n "$FIND" -o -n "$MODULE" ]; then
++		echo "ignoring extra parameters on disable"
++		FRIENDLY=""
++		FIND=""
++		MODULE=""
++	fi
++	if [ -n "$FRIENDLY" ] && [ "$FRIENDLY" != "y" -a "$FRIENDLY" != "n" ]; then
++		echo "--user_friendly_names must be either 'y' or 'n'"
++		exit 1
++	fi
++	if [ -n "$FIND" ] && [ "$FIND" != "y" -a "$FIND" != "n" ]; then
++		echo "--find_multipaths must be either 'y' or 'n'"
++		exit 1
++	fi
++	if [ -z "$ENABLE" -a -z "$FIND" -a -z "$FRIENDLY" ]; then
++		SHOW_STATUS=1
++	fi
++	if [ -n "$MODULE" ] && [ "$MODULE" != "y" -a "$MODULE" != "n" ]; then
++		echo "--with_module must be either 'y' or 'n'"
++		exit 1
++	fi
++	if [ -n "$MULTIPATHD" ] && [ "$MULTIPATHD" != "y" -a "$MULTIPATHD" != "n" ]; then
++		echo "--with_multipathd must be either 'y' or 'n'"
++		exit 1
++	fi
++	if [ "$ENABLE" = 2 -a -z "$HAVE_OUTFILE" ]; then
++		echo "Because --allow makes changes that cannot be automatically reversed,"
++		echo "you must set --outfile when you set --allow"
++		exit 1
++	fi
++}
++
++function add_blacklist_exceptions
++{
++	INDEX=0
++	while [ "$INDEX" -lt "$WWIDS" ] ; do
++		sed -i '/^blacklist_exceptions[[:space:]]*{/ a\
++	wwid '"\"${WWID_LIST[$INDEX]}\""'
++' $TMPFILE
++		((INDEX++))
++	done
++}
++
++umask 0077
++
++parse_args "$@"
++
++validate_args
++
++if [ ! -d "$MULTIPATHDIR" ]; then
++	echo "/etc/multipath/ does not exist. failing"
++	exit 1
++fi
++
++rm $TMPFILE 2> /dev/null
++echo "$DEFAULT_CONFIG" > $TMPFILE
++if [ -f "$CONFIGFILE" ]; then
++	cp $CONFIGFILE $TMPFILE
++fi
++
++if grep -q "^blacklist[[:space:]]*{" $TMPFILE ; then
++	HAVE_BLACKLIST=1
++fi
++
++if grep -q "^blacklist_exceptions[[:space:]]*{" $TMPFILE ; then
++	HAVE_EXCEPTIONS=1
++fi
++
++if grep -q "^defaults[[:space:]]*{" $TMPFILE ; then
++	HAVE_DEFAULTS=1
++fi
++
++if [ -z "$MODULE" -o "$MODULE" = "y" ]; then
++	if lsmod | grep -q "dm_multipath" ; then
++		HAVE_MODULE=1
++	else
++		HAVE_MODULE=0
++	fi
++fi
++
++if [ "$MULTIPATHD" = "y" ]; then
++	if /bin/systemctl status multipathd.service > /dev/null 2>&1 ; then
++		HAVE_MULTIPATHD=1
++	else
++		HAVE_MULTIPATHD=0
++	fi
++fi
++
++if [ "$HAVE_BLACKLIST" = "1" ]; then
++	if sed -n '/^blacklist[[:space:]]*{/,/^}/ p' $TMPFILE | grep -q "^[[:space:]]*devnode \"\.\?\*\"" ; then
++		HAVE_DISABLE=1
++	elif sed -n '/^blacklist[[:space:]]*{/,/^}/ p' $TMPFILE | grep -q "^[[:space:]]*#[[:space:]]*devnode \"\.\?\*\"" ; then
++		HAVE_DISABLE=0
++	fi
++fi
++
++if [ "$HAVE_BLACKLIST" = "1" ]; then
++	if sed -n '/^blacklist[[:space:]]*{/,/^}/ p' $TMPFILE | grep -q "^[[:space:]]*wwid \"\.\?\*\"" ; then
++		HAVE_WWID_DISABLE=1
++	elif sed -n '/^blacklist[[:space:]]*{/,/^}/ p' $TMPFILE | grep -q "^[[:space:]]*#[[:space:]]*wwid \"\.\?\*\"" ; then
++		HAVE_WWID_DISABLE=0
++	fi
++fi
++
++if [ "$HAVE_DEFAULTS" = "1" ]; then
++	if sed -n '/^defaults[[:space:]]*{/,/^}/ p' $TMPFILE | grep -q "^[[:space:]]*find_multipaths[[:space:]]*\(yes\|1\)" ; then
++		HAVE_FIND=1
++	elif sed -n '/^defaults[[:space:]]*{/,/^}/ p' $TMPFILE | grep -q "^[[:space:]]*find_multipaths[[:space:]]*\(no\|0\)" ; then
++		HAVE_FIND=0
++	fi
++	if sed -n '/^defaults[[:space:]]*{/,/^}/ p' $TMPFILE | grep -q "^[[:space:]]*user_friendly_names[[:space:]]*\(yes\|1\)" ; then
++		HAVE_FRIENDLY=1
++	elif sed -n '/^defaults[[:space:]]*{/,/^}/ p' $TMPFILE | grep -q "^[[:space:]]*user_friendly_names[[:space:]]*\(no\|0\)" ; then
++		HAVE_FRIENDLY=0
++	fi
++fi
++
++if [ -n "$SHOW_STATUS" ]; then
++	if [ -z "$HAVE_DISABLE" -o "$HAVE_DISABLE" = 0 ]; then
++		echo "multipath is enabled"
++	else
++		echo "multipath is disabled"
++	fi
++	if [ -z "$HAVE_FIND"  -o "$HAVE_FIND" = 0 ]; then
++		echo "find_multipaths is disabled"
++	else
++		echo "find_multipaths is enabled"
++	fi
++	if [ -z "$HAVE_FRIENDLY" -o "$HAVE_FRIENDLY" = 0 ]; then
++		echo "user_friendly_names is disabled"
++	else
++		echo "user_friendly_names is enabled"
++	fi
++	if [ -n "$HAVE_MODULE" ]; then
++		if [ "$HAVE_MODULE" = 1 ]; then
++			echo "dm_multipath module is loaded"
++		else
++			echo "dm_multipath module is not loaded"
++		fi
++	fi
++	if [ -z "$HAVE_MULTIPATHD" ]; then
++		if /bin/systemctl status multipathd.service > /dev/null 2>&1 ; then
++			HAVE_MULTIPATHD=1
++		else
++			HAVE_MULTIPATHD=0
++		fi
++	fi
++	if [ "$HAVE_MULTIPATHD" = 1 ]; then
++		echo "multipathd is running"
++	else
++		echo "multipathd is not running"
++	fi
++	exit 0
++fi
++
++if [ -z "$HAVE_BLACKLIST" ]; then
++	cat >> $TMPFILE <<- _EOF_
++
++blacklist {
++}
++_EOF_
++fi
++
++if [ -z "$HAVE_DEFAULTS" ]; then
++	cat >> $TMPFILE <<- _EOF_
++
++defaults {
++}
++_EOF_
++fi
++
++if [ "$ENABLE" = 2 ]; then
++	if [ "$HAVE_DISABLE" = 1 ]; then
++		sed -i '/^blacklist[[:space:]]*{/,/^}/ s/^[[:space:]]*devnode \"\.\?\*\"/#	devnode ".*"/' $TMPFILE
++	fi
++	if [ -z "$HAVE_WWID_DISABLE" ]; then
++		sed -i '/^blacklist[[:space:]]*{/ a\
++	wwid ".*"
++' $TMPFILE
++	elif [ "$HAVE_WWID_DISABLE" = 0 ]; then
++		sed -i '/^blacklist[[:space:]]*{/,/^}/ s/^[[:space:]]*#[[:space:]]*wwid \"\.\?\*\"/	wwid ".*"/' $TMPFILE
++	fi
++	if [ "$HAVE_EXCEPTIONS" = 1 ]; then
++		sed -i '/^blacklist_exceptions[[:space:]]*{/,/^}/ {/^[[:space:]]*wwid/ d}' $TMPFILE
++	else
++		cat >> $TMPFILE <<- _EOF_
++
++blacklist_exceptions {
++}
++_EOF_
++	fi
++	add_blacklist_exceptions
++elif [ "$ENABLE" = 1 ]; then
++	if [ "$HAVE_DISABLE" = 1 ]; then
++		sed -i '/^blacklist[[:space:]]*{/,/^}/ s/^[[:space:]]*devnode \"\.\?\*\"/#	devnode ".*"/' $TMPFILE
++	fi
++elif [ "$ENABLE" = 0 ]; then
++	if [ -z "$HAVE_DISABLE" ]; then
++		sed -i '/^blacklist[[:space:]]*{/ a\
++	devnode ".*"
++' $TMPFILE
++	elif [ "$HAVE_DISABLE" = 0 ]; then
++		sed -i '/^blacklist[[:space:]]*{/,/^}/ s/^[[:space:]]*#[[:space:]]*devnode \"\.\?\*\"/	devnode ".*"/' $TMPFILE
++	fi
++fi
++
++if [ "$FIND" = "n" ]; then
++	if [ "$HAVE_FIND" = 1 ]; then
++		sed -i '/^defaults[[:space:]]*{/,/^}/ s/^[[:space:]]*find_multipaths[[:space:]]*\(yes\|1\)/	find_multipaths no/' $TMPFILE
++		CHANGED_CONFIG=1
++	fi
++elif [ "$FIND" = "y" ]; then
++	if [ -z "$HAVE_FIND" ]; then
++		sed -i '/^defaults[[:space:]]*{/ a\
++	find_multipaths yes
++' $TMPFILE
++		CHANGED_CONFIG=1
++	elif [ "$HAVE_FIND" = 0 ]; then
++		sed -i '/^defaults[[:space:]]*{/,/^}/ s/^[[:space:]]*find_multipaths[[:space:]]*\(no\|0\)/	find_multipaths yes/' $TMPFILE
++		CHANGED_CONFIG=1
++	fi
++fi
++
++if [ "$FRIENDLY" = "n" ]; then
++	if [ "$HAVE_FRIENDLY" = 1 ]; then
++		sed -i '/^defaults[[:space:]]*{/,/^}/ s/^[[:space:]]*user_friendly_names[[:space:]]*\(yes\|1\)/	user_friendly_names no/' $TMPFILE
++		CHANGED_CONFIG=1
++	fi
++elif [ "$FRIENDLY" = "y" ]; then
++	if [ -z "$HAVE_FRIENDLY" ]; then
++		sed -i '/^defaults[[:space:]]*{/ a\
++	user_friendly_names yes
++' $TMPFILE
++		CHANGED_CONFIG=1
++	elif [ "$HAVE_FRIENDLY" = 0 ]; then
++		sed -i '/^defaults[[:space:]]*{/,/^}/ s/^[[:space:]]*user_friendly_names[[:space:]]*\(no\|0\)/	user_friendly_names yes/' $TMPFILE
++		CHANGED_CONFIG=1
++	fi
++fi
++
++if [ -f "$OUTPUTFILE" ]; then
++	cp $OUTPUTFILE $OUTPUTFILE.old
++	if [ $? != 0 ]; then
++		echo "failed to backup old config file, $OUTPUTFILE not updated"
++		exit 1
++	fi
++fi
++
++cp $TMPFILE $OUTPUTFILE
++if [ $? != 0 ]; then
++	echo "failed to copy new config file into place, check $OUTPUTFILE is still OK"
++	exit 1
++fi
++
++rm -f $TMPFILE
++
++if [ "$ENABLE" = 1 ]; then
++	if [ "$HAVE_MODULE" = 0 ]; then
++		modprobe dm_multipath
++	fi
++	if [ "$HAVE_MULTIPATHD" = 0 ]; then
++		systemctl start multipathd.service
++	fi
++elif [ "$ENABLE" = 0 ]; then
++	if [ "$HAVE_MULTIPATHD" = 1 ]; then
++		systemctl stop multipathd.service
++	fi
++elif [ -n "$CHANGED_CONFIG" -a "$HAVE_MULTIPATHD" = 1 ]; then
++	systemctl reload multipathd.service
++fi
+diff --git a/multipath/mpathconf.8 b/multipath/mpathconf.8
+new file mode 100644
+index 00000000..5b7ae0c3
+--- /dev/null
++++ b/multipath/mpathconf.8
+@@ -0,0 +1,119 @@
++.TH MPATHCONF 8 "June 2010" "" "Linux Administrator's Manual"
++.SH NAME
++mpathconf - A tool for configuring device-mapper-multipath
++.SH SYNOPSIS
++.B mpathconf
++.RB [\| commands \|]
++.RB [\| options \|]
++.SH DESCRIPTION
++.B mpathconf
++is a utility that creates or modifies
++.B /etc/multipath.conf.
++It can enable or disable multipathing and configure some common options.
++.B mpathconf
++can also load the
++.B dm_multipath
++module, start and stop the
++.B multipathd
++daemon, and configure the
++.B multipathd
++service to start automatically or not. If
++.B mpathconf
++is called with no commands, it will display the current configuration, but
++will not create of modify
++.B /etc/multipath.conf
++
++The default options for mpathconf are
++.B --with_module
++The
++.B --with_multipathd
++option is not set by default.  Enabling multipathing will load the
++.B dm_multipath
++module but it will not immediately start it. This is so
++that users can manually edit their config file if necessary, before starting
++.B multipathd.
++
++If
++.B /etc/multipath.conf
++already exists, mpathconf will edit it. If it does not exist, mpathconf will
++create a default file with
++.B user_friendly_names
++and
++.B find_multipaths
++set. To disable these, use the
++.B --user_friendly_names n
++and
++.B --find_multipaths n
++options
++.SH COMMANDS
++.TP
++.B --enable
++Removes any line that blacklists all device nodes from the
++.B /etc/multipath.conf
++blacklist section. Also, creates
++.B /etc/multipath.conf
++if it doesn't exist.
++.TP
++.B --disable
++Adds a line that blacklists all device nodes to the
++.B /etc/multipath.conf
++blacklist section. If no blacklist section exists, it will create one.
++.TP
++.B --allow \fB<device>\fP
++Modifies the \fB/etc/multipath/conf\fP blacklist to blacklist all
++wwids and the blacklist_exceptions to whitelist \fB<device>\fP. \fB<device>\fP
++can be in the form of MAJOR:MINOR, a wwid, or the name of a device-mapper
++device, either a multipath device, or any device on stacked on top of one or
++more multipath devices. This command can be used multiple times to allow
++multiple devices.  \fBNOTE:\fP This action will create a configuration file that
++mpathconf will not be able to revert back to its previous state. Because
++of this, \fB--outfile\fP is required when using \fB--allow\fP.
++.TP
++.B --user_friendly_name \fP { \fBy\fP | \fBn\fP }
++If set to \fBy\fP, this adds the line
++.B user_friendly_names yes
++to the
++.B /etc/multipath.conf
++defaults section. If set to \fBn\fP, this removes the line, if present. This
++command can be used along with any other command.
++.TP
++.B --find_multipaths\fP { \fBy\fP | \fBn\fP }
++If set to \fBy\fP, this adds the line
++.B find_multipaths yes
++to the
++.B /etc/multipath.conf
++defaults section. If set to \fBn\fP, this removes the line, if present. This
++command can be used aldong with any other command.
++.TP
++.B --outfile \fB<filename>\fP
++Write the resulting multipath configuration to \fB<filename>\fP instead of
++\fB/etc/multipath.conf\fP.
++.SH OPTIONS
++.TP
++.B --with_module\fP { \fBy\fP | \fBn\fP }
++If set to \fBy\fP, this runs
++.B modprobe dm_multipath
++to install the multipath modules. This option only works with the
++.B --enable
++command. This option is set to \fBy\fP by default.
++.TP
++.B --with_multipathd { \fBy\fP | \fBn\fP }
++If set to \fBy\fP, this runs
++.B service multipathd start
++to start the multipathd daemon on \fB--enable\fP,
++.B service multipathd stop
++to stop the multipathd daemon on \fB--disable\fP, and
++.B service multipathd reload
++to reconfigure multipathd on \fB--user_frindly_names\fP and
++\fB--find_multipaths\fP.
++This option is set to \fBn\fP by default.
++.SH FILES
++.BR /etc/multipath.conf
++.SH "SEE ALSO"
++.BR multipath.conf (5),
++.BR modprobe (8),
++.BR multipath (8),
++.BR multipathd (8),
++.BR service (8),
++.SH AUTHOR
++Benjamin Marzinski <bmarzins@redhat.com>
+-- 
+2.17.2
+

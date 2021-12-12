@@ -1,0 +1,65 @@
+ lib/events/libdmraid-events-isw.c | 6 +++---
+ lib/format/ataraid/jm.c           | 4 ++--
+ lib/metadata/metadata.c           | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/lib/events/libdmraid-events-isw.c b/lib/events/libdmraid-events-isw.c
+index cc78b58..9d4e902 100644
+--- a/lib/events/libdmraid-events-isw.c
++++ b/lib/events/libdmraid-events-isw.c
+@@ -838,13 +838,13 @@ static void _log_either(enum log_type log_type,
+ 
+ 	sz = _log_all_devs(log_type, rs, NULL, 0);
+ 	if (!sz) {
+-		syslog(LOG_ERR, msg[0]);
++		syslog(LOG_ERR, "%s", msg[0]);
+ 		return;
+ 	}
+ 
+ 	str = dm_malloc(++sz);
+ 	if (!str) {
+-		syslog(LOG_ERR, msg[1]);
++		syslog(LOG_ERR, "%s", msg[1]);
+ 		return;
+ 	}
+ 
+@@ -1076,7 +1076,7 @@ static enum disk_state_type _process_stripe_event(struct dm_task *dmt,
+ 						  char *params)
+ {
+ 	int argc, i, num_devs, ret = D_INSYNC;
+-	char **args, *dev_status_str, *p;
++	char **args = NULL, *dev_status_str, *p;
+ 	const char *rs_name = dm_task_get_name(dmt);
+ 	struct dso_raid_set *rs = _find_raid_set(rs_name, NULL, 1);
+ 	struct dso_raid_dev *dev;
+diff --git a/lib/format/ataraid/jm.c b/lib/format/ataraid/jm.c
+index 431f0de..d1e5df7 100644
+--- a/lib/format/ataraid/jm.c
++++ b/lib/format/ataraid/jm.c
+@@ -32,10 +32,10 @@ name(struct lib_context *lc, struct raid_dev *rd, unsigned int subset)
+ 
+ 	/* Sanitize name, make sure it's null terminated */
+ 	strncpy(buf, name, JM_NAME_LEN);
+-	while (i && isspace(buf[i])) {
++	i = strlen(buf);
++	while (i-- && isspace(buf[i])) {
+ 		name[i]='\0';
+ 		buf[i]='\0';
+-		--i;
+ 	}
+ 
+ 	len = strlen(buf) + sizeof(HANDLER) + (jm->mode == JM_T_RAID01 ? 3 : 2);
+diff --git a/lib/metadata/metadata.c b/lib/metadata/metadata.c
+index 4da6b64..14dc459 100644
+--- a/lib/metadata/metadata.c
++++ b/lib/metadata/metadata.c
+@@ -1433,7 +1433,7 @@ create_raidset(struct lib_context *lc, struct raid_set_descr *rsd)
+ 		rd->sectors = 0;
+ 		list_add_tail(&rd->devs, &rs->devs);
+ 		n++;
+-	} while (end++ != '\0');
++	} while (end++ != NULL);
+ 
+ 	rs->total_devs = rs->found_devs = n;
+ 	rs_tmp = rs;
+

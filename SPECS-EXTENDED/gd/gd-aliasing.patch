@@ -1,0 +1,30 @@
+Index: src/fontwheeltest.c
+===================================================================
+--- src/fontwheeltest.c.orig
++++ src/fontwheeltest.c
+@@ -32,6 +32,8 @@ dowheel (gdImagePtr im, int color, char
+ 	doerr (err, "------------------------------------------");
+ 
+ 	for (curang = 0.0; curang < 360.0; curang += angle) {
++		gdPoint points[4];
++
+ 		curangrads = DEGTORAD(curang);
+ 		x0 = x + cos (curangrads) * offset;
+ 		y0 = y - sin (curangrads) * offset;
+@@ -47,7 +49,15 @@ dowheel (gdImagePtr im, int color, char
+ 		if (cp)
+ 			doerr (err, cp);
+ 
+-		gdImagePolygon (im, (gdPointPtr)brect, 4, color);
++		points[0].x = brect[0];
++		points[0].y = brect[1];
++		points[1].x = brect[2];
++		points[1].y = brect[3];
++		points[2].x = brect[4];
++		points[2].y = brect[5];
++		points[3].x = brect[6];
++		points[3].y = brect[7];
++		gdImagePolygon (im, points, 4, color);
+ 	}
+ 
+ 	fclose (err);

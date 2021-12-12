@@ -1,0 +1,65 @@
+From 6c2c8af4270e258ce30885547e9e9c67b3275493 Mon Sep 17 00:00:00 2001
+Message-Id: <6c2c8af4270e258ce30885547e9e9c67b3275493.1608637099.git.mjg@fedoraproject.org>
+From: rpm-build <mjg@fedoraproject.org>
+Date: Tue, 22 Dec 2020 12:35:51 +0100
+Subject: [PATCH] restore ovp for good
+
+The original patch touches configure.ac only. Patch configure as well
+for our release builds: These are the ovp-related changes after autogen.sh
+(which one would use for git builds).
+
+Signed-off-by: rpm-build <mjg@fedoraproject.org>
+---
+ configure | 22 ++++++----------------
+ 1 file changed, 6 insertions(+), 16 deletions(-)
+
+diff --git a/configure b/configure
+index 317885c..d51c574 100755
+--- a/configure
++++ b/configure
+@@ -961,7 +961,6 @@ with_gpdl
+ enable_compile_inits
+ with_drivers
+ with_driversfile
+-with_openprinting
+ enable_hidden_visibility
+ enable_dynamic
+ with_fontpath
+@@ -11218,15 +11217,7 @@ IBM_DEVS='ibmpro jetp3852'
+ OKI_DEVS='oki182 okiibm oki4w'
+ JAPAN_DEVS='lips4 lips4v ljet4pjl lj4dithp dj505j picty180 lips2p bjc880j pr201 pr150 pr1000 pr1000_4 jj100 bj10v bj10vh mj700v2c mj500c mj6000c mj8000c fmpr fmlbp ml600 lbp310 lbp320 md50Mono md50Eco md1xMono escpage lp2000 npdl rpdl'
+ MISC_PDEVS='uniprint ap3250 atx23 atx24 atx38 itk24i itk38 coslw2p coslwxl declj250 fs600 imagen lj250 m8510 necp6 oce9050 r4081 sj48 tek4696 t4693d2 t4693d4 t4693d8 dl2100 la50 la70 la75 la75plus ln03 xes md2k md5k gdi samsunggdi'
+-
+-
+-# Check whether --with-openprinting was given.
+-if test "${with_openprinting+set}" = set; then :
+-  withval=$with_openprinting; OPVP_DEVS='opvp oprp'
+-else
+-  OPVP_DEVS=''
+-fi
+-
++OPVP_DEVS='opvp oprp'
+ 
+ ETS_HALFTONING_DEVS='rinkj'
+ 
+@@ -11265,12 +11256,11 @@ while test -n "$drivers"; do
+         PRINTERS)
+                 P_DEVS0="$P_DEVS0 $CANON_DEVS $EPSON_DEVS $HP_DEVS $LEXMARK_DEVS $BROTHER_DEVS $APPLE_DEVS $IBM_DEVS $OKI_DEVS $JAPAN_DEVS $MISC_PDEVS $ETS_HALFTONING_DEVS $URF_DEVS"
+                 IJS_DEVS0="$IJSDEVS"
+-                if test x"$OPVP_DEVS" != x"" ; then
+-                  if test x$ac_cv_lib_dl_dlopen != xno -a x$found_iconv != xno; then
+-                    P_DEVS0="$P_DEVS0 $OPVP_DEVS"
+-                  else
+-                    as_fn_error $? "Unable to include opvp/oprp driver due to missing or disabled prerequisites..." "$LINENO" 5
+-                  fi
++                if test x$ac_cv_lib_dl_dlopen != xno -a x$found_iconv != xno; then
++                        P_DEVS0="$P_DEVS0 $OPVP_DEVS"
++                else
++                        { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unable to include opvp/oprp driver due to missing or disabled prerequisites..." >&5
++$as_echo "$as_me: WARNING: Unable to include opvp/oprp driver due to missing or disabled prerequisites..." >&2;}
+                 fi
+                 ;;
+         FILES)
+-- 
+2.30.0.rc0.297.gbcca948854
+

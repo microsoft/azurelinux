@@ -1,0 +1,51 @@
+From a96d8a17e57343ff29736a2f8d0c954f2c4ba02a Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 18 Sep 2012 15:32:31 +0200
+Subject: [PATCH] rewrite: add default "ddg" dumb/smart prefixes for DuckDuckGo
+
+... and mention that URI rewriting rules may leak ELinks' identity
+in the documentation of protocol.http.user_agent.
+
+Originally requested at <https://bugzilla.redhat.com/856348>.
+---
+ src/protocol/http/http.c       |    3 ++-
+ src/protocol/rewrite/rewrite.c |    2 ++
+ 2 files changed, 4 insertions(+), 1 deletions(-)
+
+diff --git a/src/protocol/http/http.c b/src/protocol/http/http.c
+index ce14031..98053c0 100644
+--- a/src/protocol/http/http.c
++++ b/src/protocol/http/http.c
+@@ -227,7 +227,8 @@ static union option_info http_options[] = {
+ 		"pushing some lite version to them automagically.\n"
+ 		"\n"
+ 		"Use \" \" if you don't want any User-Agent header to be sent "
+-		"at all.\n"
++		"at all. URI rewriting rules may still include parameters "
++		"that reveal you are using ELinks.\n"
+ 		"\n"
+ 		"%v in the string means ELinks version,\n"
+ 		"%s in the string means system identification,\n"
+diff --git a/src/protocol/rewrite/rewrite.c b/src/protocol/rewrite/rewrite.c
+index dd5c7ab..e01da74 100644
+--- a/src/protocol/rewrite/rewrite.c
++++ b/src/protocol/rewrite/rewrite.c
+@@ -121,6 +121,7 @@ static union option_info uri_rewrite_options[] = {
+ 	INIT_OPT_DUMB_PREFIX("cia", "http://cia.navi.cx/"),
+ 	INIT_OPT_DUMB_PREFIX("b", "http://babelfish.altavista.com/babelfish/tr"),
+ 	INIT_OPT_DUMB_PREFIX("d", "http://www.dict.org"),
++	INIT_OPT_DUMB_PREFIX("ddg", "http://duckduckgo.com/?t=elinks"),
+ 	INIT_OPT_DUMB_PREFIX("g", "http://www.google.com/"),
+ 	INIT_OPT_DUMB_PREFIX("gg", "http://www.google.com/"),
+ 	INIT_OPT_DUMB_PREFIX("go", "http://www.google.com/"),
+@@ -158,6 +159,7 @@ static union option_info uri_rewrite_options[] = {
+ 	INIT_OPT_SMART_PREFIX("cambridge", "http://dictionary.cambridge.org/results.asp?searchword=%s"),
+ 	INIT_OPT_SMART_PREFIX("cliki", "http://www.cliki.net/admin/search?words=%s"),
+ 	INIT_OPT_SMART_PREFIX("d", "http://www.dict.org/bin/Dict?Query=%s&Form=Dict1&Strategy=*&Database=*&submit=Submit+query"),
++	INIT_OPT_SMART_PREFIX("ddg", "http://duckduckgo.com/?q=%s&t=elinks"),
+ 	INIT_OPT_SMART_PREFIX("dmoz", "http://search.dmoz.org/cgi-bin/search?search=%s"),
+ 	INIT_OPT_SMART_PREFIX("foldoc", "http://wombat.doc.ic.ac.uk/foldoc/foldoc.cgi?%s"),
+ 	INIT_OPT_SMART_PREFIX("g", "http://www.google.com/search?q=%s&btnG=Google+Search"),
+-- 
+1.7.1
+

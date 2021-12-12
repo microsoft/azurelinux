@@ -1,0 +1,160 @@
+From 44c46d0412b02942c77f502a578ca3d1c1f0559d Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Wed, 22 Apr 2020 13:48:07 +0100
+Subject: [PATCH 2/2] Patch out optional support for msv and relax schema
+ validation
+
+---
+ .../ValidationSchemaFactoryProviderImpl.java  | 26 +------------------
+ .../vstream/BaseStax2ValidationTest.java      | 24 -----------------
+ .../java/stax2/vwstream/BaseOutputTest.java   |  2 +-
+ .../wstxtest/vstream/BaseValidationTest.java  | 12 ---------
+ 4 files changed, 2 insertions(+), 62 deletions(-)
+
+diff --git a/src/main/java/com/ctc/wstx/osgi/ValidationSchemaFactoryProviderImpl.java b/src/main/java/com/ctc/wstx/osgi/ValidationSchemaFactoryProviderImpl.java
+index d7822bc..2c24f98 100644
+--- a/src/main/java/com/ctc/wstx/osgi/ValidationSchemaFactoryProviderImpl.java
++++ b/src/main/java/com/ctc/wstx/osgi/ValidationSchemaFactoryProviderImpl.java
+@@ -8,8 +8,6 @@ import org.codehaus.stax2.osgi.Stax2ValidationSchemaFactoryProvider;
+ 
+ import com.ctc.wstx.api.ValidatorConfig;
+ import com.ctc.wstx.dtd.DTDSchemaFactory;
+-import com.ctc.wstx.msv.RelaxNGSchemaFactory;
+-import com.ctc.wstx.msv.W3CSchemaFactory;
+ 
+ public abstract class ValidationSchemaFactoryProviderImpl
+     implements Stax2ValidationSchemaFactoryProvider
+@@ -24,7 +22,7 @@ public abstract class ValidationSchemaFactoryProviderImpl
+     public static ValidationSchemaFactoryProviderImpl[] createAll()
+     {
+         return new ValidationSchemaFactoryProviderImpl[] {
+-            new DTD(), new RelaxNG(), new W3CSchema()
++            new DTD()
+         };
+     }
+ 
+@@ -59,26 +57,4 @@ public abstract class ValidationSchemaFactoryProviderImpl
+             return new DTDSchemaFactory();
+         }
+     }
+-
+-    final static class RelaxNG
+-        extends ValidationSchemaFactoryProviderImpl
+-    {
+-        RelaxNG() { super(XMLValidationSchema.SCHEMA_ID_RELAXNG); }
+-
+-        @Override
+-        public XMLValidationSchemaFactory createValidationSchemaFactory() {
+-            return new RelaxNGSchemaFactory();
+-        }
+-    }
+-
+-    final static class W3CSchema
+-        extends ValidationSchemaFactoryProviderImpl
+-    {
+-        W3CSchema() { super(XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA); }
+-
+-        @Override
+-        public XMLValidationSchemaFactory createValidationSchemaFactory() {
+-            return new W3CSchemaFactory();
+-        }
+-    }
+ }
+diff --git a/src/test/java/stax2/vstream/BaseStax2ValidationTest.java b/src/test/java/stax2/vstream/BaseStax2ValidationTest.java
+index 7ee0706..bf607bc 100644
+--- a/src/test/java/stax2/vstream/BaseStax2ValidationTest.java
++++ b/src/test/java/stax2/vstream/BaseStax2ValidationTest.java
+@@ -8,8 +8,6 @@ import org.codehaus.stax2.XMLStreamReader2;
+ import org.codehaus.stax2.validation.*;
+ 
+ import com.ctc.wstx.dtd.DTDSchemaFactory;
+-import com.ctc.wstx.msv.RelaxNGSchemaFactory;
+-import com.ctc.wstx.msv.W3CSchemaFactory;
+ 
+ import stax2.BaseStax2Test;
+ 
+@@ -20,25 +18,10 @@ public abstract class BaseStax2ValidationTest
+     //    by implementations other than Woodstox, that do NOT support non-ns mode.
+     protected final static boolean HAS_NON_NS_MODE = true;
+     
+-    protected XMLValidationSchemaFactory newW3CSchemaValidatorFactory() {
+-        return new W3CSchemaFactory();
+-    }
+-
+-    protected XMLValidationSchemaFactory newRelaxNGValidatorFactory() {
+-        return new RelaxNGSchemaFactory();
+-    }
+-
+     protected XMLValidationSchemaFactory newDTDValidatorFactory() {
+         return new DTDSchemaFactory();
+     }
+ 
+-    protected XMLValidationSchema parseRngSchema(String contents)
+-        throws XMLStreamException
+-    {
+-        return newRelaxNGValidatorFactory()
+-                .createSchema(new StringReader(contents));
+-    }
+-
+     protected XMLValidationSchema parseDTDSchema(String contents)
+         throws XMLStreamException
+     {
+@@ -46,13 +29,6 @@ public abstract class BaseStax2ValidationTest
+                 .createSchema(new StringReader(contents));
+     }
+ 
+-    protected XMLValidationSchema parseW3CSchema(String contents)
+-        throws XMLStreamException
+-    {
+-        return newW3CSchemaValidatorFactory()
+-                .createSchema(new StringReader(contents));
+-    }
+-
+     protected void verifyFailure(String xml, XMLValidationSchema schema, String failMsg,
+                                  String failPhrase) throws XMLStreamException
+     {
+diff --git a/src/test/java/stax2/vwstream/BaseOutputTest.java b/src/test/java/stax2/vwstream/BaseOutputTest.java
+index a9e1ec5..475703e 100644
+--- a/src/test/java/stax2/vwstream/BaseOutputTest.java
++++ b/src/test/java/stax2/vwstream/BaseOutputTest.java
+@@ -36,7 +36,7 @@ abstract class BaseOutputTest
+         outf.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.valueOf(repairing));
+ 
+         XMLStreamWriter2 strw = (XMLStreamWriter2)outf.createXMLStreamWriter(w);
+-        XMLValidationSchema schema = parseW3CSchema(schemaSrc);
++        XMLValidationSchema schema = parseDTDSchema(schemaSrc);
+ 
+         strw.validateAgainst(schema);
+         strw.writeStartDocument();
+diff --git a/src/test/java/wstxtest/vstream/BaseValidationTest.java b/src/test/java/wstxtest/vstream/BaseValidationTest.java
+index b9d0c54..5ec3da2 100644
+--- a/src/test/java/wstxtest/vstream/BaseValidationTest.java
++++ b/src/test/java/wstxtest/vstream/BaseValidationTest.java
+@@ -25,24 +25,12 @@ public abstract class BaseValidationTest
+         return schF.createSchema(ref);
+     }
+ 
+-    protected XMLValidationSchema parseRngSchema(String contents)
+-        throws XMLStreamException
+-    {
+-        return parseSchema(contents, XMLValidationSchema.SCHEMA_ID_RELAXNG);
+-    }
+-
+     protected XMLValidationSchema parseDTDSchema(String contents)
+         throws XMLStreamException
+     {
+         return parseSchema(contents, XMLValidationSchema.SCHEMA_ID_DTD);
+     }
+ 
+-    protected XMLValidationSchema parseW3CSchema(String contents)
+-        throws XMLStreamException
+-    {
+-        return parseSchema(contents, XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA);
+-    }
+-
+     protected void verifyFailure(String xml, XMLValidationSchema schema, String failMsg,
+                                  String failPhrase) throws XMLStreamException
+     {
+-- 
+2.28.0
+

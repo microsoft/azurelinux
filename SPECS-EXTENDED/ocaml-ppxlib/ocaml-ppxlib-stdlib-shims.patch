@@ -1,0 +1,41 @@
+--- a/ast/dune	2021-02-09 09:29:49.858496156 -0700
++++ b/ast/dune	2021-02-09 09:29:57.847485450 -0700
+@@ -6,7 +6,7 @@
+  (name ppxlib_ast)
+  (public_name ppxlib.ast)
+  (libraries ocaml-compiler-libs.shadow ocaml-compiler-libs.common
+-   compiler-libs.common ocaml-migrate-parsetree stdlib-shims)
++   compiler-libs.common ocaml-migrate-parsetree)
+  (flags
+   (:standard -open Ocaml_shadow -safe-string)
+   -w
+--- a/dune-project	2021-02-04 09:27:47.000000000 -0700
++++ b/dune-project	2021-02-09 09:29:43.423504783 -0700
+@@ -20,7 +20,6 @@
+   (ocaml-migrate-parsetree (>= 2.1.0))
+   (ppx_derivers (>= 1.0))
+   sexplib0
+-  stdlib-shims
+   (ocamlfind :with-test)
+   (re (and :with-test (>= 1.9.0)))
+   (cinaps (and :with-test (>= v0.12.1)))
+--- a/ppxlib.opam	2021-02-09 09:28:26.394608169 -0700
++++ b/ppxlib.opam	2021-02-09 09:28:49.502577143 -0700
+@@ -26,7 +26,6 @@ depends: [
+   "ocaml-migrate-parsetree" {>= "2.1.0"}
+   "ppx_derivers" {>= "1.0"}
+   "sexplib0"
+-  "stdlib-shims"
+   "ocamlfind" {with-test}
+   "re" {with-test & >= "1.9.0"}
+   "cinaps" {with-test & >= "v0.12.1"}
+--- a/stdppx/dune	2021-02-09 09:28:26.394608169 -0700
++++ b/stdppx/dune	2021-02-09 09:29:05.478555696 -0700
+@@ -1,6 +1,6 @@
+ (library
+  (name stdppx)
+  (public_name ppxlib.stdppx)
+- (libraries ocaml-compiler-libs.shadow sexplib0 stdlib-shims)
++ (libraries ocaml-compiler-libs.shadow sexplib0)
+  (flags
+   (:standard -open Ocaml_shadow -safe-string)))

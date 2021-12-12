@@ -1,0 +1,122 @@
+From 1fd047f3b697fd0fe0ed8ca1f3505e0634367ba5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 15 Mar 2019 08:38:58 +0100
+Subject: [PATCH] Do not require release test dependencies
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+By default release tests are skipped. However, the tests have some
+uniq additional dependencies. Terminating the tests before loading the
+dependencies enables us dropping a dependency on them.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL       |  3 ---
+ t/_pod.t          | 13 ++++++++-----
+ t/_pod_coverage.t | 13 ++++++++-----
+ t/_version.t      | 14 +++++++++-----
+ 4 files changed, 25 insertions(+), 18 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 480c3ff..9f36856 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -22,10 +22,7 @@ my %script_prereq = (
+ );
+ 
+ my %test_prereq = (
+-   'File::Find::Rule'         => '0',
+    'Test::More'               => '0',
+-   'Test::Pod'                => '1.00',
+-   'Test::Pod::Coverage'      => '1.00',
+ );
+ 
+ my %config_prereq = (
+diff --git a/t/_pod.t b/t/_pod.t
+index 8d5e351..aea7d0c 100755
+--- a/t/_pod.t
++++ b/t/_pod.t
+@@ -3,15 +3,18 @@
+ use warnings 'all';
+ use strict;
+ use Test::More;
++
++BEGIN {
++    # Don't run tests for installs
++    unless ($ENV{RELEASE_TESTING}) {
++       plan skip_all => 'Author tests not required for installation (set RELEASE_TESTING to test)';
++    }
++}
++
+ use File::Basename;
+ use Cwd 'abs_path';
+ use Test::Pod 1.00;
+ 
+-# Don't run tests for installs
+-unless ($ENV{RELEASE_TESTING}) {
+-   plan skip_all => 'Author tests not required for installation (set RELEASE_TESTING to test)';
+-}
+-  
+ # Figure out the directories.  This comes from Test::Inter.
+ 
+ my($moddir,$testdir,$libdir);
+diff --git a/t/_pod_coverage.t b/t/_pod_coverage.t
+index 9255d3b..88d27f9 100755
+--- a/t/_pod_coverage.t
++++ b/t/_pod_coverage.t
+@@ -3,15 +3,18 @@
+ use warnings 'all';
+ use strict;
+ use Test::More;
++
++BEGIN {
++    # Don't run tests for installs
++    unless ($ENV{RELEASE_TESTING}) {
++       plan skip_all => 'Author tests not required for installation (set RELEASE_TESTING to test)';
++    }
++}
++
+ use File::Basename;
+ use Cwd 'abs_path';
+ use Test::Pod::Coverage 1.00;
+ 
+-# Don't run tests for installs
+-unless ($ENV{RELEASE_TESTING}) {
+-   plan skip_all => 'Author tests not required for installation (set RELEASE_TESTING to test)';
+-}
+-
+ # Figure out the directories.  This comes from Test::Inter.
+ 
+ my($moddir,$testdir,$libdir);
+diff --git a/t/_version.t b/t/_version.t
+index fe31123..dc2cae3 100755
+--- a/t/_version.t
++++ b/t/_version.t
+@@ -3,14 +3,18 @@
+ use warnings 'all';
+ use strict;
+ use Test::Inter;
+-use IO::File;
+-use File::Find::Rule;
+-my $ti      = new Test::Inter $0;
+ 
+-unless ($ENV{RELEASE_TESTING}) {
+-   $ti->skip_all('Author tests not required for installation (set RELEASE_TESTING to test)');
++my $ti;
++BEGIN {
++    $ti      = new Test::Inter $0;
++    unless ($ENV{RELEASE_TESTING}) {
++       $ti->skip_all('Author tests not required for installation (set RELEASE_TESTING to test)');
++    }
+ }
+ 
++use IO::File;
++use File::Find::Rule;
++
+ # Figure out what module we are in.  A module is in a directory:
+ #    My-Mod-Name-1.00
+ # It includes any number of .pm files, each of which contain a single
+-- 
+2.20.1
+

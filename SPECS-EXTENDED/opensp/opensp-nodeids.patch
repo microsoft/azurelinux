@@ -1,0 +1,128 @@
+--- OpenSP-1.5.2/docsrc/releasenotes.xml.nodeids	2006-10-13 13:54:59.000000000 +0100
++++ OpenSP-1.5.2/docsrc/releasenotes.xml	2006-10-13 13:58:25.000000000 +0100
+@@ -1,7 +1,7 @@
+ <?xml version='1.0'?>
+ <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+-<book>
++<book id="relnotesb">
+   <bookinfo>
+     <title>OpenSP 1.5.2</title>
+     <subtitle>Release Notes</subtitle>
+@@ -16,7 +16,7 @@
+     </copyright>
+   </bookinfo>
+ 
+-  <chapter><title>OpenSP 1.5.2 Release Notes</title>
++  <chapter id="relnotesc"><title>OpenSP 1.5.2 Release Notes</title>
+ 
+     <para>The OpenJade project provides a suite of tools and libraries for
+ validating, processing and applying DSSSL (Document Style Semantics and
+@@ -29,7 +29,7 @@
+ can be used as a basis for either open source or commerical projects. The
+ library can be built as either a dynamic or static library.
+ </para>
+-    <sect1><title>Applications of OpenSP</title>
++    <sect1 id="apps"><title>Applications of OpenSP</title>
+       <para>The OpenSP library has been used in a number of projects. The
+ World Wide Web consortium on-line HTML and XHTML validator is based on the
+ OpenSP library. In addition to the OpenSP library a set of command line tools
+@@ -41,7 +41,7 @@
+ tools.</para>
+     </sect1>
+ 
+-    <sect1><title>Obtaining OpenSP</title>
++    <sect1 id="obtaining"><title>Obtaining OpenSP</title>
+       <para>OpenSP is a project hosted at sourceforge.net and is available
+ from the OpenJade web site at http://openjade.sourceforge.net or directly from
+ the OpenJade project page at http://sourceforge.net/projects/openjade</para>
+@@ -49,7 +49,7 @@
+ linkend="bindist"/> for information on how to obtain pre-compiled
+ binary packages.</para>
+     </sect1>
+-    <sect1><title>Supported Platforms</title>
++    <sect1 id="supported"><title>Supported Platforms</title>
+       <para>OpenSP is intended to be as portable as possible. It should be
+ possible to compile and build on most contemporary UNIX type platforms. In
+ addition OpenSP should also build on Microsoft's Win32 based operating
+@@ -166,7 +166,7 @@
+ <email>openjade-devel@lists.sourceforge.net</email>, including any
+ diffs/patches you have used.</para>
+     </sect1>
+-    <sect1><title>Building OpenSP from Source</title>
++    <sect1 id="building"><title>Building OpenSP from Source</title>
+       <para>OpenSP requires 20Mb to 50Mb of disk space to build. An
+ installation will require around 10Mb to 20Mb depending on
+ architecture.</para>
+@@ -249,7 +249,7 @@
+ the latest version of OpenSP to be available from your distributor in due
+ course.</para>
+     </sect1>
+-    <sect1><title>Installation</title>
++    <sect1 id="installation"><title>Installation</title>
+       <para>In addition to the OpenSP executables and libraries you will also
+ need various DTDs and declaration files. Some DTDs and associated files
+ (entity definitions) are available in the <filename>pubtext</filename>
+@@ -263,7 +263,7 @@
+ recommended that you set up and use such a catalog system.
+ </para>
+     </sect1>
+-    <sect1><title>Support</title>
++    <sect1 id="support"><title>Support</title>
+       <para>If, after reading the documentation, you still have a problem,
+ then you may require some additional help. The OpenJade project is a volunteer
+ effort and as such does not provide any formal support. Instead, you should
+@@ -299,7 +299,7 @@
+ often the case that someone has had the same problem before.</para>
+ 
+     </sect1>
+-    <sect1><title>Version 1.5.2</title>
++    <sect1 id="v152"><title>Version 1.5.2</title>
+       <formalpara><title>Released December 2005.</title>
+ 	<para>The release contains a number of enhancements together with
+ support for version 4.0 of the GNU C++ compiler.</para>
+@@ -418,7 +418,7 @@
+       </table>
+     </sect1>
+ 
+-    <sect1><title>Version 1.5.1</title>
++    <sect1 id="v151"><title>Version 1.5.1</title>
+       <formalpara><title>Released October 2003.</title>
+ 	<para>The release contains a number of new features together with
+ support for version 3.3 for the GNU C++ compiler.</para>
+@@ -613,7 +613,7 @@
+       </table>
+     </sect1>
+ 
+-    <sect1><title>Version 1.5</title>
++    <sect1 id="v15"><title>Version 1.5</title>
+       <formalpara><title>Released November 2002.</title>
+ 	<para>In addition to many new features this version also supports the
+ latest GNU C++ compiler: gcc 3.2 at the time of writing.</para>
+@@ -976,7 +976,7 @@
+ 	</tgroup>
+       </table>
+     </sect1>
+-    <sect1>
++    <sect1 id="v14">
+       <title>Version 1.4</title>
+       <formalpara><title>Released February 2000</title>
+ 	<para>Version 1.4 added many improvements. Changes
+@@ -1023,7 +1023,7 @@
+ 	</listitem>
+       </itemizedlist>
+     </sect1>
+-    <sect1><title>Version 1.3.4</title>
++    <sect1 id="v134"><title>Version 1.3.4</title>
+       <formalpara><title>Released October 1999</title>
+ 	<para>The second release from the OpenJade project. This version was
+ distributed as part of OpenJade 1.3</para>
+@@ -1040,7 +1040,7 @@
+ 
+       </itemizedlist>
+     </sect1>
+-    <sect1><title>Version 1.3.3</title>
++    <sect1 id="v133"><title>Version 1.3.3</title>
+       <para>The first release from the OpenJade project</para>
+     </sect1>
+   </chapter>

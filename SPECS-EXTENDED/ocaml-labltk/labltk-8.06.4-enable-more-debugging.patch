@@ -1,0 +1,11 @@
+--- labltk-8.06.4.old/support/Makefile	2017-10-30 09:19:07.000000000 +0000
++++ labltk-8.06.4/support/Makefile	2017-11-07 21:24:58.244605912 +0000
+@@ -28,7 +28,7 @@
+       cltkFile.$(O) cltkMain.$(O) cltkMisc.$(O) cltkTimer.$(O) \
+       cltkVar.$(O) cltkWait.$(O) cltkImg.$(O)
+ 
+-CCFLAGS=-I$(LIBDIR)/caml $(TK_DEFS) $(SHAREDCCCOMPOPTS)
++CCFLAGS=-I$(LIBDIR)/caml $(TK_DEFS) $(SHAREDCCCOMPOPTS) -g
+ 
+ COMPFLAGS=
+ THFLAGS=-I +threads -I vmthreads

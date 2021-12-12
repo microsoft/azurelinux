@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-Vendor: %providerName
+Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.hamcrest.integration
+Require-Bundle: org.hamcrest.core;bundle-version="1.3.0"
+Bundle-Version: 1.3.0.v20090501071000
+Export-Package: org.hamcrest;integration=split;mandatory:=integration;
+ version="1.3.0",org.hamcrest.integration;version="1.3.0"
+Bundle-ManifestVersion: 2
+Import-Package: org.easymock;version="2.4.0";resolution:=optional,org.
+ jmock.core;version="1.10";resolution:=optional

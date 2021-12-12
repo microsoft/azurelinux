@@ -1,0 +1,16 @@
+--- lame-3.100/include/libmp3lame.sym	2017-09-06 14:33:35.000000000 -0500
++++ lame-3.100/include/libmp3lame.sym	2017-10-22 16:18:44.708436200 -0500
+@@ -1,5 +1,4 @@
+ lame_init
+-lame_init_old
+ lame_set_num_samples
+ lame_get_num_samples
+ lame_set_in_samplerate
+@@ -188,6 +187,7 @@ hip_decode_exit
+ hip_set_errorf
+ hip_set_debugf
+ hip_set_msgf
++hip_set_pinfo
+ hip_decode
+ hip_decode_headers
+ hip_decode1

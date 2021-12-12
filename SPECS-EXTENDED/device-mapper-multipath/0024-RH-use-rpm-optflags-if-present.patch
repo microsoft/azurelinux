@@ -1,0 +1,53 @@
+From e08dd1d6abe62714c484b046a68c95c3803716dd Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 19 Apr 2017 06:10:01 -0500
+Subject: [PATCH] RH: use rpm optflags if present
+
+Use the passed in optflags when compiling as an RPM, and keep the
+default flags as close as possible to the current fedora flags, while
+still being generic.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ Makefile.inc | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 2e8946ca..1b2f47a8 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -88,15 +88,23 @@ TEST_CC_OPTION = $(shell \
+ 		echo "$(2)"; \
+ 	fi)
+ 
+-STACKPROT := $(call TEST_CC_OPTION,-fstack-protector-strong,-fstack-protector)
+ ERROR_DISCARDED_QUALIFIERS := $(call TEST_CC_OPTION,-Werror=discarded-qualifiers,)
+-
+-OPTFLAGS	= -O2 -g -pipe -Wall -Wextra -Wformat=2 -Werror=implicit-int \
+-		  -Werror=implicit-function-declaration -Werror=format-security \
+-		  -Wno-sign-compare -Wno-unused-parameter -Wno-clobbered \
+-		  -Werror=cast-qual $(ERROR_DISCARDED_QUALIFIERS) \
+-		  -Wp,-D_FORTIFY_SOURCE=2 $(STACKPROT) \
+-		  --param=ssp-buffer-size=4
++ifndef RPM_OPT_FLAGS
++	STACKPROT := $(call TEST_CC_OPTION,-fstack-protector-strong,-fstack-protector)
++	OPTFLAGS	= -O2 -g -pipe -Wall -Werror=format-security \
++			  -Wp,-D_FORTIFY_SOURCE=2 -fexceptions \
++			  $(STACKPROT) --param=ssp-buffer-size=4 \
++			  -grecord-gcc-switches
++	ifeq ($(shell test -f /usr/lib/rpm/redhat/redhat-hardened-cc1 && echo 1),1)
++		OPTFLAGS += -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1
++	endif
++else
++	OPTFLAGS = $(RPM_OPT_FLAGS)
++endif
++OPTFLAGS	+= -Wextra -Wstrict-prototypes -Wformat=2 -Werror=implicit-int \
++		   -Werror=implicit-function-declaration -Wno-sign-compare \
++		   -Wno-unused-parameter $(ERROR_DISCARDED_QUALIFIERS) \
++		   -Werror=cast-qual
+ 
+ CFLAGS		:= $(OPTFLAGS) -DBIN_DIR=\"$(bindir)\" -DLIB_STRING=\"${LIB}\" -DRUN_DIR=\"${RUN}\" \
+ 		   -MMD -MP $(CFLAGS)
+-- 
+2.17.2
+

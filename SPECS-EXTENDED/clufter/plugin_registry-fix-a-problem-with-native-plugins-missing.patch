@@ -1,0 +1,69 @@
+From 7f4125ceefaf1dd1fb66bf96509c4b0acf2d5e94 Mon Sep 17 00:00:00 2001
+From: Jan Pokorný <jpokorny@redhat.com>
+Date: Jan 18 2020 00:29:38 +0000
+Subject: plugin_registry: fix a problem with "native plugins" missing in lookup
+
+
+For some reason, this does only appear to be a problem under Python 3
+(cannot find a trace[*] of this problem under older Python 2 build logs)
+and it is caused with these "native plugins" missing from "wildcard"
+(non-specific) "init_lookup" invocation of the plugin registry at hand.
+
+[*] e.g.
+> test01 (ccs2coroxml.Main) ... WARNING:clufter.filter:Resolve at `ccs-artefacts' filter: `SimpleFormat' (#1) format fail
+> WARNING:clufter.filter:Resolve at `cmd-annotate' filter: `Nothing' (#0) format fail
+> WARNING:clufter.filter:Resolve at `xml2simpleconfig' filter: `XML' (#0) format fail
+
+Signed-off-by: Jan Pokorný <jpokorny@redhat.com>
+
+---
+
+diff --git a/plugin_registry.py b/plugin_registry.py
+index 5851127..4c60acd 100644
+--- a/plugin_registry.py
++++ b/plugin_registry.py
+@@ -1,5 +1,5 @@
+ # -*- coding: UTF-8 -*-
+-# Copyright 2019 Red Hat, Inc.
++# Copyright 2020 Red Hat, Inc.
+ # Part of clufter project
+ # Licensed under GPLv2+ (a copy included | http://gnu.org/licenses/gpl-2.0.txt)
+ """Easy (at least for usage) plugin framework"""
+@@ -104,7 +104,7 @@ class PluginRegistry(type):
+         assert '-' not in name, "name cannot contain a dash"
+         dname = cli_decor(name)
+         attrs = attrs or {}
+-        # seems more reasonable than plying even higher meta magic game
++        # seems more reasonable than playing even higher meta magic game
+         assert  not(attrs) or '__classcell__' not in attrs, \
+                 ("{0} plugin: refrain from '__class__'/'super' (Py3.8+ limit)"
+                 ).format(name)
+@@ -287,9 +287,10 @@ class PluginManager(object):
+ 
+     @classmethod
+     def lookup(cls, plugins, registry=None, **kwargs):
+-        ret, to_discover = {}, set()
++        ret, to_discover, wildcard = {}, set(), True
+         registry = cls._default_registry if registry is None else registry
+         for plugin in args2sgpl(plugins):
++            wildcard = False
+             # XXX we could introspect sys.modules here as well
+             try:
+                 ret[plugin] = registry.plugins[plugin]
+@@ -300,9 +301,12 @@ class PluginManager(object):
+ 
+         to_discover.difference_update(ret)
+         native_plugins = registry.native_plugins
+-        ret.update(filterdict_remove(to_discover,
+-                                     _fn_=lambda x: native_plugins[x],
+-                                     *native_plugins.keys()))
++        if wildcard:
++            ret.update(native_plugins)
++        else:
++            ret.update(filterdict_remove(to_discover,
++                                         _fn_=lambda x: native_plugins[x],
++                                         *native_plugins.keys()))
+         to_discover = apply_intercalate(tuple(to_discover))
+         if to_discover:
+             log.debug("Couldn't look up everything: {0}".format(', '.join(
+

@@ -1,0 +1,11 @@
+diff -up dovecot-2.3.2/dovecot.service.in.systemd_w_protectsystem dovecot-2.3.2/dovecot.service.in
+--- dovecot-2.3.2/dovecot.service.in.systemd_w_protectsystem	2018-07-09 12:00:13.359193526 +0200
++++ dovecot-2.3.2/dovecot.service.in	2018-07-09 12:00:46.387716884 +0200
+@@ -23,6 +23,7 @@ ExecReload=@bindir@/doveadm reload
+ ExecStop=@bindir@/doveadm stop
+ PrivateTmp=true
+ NonBlocking=yes
++# this will make /usr /boot /etc read only for dovecot
+ ProtectSystem=full
+ ProtectHome=no
+ PrivateDevices=true

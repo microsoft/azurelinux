@@ -1,0 +1,52 @@
+diff -up pnm2ppa-1.04/Makefile.ldflags pnm2ppa-1.04/Makefile
+--- pnm2ppa-1.04/Makefile.ldflags	2018-03-01 15:38:09.225582684 +0100
++++ pnm2ppa-1.04/Makefile	2018-03-01 15:50:34.307261745 +0100
+@@ -11,7 +11,6 @@ INSTALL=install
+ 
+ # production build
+ CFLAGS=$(RPM_OPT_FLAGS) -DNDEBUG 
+-LDFLAGS=-lm
+ OBJS = pnm2ppa.o syslog.o ppa.o image.o dither.o cutswath.o hash_ink.o gamma.o
+ SRC =  pnm2ppa.c syslog.c ppa.c image.c dither.c cutswath.c hash_ink.c gamma.c
+ 
+@@ -108,10 +107,10 @@ uninstall:
+ 	rm -f $(CONFDIR)/pnm2ppa.conf
+ 
+ pnm2ppa: $(OBJS) 
+-	$(CC) $(LDFLAGS) $(CFLAGS) -o pnm2ppa $(OBJS)
++	$(CC) -lm $(LDFLAGS) $(CFLAGS) -o pnm2ppa $(OBJS)
+ 
+ calibrate_ppa: calibrate_ppa.o pnmtools.o gamma.o
+-	$(CC) $(LDFLAGS) $(CFLAGS) -o calibrate_ppa calibrate_ppa.o pnmtools.o gamma.o 
++	$(CC) -lm $(LDFLAGS) $(CFLAGS) -o calibrate_ppa calibrate_ppa.o pnmtools.o gamma.o 
+ 
+ calibrate_ppa.o: calibrate_ppa.c global.h image.h defaults.h pnmtools.h
+ 	$(CC) $(CFLAGS) -c calibrate_ppa.c
+@@ -144,7 +143,7 @@ syslog.o: syslog.c syslog.h global.h
+ 	$(CC) $(CFLAGS) -c syslog.c
+ 
+ make_hash_ink: 	make_hash_ink.c palette.h hash_ink.h
+-	$(CC) $(CFLAGS) -o make_hash_ink make_hash_ink.c
++	$(CC) $(CFLAGS) -lm $(LDFLAGS) -o make_hash_ink make_hash_ink.c
+ 
+ hash_ink.c: make_hash_ink
+ 	./make_hash_ink 4 3 > hash_ink.c
+diff -up pnm2ppa-1.04/pbm2ppa-0.8.6/Makefile.ldflags pnm2ppa-1.04/pbm2ppa-0.8.6/Makefile
+--- pnm2ppa-1.04/pbm2ppa-0.8.6/Makefile.ldflags	2018-03-01 15:38:09.226582676 +0100
++++ pnm2ppa-1.04/pbm2ppa-0.8.6/Makefile	2018-03-01 15:53:22.016739424 +0100
+@@ -1,6 +1,5 @@
+ CC=gcc
+ CFLAGS=$(RPM_OPT_FLAGS)
+-LDFLAGS=
+ PRINTER=HP720
+ 
+ default: all
+@@ -23,7 +22,7 @@ pbm2ppa: pbm2ppa.o ppa.o pbm.o cutswath.
+ 	$(CC) $(LDFLAGS) -o pbm2ppa pbm2ppa.o ppa.o pbm.o cutswath.o
+ 
+ pbmtpg: pbmtpg.o
+-	$(CC) $(CFLAGS) -o pbmtpg pbmtpg.o -lm
++	$(CC) $(CFLAGS) $(LDFLAGS) -o pbmtpg pbmtpg.o -lm
+ 
+ .c.o: $*.c ppa.h pbm.h
+ 	$(CC) $(CFLAGS) -DDEFAULT_PRINTER=$(PRINTER)  -c $*.c

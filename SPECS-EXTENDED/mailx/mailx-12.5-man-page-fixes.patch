@@ -1,0 +1,28 @@
+diff -ur mailx-12.5.orig/mailx.1 mailx-12.5/mailx.1
+--- mailx-12.5.orig/mailx.1	2014-06-13 16:28:18.272418000 +0200
++++ mailx-12.5/mailx.1	2014-06-13 16:32:06.757714403 +0200
+@@ -219,6 +219,14 @@
+ assigns
+ .I value
+ to it.
++Note, that when setting
++.I from
++variable, domain name of host is automatically added if value does not contain any.
++If you want to enter
++.I from
++address with owner's name, you can use, for example, following format:
++.B -S
++.I \(dqfrom=System User <DoNotReply>\(dq
+ .TP
+ .BI \-T \ name
+ Writes the `Message-Id:' and `Article-Id:' header fields
+@@ -2189,7 +2197,8 @@
+ as part of the environment
+ (this is not restricted to specific variables as in the POSIX standard).
+ A value given in a startup file overrides
+-a value imported from the environment.
++a value imported from the environment, but it is not possible to unset
++an environment variable in a startup file.
+ Options may be either binary,
+ in which case it is only significant
+ to see whether they are set or not;

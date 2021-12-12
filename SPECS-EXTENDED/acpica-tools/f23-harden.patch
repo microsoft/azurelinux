@@ -1,0 +1,61 @@
+Introduce build hardening flags for f23
+
+From: Al Stone <ahs3@redhat.com>
+
+
+---
+ generate/unix/Makefile.config |    2 ++
+ generate/unix/iasl/Makefile   |   13 +++++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+Index: acpica-unix2-20180209/generate/unix/Makefile.config
+===================================================================
+--- acpica-unix2-20180209.orig/generate/unix/Makefile.config
++++ acpica-unix2-20180209/generate/unix/Makefile.config
+@@ -182,6 +182,8 @@ ifneq ($(NOFORTIFY),TRUE)
+ OPT_CFLAGS += -D_FORTIFY_SOURCE=2
+ endif
+ 
++OPT_CFLAGS += -fPIC -pie
++
+ CFLAGS += \
+     -D$(HOST)\
+     -D_GNU_SOURCE\
+Index: acpica-unix2-20180209/generate/unix/iasl/Makefile
+===================================================================
+--- acpica-unix2-20180209.orig/generate/unix/iasl/Makefile
++++ acpica-unix2-20180209/generate/unix/iasl/Makefile
+@@ -344,26 +344,27 @@ $(OBJDIR)/prparserparse.c $(OBJDIR)/prpa
+ # Cannot use the common compile warning flags since the C files are created
+ # by the utilities above and they are not necessarily ANSI C, etc.
+ #
++HARDENING_FLAGS = -fPIC -pie
+ $(OBJDIR)/aslcompilerlex.o :   $(OBJDIR)/aslcompilerlex.c
+ 	@echo "- " "Intermediate" $<
+-	@$(CC) -c $(CFLAGS) -Wall -Werror -o$@ $<
++	@$(CC) -c $(CFLAGS) $(HARDENING_FLAGS) -Wall -Werror -o$@ $<
+ 
+ $(OBJDIR)/aslcompilerparse.o : $(OBJDIR)/aslcompilerparse.c
+ 	@echo "- " "Intermediate" $<
+-	@$(CC) -c $(CFLAGS) -Wall -Werror -o$@ $<
++	@$(CC) -c $(CFLAGS) $(HARDENING_FLAGS) -Wall -Werror -o$@ $<
+ 
+ $(OBJDIR)/dtparserlex.o :      $(OBJDIR)/dtparserlex.c
+ 	@echo "- " "Intermediate" $<
+-	@$(CC) -c $(CFLAGS) -Wall -Werror -o$@ $<
++	@$(CC) -c $(CFLAGS) $(HARDENING_FLAGS) -Wall -Werror -o$@ $<
+ 
+ $(OBJDIR)/dtparserparse.o :    $(OBJDIR)/dtparserparse.c
+ 	@echo "- " "Intermediate" $<
+-	@$(CC) -c $(CFLAGS) -Wall -Werror -o$@ $<
++	@$(CC) -c $(CFLAGS) $(HARDENING_FLAGS) -Wall -Werror -o$@ $<
+ 
+ $(OBJDIR)/prparserlex.o :      $(OBJDIR)/prparserlex.c
+ 	@echo "- " "Intermediate" $<
+-	@$(CC) -c $(CFLAGS) -Wall -Werror -o$@ $<
++	@$(CC) -c $(CFLAGS) $(HARDENING_FLAGS) -Wall -Werror -o$@ $<
+ 
+ $(OBJDIR)/prparserparse.o :    $(OBJDIR)/prparserparse.c
+ 	@echo "- " "Intermediate" $<
+-	@$(CC) -c $(CFLAGS) -Wall -Werror -o$@ $<
++	@$(CC) -c $(CFLAGS) $(HARDENING_FLAGS) -Wall -Werror -o$@ $<

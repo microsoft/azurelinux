@@ -1,0 +1,11 @@
+--- lxsession-0.5.4/lxsettings-daemon/settings-daemon.c.debug	2019-02-28 07:02:03.000000000 +0900
++++ lxsession-0.5.4/lxsettings-daemon/settings-daemon.c	2020-02-14 11:59:28.250978374 +0900
+@@ -190,6 +190,8 @@ static void load_settings( GKeyFile* kf
+ 	if ( (keys = g_key_file_get_keys( kf, group, NULL, NULL )) == NULL ) 
+ 	    return;
+ 
++	if (!managers) return;
++
+ 	for( key = keys; *key; ++key )
+ 	{
+ 		const char* name = *key + 1;

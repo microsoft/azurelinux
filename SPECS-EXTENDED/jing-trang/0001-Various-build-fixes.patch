@@ -1,0 +1,317 @@
+From 212c793fe0f4b9e352e2ae9949beb187e77abe68 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ville=20Skytt=C3=A4?= <ville.skytta@iki.fi>
+Date: Mon, 9 Jun 2014 09:54:16 +0300
+Subject: [PATCH 1/2] Various build fixes
+
+---
+ build.xml                | 19 ++++++++-----------
+ build.xsl                | 28 ++++++++++++++++++----------
+ mod/catalog/mod.xml      |  2 +-
+ mod/datatype/mod.xml     |  1 +
+ mod/jing/mod.xml         |  2 --
+ mod/pattern/mod.xml      |  1 +
+ mod/regex/mod.xml        |  2 +-
+ mod/rng-jaxp/mod.xml     |  1 +
+ mod/rng-validate/mod.xml |  2 +-
+ mod/schematron/mod.xml   |  8 ++------
+ mod/trang/mod.xml        |  3 +--
+ mod/xerces/mod.xml       |  2 +-
+ mod/xsd-datatype/mod.xml |  1 +
+ 13 files changed, 37 insertions(+), 35 deletions(-)
+
+diff --git a/build.xml b/build.xml
+index a2bc499..ee0f061 100644
+--- a/build.xml
++++ b/build.xml
+@@ -145,22 +145,19 @@
+ 
+ <target name="javadoc" depends="init">
+   <mkdir dir="${build.dir}/api"/>
+-  <mkdir dir="${build.dir}/api/datatype"/>
+   <mkdir dir="${build.dir}/api/jing"/>
+   <mkdir dir="${build.dir}/api/regex"/>
+-  <javadoc sourcepath="mod/datatype/src/main" destdir="${build.dir}/api/datatype"
+-    doctitle="RELAX NG Datatype API" windowtitle="RELAX NG Datatype API"
+-    packagenames="org.relaxng.datatype,org.relaxng.datatype.helpers"/>
+   <javadoc sourcepath="mod/util/src/main:mod/regex/src/main" destdir="${build.dir}/api/regex"
+     packagenames="com.thaiopensource.datatype.xsd.regex,
+ 		  com.thaiopensource.datatype.xsd.regex.java,
+-		  com.thaiopensource.datatype.xsd.regex.xerces2"/>
++		  com.thaiopensource.datatype.xsd.regex.xerces2">
++    <link href="/usr/share/javadoc/java"/>
++  </javadoc>
+   <javadoc sourcepathref="javadoc.sourcepath" destdir="${build.dir}/api/jing"
+     doctitle="Jing API" windowtitle="Jing API"
+     packagenames="${javadoc.packagenames}">
+-    <link offline="true" href="../datatype" packagelistLoc="${build.dir}/api/datatype"/>
+-    <link offline="true" href="http://java.sun.com/j2se/1.5.0/docs/api/"
+-	  packagelistLoc="extapidoc/jdk/1.5"/>
++    <link href="/usr/share/javadoc/java"/>
++    <link href="/usr/share/javadoc/relaxngDatatype"/>
+   </javadoc>
+ </target>
+ 
+@@ -170,7 +167,7 @@
+            destdir="${build.dir}/doccheck"
+            packagenames="${javadoc.packagenames}"
+            doclet="com.sun.tools.doclets.doccheck.DocCheck"
+-           docletpath="lib/doccheck.jar"/>
++           docletpath="${lib.dir}/doccheck.jar"/>
+ </target>
+ 
+ <target name="datatype-sample" depends="jar">
+@@ -290,7 +287,7 @@
+   <java classname="com.thaiopensource.relaxng.translate.Driver"
+         fork="true"
+         failonerror="yes"
+-        classpath="${build.dir}/trang.jar">
++        classpath="${build.dir}/trang.jar:/usr/share/java/relaxngDatatype.jar">
+     <arg value="dtdinst/dtdinst.rnc"/>
+     <arg value="${build.dir}/dtdinst/dtdinst.rng"/>
+   </java>
+@@ -360,7 +357,7 @@
+ 	depends="version,googlecode.properties"
+ 	description="Upload files to Google Code. Run dist before this.">
+   <taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask"
+-	   classpath="lib/ant-googlecode.jar" name="gcupload"/>
++	   classpath="${lib.dir}/ant-googlecode.jar" name="gcupload"/>
+   <gcupload username="${googlecode.username}" 
+             password="${googlecode.password}" 
+             projectname="jing-trang" 
+diff --git a/build.xsl b/build.xsl
+index d76508f..e084fca 100644
+--- a/build.xsl
++++ b/build.xsl
+@@ -10,12 +10,12 @@
+   <project>
+     <xmlproperty file="version.xml"/>
+     <property name="build.dir" value="${{basedir}}/build"/>
+-    <property name="javacc.dir" value="lib"/>
++    <property name="javacc.dir" value="${{lib.dir}}"/>
+     <property name="ant.build.javac.source" value="1.5"/>
+     <property name="ant.build.javac.target" value="1.5"/>
+     <taskdef name="testng" classname="org.testng.TestNGAntTask">
+       <classpath>
+-	<pathelement location="lib/testng.jar"/>
++	<pathelement location="${{lib.dir}}/testng.jar"/>
+       </classpath>
+     </taskdef>
+     <target name="dummy"/>
+@@ -111,7 +111,7 @@
+ 	    <pathelement location="{$build}/mod/{@module}/classes/main"/>
+ 	  </xsl:for-each>
+ 	  <xsl:for-each select="depends[@lib]">
+-	    <pathelement location="lib/{@lib}.jar"/>
++	    <pathelement location="${{lib.dir}}/{@lib}.jar"/>
+ 	  </xsl:for-each>
+ 	</classpath>
+       </javac>
+@@ -151,10 +151,10 @@
+ 	    <pathelement location="{$build}/mod/{@module}/classes/main"/>
+ 	  </xsl:for-each>
+ 	  <xsl:for-each select="depends[@lib]">
+-	    <pathelement location="lib/{@lib}.jar"/>
++	    <pathelement location="${{lib.dir}}/{@lib}.jar"/>
+ 	  </xsl:for-each>
+ 	  <xsl:if test="test[@type='testng']">
+-	    <pathelement location="lib/testng.jar"/>
++	    <pathelement location="${{lib.dir}}/testng.jar"/>
+ 	  </xsl:if>
+ 	</classpath>
+       </javac>
+@@ -298,13 +298,18 @@
+       <classpath>
+ 	<pathelement location="{$build}/{$app}.jar"/>
+ 	<xsl:if test="@lib">
+-	  <pathelement location="lib/{@lib}.jar"/>
++	  <pathelement location="${{lib.dir}}/{@lib}.jar"/>
+ 	  <xsl:if test="@lib='xalan'">
+-	    <pathelement location="lib/serializer.jar"/>
++	    <pathelement location="${{lib.dir}}/xalan-j2-serializer.jar"/>
+ 	  </xsl:if>
+ 	</xsl:if>
++	<!-- Upstream build assumes Class-Path in jing, trang manifests -->
+ 	<xsl:if test="$app = 'jing'">
+-	  <pathelement location="lib/xercesImpl.jar"/>
++	  <pathelement location="${{lib.dir}}/xerces-j2.jar"/>
++	  <pathelement location="${{lib.dir}}/relaxngDatatype.jar"/>
++	</xsl:if>
++	<xsl:if test="$app = 'trang'">
++	  <pathelement location="${{lib.dir}}/relaxngDatatype.jar"/>
+ 	</xsl:if>
+       </classpath>
+     </java>
+@@ -373,7 +378,7 @@
+ 	  <pathelement location="mod/{@module}/src/main"/>
+ 	</xsl:for-each>
+ 	<xsl:for-each select="../depends[@lib]">
+-	  <pathelement location="lib/{@lib}.jar"/>
++	  <pathelement location="${{lib.dir}}/{@lib}.jar"/>
+ 	</xsl:for-each>
+       </classpath>
+     </java>
+@@ -402,8 +407,11 @@
+ 	  <pathelement location="mod/{@module}/src/main"/>
+ 	</xsl:for-each>
+ 	<xsl:for-each select="../depends[@lib]">
+-	  <pathelement location="lib/{@lib}.jar"/>
++	  <pathelement location="${{lib.dir}}/{@lib}.jar"/>
+ 	</xsl:for-each>
++	<!-- Upstream testng.jar includes bsh and qdox -->
++	<pathelement location="${{lib.dir}}/bsh.jar"/>
++	<pathelement location="${{lib.dir}}/qdox.jar"/>
+       </classpath>
+     </testng>
+   </target>
+diff --git a/mod/catalog/mod.xml b/mod/catalog/mod.xml
+index c8e2feb..5398646 100644
+--- a/mod/catalog/mod.xml
++++ b/mod/catalog/mod.xml
+@@ -3,5 +3,5 @@
+   <test name="unit" type="testng"/>
+   <depends module="util"/>
+   <depends module="resolver"/>
+-  <depends lib="resolver"/>
++  <depends lib="xml-commons-resolver"/>
+ </module>
+diff --git a/mod/datatype/mod.xml b/mod/datatype/mod.xml
+index cd79499..cdb420a 100644
+--- a/mod/datatype/mod.xml
++++ b/mod/datatype/mod.xml
+@@ -1,4 +1,5 @@
+ <module>
+   <depends module="util"/>
++  <depends lib="relaxngDatatype"/>
+   <compile/>
+ </module>
+diff --git a/mod/jing/mod.xml b/mod/jing/mod.xml
+index 86583f8..8b2ec82 100644
+--- a/mod/jing/mod.xml
++++ b/mod/jing/mod.xml
+@@ -21,8 +21,6 @@
+   <jar>
+     <manifest>
+       <attribute name="Main-Class" value="com/thaiopensource/relaxng/util/Driver"/>
+-      <attribute name="Class-Path"
+-		 value="xercesImpl.jar xml-apis.jar saxon.jar saxon9.jar xalan.jar isorelax.jar resolver.jar"/>
+     </manifest>
+     <service type="com.thaiopensource.datatype.xsd.regex.RegexEngine"/>
+     <service type="org.relaxng.datatype.DatatypeLibraryFactory"/>
+diff --git a/mod/pattern/mod.xml b/mod/pattern/mod.xml
+index 777f484..875f1cb 100644
+--- a/mod/pattern/mod.xml
++++ b/mod/pattern/mod.xml
+@@ -3,6 +3,7 @@
+   <depends module="resolver"/>
+   <depends module="datatype"/>
+   <depends module="rng-parse"/>
++  <depends lib="relaxngDatatype"/>
+   <compile test="yes"/>
+   <test name="unit" type="testng"/>
+ </module>
+diff --git a/mod/regex/mod.xml b/mod/regex/mod.xml
+index 3d1f73f..b682d6d 100644
+--- a/mod/regex/mod.xml
++++ b/mod/regex/mod.xml
+@@ -1,6 +1,6 @@
+ <module>
+   <depends module="util"/>
+-  <depends lib="xercesImpl"/>
++  <depends lib="xerces-j2"/>
+   <compile test="yes"/>
+   <test name="xerces" type="java"
+ 	class="com.thaiopensource.datatype.xsd.regex.test.TestDriver">
+diff --git a/mod/rng-jaxp/mod.xml b/mod/rng-jaxp/mod.xml
+index 10a8c6d..48c5d8c 100644
+--- a/mod/rng-jaxp/mod.xml
++++ b/mod/rng-jaxp/mod.xml
+@@ -7,6 +7,7 @@
+   <depends module="rng-parse"/>
+   <depends module="pattern"/>
+   <depends module="jaxp"/>
++  <depends lib="relaxngDatatype"/>
+   <compile test="yes"/>
+   <test name="unit" type="testng"/>
+ </module>
+diff --git a/mod/rng-validate/mod.xml b/mod/rng-validate/mod.xml
+index 109543b..b05b996 100644
+--- a/mod/rng-validate/mod.xml
++++ b/mod/rng-validate/mod.xml
+@@ -7,7 +7,7 @@
+   <depends module="pattern"/>
+   <depends module="validate"/>
+   <depends lib="ant"/>
+-  <depends lib="resolver"/>
++  <depends lib="xml-commons-resolver"/>
+   <test name="spec" type="validate" schema="eg/testSuite.rng"/>
+   <compile/>
+   <version package="com/thaiopensource/relaxng/util"/>
+diff --git a/mod/schematron/mod.xml b/mod/schematron/mod.xml
+index 51d85cd..3786625 100644
+--- a/mod/schematron/mod.xml
++++ b/mod/schematron/mod.xml
+@@ -3,15 +3,11 @@
+   <depends module="resolver"/>
+   <depends module="validate"/>
+   <depends module="rng-validate"/>
+-  <depends lib="xalan"/>
++  <depends lib="xalan-j2"/>
+   <depends lib="saxon"/>
+-  <depends lib="saxon9"/>
+-  <test name="old-saxon" in="mod/schematron/test/schematrontest.xml"
+-	type="validate" schema="test/schematrontest.nrl"
+-	lib="saxon"/>
+   <test name="new-saxon" in="mod/schematron/test/schematrontest.xml"
+ 	type="validate" schema="test/schematrontest.nrl"
+-	lib="saxon9"/>
++	lib="saxon"/>
+   <test name="xalan" in="mod/schematron/test/schematrontest.xml"
+ 	type="validate" schema="test/schematrontest.nrl"
+ 	lib="xalan"/>
+diff --git a/mod/trang/mod.xml b/mod/trang/mod.xml
+index 69b5cc0..fa2d6d0 100644
+--- a/mod/trang/mod.xml
++++ b/mod/trang/mod.xml
+@@ -13,13 +13,12 @@
+   <depends module="convert-to-xsd"/>
+   <depends module="convert-from-dtd"/>
+   <depends module="convert-to-dtd"/>
+-  <depends lib="resolver"/>
++  <depends lib="xml-commons-resolver"/>
+   <compile/>
+   <version package="com/thaiopensource/relaxng/translate"/>
+   <jar>
+     <manifest>
+       <attribute name="Main-Class" value="com/thaiopensource/relaxng/translate/Driver"/>
+-      <attribute name="Class-Path" value="resolver.jar"/>
+     </manifest>
+     <service type="com.thaiopensource.datatype.xsd.regex.RegexEngine">
+       <provider classname="com.thaiopensource.datatype.xsd.regex.xerces2.RegexEngineImpl"/>
+diff --git a/mod/xerces/mod.xml b/mod/xerces/mod.xml
+index b7dc603..56bc85f 100644
+--- a/mod/xerces/mod.xml
++++ b/mod/xerces/mod.xml
+@@ -1,7 +1,7 @@
+ <module>
+   <depends module="util"/>
+   <depends module="validate"/>
+-  <depends lib="xercesImpl"/>
++  <depends lib="xerces-j2"/>
+   <compile/>
+   <service type="com.thaiopensource.validate.SchemaReaderFactory">
+     <provider classname="com.thaiopensource.validate.xerces.XsdSchemaReaderFactory"/>
+diff --git a/mod/xsd-datatype/mod.xml b/mod/xsd-datatype/mod.xml
+index f81eb3c..cc7645b 100644
+--- a/mod/xsd-datatype/mod.xml
++++ b/mod/xsd-datatype/mod.xml
+@@ -2,6 +2,7 @@
+   <depends module="util"/>
+   <depends module="datatype"/>
+   <depends module="regex"/>
++  <depends lib="relaxngDatatype"/>
+   <test name="xsd" type="validate" transform="xsdtest.xsl" schema="test/xsdtest.rnc"/>
+   <test name="unit" type="testng"/>
+   <compile test="yes"/>
+-- 
+1.9.3
+

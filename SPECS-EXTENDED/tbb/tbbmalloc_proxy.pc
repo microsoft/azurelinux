@@ -1,0 +1,5 @@
+Name: Threading Building Blocks Scallable Malloc Proxy
+Description: Implementation of proxy that redirects memory allocation calls to TBB Scalable Memory Allocator
+URL: http://www.threadingbuildingblocks.org/
+Version: _FEDORA_VERSION
+Libs: -ltbbmalloc_proxy -ltbbmalloc

@@ -1,0 +1,14 @@
+diff --git a/logwatch/dmeventd.var_cache_logwatch b/logwatch/dmeventd
+index 9b01676..9bc262d 100644
+--- a/logwatch/dmeventd.var_cache_logwatch
++++ b/logwatch/dmeventd
+@@ -36,8 +36,7 @@
+ # Set the location of the folder to store last time stamp
+ # (This is used to record the last log sent out so repeats 
+ #  are not mailed in error.)
+-$syslogpattern_file =
+-        "/etc/logwatch/scripts/services/dmeventd_syslogpattern.txt";
++$syslogpattern_file = "/var/cache/logwatch/dmeventd/syslogpattern.txt";
+ 
+ if (-e $syslogpattern_file) {
+ 	open(FD, "+<", $syslogpattern_file) or die $!;        

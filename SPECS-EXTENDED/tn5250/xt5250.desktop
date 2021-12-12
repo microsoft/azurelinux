@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=tn5250 terminal emulation
+Comment=tn5250 emulates IBM’s 5250 compatible terminals to connect over TCP/IP to an IBM AS/400
+Exec=xt5250
+Icon=tn5250
+Type=Application
+Categories=Network;
+Terminal=false

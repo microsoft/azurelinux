@@ -1,0 +1,14 @@
+diff --git a/lib/coderay/tokens.rb b/lib/coderay/tokens.rb
+index e7bffce2..b5f78e71 100644
+--- a/lib/coderay/tokens.rb
++++ b/lib/coderay/tokens.rb
+@@ -39,6 +39,9 @@ module CodeRay
+   # You can serialize it to a JSON string and store it in a database, pass it
+   # around to encode it more than once, send it to other algorithms...
+   class Tokens < Array
++    # Remove Array#filter that is a new alias for Array#select on Ruby 2.6,
++    # for method_missing called with filter method.
++    undef_method :filter if instance_methods.include?(:filter)
+     
+     # The Scanner instance that created the tokens.
+     attr_accessor :scanner

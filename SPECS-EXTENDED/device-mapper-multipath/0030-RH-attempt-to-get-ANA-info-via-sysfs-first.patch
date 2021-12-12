@@ -1,0 +1,87 @@
+From cff4e6981d8b168cabd81b3de6f9f97735de7e1a Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 11 Apr 2019 13:25:42 -0500
+Subject: [PATCH] RH: attempt to get ANA info via sysfs first
+
+When the ANA prioritizer is run, first see if the "ana_state" sysfs file
+exists, and if it does, try to read the state from there. If that fails,
+fallback to using an ioctl.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/prioritizers/ana.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/libmultipath/prioritizers/ana.c b/libmultipath/prioritizers/ana.c
+index 2673d9d9..f34ade28 100644
+--- a/libmultipath/prioritizers/ana.c
++++ b/libmultipath/prioritizers/ana.c
+@@ -24,6 +24,7 @@
+ #include "prio.h"
+ #include "util.h"
+ #include "structs.h"
++#include "sysfs.h"
+ 
+ enum {
+ 	ANA_ERR_GETCTRL_FAILED		= 1,
+@@ -36,6 +37,7 @@ enum {
+ 	ANA_ERR_GETNS_FAILED,
+ 	ANA_ERR_NO_MEMORY,
+ 	ANA_ERR_NO_INFORMATION,
++	ANA_ERR_INVALID_STATE,
+ };
+ 
+ static const char *ana_errmsg[] = {
+@@ -49,6 +51,7 @@ static const char *ana_errmsg[] = {
+ 	[ANA_ERR_GETNS_FAILED]		= "couldn't get namespace info",
+ 	[ANA_ERR_NO_MEMORY]		= "out of memory",
+ 	[ANA_ERR_NO_INFORMATION]	= "invalid fd",
++	[ANA_ERR_INVALID_STATE]		= "invalid state",
+ };
+ 
+ static const char *anas_string[] = {
+@@ -106,6 +109,27 @@ static int get_ana_state(__u32 nsid, __u32 anagrpid, void *ana_log,
+ 	return -ANA_ERR_GETANAS_NOTFOUND;
+ }
+ 
++int get_ana_info_sysfs(struct path *pp)
++{
++	char state[32];
++
++	if (!pp->udev || sysfs_attr_get_value(pp->udev, "ana_state", state,
++					      sizeof(state)) <= 0)
++		return -ANA_ERR_NO_INFORMATION;
++
++	if (strcmp(state, "optimized") == 0)
++		return NVME_ANA_OPTIMIZED;
++	if (strcmp(state, "non-optimized") == 0)
++		return NVME_ANA_NONOPTIMIZED;
++	if (strcmp(state, "inaccessible") == 0)
++		return NVME_ANA_INACCESSIBLE;
++	if (strcmp(state, "persistent-loss") == 0)
++		return NVME_ANA_PERSISTENT_LOSS;
++	if (strcmp(state, "change") == 0)
++		return NVME_ANA_CHANGE;
++	return -ANA_ERR_INVALID_STATE;
++}
++
+ int get_ana_info(struct path * pp, unsigned int timeout)
+ {
+ 	int	rc;
+@@ -208,8 +232,11 @@ int getprio(struct path *pp, char *args, unsigned int timeout)
+ 
+ 	if (pp->fd < 0)
+ 		rc = -ANA_ERR_NO_INFORMATION;
+-	else
+-		rc = get_ana_info(pp, timeout);
++	else {
++		rc = get_ana_info_sysfs(pp);
++		if (rc < 0)
++			rc = get_ana_info(pp, timeout);
++	}
+ 
+ 	switch (rc) {
+ 	case NVME_ANA_OPTIMIZED:
+-- 
+2.17.2
+

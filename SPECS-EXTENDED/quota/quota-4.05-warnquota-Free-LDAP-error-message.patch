@@ -1,0 +1,36 @@
+From a543b200cdd1e798383cc1070e51ad13ff424543 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 5 Nov 2019 12:11:14 +0100
+Subject: [PATCH] warnquota: Free LDAP error message
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+ldap_get_option(3) documents that a pointer set by
+LDAP_OPT_DIAGNOSTIC_MESSAGE must be freed with ldap_memfree(3).
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ warnquota.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/warnquota.c b/warnquota.c
+index d54b4c1..f6b42d5 100644
+--- a/warnquota.c
++++ b/warnquota.c
+@@ -190,8 +190,11 @@ static void print_ldap_error(int err, char *prefix)
+ 	sstrncat(outbuf, ": %s\n", LDAP_ERR_BUF_SIZE);
+ 	errstr(outbuf, ldap_err2string(err));
+ 	ldap_get_option(ldapconn, LDAP_OPT_DIAGNOSTIC_MESSAGE, (void *)&msg);
+-	if (msg && strcmp(msg, ""))
++	if (msg) {
++	    if (strcmp(msg, ""))
+ 		errstr(_("Additional error info: %s\n"), msg);
++	    ldap_memfree(msg);
++	}
+ }
+ 
+ static int setup_ldap(struct configparams *config)
+-- 
+2.21.0
+

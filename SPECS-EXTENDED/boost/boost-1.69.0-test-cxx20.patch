@@ -1,0 +1,50 @@
+From 8ac88c62dcc809d42daf8b6bef10f7adecc46dd1 Mon Sep 17 00:00:00 2001
+From: Laurent Stacul <laurent.stacul@amadeus.com>
+Date: Mon, 17 Feb 2020 08:57:49 +0000
+Subject: [PATCH] Fix compilation issue due to deleted
+ std::basic_ostream::operator<< overload
+
+---
+ include/boost/test/impl/test_tools.ipp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/boost/test/impl/test_tools.ipp b/include/boost/test/impl/test_tools.ipp
+index 40f24e6399..e4d61660b8 100644
+--- a/include/boost/test/impl/test_tools.ipp
++++ b/include/boost/test/impl/test_tools.ipp
+@@ -124,7 +124,7 @@ print_log_value<char const*>::operator()( std::ostream& ostr, char const* t )
+ void
+ print_log_value<wchar_t const*>::operator()( std::ostream& ostr, wchar_t const* t )
+ {
+-    ostr << ( t ? t : L"null string" );
++    ostr << ( t ? reinterpret_cast<const void*>(t) : "null string" );
+ }
+ 
+ //____________________________________________________________________________//
+From db6b98c72783351e0acd3c558691323a7a103ba9 Mon Sep 17 00:00:00 2001
+From: Raffi Enficiaud <raffi.enficiaud@mines-paris.org>
+Date: Sat, 9 May 2020 10:42:38 +0200
+Subject: [PATCH] Fixing cast issue when logging wchar_t
+
+---
+ include/boost/test/impl/test_tools.ipp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/include/boost/test/impl/test_tools.ipp b/include/boost/test/impl/test_tools.ipp
+index 025cd1a92a..bbee21fbbc 100644
+--- a/include/boost/test/impl/test_tools.ipp
++++ b/include/boost/test/impl/test_tools.ipp
+@@ -124,7 +124,12 @@ print_log_value<char const*>::operator()( std::ostream& ostr, char const* t )
+ void
+ print_log_value<wchar_t const*>::operator()( std::ostream& ostr, wchar_t const* t )
+ {
+-    ostr << ( t ? reinterpret_cast<const void*>(t) : "null string" );
++    if(t) {
++      ostr << static_cast<const void*>(t);
++    }
++    else {
++      ostr << "null w-string";
++    }
+ }
+ 
+ //____________________________________________________________________________//

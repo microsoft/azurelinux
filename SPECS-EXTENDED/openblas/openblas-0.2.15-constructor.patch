@@ -1,0 +1,19 @@
+diff -up OpenBLAS-0.2.15/driver/others/memory.c.priority OpenBLAS-0.2.15/driver/others/memory.c
+--- OpenBLAS-0.2.15/driver/others/memory.c.priority	2015-10-27 21:44:50.000000000 +0100
++++ OpenBLAS-0.2.15/driver/others/memory.c	2016-01-13 21:12:01.862225898 +0100
+@@ -146,8 +146,15 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ #define CONSTRUCTOR	__attribute__ ((constructor))
+ #define DESTRUCTOR	__attribute__ ((destructor))
+ #else
++#if __GNUC__ && INIT_PRIORITY && ((GCC_VERSION >= 40300) || (CLANG_VERSION >= 20900))
+ #define CONSTRUCTOR	__attribute__ ((constructor(101)))
+ #define DESTRUCTOR	__attribute__ ((destructor(101)))
++#elif __GNUC__ && INIT_PRIORITY
++#define CONSTRUCTOR	__attribute__ ((constructor))
++#define DESTRUCTOR	__attribute__ ((destructor))
++#else
++#define CONSTRUCTOR
++#define DESTRUCTOR
+ #endif
+ 
+ #ifdef DYNAMIC_ARCH

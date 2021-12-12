@@ -1,0 +1,86 @@
+#
+# RPM macros for gconf applications.
+#
+# (c) 2006-2007 SUSE LINUX
+# Author: Stanislav Brabec <sbrabec@suse.cz>
+# (c) 2009 Red Hat, Inc
+# Author: Toshio Kuratomi <toshio@fedoraproject.org>
+#
+# License: LGPLv2+
+#
+# Usage:
+#
+# Preamble:
+# Requires(pre): GConf2
+# Requires(preun): GConf2
+# Requires(post): GConf2
+#
+# schemas names are without path and suffix
+#
+#
+# %pre
+# %gconf_schema_obsolete schema1
+# %gconf_schema_prepare schema2 schema3
+#
+# %preun
+# %gconf_schema_remove schema2 schema3
+#
+# %post
+# %gconf_schema_upgrade schema2 schema3
+#
+# %files
+# %{_sysconfdir}/gconf/schemas/schema2.schemas
+# %{_sysconfdir}/gconf/schemas/schema3.schemas
+
+# Copy schemas from old package for later uninstall on upgrade
+%gconf_schema_prepare() \
+if [ "$1" -gt 1 ] ; then \
+    rm -rf %{_localstatedir}/lib/rpm-state/gconf/* \
+    for schema in %{*} ; do \
+        if test -f %{_sysconfdir}/gconf/schemas/"$schema".schemas ; then \
+            cp -p %{_sysconfdir}/gconf/schemas/"$schema".schemas %{_localstatedir}/lib/rpm-state/gconf/ || : \
+        fi \
+    done \
+fi \
+%{nil}
+
+# Macro to remove schemas.  Not meant to be used publically
+%_do_gconf_schema_remove() \
+        if test -f %{_sysconfdir}/gconf/schemas/"$schema".schemas ; then \
+            export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source` \
+            gconftool-2 --makefile-uninstall-rule %{_sysconfdir}/gconf/schemas/"$schema".schemas > /dev/null || : \
+        fi \
+%{nil}
+
+# Remove schemas unconditionally
+%gconf_schema_obsolete() \
+for schema in %{*} ; do \
+    %_do_gconf_schema_remove \
+done \
+%{nil}
+
+# Remove schemas on package removal (not upgrade)
+%gconf_schema_remove() \
+if [ "$1" -eq 0 ] ; then \
+    for schema in %{*} ; do \
+        %_do_gconf_schema_remove \
+    done \
+fi \
+%{nil}
+
+%gconf_schema_upgrade() \
+for schema in %{*} ; do \
+    if test -f %{_localstatedir}/lib/rpm-state/gconf/"$schema".schemas ; then \
+        cmp --quiet %{_sysconfdir}/gconf/schemas/"$schema".schemas %{_localstatedir}/lib/rpm-state/gconf/"$schema".schemas \
+        if test $? != 0; then\
+            export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source` \
+            gconftool-2 --makefile-uninstall-rule %{_localstatedir}/lib/rpm-state/gconf/"$schema".schemas > /dev/null || : \
+            gconftool-2 --makefile-install-rule %{_sysconfdir}/gconf/schemas/"$schema".schemas > /dev/null || : \
+        fi \
+        rm -f %{_localstatedir}/lib/rpm-state/gconf/"$schema".schemas \
+    else \
+        export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source` \
+        gconftool-2 --makefile-install-rule %{_sysconfdir}/gconf/schemas/"$schema".schemas > /dev/null || : \
+    fi \
+done \
+%{nil}

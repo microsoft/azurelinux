@@ -1,0 +1,21 @@
+#%Module 1.0
+#
+#  OpenMPI module for use with 'environment-modules' package:
+#
+conflict		mpi
+prepend-path 		PATH 		@LIBDIR@/bin
+prepend-path 		LD_LIBRARY_PATH @LIBDIR@/lib
+prepend-path 		PKG_CONFIG_PATH	@LIBDIR@/lib/pkgconfig
+prepend-path		MANPATH		:@MANDIR@
+setenv 			MPI_BIN		@LIBDIR@/bin
+setenv			MPI_SYSCONFIG	@ETCDIR@
+setenv			MPI_FORTRAN_MOD_DIR	@FMODDIR@
+setenv			MPI_INCLUDE	@INCDIR@
+setenv	 		MPI_LIB		@LIBDIR@/lib
+setenv			MPI_MAN		@MANDIR@
+setenv			MPI_PYTHON_SITEARCH	@PY2SITEARCH@
+setenv			MPI_PYTHON2_SITEARCH	@PY2SITEARCH@
+setenv			MPI_PYTHON3_SITEARCH	@PY3SITEARCH@
+setenv			MPI_COMPILER	@COMPILER@
+setenv			MPI_SUFFIX	@SUFFIX@
+setenv	 		MPI_HOME	@LIBDIR@

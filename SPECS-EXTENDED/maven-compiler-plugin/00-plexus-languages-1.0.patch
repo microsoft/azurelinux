@@ -1,0 +1,13 @@
+diff --git a/src/main/java/org/apache/maven/plugin/compiler/CompilerMojo.java b/src/main/java/org/apache/maven/plugin/compiler/CompilerMojo.java
+index 8bc437b..326f9f9 100644
+--- a/src/main/java/org/apache/maven/plugin/compiler/CompilerMojo.java
++++ b/src/main/java/org/apache/maven/plugin/compiler/CompilerMojo.java
+@@ -50,7 +50,7 @@ import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
+ import org.codehaus.plexus.languages.java.jpms.LocationManager;
+ import org.codehaus.plexus.languages.java.jpms.ResolvePathsRequest;
+ import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
+-import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult.ModuleNameSource;
++import org.codehaus.plexus.languages.java.jpms.ModuleNameSource;
+ 
+ /**
+  * Compiles application sources

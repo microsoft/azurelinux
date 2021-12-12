@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tck
+Bundle-SymbolicName: com.google.code.atinject.tck
+Bundle-Version: 1.0.0
+Bundle-Vendor: GOOGLE
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit;bundle-version="3.8.2"
+Export-Package: org.atinject.tck,
+ org.atinject.tck.auto;x-internal:=true,
+ org.atinject.tck.auto.accessories;x-internal:=true
+Import-Package: javax.inject;version="1.0.0"
+JavaPackages-GroupId: javax.inject
+JavaPackages-ArtifactId: javax.inject-tck
+JavaPackages-Version: 1.1.SNAPSHOT

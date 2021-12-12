@@ -1,0 +1,11 @@
+--- ./data/cputable.orig	2021-02-15 19:40:11.935329130 +0000
++++ ./data/cputable	2021-02-15 19:41:02.334670341 +0000
+@@ -40,7 +40,7 @@ or1k		or1k		or1k			32	big
+ powerpc		powerpc		(powerpc|ppc)		32	big
+ powerpcel	powerpcle	powerpcle		32	little
+ ppc64		powerpc64	(powerpc|ppc)64		64	big
+-ppc64el		powerpc64le	powerpc64le		64	little
++ppc64el		powerpc64le	(powerpc|ppc)64le	64	little
+ riscv64		riscv64		riscv64			64	little
+ s390		s390		s390			32	big
+ s390x		s390x		s390x			64	big

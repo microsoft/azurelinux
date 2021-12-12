@@ -1,0 +1,48 @@
+diff --git a/plugins/ipmidirect/ipmi.cpp b/plugins/ipmidirect/ipmi.cpp
+index f6745cf6..3b4918de 100644
+--- a/plugins/ipmidirect/ipmi.cpp
++++ b/plugins/ipmidirect/ipmi.cpp
+@@ -1929,7 +1929,12 @@ cIpmi::AllocConnection( GHashTable *handler_config )
+        char            user[32]   = "";
+        char            passwd[32] = "";
+        char           *value;
+-       struct hostent *ent;
++       struct addrinfo hints, *servinfo = NULL;
++       char portnumber_string[4];
++
++       memset(&hints, 0, sizeof(hints));
++       hints.ai_family = AF_UNSPEC;
++       hints.ai_socktype = SOCK_STREAM;
+ 
+        // Address
+        addr = (const char *)g_hash_table_lookup(handler_config, "addr");
+@@ -1941,16 +1946,16 @@ cIpmi::AllocConnection( GHashTable *handler_config )
+           }
+ 
+        stdlog << "AllocConnection: addr = '" << addr << "'.\n";
+-       ent = gethostbyname( addr );
++       (void)sprintf(portnumber_string, "%d", lan_port);
+ 
+-       if ( !ent )
++       if (getaddrinfo(addr, portnumber_string, &hints, &servinfo) != 0) 
+           {
+             stdlog << "Unable to resolve IPMI LAN address: " << addr << " !\n";
+             return 0;
+           }
+ 
+-       memcpy( &lan_addr, ent->h_addr_list[0], ent->h_length );
+-       unsigned int a = *(unsigned int *)(void *)ent->h_addr_list[0];
++       memcpy(&lan_addr, servinfo->ai_addr, servinfo->ai_addrlen);
++       unsigned int a = *(unsigned int *)(void *)servinfo->ai_addr;
+ 
+        stdlog << "Using host at "
+               << (int)(a & 0xff) << "."
+@@ -1958,6 +1963,8 @@ cIpmi::AllocConnection( GHashTable *handler_config )
+               << (int)((a >> 16) & 0xff) << "."
+               << (int)((a >> 24) & 0xff) << ".\n";
+ 
++       freeaddrinfo(servinfo);
++
+        // Port
+        lan_port = GetIntNotNull( handler_config, "port", 623 );
+ 

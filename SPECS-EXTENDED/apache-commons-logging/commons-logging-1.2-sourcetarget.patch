@@ -1,0 +1,15 @@
+--- commons-logging-1.2-src/build.xml	2014-07-05 20:11:36.000000000 +0200
++++ commons-logging-1.2-src/build.xml	2017-09-07 14:05:10.680439161 +0200
+@@ -130,10 +130,10 @@
+ <!-- ========== Compiler Defaults ========================================= -->
+ 
+   <!-- Version of java class files to generate. -->
+-  <property name="target.version" value="1.2"/>
++  <property name="target.version" value="8"/>
+ 
+   <!-- Version of java source to accept -->
+-  <property name="source.version" value="1.2"/>
++  <property name="source.version" value="8"/>
+ 
+   <!-- Should Java compilations set the 'debug' compiler option? -->
+   <property name="compile.debug"           value="true"/>

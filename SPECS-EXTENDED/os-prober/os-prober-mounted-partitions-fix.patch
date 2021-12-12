@@ -1,0 +1,26 @@
+Index: os-prober/common.sh
+===================================================================
+--- os-prober.orig/common.sh
++++ os-prober/common.sh
+@@ -146,7 +146,7 @@ parse_proc_mounts () {
+ 		set -f
+ 		set -- $line
+ 		set +f
+-		printf '%s %s %s\n' "$(mapdevfs "$1")" "$2" "$3"
++		printf '%s %s %s %s\n' "$(mapdevfs "$1")" "$2" "$3" "$1"
+ 	done
+ }
+ 
+Index: os-prober/linux-boot-prober
+===================================================================
+--- os-prober.orig/linux-boot-prober
++++ os-prober/linux-boot-prober
+@@ -167,7 +167,7 @@ else
+ 			bootpart="${mountboot%% *}"
+ 			bootmounted="${mountboot#* }"
+ 		else
+-			bootpart="$partition"
++			bootpart="$(grep " $mpoint/boot " "$OS_PROBER_TMP/mounted-map" | head -n1 | cut -d " " -f 4)"
+ 			bootmounted=0
+ 		fi
+ 		for test in /usr/lib/linux-boot-probes/mounted/*; do

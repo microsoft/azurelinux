@@ -1,0 +1,251 @@
+diff -up dvd+rw-tools-7.1/dvd+rw-format.1.format dvd+rw-tools-7.1/dvd+rw-format.1
+--- dvd+rw-tools-7.1/dvd+rw-format.1.format	2012-08-23 17:30:20.001822268 +0200
++++ dvd+rw-tools-7.1/dvd+rw-format.1	2012-08-24 09:37:14.549094680 +0200
+@@ -0,0 +1,132 @@
++.TH DVD+RW\-FORMAT 1 "24 Aug 2012" "dvd+rw\-tools 7.1"
++.SH NAME
++dvd+rw\-format \- formatting and blanking DVD and BD media program.
++.SH SYNOPSIS
++.B dvd+rw\-format
++[\fB\-force\fP[\fB\=full\fP]]
++[\fB\-lead\-out|\-blank\fP[\fB\=full\fP]]
++[\fB\-ssa\fP[\fB\=none|default|max|XXXm\fP]]
++.I /dev/dvd
++
++.SH DESCRIPTION
++\fBdvd+rw\-format\fP is a part of \fBdvd+rw\-tools\fP suite and allows to
++format virgin DVD+RW or BD\-RE media for the first use or blank already
++written DVD\-RW.
++Typical use cases of using \fBdvd+rw\-format\fP is formatting DVD\-RW to
++make them over\-writable, blanking used DVD\-RW to make them sequentially
++writable from scratch, formatting BD\-RE and DVD\-RAM with custom
++spare area sizes or re\-formatting BD\-RE and DVD\-RAM to change their spare
++size.
++It is not possible to format CD\-RW by \fBdvd+rw\-format\fP,
++you can use \fBcdrskin\fP, \fBxorriso\fP or \fBwodim\fP utilities to blank
++them or cdrwtool to format them instead, see section \fBEXAMPLES\fP.
++
++A DVD\-RW accepts two disc modes: the \fISequential Recording\fP
++and the \fIRestricted Overwrite\fP. If a DVD\-RW medium is in the latter one,
++it will behave much like DVD+RW.
++By default DVD\-RW discs are in Sequential Recording mode, but
++can be put into Restricted Overwrite mode using \fBdvd+rw\-format\fP
++when no options given.
++Be aware, that only \-blank=full, which lasts as long as full writing,
++makes a used sequential DVD\-RW capable of performing multi\-session,
++while fast blanked DVD\-RW can only do Disk\-At\-Once.
++
++Virgin DVD\-RW can be directly written without
++the need of a formatting operation, however a non\-virgin DVD\-RW in
++Sequential Recording mode needs to be blanked before writing a new
++initial session. Since a DVD\-RW medium in the Restricted Overwrite
++mode behaves much like DVD+RW, it  can be written again without prior
++formatting the media.
++
++Virgin BD\-RE and DVD+RW media may be initially formatted prior
++usage. Any\-time later, \fBgrowisofs\fP program will take care of formatting
++it automatically whenever appropriate, while further formatting is not
++recommended, however it is possible.
++
++.SH OPTIONS
++.TP
++.BI \-force[\=full]
++Perform formatting even if the medium is formatted already. This is not
++recommended for BD\-RE and DVD+RW media, since they need to be
++formatted only once. Use \fB\-format=full\fP to perform full (lengthy)
++reformat in case of DVD\-RAM or (lengthy) Full Certification in case of
++BD\-RE.
++.TP
++.BI \-lead\-out
++Relocates the lead\-out next to outermost written sector as well as makes
++sure there is no virgin surface before it. This can make the medium more
++compatible with some DVD players. Previously written data is not
++affected by this operation. 
++.TP
++.BI \-blank[\=full]
++Wipe data from DVD\-RW media. Data on BD\-RE and DVD+RW will we overwritten
++automatically, so there is no need to blank them explicitly.
++Use \fB\-blank\=full\fP to change DVD\-RW back to Sequential Recording mode.
++.TP
++.BI \-ssa[\=none|default|max|XXXm]
++Grow, eliminate, reset to default or maximize \fISupplementary Spare Area\fP.
++
++.SH EXAMPLES
++Actual device names vary from one operating system to another. We use
++\fI/dev/dvd\fP as a collective name or as symbolic link to the actual
++device if you wish. Under Linux it will most likely be a
++device such as "/dev/sr0" or "/dev/hda" for older Linux 2.6.
++
++To blank a CD\-RW, you have to use another utility, e.g. wodim:
++
++        \fBwodim\fP \fBblank=fast\fP \-immed dev=\fI/dev/cdrom\fP
++        \fBcdrskin\fP \fBblank=all|fast|as_needed\fP \-immed dev=\fI/dev/cdrom\fP
++        \fBxorriso\fP \fB\-outdev\fP \fI/dev/cdrom\fP \fB\-blank all|fast|as_needed\fP
++        
++To format CD\-RW, you can use cdrwtool:
++
++        \fBcdrwtool\fP \fB\-d\fP \fI/dev/cdrom\fP \fB\-q\fP
++
++To blank a DVD\-RW and put in the incremental sequential mode, run:
++
++        \fBdvd+rw\-format\fP \fB\-blank=full\fP \fI/dev/dvd\fP
++
++To blank a DVD\-RW and put in the Restricted Overwrite mode, run:
++
++        \fBdvd+rw\-format\fP \fB\-force\fP \fI/dev/dvd\fP
++
++To overwrite data of BD\-RE, DVD+RW, DVD\-RW or DVD\-RAM run:
++
++        \fBgrowisofs\fP \fB\-Z\fP \fI/dev/dvd\fP\=\fI/dev/zero\fP
++
++To blank a DVD\-RAM, you can use:
++
++        \fBdd\fP if\=\fI/dev/zero\fP of\=\fI/dev/dvd\fP
++
++To relocate lead\-out sector, run:
++
++        \fBdvd+rw\-format\fP \fB\-lead\-out\fP \fI/dev/dvd\fP
++        
++.SH NOTES
++Note that DVD+RW re\-formatting procedure does not substitute for
++blanking. If you want to nullify the media, e.g. for privacy reasons,
++do it explicitly with 'growisofs \-Z \fI/dev/dvd\fP\=\fB/dev/zero\fP'.
++
++When growisofs "runs into" blank Blu\-ray Disc media or BD\-RE,
++it gets pre\-formatted with minimal spare area size of 256MB.
++
++.SH SEE ALSO
++Most up\-to\-date information on dvd+rw\-tools is available at
++http://fy.chalmers.se/~appro/linux/DVD+RW/.
++.PP
++.BR growisofs (1),
++.BR cdrskin (1),
++.BR xorriso (1),
++.BR wodim (1),
++.BR cdrwtool (1)
++
++.SH AUTHORS
++Andy Polyakov <appro@fy.chalmers.se> stands for programming and on\-line
++information.
++
++This manpage was created by Honza Horak <hhorak@redhat.com> and consulted by
++Thomas Schmitt <scdbackup@gmx.net>.
++
++.SH LICENSE
++\fBdvd+rw\-format\fP is distributed under GNU GPL.
++
+diff -up dvd+rw-tools-7.1/growisofs.1.format dvd+rw-tools-7.1/growisofs.1
+--- dvd+rw-tools-7.1/growisofs.1.format	2008-03-01 11:40:06.000000000 +0100
++++ dvd+rw-tools-7.1/growisofs.1	2012-08-24 09:35:55.550780073 +0200
+@@ -113,7 +113,7 @@ recordings.
+ Actual device names vary from one operating system to another. We use
+ \fI/dev/dvd\fP as a collective name or as symbolic link to the actual
+ device if you wish. Under Linux it will most likely be an ide\-scsi
+-device  such as "/dev/scd0." Under NetBSD/OpenBSD it has to be a
++device  such as "/dev/sr0." Under NetBSD/OpenBSD it has to be a
+ \fIcharacter\fP SCSI CD\-ROM device such as "/dev/rcd0c." Under Solaris
+ it also has to be a \fIcharacter\fP SCSI/ATAPI CD\-ROM device, e.g.
+ "/dev/rdsk/c0t1d0s2" or "/vol/dev/aliases/cdrom0." And likewise in
+@@ -210,11 +210,19 @@ DVD\-RAM or Blu\-ray Disc, as volumes ar
+ When growisofs "runs into" blank Blu\-ray Disc media, BD\-RE or BD\-R,
+ it gets pre-formatted with minimal spare area size of 256MB.
+ 
++A DVD\-RW accepts two disc modes: the \fISequential Recording\fP
++and the \fIRestricted Overwrite\fP. If a DVD\-RW medium is in the later one,
++it will behave much like DVD+RW.
++By default DVD\-RW discs are in Sequential Recording mode, but
++can be put into Restricted Overwrite mode using \fBdvd+rw\-format\fP.
++See \fBdvd+rw\-format (1)\fP for more info.
++
+ .SH SEE ALSO
+ Most up-to-date information on dvd+rw\-tools is available at
+ http://fy.chalmers.se/~appro/linux/DVD+RW/.
+ .PP
+-The manpage for \fBmkisofs\fP.
++.BR mkisofs (1),
++.BR dvd+rw\-format (1)
+ 
+ .SH AUTHORS
+ Andy Polyakov <appro@fy.chalmers.se> stands for programming and on-line
+diff -up dvd+rw-tools-7.1/growisofs.c.format dvd+rw-tools-7.1/growisofs.c
+--- dvd+rw-tools-7.1/growisofs.c.format	2008-03-04 10:15:03.000000000 +0100
++++ dvd+rw-tools-7.1/growisofs.c	2012-08-23 17:30:20.028822506 +0200
+@@ -3433,8 +3433,15 @@ int main (int argc, char *argv[])
+ 	else if (isatty (0)) warn_for_isofs |= 2;
+ 
+ 	if (no_tty_check || (warn_for_isofs&2))
+-	    fprintf (stderr,"WARNING: %s already carries isofs!\n",in_device),
++	{
++	    fprintf (stderr,"WARNING: %s already carries isofs!\n",in_device);
++		/* we cannot re-write a DVD-RW media in Sequential mode */
++		if ((int)(mmc_profile&0xFFFF) == 0x14)
++			fprintf (stderr,"FATAL: DVD-RW medium is in Sequential mode, you "
++				            "need to blank it before writing again.\n"),
++			exit(FATAL_START(EBUSY));
+ 	    printf ("About to execute '");
++	}
+ 	else
+ 	    fprintf (stderr,"FATAL: %s already carries isofs!\n",in_device),
+ 	    exit(FATAL_START(EBUSY));
+diff -up dvd+rw-tools-7.1/Makefile.format dvd+rw-tools-7.1/Makefile
+--- dvd+rw-tools-7.1/Makefile.format	2008-02-27 14:11:27.000000000 +0100
++++ dvd+rw-tools-7.1/Makefile	2012-08-23 17:30:20.037822589 +0200
+@@ -22,6 +22,7 @@ pkg:
+ 		$(DIST)/Makefile.m4		\
+ 		$(DIST)/dvd+rw-tools.spec	\
+ 		$(DIST)/growisofs.1		\
++		$(DIST)/dvd+rw-format.1		\
+ 		$(DIST)/transport.hxx		\
+ 		$(DIST)/mp.h			\
+ 		$(DIST)/win32err.h		\
+diff -up dvd+rw-tools-7.1/Makefile.m4.format dvd+rw-tools-7.1/Makefile.m4
+--- dvd+rw-tools-7.1/Makefile.m4.format	2012-08-23 17:30:19.971822000 +0200
++++ dvd+rw-tools-7.1/Makefile.m4	2012-08-23 17:30:20.038822597 +0200
+@@ -32,6 +32,7 @@ BIN_MODE?=0755
+ install:	dvd+rw-tools
+ 	install -o root -m $(BIN_MODE) $(CHAIN) /usr/bin
+ 	install -o root -m 0644 growisofs.1 /usr/share/man/man1
++	install -o root -m 0644 dvd+rw-format.1 /usr/share/man/man1
+ ])
+ 
+ ifelse(OS,MINGW32,[
+@@ -68,6 +69,7 @@ BIN_MODE?=04755
+ install:	dvd+rw-tools
+ 	install -o root -m $(BIN_MODE) $(CHAIN) /usr/local/bin
+ 	install -o root -m 0644 growisofs.1 /usr/local/man/man1
++	install -o root -m 0644 dvd+rw-format.1 /usr/local/man/man1
+ ])
+ 
+ ifelse(OS,SunOS,[
+@@ -103,6 +105,7 @@ LDLIBS=-lvolmgt -lrt -lpthread -ldl
+ install:	dvd+rw-tools
+ 	/usr/ucb/install -o root -m 04755 $(CHAIN) /usr/local/bin
+ 	/usr/ucb/install -o root -m 0644 growisofs.1 /usr/local/man/man1
++	/usr/ucb/install -o root -m 0644 dvd+rw-format.1 /usr/local/man/man1
+ ])
+ 
+ ifelse(OS,HP-UX,[
+@@ -141,6 +144,7 @@ LDLIBS=-lrt -lpthread
+ install:	dvd+rw-tools
+ 	/usr/sbin/install -o -f /usr/local/bin  $(CHAIN)
+ 	/usr/sbin/install -o -f /usr/local/man/man1 growisofs.1
++	/usr/sbin/install -o -f /usr/local/man/man1 dvd+rw-format.1
+ ])
+ 
+ ifelse(OS,IRIX,[
+@@ -178,6 +182,7 @@ BIN_MODE=04755	# set-root-uid
+ install:	dvd+rw-tools
+ 	/sbin/install -u root -m $(BIN_MODE) $(CHAIN) /usr/local/bin
+ 	/sbin/install -u root -m 0644 growisofs.1 /usr/local/man/man1
++	/sbin/install -u root -m 0644 dvd+rw-format.1 /usr/local/man/man1
+ ])
+ 
+ ifelse(OS,Linux,[
+@@ -202,6 +207,7 @@ install:	dvd+rw-tools
+ 	install $(minus_o) -m $(bin_mode) $(CHAIN) $(prefix)/bin
+ 	[[ -d $(mandir)/man1 ]] || mkdir -p $(mandir)/man1
+ 	install $(minus_o) -m 0644 growisofs.1 $(mandir)/man1
++	install $(minus_o) -m 0644 dvd+rw-format.1 $(mandir)/man1
+ 	-[[ -f rpl8 ]] && install $(minus_o) -m $(bin_mode) rpl8 $(prefix)/bin || :
+ 	-[[ -f btcflash ]] && install $(minus_o) -m $(bin_mode) btcflash $(prefix)/bin || :
+ ])

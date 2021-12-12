@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Emacs Terminal
+GenericName=Emacs Terminal
+Comment=Emacs Terminal Mode
+Exec=emacs-terminal
+Icon=utilities-terminal
+Type=Application
+Terminal=false
+Categories=Application;Utility;X-Red-Hat-Base;GTK;TerminalEmulator;
+Encoding=UTF-8
+StartupWMClass=Emacs

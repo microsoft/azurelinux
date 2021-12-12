@@ -1,0 +1,17 @@
+{
+ "Signatures": {
+  "README.Fedora": "1316bcbb1ee8063a30776f0c181f0d3329a65e48d2f19692beb04148f31bf3e1",
+  "config": "1e096033ff71b358dfe970b2e45a2666c1c635822bf04b3726cd54fe6cf25e50",
+  "mom.layout": "9aff494ab592f1b379fbed272c46e9f47cdf9140316f71222060fded91dcbaa3",
+  "pbs-config": "66d63ae2cf9dc8ff21c6d393617c664fa883310a05d5f6705804db25dbf99d53",
+  "pbs_mom.service": "5b1a6b9bd202e91cda79318fa483bcc066650ad395475c226ce345808e4f0b7e",
+  "pbs_sched.service": "cbe74f36ccbcac69baca38aba8232579be36e8869e3f96d0e3193358c99cc269",
+  "pbs_server.service": "af95c5ceb1afd27324a55a3774624c28bd2cf67e3bc5a54c815d05114bd0d032",
+  "torque-4.2.10.tar.gz": "b43c6ece01f8e517be859d8c3b7ca4e9483f50c8b78708eaa9661945d798fae2",
+  "trqauthd.service": "95d24ffe802621124051b442ff90be407dacadd63c33481a737ff0a18d6aa8c8",
+  "xpbs.desktop": "c15a40357ca82884cee411d62bb8f014321e192bfd0b94ed115d9d20fcb57395",
+  "xpbs.png": "0e7fe3ba9ea1cd66b8020ffab4399483ac33206d8bcdf3d69d6e6dcede97f981",
+  "xpbsmon.desktop": "dc214b5549edb638cdfb57a2d90350c50bd93ed68e44a38bb9c277bc2dd3f1cd",
+  "xpbsmon.png": "cbb39af281d686eba36432990840e20db8819459c80acb9fcb7342e20e2c503f"
+ }
+}

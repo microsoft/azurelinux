@@ -1,0 +1,88 @@
+--- a/lib/activate/activate.c	
++++ a/lib/activate/activate.c	
+@@ -370,7 +370,10 @@ get_dm_devs(struct raid_set *rs, int valid)
+ 	return ret + get_rds(rs, valid);
+ }
+ 
+-/* Retrieve number of drive to rebuild from metadata format handler. */
++/* Retrieve number of drive to rebuild from metadata format handler.
++ *
++ * Returns number of drive to rebuild or -1 if there is no drive to rebuild
++ */
+ static int
+ get_rebuild_drive(struct lib_context *lc, struct raid_set *rs,
+ 		  struct handler_info *info)
+@@ -378,25 +381,23 @@ get_rebuild_drive(struct lib_context *lc, struct raid_set *rs,
+ 	/* Initialize drive to rebuild invalid. */
+ 	info->data.i32 = -1;
+ 
+-	if (lc->options[LC_REBUILD_SET].opt) {
+-		struct raid_dev *rd;
++	struct raid_dev *rd;
+ 
+-		if (list_empty(&rs->devs))
+-			LOG_ERR(lc, 0, "RAID set has no devices!");
++	if (list_empty(&rs->devs))
++		LOG_ERR(lc, 0, "RAID set has no devices!");
+ 
+-		rd = list_entry(rs->devs.next, typeof(*rd), devs);
+-		if (rd->fmt->metadata_handler) {
+-			if (!rd->
+-			    fmt->metadata_handler(lc, GET_REBUILD_DRIVE_NO,
+-						  info, rs))
+-				LOG_ERR(lc, 0, "Can't get rebuild drive #!");
+-		} else
+-			LOG_ERR(lc, 0,
+-				"Can't rebuild w/o metadata_handler for %s",
+-				rd->fmt->name);
+-	}
++	rd = list_entry(rs->devs.next, typeof(*rd), devs);
++	if (rd->fmt->metadata_handler) {
++		if (!rd->
++		    fmt->metadata_handler(lc, GET_REBUILD_DRIVE_NO,
++					  info, rs))
++			LOG_ERR(lc, 0, "Can't get rebuild drive #!");
++	} else
++		LOG_ERR(lc, 0,
++			"Can't rebuild w/o metadata_handler for %s",
++			rd->fmt->name);
+ 
+-	return 1;
++	return info->data.i32;
+ }
+ 
+ /* Return true if RAID set needs rebuilding. */
+@@ -458,7 +459,7 @@ dm_raid1(struct lib_context *lc, char **table, struct raid_set *rs)
+ 	 */
+ 	need_sync = rs_need_sync(rs);
+ 	rebuild_drive.data.i32 = -1;
+-	if (need_sync && !get_rebuild_drive(lc, rs, &rebuild_drive))
++	if (need_sync && get_rebuild_drive(lc, rs, &rebuild_drive) < 0)
+ 		return 0;
+ 
+ 	if (!_dm_raid1_bol(lc, table, rs, sectors, mirrors, need_sync))
+@@ -540,7 +541,7 @@ _dm_raid45_bol(struct lib_context *lc, char **table, struct raid_set *rs,
+ 
+ 	/* Get drive as rebuild target. */
+ 	rebuild_drive.data.i32 = -1;
+-	if (need_sync && !get_rebuild_drive(lc, rs, &rebuild_drive))
++	if (need_sync && get_rebuild_drive(lc, rs, &rebuild_drive) < 0)
+ 		return 0;
+ 
+ 	return p_fmt(lc, table, "0 %U %s core 2 %u %s %s 1 %u %u %d",
+--- a/lib/format/ataraid/isw.c	
++++ a/lib/format/ataraid/isw.c	
+@@ -1302,11 +1302,9 @@ isw_metadata_handler(struct lib_context *lc, enum handler_commands command,
+ 	case GET_REBUILD_DRIVE_NO:
+ 		rd = list_entry(rs->devs.next, typeof(*rd), devs);
+ 		isw = META(rd, isw);
+-		idx = rd_idx_by_name(isw, lc->options[LC_REBUILD_SET].arg.str);
+-		if (idx < 0)
+-			return 0;
+ 
+-		dev = raiddev(isw, idx);
++		/* Get disk to rebuild index form metadata stored on first disk */
++		dev = raiddev(isw, 0);
+ 		disk = isw->disk;
+ 
+ 		if (info) {

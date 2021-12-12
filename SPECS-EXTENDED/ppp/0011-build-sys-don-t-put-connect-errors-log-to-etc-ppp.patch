@@ -1,0 +1,77 @@
+From b4ef433be936c90e356da7a590b032cdee219a3f Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Fri, 4 Apr 2014 19:06:05 +0200
+Subject: [PATCH 11/27] build-sys: don't put connect-errors log to /etc/ppp/
+
+Resolves: #118837
+---
+ chat/chat.8        | 2 +-
+ linux/Makefile.top | 8 +++++++-
+ pppd/pathnames.h   | 4 ++--
+ 3 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/chat/chat.8 b/chat/chat.8
+index 6d10836..78d6939 100644
+--- a/chat/chat.8
++++ b/chat/chat.8
+@@ -200,7 +200,7 @@ The \fBSAY\fR directive allows the script to send strings to the user
+ at the terminal via standard error.  If \fBchat\fR is being run by
+ pppd, and pppd is running as a daemon (detached from its controlling
+ terminal), standard error will normally be redirected to the file
+-/etc/ppp/connect\-errors.
++/var/log/ppp/connect\-errors.
+ .LP
+ \fBSAY\fR strings must be enclosed in single or double quotes. If
+ carriage return and line feed are needed in the string to be output,
+diff --git a/linux/Makefile.top b/linux/Makefile.top
+index f63d45e..f42efd5 100644
+--- a/linux/Makefile.top
++++ b/linux/Makefile.top
+@@ -5,6 +5,8 @@ BINDIR = $(DESTDIR)/sbin
+ INCDIR = $(DESTDIR)/include
+ MANDIR = $(DESTDIR)/share/man
+ ETCDIR = $(INSTROOT)@SYSCONF@/ppp
++RUNDIR = $(DESTDIR)/var/run/ppp
++LOGDIR = $(DESTDIR)/var/log/ppp
+ 
+ # uid 0 = root
+ INSTALL= install
+@@ -16,7 +18,7 @@ all:
+ 	cd pppstats; $(MAKE) $(MFLAGS) all
+ 	cd pppdump; $(MAKE) $(MFLAGS) all
+ 
+-install: $(BINDIR) $(MANDIR)/man8 install-progs install-devel
++install: $(BINDIR) $(RUNDIR) $(LOGDIR) $(MANDIR)/man8 install-progs install-devel
+ 
+ install-progs:
+ 	cd chat; $(MAKE) $(MFLAGS) install
+@@ -44,6 +46,10 @@ $(MANDIR)/man8:
+ 	$(INSTALL) -d -m 755 $@
+ $(ETCDIR):
+ 	$(INSTALL) -d -m 755 $@
++$(RUNDIR):
++	$(INSTALL) -d -m 755 $@
++$(LOGDIR):
++	$(INSTALL) -d -m 755 $@
+ 
+ clean:
+ 	rm -f `find . -name '*.[oas]' -print`
+diff --git a/pppd/pathnames.h b/pppd/pathnames.h
+index a427cb8..bef3160 100644
+--- a/pppd/pathnames.h
++++ b/pppd/pathnames.h
+@@ -28,9 +28,9 @@
+ #define _PATH_AUTHUP	 _ROOT_PATH "/etc/ppp/auth-up"
+ #define _PATH_AUTHDOWN	 _ROOT_PATH "/etc/ppp/auth-down"
+ #define _PATH_TTYOPT	 _ROOT_PATH "/etc/ppp/options."
+-#define _PATH_CONNERRS	 _ROOT_PATH "/etc/ppp/connect-errors"
++#define _PATH_CONNERRS	 _ROOT_PATH "/var/log/ppp/connect-errors"
+ #define _PATH_PEERFILES	 _ROOT_PATH "/etc/ppp/peers/"
+-#define _PATH_RESOLV	 _ROOT_PATH "/etc/ppp/resolv.conf"
++#define _PATH_RESOLV	 _ROOT_PATH "/var/run/ppp/resolv.conf"
+ 
+ #define _PATH_USEROPT	 ".ppprc"
+ #define	_PATH_PSEUDONYM	 ".ppp_pseudonym"
+-- 
+1.8.3.1
+

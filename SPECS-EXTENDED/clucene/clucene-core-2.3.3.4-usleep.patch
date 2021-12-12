@@ -1,0 +1,11 @@
+diff -up clucene-core-2.3.3.4/src/test/search/TestIndexSearcher.cpp.usleep clucene-core-2.3.3.4/src/test/search/TestIndexSearcher.cpp
+--- clucene-core-2.3.3.4/src/test/search/TestIndexSearcher.cpp.usleep	2011-03-16 19:21:07.000000000 -0500
++++ clucene-core-2.3.3.4/src/test/search/TestIndexSearcher.cpp	2014-10-07 19:35:20.854480798 -0500
+@@ -4,6 +4,7 @@
+ * Distributable under the terms of either the Apache License (Version 2.0) or
+ * the GNU Lesser General Public License, as specified in the COPYING file.
+ ------------------------------------------------------------------------------*/
++#include <unistd.h>
+ #include "test.h"
+ 
+ DEFINE_MUTEX(searchMutex);

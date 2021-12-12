@@ -1,0 +1,16 @@
+--- t/10-basics.t
++++ t/10-basics.t
+@@ -7,7 +7,7 @@
+ use File::Slurp::Tiny qw/read_file read_lines write_file read_dir/;
+ use File::Temp qw/tempdir/;
+ 
+-use Test::More;
++use Test::More tests => 10;
+ 
+ my $content = do { local $/; open my $fh, '<:raw', $0; <$fh> };
+ is(read_file($0), $content, 'read_file() works');
+@@ -33,4 +33,3 @@
+ write_file($filename, $content, append => 1);
+ is(read_file($filename), $content x 2, 'write_file + readfile = noop');
+ 
+-done_testing;

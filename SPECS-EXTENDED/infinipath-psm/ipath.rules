@@ -1,0 +1,3 @@
+KERNEL=="ipath", MODE="0666"
+KERNEL=="ipath[0-9]*", MODE="0666"
+KERNEL=="ipath_*", MODE="0600"

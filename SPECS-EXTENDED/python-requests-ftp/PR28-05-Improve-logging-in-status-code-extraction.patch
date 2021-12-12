@@ -1,0 +1,28 @@
+diff -purN requests-ftp-0.3.1.orig/requests_ftp/ftp.py requests-ftp-0.3.1/requests_ftp/ftp.py
+--- requests-ftp-0.3.1.orig/requests_ftp/ftp.py	2018-08-02 10:15:20.491042199 -0400
++++ requests-ftp-0.3.1/requests_ftp/ftp.py	2018-08-02 10:16:16.588081626 -0400
+@@ -44,6 +44,7 @@ class FTPSession(requests.Session):
+         '''Sends an FTP SIZE. Returns a decimal number.'''
+         return self.request('SIZE', url, **kwargs)
+ 
++log = logging.getLogger(__name__)
+ 
+ def monkeypatch_session():
+     '''Monkeypatch Requests Sessions to provide all the helper
+@@ -135,10 +136,13 @@ def get_status_code_from_code_response(c
+     status_code_from_last_line = int(last_valid_line_from_code.split()[0])
+     status_code_from_first_digits = int(code[:3])
+     if status_code_from_last_line != status_code_from_first_digits:
+-        logging.warning(
++        log.warning(
+             'FTP response status code seems to be inconsistent.\n'
+-            'Code received: {0}, extracted: {1} and {2}'.format(
+-                code, status_code_from_last_line, status_code_from_first_digits))
++            'Code received: %s, extracted: %s and %s',
++            code,
++            status_code_from_last_line,
++            status_code_from_first_digits
++        )
+     return status_code_from_last_line
+ 
+ 

@@ -1,0 +1,12 @@
+diff -up cdparanoia-III-10.2/interface/interface.c.jx cdparanoia-III-10.2/interface/interface.c
+--- cdparanoia-III-10.2/interface/interface.c.jx	2009-02-10 14:25:02.000000000 -0500
++++ cdparanoia-III-10.2/interface/interface.c	2009-02-10 14:25:49.000000000 -0500
+@@ -115,7 +115,7 @@ long cdda_read_timed(cdrom_drive *d, voi
+ 
+       if(sectors>0){
+ 	/* byteswap? */
+-	if(d->bigendianp==-1) /* not determined yet */
++	if(buffer && d->bigendianp==-1) /* not determined yet */
+ 	  d->bigendianp=data_bigendianp(d);
+ 	
+ 	if(d->bigendianp!=bigendianp()){

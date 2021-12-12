@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "org.eclipse.sisu.inject-0.3.3.tar.xz": "b3485561cd3bfe874b70aa773fac0d2de9038c25b794ea21594b05b20c172ade",
+  "org.eclipse.sisu.plexus-0.3.3.tar.xz": "424bc833be5096407e6b6fb4dc93d3cbe503be0b78e40f0ef497570b4e8403b8",
+  "sisu-build.tar.xz": "9fe54646eba5cdd6c2ca57626b307a18740f0701fd89f10cb8337fd2e38e3c0f",
+  "sisu-inject.pom": "a45c5da9f97775eafb6408ce7e6864fa7930b5a6204576061c8e3ece25a29874",
+  "sisu-plexus.pom": "cbe9195214a692354d5a8b44aa66b3e5ee75a86f76850543eed6513e787336cf"
+ }
+}

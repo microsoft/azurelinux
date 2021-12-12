@@ -1,0 +1,15 @@
+diff --git a/pom.xml b/pom.xml
+index 4774e70..c7941b2 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -69,9 +69,8 @@
+               <id>default-compile</id>
+               <configuration>
+                 <jdkToolchain>
+-                  <version>9</version>
++                  <version>8</version>
+                 </jdkToolchain>
+-                <release>9</release>
+               </configuration>
+             </execution>
+             <execution>

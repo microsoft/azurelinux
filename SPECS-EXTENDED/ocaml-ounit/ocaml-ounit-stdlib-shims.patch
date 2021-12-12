@@ -1,0 +1,18 @@
+--- a/ounit2.opam
++++ b/ounit2.opam
+@@ -11,7 +11,6 @@ depends: [
+   "dune" {>= "1.11.0"}
+   "base-bytes"
+   "base-unix"
+-  "stdlib-shims"
+ ]
+ build: [
+   ["dune" "build" "-p" name "-j" jobs]
+--- a/src/lib/ounit2/advanced/dune
++++ b/src/lib/ounit2/advanced/dune
+@@ -7,4 +7,4 @@
+   (name oUnitAdvanced)
+   (public_name ounit2.advanced)
+   (wrapped false)
+-  (libraries unix bytes stdlib-shims))
++  (libraries unix bytes))

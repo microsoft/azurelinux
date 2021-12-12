@@ -1,0 +1,49 @@
+diff -up WordNet-3.0/include/Makefile.am.BAD WordNet-3.0/include/Makefile.am
+--- WordNet-3.0/include/Makefile.am.BAD	2009-02-18 13:59:09.000000000 -0500
++++ WordNet-3.0/include/Makefile.am	2009-02-18 13:59:12.000000000 -0500
+@@ -1,2 +1 @@
+ include_HEADERS = wn.h
+-SUBDIRS = tk
+diff -up WordNet-3.0/include/Makefile.in.BAD WordNet-3.0/include/Makefile.in
+--- WordNet-3.0/include/Makefile.in.BAD	2009-02-18 13:59:28.000000000 -0500
++++ WordNet-3.0/include/Makefile.in	2009-02-18 13:59:32.000000000 -0500
+@@ -147,7 +147,6 @@ sharedstatedir = @sharedstatedir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ include_HEADERS = wn.h
+-SUBDIRS = tk
+ all: all-recursive
+ 
+ .SUFFIXES:
+diff -up WordNet-3.0/configure.ac.BAD WordNet-3.0/configure.ac
+--- WordNet-3.0/configure.ac.BAD	2009-02-18 14:02:54.000000000 -0500
++++ WordNet-3.0/configure.ac	2009-02-18 14:03:15.000000000 -0500
+@@ -47,7 +47,7 @@ AC_DEFINE_UNQUOTED(DEFAULTPATH, ["$ac_pr
+ # This doesn't do anything
+ AC_CONFIG_COMMANDS([default])
+ 
+-AC_CONFIG_FILES(Makefile dict/Makefile doc/Makefile doc/html/Makefile doc/man/Makefile doc/pdf/Makefile doc/ps/Makefile include/Makefile include/tk/Makefile
++AC_CONFIG_FILES(Makefile dict/Makefile doc/Makefile doc/html/Makefile doc/man/Makefile doc/pdf/Makefile doc/ps/Makefile include/Makefile
+ src/Makefile lib/Makefile lib/wnres/Makefile)
+ 
+ AC_OUTPUT
+diff -up WordNet-3.0/configure.BAD WordNet-3.0/configure
+--- WordNet-3.0/configure.BAD	2009-02-18 14:02:35.000000000 -0500
++++ WordNet-3.0/configure	2009-02-18 14:02:45.000000000 -0500
+@@ -4296,7 +4296,7 @@ _ACEOF
+           ac_config_commands="$ac_config_commands default"
+ 
+ 
+-                                                                                                                        ac_config_files="$ac_config_files Makefile dict/Makefile doc/Makefile doc/html/Makefile doc/man/Makefile doc/pdf/Makefile doc/ps/Makefile include/Makefile include/tk/Makefile src/Makefile lib/Makefile lib/wnres/Makefile"
++                                                                                                                        ac_config_files="$ac_config_files Makefile dict/Makefile doc/Makefile doc/html/Makefile doc/man/Makefile doc/pdf/Makefile doc/ps/Makefile include/Makefile src/Makefile lib/Makefile lib/wnres/Makefile"
+ 
+ 
+ cat >confcache <<\_ACEOF
+@@ -4856,7 +4856,6 @@ do
+   "doc/pdf/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/pdf/Makefile" ;;
+   "doc/ps/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/ps/Makefile" ;;
+   "include/Makefile" ) CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
+-  "include/tk/Makefile" ) CONFIG_FILES="$CONFIG_FILES include/tk/Makefile" ;;
+   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
+   "lib/wnres/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/wnres/Makefile" ;;

@@ -1,0 +1,80 @@
+--- ./libindicator-12.10.1/libindicator/indicator-desktop-shortcuts.c.orig	2012-09-20 00:38:05.081903564 +0900
++++ ./libindicator-12.10.1/libindicator/indicator-desktop-shortcuts.c	2019-11-11 20:16:21.088761001 +0900
+@@ -61,7 +61,7 @@
+ };
+ 
+ #define INDICATOR_DESKTOP_SHORTCUTS_GET_PRIVATE(o) \
+-		(G_TYPE_INSTANCE_GET_PRIVATE ((o), INDICATOR_TYPE_DESKTOP_SHORTCUTS, IndicatorDesktopShortcutsPrivate))
++		(indicator_desktop_shortcuts_get_instance_private((IndicatorDesktopShortcuts *)o))
+ 
+ static void indicator_desktop_shortcuts_class_init (IndicatorDesktopShortcutsClass *klass);
+ static void indicator_desktop_shortcuts_init       (IndicatorDesktopShortcuts *self);
+@@ -72,7 +72,7 @@
+ static void parse_keyfile (IndicatorDesktopShortcuts * ids);
+ static gboolean should_show (GKeyFile * keyfile, const gchar * group, const gchar * identity, gboolean should_have_target);
+ 
+-G_DEFINE_TYPE (IndicatorDesktopShortcuts, indicator_desktop_shortcuts, G_TYPE_OBJECT);
++G_DEFINE_TYPE_WITH_PRIVATE (IndicatorDesktopShortcuts, indicator_desktop_shortcuts, G_TYPE_OBJECT);
+ 
+ /* Build up the class */
+ static void
+--- ./libindicator-12.10.1/libindicator/indicator-object.c.orig	2012-09-20 00:38:04.953839560 +0900
++++ ./libindicator-12.10.1/libindicator/indicator-object.c	2019-11-11 20:15:09.145806133 +0900
+@@ -117,7 +117,7 @@
+ static void indicator_object_entry_was_added     (IndicatorObject*, IndicatorObjectEntry*);
+ static IndicatorObjectEntryPrivate * entry_get_private (IndicatorObject*, IndicatorObjectEntry*);
+ 
+-G_DEFINE_TYPE (IndicatorObject, indicator_object, G_TYPE_OBJECT);
++G_DEFINE_TYPE_WITH_PRIVATE (IndicatorObject, indicator_object, G_TYPE_OBJECT);
+ 
+ /* Setup the class and put the functions into the
+    class structure */
+@@ -302,7 +302,7 @@
+ static void
+ indicator_object_init (IndicatorObject *self)
+ {
+-	IndicatorObjectPrivate * priv = G_TYPE_INSTANCE_GET_PRIVATE (self, INDICATOR_OBJECT_TYPE, IndicatorObjectPrivate);
++	IndicatorObjectPrivate * priv = indicator_object_get_instance_private(self);
+ 
+ 	priv->module = NULL;
+ 
+--- ./libindicator-12.10.1/libindicator/indicator-service-manager.c.orig	2012-09-20 00:38:05.057891563 +0900
++++ ./libindicator-12.10.1/libindicator/indicator-service-manager.c	2019-11-11 20:15:09.145806133 +0900
+@@ -89,7 +89,7 @@
+ 
+ /* GObject Stuff */
+ #define INDICATOR_SERVICE_MANAGER_GET_PRIVATE(o) \
+-(G_TYPE_INSTANCE_GET_PRIVATE ((o), INDICATOR_SERVICE_MANAGER_TYPE, IndicatorServiceManagerPrivate))
++(indicator_service_manager_get_instance_private((IndicatorServiceManager *)o))
+ 
+ static void indicator_service_manager_class_init (IndicatorServiceManagerClass *klass);
+ static void indicator_service_manager_init       (IndicatorServiceManager *self);
+@@ -105,7 +105,7 @@
+ static void service_proxy_cb (GObject * object, GAsyncResult * res, gpointer user_data);
+ static void service_proxy_name_changed (GDBusConnection * connection, const gchar * sender_name, const gchar * object_path, const gchar * interface_name, const gchar * signal_name, GVariant * parameters, gpointer user_data);
+ 
+-G_DEFINE_TYPE (IndicatorServiceManager, indicator_service_manager, G_TYPE_OBJECT);
++G_DEFINE_TYPE_WITH_PRIVATE (IndicatorServiceManager, indicator_service_manager, G_TYPE_OBJECT);
+ 
+ /* Build all of our signals and proxies and tie everything
+    all together.  Lovely. */
+--- ./libindicator-12.10.1/libindicator/indicator-service.c.orig	2012-09-20 00:38:05.009867562 +0900
++++ ./libindicator-12.10.1/libindicator/indicator-service.c	2019-11-11 20:15:09.145806133 +0900
+@@ -83,7 +83,7 @@
+ 
+ /* GObject Stuff */
+ #define INDICATOR_SERVICE_GET_PRIVATE(o) \
+-			(G_TYPE_INSTANCE_GET_PRIVATE ((o), INDICATOR_SERVICE_TYPE, IndicatorServicePrivate))
++			(indicator_service_get_instance_private((IndicatorService *)o))
+ 
+ static void indicator_service_class_init (IndicatorServiceClass *klass);
+ static void indicator_service_init       (IndicatorService *self);
+@@ -106,7 +106,7 @@
+ };
+ 
+ /* THE define */
+-G_DEFINE_TYPE (IndicatorService, indicator_service, G_TYPE_OBJECT);
++G_DEFINE_TYPE_WITH_PRIVATE (IndicatorService, indicator_service, G_TYPE_OBJECT);
+ 
+ static void
+ indicator_service_class_init (IndicatorServiceClass *klass)

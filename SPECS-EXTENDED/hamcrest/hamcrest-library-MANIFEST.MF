@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-Vendor: %providerName
+Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.hamcrest.library
+Require-Bundle: org.hamcrest.core;bundle-version="1.3.0"
+Bundle-Version: 1.3.0.v20090501071000
+Export-Package: org.hamcrest;version="1.3.0";library=split;mandatory:=
+ library,org.hamcrest.beans;version="1.3.0",org.hamcrest.collection;ve
+ rsion="1.3.0",org.hamcrest.number;version="1.3.0",org.hamcrest.object
+ ;version="1.3.0",org.hamcrest.text;version="1.3.0",org.hamcrest.xml;v
+ ersion="1.3.0"
+Bundle-ManifestVersion: 2

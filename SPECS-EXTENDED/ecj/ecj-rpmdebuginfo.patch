@@ -1,0 +1,39 @@
+### Eclipse Workspace Patch 1.0
+#P org.eclipse.jdt.core
+Index: batch/org/eclipse/jdt/internal/compiler/batch/Main.java
+===================================================================
+RCS file: /cvsroot/eclipse/org.eclipse.jdt.core/batch/org/eclipse/jdt/internal/compiler/batch/Main.java,v
+retrieving revision 1.327
+diff -u -r1.327 Main.java
+--- batch/org/eclipse/jdt/internal/compiler/batch/Main.java	21 Apr 2008 15:00:59 -0000	1.327
++++ batch/org/eclipse/jdt/internal/compiler/batch/Main.java	20 Nov 2008 19:26:57 -0000
+@@ -2609,6 +2609,29 @@
+ 		this.options.put(CompilerOptions.OPTION_Process_Annotations, CompilerOptions.ENABLED);
+ 	}
+ 
++	{
++		// If we're building an RPM, force full debugging info to
++		// be generated, no matter what options have been passed
++		// by Ant.  This is something of a kludge, but it is far
++		// better than the alternative, which is having class
++		// files with debug info mysteriously missing.
++
++		String RpmPackageName = System.getenv("RPM_PACKAGE_NAME");
++		String RpmArch = System.getenv("RPM_ARCH");
++		String RpmBuildRoot = System.getenv("RPM_BUILD_ROOT");
++		if (RpmPackageName != null && RpmArch != null && RpmBuildRoot != null) {
++			this.options.put(
++					CompilerOptions.OPTION_LocalVariableAttribute,
++					CompilerOptions.GENERATE);
++			this.options.put(
++					CompilerOptions.OPTION_LineNumberAttribute,
++					CompilerOptions.GENERATE);
++			this.options.put(
++					CompilerOptions.OPTION_SourceFileAttribute,
++					CompilerOptions.GENERATE);
++		}
++	}
++
+ 	this.logger.logCommandLineArguments(newCommandLineArgs);
+ 	this.logger.logOptions(this.options);
+ 

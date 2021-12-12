@@ -1,0 +1,21 @@
+diff -up fltk-1.3.4-1/fluid/Makefile.x-fluid_mimetype fltk-1.3.4-1/fluid/Makefile
+--- fltk-1.3.4-1/fluid/Makefile.x-fluid_mimetype	2016-07-17 14:51:54.000000000 -0500
++++ fltk-1.3.4-1/fluid/Makefile	2017-03-04 12:42:00.573346286 -0600
+@@ -84,7 +84,7 @@ install-linux:
+ 		$(INSTALL_DATA) icons/fluid-$$size.png $(DESTDIR)/usr/share/icons/hicolor/$${size}x$${size}/apps/fluid.png; \
+ 	done
+ 	-$(INSTALL_DIR) $(DESTDIR)/usr/share/mimelnk/application
+-	$(INSTALL_DATA) x-fluid.desktop  $(DESTDIR)/usr/share/mimelnk/application
++	#$(INSTALL_DATA) x-fluid.desktop  $(DESTDIR)/usr/share/mimelnk/application
+ 
+ install-osx:
+ 	echo Installing Fluid in $(DESTDIR)/Applications...
+@@ -104,7 +104,7 @@ uninstall:
+ uninstall-linux:
+ 	$(RM) $(DESTDIR)/usr/share/applications/fluid.desktop
+ 	$(RM) $(DESTDIR)/usr/share/icons/hicolor/*/fluid.png
+-	$(RM) $(DESTDIR)/usr/share/mimelnk/application/x-fluid.desktop
++	#$(RM) $(DESTDIR)/usr/share/mimelnk/application/x-fluid.desktop
+ 
+ uninstall-osx:
+ 	$(RM) -r $(DESTDIR)/Applications/fluid.app

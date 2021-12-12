@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "JDOM-2.0.6.tar.gz": "81790196ecbd9cf62cb2aa2a9c14153d74dae3a0364a9a262f42098c6d3c165d",
+  "jdom-contrib-template.pom": "9e5ecfb9c192db26ff5d63d7578ed41a71319e297a08534f1eecc58611cb4871",
+  "jdom-junit-template.pom": "0bb4bc72be67d0be327d78b29138c901f549236b72e49b1290b85ad954dced3e"
+ }
+}

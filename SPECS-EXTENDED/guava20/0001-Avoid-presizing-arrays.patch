@@ -1,0 +1,49 @@
+From c6497b79ee766206ba27c6b33391e1d5e572e662 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Wed, 2 May 2018 15:22:08 +0200
+Subject: [PATCH] Avoid presizing arrays
+
+Backported version of:
+https://github.com/google/guava/commit/f89ece5721b2f637fe754937ff1f3c86d80bb196
+
+Ignoring GWT, as we don't ship it. Using ArrayList, because
+ImmutableLongArray is not available.
+---
+ .../common/util/concurrent/AtomicDoubleArray.java     | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/guava/src/com/google/common/util/concurrent/AtomicDoubleArray.java b/guava/src/com/google/common/util/concurrent/AtomicDoubleArray.java
+index e939672..23a2535 100644
+--- a/guava/src/com/google/common/util/concurrent/AtomicDoubleArray.java
++++ b/guava/src/com/google/common/util/concurrent/AtomicDoubleArray.java
+@@ -17,7 +17,10 @@ import static java.lang.Double.doubleToRawLongBits;
+ import static java.lang.Double.longBitsToDouble;
+ 
+ import com.google.common.annotations.GwtIncompatible;
++import com.google.common.primitives.Longs;
+ import com.google.errorprone.annotations.CanIgnoreReturnValue;
++import java.util.ArrayList;
++import java.util.List;
+ import java.util.concurrent.atomic.AtomicLongArray;
+ 
+ /**
+@@ -261,13 +264,11 @@ public class AtomicDoubleArray implements java.io.Serializable {
+       throws java.io.IOException, ClassNotFoundException {
+     s.defaultReadObject();
+ 
+-    // Read in array length and allocate array
+     int length = s.readInt();
+-    this.longs = new AtomicLongArray(length);
+-
+-    // Read in all elements in the proper order.
++    List<Long> builder = new ArrayList<Long>();
+     for (int i = 0; i < length; i++) {
+-      set(i, s.readDouble());
++      builder.add(doubleToRawLongBits(s.readDouble()));
+     }
++    this.longs = new AtomicLongArray(Longs.toArray(builder));
+   }
+ }
+-- 
+2.17.0
+
