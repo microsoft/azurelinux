@@ -23,10 +23,10 @@ for doing rougly the same job is provided.
 %patch0 -p1 -b .timestamps
 
 %build
-%make_build
+%make_build PREFIX=%{_prefix}
 
 %install
-%make_install
+%make_install PREFIX=%{_prefix}
 mkdir -p %{buildroot}%{_mandir}/man1
 cp -p *.1 %{buildroot}%{_mandir}/man1
 
@@ -42,6 +42,7 @@ cp -p *.1 %{buildroot}%{_mandir}/man1
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.4-23
 - License verified
 - Lint spec
+- Specify prefix dir
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

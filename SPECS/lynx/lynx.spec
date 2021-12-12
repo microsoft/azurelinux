@@ -50,7 +50,10 @@ based and therefore makes it possible to use WWW resources on text
 terminals.
 
 %prep
-%autosetup -n %{name}%{tarbase}
+%setup -q -n %{name}%{tarbase}
+%patch0
+%patch1
+%patch3 -p1
 
 %build
 %configure --enable-debug --with-build-cflags="%{optflags} -DNO_BUILDSTAMP" \
