@@ -24,8 +24,8 @@ ca-certificates-shared-20200720-20.cm2.noarch.rpm
 ca-certificates-tools-20200720-20.cm2.noarch.rpm
 check-0.15.2-1.cm2.x86_64.rpm
 check-debuginfo-0.15.2-1.cm2.x86_64.rpm
-cmake-3.21.4-1.cm2.x86_64.rpm
-cmake-debuginfo-3.21.4-1.cm2.x86_64.rpm
+cmake-3.21.4-2.cm2.x86_64.rpm
+cmake-debuginfo-3.21.4-2.cm2.x86_64.rpm
 coreutils-8.32-1.cm2.x86_64.rpm
 coreutils-debuginfo-8.32-1.cm2.x86_64.rpm
 coreutils-lang-8.32-1.cm2.x86_64.rpm
