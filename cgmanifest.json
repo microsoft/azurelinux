@@ -2291,7 +2291,7 @@
         "other": {
           "name": "gtk2",
           "version": "2.24.32",
-          "downloadUrl": "http://download.gnome.org/sources/gtk+/2.24/gtk+-2.24.32.tar.xz"
+          "downloadUrl": "https://download.gnome.org/sources/gtk+/2.24/gtk+-2.24.32.tar.xz"
         }
       }
     },

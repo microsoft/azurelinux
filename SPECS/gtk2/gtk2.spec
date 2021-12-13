@@ -20,7 +20,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.gtk.org
-Source0:        http://download.gnome.org/sources/gtk+/2.24/gtk+-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/gtk+/2.24/gtk+-%{version}.tar.xz
 Source2:        update-gtk-immodules
 Source3:        im-cedilla.conf
 Source4:        update-gtk-immodules.1
