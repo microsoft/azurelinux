@@ -1,0 +1,20 @@
+Remove warnings found by lintian
+Last-Update: 2011-01-09
+Index: wvdial-1.61/pon.wvdial.1
+===================================================================
+--- wvdial-1.61.orig/pon.wvdial.1	2011-01-09 21:33:03.000000000 +0300
++++ wvdial-1.61/pon.wvdial.1	2011-01-09 21:33:15.000000000 +0300
+@@ -8,13 +8,11 @@
+ .SH DESCRIPTION
+ .B pon.wvdial
+ .br
+-.TR
+ .B poff.wvdial
+ .br
+ .RS
+ Replacement scripts for pon and poff.
+ .RE
+-\."
+ .SH SEE ALSO
+ .BR wvdial (1),
+ .BR pon (1),

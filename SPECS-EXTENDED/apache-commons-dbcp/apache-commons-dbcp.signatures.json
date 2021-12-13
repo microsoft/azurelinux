@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "commons-dbcp2-2.1.1-src.tar.gz": "0c509e55713ff23f0c2a93c399af6fc916d287a6b060cd6d1c98b6974dff361c",
+  "commons-dbcp2-2.1.1-src.tar.gz.asc": "52ba2a8d1a47273e43a282b7fd26947fcb8579bf2503b25f496e3e21e207a27f",
+  "commons.keyring": "f9bccd7e80aa2e7e74e717e671325b4792ae7174ff3bf316802af0f5ee5429b0"
+ }
+}

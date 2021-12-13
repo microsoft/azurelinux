@@ -1,0 +1,16 @@
+[Unit]
+Description=NIS/YP (Network Information Service) Users Passwords Change Server
+Requires=rpcbind.service
+After=syslog.target network.target rpcbind.service
+
+[Service]
+Type=notify
+NotifyAccess=all
+EnvironmentFile=-/etc/sysconfig/network
+EnvironmentFile=-/etc/sysconfig/yppasswdd
+ExecStartPre=/usr/libexec/yppasswdd-pre-setdomain
+ExecStart=/usr/libexec/rpc.yppasswdd.env
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,26 @@
+--- gpm-1.20.1/src/lib/libcurses.c.weak-wgetch	2002-12-24 17:57:16.000000000 -0500
++++ gpm-1.20.1/src/lib/libcurses.c	2004-03-22 15:51:24.000000000 -0500
+@@ -41,7 +41,12 @@
+ #endif /* HAVE_NCURSES_CURSES_H */
+ #endif /* HAVE_NCURSES_H */
+ 
+-#define GET(win) ((win) ? wgetch(win) : getch())
++/* If win != NULL, it must have been created by ncurses anyway.
++   Avoid circular library dependencies.  */
++#pragma weak wgetch
++#pragma weak stdscr
++
++#define GET(win) ((win && wgetch) ? wgetch(win) : getch())
+ 
+ int Gpm_Wgetch(WINDOW *win)
+ {
+--- gpm-1.20.1/configure.ac.weak-wgetch	2004-03-22 15:49:51.000000000 -0500
++++ gpm-1.20.1/configure.ac.footer	2004-03-22 15:51:24.000000000 -0500
+@@ -115,7 +115,7 @@
+             AC_CHECK_LIB($i, wgetch,,,$TERMLIBS)
+         else :; fi
+     done
+-    SHARED_LIBS="$LIBS $TERMLIBS -lc"
++    SHARED_LIBS="-lc"
+     LIBS=$SAVELIBS ;;
+ esac    

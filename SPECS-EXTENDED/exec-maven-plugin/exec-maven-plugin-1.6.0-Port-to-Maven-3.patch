@@ -1,0 +1,56 @@
+From 53f761ccbe3411dbbe430d3af93ad4502d09fe10 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 20 Sep 2018 15:28:48 +0200
+Subject: [PATCH] Port to Maven 3
+
+---
+ src/main/java/org/codehaus/mojo/exec/ExecJavaMojo.java     | 4 ++--
+ src/test/java/org/codehaus/mojo/exec/ExecJavaMojoTest.java | 2 +-
+ src/test/java/org/codehaus/mojo/exec/ExecMojoTest.java     | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/main/java/org/codehaus/mojo/exec/ExecJavaMojo.java b/src/main/java/org/codehaus/mojo/exec/ExecJavaMojo.java
+index 4746aa2..f9a93ad 100644
+--- a/src/main/java/org/codehaus/mojo/exec/ExecJavaMojo.java
++++ b/src/main/java/org/codehaus/mojo/exec/ExecJavaMojo.java
+@@ -704,9 +704,9 @@ public class ExecJavaMojo
+             // resolve all dependencies transitively to obtain a comprehensive list of assemblies
+             ArtifactResolutionResult result =
+                 artifactResolver.resolveTransitively( dependencyArtifacts, executablePomArtifact,
+-                                                      Collections.emptyMap(), this.localRepository,
++                                                      (java.util.Map) Collections.emptyMap(), this.localRepository,
+                                                       this.remoteRepositories, metadataSource, null,
+-                                                      Collections.emptyList() );
++                                                      (java.util.List) Collections.emptyList() );
+             executableDependencies = result.getArtifacts();
+         }
+         catch ( Exception ex )
+diff --git a/src/test/java/org/codehaus/mojo/exec/ExecJavaMojoTest.java b/src/test/java/org/codehaus/mojo/exec/ExecJavaMojoTest.java
+index 0e5afbb..4894bb3 100644
+--- a/src/test/java/org/codehaus/mojo/exec/ExecJavaMojoTest.java
++++ b/src/test/java/org/codehaus/mojo/exec/ExecJavaMojoTest.java
+@@ -277,7 +277,7 @@ public class ExecJavaMojoTest
+     private void setUpProject( File pomFile, AbstractMojo mojo )
+         throws Exception
+     {
+-        MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
++        MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.class );
+ 
+         ArtifactRepositoryLayout localRepositoryLayout =
+             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
+diff --git a/src/test/java/org/codehaus/mojo/exec/ExecMojoTest.java b/src/test/java/org/codehaus/mojo/exec/ExecMojoTest.java
+index 2821954..29c274c 100644
+--- a/src/test/java/org/codehaus/mojo/exec/ExecMojoTest.java
++++ b/src/test/java/org/codehaus/mojo/exec/ExecMojoTest.java
+@@ -233,7 +233,7 @@ public class ExecMojoTest
+     private void setUpProject( File pomFile, ExecMojo mojo )
+         throws Exception
+     {
+-        MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
++        MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.class );
+ 
+         ArtifactRepositoryLayout localRepositoryLayout =
+             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
+-- 
+2.17.1
+

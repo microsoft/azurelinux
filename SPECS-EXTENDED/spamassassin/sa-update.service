@@ -1,0 +1,28 @@
+### Spamassassin Rules Updates ###
+#
+# http://wiki.apache.org/spamassassin/RuleUpdates
+# 
+# sa-update automatically updates your rules once per day if a spam daemon like
+# spamd or amavisd are running.
+
+[Unit]
+Description=Spamassassin Rules Update
+Documentation=man:sa-update(1)
+
+[Service]
+# Note that the opposite of "yes" is the empty string, NOT "no"
+# Options for the actual sa-update command
+# These are added to the channel configuration from 
+# /etc/mail/spamassassin/channel.d/*.conf
+Environment=OPTIONS=-v
+
+# Debug script - send mail even if no update available
+#Environment=DEBUG=yes
+
+# Send mail when updates successfully processed
+# Default: send mail only on error
+#Environment=NOTIFY_UPD=yes
+
+ExecStart=/usr/share/spamassassin/sa-update.cron
+
+SuccessExitStatus=1

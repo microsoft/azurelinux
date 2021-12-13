@@ -1,0 +1,78 @@
+From fbf080cb5ca92f35a594967bdd3764c7dbb8c7f7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 1 Sep 2014 17:37:12 +0200
+Subject: [PATCH] Parse /etc/localtime by DateTime::TimeZone::Tzfile
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If there is valid /etc/localtime, then the system has configured local
+time. If the file is not a symlink to /usr/share/zoneinfo or a copy
+from there, then it's still a valid configuration. The only issue is
+one cannot know the time zone name (Unfortunately, the time zone
+abbreviations are ambiguous.)
+
+This patch implements this scenario and caused returning
+ a DateTime::TimeZone::Tzfile object instead of dying with
+"Cannot determine local time zone" message.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/DateTime/TimeZone/Local/Unix.pm | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/lib/DateTime/TimeZone/Local/Unix.pm b/lib/DateTime/TimeZone/Local/Unix.pm
+index ae26fae..c5d44fe 100644
+--- a/lib/DateTime/TimeZone/Local/Unix.pm
++++ b/lib/DateTime/TimeZone/Local/Unix.pm
+@@ -19,6 +19,7 @@ sub Methods {
+         FromEtcTIMEZONE
+         FromEtcSysconfigClock
+         FromEtcDefaultInit
++        FromEtcLocaltimeContent
+     );
+ }
+ 
+@@ -267,6 +268,25 @@ sub _ReadEtcDefaultInit {
+     close $fh or die $!;
+ }
+ 
++sub FromEtcLocaltimeContent {
++    my $class = shift;
++
++    my $lt_file = $class->_EtcFile('localtime');
++    return unless -r $lt_file && -s $lt_file && ! -l $lt_file;
++
++    my $tz;
++    {
++        local $@;
++        local $SIG{__DIE__};
++        $tz = eval {
++            require DateTime::TimeZone::Tzfile;
++            DateTime::TimeZone::Tzfile->new($lt_file);
++        };
++    }
++
++    return $tz if $tz;
++}
++
+ 1;
+ 
+ # ABSTRACT: Determine the local system's time zone on Unix
+@@ -341,6 +361,13 @@ a time zone name.
+ If this file exists, it is opened and we look for a line starting like
+ "TZ=...". If this is found, it should indicate a time zone name.
+ 
++=item * F</etc/localtime> content
++
++If this file is not a symlink, it's parsed by
++a L<DateTime::TimeZone::Tzfile> to retrieve the time zone offset
++definition. No time zone name will be defined. This is usefull if the
++file does not present in the system time zone database.
++
+ =back
+ 
+ B<Note:> Some systems such as virtual machine boxes may lack any of these
+-- 
+1.9.3
+

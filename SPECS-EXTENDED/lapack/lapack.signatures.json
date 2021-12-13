@@ -1,0 +1,11 @@
+{
+ "Signatures": {
+  "Makefile.blas": "97cf3941a28f49b6abdc49fca17566f194f781aed09b3d0b7e08e0ae4a33fdd1",
+  "Makefile.cblas": "78044928becd7984a3fc43879e008877c9ba89eec3e5d34301913fecfef66d26",
+  "Makefile.lapack": "5c6c6c117c5b0c38015b5380d120a6332d5609ae507b5c403acacd5dc34db341",
+  "blasqr.ps": "4fdeb1e649b0dc244ae1331efdc7a2b32a3f0011205d05e64129c304638fba8c",
+  "lapack-3.9.0.tar.gz": "106087f1bb5f46afdfba7f569d0cbe23dacb9a07cd24733765a0e89dbe1ad573",
+  "lapackqref.ps": "fafadde0c1804cc0ab6d9435d41239745d8e265299773ede827c82596bbcef4b",
+  "manpages.tgz": "229a6ba579ef6e41fbae32a8ee9e9e5a620b3b51bd244666e386c95c7b9c6083"
+ }
+}

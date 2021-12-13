@@ -1,0 +1,12 @@
+diff -up lapack-3.5.0/LAPACKE/src/Makefile.matgenobj lapack-3.5.0/LAPACKE/src/Makefile
+--- lapack-3.5.0/LAPACKE/src/Makefile.matgenobj	2014-06-17 13:21:30.336206692 -0400
++++ lapack-3.5.0/LAPACKE/src/Makefile	2014-06-17 13:22:31.701885152 -0400
+@@ -2061,7 +2061,7 @@ lapacke_slagsy_work.o \
+ lapacke_zlagsy.o \
+ lapacke_zlagsy_work.o
+ 
+-ALLOBJ = $(SRC_OBJ) 
++ALLOBJ = $(SRC_OBJ) $(MATGEN_OBJ)
+ 
+ ifdef USEXBLAS
+ ALLXOBJ = $(SXLASRC) $(DXLASRC) $(CXLASRC) $(ZXLASRC)

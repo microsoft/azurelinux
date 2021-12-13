@@ -1,0 +1,123 @@
+From d7a2d969b55ab34a223ad1422b2e3ef7d95a347f Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Mon, 5 Nov 2018 09:59:04 +0100
+Subject: [PATCH] Port to osgi-cmpn
+
+---
+ .../utils/repository/AggregateRepository.java | 20 +++++++++++++++++++
+ .../utils/repository/BaseRepository.java      | 19 ++++++++++++++++++
+ .../utils/properties/MockBundleContext.java   | 10 ++++++++++
+ 3 files changed, 49 insertions(+)
+
+diff --git a/src/main/java/org/apache/felix/utils/repository/AggregateRepository.java b/src/main/java/org/apache/felix/utils/repository/AggregateRepository.java
+index 50dceaf..4da3141 100644
+--- a/src/main/java/org/apache/felix/utils/repository/AggregateRepository.java
++++ b/src/main/java/org/apache/felix/utils/repository/AggregateRepository.java
+@@ -25,7 +25,12 @@ import java.util.Map;
+ 
+ import org.osgi.resource.Capability;
+ import org.osgi.resource.Requirement;
++import org.osgi.resource.Resource;
++import org.osgi.service.repository.ExpressionCombiner;
+ import org.osgi.service.repository.Repository;
++import org.osgi.service.repository.RequirementBuilder;
++import org.osgi.service.repository.RequirementExpression;
++import org.osgi.util.promise.Promise;
+ 
+ public class AggregateRepository implements Repository {
+ 
+@@ -52,4 +57,19 @@ public class AggregateRepository implements Repository {
+         }
+         return result;
+     }
++
++	@Override
++	public Promise<Collection<Resource>> findProviders(RequirementExpression expression) {
++		throw new UnsupportedOperationException();
++	}
++
++	@Override
++	public ExpressionCombiner getExpressionCombiner() {
++		throw new UnsupportedOperationException();
++	}
++
++	@Override
++	public RequirementBuilder newRequirementBuilder(String namespace) {
++		throw new UnsupportedOperationException();
++	}
+ }
+diff --git a/src/main/java/org/apache/felix/utils/repository/BaseRepository.java b/src/main/java/org/apache/felix/utils/repository/BaseRepository.java
+index 95adadd..0998ab0 100644
+--- a/src/main/java/org/apache/felix/utils/repository/BaseRepository.java
++++ b/src/main/java/org/apache/felix/utils/repository/BaseRepository.java
+@@ -30,7 +30,11 @@ import org.osgi.framework.Constants;
+ import org.osgi.resource.Capability;
+ import org.osgi.resource.Requirement;
+ import org.osgi.resource.Resource;
++import org.osgi.service.repository.ExpressionCombiner;
+ import org.osgi.service.repository.Repository;
++import org.osgi.service.repository.RequirementBuilder;
++import org.osgi.service.repository.RequirementExpression;
++import org.osgi.util.promise.Promise;
+ 
+ /**
+  */
+@@ -90,4 +94,19 @@ public class BaseRepository implements Repository {
+         }
+         return result;
+     }
++
++	@Override
++	public Promise<Collection<Resource>> findProviders(RequirementExpression expression) {
++		throw new UnsupportedOperationException();
++	}
++
++	@Override
++	public ExpressionCombiner getExpressionCombiner() {
++		throw new UnsupportedOperationException();
++	}
++
++	@Override
++	public RequirementBuilder newRequirementBuilder(String namespace) {
++		throw new UnsupportedOperationException();
++	}
+ }
+diff --git a/src/test/java/org/apache/felix/utils/properties/MockBundleContext.java b/src/test/java/org/apache/felix/utils/properties/MockBundleContext.java
+index 3eab444..df94a6c 100644
+--- a/src/test/java/org/apache/felix/utils/properties/MockBundleContext.java
++++ b/src/test/java/org/apache/felix/utils/properties/MockBundleContext.java
+@@ -25,7 +25,9 @@ import org.osgi.framework.BundleListener;
+ import org.osgi.framework.Filter;
+ import org.osgi.framework.FrameworkListener;
+ import org.osgi.framework.InvalidSyntaxException;
++import org.osgi.framework.ServiceFactory;
+ import org.osgi.framework.ServiceListener;
++import org.osgi.framework.ServiceObjects;
+ import org.osgi.framework.ServiceReference;
+ import org.osgi.framework.ServiceRegistration;
+ 
+@@ -105,6 +107,10 @@ public class MockBundleContext implements BundleContext {
+         throw new UnsupportedOperationException();
+     }
+ 
++    public <S> ServiceRegistration<S> registerService(Class<S> clazz, ServiceFactory<S> factory, Dictionary<String, ?> properties) {
++        throw new UnsupportedOperationException();
++    }
++
+     public ServiceReference[] getServiceReferences(String s, String s1) throws InvalidSyntaxException {
+         throw new UnsupportedOperationException();
+     }
+@@ -125,6 +131,10 @@ public class MockBundleContext implements BundleContext {
+         throw new UnsupportedOperationException();
+     }
+ 
++	public <S> ServiceObjects<S> getServiceObjects(ServiceReference<S> reference) {
++	    throw new UnsupportedOperationException();
++	}
++
+     public File getDataFile(String s) {
+         throw new UnsupportedOperationException();
+     }
+-- 
+2.17.2
+

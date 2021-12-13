@@ -1,0 +1,76 @@
+From 67a0dbf6434552e720b0d311597553b3a76f779e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 23 Aug 2011 13:45:15 +0200
+Subject: [PATCH] warnquota configuration tunes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Rest of changes (378a64006bb1e818e84a1c77808563b802b028fa) not
+accepted by upstream (we had root@... addresses and more enterprise
+wordings usually there).
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ warnquota.c    |  2 +-
+ warnquota.conf | 17 ++++++++---------
+ 2 files changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/warnquota.c b/warnquota.c
+index 0d911e4..2c8e084 100644
+--- a/warnquota.c
++++ b/warnquota.c
+@@ -837,7 +837,7 @@ cc_parse_err:
+ 			}
+ #ifdef USE_LDAP_MAIL_LOOKUP
+ 			else if (!strcmp(var, "LDAP_MAIL")) {
+-				if(strcasecmp(value, "true") == 0) 
++				if(strncasecmp(value, "true", 4) == 0)
+ 					config->use_ldap_mail = 1;
+ 				else
+ 					config->use_ldap_mail = 0;
+diff --git a/warnquota.conf b/warnquota.conf
+index b06f81f..7e00947 100644
+--- a/warnquota.conf
++++ b/warnquota.conf
+@@ -4,17 +4,16 @@
+ # and even blank lines
+ 
+ # values can be quoted:
+-#MAIL_CMD 	= "/usr/my/sendmail/instead/sendmail -t"
+-MAIL_CMD 	= "/bin/echo"
+-FROM 		= "bas@example.com"
++MAIL_CMD 	= "/usr/sbin/sendmail -t"
++FROM 		= "root@example.com"
+ # but they don't have to be:
+-SUBJECT 	= Hey, user, clean up your account!
+-CC_TO 		= "sysadm@example.com"
++SUBJECT 	= NOTE: You are exceeding your allocated disk space limits
++CC_TO 		= "root@example.com"
+ # If you set this variable CC will be used only when user has less than
+ # specified grace time left (examples of possible times: 5 seconds, 1 minute,
+ # 12 hours, 5 days)
+ # CC_BEFORE = 2 days
+-SUPPORT 	= "support@example.com"
++SUPPORT 	= "root@example.com"
+ PHONE 		= "(123) 456-1111 or (222) 333-4444"
+ # Text in the beginning of the mail (if not specified, default text is used)
+ # This way text can be split to more lines
+@@ -22,11 +21,11 @@ PHONE 		= "(123) 456-1111 or (222) 333-4444"
+ # The expressions %i, %h, %d, and %% are substituted for user/group name,
+ # host name, domain name, and '%' respectively. For backward compatibility
+ # %s behaves as %i but is deprecated.
+-MESSAGE         = Hello user %i, I've noticed you use too much space\
+- on my disk in %h.%d.|Delete your files on the following filesystems:|
++MESSAGE         = Your disk usage has exceeded the agreed limits\
++ on this server|Please delete any unnecessary files on following filesystems:|
+ # Text in the end of the mail (if not specified, default text using SUPPORT and PHONE
+ # is created)
+-SIGNATURE	= See you!|			Your admin of %h|
++SIGNATURE	= root@example.com
+ # Following text is used for mails about group exceeding quotas
+ GROUP_MESSAGE	= Hello,|\
+ your group %i is using too much disk space at %h.|\
+-- 
+2.13.5
+

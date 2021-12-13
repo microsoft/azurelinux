@@ -1,8 +1,8 @@
 {
  "Signatures": {
   "50-security-hardening.conf": "c9fc6624a3178cc0980ec3495ac2d5f02a8a1f3a4cdadb8770628d7394b92e2c",
-  "99-dhcp-en.network": "583c94adfa9821a06b28c5c6d0a0cb4c9c5805cf9e66e4e5beff359202668497",
-  "systemd-239.tar.gz": "8a11b1b07d620f4c06a16e95bba4dd2a97e90efdf2a5ba47ed0a935085787a14",
-  "systemd.cfg": "058b3f9c3ac85610c1e3629f63d80f5570cf716b90c2dd0caaf14b1be67aff51"
+  "99-dhcp-en.network": "158c0003826cef9d780799c6edb2814800d4518f85f884710550f4c46d14be67",
+  "systemd-249.7.tar.gz": "5dbf457431bb16e5dfc957200731ad302fe3ae4919470bc34b8224428e1addbb",
+  "systemd.cfg": "1fd673c1da90560d9395a18df31f2ce6ef23972a6bf8c910ba6f3fb07818afa9"
  }
 }

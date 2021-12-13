@@ -1,0 +1,8 @@
+--- make_data.pl
++++ make_data.pl
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/perl5.10.0
++#!/usr/bin/perl
+ use 5.010;
+ 
+ use strict;

@@ -1,0 +1,33 @@
+From 16116095d5a11c5134e0696398a9908dafc415bc Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Mon, 9 Sep 2019 17:18:08 -0500
+Subject: [PATCH] libmultipath: EMC PowerMax NVMe device config
+
+Got this config from Dell.
+
+Cc: heyi <yi.he@dell.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/hwtable.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/libmultipath/hwtable.c b/libmultipath/hwtable.c
+index 96e8b25d..ca217e65 100644
+--- a/libmultipath/hwtable.c
++++ b/libmultipath/hwtable.c
+@@ -360,6 +360,12 @@ static struct hwentry default_hw[] = {
+ 		.pgfailback    = -FAILBACK_IMMEDIATE,
+ 		.no_path_retry = 30,
+ 	},
++	{
++		/* EMC PowerMax NVMe */
++		.vendor        = "NVME",
++		.product       = "^EMC PowerMax_",
++		.pgpolicy      = MULTIBUS,
++	},
+ 	/*
+ 	 * Fujitsu
+ 	 */
+-- 
+2.17.2
+

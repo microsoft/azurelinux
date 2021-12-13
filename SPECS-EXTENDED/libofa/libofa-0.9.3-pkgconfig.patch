@@ -1,0 +1,11 @@
+--- libofa-0.9.3/libofa.pc.in.pkgconfig	2006-05-10 12:58:51.000000000 -0500
++++ libofa-0.9.3/libofa.pc.in	2006-09-14 08:36:12.000000000 -0500
+@@ -7,6 +7,6 @@
+ Description: The Open Fingerprint Architecture Library
+ URL: http://www.musicdns.org/
+ Version: @VERSION@
+-Requires: fftw3
+-Libs: -L${libdir} -lofa -lexpat -lm
++Libs: -L${libdir} -lofa
++Libs.private: -lfftw -lm
+ Cflags: -I${includedir}

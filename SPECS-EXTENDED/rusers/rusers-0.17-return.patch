@@ -1,0 +1,54 @@
+--- netkit-rusers-0.17/rup/rup.c.orig	2006-02-07 14:26:47.423011784 +0530
++++ netkit-rusers-0.17/rup/rup.c	2006-02-07 14:41:22.035029176 +0530
+@@ -242,7 +242,7 @@
+ }
+ 
+ static
+-void
++int
+ onehost(const char *host)
+ {
+ 	CLIENT *rstat_clnt;
+@@ -251,7 +251,7 @@
+ 	rstat_clnt = clnt_create(host, RSTATPROG, RSTATVERS_TIME, "udp");
+ 	if (rstat_clnt == NULL) {
+ 		warnx("%s", clnt_spcreateerror(host));
+-		return;
++		return 1;
+ 	}
+ 
+ 	memset(&remote_host_stat, 0, sizeof(remote_host_stat));
+@@ -263,7 +263,7 @@
+ 		      timeout) != RPC_SUCCESS) 
+ 	{
+ 		warnx("%s",  clnt_sperror(rstat_clnt, host));
+-		return;
++		return 1;
+ 	}
+ 
+ 	if (sort_type != SORT_NONE) {
+@@ -272,19 +272,23 @@
+ 		print_rup_data(host, &remote_host_stat);
+ 	}
+ 	clnt_destroy(rstat_clnt);
++	return 0;
+ }
+ 
+ static
+ void
+ enumhosts(int argc, char *argv[], int optind)
+ {
++	int returnval = 0;
+ 	if (sort_type != SORT_NONE) {
+ 		printf("collecting responses...");
+ 		fflush(stdout);
+ 	}
+ 
+ 	for (; optind < argc; optind++)
+-		onehost(argv[optind]);
++		returnval += onehost(argv[optind]);
++
++	if (returnval) exit(1);
+ 
+ 	if (sort_type != SORT_NONE) {
+ 		int i;

@@ -1,0 +1,118 @@
+--- jarjar-1.4/src/main/com/tonicsystems/jarjar/DepFindVisitor.java	2012-07-02 13:19:28.000000000 +0200
++++ jarjar-1.4/src/main/com/tonicsystems/jarjar/DepFindVisitor.java	2018-11-20 09:17:27.549974497 +0100
+@@ -25,7 +25,7 @@
+ import org.objectweb.asm.Type;
+ import org.objectweb.asm.commons.*;
+ 
+-class DepFindVisitor extends RemappingClassAdapter
++class DepFindVisitor extends ClassRemapper
+ {
+     public DepFindVisitor(Map<String, String> classes, String source, DepHandler handler) throws IOException {
+         super(null, new DepFindRemapper(classes, source, handler));
+--- jarjar-1.4/src/main/com/tonicsystems/jarjar/EmptyClassVisitor.java	2012-07-02 13:19:28.000000000 +0200
++++ jarjar-1.4/src/main/com/tonicsystems/jarjar/EmptyClassVisitor.java	2018-11-20 09:17:27.549974497 +0100
+@@ -28,23 +28,23 @@
+ public class EmptyClassVisitor extends ClassVisitor {
+ 
+     public EmptyClassVisitor() {
+-        super(Opcodes.ASM4);
++        super(Opcodes.ASM5);
+     }
+     
+     @Override
+     public MethodVisitor visitMethod(int access, String name, String desc,
+             String signature, String[] exceptions) {
+-        return new MethodVisitor(Opcodes.ASM4) {};
++        return new MethodVisitor(Opcodes.ASM5) {};
+     }
+     
+     @Override
+     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+-        return new AnnotationVisitor(Opcodes.ASM4) {};
++        return new AnnotationVisitor(Opcodes.ASM5) {};
+     }
+     
+     @Override
+     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+-        return new FieldVisitor(Opcodes.ASM4) {};
++        return new FieldVisitor(Opcodes.ASM5) {};
+     }
+ 
+ }
+--- jarjar-1.4/src/main/com/tonicsystems/jarjar/KeepProcessor.java	2012-07-02 13:22:34.000000000 +0200
++++ jarjar-1.4/src/main/com/tonicsystems/jarjar/KeepProcessor.java	2018-11-20 09:17:27.549974497 +0100
+@@ -26,7 +26,7 @@
+ // TODO: this can probably be refactored into JarClassVisitor, etc.
+ class KeepProcessor extends Remapper implements JarProcessor
+ {
+-    private final ClassVisitor cv = new RemappingClassAdapter(new EmptyClassVisitor(), this);
++    private final ClassVisitor cv = new ClassRemapper(new EmptyClassVisitor(), this);
+     private final List<Wildcard> wildcards;
+     private final List<String> roots = new ArrayList<String>();
+     private final Map<String, Set<String>> depend = new HashMap<String, Set<String>>();
+--- jarjar-1.4/src/main/com/tonicsystems/jarjar/StringReader.java	2012-07-02 13:19:28.000000000 +0200
++++ jarjar-1.4/src/main/com/tonicsystems/jarjar/StringReader.java	2018-11-20 09:17:27.549974497 +0100
+@@ -24,7 +24,7 @@
+     private String className;
+ 
+     public StringReader() {
+-        super(Opcodes.ASM4);
++        super(Opcodes.ASM5);
+     }
+     
+     abstract public void visitString(String className, String value, int line);
+@@ -42,7 +42,7 @@
+ 
+     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+         handleObject(value);
+-        return new FieldVisitor(Opcodes.ASM4){
++        return new FieldVisitor(Opcodes.ASM5){
+             @Override
+             public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+                 return StringReader.this.visitAnnotation(desc, visible);
+@@ -52,7 +52,7 @@
+     
+     @Override
+     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+-        return new AnnotationVisitor(Opcodes.ASM4) {
++        return new AnnotationVisitor(Opcodes.ASM5) {
+             @Override
+             public void visit(String name, Object value) {
+                 handleObject(value);
+@@ -71,7 +71,7 @@
+     @Override
+     public MethodVisitor visitMethod(int access, String name, String desc,
+             String signature, String[] exceptions) {
+-        MethodVisitor mv = new MethodVisitor(Opcodes.ASM4){
++        MethodVisitor mv = new MethodVisitor(Opcodes.ASM5){
+             @Override
+             public void visitLdcInsn(Object cst) {
+                 handleObject(cst);
+--- jarjar-1.4/src/main/com/tonicsystems/jarjar/util/GetNameClassWriter.java	2012-07-02 13:19:28.000000000 +0200
++++ jarjar-1.4/src/main/com/tonicsystems/jarjar/util/GetNameClassWriter.java	2018-11-20 09:17:27.549974497 +0100
+@@ -25,7 +25,7 @@
+     private String className;
+     
+     public GetNameClassWriter(int flags) {
+-        super(Opcodes.ASM4,new ClassWriter(flags));
++        super(Opcodes.ASM5,new ClassWriter(flags));
+     }
+ 
+     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+--- jarjar-1.4/src/main/com/tonicsystems/jarjar/util/RemappingClassTransformer.java	2012-07-02 13:19:28.000000000 +0200
++++ jarjar-1.4/src/main/com/tonicsystems/jarjar/util/RemappingClassTransformer.java	2018-11-20 09:17:27.549974497 +0100
+@@ -17,12 +17,12 @@
+ package com.tonicsystems.jarjar.util;
+ 
+ import org.objectweb.asm.ClassVisitor;
++import org.objectweb.asm.commons.ClassRemapper;
+ import org.objectweb.asm.commons.Remapper;
+-import org.objectweb.asm.commons.RemappingClassAdapter;
+ 
+ import com.tonicsystems.jarjar.EmptyClassVisitor;
+ 
+-public class RemappingClassTransformer extends RemappingClassAdapter
++public class RemappingClassTransformer extends ClassRemapper
+ {
+     public RemappingClassTransformer(Remapper pr) {
+         super(new EmptyClassVisitor(), pr);

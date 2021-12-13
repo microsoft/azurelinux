@@ -1,0 +1,861 @@
+From f513964579f72fc77eea6e0961e49cc8299bf204 Mon Sep 17 00:00:00 2001
+From: Witold Filipczyk <witekfl@poczta.onet.pl>
+Date: Sun, 31 Aug 2008 14:23:28 +0200
+Subject: [PATCH] Use real_box in dialog.c.
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ src/bfu/button.c       |   32 +++++++++++++-------------
+ src/bfu/button.h       |    3 +-
+ src/bfu/checkbox.c     |   13 +++++-----
+ src/bfu/checkbox.h     |    3 +-
+ src/bfu/dialog.c       |   59 ++++++++++++++++++++++++++++++++++-------------
+ src/bfu/dialog.h       |    2 +
+ src/bfu/group.c        |   18 +++++++-------
+ src/bfu/group.h        |    2 +-
+ src/bfu/inpfield.c     |   10 ++++----
+ src/bfu/inpfield.h     |    2 +-
+ src/bfu/listbox.c      |    3 +-
+ src/bfu/listbox.h      |    2 +-
+ src/bfu/text.c         |   16 +++++++-----
+ src/bfu/text.h         |    5 ++-
+ src/dialogs/download.c |   12 +++++-----
+ src/terminal/draw.c    |   36 +++++++++++++++++++++++++++++
+ src/terminal/draw.h    |   10 ++++++++
+ src/terminal/window.c  |   15 ++++++++++++
+ src/terminal/window.h  |    2 +
+ 19 files changed, 170 insertions(+), 75 deletions(-)
+
+diff --git a/src/bfu/button.c b/src/bfu/button.c
+index 8267c94..8e6ac62 100644
+--- a/src/bfu/button.c
++++ b/src/bfu/button.c
+@@ -115,7 +115,7 @@ buttons_width(struct widget_data *widget_data, int n,
+ }
+ 
+ void
+-dlg_format_buttons(struct terminal *term,
++dlg_format_buttons(struct terminal *term, struct dialog_data *dlg_data,
+ 		   struct widget_data *widget_data, int n,
+ 		   int x, int *y, int w, int *rw, enum format_align align, int format_only)
+ {
+@@ -212,7 +212,7 @@ display_button(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 	}
+ 
+ 
+-	draw_text(term, pos->x, pos->y, BUTTON_LEFT, BUTTON_LEFT_LEN, 0, color);
++	draw_text2(term, dlg_data, pos->x, pos->y, BUTTON_LEFT, BUTTON_LEFT_LEN, 0, color);
+ 	if (len > 0) {
+ 		unsigned char *text = widget_data->widget->text;
+ 		int hk_pos = widget_data->widget->info.button.hotkey_pos;
+@@ -236,15 +236,15 @@ display_button(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 								NULL);
+ 
+ 				if (hk_pos)
+-					draw_text(term, x, pos->y,
++					draw_text2(term, dlg_data, x, pos->y,
+ 						  text, hk_pos, 0, color);
+ 
+-				draw_text(term, x + cells_to_hk, pos->y,
++				draw_text2(term, dlg_data, x + cells_to_hk, pos->y,
+ 					  &text[hk_pos + 1], hk_bytes,
+ 					  attr, shortcut_color);
+ 
+ 				if (right > 1)
+-					draw_text(term, x+cells_to_hk+hk_cells,
++					draw_text2(term, dlg_data, x+cells_to_hk+hk_cells,
+ 						  pos->y,
+ 						  &text[hk_pos + hk_bytes + 1],
+ 						  right - 1, 0, color);
+@@ -257,11 +257,11 @@ display_button(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 							 len - hk_width,
+ 							 NULL);
+ 
+-				draw_text(term, x, pos->y,
++				draw_text2(term, dlg_data, x, pos->y,
+ 					  text, hk_len,
+ 					  attr, shortcut_color);
+ 
+-				draw_text(term, x + hk_width, pos->y,
++				draw_text2(term, dlg_data, x + hk_width, pos->y,
+ 					  &text[hk_len], len_to_display,
+ 					  0, color);
+ 			}
+@@ -271,18 +271,18 @@ display_button(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 			int right = widget_data->widget->info.button.truetextlen - hk_pos - 1;
+ 
+ 			if (hk_pos) {
+-				draw_text(term, x, pos->y, text, hk_pos, 0, color);
++				draw_text2(term, dlg_data, x, pos->y, text, hk_pos, 0, color);
+ 			}
+-			draw_text(term, x + hk_pos, pos->y,
++			draw_text2(term, dlg_data, x + hk_pos, pos->y,
+ 				  &text[hk_pos + 1], 1, attr, shortcut_color);
+ 			if (right > 1) {
+-				draw_text(term, x + hk_pos + 1, pos->y,
++				draw_text2(term, dlg_data, x + hk_pos + 1, pos->y,
+ 					  &text[hk_pos + 2], right - 1, 0, color);
+ 			}
+ 
+ 		} else {
+-			draw_text(term, x, pos->y, text, 1, attr, shortcut_color);
+-			draw_text(term, x + 1, pos->y, &text[1], len - 1, 0, color);
++			draw_text2(term, dlg_data, x, pos->y, text, 1, attr, shortcut_color);
++			draw_text2(term, dlg_data, x + 1, pos->y, &text[1], len - 1, 0, color);
+ 		}
+ 	}
+ #ifdef CONFIG_UTF8
+@@ -290,15 +290,15 @@ display_button(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 		int text_cells = utf8_ptr2cells(widget_data->widget->text, NULL);
+ 		int hk = (widget_data->widget->info.button.hotkey_pos >= 0);
+ 
+-		draw_text(term, x + text_cells - hk, pos->y,
++		draw_text2(term, dlg_data, x + text_cells - hk, pos->y,
+ 			  BUTTON_RIGHT, BUTTON_RIGHT_LEN, 0, color);
+ 	} else
+ #endif /* CONFIG_UTF8 */
+-		draw_text(term, x + len, pos->y, BUTTON_RIGHT,
++		draw_text2(term, dlg_data, x + len, pos->y, BUTTON_RIGHT,
+ 			  BUTTON_RIGHT_LEN, 0, color);
+ 	if (sel) {
+-		set_cursor(term, x, pos->y, 1);
+-		set_window_ptr(dlg_data->win, pos->x, pos->y);
++		set_cursor2(term, dlg_data, x, pos->y, 1);
++		set_window_ptr2(dlg_data, dlg_data->win, pos->x, pos->y);
+ 	}
+ 	return EVENT_PROCESSED;
+ }
+diff --git a/src/bfu/button.h b/src/bfu/button.h
+index e6e907d..de986c8 100644
+--- a/src/bfu/button.h
++++ b/src/bfu/button.h
+@@ -5,6 +5,7 @@
+ #include "util/align.h"
+ 
+ struct dialog;
++struct dialog_data;
+ struct terminal;
+ struct widget_data;
+ 
+@@ -89,6 +90,6 @@ void add_dlg_button_do(struct dialog *dlg, unsigned char *text, int flags, widge
+ #endif
+ 
+ extern const struct widget_ops button_ops;
+-void dlg_format_buttons(struct terminal *, struct widget_data *, int, int, int *, int, int *, enum format_align, int);
++void dlg_format_buttons(struct terminal *, struct dialog_data *, struct widget_data *, int, int, int *, int, int *, enum format_align, int);
+ 
+ #endif
+diff --git a/src/bfu/checkbox.c b/src/bfu/checkbox.c
+index 7ed97e0..d7c974b 100644
+--- a/src/bfu/checkbox.c
++++ b/src/bfu/checkbox.c
+@@ -36,7 +36,7 @@ add_dlg_radio_do(struct dialog *dlg, unsigned char *text,
+ }
+ 
+ void
+-dlg_format_checkbox(struct terminal *term,
++dlg_format_checkbox(struct terminal *term, struct dialog_data *dlg_data,
+ 		    struct widget_data *widget_data,
+ 		    int x, int *y, int w, int *rw,
+ 		    enum format_align align, int format_only)
+@@ -49,7 +49,7 @@ dlg_format_checkbox(struct terminal *term,
+ 
+ 	if (text && *text) {
+ 		if (rw) *rw -= CHECKBOX_LS;
+-		dlg_format_text_do(term, text, x + CHECKBOX_LS, y,
++		dlg_format_text_do(term, dlg_data, text, x + CHECKBOX_LS, y,
+ 				   w - CHECKBOX_LS, rw,
+ 				   get_bfu_color(term, "dialog.checkbox-label"),
+ 				   align, format_only);
+@@ -78,11 +78,11 @@ display_checkbox(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 	else
+ 		text = widget_data->widget->info.checkbox.gid ? "( )" : "[ ]";
+ 
+-	draw_text(term, pos->x, pos->y, text, CHECKBOX_LEN, 0, color);
++	draw_text2(term, dlg_data, pos->x, pos->y, text, CHECKBOX_LEN, 0, color);
+ 
+ 	if (selected) {
+-		set_cursor(term, pos->x + 1, pos->y, 1);
+-		set_window_ptr(dlg_data->win, pos->x, pos->y);
++		set_cursor2(term, dlg_data, pos->x + 1, pos->y, 1);
++		set_window_ptr2(dlg_data, dlg_data->win, pos->x, pos->y);
+ 	}
+ 
+ 	return EVENT_PROCESSED;
+@@ -128,7 +128,6 @@ mouse_checkbox(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ static widget_handler_status_T
+ select_checkbox(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ {
+-
+ 	if (!widget_data->widget->info.checkbox.gid) {
+ 		/* Checkbox. */
+ 		int *cdata = (int *) widget_data->cdata;
+@@ -159,8 +158,8 @@ select_checkbox(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 		}
+ 		widget_data->info.checkbox.checked = 1;
+ 	}
+-
+ 	display_widget(dlg_data, widget_data);
++
+ 	return EVENT_PROCESSED;
+ }
+ 
+diff --git a/src/bfu/checkbox.h b/src/bfu/checkbox.h
+index 573f1d2..b4e65ce 100644
+--- a/src/bfu/checkbox.h
++++ b/src/bfu/checkbox.h
+@@ -2,6 +2,7 @@
+ #define EL__BFU_CHECKBOX_H
+ 
+ struct dialog;
++struct dialog_data;
+ struct terminal;
+ struct widget_data;
+ 
+@@ -30,7 +31,7 @@ void add_dlg_radio_do(struct dialog *dlg, unsigned char *text, int groupid, int
+ extern const struct widget_ops checkbox_ops;
+ 
+ void
+-dlg_format_checkbox(struct terminal *term,
++dlg_format_checkbox(struct terminal *term, struct dialog_data *dlg_data,
+ 		    struct widget_data *widget_data,
+ 		    int x, int *y, int w, int *rw,
+ 		    enum format_align align, int format_only);
+diff --git a/src/bfu/dialog.c b/src/bfu/dialog.c
+index b2df9f8..414283f 100644
+--- a/src/bfu/dialog.c
++++ b/src/bfu/dialog.c
+@@ -82,20 +82,18 @@ redraw_dialog(struct dialog_data *dlg_data, int layout)
+ 	}
+ 
+ 	if (!dlg_data->dlg->layout.only_widgets) {
+-		struct box box;
+-
+-		set_box(&box,
++		set_box(&dlg_data->real_box,
+ 			dlg_data->box.x + (DIALOG_LEFT_BORDER + 1),
+ 			dlg_data->box.y + (DIALOG_TOP_BORDER + 1),
+ 			dlg_data->box.width - 2 * (DIALOG_LEFT_BORDER + 1),
+ 			dlg_data->box.height - 2 * (DIALOG_TOP_BORDER + 1));
+ 
+-		draw_border(term, &box, get_bfu_color(term, "dialog.frame"), DIALOG_FRAME);
++		draw_border(term, &dlg_data->real_box, get_bfu_color(term, "dialog.frame"), DIALOG_FRAME);
+ 
+ 		assert(dlg_data->dlg->title);
+ 
+ 		title_color = get_bfu_color(term, "dialog.title");
+-		if (title_color && box.width > 2) {
++		if (title_color && dlg_data->real_box.width > 2) {
+ 			unsigned char *title = dlg_data->dlg->title;
+ 			int titlelen = strlen(title);
+ 			int titlecells = titlelen;
+@@ -107,7 +105,7 @@ redraw_dialog(struct dialog_data *dlg_data, int layout)
+ 							    &title[titlelen]);
+ #endif /* CONFIG_UTF8 */
+ 
+-			titlecells = int_min(box.width - 2, titlecells);
++			titlecells = int_min(dlg_data->real_box.width - 2, titlecells);
+ 
+ #ifdef CONFIG_UTF8
+ 			if (term->utf8_cp)
+@@ -115,13 +113,13 @@ redraw_dialog(struct dialog_data *dlg_data, int layout)
+ 							    NULL);
+ #endif /* CONFIG_UTF8 */
+ 
+-			x = (box.width - titlecells) / 2 + box.x;
+-			y = box.y - 1;
++			x = (dlg_data->real_box.width - titlecells) / 2 + dlg_data->real_box.x;
++			y = dlg_data->real_box.y - 1;
+ 
+ 
+-			draw_text(term, x - 1, y, " ", 1, 0, title_color);
+-			draw_text(term, x, y, title, titlelen, 0, title_color);
+-			draw_text(term, x + titlecells, y, " ", 1, 0,
++			draw_text2(term, dlg_data, x - 1, y, " ", 1, 0, title_color);
++			draw_text2(term, dlg_data, x, y, title, titlelen, 0, title_color);
++			draw_text2(term, dlg_data, x + titlecells, y, " ", 1, 0,
+ 				  title_color);
+ 		}
+ 	}
+@@ -181,6 +179,23 @@ init_widget(struct dialog_data *dlg_data, int i)
+ 	return widget_data;
+ }
+ 
++static int
++check_range(struct dialog_data *dlg_data, struct widget_data *widget_data)
++{
++	if (!dlg_data->dlg->layout.only_widgets) {
++		struct box *box = &widget_data->box;
++		struct box *dlgbox = &dlg_data->real_box;
++		int y = box->y - dlgbox->y;
++
++		if ((y < dlg_data->y) || (y >= dlg_data->y + dlgbox->height)) {
++			dlg_data->y = y / dlgbox->height  * dlgbox->height;
++			redraw_dialog(dlg_data, 0);
++			return 1;
++		}
++	}
++	return 0;
++}
++
+ void
+ select_widget(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ {
+@@ -190,6 +205,9 @@ select_widget(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 
+ 	dlg_data->selected_widget_id = widget_data - dlg_data->widgets_data;
+ 
++	if (check_range(dlg_data, widget_data))
++		return;
++
+ 	display_widget(dlg_data, previously_selected_widget);
+ 	display_widget(dlg_data, widget_data);
+ }
+@@ -228,6 +246,11 @@ cycle_widget_focus(struct dialog_data *dlg_data, int direction)
+ 	} while (!widget_is_focusable(selected_widget(dlg_data))
+ 		 && dlg_data->selected_widget_id != prev_selected);
+ 
++	if (check_range(dlg_data, selected_widget(dlg_data))) {
++		redraw_from_window(dlg_data->win);
++		return;
++	}
++
+ 	display_widget(dlg_data, previously_selected_widget);
+ 	display_widget(dlg_data, selected_widget(dlg_data));
+ 	redraw_from_window(dlg_data->win);
+@@ -238,6 +261,7 @@ dialog_ev_init(struct dialog_data *dlg_data)
+ {
+ 	int i;
+ 
++	dlg_data->y = 0;
+ 	/* TODO: foreachback_widget() */
+ 	for (i = dlg_data->number_of_widgets - 1; i >= 0; i--) {
+ 		struct widget_data *widget_data;
+@@ -421,6 +445,7 @@ dialog_ev_abort(struct dialog_data *dlg_data)
+ 	}
+ 
+ 	freeml(dlg_data->ml);
++	dlg_data->y = 0;
+ }
+ 
+ /* TODO: use EVENT_PROCESSED/EVENT_NOT_PROCESSED. */
+@@ -554,17 +579,17 @@ format_widgets(struct terminal *term, struct dialog_data *dlg_data,
+ 		switch (wdata->widget->type) {
+ 		case WIDGET_FIELD_PASS:
+ 		case WIDGET_FIELD:
+-			dlg_format_field(term, wdata, x, y, w, rw, ALIGN_LEFT,
++			dlg_format_field(term, dlg_data, wdata, x, y, w, rw, ALIGN_LEFT,
+ 					 format_only);
+ 			break;
+ 
+ 		case WIDGET_LISTBOX:
+-			dlg_format_listbox(term, wdata, x, y, w, h, rw,
++			dlg_format_listbox(term, dlg_data, wdata, x, y, w, h, rw,
+ 					   ALIGN_LEFT, format_only);
+ 			break;
+ 
+ 		case WIDGET_TEXT:
+-			dlg_format_text(term, wdata, x, y, w, rw, h,
++			dlg_format_text(term, dlg_data, wdata, x, y, w, rw, h,
+ 					format_only);
+ 			break;
+ 
+@@ -583,7 +608,7 @@ format_widgets(struct terminal *term, struct dialog_data *dlg_data,
+ 						break;
+ 				}
+ 
+-				dlg_format_group(term, wdata, size, x, y, w, rw,
++				dlg_format_group(term, dlg_data, wdata, size, x, y, w, rw,
+ 						 format_only);
+ 				wdata += size - 1;
+ 
+@@ -591,7 +616,7 @@ format_widgets(struct terminal *term, struct dialog_data *dlg_data,
+ 
+ 				/* No horizontal space between checkboxes belonging to
+ 				 * the same group. */
+-				dlg_format_checkbox(term, wdata, x, y, w, rw,
++				dlg_format_checkbox(term, dlg_data, wdata, x, y, w, rw,
+ 						    ALIGN_LEFT, format_only);
+ 				if (widgets > 1
+ 				    && group == widget_has_group(&wdata[1]))
+@@ -603,7 +628,7 @@ format_widgets(struct terminal *term, struct dialog_data *dlg_data,
+ 		/* We assume that the buttons are all stuffed at the very end
+ 		 * of the dialog. */
+ 		case WIDGET_BUTTON:
+-			dlg_format_buttons(term, wdata, widgets,
++			dlg_format_buttons(term, dlg_data, wdata, widgets,
+ 					   x, y, w, rw, ALIGN_CENTER, format_only);
+ 			return;
+ 		}
+diff --git a/src/bfu/dialog.h b/src/bfu/dialog.h
+index b0cde3b..bec914c 100644
+--- a/src/bfu/dialog.h
++++ b/src/bfu/dialog.h
+@@ -100,6 +100,8 @@ struct dialog_data {
+ 	struct memory_list *ml;
+ 
+ 	struct box box;
++	struct box real_box;
++	int y;
+ 	int number_of_widgets;
+ 	int selected_widget_id;
+ 	struct term_event *term_event;
+diff --git a/src/bfu/group.c b/src/bfu/group.c
+index cc4c6d8..15bd827 100644
+--- a/src/bfu/group.c
++++ b/src/bfu/group.c
+@@ -20,7 +20,7 @@
+ #define CHECKBOX_LEN 3  /* "[X]" or "(X)" */
+ 
+ void
+-dlg_format_group(struct terminal *term,
++dlg_format_group(struct terminal *term, struct dialog_data *dlg_data,
+ 		 struct widget_data *widget_data,
+ 		 int n, int x, int *y, int w, int *rw, int format_only)
+ {
+@@ -87,14 +87,14 @@ dlg_format_group(struct terminal *term,
+ 								text,
+ 								label_length,
+ 								NULL);
+-						draw_text(term, xpos + width
++						draw_text2(term, dlg_data, xpos + width
+ 								+ label_padding,
+ 							  *y, text, lb, 0,
+ 							  color);
+ 					} else
+ #endif /* CONFIG_UTF8 */
+ 					{
+-						draw_text(term, xpos + width
++						draw_text2(term, dlg_data, xpos + width
+ 								+ label_padding,
+ 							  *y, text,
+ 							  label_length, 0,
+@@ -113,12 +113,12 @@ dlg_format_group(struct terminal *term,
+ 								text,
+ 								label_length,
+ 								NULL);
+-						draw_text(term, xpos, *y,
++						draw_text2(term, dlg_data, xpos, *y,
+ 							  text, lb, 0, color);
+ 					} else
+ #endif /* CONFIG_UTF8 */
+ 					{
+-						draw_text(term, xpos, *y,
++						draw_text2(term, dlg_data, xpos, *y,
+ 							  text, label_length,
+ 							  0, color);
+ 					}
+@@ -155,11 +155,11 @@ group_layouter(struct dialog_data *dlg_data)
+ #endif /* CONFIG_UTF8 */
+ 		rw = int_min(w, strlen(dlg_data->dlg->title));
+ 
+-	dlg_format_group(term, dlg_data->widgets_data, n,
++	dlg_format_group(term, dlg_data, dlg_data->widgets_data, n,
+ 			 0, &y, w, &rw, 1);
+ 
+ 	y++;
+-	dlg_format_buttons(term, dlg_data->widgets_data + n, 2, 0, &y, w,
++	dlg_format_buttons(term, dlg_data, dlg_data->widgets_data + n, 2, 0, &y, w,
+ 			   &rw, ALIGN_CENTER, 1);
+ 
+ 	w = rw;
+@@ -167,10 +167,10 @@ group_layouter(struct dialog_data *dlg_data)
+ 	draw_dialog(dlg_data, w, y);
+ 
+ 	y = dlg_data->box.y + DIALOG_TB + 1;
+-	dlg_format_group(term, dlg_data->widgets_data, n,
++	dlg_format_group(term, dlg_data, dlg_data->widgets_data, n,
+ 			 dlg_data->box.x + DIALOG_LB, &y, w, NULL, 0);
+ 
+ 	y++;
+-	dlg_format_buttons(term, dlg_data->widgets_data + n, 2,
++	dlg_format_buttons(term, dlg_data, dlg_data->widgets_data + n, 2,
+ 			   dlg_data->box.x + DIALOG_LB, &y, w, &rw, ALIGN_CENTER, 0);
+ }
+diff --git a/src/bfu/group.h b/src/bfu/group.h
+index 0de645d..9b92c2a 100644
+--- a/src/bfu/group.h
++++ b/src/bfu/group.h
+@@ -5,7 +5,7 @@ struct dialog_data;
+ struct terminal;
+ struct widget_data;
+ 
+-void dlg_format_group(struct terminal *term,
++void dlg_format_group(struct terminal *term, struct dialog_data *dlg_data,
+ 		 struct widget_data *widget_data,
+ 		 int n, int x, int *y, int w, int *rw, int format_only);
+ 
+diff --git a/src/bfu/inpfield.c b/src/bfu/inpfield.c
+index 4c0dcd2..0a9c63e 100644
+--- a/src/bfu/inpfield.c
++++ b/src/bfu/inpfield.c
+@@ -103,7 +103,7 @@ check_nonempty(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ }
+ 
+ void
+-dlg_format_field(struct terminal *term,
++dlg_format_field(struct terminal *term, struct dialog_data *dlg_data,
+ 		 struct widget_data *widget_data,
+ 		 int x, int *y, int w, int *rw, enum format_align align, int format_only)
+ {
+@@ -132,7 +132,7 @@ dlg_format_field(struct terminal *term,
+ 	if (label && *label) {
+ 		if (!format_only) text_color = get_bfu_color(term, "dialog.text");
+ 
+-		dlg_format_text_do(term, label, x, y, w, rw, text_color, ALIGN_LEFT, format_only);
++		dlg_format_text_do(term, dlg_data, label, x, y, w, rw, text_color, ALIGN_LEFT, format_only);
+ 	}
+ 
+ 	/* XXX: We want the field and label on the same line if the terminal
+@@ -140,7 +140,7 @@ dlg_format_field(struct terminal *term,
+ 	if (label && *label && float_label) {
+ 		if (widget_data->widget->info.field.flags & INPFIELD_FLOAT) {
+ 			(*y) -= INPUTFIELD_HEIGHT;
+-			dlg_format_text_do(term, INPUTFIELD_FLOAT_SEPARATOR,
++			dlg_format_text_do(term, dlg_data, INPUTFIELD_FLOAT_SEPARATOR,
+ 					   x + label_width, y, w, rw,
+ 					   text_color, ALIGN_LEFT, format_only);
+ 			w -= INPUTFIELD_FLOAT_SEPARATOR_LEN + INPUTFIELD_FLOATLABEL_PADDING;
+@@ -312,7 +312,7 @@ display_field_do(struct dialog_data *dlg_data, struct widget_data *widget_data,
+ 			if (term->utf8_cp)
+ 				w = utf8_cells2bytes(text, w, NULL);
+ #endif /* CONFIG_UTF8 */
+-			draw_text(term, widget_data->box.x, widget_data->box.y,
++			draw_text2(term, dlg_data, widget_data->box.x, widget_data->box.y,
+ 				  text, w, 0, color);
+ 		} else {
+ 			struct box box;
+@@ -763,7 +763,7 @@ input_line_layouter(struct dialog_data *dlg_data)
+ 		- ses->status.show_status_bar
+ 		- ses->status.show_tabs_bar;
+ 
+-	dlg_format_field(win->term, dlg_data->widgets_data, 0,
++	dlg_format_field(win->term, dlg_data, dlg_data->widgets_data, 0,
+ 			 &y, win->term->width, NULL, ALIGN_LEFT, 0);
+ }
+ 
+diff --git a/src/bfu/inpfield.h b/src/bfu/inpfield.h
+index d45a902..fb2270e 100644
+--- a/src/bfu/inpfield.h
++++ b/src/bfu/inpfield.h
+@@ -62,7 +62,7 @@ extern const struct widget_ops field_pass_ops;
+ widget_handler_status_T check_number(struct dialog_data *, struct widget_data *);
+ widget_handler_status_T check_nonempty(struct dialog_data *, struct widget_data *);
+ 
+-void dlg_format_field(struct terminal *, struct widget_data *, int, int *, int, int *, enum format_align, int format_only);
++void dlg_format_field(struct terminal *, struct dialog_data *, struct widget_data *, int, int *, int, int *, enum format_align, int format_only);
+ 
+ void input_field(struct terminal *, struct memory_list *, int, unsigned char *,
+ 		 unsigned char *, unsigned char *, unsigned char *, void *,
+diff --git a/src/bfu/listbox.c b/src/bfu/listbox.c
+index 7ec1b66..e4de12f 100644
+--- a/src/bfu/listbox.c
++++ b/src/bfu/listbox.c
+@@ -41,7 +41,8 @@ get_listbox_widget_data(struct widget_data *widget_data)
+ 
+ /* Layout for generic boxes */
+ void
+-dlg_format_listbox(struct terminal *term, struct widget_data *widget_data,
++dlg_format_listbox(struct terminal *term, struct dialog_data *dlg_data,
++		   struct widget_data *widget_data,
+ 	           int x, int *y, int w, int max_height, int *rw,
+ 	           enum format_align align, int format_only)
+ {
+diff --git a/src/bfu/listbox.h b/src/bfu/listbox.h
+index c3599e5..63b8be4 100644
+--- a/src/bfu/listbox.h
++++ b/src/bfu/listbox.h
+@@ -133,7 +133,7 @@ struct listbox_item {
+ 
+ extern const struct widget_ops listbox_ops;
+ 
+-void dlg_format_listbox(struct terminal *, struct widget_data *, int, int *, int, int, int *, enum format_align, int format_only);
++void dlg_format_listbox(struct terminal *, struct dialog_data *, struct widget_data *, int, int *, int, int, int *, enum format_align, int format_only);
+ 
+ struct listbox_item *traverse_listbox_items_list(struct listbox_item *, struct listbox_data *, int, int, int (*)(struct listbox_item *, void *, int *), void *);
+ 
+diff --git a/src/bfu/text.c b/src/bfu/text.c
+index e8be019..3d2895e 100644
+--- a/src/bfu/text.c
++++ b/src/bfu/text.c
+@@ -211,7 +211,8 @@ split_lines(struct widget_data *widget_data, int max_width)
+ 
+ /* Format text according to dialog box and alignment. */
+ void
+-dlg_format_text_do(struct terminal *term, unsigned char *text,
++dlg_format_text_do(struct terminal *term, struct dialog_data *dlg_data,
++		unsigned char *text,
+ 		int x, int *y, int width, int *real_width,
+ 		struct color_pair *color, enum format_align align,
+ 		int format_only)
+@@ -255,12 +256,13 @@ dlg_format_text_do(struct terminal *term, unsigned char *text,
+ 
+ 		assert(cells <= width && shift < width);
+ 
+-		draw_text(term, x + shift, *y, text, line_width, 0, color);
++		draw_text2(term, dlg_data, x + shift, *y, text, line_width, 0, color);
+ 	}
+ }
+ 
+ void
+-dlg_format_text(struct terminal *term, struct widget_data *widget_data,
++dlg_format_text(struct terminal *term, struct dialog_data *dlg_data,
++		struct widget_data *widget_data,
+ 		int x, int *y, int width, int *real_width, int max_height,
+ 		int format_only)
+ {
+@@ -335,7 +337,7 @@ dlg_format_text(struct terminal *term, struct widget_data *widget_data,
+ 		widget_data->info.text.current = 0;
+ 	}
+ 
+-	dlg_format_text_do(term, text,
++	dlg_format_text_do(term, dlg_data, text,
+ 		x, y, width, real_width,
+ 		get_bfu_color(term, "dialog.text"),
+ 		widget_data->widget->info.text.align, format_only);
+@@ -395,8 +397,8 @@ display_text(struct dialog_data *dlg_data, struct widget_data *widget_data)
+ 
+ 	/* Hope this is at least a bit reasonable. Set cursor
+ 	 * and window pointer to start of the first text line. */
+-	set_cursor(win->term, widget_data->box.x, widget_data->box.y, 1);
+-	set_window_ptr(win, widget_data->box.x, widget_data->box.y);
++	set_cursor2(win->term, dlg_data, widget_data->box.x, widget_data->box.y, 1);
++	set_window_ptr2(dlg_data, win, widget_data->box.x, widget_data->box.y);
+ 
+ 	return EVENT_PROCESSED;
+ }
+@@ -423,7 +425,7 @@ format_and_display_text(struct widget_data *widget_data,
+ 	draw_box(term, &widget_data->box, ' ', 0,
+ 		 get_bfu_color(term, "dialog.generic"));
+ 
+-	dlg_format_text(term, widget_data,
++	dlg_format_text(term, dlg_data, widget_data,
+ 			widget_data->box.x, &y, widget_data->box.width, NULL,
+ 			height, 0);
+ 
+diff --git a/src/bfu/text.h b/src/bfu/text.h
+index 8dd3365..b181c1a 100644
+--- a/src/bfu/text.h
++++ b/src/bfu/text.h
+@@ -4,6 +4,7 @@
+ #include "util/color.h"
+ 
+ struct dialog;
++struct dialog_data;
+ struct terminal;
+ 
+ struct widget_info_text	{
+@@ -45,12 +46,12 @@ void add_dlg_text(struct dialog *dlg, unsigned char *text,
+ 		  enum format_align align, int bottom_pad);
+ 
+ extern const struct widget_ops text_ops;
+-void dlg_format_text_do(struct terminal *term,
++void dlg_format_text_do(struct terminal *term, struct dialog_data *dlg_data,
+ 		    unsigned char *text, int x, int *y, int w, int *rw,
+ 		    struct color_pair *scolor, enum format_align align, int format_only);
+ 
+ void
+-dlg_format_text(struct terminal *term, struct widget_data *widget_data,
++dlg_format_text(struct terminal *term, struct dialog_data *dlg_data, struct widget_data *widget_data,
+ 		int x, int *y, int dlg_width, int *real_width, int height, int format_only);
+ 
+ #define text_is_scrollable(widget_data) \
+diff --git a/src/dialogs/download.c b/src/dialogs/download.c
+index 0116578..b90f047 100644
+--- a/src/dialogs/download.c
++++ b/src/dialogs/download.c
+@@ -157,7 +157,7 @@ download_dialog_layouter(struct dialog_data *dlg_data)
+ 		int_lower_bound(&w, DOWN_DLG_MIN);
+ 	}
+ 
+-	dlg_format_text_do(term, url, 0, &y, w, &rw,
++	dlg_format_text_do(term, dlg_data, url, 0, &y, w, &rw,
+ 			dialog_text_color, ALIGN_LEFT, 1);
+ 
+ 	y++;
+@@ -166,11 +166,11 @@ download_dialog_layouter(struct dialog_data *dlg_data)
+ #if CONFIG_BITTORRENT
+ 	if (bittorrent) y += 2;
+ #endif
+-	dlg_format_text_do(term, msg, 0, &y, w, &rw,
++	dlg_format_text_do(term, dlg_data, msg, 0, &y, w, &rw,
+ 			dialog_text_color, ALIGN_LEFT, 1);
+ 
+ 	y++;
+-	dlg_format_buttons(term, dlg_data->widgets_data,
++	dlg_format_buttons(term, dlg_data, dlg_data->widgets_data,
+ 			   dlg_data->number_of_widgets, 0, &y, w,
+ 			   &rw, ALIGN_CENTER, 1);
+ 
+@@ -190,7 +190,7 @@ download_dialog_layouter(struct dialog_data *dlg_data)
+ 
+ 	y = dlg_data->box.y + DIALOG_TB + 1;
+ 	x = dlg_data->box.x + DIALOG_LB;
+-	dlg_format_text_do(term, url, x, &y, w, NULL,
++	dlg_format_text_do(term, dlg_data, url, x, &y, w, NULL,
+ 			dialog_text_color, ALIGN_LEFT, 0);
+ 
+ 	if (show_meter) {
+@@ -207,11 +207,11 @@ download_dialog_layouter(struct dialog_data *dlg_data)
+ 	}
+ #endif
+ 	y++;
+-	dlg_format_text_do(term, msg, x, &y, w, NULL,
++	dlg_format_text_do(term, dlg_data, msg, x, &y, w, NULL,
+ 			dialog_text_color, ALIGN_LEFT, 0);
+ 
+ 	y++;
+-	dlg_format_buttons(term, dlg_data->widgets_data,
++	dlg_format_buttons(term, dlg_data, dlg_data->widgets_data,
+ 			   dlg_data->number_of_widgets, x, &y, w,
+ 			   NULL, ALIGN_CENTER, 0);
+ 
+diff --git a/src/terminal/draw.c b/src/terminal/draw.c
+index b3b3706..267d9ac 100644
+--- a/src/terminal/draw.c
++++ b/src/terminal/draw.c
+@@ -7,6 +7,7 @@
+ 
+ #include "elinks.h"
+ 
++#include "bfu/dialog.h"
+ #include "config/options.h"
+ #include "intl/charsets.h"
+ #include "terminal/color.h"
+@@ -559,6 +560,23 @@ draw_text(struct terminal *term, int x, int y,
+ }
+ 
+ void
++draw_text2(struct terminal *term, struct dialog_data *dlg_data, int x, int y,
++	  unsigned char *text, int length,
++	  enum screen_char_attr attr, struct color_pair *color)
++{
++	struct box *box = &dlg_data->real_box;
++
++	if (box->height) {
++		int y_max = box->y + box->height;
++
++		y -= dlg_data->y;
++		if (y < box->y || y >= y_max) return;
++	}
++	draw_text(term, x, y, text, length, attr, color);
++}
++
++
++void
+ set_cursor(struct terminal *term, int x, int y, int blockable)
+ {
+ 	assert(term && term->screen);
+@@ -580,6 +598,24 @@ set_cursor(struct terminal *term, int x, int y, int blockable)
+ }
+ 
+ void
++set_cursor2(struct terminal *term, struct dialog_data *dlg_data, int x, int y, int blockable)
++{
++	struct box *box = &dlg_data->real_box;
++
++	assert(term && term->screen);
++	if_assert_failed return;
++
++	if (box->height) {
++		int y_max = box->y + box->height;
++
++		y -= dlg_data->y;
++		if (y < box->y || y >= y_max) return;
++	}
++	set_cursor(term, x, y, blockable);
++}
++
++
++void
+ clear_terminal(struct terminal *term)
+ {
+ 	struct box box;
+diff --git a/src/terminal/draw.h b/src/terminal/draw.h
+index 6dcd31a..20fba4e 100644
+--- a/src/terminal/draw.h
++++ b/src/terminal/draw.h
+@@ -4,6 +4,7 @@
+ #include "intl/charsets.h" /* unicode_val_T */
+ 
+ struct color_pair;
++struct dialog_data;
+ struct box;
+ struct terminal;
+ 
+@@ -280,6 +281,12 @@ void draw_text(struct terminal *term, int x, int y,
+ 	       enum screen_char_attr attr,
+ 	       struct color_pair *color);
+ 
++/** Draws text for dialogs. */
++void draw_text2(struct terminal *term, struct dialog_data *dlg_data, int x, int y,
++	  unsigned char *text, int length,
++	  enum screen_char_attr attr, struct color_pair *color);
++
++
+ /** Draws @a length chars from @a line on the screen.  */
+ void draw_line(struct terminal *term, int x, int y, int length,
+ 	       struct screen_char *line);
+@@ -289,6 +296,9 @@ void draw_line(struct terminal *term, int x, int y, int length,
+  * bottom right corner of the screen. */
+ void set_cursor(struct terminal *term, int x, int y, int blockable);
+ 
++/* set cursor for dialogs */
++void set_cursor2(struct terminal *term, struct dialog_data *dlg_data, int x, int y, int blockable);
++
+ /** Blanks the screen. */
+ void clear_terminal(struct terminal *);
+ 
+diff --git a/src/terminal/window.c b/src/terminal/window.c
+index 9ac7191..934207d 100644
+--- a/src/terminal/window.c
++++ b/src/terminal/window.c
+@@ -7,6 +7,7 @@
+ 
+ #include "elinks.h"
+ 
++#include "bfu/dialog.h"
+ #include "bfu/menu.h"
+ #include "terminal/event.h"
+ #include "terminal/tab.h"
+@@ -227,3 +228,17 @@ would_window_receive_keypresses(const struct window *win)
+ 	return 1;
+ }
+ #endif	/* CONFIG_SCRIPTING_SPIDERMONKEY */
++
++void
++set_window_ptr2(struct dialog_data *dlg_data, struct window *window, int x, int y)
++{
++	struct box *box = &dlg_data->real_box;
++
++	if (box->height) {
++		int y_max = box->y + box->height;
++
++		y -= dlg_data->y;
++		if (y < box->y || y >= y_max) return;
++	}
++	set_window_ptr(window, x, y);
++}
+diff --git a/src/terminal/window.h b/src/terminal/window.h
+index 8bb329d..c8250ac 100644
+--- a/src/terminal/window.h
++++ b/src/terminal/window.h
+@@ -3,6 +3,7 @@
+ 
+ #include "util/lists.h"
+ 
++struct dialog_data;
+ struct term_event;
+ struct terminal;
+ struct window;
+@@ -73,6 +74,7 @@ void add_window(struct terminal *, window_handler_T, void *);
+ void delete_window(struct window *);
+ void delete_window_ev(struct window *, struct term_event *ev);
+ #define set_window_ptr(window, x_, y_) do { (window)->x = (x_); (window)->y = (y_); } while (0)
++void set_window_ptr2(struct dialog_data *dlg_data, struct window *window, int x, int y);
+ void get_parent_ptr(struct window *, int *, int *);
+ 
+ void add_empty_window(struct terminal *, void (*)(void *), void *);
+-- 
+1.7.1
+

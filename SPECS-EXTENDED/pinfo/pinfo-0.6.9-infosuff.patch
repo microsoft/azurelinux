@@ -1,0 +1,30 @@
+--- pinfo-0.6.9/src/filehandling_functions.c.infosuff	2006-03-16 16:15:02.000000000 +0100
++++ pinfo-0.6.9/src/filehandling_functions.c	2006-09-18 14:32:32.000000000 +0200
+@@ -94,6 +94,7 @@
+ 	/* iterate over all files in the directory */
+ 	while ((dp = readdir(dir)) != NULL)
+ 	{
++		int info_suffix;
+ 		/* use strcat rather than strdup, because xmalloc handles all 
+ 		 * malloc errors */
+ 		char *thisfile = xmalloc(strlen(dp->d_name)+1);
+@@ -101,7 +102,9 @@
+ 
+ 		/* strip suffixes (so "gcc.info.gz" -> "gcc") */
+ 		strip_compression_suffix(thisfile);
++		info_suffix = strlen(thisfile);
+ 		strip_info_suffix(thisfile);
++		info_suffix -= strlen(thisfile);
+ 
+ 		/* compare this file with the file we're looking for */
+ 		if (strcmp(thisfile,bname) == 0)
+@@ -110,7 +113,8 @@
+ 			matched++;
+ 			/* put it in the buffer */
+ 			strncat(Buf, thisfile, 1023-strlen(Buf));
+-			strncat(Buf, ".info", 1023-strlen(Buf));
++			if (info_suffix)
++				strncat(Buf, ".info", 1023-strlen(Buf));
+ 
+ 			/* clean up, and exit the loop */
+ 			xfree(thisfile);

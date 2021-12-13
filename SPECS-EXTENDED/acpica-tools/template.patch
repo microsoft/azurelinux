@@ -1,0 +1,22 @@
+Add in a needed parameter for a test file template
+
+From: Al Stone <ahs3@redhat.com>
+
+
+---
+ tests/templates/Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: acpica-unix2-20161222/tests/templates/Makefile
+===================================================================
+--- acpica-unix2-20161222.orig/tests/templates/Makefile
++++ acpica-unix2-20161222/tests/templates/Makefile
+@@ -2,7 +2,7 @@
+ PROG= templates
+ 
+ templates :
+-	sh templates.sh
++	sh templates.sh 1
+ 
+ clean :
+ 	rm -f *.asl *.aml *.dsl *.hex diff.log

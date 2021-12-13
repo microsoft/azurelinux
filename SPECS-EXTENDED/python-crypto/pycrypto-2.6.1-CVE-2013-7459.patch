@@ -1,0 +1,106 @@
+From 8dbe0dc3eea5c689d4f76b37b93fe216cf1f00d4 Mon Sep 17 00:00:00 2001
+From: Legrandin <helderijs@gmail.com>
+Date: Sun, 22 Dec 2013 22:24:46 +0100
+Subject: [PATCH] Throw exception when IV is used with ECB or CTR
+
+The IV parameter is currently ignored when initializing
+a cipher in ECB or CTR mode.
+
+For CTR mode, it is confusing: it takes some time to see
+that a different parameter is needed (the counter).
+
+For ECB mode, it is outright dangerous.
+
+This patch forces an exception to be raised.
+---
+ lib/Crypto/SelfTest/Cipher/common.py | 31 +++++++++++++++++++++++--------
+ src/block_template.c                 | 11 +++++++++++
+ 2 files changed, 34 insertions(+), 8 deletions(-)
+
+diff --git a/lib/Crypto/SelfTest/Cipher/common.py b/lib/Crypto/SelfTest/Cipher/common.py
+index 420b6ff..a5f8a88 100644
+--- a/lib/Crypto/SelfTest/Cipher/common.py
++++ b/lib/Crypto/SelfTest/Cipher/common.py
+@@ -239,16 +239,30 @@ class RoundtripTest(unittest.TestCase):
+         return """%s .decrypt() output of .encrypt() should not be garbled""" % (self.module_name,)
+ 
+     def runTest(self):
+-        for mode in (self.module.MODE_ECB, self.module.MODE_CBC, self.module.MODE_CFB, self.module.MODE_OFB, self.module.MODE_OPENPGP):
++
++        ## ECB mode
++        mode = self.module.MODE_ECB
++        encryption_cipher = self.module.new(a2b_hex(self.key), mode)
++        ciphertext = encryption_cipher.encrypt(self.plaintext)
++        decryption_cipher = self.module.new(a2b_hex(self.key), mode)
++        decrypted_plaintext = decryption_cipher.decrypt(ciphertext)
++        self.assertEqual(self.plaintext, decrypted_plaintext)
++
++        ## OPENPGP mode
++        mode = self.module.MODE_OPENPGP
++        encryption_cipher = self.module.new(a2b_hex(self.key), mode, self.iv)
++        eiv_ciphertext = encryption_cipher.encrypt(self.plaintext)
++        eiv = eiv_ciphertext[:self.module.block_size+2]
++        ciphertext = eiv_ciphertext[self.module.block_size+2:]
++        decryption_cipher = self.module.new(a2b_hex(self.key), mode, eiv)
++        decrypted_plaintext = decryption_cipher.decrypt(ciphertext)
++        self.assertEqual(self.plaintext, decrypted_plaintext)
++
++        ## All other non-AEAD modes (but CTR)
++        for mode in (self.module.MODE_CBC, self.module.MODE_CFB, self.module.MODE_OFB):
+             encryption_cipher = self.module.new(a2b_hex(self.key), mode, self.iv)
+             ciphertext = encryption_cipher.encrypt(self.plaintext)
+-            
+-            if mode != self.module.MODE_OPENPGP:
+-                decryption_cipher = self.module.new(a2b_hex(self.key), mode, self.iv)
+-            else:
+-                eiv = ciphertext[:self.module.block_size+2]
+-                ciphertext = ciphertext[self.module.block_size+2:]
+-                decryption_cipher = self.module.new(a2b_hex(self.key), mode, eiv)
++            decryption_cipher = self.module.new(a2b_hex(self.key), mode, self.iv)
+             decrypted_plaintext = decryption_cipher.decrypt(ciphertext)
+             self.assertEqual(self.plaintext, decrypted_plaintext)
+ 
+diff --git a/src/block_template.c b/src/block_template.c
+index f940e0e..d555ceb 100644
+--- a/src/block_template.c
++++ b/src/block_template.c
+@@ -170,6 +170,17 @@ ALGnew(PyObject *self, PyObject *args, PyObject *kwdict)
+ 				"Key cannot be the null string");
+ 		return NULL;
+ 	}
++	if (IVlen != 0 && mode == MODE_ECB)
++	{
++		PyErr_Format(PyExc_ValueError, "ECB mode does not use IV");
++		return NULL;
++	}
++	if (IVlen != 0 && mode == MODE_CTR)
++	{
++		PyErr_Format(PyExc_ValueError,
++			"CTR mode needs counter parameter, not IV");
++		return NULL;
++	}
+ 	if (IVlen != BLOCK_SIZE && mode != MODE_ECB && mode != MODE_CTR)
+ 	{
+ 		PyErr_Format(PyExc_ValueError,
+From 58de28a5d32bc10e15766e5a59f41b07397cc6cb Mon Sep 17 00:00:00 2001
+From: Richard Mitchell <richard.j.mitchell@gmail.com>
+Date: Mon, 28 Apr 2014 16:58:27 +0100
+Subject: [PATCH] Fix speedtest run for ECB modes.
+
+---
+ pct-speedtest.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/pct-speedtest.py b/pct-speedtest.py
+index 4ce18be..c7b893a 100644
+--- a/pct-speedtest.py
++++ b/pct-speedtest.py
+@@ -121,6 +121,8 @@ class Benchmark:
+         blocks = self.random_blocks(16384, 1000)
+         if mode is None:
+             cipher = module.new(key)
++        elif mode==module.MODE_ECB:
++            cipher = module.new(key, module.MODE_ECB)
+         else:
+             cipher = module.new(key, mode, iv)
+ 

@@ -1,0 +1,6 @@
+%_openmpi_load \
+ . /etc/profile.d/modules.sh; \
+ module load mpi/openmpi-%{_arch};
+%_openmpi_unload \
+ . /etc/profile.d/modules.sh; \
+ module unload mpi/openmpi-%{_arch};

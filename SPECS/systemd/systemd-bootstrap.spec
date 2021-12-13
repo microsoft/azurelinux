@@ -1,47 +1,17 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
-Version:        239
-Release:        36%{?dist}
+Version:        249.7
+Release:        2%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.freedesktop.org/wiki/Software/systemd/
-#Source0:       https://github.com/systemd/systemd-stable/archive/v%{version}.tar.gz
+#Source0:       https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz
 Source0:        systemd-%{version}.tar.gz
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
-Patch0:         01-enoX-uses-instance-number-for-vmware-hv.patch
-Patch1:         02-install-general-aliases.patch
-Patch2:         systemd-239-default-dns-from-env.patch
-Patch3:         systemd-macros.patch
-Patch4:         systemd-239-query-duid.patch
-# Fix glibc-2.28 build issue. Checked in upstream after v239
-Patch5:         systemd-239-glibc-build-fix.patch
-Patch6:         systemd-239-revert-mtu.patch
-Patch7:         systemd-239-CVE-2018-15688.patch
-Patch8:         systemd-239-CVE-2018-15686.patch
-Patch9:         systemd-239-CVE-2018-15687.patch
-Patch10:        systemd-239-CVE-2018-16864.patch
-Patch11:        systemd-239-CVE-2018-16865.patch
-Patch12:        systemd-239-CVE-2018-16866.patch
-Patch13:        Backport-FOREACH_STRING-fix-for-gcc9.patch
-Patch14:        Disable-argument-to-mount_cgroup_controllers.patch
-# This commit from upstream fixes an issue caused by using a later version of meson.
-Patch15:        https://github.com/systemd/systemd/commit/8f6b442a78d0b485f044742ad90b2e8271b4e68e.patch
-Patch16:        CVE-2019-3842.patch
-Patch17:        CVE-2019-3843.patch
-Patch18:        CVE-2019-3844.patch
-Patch19:        CVE-2019-6454.patch
-Patch20:        CVE-2019-20386.patch
-Patch21:        CVE-2020-1712.patch
-Patch22:        CVE-2020-13776.patch
-# This vulnerability is in the strict DNS-over-TLS (DoT) mechanism of systemd-resolve.
-# DoT is only enabled when systemd is build against gnutls.
-# Furthermore, strict mode DoT is not supported before v243.
-Patch23:        CVE-2018-21029.nopatch
-Patch24:        CVE-2021-33910.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -57,9 +27,10 @@ BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
-BuildRequires:  util-linux-devel >= 2.30
+BuildRequires:  python3-jinja2
+BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
-Requires:       filesystem >= 1.1
+Requires:       %{name}-rpm-macros = %{version}-%{release}
 Requires:       glib
 Requires:       kmod
 Requires:       libcap
@@ -72,6 +43,14 @@ AutoReq:        no
 %description
 Systemd is an init replacement with better process control and security
 
+%package rpm-macros
+Summary:        Macros that define paths and scriptlets related to systemd
+BuildArch:      noarch
+AutoReq:        no
+
+%description rpm-macros
+Just the definitions of rpm macros.
+
 %package devel
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
@@ -82,7 +61,7 @@ AutoReq:        no
 Development headers for developing applications linking to libsystemd
 
 %prep
-%autosetup -p1 -n systemd-%{version}
+%autosetup -p1 -n systemd-stable-%{version}
 cat > config.cache << "EOF"
 KILL=/bin/kill
 HAVE_BLKID=1
@@ -98,8 +77,8 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 CFLAGS="%{build_cflags} -Wno-error=format-overflow="                        \
 meson  --prefix %{_prefix}                                            \
-       --sysconfdir %{_sysconfdir}                                              \
-       --localstatedir %{_var}                                           \
+       --sysconfdir %{_sysconfdir}                                    \
+       --localstatedir %{_var}                                        \
        -Dblkid=true                                                   \
        -Dbuildtype=release                                            \
        -Ddefault-dnssec=no                                            \
@@ -108,8 +87,8 @@ meson  --prefix %{_prefix}                                            \
        -Dldconfig=false                                               \
        -Drootprefix=                                                  \
        -Drootlibdir=/lib                                              \
-       -Dsplit-usr=false                                               \
-       -Dsysusers=false                                               \
+       -Dsplit-usr=false                                              \
+       -Dsysusers=true                                                \
        -Dpam=true                                                     \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
@@ -117,7 +96,7 @@ meson  --prefix %{_prefix}                                            \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
-       -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                    \
+       -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                     \
        -Drc-local=%{_sysconfdir}/rc.d/rc.local                        \
        $PWD build &&
        cd build &&
@@ -135,21 +114,29 @@ sed -i '/srv/d' %{buildroot}%{_libdir}/tmpfiles.d/home.conf
 sed -i "s:0775 root lock:0755 root root:g" %{buildroot}%{_libdir}/tmpfiles.d/legacy.conf
 sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel database:g" %{buildroot}%{_libdir}/systemd/network/99-default.link
 sed -i "s:#LLMNR=yes:LLMNR=false:g" %{buildroot}%{_sysconfdir}/systemd/resolved.conf
+sed -i "s:#NTP=:NTP=time.windows.com:g" %{buildroot}%{_sysconfdir}/systemd/timesyncd.conf
 rm -f %{buildroot}%{_var}/log/README
+rm -f %{buildroot}/%{_libdir}/modprobe.d/README
+rm -f %{buildroot}/lib/systemd/network/80-wifi-ap.network.example
+rm -f %{buildroot}/lib/systemd/network/80-wifi-station.network.example
 mkdir -p %{buildroot}%{_localstatedir}/opt/journal/log
 mkdir -p %{buildroot}%{_localstatedir}/log
 ln -sfv %{_localstatedir}/opt/journal/log %{buildroot}%{_localstatedir}/log/journal
 
 find %{buildroot} -type f -name "*.la" -delete -print
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d
-install -dm 0755 %{buildroot}/boot/
-install -m 0644 %{SOURCE2} %{buildroot}/boot/
+install -dm 0700 %{buildroot}/boot/
+install -m 0600 %{SOURCE2} %{buildroot}/boot/
 rm %{buildroot}%{_libdir}/systemd/system/default.target
 ln -sfv multi-user.target %{buildroot}%{_libdir}/systemd/system/default.target
 install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 
-%post -p /sbin/ldconfig
+# Enable default systemd units.
+%post
+/sbin/ldconfig
+systemctl preset-all
+
 %postun -p /sbin/ldconfig
 
 %clean
@@ -180,6 +167,7 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.machine1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.portable1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.timesync1.conf
+%config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.oom1.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
 %config(noreplace) %{_sysconfdir}/systemd/logind.conf
@@ -187,7 +175,11 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/systemd/resolved.conf
 %config(noreplace) %{_sysconfdir}/systemd/coredump.conf
 %config(noreplace) %{_sysconfdir}/systemd/timesyncd.conf
-%config(noreplace) %{_sysconfdir}/pam.d/systemd-user
+%config(noreplace) %{_sysconfdir}/systemd/networkd.conf
+%config(noreplace) %{_sysconfdir}/systemd/oomd.conf
+%config(noreplace) %{_sysconfdir}/systemd/pstore.conf
+%config(noreplace) %{_sysconfdir}/systemd/sleep.conf
+%{_libdir}/pam.d/systemd-user
 %config(noreplace) %{_sysconfdir}/systemd/network/99-dhcp-en.network
 
 %dir %{_sysconfdir}/udev
@@ -195,26 +187,20 @@ rm -rf %{buildroot}/*
 %dir %{_sysconfdir}/udev/hwdb.d
 %config(noreplace) %{_sysconfdir}/udev/udev.conf
 %config(noreplace) /boot/systemd.cfg
-%{_sysconfdir}/systemd/system/*
 %{_libdir}/udev/*
 %{_libdir}/systemd/*
-%config(noreplace) %{_libdir}/systemd/network/99-default.link
-%config(noreplace) %{_libdir}/systemd/portable/profile/default/service.conf
-%config(noreplace) %{_libdir}/systemd/portable/profile/nonetwork/service.conf
-%config(noreplace) %{_libdir}/systemd/portable/profile/strict/service.conf
-%config(noreplace) %{_libdir}/systemd/portable/profile/trusted/service.conf
 %{_libdir}/environment.d/99-environment.conf
 %exclude %{_libdir}/debug
 %exclude %{_datadir}/locale
 %{_libdir}/binfmt.d
 %{_libdir}/kernel
 %{_libdir}/modules-load.d
-%{_libdir}/rpm
 /lib/security
 %{_libdir}/sysctl.d
 %{_libdir}/tmpfiles.d
 /lib/*.so*
 %{_libdir}/modprobe.d/systemd.conf
+%{_libdir}/sysusers.d/*
 %{_bindir}/*
 %{_sbindir}/*
 /sbin/*
@@ -222,12 +208,14 @@ rm -rf %{buildroot}/*
 %{_datadir}/factory/*
 %{_datadir}/dbus-1
 %{_docdir}/*
-%{_mandir}/man[1578]/*
 %{_datadir}/polkit-1
 %{_datadir}/systemd
 %{_datadir}/zsh/*
 %dir %{_localstatedir}/opt/journal/log
 %{_localstatedir}/log/journal
+
+%files rpm-macros
+%{_libdir}/rpm
 
 %files devel
 %dir %{_includedir}/systemd
@@ -239,53 +227,81 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/libsystemd.pc
 %{_datadir}/pkgconfig/systemd.pc
 %{_datadir}/pkgconfig/udev.pc
-%{_mandir}/man3/*
 
 %changelog
-* Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 239-36
-- Enable auto provides to unblock bootstrap builds.
+* Wed Dec 08 2021 Henry Beberman <henry.beberman@microsoft.com> 249.7-2
+- Update systemd boot args to force cgroups V1 with systemd.unified_cgroup_hierarchy=0
+- Update 99-dhcp-en.network with SendRelease=false so DHCP leases arent released on reboot
 
-* Tue Jul 20 2021 Neha Agarwal <nehaagarwal@microsoft.com> 239-35
-- CVE-2021-33910 fix
+* Wed Dec 01 2021 Henry Beberman <henry.beberman@microsoft.com> 249.7-1
+- Update to systemd-stable version 249.7 by bootstrapifying the systemd 249.7 spec
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 239-34 (from dev branch)
-- Merge the following releases from dev to 1.0 spec
-- v-ruyche@microsoft.com, 239-30: Configure to support merged /usr.
-- joschmit@microsoft.com, 239-31: Replace incorrect %%{_lib} usage with %%{_libdir}
--   Turn off dependency generators
+* Sat Oct 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 239-42
+- Adding 'Obsoletes: systemd-bootstrap-devel' for the 'devel' subpackage.
+- Making 'systemd' obsolete 'systemd-bootstrap' regardless of version and release.
 
-* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-34 (from 1.0 branch)
-- Remove build dependency on shadow-utils to break circular dependency
+* Wed Aug 18 2021 Jon Slobodzian <joslobo@microsoft.com> - 239-41
+- Merge from 1.0 to dev branch
+- nehaagarwal@microsoft.com, 2.39-38: CVE-2021-33910 fix
 
-* Thu Mar 11 2021 Chris Co <chrco@microsoft.com> - 239-33
-- Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
+* Wed Jul 28 2021 Henry Li <lihl@microsoft.com> - 239-40
+- Enable building systemd-sysusers
+- Ship systemd-sysusers and related conf files from systemd package 
 
-* Fri Feb 12 2021 Henry Beberman <henry.beberman@microsoft.com> - 239-32
-- Enable LZ4 so journalctl can read logs from the container host.
+* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
+- Merge the following releases from 1.0 to dev branch
+- niontive@microsoft.com, 2.39-33: Use autosetup
+-   Fix CVE-2019-3842
+-   Fix CVE-2019-3843
+-   Fix CVE-2019-3844
+-   Fix CVE-2019-6454
+-   Fix CVE-2019-20386
+-   Fix CVE-2020-1712
+-   Fix CVE-2020-13776
+- niontive@microsoft.com, 2.39-34: Fix CVE-2019-6454, CVE-2020-1712 patches. Add upstream patch info.
+- henry.beberman@microsoft.com, 2.39-35: Enable LZ4 so journalctl can read logs from the container host.
+- chrco@microsoft.com, 2.39-36: Disallow unprivileged BPF scripts by default. Additional mitigation for CVE-2021-20194
 
-* Fri Nov 13 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-31
-- Fix CVE-2019-6454 patch. Add upstream patch info.
-- Fix CVE-2020-1712 patch. Add upstream patch info.
+* Mon Apr 26 2021 Henry Li <lihl@microsoft.com> - 239-38
+- Provides system-setup-keyboard.
 
-* Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> - 239-30
-- Use autosetup
-- Fix CVE-2019-3842
-- Fix CVE-2019-3843
-- Fix CVE-2019-3844
-- Fix CVE-2019-6454
-- Fix CVE-2019-20386
-- Fix CVE-2020-1712
-- Fix CVE-2020-13776
+* Tue Mar 23 2021 Daniel Burgener <daburgen@microsoft.com> 239-37 (on 1.0 branch)
+- Enable SELinux support
+- Remove unused BuildRequires shadow-utils
 
-*  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-29
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 239-37
+- Replace incorrect %%{_lib} usage with %%{_libdir}
+
+* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 239-36
+- Provide nss-myhostname.
+
+* Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 239-35
+- Provide systemd-udev and libudev-devel.
+
+* Tue Nov 10 2020 Ruying Chen <v-ruyche@microsoft.com> - 239-34
+- Configure to support merged /usr.
+
+* Wed Nov 04 2020 Joe Schmitt <joschmit@microsoft.com> - 239-33
+- Provide systemd-libs, systemd-units, and systemd-sysv.
+- Subpackage rpm-macros.
+
+*  Wed Sep 23 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 239-32
+-  Portablectl patches for --now --enable and --no-block flags support
+
+*  Mon Aug 24 2020 Leandro Pereira <leperei@microsoft.com> 239-31
+-  Use time.windows.com as the default NTP server in timesyncd.
+
+*  Tue Aug 11 2020 Mateusz Malisz <mamalisz@microsoft.com> 239-30
 -  Reduce kptr_restrict to 1
 
-*  Tue Jun 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-28
--  Change summary to address circular dependency.
+*  Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-29
+-  Include cryptsetup to build cryptsetup generator.
 
-*  Fri May 29 2020 Nicolas Ontiveros <niontive@microsoft.com> 239-27
--  Fork from systemd.spec.
--  Do not include cryptsetup in BR. This breaks a circular dependency.
+*  Wed May 27 2020 Chris Co <chrco@microsoft.com> 239-28
+-  Disable IPv6 router advertisements by default
+
+*  Wed May 20 2020 Emre Girgin <mrgirgin@microsoft.com> 239-27
+-  Change /boot directory permissions to 600.
 
 *  Wed May 20 2020 Joe Schmitt <joschmit@microsoft.com> 239-26
 -  Remove 99-vmware-hotplug.rules.

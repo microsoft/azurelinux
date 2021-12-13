@@ -1,0 +1,140 @@
+--- xpp3-1.1.4c/build.xml	2006-11-11 02:41:08.000000000 +0100
++++ xpp3-1.1.4c/build.xml	2017-09-11 18:57:52.820569880 +0200
+@@ -220,20 +220,20 @@
+ 
+   <target name="api" depends="prepare,update_api">
+     <mkdir dir="${build_api}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_api}" destdir="${build_api}" classpath="${build_api}"/>
+   </target>
+ 
+   <target name="impl_min" depends="prepare,api">
+     <mkdir dir="${build_classes_min}"/>
+     <touch file="${build_classes_min}/${xpp3_tag}_MIN_VERSION"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_api}" destdir="${build_classes_min}" classpath="${build_classes_min}">
+        <include name="**/*.java"/>
+        <exclude name="**/*Factory.java"/>
+        <exclude name="**/*Serializer.java"/>
+     </javac>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+        srcdir="${src_impl_min}" destdir="${build_classes_min}" classpath="${build_classes_min}"/>
+     <mkdir dir="${build_classes_min}/META-INF/services"/>
+     <copy todir="${build_classes_min}/META-INF/services">
+@@ -249,12 +249,12 @@
+   </target>
+ 
+   <target name="serializer" depends="prepare,api">
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+        srcdir="${src_impl_serializer}" destdir="${build_classes}" classpath="${build_api}"/>
+   </target>
+ 
+   <target name="builder" depends="prepare,api">
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+        srcdir="${src_builder}" destdir="${build_classes}" classpath="${build_api}"/>
+   </target>
+ 
+@@ -267,20 +267,20 @@
+ 
+   <target name="xpath" depends="builder">
+     <mkdir dir="${build_xpath}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+        srcdir="${src_xpath}" destdir="${build_xpath}" classpath="${build_api}:${build_classes}"/>
+   </target>
+ 
+   <target name="xpath_samples" depends="check_junit,xpath" if="junit_present">
+     <mkdir dir="${build_samples}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+        srcdir="${src_xpath_samples}" destdir="${build_samples}" classpath="${build_api}:${build_classes}:${build_xpath}"/>
+   </target>
+ 
+   <target name="impl" depends="impl_min,serializer">
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+        srcdir="${src_impl_min}" destdir="${build_classes}" classpath="${build_api}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+        srcdir="${src_impl_standard}" destdir="${build_classes}" classpath="${build_api}"/>
+     <mkdir dir="${build_classes}/META-INF/services"/>
+     <copy todir="${build_classes}/META-INF/services">
+@@ -298,7 +298,7 @@
+ 
+   <target name="parser_pool" depends="api,update_parser_pool">
+     <mkdir dir="${build_classes}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_parser_pool}" destdir="${build_classes}" classpath="${build_api}"/>
+   </target>
+ 
+@@ -312,7 +312,7 @@
+ 
+   <target name="dom2_builder" depends="api,check_dom2,update_dom2_builder">
+     <mkdir dir="${build_classes}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_dom2_builder}" destdir="${build_classes}" classpath="${build_api}"/>
+   </target>
+ 
+@@ -328,7 +328,7 @@
+ 
+   <target name="sax2_driver" depends="api,check_sax2,update_sax2_driver">
+     <mkdir dir="${build_classes}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_sax2_driver}" destdir="${build_classes}" classpath="${build_api}"/>
+   </target>
+ 
+@@ -344,7 +344,7 @@
+ 
+   <target name="util" depends="api,update_util">
+     <mkdir dir="${build_classes}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_util}" destdir="${build_classes}" classpath="${build_api}"/>
+   </target>
+ 
+@@ -358,7 +358,7 @@
+ 
+   <target name="wrapper" depends="api,util,update_wrapper">
+     <mkdir dir="${build_classes}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_wrapper}" destdir="${build_classes}" classpath="${build_api}"/>
+   </target>
+ 
+@@ -389,7 +389,7 @@
+ 
+   <target name="xmlpull_samples" depends="api,update_samples">
+     <mkdir dir="${build_samples}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_samples}" destdir="${build_samples}" classpath="${build_api}"/>
+   </target>
+ 
+@@ -424,7 +424,7 @@
+ 
+   <target name="tests_addons" if="junit_present"
+      depends="check_junit,impl,update_tests,wrapper,dom2_builder">
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
+       srcdir="${src_addons_tests}" destdir="${build_tests}"
+       classpath="${build_api}:${build_classes}"      
+       />
+@@ -433,8 +433,8 @@
+   <target name="tests_main" if="junit_present"
+      depends="check_junit,impl,update_tests">
+     <mkdir dir="${build_tests}"/>
+-    <javac debug="${debug}" deprecation="${deprecation}" source="1.2" target="1.1"
+-      srcdir="${src_tests}" destdir="${build_tests}" classpath="${build_api}"
++    <javac debug="${debug}" deprecation="${deprecation}" source="1.6" target="1.6"
++      srcdir="${src_tests}" destdir="${build_tests}" classpath="${build_api}" encoding="ISO-8859-1"
+       />
+     <copy todir="${build_tests_xml}">
+       <fileset dir="${src_xml_tests}">

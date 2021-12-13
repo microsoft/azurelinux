@@ -1,0 +1,23 @@
+# sa-update configuration
+#
+# Note that the opposite of "yes" is the empty string, NOT "no"
+
+# Don't run sa-update even if it's in /etc/cron.d/ - as installed
+#SAUPDATE=no
+
+# Run sa-update even if no daemon is detected
+#SAUPDATE=yes
+
+# Default: Run only if a daemon is detected
+
+# Options for the actual sa-update command
+# These are added to the channel configuration from 
+# /etc/mail/spamassassin/channel.d/*.conf
+# OPTIONS=-v
+
+# Debug script - send mail even if no update available
+# DEBUG=yes
+
+# Send mail when updates successfully processed
+# Default: send mail only on error
+#NOTIFY_UPD=yes

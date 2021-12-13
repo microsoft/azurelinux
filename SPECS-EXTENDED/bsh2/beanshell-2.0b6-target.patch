@@ -1,0 +1,31 @@
+--- beanshell-2.0b6/build.xml	2017-09-20 10:43:43.236033837 +0200
++++ beanshell-2.0b6/build.xml	2017-09-20 11:03:53.758564875 +0200
+@@ -170,7 +170,8 @@
+ 			deprecation="${deprecation}"
+ 			optimize="on"
+ 			debug="on"
+-      target="1.5"
++			source="8"
++			target="8"
+ 			includes="**/*.java"
+ 			excludes="${excludes},**/bak/**"
+ 		>
+@@ -213,12 +214,16 @@
+ 			 destdir="${javadoc-dir}"
+ 			 author="true"
+ 			 version="true"
+-       source="1.5"
++			 source="8"
+ 			 use="true"
+ 			 windowtitle="BeanShell ${version}"
+ 			 doctitle="&lt;h1&gt;BeanShell ${version}&lt;h1&gt;"
+ 			 bottom="&lt;em&gt;&#169; 2000-2005 pat@pat.net :-)&lt;/em&gt;"
+-		/>
++		>
++			<classpath>
++				<fileset refid="lib-fileset"/>
++			</classpath>
++		</javadoc>
+ 	</target>
+ 
+ 	<!-- Jar target setup -->

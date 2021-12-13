@@ -1,0 +1,57 @@
+diff --git a/lib/format/ataraid/sil.c.fix_sil_jbod b/lib/format/ataraid/sil.c
+index 6089682..8c3df38 100644
+--- a/lib/format/ataraid/sil.c.fix_sil_jbod
++++ b/lib/format/ataraid/sil.c
+@@ -1,8 +1,8 @@
+ /*
+  * Silicon Image Medley ATARAID metadata format handler.
+  *
+- * Copyright (C) 2004,2005  Heinz Mauelshagen, Red Hat GmbH.
+- *                          All rights reserved.
++ * Copyright (C) 2004,2005,2009  Heinz Mauelshagen, Red Hat GmbH.
++ *				 All rights reserved.
+  *
+  * See file LICENSE at the top of this source tree for license information.
+  */
+@@ -166,6 +166,16 @@ sil_valid(struct lib_context *lc, struct dev_info *di,
+ 	return 1;
+ }
+ 
++/* Return number of array sectors. */
++static uint64_t
++array_size(struct raid_dev *rd)
++{
++	struct sil *sil = META(rd, sil);
++
++	return (((uint64_t) sil->array_sectors_high) << 32) +
++	       sil->array_sectors_low;
++}
++
+ static void
+ free_sils(struct sil **sils, unsigned int i)
+ {
+@@ -381,6 +391,10 @@ devices(struct raid_dev *rd, void *context)
+ 	struct sil *sil = META(rd, sil);
+ 
+ 	switch (sil->type) {
++	case SIL_T_JBOD:
++		ret = array_size(rd) < rd->sectors ?
++		      1 : sil->drives_per_striped_set;
++		break;
+ 	case SIL_T_RAID0:
+ 	case SIL_T_RAID10:
+ 		ret = sil->drives_per_striped_set;
+@@ -519,12 +533,9 @@ stripes(struct sil *sil)
+ static uint64_t
+ sectors(struct raid_dev *rd)
+ {
+-	uint64_t array_sectors, ret = 0;
++	uint64_t array_sectors = array_size(rd), ret = 0;
+ 	struct sil *sil = META(rd, sil);
+ 
+-	array_sectors = (((uint64_t) sil->array_sectors_high) << 32) +
+-		sil->array_sectors_low;
+-
+ 	switch (sil->type) {
+ 	case SIL_T_SPARE:
+ 		/* Cook them up... */

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+ALIASESDB_STAMP=/var/lib/misc/postfix.aliasesdb-stamp
+
+make_aliasesdb() {
+        if [ "$(/usr/sbin/postconf -h alias_database)" == "hash:/etc/aliases" ]
+        then
+                # /etc/aliases.db may be used by other MTA, make sure nothing
+                # has touched it since our last newaliases call
+                [ /etc/aliases -nt /etc/aliases.db ] ||
+                        [ "$ALIASESDB_STAMP" -nt /etc/aliases.db ] ||
+                        [ "$ALIASESDB_STAMP" -ot /etc/aliases.db ] || return 0
+                /usr/bin/newaliases
+                touch -r /etc/aliases.db "$ALIASESDB_STAMP"
+        else
+                /usr/bin/newaliases
+        fi
+}
+
+make_aliasesdb

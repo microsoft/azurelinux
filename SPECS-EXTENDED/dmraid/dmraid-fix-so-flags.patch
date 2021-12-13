@@ -1,0 +1,17 @@
+ make.tmpl.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/make.tmpl.in b/make.tmpl.in
+index 1f1d1e5..ef863ba 100644
+--- a/make.tmpl.in
++++ b/make.tmpl.in
+@@ -129,7 +129,7 @@ $(TARGETS): $(OBJECTS)
+ %.so: $(OBJECTS) .export.sym
+ 
+ %.so: $(OBJECTS)
+-	$(CC) -shared -Wl,-soname,$(notdir $@).$(DMRAID_LIB_VERSION) \
++	$(CC) -shared $(CFLAGS) $(LDFLAGS) -Wl,-soname,$(notdir $@).$(DMRAID_LIB_VERSION) \
+ 	-Wl,--version-script,.export.sym $(OBJECTS) -o $@ -ldevmapper-event
+ 
+ $(LIB_STATIC): $(OBJECTS)
+

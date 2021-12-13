@@ -1,0 +1,14 @@
+[Unit]
+Description=Add Fedora flatpak repositories
+ConditionPathExists=!/var/lib/flatpak/.fedora-initialized
+Before=flatpak-system-helper.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/flatpak remote-add --system --if-not-exists --title "Fedora" fedora oci+https://registry.fedoraproject.org
+ExecStart=/usr/bin/flatpak remote-add --system --if-not-exists --disable --title "Fedora (testing)" fedora-testing oci+https://registry.fedoraproject.org#testing
+ExecStartPost=/usr/bin/touch /var/lib/flatpak/.fedora-initialized
+
+[Install]
+WantedBy=multi-user.target

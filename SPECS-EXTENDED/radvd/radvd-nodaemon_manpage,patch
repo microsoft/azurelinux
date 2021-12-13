@@ -1,0 +1,28 @@
+commit c41be286c56b71a0dc12971608df1c9e68cd95fd
+Author: Pavel Zhukov <pzhukov@redhat.com>
+Date:   Mon Jun 11 14:43:19 2018 +0200
+
+    Add nodaemon option to the manpage
+
+diff --git a/radvd.8.man b/radvd.8.man
+index 167b84b..79aa937 100644
+--- a/radvd.8.man
++++ b/radvd.8.man
+@@ -23,6 +23,7 @@ radvd \- router advertisement daemon for IPv6
+ .BI "[ \-p " pidfile " ]"
+ .BI "[ \-m " logmethod " ]"
+ .BI "[ \-l " logfile " ]"
++.BI "[ \-n " nodaemon " ]"
+ .BI "[ \-f " facility " ]"
+ .BI "[ \-t " chrootdir " ]"
+ .BI "[ \-u " username " ]"
+@@ -57,6 +58,9 @@ Displays a short usage description and then aborts.
+ .BR "\-c" , " \-\-configtest"
+ Test configuration and do startup tests and then exit.
+ .TP
++.BR "\-n" , " \-\-nodaemon"
++Prevent the daemonizing.
++.TP
+ .BR "\-d " debuglevel, " \-\-debug " debuglevel
+ With this option you turn on debugging information. The debugging level is
+ an integer in the range from 1 to 5, from  quiet to very verbose. A

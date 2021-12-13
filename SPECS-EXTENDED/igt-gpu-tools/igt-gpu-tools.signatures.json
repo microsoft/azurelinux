@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "igt-gpu-tools-20201203.tar.bz2": "0028ab79457bc4b1dc2f710d53f093f62fce5d827cff00025bf8c0918b2354a1",
+  "make-git-snapshot.sh": "e60f8b74a49e360dc7e63224bdfa2a5810e81d3f58c884012e6bbc7976ecc1a7"
+ }
+}

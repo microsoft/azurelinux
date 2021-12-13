@@ -1,0 +1,43 @@
+commit bb177c93c8852417fc5a522cbcc45abbab4b3c3d
+Author: Tomas Korbar <tomas.korb@seznam.cz>
+Date:   Thu Jun 7 20:57:07 2018 +0200
+
+    Add razor log path and home directory option
+
+diff --git a/lib/Mail/SpamAssassin/Plugin/Razor2.pm b/lib/Mail/SpamAssassin/Plugin/Razor2.pm
+index e24252c..935b3ac 100644
+--- a/lib/Mail/SpamAssassin/Plugin/Razor2.pm
++++ b/lib/Mail/SpamAssassin/Plugin/Razor2.pm
+@@ -165,7 +165,9 @@ sub razor2_access {
+       $rc->{opt} = {
+ 	debug => (would_log('dbg', $debug) > 1),
+ 	foreground => 1,
+-	config => $self->{main}->{conf}->{razor_config}
++	config => $self->{main}->{conf}->{razor_config},
++	logfile => $self->{main}->{razor_log_file},
++	razorhome => $self->{main}->{razor_home_dir}
+       };
+       # no facility prefix on this die
+       $rc->do_conf() or die "$debug: " . $rc->errstr;
+diff --git a/spamd/spamd.raw b/spamd/spamd.raw
+index 821f658..2afd6bb 100755
+--- a/spamd/spamd.raw
++++ b/spamd/spamd.raw
+@@ -361,6 +361,8 @@ prepare_for_sighup_restart();
+ # Parse the command line
+ Getopt::Long::Configure("bundling");
+ GetOptions(
++  'razor-home-dir=s'         => \$opt{'razor_home_dir'},
++  'razor-log-file=s'         => \$opt{'razor_log_file'},
+   'allow-tell'               => \$opt{'tell'},
+   'allowed-ips|A=s'          => \@{ $opt{'allowed-ip'} },
+   'auth-ident'               => \$opt{'auth-ident'},
+@@ -1149,6 +1151,8 @@ if ( defined $opt{'pidfile'} ) {
+ 
+ my $spamtest = Mail::SpamAssassin->new(
+   {
++    razor_home_dir       => $opt{'razor_home_dir'},
++    razor_log_file       => $opt{'razor_log_file'},
+     dont_copy_prefs      => $dontcopy,
+     rules_filename       => ( $opt{'configpath'} || 0 ),
+     site_rules_filename  => ( $opt{'siteconfigpath'} || 0 ),

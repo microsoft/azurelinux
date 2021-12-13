@@ -37,9 +37,6 @@
       - [`DOWNLOAD_SRPMS=...`](#download_srpms-1)
         - [`DOWNLOAD_SRPMS=`**`n`** *(default)*](#download_srpmsn-default)
         - [`DOWNLOAD_SRPMS=`**`y`**](#download_srpmsy)
-      - [`USE_UPDATE_REPO=...`](#use_update_repo)
-        - [`USE_UPDATE_REPO=`**`y`** *(default)*](#use_update_repoy-default)
-        - [`USE_UPDATE_REPO=`**`n`**](#use_update_repon)
       - [`USE_PREVIEW_REPO=...`](#use_preview_repo)
         - [`USE_PREVIEW_REPO=`**`n`** *(default)*](#use_preview_repon-default)
         - [`USE_PREVIEW_REPO=`**`y`**](#use_preview_repoy)
@@ -282,7 +279,7 @@ Direct file downloads are by default pulled from:
 
 ```makefile
 SOURCE_URL         ?=
-PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
+PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 ```
 
@@ -293,8 +290,8 @@ REPO_LIST ?=
 ```
 
 The `REPO_LIST` variable supports multiple repo files, and they are prioritized in the order they appear in the list.
-The CBL-Mariner base and update repos are implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
-To disable the update repo set `USE_UPDATE_REPO=n`. If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
+The CBL-Mariner base repo is implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
+If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
 
 ### Authentication
 
@@ -312,7 +309,7 @@ The build system can operate without using pre-built components if desired. Ther
 
 ```makefile
 SOURCE_URL         ?=
-PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms
+PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 REPO_LIST          ?=
 ```
@@ -322,7 +319,6 @@ DOWNLOAD_SRPMS         ?= n
 REBUILD_TOOLCHAIN      ?= n
 REBUILD_PACKAGES       ?= y
 REBUILD_TOOLS          ?= n
-USE_UPDATE_REPO        ?= y
 DISABLE_UPSTREAM_REPOS ?= n
 TOOLCHAIN_ARCHIVE      ?=
 PACKAGE_ARCHIVE        ?=
@@ -411,16 +407,6 @@ If that is not desired all remote sources can be disabled by clearing the follow
 ##### `DOWNLOAD_SRPMS=`**`y`**
 
 > Download official pre-packed SRPMs from `$(SRPM_URL)`. Use this option if `$(SOURCE_URL)` is not available.
-
-#### `USE_UPDATE_REPO=...`
-
-##### `USE_UPDATE_REPO=`**`y`** *(default)*
-
-> Pull missing packages from the upstream update repository in addition to the base repository.
-
-##### `USE_UPDATE_REPO=`**`n`**
-
-> Do not pull missing packages from the upstream update repository.
 
 #### `USE_PREVIEW_REPO=...`
 
@@ -617,7 +603,6 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | TOOLCHAIN_ARCHIVE             |                                                                                                        | Instead of downloading toolchain *.rpms, extract them from here (see `REBUILD_TOOLCHAIN`).
 | PACKAGE_ARCHIVE               |                                                                                                        | Use with `make hydrate-rpms` to populate a set of rpms from an archive.
 | DOWNLOAD_SRPMS                | n                                                                                                      | Pack SRPMs from local SPECs or download published ones?
-| USE_UPDATE_REPO               | y                                                                                                      | Pull missing packages from the upstream update repository in addition to the base repository?
 | USE_PREVIEW_REPO              | n                                                                                                      | Pull missing packages from the upstream preview repository in addition to the base repository?
 | DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 
@@ -629,7 +614,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                                                                                          | URL to request package sources from
 | SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms`                         | Space seperated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
-| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)/rpms`            | Space seperated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
+| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`                 | Space seperated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources

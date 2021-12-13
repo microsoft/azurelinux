@@ -1,0 +1,20 @@
+diff --git a/tools/frr-reload.py b/tools/frr-reload.py
+index 208fb11..0692adc 100755
+--- a/tools/frr-reload.py
++++ b/tools/frr-reload.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ # Frr Reloader
+ # Copyright (C) 2014 Cumulus Networks, Inc.
+ #
+diff --git a/tools/generate_support_bundle.py b/tools/generate_support_bundle.py
+index 540b7a1..0876ebb 100755
+--- a/tools/generate_support_bundle.py
++++ b/tools/generate_support_bundle.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ ########################################################
+ ### Python Script to generate the FRR support bundle ###

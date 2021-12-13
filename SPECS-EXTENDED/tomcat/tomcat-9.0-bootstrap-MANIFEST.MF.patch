@@ -1,0 +1,9 @@
+--- res/META-INF/bootstrap.jar.manifest.orig	2010-04-06 10:11:09.000000000 -0600
++++ res/META-INF/bootstrap.jar.manifest	2010-04-06 10:45:56.000000000 -0600
+@@ -1,6 +1,5 @@
+ Manifest-Version: 1.0
+ Main-Class: org.apache.catalina.startup.Bootstrap
+-Class-Path: commons-daemon.jar
+ Specification-Title: Apache Tomcat Bootstrap
+ Specification-Version: @VERSION_MAJOR_MINOR@
+ Specification-Vendor: Apache Software Foundation

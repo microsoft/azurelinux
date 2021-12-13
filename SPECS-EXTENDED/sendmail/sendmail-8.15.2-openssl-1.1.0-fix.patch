@@ -1,0 +1,182 @@
+--- sendmail-8.15.2.orig/sendmail/tls.c	2016-12-01 15:20:59.953546417 +0100
++++ sendmail-8.15.2.orig/sendmail/tls.c	2016-12-01 17:26:43.868521378 +0100
+@@ -63,14 +63,28 @@ static unsigned char dh512_g[] =
+ static DH *
+ get_dh512()
+ {
+-	DH *dh = NULL;
++	DH *dh;
++	BIGNUM *p, *g;
+ 
+ 	if ((dh = DH_new()) == NULL)
+ 		return NULL;
+-	dh->p = BN_bin2bn(dh512_p, sizeof(dh512_p), NULL);
+-	dh->g = BN_bin2bn(dh512_g, sizeof(dh512_g), NULL);
+-	if ((dh->p == NULL) || (dh->g == NULL))
++	p = BN_bin2bn(dh512_p, sizeof(dh512_p), NULL);
++	g = BN_bin2bn(dh512_g, sizeof(dh512_g), NULL);
++	if (p == NULL || g == NULL)
++	{
++		BN_free(p);
++		BN_free(g);
++		DH_free(dh);
+ 		return NULL;
++	}
++
++#if OPENSSL_VERSION_NUMBER >= 0x10100005L
++	DH_set0_pqg(dh, p, NULL, g);
++#else
++	dh->p = p;
++	dh->g = g;
++#endif
++
+ 	return dh;
+ }
+ 
+@@ -117,16 +131,27 @@ get_dh2048()
+ 		};
+ 	static unsigned char dh2048_g[]={ 0x02, };
+ 	DH *dh;
++	BIGNUM *p, *g;
+ 
+ 	if ((dh=DH_new()) == NULL)
+ 		return(NULL);
+-	dh->p=BN_bin2bn(dh2048_p,sizeof(dh2048_p),NULL);
+-	dh->g=BN_bin2bn(dh2048_g,sizeof(dh2048_g),NULL);
+-	if ((dh->p == NULL) || (dh->g == NULL))
++	p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), NULL);
++	g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), NULL);
++	if (p == NULL || g == NULL)
+ 	{
++		BN_free(p);
++		BN_free(g);
+ 		DH_free(dh);
+-		return(NULL);
++		return NULL;
+ 	}
++
++#if OPENSSL_VERSION_NUMBER >= 0x10100005L
++	DH_set0_pqg(dh, p, NULL, g);
++#else
++	dh->p = p;
++	dh->g = g;
++#endif
++
+ 	return(dh);
+ }
+ # endif /* !NO_DH */
+@@ -715,6 +740,54 @@ static char server_session_id_context[]
+ # define SM_SSL_OP_TLS_BLOCK_PADDING_BUG	0
+ #endif
+ 
++static RSA *
++generate_rsa_key(bits, e)
++	int bits;
++	unsigned long e;
++{
++#if OPENSSL_VERSION_NUMBER < 0x00908000L
++	return RSA_generate_key(bits, e, NULL, NULL);
++#else
++	BIGNUM *bne;
++	RSA *rsa = NULL;
++
++	bne = BN_new();
++	if (bne && BN_set_word(bne, e) != 1)
++		rsa = RSA_new();
++	if (rsa && RSA_generate_key_ex(rsa, bits, bne, NULL) != 1)
++	{
++		RSA_free(rsa);
++		rsa = NULL;
++	}
++	BN_free(bne);
++	return rsa;
++#endif
++}
++
++static DSA *
++generate_dsa_parameters(bits, seed, seed_len, counter_ret, h_ret)
++	int bits;
++	unsigned char *seed;
++	int seed_len;
++	int *counter_ret;
++	unsigned long *h_ret;
++{
++#if OPENSSL_VERSION_NUMBER < 0x00908000L
++	return DSA_generate_parameters(bits, seed, seed_len, counter_ret,
++			               h_ret, NULL, NULL);
++#else
++	DSA *dsa = DSA_new();
++
++	if (dsa && DSA_generate_parameters_ex(dsa, bits, seed, seed_len,
++				              counter_ret, h_ret, NULL) != 1)
++	{
++		DSA_free(dsa);
++		dsa = NULL;
++	}
++	return dsa;
++#endif
++}
++
+ bool
+ inittls(ctx, req, options, srv, certfile, keyfile, cacertpath, cacertfile, dhparam)
+ 	SSL_CTX **ctx;
+@@ -926,7 +999,7 @@ inittls(ctx, req, options, srv, certfile
+ 	{
+ 		/* get a pointer to the current certificate validation store */
+ 		store = SSL_CTX_get_cert_store(*ctx);	/* does not fail */
+-		crl_file = BIO_new(BIO_s_file_internal());
++		crl_file = BIO_new(BIO_s_file());
+ 		if (crl_file != NULL)
+ 		{
+ 			if (BIO_read_filename(crl_file, CRLFile) >= 0)
+@@ -1003,8 +1076,7 @@ inittls(ctx, req, options, srv, certfile
+ 	if (bitset(TLS_I_RSA_TMP, req)
+ #  if SM_CONF_SHM
+ 	    && ShmId != SM_SHM_NO_ID &&
+-	    (rsa_tmp = RSA_generate_key(RSA_KEYLENGTH, RSA_F4, NULL,
+-					NULL)) == NULL
++	    (rsa_tmp = generate_rsa_key(RSA_KEYLENGTH, RSA_F4)) == NULL
+ #  else /* SM_CONF_SHM */
+ 	    && 0	/* no shared memory: no need to generate key now */
+ #  endif /* SM_CONF_SHM */
+@@ -1210,8 +1282,8 @@ inittls(ctx, req, options, srv, certfile
+ 				sm_dprintf("inittls: Generating %d bit DH parameters\n", bits);
+ 
+ 			/* this takes a while! */
+-			dsa = DSA_generate_parameters(bits, NULL, 0, NULL,
+-						      NULL, 0, NULL);
++			dsa = generate_dsa_parameters(bits, NULL, 0, NULL,
++						      NULL);
+ 			dh = DSA_dup_DH(dsa);
+ 			DSA_free(dsa);
+ 		}
+@@ -1747,7 +1819,7 @@ tmp_rsa_key(s, export, keylength)
+ 
+ 	if (rsa_tmp != NULL)
+ 		RSA_free(rsa_tmp);
+-	rsa_tmp = RSA_generate_key(RSA_KEYLENGTH, RSA_F4, NULL, NULL);
++	rsa_tmp = generate_rsa_key(RSA_KEYLENGTH, RSA_F4);
+ 	if (rsa_tmp == NULL)
+ 	{
+ 		if (LogLevel > 0)
+@@ -1974,11 +2046,20 @@ x509_verify_cb(ok, ctx)
+ 	{
+ 		if (LogLevel > 13)
+ 			tls_verify_log(ok, ctx, "x509");
++#if OPENSSL_VERSION_NUMBER >= 0x10100005L
++		if (X509_STORE_CTX_get_error(ctx) ==
++		    X509_V_ERR_UNABLE_TO_GET_CRL)
++		{
++			X509_STORE_CTX_set_error(ctx, 0);
++			return 1;	/* override it */
++		}
++#else
+ 		if (ctx->error == X509_V_ERR_UNABLE_TO_GET_CRL)
+ 		{
+ 			ctx->error = 0;
+ 			return 1;	/* override it */
+ 		}
++#endif
+ 	}
+ 	return ok;
+ }

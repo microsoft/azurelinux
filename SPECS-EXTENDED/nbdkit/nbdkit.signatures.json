@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "libguestfs.keyring": "de74373a15bd572ad74f276ee063d2cefa915470863829c0dda6af488d6315d8",
+  "nbdkit-1.20.7.tar.gz": "999242d56787f69b79eddcd64e5cb2c3071d4bd8ed98dc7da711a09fca8095ec",
+  "nbdkit-1.20.7.tar.gz.sig": "ce2abbbdedd2187d53d327fe3479a513832886730c435932ff37c9b1df584226"
+ }
+}

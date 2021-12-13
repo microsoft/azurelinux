@@ -165,8 +165,8 @@
         "type": "other",
         "other": {
           "name": "atftp",
-          "version": "0.7.2",
-          "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.2.tar.gz"
+          "version": "0.7.5",
+          "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.5.tar.gz"
         }
       }
     },
@@ -776,8 +776,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "19.1",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/19.1/+download/cloud-init-19.1.tar.gz"
+          "version": "21.3",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/21.3/+download/cloud-init-21.3.tar.gz"
         }
       }
     },
@@ -1135,6 +1135,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "debugedit",
+          "version": "5.0",
+          "downloadUrl": "https://sourceware.org/ftp/debugedit/5.0/debugedit-5.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dejagnu",
           "version": "1.6.3",
           "downloadUrl": "https://ftp.gnu.org/pub/gnu/dejagnu/dejagnu-1.6.3.tar.gz"
@@ -1347,8 +1357,8 @@
         "type": "other",
         "other": {
           "name": "dracut",
-          "version": "049",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-049.tar.xz"
+          "version": "055",
+          "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-055.tar.xz"
         }
       }
     },
@@ -2189,8 +2199,8 @@
         "type": "other",
         "other": {
           "name": "groff",
-          "version": "1.22.3",
-          "downloadUrl": "http://ftp.gnu.org/gnu/groff/groff-1.22.3.tar.gz"
+          "version": "1.22.4",
+          "downloadUrl": "http://ftp.gnu.org/gnu/groff/groff-1.22.4.tar.gz"
         }
       }
     },
@@ -2919,8 +2929,8 @@
         "type": "other",
         "other": {
           "name": "less",
-          "version": "530",
-          "downloadUrl": "http://www.greenwoodsoftware.com/less/less-530.tar.gz"
+          "version": "590",
+          "downloadUrl": "http://www.greenwoodsoftware.com/less/less-590.tar.gz"
         }
       }
     },
@@ -5282,8 +5292,8 @@
         "type": "other",
         "other": {
           "name": "openscap",
-          "version": "1.3.1",
-          "downloadUrl": "https://github.com/OpenSCAP/openscap/releases/download/1.3.1/openscap-1.3.1.tar.gz"
+          "version": "1.3.5",
+          "downloadUrl": "https://github.com/OpenSCAP/openscap/releases/download/1.3.5/openscap-1.3.5.tar.gz"
         }
       }
     },
@@ -7652,8 +7662,8 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.14.2.1",
-          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.14.2.1-release.tar.gz"
+          "version": "4.17.0",
+          "downloadUrl": "https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz"
         }
       }
     },
@@ -8833,8 +8843,8 @@
         "type": "other",
         "other": {
           "name": "systemd",
-          "version": "239",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v239.tar.gz"
+          "version": "249.7",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz"
         }
       }
     },
@@ -8843,8 +8853,8 @@
         "type": "other",
         "other": {
           "name": "systemd-bootstrap",
-          "version": "239",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v239.tar.gz"
+          "version": "249.7",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz"
         }
       }
     },
@@ -9213,8 +9223,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.1.1667",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.1.1667.tar.gz"
+          "version": "8.2.3582",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.3582.tar.gz"
         }
       }
     },

@@ -1,0 +1,22 @@
+--- Changes
++++ Changes
+@@ -48,7 +48,7 @@
+ 
+    Release 0.08
+ 
+-   A little patch to Makefile.PL from Andreas König that makes the
++   A little patch to Makefile.PL from Andreas KÃ¶nig that makes the
+    umap program install by default.
+ 
+    Added some Unicode::Map8 compatibility stuff to the interface.
+--- README
++++ README
+@@ -231,7 +231,7 @@
+ 
+ COPYRIGHT
+ 
+-  © 1998-1999 Gisle Aas. All rights reserved.
++  Â© 1998-1999 Gisle Aas. All rights reserved.
+ 
+ This library is free software; you can redistribute it and/or modify
+ it under the same terms as Perl itself.

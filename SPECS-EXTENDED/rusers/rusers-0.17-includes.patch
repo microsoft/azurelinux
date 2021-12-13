@@ -1,0 +1,42 @@
+--- netkit-rusers-0.17/rup/err.c.includes	Sun Apr  6 00:13:31 1997
++++ netkit-rusers-0.17/rup/err.c	Wed Jul 25 15:08:27 2001
+@@ -6,6 +6,7 @@
+   "$Id: err.c,v 1.1 1997/04/05 22:13:31 dholland Exp $";
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <stdarg.h>
+ #include <err.h>
+ 
+--- netkit-rusers-0.17/rpc.rusersd/rusers_proc.c.includes	Wed Jul 25 15:07:24 2001
++++ netkit-rusers-0.17/rpc.rusersd/rusers_proc.c	Wed Jul 25 15:10:14 2001
+@@ -31,7 +31,7 @@
+ 
+ #include <signal.h>
+ #include <sys/types.h>
+-#include <sys/time.h>
++#include <time.h>
+ #include <utmp.h>
+ #include <stdio.h>
+ #include <syslog.h>
+--- netkit-rusers-0.17/rusers/rusers.c.includes	Sun Dec 12 20:32:05 1999
++++ netkit-rusers-0.17/rusers/rusers.c	Wed Jul 25 15:12:27 2001
+@@ -44,6 +44,7 @@
+ #include <utmp.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <time.h>
+ 
+ #include "../version.h"
+ 
+--- netkit-rusers-0.17/rpc.rstatd/rstatd.c.includes	Wed Feb 10 20:27:53 1999
++++ netkit-rusers-0.17/rpc.rstatd/rstatd.c	Wed Jul 25 15:13:09 2001
+@@ -40,6 +40,8 @@
+ #include <signal.h>
+ #include <syslog.h>
+ #include <rpcsvc/rstat.h>
++#include <sys/socket.h>
++#include <unistd.h>
+ 
+ extern void rstat_service();
+ 

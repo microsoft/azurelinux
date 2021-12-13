@@ -1,0 +1,42 @@
+From 3615f3ec7dd3c867a8394640c0fc4736189315df Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Thu, 5 Sep 2019 16:29:08 +0200
+Subject: [PATCH] warnquota: Properly detect LDAP errors
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+ldap_search_ext_s() and ldap_sasl_bind_s() can return also positive
+error result codes. Catch them properly.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ warnquota.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/warnquota.c b/warnquota.c
+index 53da671..24d7410 100644
+--- a/warnquota.c
++++ b/warnquota.c
+@@ -201,7 +201,7 @@ static int setup_ldap(struct configparams *config)
+ 		}
+ 	}
+ 	ret = ldap_sasl_bind_s(ldapconn, config->ldap_binddn, LDAP_SASL_SIMPLE, &cred, NULL, NULL, NULL);
+-	if(ret < 0) {
++	if (ret != LDAP_SUCCESS) {
+ 		errstr(_("ldap_sasl_bind_s() failed: %s\n"), ldap_err2string(ret));
+ 		return -1;
+ 	}
+@@ -426,7 +426,7 @@ static char *lookup_user(struct configparams *config, char *user)
+ 		searchbuf, NULL, 0, NULL, NULL, NULL,
+ 		0, &result);
+ 
+-	if (ret < 0) {
++	if (ret != LDAP_SUCCESS) {
+ 		errstr(_("Error with %s.\n"), user);
+ 		errstr(_("ldap_search_ext_s() failed: %s\n"), ldap_err2string(ret));
+ 		return NULL;
+-- 
+2.21.0
+

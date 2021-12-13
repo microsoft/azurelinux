@@ -1,55 +1,17 @@
-Summary:        Systemd-239
+Summary:        Systemd-249
 Name:           systemd
-Version:        239
-Release:        42%{?dist}
+Version:        249.7
+Release:        2%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.freedesktop.org/wiki/Software/systemd/
-#Source0:       https://github.com/systemd/systemd-stable/archive/v%{version}.tar.gz
+#Source0:       https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
-Patch0:         01-enoX-uses-instance-number-for-vmware-hv.patch
-Patch1:         02-install-general-aliases.patch
-Patch2:         systemd-239-default-dns-from-env.patch
-Patch3:         systemd-macros.patch
-Patch4:         systemd-239-query-duid.patch
-# Fix glibc-2.28 build issue. Checked in upstream after v239
-Patch5:         systemd-239-glibc-build-fix.patch
-Patch6:         systemd-239-revert-mtu.patch
-Patch7:         systemd-239-CVE-2018-15688.patch
-Patch8:         systemd-239-CVE-2018-15686.patch
-Patch9:         systemd-239-CVE-2018-15687.patch
-Patch10:        systemd-239-CVE-2018-16864.patch
-Patch11:        systemd-239-CVE-2018-16865.patch
-Patch12:        systemd-239-CVE-2018-16866.patch
-Patch13:        Backport-FOREACH_STRING-fix-for-gcc9.patch
-Patch14:        Disable-argument-to-mount_cgroup_controllers.patch
-# This commit from upstream fixes an issue caused by using a later version of meson.
-Patch15:        https://github.com/systemd/systemd/commit/8f6b442a78d0b485f044742ad90b2e8271b4e68e.patch
-Patch16:        CVE-2019-3842.patch
-Patch17:        CVE-2019-3843.patch
-Patch18:        CVE-2019-3844.patch
-Patch19:        CVE-2019-6454.patch
-Patch20:        CVE-2019-20386.patch
-Patch21:        CVE-2020-1712.patch
-Patch22:        CVE-2020-13776.patch
-# This vulnerability is in the strict DNS-over-TLS (DoT) mechanism of systemd-resolve.
-# DoT is only enabled when systemd is build against gnutls.
-# Furthermore, strict mode DoT is not supported before v243.
-Patch23:        CVE-2018-21029.nopatch
-Patch24:        CVE-2021-33910.patch
-#Portablectl patches for --now --enable and --no-block flags support
-Patch100:       100-portabled-allow-to-detach-an-image-with-a-unit-in-li.patch
-Patch101:       101-Portabled-fix-inspect-on-image-attached-as-directory.patch
-Patch102:       102-portablectl-add-now-and-enable-to-attach-detach.patch
-Patch103:       103-core-allow-portablectl-to-load-new-services-without-.patch
-Patch104:       104-portablectl-block-when-stopping-a-unit-on-detach-now.patch
-Patch105:       105-portablectl-use-replace-unload-when-stopping-a-servi.patch
-Patch106:       106-portabled-implement-container-host-os-release-interf.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -67,10 +29,10 @@ BuildRequires:  lz4-devel
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
-BuildRequires:  util-linux-devel >= 2.30
+BuildRequires:  python3-jinja2
+BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
 Requires:       %{name}-rpm-macros = %{version}-%{release}
-Requires:       filesystem >= 1.1
 Requires:       glib
 Requires:       kmod
 Requires:       libcap
@@ -121,7 +83,7 @@ Requires:       %{name} = %{version}-%{release}
 Language pack for systemd
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n systemd-stable-%{version}
 cat > config.cache << "EOF"
 KILL=/bin/kill
 HAVE_BLKID=1
@@ -147,8 +109,8 @@ meson  --prefix %{_prefix}                                            \
        -Dldconfig=false                                               \
        -Drootprefix=                                                  \
        -Drootlibdir=/lib                                              \
-       -Dsplit-usr=false                                               \
-       -Dsysusers=true                                               \
+       -Dsplit-usr=false                                              \
+       -Dsysusers=true                                                \
        -Dpam=true                                                     \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
@@ -179,6 +141,9 @@ sed -i "s:NamePolicy=kernel database onboard slot path:NamePolicy=kernel databas
 sed -i "s:#LLMNR=yes:LLMNR=false:g" %{buildroot}%{_sysconfdir}/systemd/resolved.conf
 sed -i "s:#NTP=:NTP=time.windows.com:g" %{buildroot}%{_sysconfdir}/systemd/timesyncd.conf
 rm -f %{buildroot}%{_var}/log/README
+rm -f %{buildroot}/%{_libdir}/modprobe.d/README
+rm -f %{buildroot}/lib/systemd/network/80-wifi-ap.network.example
+rm -f %{buildroot}/lib/systemd/network/80-wifi-station.network.example
 mkdir -p %{buildroot}%{_localstatedir}/opt/journal/log
 mkdir -p %{buildroot}%{_localstatedir}/log
 ln -sfv %{_localstatedir}/opt/journal/log %{buildroot}%{_localstatedir}/log/journal
@@ -196,7 +161,11 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 %check
 meson test -C build
 
-%post -p /sbin/ldconfig
+# Enable default systemd units.
+%post
+/sbin/ldconfig
+systemctl preset-all
+
 %postun -p /sbin/ldconfig
 
 %clean
@@ -218,6 +187,7 @@ rm -rf %{buildroot}/*
 %{_sysconfdir}/xdg/systemd
 %{_sysconfdir}/rc.d/init.d/README
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
+%config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.home1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.locale1.conf
@@ -227,14 +197,20 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.machine1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.portable1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.timesync1.conf
+%config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.oom1.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
+%config(noreplace) %{_sysconfdir}/systemd/homed.conf
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
 %config(noreplace) %{_sysconfdir}/systemd/logind.conf
 %config(noreplace) %{_sysconfdir}/systemd/journald.conf
 %config(noreplace) %{_sysconfdir}/systemd/resolved.conf
 %config(noreplace) %{_sysconfdir}/systemd/coredump.conf
 %config(noreplace) %{_sysconfdir}/systemd/timesyncd.conf
-%config(noreplace) %{_sysconfdir}/pam.d/systemd-user
+%config(noreplace) %{_sysconfdir}/systemd/networkd.conf
+%config(noreplace) %{_sysconfdir}/systemd/oomd.conf
+%config(noreplace) %{_sysconfdir}/systemd/pstore.conf
+%config(noreplace) %{_sysconfdir}/systemd/sleep.conf
+%{_libdir}/pam.d/systemd-user
 %config(noreplace) %{_sysconfdir}/systemd/network/99-dhcp-en.network
 
 %dir %{_sysconfdir}/udev
@@ -242,14 +218,8 @@ rm -rf %{buildroot}/*
 %dir %{_sysconfdir}/udev/hwdb.d
 %config(noreplace) %{_sysconfdir}/udev/udev.conf
 %config(noreplace) /boot/systemd.cfg
-%{_sysconfdir}/systemd/system/*
 %{_libdir}/udev/*
 %{_libdir}/systemd/*
-%config(noreplace) %{_libdir}/systemd/network/99-default.link
-%config(noreplace) %{_libdir}/systemd/portable/profile/default/service.conf
-%config(noreplace) %{_libdir}/systemd/portable/profile/nonetwork/service.conf
-%config(noreplace) %{_libdir}/systemd/portable/profile/strict/service.conf
-%config(noreplace) %{_libdir}/systemd/portable/profile/trusted/service.conf
 %{_libdir}/environment.d/99-environment.conf
 %exclude %{_libdir}/debug
 %exclude %{_datadir}/locale
@@ -269,7 +239,6 @@ rm -rf %{buildroot}/*
 %{_datadir}/factory/*
 %{_datadir}/dbus-1
 %{_docdir}/*
-%{_mandir}/man[1578]/*
 %{_datadir}/polkit-1
 %{_datadir}/systemd
 %{_datadir}/zsh/*
@@ -289,11 +258,19 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/libsystemd.pc
 %{_datadir}/pkgconfig/systemd.pc
 %{_datadir}/pkgconfig/udev.pc
-%{_mandir}/man3/*
 
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Dec 08 2021 Henry Beberman <henry.beberman@microsoft.com> 249.7-2
+- Update systemd boot args to force cgroups V1 with systemd.unified_cgroup_hierarchy=0
+- Update 99-dhcp-en.network with SendRelease=false so DHCP leases arent released on reboot
+
+* Wed Dec 01 2021 Henry Beberman <henry.beberman@microsoft.com> 249.7-1
+- Update to systemd-stable version 249.7
+- Remove all patches, most have been merged upstream.
+- Add 'systemctl preset-all' to post section to enact presets in '/usr/lib/systemd/system-preset'
+
 * Sat Oct 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 239-42
 - Adding 'Obsoletes: systemd-bootstrap-devel' for the 'devel' subpackage.
 - Making 'systemd' obsolete 'systemd-bootstrap' regardless of version and release.

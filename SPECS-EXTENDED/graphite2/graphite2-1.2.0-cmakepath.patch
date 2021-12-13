@@ -1,0 +1,9 @@
+diff -urN graphite2-1.2.0.orig/src/CMakeLists.txt graphite2-1.2.0/src/CMakeLists.txt
+--- graphite2-1.2.0.orig/src/CMakeLists.txt	2013-01-29 15:47:32.465841769 +0530
++++ graphite2-1.2.0/src/CMakeLists.txt	2013-01-29 15:48:24.056843352 +0530
+@@ -136,4 +136,4 @@
+ 
+ 
+ install(TARGETS graphite2 EXPORT graphite2 LIBRARY DESTINATION lib${LIB_SUFFIX} ARCHIVE DESTINATION lib${LIB_SUFFIX} PUBLIC_HEADER DESTINATION include/graphite2 RUNTIME DESTINATION bin)
+-install(EXPORT graphite2 DESTINATION share/graphite2 NAMESPACE gr2_)
++install(EXPORT graphite2 DESTINATION lib${LIB_SUFFIX}/graphite2 NAMESPACE gr2_)

@@ -1,0 +1,67 @@
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/Makefile.am.reload	2016-06-21 00:15:37.370393487 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/Makefile.am	2016-06-21 00:17:34.190841661 +0900
+@@ -418,6 +418,7 @@
+     --pkg gio-2.0 \
+     --pkg posix \
+     --pkg lxsettings-daemon \
++    --pkg xevent \
+     $(buildinclip_VALAFLAGS) \
+     $(buildinpolkit_VALAFLAGS) \
+     $(lxsession_gtk_lxsession_VALAFLAGS) \
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/vapi/xevent.vapi.reload	2016-06-21 00:15:37.370393487 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/vapi/xevent.vapi	2016-06-21 00:15:37.370393487 +0900
+@@ -0,0 +1,10 @@
++[CCode (cprefix = "LxsessionXEvent", cheader_filename = "lxsettings-daemon/xevent.h")]
++    public static void send_internal_command( int cmd );
++    public static bool xdpy_init();
++
++[CCode (cname = "int", cprefix = "LXS_", cheader_filename = "lxsettings-daemon/xevent.h", has_type_id = false)]
++	public enum LXS_CMD {
++		RELOAD,
++		EXIT,
++		LAST_CMD
++	}
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsettings-daemon/xevent.c.reload	2016-04-18 03:13:01.000000000 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsettings-daemon/xevent.c	2016-06-21 00:15:37.370393487 +0900
+@@ -71,13 +71,19 @@
+ 	XSync(dpy, False);
+ }
+ 
++gboolean xdpy_init()
++{
++	dpy = XOpenDisplay( g_getenv("DISPLAY") );
++	if( ! dpy )
++		return FALSE;
++}
++
+ gboolean xevent_init()
+ {
+ 	X11Source* xsource;
+ 	int fd;
+ 
+-	dpy = XOpenDisplay( g_getenv("DISPLAY") );
+-	if( ! dpy )
++	if( xdpy_init() == FALSE )
+ 		return FALSE;
+ 
+ 	/* according to the spec, private Atoms should prefix their names with _. */
+--- lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsession/main.vala.reload	2016-04-18 03:13:01.000000000 +0900
++++ lxsession-9f8d613332abec5ec0b64b94e1a17caa0c56798b/lxsession/main.vala	2016-06-21 00:15:37.370393487 +0900
+@@ -99,6 +99,17 @@
+             return -1;
+         }
+ 
++		if (xdpy_init() == false)
++		{
++			return 1;
++		}
++
++		if (reload == true)
++		{
++			send_internal_command(LXS_CMD.RELOAD);
++			return 0;
++		}
++
+         message ("Session is %s",session);
+         message ("DE is %s", desktop_environnement);
+ 

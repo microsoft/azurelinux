@@ -1,0 +1,95 @@
+From 6f1e595890521c0c3448457f112c1598d8b9c7f9 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Fri, 16 Mar 2018 13:45:01 +0100
+Subject: [PATCH 4/4] Port to current maven-shared-utils
+
+---
+ .../surefire/report/StatelessXmlReporter.java    | 16 ++++++++++------
+ pom.xml                                          |  2 +-
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/report/StatelessXmlReporter.java b/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/report/StatelessXmlReporter.java
+index dad9808..111b92b 100644
+--- a/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/report/StatelessXmlReporter.java
++++ b/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/report/StatelessXmlReporter.java
+@@ -237,6 +237,10 @@ public class StatelessXmlReporter
+             }
+             ppw.endElement(); // TestSuite
+         }
++        catch (IOException e)
++        {
++            throw new RuntimeException(e);
++        }
+         finally
+         {
+             closeQuietly( fw );
+@@ -323,7 +327,7 @@ public class StatelessXmlReporter
+     }
+ 
+     private static void startTestElement( XMLWriter ppw, WrappedReportEntry report, String reportNameSuffix,
+-                                          String timeAsString )
++                                          String timeAsString ) throws IOException
+     {
+         ppw.startElement( "testcase" );
+         ppw.addAttribute( "name", report.getReportName() );
+@@ -346,7 +350,7 @@ public class StatelessXmlReporter
+     }
+ 
+     private void createTestSuiteElement( XMLWriter ppw, WrappedReportEntry report, TestSetStats testSetStats,
+-                                         String timeAsString )
++                                         String timeAsString ) throws IOException
+     {
+         ppw.startElement( "testsuite" );
+ 
+@@ -373,7 +377,7 @@ public class StatelessXmlReporter
+ 
+     private static void getTestProblems( OutputStreamWriter outputStreamWriter, XMLWriter ppw,
+                                          WrappedReportEntry report, boolean trimStackTrace, OutputStream fw,
+-                                         String testErrorType, boolean createOutErrElementsInside )
++                                         String testErrorType, boolean createOutErrElementsInside ) throws IOException
+     {
+         ppw.startElement( testErrorType );
+ 
+@@ -418,7 +422,7 @@ public class StatelessXmlReporter
+ 
+     // Create system-out and system-err elements
+     private static void createOutErrElements( OutputStreamWriter outputStreamWriter, XMLWriter ppw,
+-                                              WrappedReportEntry report, OutputStream fw )
++                                              WrappedReportEntry report, OutputStream fw ) throws IOException
+     {
+         EncodingOutputStream eos = new EncodingOutputStream( fw );
+         addOutputStreamElement( outputStreamWriter, eos, ppw, report.getStdout(), "system-out" );
+@@ -428,7 +432,7 @@ public class StatelessXmlReporter
+     private static void addOutputStreamElement( OutputStreamWriter outputStreamWriter,
+                                          EncodingOutputStream eos, XMLWriter xmlWriter,
+                                          Utf8RecodingDeferredFileOutputStream utf8RecodingDeferredFileOutputStream,
+-                                         String name )
++                                         String name ) throws IOException
+     {
+         if ( utf8RecodingDeferredFileOutputStream != null && utf8RecodingDeferredFileOutputStream.getByteCount() > 0 )
+         {
+@@ -458,7 +462,7 @@ public class StatelessXmlReporter
+      *
+      * @param xmlWriter The test suite to report to
+      */
+-    private static void showProperties( XMLWriter xmlWriter, Map<String, String> systemProperties )
++    private static void showProperties( XMLWriter xmlWriter, Map<String, String> systemProperties ) throws IOException
+     {
+         xmlWriter.startElement( "properties" );
+         for ( final Entry<String, String> entry : systemProperties.entrySet() )
+diff --git a/pom.xml b/pom.xml
+index efc9342..6492689 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -91,7 +91,7 @@
+     <mavenPluginPluginVersion>3.5</mavenPluginPluginVersion>
+     <commonsLang3Version>3.5</commonsLang3Version>
+     <commonsIoVersion>2.5</commonsIoVersion>
+-    <mavenSharedUtilsVersion>0.9</mavenSharedUtilsVersion>
++    <mavenSharedUtilsVersion>3.2.1</mavenSharedUtilsVersion>
+     <powermockVersion>2.0.0-beta.5</powermockVersion>
+     <maven.surefire.scm.devConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-surefire.git</maven.surefire.scm.devConnection>
+     <maven.site.path>surefire-archives/surefire-LATEST</maven.site.path>
+-- 
+2.17.1
+

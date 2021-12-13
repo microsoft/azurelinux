@@ -1,0 +1,29 @@
+From 05e241bca2f48a271627a2fedcdb43f1fe5b9483 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 2 Jul 2015 13:37:47 +0200
+Subject: [PATCH] Normalize Changes encoding
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Changes | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Changes b/Changes
+index 831e061..27fda24 100644
+--- a/Changes
++++ b/Changes
+@@ -236,7 +236,7 @@ Revision history for Perl distribution libnet
+ 
+ 1.24 2014-01-06
+ 
+-    - Fix incorrect handling of CRLF in Net::FTP.  [Willem Monsuw�, CPAN
++    - Fix incorrect handling of CRLF in Net::FTP.  [Willem Monsuwé, CPAN
+       RT#41642/62029]
+ 
+     - POD fixes.  [Dominic Hargreaves, CPAN RT#91761]
+-- 
+2.5.5
+

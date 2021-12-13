@@ -1,0 +1,260 @@
+From cc1f4c53100ae50e0fba379c40ac8e1fe72c1fb1 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Tue, 2 Jul 2019 16:28:16 -0500
+Subject: [PATCH] libmultipath: add wrapper function around pgpolicyfn
+
+group_paths() is a wrapper around the pgpolicy functions, that pulls out
+the common code from the beginning and the end. For this to work,
+one_group() needs to change how it sets up the pathgroups vector to work
+like the other pgpolicy functions. This does means that the pathgroups
+in group_by_prio are now needlessly sorted afterwards. That will be
+dealt with in a later patch.  Also, since store_pathgroup() is only
+called by add_pathgroup(), it doesn't need to exist as a seperate
+function.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/configure.c  |  2 +-
+ libmultipath/pgpolicies.c | 83 ++++++++++++++-------------------------
+ libmultipath/pgpolicies.h |  2 +-
+ libmultipath/structs.c    | 16 ++------
+ libmultipath/structs.h    |  1 -
+ 5 files changed, 35 insertions(+), 69 deletions(-)
+
+diff --git a/libmultipath/configure.c b/libmultipath/configure.c
+index b09ef529..3c309d64 100644
+--- a/libmultipath/configure.c
++++ b/libmultipath/configure.c
+@@ -387,7 +387,7 @@ int setup_map(struct multipath *mpp, char *params, int params_size,
+ 		vector_free(mpp->pg);
+ 		mpp->pg = NULL;
+ 	}
+-	if (mpp->pgpolicyfn && mpp->pgpolicyfn(mpp))
++	if (group_paths(mpp))
+ 		return 1;
+ 
+ 	/*
+diff --git a/libmultipath/pgpolicies.c b/libmultipath/pgpolicies.c
+index 660768a4..1b59485c 100644
+--- a/libmultipath/pgpolicies.c
++++ b/libmultipath/pgpolicies.c
+@@ -84,6 +84,26 @@ sort_pathgroups (struct multipath *mp) {
+ }
+ 
+ 
++int group_paths(struct multipath *mp)
++{
++	if (!mp->pg)
++		mp->pg = vector_alloc();
++	if (!mp->pg)
++		return 1;
++
++	if (VECTOR_SIZE(mp->paths) > 0 &&
++	    (!mp->pgpolicyfn || mp->pgpolicyfn(mp))) {
++		vector_free(mp->pg);
++		mp->pg = NULL;
++		return 1;
++	}
++
++	sort_pathgroups(mp);
++	vector_free(mp->paths);
++	mp->paths = NULL;
++	return 0;
++}
++
+ /*
+  * One path group per unique tgt_node_name present in the path vector
+  */
+@@ -95,12 +115,6 @@ int group_by_node_name(struct multipath * mp)
+ 	struct pathgroup * pgp;
+ 	struct path * pp2;
+ 
+-	if (!mp->pg)
+-		mp->pg = vector_alloc();
+-
+-	if (!mp->pg)
+-		return 1;
+-
+ 	/* init the bitmap */
+ 	bitmap = (int *)MALLOC(VECTOR_SIZE(mp->paths) * sizeof (int));
+ 
+@@ -146,9 +160,6 @@ int group_by_node_name(struct multipath * mp)
+ 		}
+ 	}
+ 	FREE(bitmap);
+-	sort_pathgroups(mp);
+-	free_pathvec(mp->paths, KEEP_PATHS);
+-	mp->paths = NULL;
+ 	return 0;
+ out2:
+ 	free_pathgroup(pgp, KEEP_PATHS);
+@@ -171,12 +182,6 @@ int group_by_serial(struct multipath * mp)
+ 	struct pathgroup * pgp;
+ 	struct path * pp2;
+ 
+-	if (!mp->pg)
+-		mp->pg = vector_alloc();
+-
+-	if (!mp->pg)
+-		return 1;
+-
+ 	/* init the bitmap */
+ 	bitmap = (int *)MALLOC(VECTOR_SIZE(mp->paths) * sizeof (int));
+ 
+@@ -221,9 +226,6 @@ int group_by_serial(struct multipath * mp)
+ 		}
+ 	}
+ 	FREE(bitmap);
+-	sort_pathgroups(mp);
+-	free_pathvec(mp->paths, KEEP_PATHS);
+-	mp->paths = NULL;
+ 	return 0;
+ out2:
+ 	free_pathgroup(pgp, KEEP_PATHS);
+@@ -241,12 +243,6 @@ int one_path_per_group(struct multipath *mp)
+ 	struct path * pp;
+ 	struct pathgroup * pgp;
+ 
+-	if (!mp->pg)
+-		mp->pg = vector_alloc();
+-
+-	if (!mp->pg)
+-		return 1;
+-
+ 	for (i = 0; i < VECTOR_SIZE(mp->paths); i++) {
+ 		pp = VECTOR_SLOT(mp->paths, i);
+ 		pgp = alloc_pathgroup();
+@@ -260,9 +256,6 @@ int one_path_per_group(struct multipath *mp)
+ 		if (store_path(pgp->paths, pp))
+ 			goto out1;
+ 	}
+-	sort_pathgroups(mp);
+-	free_pathvec(mp->paths, KEEP_PATHS);
+-	mp->paths = NULL;
+ 	return 0;
+ out1:
+ 	free_pathgroup(pgp, KEEP_PATHS);
+@@ -274,32 +267,24 @@ out:
+ 
+ int one_group(struct multipath *mp)	/* aka multibus */
+ {
++	int i;
++	struct path * pp;
+ 	struct pathgroup * pgp;
+ 
+-	if (VECTOR_SIZE(mp->paths) < 0)
+-		return 0;
++	pgp = alloc_pathgroup();
+ 
+-	if (!mp->pg)
+-		mp->pg = vector_alloc();
++	if (!pgp)
++		goto out;
+ 
+-	if (!mp->pg)
+-		return 1;
++	if (add_pathgroup(mp, pgp))
++		goto out1;
+ 
+-	if (VECTOR_SIZE(mp->paths) > 0) {
+-		pgp = alloc_pathgroup();
++	for (i = 0; i < VECTOR_SIZE(mp->paths); i++) {
++		pp = VECTOR_SLOT(mp->paths, i);
+ 
+-		if (!pgp)
++		if (store_path(pgp->paths, pp))
+ 			goto out;
+-
+-		vector_free(pgp->paths);
+-
+-		if (add_pathgroup(mp, pgp))
+-			goto out1;
+-
+-		pgp->paths = mp->paths;
+-		mp->paths = NULL;
+ 	}
+-
+ 	return 0;
+ out1:
+ 	free_pathgroup(pgp, KEEP_PATHS);
+@@ -317,12 +302,6 @@ int group_by_prio(struct multipath *mp)
+ 	struct pathgroup * pgp;
+ 	vector pathvec = NULL;
+ 
+-	if (!mp->pg)
+-		mp->pg = vector_alloc();
+-
+-	if (!mp->pg)
+-		return 1;
+-
+ 	pathvec = vector_alloc();
+ 	if (!pathvec)
+ 		goto out;
+@@ -387,8 +366,6 @@ int group_by_prio(struct multipath *mp)
+ 		}
+ 	}
+ 	free_pathvec(pathvec, KEEP_PATHS);
+-	free_pathvec(mp->paths, KEEP_PATHS);
+-	mp->paths = NULL;
+ 	return 0;
+ out2:
+ 	free_pathgroup(pgp, KEEP_PATHS);
+diff --git a/libmultipath/pgpolicies.h b/libmultipath/pgpolicies.h
+index c0eaa7f4..11834011 100644
+--- a/libmultipath/pgpolicies.h
++++ b/libmultipath/pgpolicies.h
+@@ -21,7 +21,7 @@ enum iopolicies {
+ 
+ int get_pgpolicy_id(char *);
+ int get_pgpolicy_name (char *, int, int);
+-
++int group_paths(struct multipath *);
+ /*
+  * policies
+  */
+diff --git a/libmultipath/structs.c b/libmultipath/structs.c
+index fee899bd..bf7fdd73 100644
+--- a/libmultipath/structs.c
++++ b/libmultipath/structs.c
+@@ -318,23 +318,13 @@ store_path (vector pathvec, struct path * pp)
+ 	return 0;
+ }
+ 
+-int
+-store_pathgroup (vector pgvec, struct pathgroup * pgp)
++int add_pathgroup(struct multipath *mpp, struct pathgroup *pgp)
+ {
+-	if (!vector_alloc_slot(pgvec))
++	if (!vector_alloc_slot(mpp->pg))
+ 		return 1;
+ 
+-	vector_set_slot(pgvec, pgp);
+-
+-	return 0;
+-}
+-
+-int add_pathgroup(struct multipath *mpp, struct pathgroup *pgp)
+-{
+-	int ret = store_pathgroup(mpp->pg, pgp);
++	vector_set_slot(mpp->pg, pgp);
+ 
+-	if (ret)
+-		return ret;
+ 	pgp->mpp = mpp;
+ 	return 0;
+ }
+diff --git a/libmultipath/structs.h b/libmultipath/structs.h
+index 1a3d827b..893074eb 100644
+--- a/libmultipath/structs.h
++++ b/libmultipath/structs.h
+@@ -445,7 +445,6 @@ int store_adaptergroup(vector adapters, struct adapter_group *agp);
+ int store_hostgroup(vector hostgroupvec, struct host_group *hgp);
+ 
+ int store_path (vector pathvec, struct path * pp);
+-int store_pathgroup (vector pgvec, struct pathgroup * pgp);
+ int add_pathgroup(struct multipath*, struct pathgroup *);
+ 
+ struct multipath * find_mp_by_alias (const struct _vector *mp, const char *alias);
+-- 
+2.17.2
+

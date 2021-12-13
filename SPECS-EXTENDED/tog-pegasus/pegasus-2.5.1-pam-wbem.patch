@@ -1,0 +1,22 @@
+--- pegasus/rpm/wbem.pam-wbem	2006-01-17 14:17:43.000000000 -0500
++++ pegasus/rpm/wbem	2006-04-05 19:26:46.000000000 -0400
+@@ -1,13 +1,7 @@
+ #%PAM-1.0
+-auth        required      $ISA/pam_env.so
+-auth        sufficient    $ISA/pam_unix.so nullok
+-auth        required      $ISA/pam_deny.so
+-
+-account     required      $ISA/pam_unix.so
+-
+-password    required      $ISA/pam_cracklib.so retry=3 type=
+-password    sufficient    $ISA/pam_unix.so nullok use_authtok md5 shadow
+-password    required      $ISA/pam_deny.so
+-
+-session     required      $ISA/pam_limits.so
+-session     required      $ISA/pam_unix.so
++auth       include      password-auth
++account    required     pam_access.so accessfile=/etc/Pegasus/access.conf
++account    include      password-auth
++password   include      password-auth
++session    required     pam_loginuid.so 
++session    include      password-auth

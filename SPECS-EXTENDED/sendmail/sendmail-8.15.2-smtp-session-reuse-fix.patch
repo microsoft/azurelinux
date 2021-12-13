@@ -1,0 +1,249 @@
+diff -ru a/sendmail/deliver.c b/sendmail/deliver.c
+--- a/sendmail/deliver.c	2016-02-29 06:01:55.000000000 -0800
++++ b/sendmail/deliver.c	2016-02-29 06:02:06.000000000 -0800
+@@ -6274,8 +6274,7 @@
+ 				tlslogerr(LOG_WARNING, "client");
+ 		}
+ 
+-		SSL_free(clt_ssl);
+-		clt_ssl = NULL;
++		SM_SSL_FREE(clt_ssl);
+ 		return EX_SOFTWARE;
+ 	}
+ 	mci->mci_ssl = clt_ssl;
+@@ -6287,8 +6286,7 @@
+ 		return EX_OK;
+ 
+ 	/* failure */
+-	SSL_free(clt_ssl);
+-	clt_ssl = NULL;
++	SM_SSL_FREE(clt_ssl);
+ 	return EX_SOFTWARE;
+ }
+ /*
+@@ -6309,7 +6307,7 @@
+ 
+ 	if (!bitset(MCIF_TLSACT, mci->mci_flags))
+ 		return EX_OK;
+-	r = endtls(mci->mci_ssl, "client");
++	r = endtls(&mci->mci_ssl, "client");
+ 	mci->mci_flags &= ~MCIF_TLSACT;
+ 	return r;
+ }
+diff -ru a/sendmail/macro.c b/sendmail/macro.c
+--- a/sendmail/macro.c	2016-02-29 06:01:55.000000000 -0800
++++ b/sendmail/macro.c	2016-02-29 06:02:06.000000000 -0800
+@@ -362,6 +362,33 @@
+ }
+ 
+ /*
++**  MACTABCLEAR -- clear entire macro table
++**
++**	Parameters:
++**		mac -- Macro table.
++**
++**	Returns:
++**		none.
++**
++**	Side Effects:
++**		clears entire mac structure including rpool pointer!
++*/
++
++void
++mactabclear(mac)
++	MACROS_T *mac;
++{
++	int i;
++
++	if (mac->mac_rpool == NULL)
++	{
++		for (i = 0; i < MAXMACROID; i++)
++	    		SM_FREE_CLR(mac->mac_table[i]);
++	}
++	memset((char *) mac, '\0', sizeof(*mac));
++}
++
++/*
+ **  MACDEFINE -- bind a macro name to a value
+ **
+ **	Set a macro to a value, with fancy storage management.
+diff -ru a/sendmail/mci.c b/sendmail/mci.c
+--- a/sendmail/mci.c	2016-02-29 06:01:55.000000000 -0800
++++ b/sendmail/mci.c	2016-02-29 06:02:06.000000000 -0800
+@@ -25,6 +25,7 @@
+ 						  int, bool));
+ static bool	mci_load_persistent __P((MCI *));
+ static void	mci_uncache __P((MCI **, bool));
++static void	mci_clear __P((MCI *));
+ static int	mci_lock_host_statfile __P((MCI *));
+ static int	mci_read_persistent __P((SM_FILE_T *, MCI *));
+ 
+@@ -253,6 +254,7 @@
+ 	SM_FREE_CLR(mci->mci_status);
+ 	SM_FREE_CLR(mci->mci_rstatus);
+ 	SM_FREE_CLR(mci->mci_heloname);
++ 	mci_clear(mci);
+ 	if (mci->mci_rpool != NULL)
+ 	{
+ 		sm_rpool_free(mci->mci_rpool);
+@@ -315,6 +317,41 @@
+ }
+ 
+ /*
++**  MCI_CLEAR -- clear mci
++**
++**	Parameters:
++**		mci -- the connection to clear.
++**
++**	Returns:
++**		none.
++*/
++
++static void
++mci_clear(mci)
++	MCI *mci;
++{
++	if (mci == NULL)
++		return;
++
++	mci->mci_maxsize = 0;
++	mci->mci_min_by = 0;
++	mci->mci_deliveries = 0;
++#if SASL
++	if (bitset(MCIF_AUTHACT, mci->mci_flags))
++		sasl_dispose(&mci->mci_conn);
++#endif
++#if STARTTLS
++	if (bitset(MCIF_TLSACT, mci->mci_flags) && mci->mci_ssl != NULL)
++		SM_SSL_FREE(mci->mci_ssl);
++#endif
++
++	/* which flags to preserve? */
++	mci->mci_flags &= MCIF_CACHED;
++	mactabclear(&mci->mci_macro);
++}
++
++
++/*
+ **  MCI_GET -- get information about a particular host
+ **
+ **	Parameters:
+@@ -419,6 +456,7 @@
+ 			mci->mci_errno = 0;
+ 			mci->mci_exitstat = EX_OK;
+ 		}
++	 	mci_clear(mci);
+ 	}
+ 
+ 	return mci;
+diff -ru a/sendmail/sendmail.h b/sendmail/sendmail.h
+--- a/sendmail/sendmail.h	2016-02-29 06:01:55.000000000 -0800
++++ b/sendmail/sendmail.h	2016-02-29 06:02:06.000000000 -0800
+@@ -1186,6 +1186,7 @@
+ #define macid(name)  macid_parse(name, NULL)
+ extern char	*macname __P((int));
+ extern char	*macvalue __P((int, ENVELOPE *));
++extern void	mactabclear __P((MACROS_T *));
+ extern int	rscheck __P((char *, char *, char *, ENVELOPE *, int, int, char *, char *, ADDRESS *, char **));
+ extern int	rscap __P((char *, char *, char *, ENVELOPE *, char ***, char *, int));
+ extern void	setclass __P((int, char *));
+@@ -2002,7 +2003,15 @@
+ extern void	setclttls __P((bool));
+ extern bool	initsrvtls __P((bool));
+ extern int	tls_get_info __P((SSL *, bool, char *, MACROS_T *, bool));
+-extern int	endtls __P((SSL *, char *));
++#define SM_SSL_FREE(ssl)			\
++	do {					\
++		if (ssl != NULL)		\
++		{				\
++			SSL_free(ssl);		\
++			ssl = NULL;		\
++		}				\
++	} while (0)
++extern int	endtls __P((SSL **, char *));
+ extern void	tlslogerr __P((int, const char *));
+ 
+ 
+diff -ru a/sendmail/srvrsmtp.c b/sendmail/srvrsmtp.c
+--- a/sendmail/srvrsmtp.c	2016-02-29 06:01:55.000000000 -0800
++++ b/sendmail/srvrsmtp.c	2016-02-29 06:02:06.000000000 -0800
+@@ -2122,8 +2122,7 @@
+ 			if (get_tls_se_options(e, srv_ssl, true) != 0)
+ 			{
+ 				message("454 4.3.3 TLS not available: error setting options");
+-				SSL_free(srv_ssl);
+-				srv_ssl = NULL;
++				SM_SSL_FREE(srv_ssl);
+ 				goto tls_done;
+ 			}
+ 
+@@ -2145,8 +2144,7 @@
+ 			    SSL_set_wfd(srv_ssl, wfd) <= 0)
+ 			{
+ 				message("454 4.3.3 TLS not available: error set fd");
+-				SSL_free(srv_ssl);
+-				srv_ssl = NULL;
++				SM_SSL_FREE(srv_ssl);
+ 				goto tls_done;
+ 			}
+ 			if (!smtps)
+@@ -2188,8 +2186,7 @@
+ 						tlslogerr(LOG_WARNING, "server");
+ 				}
+ 				tls_ok_srv = false;
+-				SSL_free(srv_ssl);
+-				srv_ssl = NULL;
++				SM_SSL_FREE(srv_ssl);
+ 
+ 				/*
+ 				**  according to the next draft of
+@@ -3416,7 +3413,7 @@
+ 			/* shutdown TLS connection */
+ 			if (tls_active)
+ 			{
+-				(void) endtls(srv_ssl, "server");
++				(void) endtls(&srv_ssl, "server");
+ 				tls_active = false;
+ 			}
+ #endif /* STARTTLS */
+diff -ru a/sendmail/tls.c b/sendmail/tls.c
+--- a/sendmail/tls.c	2016-02-29 06:01:55.000000000 -0800
++++ b/sendmail/tls.c	2016-02-29 06:02:06.000000000 -0800
+@@ -1624,7 +1624,7 @@
+ **  ENDTLS -- shutdown secure connection
+ **
+ **	Parameters:
+-**		ssl -- SSL connection information.
++**		pssl -- pointer to TLS session context
+ **		side -- server/client (for logging).
+ **
+ **	Returns:
+@@ -1632,12 +1632,16 @@
+ */
+ 
+ int
+-endtls(ssl, side)
+-	SSL *ssl;
++endtls(pssl, side)
++	SSL **pssl;
+ 	char *side;
+ {
+ 	int ret = EX_OK;
++	SSL *ssl;
+ 
++	SM_REQUIRE(pssl != NULL);
++ 	ret = EX_OK;
++	ssl = *pssl;
+ 	if (ssl != NULL)
+ 	{
+ 		int r;
+@@ -1703,8 +1707,7 @@
+ 			ret = EX_SOFTWARE;
+ 		}
+ # endif /* !defined(OPENSSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER > 0x0090602fL */
+-		SSL_free(ssl);
+-		ssl = NULL;
++		SM_SSL_FREE(*pssl);
+ 	}
+ 	return ret;
+ }

@@ -1,0 +1,27 @@
+diff -up ./build.xml.orig ./build.xml
+--- ./build.xml.orig	2020-07-13 12:59:09.555368724 -0400
++++ ./build.xml	2020-07-13 13:06:51.246135917 -0400
+@@ -3307,6 +3307,11 @@ Read the Building page on the Apache Tom
+     <!-- Add bnd tasks to project -->
+     <path id="bnd.classpath">
+       <fileset file="${bnd.jar}" />
++      <fileset file="${bndlib.jar}" />
++      <fileset file="${bndlibg.jar}" />
++      <fileset file="${bndannotation.jar}" />
++      <fileset file="${slf4j-api.jar}" />
++      <fileset file="${osgi-cmpn.jar}" />
+     </path>
+ 
+     <taskdef resource="aQute/bnd/ant/taskdef.properties" classpathref="bnd.classpath" />
+diff -up ./res/bnd/build-defaults.bnd.orig ./res/bnd/build-defaults.bnd
+--- ./res/bnd/build-defaults.bnd.orig	2020-07-13 13:47:01.229077747 -0400
++++ ./res/bnd/build-defaults.bnd	2020-07-13 13:47:12.923095618 -0400
+@@ -13,7 +13,7 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+ 
+-Bundle-Version: ${version_cleanup;${version}}
++Bundle-Version: ${version}
+ 
+ Specification-Title: Apache Tomcat
+ Specification-Version: ${version.major.minor}

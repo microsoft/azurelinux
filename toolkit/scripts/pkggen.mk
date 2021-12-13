@@ -101,10 +101,6 @@ ifeq ($(DISABLE_UPSTREAM_REPOS),y)
 graphpkgfetcher_extra_flags += --disable-upstream-repos
 endif
 
-ifeq ($(USE_UPDATE_REPO),y)
-graphpkgfetcher_extra_flags += --use-update-repo
-endif
-
 ifeq ($(USE_PREVIEW_REPO),y)
 graphpkgfetcher_extra_flags += --use-preview-repo
 endif
@@ -179,6 +175,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(chroot_worker) $(go-schedu
 		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
 		--build-agent="chroot-agent" \
 		--build-agent-program="$(go-pkgworker)" \
+		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \

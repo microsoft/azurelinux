@@ -1,0 +1,29 @@
+https://salsa.debian.org/java-team/maven-javadoc-plugin/blob/master/debian/patches/reproducible-footer.patch
+for https://issues.apache.org/jira/browse/MJAVADOC-619
+
+Description: Use the SOURCE_DATE_EPOCH variable to set the current year displayed in the javadoc footer
+Author: Emmanuel Bourg <ebourg@apache.org>
+Forwarded: no
+--- a/src/main/java/org/apache/maven/plugins/javadoc/AbstractJavadocMojo.java
++++ b/src/main/java/org/apache/maven/plugins/javadoc/AbstractJavadocMojo.java
+@@ -2821,6 +2821,20 @@
+     private String getBottomText()
+     {
+         int currentYear = Calendar.getInstance().get( Calendar.YEAR );
++        if ( System.getenv("SOURCE_DATE_EPOCH") != null )
++        {
++            try
++            {
++                Calendar calendar = Calendar.getInstance( java.util.TimeZone.getTimeZone("UTC") );
++                calendar.setTimeInMillis(Long.parseLong( System.getenv("SOURCE_DATE_EPOCH") ) * 1000);
++                currentYear = calendar.get( Calendar.YEAR );
++            }
++            catch (Exception e)
++            {
++                e.printStackTrace();
++            }
++        }
++
+         String year = String.valueOf( currentYear );
+ 
+         String inceptionYear = project.getInceptionYear();

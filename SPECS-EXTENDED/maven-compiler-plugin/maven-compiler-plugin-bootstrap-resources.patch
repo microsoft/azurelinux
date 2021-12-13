@@ -1,0 +1,2122 @@
+--- maven-compiler-plugin-3.8.1/src/main/filtered-resources/META-INF/maven/org.apache.maven.plugins/maven-compiler-plugin/plugin-help.xml	1970-01-01 01:00:00.000000000 +0100
++++ maven-compiler-plugin-3.8.1/src/main/filtered-resources/META-INF/maven/org.apache.maven.plugins/maven-compiler-plugin/plugin-help.xml	2019-11-25 17:47:55.264289561 +0100
+@@ -0,0 +1,720 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<plugin>
++  <name>${project.name}</name>
++  <description>${project.description}</description>
++  <groupId>${project.groupId}</groupId>
++  <artifactId>${project.artifactId}</artifactId>
++  <version>${project.version}</version>
++  <goalPrefix>compiler</goalPrefix>
++  <mojos>
++    <mojo>
++      <goal>compile</goal>
++      <description>Compiles application sources</description>
++      <requiresDependencyResolution>compile</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>compile</phase>
++      <implementation>org.apache.maven.plugin.compiler.CompilerMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>annotationProcessorPaths</name>
++          <type>java.util.List</type>
++          <since>3.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>annotationProcessors</name>
++          <type>java.lang.String[]</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArgs</name>
++          <type>java.util.List</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArgument</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArguments</name>
++          <type>java.util.Map</type>
++          <since>2.0.1</since>
++          <deprecated>use {@link #compilerArgs} instead.</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerId</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerReuseStrategy</name>
++          <type>java.lang.String</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerVersion</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>debug</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>debuglevel</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>excludes</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>executable</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>failOnError</name>
++          <type>boolean</type>
++          <since>2.0.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>failOnWarning</name>
++          <type>boolean</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>fileExtensions</name>
++          <type>java.util.List</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>forceJavacCompilerUse</name>
++          <type>boolean</type>
++          <since>3.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>fork</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>generatedSourcesDirectory</name>
++          <type>java.io.File</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>includes</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>jdkToolchain</name>
++          <type>java.util.Map</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>maxmem</name>
++          <type>java.lang.String</type>
++          <since>2.0.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>meminitial</name>
++          <type>java.lang.String</type>
++          <since>2.0.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>multiReleaseOutput</name>
++          <type>boolean</type>
++          <since>3.7.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>optimize</name>
++          <type>boolean</type>
++          <deprecated>This property is a no-op in {@code javac}.</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>outputFileName</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>parameters</name>
++          <type>boolean</type>
++          <since>3.6.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>proc</name>
++          <type>java.lang.String</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>release</name>
++          <type>java.lang.String</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>showDeprecation</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>showWarnings</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>skipMain</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>skipMultiThreadWarning</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>source</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>staleMillis</name>
++          <type>int</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>target</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>useIncrementalCompilation</name>
++          <type>boolean</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>verbose</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <compilerId implementation="java.lang.String" default-value="javac">${maven.compiler.compilerId}</compilerId>
++        <compilerReuseStrategy implementation="java.lang.String" default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
++        <compilerVersion implementation="java.lang.String">${maven.compiler.compilerVersion}</compilerVersion>
++        <debug implementation="boolean" default-value="true">${maven.compiler.debug}</debug>
++        <debuglevel implementation="java.lang.String">${maven.compiler.debuglevel}</debuglevel>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <executable implementation="java.lang.String">${maven.compiler.executable}</executable>
++        <failOnError implementation="boolean" default-value="true">${maven.compiler.failOnError}</failOnError>
++        <failOnWarning implementation="boolean" default-value="false">${maven.compiler.failOnWarning}</failOnWarning>
++        <forceJavacCompilerUse implementation="boolean" default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
++        <fork implementation="boolean" default-value="false">${maven.compiler.fork}</fork>
++        <generatedSourcesDirectory implementation="java.io.File" default-value="${project.build.directory}/generated-sources/annotations"/>
++        <maxmem implementation="java.lang.String">${maven.compiler.maxmem}</maxmem>
++        <meminitial implementation="java.lang.String">${maven.compiler.meminitial}</meminitial>
++        <optimize implementation="boolean" default-value="false">${maven.compiler.optimize}</optimize>
++        <parameters implementation="boolean" default-value="false">${maven.compiler.parameters}</parameters>
++        <release implementation="java.lang.String">${maven.compiler.release}</release>
++        <showDeprecation implementation="boolean" default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
++        <showWarnings implementation="boolean" default-value="false">${maven.compiler.showWarnings}</showWarnings>
++        <skipMain implementation="boolean">${maven.main.skip}</skipMain>
++        <skipMultiThreadWarning implementation="boolean" default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
++        <source implementation="java.lang.String" default-value="1.6">${maven.compiler.source}</source>
++        <staleMillis implementation="int" default-value="0">${lastModGranularityMs}</staleMillis>
++        <target implementation="java.lang.String" default-value="1.6">${maven.compiler.target}</target>
++        <useIncrementalCompilation implementation="boolean" default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
++        <verbose implementation="boolean" default-value="false">${maven.compiler.verbose}</verbose>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>testCompile</goal>
++      <description>Compiles application test sources.</description>
++      <requiresDependencyResolution>test</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>test-compile</phase>
++      <implementation>org.apache.maven.plugin.compiler.TestCompilerMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>annotationProcessorPaths</name>
++          <type>java.util.List</type>
++          <since>3.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>annotationProcessors</name>
++          <type>java.lang.String[]</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArgs</name>
++          <type>java.util.List</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArgument</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArguments</name>
++          <type>java.util.Map</type>
++          <since>2.0.1</since>
++          <deprecated>use {@link #compilerArgs} instead.</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerId</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerReuseStrategy</name>
++          <type>java.lang.String</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerVersion</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>debug</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>debuglevel</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>executable</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>failOnError</name>
++          <type>boolean</type>
++          <since>2.0.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>failOnWarning</name>
++          <type>boolean</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>fileExtensions</name>
++          <type>java.util.List</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>forceJavacCompilerUse</name>
++          <type>boolean</type>
++          <since>3.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>fork</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>generatedTestSourcesDirectory</name>
++          <type>java.io.File</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>jdkToolchain</name>
++          <type>java.util.Map</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>maxmem</name>
++          <type>java.lang.String</type>
++          <since>2.0.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>meminitial</name>
++          <type>java.lang.String</type>
++          <since>2.0.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>optimize</name>
++          <type>boolean</type>
++          <deprecated>This property is a no-op in {@code javac}.</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>outputFileName</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>parameters</name>
++          <type>boolean</type>
++          <since>3.6.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>proc</name>
++          <type>java.lang.String</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>release</name>
++          <type>java.lang.String</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>showDeprecation</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>showWarnings</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>skipMultiThreadWarning</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>source</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>staleMillis</name>
++          <type>int</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>target</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>testCompilerArgument</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testCompilerArguments</name>
++          <type>java.util.Map</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testExcludes</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testIncludes</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testRelease</name>
++          <type>java.lang.String</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testSource</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testTarget</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>useIncrementalCompilation</name>
++          <type>boolean</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>verbose</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two scans of all the source code if the compiler has to have the entire set of sources. This is currently the case for at least the C# compiler and most likely all the other .NET compilers too.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <compilerId implementation="java.lang.String" default-value="javac">${maven.compiler.compilerId}</compilerId>
++        <compilerReuseStrategy implementation="java.lang.String" default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
++        <compilerVersion implementation="java.lang.String">${maven.compiler.compilerVersion}</compilerVersion>
++        <debug implementation="boolean" default-value="true">${maven.compiler.debug}</debug>
++        <debuglevel implementation="java.lang.String">${maven.compiler.debuglevel}</debuglevel>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <executable implementation="java.lang.String">${maven.compiler.executable}</executable>
++        <failOnError implementation="boolean" default-value="true">${maven.compiler.failOnError}</failOnError>
++        <failOnWarning implementation="boolean" default-value="false">${maven.compiler.failOnWarning}</failOnWarning>
++        <forceJavacCompilerUse implementation="boolean" default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
++        <fork implementation="boolean" default-value="false">${maven.compiler.fork}</fork>
++        <generatedTestSourcesDirectory implementation="java.io.File" default-value="${project.build.directory}/generated-test-sources/test-annotations"/>
++        <maxmem implementation="java.lang.String">${maven.compiler.maxmem}</maxmem>
++        <meminitial implementation="java.lang.String">${maven.compiler.meminitial}</meminitial>
++        <optimize implementation="boolean" default-value="false">${maven.compiler.optimize}</optimize>
++        <parameters implementation="boolean" default-value="false">${maven.compiler.parameters}</parameters>
++        <release implementation="java.lang.String">${maven.compiler.release}</release>
++        <showDeprecation implementation="boolean" default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
++        <showWarnings implementation="boolean" default-value="false">${maven.compiler.showWarnings}</showWarnings>
++        <skip implementation="boolean">${maven.test.skip}</skip>
++        <skipMultiThreadWarning implementation="boolean" default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
++        <source implementation="java.lang.String" default-value="1.6">${maven.compiler.source}</source>
++        <staleMillis implementation="int" default-value="0">${lastModGranularityMs}</staleMillis>
++        <target implementation="java.lang.String" default-value="1.6">${maven.compiler.target}</target>
++        <testRelease implementation="java.lang.String">${maven.compiler.testRelease}</testRelease>
++        <testSource implementation="java.lang.String">${maven.compiler.testSource}</testSource>
++        <testTarget implementation="java.lang.String">${maven.compiler.testTarget}</testTarget>
++        <useIncrementalCompilation implementation="boolean" default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
++        <verbose implementation="boolean" default-value="false">${maven.compiler.verbose}</verbose>
++      </configuration>
++    </mojo>
++  </mojos>
++</plugin>
+--- maven-compiler-plugin-3.8.1/src/main/filtered-resources/META-INF/maven/plugin.xml	1970-01-01 01:00:00.000000000 +0100
++++ maven-compiler-plugin-3.8.1/src/main/filtered-resources/META-INF/maven/plugin.xml	2019-11-25 17:48:57.728635290 +0100
+@@ -0,0 +1,1396 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<plugin>
++  <name>${project.name}</name>
++  <description>${project.description}</description>
++  <groupId>${project.groupId}</groupId>
++  <artifactId>${project.artifactId}</artifactId>
++  <version>${project.version}</version>
++  <goalPrefix>compiler</goalPrefix>
++  <isolatedRealm>false</isolatedRealm>
++  <inheritedByDefault>true</inheritedByDefault>
++  <mojos>
++    <mojo>
++      <goal>compile</goal>
++      <description>Compiles application sources</description>
++      <requiresDependencyResolution>compile</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>compile</phase>
++      <implementation>org.apache.maven.plugin.compiler.CompilerMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>annotationProcessorPaths</name>
++          <type>java.util.List</type>
++          <since>3.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>annotationProcessors</name>
++          <type>java.lang.String[]</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>basedir</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>buildDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilePath</name>
++          <type>java.util.List</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>compileSourceRoots</name>
++          <type>java.util.List</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>compilerArgs</name>
++          <type>java.util.List</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArgument</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArguments</name>
++          <type>java.util.Map</type>
++          <since>2.0.1</since>
++          <deprecated>use {@link #compilerArgs} instead.</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerId</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerReuseStrategy</name>
++          <type>java.lang.String</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerVersion</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>debug</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>debuglevel</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>excludes</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>executable</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>failOnError</name>
++          <type>boolean</type>
++          <since>2.0.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>failOnWarning</name>
++          <type>boolean</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>fileExtensions</name>
++          <type>java.util.List</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>forceJavacCompilerUse</name>
++          <type>boolean</type>
++          <since>3.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>fork</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>generatedSourcesDirectory</name>
++          <type>java.io.File</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>includes</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>jdkToolchain</name>
++          <type>java.util.Map</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>maxmem</name>
++          <type>java.lang.String</type>
++          <since>2.0.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>meminitial</name>
++          <type>java.lang.String</type>
++          <since>2.0.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>mojoExecution</name>
++          <type>org.apache.maven.plugin.MojoExecution</type>
++          <since>3.0 needed for storing the status for the incremental build support.</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>multiReleaseOutput</name>
++          <type>boolean</type>
++          <since>3.7.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>optimize</name>
++          <type>boolean</type>
++          <deprecated>This property is a no-op in {@code javac}.</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>outputFileName</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>parameters</name>
++          <type>boolean</type>
++          <since>3.6.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>proc</name>
++          <type>java.lang.String</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>projectArtifact</name>
++          <type>org.apache.maven.artifact.Artifact</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>release</name>
++          <type>java.lang.String</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>session</name>
++          <type>org.apache.maven.execution.MavenSession</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>showDeprecation</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>showWarnings</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>skipMain</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application sources</description>
++        </parameter>
++        <parameter>
++          <name>skipMultiThreadWarning</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>source</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>staleMillis</name>
++          <type>int</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>target</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>useIncrementalCompilation</name>
++          <type>boolean</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>verbose</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <basedir implementation="java.io.File" default-value="${basedir}"/>
++        <buildDirectory implementation="java.io.File" default-value="${project.build.directory}"/>
++        <compilePath implementation="java.util.List" default-value="${project.compileClasspathElements}"/>
++        <compileSourceRoots implementation="java.util.List" default-value="${project.compileSourceRoots}"/>
++        <compilerId implementation="java.lang.String" default-value="javac">${maven.compiler.compilerId}</compilerId>
++        <compilerReuseStrategy implementation="java.lang.String" default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
++        <compilerVersion implementation="java.lang.String">${maven.compiler.compilerVersion}</compilerVersion>
++        <debug implementation="boolean" default-value="true">${maven.compiler.debug}</debug>
++        <debuglevel implementation="java.lang.String">${maven.compiler.debuglevel}</debuglevel>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <executable implementation="java.lang.String">${maven.compiler.executable}</executable>
++        <failOnError implementation="boolean" default-value="true">${maven.compiler.failOnError}</failOnError>
++        <failOnWarning implementation="boolean" default-value="false">${maven.compiler.failOnWarning}</failOnWarning>
++        <forceJavacCompilerUse implementation="boolean" default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
++        <fork implementation="boolean" default-value="false">${maven.compiler.fork}</fork>
++        <generatedSourcesDirectory implementation="java.io.File" default-value="${project.build.directory}/generated-sources/annotations"/>
++        <maxmem implementation="java.lang.String">${maven.compiler.maxmem}</maxmem>
++        <meminitial implementation="java.lang.String">${maven.compiler.meminitial}</meminitial>
++        <mojoExecution implementation="org.apache.maven.plugin.MojoExecution" default-value="${mojoExecution}"/>
++        <optimize implementation="boolean" default-value="false">${maven.compiler.optimize}</optimize>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.outputDirectory}"/>
++        <parameters implementation="boolean" default-value="false">${maven.compiler.parameters}</parameters>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <projectArtifact implementation="org.apache.maven.artifact.Artifact" default-value="${project.artifact}"/>
++        <release implementation="java.lang.String">${maven.compiler.release}</release>
++        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
++        <showDeprecation implementation="boolean" default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
++        <showWarnings implementation="boolean" default-value="false">${maven.compiler.showWarnings}</showWarnings>
++        <skipMain implementation="boolean">${maven.main.skip}</skipMain>
++        <skipMultiThreadWarning implementation="boolean" default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
++        <source implementation="java.lang.String" default-value="1.6">${maven.compiler.source}</source>
++        <staleMillis implementation="int" default-value="0">${lastModGranularityMs}</staleMillis>
++        <target implementation="java.lang.String" default-value="1.6">${maven.compiler.target}</target>
++        <useIncrementalCompilation implementation="boolean" default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
++        <verbose implementation="boolean" default-value="false">${maven.compiler.verbose}</verbose>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
++          <field-name>artifactHandlerManager</field-name>
++        </requirement>
++        <requirement>
++          <role>org.codehaus.plexus.compiler.manager.CompilerManager</role>
++          <field-name>compilerManager</field-name>
++        </requirement>
++        <requirement>
++          <role>org.codehaus.plexus.languages.java.jpms.LocationManager</role>
++          <field-name>locationManager</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.repository.RepositorySystem</role>
++          <field-name>repositorySystem</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.artifact.resolver.ResolutionErrorHandler</role>
++          <field-name>resolutionErrorHandler</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.toolchain.ToolchainManager</role>
++          <field-name>toolchainManager</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++    <mojo>
++      <goal>testCompile</goal>
++      <description>Compiles application test sources.</description>
++      <requiresDependencyResolution>test</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>test-compile</phase>
++      <implementation>org.apache.maven.plugin.compiler.TestCompilerMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>annotationProcessorPaths</name>
++          <type>java.util.List</type>
++          <since>3.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>annotationProcessors</name>
++          <type>java.lang.String[]</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>basedir</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>buildDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilePath</name>
++          <type>java.util.List</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>compileSourceRoots</name>
++          <type>java.util.List</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArgs</name>
++          <type>java.util.List</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArgument</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerArguments</name>
++          <type>java.util.Map</type>
++          <since>2.0.1</since>
++          <deprecated>use {@link #compilerArgs} instead.</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerId</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerReuseStrategy</name>
++          <type>java.lang.String</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>compilerVersion</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>debug</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>debuglevel</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>executable</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>failOnError</name>
++          <type>boolean</type>
++          <since>2.0.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>failOnWarning</name>
++          <type>boolean</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>fileExtensions</name>
++          <type>java.util.List</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>forceJavacCompilerUse</name>
++          <type>boolean</type>
++          <since>3.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>fork</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>generatedTestSourcesDirectory</name>
++          <type>java.io.File</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>jdkToolchain</name>
++          <type>java.util.Map</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>maxmem</name>
++          <type>java.lang.String</type>
++          <since>2.0.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>meminitial</name>
++          <type>java.lang.String</type>
++          <since>2.0.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>mojoExecution</name>
++          <type>org.apache.maven.plugin.MojoExecution</type>
++          <since>3.0 needed for storing the status for the incremental build support.</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>optimize</name>
++          <type>boolean</type>
++          <deprecated>This property is a no-op in {@code javac}.</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>outputFileName</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>parameters</name>
++          <type>boolean</type>
++          <since>3.6.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>proc</name>
++          <type>java.lang.String</type>
++          <since>2.2</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>release</name>
++          <type>java.lang.String</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>session</name>
++          <type>org.apache.maven.execution.MavenSession</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>showDeprecation</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>showWarnings</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>skipMultiThreadWarning</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>source</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>staleMillis</name>
++          <type>int</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>target</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>testCompilerArgument</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testCompilerArguments</name>
++          <type>java.util.Map</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testExcludes</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testIncludes</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testPath</name>
++          <type>java.util.List</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testRelease</name>
++          <type>java.lang.String</type>
++          <since>3.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testSource</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>testTarget</name>
++          <type>java.lang.String</type>
++          <since>2.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Compiles application test sources.</description>
++        </parameter>
++        <parameter>
++          <name>useIncrementalCompilation</name>
++          <type>boolean</type>
++          <since>3.1</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++        <parameter>
++          <name>verbose</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>TODO: At least one step could be optimized, currently the plugin will do two
++scans of all the source code if the compiler has to have the entire set of
++sources. This is currently the case for at least the C# compiler and most
++likely all the other .NET compilers too.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <basedir implementation="java.io.File" default-value="${basedir}"/>
++        <buildDirectory implementation="java.io.File" default-value="${project.build.directory}"/>
++        <compilePath implementation="java.util.List" default-value="${project.compileClasspathElements}"/>
++        <compileSourceRoots implementation="java.util.List" default-value="${project.testCompileSourceRoots}"/>
++        <compilerId implementation="java.lang.String" default-value="javac">${maven.compiler.compilerId}</compilerId>
++        <compilerReuseStrategy implementation="java.lang.String" default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
++        <compilerVersion implementation="java.lang.String">${maven.compiler.compilerVersion}</compilerVersion>
++        <debug implementation="boolean" default-value="true">${maven.compiler.debug}</debug>
++        <debuglevel implementation="java.lang.String">${maven.compiler.debuglevel}</debuglevel>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <executable implementation="java.lang.String">${maven.compiler.executable}</executable>
++        <failOnError implementation="boolean" default-value="true">${maven.compiler.failOnError}</failOnError>
++        <failOnWarning implementation="boolean" default-value="false">${maven.compiler.failOnWarning}</failOnWarning>
++        <forceJavacCompilerUse implementation="boolean" default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
++        <fork implementation="boolean" default-value="false">${maven.compiler.fork}</fork>
++        <generatedTestSourcesDirectory implementation="java.io.File" default-value="${project.build.directory}/generated-test-sources/test-annotations"/>
++        <maxmem implementation="java.lang.String">${maven.compiler.maxmem}</maxmem>
++        <meminitial implementation="java.lang.String">${maven.compiler.meminitial}</meminitial>
++        <mojoExecution implementation="org.apache.maven.plugin.MojoExecution" default-value="${mojoExecution}"/>
++        <optimize implementation="boolean" default-value="false">${maven.compiler.optimize}</optimize>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.testOutputDirectory}"/>
++        <parameters implementation="boolean" default-value="false">${maven.compiler.parameters}</parameters>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <release implementation="java.lang.String">${maven.compiler.release}</release>
++        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
++        <showDeprecation implementation="boolean" default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
++        <showWarnings implementation="boolean" default-value="false">${maven.compiler.showWarnings}</showWarnings>
++        <skip implementation="boolean">${maven.test.skip}</skip>
++        <skipMultiThreadWarning implementation="boolean" default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
++        <source implementation="java.lang.String" default-value="1.6">${maven.compiler.source}</source>
++        <staleMillis implementation="int" default-value="0">${lastModGranularityMs}</staleMillis>
++        <target implementation="java.lang.String" default-value="1.6">${maven.compiler.target}</target>
++        <testPath implementation="java.util.List" default-value="${project.testClasspathElements}"/>
++        <testRelease implementation="java.lang.String">${maven.compiler.testRelease}</testRelease>
++        <testSource implementation="java.lang.String">${maven.compiler.testSource}</testSource>
++        <testTarget implementation="java.lang.String">${maven.compiler.testTarget}</testTarget>
++        <useIncrementalCompilation implementation="boolean" default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
++        <verbose implementation="boolean" default-value="false">${maven.compiler.verbose}</verbose>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
++          <field-name>artifactHandlerManager</field-name>
++        </requirement>
++        <requirement>
++          <role>org.codehaus.plexus.compiler.manager.CompilerManager</role>
++          <field-name>compilerManager</field-name>
++        </requirement>
++        <requirement>
++          <role>org.codehaus.plexus.languages.java.jpms.LocationManager</role>
++          <field-name>locationManager</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.repository.RepositorySystem</role>
++          <field-name>repositorySystem</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.artifact.resolver.ResolutionErrorHandler</role>
++          <field-name>resolutionErrorHandler</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.toolchain.ToolchainManager</role>
++          <field-name>toolchainManager</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++  </mojos>
++  <dependencies>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-plugin-api</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-classworlds</artifactId>
++      <type>jar</type>
++      <version>2.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-utils</artifactId>
++      <type>jar</type>
++      <version>3.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.sisu</groupId>
++      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <type>jar</type>
++      <version>0.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-artifact</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.commons</groupId>
++      <artifactId>commons-lang3</artifactId>
++      <type>jar</type>
++      <version>3.8.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-core</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-settings</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-util</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.sisu</groupId>
++      <artifactId>org.eclipse.sisu.inject</artifactId>
++      <type>jar</type>
++      <version>0.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.enterprise</groupId>
++      <artifactId>cdi-api</artifactId>
++      <type>jar</type>
++      <version>1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.el</groupId>
++      <artifactId>javax.el-api</artifactId>
++      <type>jar</type>
++      <version>3.0.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.jboss.spec.javax.interceptor</groupId>
++      <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
++      <type>jar</type>
++      <version>any</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.inject</groupId>
++      <artifactId>guice</artifactId>
++      <type>jar</type>
++      <version>4.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>aopalliance</groupId>
++      <artifactId>aopalliance</artifactId>
++      <type>jar</type>
++      <version>1.0</version>
++    </dependency>
++    <dependency>
++      <groupId>cglib</groupId>
++      <artifactId>cglib</artifactId>
++      <type>jar</type>
++      <version>3.2.0</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.guava</groupId>
++      <artifactId>guava</artifactId>
++      <type>jar</type>
++      <version>19.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-resolver-provider</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.slf4j</groupId>
++      <artifactId>slf4j-api</artifactId>
++      <type>jar</type>
++      <version>1.7.25</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-api</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.inject</groupId>
++      <artifactId>javax.inject</artifactId>
++      <type>jar</type>
++      <version>1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-impl</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-repository-metadata</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-spi</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-component-annotations</artifactId>
++      <type>jar</type>
++      <version>1.5.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model-builder</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-builder-support</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-settings-builder</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-sec-dispatcher</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-cipher</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-shared-utils</artifactId>
++      <type>jar</type>
++      <version>3.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>commons-io</groupId>
++      <artifactId>commons-io</artifactId>
++      <type>jar</type>
++      <version>2.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-shared-incremental</artifactId>
++      <type>jar</type>
++      <version>1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-java</artifactId>
++      <type>jar</type>
++      <version>0.9.10</version>
++    </dependency>
++    <dependency>
++      <groupId>org.ow2.asm</groupId>
++      <artifactId>asm</artifactId>
++      <type>jar</type>
++      <version>7.0</version>
++    </dependency>
++    <dependency>
++      <groupId>com.thoughtworks.qdox</groupId>
++      <artifactId>qdox</artifactId>
++      <type>jar</type>
++      <version>2.0-M9</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-compiler-api</artifactId>
++      <type>jar</type>
++      <version>2.8.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-compiler-manager</artifactId>
++      <type>jar</type>
++      <version>2.8.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-compiler-javac</artifactId>
++      <type>jar</type>
++      <version>2.8.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-interpolation</artifactId>
++      <type>jar</type>
++      <version>1.25</version>
++    </dependency>
++  </dependencies>
++</plugin>

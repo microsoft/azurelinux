@@ -1,0 +1,35 @@
+From 6c8b9c5cf292ccb34ac951ece7e8e621c92cdd2f Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Tue, 25 Feb 2020 17:09:31 -0800
+Subject: [PATCH] Redirect two more echo stmt to stderr in init/bash.in
+
+This just does the same thing as fa2e3a1a, but for two more
+similar echo statements that were missed.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ init/bash.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/init/bash.in b/init/bash.in
+index 5afda8127..e509b407a 100644
+--- a/init/bash.in
++++ b/init/bash.in
+@@ -19,7 +19,7 @@ export LMOD_ROOT=@lmod_root@
+ export LMOD_PKG=@PKGV@
+ 
+ if [ -n "${__lmod_vx:-}" ]; then
+-    echo "Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for this output ($LMOD_PKG/init/bash)"
++    echo "Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for this output ($LMOD_PKG/init/bash)" 1>&2
+ fi
+ 
+ export LMOD_DIR=$LMOD_PKG/libexec
+@@ -94,7 +94,7 @@ else
+      ############################################################
+      # Un-silence shell debug after module command
+      if [ -n "${__lmod_sh_dbg:-}" ]; then
+-       echo "Shell debugging restarted"
++       echo "Shell debugging restarted" 1>&2
+        set -$__lmod_sh_dbg;
+        unset __lmod_sh_dbg;
+      fi;

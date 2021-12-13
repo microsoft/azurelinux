@@ -1,0 +1,39 @@
+diff -up libglade-2.6.3/glade/glade-gtk.c.secondary libglade-2.6.3/glade/glade-gtk.c
+--- libglade-2.6.3/glade/glade-gtk.c.secondary	2009-02-20 00:21:52.433916022 -0500
++++ libglade-2.6.3/glade/glade-gtk.c	2009-02-20 00:22:02.065954023 -0500
+@@ -544,7 +544,7 @@ gtk_dialog_build_children(GladeXML *self
+ 
+ {
+     GtkDialog *dialog = GTK_DIALOG (w);
+-    GList *children, *list;
++    GList *children, *list, *secondary;
+ 
+     glade_standard_build_children (self, w, info);
+ 
+@@ -553,10 +553,13 @@ gtk_dialog_build_children(GladeXML *self
+ 
+     /* repack children of action_area */
+     children = gtk_container_get_children(GTK_CONTAINER(dialog->action_area));
++    secondary = NULL;
+     for (list = children; list; list = list->next) {
+ 	GtkWidget *child = GTK_WIDGET(list->data);
+ 
+ 	g_object_ref(child);
++	if (gtk_button_box_get_child_secondary (GTK_BUTTON_BOX (dialog->action_area), child))
++		secondary = g_list_prepend (secondary, child);
+ 	gtk_container_remove (GTK_CONTAINER (dialog->action_area), child);
+     }
+     for (list = children; list; list = list->next) {
+@@ -569,7 +572,12 @@ gtk_dialog_build_children(GladeXML *self
+ 	g_object_unref(child);
+ 
+     }
++    for (list = secondary; list; list = list->next) {
++	GtkWidget *child = GTK_WIDGET(list->data);
++        gtk_button_box_set_child_secondary (GTK_BUTTON_BOX (dialog->action_area), child, TRUE);
++    }
+     g_list_free (children);
++    g_list_free (secondary);
+ }
+ 
+ 

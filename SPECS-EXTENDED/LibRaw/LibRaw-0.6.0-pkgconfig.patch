@@ -1,0 +1,42 @@
+--- libraw.pc.in~	2014-01-17 07:38:31.000000000 -0600
++++ libraw.pc.in	2014-02-20 14:18:20.559279964 -0600
+@@ -7,5 +7,6 @@
+ Description: Raw image decoder library (non-thread-safe)
+ Requires: @PACKAGE_REQUIRES@
+ Version: @PACKAGE_VERSION@
+-Libs: -L${libdir} -lraw -lstdc++@PC_OPENMP@
++Libs: -L${libdir} -lraw@PC_OPENMP@
++Libs.private: -lstdc++
+ Cflags: -I${includedir}/libraw
+--- libraw_r.pc.in~	2014-01-17 07:38:31.000000000 -0600
++++ libraw_r.pc.in	2014-02-20 14:20:35.740276947 -0600
+@@ -7,5 +7,6 @@
+ Description: Raw image decoder library (thread-safe)
+ Requires: @PACKAGE_REQUIRES@
+ Version: @PACKAGE_VERSION@
+-Libs: -L${libdir} -lraw_r -lstdc++@PC_OPENMP@
++Libs: -L${libdir} -lraw_r@PC_OPENMP@
++Libs.private: -lstdc++
+ Cflags: -I${includedir}/libraw
+--- libraw_r.pc.in~	2014-02-20 14:22:36.000000000 -0600
++++ libraw_r.pc.in	2014-02-20 14:27:24.454267828 -0600
+@@ -5,7 +5,7 @@
+ 
+ Name: libraw
+ Description: Raw image decoder library (thread-safe)
+-Requires: @PACKAGE_REQUIRES@
++Requires.private: @PACKAGE_REQUIRES@
+ Version: @PACKAGE_VERSION@
+ Libs: -L${libdir} -lraw_r@PC_OPENMP@
+ Libs.private: -lstdc++
+--- libraw.pc.in~	2014-02-20 14:22:36.000000000 -0600
++++ libraw.pc.in	2014-02-20 14:27:18.368267964 -0600
+@@ -5,7 +5,7 @@
+ 
+ Name: libraw
+ Description: Raw image decoder library (non-thread-safe)
+-Requires: @PACKAGE_REQUIRES@
++Requires.private: @PACKAGE_REQUIRES@
+ Version: @PACKAGE_VERSION@
+ Libs: -L${libdir} -lraw@PC_OPENMP@
+ Libs.private: -lstdc++

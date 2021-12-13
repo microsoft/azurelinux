@@ -1,0 +1,8 @@
+# This file describes how to load the opensc module
+# See: http://p11-glue.freedesktop.org/doc/p11-kit/config.html
+
+# This is a relative path, which means it will be loaded from
+# the p11-kit default path which is usually $(libdir)/pkcs11.
+# Doing it this way allows for packagers to package opensc for
+# 32-bit and 64-bit and make them parallel installable
+module: opensc-pkcs11.so

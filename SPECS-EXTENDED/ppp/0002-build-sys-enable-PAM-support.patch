@@ -1,0 +1,25 @@
+From 0d71a32b73b71c9793d0b304320858062faf00d1 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Fri, 4 Apr 2014 11:25:43 +0200
+Subject: [PATCH 02/27] build-sys: enable PAM support
+
+---
+ pppd/Makefile.linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
+index 1d9ea78..5a44d30 100644
+--- a/pppd/Makefile.linux
++++ b/pppd/Makefile.linux
+@@ -61,7 +61,7 @@ HAVE_MULTILINK=y
+ USE_TDB=y
+ 
+ HAS_SHADOW=y
+-#USE_PAM=y
++USE_PAM=y
+ HAVE_INET6=y
+ 
+ # Enable plugins
+-- 
+1.8.3.1
+

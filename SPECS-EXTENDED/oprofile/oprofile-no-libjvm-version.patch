@@ -1,0 +1,33 @@
+From: Tony Jones <tonyj@suse.de>
+Subject: Build libjvm[pt]i as so only
+Upstream: no
+
+Only expected user is Java.
+
+Extracted from 0.9.7 patch 'oprofile-0.9.5-buildfixes.diff'
+
+---
+ agents/jvmpi/Makefile.am |    1 +
+ agents/jvmti/Makefile.am |    1 +
+ 2 files changed, 2 insertions(+)
+
+--- a/agents/jvmpi/Makefile.am
++++ b/agents/jvmpi/Makefile.am
+@@ -1,6 +1,7 @@
+ pkglib_LTLIBRARIES = libjvmpi_oprofile.la
+ 
+ libjvmpi_oprofile_la_CXXFLAGS = -W -Wall -fPIC
++libjvmpi_oprofile_la_LDFLAGS = -module -avoid-version
+ 
+ libjvmpi_oprofile_la_SOURCES = jvmpi_oprofile.cpp
+ 
+--- a/agents/jvmti/Makefile.am
++++ b/agents/jvmti/Makefile.am
+@@ -3,6 +3,7 @@ AM_CFLAGS = @OP_CFLAGS@
+ pkglib_LTLIBRARIES = libjvmti_oprofile.la
+ 
+ libjvmti_oprofile_la_CFLAGS = $(AM_CFLAGS) -fPIC
++libjvmti_oprofile_la_LDFLAGS = -module -avoid-version
+ 
+ libjvmti_oprofile_la_LIBADD = ../../libopagent/libopagent.la
+ 

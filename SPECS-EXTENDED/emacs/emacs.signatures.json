@@ -1,0 +1,15 @@
+{
+ "Signatures": {
+  "default.el": "b5497d5f1d3cd989602b67c73e5a6b04816256a6c84bde211ca4720c6ff74e05",
+  "dotemacs.el": "509792f6fd28d55f210c19c9872813a229e50475075c88ad35c6be08d99e3d08",
+  "emacs-27.1.tar.xz": "4a4c128f915fc937d61edfc273c98106711b540c9be3cd5d2e2b9b5b2f172e41",
+  "emacs-27.1.tar.xz.sig": "406451882cdd95f3462e2c5effac94de40419564c46889cd5c394c991529a7a4",
+  "emacs-terminal.desktop": "d731c9329f6148c6e4aabb362e27aed2290b3d349c43bc3bb389d048a4dba316",
+  "emacs-terminal.sh": "2e2fe240719179db235a22c78613dc011f13a580cfc0a457fcb6fd3c8f09762b",
+  "emacs.appdata.xml": "c2ee8e7d4b8c512532a2e37d1c9113a1ff7cc5cfb651223ed6d0a9b65ed5a99e",
+  "emacs.desktop": "4c46042acafc11936613f18cd7beaa288db3ab9d4323d5aaa81f352d91c69e24",
+  "emacs.service": "f9cd5d0f4598eaa76c369607b9ffbac5a5f101adde932f8720fff9d375bc2669",
+  "gpgkey-D405AA2C862C54F17EEE6BE0E8BCD7866AFCF978.gpg": "42f84074618725e595b04e66cadd897975148d61cb65a238802b6ec95c85ff7b",
+  "site-start.el": "b706dd48ea8d87485d9e308f337ee7b6fc785fbb4483a1a89d15d75493b36cfc"
+ }
+}

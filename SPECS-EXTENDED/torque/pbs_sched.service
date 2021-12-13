@@ -1,0 +1,11 @@
+[Unit]
+Description=pbs-sched
+After=syslog.target network.target trqauthd.service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/pbs_sched
+PIDFile=/var/lib/torque/sched_priv/sched.lock
+
+[Install]
+WantedBy=multi-user.target

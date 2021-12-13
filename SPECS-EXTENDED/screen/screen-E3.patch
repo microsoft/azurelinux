@@ -1,0 +1,58 @@
+Clear scrollback buffer when locking terminal
+    
+Linux kernel 3.0 adds a new command to clear the scrollback buffer in
+the linux console. It's available in the ncurses terminfo entry as
+extended capability E3. This is useful to prevent an attacker to read
+content of a locked terminal via Shift-PgUp key.
+
+diff --git a/display.c b/display.c
+index d0ed6a4..7b534c0 100644
+--- a/display.c
++++ b/display.c
+@@ -4079,4 +4079,10 @@ char **cmdv;
+ 
+ #endif /* BLANKER_PRG */
+ 
++void
++ClearScrollbackBuffer()
++{
++  if (D_CE3)
++    AddCStr(D_CE3);
++}
+ 
+diff --git a/extern.h b/extern.h
+index d4e57df..4564581 100644
+--- a/extern.h
++++ b/extern.h
+@@ -320,6 +320,7 @@ extern int   color256to88 __P((int));
+ extern void  ResetIdle __P((void));
+ extern void  KillBlanker __P((void));
+ extern void  DisplaySleep1000 __P((int, int));
++extern void  ClearScrollbackBuffer __P((void));
+ 
+ /* resize.c */
+ extern int   ChangeWindowSize __P((struct win *, int, int, int));
+diff --git a/screen.c b/screen.c
+index 7dcb9af..c934d75 100644
+--- a/screen.c
++++ b/screen.c
+@@ -1952,6 +1952,7 @@ void Detach(int mode)
+ 
+     case D_LOCK:
+       ClearAll();
++      ClearScrollbackBuffer();
+       sign = SIG_LOCK;
+       /* tell attacher to lock terminal with a lockprg. */
+       break;
+diff --git a/term.c b/term.c
+index c7a13c9..f49b3a7 100644
+--- a/term.c
++++ b/term.c
+@@ -83,6 +83,7 @@ struct term term[T_N] =
+   { "CD", T_STR  },
+   { "ce", T_STR  },
+   { "cb", T_STR  },
++  { "E3", T_STR  },
+ 
+ /* initialise */
+   { "is", T_STR  },

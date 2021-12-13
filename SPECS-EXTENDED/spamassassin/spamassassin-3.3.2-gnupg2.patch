@@ -1,0 +1,12 @@
+diff -Nur Mail-SpamAssassin-3.3.2.orig/sa-update.raw Mail-SpamAssassin-3.3.2/sa-update.raw
+--- Mail-SpamAssassin-3.3.2.orig/sa-update.raw	2011-06-06 17:59:19.000000000 -0600
++++ Mail-SpamAssassin-3.3.2/sa-update.raw	2014-01-28 13:29:33.933526585 -0700
+@@ -281,7 +281,7 @@
+ if ($GPG_ENABLED || $opt{'import'}) {
+   # find GPG in the PATH
+   # bug 4958: for *NIX it's "gpg", in Windows it's "gpg.exe"
+-  $GPGPath = 'gpg' . $Config{_exe};
++  $GPGPath = 'gpg2' . $Config{_exe};
+   dbg("gpg: Searching for '$GPGPath'");
+ 
+   if ($GPGPath = Mail::SpamAssassin::Util::find_executable_in_env_path($GPGPath)) {

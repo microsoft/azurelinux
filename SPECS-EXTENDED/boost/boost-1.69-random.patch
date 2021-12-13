@@ -1,0 +1,22 @@
+From 1be44d405e48a42a63bd8d2dae739560b486a55c Mon Sep 17 00:00:00 2001
+From: Nick Thompson <nathompson7@protonmail.com>
+Date: Sun, 11 Feb 2018 15:02:43 -0600
+Subject: [PATCH] [ci skip] Remove deprecated header.
+
+---
+ include/boost/random/detail/integer_log2.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/boost/random/detail/integer_log2.hpp b/include/boost/random/detail/integer_log2.hpp
+index 248243a4b..2e49f281f 100644
+--- a/include/boost/random/detail/integer_log2.hpp
++++ b/include/boost/random/detail/integer_log2.hpp
+@@ -16,7 +16,7 @@
+ 
+ #include <boost/config.hpp>
+ #include <boost/limits.hpp>
+-#include <boost/pending/integer_log2.hpp>
++#include <boost/integer/integer_log2.hpp>
+ 
+ namespace boost {
+ namespace random {

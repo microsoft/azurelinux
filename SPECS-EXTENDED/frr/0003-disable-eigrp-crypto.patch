@@ -1,0 +1,252 @@
+diff --git a/eigrpd/eigrp_packet.c b/eigrpd/eigrp_packet.c
+index bedaf15..8dc09bf 100644
+--- a/eigrpd/eigrp_packet.c
++++ b/eigrpd/eigrp_packet.c
+@@ -40,8 +40,10 @@
+ #include "log.h"
+ #include "sockopt.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
+ #include "sha256.h"
++#endif
+ #include "lib_errors.h"
+ 
+ #include "eigrpd/eigrp_structs.h"
+@@ -95,8 +97,12 @@ int eigrp_make_md5_digest(struct eigrp_interface *ei, struct stream *s,
+ 	struct key *key = NULL;
+ 	struct keychain *keychain;
+ 
++
+ 	unsigned char digest[EIGRP_AUTH_TYPE_MD5_LEN];
++#ifdef CRYPTO_OPENSSL
++#elif CRYPTO_INTERNAL
+ 	MD5_CTX ctx;
++#endif
+ 	uint8_t *ibuf;
+ 	size_t backup_get, backup_end;
+ 	struct TLV_MD5_Authentication_Type *auth_TLV;
+@@ -119,6 +125,9 @@ int eigrp_make_md5_digest(struct eigrp_interface *ei, struct stream *s,
+ 		return EIGRP_AUTH_TYPE_NONE;
+ 	}
+ 
++#ifdef CRYPTO_OPENSSL
++//TBD when this is fixed in upstream
++#elif CRYPTO_INTERNAL
+ 	memset(&ctx, 0, sizeof(ctx));
+ 	MD5Init(&ctx);
+ 
+@@ -146,7 +155,7 @@ int eigrp_make_md5_digest(struct eigrp_interface *ei, struct stream *s,
+ 	}
+ 
+ 	MD5Final(digest, &ctx);
+-
++#endif
+ 	/* Append md5 digest to the end of the stream. */
+ 	memcpy(auth_TLV->digest, digest, EIGRP_AUTH_TYPE_MD5_LEN);
+ 
+@@ -162,7 +171,10 @@ int eigrp_check_md5_digest(struct stream *s,
+ 			   struct TLV_MD5_Authentication_Type *authTLV,
+ 			   struct eigrp_neighbor *nbr, uint8_t flags)
+ {
++#ifdef CRYPTO_OPENSSL
++#elif CRYPTO_INTERNAL
+ 	MD5_CTX ctx;
++#endif
+ 	unsigned char digest[EIGRP_AUTH_TYPE_MD5_LEN];
+ 	unsigned char orig[EIGRP_AUTH_TYPE_MD5_LEN];
+ 	struct key *key = NULL;
+@@ -203,6 +215,9 @@ int eigrp_check_md5_digest(struct stream *s,
+ 		return 0;
+ 	}
+ 
++#ifdef CRYPTO_OPENSSL
++	//TBD when eigrpd crypto is fixed in upstream
++#elif CRYPTO_INTERNAL
+ 	memset(&ctx, 0, sizeof(ctx));
+ 	MD5Init(&ctx);
+ 
+@@ -230,6 +245,7 @@ int eigrp_check_md5_digest(struct stream *s,
+ 	}
+ 
+ 	MD5Final(digest, &ctx);
++#endif
+ 
+ 	/* compare the two */
+ 	if (memcmp(orig, digest, EIGRP_AUTH_TYPE_MD5_LEN) != 0) {
+@@ -254,7 +270,11 @@ int eigrp_make_sha256_digest(struct eigrp_interface *ei, struct stream *s,
+ 	unsigned char digest[EIGRP_AUTH_TYPE_SHA256_LEN];
+ 	unsigned char buffer[1 + PLAINTEXT_LENGTH + 45 + 1] = {0};
+ 
++#ifdef CRYPTO_OPENSSL
++	//TBD when eigrpd crypto is fixed in upstream
++#elif CRYPTO_INTERNAL
+ 	HMAC_SHA256_CTX ctx;
++#endif
+ 	void *ibuf;
+ 	size_t backup_get, backup_end;
+ 	struct TLV_SHA256_Authentication_Type *auth_TLV;
+@@ -283,6 +303,9 @@ int eigrp_make_sha256_digest(struct eigrp_interface *ei, struct stream *s,
+ 
+ 	inet_ntop(AF_INET, &ei->address.u.prefix4, source_ip, PREFIX_STRLEN);
+ 
++#ifdef CRYPTO_OPENSSL
++	//TBD when eigrpd crypto is fixed in upstream
++#elif CRYPTO_INTERNAL
+ 	memset(&ctx, 0, sizeof(ctx));
+ 	buffer[0] = '\n';
+ 	memcpy(buffer + 1, key, strlen(key->string));
+@@ -291,7 +314,7 @@ int eigrp_make_sha256_digest(struct eigrp_interface *ei, struct stream *s,
+ 			  1 + strlen(key->string) + strlen(source_ip));
+ 	HMAC__SHA256_Update(&ctx, ibuf, strlen(ibuf));
+ 	HMAC__SHA256_Final(digest, &ctx);
+-
++#endif
+ 
+ 	/* Put hmac-sha256 digest to it's place */
+ 	memcpy(auth_TLV->digest, digest, EIGRP_AUTH_TYPE_SHA256_LEN);
+diff --git a/eigrpd/eigrp_filter.c b/eigrpd/eigrp_filter.c
+index 93eed94..f1c7347 100644
+--- a/eigrpd/eigrp_filter.c
++++ b/eigrpd/eigrp_filter.c
+@@ -47,7 +47,9 @@
+ #include "if_rmap.h"
+ #include "plist.h"
+ #include "distribute.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "keychain.h"
+ #include "privs.h"
+ #include "vrf.h"
+diff --git a/eigrpd/eigrp_hello.c b/eigrpd/eigrp_hello.c
+index dacd5ca..b232cc5 100644
+--- a/eigrpd/eigrp_hello.c
++++ b/eigrpd/eigrp_hello.c
+@@ -43,7 +43,9 @@
+ #include "sockopt.h"
+ #include "checksum.h"
+ #include "vty.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ 
+ #include "eigrpd/eigrp_structs.h"
+ #include "eigrpd/eigrpd.h"
+diff --git a/eigrpd/eigrp_query.c b/eigrpd/eigrp_query.c
+index 84dcf5e..a2575e3 100644
+--- a/eigrpd/eigrp_query.c
++++ b/eigrpd/eigrp_query.c
+@@ -38,7 +38,9 @@
+ #include "log.h"
+ #include "sockopt.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "vty.h"
+ 
+ #include "eigrpd/eigrp_structs.h"
+diff --git a/eigrpd/eigrp_reply.c b/eigrpd/eigrp_reply.c
+index ccf0496..2902365 100644
+--- a/eigrpd/eigrp_reply.c
++++ b/eigrpd/eigrp_reply.c
+@@ -42,7 +42,9 @@
+ #include "log.h"
+ #include "sockopt.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "vty.h"
+ #include "keychain.h"
+ #include "plist.h"
+diff --git a/eigrpd/eigrp_siaquery.c b/eigrpd/eigrp_siaquery.c
+index ff38325..09b9369 100644
+--- a/eigrpd/eigrp_siaquery.c
++++ b/eigrpd/eigrp_siaquery.c
+@@ -38,7 +38,9 @@
+ #include "log.h"
+ #include "sockopt.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "vty.h"
+ 
+ #include "eigrpd/eigrp_structs.h"
+diff --git a/eigrpd/eigrp_siareply.c b/eigrpd/eigrp_siareply.c
+index d3dd123..f6a2bd6 100644
+--- a/eigrpd/eigrp_siareply.c
++++ b/eigrpd/eigrp_siareply.c
+@@ -37,7 +37,9 @@
+ #include "log.h"
+ #include "sockopt.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "vty.h"
+ 
+ #include "eigrpd/eigrp_structs.h"
+diff --git a/eigrpd/eigrp_snmp.c b/eigrpd/eigrp_snmp.c
+index 21c9238..cfb8890 100644
+--- a/eigrpd/eigrp_snmp.c
++++ b/eigrpd/eigrp_snmp.c
+@@ -42,7 +42,9 @@
+ #include "log.h"
+ #include "sockopt.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "keychain.h"
+ #include "smux.h"
+ 
+diff --git a/eigrpd/eigrp_update.c b/eigrpd/eigrp_update.c
+index 8db4903..2a4f0bb 100644
+--- a/eigrpd/eigrp_update.c
++++ b/eigrpd/eigrp_update.c
+@@ -42,7 +42,9 @@
+ #include "log.h"
+ #include "sockopt.h"
+ #include "checksum.h"
++#ifdef CRYPTO_INTERNAL
+ #include "md5.h"
++#endif
+ #include "vty.h"
+ #include "plist.h"
+ #include "plist_int.h"
+diff --git a/eigrpd/eigrp_cli.c b/eigrpd/eigrp_cli.c
+index a93d4c8..b01e121 100644
+--- a/eigrpd/eigrp_cli.c
++++ b/eigrpd/eigrp_cli.c
+@@ -25,6 +25,7 @@
+ #include "lib/command.h"
+ #include "lib/log.h"
+ #include "lib/northbound_cli.h"
++#include "lib/libfrr.h"
+ 
+ #include "eigrp_structs.h"
+ #include "eigrpd.h"
+@@ -726,6 +726,20 @@ DEFPY(
+ 	"Keyed message digest\n"
+ 	"HMAC SHA256 algorithm \n")
+ {
++	//EIGRP authentication is currently broken in FRR
++	switch (frr_get_cli_mode()) {
++	case FRR_CLI_CLASSIC:
++		vty_out(vty, "%% Eigrp Authentication is disabled\n\n");
++		break;
++	case FRR_CLI_TRANSACTIONAL:
++		vty_out(vty,
++			"%% Failed to edit candidate configuration - "
++			"Eigrp Authentication is disabled.\n\n");
++		break;
++	}
++
++	return CMD_WARNING_CONFIG_FAILED;
++
+ 	char xpath[XPATH_MAXLEN], xpath_auth[XPATH_MAXLEN + 64];
+ 
+ 	snprintf(xpath, sizeof(xpath), "./frr-eigrpd:eigrp/instance[asn='%s']",

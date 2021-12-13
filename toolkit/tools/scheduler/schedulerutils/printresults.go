@@ -13,14 +13,17 @@ import (
 
 // PrintBuildResult prints a build result to the logger.
 func PrintBuildResult(res *BuildResult) {
+	baseSRPMName := res.Node.SRPMFileName()
+
 	if res.Err != nil {
-		logger.Log.Errorf("Failed to build %s, error: %s, for details see: %s", filepath.Base(res.Node.SrpmPath), res.Err, res.LogFile)
+		logger.Log.Errorf("Failed to build %s, error: %s, for details see: %s", baseSRPMName, res.Err, res.LogFile)
 		return
 	}
 
-	baseSRPMName := filepath.Base(res.Node.SrpmPath)
 	if res.Node.Type == pkggraph.TypeBuild {
-		if res.UsedCache {
+		if res.Skipped {
+			logger.Log.Warnf("Skipped build for '%s' per user request. RPMs expected to be present: %v", baseSRPMName, res.BuiltFiles)
+		} else if res.UsedCache {
 			logger.Log.Infof("Prebuilt: %s -> %v", baseSRPMName, res.BuiltFiles)
 		} else {
 			logger.Log.Infof("Built: %s -> %v", baseSRPMName, res.BuiltFiles)
@@ -95,7 +98,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	if len(failures) != 0 {
 		logger.Log.Info("Failed SRPMs:")
 		for _, failure := range failures {
-			logger.Log.Infof("--> %s , error: %s, for details see: %s", filepath.Base(failure.Node.SrpmPath), failure.Err, failure.LogFile)
+			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
 		}
 	}
 

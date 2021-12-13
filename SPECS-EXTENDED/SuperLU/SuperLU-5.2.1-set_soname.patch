@@ -1,0 +1,11 @@
+--- a/SRC/CMakeLists.orig.txt	2018-04-25 15:17:39.786715000 +0200
++++ b/SRC/CMakeLists.txt	2018-04-25 15:25:00.253317607 +0200
+@@ -230,7 +230,7 @@
+ 
+ target_link_libraries(superlu ${BLAS_LIB} m)
+ set_target_properties(superlu PROPERTIES
+-  VERSION ${PROJECT_VERSION} SOVERSION ${VERSION_MAJOR}
++  VERSION ${PROJECT_VERSION} SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR}
+   )
+ 
+ include(GNUInstallDirs)

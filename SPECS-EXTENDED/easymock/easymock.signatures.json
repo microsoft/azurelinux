@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "easymock-3.6.tar.xz": "f9f51b1b00e292d76b52881cc6789f307bbb186f2d72f2b70ecf85de5bac0f90",
+  "easymock-build.tar.xz": "b0f5703281a08d50cf898f0494854e6fe7d1c51dd7a0aac4c49aea5f3e1fd7a0",
+  "generate-tarball.sh": "18f57addc0d864f634d611242e805e8dc87e72d3505856a6d9a22543aced96e8"
+ }
+}

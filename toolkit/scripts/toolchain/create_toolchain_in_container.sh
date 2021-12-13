@@ -24,14 +24,15 @@ cp -v $MARINER_SPECS_DIR/openjdk8/check-system-ca-certs.patch ./container
 # M4 patch
 cp -v $MARINER_SPECS_DIR/m4/04-fix-sigstksz.patch ./container
 cp -v $MARINER_SPECS_DIR/m4/m4-1.4.18-glibc-change-work-around.patch ./container
-# RPM patch
-cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
 # CPIO patch
 cp -v $MARINER_SPECS_DIR/cpio/cpio_extern_nocommon.patch ./container
 # Coreutils aarch64 patch
 cp -v $MARINER_SPECS_DIR/coreutils/coreutils-fix-get-sys_getdents-aarch64.patch ./container
 # Binutils readonly patch
 cp -v $MARINER_SPECS_DIR/binutils/linker-script-readonly-keyword-support.patch ./container/linker-script-readonly-keyword-support.patch
+# RPM LD_FLAGS patch
+cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
+
 # Create .bashrc file for lfs user in the container
 cat > ./container/.bashrc << EOF
 umask 022

@@ -1,0 +1,25 @@
+From 7e9bed1ca10901a3cf28775d9563570e94e2280b Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Mon, 9 Sep 2019 12:42:10 +0100
+Subject: [PATCH] Distro jetty.home
+
+---
+ .../org/eclipse/jetty/start/config/CommandLineConfigSource.java | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/jetty-start/src/main/java/org/eclipse/jetty/start/config/CommandLineConfigSource.java b/jetty-start/src/main/java/org/eclipse/jetty/start/config/CommandLineConfigSource.java
+index 792413e..5e5cab9 100644
+--- a/jetty-start/src/main/java/org/eclipse/jetty/start/config/CommandLineConfigSource.java
++++ b/jetty-start/src/main/java/org/eclipse/jetty/start/config/CommandLineConfigSource.java
+@@ -120,6 +120,8 @@ public class CommandLineConfigSource implements ConfigSource
+                 try
+                 {
+                     Path home = new File(new URI(m.group(1))).getParentFile().toPath();
++                    if (home.endsWith("/usr/share/java/jetty"))
++                        home = new File(home.toString().replaceAll("java/jetty$", "jetty")).toPath();
+                     setProperty(BaseHome.JETTY_HOME, home.toString(), ORIGIN_INTERNAL_FALLBACK);
+                     return home;
+                 }
+-- 
+2.20.1
+

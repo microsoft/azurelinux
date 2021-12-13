@@ -1,0 +1,1144 @@
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/AllOf.java	2012-05-20 11:27:42.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/AllOf.java	2017-09-08 09:15:48.806422798 +0200
+@@ -40,7 +40,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ALL</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", allOf(startsWith("my"), containsString("Val")))</pre>
+      */
+@@ -51,7 +51,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ALL</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", allOf(startsWith("my"), containsString("Val")))</pre>
+      */
+@@ -62,7 +62,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ALL</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", allOf(startsWith("my"), containsString("Val")))</pre>
+      */
+@@ -76,7 +76,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ALL</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", allOf(startsWith("my"), containsString("Val")))</pre>
+      */
+@@ -91,7 +91,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ALL</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", allOf(startsWith("my"), containsString("Val")))</pre>
+      */
+@@ -107,7 +107,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ALL</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", allOf(startsWith("my"), containsString("Val")))</pre>
+      */
+@@ -124,7 +124,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ALL</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", allOf(startsWith("my"), containsString("Val")))</pre>
+      */
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/AnyOf.java	2012-05-20 11:26:37.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/AnyOf.java	2017-09-08 09:15:48.806422798 +0200
+@@ -30,7 +30,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ANY</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", anyOf(startsWith("foo"), containsString("Val")))</pre>
+      */
+@@ -41,7 +41,7 @@
+     
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ANY</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", anyOf(startsWith("foo"), containsString("Val")))</pre>
+      */
+@@ -52,7 +52,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ANY</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", anyOf(startsWith("foo"), containsString("Val")))</pre>
+      */
+@@ -66,7 +66,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ANY</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", anyOf(startsWith("foo"), containsString("Val")))</pre>
+      */
+@@ -81,7 +81,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ANY</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", anyOf(startsWith("foo"), containsString("Val")))</pre>
+      */
+@@ -97,7 +97,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ANY</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", anyOf(startsWith("foo"), containsString("Val")))</pre>
+      */
+@@ -114,7 +114,7 @@
+ 
+     /**
+      * Creates a matcher that matches if the examined object matches <b>ANY</b> of the specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myValue", anyOf(startsWith("foo"), containsString("Val")))</pre>
+      */
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/CombinableMatcher.java	2012-05-20 11:29:50.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/CombinableMatcher.java	2017-09-08 09:15:48.806422798 +0200
+@@ -42,7 +42,7 @@
+ 
+   /**
+    * Creates a matcher that matches when both of the specified matchers match the examined object.
+-   * <p/>
++   * <p></p>
+    * For example:
+    * <pre>assertThat("fab", both(containsString("a")).and(containsString("b")))</pre>
+    */
+@@ -63,7 +63,7 @@
+ 
+   /**
+    * Creates a matcher that matches when either of the specified matchers match the examined object.
+-   * <p/>
++   * <p></p>
+    * For example:
+    * <pre>assertThat("fan", either(containsString("a")).and(containsString("b")))</pre>
+    */
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/DescribedAs.java	2012-06-10 16:53:10.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/DescribedAs.java	2017-09-08 09:15:48.810422798 +0200
+@@ -56,7 +56,7 @@
+     /**
+      * Wraps an existing matcher, overriding its description with that specified.  All other functions are
+      * delegated to the decorated matcher, including its mismatch description.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>describedAs("a big decimal equal to %0", equalTo(myBigDecimal), myBigDecimal.toPlainString())</pre> 
+      * 
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/Every.java	2012-05-20 11:19:43.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/Every.java	2017-09-08 09:15:48.806422798 +0200
+@@ -33,7 +33,7 @@
+      * Creates a matcher for {@link Iterable}s that only matches when a single pass over the
+      * examined {@link Iterable} yields items that are all matched by the specified
+      * <code>itemMatcher</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("bar", "baz"), everyItem(startsWith("ba")))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsCollectionContaining.java	2012-05-20 11:54:27.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsCollectionContaining.java	2017-09-08 09:15:48.806422798 +0200
+@@ -47,7 +47,7 @@
+      * examined {@link Iterable} yields at least one item that is matched by the specified
+      * <code>itemMatcher</code>.  Whilst matching, the traversal of the examined {@link Iterable}
+      * will stop as soon as a matching item is found.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), hasItem(startsWith("ba")))</pre>
+      * 
+@@ -64,7 +64,7 @@
+      * examined {@link Iterable} yields at least one item that is equal to the specified
+      * <code>item</code>.  Whilst matching, the traversal of the examined {@link Iterable}
+      * will stop as soon as a matching item is found.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), hasItem("bar"))</pre>
+      * 
+@@ -82,7 +82,7 @@
+      * examined {@link Iterable} yield at least one item that is matched by the corresponding
+      * matcher from the specified <code>itemMatchers</code>.  Whilst matching, each traversal of
+      * the examined {@link Iterable} will stop as soon as a matching item is found.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar", "baz"), hasItems(endsWith("z"), endsWith("o")))</pre>
+      * 
+@@ -106,7 +106,7 @@
+      * examined {@link Iterable} yield at least one item that is equal to the corresponding
+      * item from the specified <code>items</code>.  Whilst matching, each traversal of the
+      * examined {@link Iterable} will stop as soon as a matching item is found.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar", "baz"), hasItems("baz", "foo"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsEqual.java	2012-05-20 12:27:35.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsEqual.java	2017-09-08 09:15:48.806422798 +0200
+@@ -79,7 +79,7 @@
+      * it will match if both the operand and the examined object are arrays of the same length and
+      * contain items that are equal to each other (according to the above rules) <b>in the same
+      * indexes</b>.</p> 
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>
+      * assertThat("foo", equalTo("foo"));
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsInstanceOf.java	2012-05-20 12:41:25.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsInstanceOf.java	2017-09-08 09:15:48.806422798 +0200
+@@ -65,7 +65,7 @@
+      * the examined object.
+      * 
+      * <p>The created matcher assumes no relationship between specified type and the examined object.</p>
+-     * <p/>
++     * <p></p>
+      * For example: 
+      * <pre>assertThat(new Canoe(), instanceOf(Paddlable.class));</pre>
+      * 
+@@ -84,7 +84,7 @@
+      * <p>The created matcher forces a relationship between specified type and the examined object, and should be
+      * used when it is necessary to make generics conform, for example in the JMock clause
+      * <code>with(any(Thing.class))</code></p>
+-     * <p/>
++     * <p></p>
+      * For example: 
+      * <pre>assertThat(new Canoe(), instanceOf(Canoe.class));</pre>
+      *
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/Is.java	2012-05-20 11:35:36.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/Is.java	2017-09-08 09:20:42.623568709 +0200
+@@ -40,7 +40,7 @@
+     /**
+      * Decorates another Matcher, retaining its behaviour, but allowing tests
+      * to be slightly more expressive.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(equalTo(smelly)))</pre>
+      * instead of:
+@@ -54,7 +54,7 @@
+ 
+     /**
+      * A shortcut to the frequently used <code>is(equalTo(x))</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(smelly))</pre>
+      * instead of:
+@@ -68,13 +68,13 @@
+ 
+     /**
+      * A shortcut to the frequently used <code>is(instanceOf(SomeClass.class))</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(Cheddar.class))</pre>
+      * instead of:
+      * <pre>assertThat(cheese, is(instanceOf(Cheddar.class)))</pre>
+      *
+-     * @deprecated use isA(Class<T> type) instead.
++     * @deprecated use isA(Class&lt;T&gt; type) instead.
+      */
+     @Factory
+     @Deprecated
+@@ -85,7 +85,7 @@
+ 
+     /**
+      * A shortcut to the frequently used <code>is(instanceOf(SomeClass.class))</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, isA(Cheddar.class))</pre>
+      * instead of:
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsNot.java	2012-05-20 12:49:02.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsNot.java	2017-09-08 09:15:48.806422798 +0200
+@@ -34,7 +34,7 @@
+     /**
+      * Creates a matcher that wraps an existing matcher, but inverts the logic by which
+      * it will match.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(not(equalTo(smelly))))</pre>
+      * 
+@@ -48,7 +48,7 @@
+ 
+     /**
+      * A shortcut to the frequently used <code>not(equalTo(x))</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(not(smelly)))</pre>
+      * instead of:
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsNull.java	2012-05-20 12:56:27.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/IsNull.java	2017-09-08 09:15:48.806422798 +0200
+@@ -24,7 +24,7 @@
+ 
+     /**
+      * Creates a matcher that matches if examined object is <code>null</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(nullValue())</pre>
+      * 
+@@ -36,7 +36,7 @@
+ 
+     /**
+      * A shortcut to the frequently used <code>not(nullValue())</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(notNullValue()))</pre>
+      * instead of:
+@@ -51,7 +51,7 @@
+     /**
+      * Creates a matcher that matches if examined object is <code>null</code>. Accepts a
+      * single dummy argument to facilitate type inference.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(nullValue(Cheese.class))</pre>
+      * 
+@@ -66,7 +66,7 @@
+     /**
+      * A shortcut to the frequently used <code>not(nullValue(X.class)). Accepts a
+      * single dummy argument to facilitate type inference.</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(cheese, is(notNullValue(X.class)))</pre>
+      * instead of:
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/StringContains.java	2012-05-20 13:02:47.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/StringContains.java	2017-09-08 09:15:48.806422798 +0200
+@@ -26,7 +26,7 @@
+     /**
+      * Creates a matcher that matches if the examined {@link String} contains the specified
+      * {@link String} anywhere.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myStringOfNote", containsString("ring"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/StringEndsWith.java	2012-05-20 13:02:23.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/StringEndsWith.java	2017-09-08 09:15:48.806422798 +0200
+@@ -26,7 +26,7 @@
+     /**
+      * Creates a matcher that matches if the examined {@link String} ends with the specified
+      * {@link String}.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myStringOfNote", endsWith("Note"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/StringStartsWith.java	2012-05-20 13:02:14.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/core/StringStartsWith.java	2017-09-08 09:15:48.806422798 +0200
+@@ -26,7 +26,7 @@
+     /**
+      * Creates a matcher that matches if the examined {@link String} starts with the specified
+      * {@link String}.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myStringOfNote", startsWith("my"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/CustomMatcher.java	2012-05-10 21:16:11.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/CustomMatcher.java	2017-09-08 09:18:12.562425252 +0200
+@@ -6,7 +6,7 @@
+  * <pre>
+  * Matcher&lt;String&gt; aNonEmptyString = new CustomMatcher&lt;String&gt;("a non empty string") {
+  *   public boolean matches(Object object) {
+- *     return ((object instanceof String) && !((String) object).isEmpty();
++ *     return ((object instanceof String) &amp;&amp; !((String) object).isEmpty();
+  *   }
+  * };
+  * </pre>
+--- hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/Matcher.java	2012-05-19 17:09:09.000000000 +0200
++++ hamcrest-1.3/hamcrest-core/src/main/java/org/hamcrest/Matcher.java	2017-09-08 09:15:48.810422798 +0200
+@@ -5,15 +5,15 @@
+ /**
+  * A matcher over acceptable values.
+  * A matcher is able to describe itself to give feedback when it fails.
+- * <p/>
++ * <p></p>
+  * Matcher implementations should <b>NOT directly implement this interface</b>.
+  * Instead, <b>extend</b> the {@link BaseMatcher} abstract class,
+  * which will ensure that the Matcher API can grow to support
+  * new features and remain compatible with all Matcher implementations.
+- * <p/>
++ * <p></p>
+  * For easy access to common Matcher implementations, use the static factory
+  * methods in {@link CoreMatchers}.
+- * <p/>
++ * <p></p>
+  * N.B. Well designed matchers should be immutable.
+  * 
+  * @see CoreMatchers
+@@ -23,7 +23,7 @@
+ 
+     /**
+      * Evaluates the matcher for argument <var>item</var>.
+-     * <p/>
++     * <p></p>
+      * This method matches against Object, instead of the generic type T. This is
+      * because the caller of the Matcher does not know at runtime what the type is
+      * (because of type erasure with Java generics). It is down to the implementations
+--- hamcrest-1.3/hamcrest-generator/src/main/java/org/hamcrest/generator/FactoryMethod.java	2012-06-10 16:42:53.000000000 +0200
++++ hamcrest-1.3/hamcrest-generator/src/main/java/org/hamcrest/generator/FactoryMethod.java	2017-09-08 09:10:08.403506109 +0200
+@@ -6,7 +6,7 @@
+ 
+ /**
+  * Represents a Matcher Factory method.
+- * <p/>
++ * <p></p>
+  * <p>This class uses Strings to represent things instead of java.lang.reflect equivalents,
+  * allowing methods to be defined from sources other than reflection of classes in the
+  * classpath.
+@@ -72,7 +72,7 @@
+ 
+     /**
+      * List of Parameters passed to factory method.
+-     * ie. 'public Matcher&lt;...&ht;> blah(THIS, AND, THAT)'
++     * ie. 'public Matcher&lt;...&gt; blah(THIS, AND, THAT)'
+      */
+     public List<Parameter> getParameters() {
+         return unmodifiableList(parameters);
+--- hamcrest-1.3/hamcrest-generator/src/main/java/org/hamcrest/generator/FactoryWriter.java	2012-05-10 21:16:11.000000000 +0200
++++ hamcrest-1.3/hamcrest-generator/src/main/java/org/hamcrest/generator/FactoryWriter.java	2017-09-08 09:11:58.739507993 +0200
+@@ -8,11 +8,11 @@
+  * Writes syntactic sugar code for factories.
+  * <p>Implementations of this could include vanilla factory methods for
+  * Hamcrest matchers, wrapped factories for other libraries or factories
+- * in other languages (jython, jruby, groovy, etc).
++ * in other languages (jython, jruby, groovy, etc).</p>
+  * <h3>Usage:</h3>
+  * <pre>
+  * writer.writeHeader(...);
+- * <p/>
++ * 
+  * writer.writeMethod(...);
+  * writer.writeMethod(...);
+  * writer.writeMethod(...);
+--- hamcrest-1.3/hamcrest-generator/src/main/java/org/hamcrest/generator/ReflectiveFactoryReader.java	2012-06-17 11:52:43.000000000 +0200
++++ hamcrest-1.3/hamcrest-generator/src/main/java/org/hamcrest/generator/ReflectiveFactoryReader.java	2017-09-08 09:15:48.806422798 +0200
+@@ -17,7 +17,7 @@
+  *   ...
+  * }
+  * </pre>
+- * <p>All methods matching signature '@Factory public static Matcher<blah> blah(blah)' will be
++ * <p>All methods matching signature '@Factory public static Matcher&lt;blah&gt; blah(blah)' will be
+  * treated as factory methods. To change this behavior, override {@link #isFactoryMethod(Method)}.
+  * <p>Caveat: Reflection is hassle-free, but unfortunately cannot expose method parameter names or JavaDoc
+  * comments, making the sugar slightly more obscure.
+@@ -77,12 +77,12 @@
+ 
+     /**
+      * Determine whether a particular method is classified as a matcher factory method.
+-     * <p/>
++     * <p></p>
+      * <p>The rules for determining this are:
+      * 1. The method must be public static.
+      * 2. It must have a return type of org.hamcrest.Matcher (or something that extends this).
+      * 3. It must be marked with the org.hamcrest.Factory annotation.
+-     * <p/>
++     * <p></p>
+      * <p>To use another set of rules, override this method.
+      */
+     protected boolean isFactoryMethod(Method javaMethod) {
+@@ -158,7 +158,7 @@
+ 
+     /*
+      * Get String representation of Type (e.g. java.lang.String or Map&lt;Stuff,? extends Cheese&gt;).
+-     * <p/>
++     * <p></p>
+      * Annoyingly this method wouldn't be needed if java.lang.reflect.Type.toString() behaved consistently
+      * across implementations. Rock on Liskov.
+      */
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/beans/HasProperty.java	2012-05-20 14:46:40.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/beans/HasProperty.java	2017-09-08 09:15:48.802422798 +0200
+@@ -46,7 +46,7 @@
+     /**
+      * Creates a matcher that matches when the examined object has a JavaBean property
+      * with the specified name.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myBean, hasProperty("foo"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/beans/HasPropertyWithValue.java	2012-05-20 14:44:00.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/beans/HasPropertyWithValue.java	2017-09-08 09:15:48.802422798 +0200
+@@ -20,7 +20,7 @@
+  * mock object meets the provided matcher. This is useful for when objects
+  * are created within code under test and passed to a mock object, and you wish
+  * to assert that the created object has certain properties.
+- * <p/>
++ * <p></p>
+  * <h2>Example Usage</h2>
+  * Consider the situation where we have a class representing a person, which
+  * follows the basic JavaBean convention of having get() and possibly set()
+@@ -55,11 +55,11 @@
+  * does not exist, is not readable, or a reflection related exception is thrown
+  * when trying to invoke it then this is treated as an evaluation failure and
+  * the matches method will return false.
+- * <p/>
++ * <p></p>
+  * This matcher class will also work with JavaBean objects that have explicit
+  * bean descriptions via an associated BeanInfo description class. See the
+  * JavaBeans specification for more information:
+- * <p/>
++ * <p></p>
+  * http://java.sun.com/products/javabeans/docs/index.html
+  *
+  * @author Iain McGinniss
+@@ -136,7 +136,7 @@
+     /**
+      * Creates a matcher that matches when the examined object has a JavaBean property
+      * with the specified name whose value satisfies the specified matcher.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myBean, hasProperty("foo", equalTo("bar"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/beans/PropertyUtil.java	2012-05-10 21:16:11.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/beans/PropertyUtil.java	2017-09-08 09:15:48.802422798 +0200
+@@ -8,7 +8,7 @@
+ 
+ /**
+  * Utility class for accessing properties on JavaBean objects.
+- * <p/>
++ * <p></p>
+  * See http://java.sun.com/products/javabeans/docs/index.html for
+  * more information on JavaBeans.
+  *
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/beans/SamePropertyValuesAs.java	2012-05-20 14:46:38.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/beans/SamePropertyValuesAs.java	2017-09-08 09:15:48.802422798 +0200
+@@ -124,7 +124,7 @@
+      * Creates a matcher that matches when the examined object has values for all of
+      * its JavaBean properties that are equal to the corresponding values of the
+      * specified bean.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myBean, samePropertyValuesAs(myExpectedBean))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArrayContainingInAnyOrder.java	2012-05-20 16:39:49.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArrayContainingInAnyOrder.java	2017-09-08 09:15:48.806422798 +0200
+@@ -42,7 +42,7 @@
+      * examined array satisfies one matcher anywhere in the specified matchers.
+      * For a positive match, the examined array must be of the same length as the number of
+      * specified matchers.
+-     * <p/>
++     * <p></p>
+      * N.B. each of the specified matchers will only be used once during a given examination, so be
+      * careful when specifying matchers that may be satisfied by more than one entry in an examined
+      * array.
+@@ -63,7 +63,7 @@
+      * examined array satisfies one matcher anywhere in the specified collection of matchers.
+      * For a positive match, the examined array must be of the same length as the specified collection
+      * of matchers.
+-     * <p/>
++     * <p></p>
+      * N.B. each matcher in the specified collection will only be used once during a given
+      * examination, so be careful when specifying matchers that may be satisfied by more than
+      * one entry in an examined array.
+@@ -84,7 +84,7 @@
+      * examined array is logically equal to one item anywhere in the specified items.
+      * For a positive match, the examined array must be of the same length as the number of
+      * specified items.
+-     * <p/>
++     * <p></p>
+      * N.B. each of the specified items will only be used once during a given examination, so be
+      * careful when specifying items that may be equal to more than one entry in an examined
+      * array.
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArrayContainingInOrder.java	2012-05-20 16:46:29.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArrayContainingInOrder.java	2017-09-08 09:15:48.802422798 +0200
+@@ -40,7 +40,7 @@
+      * Creates a matcher for arrays that matcheswhen each item in the examined array is
+      * logically equal to the corresponding item in the specified items.  For a positive match,
+      * the examined array must be of the same length as the number of specified items.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new String[]{"foo", "bar"}, contains("foo", "bar"))</pre>
+      * 
+@@ -60,7 +60,7 @@
+      * Creates a matcher for arrays that matches when each item in the examined array satisfies the
+      * corresponding matcher in the specified matchers.  For a positive match, the examined array
+      * must be of the same length as the number of specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new String[]{"foo", "bar"}, contains(equalTo("foo"), equalTo("bar")))</pre>
+      * 
+@@ -76,7 +76,7 @@
+      * Creates a matcher for arrays that matches when each item in the examined array satisfies the
+      * corresponding matcher in the specified list of matchers.  For a positive match, the examined array
+      * must be of the same length as the specified list of matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new String[]{"foo", "bar"}, contains(Arrays.asList(equalTo("foo"), equalTo("bar"))))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArrayContaining.java	2012-05-20 15:04:17.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArrayContaining.java	2017-09-08 09:15:48.806422798 +0200
+@@ -44,7 +44,7 @@
+      * Creates a matcher for arrays that matches when the examined array contains at least one item
+      * that is matched by the specified <code>elementMatcher</code>.  Whilst matching, the traversal
+      * of the examined array will stop as soon as a matching element is found.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new String[] {"foo", "bar"}, hasItemInArray(startsWith("ba")))</pre>
+      * 
+@@ -58,7 +58,7 @@
+ 
+     /**
+      * A shortcut to the frequently used <code>hasItemInArray(equalTo(x))</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(hasItemInArray(x))</pre>
+      * instead of:
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArray.java	2012-05-20 14:54:52.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArray.java	2017-09-08 09:15:48.802422798 +0200
+@@ -83,7 +83,7 @@
+      * Creates a matcher that matches arrays whose elements are satisfied by the specified matchers.  Matches
+      * positively only if the number of matchers specified is equal to the length of the examined array and
+      * each matcher[i] is satisfied by array[i].
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new Integer[]{1,2,3}, is(array(equalTo(1), equalTo(2), equalTo(3))))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArrayWithSize.java	2012-05-20 16:19:19.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsArrayWithSize.java	2017-09-08 09:15:48.802422798 +0200
+@@ -23,7 +23,7 @@
+     /**
+      * Creates a matcher for arrays that matches when the <code>length</code> of the array
+      * satisfies the specified matcher.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new String[]{"foo", "bar"}, arrayWithSize(equalTo(2)))</pre>
+      * 
+@@ -38,7 +38,7 @@
+     /**
+      * Creates a matcher for arrays that matches when the <code>length</code> of the array
+      * equals the specified <code>size</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new String[]{"foo", "bar"}, arrayWithSize(2))</pre>
+      * 
+@@ -53,7 +53,7 @@
+     /**
+      * Creates a matcher for arrays that matches when the <code>length</code> of the array
+      * is zero.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new String[0], emptyArray())</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsCollectionWithSize.java	2012-06-10 17:02:21.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsCollectionWithSize.java	2017-09-08 09:15:48.802422798 +0200
+@@ -24,7 +24,7 @@
+     /**
+      * Creates a matcher for {@link java.util.Collection}s that matches when the <code>size()</code> method returns
+      * a value that satisfies the specified matcher.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), hasSize(equalTo(2)))</pre>
+      * 
+@@ -39,7 +39,7 @@
+     /**
+      * Creates a matcher for {@link java.util.Collection}s that matches when the <code>size()</code> method returns
+      * a value equal to the specified <code>size</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), hasSize(2))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsEmptyCollection.java	2012-06-18 23:49:04.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsEmptyCollection.java	2017-09-08 09:15:48.802422798 +0200
+@@ -30,7 +30,7 @@
+     /**
+      * Creates a matcher for {@link java.util.Collection}s matching examined collections whose <code>isEmpty</code>
+      * method returns <code>true</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new ArrayList&lt;String&gt;(), is(empty()))</pre>
+      * 
+@@ -43,7 +43,7 @@
+     /**
+      * Creates a matcher for {@link java.util.Collection}s matching examined collections whose <code>isEmpty</code>
+      * method returns <code>true</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new ArrayList&lt;String&gt;(), is(emptyCollectionOf(String.class)))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsEmptyIterable.java	2012-06-18 23:49:30.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsEmptyIterable.java	2017-09-08 09:15:48.806422798 +0200
+@@ -26,7 +26,7 @@
+ 
+     /**
+      * Creates a matcher for {@link Iterable}s matching examined iterables that yield no items.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new ArrayList&lt;String&gt;(), is(emptyIterable()))</pre>
+      * 
+@@ -38,7 +38,7 @@
+ 
+     /**
+      * Creates a matcher for {@link Iterable}s matching examined iterables that yield no items.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(new ArrayList&lt;String&gt;(), is(emptyIterableOf(String.class)))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsIn.java	2012-05-20 17:43:01.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsIn.java	2017-09-08 09:15:48.802422798 +0200
+@@ -33,7 +33,7 @@
+     /**
+      * Creates a matcher that matches when the examined object is found within the
+      * specified collection.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("foo", isIn(Arrays.asList("bar", "foo")))</pre>
+      * 
+@@ -49,7 +49,7 @@
+     /**
+      * Creates a matcher that matches when the examined object is found within the
+      * specified array.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("foo", isIn(new String[]{"bar", "foo"}))</pre>
+      * 
+@@ -65,7 +65,7 @@
+     /**
+      * Creates a matcher that matches when the examined object is equal to one of the
+      * specified elements.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("foo", isIn("bar", "foo"))</pre>
+      *  
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsIterableContainingInAnyOrder.java	2012-05-20 17:43:31.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsIterableContainingInAnyOrder.java	2017-09-08 09:27:24.901132454 +0200
+@@ -87,11 +87,11 @@
+      * Creates a matcher for {@link Iterable}s that matches when a single pass over the
+      * examined {@link Iterable} yields a single item that satisfies the specified matcher.
+      * For a positive match, the examined iterable must only yield one item.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo"), containsInAnyOrder(equalTo("foo")))</pre>
+      * 
+-     * @deprecated use contains(Matcher<? super E> itemMatcher) instead
++     * @deprecated use contains(Matcher&lt;? super E&gt; itemMatcher) instead
+      * 
+      * @param itemMatcher
+      *     the matcher that must be satisfied by the single item provided by an
+@@ -109,11 +109,11 @@
+      * the examined {@link Iterable} yields a series of items, each satisfying one matcher anywhere
+      * in the specified matchers.  For a positive match, the examined iterable must be of the same
+      * length as the number of specified matchers.
+-     * <p/>
++     * <p></p>
+      * N.B. each of the specified matchers will only be used once during a given examination, so be
+      * careful when specifying matchers that may be satisfied by more than one entry in an examined
+      * iterable.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), containsInAnyOrder(equalTo("bar"), equalTo("foo")))</pre>
+      * 
+@@ -130,11 +130,11 @@
+      * the examined {@link Iterable} yields a series of items, each logically equal to one item
+      * anywhere in the specified items. For a positive match, the examined iterable
+      * must be of the same length as the number of specified items.
+-     * <p/>
++     * <p></p>
+      * N.B. each of the specified items will only be used once during a given examination, so be
+      * careful when specifying items that may be equal to more than one entry in an examined
+      * iterable.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), containsInAnyOrder("bar", "foo"))</pre>
+      * 
+@@ -156,11 +156,11 @@
+      * the examined {@link Iterable} yields a series of items, each satisfying one matcher anywhere
+      * in the specified collection of matchers.  For a positive match, the examined iterable
+      * must be of the same length as the specified collection of matchers.
+-     * <p/>
++     * <p></p>
+      * N.B. each matcher in the specified collection will only be used once during a given
+      * examination, so be careful when specifying matchers that may be satisfied by more than
+      * one entry in an examined iterable.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), containsInAnyOrder(Arrays.asList(equalTo("bar"), equalTo("foo"))))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsIterableContainingInOrder.java	2012-05-20 15:25:17.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsIterableContainingInOrder.java	2017-09-08 09:15:48.802422798 +0200
+@@ -89,7 +89,7 @@
+      * examined {@link Iterable} yields a series of items, each logically equal to the
+      * corresponding item in the specified items.  For a positive match, the examined iterable
+      * must be of the same length as the number of specified items.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), contains("foo", "bar"))</pre>
+      * 
+@@ -110,7 +110,7 @@
+      * Creates a matcher for {@link Iterable}s that matches when a single pass over the
+      * examined {@link Iterable} yields a single item that satisfies the specified matcher.
+      * For a positive match, the examined iterable must only yield one item.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo"), contains(equalTo("foo")))</pre>
+      * 
+@@ -129,7 +129,7 @@
+      * examined {@link Iterable} yields a series of items, each satisfying the corresponding
+      * matcher in the specified matchers.  For a positive match, the examined iterable
+      * must be of the same length as the number of specified matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), contains(equalTo("foo"), equalTo("bar")))</pre>
+      * 
+@@ -146,7 +146,7 @@
+      * examined {@link Iterable} yields a series of items, each satisfying the corresponding
+      * matcher in the specified list of matchers.  For a positive match, the examined iterable
+      * must be of the same length as the specified list of matchers.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), contains(Arrays.asList(equalTo("foo"), equalTo("bar"))))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsIterableWithSize.java	2012-05-20 16:14:03.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsIterableWithSize.java	2017-09-08 09:15:48.802422798 +0200
+@@ -28,7 +28,7 @@
+      * Creates a matcher for {@link Iterable}s that matches when a single pass over the
+      * examined {@link Iterable} yields an item count that satisfies the specified
+      * matcher.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), iterableWithSize(equalTo(2)))</pre>
+      * 
+@@ -44,7 +44,7 @@
+      * Creates a matcher for {@link Iterable}s that matches when a single pass over the
+      * examined {@link Iterable} yields an item count that is equal to the specified
+      * <code>size</code> argument.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Arrays.asList("foo", "bar"), iterableWithSize(2))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsMapContaining.java	2012-06-10 17:04:41.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/collection/IsMapContaining.java	2017-09-08 09:15:48.802422798 +0200
+@@ -48,7 +48,7 @@
+      * Creates a matcher for {@link java.util.Map}s matching when the examined {@link java.util.Map} contains
+      * at least one entry whose key satisfies the specified <code>keyMatcher</code> <b>and</b> whose
+      * value satisfies the specified <code>valueMatcher</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myMap, hasEntry(equalTo("bar"), equalTo("foo")))</pre>
+      * 
+@@ -66,7 +66,7 @@
+      * Creates a matcher for {@link java.util.Map}s matching when the examined {@link java.util.Map} contains
+      * at least one entry whose key equals the specified <code>key</code> <b>and</b> whose value equals the
+      * specified <code>value</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myMap, hasEntry("bar", "foo"))</pre>
+      *  
+@@ -83,7 +83,7 @@
+     /**
+      * Creates a matcher for {@link java.util.Map}s matching when the examined {@link java.util.Map} contains
+      * at least one key that satisfies the specified matcher.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myMap, hasKey(equalTo("bar")))</pre>
+      * 
+@@ -98,7 +98,7 @@
+     /**
+      * Creates a matcher for {@link java.util.Map}s matching when the examined {@link java.util.Map} contains
+      * at least one key that is equal to the specified key.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myMap, hasKey("bar"))</pre>
+      * 
+@@ -113,7 +113,7 @@
+     /**
+      * Creates a matcher for {@link java.util.Map}s matching when the examined {@link java.util.Map} contains
+      * at least one value that satisfies the specified valueMatcher.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myMap, hasValue(equalTo("foo")))</pre>
+      * 
+@@ -128,7 +128,7 @@
+     /**
+      * Creates a matcher for {@link java.util.Map}s matching when the examined {@link java.util.Map} contains
+      * at least one value that is equal to the specified value.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(myMap, hasValue("foo"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/number/BigDecimalCloseTo.java	2012-06-10 17:06:51.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/number/BigDecimalCloseTo.java	2017-09-08 09:15:48.806422798 +0200
+@@ -46,7 +46,7 @@
+    * Creates a matcher of {@link java.math.BigDecimal}s that matches when an examined BigDecimal is equal
+    * to the specified <code>operand</code>, within a range of +/- <code>error</code>. The comparison for equality
+    * is done by BigDecimals {@link java.math.BigDecimal#compareTo(java.math.BigDecimal)} method.
+-   * <p/>
++   * <p></p>
+    * For example:
+    * <pre>assertThat(new BigDecimal("1.03"), is(closeTo(new BigDecimal("1.0"), new BigDecimal("0.03"))))</pre>
+    * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/number/IsCloseTo.java	2012-05-20 17:44:07.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/number/IsCloseTo.java	2017-09-08 09:15:48.806422798 +0200
+@@ -48,7 +48,7 @@
+     /**
+      * Creates a matcher of {@link Double}s that matches when an examined double is equal
+      * to the specified <code>operand</code>, within a range of +/- <code>error</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(1.03, is(closeTo(1.0, 0.03)))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/number/OrderingComparison.java	2012-05-20 16:59:41.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/number/OrderingComparison.java	2017-09-08 09:15:48.806422798 +0200
+@@ -58,7 +58,7 @@
+      * Creates a matcher of {@link Comparable} object that matches when the examined object is
+      * equal to the specified value, as reported by the <code>compareTo</code> method of the
+      * <b>examined</b> object.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(1, comparesEqualTo(1))</pre>
+      * 
+@@ -75,7 +75,7 @@
+      * Creates a matcher of {@link Comparable} object that matches when the examined object is
+      * greater than the specified value, as reported by the <code>compareTo</code> method of the
+      * <b>examined</b> object.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(2, greaterThan(1))</pre>
+      * 
+@@ -93,7 +93,7 @@
+      * Creates a matcher of {@link Comparable} object that matches when the examined object is
+      * greater than or equal to the specified value, as reported by the <code>compareTo</code> method
+      * of the <b>examined</b> object.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(1, greaterThanOrEqualTo(1))</pre>
+      * 
+@@ -111,7 +111,7 @@
+      * Creates a matcher of {@link Comparable} object that matches when the examined object is
+      * less than the specified value, as reported by the <code>compareTo</code> method of the
+      * <b>examined</b> object.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(1, lessThan(2))</pre>
+      * 
+@@ -129,7 +129,7 @@
+      * Creates a matcher of {@link Comparable} object that matches when the examined object is
+      * less than or equal to the specified value, as reported by the <code>compareTo</code> method
+      * of the <b>examined</b> object.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(1, lessThanOrEqualTo(1))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/object/HasToString.java	2012-05-20 17:04:01.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/object/HasToString.java	2017-09-08 09:15:48.806422798 +0200
+@@ -19,7 +19,7 @@
+     /**
+      * Creates a matcher that matches any examined object whose <code>toString</code> method
+      * returns a value that satisfies the specified matcher.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(true, hasToString(equalTo("TRUE")))</pre>
+      * 
+@@ -34,7 +34,7 @@
+     /**
+      * Creates a matcher that matches any examined object whose <code>toString</code> method
+      * returns a value equalTo the specified string.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(true, hasToString("TRUE"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/object/IsCompatibleType.java	2012-05-20 17:44:35.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/object/IsCompatibleType.java	2017-09-08 09:15:48.806422798 +0200
+@@ -30,7 +30,7 @@
+     /**
+      * Creates a matcher of {@link Class} that matches when the specified baseType is
+      * assignable from the examined class.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(Integer.class, typeCompatibleWith(Number.class))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/object/IsEventFrom.java	2012-06-10 17:03:11.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/object/IsEventFrom.java	2017-09-08 09:24:20.531572428 +0200
+@@ -50,6 +50,7 @@
+     }
+ 
+     /**
++     * <p>
+      * Creates a matcher of {@link java.util.EventObject} that matches any object
+      * derived from <var>eventClass</var> announced by <var>source</var>.
+      * </p>
+@@ -67,6 +68,7 @@
+     }
+ 
+     /**
++     * <p>
+      * Creates a matcher of {@link java.util.EventObject} that matches any EventObject
+      * announced by <var>source</var>.
+      * </p>
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/text/IsEmptyString.java	2012-05-20 17:15:48.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/text/IsEmptyString.java	2017-09-08 09:15:48.806422798 +0200
+@@ -29,7 +29,7 @@
+ 
+     /**
+      * Creates a matcher of {@link String} that matches when the examined string has zero length.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("", isEmptyString())</pre>
+      * 
+@@ -42,7 +42,7 @@
+     /**
+      * Creates a matcher of {@link String} that matches when the examined string is <code>null</code>, or
+      * has zero length.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(((String)null), isEmptyString())</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/text/IsEqualIgnoringCase.java	2012-05-20 17:18:01.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/text/IsEqualIgnoringCase.java	2017-09-08 09:15:48.806422798 +0200
+@@ -44,7 +44,7 @@
+     /**
+      * Creates a matcher of {@link String} that matches when the examined string is equal to
+      * the specified expectedString, ignoring case.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("Foo", equalToIgnoringCase("FOO"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/text/IsEqualIgnoringWhiteSpace.java	2012-05-20 17:25:03.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/text/IsEqualIgnoringWhiteSpace.java	2017-09-08 09:15:48.806422798 +0200
+@@ -69,7 +69,7 @@
+      *   <li>all leading and trailing whitespace of both the expectedString and the examined string are ignored</li>
+      *   <li>any remaining whitespace, appearing within either string, is collapsed to a single space before comparison</li>
+      * </ul>
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("   my\tfoo  bar ", equalToIgnoringWhiteSpace(" my  foo bar"))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/text/StringContainsInOrder.java	2012-05-20 17:29:11.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/text/StringContainsInOrder.java	2017-09-08 09:15:48.806422798 +0200
+@@ -41,7 +41,7 @@
+     /**
+      * Creates a matcher of {@link String} that matches when the examined string contains all of
+      * the specified substrings, regardless of the order of their appearance.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat("myfoobarbaz", stringContainsInOrder(Arrays.asList("bar", "foo")))</pre>
+      * 
+--- hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/xml/HasXPath.java	2012-06-10 17:06:08.000000000 +0200
++++ hamcrest-1.3/hamcrest-library/src/main/java/org/hamcrest/xml/HasXPath.java	2017-09-08 09:15:48.806422798 +0200
+@@ -106,7 +106,7 @@
+     /**
+      * Creates a matcher of {@link org.w3c.dom.Node}s that matches when the examined node has a value at the
+      * specified <code>xPath</code> that satisfies the specified <code>valueMatcher</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(xml, hasXPath("/root/something[2]/cheese", equalTo("Cheddar")))</pre>
+      * 
+@@ -124,7 +124,7 @@
+      * Creates a matcher of {@link org.w3c.dom.Node}s that matches when the examined node has a value at the
+      * specified <code>xPath</code>, within the specified <code>namespaceContext</code>, that satisfies
+      * the specified <code>valueMatcher</code>.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(xml, hasXPath("/root/something[2]/cheese", myNs, equalTo("Cheddar")))</pre>
+      * 
+@@ -143,7 +143,7 @@
+     /**
+      * Creates a matcher of {@link org.w3c.dom.Node}s that matches when the examined node contains a node
+      * at the specified <code>xPath</code>, with any content.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(xml, hasXPath("/root/something[2]/cheese"))</pre>
+      * 
+@@ -158,7 +158,7 @@
+     /**
+      * Creates a matcher of {@link org.w3c.dom.Node}s that matches when the examined node contains a node
+      * at the specified <code>xPath</code> within the specified namespace context, with any content.
+-     * <p/>
++     * <p></p>
+      * For example:
+      * <pre>assertThat(xml, hasXPath("/root/something[2]/cheese", myNs))</pre>
+      * 

@@ -1,0 +1,174 @@
+From 47087fb04266997c1b8ab42202f0700661d60896 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Thu, 12 Apr 2018 17:48:29 -0400
+Subject: [PATCH] Initial support for new mod_proxy function ssl_engine_set
+
+mod_ssl has abstracted out per-directory configuration. I'm
+not entirely sure if I need to switch to that as well. It might
+help keeping the packages in-sync function-wise but I don't
+know what benefit it adds.
+
+https://pagure.io/mod_nss/issue/45
+---
+ mod_nss.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mod_nss.h | 17 +++++++++++++
+ 2 files changed, 104 insertions(+)
+
+diff --git a/mod_nss.c b/mod_nss.c
+index 3b38b8a1..ab234109 100644
+--- a/mod_nss.c
++++ b/mod_nss.c
+@@ -220,8 +220,86 @@ static SSLConnRec *nss_init_connection_ctx(conn_rec *c)
+     return sslconn;
+ }
+ 
++static int nss_engine_status(conn_rec *c, SSLConnRec *sslconn)
++{
++    SSLSrvConfigRec *sc = mySrvConfig(c->base_server);
++
++    if (c->master) {
++        return DECLINED;
++    }
++    if (sslconn) {
++        if (sslconn->disabled) {
++            return SUSPENDED;
++        }
++        if (sslconn->is_proxy) {
++            if (!sc->proxy_enabled) {
++                return DECLINED;
++            }
++        }
++        else {
++            if (sc->enabled != TRUE) {
++                return DECLINED;
++            }
++        }
++    }
++    else {
++        if (sc->enabled != TRUE) {
++            return DECLINED;
++        }
++    }
++    return OK;
++}
++
+ static APR_OPTIONAL_FN_TYPE(ssl_proxy_enable) *othermod_proxy_enable;
+ static APR_OPTIONAL_FN_TYPE(ssl_engine_disable) *othermod_engine_disable;
++#ifdef SSL_ENGINE_SET
++static APR_OPTIONAL_FN_TYPE(ssl_engine_set) *othermod_engine_set;
++
++int nss_engine_set(conn_rec *c,
++                   ap_conf_vector_t *per_dir_config,
++                   int proxy, int enable)
++{
++    SSLConnRec *sslconn;
++    int status;
++    SSLSrvConfigRec *sc = mySrvConfig(c->base_server);
++
++    if (othermod_engine_set) {
++        return othermod_engine_set(c, per_dir_config, proxy, enable);
++    }
++
++    // FIXME: Add support for per_dir_config
++    if (proxy) {
++        sslconn = nss_init_connection_ctx(c);
++        sslconn->is_proxy = 1;
++    }
++    else {
++        sslconn = myConnConfig(c);
++    }
++
++    status = nss_engine_status(c, sslconn);
++
++    if (proxy && status == DECLINED) {
++        if (enable) {
++            SSLSrvConfigRec *sc = mySrvConfig(c->base_server);
++            ap_log_cerror(APLOG_MARK, APLOG_ERR, 0, c, APLOGNO(01961)
++                          "SSL Proxy requested for %s but not enabled "
++                          "[Hint: SSLProxyEngine]", sc->vhost_id);
++        }
++        sslconn->disabled = 1;
++    }
++    else if (sslconn) {
++        sslconn->disabled = !enable;
++    }
++
++    return status != DECLINED;
++}
++
++static int ssl_engine_set(conn_rec *c,
++                          ap_conf_vector_t *per_dir_config,
++                          int proxy, int enable) {
++    return nss_engine_set(c, per_dir_config, proxy, enable);
++}
++#endif
+ 
+ int nss_proxy_enable(conn_rec *c)
+ {
+@@ -503,14 +581,23 @@ static void nss_register_hooks(apr_pool_t *p)
+     /* Always register these mod_nss optional functions */
+     APR_REGISTER_OPTIONAL_FN(nss_proxy_enable);
+     APR_REGISTER_OPTIONAL_FN(nss_engine_disable);
++#ifdef SSL_ENGINE_SET
++    APR_REGISTER_OPTIONAL_FN(nss_engine_set);
++#endif
+ 
+     /* Save the state of any previously registered mod_ssl functions */
+     othermod_proxy_enable = APR_RETRIEVE_OPTIONAL_FN(ssl_proxy_enable);
+     othermod_engine_disable = APR_RETRIEVE_OPTIONAL_FN(ssl_engine_disable);
++#ifdef SSL_ENGINE_SET
++    othermod_engine_set = APR_RETRIEVE_OPTIONAL_FN(ssl_engine_set);
++#endif
+ 
+     /* Always register these local mod_ssl optional functions */
+     APR_REGISTER_OPTIONAL_FN(ssl_proxy_enable);
+     APR_REGISTER_OPTIONAL_FN(ssl_engine_disable);
++#ifdef SSL_ENGINE_SET
++    APR_REGISTER_OPTIONAL_FN(ssl_engine_set);
++#endif
+ }
+ 
+ module AP_MODULE_DECLARE_DATA nss_module = {
+diff --git a/mod_nss.h b/mod_nss.h
+index 5fed982e..0a894ef6 100644
+--- a/mod_nss.h
++++ b/mod_nss.h
+@@ -72,6 +72,11 @@
+ #undef PACKAGE_BUGREPORT
+ #include "config.h"
+ 
++#if (AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER == 4 \
++     && AP_SERVER_PATCHLEVEL_NUMBER > 32)
++#define SSL_ENGINE_SET 1
++#endif
++
+ /* The #ifdef macros are only defined AFTER including the above
+  * therefore we cannot include these system files at the top  :-(
+  */
+@@ -488,11 +493,23 @@ APR_DECLARE_OPTIONAL_FN(int, nss_is_https, (conn_rec *));
+ /* Proxy Support */
+ int nss_proxy_enable(conn_rec *c);
+ int nss_engine_disable(conn_rec *c);
++#ifdef SSL_ENGINE_SET
++int nss_engine_set(conn_rec *c,
++                   ap_conf_vector_t *per_dir_config,
++                   int proxy, int enable);
++#endif
+ 
+ APR_DECLARE_OPTIONAL_FN(int, nss_proxy_enable, (conn_rec *));
+ 
+ APR_DECLARE_OPTIONAL_FN(int, nss_engine_disable, (conn_rec *));
+ 
++#ifdef SSL_ENGINE_SET
++APR_DECLARE_OPTIONAL_FN(int, nss_engine_set, (conn_rec *,
++                                              ap_conf_vector_t *,
++                                              int proxy, int enable));
++#endif
++
++
+ /* I/O */
+ PRFileDesc * nss_io_new_fd();
+ int nss_io_layer_init();
+-- 
+2.13.6
+

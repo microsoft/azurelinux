@@ -1,0 +1,42 @@
+diff --git a/src/main/java/org/sonatype/plexus/build/incremental/EmptyScanner.java b/src/main/java/org/sonatype/plexus/build/incremental/EmptyScanner.java
+index 7cce37d..68b5b41 100644
+--- a/src/main/java/org/sonatype/plexus/build/incremental/EmptyScanner.java
++++ b/src/main/java/org/sonatype/plexus/build/incremental/EmptyScanner.java
+@@ -14,6 +14,7 @@ See the Apache License Version 2.0 for the specific language governing permissio
+ package org.sonatype.plexus.build.incremental;
+ 
+ import java.io.File;
++import java.util.Comparator;
+ 
+ import org.codehaus.plexus.util.Scanner;
+ 
+@@ -54,4 +55,7 @@ public class EmptyScanner implements Scanner {
+     return basedir;
+   }
+ 
++  public void setFilenameComparator(Comparator<String> filenameComparator) {
++  }
++
+ }
+diff --git a/src/test/java/org/sonatype/plexus/build/incremental/test/TestIncrementalBuildContext.java b/src/test/java/org/sonatype/plexus/build/incremental/test/TestIncrementalBuildContext.java
+index 14c1e26..c89fa52 100644
+--- a/src/test/java/org/sonatype/plexus/build/incremental/test/TestIncrementalBuildContext.java
++++ b/src/test/java/org/sonatype/plexus/build/incremental/test/TestIncrementalBuildContext.java
+@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.io.OutputStream;
+ import java.util.ArrayList;
++import java.util.Comparator;
+ import java.util.HashSet;
+ import java.util.Iterator;
+ import java.util.List;
+@@ -66,6 +67,9 @@ public class TestIncrementalBuildContext implements BuildContext {
+     public File getBasedir() {
+       return basedir;
+     }
++
++    public void setFilenameComparator(Comparator<String> filenameComparator) {
++    }
+   }
+ 
+   private final Set changedFiles;

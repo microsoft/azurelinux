@@ -1,0 +1,82 @@
+<!-- ...................................................................... -->
+<!-- DocBook MathML Module V1.1CR1 ........................................... -->
+<!-- File dbmathml.dtd .................................................... -->
+
+<!-- Copyright (C) 2000, 2001, 2002, 2003, 2004 Organization for the Advancement
+     of Structured Information Standards (OASIS).
+
+     $Id: dbmathml.dtd,v 1.7 2004/07/27 16:08:17 nwalsh Exp $
+
+     Permission to use, copy, modify and distribute the DocBook MathML
+     Module and its accompanying documentation for any purpose and
+     without fee is hereby granted in perpetuity, provided that the
+     above copyright notice and this paragraph appear in all copies.
+     The copyright holders make no representation about the
+     suitability of the DTD for any purpose.  It is provided "as is"
+     without expressed or implied warranty.
+
+     If you modify the DocBook MathML Module in any way, label your DTD
+     as a variant of DocBook.  See the maintenance documentation for
+     more information.
+
+     Please direct all questions, bug reports, or suggestions for 
+     changes to the docbook@lists.oasis-open.org mailing list. For more
+     information, see http://www.oasis-open.org/docbook/.
+-->
+
+<!-- ...................................................................... -->
+
+<!-- This is the driver file for V1.1CR1 of the DocBook MathML Module.
+     Please use the following formal public identifier to identify it:
+
+     "-//OASIS//DTD DocBook MathML Module V1.1CR1//EN"
+
+     For example, if your document's top-level element is Book, and
+     you are using DocBook directly, use the FPI in the DOCTYPE
+     declaration:
+
+     <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook MathML Module V1.1CR1//EN"
+                    "http://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd"
+                    [...]>
+
+     Or, if you have a higher-level driver file that customizes DocBook,
+     use the FPI in the parameter entity declaration:
+
+     <!ENTITY % DocBookMathMLDTD PUBLIC "-//OASIS//DTD DocBook MathML Module V1.1CR1//EN"
+                "http://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd">
+     %DocBookMathMLDTD;
+
+     See the documentation for detailed information on the parameter
+     entity and module scheme used in DocBook, customizing DocBook and
+     planning for interchange, and changes made since the last release
+     of DocBook.
+-->
+
+
+<!ENTITY % mathml-colon               ':'>
+<!ENTITY % mathml-prefix              'mml'>
+
+<!ENTITY % mathml-math                '%mathml-prefix;%mathml-colon;math' >
+
+<!ENTITY % equation.content "(alt?, (graphic|mediaobject|%mathml-math;)+)">
+<!ENTITY % inlineequation.content "(alt?, (graphic|inlinemediaobject|%mathml-math;)+)">
+
+<!ENTITY % docbook PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+%docbook;
+
+<!-- tell the MathML DTD to do the right prefixing -->
+<!ENTITY % NS.prefixed     "INCLUDE">
+<!ENTITY % MATHML.prefix   "%mathml-prefix;">
+<!ENTITY % NamespaceDecl.attrib "
+	xmlns%mathml-colon;%mathml-prefix;
+		CDATA	#FIXED 'http://www.w3.org/1998/Math/MathML'
+">
+
+<!-- You must also include the MathML DTD -->
+<!ENTITY % mathml PUBLIC "-//W3C//DTD MathML 2.0//EN"
+                  "http://www.w3.org/TR/MathML2/dtd/mathml2.dtd">
+%mathml;
+
+<!-- End of dbmathml.dtd V1.1CR1 ............................................. -->
+<!-- ...................................................................... -->

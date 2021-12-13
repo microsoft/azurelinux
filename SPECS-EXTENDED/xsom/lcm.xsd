@@ -1,0 +1,145 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!-- $Header: /cvsroot/ebxmlrr/ebxmlrr-spec/misc/3.0/schema/lcm.xsd,v 1.5 2005/01/31 22:28:18 farrukh_najmi Exp $ -->
+<schema targetNamespace="urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0" 
+  xmlns="http://www.w3.org/2001/XMLSchema" 
+  xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" 
+  xmlns:rs="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0" 
+  xmlns:tns="urn:oasis:names:tc:ebxml-regrep:xsd:lcm:3.0"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  >
+  
+  <annotation>
+    <documentation xml:lang="en">The schema for OASIS ebXML Registry Services</documentation>
+  </annotation>
+  <!-- Import the rim.xsd file with XML schema mappaing from RIM -->
+  <import namespace="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" schemaLocation="rim.xsd"/>
+  <!-- Import the rs.xsd file with XML schema for base rs related schema -->
+  <import namespace="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0" schemaLocation="rs.xsd"/>
+  <element name="SubmitObjectsRequest">
+    <annotation>
+      <documentation xml:lang="en">The SubmitObjectsRequest allows one to submit a list of RegistryObject elements. Each RegistryEntry element provides metadata for a single submitted object.  Note that the repository item being submitted is in a separate document that is not in this DTD. The ebXML Messaging Services Specfication defines packaging, for submission, of the metadata of a repository item with the repository item itself. The value of the id attribute of the ExtrinsicObject element must be the same as the xlink:href attribute within the Reference element within the Manifest element of the MessageHeader.</documentation>
+    </annotation>
+    <complexType>
+      <complexContent>
+        <extension base="rs:RegistryRequestType">
+          <sequence>
+            <element ref="rim:RegistryObjectList"/>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+  <element name="UpdateObjectsRequest">
+    <annotation>
+      <documentation xml:lang="en">The UpdateObjectsRequest allows one to update a list of RegistryObject elements. Each RegistryEntry element provides metadata for a single submitted object.  Note that the repository item being submitted is in a separate document that is not in this DTD. The ebXML Messaging Services Specfication defines packaging, for submission, of the metadata of a repository item with the repository item itself. The value of the id attribute of the ExtrinsicObject element must be the same as the xlink:href attribute within the Reference element within the Manifest element of the MessageHeader.</documentation>
+    </annotation>
+    <complexType>
+      <complexContent>
+        <extension base="rs:RegistryRequestType">
+          <sequence>
+            <element ref="rim:RegistryObjectList"/>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+  <element name="ApproveObjectsRequest">
+    <annotation>
+      <documentation xml:lang="en">
+        The ObjectRefList and AdhocQuery identify the list of
+        objects being approved.
+      </documentation>
+    </annotation>
+    <complexType>
+      <complexContent>
+        <extension base="rs:RegistryRequestType">
+          <sequence>
+            <element ref="rim:AdhocQuery" minOccurs="0" maxOccurs="1" />          
+            <element ref="rim:ObjectRefList" minOccurs="0" maxOccurs="1" />
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+  <element name="DeprecateObjectsRequest">
+    <annotation>
+      <documentation xml:lang="en">
+        The ObjectRefList and AdhocQuery identify the list of
+        objects being deprecated.
+      </documentation>
+    </annotation>
+    <complexType>
+      <complexContent>
+        <extension base="rs:RegistryRequestType">
+          <sequence>
+            <element ref="rim:AdhocQuery" minOccurs="0" maxOccurs="1" />          
+            <element ref="rim:ObjectRefList" minOccurs="0" maxOccurs="1" />
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+  <element name="UndeprecateObjectsRequest">
+    <annotation>
+      <documentation xml:lang="en">
+        The ObjectRefList is the list of
+        refs to the registry entrys being un-deprecated.
+      </documentation>
+    </annotation>
+    <complexType>
+      <complexContent>
+        <extension base="rs:RegistryRequestType">
+          <sequence>
+            <element ref="rim:AdhocQuery" minOccurs="0" maxOccurs="1" />          
+            <element ref="rim:ObjectRefList" minOccurs="0" maxOccurs="1" />
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+  <element name="RemoveObjectsRequest">
+    <annotation>
+      <documentation xml:lang="en">
+        The ObjectRefList is the list of
+        refs to the registry entrys being removed
+      </documentation>
+    </annotation>
+    <complexType>
+      <complexContent>
+        <extension base="rs:RegistryRequestType">
+          <sequence>
+            <element ref="rim:AdhocQuery" minOccurs="0" maxOccurs="1" />          
+            <element ref="rim:ObjectRefList" minOccurs="0" maxOccurs="1" />
+          </sequence>
+          <attribute name="deletionScope" default="urn:oasis:names:tc:ebxml-regrep:DeletionScopeType:DeleteAll" type="rim:referenceURI" use="optional"/>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+  <element name="RelocateObjectsRequest">
+    <complexType>
+      <complexContent>
+        <extension base="rs:RegistryRequestType">
+          <sequence>
+            <element maxOccurs="1" minOccurs="1" ref="rim:AdhocQuery" />
+            <element maxOccurs="1" minOccurs="1" name="SourceRegistry" type="rim:ObjectRefType"/>
+            <element maxOccurs="1" minOccurs="1" name="DestinationRegistry" type="rim:ObjectRefType"/>
+            <element maxOccurs="1" minOccurs="1" name="OwnerAtSource" type="rim:ObjectRefType"/>
+            <element maxOccurs="1" minOccurs="1" name="OwnerAtDestination" type="rim:ObjectRefType"/>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+  <element name="AcceptObjectsRequest">
+    <!-- The ObjectRefList must only contain local ObjectRefs such that they do not specify home attribute -->
+    <complexType>
+      <complexContent>
+        <extension base="rs:RegistryRequestType">
+          <attribute name="correlationId" type="anyURI" use="required"/>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+</schema>

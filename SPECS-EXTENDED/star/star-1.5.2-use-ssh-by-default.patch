@@ -1,0 +1,13 @@
+diff --git a/librmt/remote.c b/librmt/remote.c
+index 4606484..298ecef 100644
+--- a/librmt/remote.c
++++ b/librmt/remote.c
+@@ -1462,7 +1462,7 @@ _rcmdrsh(ahost, inport, locuser, remuser, cmd, rsh)
+ 	int	pid;
+ 
+ 	if (rsh == 0)
+-		rsh = "rsh";
++		rsh = "ssh";
+ 
+ 	/*
+ 	 * Verify that 'locuser' is present on local host.

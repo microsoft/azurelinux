@@ -1,0 +1,11 @@
+--- lxsession-0.5.5/lxsession/environement.vala.custom	2020-02-29 23:15:59.000000000 +0900
++++ lxsession-0.5.5/lxsession/environement.vala	2020-05-07 14:46:01.109408819 +0900
+@@ -127,7 +127,7 @@ namespace Lxsession
+             }
+             else
+             {
+-                custom_config = "/etc/xdg";
++                custom_config = "/etc/xdg/lxsession:/etc/xdg";
+                 custom_data ="/usr/local/share:/usr/share:/usr/share/gdm:/var/lib/menu-xdg";
+             }
+ 

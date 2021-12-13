@@ -1,0 +1,11 @@
+[Unit]
+Description=pbs-server
+After=syslog.target network.target trqauthd.service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/pbs_server
+PIDFile=/var/lib/torque/server_priv/server.lock
+
+[Install]
+WantedBy=multi-user.target

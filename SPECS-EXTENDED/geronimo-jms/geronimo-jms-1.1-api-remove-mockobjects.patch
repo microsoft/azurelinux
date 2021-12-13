@@ -1,0 +1,25 @@
+--- geronimo-jms_1.1_spec-1.1.1.orig/pom.xml	2010-01-19 10:28:16.336981322 +0000
++++ geronimo-jms_1.1_spec-1.1.1/pom.xml	2010-01-19 10:37:46.968918686 +0000
+@@ -41,22 +41,6 @@
+         <geronimo.osgi.export.version>1.1</geronimo.osgi.export.version>
+     </properties>
+ 
+-    <dependencies>
+-        <dependency>
+-            <groupId>mockobjects</groupId>
+-            <artifactId>mockobjects-core</artifactId>
+-            <version>0.09</version>
+-            <scope>test</scope>
+-        </dependency>
+-
+-        <dependency>
+-            <groupId>mockobjects</groupId>
+-            <artifactId>mockobjects-jdk1.4-j2ee1.3</artifactId>
+-            <version>0.09</version>
+-            <scope>test</scope>
+-        </dependency>
+-    </dependencies>
+-
+     <scm>
+         <connection>scm:svn:https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jms_1.1_spec-1.1.1</connection>
+         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jms_1.1_spec-1.1.1</developerConnection>

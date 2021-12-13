@@ -1,0 +1,43 @@
+From 02022c17212357afb5cec727edd8f095aa40d98d Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <ueno@unixuser.org>
+Date: Thu, 29 Sep 2011 10:17:28 +0900
+Subject: [PATCH 2/4] Hide status from the panel if status == title.
+
+---
+ src/engine.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
+
+Index: ibus-m17n-1.3.4/src/engine.c
+===================================================================
+--- ibus-m17n-1.4.0.orig/src/engine.c	2018-10-23 15:32:43.000000000 +0200
++++ ibus-m17n-1.4.0/src/engine.c	2018-10-24 08:35:49.463479480 +0200
+@@ -41,6 +41,7 @@
+     gint lookup_table_orientation;
+     gboolean use_us_layout;
+ 
++    gchar *title;
+     MInputMethod *im;
+ };
+ 
+@@ -236,6 +237,10 @@
+         "org.freedesktop.ibus.engine.m17n",
+         g_strdup_printf ("/org/freedesktop/ibus/engine/m17n/%s/%s/",
+                          lang, name));
++    MPlist *l = minput_get_title_icon (msymbol (lang), msymbol (name));
++    if (l && mplist_key (l) == Mtext) {
++        klass->title = ibus_m17n_mtext_to_utf8 (mplist_value (l));
++    }
+     g_free (lang);
+     g_free (name);
+ 
+@@ -961,8 +966,9 @@
+     else if (command == Minput_status_draw) {
+         gchar *status;
+         status = ibus_m17n_mtext_to_utf8 (m17n->context->status);
++        IBusM17NEngineClass *klass = (IBusM17NEngineClass *) G_OBJECT_GET_CLASS (m17n);
+ 
+-        if (status && strlen (status)) {
++        if (status && strlen (status) && g_strcmp0 (status, klass->title)) {
+             IBusText *text;
+             text = ibus_text_new_from_string (status);
+             ibus_property_set_label (m17n->status_prop, text);

@@ -1,0 +1,21 @@
+diff -urEbwB apache-log4j-1.2.17/build.xml apache-log4j-1.2.17.new/build.xml
+--- apache-log4j-1.2.17/build.xml	2012-05-06 13:00:28.000000000 +0200
++++ apache-log4j-1.2.17.new/build.xml	2020-03-20 13:54:30.581916159 +0100
+@@ -433,6 +433,17 @@
+                    ${stem}/config/*.class"
+          excludes="**/UnitTest**">
+ 		<manifest>
++			<attribute name="Bundle-Description" value="Apache Log4j 1.2"/>
++			<attribute name="Bundle-DocURL" value="http://logging.apache.org/log4j/1.2"/>
++			<attribute name="Bundle-License" value="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
++			<attribute name="Bundle-ManifestVersion" value="2"/>
++			<attribute name="Bundle-Name" value="Apache Log4j"/>
++			<attribute name="Bundle-SymbolicName" value="org.apache.log4j"/>
++			<attribute name="Bundle-Vendor" value="Apache Software Foundation"/>
++			<attribute name="Bundle-Version" value="${version}"/>
++			<attribute name="Export-Package" value="org.apache.log4j;version=&quot;${version}&quot;,org.apache.log4j.config;version=&quot;${version}&quot;,org.apache.log4j.helpers;version=&quot;${version}&quot;,org.apache.log4j.jdbc;version=&quot;${version}&quot;,org.apache.log4j.jmx;version=&quot;${version}&quot;,org.apache.log4j.net;version=&quot;${version}&quot;,org.apache.log4j.or;version=&quot;${version}&quot;,org.apache.log4j.or.jms;version=&quot;${version}&quot;,org.apache.log4j.or.sax;version=&quot;${version}&quot;,org.apache.log4j.pattern;version=&quot;${version}&quot;,org.apache.log4j.rewrite;version=&quot;${version}&quot;,org.apache.log4j.spi;version=&quot;${version}&quot;,org.apache.log4j.varia;version=&quot;${version}&quot;,org.apache.log4j.xml;version=&quot;${version}&quot;"/>
++			<attribute name="Import-Package" value="javax.jms;resolution:=optional,javax.mail;resolution:=optional,javax.mail.internet;resolution:=optional,javax.management,javax.naming,javax.xml.parsers,org.w3c.dom,org.xml.sax,org.xml.sax.helpers"/>
++			<attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=1.6))&quot;"/>
+ 			<section name="org/apache/log4j">
+ 				<attribute name="Implementation-Title" value="log4j"/>
+ 				<attribute name="Implementation-Version" value="${version}"/> 

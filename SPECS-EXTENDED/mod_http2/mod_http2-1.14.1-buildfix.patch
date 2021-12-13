@@ -1,0 +1,14 @@
+diff -uap mod_http2-1.14.0/mod_http2/h2_from_h1.c.buildfix mod_http2-1.14.0/mod_http2/h2_from_h1.c
+--- mod_http2-1.14.0/mod_http2/h2_from_h1.c.buildfix	2019-02-12 13:30:56.000000000 +0000
++++ mod_http2-1.14.0/mod_http2/h2_from_h1.c	2019-03-14 10:35:46.365678537 +0000
+@@ -35,6 +35,10 @@
+ #include "h2_task.h"
+ #include "h2_util.h"
+ 
++#ifndef AP_STATUS_IS_HEADER_ONLY
++#define AP_STATUS_IS_HEADER_ONLY(x) ((x) == HTTP_NO_CONTENT || \
++                                     (x) == HTTP_NOT_MODIFIED)
++#endif
+ 
+ /* This routine is called by apr_table_do and merges all instances of
+  * the passed field values into a single array that will be further

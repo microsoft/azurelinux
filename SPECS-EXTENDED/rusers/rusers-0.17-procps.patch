@@ -1,0 +1,100 @@
+--- netkit-rusers-0.17/rpc.rstatd/GNUmakefile.procps	2004-07-12 17:41:48.179608944 +0200
++++ netkit-rusers-0.17/rpc.rstatd/GNUmakefile	2004-07-12 17:41:48.190607585 +0200
+@@ -6,10 +6,6 @@
+ CFLAGS += -DGNU_LIBC -D_GNU_SOURCE
+ endif
+ 
+-#LIBS += -lproc
+-# XXX FIXME!
+-LIBS += /lib/$(shell cd /lib && echo libproc.so.*)
+-
+ RPCGEN=rpcgen
+ 
+ # Warning, do not put this in the current directory without updating
+--- netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.procps	2004-07-12 17:41:48.174609561 +0200
++++ netkit-rusers-0.17/rpc.rstatd/rstat_proc.c	2004-07-12 17:55:36.605332290 +0200
+@@ -45,6 +45,7 @@
+ #include <string.h>
+ #include <signal.h>
+ #include <fcntl.h>
++#include <locale.h>
+ 
+ #include <limits.h>
+ #include <rpc/rpc.h>
+@@ -596,27 +597,71 @@
+ #define	_DELTA(_x, _i)	( (_x)[(_i)] )
+ #endif
+ 
+-extern int uptime(double *, double *);
+-extern void loadavg(double *, double *, double *);
+-
+ static void
+ convert_stats(void)
+ {
+ 	static int tog = 0;
+ 	double up;
+ 	int i;
++	int fd;
++	static char buf[1024];
++	char *savelocale;
+ 
+ 	hz = sysconf(_SC_CLK_TCK);
+ 	gettimeofday(&tm, (struct timezone *) 0);
+ 
+-	i = uptime(&up, NULL);
++	fd = open("/proc/uptime", O_RDONLY);
++	if (fd == -1) {
++		fprintf(stderr, "Error opening /proc/uptime, please make sure /proc is mounted.\n");
++		exit(1);
++	}
++
++	i = read(fd, buf, sizeof(buf) - 1);
++	if (i < 0) {
++		perror("/proc/uptime");
++		close(fd);
++		exit(1);
++	}
++	buf[i] = '\0';
++	savelocale = setlocale(LC_NUMERIC, NULL);
++	setlocale(LC_NUMERIC, "C");
++	if (sscanf(buf, "%lf", &up) < 1) {
++		fprintf(stderr, "bad data in /proc/uptime\n");
++		exit(1);
++	}
++	setlocale(LC_NUMERIC, savelocale);
++	close(fd);
++
++	i = (int)up;
++
+ 	btm.tv_sec = tm.tv_sec - i;
+ 	btm.tv_usec = 0;
+ 	up -= i;
+ 	if (up > 0)
+ 		btm.tv_usec = 1000000 * up;
+ 
+-	loadavg(&avrun[0], &avrun[1], &avrun[2]);
++	fd = open("/proc/loadavg", O_RDONLY);
++	if (fd == -1) {
++		fprintf(stderr, "Error opening /proc/loadavg, please make sure /proc is mounted.\n");
++		exit(1);
++	}
++
++	i = read(fd, buf, sizeof(buf) - 1);
++	if (i < 0) {
++		perror("/proc/loadavg");
++		close(fd);
++		exit(1);
++	}
++	buf[i] = '\0';
++	savelocale = setlocale(LC_NUMERIC, NULL);
++	setlocale(LC_NUMERIC, "C");
++	if (sscanf(buf, "%lf %lf %lf", &avrun[0], &avrun[1], &avrun[2]) < 3) {
++		fprintf(stderr, "bad data in /proc/loadavg\n");
++		exit(1);
++	}
++	setlocale(LC_NUMERIC, savelocale);
++	close(fd);
++
+ 	getstat(cpu_use+tog,cpu_nic+tog,cpu_sys+tog,cpu_idl+tog,
+ 		pgpgin+tog,pgpgout+tog,pswpin+tog,pswpout+tog,
+ 		inter+tog,ticks+tog,ctxt+tog, disk+tog);

@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "ant-bootstrap.pom.in": "85d35aedfb5ccc60ba1642b4c7624d092f34b253662d3c6c8f2bc1982dcad580",
+  "ant.keyring": "c4bb9a81a4330dfed089afb72975fdc1d71f77760db64b03317121d831157987",
+  "apache-ant-1.10.9-src.tar.xz": "4b2008cc60fefd424b05567e9d43a071302865d5fd8b01a807e15e381b557ec2",
+  "apache-ant-1.10.9-src.tar.xz.asc": "6dea423cd56c433a42851a278b6cf2c13c0de5205c94a5ecddc6db634957a3a4",
+  "apache-ant-1.8.ant.conf": "8a0bace4a527bd0ff35ad0b0a31c1f7bf30fa186e98cd9dc5142a97098f36ddf",
+  "pre_checkin.sh": "998aa39eb724efbf77076105038cb9ea1e858abf5e87df2779b544eb6e63c1fc"
+ }
+}

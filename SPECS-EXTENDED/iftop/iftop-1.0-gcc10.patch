@@ -1,0 +1,63 @@
+Patch by Robert Scheck <robert@fedoraproject.org> for iftop <= 1.0pre4 to avoid a
+GCC 10 related build failure due to global variables in a header file with omitted
+"extern" declaration, see also: https://gcc.gnu.org/gcc-10/porting_to.html
+
+Example build failure output:
+/usr/bin/ld: ui_common.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:36: multiple definition of `screen_list'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:36: first defined here
+/usr/bin/ld: ui_common.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peaktotal'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: ui_common.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peakrecv'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: ui_common.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peaksent'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: ui_common.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:37: multiple definition of `totals'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:37: first defined here
+/usr/bin/ld: ui_common.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:40: multiple definition of `screen_hash'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:40: first defined here
+/usr/bin/ld: ui_common.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:41: multiple definition of `service_hash'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:41: first defined here
+/usr/bin/ld: ui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:36: multiple definition of `screen_list'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:36: first defined here
+/usr/bin/ld: ui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peaksent'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: ui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peakrecv'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: ui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peaktotal'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: ui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:37: multiple definition of `totals'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:37: first defined here
+/usr/bin/ld: ui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:40: multiple definition of `screen_hash'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:40: first defined here
+/usr/bin/ld: ui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:41: multiple definition of `service_hash'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:41: first defined here
+/usr/bin/ld: tui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:36: multiple definition of `screen_list'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:36: first defined here
+/usr/bin/ld: tui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:37: multiple definition of `totals'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:37: first defined here
+/usr/bin/ld: tui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peaksent'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: tui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peakrecv'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: tui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: multiple definition of `peaktotal'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:38: first defined here
+/usr/bin/ld: tui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:40: multiple definition of `screen_hash'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:40: first defined here
+/usr/bin/ld: tui.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:41: multiple definition of `service_hash'; iftop.o:/builddir/build/BUILD/iftop-1.0pre4/ui_common.h:41: first defined here
+collect2: error: ld returned 1 exit status
+
+--- iftop-1.0pre4/ui_common.h			2020-02-02 23:58:40.104880963 +0100
++++ iftop-1.0pre4/ui_common.h.gcc10		2020-02-02 23:59:36.822197955 +0100
+@@ -33,12 +33,12 @@
+ 
+ extern options_t options;
+ 
+-sorted_list_type screen_list;
+-host_pair_line totals;
+-int peaksent, peakrecv, peaktotal;
++extern sorted_list_type screen_list;
++extern host_pair_line totals;
++extern int peaksent, peakrecv, peaktotal;
+ extern history_type history_totals;
+-hash_type* screen_hash;
+-hash_type* service_hash;
++extern hash_type* screen_hash;
++extern hash_type* service_hash;
+ 
+ void analyse_data(void);
+ void screen_list_init(void);
+--- iftop-1.0pre4/ui_common.c			2020-02-02 23:58:40.104880963 +0100
++++ iftop-1.0pre4/ui_common.c.gcc10		2020-02-03 00:06:14.604323838 +0100
+@@ -27,6 +27,12 @@
+   [OPTION_BW_PKTS]  = { "p", "Kp", "Mp", "GB"},
+ };
+ 
++sorted_list_type screen_list;
++host_pair_line totals;
++int peaksent, peakrecv, peaktotal;
++hash_type* screen_hash;
++hash_type* service_hash;
++
+ extern hash_type* history;
+ extern int history_pos;
+ extern int history_len;

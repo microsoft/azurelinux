@@ -1,0 +1,15 @@
+[Unit]
+Description=HyperSQL Database Engine
+
+
+[Service]
+Type=simple
+User=hsqldb
+Group=hsqldb
+ExecStart=/usr/lib/hsqldb/hsqldb-wrapper
+ExecStartPost=/usr/lib/hsqldb/hsqldb-post
+ExecStop=/usr/lib/hsqldb/hsqldb-stop
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

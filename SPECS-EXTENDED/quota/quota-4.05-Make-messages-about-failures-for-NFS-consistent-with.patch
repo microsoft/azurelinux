@@ -1,0 +1,112 @@
+From a4b0af23e1e3761825e9d4ac075e3fcae8ab91cb Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Fri, 24 May 2019 12:03:27 +0200
+Subject: [PATCH 1/4] Make messages about failures for NFS consistent with
+ local filesystems
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Currently, some types for failures when fetching quota information for
+NFS filesystem were silent (e.g. when rpc.rquotad was not running) while
+others were reporting error message (e.g. when rpc connection failed).
+There's no big difference in these for the user / administrator and also
+is inconsistent with how we deal with local filesystems - there we
+report error if the filesystem was explicitely specified on command line
+and silently ignore it for "scan all" operations.
+
+So change error reporting for NFS to report errors about quota not being
+supported if and only if filesystem was explicitely specified on command
+line.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ edquota.c  | 4 ++--
+ quota.c    | 2 +-
+ quotaops.c | 2 +-
+ setquota.c | 6 +++---
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/edquota.c b/edquota.c
+index 912f833..a77106c 100644
+--- a/edquota.c
++++ b/edquota.c
+@@ -176,7 +176,7 @@ static void copy_prototype(int argc, char **argv, struct quota_handle **handles)
+ 	protoprivs = getprivs(protoid, handles, 0);
+ 	while (argc-- > 0) {
+ 		id = name2id(*argv, quotatype, !!(flags & FL_NUMNAMES), NULL);
+-		curprivs = getprivs(id, handles, 0);
++		curprivs = getprivs(id, handles, !dirname);
+ 		if (!curprivs)
+ 			die(1, _("Cannot get quota information for user %s\n"), *argv);
+ 		argv++;
+@@ -296,7 +296,7 @@ int main(int argc, char **argv)
+ 	else {
+ 		for (; argc > 0; argc--, argv++) {
+ 			id = name2id(*argv, quotatype, !!(flags & FL_NUMNAMES), NULL);
+-			curprivs = getprivs(id, handles, 0);
++			curprivs = getprivs(id, handles, !dirname);
+ 			if (!curprivs)
+ 				die(1, _("Cannot get quota information for user %s.\n"), *argv);
+ 			if (flags & FL_EDIT_TIMES) {
+diff --git a/quota.c b/quota.c
+index 8235013..be494e3 100644
+--- a/quota.c
++++ b/quota.c
+@@ -168,7 +168,7 @@ static int showquotas(int type, qid_t id, int mntcnt, char **mnt)
+ 		((flags & FL_NOAUTOFS) ? MS_NO_AUTOFS : 0)
+ 		| ((flags & FL_LOCALONLY) ? MS_LOCALONLY : 0)
+ 		| ((flags & FL_NFSALL) ? MS_NFS_ALL : 0));
+-	qlist = getprivs(id, handles, !!(flags & FL_QUIETREFUSE));
++	qlist = getprivs(id, handles, !mntcnt || (flags & FL_QUIETREFUSE));
+ 	if (!qlist) {
+ 		over = 1;
+ 		goto out_handles;
+diff --git a/quotaops.c b/quotaops.c
+index 976e6b3..ad29fd9 100644
+--- a/quotaops.c
++++ b/quotaops.c
+@@ -125,7 +125,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int quiet)
+ 
+ 		if (!(q = handles[i]->qh_ops->read_dquot(handles[i], id))) {
+ 			/* If rpc.rquotad is not running filesystem might be just without quotas... */
+-			if (errno != ENOENT && (errno != ECONNREFUSED || !quiet)) {
++			if (!quiet || (errno != ENOENT && errno != ECONNREFUSED)) {
+ 				int olderrno = errno;
+ 
+ 				id2name(id, handles[i]->qh_type, name);
+diff --git a/setquota.c b/setquota.c
+index bfd6682..08fdbfc 100644
+--- a/setquota.c
++++ b/setquota.c
+@@ -314,7 +314,7 @@ static int setlimits(struct quota_handle **handles)
+ 	struct dquot *q, *protoq, *protoprivs = NULL, *curprivs;
+ 	int ret = 0;
+ 
+-	curprivs = getprivs(id, handles, 0);
++	curprivs = getprivs(id, handles, !!(flags & FL_ALL));
+ 	if (flags & FL_PROTO) {
+ 		protoprivs = getprivs(protoid, handles, 0);
+ 		for (q = curprivs, protoq = protoprivs; q && protoq; q = q->dq_next, protoq = protoq->dq_next) {
+@@ -435,7 +435,7 @@ static int batch_setlimits(struct quota_handle **handles)
+ 	int ret = 0;
+ 
+ 	while (!read_entry(&id, &isoftlimit, &ihardlimit, &bsoftlimit, &bhardlimit)) {
+-		curprivs = getprivs(id, handles, 0);
++		curprivs = getprivs(id, handles, !!(flags & FL_ALL));
+ 		for (q = curprivs; q; q = q->dq_next) {
+ 			q->dq_dqb.dqb_bsoftlimit = bsoftlimit;
+ 			q->dq_dqb.dqb_bhardlimit = bhardlimit;
+@@ -474,7 +474,7 @@ static int setindivgraces(struct quota_handle **handles)
+ 	int ret = 0;
+ 	struct dquot *q, *curprivs;
+ 
+-	curprivs = getprivs(id, handles, 0);
++	curprivs = getprivs(id, handles, !!(flags & FL_ALL));
+ 	for (q = curprivs; q; q = q->dq_next) {
+ 		if (q->dq_dqb.dqb_bsoftlimit && toqb(q->dq_dqb.dqb_curspace) > q->dq_dqb.dqb_bsoftlimit)
+ 			q->dq_dqb.dqb_btime = toset.dqb_btime;
+-- 
+2.20.1
+

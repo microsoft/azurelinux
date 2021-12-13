@@ -1,0 +1,26 @@
+--- build.xml.orig	2018-03-20 15:15:57.063810672 +0000
++++ build.xml	2018-03-20 15:16:26.018700633 +0000
+@@ -15,16 +15,20 @@
+ 	<property name="output" value="bin" />
+ 	<property name="jar_file" value="ecj.jar" />
+ 
++	<path id="build.path">
++		<pathelement path="${javaapi}"/>
++		<pathelement path="${rtjar}"/>
++	</path>
+ 	<target name="build">
+ 		<delete file="${basedir}/${jar_file}" failonerror="no" />
+ 		<delete dir="${output}" failonerror="no" />
+ 		<mkdir dir="${output}" />
+ 
+-		<javac srcdir="${basedir}" destdir="${output}"
+-					debuglevel="lines,source"
++		<javac srcdir="${basedir}" destdir="${output}" bootclasspathref="build.path"
++					debug="yes"
+ 					source="1.8"
+ 					target="1.8">
+-			<compilerarg line="-Xlint:none"/>
++			<compilerarg line="-Xlint:none -encoding cp1252"/>
+ 		</javac>
+ 
+ 		<delete file="${basedir}/META-INF/MANIFEST.MF" failonerror="false"/>

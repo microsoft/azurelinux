@@ -1,0 +1,33 @@
+From 690138ca262b03d7e43336dd9bfee2ca0e1b03f9 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 12 May 2016 09:36:10 +0200
+Subject: [PATCH 3/3] Port to plexus-utils 3.0.24
+
+---
+ .../maven/tools/plugin/generator/PluginHelpGenerator.java      | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/PluginHelpGenerator.java b/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/PluginHelpGenerator.java
+index 23c3ed9..7543496 100644
+--- a/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/PluginHelpGenerator.java
++++ b/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/PluginHelpGenerator.java
+@@ -302,7 +302,15 @@ public class PluginHelpGenerator
+             return;
+         }
+ 
+-        Properties properties = PropertyUtils.loadProperties( tmpPropertiesFile );
++        Properties properties;
++        try
++        {
++            properties = PropertyUtils.loadProperties( tmpPropertiesFile );
++        }
++        catch ( IOException exc )
++        {
++            properties = new Properties();
++        }
+ 
+         String helpPackageName = properties.getProperty( "helpPackageName" );
+ 
+-- 
+2.14.3
+

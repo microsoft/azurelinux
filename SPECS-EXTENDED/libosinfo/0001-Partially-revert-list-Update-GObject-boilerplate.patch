@@ -1,0 +1,100 @@
+From 0baa3d3ab5db3cf06c10a3281dee9d2089872aaf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fabiano=20Fid=C3=AAncio?= <fidencio@redhat.com>
+Date: Fri, 10 Jan 2020 11:53:22 +0100
+Subject: [PATCH] Partially revert "list: Update GObject boilerplate"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This partially reverts commit 706b6fd0d97ed572d92c4a33882605d561ebe3c8,
+which introduced an ABI breakage by using G_DECLARE_DERIVABLE_TYPE when
+declaring an OsinfoList.
+
+Signed-off-by: Fabiano Fidêncio <fidencio@redhat.com>
+---
+ osinfo/osinfo_list.c |  4 ++--
+ osinfo/osinfo_list.h | 36 +++++++++++++++++++++++++++++++-----
+ 2 files changed, 33 insertions(+), 7 deletions(-)
+
+diff --git a/osinfo/osinfo_list.c b/osinfo/osinfo_list.c
+index e8fa74c8..7f95c266 100644
+--- a/osinfo/osinfo_list.c
++++ b/osinfo/osinfo_list.c
+@@ -35,13 +35,13 @@
+  *
+  */
+ 
+-typedef struct
++struct _OsinfoListPrivate
+ {
+     GPtrArray *array;
+     GHashTable *entities;
+ 
+     GType elementType;
+-} OsinfoListPrivate;
++};
+ 
+ enum {
+     PROP_O,
+diff --git a/osinfo/osinfo_list.h b/osinfo/osinfo_list.h
+index 07731f0e..49550662 100644
+--- a/osinfo/osinfo_list.h
++++ b/osinfo/osinfo_list.h
+@@ -27,16 +27,44 @@
+ 
+ # include <osinfo/osinfo_filter.h>
+ 
+-G_BEGIN_DECLS
++/*
++ * Type macros.
++ */
++# define OSINFO_TYPE_LIST                  (osinfo_list_get_type ())
++# define OSINFO_LIST(obj)                  (G_TYPE_CHECK_INSTANCE_CAST ((obj), OSINFO_TYPE_LIST, OsinfoList))
++# define OSINFO_IS_LIST(obj)               (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OSINFO_TYPE_LIST))
++# define OSINFO_LIST_CLASS(klass)          (G_TYPE_CHECK_CLASS_CAST ((klass), OSINFO_TYPE_LIST, OsinfoListClass))
++# define OSINFO_IS_LIST_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE ((klass), OSINFO_TYPE_LIST))
++# define OSINFO_LIST_GET_CLASS(obj)        (G_TYPE_INSTANCE_GET_CLASS ((obj), OSINFO_TYPE_LIST, OsinfoListClass))
++
++typedef struct _OsinfoList       OsinfoList;
++
++typedef struct _OsinfoListClass   OsinfoListClass;
++
++typedef struct _OsinfoListPrivate OsinfoListPrivate;
++
++/* object */
++struct _OsinfoList
++{
++    GObject parent_instance;
++
++    /* public */
+ 
+-# define OSINFO_TYPE_LIST (osinfo_list_get_type ())
+-G_DECLARE_DERIVABLE_TYPE(OsinfoList, osinfo_list, OSINFO, LIST, GObject)
++    /* private */
++    OsinfoListPrivate *priv;
++};
+ 
++/* class */
+ struct _OsinfoListClass
+ {
++    /*< private >*/
+     GObjectClass parent_class;
++
++    /* class members */
+ };
+ 
++GType osinfo_list_get_type(void);
++
+ GType osinfo_list_get_element_type(OsinfoList *list);
+ gint osinfo_list_get_length(OsinfoList *list);
+ OsinfoEntity *osinfo_list_get_nth(OsinfoList *list, gint idx);
+@@ -55,6 +83,4 @@ OsinfoList *osinfo_list_new_filtered(OsinfoList *source, OsinfoFilter *filter);
+ OsinfoList *osinfo_list_new_intersection(OsinfoList *sourceOne, OsinfoList *sourceTwo);
+ OsinfoList *osinfo_list_new_union(OsinfoList *sourceOne, OsinfoList *sourceTwo);
+ 
+-G_END_DECLS
+-
+ #endif /* __OSINFO_LIST_H__ */
+-- 
+2.24.1
+

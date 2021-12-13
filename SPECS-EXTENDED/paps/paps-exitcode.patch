@@ -1,0 +1,66 @@
+diff -pruN paps-0.6.8.orig/src/paps.c paps-0.6.8/src/paps.c
+--- paps-0.6.8.orig/src/paps.c	2008-09-01 15:54:11.000000000 +0900
++++ paps-0.6.8/src/paps.c	2008-09-01 15:54:47.000000000 +0900
+@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
+       if (!IN)
+         {
+           fprintf(stderr, "Failed to open %s!\n", filename_in);
+-          exit(-1);
++          exit(1);
+         }
+     }
+   else
+@@ -499,7 +499,7 @@ int main(int argc, char *argv[])
+       if (cvh == NULL)
+         {
+           fprintf(stderr, "%s: Invalid encoding: %s\n", g_get_prgname (), encoding);
+-          exit(-1);
++          exit(1);
+         }
+     }
+ 
+@@ -559,7 +559,7 @@ read_file (FILE   *file,
+         {
+           fprintf(stderr, "%s: Error reading file.\n", g_get_prgname ());
+           g_string_free (inbuf, TRUE);
+-          return NULL;
++          exit(1);
+         }
+       else if (bp == NULL)
+         break;
+@@ -573,7 +573,7 @@ read_file (FILE   *file,
+           if (g_iconv (handle, &ib, &iblen, &ob, &oblen) == -1)
+             {
+               fprintf (stderr, "%s: Error while converting strings.\n", g_get_prgname ());
+-              return NULL;
++              exit(1);
+             }
+           obuffer[BUFSIZE * 6 - 1 - oblen] = 0;
+         }
+@@ -637,7 +637,7 @@ split_text_into_paragraphs (PangoContext
+ 	      if (wtext == NULL)
+ 	        {
+ 		  fprintf (stderr, "Failed to convert UTF-8 to UCS-4.\n");
+-		  return NULL;
++                  exit(1);
+ 		}
+ 
+ 	      len = g_utf8_strlen (para->text, para->length);
+@@ -650,7 +650,7 @@ split_text_into_paragraphs (PangoContext
+ 		    {
+ 		      fprintf (stderr, "Failed to allocate a memory.\n");
+ 		      g_free (wtext);
+-		      return NULL;
++                      exit(1);
+ 		    }
+ 		  for (i = 0; i < len; i++)
+ 		    {
+@@ -665,7 +665,7 @@ split_text_into_paragraphs (PangoContext
+ 		  if (newtext == NULL)
+ 		    {
+ 		      fprintf (stderr, "Failed to convert UCS-4 to UTF-8.\n");
+-		      return NULL;
++                      exit(1);
+ 		    }
+ 
+ 		  pango_layout_set_text (para->layout, newtext, -1);

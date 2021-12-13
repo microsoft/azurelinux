@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: javax.wsdl
+Specification-Version: 1.2
+Bundle-ManifestVersion: 2
+Specification-Title: JWSDL
+Bundle-Version: 1.6.3
+Bundle-Vendor: IBM
+Implementation-Vendor: IBM
+Bundle-RequiredExecutionEnvironment: J2SE-1.2
+Bundle-Localization: plugin
+Bundle-Name: WSDL4J
+Specification-Vendor: IBM (Java Community Process)
+Implementation-Version: 1.6
+Bundle-ClassPath: .
+Implementation-Title: WSDL4J
+Export-Package: com.ibm.wsdl,com.ibm.wsdl.extensions,com.ibm.wsdl.exte
+ nsions.http,com.ibm.wsdl.extensions.mime,com.ibm.wsdl.extensions.sche
+ ma,com.ibm.wsdl.extensions.soap,com.ibm.wsdl.extensions.soap12,com.ib
+ m.wsdl.factory,com.ibm.wsdl.util,com.ibm.wsdl.util.xml,com.ibm.wsdl.x
+ ml,javax.wsdl,javax.wsdl.extensions,javax.wsdl.extensions.http,javax.
+ wsdl.extensions.mime,javax.wsdl.extensions.schema,javax.wsdl.extensio
+ ns.soap,javax.wsdl.extensions.soap12,javax.wsdl.factory,javax.wsdl.xm
+ l

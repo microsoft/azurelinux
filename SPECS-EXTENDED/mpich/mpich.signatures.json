@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "mpich-3.3.2.tar.gz": "4bfaf8837a54771d3e4922c84071ef80ffebddbb6971a006038d91ee7ef959b9",
+  "mpich.macros": "c40ceff8dafeab533e9bf31bb1dbeb15f97d7d99fc49c06a1852c7ab4ec533f1",
+  "mpich.pth.py3": "2acaeda51628ea81b01876497dc4c84fe056317391262cab92e9dd40b0721e74"
+ }
+}

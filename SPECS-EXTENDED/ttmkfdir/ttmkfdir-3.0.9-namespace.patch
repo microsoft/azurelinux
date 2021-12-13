@@ -1,0 +1,56 @@
+*** ttmkfdir-3.0.9/ttf.h.ORIG	2004-03-10 13:40:47.149814008 -0700
+--- ttmkfdir-3.0.9/ttf.h	2004-03-10 13:40:50.571293864 -0700
+*************** namespace ttf {
+*** 50,56 ****
+  	TT_Postscript	    *post;
+  	std::string	    FileName;
+      };
+! };
+  
+  #endif /* TTF_H__ */
+  
+--- 50,56 ----
+  	TT_Postscript	    *post;
+  	std::string	    FileName;
+      };
+! }
+  
+  #endif /* TTF_H__ */
+  
+*** ttmkfdir-3.0.9/util.h.ORIG	2004-03-10 13:40:19.872960720 -0700
+--- ttmkfdir-3.0.9/util.h	2004-03-10 13:40:34.059803992 -0700
+*************** namespace util {
+*** 17,22 ****
+  	Singleton (void) {};
+  	~Singleton (void) {};
+      };
+! }; 
+  
+  #endif // TTMKFDIRUTIL_H__
+--- 17,22 ----
+  	Singleton (void) {};
+  	~Singleton (void) {};
+      };
+! }
+  
+  #endif // TTMKFDIRUTIL_H__
+*** ttmkfdir-3.0.9/builtin.cpp.ORIG	2004-03-10 13:41:47.089701760 -0700
+--- ttmkfdir-3.0.9/builtin.cpp	2004-03-10 13:41:51.327057584 -0700
+*************** namespace {
+*** 600,606 ****
+  	0x00f8, 0x00f9, 0x00fa, 0x00fb, 0x00fc, 0x00fd, 0x00fe, 0x00ff
+      };
+  
+! };
+  
+  Encoding::BuiltinEncoding_t Encoding::builtin_encodings[] = {
+      {256,191,32,{TT_PLATFORM_MICROSOFT,TT_MS_ID_UNICODE_CS,iso8859_1},{"iso8859-1",}},
+--- 600,606 ----
+  	0x00f8, 0x00f9, 0x00fa, 0x00fb, 0x00fc, 0x00fd, 0x00fe, 0x00ff
+      };
+  
+! }
+  
+  Encoding::BuiltinEncoding_t Encoding::builtin_encodings[] = {
+      {256,191,32,{TT_PLATFORM_MICROSOFT,TT_MS_ID_UNICODE_CS,iso8859_1},{"iso8859-1",}},
+

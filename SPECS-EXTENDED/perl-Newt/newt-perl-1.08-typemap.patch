@@ -1,0 +1,13 @@
+--- Newt-1.08/typemap.valist	Thu Oct  8 18:02:18 1998
++++ Newt-1.08/typemap	Tue Jun 12 14:43:18 2001
+@@ -23,9 +23,7 @@
+ struct newtExitStruct *				T_PTROBJ
+ struct newtWinEntry *				T_PTROBJ
+ newtSuspendCallback				T_PTROBJ
+-va_list						T_PTROBJ
+ newtEntryFilter					T_PTROBJ
+ newtComponent *					T_PTROBJ
+-__gnuc_va_list					T_PTROBJ
+ unsigned long long				T_PTROBJ
+-enum newtFlagsSense				T_PTROBJ
++enum newtFlagsSense				T_IV

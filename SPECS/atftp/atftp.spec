@@ -1,9 +1,9 @@
 Summary:        Advanced Trivial File Transfer Protocol (ATFTP) - TFTP server
 Name:           atftp
-Version:        0.7.2
-Release:        3%{?dist}
+Version:        0.7.5
+Release:        2%{?dist}
 URL:            http://sourceforge.net/projects/atftp
-License:        GPLv2+ and GPLv3+ and LGPLv2+
+License:        GPLv2+
 Group:          System Environment/Daemons
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -131,6 +131,12 @@ fi
 
 
 %changelog
+* Thu Nov 18 2021 Chris Co <chrco@microsoft.com> - 0.7.5-2
+- License verified
+
+* Mon Sep 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.7.5-1
+- Fix CVE-2021-41054 by updating to 0.7.5.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.7.2-3
 - Added %%license line automatically
 

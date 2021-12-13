@@ -1,0 +1,15 @@
+diff -urNp docbook-utils-0.6.14-orig/bin/jw.in docbook-utils-0.6.14/bin/jw.in
+--- docbook-utils-0.6.14-orig/bin/jw.in	2008-11-28 10:53:09.000000000 +0100
++++ docbook-utils-0.6.14/bin/jw.in	2008-11-28 11:22:28.000000000 +0100
+@@ -81,9 +81,9 @@ SGML_CATALOGS_DIR="/etc/sgml"
+ if [ -f "$SGML_CONF" ]
+ then
+   RE='^[:space:]*SGML_BASE_DIR[:space:]*=[:space:]*'
+-  SGML_BASE_DIR=`grep $RE $SGML_CONF | sed "s/$RE//"`
++  SGML_BASE_DIR=`grep --color=never $RE $SGML_CONF | sed "s/$RE//"`
+   RE='^[:space:]*SGML_CATALOGS_DIR[:space:]*=[:space:]*'
+-  SGML_CATALOGS_DIR=`grep $RE $SGML_CONF | sed "s/$RE//"`
++  SGML_CATALOGS_DIR=`grep --color=never $RE $SGML_CONF | sed "s/$RE//"`
+ fi
+ 
+ # Set frontend to use

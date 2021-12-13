@@ -1,0 +1,21 @@
+diff --git a/lib/format/ddf/ddf1.c.lsi_name b/lib/format/ddf/ddf1.c
+index 05b550b..c8e484b 100644
+--- a/lib/format/ddf/ddf1.c
++++ b/lib/format/ddf/ddf1.c
+@@ -696,6 +696,16 @@ name(struct lib_context *lc, struct ddf1 *ddf1, struct raid_dev *rd)
+ 			sprintf(b, "%02x%02x%02x%02x",
+ 				vd->guid[i], vd->guid[i + 1],
+ 				vd->guid[i + 2], vd->guid[i + 3]);
++
++		/*
++		 * Because the LSI bios changes the timestamp in the
++		 * metadata on every boot, we have to neutralize it
++		 * in order to allow for persistent names.
++		 *
++		 * Using a dummy string "47114711" for that.
++		 */
++		if (!strncmp((char *) vd->guid, "LSI", 3))
++			strncpy(buf + prefix + 32, "47114711", 8);
+ 	}
+ 
+ out:

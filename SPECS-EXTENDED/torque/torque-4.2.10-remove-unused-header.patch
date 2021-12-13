@@ -1,0 +1,29 @@
+From fb7c21c16423cecdbd8ac2429118305c26b82bb4 Mon Sep 17 00:00:00 2001
+From: Justin Bronder <jsbronder@gmail.com>
+Date: Sat, 1 Jun 2013 11:37:27 -0400
+Subject: [PATCH] Libnet:  remove unused header
+
+Do not include <rpc/rpc.h> as it is unused.  While this is normally
+harmless, glibc is dropping support for rpc as of 2.14 [1] and ipv6 is
+only supported in ti-rpc.
+
+This fixes building on distros that have not manually patched rpc
+support back into glibc.
+
+1. http://sourceware.org/bugzilla/show_bug.cgi?id=12949
+---
+ src/lib/Libnet/net_client.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/lib/Libnet/net_client.c b/src/lib/Libnet/net_client.c
+index d8e51312f8..04c3ba0d78 100644
+--- a/src/lib/Libnet/net_client.c
++++ b/src/lib/Libnet/net_client.c
+@@ -80,7 +80,6 @@
+ 
+ #include <sys/types.h>
+ #include <sys/socket.h>
+-#include <rpc/rpc.h>
+ #include <netinet/in.h>
+ #include <stdio.h>
+ #include <errno.h>

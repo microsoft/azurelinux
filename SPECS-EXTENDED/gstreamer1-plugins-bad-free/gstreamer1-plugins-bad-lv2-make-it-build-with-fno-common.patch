@@ -1,0 +1,139 @@
+From 89d17470cfa9b52402e97cbafdd95242b880856e Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <rishi@gnu.org>
+Date: Fri, 20 Mar 2020 15:49:06 +0100
+Subject: [PATCH] lv2: Make it build with -fno-common
+
+GCC 10 defaults to -fno-common. This means that global variables shared
+across multiple translation units should be declared as 'extern' in
+header files and defined in exactly one C file. See:
+https://gcc.gnu.org/gcc-10/porting_to.html
+
+https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/merge_requests/1125
+---
+ ext/lv2/gstlv2.c | 33 ++++++++++++++++++++++++++
+ ext/lv2/gstlv2.h | 62 ++++++++++++++++++++++++------------------------
+ 2 files changed, 64 insertions(+), 31 deletions(-)
+
+diff --git a/ext/lv2/gstlv2.c b/ext/lv2/gstlv2.c
+index 60d502f41af9..7feeee192144 100644
+--- a/ext/lv2/gstlv2.c
++++ b/ext/lv2/gstlv2.c
+@@ -69,6 +69,39 @@ GST_DEBUG_CATEGORY (lv2_debug);
+ #error "Unsupported OS"
+ #endif
+ 
++LilvWorld *world = NULL;
++LilvNode *atom_class = NULL;
++LilvNode *audio_class = NULL;
++LilvNode *control_class = NULL;
++LilvNode *cv_class = NULL;
++LilvNode *event_class = NULL;
++LilvNode *input_class = NULL;
++LilvNode *output_class = NULL;
++LilvNode *preset_class = NULL;
++LilvNode *state_iface = NULL;
++LilvNode *state_uri = NULL;
++
++LilvNode *integer_prop = NULL;
++LilvNode *toggled_prop = NULL;
++LilvNode *designation_pred = NULL;
++LilvNode *in_place_broken_pred = NULL;
++LilvNode *optional_pred = NULL;
++LilvNode *group_pred = NULL;
++LilvNode *supports_event_pred = NULL;
++LilvNode *label_pred = NULL;
++
++LilvNode *center_role = NULL;
++LilvNode *left_role = NULL;
++LilvNode *right_role = NULL;
++LilvNode *rear_center_role = NULL;
++LilvNode *rear_left_role = NULL;
++LilvNode *rear_right_role = NULL;
++LilvNode *lfe_role = NULL;
++LilvNode *center_left_role = NULL;
++LilvNode *center_right_role = NULL;
++LilvNode *side_left_role = NULL;
++LilvNode *side_right_role = NULL;
++
+ GstStructure *lv2_meta_all = NULL;
+ 
+ static void
+diff --git a/ext/lv2/gstlv2.h b/ext/lv2/gstlv2.h
+index 177f9b2c19cd..9f7258229445 100644
+--- a/ext/lv2/gstlv2.h
++++ b/ext/lv2/gstlv2.h
+@@ -28,40 +28,40 @@
+ 
+ #include "gstlv2utils.h"
+ 
+-LilvWorld *world;
+-LilvNode *atom_class;
+-LilvNode *audio_class;
+-LilvNode *control_class;
+-LilvNode *cv_class;
+-LilvNode *event_class;
+-LilvNode *input_class;
+-LilvNode *output_class;
+-LilvNode *preset_class;
+-LilvNode *state_iface;
+-LilvNode *state_uri;
++extern LilvWorld *world;
++extern LilvNode *atom_class;
++extern LilvNode *audio_class;
++extern LilvNode *control_class;
++extern LilvNode *cv_class;
++extern LilvNode *event_class;
++extern LilvNode *input_class;
++extern LilvNode *output_class;
++extern LilvNode *preset_class;
++extern LilvNode *state_iface;
++extern LilvNode *state_uri;
+ 
+-LilvNode *integer_prop;
+-LilvNode *toggled_prop;
+-LilvNode *designation_pred;
+-LilvNode *in_place_broken_pred;
+-LilvNode *optional_pred;
+-LilvNode *group_pred;
+-LilvNode *supports_event_pred;
+-LilvNode *label_pred;
++extern LilvNode *integer_prop;
++extern LilvNode *toggled_prop;
++extern LilvNode *designation_pred;
++extern LilvNode *in_place_broken_pred;
++extern LilvNode *optional_pred;
++extern LilvNode *group_pred;
++extern LilvNode *supports_event_pred;
++extern LilvNode *label_pred;
+ 
+-LilvNode *center_role;
+-LilvNode *left_role;
+-LilvNode *right_role;
+-LilvNode *rear_center_role;
+-LilvNode *rear_left_role;
+-LilvNode *rear_right_role;
+-LilvNode *lfe_role;
+-LilvNode *center_left_role;
+-LilvNode *center_right_role;
+-LilvNode *side_left_role;
+-LilvNode *side_right_role;
++extern LilvNode *center_role;
++extern LilvNode *left_role;
++extern LilvNode *right_role;
++extern LilvNode *rear_center_role;
++extern LilvNode *rear_left_role;
++extern LilvNode *rear_right_role;
++extern LilvNode *lfe_role;
++extern LilvNode *center_left_role;
++extern LilvNode *center_right_role;
++extern LilvNode *side_left_role;
++extern LilvNode *side_right_role;
+ 
+-GstStructure *lv2_meta_all;
++extern GstStructure *lv2_meta_all;
+ 
+ void gst_lv2_filter_register_element (GstPlugin *plugin,
+                                       GstStructure * lv2_meta);
+-- 
+2.24.1
+

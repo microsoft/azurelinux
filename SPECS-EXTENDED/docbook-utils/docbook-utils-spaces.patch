@@ -1,0 +1,32 @@
+--- docbook-utils-0.6.14/bin/jw.in.spaces	2003-04-30 17:21:49.000000000 +0100
++++ docbook-utils-0.6.14/bin/jw.in	2004-08-19 09:33:34.989426640 +0100
+@@ -405,9 +405,9 @@
+   echo -e $SGML_HELP_MESSAGE >&2
+   exit 1
+ fi
+-if [ ! -d $SGML_OUTPUT_DIRECTORY ]
++if [ ! -d "$SGML_OUTPUT_DIRECTORY" ]
+ then
+-  mkdir $SGML_OUTPUT_DIRECTORY 2>/dev/null
++  mkdir "$SGML_OUTPUT_DIRECTORY" 2>/dev/null
+   if [ $? -ne 0 ]
+   then
+     echo "`basename $0`: Could not create \"$SGML_OUTPUT_DIRECTORY\" output directory" >&2
+@@ -422,7 +422,7 @@
+ echo "Using catalogs: `echo $SGML_CATALOG_FILES | sed 's/:/, /g'`"
+ echo "Using stylesheet: $SGML_STYLESHEET"
+ echo "Working on: $SGML_FILE"
+-cd $SGML_OUTPUT_DIRECTORY
++cd "$SGML_OUTPUT_DIRECTORY"
+ export SGML_JADE SGML_FILE_NAME SGML_ARGUMENTS
+ export SGML_CATALOG_FILES SGML_BASE_DIR SGML_FILE SGML_STYLESHEET
+ NOCHUNKS=`echo $SGML_OPTIONS | grep nochunks`
+@@ -433,7 +433,7 @@
+ 	sh $SGML_BACKEND >$SGML_FILE_NAME.html
+ fi
+ SGML_RETURN=$?
+-cd $SGML_CURRENT_DIRECTORY
++cd "$SGML_CURRENT_DIRECTORY"
+ 
+ if [ $SGML_RETURN -gt 0 ]
+ then exit `expr 7 + $SGML_RETURN`

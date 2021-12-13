@@ -1,0 +1,599 @@
+From 7b0d091839a4f1315ba216175fb2787e86f7fa31 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Tue, 3 Mar 2020 17:08:30 +0900
+Subject: [PATCH] src/tests: Delete graves in substitution in
+ ibus-desktop-testing-runner
+
+Delete the single quotations to enclose grave chracters because
+DASH saves the single quoted '`id -u`' as the raw string in the command
+substitution not to be extracted.
+
+BUG=https://github.com/ibus/ibus/issues/2189
+---
+ src/tests/ibus-desktop-testing-runner.in | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/tests/ibus-desktop-testing-runner.in b/src/tests/ibus-desktop-testing-runner.in
+index 0d9a847c..f9238e69 100755
+--- a/src/tests/ibus-desktop-testing-runner.in
++++ b/src/tests/ibus-desktop-testing-runner.in
+@@ -4,7 +4,7 @@
+ #
+ # ibus - The Input Bus
+ #
+-# Copyright (c) 2018-2019 Takao Fujiwara <takao.fujiwara1@gmail.com>
++# Copyright (c) 2018-2020 Takao Fujiwara <takao.fujiwara1@gmail.com>
+ # Copyright (c) 2018 Red Hat, Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+@@ -31,7 +31,8 @@
+ # POSIX sh has no 'echo -e'
+ : ${ECHO:='/usr/bin/echo'}
+ # POSIX sh has $UID
+-: ${UID:='`id -u`'}
++# DASH saves the graves in '``' as characters not to be extracted
++: ${UID:=`id -u`}
+ 
+ 
+ PROGNAME=`basename $0`
+@@ -170,7 +171,7 @@ _EOF
+ run_dbus_daemon()
+ {
+     # Use dbus-launch --exit-with-session later instead of --sh-syntax
+-    export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$UID/bus
++    export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$UID/bus"
+ }
+ 
+ run_desktop()
+-- 
+2.24.1
+
+From 8ce25208c3f4adfd290a032c6aa739d2b7580eb1 Mon Sep 17 00:00:00 2001
+From: Carlos Garnacho <carlosg@gnome.org>
+Date: Thu, 12 Mar 2020 16:02:16 +0900
+Subject: [PATCH] src: Use WAYLAND_DISPLAY on Wayland sessions to make up
+ IBus socket name
+
+In Wayland sessions, GNOME Shell 3.36 is leveraging 2 X11 Display
+connections so one is used to set up all services for a "X11 session"
+before user applications connected to the other display might require it.
+This allows seamlessly starting Xwayland on demand to X11 user applications.
+
+IBus here belongs to the first described connection, it is started
+explicitly on that display by GNOME Shell as it is necessary to set up
+ibus-x11 before any other X11 client might want to use it.
+
+However the use of this "secondary" display results in IBus daemon left
+unable to talk to applications, as the socket name is dependent on the
+DISPLAY envvar and ibus/applications don't agree on its content.
+
+For wayland sessions, make it look for WAYLAND_DISPLAY, as that'll have
+the similar "per session bus" behavior that this seems to look after.
+
+BUG=https://gitlab.gnome.org/GNOME/gnome-shell/issues/2341
+---
+ src/ibusshare.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/src/ibusshare.c b/src/ibusshare.c
+index 0d50d3f5..e0ef2ce0 100644
+--- a/src/ibusshare.c
++++ b/src/ibusshare.c
+@@ -100,6 +100,7 @@ ibus_get_socket_path (void)
+         gchar *display;
+         gchar *displaynumber = "0";
+         /* gchar *screennumber = "0"; */
++        gboolean is_wayland = FALSE;
+         gchar *p;
+ 
+         path = g_strdup (g_getenv ("IBUS_ADDRESS_FILE"));
+@@ -108,13 +109,19 @@ ibus_get_socket_path (void)
+         }
+ 
+         if (_display == NULL) {
+-            display = g_strdup (g_getenv ("DISPLAY"));
++            display = g_strdup (g_getenv ("WAYLAND_DISPLAY"));
++            if (display)
++                is_wayland = TRUE;
++            else
++                display = g_strdup (g_getenv ("DISPLAY"));
+         }
+         else {
+             display = g_strdup (_display);
+         }
+ 
+-        if (display) {
++        if (is_wayland) {
++            displaynumber = display;
++        } else if (display) {
+             p = display;
+             hostname = display;
+             for (; *p != ':' && *p != '\0'; p++);
+-- 
+2.24.1
+
+From 5765bfd69fb2ab1174378fbb0d8cac7f2bd2610f Mon Sep 17 00:00:00 2001
+From: Changwoo Ryu <cwryu@debian.org>
+Date: Wed, 15 Apr 2020 17:43:14 +0900
+Subject: [PATCH] client/gtk2: Remove glib_check_version() in gtk immodule
+
+In the gtk2/gtk3 immodule, glib_check_version() is being used to make sure
+that the installed glib version is not older than the glib version which ibus
+is built with.
+
+But there is no reason why glib version is checked in runtime. Library
+compatibility is already being checked more precisely by packaging systems and
+linkers.
+
+This version check can break the ibus gtk immodule when used with an older but
+compatible version of glib, such as glib 2.62.x which is compatible with
+2.64.x.
+
+BUG=https://github.com/ibus/ibus/issues/2200
+---
+ client/gtk2/ibusim.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/client/gtk2/ibusim.c b/client/gtk2/ibusim.c
+index bfacd0f0..d70800d3 100644
+--- a/client/gtk2/ibusim.c
++++ b/client/gtk2/ibusim.c
+@@ -41,9 +41,7 @@ static const GtkIMContextInfo *info_list[] = {
+ G_MODULE_EXPORT const gchar*
+ g_module_check_init (GModule *module)
+ {
+-    return glib_check_version (GLIB_MAJOR_VERSION,
+-                               GLIB_MINOR_VERSION,
+-                               0);
++    return null;
+ }
+ 
+ G_MODULE_EXPORT void
+-- 
+2.24.1
+
+From 8da016764cee9616cca4658d1fb311d6b3bfc0df Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Wed, 15 Apr 2020 17:55:03 +0900
+Subject: [PATCH] src/tests: Fix to get focus events with su in
+ ibus-desktop-testing-runner
+
+GtkWindow haven't received focus events in any test cases since Fedora 31
+whenever Ansible runs ibus-desktop-testing-runner after `su root`.
+Seems su command does not run systemd automatically and now systemd
+requires XDG_RUNTIME_DIR and Ansible requires root access with ssh.
+This fix requires to restart sshd with modified /etc/ssh/sshd_config
+with "PermitRootLogin yes" in order to run with su command.
+
+Ansible with ibus-desktop-testin-runner has worked fine if root console
+login is used without this patch because PAM runs systemd by login.
+---
+ src/tests/ibus-desktop-testing-runner.in | 36 ++++++++++++++++++++++--
+ 1 file changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/src/tests/ibus-desktop-testing-runner.in b/src/tests/ibus-desktop-testing-runner.in
+index f9238e69..f760fd5b 100755
+--- a/src/tests/ibus-desktop-testing-runner.in
++++ b/src/tests/ibus-desktop-testing-runner.in
+@@ -49,6 +49,7 @@ PID_XORG=0
+ PID_GNOME_SESSION=0
+ TESTING_RUNNER="default"
+ TESTS=""
++TIMEOUT=300
+ GREEN='\033[0;32m'
+ RED='\033[0;31m'
+ NC='\033[0m'
+@@ -84,6 +85,7 @@ usage()
+ "-r, --runner=RUNNER              Run TESTS programs with a test RUNNER.\n"    \
+ "                                 RUNNDER = gnome or default.\n"               \
+ "                                 default is an embedded runner.\n"            \
++"-T, --timeout=TIMEOUT            Set timeout (default TIMEOUT is 300 sec).\n" \
+ "-o, --output=OUTPUT_FILE         OUtput the log to OUTPUT_FILE\n"             \
+ "-O, --result=RESULT_FILE         OUtput the result to RESULT_FILE\n"          \
+ ""
+@@ -92,8 +94,8 @@ usage()
+ parse_args()
+ {
+     # This is GNU getopt. "sudo port getopt" in BSD?
+-    ARGS=`getopt -o hvb:s:cd:t:r:o:O: --long \
+-          help,version,builddir:,srcdir:,no-graphics,desktop:,tests:,runner:,output:,result:\
++    ARGS=`getopt -o hvb:s:cd:t:r:T:o:O: --long \
++          help,version,builddir:,srcdir:,no-graphics,desktop:,tests:,runner:,timeout:,output:,result:\
+         -- "$@"`;
+     eval set -- "$ARGS"
+     while [ 1 ] ; do
+@@ -106,6 +108,7 @@ parse_args()
+         -d | --desktop )     DESKTOP_COMMAND="$2"; shift 2;;
+         -t | --tests )       TESTS="$2"; shift 2;;
+         -r | --runner )      TESTING_RUNNER="$2"; shift 2;;
++        -T | --timeout )     TIMEOUT="$2"; shift 2;;
+         -o | --output )      TEST_LOG="$2"; shift 2;;
+         -O | --result )      RESULT_LOG="$2"; shift 2;;
+         -- )                 shift; break;;
+@@ -166,11 +169,37 @@ _EOF
+     fi
+     # `su` command does not run loginctl
+     export XDG_SESSION_TYPE='x11'
++    export XDG_SESSION_CLASS=user
++    # `su` command does not get focus in events without this variable.
++    # Need to restart sshd after set "PermitRootLogin yes" in sshd_config
++    if [ "x$XDG_RUNTIME_DIR" = x ] ; then
++        export XDG_RUNTIME_DIR=/run/user/$UID
++        is_root_login=`grep "^PermitRootLogin" /etc/ssh/sshd_config | grep yes`
++        if [ "x$ANSIBLE" != x ] && [ "x$is_root_login" = x ] ; then
++            print_log -e "${RED}FAIL${NC}: No permission to get focus-in events in GtkWindow with ansible"
++            echo "su command does not configure necessary login info "         \
++                 "with systemd and GtkWindow cannot receive focus-events "     \
++                 "when ibus-desktop-testing-runner is executed by "            \
++                 "ansible-playbook." >> $TEST_LOG
++            echo "Enabling root login via sshd, restarting sshd, set "         \
++                 "XDG_RUNTIME_DIR can resolve the problem under "              \
++                 "ansible-playbook." >> $TEST_LOG
++            exit 255
++        fi
++    fi
++    #  Do we need XDG_SESSION_ID and XDG_SEAT?
++    #export XDG_CONFIG_DIRS=/etc/xdg
++    #export XDG_SESSION_ID=10
++    #export XDG_SESSION_DESKTOP=gnome
++    #export XDG_SEAT=seat0
+ }
+ 
+ run_dbus_daemon()
+ {
+     # Use dbus-launch --exit-with-session later instead of --sh-syntax
++    # GNOME uses a unix:abstract address and it effects gsettings set values
++    # in each test case.
++    # TODO: Should we comment out this line?
+     export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$UID/bus"
+ }
+ 
+@@ -288,7 +317,8 @@ run_gnome_desktop_testing_runner()
+             fail=1
+             continue
+         fi
+-        gnome-desktop-testing-runner $tst 2>>$TEST_LOG 1>>$TEST_LOG
++        gnome-desktop-testing-runner --timeout=$TIMEOUT $tst \
++                2>>$TEST_LOG 1>>$TEST_LOG
+         retval=$?
+         read pass fail << EOF
+         `count_case_result $retval $pass $fail`
+-- 
+2.24.1
+
+From 0b9d9365988a96a2bc31c48624f9c2b8081601b6 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Wed, 22 Apr 2020 20:17:12 +0900
+Subject: [PATCH] client/gtk2: Fix typo
+
+---
+ client/gtk2/ibusim.c                     | 4 ++--
+ src/tests/ibus-desktop-testing-runner.in | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/client/gtk2/ibusim.c b/client/gtk2/ibusim.c
+index d70800d3..55609ce7 100644
+--- a/client/gtk2/ibusim.c
++++ b/client/gtk2/ibusim.c
+@@ -2,7 +2,7 @@
+ /* vim:set et ts=4: */
+ /* ibus - The Input Bus
+  * Copyright (C) 2008-2010 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2008-2010 Red Hat, Inc.
++ * Copyright (C) 2008-2020 Red Hat, Inc.
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+@@ -41,7 +41,7 @@ static const GtkIMContextInfo *info_list[] = {
+ G_MODULE_EXPORT const gchar*
+ g_module_check_init (GModule *module)
+ {
+-    return null;
++    return NULL;
+ }
+ 
+ G_MODULE_EXPORT void
+diff --git a/src/tests/ibus-desktop-testing-runner.in b/src/tests/ibus-desktop-testing-runner.in
+index f760fd5b..4232c549 100755
+--- a/src/tests/ibus-desktop-testing-runner.in
++++ b/src/tests/ibus-desktop-testing-runner.in
+@@ -173,7 +173,7 @@ _EOF
+     # `su` command does not get focus in events without this variable.
+     # Need to restart sshd after set "PermitRootLogin yes" in sshd_config
+     if [ "x$XDG_RUNTIME_DIR" = x ] ; then
+-        export XDG_RUNTIME_DIR=/run/user/$UID
++        export XDG_RUNTIME_DIR="/run/user/$UID"
+         is_root_login=`grep "^PermitRootLogin" /etc/ssh/sshd_config | grep yes`
+         if [ "x$ANSIBLE" != x ] && [ "x$is_root_login" = x ] ; then
+             print_log -e "${RED}FAIL${NC}: No permission to get focus-in events in GtkWindow with ansible"
+-- 
+2.24.1
+
+From 8c4125bc78ce3502b5aeb053e7029cc2594f83f2 Mon Sep 17 00:00:00 2001
+From: Changwoo Ryu <cwryu@debian.org>
+Date: Sun, 12 Apr 2020 05:28:15 +0900
+Subject: [PATCH] src: Build the Emoji dictionaries in parallel
+
+Instead of building Emoji dictionaries src/dicts/emoji-*.dict in sequence, a
+pattern rule is specified for them. The make -jN option builds the
+dictionaries in parallel.
+
+The GNU make extensions like pattern rule and patsubst function are used for
+it. But src/Makefile.am has had other GNU make extensions for a while, so
+using more extensions should not make portability worse.
+
+BUG=https://github.com/ibus/ibus/pull/2209
+---
+ src/Makefile.am | 55 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 27 insertions(+), 28 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index a8e3d07d..99de1ab7 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -246,42 +246,41 @@ if ENABLE_EMOJI_DICT
+ AM_CPPFLAGS += -DENABLE_EMOJI_DICT
+ 
+ dictdir = $(pkgdatadir)/dicts
+-dict_DATA = dicts/emoji-en.dict
+ LANG_FILES = $(basename $(notdir $(wildcard $(EMOJI_ANNOTATION_DIR)/*.xml)))
++EMOJI_DICT_FILES = $(patsubst %,dicts/emoji-%.dict,$(LANG_FILES))
++dict_DATA = $(EMOJI_DICT_FILES)
+ 
+ noinst_PROGRAMS += emoji-parser
+ 
+-dicts/emoji-en.dict: emoji-parser
++dicts/emoji-%.dict: emoji-parser
+ 	$(AM_V_at)if test x"$(LANG_FILES)" = x ; then \
+ 	    echo "WARNING: Not found $(EMOJI_ANNOTATION_DIR)/en.xml" 1>&2; \
+ 	fi; \
+-	for f in $(LANG_FILES) ; do \
+-	    if test -f dicts/emoji-$$f.dict; then \
+-	        echo "Already exists dicts/emoji-$$f.dict"; \
+-	        continue; \
+-	    fi; \
+-	    if test -f \
+-	    "$(EMOJI_ANNOTATION_DIR)/../annotationsDerived/$$f.xml" ; then \
+-	        xml_derived_option="--xml-derived $(EMOJI_ANNOTATION_DIR)/../annotationsDerived/$$f.xml"; \
++	if test -f $@; then \
++	    echo "Already exists $@"; \
++	    exit 0; \
++	fi; \
++	if test -f \
++	    "$(EMOJI_ANNOTATION_DIR)/../annotationsDerived/$*.xml" ; then \
++	        xml_derived_option="--xml-derived $(EMOJI_ANNOTATION_DIR)/../annotationsDerived/$*.xml"; \
+ 	        plus_comment="derived"; \
+-	    fi; \
+-	    if test x"$$f" = xen ; then \
+-	        $(builddir)/emoji-parser \
+-	            --unicode-emoji-dir $(UNICODE_EMOJI_DIR) \
+-	            --xml $(EMOJI_ANNOTATION_DIR)/$$f.xml \
+-	            $$xml_derived_option \
+-	            --xml-ascii $(top_srcdir)/data/annotations/en_ascii.xml \
+-	            --out-category ibusemojigen.h \
+-	            --out $@; \
+-	    else \
+-	        $(builddir)/emoji-parser \
+-	            --unicode-emoji-dir $(UNICODE_EMOJI_DIR) \
+-	            --xml $(EMOJI_ANNOTATION_DIR)/$$f.xml \
+-	            $$xml_derived_option \
+-	            --out dicts/emoji-$$f.dict; \
+-	    fi; \
+-	    echo "Generated $$plus_comment dicts/emoji-$$f.dict"; \
+-	done
++	fi; \
++	if test x"$*" = xen ; then \
++	    $(builddir)/emoji-parser \
++	        --unicode-emoji-dir $(UNICODE_EMOJI_DIR) \
++	        --xml $(EMOJI_ANNOTATION_DIR)/$*.xml \
++	        $$xml_derived_option \
++	        --xml-ascii $(top_srcdir)/data/annotations/en_ascii.xml \
++	        --out-category ibusemojigen.h \
++	        --out $@; \
++	else \
++	    $(builddir)/emoji-parser \
++	        --unicode-emoji-dir $(UNICODE_EMOJI_DIR) \
++	        --xml $(EMOJI_ANNOTATION_DIR)/$*.xml \
++	        $$xml_derived_option \
++	        --out $@; \
++	fi; \
++	echo "Generated $$plus_comment $@"
+ 
+ ibusemojigen.h: dicts/emoji-en.dict
+ 	$(NULL)
+-- 
+2.23.0.rc1
+
+From 02105c4d486283e6b561181d9c934d4d23f2d65e Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 14 May 2020 15:48:34 +0900
+Subject: [PATCH] bus: Fix SEGV in bus_panel_proxy_focus_in()
+
+SEGV in BUS_IS_PANEL_PROXY() in bus_panel_proxy_focus_in()
+Check if GDBusConnect is closed before bus_panel_proxy_new() is called.
+
+BUG=rhbz#1349148
+BUG=rhbz#1385349
+---
+ bus/ibusimpl.c | 25 ++++++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/bus/ibusimpl.c b/bus/ibusimpl.c
+index 85761d30..e432e849 100644
+--- a/bus/ibusimpl.c
++++ b/bus/ibusimpl.c
+@@ -2,8 +2,8 @@
+ /* vim:set et sts=4: */
+ /* ibus - The Input Bus
+  * Copyright (C) 2008-2013 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2011-2019 Takao Fujiwara <takao.fujiwara1@gmail.com>
+- * Copyright (C) 2008-2019 Red Hat, Inc.
++ * Copyright (C) 2011-2020 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2008-2020 Red Hat, Inc.
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+@@ -464,13 +464,16 @@ _dbus_name_owner_changed_cb (BusDBusImpl   *dbus,
+     else if (!g_strcmp0 (name, IBUS_SERVICE_PANEL_EXTENSION_EMOJI))
+         panel_type = PANEL_TYPE_EXTENSION_EMOJI;
+ 
+-    if (panel_type != PANEL_TYPE_NONE) {
++    do {
++        if (panel_type == PANEL_TYPE_NONE)
++            break;
+         if (g_strcmp0 (new_name, "") != 0) {
+             /* a Panel process is started. */
+             BusConnection *connection;
+             BusInputContext *context = NULL;
+             BusPanelProxy   **panel = (panel_type == PANEL_TYPE_PANEL) ?
+                                       &ibus->panel : &ibus->emoji_extension;
++            GDBusConnection *dbus_connection = NULL;
+ 
+             if (*panel != NULL) {
+                 ibus_proxy_destroy ((IBusProxy *)(*panel));
+@@ -479,9 +482,21 @@ _dbus_name_owner_changed_cb (BusDBusImpl   *dbus,
+                 g_assert (*panel == NULL);
+             }
+ 
+-            connection = bus_dbus_impl_get_connection_by_name (BUS_DEFAULT_DBUS, new_name);
++            connection = bus_dbus_impl_get_connection_by_name (BUS_DEFAULT_DBUS,
++                                                               new_name);
+             g_return_if_fail (connection != NULL);
+ 
++            dbus_connection = bus_connection_get_dbus_connection (connection);
++            /* rhbz#1349148 rhbz#1385349
++             * Avoid SEGV of BUS_IS_PANEL_PROXY (ibus->panel)
++             * This function is called during destroying the connection
++             * in this case? */
++            if (dbus_connection == NULL ||
++                g_dbus_connection_is_closed (dbus_connection)) {
++                new_name = "";
++                break;
++            }
++
+             *panel = bus_panel_proxy_new (connection, panel_type);
+             if (panel_type == PANEL_TYPE_EXTENSION_EMOJI)
+                 ibus->enable_emoji_extension = FALSE;
+@@ -535,7 +550,7 @@ _dbus_name_owner_changed_cb (BusDBusImpl   *dbus,
+                 }
+             }
+         }
+-    }
++    } while (0);
+ 
+     bus_ibus_impl_component_name_owner_changed (ibus, name, old_name, new_name);
+ }
+-- 
+2.24.1
+
+From f591381e3c892947ecaffe9131b9039ab9014498 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 14 May 2020 16:02:00 +0900
+Subject: [PATCH] bus: Fix SEGV in bus_dbus_impl_name_owner_changed()
+
+rhbz#1406699 SEGV in new_owner!=NULL in bus_dbus_impl_name_owner_changed()
+which is called by bus_name_service_remove_owner()
+If bus_connection_get_unique_name()==NULL, set new_owner="" in
+bus_name_service_remove_owner()
+
+rhbz#1432252 SEGV in old_owner!=NULL in bus_dbus_impl_name_owner_changed()
+which is called by bus_name_service_set_primary_owner()
+If bus_connection_get_unique_name()==NULL, set old_owner="" in
+bus_name_service_set_primary_owner()
+
+BUG=rhbz#1406699
+BUG=rhbz#1432252
+---
+ bus/dbusimpl.c | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/bus/dbusimpl.c b/bus/dbusimpl.c
+index b54ef817..59787a80 100644
+--- a/bus/dbusimpl.c
++++ b/bus/dbusimpl.c
+@@ -2,7 +2,8 @@
+ /* vim:set et sts=4: */
+ /* ibus - The Input Bus
+  * Copyright (C) 2008-2013 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2008-2013 Red Hat, Inc.
++ * Copyright (C) 2015-2020 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2008-2020 Red Hat, Inc.
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+@@ -344,6 +345,8 @@ bus_name_service_set_primary_owner (BusNameService     *service,
+                                     BusConnectionOwner *owner,
+                                     BusDBusImpl        *dbus)
+ {
++    gboolean has_old_owner = FALSE;
++
+     g_assert (service != NULL);
+     g_assert (owner != NULL);
+     g_assert (dbus != NULL);
+@@ -351,6 +354,13 @@ bus_name_service_set_primary_owner (BusNameService     *service,
+     BusConnectionOwner *old = service->owners != NULL ?
+             (BusConnectionOwner *)service->owners->data : NULL;
+ 
++    /* rhbz#1432252 If bus_connection_get_unique_name() == NULL,
++     * "Hello" method is not received yet.
++     */
++    if (old != NULL && bus_connection_get_unique_name (old->conn) != NULL) {
++        has_old_owner = TRUE;
++    }
++
+     if (old != NULL) {
+         g_signal_emit (dbus,
+                        dbus_signals[NAME_LOST],
+@@ -370,7 +380,8 @@ bus_name_service_set_primary_owner (BusNameService     *service,
+                    0,
+                    owner->conn,
+                    service->name,
+-                   old != NULL ? bus_connection_get_unique_name (old->conn) : "",
++                   has_old_owner ? bus_connection_get_unique_name (old->conn) :
++                           "",
+                    bus_connection_get_unique_name (owner->conn));
+ 
+     if (old != NULL && old->do_not_queue != 0) {
+@@ -427,6 +438,7 @@ bus_name_service_remove_owner (BusNameService     *service,
+                                BusDBusImpl        *dbus)
+ {
+     GSList *owners;
++    gboolean has_new_owner = FALSE;
+ 
+     g_assert (service != NULL);
+     g_assert (owner != NULL);
+@@ -439,6 +451,13 @@ bus_name_service_remove_owner (BusNameService     *service,
+         BusConnectionOwner *_new = NULL;
+         if (owners->next != NULL) {
+             _new = (BusConnectionOwner *)owners->next->data;
++            /* rhbz#1406699 If bus_connection_get_unique_name() == NULL,
++             * "Hello" method is not received yet.
++             */
++            if (_new != NULL &&
++                bus_connection_get_unique_name (_new->conn) != NULL) {
++                has_new_owner = TRUE;
++            }
+         }
+ 
+         if (dbus != NULL) {
+@@ -447,7 +466,7 @@ bus_name_service_remove_owner (BusNameService     *service,
+                            0,
+                            owner->conn,
+                            service->name);
+-            if (_new != NULL) {
++            if (has_new_owner) {
+                 g_signal_emit (dbus,
+                                dbus_signals[NAME_ACQUIRED],
+                                0,
+@@ -460,7 +479,7 @@ bus_name_service_remove_owner (BusNameService     *service,
+                     _new != NULL ? _new->conn : NULL,
+                     service->name,
+                     bus_connection_get_unique_name (owner->conn),
+-                    _new != NULL ? bus_connection_get_unique_name (_new->conn) : "");
++                    has_new_owner ? bus_connection_get_unique_name (_new->conn) : "");
+ 
+         }
+     }
+-- 
+2.24.1
+

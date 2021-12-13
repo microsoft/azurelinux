@@ -1,0 +1,103 @@
+diff --git a/ospfd/ospf_vty.c b/ospfd/ospf_vty.c
+index 631465f..e084ff3 100644
+--- a/ospfd/ospf_vty.c
++++ b/ospfd/ospf_vty.c
+@@ -1136,6 +1136,11 @@ DEFUN (ospf_area_vlink,
+ 
+ 	if (argv_find(argv, argc, "message-digest", &idx)) {
+ 		/* authentication message-digest */
++		if(FIPS_mode())
++		{
++			vty_out(vty, "FIPS mode is enabled, md5 authentication is disabled\n");
++			return CMD_WARNING_CONFIG_FAILED;
++		}
+ 		vl_config.auth_type = OSPF_AUTH_CRYPTOGRAPHIC;
+ 	} else if (argv_find(argv, argc, "null", &idx)) {
+ 		/* "authentication null" */
+@@ -1993,6 +1998,15 @@ DEFUN (ospf_area_authentication_message_digest,
+ 				  ? OSPF_AUTH_NULL
+ 				  : OSPF_AUTH_CRYPTOGRAPHIC;
+ 
++	if(area->auth_type == OSPF_AUTH_CRYPTOGRAPHIC)
++	{
++		if(FIPS_mode())
++		{
++			vty_out(vty, "FIPS mode is enabled, md5 authentication is disabled\n");
++			return CMD_WARNING_CONFIG_FAILED;
++		}
++	}
++
+ 	return CMD_SUCCESS;
+ }
+ 
+@@ -6665,6 +6679,11 @@ DEFUN (ip_ospf_authentication_args,
+ 
+ 	/* Handle message-digest authentication */
+ 	if (argv[idx_encryption]->arg[0] == 'm') {
++		if(FIPS_mode())
++		{
++			vty_out(vty, "FIPS mode is enabled, md5 authentication is disabled\n");
++			return CMD_WARNING_CONFIG_FAILED;
++		}
+ 		SET_IF_PARAM(params, auth_type);
+ 		params->auth_type = OSPF_AUTH_CRYPTOGRAPHIC;
+ 		return CMD_SUCCESS;
+@@ -6971,6 +6990,11 @@ DEFUN (ip_ospf_message_digest_key,
+        "The OSPF password (key)\n"
+        "Address of interface\n")
+ {
++	if(FIPS_mode())
++	{
++		vty_out(vty, "FIPS mode is enabled, md5 authentication is disabled\n");
++		return CMD_WARNING_CONFIG_FAILED;
++	}
+ 	VTY_DECLVAR_CONTEXT(interface, ifp);
+ 	struct crypt_key *ck;
+ 	uint8_t key_id;
+diff --git a/isisd/isis_circuit.c b/isisd/isis_circuit.c
+index 81b4b39..cce33d9 100644
+--- a/isisd/isis_circuit.c
++++ b/isisd/isis_circuit.c
+@@ -1318,6 +1318,10 @@ static int isis_circuit_passwd_set(struct isis_circuit *circuit,
+ 		return ferr_code_bug(
+ 			"circuit password too long (max 254 chars)");
+ 
++	//When in FIPS mode, the password never gets set in MD5
++	if((passwd_type == ISIS_PASSWD_TYPE_HMAC_MD5) && FIPS_mode())
++		return ferr_cfg_invalid("FIPS mode is enabled, md5 authentication is disabled");
++
+ 	circuit->passwd.len = len;
+ 	strlcpy((char *)circuit->passwd.passwd, passwd,
+ 		sizeof(circuit->passwd.passwd));
+diff --git a/isisd/isisd.c b/isisd/isisd.c
+index 419127c..a6c36af 100644
+--- a/isisd/isisd.c
++++ b/isisd/isisd.c
+@@ -1638,6 +1638,10 @@ static int isis_area_passwd_set(struct isis_area *area, int level,
+ 		if (len > 254)
+ 			return -1;
+ 
++		//When in FIPS mode, the password never get set in MD5
++		if ((passwd_type == ISIS_PASSWD_TYPE_HMAC_MD5) && (FIPS_mode()))
++			return ferr_cfg_invalid("FIPS mode is enabled, md5 authentication is disabled");
++
+ 		modified.len = len;
+ 		strlcpy((char *)modified.passwd, passwd,
+ 			sizeof(modified.passwd));
+diff --git a/ripd/rip_cli.c b/ripd/rip_cli.c
+index 5bb81ef..02a09ef 100644
+--- a/ripd/rip_cli.c
++++ b/ripd/rip_cli.c
+@@ -796,6 +796,12 @@ DEFPY (ip_rip_authentication_mode,
+ 			value = "20";
+ 	}
+ 
++	if(strmatch(mode, "md5") && FIPS_mode())
++	{
++		vty_out(vty, "FIPS mode is enabled, md5 authentication id disabled\n");
++		return CMD_WARNING_CONFIG_FAILED;
++	}
++
+ 	nb_cli_enqueue_change(vty, "./authentication-scheme/mode", NB_OP_MODIFY,
+ 			      strmatch(mode, "md5") ? "md5" : "plain-text");
+ 	if (strmatch(mode, "md5"))

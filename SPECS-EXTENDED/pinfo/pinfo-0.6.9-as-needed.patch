@@ -1,0 +1,22 @@
+--- a/macros/curses.m4
++++ b/macros/curses.m4
+@@ -257,8 +257,8 @@
+ 	dnl save CFLAGS and LDFLAGS and set new ones
+ 	CFLAGS_OLD=$CFLAGS
+ 	CFLAGS="$CFLAGS $curses_includes"
+-	LDFLAGS_OLD=$LDFLAGS
+-	LDFLAGS="$LDFLAGS $curses_libs"
++	LIBS_OLD=$LIBS
++	LIBS="$LIBS $curses_libs"
+ 
+ 	dnl do the compile test 
+ 	AC_MSG_CHECKING([if curses is usable])
+@@ -288,7 +288,7 @@
+ 
+ 	dnl restore variables
+ 	CFLAGS=$CFLAGS_OLD
+-	LDFLAGS=$LDFLAGS_OLD
++	LIBS=$LIBS_OLD
+ 
+ ])
+ 

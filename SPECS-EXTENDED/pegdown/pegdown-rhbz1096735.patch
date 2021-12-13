@@ -1,0 +1,13 @@
+diff --git a/src/main/java/org/pegdown/ToHtmlSerializer.java b/src/main/java/org/pegdown/ToHtmlSerializer.java
+index 26651da..519a7fc 100644
+--- a/src/main/java/org/pegdown/ToHtmlSerializer.java
++++ b/src/main/java/org/pegdown/ToHtmlSerializer.java
+@@ -396,7 +396,7 @@ public class ToHtmlSerializer implements Visitor {
+         for (LinkRenderer.Attribute attr : rendering.attributes) {
+             printAttribute(attr.name, attr.value);
+         }
+-        printer.print("\"/>");
++        printer.print("/>");
+     }
+ 
+     protected void printLink(LinkRenderer.Rendering rendering) {

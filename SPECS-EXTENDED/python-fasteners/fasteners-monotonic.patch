@@ -1,0 +1,30 @@
+diff -uNr fasteners-0.14.1.orig/fasteners/_utils.py fasteners-0.14.1/fasteners/_utils.py
+--- fasteners-0.14.1.orig/fasteners/_utils.py	2015-11-13 07:46:46.000000000 +0100
++++ fasteners-0.14.1/fasteners/_utils.py	2018-01-17 17:42:58.715726344 +0100
+@@ -19,7 +19,10 @@
+ import logging
+ import time
+ 
+-from monotonic import monotonic as now  # noqa
++try:
++    from time import monotonic as now
++except ImportError:
++    from monotonic import monotonic as now
+ 
+ # log level for low-level debugging
+ BLATHER = 5
+diff -uNr fasteners-0.14.1.orig/setup.py fasteners-0.14.1/setup.py
+--- fasteners-0.14.1.orig/setup.py	2015-11-13 07:46:46.000000000 +0100
++++ fasteners-0.14.1/setup.py	2018-01-17 17:50:26.654085344 +0100
+@@ -26,8 +26,10 @@
+ 
+ install_requires = [
+     'six',
+-    'monotonic>=0.1',
+ ]
++import sys
++if sys.version_info < (3, 3, 0):
++    install_requires += ['monotonic>=0.1']
+ 
+ setup(
+     name='fasteners',

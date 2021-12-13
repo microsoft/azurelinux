@@ -1,0 +1,31 @@
+diff -up ./_builddir/zzip/_config.h.orig ./_builddir/zzip/_config.h
+--- ./_builddir/zzip/_config.h.orig	2018-07-23 09:11:59.971840954 +0300
++++ ./_builddir/zzip/_config.h	2018-07-23 09:12:07.438731527 +0300
+@@ -139,6 +139,11 @@
+ /* whether the system defaults to 32bit off_t but can do 64bit when requested
+    */
+ /* #undef LARGEFILE_SENSITIVE */
++#if __WORDSIZE == 32
++#ifndef ZZIP_LARGEFILE_SENSITIVE 
++#define ZZIP_LARGEFILE_SENSITIVE  1 
++#endif
++#endif
+ 
+ /* Define to the sub-directory where libtool stores uninstalled libraries. */
+ #ifndef ZZIP_LT_OBJDIR 
+@@ -197,6 +202,15 @@
+ /* The number of bytes in type short */
+ /* #undef SIZEOF_SHORT */
+ 
++/* The number of bytes in type long */
++#ifndef ZZIP_SIZEOF_LONG 
++#if __WORDSIZE == 32
++#define ZZIP_SIZEOF_LONG  4
++#elif __WORDSIZE == 64
++#define ZZIP_SIZEOF_LONG  8 
++#endif
++#endif
++
+ /* Define to 1 if you have the ANSI C header files. */
+ #ifndef ZZIP_STDC_HEADERS 
+ #define ZZIP_STDC_HEADERS  1 

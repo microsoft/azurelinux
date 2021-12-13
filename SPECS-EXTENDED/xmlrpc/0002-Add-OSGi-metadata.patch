@@ -1,0 +1,74 @@
+From 56ed627f9d69a9c065aab02e8f7d07524d4fa315 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Tue, 31 Mar 2020 17:00:03 +0100
+Subject: [PATCH 2/6] Add OSGi metadata
+
+---
+ client/pom.xml | 11 +++++++++++
+ common/pom.xml | 10 ++++++++++
+ server/pom.xml |  6 ++++++
+ 3 files changed, 27 insertions(+)
+
+diff --git a/client/pom.xml b/client/pom.xml
+index e588657..f31b2d2 100644
+--- a/client/pom.xml
++++ b/client/pom.xml
+@@ -48,6 +48,17 @@
+               <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
+               <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
+               <Implementation-Version>${project.version}</Implementation-Version>
++              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
++              <Bundle-Name>%Bundle-Name</Bundle-Name>
++              <Bundle-Localization>plugin</Bundle-Localization>
++              <Bundle-SymbolicName>org.apache.xmlrpc</Bundle-SymbolicName>
++              <Bundle-Version>${project.version}</Bundle-Version>
++              <Require-Bundle>org.apache.xmlrpc.common</Require-Bundle>
++	      <Export-Package>org.apache.xmlrpc, org.apache.xmlrpc.client, org.apache.xmlrpc.client.util</Export-Package>
++	      <Import-Package>javax.xml.namespace, javax.xml.parsers, org.apache.commons.httpclient, org.apache.commons.httpclient.auth, org.apache.commons.httpclient.methods, org.apache.commons.httpclient.params, org.apache.commons.logging, org.apache.ws.commons.serialize, org.apache.ws.commons.util, org.w3c.dom, org.xml.sax, org.xml.sax.helpers</Import-Package>
++	      <Bundle-RequiredExecutionEnvironment>J2SE-1.4, CDC-1.0/Foundation-1.0, J2SE-1.3</Bundle-RequiredExecutionEnvironment>
++	      <Eclipse-BuddyPolicy>dependent</Eclipse-BuddyPolicy>
++	      <Bundle-Vendor>%Bundle-Vendor.0</Bundle-Vendor>
+             </manifestEntries>
+           </archive>
+         </configuration>
+diff --git a/common/pom.xml b/common/pom.xml
+index 5058d50..7a5bf49 100644
+--- a/common/pom.xml
++++ b/common/pom.xml
+@@ -48,6 +48,16 @@
+               <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
+               <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
+               <Implementation-Version>${project.version}</Implementation-Version>
++              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
++              <Bundle-Name>%Bundle-Name</Bundle-Name>
++              <Bundle-Localization>plugin</Bundle-Localization>
++              <Bundle-SymbolicName>org.apache.xmlrpc.common</Bundle-SymbolicName>
++              <Bundle-Version>${project.version}</Bundle-Version>
++              <Export-Package>org.apache.xmlrpc, org.apache.xmlrpc.common, org.apache.xmlrpc.jaxb, org.apache.xmlrpc.parser, org.apache.xmlrpc.serializer, org.apache.xmlrpc.util</Export-Package>
++              <Import-Package>javax.xml.namespace, javax.xml.parsers, org.apache.commons.httpclient, org.apache.commons.httpclient.auth, org.apache.commons.httpclient.methods, org.apache.commons.httpclient.params, org.apache.commons.logging, org.apache.ws.commons.serialize, org.apache.ws.commons.util, org.w3c.dom, org.xml.sax, org.xml.sax.helpers</Import-Package>
++              <Bundle-RequiredExecutionEnvironment>J2SE-1.4, CDC-1.0/Foundation-1.0, J2SE-1.3</Bundle-RequiredExecutionEnvironment>
++              <Eclipse-BuddyPolicy>dependent</Eclipse-BuddyPolicy>
++              <Bundle-Vendor>%Bundle-Vendor.0</Bundle-Vendor>
+             </manifestEntries>
+           </archive>
+         </configuration>
+diff --git a/server/pom.xml b/server/pom.xml
+index 6cbc6e7..4c90e50 100644
+--- a/server/pom.xml
++++ b/server/pom.xml
+@@ -48,6 +48,12 @@
+               <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
+               <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
+               <Implementation-Version>${project.version}</Implementation-Version>
++	      <Bundle-ManifestVersion>1</Bundle-ManifestVersion>
++              <Bundle-Name>%Bundle-Name</Bundle-Name>
++              <Bundle-SymbolicName>org.apache.xmlrpc.server</Bundle-SymbolicName>
++	      <Bundle-Version>${project.version}</Bundle-Version>
++	      <Require-Bundle>org.apache.xmlrpc.common</Require-Bundle>
++	      <Export-Package>org.apache.xmlrpc.server,org.apache.xmlrpc.webserver</Export-Package>
+             </manifestEntries>
+           </archive>
+         </configuration>
+-- 
+2.26.0.rc2
+

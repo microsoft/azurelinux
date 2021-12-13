@@ -1,0 +1,22 @@
+Index: os-prober-1.58/linux-boot-probes/mounted/common/40grub2
+===================================================================
+--- os-prober-1.58.orig/linux-boot-probes/mounted/common/40grub2
++++ os-prober-1.58/linux-boot-probes/mounted/common/40grub2
+@@ -77,7 +77,7 @@ parse_grub_menu () {
+ 					ignore_item=1
+ 				fi
+ 			;;
+-			linux)
++			linux*)
+ 				# Hack alert: sed off any (hdn,n) but
+ 				# assume the kernel is on the same
+ 				# partition.
+@@ -90,7 +90,7 @@ parse_grub_menu () {
+ 					kernel="/boot$kernel"
+ 				fi
+ 			;;
+-			initrd)
++			initrd*)
+ 				initrd="$(echo "$2" | sed 's/(.*)//')"
+ 				# Initrd same.
+ 				if [ "$partition" != "$bootpart" ]; then

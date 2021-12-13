@@ -1,0 +1,264 @@
+From a552fe2cd20c9804d9abcbf5f99533ed9c495fe7 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Tue, 31 Mar 2020 16:58:31 +0100
+Subject: [PATCH 1/6] Javax Servlet API
+
+---
+ dist/pom.xml                                  |  2 +-
+ pom.xml                                       |  4 +-
+ server/pom.xml                                |  8 ++-
+ .../webserver/HttpServletRequestImpl.java     | 54 +++++++++++++++++++
+ .../webserver/HttpServletResponseImpl.java    | 26 ++++++++-
+ .../webserver/ServletOutputStreamImpl.java    |  5 ++
+ 6 files changed, 94 insertions(+), 5 deletions(-)
+
+diff --git a/dist/pom.xml b/dist/pom.xml
+index 67aded6..590f750 100644
+--- a/dist/pom.xml
++++ b/dist/pom.xml
+@@ -59,7 +59,7 @@
+   <dependencies>
+     <dependency>
+       <groupId>javax.servlet</groupId>
+-      <artifactId>servlet-api</artifactId>
++      <artifactId>javax.servlet-api</artifactId>
+     </dependency>
+     <dependency>
+     	<groupId>org.apache.xmlrpc</groupId>
+diff --git a/pom.xml b/pom.xml
+index 3933da5..5e18625 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -344,8 +344,8 @@
+       </dependency>
+       <dependency>
+         <groupId>javax.servlet</groupId>
+-        <artifactId>servlet-api</artifactId>
+-        <version>2.4</version>
++        <artifactId>javax.servlet-api</artifactId>
++        <version>3.1.0</version>
+         <scope>provided</scope>
+       </dependency>
+       <dependency>
+diff --git a/server/pom.xml b/server/pom.xml
+index 0d09544..6cbc6e7 100644
+--- a/server/pom.xml
++++ b/server/pom.xml
+@@ -67,6 +67,12 @@
+     <dependency>
+       <groupId>commons-logging</groupId>
+       <artifactId>commons-logging</artifactId>
++      <exclusions>
++	<exclusion>
++          <groupId>javax.servlet</groupId>
++          <artifactId>servlet-api</artifactId>
++	</exclusion>
++      </exclusions>
+     </dependency>
+     <dependency>
+       <groupId>org.apache.xmlrpc</groupId>
+@@ -81,7 +87,7 @@
+     </dependency>
+     <dependency>
+       <groupId>javax.servlet</groupId>
+-      <artifactId>servlet-api</artifactId>
++      <artifactId>javax.servlet-api</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>commons-httpclient</groupId>
+diff --git a/server/src/main/java/org/apache/xmlrpc/webserver/HttpServletRequestImpl.java b/server/src/main/java/org/apache/xmlrpc/webserver/HttpServletRequestImpl.java
+index 3dc7e43..19b14a2 100644
+--- a/server/src/main/java/org/apache/xmlrpc/webserver/HttpServletRequestImpl.java
++++ b/server/src/main/java/org/apache/xmlrpc/webserver/HttpServletRequestImpl.java
+@@ -31,6 +31,7 @@ import java.net.URLDecoder;
+ import java.security.Principal;
+ import java.util.ArrayList;
+ import java.util.Collections;
++import java.util.Collection;
+ import java.util.Enumeration;
+ import java.util.HashMap;
+ import java.util.Iterator;
+@@ -39,10 +40,20 @@ import java.util.Locale;
+ import java.util.Map;
+ import java.util.StringTokenizer;
+ 
++import javax.servlet.ReadListener;
+ import javax.servlet.RequestDispatcher;
++import javax.servlet.ServletException;
+ import javax.servlet.ServletInputStream;
++import javax.servlet.DispatcherType;
++import javax.servlet.AsyncContext;
++import javax.servlet.ServletContext;
++import javax.servlet.ServletRequest;
++import javax.servlet.ServletResponse;
+ import javax.servlet.http.Cookie;
++import javax.servlet.http.HttpUpgradeHandler;
++import javax.servlet.http.Part;
+ import javax.servlet.http.HttpServletRequest;
++import javax.servlet.http.HttpServletResponse;
+ import javax.servlet.http.HttpSession;
+ 
+ import org.apache.xmlrpc.common.XmlRpcStreamConfig;
+@@ -66,6 +77,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
+ 	private String queryString;
+ 	private String httpVersion;
+ 	private final Map headers = new HashMap();
++	private final Map parts = new HashMap();
+ 	private final Map attributes = new HashMap();
+ 	private Map parameters;
+ 	private String characterEncoding;
+@@ -97,6 +109,18 @@ public class HttpServletRequestImpl implements HttpServletRequest {
+ 				}
+ 				return c;
+ 			}
++
++			public boolean isFinished() {
++				return contentBytesRemaining == 0;
++			}
++
++			public boolean isReady() {
++				return true;
++			}
++
++			public void setReadListener(ReadListener arg0) {
++				throw new IllegalStateException("Not implemented.");
++			}
+ 		};
+ 	}
+ 
+@@ -227,6 +251,12 @@ public class HttpServletRequestImpl implements HttpServletRequest {
+ 		return Collections.enumeration(list);
+ 	}
+ 
++	public Part getPart(String name) { throw new IllegalStateException("Not implemented"); }
++
++	public Collection getParts() { throw new IllegalStateException("Not implemented"); }
++
++	public boolean authenticate (HttpServletResponse response) { throw new IllegalStateException("Not implemented"); }
++
+ 	public int getIntHeader(String pHeader) {
+ 		String s = getHeader(pHeader);
+ 		return s == null ? -1 : Integer.parseInt(s);
+@@ -242,6 +272,10 @@ public class HttpServletRequestImpl implements HttpServletRequest {
+ 
+ 	public String getRemoteUser() { throw new IllegalStateException("Not implemented"); }
+ 
++	public void login(String username, String password) { throw new IllegalStateException("Not implemented"); }
++
++	public void logout() { throw new IllegalStateException("Not implemented"); }
++
+ 	public String getRequestURI() { return uri; }
+ 
+ 	public StringBuffer getRequestURL() {
+@@ -280,6 +314,20 @@ public class HttpServletRequestImpl implements HttpServletRequest {
+ 		return sb;
+ 	}
+ 
++	public AsyncContext getAsyncContext() { throw new IllegalStateException("Not implemented"); }
++
++	public boolean isAsyncSupported() { return false; }
++
++	public boolean isAsyncStarted() { return false; }
++
++	public ServletContext getServletContext() { throw new IllegalStateException("Not implemented"); }
++
++	public AsyncContext startAsync(ServletRequest req, ServletResponse resp) { throw new IllegalStateException("Not implemented"); }
++
++	public AsyncContext startAsync() { throw new IllegalStateException("Not implemented"); }
++
++	public DispatcherType getDispatcherType() { throw new IllegalStateException("Not implemented"); }
++
+ 	public String getRequestedSessionId() { throw new IllegalStateException("Not implemented"); }
+ 
+ 	public String getServletPath() { return uri; }
+@@ -544,4 +592,10 @@ public class HttpServletRequestImpl implements HttpServletRequest {
+ 	}
+ 
+ 	protected String getHttpVersion() { return httpVersion; }
++
++	public long getContentLengthLong() { throw new IllegalStateException("Not implemented."); }
++
++	public String changeSessionId() { throw new IllegalStateException("Not implemented."); }
++
++	public HttpUpgradeHandler upgrade(Class arg0) { throw new IllegalStateException("Not implemented."); }
+ }
+diff --git a/server/src/main/java/org/apache/xmlrpc/webserver/HttpServletResponseImpl.java b/server/src/main/java/org/apache/xmlrpc/webserver/HttpServletResponseImpl.java
+index 6ba7018..5319dcf 100644
+--- a/server/src/main/java/org/apache/xmlrpc/webserver/HttpServletResponseImpl.java
++++ b/server/src/main/java/org/apache/xmlrpc/webserver/HttpServletResponseImpl.java
+@@ -29,6 +29,8 @@ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Locale;
+ import java.util.Map;
++import java.util.Collection;
++import java.util.Collections;
+ import java.util.StringTokenizer;
+ 
+ import javax.servlet.ServletOutputStream;
+@@ -84,7 +86,7 @@ public class HttpServletResponseImpl implements HttpServletResponse {
+ 		}
+ 	}
+ 
+-	private String getHeader(String pHeader) {
++	public String getHeader(String pHeader) {
+ 		String key = pHeader.toLowerCase();
+ 		Object o = headers.get(key);
+ 		if (o == null) {
+@@ -101,6 +103,26 @@ public class HttpServletResponseImpl implements HttpServletResponse {
+ 		}
+ 	}
+ 
++	public Collection getHeaderNames() {
++		return headers.keySet();
++	}
++
++	public Collection getHeaders(String pHeader) {
++		String key = pHeader.toLowerCase();
++		Object o = headers.get(key);
++		List list;
++		if (o instanceof List) {
++		list = (List) o;
++		} else {
++			list = Collections.singletonList(o);
++		}
++		return list;
++	}
++
++	public int getStatus() {
++		return status;
++	}
++
+ 	public void addIntHeader(String pHeader, int pValue) {
+ 		addHeader(pHeader, Integer.toString(pValue));
+ 	}
+@@ -465,4 +487,6 @@ public class HttpServletResponseImpl implements HttpServletResponse {
+ 		sb.append("\r\n");
+ 		return sb.toString();
+ 	}
++
++	public void setContentLengthLong(long arg0) { throw new IllegalStateException("Not implemented."); }
+ }
+diff --git a/server/src/main/java/org/apache/xmlrpc/webserver/ServletOutputStreamImpl.java b/server/src/main/java/org/apache/xmlrpc/webserver/ServletOutputStreamImpl.java
+index c2a53b1..86dbbb4 100644
+--- a/server/src/main/java/org/apache/xmlrpc/webserver/ServletOutputStreamImpl.java
++++ b/server/src/main/java/org/apache/xmlrpc/webserver/ServletOutputStreamImpl.java
+@@ -22,6 +22,7 @@ import java.io.IOException;
+ import java.io.OutputStream;
+ 
+ import javax.servlet.ServletOutputStream;
++import javax.servlet.WriteListener;
+ 
+ 
+ /** Default implementation of a servlet output stream.
+@@ -99,4 +100,8 @@ class ServletOutputStreamImpl extends ServletOutputStream {
+ 	boolean isCommitted() {
+ 		return committed;
+ 	}
++
++	public boolean isReady() { return true; }
++
++	public void setWriteListener(WriteListener arg0) { throw new IllegalStateException("Not implemented."); }
+ }
+-- 
+2.26.0.rc2
+

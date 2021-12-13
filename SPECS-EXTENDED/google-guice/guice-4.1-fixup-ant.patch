@@ -1,0 +1,147 @@
+diff -urEbwB guice-4.1/build.properties guice-4.1.new/build.properties
+--- guice-4.1/build.properties	2016-06-17 20:00:06.000000000 +0200
++++ guice-4.1.new/build.properties	2019-02-13 23:51:02.592074396 +0100
+@@ -37,4 +37,4 @@
+   com.google.inject.testing.fieldbinder
+ test.class=com.google.inject.AllTests
+ module=com.google.inject
+-imports=!net.sf.cglib.*,!org.objectweb.asm.*
++imports=net.sf.cglib.*,org.objectweb.asm.*
+diff -urEbwB guice-4.1/build.xml guice-4.1.new/build.xml
+--- guice-4.1/build.xml	2016-06-17 20:00:06.000000000 +0200
++++ guice-4.1.new/build.xml	2019-02-13 23:51:02.596074414 +0100
+@@ -18,10 +18,10 @@
+   </path>
+ 
+ 
+-  <target name="jar" depends="jar.withdeps, manifest" description="Build jar.">
+-    <jar jarfile="${build.dir}/dist/guice-${version}.jar"
++  <target name="jar" depends="compile, manifest" description="Build jar.">
++    <jar destfile="${build.dir}/${ant.project.name}-${version}.jar"
+         manifest="${build.dir}/META-INF/MANIFEST.MF">
+-      <zipfileset src="${build.dir}/${ant.project.name}-with-deps.jar"/>
++      <fileset dir="${build.dir}/classes" />
+     </jar>
+   </target>
+ 
+@@ -118,16 +118,8 @@
+       <classpath>
+         <pathelement location="${build.dir}/guice-${version}-tests.jar"/>
+         <pathelement location="${build.dir}/dist/guice-${version}.jar"/>
+-        <pathelement location="lib/javax.inject.jar"/>
+-        <pathelement location="lib/aopalliance.jar"/>
+-        <pathelement location="lib/guava-19.0.jar"/>
+-        <pathelement location="lib/build/guava-testlib-19.0.jar"/>
+-        <pathelement location="lib/build/junit.jar"/>
+-        <pathelement location="lib/build/servlet-api-2.5.jar"/>
+-        <pathelement location="lib/build/easymock.jar"/>
+-        <pathelement location="lib/build/javax.inject-tck.jar"/>
+-        <pathelement location="lib/build/bnd-0.0.384.jar"/>
+-        <pathelement location="lib/build/felix-2.0.5.jar"/>
++        <fileset dir="${lib.dir}" includes="*.jar"/>
++        <fileset dir="${lib.dir}/build" includes="*.jar"/>
+       </classpath>
+       <arg value="com.google.inject.AllTests"/>
+       <jvmarg value="${jvmarg-value}"/>
+diff -urEbwB guice-4.1/common.xml guice-4.1.new/common.xml
+--- guice-4.1/common.xml	2016-06-17 20:00:06.000000000 +0200
++++ guice-4.1.new/common.xml	2019-02-13 23:51:18.596146420 +0100
+@@ -14,7 +14,7 @@
+     <javac srcdir="${src.dir}"
+          debug="on"
+          destdir="${build.dir}/classes"
+-         source="1.6" target="1.6" includeantruntime="false">
++         source="1.6" target="1.6" encoding="UTF-8" includeantruntime="false">
+       <compilerarg value="-Xlint:all,-serial"/>
+       <classpath refid="compile.classpath"/>
+     </javac>
+@@ -26,7 +26,7 @@
+   <target name="manifest" description="Generate OSGi manifest." depends="compile">
+     <dirname property="common.basedir" file="${ant.file.common}"/>
+     <taskdef resource="aQute/bnd/ant/taskdef.properties"
+-      classpath="${common.basedir}/lib/build/bnd-0.0.384.jar"/>
++      classpathref="compile.classpath"/>
+ 
+     <fail unless="module" message="Missing 'module' property (use the primary package name in this jar)"/>
+     <property name="imports" value=""/>
+@@ -48,7 +48,7 @@
+       <equals arg1="${module}" arg2="com.google.inject"/>
+     </condition>
+ 
+-    <condition property="Import-Package" value="!com.google.inject.*,*" else="!${module}.*,${imports},*">
++    <condition property="Import-Package" value="!com.google.inject.*,*" else="!${module}.*,*">
+       <istrue value="${fragment}"/>
+     </condition>
+ 
+@@ -60,13 +60,19 @@
+ 
+     <property name="-removeheaders" value="Bnd-LastModified,Ignore-Package,Include-Resource,Private-Package,Tool"/>
+ 
+-    <bndwrap jars="${build.dir}/classes" output="${build.dir}"/>
++    <jar destfile="${build.dir}/classes.jar" basedir="${build.dir}/classes"/>
++
++    <bndwrap jars="${build.dir}/classes.jar" output="${build.dir}/classes.bar"/>
++	
++	<delete file="${build.dir}/classes.jar"/>
+ 
+     <unjar src="${build.dir}/classes.bar" dest="${build.dir}">
+       <patternset>
+         <include name="META-INF/MANIFEST.MF"/>
+       </patternset>
+     </unjar>
++	
++	<delete file="${build.dir}/classes.bar"/>
+   </target>
+ 
+   <target name="test.compile"
+@@ -76,7 +82,7 @@
+     <javac srcdir="${test.dir}"
+          debug="on"
+          destdir="${build.dir}/test"
+-         source="1.6" target="1.6" includeantruntime="false">
++         source="1.6" target="1.6" encoding="UTF-8" includeantruntime="false">
+       <classpath path="${build.dir}/classes"/>
+       <classpath path="${build.dir}/test"/>
+       <classpath refid="compile.classpath"/>
+@@ -120,37 +126,16 @@
+       description="Build jar files"/>
+ 
+   <target name="test.withdeps" depends="test.compile"
+-      description="Build a jar of tests with internal.util refocused.">
++      description="Build a jar of tests.">
+     <mkdir dir="${build.dir}/dist"/>
+     <dirname property="common.basedir" file="${ant.file.common}"/>
+-    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+-        classpath="${common.basedir}/lib/build/jarjar-1.1.jar"/>
+-    <jarjar jarfile="${build.dir}/${ant.project.name}-${version}-tests.jar">
+-      <fileset dir="${build.dir}/test"/>
+-      <rule pattern="net.sf.cglib.*" result="com.google.inject.internal.cglib.$@1"/>
+-      <rule pattern="net.sf.cglib.**.*" result="com.google.inject.internal.cglib.@1.$@2"/>
+-      <rule pattern="org.objectweb.asm.*" result="com.google.inject.internal.asm.$@1"/>
+-      <rule pattern="org.objectweb.asm.**.*" result="com.google.inject.internal.asm.@1.$@2"/>
+-      <keep pattern="com.google.inject.**"/>
+-      <keep pattern="com.googlecode.**"/>
+-    </jarjar>
++    <jar destfile="${build.dir}/${ant.project.name}-${version}-tests.jar" basedir="${build.dir}/test"/>
+   </target>
+ 
+   <target name="jar.withdeps" depends="compile"
+-      description="Build jar with dependencies embedded.">
++      description="Build jar.">
+     <mkdir dir="${build.dir}/dist"/>
+     <dirname property="common.basedir" file="${ant.file.common}"/>
+-    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+-        classpath="${common.basedir}/lib/build/jarjar-1.1.jar"/>
+-    <jarjar jarfile="${build.dir}/${ant.project.name}-with-deps.jar">
+-      <fileset dir="${build.dir}/classes"/>
+-      <zipfileset src="${common.basedir}/lib/build/cglib-3.2.jar"/>
+-      <zipfileset src="${common.basedir}/lib/build/asm-5.0.3.jar"/>
+-      <rule pattern="net.sf.cglib.*" result="com.google.inject.internal.cglib.$@1"/>
+-      <rule pattern="net.sf.cglib.**.*" result="com.google.inject.internal.cglib.@1.$@2"/>
+-      <rule pattern="org.objectweb.asm.*" result="com.google.inject.internal.asm.$@1"/>
+-      <rule pattern="org.objectweb.asm.**.*" result="com.google.inject.internal.asm.@1.$@2"/>
+-      <keep pattern="com.google.inject.**"/>
+-    </jarjar>
++    <jar destfile="${build.dir}/${ant.project.name}-with-deps.jar" basedir="${build.dir}/classes"/>
+   </target>
+ </project>

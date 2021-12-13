@@ -1,0 +1,24 @@
+From e8d9d5e9817627dcf208ac742debcc9dc320752d Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Wed, 27 Jul 2016 19:06:29 +0200
+Subject: [PATCH] Fix man page reference in systemd service file
+
+---
+ dbus/realmd.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dbus/realmd.service.in b/dbus/realmd.service.in
+index b3bcf7a..64c1090 100644
+--- a/dbus/realmd.service.in
++++ b/dbus/realmd.service.in
+@@ -1,6 +1,6 @@
+ [Unit]
+ Description=Realm and Domain Configuration
+-Documentation=man:realmd(8)
++Documentation=man:realm(8)
+ 
+ [Service]
+ Type=dbus
+-- 
+2.7.4
+

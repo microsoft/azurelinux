@@ -1,0 +1,81 @@
+From 4957492864d6a88a814bfd6f21798b52a4e70515 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Sat, 29 Jun 2019 14:00:13 +0200
+Subject: [PATCH 2/3] Make xmvn-subst honor settings for ignoring duplicate
+ metadata
+
+---
+ .../xmvn/tools/subst/SubstCli.java            | 25 +++++++++++++------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
+
+diff --git a/xmvn-tools/xmvn-subst/src/main/java/org/fedoraproject/xmvn/tools/subst/SubstCli.java b/xmvn-tools/xmvn-subst/src/main/java/org/fedoraproject/xmvn/tools/subst/SubstCli.java
+index 423b5e61..30b1ac63 100644
+--- a/xmvn-tools/xmvn-subst/src/main/java/org/fedoraproject/xmvn/tools/subst/SubstCli.java
++++ b/xmvn-tools/xmvn-subst/src/main/java/org/fedoraproject/xmvn/tools/subst/SubstCli.java
+@@ -23,6 +23,7 @@ import java.util.ArrayList;
+ import java.util.List;
+ 
+ import org.fedoraproject.xmvn.config.Configurator;
++import org.fedoraproject.xmvn.config.ResolverSettings;
+ import org.fedoraproject.xmvn.locator.ServiceLocator;
+ import org.fedoraproject.xmvn.locator.ServiceLocatorFactory;
+ import org.fedoraproject.xmvn.metadata.MetadataRequest;
+@@ -34,26 +35,34 @@ import org.fedoraproject.xmvn.metadata.MetadataResult;
+  */
+ public class SubstCli
+ {
+-    private final List<String> configuredMetadataRepos;
+-
+     private MetadataResolver metadataResolver;
+ 
++    private ResolverSettings resolverSettings;
++
+     public SubstCli( Configurator configurator, MetadataResolver metadataResolver )
+     {
+         this.metadataResolver = metadataResolver;
+-        configuredMetadataRepos = configurator.getConfiguration().getResolverSettings().getMetadataRepositories();
++        resolverSettings = configurator.getConfiguration().getResolverSettings();
++    }
++
++    private MetadataResult resolveMetadata( List<String> repos )
++    {
++        MetadataRequest request = new MetadataRequest( repos );
++        request.setIgnoreDuplicates( resolverSettings.isIgnoreDuplicateMetadata() );
++        MetadataResult result = metadataResolver.resolveMetadata( request );
++        return result;
+     }
+ 
+     private void run( SubstCliRequest cliRequest )
+     {
+-        List<MetadataResult> metadataResolvers = new ArrayList<>();
++        List<MetadataResult> metadataResults = new ArrayList<>();
+ 
+         if ( cliRequest.getRoot() != null )
+         {
+             List<String> metadataRepos = new ArrayList<>();
+             Path root = Paths.get( cliRequest.getRoot() );
+ 
+-            for ( String configuredRepo : configuredMetadataRepos )
++            for ( String configuredRepo : resolverSettings.getMetadataRepositories() )
+             {
+                 Path repoPath = Paths.get( configuredRepo );
+                 if ( repoPath.isAbsolute() )
+@@ -62,12 +71,12 @@ public class SubstCli
+                 }
+             }
+ 
+-            metadataResolvers.add( metadataResolver.resolveMetadata( new MetadataRequest( metadataRepos ) ) );
++            metadataResults.add( resolveMetadata( metadataRepos ) );
+         }
+ 
+-        metadataResolvers.add( metadataResolver.resolveMetadata( new MetadataRequest( configuredMetadataRepos ) ) );
++        metadataResults.add( resolveMetadata( resolverSettings.getMetadataRepositories() ) );
+ 
+-        ArtifactVisitor visitor = new ArtifactVisitor( cliRequest.isDebug(), metadataResolvers );
++        ArtifactVisitor visitor = new ArtifactVisitor( cliRequest.isDebug(), metadataResults );
+ 
+         visitor.setTypes( cliRequest.getTypes() );
+         visitor.setFollowSymlinks( cliRequest.isFollowSymlinks() );
+-- 
+2.21.0
+

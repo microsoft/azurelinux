@@ -1,0 +1,16 @@
+diff --git a/CONFIG/src/SpewMakeInc.c b/CONFIG/src/SpewMakeInc.c
+index eed259e..65d68a1 100644
+--- a/CONFIG/src/SpewMakeInc.c
++++ b/CONFIG/src/SpewMakeInc.c
+@@ -764,9 +764,9 @@ int main(int nargs, char **args)
+       else
+       {
+          if (ptrbits == 32)
+-            fprintf(fpout, " -melf_i386");
++            fprintf(fpout, " -Wl,-melf_i386");
+          else if (ptrbits == 64)
+-            fprintf(fpout, " -melf_x86_64");
++            fprintf(fpout, " -Wl,-melf_x86_64");
+          if (OS == OSFreeBSD)
+             fprintf(fpout, "_fbsd");
+       }

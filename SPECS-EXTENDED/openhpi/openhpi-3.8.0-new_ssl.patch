@@ -1,0 +1,72 @@
+From 4a32923cd6d39ffad201d0f4570ddc882b474e0c Mon Sep 17 00:00:00 2001
+From: Mohan Devarajulu <mohan.dev@hpe.com>
+Date: Fri, 11 May 2018 15:15:22 -0600
+Subject: [PATCH] Fixes #1973 Work with new ssl libraries
+
+---
+ configure.ac                     | 15 +++++++++++++--
+ plugins/ipmidirect/ipmi_auth.cpp |  5 +++--
+ 2 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a9999a1f..8b733ff5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -173,8 +173,10 @@ dnl ssl is used for md2/md5 authentification in ipmidirect
+ dnl and for SSL-based communication in ilo2_ribcl and oa_soap
+ AC_CHECK_LIB([crypto],[MD5_Init],[CRYPTO_LIB=-lcrypto],[CRYPTO_LIB=])
+ AC_SUBST(CRYPTO_LIB)
+-AC_CHECK_LIB([ssl],[SSL_library_init],[SSL_LIB=-lssl],[SSL_LIB=])
+-AC_SUBST(SSL_LIB)
++AC_CHECK_LIB([ssl],[SSL_library_init],[SSL_OLD_LIB=-lssl],[SSL_OLD_LIB=])
++AC_CHECK_LIB([ssl],[OPENSSL_init_ssl],[SSL_NEW_LIB=-lssl],[SSL_NEW_LIB=])
++AC_SUBST(SSL_OLD_LIB)
++AC_SUBST(SSL_NEW_LIB)
+ AC_CHECK_HEADERS([openssl/md2.h openssl/md5.h openssl/bio.h openssl/ssl.h openssl/err.h],[have_openssl=yes],[have_openssl=no])
+ 
+ dnl xml is used for XML-based communication in ilo2_ribcl and oa_soap
+@@ -743,6 +745,15 @@ dnl replace common includes here
+ AC_SUBST(OPENHPI_INCLUDES)
+ 
+ dnl Set up libs that will be linked to
++if test -n "$SSL_OLD_LIB"; then
++	AC_SUBST(SSL_LIB,-lssl)
++else
++	if test -n "$SSL_NEW_LIB"; then
++		AC_SUBST(SSL_LIB,-lssl)
++	else
++		AC_SUBST(SSL_LIB,"")
++	fi
++fi
+ LIBS="$LIBS $SSL_LIB $GLIB_LIBS -lm -lpthread"
+ 
+ AC_CHECK_PROG([found_pod2man], [pod2man], [yes])
+diff --git a/plugins/ipmidirect/ipmi_auth.cpp b/plugins/ipmidirect/ipmi_auth.cpp
+index e2bbd574..4463e618 100644
+--- a/plugins/ipmidirect/ipmi_auth.cpp
++++ b/plugins/ipmidirect/ipmi_auth.cpp
+@@ -21,6 +21,7 @@
+ #include "ipmi_auth.h"
+ #include <string.h>
+ #include <errno.h>
++#include <openssl/opensslconf.h>
+ 
+ 
+ cIpmiAuth *
+@@ -32,7 +33,7 @@ IpmiAuthFactory( tIpmiAuthType type )
+             return new cIpmiAuthNone;
+ 
+        case eIpmiAuthTypeMd2:
+-#ifdef HAVE_OPENSSL_MD2_H
++#if defined(HAVE_OPENSSL_MD2_H) && !defined(OPENSSL_NO_MD2) 
+             return new cIpmiAuthMd2;
+ #else
+             break;
+@@ -78,7 +79,7 @@ cIpmiAuthNone::Check( cIpmiAuthSg /*d*/[], void * /*code*/ )
+ }
+ 
+ 
+-#ifdef HAVE_OPENSSL_MD2_H
++#if defined(HAVE_OPENSSL_MD2_H) && !defined(OPENSSL_NO_MD2) 
+ #include <openssl/md2.h>
+ 

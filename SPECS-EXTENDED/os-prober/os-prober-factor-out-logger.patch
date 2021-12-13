@@ -1,0 +1,107 @@
+Index: os-prober/common.sh
+===================================================================
+--- os-prober.orig/common.sh
++++ os-prober/common.sh
+@@ -62,10 +62,14 @@ cache_progname() {
+   esac
+ }
+ 
+-log() {
+-  cache_progname
+-  logger -t "$progname" "$@"
+-}
++# fd_logger: bind value now, possibly after assigning default. 
++eval '
++  log() {
++    cache_progname
++    echo "$progname: $@"  1>&'${fd_logger:=9}'
++  }
++'
++export fd_logger  # so subshells inherit current value by default
+ 
+ error() {
+   log "error: $@"
+@@ -81,10 +85,14 @@ debug() {
+   fi
+ }
+ 
+-result () {
+-  log "result:" "$@"
+-  echo "$@"
+-}
++# fd_result: bind value now, possibly after assigning default.
++eval '
++  result() {
++    log "result:" "$@"
++    echo "$@"  1>&'${fd_result:=1}'
++  }
++'
++export fd_result  # so subshells inherit current value by default
+ 
+ # shim to make it easier to use os-prober outside d-i
+ if ! type mapdevfs >/dev/null 2>&1; then
+Index: os-prober/linux-boot-prober
+===================================================================
+--- os-prober.orig/linux-boot-prober
++++ os-prober/linux-boot-prober
+@@ -1,4 +1,12 @@
+ #!/bin/sh
++
++# dash shell does not have "{varname}>&1" feature that bash shell has
++# for auto-assignment of new filedescriptors.
++# It is cumbersome to write the 'eval' to use our own variables in redirections.
++# Therefore use fixed numbers.
++export fd_result=3  # file descriptor for external results
++export fd_logger=9  # file descriptor for input to logger
++
+ . /usr/share/os-prober/common.sh
+ 
+ set -e
+@@ -19,6 +27,7 @@ bootuuid=
+ 
+ grep "^/dev/" /proc/mounts | parse_proc_mounts >"$OS_PROBER_TMP/mounted-map" || true
+ 
++( (
+ if [ -z "$1" ]; then
+ 	ERR=y
+ elif [ "$1" = btrfs -a -z "$2" ]; then
+@@ -186,3 +195,5 @@ else
+ 		fi
+ 	fi
+ fi
++) 9>&1 | logger 1>&-  # fd_logger
++) 3>&1  # fd_result
+Index: os-prober/os-prober
+===================================================================
+--- os-prober.orig/os-prober
++++ os-prober/os-prober
+@@ -1,7 +1,14 @@
+ #!/bin/sh
+ set -e
+ 
+-. /usr/share/os-prober/common.sh
++# dash shell does not have "{varname}>&1" feature that bash shell has
++# for auto-assignment of new filedescriptors.
++# It is cumbersome to write the 'eval' to use our own variables in redirections.
++# Therefore use fixed numbers.
++export fd_result=3  # file descriptor for external results
++export fd_logger=9  # file descriptor for input to logger
++
++ . /usr/share/os-prober/common.sh
+ 
+ newns "$@"
+ require_tmpdir
+@@ -136,6 +143,7 @@ fi
+ 
+ : >"$OS_PROBER_TMP/btrfs-vols"
+ 
++( (
+ for partition in $(partitions); do
+ 	if ! mapped="$(mapdevfs "$partition")"; then
+ 		log "Device '$partition' does not exist; skipping"
+@@ -200,3 +208,5 @@ for partition in $(partitions); do
+ 		fi
+ 	fi
+ done
++) 9>&1 | logger 1>&-  # fd_logger
++) 3>&1  # fd_result

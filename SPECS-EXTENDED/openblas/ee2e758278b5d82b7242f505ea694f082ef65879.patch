@@ -1,0 +1,73 @@
+From ee2e758278b5d82b7242f505ea694f082ef65879 Mon Sep 17 00:00:00 2001
+From: Martin Kroeker <martin@ruby.chemie.uni-freiburg.de>
+Date: Fri, 13 Mar 2020 20:34:13 +0100
+Subject: [PATCH] Move declarations of lapack_complex_custom types outside the
+ extern C
+
+fixes #2510
+---
+ lapack-netlib/LAPACKE/include/lapack.h | 44 ++++++++++++++------------
+ 1 file changed, 23 insertions(+), 21 deletions(-)
+
+diff --git a/lapack-netlib/LAPACKE/include/lapack.h b/lapack-netlib/LAPACKE/include/lapack.h
+index 0a6226fe4..36e53ec24 100644
+--- a/lapack-netlib/LAPACKE/include/lapack.h
++++ b/lapack-netlib/LAPACKE/include/lapack.h
+@@ -12,27 +12,6 @@
+ 
+ #include <stdlib.h>
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-/*----------------------------------------------------------------------------*/
+-#ifndef lapack_int
+-#define lapack_int     int
+-#endif
+-
+-#ifndef lapack_logical
+-#define lapack_logical lapack_int
+-#endif
+-
+-/* f2c, hence clapack and MacOS Accelerate, returns double instead of float
+- * for sdot, slange, clange, etc. */
+-#if defined(LAPACK_F2C)
+-    typedef double lapack_float_return;
+-#else
+-    typedef float lapack_float_return;
+-#endif
+-
+ /* Complex types are structures equivalent to the
+ * Fortran complex types COMPLEX(4) and COMPLEX(8).
+ *
+@@ -88,6 +67,29 @@ extern "C" {
+ 
+ #endif /* LAPACK_COMPLEX_CUSTOM */
+ 
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/*----------------------------------------------------------------------------*/
++#ifndef lapack_int
++#define lapack_int     int
++#endif
++
++#ifndef lapack_logical
++#define lapack_logical lapack_int
++#endif
++
++/* f2c, hence clapack and MacOS Accelerate, returns double instead of float
++ * for sdot, slange, clange, etc. */
++#if defined(LAPACK_F2C)
++    typedef double lapack_float_return;
++#else
++    typedef float lapack_float_return;
++#endif
++
++
+ /* Callback logical functions of one, two, or three arguments are used
+ *  to select eigenvalues to sort to the top left of the Schur form.
+ *  The value is selected if function returns TRUE (non-zero). */

@@ -1,0 +1,14 @@
+[Unit]
+Description=NIS/YP (Network Information Service) Maps Transferring Accelerator
+Requires=rpcbind.service
+After=syslog.target network.target rpcbind.service
+
+[Service]
+Type=notify
+NotifyAccess=all
+EnvironmentFile=-/etc/sysconfig/network
+ExecStart=/usr/sbin/rpc.ypxfrd -f $YPXFRD_ARGS
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

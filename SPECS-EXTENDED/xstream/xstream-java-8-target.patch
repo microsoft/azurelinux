@@ -1,0 +1,26 @@
+diff --git a/pom.xml b/pom.xml
+index 2ab1bd4..4e6ea8b 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -84,8 +84,8 @@
+         <jdk>1.8</jdk>
+       </activation>
+       <properties>
+-        <version.java.source>1.4</version.java.source>
+-        <version.java.target>1.4</version.java.target>
++        <version.java.source>1.8</version.java.source>
++        <version.java.target>1.8</version.java.target>
+       </properties>
+     </profile>
+     <profile>
+@@ -1100,8 +1100,8 @@
+ 
+     <version.java.5>1.5</version.java.5>
+     <version.java.6>1.6</version.java.6>
+-    <version.java.source>1.5</version.java.source>
+-    <version.java.target>1.5</version.java.target>
++    <version.java.source>1.8</version.java.source>
++    <version.java.target>1.8</version.java.target>
+     <version.java.enforced>[1.4,)</version.java.enforced>
+ 
+     <version.plugin.codehaus.xsite>1.3</version.plugin.codehaus.xsite>

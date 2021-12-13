@@ -4,8 +4,6 @@
 package schedulerutils
 
 import (
-	"path/filepath"
-
 	"microsoft.com/pkggen/internal/logger"
 	"microsoft.com/pkggen/internal/pkggraph"
 )
@@ -63,7 +61,7 @@ func (g *GraphBuildState) ActiveBuilds() map[int64]*BuildRequest {
 func (g *GraphBuildState) ActiveSRPMs() (builtSRPMs []string) {
 	for _, buildRequest := range g.activeBuilds {
 		if buildRequest.Node.Type == pkggraph.TypeBuild {
-			builtSRPMs = append(builtSRPMs, filepath.Base(buildRequest.Node.SrpmPath))
+			builtSRPMs = append(builtSRPMs, buildRequest.Node.SRPMFileName())
 		}
 	}
 

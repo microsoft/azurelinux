@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "ccid-1.4.33.tar.bz2": "5256da939711deb42b74d05d2bd6bd0c73c4d564feb0c1a50212609eb680e424",
+  "ccid-1.4.33.tar.bz2.asc": "6cf9370701a65eef431d0add24e53a2a3ebe1fc8df227f376ee85b9c132e6454",
+  "gpgkey-F5E11B9FFE911146F41D953D78A1B4DFE8F9C57E.gpg": "204e5824015b70baa1da46a58aa3b2be53e67e03848e180006c82edca387c6da"
+ }
+}

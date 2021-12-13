@@ -1,0 +1,47 @@
+diff --git a/pom.xml b/pom.xml
+index 1a4f2c4..f5fa596 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -160,42 +160,6 @@ under the License.
+       <version>1.7.0</version>
+       <optional>true</optional>
+     </dependency>
+-    <dependency>
+-      <groupId>com.mockrunner</groupId>
+-      <artifactId>mockrunner-jdk1.3-j2ee1.3</artifactId>
+-      <version>0.4</version>
+-      <scope>test</scope>
+-      <exclusions>
+-        <exclusion>
+-          <groupId>cglib-nodep</groupId>
+-          <artifactId>cglib-nodep</artifactId>
+-        </exclusion>
+-        <exclusion>
+-          <groupId>jboss</groupId>
+-          <artifactId>jboss-jee</artifactId>
+-        </exclusion>
+-        <exclusion>
+-          <groupId>nekohtml</groupId>
+-          <artifactId>nekohtml</artifactId>
+-        </exclusion>
+-        <exclusion>
+-          <groupId>struts</groupId>
+-          <artifactId>struts</artifactId>
+-        </exclusion>
+-        <exclusion>
+-          <groupId>oro</groupId>
+-          <artifactId>oro</artifactId>
+-        </exclusion>
+-        <exclusion>
+-          <groupId>commons-validator</groupId>
+-          <artifactId>commons-validator</artifactId>
+-        </exclusion>
+-        <exclusion>
+-          <groupId>commons-digester</groupId>
+-          <artifactId>commons-digester</artifactId>
+-        </exclusion>
+-      </exclusions>
+-    </dependency>
+   </dependencies>
+   <reporting>
+     <plugins>

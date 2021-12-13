@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "bsf-pom.xml": "b91c47ceb058941603f1fd70dedae49c0d6541573243f436f10bffbf0a12fdd9",
+  "bsf-src-2.4.0.tar.gz": "5ab58cf5738c144f4d85a4a442c2f33be2c4c502dca6e29e0c570c2a51ae6ae9",
+  "bsf-src-2.4.0.tar.gz.asc": "63eb4e1faeb930fc4a0ea76c8fb042b66151181cd5c911955fbb3c194a7397c5",
+  "bsf.keyring": "75c45f79f274138cc4dacaf29f10b566c2c669ddaa5aa850e1472d06494caf9d"
+ }
+}

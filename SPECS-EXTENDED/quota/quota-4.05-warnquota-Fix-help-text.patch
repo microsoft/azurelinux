@@ -1,0 +1,33 @@
+From 1ae10f8692981285ad52af9e9ae3e5f16201b187 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Mon, 12 Aug 2019 16:31:31 +0200
+Subject: [PATCH] warnquota: Fix help text
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The help text was wrongly saying that -v is equivalent to --version.
+It should be -V.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ warnquota.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/warnquota.c b/warnquota.c
+index 5158094..606b7cc 100644
+--- a/warnquota.c
++++ b/warnquota.c
+@@ -1042,7 +1042,7 @@ static void usage(void)
+ -q, --quota-tab=quotatab-file   non-default quotatab\n\
+ -a, --admins-file=admins-file   non-default admins file\n\
+ -h, --help                      display this help message and exit\n\
+--v, --version                   display version information and exit\n\n"));
++-V, --version                   display version information and exit\n\n"));
+ 	errstr(_("Bugs to %s\n"), PACKAGE_BUGREPORT);
+ 	wc_exit(1);
+ }
+-- 
+2.21.0
+

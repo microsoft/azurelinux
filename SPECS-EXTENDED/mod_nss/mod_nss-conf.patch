@@ -1,0 +1,75 @@
+From 1b6f32185488ee84b0276aea71f5caf0f0553b49 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Fri, 4 Mar 2016 10:41:09 -0500
+Subject: [PATCH] Configure nss.conf.in to match Fedora filesystem layout
+
+---
+ nss.conf.in | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/nss.conf.in b/nss.conf.in
+index e0e2f71..b2ea6df 100644
+--- a/nss.conf.in
++++ b/nss.conf.in
+@@ -8,14 +8,16 @@
+ # consult the online docs. You have been warned.  
+ #
+ 
++LoadModule nss_module modules/libmodnss.so
++
+ #
+ # When we also provide SSL we have to listen to the 
+ # standard HTTP port (see above) and to the HTTPS port
+ #
+ # Note: Configurations that use IPv6 but not IPv4-mapped addresses need two
+-#       Listen directives: "Listen [::]:443" and "Listen 0.0.0.0:443"
++#       Listen directives: "Listen [::]:8443" and "Listen 0.0.0.0:443"
+ #
+-Listen 443
++Listen 8443
+ 
+ ##
+ ##  SSL Global Context
+@@ -77,17 +79,17 @@ NSSRequireSafeNegotiation off
+ ## SSL Virtual Host Context
+ ##
+ 
+-<VirtualHost _default_:443>
++<VirtualHost _default_:8443>
+ 
+ #   General setup for the virtual host
+ #DocumentRoot "@apache_prefix@/htdocs"
+-#ServerName www.example.com:443
++#ServerName www.example.com:8443
+ #ServerAdmin you@example.com
+ 
+ # mod_nss can log to separate log files, you can choose to do that if you'd like
+ # LogLevel is not inherited from httpd.conf.
+-#ErrorLog @apache_prefix@/logs/error_log
+-#TransferLog @apache_prefix@/logs/access_log
++ErrorLog @apache_prefix@/logs/error_log
++TransferLog @apache_prefix@/logs/access_log
+ LogLevel warn
+ 
+ #   SSL Engine Switch:
+@@ -124,7 +126,7 @@ NSSNickname Server-Cert
+ #   The NSS security database directory that holds the certificates and
+ #   keys. The database consists of 3 files: cert9.db, key4.db and pkcs11.txt
+ #   Provide the directory that these files exist.
+-NSSCertificateDatabase @apache_conf@
++NSSCertificateDatabase /etc/httpd/alias
+ 
+ #   Database Prefix:
+ #   In order to be able to store multiple NSS databases in one directory
+@@ -200,7 +202,7 @@ NSSCertificateDatabase @apache_conf@
+ <Files ~ "\.(cgi|shtml|phtml|php3?)$">
+     NSSOptions +StdEnvVars
+ </Files>
+-<Directory "@apache_prefix@/cgi-bin">
++<Directory "/var/www/cgi-bin">
+     NSSOptions +StdEnvVars
+ </Directory>
+ 
+-- 
+2.13.6
+

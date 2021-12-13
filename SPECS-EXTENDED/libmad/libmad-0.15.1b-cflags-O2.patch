@@ -1,0 +1,12 @@
+diff -Naur libmad-0.15.1b-orig/configure.ac libmad-0.15.1b/configure.ac
+--- libmad-0.15.1b-orig/configure.ac	2007-07-01 12:58:13.000000000 -0600
++++ libmad-0.15.1b/configure.ac	2007-07-01 12:59:13.000000000 -0600
+@@ -105,7 +105,7 @@
+ 	    shift
+ 	    ;;
+ 	-O2)
+-	    optimize="-O"
++	    optimize="-O2"
+ 	    shift
+ 	    ;;
+ 	-fomit-frame-pointer)

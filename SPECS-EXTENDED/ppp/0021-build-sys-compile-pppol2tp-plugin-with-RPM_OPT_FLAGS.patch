@@ -1,0 +1,23 @@
+From d69eb9a8aa284014dd7dd282813989eda9d84d74 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Wed, 9 Apr 2014 09:56:09 +0200
+Subject: [PATCH 21/27] build-sys: compile pppol2tp plugin with RPM_OPT_FLAGS
+
+---
+ pppd/plugins/pppol2tp/Makefile.linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pppd/plugins/pppol2tp/Makefile.linux b/pppd/plugins/pppol2tp/Makefile.linux
+index 4339566..9a635b8 100644
+--- a/pppd/plugins/pppol2tp/Makefile.linux
++++ b/pppd/plugins/pppol2tp/Makefile.linux
+@@ -1,5 +1,5 @@
+ #CC	= gcc
+-COPTS	= -O2 -g
++COPTS	= $(RPM_OPT_FLAGS)
+ CFLAGS	= $(COPTS) -I. -I../.. -I../../../include -fPIC
+ LDFLAGS	= -shared
+ INSTALL	= install
+-- 
+1.8.3.1
+

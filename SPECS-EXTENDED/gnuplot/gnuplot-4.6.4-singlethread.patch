@@ -1,0 +1,15 @@
+diff -up wrk/src/wxterminal/wxt_gui.h.wrk wrk/src/wxterminal/wxt_gui.h
+--- wrk/src/wxterminal/wxt_gui.h.wrk	2014-04-15 17:45:55.184153975 +0200
++++ wrk/src/wxterminal/wxt_gui.h	2014-04-15 17:48:08.151643628 +0200
+@@ -155,8 +155,9 @@ extern "C" {
+  * already has its event loop, we may or may not be multithreaded */
+ #ifndef WXT_MONOTHREADED
+ #if defined(__WXGTK__)
+-# define WXT_MULTITHREADED
+-#elif defined(__WXMSW__) || defined(__WXMAC__)
++//avoid a crash when unlocking a not-locked mutex, do not use threads
++//# define WXT_MULTITHREADED
++//#elif defined(__WXMSW__) || defined(__WXMAC__)
+ # define WXT_MONOTHREADED
+ #else
+ # error "wxt does not know if this platform has to be single- or multi-threaded"

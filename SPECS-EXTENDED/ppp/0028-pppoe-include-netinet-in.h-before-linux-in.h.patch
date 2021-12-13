@@ -1,0 +1,35 @@
+From 33797aa193a2751da26f9af120e39c110defe4d1 Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Sat, 10 Dec 2016 19:53:56 +0100
+Subject: [PATCH] pppoe: include netinet/in.h before linux/in.h
+
+To fix build breakage.
+---
+ pppd/plugins/rp-pppoe/pppoe.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pppd/plugins/rp-pppoe/pppoe.h b/pppd/plugins/rp-pppoe/pppoe.h
+index 9ab2eee..f77f5b7 100644
+--- a/pppd/plugins/rp-pppoe/pppoe.h
++++ b/pppd/plugins/rp-pppoe/pppoe.h
+@@ -15,6 +15,8 @@
+ 
+ #include "config.h"
+ 
++#include <netinet/in.h>
++
+ #if defined(HAVE_NETPACKET_PACKET_H) || defined(HAVE_LINUX_IF_PACKET_H)
+ #define _POSIX_SOURCE 1 /* For sigaction defines */
+ #endif
+@@ -84,8 +86,6 @@ typedef unsigned long UINT32_t;
+ #include <linux/if_ether.h>
+ #endif
+ 
+-#include <netinet/in.h>
+-
+ #ifdef HAVE_NETINET_IF_ETHER_H
+ #include <sys/types.h>
+ 
+-- 
+2.9.3
+

@@ -1,0 +1,16 @@
+diff -ru ibus-sayura-1.3.2.orig/src/engine.c ibus-sayura-1.3.2/src/engine.c
+--- ibus-sayura-1.3.2.orig/src/engine.c	2013-03-27 05:13:49.000000000 +0100
++++ ibus-sayura-1.3.2/src/engine.c	2019-07-17 12:27:52.139045068 +0200
+@@ -558,10 +558,8 @@
+ 	int i;
+ 	IBusText *text;
+ 	if(sinhala->buffer){
+-		for(i=0; i<sinhala->buffer->len; i++){
+-			text = ibus_text_new_from_unichar(g_array_index(sinhala->buffer, gunichar,i));
+-			ibus_engine_commit_text ((IBusEngine *)sinhala, text);		
+-		}
++		text = ibus_text_new_from_ucs4((gunichar *) sinhala->buffer->data);
++		ibus_engine_commit_text ((IBusEngine *)sinhala, text);
+ 		if(sinhala->buffer->len > 0){
+ 			g_array_remove_range(sinhala->buffer, 0, sinhala->buffer->len);
+ 			ibus_sinhala_engine_update_preedit_text(sinhala);

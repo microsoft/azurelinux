@@ -206,3 +206,6 @@ end
 
 # A directory for appdata metainfo.
 %_metainfodir %{_datadir}/metainfo
+
+# New version of RPM has stricter approach to encoding; turn the errors off temporarily.
+%_invalid_encoding_terminates_build 0

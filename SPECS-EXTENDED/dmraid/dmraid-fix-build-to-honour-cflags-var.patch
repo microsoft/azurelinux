@@ -1,0 +1,17 @@
+diff -purN 1.0.0.rc16.orig/tools/Makefile.in 1.0.0.rc16.new/tools/Makefile.in
+--- 1.0.0.rc16.orig/tools/Makefile.in	2009-09-16 10:55:23.000000000 +0200
++++ 1.0.0.rc16.new/tools/Makefile.in	2015-07-21 14:51:42.004800788 +0200
+@@ -71,11 +71,11 @@ all: $(TARGETS)
+ .PHONY: install_dmraid_tools remove_dmraid_tools
+ 
+ dmraid:	$(OBJECTS) $(top_srcdir)/lib/libdmraid.a
+-	$(CC) -o $@ $(OBJECTS) $(LDFLAGS) -L$(top_srcdir)/lib \
++	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS) -L$(top_srcdir)/lib \
+ 	      -L$(DESTDIR)$(libdir) $(DMRAIDLIBS) $(DMEVENTTOOLLIBS) $(DMRAIDLIBS) $(LIBS) 
+ 
+ dmevent_tool: $(top_srcdir)/lib/libdmraid.a
+-	$(CC) -o $@ $@.c $(INCLUDES) $(LDFLAGS) -L$(top_srcdir)/lib \
++	$(CC) -o $@ $@.c $(INCLUDES) $(CFLAGS) $(LDFLAGS) -L$(top_srcdir)/lib \
+ 	      -L$(DESTDIR)$(libdir) $(DMRAIDLIBS) $(DMEVENTTOOLLIBS) $(DMRAIDLIBS) $(LIBS) 
+ 
+ install_dmraid_tools: $(TARGETS)

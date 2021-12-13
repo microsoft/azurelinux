@@ -1,0 +1,29 @@
+From 84707bf14b51ed9ffc0d7de626e9aaeaa54d2168 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 26 Apr 2016 10:48:59 +0200
+Subject: [PATCH] Regenerate README in UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 10be6eb..74b488d 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -21,7 +21,7 @@ requires 'Pod::Html' => 0;
+ requires 'Pod::Man' => 0;
+ requires 'Pod::Markdown' => 2.0;
+ recommends 'App::pod2pdf';
+-readme_from;    # Self hosting!
++readme_from '', { clean => 1, options => [ utf8 => 1 ]};    # Self hosting!
+ githubmeta;
+ clean_files 'dist have_make LICENSE';
+ if ( $Config{make} and can_run( $Config{make} ) ) {
+-- 
+2.5.5
+
