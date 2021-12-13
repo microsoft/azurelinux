@@ -1,0 +1,48 @@
+From d05b62bb75e6a3e217435a1fe0f15a53e692898c Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Wed, 18 Mar 2020 15:09:33 +0100
+Subject: [PATCH] Port to Python 3.9
+
+On Python 3.9, define _Py_DEC_REFTOTAL which has been removed by:
+https://github.com/python/cpython/commit/49932fec62c616ec88da52642339d83ae719e924
+
+Replace also PyEval_CallObjectWithKeywords() with PyObject_Call(),
+since PyEval_CallObjectWithKeywords() has been deprecated in
+Python 3.9 and PyObject_Call() has the same behavior. The only
+difference is that PyEval_CallObjectWithKeywords() can be called with
+args=NULL, but g_initialstub() ensures that args is not NULL.
+---
+ greenlet.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/greenlet.c b/greenlet.c
+index ec738b9..d37fc97 100644
+--- a/greenlet.c
++++ b/greenlet.c
+@@ -109,6 +109,16 @@ extern PyTypeObject PyGreenlet_Type;
+ #define GREENLET_USE_TRACING 1
+ #endif
+ 
++#ifndef _Py_DEC_REFTOTAL
++  /* _Py_DEC_REFTOTAL macro has been removed from Python 3.9 by:
++    https://github.com/python/cpython/commit/49932fec62c616ec88da52642339d83ae719e924 */
++#  ifdef Py_REF_DEBUG
++#    define _Py_DEC_REFTOTAL _Py_RefTotal--
++#  else
++#    define _Py_DEC_REFTOTAL
++#  endif
++#endif
++
+ /* Weak reference to the switching-to greenlet during the slp switch */
+ static PyGreenlet* volatile ts_target = NULL;
+ /* Strong reference to the switching from greenlet after the switch */
+@@ -820,8 +830,7 @@ static int GREENLET_NOINLINE(g_initialstub)(void* mark)
+ 			result = NULL;
+ 		} else {
+ 			/* call g.run(*args, **kwargs) */
+-			result = PyEval_CallObjectWithKeywords(
+-				run, args, kwargs);
++			result = PyObject_Call(run, args, kwargs);
+ 			Py_DECREF(args);
+ 			Py_XDECREF(kwargs);
+ 		}

@@ -1,7 +1,7 @@
 Summary:        A library for retrieving information onrunning processes and system utilization
 Name:           python-psutil
 Version:        5.6.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Url:            https://pypi.python.org/pypi/psutil
 License:        BSD
 Group:          Development/Languages/Python
@@ -22,6 +22,7 @@ BuildRequires:  ncurses-term
 BuildRequires:  coreutils
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-six
 BuildRequires:  python3-test
 BuildRequires:  python3-setuptools
@@ -47,11 +48,7 @@ FreeBSD, OpenBSD and NetBSD, both 32-bit and 64-bit architectures, with Python v
 %py3_install
 
 %check
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-$easy_install_3 linecache2
-$easy_install_3 pytest
-$easy_install_3 mock
-$easy_install_3 unittest2
+pip3 install linecache2 pytest mock unittest2
 LANG=en_US.UTF-8 make test PYTHON=python%{python3_version}
 
 %files -n python3-psutil
@@ -60,6 +57,9 @@ LANG=en_US.UTF-8 make test PYTHON=python%{python3_version}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 5.6.3-6
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 5.6.3-5
 - Add license to python3 package
 - Remove python2 package

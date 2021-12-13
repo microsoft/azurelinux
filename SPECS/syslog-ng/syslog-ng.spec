@@ -3,7 +3,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.23.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and GPLv2+ and LGPLv2+
 URL:            https://syslog-ng.org/
 Group:          System Environment/Daemons
@@ -31,6 +31,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 %if %{with_check}
 BuildRequires:  curl-devel
+BuildRequires:  python3-pip
 %endif
 Obsoletes:      eventlog
 
@@ -133,11 +134,7 @@ $easy_install_2 ply
 $easy_install_2 pep8
 make %{?_smp_mflags} check
 pushd ../p3dir
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-$easy_install_3 unittest2
-$easy_install_3 nose
-$easy_install_3 ply
-$easy_install_3 pep8
+pip3 install unittest2 nose ply pep8
 make %{?_smp_mflags} check
 popd
 
@@ -194,6 +191,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.23.1-3
+- Replace easy_install usage with pip in %%check sections
+
 *   Tue Oct 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.23.1-2
 -   Added the %%license macro.
 -   License verified.

@@ -1,9 +1,8 @@
-%{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 Name:           apparmor
 Version:        2.13
-Release:        15%{?dist}
-License:        GNU LGPL v2.1
+Release:        16%{?dist}
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Security
@@ -13,6 +12,7 @@ Patch0:         apparmor-set-profiles-complain-mode.patch
 Patch1:         apparmor-service-start-fix.patch
 Patch2:         apparmor-fix-make-check.patch
 Patch3:         apparmor-update-severity-db.patch
+Patch4:         apparmor-fix-python-autoconf-check.patch
 # CVE-2016-1585 has no upstream fix as of 2020/09/28
 Patch100:       CVE-2016-1585.nopatch
 BuildRequires:  apr
@@ -46,6 +46,9 @@ BuildRequires:  python3-xml
 BuildRequires:  swig
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  which
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 AppArmor is a file and network mandatory access control
@@ -55,6 +58,7 @@ vulnerabilities.
 
 %package -n libapparmor
 Summary:        Utility library for AppArmor
+License:        LGPLv2
 Group:          Development/Libraries/C and C++
 
 %description -n libapparmor
@@ -62,6 +66,7 @@ This package contains the AppArmor library.
 
 %package -n libapparmor-devel
 Summary:        Development headers and libraries for libapparmor
+License:        LGPLv2
 Group:          Development/Libraries/C and C++
 Requires:       libapparmor = %{version}-%{release}
 
@@ -149,16 +154,12 @@ Requires:       libapparmor = %{version}-%{release}
 This package contains the AppArmor module for perl.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p1
 
 %build
-export PYTHONPATH=%{_libdir}/python3.7/site-packages
-export PYTHON=%{_bindir}/python3
-export PYTHON_VERSION=3.7
+export PYTHONPATH=%{python3_sitelib}
+export PYTHON=%{python3}
+export PYTHON_VERSION=%{python3_version}
 export PYTHON_VERSIONS=python3
 #Building libapparmor
 cd ./libraries/libapparmor
@@ -193,11 +194,10 @@ cd ../../profiles
 make %{?_smp_mflags}
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pyflakes
-export PYTHONPATH=%{_libdir}/python3.7/site-packages
-export PYTHON=%{_bindir}/python3
-export PYTHON_VERSION=3.7
+pip3 install pyflakes
+export PYTHONPATH=%{python3_sitelib}
+export PYTHON=%{python3}
+export PYTHON_VERSION=%{python3_version}
 export PYTHON_VERSIONS=python3
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_libdir}/"
 cd ./libraries/libapparmor
@@ -208,9 +208,9 @@ cd ../utils
 make check
 
 %install
-export PYTHONPATH=%{_libdir}/python3.7/site-packages
-export PYTHON=%{_bindir}/python3
-export PYTHON_VERSION=3.7
+export PYTHONPATH=%{python3_sitelib}
+export PYTHON=%{python3}
+export PYTHON_VERSION=%{python3_version}
 export PYTHON_VERSIONS=python3
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{_libdir}/"
 cd libraries/libapparmor
@@ -230,7 +230,7 @@ make DESTDIR=%{buildroot} install
 
 %files -n libapparmor
 %defattr(-,root,root)
-%license LICENSE
+%license LICENSE libraries/libapparmor/COPYING.LGPL
 %{_libdir}/libapparmor.so.*
 
 %post -n libapparmor -p /sbin/ldconfig
@@ -346,6 +346,11 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.13-16
+- Remove hardcoded python3 variables in favor of macros to enable build with Python 3.9
+- Add upstream patch to fix autoconf macro for python3 >= 3.8
+- License verified
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13-15
 - Added missing BR on "systemd-rpm-macros".
 

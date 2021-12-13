@@ -1,7 +1,7 @@
 Summary:        A network address manipulation library for Python
 Name:           python-netaddr
 Version:        0.7.19
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
 %if %{with_check}
+BuildRequires:  python3-pip
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 %endif
@@ -39,8 +40,7 @@ A network address manipulation library for Python
 ln -s netaddr %{buildroot}/%{_bindir}/netaddr3
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pytest
+pip3 install pytest
 LANG=en_US.UTF-8 PYTHONPATH=./ %{python3} setup.py test
 
 %files -n python3-netaddr
@@ -51,6 +51,9 @@ LANG=en_US.UTF-8 PYTHONPATH=./ %{python3} setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-10
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-9
 - Add license to python3 package
 - Remove python2 package

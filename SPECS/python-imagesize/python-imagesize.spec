@@ -1,7 +1,7 @@
 Summary:        python module to analyze jpeg/jpeg2000/png/gif image header and return image size.
 Name:           python-imagesize
 Version:        1.1.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,8 +37,7 @@ Python 3 module to analyze jpeg/jpeg2000/png/gif image header and return image s
 %py3_install
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pytest pathlib2 pluggy
+pip3 install pytest pathlib2 pluggy
 %{python3} setup.py test
 popd
 
@@ -48,6 +47,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-8
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-7
 - Add license to python3 package
 - Remove python2 package

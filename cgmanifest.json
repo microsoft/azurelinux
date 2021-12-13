@@ -6571,16 +6571,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-nose",
-          "version": "1.3.7",
-          "downloadUrl": "https://pypi.python.org/packages/source/n/nose/nose-1.3.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-ntplib",
           "version": "0.3.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/29/8b/85a86e01c510665b0790d3a9fd4532ad98aba9e185a676113a0ae3879350/ntplib-0.3.3.tar.gz"
@@ -7202,8 +7192,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.10",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.10/Python-3.7.10.tar.xz"
+          "version": "3.9.9",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tar.xz"
         }
       }
     },

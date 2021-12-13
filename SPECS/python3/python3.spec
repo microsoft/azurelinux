@@ -1,9 +1,14 @@
 %global openssl_flags -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL2 -DOPENSSL_NO_COMP
 %global __brp_python_bytecompile %{nil}
+%global majmin 3.9
+# See Lib/ensurepip/__init__.py in Source0 for these version numbers
+%global pip_version 21.2.4
+%global setuptools_version 58.1.0
+
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.7.10
-Release:        3%{?dist}
+Version:        3.9.9
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,9 +16,6 @@ Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 Patch0:         cgi3.patch
-Patch1:         python3-support-mariner-platform.patch
-Patch2:         Replace-unsupported-TLS-methods.patch
-Patch3:         fix_broken_mariner_ssl_tests.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
@@ -25,7 +27,7 @@ BuildRequires:  sqlite-devel
 BuildRequires:  xz-devel
 Requires:       ncurses
 Requires:       openssl
-Requires:       python3-libs = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       readline
 Requires:       xz
 Provides:       python
@@ -46,7 +48,7 @@ Python 3 brings more efficient ways of handling dictionaries, better unicode
 strings support, easier and more intuitive syntax, and removes the deprecated
 code. It is incompatible with Python 2.x releases.
 
-%package libs
+%package        libs
 Summary:        The libraries for python runtime
 Group:          Applications/System
 Requires:       bzip2-libs
@@ -54,26 +56,19 @@ Requires:       expat >= 2.1.0
 Requires:       libffi >= 3.0.13
 Requires:       ncurses
 Requires:       sqlite-libs
+# python3-xml is provided for Mariner 1.0 compatibility
+Provides:       %{name}-xml = %{version}-%{release}
 
 %description    libs
 The python interpreter can be embedded into applications wanting to
 use python as an embedded scripting language.  The python-libs package
 provides the libraries needed for python 3 applications.
 
-%package        xml
-Summary:        XML libraries for python3 runtime
-Group:          Applications/System
-Requires:       python3 = %{version}-%{release}
-Requires:       python3-libs = %{version}-%{release}
-
-%description    xml
-The python3-xml package provides the libraries needed for XML manipulation.
-
 %package        curses
 Summary:        Python module interface for NCurses Library
 Group:          Applications/System
 Requires:       ncurses
-Requires:       python3-libs = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description    curses
 The python3-curses package provides interface for ncurses library.
@@ -82,12 +77,8 @@ The python3-curses package provides interface for ncurses library.
 Summary:        The libraries and header files needed for Python development.
 Group:          Development/Libraries
 Requires:       expat-devel >= 2.1.0
-Requires:       python3 = %{version}-%{release}
-Requires:       python3-setuptools = %{version}-%{release}
-Requires:       python3-xml = %{version}-%{release}
-# Needed here because of the migration of Makefile from -devel to the main
-# package
-Conflicts:      python3 < %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-setuptools = %{version}-%{release}
 
 %description    devel
 The Python programming language's interpreter can be extended with
@@ -103,7 +94,7 @@ documentation.
 %package        tools
 Summary:        A collection of development tools included with Python.
 Group:          Development/Tools
-Requires:       python3 = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description    tools
 The Python package includes several development tools that are used
@@ -112,10 +103,9 @@ to build python programs.
 %package        pip
 Summary:        The PyPA recommended tool for installing Python packages.
 Group:          Development/Tools
-Requires:       python3 = %{version}-%{release}
-Requires:       python3-xml = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Provides:       python3dist(pip) = %{version}-%{release}
-Provides:       python3.7dist(pip) = %{version}-%{release}
+Provides:       python%{majmin}dist(pip) = %{version}-%{release}
 BuildArch:      noarch
 
 %description    pip
@@ -124,19 +114,18 @@ The PyPA recommended tool for installing Python packages.
 %package        setuptools
 Summary:        Download, build, install, upgrade, and uninstall Python packages.
 Group:          Development/Tools
-Requires:       python3 = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Provides:       python3dist(setuptools) = %{version}-%{release}
-Provides:       python3.7dist(setuptools) = %{version}-%{release}
-Requires:       python3-xml
+Provides:       python3.9dist(setuptools) = %{version}-%{release}
 BuildArch:      noarch
 
 %description    setuptools
 setuptools is a collection of enhancements to the Python distutils that allow you to more easily build and distribute Python packages, especially ones that have dependencies on other packages.
 
-%package test
+%package        test
 Summary:        Regression tests package for Python.
 Group:          Development/Tools
-Requires:       python3 = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description test
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
@@ -150,22 +139,33 @@ export OPT="%{optflags} %{openssl_flags}"
     CFLAGS="%{optflags} %{openssl_flags}" \
     CXXFLAGS="%{optflags} %{openssl_flags}" \
     --enable-shared \
+    --with-platlibdir=%{_lib} \
     --with-system-expat \
     --with-system-ffi \
     --with-dbmliborder=gdbm:ndbm \
-    --with-ensurepip=yes
-make %{?_smp_mflags}
+    --with-ensurepip=no \
+    --enable-optimizations
+%make_build
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
-chmod -v 755 %{buildroot}%{_libdir}/libpython3.7m.so.1.0
+%make_install
 %{_fixperms} %{buildroot}/*
-ln -sf libpython3.7m.so %{buildroot}%{_libdir}/libpython3.7.so
+
+# Installing pip/setuptools via ensurepip fails in our toolchain.
+# The versions of these tools from the raw toolchain are detected,
+# and install fails. We will install these two bundled wheels manually.
+# https://github.com/pypa/pip/issues/3063
+# https://bugs.python.org/issue31916
+pushd Lib/ensurepip/_bundled
+pip3 install --no-cache-dir --no-index --ignore-installed \
+    --root %{buildroot} \
+    setuptools-%{setuptools_version}-py3-none-any.whl \
+    pip-%{pip_version}-py3-none-any.whl
+popd
 
 # Install pathfix.py to bindir
-cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix3.7.py
-ln -s ./pathfix3.7.py %{buildroot}%{_bindir}/pathfix.py
+cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{majmin}.py
+ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
 
 # Remove unused stuff
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
@@ -177,74 +177,61 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 # %check
 # make  %{?_smp_mflags} test
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-, root, root)
 %license LICENSE
 %doc README.rst
 %{_bindir}/pydoc*
-%{_bindir}/pyvenv*
 %{_bindir}/python3
-%{_bindir}/python3.7
-%{_bindir}/python3.7m
+%{_bindir}/python%{majmin}
 %{_mandir}/*/*
 
-%dir %{_libdir}/python3.7
-%dir %{_libdir}/python3.7/site-packages
+%dir %{_libdir}/python%{majmin}
+%dir %{_libdir}/python%{majmin}/site-packages
 
-%{_libdir}/libpython3.so
-%{_libdir}/libpython3.7.so
-%{_libdir}/libpython3.7m.so.1.0
-
-%exclude %{_libdir}/python3.7/ctypes/test
-%exclude %{_libdir}/python3.7/distutils/tests
-%exclude %{_libdir}/python3.7/sqlite3/test
-%exclude %{_libdir}/python3.7/idlelib/idle_test
-%exclude %{_libdir}/python3.7/test
-%exclude %{_libdir}/python3.7/lib-dynload/_ctypes_test.*.so
+%exclude %{_libdir}/python%{majmin}/ctypes/test
+%exclude %{_libdir}/python%{majmin}/distutils/tests
+%exclude %{_libdir}/python%{majmin}/sqlite3/test
+%exclude %{_libdir}/python%{majmin}/idlelib/idle_test
+%exclude %{_libdir}/python%{majmin}/test
+%exclude %{_libdir}/python%{majmin}/lib-dynload/_ctypes_test.*.so
 
 %files libs
 %defattr(-,root,root)
 %license LICENSE
 %doc README.rst
-%{_libdir}/python3.7
-%{_libdir}/python3.7/site-packages/easy_install.py
-%{_libdir}/python3.7/site-packages/README.txt
-%exclude %{_libdir}/python3.7/site-packages/
-%exclude %{_libdir}/python3.7/ctypes/test
-%exclude %{_libdir}/python3.7/distutils/tests
-%exclude %{_libdir}/python3.7/sqlite3/test
-%exclude %{_libdir}/python3.7/idlelib/idle_test
-%exclude %{_libdir}/python3.7/test
-%exclude %{_libdir}/python3.7/lib-dynload/_ctypes_test.*.so
-%exclude %{_libdir}/python3.7/xml
-%exclude %{_libdir}/python3.7/lib-dynload/pyexpat*.so
-%exclude %{_libdir}/python3.7/curses
-%exclude %{_libdir}/python3.7/lib-dynload/_curses*.so
-%exclude %{_libdir}/python3.7/distutils/command/wininst-*.exe
-
-%files xml
-%{_libdir}/python3.7/xml/*
-%{_libdir}/python3.7/lib-dynload/pyexpat*.so
+%{_libdir}/libpython3.so
+%{_libdir}/libpython%{majmin}.so.1.0
+%{_libdir}/python%{majmin}
+%{_libdir}/python%{majmin}/site-packages/README.txt
+%exclude %{_libdir}/python%{majmin}/site-packages/
+%exclude %{_libdir}/python%{majmin}/ctypes/test
+%exclude %{_libdir}/python%{majmin}/distutils/tests
+%exclude %{_libdir}/python%{majmin}/sqlite3/test
+%exclude %{_libdir}/python%{majmin}/idlelib/idle_test
+%exclude %{_libdir}/python%{majmin}/test
+%exclude %{_libdir}/python%{majmin}/lib-dynload/_ctypes_test.*.so
+%exclude %{_libdir}/python%{majmin}/curses
+%exclude %{_libdir}/python%{majmin}/lib-dynload/_curses*.so
 
 %files curses
-%{_libdir}/python3.7/curses/*
-%{_libdir}/python3.7/lib-dynload/_curses*.so
+%{_libdir}/python%{majmin}/curses/*
+%{_libdir}/python%{majmin}/lib-dynload/_curses*.so
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
-%{_libdir}/pkgconfig/python-3.7.pc
-%{_libdir}/pkgconfig/python-3.7m.pc
-%{_libdir}/pkgconfig/python3.pc
-%{_libdir}/libpython3.7m.so
+%{_libdir}/pkgconfig/python-%{majmin}.pc
+%{_libdir}/pkgconfig/python-%{majmin}-embed.pc
+%{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/pkgconfig/%{name}-embed.pc
+%{_libdir}/libpython%{majmin}.so
 %{_bindir}/python3-config
-%{_bindir}/python3.7-config
-%{_bindir}/python3.7m-config
+%{_bindir}/python%{majmin}-config
 %{_bindir}/pathfix.py
-%{_bindir}/pathfix3.7.py
+%{_bindir}/pathfix%{majmin}.py
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
 %exclude %{_bindir}/2to3*
 %exclude %{_bindir}/idle*
@@ -252,27 +239,36 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %files tools
 %defattr(-,root,root,755)
 %doc Tools/README
-%{_libdir}/python3.7/lib2to3
-%{_bindir}/2to3-3.7
+%{_libdir}/python%{majmin}/lib2to3
+%{_bindir}/2to3-%{majmin}
 %exclude %{_bindir}/idle*
 
 %files pip
 %defattr(-,root,root,755)
-%{_libdir}/python3.7/site-packages/pip/*
-%{_libdir}/python3.7/site-packages/pip-20.1.1.dist-info/*
+%{_libdir}/python%{majmin}/site-packages/pip/*
+%{_libdir}/python%{majmin}/site-packages/pip-%{pip_version}.dist-info/*
 %{_bindir}/pip*
 
 %files setuptools
 %defattr(-,root,root,755)
-%{_libdir}/python3.7/site-packages/pkg_resources/*
-%{_libdir}/python3.7/site-packages/setuptools/*
-%{_libdir}/python3.7/site-packages/setuptools-47.1.0.dist-info/*
-%{_bindir}/easy_install-3.7
+%{_libdir}/python%{majmin}/site-packages/pkg_resources/*
+%{_libdir}/python%{majmin}/site-packages/setuptools/*
+%{_libdir}/python%{majmin}/site-packages/_distutils_hack/
+%{_libdir}/python%{majmin}/site-packages/setuptools-%{setuptools_version}.dist-info/*
 
 %files test
-%{_libdir}/python3.7/test/*
+%{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-1
+- Upgrade to latest release in 3.9 series
+- Add profile guided optimization to configuration
+- Fold xml subpackage into libs subpackage and add compatibility provides
+- Align libpython*.so* file packaging with other distros
+- Manually install pip/setuptools wheels
+- Remove irrelevant patches
+- License verified
+
 * Fri May 07 2021 Daniel Burgener <daburgen@microsoft.com> 3.7.10-3
 - Remove coreutils dependency to remove circular dependency with libselinux
 
