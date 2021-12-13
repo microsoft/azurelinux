@@ -1,0 +1,48 @@
+diff -up WordNet-3.0/doc/man/wishwn.1.orig WordNet-3.0/doc/man/wishwn.1
+--- WordNet-3.0/doc/man/wishwn.1.orig	2009-01-14 00:47:21.000000000 +0100
++++ WordNet-3.0/doc/man/wishwn.1	2009-01-14 00:47:43.000000000 +0100
+@@ -0,0 +1,44 @@
++.\" Copyright (c) 2001  Andreas Tille <tille@debian.org>
++.\"
++.\" This manual page is free software; you can redistribute it and/or modify
++.\" it under the terms of the GNU General Public License as published by
++.\" the Free Software Foundation; either version 2 of the License, or
++.\" (at your option) any later version.
++.\"
++.\" This program is distributed in the hope that it will be useful,
++.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
++.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++.\" GNU General Public License for more details.
++.\"
++.\" You should have received a copy of the GNU General Public License
++.\" along with this program; if not, write to the Free Software
++.\" Foundation, Inc.,59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++.\"
++.\" This manual page is written especially for Debian Linux.
++.\"
++.TH WISHWN 1 "May 2001" "Debian Project" "Debian GNU/Linux"
++.SH NAME
++wishwn \- default version of the Tcl_AppInit procedure for wnb(1)
++
++.SH SYNOPSIS
++it is intended to be run from wnb (see wnb.1)
++
++.SH DESCRIPTION
++
++Provides a default version of the Tcl_AppInit procedure for
++use in wish and similar Tk-based applications.
++
++Acts as a gateway between Tcl and the Wordnet C library.  It
++contains stubs for all the commands added to the default Tcl and Tk set
++for this Wordnet application, as well as the routine that initializes them.
++
++.SH SEE ALSO
++.BR wn (1),
++.BR wnb (1).
++
++.SH AUTHOR
++.B wishwn
++was written by the authors of wordnet 1.6.
++.PP
++This manual page was created by Andreas Tille <tille@debian.org>
++for the Debian GNU/Linux system. Feel free to improve this!

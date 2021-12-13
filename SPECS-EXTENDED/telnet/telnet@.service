@@ -1,0 +1,7 @@
+[Unit]
+Description=Telnet Server
+After=local-fs.target
+
+[Service]
+ExecStart=-/usr/sbin/in.telnetd
+StandardInput=socket

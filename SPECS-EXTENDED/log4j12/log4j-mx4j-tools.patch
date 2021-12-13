@@ -1,0 +1,13 @@
+Index: build.xml
+===================================================================
+--- build.xml.orig
++++ build.xml
+@@ -167,7 +167,7 @@
+         <and>
+             <available classname="javax.management.MBeanInfo"
+                        classpath="${jmx.jar}"/>
+-            <available classname="com.sun.jdmk.comm.HtmlAdaptorServer">
++            <available classname="mx4j.tools.adaptor.AdaptorServerSocketFactory">
+                 <classpath>
+                     <pathelement location="${jmx.jar}"/>
+ 					<pathelement location="${javaee-api.jar}"/>

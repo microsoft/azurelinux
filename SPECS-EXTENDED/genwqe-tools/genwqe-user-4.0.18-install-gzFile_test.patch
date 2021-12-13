@@ -1,0 +1,11 @@
+diff -up genwqe-user-4.0.18/tools/Makefile.than genwqe-user-4.0.18/tools/Makefile
+--- genwqe-user-4.0.18/tools/Makefile.than	2017-02-13 15:26:30.887046956 +0100
++++ genwqe-user-4.0.18/tools/Makefile	2017-02-13 15:27:01.084890726 +0100
+@@ -110,6 +110,7 @@ install_gzip_tools: all
+ 	install -D -m 755 zlib_mt_perf   -T $(DESTDIR)/bin/zlib_mt_perf
+ 	install -D -m 755 genwqe_mt_perf -T $(DESTDIR)/bin/genwqe_mt_perf
+ 	install -D -m 755 genwqe_test_gz -T $(DESTDIR)/bin/genwqe_test_gz
++	install -D -m 755 gzFile_test -T $(DESTDIR)/bin/gzFile_test
+ 
+ uninstall_gzip_tools:
+ 	$(RM) $(DESTDIR)/bin/genwqe_gzip \

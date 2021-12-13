@@ -1,0 +1,84 @@
+From 49bf49b99a7ffb12b68035f096c160bc51e48775 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 21 Nov 2019 09:22:33 +0100
+Subject: [PATCH] Use system Object::HashBase
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL                 | 1 +
+ lib/Term/Table.pm           | 2 +-
+ lib/Term/Table/Cell.pm      | 2 +-
+ lib/Term/Table/CellStack.pm | 2 +-
+ lib/Term/Table/LineBreak.pm | 2 +-
+ 5 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 44de066..4d4c7d4 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
+     "Carp" => 0,
+     "Importer" => "0.024",
+     "List::Util" => 0,
++    "Object::HashBase" => "0.008",
+     "Scalar::Util" => 0
+   },
+   "TEST_REQUIRES" => {
+diff --git a/lib/Term/Table.pm b/lib/Term/Table.pm
+index 578eba8..3190bcd 100644
+--- a/lib/Term/Table.pm
++++ b/lib/Term/Table.pm
+@@ -11,7 +11,7 @@ use Scalar::Util qw/blessed/;
+ use List::Util qw/max sum/;
+ use Carp qw/croak carp/;
+ 
+-use Term::Table::HashBase qw/rows _columns collapse max_width mark_tail sanitize show_header auto_columns no_collapse header allow_overflow pad/;
++use Object::HashBase 0.008 qw/rows _columns collapse max_width mark_tail sanitize show_header auto_columns no_collapse header allow_overflow pad/;
+ 
+ sub BORDER_SIZE()   { 4 }    # '| ' and ' |' borders
+ sub DIV_SIZE()      { 3 }    # ' | ' column delimiter
+diff --git a/lib/Term/Table/Cell.pm b/lib/Term/Table/Cell.pm
+index 978ef06..10d2b70 100644
+--- a/lib/Term/Table/Cell.pm
++++ b/lib/Term/Table/Cell.pm
+@@ -9,7 +9,7 @@ use Term::Table::Util qw/uni_length/;
+ 
+ use List::Util qw/sum/;
+ 
+-use Term::Table::HashBase qw/value border_left border_right _break _widths border_color value_color reset_color/;
++use Object::HashBase 0.008 qw/value border_left border_right _break _widths border_color value_color reset_color/;
+ 
+ my %CHAR_MAP = (
+     # Special case, \n should render as \n, but also actually do the newline thing
+diff --git a/lib/Term/Table/CellStack.pm b/lib/Term/Table/CellStack.pm
+index 7b99f6a..a948d10 100644
+--- a/lib/Term/Table/CellStack.pm
++++ b/lib/Term/Table/CellStack.pm
+@@ -4,7 +4,7 @@ use warnings;
+ 
+ our $VERSION = '0.015';
+ 
+-use Term::Table::HashBase qw/-cells -idx/;
++use Object::HashBase 0.008 qw/-cells -idx/;
+ 
+ use List::Util qw/max/;
+ 
+diff --git a/lib/Term/Table/LineBreak.pm b/lib/Term/Table/LineBreak.pm
+index dc70ca3..ef95f7e 100644
+--- a/lib/Term/Table/LineBreak.pm
++++ b/lib/Term/Table/LineBreak.pm
+@@ -8,7 +8,7 @@ use Carp qw/croak/;
+ use Scalar::Util qw/blessed/;
+ use Term::Table::Util qw/uni_length/;
+ 
+-use Term::Table::HashBase qw/string gcstring _len _parts idx/;
++use Object::HashBase 0.008 qw/string gcstring _len _parts idx/;
+ 
+ sub init {
+     my $self = shift;
+-- 
+2.21.0
+

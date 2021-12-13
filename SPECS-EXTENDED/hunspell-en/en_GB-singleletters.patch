@@ -1,0 +1,56 @@
+--- wordlist.orig/en_GB.dic	2005-05-26 11:49:30.000000000 +0100
++++ wordlist/en_GB.dic	2008-11-28 10:01:37.000000000 +0000
+@@ -1,4 +1,4 @@
+-46280
++46286
+ abaft
+ abbreviation/M
+ abdicate/DNGSn
+@@ -2278,6 +2278,7 @@
+ hysterectomy/SM
+ Hyundai/M
+ ICC/M
++i
+ icebox/SM
+ icicle/SM
+ iconoclasm/MS
+@@ -2470,6 +2471,7 @@
+ Ithacan
+ its
+ ix
++j
+ jackknife/DGMS
+ Jacqueline
+ Jaeger/M
+@@ -2764,6 +2766,7 @@
+ Mabel/M
+ Macedon
+ Macedonia/M
++m
+ macintosh/SM
+ MacIntyre
+ Mackenzie
+@@ -3222,6 +3225,7 @@
+ nuttiness/S
+ nymphomaniac/S
+ Oakland/M
++o
+ ob.
+ obeyer/EM
+ obfuscation/M
+@@ -4797,6 +4801,7 @@
+ tyro/SM
+ UFO/S
+ Ukrainian/S
++u
+ ulcerate/SGNDn
+ ulcerous
+ Ulrika/M
+@@ -4962,6 +4967,7 @@
+ vulnerability/SI
+ vulva/M
+ WAC
++w
+ wagon/SM
+ waitress/MS
+ Waldemar/M

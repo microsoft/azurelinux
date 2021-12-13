@@ -1,0 +1,68 @@
+diff -rupN --no-dereference scotch_6.0.9/src/esmumps/Makefile scotch_6.0.9-new/src/esmumps/Makefile
+--- scotch_6.0.9/src/esmumps/Makefile	2019-05-10 17:34:57.000000000 +0200
++++ scotch_6.0.9-new/src/esmumps/Makefile	2019-11-05 15:04:03.335685594 +0100
+@@ -148,7 +148,7 @@ libesmumps$(LIB)		:	graph_graph$(OBJ)
+ 					esmumps$(OBJ)				\
+ 					esmumps_f$(OBJ)				\
+ 					esmumps_strats$(OBJ)
+-					$(AR) $(ARFLAGS) $(@) $(?)
++					$(AR) $(ARFLAGS) $(@) $(?) $(LDFLAGS) -L ../libscotch -lscotch
+ 					-$(RANLIB) $(@)
+ 
+ main_esmumps$(EXE)		:	main_esmumps.c				\
+diff -rupN --no-dereference scotch_6.0.9/src/libscotch/Makefile scotch_6.0.9-new/src/libscotch/Makefile
+--- scotch_6.0.9/src/libscotch/Makefile	2019-11-04 13:18:39.000000000 +0100
++++ scotch_6.0.9-new/src/libscotch/Makefile	2019-11-05 15:04:03.336685593 +0100
+@@ -3092,26 +3092,26 @@ ptscotchf.h			:	ptdummysizes$(EXE)			\
+ 					library_pt_f.h
+ 					./ptdummysizes$(EXE) "-s$(SCOTCH_NAME_SUFFIX)" library_pt_f.h ptscotchf.h
+ 
+-libscotch$(LIB)			:	$(LIBSCOTCHDEPS)
+-					$(AR) $(ARFLAGS) $(@) $(?)
++libscotch$(LIB)			:	$(LIBSCOTCHDEPS) libscotcherr$(LIB)
++					$(AR) $(ARFLAGS) $(@) $(?) $(LDFLAGS) -L . -lscotcherr
+ 					-$(RANLIB) $(@)
+ 
+ libscotcherr$(LIB)		:	library_error$(OBJ)
+-					$(AR) $(ARFLAGS) $(@) $(?)
++					$(AR) $(ARFLAGS) $(@) $(?) $(LDFLAGS)
+ 					-$(RANLIB) $(@)
+ 
+ libscotcherrexit$(LIB)		:	library_error_exit$(OBJ)
+-					$(AR) $(ARFLAGS) $(@) $(?)
++					$(AR) $(ARFLAGS) $(@) $(?) $(LDFLAGS)
+ 					-$(RANLIB) $(@)
+ 
+-libptscotch$(LIB)		:	$(LIBPTSCOTCHDEPS)
+-					$(AR) $(ARFLAGS) $(@) $(?)
++libptscotch$(LIB)		:	$(LIBPTSCOTCHDEPS) libscotch$(LIB)
++					$(AR) $(ARFLAGS) $(@) $(?) $(LDFLAGS) -L . -lscotch
+ 					-$(RANLIB) $(@)
+ 
+ libptscotcherr$(LIB)		:	library_error_pt$(OBJ)
+-					$(AR) $(ARFLAGS) $(@) $(?)
++					$(AR) $(ARFLAGS) $(@) $(?) $(LDFLAGS)
+ 					-$(RANLIB) $(@)
+ 
+ libptscotcherrexit$(LIB)	:	library_error_exit_pt$(OBJ)
+-					$(AR) $(ARFLAGS) $(@) $(?)
++					$(AR) $(ARFLAGS) $(@) $(?) $(LDFLAGS)
+ 					-$(RANLIB) $(@)
+diff -rupN --no-dereference scotch_6.0.9/src/libscotchmetis/Makefile scotch_6.0.9-new/src/libscotchmetis/Makefile
+--- scotch_6.0.9/src/libscotchmetis/Makefile	2019-05-19 01:42:19.000000000 +0200
++++ scotch_6.0.9-new/src/libscotchmetis/Makefile	2019-11-05 15:04:03.336685593 +0100
+@@ -142,12 +142,12 @@ libptscotchparmetis$(LIB)	:	parmetis_dgr
+ 					parmetis_dgraph_order_f$(OBJ)		\
+ 					parmetis_dgraph_part$(OBJ)		\
+ 					parmetis_dgraph_part_f$(OBJ)
+-					$(AR) $(ARFLAGS) $(@) $(^)
++					$(AR) $(ARFLAGS) $(@) $(^) $(LDFLAGS) -L ../libscotch -lptscotch
+ 					-$(RANLIB) $(@)
+ 
+ libscotchmetis$(LIB)		:	metis_graph_order$(OBJ)			\
+ 					metis_graph_order_f$(OBJ)		\
+ 					metis_graph_part$(OBJ)			\
+ 					metis_graph_part_f$(OBJ)
+-					$(AR) $(ARFLAGS) $(@) $(^)
++					$(AR) $(ARFLAGS) $(@) $(^) $(LDFLAGS) -L ../libscotch -lscotch
+ 					-$(RANLIB) $(@)

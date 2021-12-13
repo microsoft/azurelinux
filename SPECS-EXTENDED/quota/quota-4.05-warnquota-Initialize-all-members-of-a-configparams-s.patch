@@ -1,0 +1,61 @@
+From 50c3f30d610ed9979a1291422e8641e05f881212 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 5 Nov 2019 14:20:46 +0100
+Subject: [PATCH] warnquota: Initialize all members of a configparams structure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Running warnquota under valgrind reported many "Conditional jump or
+move depends on uninitialised value" mistakes because readconfigfile()
+did not initizalize ldap_bindpw member if some of the configuration
+options were missing from the configuration file.
+
+This patch simply initializes all bytes of the configparams structure
+to 0 instead of settting each of the members explicitly.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ warnquota.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/warnquota.c b/warnquota.c
+index f6b42d5..2882fee 100644
+--- a/warnquota.c
++++ b/warnquota.c
+@@ -759,13 +759,13 @@ static int readconfigfile(const char *filename, struct configparams *config)
+ 	char *locale;
+ 
+ 	/* set default values */
++	memset(config, 0, sizeof(*config));
+ 	sstrncpy(config->mail_cmd, MAIL_CMD, CNF_BUFFER);
+ 	sstrncpy(config->from, FROM, CNF_BUFFER);
+ 	sstrncpy(config->subject, SUBJECT, CNF_BUFFER);
+ 	sstrncpy(config->cc_to, CC_TO, CNF_BUFFER);
+ 	sstrncpy(config->support, SUPPORT, CNF_BUFFER);
+ 	sstrncpy(config->phone, PHONE, CNF_BUFFER);
+-	(config->charset)[0] = '\0';
+ 	setlocale(LC_ALL, NULL);
+ 	locale = setlocale(LC_MESSAGES, NULL);
+ #ifdef HAVE_NL_LANGINFO
+@@ -775,17 +775,11 @@ static int readconfigfile(const char *filename, struct configparams *config)
+ 	}
+ #endif
+ 	maildev[0] = 0;
+-	config->user_signature = config->user_message = config->group_signature = config->group_message = NULL;
+ 	config->cc_before = -1;
+ 
+ #ifdef USE_LDAP_MAIL_LOOKUP
+-	config->use_ldap_mail = 0;
+-	config->ldap_starttls = 0;
+ 	config->ldap_tls = LDAP_OPT_X_TLS_NEVER;
+ 	config->ldap_vers = LDAP_VERSION3;
+-	config->ldap_port = config->ldap_is_setup = 0;
+-	config->ldap_host[0] = 0;
+-	config->ldap_uri[0] = 0;
+ #endif
+ 
+ 	if (!(fp = fopen(filename, "r"))) {
+-- 
+2.21.0
+

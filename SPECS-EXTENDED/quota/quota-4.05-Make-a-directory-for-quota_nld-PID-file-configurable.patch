@@ -1,0 +1,74 @@
+From bbcf9eedb2299ab55a0ae208e196eb2ca59ad97e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 30 May 2019 13:20:25 +0200
+Subject: [PATCH] Make a directory for quota_nld PID file configurable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+While Filesystem Hierarchy Standard prescribes /var/run path for
+storing PID files, some (systemd-based) distributions uses /run.
+
+This patch adds a --with-pid-dir=DIRECTORY option to the ./configure
+script. The option enables to change the path. Default one is
+/var/run as used to be until now.
+
+(I did not use $localstatedir environment variable because Autoconf
+manual allows using "precious" variables only in a makefile.)
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ configure.ac | 10 ++++++++++
+ quota_nld.c  |  4 ++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b783568..3cb57c5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -277,6 +277,15 @@ AS_IF([test "$with_proc_mounts" != "no"], [
+     AC_DEFINE_UNQUOTED([ALT_MTAB], ["$with_proc_mounts"], [File with mounted filesystems])
+ ])
+ 
++AC_ARG_WITH([pid-dir],
++    [AS_HELP_STRING([--with-pid-dir=DIRECTORY], [Create PID files in this directory instead of /var/run])],
++    [with_pid_dir="$withval"]
++)
++AS_IF([test "X$with_pid_dir" == "X" -o "$with_pid_dir" == "yes" -o "$with_pid_dir" == "no"],[
++    with_pid_dir="/var/run"
++])
++AC_DEFINE_UNQUOTED([PID_DIR], ["$with_pid_dir"], [Directory for PID files])
++
+ AC_DEFINE_UNQUOTED([COMPILE_OPTS], ["$COMPILE_OPTS"], [Configuration options])
+ 
+ AC_CONFIG_FILES([
+@@ -297,6 +306,7 @@ Build configuration:
+ 	libwrap:         ${build_libwrap}
+ 	netlink:         ${build_netlink}
+ 	nls:             ${enable_nls}
++	pid-dir:         ${with_pid_dir}
+ 	proc-mounts:     ${with_proc_mounts}
+ 	rpc:             ${build_rpc}
+ 	rpcsetquota:     ${enable_rpcsetquota}
+diff --git a/quota_nld.c b/quota_nld.c
+index ac24bdb..72d99a9 100644
+--- a/quota_nld.c
++++ b/quota_nld.c
+@@ -403,12 +403,12 @@ static char *build_pid_file_name(void)
+ 		errstr(_("Undefined program name.\n"));
+ 		return NULL;
+ 	}
+-	pid_name = malloc(9 + strlen(progname) + 4 + 1);
++	pid_name = malloc(strlen(PID_DIR) + 1 + strlen(progname) + 4 + 1);
+ 	if (!pid_name) {
+ 		errstr(_("Not enough memory to build PID file name.\n"));
+ 		return NULL;
+ 	}
+-	sprintf(pid_name, "/var/run/%s.pid", progname);
++	sprintf(pid_name, "%s/%s.pid", PID_DIR, progname);
+ 	return pid_name;
+ }
+ 
+-- 
+2.20.1
+

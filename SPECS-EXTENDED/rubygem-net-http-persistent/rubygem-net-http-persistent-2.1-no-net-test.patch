@@ -1,0 +1,10 @@
+--- net-http-persistent-2.1/test/test_net_http_persistent.rb.net	2011-10-09 03:15:00.000000000 +0900
++++ net-http-persistent-2.1/test/test_net_http_persistent.rb	2011-10-09 03:52:17.000000000 +0900
+@@ -257,6 +257,7 @@
+   end
+ 
+   def test_connection_for_no_ssl_reuse
++    skip "No net available"
+     @http.reuse_ssl_sessions = false
+     @http.open_timeout = 123
+     @http.read_timeout = 321

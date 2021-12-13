@@ -1,0 +1,74 @@
+--- device_reference.txt	2014-05-29 22:18:46.000000000 +0200
++++ device_reference_utf8.txt	2014-11-24 20:51:17.647221466 +0100
+@@ -60,7 +60,7 @@
+ ########################################################
+ # Option GlobeTrotter GT MAX 3.6 (aka "T-Mobile Web'n'walk Card Compact II")
+ #
+-# Contributor: Bernd HolzmÃ¼ller
++# Contributor: Bernd Holzmüller
+ 
+ DefaultVendor=  0x05c6
+ DefaultProduct= 0x1000
+@@ -279,7 +279,7 @@
+ #
+ # Probably works with DetachStorageOnly too
+ #
+-# Contributor: FlÃƒÂ¡vio Moringa and others
++# Contributor: Flávio Moringa and others
+ 
+ DefaultVendor=  0x19d2
+ DefaultProduct= 0x2000
+@@ -777,7 +777,7 @@
+ #
+ # Recommended init command: ATE0V1&D2&C1S0=0
+ #
+-# Contributor: JÃƒÂ©rÃƒÂ´me Oufella
++# Contributor: Jérôme Oufella
+ 
+ DefaultVendor=  0x1004
+ DefaultProduct= 0x1000
+@@ -1336,7 +1336,7 @@
+ ########################################################
+ # LG HDM-2100 (EVDO Rev.A USB modem)
+ #
+-# Contributor: JÃƒÂ©rÃƒÂ´me Oufella
++# Contributor: Jérôme Oufella
+ 
+ DefaultVendor= 0x1004
+ DefaultProduct=0x607f
+@@ -1641,7 +1641,7 @@
+ ########################################################
+ # Huawei U8110 / U8300 / Joy, Vodafone 845 (Android smartphone)
+ #
+-# Contributor: David Erosa GarcÃƒÂ­a
++# Contributor: David Erosa García
+ 
+ DefaultVendor= 0x12d1
+ DefaultProduct=0x1031
+@@ -1658,7 +1658,7 @@
+ ########################################################
+ # Nokia CS-10
+ #
+-# Contributor: WacÃ…â€šaw Sierek
++# Contributor: Wacław Sierek
+ 
+ DefaultVendor= 0x0421
+ DefaultProduct=0x060c
+@@ -1700,7 +1700,7 @@
+ #######################################################
+ # Samsung GT-B3730
+ #
+-# Contributor: Per ÃƒËœyvind Karlsen
++# Contributor: Per Øyvind Karlsen
+ 
+ DefaultVendor= 0x04e8
+ DefaultProduct=0x689a
+@@ -1771,7 +1771,7 @@
+ #######################################################
+ # Huawei EC168C (from Zantel)
+ #
+-# Contributor: Ãƒâ€¦smund Hjulstad
++# Contributor: Åsmund Hjulstad
+ 
+ DefaultVendor= 0x12d1
+ DefaultProduct=0x1446

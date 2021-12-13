@@ -1,0 +1,255 @@
+From ac9f85cd5fdab1d51defa363b31235c45560c7f6 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Fri, 12 Feb 2016 09:45:20 +0100
+Subject: [PATCH 1/4] Port to current maven-dependency-tree
+
+---
+ pom.xml                                            |  2 +-
+ .../apache/felix/bundleplugin/BundleAllPlugin.java | 54 ++++++++++++----------
+ .../apache/felix/bundleplugin/BundlePlugin.java    | 30 ++++++------
+ 3 files changed, 46 insertions(+), 40 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index dfbf237..46b2ba6 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -192,7 +192,7 @@
+   <dependency>
+    <groupId>org.apache.maven.shared</groupId>
+    <artifactId>maven-dependency-tree</artifactId>
+-   <version>2.1</version>
++   <version>3.0</version>
+   </dependency>
+   <dependency>
+    <groupId>org.codehaus.plexus</groupId>
+diff --git a/src/main/java/org/apache/felix/bundleplugin/BundleAllPlugin.java b/src/main/java/org/apache/felix/bundleplugin/BundleAllPlugin.java
+index f3b5509..6591923 100644
+--- a/src/main/java/org/apache/felix/bundleplugin/BundleAllPlugin.java
++++ b/src/main/java/org/apache/felix/bundleplugin/BundleAllPlugin.java
+@@ -21,8 +21,10 @@ package org.apache.felix.bundleplugin;
+ 
+ import java.io.File;
+ import java.io.FilenameFilter;
++import java.util.ArrayDeque;
+ import java.util.Arrays;
+ import java.util.Collection;
++import java.util.Deque;
+ import java.util.HashSet;
+ import java.util.Iterator;
+ import java.util.LinkedHashMap;
+@@ -38,7 +40,6 @@ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.artifact.factory.ArtifactFactory;
+ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+ import org.apache.maven.artifact.repository.ArtifactRepository;
+-import org.apache.maven.artifact.resolver.ArtifactCollector;
+ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+ import org.apache.maven.artifact.resolver.ArtifactResolver;
+@@ -49,13 +50,14 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
+ import org.apache.maven.plugins.annotations.Mojo;
+ import org.apache.maven.plugins.annotations.Parameter;
+ import org.apache.maven.plugins.annotations.ResolutionScope;
++import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
+ import org.apache.maven.project.MavenProjectBuilder;
+ import org.apache.maven.project.ProjectBuildingException;
++import org.apache.maven.project.ProjectBuildingRequest;
+ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+-import org.apache.maven.shared.dependency.tree.DependencyNode;
+-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
+-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
++import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
++import org.apache.maven.shared.dependency.graph.DependencyNode;
+ import org.codehaus.plexus.util.FileUtils;
+ 
+ import aQute.bnd.osgi.Analyzer;
+@@ -92,24 +94,18 @@ public class BundleAllPlugin extends ManifestPlugin
+      */
+     @Parameter( property = "wrapImportPackage", defaultValue = "*" )
+     private String wrapImportPackage;
+-
+     @Component
+     private ArtifactFactory m_factory;
+ 
+     @Component
+     private ArtifactMetadataSource m_artifactMetadataSource;
+ 
+-    @Component
+-    private ArtifactCollector m_collector;
+-
+     /**
+      * Artifact resolver, needed to download jars.
+      */
+     @Component
+     private ArtifactResolver m_artifactResolver;
+ 
+-    @Component
+-    private DependencyTreeBuilder m_dependencyTreeBuilder;
+ 
+     @Component
+     private MavenProjectBuilder m_mavenProjectBuilder;
+@@ -180,17 +176,19 @@ public class BundleAllPlugin extends ManifestPlugin
+ 
+         try
+         {
+-            dependencyTree = m_dependencyTreeBuilder.buildDependencyTree( project, localRepository, m_factory,
+-                m_artifactMetadataSource, null, m_collector );
++            ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
++            request.setProject(getProject());
++            request.setRepositorySession(session.getRepositorySession());
++            dependencyTree = m_dependencyGraphBuilder.buildDependencyGraph(request, null);
+         }
+-        catch ( DependencyTreeBuilderException e )
++        catch ( DependencyGraphBuilderException e )
+         {
+             throw new MojoExecutionException( "Unable to build dependency tree", e );
+         }
+ 
+         BundleInfo bundleInfo = new BundleInfo();
+ 
+-        if ( !dependencyTree.hasChildren() )
++        if ( dependencyTree.getChildren().isEmpty())
+         {
+             /* no need to traverse the tree */
+             return bundleRoot( project, bundleInfo );
+@@ -198,20 +196,27 @@ public class BundleAllPlugin extends ManifestPlugin
+ 
+         getLog().debug( "Will bundle the following dependency tree" + LS + dependencyTree );
+ 
+-        for ( Iterator it = dependencyTree.inverseIterator(); it.hasNext(); )
++        Deque<DependencyNode> stack = new ArrayDeque<DependencyNode>();
++        stack.push(dependencyTree);
++        Set<DependencyNode> visited = new HashSet<DependencyNode>();
++        while (!stack.isEmpty())
+         {
+-            DependencyNode node = ( DependencyNode ) it.next();
+-            if ( !it.hasNext() )
++            DependencyNode node = stack.pop();
++            if (visited.contains(node))
+             {
+-                /* this is the root, current project */
+-                break;
++                continue;
+             }
+-
+-            if ( node.getState() != DependencyNode.INCLUDED )
++            visited.add(node);
++            if (node.getChildren() != null)
+             {
+-                continue;
++                stack.addAll(node.getChildren());
+             }
+ 
++            //if ( node.getState() != DependencyNode.INCLUDED )
++            //{
++            //    continue;
++            //}
++
+             if ( Artifact.SCOPE_SYSTEM.equals( node.getArtifact().getScope() ) )
+             {
+                 getLog().debug( "Ignoring system scoped artifact " + node.getArtifact() );
+@@ -235,12 +240,11 @@ public class BundleAllPlugin extends ManifestPlugin
+ 
+             node.getArtifact().setFile( artifact.getFile() );
+ 
+-            int nodeDepth = node.getDepth();
+-            if ( nodeDepth > maxDepth )
++            if ( stack.size() > maxDepth )
+             {
+                 /* node is deeper than we want */
+                 getLog().debug(
+-                    "Ignoring " + node.getArtifact() + ", depth is " + nodeDepth + ", bigger than " + maxDepth );
++                    "Ignoring " + node.getArtifact() + ", depth is " + stack.size() + ", bigger than " + maxDepth );
+                 continue;
+             }
+ 
+diff --git a/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java b/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
+index 1dcf1c1..3e4384e 100644
+--- a/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
++++ b/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
+@@ -72,15 +72,15 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
+ import org.apache.maven.plugins.annotations.Mojo;
+ import org.apache.maven.plugins.annotations.Parameter;
+ import org.apache.maven.plugins.annotations.ResolutionScope;
++import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
+ import org.apache.maven.project.MavenProjectBuilder;
+ import org.apache.maven.project.MavenProjectHelper;
+ import org.apache.maven.project.ProjectBuildingException;
++import org.apache.maven.project.ProjectBuildingRequest;
+ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+ import org.apache.maven.shared.dependency.graph.DependencyNode;
+-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
+-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+ import org.apache.maven.shared.osgi.DefaultMaven2OsgiConverter;
+ import org.apache.maven.shared.osgi.Maven2OsgiConverter;
+ import org.codehaus.plexus.archiver.UnArchiver;
+@@ -225,9 +225,6 @@ public class BundlePlugin extends AbstractMojo
+     @Component
+     protected MavenProjectBuilder mavenProjectBuilder;
+ 
+-    @Component
+-    private DependencyTreeBuilder dependencyTreeBuilder;
+-
+     /**
+      * The dependency graph builder to use.
+      */
+@@ -347,7 +344,10 @@ public class BundlePlugin extends AbstractMojo
+         DependencyNode dependencyGraph;
+         try
+         {
+-            dependencyGraph = m_dependencyGraphBuilder.buildDependencyGraph( mavenProject, null );
++            ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
++            request.setProject(mavenProject);
++            request.setRepositorySession(session.getRepositorySession());
++            dependencyGraph = m_dependencyGraphBuilder.buildDependencyGraph( request, null );
+         }
+         catch ( DependencyGraphBuilderException e )
+         {
+@@ -758,7 +758,7 @@ public class BundlePlugin extends AbstractMojo
+     // We need to find the direct dependencies that have been included in the uber JAR so that we can modify the
+     // POM accordingly.
+     private void createDependencyReducedPom( Set<String> artifactsToRemove )
+-            throws IOException, DependencyTreeBuilderException, ProjectBuildingException
++            throws IOException, DependencyGraphBuilderException, ProjectBuildingException
+     {
+         Model model = project.getOriginalModel();
+         List<Dependency> dependencies = new ArrayList<Dependency>();
+@@ -901,24 +901,26 @@ public class BundlePlugin extends AbstractMojo
+     }
+ 
+     public boolean updateExcludesInDeps( MavenProject project, List<Dependency> dependencies, List<Dependency> transitiveDeps )
+-            throws DependencyTreeBuilderException
++    throws DependencyGraphBuilderException
+     {
+-        org.apache.maven.shared.dependency.tree.DependencyNode node = dependencyTreeBuilder.buildDependencyTree(project, localRepository, artifactFactory,
+-                artifactMetadataSource, null,
+-                artifactCollector);
++        ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
++        request.setProject(project);
++        request.setRepositorySession(session.getRepositorySession());
++        DependencyNode node = dependencyGraphBuilder.buildDependencyGraph(request, null);
+         boolean modified = false;
+         Iterator it = node.getChildren().listIterator();
+         while ( it.hasNext() )
+         {
+-            org.apache.maven.shared.dependency.tree.DependencyNode n2 = (org.apache.maven.shared.dependency.tree.DependencyNode) it.next();
++            DependencyNode n2 = (DependencyNode) it.next();
+             Iterator it2 = n2.getChildren().listIterator();
+             while ( it2.hasNext() )
+             {
+-                org.apache.maven.shared.dependency.tree.DependencyNode n3 = (org.apache.maven.shared.dependency.tree.DependencyNode) it2.next();
++                DependencyNode n3 = (DependencyNode) it2.next();
+                 //anything two levels deep that is marked "included"
+                 //is stuff that was excluded by the original poms, make sure it
+                 //remains excluded IF promoting transitives.
+-                if ( n3.getState() == org.apache.maven.shared.dependency.tree.DependencyNode.INCLUDED )
++                //if ( n3.getState() == org.apache.maven.shared.dependency.tree.DependencyNode.INCLUDED )
++                if (true)
+                 {
+                     //check if it really isn't in the list of original dependencies.  Maven
+                     //prior to 2.0.8 may grab versions from transients instead of
+-- 
+2.14.3
+

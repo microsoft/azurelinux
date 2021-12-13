@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "bsh-2.0-b6.tar.gz": "fefbbece1a68c0c5bce9934ce371a8116b58a315e386ae2d5d9acf20acac2a81",
+  "bsh-desktop.desktop": "ee50b4de5941dcf5cc0a79390080fcae582533ea8fa2d7d7a33ffc81a4310d32",
+  "generate-tarball.sh": "a400b180ab2458e01483ece6c81a71d8efcc96a1ba4247c4b7699d2295124ce2"
+ }
+}

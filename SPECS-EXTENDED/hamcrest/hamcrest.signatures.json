@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "hamcrest-core-MANIFEST.MF": "e7f9896a592acd79ce343d631f08482066cfb1e48e7de8948c6696bb65543ead",
+  "hamcrest-generator-MANIFEST.MF": "e3b43dbebc2ff7c0fdf5325ae7a41c034fca453ffb9a373c122fa8d5e40581cb",
+  "hamcrest-integration-MANIFEST.MF": "8cbd6c66f9c6151629f784323bc3f995c959629f2159794c40056988e11a5381",
+  "hamcrest-java-1.3.tar.gz": "6ac31de50c6f3b047a7bd7f62ab7ca3e88b2a8449d22b0978c9f575740d0e085",
+  "hamcrest-library-MANIFEST.MF": "4f7a10eacd248f4bfba6d3a25d63195b87893789e686d7b64ac17fc9b09953a3"
+ }
+}

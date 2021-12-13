@@ -1,0 +1,3 @@
+# dir isn't version, but it's contents is
+addFilter("shlib-policy-nonversioned-dir")
+addFilter("no-dependency-on")

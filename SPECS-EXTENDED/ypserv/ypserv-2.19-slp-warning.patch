@@ -1,0 +1,15 @@
+diff -up ./etc/ypserv.conf.slp-warning ./etc/ypserv.conf
+--- ./etc/ypserv.conf.slp-warning	2006-10-12 13:03:32.000000000 +0200
++++ ./etc/ypserv.conf	2013-05-06 18:32:16.581509617 +0200
+@@ -13,9 +13,9 @@
+ 
+ # Should we register ypserv with SLP? Only available if SLP support
+ # is compiled in. Deprecated functionality.
+-slp: no
++# slp: no
+ # After how many seconds we should re-register ypserv with SLP?
+-slp_timeout: 3600
++# slp_timeout: 3600
+ 
+ # xfr requests are only allowed from ports < 1024
+ xfr_check_port: yes

@@ -1,0 +1,199 @@
+--- build.xml.sav	2003-11-15 06:42:11.000000000 +0100
++++ build.xml	2005-08-10 11:58:48.000000000 +0200
+@@ -9,7 +9,8 @@
+   <property name="midp4palm.home" value="c:/util/midp4palm1.0" />
+ 
+ 
+-  <property name="target" value="1.1" />
++  <property name="target" value="1.6" />
++  <property name="source" value="1.6" />
+   <!-- set global properties for this build -->
+ 
+   <property name="name" value="XML Pull Parser"/>
+@@ -165,7 +166,7 @@
+ 
+   <target name="intf" depends="prepare">
+     <mkdir dir="${build_intf}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_intf}" destdir="${build_intf}"/>
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_intf}" destdir="${build_intf}"/>
+     <touch file="${build_intf}/PullParser${version}_VERSION"/>
+   </target>
+ 
+@@ -175,7 +176,7 @@
+ 
+   <target name="impl_tag" depends="intf">
+     <mkdir dir="${build_impl_tag}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_tag}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_tag}"
+       destdir="${build_impl_tag}"
+       classpath="${build_intf}">
+ 
+@@ -185,7 +186,7 @@
+ 
+   <target name="impl_node" depends="intf">
+     <mkdir dir="${build_impl_node}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_node}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_node}"
+       destdir="${build_impl_node}"
+       classpath="${build_intf}:${build_impl_tag}">
+ 
+@@ -195,7 +196,7 @@
+ 
+   <target name="impl_format" depends="intf">
+     <mkdir dir="${build_impl_format}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_format}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_format}"
+       destdir="${build_impl_format}"
+       classpath="${build_intf}">
+ 
+@@ -205,7 +206,7 @@
+ 
+   <target name="impl_pp" depends="impl_tag,intf">
+     <mkdir dir="${build_impl_pp}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_pp}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_pp}"
+       destdir="${build_impl_pp}"
+       classpath="${build_intf}:${build_impl_tag}">
+ 
+@@ -215,7 +216,7 @@
+ 
+   <target name="impl" depends="intf,impl_tag,impl_pp,impl_node,impl_format,drivers">
+     <mkdir dir="${build_impl_factory}/META-INF/services"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_factory}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_factory}"
+       destdir="${build_impl_factory}"
+       classpath="${build_intf}:${build_impl_tag}:${build_impl_pp}:${build_impl_node}:${build_impl_format}">
+         <patternset refid="all.source.files"/>
+@@ -247,7 +248,7 @@
+ 
+   <target name="impl_small" depends="intf,impl_tag,impl_pp">
+     <mkdir dir="${build_impl_small}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_small}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_impl_small}"
+       destdir="${build_impl_small}"
+       classpath="${build_intf}:${build_impl_tag}:${build_impl_pp}">
+       <patternset refid="all.source.files"/>
+@@ -271,7 +272,7 @@
+ 
+   <target name="x2impl_pp" if="x2_present" depends="intf,check_x2">
+     <mkdir dir="${build_x2impl_pp}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_x2impl_pp}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}" srcdir="${src_x2impl_pp}"
+       destdir="${build_x2impl_pp}"
+       classpath="${build_intf}">
+     </javac>
+@@ -279,7 +280,7 @@
+ 
+   <target name="x2impl" if="x2_present" depends="x2impl_pp,drivers">
+     <mkdir dir="${build_x2impl_factory}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_x2impl_factory}"
+       destdir="${build_x2impl_factory}"
+       classpath="${build_intf}:${build_impl_tag}:${build_x2impl_pp}:${build_impl_node}:${build_impl_format}">
+@@ -304,7 +305,7 @@
+ 
+   <target name="samples" depends="intf">
+     <mkdir dir="${build_samples}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_samples}" destdir="${build_samples}"
+       classpath="${build_intf}"
+     >
+@@ -319,7 +320,7 @@
+ 
+   <target name="api_sax2" depends="prepare">
+     <mkdir dir="${build_api_sax2}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_api_sax2}" destdir="${build_api_sax2}"
+     >
+     </javac>
+@@ -327,7 +328,7 @@
+ 
+   <target name="driver_sax2" depends="api_sax2,intf">
+     <mkdir dir="${build_driver_sax2}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_driver_sax2}" destdir="${build_driver_sax2}"
+       classpath="${build_api_sax2}:${build_intf}"
+     >
+@@ -336,7 +337,7 @@
+ 
+   <target name="api_jaxp11" depends="api_sax2">
+     <mkdir dir="${build_api_jaxp11}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_api_jaxp11}" destdir="${build_api_jaxp11}"
+       classpath="${build_api_sax2}"
+     >
+@@ -350,7 +351,7 @@
+     <!--copy todir="${build_driver_jaxp11}/META-INF/services">
+       <fileset dir="${src_driver_jaxp11}/META-INF/services/"/>
+     </copy-->
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_driver_jaxp11}" destdir="${build_driver_jaxp11}"
+       classpath="${build_api_sax2}:${build_driver_sax2}:${build_api_jaxp11}:${build_intf}"
+     >
+@@ -385,7 +386,7 @@
+     <delete dir="${build_j2me}/count_midlet" />
+     <mkdir dir="${build_j2me}/count_midlet"/>
+ 
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_samples}" destdir="${build_j2me}/count_midlet"
+       bootclasspath="${j2mewtk.home}/lib/midpapi.zip"
+       classpath="${build_intf}"
+@@ -426,7 +427,7 @@
+   <!-- thi is special verion of XPP2 that is equivalent to impl_small but smaller -->
+   <target name="impl_tiny" depends="prepare">
+     <mkdir dir="${build_impl_tiny}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_impl_tiny}"
+       destdir="${build_impl_tiny}"
+       >
+@@ -443,7 +444,7 @@
+     <delete dir="${build_j2me}/count_midlet_tiny" />
+     <mkdir dir="${build_j2me}/count_midlet_tiny"/>
+ 
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_samples}" destdir="${build_j2me}/count_midlet_tiny"
+       bootclasspath="${j2mewtk.home}/lib/midpapi.zip"
+       classpath="${build_impl_tiny}"
+@@ -529,7 +530,7 @@
+ 
+   <target name="tests" if="junit.present" depends="intf,check_junit">
+     <mkdir dir="${build_tests}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+        srcdir="${src_tests}" destdir="${build_tests}">
+       <classpath refid="test_classpath" />
+     </javac>
+@@ -537,7 +538,7 @@
+ 
+   <target name="tiny_tests" if="junit.present" depends="impl_tiny,check_junit">
+     <mkdir dir="${build_tiny_tests}"/>
+-    <javac target="${target}" debug="${debug}" deprecation="${deprecation}"
++    <javac source="${source}" target="${target}" debug="${debug}" deprecation="${deprecation}"
+       srcdir="${src_tests}" destdir="${build_tiny_tests}" classpath="${build_impl_tiny}:${java.class.path}">
+       <patternset>
+          <exclude name="All**"/>
+@@ -580,6 +581,7 @@
+     <javadoc packagenames="${apidoc_packages}"
+              sourcepath="${src_intf}"
+              destdir="${build_apidoc}"
++             source="1.6"
+              author="true"
+              version="true"
+              use="true"
+@@ -596,6 +598,7 @@
+     <javadoc packagenames="${javadoc_packages}"
+              sourcepath="${src_intf}:${src_impl_factory}:${src_impl_small}:${src_impl_tag}:${src_impl_pp}:${src_impl_node}:${src_impl_format}:${src_x2impl}:${src_x2impl_factory}:${src_x2impl_pp}"
+              destdir="${build_javadoc}"
++             source="1.6"
+              author="true"
+              version="true"
+              use="true"

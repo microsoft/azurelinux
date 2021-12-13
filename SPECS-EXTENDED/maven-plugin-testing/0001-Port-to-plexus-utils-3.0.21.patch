@@ -1,0 +1,39 @@
+From a64a54900d64d7f2b699979a8abd46506d6779ad Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 27 Mar 2015 06:51:35 +0100
+Subject: [PATCH 1/2] Port to plexus-utils 3.0.21
+
+---
+ .../main/java/org/apache/maven/plugin/testing/AbstractMojoTestCase.java | 2 +-
+ pom.xml                                                                 | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/AbstractMojoTestCase.java b/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/AbstractMojoTestCase.java
+index 8b047a7..4d35dc4 100644
+--- a/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/AbstractMojoTestCase.java
++++ b/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/AbstractMojoTestCase.java
+@@ -156,7 +156,7 @@ public abstract class AbstractMojoTestCase
+         XmlStreamReader reader = new XmlStreamReader( is );
+ 
+         InterpolationFilterReader interpolationFilterReader =
+-            new InterpolationFilterReader( new BufferedReader( reader ), container.getContext().getContextData() );
++            new InterpolationFilterReader( new BufferedReader( reader ), ( Map ) container.getContext().getContextData() );
+ 
+         PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build( interpolationFilterReader );
+ 
+diff --git a/pom.xml b/pom.xml
+index 0aab541..d0f0e7e 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -194,7 +194,7 @@ under the License.
+       <dependency>
+         <groupId>org.codehaus.plexus</groupId>
+         <artifactId>plexus-utils</artifactId>
+-        <version>3.0.15</version>
++        <version>3.0.21</version>
+         <scope>provided</scope>
+       </dependency>    
+     
+-- 
+2.5.0
+

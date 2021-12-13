@@ -1,0 +1,10 @@
+--- jabberpy-0.5-0-orig/jabber/xmlstream.py	2004-02-03 11:33:37.000000000 -0500
++++ jabberpy-0.5-0/jabber/xmlstream.py	2007-10-03 14:35:29.000000000 -0400
+@@ -385,7 +385,6 @@
+     def disconnect(self):
+         """Close the stream and socket"""
+         self.write ( u"</stream:stream>" )
+-        while self.process(): pass
+         self._sock.close()
+         self._sock = None
+ 

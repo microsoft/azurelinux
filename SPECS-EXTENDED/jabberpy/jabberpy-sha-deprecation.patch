@@ -1,0 +1,42 @@
+diff --git jabberpy-0.5-0/jabber/jabber.py jabberpy-0.5-0/jabber/jabber.py
+index 3074aa5..ab9d9b3 100644
+--- jabber/jabber.py
++++ jabber/jabber.py
+@@ -65,7 +65,8 @@ An example of usage for a simple client would be ( only psuedo code !)
+ # $Id: jabber.py,v 1.58 2004/01/18 05:27:10 snakeru Exp $
+ 
+ import xmlstream
+-import sha, time
++import time
++import hashlib
+ 
+ debug=xmlstream.debug
+ 
+@@ -524,15 +525,15 @@ class Client(Connection):
+             token = auth_ret_query.getTag('token').getData()
+             seq = auth_ret_query.getTag('sequence').getData()
+             self.DEBUG("zero-k authentication supported",(DBG_INIT,DBG_NODE_IQ))
+-            hash = sha.new(sha.new(passwd).hexdigest()+token).hexdigest()
+-            for foo in xrange(int(seq)): hash = sha.new(hash).hexdigest()
++            hash = hashlib.new('sha1', hashlib.new('sha1', passwd).hexdigest()+token).hexdigest()
++            for foo in xrange(int(seq)): hash = hashlib.new('sha1', hash).hexdigest()
+             q.insertTag('hash').insertData(hash)
+ 
+         elif auth_ret_query.getTag('digest'):
+ 
+             self.DEBUG("digest authentication supported",(DBG_INIT,DBG_NODE_IQ))
+             digest = q.insertTag('digest')
+-            digest.insertData(sha.new(
++            digest.insertData(hashlib.new('sha1',
+                 self.getIncomingID() + passwd).hexdigest() )
+         else:
+             self.DEBUG("plain text authentication supported",(DBG_INIT,DBG_NODE_IQ))
+@@ -1397,7 +1398,7 @@ class Component(Connection):
+     def auth(self,secret):
+         """will disconnect on failure"""
+         self.send( u"<handshake id='1'>%s</handshake>"
+-                   % sha.new( self.getIncomingID() + secret ).hexdigest()
++                   % hashlib.new('sha1', self.getIncomingID() + secret ).hexdigest()
+                   )
+         while not self._auth_OK:
+             self.DEBUG("waiting on handshake")

@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "libguestfs.keyring": "de74373a15bd572ad74f276ee063d2cefa915470863829c0dda6af488d6315d8",
+  "virt-v2v-1.42.0.tar.gz": "a177452d990be506e66a7fd986d8a7b727d48158bb564673babe34f94a857547",
+  "virt-v2v-1.42.0.tar.gz.sig": "23c0b0e9984ce2e6ffc913d164af910e0006d9fbb9ea837eb6d601748768243b"
+ }
+}

@@ -1,0 +1,56 @@
+From 399d796ca81507f90a8080e3e58ada54bca023cd Mon Sep 17 00:00:00 2001
+From: Honggang Li <honli@redhat.com>
+Date: Tue, 21 Feb 2017 22:49:19 -0500
+Subject: [PATCH] Extend buffer for uvalue and pvalue
+
+psm_ep.c: In function '__psm_ep_open':
+psm_ep.c:1013:27: error: '%1d' directive output may be truncated writing between 1 and 5 bytes into a region of size 4 [-Werror=format-truncation=]
+      snprintf(pvalue, 4, "%1d", ports[0]);
+                           ^~~
+psm_ep.c:1013:26: note: directive argument in the range [0, 65535]
+      snprintf(pvalue, 4, "%1d", ports[0]);
+                          ^~~~~
+
+Signed-off-by: Honggang Li <honli@redhat.com>
+---
+ psm_ep.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/psm_ep.c b/psm_ep.c
+index 6857895..4114fc8 100644
+--- a/psm_ep.c
++++ b/psm_ep.c
+@@ -978,7 +978,7 @@ __psm_ep_open(psm_uuid_t const unique_job_key, struct psm_ep_open_opts const *op
+     int i, num_rails = 0;
+     char *uname = "IPATH_UNIT";
+     char *pname = "IPATH_PORT";
+-    char uvalue[4], pvalue[4];
++    char uvalue[6], pvalue[6];
+     int devid_enabled[PTL_MAX_INIT];
+     union psmi_envvar_val devs;
+ 
+@@ -1009,8 +1009,8 @@ __psm_ep_open(psm_uuid_t const unique_job_key, struct psm_ep_open_opts const *op
+ 
+ 	/* If multi-rail is used, set the first ep unit/port */
+ 	if (num_rails > 0) {
+-	    snprintf(uvalue, 4, "%1d", units[0]);
+-	    snprintf(pvalue, 4, "%1d", ports[0]);
++	    snprintf(uvalue, 6, "%1d", units[0]);
++	    snprintf(pvalue, 6, "%1d", ports[0]);
+ 	    setenv(uname, uvalue, 1);
+ 	    setenv(pname, pvalue, 1);
+ 	}
+@@ -1037,8 +1037,8 @@ __psm_ep_open(psm_uuid_t const unique_job_key, struct psm_ep_open_opts const *op
+ 
+     if (psmi_device_is_enabled(devid_enabled, PTL_DEVID_IPS)) {
+ 	for (i = 1; i < num_rails; i++) {
+-	    snprintf(uvalue, 4, "%1d", units[i]);
+-	    snprintf(pvalue, 4, "%1d", ports[i]);
++	    snprintf(uvalue, 6, "%1d", units[i]);
++	    snprintf(pvalue, 6, "%1d", ports[i]);
+ 	    setenv(uname, uvalue, 1);
+ 	    setenv(pname, pvalue, 1);
+ 
+-- 
+2.7.4
+

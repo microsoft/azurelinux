@@ -1,0 +1,154 @@
+From 0b72059e1bebb52f41a93de710ae12577769fb50 Mon Sep 17 00:00:00 2001
+From: Miciah Dashiel Butler Masters <miciah.masters@gmail.com>
+Date: Sun, 5 Apr 2009 12:57:35 +0000
+Subject: [PATCH 1/2] Lua: Report bad arguments to edit_bookmark_dialoga
+
+If edit_bookamrk_dialogs is given the wrong number or types of
+arguments, report the problem to the user instead of failing silently.
+
+[upstream commit 6a8e0ccd9bdb06e440b7b147c61f7741dd6d1fcd]
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ src/scripting/lua/core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/scripting/lua/core.c b/src/scripting/lua/core.c
+index bff037b..7712dcd 100644
+--- a/src/scripting/lua/core.c
++++ b/src/scripting/lua/core.c
+@@ -369,6 +369,7 @@ l_edit_bookmark_dialog(LS)
+ 
+ 	if (!lua_isstring(S, 1) || !lua_isstring(S, 2)
+ 	    || !lua_isstring(S, 3) || !lua_isfunction(S, 4)) {
++		alert_lua_error("bad arguments to edit_bookmark_dialog");
+ 		lua_pushnil(S);
+ 		return 1;
+ 	}
+-- 
+1.8.3.1
+
+
+From 8ce643a489dd8dc195aa2f8dc4029ce347093c98 Mon Sep 17 00:00:00 2001
+From: Witold Filipczyk <witekfl@poczta.onet.pl>
+Date: Wed, 21 Jul 2010 19:07:49 +0200
+Subject: [PATCH 2/2] Link against lua51, not lua50.
+
+[upstream commit 331a4dc62b0dbdecba3857d87dc4e12660e5d705]
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ configure.in              | 16 +++++++---------
+ src/scripting/lua/core.c  | 13 +++++--------
+ src/scripting/lua/hooks.c |  6 +++++-
+ 3 files changed, 17 insertions(+), 18 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 3ef8603..ca138ac 100644
+--- a/configure.in
++++ b/configure.in
+@@ -854,10 +854,10 @@ if test -z "$disable_lua"; then
+ 		withval="";
+ 	fi
+ 	for luadir in "$withval" "" /usr /usr/local; do
+-		for suffix in "" 50; do
++		for suffix in "" 51; do
+ 			if test "$cf_result" = no && ( test -f "$luadir/include/lua.h" || \
+ 			   test -f "$luadir/include/lua$suffix/lua.h" ) ; then
+-				LUA_LIBS="-L$luadir/lib -llua$suffix -llualib$suffix -lm"
++				LUA_LIBS="-L$luadir/lib -llua$suffix -lm"
+ 				LUA_CFLAGS="-I$luadir/include -I$luadir/include/lua$suffix"
+ 
+ 				LIBS="$LUA_LIBS $LIBS_X"
+@@ -865,13 +865,11 @@ if test -z "$disable_lua"; then
+ 				CPPFLAGS="$CPPFLAGS_X $LUA_CFLAGS"
+ 
+ 				# Check that it is a compatible Lua version
+-				AC_LINK_IFELSE([AC_LANG_PROGRAM([[	#include <lua.h>
+-						#include <lualib.h>]], [[	lua_State *L = lua_open();
+-						luaopen_base(L);
+-						luaopen_table(L);
+-						luaopen_io(L);
+-						luaopen_string(L);
+-						luaopen_math(L);
++				AC_LINK_IFELSE([AC_LANG_PROGRAM([[	#include <lauxlib.h>]
++						#include <lua.h>
++						#include <lualib.h>
++						], [[	lua_State *L = luaL_newstate();
++						luaL_openlibs(L);
+ 						lua_pushboolean(L, 1);
+ 						lua_close(L);]])],[cf_result=yes],[cf_result=no])
+ 			fi
+diff --git a/src/scripting/lua/core.c b/src/scripting/lua/core.c
+index 7712dcd..1c4dbbc 100644
+--- a/src/scripting/lua/core.c
++++ b/src/scripting/lua/core.c
+@@ -12,6 +12,7 @@
+ #include <unistd.h>
+ #endif
+ 
++#include <lauxlib.h>
+ #include <lua.h>
+ #include <lualib.h>
+ 
+@@ -659,7 +660,7 @@ do_hooks_file(LS, unsigned char *prefix, unsigned char *filename)
+ 	if (file_can_read(file)) {
+ 		int oldtop = lua_gettop(S);
+ 
+-		if (lua_dofile(S, file) != 0)
++		if (luaL_dofile(S, file) != 0)
+ 			sleep(3); /* Let some time to see error messages. */
+ 		lua_settop(S, oldtop);
+ 	}
+@@ -670,13 +671,9 @@ do_hooks_file(LS, unsigned char *prefix, unsigned char *filename)
+ void
+ init_lua(struct module *module)
+ {
+-	L = lua_open();
++	L = luaL_newstate();
+ 
+-	luaopen_base(L);
+-	luaopen_table(L);
+-	luaopen_io(L);
+-	luaopen_string(L);
+-	luaopen_math(L);
++	luaL_openlibs(L);
+ 
+ 	lua_register(L, LUA_ALERT, l_alert);
+ 	lua_register(L, "current_url", l_current_url);
+@@ -781,7 +778,7 @@ handle_ret_eval(struct session *ses)
+ 		int oldtop = lua_gettop(L);
+ 
+ 		if (prepare_lua(ses) == 0) {
+-			lua_dostring(L, expr);
++			luaL_dostring(L, expr);
+ 			lua_settop(L, oldtop);
+ 			finish_lua();
+ 		}
+diff --git a/src/scripting/lua/hooks.c b/src/scripting/lua/hooks.c
+index d79ad80..49b6414 100644
+--- a/src/scripting/lua/hooks.c
++++ b/src/scripting/lua/hooks.c
+@@ -4,6 +4,10 @@
+ #include "config.h"
+ #endif
+ 
++#include <lauxlib.h>
++#include <lua.h>
++#include <lualib.h>
++
+ #include "elinks.h"
+ 
+ #include "cache/cache.h"
+@@ -200,7 +204,7 @@ static enum evhook_status
+ script_hook_quit(va_list ap, void *data)
+ {
+ 	if (!prepare_lua(NULL)) {
+-		lua_dostring(lua_state, "if quit_hook then quit_hook() end");
++		luaL_dostring(lua_state, "if quit_hook then quit_hook() end");
+ 		finish_lua();
+ 	}
+ 
+-- 
+1.8.3.1
+

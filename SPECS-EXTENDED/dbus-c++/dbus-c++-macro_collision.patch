@@ -1,0 +1,14 @@
+diff -rupN libdbus-c++-0.9.0/examples/glib/dbus-browser.h libdbus-c++-0.9.0-new/examples/glib/dbus-browser.h
+--- libdbus-c++-0.9.0/examples/glib/dbus-browser.h	2015-03-05 23:43:26.903517530 +0100
++++ libdbus-c++-0.9.0-new/examples/glib/dbus-browser.h	2011-11-28 16:03:19.000000000 +0100
+@@ -1,9 +1,9 @@
+ #ifndef __DEMO_DBUS_BROWSER_H
+ #define __DEMO_DBUS_BROWSER_H
+ 
++#include <gtkmm.h>
+ #include <dbus-c++/dbus.h>
+ #include <dbus-c++/glib-integration.h>
+-#include <gtkmm.h>
+ 
+ #include "dbus-glue.h"
+ 

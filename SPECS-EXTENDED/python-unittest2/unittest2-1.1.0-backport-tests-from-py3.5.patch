@@ -1,0 +1,45 @@
+--- unittest2/test/test_loader.py.orig	2015-11-15 09:26:43.752421511 +0100
++++ unittest2/test/test_loader.py	2015-11-15 11:02:43.944233784 +0100
+@@ -512,10 +512,20 @@
+     def test_loadTestsFromName__relative_malformed_name(self):
+         loader = unittest.TestLoader()
+ 
++        # XXX Should this raise AttributeError or ValueError?
+         suite = loader.loadTestsFromName('abc () //', unittest)
+         error, test = self.check_deferred_error(loader, suite)
+-        self.check_module_lookup_error(
+-            error, test, 'unittest2', 'abc () //', 'abc \(\) //')
++        if sys.version_info[:2] < (3, 5):
++            expected = "'module' object has no attribute 'abc () //'"
++            expected_regex = "'module' object has no attribute 'abc \(\) //'"
++        else:
++            expected = "module 'unittest2' has no attribute 'abc () //'"
++            expected_regex = "module 'unittest2' has no attribute 'abc \(\) //'"
++        self.assertIn(
++            expected, error,
++            'missing error string in %r' % error)
++        self.assertRaisesRegex(
++            AttributeError, expected_regex, getattr(test, 'abc () //'))
+ 
+     # "The method optionally resolves name relative to the given module"
+     #
+@@ -924,8 +934,17 @@
+         # XXX Should this raise AttributeError or ValueError?
+         suite = loader.loadTestsFromNames(['abc () //'], unittest)
+         error, test = self.check_deferred_error(loader, list(suite)[0])
+-        self.check_module_lookup_error(
+-            error, test, 'unittest2', 'abc () //', 'abc \(\) //')
++        if sys.version_info[:2] < (3, 5):
++            expected = "'module' object has no attribute 'abc () //'"
++            expected_regex = "'module' object has no attribute 'abc \(\) //'"
++        else:
++            expected = "module 'unittest2' has no attribute 'abc () //'"
++            expected_regex = "module 'unittest2' has no attribute 'abc \(\) //'"
++        self.assertIn(
++            expected, error,
++            'missing error string in %r' % error)
++        self.assertRaisesRegex(
++            AttributeError, expected_regex, getattr(test, 'abc () //'))
+ 
+     # "The method optionally resolves name relative to the given module"
+     #

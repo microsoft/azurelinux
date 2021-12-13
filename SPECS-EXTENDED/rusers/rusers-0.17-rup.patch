@@ -1,0 +1,66 @@
+--- netkit-rusers-0.17/rup/rup.c.rup	Sat Jul 22 21:51:40 2000
++++ netkit-rusers-0.17/rup/rup.c	Wed Jul 17 15:08:17 2002
+@@ -256,19 +256,48 @@
+ 	memset(&host_stat, 0, sizeof(host_stat));
+ 	if (clnt_call(rstat_clnt, RSTATPROC_STATS, 
+ 		      (xdrproc_t) xdr_void, NULL, 
+-		      (xdrproc_t) xdr_statstime, &host_stat, 
++		      (xdrproc_t) xdr_statstime,
++		      (caddr_t) &host_stat, 
++
+ 		      foo) != RPC_SUCCESS) 
+ 	{
+ 		warnx("%s",  clnt_sperror(rstat_clnt, host));
+ 		return;
+ 	}
+ 
+-	print_rup_data(host, &host_stat);
++	if (sort_type != SORT_NONE) {
++		remember_rup_data(host, &host_stat);
++	} else {
++		print_rup_data(host, &host_stat);
++	}
+ 	clnt_destroy(rstat_clnt);
+ }
+ 
+ static
+ void
++enumhosts(int argc, char *argv[], int optind)
++{
++	if (sort_type != SORT_NONE) {
++		printf("collecting responses...");
++		fflush(stdout);
++	}
++
++	for (; optind < argc; optind++)
++		onehost(argv[optind]);
++
++	if (sort_type != SORT_NONE) {
++		int i;
++		putchar('\n');
++		qsort(rup_data, rup_data_idx, sizeof(struct rup_data), compare);
++
++		for (i = 0; i < rup_data_idx; i++) {
++			print_rup_data(rup_data[i].host, &rup_data[i].statstime);
++		}
++	}
++}
++
++static
++void
+ allhosts(void)
+ {
+ 	statstime host_stat;
+@@ -337,10 +366,8 @@
+ 
+ 	if (argc == optind)
+ 		allhosts();
+-	else {
+-		for (; optind < argc; optind++)
+-			onehost(argv[optind]);
+-	}
++	else
++		enumhosts(argc, argv, optind);
+ 
+ 	exit(0);
+ }

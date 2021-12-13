@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "clufter-0.77.2-tests.tar.xz": "b8bdac410603c109c459b2ca78bd02e1365503d0f5d32b22ffa68f400efe8b75",
+  "clufter-0.77.2.tar.gz": "c4e3a30b4a7a279ca5b547d3982467fecd7368ab6c7190ca264e173da61a68f1",
+  "clufter-0.77.2.tar.gz.asc": "39bf35b736139742704309e329bf07b6642256241ea680c9866110644fd87b36",
+  "clufter-2019-08-15-5CD7F9EF.keyring": "b2917412ed6d15206235ad98a14f4b51cbe15c66f534965bd31a13c01984305b",
+  "fix-jing-simplified-rng.xsl": "afe60fbdbfb61ad7f84df04a9bb56fbb8b99222db89594c619e8c8d94a4f6011",
+  "pacemaker-borrow-schemas": "0f767afcdf629e7d98b57a248b953c5a589d40b643b3e8d92acf92de47afe5ef"
+ }
+}

@@ -1,0 +1,83 @@
+From 78e995f9f2958fc54e2a559a52c81684dc3460cf Mon Sep 17 00:00:00 2001
+From: giraffedata <giraffedata@98333e67-4a24-44d7-a75c-e53540dd3050>
+Date: Sun, 21 Jan 2018 22:27:31 +0000
+Subject: [PATCH] Remove trace statements accidentally committed with 2977
+
+git-svn-id: https://svn.code.sf.net/p/xmlrpc-c/code/trunk@2981 98333e67-4a24-44d7-a75c-e53540dd3050
+---
+ src/cpp/value.cpp   | 8 --------
+ src/xmlrpc_string.c | 5 -----
+ 2 files changed, 13 deletions(-)
+
+diff --git a/src/cpp/value.cpp b/src/cpp/value.cpp
+index e2c12372..b319430e 100644
+--- a/src/cpp/value.cpp
++++ b/src/cpp/value.cpp
+@@ -1,4 +1,3 @@
+-#include <iostream>
+ /*****************************************************************************
+                                 value.cpp
+ ******************************************************************************
+@@ -622,13 +621,9 @@ public:
+ 
+         switch (nlCode) {
+         case value_string::nlCode_all:
+-            cerr << "Going to call xmlrpc_string_new_lp" << endl;
+-            cerr << "length = " << cppvalue.length() << ", value = "
+-                 << cppvalue.c_str() << endl;
+             this->valueP = xmlrpc_string_new_lp(&env.env_c,
+                                                 cppvalue.length(),
+                                                 cppvalue.c_str());
+-            cerr << "Back from xmlrpc_string_new_lp" << endl;
+             break;
+         case value_string::nlCode_lf:
+             this->valueP = xmlrpc_string_new_lp_cr(&env.env_c,
+@@ -661,12 +656,9 @@ value_string::value_string(std::string          const& cppvalue,
+ 
+ value_string::value_string(std::string const& cppvalue) {
+ 
+-    cerr << "value_string constructor entered" << endl;
+     cNewStringWrapper wrapper(cppvalue, nlCode_all);
+-    cerr << "wrapper constructed" << endl;
+ 
+     this->instantiate(wrapper.valueP);
+-    cerr << "value_string constructor exiting" << endl;
+ }
+ 
+ 
+diff --git a/src/xmlrpc_string.c b/src/xmlrpc_string.c
+index 2da61e4e..e6e00716 100644
+--- a/src/xmlrpc_string.c
++++ b/src/xmlrpc_string.c
+@@ -1,4 +1,3 @@
+-#include <stdio.h>
+ /*=============================================================================
+                               xmlrpc_string
+ ===============================================================================
+@@ -746,15 +745,12 @@ stringNew(xmlrpc_env *     const envP,
+           enum crTreatment const crTreatment,
+           xmlrpc_value **  const valPP) {
+ 
+-    fprintf(stderr, "stringNew entered\n");
+     xmlrpc_value * valP;
+ 
+     xmlrpc_validate_utf8(envP, value, length);
+ 
+     if (!envP->fault_occurred) {
+-        fprintf(stderr, "Going to xmlrpc_createXmlrpcValue\n");
+         xmlrpc_createXmlrpcValue(envP, &valP);
+-        fprintf(stderr, "Back from createXmlrpcValue\n");
+ 
+         if (!envP->fault_occurred) {
+             valP->_type = XMLRPC_TYPE_STRING;
+@@ -774,7 +770,6 @@ stringNew(xmlrpc_env *     const envP,
+                 *valPP = valP;
+         }
+     }
+-    fprintf(stderr, "stringNew exiting\n");
+ }
+ 
+ 
+-- 
+2.17.0
+

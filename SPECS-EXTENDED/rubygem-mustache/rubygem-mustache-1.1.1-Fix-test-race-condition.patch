@@ -1,0 +1,36 @@
+From 407c6a5db6c1f1cfb40bd6113f07f067d07885a4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Mon, 27 Apr 2020 11:16:17 +0200
+Subject: [PATCH] Fix test race condition.
+
+The test suite randomly fails with errors such as:
+
+~~~
+  1) Failure:
+AutoloadingTest#test_autoload_lowercase [/builddir/build/BUILD/mustache-1.1.1/usr/share/gems/gems/mustache-1.1.1/test/autoloading_test.rb:17]:
+Expected: Comments
+  Actual: nil
+~~~
+
+This happens when `test_namespaced*` test cases are executed earlier
+than the remaining test cases, because they are defining
+`view_namespace` but not cleaning up afterwards.
+---
+ test/autoloading_test.rb | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/test/autoloading_test.rb b/test/autoloading_test.rb
+index 0a7ad762..77eb3557 100644
+--- a/test/autoloading_test.rb
++++ b/test/autoloading_test.rb
+@@ -7,6 +7,10 @@ def setup
+     Mustache.view_path = File.dirname(__FILE__) + '/fixtures'
+   end
+ 
++  def teardown
++    Mustache.remove_instance_variable(:@view_namespace) if Mustache.instance_variable_defined?(:@view_namespace)
++  end
++
+   def test_autoload
+     klass = Mustache.view_class(:Comments)
+     assert_equal Comments, klass

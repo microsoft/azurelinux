@@ -1,0 +1,16 @@
+Description: Display a warning instead of failing the build if the plugin
+ is misconfigured and attempts to attach twice the same artifact.
+Author: Emmanuel Bourg <ebourg@apache.org>
+Forwarded: no
+Bug: https://issues.apache.org/jira/browse/MJAR-198
+--- a/src/main/java/org/apache/maven/plugins/jar/AbstractJarMojo.java
++++ b/src/main/java/org/apache/maven/plugins/jar/AbstractJarMojo.java
+@@ -300,7 +300,7 @@
+             {
+                 if ( projectHasAlreadySetAnArtifact() )
+                 {
+-                    throw new MojoExecutionException( "You have to use a classifier "
++                    getLog().warn( "You have to use a classifier "
+                         + "to attach supplemental artifacts to the project instead of replacing them." );
+                 }
+                 getProject().getArtifact().setFile( jarFile );

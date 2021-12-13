@@ -1,0 +1,127 @@
+From 4cd287f3fa3838a31eb6636366f8ce26ee6e1425 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Tue, 28 May 2019 10:52:49 +0200
+Subject: [PATCH] rpc: Clarify error message when cannot connect to rpc.rquotad
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Currently when RPC rquota service is not registered, we report somewhat
+confusing "No such file of directory" error. For other errors when
+creating rquota request we report "Connection refused". There's no big
+difference for user between these errors and neither of them tells what
+really happened. So just unify handling of these errors and report more
+general error telling the user where the problem is.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ quotaops.c      | 14 +++++++++-----
+ rquota_client.c | 14 --------------
+ 2 files changed, 9 insertions(+), 19 deletions(-)
+
+diff --git a/quotaops.c b/quotaops.c
+index e067d29..16475e8 100644
+--- a/quotaops.c
++++ b/quotaops.c
+@@ -124,16 +124,20 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int ignore_noquo
+ #endif
+ 
+ 		if (!(q = handles[i]->qh_ops->read_dquot(handles[i], id))) {
+-			int olderrno = errno;
++			char *estr;
+ 
+-			/* If rpc.rquotad is not running filesystem might be just without quotas... */
+-			if (ignore_noquota &&
+-			    (errno == ENOENT || errno == ECONNREFUSED))
++			/* If rpc.rquotad is not running, filesystem might be just without quotas... */
++			if (ignore_noquota && errno == ECONNREFUSED)
+ 				continue;
+ 
++			if (errno == ECONNREFUSED) {
++				estr = "Cannot connect to RPC quota service";
++			} else {
++				estr = strerror(errno);
++			}
+ 			id2name(id, handles[i]->qh_type, name);
+ 			errstr(_("error while getting quota from %s for %s (id %u): %s\n"),
+-				handles[i]->qh_quotadev, name, id, strerror(olderrno));
++				handles[i]->qh_quotadev, name, id, estr);
+ out_err:
+ 			freeprivs(qhead);
+ 			return NULL;
+diff --git a/rquota_client.c b/rquota_client.c
+index a3a4ae3..7f8e821 100644
+--- a/rquota_client.c
++++ b/rquota_client.c
+@@ -148,7 +148,6 @@ int rpc_rquota_get(struct dquot *dquot)
+ 	} args;
+ 	char *fsname_tmp, *host, *pathname;
+ 	struct timeval timeout = { 2, 0 };
+-	int rquotaprog_not_registered = 0;
+ 	int ret;
+ 
+ 	/*
+@@ -210,8 +209,6 @@ int rpc_rquota_get(struct dquot *dquot)
+ 	}
+ 	else {
+ 		result = NULL;
+-		if (rpc_createerr.cf_stat == RPC_PROGNOTREGISTERED)
+-			rquotaprog_not_registered = 1;
+ 	}
+ 
+ 	if (result == NULL || !result->status) {
+@@ -251,16 +248,12 @@ int rpc_rquota_get(struct dquot *dquot)
+ 				clnt_destroy(clnt);
+ 			} else {
+ 				result = NULL;
+-				if (rpc_createerr.cf_stat == RPC_PROGNOTREGISTERED)
+-					    rquotaprog_not_registered = 1;
+ 			}
+ 		}
+ 	}
+ 	free(fsname_tmp);
+ 	if (result)
+ 		ret = result->status;
+-	else if (rquotaprog_not_registered)
+-		ret = Q_NOQUOTA;
+ 	else
+ 		ret = -1;
+ 	return rquota_err(ret);
+@@ -280,7 +273,6 @@ int rpc_rquota_set(int qcmd, struct dquot *dquot)
+ 	} args;
+ 	char *fsname_tmp, *host, *pathname;
+ 	struct timeval timeout = { 2, 0 };
+-	int rquotaprog_not_registered = 0;
+ 	int ret;
+ 
+ 	/* RPC limits values to 32b variables. Prevent value wrapping. */
+@@ -340,8 +332,6 @@ int rpc_rquota_set(int qcmd, struct dquot *dquot)
+ 	}
+ 	else {
+ 		result = NULL;
+-		if (rpc_createerr.cf_stat == RPC_PROGNOTREGISTERED)
+-			rquotaprog_not_registered = 1;
+ 	}
+ 
+ 	if (result == NULL || !result->status) {
+@@ -383,16 +373,12 @@ int rpc_rquota_set(int qcmd, struct dquot *dquot)
+ 				clnt_destroy(clnt);
+ 			} else {
+ 				result = NULL;
+-				if (rpc_createerr.cf_stat == RPC_PROGNOTREGISTERED)
+-					rquotaprog_not_registered = 1;
+ 			}
+ 		}
+ 	}
+ 	free(fsname_tmp);
+ 	if (result)
+ 		ret = result->status;
+-	else if (rquotaprog_not_registered)
+-		ret = Q_NOQUOTA;
+ 	else
+ 		ret = -1;
+ 	return rquota_err(ret);
+-- 
+2.20.1
+

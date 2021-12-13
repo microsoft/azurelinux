@@ -1,0 +1,11 @@
+diff -up dovecot-2.3.0.1/dovecot.service.in.waitonline dovecot-2.3.0.1/dovecot.service.in
+--- dovecot-2.3.0.1/dovecot.service.in.waitonline	2018-03-01 10:35:39.888371078 +0100
++++ dovecot-2.3.0.1/dovecot.service.in	2018-03-01 10:36:29.738784661 +0100
+@@ -12,6 +12,7 @@ After=local-fs.target network-online.tar
+ 
+ [Service]
+ Type=simple
++ExecStartPre=/usr/libexec/dovecot/prestartscript
+ ExecStart=@sbindir@/dovecot -F
+ PIDFile=@rundir@/master.pid
+ ExecReload=@bindir@/doveadm reload

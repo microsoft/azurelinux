@@ -1,0 +1,22 @@
+--- jdom/package/META-INF/MANIFEST.MF.osgimanifest	2008-07-21 16:00:59.000000000 -0400
++++ jdom/package/META-INF/MANIFEST.MF	2008-07-21 16:02:20.000000000 -0400
+@@ -1,4 +1,19 @@
+ Manifest-Version: 1.0
++Bundle-RequiredExecutionEnvironment: J2SE-1.4
++Bundle-SymbolicName: org.jdom
++Bundle-ManifestVersion: 2
++Bundle-Name: %Bundle-Name.0
++Bundle-Localization: plugin
++Bundle-Version: @version.impl@
++Bundle-Vendor: %Bundle-Vendor.0
++Export-Package: org.jdom;version="@version.impl@",
++ org.jdom.adapters;version="@version.impl@",
++ org.jdom.filter;version="@version.impl@",
++ org.jdom.input;version="@version.impl@",
++ org.jdom.output;version="@version.impl@",
++ org.jdom.transform;version="@version.impl@",
++ org .jdom.xpath;version="@version.impl@"
++Require-Bundle: org.apache.xerces;resolution:=optional
+ 
+ Name: org/jdom/
+ Specification-Title: JDOM Classes

@@ -1,0 +1,16 @@
+From d97ec6e652690a321d7ce8c81aa30f87d9c0de8f Mon Sep 17 00:00:00 2001
+From: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+Date: Mon, 19 Dec 2016 21:33:47 +0100
+Subject: [PATCH 2/2] chmod +x xml-rpc-api2txt
+
+It's script which is installing into $bindir, so it must be executable.
+
+Signed-off-by: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+---
+ tools/xml-rpc-api2txt/xml-rpc-api2txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 tools/xml-rpc-api2txt/xml-rpc-api2txt
+
+diff --git a/tools/xml-rpc-api2txt/xml-rpc-api2txt b/tools/xml-rpc-api2txt/xml-rpc-api2txt
+old mode 100644
+new mode 100755

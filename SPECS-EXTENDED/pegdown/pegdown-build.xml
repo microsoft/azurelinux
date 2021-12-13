@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="pegdown-from-maven" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="build.properties"/>
+
+  <property name="project.groupId" value="org.pegdown"/>
+  <property name="project.artifactId" value="pegdown"/>
+  <property name="project.description" value="A Java 1.5+ library providing a clean and lightweight markdown processor"/>
+  <property name="project.url" value="http://pegdown.org"/>
+  <property name="project.version" value="1.4.2"/>
+  <property name="project.name" value="${project.artifactId}"/>
+  <property name="project.organization.name" value="${project.groupId}"/>
+
+  <property name="spec.version" value="1.4"/>
+
+  <property name="compiler.source" value="1.6"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src/main/java"/>
+  <property name="build.resourceDir" value="."/>
+
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath">
+    <fileset dir="lib">
+      <!-- parboiled-java-1.1.6 parboiled-core-1.1.6 -->
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}"
+           nowarn="false"
+           debug="true"
+           optimize="false"
+           deprecation="true"
+           target="${compiler.target}"
+           verbose="false"
+           fork="false"
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+      </src>
+      <classpath refid="build.classpath"/>
+    </javac>
+    <mkdir dir="${build.outputDir}/META-INF"/>
+    <copy todir="${build.outputDir}/META-INF">
+      <fileset dir="${build.resourceDir}">
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Test-compilation target                                                -->
+  <!-- ====================================================================== -->
+
+  <target name="compile-tests"
+          depends="compile"
+          description="Compile the test code"
+          unless="test.skip">
+    <mkdir dir="${build.testOutputDir}"/>
+    <javac destdir="${build.testOutputDir}"
+           nowarn="false"
+           debug="true"
+           optimize="false"
+           deprecation="true"
+           target="${compiler.target}"
+           verbose="false"
+           fork="false"
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.testDir}"/>
+      </src>
+      <classpath>
+        <path refid="build.test.classpath"/>
+        <pathelement location="${build.outputDir}"/>
+      </classpath>
+    </javac>
+    <copy todir="${build.testOutputDir}">
+      <fileset dir="${build.testResourceDir}"/>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir}"
+             packagenames="*"
+             destdir="${reporting.outputDirectory}/apidocs"
+             access="protected"
+			 classpathref="build.classpath"
+             source="${compiler.source}"
+             verbose="false"
+             version="true"
+             use="true"
+             author="true"
+             splitindex="false"
+             nodeprecated="false"
+             nodeprecatedlist="false"
+             notree="false"
+             noindex="false"
+             nohelp="false"
+             nonavbar="false"
+             serialwarn="false"
+             charset="ISO-8859-1"
+             linksource="false"
+             breakiterator="false"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar"
+         compress="true"
+         index="false"
+         basedir="${build.outputDir}"
+         excludes="**/package.html">
+      <manifest>
+        <attribute name="Bundle-Description" value="${project.description}"/>
+        <attribute name="Bundle-DocURL" value="${project.url}"/>
+        <attribute name="Bundle-License" value="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        <attribute name="Bundle-ManifestVersion" value="2"/>
+        <attribute name="Bundle-Name" value="pegdown"/>
+        <attribute name="Bundle-SymbolicName" value="org.pegdown"/>
+        <attribute name="Bundle-Vendor" value="pegdown.org"/>
+        <attribute name="Bundle-Version" value="${project.version}"/>
+        <attribute name="Export-Package" value="org.pegdown;uses:=&quot;org.parboiled,org.parboiled.annotations,org.parboiled.parserunners,org.parboiled.support,org.pegdown.ast,org.pegdown.plugins&quot;;version=&quot;${project.version}&quot;,org.pegdown.plugins;uses:=&quot;org.parboiled,org.pegdown,org.pegdown.ast&quot;;version=&quot;${project.version}&quot;,org.pegdown.ast;uses:=&quot;org.parboiled.trees&quot;;version=&quot;${project.version}&quot;"/>
+        <attribute name="Implementation-Title" value="${project.name}"/>
+        <attribute name="Implementation-URL" value="${project.url}"/>
+        <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+        <attribute name="Implementation-Vendor-Id" value="${project.groupId}"/>
+        <attribute name="Implementation-Version" value="${project.version}"/>
+        <attribute name="Import-Package" value="org.parboiled,org.parboiled.annotations,org.parboiled.buffers,org.parboiled.common,org.parboiled.errors,org.parboiled.parserunners,org.parboiled.support,org.parboiled.trees,org.pegdown,org.pegdown.ast,org.pegdown.plugins"/>
+        <attribute name="JavaPackages-ArtifactId" value="${project.artifactId}"/>
+        <attribute name="JavaPackages-GroupId" value="${project.groupId}"/>
+        <attribute name="JavaPackages-Version" value="${project.version}"/>
+        <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+        <attribute name="Specification-Title" value="${project.name}"/>
+        <attribute name="Specification-Vendor" value="${project.organization.name}"/>
+        <attribute name="Specification-Version" value="${spec.version}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

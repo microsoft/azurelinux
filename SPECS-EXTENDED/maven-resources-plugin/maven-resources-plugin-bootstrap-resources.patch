@@ -1,0 +1,1329 @@
+--- maven-resources-plugin-3.1.0/src/main/filtered-resources/META-INF/maven/org.apache.maven.plugins/maven-resources-plugin/plugin-help.xml	1970-01-01 01:00:00.000000000 +0100
++++ maven-resources-plugin-3.1.0/src/main/filtered-resources/META-INF/maven/org.apache.maven.plugins/maven-resources-plugin/plugin-help.xml	2019-04-01 08:42:56.035739311 +0200
+@@ -0,0 +1,493 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<plugin>
++  <name>${project.name}</name>
++  <description>${project.description}</description>
++  <groupId>${project.groupId}</groupId>
++  <artifactId>${project.artifactId}</artifactId>
++  <version>${project.version}</version>
++  <goalPrefix>resources</goalPrefix>
++  <mojos>
++    <mojo>
++      <goal>copy-resources</goal>
++      <description>Copy resources of the configured plugin attribute resources</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <implementation>org.apache.maven.plugins.resources.CopyResourcesMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.3</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>addDefaultExcludes</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>delimiters</name>
++          <type>java.util.LinkedHashSet</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeString</name>
++          <type>java.lang.String</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeWindowsPaths</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>fileNameFiltering</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>filters</name>
++          <type>java.util.List</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>includeEmptyDirs</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>mavenFilteringHints</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>nonFilteredFileExtensions</name>
++          <type>java.util.List</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>overwrite</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>resources</name>
++          <type>java.util.List</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>supportMultiLineFiltering</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useBuildFilters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultDelimiters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <addDefaultExcludes implementation="boolean" default-value="true"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}"/>
++        <escapeWindowsPaths implementation="boolean" default-value="true"/>
++        <fileNameFiltering implementation="boolean" default-value="false"/>
++        <includeEmptyDirs implementation="boolean" default-value="false"/>
++        <overwrite implementation="boolean" default-value="false"/>
++        <skip implementation="boolean" default-value="false">${maven.resources.skip}</skip>
++        <supportMultiLineFiltering implementation="boolean" default-value="false"/>
++        <useBuildFilters implementation="boolean" default-value="true"/>
++        <useDefaultDelimiters implementation="boolean" default-value="true"/>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>resources</goal>
++      <description>Copy resources for the main source code to the main output directory. Always uses the project.build.resources element to specify the resources to copy.</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>process-resources</phase>
++      <implementation>org.apache.maven.plugins.resources.ResourcesMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>addDefaultExcludes</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>delimiters</name>
++          <type>java.util.LinkedHashSet</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeString</name>
++          <type>java.lang.String</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeWindowsPaths</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>fileNameFiltering</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>filters</name>
++          <type>java.util.List</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>includeEmptyDirs</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>mavenFilteringHints</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>nonFilteredFileExtensions</name>
++          <type>java.util.List</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources for the main source code to the main output directory. Always uses the project.build.resources element to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>overwrite</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>supportMultiLineFiltering</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useBuildFilters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultDelimiters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <addDefaultExcludes implementation="boolean" default-value="true"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}"/>
++        <escapeWindowsPaths implementation="boolean" default-value="true"/>
++        <fileNameFiltering implementation="boolean" default-value="false"/>
++        <includeEmptyDirs implementation="boolean" default-value="false"/>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.outputDirectory}"/>
++        <overwrite implementation="boolean" default-value="false"/>
++        <skip implementation="boolean" default-value="false">${maven.resources.skip}</skip>
++        <supportMultiLineFiltering implementation="boolean" default-value="false"/>
++        <useBuildFilters implementation="boolean" default-value="true"/>
++        <useDefaultDelimiters implementation="boolean" default-value="true"/>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>testResources</goal>
++      <description>Copy resources for the test source code to the test output directory. Always uses the project.build.testResources element to specify the resources to copy.</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>process-test-resources</phase>
++      <implementation>org.apache.maven.plugins.resources.TestResourcesMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>addDefaultExcludes</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>delimiters</name>
++          <type>java.util.LinkedHashSet</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeString</name>
++          <type>java.lang.String</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeWindowsPaths</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>fileNameFiltering</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>filters</name>
++          <type>java.util.List</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>includeEmptyDirs</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>mavenFilteringHints</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>nonFilteredFileExtensions</name>
++          <type>java.util.List</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources for the test source code to the test output directory. Always uses the project.build.testResources element to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>overwrite</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>resources</name>
++          <type>java.util.List</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources for the test source code to the test output directory. Always uses the project.build.testResources element to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources for the test source code to the test output directory. Always uses the project.build.testResources element to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>supportMultiLineFiltering</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useBuildFilters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultDelimiters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <addDefaultExcludes implementation="boolean" default-value="true"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}"/>
++        <escapeWindowsPaths implementation="boolean" default-value="true"/>
++        <fileNameFiltering implementation="boolean" default-value="false"/>
++        <includeEmptyDirs implementation="boolean" default-value="false"/>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.testOutputDirectory}"/>
++        <overwrite implementation="boolean" default-value="false"/>
++        <resources implementation="java.util.List" default-value="${project.testResources}"/>
++        <skip implementation="boolean" default-value="false">${maven.test.skip}</skip>
++        <supportMultiLineFiltering implementation="boolean" default-value="false"/>
++        <useBuildFilters implementation="boolean" default-value="true"/>
++        <useDefaultDelimiters implementation="boolean" default-value="true"/>
++      </configuration>
++    </mojo>
++  </mojos>
++</plugin>
+--- maven-resources-plugin-3.1.0/src/main/filtered-resources/META-INF/maven/plugin.xml	1970-01-01 01:00:00.000000000 +0100
++++ maven-resources-plugin-3.1.0/src/main/filtered-resources/META-INF/maven/plugin.xml	2019-04-01 08:42:45.083685375 +0200
+@@ -0,0 +1,830 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<plugin>
++  <name>${project.name}</name>
++  <description>${project.description}</description>
++  <groupId>${project.groupId}</groupId>
++  <artifactId>${project.artifactId}</artifactId>
++  <version>${project.version}</version>
++  <goalPrefix>resources</goalPrefix>
++  <isolatedRealm>false</isolatedRealm>
++  <inheritedByDefault>true</inheritedByDefault>
++  <mojos>
++    <mojo>
++      <goal>copy-resources</goal>
++      <description>Copy resources of the configured plugin attribute resources</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <implementation>org.apache.maven.plugins.resources.CopyResourcesMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.3</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>addDefaultExcludes</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>buildFilters</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>delimiters</name>
++          <type>java.util.LinkedHashSet</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeString</name>
++          <type>java.lang.String</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeWindowsPaths</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>fileNameFiltering</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>filters</name>
++          <type>java.util.List</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>includeEmptyDirs</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>mavenFilteringHints</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>nonFilteredFileExtensions</name>
++          <type>java.util.List</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>overwrite</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>resources</name>
++          <type>java.util.List</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>session</name>
++          <type>org.apache.maven.execution.MavenSession</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>supportMultiLineFiltering</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useBuildFilters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultDelimiters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <addDefaultExcludes implementation="boolean" default-value="true"/>
++        <buildFilters implementation="java.util.List" default-value="${project.build.filters}"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}"/>
++        <escapeWindowsPaths implementation="boolean" default-value="true"/>
++        <fileNameFiltering implementation="boolean" default-value="false"/>
++        <includeEmptyDirs implementation="boolean" default-value="false"/>
++        <overwrite implementation="boolean" default-value="false"/>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
++        <skip implementation="boolean" default-value="false">${maven.resources.skip}</skip>
++        <supportMultiLineFiltering implementation="boolean" default-value="false"/>
++        <useBuildFilters implementation="boolean" default-value="true"/>
++        <useDefaultDelimiters implementation="boolean" default-value="true"/>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>org.apache.maven.shared.filtering.MavenResourcesFiltering</role>
++          <role-hint>default</role-hint>
++          <field-name>mavenResourcesFiltering</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++    <mojo>
++      <goal>resources</goal>
++      <description>Copy resources for the main source code to the main output directory. Always uses the project.build.resources element
++to specify the resources to copy.</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>process-resources</phase>
++      <implementation>org.apache.maven.plugins.resources.ResourcesMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>addDefaultExcludes</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>buildFilters</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>delimiters</name>
++          <type>java.util.LinkedHashSet</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeString</name>
++          <type>java.lang.String</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeWindowsPaths</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>fileNameFiltering</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>filters</name>
++          <type>java.util.List</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>includeEmptyDirs</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>mavenFilteringHints</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>nonFilteredFileExtensions</name>
++          <type>java.util.List</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources for the main source code to the main output directory. Always uses the project.build.resources element
++to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>overwrite</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>resources</name>
++          <type>java.util.List</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Copy resources for the main source code to the main output directory. Always uses the project.build.resources element
++to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>session</name>
++          <type>org.apache.maven.execution.MavenSession</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>supportMultiLineFiltering</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useBuildFilters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultDelimiters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <addDefaultExcludes implementation="boolean" default-value="true"/>
++        <buildFilters implementation="java.util.List" default-value="${project.build.filters}"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}"/>
++        <escapeWindowsPaths implementation="boolean" default-value="true"/>
++        <fileNameFiltering implementation="boolean" default-value="false"/>
++        <includeEmptyDirs implementation="boolean" default-value="false"/>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.outputDirectory}"/>
++        <overwrite implementation="boolean" default-value="false"/>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <resources implementation="java.util.List" default-value="${project.resources}"/>
++        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
++        <skip implementation="boolean" default-value="false">${maven.resources.skip}</skip>
++        <supportMultiLineFiltering implementation="boolean" default-value="false"/>
++        <useBuildFilters implementation="boolean" default-value="true"/>
++        <useDefaultDelimiters implementation="boolean" default-value="true"/>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>org.apache.maven.shared.filtering.MavenResourcesFiltering</role>
++          <role-hint>default</role-hint>
++          <field-name>mavenResourcesFiltering</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++    <mojo>
++      <goal>testResources</goal>
++      <description>Copy resources for the test source code to the test output directory.
++Always uses the project.build.testResources element to specify the resources to copy.</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>process-test-resources</phase>
++      <implementation>org.apache.maven.plugins.resources.TestResourcesMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>addDefaultExcludes</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>buildFilters</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>delimiters</name>
++          <type>java.util.LinkedHashSet</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeString</name>
++          <type>java.lang.String</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>escapeWindowsPaths</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>fileNameFiltering</name>
++          <type>boolean</type>
++          <since>3.0.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>filters</name>
++          <type>java.util.List</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>includeEmptyDirs</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>mavenFilteringHints</name>
++          <type>java.util.List</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>nonFilteredFileExtensions</name>
++          <type>java.util.List</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources for the test source code to the test output directory.
++Always uses the project.build.testResources element to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>overwrite</name>
++          <type>boolean</type>
++          <since>2.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>resources</name>
++          <type>java.util.List</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Copy resources for the test source code to the test output directory.
++Always uses the project.build.testResources element to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>session</name>
++          <type>org.apache.maven.execution.MavenSession</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources for the test source code to the test output directory.
++Always uses the project.build.testResources element to specify the resources to copy.</description>
++        </parameter>
++        <parameter>
++          <name>supportMultiLineFiltering</name>
++          <type>boolean</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useBuildFilters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultDelimiters</name>
++          <type>boolean</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Copy resources of the configured plugin attribute resources</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <addDefaultExcludes implementation="boolean" default-value="true"/>
++        <buildFilters implementation="java.util.List" default-value="${project.build.filters}"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}"/>
++        <escapeWindowsPaths implementation="boolean" default-value="true"/>
++        <fileNameFiltering implementation="boolean" default-value="false"/>
++        <includeEmptyDirs implementation="boolean" default-value="false"/>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.testOutputDirectory}"/>
++        <overwrite implementation="boolean" default-value="false"/>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <resources implementation="java.util.List" default-value="${project.testResources}"/>
++        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
++        <skip implementation="boolean" default-value="false">${maven.test.skip}</skip>
++        <supportMultiLineFiltering implementation="boolean" default-value="false"/>
++        <useBuildFilters implementation="boolean" default-value="true"/>
++        <useDefaultDelimiters implementation="boolean" default-value="true"/>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>org.apache.maven.shared.filtering.MavenResourcesFiltering</role>
++          <role-hint>default</role-hint>
++          <field-name>mavenResourcesFiltering</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++  </mojos>
++  <dependencies>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-plugin-api</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-classworlds</artifactId>
++      <type>jar</type>
++      <version>2.5.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-artifact</artifactId>
++      <type>jar</type>
++      <version>3.5.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.sisu</groupId>
++      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <type>jar</type>
++      <version>0.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-core</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-settings</artifactId>
++      <type>jar</type>
++      <version>3.5.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-util</artifactId>
++      <type>jar</type>
++      <version>1.1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.commons</groupId>
++      <artifactId>commons-lang3</artifactId>
++      <type>jar</type>
++      <version>3.8.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.sisu</groupId>
++      <artifactId>org.eclipse.sisu.inject</artifactId>
++      <type>jar</type>
++      <version>0.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.enterprise</groupId>
++      <artifactId>cdi-api</artifactId>
++      <type>jar</type>
++      <version>1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.el</groupId>
++      <artifactId>javax.el-api</artifactId>
++      <type>jar</type>
++      <version>3.0.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.jboss.spec.javax.interceptor</groupId>
++      <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
++      <type>jar</type>
++      <version>any</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.guava</groupId>
++      <artifactId>guava</artifactId>
++      <type>jar</type>
++      <version>20.0</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.inject</groupId>
++      <artifactId>guice</artifactId>
++      <type>jar</type>
++      <version>4.2.0</version>
++    </dependency>
++    <dependency>
++      <groupId>cglib</groupId>
++      <artifactId>cglib</artifactId>
++      <type>jar</type>
++      <version>3.2.0</version>
++    </dependency>
++    <dependency>
++      <groupId>aopalliance</groupId>
++      <artifactId>aopalliance</artifactId>
++      <type>jar</type>
++      <version>1.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.ow2.asm</groupId>
++      <artifactId>asm</artifactId>
++      <type>jar</type>
++      <version>5.0.3</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-resolver-provider</artifactId>
++      <type>jar</type>
++      <version>3.5.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-api</artifactId>
++      <type>jar</type>
++      <version>1.1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.inject</groupId>
++      <artifactId>javax.inject</artifactId>
++      <type>jar</type>
++      <version>1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-impl</artifactId>
++      <type>jar</type>
++      <version>1.1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.slf4j</groupId>
++      <artifactId>slf4j-api</artifactId>
++      <type>jar</type>
++      <version>1.7.25</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-repository-metadata</artifactId>
++      <type>jar</type>
++      <version>3.5.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-spi</artifactId>
++      <type>jar</type>
++      <version>1.1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-component-annotations</artifactId>
++      <type>jar</type>
++      <version>1.5.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model-builder</artifactId>
++      <type>jar</type>
++      <version>3.5.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-builder-support</artifactId>
++      <type>jar</type>
++      <version>3.5.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-shared-utils</artifactId>
++      <type>jar</type>
++      <version>3.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-settings-builder</artifactId>
++      <type>jar</type>
++      <version>3.5.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-sec-dispatcher</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-cipher</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-utils</artifactId>
++      <type>jar</type>
++      <version>3.1.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-filtering</artifactId>
++      <type>jar</type>
++      <version>3.1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-build-api</artifactId>
++      <type>jar</type>
++      <version>0.0.7</version>
++    </dependency>
++    <dependency>
++      <groupId>commons-io</groupId>
++      <artifactId>commons-io</artifactId>
++      <type>jar</type>
++      <version>2.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-interpolation</artifactId>
++      <type>jar</type>
++      <version>1.24</version>
++    </dependency>
++  </dependencies>
++</plugin>

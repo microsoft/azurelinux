@@ -1,0 +1,137 @@
+Make sure that the asm files don't incorrectly trigger an executable
+stack marking in the final shared library.  That's bad, mmmkay.
+
+Upstream has already fixed this in their cvs.
+
+--- libdv/dct_block_mmx.S
++++ libdv/dct_block_mmx.S
+@@ -1217,3 +1217,7 @@ _dv_dct_block_mmx_postscale_248:
+ 	popl	 %esi
+ 	popl	 %ebp
+ 	ret
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/dct_block_mmx_x86_64.S
++++ libdv/dct_block_mmx_x86_64.S
+@@ -1207,3 +1207,7 @@ _dv_dct_block_mmx_x86_64_postscale_248:
+ 	pop	 %r12
+ 	
+ 	ret
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/encode_x86.S
++++ libdv/encode_x86.S
+@@ -611,3 +611,6 @@ _dv_need_dct_248_mmx_rows:
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/encode_x86_64.S
++++ libdv/encode_x86_64.S
+@@ -612,3 +612,6 @@ _dv_need_dct_248_mmx_x86_64_rows:
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/idct_block_mmx.S
++++ libdv/idct_block_mmx.S
+@@ -649,3 +649,6 @@ x0:
+ 	.long 0,0
+ 	.align 8
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/idct_block_mmx_x86_64.S
++++ libdv/idct_block_mmx_x86_64.S
+@@ -654,3 +654,6 @@ x0:
+ 	.long 0,0
+ 	.align 8
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/quant_x86.S
++++ libdv/quant_x86.S
+@@ -458,3 +458,6 @@ _dv_quant_x86:	
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/quant_x86_64.S
++++ libdv/quant_x86_64.S
+@@ -463,3 +463,6 @@ _dv_quant_x86_64:
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/rgbtoyuv.S
++++ libdv/rgbtoyuv.S
+@@ -1451,3 +1451,6 @@ video_copy_ntsc_c_block_mmx_loop:	
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/rgbtoyuv_x86_64.S
++++ libdv/rgbtoyuv_x86_64.S
+@@ -1391,3 +1391,6 @@ video_copy_ntsc_c_block_mmx_loop:	
+ 
+ 
+ 
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/transpose_x86.S
++++ libdv/transpose_x86.S
+@@ -190,3 +190,7 @@ popl    %esi
+ popl %ebp
+ 
+ ret     $0
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/transpose_x86_64.S
++++ libdv/transpose_x86_64.S
+@@ -190,3 +190,7 @@ all_done_ready_to_exit:
+ 	pop	%r12
+ 
+ 	ret     $0
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/vlc_x86.S
++++ libdv/vlc_x86.S
+@@ -587,3 +587,7 @@ mod_12:
+ 	.align 16
+ const_f_0_0_0:
+ 	.short	0xffff,0,0,0
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif
+--- libdv/vlc_x86_64.S
++++ libdv/vlc_x86_64.S
+@@ -673,3 +673,7 @@ mod_12:
+ 	.align 16
+ const_f_0_0_0:
+ 	.short	0xffff,0,0,0
++
++#ifdef __ELF__
++.section .note.GNU-stack,"",@progbits
++#endif

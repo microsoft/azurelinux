@@ -1,0 +1,96 @@
+--- maven-resolver-1.3.1/maven-resolver-connector-basic/src/main/java/org/eclipse/aether/connector/basic/ChecksumCalculator.java	2018-11-01 17:20:57.663142972 +0100
++++ maven-resolver-1.3.1/maven-resolver-connector-basic/src/main/java/org/eclipse/aether/connector/basic/ChecksumCalculator.java	2018-11-16 12:47:37.324328358 +0100
+@@ -23,6 +23,7 @@
+ import java.io.FileInputStream;
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.security.MessageDigest;
+ import java.security.NoSuchAlgorithmException;
+@@ -164,8 +165,8 @@
+                 {
+                     read -= total - dataOffset;
+                 }
+-                buffer.rewind();
+-                buffer.limit( read );
++                ((Buffer)buffer).rewind();
++                ((Buffer)buffer).limit( read );
+                 update( buffer );
+             }
+ 
+@@ -199,9 +200,9 @@
+     {
+         for ( Checksum checksum : checksums )
+         {
+-            data.mark();
++            ((Buffer)data).mark();
+             checksum.update( data );
+-            data.reset();
++            ((Buffer)data).reset();
+         }
+     }
+ 
+--- maven-resolver-1.3.1/maven-resolver-impl/src/main/java/org/eclipse/aether/internal/impl/DefaultFileProcessor.java	2018-11-01 17:20:57.667142992 +0100
++++ maven-resolver-1.3.1/maven-resolver-impl/src/main/java/org/eclipse/aether/internal/impl/DefaultFileProcessor.java	2018-11-16 12:53:34.318211356 +0100
+@@ -25,6 +25,7 @@
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.OutputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.charset.StandardCharsets;
+ 
+@@ -229,8 +230,8 @@
+             {
+                 try
+                 {
+-                    buffer.rewind();
+-                    buffer.limit( bytes );
++                    ((Buffer)buffer).rewind();
++                    ((Buffer)buffer).limit( bytes );
+                     listener.progressed( buffer );
+                 }
+                 catch ( Exception e )
+--- maven-resolver-1.3.1/maven-resolver-spi/src/main/java/org/eclipse/aether/spi/connector/transport/AbstractTransporter.java	2018-11-01 17:20:57.691143110 +0100
++++ maven-resolver-1.3.1/maven-resolver-spi/src/main/java/org/eclipse/aether/spi/connector/transport/AbstractTransporter.java	2018-11-16 12:51:22.725517276 +0100
+@@ -22,6 +22,7 @@
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.OutputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.util.concurrent.atomic.AtomicBoolean;
+ 
+@@ -251,8 +252,8 @@
+         for ( int read = is.read( array ); read >= 0; read = is.read( array ) )
+         {
+             os.write( array, 0, read );
+-            buffer.rewind();
+-            buffer.limit( read );
++            ((Buffer)buffer).rewind();
++            ((Buffer)buffer).limit( read );
+             listener.transportProgressed( buffer );
+         }
+     }
+--- maven-resolver-1.3.1/maven-resolver-test-util/src/main/java/org/eclipse/aether/internal/test/util/TestFileProcessor.java	2018-11-01 17:20:57.695143130 +0100
++++ maven-resolver-1.3.1/maven-resolver-test-util/src/main/java/org/eclipse/aether/internal/test/util/TestFileProcessor.java	2018-11-16 12:50:32.565252686 +0100
+@@ -26,6 +26,7 @@
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.OutputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.charset.StandardCharsets;
+ 
+@@ -218,8 +219,8 @@
+             {
+                 try
+                 {
+-                    buffer.rewind();
+-                    buffer.limit( bytes );
++                    ((Buffer)buffer).rewind();
++                    ((Buffer)buffer).limit( bytes );
+                     listener.progressed( buffer );
+                 }
+                 catch ( Exception e )

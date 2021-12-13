@@ -1,0 +1,21 @@
+diff -up imap-2007f/src/osdep/unix/Makefile.ldflags imap-2007f/src/osdep/unix/Makefile
+--- imap-2007f/src/osdep/unix/Makefile.ldflags	2018-04-24 13:18:45.333043626 +0200
++++ imap-2007f/src/osdep/unix/Makefile	2018-04-24 13:29:09.262125281 +0200
+@@ -73,7 +73,7 @@ SSLRSA= # -lRSAglue -lrsaref
+ 
+ SSLCFLAGS= -I$(SSLINCLUDE) -I$(SSLINCLUDE)/openssl\
+  -DSSL_CERT_DIRECTORY=\"$(SSLCERTS)\" -DSSL_KEY_DIRECTORY=\"$(SSLKEYS)\"
+-SSLLDFLAGS= -L$(SSLLIB) -lssl $(SSLCRYPTO) $(SSLRSA)
++SSLLDFLAGS= -L$(SSLLIB) -lssl $(SSLCRYPTO) $(SSLRSA) $(EXTRALDFLAGS)
+ 
+ 
+ # Extended flags needed for non-standard passwd types.  You may need to modify.
+@@ -502,7 +502,7 @@ lnp:	# Linux Pluggable Authentication mo
+ 	 ACTIVEFILE=/var/lib/news/active \
+ 	 RSHPATH=/usr/bin/rsh \
+ 	 BASECFLAGS="$(GCCCFLAGS)" \
+-	 BASELDFLAGS="$(PAMLDFLAGS)"
++	 BASELDFLAGS="$(EXTRALDFLAGS) $(PAMLDFLAGS)"
+ 
+ lnx:	# Linux non-shadow passwords
+ 	@echo You are building for traditional Linux *without* shadow

@@ -1,0 +1,868 @@
+From 8f39a0f78abff259b772339426d84578f50fd932 Mon Sep 17 00:00:00 2001
+From: Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
+Date: Thu, 5 Sep 2019 18:29:53 +0200
+Subject: [PATCH 1/2] tests/rsa-common: Add function to create various tokens
+
+This allows the creation of multiple devices in the test scripts.
+
+Signed-off-by: Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
+(cherry picked from commit 712e869189610f900ebf8c50090e228167b6bf8f)
+---
+ tests/rsa-common.sh | 54 +++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 42 insertions(+), 12 deletions(-)
+
+diff --git a/tests/rsa-common.sh b/tests/rsa-common.sh
+index 7db5ba0..e6e12cb 100755
+--- a/tests/rsa-common.sh
++++ b/tests/rsa-common.sh
+@@ -86,13 +86,13 @@ init_db () {
+ 
+ # Create a new device
+ init_card () {
+-	PIN="$1"
+-	PUK="$2"
+-	DEV_LABEL="$3"
++	pin="$1"
++	puk="$2"
++	dev_label="$3"
+ 
+-	echo -n "* Initializing smart card... "
+-	${SOFTHSM_TOOL} --init-token ${SLOT} --label "${DEV_LABEL}" \
+-		--so-pin "${PUK}" --pin "${PIN}" >/dev/null
++	echo -n "* Initializing smart card ${dev_label}..."
++	${SOFTHSM_TOOL} --init-token ${SLOT} --label "${dev_label}" \
++		--so-pin "${puk}" --pin "${pin}" >/dev/null
+ 	if test $? = 0; then
+ 		echo ok
+ 	else
+@@ -103,22 +103,26 @@ init_card () {
+ 
+ # Import objects to the token
+ import_objects () {
+-	ID=$1
+-	OBJ_LABEL=$2
++	id=$1
++	obj_label=$2
++	token_label=$3
+ 
+-	pkcs11-tool -p ${PIN} --module ${MODULE} -d ${ID} -a ${OBJ_LABEL} -l -w \
++	pkcs11-tool -p ${PIN} --module ${MODULE} -d ${id} \
++		--token-label ${token_label} -a ${obj_label} -l -w \
+ 		${srcdir}/rsa-prvkey.der -y privkey >/dev/null
+ 	if test $? != 0;then
+ 		exit 1;
+ 	fi
+ 
+-	pkcs11-tool -p ${PIN} --module ${MODULE} -d ${ID} -a ${OBJ_LABEL} -l -w \
++	pkcs11-tool -p ${PIN} --module ${MODULE} -d ${id} \
++		--token-label ${token_label} -a ${obj_label} -l -w \
+ 		${srcdir}/rsa-pubkey.der -y pubkey >/dev/null
+ 	if test $? != 0;then
+ 		exit 1;
+ 	fi
+ 
+-	pkcs11-tool -p ${PIN} --module ${MODULE} -d ${ID} -a ${OBJ_LABEL} -l -w \
++	pkcs11-tool -p ${PIN} --module ${MODULE} -d ${id} \
++		--token-label ${token_label} -a ${obj_label} -l -w \
+ 		${srcdir}/rsa-cert.der -y cert >/dev/null
+ 	if test $? != 0;then
+ 		exit 1;
+@@ -148,8 +152,34 @@ common_init () {
+ 
+ 	echo Importing
+ 	# Import the used objects (private key, public key, and certificate)
+-	import_objects 01020304 "server-key"
++	import_objects 01020304 "server-key" "libp11-test"
+ 
+ 	# List the imported objects
+ 	list_objects
+ }
++
++create_devices () {
++	num_devices=$1
++	pin="$2"
++	puk="$3"
++	common_label="$4"
++	object_label="$5"
++
++	i=0
++	while [ $i -le ${num_devices} ]; do
++		init_card ${pin} ${puk} "${common_label}-$i"
++
++		echo "Importing objects to token ${common_label}-$i"
++		# Import objects with different labels
++		import_objects 01020304 "${object_label}-$i" "${common_label}-$i"
++
++		pkcs11-tool -p ${pin} --module ${MODULE} -l -O --token-label \
++			"${common_label}-$i"
++		if test $? != 0;then
++			echo Failed!
++			exit 1;
++		fi
++
++		i=$(($i + 1))
++	done
++}
+-- 
+2.21.0
+
+
+From 8502b459544619286979ffa3ef6d4748d8066daa Mon Sep 17 00:00:00 2001
+From: Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
+Date: Tue, 3 Sep 2019 19:04:27 +0200
+Subject: [PATCH 2/2] eng_back: Search objects in all matching tokens
+
+Previously, the search for objects would stop in the first matching
+token when a more generic PKCS#11 URI was provided (e.g.
+"pkcs11:type=public").  This change makes the search continue past the
+first matching token if the object was not found.
+
+In ctx_load_{key, cert}(), the search will try to login only if a single
+token matched the search.  This is to avoid trying the provided PIN
+against all matching tokens which could lock the devices.
+
+This also makes the search for objects to ignore uninitialized tokens
+and to avoid trying to login when the token does not require login.
+
+Signed-off-by: Anderson Toshiyuki Sasaki <ansasaki@redhat.com>
+(cherry picked from commit 85a91f4502d48371df0d392d19cecfbced2388c0)
+---
+ src/eng_back.c                           | 393 +++++++++++++++--------
+ tests/Makefile.am                        |   4 +-
+ tests/pkcs11-uri-without-token.softhsm   |  62 ++++
+ tests/search-all-matching-tokens.softhsm | 106 ++++++
+ 4 files changed, 426 insertions(+), 139 deletions(-)
+ create mode 100755 tests/pkcs11-uri-without-token.softhsm
+ create mode 100755 tests/search-all-matching-tokens.softhsm
+
+diff --git a/src/eng_back.c b/src/eng_back.c
+index 39a685a..afa6271 100644
+--- a/src/eng_back.c
++++ b/src/eng_back.c
+@@ -375,7 +375,7 @@ static X509 *ctx_load_cert(ENGINE_CTX *ctx, const char *s_slot_cert_id,
+ 		const int login)
+ {
+ 	PKCS11_SLOT *slot;
+-	PKCS11_SLOT *found_slot = NULL;
++	PKCS11_SLOT *found_slot = NULL, **matched_slots = NULL;
+ 	PKCS11_TOKEN *tok, *match_tok = NULL;
+ 	PKCS11_CERT *certs, *selected_cert = NULL;
+ 	X509 *x509;
+@@ -387,6 +387,7 @@ static X509 *ctx_load_cert(ENGINE_CTX *ctx, const char *s_slot_cert_id,
+ 	size_t tmp_pin_len = MAX_PIN_LENGTH;
+ 	int slot_nr = -1;
+ 	char flags[64];
++	size_t matched_count = 0;
+ 
+ 	if (ctx_init_libp11(ctx)) /* Delayed libp11 initialization */
+ 		return NULL;
+@@ -401,11 +402,9 @@ static X509 *ctx_load_cert(ENGINE_CTX *ctx, const char *s_slot_cert_id,
+ 					"The certificate ID is not a valid PKCS#11 URI\n"
+ 					"The PKCS#11 URI format is defined by RFC7512\n");
+ 				ENGerr(ENG_F_CTX_LOAD_CERT, ENG_R_INVALID_ID);
+-				return NULL;
++				goto error;
+ 			}
+ 			if (tmp_pin_len > 0 && tmp_pin[0] != 0) {
+-				if (!login)
+-					return NULL; /* Process on second attempt */
+ 				ctx_destroy_pin(ctx);
+ 				ctx->pin = OPENSSL_malloc(MAX_PIN_LENGTH+1);
+ 				if (ctx->pin != NULL) {
+@@ -424,7 +423,7 @@ static X509 *ctx_load_cert(ENGINE_CTX *ctx, const char *s_slot_cert_id,
+ 					"The legacy ENGINE_pkcs11 ID format is also "
+ 					"still accepted for now\n");
+ 				ENGerr(ENG_F_CTX_LOAD_CERT, ENG_R_INVALID_ID);
+-				return NULL;
++				goto error;
+ 			}
+ 		}
+ 		ctx_log(ctx, 1, "Looking in slot %d for certificate: ",
+@@ -440,6 +439,13 @@ static X509 *ctx_load_cert(ENGINE_CTX *ctx, const char *s_slot_cert_id,
+ 		ctx_log(ctx, 1, "\n");
+ 	}
+ 
++	matched_slots = (PKCS11_SLOT **)calloc(ctx->slot_count,
++		sizeof(PKCS11_SLOT *));
++	if (matched_slots == NULL) {
++		ctx_log(ctx, 0, "Could not allocate memory for matched slots\n");
++		goto error;
++	}
++
+ 	for (n = 0; n < ctx->slot_count; n++) {
+ 		slot = ctx->slot_list + n;
+ 		flags[0] = '\0';
+@@ -463,6 +469,7 @@ static X509 *ctx_load_cert(ENGINE_CTX *ctx, const char *s_slot_cert_id,
+ 			slot_nr == (int)PKCS11_get_slotid_from_slot(slot)) {
+ 			found_slot = slot;
+ 		}
++
+ 		if (match_tok && slot->token &&
+ 				(match_tok->label == NULL ||
+ 					!strcmp(match_tok->label, slot->token->label)) &&
+@@ -483,75 +490,115 @@ static X509 *ctx_load_cert(ENGINE_CTX *ctx, const char *s_slot_cert_id,
+ 				slot->token->label : "no label");
+ 		}
+ 		ctx_log(ctx, 1, "\n");
+-	}
+ 
+-	if (match_tok) {
+-		OPENSSL_free(match_tok->model);
+-		OPENSSL_free(match_tok->manufacturer);
+-		OPENSSL_free(match_tok->serialnr);
+-		OPENSSL_free(match_tok->label);
+-		OPENSSL_free(match_tok);
+-	}
+-	if (found_slot) {
+-		slot = found_slot;
+-	} else if (match_tok) {
+-		ctx_log(ctx, 0, "Specified object not found\n");
+-		return NULL;
+-	} else if (slot_nr == -1) {
+-		if (!(slot = PKCS11_find_token(ctx->pkcs11_ctx,
+-				ctx->slot_list, ctx->slot_count))) {
+-			ctx_log(ctx, 0, "No tokens found\n");
+-			return NULL;
+-		}
+-	} else {
+-		ctx_log(ctx, 0, "Invalid slot number: %d\n", slot_nr);
+-		return NULL;
+-	}
+-	tok = slot->token;
++		if (found_slot && found_slot->token && !found_slot->token->initialized)
++			ctx_log(ctx, 0, "Found uninitialized token\n");
+ 
+-	if (tok == NULL) {
+-		ctx_log(ctx, 0, "Empty token found\n");
+-		return NULL;
++		/* Ignore slots without tokens or with uninitialized token */
++		if (found_slot && found_slot->token && found_slot->token->initialized) {
++			matched_slots[matched_count] = found_slot;
++			matched_count++;
++		}
++		found_slot = NULL;
+ 	}
+ 
+-	ctx_log(ctx, 1, "Found slot:  %s\n", slot->description);
+-	ctx_log(ctx, 1, "Found token: %s\n", slot->token->label);
++	if (matched_count == 0) {
++		if (match_tok) {
++			ctx_log(ctx, 0, "Specified object not found\n");
++			goto error;
++		}
+ 
+-	/* In several tokens certificates are marked as private */
+-	if (login && !ctx_login(ctx, slot, tok,
+-			ctx->ui_method, ctx->callback_data)) {
+-		ctx_log(ctx, 0, "Login to token failed, returning NULL...\n");
+-		return NULL;
++		/* If the legacy slot ID format was used */
++		if (slot_nr != -1) {
++			ctx_log(ctx, 0, "Invalid slot number: %d\n", slot_nr);
++			goto error;
++		} else {
++			found_slot = PKCS11_find_token(ctx->pkcs11_ctx,
++								ctx->slot_list, ctx->slot_count);
++			/* Ignore if the the token is not initialized */
++			if (found_slot && found_slot->token &&
++					found_slot->token->initialized) {
++				matched_slots[matched_count] = found_slot;
++				matched_count++;
++			} else {
++				ctx_log(ctx, 0, "No tokens found\n");
++				goto error;
++			}
++		}
+ 	}
+ 
+-	if (PKCS11_enumerate_certs(tok, &certs, &cert_count)) {
+-		ctx_log(ctx, 0, "Unable to enumerate certificates\n");
+-		return NULL;
+-	}
++	for (n = 0; n < matched_count; n++) {
++		slot = matched_slots[n];
++		tok = slot->token;
++		if (tok == NULL) {
++			ctx_log(ctx, 0, "Empty token found\n");
++			break;
++		}
+ 
+-	ctx_log(ctx, 1, "Found %u cert%s:\n", cert_count,
+-		(cert_count <= 1) ? "" : "s");
+-	if ((s_slot_cert_id && *s_slot_cert_id) &&
+-			(cert_id_len != 0 || cert_label != NULL)) {
+-		for (n = 0; n < cert_count; n++) {
+-			PKCS11_CERT *k = certs + n;
++		ctx_log(ctx, 1, "Found slot:  %s\n", slot->description);
++		ctx_log(ctx, 1, "Found token: %s\n", slot->token->label);
++
++		/* In several tokens certificates are marked as private */
++		if (login) {
++			/* Only try to login if login is required */
++			if (tok->loginRequired) {
++				/* Only try to login if a single slot matched to avoiding trying
++				 * the PIN against all matching slots */
++				if (matched_count == 1) {
++					if (!ctx_login(ctx, slot, tok,
++							ctx->ui_method, ctx->callback_data)) {
++						ctx_log(ctx, 0, "Login to token failed, returning NULL...\n");
++						goto error;
++					}
++				} else {
++					ctx_log(ctx, 0, "Multiple matching slots (%lu); will not try to"
++						" login\n", matched_count);
++					for (m = 0; m < matched_count; m++){
++						slot = matched_slots[m];
++						ctx_log(ctx, 0, "[%u] %s: %s\n", m + 1,
++								slot->description? slot->description:
++								"(no description)",
++								(slot->token && slot->token->label)?
++								slot->token->label: "no label");
++					}
++					goto error;
++				}
++			}
++		}
+ 
+-			if (cert_label != NULL && strcmp(k->label, cert_label) == 0)
+-				selected_cert = k;
+-			if (cert_id_len != 0 && k->id_len == cert_id_len &&
+-					memcmp(k->id, cert_id, cert_id_len) == 0)
+-				selected_cert = k;
++		if (PKCS11_enumerate_certs(tok, &certs, &cert_count)) {
++			ctx_log(ctx, 0, "Unable to enumerate certificates\n");
++			continue;
+ 		}
+-	} else {
+-		for (n = 0; n < cert_count; n++) {
+-			PKCS11_CERT *k = certs + n;
+-			if (k->id && *(k->id)) {
+-				selected_cert = k; /* Use the first certificate with nonempty id */
+-				break;
++
++		ctx_log(ctx, 1, "Found %u cert%s:\n", cert_count,
++				(cert_count <= 1) ? "" : "s");
++		if ((s_slot_cert_id && *s_slot_cert_id) &&
++				(cert_id_len != 0 || cert_label != NULL)) {
++			for (m = 0; m < cert_count; m++) {
++				PKCS11_CERT *k = certs + m;
++
++				if (cert_label != NULL && strcmp(k->label, cert_label) == 0)
++					selected_cert = k;
++				if (cert_id_len != 0 && k->id_len == cert_id_len &&
++						memcmp(k->id, cert_id, cert_id_len) == 0)
++					selected_cert = k;
++			}
++		} else {
++			for (m = 0; m < cert_count; m++) {
++				PKCS11_CERT *k = certs + m;
++				if (k->id && *(k->id)) {
++					selected_cert = k; /* Use the first certificate with nonempty id */
++					break;
++				}
+ 			}
++			if (!selected_cert)
++				selected_cert = certs; /* Use the first certificate */
++		}
++
++		if (selected_cert) {
++			break;
+ 		}
+-		if (!selected_cert)
+-			selected_cert = certs; /* Use the first certificate */
+ 	}
+ 
+ 	if (selected_cert != NULL) {
+@@ -561,8 +608,20 @@ static X509 *ctx_load_cert(ENGINE_CTX *ctx, const char *s_slot_cert_id,
+ 			ctx_log(ctx, 0, "Certificate not found.\n");
+ 		x509 = NULL;
+ 	}
++error:
++	/* Free the searched token data */
++	if (match_tok) {
++		OPENSSL_free(match_tok->model);
++		OPENSSL_free(match_tok->manufacturer);
++		OPENSSL_free(match_tok->serialnr);
++		OPENSSL_free(match_tok->label);
++		OPENSSL_free(match_tok);
++	}
++
+ 	if (cert_label != NULL)
+ 		OPENSSL_free(cert_label);
++	if (matched_slots != NULL)
++		free(matched_slots);
+ 	return x509;
+ }
+ 
+@@ -605,7 +664,7 @@ static EVP_PKEY *ctx_load_key(ENGINE_CTX *ctx, const char *s_slot_key_id,
+ 		const int isPrivate, const int login)
+ {
+ 	PKCS11_SLOT *slot;
+-	PKCS11_SLOT *found_slot = NULL;
++	PKCS11_SLOT *found_slot = NULL, **matched_slots = NULL;
+ 	PKCS11_TOKEN *tok, *match_tok = NULL;
+ 	PKCS11_KEY *keys, *selected_key = NULL;
+ 	EVP_PKEY *pk = NULL;
+@@ -617,6 +676,7 @@ static EVP_PKEY *ctx_load_key(ENGINE_CTX *ctx, const char *s_slot_key_id,
+ 	char tmp_pin[MAX_PIN_LENGTH+1];
+ 	size_t tmp_pin_len = MAX_PIN_LENGTH;
+ 	char flags[64];
++	size_t matched_count = 0;
+ 
+ 	if (ctx_init_libp11(ctx)) /* Delayed libp11 initialization */
+ 		goto error;
+@@ -637,7 +697,9 @@ static EVP_PKEY *ctx_load_key(ENGINE_CTX *ctx, const char *s_slot_key_id,
+ 				goto error;
+ 			}
+ 			if (tmp_pin_len > 0 && tmp_pin[0] != 0) {
+-				if (!login)
++				/* If the searched key is public, try without login once even
++				 * when the PIN is provided */
++				if (!login && isPrivate)
+ 					goto error; /* Process on second attempt */
+ 				ctx_destroy_pin(ctx);
+ 				ctx->pin = OPENSSL_malloc(MAX_PIN_LENGTH+1);
+@@ -673,6 +735,13 @@ static EVP_PKEY *ctx_load_key(ENGINE_CTX *ctx, const char *s_slot_key_id,
+ 		ctx_log(ctx, 1, "\n");
+ 	}
+ 
++	matched_slots = (PKCS11_SLOT **)calloc(ctx->slot_count,
++		sizeof(PKCS11_SLOT *));
++	if (matched_slots == NULL) {
++		ctx_log(ctx, 0, "Could not allocate memory for matched slots\n");
++		goto error;
++	}
++
+ 	for (n = 0; n < ctx->slot_count; n++) {
+ 		slot = ctx->slot_list + n;
+ 		flags[0] = '\0';
+@@ -696,6 +765,7 @@ static EVP_PKEY *ctx_load_key(ENGINE_CTX *ctx, const char *s_slot_key_id,
+ 			slot_nr == (int)PKCS11_get_slotid_from_slot(slot)) {
+ 			found_slot = slot;
+ 		}
++
+ 		if (match_tok && slot->token &&
+ 				(match_tok->label == NULL ||
+ 					!strcmp(match_tok->label, slot->token->label)) &&
+@@ -716,92 +786,128 @@ static EVP_PKEY *ctx_load_key(ENGINE_CTX *ctx, const char *s_slot_key_id,
+ 				slot->token->label : "no label");
+ 		}
+ 		ctx_log(ctx, 1, "\n");
+-	}
+ 
+-	if (match_tok) {
+-		OPENSSL_free(match_tok->model);
+-		OPENSSL_free(match_tok->manufacturer);
+-		OPENSSL_free(match_tok->serialnr);
+-		OPENSSL_free(match_tok->label);
+-		OPENSSL_free(match_tok);
++		if (found_slot && found_slot->token && !found_slot->token->initialized)
++			ctx_log(ctx, 0, "Found uninitialized token\n");
++
++		/* Ignore slots without tokens or with uninitialized token */
++		if (found_slot && found_slot->token && found_slot->token->initialized) {
++			matched_slots[matched_count] = found_slot;
++			matched_count++;
++		}
++		found_slot = NULL;
+ 	}
+-	if (found_slot) {
+-		slot = found_slot;
+-	} else if (match_tok) {
+-		ctx_log(ctx, 0, "Specified object not found\n");
+-		goto error;
+-	} else if (slot_nr == -1) {
+-		if (!(slot = PKCS11_find_token(ctx->pkcs11_ctx,
+-				ctx->slot_list, ctx->slot_count))) {
+-			ctx_log(ctx, 0, "No tokens found\n");
++
++	if (matched_count == 0) {
++		if (match_tok) {
++			ctx_log(ctx, 0, "Specified object not found\n");
+ 			goto error;
+ 		}
+-	} else {
+-		ctx_log(ctx, 0, "Invalid slot number: %d\n", slot_nr);
+-		goto error;
+-	}
+-	tok = slot->token;
+ 
+-	if (tok == NULL) {
+-		ctx_log(ctx, 0, "Found empty token\n");
+-		goto error;
++		/* If the legacy slot ID format was used */
++		if (slot_nr != -1) {
++			ctx_log(ctx, 0, "Invalid slot number: %d\n", slot_nr);
++			goto error;
++		} else {
++			found_slot = PKCS11_find_token(ctx->pkcs11_ctx,
++								ctx->slot_list, ctx->slot_count);
++			/* Ignore if the the token is not initialized */
++			if (found_slot && found_slot->token &&
++					found_slot->token->initialized) {
++				matched_slots[matched_count] = found_slot;
++				matched_count++;
++			} else {
++				ctx_log(ctx, 0, "No tokens found\n");
++				goto error;
++			}
++		}
+ 	}
+-	/* The following check is non-critical to ensure interoperability
+-	 * with some other (which ones?) PKCS#11 libraries */
+-	if (!tok->initialized)
+-		ctx_log(ctx, 0, "Found uninitialized token\n");
+ 
+-	ctx_log(ctx, 1, "Found slot:  %s\n", slot->description);
+-	ctx_log(ctx, 1, "Found token: %s\n", slot->token->label);
++	for (n = 0; n < matched_count; n++) {
++		slot = matched_slots[n];
++		tok = slot->token;
++		if (tok == NULL) {
++			ctx_log(ctx, 0, "Found empty token\n");
++			break;
++		}
+ 
+-	/* Both private and public keys can have the CKA_PRIVATE attribute
+-	 * set and thus require login (even to retrieve attributes!) */
+-	if (login && !ctx_login(ctx, slot, tok, ui_method, callback_data)) {
+-		ctx_log(ctx, 0, "Login to token failed, returning NULL...\n");
+-		goto error;
+-	}
++		ctx_log(ctx, 1, "Found slot:  %s\n", slot->description);
++		ctx_log(ctx, 1, "Found token: %s\n", slot->token->label);
++
++		/* Both private and public keys can have the CKA_PRIVATE attribute
++		 * set and thus require login (even to retrieve attributes!) */
++		if (login) {
++			/* Try to login only if login is required */
++			if (tok->loginRequired) {
++				/* Try to login only if a single slot matched to avoiding trying
++				 * the PIN against all matching slots */
++				if (matched_count == 1) {
++					if (!ctx_login(ctx, slot, tok, ui_method, callback_data)) {
++						ctx_log(ctx, 0, "Login to token failed, returning NULL...\n");
++						goto error;
++					}
++				} else {
++					ctx_log(ctx, 0, "Multiple matching slots (%lu); will not try to"
++						" login\n", matched_count);
++					for (m = 0; m < matched_count; m++){
++						slot = matched_slots[m];
++						ctx_log(ctx, 1, "[%u] %s: %s\n", m + 1,
++								slot->description? slot->description:
++								"(no description)",
++								(slot->token && slot->token->label)?
++								slot->token->label: "no label");
++					}
++					goto error;
++				}
++			}
++		}
+ 
+-	if (isPrivate) {
+-		/* Make sure there is at least one private key on the token */
+-		if (PKCS11_enumerate_keys(tok, &keys, &key_count)) {
+-			ctx_log(ctx, 0, "Unable to enumerate private keys\n");
+-			goto error;
++		if (isPrivate) {
++			/* Make sure there is at least one private key on the token */
++			if (PKCS11_enumerate_keys(tok, &keys, &key_count)) {
++				ctx_log(ctx, 0, "Unable to enumerate private keys\n");
++				continue;
++			}
++		} else {
++			/* Make sure there is at least one public key on the token */
++			if (PKCS11_enumerate_public_keys(tok, &keys, &key_count)) {
++				ctx_log(ctx, 0, "Unable to enumerate public keys\n");
++				continue;
++			}
+ 		}
+-	} else {
+-		/* Make sure there is at least one public key on the token */
+-		if (PKCS11_enumerate_public_keys(tok, &keys, &key_count)) {
+-			ctx_log(ctx, 0, "Unable to enumerate public keys\n");
+-			goto error;
++		if (key_count == 0) {
++			if (login) /* Only print the error on the second attempt */
++				ctx_log(ctx, 0, "No %s keys found.\n",
++						(char *)(isPrivate ? "private" : "public"));
++			continue;
+ 		}
+-	}
+-	if (key_count == 0) {
+-		if (login) /* Only print the error on the second attempt */
+-			ctx_log(ctx, 0, "No %s keys found.\n",
+-				(char *)(isPrivate ? "private" : "public"));
+-		goto error;
+-	}
+-	ctx_log(ctx, 1, "Found %u %s key%s:\n", key_count,
+-		(char *)(isPrivate ? "private" : "public"),
+-		(key_count == 1) ? "" : "s");
+-
+-	if (s_slot_key_id && *s_slot_key_id &&
+-			(key_id_len != 0 || key_label != NULL)) {
+-		for (n = 0; n < key_count; n++) {
+-			PKCS11_KEY *k = keys + n;
+-
+-			ctx_log(ctx, 1, "  %2u %c%c id=", n + 1,
+-				k->isPrivate ? 'P' : ' ',
+-				k->needLogin ? 'L' : ' ');
+-			dump_hex(ctx, 1, k->id, k->id_len);
+-			ctx_log(ctx, 1, " label=%s\n", k->label);
+-			if (key_label != NULL && strcmp(k->label, key_label) == 0)
+-				selected_key = k;
+-			if (key_id_len != 0 && k->id_len == key_id_len
+-					&& memcmp(k->id, key_id, key_id_len) == 0)
+-				selected_key = k;
++		ctx_log(ctx, 1, "Found %u %s key%s:\n", key_count,
++				(char *)(isPrivate ? "private" : "public"),
++				(key_count == 1) ? "" : "s");
++
++		if (s_slot_key_id && *s_slot_key_id &&
++				(key_id_len != 0 || key_label != NULL)) {
++			for (m = 0; m < key_count; m++) {
++				PKCS11_KEY *k = keys + m;
++
++				ctx_log(ctx, 1, "  %2u %c%c id=", m + 1,
++						k->isPrivate ? 'P' : ' ',
++						k->needLogin ? 'L' : ' ');
++				dump_hex(ctx, 1, k->id, k->id_len);
++				ctx_log(ctx, 1, " label=%s\n", k->label);
++				if (key_label != NULL && strcmp(k->label, key_label) == 0)
++					selected_key = k;
++				if (key_id_len != 0 && k->id_len == key_id_len
++						&& memcmp(k->id, key_id, key_id_len) == 0)
++					selected_key = k;
++			}
++		} else {
++			selected_key = keys; /* Use the first key */
++		}
++
++		if (selected_key) {
++			break;
+ 		}
+-	} else {
+-		selected_key = keys; /* Use the first key */
+ 	}
+ 
+ 	if (selected_key != NULL) {
+@@ -813,9 +919,20 @@ static EVP_PKEY *ctx_load_key(ENGINE_CTX *ctx, const char *s_slot_key_id,
+ 			ctx_log(ctx, 0, "Key not found.\n");
+ 		pk = NULL;
+ 	}
++
+ error:
++	/* Free the searched token data */
++	if (match_tok) {
++		OPENSSL_free(match_tok->model);
++		OPENSSL_free(match_tok->manufacturer);
++		OPENSSL_free(match_tok->serialnr);
++		OPENSSL_free(match_tok->label);
++		OPENSSL_free(match_tok);
++	}
+ 	if (key_label != NULL)
+ 		OPENSSL_free(key_label);
++	if (matched_slots != NULL)
++		free(matched_slots);
+ 	return pk;
+ }
+ 
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index e7d61ee..4fa22dc 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -28,7 +28,9 @@ dist_check_SCRIPTS = \
+ 	rsa-pss-sign.softhsm \
+ 	rsa-oaep.softhsm \
+ 	case-insensitive.softhsm \
+-	ec-check-privkey.softhsm
++	ec-check-privkey.softhsm \
++	pkcs11-uri-without-token.softhsm \
++	search-all-matching-tokens.softhsm
+ dist_check_DATA = \
+ 	rsa-cert.der rsa-prvkey.der rsa-pubkey.der \
+ 	ec-cert.der ec-prvkey.der ec-pubkey.der
+diff --git a/tests/pkcs11-uri-without-token.softhsm b/tests/pkcs11-uri-without-token.softhsm
+new file mode 100755
+index 0000000..f82e1f4
+--- /dev/null
++++ b/tests/pkcs11-uri-without-token.softhsm
+@@ -0,0 +1,62 @@
++#!/bin/sh
++
++# Copyright (C) 2015 Nikos Mavrogiannopoulos
++#
++# GnuTLS is free software; you can redistribute it and/or modify it
++# under the terms of the GNU General Public License as published by the
++# Free Software Foundation; either version 3 of the License, or (at
++# your option) any later version.
++#
++# GnuTLS is distributed in the hope that it will be useful, but
++# WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with GnuTLS; if not, write to the Free Software Foundation,
++# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
++
++# This test checks if it is possible to use the keys without specifying the
++# token if there is only one initialized token available.
++
++outdir="output.$$"
++
++# Load common test functions
++. ${srcdir}/rsa-common.sh
++
++# Do the common test initialization
++common_init
++
++sed -e "s|@MODULE_PATH@|${MODULE}|g" -e \
++    "s|@ENGINE_PATH@|../src/.libs/pkcs11.so|g" \
++    <"${srcdir}/engines.cnf.in" >"${outdir}/engines.cnf"
++
++export OPENSSL_ENGINES="../src/.libs/"
++export OPENSSL_CONF="${outdir}/engines.cnf"
++
++# These URIs don't contain the token specification
++PRIVATE_KEY="pkcs11:object=server-key;type=private;pin-value=1234"
++PUBLIC_KEY="pkcs11:object=server-key;type=public;pin-value=1234"
++
++# Create input file
++echo "secret" >"${outdir}/in.txt"
++
++# Generate signature without specifying the token in the PKCS#11 URI
++openssl pkeyutl -engine pkcs11 -keyform engine -inkey "${PRIVATE_KEY}" \
++	-sign -out "${outdir}/signature.bin" -in "${outdir}/in.txt"
++if test $? != 0;then
++	echo "Failed to generate signature using PKCS#11 URI ${PRIVATE_KEY}"
++	exit 1;
++fi
++
++# Verify the signature without specifying the token in the PKCS#11 URI
++openssl pkeyutl -engine pkcs11 -keyform engine -pubin -inkey "${PUBLIC_KEY}" \
++	-verify -sigfile "${outdir}/signature.bin" -in "${outdir}/in.txt"
++if test $? != 0;then
++	echo "Failed to verify signature using PKCS#11 URI ${PUBLIC_KEY}"
++	exit 1;
++fi
++
++rm -rf "$outdir"
++
++exit 0
+diff --git a/tests/search-all-matching-tokens.softhsm b/tests/search-all-matching-tokens.softhsm
+new file mode 100755
+index 0000000..d0810c4
+--- /dev/null
++++ b/tests/search-all-matching-tokens.softhsm
+@@ -0,0 +1,106 @@
++#!/bin/sh
++
++# Copyright (C) 2015 Nikos Mavrogiannopoulos
++#
++# GnuTLS is free software; you can redistribute it and/or modify it
++# under the terms of the GNU General Public License as published by the
++# Free Software Foundation; either version 3 of the License, or (at
++# your option) any later version.
++#
++# GnuTLS is distributed in the hope that it will be useful, but
++# WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with GnuTLS; if not, write to the Free Software Foundation,
++# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
++
++# This test checks if the search for objects in tokens will continue past the
++# first token found.
++#
++# Generic PKCS#11 URIs are used to make the search to match more than one
++# token. The search should be able to find the objects in each device, which are
++# labeled differently per token.
++#
++# This test also contains a negative test to verify that the engine will not try
++# to login to a token if more than one token matched the search. This is why it
++# is required to have only one match to be able to use a private key.
++
++outdir="output.$$"
++
++# Load common test functions
++. ${srcdir}/rsa-common.sh
++
++PIN=1234
++PUK=1234
++
++NUM_DEVICES=5
++
++# Initialize the SoftHSM DB
++init_db
++
++# Create some devices
++create_devices $NUM_DEVICES $PIN $PUK "libp11-test" "label"
++
++sed -e "s|@MODULE_PATH@|${MODULE}|g" -e "s|@ENGINE_PATH@|../src/.libs/pkcs11.so|g" <"${srcdir}/engines.cnf.in" >"${outdir}/engines.cnf"
++
++export OPENSSL_ENGINES="../src/.libs/"
++export OPENSSL_CONF="${outdir}/engines.cnf"
++
++PRIVATE_KEY="pkcs11:token=libp11-test-3;object=label-3;type=private;pin-value=1234"
++PRIVATE_KEY_WITHOUT_TOKEN="pkcs11:object=label-3;type=private;pin-value=1234"
++PUBLIC_KEY_ANY="pkcs11:type=public"
++CERTIFICATE="pkcs11:object=label-3;type=cert;pin-value=1234"
++
++# Create input file
++echo "secret" > "${outdir}/in.txt"
++
++# Verify that it doesn't try to login if more than one token matched the search
++openssl pkeyutl -engine pkcs11 -keyform engine \
++	-inkey "${PRIVATE_KEY_WITHOUT_TOKEN}" \
++	-sign -out "${outdir}/signature.bin" -in "${outdir}/in.txt"
++if test $? = 0;then
++	echo "Did not fail when the PKCS#11 URI matched multiple tokens"
++fi
++
++# Generate signature specifying the token in the PKCS#11 URI
++openssl pkeyutl -engine pkcs11 -keyform engine -inkey "${PRIVATE_KEY}" \
++	-sign -out "${outdir}/signature.bin" -in "${outdir}/in.txt"
++if test $? != 0;then
++	echo "Failed to sign file using PKCS#11 URI ${PRIVATE_KEY}"
++	exit 1;
++fi
++
++# Verify the signature using the public key from each token
++i=0
++while [ $i -le ${NUM_DEVICES} ]; do
++	pubkey="pkcs11:object=label-$i;type=public;pin-value=1234"
++	openssl pkeyutl -engine pkcs11 -keyform engine -pubin -inkey "${pubkey}" \
++		-verify -sigfile "${outdir}/signature.bin" -in "${outdir}/in.txt"
++	if test $? != 0;then
++		echo "Failed to verify the signature using the PKCS#11 URI ${pubkey}"
++		exit 1;
++	fi
++	i=$(($i + 1))
++done
++
++# Verify the signature using a certificate without specifying the token
++openssl pkeyutl -engine pkcs11 -keyform engine -pubin -inkey "${CERTIFICATE}" \
++	-verify -sigfile "${outdir}/signature.bin" -in "${outdir}/in.txt"
++if test $? != 0;then
++	echo "Failed to verify the signature using the PKCS#11 URI ${CERTIFICATE}"
++	exit 1;
++fi
++
++# Verify the signature using the first public key found
++openssl pkeyutl -engine pkcs11 -keyform engine -pubin -inkey "${PUBLIC_KEY_ANY}" \
++	-verify -sigfile "${outdir}/signature.bin" -in "${outdir}/in.txt"
++if test $? != 0;then
++	echo "Failed to verify the signature using the PKCS#11 URI ${PUBLIC_KEY_ANY}."
++	exit 1;
++fi
++
++rm -rf "$outdir"
++
++exit 0
+-- 
+2.21.0
+

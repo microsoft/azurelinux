@@ -1,0 +1,40 @@
+--- bc-java-r1v60/ant/bc+-build.xml	2018-07-02 00:14:10.000000000 +0200
++++ bc-java-r1v60/ant/bc+-build.xml	2018-11-19 18:49:26.961265967 +0100
+@@ -106,7 +106,7 @@
+                 <javac source="${bc.javac.source}" target="${bc.javac.target}"
+                     srcdir="${artifacts.dir}/@{target}/src"
+                     destdir="${build.dir}/@{target}/classes"
+-                    memoryMaximumSize="512m"
++                    memoryMaximumSize="512m" encoding="utf-8"
+                     debug="${release.debug}" fork="true">
+                     <classpath>
+                         <path refid="project.classpath" /> 
+@@ -143,7 +143,7 @@
+                 <javac source="${bc.javac.source}" target="${bc.javac.target}"
+                     srcdir="${artifacts.dir}/@{target}/src"
+                     destdir="${build.dir}/@{target}/classes"
+-                    memoryMaximumSize="512m"
++                    memoryMaximumSize="512m" encoding="utf-8"
+                     debug="${release.debug}">
+                     <classpath>
+                         <path refid="project.classpath" /> 
+@@ -219,8 +219,8 @@
+             <element name="docElements" />
+             <sequential>
+             <mkdir dir="@{docsDir}" />
+-            <javadoc maxmemory="384m" sourcepath="@{srcDir}"
+-                     destdir="@{docsDir}"
++            <javadoc maxmemory="384m" sourcepath="@{srcDir}" source="${bc.javac.source}"
++                     destdir="@{docsDir}" encoding="utf-8"
+                      windowtitle="Bouncy Castle Library ${release.name} API Specification"
+                      header="&lt;b&gt;Bouncy Castle Cryptography Library ${release.name}&lt;/b&gt;">
+                 <docElements/>
+@@ -284,7 +284,7 @@
+         <javac source="${bc.javac.source}" target="${bc.javac.target}"
+             srcdir="${lcrypto.target.src.dir}"
+             destdir="${lcrypto.target.classes.dir}"
+-	    memoryMaximumSize="512m"
++	    memoryMaximumSize="512m" encoding="utf-8"
+             fork="true"
+             debug="${release.debug}">
+             <classpath>

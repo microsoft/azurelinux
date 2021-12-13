@@ -1,0 +1,83 @@
+From 7c928fcd9c0b0a61772bebf877306bdacbc779a8 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Sat, 21 Mar 2020 16:03:30 +0100
+Subject: [PATCH] util: Unset GNOME_SETUP_DISPLAY at login time
+
+This variable was introduced to allow Xwayland auto-startup.
+Unfortunately, it will prevent g-s-d process startup if it leaks from a
+wayland session to an Xorg session.
+
+As such, add it to the list of variables that are unset at login time.
+---
+ gnome-session/gsm-util.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gnome-session/gsm-util.c b/gnome-session/gsm-util.c
+index 02bc4a57..5a52de57 100644
+--- a/gnome-session/gsm-util.c
++++ b/gnome-session/gsm-util.c
+@@ -37,60 +37,61 @@ static gchar **child_environment;
+ 
+ /* These are variables that will not be passed on to subprocesses
+  * (either directly, via systemd or DBus).
+  * Some of these are blacklisted as they might end up in the wrong session
+  * (e.g. XDG_VTNR), others because they simply must never be passed on
+  * (NOTIFY_SOCKET).
+  */
+ static const char * const variable_blacklist[] = {
+     "NOTIFY_SOCKET",
+     "XDG_SEAT",
+     "XDG_SESSION_ID",
+     "XDG_VTNR",
+     NULL
+ };
+ 
+ /* The following is copied from GDMs spawn_session function.
+  *
+  * Environment variables listed here will be copied into the user's service
+  * environments if they are set in gnome-session's environment. If they are
+  * not set in gnome-session's environment, they will be removed from the
+  * service environments. This is to protect against environment variables
+  * leaking from previous sessions (e.g. when switching from classic to
+  * default GNOME $GNOME_SHELL_SESSION_MODE will become unset).
+  */
+ static const char * const variable_unsetlist[] = {
+     "DISPLAY",
+     "XAUTHORITY",
+     "WAYLAND_DISPLAY",
+     "WAYLAND_SOCKET",
+     "GNOME_SHELL_SESSION_MODE",
++    "GNOME_SETUP_DISPLAY",
+     NULL
+ };
+ 
+ char *
+ gsm_util_find_desktop_file_for_app_name (const char *name,
+                                          gboolean    look_in_saved_session,
+                                          gboolean    autostart_first)
+ {
+         char     *app_path;
+         char    **app_dirs;
+         GKeyFile *key_file;
+         char     *desktop_file;
+         int       i;
+ 
+         app_path = NULL;
+ 
+         app_dirs = gsm_util_get_desktop_dirs (look_in_saved_session, autostart_first);
+ 
+         key_file = g_key_file_new ();
+ 
+         desktop_file = g_strdup_printf ("%s.desktop", name);
+ 
+         g_debug ("GsmUtil: Looking for file '%s'", desktop_file);
+ 
+         for (i = 0; app_dirs[i] != NULL; i++) {
+                 g_debug ("GsmUtil: Looking in '%s'", app_dirs[i]);
+         }
+ 
+         g_key_file_load_from_dirs (key_file,
+                                    desktop_file,
+-- 
+2.21.1
+

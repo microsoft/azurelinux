@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Parag Nemade <pnemade AT redhat DOT com> -->
+<component type="font">
+  <id>google-crosextra-carlito</id>
+  <metadata_license>CC-BY-3.0</metadata_license>
+  <name>Carlito</name>
+  <summary>Sans-Serif font metric-compatible with Calibri font</summary>
+  <description>
+    <p>
+      Carlito is metric-compatible with Calibri font. Carlito comes in regular, bold,
+      italic, and bold italic.
+    </p>
+  </description>
+  <updatecontact>pnemade_at_redhat_dot_com</updatecontact>
+  <url type="homepage">http://code.google.com/p/chromium/issues/detail?id=280557</url>
+</component>
+

@@ -1,0 +1,13 @@
+diff --git a/pnm2ppa.c b/pnm2ppa.c
+index 4ae36ce..0d60fbb 100644
+--- a/pnm2ppa.c
++++ b/pnm2ppa.c
+@@ -604,7 +604,7 @@ main (int argc, char *argv[])
+   int i, opt_index;
+   FILE *in = NULL, *out = NULL, *gf = NULL;
+   struct stat tmpstat;
+-  char c;
++  int c;
+   BOOLEAN get_Gamma = true;
+ 
+   char *gammaFile=NULL; 

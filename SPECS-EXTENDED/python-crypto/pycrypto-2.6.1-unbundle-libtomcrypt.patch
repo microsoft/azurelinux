@@ -1,0 +1,30 @@
+--- setup.py
++++ setup.py
+@@ -390,10 +390,12 @@ kw = {'name':"pycrypto",
+                       include_dirs=['src/'],
+                       sources=["src/CAST.c"]),
+             Extension("Crypto.Cipher._DES",
+-                      include_dirs=['src/', 'src/libtom/'],
++                      include_dirs=['src/'],
++                      libraries=['tomcrypt'],
+                       sources=["src/DES.c"]),
+             Extension("Crypto.Cipher._DES3",
+-                      include_dirs=['src/', 'src/libtom/'],
++                      include_dirs=['src/'],
++                      libraries=['tomcrypt'],
+                       sources=["src/DES3.c"]),
+ 
+             # Stream ciphers
+--- src/DES.c
++++ src/DES.c
+@@ -28,8 +28,8 @@
+  * assert-like LTC_ARGCHK macro fails. */
+ #define ARGTYPE 4
+ 
+-/* Include the actial DES implementation */
+-#include "libtom/tomcrypt_des.c"
++/* Access the actual DES implementation */
++#include "tomcrypt.h"
+ 
+ #undef DES  /* this is needed because tomcrypt_custom.h defines DES to an empty string */
+ 

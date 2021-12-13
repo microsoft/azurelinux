@@ -1,0 +1,228 @@
+diff --git a/src/autoconf b/src/autoconf
+index 3a52e6c..ff78048 100755
+--- a/src/autoconf
++++ b/src/autoconf
+@@ -68,8 +68,6 @@
+ #	#define NOfsync
+ #Ok	#define endpwent()
+ #Ok	#define endgrent()
+-#Ok	#define endhostent()
+-#Ok	#define endservent()
+ #Ok	#define endprotoent()
+ #	#define h_0addr_list h_addr
+ #Ok	#define NOpw_passwd
+@@ -896,7 +894,7 @@ int main(){int i=0;
+  {uid_t vuid_t;i+=vuid_t=1;}
+  {gid_t vgid_t;i+=vgid_t=1;}
+ #ifndef NO_COMSAT
+- {struct hostent vhostent;i+=!(vhostent.h_addr_list=0);}
++ {struct addrinfo res; i+=!(res.ai_socktype=0);}
+ #endif
+ #ifndef NOuname
+  {struct utsname vutsname;i+=!(*vutsname.nodename='\0');}
+@@ -917,8 +915,6 @@ do
+   test -z "$i3" && grepfor mode_t 'typedef int mode_t;' && i3=I
+   test -z "$i4" && grepfor uid_t 'typedef int uid_t;' && i4=I
+   test -z "$i5" && grepfor gid_t 'typedef int gid_t;' && i5=I
+-  test -z "$i6" && grepfor h_addr_list '#define h_0addr_list h_addr' && i6=I
+-  test -z "$i6" && grepfor hostent '#define h_0addr_list h_addr' && i6=I
+   test -z "$i6" && grepfor member '#define h_0addr_list h_addr' && i6=I
+   test -z "$i7" && grepfor utsname "#define NOuname			      \
+ /* <sys/utsname.h> is there, but empty */" && i7=I
+@@ -1048,8 +1044,12 @@ int main(){char a[2];
+  {struct utsname b;uname(&b);}
+ #endif
+ #ifndef NO_COMSAT
+- gethostbyname("0");getprotobyname(COMSATprotocol);endhostent();endservent();
+- endprotoent();
++ {
++ struct addrinfo *res, hints;
++ memset(&hints, '\0', sizeof(hints));
++ if(getaddrinfo(COMSAThost,BIFF_serviceport,&hints,&res))
++ 	freeaddrinfo(res);
++ }
+ #endif
+  _exit(0);
+  return 0;}
+@@ -1103,14 +1103,9 @@ grepfor uname "\
+ /* <sys/utsname.h> defines it, the libraries don't */"
+ grepfor endpwent '#define endpwent()'
+ grepfor endgrent '#define endgrent()'
+-if grepfor gethostbyname '#define NO_COMSAT'
++if grepfor getaddrinfo '#define NO_COMSAT'
+ then
+ :
+-else
+-  grepfor getprotobyname '#define UDP_protocolno 17'
+-  grepfor endhostent '#define endhostent()'
+-  grepfor endservent '#define endservent()'
+-  grepfor endprotoent '#define endprotoent()'
+ fi
+ grepfor strstr '#define SLOWstrstr' ||
+  grepfor clock '#define SLOWstrstr'
+@@ -1239,39 +1234,9 @@ int main(argc,argv)int argc;const char*argv[];
+ 	printf("/* Insufficient memory to perform the benchmark! */\n");
+ #endif /* SLOWstrstr */
+ #ifndef NO_COMSAT
+-#ifndef UDP_protocolno
+-     ;{ const struct protoent*p;
+-	if(p=getprotobyname(COMSATprotocol))
+-	 { printf("#define UDP_protocolno %d\n",p->p_proto);
+-#else
+-     ;{ if(1)
+-	 {
+-#endif
+-	   ;{ const struct servent*serv;
+-	      if(serv=getservbyname(COMSATservice,COMSATprotocol))
+-		 printf("#define BIFF_serviceport \"%d\"\n",
+-		  ntohs(serv->s_port));
+-	    }
+-#ifdef AF_INET
+-	   ;{ const struct hostent*host;
+-	      if(!strcmp("localhost",COMSAThost)&&
+-	       (host=gethostbyname(COMSAThost))&&
+-	       host->h_0addr_list&&host->h_addrtype==AF_INET&&
+-	       host->h_length)
+-	       { int j=host->h_length;
+-		 const unsigned char*ad=(void*)host->h_0addr_list;
+-		 printf("#define IP_localhost {");
+-		 printf("%d",*ad++);
+-		 while(--j)
+-		    printf(",%d",*ad++);
+-		 puts("}");
+-	       }
+-	    }
++#ifndef AF_INET
++	puts("#define NO_COMSAT");
+ #endif /* AF_INET */
+-	 }
+-	else
+-	   puts("#define NO_COMSAT");
+-      }
+ #endif /* NO_COMSAT */
+      ;{ unsigned long s=(size_t)~0;int bits;
+ 	for(bits=1;s>>=1;bits++);
+diff --git a/src/comsat.c b/src/comsat.c
+index 9712e74..5082b16 100644
+--- a/src/comsat.c
++++ b/src/comsat.c
+@@ -27,7 +27,8 @@ static /*const*/char rcsid[]=
+ #include "comsat.h"
+ 
+ static int csvalid;		     /* is it turned on with a good address? */
+-static struct sockaddr_in csaddr;
++static struct addrinfo cai;
++static struct sockaddr *csaddr;
+ static char*cslastf,*cslgname;
+ 
+ void setlfcs(folder)const char*folder;		/* set lastfolder for comsat */
+@@ -62,56 +63,32 @@ void setlgcs(name)const char*name;		   /* set logname for comsat */
+ }
+ 
+ int setcomsat(chp)const char*chp;
+-{ char*chad;int newvalid; struct sockaddr_in newaddr;
++{ char*chad;int newvalid; struct addrinfo *res, hints;
+   chad=strchr(chp,SERV_ADDRsep);			     /* @ separator? */
+   if(!chad&&!renvint(-1L,chp))
+      return csvalid=0;					/* turned off comsat */
+   newvalid=1;
+   if(chad)
+      *chad++='\0';				      /* split the specifier */
++  if(!chad||!*chp)					       /* no service */
++     chp=BIFF_serviceport;				/* new balls please! */
+   if(!chad||!*chad)						  /* no host */
+-#ifndef IP_localhost			      /* Is "localhost" preresolved? */
+      chad=COMSAThost;					/* nope, use default */
+-#else /* IP_localhost */
+-   { static const unsigned char ip_localhost[]=IP_localhost;
+-     newaddr.sin_family=AF_INET;
+-     tmemmove(&newaddr.sin_addr,ip_localhost,sizeof ip_localhost);
+-   }
+-  else
+-#endif /* IP_localhost */
+-   { const struct hostent*host;		      /* what host?  paranoid checks */
+-     if(!(host=gethostbyname(chad))||!host->h_0addr_list)
+-      { bbzero(&newaddr.sin_addr,sizeof newaddr.sin_addr);
+-	newvalid=0;			     /* host can't be found, too bad */
+-      }
+-     else
+-      { newaddr.sin_family=host->h_addrtype;	     /* address number found */
+-	tmemmove(&newaddr.sin_addr,host->h_0addr_list,host->h_length);
+-      }
+-     endhostent();
+-   }
+-  if(newvalid)						  /* so far, so good */
+-   { int s;
+-     if(!chad||!*chp)					       /* no service */
+-	chp=BIFF_serviceport;				/* new balls please! */
+-     s=strtol(chp,&chad,10);
+-     if(chp!=chad)			       /* the service is not numeric */
+-	newaddr.sin_port=htons((short)s);		    /* network order */
+-     else
+-      { const struct servent*serv;
+-	serv=getservbyname(chp,COMSATprotocol);		   /* so get its no. */
+-	if(serv)
+-	   newaddr.sin_port=serv->s_port;
+-	else
+-	 { newaddr.sin_port=htons((short)0);		  /* no such service */
+-	   newvalid=0;
+-	 }
+-	endservent();
+-      }
+-   }
++  bzero(&hints,sizeof(hints));
++  hints.ai_socktype=SOCK_DGRAM;
++  hints.ai_flags=AI_ADDRCONFIG;
++  if(getaddrinfo(chad,chp,&hints,&res))
++     newvalid=0;
++  
+   onguard();				    /* update the address atomically */
+   if(csvalid=newvalid)
+-     tmemmove(&csaddr,&newaddr,sizeof(newaddr));
++   { if(csaddr)
++        free(csaddr);
++     csaddr=malloc(res->ai_addrlen);
++     tmemmove(csaddr,res->ai_addr,res->ai_addrlen);
++     tmemmove(&cai,res,sizeof(cai));
++     freeaddrinfo(res);
++   }
+   offguard();
+   return newvalid;
+ }
+@@ -132,8 +109,8 @@ void sendcomsat(folder)const char*folder;
+    }
+   strlcat(buf,COMSATxtrsep,linebuf);			 /* custom seperator */
+   strlcat(buf,p,linebuf);			  /* where was it delivered? */
+-  if((s=socket(AF_INET,SOCK_DGRAM,UDP_protocolno))>=0)
+-   { sendto(s,buf,strlen(buf),0,(struct sockaddr*)&csaddr,sizeof(csaddr));
++  if((s=socket(cai.ai_family,cai.ai_socktype,cai.ai_protocol))>=0)
++   { sendto(s,buf,strlen(buf),0,csaddr,cai.ai_addrlen);
+      rclose(s);
+      yell("Notified comsat:",buf);
+    }
+diff --git a/src/network.h b/src/network.h
+index d7d08f2..b09b6c4 100644
+--- a/src/network.h
++++ b/src/network.h
+@@ -1,19 +1,13 @@
+ /*$Id: network.h,v 1.7 1997/04/02 03:15:41 srb Exp $*/
+ 
+-#include <sys/socket.h>			/* socket() sendto() AF_INET
++#include <sys/socket.h>			/* socket() sendto() */
+ 					/* SOCK_DGRAM */
+-#include <netdb.h>			/* gethostbyname() getservbyname()
+-					/* getprotobyname() */
+-#include <netinet/in.h>			/* htons() struct sockaddr_in */
++#include <netdb.h>			/* getaddrinfo() */
+ 
+ #ifndef BIFF_serviceport
+ #define BIFF_serviceport	COMSATservice
+ #endif
+ 
+-#ifndef h_0addr_list
+-#define h_0addr_list	h_addr_list[0]		      /* POSIX struct member */
+-#endif
+-
+ #ifndef NO_const      /* since network.h is outside the autoconf const check */
+ #ifdef const		    /* loop, we need this backcheck for some systems */
+ #undef const

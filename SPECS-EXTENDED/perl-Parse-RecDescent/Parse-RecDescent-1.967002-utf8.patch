@@ -1,0 +1,33 @@
+diff -up Parse-RecDescent-1.967002/Changes.utf8 Parse-RecDescent-1.967002/Changes
+--- Parse-RecDescent-1.967002/Changes.utf8	2012-01-30 03:13:13.000000000 +0000
++++ Parse-RecDescent-1.967002/Changes	2012-01-30 16:22:52.599253728 +0000
+@@ -531,7 +531,7 @@ Revision history for Parse-RecDescent
+ 
+     - Fixed nit in debugging of conditional regexes (thanks, Brian)
+ 
+-    - Moved expectation creation to compile-time (thanks François)
++    - Moved expectation creation to compile-time (thanks FranÃ§ois)
+ 
+     - Removed redundant inheritances (i.e. @ISA elements)
+       in internal namespace (thanks Hugo)
+diff -up Parse-RecDescent-1.967002/demo/demo_dot.pl.utf8 Parse-RecDescent-1.967002/demo/demo_dot.pl
+--- Parse-RecDescent-1.967002/demo/demo_dot.pl.utf8	2012-01-30 16:22:52.580253741 +0000
++++ Parse-RecDescent-1.967002/demo/demo_dot.pl	2012-01-30 16:22:52.626253709 +0000
+@@ -10,7 +10,7 @@ Received: (from root@localhost)
+ 	Wed, 20 Oct 1999 21:29:05 +0200
+ Date: Wed, 20 Oct 1999 21:29:05 +0200
+ Message-Id: <199910201929.VAA00889@bib.adnintern.org>
+-From: "Stéphane Payrard -- stef@adnaccess.com (06 60 95 82 69)" <stef@adnaccess.com>
++From: "StÃ©phane Payrard -- stef@adnaccess.com (06 60 95 82 69)" <stef@adnaccess.com>
+ To: damian@cs.monash.edu.au
+ Subject: parsing dot file
+ Reply-to: stef@adnaccess.com
+@@ -39,7 +39,7 @@ my $graph = "$DOTSRC/graphs";
+ # $::RD_AUTOSTUB=1;
+ # $::RD_TRACE=1;
+ 
+-#  'strict'(?) pas accepté
++#  'strict'(?) pas acceptÃ©
+ $gram = <<'EOF';
+ 
+ graph:        comment(?) strict(?)  ( 'digraph' | 'graph' ) id  '{' stmt_list '}'

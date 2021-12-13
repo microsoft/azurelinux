@@ -1,0 +1,21 @@
+diff -up openhpi-3.8.0/plugins/snmp_bc/t/Makefile.am.me openhpi-3.8.0/plugins/snmp_bc/t/Makefile.am
+--- openhpi-3.8.0/plugins/snmp_bc/t/Makefile.am.me	2018-12-06 10:33:50.698431653 +0100
++++ openhpi-3.8.0/plugins/snmp_bc/t/Makefile.am	2018-12-06 10:36:09.478204907 +0100
+@@ -74,7 +74,7 @@ nodist_libsnmp_bc_la_SOURCES = $(GENERAT
+ # libopenhpi_la_LIBADD    = $(top_builddir)/utils/libopenhpiutils.la
+ # libopenhpi_la_LDFLAGS   = -L$(top_builddir)/utils -version-info @HPI_LIB_VERSION@ -export-symbols $(top_srcdir)/src/hpi.sym
+ 
+-libsnmp_bc_la_LIBADD = -luuid @SNMPLIBS@ $(top_builddir)/utils/libopenhpiutils.la
++libsnmp_bc_la_LIBADD = -luuid @SNMPLIBS@ $(top_builddir)/utils/libopenhpiutils.la $(top_builddir)/baselib/libopenhpi.la
+ libsnmp_bc_la_LDFLAGS = -L$(top_builddir)/utils -module -version-info @HPI_LIB_VERSION@
+ # libsnmp_bc_la_LDFLAGS = -version 0:0:0
+ 
+@@ -97,7 +97,7 @@ TESTS_ENVIRONMENT  = OPENHPI_CONF=$(srcd
+ TESTS_ENVIRONMENT += OPENHPI_SIMTEST_FILE=$(srcdir)/sim_test_file
+ #TESTS_ENVIRONMENT += OPENHPI_ERROR=YES
+ #TESTS_ENVIRONMENT += OPENHPI_DEBUG=YES
+-TESTS_ENVIRONMENT += LD_LIBRARY_PATH=$(top_srcdir)/openhpid/.libs:$(top_srcdir)/ssl/.libs:$(top_srcdir)/utils/.libs:$(top_srcdir)/plugins/snmp/.libs:$(top_srcdir)/plugins/snmp_bc/t/.libs
++TESTS_ENVIRONMENT += LD_LIBRARY_PATH=$(top_srcdir)/openhpid/.libs:$(top_srcdir)/ssl/.libs:$(top_srcdir)/utils/.libs:$(top_srcdir)/plugins/snmp/.libs:$(top_srcdir)/plugins/snmp_bc/t/.libs:$(top_srcdir)/baselib/.libs:$(top_srcdir)/transport/.libs:$(top_srcdir)/marshal/.libs
+ TESTS_ENVIRONMENT += OPENHPI_UID_MAP=$(shell pwd)/uid_map
+ TESTS_ENVIRONMENT += OPENHPI_PATH=$(shell pwd)
+ 

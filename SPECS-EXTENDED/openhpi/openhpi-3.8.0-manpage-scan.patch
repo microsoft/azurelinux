@@ -1,0 +1,54 @@
+diff -up openhpi-3.8.0/docs/man/hpicrypt.1.pod.me openhpi-3.8.0/docs/man/hpicrypt.1.pod
+--- openhpi-3.8.0/docs/man/hpicrypt.1.pod.me	2018-08-07 15:49:10.034455449 +0200
++++ openhpi-3.8.0/docs/man/hpicrypt.1.pod	2018-08-07 15:50:10.702706004 +0200
+@@ -23,6 +23,9 @@ Please have a backup copy of the file be
+ 
+ Decrypt the config_file and output the text to screen with helpful message
+ 
++=item B<-c>
++Config file to encrypt or decrypt
++
+ =back
+ 
+ =head1 SEE ALSO
+diff -up openhpi-3.8.0/docs/man/hpitop.1.pod.me openhpi-3.8.0/docs/man/hpitop.1.pod
+--- openhpi-3.8.0/docs/man/hpitop.1.pod.me	2018-08-07 15:23:49.398174972 +0200
++++ openhpi-3.8.0/docs/man/hpitop.1.pod	2018-08-07 15:25:16.451534556 +0200
+@@ -5,7 +5,7 @@ hpitop - A openhpi sample application th
+ 
+ =head1 SYNOPSIS 
+ 
+- hpitop [-D nn] [-N host[:port]] [-C <cfgfile>] [-rscwiafd] [-n nn] [-X] [-h]
++ hpitop [-D nn] [-N host[:port]] [-C <cfgfile>] [-r] [-s] [-c] [-w] [-i] [-a] [-f] [-d] [-n nn] [-X] [-h]
+  hpitop [--domain=nn] [--host=host[:port]] [--cfgfile=file] [--rpts] [--sensors]
+         [--controls] [--watchdogs] [--inventories] [--annunciators] [--fumis] [--dimis] 
+         [--resource=nn] [--debug] [--help]
+diff -up openhpi-3.8.0/docs/man/hpitree.1.pod.me openhpi-3.8.0/docs/man/hpitree.1.pod
+--- openhpi-3.8.0/docs/man/hpitree.1.pod.me	2018-08-07 16:01:44.231568709 +0200
++++ openhpi-3.8.0/docs/man/hpitree.1.pod	2018-08-07 16:02:31.364763240 +0200
+@@ -5,7 +5,7 @@ and resources' manamegement instruments
+ 
+ =head1 SYNOPSIS 
+ 
+- hpitree [-D nn] [-N host[:port]] [-C <cfgfile>] [-acdiorsw ] [-n nn] [-X] [-h]
++ hpitree [-D nn] [-N host[:port]] [-C <cfgfile>] [-a] [-c] [-d] [-i] [-o] [-r] [-s] [-w] [-n nn] [-X] [-h]
+  hpitree [--domain=nn] [--host=host[:port]] [--cfgfile=file] [--all] [--controls] [--rdrs] [--inventories] [--rpts]
+          [--sensors] [--watchdogs] [--overview] [--resource=nn] [--debug] [--help]
+ 
+diff -up openhpi-3.8.0/docs/man/openhpid.8.pod.me openhpi-3.8.0/docs/man/openhpid.8.pod
+--- openhpi-3.8.0/docs/man/openhpid.8.pod.me	2018-08-07 16:10:04.766634543 +0200
++++ openhpi-3.8.0/docs/man/openhpid.8.pod	2018-08-07 16:15:01.409858847 +0200
+@@ -38,6 +38,12 @@ The client and daemon currently cannot r
+ 
+ =over 4
+ 
++=item B<-d>, B<--decrypt>
++Config file encrypted with hpicrypt. Decrypt and read
++
++=item B<-h>, B<--help>
++Show help options
++
+ =item B<-c>, B<--cfg>=I<conf_file>
+ 
+ Sets path/name of the configuration file.
+diff -up openhpi-3.8.0/openhpid/threaded.c.me openhpi-3.8.0/openhpid/threaded.c

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<project name="relaxngcc" default="jar">
+  
+  <!-- Compile Java source files: -->
+  <target name="compile">
+    <mkdir dir="bin"/>
+    <javacc target="src/relaxngcc/javabody/JavaBodyParser.jj" outputdirectory="src/relaxngcc/javabody" javacchome="lib" static="false"/>
+    <javac srcdir="src" destdir="bin" debug="on" optimize="off" classpath="lib"> 
+      <classpath>
+        <fileset dir="lib" includes="**/*.jar"/>
+      </classpath>
+    </javac>
+  </target>
+  
+  <!-- Generate javadoc documentation: -->
+  <target name="javadoc" depends="compile">
+    <mkdir dir="javadoc"/>
+    <javadoc locale="en_US" sourcepath="src" destdir="javadoc" windowtitle="RelaxNGCC" public="yes">
+      <package name="relaxngcc.*"/>
+      <classpath>
+        <fileset dir="lib" includes="*.jar"/>
+      </classpath>
+    </javadoc>
+  </target>
+ 
+  <!-- Create the jar file: --> 
+  <target name="jar" depends="compile">
+    <tstamp/>
+    <jar jarfile="relaxngcc.jar">
+      <manifest>
+        <attribute name="Version" value="${DSTAMP}"/>
+        <attribute name="Main-Class" value="relaxngcc.RelaxNGCC"/>
+       </manifest>
+      <fileset dir="src" includes="**/*.properties"/>
+      <fileset dir="src" includes="**/*.xsl"/>
+      <fileset dir="src" includes="**/*.jelly"/>
+      <fileset dir="src" includes="relaxngcc/runtime/*.java"/>
+      <fileset dir="bin" includes="**/*.class"/>
+      <fileset dir="." includes="project.xml"/>
+    </jar>
+  </target>
+  
+</project>

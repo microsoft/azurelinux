@@ -1,0 +1,28 @@
+diff -up openslp-2.0.0/common/slp_crypto.c.orig openslp-2.0.0/common/slp_crypto.c
+--- openslp-2.0.0/common/slp_crypto.c.orig	2012-12-07 21:13:28.000000000 +0100
++++ openslp-2.0.0/common/slp_crypto.c	2017-10-04 09:38:48.469999889 +0200
+@@ -88,11 +88,24 @@ SLPCryptoDSAKey * SLPCryptoDSAKeyDup(SLP
+    result =  DSA_new();
+    if (result)
+    {
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++      const BIGNUM *p, *q, *g;
++      const BIGNUM *priv_key, *pub_key;
++
++      DSA_get0_pqg(dsa, &p, &q, &g);
++      DSA_get0_key(dsa, &pub_key, &priv_key);
++
++      /* would be nice to check return values, but
++       * original code for OpenSSL < 1.1 didn't do that either... */
++      DSA_set0_pqg(result, BN_dup(p), BN_dup(q), BN_dup(g));
++      DSA_set0_key(result, BN_dup(pub_key), BN_dup(priv_key));
++#else
+       result->p = BN_dup(dsa->p);
+       result->q = BN_dup(dsa->q);
+       result->g = BN_dup(dsa->g);
+       result->priv_key = BN_dup(dsa->priv_key);
+       result->pub_key = BN_dup(dsa->pub_key);
++#endif
+    }
+    return result;
+ }

@@ -1,0 +1,265 @@
+diff -ur /home/fedora/packaging-work/orangefs/orangefs-2.9.6/Makefile.in ./Makefile.in
+--- /home/fedora/packaging-work/orangefs/orangefs-2.9.6/Makefile.in	2017-08-28 16:49:41.769131000 +0000
++++ ./Makefile.in	2017-09-15 17:02:45.526366949 +0000
+@@ -1393,7 +1393,7 @@
+ src/server/simple.conf: src/apps/admin/pvfs2-genconfig
+ 	$(Q) "  GENCONFIG     $@"
+ 	$(E)$(srcdir)/src/apps/admin/pvfs2-genconfig --protocol tcp --port 3334 \
+-	--ioservers localhost --metaservers localhost --logfile $(prefix)/log/pvfs2-server.log \
++	--ioservers localhost --metaservers localhost \
+ 	--storage $(prefix)/storage/data --metadata $(prefix)/storage/meta \
+ 	--logging "server,network,storage,flow" --quiet src/server/simple.conf
+ 
+@@ -1404,7 +1404,7 @@
+ examples/fs.conf: src/apps/admin/pvfs2-genconfig
+ 	$(Q) "  GENCONFIG     $@"
+ 	$(E)$(srcdir)/src/apps/admin/pvfs2-genconfig --protocol tcp --port 3334 \
+-	--ioservers localhost --metaservers localhost --logfile $(prefix)/log/pvfs2-server.log \
++	--ioservers localhost --metaservers localhost \
+ 	--storage $(prefix)/storage/data --metadata $(prefix)/storage/meta \
+ 	--quiet examples/fs.conf
+ endif
+diff -ur /home/fedora/packaging-work/orangefs/orangefs-2.9.6/src/apps/admin/pvfs2-genconfig ./src/apps/admin/pvfs2-genconfig
+--- /home/fedora/packaging-work/orangefs/orangefs-2.9.6/src/apps/admin/pvfs2-genconfig	2017-08-15 16:14:22.880025000 +0000
++++ ./src/apps/admin/pvfs2-genconfig	2017-09-15 16:15:38.642709285 +0000
+@@ -28,7 +28,6 @@
+ my $opt_portal = '';
+ my $opt_ioservers = '';
+ my $opt_metaservers = '';
+-my $opt_logfile = '';
+ my $opt_storage = '';
+ my $opt_metadata = '';
+ my $opt_trovesync = '1';
+@@ -67,9 +66,8 @@
+ 
+ my %all_endpoints = ();
+ 
+-my $default_storage = undef;
+-my $default_meta_storage = undef;
+-my $default_logfile = undef;
++my $default_storage = "/var/lib/orangefs/data";
++my $default_meta_storage = "/var/lib/orangefs/meta";
+ 
+ my $bmi_module = undef;
+ 
+@@ -389,7 +387,7 @@
+ 
+ sub emit_defaults
+ {
+-    my ($target, $num_unexp, $bmi_module, $logfile,
++    my ($target, $num_unexp, $bmi_module,
+         $logging, $tracing, $logstamp, $server_job_timeout, $client_job_timeout) = @_;
+ 
+     print $target "<Defaults>\n";
+@@ -419,10 +417,7 @@
+         print $target "\tMetadataStorageSpace " . $default_meta_storage . "\n\n";
+     }
+ 
+-    if(defined($default_logfile))
+-    {
+-        print $target "\tLogFile " . $default_logfile . "\n";
+-    }
++    print $target "\tLogType syslog\n";
+ 
+     if($opt_tcpbindspecific)
+     {
+@@ -664,7 +659,6 @@
+         print $target "\tServer $alias\n";
+         print $target "\tDataStorageSpace $endpoint->{STORAGE}\n";
+         print $target "\tMetadataStorageSpace $endpoint->{METASTORAGE}\n";
+-        print $target "\tLogFile $endpoint->{LOGFILE}\n";
+ 
+         if ($opt_server_dbmaxsize)
+         {
+@@ -680,12 +674,11 @@
+ 
+ sub emit_server_conf
+ {
+-    my($target, $node, $storage, $metastorage, $logfile) = @_;
++    my($target, $node, $storage, $metastorage) = @_;
+ 
+     print $target "DataStorageSpace $storage\n";
+     print $target "MetadataStorageSpace $metastorage\n";
+     print $target "HostID \"" . get_bmi_endpoint($node) . "\"\n";
+-    print $target "LogFile $logfile\n";
+ }
+ 
+ sub emit_fs_key
+@@ -835,7 +828,6 @@
+                                        ('none','usec', or 'datetime' are valid)
+      --storage     <STRING>            path to OrangeFS storage (data) directory.
+      --metadata    <STRING>            path to OrangeFS metadata directory.
+-     --logfile     <STRING>            file to place server logging.
+      --dbmaxsize   <NUM>               LMDB specific; size of storage_attributes and collections databases. 
+                                        If not specified, default is 512MB.
+      --server-dbmaxsize <NUM>          LMDB specific; size of storage_attributes and collections databases 
+@@ -1159,33 +1151,21 @@
+     return $client_job_timeout;
+ }
+ 
+-sub get_logfile
+-{
+-    my $logfile = "/var/log/orangefs-server.log";
+-    if ($opt_logfile) {
+-        $logfile = $opt_logfile;
+-    } elsif (!$opt_quiet) {
+-            print $OUT "Choose a file for each server to write log messages to.\n";
+-            $logfile = prompt_word("Enter log file location [Default is $logfile]: ","$logfile");
+-    }
+-    return $logfile;
+-}
+-
+ sub get_storage
+ {
+-    my $storage = "${fs_path}/storage/data";
++    my $storage = $default_storage;
+     if ($opt_storage) {
+         $storage = $opt_storage;
+     } elsif (!$opt_quiet) {
+             print $OUT "Choose a directory for each server to store data in.\n";
+-            $storage = prompt_word("Enter directory name: [Default is ${fs_path}/storage/data]: ","${fs_path}/storage/data");
++            $storage = prompt_word("Enter directory name: [Default is ${default_storage}]: ","${default_storage}");
+     }
+     return $storage;
+ }
+ 
+ sub get_meta_storage
+ {
+-    my $metastorage = "${fs_path}/storage/meta";
++    my $metastorage = $default_meta_storage;
+     if ($opt_metadata) {
+         $metastorage = $opt_metadata;
+     } elsif ($opt_storage) {
+@@ -1193,7 +1173,7 @@
+         $metastorage = $opt_storage;
+     } elsif (!$opt_quiet) {
+             print $OUT "Choose a directory for each server to store metadata in.\n";
+-            $metastorage = prompt_word("Enter directory name: [Default is ${fs_path}/storage/meta]: ","${fs_path}/storage/meta");
++            $metastorage = prompt_word("Enter directory name: [Default is ${default_meta_storage}]: ","${default_meta_storage}");
+     }
+     return $metastorage;
+ }
+@@ -1303,7 +1283,6 @@
+     my $portmap = shift;
+     my $storage = shift;
+     my $metastorage = shift;
+-    my $logfile = shift;
+     my $ioline = '';
+     if ($opt_ioservers) {
+         $ioline = $opt_ioservers;
+@@ -1332,8 +1311,7 @@
+                 HOSTNAME => $io_host, 
+                 PORTMAP => $portmap, 
+                 STORAGE => $storage,
+-                METASTORAGE => $metastorage, 
+-                LOGFILE => $logfile};
++                METASTORAGE => $metastorage};
+         }
+     }
+ }
+@@ -1343,7 +1321,6 @@
+     my $portmap = shift;
+     my $storage = shift;
+     my $metastorage = shift;
+-    my $logfile = shift;
+     my $metaline = '';
+     my @meta_hosts;
+     if ($opt_metaservers) {
+@@ -1389,8 +1366,7 @@
+                 HOSTNAME => $meta_host, 
+                 PORTMAP => $portmap, 
+                 STORAGE => $storage,
+-                METASTORAGE => $metastorage, 
+-                LOGFILE => $logfile};
++                METASTORAGE => $metastorage};
+         }
+     }
+ }
+@@ -1488,8 +1464,7 @@
+                 HOSTNAME => $hostname, 
+                 PORTMAP => \%port, 
+                 STORAGE => $stor,
+-                METASTORAGE => $mstor, 
+-                LOGFILE => $logf};
++                METASTORAGE => $mstor};
+         }
+         else
+         {
+@@ -1584,8 +1559,7 @@
+                                 HOSTNAME => $hostname,
+                                 PORTMAP => $portmap, 
+                                 STORAGE => $stor, 
+-                                METASTORAGE => $mstor,
+-                                LOGFILE => $logf};
++                                METASTORAGE => $mstor};
+                         }
+                     }
+                     else
+@@ -1606,8 +1580,7 @@
+                                     HOSTNAME => $hostname,
+                                     PORTMAP => $portmap,
+                                     STORAGE => $stor,
+-                                    METASTORAGE => $mstor,
+-                                    LOGFILE => $logf};
++                                    METASTORAGE => $mstor};
+                             }
+                         }
+ 
+@@ -1645,8 +1618,7 @@
+                                         HOSTNAME => $hostname,
+                                         PORTMAP => $portmap,
+                                         STORAGE => $stor,
+-                                        METASTORAGE => $mstor,
+-                                        LOGFILE => $logf};
++                                        METASTORAGE => $mstor};
+                                 }
+                             }
+                         }
+@@ -1938,7 +1910,6 @@
+     'portal=i'      => \$opt_portal,
+     'ioservers=s'   => \$opt_ioservers,
+     'metaservers=s' => \$opt_metaservers,
+-    'logfile=s'     => \$opt_logfile,
+     'dbmaxsize=i'   => \$opt_default_dbmaxsize,
+     'logging=s'     => \$opt_logging,
+     'tracing'       => \$opt_tracing,
+@@ -2089,10 +2060,9 @@
+ 
+     $default_storage = get_storage();
+     $default_meta_storage = get_meta_storage();
+-    $default_logfile = get_logfile();
+ 
+-    get_ionames($portmap, $default_storage, $default_logfile);
+-    get_metanames($portmap, $default_meta_storage, $default_logfile);
++    get_ionames($portmap, $default_storage);
++    get_metanames($portmap, $default_meta_storage);
+ }
+ 
+ # find out if any of the storage or logfile entries in the endpoints
+@@ -2118,17 +2088,6 @@
+     set_default_value(METASTORAGE, $default_meta_storage);
+ }
+ 
+-if(needs_default_value(LOGFILE))
+-{
+-    if(!defined($default_logfile))
+-    {
+-        $default_logfile = get_logfile();
+-    }
+-
+-    set_default_value(LOGFILE, $default_logfile);
+-    set_default_value(LOGFILE, $default_logfile);
+-}
+-
+ my $count = scalar(keys %all_endpoints);
+ my $io_count = scalar(get_aliases($IO_ENDPOINT));
+ my $meta_count = scalar(get_aliases($META_ENDPOINT));
+@@ -2214,7 +2173,7 @@
+ }
+ 
+ emit_defaults($output_target, $num_unexp_reqs,
+-              $bmi_module, $default_logfile, $logging, $tracing,
++              $bmi_module, $logging, $tracing,
+               $logstamp, $server_job_timeout, $client_job_timeout);
+ 
+ emit_aliases($output_target);

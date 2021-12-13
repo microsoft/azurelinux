@@ -1,0 +1,6 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>jdepend</groupId>
+  <artifactId>jdepend</artifactId>
+  <version>2.9.1</version>
+</project>

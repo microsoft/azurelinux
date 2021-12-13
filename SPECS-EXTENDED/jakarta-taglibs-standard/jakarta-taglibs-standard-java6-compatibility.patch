@@ -1,0 +1,16 @@
+--- standard/src/org/apache/taglibs/standard/tag/common/sql/DataSourceWrapper.java
++++ standard/src/org/apache/taglibs/standard/tag/common/sql/DataSourceWrapper.java
+@@ -111,5 +111,13 @@
+         throw new SQLException(Resources.getMessage("NOT_SUPPORTED"));
+     }
+ 
++    // Java6 Build - java.sql.Wrapper
++    public <T> T unwrap(Class<T> iface) throws SQLException {
++        throw new SQLException(Resources.getMessage("NOT_SUPPORTED"));
++    }
+ 
++    public boolean isWrapperFor(Class<?> iface) throws SQLException {
++        throw new SQLException(Resources.getMessage("NOT_SUPPORTED"));
++    }
++    
+ }

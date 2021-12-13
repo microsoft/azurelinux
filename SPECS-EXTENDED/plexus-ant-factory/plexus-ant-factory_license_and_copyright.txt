@@ -1,0 +1,19 @@
+Date: Thu, 29 May 2008 11:13:06 -0400
+From: John Casey <jdcasey@commonjava.org>
+To: tcallawa@redhat.com
+Subject: plexus-ant-factory license and copyright
+
+This is just an official notice that I wrote the original version of the 
+plexus-ant-factory, and that it's licensed in a consistent manner with 
+the plexus-container-default artifact, which is APLv2.0.
+
+Since then, it's only been modified by plexus-project committers, with 
+the understanding that all of plexus is APLv2-compliant.
+
+-john
+
+-- 
+John Casey
+Developer, PMC Member - Apache Maven (http://maven.apache.org)
+Blog: http://www.ejlife.net/blogs/buildchimp/
+

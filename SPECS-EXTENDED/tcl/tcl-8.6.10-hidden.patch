@@ -1,0 +1,35 @@
+diff --git a/generic/tclInt.h b/generic/tclInt.h
+index 39fb740..bbe342b 100644
+--- a/generic/tclInt.h
++++ b/generic/tclInt.h
+@@ -3277,7 +3277,7 @@ MODULE_SCOPE void	TclClockInit(Tcl_Interp *interp);
+ MODULE_SCOPE int	TclClockOldscanObjCmd(
+ 			    ClientData clientData, Tcl_Interp *interp,
+ 			    int objc, Tcl_Obj *const objv[]);
+-MODULE_SCOPE int	Tcl_CloseObjCmd(ClientData clientData,
++extern int	Tcl_CloseObjCmd(ClientData clientData,
+ 			    Tcl_Interp *interp, int objc,
+ 			    Tcl_Obj *const objv[]);
+ MODULE_SCOPE int	Tcl_ConcatObjCmd(ClientData clientData,
+@@ -3458,7 +3458,7 @@ MODULE_SCOPE int	Tcl_RenameObjCmd(ClientData clientData,
+ MODULE_SCOPE int	Tcl_RepresentationCmd(ClientData clientData,
+ 			    Tcl_Interp *interp, int objc,
+ 			    Tcl_Obj *const objv[]);
+-MODULE_SCOPE int	Tcl_ReturnObjCmd(ClientData clientData,
++extern int	Tcl_ReturnObjCmd(ClientData clientData,
+ 			    Tcl_Interp *interp, int objc,
+ 			    Tcl_Obj *const objv[]);
+ MODULE_SCOPE int	Tcl_ScanObjCmd(ClientData clientData,
+diff --git a/generic/tclPort.h b/generic/tclPort.h
+index 9485567..f329cde 100644
+--- a/generic/tclPort.h
++++ b/generic/tclPort.h
+@@ -20,7 +20,7 @@
+ #if defined(_WIN32)
+ #   include "tclWinPort.h"
+ #else
+-#   include "tclUnixPort.h"
++#   include "../unix/tclUnixPort.h"
+ #endif
+ #include "tcl.h"
+ 

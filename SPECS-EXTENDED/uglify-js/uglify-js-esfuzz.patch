@@ -1,0 +1,23 @@
+commit 2c6570391beeda550f86500e3f7c6eaa992a05b7
+Author: Tom Hughes <tom@compton.nu>
+Date:   Wed Feb 10 18:16:53 2016 +0000
+
+    Patch out tests that require esfuzz
+
+diff --git a/test/run-tests.js b/test/run-tests.js
+index 3ec04fd..96c0613 100755
+--- a/test/run-tests.js
++++ b/test/run-tests.js
+@@ -19,12 +19,6 @@ if (failures) {
+ var run_sourcemaps_tests = require('./sourcemaps');
+ run_sourcemaps_tests();
+ 
+-var run_ast_conversion_tests = require("./mozilla-ast");
+-
+-run_ast_conversion_tests({
+-    iterations: 1000
+-});
+-
+ /* -----[ utils ]----- */
+ 
+ function tmpl() {

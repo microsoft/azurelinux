@@ -1,0 +1,17 @@
+diff -up gnuplot-4.2.2/src/variable.c.refto gnuplot-4.2.2/src/variable.c
+--- gnuplot-4.2.2/src/variable.c.refto	2006-06-27 04:36:30.000000000 +0200
++++ gnuplot-4.2.2/src/variable.c	2007-10-25 14:04:20.000000000 +0200
+@@ -263,8 +263,11 @@ static const struct path_table fontpath_
+     { "$`kpsexpand '$TEXMFDIST'`/fonts/type1!" },
+ #endif
+     /* Linux paths */
+-    { "/usr/X11R6/lib/X11/fonts/Type1" },
+-    { "/usr/X11R6/lib/X11/fonts/truetype" },
++    { "/usr/share/fonts/default/ghostscript/" },
++    { "/usr/share/fonts/default/Type1/" },
++    { "/usr/share/fonts/bitstream-vera/" },
++    { "/usr/share/fonts/dejavu-lgc" },
++    { "/usr/share/fonts/liberation" },
+     /* HP-UX */
+     { "/usr/lib/X11/fonts!"},
+     /* Ghostscript */

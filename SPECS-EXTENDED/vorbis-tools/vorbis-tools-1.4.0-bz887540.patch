@@ -1,0 +1,27 @@
+From 43120cc36c08dcfba0c9ff22354da2f3029c3f70 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 17 Dec 2012 12:50:36 +0100
+Subject: [PATCH] vorbiscomment.1: fix URL to format documentation
+
+Reported By: Samuel Sieb
+Bug: https://bugzilla.redhat.com/887540
+---
+ vorbiscomment/vorbiscomment.1 |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/vorbiscomment/vorbiscomment.1 b/vorbiscomment/vorbiscomment.1
+index a47bb12..0108e78 100644
+--- a/vorbiscomment/vorbiscomment.1
++++ b/vorbiscomment/vorbiscomment.1
+@@ -87,7 +87,7 @@ To add a set of comments from the standard input:
+ 
+ .SH TAG FORMAT
+ 
+-See http://xiph.org/ogg/vorbis/doc/v-comment.html for documentation on the Ogg Vorbis tag format, including a suggested list of canonical tag names.
++See http://xiph.org/vorbis/doc/v-comment.html for documentation on the Ogg Vorbis tag format, including a suggested list of canonical tag names.
+ 
+ .SH AUTHORS
+ 
+-- 
+1.7.1
+

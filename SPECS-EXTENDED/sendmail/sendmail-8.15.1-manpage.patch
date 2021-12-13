@@ -1,0 +1,18 @@
+diff --git a/sendmail/sendmail.8 b/sendmail/sendmail.8
+index 9e0b9af..0356839 100644
+--- a/sendmail/sendmail.8
++++ b/sendmail/sendmail.8
+@@ -729,13 +729,11 @@ collected statistics
+  /var/spool/mqueue/*
+ temp files
+ .SH SEE ALSO
+-binmail(1),
+ mail(1),
+ rmail(1),
+ syslog(3),
+ aliases(5),
+ mailaddr(7),
+-rc(8)
+ .PP
+ DARPA 
+ Internet Request For Comments

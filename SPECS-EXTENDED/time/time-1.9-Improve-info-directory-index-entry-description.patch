@@ -1,0 +1,32 @@
+From d8cf31417c84646497657280830c432b6f412495 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 18 Jun 2018 10:05:06 +0200
+Subject: [PATCH] Improve info directory index entry description
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Describing "time" as "time" is not explanatory. Use better
+description.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ doc/time.texi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/time.texi b/doc/time.texi
+index 63d25b4..dac65b4 100644
+--- a/doc/time.texi
++++ b/doc/time.texi
+@@ -28,7 +28,7 @@ Texts.  A copy of the license is included in the section entitled
+ 
+ @dircategory Basics
+ @direntry
+-* Time: (time).                  time
++* Time: (time).                  GNU time utility.
+ @end direntry
+ 
+ 
+-- 
+2.14.4
+

@@ -1,0 +1,153 @@
+.TH MVN "1" "April 2015" "Apache Maven 3.3.1" "User Commands"
+.SH NAME
+mvn \- software project management and comprehension tool
+.SH DESCRIPTION
+usage: mvn [options] [<goal(s)>] [<phase(s)>]
+usage: mvnDebug [options] [<goal(s)>] [<phase(s)>]
+.SH OPTIONS
+.TP
+\fB\-am\fR,\-\-also\-make
+If project list is specified, also
+build projects required by the
+list
+.TP
+\fB\-amd\fR,\-\-also\-make\-dependents
+If project list is specified, also
+build projects that depend on
+projects on the list
+.TP
+\fB\-B\fR,\-\-batch\-mode
+Run in non\-interactive (batch)
+mode
+.TP
+\fB\-b\fR,\-\-builder <arg>
+The id of the build strategy to
+use.
+.TP
+\fB\-C\fR,\-\-strict\-checksums
+Fail the build if checksums don't
+match
+.TP
+\fB\-c\fR,\-\-lax\-checksums
+Warn if checksums don't match
+.TP
+\fB\-cpu\fR,\-\-check\-plugin\-updates
+Ineffective, only kept for
+backward compatibility
+.TP
+\fB\-D\fR,\-\-define <arg>
+Define a system property
+.TP
+\fB\-e\fR,\-\-errors
+Produce execution error messages
+.TP
+\fB\-emp\fR,\-\-encrypt\-master\-password <arg>
+Encrypt master security password
+.TP
+\fB\-ep\fR,\-\-encrypt\-password <arg>
+Encrypt server password
+.TP
+\fB\-f\fR,\-\-file <arg>
+Force the use of an alternate POM
+file (or directory with pom.xml).
+.TP
+\fB\-fae\fR,\-\-fail\-at\-end
+Only fail the build afterwards;
+allow all non\-impacted builds to
+continue
+.TP
+\fB\-ff\fR,\-\-fail\-fast
+Stop at first failure in
+reactorized builds
+.TP
+\fB\-fn\fR,\-\-fail\-never
+NEVER fail the build, regardless
+of project result
+.TP
+\fB\-gs\fR,\-\-global\-settings <arg>
+Alternate path for the global
+settings file
+.TP
+\fB\-gt\fR,\-\-global\-toolchains <arg>
+Alternate path for the global
+toolchains file
+.TP
+\fB\-h\fR,\-\-help
+Display help information
+.TP
+\fB\-l\fR,\-\-log\-file <arg>
+Log file to where all build output
+will go.
+.TP
+\fB\-llr\fR,\-\-legacy\-local\-repository
+Use Maven 2 Legacy Local
+Repository behaviour, ie no use of
+_remote.repositories. Can also be
+activated by using
+\fB\-Dmaven\fR.legacyLocalRepo=true
+.TP
+\fB\-N\fR,\-\-non\-recursive
+Do not recurse into sub\-projects
+.TP
+\fB\-npr\fR,\-\-no\-plugin\-registry
+Ineffective, only kept for
+backward compatibility
+.TP
+\fB\-npu\fR,\-\-no\-plugin\-updates
+Ineffective, only kept for
+backward compatibility
+.TP
+\fB\-nsu\fR,\-\-no\-snapshot\-updates
+Suppress SNAPSHOT updates
+.TP
+\fB\-o\fR,\-\-offline
+Work offline
+.TP
+\fB\-P\fR,\-\-activate\-profiles <arg>
+Comma\-delimited list of profiles
+to activate
+.TP
+\fB\-pl\fR,\-\-projects <arg>
+Comma\-delimited list of specified
+reactor projects to build instead
+of all projects. A project can be
+specified by [groupId]:artifactId
+or by its relative path.
+.TP
+\fB\-q\fR,\-\-quiet
+Quiet output \- only show errors
+.TP
+\fB\-rf\fR,\-\-resume\-from <arg>
+Resume reactor from specified
+project
+.TP
+\fB\-s\fR,\-\-settings <arg>
+Alternate path for the user
+settings file
+.TP
+\fB\-T\fR,\-\-threads <arg>
+Thread count, for instance 2.0C
+where C is core multiplied
+.TP
+\fB\-t\fR,\-\-toolchains <arg>
+Alternate path for the user
+toolchains file
+.TP
+\fB\-U\fR,\-\-update\-snapshots
+Forces a check for missing
+releases and updated snapshots on
+remote repositories
+.TP
+\fB\-up\fR,\-\-update\-plugins
+Ineffective, only kept for
+backward compatibility
+.TP
+\fB\-V\fR,\-\-show\-version
+Display version information
+WITHOUT stopping build
+.TP
+\fB\-v\fR,\-\-version
+Display version information
+.TP
+\fB\-X\fR,\-\-debug
+Produce execution debug output

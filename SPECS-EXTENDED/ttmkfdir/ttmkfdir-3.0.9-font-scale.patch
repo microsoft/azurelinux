@@ -1,0 +1,107 @@
+diff -ruN -x '*o' -x '*~' -x ttmkfdir -x parser.cpp ttmkfdir-3.0.9.orig/ttf.cpp ttmkfdir-3.0.9/ttf.cpp
+--- ttmkfdir-3.0.9.orig/ttf.cpp	2006-11-29 15:46:55.000000000 +0900
++++ ttmkfdir-3.0.9/ttf.cpp	2006-11-29 17:21:40.000000000 +0900
+@@ -70,7 +70,6 @@
+ Face::Face (const std::string &filename)
+ {
+     FT_Error fterror;
+-    string header_enc("-");
+     int face_id, face_count;
+ 
+     string::size_type pos = filename.rfind("/");
+@@ -98,29 +97,13 @@
+         if ((post = (TT_Postscript *) FT_Get_Sfnt_Table(face, ft_sfnt_post)) == 0){
+             std::cout << "Warning: Can't get POST table : " << FileName << "(" << FT_Err_Post_Table_Missing << ")" << std::endl;
+ 	    return;
+-    }
++	}
+ 
+         if ((os2 = (TT_OS2 *) FT_Get_Sfnt_Table(face, ft_sfnt_os2)) == 0) {
+             std::cout << "Warning: Can't get OS2 table : " << FileName << "(" << FT_Err_Table_Missing << ")" << std::endl;
+ 	    return;
+         }
+ 
+-        for (int j = 0; j < 32; j++) {
+-	    switch (os2->ulCodePageRange1 & (1 << j)) {
+-	        case TT_CODEPAGE_RANGE_932: /* Japanese */
+-                    header_enc = "ji";
+-	            break;
+-	        case TT_CODEPAGE_RANGE_936: /* Simplified Chinese */
+-                    header_enc = "gb";
+-	            break;
+-	        case TT_CODEPAGE_RANGE_949: /* Korean Wansung */
+-                    header_enc = "ks";
+-	            break;
+-	        case TT_CODEPAGE_RANGE_950: /* Traditional Chinese */
+-                    header_enc = "big";
+-	            break;
+-            }
+-        }
+         /*
+          * Iterate over all cmap entries.
+          */
+@@ -148,25 +131,50 @@
+ 	     */
+ 	    typedef Encodings_t::const_iterator MI;
+ 	    std::pair<MI, MI> bounds = Encodings::instance()->equal_range (key);
++	    bool need_non_cjk_encoding = true;
+ 
+ 	    /*
+ 	     * then look whether each of these encodings is present in this cmap.
+ 	     */
+-	    for (Encodings_t::const_iterator i = bounds.first; i != bounds.second; i++) {
+-	        if (MappingPresent (cmapidx, 
+-	    		        i->second->mappings[key], 
+-				i->second->enc_size,
+-			       	i->second->start_code, 
+-				(header_enc.compare("-")?((i->second->names[0].find(header_enc) != string::npos)?1:0):1)
+-		    	        )) {
+-		    /*
+-		     * if the mapping is present, add all xlfd names for this mapping to the
+-		     * list of available font names.
+-		     */
+-		    for (unsigned int k = 0; k < i->second->names.size (); k++) {
+-	                add_entries (i->second->names[k],face_id);
++	    for (int j = 0; j < 32; j++) {
++	        string header_enc("-");
++
++		switch (os2->ulCodePageRange1 & (1 << j)) {
++	            case TT_CODEPAGE_RANGE_932: /* Japanese */
++		        header_enc = "ji";
++		        break;
++	            case TT_CODEPAGE_RANGE_936: /* Simplified Chinese */
++		        header_enc = "gb";
++			break;
++	            case TT_CODEPAGE_RANGE_949: /* Korean Wansung */
++                        header_enc = "ks";
++			break;
++	            case TT_CODEPAGE_RANGE_950: /* Traditional Chinese */
++		        header_enc = "big";
++			break;
++		    default:
++		      if (need_non_cjk_encoding)
++			  need_non_cjk_encoding = false;
++		      else
++			  continue;
++		      break;
++		}
++		for (Encodings_t::const_iterator i = bounds.first; i != bounds.second; i++) {
++		    if (MappingPresent (cmapidx, 
++					i->second->mappings[key], 
++					i->second->enc_size,
++					i->second->start_code, 
++					(header_enc.compare("-")?((i->second->names[0].find(header_enc) != string::npos)?1:0):1)
++					)) {
++		        /*
++			 * if the mapping is present, add all xlfd names for this mapping to the
++			 * list of available font names.
++			 */
++		        for (unsigned int k = 0; k < i->second->names.size (); k++) {
++			    add_entries (i->second->names[k],face_id);
++			}
+ 		    }
+-	        }
++		}
+ 	    }
+         }
+ 

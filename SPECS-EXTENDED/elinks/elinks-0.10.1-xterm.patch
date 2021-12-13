@@ -1,0 +1,18 @@
+ src/config/options.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/src/config/options.c b/src/config/options.c
+index 925e042..ace1a13 100644
+--- a/src/config/options.c
++++ b/src/config/options.c
+@@ -706,8 +706,9 @@ register_autocreated_options(void)
+ 	get_opt_bool("terminal.linux.m11_hack") = 1;
+ 	get_opt_int("terminal.vt100.type") = TERM_VT100;
+ 	get_opt_int("terminal.vt110.type") = TERM_VT100;
+-	get_opt_int("terminal.xterm.type") = TERM_VT100;
++	get_opt_int("terminal.xterm.type") = 2;
+ 	get_opt_bool("terminal.xterm.underline") = 1;
++	get_opt_int("terminal.xterm.colors") = 1;
+ 	get_opt_int("terminal.xterm-color.type") = TERM_VT100;
+ 	get_opt_int("terminal.xterm-color.colors") = COLOR_MODE_16;
+ 	get_opt_bool("terminal.xterm-color.underline") = 1;

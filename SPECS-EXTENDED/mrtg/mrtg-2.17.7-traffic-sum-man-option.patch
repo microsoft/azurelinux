@@ -1,0 +1,12 @@
+diff -up mrtg-2.17.7/bin/mrtg-traffic-sum.orig mrtg-2.17.7/bin/mrtg-traffic-sum
+--- mrtg-2.17.7/bin/mrtg-traffic-sum.orig	2018-10-18 12:21:12.616589922 +0200
++++ mrtg-2.17.7/bin/mrtg-traffic-sum	2018-10-18 12:23:10.852648709 +0200
+@@ -58,7 +58,7 @@ sub mailout($$);
+ sub main()
+ {
+     # parse options
+-    GetOptions(\%opt, 'min=i','help|h', 'catch=s', 'email=s','version','range=s','units=s') or exit(1);
++    GetOptions(\%opt, 'min=i','help|h', 'catch=s', 'email=s','version','range=s','units=s','man') or exit(1);
+     if($opt{help})     { pod2usage(1) }
+     if($opt{man})      { pod2usage(-exitstatus => 0, -verbose => 2) }
+     if($opt{version})  { print "mrtg-traffic-sum $Revision\n"; exit(0) }

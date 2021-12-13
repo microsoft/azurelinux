@@ -1,0 +1,20 @@
+diff --git a/scipy/conftest.py b/scipy/conftest.py
+index e5fac23..1a971e8 100644
+--- a/scipy/conftest.py
++++ b/scipy/conftest.py
+@@ -37,3 +38,15 @@ def check_fpu_mode(request):
+         warnings.warn("FPU mode changed from {0:#x} to {1:#x} during "
+                       "the test".format(old_mode, new_mode),
+                       category=FPUModeChangeWarning, stacklevel=0)
++
++
++ACCEPTABLE_FAILURE_RATE = int(os.environ.get('ACCEPTABLE_FAILURE_RATE', 0))
++
++
++@pytest.hookimpl()
++def pytest_sessionfinish(session, exitstatus):
++    if exitstatus != 1:
++        return
++    failure_rate = (100.0 * session.testsfailed) / session.testscollected
++    if failure_rate <= ACCEPTABLE_FAILURE_RATE:
++        session.exitstatus = 0

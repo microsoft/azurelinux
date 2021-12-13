@@ -1,0 +1,15 @@
+diff -up SDL2-2.0.9/include/SDL_opengl_glext.h.khrplatform SDL2-2.0.9/include/SDL_opengl_glext.h
+--- SDL2-2.0.9/include/SDL_opengl_glext.h.khrplatform	2019-02-15 20:22:39.173773779 -0500
++++ SDL2-2.0.9/include/SDL_opengl_glext.h	2019-02-15 20:22:58.176399330 -0500
+@@ -469,8 +469,9 @@ GLAPI void APIENTRY glBlendEquation (GLe
+ typedef long GLsizeiptr;
+ typedef long GLintptr;
+ #else
+-typedef ptrdiff_t GLsizeiptr;
+-typedef ptrdiff_t GLintptr;
++#include <KHR/khrplatform.h>
++typedef khronos_intptr_t GLintptr;
++typedef khronos_ssize_t GLsizeiptr;
+ #endif
+ #define GL_BUFFER_SIZE                    0x8764
+ #define GL_BUFFER_USAGE                   0x8765

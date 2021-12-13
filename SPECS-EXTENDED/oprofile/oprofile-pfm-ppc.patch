@@ -1,0 +1,21 @@
+From: Tony Jones <tonyj@suse.de>
+Subject: enable pfm detection for 32bit ppc
+Upstream: no
+
+---
+ configure.ac |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: oprofile-1.1.0/configure.ac
+===================================================================
+--- oprofile-1.1.0.orig/configure.ac
++++ oprofile-1.1.0/configure.ac
+@@ -205,7 +205,7 @@ rm -f test-for-precise-ip*
+ AC_DEFINE_UNQUOTED(HAVE_PERF_EVENTS, $HAVE_PERF_EVENTS, [Kernel support for perf_events exists])
+ AC_CANONICAL_HOST
+ PFM_LIB=
+-if test "$host_cpu" = "powerpc64le" -o "$host_cpu" = "powerpc64"; then
++if test "$host_cpu" = "powerpc64le" -o "$host_cpu" = "powerpc64" -o "$host_cpu" = "powerpc32"; then
+ 	AC_CHECK_HEADER(perfmon/pfmlib.h,,[AC_MSG_ERROR([pfmlib.h not found; may be provided by libpfm devel or papi devel package])])
+ 	AC_CHECK_LIB(pfm,pfm_get_os_event_encoding, HAVE_LIBPFM3='0'; HAVE_LIBPFM='1', [
+ 		AC_CHECK_LIB(pfm, pfm_get_event_name, HAVE_LIBPFM3='1'; HAVE_LIBPFM='1',

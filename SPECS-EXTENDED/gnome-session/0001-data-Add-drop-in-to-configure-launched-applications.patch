@@ -1,0 +1,49 @@
+From 228d779b0d8c91c97a6ee7bc8af036f90e618046 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Wed, 27 Nov 2019 16:46:49 +0100
+Subject: [PATCH 1/2] data: Add drop-in to configure launched applications
+
+Both gnome-shell and g-s-d will start putting launched applications into
+transient scopes. As these scopes will be prefixed with gnome-launched-,
+we can set defaults by installing an appropriate drop-in. This allows us
+to bind them to graphical-session.target and lower their stop timeout.
+
+See gnome-shell!863 and gnome-settings-daemon!147
+---
+ data/gnome-launched-override.scope.conf | 6 ++++++
+ data/meson.build                        | 6 ++++++
+ 2 files changed, 12 insertions(+)
+ create mode 100644 data/gnome-launched-override.scope.conf
+
+diff --git a/data/gnome-launched-override.scope.conf b/data/gnome-launched-override.scope.conf
+new file mode 100644
+index 00000000..810bf239
+--- /dev/null
++++ b/data/gnome-launched-override.scope.conf
+@@ -0,0 +1,6 @@
++[Unit]
++CollectMode=inactive-or-failed
++PartOf=graphical-session.target
++
++[Scope]
++TimeoutStopSec=5s
+diff --git a/data/meson.build b/data/meson.build
+index 62f32880..3ae6f245 100644
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -133,6 +133,12 @@ if enable_systemd_session
+     systemd_target,
+     install_dir: systemd_userunitdir
+   )
++
++  install_data(
++    'gnome-launched-override.scope.conf',
++    rename: 'override.conf',
++    install_dir : join_paths(systemd_userunitdir, 'gnome-launched-.scope.d')
++  )
+ endif
+ 
+ data = files('hardware-compatibility')
+-- 
+2.23.0
+

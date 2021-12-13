@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "LICENSE-MIT": "450de87145fa83689f10fc86c21c867f688ccce68488886f5ef99ff971e7b61d",
+  "jetty-9.4.31.v20200723.tar.gz": "3cab80ddc14763764509552d79d5f1f17b565a3eb0a1951991d4a6fcfee9b4b1",
+  "jetty.logrotate": "bc4f674a3d6625da8ba98232fece8aeb3fdc41a1682c2601fe9707b45ed77179",
+  "jetty.service": "2b4b936ca1a9310b0a5f8cafeaf328249d1ecdeff1c16dffb7fadb25ae82eaec",
+  "jetty.sh": "ca4f77899d3e09137f1ed90c5e7806d32e573c565f66cf6304753d8f789a5da8"
+ }
+}

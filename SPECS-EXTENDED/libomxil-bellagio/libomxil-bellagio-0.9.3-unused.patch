@@ -1,0 +1,20 @@
+diff -up libomxil-bellagio-0.9.3/src/omxregister.c.unused libomxil-bellagio-0.9.3/src/omxregister.c
+--- libomxil-bellagio-0.9.3/src/omxregister.c.unused	2011-01-12 08:53:26.000000000 +0100
++++ libomxil-bellagio-0.9.3/src/omxregister.c	2012-12-10 22:02:28.621695659 +0100
+@@ -248,7 +248,15 @@ static int buildComponentsList(FILE* omx
+ 						}
+ 						fptr(stComponents);
+ 						err = fwrite(lib_absolute_path, 1, strlen(lib_absolute_path), omxregistryfp);
+-						err = fwrite("\n", 1, 1, omxregistryfp);
++						if (err != strlen(lib_absolute_path)) {
++							DEBUG(DEB_LEV_ERR, "Failed to write %zu bytes to fd %d\n", strlen(lib_absolute_path), fileno(omxregistryfp));
++							continue;
++						}
++						err = fwrite("\n", 1, strlen(buffer), omxregistryfp);
++						if (err != strlen(buffer)) {
++							DEBUG(DEB_LEV_ERR, "Failed to write %zu bytes to fd %d\n", strlen(buffer), fileno(omxregistryfp));
++							continue;
++						}
+ 
+ 
+ 						for (i = 0; i<num_of_comp; i++) {

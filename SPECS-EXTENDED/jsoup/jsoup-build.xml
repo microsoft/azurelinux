@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="jsoup" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="build.properties"/>
+  
+  <property name="project.name" value="jsoup Java HTML Parser"/>
+  <property name="project.groupId" value="org.jsoup"/>
+  <property name="project.artifactId" value="jsoup"/>
+  <property name="project.version" value="1.11.3"/>
+  <property name="project.description" value="jsoup is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods. jsoup implements the WHATWG HTML5 specification, and parses HTML to the same DOM as modern browsers do."/>
+  <property name="project.organization.name" value="Jonathan Hedley"/>
+  <property name="project.build.sourceEncoding" value="UTF-8"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir.0" value="src/main/java"/>
+  <property name="build.javadocDir.0" value="src/main/javadoc"/>
+  <property name="build.resourceDir.0" value="src/main/java"/>
+  <property name="build.resourceDir.1" value="."/>
+
+  <property name="compiler.source" value="1.7"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           encoding="UTF-8" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir.0}"/>
+      </src>
+    </javac>
+    <copy todir="${build.outputDir}">
+      <fileset dir="${build.resourceDir.0}">
+        <include name="**/*.properties"/>
+      </fileset>
+    </copy>
+    <mkdir dir="${build.outputDir}/META-INF/"/>
+    <copy todir="${build.outputDir}/META-INF/">
+      <fileset dir="${build.resourceDir.1}">
+        <include name="LICENSE"/>
+        <include name="README.md"/>
+        <include name="CHANGES"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir.0}" 
+             packagenames="*" 
+             destdir="${reporting.outputDirectory}/apidocs" 
+             access="protected" 
+             old="false" 
+             verbose="false" 
+             version="true" 
+             use="true" 
+             author="true" 
+             splitindex="false" 
+             nodeprecated="false" 
+             nodeprecatedlist="false" 
+             notree="false" 
+             noindex="false" 
+             nohelp="false" 
+             nonavbar="false" 
+             serialwarn="false" 
+             source="${compiler.source}"
+			 encoding="${project.build.sourceEncoding}"
+             linksource="false" 
+             overview="${build.javadocDir.0}/overview.html" 
+             doctitle="${project.name} ${project.version} API" 
+             windowtitle="${project.name} ${project.version} API" 
+             breakiterator="false"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html">
+      <manifest>
+        <attribute name="Automatic-Module-Name" value="${project.groupId}"/>
+        <attribute name="Bundle-Description" value="${project.description}"/>
+        <attribute name="Bundle-DocURL" value="https://jsoup.org/"/>
+        <attribute name="Bundle-License" value="https://jsoup.org/license"/>
+        <attribute name="Bundle-Name" value="${project.name}"/>
+        <attribute name="Bundle-SymbolicName" value="org.jsoup"/>
+        <attribute name="Bundle-Vendor" value="${project.organization.name}"/>
+        <attribute name="Bundle-Version" value="${project.version}"/>
+        <attribute name="Export-Package" value="org.jsoup;uses:=&quot;javax.net.ssl,org.jsoup.nodes,org.jsoup.parser,org.jsoup.safety&quot;;version=&quot;${project.version}&quot;,org.jsoup.nodes;uses:=&quot;org.jsoup,org.jsoup.parser,org.jsoup.select&quot;;version=&quot;${project.version}&quot;,org.jsoup.parser;uses:=&quot;org.jsoup.nodes&quot;;version=&quot;${project.version}&quot;,org.jsoup.helper;uses:=&quot;javax.net.ssl,javax.xml.parsers,org.jsoup,org.jsoup.nodes,org.jsoup.parser,org.jsoup.select,org.w3c.dom&quot;;version=&quot;${project.version}&quot;,org.jsoup.select;uses:=&quot;org.jsoup.nodes&quot;;version=&quot;${project.version}&quot;,org.jsoup.examples;uses:=&quot;org.jsoup.nodes&quot;;version=&quot;${project.version}&quot;,org.jsoup.safety;uses:=&quot;org.jsoup.nodes&quot;;version=&quot;${project.version}&quot;"/>
+        <attribute name="Import-Package" value="javax.net.ssl,javax.xml.parsers,javax.xml.transform,javax.xml.transform.dom,javax.xml.transform.stream,org.jsoup,org.w3c.dom"/>
+        <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+	  </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

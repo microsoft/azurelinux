@@ -1,0 +1,90 @@
+Patch by Robert Scheck <robert@fedoraproject.org> for kyotocabinet >= 1.2.76 to ensure
+that CFLAGS and CXXFLAGS do not include "-g0 -O2" or "-O0" at all as we need debug info
+for the -debuginfo RPM packages. Additionally the patch removes "-rpath-link" as well.
+
+--- kyotocabinet-1.2.76/configure			2012-05-24 13:31:45.000000000 +0200
++++ kyotocabinet-1.2.76/configure.cflags		2013-11-17 18:28:55.000000000 +0100
+@@ -2109,8 +2109,8 @@
+ MYPCFILES="kyotocabinet.pc"
+ 
+ # Building flags
+-MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g0 -O2"
+-MYCXXFLAGS="-Wall -fPIC -fsigned-char -g0 -O2"
++MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char"
++MYCXXFLAGS="-Wall -fPIC -fsigned-char"
+ MYCPPFLAGS="-I. -I\$(INCLUDEDIR) -I/usr/local/include"
+ MYCPPFLAGS="$MYCPPFLAGS -DNDEBUG -D_GNU_SOURCE=1"
+ MYCPPFLAGS="$MYCPPFLAGS -D_FILE_OFFSET_BITS=64 -D_REENTRANT -D__EXTENSIONS__"
+@@ -2147,8 +2147,8 @@
+ 
+ if test "$enable_debug" = "yes"
+ then
+-  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g -O0"
+-  MYCXXFLAGS="-Wall -fPIC -fsigned-char -g -O0"
++  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g"
++  MYCXXFLAGS="-Wall -fPIC -fsigned-char -g"
+   MYCPPFLAGS="$MYCPPFLAGS -UNDEBUG -D_KCDEBUG"
+   is_static="yes"
+   enables="$enables (debug)"
+@@ -2178,8 +2178,8 @@
+ 
+ if test "$enable_opt" = "no"
+ then
+-  MYCFLAGS="$MYCFLAGS -O0"
+-  MYCXXFLAGS="$MYCXXFLAGS -O0"
++  MYCFLAGS="$MYCFLAGS"
++  MYCXXFLAGS="$MYCXXFLAGS"
+   enables="$enables (no-opt)"
+ fi
+ 
+@@ -4538,7 +4538,6 @@
+ # As-needed linking
+ if uname | grep Linux >config.tmp
+ then
+-  MYLDFLAGS="$MYLDFLAGS -Wl,-rpath-link,.:/usr/local/lib:$MYLDLIBPATH"
+   MYLDFLAGS="$MYLDFLAGS -Wl,--as-needed"
+ else
+   MYCMDLIBS="$MYCMDLIBS $LIBS"
+--- kyotocabinet-1.2.76/configure.in			2012-05-24 13:31:42.000000000 +0200
++++ kyotocabinet-1.2.76/configure.in.cflags		2013-11-17 18:29:20.000000000 +0100
+@@ -35,8 +35,8 @@
+ MYPCFILES="kyotocabinet.pc"
+ 
+ # Building flags
+-MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g0 -O2"
+-MYCXXFLAGS="-Wall -fPIC -fsigned-char -g0 -O2"
++MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char"
++MYCXXFLAGS="-Wall -fPIC -fsigned-char"
+ MYCPPFLAGS="-I. -I\$(INCLUDEDIR) -I/usr/local/include"
+ MYCPPFLAGS="$MYCPPFLAGS -DNDEBUG -D_GNU_SOURCE=1"
+ MYCPPFLAGS="$MYCPPFLAGS -D_FILE_OFFSET_BITS=64 -D_REENTRANT -D__EXTENSIONS__"
+@@ -70,8 +70,8 @@
+   AC_HELP_STRING([--enable-debug], [build for debugging]))
+ if test "$enable_debug" = "yes"
+ then
+-  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g -O0"
+-  MYCXXFLAGS="-Wall -fPIC -fsigned-char -g -O0"
++  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g"
++  MYCXXFLAGS="-Wall -fPIC -fsigned-char -g"
+   MYCPPFLAGS="$MYCPPFLAGS -UNDEBUG -D_KCDEBUG"
+   is_static="yes"
+   enables="$enables (debug)"
+@@ -95,8 +95,8 @@
+   AC_HELP_STRING([--disable-opt], [build without optimization]))
+ if test "$enable_opt" = "no"
+ then
+-  MYCFLAGS="$MYCFLAGS -O0"
+-  MYCXXFLAGS="$MYCXXFLAGS -O0"
++  MYCFLAGS="$MYCFLAGS"
++  MYCXXFLAGS="$MYCXXFLAGS"
+   enables="$enables (no-opt)"
+ fi
+ 
+@@ -302,7 +302,6 @@
+ # As-needed linking
+ if uname | grep Linux >config.tmp
+ then
+-  MYLDFLAGS="$MYLDFLAGS -Wl,-rpath-link,.:/usr/local/lib:$MYLDLIBPATH"
+   MYLDFLAGS="$MYLDFLAGS -Wl,--as-needed"
+ else
+   MYCMDLIBS="$MYCMDLIBS $LIBS"

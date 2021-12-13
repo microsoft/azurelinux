@@ -1,0 +1,25 @@
+From 54b7ccdd1e16f1d6dd07359eae0fcac8f1883373 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Mon, 2 Jan 2017 10:31:56 +0100
+Subject: [PATCH] Fork javac
+
+---
+ build.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build.xml b/build.xml
+index 1cfd4fb..69acfe8 100644
+--- a/build.xml
++++ b/build.xml
+@@ -284,7 +284,7 @@
+                 <attribute name="Built-Date" value="${build.timestamp}"/>
+             </manifest>
+             <mkdir dir="build/temp/@{modulename}-${version}.jar.contents"/>
+-            <javac srcdir="@{srcdir}" destdir="build/temp/@{modulename}-${version}.jar.contents" debug="${debug}" target="1.5" includeantruntime="false">
++            <javac srcdir="@{srcdir}" destdir="build/temp/@{modulename}-${version}.jar.contents" debug="${debug}" includeantruntime="false" fork="true">
+                 <classpath>
+                     <fileset dir="lib/integration">
+                         <include name="*.jar"/>
+-- 
+2.9.3
+

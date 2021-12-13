@@ -1,0 +1,27 @@
+From 40960f91cdd06da387616ec838ae2599e7f01cee Mon Sep 17 00:00:00 2001
+From: Jiri Skala <jskala@fedoraproject.org>
+Date: Mon, 7 Apr 2014 15:24:01 +0200
+Subject: [PATCH 18/27] scritps: fix ip-up.local sample
+
+Resolves: #613717
+---
+ scripts/ip-up.local.add | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/scripts/ip-up.local.add b/scripts/ip-up.local.add
+index 26cf5f8..282337c 100644
+--- a/scripts/ip-up.local.add
++++ b/scripts/ip-up.local.add
+@@ -18,6 +18,9 @@ if [ -n "$USEPEERDNS" -a -f /var/run/ppp/resolv.conf ]; then
+ 		rscf=/var/run/ppp/resolv.new
+ 		grep domain /var/run/ppp/resolv.prev > $rscf
+ 		grep search /var/run/ppp/resolv.prev >> $rscf
++		if [ -f /var/run/ppp/resolv.conf ]; then
++			cat /var/run/ppp/resolv.conf >> $rscf
++		fi
+ 		change_resolv_conf $rscf
+ 		rm -f $rscf
+ 	else
+-- 
+1.8.3.1
+

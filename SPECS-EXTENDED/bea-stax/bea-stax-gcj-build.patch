@@ -1,0 +1,31 @@
+--- src/com/bea/xml/stream/StaticAllocator.java
++++ src/com/bea/xml/stream/StaticAllocator.java
+@@ -90,7 +90,7 @@
+     
+     Iterator ni = XMLEventAllocatorBase.getNamespaces(reader);
+     while (ni.hasNext())
+-      startElement.addAttribute((Namespace)ni.next());
++      startElement.addAttribute((Attribute)ni.next());
+     return startElement;
+   }
+ 
+--- src/com/bea/xml/stream/samples/Parse.java
++++ src/com/bea/xml/stream/samples/Parse.java
+@@ -122,11 +122,12 @@
+   }
+   
+   private static void printNamespace(Namespace a) {
+-    System.out.println("PREFIX: " + a.getName().getPrefix());
+-    System.out.println("NAMESP: " + a.getName().getNamespaceURI());
+-    System.out.println("NAME:   " + a.getName().getLocalPart());
+-    System.out.println("VALUE:  " + a.getValue());
+-    System.out.println("TYPE:   " + a.getDTDType());
++    Attribute at = (Attribute) a;
++    System.out.println("PREFIX: " + at.getName().getPrefix());
++    System.out.println("NAMESP: " + at.getName().getNamespaceURI());
++    System.out.println("NAME:   " + at.getName().getLocalPart());
++    System.out.println("VALUE:  " + at.getValue());
++    System.out.println("TYPE:   " + at.getDTDType());
+   }
+ }
+ 

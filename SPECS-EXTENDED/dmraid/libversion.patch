@@ -1,0 +1,12 @@
+diff --git a/lib/version.h.libversion b/lib/version.h
+index c0e4e68..ca7369b 100644
+--- a/lib/version.h.libversion
++++ b/lib/version.h
+@@ -1,6 +1,6 @@
+ #ifndef	DMRAID_LIB_VERSION
+ 
+-#define	DMRAID_LIB_VERSION		"1.0.0.rc16"
++#define	DMRAID_LIB_VERSION		"1"
+ 
+ #define	DMRAID_LIB_MAJOR_VERSION	1
+ #define	DMRAID_LIB_MINOR_VERSION	0

@@ -1,0 +1,52 @@
+diff -up libgdither-0.6/Makefile.default libgdither-0.6/Makefile
+--- libgdither-0.6/Makefile.default	2005-07-24 22:19:30.000000000 +0200
++++ libgdither-0.6/Makefile	2008-06-10 20:05:01.000000000 +0200
+@@ -1,6 +1,6 @@
+ VERSION = 0.6
+-PREFIX = /usr/local
+-CFLAGS = -Wall -g -I. -O3 -funroll-loops -finline-limit=9999999 -ffast-math -malign-double -march=`uname -m` -fPIC
++PREFIX = /usr
++CFLAGS = $(INIT_CFLAGS) -I. -ffast-math -fPIC
+ 
+ TARDIR = libgdither-$(VERSION)
+ 
+@@ -10,20 +10,22 @@ gdither.o: gdither.c gdither.h gdither_t
+ 	$(CC) $(CFLAGS) -c gdither.c
+ 
+ libgdither.so: gdither.o
+-	$(CC) -shared gdither.o -o libgdither.so
++	$(CC) -shared gdither.o -Wl,-soname,libgdither.so.1 -o libgdither.so.1.0
+ 
+ libgdither.pc: libgdither.pc.in Makefile
+ 	sed -e 's|@VERSION@|$(VERSION)|' -e 's|@PREFIX@|$(PREFIX)|' \
+ 		libgdither.pc.in > libgdither.pc
+ 
+ install: all
+-	install -d $(PREFIX)/lib/
+-	install libgdither.so $(PREFIX)/lib/
+-	install -d $(PREFIX)/include/
+-	install gdither.h $(PREFIX)/include/
+-	install gdither_types.h $(PREFIX)/include/
+-	install -d $(PREFIX)/lib/pkgconfig/
+-	install libgdither.pc $(PREFIX)/lib/pkgconfig/
++	mkdir -p $(DESTDIR)$(LIBDIR)
++	install -pm 0755 libgdither.so* $(DESTDIR)$(LIBDIR)
++	ln -s libgdither.so.1.0 $(DESTDIR)$(LIBDIR)/libgdither.so.1
++	ln -s libgdither.so.1.0 $(DESTDIR)$(LIBDIR)/libgdither.so
++	mkdir -p $(DESTDIR)$(PREFIX)/include/libgdither
++	install -pm 0644 gdither.h $(DESTDIR)$(PREFIX)/include/libgdither
++	install -pm 0644 gdither_types.h $(DESTDIR)$(PREFIX)/include/libgdither
++	mkdir -p $(DESTDIR)$(LIBDIR)/pkgconfig/
++	install -pm 0644 libgdither.pc $(DESTDIR)$(LIBDIR)/pkgconfig/
+ 
+ clean:
+ 	rm -f *.o *.so
+diff -up libgdither-0.6/libgdither.pc.default libgdither-0.6/libgdither.pc
+--- libgdither-0.6/libgdither.pc.default	2005-07-24 22:19:30.000000000 +0200
++++ libgdither-0.6/libgdither.pc	2008-06-10 20:04:09.000000000 +0200
+@@ -6,4 +6,4 @@ Name: libgdither
+ Version: 0.6
+ Description: A library for applying dithering to PCM audio sources
+ Libs: -L${libdir} -lgdither -lm
+-Cflags: -I${includedir}
++Cflags: -I${includedir}/libgdither

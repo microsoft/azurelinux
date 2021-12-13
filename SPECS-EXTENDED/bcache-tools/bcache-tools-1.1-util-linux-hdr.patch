@@ -1,0 +1,33 @@
+diff -ruN bcache-tools-1.1.orig/lib.c bcache-tools-1.1/lib.c
+--- bcache-tools-1.1.orig/lib.c	2019-12-12 13:51:01.000000000 +0100
++++ bcache-tools-1.1/lib.c	2021-01-30 12:34:09.882481894 +0100
+@@ -2,7 +2,7 @@
+ // Author: Shaoxiong Li <dahefanteng@gmail.com>
+ 
+ #include <stdbool.h>
+-#include <blkid.h>
++#include <blkid/blkid.h>
+ #include <dirent.h>
+ #include <sys/types.h>
+ #include <unistd.h>
+@@ -10,7 +10,7 @@
+ #include <fcntl.h>
+ #include "bcache.h"
+ #include "lib.h"
+-#include <uuid.h>
++#include <uuid/uuid.h>
+ #include <string.h>
+ #include <malloc.h>
+ #include <regex.h>
+diff -ruN bcache-tools-1.1.orig/probe-bcache.c bcache-tools-1.1/probe-bcache.c
+--- bcache-tools-1.1.orig/probe-bcache.c	2019-12-12 13:51:01.000000000 +0100
++++ bcache-tools-1.1/probe-bcache.c	2021-01-30 12:33:46.338676440 +0100
+@@ -8,7 +8,7 @@
+ #define __USE_FILE_OFFSET64
+ #define _XOPEN_SOURCE 500
+ 
+-#include <blkid.h>
++#include <blkid/blkid.h>
+ #include <fcntl.h>
+ #include <linux/fs.h>
+ #include <stdbool.h>

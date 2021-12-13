@@ -1,0 +1,30 @@
+--- bcache-tools-1.0.8/69-bcache.rules.noprobe	2015-02-04 21:24:06.000000000 +0100
++++ bcache-tools-1.0.8/69-bcache.rules	2015-02-06 23:38:41.494507524 +0100
+@@ -7,17 +7,10 @@
+ KERNEL=="fd*|sr*", GOTO="bcache_end"
+ 
+ # blkid was run by the standard udev rules
+-# It recognised bcache (util-linux 2.24+)
+-ENV{ID_FS_TYPE}=="bcache", GOTO="bcache_backing_found"
+-# It recognised something else; bail
+-ENV{ID_FS_TYPE}=="?*", GOTO="bcache_backing_end"
+-
+ # Backing devices: scan, symlink, register
+-IMPORT{program}="probe-bcache -o udev $tempnode"
+ ENV{ID_FS_TYPE}!="bcache", GOTO="bcache_backing_end"
+ ENV{ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID_ENC}"
+ 
+-LABEL="bcache_backing_found"
+ RUN{builtin}+="kmod load bcache"
+ RUN+="bcache-register $tempnode"
+ LABEL="bcache_backing_end"
+--- bcache-tools-1.0.8/dracut/module-setup.sh.noprobe	2015-02-06 23:38:41.495507529 +0100
++++ bcache-tools-1.0.8/dracut/module-setup.sh	2015-02-06 23:39:49.471863166 +0100
+@@ -30,7 +30,6 @@
+ 
+ install() {
+     inst_multiple \
+-        ${udevdir}/probe-bcache \
+         ${udevdir}/bcache-register \
+         ${udevdir}/bcache-params
+     inst_rules 69-bcache.rules

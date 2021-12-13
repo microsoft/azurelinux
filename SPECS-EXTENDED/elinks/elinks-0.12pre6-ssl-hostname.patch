@@ -1,0 +1,974 @@
+From 30d96f81dbefffd3f1523256cc5a5328ea1c7ecb Mon Sep 17 00:00:00 2001
+From: Kalle Olavi Niemitalo <kon@iki.fi>
+Date: Mon, 2 May 2011 14:41:40 +0300
+Subject: [PATCH 1/4] 1024: Use RFC 3546 server_name TLS extension
+
+For both GnuTLS and OpenSSL.  Not tested with nss-compat-openssl.
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ src/network/ssl/socket.c | 19 ++++++++++++++++++-
+ src/network/ssl/ssl.c    | 29 ++++++++++++++++++++++++-----
+ src/network/ssl/ssl.h    | 14 ++++++++++++--
+ 3 files changed, 54 insertions(+), 8 deletions(-)
+
+diff --git a/src/network/ssl/socket.c b/src/network/ssl/socket.c
+index 45b4b4a..dc682d0 100644
+--- a/src/network/ssl/socket.c
++++ b/src/network/ssl/socket.c
+@@ -22,6 +22,7 @@
+ #include "network/socket.h"
+ #include "network/ssl/socket.h"
+ #include "network/ssl/ssl.h"
++#include "protocol/uri.h"
+ #include "util/memory.h"
+ 
+ 
+@@ -117,12 +118,28 @@ int
+ ssl_connect(struct socket *socket)
+ {
+ 	int ret;
++	unsigned char *server_name;
++	struct connection *conn = socket->conn;
+ 
+-	if (init_ssl_connection(socket) == S_SSL_ERROR) {
++	/* TODO: Recode server_name to UTF-8.  */
++	server_name = get_uri_string(conn->proxied_uri, URI_HOST);
++	if (!server_name) {
++		socket->ops->done(socket, connection_state(S_OUT_OF_MEM));
++		return -1;
++	}
++
++	/* RFC 3546 says literal IPv4 and IPv6 addresses are not allowed.  */
++	if (is_ip_address(server_name, strlen(server_name)))
++		mem_free_set(&server_name, NULL);
++
++	if (init_ssl_connection(socket, server_name) == S_SSL_ERROR) {
++		mem_free_if(server_name);
+ 		socket->ops->done(socket, connection_state(S_SSL_ERROR));
+ 		return -1;
+ 	}
+ 
++	mem_free_if(server_name);
++
+ 	if (socket->no_tls)
+ 		ssl_set_no_tls(socket);
+ 
+diff --git a/src/network/ssl/ssl.c b/src/network/ssl/ssl.c
+index 685c31e..7767a71 100644
+--- a/src/network/ssl/ssl.c
++++ b/src/network/ssl/ssl.c
+@@ -212,13 +212,26 @@ struct module ssl_module = struct_module(
+ );
+ 
+ int
+-init_ssl_connection(struct socket *socket)
++init_ssl_connection(struct socket *socket,
++		    const unsigned char *server_name)
+ {
+ #ifdef CONFIG_OPENSSL
+ 	socket->ssl = SSL_new(context);
+ 	if (!socket->ssl) return S_SSL_ERROR;
++
++	/* If the server name is known, pass it to OpenSSL.
++	 *
++	 * The return value of SSL_set_tlsext_host_name is not
++	 * documented.  The source shows that it returns 1 if
++	 * successful; on error, it calls SSLerr and returns 0.  */
++	if (server_name
++	    && !SSL_set_tlsext_host_name(socket->ssl, server_name)) {
++		SSL_free(socket->ssl);
++		socket->ssl = NULL;
++		return S_SSL_ERROR;
++	}
++
+ #elif defined(CONFIG_GNUTLS)
+-	/* const unsigned char server_name[] = "localhost"; */
+ 	ssl_t *state = mem_alloc(sizeof(ssl_t));
+ 
+ 	if (!state) return S_SSL_ERROR;
+@@ -255,9 +268,15 @@ init_ssl_connection(struct socket *socket)
+ 	/* gnutls_handshake_set_private_extensions(*state, 1); */
+ 	gnutls_cipher_set_priority(*state, cipher_priority);
+ 	gnutls_kx_set_priority(*state, kx_priority);
+-	/* gnutls_certificate_type_set_priority(*state, cert_type_priority);
+-	gnutls_server_name_set(*state, GNUTLS_NAME_DNS, server_name,
+-			       sizeof(server_name) - 1); */
++	/* gnutls_certificate_type_set_priority(*state, cert_type_priority); */
++
++	if (server_name
++	    && gnutls_server_name_set(*state, GNUTLS_NAME_DNS, server_name,
++				      strlen(server_name))) {
++		gnutls_deinit(*state);
++		mem_free(state);
++		return S_SSL_ERROR;
++	}
+ 
+ 	socket->ssl = state;
+ #endif
+diff --git a/src/network/ssl/ssl.h b/src/network/ssl/ssl.h
+index 7c54a7a..bfd94e1 100644
+--- a/src/network/ssl/ssl.h
++++ b/src/network/ssl/ssl.h
+@@ -11,8 +11,18 @@ struct socket;
+ extern struct module ssl_module;
+ 
+ /* Initializes the SSL connection data. Returns S_OK on success and S_SSL_ERROR
+- * on failure. */
+-int init_ssl_connection(struct socket *socket);
++ * on failure.
++ *
++ * server_name is the DNS name of the server (in UTF-8), or NULL if
++ * ELinks knows only the IP address.  ELinks reports that name to the
++ * server so that the server can choose the correct certificate if it
++ * has multiple virtual hosts on the same IP address.  See RFC 3546
++ * section 3.1.
++ *
++ * server_name does not affect how ELinks verifies the certificate
++ * after the server has returned it.  */
++int init_ssl_connection(struct socket *socket,
++			const unsigned char *server_name);
+ 
+ /* Releases the SSL connection data */
+ void done_ssl_connection(struct socket *socket);
+-- 
+2.1.0
+
+
+From e7484a980572b665747c28aa1376e29a12fb4b19 Mon Sep 17 00:00:00 2001
+From: Kalle Olavi Niemitalo <kon@iki.fi>
+Date: Tue, 3 May 2011 03:52:21 +0300
+Subject: [PATCH 2/4] 1024: Verify server certificate hostname with OpenSSL
+
+Not tested with nss-compat-ossl.
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ src/network/ssl/Makefile                   |   7 +-
+ src/network/ssl/match-hostname.c           | 125 +++++++++++++++++
+ src/network/ssl/match-hostname.h           |  10 ++
+ src/network/ssl/socket.c                   | 211 ++++++++++++++++++++++++++++-
+ src/network/ssl/ssl.c                      |  41 +++++-
+ src/network/ssl/ssl.h                      |   3 +
+ src/network/ssl/test/Makefile              |   9 ++
+ src/network/ssl/test/match-hostname-test.c | 123 +++++++++++++++++
+ src/network/ssl/test/test-match-hostname   |   3 +
+ 9 files changed, 529 insertions(+), 3 deletions(-)
+ create mode 100644 src/network/ssl/match-hostname.c
+ create mode 100644 src/network/ssl/match-hostname.h
+ create mode 100644 src/network/ssl/test/Makefile
+ create mode 100644 src/network/ssl/test/match-hostname-test.c
+ create mode 100755 src/network/ssl/test/test-match-hostname
+
+diff --git a/src/network/ssl/Makefile b/src/network/ssl/Makefile
+index 26f02c2..6f265da 100644
+--- a/src/network/ssl/Makefile
++++ b/src/network/ssl/Makefile
+@@ -3,6 +3,11 @@ include $(top_builddir)/Makefile.config
+ 
+ INCLUDES += $(GNUTLS_CFLAGS) $(OPENSSL_CFLAGS)
+ 
+-OBJS = ssl.o socket.o
++SUBDIRS = test
++
++# ELinks uses match-hostname.o only if CONFIG_OPENSSL.
++# However, match-hostname.o has test cases that always need it.
++# The test framework doesn't seem to support conditional tests.
++OBJS = match-hostname.o ssl.o socket.o
+ 
+ include $(top_srcdir)/Makefile.lib
+diff --git a/src/network/ssl/match-hostname.c b/src/network/ssl/match-hostname.c
+new file mode 100644
+index 0000000..9a64bb4
+--- /dev/null
++++ b/src/network/ssl/match-hostname.c
+@@ -0,0 +1,125 @@
++/* Matching a host name to wildcards in SSL certificates */
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include "elinks.h"
++
++#include "intl/charsets.h"
++#include "network/ssl/match-hostname.h"
++#include "util/conv.h"
++#include "util/error.h"
++#include "util/string.h"
++
++/** Checks whether a host name matches a pattern that may contain
++ * wildcards.
++ *
++ * @param[in] hostname
++ *   The host name to which the user wanted to connect.
++ *   Should be in UTF-8 and need not be null-terminated.
++ * @param[in] hostname_length
++ *   The length of @a hostname, in bytes.
++ * @param[in] pattern
++ *   A pattern that the host name might match.
++ *   Should be in UTF-8 and need not be null-terminated.
++ *   The pattern may contain wildcards, as specified in
++ *   RFC 2818 section 3.1.
++ * @param[in] pattern_length
++ *   The length of @a pattern, in bytes.
++ *
++ * @return
++ *   Nonzero if the host name matches.  Zero if it doesn't.
++ *
++ * According to RFC 2818 section 3.1, '*' matches any number of
++ * characters except '.'.  For example, "*r*.example.org" matches
++ * "random.example.org" or "history.example.org" but not
++ * "frozen.fruit.example.org".
++ *
++ * This function does not allocate memory, and consumes at most
++ * O(@a hostname_length * @a pattern_length) time.  */
++int
++match_hostname_pattern(const unsigned char *hostname,
++		       size_t hostname_length,
++		       const unsigned char *pattern,
++		       size_t pattern_length)
++{
++	const unsigned char *const hostname_end = hostname + hostname_length;
++	const unsigned char *const pattern_end = pattern + pattern_length;
++
++	assert(hostname <= hostname_end);
++	assert(pattern <= pattern_end);
++	if_assert_failed return 0;
++
++	while (pattern < pattern_end) {
++		if (*pattern == '*') {
++			const unsigned char *next_wildcard;
++			size_t literal_length;
++
++			++pattern;
++			next_wildcard = memchr(pattern, '*',
++					       pattern_end - pattern);
++			if (next_wildcard == NULL)
++				literal_length = pattern_end - pattern;
++			else
++				literal_length = next_wildcard - pattern;
++
++			for (;;) {
++				size_t hostname_left = hostname_end - hostname;
++				unicode_val_T uni;
++
++				if (hostname_left < literal_length)
++					return 0;
++
++				/* If next_wildcard == NULL, then the
++				 * literal string is at the end of the
++				 * pattern, so anchor the match to the
++				 * end of the hostname.  The end of
++				 * this function can then easily
++				 * verify that the whole hostname was
++				 * matched.
++				 *
++				 * But do not jump directly there;
++				 * first verify that there are no '.'
++				 * characters in between.  */
++				if ((next_wildcard != NULL
++				     || hostname_left == literal_length)
++				    && !c_strlcasecmp(pattern, literal_length,
++						      hostname, literal_length))
++					break;
++
++				/* The literal string doesn't match here.
++				 * Skip one character of the hostname and
++				 * retry.  If the skipped character is '.'
++				 * or one of the equivalent characters
++				 * listed in RFC 3490 section 3.1
++				 * requirement 1, then return 0, because
++				 * '*' must not match such characters.
++				 * Do the same if invalid UTF-8 is found.
++				 * Cast away const.  */
++				uni = utf8_to_unicode((unsigned char **) hostname,
++						      hostname_end);
++				if (uni == 0x002E
++				    || uni == 0x3002
++				    || uni == 0xFF0E
++				    || uni == 0xFF61
++				    || uni == UCS_NO_CHAR)
++					return 0;
++			}
++
++			pattern += literal_length;
++			hostname += literal_length;
++		} else {
++			if (hostname == hostname_end)
++				return 0;
++
++			if (c_toupper(*pattern) != c_toupper(*hostname))
++				return 0;
++
++			++pattern;
++			++hostname;
++		}
++	}
++
++	return hostname == hostname_end;
++}
+diff --git a/src/network/ssl/match-hostname.h b/src/network/ssl/match-hostname.h
+new file mode 100644
+index 0000000..60d32b2
+--- /dev/null
++++ b/src/network/ssl/match-hostname.h
+@@ -0,0 +1,10 @@
++
++#ifndef EL__NETWORK_SSL_MATCH_HOSTNAME_H
++#define EL__NETWORK_SSL_MATCH_HOSTNAME_H
++
++int match_hostname_pattern(const unsigned char *hostname,
++			   size_t hostname_length,
++			   const unsigned char *pattern,
++			   size_t pattern_length);
++
++#endif
+diff --git a/src/network/ssl/socket.c b/src/network/ssl/socket.c
+index dc682d0..a67bbde 100644
+--- a/src/network/ssl/socket.c
++++ b/src/network/ssl/socket.c
+@@ -6,13 +6,24 @@
+ 
+ #ifdef CONFIG_OPENSSL
+ #include <openssl/ssl.h>
++#include <openssl/x509v3.h>
++#define USE_OPENSSL
++#elif defined(CONFIG_NSS_COMPAT_OSSL)
++#include <nss_compat_ossl/nss_compat_ossl.h>
++#define USE_OPENSSL
+ #elif defined(CONFIG_GNUTLS)
+ #include <gnutls/gnutls.h>
+ #else
+ #error "Huh?! You have SSL enabled, but not OPENSSL nor GNUTLS!! And then you want exactly *what* from me?"
+ #endif
+ 
++#ifdef HAVE_ARPA_INET_H
++#include <arpa/inet.h>
++#endif
+ #include <errno.h>
++#ifdef HAVE_NETINET_IN_H
++#include <netinet/in.h>
++#endif
+ 
+ #include "elinks.h"
+ 
+@@ -20,6 +31,7 @@
+ #include "main/select.h"
+ #include "network/connection.h"
+ #include "network/socket.h"
++#include "network/ssl/match-hostname.h"
+ #include "network/ssl/socket.h"
+ #include "network/ssl/ssl.h"
+ #include "protocol/uri.h"
+@@ -83,6 +95,203 @@ ssl_set_no_tls(struct socket *socket)
+ #endif
+ }
+ 
++#ifdef USE_OPENSSL
++
++/** Checks whether the host component of a URI matches a host name in
++ * the server certificate.
++ *
++ * @param[in] uri_host
++ *   The host name (or IP address) to which the user wanted to connect.
++ *   Should be in UTF-8.
++ * @param[in] cert_host_asn1
++ *   A host name found in the server certificate: either as commonName
++ *   in the subject field, or as a dNSName in the subjectAltName
++ *   extension.  This may contain wildcards, as specified in RFC 2818
++ *   section 3.1.
++ *
++ * @return
++ *   Nonzero if the host matches.  Zero if it doesn't, or on error.
++ *
++ * If @a uri_host is an IP address literal rather than a host name,
++ * then this function returns 0, meaning that the host name does not match.
++ * According to RFC 2818, if the certificate is intended to match an
++ * IP address, then it must have that IP address as an iPAddress
++ * SubjectAltName, rather than in commonName.  For comparing those,
++ * match_uri_host_ip() must be used instead of this function.  */
++static int
++match_uri_host_name(const unsigned char *uri_host,
++		    ASN1_STRING *cert_host_asn1)
++{
++	const size_t uri_host_len = strlen(uri_host);
++	unsigned char *cert_host = NULL;
++	int cert_host_len;
++	int matched = 0;
++
++	if (is_ip_address(uri_host, uri_host_len))
++		goto mismatch;
++
++	/* This function is used for both dNSName and commonName.
++	 * Although dNSName is always an IA5 string, commonName allows
++	 * many other encodings too.  Normalize all to UTF-8.  */
++	cert_host_len = ASN1_STRING_to_UTF8(&cert_host,
++					    cert_host_asn1);
++	if (cert_host_len < 0)
++		goto mismatch;
++
++	matched = match_hostname_pattern(uri_host, uri_host_len,
++					 cert_host, cert_host_len);
++
++mismatch:
++	if (cert_host)
++		OPENSSL_free(cert_host);
++	return matched;
++}
++
++/** Checks whether the host component of a URI matches an IP address
++ * in the server certificate.
++ *
++ * @param[in] uri_host
++ *   The IP address (or host name) to which the user wanted to connect.
++ *   Should be in UTF-8.
++ * @param[in] cert_host_asn1
++ *   An IP address found as iPAddress in the subjectAltName extension
++ *   of the server certificate.  According to RFC 5280 section 4.2.1.6,
++ *   that is an octet string in network byte order.  According to
++ *   RFC 2818 section 3.1, wildcards are not allowed.
++ *
++ * @return
++ *   Nonzero if the host matches.  Zero if it doesn't, or on error.
++ *
++ * If @a uri_host is a host name rather than an IP address literal,
++ * then this function returns 0, meaning that the address does not match.
++ * This function does not try to resolve the host name to an IP address
++ * and compare that to @a cert_host_asn1, because such an approach would
++ * be vulnerable to DNS spoofing.
++ *
++ * This function does not support the address-and-netmask format used
++ * in the name constraints extension of a CA certificate (RFC 5280
++ * section 4.2.1.10).  */
++static int
++match_uri_host_ip(const unsigned char *uri_host,
++		  ASN1_OCTET_STRING *cert_host_asn1)
++{
++	const unsigned char *cert_host_addr = ASN1_STRING_data(cert_host_asn1);
++	struct in_addr uri_host_in;
++#ifdef CONFIG_IPV6
++	struct in6_addr uri_host_in6;
++#endif
++
++	/* RFC 5280 defines the iPAddress alternative of GeneralName
++	 * as an OCTET STRING.  Verify that the type is indeed that.
++	 * This is an assertion because, if someone puts the wrong
++	 * type of data there, then it will not even be recognized as
++	 * an iPAddress, and this function will not be called.
++	 *
++	 * (Because GeneralName is defined in an implicitly tagged
++	 * ASN.1 module, the OCTET STRING tag is not part of the DER
++	 * encoding.  BER also allows a constructed encoding where
++	 * each substring begins with the OCTET STRING tag; but ITU-T
++	 * Rec. X.690 (07/2002) subclause 8.21 says those would be
++	 * OCTET STRING even if the outer string were of some other
++	 * type.  "A Layman's Guide to a Subset of ASN.1, BER, and
++	 * DER" (Kaliski, 1993) claims otherwise, though.)  */
++	assert(ASN1_STRING_type(cert_host_asn1) == V_ASN1_OCTET_STRING);
++	if_assert_failed return 0;
++
++	/* cert_host_addr, url_host_in, and url_host_in6 are all in
++	 * network byte order.  */
++	switch (ASN1_STRING_length(cert_host_asn1)) {
++	case 4:
++		return inet_aton(uri_host, &uri_host_in) != 0
++		    && memcmp(cert_host_addr, &uri_host_in.s_addr, 4) == 0;
++
++#ifdef CONFIG_IPV6
++	case 16:
++		return inet_pton(AF_INET6, uri_host, &uri_host_in6) == 1
++		    && memcmp(cert_host_addr, &uri_host_in6.s6_addr, 16) == 0;
++#endif
++
++	default:
++		return 0;
++	}
++}
++
++/** Verify one certificate in the server certificate chain.
++ * This callback is documented in SSL_set_verify(3).  */
++static int
++verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
++{
++	X509 *cert;
++	SSL *ssl;
++	struct socket *socket;
++	struct connection *conn;
++	unsigned char *host_in_uri;
++	GENERAL_NAMES *alts;
++	int saw_dns_name = 0;
++	int matched = 0;
++
++	/* If OpenSSL already found a problem, keep that.  */
++	if (!preverify_ok)
++		return 0;
++
++	/* Examine only the server certificate, not CA certificates.  */
++	if (X509_STORE_CTX_get_error_depth(ctx) != 0)
++		return preverify_ok;
++
++	cert = X509_STORE_CTX_get_current_cert(ctx);
++	ssl = X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
++	socket = SSL_get_ex_data(ssl, socket_SSL_ex_data_idx);
++	conn = socket->conn;
++	host_in_uri = get_uri_string(conn->uri, URI_HOST | URI_IDN);
++	if (!host_in_uri)
++		return 0;
++
++	/* RFC 5280 section 4.2.1.6 describes the subjectAltName extension.
++	 * RFC 2818 section 3.1 says Common Name must not be used
++	 * if dNSName is present.  */
++	alts = X509_get_ext_d2i(cert, NID_subject_alt_name, NULL, NULL);
++	if (alts != NULL) {
++		int alt_count;
++		int alt_pos;
++		GENERAL_NAME *alt;
++
++		alt_count = sk_GENERAL_NAME_num(alts);
++		for (alt_pos = 0; !matched && alt_pos < alt_count; ++alt_pos) {
++			alt = sk_GENERAL_NAME_value(alts, alt_pos);
++			if (alt->type == GEN_DNS) {
++				saw_dns_name = 1;
++				matched = match_uri_host_name(host_in_uri,
++							      alt->d.dNSName);
++			} else if (alt->type == GEN_IPADD) {
++				matched = match_uri_host_ip(host_in_uri,
++							    alt->d.iPAddress);
++			}
++		}
++
++		/* Free the GENERAL_NAMES list and each element.  */
++		sk_GENERAL_NAME_pop_free(alts, GENERAL_NAME_free);
++	}
++
++	if (!matched && !saw_dns_name) {
++		X509_NAME *name;
++		int cn_index;
++		X509_NAME_ENTRY *entry = NULL;
++
++		name = X509_get_subject_name(cert);
++		cn_index = X509_NAME_get_index_by_NID(name, NID_commonName, -1);
++		if (cn_index >= 0)
++			entry = X509_NAME_get_entry(name, cn_index);
++		if (entry != NULL)
++			matched = match_uri_host_name(host_in_uri,
++						      X509_NAME_ENTRY_get_data(entry));
++	}
++
++	mem_free(host_in_uri);
++	return matched;
++}
++
++#endif	/* USE_OPENSSL */
++
+ static void
+ ssl_want_read(struct socket *socket)
+ {
+@@ -149,7 +358,7 @@ ssl_connect(struct socket *socket)
+ 	if (get_opt_bool("connection.ssl.cert_verify"))
+ 		SSL_set_verify(socket->ssl, SSL_VERIFY_PEER
+ 					  | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
+-				NULL);
++			       verify_callback);
+ 
+ 	if (get_opt_bool("connection.ssl.client_cert.enable")) {
+ 		unsigned char *client_cert;
+diff --git a/src/network/ssl/ssl.c b/src/network/ssl/ssl.c
+index 7767a71..d1881c8 100644
+--- a/src/network/ssl/ssl.c
++++ b/src/network/ssl/ssl.c
+@@ -39,7 +39,35 @@
+ #define	PATH_MAX	256 /* according to my /usr/include/bits/posix1_lim.h */
+ #endif
+ 
+-SSL_CTX *context = NULL;
++static SSL_CTX *context = NULL;
++int socket_SSL_ex_data_idx = -1;
++
++/** Prevent SSL_dup() if the SSL is associated with struct socket.
++ * We cannot copy struct socket and it doesn't have a reference count
++ * either.  */
++static int
++socket_SSL_ex_data_dup(CRYPTO_EX_DATA *to, CRYPTO_EX_DATA *from,
++		       void *from_d, int idx, long argl, void *argp)
++{
++	/* The documentation of from_d in RSA_get_ex_new_index(3)
++	 * is a bit unclear.  The caller does something like:
++	 *
++	 * void *data = CRYPTO_get_ex_data(from, idx);
++	 * socket_SSL_dup(to, from, &data, idx, argl, argp);
++	 * CRYPTO_set_ex_data(to, idx, data);
++	 *
++	 * i.e., from_d always points to a pointer, even though
++	 * it is just a void * in the prototype.  */
++	struct socket *socket = *(void **) from_d;
++
++	assert(idx == socket_SSL_ex_data_idx);
++	if_assert_failed return 0;
++
++	if (socket)
++		return 0;	/* prevent SSL_dup() */
++	else
++		return 1;	/* allow SSL_dup() */
++}
+ 
+ static void
+ init_openssl(struct module *module)
+@@ -48,12 +76,17 @@ init_openssl(struct module *module)
+ 	context = SSL_CTX_new(SSLv23_client_method());
+ 	SSL_CTX_set_options(context, SSL_OP_ALL);
+ 	SSL_CTX_set_default_verify_paths(context);
++	socket_SSL_ex_data_idx = SSL_get_ex_new_index(0, NULL,
++						      NULL,
++						      socket_SSL_ex_data_dup,
++						      NULL);
+ }
+ 
+ static void
+ done_openssl(struct module *module)
+ {
+ 	if (context) SSL_CTX_free(context);
++	/* There is no function that undoes SSL_get_ex_new_index.  */
+ }
+ 
+ static union option_info openssl_options[] = {
+@@ -219,6 +252,12 @@ init_ssl_connection(struct socket *socket,
+ 	socket->ssl = SSL_new(context);
+ 	if (!socket->ssl) return S_SSL_ERROR;
+ 
++	if (!SSL_set_ex_data(socket->ssl, socket_SSL_ex_data_idx, socket)) {
++		SSL_free(socket->ssl);
++		socket->ssl = NULL;
++		return S_SSL_ERROR;
++	}
++
+ 	/* If the server name is known, pass it to OpenSSL.
+ 	 *
+ 	 * The return value of SSL_set_tlsext_host_name is not
+diff --git a/src/network/ssl/ssl.h b/src/network/ssl/ssl.h
+index bfd94e1..480b4db 100644
+--- a/src/network/ssl/ssl.h
++++ b/src/network/ssl/ssl.h
+@@ -29,6 +29,9 @@ void done_ssl_connection(struct socket *socket);
+ 
+ unsigned char *get_ssl_connection_cipher(struct socket *socket);
+ 
++#if defined(CONFIG_OPENSSL) || defined(CONFIG_NSS_COMPAT_OSSL)
++extern int socket_SSL_ex_data_idx;
++#endif
+ 
+ /* Internal type used in ssl module. */
+ 
+diff --git a/src/network/ssl/test/Makefile b/src/network/ssl/test/Makefile
+new file mode 100644
+index 0000000..f2196eb
+--- /dev/null
++++ b/src/network/ssl/test/Makefile
+@@ -0,0 +1,9 @@
++top_builddir=../../../..
++include $(top_builddir)/Makefile.config
++
++SUBDIRS =
++TEST_PROGS = match-hostname-test
++TESTDEPS += \
++ $(top_builddir)/src/network/ssl/match-hostname.o
++
++include $(top_srcdir)/Makefile.lib
+diff --git a/src/network/ssl/test/match-hostname-test.c b/src/network/ssl/test/match-hostname-test.c
+new file mode 100644
+index 0000000..fbdf6fa
+--- /dev/null
++++ b/src/network/ssl/test/match-hostname-test.c
+@@ -0,0 +1,123 @@
++/* Test match_hostname_pattern() */
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "elinks.h"
++
++#include "network/ssl/match-hostname.h"
++#include "util/string.h"
++
++struct match_hostname_pattern_test_case
++{
++	const unsigned char *pattern;
++	const unsigned char *hostname;
++	int match;
++};
++
++static const struct match_hostname_pattern_test_case match_hostname_pattern_test_cases[] = {
++	{ "*r*.example.org", "random.example.org", 1 },
++	{ "*r*.example.org", "history.example.org", 1 },
++	{ "*r*.example.org", "frozen.fruit.example.org", 0 },
++	{ "*r*.example.org", "steamed.fruit.example.org", 0 },
++
++	{ "ABC.def.Ghi", "abc.DEF.gHI", 1 },
++
++	{ "*", "localhost", 1 },
++	{ "*", "example.org", 0 },
++	{ "*.*", "example.org", 1 },
++	{ "*.*.*", "www.example.org", 1 },
++	{ "*.*.*", "example.org", 0 },
++
++	{ "assign", "assignee", 0 },
++	{ "*peg", "arpeggiator", 0 },
++	{ "*peg*", "arpeggiator", 1 },
++	{ "*r*gi*", "arpeggiator", 1 },
++	{ "*r*git*", "arpeggiator", 0 },
++
++	{ NULL, NULL, 0 }
++};
++
++int
++main(void)
++{
++	const struct match_hostname_pattern_test_case *test;
++	int count_ok = 0;
++	int count_fail = 0;
++	struct string hostname_str = NULL_STRING;
++	struct string pattern_str = NULL_STRING;
++
++	if (!init_string(&hostname_str) || !init_string(&pattern_str)) {
++		fputs("Out of memory.\n", stderr);
++		done_string(&hostname_str);
++		done_string(&pattern_str);
++		return EXIT_FAILURE;
++	}
++
++	for (test = match_hostname_pattern_test_cases; test->pattern; test++) {
++		int match;
++
++		match = match_hostname_pattern(
++			test->hostname,
++			strlen(test->hostname),
++			test->pattern,
++			strlen(test->pattern));
++		if (!match == !test->match) {
++			/* Test OK */
++			count_ok++;
++		} else {
++			fprintf(stderr, "match_hostname_pattern() test failed\n"
++				"\tHostname: %s\n"
++				"\tPattern: %s\n"
++				"\tActual result: %d\n"
++				"\tCorrect result: %d\n",
++				test->hostname,
++				test->pattern,
++				match,
++				test->match);
++			count_fail++;
++		}
++
++		/* Try with strings that are not null-terminated.  */
++		hostname_str.length = 0;
++		add_to_string(&hostname_str, test->hostname);
++		add_to_string(&hostname_str, "ZZZ");
++		pattern_str.length = 0;
++		add_to_string(&pattern_str, test->pattern);
++		add_to_string(&hostname_str, "______");
++
++		match = match_hostname_pattern(
++			hostname_str.source,
++			strlen(test->hostname),
++			pattern_str.source,
++			strlen(test->pattern));
++		if (!match == !test->match) {
++			/* Test OK */
++			count_ok++;
++		} else {
++			fprintf(stderr, "match_hostname_pattern() test failed\n"
++				"\tVariant: Strings were not null-terminated.\n"
++				"\tHostname: %s\n"
++				"\tPattern: %s\n"
++				"\tActual result: %d\n"
++				"\tCorrect result: %d\n",
++				test->hostname,
++				test->pattern,
++				match,
++				test->match);
++			count_fail++;
++		}
++	}
++
++	printf("Summary of match_hostname_pattern() tests: %d OK, %d failed.\n",
++	       count_ok, count_fail);
++
++	done_string(&hostname_str);
++	done_string(&pattern_str);
++	return count_fail ? EXIT_FAILURE : EXIT_SUCCESS;
++
++}
+diff --git a/src/network/ssl/test/test-match-hostname b/src/network/ssl/test/test-match-hostname
+new file mode 100755
+index 0000000..01d7173
+--- /dev/null
++++ b/src/network/ssl/test/test-match-hostname
+@@ -0,0 +1,3 @@
++#! /bin/sh -e
++
++./match-hostname-test
+-- 
+2.1.0
+
+
+From 0cb6967bb9ccabc583bbdc6ee76baf4fdf0f90cc Mon Sep 17 00:00:00 2001
+From: mancha <mancha@mac.hush.com>
+Date: Sun, 15 Jul 2012 23:27:53 +0200
+Subject: [PATCH 3/4] Fix hostname verification code.
+
+[ From bug 1123 attachment 569.  --KON ]
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ src/network/ssl/match-hostname.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/network/ssl/match-hostname.c b/src/network/ssl/match-hostname.c
+index 9a64bb4..80d93b0 100644
+--- a/src/network/ssl/match-hostname.c
++++ b/src/network/ssl/match-hostname.c
+@@ -97,7 +97,7 @@ match_hostname_pattern(const unsigned char *hostname,
+ 				 * '*' must not match such characters.
+ 				 * Do the same if invalid UTF-8 is found.
+ 				 * Cast away const.  */
+-				uni = utf8_to_unicode((unsigned char **) hostname,
++				uni = utf8_to_unicode((unsigned char **) &hostname,
+ 						      hostname_end);
+ 				if (uni == 0x002E
+ 				    || uni == 0x3002
+-- 
+2.1.0
+
+
+From cf8586b0389911d944d767646d5a91c2e1bae86c Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Fri, 5 Jun 2015 17:08:46 +0200
+Subject: [PATCH 4/4] ssl: use the OpenSSL-provided host name check
+
+... if built against a new enough version of OpenSSL
+
+Suggested-by: Christian Heimes
+---
+ configure.in             |  3 +++
+ src/network/ssl/socket.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 52 insertions(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 91d0257..1d858bd 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1044,6 +1044,9 @@ else
+ fi
+ 
+ AC_MSG_RESULT($cf_result)
++if test "$cf_result" = yes; then
++	AC_CHECK_FUNCS(X509_VERIFY_PARAM_set1_host)
++fi
+ 
+ # ---- GNU TLS
+ 
+diff --git a/src/network/ssl/socket.c b/src/network/ssl/socket.c
+index a67bbde..c9e2be4 100644
+--- a/src/network/ssl/socket.c
++++ b/src/network/ssl/socket.c
+@@ -7,6 +7,9 @@
+ #ifdef CONFIG_OPENSSL
+ #include <openssl/ssl.h>
+ #include <openssl/x509v3.h>
++#ifdef HAVE_X509_VERIFY_PARAM_SET1_HOST
++#include <openssl/x509_vfy.h>
++#endif
+ #define USE_OPENSSL
+ #elif defined(CONFIG_NSS_COMPAT_OSSL)
+ #include <nss_compat_ossl/nss_compat_ossl.h>
+@@ -97,6 +100,30 @@ ssl_set_no_tls(struct socket *socket)
+ 
+ #ifdef USE_OPENSSL
+ 
++#ifdef HAVE_X509_VERIFY_PARAM_SET1_HOST
++/* activate the OpenSSL-provided host name check */
++static int
++ossl_set_hostname(void *ssl, unsigned char *server_name)
++{
++	int ret = -1;
++
++	X509_VERIFY_PARAM *vpm = X509_VERIFY_PARAM_new();
++	if (vpm) {
++		if (X509_VERIFY_PARAM_set1_host(vpm, (char *) server_name, 0)
++				&& SSL_set1_param(ssl, vpm))
++		{
++			/* successfully activated the OpenSSL host name check */
++			ret = 0;
++		}
++
++		X509_VERIFY_PARAM_free(vpm);
++	}
++
++	return ret;
++}
++
++#else /* HAVE_X509_VERIFY_PARAM_SET1_HOST */
++
+ /** Checks whether the host component of a URI matches a host name in
+  * the server certificate.
+  *
+@@ -289,6 +316,7 @@ verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
+ 	mem_free(host_in_uri);
+ 	return matched;
+ }
++#endif	/* HAVE_X509_VERIFY_PARAM_SET1_HOST */
+ 
+ #endif	/* USE_OPENSSL */
+ 
+@@ -329,6 +357,9 @@ ssl_connect(struct socket *socket)
+ 	int ret;
+ 	unsigned char *server_name;
+ 	struct connection *conn = socket->conn;
++#ifdef USE_OPENSSL
++	int (*verify_callback_ptr)(int, X509_STORE_CTX *);
++#endif	/* USE_OPENSSL */
+ 
+ 	/* TODO: Recode server_name to UTF-8.  */
+ 	server_name = get_uri_string(conn->proxied_uri, URI_HOST);
+@@ -347,6 +378,23 @@ ssl_connect(struct socket *socket)
+ 		return -1;
+ 	}
+ 
++#ifdef USE_OPENSSL
++#ifdef HAVE_X509_VERIFY_PARAM_SET1_HOST
++	/* activate the OpenSSL-provided host name check */
++	if (ossl_set_hostname(socket->ssl, server_name)) {
++		mem_free_if(server_name);
++		socket->ops->done(socket, connection_state(S_SSL_ERROR));
++		return -1;
++	}
++
++	/* verify_callback() is not needed with X509_VERIFY_PARAM_set1_host() */
++	verify_callback_ptr = NULL;
++#else
++	/* use our own callback implementing the host name check */
++	verify_callback_ptr = verify_callback;
++#endif
++#endif	/* USE_OPENSSL */
++
+ 	mem_free_if(server_name);
+ 
+ 	if (socket->no_tls)
+@@ -358,7 +406,7 @@ ssl_connect(struct socket *socket)
+ 	if (get_opt_bool("connection.ssl.cert_verify"))
+ 		SSL_set_verify(socket->ssl, SSL_VERIFY_PEER
+ 					  | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
+-			       verify_callback);
++			       verify_callback_ptr);
+ 
+ 	if (get_opt_bool("connection.ssl.client_cert.enable")) {
+ 		unsigned char *client_cert;
+-- 
+2.4.3
+

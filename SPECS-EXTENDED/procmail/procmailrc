@@ -1,0 +1,424 @@
+################################################################
+#                  Here we go....                              #
+#                  my very own mail-mangler                    #
+################################################################
+
+################################################################
+# Updated to have working URLs and arbitrarily version-bumped  #
+# to 1.2 on the grounds it matched the mutt version. Very      #
+# little beyond URLs and list addresses has changed.           #
+#                                 2002-03-21.                  #
+################################################################
+
+
+################################################################
+# In the spirit of the net, 90% of this came from other people #
+# and the remaining 10% might be from me. Most of the 90%      #
+# came from these sources:                                     #
+#                                                              #
+#	"Getting started with procmail" at                     #
+#                http://www.spambouncer.org/proctut.shtml      #
+#                http://www.spambouncer.org/procmail.rc        #
+#	...by Catherine A. Hampton.                            #
+#                                                              #
+#	man procmail (overview)                                #
+#	man procmailrc (writing the procmailrc)                #
+#       man procmailex (example recipes)                       #
+#       man formail (especially for splitting digests)         #
+#                                                              #
+#	and .procmailrcs from several friends. Thanks, folks,  #
+#       especially to the one who had more patterns which sent #
+#       things to /dev/null than to mailboxes, for showing me  #
+#       what true impatience with email was like!              #
+################################################################
+                                                                
+################################################################
+# Procmailrc files have two parts. First you tell it where     #
+# everything lives. Then you tell it the recipes.              #
+################################################################
+
+##########################################
+# Varibiggles and where everything lives #
+##########################################
+
+################################################################
+# All of these will work quite happily without changing for    #
+# Red Hat Linux 6.0 through to 7.2.They won't necessarily work #
+# for other flavours without changing paths. See the "Getting  #
+# started with procmail" doc I mentioned above for the likely  #
+# settings for them in other environments. It has a list :)    #
+################################################################
+
+################################################################
+# Since I installed procmail, I have changed from using        #
+# sendmail to using exim. Because I can understand the config  #
+# file. If you use exim, you may need to tweak the config file #
+# as I did. If you do, then check you are reading the docs for #
+# the right version of exim! This worked for me:               #
+#                                                              #
+# http://www.exim.org/exim-html-3.20/doc/html/spec_18.html     #
+# and look for procmail. It's in the example for the 'pipe     #
+# transport'. Just paste it into /etc/exim.conf.               #
+################################################################
+
+SHELL=/bin/bash		
+	# Have to have this one (or whatever your shell is)
+	# Best bet is bash or sh. 
+
+LINEBUF=4096            
+	# Magic. Apparently it burps on long lines if you don't
+        # put this in.
+
+PATH=/bin:/usr/bin:/usr/local/bin
+	# Where procmail looks for stuff. Works for RH 6.0, 6.1
+	# and most other Linux settings I've seen. 
+
+VERBOSE=off
+        # Change to 'on' to get _long_ procmail log. 
+        # NB: if this is short, I don't want to see long: I get
+	# a one-line summary for every email procmail looks at!
+
+MAILDIR=$HOME/Mail	
+	# Not where your mail arrives on the machine. Where
+	# procmail will assume all the folders you mention in
+	# your recipes goes. Make sure your email-reading
+	# program also knows about it. (I understand $HOME/Mail
+	# is pretty standard, however.)
+
+LOGFILE=$HOME/Mail/procmaillog
+	# I don't think this needs to be in your Mail folder,
+	# but my mail-reader (mutt) is great at different 
+	# sorting, so I put the log into the mail directory :)
+	# Note learned through experience: if you leave this file
+	# too long, it will end up with tens of thousands of
+	# messages. Mutt is not always -that- good at sorting
+	# that lot quickly :)
+
+FORMAIL=/usr/bin/formail
+	# 'formail'. Part of the procmail package. Correct
+	# the path if this isn't where it lives for you.
+	# ('which formail' may well tell you.)
+
+SENDMAIL=/usr/sbin/sendmail 
+	# As with formail, tells procmail where to look for
+	# sendmail. If sendmail isn't there, mail transfer
+	# might be handled by a different program. Ask
+	# your sysadmin :) If you are your own sysadmin,
+        # then I hope you know. 
+	# Subsequent to writing that, I have learned that this
+	# file is provided (with this name) by other MTAs too.
+	# I now use Exim (see note above) and this file is still
+	# there, courtesy of exim.
+
+
+############################
+# The recipes - I hope...  #
+############################
+
+################################################################                                                                
+# Gods know how this works. But it's very useful. If you get   #
+# email that is sent simultaneously to you and to two other    #
+# lists, this will nuke two of those so that you only see it   #
+# once. Came from 'man procmail'.                              #
+################################################################
+
+# Nuke duplicate messages
+:0 Wh: msgid.lock
+| $FORMAIL -D 8192 msgid.cache
+
+################################################################
+# Next two are from the 'Getting started with procmail' doc.   #
+# I'm not too sure about how they work, but they look handy... #
+################################################################
+
+# Create a backup cache of 200 most recent messages in case of 
+# mistakes (yes, you can change the 200 to 20 or 400 or whatever
+# you want)
+:0 c
+backup
+
+  :0 ic
+  | cd backup && rm -f dummy `ls -t msg.* | sed -e 1,200d`
+
+# Regenerate "From" lines to make sure they are valid
+:0 fhw
+| formail -I "From " -a "From "
+
+
+################################################################
+# For testing shit - I picked a subject line that no-one would #
+# send me and then tried different recipes on the results, and #
+# then sent myself a whole pile of email about grobblefruit,   #
+# with different recipes here, to see what happened when I     #
+# tried different headers and so on.                           #
+################################################################
+
+:0:
+* ^Subject: Test grobblefruit
+IN.testing
+
+
+################################################################
+#                       Mailing lists                          #
+#                                                              #
+# I think this is the thing that most people who finally get   #
+# procmail want to know about: how to get different messages   #
+# from different mailing lists into different folders. This is #
+# where all that MAILDIR stuff comes from. All the folders I   #
+# name in here are all created off whatever directory I filled #
+# in as the MAILDIR at the start. And no, they don't suddenly  #
+# appear the instant you edit this file. They only appear when #
+# procmail finds mail that should go in them.                  #
+#                                                              #
+# You can have more than one recipe sending email into the     #
+# same folder, btw, yes.                                       #
+#                                                              #
+# General useful (?) comments:                                 #
+#	The "^Resent-From: " pattern works wonderfully on      #
+#    lists which generate it.                                  #
+#	Making the folder not -quite- the list name means you  #
+#    can save mail from it to a folder named for the list. Can #
+#    be handy.                                                 #
+#	Some lists are indeed a pig to catch everything with.  #
+#	"TO" is different from "To" and you mustn't put a      #
+#    a space after "TO". It catches "To: " and "Cc: ", I       #
+#    think. Very handy. But it doesn't catch everything. If    #
+#    it's a mailman list, don't use it and see below.          #
+#	Mailman-run lists all seem to have a Sender: header    #
+#    which is very useful to sort with. Just add -admin onto   #
+#    the name of the mailing list.                             #
+#	Even more useful for mailman-run lists turns out to be #
+#    "X-BeenThere: listname@site.com"                          #
+################################################################
+
+################################################################
+# I hardly use TO now, but here's an example in case.          #
+################################################################
+
+:0:
+* ^TOlynx-dev@sig.net
+IN.lynx-dev
+
+###########
+# bugtraq #
+###########
+
+:0:
+* ^Sender:.*Bugtraq List
+IN.bugtraq
+
+#########################
+# gnome CVS commit list #
+#########################
+
+:0:
+* X-BeenThere: cvs-commits-list@gnome.org
+IN.cvs-commits
+
+
+##############
+# gnome-list #
+##############
+
+:0:
+* ^X-BeenThere: gnome-list@gnome.org
+IN.gnome-list
+
+
+##################
+# gnome-doc-list #
+##################
+
+:0:
+* ^X-BeenThere: gnome-doc-list@gnome.org
+IN.gnome-doc-list
+
+
+###############################################################
+# linuxchix lists: there are several mailing lists here: see  #
+# the end of this file for the different ways to deal with    #
+# heavy traffic lists with digest options.                    #
+###############################################################
+
+:0:
+* ^X-BeenThere: grrltalk@linuxchix.org
+IN.linuxchix
+
+:0:
+* ^X-BeenThere: issues@linuxchix.org
+IN.linuxchix
+
+:0:
+* ^X-BeenThere: techtalk@linuxchix.org
+IN.linuxchix
+
+
+#################################################
+# This is what I consider advanced stuff: this  #
+# one doesn't put the digest straight into a    #
+# folder. Instead it runs 'formail +1 -ds',     #
+# which splits the digest into its original     #
+# messages, and then puts the results of that   #
+# into the folder.                              #
+#                                               #
+# The address is way way out of date, but I am  #
+# not sure of the current digest address, so I  #
+# have left it.                                 #
+#                                               #
+# It is commented out because I actually read   #
+# the main list, not the digest, these days.    #
+#################################################
+
+# :0: 
+# * ^TOgrrltalk-digest@hub.org
+# | formail +1 -ds >> IN.linuxchix
+
+
+##############
+# mutt-users #
+##############
+:0:
+* ^TOmutt-users@mutt.org
+IN.mutt-users
+
+:0:
+* ^Sender: owner-mutt-users@mutt.org
+IN.mutt-users
+
+
+#################################################
+# Procmail list                                 #
+#	...be aware that everyone on this list	#
+# seems to have monster spam filters and thus   #
+# to be completely unconcerned at the huge      #
+# amount of spam it gets: you will either need  #
+# spam filters or tolerance to find the good    #
+# stuff. (I am not subscribed now, but that was #
+# the case when I was.)                         #
+#################################################
+
+:0:
+* ^TOprocmail@Informatik.RWTH-Aachen.DE
+IN.procmaillist
+
+
+#######################################################
+# Red Hat announce -- very handy for security updates #
+#######################################################
+
+:0:
+* ^X-BeenThere: redhat-announce-list@redhat.com
+IN.rh-announce
+
+:0:
+* ^X-BeenThere: redhat-watch-list@redhat.com
+IN.rh-announce
+
+
+#########################
+# windowmaker: wm-users #
+#########################
+
+:0:
+*^From wm-user-request@windowmaker.org
+IN.wm-user
+
+################################################################
+#                 Splitting digests                            #
+#                                                              #
+# You don't need to do this, but this seems to be another very #
+# popular thing to do with procmail. If you're on mailing      #
+# lists using the digest option, sometimes you may want to     #
+# split the digests back up into the original emails. There is #
+# (of course) more than one way to do this:                    #
+#                                                              #
+# (1) don't bother: just read through all the digest in one    #
+# big lump. Simple, easy, and great until you find someone     #
+# sent a 500-line postscript file or a giant jpg which got     #
+# included into the digest :(                                  #
+#                                                              #
+# (2) use a mail-reader such as mutt, and if you suddenly want #
+# to split a digest up, then whilst reading the message, hit   #
+# 	| formail +1 -ds                                       #
+# which will put the results into your main inbox. If you want #
+# it in a particular folder (like the one you're reading), do  #
+#	| formail +1 -ds >> foldername                         #
+#                                                              #
+# (3) make procmail (or formail, actually), split it up ready  #
+# for you to read.                                             #
+#                                                              #
+# So if you want to have each digest automatically split up    #
+# by procmail as it arrives, and to read each message          #
+# individually, then here's some examples of what you can put. #
+# The first two lines are exactly the same. The third one has  #
+# a pipe (vertical line) symbol at the start, and then the     #
+# command you're piping it through.                            #
+#                                                              #
+# Yes, I picked a notoriously heavy-traffic one for the first  #
+# example... And it -should- work, but it's not a list I read, #
+# sorry!                                                       #
+#                                                              #
+# Instead of this:                                             #
+#	:0:                                                    #
+#	* ^Sender: owner-linux-kernel@vger.rutgers.edu         #
+#	IN.linux-kernel                                        #
+# ...you want this:                                            #
+#	:0:                                                    #
+#	* ^Sender: owner-linux-kernel@vger.rutgers.edu         #
+#	| formail +1 -ds >> IN.linux-kernel                    #
+#                                                              #
+# Da-dah! That's all.                                          #
+#                                                              #
+# And for those where the list name changes and that's what    #
+# you're matching patterns on, instead of this:                #
+# 	:0:                                                    #
+# 	* ^TOgrrltalk@hub.org                                  #
+# 	IN.linuxchix                                           #
+# ...you want this:                                            #
+#	:0:                                                    #
+* 	^TOgrrltalk-digest@hub.org                             #
+#	| formail +1 -ds >> IN.linuxchix                       #
+#                                                              #
+# Magic :)                                                     #
+################################################################
+
+
+
+################################################################
+# That's it. Any email that doesn't match any of the recipes   #
+# above goes into my usual place for email, which until I read #
+# it is /var/spool/mail/hobbit. Procmail appears to know about #
+# that without being told.                                     #
+#                                                              #
+# Quick summary for adding your own or changing these: the     #
+# general format for putting an email into a folder and not    #
+# doing anything fancy to it first is:                         #
+#                                                              #
+# :0:                                                          #
+# * <what you're looking for>                                  #
+# <where you're putting it>                                    #
+#                                                              #
+# The ^ sign in my recipes is the sign procmail understands as #
+# "start of the line", so "^From" matches the word "From" when #
+# it's the start of a header.                                  #
+#                                                              #
+# The "IN." at the start of folder names is not necessary:     #
+# that's just my naming system. Stolen, like everything else,  #
+# from a friend's example. It has the benefit that with my     #
+# mail-reader (mutt), which sorts alphabetically, all of them  #
+# show up first (capitals are earlier in the alphabet if       #
+# you're a computer...) and I can save them easily: from       #
+# IN.blah to blah. If you want to call the folders blah-spool, #
+# or just blah, then cool. That'll work, too.                  #
+#                                                              #
+# It is possible that now you have everything in different     #
+# folders, you want to read with a cool program which does     #
+# cool things like display by thread or which understands you  #
+# when you tell it "These are mailing lists" and does handy    #
+# things as a result. If you do, and you discover Mutt, you    #
+# might want to look at my muttrc which is probably next to    #
+# this file.                                                   #
+#                                                              #
+# Have fun!                                                    #
+#                             -- Telsa                         #
+################################################################

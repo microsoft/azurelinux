@@ -1,0 +1,24 @@
+diff -urNp wvstreams-4.6.1-orig/include/wvunixdgsocket.h wvstreams-4.6.1/include/wvunixdgsocket.h
+--- wvstreams-4.6.1-orig/include/wvunixdgsocket.h	2008-07-14 21:11:35.000000000 +0200
++++ wvstreams-4.6.1/include/wvunixdgsocket.h	2010-01-13 14:01:13.000000000 +0100
+@@ -4,6 +4,7 @@
+ #include <sys/types.h>
+ #include <sys/syslog.h>
+ #include <sys/socket.h>
++#include <sys/stat.h>
+ #include <fcntl.h>
+ 
+ #include "wvlog.h"
+diff -urNp wvstreams-4.6.1-orig/streams/wvatomicfile.cc wvstreams-4.6.1/streams/wvatomicfile.cc
+--- wvstreams-4.6.1-orig/streams/wvatomicfile.cc	2009-05-13 23:42:52.000000000 +0200
++++ wvstreams-4.6.1/streams/wvatomicfile.cc	2010-01-13 14:40:30.000000000 +0100
+@@ -11,9 +11,7 @@
+ #include "wvfileutils.h"
+ #include "wvstrutils.h"
+ 
+-#ifdef MACOS
+ #include <sys/stat.h>
+-#endif
+ 
+ WvAtomicFile::WvAtomicFile(WvStringParm filename, int flags, mode_t create_mode)
+     : tmp_file(WvString::null)

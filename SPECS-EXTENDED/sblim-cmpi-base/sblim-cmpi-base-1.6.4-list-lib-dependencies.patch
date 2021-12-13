@@ -1,0 +1,86 @@
+diff -up sblim-cmpi-base-1.6.4/Makefile.am.orig sblim-cmpi-base-1.6.4/Makefile.am
+--- sblim-cmpi-base-1.6.4/Makefile.am.orig	2018-08-22 11:36:52.150165932 +0200
++++ sblim-cmpi-base-1.6.4/Makefile.am	2018-08-22 11:42:27.735431424 +0200
+@@ -61,6 +61,7 @@ libcmpiOSBase_ComputerSystemProvider_la_
+ 		OSBase_ComputerSystem.c
+ libcmpiOSBase_ComputerSystemProvider_la_LIBADD = -lcmpiOSBase_Common
+ libcmpiOSBase_ComputerSystemProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_ComputerSystemProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ # Operating System
+ libcmpiOSBase_OperatingSystemProvider_la_SOURCES = \
+@@ -72,6 +73,8 @@ libcmpiOSBase_OperatingSystemProvider_la
+ 						-ldmiinfo @LINDHELP@
+ # This gcc/ld specific flag is ugly - need to check in configure
+ libcmpiOSBase_OperatingSystemProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_OperatingSystemProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la \
++						libdmiinfo.la
+ 
+ # Operating System Statistical Data
+ libcmpiOSBase_OperatingSystemStatisticalDataProvider_la_SOURCES = \
+@@ -80,6 +83,7 @@ libcmpiOSBase_OperatingSystemStatistical
+ 		OSBase_OperatingSystemStatisticalData.c
+ libcmpiOSBase_OperatingSystemStatisticalDataProvider_la_LIBADD =  -lcmpiOSBase_Common
+ libcmpiOSBase_OperatingSystemStatisticalDataProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_OperatingSystemStatisticalDataProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ # Unix Process
+ libcmpiOSBase_UnixProcessProvider_la_SOURCES = \
+@@ -88,6 +92,7 @@ libcmpiOSBase_UnixProcessProvider_la_SOU
+ 		OSBase_UnixProcess.c
+ libcmpiOSBase_UnixProcessProvider_la_LIBADD =  -lcmpiOSBase_Common
+ libcmpiOSBase_UnixProcessProvider_la_LDFLAGS =  -avoid-version
++libcmpiOSBase_UnixProcessProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ # Processor 
+ libcmpiOSBase_ProcessorProvider_la_SOURCES = \
+@@ -96,6 +101,7 @@ libcmpiOSBase_ProcessorProvider_la_SOURC
+ 		OSBase_Processor.c
+ libcmpiOSBase_ProcessorProvider_la_LIBADD =  -lcmpiOSBase_Common -lpthread
+ libcmpiOSBase_ProcessorProvider_la_LDFLAGS =  -avoid-version
++libcmpiOSBase_ProcessorProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ # Base Board
+ libcmpiOSBase_BaseBoardProvider_la_SOURCES = \
+@@ -104,26 +110,33 @@ libcmpiOSBase_BaseBoardProvider_la_SOURC
+ 		OSBase_BaseBoard.c
+ libcmpiOSBase_BaseBoardProvider_la_LIBADD = -lcmpiOSBase_Common -ldmiinfo
+ libcmpiOSBase_BaseBoardProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_BaseBoardProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la \
++						libdmiinfo.la
+ 
+ libcmpiOSBase_RunningOSProvider_la_SOURCES = cmpiOSBase_RunningOSProvider.c
+ libcmpiOSBase_RunningOSProvider_la_LIBADD = -lcmpiOSBase_Common
+ libcmpiOSBase_RunningOSProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_RunningOSProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ libcmpiOSBase_OSProcessProvider_la_SOURCES = cmpiOSBase_OSProcessProvider.c
+ libcmpiOSBase_OSProcessProvider_la_LIBADD = -lcmpiOSBase_Common
+ libcmpiOSBase_OSProcessProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_OSProcessProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ libcmpiOSBase_OperatingSystemStatisticsProvider_la_SOURCES = cmpiOSBase_OperatingSystemStatisticsProvider.c
+ libcmpiOSBase_OperatingSystemStatisticsProvider_la_LIBADD = -lcmpiOSBase_Common
+ libcmpiOSBase_OperatingSystemStatisticsProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_OperatingSystemStatisticsProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ libcmpiOSBase_CSProcessorProvider_la_SOURCES = cmpiOSBase_CSProcessorProvider.c
+ libcmpiOSBase_CSProcessorProvider_la_LIBADD = -lcmpiOSBase_Common
+ libcmpiOSBase_CSProcessorProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_CSProcessorProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ libcmpiOSBase_CSBaseBoardProvider_la_SOURCES = cmpiOSBase_CSBaseBoardProvider.c
+ libcmpiOSBase_CSBaseBoardProvider_la_LIBADD = -lcmpiOSBase_Common
+ libcmpiOSBase_CSBaseBoardProvider_la_LDFLAGS = -avoid-version
++libcmpiOSBase_CSBaseBoardProvider_la_DEPENDENCIES = libcmpiOSBase_Common.la
+ 
+ 
+ # OSBase support utility libraries
+@@ -139,6 +152,7 @@ libdmiinfo_la_SOURCES=dmiinfo.c dmiinfo.
+ noinst_PROGRAMS = dmitest
+ dmitest_SOURCES = dmitest.c
+ dmitest_LDADD = -ldmiinfo
++dmitest_DEPENDENCIES = libdmiinfo.la
+ 
+ # Installable Header Files
+ sbliminc_HEADERS = OSBase_Common.h cmpiOSBase_Common.h \

@@ -1,0 +1,32 @@
+--- build.xml
++++ build.xml
+@@ -70,7 +70,7 @@
+     <!--mkdir dir="${api_src_dir}"/-->
+     <!--unjar src="${jar_api}" dest="${class_dir}"/-->
+     <javac srcdir="${src_api}"
+-      source="1.2" target="1.2"
++      source="8" target="8"
+       includes="${api_dirs}"
+       destdir="${class_dir}"
+       debug="true">
+@@ -104,9 +104,10 @@
+   <target name="compile" depends="init,api">
+     <!--javac srcdir="${src}:${api_src_dir}"-->
+     <javac srcdir="${src}"
+-      source="1.2" target="1.2"
++      source="8" target="8"
+       includes="${topdirs}"
+       destdir="${class_dir}"
++      encoding="ISO-8859-1"
+       debug="true">
+       <classpath>
+         <pathelement path="${java.class.path}"/>
+@@ -124,7 +125,7 @@
+   </target>
+   <target name="test_compile" depends="api, test_init">
+     <javac srcdir="${src}" includes="org/codehaus/stax/test/**/*.java"
+-      source="1.2" target="1.2"
++      source="8" target="8"
+       destdir="${test_class_dir}"
+       debug="true">
+       <classpath>

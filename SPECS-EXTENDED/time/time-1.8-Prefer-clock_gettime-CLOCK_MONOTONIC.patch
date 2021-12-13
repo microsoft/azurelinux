@@ -1,0 +1,108 @@
+From a3c400a8553b598bc2fd01eb0f63c5748b2147e1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 8 Nov 2017 17:02:42 +0100
+Subject: [PATCH] Prefer clock_gettime(CLOCK_MONOTONIC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+gettimeofday() reports wrong elapsed real time if a time step was
+inserted while running a program. This can happen on initial time
+adjustment from NTP server or by manual adjustement by date command.
+
+This patch uses clock_gettime(CLOCK_MONOTONIC) instead (if available)
+that does not suffer from the issue.
+
+<http://lists.gnu.org/archive/html/bug-gnu-utils/2013-09/msg00008.html>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ configure.ac |  3 +++
+ src/resuse.c | 27 +++++++++++++++++++++++++--
+ 2 files changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ede8fd5..d2950bd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -72,6 +72,9 @@ dnl Checks for library functions.
+ AC_FUNC_VPRINTF
+ AC_FUNC_WAIT3
+ AC_CHECK_FUNCS(strerror)
++AC_SEARCH_LIBS(clock_gettime, [rt])
++test "$ac_cv_search_clock_gettime" != "no" && \
++    AC_DEFINE([HAVE_CLOCK_GETTIME], [1], [System provides clock_gettime() call])
+ 
+ 
+ # What memory units are reported by getrusage(2) ?
+diff --git a/src/resuse.c b/src/resuse.c
+index d2ab870..ec54863 100644
+--- a/src/resuse.c
++++ b/src/resuse.c
+@@ -26,7 +26,14 @@
+ #include <sys/wait.h>
+ #include <sys/resource.h>
+ 
+-#if !HAVE_WAIT3
++#if HAVE_WAIT3
++# if HAVE_CLOCK_GETTIME
++#  ifndef _POSIX_C_SOURCE
++#   define _POSIX_C_SOURCE 199309L
++#  endif
++#  include <time.h>
++# endif
++#else
+ # include <sys/times.h>
+ # ifndef HZ
+ #  include <sys/param.h>
+@@ -51,7 +58,14 @@ resuse_start (resp)
+      RESUSE *resp;
+ {
+ #if HAVE_WAIT3
++#if HAVE_CLOCK_GETTIME
++  struct timespec res;
++  clock_gettime(CLOCK_MONOTONIC, &res);
++  resp->start.tv_sec = res.tv_sec;
++  resp->start.tv_usec = res.tv_nsec / 1000;
++#else
+   gettimeofday (&resp->start, (struct timezone *) 0);
++#endif /* !HAVE_CLOCK_GETTIME */
+ #else
+   long value;
+   struct tms tms;
+@@ -59,7 +73,7 @@ resuse_start (resp)
+   value = times (&tms);
+   resp->start.tv_sec = value / HZ;
+   resp->start.tv_usec = value % HZ * (1000000 / HZ);
+-#endif
++#endif /* !HAVE_WAIT3 */
+ }
+ 
+ /* Wait for and fill in data on child process PID.
+@@ -79,6 +93,9 @@ resuse_end (pid, resp)
+   int status;
+ 
+ #if HAVE_WAIT3
++#if HAVE_CLOCK_GETTIME
++  struct timespec res;
++#endif
+   pid_t caught;
+ 
+   /* Ignore signals, but don't ignore the children.  When wait3
+@@ -89,7 +106,13 @@ resuse_end (pid, resp)
+ 	return 0;
+     }
+ 
++#if HAVE_CLOCK_GETTIME
++  clock_gettime(CLOCK_MONOTONIC, &res);
++  resp->elapsed.tv_sec = res.tv_sec;
++  resp->elapsed.tv_usec = res.tv_nsec / 1000;
++#else
+   gettimeofday (&resp->elapsed, (struct timezone *) 0);
++#endif
+ #else  /* !HAVE_WAIT3 */
+   long value;
+   struct tms tms;
+-- 
+2.13.6
+

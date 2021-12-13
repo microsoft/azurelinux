@@ -1,0 +1,13 @@
+log() function not available in libgmp, need libm too
+
+--- setup.py
++++ setup.py
+@@ -349,7 +349,7 @@ kw = {'name':"pycrypto",
+             # _fastmath (uses GNU mp library)
+             Extension("Crypto.PublicKey._fastmath",
+                       include_dirs=['src/','/usr/include/'],
+-                      libraries=['gmp'],
++                      libraries=['gmp','m'],
+                       sources=["src/_fastmath.c"]),
+ 
+             # Hash functions

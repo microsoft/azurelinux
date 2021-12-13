@@ -1,0 +1,33 @@
+From 573e29a3f6b379c1bd1dba8c73c65a5f885176a0 Mon Sep 17 00:00:00 2001
+From: Stefan Becker <chemobejk@gmail.com>
+Date: Thu, 4 Jul 2019 10:54:03 +0300
+Subject: [PATCH] configure: add check for glib-mkenums
+
+This fixes build failure for latest source with autoconf. Add the check
+glib-mkenums and definition of GLIB_MKENUMS to configure.ac
+
+Fixes #16
+---
+ configure.ac | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 31be2770..431aa2da 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -264,6 +264,12 @@ FS_PREFIX="`$PKG_CONFIG --variable=prefix farstream-$FS_APIVERSION`"
+ AC_SUBST(GLIB_PREFIX)
+ AC_SUBST(FS_PREFIX)
+ 
++dnl Check for glib-2.0 tools
++AC_MSG_CHECKING([for glib-mkenums])
++GLIB_MKENUMS="`$PKG_CONFIG --variable=glib_mkenums glib-2.0`"
++AC_SUBST(GLIB_MKENUMS)
++AC_MSG_RESULT($GLIB_MKENUMS)
++
+ dnl *** set variables based on configure arguments ***
+ 
+ dnl set license and copyright notice
+-- 
+2.21.0
+

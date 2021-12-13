@@ -1,0 +1,369 @@
+From 0cb918b9a9b9080c61556c0e6a167855ca9c7f48 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 8 Sep 2017 11:31:02 +0200
+Subject: [PATCH] Remove redundant pkgconfig implementations
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Only one implementation is required, we selected
+Alien::Build::Plugin::PkgConfig::LibPkgConf. This patch removes other
+ones to decrease number of dependencies.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ MANIFEST                                      |   4 -
+ Makefile.PL                                   |   4 +-
+ lib/Alien/Build/Plugin/PkgConfig/Negotiate.pm |  25 +--
+ t/01_use.t                                    |   4 -
+ t/alien_build_plugin_pkgconfig_negotiate.t    |   2 +-
+ ...n_build_plugin_pkgconfig_negotiate__pick.t | 176 +-----------------
+ 6 files changed, 11 insertions(+), 204 deletions(-)
+
+diff --git a/MANIFEST b/MANIFEST
+index 23f181a..eb81c8b 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -177,11 +177,9 @@ lib/Alien/Build/Plugin/Fetch/LocalDir.pm
+ lib/Alien/Build/Plugin/Fetch/NetFTP.pm
+ lib/Alien/Build/Plugin/Fetch/Wget.pm
+ lib/Alien/Build/Plugin/Gather/IsolateDynamic.pm
+-lib/Alien/Build/Plugin/PkgConfig/CommandLine.pm
+ lib/Alien/Build/Plugin/PkgConfig/LibPkgConf.pm
+ lib/Alien/Build/Plugin/PkgConfig/MakeStatic.pm
+ lib/Alien/Build/Plugin/PkgConfig/Negotiate.pm
+-lib/Alien/Build/Plugin/PkgConfig/PP.pm
+ lib/Alien/Build/Plugin/Prefer.pod
+ lib/Alien/Build/Plugin/Prefer/BadVersion.pm
+ lib/Alien/Build/Plugin/Prefer/GoodVersion.pm
+@@ -265,12 +263,10 @@ t/alien_build_plugin_fetch_netftp.t
+ t/alien_build_plugin_fetch_wget.t
+ t/alien_build_plugin_gather_isolatedynamic.t
+ t/alien_build_plugin_meta.t
+-t/alien_build_plugin_pkgconfig_commandline.t
+ t/alien_build_plugin_pkgconfig_libpkgconf.t
+ t/alien_build_plugin_pkgconfig_makestatic.t
+ t/alien_build_plugin_pkgconfig_negotiate.t
+ t/alien_build_plugin_pkgconfig_negotiate__pick.t
+-t/alien_build_plugin_pkgconfig_pp.t
+ t/alien_build_plugin_prefer_badversion.t
+ t/alien_build_plugin_prefer_goodversion.t
+ t/alien_build_plugin_prefer_sortversions.t
+diff --git a/Makefile.PL b/Makefile.PL
+index 63b5258..7c79e1a 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -86,11 +86,9 @@ my %WriteMakefileArgs = (
+     "lib/Alien/Build/Plugin/Fetch/NetFTP.pm"             => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/NetFTP.pm",
+     "lib/Alien/Build/Plugin/Fetch/Wget.pm"               => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/Wget.pm",
+     "lib/Alien/Build/Plugin/Gather/IsolateDynamic.pm"    => "\$(INST_LIB)/Alien/Build/Plugin/Gather/IsolateDynamic.pm",
+-    "lib/Alien/Build/Plugin/PkgConfig/CommandLine.pm"    => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/CommandLine.pm",
+     "lib/Alien/Build/Plugin/PkgConfig/LibPkgConf.pm"     => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/LibPkgConf.pm",
+     "lib/Alien/Build/Plugin/PkgConfig/MakeStatic.pm"     => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/MakeStatic.pm",
+     "lib/Alien/Build/Plugin/PkgConfig/Negotiate.pm"      => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/Negotiate.pm",
+-    "lib/Alien/Build/Plugin/PkgConfig/PP.pm"             => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/PP.pm",
+     "lib/Alien/Build/Plugin/Prefer.pod"                  => "\$(INST_LIB)/Alien/Build/Plugin/Prefer.pod",
+     "lib/Alien/Build/Plugin/Prefer/BadVersion.pm"        => "\$(INST_LIB)/Alien/Build/Plugin/Prefer/BadVersion.pm",
+     "lib/Alien/Build/Plugin/Prefer/GoodVersion.pm"       => "\$(INST_LIB)/Alien/Build/Plugin/Prefer/GoodVersion.pm",
+@@ -197,4 +195,4 @@ sub requires { goto &runtime_requires }
+ sub runtime_requires {
+   my ( $module, $version_or_range ) = @_;
+   _add_prereq( PREREQ_PM => $module, $version_or_range );
+-}
+\ No newline at end of file
++}
+diff --git a/lib/Alien/Build/Plugin/PkgConfig/Negotiate.pm b/lib/Alien/Build/Plugin/PkgConfig/Negotiate.pm
+index 56fe5a6..aff683c 100644
+--- a/lib/Alien/Build/Plugin/PkgConfig/Negotiate.pm
++++ b/lib/Alien/Build/Plugin/PkgConfig/Negotiate.pm
+@@ -3,9 +3,7 @@ package Alien::Build::Plugin::PkgConfig::Negotiate;
+ use strict;
+ use warnings;
+ use Alien::Build::Plugin;
+-use Alien::Build::Plugin::PkgConfig::PP;
+ use Alien::Build::Plugin::PkgConfig::LibPkgConf;
+-use Alien::Build::Plugin::PkgConfig::CommandLine;
+ use Alien::Build::Util qw( _perl_config );
+ use Carp ();
+ 
+@@ -41,27 +39,6 @@ sub pick
+     return 'PkgConfig::LibPkgConf';
+   }
+ 
+-  if(Alien::Build::Plugin::PkgConfig::CommandLine->available)
+-  {
+-    # TODO: determine environment or flags necessary for using pkg-config
+-    # on solaris 64 bit.
+-    # Some advice on pkg-config and 64 bit Solaris
+-    # https://docs.oracle.com/cd/E53394_01/html/E61689/gplhi.html
+-    my $is_solaris64 = (_perl_config('osname') eq 'solaris' && _perl_config('ptrsize') == 8);
+-
+-    # PkgConfig.pm is more reliable on windows
+-    my $is_windows = _perl_config('osname') eq 'MSWin32';
+-
+-    if(!$is_solaris64 && !$is_windows)
+-    {
+-      return 'PkgConfig::CommandLine';
+-    }
+-  }
+-
+-  if(Alien::Build::Plugin::PkgConfig::PP->available)
+-  {
+-    return 'PkgConfig::PP';
+-  }
+   else
+   {
+     # this is a fata error.  because we check for a pkg-config implementation
+@@ -69,7 +46,7 @@ sub pick
+     # fallback on installing PkgConfig.pm as a prereq if nothing else is avail).
+     # we therefore expect at least one of these to work, if not, then the configuration
+     # of the system has shifted from underneath us.
+-    Carp::croak("Could not find an appropriate pkg-config or pkgconf implementation, please install PkgConfig.pm, PkgConfig::LibPkgConf, pkg-config or pkgconf");
++    Carp::croak("Could not find an appropriate pkg-config or pkgconf implementation, please install PkgConfig::LibPkgConf");
+   }
+ }
+ 
+diff --git a/t/01_use.t b/t/01_use.t
+index 2c7845d..8a43feb 100644
+--- a/t/01_use.t
++++ b/t/01_use.t
+@@ -45,11 +45,9 @@ require_ok 'Alien::Build::Plugin::Fetch::LocalDir';
+ require_ok 'Alien::Build::Plugin::Fetch::NetFTP';
+ require_ok 'Alien::Build::Plugin::Fetch::Wget';
+ require_ok 'Alien::Build::Plugin::Gather::IsolateDynamic';
+-require_ok 'Alien::Build::Plugin::PkgConfig::CommandLine';
+ require_ok 'Alien::Build::Plugin::PkgConfig::LibPkgConf';
+ require_ok 'Alien::Build::Plugin::PkgConfig::MakeStatic';
+ require_ok 'Alien::Build::Plugin::PkgConfig::Negotiate';
+-require_ok 'Alien::Build::Plugin::PkgConfig::PP';
+ require_ok 'Alien::Build::Plugin::Prefer::BadVersion';
+ require_ok 'Alien::Build::Plugin::Prefer::GoodVersion';
+ require_ok 'Alien::Build::Plugin::Prefer::SortVersions';
+@@ -111,11 +109,9 @@ ok -f 't/alien_build_plugin_fetch_localdir.t',                'test for Alien::B
+ ok -f 't/alien_build_plugin_fetch_netftp.t',                  'test for Alien::Build::Plugin::Fetch::NetFTP';
+ ok -f 't/alien_build_plugin_fetch_wget.t',                    'test for Alien::Build::Plugin::Fetch::Wget';
+ ok -f 't/alien_build_plugin_gather_isolatedynamic.t',         'test for Alien::Build::Plugin::Gather::IsolateDynamic';
+-ok -f 't/alien_build_plugin_pkgconfig_commandline.t',         'test for Alien::Build::Plugin::PkgConfig::CommandLine';
+ ok -f 't/alien_build_plugin_pkgconfig_libpkgconf.t',          'test for Alien::Build::Plugin::PkgConfig::LibPkgConf';
+ ok -f 't/alien_build_plugin_pkgconfig_makestatic.t',          'test for Alien::Build::Plugin::PkgConfig::MakeStatic';
+ ok -f 't/alien_build_plugin_pkgconfig_negotiate.t',           'test for Alien::Build::Plugin::PkgConfig::Negotiate';
+-ok -f 't/alien_build_plugin_pkgconfig_pp.t',                  'test for Alien::Build::Plugin::PkgConfig::PP';
+ ok -f 't/alien_build_plugin_prefer_badversion.t',             'test for Alien::Build::Plugin::Prefer::BadVersion';
+ ok -f 't/alien_build_plugin_prefer_goodversion.t',            'test for Alien::Build::Plugin::Prefer::GoodVersion';
+ ok -f 't/alien_build_plugin_prefer_sortversions.t',           'test for Alien::Build::Plugin::Prefer::SortVersions';
+diff --git a/t/alien_build_plugin_pkgconfig_negotiate.t b/t/alien_build_plugin_pkgconfig_negotiate.t
+index 8ac54b2..981f88c 100644
+--- a/t/alien_build_plugin_pkgconfig_negotiate.t
++++ b/t/alien_build_plugin_pkgconfig_negotiate.t
+@@ -15,7 +15,7 @@ subtest 'pick' => sub {
+ 
+ subtest 'override' => sub {
+ 
+-  foreach my $name (qw( PP LibPkgConf CommandLine ))
++  foreach my $name (qw( LibPkgConf ))
+   {
+     local $ENV{ALIEN_BUILD_PKG_CONFIG} = "PkgConfig::$name";
+     subtest $ENV{ALIEN_BUILD_PKG_CONFIG} => sub {
+diff --git a/t/alien_build_plugin_pkgconfig_negotiate__pick.t b/t/alien_build_plugin_pkgconfig_negotiate__pick.t
+index 148b794..947c05d 100644
+--- a/t/alien_build_plugin_pkgconfig_negotiate__pick.t
++++ b/t/alien_build_plugin_pkgconfig_negotiate__pick.t
+@@ -24,9 +24,10 @@ subtest 'LibPkgConf' => sub {
+ 
+       local $PkgConfig::LibPkgConf::VERSION = '0.01';
+ 
+-      isnt(
+-        Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-        'PkgConfig::LibPkgConf',
++      eval { Alien::Build::Plugin::PkgConfig::Negotiate->pick };
++      ok(
++        $@,
++        'PkgConfig::LibPkgConf "0.1" is too old',
+       );
+ 
+     };
+@@ -39,9 +40,10 @@ subtest 'LibPkgConf' => sub {
+     # cannot be loaded for the rest of this .t file
+     note scalar capture_merged { Devel::Hide->import(qw( PkgConfig::LibPkgConf )) };
+ 
+-    isnt(
+-      Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-      'PkgConfig::LibPkgConf',
++    eval { Alien::Build::Plugin::PkgConfig::Negotiate->pick };
++    ok(
++      $@,
++      'Missing PkgConfig::LibPkgConf triggers an exception',
+     );
+ 
+   };
+@@ -54,167 +56,5 @@ my $make_pkgconfig_libpkgconf_unavailable = mock 'Alien::Build::Plugin::PkgConfi
+   ],
+ );
+ 
+-subtest 'CommandLine' => sub {
+-
+-  local $INC{'PkgConfig.pm'} = __FILE__;
+-  local $PkgConfig::VERSION = '0.14026';
+-
+-  my %which;
+-
+-  my $mock = mock 'File::Which' => (
+-    override => [
+-      which => sub {
+-        my($prog) = @_;
+-        if(defined $prog)
+-        {
+-          if($which{$prog})
+-          {
+-            note "which: $prog => $which{$prog}";
+-            return $which{$prog};
+-          }
+-          else
+-          {
+-            note "which: $prog N/A";
+-          }
+-        }
+-        else
+-        {
+-          note "which: undef";
+-        }
+-      },
+-    ],
+-  );
+-
+-  my $mock2 = mock 'Alien::Build::Plugin::PkgConfig::Negotiate';
+-
+-  if($^O =~ /^(solaris|MSWin32)$/) {
+-    $mock2->override(
+-      _perl_config => sub {
+-        my($key) = @_;
+-        if($key eq 'osname')
+-        { return 'linux' }
+-        else
+-        { return $Config{$key} }
+-      },
+-    );
+-  }
+-
+-  subtest 'no command line' => sub {
+-
+-    %which = ();
+-
+-    is(
+-      Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-      'PkgConfig::PP',
+-    );
+-
+-  };
+-
+-  subtest 'pkg-config' => sub {
+-
+-    %which = ( 'pkg-config' => '/usr/bin/pkg-config' );
+-
+-    is(
+-      Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-      'PkgConfig::CommandLine',
+-    );
+-
+-  };
+-
+-  subtest 'pkgconf' => sub {
+-
+-    %which = ( 'pkgconf' => '/usr/bin/pkgconf' );
+-
+-    is(
+-      Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-      'PkgConfig::CommandLine',
+-    );
+-
+-  };
+-
+-  subtest 'PKG_CONFIG' => sub {
+-
+-    local $ENV{PKG_CONFIG} = 'foo-pkg-config';
+-    %which = ( 'foo-pkg-config' => '/usr/bin/foo-pkg-config' );
+-
+-    is(
+-      Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-      'PkgConfig::CommandLine',
+-    );
+-
+-  };
+-
+-  subtest 'PP' => sub {
+-
+-    subtest '64 bit solaris' => sub {
+-
+-      %which = ( 'pkg-config' => '/usr/bin/pkg-config' );
+-
+-      # From the old AB::MB days we prefer PkgConfig.pm
+-      # for 64 bit solaris over the command line pkg-config
+-
+-      my $mock2 = mock 'Alien::Build::Plugin::PkgConfig::Negotiate' => (
+-        override => [
+-          _perl_config => sub {
+-            my($key) = @_;
+-            if($key eq 'ptrsize')
+-            { return 8 }
+-            elsif($key eq 'osname')
+-            { return 'solaris' }
+-            else
+-            { return $Config{$key} }
+-          },
+-        ],
+-      );
+-
+-      is(
+-        Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-        'PkgConfig::PP',
+-      );
+-
+-    };
+-
+-
+-    subtest 'Windows' => sub {
+-
+-      %which = ( 'pkg-config' => '/usr/bin/pkg-config' );
+-
+-      # From the old AB::MB days we prefer PkgConfig.pm
+-      # for 64 bit solaris over the command line pkg-config
+-
+-      my $mock2 = mock 'Alien::Build::Plugin::PkgConfig::Negotiate' => (
+-        override => [
+-          _perl_config => sub {
+-            my($key) = @_;
+-            if($key eq 'osname')
+-            { return 'MSWin32' }
+-            else
+-            { return $Config{$key} }
+-          },
+-        ],
+-      );
+-
+-      is(
+-        Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-        'PkgConfig::PP',
+-      );
+-
+-    };
+-
+-    subtest 'PP is fallback' => sub {
+-
+-      %which = ();
+-
+-      is(
+-        Alien::Build::Plugin::PkgConfig::Negotiate->pick,
+-        'PkgConfig::PP',
+-      );
+-
+-    };
+-
+-  };
+-
+-};
+-
+ done_testing;
+ 
+-- 
+2.21.1
+

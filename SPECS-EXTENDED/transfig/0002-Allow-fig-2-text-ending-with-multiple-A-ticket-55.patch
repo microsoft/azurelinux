@@ -1,0 +1,71 @@
+From 19db5fe6f77ebad91af4b4ef0defd61bd0bb358f Mon Sep 17 00:00:00 2001
+From: Thomas Loimer <thomas.loimer@tuwien.ac.at>
+Date: Wed, 4 Dec 2019 17:56:04 +0100
+Subject: [PATCH 2/8] Allow fig 2 text ending with multiple ^A, ticket #55
+
+---
+ CHANGES               |  2 ++
+ fig2dev/read.c        |  4 ++--
+ fig2dev/tests/read.at | 11 +++++++++++
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/CHANGES b/CHANGES
+index 2cdfda0..edd0843 100644
+--- a/CHANGES
++++ b/CHANGES
+@@ -5,6 +5,8 @@ Version 3.2
+ Patchlevel Xx (Xxx 20xx)
+ 
+ BUGS FIXED:
++	Ticket numbers refer to https://sourceforge.net/p/mcj/tickets/#.
++	o Allow Fig v2 text strings ending with multiple ^A. Ticket #55.
+ 	o Embed images in pdfs with their original compression type, i.e., leave
+ 	  the gs switch "-dAutoFilterColorImages" at its default value "true".
+ 
+diff --git a/fig2dev/read.c b/fig2dev/read.c
+index af84531..09bd17d 100644
+--- a/fig2dev/read.c
++++ b/fig2dev/read.c
+@@ -3,7 +3,7 @@
+  * Copyright (c) 1991 by Micah Beck
+  * Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
+  * Parts Copyright (c) 1989-2015 by Brian V. Smith
+- * Parts Copyright (c) 2015-2018 by Thomas Loimer
++ * Parts Copyright (c) 2015-2019 by Thomas Loimer
+  *
+  * Any party obtaining a copy of these files is granted, free of charge, a
+  * full and unrestricted irrevocable, world-wide, paid up, royalty-free,
+@@ -1328,7 +1328,7 @@ read_textobject(FILE *fp)
+ 		If we do not find the CONTROL-A on this line then this must
+ 		be a multi-line text object and we will have to read more. */
+ 
+-	    n = sscanf(buf,"%*d%d%d%lf%d%d%d%lf%d%lf%lf%d%d%[^\1]%[\1]",
++	    n = sscanf(buf,"%*d%d%d%lf%d%d%d%lf%d%lf%lf%d%d%[^\1]%1[\1]",
+ 		&t->type, &t->font, &t->size, &t->pen,
+ 		&t->color, &t->depth, &t->angle,
+ 		&t->flags, &t->height, &t->length,
+diff --git a/fig2dev/tests/read.at b/fig2dev/tests/read.at
+index a606de0..c36d07a 100644
+--- a/fig2dev/tests/read.at
++++ b/fig2dev/tests/read.at
+@@ -359,6 +359,17 @@ EOF
+ ], 0, ignore)
+ AT_CLEANUP
+ 
++AT_SETUP([allow text ending with multiple ^A, ticket #55])
++AT_KEYWORDS([read.c])
++AT_CHECK([fig2dev -L box <<EOF
++#FIG 2
++1200 2
++4 2 0 0 1 0 0 390 306 110 376 639 5 Text
++EOF
++], 1, ignore, [Invalid text object at line 2.
++])
++AT_CLEANUP
++
+ AT_BANNER([Dynamically allocate picture file name.])
+ 
+ AT_SETUP([prepend fig file path to picture file name])
+-- 
+2.24.1
+

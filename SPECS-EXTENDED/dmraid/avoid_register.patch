@@ -1,0 +1,31 @@
+diff --git a/lib/activate/activate.c.avoid_register b/lib/activate/activate.c
+index 1d71ea8..86882f7 100644
+--- a/lib/activate/activate.c.avoid_register
++++ b/lib/activate/activate.c
+@@ -964,11 +964,13 @@ activate_subset(struct lib_context *lc, struct raid_set *rs, enum dm_what what)
+ {
+ 	int ret = 0;
+ 	char *table = NULL;
++	struct dmraid_format *fmt = get_format(rs);
+ 
+ 	if (T_GROUP(rs))
+ 		return 1;
+ 
+-	if (what == DM_REGISTER)
++	if (what == DM_REGISTER &&
++	    fmt->metadata_handler)
+ 		return register_devices(lc, rs);
+ 
+ 	/* Call type handler */
+@@ -1053,8 +1055,10 @@ deactivate_superset(struct lib_context *lc, struct raid_set *rs,
+ 		    enum dm_what what)
+ {
+ 	int ret = 1, status;
++	struct dmraid_format *fmt = get_format(rs);
+ 
+-	if (what == DM_REGISTER)
++	if (what == DM_REGISTER &&
++	    fmt->metadata_handler)
+ 		return unregister_devices(lc, rs);
+ 
+ 	status = dm_status(lc, rs);

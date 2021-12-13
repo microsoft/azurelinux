@@ -1,0 +1,40 @@
+From 73cbf7936466f7e32483b871813a82f214d44b30 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 10 Jul 2017 10:37:50 +0200
+Subject: [PATCH 3/4] Port to TestNG 6.11
+
+---
+ surefire-providers/surefire-testng/pom.xml                     | 3 +--
+ .../maven/surefire/testng/conf/AbstractDirectConfigurator.java | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/surefire-providers/surefire-testng/pom.xml b/surefire-providers/surefire-testng/pom.xml
+index 8aee308..e1b37ea 100644
+--- a/surefire-providers/surefire-testng/pom.xml
++++ b/surefire-providers/surefire-testng/pom.xml
+@@ -51,8 +51,7 @@
+     <dependency>
+       <groupId>org.testng</groupId>
+       <artifactId>testng</artifactId>
+-      <version>5.10</version>
+-      <classifier>jdk15</classifier>
++      <version>6.11</version>
+       <scope>provided</scope>
+     </dependency>
+   </dependencies>
+diff --git a/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/AbstractDirectConfigurator.java b/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/AbstractDirectConfigurator.java
+index c639ce9..3f05eed 100644
+--- a/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/AbstractDirectConfigurator.java
++++ b/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/AbstractDirectConfigurator.java
+@@ -63,7 +63,7 @@ public abstract class AbstractDirectConfigurator
+         testng.setUseDefaultListeners( false );
+         configureInstance( testng, options );
+         // TODO: we should have the Profile so that we can decide if this is needed or not
+-        testng.setListenerClasses( loadListenerClasses( listeners ) );
++        testng.setListenerClasses( ( List ) loadListenerClasses( listeners ) );
+     }
+ 
+     @Override
+-- 
+2.17.1
+

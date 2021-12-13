@@ -1,0 +1,3 @@
+# license is part of pom
+addFilter('W: no-documentation')
+

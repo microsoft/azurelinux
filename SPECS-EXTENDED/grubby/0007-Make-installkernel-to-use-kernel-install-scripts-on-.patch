@@ -1,0 +1,48 @@
+From fa1bf7b54cb71fa193da16ffc404f8535d7d16ac Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Tue, 31 Jul 2018 17:43:53 +0200
+Subject: [PATCH 7/8] Make installkernel to use kernel-install scripts on BLS
+ configuration
+
+The kernel make install target executes the arch/$ARCH/boot/install.sh
+that in turns executes the distro specific installkernel script. This
+script always uses new-kernel-pkg to install the kernel images.
+
+But on a BootLoaderSpec setup, the kernel-install scripts must be used
+instead. Check if the system uses a BLS setup, and call kernel-install
+add in that case instead of new-kernel-pkg.
+
+Reported-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ installkernel | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/installkernel b/installkernel
+index b887929c179..68dcfac16d2 100755
+--- a/installkernel
++++ b/installkernel
+@@ -20,6 +20,8 @@
+ # Author(s): tyson@rwii.com
+ #
+ 
++[[ -f /etc/default/grub ]] && . /etc/default/grub
++
+ usage() {
+     echo "Usage: `basename $0` <kernel_version> <bootimage> <mapfile>" >&2
+     exit 1
+@@ -77,6 +79,11 @@ cp $MAPFILE $INSTALL_PATH/System.map-$KERNEL_VERSION
+ ln -fs ${RELATIVE_PATH}$INSTALL_PATH/$KERNEL_NAME-$KERNEL_VERSION $LINK_PATH/$KERNEL_NAME
+ ln -fs ${RELATIVE_PATH}$INSTALL_PATH/System.map-$KERNEL_VERSION $LINK_PATH/System.map
+ 
++if [ "x${GRUB_ENABLE_BLSCFG}" = "xtrue" ] || [ ! -f /sbin/new-kernel-pkg ]; then
++	kernel-install add $KERNEL_VERSION $INSTALL_PATH/$KERNEL_NAME-$KERNEL_VERSION
++	exit $?
++fi
++
+ if [ -n "$cfgLoader" ] && [ -x /sbin/new-kernel-pkg ]; then
+ 	if [ -n "$(which dracut 2>/dev/null)" ]; then
+ 		new-kernel-pkg --mkinitrd --dracut --host-only --depmod --install --kernel-name $KERNEL_NAME $KERNEL_VERSION
+-- 
+2.17.1
+

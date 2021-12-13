@@ -1,0 +1,950 @@
+--- procmail-3.22.orig/examples/advanced
++++ procmail-3.22/examples/advanced
+@@ -251,14 +251,14 @@
+    --------------------------------------------------------
+ 
+ There are many different reasons why more and more sites decide not to
+-store mail in /usr/spool/mail or /usr/mail anymore.
++store mail in /var/spool/mail or /var/mail anymore.
+ Some of the obvious advantages when storing mail in the recipient's home
+ directory are:
+ 	- Mail is automatically subject to the user's quota limitations.
+ 	- Often there is more room on the home partition(s) than on that
+-	  one /usr/mail partition.
++	  one /var/mail partition.
+ 
+-The quota limitations also apply to /usr/spool/mail or /usr/mail if procmail
++The quota limitations also apply to /var/spool/mail or /var/mail if procmail
+ does the delivery.  These quota limitations often do not work with the
+ regular /bin/mail since that usually writes the mailbox with root permissions
+ (eluding the quota restrictions).
+@@ -276,7 +276,7 @@
+ 	defined SYSTEM_MBOX to be.  Some braindamaged mail programs
+ 	do not pick up the MAIL environment variable, these either
+ 	have to be patched/recompiled or you have to create symbolic
+-	links in /usr/mail to every person's new mailbox.
++	links in /var/mail to every person's new mailbox.
+ 
+ 				---
+ 
+--- procmail-3.22.orig/man/procmail.man
++++ procmail-3.22/man/procmail.man
+@@ -166,7 +166,8 @@
+ accept an unlimited number of arguments.@ETCRCS_desc@
+ For some advanced usage of this option you should look in the
+ .B EXAMPLES
+-section below.@LMTPOPTdesc@.SH ARGUMENTS
++section below.@LMTPOPTdesc@
++.SH ARGUMENTS
+ Any arguments containing an '=' are considered to be environment variable
+ assignments, they will
+ .I all
+@@ -723,6 +724,15 @@
+ .fi
+ .ad
+ .PP
++Some mailers (notably exim) do not currently accept the above syntax.
++In such case use this instead:
++.PP
++.na
++.nf
++|/usr/bin/procmail
++.fi
++.ad
++.PP
+ Procmail can also be invoked to postprocess an already filled system
+ mailbox.  This can be useful if you don't want to or can't use a
+ $HOME/@DOT_FORWARD@ file (in which case the following script could
+@@ -754,7 +764,7 @@
+ .SS "A sample small @PROCMAILRC@:"
+ .na
+ .nf
+-PATH=/bin:/usr/bin:@BINDIR@
++PATH=/usr/local/bin:/usr/bin:/bin
+ MAILDIR=$HOME/Mail      #you'd better make sure it exists
+ DEFAULT=$MAILDIR/mbox   #completely optional
+ LOGFILE=$MAILDIR/from   #recommended
+--- procmail-3.22.orig/man/procmailrc.man
++++ procmail-3.22/man/procmailrc.man
+@@ -779,7 +779,7 @@
+ .PP
+ Some non-optimal and non-obvious regexps set MATCH to an incorrect
+ value.  The regexp can be made to work by removing one or more unneeded
+-'*', '+', or '?' operator on the left-hand side of the \e/ token.
++\&'*', '+', or '?' operator on the left-hand side of the \e/ token.
+ .SH MISCELLANEOUS
+ If the regular expression contains `\fB@TO_key@\fP' it will be substituted by
+ .na
+--- procmail-3.22.orig/src/comsat.c
++++ procmail-3.22/src/comsat.c
+@@ -92,7 +92,7 @@
+    }
+   if(newvalid)						  /* so far, so good */
+    { int s;
+-     if(!*chp)						       /* no service */
++     if(!chad||!*chp)					       /* no service */
+ 	chp=BIFF_serviceport;				/* new balls please! */
+      s=strtol(chp,&chad,10);
+      if(chp!=chad)			       /* the service is not numeric */
+@@ -120,7 +120,7 @@
+ { int s;const char*p;
+   if(!csvalid||!buf)		  /* is comat on and set to a valid address? */
+      return;
+-  if(!*cslgname||strlen(cslgname)+2>linebuf)	       /* is $LOGNAME bogus? */
++  if(!cslgname||!*cslgname||strlen(cslgname)+2>linebuf)/* is $LOGNAME bogus? */
+      return;
+   if(!(p=folder?folder:cslastf))		     /* do we have a folder? */
+      return;
+--- procmail-3.22.orig/src/formail.c
++++ procmail-3.22/src/formail.c
+@@ -758,9 +758,9 @@
+ 	lputssn(buf,buffilled),ctlength-=buffilled,buffilled=lnl=0;
+      ;{ int tbl=buflast,lwr='\n';
+ 	while(--ctlength>=0&&tbl!=EOF)	       /* skip Content-Length: bytes */
+-	   lnl=lwr==tbl&&lwr=='\n',putcs(lwr=tbl),tbl=getchar();
++	   lnl=lwr==tbl&&lwr=='\n',lputcs(lwr=tbl),tbl=getchar();
+ 	if((buflast=tbl)=='\n'&&lwr!=tbl)	/* just before a line break? */
+-	   putcs('\n'),buflast=getchar();		/* wrap up loose end */
++	   lputcs('\n'),buflast=getchar();		/* wrap up loose end */
+       }
+      if(!quiet&&ctlength>0)
+       { charNUM(num,ctlength);
+--- procmail-3.22.orig/src/memblk.c
++++ procmail-3.22/src/memblk.c
+@@ -51,11 +51,11 @@
+ {
+ #ifdef USE_MMAP
+   if(mb->fd>=0)
+-   { long len=mb->len+1;
+-     if(munmap(mb->p,len))
+-	mmapfailed(len);		      /* don't want to continue here */
+-     if((mb->p=mmap(0,len,PROT_READ,MAP_PRIVATE,mb->fd,(off_t)0))==MAP_FAILED)
+-	mmapfailed(len);
++   { long mlen=mb->len+1;
++     if(munmap(mb->p,mlen))
++	mmapfailed(mlen);		      /* don't want to continue here */
++     if((mb->p=mmap(0,mlen,PROT_READ,MAP_PRIVATE,mb->fd,(off_t)0))==MAP_FAILED)
++	mmapfailed(mlen);
+      close(mb->fd);
+      mb->fd=ropen(devnull,O_RDWR,0);		/* XXX Perhaps -1 is better? */
+    }
+@@ -77,8 +77,8 @@
+      strcpy(filename,MMAP_DIR);
+      if(unique(filename,strchr(filename,'\0'),MMAP_FILE_LEN,MMAP_PERM,0,0)&&
+ 	(mb->fd=ropen(filename,O_RDWR,MMAP_PERM),unlink(filename),mb->fd>=0))
+-      { mb->filelen=len;
+-	if(lseek(mb->fd,mb->filelen-1,SEEK_SET)<0||1!=rwrite(mb->fd,empty,1))
++      { mb->filelen=len+1;
++	if(lseek(mb->fd,len,SEEK_SET)<0||1!=rwrite(mb->fd,empty,1))
+ dropf:	 { close(mb->fd);mb->fd= -1;
+ 	   if(verbose)nlog("Unable to extend or use tempfile");
+ 	 }
+@@ -98,9 +98,9 @@
+       }
+    }
+   if(mb->fd>=0)
+-   { if(len>mb->filelen)				  /* need to extend? */
+-      { mb->filelen=len;
+-	if(lseek(mb->fd,mb->filelen-1,SEEK_SET)<0||1!=rwrite(mb->fd,empty,1))
++   { if(len>=mb->filelen)				  /* need to extend? */
++      { mb->filelen=len+1;
++	if(lseek(mb->fd,len,SEEK_SET)<0||1!=rwrite(mb->fd,empty,1))
+ 	 { char*p=malloc(len+1);	   /* can't extend, switch to malloc */
+ 	   tmemmove(p,mb->p,mb->len);
+ 	   munmap(mb->p,mb->len+1);
+@@ -124,9 +124,9 @@
+    }
+   else
+      mb->p=realloc(mb->p,len+1);
+-  mb->len=len+1;
+-  mb->p[len]='\0';
++  mb->len=len;
+ ret1:
++  mb->p[len]='\0';
+   return 1;
+ }
+ 
+--- procmail-3.22.orig/src/autoconf
++++ procmail-3.22/src/autoconf
+@@ -1470,15 +1470,14 @@
+  grep 'Mlocal.*procmail' >$DEVNULL ||
+  echo '#define CF_no_procmail_yet' >>$ACONF
+ 
+-cat /usr/lib/sendmail.cf /etc/sendmail.cf /etc/mail/sendmail.cf 2>$DEVNULL |
+- grep '^V' >$DEVNULL ||
+- echo '#define buggy_SENDMAIL' >>$ACONF
++# cat /usr/lib/sendmail.cf /etc/sendmail.cf /etc/mail/sendmail.cf 2>$DEVNULL |
++#  grep '^V' >$DEVNULL ||
++#  echo '#define buggy_SENDMAIL' >>$ACONF
+ 
+ lpath='/bin'
+ bins="/bin"
+ 
+-for newd in /usr/bin /usr/ucb /usr/5bin $BINDIR /local/bin /usr/local/bin \
+- /global/bin /usr/bin/X11 /usr/X*/bin
++for newd in /usr/bin $BINDIR /usr/bin/X11 /usr/X*/bin
+ do
+   if test -d $newd
+   then
+--- procmail-3.22.orig/src/procmail.c
++++ procmail-3.22/src/procmail.c
+@@ -652,8 +652,7 @@
+ 	      nrcond= -1;
+ 	   if(tolock)		 /* clear temporary buffer for lockfile name */
+ 	      free(tolock);
+-	   for(i=maxindex(flags);i;i--)			  /* clear the flags */
+-	      flags[i]=0;
++	   bbzero(flags,sizeof(flags));		  /* clear the flags */
+ 	   for(tolock=0,locknext=0;;)
+ 	    { chp=skpspace(chp);
+ 	      switch(i= *chp++)
+--- procmail-3.22.orig/src/pipes.c
++++ procmail-3.22/src/pipes.c
+@@ -145,7 +145,9 @@
+   if(Stdout)
+    { *(eq=strchr(Stdout,'\0')-1)='\0';			     /* chop the '=' */
+      if(!(backblock=getenv(Stdout)))			/* no current value? */
+-	PRDB=PWRB= -1;
++      { PRDB=PWRB= -1;
++	backlen=0;
++      }
+      else
+       { backlen=strlen(backblock);
+ 	goto pip;
+@@ -155,9 +157,7 @@
+ pip: rpipe(pbackfd);
+   rpipe(pinfd);						 /* main pipes setup */
+   if(!(pidchild=sfork()))			/* create a sending procmail */
+-   { if(Stdout&&backblock)
+-	backlen=strlen(backblock);
+-     else
++   { if(!Stdout)
+ 	backblock=source,backlen=len;
+      childsetup();rclose(PRDI);rclose(PRDB);
+      rpipe(poutfd);rclose(STDOUT);
+@@ -194,7 +194,7 @@
+      makeblock(&temp,Stdfilled);
+      tmemmove(temp.p,Stdout,Stdfilled);
+      readdyn(&temp,&Stdfilled,Stdfilled+backlen+1);
+-     Stdout=realloc(Stdout,&Stdfilled+1);
++     Stdout=realloc(Stdout,Stdfilled+1);
+      tmemmove(Stdout,temp.p,Stdfilled+1);
+      freeblock(&temp);
+      retStdout(Stdout,pwait&&pipw,!backblock);
+--- procmail-3.22.orig/src/memblk.h
++++ procmail-3.22/src/memblk.h
+@@ -1,6 +1,6 @@
+ typedef struct memblk {
+     char*p;						  /* where it starts */
+-    long len;					 /* currently allocated size */
++    long len;			 /* current size, not including trailing NUL */
+ #ifdef USE_MMAP
+     off_t filelen;				     /* how long is the file */
+     int fd;					   /* file which is mmap()ed */
+--- procmail-3.22.orig/src/manconf.c
++++ procmail-3.22/src/manconf.c
+@@ -233,7 +233,7 @@
+  \2-@PRESERVOPT@\1and\1.BR \2-@FROMWHOPT@ .\1");
+   pc("LMTPOPT",LMTPOPT);
+ #else
+-  ps("LMTPOPTdesc","");ps("LMTPusage","");
++  ps("LMTPOPTdesc","");ps("LMTPusage","\1");
+ #endif
+   pname("INIT_UMASK",0);printf("0%lo/g\n",(unsigned long)INIT_UMASK);lines--;
+   pn("DEFlinebuf",DEFlinebuf);
+--- procmail-3.22.orig/src/recommend.c
++++ procmail-3.22/src/recommend.c
+@@ -47,7 +47,7 @@
+      printf("chmod %lo %s\n",(unsigned long)(sgid|PERMIS),argv[2]);
+   else if(chmdir==1)
+      goto nogchmod;
+-  if(chmdir)
++  if(0)
+      printf("chmod %c+w %s/.\n",chmdir==1?'g':'a',mailspooldir);
+ nogchmod:
+   return EXIT_SUCCESS;
+--- procmail-3.22.orig/src/foldinfo.h
++++ procmail-3.22/src/foldinfo.h
+@@ -10,7 +10,7 @@
+ 
+ #define ft_lock(type)	   ((type)>ft_MAILDIR)		   /* kernel lock fd */
+ #define ft_atime(type)	   ((type)==ft_FILE)	      /* force atime < mtime */
+-#define ft_dotlock(type)   ((type)==ft_FILE)		 /* dotlock $DEFAULT */
++#define ft_dotlock(type)   ((type)>ft_MAILDIR)		 /* dotlock $DEFAULT */
+ #define ft_delim(type)	   ((type)==ft_FILE)		   /* add MMDF delim */
+ #define ft_checkcloser(type) ((type)>ft_MH)
+ #define ft_forceblank(type) ((type)!=ft_MAILDIR)  /* force blank line at end */
+--- procmail-3.22.orig/src/mailfold.c
++++ procmail-3.22/src/mailfold.c
+@@ -378,7 +378,8 @@
+ 	dfilled=mailread=0;
+      else if(rhead)				/* only read in a new header */
+       { memblk new;
+-	dfilled=mailread=0;makeblock(&new,0);readdyn(&new,&dfilled,0);
++	dfilled=mailread=0;makeblock(&new,0);
++	readdyn(&new,&dfilled,thebody-themail.p);
+ 	if(tobesent>dfilled&&isprivate)		     /* put it in place here */
+ 	 { tmemmove(themail.p+dfilled,thebody,filled-=tobesent);
+ 	   tmemmove(themail.p,new.p,dfilled);
+--- procmail-3.22.orig/FAQ
++++ procmail-3.22/FAQ
+@@ -57,8 +57,8 @@
+ 		Forward to |/usr/bin/procmail
+ 	or if that doesn't work, try:
+ 		Pipe to /usr/bin/procmail
+-	as the only line in your mail spool file (e.g. /usr/mail/$LOGNAME), as
+-	well as doing a "chmod 06660 /usr/mail/$LOGNAME".  For more information
++	as the only line in your mail spool file (e.g. /var/mail/$LOGNAME), as
++	well as doing a "chmod 06660 /var/mail/$LOGNAME".  For more information
+ 	on such systems, do a "man mail".
+ 
+ 	If all of this doesn't work, procmail can be called on a periodical
+@@ -210,14 +210,14 @@
+ 	procmail with both the fcntl() and lockf() locking method
+ 	disabled (see config.h).
+ 
+-17. I sometimes get these `Lock failure on "/usr/mail/$LOGNAME.lock"' errors
++17. I sometimes get these `Lock failure on "/var/mail/$LOGNAME.lock"' errors
+     from procmail.  What do I do about it?
+ 
+ 	The problem here is that as long as procmail has not read a
+ 	$HOME/.procmailrc file, it can hang on to the sgid mail permission
+-	(which it needs in order to create a lockfile in /usr/mail).
++	(which it needs in order to create a lockfile in /var/mail).
+ 	I.e. if procmail delivers mail to a user without a $HOME/.procmailrc
+-	file, procmail *can* (and does) use the /usr/mail/$LOGNAME.lock file.
++	file, procmail *can* (and does) use the /var/mail/$LOGNAME.lock file.
+ 
+ 	If, however, it finds a $HOME/.procmailrc file, procmail has to let go
+ 	of the sgid mail permission because otherwise any ordinary user could
+@@ -226,7 +226,7 @@
+ 	There are several solutions to this problem:
+ 	- Some systems support the sticky bit on directories (when set only
+ 	  allows the owner of a file in that directory to rename or remove
+-	  it).	This enables you to make /usr/spool/mail drwxrwxrwt.  It is
++	  it).	This enables you to make /var/mail drwxrwxrwt.  It is
+ 	  thus effectively world writable, but all the mailboxes in it are
+ 	  protected because only the mailbox owner can remove or rename it.
+ 	- If your system did not exhibit the !@#$%^&* POSIX semantics for
+@@ -245,9 +245,9 @@
+ 			:0
+ 			$DEFAULT
+ 
+-	- You could, instead of using /usr/mail/$LOGNAME, use a file below
++	- You could, instead of using /var/mail/$LOGNAME, use a file below
+ 	  your home directory as your default mailbox.
+-	- Or, you could still use /usr/mail/$LOGNAME as the mailbox, but
++	- Or, you could still use /var/mail/$LOGNAME as the mailbox, but
+ 	  simply instruct procmail to use a different lockfile.	 This can
+ 	  be achieved by putting following recipe at the bottom of
+ 	  your .procmailrc file:
+--- procmail-3.22.orig/Makefile
++++ procmail-3.22/Makefile
+@@ -79,7 +79,7 @@
+ #			-lresolv	# not really needed, is it?
+ 
+ # Informal list of directories where we look for the libraries in SEARCHLIBS
+-LIBPATHS=/lib /usr/lib /usr/local/lib
++LIBPATHS=/lib /usr/lib
+ 
+ GCC_WARNINGS = -O2 -pedantic -Wreturn-type -Wunused -Wformat -Wtraditional \
+  -Wpointer-arith -Wconversion -Waggregate-return \
+--- procmail-3.22.orig/debian/changelog
++++ procmail-3.22/debian/changelog
+@@ -0,0 +1,294 @@
++procmail (3.22-8) unstable; urgency=low
++
++  * Fixed strange formail -l behaviour when there is a Content-Length: header.
++    Thanks a lot to Henning Makholm for the patch (Closes: #217853).
++
++ -- Santiago Vila <sanvila@debian.org>  Mon,  3 Nov 2003 20:01:24 +0100
++
++procmail (3.22-7) unstable; urgency=low
++
++  * Fixed bad nroff syntax in procmailrc(5), closes: #147173.
++  * Added missing newline in procmail(1), closes: #180477.
++
++ -- Santiago Vila <sanvila@debian.org>  Mon, 10 Mar 2003 00:09:20 +0100
++
++procmail (3.22-6) unstable; urgency=low
++
++  * Standards-Version: 3.5.8.
++
++ -- Santiago Vila <sanvila@debian.org>  Thu, 26 Dec 2002 18:27:08 +0100
++
++procmail (3.22-5) stable; urgency=medium
++
++  * Patched pipes.c to fix a memory allocation bug (Closes: #171514).
++
++ -- Santiago Vila <sanvila@debian.org>  Thu, 26 Dec 2002 18:09:38 +0100
++
++procmail (3.22-4) unstable; urgency=low
++
++  * Fixed a typo in procmail(1). Patch by the author (Closes: #142983).
++
++ -- Santiago Vila <sanvila@debian.org>  Tue, 16 Apr 2002 19:16:20 +0200
++
++procmail (3.22-3) unstable; urgency=medium
++
++  * Fixed off-by-one bug in procmail.c which made the raw flag not to be
++    cleared properly. Thanks to Gregory Stark (Closes: #134341).
++
++ -- Santiago Vila <sanvila@debian.org>  Sun, 17 Feb 2002 16:43:02 +0100
++
++procmail (3.22-2) unstable; urgency=medium
++
++  * Modified mailfold.c to fix a segfault problem. Patch by the author.
++  * The system-wide mail directory is /var/mail as per policy.
++
++ -- Santiago Vila <sanvila@debian.org>  Thu, 29 Nov 2001 09:39:04 +0100
++
++procmail (3.22-1) unstable; urgency=low
++
++  * New upstream release, which uses the `standard' format for Maildir
++    filenames and retries on name collision. It also contains some
++    bug fixes from the 3.23pre snapshot dated 2001-09-13.
++  * Removed `sendmail' from the Recommends field, since we already
++    have `exim' (the default Debian MTA) and `mail-transport-agent'.
++  * Removed suidmanager support. Conflicts: suidmanager (<< 0.50).
++  * Added support for DEB_BUILD_OPTIONS in the source package.
++  * README.Maildir: Do not use locking on the example recipe,
++    since it's wrong to do so in this case.
++
++ -- Santiago Vila <sanvila@debian.org>  Wed, 21 Nov 2001 09:40:20 +0100
++
++procmail (3.15.2-1) stable; urgency=high
++
++  * New upstream release, with improved security and robustness involving
++    signal handlers. Author recommends upgrading to this version on
++    any system where it is installed setuid or setgid.
++  * This release fixes also Bug #108417: procmail -p -m resets PATH.
++
++ -- Santiago Vila <sanvila@debian.org>  Thu, 30 Aug 2001 20:05:06 +0200
++
++procmail (3.15.1-4) unstable; urgency=low
++
++  * Don't add an extra newline when delivering to a Maildir folder.
++    Please note that the MTA may still add a newline on their own.
++    Exim users should check the `suffix' variable, for example.
++    Patch by the author. Closes: #78623.
++
++ -- Santiago Vila <sanvila@debian.org>  Sat, 14 Apr 2001 17:18:29 +0200
++
++procmail (3.15.1-3) unstable; urgency=low
++
++  * Clarified formail -X behaviour, patch by the author (Closes: #77388).
++  * Updated QuickStart.
++
++ -- Santiago Vila <sanvila@debian.org>  Sun, 25 Mar 2001 10:45:56 +0200
++
++procmail (3.15.1-2) unstable; urgency=low
++
++  * Fixed lockfile -l endless loop (Closes: #82006). Patch by the author.
++
++ -- Santiago Vila <sanvila@debian.org>  Sun, 28 Jan 2001 19:44:49 +0100
++
++procmail (3.15.1-1) unstable; urgency=low
++
++  * New upstream release. A race to create the mailspool would bounce one of
++    the messages due to an internal error.
++
++ -- Santiago Vila <sanvila@debian.org>  Mon,  8 Jan 2001 20:09:34 +0100
++
++procmail (3.15-3) unstable; urgency=low
++
++  * Fixed formatting error in procmailrc(5). Patch by the author.
++    (Closes: #80437).
++
++ -- Santiago Vila <sanvila@debian.org>  Sun, 31 Dec 2000 17:20:47 +0100
++
++procmail (3.15-2) unstable; urgency=low
++
++  * formail -l is now documented. Patch by the author (Closes: #72275).
++
++ -- Santiago Vila <sanvila@debian.org>  Fri,  1 Dec 2000 19:54:22 +0100
++
++procmail (3.15-1) unstable; urgency=low
++
++  * New upstream release. Maildir support is now built-in.
++  * Really change default PATH to "$HOME/bin:/usr/local/bin:/usr/bin:/bin".
++  * Modified the note in QuickStart about refiltering an old mail folder.
++  * Use SEARCHLIBS="" in debian/rules clean target to speed it up.
++  * Modified ft_dotlock in src/foldinfo.h to be in compliance with
++    locking policy, following a hint by the author.
++  * Removed (versioned) dependency on debianutils, since mailstat
++    does not use temporary files anymore.
++  * Made the .forward example in procmail(1) not to depend on the build
++    environment by modifying src/autoconf so that buggy_SENDMAIL is
++    never defined.
++
++ -- Santiago Vila <sanvila@debian.org>  Mon, 28 Aug 2000 12:51:05 +0200
++
++procmail (3.13.1-4) stable; urgency=high
++
++  * Fixed weird formail -rk behavior (patch from the author, backported
++    from procmail-3.15). Thanks to Ben Collins for the report.
++  * s/smail/exim/ in `Recommends:' field.
++
++ -- Santiago Vila <sanvila@debian.org>  Tue, 22 Aug 2000 13:04:50 +0200
++
++procmail (3.13.1-3) unstable; urgency=medium
++
++  * Standards-Version: 3.1.1
++  * Updated location of licenses in copyright file.
++  * LOCKINGTEST=100 again, to use fcntl() and dot-locking, as required by
++    latest policy.
++
++ -- Santiago Vila <sanvila@ctv.es>  Wed,  1 Dec 1999 12:37:35 +0100
++
++procmail (3.13.1-2) unstable; urgency=low
++
++  * Modified procmail(1) and QuickStart to reflect the fact that exim does
++    not accept the exec keyword in .forward files (Bugs #33460 and #37771).
++  * Modified formail to recognize exim's Envelope-To: header (Bug#40718).
++    Patch by Philip Guenther.
++  * Standards-Version: 3.0.0.
++
++ -- Santiago Vila <sanvila@ctv.es>  Mon, 19 Jul 1999 20:09:25 +0200
++
++procmail (3.13.1-1) stable unstable; urgency=high
++
++  * New upstream release, 3.13 missed a couple possible overflows.
++  * Applied `procmail-locking.patch' from Bruce Guenter, since
++    no directory delivery mechanism requires locking (Bug #35210).
++
++ -- Santiago Vila <sanvila@ctv.es>  Thu,  8 Apr 1999 13:56:33 +0200
++
++procmail (3.13-1) stable unstable; urgency=high
++
++  * New upstream release. procmail 3.12 breaks smartlist (Bug #35115).
++
++ -- Santiago Vila <sanvila@ctv.es>  Fri,  2 Apr 1999 14:24:24 +0200
++
++procmail (3.12-1) frozen unstable; urgency=high
++
++  * New upstream release. Fixes some security bugs.
++  * #define GROUP_PER_USER in config.h to allow writeable rcfiles when
++    the group is the user's default group.
++  * Added KNOWN_BUGS to the doc directory.
++  * suid procmail to avoid non-suidness window when upgrading.
++
++ -- Santiago Vila <sanvila@ctv.es>  Thu,  4 Mar 1999 10:28:28 +0100
++
++procmail (3.10.7-7) frozen unstable; urgency=medium
++
++  * New Maildir patches from Bruce Guenter.
++    Should fix Bug #30320: procmail: maildir does not use From_ lines.
++
++ -- Santiago Vila <sanvila@ctv.es>  Thu, 31 Dec 1998 13:27:20 +0100
++
++procmail (3.10.7-6) frozen unstable; urgency=medium
++
++  * Patched mailfold.c to avoid the unnecessary one second wait when
++    delivering to MH folders (patch by the author).
++  * src/locking.c: Applied a bugfix patch from the author.
++
++ -- Santiago Vila <sanvila@ctv.es>  Wed, 13 May 1998 21:50:19 +0200
++
++procmail (3.10.7-5) frozen unstable; urgency=medium
++
++  * Added a patch for Maildir support. The "new" procmail should be
++    completely backwards compatible with the "previous" one, in the
++    sense that its behaviour should be just the same for already
++    existing .procmailrc files which do not use the new syntax for
++    Maildir folders.
++  * Added a small README.Maildir explaining how to use this feature.
++
++ -- Santiago Vila <sanvila@ctv.es>  Mon,  4 May 1998 19:39:55 +0200
++
++procmail (3.10.7-4) frozen unstable; urgency=low
++
++  * Added a small note in QuickStart about refiltering an old mail folder.
++  * mailstat(1): The log file is truncated to zero length (Bug #21022).
++  * PATH=/usr/local/bin:/usr/bin:/bin for the example in procmail(1).
++  * Standards-Version: 2.4.1.
++
++ -- Santiago Vila <sanvila@ctv.es>  Fri, 17 Apr 1998 18:00:14 +0200
++
++procmail (3.10.7-3) frozen unstable; urgency=medium
++
++  * Patched src/recommend.c so that the mail spool directory is not
++    touched. This will allow the package to be built using fakeroot.
++  * Patched mailstat so that it uses tempfile.
++
++ -- Santiago Vila <sanvila@ctv.es>  Tue, 24 Mar 1998 21:43:08 +0100
++
++procmail (3.10.7-2) unstable; urgency=low
++
++  * Default PATH is now "$HOME/bin:/usr/local/bin:/usr/bin:/bin".
++  * Added "fetchmail" to the Recommends: line as one more option.
++  * Added /usr/doc/procmail/QuickStart (experimental).
++  * Compressed changelog.Debian.
++  * Removed debstd dependency.
++  * Pristine source.
++
++ -- Santiago Vila <sanvila@ctv.es>  Sat, 31 Jan 1998 20:30:06 +0100
++
++procmail (3.10.7-1) unstable; urgency=low
++
++  * Upgraded to 3.11pre7. Sources are now GPLed, hurrah!
++  * Added explicit SEARCHLIBS, to avoid unneeded dependency on libdl.
++  * First libc6 release.
++
++ -- Santiago Vila <sanvila@ctv.es>  Wed, 18 Jun 1997 20:43:28 +0200
++
++procmail (3.10.4-2) frozen unstable; urgency=low
++
++  * Rebuilt using latest debmake to avoid a problem with suidmanager.
++
++ -- Santiago Vila <sanvila@ctv.es>  Sat, 17 May 1997 20:52:59 +0200
++
++procmail (3.10.4-1) frozen unstable; urgency=low
++
++  * Upgraded to 3.11pre4. Side effect: It can be built using libc6.
++  * Removed NFS_ATIME_HACK patch, since it is no longer needed.
++
++ -- Santiago Vila <sanvila@ctv.es>  Sat, 12 Apr 1997 19:06:46 +0200
++
++procmail (3.10-8) unstable; urgency=low
++
++  * Rewritten copyright file.
++  * initmake unmodified (source).
++  * Patched to recognize NFS_ATIME_HACK variable in .procmailrc or
++    /etc/procmailrc. Default value is "yes" (i.e. wait a second).
++  * Added a small note about this in /usr/doc/procmail/README.Debian.
++
++ -- Santiago Vila <sanvila@ctv.es>  Sun, 23 Mar 1997 12:04:34 +0100
++
++procmail (3.10-7) unstable; urgency=low
++
++  * Put CFLAGS settings &c in ./Makefile, not in debian/rules.
++  * Removed fix-substvars script, since it's no longer needed with
++    new libc5-5.4.20.
++  * Man page for mailstat changed slightly.
++  * Some minor debian/rules changes.
++  * Added MD5 sums.
++
++ -- Santiago Vila <sanvila@ctv.es>  Fri, 21 Feb 1997 20:53:30 +0100
++
++procmail (3.10-6) unstable; urgency=low
++
++  * Use debmake.
++  * suidmanager support.
++  * Removed `mailstat' from examples, it's already in /usr/bin.
++  * Removed also `dirname' (which was "for the deprived").
++  * Added `fix-substvars' script to depend on libc5 >= 5.4.0.
++
++ -- Santiago Vila <sanvila@ctv.es>  Mon, 23 Dec 1996 16:34:02 +0100
++
++procmail (3.10-5) unstable; urgency=low
++
++  * Updated to Standards-Version 2.1.2.2.
++  * Changed "Depends: MTA" to "Recommends: MTA".
++  * Added extended package description in control file.
++  * Added the symlink changelog.gz -> HISTORY.gz.
++  * Added an "experimental" man page for mailstat.
++  * New maintainer.
++
++ -- Santiago Vila <sanvila@ctv.es>  Sat, 21 Dec 1996 23:32:11 +0100
+--- procmail-3.22.orig/debian/control
++++ procmail-3.22/debian/control
+@@ -0,0 +1,18 @@
++Source: procmail
++Section: mail
++Priority: standard
++Maintainer: Santiago Vila <sanvila@debian.org>
++Standards-Version: 3.6.1
++
++Package: procmail
++Architecture: any
++Depends: ${shlibs:Depends}
++Conflicts: suidmanager (<< 0.50)
++Recommends: exim | mail-transport-agent | fetchmail
++Description: Versatile e-mail processor
++ Can be used to create mail-servers, mailing lists, sort your incoming
++ mail into separate folders/files (real convenient when subscribing to one
++ or more mailing lists or for prioritising your mail), preprocess your
++ mail, start any programs upon mail arrival (e.g. to generate different
++ chimes on your workstation for different types of mail) or selectively
++ forward certain incoming mail automatically to someone.
+--- procmail-3.22.orig/debian/copyright
++++ procmail-3.22/debian/copyright
+@@ -0,0 +1,41 @@
++This is the Debian prepackaged version of the "procmail" mail-processing
++program written by Stephen van den Berg.
++
++This package is currently maintained by Santiago Vila <sanvila@debian.org>.
++The source for this release was downloaded from:
++
++ftp://ftp.procmail.org/pub/procmail/procmail-3.22.tar.gz
++
++This package was first put together by Bruce Perens <bruce@hams.com>,
++who added Debian package maintenance system files, and edited config.h
++to configure for Debian.
++
++Copyright:
++
++Procmail & formail mail processing package.
++Copyright (c) 1990-1999, S.R. van den Berg, The Netherlands.
++Copyright (c) 1999-2001, Philip Guenther, The United States of America
++
++This package is open source software; you can redistribute it and/or
++modify it under the terms of either:
++- the GNU General Public License as published by the Free Software Foundation
++  and can be found in the included file called "COPYING"; either version 2,
++  or (at your option) any later version, or
++- the "Artistic License" which can be found in the included file called
++  "Artistic".
++
++This package is distributed in the hope that it will be useful, but without
++any warranty; without even the implied warranty of merchantability or fitness
++for a particular purpose.  See either the GNU General Public License or the
++Artistic License for more details.
++
++For those of you that choose to use the GNU General Public License,
++my interpretation of the GNU General Public License is that no procmailrc
++script falls under the terms of the GPL unless you explicitly put
++said script under the terms of the GPL yourself.
++
++
++On Debian systems, the complete text of the GNU General Public License
++can be found in `/usr/share/common-licenses/GPL', and the complete
++text of the "Artistic License" can be found in
++`/usr/share/common-licenses/Artistic'.
+--- procmail-3.22.orig/debian/mailstat.1
++++ procmail-3.22/debian/mailstat.1
+@@ -0,0 +1,40 @@
++.TH MAILSTAT 1
++.SH NAME
++mailstat \- shows mail-arrival statistics
++.SH SYNOPSIS
++.B mailstat
++[\-klmots] [logfile]
++.SH DESCRIPTION
++.B mailstat
++parses a procmail-generated $LOGFILE and displays
++a summary about the messages delivered to all folders
++(total size, average size, nr of messages).
++The $LOGFILE is truncated to zero length, unless the
++.B -k
++option is used.
++Exit code 0 if mail arrived, 1 if no mail arrived.
++.SH OPTIONS
++.TP
++.I \-k
++keep logfile intact
++.TP
++.I \-l
++long display format
++.TP
++.I \-m
++merge any errors into one line
++.TP
++.I \-o
++use the old logfile
++.TP
++.I \-t
++terse display format
++.TP
++.I \-s
++silent in case of no mail
++.SH NOTES
++Customise to your heart's content, this program is only provided as a
++guideline.
++.SH AUTHOR
++This manual page was written by Santiago Vila <sanvila@debian.org>
++for the Debian GNU/Linux distribution (but may be used by others).
+--- procmail-3.22.orig/debian/QuickStart
++++ procmail-3.22/debian/QuickStart
+@@ -0,0 +1,97 @@
++procmail QuickStart
++===================
++
++* procmail is not an `interactive' program. It has to run automatically
++when the mail arrives. Therefore the first thing to do is to tell our MTA
++that we want procmail to "eat" all our mail messages. The way of doing
++this depends on the MTA we are using. For example, if we are using
++sendmail, it will suffice to have a .forward file like this in our home
++directory:
++
++"|exec /usr/bin/procmail"
++
++(don't forget the quotes, they are needed in this case).
++
++If you are using exim, use this instead as your .forward file:
++
++|/usr/bin/procmail
++
++The step of creating a .forward file is not needed if the MTA already
++performs the delivery using procmail. For example, Debian sendmail will
++automatically use procmail for mail delivering if the sendmail.cf is
++generated from a sendmail.mc file containing this line:
++
++FEATURE(local_procmail)dnl
++
++
++* If we have a stand-alone system with no permanent net connection (like
++PPP), and we are using fetchmail to get mail from a server, we don't
++really need a MTA.  Just adding  --mda "formail -s procmail"  to the
++fetchmail command line (or using the `mda' keyword) will tell it to
++deliver through procmail.
++
++
++* Next, we have to write a ~/.procmailrc file in our home directory. This
++file is a set of filtering rules, based on regular expressions. The
++complete syntax is explained in procmailrc(5). Let's see a real example
++just to get started. Let's suppose you are subscribed to the following two
++mailing lists:
++
++linux-kernel@vger.kernel.org
++debian-user@lists.debian.org
++
++The first list is managed by Majordomo. Messages coming from a Majordomo
++list often include a header field "Sender: " which allow easy filtering.
++
++The second list is managed my SmartList. Messages coming from a SmartList
++list may include several headers that can be used to filter it. One of
++them (in fact, the only that it is not X-whatever) is "Resent-Sender: ".
++
++So the following .procmailrc will first filter the mailing lists, and
++any remaining message will go to the default folder:
++
++*--------------------------------->8------------------------------------
++PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
++MAILDIR=$HOME/mail             # you'd better make sure it exists
++DEFAULT=$MAILDIR/mbox          # completely optional
++LOGFILE=$MAILDIR/procmail.log  # recommended
++
++:0:
++* ^Sender:.*linux-kernel-owner@vger.kernel.org
++linux-kernel
++
++:0:
++* ^Resent-Sender:.*debian-user-request@lists.debian.org
++debian-user
++*--------------------------------->8------------------------------------
++
++From this example additional rules for mailing lists may be created
++easily.
++
++
++* Once you have received lots of messages you will want to know where
++did they go. That's what the LOGFILE is for. There is a tool named
++mailstat which parses this file and shows a summary:
++
++mailstat procmail.log
++
++The mailstat command that this package provides does really come from the
++examples directory and it is installed by default. You may have your own
++modified copy in $HOME/bin, if you like.
++
++
++If you have to refilter an old mail folder according to your current
++~/.procmailrc file, you may do the following:
++
++cat mbox | formail -s procmail
++
++But of course if your mbox file is the target of a procmail recipe you should
++do this instead:
++
++mv mbox whatever
++cat whatever | formail -s procmail
++
++See formail(1) for details.
++
++
++Santiago Vila <sanvila@debian.org>
+--- procmail-3.22.orig/debian/README.Maildir
++++ procmail-3.22/debian/README.Maildir
+@@ -0,0 +1,12 @@
++This version of procmail supports Maildir folders.
++
++To make procmail to deliver into a Maildir folder, just append
++a slash (/) to the name of the maildir folder in your ~/.procmailrc file.
++For example, the following rule:
++
++:0
++* ^Resent-Sender.*debian-user-request@lists.debian.org
++debian-user/
++
++will deliver all mail from the debian-user mailing list to the Maildir
++folder "debian-user".
+--- procmail-3.22.orig/debian/rules
++++ procmail-3.22/debian/rules
+@@ -0,0 +1,76 @@
++#!/usr/bin/make -f
++
++package = procmail
++docdir = debian/tmp/usr/share/doc/$(package)
++
++CC = gcc
++CFLAGS0 = -g
++LDFLAGS0 =
++SEARCHLIBS = -lm
++STRIP = true
++
++ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
++  CFLAGS0 += -O2
++endif
++ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
++  STRIP = strip --remove-section=.comment --remove-section=.note
++endif
++
++build:
++	$(checkdir)
++	$(MAKE) CC="$(CC)" CFLAGS0="$(CFLAGS0)" LDFLAGS0="$(LDFLAGS0)" \
++		SEARCHLIBS="$(SEARCHLIBS)"
++	touch build
++
++clean:
++	$(checkdir)
++	rm -f build
++	-$(MAKE) realclean SEARCHLIBS=""
++	rm -f `find . -name "*~"`
++	rm -rf debian/tmp debian/files* core debian/substvars
++
++binary-indep: checkroot build
++	$(checkdir)
++
++binary-arch: checkroot build
++	$(checkdir)
++	rm -rf debian/tmp
++	install -d debian/tmp/DEBIAN $(docdir)/examples
++	cd debian/tmp && install -d usr/bin
++	$(MAKE) BASENAME=`pwd`/debian/tmp/usr install.man install-suid
++	$(STRIP) debian/tmp/usr/bin/procmail
++	$(STRIP) debian/tmp/usr/bin/lockfile
++	$(STRIP) debian/tmp/usr/bin/formail
++	cp -p debian/copyright $(docdir)
++	cp -p debian/changelog $(docdir)/changelog.Debian
++	install -m 644 debian/mailstat.1 debian/tmp/usr/man/man1
++	cp -p FEATURES HISTORY README FAQ KNOWN_BUGS \
++		debian/QuickStart debian/README.Maildir $(docdir)
++	cp -p examples/* $(docdir)/examples
++	cd $(docdir)/examples && rm -f dirname mailstat procmail-rpm.spec
++	cd $(docdir) && gzip -9 HISTORY changelog.Debian
++	ln -s HISTORY.gz $(docdir)/changelog.gz
++	mv debian/tmp/usr/man debian/tmp/usr/share
++	gzip -r9 debian/tmp/usr/share/man
++	dpkg-shlibdeps debian/tmp/usr/bin/*
++	dpkg-gencontrol -isp
++	cd debian/tmp && \
++		md5sum `find * -type f ! -regex "DEBIAN/.*"` > DEBIAN/md5sums
++	chown -R root:root debian/tmp
++	chmod -R go=rX debian/tmp
++	chgrp mail debian/tmp/usr/bin/procmail debian/tmp/usr/bin/lockfile
++	chmod 6755 debian/tmp/usr/bin/procmail
++	chmod 2755 debian/tmp/usr/bin/lockfile
++	dpkg --build debian/tmp ..
++
++define checkdir
++        test -f src/$(package).c -a -f debian/rules
++endef
++
++binary: binary-indep binary-arch
++
++checkroot:
++	$(checkdir)
++	test root = "`whoami`"
++
++.PHONY: binary binary-arch binary-indep clean checkroot

@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "bcmail-jdk15on-1.66.pom": "96dcb0de86b38da90933b70db5960a56d18ad81b1a90aa893c0dd9f92ee299b6",
+  "bcpg-jdk15on-1.66.pom": "80f650a30376f0758ac9c09ce68995622f2d691ea58046a3920b8b40577856fe",
+  "bcpkix-jdk15on-1.66.pom": "9015fe497ee5b61fa74fbd610919c3aac06b42795abcee3a2160a4b8bbf21aeb",
+  "bcprov-jdk15on-1.66.pom": "aa4d16a19b2dfaceab94c6436c6404eae5b0fb75349f9fe061036465b420f270",
+  "bctls-jdk15on-1.66.pom": "60b098501cdbc3becef733ce09595180e7b72133f4146de68b88ccb0f755ddd6",
+  "bouncycastle-1.66.tar.gz": "2c1c7f41e65af6ca2249a4e655ec7f2a8377e73c17470d0c9d3545825e190198"
+ }
+}

@@ -1,0 +1,47 @@
+Fix some 64-bitness issues arising from unixODBC 2.2.14 changes.
+
+diff --git a/driver/utility.cc b/driver/utility.cc
+index 401a5e7..66765ed 100644
+--- a/driver/utility.cc
++++ b/driver/utility.cc
+@@ -1273,7 +1273,7 @@ SQLLEN fill_display_size_buff(char *buff, STMT *stmt, MYSQL_FIELD *field)
+ {
+   /* See comment for fill_transfer_oct_len_buff()*/
+   SQLLEN size= get_display_size(stmt, field);
+-  sprintf(buff,size == SQL_NO_TOTAL ? "%d" : (sizeof(SQLLEN) == 4 ? "%lu" : "%lld"), size);
++  sprintf(buff, (size == SQL_NO_TOTAL ? "%ld" : "%lu"), size);
+ 
+   return size;
+ }
+@@ -1296,7 +1296,7 @@ SQLLEN fill_transfer_oct_len_buff(char *buff, STMT *stmt, MYSQL_FIELD *field)
+   */
+   SQLLEN len= get_transfer_octet_length(stmt, field);
+ 
+-  sprintf(buff, len == SQL_NO_TOTAL ? "%d" : (sizeof(SQLLEN) == 4 ? "%lu" : "%lld"), len );
++  sprintf(buff, (len == SQL_NO_TOTAL ? "%ld" : "%lu"), len );
+ 
+   return len;
+ }
+@@ -1313,8 +1313,7 @@ SQLLEN fill_transfer_oct_len_buff(char *buff, STMT *stmt, MYSQL_FIELD *field)
+ SQLULEN fill_column_size_buff(char *buff, STMT *stmt, MYSQL_FIELD *field)
+ {
+   SQLULEN size= get_column_size(stmt, field);
+-  sprintf(buff, (size== SQL_NO_TOTAL ? "%d" :
+-      (sizeof(SQLULEN) == 4 ? "%lu" : "%llu")), size);
++  sprintf(buff, (size== SQL_NO_TOTAL ? "%ld" : "%lu"), size);
+   return size;
+ }
+ 
+diff --git a/test/my_catalog1.c b/test/my_catalog1.c
+index cee16ab..bf9aace 100644
+--- a/test/my_catalog1.c
++++ b/test/my_catalog1.c
+@@ -631,7 +631,7 @@ DECLARE_TEST(t_tables_bug)
+     printMessage(" Column Name   : %s", szColName);
+     printMessage(" NameLengh     : %d", pcbColName);
+     printMessage(" DataType      : %d", pfSqlType);
+-    printMessage(" ColumnSize    : %d", pcbColDef);
++    printMessage(" ColumnSize    : %ld", pcbColDef);
+     printMessage(" DecimalDigits : %d", pibScale);
+     printMessage(" Nullable      : %d", pfNullable);
+ 

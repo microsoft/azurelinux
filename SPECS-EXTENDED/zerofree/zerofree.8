@@ -1,0 +1,65 @@
+.TH "ZEROFREE" "8" 
+.SH "NAME" 
+zerofree \(em zero free blocks from ext2/3 file-systems 
+.SH "SYNOPSIS" 
+.PP 
+\fBzerofree\fR [\fB-n\fP]  [\fB-v\fP]  \fIfilesystem\fR 
+.SH "DESCRIPTION" 
+.PP 
+\fBzerofree\fR finds the unallocated, 
+non-zeroed blocks in an ext2 or ext3 
+\fIfilesystem\fR (e.g. /dev/hda1) and 
+fills them with zeroes. This is useful if the device on which 
+this file-system resides is a disk image. In this case, 
+depending on the type of disk image, a secondary utility may be 
+able to reduce the size of the disk image after zerofree has 
+been run. 
+.PP 
+The usual way to achieve the same result (zeroing the 
+unallocated blocks) is to run \fBdd\fR (1) to 
+create a file full of zeroes that takes up the entire free 
+space on the drive, and then delete this file. This has many 
+disadvantages, which zerofree alleviates: 
+.IP "   \(bu" 6 
+it is slow; 
+.IP "   \(bu" 6 
+it makes the disk image (temporarily) grow to its maximal 
+extent; 
+.IP "   \(bu" 6 
+it (temporarily) uses all free space on the disk, so other 
+concurrent write actions may fail. 
+.PP 
+\fIfilesystem\fR has to be unmounted or 
+mounted read-only for \fBzerofree\fR to work. It 
+will exit with an error message if the 
+\fIfilesystem\fR is mounted writable. To 
+remount the root file-system readonly, you can first switch to 
+single user runlevel (\fBtelinit 1\fR) then use 
+\fBmount \-o remount,ro 
+\fIfilesystem\fR\fR. 
+.PP 
+\fBzerofree\fR has been written to be 
+run from GNU/Linux systems installed as guest OSes inside a 
+virtual machine. It may however be useful in other 
+situations. 
+.SH "OPTIONS" 
+.IP "\fB-n\fP         " 10 
+Perform a dry run  (do not modify the file-system); 
+.IP "\fB-v\fP         " 10 
+Be verbose. 
+.SH "SEE ALSO" 
+.PP 
+dd (1). 
+.SH "AUTHOR" 
+.PP 
+This manual page was written by Thibaut Paumard <paumard@users.sourceforge.net> for 
+the \fBDebian\fP system (but may be used by others).  Permission is 
+granted to copy, distribute and/or modify this document under 
+the terms of the GNU General Public License, Version 2 or any  
+later version published by the Free Software Foundation. 
+ 
+.PP 
+On Debian systems, the complete text of the GNU General Public 
+License can be found in /usr/share/common-licenses/GPL-2. 
+ 
+.\" created by instant / docbook-to-man, Wed 25 Nov 2009, 17:45 

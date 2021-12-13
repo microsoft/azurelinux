@@ -1,0 +1,20 @@
+$NetBSD$
+
+  manifypods-razor depends on INST_MAN5DIR which gets created by the 'config'
+  target. Without this, there may problems building with parallel make.
+
+See also:
+ - https://sourceforge.net/p/razor/bugs/67/
+ - https://bugzilla.redhat.com/show_bug.cgi?id=1379566
+
+--- Makefile.PL.orig	2007-05-09 00:47:53.000000000 +0200
++++ Makefile.PL
+@@ -115,7 +115,7 @@ sub MY::manifypods {
+ # begin razor-agents
+ %s
+ 
+-manifypods-razor : docs/razor-agent.conf.pod \
++manifypods-razor : config docs/razor-agent.conf.pod \
+ 	docs/razor-agents.pod                \
+ 	docs/razor-whitelist.pod
+ 	$(POD2MAN) \

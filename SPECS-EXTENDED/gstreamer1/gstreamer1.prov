@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Script to install in:
+# /usr/lib/rpm/redhat/find-provides.d
+#
+# Transform GStreamer auto install info into RPM provides
+#
+# Author: Bastien Nocera <hadess@hadess.net>
+# Based on other provides scripts from RPM
+#
+
+filelist=`grep -e '^.*/gstreamer-1.0/lib.*.so$' | sed "s/['\"]/\\\&/g"`
+
+# --- Alpha does not mark 64bit dependencies•
+case `uname -m` in
+  alpha*)	mark64="" ;;
+  *)		mark64="()(64bit)" ;;
+esac
+
+solist=$(echo $filelist | \
+	xargs file -L 2>/dev/null | grep "ELF" | cut -d: -f1 )
+
+function getmark()
+{
+	lib64=`if file -L $1 2>/dev/null | \
+		grep "ELF 64-bit" >/dev/null; then echo -n "$mark64"; fi`
+}
+
+function libdir()
+{
+	buildlibdir=`dirname $1`
+	buildlibdir=`dirname $buildlibdir`
+}
+
+for so in $solist ; do
+	getmark $so
+	libdir $so
+	LD_LIBRARY_PATH=$buildlibdir gst-inspect-1.0 --print-plugin-auto-install-info --rpm $so 2> /dev/null | while read line ; do
+		echo -n "$line";
+		echo -n "$lib64"
+		echo
+	done
+done
+

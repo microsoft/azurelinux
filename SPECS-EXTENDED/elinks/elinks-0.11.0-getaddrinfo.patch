@@ -1,0 +1,25 @@
+--- elinks-0.11.0/src/network/dns.c.getaddrinfo	2006-01-01 17:39:36.000000000 +0100
++++ elinks-0.11.0/src/network/dns.c	2006-01-10 09:30:56.000000000 +0100
+@@ -157,9 +157,21 @@ do_real_lookup(unsigned char *name, struct sockaddr_storage **addrs, int *addrno
+ 	 * But we duplicate the code terribly here :|. */
+ 	/* hostent = getipnodebyname(name, AF_INET6, AI_ALL | AI_ADDRCONFIG, NULL); */
+ 	memset(&hint, 0, sizeof(hint));
++	hint.ai_flags = AI_ADDRCONFIG;
+ 	hint.ai_family = AF_UNSPEC;
+ 	hint.ai_socktype = SOCK_STREAM;
+-	if (getaddrinfo(name, NULL, &hint, &ai) != 0) return DNS_ERROR;
++	switch (getaddrinfo(name, NULL, &hint, &ai))
++	{
++	case 0:
++		break;
++	case EAI_BADFLAGS:
++		hint.ai_flags = 0;
++		if (getaddrinfo(name, NULL, &hint, &ai) == 0)
++			break;
++		/* fall through */
++	default:
++		return DNS_ERROR;
++	}
+ 
+ #else
+ 	/* Seems there are problems on Mac, so we first need to try

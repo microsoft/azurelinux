@@ -1,0 +1,14 @@
+--- netkit-rusers-0.17/rpc.rusersd/rusers_proc.c	2008-09-04 15:34:47.000000000 +0200
++++ netkit-rusers-0.17_new/rpc.rusersd/rusers_proc.c	2008-09-04 15:18:34.000000000 +0200
+@@ -309,7 +309,11 @@ rusersproc_allnames_3(void *tmp1, CLIENT
+ 
+ static void do_strncpy(char *tgt, const char *src, size_t len) {
+     strncpy(tgt, src, len);
++#ifdef BROKEN_UTMP
++    /* traditional utmp fields used by version 2 of the rusers protocol
++       are not null-terminated if they are full width */
+     tgt[len-1] = 0;
++#endif /* BROKEN_UTMP */
+ }
+ 
+ static 

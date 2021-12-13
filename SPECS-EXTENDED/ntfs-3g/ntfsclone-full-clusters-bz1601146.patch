@@ -1,0 +1,81 @@
+--- ntfsprogs/ntfsclone.c	2018-05-16 18:46:47.114964000 +0200
++++ ntfsprogs/ntfsclone.c	2018-07-16 14:03:20.273809100 +0200
+@@ -776,6 +776,10 @@ 
+ 
+ 		/* possible partial cluster holding the backup boot sector */
+ 	backup_bootsector = (lcn + 1)*csize >= full_device_size;
++	buff = (char*)ntfs_malloc(csize);
++	if (!buff)
++		err_exit("Not enough memory");
++
+ 	if (backup_bootsector) {
+ 		csize = full_device_size - lcn*csize;
+ 		if (csize < 0) {
+@@ -783,10 +787,6 @@ 
+ 		}
+ 	}
+ 
+-	buff = (char*)ntfs_malloc(csize);
+-	if (!buff)
+-		err_exit("Not enough memory");
+-
+ // need reading when not about to write ?
+ 	if (read_all(fd, buff, csize) == -1) {
+ 
+@@ -1507,6 +1507,7 @@ 
+ 	s64 mft_no;
+ 	u32 mft_record_size;
+ 	u32 csize;
++	u32 buff_size;
+ 	u32 bytes_per_sector;
+ 	u32 records_per_set;
+ 	u32 clusters_per_set;
+@@ -1524,15 +1525,18 @@ 
+ 		/*
+ 		 * Depending on the sizes, there may be several records
+ 		 * per cluster, or several clusters per record.
++		 * Anyway, full clusters are needed for rescuing bad ones.
+ 		 */
+ 	if (csize >= mft_record_size) {
+ 		records_per_set = csize/mft_record_size;
+ 		clusters_per_set = 1;
++		buff_size = csize;
+ 	} else {
+ 		clusters_per_set = mft_record_size/csize;
+ 		records_per_set = 1;
++		buff_size = mft_record_size;
+ 	}
+-	buff = (char*)ntfs_malloc(mft_record_size);
++	buff = (char*)ntfs_malloc(buff_size);
+ 	if (!buff)
+ 		err_exit("Not enough memory");
+ 
+@@ -1585,6 +1589,7 @@ 
+ 	void *fd;
+ 	u32 indx_record_size;
+ 	u32 csize;
++	u32 buff_size;
+ 	u32 bytes_per_sector;
+ 	u32 records_per_set;
+ 	u32 clusters_per_set;
+@@ -1601,16 +1606,19 @@ 
+ 		/*
+ 		 * Depending on the sizes, there may be several records
+ 		 * per cluster, or several clusters per record.
++		 * Anyway, full clusters are needed for rescuing bad ones.
+ 		 */
+ 	indx_record_size = image->ni->vol->indx_record_size;
+ 	if (csize >= indx_record_size) {
+ 		records_per_set = csize/indx_record_size;
+ 		clusters_per_set = 1;
++		buff_size = csize;
+ 	} else {
+ 		clusters_per_set = indx_record_size/csize;
+ 		records_per_set = 1;
++		buff_size = indx_record_size;
+ 	}
+-	buff = (char*)ntfs_malloc(indx_record_size);
++	buff = (char*)ntfs_malloc(buff_size);
+ 	if (!buff)
+ 		err_exit("Not enough memory");
+ 

@@ -1,0 +1,65 @@
+From edda349a2d4fffa6c7f277483ccb40a66c0795b9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 10 Feb 2020 23:17:28 +0100
+Subject: [PATCH] Test fixes for Python 3.9
+
+Fixes https://github.com/PythonCharmers/python-future/issues/540
+Fixes https://github.com/PythonCharmers/python-future/issues/541
+---
+ src/future/moves/_dummy_thread.py          | 2 +-
+ src/future/standard_library/__init__.py    | 2 +-
+ tests/test_future/test_standard_library.py | 1 -
+ tests/test_future/test_urllib_toplevel.py  | 2 --
+ 4 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/src/future/moves/_dummy_thread.py b/src/future/moves/_dummy_thread.py
+index 688d249b..cc2fc891 100644
+--- a/src/future/moves/_dummy_thread.py
++++ b/src/future/moves/_dummy_thread.py
+@@ -2,7 +2,7 @@
+ from future.utils import PY3
+ 
+ if PY3:
+-    from _dummy_thread import *
++    from _thread import *
+ else:
+     __future_module__ = True
+     from dummy_thread import *
+diff --git a/src/future/standard_library/__init__.py b/src/future/standard_library/__init__.py
+index cff02f95..3e8da8a6 100644
+--- a/src/future/standard_library/__init__.py
++++ b/src/future/standard_library/__init__.py
+@@ -125,7 +125,7 @@
+            # 'Tkinter': 'tkinter',
+            '_winreg': 'winreg',
+            'thread': '_thread',
+-           'dummy_thread': '_dummy_thread',
++           'dummy_thread': '_thread',
+            # 'anydbm': 'dbm',   # causes infinite import loop
+            # 'whichdb': 'dbm',  # causes infinite import loop
+            # anydbm and whichdb are handled by fix_imports2
+diff --git a/tests/test_future/test_standard_library.py b/tests/test_future/test_standard_library.py
+index 3ac5d2d7..8ab27a27 100644
+--- a/tests/test_future/test_standard_library.py
++++ b/tests/test_future/test_standard_library.py
+@@ -422,7 +422,6 @@ def test_urllib_imports_install_hooks(self):
+ 
+     def test_underscore_prefixed_modules(self):
+         import _thread
+-        import _dummy_thread
+         import _markupbase
+         self.assertTrue(True)
+ 
+diff --git a/tests/test_future/test_urllib_toplevel.py b/tests/test_future/test_urllib_toplevel.py
+index 11e77201..25f4ca82 100644
+--- a/tests/test_future/test_urllib_toplevel.py
++++ b/tests/test_future/test_urllib_toplevel.py
+@@ -781,8 +781,6 @@ def test_unquoting(self):
+                          "%s" % result)
+         self.assertRaises((TypeError, AttributeError), urllib_parse.unquote, None)
+         self.assertRaises((TypeError, AttributeError), urllib_parse.unquote, ())
+-        with support.check_warnings(('', BytesWarning), quiet=True):
+-            self.assertRaises((TypeError, AttributeError), urllib_parse.unquote, bytes(b''))
+ 
+     def test_unquoting_badpercent(self):
+         # Test unquoting on bad percent-escapes

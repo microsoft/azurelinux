@@ -1,0 +1,34 @@
+From 8f572ac8d4f7f128e224cde92f8c604631ca8548 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 10 Nov 2016 07:59:31 +0100
+Subject: [PATCH] Port to current doxia sitetools
+
+---
+ apache-rat-plugin/src/main/java/org/apache/rat/mp/RatReportMojo.java | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/apache-rat-plugin/src/main/java/org/apache/rat/mp/RatReportMojo.java b/apache-rat-plugin/src/main/java/org/apache/rat/mp/RatReportMojo.java
+index 8d1eae6..ea25a00 100644
+--- a/apache-rat-plugin/src/main/java/org/apache/rat/mp/RatReportMojo.java
++++ b/apache-rat-plugin/src/main/java/org/apache/rat/mp/RatReportMojo.java
+@@ -89,7 +89,7 @@ public class RatReportMojo extends AbstractRatMojo implements MavenReport {
+      * @throws MojoFailureException   An error in the plugin configuration was detected.
+      * @throws MojoExecutionException An error occurred while searching for the artifact file.
+      */
+-    private File getSkinArtifactFile() throws MojoFailureException, MojoExecutionException {
++    private Artifact getSkinArtifactFile() throws MojoFailureException, MojoExecutionException {
+         final Skin skin = Skin.getDefaultSkin();
+ 
+         String version = skin.getVersion();
+@@ -112,7 +112,7 @@ public class RatReportMojo extends AbstractRatMojo implements MavenReport {
+             throw new MojoFailureException("The skin does not exist: " + e.getMessage());
+         }
+ 
+-        return artifact.getFile();
++        return artifact;
+     }
+ 
+     /**
+-- 
+2.7.4
+

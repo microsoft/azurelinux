@@ -1,0 +1,23 @@
+diff -up foomatic-db-20131218/db/source/driver/Postscript.xml.orig foomatic-db-20131218/db/source/driver/Postscript.xml
+--- foomatic-db-20131218/db/source/driver/Postscript.xml.orig	2013-12-18 01:41:18.000000000 +0100
++++ foomatic-db-20131218/db/source/driver/Postscript.xml	2013-12-18 15:09:08.471674405 +0100
+@@ -358,9 +358,6 @@
+       <id>printer/HP-Business_Inkjet_3000</id>
+     </printer>
+     <printer>
+-      <id>printer/HP-Business_Inkjet_9100</id>
+-    </printer>
+-    <printer>
+       <id>printer/HP-Color_LaserJet_2500</id>
+     </printer>
+     <printer>
+@@ -1066,9 +1063,6 @@
+       <id>printer/Oce-3155PS</id>
+     </printer>
+     <printer>
+-      <id>printer/Oce-3165</id>
+-    </printer>
+-    <printer>
+       <id>printer/Oce-3165PS</id>
+     </printer>
+     <printer>

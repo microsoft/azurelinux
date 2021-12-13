@@ -1,0 +1,62 @@
+--- netkit-rusers-0.17/rup/rup.c.orig	2005-04-11 10:00:09.000000000 -0400
++++ netkit-rusers-0.17/rup/rup.c	2005-04-11 10:01:46.000000000 -0400
+@@ -54,6 +54,8 @@
+ 
+ #define HOST_WIDTH 24
+ 
++static statstime remote_host_stat;
++
+ static int print_rup_data(const char *host, statstime *host_stat);
+ 
+ static int printtime;			/* print the remote host(s)'s time */
+@@ -244,7 +246,6 @@
+ onehost(const char *host)
+ {
+ 	CLIENT *rstat_clnt;
+-	statstime host_stat;
+ 	struct timeval timeout = { 25, 0 };
+ 	
+ 	rstat_clnt = clnt_create(host, RSTATPROG, RSTATVERS_TIME, "udp");
+@@ -253,11 +254,11 @@
+ 		return;
+ 	}
+ 
+-	memset(&host_stat, 0, sizeof(host_stat));
++	memset(&remote_host_stat, 0, sizeof(remote_host_stat));
+ 	if (clnt_call(rstat_clnt, RSTATPROC_STATS, 
+ 		      (xdrproc_t) xdr_void, NULL, 
+ 		      (xdrproc_t) xdr_statstime,
+-		      (caddr_t) &host_stat, 
++		      (caddr_t) &remote_host_stat, 
+ 
+ 		      timeout) != RPC_SUCCESS) 
+ 	{
+@@ -266,9 +267,9 @@
+ 	}
+ 
+ 	if (sort_type != SORT_NONE) {
+-		remember_rup_data(host, &host_stat);
++		remember_rup_data(host, &remote_host_stat);
+ 	} else {
+-		print_rup_data(host, &host_stat);
++		print_rup_data(host, &remote_host_stat);
+ 	}
+ 	clnt_destroy(rstat_clnt);
+ }
+@@ -300,7 +301,6 @@
+ void
+ allhosts(void)
+ {
+-	statstime host_stat;
+ 	enum clnt_stat clnt_stat;
+ 	int i;
+ 
+@@ -312,7 +312,7 @@
+ 	clnt_stat = clnt_broadcast(RSTATPROG, RSTATVERS_TIME, RSTATPROC_STATS,
+ 				   (xdrproc_t) xdr_void, NULL,
+ 				   (xdrproc_t) xdr_statstime, 
+-				   (char *) &host_stat, 
++				   (char *) &remote_host_stat, 
+ 				   (resultproc_t) rstat_reply);
+ 	if (clnt_stat != RPC_SUCCESS && clnt_stat != RPC_TIMEDOUT) {
+ 		warnx("%s", clnt_sperrno(clnt_stat));

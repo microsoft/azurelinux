@@ -1,0 +1,92 @@
+From da397953bd73068c4ab8d219ec91e312fd3d5d55 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Mon, 6 Feb 2017 14:27:53 +0100
+Subject: [PATCH 2/2] Remove dependency on velocity-tools
+
+---
+ .../doxia/siterenderer/DefaultSiteRenderer.java    | 58 +---------------------
+ 1 file changed, 2 insertions(+), 56 deletions(-)
+
+diff --git a/doxia-site-renderer/src/main/java/org/apache/maven/doxia/siterenderer/DefaultSiteRenderer.java b/doxia-site-renderer/src/main/java/org/apache/maven/doxia/siterenderer/DefaultSiteRenderer.java
+index c31688d..58058b3 100644
+--- a/doxia-site-renderer/src/main/java/org/apache/maven/doxia/siterenderer/DefaultSiteRenderer.java
++++ b/doxia-site-renderer/src/main/java/org/apache/maven/doxia/siterenderer/DefaultSiteRenderer.java
+@@ -76,31 +76,11 @@ import org.apache.maven.doxia.parser.module.ParserModuleNotFoundException;
+ import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
+ import org.apache.maven.doxia.util.XmlValidator;
+ import org.apache.velocity.Template;
++import org.apache.velocity.VelocityContext;
+ import org.apache.velocity.context.Context;
+ import org.apache.velocity.exception.ParseErrorException;
+ import org.apache.velocity.exception.ResourceNotFoundException;
+ import org.apache.velocity.exception.VelocityException;
+-import org.apache.velocity.tools.Scope;
+-import org.apache.velocity.tools.ToolManager;
+-import org.apache.velocity.tools.config.ConfigurationUtils;
+-import org.apache.velocity.tools.config.EasyFactoryConfiguration;
+-import org.apache.velocity.tools.config.FactoryConfiguration;
+-import org.apache.velocity.tools.generic.AlternatorTool;
+-import org.apache.velocity.tools.generic.ClassTool;
+-import org.apache.velocity.tools.generic.ComparisonDateTool;
+-import org.apache.velocity.tools.generic.ContextTool;
+-import org.apache.velocity.tools.generic.ConversionTool;
+-import org.apache.velocity.tools.generic.DisplayTool;
+-import org.apache.velocity.tools.generic.EscapeTool;
+-import org.apache.velocity.tools.generic.FieldTool;
+-import org.apache.velocity.tools.generic.LinkTool;
+-import org.apache.velocity.tools.generic.LoopTool;
+-import org.apache.velocity.tools.generic.MathTool;
+-import org.apache.velocity.tools.generic.NumberTool;
+-import org.apache.velocity.tools.generic.RenderTool;
+-import org.apache.velocity.tools.generic.ResourceTool;
+-import org.apache.velocity.tools.generic.SortTool;
+-import org.apache.velocity.tools.generic.XmlTool;
+ import org.codehaus.plexus.PlexusContainer;
+ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+@@ -481,41 +461,7 @@ public class DefaultSiteRenderer
+      */
+     protected Context createToolManagedVelocityContext( SiteRenderingContext siteRenderingContext )
+     {
+-        Locale locale = siteRenderingContext.getLocale();
+-        String dateFormat = siteRenderingContext.getDecoration().getPublishDate().getFormat();
+-
+-        EasyFactoryConfiguration config = new EasyFactoryConfiguration( false );
+-        config.property( "safeMode", Boolean.FALSE );
+-        config.toolbox( Scope.REQUEST )
+-            .tool( ContextTool.class )
+-            .tool( LinkTool.class )
+-            .tool( LoopTool.class )
+-            .tool( RenderTool.class );
+-        config.toolbox( Scope.APPLICATION ).property( "locale", locale )
+-            .tool( AlternatorTool.class )
+-            .tool( ClassTool.class )
+-            .tool( ComparisonDateTool.class ).property( "format", dateFormat )
+-            .tool( ConversionTool.class ).property( "dateFormat", dateFormat )
+-            .tool( DisplayTool.class )
+-            .tool( EscapeTool.class )
+-            .tool( FieldTool.class )
+-            .tool( MathTool.class )
+-            .tool( NumberTool.class )
+-            .tool( ResourceTool.class ).property( "bundles", new String[] { "site-renderer" } )
+-            .tool( SortTool.class )
+-            .tool( XmlTool.class );
+-
+-        FactoryConfiguration customConfig = ConfigurationUtils.findInClasspath( TOOLS_LOCATION );
+-
+-        if ( customConfig != null )
+-        {
+-            config.addConfiguration( customConfig );
+-        }
+-
+-        ToolManager manager = new ToolManager( false, false );
+-        manager.configure( config );
+-
+-        return manager.createContext();
++        return new VelocityContext();
+     }
+ 
+     /**
+-- 
+2.9.3
+

@@ -1,0 +1,42 @@
+#!/bin/bash
+
+if [ -r /usr/share/java-utils/java-functions ]; then
+  . /usr/share/java-utils/java-functions
+else
+  echo "Can't read Java functions library, aborting"
+  exit 1
+fi
+
+_save_function() {
+    local ORIG_FUNC=$(declare -f $1)
+    local NEWNAME_FUNC="$2${ORIG_FUNC#$1}"
+    eval "$NEWNAME_FUNC"
+}
+
+run_jsvc(){
+    if [ -x /usr/bin/jsvc ]; then
+        TOMCAT_USER="${TOMCAT_USER:-tomcat}"
+        JSVC="/usr/bin/jsvc"
+
+        JSVC_OPTS="-nodetach -pidfile /var/run/jsvc-tomcat${NAME}.pid -user ${TOMCAT_USER} -outfile ${CATALINA_BASE}/logs/catalina.out -errfile ${CATALINA_BASE}/logs/catalina.out"
+        if [ "$1" = "stop" ]; then
+            JSVC_OPTS="${JSVC_OPTS} -stop"
+    	fi
+
+        exec "${JSVC}" ${JSVC_OPTS} ${FLAGS} -classpath "${CLASSPATH}" ${OPTIONS} "${MAIN_CLASS}" "${@}"
+    else
+       	echo "Can't find /usr/bin/jsvc executable"
+    fi
+
+}
+
+_save_function run run_java
+
+run() {
+   if [ "${USE_JSVC}" = "true" ] ; then
+	run_jsvc $@
+   else
+	run_java $@
+   fi
+}
+

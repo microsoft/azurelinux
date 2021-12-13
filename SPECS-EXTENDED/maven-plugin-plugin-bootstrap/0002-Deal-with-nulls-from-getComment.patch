@@ -1,0 +1,66 @@
+From ea64c5b59f5f820a73ab3e82b6898762e55a8719 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Mon, 16 Mar 2015 16:42:20 +0100
+Subject: [PATCH 2/3] Deal with nulls from getComment
+
+---
+ .../annotations/JavaAnnotationsMojoDescriptorExtractor.java         | 6 +++---
+ .../extractor/javadoc/JavaJavadocMojoDescriptorExtractor.java       | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/maven-plugin-tools-annotations/src/main/java/org/apache/maven/tools/plugin/extractor/annotations/JavaAnnotationsMojoDescriptorExtractor.java b/maven-plugin-tools-annotations/src/main/java/org/apache/maven/tools/plugin/extractor/annotations/JavaAnnotationsMojoDescriptorExtractor.java
+index 231ed12..6ac677b 100644
+--- a/maven-plugin-tools-annotations/src/main/java/org/apache/maven/tools/plugin/extractor/annotations/JavaAnnotationsMojoDescriptorExtractor.java
++++ b/maven-plugin-tools-annotations/src/main/java/org/apache/maven/tools/plugin/extractor/annotations/JavaAnnotationsMojoDescriptorExtractor.java
+@@ -269,7 +269,7 @@ public class JavaAnnotationsMojoDescriptorExtractor
+             MojoAnnotationContent mojoAnnotationContent = entry.getValue().getMojo();
+             if ( mojoAnnotationContent != null )
+             {
+-                mojoAnnotationContent.setDescription( javaClass.getComment() );
++                mojoAnnotationContent.setDescription( javaClass.getComment() != null ? javaClass.getComment() : "" );
+ 
+                 DocletTag since = findInClassHierarchy( javaClass, "since" );
+                 if ( since != null )
+@@ -300,7 +300,7 @@ public class JavaAnnotationsMojoDescriptorExtractor
+                 }
+ 
+                 ParameterAnnotationContent parameterAnnotationContent = parameter.getValue();
+-                parameterAnnotationContent.setDescription( javaField.getComment() );
++                parameterAnnotationContent.setDescription( javaClass.getComment() != null ? javaClass.getComment() : "" );
+ 
+                 DocletTag deprecated = javaField.getTagByName( "deprecated" );
+                 if ( deprecated != null )
+@@ -326,7 +326,7 @@ public class JavaAnnotationsMojoDescriptorExtractor
+                 }
+ 
+                 ComponentAnnotationContent componentAnnotationContent = component.getValue();
+-                componentAnnotationContent.setDescription( javaField.getComment() );
++                componentAnnotationContent.setDescription( javaClass.getComment() != null ? javaClass.getComment() : "" );
+ 
+                 DocletTag deprecated = javaField.getTagByName( "deprecated" );
+                 if ( deprecated != null )
+diff --git a/maven-plugin-tools-java/src/main/java/org/apache/maven/tools/plugin/extractor/javadoc/JavaJavadocMojoDescriptorExtractor.java b/maven-plugin-tools-java/src/main/java/org/apache/maven/tools/plugin/extractor/javadoc/JavaJavadocMojoDescriptorExtractor.java
+index 137d90d..36b30dc 100644
+--- a/maven-plugin-tools-java/src/main/java/org/apache/maven/tools/plugin/extractor/javadoc/JavaJavadocMojoDescriptorExtractor.java
++++ b/maven-plugin-tools-java/src/main/java/org/apache/maven/tools/plugin/extractor/javadoc/JavaJavadocMojoDescriptorExtractor.java
+@@ -115,7 +115,7 @@ public class JavaJavadocMojoDescriptorExtractor
+         ExtendedMojoDescriptor mojoDescriptor = new ExtendedMojoDescriptor();
+         mojoDescriptor.setLanguage( "java" );
+         mojoDescriptor.setImplementation( javaClass.getFullyQualifiedName() );
+-        mojoDescriptor.setDescription( javaClass.getComment() );
++        mojoDescriptor.setDescription( javaClass.getComment() != null ? javaClass.getComment() : "" );
+ 
+         // ----------------------------------------------------------------------
+         // Mojo annotations in alphabetical order
+@@ -392,7 +392,7 @@ public class JavaJavadocMojoDescriptorExtractor
+ 
+             pd.setType( type.getFullyQualifiedName() );
+ 
+-            pd.setDescription( field.getComment() );
++            pd.setDescription( javaClass.getComment() != null ? javaClass.getComment() : "" );
+ 
+             DocletTag deprecationTag = field.getTagByName( JavadocMojoAnnotation.DEPRECATED );
+ 
+-- 
+2.14.3
+

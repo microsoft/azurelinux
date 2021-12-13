@@ -1,0 +1,2 @@
+# Options to spamd
+SPAMDOPTIONS="-c -m5 -H --razor-home-dir='/var/lib/razor/' --razor-log-file='sys-syslog'"

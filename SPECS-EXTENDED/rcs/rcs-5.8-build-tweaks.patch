@@ -1,0 +1,15 @@
+diff -up ./man/Makefile.in.build-tweaks ./man/Makefile.in
+--- ./man/Makefile.in.build-tweaks	2013-05-06 09:28:45.000000000 +0200
++++ ./man/Makefile.in	2013-05-10 23:03:36.975917262 +0200
+@@ -1237,9 +1237,9 @@ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ dist_man_MANS = ci.1 co.1 ident.1 merge.1 rcs.1 rcsclean.1 \
+-  rcsdiff.1 rcsfile.5 rcsmerge.1 rlog.1
++  rcsdiff.1 rcsfile.5 rcsmerge.1 rlog.1 rcsfreeze.1
+ 
+-dist_noinst_MANS = rcsfreeze.1
++#dist_noinst_MANS = rcsfreeze.1
+ BUILT_SOURCES = REL $(dist_noinst_MANS)
+ bits = b-base \
+   b-emptylogmessage \

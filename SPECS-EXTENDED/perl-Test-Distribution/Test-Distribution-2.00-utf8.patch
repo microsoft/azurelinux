@@ -1,0 +1,31 @@
+--- Changes.pod
++++ Changes.pod
+@@ -146,7 +146,7 @@ Thanks to Steffen Schwigon for both of t
+ =item  Test::Distribution now uses the MANIFEST to find modules to test.
+ 
+ It falls back to doing a find for *.pm if no MANIFEST exists.  (thanks to
+-Paul Hughes aka Barbie and Steffen Müller for suggesting this)
++Paul Hughes aka Barbie and Steffen MÃ¼ller for suggesting this)
+ 
+ =item  Added manifest test.
+ 
+--- README
++++ README
+@@ -220,7 +220,7 @@ SOURCE AVAILABILITY
+     http://sourceforge.net/projects/sagar-r-shah/
+ 
+ AUTHORS
+-    Marcel Grünauer <marcel@cpan.org>
++    Marcel GrÃ¼nauer <marcel@cpan.org>
+ 
+     Sagar R. Shah
+ 
+@@ -230,7 +230,7 @@ OTHER CREDITS
+     describes an idea by Andy Lester.
+ 
+ COPYRIGHT & LICENSE
+-    Copyright 2002-2003 Marcel Grünauer. All rights reserved.
++    Copyright 2002-2003 Marcel GrÃ¼nauer. All rights reserved.
+ 
+     Copyright 2003-2007, Sagar R. Shah, All rights reserved.
+ 

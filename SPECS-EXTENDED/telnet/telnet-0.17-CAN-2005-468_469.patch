@@ -1,0 +1,179 @@
+--- netkit-telnet-0.17/telnet/telnet.c.CAN-2005-468_469	2005-03-17 13:48:58.000000000 +0100
++++ netkit-telnet-0.17/telnet/telnet.c	2005-03-17 14:02:27.000000000 +0100
+@@ -1310,22 +1310,66 @@
+ }
+ 
+ 
+-unsigned char slc_reply[128];
++#define SLC_REPLY_SIZE 128
++unsigned char *slc_reply;
+ unsigned char *slc_replyp;
++unsigned char *slc_replyend;
+ 
+ 	void
+ slc_start_reply(void)
+ {
++        slc_reply = (unsigned char *)malloc(SLC_REPLY_SIZE);
++        if (slc_reply == NULL) {
++/*@*/           printf("slc_start_reply: malloc()/realloc() failed!!!\n");
++                slc_reply = slc_replyp = slc_replyend = NULL;
++                return;
++	}
++
+ 	slc_replyp = slc_reply;
++	slc_replyend = slc_reply + SLC_REPLY_SIZE;
+ 	*slc_replyp++ = IAC;
+ 	*slc_replyp++ = SB;
+ 	*slc_replyp++ = TELOPT_LINEMODE;
+ 	*slc_replyp++ = LM_SLC;
+ }
+ 
++static int
++slc_assure_buffer(int want_len);
++
++	static int
++slc_assure_buffer(int want_len)
++{
++        if ((slc_replyp + want_len) >= slc_replyend) {
++                int len;
++		int old_len = slc_replyp - slc_reply;
++		unsigned char *p;
++
++                len = old_len
++			+ (want_len / SLC_REPLY_SIZE + 1) * SLC_REPLY_SIZE;
++                p = (unsigned char *)realloc(slc_reply, len);
++                if (p == NULL)
++                        free(slc_reply);
++                slc_reply = p;
++                if (slc_reply == NULL) {
++/*@*/                   printf("slc_add_reply: realloc() failed!!!\n");
++                        slc_reply = slc_replyp = slc_replyend = NULL;
++                        return 1;
++                }
++                slc_replyp = slc_reply + old_len;
++                slc_replyend = slc_reply + len;
++        }
++	return 0;
++}
++
+ 	void
+ slc_add_reply(unsigned char func, unsigned char flags, cc_t value)
+ {
++	if (slc_assure_buffer(6))
++		return;
++
++	if (slc_replyp == NULL)
++		return;
++
+ 	if ((*slc_replyp++ = func) == IAC)
+ 		*slc_replyp++ = IAC;
+ 	if ((*slc_replyp++ = flags) == IAC)
+@@ -1339,6 +1383,12 @@
+ {
+     int len;
+ 
++    if (slc_assure_buffer(2))
++	return;
++
++    if (slc_replyp == NULL)
++	return;
++
+     *slc_replyp++ = IAC;
+     *slc_replyp++ = SE;
+     len = slc_replyp - slc_reply;
+@@ -1456,7 +1506,7 @@
+ 	}
+ }
+ 
+-#define	OPT_REPLY_SIZE	256
++#define	OPT_REPLY_SIZE	1024
+ unsigned char *opt_reply;
+ unsigned char *opt_replyp;
+ unsigned char *opt_replyend;
+@@ -1490,10 +1540,38 @@
+ env_opt_start_info(void)
+ {
+ 	env_opt_start();
+-	if (opt_replyp)
++	if (opt_replyp && (opt_replyp > opt_reply))
+ 	    opt_replyp[-1] = TELQUAL_INFO;
+ }
+ 
++static int
++env_opt_assure_buffer(int want_len);
++
++	static int
++env_opt_assure_buffer(int want_len)
++{
++        if ((opt_replyp + want_len) >= opt_replyend) {
++		int len;
++		unsigned char *p;
++		int old_len = opt_replyp - opt_reply;
++
++		len = old_len
++			+ (want_len / OPT_REPLY_SIZE + 1) * OPT_REPLY_SIZE;
++		p = (unsigned char *)realloc(opt_reply, len);
++		if (p == NULL)
++			free(opt_reply);
++		opt_reply = p;
++		if (opt_reply == NULL) {
++/*@*/			printf("env_opt_add: realloc() failed!!!\n");
++			opt_reply = opt_replyp = opt_replyend = NULL;
++			return 1;
++		}
++		opt_replyp = opt_reply + old_len;
++		opt_replyend = opt_reply + len;
++	}
++	return 0;
++}
++
+ 	void
+ env_opt_add(unsigned char *ep)
+ {
+@@ -1515,25 +1593,12 @@
+ 		return;
+ 	}
+ 	vp = env_getvalue(ep, 1);
+-	if (opt_replyp + (vp ? strlen((char *)vp) : 0) +
+-				strlen((char *)ep) + 6 > opt_replyend)
+-	{
+-		int len;
+-		unsigned char *p;
+-		opt_replyend += OPT_REPLY_SIZE;
+-		len = opt_replyend - opt_reply;
+-		p = (unsigned char *)realloc(opt_reply, len);
+-		if (p == NULL)
+-			free(opt_reply);
+-		opt_reply = p;
+-		if (opt_reply == NULL) {
+-/*@*/			printf("env_opt_add: realloc() failed!!!\n");
+-			opt_reply = opt_replyp = opt_replyend = NULL;
+-			return;
+-		}
+-		opt_replyp = opt_reply + len - (opt_replyend - opt_replyp);
+-		opt_replyend = opt_reply + len;
+-	}
++
++	/* use the double length in case it gots escaped */
++	if (env_opt_assure_buffer((vp ? strlen((char *)vp)*2 : 0) +
++				strlen((char *)ep)*2 + 6))
++		return;
++
+ 	if (opt_welldefined((char *)ep))
+ #ifdef	OLD_ENVIRON
+ 		if (telopt_environ == TELOPT_OLD_ENVIRON)
+@@ -1588,8 +1653,14 @@
+ {
+ 	int len;
+ 
++        if (opt_reply == NULL)          /*XXX*/
++                return;                 /*XXX*/
++
++
+ 	len = opt_replyp - opt_reply + 2;
+ 	if (emptyok || len > 6) {
++		if (env_opt_assure_buffer(2))
++			return;
+ 		*opt_replyp++ = IAC;
+ 		*opt_replyp++ = SE;
+ 		if (NETROOM() > len) {

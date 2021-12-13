@@ -1,0 +1,65 @@
+From 7b69cb5f2fe46d46814712cdc43123807c681dc3 Mon Sep 17 00:00:00 2001
+From: Dan Scott <dan@coffeecode.net>
+Date: Sun, 2 Mar 2014 19:55:08 -0500
+Subject: [PATCH] Make SPARQLWrapper an extra_requires for now
+
+Per discussion in https://github.com/RDFLib/rdflib/pull/359
+
+Signed-off-by: Dan Scott <dan@coffeecode.net>
+---
+diff --git a/setup.py b/setup.py
+index c21cc27..d7a8347 100644
+--- a/setup.py
++++ b/setup.py
+@@ -41,8 +41,8 @@ if sys.version_info[0] >= 3:
+     kwargs['install_requires'] = ['isodate', 'pyparsing']
+     kwargs['tests_require'] = ['html5lib', 'networkx']
+     kwargs['requires'] = [
+-        'isodate', 'pyparsing',
+-        'SPARQLWrapper']
++        'isodate', 'pyparsing']
++    kwargs['extras_require'] = {'SPARQLStore': 'SPARQLWrapper'}
+     kwargs['src_root'] = setup_python3()
+     assert setup
+ else:
+@@ -52,7 +52,8 @@ else:
+         kwargs['test_suite'] = "nose.collector"
+         kwargs['install_requires'] = [
+             'isodate',
+-            'pyparsing', 'SPARQLWrapper']
++            'pyparsing']
++        kwargs['extras_require'] = {'SPARQLStore': 'SPARQLWrapper'}
+         kwargs['tests_require'] = ['networkx']
+ 
+         if sys.version_info[1]<7:  # Python 2.6
+diff --git a/test/test_dataset.py b/test/test_dataset.py
+index 4d39c3d..d12d054 100644
+--- a/test/test_dataset.py
++++ b/test/test_dataset.py
+@@ -2,6 +2,12 @@ import sys
+ import os
+ import unittest
+ 
++try:
++    import SPARQLWrapper
++except ImportError:
++    from nose.exc import SkipTest
++    raise SkipTest("SPARQLWrapper not installed")
++
+ from tempfile import mkdtemp, mkstemp
+ import shutil
+ from rdflib import Graph, Dataset, URIRef, BNode, plugin
+diff --git a/test/test_issue457.py b/test/test_issue457.py
+index f9957db..8c6f491 100644
+--- a/test/test_issue457.py
++++ b/test/test_issue457.py
+@@ -1,4 +1,9 @@
+ # test for https://github.com/RDFLib/rdflib/issues/457
++try:
++    import SPARQLWrapper
++except ImportError:
++    from nose.exc import SkipTest
++    raise SkipTest("SPARQLWrapper not installed")
+ 
+ import io
+ from xml.etree import ElementTree

@@ -1,0 +1,20 @@
+--- ttmkfdir-3.0.9/ttmkfdir.cpp.Origin	2006-06-15 17:58:43.000000000 +0800
++++ ttmkfdir-3.0.9/ttmkfdir.cpp	2006-06-15 17:59:07.000000000 +0800
+@@ -16,7 +16,7 @@
+ 
+     cerr << "This Program is (C) Joerg Pommnitz, 2000" << endl;
+     cerr << "Usage: " << program << " [OPTION]" << endl;
+-    cerr << "-e, --encoding\t\tname of the encoding directory file, default is \"/usr/X11R6/lib/X11/fonts/encodings/encodings.dir\"" << endl;
++    cerr << "-e, --encoding\t\tname of the encoding directory file, default is \"/usr/share/X11/fonts/encodings/encodings.dir\"" << endl;
+     cerr << "-o, --output\t\tname of the destination file, default is \"fonts.scale\"" << endl;
+     cerr << "-d, --font-dir\t\tname of the TrueType font directory, default is \".\"" << endl;
+     cerr << "-f, --default-foundry\tname of the default font foundry, default is \"misc\"" << endl;
+@@ -32,7 +32,7 @@
+ void
+ ParseCommandline (int argc, char *argv[])
+ {
+-    cmdline::instance()->AddOption (new Commandline::Option ("encoding", 'e', "/usr/X11R6/lib/X11/fonts/encodings/encodings.dir"));
++    cmdline::instance()->AddOption (new Commandline::Option ("encoding", 'e', "/usr/share/X11/fonts/encodings/encodings.dir"));
+     cmdline::instance()->AddOption (new Commandline::Option ("output", 'o', "fonts.scale"));
+     cmdline::instance()->AddOption (new Commandline::Option ("font-dir", 'd', "."));
+     cmdline::instance()->AddOption (new Commandline::Option ("default-foundry", 'f', "misc"));

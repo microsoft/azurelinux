@@ -1,0 +1,10 @@
+--- mockito-1.10.19/conf/mockito-core.bnd	2019-02-12 08:42:54.733499386 +0100
++++ mockito-1.10.19/conf/mockito-core.bnd	2019-02-12 08:41:38.221110764 +0100
+@@ -1,6 +1,7 @@
+ Bundle-Name= Mockito Mock Library for Java.
+ Bundle-SymbolicName= org.mockito.mockito-core
+ Bundle-Version= ${version}
++Require-Bundle= org.hamcrest.core
+ 
+ Export-Package= !org.mockito.asm.*, \
+                 !org.mockito.cglib.*, \

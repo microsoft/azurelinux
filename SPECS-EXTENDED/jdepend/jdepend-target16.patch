@@ -1,0 +1,29 @@
+--- build.xml
++++ build.xml
+@@ -38,7 +38,7 @@
+ 
+   <target name="compile" depends="prepare"
+     description="Compiles the source code">
+-    <javac srcdir="${src.dir}"
++    <javac source="1.6" target="1.6" srcdir="${src.dir}"
+            destdir="${build.dir}"
+            debug="${build.debug}">
+       <classpath refid="project.classpath"/>
+@@ -47,7 +47,7 @@
+ 
+   <target name="compile-sample" depends="prepare"
+     description="Compiles the sample code">
+-    <javac srcdir="sample"
++    <javac source="1.6" target="1.6" srcdir="sample"
+            destdir="${build.dir}"
+            debug="${build.debug}">
+       <classpath refid="project.classpath"/>
+@@ -57,7 +57,7 @@
+   <target name="compile-tests" depends="compile"
+           if="junit.available"
+     description="Compiles the test code">
+-    <javac srcdir="${test.dir}"
++    <javac source="1.6" target="1.6" srcdir="${test.dir}"
+            destdir="${build.dir}"
+            debug="${build.debug}">
+       <classpath refid="project.classpath"/>

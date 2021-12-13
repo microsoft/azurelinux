@@ -1,0 +1,127 @@
+--- junitperf-1.9.1/src/com/clarkware/junitperf/LoadTest.java	2004-12-30 09:05:00.000000000 +0100
++++ junitperf-1.9.1/src/com/clarkware/junitperf/LoadTest.java	2017-09-08 10:52:12.526400232 +0200
+@@ -16,18 +16,20 @@
+  * For example, to create a load test of 10 concurrent users
+  * with each user running <code>ExampleTest</code> once and 
+  * all users started simultaneously, use:
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Test loadTest = new LoadTest(new TestSuite(ExampleTest.class), 10);
+  * </pre>
+  * </blockquote>
++ * <p>
+  * or, to load test a single test method, use: 
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Test loadTest = new LoadTest(new ExampleTest("testSomething"), 10);
+  * </pre>
+  * </blockquote>
+- * </p>
+  * <p>
+  * The load can be ramped by specifying a pluggable 
+  * <code>Timer</code> instance which prescribes the delay
+@@ -41,13 +43,13 @@
+  * For example, to create a load test of 10 concurrent users
+  * with each user running <code>ExampleTest.testSomething()</code> once and 
+  * with a one second delay between the addition of users, use:
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Timer timer = new ConstantTimer(1000);
+  * Test loadTest = new LoadTest(new ExampleTest("testSomething"), 10, timer);
+  * </pre>
+  * </blockquote>
+- * </p>
+  * <p>
+  * In order to simulate each concurrent user running a test for a 
+  * specified number of iterations, a <code>LoadTest</code> can be 
+@@ -60,6 +62,7 @@
+  * For example, to create a load test of 10 concurrent users
+  * with each user running <code>ExampleTest.testSomething()</code> for 20 iterations, 
+  * and with a one second delay between the addition of users, use:
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Timer timer = new ConstantTimer(1000);
+@@ -67,23 +70,26 @@
+  * Test loadTest = new LoadTest(repeatedTest, 10, timer);
+  * </pre>
+  * </blockquote>
++ * <p>
+  * or, alternatively, use: 
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Timer timer = new ConstantTimer(1000);
+  * Test loadTest = new LoadTest(new ExampleTest("testSomething"), 10, 20, timer);
+  * </pre>
+  * </blockquote> 
++ * <p>
+  * A <code>LoadTest</code> can be decorated as a <code>TimedTest</code>
+  * to test the elapsed time of the load test.  For example, to decorate 
+  * the load test constructed above as a timed test with a maximum elapsed 
+  * time of 2 seconds, use:
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Test timedTest = new TimedTest(loadTest, 2000);
+  * </pre>
+  * </blockquote>
+- * </p>
+  * <p>
+  * By default, a <code>LoadTest</code> does not enforce test 
+  * atomicity (as defined in transaction processing) if its decorated 
+--- junitperf-1.9.1/src/com/clarkware/junitperf/TestFactory.java	2004-12-30 09:05:00.000000000 +0100
++++ junitperf-1.9.1/src/com/clarkware/junitperf/TestFactory.java	2017-09-08 10:49:39.705002745 +0200
+@@ -22,6 +22,7 @@
+  * </p>
+  * <p>
+  * A typical usage scenario is as follows:
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Test factory = new TestFactory(YourTestCase.class);
+@@ -29,7 +30,6 @@
+  * ...
+  * </pre>
+  * </blockquote>
+- * </p>
+  * <p>
+  * Of course, static variables cannot be protected externally, so tests
+  * intended to be run in a multi-threaded environment should ensure
+--- junitperf-1.9.1/src/com/clarkware/junitperf/TestMethodFactory.java	2004-12-30 09:05:00.000000000 +0100
++++ junitperf-1.9.1/src/com/clarkware/junitperf/TestMethodFactory.java	2017-09-08 10:55:05.061911055 +0200
+@@ -13,6 +13,7 @@
+  * a specific test method of a <code>TestCase</code>.
+  * <p>
+  * A typical usage scenario is as follows:
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Test factory = new TestMethodFactory(YourTestCase.class, "testSomething");
+@@ -20,7 +21,6 @@
+  * ...
+  * </pre>
+  * </blockquote>
+- * </p>
+  * 
+  * @author <b>Mike Clark</b>
+  * @author Clarkware Consulting, Inc.
+--- junitperf-1.9.1/src/com/clarkware/junitperf/TimedTest.java	2004-12-30 09:05:00.000000000 +0100
++++ junitperf-1.9.1/src/com/clarkware/junitperf/TimedTest.java	2017-09-08 10:54:30.458402586 +0200
+@@ -41,12 +41,12 @@
+  * Alternatively, to decorate the <code>ExampleTest.testSomething()</code>
+  * test as a <code>TimedTest</code> that fails immediately when
+  * the maximum elapsed time of 2 seconds is exceeded, use:
++ * </p>
+  * <blockquote>
+  * <pre>
+  * Test timedTest = new TimedTest(new ExampleTest("testSomething"), 2000, false);
+  * </pre>
+  * </blockquote>
+- * </p>
+  * 
+  * @author <b>Mike Clark</b>
+  * @author Clarkware Consulting, Inc.

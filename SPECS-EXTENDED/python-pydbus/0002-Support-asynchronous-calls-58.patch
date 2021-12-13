@@ -1,0 +1,201 @@
+From 31d6dd7893a5e1bb9eb14bfcee861a5b62f64960 Mon Sep 17 00:00:00 2001
+From: Vendula Poncova <vponcova@redhat.com>
+Date: Thu, 27 Jul 2017 18:41:29 +0200
+Subject: [PATCH 2/3] Support asynchronous calls (#58)
+
+Added support for asynchronous calls of methods. A method is called
+synchronously unless its callback parameter is specified. A callback
+is a function f(*args, returned=None, error=None), where args is
+callback_args specified in the method call, returned is a return
+value of the method and error is an exception raised by the method.
+
+Example of an asynchronous call:
+
+def func(x, y, returned=None, error=None):
+  pass
+
+proxy.Method(a, b, callback=func, callback_args=(x, y))
+---
+ doc/tutorial.rst       | 11 ++++++++-
+ pydbus/proxy_method.py | 44 ++++++++++++++++++++++++++++++-----
+ tests/publish_async.py | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/run.sh           |  1 +
+ 4 files changed, 112 insertions(+), 7 deletions(-)
+ create mode 100644 tests/publish_async.py
+
+diff --git a/doc/tutorial.rst b/doc/tutorial.rst
+index 7474de3..b8479cf 100644
+--- a/doc/tutorial.rst
++++ b/doc/tutorial.rst
+@@ -84,7 +84,8 @@ All objects have methods, properties and signals.
+ Setting up an event loop
+ ========================
+ 
+-To handle signals emitted by exported objects, or to export your own objects, you need to setup an event loop.
++To handle signals emitted by exported objects, to asynchronously call methods
++or to export your own objects, you need to setup an event loop.
+ 
+ The only main loop supported by ``pydbus`` is GLib.MainLoop.
+ 
+@@ -156,6 +157,14 @@ To call a method::
+ 
+     dev.Disconnect()
+ 
++To asynchronously call a method::
++
++    def print_result(returned=None, error=None):
++        print(returned, error)
++
++    dev.GetAppliedConnection(0, callback=print_result)
++    loop.run()
++
+ To read a property::
+ 
+     print(dev.Autoconnect)
+diff --git a/pydbus/proxy_method.py b/pydbus/proxy_method.py
+index 3e6e6ee..442fe07 100644
+--- a/pydbus/proxy_method.py
++++ b/pydbus/proxy_method.py
+@@ -65,15 +65,34 @@ class ProxyMethod(object):
+ 
+ 		# Python 2 sux
+ 		for kwarg in kwargs:
+-			if kwarg not in ("timeout",):
++			if kwarg not in ("timeout", "callback", "callback_args"):
+ 				raise TypeError(self.__qualname__ + " got an unexpected keyword argument '{}'".format(kwarg))
+ 		timeout = kwargs.get("timeout", None)
++		callback = kwargs.get("callback", None)
++		callback_args = kwargs.get("callback_args", tuple())
++
++		call_args = (
++			instance._bus_name,
++			instance._path,
++			self._iface_name,
++			self.__name__,
++			GLib.Variant(self._sinargs, args),
++			GLib.VariantType.new(self._soutargs),
++			0,
++			timeout_to_glib(timeout),
++			None
++		)
++
++		if callback:
++			call_args += (self._finish_async_call, (callback, callback_args))
++			instance._bus.con.call(*call_args)
++			return None
++		else:
++			ret = instance._bus.con.call_sync(*call_args)
++			return self._unpack_return(ret)
+ 
+-		ret = instance._bus.con.call_sync(
+-			instance._bus_name, instance._path,
+-			self._iface_name, self.__name__, GLib.Variant(self._sinargs, args), GLib.VariantType.new(self._soutargs),
+-			0, timeout_to_glib(timeout), None).unpack()
+-
++	def _unpack_return(self, values):
++		ret = values.unpack()
+ 		if len(self._outargs) == 0:
+ 			return None
+ 		elif len(self._outargs) == 1:
+@@ -81,6 +100,19 @@ class ProxyMethod(object):
+ 		else:
+ 			return ret
+ 
++	def _finish_async_call(self, source, result, user_data):
++		error = None
++		return_args = None
++
++		try:
++			ret = source.call_finish(result)
++			return_args = self._unpack_return(ret)
++		except Exception as err:
++			error = err
++
++		callback, callback_args = user_data
++		callback(*callback_args, returned=return_args, error=error)
++
+ 	def __get__(self, instance, owner):
+ 		if instance is None:
+ 			return self
+diff --git a/tests/publish_async.py b/tests/publish_async.py
+new file mode 100644
+index 0000000..3f79b62
+--- /dev/null
++++ b/tests/publish_async.py
+@@ -0,0 +1,63 @@
++from pydbus import SessionBus
++from gi.repository import GLib
++from threading import Thread
++import sys
++
++done = 0
++loop = GLib.MainLoop()
++
++class TestObject(object):
++	'''
++<node>
++	<interface name='net.lew21.pydbus.tests.publish_async'>
++		<method name='HelloWorld'>
++			<arg type='i' name='x' direction='in'/>
++			<arg type='s' name='response' direction='out'/>
++		</method>
++	</interface>
++</node>
++	'''
++	def __init__(self, id):
++		self.id = id
++
++	def HelloWorld(self, x):
++		res = self.id + ": " + str(x)
++		print(res)
++		return res
++
++bus = SessionBus()
++
++with bus.publish("net.lew21.pydbus.tests.publish_async", TestObject("Obj")):
++	remote = bus.get("net.lew21.pydbus.tests.publish_async")
++
++	def callback(x, returned=None, error=None):
++		print("asyn: " + returned)
++		assert (returned is not None)
++		assert(error is None)
++		assert(x == int(returned.split()[1]))
++
++		global done
++		done += 1
++		if done == 3:
++			loop.quit()
++
++	def t1_func():
++		remote.HelloWorld(1, callback=callback, callback_args=(1,))
++		remote.HelloWorld(2, callback=callback, callback_args=(2,))
++		print("sync: " + remote.HelloWorld(3))
++		remote.HelloWorld(4, callback=callback, callback_args=(4,))
++
++	t1 = Thread(None, t1_func)
++	t1.daemon = True
++
++	def handle_timeout():
++		print("ERROR: Timeout.")
++		sys.exit(1)
++
++	GLib.timeout_add_seconds(2, handle_timeout)
++
++	t1.start()
++
++	loop.run()
++
++	t1.join()
+diff --git a/tests/run.sh b/tests/run.sh
+index 8d93644..271c58a 100755
+--- a/tests/run.sh
++++ b/tests/run.sh
+@@ -15,4 +15,5 @@ then
+ 	"$PYTHON" $TESTS_DIR/publish.py
+ 	"$PYTHON" $TESTS_DIR/publish_properties.py
+ 	"$PYTHON" $TESTS_DIR/publish_multiface.py
++	"$PYTHON" $TESTS_DIR/publish_async.py
+ fi
+-- 
+2.13.5
+

@@ -1,0 +1,70 @@
+--- hsqldb-2.4.1/hsqldb/build/build.xml	2018-01-02 16:19:00.000000000 +0100
++++ hsqldb-2.4.1/hsqldb/build/build.xml	2018-07-11 08:35:42.354467810 +0200
+@@ -871,36 +871,7 @@
+       </jar>
+     </target>
+ 
+-    <target name="-doclink-18"
+-                if="ant.java.iscjava18">
+-                        <!-- TODO: update to final release api docs url when available -->
+-        <property name="jse.doc.link"
+-                  value="http://docs.oracle.com/javase/8/docs/api/"/>
+-        <property name="jee.doc.link"
+-                  value="http://docs.oracle.com/javaee/7/api/"/>
+-    </target>
+-
+-    <target name="-doclink-16"
+-                depends="-doclink-18"
+-                    if="ant.java.iscjava16"
+-            unless="ant.java.iscjava18">
+-        <property name="jse.doc.link"
+-                  value="http://docs.oracle.com/javase/6/docs/api/"/>
+-        <property name="jee.doc.link"
+-                  value="http://docs.oracle.com/javaee/6/api/"/>
+-    </target>
+-
+-    <target name="-doclink-15"
+-                    depends="-doclink-16"
+-                    if="ant.java.iscjava15"
+-            unless="ant.java.iscjava16">
+-        <property name="jse.doc.link"
+-                  value="http://docs.oracle.com/javase/1.5.0/docs/api/"/>
+-        <property name="jee.doc.link"
+-                  value="http://docs.oracle.com/javaee/5/api/"/>
+-    </target>
+-
+-    <target name="javadoc" depends="-prepare-javadoc,-set-jvmvars,-doclink-15"
++    <target name="javadoc" depends="-prepare-javadoc,-set-jvmvars"
+             description="Create javadoc for the distribution package">
+       <!-- TODO:  Find out why JDBCDriver class is listed twice in the lass
+            list pane, but only when All Classes selected
+@@ -953,8 +924,6 @@
+            <packageset dir='src'>
+                <include name='org/hsqldb/jdbc'/>
+            </packageset>
+-           <link href="${jse.doc.link}"/>
+-           <link href="${jee.doc.link}"/>
+            <tag name="todo" enabled="false"/>
+            <tag name="revised" enabled="false"/>
+            <tag name="jboss.xmbean" enabled="false"/>
+@@ -968,7 +937,7 @@
+    </target>
+ 
+    <target name="javadocdev"
+-            depends="-prepare-javadoc,-set-jvmvars,-doclink-15"
++            depends="-prepare-javadoc,-set-jvmvars"
+             description="Create javadoc for all HSQLDB code-base classes">
+       <!-- Since our preprocessor package compilatoin depends on the
+            env-specific ant runtime lib via includeAntRuntime=true, Javadoc
+@@ -998,9 +967,6 @@
+              <pathelement location="${junit38.lib}"/>
+              <pathelement location="${servletapi.lib}"/>
+            </classpath>
+-           <link href="${jse.doc.link}"/>
+-           <link href="${jee.doc.link}"/>
+-           <link href="${junit.doc.link}"/>
+            <tag name="todo"/>
+            <tag name="revised"/>
+            <tag name="jboss.xmbean"/>
+Only in hsqldb-2.4.1/hsqldb/build: build.xml.orig
+Only in hsqldb-2.4.1/hsqldb/build: build.xml.rej

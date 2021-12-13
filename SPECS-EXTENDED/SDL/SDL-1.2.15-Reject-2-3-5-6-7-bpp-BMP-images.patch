@@ -1,0 +1,42 @@
+From 70c3d0e97755e1b208ceba2ae012877797f15627 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 21 Feb 2019 10:57:41 +0100
+Subject: [PATCH] Reject 2, 3, 5, 6, 7-bpp BMP images
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+BMP decoder assumes less than 8 bit depth images have 1 or 4 bits
+per pixel. No other depths are correctly translated to an 8bpp
+surface.
+
+This patch rejects loading these images.
+
+https://bugzilla.libsdl.org/show_bug.cgi?id=4498
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/video/SDL_bmp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/video/SDL_bmp.c b/src/video/SDL_bmp.c
+index 8eadc5f..758d4bb 100644
+--- a/src/video/SDL_bmp.c
++++ b/src/video/SDL_bmp.c
+@@ -163,6 +163,14 @@ SDL_Surface * SDL_LoadBMP_RW (SDL_RWops *src, int freesrc)
+ 			ExpandBMP = biBitCount;
+ 			biBitCount = 8;
+ 			break;
++		case 2:
++		case 3:
++		case 5:
++		case 6:
++		case 7:
++			SDL_SetError("%d-bpp BMP images are not supported", biBitCount);
++			was_error = SDL_TRUE;
++			goto done;
+ 		default:
+ 			ExpandBMP = 0;
+ 			break;
+-- 
+2.20.1
+

@@ -1,0 +1,19 @@
+diff -up pegasus/mak/config-linux.mak.orig pegasus/mak/config-linux.mak
+diff -up pegasus/mak/SDKMakefile.orig pegasus/mak/SDKMakefile
+--- pegasus/mak/SDKMakefile.orig	2015-10-06 13:05:36.418021720 +0200
++++ pegasus/mak/SDKMakefile	2015-10-06 13:08:41.135869147 +0200
+@@ -482,6 +482,13 @@ ifeq ($(RUNTIME_PLATFORM_TEST_NEEDED), t
+ 	@$(ECHO-E) "   endif" \
+             >> $(PEGASUS_STAGING_DIR)$(PEGASUS_SAMPLES_DIR)/mak/config.mak
+ 
++	@$(ECHO-E) "   ifeq (\044(shell uname -i),ppc64le)" \
++            >> $(PEGASUS_STAGING_DIR)$(PEGASUS_SAMPLES_DIR)/mak/config.mak
++	@$(ECHO-E) "      PEGASUS_PLATFORM = LINUX_PPC64_GNU" \
++            >> $(PEGASUS_STAGING_DIR)$(PEGASUS_SAMPLES_DIR)/mak/config.mak
++	@$(ECHO-E) "   endif" \
++            >> $(PEGASUS_STAGING_DIR)$(PEGASUS_SAMPLES_DIR)/mak/config.mak
++
+ 	@$(ECHO-E) "   ifeq (\044(shell uname -i),s390)" \
+             >> $(PEGASUS_STAGING_DIR)$(PEGASUS_SAMPLES_DIR)/mak/config.mak
+ 	@$(ECHO-E) "      PEGASUS_PLATFORM = LINUX_ZSERIES_GNU" \
+diff -up pegasus/src/SDK/samples/mak/config.mak.orig pegasus/src/SDK/samples/mak/config.mak

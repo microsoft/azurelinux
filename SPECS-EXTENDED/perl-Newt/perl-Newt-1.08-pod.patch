@@ -1,0 +1,20 @@
+--- Newt-1.08/Newt.pm	2009-03-11 21:21:20.000000000 -0400
++++ Newt-1.08/Newt.pm	2009-03-11 21:19:16.000000000 -0400
+@@ -857,6 +856,8 @@
+ 
+ Returns a tuple containing the screen dimensions.
+ 
++=back
++
+ =head1 Keyboard input
+ 
+ =over
+@@ -1389,7 +1390,7 @@
+ 
+ F12 is always defined to be a hotkey.
+ 
+-=head2 Drawing panels instead uf running them
++=head2 Drawing panels instead of running them
+ 
+ When you run a panel the terminal is blocked until the user presses a
+ component or a key that causes the panel to exit. Sometimes is useful

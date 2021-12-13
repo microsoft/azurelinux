@@ -1,0 +1,32 @@
+From 769521a3798fd554ddc7333cb1255cd1b40790e8 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Thu, 10 Apr 2014 10:00:55 +0200
+Subject: [PATCH 23/27] build-sys: install rp-pppoe plugin files with standard
+ perms
+
+This is needed to properly generate debuginfo package.
+---
+ pppd/plugins/rp-pppoe/Makefile.linux | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pppd/plugins/rp-pppoe/Makefile.linux b/pppd/plugins/rp-pppoe/Makefile.linux
+index b949716..fa49efb 100644
+--- a/pppd/plugins/rp-pppoe/Makefile.linux
++++ b/pppd/plugins/rp-pppoe/Makefile.linux
+@@ -44,10 +44,10 @@ rp-pppoe.so: plugin.o discovery.o if.o common.o
+ 
+ install: all
+ 	$(INSTALL) -d -m 755 $(LIBDIR)
+-	$(INSTALL) -c -m 4550 rp-pppoe.so $(LIBDIR)
++	$(INSTALL) -c -m 755 rp-pppoe.so $(LIBDIR)
+ 	$(INSTALL) -d -m 755 $(BINDIR)
+-	$(INSTALL) -c -m 555 pppoe-discovery $(BINDIR)
+-	$(INSTALL) -c -m 444 pppoe-discovery.8 $(MANDIR)
++	$(INSTALL) -c -m 755 pppoe-discovery $(BINDIR)
++	$(INSTALL) -c -m 644 pppoe-discovery.8 $(MANDIR)
+ 
+ clean:
+ 	rm -f *.o *.so pppoe-discovery
+-- 
+1.8.3.1
+

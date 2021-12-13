@@ -1,0 +1,112 @@
+--- Unicode-String-2.09/README		2005-10-25 13:56:28.000000000 +0100
++++ Unicode-String-2.09/README.utf8	2010-02-18 09:11:45.235669975 +0000
+@@ -18,8 +18,8 @@
+    o Depreciation because of perl's own utf8 support.
+ 
+    o Composition/decomposition support:
+-     $u->decomp;  # will decomposite as much as possible:  "å"  --> "a°"
+-     $u->comp;    # will composite as much as possible:    "a°" --> "å"
++     $u->decomp;  # will decomposite as much as possible:  "Ã¥"  --> "aÂ°"
++     $u->comp;    # will composite as much as possible:    "aÂ°" --> "Ã¥"
+ 
+      Need separate routines or a special argument to distinguish
+      between compatibility decomposition and canonical decomposition.
+@@ -64,7 +64,7 @@
+    print $u->latin1;
+    print $u->hex;
+ 
+-   print latin1("naïve\n")->utf8;
++   print utf8("naÃ¯ve\n")->latin1;
+ 
+    use Unicode::CharName qw(uname);
+    print uname(ord('$')), "\n";
+@@ -73,7 +73,7 @@
+ 
+ COPYRIGHT
+ 
+-  © 1997-2000,2005 Gisle Aas. All rights reserved.
++  Â© 1997-2000,2005 Gisle Aas. All rights reserved.
+ 
+ This library is free software; you can redistribute it and/or modify
+ it under the same terms as Perl itself.
+--- Unicode-String-2.09/String.pm	2005-10-26 09:13:10.000000000 +0100
++++ Unicode-String-2.09/String.pm.utf8	2010-02-18 09:11:45.234427359 +0000
+@@ -597,7 +597,7 @@
+ current value is returned.
+ 
+ To illustrate the encodings we show how the 2 character sample string
+-of "µm" (micro meter) is encoded for each one.
++of "Âµm" (micro meter) is encoded for each one.
+ 
+ =over 4
+ 
+@@ -606,7 +606,7 @@
+ =item $us->utf32be( $newval )
+ 
+ The string passed should be in the UTF-32 encoding with bytes in big
+-endian order.  The sample "µm" is "\0\0\0\xB5\0\0\0m" in this encoding.
++endian order.  The sample "Âµm" is "\0\0\0\xB5\0\0\0m" in this encoding.
+ 
+ Alternative names for this method are utf32() and ucs4().
+ 
+@@ -615,14 +615,14 @@
+ =item $us->utf32le( $newval )
+ 
+ The string passed should be in the UTF-32 encoding with bytes in little
+-endian order.  The sample "µm" is is "\xB5\0\0\0m\0\0\0" in this encoding.
++endian order.  The sample "Âµm" is is "\xB5\0\0\0m\0\0\0" in this encoding.
+ 
+ =item $us->utf16be
+ 
+ =item $us->utf16be( $newval )
+ 
+ The string passed should be in the UTF-16 encoding with bytes in big
+-endian order. The sample "µm" is "\0\xB5\0m" in this encoding.
++endian order. The sample "Âµm" is "\0\xB5\0m" in this encoding.
+ 
+ Alternative names for this method are utf16() and ucs2().
+ 
+@@ -635,7 +635,7 @@
+ =item $us->utf16le( $newval )
+ 
+ The string passed should be in the UTF-16 encoding with bytes in
+-little endian order.  The sample "µm" is is "\xB5\0m\0" in this
++little endian order.  The sample "Âµm" is is "\xB5\0m\0" in this
+ encoding.  This is the encoding used by the Microsoft Windows API.
+ 
+ If the string passed to utf16le() starts with the Unicode byte order
+@@ -646,14 +646,14 @@
+ 
+ =item $us->utf8( $newval )
+ 
+-The string passed should be in the UTF-8 encoding. The sample "µm" is
++The string passed should be in the UTF-8 encoding. The sample "Âµm" is
+ "\xC2\xB5m" in this encoding.
+ 
+ =item $us->utf7
+ 
+ =item $us->utf7( $newval )
+ 
+-The string passed should be in the UTF-7 encoding. The sample "µm" is
++The string passed should be in the UTF-7 encoding. The sample "Âµm" is
+ "+ALU-m" in this encoding.
+ 
+ 
+@@ -673,7 +673,7 @@
+ 
+ =item $us->latin1( $newval )
+ 
+-The string passed should be in the ISO-8859-1 encoding. The sample "µm" is
++The string passed should be in the ISO-8859-1 encoding. The sample "Âµm" is
+ "\xB5m" in this encoding.
+ 
+ Characters outside the "\x00" .. "\xFF" range are simply removed from
+@@ -688,7 +688,7 @@
+ The string passed should be plain ASCII where each Unicode character
+ is represented by the "U+XXXX" string and separated by a single space
+ character.  The "U+" prefix is optional when setting the value.  The
+-sample "µm" is "U+00b5 U+006d" in this encoding.
++sample "Âµm" is "U+00b5 U+006d" in this encoding.
+ 
+ =back
+ 

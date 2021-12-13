@@ -1,0 +1,57 @@
+--- jflex-1.4.2/src/build.xml.orig	2008-08-07 13:13:24.346611761 -0400
++++ jflex-1.4.2/src/build.xml	2008-08-07 13:14:15.625486402 -0400
+@@ -28,12 +28,13 @@
+   <target name="help" description="show help message">
+   	<echo message="Ant build file for JFlex. Useful targets:"/> 
+   	<echo message=""/> 
+-  	<echo message="gettools:   download development tools for the build"/> 
+   	<echo message="realclean:  remove all compiled and generated files"/>
+   	<echo message="jar:        make JFlex.jar"/> 
+   	<echo message=""/> 
++<!--
+   	<echo message="Use the gettool target or override the *.jar properties"/>
+   	<echo message="before you do the first build."/> 
++-->
+   </target> 
+ 
+   <target name="declare" description="define tasks for jflex and cup">
+@@ -41,12 +42,14 @@
+     <taskdef classname="java_cup.anttask.CUPTask" name="cup" classpath="${cup.jar}"/>
+   </target>
+ 
++<!--
+   <target name="gettools" description="download development tools">
+     <mkdir dir="${tools.dir}"/>
+     <get src="${jflex.jar.url}" dest="${jflex.jar}"/>
+     <get src="${cup.jar.url}" dest="${cup.jar}"/>
+     <get src="${junit.jar.url}" dest="${junit.jar}"/>
+   </target>
++-->
+ 
+   <target name="dist" description="build distribution">
+     <antcall target="gettools" />
+@@ -60,7 +63,7 @@
+   <target name="cbuild" depends="libclean,compile,jar" 
+           description="recompile and pack all classes"/> 
+ 
+-  <target name="compile" depends="jflex,cup"
++  <target name="compile"
+           description="compile all classes">
+     <javac srcdir="." 
+            destdir="../lib" 
+@@ -68,6 +71,7 @@
+            debug="on" />
+   </target>
+ 
++<!--
+   <target name="jflex" depends="declare" description="generate scanner">
+     <jflex file="JFlex/LexScan.flex" skeleton="skeleton.nested"/>
+   </target>
+@@ -75,6 +79,7 @@
+   <target name="cup" depends="declare" description="generate parser">
+     <cup srcfile="JFlex/LexParse.cup" interface="true" parser="LexParse" />
+   </target>
++-->
+ 
+   <target name="copy" description="copy resources to build dir">
+     <copy file="skeleton.default" todir="../lib/JFlex" />

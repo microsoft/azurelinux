@@ -1,0 +1,25 @@
+--- telnetd/telnetd.c	2005-01-19 14:37:25.000000000 +0000
++++ telnetd/telnetd.c.new	2005-01-19 14:48:12.000000000 +0000
+@@ -697,6 +697,7 @@
+     int on = 1;
+     char *HE;
+     const char *IM;
++    int pty_read_ok = 0; /* track whether the pty read has worked yet */
+ 
+     /*
+      * Initialize the slc mapping table.
+@@ -1016,12 +1017,13 @@
+ 	     * off the master side before the slave side is
+ 	     * opened, we get EIO.
+ 	     */
+-	    if (pcc < 0 && (errno == EWOULDBLOCK || errno == EIO)) {
++	    if (pcc < 0 && (errno == EWOULDBLOCK || (errno == EIO && pty_read_ok == 0))) {
+ 		pcc = 0;
+ 	    } 
+ 	    else {
+ 		if (pcc <= 0)
+ 		    break;
++		pty_read_ok = 1;	/* mark connection up for read */
+ #ifdef	LINEMODE
+ 				/*
+ 				 * If ioctl from pty, pass it through net

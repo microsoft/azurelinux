@@ -1,0 +1,30 @@
+diff -urN xalan-j_2_7_2.old/build.xml xalan-j_2_7_2/build.xml
+--- xalan-j_2_7_2.old/build.xml	2014-06-23 09:21:30.815410307 +0200
++++ xalan-j_2_7_2/build.xml	2014-06-23 09:22:59.124418473 +0200
+@@ -204,7 +204,9 @@
+   <property name="serializer.jar.name"          value="serializer.jar"/>   
+   <property name="build.serializer.jar"         value="${serializer.build.dir}/${serializer.jar.name}"/> 
+   <property name="lib.serializer.jar"           value="./lib/${serializer.jar.name}"/>   
+- 
++
++  <property name="api.j2se" value="http://java.sun.com/j2se/1.4/docs/api/"/>
++
+   <!-- Class paths used in various targets -->
+   <path id="docs.class.path">
+     <pathelement location="${xmlapis.jar}" />
+@@ -1098,6 +1100,7 @@
+           <group title="DOM 2" packages="org.w3c.dom*"/>
+           <group title="XSLTC Core"
+                  packages="org.apache.xalan.xsltc*"/>
++          <link href="${api.j2se}"/>
+     </javadoc>
+   </target>
+ 
+@@ -1133,6 +1136,7 @@
+           <group title="DOM 2" packages="org.w3c.dom*"/>
+           <group title="XSLTC Core"
+                  packages="org.apache.xalan.xsltc*"/>
++          <link href="${api.j2se}"/>
+     </javadoc>
+   </target>
+ 

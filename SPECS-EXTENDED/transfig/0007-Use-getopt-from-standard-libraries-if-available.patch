@@ -1,0 +1,173 @@
+From 93795dd396730c80e63767dede7777f4cb7dc383 Mon Sep 17 00:00:00 2001
+From: Thomas Loimer <thomas.loimer@tuwien.ac.at>
+Date: Sun, 15 Dec 2019 21:34:34 +0100
+Subject: [PATCH 7/8] Use getopt() from standard libraries, if available
+
+---
+ configure.ac               | 10 +++++-----
+ fig2dev/Makefile.am        |  2 +-
+ fig2dev/Nmakefile          |  6 +++---
+ fig2dev/fig2dev.c          | 12 +++++++-----
+ fig2dev/{ => lib}/getopt.c | 12 +++---------
+ 5 files changed, 19 insertions(+), 23 deletions(-)
+ rename fig2dev/{ => lib}/getopt.c (91%)
+
+diff --git a/configure.ac b/configure.ac
+index e88b27a..8e955ee 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5,7 +5,7 @@ AC_COPYRIGHT([Fig2dev: Translate Fig code to various Devices
+ Copyright (c) 1991 by Micah Beck
+ Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
+ Parts Copyright (c) 1989-2015 by Brian V. Smith
+-Parts Copyright (c) 2015-2018 by Thomas Loimer
++Parts Copyright (c) 2015-2019 by Thomas Loimer
+ 
+ Any party obtaining a copy of these files is granted, free of charge, a
+ full and unrestricted irrevocable, world-wide, paid up, royalty-free,
+@@ -19,7 +19,7 @@ and this permission notice remain intact.
+ 
+ #
+ # configure.ac
+-# Author: Thomas Loimer, 2015-2018.
++# Author: Thomas Loimer, 2015-2019.
+ #
+ 
+ dnl Define m4 variables for use in AC_INIT and AC_DEFINE below.
+@@ -366,9 +366,9 @@ AS_IF([test "$tl_cv_func__setmode" = yes],
+ 
+ # Check for functions and, if not found, use the corresponding
+ # replacement, e.g., strstr.c, in the top srcdir. Sets, e.g.,
+-# HAVE_STRSTR. Any modern system should have these functions, so
+-# this are obsolete checks.
+-AC_REPLACE_FUNCS([isascii strstr strchr strrchr strcasecmp strncasecmp \
++# HAVE_STRSTR. Except possibly getopt(), any modern system should have these
++# functions, so all except one are obsolete checks.
++AC_REPLACE_FUNCS([getopt isascii strstr strchr strrchr strcasecmp strncasecmp \
+ 	strdup strndup])
+ 
+ # Place the replacement functions into this dir.
+diff --git a/fig2dev/Makefile.am b/fig2dev/Makefile.am
+index d00ac54..70ae569 100644
+--- a/fig2dev/Makefile.am
++++ b/fig2dev/Makefile.am
+@@ -39,7 +39,7 @@ bin_PROGRAMS = fig2dev
+ fig2dev_SOURCES = alloc.h arrow.c bool.h bound.h bound.c colors.h colors.c \
+     creationdate.h creationdate.c drivers.h fig2dev.h fig2dev.c free.h free.c \
+     iso2tex.c localmath.h localmath.c object.h read1_3.c read.h read.c \
+-    trans_spline.h trans_spline.c pi.h getopt.c
++    trans_spline.h trans_spline.c pi.h
+ 
+ # CONFIG_HEADER is config.h, which contains PACKAGE_VERSION. If that
+ # changes, fig2dev should take up the new version string.
+diff --git a/fig2dev/Nmakefile b/fig2dev/Nmakefile
+index 7623e40..bba38c9 100644
+--- a/fig2dev/Nmakefile
++++ b/fig2dev/Nmakefile
+@@ -2,7 +2,7 @@
+ # Copyright (c) 1991 by Micah Beck
+ # Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
+ # Parts Copyright (c) 1989-2015 by Brian V. Smith
+-# Parts Copyright (c) 2015-2018 by Thomas Loimer
++# Parts Copyright (c) 2015-2019 by Thomas Loimer
+ #
+ # Any party obtaining a copy of these files is granted, free of charge, a
+ # full and unrestricted irrevocable, world-wide, paid up, royalty-free,
+@@ -14,7 +14,7 @@
+ # and this permission notice remain intact.
+ 
+ # fig2dev/Nmakefile
+-# Author: Thomas Loimer, 2018.
++# Author: Thomas Loimer, 2018, 2019.
+ 
+ #############################################################
+ #
+@@ -84,7 +84,7 @@ CFLAGS = /I. /Idev /nologo /W1 /DWIN32 /D_BIND_TO_CURRENT_VCLIBS_VERSION=1 \
+ REPL_LIBS = lib/strndup.c
+ 
+ FIG2DEV_SRCS = arrow.c bound.c colors.c creationdate.c fig2dev.c free.c \
+-	getopt.c iso2tex.c localmath.c  read.c read1_3.c trans_spline.c \
++	iso2tex.c localmath.c read.c read1_3.c trans_spline.c \
+ 	dev/asc85ec.c dev/genbitmaps.c dev/genbox.c dev/gencgm.c dev/gendxf.c \
+ 	dev/genemf.c dev/genepic.c dev/gengbx.c dev/genge.c dev/genibmgl.c \
+ 	dev/genlatex.c dev/genmap.c dev/genmf.c dev/genmp.c dev/genpdf.c \
+diff --git a/fig2dev/fig2dev.c b/fig2dev/fig2dev.c
+index 479b484..d8c5e2a 100644
+--- a/fig2dev/fig2dev.c
++++ b/fig2dev/fig2dev.c
+@@ -29,6 +29,7 @@
+ #include <stdlib.h>
+ #include <stdarg.h>
+ #include <string.h>
++#include <unistd.h>
+ #include <locale.h>
+ /* In Windows, _setmode() is declared in <io.h>, O_BINARY in <fcntl.h>. It
+  * accepts two arguments and sets file mode to text or binary. */
+@@ -44,10 +45,11 @@
+ #include "bound.h"
+ #include "read.h"
+ 
+-/* the three lines below could go into a getopt.h file */
+-extern int	 fig_getopt(int nargc, char **nargv, char *ostr); /* getopt.c */
+-extern char	*optarg;		/* getopt.c */
+-extern int	 optind;		/* getopt.c */
++#ifndef HAVE_GETOPT
++extern int	getopt(int argc, char *argv[], const char *ostr);
++extern char	*optarg;
++extern int	 optind;
++#endif
+ 
+ char	Err_badarg[] = "Argument -%c unknown to %s driver.";
+ char	Err_mem[] = "Running out of memory.";
+@@ -226,7 +228,7 @@ get_args(int argc, char *argv[])
+ 	}
+ 
+ 	/* sum of all arguments */
+-	while ((c = fig_getopt(argc, argv, ARGSTRING)) != EOF) {
++	while ((c = getopt(argc, argv, ARGSTRING)) != EOF) {
+ 
+ 	  /* global (all drivers) option handling */
+ 	    switch (c) {
+diff --git a/fig2dev/getopt.c b/fig2dev/lib/getopt.c
+similarity index 91%
+rename from fig2dev/getopt.c
+rename to fig2dev/lib/getopt.c
+index 867a9fe..f3d1845 100644
+--- a/fig2dev/getopt.c
++++ b/fig2dev/lib/getopt.c
+@@ -2,8 +2,8 @@
+  * Fig2dev: Translate Fig code to various Devices
+  * Copyright (c) 1991 by Micah Beck
+  * Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
+- * Parts Copyright (c) 1989-2007 by Brian V. Smith
+- * Parts Copyright (c) 2015-2017 by Thomas Loimer
++ * Parts Copyright (c) 1989-2015 by Brian V. Smith
++ * Parts Copyright (c) 2015-2019 by Thomas Loimer
+  *
+  * Any party obtaining a copy of these files is granted, free of charge, a
+  * full and unrestricted irrevocable, world-wide, paid up, royalty-free,
+@@ -37,12 +37,6 @@
+ #include <stdio.h>
+ #include <string.h>
+ 
+-/*
+-#ifndef lint
+-static	char	sccsfid[] = "@(#) getopt.c 5.0 (UTZoo) 1985";
+-#endif
+-*/
+-
+ #define	ARGCH    (int)':'
+ #define BADCH	 (int)'?'
+ #define EMSG	 ""
+@@ -59,7 +53,7 @@ char	*optarg;		/* argument associated with option */
+ 		fputc(optc,stderr); fputc('\n',stderr); return BADCH
+ 
+ int
+-fig_getopt(int nargc, char **nargv, char *ostr)
++getopt(int nargc, char **nargv, const char *ostr)
+ {
+ 	static char	*place = EMSG;	/* option letter processing */
+ 	char		*oli;		/* option letter list index */
+-- 
+2.24.1
+

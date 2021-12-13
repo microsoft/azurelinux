@@ -1,0 +1,634 @@
+diff --git jabberpy-0.5-0/jabber/__init__.py jabberpy-0.5-0/jabber/__init__.py
+index ba26086..8d134bd 100644
+--- jabberpy-0.5-0/jabber/__init__.py
++++ jabberpy-0.5-0/jabber/__init__.py
+@@ -1,6 +1,10 @@
+-__all__ = []
++import sys
++if sys.version_info[0] == 3:
++    from . import jabber
++else:
++    import jabber
+ 
+-import jabber
++__all__ = []
+ 
+ for __s in dir(jabber):
+     __val = getattr(jabber, __s)
+diff --git jabberpy-0.5-0/jabber/debug.py jabberpy-0.5-0/jabber/debug.py
+index 4615697..b9ee00d 100644
+--- jabberpy-0.5-0/jabber/debug.py
++++ jabberpy-0.5-0/jabber/debug.py
+@@ -41,9 +41,13 @@ in this code
+ 
+ import sys
+ import time
+-from string import join
+ 
+-import types
++if sys.version_info[0] == 3:
++    StringType = (str, bytes)
++    UnicodeType = str
++else:
++    StringType = basestring
++    UnicodeType = unicode
+ 
+ 
+ debug_flags = []
+@@ -164,10 +168,10 @@ class Debug:
+                   ):
+ 
+         if type(active_flags) not in [type([]), type(())]:
+-            print  '***' 
+-            print  '*** Invalid or oldformat debug param given: %s' % active_flags
+-            print  '*** please correct your param, should be of [] type!'
+-            print  '*** Due to this, full debuging is enabled'
++            print('***')
++            print('*** Invalid or oldformat debug param given: %s' % active_flags)
++            print('*** please correct your param, should be of [] type!')
++            print('*** Due to this, full debuging is enabled')
+             active_flags=[DBG_ALWAYS]
+ 
+         if welcome == -1:
+@@ -182,7 +186,7 @@ class Debug:
+                 try:
+                     self._fh = open(log_file,'w')
+                 except:
+-                    print 'ERROR: can open %s for writing'
++                    print('ERROR: can open %s for writing')
+                     sys.exit(0)
+             else: ## assume its a stream type object
+                 self._fh = log_file
+@@ -190,8 +194,7 @@ class Debug:
+             self._fh = sys.stdout
+          
+         if time_stamp not in (0,1,2):
+-            msg2 = '%s' % time_stamp
+-            raise 'Invalid time_stamp param', msg2
++            raise Exception('Invalid time_stamp param: %s' % time_stamp)
+         self.prefix = prefix
+         self.sufix = sufix
+         self.time_stamp = time_stamp
+@@ -214,8 +217,7 @@ class Debug:
+         if type(flag_show) in (type(''), type(None)):
+             self.flag_show = flag_show
+         else:
+-            msg2 = '%s' % type(flag_show )
+-            raise 'Invalid type for flag_show!', msg2
++            raise Exception('Invalid type for flag_show: %s' % type(flag_show))
+ 
+ 
+         
+@@ -271,7 +273,7 @@ class Debug:
+                 # dont print "None", just show the separator
+                 output = '%s %s' % ( output, self.flag_show )
+ 
+-        if type(msg)==type(u'') and self.encoding:
++        if isinstance(msg, UnicodeType) and self.encoding:
+             msg=msg.encode(self.encoding, 'replace')
+ 
+         output = '%s%s%s' % ( output, msg, suf )
+@@ -321,11 +323,11 @@ class Debug:
+         if not active_flags:
+             #no debuging at all
+             self.active = []
+-        elif type( active_flags ) in ( types.TupleType, types.ListType ):
++        elif isinstance(active_flags, (tuple, list)):
+             flags = self._as_one_list( active_flags )
+             for t in flags:
+                 if t not in debug_flags:
+-                    print 'Invalid debugflag given', t
++                    print('Invalid debugflag given', t)
+                 else:
+                     ok_flags.append( t )
+                 
+@@ -360,7 +362,7 @@ class Debug:
+         
+         This code organises lst and remves dupes
+         """
+-        if type( items ) <> type( [] ) and type( items ) <> type( () ):
++        if not isinstance(items, (tuple, list)):
+             return [ items ]
+         r = []
+         for l in items:
+@@ -377,9 +379,8 @@ class Debug:
+     
+     def _append_unique_str( self, lst, item ):
+         """filter out any dupes."""
+-        if type(item) <> type(''):
+-            msg2 = '%s' % item
+-            raise 'Invalid item type (should be string)',msg2
++        if not isinstance(item, StringType):
++            raise Exception('Invalid item type (should be string): %s' % type(item))
+         if item not in lst:
+             lst.append( item )
+         return lst
+@@ -389,9 +390,8 @@ class Debug:
+         'verify that flag is defined.'
+         if flags:
+             for f in self._as_one_list( flags ):
+-                if not f in debug_flags:
+-                    msg2 = '%s' % f
+-                    raise 'Invalid debugflag given', msg2
++                if f not in debug_flags:
++                    raise Exception('Invalid debugflag given: %s' % f)
+ 
+     def _remove_dupe_flags( self ):
+         """
+diff --git jabberpy-0.5-0/jabber/jabber.py jabberpy-0.5-0/jabber/jabber.py
+index ab9d9b3..c6c97c7 100644
+--- jabberpy-0.5-0/jabber/jabber.py
++++ jabberpy-0.5-0/jabber/jabber.py
+@@ -64,17 +64,23 @@ An example of usage for a simple client would be ( only psuedo code !)
+ 
+ # $Id: jabber.py,v 1.58 2004/01/18 05:27:10 snakeru Exp $
+ 
+-import xmlstream
+ import time
+ import hashlib
++import sys
++
++if sys.version_info[0] == 3:
++    from . import xmlstream
++    StringType = (str, bytes)
++    UnicodeType = str
++else:
++    import xmlstream
++    StringType = basestring
++    UnicodeType = unicode
+ 
+ debug=xmlstream.debug
+ 
+ VERSION = xmlstream.VERSION
+ 
+-False = 0;
+-True  = 1;
+-
+ timeout = 300
+ 
+ DBG_INIT, DBG_ALWAYS = debug.DBG_INIT, debug.DBG_ALWAYS
+@@ -179,14 +185,14 @@ RS_EXT_PENDING  = 0
+ def ustr(what):
+     """If sending object is already a unicode str, just
+        return it, otherwise convert it using xmlstream.ENCODING"""
+-    if type(what) == type(u''):
++    if isinstance(what, UnicodeType):
+         r = what
+     else:
+         try: r = what.__str__()
+         except AttributeError: r = str(what)
+         # make sure __str__() didnt return a unicode
+-        if type(r) <> type(u''):
+-            r = unicode(r,xmlstream.ENCODING,'replace')
++        if not isinstance(r, UnicodeType):
++            r = UnicodeType(r,xmlstream.ENCODING,'replace')
+     return r
+ xmlstream.ustr = ustr
+ 
+@@ -218,17 +224,17 @@ class Connection(xmlstream.Client):
+ 
+     def setMessageHandler(self, func, type='', chainOutput=False):
+         """Back compartibility method"""
+-        print "WARNING! setMessageHandler(...) method is obsolette, use registerHandler('message',...) instead."
++        print("WARNING! setMessageHandler(...) method is obsolette, use registerHandler('message',...) instead.")
+         return self.registerHandler('message', func, type, chained=chainOutput)
+ 
+     def setPresenceHandler(self, func, type='', chainOutput=False):
+         """Back compartibility method"""
+-        print "WARNING! setPresenceHandler(...) method is obsolette, use registerHandler('presence',...) instead."
++        print("WARNING! setPresenceHandler(...) method is obsolette, use registerHandler('presence',...) instead.")
+         return self.registerHandler('presence', func, type, chained=chainOutput)
+ 
+     def setIqHandler(self, func, type='', ns=''):
+         """Back compartibility method"""
+-        print "WARNING! setIqHandler(...) method is obsolette, use registerHandler('iq',...) instead."
++        print("WARNING! setIqHandler(...) method is obsolette, use registerHandler('iq',...) instead.")
+         return self.registerHandler('iq', func, type, ns)
+ 
+     def header(self):
+@@ -248,7 +254,7 @@ class Connection(xmlstream.Client):
+ 
+     def _expectedIqHandler(self, conn, iq_obj):
+         if iq_obj.getAttr('id') and \
+-           self._expected.has_key(iq_obj.getAttr('id')):
++           iq_obj.getAttr('id') in self._expected:
+             self._expected[iq_obj.getAttr('id')] = iq_obj
+             raise NodeProcessed('No need for further Iq processing.')
+ 
+@@ -257,7 +263,7 @@ class Connection(xmlstream.Client):
+            Builds the relevant jabber.py object and dispatches it
+            to a relevant function or callback."""
+         name=stanza.getName()
+-        if not self.handlers.has_key(name):
++        if name not in self.handlers:
+             self.DEBUG("whats a tag -> " + name,DBG_NODE_UNKNOWN)
+             name='unknown'
+         else:
+@@ -274,9 +280,9 @@ class Connection(xmlstream.Client):
+         self.DEBUG("dispatch called for: name->%s ns->%s"%(name,ns),DBG_DISPATCH)
+ 
+         typns=typ+ns
+-        if not self.handlers[name].has_key(ns): ns=''
+-        if not self.handlers[name].has_key(typ): typ=''
+-        if not self.handlers[name].has_key(typns): typns=''
++        if ns not in self.handlers[name]: ns=''
++        if typ not in self.handlers[name]: typ=''
++        if typns not in self.handlers[name]: typns=''
+ 
+         chain=[]
+         for key in ['default',typ,ns,typns]: # we will use all handlers: from very common to very particular
+@@ -337,7 +343,7 @@ class Connection(xmlstream.Client):
+            have lower priority that common handlers.
+         """
+         if not type and not ns: type='default'
+-        if not self.handlers[name].has_key(type+ns): self.handlers[name][type+ns]=[]
++        if type+ns not in self.handlers[name]: self.handlers[name][type+ns]=[]
+         if makefirst: self.handlers[name][type+ns].insert({'chain':chained,'func':handler,'system':system})
+         else: self.handlers[name][type+ns].append({'chain':chained,'func':handler,'system':system})
+ 
+@@ -525,16 +531,23 @@ class Client(Connection):
+             token = auth_ret_query.getTag('token').getData()
+             seq = auth_ret_query.getTag('sequence').getData()
+             self.DEBUG("zero-k authentication supported",(DBG_INIT,DBG_NODE_IQ))
+-            hash = hashlib.new('sha1', hashlib.new('sha1', passwd).hexdigest()+token).hexdigest()
+-            for foo in xrange(int(seq)): hash = hashlib.new('sha1', hash).hexdigest()
++            # Unicode-objects must be encoded before hashing
++            if isinstance(passwd, UnicodeType):
++                pass_enc = passwd.encode('utf-8')
++            else:
++                pass_enc = passwd
++            hash = hashlib.new('sha1', hashlib.new('sha1', pass_enc).hexdigest()+token).hexdigest()
++            for foo in range(int(seq)): hash = hashlib.new('sha1', hash).hexdigest()
+             q.insertTag('hash').insertData(hash)
+ 
+         elif auth_ret_query.getTag('digest'):
+ 
+             self.DEBUG("digest authentication supported",(DBG_INIT,DBG_NODE_IQ))
+             digest = q.insertTag('digest')
+-            digest.insertData(hashlib.new('sha1',
+-                self.getIncomingID() + passwd).hexdigest() )
++            idp = self.getIncomingID() + passwd
++            if isinstance(idp, UnicodeType):
++                idp = idp.encode('uft-8')
++            digest.insertData(hashlib.new('sha1', idp).hexdigest() )
+         else:
+             self.DEBUG("plain text authentication supported",(DBG_INIT,DBG_NODE_IQ))
+             q.insertTag('password').insertData(passwd)
+@@ -729,7 +742,7 @@ class Protocol(xmlstream.Node):
+ 
+     def asNode(self):
+         """Back compartibility method"""
+-        print 'WARNING! "asNode()" method is obsolette, use Protocol object as Node object instead.'
++        print('WARNING! "asNode()" method is obsolette, use Protocol object as Node object instead.')
+         return self
+ 
+     def getError(self):
+@@ -822,7 +835,7 @@ class Protocol(xmlstream.Node):
+            XML document"""
+         x = self.setX(namespace)
+ 
+-        if type(payload) == type('') or type(payload) == type(u''):
++        if isinstance(payload, StringType):
+                 payload = xmlstream.NodeBuilder(payload).getDom()
+ 
+         x.kids = [] # should be a method for this realy
+@@ -961,7 +974,7 @@ class Message(Protocol):
+         return m
+ 
+     def build_reply(self, reply_txt=''):
+-        print "WARNING: build_reply method is obsolette. Use buildReply instead."
++        print("WARNING: build_reply method is obsolette. Use buildReply instead.")
+         return self.buildReply(reply_txt)
+ 
+ #############################################################################
+@@ -1059,7 +1072,7 @@ class Iq(Protocol):
+         if q is None:
+             q = self.insertTag('query')
+ 
+-        if type(payload) == type('') or type(payload) == type(u''):
++        if isinstance(payload, StringType):
+                 payload = xmlstream.NodeBuilder(payload).getDom()
+ 
+         if not add: q.kids = []
+@@ -1138,7 +1151,7 @@ class Roster:
+     def getStatus(self, jid): ## extended
+         """Returns the 'status' value for a Roster item with the given jid."""
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             return self._data[jid]['status']
+         return None
+ 
+@@ -1146,7 +1159,7 @@ class Roster:
+     def getShow(self, jid):   ## extended
+         """Returns the 'show' value for a Roster item with the given jid."""
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             return self._data[jid]['show']
+         return None
+ 
+@@ -1155,7 +1168,7 @@ class Roster:
+         """Returns the 'online' status for a Roster item with the given jid.
+            """
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             return self._data[jid]['online']
+         return None
+ 
+@@ -1164,7 +1177,7 @@ class Roster:
+         """Returns the 'subscription' status for a Roster item with the given
+            jid."""
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             return self._data[jid]['sub']
+         return None
+ 
+@@ -1172,7 +1185,7 @@ class Roster:
+     def getName(self,jid):
+         """Returns the 'name' for a Roster item with the given jid."""
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             return self._data[jid]['name']
+         return None
+ 
+@@ -1181,7 +1194,7 @@ class Roster:
+         """ Returns the lsit of groups associated with the given roster item.
+         """
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             return self._data[jid]['groups']
+         return None
+ 
+@@ -1189,7 +1202,7 @@ class Roster:
+     def getAsk(self,jid):
+         """Returns the 'ask' status for a Roster item with the given jid."""
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             return self._data[jid]['ask']
+         return None
+ 
+@@ -1233,7 +1246,7 @@ class Roster:
+         jid = ustr(jid) # just in case
+         online = 'offline'
+         if ask: online = 'pending'
+-        if self._data.has_key(jid): # update it
++        if jid in self._data: # update it
+             self._data[jid]['name'] = name
+             self._data[jid]['groups'] = groups
+             self._data[jid]['ask'] = ask
+@@ -1255,13 +1268,13 @@ class Roster:
+     def _setOnline(self,jid,val):
+         """Used internally - private"""
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             self._data[jid]['online'] = val
+             if self._listener != None:
+                 self._listener("update", jid, {'online' : val})
+         else:                      ## fall back
+             jid_basic = JID(jid).getStripped()
+-            if self._data.has_key(jid_basic):
++            if jid_basic in self._data:
+                 self._data[jid_basic]['online'] = val
+                 if self._listener != None:
+                     self._listener("update", jid_basic, {'online' : val})
+@@ -1270,13 +1283,13 @@ class Roster:
+     def _setShow(self,jid,val):
+         """Used internally - private"""
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             self._data[jid]['show'] = val
+             if self._listener != None:
+                 self._listener("update", jid, {'show' : val})
+         else:                      ## fall back
+             jid_basic = JID(jid).getStripped()
+-            if self._data.has_key(jid_basic):
++            if jid_basic in self._data:
+                 self._data[jid_basic]['show'] = val
+                 if self._listener != None:
+                     self._listener("update", jid_basic, {'show' : val})
+@@ -1285,13 +1298,13 @@ class Roster:
+     def _setStatus(self,jid,val):
+         """Used internally - private"""
+         jid = ustr(jid)
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             self._data[jid]['status'] = val
+             if self._listener != None:
+                 self._listener("update", jid, {'status' : val})
+         else:                      ## fall back
+             jid_basic = JID(jid).getStripped()
+-            if self._data.has_key(jid_basic):
++            if jid_basic in self._data:
+                 self._data[jid_basic]['status'] = val
+                 if self._listener != None:
+                     self._listener("update", jid_basic, {'status' : val})
+@@ -1299,7 +1312,7 @@ class Roster:
+ 
+     def _remove(self,jid):
+         """Used internally - private"""
+-        if self._data.has_key(jid):
++        if jid in self._data:
+             del self._data[jid]
+             if self._listener != None:
+                 self._listener("remove", jid, {})
+@@ -1397,8 +1410,11 @@ class Component(Connection):
+ 
+     def auth(self,secret):
+         """will disconnect on failure"""
++        idp = self.getIncomingID() + secret
++        if isinstance(idp, UnicodeType):
++            idp = idp.encode('uft-8')
+         self.send( u"<handshake id='1'>%s</handshake>"
+-                   % hashlib.new('sha1', self.getIncomingID() + secret ).hexdigest()
++                   % hashlib.new('sha1', idp).hexdigest()
+                   )
+         while not self._auth_OK:
+             self.DEBUG("waiting on handshake")
+diff --git jabberpy-0.5-0/jabber/xmlstream.py jabberpy-0.5-0/jabber/xmlstream.py
+index e8fdcab..7e72708 100644
+--- jabberpy-0.5-0/jabber/xmlstream.py
++++ jabberpy-0.5-0/jabber/xmlstream.py
+@@ -34,14 +34,21 @@ import time, sys, re, socket
+ from select import select
+ from base64 import encodestring
+ import xml.parsers.expat
+-import debug
++
++if sys.version_info[0] == 3:
++    from . import debug
++    UnicodeType = str
++    BytesType = bytes
++else:
++    BytesType = str
++    UnicodeType = unicode
++    import debug
++
++
+ _debug=debug
+ 
+ VERSION = "0.5"
+ 
+-False = 0
+-True  = 1
+-
+ TCP     = 1
+ STDIO   = 0
+ TCP_SSL = 2
+@@ -83,7 +90,7 @@ class Node:
+     """A simple XML DOM like class"""
+     def __init__(self, tag=None, parent=None, attrs={}, payload=[], node=None):
+         if node:
+-            if type(node)<>type(self): node=NodeBuilder(node).getDom()
++            if type(node) != type(self): node=NodeBuilder(node).getDom()
+             self.name,self.namespace,self.attrs,self.data,self.kids,self.parent = \
+                 node.name,node.namespace,node.attrs,node.data,node.kids,node.parent
+         else:
+@@ -244,7 +251,8 @@ class NodeBuilder:
+         self.__depth = 0
+         self._dispatch_depth = 1
+ 
+-        if data: self._parser.Parse(data,1)
++        if data:
++            self._parser.Parse(data.__str__(), 1)
+ 
+     def unknown_starttag(self, tag, attrs):
+         """XML Parser callback"""
+@@ -258,7 +266,7 @@ class NodeBuilder:
+             self._ptr.kids.append(Node(tag=tag,parent=self._ptr,attrs=attrs))
+             self._ptr = self._ptr.kids[-1]
+         else:                           ## it the stream tag:
+-            if attrs.has_key('id'):
++            if 'id' in attrs:
+                 self._incomingID = attrs['id']
+         self.last_is_data = False
+ 
+@@ -322,7 +330,7 @@ class Stream(NodeBuilder):
+                 try:
+                     self._logFH = open(log,'w')
+                 except:
+-                    print "ERROR: can open %s for writing" % log
++                    print("ERROR: can open %s for writing" % log)
+                     sys.exit(0)
+             else: ## assume its a stream type object
+                 self._logFH = log
+@@ -361,9 +369,9 @@ class Stream(NodeBuilder):
+            If supplied data is not unicode string, ENCODING
+            is used for convertion. Avoid this!
+            Always send your data as a unicode string."""
+-        if type(raw_data) == type(''):
++        if isinstance(raw_data, BytesType):
+             self.DEBUG('Non-utf-8 string "%s" passed to Stream.write! Treating it as %s encoded.'%(raw_data,ENCODING))
+-            raw_data = unicode(raw_data,ENCODING)
++            raw_data = UnicodeType(raw_data,ENCODING)
+         data_out = raw_data.encode('utf-8')
+         try:
+             self._write(data_out)
+@@ -469,7 +477,7 @@ class Client(Stream):
+             af, socktype, proto, canonname, sa = r
+             try:
+                 self._sock = socket.socket(af, socktype, proto)
+-            except socket.error, msg:
++            except socket.error:
+                 self._sock = None
+                 continue
+             try:
+@@ -477,7 +485,8 @@ class Client(Stream):
+                     self._sock.connect((self._proxy['host'], self._proxy['port']))
+                 else:
+                     self._sock.connect((self._hostIP, self._port))
+-            except socket.error, e:
++            except socket.error:
++                e = sys.exc_info()[1]
+                 self._sock.close()
+                 self._sock = None
+                 self.DEBUG("socket error: "+str(e),DBG_CONN_ERROR)
+@@ -501,7 +510,7 @@ class Client(Stream):
+ 
+         if self._proxy:
+             self.DEBUG("Proxy connected",DBG_INIT)
+-            if self._proxy.has_key('type'): type = self._proxy['type'].upper()
++            if 'type' in self._proxy: type = self._proxy['type'].upper()
+             else: type = 'CONNECT'
+             connector = []
+             if type == 'CONNECT':
+@@ -515,7 +524,7 @@ class Client(Stream):
+             connector.append('Pragma: no-cache')
+             connector.append('Host: %s:%s'%(self._hostIP,self._port))
+             connector.append('User-Agent: Jabberpy/'+VERSION)
+-            if self._proxy.has_key('user') and self._proxy.has_key('password'):
++            if 'user' in self._proxy and 'password' in self._proxy:
+                 credentials = '%s:%s'%(self._proxy['user'],self._proxy['password'])
+                 credentials = encodestring(credentials).strip()
+                 connector.append('Proxy-Authorization: Basic '+credentials)
+@@ -526,7 +535,7 @@ class Client(Stream):
+             self._read , self._write = bak
+             try: proto,code,desc=reply.split('\n')[0].split(' ',2)
+             except: raise error('Invalid proxy reply')
+-            if code<>'200': raise error('Invalid proxy reply: %s %s %s'%(proto,code,desc))
++            if code != '200': raise error('Invalid proxy reply: %s %s %s'%(proto,code,desc))
+             while reply.find('\n\n') == -1: reply += self.read().replace('\r','')
+ 
+         self.DEBUG("Jabber server connected",DBG_INIT)
+@@ -574,16 +583,16 @@ class Server:
+ 
+     def serve(self):
+ 
+-        print 'select-server loop starting'
++        print('select-server loop starting')
+ 
+         while 1:
+-            print "LOOPING"
++            print("LOOPING")
+             readables, writeables, exceptions = select(self.readsocks,
+                                                        self.writesocks, [])
+             for sockobj in readables:
+                 if sockobj in self. mainsocks:   # for ready input sockets
+                     newsock, address = sockobj.accept() # accept not block
+-                    print 'Connect:', address, id(newsock)
++                    print('Connect:', address, id(newsock))
+                     self.readsocks.append(newsock)
+                     self._makeNewStream(newsock)
+                     # add to select list, wait
+@@ -591,7 +600,7 @@ class Server:
+                     # client socket: read next line
+                     data = sockobj.recv(1024)
+                     # recv should not block
+-                    print '\tgot', data, 'on', id(sockobj)
++                    print('\tgot', data, 'on', id(sockobj))
+                     if not data:        # if closed by the clients
+                         sockobj.close() # close here and remv from
+                         self.readsocks.remove(sockobj)
+diff --git jabberpy-0.5-0/setup.py jabberpy-0.5-0/setup.py
+index 11f6f81..84c5369 100644
+--- jabberpy-0.5-0/setup.py
++++ jabberpy-0.5-0/setup.py
+@@ -5,14 +5,14 @@ try:
+     from distutils.core import setup
+ except:
+     if sys.version[0] < 2:
+-        print "jabber.py requires at least python 2.0"
+-        print "Setup cannot continue."
++        print("jabber.py requires at least python 2.0")
++        print("Setup cannot continue.")
+         sys.exit(1)
+-    print "You appear not to have the Python distutils modules"
+-    print "installed. Setup cannot continue."
+-    print "You can manually install jabberpy by coping the jabber"
+-    print "directory to your /python-libdir/site-packages"    
+-    print "directory."
++    print("You appear not to have the Python distutils modules")
++    print("installed. Setup cannot continue.")
++    print("You can manually install jabberpy by coping the jabber")
++    print("directory to your /python-libdir/site-packages")
++    print("directory.")
+     sys.exit(1)
+     
+ setup(name="jabber.py",

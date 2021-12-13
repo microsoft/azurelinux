@@ -1,0 +1,21 @@
+--- include/OMX_Types.h.orig 2011-01-12 08:53:26.000000000 +0100
++++ include/OMX_Types.h 2013-02-25 09:53:55.000000000 +0100
+@@ -314,6 +314,18 @@
+  *  platform & operating specific object used to reference the window */
+ typedef void* OMX_NATIVE_WINDOWTYPE;
+
++
++/** Define the OMX IL version that corresponds to this set of header files.
++ *  We also define a combined version that can be used to write or compare
++ *  values of the 32bit nVersion field, assuming a little endian architecture */
++#define OMX_VERSION_MAJOR 1
++#define OMX_VERSION_MINOR 1
++#define OMX_VERSION_REVISION 2
++#define OMX_VERSION_STEP 0
++
++#define OMX_VERSION ((OMX_VERSION_STEP<<24) | (OMX_VERSION_REVISION<<16) | (OMX_VERSION_MINOR<<8) | OMX_VERSION_MAJOR)
++
++
+ /** The OMX_VERSIONTYPE union is used to specify the version for
+     a structure or component.  For a component, the version is entirely
+     specified by the component vendor.  Components doing the same function
