@@ -105,7 +105,7 @@ Summary:        The PyPA recommended tool for installing Python packages.
 Group:          Development/Tools
 Requires:       %{name} = %{version}-%{release}
 Provides:       python3dist(pip) = %{version}-%{release}
-Provides:       python3.9dist(pip) = %{version}-%{release}
+Provides:       python%{majmin}dist(pip) = %{version}-%{release}
 BuildArch:      noarch
 
 %description    pip
