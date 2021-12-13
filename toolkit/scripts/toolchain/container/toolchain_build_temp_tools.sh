@@ -303,7 +303,7 @@ rm -rf gcc-11.2.0
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
 echo M4-1.4.19
-tar xf m4-1.4.19.tar.xz
+tar xf m4-1.4.19.tar.gz
 pushd m4-1.4.19
 ./configure --prefix=/tools
 make -j$(nproc)
