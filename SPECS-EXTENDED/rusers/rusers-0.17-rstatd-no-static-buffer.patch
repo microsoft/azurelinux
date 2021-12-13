@@ -1,0 +1,44 @@
+--- netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.buffer	Thu May 30 16:24:12 2002
++++ netkit-rusers-0.17/rpc.rstatd/rstat_proc.c	Thu May 30 16:59:13 2002
+@@ -402,14 +402,26 @@
+ {
+   static int stat;
+ #define	BUFFSIZE	1024
+-  char buff[BUFFSIZE];
++  char *buff = NULL;
++  off_t buffsize = 1;
+   int ndisks;
+   
+   if ((stat=open("/proc/stat", O_RDONLY, 0)) != -1) {
+     char* b;
+-    buff[BUFFSIZE-1] = 0;  /* ensure null termination in buffer */
+-    read(stat,buff,BUFFSIZE-1);
++    b = buff;
++
++    do {
++      buffsize += BUFFSIZE;
++      buff = realloc(buff, buffsize);
++      if (buff == NULL) {
++	perror("getstat(): realloc");
++	abort();
++      }
++      b = buff + buffsize - BUFFSIZE - 1;
++    } while (read(stat,b,BUFFSIZE) == BUFFSIZE);
+     close(stat);
++    buff[buffsize - 1] = '\0';
++    
+     *itot = 0; 
+     *i1 = 1;   /* ensure assert below will fail if the sscanf bombs */
+     b = strstr(buff, "cpu ");
+@@ -437,7 +449,10 @@
+     b = strstr(buff, "ctxt ");
+     if(b)
+     sscanf(b, "ctxt %u", ct);
+-    assert(*itot>*i1);
++    /* avoid breaking with certain kernels where all the
++       interrupt numbers have 1000000000 added to the value */
++    /*    assert(*itot>*i1); */
++    free(buff);
+   }
+ }
+ 

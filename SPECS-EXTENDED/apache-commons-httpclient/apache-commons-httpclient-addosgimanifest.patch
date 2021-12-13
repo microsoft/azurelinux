@@ -1,0 +1,31 @@
+--- MANIFEST.MF	2007-09-06 12:31:02.000000000 -0400
++++ MANIFEST.MF	2007-09-06 12:30:45.000000000 -0400
+@@ -3,4 +3,27 @@
+ Specification-Version: 1.0
+ Implementation-Vendor: Apache Software Foundation
+ Implementation-Version: @version@
+-
++Bundle-ManifestVersion: 2
++Bundle-Name: %bundleName
++Bundle-SymbolicName: org.apache.commons.httpclient
++Bundle-Version: 3.1.0.v20080605-1935
++Import-Package: javax.crypto;resolution:=optional,
++ javax.crypto.spec;resolution:=optional,
++ javax.net;resolution:=optional,
++ javax.net.ssl;resolution:=optional,
++ org.apache.commons.codec;version="[1.2.0,2.0.0)",
++ org.apache.commons.codec.binary;version="[1.2.0,2.0.0)",
++ org.apache.commons.codec.net;version="[1.2.0,2.0.0)",
++ org.apache.commons.logging;version="[1.0.4,2.0.0)"
++Export-Package: org.apache.commons.httpclient;version="3.1.0",
++ org.apache.commons.httpclient.auth;version="3.1.0",
++ org.apache.commons.httpclient.cookie;version="3.1.0",
++ org.apache.commons.httpclient.methods;version="3.1.0",
++ org.apache.commons.httpclient.methods.multipart;version="3.1.0",
++ org.apache.commons.httpclient.params;version="3.1.0",
++ org.apache.commons.httpclient.protocol;version="3.1.0",
++ org.apache.commons.httpclient.util;version="3.1.0"
++Bundle-Vendor: %bundleProvider
++Bundle-Localization: plugin
++Bundle-RequiredExecutionEnvironment: CDC-1.0/Foundation-1.0,
++ J2SE-1.2

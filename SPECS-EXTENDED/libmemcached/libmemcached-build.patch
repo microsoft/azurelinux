@@ -1,0 +1,60 @@
+diff -up ./clients/memflush.cc.old ./clients/memflush.cc
+--- ./clients/memflush.cc.old	2017-02-12 10:12:59.615209225 +0100
++++ ./clients/memflush.cc	2017-02-12 10:13:39.998382783 +0100
+@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
+ {
+   options_parse(argc, argv);
+ 
+-  if (opt_servers == false)
++  if (!opt_servers)
+   {
+     char *temp;
+ 
+@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
+       opt_servers= strdup(temp);
+     }
+ 
+-    if (opt_servers == false)
++    if (!opt_servers)
+     {
+       std::cerr << "No Servers provided" << std::endl;
+       exit(EXIT_FAILURE);
+diff -up ./clients/memaslap.c.old ./clients/memaslap.c
+--- ./clients/memaslap.c.old	2020-02-04 14:11:45.029205068 +0100
++++ ./clients/memaslap.c	2020-02-04 14:12:05.409115227 +0100
+@@ -32,6 +32,15 @@
+ #include "ms_setting.h"
+ #include "ms_thread.h"
+ 
++/* global structure */
++ms_global_t ms_global;
++
++/* global stats information structure */
++ms_stats_t ms_stats;
++
++/* global statistic structure */
++ms_statistic_t ms_statistic;
++
+ #define PROGRAM_NAME    "memslap"
+ #define PROGRAM_DESCRIPTION \
+                         "Generates workload against memcached servers."
+diff -up ./clients/ms_memslap.h.old ./clients/ms_memslap.h
+--- ./clients/ms_memslap.h.old	2020-02-04 14:11:50.072182835 +0100
++++ ./clients/ms_memslap.h	2020-02-04 14:12:13.268080586 +0100
+@@ -117,13 +117,13 @@ typedef struct global
+ } ms_global_t;
+ 
+ /* global structure */
+-ms_global_t ms_global;
++extern ms_global_t ms_global;
+ 
+ /* global stats information structure */
+-ms_stats_t ms_stats;
++extern ms_stats_t ms_stats;
+ 
+ /* global statistic structure */
+-ms_statistic_t ms_statistic;
++extern ms_statistic_t ms_statistic;
+ 
+ #ifdef __cplusplus
+ }

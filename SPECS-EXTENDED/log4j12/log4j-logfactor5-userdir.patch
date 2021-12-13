@@ -1,0 +1,50 @@
+Index: src/main/java/org/apache/log4j/lf5/viewer/configure/ConfigurationManager.java
+===================================================================
+--- src/main/java/org/apache/log4j/lf5/viewer/configure/ConfigurationManager.java.orig	2009-12-10 12:10:48.754263787 +0100
++++ src/main/java/org/apache/log4j/lf5/viewer/configure/ConfigurationManager.java	2009-12-10 12:10:53.073264414 +0100
+@@ -340,7 +340,7 @@
+     String home = System.getProperty("user.home");
+     String sep = System.getProperty("file.separator");
+ 
+-    return home + sep + "lf5" + sep + CONFIG_FILE_NAME;
++    return home + sep + ".logfactor5" + sep + CONFIG_FILE_NAME;
+   }
+ 
+   //--------------------------------------------------------------------------
+Index: src/main/java/org/apache/log4j/lf5/viewer/configure/MRUFileManager.java
+===================================================================
+--- src/main/java/org/apache/log4j/lf5/viewer/configure/MRUFileManager.java.orig	2009-12-10 12:10:48.755263943 +0100
++++ src/main/java/org/apache/log4j/lf5/viewer/configure/MRUFileManager.java	2009-12-10 12:10:53.074264009 +0100
+@@ -167,14 +167,14 @@
+ 
+   /**
+    * Creates the directory where the MRU file list will be written.
+-   * The "lf5" directory is created in the Documents and Settings
++   * The ".logfactor5" directory is created in the Documents and Settings
+    * directory on Windows 2000 machines and where ever the user.home
+    * variable points on all other platforms.
+    */
+   public static void createConfigurationDirectory() {
+     String home = System.getProperty("user.home");
+     String sep = System.getProperty("file.separator");
+-    File f = new File(home + sep + "lf5");
++    File f = new File(home + sep + ".logfactor5");
+     if (!f.exists()) {
+       try {
+         f.mkdir();
+@@ -260,7 +260,7 @@
+     String home = System.getProperty("user.home");
+     String sep = System.getProperty("file.separator");
+ 
+-    return home + sep + "lf5" + sep + CONFIG_FILE_NAME;
++    return home + sep + ".logfactor5" + sep + CONFIG_FILE_NAME;
+   }
+ 
+   /**
+@@ -282,4 +282,4 @@
+   //--------------------------------------------------------------------------
+   //   Nested Top-Level Classes or Interfaces
+   //--------------------------------------------------------------------------
+-}
+\ No newline at end of file
++}

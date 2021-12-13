@@ -1,0 +1,85 @@
+From 01419dfb684d501b57f1c24dcfdbcf9da93ccca2 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Fri, 4 Apr 2014 18:12:47 +0200
+Subject: [PATCH 06/27] scritps: use change_resolv_conf function
+
+Don't handle /etc/resolv.conf manually, but use a helper function from
+initscripts. Also change path where we save DNS servers supplied by peer while
+we are at it.
+
+Resolves: #132482
+---
+ pppd/pppd.8               |  2 +-
+ scripts/ip-down.local.add |  9 +++++----
+ scripts/ip-up.local.add   | 17 ++++++++++-------
+ 3 files changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/pppd/pppd.8 b/pppd/pppd.8
+index e2768b1..2dd6e1a 100644
+--- a/pppd/pppd.8
++++ b/pppd/pppd.8
+@@ -1099,7 +1099,7 @@ Ask the peer for up to 2 DNS server addresses.  The addresses supplied
+ by the peer (if any) are passed to the /etc/ppp/ip\-up script in the
+ environment variables DNS1 and DNS2, and the environment variable
+ USEPEERDNS will be set to 1.  In addition, pppd will create an
+-/etc/ppp/resolv.conf file containing one or two nameserver lines with
++/var/run/ppp/resolv.conf file containing one or two nameserver lines with
+ the address(es) supplied by the peer.
+ .TP
+ .B user \fIname
+diff --git a/scripts/ip-down.local.add b/scripts/ip-down.local.add
+index b93590e..163f71e 100644
+--- a/scripts/ip-down.local.add
++++ b/scripts/ip-down.local.add
+@@ -9,12 +9,13 @@
+ #
+ # Nick Walker (nickwalker@email.com)
+ #
++. /etc/sysconfig/network-scripts/network-functions
+ 
+-if [ -n "$USEPEERDNS" -a -f /etc/ppp/resolv.conf ]; then
+-	if [ -f /etc/ppp/resolv.prev ]; then
+-		cp -f /etc/ppp/resolv.prev /etc/resolv.conf
++if [ -n "$USEPEERDNS" -a -f /var/run/ppp/resolv.conf ]; then
++	if [ -f /var/run/ppp/resolv.prev ]; then
++		change_resolv_conf /var/run/ppp/resolv.prev
+ 	else
+-		rm -f /etc/resolv.conf
++		change_resolv_conf
+ 	fi
+ fi
+ 
+diff --git a/scripts/ip-up.local.add b/scripts/ip-up.local.add
+index 8017209..26cf5f8 100644
+--- a/scripts/ip-up.local.add
++++ b/scripts/ip-up.local.add
+@@ -9,16 +9,19 @@
+ #
+ # Nick Walker (nickwalker@email.com)
+ #
++. /etc/sysconfig/network-scripts/network-functions
+ 
+-if [ -n "$USEPEERDNS" -a -f /etc/ppp/resolv.conf ]; then
+-	rm -f /etc/ppp/resolv.prev
++if [ -n "$USEPEERDNS" -a -f /var/run/ppp/resolv.conf ]; then
++	rm -f /var/run/ppp/resolv.prev
+ 	if [ -f /etc/resolv.conf ]; then
+-		cp /etc/resolv.conf /etc/ppp/resolv.prev
+-		grep domain /etc/ppp/resolv.prev > /etc/resolv.conf
+-		grep search /etc/ppp/resolv.prev >> /etc/resolv.conf
+-		cat /etc/ppp/resolv.conf >> /etc/resolv.conf
++		cp /etc/resolv.conf /var/run/ppp/resolv.prev
++		rscf=/var/run/ppp/resolv.new
++		grep domain /var/run/ppp/resolv.prev > $rscf
++		grep search /var/run/ppp/resolv.prev >> $rscf
++		change_resolv_conf $rscf
++		rm -f $rscf
+ 	else
+-		cp /etc/ppp/resolv.conf /etc
++		change_resolv_conf /var/run/ppp/resolv.conf
+ 	fi
+ fi
+ 
+-- 
+1.8.3.1
+

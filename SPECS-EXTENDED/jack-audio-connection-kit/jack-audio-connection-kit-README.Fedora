@@ -1,0 +1,144 @@
+	USING ALSA DIRECTLY
+
+Switch to root account.
+
+Install the required packages:
+    dnf install alsa-plugins-jack
+
+Add yourself to the jackuser group.
+    usermod -a -G audio,jackuser "<your username>"
+Now you will need to log out and log back in, or simply restart the system.
+
+Start the jack daemon (the best parameters for your sound card may be different):
+    jackd -R -d alsa -d hw:0
+This will start jack on the first sound card, at 48KHz sampling rate (can be 
+changed with the "-r" command line parameter), with a period of 1024 frames 
+(change with "-p", determines the latency) and with 2 interrupts per period 
+(change with -n). USB sound cards can benefit from running with "-n 3" or
+"-n 4". All of these optional parameters should be specified after "-d alsa".
+
+It is best to replace the card number with the card name as the numbering can
+change from boot to boot if there is more than one sound card. The name of a
+particular card can be found in the output of "cat /proc/asound/cards", for each
+card it is the string between square brackets without the trailing blanks.
+
+Note: Jack is a sound server and not a daemon - while it does work "in the 
+background" it is not something similar to unix daemons which are started at
+boot time.
+
+
+	QJACKCTL
+
+This application can be used to control the jack sound server with a graphical
+interface. It can be started via
+    qjackctl -s
+"-s" parameter makes the jack sound server start immediately.
+
+When starting jack through qjackctl it is important to note that you should (at
+least) change the "Interface" field in the "Setup" dialog to _not_ be "(default)"
+which would point Jack to use Pulse Audio. The proper "Interface" is the direct
+hw ALSA device (hw:0 for the first card, etc). Even best to use the name of the
+card as stated above.
+
+
+    USING THE JACK DBUS INTERFACE
+
+Control applications such as qjackctl can be configured to interact with the jack
+sound server using D-Bus. This has the advantage of allowing jack to request the
+release of the sound device from Pulseaudio (see below).
+
+jackdbus is shipped in a separate package. To install this (as root) do:
+
+    dnf install jack-audio-connection-kit-dbus
+
+and check "Enable D-Bus interface" in Setup -> Misc within Qjackctl
+
+
+	INTEGRATE JACK WITH PULSEAUDIO
+
+Jack will ask Pulse Audio through D-Bus for ownership of the sound card. Pulse
+Audio will grant it and Jack will have complete control of it. No conflicts and
+no configuration necessary. In this case Pulse Audio will stop using the card
+and if it is the only one, you will not have sound for system sounds, browser
+media playback, etc (which is usually what you want). Otherwise it is possible
+to load a Pulse Audio module that redirects PA to use Jack.
+
+
+
+
+	RUNNING JACK SERVER IN REALTIME MODE
+
+NOTE: This chapter explains why you have done the above changes in more detail.
+It is kept for informational purposes. The changes suggested below is done
+automatically by your Jack installation and no manual modification of the
+pam configuration should be necessary.
+
+
+The JACK server jackd has the capability to run in a real-time mode
+which greatly decreases the chance of audio glitches. The real-time mode
+is enabled by passing the -R or --realtime option to jackd when starting
+the server. It is only possible to run jackd in real-time mode as a
+non-root user by modifying your PAM configuration, PAM stands for
+Pluggable Authentication Modules and is the primary authentification
+mechanism used on Fedora. The primary source of PAM documentation can be
+found at the following at http://www.kernel.org/pub/linux/libs/pam/
+
+The specific PAM configuration file that needs to be modified is
+/etc/security/limits.conf and it controls the system resource limits. It
+is important to understand that modifying the resource limits
+configuration files can decrease the security of your system.
+Documentation specific to the resource limits PAM module can be found at
+http://www.kernel.org/pub/linux/libs/pam/Linux-PAM-html/pam-6.html#ss6.12
+
+Alternatively, one can create a new file 
+   /etc/security/limits.d/<priority>-<name>.conf
+that contains the resource limits for individual users and/or groups. The
+jack-audio-connection-kit package that comes with Fedora contains the file
+   /etc/security/limits.d/99-jack.conf
+that does this job for you.
+
+The resource limits that need to be changed to allow jackd to run in
+realtime mode are named rtprio and memlock. To increase the limits for a
+specific user named fred you would add the following to
+/etc/security/limits.conf
+
+fred - rtprio 20
+fred - memlock 50000
+
+The value of rtprio can be set in the range 0 - 99 where any value
+greater that 0 will allow the user to change the scheduling policy to
+"real-time". By default the JACK server requires a minimum rtprio
+setting of 20 but jackd will accept a command line parameter -P or
+--realtime-priority which will change the minimum required value of
+rtprio that is needed, but the default of 20 is nearly always
+sufficient.
+
+The appropriate value for memlock is dependent on the amount of memory
+present in the system but a minimum value of 50000(50MB) and a maximum
+value of half the available memory can be used as a rough guideline. 
+
+To verify that the resource limits have been modified you can use the
+bash built-in ulimit command, for example:
+
+$ulimit -a
+core file size          (blocks, -c) 0
+data seg size           (kbytes, -d) unlimited
+max nice                        (-e) 0
+file size               (blocks, -f) unlimited
+pending signals                 (-i) 8191
+max locked memory       (kbytes, -l) 50000
+max memory size         (kbytes, -m) unlimited
+open files                      (-n) 1024
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+max rt priority                 (-r) 20
+stack size              (kbytes, -s) 10240
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 8191
+virtual memory          (kbytes, -v) unlimited
+file locks                      (-x) unlimited
+file locks                      (-x) unlimited
+
+Keep in mind that you may have to re-login before changes to limits.conf,
+or additions to the limits.d/ directory to take effect.
+

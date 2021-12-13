@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "LICENSE-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+  "generate-tarball.sh": "271f74962d0e381a9277d315fd08f60f0ab9c17eb49cbdea97605d8e354e553b",
+  "plexus-java-build.xml": "8dbbda4539e6139d74528f8e61c8e627975d55b89672711ce88ecd39148d5f47",
+  "plexus-languages-1.0.3.tar.xz": "300bd9b38fdc7ac44ef0c2e4d2ffb75a80878486736785967610e74def6eebba"
+ }
+}

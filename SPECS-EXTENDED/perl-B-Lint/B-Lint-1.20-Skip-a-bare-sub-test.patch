@@ -1,0 +1,68 @@
+From d350b6338066d2563b4abacf1eb7da56c5264b22 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 12 Jun 2015 13:27:07 +0200
+Subject: [PATCH] Skip a bare-sub test
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Perl 5.22 optimization causes B::Lint not to recognize $a{b} for
+bare-sub check. This patch document this deficency and skips a test
+for it.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/B/Lint.pm |  4 ++++
+ t/lint.t      | 11 +++++++++--
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/lib/B/Lint.pm b/lib/B/Lint.pm
+index 1f5098f..7291b18 100644
+--- a/lib/B/Lint.pm
++++ b/lib/B/Lint.pm
+@@ -85,6 +85,10 @@ trap are:
+ 
+ Neither of these will do what a naive user would expect.
+ 
++Notice: Perl 5.22.0 does not report C<foo> in C<$b{foo}> as BARE token
++anymore. Therefore L<B::Lint> test is not reliable here. See
++L<CPAN RT#101115|https://rt.cpan.org/Public/Bug/Display.html?id=101115>.
++
+ =item B<dollar-underscore>
+ 
+ This option warns whenever C<$_> is used either explicitly anywhere or
+diff --git a/t/lint.t b/t/lint.t
+index 7317b1d..93255d9 100644
+--- a/t/lint.t
++++ b/t/lint.t
+@@ -14,7 +14,7 @@ BEGIN {
+ use strict;
+ use warnings;
+ 
+-plan tests => 29;
++plan tests => 30;
+ 
+ # Runs a separate perl interpreter with the appropriate lint options
+ # turned on
+@@ -116,10 +116,17 @@ RESULT
+ 
+ runlint 'bare-subs', 'sub bare(){1};$x=bare', '';
+ 
+-runlint 'bare-subs', 'sub bare(){1}; $x=[bare=>0]; $x=$y{bare}', <<'RESULT';
++runlint 'bare-subs', 'sub bare(){1}; $x=[bare=>0]', <<'RESULT';
+ Bare sub name 'bare' interpreted as string at -e line 1
++RESULT
++
++SKIP: {
++    skip 'Perl 5.22 stopped marking $hash{bare} as BARE word, CPAN RT#101115',
++        1, if $] >= 5.022;
++    runlint 'bare-subs', 'sub bare(){1}; $x=$y{bare}', <<'RESULT';
+ Bare sub name 'bare' interpreted as string at -e line 1
+ RESULT
++}
+ 
+ {
+ 
+-- 
+2.1.0
+

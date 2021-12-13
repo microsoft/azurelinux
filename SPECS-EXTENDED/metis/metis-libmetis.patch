@@ -1,0 +1,20 @@
+--- libmetis/CMakeLists.orig.txt	2011-06-22 19:47:13.000000000 +0200
++++ libmetis/CMakeLists.txt	2013-03-15 17:13:19.948911972 +0100
+@@ -4,13 +4,14 @@
+ file(GLOB metis_sources *.c)
+ # Build libmetis.
+ add_library(metis ${METIS_LIBRARY_TYPE} ${GKlib_sources} ${metis_sources})
++set_target_properties(metis PROPERTIES SOVERSION 0)
+ if(UNIX)
+   target_link_libraries(metis m)
+ endif()
+ 
+ if(METIS_INSTALL)
+   install(TARGETS metis
+-    LIBRARY DESTINATION lib
+-    RUNTIME DESTINATION lib
+-    ARCHIVE DESTINATION lib)
++    LIBRARY DESTINATION lib${LIB_SUFFIX}
++    RUNTIME DESTINATION lib${LIB_SUFFIX}
++    ARCHIVE DESTINATION lib${LIB_SUFFIX})
+ endif()

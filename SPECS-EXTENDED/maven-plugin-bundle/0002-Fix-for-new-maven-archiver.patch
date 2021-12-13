@@ -1,0 +1,25 @@
+From 17a505c7c7924540f9636e3cd2700cc25a59447e Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Thu, 14 Apr 2016 17:00:23 +0100
+Subject: [PATCH 2/4] Fix for new maven archiver
+
+---
+ src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java b/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
+index 3e4384e..a42d6ef 100644
+--- a/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
++++ b/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
+@@ -1104,7 +1104,7 @@ public class BundlePlugin extends AbstractMojo
+              * Grab customized manifest entries from the maven-jar-plugin configuration
+              */
+             MavenArchiveConfiguration archiveConfig = JarPluginConfiguration.getArchiveConfiguration( currentProject );
+-            String mavenManifestText = new MavenArchiver().getManifest( currentProject, archiveConfig ).toString();
++            String mavenManifestText = new MavenArchiver().getManifest( m_mavenSession, currentProject, archiveConfig ).toString();
+             addMavenDescriptor = addMavenDescriptor && archiveConfig.isAddMavenDescriptor();
+ 
+             Manifest mavenManifest = new Manifest();
+-- 
+2.14.3
+

@@ -1,0 +1,170 @@
+From 5f2d519d8872cb68fe4bc1571e4b070e88a7a405 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Tue, 12 Mar 2019 12:38:30 +0000
+Subject: [PATCH] Port to using python 3 for use in the test framework
+
+---
+ Makefile.am          |  8 ++++----
+ gencert.in           |  2 +-
+ test/test.py         |  8 --------
+ test/test_config.py  | 16 ++++++++--------
+ test/test_request.py |  3 +--
+ test/test_util.py    |  9 +++++++--
+ 6 files changed, 21 insertions(+), 25 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2009060..1946d00 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -100,14 +100,14 @@ EXTRA_DIST = *.h *.8 LICENSE test docs
+ check:
+ 	cd test;	\
+ 	rm -rf work;	\
+-	nosetests -v test_cipher.py;	\
++	nosetests-3 -v test_cipher.py;	\
+ 	if [ `id -u` != 0 ]; then	\
+ 	./setup.sh -s 1 dbm:;	\
+-	DBPREFIX=dbm: nosetests -v test.py;	\
++	DBPREFIX=dbm: nosetests-3 -v test.py;	\
+ 	sleep 5;	\
+ 	rm -rf work;	\
+ 	./setup.sh -s 1 sql:;	\
+-	DBPREFIX=sql: nosetests -v test.py;	\
++	DBPREFIX=sql: nosetests-3 -v test.py;	\
+ 	cd ..;	\
+ 	else	\
+ 	echo "Skipping live tests as they cannot be run as root";	\
+@@ -117,7 +117,7 @@ checksni:
+ 	cd test;	\
+ 	rm -rf work;	\
+ 	./setup.sh -s 25;	\
+-	nosetests -v testsni.py;	\
++	nosetests-3 -v testsni.py;	\
+ 	cd ..
+ 
+ 
+diff --git a/gencert.in b/gencert.in
+index d119f04..9418025 100755
+--- a/gencert.in
++++ b/gencert.in
+@@ -38,7 +38,7 @@ getFQDN() {
+                 echo $maxhost
+                 return
+         fi
+-        hostname=$(python -c 'import socket; print(socket.getfqdn())')
++        hostname=$(python3 -c 'import socket; print(socket.getfqdn())')
+         if [ $? == 0 ]; then
+             echo $hostname
+             return
+diff --git a/test/test.py b/test/test.py
+index 20fd3d2..1b2cb66 100644
+--- a/test/test.py
++++ b/test/test.py
+@@ -221,14 +221,6 @@ class test_suite1(Declarative):
+             expected=200,
+         ),
+ 
+-        dict(
+-            desc='Try SSLv3 client on 1.2-only VH',
+-            request=('/protocoltls12/index.html',
+-                     {'port': 8001,
+-                      'ssl_version': ssl.PROTOCOL_SSLv3}),
+-            expected=requests.exceptions.SSLError(),
+-        ),
+-
+         dict(
+             desc='Try TLSv1 client on 1.2-only VH',
+             request=('/protocoltls12/index.html',
+diff --git a/test/test_config.py b/test/test_config.py
+index f3091e8..749d041 100644
+--- a/test/test_config.py
++++ b/test/test_config.py
+@@ -61,7 +61,8 @@ def template_file(infilename, vars):
+ 
+ def write_template_file(infilename, outfilename, vars):
+     """Read a file and perform template substitutions"""
+-    replacevars = dict(default_vars.items() + vars.items())
++    replacevars = dict(default_vars.items())
++    replacevars.update(vars.items())
+     with open(outfilename, 'w') as f:
+         f.write('%s\n' % template_file(infilename, replacevars))
+ 
+@@ -171,17 +172,16 @@ class Declarative(object):
+         name = klass.__name__
+         try:
+             output = self.make_request(uri, options)
+-        except StandardError, e:
+-            pass
++        except Exception as e:
++            if not isinstance(e, klass):
++                if expected_str not in str(e):
++                    raise AssertionError(
++                        UNEXPECTED % (uri, name, options, e.__class__.__name__, e)
++                    )
+         else:
+             raise AssertionError(
+                 EXPECTED % (uri, name, options, output)
+             )
+-        if not isinstance(e, klass):
+-            if expected_str not in str(e):
+-                raise AssertionError(
+-                    UNEXPECTED % (uri, name, options, e.__class__.__name__, e)
+-                )
+ 
+     def check_result(self, nice, uri, options, expected, cipher=None,
+                      protocol=None, content=None):
+diff --git a/test/test_request.py b/test/test_request.py
+index 8b6dae2..6235e6f 100644
+--- a/test/test_request.py
++++ b/test/test_request.py
+@@ -3,7 +3,6 @@
+ 
+ import socket
+ import requests
+-import urlparse
+ import logging
+ import socket
+ from requests.packages.urllib3.util import get_host
+@@ -227,7 +226,7 @@ try:
+               'ssl_version': ssl.PROTOCOL_SSLv23,
+               'ciphers': 'HIGH'})
+     cipher = r.raw._pool._get_conn().client_cipher
+-except requests.exceptions.SSLError, e:
++except requests.exceptions.SSLError as e:
+     print e.message
+ else:
+     print r.status_code
+diff --git a/test/test_util.py b/test/test_util.py
+index 101b6a2..95144fc 100644
+--- a/test/test_util.py
++++ b/test/test_util.py
+@@ -1,3 +1,4 @@
++import locale
+ import socket
+ import time
+ import subprocess
+@@ -24,7 +25,7 @@ def host_port_open(host, port, socket_type=socket.SOCK_STREAM,
+                 s.recv(512)
+ 
+             return True
+-        except socket.error, e:
++        except socket.error:
+             pass
+         finally:
+             if s:
+@@ -81,7 +82,11 @@ def run(args):
+         p.wait()
+         raise
+ 
+-    return (stdout, stderr, p.returncode)
++    encoding = locale.getpreferredencoding()
++    output = stdout.decode(encoding)
++    error_output = stderr.decode(encoding)
++
++    return (output, error_output, p.returncode)
+ 
+ 
+ def assert_equal(got, expected):
+-- 
+2.20.1
+

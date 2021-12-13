@@ -1,0 +1,68 @@
+Upstream didn't accepted this patch and only replied that user should fix
+the configuration. Since we believe that even if configuration is wrong,
+program (especially daemon) shouldn't crash with segfault, we rather fix
+this on our own to print a nice error when level of recursion exceeds 128.
+
+diff -up ypserv-2.31/revnetgroup/getnetgrent.c.recursive ypserv-2.31/revnetgroup/getnetgrent.c
+--- ypserv-2.31/revnetgroup/getnetgrent.c.recursive	2013-05-17 12:37:08.143675080 +0200
++++ ypserv-2.31/revnetgroup/getnetgrent.c	2013-05-17 14:20:49.376566354 +0200
+@@ -31,6 +31,8 @@
+ 
+ #include "hash.h"
+ 
++#define NETGROUPENTRY_RECURSION_LIMIT 128
++
+ extern hash_t *input;
+ 
+ void rev_setnetgrent (const char *);
+@@ -53,7 +55,7 @@ struct netgrlist
+   };
+ 
+ 
+-static void rev_expand_netgroupentry (const char *, struct netgrlist *);
++static void rev_expand_netgroupentry (const char *, struct netgrlist *, int level);
+ static void rev_parse_entry (char *, char *, struct netgrlist *);
+ static void rev_netgr_free (struct netgrlist *);
+ static struct netgrlist list = {0, 0, NULL};
+@@ -83,7 +85,7 @@ rev_setnetgrent (const char *netgr)
+     {
+       rev_endnetgrent ();
+       netgroup = strdup (netgr);
+-      rev_expand_netgroupentry (netgr, &list);
++      rev_expand_netgroupentry (netgr, &list, 0);
+     }
+   first = 1;
+ }
+@@ -141,7 +143,7 @@ rev_netgr_free (struct netgrlist *list)
+ }
+ 
+ static void
+-rev_expand_netgroupentry (const char *netgr, struct netgrlist *list)
++rev_expand_netgroupentry (const char *netgr, struct netgrlist *list, int level)
+ {
+   char *outval = NULL;
+   char *outptr = NULL;
+@@ -156,6 +158,14 @@ rev_expand_netgroupentry (const char *ne
+   if (outptr == NULL)
+     return;
+ 
++  /* check the recursion - return if we exceed the recursion limit */
++  if (level >= NETGROUPENTRY_RECURSION_LIMIT)
++    {
++      fprintf (stderr, "WARNING: level of recursion in netgroup %s reached"
++	       "%d, entry ignored\n", netgr, NETGROUPENTRY_RECURSION_LIMIT);
++      return;
++    }
++
+   /* make a copy to work with */
+   outval = strdup (outptr);
+   if (outval == NULL)
+@@ -198,7 +208,7 @@ rev_expand_netgroupentry (const char *ne
+ 	  *end = '\0';
+ 
+ 	  /* recursion */
+-	  rev_expand_netgroupentry (start, list);
++	  rev_expand_netgroupentry (start, list, level+1);
+ 	}
+ 
+       /* skip to the next entry */

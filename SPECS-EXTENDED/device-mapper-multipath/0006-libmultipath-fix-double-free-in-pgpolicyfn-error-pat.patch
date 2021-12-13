@@ -1,0 +1,79 @@
+From 3209740e5a3e80b5f76dbc2ddaa63f2045aafd53 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Tue, 2 Jul 2019 17:30:32 -0500
+Subject: [PATCH] libmultipath: fix double free in pgpolicyfn error paths
+
+In the pgpolicy functions, if an error is encountered after
+alloc_pathgroup() is called, but before the path group is added to a
+multipath device with add_pathgroup(), the pathgroup needs to be cleaned
+up by calling free_pathgroup(). However, after the pathgroup has been
+added to the multipath device, calling free_pgvec() will clean it up. In
+this case, if free_pathgroup() is called first, the recently added
+pathgroup will be freed twice.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/pgpolicies.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/libmultipath/pgpolicies.c b/libmultipath/pgpolicies.c
+index 1b59485c..1af42f52 100644
+--- a/libmultipath/pgpolicies.c
++++ b/libmultipath/pgpolicies.c
+@@ -139,7 +139,7 @@ int group_by_node_name(struct multipath * mp)
+ 
+ 		/* feed the first path */
+ 		if (store_path(pgp->paths, pp))
+-			goto out2;
++			goto out1;
+ 
+ 		bitmap[i] = 1;
+ 
+@@ -153,7 +153,7 @@ int group_by_node_name(struct multipath * mp)
+ 			if (!strncmp(pp->tgt_node_name, pp2->tgt_node_name,
+ 					NODE_NAME_SIZE)) {
+ 				if (store_path(pgp->paths, pp2))
+-					goto out2;
++					goto out1;
+ 
+ 				bitmap[j] = 1;
+ 			}
+@@ -206,7 +206,7 @@ int group_by_serial(struct multipath * mp)
+ 
+ 		/* feed the first path */
+ 		if (store_path(pgp->paths, pp))
+-			goto out2;
++			goto out1;
+ 
+ 		bitmap[i] = 1;
+ 
+@@ -219,7 +219,7 @@ int group_by_serial(struct multipath * mp)
+ 
+ 			if (0 == strcmp(pp->serial, pp2->serial)) {
+ 				if (store_path(pgp->paths, pp2))
+-					goto out2;
++					goto out1;
+ 
+ 				bitmap[j] = 1;
+ 			}
+@@ -254,7 +254,7 @@ int one_path_per_group(struct multipath *mp)
+ 			goto out1;
+ 
+ 		if (store_path(pgp->paths, pp))
+-			goto out1;
++			goto out;
+ 	}
+ 	return 0;
+ out1:
+@@ -358,7 +358,7 @@ int group_by_prio(struct multipath *mp)
+ 		vector_foreach_slot(pathvec, pp, i) {
+ 			if (pp->priority == prio) {
+ 				if (store_path(pgp->paths, pp))
+-					goto out2;
++					goto out1;
+ 
+ 				vector_del_slot(pathvec, i);
+ 				i--;
+-- 
+2.17.2
+

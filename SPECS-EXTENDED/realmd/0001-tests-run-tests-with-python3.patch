@@ -1,0 +1,374 @@
+From c257850912897a07e20f205faecf3c1b692fa9e9 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Wed, 4 Jul 2018 16:41:16 +0200
+Subject: [PATCH] tests: run tests with python3
+
+To allow the test to run with python3 build/tap-driver and
+build/tap-gtester are updated to the latest version provided by the
+cockpit project https://github.com/cockpit-project/cockpit.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1595813
+---
+ build/tap-driver  | 104 +++++++++++++++++++++++++++++++++++++++++++-----------
+ build/tap-gtester |  59 ++++++++++++++++++++++---------
+ 2 files changed, 125 insertions(+), 38 deletions(-)
+
+diff --git a/build/tap-driver b/build/tap-driver
+index 42f57c8..241fd50 100755
+--- a/build/tap-driver
++++ b/build/tap-driver
+@@ -1,4 +1,5 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
++# This can also be run with Python 2.
+ 
+ # Copyright (C) 2013 Red Hat, Inc.
+ #
+@@ -29,20 +30,58 @@
+ #
+ 
+ import argparse
++import fcntl
+ import os
+ import select
++import struct
+ import subprocess
+ import sys
++import termios
++import errno
++
++_PY3 = sys.version[0] >= '3'
++_str = _PY3 and str or unicode
++
++def out(data, stream=None, flush=False):
++    if not isinstance(data, bytes):
++        data = data.encode("UTF-8")
++    if not stream:
++        stream = _PY3 and sys.stdout.buffer or sys.stdout
++    while True:
++        try:
++            if data:
++                stream.write(data)
++            data = None
++            if flush:
++                stream.flush()
++            flush = False
++            break
++        except IOError as e:
++            if e.errno == errno.EAGAIN:
++                continue
++            raise
++
++def terminal_width():
++    try:
++        h, w, hp, wp = struct.unpack('HHHH',
++            fcntl.ioctl(1, termios.TIOCGWINSZ,
++            struct.pack('HHHH', 0, 0, 0, 0)))
++        return w
++    except IOError as e:
++        if e.errno != errno.ENOTTY:
++            sys.stderr.write("%i %s %s\n" % (e.errno, e.strerror, sys.exc_info()))
++        return sys.maxsize
+ 
+ class Driver:
+     def __init__(self, args):
+         self.argv = args.command
+         self.test_name = args.test_name
+-        self.log = open(args.log_file, "w")
+-        self.log.write("# %s\n" % " ".join(sys.argv))
++        self.log = open(args.log_file, "wb")
++        self.log.write(("# %s\n" % " ".join(sys.argv)).encode("UTF-8"))
+         self.trs = open(args.trs_file, "w")
+         self.color_tests = args.color_tests
+         self.expect_failure = args.expect_failure
++        self.width = terminal_width() - 9
+ 
+     def report(self, code, *args):
+         CODES = {
+@@ -57,17 +96,18 @@ class Driver:
+         # Print out to console
+         if self.color_tests:
+             if code in CODES:
+-                sys.stdout.write(CODES[code])
+-        sys.stdout.write(code)
++                out(CODES[code])
++        out(code)
+         if self.color_tests:
+-            sys.stdout.write('\x1b[m')
+-        sys.stdout.write(": ")
+-        sys.stdout.write(self.test_name)
+-        sys.stdout.write(" ")
+-        for arg in args:
+-            sys.stdout.write(str(arg))
+-        sys.stdout.write("\n")
+-        sys.stdout.flush()
++            out('\x1b[m')
++        out(": ")
++        msg = "".join([ self.test_name + " " ] + list(map(_str, args)))
++        if code == "PASS" and len(msg) > self.width:
++            out(msg[:self.width])
++            out("...")
++        else:
++            out(msg)
++        out("\n", flush=True)
+ 
+         # Book keeping
+         if code in CODES:
+@@ -100,12 +140,14 @@ class Driver:
+     def execute(self):
+         try:
+             proc = subprocess.Popen(self.argv, close_fds=True,
++                                    stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE)
+-        except OSError, ex:
++        except OSError as ex:
+             self.report_error("Couldn't run %s: %s" % (self.argv[0], str(ex)))
+             return
+ 
++        proc.stdin.close()
+         outf = proc.stdout.fileno()
+         errf = proc.stderr.fileno()
+         rset = [outf, errf]
+@@ -113,18 +155,25 @@ class Driver:
+             ret = select.select(rset, [], [], 10)
+             if outf in ret[0]:
+                 data = os.read(outf, 1024)
+-                if data == "":
++                if data == b"":
+                     rset.remove(outf)
+                 self.log.write(data)
+                 self.process(data)
+             if errf in ret[0]:
+                 data = os.read(errf, 1024)
+-                if data == "":
++                if data == b"":
+                     rset.remove(errf)
+                 self.log.write(data)
+-                sys.stderr.write(data)
++                stream = _PY3 and sys.stderr.buffer or sys.stderr
++                out(data, stream=stream, flush=True)
+ 
+         proc.wait()
++
++        # Make sure the test didn't change blocking output
++        assert fcntl.fcntl(0, fcntl.F_GETFL) & os.O_NONBLOCK == 0
++        assert fcntl.fcntl(1, fcntl.F_GETFL) & os.O_NONBLOCK == 0
++        assert fcntl.fcntl(2, fcntl.F_GETFL) & os.O_NONBLOCK == 0
++
+         return proc.returncode
+ 
+ 
+@@ -137,6 +186,7 @@ class TapDriver(Driver):
+         self.late_plan = False
+         self.errored = False
+         self.bail_out = False
++        self.skip_all_reason = None
+ 
+     def report(self, code, num, *args):
+         if num:
+@@ -170,13 +220,19 @@ class TapDriver(Driver):
+         else:
+             self.result_fail(num, description)
+ 
+-    def consume_test_plan(self, first, last):
++    def consume_test_plan(self, line):
+         # Only one test plan is supported
+         if self.test_plan:
+             self.report_error("Get a second TAP test plan")
+             return
+ 
++        if line.lower().startswith('1..0 # skip'):
++            self.skip_all_reason = line[5:].strip()
++            self.bail_out = True
++            return
++
+         try:
++            (first, unused, last) = line.partition("..")
+             first = int(first)
+             last = int(last)
+         except ValueError:
+@@ -192,7 +248,7 @@ class TapDriver(Driver):
+ 
+     def process(self, output):
+         if output:
+-            self.output += output
++            self.output += output.decode("UTF-8")
+         elif self.output:
+             self.output += "\n"
+         (ready, unused, self.output) = self.output.rpartition("\n")
+@@ -202,8 +258,7 @@ class TapDriver(Driver):
+             elif line.startswith("not ok "):
+                 self.consume_test_line(False, line[7:])
+             elif line and line[0].isdigit() and ".." in line:
+-                (first, unused, last) = line.partition("..")
+-                self.consume_test_plan(first, last)
++                self.consume_test_plan(line)
+             elif line.lower().startswith("bail out!"):
+                 self.consume_bail_out(line)
+ 
+@@ -213,6 +268,13 @@ class TapDriver(Driver):
+         failed = False
+         skipped = True
+ 
++        if self.skip_all_reason is not None:
++            self.result_skip("skipping:", self.skip_all_reason)
++            self.trs.write(":global-test-result: SKIP\n")
++            self.trs.write(":test-global-result: SKIP\n")
++            self.trs.write(":recheck: no\n")
++            return 0
++
+         # Basic collation of results
+         for (num, code) in self.reported.items():
+             if code == "ERROR":
+diff --git a/build/tap-gtester b/build/tap-gtester
+index 7e667d4..bbda266 100755
+--- a/build/tap-gtester
++++ b/build/tap-gtester
+@@ -1,4 +1,5 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
++# This can also be run with Python 2.
+ 
+ # Copyright (C) 2014 Red Hat, Inc.
+ #
+@@ -30,9 +31,19 @@
+ import argparse
+ import os
+ import select
++import signal
+ import subprocess
+ import sys
+ 
++# Yes, it's dumb, but strsignal is not exposed in python
++# In addition signal numbers varify heavily from arch to arch
++def strsignal(sig):
++    for name in dir(signal):
++        if name.startswith("SIG") and sig == getattr(signal, name):
++            return name
++    return str(sig)
++
++
+ class NullCompiler:
+     def __init__(self, command):
+         self.command = command
+@@ -76,22 +87,22 @@ class GTestCompiler(NullCompiler):
+            elif cmd == "result":
+                if self.test_name:
+                    if data == "OK":
+-                       print "ok %d %s" % (self.test_num, self.test_name)
++                       print("ok %d %s" % (self.test_num, self.test_name))
+                    if data == "FAIL":
+-                       print "not ok %d %s", (self.test_num, self.test_name)
++                       print("not ok %d %s" % (self.test_num, self.test_name))
+                self.test_name = None
+            elif cmd == "skipping":
+                if "/subprocess" not in data:
+-                   print "ok %d # skip -- %s" % (self.test_num, data)
++                   print("ok %d # skip -- %s" % (self.test_num, data))
+                self.test_name = None
+            elif data:
+-               print "# %s: %s" % (cmd, data)
++               print("# %s: %s" % (cmd, data))
+            else:
+-               print "# %s" % cmd
++               print("# %s" % cmd)
+         elif line.startswith("(MSG: "):
+-            print "# %s" % line[6:-1]
++            print("# %s" % line[6:-1])
+         elif line:
+-            print "# %s" % line
++            print("# %s" % line)
+         sys.stdout.flush()
+ 
+     def run(self, proc, output=""):
+@@ -106,22 +117,26 @@ class GTestCompiler(NullCompiler):
+             if line.startswith("/"):
+                 self.test_remaining.append(line.strip())
+         if not self.test_remaining:
+-            print "Bail out! No tests found in GTest: %s" % self.command[0]
++            print("Bail out! No tests found in GTest: %s" % self.command[0])
+             return 0
+ 
+-        print "1..%d" % len(self.test_remaining)
++        print("1..%d" % len(self.test_remaining))
+ 
+         # First try to run all the tests in a batch
+-        proc = subprocess.Popen(self.command + ["--verbose" ], close_fds=True, stdout=subprocess.PIPE)
++        proc = subprocess.Popen(self.command + ["--verbose" ], close_fds=True,
++                                stdout=subprocess.PIPE, universal_newlines=True)
+         result = self.process(proc)
+         if result == 0:
+             return 0
+ 
++        if result < 0:
++            sys.stderr.write("%s terminated with %s\n" % (self.command[0], strsignal(-result)))
++
+         # Now pick up any stragglers due to failures
+         while True:
+             # Assume that the last test failed
+             if self.test_name:
+-                print "not ok %d %s" % (self.test_num, self.test_name)
++                print("not ok %d %s" % (self.test_num, self.test_name))
+                 self.test_name = None
+ 
+             # Run any tests which didn't get run
+@@ -129,7 +144,8 @@ class GTestCompiler(NullCompiler):
+                 break
+ 
+             proc = subprocess.Popen(self.command + ["--verbose", "-p", self.test_remaining[0]],
+-                                    close_fds=True, stdout=subprocess.PIPE)
++                                    close_fds=True, stdout=subprocess.PIPE,
++                                    universal_newlines=True)
+             result = self.process(proc)
+ 
+             # The various exit codes and signals we continue for
+@@ -139,24 +155,32 @@ class GTestCompiler(NullCompiler):
+         return result
+ 
+ def main(argv):
+-    parser = argparse.ArgumentParser(description='Automake TAP compiler')
++    parser = argparse.ArgumentParser(description='Automake TAP compiler',
++                                     usage="tap-gtester [--format FORMAT] command ...")
+     parser.add_argument('--format', metavar='FORMAT', choices=[ "auto", "gtest", "tap" ],
+                         default="auto", help='The input format to compile')
+     parser.add_argument('--verbose', action='store_true',
+                         default=True, help='Verbose mode (ignored)')
+-    parser.add_argument('command', nargs='+', help="A test command to run")
++    parser.add_argument('command', nargs=argparse.REMAINDER, help="A test command to run")
+     args = parser.parse_args(argv[1:])
+ 
+     output = None
+     format = args.format
+     cmd = args.command
++    if not cmd:
++        sys.stderr.write("tap-gtester: specify a command to run\n")
++        return 2
++    if cmd[0] == '--':
++        cmd.pop(0)
++
+     proc = None
+ 
+     os.environ['HARNESS_ACTIVE'] = '1'
+ 
+     if format in ["auto", "gtest"]:
+         list_cmd = cmd + ["-l", "--verbose"]
+-        proc = subprocess.Popen(list_cmd, close_fds=True, stdout=subprocess.PIPE)
++        proc = subprocess.Popen(list_cmd, close_fds=True, stdout=subprocess.PIPE,
++                                universal_newlines=True)
+         output = proc.stdout.readline()
+         # Smell whether we're dealing with GTest list output from first line
+         if "random seed" in output or "GTest" in output or output.startswith("/"):
+@@ -164,7 +188,8 @@ def main(argv):
+         else:
+             format = "tap"
+     else:
+-        proc = subprocess.Popen(cmd, close_fds=True, stdout=subprocess.PIPE)
++        proc = subprocess.Popen(cmd, close_fds=True, stdout=subprocess.PIPE,
++                                universal_newlines=True)
+ 
+     if format == "gtest":
+         compiler = GTestCompiler(cmd)
+-- 
+2.14.4
+

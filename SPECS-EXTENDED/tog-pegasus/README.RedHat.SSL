@@ -1,0 +1,65 @@
+              Red Hat SSL configuration for tog-pegasus
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   The Red Hat tog-pegasus package is built with support for SSL
+   (the Secure Socket Layer).
+   Note: the upstream documentation for SSL is located here:
+   /usr/share/doc/tog-pegasus/PegasusSSLGuidelines.htm
+   However, because the upstream documentation for SSL is not up-to-date
+   (it was last updated in March, 2006, around the time of the
+   OpenPegasus-2.5.1 release), nor accurate, we are providing this short
+   description of how to configure SSL, as well as how it should be used.
+
+ Hard-Coded Build-Time Constants:
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Here is the list of constants which are hard-coded during build time:
+
+   PEGASUS_CONFIG_DIR = /etc/Pegasus
+
+   PEGASUS_PEM_DIR = /etc/pki/Pegasus
+
+   PEGASUS_SSL_KEY_FILE = file.pem
+   PEGASUS_SSL_KEY_FILE_PATH = $(PEGASUS_PEM_DIR)/$(PEGASUS_SSL_KEY_FILE)
+                  (= /etc/pki/Pegasus/file.pem)
+   o Contains the private key for the CIM Server SSL Certificate.
+
+   PEGASUS_SSL_CERT_FILE = server.pem
+   PEGASUS_SSL_CERT_FILE_PATH = $(PEGASUS_PEM_DIR)/$(PEGASUS_SSL_CERT_FILE)
+                             (= /etc/pki/Pegasus/server.pem)
+   o Contains the CIM Server SSL Certificate.
+
+   PEGASUS_SSL_TRUSTSTORE = client.pem
+   PEGASUS_SSL_CLIENT_TRUSTSTORE = $(PEGASUS_PEM_DIR)/$(PEGASUS_SSL_TRUSTSTORE)
+                                (= /etc/pki/Pegasus/client.pem)
+   PEGASUS_SSL_SERVER_TRUSTSTORE = $(PEGASUS_PEM_DIR)/cimserver_trust
+                                (= /etc/pki/Pegasus/cimserver_trust)
+   o Specifies the location of the OpenSSL truststore. Consistent with the
+     OpenSSL implementation, a truststore can be either a file or directory.
+     If the truststore is a directory, then all certificates within the
+     directory are considered trusted.
+
+   PEGASUS_SSL_SERVER_CRL = $(PEGASUS_PEM_DIR)/crl
+                         (= /etc/pki/Pegasus/crl)
+   o This is where the CRL (Certificate Revocation List) store resides.
+
+ Tips Following Package Installation:
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   o CIM Server default SSL certificates are generated when you run the
+     tog-pegasus daemon (for example, by issuing the command
+     "systemctl start tog-pegasus") for the first time, which includes the
+     following files, which are created in /etc/pki/Pegasus: ca.crt, ca.srl,
+     client.pem, file.pem, server.pem and in /etc/Pegasus: ssl-ca.cnf,
+     ssl-service.cnf.
+     Important: simply running the "cimserver" binary (/usr/sbin/cimserver)
+     does NOT create the certificates or abovementioned files.
+     Note: if you want to use your own certificates, simply overwrite the ones
+     in /etc/pki/Pegasus.
+
+   o to enable/disable HTTPS port 5989 (the official WBEM secure port),
+     use cimconfig.
+
+   o the wbemcli command (from the sblim-wbemcli package)
+     uses /etc/pki/Pegasus/client.pem by default (see man wbemcli).
+

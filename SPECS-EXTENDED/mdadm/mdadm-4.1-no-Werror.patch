@@ -1,0 +1,26 @@
+From: martin f. krafft <madduck@debian.org>
+Subject: Remove -Werror from compiler flags
+
+-Werror seems like a bad idea on released/packaged code because a toolchain
+update (introducing new warnings) could break the build. We'll let upstream
+use it to beautify the code, but remove it for out builds.
+
+Signed-off-by: martin f. krafft <madduck@debian.org>
+
+---
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+Index: mdadm-4.1/Makefile
+===================================================================
+--- mdadm-4.1.orig/Makefile
++++ mdadm-4.1/Makefile
+@@ -48,7 +48,7 @@ endif
+ 
+ CC ?= $(CROSS_COMPILE)gcc
+ CXFLAGS ?= -ggdb
+-CWFLAGS = -Wall -Werror -Wstrict-prototypes -Wextra -Wno-unused-parameter
++CWFLAGS = -Wall -Wstrict-prototypes -Wextra -Wno-unused-parameter
+ ifdef WARN_UNUSED
+ CWFLAGS += -Wp,-D_FORTIFY_SOURCE=2 -O3
+ endif

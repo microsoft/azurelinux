@@ -1,0 +1,46 @@
+diff -urEbwB guice-4.1/build.xml guice-4.1.new/build.xml
+--- guice-4.1/build.xml	2019-02-13 23:43:35.806063663 +0100
++++ guice-4.1.new/build.xml	2019-02-13 23:46:22.818815271 +0100
+@@ -126,7 +126,7 @@
+     <!-- Generate API for current version. -->
+     <javadoc packagenames="com.google.*"
+              docletpath="${jdiff.home}/jdiff.jar${path.separator}${jdiff.home}/xerces.jar"
+-             maxmemory="1024M"
++             maxmemory="1024M" source="1.6" encoding="UTF-8"
+              classpathref="javadoc.classpath">
+       <fileset dir="${src.dir}" defaultexcludes="yes">
+         <include name="com/google/**"/>
+@@ -151,7 +151,7 @@
+     <javadoc packagenames="com.google.*"
+              destdir="${jdiff.tmp}"
+              docletpath="${jdiff.home}/jdiff.jar${path.separator}${jdiff.home}/xerces.jar"
+-             maxmemory="512M"
++             maxmemory="512M" source="1.6" encoding="UTF-8"
+              sourcefiles="${jdiff.home}/Null.java"
+              classpathref="javadoc.classpath">
+       <doclet name="jdiff.JDiff">
+@@ -170,9 +170,9 @@
+   <target name="javadoc" depends="compile">
+     <javadoc packagenames="com.google.*"
+              destdir="build/docs/javadoc"
+-             maxmemory="512M"
++             maxmemory="512M" source="1.6" encoding="UTF-8"
+              classpathref="javadoc.classpath"
+-             additionalparam="-Xdoclint:none -notimestamp"
++             additionalparam="-notimestamp"
+              windowtitle="Guice ${new.api} API"
+              author="false"
+              protected="true">
+@@ -205,12 +205,6 @@
+ 
+       <group title="JMX Extension" packages="com.google.inject.tools.jmx"/>
+       <fileset dir="${jmx.src.dir}"/>      
+-
+-      <link href="http://aopalliance.sourceforge.net/doc/"/>
+-      <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+-      <link href="http://atinject.googlecode.com/svn/trunk/javadoc/"/>
+-      <link href="http://docs.guava-libraries.googlecode.com/git/javadoc/"/>
+-      <link href="https://tomcat.apache.org/tomcat-5.5-doc/servletapi/"/>
+     </javadoc>
+   </target>
+ 

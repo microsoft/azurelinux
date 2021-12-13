@@ -1,0 +1,289 @@
+Terms and Conditions - The MirBSD Korn Shell
+============================================
+
+The MirBSD Korn Shell (mksh) consists of a number of "source" files,
+which are provided by upstream in a number of places. This file will
+list the files belonging to mksh or being part of it and the licence
+terms and conditions that apply to them, in one single central place
+for packagers' convenience. This list aims to be authoritative. (Yet
+as it was compiled by a human, there may be bugs, please report them
+if any are found. We don't think so though.)
+
+All paths are relative to The MirOS Project's CVS repository.
+
+
+The following files form The MirBSD Korn Shell R59b:
+- build system
+  * mksh/Build.sh
+  * mksh/FAQ2HTML.sh
+- testsuite driver
+  * mksh/check.pl
+- testsuite with code examples
+  * mksh/check.t
+- configuration with/and code examples (informal)
+  * mksh/dot.mkshrc
+  * contrib/hosted/tg/assockit.ksh
+  * contrib/hosted/tg/progress-bar
+  * contrib/hosted/tg/uhr
+- documentation
+  * mksh/lksh.1
+  * mksh/mksh.1
+  * mksh/mksh.faq
+- source code
+  * mksh/edit.c
+  * mksh/emacsfn.h
+  * mksh/eval.c
+  * mksh/exec.c
+  * mksh/expr.c
+  * mksh/exprtok.h
+  * mksh/funcs.c
+  * mksh/histrap.c
+  * mksh/jehanne.c
+  * mksh/jobs.c
+  * mksh/lalloc.c
+  * mksh/lex.c
+  * mksh/main.c
+  * mksh/mirhash.h
+  * mksh/misc.c
+  * mksh/os2.c
+  * mksh/rlimits.opt
+  * mksh/sh.h
+  * mksh/sh_flags.opt
+  * mksh/shf.c
+  * mksh/syn.c
+  * mksh/tree.c
+  * mksh/var.c
+  * mksh/var_spec.h
+- upstream provided packaging
+  * mksh/mksh.ico (application icon resource)
+  * mksh/Makefile (MirBSD only, not part of mksh)
+  * ports/shells/mksh/DEINSTALL
+  * ports/shells/mksh/DESCR (official)
+  * ports/shells/mksh/INSTALL
+  * ports/shells/mksh/Makefile
+  * ports/shells/mksh/PLIST
+  * ports/shells/mksh/distinfo (official)
+  * src/distrib/special/mksh/Makefile (for the MirBSD installer)
+- website (informal)
+  * www/files/TaC-mksh.txt (this file)
+  * www/pics/mksh.svg (logo source code)
+  * www/pics/mksh128x100.png (logo compiled version)
+  * www/src/mksh-faq.hts (supplemental documentation)
+  * www/src/mksh.hts (primary webpage)
+  * www/src/mksh_bld.hts (supplemental webpage)
+  * www/src/mksh_old.hts (supplemental webpage)
+
+All of these files are covered by The MirOS Licence (Appendix A) ex-
+cept the application icon resource, the terms for that are listed in
+Appendix D. Width data comes under those in Appendix E.
+
+The creator of mksh acknowledges the contributions of several people
+to the Public Domain Korn Shell as well as suggestions and work from
+packagers, other developers etc. and everyone else who helped making
+mksh what it is today. Thanks!  The MirBSD Korn Shell is sublicenced
+under a copyright licence fallback from the original pdsh author.
+
+
+The following files belong to mksh and are distributed inside of its
+distfile, but are not part of it. They are provided for convenience,
+because they are required on many operating environments for mksh or
+some of its features to function:
+- source code
+  * mksh/strlcpy.c (needed if not provided by the OS already)
+
+These files are covered by seperate licences in addition (Appendix C
+for now). Some operating environments already provide their functio-
+nality, such as the BSDs and OSX libc, or the Debian/freedesktop.org
+libbsd package. The files are not compiled into the resulting binary
+if their respective functionality is already provided.
+
+
+The following file is not part of mksh but can be used with it; it's
+also not included in the mksh distfile:
+- source code
+  * src/usr.bin/printf/printf.c (UCB printf(1) utility that has been
+    slightly modified, for an optional built-in printf, to be inclu-
+    ded for lksh-as-/bin/sh only and only when necessary)
+
+The printf.c file is covered by the UCB three-clause BSD licence, as
+shown in Appendix B below.
+
+
+The MirOS Licence also applies as a collective-work copyright on The
+MirBSD Korn Shell, an authorised derivate of the 1980s Public Domain
+V7/Bourne Shell.
+
+Note that these appendices may represent the terms and conditions of
+more than one file, hence the actual wording of the files was folded
+into one representation, with different copyright holders and years,
+separated if merging was undesirable.
+
+
+Appendix A - The MirOS Licence (OSI approved)
+==============================
+
+The MirBSD Korn Shell (mksh) is
+Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+	      2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
+	      2020
+	mirabilos <m@mirbsd.org>
+Copyright (c) 2015, 2017, 2020
+	KO Myung-Hun <komh@chollian.net>
+Copyright (c) 2015
+	Daniel Richard G. <skunk@iSKUNK.ORG>
+Copyright (c) 2017
+	Giacomo Tesio <giacomo@tesio.it>
+All rights reserved.
+
+The mksh logo is
+Copyright (c) 2008, 2009
+	Lukas U. <smultron@midnightbsd.org>
+Copyright (c) 2008, 2009
+	mirabilos <m@mirbsd.org>
+
+
+Provided that these terms and disclaimer and all copyright notices
+are retained or reproduced in an accompanying document, permission
+is granted to deal in this work without restriction, including un-
+limited rights to use, publicly perform, distribute, sell, modify,
+merge, give away, or sublicence.
+
+This work is provided "AS IS" and WITHOUT WARRANTY of any kind, to
+the utmost extent permitted by applicable law, neither express nor
+implied; without malicious intent or gross negligence. In no event
+may a licensor, author or contributor be held liable for indirect,
+direct, other damage, loss, or other issues arising in any way out
+of dealing in the work, even if advised of the possibility of such
+damage or existence of a defect, except proven that it results out
+of said person's immediate fault when using the work as intended.
+
+
+Appendix B - The UCB (3-clause BSD) licence (OSI approved)
+===========================================
+
+printf.c is
+Copyright (c) 1989
+	The Regents of the University of California.
+All rights reserved.
+
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. Neither the name of the University nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+
+Appendix C - ISC Licence (OSI approved)
+========================
+
+strlcpy.c is
+Copyright (c) 2006, 2008, 2009, 2013
+	mirabilos <m@mirbsd.org>
+Copyright (c) 1998
+	Todd C. Miller <Todd.Miller@courtesan.com>
+
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+Appendix D - Licence for mksh.ico (optional component)
+=================================
+
+The application icon resource comes in its preferred form
+of modification and is an unregistered trademark:
+
+Copyright (c) 2013 Michael Langguth
+Copyright (c) 2006 Benny Siegert
+Copyright (c) 2005 mirabilos
+
+This icon may be used to refer to The MirBSD Korn Shell and
+its Win32 port. Distribution patches are acceptable as long
+as they modify $KSH_VERSION according to the guidelines that
+are published on the website; forks and works that are not
+derivates are not allowed to use it.
+
+As far as MirBSD is concerned, the files themselves are free
+to modification and distribution under BSD/MirOS Licence, the
+restriction on use stems only from a need to protect it or
+lose it: http://www.mckusick.com/beastie/mainpage/copyright.html
+
+The Shilouette daemon is Copyright (c) 2003 by Rick Collette.
+The MirOS Project may freely use the former ekkoBSD Logo,
+the shilouette Daemon, for MirBSD, on anything the project
+leader sees fit, so long as it pertains to MirBSD in some
+way and the leader gives credit for the original daemon to
+Marshall Kirk McKusick.
+
+The BSD daemon is Copyright (c) 1988 by Marshall Kirk McKusick.
+All Rights Reserved.  Individuals may use the daemon for their
+personal use within the bounds of good taste.  When reasonably
+possible, the text shown above is to be included.
+
+
+Appendix E - Unicode Data Files and Software Licence
+====================================================
+
+Copyright © 1991–2020 Unicode, Inc. All rights reserved.
+Distributed under the Terms of Use in https://www.unicode.org/copyright.html.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Unicode data files and any associated documentation
+(the "Data Files") or Unicode software and any associated documentation
+(the "Software") to deal in the Data Files or Software
+without restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, and/or sell copies of
+the Data Files or Software, and to permit persons to whom the Data Files
+or Software are furnished to do so, provided that either
+(a) this copyright and permission notice appear with all copies
+of the Data Files or Software, or
+(b) this copyright and permission notice appear in associated
+Documentation.
+
+THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT OF THIRD PARTY RIGHTS.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS
+NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL
+DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THE DATA FILES OR SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder
+shall not be used in advertising or otherwise to promote the sale,
+use or other dealings in these Data Files or Software without prior
+written authorization of the copyright holder.
+
+
+__________________________________________________________________
+$MirOS: www/files/TaC-mksh.txt,v 1.37 2020/05/16 23:08:35 tg Exp $

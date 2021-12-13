@@ -1,0 +1,19 @@
+diff -up netkit-rusers-0.17/rpc.rstatd/rpc.rstatd.8.old netkit-rusers-0.17/rpc.rstatd/rpc.rstatd.8
+--- netkit-rusers-0.17/rpc.rstatd/rpc.rstatd.8.old	2016-12-14 08:49:52.073732006 +0100
++++ netkit-rusers-0.17/rpc.rstatd/rpc.rstatd.8	2016-12-14 08:50:59.021211518 +0100
+@@ -47,9 +47,7 @@
+ is a server which returns performance statistics obtained from the kernel.
+ These statistics are usually read using the 
+ .Xr rup 1
+-command.  They are also used by the
+-.Xr rpc.lockd 8
+-server during crash recovery.
++command.
+ The
+ .Nm rpc.rstatd
+ daemon is normally invoked by
+@@ -61,4 +59,3 @@ uses an RPC protocol defined in
+ .Sh SEE ALSO
+ .Xr rup 1 ,
+ .Xr inetd 8 ,
+-.Xr rpc.lockd 8

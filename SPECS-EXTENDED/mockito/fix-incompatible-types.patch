@@ -1,0 +1,12 @@
+diff --git a/src/org/mockito/internal/creation/instance/ObjenesisInstantiator.java b/src/org/mockito/internal/creation/instance/ObjenesisInstantiator.java
+index 1ca0003..15172bd 100644
+--- a/src/org/mockito/internal/creation/instance/ObjenesisInstantiator.java
++++ b/src/org/mockito/internal/creation/instance/ObjenesisInstantiator.java
+@@ -11,6 +11,6 @@ class ObjenesisInstantiator implements Instantiator {
+     private final ObjenesisStd objenesis = new ObjenesisStd(new GlobalConfiguration().enableClassCache());
+ 
+     public <T> T newInstance(Class<T> cls) {
+-        return objenesis.newInstance(cls);
++        return (T) objenesis.newInstance(cls);
+     }
+ }

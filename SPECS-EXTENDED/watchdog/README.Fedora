@@ -1,0 +1,34 @@
+This is the watchdog package for Fedora.  It implements a userspace
+daemon which periodically pings (usually hardware) to tell the
+hardware that the machine is alive.  If the hardware times out without
+receiving a ping, it assumes userspace is dead and reboots the
+machine.
+
+There are several major classes of watchdog available:
+
+ - watchdog hardware implementing the Linux /dev/watchdog API
+
+     * drivers in /lib/modules/$(uname -r)/kernel/drivers/watchdog/
+     * http://lxr.linux.no/linux/Documentation/watchdog/watchdog-api.txt
+
+ - softdog
+
+     * software watchdog (just runs inside the kernel)
+     * implements the Linux /dev/watchdog API
+     * won't help you if the kernel fails (obvious, right?)
+
+ - IPMI
+
+     * a heavyweight standard for all things server-management
+     * separate Linux driver
+     * ipmitool to control it
+     * see README.watchdog.ipmi for how to use this daemon together
+       with IPMI
+
+You can also use watchdogs inside recent QEMU/KVM virtual machines.
+When running qemu, specify "-watchdog i6300esb" on the qemu command
+line (or use libvirt).  Inside the guest, the i6300esb watchdog driver
+should automatically load and provide you with a Linux /dev/watchdog-
+compatible API.
+
+	- Richard W.M. Jones (rjones@redhat.com) 2009-02-26

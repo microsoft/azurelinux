@@ -1,0 +1,8 @@
+# Use the texttopaps filter (from the paps package) in preference to
+# the texttops filter shipped as part of CUPS.  This is so that we
+# have full UTF-8 support.
+#
+# To use the default CUPS texttops filter instead, remove this file
+# (or the package it belongs to).
+
+text/plain			application/postscript		30	texttopaps

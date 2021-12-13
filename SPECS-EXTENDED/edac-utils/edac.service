@@ -1,0 +1,11 @@
+[Unit]
+Description=Initialize EDAC Drivers For Machine Hardware
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/edac-ctl --register-labels
+ExecStop=/usr/sbin/edac-ctl --unload
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

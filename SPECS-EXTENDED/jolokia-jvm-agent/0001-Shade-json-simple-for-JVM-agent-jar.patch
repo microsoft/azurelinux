@@ -1,0 +1,148 @@
+From e7ab408b8cac0b0881829010c91844bae4bc845d Mon Sep 17 00:00:00 2001
+From: Severin Gehwolf <sgehwolf@redhat.com>
+Date: Tue, 27 Aug 2019 18:33:44 +0200
+Subject: [PATCH] Shade json-simple for JVM agent jar
+
+The dependency is then included in its own namespace,
+namely org.jolokia.shaded.org.json.simple*.
+
+Closes #398
+---
+ agent/jvm/pom.xml                     | 56 ++++++++++++++++++---------
+ agent/jvm/src/main/assembly/agent.xml | 32 ---------------
+ pom.xml                               |  6 +++
+ 3 files changed, 44 insertions(+), 50 deletions(-)
+ delete mode 100644 agent/jvm/src/main/assembly/agent.xml
+
+diff --git a/agent/jvm/pom.xml b/agent/jvm/pom.xml
+index f2d5de2d..053fee8b 100644
+--- a/agent/jvm/pom.xml
++++ b/agent/jvm/pom.xml
+@@ -101,30 +101,50 @@
+         </configuration>
+       </plugin>
+ 
++      <!-- Build a full shaded jar with dependencies -->
+       <plugin>
+-        <artifactId>maven-assembly-plugin</artifactId>
+-        <configuration>
+-          <descriptors>
+-            <descriptor>src/main/assembly/agent.xml</descriptor>
+-          </descriptors>
+-          <archive>
+-            <manifestEntries>
+-              <Premain-Class>org.jolokia.jvmagent.JvmAgent</Premain-Class>
+-              <Agent-Class>org.jolokia.jvmagent.JvmAgent</Agent-Class>
+-              <Main-Class>org.jolokia.jvmagent.client.AgentLauncher</Main-Class>
+-              <Can-Redefine-Classes>false</Can-Redefine-Classes>
+-              <Can-Retransform-Classes>false</Can-Retransform-Classes>
+-              <Can-Set-Native-Method-Prefix>false</Can-Set-Native-Method-Prefix>
+-            </manifestEntries>
+-          </archive>
+-        </configuration>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-shade-plugin</artifactId>
++        <version>2.3</version>
+         <executions>
+           <execution>
+-            <id>make-assembly</id>
+             <phase>package</phase>
+             <goals>
+-              <goal>single</goal>
++              <goal>shade</goal>
+             </goals>
++            <configuration>
++              <relocations>
++                <relocation>
++                  <shadedPattern>org.jolokia.shaded.</shadedPattern>
++                  <includes>
++                    <include>org.json.simple.**</include>
++                  </includes>
++                  <excludes>
++                    <exclude>org.jolokia.shaded.**</exclude>
++                  </excludes>
++                </relocation>
++              </relocations>
++              <filters>
++                <filter>
++                  <artifact>com.sun:tools</artifact>
++                  <excludes>
++                    <exclude>**</exclude>
++                  </excludes>
++                </filter>
++              </filters>
++              <transformers>
++                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
++                  <manifestEntries>
++                    <Premain-Class>org.jolokia.jvmagent.JvmAgent</Premain-Class>
++                    <Agent-Class>org.jolokia.jvmagent.JvmAgent</Agent-Class>
++                    <Main-Class>org.jolokia.jvmagent.client.AgentLauncher</Main-Class>
++                    <Can-Redefine-Classes>false</Can-Redefine-Classes>
++                    <Can-Retransform-Classes>false</Can-Retransform-Classes>
++                    <Can-Set-Native-Method-Prefix>false</Can-Set-Native-Method-Prefix>
++                  </manifestEntries>
++                </transformer>
++              </transformers>
++            </configuration>
+           </execution>
+         </executions>
+       </plugin>
+diff --git a/agent/jvm/src/main/assembly/agent.xml b/agent/jvm/src/main/assembly/agent.xml
+deleted file mode 100644
+index cc125050..00000000
+--- a/agent/jvm/src/main/assembly/agent.xml
++++ /dev/null
+@@ -1,32 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-  ~ Copyright 2009-2012  Roland Huss
+-  ~
+-  ~ Licensed under the Apache License, Version 2.0 (the "License");
+-  ~ you may not use this file except in compliance with the License.
+-  ~ You may obtain a copy of the License at
+-  ~
+-  ~     http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~ Unless required by applicable law or agreed to in writing, software
+-  ~ distributed under the License is distributed on an "AS IS" BASIS,
+-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-  ~ See the License for the specific language governing permissions and
+-  ~ limitations under the License.
+-  -->
+-
+-<assembly>
+-  <id>agent</id>
+-  <formats>
+-    <format>jar</format>
+-  </formats>
+-  <includeBaseDirectory>false</includeBaseDirectory>
+-  <dependencySets>
+-    <dependencySet>
+-      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+-      <unpack>true</unpack>
+-      <scope>runtime</scope>
+-      <useProjectArtifact>true</useProjectArtifact>
+-    </dependencySet>
+-  </dependencySets>
+-</assembly>
+\ No newline at end of file
+diff --git a/pom.xml b/pom.xml
+index 54608911..9fcf5178 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -218,6 +218,12 @@
+           <version>2.5</version>
+         </plugin>
+ 
++        <plugin>
++          <groupId>org.apache.maven.plugins</groupId>
++          <artifactId>maven-shade-plugin</artifactId>
++          <version>2.3</version>
++        </plugin>
++
+         <plugin>
+           <artifactId>maven-deploy-plugin</artifactId>
+           <version>2.8.2</version>
+-- 
+2.21.0
+

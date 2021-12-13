@@ -1,0 +1,11 @@
+--- jabberpy-0.5-0/jabber/xmlstream.py
++++ jabberpy-0.5-0/jabber/xmlstream.py
+@@ -522,7 +522,7 @@ class Client(Stream):
+             connector.append('\r\n')
+             bak = self._read , self._write
+             self.write('\r\n'.join(connector))
+-            reply = self.read().replace('\r','')
++            reply = self._read(BLOCK_SIZE).replace('\r','')
+             self._read , self._write = bak
+             try: proto,code,desc=reply.split('\n')[0].split(' ',2)
+             except: raise error('Invalid proxy reply')

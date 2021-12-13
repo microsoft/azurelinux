@@ -1,0 +1,543 @@
+From dfca464e5fe4c9107f08bff7e6e2730a504945b7 Mon Sep 17 00:00:00 2001
+From: Boris Ranto <branto@redhat.com>
+Date: Thu, 2 Jun 2016 12:47:22 +0200
+Subject: [PATCH] Apply './OpenIPMI-2.0.19-man.patch'
+
+Signed-off-by: Boris Ranto <branto@redhat.com>
+---
+ lanserv/ipmilan.8       | 13 ++++++++++---
+ man/ipmi_cmdlang.7      | 36 ++++++++++++++++++------------------
+ man/ipmi_ui.1           | 10 +++++-----
+ man/openipmi_conparms.7 |  4 ++--
+ man/openipmicmd.1       |  6 +++---
+ man/openipmigui.1       | 12 ++++++------
+ man/openipmish.1        | 12 +++++++++++-
+ man/rmcp_ping.1         |  2 +-
+ man/solterm.1           |  6 +++---
+ sample/ipmicmd.c        |  1 +
+ sample/rmcp_ping.c      |  5 +++++
+ sample/solterm.c        |  7 ++++++-
+ ui/basic_ui.c           | 25 +++++++++++++++++++++++++
+ 13 files changed, 96 insertions(+), 43 deletions(-)
+
+diff --git a/lanserv/ipmilan.8 b/lanserv/ipmilan.8
+index ff43d5c..9360507 100644
+--- a/lanserv/ipmilan.8
++++ b/lanserv/ipmilan.8
+@@ -29,18 +29,25 @@ address they came in.
+ 
+ .SH OPTIONS
+ .TP
+-.BI \-c\  config-file
++\fB\-c\fR file,\ \fB\-\-config\-file\fR file
+ Set the configuration file to one other than the default of
+ .I "/etc/ipmi_lan.conf"
+ .TP
+-.B \-n
++\fB\-i\fR device,\ \fB\-\-ipmi-dev\fR device
++Sets the desired device
++.TP
++\fB\-n\fR,\ \fB\-\-daemonize\fR
+ Stops  the  daemon  from  forking  and  detaching  from the controlling
+ terminal. This is useful for running from init.
+ .TP
+-.B \-d
++\fB\-d\fR,\ \fB\-\-debug\fR
+ Turns on debugging to standard output.  You generally have to use
+ .B \-n
+ with this.
++.TP
++\fB\-?\fR,\ \fB\-\-help\fR,\ \fB\-\-usage\fR
++Prints brief usage hints message.
++
+ 
+ 
+ .SH CONFIGURATION
+diff --git a/man/ipmi_cmdlang.7 b/man/ipmi_cmdlang.7
+index 4d18e76..a6d73b9 100644
+--- a/man/ipmi_cmdlang.7
++++ b/man/ipmi_cmdlang.7
+@@ -246,7 +246,7 @@ instance, the command to create a domain is
+ The command to list all sensors in a domain named domain1 is
+ .B sensor list domain1.
+ 
+-Each command has a reponse for each object operated on, which is
++Each command has a response for each object operated on, which is
+ listed after the command description.  In those responses, anything
+ that begins with a
+ .B %
+@@ -316,7 +316,7 @@ BMC.  For that, notice that the LAN connection has an options extra IP
+ and port for the second IP address.  OpenIPMI supports these IP
+ addresses and connection, detecting failures, switching between
+ addresses, and other fault-tolerant things.  It does this
+-transparently to the user.  Mutiple connections may require special
++transparently to the user.  Multiple connections may require special
+ OEM support, read the documentation about your specific system if you
+ need this.
+ 
+@@ -336,7 +336,7 @@ or
+ \fI<name>\fP and \fI<password>\fP are the user name and password of
+ the IPMI user to use for the connection.
+ The <smi num> is the driver number, generally 0.
+-Options enable and disable various automitic processing and are:
++Options enable and disable various automatic processing and are:
+ .PD 0
+ .HP
+ .B -[no]all
+@@ -356,7 +356,7 @@ is false by default.
+ is false by default.
+ .HP
+ .B -[no]ipmbscan
+-- IPMB bus scanning.  This turns on scanning IPMB busses when they are found.
++- IPMB bus scanning.  This turns on scanning IPMB buses when they are found.
+ This is false by default.
+ .HP
+ .B -[no]oeminit
+@@ -461,7 +461,7 @@ available hacks are:
+ The -M option sets the maximum outstanding messages.  The default is
+ 2, ranges 1-63.
+ 
+-Options enable and disable various automitic processing and are:
++Options enable and disable various automatic processing and are:
+ .PD 0
+ .HP
+ .B -[no]all
+@@ -519,7 +519,7 @@ Domain Created: <domain>
+ .RE
+ 
+ .B fru <domain> <is_logical> <device_address> <device_id> <lun> <private_bus> <channel>
+-- dump a fru given all it's insundry information.
++- dump a fru given all it's sundry information.
+ .TP
+ Response:
+ .RS
+@@ -533,7 +533,7 @@ Domain
+ 
+ .B msg <domain> <channel> <ipmb> <LUN> <NetFN> <Cmd> [data...]
+ - Send a command to the given IPMB address on the given channel and
+-display the response.  Note that this does not require the existance
++display the response.  Note that this does not require the existence
+ of an MC in OpenIPMI.
+ .TP
+ Response:
+@@ -571,7 +571,7 @@ SEL Rescan done: <domain>
+ .RE
+ 
+ .B presence <domain>
+-- Audit the presence of all enities in the domain.  Note that this just
++- Audit the presence of all entities in the domain.  Note that this just
+ starts the process; it will run in the background.
+ .TP
+ Response is:
+@@ -689,7 +689,7 @@ FRU deleted: <fru>
+ - Set the value of a FRU element.  The
+ name is the record name, or multi-record.  The number is required
+ for fields that need it (custom and multi-record).  The value is
+-an a single value for integers.  For strings it is a string
++a single value for integers.  For strings it is a string
+ type (either binary, ascii, or unicode) and the info.  Binary and
+ unicode data is specified as numbers.  ascii data is specified in
+ a string.  Note that setting a ascii value with no string will
+@@ -770,7 +770,7 @@ Domain
+ .B info <entity>
+ - Dump information about an entity.
+ .TP
+-Reponse:
++Response:
+ .RS
+ .nf
+ Entity
+@@ -784,7 +784,7 @@ Entity
+ .B fru <entity>
+ - Dump the FRU information about the given entity.
+ .TP
+-Reponse:
++Response:
+ .RS
+ .nf
+ Entity
+@@ -813,7 +813,7 @@ Entity
+ .B set_act_time <entity>
+ - Set the hot-swap auto-activate time.
+ .TP
+-Reponse:
++Response:
+ .RS
+ .nf
+ Set act time: <entity>
+@@ -981,7 +981,7 @@ Response:
+ .nf
+ Sensor
+   Name: <sensor>
+-  Positivie Hysteresis: <integer>
++  Positive Hysteresis: <integer>
+   Negative Hysteresis: <integer>
+ .fi
+ .RE
+@@ -1101,7 +1101,7 @@ Set done: <control>
+ .RE
+ 
+ .B get <control>
+-- Get the value of a control.  The reponse depends
++- Get the value of a control.  The response depends
+ on the control type.
+ .TP
+ Response:
+@@ -1128,7 +1128,7 @@ multiple lights.  The options values (marked with
+ ) will not be
+ present if local control is set to true.  Local control means that
+ the LED takes whatever default function it does on the device
+-(like disk activity, ethernet activity, hot-swap LED, etc.).
++(like disk activity, Ethernet activity, hot-swap LED, etc.).
+ Response for id control:
+ .RS
+ .nf
+@@ -1325,7 +1325,7 @@ Channel Access
+ - Set information about the MC's channel access.  There are two different
+ places where this is stored, the present in-use values (volatile) and the
+ non-volatile storage that is loaded at startup.  Note if you specify
+-channel 0xe, the modified channel will be the current channel.  Parms
++channel 0xe, the modified channel will be the current channel.  Parameters
+ are:
+ .RS
+ .nf
+@@ -1547,7 +1547,7 @@ PET destroyed: <pet>
+ .SS pef
+ commands dealing with platform even filters.  These are basically
+ connections to the PEF configuration parameters in an MC.  You use a
+-pef to fetch a pef config, which you can then modify and write back to
++pef to fetch a pef configuration, which you can then modify and write back to
+ the MC.  Note that when you get a pef config, you claim a lock on the
+ MC that must be unlocked.
+ 
+@@ -1780,7 +1780,7 @@ operational and finished all it SDR, FRU, and bus scans:
+ .fi
+ .RE
+ 
+-The following comes out when domain connection infomration changes:
++The following comes out when domain connection information changes:
+ .RS
+ .nf
+   EVENT
+diff --git a/man/ipmi_ui.1 b/man/ipmi_ui.1
+index 9c5d9b6..011255f 100644
+--- a/man/ipmi_ui.1
++++ b/man/ipmi_ui.1
+@@ -4,7 +4,7 @@
+ ipmi_ui \- Crude interface to an IPMI system
+ 
+ .SH SYNOPSIS
+-.B ipmiui
++.B ipmi_ui
+ .RB [\| \-dmsg \|]
+ .RB [\| \-dmem \|]
+ .RB [\| \-c \|]
+@@ -34,7 +34,7 @@ Normally,
+ starts up in a full-screen format.  The left window shows the output
+ of commands, the right window shows the logs from OpenIPMI.  Both
+ windows are scrollable with page up and page down keys, press the "\fBF1\fP"
+-key to choose the the left window to scroll, the "\fBF2\fP" key to choose
++key to choose the left window to scroll, the "\fBF2\fP" key to choose
+ the right window to scroll.
+ 
+ Note that you must set your environment \fBTERM\fP variable properly for
+@@ -48,7 +48,7 @@ the connections are to the same IPMI domain through different
+ management controllers.  Also, each LAN connection may have two IP
+ addresses.  These are two different addresses to the same management
+ controller.  So you may have a total of 4 IP addresses to an IPMI
+-domain, two management controllers and two IP adresses to each
++domain, two management controllers and two IP addresses to each
+ management controller.
+ 
+ .SH OPTIONS
+@@ -174,12 +174,12 @@ turns events on or off from the sensor (\fB0\fP or \fB1\fP).
+ turns scanning on or off for the sensor (\fB0\fP or \fB1\fP).
+ .I "assertion-bitmask"
+ specifies the bitmask of thresholds or states
+-that should be enabled or disabled when a thrshold or state is
++that should be enabled or disabled when a threshold or state is
+ asserted.  It is a bunch of 0's and 1's, where the first one is for
+ threshold/state 0, the second for threshold/state 1, etc.
+ .I "deassertion-bitmask"
+ specifies the bitmask of thresholds or states
+-that should be enabled or disabled when a thrshold or state is
++that should be enabled or disabled when a threshold or state is
+ deasserted.
+ 
+ .SH CONTROLS
+diff --git a/man/openipmi_conparms.7 b/man/openipmi_conparms.7
+index 587da2a..9dc6404 100644
+--- a/man/openipmi_conparms.7
++++ b/man/openipmi_conparms.7
+@@ -1,7 +1,7 @@
+ .TH openipmi_conparms 7 05/13/03 OpenIPMI "Connection Parameters for OpenIPMI"
+ 
+ .SH NAME
+-openipmi_cmdparms \- Connection parmeters for OpenIPMI
++openipmi_cmdparms \- Connection parameters for OpenIPMI
+ 
+ .SH SYNOPSIS
+ 
+@@ -97,7 +97,7 @@ use.
+ .TP
+ .BI \-Rc\  confidentiality\ algorithm
+ The \fIRMCP+ confidentiality (encryption) algorithm\fP to use.  This keeps
+-evesdroppers from seeing the data.  Valid values are: \fBbmcpick\fP,
++eavesdroppers from seeing the data.  Valid values are: \fBbmcpick\fP,
+ \fBaes_cbc_128\fP, \fBxrc4_128\fP, and \fBxrc_40\fP.  The \fBbmcpick\fP option is used by
+ default, which means the BMC picks the algorithm it wants to use.
+ 
+diff --git a/man/openipmicmd.1 b/man/openipmicmd.1
+index 6bd2401..5d206d1 100644
+--- a/man/openipmicmd.1
++++ b/man/openipmicmd.1
+@@ -22,7 +22,7 @@ interfaces.
+ Execute a single command an exit.
+ 
+ .TP
+-.BI <connection parms>
++.BI <connection\ parms>
+ The parameters for the connection depend on the connection type.
+ These are all described in openipmi_conparms (7)
+ 
+@@ -32,7 +32,7 @@ Once up, you can execute commands in the user interface.  Note that
+ commands and responses are asynchronous, you issue a command and the
+ interface returns immediately.  When the response comes back, it will
+ be dumped on your console.  That's a little strange looking, but IPMI
+-is ansychronous underneath.  Note that the \fB\-k\fP option is synchronous,
++is asynchronous underneath.  Note that the \fB\-k\fP option is synchronous,
+ it will wait for the response or a timeout before returning.
+ 
+ .TP
+@@ -82,7 +82,7 @@ Remove a command registration.
+ .BR openipmi_conparms (7)
+ 
+ .SH "KNOWN PROBLEMS"
+-The asychronous nature of the program can be annoying.
++The asynchronous nature of the program can be annoying.
+ 
+ .SH AUTHOR
+ .PP
+diff --git a/man/openipmigui.1 b/man/openipmigui.1
+index 04f880b..0c8c10f 100644
+--- a/man/openipmigui.1
++++ b/man/openipmigui.1
+@@ -38,7 +38,7 @@ Turn on message debugging, this will dump all messages to debug log output.
+ .TP
+ .B \-\-drawmsg
+ Turn on raw message debugging, this will dump all low-level messages to
+-debug log output.  This differes from normal message debugging in that all
++debug log output.  This differs from normal message debugging in that all
+ protocol messages are also dumped, not just IPMI messages.
+ .TP
+ .B \-\-dmem
+@@ -81,7 +81,7 @@ tree.
+ 
+ The tree window has a top-level list of all the domains for which
+ OpenIPMI has connections (or pending connection).  Each domain
+-exapands into domain-specific information and a list of entities and
++expands into domain-specific information and a list of entities and
+ Management Controllers (MCs) for that domain.
+ 
+ Right click drives most of the operations in the tree window.  Many
+@@ -92,7 +92,7 @@ Color is used in the GUI to denote error status, and shading is used
+ to denote availability.  If a sensor has an error, the tree entry for
+ that sensor will change colors.  Black means no error, yellow means
+ warning, red means critical, and blue means non-recoverable.  These
+-errors propigate up, so the entity containing that sensor will be the
++errors propagate up, so the entity containing that sensor will be the
+ same color as the most critical error for the sensors underneath it.
+ The same goes for domain, it will be the same color as the most
+ critical error for the entities underneath it.  This way, if you watch
+@@ -146,7 +146,7 @@ that sensor.
+ 
+ .SH CONTROLS
+ 
+-Controls are available under the entity they belong to.  control
++Controls are available under the entity they belong to.  Control
+ information is beyond the scope of this document, as IPMI controls are
+ very complex.  See the IPMI document from OpenIPMI for information
+ about controls.
+@@ -214,7 +214,7 @@ channel listing.  Note that some user setting (the name and password)
+ are global to all channels on the MC.
+ 
+ Due to the IPMI spec and some unfortunate implementation bugs, some
+-wierd issues exist with this information.  The user has an Enabled
++weird issues exist with this information.  The user has an Enabled
+ value that tells whether the user is enabled or not.  When initially
+ displayed, this field shows as a "?" because this field is not
+ readable. It will displayed as the actual value when it is modified,
+@@ -247,7 +247,7 @@ changed.
+ .SH SOLPARMS
+ 
+ In the channel display on a 8023_LAN channel, a LANPARM configuration
+-command is available if the MC supporte SOL (Serial Over LAN).  This
++command is available if the MC supports SOL (Serial Over LAN).  This
+ pulls up all the parameters for the LAN and allows them to be set.
+ Right-clicking on an item allows it to be changed.
+ 
+diff --git a/man/openipmish.1 b/man/openipmish.1
+index 36b1e43..2c902e4 100644
+--- a/man/openipmish.1
++++ b/man/openipmish.1
+@@ -26,7 +26,7 @@ Turn on message debugging, this will dump all messages to debug log output.
+ .TP
+ .B \-\-drawmsg
+ Turn on raw message debugging, this will dump all low-level messages to
+-debug log output.  This differes from normal message debugging in that all
++debug log output.  This differs from normal message debugging in that all
+ protocol messages are also dumped, not just IPMI messages.
+ .TP
+ .B \-\-dmem
+@@ -34,11 +34,21 @@ Turn on memory debugging, this will cause memory allocation and
+ deallocations to be checked.  When the program terminates, it will
+ dump all memory that was not properly freed (leaked).
+ .TP
++.B \-\-dmsgerr
++Turn on printing out low-level message errors.
++.TP
+ .B \-\-dlock
+ Turn on lock debugging, this will check lock operations to make sure
+ that locks are help in all the proper places and make sure that locks
+ are properly nested.
+ .TP
++\fB-x\fR\ <string>,\ \fB\-\-execute\fR\ <string>
++Execute the given string at startup.  This may be entered multiple times
++for multiple commands.
++.TP
++.B \-\-glib
++Use glib for the OS handler.
++.TP
+ .B \-\-snmp
+ Enable the SNMP trap handler.
+ .B openipmish
+diff --git a/man/rmcp_ping.1 b/man/rmcp_ping.1
+index d60019a..ce5cab0 100644
+--- a/man/rmcp_ping.1
++++ b/man/rmcp_ping.1
+@@ -38,7 +38,7 @@ starttag.  This is zero by default
+ Turns on debugging to standard output.
+ .TP
+ .I destination
+-The target address, default is the boradcast address (default 255.255.255.255)
++The target address, default is the broadcast address (default 255.255.255.255)
+ 
+ .SH AUTHOR
+ .PP
+diff --git a/man/solterm.1 b/man/solterm.1
+index 1479a1b..ada15d8 100644
+--- a/man/solterm.1
++++ b/man/solterm.1
+@@ -37,9 +37,9 @@ These are all described in openipmi_conparms (7)
+ .TP
+ .BI \-e\  escape_char
+ The character to use to escape, or exit, the program.  Entering this
+-chatacter right after a newline is entered causes the program to go
++character right after a newline is entered causes the program to go
+ into command mode.  A single character after this performs a command.
+-The default escape character is "~" as shown below.  Suppported
++The default escape character is "~" as shown below.  Supported
+ commands are:
+ .RS
+ .IP ~.
+@@ -98,7 +98,7 @@ the SoL session. This is the default.
+ .TP
+ .BI \-holdoff
+ Specifies that CTS, DTR, and DSR are to be deasserted at the start of
+-the SoL session so that the configuration may be modifeid before the
++the SoL session so that the configuration may be modified before the
+ handshake is released.
+ 
+ .TP
+diff --git a/sample/ipmicmd.c b/sample/ipmicmd.c
+index 6cbcdc5..5f5c1ec 100644
+--- a/sample/ipmicmd.c
++++ b/sample/ipmicmd.c
+@@ -124,6 +124,7 @@ void usage(void)
+     printf("%s [-k <command>] [-v] <con_parms>\n", progname);
+     printf("Where <con_parms> is one of:");
+     ipmi_parse_args_iter_help(con_usage, NULL);
++    printf("\n");
+ }
+ 
+ char *
+diff --git a/sample/rmcp_ping.c b/sample/rmcp_ping.c
+index 7814792..5778fea 100644
+--- a/sample/rmcp_ping.c
++++ b/sample/rmcp_ping.c
+@@ -156,6 +156,11 @@ main(int argc, char *argv[])
+ 	if (strcmp(argv[i], "--") == 0) {
+ 	    i++;
+ 	    break;
++	} else if ((strcmp(argv[i], "--help") == 0) ||
++		   (strcmp(argv[i], "-?") == 0) ||
++		   (strcmp(argv[i], "-h") == 0)) {
++	    i++;
++	    usage();
+ 	} else if (strcmp(argv[i], "-p") == 0) {
+ 	    i++;
+ 	    if (i >= argc) {
+diff --git a/sample/solterm.c b/sample/solterm.c
+index 38a3f9d..a3e52de 100644
+--- a/sample/solterm.c
++++ b/sample/solterm.c
+@@ -743,7 +743,12 @@ int main(int argc, char *argv[])
+ 
+ 	/* Now we make sure "lan" is the first argument so we get the
+ 	   right connection type... */
+-	if (strcmp(argv[1], "lan") != 0) {
++	if ((strcmp(argv[1], "-h") == 0) ||
++	    (strcmp(argv[1], "--help") == 0) ||
++	    (strcmp(argv[1], "-?") == 0)) {
++		usage();
++		exit(1);
++	} else if (strcmp(argv[1], "lan") != 0) {
+ 		fprintf(stderr, "main: %s only supports lan connections\n",
+ 			progname);
+ 		exit(1);
+diff --git a/ui/basic_ui.c b/ui/basic_ui.c
+index 6993eb2..84889cb 100644
+--- a/ui/basic_ui.c
++++ b/ui/basic_ui.c
+@@ -306,6 +306,26 @@ snmp_init(os_handler_t *os_hnd)
+ static void snmp_setup_fds(os_handler_t *os_hnd) { }
+ #endif /* HAVE_UCDSNMP */
+     
++void help(void)
++{
++    fprintf(stdout, "ipmi_ui [ options ] smi smi-num\n");
++    fprintf(stdout, "ipmi_ui [ oprions ] lan IP port [IP2 port2] auth priv user pass\n");
++    fprintf(stdout, "\n");
++    fprintf(stdout, "Options:\n");
++    fprintf(stdout, "    -c       Command line mode\n");
++    fprintf(stdout, "    -dlock   Lock debugging ON\n");
++    fprintf(stdout, "    -dmem    Memory debugging ON\n");
++    fprintf(stdout, "    -drawmsg Raw message ON\n");
++    fprintf(stdout, "    -dmsg    Dump all messages.\n");
++#ifdef HAVE_UCDSNMP
++    fprintf(stdout, "    -snmp    SNMP trap handler ON\n");
++#endif
++    fprintf(stdout, "Auth:\n");
++    fprintf(stdout, "    none | straight | md5 | md2\n");
++    fprintf(stdout, "Priv:\n");
++    fprintf(stdout, "    callback | user | operator | admin\n");
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -327,6 +347,11 @@ main(int argc, char *argv[])
+ 	curr_arg++;
+ 	if (strcmp(arg, "--") == 0) {
+ 	    break;
++	} else if (strcmp(arg, "-?") == 0 ||
++		   strcmp(arg, "-h") == 0 ||
++		   strcmp(arg, "--help") == 0) {
++	   help();
++	   return(1);
+ 	} else if (strcmp(arg, "-c") == 0) {
+ 	    full_screen = 0;
+ 	} else if (strcmp(arg, "-dlock") == 0) {
+-- 
+2.7.4
+

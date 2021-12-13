@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>plexus</artifactId>
+    <groupId>org.codehaus.plexus</groupId>
+    <version>1.0.11</version>
+  </parent>
+  <artifactId>plexus-component-factories</artifactId>
+  <version>1.0-alpha-11</version>
+  <name>Plexus Component Factories</name>
+  <inceptionYear>2001</inceptionYear>
+  <packaging>pom</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-46</version>
+    </dependency>
+  </dependencies>
+  <modules>
+    <module>plexus-bsh-factory</module>
+    <module>plexus-ant-factory</module>
+    <!--
+    <module>plexus-jruby-factory</module>
+    -->
+    <module>plexus-groovy-factory</module>
+    <!-- module>plexus-jython-factory</module -->
+    <!--<module>plexus-marmalade-factory</module>-->
+  </modules>
+  <scm> 
+    <connection>scm:svn:http://svn.codehaus.org/plexus/plexus-component-factories/tags/plexus-component-factories-1.0-alpha-11</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/plexus-component-factories/tags/plexus-component-factories-1.0-alpha-11</developerConnection> 
+    <url>http://fisheye.codehaus.org/browse/plexus/plexus-component-factories/tags/plexus-component-factories-1.0-alpha-11</url>
+  </scm>
+</project>

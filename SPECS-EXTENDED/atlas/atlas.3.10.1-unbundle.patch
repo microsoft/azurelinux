@@ -1,0 +1,17 @@
+diff -up wrk/makes/Make.lib.wrk wrk/makes/Make.lib
+--- wrk/makes/Make.lib.wrk	2015-01-23 21:14:46.465494411 +0100
++++ wrk/makes/Make.lib	2015-01-23 22:48:39.632479588 +0100
+@@ -185,11 +185,11 @@ TRYALL :
+ #
+ fat_ptshared :                              # threaded target
+ 	$(MAKE) TRYALL outso=libtatlas.so \
+-                libas="libptlapack.a libptf77blas.a libptcblas.a libatlas.a" \
++                libas="libptlapack.a libptf77blas.a libptcblas.a libatlas.a $(SLAPACKlib)" \
+                 LIBINSTdir="$(LIBINSTdir)"
+ fat_shared :                                # serial target
+ 	$(MAKE) TRYALL outso=libsatlas.so \
+-                libas="liblapack.a libf77blas.a libcblas.a libatlas.a" \
++                libas="liblapack.a libf77blas.a libcblas.a libatlas.a $(SLAPACKlib)" \
+                 LIBINSTdir="$(LIBINSTdir)"
+ #
+ # Builds shared lib, not include fortran codes from LAPACK

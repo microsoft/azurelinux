@@ -1,0 +1,12 @@
+--- hamcrest-1.3/build.xml	2012-07-02 21:14:09.000000000 +0200
++++ hamcrest-1.3/build.xml	2017-12-18 07:46:06.290074242 +0100
+@@ -165,9 +165,6 @@
+             <group title="Hamcrest API and Utility Classes" packages="org.hamcrest"/>
+             <group title="Matcher Library" packages="org.hamcrest.*"/>
+             <group title="Integration" packages="org.hamcrest.integration, org.hamcrest.integration.*"/>
+-            
+-            <link offline="false" href="http://www.junit.org/junit/javadoc/3.8.1/"/>
+-            <link offline="false" href="http://kentbeck.github.com/junit/javadoc/latest/"/>
+         </javadoc>
+         <jar jarfile="build/hamcrest-all-${version}-javadoc.jar">
+             <fileset dir="build/temp/hamcrest-all-${version}-javadoc.jar.contents"/>

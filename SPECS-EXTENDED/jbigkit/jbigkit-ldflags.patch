@@ -1,0 +1,51 @@
+diff -up jbigkit-2.1/libjbig/Makefile.ldflags jbigkit-2.1/libjbig/Makefile
+--- jbigkit-2.1/libjbig/Makefile.ldflags	2018-02-27 17:50:15.786038149 +0100
++++ jbigkit-2.1/libjbig/Makefile	2018-02-27 17:55:44.042093437 +0100
+@@ -10,19 +10,19 @@ PICFLAGS := -fPIC -DPIC
+ all: libjbig.so.$(VERSION) tstcodec tstcodec85
+ 
+ tstcodec: tstcodec.o libjbig.so
+-	$(CC) $(CFLAGS) -o tstcodec $< -L. -ljbig
++	$(CC) $(CFLAGS) -o tstcodec $< -L. -ljbig $(LDFLAGS)
+ 
+ tstcodec85: tstcodec85.o libjbig85.so
+-	$(CC) $(CFLAGS) -o tstcodec85 $^ -L. -ljbig
++	$(CC) $(CFLAGS) -o tstcodec85 $^ -L. -ljbig $(LDFLAGS)
+ 
+ %.so: %.so.$(VERSION)
+ 	ln -sf $< $@
+ 
+ libjbig.so.$(VERSION): jbig.o jbig_ar.o
+-	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) -shared -Wl,-soname,$@ -o $@ $^
+ 
+ libjbig85.so.$(VERSION): jbig85.o jbig_ar.o
+-	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) -shared -Wl,-soname,$@ -o $@ $^
+ 
+ jbig.o jbig85.o jbig_ar.o: CFLAGS += $(PICFLAGS)
+ 
+diff -up jbigkit-2.1/pbmtools/Makefile.ldflags jbigkit-2.1/pbmtools/Makefile
+--- jbigkit-2.1/pbmtools/Makefile.ldflags	2018-02-27 17:50:35.902857687 +0100
++++ jbigkit-2.1/pbmtools/Makefile	2018-02-27 17:57:09.296328639 +0100
+@@ -15,16 +15,16 @@ all: pbmtojbg jbgtopbm pbmtojbg85 jbgtop
+ txt: pbmtojbg.txt jbgtopbm.txt pbm.txt pgm.txt
+ 
+ pbmtojbg: pbmtojbg.o ../libjbig/libjbig.so
+-	$(CC) $(CFLAGS) -o pbmtojbg pbmtojbg.o -L../libjbig -ljbig
++	$(CC) $(CFLAGS) -o pbmtojbg pbmtojbg.o -L../libjbig -ljbig $(LDFLAGS)
+ 
+ jbgtopbm: jbgtopbm.o ../libjbig/libjbig.so
+-	$(CC) $(CFLAGS) -o jbgtopbm jbgtopbm.o -L../libjbig -ljbig
++	$(CC) $(CFLAGS) -o jbgtopbm jbgtopbm.o -L../libjbig -ljbig $(LDFLAGS)
+ 
+ pbmtojbg85: pbmtojbg85.o ../libjbig/libjbig85.so
+-	$(CC) $(CFLAGS) -o pbmtojbg85 pbmtojbg85.o -L../libjbig -ljbig85
++	$(CC) $(CFLAGS) -o pbmtojbg85 pbmtojbg85.o -L../libjbig -ljbig85 $(LDFLAGS)
+ 
+ jbgtopbm85: jbgtopbm85.o ../libjbig/libjbig85.so
+-	$(CC) $(CFLAGS) -o jbgtopbm85 jbgtopbm85.o -L../libjbig -ljbig85
++	$(CC) $(CFLAGS) -o jbgtopbm85 jbgtopbm85.o -L../libjbig -ljbig85 $(LDFLAGS)
+ 
+ jbgtopbm.o: jbgtopbm.c ../libjbig/jbig.h
+ pbmtojbg.o: pbmtojbg.c ../libjbig/jbig.h

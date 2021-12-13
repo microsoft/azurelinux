@@ -1,0 +1,51 @@
+diff -up xterm-328/minstall.in.man-paths xterm-328/minstall.in
+--- xterm-328/minstall.in.man-paths	2016-10-25 00:29:20.000000000 +0200
++++ xterm-328/minstall.in	2017-06-01 16:36:26.544065282 +0200
+@@ -138,6 +138,11 @@ USE_chr1=`echo "$USE_name" | sed -e 's/^
+ USE_Name=${USE_chr0}${USE_chr1}
+ USE_NAME=`echo "$USE_name" | tr '[a-z]' '[A-Z]'`
+ 
++fontpath=/usr/share/X11/fonts
++xorgcfgdir=/etc/X11
++xorgcfgfil=xorg.conf
++X_MANSECT=7
++
+ sed	-e 's%__vendorversion__%"X Window System"%' \
+ 	-e 's%__app_version__%Patch\ \#'$PATCH_NUM% \
+ 	-e 's%__app_date__%'$PATCH_YMD% \
+@@ -163,6 +168,9 @@ sed	-e 's%__vendorversion__%"X Window Sy
+ 	-e s%fIwtmp'\\%fI'$WTMP_NAME'\\%g' \
+ 	-e s%/etc/wtmp%$WTMP_PATH%g \
+ 	-e 's%/\\(\*\*%/*%g' \
++ 	-e s%__fontpath__%$fontpath%g \
++ 	-e s%__xorgcfgdir__%$xorgcfgdir%g \
++ 	-e s%__xorgcfgfil__%$xorgcfgfil%g \
+ 	$OLD_FILE >$NEW_FILE
+ # diff -u $OLD_FILE $NEW_FILE
+ 
+diff -up xterm-328/xterm.man.man-paths xterm-328/xterm.man
+--- xterm-328/xterm.man.man-paths	2017-05-31 00:57:12.000000000 +0200
++++ xterm-328/xterm.man	2017-06-01 16:33:16.493512367 +0200
+@@ -2328,19 +2328,18 @@ Since X11R6, bitmap fonts have been scal
+ The font server claims to provide the bold font that \fI\*n\fP requests,
+ but the result is not always readable.
+ XFree86 introduced a feature which can be used to suppress the scaling.
+-In the X server's configuration file (e.g., \*(``/etc/X11/XFree86\*(''
+-or \*(``/etc/X11/xorg.conf\*(''), you
++In the X server's configuration file (e.g., \*(``__xorgcfgdir__/__xorgcfgfil__\*(''), you
+ can add \*(``:unscaled\*('' to the end of the directory specification for the
+ \*(``misc\*('' fonts,
+ which comprise the fixed-pitch fonts that are used by \fI\*n\fP.
+ For example
+ .NS
+-FontPath	"/usr/lib/X11/fonts/misc/"
++FontPath	"__fontpath__/misc/"
+ .NE
+ .IP
+ would become
+ .NS
+-FontPath	"/usr/lib/X11/fonts/misc/:unscaled"
++FontPath	"__fontpath__/misc/:unscaled"
+ .NE
+ .IP
+ Depending on your configuration, the font server may have its own configuration

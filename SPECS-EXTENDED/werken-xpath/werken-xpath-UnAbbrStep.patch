@@ -1,0 +1,47 @@
+--- src/com/werken/xpath/impl/UnAbbrStep.java.sav	2000-10-31 21:20:56.000000000 +0100
++++ src/com/werken/xpath/impl/UnAbbrStep.java	2006-05-05 20:20:11.000000000 +0200
+@@ -175,7 +175,7 @@
+       }
+     }
+ 
+-    return aggregateResults;;
++    return aggregateResults;
+   }
+ 
+   private List applyPredicates(List nodeSet,
+@@ -227,7 +227,7 @@
+ 
+     if ( node instanceof Element )
+     {
+-      List children = ((Element)node).getMixedContent();
++      List children = ((Element)node).getContent();
+       
+       results.addAll( applyTo( children,
+                                support,
+@@ -235,7 +235,7 @@
+     }
+     else if ( node instanceof Document )
+     {
+-      List children = ((Document)node).getMixedContent();
++      List children = ((Document)node).getContent();
+       
+       results.addAll( applyTo( children,
+                                support,
+@@ -256,7 +256,7 @@
+ 
+     if ( node instanceof Element )
+     {
+-      List children = ((Element)node).getMixedContent();
++      List children = ((Element)node).getContent();
+       
+       results.addAll( applyTo( children,
+                                support,
+@@ -264,7 +264,7 @@
+     }
+     else if ( node instanceof Document )
+     {
+-      List children = ((Document)node).getMixedContent();
++      List children = ((Document)node).getContent();
+ 
+       results.addAll( applyTo( children,
+                                support,

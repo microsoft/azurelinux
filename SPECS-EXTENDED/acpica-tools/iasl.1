@@ -1,0 +1,231 @@
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH IASL 1 "January 23, 2013"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+iasl \- ACPI Source Language compiler/decompiler
+.SH SYNOPSIS
+.B iasl
+.RI [ <option> ... ]
+.RI <input-file>
+.B ...
+.SH DESCRIPTION
+This manual page briefly documents the
+.B iasl
+command. The option list is taken from the iasl interactive help.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
+.\" respectively.
+.B iasl
+is an ASL compiler and decompiler.  This command provides both the ability
+to translate one or more ASL source files to their corresponding AML binary
+files, and the ability to translate AML binary files back to readable
+ASL source.
+.PP
+Much more detailed documentation may be found at
+http://www.acpica.org/documentation/.
+
+.SH OPTIONS
+
+.PP
+.SS Global
+.TP
+.B \-@ <file>
+Specify command file
+.TP
+.B \-I <dir>
+Specify additional include directory
+.TP
+.B \-T <sig>|ALL|*
+Create table template file for ACPI <sig>
+.TP
+.B \-v
+Display compiler version
+
+.PP
+.SS Preprocessor
+.TP
+.B \-D <symbol>
+Define sybol for preprocessor use
+.TP
+.B \-li
+Create prepocessed output file (*.i)
+.TP
+.B \-P
+Preprocess only and create preprocessor output file (*.i)
+.TP
+.B \-Pn
+Disable preprocessor
+
+.PP
+.SS General Output
+.TP
+.B \-p <prefix>
+Specify path/filename prefix for all output files
+.TP
+.B \-va
+Disable all errors and warnings (summary only)
+.TP
+.B \-vi
+Less verbose errors and warnings for use with IDEs
+.TP
+.B \-vo
+Enable optimization comments
+.TP
+.B \-vr
+Disable remarks
+.TP
+.B \-vs
+Disable signon
+.TP
+.B \-w{1|2|3}
+Set warning reporting level
+.TP
+.B \-we
+Report warnings as errors
+
+.PP
+.SS AML and Data Output Files
+.TP
+.B \-s{a|c}
+Create assembler or C source file (*.asm or *.c)
+.TP
+.B \-i{a|c}
+Create assembler or C include file (*.inc or *.h)
+.TP
+.B \-t{a|c|s}
+Create assembler, C, or ASL hex table (*.hex)
+
+.PP
+.SS AML Code Generation
+.TP
+.B \-oa
+Disable all optimizations (compatibility mode)
+.TP
+.B \-of
+Disable constant folding
+.TP
+.B \-oi
+Disable integer optimization to Zero/One/Ones
+.TP
+.B \-on
+Disable named reference string optimization
+.TP
+.B \-cr
+Disable Resource Descriptor error checking
+.TP
+.B \-in
+Ignore NoOp operators
+.TP
+.B \-r <revision>
+Override table header Revision (1-255)
+
+.PP
+.SS ASL Listing Files
+.TP
+.B \-l
+Create mixed listing file (ASL source and AML) (*.lst)
+.TP
+.B \-ln
+Create namespace file (*.nsp)
+.TP
+.B \-ls
+Create combined source file (expanded includes) (*.src)
+
+.PP
+.SS ACPI Data Tables
+.TP
+.B \-G
+Compile custom table containing generic operators
+.TP
+.B \-vt
+Create verbose templates (full disassembly)
+
+.PP
+.SS AML Disassembler
+.TP
+.B \-d [<file>]
+Disassemble AML to ASL source code file (*.dsl)
+.TP
+.B \-da [<file1>,<file2>]
+Disassemble multiple tables from single namespace
+.TP
+.B \-db
+Do not translate Buffers to Resource Templates
+.TP
+.B \-dc [<file>]
+Disassemble AML and immediately compile it
+.br
+(Obtain DSDT from current system if no input file)
+.TP
+.B \-e [<file1>,<file2>]
+Include ACPI table(s) for external symbol resolution
+.TP
+.B \-g
+Get ACPI tables and write to files (*.dat)
+.TP
+.B \-in
+Ignore NoOp opcodes
+.TP
+.B \-vt
+Dump binary table date in hex format within output file
+
+.PP
+.SS Help
+.TP
+.B \-h
+Additional help and compiler debug options
+.TP
+.B \-hc
+Display operators allowed in constant expressions
+.TP
+.B \-hf
+Display help for output file name generation
+.TP
+.B \-hr
+Display ACPI reserved method names
+.TP
+.B \-ht
+Display currently supported ACPI table names
+
+.PP
+.SS Debug
+.TP
+.B \-b{f|t}
+Create debug file (full or parse tree only) (*.txt)
+.TP
+.B \-f
+Ignore errors, force creation of AML output file(s)
+.TP
+.B \-n
+Parse only, no output generation
+.TP
+.B \-ot
+Display compiles times and statistics
+.TP
+.B \-x <level>
+Set debug level for trace output
+.TP
+.B \-z
+Do not insert new compiler ID for DataTables
+
+.SH AUTHOR
+iasl was written by Robert Moore <robert.moore@intel.com>.
+.PP
+This manual page was written by Mattia Dongili <malattia@debian.org>,
+for the Debian project (but may be used by others).  It was updated for
+the Fedora project by Al Stone <ahs3@redhat.com> (and may also be used
+by others).

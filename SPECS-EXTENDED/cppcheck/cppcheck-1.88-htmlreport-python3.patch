@@ -1,0 +1,27 @@
+diff -up cppcheck-1.88/htmlreport/cppcheck-htmlreport.python3 cppcheck-1.88/htmlreport/cppcheck-htmlreport
+--- cppcheck-1.88/htmlreport/cppcheck-htmlreport.python3	2019-06-29 09:51:25.000000000 +0200
++++ cppcheck-1.88/htmlreport/cppcheck-htmlreport	2019-08-14 11:02:23.791627296 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ 
+ from __future__ import unicode_literals
+ 
+diff -up cppcheck-1.88/htmlreport/setup.py.python3 cppcheck-1.88/htmlreport/setup.py
+--- cppcheck-1.88/htmlreport/setup.py.python3	2019-06-29 09:51:25.000000000 +0200
++++ cppcheck-1.88/htmlreport/setup.py	2019-08-14 11:02:28.570423533 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ 
+ from setuptools import setup
+ 
+diff -up cppcheck-1.88/htmlreport/test_htmlreport.py.python3 cppcheck-1.88/htmlreport/test_htmlreport.py
+--- cppcheck-1.88/htmlreport/test_htmlreport.py.python3	2019-06-29 09:51:25.000000000 +0200
++++ cppcheck-1.88/htmlreport/test_htmlreport.py	2019-08-14 11:02:20.296776345 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ """Test cppcheck-htmlreport."""
+ 
+ import os

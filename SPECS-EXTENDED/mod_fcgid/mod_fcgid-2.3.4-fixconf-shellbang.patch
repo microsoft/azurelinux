@@ -1,0 +1,8 @@
+--- mod_fcgid-2.3.4/build/fixconf.sed	2009-10-07 04:16:08.000000000 +0100
++++ mod_fcgid-2.3.4/build/fixconf.sed	2009-10-12 09:50:14.570448865 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/sed -f
++#!/bin/sed -f
+ #
+ # Licensed to the Apache Software Foundation (ASF) under one or more
+ # contributor license agreements.  See the NOTICE file distributed with

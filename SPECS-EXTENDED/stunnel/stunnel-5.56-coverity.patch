@@ -1,0 +1,22 @@
+diff -up stunnel-5.48/src/str.c.coverity stunnel-5.48/src/str.c
+--- stunnel-5.48/src/str.c.coverity	2018-07-02 23:30:10.000000000 +0200
++++ stunnel-5.48/src/str.c	2018-09-04 17:24:08.949928906 +0200
+@@ -165,6 +165,7 @@ char *str_vprintf(const char *format, va
+     for(;;) {
+         va_copy(ap, start_ap);
+         n=vsnprintf(p, size, format, ap);
++        va_end(ap);
+         if(n>-1 && n<(int)size)
+             return p;
+         if(n>-1)                /* glibc 2.1 */
+diff -up stunnel-5.48/src/stunnel.c.coverity stunnel-5.48/src/stunnel.c
+--- stunnel-5.48/src/stunnel.c.coverity	2018-07-02 23:30:10.000000000 +0200
++++ stunnel-5.48/src/stunnel.c	2018-09-04 17:24:08.949928906 +0200
+@@ -364,7 +364,6 @@ NOEXPORT int accept_connection(SERVICE_O
+ #endif
+     if(create_client(fd, s, alloc_client_session(opt, s, s))) {
+         s_log(LOG_ERR, "Connection rejected: create_client failed");
+-        closesocket(s);
+ #ifndef USE_FORK
+         service_free(opt);
+ #endif

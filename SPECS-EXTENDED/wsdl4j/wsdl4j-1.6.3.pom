@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>wsdl4j</groupId>
+    <artifactId>wsdl4j</artifactId>
+    <version>1.6.3</version>
+    <packaging>jar</packaging>
+    <name>WSDL4J</name>
+    <url>http://sf.net/projects/wsdl4j</url>
+    <description>Java stub generator for WSDL</description>
+    <dependencies/>
+    <licenses>
+        <license>
+            <name>CPL</name>
+            <url>http://www.opensource.org/licenses/cpl1.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>Common Public License</comments>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:cvs:pserver:anonymous@wsdl4j.cvs.sourceforge.net:/cvsroot/wsdl4j</connection>
+        <developerConnection>scm:cvs:pserver:wsdl4j.cvs.sourceforge.net:/cvsroot/wsdl4j</developerConnection>
+        <url>http://wsdl4j.cvs.sourceforge.net/wsdl4j</url>
+    </scm>
+    <developers>
+        <developer>
+            <id>wsdl4j</id>
+            <name>WSDL4J</name>
+            <email>wsdl4j-discuss@sourceforge.net</email>
+        </developer>
+    </developers>
+</project>

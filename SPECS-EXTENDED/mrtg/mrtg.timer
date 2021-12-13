@@ -1,0 +1,20 @@
+# To customize, copy this file to /etc/systemd/system and edit there
+#
+# You can use this unit to periodically run mrtg.service.
+# Only enable if you do not want to run mrtg as a daemon.
+# Starting mrtg.timer while mrtg.service is running as a daemon has no point.
+#
+# Please disable /etc/crond.d/mrtg job when using this unit!
+#
+# Default is to run mrtg.service every 5 minutes, starting
+# 1 minute after system boot.
+
+[Unit]
+Description=periodic invocation of MRTG
+
+[Timer]
+OnBootSec=1m
+OnUnitActiveSec=5m
+
+[Install]
+WantedBy=multi-user.target

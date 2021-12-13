@@ -1,0 +1,383 @@
+From 6edc865bd02ab591b9121d4a5f6dc3cdbe5af809 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Wed, 9 Apr 2014 09:18:24 +0200
+Subject: [PATCH 19/27] sys-linux: rework get_first_ethernet()
+
+We can't assume that host has ethernet NIC named "eth0". Rather than guessing we
+better ask udev. We iterate over symlinks symlinks in /sys/class/net and
+for each device we determine if it is ethernet device and additionally we query
+udev database for sub-type of the device. If we find PCI or USB device which has
+ethernet datalink type and appropriate sub-type we return its name. If we don't
+succeed in determining more information about device we will return "good
+enough" device which in turn is first device with ethernet datalink type.
+
+Note that we now have two copies of get_first_ethernet() in the source code. This
+is bad and should be fixed in the future.
+
+This commit replaces ppp-2.4.5-eth.patch.
+
+Resolves: #682381
+---
+ pppd/Makefile.linux                     |   3 +
+ pppd/multilink.c                        |   4 +-
+ pppd/plugins/rp-pppoe/Makefile.linux    |   4 +-
+ pppd/plugins/rp-pppoe/pppoe-discovery.c | 117 +++++++++++++++++++++++++++++++-
+ pppd/pppd.h                             |   2 +-
+ pppd/sys-linux.c                        | 115 +++++++++++++++++++++++++++++--
+ 6 files changed, 232 insertions(+), 13 deletions(-)
+
+diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
+index 53df4d2..0e8107f 100644
+--- a/pppd/Makefile.linux
++++ b/pppd/Makefile.linux
+@@ -32,6 +32,9 @@ include .depend
+ endif
+ 
+ CC = gcc
++
++LIBS = -ludev
++
+ #
+ COPTS = -Wall $(RPM_OPT_FLAGS) -DLIBDIR=\""$(LIBDIR)"\"
+ 
+diff --git a/pppd/multilink.c b/pppd/multilink.c
+index 135cab0..2f0ed50 100644
+--- a/pppd/multilink.c
++++ b/pppd/multilink.c
+@@ -436,12 +436,12 @@ static int
+ get_default_epdisc(ep)
+      struct epdisc *ep;
+ {
+-	char *p;
++	char *p = NULL;
+ 	struct hostent *hp;
+ 	u_int32_t addr;
+ 
+ 	/* First try for an ethernet MAC address */
+-	p = get_first_ethernet();
++        get_first_ethernet(&p);
+ 	if (p != 0 && get_if_hwaddr(ep->value, p) >= 0) {
+ 		ep->class = EPD_MAC;
+ 		ep->length = 6;
+diff --git a/pppd/plugins/rp-pppoe/Makefile.linux b/pppd/plugins/rp-pppoe/Makefile.linux
+index 9918091..b949716 100644
+--- a/pppd/plugins/rp-pppoe/Makefile.linux
++++ b/pppd/plugins/rp-pppoe/Makefile.linux
+@@ -30,8 +30,8 @@ COPTS=$(RPM_OPT_FLAGS)
+ CFLAGS=$(COPTS) -I../../../include '-DRP_VERSION="$(RP_VERSION)"'
+ all: rp-pppoe.so pppoe-discovery
+ 
+-pppoe-discovery: pppoe-discovery.o debug.o
+-	$(CC) -o pppoe-discovery pppoe-discovery.o debug.o
++pppoe-discovery: pppoe-discovery.o debug.o common.o
++	$(CC) -o pppoe-discovery pppoe-discovery.o debug.o -ludev
+ 
+ pppoe-discovery.o: pppoe-discovery.c
+ 	$(CC) $(CFLAGS) -c -o pppoe-discovery.o pppoe-discovery.c
+diff --git a/pppd/plugins/rp-pppoe/pppoe-discovery.c b/pppd/plugins/rp-pppoe/pppoe-discovery.c
+index c0d927d..2bd910f 100644
+--- a/pppd/plugins/rp-pppoe/pppoe-discovery.c
++++ b/pppd/plugins/rp-pppoe/pppoe-discovery.c
+@@ -47,8 +47,13 @@
+ #include <net/if_arp.h>
+ #endif
+ 
++#include <dirent.h>
++#include <sys/types.h>
++#include <libudev.h>
++
+ char *xstrdup(const char *s);
+ void usage(void);
++int get_first_ethernet(char **_r);
+ 
+ void die(int status)
+ {
+@@ -681,8 +686,15 @@ int main(int argc, char *argv[])
+     }
+ 
+     /* default interface name */
+-    if (!conn->ifName)
+-	conn->ifName = strdup("eth0");
++    if (!conn->ifName) {
++            char *eth_dev;
++            if (get_first_ethernet(&eth_dev) < 0) {
++                    fprintf(stderr, "No ethernet device on the host.\n");
++                    exit(1);
++            }
++            conn->ifName = eth_dev;
++    }
++
+ 
+     conn->discoverySocket = -1;
+     conn->sessionSocket = -1;
+@@ -722,3 +734,104 @@ void usage(void)
+     fprintf(stderr, "Usage: pppoe-discovery [options]\n");
+     fprintf(stderr, "\nVersion " RP_VERSION "\n");
+ }
++
++/*
++ * get_first_ethernet - return the name of the first ethernet-style
++ * interface on this system.
++ */
++int
++get_first_ethernet(char **_r)
++{
++        int r = 0;
++        DIR *d = NULL;
++        struct dirent *entry = NULL;
++        struct udev *udev = NULL;
++        struct udev_device *dev = NULL;
++        char *eth_dev = NULL;
++
++        d = opendir("/sys/class/net");
++        if (!d) {
++                fprintf(stderr, "Failed to open dir /sys/class/net : %m\n");
++                r = -errno;
++                goto fail;
++        }
++
++        udev = udev_new();
++        if (!udev) {
++                fprintf(stderr, "Failed to talk to systemd-udevd\n");
++                r = -EIO;
++                goto fail;
++        }
++
++        while ((entry = readdir(d)) != NULL) {
++                char syspath[PATH_MAX] = {};
++                const char *type = NULL;
++
++                if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0))
++                        continue;
++
++                sprintf(syspath, "/sys/class/net/%s", entry->d_name);
++
++                dev = udev_device_new_from_syspath(udev, syspath);
++                if (!dev)
++                        continue;
++
++                type = udev_device_get_sysattr_value(dev, "type");
++                if (strcmp(type, "1") == 0) {
++                        const char *pci_dev_subclass = NULL, *usb_dev_subclass = NULL;
++
++                        pci_dev_subclass = udev_device_get_property_value(dev,
++                                                                          "ID_PCI_SUBCLASS_FROM_DATABASE");
++                        usb_dev_subclass = udev_device_get_property_value(dev,
++                                                                          "ID_USB_SUBCLASS_FROM_DATABASE");
++
++                        if ((pci_dev_subclass && strcmp(pci_dev_subclass, "Ethernet controller") == 0) ||
++                            (usb_dev_subclass && (strcmp(usb_dev_subclass, "Ethernet Networking") == 0 ||
++                                                  strcmp(usb_dev_subclass, "Ethernet Emulation") == 0))) {
++                                char *d = NULL;
++
++                                d = strdup(entry->d_name);
++                                if (!d) {
++                                        r = -ENOMEM;
++                                        goto fail;
++                                }
++
++                                free(eth_dev);
++                                eth_dev = d;
++                                break;
++                        } else if (!eth_dev) {
++                                eth_dev = strdup(entry->d_name);
++                                if (!eth_dev) {
++                                        r = -ENOMEM;
++                                        goto fail;
++                                }
++                        }
++                }
++
++                udev_device_unref(dev);
++                dev = NULL;
++        }
++
++        if (dev)
++                udev_device_unref(dev);
++        udev_unref(udev);
++        closedir(d);
++
++        *_r = eth_dev;
++
++        return 0;
++
++fail:
++        if (dev)
++                udev_device_unref(dev);
++
++        if (udev)
++                udev_unref(udev);
++
++        if (d)
++                closedir(d);
++
++        free(eth_dev);
++
++        return r;
++}
+diff --git a/pppd/pppd.h b/pppd/pppd.h
+index de271c1..aaddba1 100644
+--- a/pppd/pppd.h
++++ b/pppd/pppd.h
+@@ -691,7 +691,7 @@ int  sipxfaddr __P((int, unsigned long, unsigned char *));
+ int  cipxfaddr __P((int));
+ #endif
+ int  get_if_hwaddr __P((u_char *addr, char *name));
+-char *get_first_ethernet __P((void));
++int get_first_ethernet __P((char **_r));
+ 
+ /* Procedures exported from options.c */
+ int setipaddr __P((char *, char **, int)); /* Set local/remote ip addresses */
+diff --git a/pppd/sys-linux.c b/pppd/sys-linux.c
+index 0690019..ec09c50 100644
+--- a/pppd/sys-linux.c
++++ b/pppd/sys-linux.c
+@@ -92,6 +92,9 @@
+ #include <ctype.h>
+ #include <termios.h>
+ #include <unistd.h>
++#include <dirent.h>
++
++#include <libudev.h>
+ 
+ /* This is in netdevice.h. However, this compile will fail miserably if
+    you attempt to include netdevice.h because it has so many references
+@@ -1873,10 +1876,101 @@ get_if_hwaddr(u_char *addr, char *name)
+  * get_first_ethernet - return the name of the first ethernet-style
+  * interface on this system.
+  */
+-char *
+-get_first_ethernet()
+-{
+-	return "eth0";
++int
++get_first_ethernet(char **_r)
++{
++        int r = 0;
++        DIR *d = NULL;
++        struct dirent *entry = NULL;
++        struct udev *udev = NULL;
++        struct udev_device *dev = NULL;
++        char *eth_dev = NULL;
++
++        d = opendir("/sys/class/net");
++        if (!d) {
++                fprintf(stderr, "Failed to open dir /sys/class/net : %m\n");
++                r = -errno;
++                goto fail;
++        }
++
++        udev = udev_new();
++        if (!udev) {
++                fprintf(stderr, "Failed to talk to systemd-udevd\n");
++                r = -EIO;
++                goto fail;
++        }
++
++        while ((entry = readdir(d)) != NULL) {
++                char syspath[PATH_MAX] = {};
++                const char *type = NULL;
++
++                if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0))
++                        continue;
++
++                sprintf(syspath, "/sys/class/net/%s", entry->d_name);
++
++                dev = udev_device_new_from_syspath(udev, syspath);
++                if (!dev)
++                        continue;
++
++                type = udev_device_get_sysattr_value(dev, "type");
++                if (strcmp(type, "1") == 0) {
++                        const char *pci_dev_subclass = NULL, *usb_dev_subclass = NULL;
++
++                        pci_dev_subclass = udev_device_get_property_value(dev,
++                                                                          "ID_PCI_SUBCLASS_FROM_DATABASE");
++                        usb_dev_subclass = udev_device_get_property_value(dev,
++                                                                          "ID_USB_SUBCLASS_FROM_DATABASE");
++
++                        if ((pci_dev_subclass && strcmp(pci_dev_subclass, "Ethernet controller") == 0) ||
++                            (usb_dev_subclass && (strcmp(usb_dev_subclass, "Ethernet Networking") == 0 ||
++                                                  strcmp(usb_dev_subclass, "Ethernet Emulation") == 0))) {
++                                char *d = NULL;
++
++                                d = strdup(entry->d_name);
++                                if (!d) {
++                                        r = -ENOMEM;
++                                        goto fail;
++                                }
++
++                                free(eth_dev);
++                                eth_dev = d;
++                                break;
++                        } else if (!eth_dev) {
++                                eth_dev = strdup(entry->d_name);
++                                if (!eth_dev) {
++                                        r = -ENOMEM;
++                                        goto fail;
++                                }
++                        }
++                }
++
++                udev_device_unref(dev);
++                dev = NULL;
++        }
++
++        if (dev)
++                udev_device_unref(dev);
++        udev_unref(udev);
++        closedir(d);
++
++        *_r = eth_dev;
++
++        return 0;
++
++fail:
++        if (dev)
++                udev_device_unref(dev);
++
++        if (udev)
++                udev_unref(udev);
++
++        if (d)
++                closedir(d);
++
++        free(eth_dev);
++
++        return r;
+ }
+ 
+ /********************************************************************
+@@ -2859,6 +2953,7 @@ ether_to_eui64(eui64_t *p_eui64)
+     struct ifreq ifr;
+     int skfd;
+     const unsigned char *ptr;
++    char *eth_dev = NULL;
+ 
+     skfd = socket(PF_INET6, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+     if(skfd == -1)
+@@ -2867,11 +2962,19 @@ ether_to_eui64(eui64_t *p_eui64)
+         return 0;
+     }
+ 
+-    strcpy(ifr.ifr_name, "eth0");
++    if (get_first_ethernet(&eth_dev) < 0)
++    {
++            warn("no ethernet device present on the host");
++            return 0;
++    }
++
++    strcpy(ifr.ifr_name, eth_dev);
++    free(eth_dev);
++
+     if(ioctl(skfd, SIOCGIFHWADDR, &ifr) < 0)
+     {
+         close(skfd);
+-        warn("could not obtain hardware address for eth0");
++        warn("could not obtain hardware address for %s", ifr.ifr_name);
+         return 0;
+     }
+     close(skfd);
+-- 
+1.8.3.1
+

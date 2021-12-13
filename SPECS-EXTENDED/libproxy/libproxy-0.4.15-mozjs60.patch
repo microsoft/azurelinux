@@ -1,0 +1,23 @@
+From 1600c6af7ed775d4ccbb239937acd92ef7162409 Mon Sep 17 00:00:00 2001
+From: Laurent Bigonville <bigon@bigon.be>
+Date: Sun, 9 Dec 2018 16:07:55 +0100
+Subject: [PATCH] Build with mozjs 60 instead
+
+This seems enough to make it work with mozjs 60
+---
+ libproxy/cmake/modules/pacrunner_mozjs.cmk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libproxy/cmake/modules/pacrunner_mozjs.cmk b/libproxy/cmake/modules/pacrunner_mozjs.cmk
+index 20857fb..871cc85 100644
+--- a/libproxy/cmake/modules/pacrunner_mozjs.cmk
++++ b/libproxy/cmake/modules/pacrunner_mozjs.cmk
+@@ -9,7 +9,7 @@ if(WIN32)
+ elseif(NOT APPLE)
+   option(WITH_MOZJS "Search for MOZJS package" ON)
+   if (WITH_MOZJS)
+-    pkg_search_module(MOZJS mozjs-52)
++    pkg_search_module(MOZJS mozjs-60)
+     if(MOZJS_FOUND)
+       include_directories(${MOZJS_INCLUDE_DIRS})
+       link_directories(${MOZJS_LIBRARY_DIRS})

@@ -1,0 +1,65 @@
+From 5a2388c895cfd7db5f6ca1cc4acb062dfde336bf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 25 Apr 2019 14:23:55 +0200
+Subject: [PATCH] test: Remove a test for cancelling asynchronous calls
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+t/60cancel.t performed a racy test when it started an asynchronous query, then
+it canceled it and tested that the cancelling succeeded. However, if a server
+finished the search before the cancelling order was issued, the cancel itself
+failed because it referred an not running and thus then nonexisting query:
+
+    t/60cancel.t .. 1/7
+    #   Failed test 'cancel a running operation: 119: message ID not found'
+    #   at t/60cancel.t line 63.
+    # This test may have failed because the server was too fast
+
+The race was actually admitted in the diag message.
+
+This patch removes the unreliable test to prevent from false negatives.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ t/60cancel.t | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/t/60cancel.t b/t/60cancel.t
+index c72bfa5..8a3074c 100644
+--- a/t/60cancel.t
++++ b/t/60cancel.t
+@@ -11,7 +11,7 @@ BEGIN { require "t/common.pl" }
+ 
+ 
+ start_server()
+-? plan tests => 7
++? plan tests => 6
+ : plan skip_all => 'no server';
+ 
+ 
+@@ -47,21 +47,6 @@ SKIP: {
+   # cancel the finished search => should fail
+   $cancel = $ldap->cancel($search);
+   ok($cancel->code, "cancel a finished operation: " . $cancel->code . ": " . $cancel->error);
+-
+-  # switch to async mode
+-  $ldap->async(1);
+-
+-  # perform a search (asynchronously)
+-  $search = $ldap->search(
+-                       base     => $BASEDN,
+-                       filter   => '(objectclass=*)',
+-                       callback => \&process_entry, # Call this sub for each entry
+-                     );
+-
+-  # cancel the running search => should work [may fail, as it depends on the server's speed]
+-  $cancel = $ldap->cancel($search);
+-  ok(!$cancel->code, "cancel a running operation: " . $cancel->code . ": " . $cancel->error)
+-    or diag("This test may have failed because the server was too fast");
+ }
+ 
+ 
+-- 
+2.20.1
+

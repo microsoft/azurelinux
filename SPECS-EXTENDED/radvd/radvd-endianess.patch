@@ -1,0 +1,70 @@
+diff --git a/radvd.h b/radvd.h
+index 89a5b9e..f520f24 100644
+--- a/radvd.h
++++ b/radvd.h
+@@ -259,9 +259,7 @@ struct nd_opt_6co {
+ 	uint8_t nd_opt_6co_type;
+ 	uint8_t nd_opt_6co_len;
+ 	uint8_t nd_opt_6co_context_len;
+-	uint8_t nd_opt_6co_res : 3;
+-	uint8_t nd_opt_6co_c : 1;
+-	uint8_t nd_opt_6co_cid : 4;
++	uint8_t nd_opt_6co_res_c_cid; /* [ res=3-bits | c=1-bit | cid=4-bits ] */
+ 	uint16_t nd_opt_6co_reserved;
+ 	uint16_t nd_opt_6co_valid_lifetime;
+ 	struct in6_addr nd_opt_6co_con_prefix;
+diff --git a/send.c b/send.c
+index 8bc16a8..0a4951a 100644
+--- a/send.c
++++ b/send.c
+@@ -619,9 +619,9 @@ static void add_ra_option_lowpanco(struct safe_buffer *sb, struct AdvLowpanCo co
+ 	co.nd_opt_6co_type = ND_OPT_6CO;
+ 	co.nd_opt_6co_len = 3;
+ 	co.nd_opt_6co_context_len = lowpanco->ContextLength;
+-	co.nd_opt_6co_c = lowpanco->ContextCompressionFlag;
+-	co.nd_opt_6co_cid = lowpanco->AdvContextID;
+-	co.nd_opt_6co_valid_lifetime = lowpanco->AdvLifeTime;
++	co.nd_opt_6co_res_c_cid = ((lowpanco->ContextCompressionFlag ? 1 : 0) << 4)
++				| (lowpanco->AdvContextID & 0x0F);
++	co.nd_opt_6co_valid_lifetime = htons(lowpanco->AdvLifeTime);
+ 	co.nd_opt_6co_con_prefix = lowpanco->AdvContextPrefix;
+ 
+ 	safe_buffer_append(sb, &co, sizeof(co));
+@@ -635,9 +635,9 @@ static void add_ra_option_abro(struct safe_buffer *sb, struct AdvAbro const *abr
+ 
+ 	abro.nd_opt_abro_type = ND_OPT_ABRO;
+ 	abro.nd_opt_abro_len = 3;
+-	abro.nd_opt_abro_ver_low = abroo->Version[1];
+-	abro.nd_opt_abro_ver_high = abroo->Version[0];
+-	abro.nd_opt_abro_valid_lifetime = abroo->ValidLifeTime;
++	abro.nd_opt_abro_ver_low = htons(abroo->Version[1]);
++	abro.nd_opt_abro_ver_high = htons(abroo->Version[0]);
++	abro.nd_opt_abro_valid_lifetime = htons(abroo->ValidLifeTime);
+ 	abro.nd_opt_abro_6lbr_address = abroo->LBRaddress;
+ 
+ 	safe_buffer_append(sb, &abro, sizeof(abro));
+diff --git a/test/send.c b/test/send.c
+index 92fe45b..b194449 100644
+--- a/test/send.c
++++ b/test/send.c
+@@ -309,10 +309,9 @@ START_TEST(test_add_ra_option_lowpanco)
+ 	ck_assert_msg(0, "\n%s", &buf);
+ #else
+ 	unsigned char expected[] = {
+-	    0x22, 0x03, 0x32, 0x48, 0x00, 0x00, 0xe8, 0x03, 0x00, 0x00, 0x00, 0x00,
++	    0x22, 0x03, 0x32, 0x14, 0x00, 0x00, 0x03, 0xe8, 0x00, 0x00, 0x00, 0x00,
+ 	    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+ 	};
+-
+ 	ck_assert_int_eq(sb.used, sizeof(expected));
+ 	ck_assert_int_eq(0, memcmp(expected, sb.buffer, sizeof(expected)));
+ #endif
+@@ -334,7 +333,7 @@ START_TEST(test_add_ra_option_abro)
+ 	ck_assert_msg(0, "\n%s", &buf);
+ #else
+ 	unsigned char expected[] = {
+-	    0x23, 0x03, 0x0a, 0x00, 0x02, 0x00, 0x02, 0x00, 0xfe, 0x80, 0x00, 0x00,
++	    0x23, 0x03, 0x00, 0x0a, 0x00, 0x02, 0x00, 0x02, 0xfe, 0x80, 0x00, 0x00,
+ 	    0x00, 0x00, 0x00, 0x00, 0xa2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+ 	};
+ 

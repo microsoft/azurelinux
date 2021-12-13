@@ -1,0 +1,11 @@
+--- File-Find-Rule-Perl-1.15.orig/t/03_no_index.t	2015-04-05 22:57:10.000000000 +0200
++++ File-Find-Rule-Perl-1.15/t/03_no_index.t	2015-04-15 12:39:45.612810084 +0200
+@@ -38,6 +38,8 @@
+                         MYMETA.json
+ 		};
+ 		my @files = sort grep {
++			! /^(debug|elf).*\.list/
++			and
+ 			! /^debian\b/
+ 			and
+ 			! /(?:^|\W)\.\w/

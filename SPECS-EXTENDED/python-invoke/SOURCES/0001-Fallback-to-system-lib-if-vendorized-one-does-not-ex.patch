@@ -1,0 +1,156 @@
+From 566d4da2a3cd103891569c79b7b0e095ce0e0fdb Mon Sep 17 00:00:00 2001
+From: Athmane Madjoudj <athmane@fedoraproject.org>
+Date: Sun, 31 Mar 2019 00:56:07 +0100
+Subject: [PATCH] Fallback to system lib if vendorized one does not exists
+
+---
+ integration/_support/respond_base.py | 5 ++++-
+ integration/_support/respond_both.py | 5 ++++-
+ integration/_support/respond_fail.py | 5 ++++-
+ integration/_util.py                 | 5 ++++-
+ tests/_util.py                       | 5 ++++-
+ tests/concurrency.py                 | 5 ++++-
+ tests/conftest.py                    | 6 +++++-
+ tests/runners.py                     | 5 ++++-
+ tests/watchers.py                    | 5 ++++-
+ 9 files changed, 37 insertions(+), 9 deletions(-)
+
+diff --git a/integration/_support/respond_base.py b/integration/_support/respond_base.py
+index 1ce0771d..cb88a2bf 100644
+--- a/integration/_support/respond_base.py
++++ b/integration/_support/respond_base.py
+@@ -1,6 +1,9 @@
+ import sys
+ 
+-from invoke.vendor.six.moves import input
++try:
++    from invoke.vendor.six.moves import input
++except ImportError:
++    from six.moves import input
+ 
+ if input("What's the password?") != "Rosebud":
+     sys.exit(1)
+diff --git a/integration/_support/respond_both.py b/integration/_support/respond_both.py
+index 7683a369..f475e47a 100644
+--- a/integration/_support/respond_both.py
++++ b/integration/_support/respond_both.py
+@@ -1,6 +1,9 @@
+ import sys
+ 
+-from invoke.vendor.six.moves import input
++try:
++    from invoke.vendor.six.moves import input
++except ImportError:
++    from six.moves import input
+ 
+ if input("standard out") != "with it":
+     sys.exit(1)
+diff --git a/integration/_support/respond_fail.py b/integration/_support/respond_fail.py
+index 6c806036..f4064418 100644
+--- a/integration/_support/respond_fail.py
++++ b/integration/_support/respond_fail.py
+@@ -1,4 +1,7 @@
+-from invoke.vendor.six.moves import input
++try:
++    from invoke.vendor.six.moves import input
++except ImportError:
++    from six.moves import input
+ 
+ if input("What's the password?") == "Rosebud":
+     print("You're not Citizen Kane!")
+diff --git a/integration/_util.py b/integration/_util.py
+index 709bc059..6d2f4f49 100644
+--- a/integration/_util.py
++++ b/integration/_util.py
+@@ -3,7 +3,10 @@ from resource import getrusage, RUSAGE_SELF
+ import sys
+ import time
+ 
+-from invoke.vendor.six import wraps
++try:
++    from invoke.vendor.six import wraps
++except ImportError:
++    from six import wraps
+ 
+ from pytest import skip
+ 
+diff --git a/tests/_util.py b/tests/_util.py
+index a51c2bef..0ce507bb 100644
+--- a/tests/_util.py
++++ b/tests/_util.py
+@@ -8,7 +8,10 @@ except ImportError:
+     termios = None
+ from contextlib import contextmanager
+ 
+-from invoke.vendor.six import BytesIO, b, wraps
++try:
++    from invoke.vendor.six import BytesIO, b, wraps
++except ImportError:
++    from six import BytesIO, b, wraps
+ 
+ from mock import patch, Mock
+ from pytest import skip
+diff --git a/tests/concurrency.py b/tests/concurrency.py
+index f77eed81..1cf86f39 100644
+--- a/tests/concurrency.py
++++ b/tests/concurrency.py
+@@ -1,4 +1,7 @@
+-from invoke.vendor.six.moves.queue import Queue
++try:
++    from invoke.vendor.six.moves.queue import Queue
++except ImportError:
++    from six.moves.queue import Queue
+ 
+ from invoke.util import ExceptionWrapper, ExceptionHandlingThread as EHThread
+ 
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 4fe8dbca..faf88105 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -3,7 +3,11 @@ import os
+ import sys
+ import termios
+ 
+-from invoke.vendor.six import iteritems
++try:
++    from invoke.vendor.six import iteritems
++except ImportError:
++    from six import iteritems
++
+ import pytest
+ from mock import patch
+ 
+diff --git a/tests/runners.py b/tests/runners.py
+index abd3b4f9..259cf3c9 100644
+--- a/tests/runners.py
++++ b/tests/runners.py
+@@ -6,7 +6,10 @@ import types
+ from io import BytesIO
+ from itertools import chain, repeat
+ 
+-from invoke.vendor.six import StringIO, b, PY2, iteritems
++try:
++    from invoke.vendor.six import StringIO, b, PY2, iteritems
++except ImportError:
++    from six import StringIO, b, PY2, iteritems
+ 
+ from pytest import raises, skip
+ from pytest_relaxed import trap
+diff --git a/tests/watchers.py b/tests/watchers.py
+index 2d02e2b7..f27a025a 100644
+--- a/tests/watchers.py
++++ b/tests/watchers.py
+@@ -1,6 +1,9 @@
+ from threading import Thread, Event
+ 
+-from invoke.vendor.six.moves.queue import Queue, Empty
++try:
++    from invoke.vendor.six.moves.queue import Queue, Empty
++except ImportError:
++    from six.moves.queue import Queue, Empty
+ 
+ from invoke import Responder, FailingResponder, ResponseNotAccepted
+ 
+-- 
+2.20.1
+

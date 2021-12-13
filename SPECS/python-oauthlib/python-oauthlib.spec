@@ -1,7 +1,7 @@
 Summary:        An implementation of the OAuth request-signing logic
 Name:           python-oauthlib
 Version:        2.1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,8 +34,7 @@ OAuthLib is a generic utility which implements the logic of OAuth without assumi
 %py3_install
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 mock
+pip3 install mock
 %python3 setup.py test
 
 %files -n python3-oauthlib
@@ -43,6 +42,9 @@ $easy_install_3 mock
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-6
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-5
 - Add license to python3 package
 - Remove python2 package

@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "default.pa-for-gdm": "a18ea3a17bf1c52011cb15f500973946625586786ad8f7c7eec1808f80ffd939",
+  "gdm-3.36.4.tar.xz": "2bcd383ad82ab9d01f5aa190b30c7ef94878cf822791dd46222a338f093729f2",
+  "org.gnome.login-screen.gschema.override": "f0732aa479280e8313ee789ef59b9ba7d5f346d011be34d2fabdb3c760a76011"
+ }
+}

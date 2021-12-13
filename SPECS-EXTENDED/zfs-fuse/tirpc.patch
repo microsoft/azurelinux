@@ -1,0 +1,93 @@
+--- zfs-fuse-0.7.2.2/src/SConstruct~	2019-02-21 13:03:39.000000000 -0600
++++ zfs-fuse-0.7.2.2.good/src/SConstruct	2019-02-21 13:04:08.580527960 -0600
+@@ -35,7 +35,7 @@
+ env.Append(CCFLAGS = Split('-pipe -Wall -std=c99 -Wno-switch -Wno-unused -Wno-missing-braces -Wno-parentheses -Wno-uninitialized -Wcast-align -fno-strict-aliasing -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -DTEXT_DOMAIN=\\"zfs-fuse\\" '))
+ 
+ if osname == "Linux":
+-  env.Append(CPPFLAGS = " -DLINUX_AIO")
++  env.Append(CPPFLAGS = " -DLINUX_AIO -I/usr/include/tirpc")
+ 
+ debug = int(ARGUMENTS.get('debug', '0'))
+ optim = ARGUMENTS.get('optim', '-O2')
+diff -r -U3 zfs-fuse-0.7.2.2/src/cmd/zfs/zfs_main.c zfs-fuse-0.7.2.2.good/src/cmd/zfs/zfs_main.c
+--- zfs-fuse-0.7.2.2/src/cmd/zfs/zfs_main.c	2015-11-24 10:32:31.000000000 -0600
++++ zfs-fuse-0.7.2.2.good/src/cmd/zfs/zfs_main.c	2019-02-21 13:38:11.861699917 -0600
+@@ -47,6 +47,7 @@
+ #include <sys/fs/zfs.h>
+ #include <sys/types.h>
+ #include <time.h>
++#include <sys/sysmacros.h>
+ 
+ #include <libzfs.h>
+ #include <libuutil.h>
+Only in zfs-fuse-0.7.2.2.good/src/lib/libnvpair: build-kernel
+Only in zfs-fuse-0.7.2.2.good/src/lib/libnvpair: build-user
+diff -r -U3 zfs-fuse-0.7.2.2/src/lib/libnvpair/nvpair.c zfs-fuse-0.7.2.2.good/src/lib/libnvpair/nvpair.c
+--- zfs-fuse-0.7.2.2/src/lib/libnvpair/nvpair.c	2015-11-24 10:32:31.000000000 -0600
++++ zfs-fuse-0.7.2.2.good/src/lib/libnvpair/nvpair.c	2019-02-21 13:25:47.483941076 -0600
+@@ -31,7 +31,7 @@
+ #include <sys/nvpair.h>
+ #include <sys/nvpair_impl.h>
+ #include <rpc/types.h>
+-#include <rpc/xdr.h>
++#include "../libsolcompat/include/rpc/xdr.h"
+ 
+ #if defined(_KERNEL) && !defined(_BOOT)
+ #include <sys/varargs.h>
+diff -r -U3 zfs-fuse-0.7.2.2/src/lib/libsolcompat/getmntany.c zfs-fuse-0.7.2.2.good/src/lib/libsolcompat/getmntany.c
+--- zfs-fuse-0.7.2.2/src/lib/libsolcompat/getmntany.c	2015-11-24 10:32:31.000000000 -0600
++++ zfs-fuse-0.7.2.2.good/src/lib/libsolcompat/getmntany.c	2019-02-21 13:34:53.530041172 -0600
+@@ -36,6 +36,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
++#include <sys/sysmacros.h>
+ 
+ #define BUFSIZE (MNT_LINE_MAX + 2)
+ 
+diff -r -U3 zfs-fuse-0.7.2.2/src/lib/libsolkerncompat/vfs.c zfs-fuse-0.7.2.2.good/src/lib/libsolkerncompat/vfs.c
+--- zfs-fuse-0.7.2.2/src/lib/libsolkerncompat/vfs.c	2015-11-24 10:32:31.000000000 -0600
++++ zfs-fuse-0.7.2.2.good/src/lib/libsolkerncompat/vfs.c	2019-02-21 13:39:41.902544986 -0600
+@@ -38,6 +38,7 @@
+ #include <errno.h>
+ #include <pthread.h>
+ #include <unistd.h>
++#include <stddef.h>
+ 
+ struct vfs st_rootvfs = {};
+ 
+diff -r -U3 zfs-fuse-0.7.2.2/src/lib/libsolkerncompat/vnode.c zfs-fuse-0.7.2.2.good/src/lib/libsolkerncompat/vnode.c
+--- zfs-fuse-0.7.2.2/src/lib/libsolkerncompat/vnode.c	2015-11-24 10:32:31.000000000 -0600
++++ zfs-fuse-0.7.2.2.good/src/lib/libsolkerncompat/vnode.c	2019-02-21 13:44:47.662018866 -0600
+@@ -52,6 +52,8 @@
+ #include <sys/pathname.h>
+ #include <fs/fs_subr.h>
+ 
++#include <sys/sysmacros.h>
++
+ #include <stdio.h>
+ #include <fcntl.h>
+ #include <string.h>
+diff -r -U3 zfs-fuse-0.7.2.2/src/SConstruct zfs-fuse-0.7.2.2.good/src/SConstruct
+--- zfs-fuse-0.7.2.2/src/SConstruct	2019-02-21 13:53:53.467094730 -0600
++++ zfs-fuse-0.7.2.2.good/src/SConstruct	2019-02-21 13:28:53.021649581 -0600
+@@ -31,7 +31,7 @@
+ env.CacheDir('/tmp/.zfs-fuse.scons')
+ env['CC'] = os.environ.setdefault("CC","gcc")
+ env['CCFLAGS'] = os.environ.setdefault("CFLAGS","")
+-env['LINKFLAGS'] = Split('-pipe -Wall')
++env['LINKFLAGS'] = Split('-pipe -Wall -ltirpc')
+ env.Append(CCFLAGS = Split('-pipe -Wall -std=c99 -Wno-switch -Wno-unused -Wno-missing-braces -Wno-parentheses -Wno-uninitialized -Wcast-align -fno-strict-aliasing -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -DTEXT_DOMAIN=\\"zfs-fuse\\" '))
+ 
+ if osname == "Linux":
+diff -r -U3 zfs-fuse-0.7.2.2/src/zfs-fuse/zfs_operations.c zfs-fuse-0.7.2.2.good/src/zfs-fuse/zfs_operations.c
+--- zfs-fuse-0.7.2.2/src/zfs-fuse/zfs_operations.c	2015-11-24 10:32:31.000000000 -0600
++++ zfs-fuse-0.7.2.2.good/src/zfs-fuse/zfs_operations.c	2019-02-21 13:49:44.500513196 -0600
+@@ -35,6 +35,7 @@
+ #include <sys/zfs_znode.h>
+ #include <sys/mode.h>
+ #include <attr/xattr.h>
++#include <attr/attributes.h>
+ #include <sys/fcntl.h>
+ #include <sys/sa.h>
+ 

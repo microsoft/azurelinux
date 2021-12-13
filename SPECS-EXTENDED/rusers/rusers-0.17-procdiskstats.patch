@@ -1,0 +1,137 @@
+--- netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.procdiskstats	2006-08-09 14:15:27.000000000 +0200
++++ netkit-rusers-0.17/rpc.rstatd/rstat_proc.c	2006-08-09 14:28:45.000000000 +0200
+@@ -397,9 +397,88 @@
+ };
+ 
+ static void
++getdiskstat(struct _ldisk *d)
++{
++  FILE *statfp;
++  int dsk = 0;
++  unsigned int active;
++  unsigned int ma, mi, xfer;
++  /* merges, ticks, in flight meals, and aveq are not used */
++  unsigned int rd_ios, rd_merges, rd_sectors, rd_ticks;
++  unsigned int wr_ios, wr_merges, wr_sectors, wr_ticks;
++  unsigned int ios_in_flight, io_ticks, aveq;
++  int cd_check = 0;
++  char disk_name[256];
++  static char line[2560];
++  char *s;
++  
++  /* Open /proc/partitions file */
++  if ((statfp = fopen("/proc/diskstats", "r")) == NULL) {
++    syslog(LOG_ERR, "Cannot open %s: %s\n", "/proc/diskstats", strerror(errno));
++    exit(1);
++  }
++
++  /* The first two lines are unimportant. */
++  fgets(line, 2560, statfp);
++  fgets(line, 2560, statfp);
++  while (fgets(line, 2560, statfp) != NULL && dsk < MAX_DISKS) {
++    sscanf (line, "%4d %4d %s %d %d %d %d %d %d %d %d %d %d %d",
++            &ma, &mi, disk_name,
++            &rd_ios, &rd_merges, &rd_sectors, &rd_ticks,
++            &wr_ios, &wr_merges, &wr_sectors, &wr_ticks,
++            &ios_in_flight, &io_ticks, &aveq);
++    /* Check for compaq devices */
++    for(s=disk_name;*s;s++) {
++      if(*s == '/') {
++        cd_check=1;
++      }
++    }
++
++    /*
++     * if we set cd_check we need to check
++     * the name of the device using the compaq c#d#p# 
++     * format, else we can just use the h/sda# format
++     */
++    if(cd_check) {
++      /*
++       * if the second or third from the last character
++       * is p then this is a partition
++       */
++      if((s[-2] == 'p') || (s[-3] == 'p'))
++        continue;
++      goto found_dsk;
++    } else {
++      /*
++       * if the last value is a digit, its a
++       * partition, so go back to the top of the whlie loop
++       */
++      if (isdigit(s[-1])) {
++        continue;
++      }
++found_dsk:
++      xfer = rd_ios + wr_ios;
++      /* this is how /proc/stat determines which devices to display in /proc/stat */
++      active = xfer + rd_sectors, wr_sectors;
++      if (active) {
++        dsk++;
++        d->xfer[dsk] = xfer;
++        d->rio[dsk] = rd_ios;
++        d->rblk[dsk] = rd_sectors;
++        d->wio[dsk] = wr_ios;
++        d->wblk[dsk] = wr_sectors;
++      } else {
++        /* Do not count inactive devices. */
++      }
++    }
++  }
++  /* Close /proc/partitions file */
++   fclose(statfp);
++}
++
++static void
+ getstat(unsigned long *cuse, unsigned long *cice, unsigned long *csys, unsigned long *cide,
+ 	     unsigned *pin, unsigned *pout, unsigned *sin, unsigned *sout,
+-	     unsigned *itot, unsigned *i1, unsigned *ct, struct _ldisk *d)
++	     unsigned *itot, unsigned *i1, unsigned *ct)
+ {
+   static int stat;
+ #define	BUFFSIZE	1024
+@@ -428,34 +507,6 @@
+     b = strstr(buff, "cpu ");
+     if(b)
+     sscanf(b, "cpu  %lu %lu %lu %lu", cuse, cice, csys, cide);
+-    b = strstr(buff, "disk ");
+-    if(b)
+-      sscanf(b, "disk %u %u %u %u", &d->xfer[0], &d->xfer[1], &d->xfer[2], &d->xfer[3]);
+-    b = strstr(buff, "disk_rio ");
+-    if(b)
+-      sscanf(b, "disk_rio %u %u %u %u", &d->rio[0], &d->rio[1], &d->rio[2], &d->rio[3]);
+-    b = strstr(buff, "disk_wio ");
+-    if(b)
+-      sscanf(b, "disk_wio %u %u %u %u", &d->wio[0], &d->wio[1], &d->wio[2], &d->wio[3]);
+-    b = strstr(buff, "disk_rblk ");
+-    if(b)
+-      sscanf(b, "disk_rblk %u %u %u %u", &d->rblk[0], &d->rblk[1], &d->rblk[2], &d->rblk[3]);
+-    b = strstr(buff, "disk_wblk ");
+-    if(b)
+-      sscanf(b, "disk_wblk %u %u %u %u", &d->wblk[0], &d->wblk[1], &d->wblk[2], &d->wblk[3]);
+-
+-    b = strstr(buff, "disk_io:");
+-    if(b) {
+-      ndisks = 0;
+-      while ( (b = strstr(b, "):")) != NULL && ndisks < MAX_DISKS ) {
+-        sscanf (b, "):(%u,%u,%u,%u,%u)", &d->xfer[ndisks], 
+-	        &d->rio[ndisks], &d->rblk[ndisks], 
+-	        &d->wio[ndisks], &d->wblk[ndisks]);
+-        ndisks++;
+-        b += 2;
+-      }
+-    }
+-
+     b = strstr(buff, "page ");
+     if(b)
+     sscanf(b, "page %u %u", pin, pout);
+@@ -664,7 +715,8 @@
+ 
+ 	getstat(cpu_use+tog,cpu_nic+tog,cpu_sys+tog,cpu_idl+tog,
+ 		pgpgin+tog,pgpgout+tog,pswpin+tog,pswpout+tog,
+-		inter+tog,ticks+tog,ctxt+tog, disk+tog);
++		inter+tog,ticks+tog,ctxt+tog);
++	getdiskstat(disk+tog);
+ 
+ 	dk_ndrive = 0;
+ 	for (i = 0; i < 4; i++) {

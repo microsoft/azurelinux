@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=LogFactor5
+Comment=Graphical user interface for managing log4j log messages
+Exec=logfactor5
+Icon=logfactor5.png
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=Application;Development;Monitor;X-JPackage;

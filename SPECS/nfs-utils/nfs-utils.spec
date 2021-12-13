@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
 Version:        2.5.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -73,7 +73,6 @@ Requires:    libnfsidmap = %{version}-%{release}
 #not prevent statd to start
 sed -i "/daemon_init/s:\!::" utils/statd/statd.c
 sed '/unistd.h/a#include <stdint.h>' -i support/nsm/rpc.c
-find . -iname "*.py" | xargs -I file sed -i '1s/python/python3/g' file
 # fix --with-rpcgen=internal
 sed -i 's/RPCGEN_PATH" =/rpcgen_path" =/' configure
 
@@ -168,59 +167,87 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
-*   Wed Nov 10 2021 Andrew Phelps <anphel@microsoft.com> 2.5.4-1
--   Update to version 2.5.4
-*   Wed Jun 03 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.3.3-8
--   Fix format-security errors and re-disable -Werror=strict-prototypes
-*   Tue Jun 02 2020 Andrew Phelps <anphel@microsoft.com> 2.3.3-7
--   Add sqlite build requirement.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.3.3-6
--   Added %%license line automatically
-*   Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 2.3.3-5
--   Rename shadow to shadow-utils.
-*   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 2.3.3-4
--   Make libnfsidmap into a separate subpackage.
--   Update Source0, URL and License.
--   Verified License.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.3.3-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> 2.3.3-2
--   Fix compilation issue against glibc-2.28
--   Use internal rpcgen, disable librpcsecgss dependency.
-*   Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 2.3.3-1
--   Update to 2.3.3
-*   Thu Jun 07 2018 Anish Swaminathan <anishs@vmware.com> 2.3.1-2
--   Add noreplace qualifier to config files
-*   Fri Jan 26 2018 Xiaolin Li <xiaolinl@vmware.com> 2.3.1-1
--   Update to 2.3.1 and enable nfsv4
-*   Tue Oct 10 2017 Alexey Makhalov <amakhalov@vmware.com> 2.1.1-7
--   No direct toybox dependency, shadow depends on toybox
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 2.1.1-6
--   Requires shadow or toybox
-*   Thu Aug 24 2017 Alexey Makhalov <amakhalov@vmware.com> 2.1.1-5
--   Fix compilation issue for glibc-2.26
-*   Wed Aug 16 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.1.1-4
--   Add check and ignore test that fails.
-*   Tue Aug 8 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.1.1-3
--   Alter nfs-server and nfs-mountd service files to use
--   environment file and port opts.
-*   Tue May 23 2017 Xiaolin Li <xiaolinl@vmware.com> 2.1.1-2
--   Build with python3.
-*   Sat Apr 15 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.1.1-1
--   Update to 2.1.1
-*   Fri Dec 16 2016 Nick Shi <nshi@vmware.com> 1.3.3-6
--   Requires rpcbind.socket upon starting rpc-statd service (bug 1668405)
-*   Mon Nov 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.3.3-5
--   add shadow to requires
-*   Wed Jul 27 2016 Divya Thaluru <dthaluru@vmware.com> 1.3.3-4
--   Removed packaging of debug files
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.3.3-3
--   GA - Bump release of all rpms
-*   Thu Apr 28 2016 Xiaolin Li <xiaolinl@vmware.com> 1.3.3-2
--   Add nfs-server.service to rpm.
-*   Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> 1.3.3-1
--   Updated to version 1.3.3
-*   Tue Dec 8 2015 Divya Thaluru <dthaluru@vmware.com> 1.3.2-2
--   Adding systemd service files
-*   Tue Jul 14 2015 Rongrong Qiu <rqiu@vmware.com> 1.3.2-1
--   Initial build.  First version
+* Tue Nov 30 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.4-2
+- Remove python shebang line fixes (fixed upstream)
+
+* Wed Nov 10 2021 Andrew Phelps <anphel@microsoft.com> - 2.5.4-1
+- Update to version 2.5.4
+
+* Wed Jun 03 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.3.3-8
+- Fix format-security errors and re-disable -Werror=strict-prototypes
+
+* Tue Jun 02 2020 Andrew Phelps <anphel@microsoft.com> - 2.3.3-7
+- Add sqlite build requirement.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.3.3-6
+- Added %%license line automatically
+
+* Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.3.3-5
+- Rename shadow to shadow-utils.
+
+* Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.3.3-4
+- Make libnfsidmap into a separate subpackage.
+- Update Source0, URL and License.
+- Verified License.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.3.3-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> - 2.3.3-2
+- Fix compilation issue against glibc-2.28
+- Use internal rpcgen, disable librpcsecgss dependency.
+
+* Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> - 2.3.3-1
+- Update to 2.3.3
+
+* Thu Jun 07 2018 Anish Swaminathan <anishs@vmware.com> - 2.3.1-2
+- Add noreplace qualifier to config files
+
+* Fri Jan 26 2018 Xiaolin Li <xiaolinl@vmware.com> - 2.3.1-1
+- Update to 2.3.1 and enable nfsv4
+
+* Tue Oct 10 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.1.1-7
+- No direct toybox dependency, shadow depends on toybox
+
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.1.1-6
+- Requires shadow or toybox
+
+* Thu Aug 24 2017 Alexey Makhalov <amakhalov@vmware.com> - 2.1.1-5
+- Fix compilation issue for glibc-2.26
+
+* Wed Aug 16 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.1.1-4
+- Add check and ignore test that fails.
+
+* Tue Aug 8 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.1.1-3
+- Alter nfs-server and nfs-mountd service files to use
+- environment file and port opts.
+
+* Tue May 23 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.1.1-2
+- Build with python3.
+
+* Sat Apr 15 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.1.1-1
+- Update to 2.1.1
+
+* Fri Dec 16 2016 Nick Shi <nshi@vmware.com> - 1.3.3-6
+- Requires rpcbind.socket upon starting rpc-statd service (bug 1668405)
+
+* Mon Nov 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.3.3-5
+- add shadow to requires
+
+* Wed Jul 27 2016 Divya Thaluru <dthaluru@vmware.com> - 1.3.3-4
+- Removed packaging of debug files
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.3.3-3
+- GA - Bump release of all rpms
+
+* Thu Apr 28 2016 Xiaolin Li <xiaolinl@vmware.com> - 1.3.3-2
+- Add nfs-server.service to rpm.
+
+* Thu Jan 21 2016 Xiaolin Li <xiaolinl@vmware.com> - 1.3.3-1
+- Updated to version 1.3.3
+
+* Tue Dec 8 2015 Divya Thaluru <dthaluru@vmware.com> - 1.3.2-2
+- Adding systemd service files
+
+* Tue Jul 14 2015 Rongrong Qiu <rqiu@vmware.com> - 1.3.2-1
+- Initial build.  First version

@@ -1,0 +1,16 @@
+--- tagsoup.1	2011-07-08 02:17:59.000000000 +0200
++++ tagsoup.1-gil	2012-04-09 14:56:31.111938251 +0200
+@@ -11,11 +11,11 @@
+ \' OF ANY KIND, either express or implied; not even the implied warranty
+ \' of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ \'
+-.TH TAGSOUP "1" "January 2008" "TagSoup 1.2" "User Commands"
++.TH TAGSOUP "1" "January 2008" "TagSoup 1.2.1" "User Commands"
+ .SH NAME
+ tagsoup \- convert nasty, ugly HTML to clean XHTML
+ .SH SYNOPSIS
+-.B java -jar tagsoup-1.2
++.B java -jar tagsoup
+ [
+ .I options
+ ] [

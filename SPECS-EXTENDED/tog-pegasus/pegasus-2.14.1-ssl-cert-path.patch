@@ -1,0 +1,12 @@
+diff -up pegasus/env_var_Linux.status.orig pegasus/env_var_Linux.status
+--- pegasus/env_var_Linux.status.orig	2016-02-18 12:06:51.571515464 +0100
++++ pegasus/env_var_Linux.status	2016-02-18 12:07:02.946568247 +0100
+@@ -133,7 +133,7 @@ PEGASUS_LOCAL_DOMAIN_SOCKET_DIR = $(PEGA
+ PEGASUS_LOCAL_DOMAIN_SOCKET_PATH = \
+      $(PEGASUS_LOCAL_DOMAIN_SOCKET_DIR)/cimxml.socket
+ 
+-PEGASUS_PEM_DIR = $(PEGASUS_CONFIG_DIR)
++PEGASUS_PEM_DIR = /etc/pki/Pegasus
+ PEGASUS_SSL_KEY_FILE = file.pem
+ PEGASUS_SSL_KEY_FILE_PATH = $(PEGASUS_PEM_DIR)/$(PEGASUS_SSL_KEY_FILE)
+ PEGASUS_SSL_CERT_FILE = server.pem

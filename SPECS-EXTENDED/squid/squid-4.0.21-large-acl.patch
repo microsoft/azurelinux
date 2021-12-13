@@ -1,0 +1,178 @@
+diff --git a/src/acl/RegexData.cc b/src/acl/RegexData.cc
+index 01a4c12..b5c1679 100644
+--- a/src/acl/RegexData.cc
++++ b/src/acl/RegexData.cc
+@@ -22,6 +22,7 @@
+ #include "ConfigParser.h"
+ #include "Debug.h"
+ #include "sbuf/List.h"
++#include "sbuf/Algorithms.h"
+ 
+ ACLRegexData::~ACLRegexData()
+ {
+@@ -129,6 +130,18 @@ compileRE(std::list<RegexPattern> &curlist, const char * RE, int flags)
+     return true;
+ }
+ 
++static bool
++compileRE(std::list<RegexPattern> &curlist, const SBufList &RE, int flags)
++{
++	if (RE.empty())
++		return curlist.empty(); // XXX: old code did this. It looks wrong.
++	SBuf regexp;
++	static const SBuf openparen("("), closeparen(")"), separator(")|(");
++	JoinContainerIntoSBuf(regexp, RE.begin(), RE.end(), separator, openparen,
++			closeparen);
++	return compileRE(curlist, regexp.c_str(), flags);
++}
++
+ /** Compose and compile one large RE from a set of (small) REs.
+  * The ultimate goal is to have only one RE per ACL so that match() is
+  * called only once per ACL.
+@@ -137,16 +150,11 @@ static int
+ compileOptimisedREs(std::list<RegexPattern> &curlist, const SBufList &sl)
+ {
+     std::list<RegexPattern> newlist;
+-    int numREs = 0;
++    SBufList accumulatedRE;
++    int numREs = 0, reSize = 0;
+     int flags = REG_EXTENDED | REG_NOSUB;
+-    int largeREindex = 0;
+-    char largeRE[BUFSIZ];
+-    *largeRE = 0;
+ 
+     for (const SBuf & configurationLineWord : sl) {
+-        int RElen;
+-        RElen = configurationLineWord.length();
+-
+         static const SBuf minus_i("-i");
+         static const SBuf plus_i("+i");
+         if (configurationLineWord == minus_i) {
+@@ -155,10 +163,11 @@ compileOptimisedREs(std::list<RegexPattern> &curlist, const SBufList &sl)
+                 debugs(28, 2, "optimisation of -i ... -i" );
+             } else {
+                 debugs(28, 2, "-i" );
+-                if (!compileRE(newlist, largeRE, flags))
++                if (!compileRE(newlist, accumulatedRE, flags))
+                     return 0;
+                 flags |= REG_ICASE;
+-                largeRE[largeREindex=0] = '\0';
++                accumulatedRE.clear();
++                reSize = 0;
+             }
+         } else if (configurationLineWord == plus_i) {
+             if ((flags & REG_ICASE) == 0) {
+@@ -166,37 +175,34 @@ compileOptimisedREs(std::list<RegexPattern> &curlist, const SBufList &sl)
+                 debugs(28, 2, "optimisation of +i ... +i");
+             } else {
+                 debugs(28, 2, "+i");
+-                if (!compileRE(newlist, largeRE, flags))
++                if (!compileRE(newlist, accumulatedRE, flags))
+                     return 0;
+                 flags &= ~REG_ICASE;
+-                largeRE[largeREindex=0] = '\0';
++                accumulatedRE.clear();
++                reSize = 0;
+             }
+-        } else if (RElen + largeREindex + 3 < BUFSIZ-1) {
++        } else if (reSize < 1024) {
+             debugs(28, 2, "adding RE '" << configurationLineWord << "'");
+-            if (largeREindex > 0) {
+-                largeRE[largeREindex] = '|';
+-                ++largeREindex;
+-            }
+-            largeRE[largeREindex] = '(';
+-            ++largeREindex;
+-            configurationLineWord.copy(largeRE+largeREindex, BUFSIZ-largeREindex);
+-            largeREindex += configurationLineWord.length();
+-            largeRE[largeREindex] = ')';
+-            ++largeREindex;
+-            largeRE[largeREindex] = '\0';
++            accumulatedRE.push_back(configurationLineWord);
+             ++numREs;
++            reSize += configurationLineWord.length();
+         } else {
+             debugs(28, 2, "buffer full, generating new optimised RE..." );
+-            if (!compileRE(newlist, largeRE, flags))
++            accumulatedRE.push_back(configurationLineWord);
++            if (!compileRE(newlist, accumulatedRE, flags))
+                 return 0;
+-            largeRE[largeREindex=0] = '\0';
++            accumulatedRE.clear();
++            reSize = 0;
+             continue;    /* do the loop again to add the RE to largeRE */
+         }
+     }
+ 
+-    if (!compileRE(newlist, largeRE, flags))
++    if (!compileRE(newlist, accumulatedRE, flags))
+         return 0;
+ 
++    accumulatedRE.clear();
++    reSize = 0;
++
+     /* all was successful, so put the new list at the tail */
+     curlist.splice(curlist.end(), newlist);
+ 
+diff --git a/src/sbuf/Algorithms.h b/src/sbuf/Algorithms.h
+index 21ee889..338e9c0 100644
+--- a/src/sbuf/Algorithms.h
++++ b/src/sbuf/Algorithms.h
+@@ -81,6 +81,57 @@ SBufContainerJoin(const Container &items, const SBuf& separator)
+     return rv;
+ }
+ 
++/** Join container of SBufs and append to supplied target
++ *
++ * append to the target SBuf all elements in the [begin,end) range from
++ * an iterable container, prefixed by prefix, separated by separator and
++ * followed by suffix. Prefix and suffix are added also in case of empty
++ * iterable
++ *
++ * \return the modified dest
++ */
++template <class ContainerIterator>
++SBuf&
++JoinContainerIntoSBuf(SBuf &dest, const ContainerIterator &begin,
++                      const ContainerIterator &end, const SBuf& separator,
++                      const SBuf& prefix = SBuf(), const SBuf& suffix = SBuf())
++{
++    if (begin == end) {
++        dest.append(prefix).append(suffix);
++        return dest;
++    }
++
++    // optimization: pre-calculate needed storage
++    const SBuf::size_type totalContainerSize =
++        std::accumulate(begin, end, 0, SBufAddLength(separator)) +
++        dest.length() + prefix.length() + suffix.length();
++    SBufReservationRequirements req;
++    req.minSpace = totalContainerSize;
++    dest.reserve(req);
++
++    auto i = begin;
++    dest.append(prefix);
++    dest.append(*i);
++    ++i;
++    for (; i != end; ++i)
++        dest.append(separator).append(*i);
++    dest.append(suffix);
++    return dest;
++}
++
++
++/// convenience wrapper of JoinContainerIntoSBuf with no caller-supplied SBuf
++template <class ContainerIterator>
++SBuf
++JoinContainerToSBuf(const ContainerIterator &begin,
++                    const ContainerIterator &end, const SBuf& separator,
++                    const SBuf& prefix = SBuf(), const SBuf& suffix = SBuf())
++{
++    SBuf rv;
++    return JoinContainerIntoSBuf(rv, begin, end, separator, prefix, suffix);
++}
++
++
+ namespace std {
+ /// default hash functor to support std::unordered_map<SBuf,*>
+ template <>

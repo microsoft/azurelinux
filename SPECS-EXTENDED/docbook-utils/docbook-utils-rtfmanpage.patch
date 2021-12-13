@@ -1,0 +1,15 @@
+diff -urNp docbook-utils-0.6.14-orig/doc/man/jw.1 docbook-utils-0.6.14/doc/man/jw.1
+--- docbook-utils-0.6.14-orig/doc/man/jw.1	2004-02-11 15:16:21.000000000 +0100
++++ docbook-utils-0.6.14/doc/man/jw.1	2009-08-13 10:44:03.000000000 +0200
+@@ -192,6 +192,11 @@ by calling \fBJade\fR or
+ \fBOpenJade\fR\&. The resulting file can
+ then be inported into \fBMS Word\fR
+ or one of its Linux replacement programs.
++
++\fBNote\fR - The original picture must be
++present when RTF document is viewed, because
++the RTF documents created by \fBOpenJade\fR
++includes pictures by reference.
+ .TP
+ \fB\fItex\fB\fR
+ Converts to TeX by calling \fBJade\fR or

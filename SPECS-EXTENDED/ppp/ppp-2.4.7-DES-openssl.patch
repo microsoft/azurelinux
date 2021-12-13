@@ -1,0 +1,79 @@
+diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
+index 534ccc2..cf11b74 100644
+--- a/pppd/Makefile.linux
++++ b/pppd/Makefile.linux
+@@ -41,7 +41,7 @@ COPTS = -Wall $(RPM_OPT_FLAGS) -DLIBDIR=\""$(LIBDIR)"\"
+ # Uncomment the next 2 lines to include support for Microsoft's
+ # MS-CHAP authentication protocol.  Also, edit plugins/radius/Makefile.linux.
+ CHAPMS=y
+-USE_CRYPT=y
++#USE_CRYPT=y
+ # Don't use MSLANMAN unless you really know what you're doing.
+ #MSLANMAN=y
+ # Uncomment the next line to include support for MPPE.  CHAPMS (above) must
+@@ -147,7 +147,8 @@ endif
+ 
+ ifdef NEEDDES
+ ifndef USE_CRYPT
+-LIBS     += -ldes $(LIBS)
++CFLAGS   += -I/usr/include/openssl
++LIBS     += -lcrypto
+ else
+ CFLAGS   += -DUSE_CRYPT=1
+ endif
+diff --git a/pppd/pppcrypt.c b/pppd/pppcrypt.c
+index 8b85b13..6b35375 100644
+--- a/pppd/pppcrypt.c
++++ b/pppd/pppcrypt.c
+@@ -64,7 +64,7 @@ u_char *des_key;	/* OUT 64 bit DES key with parity bits added */
+ 	des_key[7] = Get7Bits(key, 49);
+ 
+ #ifndef USE_CRYPT
+-	des_set_odd_parity((des_cblock *)des_key);
++	DES_set_odd_parity((DES_cblock *)des_key);
+ #endif
+ }
+ 
+@@ -158,25 +158,25 @@ u_char *clear;	/* OUT 8 octets */
+ }
+ 
+ #else /* USE_CRYPT */
+-static des_key_schedule	key_schedule;
++static DES_key_schedule	key_schedule;
+ 
+ bool
+ DesSetkey(key)
+ u_char *key;
+ {
+-	des_cblock des_key;
++	DES_cblock des_key;
+ 	MakeKey(key, des_key);
+-	des_set_key(&des_key, key_schedule);
++	DES_set_key(&des_key, &key_schedule);
+ 	return (1);
+ }
+ 
+ bool
+-DesEncrypt(clear, key, cipher)
++DesEncrypt(clear, cipher)
+ u_char *clear;	/* IN  8 octets */
+ u_char *cipher;	/* OUT 8 octets */
+ {
+-	des_ecb_encrypt((des_cblock *)clear, (des_cblock *)cipher,
+-	    key_schedule, 1);
++	DES_ecb_encrypt((DES_cblock *)clear, (DES_cblock *)cipher,
++	    &key_schedule, 1);
+ 	return (1);
+ }
+ 
+@@ -185,8 +185,8 @@ DesDecrypt(cipher, clear)
+ u_char *cipher;	/* IN  8 octets */
+ u_char *clear;	/* OUT 8 octets */
+ {
+-	des_ecb_encrypt((des_cblock *)cipher, (des_cblock *)clear,
+-	    key_schedule, 0);
++	DES_ecb_encrypt((DES_cblock *)cipher, (DES_cblock *)clear,
++	    &key_schedule, 0);
+ 	return (1);
+ }
+ 

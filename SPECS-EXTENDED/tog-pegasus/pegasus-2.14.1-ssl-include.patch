@@ -1,0 +1,11 @@
+diff -up pegasus/src/Pegasus/Server/tests/TLSv_1_2_Support/TestTLSv1_2_Support.cpp.orig pegasus/src/Pegasus/Server/tests/TLSv_1_2_Support/TestTLSv1_2_Support.cpp
+--- pegasus/src/Pegasus/Server/tests/TLSv_1_2_Support/TestTLSv1_2_Support.cpp.orig	2015-05-19 13:49:59.100133630 +0200
++++ pegasus/src/Pegasus/Server/tests/TLSv_1_2_Support/TestTLSv1_2_Support.cpp	2015-05-19 13:50:40.665309444 +0200
+@@ -37,6 +37,7 @@
+ 
+ 
+ #ifdef PEGASUS_HAS_SSL
++#  include <openssl/ssl.h>
+ #  include <openssl/tls1.h>
+ #endif
+ 

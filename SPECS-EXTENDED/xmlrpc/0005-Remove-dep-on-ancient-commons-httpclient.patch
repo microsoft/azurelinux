@@ -1,0 +1,466 @@
+From 77f696a95873c6bd8cac9254579838db556044a6 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Tue, 31 Mar 2020 17:18:53 +0100
+Subject: [PATCH 5/6] Remove dep on ancient commons httpclient
+
+---
+ client/pom.xml                                |   4 -
+ .../xmlrpc/client/XmlRpcCommonsTransport.java | 262 ------------------
+ .../client/XmlRpcCommonsTransportFactory.java |  66 -----
+ pom.xml                                       |   6 -
+ server/pom.xml                                |   5 -
+ .../apache/xmlrpc/test/CommonsProvider.java   |  41 ---
+ .../apache/xmlrpc/test/XmlRpcTestCase.java    |   1 -
+ 7 files changed, 385 deletions(-)
+ delete mode 100644 client/src/main/java/org/apache/xmlrpc/client/XmlRpcCommonsTransport.java
+ delete mode 100644 client/src/main/java/org/apache/xmlrpc/client/XmlRpcCommonsTransportFactory.java
+ delete mode 100644 server/src/test/java/org/apache/xmlrpc/test/CommonsProvider.java
+
+diff --git a/client/pom.xml b/client/pom.xml
+index f31b2d2..b78ede0 100644
+--- a/client/pom.xml
++++ b/client/pom.xml
+@@ -72,9 +72,5 @@
+       <artifactId>xmlrpc-common</artifactId>
+       <version>3.1.3</version>
+     </dependency>
+-    <dependency>
+-      <groupId>commons-httpclient</groupId>
+-      <artifactId>commons-httpclient</artifactId>
+-    </dependency>
+   </dependencies>
+ </project>
+diff --git a/client/src/main/java/org/apache/xmlrpc/client/XmlRpcCommonsTransport.java b/client/src/main/java/org/apache/xmlrpc/client/XmlRpcCommonsTransport.java
+deleted file mode 100644
+index 1e60ceb..0000000
+--- a/client/src/main/java/org/apache/xmlrpc/client/XmlRpcCommonsTransport.java
++++ /dev/null
+@@ -1,262 +0,0 @@
+-/*
+- * Licensed to the Apache Software Foundation (ASF) under one
+- * or more contributor license agreements.  See the NOTICE file
+- * distributed with this work for additional information
+- * regarding copyright ownership.  The ASF licenses this file
+- * to you under the Apache License, Version 2.0 (the
+- * "License"); you may not use this file except in compliance
+- * with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing,
+- * software distributed under the License is distributed on an
+- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- * KIND, either express or implied.  See the License for the
+- * specific language governing permissions and limitations
+- * under the License.    
+- */
+-package org.apache.xmlrpc.client;
+-
+-import java.io.BufferedOutputStream;
+-import java.io.FilterOutputStream;
+-import java.io.IOException;
+-import java.io.InputStream;
+-import java.io.OutputStream;
+-
+-import org.apache.commons.httpclient.Credentials;
+-import org.apache.commons.httpclient.Header;
+-import org.apache.commons.httpclient.HttpClient;
+-import org.apache.commons.httpclient.HttpException;
+-import org.apache.commons.httpclient.HttpMethod;
+-import org.apache.commons.httpclient.HttpStatus;
+-import org.apache.commons.httpclient.HttpVersion;
+-import org.apache.commons.httpclient.URI;
+-import org.apache.commons.httpclient.URIException;
+-import org.apache.commons.httpclient.UsernamePasswordCredentials;
+-import org.apache.commons.httpclient.auth.AuthScope;
+-import org.apache.commons.httpclient.methods.PostMethod;
+-import org.apache.commons.httpclient.methods.RequestEntity;
+-import org.apache.commons.httpclient.params.HttpMethodParams;
+-import org.apache.xmlrpc.XmlRpcException;
+-import org.apache.xmlrpc.XmlRpcRequest;
+-import org.apache.xmlrpc.common.XmlRpcStreamConfig;
+-import org.apache.xmlrpc.common.XmlRpcStreamRequestConfig;
+-import org.apache.xmlrpc.util.HttpUtil;
+-import org.apache.xmlrpc.util.XmlRpcIOException;
+-import org.xml.sax.SAXException;
+-
+-
+-/** An HTTP transport factory, which is based on the Jakarta Commons
+- * HTTP Client.
+- */
+-public class XmlRpcCommonsTransport extends XmlRpcHttpTransport {
+-    /**
+-     * Maximum number of allowed redirects.
+-     */
+-    private static final int MAX_REDIRECT_ATTEMPTS = 100;
+-
+-    protected final HttpClient client;
+-	private static final String userAgent = USER_AGENT + " (Jakarta Commons httpclient Transport)";
+-	protected PostMethod method;
+-	private int contentLength = -1;
+-	private XmlRpcHttpClientConfig config;      
+-
+-	/** Creates a new instance.
+-	 * @param pFactory The factory, which created this transport.
+-	 */
+-	public XmlRpcCommonsTransport(XmlRpcCommonsTransportFactory pFactory) {
+-		super(pFactory.getClient(), userAgent);
+-        HttpClient httpClient = pFactory.getHttpClient();
+-        if (httpClient == null) {
+-            httpClient = newHttpClient();
+-        }
+-        client = httpClient;
+-     }
+-
+-	protected void setContentLength(int pLength) {
+-		contentLength = pLength;
+-	}
+-
+-    protected HttpClient newHttpClient() {
+-        return new HttpClient();
+-    }
+-
+-    protected void initHttpHeaders(XmlRpcRequest pRequest) throws XmlRpcClientException {
+-        config = (XmlRpcHttpClientConfig) pRequest.getConfig();
+-        method = newPostMethod(config);
+-        super.initHttpHeaders(pRequest);
+-        
+-        if (config.getConnectionTimeout() != 0)
+-            client.getHttpConnectionManager().getParams().setConnectionTimeout(config.getConnectionTimeout());
+-        
+-        if (config.getReplyTimeout() != 0)
+-            client.getHttpConnectionManager().getParams().setSoTimeout(config.getReplyTimeout());
+-        
+-        method.getParams().setVersion(HttpVersion.HTTP_1_1);
+-    }
+-
+-    protected PostMethod newPostMethod(XmlRpcHttpClientConfig pConfig) {
+-        return new PostMethod(pConfig.getServerURL().toString());
+-    }
+-
+-	protected void setRequestHeader(String pHeader, String pValue) {
+-		method.setRequestHeader(new Header(pHeader, pValue));
+-	}
+-
+-	protected boolean isResponseGzipCompressed() {
+-		Header h = method.getResponseHeader( "Content-Encoding" );
+-		if (h == null) {
+-			return false;
+-		} else {
+-			return HttpUtil.isUsingGzipEncoding(h.getValue());
+-		}
+-	}
+-
+-	protected InputStream getInputStream() throws XmlRpcException {
+-        try {
+-            checkStatus(method);
+-            return method.getResponseBodyAsStream();
+-		} catch (HttpException e) {
+-			throw new XmlRpcClientException("Error in HTTP transport: " + e.getMessage(), e);
+-		} catch (IOException e) {
+-			throw new XmlRpcClientException("I/O error in server communication: " + e.getMessage(), e);
+-		}
+-	}
+-
+-	protected void setCredentials(XmlRpcHttpClientConfig pConfig) throws XmlRpcClientException {
+-		String userName = pConfig.getBasicUserName();
+-		if (userName != null) {
+-            String enc = pConfig.getBasicEncoding();
+-            if (enc == null) {
+-                enc = XmlRpcStreamConfig.UTF8_ENCODING;
+-            }
+-            client.getParams().setParameter(HttpMethodParams.CREDENTIAL_CHARSET, enc);
+-			Credentials creds = new UsernamePasswordCredentials(userName, pConfig.getBasicPassword());
+-			AuthScope scope = new AuthScope(null, AuthScope.ANY_PORT, null, AuthScope.ANY_SCHEME);
+-			client.getState().setCredentials(scope, creds);
+-            client.getParams().setAuthenticationPreemptive(true);
+-        }
+-	}
+-
+-	protected void close() throws XmlRpcClientException {
+-		method.releaseConnection();
+-	}
+-
+-	protected boolean isResponseGzipCompressed(XmlRpcStreamRequestConfig pConfig) {
+-		Header h = method.getResponseHeader( "Content-Encoding" );
+-		if (h == null) {
+-			return false;
+-		} else {
+-			return HttpUtil.isUsingGzipEncoding(h.getValue());
+-		}
+-	}
+-
+-	protected boolean isRedirectRequired() {
+-	    switch (method.getStatusCode()) {
+-	        case HttpStatus.SC_MOVED_TEMPORARILY:
+-	        case HttpStatus.SC_MOVED_PERMANENTLY:
+-	        case HttpStatus.SC_SEE_OTHER:
+-	        case HttpStatus.SC_TEMPORARY_REDIRECT:
+-	            return true;
+-	        default:
+-	            return false;
+-	    }
+-	}
+-
+-	protected void resetClientForRedirect()
+-            throws XmlRpcException {
+-	    //get the location header to find out where to redirect to
+-	    Header locationHeader = method.getResponseHeader("location");
+-	    if (locationHeader == null) {
+-            throw new XmlRpcException("Invalid redirect: Missing location header");
+-	    }
+-	    String location = locationHeader.getValue();
+-
+-	    URI redirectUri = null;
+-	    URI currentUri = null;
+-	    try {
+-	        currentUri = method.getURI();
+-	        String charset = currentUri.getProtocolCharset();
+-	        redirectUri = new URI(location, true, charset);
+-	        method.setURI(redirectUri);
+-	    } catch (URIException ex) {
+-            throw new XmlRpcException(ex.getMessage(), ex);
+-	    }
+-
+-	    //And finally invalidate the actual authentication scheme
+-	    method.getHostAuthState().invalidate();
+-    }
+-
+-    protected void writeRequest(final ReqWriter pWriter) throws XmlRpcException {
+-		method.setRequestEntity(new RequestEntity(){
+-			public boolean isRepeatable() { return true; }
+-			public void writeRequest(OutputStream pOut) throws IOException {
+-				try {
+-                    /* Make sure, that the socket is not closed by replacing it with our
+-                     * own BufferedOutputStream.
+-                     */
+-                    OutputStream ostream;
+-                    if (isUsingByteArrayOutput(config)) {
+-                        // No need to buffer the output.
+-                        ostream = new FilterOutputStream(pOut){
+-                            public void close() throws IOException {
+-                                flush();
+-                            }
+-                        };
+-                    } else {
+-                        ostream = new BufferedOutputStream(pOut){
+-                            public void close() throws IOException {
+-                                flush();
+-                            }
+-                        };
+-                    }
+-					pWriter.write(ostream);
+-				} catch (XmlRpcException e) {
+-					throw new XmlRpcIOException(e);
+-				} catch (SAXException e) {
+-                    throw new XmlRpcIOException(e);
+-                }
+-			}
+-			public long getContentLength() { return contentLength; }
+-			public String getContentType() { return "text/xml"; }
+-		});
+-		try {
+-            int redirectAttempts = 0;
+-            for (;;) {
+-    			client.executeMethod(method);
+-                if (!isRedirectRequired()) {
+-                    break;
+-                }
+-                if (redirectAttempts++ > MAX_REDIRECT_ATTEMPTS) {
+-                    throw new XmlRpcException("Too many redirects.");
+-                }
+-                resetClientForRedirect();
+-            }
+-		} catch (XmlRpcIOException e) {
+-			Throwable t = e.getLinkedException();
+-			if (t instanceof XmlRpcException) {
+-				throw (XmlRpcException) t;
+-			} else {
+-				throw new XmlRpcException("Unexpected exception: " + t.getMessage(), t);
+-			}
+-		} catch (IOException e) {
+-			throw new XmlRpcException("I/O error while communicating with HTTP server: " + e.getMessage(), e);
+-		}
+-	}
+-    
+-    /**
+-     * Check the status of the HTTP request and throw an XmlRpcHttpTransportException if it
+-     * indicates that there is an error.
+-     * @param pMethod the method that has been executed
+-     * @throws XmlRpcHttpTransportException if the status of the method indicates that there is an error.
+-     */
+-    private void checkStatus(HttpMethod pMethod) throws XmlRpcHttpTransportException {
+-        final int status = pMethod.getStatusCode();
+-        
+-        // All status codes except SC_OK are handled as errors. Perhaps some should require special handling (e.g., SC_UNAUTHORIZED)
+-        if (status < 200  ||  status > 299) {
+-            throw new XmlRpcHttpTransportException(status, pMethod.getStatusText());
+-        }
+-    }
+-}
+diff --git a/client/src/main/java/org/apache/xmlrpc/client/XmlRpcCommonsTransportFactory.java b/client/src/main/java/org/apache/xmlrpc/client/XmlRpcCommonsTransportFactory.java
+deleted file mode 100644
+index 630d5b4..0000000
+--- a/client/src/main/java/org/apache/xmlrpc/client/XmlRpcCommonsTransportFactory.java
++++ /dev/null
+@@ -1,66 +0,0 @@
+-/*
+- * Licensed to the Apache Software Foundation (ASF) under one
+- * or more contributor license agreements.  See the NOTICE file
+- * distributed with this work for additional information
+- * regarding copyright ownership.  The ASF licenses this file
+- * to you under the Apache License, Version 2.0 (the
+- * "License"); you may not use this file except in compliance
+- * with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing,
+- * software distributed under the License is distributed on an
+- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- * KIND, either express or implied.  See the License for the
+- * specific language governing permissions and limitations
+- * under the License.    
+- */
+-package org.apache.xmlrpc.client;
+-
+-import org.apache.commons.httpclient.HttpClient;
+-
+-
+-/** An HTTP transport factory, which is based on the Jakarta Commons
+- * HTTP Client.
+- */
+-public class XmlRpcCommonsTransportFactory extends XmlRpcTransportFactoryImpl {
+-    private HttpClient httpClient;
+-
+-    /** Creates a new instance.
+-	 * @param pClient The client, which is controlling the factory.
+-	 */
+-	public XmlRpcCommonsTransportFactory(XmlRpcClient pClient) {
+-		super(pClient);
+-	}
+-
+-	public XmlRpcTransport getTransport() {
+-		return new XmlRpcCommonsTransport(this);
+-	}
+-
+-	/**
+-     * <p>Sets the factories {@link HttpClient}. By default, a new instance
+-     * of {@link HttpClient} is created for any request.</p>
+-     * <p>Reusing the {@link HttpClient} is required, if you want to preserve
+-     * some state between requests. This applies, in particular, if you want
+-     * to use cookies: In that case, create an instance of {@link HttpClient},
+-     * give it to the factory, and use {@link HttpClient#getState()} to
+-     * read or set cookies.
+-	 */
+-    public void setHttpClient(HttpClient pHttpClient) {
+-        httpClient = pHttpClient;
+-    }
+-
+-    /**
+-     * <p>Returns the factories {@link HttpClient}. By default, a new instance
+-     * of {@link HttpClient} is created for any request.</p>
+-     * <p>Reusing the {@link HttpClient} is required, if you want to preserve
+-     * some state between requests. This applies, in particular, if you want
+-     * to use cookies: In that case, create an instance of {@link HttpClient},
+-     * give it to the factory, and use {@link HttpClient#getState()} to
+-     * read or set cookies.
+-     */
+-    public HttpClient getHttpClient() {
+-        return httpClient;
+-    }
+-}
+diff --git a/pom.xml b/pom.xml
+index 5e18625..55cc6a8 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -321,12 +321,6 @@
+ 
+   <dependencyManagement>
+     <dependencies>
+-      <dependency>
+-        <groupId>commons-httpclient</groupId>
+-        <artifactId>commons-httpclient</artifactId>
+-        <version>3.0.1</version>
+-        <scope>provided</scope>
+-      </dependency>
+       <dependency>
+         <groupId>commons-logging</groupId>
+         <artifactId>commons-logging</artifactId>
+diff --git a/server/pom.xml b/server/pom.xml
+index 4c90e50..84234ff 100644
+--- a/server/pom.xml
++++ b/server/pom.xml
+@@ -95,10 +95,5 @@
+       <groupId>javax.servlet</groupId>
+       <artifactId>javax.servlet-api</artifactId>
+     </dependency>
+-    <dependency>
+-      <groupId>commons-httpclient</groupId>
+-      <artifactId>commons-httpclient</artifactId>
+-      <scope>test</scope>
+-    </dependency>
+   </dependencies>
+ </project>
+diff --git a/server/src/test/java/org/apache/xmlrpc/test/CommonsProvider.java b/server/src/test/java/org/apache/xmlrpc/test/CommonsProvider.java
+deleted file mode 100644
+index 2551a59..0000000
+--- a/server/src/test/java/org/apache/xmlrpc/test/CommonsProvider.java
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/*
+- * Licensed to the Apache Software Foundation (ASF) under one
+- * or more contributor license agreements.  See the NOTICE file
+- * distributed with this work for additional information
+- * regarding copyright ownership.  The ASF licenses this file
+- * to you under the Apache License, Version 2.0 (the
+- * "License"); you may not use this file except in compliance
+- * with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing,
+- * software distributed under the License is distributed on an
+- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- * KIND, either express or implied.  See the License for the
+- * specific language governing permissions and limitations
+- * under the License.    
+- */
+-package org.apache.xmlrpc.test;
+-
+-import org.apache.xmlrpc.client.XmlRpcClient;
+-import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
+-import org.apache.xmlrpc.client.XmlRpcTransportFactory;
+-import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
+-
+-
+-/** Provider for testing the
+- * {@link org.apache.xmlrpc.client.XmlRpcCommonsTransport}.
+- */
+-public class CommonsProvider extends WebServerProvider {
+-	/** Creates a new instance.
+-	 * @param pMapping The test servers handler mapping.
+-	 */
+-	public CommonsProvider(XmlRpcHandlerMapping pMapping) {
+-		super(pMapping, true);
+-	}
+-
+-	protected XmlRpcTransportFactory getTransportFactory(XmlRpcClient pClient) {
+-		return new XmlRpcCommonsTransportFactory(pClient);
+-	}
+-}
+diff --git a/server/src/test/java/org/apache/xmlrpc/test/XmlRpcTestCase.java b/server/src/test/java/org/apache/xmlrpc/test/XmlRpcTestCase.java
+index a9d1fbf..de06406 100644
+--- a/server/src/test/java/org/apache/xmlrpc/test/XmlRpcTestCase.java
++++ b/server/src/test/java/org/apache/xmlrpc/test/XmlRpcTestCase.java
+@@ -75,7 +75,6 @@ public abstract class XmlRpcTestCase extends TestCase {
+                 // new LiteTransportProvider(mapping, false), Doesn't support HTTP/1.1
+                 new SunHttpTransportProvider(pMapping, true),
+                 new SunHttpTransportProvider(pMapping, false),
+-                new CommonsProvider(pMapping),
+                 new ServletWebServerProvider(pMapping, true),
+                 new ServletWebServerProvider(pMapping, false)
+             };
+-- 
+2.26.0.rc2
+

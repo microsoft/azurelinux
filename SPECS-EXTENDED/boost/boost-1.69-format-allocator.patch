@@ -1,0 +1,28 @@
+--- boost_1_69_0/boost/format/alt_sstream_impl.hpp~	2020-03-30 15:20:18.565658757 +0100
++++ boost_1_69_0/boost/format/alt_sstream_impl.hpp	2020-03-30 15:20:33.768636162 +0100
+@@ -40,8 +40,11 @@
+ #ifdef _RWSTD_NO_CLASS_PARTIAL_SPEC
+                 void *vd_ptr = alloc_.allocate(sz, is_allocated_? eback() : 0);
+                 Ch *new_ptr = static_cast<Ch *>(vd_ptr);
+-#else
++#elif defined BOOST_NO_CXX11_ALLOCATOR
+                 Ch *new_ptr = alloc_.allocate(sz, is_allocated_? eback() : 0);
++#else
++                Ch *new_ptr = std::allocator_traits<compat_allocator_type>::allocate(alloc_,
++                    sz, is_allocated_? eback() : 0);
+ #endif
+                 // if this didnt throw, we're safe, update the buffer
+                 dealloc();
+@@ -257,8 +260,11 @@
+ #ifdef _RWSTD_NO_CLASS_PARTIAL_SPEC
+                     void *vdptr = alloc_.allocate(new_size, is_allocated_? oldptr : 0);
+                     newptr = static_cast<Ch *>(vdptr);
+-#else
++#elif defined BOOST_NO_CXX11_ALLOCATOR
+                     newptr = alloc_.allocate(new_size, is_allocated_? oldptr : 0);
++#else
++                    newptr = std::allocator_traits<compat_allocator_type>::allocate(alloc_,
++                        new_size, is_allocated_? oldptr : 0);
+ #endif
+                 }
+ 

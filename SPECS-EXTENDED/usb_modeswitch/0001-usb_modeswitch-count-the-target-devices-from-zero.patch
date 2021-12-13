@@ -1,0 +1,26 @@
+From 99cade3624c432a478e624f278692cdedf4e0450 Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Fri, 18 Aug 2017 10:40:41 +0200
+Subject: [PATCH] usb_modeswitch: count the target devices from zero
+
+Most likely a typo here.
+---
+ usb_modeswitch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usb_modeswitch.c b/usb_modeswitch.c
+index 3239946..1b3bf9d 100644
+--- a/usb_modeswitch.c
++++ b/usb_modeswitch.c
+@@ -1582,7 +1582,7 @@ int checkSuccess()
+ 		 * description is read for syslog message
+ 		 */
+ 		// Wait counter passed on from previous loop
+-		for (i=i; i < CheckSuccess; i++) {
++		for (i=0; i < CheckSuccess; i++) {
+ 			SHOW_PROGRESS(output," Search for target devices ...\n");
+ 			dev = search_devices(&newTargetCount, TargetVendor, TargetProductList,
+ 					TargetClass, 0, SEARCH_TARGET);
+-- 
+2.14.3
+

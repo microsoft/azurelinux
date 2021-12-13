@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.pegdown</groupId>
+    <artifactId>pegdown</artifactId>
+    <packaging>jar</packaging>
+    <description>A Java 1.5+ library providing a clean and lightweight markdown processor</description>
+    <url>http://pegdown.org</url>
+    <version>1.4.2</version>
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <name>pegdown</name>
+    <inceptionYear>2009</inceptionYear>
+    <organization>
+        <name>org.pegdown</name>
+        <url>http://pegdown.org</url>
+    </organization>
+    <scm>
+        <url>git@github.com:sirthias/pegdown.git</url>
+        <connection>scm:git:git@github.com:sirthias/pegdown.git</connection>
+    </scm>
+    <developers>
+        <developer>
+            <id>sirthias</id>
+            <name>Mathias Doenitz</name>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>org.parboiled</groupId>
+            <artifactId>parboiled-java</artifactId>
+            <version>1.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jtidy</groupId>
+            <artifactId>jtidy</artifactId>
+            <version>r938</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.specs2</groupId>
+            <artifactId>specs2_2.9.3</artifactId>
+            <version>1.12.4.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,47 @@
+From fa6dd59c5eaabc8c7e540f2aa2ded6f785de0a13 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Wed, 20 Feb 2019 11:12:04 -0800
+Subject: [PATCH] Set 'NEWEST' flag when resolving packages with PackageKit
+
+When resolving package names via PackageKit, realmd does not set
+the PK_FILTER_ENUM_NEWEST flag that asks PK to only give the
+*newest available* package for each package name. So if there
+are three different versions of the package available in three
+repositories, realmd winds up producing an array containing the
+package IDs for all three of those packages and calling
+InstallPackages on all of them. I don't know if PK's behaviour
+in this case is defined or predictable, but in practice in at
+least one case it reliably results in one of the older package
+versions being installed.
+
+This does not seem desirable, we should always want to install
+the newest available version. So let's set the NEWEST flag to
+ensure this.
+
+A possible consequence here is that, if a newer version of the
+package is not installable but an older version is, we will now
+fail where previously we did not. But even in that case I don't
+know if we would *reliably* succeed before, and silently
+installing an older version still doesn't necessarily seem like
+the right thing to do.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ service/realm-packages.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/service/realm-packages.c b/service/realm-packages.c
+index 5976439..0309c57 100644
+--- a/service/realm-packages.c
++++ b/service/realm-packages.c
+@@ -343,6 +343,7 @@ packages_resolve_async (GDBusConnection *connection,
+                         gpointer user_data)
+ {
+ 	guint64 flags = 1 << 18 /* PK_FILTER_ENUM_ARCH */;
++	flags |= 1 << 16 /* PK_FILTER_ENUM_NEWEST */;
+ 	package_transaction_create ("Resolve", g_variant_new ("(t^as)", flags, package_names),
+ 	                            connection, cancellable, callback, user_data);
+ }
+-- 
+2.20.1
+

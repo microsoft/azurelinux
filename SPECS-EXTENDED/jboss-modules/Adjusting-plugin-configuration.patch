@@ -1,0 +1,39 @@
+From 8822d48a1a71df33cecaeb3ad646995bb3e5d72d Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawel.winogrodzki@microsoft.com>
+Date: Tue, 17 Aug 2021 05:25:55 -0700
+Subject: [PATCH] Adjusting plugin configuration.
+
+---
+ pom.xml | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 19a766b..a0fe62f 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -94,11 +94,19 @@
+             <!-- Compiler -->
+             <plugin>
+                 <artifactId>maven-compiler-plugin</artifactId>
++                <inherited>true</inherited>
+                 <configuration>
+-                    <showDeprecation>true</showDeprecation>
++                    <source>1.8</source>
++                    <target>1.8</target>
++                    <showDeprecation>false</showDeprecation>
+                     <showWarnings>true</showWarnings>
+-                    <skipMain>${skip.compile}</skipMain>
+-                    <skip>${skip.compile}</skip>
++                    <optimize>true</optimize>
++                    <compilerVersion>1.8</compilerVersion>
++                    <fork>true</fork>
++                    <compilerArguments>
++                        <source>1.8</source>
++                        <target>1.8</target>
++                    </compilerArguments>
+                 </configuration>
+             </plugin>
+ 
+-- 
+2.17.1
+

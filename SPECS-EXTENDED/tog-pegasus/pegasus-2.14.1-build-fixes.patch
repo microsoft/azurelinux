@@ -1,0 +1,28 @@
+diff -up pegasus/src/Pegasus/Common/Message.cpp.orig pegasus/src/Pegasus/Common/Message.cpp
+--- pegasus/src/Pegasus/Common/Message.cpp.orig	2015-03-14 14:56:48.000000000 +0100
++++ pegasus/src/Pegasus/Common/Message.cpp	2015-04-08 10:02:47.355935316 +0200
+@@ -430,7 +430,8 @@ CIMOperationType Message::convertMessage
+  */
+ Boolean Message::valid() const
+ {
+-    return magic && (_type < NUMBER_OF_MESSAGES);
++    //return magic && (_type < NUMBER_OF_MESSAGES);
++    return true;
+ }
+ 
+ 
+diff -up pegasus/src/Pegasus/Server/CIMOperationRequestDispatcher.cpp.orig pegasus/src/Pegasus/Server/CIMOperationRequestDispatcher.cpp
+--- pegasus/src/Pegasus/Server/CIMOperationRequestDispatcher.cpp.orig	2015-03-14 14:56:48.000000000 +0100
++++ pegasus/src/Pegasus/Server/CIMOperationRequestDispatcher.cpp	2015-04-08 10:02:47.357935317 +0200
+@@ -1008,9 +1008,11 @@ Boolean CIMOperationRequestDispatcher::_
+             }
+             else
+             {
++/*
+                 EnumerationContext* ent = _enumerationContextTable->find(
+                     poA->_contextId);
+                 PEGASUS_DEBUG_ASSERT(ent == en);
++*/
+             }
+ 
+             PEGASUS_DEBUG_ASSERT(poA->_contextId == en->getContextId());

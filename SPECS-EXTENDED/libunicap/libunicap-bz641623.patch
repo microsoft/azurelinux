@@ -1,0 +1,15 @@
+diff --git a/cpi/v4l2cpi/v4l2.c b/cpi/v4l2cpi/v4l2.c
+index a8e0c92..ec4c8db 100644
+--- a/cpi/v4l2cpi/v4l2.c
++++ b/cpi/v4l2cpi/v4l2.c
+@@ -1928,6 +1928,10 @@ static unicap_status_t v4l2_capture_start( void *cpi_data )
+    }
+    
+    handle->buffer_mgr = buffer_mgr_create( handle->fd, &handle->current_format );
++   if( !handle->buffer_mgr )
++   {
++      return STATUS_FAILURE;
++   }
+ 
+    handle->capture_running = 1;
+ 

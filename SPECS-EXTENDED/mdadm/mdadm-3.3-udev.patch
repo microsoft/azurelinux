@@ -1,0 +1,13 @@
+--- mdadm/udev-md-raid-assembly.rules~	2018-07-09 18:24:27.450774446 +0800
++++ mdadm/udev-md-raid-assembly.rules	2018-07-09 18:25:12.630735637 +0800
+@@ -5,6 +5,10 @@
+ ENV{ANACONDA}=="?*", GOTO="md_inc_end"
+ # assemble md arrays
+ 
++# In Fedora we handle the raid components in 65-md-incremental.rules so that
++# we can do things like honor anaconda command line options and such
++GOTO="md_inc_end"
++
+ SUBSYSTEM!="block", GOTO="md_inc_end"
+ 
+ # skip non-initialized devices

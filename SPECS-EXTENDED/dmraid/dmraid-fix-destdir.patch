@@ -1,0 +1,60 @@
+ dmraid.spec       | 8 ++++----
+ make.tmpl.in      | 4 ----
+ tools/Makefile.in | 4 ++--
+ 3 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/dmraid.spec b/dmraid.spec
+index 681964c..5c602dc 100644
+--- a/dmraid.spec
++++ b/dmraid.spec
+@@ -59,12 +59,12 @@ Device failure reporting has to be activated manually by activating the
+ %setup -q -n dmraid/%{version}
+ 
+ %build
+-%configure --prefix=${RPM_BUILD_ROOT}/usr --sbindir=${RPM_BUILD_ROOT}/sbin --libdir=${RPM_BUILD_ROOT}/%{_libdir} --mandir=${RPM_BUILD_ROOT}/%{_mandir} --includedir=${RPM_BUILD_ROOT}/%{_includedir} --enable-debug --enable-libselinux --enable-libsepol --enable-static_link --enable-led --enable-intel_led
+-make DESTDIR=$RPM_BUILD_ROOT
++%configure --enable-debug --enable-libselinux --enable-libsepol --enable-static_link --enable-led --enable-intel_led
++make
+ mv tools/dmraid tools/dmraid.static
+ make clean
+-%configure --prefix=${RPM_BUILD_ROOT}/usr --sbindir=${RPM_BUILD_ROOT}/sbin --libdir=${RPM_BUILD_ROOT}/%{_libdir} --mandir=${RPM_BUILD_ROOT}/%{_mandir} --includedir=${RPM_BUILD_ROOT}/%{_includedir} --enable-debug --enable-libselinux --enable-libsepol --disable-static_linko --enable-led --enable-intel_led
+-make DESTDIR=$RPM_BUILD_ROOT
++%configure --enable-debug --enable-libselinux --enable-libsepol --disable-static_linko --enable-led --enable-intel_led
++make
+ 
+ %install
+ rm -rf $RPM_BUILD_ROOT
+diff --git a/make.tmpl.in b/make.tmpl.in
+index 48e5a99..2a26153 100644
+--- a/make.tmpl.in
++++ b/make.tmpl.in
+@@ -88,10 +88,6 @@ INCLUDES+=-I. -I$(top_srcdir)/include -I$(top_srcdir)/lib
+ 
+ STRIP=
+ 
+-ifdef DESTDIR
+-  INCLUDES+=-I$(DESTDIR)/usr/include
+-endif
+-
+ DEPS=$(top_srcdir)/make.tmpl $(top_srcdir)/tools/VERSION Makefile
+ 
+ OBJECTS=$(SOURCES:%.c=%.o)
+diff --git a/tools/Makefile.in b/tools/Makefile.in
+index 0342d2a..ea2c915 100644
+--- a/tools/Makefile.in
++++ b/tools/Makefile.in
+@@ -72,11 +72,11 @@ all: $(TARGETS)
+ 
+ dmraid:	$(OBJECTS) $(top_srcdir)/lib/libdmraid.a
+ 	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS) -L$(top_srcdir)/lib \
+-	      -L$(DESTDIR)$(libdir) $(DMRAIDLIBS) $(DMEVENTTOOLLIBS) $(DMRAIDLIBS) $(LIBS) 
++	      $(DMRAIDLIBS) $(DMEVENTTOOLLIBS) $(DMRAIDLIBS) $(LIBS) 
+ 
+ dmevent_tool: $(top_srcdir)/lib/libdmraid.a
+ 	$(CC) -o $@ $@.c $(INCLUDES) $(CFLAGS) $(LDFLAGS) -L$(top_srcdir)/lib \
+-	      -L$(DESTDIR)$(libdir) $(DMRAIDLIBS) $(DMEVENTTOOLLIBS) $(DMRAIDLIBS) $(LIBS) 
++	      $(DMRAIDLIBS) $(DMEVENTTOOLLIBS) $(DMRAIDLIBS) $(LIBS) 
+ 
+ install_dmraid_tools: $(TARGETS)
+ 	@echo "Installing $(TARGETS) in $(sbindir)"; \
+

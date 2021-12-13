@@ -1,0 +1,338 @@
+From 0a169bd9b2687293f74bb57694eb82f9769610c9 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Wed, 27 Nov 2019 12:34:45 +0100
+Subject: [PATCH 2/6] tools: add show-computer command
+
+The show-computer command prints the LDAP attributes of the related
+computer object from AD.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1737342
+---
+ doc/adcli.xml      | 28 ++++++++++++++
+ library/adenroll.c | 78 +++++++++++++++++++++++++++++---------
+ library/adenroll.h |  5 +++
+ tools/computer.c   | 93 ++++++++++++++++++++++++++++++++++++++++++++++
+ tools/tools.c      |  1 +
+ tools/tools.h      |  4 ++
+ 6 files changed, 191 insertions(+), 18 deletions(-)
+
+diff --git a/doc/adcli.xml b/doc/adcli.xml
+index 9faf96a..1f93186 100644
+--- a/doc/adcli.xml
++++ b/doc/adcli.xml
+@@ -93,6 +93,11 @@
+ 		<arg choice="opt">--domain=domain.example.com</arg>
+ 		<arg choice="plain">computer</arg>
+ 	</cmdsynopsis>
++	<cmdsynopsis>
++		<command>adcli show-computer</command>
++		<arg choice="opt">--domain=domain.example.com</arg>
++		<arg choice="plain">computer</arg>
++	</cmdsynopsis>
+ </refsynopsisdiv>
+ 
+ <refsect1 id='general_overview'>
+@@ -811,6 +816,29 @@ Password for Administrator:
+ 
+ </refsect1>
+ 
++<refsect1 id='show_computer_account'>
++	<title>Show Computer Account Attributes</title>
++
++	<para><command>adcli show-computer</command> show the computer account
++	attributes stored in AD. The account must already exist.</para>
++
++<programlisting>
++$ adcli show-computer --domain=domain.example.com host2
++Password for Administrator:
++</programlisting>
++
++	<para>If the computer name contains a dot, then it is
++	treated as fully qualified host name, otherwise it is treated
++	as short computer name.</para>
++
++	<para>If no computer name is specified, then the host name of the
++	computer adcli is running on is used, as returned by
++	<literal>gethostname()</literal>.</para>
++
++	<para>The various global options can be used.</para>
++
++</refsect1>
++
+ <refsect1 id='bugs'>
+ 	<title>Bugs</title>
+ 	<para>
+diff --git a/library/adenroll.c b/library/adenroll.c
+index 524663a..8d2adeb 100644
+--- a/library/adenroll.c
++++ b/library/adenroll.c
+@@ -71,6 +71,21 @@ static krb5_enctype v51_earlier_enctypes[] = {
+ 	0
+ };
+ 
++static char *default_ad_ldap_attrs[] =  {
++	"sAMAccountName",
++	"userPrincipalName",
++	"msDS-KeyVersionNumber",
++	"msDS-supportedEncryptionTypes",
++	"dNSHostName",
++	"servicePrincipalName",
++	"operatingSystem",
++	"operatingSystemVersion",
++	"operatingSystemServicePack",
++	"pwdLastSet",
++	"userAccountControl",
++	NULL,
++};
++
+ /* Some constants for the userAccountControl AD LDAP attribute, see e.g.
+  * https://support.microsoft.com/en-us/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
+  * for details. */
+@@ -1213,19 +1228,6 @@ retrieve_computer_account (adcli_enroll *enroll)
+ 	char *end;
+ 	int ret;
+ 
+-	char *attrs[] =  {
+-		"msDS-KeyVersionNumber",
+-		"msDS-supportedEncryptionTypes",
+-		"dNSHostName",
+-		"servicePrincipalName",
+-		"operatingSystem",
+-		"operatingSystemVersion",
+-		"operatingSystemServicePack",
+-		"pwdLastSet",
+-		"userAccountControl",
+-		NULL,
+-	};
+-
+ 	assert (enroll->computer_dn != NULL);
+ 	assert (enroll->computer_attributes == NULL);
+ 
+@@ -1233,7 +1235,8 @@ retrieve_computer_account (adcli_enroll *enroll)
+ 	assert (ldap != NULL);
+ 
+ 	ret = ldap_search_ext_s (ldap, enroll->computer_dn, LDAP_SCOPE_BASE,
+-	                         "(objectClass=*)", attrs, 0, NULL, NULL, NULL, -1,
++	                         "(objectClass=*)", default_ad_ldap_attrs,
++	                         0, NULL, NULL, NULL, -1,
+ 	                         &enroll->computer_attributes);
+ 
+ 	if (ret != LDAP_SUCCESS) {
+@@ -2179,12 +2182,11 @@ adcli_enroll_load (adcli_enroll *enroll)
+ }
+ 
+ adcli_result
+-adcli_enroll_update (adcli_enroll *enroll,
+-		     adcli_enroll_flags flags)
++adcli_enroll_read_computer_account (adcli_enroll *enroll,
++		                    adcli_enroll_flags flags)
+ {
+ 	adcli_result res = ADCLI_SUCCESS;
+ 	LDAP *ldap;
+-	char *value;
+ 
+ 	return_unexpected_if_fail (enroll != NULL);
+ 
+@@ -2214,7 +2216,18 @@ adcli_enroll_update (adcli_enroll *enroll,
+ 	}
+ 
+ 	/* Get information about the computer account */
+-	res = retrieve_computer_account (enroll);
++	return retrieve_computer_account (enroll);
++}
++
++adcli_result
++adcli_enroll_update (adcli_enroll *enroll,
++		     adcli_enroll_flags flags)
++{
++	adcli_result res = ADCLI_SUCCESS;
++	LDAP *ldap;
++	char *value;
++
++	res = adcli_enroll_read_computer_account (enroll, flags);
+ 	if (res != ADCLI_SUCCESS)
+ 		return res;
+ 
+@@ -2242,6 +2255,35 @@ adcli_enroll_update (adcli_enroll *enroll,
+ 	return enroll_join_or_update_tasks (enroll, flags);
+ }
+ 
++adcli_result
++adcli_enroll_show_computer_attribute (adcli_enroll *enroll)
++{
++	LDAP *ldap;
++	size_t c;
++	char **vals;
++	size_t v;
++
++	ldap = adcli_conn_get_ldap_connection (enroll->conn);
++	assert (ldap != NULL);
++
++	for (c = 0; default_ad_ldap_attrs[c] != NULL; c++) {
++		vals = _adcli_ldap_parse_values (ldap,
++		                                 enroll->computer_attributes,
++		                                 default_ad_ldap_attrs[c]);
++		printf ("%s:\n", default_ad_ldap_attrs[c]);
++		if (vals == NULL) {
++			printf (" - not set -\n");
++		} else {
++			for (v = 0; vals[v] != NULL; v++) {
++				printf (" %s\n", vals[v]);
++			}
++		}
++		_adcli_strv_free (vals);
++	}
++
++	return ADCLI_SUCCESS;
++}
++
+ adcli_result
+ adcli_enroll_delete (adcli_enroll *enroll,
+                      adcli_enroll_flags delete_flags)
+diff --git a/library/adenroll.h b/library/adenroll.h
+index 1d5d00d..11eb517 100644
+--- a/library/adenroll.h
++++ b/library/adenroll.h
+@@ -46,6 +46,11 @@ adcli_result       adcli_enroll_join                    (adcli_enroll *enroll,
+ adcli_result       adcli_enroll_update                  (adcli_enroll *enroll,
+ 		                                         adcli_enroll_flags flags);
+ 
++adcli_result       adcli_enroll_read_computer_account   (adcli_enroll *enroll,
++                                                         adcli_enroll_flags flags);
++
++adcli_result       adcli_enroll_show_computer_attribute (adcli_enroll *enroll);
++
+ adcli_result       adcli_enroll_delete                  (adcli_enroll *enroll,
+                                                          adcli_enroll_flags delete_flags);
+ 
+diff --git a/tools/computer.c b/tools/computer.c
+index ac8a203..c8b96a4 100644
+--- a/tools/computer.c
++++ b/tools/computer.c
+@@ -964,3 +964,96 @@ adcli_tool_computer_delete (adcli_conn *conn,
+ 	adcli_enroll_unref (enroll);
+ 	return 0;
+ }
++
++int
++adcli_tool_computer_show (adcli_conn *conn,
++                          int argc,
++                          char *argv[])
++{
++	adcli_enroll *enroll;
++	adcli_result res;
++	int opt;
++
++	struct option options[] = {
++		{ "domain", required_argument, NULL, opt_domain },
++		{ "domain-realm", required_argument, NULL, opt_domain_realm },
++		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "login-user", required_argument, NULL, opt_login_user },
++		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
++		{ "login-type", required_argument, NULL, opt_login_type },
++		{ "no-password", no_argument, 0, opt_no_password },
++		{ "stdin-password", no_argument, 0, opt_stdin_password },
++		{ "prompt-password", no_argument, 0, opt_prompt_password },
++		{ "verbose", no_argument, NULL, opt_verbose },
++		{ "help", no_argument, NULL, 'h' },
++		{ 0 },
++	};
++
++	static adcli_tool_desc usages[] = {
++		{ 0, "usage: adcli show-computer --domain=xxxx host1.example.com" },
++		{ 0 },
++	};
++
++	enroll = adcli_enroll_new (conn);
++	if (enroll == NULL) {
++		warnx ("unexpected memory problems");
++		return -1;
++	}
++
++	while ((opt = adcli_tool_getopt (argc, argv, options)) != -1) {
++		switch (opt) {
++		case 'h':
++		case '?':
++		case ':':
++			adcli_tool_usage (options, usages);
++			adcli_tool_usage (options, common_usages);
++			adcli_enroll_unref (enroll);
++			return opt == 'h' ? 0 : 2;
++		default:
++			res = parse_option ((Option)opt, optarg, conn, enroll);
++			if (res != ADCLI_SUCCESS) {
++				adcli_enroll_unref (enroll);
++				return res;
++			}
++			break;
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++
++	res = adcli_conn_connect (conn);
++	if (res != ADCLI_SUCCESS) {
++		warnx ("couldn't connect to %s domain: %s",
++		       adcli_conn_get_domain_name (conn),
++		       adcli_get_last_error ());
++		adcli_enroll_unref (enroll);
++		return -res;
++	}
++
++	if (argc == 1) {
++		parse_fqdn_or_name (enroll, argv[0]);
++	}
++
++	res = adcli_enroll_read_computer_account (enroll, 0);
++	if (res != ADCLI_SUCCESS) {
++		warnx ("couldn't read data for %s: %s",
++		       adcli_enroll_get_host_fqdn (enroll) != NULL
++		           ? adcli_enroll_get_host_fqdn (enroll)
++		           : adcli_enroll_get_computer_name (enroll),
++		       adcli_get_last_error ());
++		adcli_enroll_unref (enroll);
++		return -res;
++	}
++
++	res = adcli_enroll_show_computer_attribute (enroll);
++	if (res != ADCLI_SUCCESS) {
++		warnx ("couldn't print data for %s: %s",
++		       argv[0], adcli_get_last_error ());
++		adcli_enroll_unref (enroll);
++		return -res;
++	}
++
++	adcli_enroll_unref (enroll);
++	return 0;
++}
+diff --git a/tools/tools.c b/tools/tools.c
+index fc9fa9a..9d422f2 100644
+--- a/tools/tools.c
++++ b/tools/tools.c
+@@ -59,6 +59,7 @@ struct {
+ 	{ "preset-computer", adcli_tool_computer_preset, "Pre setup computers accounts", },
+ 	{ "reset-computer", adcli_tool_computer_reset, "Reset a computer account", },
+ 	{ "delete-computer", adcli_tool_computer_delete, "Delete a computer account", },
++	{ "show-computer", adcli_tool_computer_show, "Show computer account attributes stored in AD", },
+ 	{ "create-user", adcli_tool_user_create, "Create a user account", },
+ 	{ "delete-user", adcli_tool_user_delete, "Delete a user account", },
+ 	{ "create-group", adcli_tool_group_create, "Create a group", },
+diff --git a/tools/tools.h b/tools/tools.h
+index 8cebbf9..3702875 100644
+--- a/tools/tools.h
++++ b/tools/tools.h
+@@ -78,6 +78,10 @@ int       adcli_tool_computer_delete   (adcli_conn *conn,
+                                         int argc,
+                                         char *argv[]);
+ 
++int       adcli_tool_computer_show     (adcli_conn *conn,
++                                        int argc,
++                                        char *argv[]);
++
+ int       adcli_tool_user_create       (adcli_conn *conn,
+                                         int argc,
+                                         char *argv[]);
+-- 
+2.25.1
+

@@ -1,0 +1,11 @@
+--- src/com/werken/xpath/impl/ParentStep.java.sav	2006-05-05 20:01:17.000000000 +0200
++++ src/com/werken/xpath/impl/ParentStep.java	2006-05-05 20:02:17.000000000 +0200
+@@ -50,7 +50,7 @@
+ 
+       if ( each instanceof Element )
+       {
+-        parent = ((Element)each).getParent();
++        parent = (Element)((Element)each).getParent();
+ 
+         if (parent != null)
+         {

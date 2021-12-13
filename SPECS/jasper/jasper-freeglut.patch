@@ -1,0 +1,66 @@
+diff -urNp a/build/cmake/modules/JasOpenGL.cmake b/build/cmake/modules/JasOpenGL.cmake
+--- a/build/cmake/modules/JasOpenGL.cmake	2020-10-07 10:00:16.316291325 +0200
++++ b/build/cmake/modules/JasOpenGL.cmake	2020-10-07 10:03:39.536143003 +0200
+@@ -13,19 +13,19 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
+ 	set(JAS_HAVE_OPENGL 0)
+ 	message("OpenGL include directory: ${OPENGL_INCLUDE_DIR}")
+ 	message("OpenGL libraries: ${OPENGL_LIBRARIES}")
+-	find_package(GLUT ${JAS_REQUIRED})
+-	message("GLUT library found: ${GLUT_FOUND}")
+-	if (GLUT_FOUND)
+-		message("GLUT include directory: ${GLUT_INCLUDE_DIR}")
+-		message("GLUT libraries: ${GLUT_LIBRARIES}")
+-		set(CMAKE_REQUIRED_INCLUDES ${GLUT_INCLUDE_DIR})
+-		check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
++	find_package(FreeGLUT ${JAS_REQUIRED})
++	message("GLUT library found: ${FreeGLUT_FOUND}")
++	if (FreeGLUT_FOUND)
++		message("GLUT include directory: ${FreeGLUT_INCLUDE_DIR}")
++		message("GLUT libraries: ${FreeGLUT_LIBRARIES}")
++		set(CMAKE_REQUIRED_INCLUDES ${FreeGLUT_INCLUDE_DIR})
++		check_include_files(GL/freeglut.h JAS_HAVE_GL_GLUT_H)
+ 		check_include_files(glut.h JAS_HAVE_GLUT_H)
+ 		if (JAS_HAVE_GL_GLUT_H OR JAS_HAVE_GLUT_H)
+ 			set(JAS_HAVE_OPENGL 1)
+-			include_directories(${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
++			include_directories(${FreeGLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
+ 		else()
+-			message(WARNING "The header files GL/glut.h and glut.h both appear to be missing.")
++			message(WARNING "The header files GL/freeglut.h and glut.h both appear to be missing.")
+ 			message(WARNING "Disabling OpenGL.")
+ 		endif()
+ 	endif()
+@@ -49,6 +49,6 @@ else()
+ 	set(JAS_HAVE_OPENGL 0)
+ 	set(OPENGL_INCLUDE_DIR "")
+ 	set(OPENGL_LIBRARIES "")
+-	set(GLUT_INCLUDE_DIR "")
++	set(FreeGLUT_INCLUDE_DIR "")
+ 	set(GLUT_LIBRARIES "")
+ endif()
+diff -urNp a/src/appl/CMakeLists.txt b/src/appl/CMakeLists.txt
+--- a/src/appl/CMakeLists.txt	2020-10-07 10:00:16.338291526 +0200
++++ b/src/appl/CMakeLists.txt	2020-10-07 10:04:58.864872143 +0200
+@@ -23,8 +23,8 @@ set(man_pages "${man_pages}" imgcmp.1)
+ if(JAS_HAVE_OPENGL)
+ 	add_executable(jiv jiv.c)
+ 	target_include_directories(jiv PUBLIC
+-	  ${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
+-	target_link_libraries(jiv libjasper ${JPEG_LIBRARIES} ${GLUT_LIBRARIES}
++	  ${FreeGLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
++	target_link_libraries(jiv libjasper ${JPEG_LIBRARIES} -lglut
+ 	  ${OPENGL_LIBRARIES} ${MATH_LIBRARY})
+ 	set(programs "${programs}" jiv)
+ 	set(man_pages "${man_pages}" jiv.1)
+diff -urNp a/src/appl/jiv.c b/src/appl/jiv.c
+--- a/src/appl/jiv.c	2020-10-07 10:00:16.340291544 +0200
++++ b/src/appl/jiv.c	2020-10-07 10:05:35.319207658 +0200
+@@ -68,7 +68,7 @@
+ #include <math.h>
+ #include <inttypes.h>
+ #if defined(JAS_HAVE_GL_GLUT_H)
+-#include <GL/glut.h>
++#include <GL/freeglut.h>
+ #else
+ #include <glut.h>
+ #endif

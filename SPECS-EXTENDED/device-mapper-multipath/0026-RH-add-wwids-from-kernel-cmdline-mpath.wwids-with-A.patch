@@ -1,0 +1,169 @@
+From bba3bc3cfd910921ab5887acdc9503610e7efa18 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Fri, 17 Oct 2014 11:20:34 -0500
+Subject: [PATCH] RH: add wwids from kernel cmdline mpath.wwids with -A
+
+This patch adds another option to multipath, "-A", which reads
+/proc/cmdline for mpath.wwid=<WWID> options, and adds any wwids it finds
+to /etc/multipath/wwids.  While this isn't usually important during
+normal operation, since these wwids should already be added, it can be
+helpful during installation, to make sure that multipath can claim
+devices as its own, before LVM or something else makes use of them.  The
+patch also execs "/sbin/multipath -A" before running multipathd in
+multipathd.service
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/wwids.c          | 44 +++++++++++++++++++++++++++++++++++
+ libmultipath/wwids.h          |  1 +
+ multipath/main.c              | 10 ++++++--
+ multipath/multipath.8         |  7 +++++-
+ multipathd/multipathd.service |  1 +
+ 5 files changed, 60 insertions(+), 3 deletions(-)
+
+diff --git a/libmultipath/wwids.c b/libmultipath/wwids.c
+index ef748125..349da8b7 100644
+--- a/libmultipath/wwids.c
++++ b/libmultipath/wwids.c
+@@ -444,3 +444,47 @@ int op ## _wwid(const char *wwid) \
+ declare_failed_wwid_op(is_failed, false)
+ declare_failed_wwid_op(mark_failed, true)
+ declare_failed_wwid_op(unmark_failed, true)
++
++int remember_cmdline_wwid(void)
++{
++	FILE *f = NULL;
++	char buf[LINE_MAX], *next, *ptr;
++	int ret = 0;
++
++	f = fopen("/proc/cmdline", "re");
++	if (!f) {
++		condlog(0, "can't open /proc/cmdline : %s", strerror(errno));
++		return -1;
++	}
++
++	if (!fgets(buf, sizeof(buf), f)) {
++		if (ferror(f))
++			condlog(0, "read of /proc/cmdline failed : %s",
++				strerror(errno));
++		else
++			condlog(0, "couldn't read /proc/cmdline");
++		fclose(f);
++		return -1;
++	}
++	fclose(f);
++	next = buf;
++	while((ptr = strstr(next, "mpath.wwid="))) {
++		ptr += 11;
++		next = strpbrk(ptr, " \t\n");
++		if (next) {
++			*next = '\0';
++			next++;
++		}
++		if (strlen(ptr)) {
++			if (remember_wwid(ptr) != 0)
++				ret = -1;
++		}
++		else {
++			condlog(0, "empty mpath.wwid kernel command line option");
++			ret = -1;
++		}
++		if (!next)
++			break;
++	}
++	return ret;
++}
+diff --git a/libmultipath/wwids.h b/libmultipath/wwids.h
+index 0c6ee54d..e32a0b0e 100644
+--- a/libmultipath/wwids.h
++++ b/libmultipath/wwids.h
+@@ -17,6 +17,7 @@ int remember_wwid(char *wwid);
+ int check_wwids_file(char *wwid, int write_wwid);
+ int remove_wwid(char *wwid);
+ int replace_wwids(vector mp);
++int remember_cmdline_wwid(void);
+ 
+ enum {
+ 	WWID_IS_NOT_FAILED = 0,
+diff --git a/multipath/main.c b/multipath/main.c
+index 4f4d8e89..22aff7be 100644
+--- a/multipath/main.c
++++ b/multipath/main.c
+@@ -138,7 +138,7 @@ usage (char * progname)
+ 	fprintf (stderr, "  %s [-v level] [-R retries] -F\n", progname);
+ 	fprintf (stderr, "  %s [-v level] [-l|-ll] [device]\n", progname);
+ 	fprintf (stderr, "  %s [-v level] [-a|-w] device\n", progname);
+-	fprintf (stderr, "  %s [-v level] -W\n", progname);
++	fprintf (stderr, "  %s [-v level] [-A|-W]\n", progname);
+ 	fprintf (stderr, "  %s [-v level] [-i] [-c|-C] device\n", progname);
+ 	fprintf (stderr, "  %s [-v level] [-i] [-u|-U]\n", progname);
+ 	fprintf (stderr, "  %s [-h|-t|-T]\n", progname);
+@@ -151,6 +151,8 @@ usage (char * progname)
+ 		"  -f      flush a multipath device map\n"
+ 		"  -F      flush all multipath device maps\n"
+ 		"  -a      add a device wwid to the wwids file\n"
++		"  -A      add devices from kernel command line mpath.wwids\n"
++		"          parameters to wwids file\n"
+ 		"  -c      check if a device should be a path in a multipath device\n"
+ 		"  -C      check if a multipath device has usable paths\n"
+ 		"  -q      allow queue_if_no_path when multipathd is not running\n"
+@@ -905,7 +907,7 @@ main (int argc, char *argv[])
+ 		exit(RTVL_FAIL);
+ 	multipath_conf = conf;
+ 	conf->retrigger_tries = 0;
+-	while ((arg = getopt(argc, argv, ":adcChl::FfM:v:p:b:BrR:itTquUwW")) != EOF ) {
++	while ((arg = getopt(argc, argv, ":aAdcChl::FfM:v:p:b:BrR:itTquUwW")) != EOF ) {
+ 		switch(arg) {
+ 		case 1: printf("optarg : %s\n",optarg);
+ 			break;
+@@ -975,6 +977,10 @@ main (int argc, char *argv[])
+ 		case 'T':
+ 			cmd = CMD_DUMP_CONFIG;
+ 			break;
++		case 'A':
++			if (remember_cmdline_wwid() != 0)
++				exit(RTVL_FAIL);
++			exit(RTVL_OK);
+ 		case 'h':
+ 			usage(argv[0]);
+ 			exit(RTVL_OK);
+diff --git a/multipath/multipath.8 b/multipath/multipath.8
+index 9cdd05a3..8befc45a 100644
+--- a/multipath/multipath.8
++++ b/multipath/multipath.8
+@@ -63,7 +63,7 @@ multipath \- Device mapper target autoconfig.
+ .B multipath
+ .RB [\| \-v\ \c
+ .IR level \|]
+-.B -W
++.RB [\| \-A | \-W \|]
+ .
+ .LP
+ .B multipath
+@@ -145,6 +145,11 @@ device mapper, path checkers ...).
+ Add the WWID for the specified device to the WWIDs file.
+ .
+ .TP
++.B \-A
++Add the WWIDs from any kernel command line \fImpath.wwid\fR parameters to the
++WWIDs file.
++.
++.TP
+ .B \-w
+ Remove the WWID for the specified device from the WWIDs file.
+ .
+diff --git a/multipathd/multipathd.service b/multipathd/multipathd.service
+index 17434cef..0fbcc46b 100644
+--- a/multipathd/multipathd.service
++++ b/multipathd/multipathd.service
+@@ -15,6 +15,7 @@ Type=notify
+ NotifyAccess=main
+ LimitCORE=infinity
+ ExecStartPre=-/sbin/modprobe -a scsi_dh_alua scsi_dh_emc scsi_dh_rdac dm-multipath
++ExecStartPre=-/sbin/multipath -A
+ ExecStart=/sbin/multipathd -d -s
+ ExecReload=/sbin/multipathd reconfigure
+ TasksMax=infinity
+-- 
+2.17.2
+

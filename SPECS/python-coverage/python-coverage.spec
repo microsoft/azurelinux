@@ -1,7 +1,7 @@
 Summary:        Code coverage measurement for Python.
 Name:           python-coverage
 Version:        4.5.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 %endif
@@ -40,8 +41,7 @@ executable, and which have been executed.
 %py3_install
 
 %check
-easy_install tox
-easy_install PyContracts
+pip3 install tox PyContracts
 LANG=en_US.UTF-8 tox -e py36
 
 %files -n python3-coverage
@@ -53,6 +53,9 @@ LANG=en_US.UTF-8 tox -e py36
 %{_bindir}/coverage-%{python3_version}
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 4.5.1-6
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.5.1-5
 - Add license to python3 package
 - Remove python2 package

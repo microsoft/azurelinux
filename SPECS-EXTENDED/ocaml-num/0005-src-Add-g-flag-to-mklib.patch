@@ -1,0 +1,42 @@
+From 0419c771916f4f53e6dd2d89cfd11384ecd2be96 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Wed, 8 Nov 2017 22:16:59 +0000
+Subject: [PATCH 5/5] src: Add -g flag to mklib.
+
+---
+ src/Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 8ad0e2c..4dc802f 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -42,13 +42,13 @@ all:: nums.cmxs
+ endif
+ 
+ libnums.$(A): $(COBJS)
+-	$(OCAMLMKLIB) -oc nums $(COBJS)
++	$(OCAMLMKLIB) -g -oc nums $(COBJS)
+ 
+ nums.cma: $(CMOS)
+-	$(OCAMLMKLIB) -o nums -oc nums -linkall $(CMOS)
++	$(OCAMLMKLIB) -g -o nums -oc nums -linkall $(CMOS)
+ 
+ nums.cmxa: $(CMXS)
+-	$(OCAMLMKLIB) -o nums -oc nums -linkall $(CMXS)
++	$(OCAMLMKLIB) -g -o nums -oc nums -linkall $(CMXS)
+ 
+ nums.cmxs: nums.cmxa libnums.$(A)
+ 	$(OCAMLOPT) $(CAMLOPTFLAGS) -I . -shared -o nums.cmxs nums.cmxa
+@@ -65,7 +65,7 @@ nat_stubs.$(O): bng.h nat.h
+ %.cmx: %.ml
+ 	$(OCAMLOPT) $(CAMLOPTFLAGS) -c $*.ml
+ %.$(O): %.c
+-	$(OCAMLC) -ccopt -DBNG_ARCH_$(BNG_ARCH) -c $*.c
++	$(OCAMLC) -g -ccopt -DBNG_ARCH_$(BNG_ARCH) -c $*.c
+ 
+ # Legacy installation: files go into OCaml's stdlib directory; only META
+ # is installed via findlib
+-- 
+2.24.1
+

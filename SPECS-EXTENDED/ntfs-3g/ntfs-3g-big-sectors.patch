@@ -1,0 +1,379 @@
+--- libntfs-3g/bootsect.c.ref	2017-03-23 10:42:44.000000000 +0100
++++ libntfs-3g/bootsect.c	2018-05-07 09:11:13.004710800 +0200
+@@ -38,6 +38,7 @@ 
+ #include <errno.h>
+ #endif
+ 
++#include "param.h"
+ #include "compat.h"
+ #include "bootsect.h"
+ #include "debug.h"
+@@ -61,6 +62,7 @@ 
+ {
+ 	u32 i;
+ 	BOOL ret = FALSE;
++	u16 sectors_per_cluster;
+ 
+ 	ntfs_log_debug("Beginning bootsector check.\n");
+ 
+@@ -83,15 +85,27 @@ 
+ 	case 1: case 2: case 4: case 8: case 16: case 32: case 64: case 128:
+ 		break;
+ 	default:
+-		ntfs_log_error("Unexpected sectors per cluster value (%d).\n",
+-			       b->bpb.sectors_per_cluster);
+-		goto not_ntfs;
++		if ((b->bpb.sectors_per_cluster < 240)
++		    || (b->bpb.sectors_per_cluster > 249)) {
++			if (b->bpb.sectors_per_cluster > 128)
++				ntfs_log_error("Unexpected sectors"
++					" per cluster value (code 0x%x)\n",
++					b->bpb.sectors_per_cluster);
++			else
++				ntfs_log_error("Unexpected sectors"
++					" per cluster value (%d).\n",
++					b->bpb.sectors_per_cluster);
++			goto not_ntfs;
++		}
+ 	}
+ 
+ 	ntfs_log_debug("Checking cluster size.\n");
+-	i = (u32)le16_to_cpu(b->bpb.bytes_per_sector) * 
+-		b->bpb.sectors_per_cluster;
+-	if (i > 65536) {
++	if (b->bpb.sectors_per_cluster > 128)
++		sectors_per_cluster = 1 << (256 - b->bpb.sectors_per_cluster);
++	else
++		sectors_per_cluster = b->bpb.sectors_per_cluster;
++	i = (u32)le16_to_cpu(b->bpb.bytes_per_sector) * sectors_per_cluster;
++	if (i > NTFS_MAX_CLUSTER_SIZE) {
+ 		ntfs_log_error("Unexpected cluster size (%d).\n", i);
+ 		goto not_ntfs;
+ 	}
+@@ -171,7 +185,7 @@ 
+ int ntfs_boot_sector_parse(ntfs_volume *vol, const NTFS_BOOT_SECTOR *bs)
+ {
+ 	s64 sectors;
+-	u8  sectors_per_cluster;
++	u16  sectors_per_cluster;
+ 	s8  c;
+ 
+ 	/* We return -1 with errno = EINVAL on error. */
+@@ -186,7 +200,10 @@ 
+ 	 * below or equal the number_of_clusters) really belong in the
+ 	 * ntfs_boot_sector_is_ntfs but in this way we can just do this once.
+ 	 */
+-	sectors_per_cluster = bs->bpb.sectors_per_cluster;
++	if (bs->bpb.sectors_per_cluster > 128)
++		sectors_per_cluster = 1 << (256 - bs->bpb.sectors_per_cluster);
++	else
++		sectors_per_cluster = bs->bpb.sectors_per_cluster;
+ 	ntfs_log_debug("SectorsPerCluster = 0x%x\n", sectors_per_cluster);
+ 	if (sectors_per_cluster & (sectors_per_cluster - 1)) {
+ 		ntfs_log_error("sectors_per_cluster (%d) is not a power of 2."
+--- ntfsprogs/mkntfs.8.in.ref	2017-03-23 10:42:44.000000000 +0100
++++ ntfsprogs/mkntfs.8.in	2018-05-07 09:11:13.014132400 +0200
+@@ -132,7 +132,7 @@ 
+ .TP
+ \fB\-c\fR, \fB\-\-cluster\-size\fR BYTES
+ Specify the size of clusters in bytes. Valid cluster size values are powers of
+-two, with at least 256, and at most 65536 bytes per cluster. If omitted,
++two, with at least 256, and at most 2097152 bytes (2MB) per cluster. If omitted,
+ .B mkntfs
+ uses 4096 bytes as the default cluster size.
+ .sp
+--- ntfsprogs/mkntfs.c.ref	2017-03-23 10:42:44.000000000 +0100
++++ ntfsprogs/mkntfs.c	2018-05-07 09:11:13.035522300 +0200
+@@ -6,7 +6,7 @@ 
+  * Copyright (c) 2002-2006 Szabolcs Szakacsits
+  * Copyright (c) 2005      Erik Sornes
+  * Copyright (c) 2007      Yura Pakhuchiy
+- * Copyright (c) 2010-2014 Jean-Pierre Andre
++ * Copyright (c) 2010-2018 Jean-Pierre Andre
+  *
+  * This utility will create an NTFS 1.2 or 3.1 volume on a user
+  * specified (block) device.
+@@ -119,6 +119,7 @@ 
+ #	endif
+ #endif
+ 
++#include "param.h"
+ #include "security.h"
+ #include "types.h"
+ #include "attrib.h"
+@@ -287,7 +288,7 @@ 
+ 	ntfs_log_info("Copyright (c) 2002-2006 Szabolcs Szakacsits\n");
+ 	ntfs_log_info("Copyright (c) 2005      Erik Sornes\n");
+ 	ntfs_log_info("Copyright (c) 2007      Yura Pakhuchiy\n");
+-	ntfs_log_info("Copyright (c) 2010-2014 Jean-Pierre Andre\n");
++	ntfs_log_info("Copyright (c) 2010-2018 Jean-Pierre Andre\n");
+ 	ntfs_log_info("\n%s\n%s%s\n", ntfs_gpl, ntfs_bugs, ntfs_home);
+ }
+ 
+@@ -3719,11 +3720,11 @@ 
+ 		/*
+ 		 * For huge volumes, grow the cluster size until the number of
+ 		 * clusters fits into 32 bits or the cluster size exceeds the
+-		 * maximum limit of 64kiB.
++		 * maximum limit of NTFS_MAX_CLUSTER_SIZE.
+ 		 */
+ 		while (volume_size >> (ffs(vol->cluster_size) - 1 + 32)) {
+ 			vol->cluster_size <<= 1;
+-			if (vol->cluster_size > 65535) {
++			if (vol->cluster_size >= NTFS_MAX_CLUSTER_SIZE) {
+ 				ntfs_log_error("Device is too large to hold an "
+ 						"NTFS volume (maximum size is "
+ 						"256TiB).\n");
+@@ -3744,15 +3745,18 @@ 
+ 				"to, or larger than, the sector size.\n");
+ 		return FALSE;
+ 	}
+-	if (vol->cluster_size > 128 * (u32)opts.sector_size) {
++		/* Before Windows 10 Creators, the limit was 128 */
++	if (vol->cluster_size > 4096 * (u32)opts.sector_size) {
+ 		ntfs_log_error("The cluster size is invalid.  It cannot be "
+-				"more that 128 times the size of the sector "
++				"more that 4096 times the size of the sector "
+ 				"size.\n");
+ 		return FALSE;
+ 	}
+-	if (vol->cluster_size > 65536) {
++	if (vol->cluster_size > NTFS_MAX_CLUSTER_SIZE) {
+ 		ntfs_log_error("The cluster size is invalid.  The maximum "
+-			"cluster size is 65536 bytes (64kiB).\n");
++			"cluster size is %lu bytes (%lukiB).\n",
++			(unsigned long)NTFS_MAX_CLUSTER_SIZE,
++			(unsigned long)(NTFS_MAX_CLUSTER_SIZE >> 10));
+ 		return FALSE;
+ 	}
+ 	vol->cluster_size_bits = ffs(vol->cluster_size) - 1;
+@@ -4387,6 +4391,7 @@ 
+ 	u8 *sd;
+ 	FILE_ATTR_FLAGS extend_flags;
+ 	VOLUME_FLAGS volume_flags = const_cpu_to_le16(0);
++	int sectors_per_cluster;
+ 	int nr_sysfiles;
+ 	int buf_sds_first_size;
+ 	char *buf_sds;
+@@ -4639,8 +4644,11 @@ 
+ 	 * already inserted, so no need to worry about these things.
+ 	 */
+ 	bs->bpb.bytes_per_sector = cpu_to_le16(opts.sector_size);
+-	bs->bpb.sectors_per_cluster = (u8)(g_vol->cluster_size /
+-			opts.sector_size);
++	sectors_per_cluster = g_vol->cluster_size / opts.sector_size;
++	if (sectors_per_cluster > 128)
++		bs->bpb.sectors_per_cluster = 257 - ffs(sectors_per_cluster);
++	else
++		bs->bpb.sectors_per_cluster = sectors_per_cluster;
+ 	bs->bpb.media_type = 0xf8; /* hard disk */
+ 	bs->bpb.sectors_per_track = cpu_to_le16(opts.sectors_per_track);
+ 	ntfs_log_debug("sectors per track = %ld (0x%lx)\n",
+--- ntfsprogs/ntfsclone.c.ref	2017-03-23 10:42:44.000000000 +0100
++++ ntfsprogs/ntfsclone.c	2018-05-07 09:11:38.245007100 +0200
+@@ -3,7 +3,7 @@ 
+  *
+  * Copyright (c) 2003-2006 Szabolcs Szakacsits
+  * Copyright (c) 2004-2006 Anton Altaparmakov
+- * Copyright (c) 2010-2016 Jean-Pierre Andre
++ * Copyright (c) 2010-2018 Jean-Pierre Andre
+  * Special image format support copyright (c) 2004 Per Olofsson
+  *
+  * Clone NTFS data and/or metadata to a sparse file, image, device or stdout.
+@@ -71,6 +71,7 @@ 
+  */
+ #define NTFS_DO_NOT_CHECK_ENDIANS
+ 
++#include "param.h"
+ #include "debug.h"
+ #include "types.h"
+ #include "support.h"
+@@ -270,7 +271,6 @@ 
+ 
+ #define LAST_METADATA_INODE	11
+ 
+-#define NTFS_MAX_CLUSTER_SIZE	65536
+ #define NTFS_SECTOR_SIZE	  512
+ 
+ #define rounded_up_division(a, b) (((a) + (b - 1)) / (b))
+@@ -393,7 +393,7 @@ 
+ 		   "Efficiently clone, image, restore or rescue an NTFS Volume.\n\n"
+ 		   "Copyright (c) 2003-2006 Szabolcs Szakacsits\n"
+ 		   "Copyright (c) 2004-2006 Anton Altaparmakov\n"
+-		   "Copyright (c) 2010-2016 Jean-Pierre Andre\n\n");
++		   "Copyright (c) 2010-2018 Jean-Pierre Andre\n\n");
+ 	fprintf(stderr, "%s\n%s%s", ntfs_gpl, ntfs_bugs, ntfs_home);
+ 	exit(0);
+ }
+@@ -756,7 +756,7 @@ 
+ 
+ static void copy_cluster(int rescue, u64 rescue_lcn, u64 lcn)
+ {
+-	char buff[NTFS_MAX_CLUSTER_SIZE]; /* overflow checked at mount time */
++	char *buff;
+ 	/* vol is NULL if opt.restore_image is set */
+ 	s32 csize = le32_to_cpu(image_hdr.cluster_size);
+ 	BOOL backup_bootsector;
+@@ -783,6 +783,10 @@ 
+ 		}
+ 	}
+ 
++	buff = (char*)ntfs_malloc(csize);
++	if (!buff)
++		err_exit("Not enough memory");
++
+ // need reading when not about to write ?
+ 	if (read_all(fd, buff, csize) == -1) {
+ 
+@@ -858,6 +862,7 @@ 
+ 		perr_printf("Write failed");
+ #endif
+ 	}
++	free(buff);
+ }
+ 
+ static s64 lseek_out(int fd, s64 pos, int mode)
+@@ -995,7 +1000,11 @@ 
+ 				 struct progress_bar *progress, u64 *p_counter)
+ {
+ 	s64 i;
+-	char buff[NTFS_MAX_CLUSTER_SIZE];
++	char *buff;
++
++	buff = (char*)ntfs_malloc(csize);
++	if (!buff)
++		err_exit("Not enough memory");
+ 
+ 	memset(buff, 0, csize);
+ 
+@@ -1004,6 +1013,7 @@ 
+ 			perr_exit("write_all");
+ 		progress_update(progress, ++(*p_counter));
+ 	}
++	free(buff);
+ }
+ 
+ static void restore_image(void)
+@@ -1492,7 +1502,7 @@ 
+ 
+ static void copy_wipe_mft(ntfs_walk_clusters_ctx *image, runlist *rl)
+ {
+-	char buff[NTFS_MAX_CLUSTER_SIZE]; /* overflow checked at mount time */
++	char *buff;
+ 	void *fd;
+ 	s64 mft_no;
+ 	u32 mft_record_size;
+@@ -1522,6 +1532,10 @@ 
+ 		clusters_per_set = mft_record_size/csize;
+ 		records_per_set = 1;
+ 	}
++	buff = (char*)ntfs_malloc(mft_record_size);
++	if (!buff)
++		err_exit("Not enough memory");
++
+ 	mft_no = 0;
+ 	ri = rj = 0;
+ 	wi = wj = 0;
+@@ -1554,6 +1568,7 @@ 
+ 		}
+ 	}
+ 	image->current_lcn = current_lcn;
++	free(buff);
+ }
+ 
+ /*
+@@ -1566,7 +1581,7 @@ 
+ 
+ static void copy_wipe_i30(ntfs_walk_clusters_ctx *image, runlist *rl)
+ {
+-	char buff[NTFS_MAX_CLUSTER_SIZE]; /* overflow checked at mount time */
++	char *buff;
+ 	void *fd;
+ 	u32 indx_record_size;
+ 	u32 csize;
+@@ -1595,6 +1610,10 @@ 
+ 		clusters_per_set = indx_record_size/csize;
+ 		records_per_set = 1;
+ 	}
++	buff = (char*)ntfs_malloc(indx_record_size);
++	if (!buff)
++		err_exit("Not enough memory");
++
+ 	ri = rj = 0;
+ 	wi = wj = 0;
+ 	if (rl[ri].length)
+@@ -1627,6 +1646,7 @@ 
+ 		}
+ 	}
+ 	image->current_lcn = current_lcn;
++	free(buff);
+ }
+ 
+ static void dump_clusters(ntfs_walk_clusters_ctx *image, runlist *rl)
+--- ntfsprogs/ntfsresize.c.ref	2017-03-23 10:42:44.000000000 +0100
++++ ntfsprogs/ntfsresize.c	2018-05-07 09:11:13.076883400 +0200
+@@ -59,6 +59,7 @@ 
+ #include <fcntl.h>
+ #endif
+ 
++#include "param.h"
+ #include "debug.h"
+ #include "types.h"
+ #include "support.h"
+@@ -243,8 +244,6 @@ 
+ #define DIRTY_INODE		(1)
+ #define DIRTY_ATTRIB		(2)
+ 
+-#define NTFS_MAX_CLUSTER_SIZE	(65536)
+-
+ static s64 rounded_up_division(s64 numer, s64 denom)
+ {
+ 	return (numer + (denom - 1)) / denom;
+@@ -404,7 +403,7 @@ 
+ 	printf("Copyright (c) 2002-2005  Anton Altaparmakov\n");
+ 	printf("Copyright (c) 2002-2003  Richard Russon\n");
+ 	printf("Copyright (c) 2007       Yura Pakhuchiy\n");
+-	printf("Copyright (c) 2011-2016  Jean-Pierre Andre\n");
++	printf("Copyright (c) 2011-2018  Jean-Pierre Andre\n");
+ 	printf("\n%s\n%s%s", ntfs_gpl, ntfs_bugs, ntfs_home);
+ }
+ 
+@@ -1849,9 +1848,13 @@ 
+ static void copy_clusters(ntfs_resize_t *resize, s64 dest, s64 src, s64 len)
+ {
+ 	s64 i;
+-	char buff[NTFS_MAX_CLUSTER_SIZE]; /* overflow checked at mount time */
++	char *buff;
+ 	ntfs_volume *vol = resize->vol;
+ 
++	buff = (char*)ntfs_malloc(vol->cluster_size);
++	if (!buff)
++		perr_exit("ntfs_malloc");
++
+ 	for (i = 0; i < len; i++) {
+ 
+ 		lseek_to_cluster(vol, src + i);
+@@ -1875,6 +1878,7 @@ 
+ 		resize->relocations++;
+ 		progress_update(&resize->progress, resize->relocations);
+ 	}
++	free(buff);
+ }
+ 
+ static void relocate_clusters(ntfs_resize_t *r, runlist *dest_rl, s64 src_lcn)
+--- include/ntfs-3g/param.h.ref	2017-03-23 10:42:44.000000000 +0100
++++ include/ntfs-3g/param.h	2018-05-07 09:11:13.088302600 +0200
+@@ -40,6 +40,13 @@ 
+ };
+ 
+ /*
++ *		Parameters for formatting
++ */
++
++		/* Up to Windows 10, the cluster size was limited to 64K */
++#define NTFS_MAX_CLUSTER_SIZE 2097152 /* Windows 10 Creators allows 2MB */
++
++/*
+  *		Parameters for compression
+  */
+ 

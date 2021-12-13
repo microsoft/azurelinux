@@ -1,0 +1,27 @@
+--- mockito-1.10.19/build.xml	2014-12-31 17:43:56.000000000 +0100
++++ mockito-1.10.19/build.xml	2018-10-29 14:34:54.339789774 +0100
+@@ -79,14 +79,14 @@
+   </target>
+ 
+   <target name="compile" depends="clean, prepare">
+-    <javac srcdir="src" destdir="${src.classes.dir}" source="1.5" target="1.5" debug="true" deprecation="true" nowarn="true">
++    <javac srcdir="src" destdir="${src.classes.dir}" debug="true" deprecation="true" nowarn="true">
+       <classpath refid="compile.classpath" />
+       <compilerarg value="-Xlint:none" />
+     </javac>
+   </target>
+ 
+   <target name="compile.test" depends="compile">
+-    <javac srcdir="test" destdir="${test.classes.dir}" source="1.5" target="1.5" debug="true" deprecation="true" nowarn="true">
++    <javac srcdir="test" destdir="${test.classes.dir}" debug="true" deprecation="true" nowarn="true">
+       <classpath refid="test.compile.classpath" />
+     </javac>
+   </target>
+@@ -308,7 +308,6 @@
+     <javadoc
+             sourcepath="${src.dir}"
+             destdir="${javadoc.dir}"
+-            stylesheetfile="javadoc/stylesheet.css"
+             header=""
+             author="true"
+             version="true"

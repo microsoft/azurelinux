@@ -1,0 +1,520 @@
+diff -U3 -r gnome-doc-utils-0.20.10.orig/xml2po/xml2po/__init__.py gnome-doc-utils-0.20.10/xml2po/xml2po/__init__.py
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/__init__.py	2011-08-04 09:36:03.000000000 -0500
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/__init__.py	2019-09-10 09:30:28.018627919 -0500
+@@ -86,14 +86,14 @@
+                 self.messages.append(t)
+                 if spacepreserve:
+                     self.nowrap[t] = True
+-                if t in self.linenos.keys():
++                if t in list(self.linenos.keys()):
+                     self.linenos[t].append((self.filename, tag, lineno))
+                 else:
+                     self.linenos[t] = [ (self.filename, tag, lineno) ]
+                 if (not self.do_translations) and comment and not t in self.comments:
+                     self.comments[t] = comment
+             else:
+-                if t in self.linenos.keys():
++                if t in list(self.linenos.keys()):
+                     self.linenos[t].append((self.filename, tag, lineno))
+                 else:
+                     self.linenos[t] = [ (self.filename, tag, lineno) ]
+@@ -166,7 +166,7 @@
+         elif node.isText():
+             if node.isBlankNode():
+                 if self.app.options.get('expand_entities') or \
+-                  (not (node.prev and not node.prev.isBlankNode() and node.next and not node.next.isBlankNode()) ):
++                  (not (node.prev and not node.prev.isBlankNode() and node.__next__ and not node.next.isBlankNode()) ):
+                     #print >>sys.stderr, "BLANK"
+                     node.setContent('')
+             else:
+@@ -176,7 +176,7 @@
+             child = node.children
+             while child:
+                 self.normalizeNode(child)
+-                child = child.next
++                child = child.__next__
+ 
+     def normalizeString(self, text, spacepreserve = False):
+         """Normalizes string to be used as key for gettext lookup.
+@@ -200,7 +200,7 @@
+             tree = ctxt.doc()
+             newnode = tree.getRootElement()
+         except:
+-            print >> sys.stderr, """Error while normalizing string as XML:\n"%s"\n""" % (text)
++            print("""Error while normalizing string as XML:\n"%s"\n""" % (text), file=sys.stderr)
+             return text
+ 
+         self.normalizeNode(newnode)
+@@ -209,7 +209,7 @@
+         child = newnode.children
+         while child:
+             result += child.serialize('utf-8')
+-            child = child.next
++            child = child.__next__
+ 
+         result = re.sub('^ ','', result)
+         result = re.sub(' $','', result)
+@@ -235,7 +235,7 @@
+         ctxt.parseDocument()
+         tree = ctxt.doc()
+         if next:
+-            newnode = tree.children.next
++            newnode = tree.children.__next__
+         else:
+             newnode = tree.children
+ 
+@@ -243,7 +243,7 @@
+         child = newnode.children
+         while child:
+             result += child.serialize('utf-8')
+-            child = child.next
++            child = child.__next__
+         tree.freeDoc()
+         return result
+ 
+@@ -262,7 +262,7 @@
+                         result += child.content.decode('utf-8')
+                 else:
+                     result += self.myAttributeSerialize(child)
+-                child = child.next
++                child = child.__next__
+         else:
+             result = node.serialize('utf-8')
+         return result
+@@ -338,7 +338,7 @@
+                 pass
+ 
+             if not newnode:
+-                print >> sys.stderr, """Error while parsing translation as XML:\n"%s"\n""" % (text.encode('utf-8'))
++                print("""Error while parsing translation as XML:\n"%s"\n""" % (text.encode('utf-8')), file=sys.stderr)
+                 return
+ 
+             newelem = newnode.getRootElement()
+@@ -346,13 +346,13 @@
+             if newelem and newelem.children:
+                 free = node.children
+                 while free:
+-                    next = free.next
++                    next = free.__next__
+                     free.unlinkNode()
+                     free = next
+ 
+                 if node:
+                     copy = newelem.copyNodeList()
+-                    next = node.next
++                    next = node.__next__
+                     node.replaceNode(newelem.copyNodeList())
+                     node.next = next
+ 
+@@ -378,7 +378,7 @@
+             if child.type in ['text'] and  child.content.strip()!='':
+                 final = True
+                 break
+-            child = child.next
++            child = child.__next__
+ 
+         node.__autofinal__ = final
+         return final
+@@ -457,7 +457,7 @@
+                     outtxt += '<%s>%s</%s>' % (starttag, content, endtag)
+                 else:
+                     outtxt += self.doSerialize(child)
+-            child = child.next
++            child = child.__next__
+ 
+         if self.app.operation == 'merge':
+             norm_outtxt = self.normalizeString(outtxt, self.app.isSpacePreserveNode(node))
+@@ -534,7 +534,7 @@
+             outtxt = ''
+             while child:
+                 outtxt += self.doSerialize(child)
+-                child = child.next
++                child = child.__next__
+             return outtxt
+ 
+ def xml_error_handler(arg, ctxt):
+@@ -577,8 +577,8 @@
+                 raise IOError("Unable to read file '%s'" % xmlfile)
+             try:
+                 doc = XMLDocument(xmlfile, self)
+-            except Exception, e:
+-                print >> sys.stderr, "Unable to parse XML file '%s': %s" % (xmlfile, str(e))
++            except Exception as e:
++                print("Unable to parse XML file '%s': %s" % (xmlfile, str(e)), file=sys.stderr)
+                 sys.exit(1)
+             self.current_mode.preProcessXml(doc.doc, self.msg)
+             doc.generate_messages()
+@@ -590,14 +590,14 @@
+             raise IOError("Unable to read file '%s'" % xmlfile)
+         try:
+             doc = XMLDocument(xmlfile, self)
+-        except Exception, e:
+-            print >> sys.stderr, str(e)
++        except Exception as e:
++            print(str(e), file=sys.stderr)
+             sys.exit(1)
+ 
+         try:
+             mfile = open(mofile, "rb")
+         except:
+-            print >> sys.stderr, "Can't open MO file '%s'." % (mofile)
++            print("Can't open MO file '%s'." % (mofile), file=sys.stderr)
+         self.gt = gettext.GNUTranslations(mfile)
+         self.gt.add_fallback(NoneTranslations())
+         # Has preProcessXml use cases for merge?
+@@ -619,16 +619,16 @@
+             raise IOError("Unable to read file '%s'" % xmlfile)
+         try:
+             doc = XMLDocument(xmlfile, self)
+-        except Exception, e:
+-            print >> sys.stderr, str(e)
++        except Exception as e:
++            print(str(e), file=sys.stderr)
+             sys.exit(1)
+         doc.generate_messages()
+ 
+         self.msg.translationsFollow()
+         try:
+             doc = XMLDocument(origxml, self)
+-        except Exception, e:
+-            print >> sys.stderr, str(e)
++        except Exception as e:
++            print(str(e), file=sys.stderr)
+             sys.exit(1)
+         doc.generate_messages()
+         self.output_po()
+diff -U3 -r gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/docbook.py gnome-doc-utils-0.20.10/xml2po/xml2po/modes/docbook.py
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/docbook.py	2011-01-10 10:08:10.000000000 -0600
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/modes/docbook.py	2019-09-10 09:31:15.199572286 -0500
+@@ -43,7 +43,7 @@
+ except ImportError:
+     from md5 import new as md5_new
+ 
+-from basic import basicXmlMode
++from .basic import basicXmlMode
+ 
+ class docbookXmlMode(basicXmlMode):
+     """Class for special handling of DocBook document types.
+@@ -131,7 +131,7 @@
+                     hash = self._md5_for_file(fullpath)
+                 else:
+                     hash = "THIS FILE DOESN'T EXIST"
+-                    print >>sys.stderr, "Warning: image file '%s' not found." % fullpath
++                    print("Warning: image file '%s' not found." % fullpath, file=sys.stderr)
+ 
+                 msg.outputMessage("@@image: '%s'; md5=%s" % (attr, hash), node.lineNo(),
+                                   "When image changes, this message will be marked fuzzy or untranslated for you.\n"+
+@@ -198,10 +198,10 @@
+ # Perform some tests when ran standalone
+ if __name__ == '__main__':
+     test = docbookXmlMode()
+-    print "Ignored tags       : " + repr(test.getIgnoredTags())
+-    print "Final tags         : " + repr(test.getFinalTags())
+-    print "Space-preserve tags: " + repr(test.getSpacePreserveTags())
++    print("Ignored tags       : " + repr(test.getIgnoredTags()))
++    print("Final tags         : " + repr(test.getFinalTags()))
++    print("Space-preserve tags: " + repr(test.getSpacePreserveTags()))
+ 
+-    print "Credits from string: '%s'" % test.getStringForTranslators()
+-    print "Explanation for credits:\n\t'%s'" % test.getCommentForTranslators()
++    print("Credits from string: '%s'" % test.getStringForTranslators())
++    print("Explanation for credits:\n\t'%s'" % test.getCommentForTranslators())
+ 
+diff -U3 -r gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/gs.py gnome-doc-utils-0.20.10/xml2po/xml2po/modes/gs.py
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/gs.py	2010-12-13 10:14:07.000000000 -0600
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/modes/gs.py	2019-09-10 09:31:15.201572284 -0500
+@@ -20,7 +20,7 @@
+ # Special case Gnome Summary
+ #
+ 
+-from basic import basicXmlMode
++from .basic import basicXmlMode
+ 
+ class gsXmlMode(basicXmlMode):
+     """Abstract class for special handling of document types."""
+diff -U3 -r gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/mallard.py gnome-doc-utils-0.20.10/xml2po/xml2po/modes/mallard.py
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/mallard.py	2011-01-10 10:08:50.000000000 -0600
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/modes/mallard.py	2019-09-10 09:31:15.212572271 -0500
+@@ -39,7 +39,7 @@
+ except ImportError:
+     from md5 import new as md5_new
+ 
+-from basic import basicXmlMode
++from .basic import basicXmlMode
+ 
+ class mallardXmlMode(basicXmlMode):
+     """Class for special handling of Mallard document types."""
+@@ -112,7 +112,7 @@
+                     hash = self._md5_for_file(fullpath)
+                 else:
+                     hash = "THIS FILE DOESN'T EXIST"
+-                    print >>sys.stderr, "Warning: image file '%s' not found." % fullpath
++                    print("Warning: image file '%s' not found." % fullpath, file=sys.stderr)
+                     
+                 msg.outputMessage("@@image: '%s'; md5=%s" % (attr, hash), node.lineNo(),
+                                   "When image changes, this message will be marked fuzzy or untranslated for you.\n"+
+diff -U3 -r gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/ubuntu.py gnome-doc-utils-0.20.10/xml2po/xml2po/modes/ubuntu.py
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/ubuntu.py	2010-12-13 10:14:07.000000000 -0600
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/modes/ubuntu.py	2019-09-10 09:31:15.213572270 -0500
+@@ -2,7 +2,7 @@
+ 
+ import libxml2
+ 
+-from docbook import docbookXmlMode
++from .docbook import docbookXmlMode
+ 
+ class ubuntuXmlMode (docbookXmlMode):
+     """Special-casing Ubuntu DocBook website documentation."""
+diff -U3 -r gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/xhtml.py gnome-doc-utils-0.20.10/xml2po/xml2po/modes/xhtml.py
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/modes/xhtml.py	2010-12-13 10:14:07.000000000 -0600
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/modes/xhtml.py	2019-09-10 09:31:15.214572269 -0500
+@@ -21,7 +21,7 @@
+ # This implements special instructions for handling XHTML documents
+ # in a better way, particularly to extract some attributes in HTML tags
+ 
+-from basic import basicXmlMode
++from .basic import basicXmlMode
+ 
+ class xhtmlXmlMode(basicXmlMode):
+     """Class for special handling of XHTML document types."""
+diff -U3 -r gnome-doc-utils-0.20.10.orig/xml2po/xml2po/xml2po.py.in gnome-doc-utils-0.20.10/xml2po/xml2po/xml2po.py.in
+--- gnome-doc-utils-0.20.10.orig/xml2po/xml2po/xml2po.py.in	2010-12-13 10:14:07.000000000 -0600
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/xml2po.py.in	2019-09-10 09:30:28.217627684 -0500
+@@ -41,9 +41,9 @@
+ if not os.path.exists('/dev/null'): NULL_STRING = 'NUL'
+ 
+ def usage (with_help = False):
+-    print >> sys.stderr, "Usage:  %s [OPTIONS] [XMLFILE]..." % (sys.argv[0])
++    print("Usage:  %s [OPTIONS] [XMLFILE]..." % (sys.argv[0]), file=sys.stderr)
+     if with_help:
+-        print >> sys.stderr, """
++        print("""
+ OPTIONS may be some of:
+     -a    --automatic-tags     Automatically decides if tags are to be considered
+                                  "final" or not
+@@ -72,7 +72,7 @@
+     using -p option for each XML file:
+         %(command)s -p de.po chapter1.xml > chapter1.de.xml
+         %(command)s -p de.po chapter2.xml > chapter2.de.xml
+-""" % {'command': sys.argv[0]}
++""" % {'command': sys.argv[0]}, file=sys.stderr)
+ 
+ 
+ def main(argv):
+@@ -82,7 +82,7 @@
+ 
+     name = os.path.join(os.path.dirname(__file__), '..')
+     if os.path.exists(os.path.join(name, 'tests')):
+-        print >> sys.stderr, 'Running from source folder, modifying PYTHONPATH'
++        print('Running from source folder, modifying PYTHONPATH', file=sys.stderr)
+         sys.path.insert(0, name)
+ 
+     from xml2po import Main
+@@ -142,14 +142,14 @@
+         elif opt in ('-o', '--output'):
+             output = arg
+         elif opt in ('-v', '--version'):
+-            print VERSION
++            print(VERSION)
+             sys.exit(0)
+         elif opt in ('-h', '--help'):
+             usage(True)
+             sys.exit(0)
+ 
+     if operation == 'update' and output != "-":
+-        print >> sys.stderr, "Option '-o' is not yet supported when updating translations directly. Ignoring this option."
++        print("Option '-o' is not yet supported when updating translations directly. Ignoring this option.", file=sys.stderr)
+ 
+     # Treat remaining arguments as XML files
+     filenames = []
+@@ -159,16 +159,16 @@
+     try:
+         xml2po_main = Main(default_mode, operation, output, options)
+     except IOError:
+-        print >> sys.stderr, "Error: cannot open file %s for writing." % (output)
++        print("Error: cannot open file %s for writing." % (output), file=sys.stderr)
+         sys.exit(5)
+ 
+     if operation == 'merge':
+         if len(filenames) > 1:
+-            print  >> sys.stderr, "Error: You can merge translations with only one XML file at a time."
++            print("Error: You can merge translations with only one XML file at a time.", file=sys.stderr)
+             sys.exit(2)
+ 
+         if not mofile:
+-            print >> sys.stderr, "Error: You must specify MO file when merging translations."
++            print("Error: You must specify MO file when merging translations.", file=sys.stderr)
+             sys.exit(3)
+ 
+         xml2po_main.merge(mofile, filenames[0])
+--- gnome-doc-utils-0.20.10/xml2po/xml2po/__init__.py.orig	2019-09-10 09:34:42.110328324 -0500
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/__init__.py	2019-09-10 09:34:44.170325899 -0500
+@@ -166,7 +166,7 @@
+         elif node.isText():
+             if node.isBlankNode():
+                 if self.app.options.get('expand_entities') or \
+-                  (not (node.prev and not node.prev.isBlankNode() and node.__next__ and not node.next.isBlankNode()) ):
++                  (not (node.prev and not node.prev.isBlankNode() and node.next and not node.next.isBlankNode()) ):
+                     #print >>sys.stderr, "BLANK"
+                     node.setContent('')
+             else:
+@@ -176,7 +176,7 @@
+             child = node.children
+             while child:
+                 self.normalizeNode(child)
+-                child = child.__next__
++                child = child.next
+ 
+     def normalizeString(self, text, spacepreserve = False):
+         """Normalizes string to be used as key for gettext lookup.
+@@ -209,7 +209,7 @@
+         child = newnode.children
+         while child:
+             result += child.serialize('utf-8')
+-            child = child.__next__
++            child = child.next
+ 
+         result = re.sub('^ ','', result)
+         result = re.sub(' $','', result)
+@@ -235,7 +235,7 @@
+         ctxt.parseDocument()
+         tree = ctxt.doc()
+         if next:
+-            newnode = tree.children.__next__
++            newnode = tree.children.next
+         else:
+             newnode = tree.children
+ 
+@@ -243,7 +243,7 @@
+         child = newnode.children
+         while child:
+             result += child.serialize('utf-8')
+-            child = child.__next__
++            child = child.next
+         tree.freeDoc()
+         return result
+ 
+@@ -262,7 +262,7 @@
+                         result += child.content.decode('utf-8')
+                 else:
+                     result += self.myAttributeSerialize(child)
+-                child = child.__next__
++                child = child.next
+         else:
+             result = node.serialize('utf-8')
+         return result
+@@ -346,13 +346,13 @@
+             if newelem and newelem.children:
+                 free = node.children
+                 while free:
+-                    next = free.__next__
++                    next = free.next
+                     free.unlinkNode()
+                     free = next
+ 
+                 if node:
+                     copy = newelem.copyNodeList()
+-                    next = node.__next__
++                    next = node.next
+                     node.replaceNode(newelem.copyNodeList())
+                     node.next = next
+ 
+@@ -378,7 +378,7 @@
+             if child.type in ['text'] and  child.content.strip()!='':
+                 final = True
+                 break
+-            child = child.__next__
++            child = child.next
+ 
+         node.__autofinal__ = final
+         return final
+@@ -457,7 +457,7 @@
+                     outtxt += '<%s>%s</%s>' % (starttag, content, endtag)
+                 else:
+                     outtxt += self.doSerialize(child)
+-            child = child.__next__
++            child = child.next
+ 
+         if self.app.operation == 'merge':
+             norm_outtxt = self.normalizeString(outtxt, self.app.isSpacePreserveNode(node))
+@@ -534,7 +534,7 @@
+             outtxt = ''
+             while child:
+                 outtxt += self.doSerialize(child)
+-                child = child.__next__
++                child = child.next
+             return outtxt
+ 
+ def xml_error_handler(arg, ctxt):
+--- gnome-doc-utils-0.20.10/xml2po/xml2po/__init__.py.orig	2019-09-10 09:39:57.733974912 -0500
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/__init__.py	2019-09-10 09:40:24.761946962 -0500
+@@ -326,7 +326,7 @@
+                 pass
+ 
+             content = '<%s>%s</%s>' % (starttag, text, endtag)
+-            tmp = tmp + content.encode('utf-8')
++            tmp = tmp + content
+ 
+             newnode = None
+             try:
+@@ -663,7 +663,7 @@
+         if not text or text.strip() == '':
+             return text
+         if self.gt:
+-            res = self.gt.ugettext(text.decode('utf-8'))
++            res = self.gt.gettext(text)
+             return res
+ 
+         return text
+--- gnome-doc-utils-0.20.10/xml2po/xml2po/__init__.py.orig	2019-09-10 09:41:23.853885851 -0500
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/__init__.py	2019-09-10 09:44:23.580699979 -0500
+@@ -352,9 +352,10 @@
+ 
+                 if node:
+                     copy = newelem.copyNodeList()
+-                    next = node.next
++                    #next = node.next
+                     node.replaceNode(newelem.copyNodeList())
+-                    node.next = next
++                    #print(type(next))
++                    #node.next = next
+ 
+             else:
+                 # In practice, this happens with tags such as "<para>    </para>" (only whitespace in between)
+@@ -470,7 +471,7 @@
+ 
+         worth = self.worthOutputting(node)
+         if not translation:
+-            translation = outtxt.decode('utf-8')
++            translation = outtxt
+             if worth and self.app.options.get('mark_untranslated'):
+                 node.setLang('C')
+ 
+--- gnome-doc-utils-0.20.10/xml2po/xml2po/modes/docbook.py.orig	2019-09-10 09:46:15.409584334 -0500
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/modes/docbook.py	2019-09-10 09:46:30.164569075 -0500
+@@ -184,7 +184,7 @@
+                     else:
+                         ai.addChild(copy)
+                     if match.group(3):
+-                        copy.newChild(None, "year", match.group(3).encode('utf-8'))
++                        copy.newChild(None, "year", match.group(3))
+                     if match.group(1) and match.group(2):
+                         holder = match.group(1)+"(%s)" % match.group(2)
+                     elif match.group(1):
+@@ -193,7 +193,7 @@
+                         holder = match.group(2)
+                     else:
+                         holder = "???"
+-                    copy.newChild(None, "holder", holder.encode('utf-8'))
++                    copy.newChild(None, "holder", holder)
+ 
+ # Perform some tests when ran standalone
+ if __name__ == '__main__':
+--- gnome-doc-utils-0.20.10/xml2po/xml2po/xml2po.py.in~	2019-09-10 09:50:34.000000000 -0500
++++ gnome-doc-utils-0.20.10/xml2po/xml2po/xml2po.py.in	2019-09-10 09:50:45.114305443 -0500
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python -u
++#!/usr/bin/python3 -u
+ # -*- encoding: utf-8 -*-
+ # Copyright (c) 2004, 2005, 2006 Danilo Šegan <danilo@gnome.org>.
+ # Copyright (c) 2009 Claude Paroz <claude@2xlibre.net>.

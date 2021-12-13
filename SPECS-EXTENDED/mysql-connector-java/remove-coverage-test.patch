@@ -1,0 +1,170 @@
+From b31d3c13c6eb99aa75739cd80cb9c43972320e0f Mon Sep 17 00:00:00 2001
+From: Ondrej Dubaj <odubaj@redhat.com>
+Date: Wed, 26 Aug 2020 08:08:39 +0200
+Subject: [PATCH] Remove coverage test
+
+---
+ build.xml | 140 ------------------------------------------------------
+ 1 file changed, 140 deletions(-)
+
+diff --git a/build.xml b/build.xml
+index 98f00ed..fde7906 100644
+--- a/build.xml
++++ b/build.xml
+@@ -1290,72 +1290,6 @@ See also com.mysql.cj.conf.PropertyDefinitions.SYSP_* variables for other test o
+         </condition>
+         <echo>${com.mysql.cj.testsuite.message.test.mode}</echo>
+ 
+-        <local name="com.mysql.cj.testsuite.test.coverage" />
+-        <condition property="com.mysql.cj.testsuite.test.coverage" value="true" else="false">
+-            <isset property="com.mysql.cj.coverage.result.dir.final" />
+-        </condition>
+-
+-        <local name="com.mysql.cj.testsuite.test.coverage.jvmarg" />
+-        <jacoco:agent destfile="${com.mysql.cj.coverage.result.dir.final}/${com.mysql.cj.coverage.result.name.final}"
+-                      enabled="${com.mysql.cj.testsuite.test.coverage}"
+-                      property="com.mysql.cj.testsuite.test.coverage.jvmarg" />
+-
+-        <local name="com.mysql.cj.testsuite.test.coverage.jvmargfinal" />
+-        <condition property="com.mysql.cj.testsuite.test.coverage.jvmargfinal"
+-                   value="${com.mysql.cj.testsuite.test.coverage.jvmarg}"
+-                   else="-Dcoverage=disabled">
+-            <and>
+-                <isset property="com.mysql.cj.testsuite.test.coverage.jvmarg" />
+-                <not>
+-                    <equals arg1="${com.mysql.cj.testsuite.test.coverage.jvmarg}" arg2="" />
+-                </not>
+-            </and>
+-        </condition>
+-
+-        <junitlauncher haltOnFailure="false" printSummary="true" failureProperty="com.mysql.cj.testsuite.junit.fail">
+-            <classpath refid="com.mysql.cj.testsuite.build.classpath" />
+-
+-            <test if="${com.mysql.cj.testsuite.test.methods.enabled}"
+-                  name="${com.mysql.cj.testsuite.test.class}"
+-                  methods="${com.mysql.cj.testsuite.test.methods}"
+-                  outputdir="${com.mysql.cj.testsuite.junit.results}">
+-                <fork>
+-                    <jvmarg value="-Xmx1024m" />
+-                    <jvmarg value="${com.mysql.cj.testsuite.test.coverage.jvmargfinal}" />
+-                    <syspropertyset refid="junit.system.properties" />
+-                </fork>
+-                <listener type="legacy-xml" sendSysOut="true" sendSysErr="true" />
+-                <listener type="legacy-plain" sendSysOut="true" sendSysErr="true" />
+-            </test>
+-
+-            <test if="com.mysql.cj.testsuite.test.class"
+-                  unless="com.mysql.cj.testsuite.test.methods"
+-                  name="${com.mysql.cj.testsuite.test.class}"
+-                  outputdir="${com.mysql.cj.testsuite.junit.results}">
+-                <fork>
+-                    <jvmarg value="-Xmx1024m" />
+-                    <jvmarg value="${com.mysql.cj.testsuite.test.coverage.jvmargfinal}" />
+-                    <syspropertyset refid="junit.system.properties" />
+-                </fork>
+-                <listener type="legacy-xml" sendSysOut="true" sendSysErr="true" />
+-                <listener type="legacy-plain" sendSysOut="true" sendSysErr="true" />
+-            </test>
+-
+-            <testclasses unless="com.mysql.cj.testsuite.test.class" outputdir="${com.mysql.cj.testsuite.junit.results}">
+-                <fileset dir="${com.mysql.cj.testsuite.build.dir}/${com.mysql.cj.build.driver.fullName}">
+-                    <include name="**/*Test.class" />
+-                    <exclude name="**/perf/*.class" />
+-                </fileset>
+-                <fork>
+-                    <jvmarg value="-Xmx1024m" />
+-                    <jvmarg value="${com.mysql.cj.testsuite.test.coverage.jvmargfinal}" />
+-                    <syspropertyset refid="junit.system.properties" />
+-                </fork>
+-                <listener type="legacy-xml" sendSysOut="true" sendSysErr="true" />
+-                <listener type="legacy-plain" sendSysOut="true" sendSysErr="true" />
+-            </testclasses>
+-        </junitlauncher>
+-
+         <junitreport todir="${com.mysql.cj.testsuite.junit.results}/report">
+             <fileset dir="${com.mysql.cj.testsuite.junit.results}">
+                 <include name="**/TEST-*.xml" />
+@@ -1374,80 +1308,6 @@ See also com.mysql.cj.conf.PropertyDefinitions.SYSP_* variables for other test o
+     </target>
+ 
+ 
+-    <!-- ********************************* -->
+-    <!-- ***** TESTING CODE COVERAGE ***** -->
+-    <!-- ********************************* -->
+-
+-
+-    <target name="test-coverage" description="Runs tests collecting coverage results." depends="-set-test-coverage-detaults, test" />
+-
+-
+-    <target name="-set-test-coverage-detaults">
+-        <condition property="com.mysql.cj.coverage.result.dir.final"
+-                   value="${com.mysql.cj.coverage.result.dir}"
+-                   else="${com.mysql.cj.testsuite.build.dir}/coverage">
+-            <isset property="com.mysql.cj.coverage.result.dir" />
+-        </condition>
+-        <condition property="com.mysql.cj.coverage.result.name.final" value="${com.mysql.cj.coverage.result.name}" else="jacoco.exec">
+-            <isset property="com.mysql.cj.coverage.result.name" />
+-        </condition>
+-    </target>
+-
+-
+-    <!-- *********************************** -->
+-    <!-- ***** REPORTING CODE COVERAGE ***** -->
+-    <!-- *********************************** -->
+-
+-
+-    <target name="report-coverage"
+-            depends="-extra-libs-check, -set-report-coverage-detaults, -jacoco-merge"
+-            description="Merges coverage results and creates HTML coverage report.">
+-        <jacoco:report>
+-            <executiondata>
+-                <file file="${com.mysql.cj.coverage.merge.result.final}" />
+-            </executiondata>
+-
+-            <structure name="Connector/J classes">
+-                <classfiles>
+-                    <fileset dir="${com.mysql.cj.build.dir.driver}">
+-                        <include name="com/mysql/cj/**" />
+-                        <exclude name="com/mysql/cj/x/protobuf/**" />
+-                    </fileset>
+-                </classfiles>
+-                <sourcefiles encoding="UTF-8">
+-                    <fileset dir="${com.mysql.cj.build.dir.driver}">
+-                        <include name="com/mysql/cj/**" />
+-                        <exclude name="com/mysql/cj/x/protobuf/**" />
+-                    </fileset>
+-                </sourcefiles>
+-            </structure>
+-
+-            <html destdir="${com.mysql.cj.coverage.report.dir.final}" />
+-        </jacoco:report>
+-    </target>
+-
+-
+-    <target name="-jacoco-merge" depends="-set-report-coverage-detaults" if="com.mysql.cj.coverage.merge.files">
+-        <jacoco:merge destfile="${com.mysql.cj.coverage.merge.result.final}">
+-            <fileset dir="${com.mysql.cj.coverage.result.dir.final}" includes="${com.mysql.cj.coverage.merge.files}" />
+-        </jacoco:merge>
+-    </target>
+-
+-
+-    <target name="-set-report-coverage-detaults" depends="-set-test-coverage-detaults">
+-        <condition property="com.mysql.cj.coverage.merge.result.final"
+-                   value="${com.mysql.cj.coverage.merge.result}"
+-                   else="${com.mysql.cj.coverage.result.dir.final}/jacoco.exec">
+-            <isset property="com.mysql.cj.coverage.merge.result" />
+-        </condition>
+-        <condition property="com.mysql.cj.coverage.report.dir.final"
+-                   value="${com.mysql.cj.coverage.report.dir}"
+-                   else="${com.mysql.cj.coverage.result.dir.final}/report">
+-            <isset property="com.mysql.cj.coverage.report.dir" />
+-        </condition>
+-    </target>
+-
+-
+     <!-- ***************************** -->
+     <!-- ***** RPM/DEB PACKAGING ***** -->
+     <!-- ***************************** -->
+-- 
+2.26.0
+

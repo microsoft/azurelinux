@@ -1,0 +1,24 @@
+diff -up pegasus/rpm/manLinux/man8.Z/cimconfig.8.orig pegasus/rpm/manLinux/man8.Z/cimconfig.8
+--- pegasus/rpm/manLinux/man8.Z/cimconfig.8.orig	2014-01-07 14:51:40.841757649 +0100
++++ pegasus/rpm/manLinux/man8.Z/cimconfig.8	2014-01-07 14:52:03.415820767 +0100
+@@ -161,7 +161,7 @@ and listener destination instances other
+ is required.
+ .PD 0
+ .IP 
+-.BR "Default Value: " False
++.BR "Default Value: " True
+ .IP 
+ .BR Dynamic: \0No
+ .PD
+diff -up pegasus/src/Pegasus/Config/SecurityPropertyOwner.cpp.orig pegasus/src/Pegasus/Config/SecurityPropertyOwner.cpp
+--- pegasus/src/Pegasus/Config/SecurityPropertyOwner.cpp.orig	2014-01-07 14:48:14.377180640 +0100
++++ pegasus/src/Pegasus/Config/SecurityPropertyOwner.cpp	2014-01-07 14:51:30.760729464 +0100
+@@ -121,7 +121,7 @@ static struct ConfigPropertyRow properti
+ #if defined(PEGASUS_OS_HPUX) || defined(PEGASUS_OS_LINUX)
+ # ifdef PEGASUS_USE_RELEASE_CONFIG_OPTIONS
+     {"enableSubscriptionsForNonprivilegedUsers",
+-         "false", IS_STATIC, IS_VISIBLE},
++         "true", IS_STATIC, IS_VISIBLE},
+ # else
+     {"enableSubscriptionsForNonprivilegedUsers", "true", IS_STATIC, IS_VISIBLE},
+ # endif

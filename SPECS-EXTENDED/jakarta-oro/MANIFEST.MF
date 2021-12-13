@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jakarta Oro
+Bundle-SymbolicName: org.apache.oro
+Bundle-Version: 2.0.8
+Bundle-Vendor: Apache Software Foundation
+Bundle-Localization: plugin
+Export-Package: org.apache.oro.io;version="2.0.8", org.apache.oro.text
+ ;version="2.0.8", org.apache.oro.text.awk;version="2.0.8", org.apache
+ .oro.text.perl;version="2.0.8", org.apache.oro.text.regex;version="2.
+ 0.8", org.apache.oro.util;version="2.0.8"
+Bundle-RequiredExecutionEnvironment: J2SE-1.2
+

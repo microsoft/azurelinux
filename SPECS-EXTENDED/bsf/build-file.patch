@@ -1,0 +1,85 @@
+diff -urEbwB bsf-2.4.0-orig/build.xml bsf-2.4.0/build.xml
+--- bsf-2.4.0-orig/build.xml	2018-11-27 10:25:00.759233502 +0100
++++ bsf-2.4.0/build.xml	2018-11-27 10:28:36.864365763 +0100
+@@ -102,7 +102,7 @@
+ 		<pathelement location="${build.tests}"/>
+ 	</path>
+ 
+-	<target name="init" depends="clean">
++	<target name="init">
+ 		<tstamp />
+ 
+ 
+@@ -122,23 +122,61 @@
+ 		<!-- ================================================================= -->
+ 		<!-- Determines what optional components are available                 -->
+ 		<!-- ================================================================= -->
+-		<available property="jacl.present" classname="tcl.lang.JACL" />
+-
+-		<available property="jython.present" classname="org.python.util.jython" />
+-
+-		<available property="netrexx.present" classname="netrexx.lang.Rexx" />
+-
+-		<available property="rhino.present" classname="org.mozilla.javascript.Scriptable" />
+-
+-		<available property="xalan.present" classname="org.apache.xalan.xslt.EnvironmentCheck" />
+-
+-		<available property="junit.present" classname="junit.framework.TestCase" />
++		<available property="jacl.present" classname="tcl.lang.JACL">
++			<classpath>
++				<fileset dir="lib">
++					<include name="*.jar"/>
++				</fileset>
++			</classpath>
++		</available>
++
++		<available property="jython.present" classname="org.python.util.jython">
++			<classpath>
++				<fileset dir="lib">
++					<include name="*.jar"/>
++				</fileset>
++			</classpath>
++		</available>
++
++		<available property="netrexx.present" classname="netrexx.lang.Rexx">
++			<classpath>
++				<fileset dir="lib">
++					<include name="*.jar"/>
++				</fileset>
++			</classpath>
++		</available>
++
++		<available property="rhino.present" classname="org.mozilla.javascript.Scriptable">
++			<classpath>
++				<fileset dir="lib">
++					<include name="*.jar"/>
++				</fileset>
++			</classpath>
++		</available>
++
++		<available property="xalan.present" classname="org.apache.xalan.xslt.EnvironmentCheck">
++			<classpath>
++				<fileset dir="lib">
++					<include name="*.jar"/>
++				</fileset>
++			</classpath>
++		</available>
++
++		<available property="junit.present" classname="junit.framework.TestCase">
++			<classpath>
++				<fileset dir="lib">
++					<include name="*.jar"/>
++				</fileset>
++			</classpath>
++		</available>
+ 
++		<!--
+ 		<uptodate property="javac.notRequired" targetfile="${build.lib}/${project.name}.jar">
+ 			<srcfiles dir="${src.dir}">
+ 				<patternset refid="javac.source.files" />
+ 			</srcfiles>
+ 		</uptodate>
++		-->		
+ 
+ 		<uptodate property="javadoc.required" targetfile="${build.lib}/${project.name}.jar">
+ 			<srcfiles dir="${build.dir}" includes="**/*.html" />

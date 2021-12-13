@@ -1,0 +1,8 @@
+--- t/test.t
++++ t/test.t
+@@ -1,4 +1,4 @@
+-#!perl
++#!/usr/bin/perl
+ 
+ # Test suite for Readonly::XS.
+ 

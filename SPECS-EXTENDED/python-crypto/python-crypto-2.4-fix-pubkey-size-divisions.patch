@@ -1,0 +1,46 @@
+setup.py for Python 3 doesn't invoke 2to3 on pct-speedtest.py, which runs
+into problems:
+
+Traceback (most recent call last):
+  File "pct-speedtest.py", line 218, in <module>
+    Benchmark().run()
+  File "pct-speedtest.py", line 200, in run
+    self.test_pubkey_setup(pubkey_name, module, key_bytes)
+  File "pct-speedtest.py", line 85, in test_pubkey_setup
+    keys = self.random_keys(key_bytes)[:5]
+  File "pct-speedtest.py", line 49, in random_keys
+    return self.random_blocks(bytes, 10**5)     # 100k
+  File "pct-speedtest.py", line 53, in random_blocks
+    data = self.random_data(bytes)
+  File "pct-speedtest.py", line 62, in random_data
+    self.__random_data = self._random_bytes(bytes)
+  File "pct-speedtest.py", line 73, in _random_bytes
+    return os.urandom(b)
+  File "/usr/lib64/python3.2/os.py", line 777, in urandom
+    bs += read(_urandomfd, n - len(bs))
+TypeError: integer argument expected, got float
+
+This is due to the divisions in the pubkey_specs table, which in Python 3 is
+true division, returning a float.
+
+As it happens, 2to3 can't convert these divisions, see:
+http://bugs.python.org/issue12831
+
+Change them to explicitly be floor divisions (supported in Python 2.2
+onwards; see PEP 0238)
+
+--- pycrypto/pct-speedtest.py
++++ pycrypto/pct-speedtest.py
+@@ -165,9 +165,9 @@
+ 
+     def run(self):
+         pubkey_specs = [
+-            ("RSA(1024)", RSA, 1024/8),
+-            ("RSA(2048)", RSA, 2048/8),
+-            ("RSA(4096)", RSA, 4096/8),
++            ("RSA(1024)", RSA, 1024//8),
++            ("RSA(2048)", RSA, 2048//8),
++            ("RSA(4096)", RSA, 4096//8),
+             ]
+         block_specs = [
+             ("DES", DES, 8),

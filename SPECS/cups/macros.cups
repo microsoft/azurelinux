@@ -1,0 +1,1 @@
+%_cups_serverbin %(/usr/bin/cups-config --serverbin)

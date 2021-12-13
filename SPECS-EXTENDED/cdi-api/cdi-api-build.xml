@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="cdi-api" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="build.properties"/>
+
+  <property name="project.groupId" value="javax.enterprise"/>
+  <property name="project.artifactId" value="cdi-api"/>
+  <property name="project.version" value="1.2"/>
+  <property name="project.name" value="CDI APIs"/>
+  <property name="project.description" value="APIs for CDI (Contexts and Dependency Injection for Java EE)"/>
+  <property name="project.url" value="http://cdi-spec.org"/>
+  <property name="project.license.url" value="http://www.apache.org/licenses/LICENSE-2.0.html"/>
+  
+  <property name="project.organization.name" value="JBoss by Red Hat, Inc."/>
+  <property name="project.organization.url" value="http://jboss.org"/>
+
+  <property name="bundle.version" value="${project.version}.0"/>
+  
+  <property name="spec.title" value="JSR-346 Contexts and Dependency Injection for the Java EE platform"/>
+  <property name="spec.version" value="${project.version}"/>
+  
+  <property name="compiler.source" value="1.6"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src/main/java"/>
+  <property name="build.resourceDir" value="src/main/resources"/>
+  <property name="build.testOutputDir" value="${build.dir}/test-classes"/>
+  <property name="build.testDir" value="src/test/java"/>
+  <property name="build.testResourceDir" value="src/test/resources"/>
+  <property name="test.reports" value="${build.dir}/test-reports"/>
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath">
+    <fileset dir="lib">
+      <!-- javax.el-api-3.0.0 jboss-interceptors-api_1.2_spec-1.0.0
+           javax.inject-1 -->
+      <include name="**/*"/>
+    </fileset>
+  </path>
+  <path id="build.test.classpath">
+    <fileset dir="lib">
+      <!-- javax.el-api-3.0.0 jboss-interceptors-api_1.2_spec-1.0.0
+           javax.inject-1.jar testng-5.10-jdk15 jcommander-1.64
+           snakeyaml-1.17  base64coder commons-codec -->
+      <include name="**/*"/>
+    </fileset>
+  </path>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+      </src>
+      <classpath refid="build.classpath"/>
+    </javac>
+    <copy todir="${build.outputDir}">
+      <fileset dir="${build.resourceDir}"/>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Test-compilation target                                                -->
+  <!-- ====================================================================== -->
+
+  <target name="compile-tests" 
+          depends="compile" 
+          description="Compile the test code" 
+          unless="test.skip">
+    <mkdir dir="${build.testOutputDir}"/>
+    <javac destdir="${build.testOutputDir}" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.testDir}"/>
+      </src>
+      <classpath>
+        <path refid="build.test.classpath"/>
+        <pathelement location="${build.outputDir}"/>
+      </classpath>
+    </javac>
+    <copy todir="${build.testOutputDir}">
+      <fileset dir="${build.testResourceDir}"/>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Run all tests                                                          -->
+  <!-- ====================================================================== -->
+
+  <target name="test" 
+          depends="compile-tests, junit-missing" 
+          unless="junit.skipped" 
+          description="Run the test cases">
+    <mkdir dir="${test.reports}"/>
+    <junit printSummary="yes" haltonerror="true" haltonfailure="true" fork="true" dir=".">
+      <sysproperty key="basedir" value="."/>
+      <formatter type="xml"/>
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+        <path refid="build.test.classpath"/>
+        <pathelement location="${build.outputDir}"/>
+        <pathelement location="${build.testOutputDir}"/>
+      </classpath>
+      <batchtest todir="${test.reports}" unless="test">
+        <fileset dir="${build.testDir}">
+          <include name="**/Test*.java"/>
+          <include name="**/*Test.java"/>
+          <include name="**/*TestCase.java"/>
+          <exclude name="**/*Abstract*Test.java"/>
+        </fileset>
+      </batchtest>
+      <batchtest todir="${test.reports}" if="test">
+        <fileset dir="${build.testDir}">
+          <include name="**/${test}.java"/>
+          <exclude name="**/*Abstract*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="test-junit-present">
+    <available classname="junit.framework.Test" property="junit.present" classpathref="build.test.classpath"/>
+  </target>
+
+  <target name="test-junit-status" 
+          depends="test-junit-present">
+    <condition property="junit.missing">
+      <and>
+        <isfalse value="${junit.present}"/>
+        <isfalse value="${test.skip}"/>
+      </and>
+    </condition>
+    <condition property="junit.skipped">
+      <or>
+        <isfalse value="${junit.present}"/>
+        <istrue value="${test.skip}"/>
+      </or>
+    </condition>
+  </target>
+
+  <target name="junit-missing" 
+          depends="test-junit-status" 
+          if="junit.missing">
+    <echo>=================================== WARNING ===================================</echo>
+    <echo> JUnit is not present in the test classpath or your $ANT_HOME/lib directory. Tests not executed.</echo>
+    <echo>===============================================================================</echo>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir}" 
+             packagenames="*" 
+             destdir="${reporting.outputDirectory}/apidocs" 
+             access="protected" 
+             verbose="false" 
+             version="true" 
+             use="true" 
+             author="true" 
+             splitindex="false" 
+             nodeprecated="false" 
+             nodeprecatedlist="false" 
+             notree="false" 
+             noindex="false" 
+             nohelp="false" 
+             nonavbar="false" 
+             serialwarn="false" 
+             charset="ISO-8859-1" 
+             linksource="false" 
+             breakiterator="false" 
+             source="${compiler.source}"
+             classpathref="build.classpath"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile,test" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html">
+      <manifest>
+		<attribute name="Bundle-Description" value="${project.description}"/>
+		<attribute name="Bundle-DocURL" value="${project.organization.url}"/>
+		<attribute name="Bundle-License" value="${project.license.url}"/>
+		<attribute name="Bundle-ManifestVersion" value="2"/>
+		<attribute name="Bundle-Name" value="${project.name}"/>
+		<attribute name="Bundle-SymbolicName" value="${project.groupId}.${project.artifactId}"/>
+		<attribute name="Bundle-Vendor" value="${project.organization.name}"/>
+		<attribute name="Bundle-Version" value="${bundle.version}"/>
+		<attribute name="Export-Package" value="javax.decorator;version=&quot;1.1&quot;;uses:=&quot;javax.enterprise.inject&quot;,javax.enterprise.context;version=&quot;1.1&quot;;uses:=&quot;javax.inject&quot;,javax.enterprise.context.spi;version=&quot;1.1&quot;,javax.enterprise.event;version=&quot;1.1&quot;;uses:=&quot;javax.enterprise.util&quot;,javax.enterprise.inject;version=&quot;1.1&quot;;uses:=&quot;javax.enterprise.context,javax.enterprise.util,javax.inject&quot;,javax.enterprise.inject.spi;version=&quot;1.1&quot;;uses:=&quot;javax.el,javax.enterprise.context.spi,javax.enterprise.event,javax.enterprise.inject,javax.interceptor&quot;,javax.enterprise.util;version=&quot;1.1&quot;"/>
+		<attribute name="Implementation-Title" value="${project.name}"/>
+		<attribute name="Implementation-Version" value="${project.version}"/>
+		<attribute name="Import-Package" value="javax.el;version=&quot;2.2&quot;,javax.enterprise.context;version=&quot;[1.1,2)&quot;,javax.enterprise.context.spi;version=&quot;[1.1,2)&quot;,javax.enterprise.event;version=&quot;[1.1,2)&quot;,javax.enterprise.inject;version=&quot;[1.1,2)&quot;,javax.enterprise.util;version=&quot;[1.1,2)&quot;,javax.inject;version=&quot;[1.0,2)&quot;,javax.interceptor;version=&quot;[${project.version},2)&quot;"/>
+		<attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+		<attribute name="Specification-Title" value="${spec.title}"/>
+		<attribute name="Specification-Version" value="${spec.version}"/>
+	  </manifest>
+	</jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

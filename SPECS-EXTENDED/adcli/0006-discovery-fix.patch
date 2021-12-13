@@ -1,0 +1,27 @@
+From 08bac0946de29f3e5de90743ce6dfc7118d4ad20 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Tue, 11 Feb 2020 17:42:03 +0100
+Subject: [PATCH 6/6] discovery fix
+
+Do not continue processing on closed connection.
+
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1802258
+---
+ library/addisco.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/library/addisco.c b/library/addisco.c
+index 6e73ead..f3b3546 100644
+--- a/library/addisco.c
++++ b/library/addisco.c
+@@ -622,6 +622,7 @@ ldap_disco (const char *domain,
+ 			                            "Couldn't perform discovery search");
+ 			ldap_unbind_ext_s (ldap[i], NULL, NULL);
+ 			ldap[i] = NULL;
++			continue;
+ 		}
+ 
+ 		/* From https://msdn.microsoft.com/en-us/library/ff718294.aspx first
+-- 
+2.25.1
+

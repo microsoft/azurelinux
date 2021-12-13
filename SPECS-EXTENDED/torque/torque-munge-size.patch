@@ -1,0 +1,25 @@
+From 12a8d7dde1d07aed670f0dd50b317b256daaa991 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ha=C3=AFkel=20Gu=C3=A9mar?= <hguemar@fedoraproject.org>
+Date: Sun, 12 Jan 2014 11:42:32 +0100
+Subject: [PATCH] munge size fix
+
+---
+ src/include/libpbs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/include/libpbs.h b/src/include/libpbs.h
+index 6d32c8b..06b1bec 100644
+--- a/src/include/libpbs.h
++++ b/src/include/libpbs.h
+@@ -121,7 +121,7 @@
+ #define EOF -1
+ #endif
+ 
+-#define MUNGE_SIZE 256 /* I do not know what the proper size of this should be. My 
++#define MUNGE_SIZE 1024 /* I do not know what the proper size of this should be. My
+                           testing with munge shows it creates a string of 128 bytes */
+ 
+ 
+-- 
+1.8.4.2
+

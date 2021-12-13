@@ -1,0 +1,72 @@
+From 3f53b5fe72fe888ab953bea2eac49ec9def7c6ad Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 16 Nov 2016 13:28:26 +0100
+Subject: [PATCH] Skip tests with unportable commands
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch skips unportable tests whose return code is 500. It usually
+mean the server does not suport it.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ test.pl | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/test.pl b/test.pl
+index 4f21575..26a100c 100644
+--- a/test.pl
++++ b/test.pl
+@@ -33,17 +33,32 @@ EOF
+ 
+ $i = 2;
+ 
++sub skip_500_ok {
++  my ($counter, $client, $function, @arguments) = @_;
++  my $status = $client->$function(@arguments);
++  my $code = $client->code();
++  if ($code != 500) {
++      print "not " unless $status;
++      print "ok ", ${$counter}++, " ($f)\n";
++  } else {
++      print "ok ", ${$counter}++, " # skip ($f is unsupported by the server)\n";
++  }
++}
++
+ $c = new News::NNTPClient;
+ 
+ $c->gmt(1);
+ $c->fourdigityear(1);
+ 
+ for $f (qw(version debug eol gmt fourdigityear message code
+-	   ok okprint postok mode_reader list help slave)) {
++	   ok okprint postok mode_reader list help)) {
+   print "not " unless $c->$f();
+   print "ok ", $i++, " ($f)\n";
+ }
+ 
++# slave not supported by inn
++skip_500_ok(\$i, $c, 'slave');
++
+ print <<EOF;
+ 
+     In addition to needing access to a news server, the following
+@@ -99,12 +114,10 @@ EOF
+ 
+ # xpath xgtitle xhdr xpat xover xmotd xthread xindex xsearch
+ 
+-print "not " unless $c->xpath($msgid);
+-print "ok ", $i++, " (xpath $msgid)\n";
++skip_500_ok(\$i, $c, 'xpath', $msgid);
+ 
+ for $f (qw(xgtitle xhdr xpat xover xmotd xthread xindex xsearch)) {
+-  print "not " unless $c->$f();
+-  print "ok ", $i++, " ($f)\n";
++  skip_500_ok(\$i, $c, $f);
+ }
+ 
+ print <<EOF;
+-- 
+2.7.4
+

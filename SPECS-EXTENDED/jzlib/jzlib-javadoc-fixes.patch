@@ -1,0 +1,21 @@
+--- src/main/java/com/jcraft/jzlib/ZStream.java.orig	2014-05-09 12:35:05.241400959 +0100
++++ src/main/java/com/jcraft/jzlib/ZStream.java	2014-05-09 12:35:35.093886286 +0100
+@@ -371,6 +371,7 @@
+   /**
+    * Those methods are expected to be override by Inflater and Deflater.
+    * In the future, they will become abstract methods.
++   * @return an error code
+    */ 
+   public int end(){ return Z_OK; }
+   public boolean finished(){ return false; }
+--- src/main/java/com/jcraft/jzlib/GZIPHeader.java.orig	2014-05-09 12:37:35.358812069 +0100
++++ src/main/java/com/jcraft/jzlib/GZIPHeader.java	2014-05-09 12:37:40.267727366 +0100
+@@ -37,7 +37,7 @@
+ import java.io.UnsupportedEncodingException;
+ 
+ /**
+- * @see "http://www.ietf.org/rfc/rfc1952.txt"
++ * See "http://www.ietf.org/rfc/rfc1952.txt"
+  */
+ public class GZIPHeader implements Cloneable {
+ 

@@ -1,0 +1,10 @@
+diff -up dovecot-2.2.36/doc/dovecot-openssl.cnf.bigkey dovecot-2.2.36/doc/dovecot-openssl.cnf
+--- dovecot-2.2.36/doc/dovecot-openssl.cnf.bigkey	2017-06-23 13:18:28.000000000 +0200
++++ dovecot-2.2.36/doc/dovecot-openssl.cnf	2018-10-16 17:15:35.836205498 +0200
+@@ -1,5 +1,5 @@
+ [ req ]
+-default_bits = 1024
++default_bits = 3072
+ encrypt_key = yes
+ distinguished_name = req_dn
+ x509_extensions = cert_type

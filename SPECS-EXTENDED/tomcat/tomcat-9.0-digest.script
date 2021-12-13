@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# tomcat-digest script
+# JPackage Project <http://www.jpackage.org/>
+
+# Source functions library
+if [ -f /usr/share/java-utils/java-functions ] ; then
+  . /usr/share/java-utils/java-functions
+else
+  echo "Can't find functions library, aborting"
+  exit 1
+fi
+
+# Get the tomcat config (use this for environment specific settings)
+if [ -z "${TOMCAT_CFG}" ]; then
+    TOMCAT_CFG="/etc/tomcat/tomcat.conf"
+fi
+
+if [ -r "$TOMCAT_CFG" ]; then
+    . $TOMCAT_CFG
+fi
+
+set_javacmd
+
+# CLASSPATH munging
+if [ -n "$JSSE_HOME" ]; then
+  CLASSPATH="${CLASSPATH}:$(build-classpath jcert jnet jsse 2>/dev/null)"
+fi
+CLASSPATH="${CLASSPATH}:${CATALINA_HOME}/bin/bootstrap.jar"
+CLASSPATH="${CLASSPATH}:${CATALINA_HOME}/bin/tomcat-juli.jar"
+export CLASSPATH
+
+# Configuration
+MAIN_CLASS="org.apache.catalina.startup.Tool"
+BASE_FLAGS="-Dcatalina.home=\"$CATALINA_HOME\""
+BASE_OPTIONS=""
+BASE_JARS="commons-daemon tomcat/catalina servlet tomcat/tomcat-util tomcat/tomcat-coyote tomcat/tomcat-api tomcat/tomcat-util-scan"
+
+# Set parameters
+set_classpath $BASE_JARS
+set_flags $BASE_FLAGS
+set_options $BASE_OPTIONS
+
+# Let's start
+run -server org.apache.catalina.realm.RealmBase "$@"

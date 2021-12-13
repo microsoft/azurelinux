@@ -1,0 +1,25 @@
+From f389970daa5f5cae428d686eca31122cb0d61076 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Wed, 8 Nov 2017 22:15:06 +0000
+Subject: [PATCH 4/5] toplevel: Add -g flag.
+
+---
+ toplevel/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/toplevel/Makefile b/toplevel/Makefile
+index 4af7905..96d37d8 100644
+--- a/toplevel/Makefile
++++ b/toplevel/Makefile
+@@ -2,7 +2,7 @@ OCAMLC=ocamlc
+ OCAMLDEP=ocamldep
+ OCAMLFIND=ocamlfind
+ 
+-CAMLCFLAGS=-I ../src -I +compiler-libs \
++CAMLCFLAGS=-g -I ../src -I +compiler-libs \
+            -w +a-4-9-41-42-44-45-48 -warn-error A \
+            -safe-string -strict-sequence -strict-formats
+ 
+-- 
+2.24.1
+

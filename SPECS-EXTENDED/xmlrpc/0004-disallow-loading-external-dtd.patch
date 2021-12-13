@@ -1,0 +1,30 @@
+From 2c16d38ab18039327b2575f61c3035683f16cd7d Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Tue, 31 Mar 2020 17:02:12 +0100
+Subject: [PATCH 4/6] disallow loading external dtd
+
+---
+ .../src/main/java/org/apache/xmlrpc/util/SAXParsers.java   | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/common/src/main/java/org/apache/xmlrpc/util/SAXParsers.java b/common/src/main/java/org/apache/xmlrpc/util/SAXParsers.java
+index b1034e7..49ef5de 100644
+--- a/common/src/main/java/org/apache/xmlrpc/util/SAXParsers.java
++++ b/common/src/main/java/org/apache/xmlrpc/util/SAXParsers.java
+@@ -48,6 +48,13 @@ public class SAXParsers {
+         } catch (org.xml.sax.SAXException e) {
+             // Ignore it
+ 		}
++        try {
++            spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
++        } catch (javax.xml.parsers.ParserConfigurationException e) {
++            // Ignore it
++        } catch (org.xml.sax.SAXException e) {
++            // Ignore it
++        }
+ 	}
+ 
+ 	/** Creates a new instance of {@link XMLReader}.
+-- 
+2.26.0.rc2
+

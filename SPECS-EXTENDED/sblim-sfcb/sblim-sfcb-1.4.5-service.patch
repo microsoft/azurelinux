@@ -1,0 +1,27 @@
+diff -up sblim-sfcb-1.4.6/Makefile.in.orig sblim-sfcb-1.4.6/Makefile.in
+--- sblim-sfcb-1.4.6/Makefile.in.orig	2013-10-07 10:43:34.783228137 +0200
++++ sblim-sfcb-1.4.6/Makefile.in	2013-10-07 10:44:30.178533289 +0200
+@@ -627,7 +627,6 @@ initdir = $(sysconfdir)/init.d
+ pamdir = $(sysconfdir)/pam.d
+ sfcblibdir = $(libdir)/sfcb
+ cmpilibdir = $(libdir)/cmpi
+-systemddir = $(DESTDIR)@SYSTEMDDIR@
+ MANFILES = man/genSslCert.1 man/getSchema.1 man/sfcbd.1 man/sfcbmof.1 \
+ 	man/sfcbrepos.1 man/sfcbstage.1 man/sfcbunstage.1 man/sfcbuuid.1 \
+ 	man/wbemcat.1 man/xmltest.1
+@@ -2366,7 +2365,6 @@ unittest:
+ 	cd test && sh check_all.sh
+ 
+ install-data-local:
+-	if test -d $(systemddir); then cp $(srcdir)/sblim-sfcb.service $(systemddir); fi; 
+ 	test -d $(DESTDIR)$(sfcbstatedir)/registration/repository || $(mkdir_p) $(DESTDIR)$(sfcbstatedir)/registration/repository
+ 	test -d $(DESTDIR)$(sfcbstatedir)/stage/mofs/root/interop || $(mkdir_p) $(DESTDIR)$(sfcbstatedir)/stage/mofs/root/interop
+ 	test -d $(DESTDIR)$(sfcbstatedir)/stage/regs || $(mkdir_p) $(DESTDIR)$(sfcbstatedir)/stage/regs
+@@ -2384,7 +2382,6 @@ install-data-local:
+ uninstall-local:
+ 	rm -f $(DESTDIR)$(sfcbstatedir)/stage/default.reg
+ 	rm -f $(DESTDIR)$(sfcbstatedir)/stage/mofs/root/interop/10_interop.mof
+-	rm -f $(systemddir)/sblim-sfcb.service
+ @INDICATIONS_TRUE@	rm -f $(DESTDIR)$(sfcbstatedir)/stage/mofs/root/interop/20_indication.mof
+ @INDICATIONS_TRUE@	rm -f $(DESTDIR)$(sfcbstatedir)/stage/mofs/indication.mof
+ @DOCS_TRUE@	rm -rf $(DESTDIR)$(sfcbdocdir)/html

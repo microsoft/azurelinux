@@ -1,0 +1,46 @@
+From 5e514316b5cfbe769b21dc089e2631a9c302dd19 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 12 May 2016 09:24:36 +0200
+Subject: [PATCH 3/4] Port to plexus-utils 3.0.24
+
+---
+ pom.xml                                                       | 2 +-
+ src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 46b2ba6..144f5ad 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -197,7 +197,7 @@
+   <dependency>
+    <groupId>org.codehaus.plexus</groupId>
+    <artifactId>plexus-utils</artifactId>
+-   <version>3.0.10</version>
++   <version>3.0.24</version>
+   </dependency>
+   <dependency>
+    <groupId>org.sonatype.plexus</groupId>
+diff --git a/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java b/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
+index a42d6ef..c858b6b 100644
+--- a/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
++++ b/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
+@@ -1806,7 +1806,14 @@ public class BundlePlugin extends AbstractMojo
+             File filterFile = new File( i.next() );
+             if ( filterFile.isFile() )
+             {
+-                properties.putAll( PropertyUtils.loadProperties( filterFile ) );
++                try
++                {
++                    properties.putAll( PropertyUtils.loadProperties( filterFile ) );
++                }
++                catch ( IOException exc )
++                {
++                    // Ignore
++                }
+             }
+         }
+ 
+-- 
+2.14.3
+

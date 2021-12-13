@@ -1,0 +1,25 @@
+diff --git a/syslog.c b/syslog.c
+index e70f12c..af067e2 100644
+--- a/syslog.c
++++ b/syslog.c
+@@ -27,6 +27,7 @@
+ #include "global.h"
+ 
+ 
++char syslog_message[128];
+ 
+ /*
+   For some reason, BeOS doesn't seem to implement syslog(), even though it is
+diff --git a/syslog.h b/syslog.h
+index 7d0e436..5c1accd 100644
+--- a/syslog.h
++++ b/syslog.h
+@@ -39,7 +39,7 @@
+ #include <syslog.h>
+ #endif
+ 
+-char syslog_message[128];
++extern char syslog_message[128];
+ extern size_t message_size ;
+ 
+ void wrap_syslog( int, char *, char *);

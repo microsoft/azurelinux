@@ -1,0 +1,24 @@
+diff -Nru libappindicator-0.4.92.orig/bindings/mono/appindicator-sharp-0.1.pc.in libappindicator-0.4.92/bindings/mono/appindicator-sharp-0.1.pc.in
+--- libappindicator-0.4.92.orig/bindings/mono/appindicator-sharp-0.1.pc.in	2012-06-27 21:04:30.199741626 -0400
++++ libappindicator-0.4.92/bindings/mono/appindicator-sharp-0.1.pc.in	2012-06-27 21:05:23.326822552 -0400
+@@ -1,7 +1,7 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ libdir=@libdir@
+-assemblies_dir=${libdir}/cli/appindicator-sharp-0.1
++assemblies_dir=${libdir}/appindicator-sharp-0.1
+ 
+ Name: appindicator-sharp
+ Description: application indicators for .NET
+diff -Nru libappindicator-0.4.92.orig/bindings/mono/Makefile.am libappindicator-0.4.92/bindings/mono/Makefile.am
+--- libappindicator-0.4.92.orig/bindings/mono/Makefile.am	2012-06-27 21:04:30.199741626 -0400
++++ libappindicator-0.4.92/bindings/mono/Makefile.am	2012-06-27 21:04:59.562786431 -0400
+@@ -31,7 +31,7 @@
+ 	$(DLLPOLICY1) \
+ 	$(POLICY1).config
+ 
+-assemblydir = $(libdir)/cli/appindicator-sharp-0.1
++assemblydir = $(libdir)/appindicator-sharp-0.1
+ assembly_DATA = $(TARGET)
+ 
+ CLEANFILES = \

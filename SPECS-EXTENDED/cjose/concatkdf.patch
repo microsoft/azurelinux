@@ -1,0 +1,74 @@
+commit 0238eb8f3612515f4374381b593dd79116169330
+Author: John Dennis <jdennis@redhat.com>
+Date:   Thu Aug 2 16:21:33 2018 -0400
+
+    fix concatkdf failures on big endian architectures
+    
+    Several of the elements used to compute the digest in ECDH-ES key
+    agreement computation are represented in binary form as a 32-bit
+    integer length followed by that number of octets.  the length
+    field. The 32-bit length integer is represented in big endian
+    format (the 8 most significant bits are in the first octet.).
+    
+    The conversion to a 4 byte big endian integer was being computed
+    in a manner that only worked on little endian architectures. The
+    function htonl() returns a 32-bit integer whose octet sequence given
+    the address of the integer is big endian. There is no need for any
+    further manipulation.
+    
+    The existing code used bit shifting on a 32-bit value. In C bit
+    shifting is endian agnostic for multi-octet values, a right shift
+    moves most significant bits toward least significant bits. The result
+    of a bit shift of a multi-octet value on either big or little
+    archictures will always be the same provided you "view" it as the same
+    data type (e.g. 32-bit integer). But indexing the octets of that
+    mulit-octet value will be different depending on endianness, hence the
+    assembled octets differed depending on endianness.
+    
+    Issue: #77
+    Signed-off-by: John Dennis <jdennis@redhat.com>
+
+diff --git a/src/concatkdf.c b/src/concatkdf.c
+index ec064ab..59b845a 100644
+--- a/src/concatkdf.c
++++ b/src/concatkdf.c
+@@ -29,15 +29,9 @@
+ ////////////////////////////////////////////////////////////////////////////////
+ static uint8_t *_apply_uint32(const uint32_t value, uint8_t *buffer)
+ {
+-    const uint32_t formatted = htonl(value);
+-    const uint8_t data[4] = {
+-        (formatted >> 0) & 0xff,
+-        (formatted >> 8) & 0xff,
+-        (formatted >> 16) & 0xff,
+-        (formatted >> 24) & 0xff
+-    };
+-    memcpy(buffer, data, 4);
++    const uint32_t big_endian_int32 = htonl(value);
+ 
++    memcpy(buffer, &big_endian_int32, 4);
+     return buffer + 4;
+ }
+ 
+diff --git a/test/check_concatkdf.c b/test/check_concatkdf.c
+index e4325fc..41d0f1c 100644
+--- a/test/check_concatkdf.c
++++ b/test/check_concatkdf.c
+@@ -60,14 +60,9 @@ _create_otherinfo_header_finish:
+ 
+ static bool _cmp_uint32(uint8_t **actual, uint32_t expected)
+ {
+-    uint32_t value = htonl(expected);
+-    uint8_t expectedData[] = {
+-        (value >> 0) & 0xff,
+-        (value >> 8) & 0xff,
+-        (value >> 16) & 0xff,
+-        (value >> 24) & 0xff
+-    };
+-    bool result = (0 == memcmp(*actual, expectedData, 4));
++    uint32_t big_endian_int32 = htonl(expected);
++
++    bool result = (0 == memcmp(*actual, &big_endian_int32, 4));
+     (*actual) += 4;
+     return result;
+ }

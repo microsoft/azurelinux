@@ -1,0 +1,96 @@
+diff -up ypserv-2.32/scripts/ypMakefile.in.nfsnobody ypserv-2.32/scripts/ypMakefile.in
+--- ypserv-2.32/scripts/ypMakefile.in.nfsnobody	2013-11-18 09:19:58.092797179 +0100
++++ ypserv-2.32/scripts/ypMakefile.in	2013-11-18 09:20:39.885790669 +0100
+@@ -40,6 +40,11 @@ YPPUSH_ARGS =
+ MINUID=$(shell TMP=`egrep '^UID_MIN\s+[0-9]+' /etc/login.defs|sed -e 's/^UID_MIN//'` ; [ -n "$$TMP" ] && echo "$$TMP" || echo 1000)
+ MINGID=$(shell TMP=`egrep '^GID_MIN\s+[0-9]+' /etc/login.defs|sed -e 's/^GID_MIN//'` ; [ -n "$$TMP" ] && echo "$$TMP" || echo 1000)
+ 
++# Don't export this uid/guid (nfsnobody).
++# Set to 0 if you want to
++NFSNOBODYUID=65534
++NFSNOBODYGID=65534
++
+ # Should we merge the passwd file with the shadow file ?
+ # MERGE_PASSWD=true|false
+ MERGE_PASSWD=true
+@@ -294,7 +299,7 @@ passwd.byname: $(PASSWD) $(SHADOW) $(YPD
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+ 	$(MERGER) -p $(PASSWD) $(SHADOW) | \
+-	   $(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINUID) ) \
++	   $(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINUID) && $$3 != $(NFSNOBODYUID) ) \
+ 	   print $$1"\t"$$0 }' | $(DBLOAD) -i $(PASSWD) \
+ 		-o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@
+@@ -303,7 +308,7 @@ passwd.byuid: $(PASSWD) $(SHADOW) $(YPDI
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+ 	$(MERGER) -p $(PASSWD) $(SHADOW) | \
+-	   $(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINUID) ) \
++	   $(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINUID) && $$3 != $(NFSNOBODYUID) ) \
+ 	   print $$3"\t"$$0 }' | $(DBLOAD) -i $(PASSWD) \
+ 		 -o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@
+@@ -317,7 +322,7 @@ else
+ passwd.byname: $(PASSWD) $(YPDIR)/Makefile
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+-	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINUID) ) \
++	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINUID) && $$3 != $(NFSNOBODYUID) ) \
+ 	   print $$1"\t"$$0 }' $(PASSWD) | $(DBLOAD) -i $(PASSWD) \
+ 		-o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@
+@@ -325,7 +330,7 @@ passwd.byname: $(PASSWD) $(YPDIR)/Makefi
+ passwd.byuid: $(PASSWD) $(YPDIR)/Makefile
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+-	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINUID) ) \
++	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINUID) && $$3 != $(NFSNOBODYUID) ) \
+ 	   print $$3"\t"$$0 }' $(PASSWD) | $(DBLOAD) -i $(PASSWD) \
+ 		 -o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@
+@@ -334,7 +339,7 @@ shadow.byname: $(SHADOW) $(YPDIR)/Makefi
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+ 	$(AWK) -F: '{ if (FILENAME ~ /shadow$$/) { \
+-		if (UID[$$1] >= $(MINUID) ) print $$1"\t"$$0; \
++		if (UID[$$1] >= $(MINUID) && UID[$$1] != $(NFSNOBODYUID)) print $$1"\t"$$0; \
+ 			} else UID[$$1] = $$3; }' $(PASSWD) $(SHADOW) \
+ 		| $(DBLOAD) -s -i $(SHADOW) -o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@
+@@ -353,7 +358,7 @@ group.byname: $(GROUP) $(GSHADOW) $(YPDI
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+ 	$(MERGER) -g $(GROUP) $(GSHADOW) | \
+-	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINGID) ) \
++	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINGID) && $$3 != $(NFSNOBODYGID) ) \
+ 	print $$1"\t"$$0 }' | $(DBLOAD) -i $(GROUP) -o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@
+ 
+@@ -361,7 +366,7 @@ group.bygid: $(GROUP) $(GSHADOW) $(YPDIR
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+ 	$(MERGER) -g $(GROUP) $(GSHADOW) | \
+-	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINGID) ) \
++	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINGID) && $$3 != $(NFSNOBODYGID) ) \
+ 	print $$3"\t"$$0 }' | $(DBLOAD) -i $(GROUP) -o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@
+ 
+@@ -370,7 +375,7 @@ else
+ group.byname: $(GROUP) $(YPDIR)/Makefile
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+-	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINGID) ) \
++	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINGID) && $$3 != $(NFSNOBODYGID) ) \
+ 					print $$1"\t"$$0 }' $(GROUP) \
+ 		| $(DBLOAD) -i $(GROUP) -o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@
+@@ -378,7 +383,7 @@ group.byname: $(GROUP) $(YPDIR)/Makefile
+ group.bygid: $(GROUP) $(YPDIR)/Makefile
+ 	@echo "Updating $@..."
+ 	@$(UMASK); \
+-	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINGID) ) \
++	$(AWK) -F: '!/^[-+#]/ { if ($$1 != "" && $$3 >= $(MINGID) && $$3 != $(NFSNOBODYGID) ) \
+ 					print $$3"\t"$$0 }' $(GROUP) \
+ 		| $(DBLOAD) -i $(GROUP) -o $(YPMAPDIR)/$@ - $@
+ 	-@$(NOPUSH) || $(YPPUSH) -d $(DOMAIN) $@

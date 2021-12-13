@@ -1,0 +1,174 @@
+From 2a97ab28ee00586e5f06b3ef3a0e43ea0c7c6499 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Mon, 7 Apr 2014 14:21:41 +0200
+Subject: [PATCH 14/27] everywhere: use SOCK_CLOEXEC when creating socket
+
+---
+ pppd/plugins/pppoatm/pppoatm.c          |  2 +-
+ pppd/plugins/pppol2tp/openl2tp.c        |  2 +-
+ pppd/plugins/pppol2tp/pppol2tp.c        |  2 +-
+ pppd/plugins/rp-pppoe/if.c              |  2 +-
+ pppd/plugins/rp-pppoe/plugin.c          |  6 +++---
+ pppd/plugins/rp-pppoe/pppoe-discovery.c |  2 +-
+ pppd/sys-linux.c                        | 10 +++++-----
+ pppd/tty.c                              |  2 +-
+ 8 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/pppd/plugins/pppoatm/pppoatm.c b/pppd/plugins/pppoatm/pppoatm.c
+index d693350..c31bb34 100644
+--- a/pppd/plugins/pppoatm/pppoatm.c
++++ b/pppd/plugins/pppoatm/pppoatm.c
+@@ -135,7 +135,7 @@ static int connect_pppoatm(void)
+ 
+ 	if (!device_got_set)
+ 		no_device_given_pppoatm();
+-	fd = socket(AF_ATMPVC, SOCK_DGRAM, 0);
++	fd = socket(AF_ATMPVC, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+ 	if (fd < 0)
+ 		fatal("failed to create socket: %m");
+ 	memset(&qos, 0, sizeof qos);
+diff --git a/pppd/plugins/pppol2tp/openl2tp.c b/pppd/plugins/pppol2tp/openl2tp.c
+index 9643b96..1099575 100644
+--- a/pppd/plugins/pppol2tp/openl2tp.c
++++ b/pppd/plugins/pppol2tp/openl2tp.c
+@@ -83,7 +83,7 @@ static int openl2tp_client_create(void)
+ 	int result;
+ 
+ 	if (openl2tp_fd < 0) {
+-		openl2tp_fd = socket(PF_UNIX, SOCK_DGRAM, 0);
++		openl2tp_fd = socket(PF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+ 		if (openl2tp_fd < 0) {
+ 			error("openl2tp connection create: %m");
+ 			return -ENOTCONN;
+diff --git a/pppd/plugins/pppol2tp/pppol2tp.c b/pppd/plugins/pppol2tp/pppol2tp.c
+index a7e3400..e64a778 100644
+--- a/pppd/plugins/pppol2tp/pppol2tp.c
++++ b/pppd/plugins/pppol2tp/pppol2tp.c
+@@ -208,7 +208,7 @@ static void send_config_pppol2tp(int mtu,
+ 		struct ifreq ifr;
+ 		int fd;
+ 
+-		fd = socket(AF_INET, SOCK_DGRAM, 0);
++		fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+ 		if (fd >= 0) {
+ 			memset (&ifr, '\0', sizeof (ifr));
+ 			strlcpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
+diff --git a/pppd/plugins/rp-pppoe/if.c b/pppd/plugins/rp-pppoe/if.c
+index 91e9a57..72aba41 100644
+--- a/pppd/plugins/rp-pppoe/if.c
++++ b/pppd/plugins/rp-pppoe/if.c
+@@ -116,7 +116,7 @@ openInterface(char const *ifname, UINT16_t type, unsigned char *hwaddr)
+     stype = SOCK_PACKET;
+ #endif
+ 
+-    if ((fd = socket(domain, stype, htons(type))) < 0) {
++    if ((fd = socket(domain, stype | SOCK_CLOEXEC, htons(type))) < 0) {
+ 	/* Give a more helpful message for the common error case */
+ 	if (errno == EPERM) {
+ 	    fatal("Cannot create raw socket -- pppoe must be run as root.");
+diff --git a/pppd/plugins/rp-pppoe/plugin.c b/pppd/plugins/rp-pppoe/plugin.c
+index a8c2bb4..24bdf8f 100644
+--- a/pppd/plugins/rp-pppoe/plugin.c
++++ b/pppd/plugins/rp-pppoe/plugin.c
+@@ -137,7 +137,7 @@ PPPOEConnectDevice(void)
+     /* server equipment).                                                  */
+     /* Opening this socket just before waitForPADS in the discovery()      */
+     /* function would be more appropriate, but it would mess-up the code   */
+-    conn->sessionSocket = socket(AF_PPPOX, SOCK_STREAM, PX_PROTO_OE);
++    conn->sessionSocket = socket(AF_PPPOX, SOCK_STREAM | SOCK_CLOEXEC, PX_PROTO_OE);
+     if (conn->sessionSocket < 0) {
+ 	error("Failed to create PPPoE socket: %m");
+ 	return -1;
+@@ -148,7 +148,7 @@ PPPOEConnectDevice(void)
+     lcp_wantoptions[0].mru = conn->mru;
+ 
+     /* Update maximum MRU */
+-    s = socket(AF_INET, SOCK_DGRAM, 0);
++    s = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+     if (s < 0) {
+ 	error("Can't get MTU for %s: %m", conn->ifName);
+ 	goto errout;
+@@ -320,7 +320,7 @@ PPPoEDevnameHook(char *cmd, char **argv, int doit)
+     }
+ 
+     /* Open a socket */
+-    if ((fd = socket(PF_PACKET, SOCK_RAW, 0)) < 0) {
++    if ((fd = socket(PF_PACKET, SOCK_RAW | SOCK_CLOEXEC, 0)) < 0) {
+ 	r = 0;
+     }
+ 
+diff --git a/pppd/plugins/rp-pppoe/pppoe-discovery.c b/pppd/plugins/rp-pppoe/pppoe-discovery.c
+index 3d3bf4e..c0d927d 100644
+--- a/pppd/plugins/rp-pppoe/pppoe-discovery.c
++++ b/pppd/plugins/rp-pppoe/pppoe-discovery.c
+@@ -121,7 +121,7 @@ openInterface(char const *ifname, UINT16_t type, unsigned char *hwaddr)
+     stype = SOCK_PACKET;
+ #endif
+ 
+-    if ((fd = socket(domain, stype, htons(type))) < 0) {
++    if ((fd = socket(domain, stype | SOCK_CLOEXEC, htons(type))) < 0) {
+ 	/* Give a more helpful message for the common error case */
+ 	if (errno == EPERM) {
+ 	    rp_fatal("Cannot create raw socket -- pppoe must be run as root.");
+diff --git a/pppd/sys-linux.c b/pppd/sys-linux.c
+index 00a2cf5..0690019 100644
+--- a/pppd/sys-linux.c
++++ b/pppd/sys-linux.c
+@@ -308,12 +308,12 @@ static int modify_flags(int fd, int clear_bits, int set_bits)
+ void sys_init(void)
+ {
+     /* Get an internet socket for doing socket ioctls. */
+-    sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
++    sock_fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+     if (sock_fd < 0)
+ 	fatal("Couldn't create IP socket: %m(%d)", errno);
+ 
+ #ifdef INET6
+-    sock6_fd = socket(AF_INET6, SOCK_DGRAM, 0);
++    sock6_fd = socket(AF_INET6, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+     if (sock6_fd < 0)
+ 	sock6_fd = -errno;	/* save errno for later */
+ #endif
+@@ -1857,7 +1857,7 @@ get_if_hwaddr(u_char *addr, char *name)
+ 	struct ifreq ifreq;
+ 	int ret, sock_fd;
+ 
+-	sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
++	sock_fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+ 	if (sock_fd < 0)
+ 		return 0;
+ 	memset(&ifreq.ifr_hwaddr, 0, sizeof(struct sockaddr));
+@@ -2067,7 +2067,7 @@ int ppp_available(void)
+ /*
+  * Open a socket for doing the ioctl operations.
+  */
+-    s = socket(AF_INET, SOCK_DGRAM, 0);
++    s = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+     if (s < 0)
+ 	return 0;
+ 
+@@ -2860,7 +2860,7 @@ ether_to_eui64(eui64_t *p_eui64)
+     int skfd;
+     const unsigned char *ptr;
+ 
+-    skfd = socket(PF_INET6, SOCK_DGRAM, 0);
++    skfd = socket(PF_INET6, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+     if(skfd == -1)
+     {
+         warn("could not open IPv6 socket");
+diff --git a/pppd/tty.c b/pppd/tty.c
+index bc96695..8e76a5d 100644
+--- a/pppd/tty.c
++++ b/pppd/tty.c
+@@ -896,7 +896,7 @@ open_socket(dest)
+     *sep = ':';
+ 
+     /* get a socket and connect it to the other end */
+-    sock = socket(PF_INET, SOCK_STREAM, 0);
++    sock = socket(PF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+     if (sock < 0) {
+ 	error("Can't create socket: %m");
+ 	return -1;
+-- 
+1.8.3.1
+

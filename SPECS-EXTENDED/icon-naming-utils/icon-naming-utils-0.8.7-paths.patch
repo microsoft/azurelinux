@@ -1,0 +1,44 @@
+diff -up icon-naming-utils-0.8.7/icon-naming-utils.pc.in.paths icon-naming-utils-0.8.7/icon-naming-utils.pc.in
+--- icon-naming-utils-0.8.7/icon-naming-utils.pc.in.paths	2006-01-20 12:33:01.000000000 -0500
++++ icon-naming-utils-0.8.7/icon-naming-utils.pc.in	2008-07-22 01:00:43.000000000 -0400
+@@ -1,6 +1,6 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-program_path=@libexecdir@
++program_path=/usr/bin
+ 
+ Name: icon-naming-utils
+ Description: Utilities for mapping legacy GNOME and KDE icon names to the new Icon Naming Specification
+diff -up icon-naming-utils-0.8.7/Makefile.am.paths icon-naming-utils-0.8.7/Makefile.am
+--- icon-naming-utils-0.8.7/Makefile.am.paths	2007-08-18 08:24:39.000000000 -0400
++++ icon-naming-utils-0.8.7/Makefile.am	2008-07-22 01:03:30.000000000 -0400
+@@ -1,5 +1,5 @@
+ 
+-libexec_SCRIPTS = icon-name-mapping
++bin_SCRIPTS = icon-name-mapping
+ 
+ %: %.pl.in
+ 	sed -e "s#\@PERL\@#$(PERL)#g"		\
+@@ -11,10 +11,9 @@ pkgconfig_in_files =				\
+ pkgconfigdir = $(datadir)/pkgconfig
+ pkgconfig_DATA = $(pkgconfig_in_files:.pc.in=.pc)
+ 
+-dtddir = $(datadir)/dtds
+-dtd_DATA = legacy-icon-mapping.dtd
+-
+-pkgdata_DATA = legacy-icon-mapping.xml
++pkgdata_DATA =  			\
++	legacy-icon-mapping.xml 	\
++	legacy-icon-mapping.dtd
+ 
+ EXTRA_DIST =				\
+ 	icon-name-mapping.pl.in		\
+@@ -24,7 +23,7 @@ EXTRA_DIST =				\
+ 	icon-naming-utils-uninstalled.pc.in
+ 
+ CLEANFILES =				\
+-	$(libexec_SCRIPTS)
++	$(bin_SCRIPTS)
+ 
+ DISTCLEANFILES =			\
+ 	$(pkgconfig_DATA)		\

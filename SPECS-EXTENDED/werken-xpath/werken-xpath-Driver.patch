@@ -1,0 +1,55 @@
+--- test/src/com/werken/xpath/test/Driver.java.sav	2000-11-09 18:43:30.000000000 +0100
++++ test/src/com/werken/xpath/test/Driver.java	2006-05-05 20:40:06.000000000 +0200
+@@ -12,6 +12,7 @@
+ import org.jdom.JDOMException;
+ import org.jdom.input.SAXBuilder;
+ import org.jdom.output.XMLOutputter;
++import org.jdom.output.Format;
+ 
+ import java.io.File;
+ import java.io.IOException;
+@@ -98,6 +99,10 @@
+         {
+             e.printStackTrace();
+         }
++        catch (IOException ioe)
++        {
++            ioe.printStackTrace();
++        }
+ 
+         System.out.println("================================================================================");
+         System.out.println("TEST SUMMARY");
+@@ -150,6 +155,10 @@
+             {
+                 e.printStackTrace();
+             }
++            catch (IOException ioe)
++            {
++                ioe.printStackTrace();
++            }
+ 
+             if ( doc != null )
+             {
+@@ -221,8 +230,11 @@
+             }
+             else
+             {
+-                XMLOutputter outputter = new XMLOutputter("    ", true);
+-        
++                XMLOutputter outputter = new XMLOutputter();
++                Format fmt = outputter.getFormat();
++                fmt.setIndent("  ");
++                fmt.setLineSeparator("\n");
++
+                 try
+                 {
+           
+@@ -412,7 +424,7 @@
+                     elemID = "";
+                 }
+ 
+-                resultNode.addAttribute("id", elemID);
++                resultNode.setAttribute("id", elemID);
+                 node.addContent( resultNode );
+                 results.addContent( node );
+             }

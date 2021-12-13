@@ -1,0 +1,58 @@
+diff -up fltk-1.3.4-1/fltk-config.in.fltk_config fltk-1.3.4-1/fltk-config.in
+--- fltk-1.3.4-1/fltk-config.in.fltk_config	2016-01-30 20:49:56.000000000 -0600
++++ fltk-1.3.4-1/fltk-config.in	2017-03-04 12:29:28.910316677 -0600
+@@ -44,8 +44,8 @@ CXX="@CXX@"
+ 
+ # flags for C++ compiler:
+ ARCHFLAGS="@ARCHFLAGS@"
+-CFLAGS="@CFLAGS@ @LARGEFILE@ @PTHREAD_FLAGS@"
+-CXXFLAGS="@CXXFLAGS@ @LARGEFILE@ @PTHREAD_FLAGS@"
++CFLAGS=""
++CXXFLAGS=""
+ LDFLAGS="@LDFLAGS@"
+ LDLIBS="@LIBS@"
+ OPTIM="@OPTIM@"
+@@ -228,7 +228,7 @@ if test "$BINARY_DIR" != ""; then
+     includes="-I$BINARY_DIR $includes"
+ fi
+ 
+-if test "$libdir" != /usr/lib -a "$libdir" != /usr/lib32; then
++if test "$libdir" != /usr/lib -a "$libdir" != /usr/lib32 -a "$libdir" != /usr/lib64; then
+     libs=-L$libdir
+ else
+     libs=
+@@ -236,28 +236,28 @@ fi
+ 
+ # Calculate needed libraries
+ LDSTATIC="$libdir/libfltk.a $LDLIBS"
+-LDLIBS="-lfltk$SHAREDSUFFIX $LDLIBS"
++LDLIBS="-lfltk$SHAREDSUFFIX"
+ 
+ if test x$use_forms = xyes; then
+     LDLIBS="-lfltk_forms$SHAREDSUFFIX $LDLIBS"
+     LDSTATIC="$libdir/libfltk_forms.a $LDSTATIC"
+ fi
+ if test x$use_gl = xyes; then
+-    LDLIBS="-lfltk_gl$SHAREDSUFFIX @GLLIB@ $LDLIBS"
++    LDLIBS="-lfltk_gl$SHAREDSUFFIX $LDLIBS"
+     LDSTATIC="$libdir/libfltk_gl.a @GLLIB@ $LDSTATIC"
+ fi
+ if test x$use_images = xyes; then
+-    LDLIBS="-lfltk_images$SHAREDSUFFIX $IMAGELIBS $LDLIBS"
++    LDLIBS="-lfltk_images$SHAREDSUFFIX $LDLIBS"
+     LDSTATIC="$libdir/libfltk_images.a $STATICIMAGELIBS $LDSTATIC"
+ fi
+ 
+ if test x$use_cairo = xyes; then
+-    LDLIBS="-lfltk_cairo$SHAREDSUFFIX $CAIROLIBS $LDLIBS"
++    LDLIBS="-lfltk_cairo$SHAREDSUFFIX $LDLIBS"
+     LDSTATIC="$libdir/libfltk_cairo.a $CAIROLIBS $LDSTATIC"
+ fi
+ 
+-LDLIBS="$DSOLINK $LDFLAGS $libs $LDLIBS"
+-LDSTATIC="$LDFLAGS $LDSTATIC"
++LDLIBS="$libs $LDLIBS"
++#LDSTATIC="$LDFLAGS $LDSTATIC"
+ 
+ # Answer to user requests
+ if test -n "$echo_help"; then

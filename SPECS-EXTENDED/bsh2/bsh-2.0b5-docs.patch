@@ -1,0 +1,25 @@
+Index: beanshell-2.0b6/docs/faq/faq.xsl
+===================================================================
+--- beanshell-2.0b6.orig/docs/faq/faq.xsl
++++ beanshell-2.0b6/docs/faq/faq.xsl
+@@ -18,7 +18,7 @@
+ <!--xsl:param name="imagedir"/-->
+ 
+ <!-- Output directives -->
+-<xsl:output method="xhtml" indent="yes"/>
++<xsl:output method="html" indent="yes"/>
+ 
+ <!-- 
+ 	Root
+Index: beanshell-2.0b6/docs/manual/xsl/manual.xsl
+===================================================================
+--- beanshell-2.0b6.orig/docs/manual/xsl/manual.xsl
++++ beanshell-2.0b6/docs/manual/xsl/manual.xsl
+@@ -1,6 +1,6 @@
+ <xsl:stylesheet	
+ 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+-    xmlns:redirect="org.apache.xalan.xslt.extensions.Redirect"
++        xmlns:redirect="http://xml.apache.org/xalan/redirect"
+     extension-element-prefixes="redirect"
+ >
+ 

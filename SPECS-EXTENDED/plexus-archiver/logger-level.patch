@@ -1,0 +1,11 @@
+--- plexus-archiver-plexus-archiver-3.6.0/src/test/java/org/codehaus/plexus/archiver/DuplicateFilesTest.java	2018-05-06 14:13:22.000000000 +0200
++++ plexus-archiver-plexus-archiver-3.6.0/src/test/java/org/codehaus/plexus/archiver/DuplicateFilesTest.java	2019-03-08 07:35:58.658910163 +0100
+@@ -31,7 +31,7 @@
+         throws Exception
+     {
+         super.setUp();
+-        getContainer().getLoggerManager().setThreshold( Logger.LEVEL_DEBUG );
++        ((org.codehaus.plexus.DefaultPlexusContainer)getContainer()).getLoggerManager().setThreshold( Logger.LEVEL_DEBUG );
+     }
+ 
+     public void testZipArchiver()

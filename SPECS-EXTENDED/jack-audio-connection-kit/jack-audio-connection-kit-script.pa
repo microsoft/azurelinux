@@ -1,0 +1,20 @@
+#!/usr/bin/pulseaudio -nF
+
+load-module module-jack-sink
+load-module module-jack-source
+
+load-module module-native-protocol-unix
+load-module module-volume-restore
+load-module module-default-device-restore
+load-module module-rescue-streams
+load-module module-suspend-on-idle
+.ifexists module-gconf.so
+.nofail
+load-module module-gconf
+.fail
+.endif
+.ifexists module-x11-publish.so
+.nofail
+load-module module-x11-publish
+.fail
+.endif

@@ -1,0 +1,50 @@
+From 32ecfa8e89306ace726f7ad14f2b09c2aa1b96c4 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Tue, 9 Feb 2016 21:02:59 +0100
+Subject: [PATCH] Use explicit cast and prevent compiler error
+
+---
+ streams/wvstream.cc | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/streams/wvstream.cc b/streams/wvstream.cc
+index 4564f3c..76565b4 100644
+--- a/streams/wvstream.cc
++++ b/streams/wvstream.cc
+@@ -907,9 +907,9 @@ void WvStream::_build_selectinfo(SelectInfo &si, time_t msec_timeout,
+     
+     if (forceable)
+     {
+-	si.wants.readable = readcb;
+-	si.wants.writable = writecb;
+-	si.wants.isexception = exceptcb;
++	si.wants.readable = static_cast<bool>(readcb);
++	si.wants.writable = static_cast<bool>(writecb);
++	si.wants.isexception = static_cast<bool>(exceptcb);
+     }
+     else
+     {
+@@ -1019,7 +1019,7 @@ bool WvStream::_select(time_t msec_timeout, bool readable, bool writable,
+ 
+ IWvStream::SelectRequest WvStream::get_select_request()
+ {
+-    return IWvStream::SelectRequest(readcb, writecb, exceptcb);
++    return IWvStream::SelectRequest(static_cast<bool>(readcb), static_cast<bool>(writecb), static_cast<bool>(exceptcb));
+ }
+ 
+ 
+@@ -1107,7 +1107,10 @@ bool WvStream::continue_select(time_t msec_timeout)
+     // inefficient, because if the alarm was expired then pre_select()
+     // returned true anyway and short-circuited the previous select().
+     TRACE("hello-%p\n", this);
+-    return !alarm_was_ticking || select(0, readcb, writecb, exceptcb);
++    return !alarm_was_ticking || select(0,
++					static_cast<bool>(readcb),
++					static_cast<bool>(writecb),
++					static_cast<bool>(exceptcb));
+ }
+ 
+ 
+-- 
+2.5.0
+

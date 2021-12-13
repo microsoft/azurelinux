@@ -1,0 +1,41 @@
+diff -up libproxy-0.4.11/libproxy/extension_pacrunner.cpp.crash libproxy-0.4.11/libproxy/extension_pacrunner.cpp
+--- libproxy-0.4.11/libproxy/extension_pacrunner.cpp.crash	2010-07-29 08:14:59.000000000 -0400
++++ libproxy-0.4.11/libproxy/extension_pacrunner.cpp	2013-11-11 15:23:56.987266457 -0500
+@@ -22,20 +22,10 @@ using namespace libproxy;
+ 
+ pacrunner::pacrunner(string, const url&) {}
+ 
+-pacrunner_extension::pacrunner_extension() {
+-	this->pr = NULL;
+-}
++pacrunner_extension::pacrunner_extension() {}
+ 
+-pacrunner_extension::~pacrunner_extension() {
+-	if (this->pr) delete this->pr;
+-}
++pacrunner_extension::~pacrunner_extension() {}
+ 
+ pacrunner* pacrunner_extension::get(string pac, const url& pacurl) throw (bad_alloc) {
+-	if (this->pr) {
+-		if (this->last == pac)
+-			return this->pr;
+-		delete this->pr;
+-	}
+-
+-	return this->pr = this->create(pac, pacurl);
++	return this->create(pac, pacurl);
+ }
+diff -up libproxy-0.4.11/libproxy/proxy.cpp.crash libproxy-0.4.11/libproxy/proxy.cpp
+--- libproxy-0.4.11/libproxy/proxy.cpp.crash	2013-11-11 15:25:27.309271353 -0500
++++ libproxy-0.4.11/libproxy/proxy.cpp	2013-11-11 15:25:31.569271584 -0500
+@@ -416,7 +416,9 @@ void proxy_factory::run_pac(url &realurl
+ 
+ 		/* Run the PAC, but only try one PACRunner */
+ 		if (debug) cerr << "Using pacrunner: " << typeid(*pacrunners[0]).name() << endl;
+-		string pacresp = pacrunners[0]->get(this->pac, this->pacurl->to_string())->run(realurl);
++		pacrunner* runner = pacrunners[0]->get(this->pac, this->pacurl->to_string());
++		string pacresp = runner->run(realurl);
++		delete runner;
+ 		if (debug) cerr << "Pacrunner returned: " << pacresp << endl;
+ 		format_pac_response(pacresp, response);
+ 	}

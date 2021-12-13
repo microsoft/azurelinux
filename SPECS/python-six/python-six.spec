@@ -3,7 +3,7 @@
 
 Name:           python-six
 Version:        1.11.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Python 2 and 3 compatibility utilities
 License:        MIT
 Group:          Development/Languages/Python
@@ -57,8 +57,7 @@ python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 easy_install_2=$(ls /usr/bin |grep easy_install |grep 2)
 $easy_install_2 pytest
 python2 test_six.py
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-$easy_install_3 pytest
+pip3 install pytest
 python3 test_six.py
 
 
@@ -72,6 +71,9 @@ python3 test_six.py
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com>
+- Replace easy_install usage with pip in %%check sections
+
 *   Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.0-5
 -   Adding an additional "Provides" for "python2-six" as it's the name expected by some packages.
 -   Removed the "sha1" macro.

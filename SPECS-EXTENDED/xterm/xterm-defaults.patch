@@ -1,0 +1,15 @@
+diff -up xterm-333/XTerm.ad.defaults xterm-333/XTerm.ad
+--- xterm-333/XTerm.ad.defaults	2016-12-22 03:07:39.000000000 +0100
++++ xterm-333/XTerm.ad	2018-05-30 15:44:53.325426803 +0200
+@@ -259,3 +259,11 @@
+ !*allowTcapOps: false
+ !*allowTitleOps: false
+ !*allowWindowOps: false
++
++! Red Hat Defaults:
++*allowFontOps: false
++*allowTcapOps: false
++*VT100*eightBitInput: false
++*VT100*scrollBar: true
++*VT100*utf8Title: true
++*termName: xterm-256color

@@ -1,0 +1,112 @@
+#!/bin/bash
+#
+# ipv6-up
+#
+# Called by pppd after IPV6CP/up was finished
+#
+# This file should not be modified -- make local changes to
+# /etc/ppp/ipv6-up.local instead
+#
+# Taken from:
+# (P) & (C) 2001-2006 by Peter Bieringer <pb@bieringer.de>
+#
+#  You will find more information on the initscripts-ipv6 homepage at
+#   http://www.deepspace6.net/projects/initscripts-ipv6.html
+#
+# RHL integration assistance by Pekka Savola <pekkas@netcore.fi>
+#
+# Calling parameters:
+#  $1: interface name
+#  $6: logical interface name (set by pppd option ipparam)
+#
+#
+# Version: 2006-08-02
+#
+# Uses following information from "/etc/sysconfig/network":
+#  IPV6_DEFAULTDEV=<device>: controls default route (optional)
+#
+# Uses following information from "/etc/sysconfig/network-scripts/ifcfg-$1":
+#  IPV6INIT=yes|no: controls IPv6 configuration for this interface
+#  IPV6ADDR=<IPv6 address>[/<prefix length>]: specify primary static IPv6 address
+#  IPV6ADDR_SECONDARIES="<IPv6 address>[/<prefix length>] ..." (optional)
+#  IPV6_MTU=<MTU for IPv6>: controls IPv6 MTU for this link (optional)
+#
+
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export PATH
+
+LOGDEVICE=$6
+REALDEVICE=$1
+
+[ -f /etc/sysconfig/network ] || exit 0
+. /etc/sysconfig/network
+
+cd /etc/sysconfig/network-scripts
+. ./network-functions
+. ./network-functions-ipv6
+
+CONFIG=$LOGDEVICE
+[ -f "$CONFIG" ] || CONFIG=ifcfg-$CONFIG
+source_config
+
+# Test whether IPv6 configuration is disabled for this interface
+[[ "$IPV6INIT" = [nN0]* ]] && exit 0
+
+[ -f /etc/sysconfig/network-scripts/network-functions-ipv6 ] || exit 1
+. /etc/sysconfig/network-scripts/network-functions-ipv6
+
+# IPv6 test, module loaded, exit if system is not IPv6-ready
+ipv6_test || exit 1
+
+# Test device status
+ipv6_test_device_status $REALDEVICE
+if [ $? != 0 -a $? != 11 ]; then
+	# device doesn't exist or other problem occurs
+	exit 1
+fi
+
+# Setup IPv6 address on specified interface
+if [ -n "$IPV6ADDR" ]; then
+	ipv6_add_addr_on_device $REALDEVICE $IPV6ADDR || exit 1
+fi
+
+# Set IPv6 MTU, if given
+if [ -n "$IPV6_MTU" ]; then
+	ipv6_set_mtu $REALDEVICE $IPV6_MTU
+fi
+
+# Setup additional IPv6 addresses from list, if given
+if [ -n "$IPV6ADDR_SECONDARIES" ]; then
+	for ipv6addr in $IPV6ADDR_SECONDARIES; do
+			ipv6_add_addr_on_device $REALDEVICE $ipv6addr
+	done
+fi
+
+# Setup default IPv6 route through device
+if [ "$IPV6_DEFAULTDEV" = "$LOGDEVICE" ]; then
+	ipv6_set_default_route "" "$REALDEVICE" "$REALDEVICE"
+fi
+
+# Setup additional static IPv6 routes on specified interface, if given
+if [ -f /etc/sysconfig/static-routes-ipv6 ]; then
+	LC_ALL=C grep -w "^$LOGDEVICE" /etc/sysconfig/static-routes-ipv6 | while read device args; do
+		ipv6_add_route $args $REALDEVICE
+	done
+fi
+
+# Setup additional static IPv6 routes (newer config style)
+if [ -f "/etc/sysconfig/network-scripts/route6-$DEVICE" ]; then
+	sed -ne 's/#.*//' -e '/[^[:space:]]/p' "/etc/sysconfig/network-scripts/route6-$DEVICE" | while read line; do
+		/sbin/ip -6 route add $line
+	done
+fi
+
+if [ "$IPV6_CONTROL_RADVD" = "yes" ]; then						
+	# Control running radvd								
+	ipv6_trigger_radvd up "$IPV6_RADVD_TRIGGER_ACTION" $IPV6_RADVD_PIDFILE		
+fi											
+
+[ -x /etc/ppp/ipv6-up.local ] && /etc/ppp/ipv6-up.local "$@"
+
+exit 0

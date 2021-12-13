@@ -1,0 +1,13 @@
+diff --git a/gucharmap/gucharmap-type-builtins.c.template b/gucharmap/gucharmap-type-builtins.c.template
+index fb78d12..38e6f85 100644
+--- a/gucharmap/gucharmap-type-builtins.c.template
++++ b/gucharmap/gucharmap-type-builtins.c.template
+@@ -13,7 +13,7 @@
+ GType
+ @enum_name@_get_type (void)
+ {
+-  static volatile gsize g_define_type_id__volatile = 0;
++  static gsize g_define_type_id__volatile = 0;
+  
+   if (g_once_init_enter (&g_define_type_id__volatile)) {
+     static const G@Type@Value values[] = {

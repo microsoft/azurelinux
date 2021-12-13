@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="testng" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="build.properties"/>
+
+  <property name="project.groupId" value="org.testng"/>
+  <property name="project.artifactId" value="testng"/>
+  <property name="project.name" value="TestNG"/>
+  <property name="project.version" value="6.14.3"/>
+  <property name="project.description" value="TestNG is a testing framework."/>
+
+  <property name="compiler.source" value="1.7"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src/main/java"/>
+  <property name="build.resourceDir" value="src/main/resources"/>
+
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath">
+    <fileset dir="lib">
+      <!-- ant beust-jcommander bsh2/bsh google-guice jsr-305 junit snakeyaml -->
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}"
+           nowarn="false"
+           debug="true"
+           encoding="utf-8"
+           optimize="false"
+           deprecation="true"
+           target="${compiler.target}"
+           verbose="false"
+           fork="false"
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+      </src>
+      <classpath refid="build.classpath"/>
+    </javac>
+    <copy todir="${build.outputDir}">
+      <fileset dir="${build.resourceDir}"/>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir}"
+             packagenames="*"
+             destdir="${reporting.outputDirectory}/apidocs"
+             access="protected"
+             source="${compiler.source}"
+             verbose="false"
+             version="true"
+             use="true"
+             author="true"
+             splitindex="false"
+             nodeprecated="false"
+             nodeprecatedlist="false"
+             notree="false"
+             noindex="false"
+             nohelp="false"
+             nonavbar="false"
+             serialwarn="false"
+             encoding="utf-8"
+             linksource="false"
+             breakiterator="false">
+      <classpath refid="build.classpath"/>
+    </javadoc>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar"
+         compress="true"
+         index="false"
+         basedir="${build.outputDir}"
+         excludes="**/package.html">
+      <manifest>
+        <attribute name="Bundle-Description" value="${project.description}"/>
+        <attribute name="Bundle-License" value="http://apache.org/licenses/LICENSE-2.0"/>
+        <attribute name="Bundle-ManifestVersion" value="2"/>
+        <attribute name="Bundle-Name" value="${project.name}"/>
+        <attribute name="Bundle-SymbolicName" value="${project.groupId}"/>
+        <attribute name="Bundle-Version" value="${project.version}"/>
+        <attribute name="Export-Package" value="com.beust.testng;uses:=&quot;org.testng&quot;;version=&quot;${project.version}&quot;,org.testng;uses:=&quot;com.beust.jcommander,com.beust.jcommander.converters,com.google.inject,javax.xml.parsers,org.apache.tools.ant,org.apache.tools.ant.taskdefs,org.apache.tools.ant.types,org.testng.annotations,org.testng.internal,org.testng.internal.annotations,org.testng.internal.junit,org.testng.internal.thread.graph,org.testng.xml,org.xml.sax&quot;;version=&quot;${project.version}&quot;,org.testng.annotations;uses:=&quot;com.google.inject,org.testng,org.testng.internal.annotations&quot;;version=&quot;${project.version}&quot;,org.testng.asserts;version=&quot;${project.version}&quot;,org.testng.collections;version=&quot;${project.version}&quot;,org.testng.internal;uses:=&quot;com.google.inject,javax.annotation,org.testng,org.testng.annotations,org.testng.collections,org.testng.internal.annotations,org.testng.internal.thread,org.testng.internal.thread.graph,org.testng.junit,org.testng.reporters,org.testng.xml&quot;;version=&quot;${project.version}&quot;,org.testng.internal.annotations;uses:=&quot;org.testng,org.testng.annotations,org.testng.internal,org.testng.xml&quot;;version=&quot;${project.version}&quot;,org.testng.internal.collections;version=&quot;${project.version}&quot;,org.testng.internal.invokers;uses:=&quot;org.testng&quot;;version=&quot;${project.version}&quot;,org.testng.internal.junit;version=&quot;${project.version}&quot;,org.testng.internal.reflect;uses:=&quot;org.testng&quot;;version=&quot;${project.version}&quot;,org.testng.internal.thread;version=&quot;${project.version}&quot;,org.testng.internal.thread.graph;uses:=&quot;org.testng,org.testng.internal&quot;;version=&quot;${project.version}&quot;,org.testng.junit;uses:=&quot;junit.framework,org.junit.runner,org.testng,org.testng.internal,org.testng.internal.annotations,org.testng.xml&quot;;version=&quot;${project.version}&quot;,org.testng.log;version=&quot;${project.version}&quot;,org.testng.log4testng;version=&quot;${project.version}&quot;,org.testng.mustache;version=&quot;${project.version}&quot;,org.testng.reporters;uses:=&quot;javax.annotation,org.testng,org.testng.internal,org.testng.xml&quot;;version=&quot;${project.version}&quot;,org.testng.reporters.jq;uses:=&quot;org.testng,org.testng.reporters,org.testng.xml&quot;;version=&quot;${project.version}&quot;,org.testng.reporters.util;uses:=&quot;org.testng&quot;;version=&quot;${project.version}&quot;,org.testng.util;uses:=&quot;org.testng&quot;;version=&quot;${project.version}&quot;,org.testng.xml;uses:=&quot;org.testng,org.testng.reporters,org.testng.xml.dom,org.xml.sax,org.xml.sax.helpers&quot;;version=&quot;${project.version}&quot;,org.testng.xml.dom;uses:=&quot;javax.xml.parsers,javax.xml.xpath,org.testng,org.testng.internal.collections,org.testng.xml,org.w3c.dom,org.xml.sax&quot;;version=&quot;${project.version}&quot;,org.testng.xml.internal;uses:=&quot;org.testng.xml&quot;;version=&quot;${project.version}&quot;"/>
+        <attribute name="Import-Package" value="com.beust.jcommander;version=&quot;[1.7.0,3.0.0)&quot;,com.beust.jcommander.converters;version=&quot;[1.7.0,3.0.0)&quot;,bsh;version=&quot;[2.0.0,3.0.0)&quot;;resolution:=optional,com.google.inject;version=&quot;[1.2,1.3)&quot;;resolution:=optional,junit.framework;version=&quot;[3.8.1,5.0.0)&quot;;resolution:=optional,org.junit;resolution:=optional;version=&quot;[4.12,5)&quot;,org.junit.runner;resolution:=optional;version=&quot;[4.12,5)&quot;,org.junit.runner.manipulation;resolution:=optional;version=&quot;[4.12,5)&quot;,org.junit.runner.notification;resolution:=optional;version=&quot;[4.12,5)&quot;,org.apache.tools.ant;version=&quot;[1.7.0,2.0.0)&quot;;resolution:=optional,org.apache.tools.ant.taskdefs;version=&quot;[1.7.0,2.0.0)&quot;;resolution:=optional,org.apache.tools.ant.types;version=&quot;[1.7.0,2.0.0)&quot;;resolution:=optional,org.apache.tools.ant.types.resources;version=&quot;[1.7.0,2.0.0)&quot;;resolution:=optional,org.apache.tools.ant.types.selectors;version=&quot;[1.7.0,2.0.0)&quot;;resolution:=optional,org.yaml.snakeyaml;version=&quot;[1.6,2.0)&quot;;resolution:=optional,org.yaml.snakeyaml.constructor;version=&quot;[1.6,2.0)&quot;;resolution:=optional,org.yaml.snakeyaml.nodes;version=&quot;[1.6,2.0)&quot;;resolution:=optional,javax.annotation,javax.xml.parsers,javax.xml.xpath,org.w3c.dom,org.xml.sax,org.xml.sax.helpers"/>
+        <attribute name="JavaPackages-ArtifactId" value="${project.artifactId}"/>
+        <attribute name="JavaPackages-GroupId" value="${project.groupId}"/>
+        <attribute name="JavaPackages-Version" value="${project.version}"/>
+        <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

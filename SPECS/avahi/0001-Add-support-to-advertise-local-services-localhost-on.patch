@@ -1,0 +1,86 @@
+From 9283ba29b23dd6dc7faaf138188fd02ab38b30e8 Mon Sep 17 00:00:00 2001
+From: Till Kamppeter <till.kamppeter@gmail.com>
+Date: Fri, 15 Dec 2017 10:16:28 -0200
+Subject: [PATCH] Add support to advertise local services ("localhost") on the
+ local machine only
+
+This is the patch attached to Issue #125 (on Dec 6, 2017) and also
+shown in the readme.md of ippusbxd
+(https://github.com/OpenPrinting/ippusbxd).
+
+It makes also services on the loopback ("lo") interface being
+advertised and these records use "localhost" instead of the network
+host name of the machine as server host name. This way clients, like
+for example CUPS or cups-browsed will find these local services and be
+able to work with them as they were network services.
+---
+ avahi-core/iface-linux.c     | 4 ++--
+ avahi-core/iface-pfroute.c   | 8 ++++----
+ avahi-core/resolve-service.c | 3 ++-
+ 3 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/avahi-core/iface-linux.c b/avahi-core/iface-linux.c
+index c6c5f77..e116c7b 100644
+--- a/avahi-core/iface-linux.c
++++ b/avahi-core/iface-linux.c
+@@ -104,8 +104,8 @@ static void netlink_callback(AvahiNetlink *nl, struct nlmsghdr *n, void* userdat
+         hw->flags_ok =
+             (ifinfomsg->ifi_flags & IFF_UP) &&
+             (!m->server->config.use_iff_running || (ifinfomsg->ifi_flags & IFF_RUNNING)) &&
+-            !(ifinfomsg->ifi_flags & IFF_LOOPBACK) &&
+-            (ifinfomsg->ifi_flags & IFF_MULTICAST) &&
++            ((ifinfomsg->ifi_flags & IFF_LOOPBACK) ||
++             (ifinfomsg->ifi_flags & IFF_MULTICAST)) &&
+             (m->server->config.allow_point_to_point || !(ifinfomsg->ifi_flags & IFF_POINTOPOINT));
+ 
+         /* Handle interface attributes */
+diff --git a/avahi-core/iface-pfroute.c b/avahi-core/iface-pfroute.c
+index 9a2e953..27c3443 100644
+--- a/avahi-core/iface-pfroute.c
++++ b/avahi-core/iface-pfroute.c
+@@ -80,8 +80,8 @@ static void rtm_info(struct rt_msghdr *rtm, AvahiInterfaceMonitor *m)
+   hw->flags_ok =
+     (ifm->ifm_flags & IFF_UP) &&
+     (!m->server->config.use_iff_running || (ifm->ifm_flags & IFF_RUNNING)) &&
+-    !(ifm->ifm_flags & IFF_LOOPBACK) &&
+-    (ifm->ifm_flags & IFF_MULTICAST) &&
++    ((ifm->ifm_flags & IFF_LOOPBACK) ||
++     (ifm->ifm_flags & IFF_MULTICAST)) &&
+     (m->server->config.allow_point_to_point || !(ifm->ifm_flags & IFF_POINTOPOINT));
+ 
+   avahi_free(hw->name);
+@@ -427,8 +427,8 @@ static void if_add_interface(struct lifreq *lifreq, AvahiInterfaceMonitor *m, in
+         hw->flags_ok =
+             (flags & IFF_UP) &&
+             (!m->server->config.use_iff_running || (flags & IFF_RUNNING)) &&
+-            !(flags & IFF_LOOPBACK) &&
+-            (flags & IFF_MULTICAST) &&
++            ((flags & IFF_LOOPBACK) ||
++             (flags & IFF_MULTICAST)) &&
+             (m->server->config.allow_point_to_point || !(flags & IFF_POINTOPOINT));
+         hw->name = avahi_strdup(lifreq->lifr_name);
+         hw->mtu = mtu;
+diff --git a/avahi-core/resolve-service.c b/avahi-core/resolve-service.c
+index 3377a50..3311b6b 100644
+--- a/avahi-core/resolve-service.c
++++ b/avahi-core/resolve-service.c
+@@ -24,6 +24,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <net/if.h>
+ 
+ #include <avahi-common/domain.h>
+ #include <avahi-common/timeval.h>
+@@ -129,7 +130,7 @@ static void finish(AvahiSServiceResolver *r, AvahiResolverEvent event) {
+                 r->service_name,
+                 r->service_type,
+                 r->domain_name,
+-                r->srv_record->data.srv.name,
++                (r->interface == if_nametoindex("lo")) ? "localhost" : r->srv_record->data.srv.name,
+                 r->address_record ? &a : NULL,
+                 r->srv_record->data.srv.port,
+                 r->txt_record ? r->txt_record->data.txt.string_list : NULL,
+-- 
+2.17.2
+

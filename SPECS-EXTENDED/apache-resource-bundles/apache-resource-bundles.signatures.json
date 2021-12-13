@@ -1,0 +1,11 @@
+{
+ "Signatures": {
+  "apache-incubator-disclaimer-resource-bundle-1.1-sources.jar": "d30be21d86530961e1e0d84a3b56411997aa67607fce864327ae82a8302258cb",
+  "apache-incubator-disclaimer-resource-bundle-1.1.pom": "d408103eada1400f34253c7d4630cca00734eb006e7206e2a928ffd603292e74",
+  "apache-jar-resource-bundle-1.4-sources.jar": "adb7d1efac653be3d9e2f83896b27c7445bc592385632d3aa6aaa77987e1ffcf",
+  "apache-jar-resource-bundle-1.4.pom": "4be9d9971464ca35fd23cb2325a6a5805596c572ee06c824b54f26c97c05167a",
+  "apache-license-header-resource-bundle-1.1-sources.jar": "ec7e1424897ad4f8f4a8520f086c16e22657684ae24881235509ec4e57aa62a8",
+  "apache-license-header-resource-bundle-1.1.pom": "118ce2fc4f166b273d1a5f5c756f0db464c9a6eb7fedd4baba0a621b3ba0b5da",
+  "apache-resource-bundles-2.pom": "3b2fe045e96987b6a7f4dc44780a7b7676cc0f673947272d14c92c474eef3a34"
+ }
+}

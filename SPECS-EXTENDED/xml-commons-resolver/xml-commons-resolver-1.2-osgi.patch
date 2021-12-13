@@ -1,0 +1,19 @@
+diff -up xml-commons-resolver-1.2/src/manifest.resolver~ xml-commons-resolver-1.2/src/manifest.resolver
+--- xml-commons-resolver-1.2/src/manifest.resolver~	2006-11-20 22:23:06.000000000 +0200
++++ xml-commons-resolver-1.2/src/manifest.resolver	2011-10-19 01:38:13.954802303 +0300
+@@ -1,5 +1,15 @@
+ Manifest-Version: 1.0
+ Main-Class: org.apache.xml.resolver.apps.resolver
++Bundle-RequiredExecutionEnvironment: J2SE-1.2
++Bundle-SymbolicName: org.apache.xml.resolver
++Bundle-ManifestVersion: 2
++Bundle-Name: XML Commons Resolver
++Bundle-Localization: plugin
++Bundle-Version: 1.2.0.v200806030312
++Bundle-Vendor: Apache Software Foundation
++Export-Package: org.apache.env,org.apache.xml.resolver,org.apache.xml.
++ resolver.apps,org.apache.xml.resolver.etc,org.apache.xml.resolver.hel
++ pers,org.apache.xml.resolver.readers,org.apache.xml.resolver.tools
+ 
+ Name: org/apache/xml/resolver
+ Comment: xml-commons Resolver code

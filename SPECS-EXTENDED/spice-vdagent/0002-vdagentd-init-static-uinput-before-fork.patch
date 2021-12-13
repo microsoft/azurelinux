@@ -1,0 +1,44 @@
+From 7b0435ef66af088c1a1be20b6bc6b0fcb76e4e1a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jakub=20Jank=C5=AF?= <jjanku@redhat.com>
+Date: Fri, 20 Mar 2020 17:18:32 +0100
+Subject: [PATCH 2/2] vdagentd: init static uinput before fork
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Otherwise the caller doesn't know that the init failed
+because we're returning 0 in the parent and 1 in child.
+
+Signed-off-by: Jakub Janků <jjanku@redhat.com>
+Acked-by: Frediano Ziglio <fziglio@redhat.com>
+---
+ src/vdagentd/vdagentd.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/vdagentd/vdagentd.c b/src/vdagentd/vdagentd.c
+index 1b63ec8..753c9bf 100644
+--- a/src/vdagentd/vdagentd.c
++++ b/src/vdagentd/vdagentd.c
+@@ -1224,9 +1224,6 @@ int main(int argc, char *argv[])
+         }
+     }
+ 
+-    if (do_daemonize)
+-        daemonize();
+-
+ #ifdef WITH_STATIC_UINPUT
+     uinput = vdagentd_uinput_create(uinput_device, 1024, 768, NULL, 0,
+                                     debug > 1, uinput_fake);
+@@ -1236,6 +1233,9 @@ int main(int argc, char *argv[])
+     }
+ #endif
+ 
++    if (do_daemonize)
++        daemonize();
++
+     g_unix_signal_add(SIGINT, signal_handler, NULL);
+     g_unix_signal_add(SIGHUP, signal_handler, NULL);
+     g_unix_signal_add(SIGTERM, signal_handler, NULL);
+-- 
+2.25.1
+

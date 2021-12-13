@@ -1,0 +1,92 @@
+diff -up gnuplot-5.2.4/demo/circles.dem.nolena gnuplot-5.2.4/demo/circles.dem
+--- gnuplot-5.2.4/demo/circles.dem.nolena	2017-12-22 18:32:30.000000000 +0100
++++ gnuplot-5.2.4/demo/circles.dem	2018-08-08 10:14:21.308379527 +0200
+@@ -98,21 +98,6 @@ pause -1 "Hit return to continue"
+ 
+ reset
+ set size ratio -1
+-set title "Lena's key points"
+-unset xtics
+-unset ytics
+-unset key
+-unset border
+-set yrange [] reverse
+-
+-plot 'lena.rgb' binary array=(128,128) dx=4 dy=4 format='%uchar' with rgbimage, \
+-     'lena-keypoints.bin' binary format='%double' with circles lc rgb "yellow"
+-
+-pause -1 "Hit return to continue"
+-
+-
+-reset
+-set size ratio -1
+ set title "Delaunay triangulation of Hemisphere points, some empty circles in red"
+ unset key
+ 
+diff -up gnuplot-5.2.4/demo/Makefile.am.nolena gnuplot-5.2.4/demo/Makefile.am
+--- gnuplot-5.2.4/demo/Makefile.am.nolena	2017-12-23 07:29:12.000000000 +0100
++++ gnuplot-5.2.4/demo/Makefile.am	2018-08-08 10:18:08.787797877 +0200
+@@ -68,7 +68,7 @@ epslatex:
+ 	dvips epslatex
+ 
+ ##m4-files-begin
+-EXTRA_DIST = Makefile.am.in lena-keypoints.bin scatter2.bin sine.bin \
++EXTRA_DIST = Makefile.am.in scatter2.bin sine.bin \
+ using.bin gnuplot.cfg world.cor 1.dat 2.dat 3.dat arrowstyle.dat \
+ asciimat.dat battery.dat big_peak.dat candlesticks.dat cities.dat \
+ clip14in.dat ctg-y2.dat delaunay-edges.dat ellipses.dat empty-circles.dat \
+@@ -107,7 +107,7 @@ textrotate.dem tics.dem timedat.dem tran
+ ttics.dem using.dem utf8.dem varcolor.dem vector.dem violinplot.dem \
+ volatile.dem world2.dem world.dem zerror.dem demo.edf density.fnc \
+ hexa.fnc line.fnc reflect.fnc gen-random.inc stat.inc GM1_sugar.pdb \
+-bldg.png GM1_bonds.r3d blutux.rgb lena.rgb sound.par sound2.par start.par \
++bldg.png GM1_bonds.r3d blutux.rgb sound.par sound2.par start.par \
+ gnuplot.rot gnu-valley random-points gpdemos.tcl html 
+ ##m4-files-end
+ 
+diff -up gnuplot-5.2.4/demo/Makefile.in.nolena gnuplot-5.2.4/demo/Makefile.in
+--- gnuplot-5.2.4/demo/Makefile.in.nolena	2018-06-01 03:51:13.000000000 +0200
++++ gnuplot-5.2.4/demo/Makefile.in	2018-08-08 10:18:14.455683660 +0200
+@@ -330,7 +330,7 @@ SUBDIRS = $(PLUGIN_DIR)
+ DIST_SUBDIRS = plugin
+ DEMO = all.dem
+ GNUPLOT = gnuplot
+-EXTRA_DIST = Makefile.am.in lena-keypoints.bin scatter2.bin sine.bin \
++EXTRA_DIST = Makefile.am.in scatter2.bin sine.bin \
+ using.bin gnuplot.cfg world.cor 1.dat 2.dat 3.dat arrowstyle.dat \
+ asciimat.dat battery.dat big_peak.dat candlesticks.dat cities.dat \
+ clip14in.dat ctg-y2.dat delaunay-edges.dat ellipses.dat empty-circles.dat \
+@@ -369,7 +369,7 @@ textrotate.dem tics.dem timedat.dem tran
+ ttics.dem using.dem utf8.dem varcolor.dem vector.dem violinplot.dem \
+ volatile.dem world2.dem world.dem zerror.dem demo.edf density.fnc \
+ hexa.fnc line.fnc reflect.fnc gen-random.inc stat.inc GM1_sugar.pdb \
+-bldg.png GM1_bonds.r3d blutux.rgb lena.rgb sound.par sound2.par start.par \
++bldg.png GM1_bonds.r3d blutux.rgb sound.par sound2.par start.par \
+ gnuplot.rot gnu-valley random-points gpdemos.tcl html 
+ 
+ @BUILD_PLUGIN_TRUE@PLUGIN_DIR = plugin
+diff -up gnuplot-5.2.4/demo/rgbalpha.dem.nolena gnuplot-5.2.4/demo/rgbalpha.dem
+--- gnuplot-5.2.4/demo/rgbalpha.dem.nolena	2017-12-22 18:32:30.000000000 +0100
++++ gnuplot-5.2.4/demo/rgbalpha.dem	2018-08-08 10:14:21.309379507 +0200
+@@ -18,8 +18,8 @@ set yrange [ 0. : 128. ]
+ # Alpha =  linear gradient on x
+ 
+ plot 100.*(.4+sin(x/5.)/(x/5.)) lw 5 title 'solid line', \
+-     'lena.rgb' binary array=(128,128) format="%uchar" flipy using 1:2:3:(2.*column(0)) \
+-                with rgbalpha title "Lena with linear\nalpha gradient"
++     'blutux.rgb' binary array=(128,128) format="%uchar" flipy using 1:2:3:(2.*column(0)) \
++                with rgbalpha title "Tux with linear\nalpha gradient"
+ 
+ pause -1 "Hit return to continue"
+ 
+@@ -28,8 +28,8 @@ pause -1 "Hit return to continue"
+ focus(x,y) = ((column(0)-x)**2 + (column(-1)-(127-y))**2) > 400 ? 0 : 255
+ 
+ plot 100.*(.4+sin(x/5.)/(x/5.)) lw 5 title 'solid line', \
+-     'lena.rgb' binary array=(128,128) format="%uchar" flipy using 1:2:3:(focus(70,50)) \
+-                with rgbalpha title "Lena with circular mask"
++     'blutux.rgb' binary array=(128,128) format="%uchar" flipy using 1:2:3:(focus(70,50)) \
++                with rgbalpha title "Tux with circular mask"
+ 
+ pause -1 "Hit return to continue"
+ reset

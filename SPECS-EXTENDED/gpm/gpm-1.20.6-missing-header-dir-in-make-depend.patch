@@ -1,0 +1,12 @@
+diff -Naur gpm-1.20.6.orig/src/Makefile.in gpm-1.20.6/src/Makefile.in
+--- gpm-1.20.6.orig/src/Makefile.in	2009-02-09 10:58:53.000000000 +0100
++++ gpm-1.20.6/src/Makefile.in	2013-03-19 14:33:58.092659991 +0100
+@@ -96,7 +96,7 @@
+ 
+ 	# create dependencies
+ 	for DEPS in `echo *.c */*.c`; do \
+-	$(CC) -I. -I $(srcdir) -M @CPPFLAGS@ $(CPPFLAGS) $$DEPS | \
++	$(CC) -I. -Iheaders -I $(srcdir) -M @CPPFLAGS@ $(CPPFLAGS) $$DEPS | \
+ 	$(SED) 's/^\(.*\)\.o\([ :]+\)/\1.o \1.lo\2/g' >> $(DEPFILE) ; done
+ 
+ ### INSTALL

@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>10</version>
+  </parent>
+
+  <groupId>org.apache.taglibs</groupId>
+  <artifactId>taglibs-parent</artifactId>
+  <version>3</version>
+  <name>Apache Taglibs Parent</name>
+  <packaging>pom</packaging>
+
+  <inceptionYear>2000</inceptionYear>
+
+  <url>http://tomcat.apache.org/taglibs/</url>
+
+  <properties>
+    <!-- Default configuration for compiler source and target JVM -->
+    <maven.compiler.source>1.5</maven.compiler.source>
+    <maven.compiler.target>1.5</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
+  <ciManagement>
+    <system>jenkins</system>
+    <url>https://builds.apache.org/view/S-Z/view/Tomcat/job/Taglibs-All/</url>
+  </ciManagement>
+
+  <issueManagement>
+    <system>bugzilla</system>
+    <url>http://issues.apache.org/bugzilla/</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/tomcat/taglibs/taglibs-parent/tags/taglibs-parent-3</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/tomcat/taglibs/taglibs-parent/tags/taglibs-parent-3</developerConnection>
+    <url>http://svn.apache.org/viewvc/tomcat/taglibs/taglibs-parent/tags/taglibs-parent-3</url>
+  </scm>
+
+  <mailingLists>
+    <mailingList>
+      <name>Taglibs User List</name>
+      <subscribe>taglibs-user-subscribe@tomcat.apache.org</subscribe>
+      <unsubscribe>taglibs-user-unsubscribe@tomcat.apache.org</unsubscribe>
+      <post>taglibs-user@tomcat.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/tomcat-taglibs-user/</archive>
+      <otherArchives>
+        <otherArchive>http://www.mail-archive.com/taglibs-user@tomcat.apache.org/</otherArchive>
+      </otherArchives>
+    </mailingList>
+      <mailingList>
+          <name>Tomcat Dev List</name>
+          <subscribe>dev-subscribe@tomcat.apache.org</subscribe>
+          <unsubscribe>dev-unsubscribe@tomcat.apache.org</unsubscribe>
+          <post>dev@tomcat.apache.org</post>
+          <archive>http://mail-archives.apache.org/mod_mbox/tomcat-dev/</archive>
+          <otherArchives>
+              <otherArchive>http://markmail.org/list/org.apache.tomcat.dev/</otherArchive>
+              <otherArchive>http://www.nabble.com/Tomcat---Dev-f341.html</otherArchive>
+              <otherArchive>http://www.mail-archive.com/dev@tomcat.apache.org/</otherArchive>
+              <otherArchive>http://news.gmane.org/gmane.comp.tomcat.devel</otherArchive>
+          </otherArchives>
+      </mailingList>
+    <mailingList>
+      <name>Old Taglibs User Archive</name>
+      <archive>http://mail-archives.apache.org/mod_mbox/jakarta-taglibs-user/</archive>
+      <otherArchives>
+        <otherArchive>http://markmail.org/list/org.apache.jakarta.taglibs-user/</otherArchive>
+        <otherArchive>http://www.nabble.com/Taglibs---User-f338.html</otherArchive>
+        <otherArchive>http://www.mail-archive.com/taglibs-user@jakarta.apache.org/</otherArchive>
+        <otherArchive>http://news.gmane.org/gmane.comp.jakarta.taglibs.user</otherArchive>
+      </otherArchives>
+    </mailingList>
+    <mailingList>
+      <name>Old Taglibs Dev Archive</name>
+      <archive>http://mail-archives.apache.org/mod_mbox/jakarta-taglibs-dev/</archive>
+      <otherArchives>
+        <otherArchive>http://markmail.org/list/org.apache.jakarta.taglibs-dev/</otherArchive>
+        <otherArchive>http://www.nabble.com/Taglibs---Dev-f339.html</otherArchive>
+        <otherArchive>http://www.mail-archive.com/dev@jakarta.apache.org/</otherArchive>
+        <otherArchive>http://news.gmane.org/gmane.comp.jakarta.taglibs.devel</otherArchive>
+      </otherArchives>
+    </mailingList>
+  </mailingLists>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3.2</version>
+          <configuration>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+            <encoding>${project.build.sourceEncoding}</encoding>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.12</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Implementation-Title>${project.name}</Implementation-Title>
+            <Implementation-Version>${project.version}</Implementation-Version>
+            <Bundle-DocURL>${project.url}</Bundle-DocURL>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+          <quiet>true</quiet>
+          <links>
+            <link>http://download.oracle.com/javase/1.5.0/docs/api</link>
+          </links>          
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-changes-plugin</artifactId>
+        <version>2.3</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>changes-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.2</version>
+      </plugin>      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.4</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.12</version>
+      </plugin>          
+    </plugins>
+  </reporting>
+</project>

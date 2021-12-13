@@ -1,0 +1,6 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>regexp</groupId>
+  <artifactId>regexp</artifactId>
+  <version>1.5</version>
+</project>

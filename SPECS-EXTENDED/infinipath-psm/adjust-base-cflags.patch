@@ -1,0 +1,12 @@
+diff --git a/buildflags.mak b/buildflags.mak.old
+index 34fdf1c..2c229cb 100644
+--- a/buildflags.mak
++++ b/buildflags.mak.old
+@@ -94,5 +94,6 @@ ifeq (1,${PSM_USE_SYS_UUID})
+ endif
+ 
+ CFLAGS += $(BASECFLAGS) $(if $(filter $(CC),gcc),-Wno-strict-aliasing) \
+-	$(if $(PSM_VALGRIND:0=),-DPSM_VALGRIND,-DNVALGRIND)
++	$(if $(PSM_VALGRIND:0=),-DPSM_VALGRIND,-DNVALGRIND) \
++	-Wno-maybe-uninitialized -Wno-implicit-function-declaration
+ 

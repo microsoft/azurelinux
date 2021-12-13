@@ -1,0 +1,13 @@
+--- jsch-0.1.54/build.xml	2016-08-30 09:06:39.000000000 +0200
++++ jsch-0.1.54/build.xml	2017-09-08 10:27:56.694518991 +0200
+@@ -35,8 +35,8 @@
+     </available>
+     <javac srcdir="${src}"
+            destdir="${build}"
+-           target="1.4"
+-           source="1.4"
++           target="1.6"
++           source="1.6"
+            debug="${javac.debug}">
+       <classpath refid="lib.path.ref"/>
+       <exclude name="com/jcraft/jsch/jcraft/Compression.java"

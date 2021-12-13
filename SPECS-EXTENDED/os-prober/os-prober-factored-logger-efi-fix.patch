@@ -1,0 +1,16 @@
+Index: os-prober/os-probes/mounted/x86/05efi
+===================================================================
+--- os-prober.orig/os-probes/mounted/x86/05efi
++++ os-prober/os-probes/mounted/x86/05efi
+@@ -59,7 +59,11 @@ ret=1
+ for test in /usr/lib/os-probes/mounted/efi/*; do
+ 	debug "running subtest $test"
+ 	if [ -f "$test" ] && [ -x "$test" ]; then
++		# we need results of subtest in stdout
++		orig_fd_res=$fd_result
++		export fd_result=1
+ 		entry=$("$test" "$mpoint/$efi")
++		export fd_result=$orig_fd_res
+ 		if [ -n "$entry" ]; then
+ 			debug "bootloader $entry found by subtest $test"
+ 			ret=0

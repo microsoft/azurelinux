@@ -1,0 +1,61 @@
+--- a/contrib/init.d/pbs_mom.in	2015-03-19 20:24:58.000000000 -0700
++++ b/contrib/init.d/pbs_mom.in	2016-02-20 18:46:26.058196405 -0800
+@@ -13,11 +13,21 @@
+ SBIN_PATH=@sbindir@
+ PBS_DAEMON="$SBIN_PATH/pbs_mom"
+ PBS_HOME=@PBS_HOME@
++# this should be the integer port value
++PBS_PORT=""
+ 
+ if [ -f /etc/sysconfig/pbs_mom ];then
+     . /etc/sysconfig/pbs_mom
+ fi
+ 
++if [ -z "$PBS_PORT" ]; then
++   momctl_port_arg=""
++   pbs_mom_port_arg=""
++else
++   momctl_port_arg="$PBS_PORT"
++   pbs_mom_port_arg="-M $PBS_PORT"
++fi
++
+ if [ -z "$previous" ];then
+    # being run manually, don't disturb jobs
+    args="$args -p"
+@@ -41,7 +51,7 @@
+    fi
+    retval=1
+    while kill -0 $pid 2>/dev/null;do
+-      $SBIN_PATH/momctl -s
++      $SBIN_PATH/momctl -s $momctl_port_arg
+       retval=$?
+       sleep 1
+    done
+@@ -58,7 +68,7 @@
+ 		[ $RET -eq 0 ] && echo -n "pbs_mom already running" && success && echo && exit 0
+ 
+                 # ulimit -c unlimited  # Uncomment this to preserve core files
+-		daemon $PBS_DAEMON $args -d $PBS_HOME
++		daemon $PBS_DAEMON $args $pbs_mom_port_arg -d $PBS_HOME
+ 		RET=$?
+ 		touch /var/lock/subsys/pbs_mom
+    		echo
+--- a/contrib/init.d/pbs_sched.in	2016-02-20 18:48:08.593799420 -0800
++++ b/contrib/init.d/pbs_sched.in	2016-02-20 18:48:54.455727300 -0800
+@@ -11,6 +11,7 @@
+ PBS_DAEMON=@sbindir@/pbs_sched
+ PBS_HOME=@PBS_HOME@
+ export PBS_DAEMON PBS_HOME
++PBS_ARGS=""
+ 
+ if [ -f /etc/sysconfig/pbs_sched ];then
+    . /etc/sysconfig/pbs_sched
+@@ -24,7 +25,7 @@
+ 		RET=$?
+ 		[ $RET -eq 0 ] && echo -n "pbs_sched already running" && success && echo && exit 0
+ 
+-		daemon $PBS_DAEMON -d $PBS_HOME
++		daemon $PBS_DAEMON -d $PBS_HOME $PBS_ARGS
+ 		RET=$?
+ 		[ $RET -eq 0 ] && touch /var/lock/subsys/pbs_sched
+ 		echo

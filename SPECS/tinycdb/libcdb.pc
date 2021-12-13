@@ -1,0 +1,12 @@
+# Package Information for pkg-config
+
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libcdb
+Description: tinycdb - Constant Data Base library
+Version: 0.78
+Libs: -L${libdir} -lcdb
+Cflags: -I${includedir}

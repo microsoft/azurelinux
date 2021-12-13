@@ -1,0 +1,31 @@
+From c0a0dbfa58bf13cbd2a637288bf93619a7007673 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 26 Jan 2015 12:33:19 +0100
+Subject: [PATCH] oggenc: do not use stack variable out of its scope of
+ validity
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Reported-by: Thomas Köller
+Bug: https://bugzilla.redhat.com/1185558
+---
+ oggenc/oggenc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/oggenc/oggenc.c b/oggenc/oggenc.c
+index ea105b2..759a3ee 100644
+--- a/oggenc/oggenc.c
++++ b/oggenc/oggenc.c
+@@ -239,7 +239,7 @@ int main(int argc, char **argv)
+ 
+         if(opt.rawmode)
+         {
+-            input_format raw_format = {NULL, 0, raw_open, wav_close, "raw", 
++            static input_format raw_format = {NULL, 0, raw_open, wav_close, "raw",
+                 N_("RAW file reader")};
+ 
+             enc_opts.rate=opt.raw_samplerate;
+-- 
+2.1.0
+

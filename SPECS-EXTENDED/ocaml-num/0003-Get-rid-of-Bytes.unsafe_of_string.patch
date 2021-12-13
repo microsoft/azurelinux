@@ -1,0 +1,48 @@
+From 2def7803f0536aa961d3fb6e59dbfb1139cc3b42 Mon Sep 17 00:00:00 2001
+From: Hugo Heuzard <hugo.heuzard@gmail.com>
+Date: Sat, 23 Nov 2019 18:11:45 +0800
+Subject: [PATCH 3/5] Get rid of Bytes.unsafe_of_string
+
+---
+ src/big_int.ml | 2 +-
+ src/ratio.ml   | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/big_int.ml b/src/big_int.ml
+index 45cea9c..779e0ba 100644
+--- a/src/big_int.ml
++++ b/src/big_int.ml
+@@ -674,7 +674,7 @@ let approx_big_int prec bi =
+                                       (big_int_of_string "963295986"))
+                         (big_int_of_string "100000000")))) in
+   let s =
+-    Bytes.unsafe_of_string
++    Bytes.of_string
+       (string_of_big_int (div_big_int bi (power_int_positive_int 10 n)))
+   in
+   let (sign, off) =
+diff --git a/src/ratio.ml b/src/ratio.ml
+index 491cb96..5943383 100644
+--- a/src/ratio.ml
++++ b/src/ratio.ml
+@@ -438,7 +438,7 @@ let approx_ratio_fix n r =
+                    (base_power_big_int
+                        10 (succ n) (abs_big_int r.numerator))
+                    r.denominator)) in
+-       let s1 = Bytes.unsafe_of_string s1 in
++       let s1 = Bytes.of_string s1 in
+        (* Round up and add 1 in front if needed *)
+        let s2 =
+          if round_futur_last_digit s1 0 (Bytes.length s1)
+@@ -508,7 +508,7 @@ let approx_ratio_exp n r =
+                                 10 k (abs_big_int r.numerator))
+                                r.denominator) in
+        string_of_nat nat) in
+-     let s = Bytes.unsafe_of_string s in
++     let s = Bytes.of_string s in
+      if round_futur_last_digit s 0 (Bytes.length s)
+       then
+        let m = num_decimal_digits_int (succ msd) in
+-- 
+2.24.1
+

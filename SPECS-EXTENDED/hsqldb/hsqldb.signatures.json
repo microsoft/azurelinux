@@ -1,0 +1,14 @@
+{
+ "Signatures": {
+  "hsqldb-1.8.0-standard-server.properties": "ab8b0018c85fbd26f7013b9d265333d17d274f62f02eeb468f780392c3f2a0af",
+  "hsqldb-1.8.0-standard-sqltool.rc": "c4e39ebc0a9cca035669c2f955296443575656440f9e904b3525e9ed9e0da8aa",
+  "hsqldb-1.8.0-standard-webserver.properties": "c7a7f3d6497f108e0ec1773de7a4b60ebf31e77730b5797ed12ad02ba33586ae",
+  "hsqldb-1.8.0-standard.cfg": "1c5367ce0faedea1604416223a9939d76847f4622f112fbcb16fd9280fa0d126",
+  "hsqldb-2.4.1.pom": "b0dc90e98edbdccafced91434f73359a81db188d73443f4727521b40f0cc4ef3",
+  "hsqldb-2.4.1.zip": "467ff38b073d1d05c78aa992c8bcd57d80740e6a9c449a08b745aa5f06a09bfc",
+  "hsqldb-post": "96f448645bff3a9811e8f7a04f403bd74c529cbc9bab66f6334d068b50ec3b1b",
+  "hsqldb-stop": "059fc2bcc887db6bf31ef741ace04ed74d2437898100cb5896485595fbf39691",
+  "hsqldb-wrapper": "f87359e0c3afc9dfdc8555e10f794d901816cf5c088203c5330fe37e8e6b0bdc",
+  "hsqldb.systemd": "d6c895f1501485a3aaf09e86d44844d61b3d86e165ba2b0b6506d8b538461f09"
+ }
+}

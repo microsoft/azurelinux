@@ -1,0 +1,89 @@
+diff -up rp-pppoe-3.12/man/pppoe.conf.5.config rp-pppoe-3.12/man/pppoe.conf.5
+--- rp-pppoe-3.12/man/pppoe.conf.5.config	2015-11-11 16:10:02.000000000 +0100
++++ rp-pppoe-3.12/man/pppoe.conf.5	2015-11-16 16:40:18.061006832 +0100
+@@ -2,16 +2,16 @@
+ .TH PPPOE.CONF 5 "21 February 2000"
+ .UC 4
+ .SH NAME
+-pppoe.conf \- Configuration file used by \fBpppoe-start\fR(8),
++ifcfg-ppp0 \- Configuration file used by \fBpppoe-start\fR(8),
+ \fBpppoe-stop\fR(8), \fBpppoe-status(8)\fR and \fBpppoe-connect\fR(8).
+ 
+ .SH DESCRIPTION
+-\fB/etc/ppp/pppoe.conf\fR is a shell script which contains configuration
++\fB/etc/sysconfig/network-scripts/ifcfg-ppp0\fR is a shell script which contains configuration
+ information for Roaring Penguin's PPPoE scripts.  Note that \fBpppoe.conf\fR
+ is used only by the various pppoe-* shell scripts, not by \fBpppoe\fR
+ itself.
+ 
+-\fBpppoe.conf\fR consists of a sequence of shell variable assignments.
++\fBifcfg-ppp0\fR consists of a sequence of shell variable assignments.
+ The variables and their meanings are:
+ 
+ .TP
+@@ -54,11 +54,10 @@ from /etc/resolv.conf to /etc/ppp/resolv
+ IP addresses of DNS servers if you use DNSTYPE=SPECIFY.
+ 
+ .TP
+-.B NONROOT
+-If the line \fBNONROOT=OK\fR (exactly like that; no whitespace or comments)
+-appears in the configuration file, then \fBpppoe-wrapper\fR will allow
+-non-root users to bring the conneciton up or down.  The wrapper is installed
+-only if you installed the rp-pppoe-gui package.
++.B USERCTL
++If the line \fBUSERCTL=yes\fR (exactly like that; no whitespace or comments)
++appears in the configuration file, then \fB/sbin/ifup\fR will allow
++non-root users to bring the conneciton up or down.
+ 
+ .TP
+ .B USEPEERDNS
+diff -up rp-pppoe-3.12/man/pppoe-connect.8.config rp-pppoe-3.12/man/pppoe-connect.8
+--- rp-pppoe-3.12/man/pppoe-connect.8.config	2015-11-11 16:10:01.000000000 +0100
++++ rp-pppoe-3.12/man/pppoe-connect.8	2015-11-16 16:40:18.061006832 +0100
+@@ -13,7 +13,8 @@ pppoe-connect \- Shell script to manage
+ .SH DESCRIPTION
+ \fBpppoe-connect\fR is a shell script which manages a PPPoE connection
+ using the Roaring Penguin user-space PPPoE client.  If you omit
+-\fIconfig_file\fR, the default file \fB/etc/ppp/pppoe.conf\fR is used.
++\fIconfig_file\fR, the default file
++\fB/etc/sysconfig/network-scripts/ifcfg-ppp0\fR is used.
+ If you supply \fIinterface\fR and \fIuser\fR, then they override the
+ Ethernet interface and user-name settings in the configuration file.
+ .P
+diff -up rp-pppoe-3.12/man/pppoe-setup.8.config rp-pppoe-3.12/man/pppoe-setup.8
+--- rp-pppoe-3.12/man/pppoe-setup.8.config	2015-11-16 16:40:18.061006832 +0100
++++ rp-pppoe-3.12/man/pppoe-setup.8	2015-11-16 16:42:49.148104863 +0100
+@@ -8,7 +8,7 @@ pppoe-setup \- Shell script to configure
+ 
+ .SH DESCRIPTION
+ \fBpppoe-setup\fR is a shell script which prompts you for various pieces
+-of information and sets up an /etc/ppp/pppoe.conf configuration script
++of information and sets up an /etc/sysconfig/network-scripts/ifcfg-ppp0 configuration script
+ for the \fBpppoe-start\fR, \fBpppoe-stop\fR and \fBpppoe-connect\fR scripts.
+ 
+ .SH AUTHOR
+diff -up rp-pppoe-3.12/man/pppoe-start.8.config rp-pppoe-3.12/man/pppoe-start.8
+--- rp-pppoe-3.12/man/pppoe-start.8.config	2015-11-11 16:10:01.000000000 +0100
++++ rp-pppoe-3.12/man/pppoe-start.8	2015-11-16 16:40:18.061006832 +0100
+@@ -11,7 +11,7 @@ pppoe-start \- Shell script to bring up
+ .SH DESCRIPTION
+ \fBpppoe-start\fR is a shell script which starts the Roaring Penguin
+ user-space PPPoE client.  If you omit \fIconfig_file\fR, the default
+-file \fB/etc/ppp/pppoe.conf\fR is used.  If you supply
++file \fB/etc/sysconfig/network-scripts/ifcfg-ppp0\fR is used.  If you supply
+ \fIinterface\fR and \fIuser\fR, then they override the Ethernet interface
+ and user-name settings in the configuration file.
+ 
+diff -up rp-pppoe-3.12/man/pppoe-status.8.config rp-pppoe-3.12/man/pppoe-status.8
+diff -up rp-pppoe-3.12/man/pppoe-stop.8.config rp-pppoe-3.12/man/pppoe-stop.8
+--- rp-pppoe-3.12/man/pppoe-stop.8.config	2015-11-16 16:40:18.061006832 +0100
++++ rp-pppoe-3.12/man/pppoe-stop.8	2015-11-16 16:43:23.050902476 +0100
+@@ -9,7 +9,7 @@ pppoe-stop \- Shell script to shut down
+ .SH DESCRIPTION
+ \fBpppoe-stop\fR is a shell script which stops the Roaring Penguin
+ user-space PPPoE client.  If you omit \fIconfig_file\fR, the default
+-file \fB/etc/ppp/pppoe.conf\fR is used.
++file \fB/etc/sysconfig/network-scripts/ifcfg-ppp0\fR is used.
+ 
+ .SH AUTHOR
+ \fBpppoe-stop\fR was written by Dianne Skoll <dfs@roaringpenguin.com>.

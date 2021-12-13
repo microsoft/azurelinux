@@ -1,0 +1,14 @@
+Index: src/gd_errors.h
+===================================================================
+--- src/gd_errors.h.orig	2013-06-25 11:58:23.000000000 +0200
++++ src/gd_errors.h	2013-12-18 11:47:26.605907096 +0100
+@@ -40,7 +40,7 @@
+ #define GD_INFO LOG_INFO
+ #define GD_DEBUG LOG_DEBUG
+ 
+-void gd_error(const char *format, ...);
+-void gd_error_ex(int priority, const char *format, ...);
++void gd_error(const char *format, ...) __attribute__((format(printf, 1, 2)));
++void gd_error_ex(int priority, const char *format, ...) __attribute__((format(printf, 2, 3)));
+ 
+ #endif

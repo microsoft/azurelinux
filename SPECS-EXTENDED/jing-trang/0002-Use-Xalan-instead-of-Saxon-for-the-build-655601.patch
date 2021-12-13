@@ -1,0 +1,154 @@
+From c8a7800f6424beb64f4487e8c450875846e0d16a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ville=20Skytt=C3=A4?= <ville.skytta@iki.fi>
+Date: Mon, 9 Jun 2014 09:57:38 +0300
+Subject: [PATCH 2/2] Use Xalan instead of Saxon for the build (#655601)
+
+---
+ build.xml                         | 10 +++++-----
+ build.xsl                         |  4 ++--
+ mod/schematron/mod.xml            |  4 ++--
+ mod/xsd-datatype/test/xsdtest.xml |  2 ++
+ test/saxon.xsl                    | 14 +++++++-------
+ 5 files changed, 18 insertions(+), 16 deletions(-)
+
+diff --git a/build.xml b/build.xml
+index ee0f061..574c75f 100644
+--- a/build.xml
++++ b/build.xml
+@@ -40,7 +40,7 @@
+ 
+ <target name="modbuild" depends="modules,check-modbuild" unless="modbuild-ok">
+   <xslt style="build.xsl" in="modules.xml" out="modbuild.xml" force="true">
+-    <factory name="com.icl.saxon.TransformerFactoryImpl"/>
++    <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+   </xslt>
+ </target>
+ 
+@@ -74,7 +74,7 @@
+ 	includes="${moddir}/*/${modfile}"
+ 	filedirparameter="name"
+ 	destdir=".">
+-    <factory name="com.icl.saxon.TransformerFactoryImpl"/>
++    <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+     <regexpmapper from="mod/([-a-zA-Z0-9_]*)/mod.xml"
+ 		  to="mod/\1/\1.iml"
+ 		  handledirsep="true"/>
+@@ -180,15 +180,15 @@
+ <target name="jing-doc" depends="version">
+   <xslt basedir="doc" destdir="${build.dir}" includes="derivative.xml"
+         style="doc/derivative.xsl">
+-    <factory name="com.icl.saxon.TransformerFactoryImpl"/>
++    <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+   </xslt>
+   <xslt basedir="doc" destdir="${build.dir}" includes="design.xml"
+         style="doc/design.xsl">
+-    <factory name="com.icl.saxon.TransformerFactoryImpl"/>
++    <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+   </xslt>
+   <xslt basedir="doc" destdir="${build.dir}" includes="nrl.xml"
+         style="doc/nrl.xsl">
+-    <factory name="com.icl.saxon.TransformerFactoryImpl"/>
++    <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+   </xslt>
+   <copy todir="${build.dir}">
+     <fileset dir="doc" includes="*.html"/>
+diff --git a/build.xsl b/build.xsl
+index e084fca..b29694f 100644
+--- a/build.xsl
++++ b/build.xsl
+@@ -330,7 +330,7 @@
+       <xslt style="{$srctestdir}/{@transform}"
+ 	    in="{$srctest}"
+ 	    out="{$runtestdir}/{@name}test.xml">
+-	<factory name="com.icl.saxon.TransformerFactoryImpl"/>
++	<factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+       </xslt>
+       <!-- XXX Could validate intermediate result against a schema -->
+     </xsl:if>
+@@ -346,7 +346,7 @@
+ 	  </xsl:otherwise>
+ 	</xsl:choose>
+       </xsl:attribute>
+-      <factory name="com.icl.saxon.TransformerFactoryImpl"/>
++      <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+       <param name="dir" expression="{$runtestdir}"/>
+     </xslt>
+   </target>
+diff --git a/mod/schematron/mod.xml b/mod/schematron/mod.xml
+index 3786625..3e1d5b9 100644
+--- a/mod/schematron/mod.xml
++++ b/mod/schematron/mod.xml
+@@ -23,12 +23,12 @@
+       <xslt style="mod/schematron/lib/xsltc-fixup.xsl"
+ 	    in="mod/schematron/src/main/${mod.schematron.respackage}/schematron.xsl"
+ 	    out="${mod.schematron.resdir}/schematron-xsltc.xsl">
+-	      <factory name="com.icl.saxon.TransformerFactoryImpl"/>
++	      <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+       </xslt>
+       <xslt style="mod/schematron/lib/xsltc-fixup.xsl"
+       in="mod/schematron/src/main/${mod.schematron.respackage}/iso-schematron.xsl"
+       out="${mod.schematron.resdir}/iso-schematron-xsltc.xsl">
+-        <factory name="com.icl.saxon.TransformerFactoryImpl"/>
++        <factory name="org.apache.xalan.processor.TransformerFactoryImpl"/>
+       </xslt>
+     </target>
+   </ant>
+diff --git a/mod/xsd-datatype/test/xsdtest.xml b/mod/xsd-datatype/test/xsdtest.xml
+index 5bbba48..fc0221b 100644
+--- a/mod/xsd-datatype/test/xsdtest.xml
++++ b/mod/xsd-datatype/test/xsdtest.xml
+@@ -739,7 +739,9 @@ B EEF </value>
+ <length value="0"></length>
+ <length value="1">x</length>
+ <length value="1"> x </length>
++<!-- xalan creates invalid XML out of this: &#55298;&#56320;
+ <length value="1">&#x10800;</length>
++-->
+ </datatype>
+ <datatype name="language">
+ <valid>en</valid>
+diff --git a/test/saxon.xsl b/test/saxon.xsl
+index 9a86877..1471783 100644
+--- a/test/saxon.xsl
++++ b/test/saxon.xsl
+@@ -1,8 +1,8 @@
+ <?xml version="1.0"?>
+-<xsl:stylesheet version="1.0"
++<xsl:stylesheet version="1.1"
+   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+-  xmlns:saxon="http://icl.com/saxon"
+-  extension-element-prefixes="saxon">
++  xmlns:xalan="http://xml.apache.org/xalan"
++  extension-element-prefixes="xalan">
+ 
+ <xsl:output method="text"/>
+ 
+@@ -10,21 +10,21 @@
+   <xsl:variable name="prepped">
+     <xsl:apply-templates select="*"/>
+   </xsl:variable>
+-  <xsl:apply-templates select="saxon:node-set($prepped)/documents/*" mode="output"/>
++  <xsl:apply-templates select="xalan:nodeset($prepped)/documents/*" mode="output"/>
+ </xsl:template>
+ 
+ <xsl:template match="document" mode="output">
+-  <saxon:output href="{@href}" method="{@method}">
++  <xsl:document href="{@href}" method="{@method}">
+     <xsl:if test="@dtd">
+       <xsl:value-of select="@dtd" disable-output-escaping="yes"/>
+     </xsl:if>
+     <xsl:copy-of select="node()"/>
+-  </saxon:output>
++  </xsl:document>
+ </xsl:template>
+ 
+ <xsl:template match="dir" mode="output">
+   <xsl:value-of select="substring(File:mkdir(File:new(@name)),0,0)" 
+-                xmlns:File="java:java.io.File"/>
++                xmlns:File="xalan://java.io.File"/>
+ </xsl:template>
+ 
+ </xsl:stylesheet>
+-- 
+1.9.3
+

@@ -1,0 +1,25 @@
+From 565ef3ffcaaef69a768b6a341777c339217bbbab Mon Sep 17 00:00:00 2001
+From: Lukas Slebodnik <lslebodn@fedoraproject.org>
+Date: Mon, 12 Dec 2016 21:56:16 +0100
+Subject: [PATCH] SYSTEMD: Use capabilities
+
+copied from selinux policy
+---
+ src/sysv/systemd/sssd.service.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/sysv/systemd/sssd.service.in b/src/sysv/systemd/sssd.service.in
+index 0c515d34caaa3ea397c4c7e95eef0188df170840..252889dbb2b7b1e651966258e7b76eab38357e76 100644
+--- a/src/sysv/systemd/sssd.service.in
++++ b/src/sysv/systemd/sssd.service.in
+@@ -11,6 +11,7 @@ ExecStart=@sbindir@/sssd -i ${DEBUG_LOGGER}
+ Type=notify
+ NotifyAccess=main
+ PIDFile=@pidpath@/sssd.pid
++CapabilityBoundingSet=CAP_IPC_LOCK CAP_CHOWN CAP_DAC_READ_SEARCH CAP_KILL CAP_NET_ADMIN CAP_SYS_NICE CAP_FOWNER CAP_SETGID CAP_SETUID CAP_SYS_ADMIN CAP_SYS_RESOURCE CAP_BLOCK_SUSPEND
+ Restart=on-failure
+ 
+ [Install]
+-- 
+2.15.1
+

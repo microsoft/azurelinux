@@ -1,0 +1,29 @@
+diff --git a/Makefile.am b/Makefile.am
+index 5be3264..33abc1d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -130,8 +130,6 @@ include ospf6d/subdir.am
+ include ospfclient/subdir.am
+ include isisd/subdir.am
+ include nhrpd/subdir.am
+-include ldpd/subdir.am
+-include babeld/subdir.am
+ include eigrpd/subdir.am
+ include sharpd/subdir.am
+ include pimd/subdir.am
+@@ -182,7 +180,6 @@ EXTRA_DIST += \
+ 	snapcraft/defaults \
+ 	snapcraft/helpers \
+ 	snapcraft/snap \
+-	babeld/Makefile \
+ 	bgpd/Makefile \
+ 	bgpd/rfp-example/librfp/Makefile \
+ 	bgpd/rfp-example/rfptest/Makefile \
+@@ -193,7 +190,6 @@ EXTRA_DIST += \
+ 	fpm/Makefile \
+ 	grpc/Makefile \
+ 	isisd/Makefile \
+-	ldpd/Makefile \
+ 	lib/Makefile \
+ 	nhrpd/Makefile \
+ 	ospf6d/Makefile \

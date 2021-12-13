@@ -1,0 +1,47 @@
+Notes on the packaged version of ATLAS
+
+by Quentin Spencer
+updated: October 4, 2005
+
+updated by Deji Akingunola
+October 15, 2008
+
+updated by Deji Akingunola
+June 15, 2011
+
+updated by Frantisek Kluknavsky
+Nov 20, 2012
+
+Because ATLAS relies on compile-time optimizations to obtain improved
+performance over BLAS and LAPACK, the resulting binaries are closely
+tied to the hardware on which they are compiled, and can likely result
+in very poor performance on other hardware.  For this reason,
+including a package like ATLAS in Fedora requires some compromises.
+Optimizing ATLAS for the most modern hardware can result in
+significant performance penalties for users using the same package on
+older hardware. A binary ATLAS package must perform reasonably well on the
+entire range of hardware on which it could potentially be installed.
+
+The result is a set of libraries that will not
+necessarily achieve optimal performance on any given hardware but
+should still offer significant performance gains over the reference
+BLAS and LAPACK libraries on most hardware.  
+
+In addition to the base 32bit build, subpackages are built for SSE, SSE2,
+and SSE3 ix86 extensions.
+
+On 64bit x86 systems the default atlas package was built with SSE3
+optimization.
+  
+This packaging allows multiple installation of different atlas sub-packages
+at the same time. The alternatives system (read 'man alternatives' for usage)
+is used in the -devel subpackages to select the appropriate location for the 
+architectural dependent header files.
+ 
+For users who want optimal performance on
+particular hardware, custom RPMs can be built from the source package
+by setting the RPM macro "enable_native_atlas" to a value of 1. This
+can be done from the command line as in the following example:
+
+rpmbuild -D "enable_native_atlas 1" --rebuild atlas-3.8.3-1.src.rpm
+

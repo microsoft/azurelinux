@@ -1,0 +1,21 @@
+diff --git a/build/build.xml b/build/build.xml
+index ae8b37b..f3453fd 100644
+--- a/build/build.xml
++++ b/build/build.xml
+@@ -493,7 +493,7 @@ examples:
+     </target>
+ 
+     <!-- compiles the cmdline classes -->
+-    <target name="-cmdline" if="ant.java.iscjava15"
++    <target name="-cmdline"
+             depends="-prepare, -update-switch-branch,
+                      -conditionalize-sqlfile-scanner, -sqlfile-scanner">
+       <javac srcdir="${swsrc}"
+@@ -700,7 +700,6 @@ examples:
+          <exclude name="org/hsqldb/util/Zaurus*"/>
+          <exclude name="org/hsqldb/test/*.class"/>
+          <exclude name="org/hsqldb/sample/*.class"/>
+-         <exclude name="org/hsqldb/cmdline/**"/>
+       </jar>
+     </target>
+ 

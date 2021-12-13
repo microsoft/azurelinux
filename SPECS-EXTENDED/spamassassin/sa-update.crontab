@@ -1,0 +1,12 @@
+# *** DO NOT MODIFY THIS FILE ***
+### Spamassassin Rules Updates ###
+#
+# http://wiki.apache.org/spamassassin/RuleUpdates
+# 
+# sa-update automatically updates your rules once per day if a spam daemon like
+# spamd or amavisd are running.  You can force sa-update to run in
+# /etc/sysconfig/sa-update
+#
+# /var/log/sa-update.log contains a history log of sa-update runs
+
+10 4 * * * root /usr/share/spamassassin/sa-update.cron 2>&1 | tee -a /var/log/sa-update.log

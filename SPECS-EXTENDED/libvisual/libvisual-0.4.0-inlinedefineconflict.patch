@@ -1,0 +1,61 @@
+diff -ru libvisual-0.4.0.orig/libvisual/lv_cache.c libvisual-0.4.0/libvisual/lv_cache.c
+--- libvisual-0.4.0.orig/libvisual/lv_cache.c	2009-03-07 17:17:38.000000000 +0000
++++ libvisual-0.4.0/libvisual/lv_cache.c	2009-03-07 17:25:26.000000000 +0000
+@@ -32,7 +32,7 @@
+ static int cache_dtor (VisObject *object);
+ static int cache_remove_list_entry (VisCache *cache, VisListEntry **le);
+ 
+-static inline void handle_request_reset (VisCache *cache, VisListEntry *le);
++static lv_inline void handle_request_reset (VisCache *cache, VisListEntry *le);
+ 
+ static int cache_dtor (VisObject *object)
+ {
+@@ -74,7 +74,7 @@
+ }
+ 
+ 
+-static inline void handle_request_reset (VisCache *cache, VisListEntry *le)
++static lv_inline void handle_request_reset (VisCache *cache, VisListEntry *le)
+ {
+ 	VisCacheEntry *centry;
+ 
+diff -ru libvisual-0.4.0.orig/libvisual/lv_defines.h libvisual-0.4.0/libvisual/lv_defines.h
+--- libvisual-0.4.0.orig/libvisual/lv_defines.h	2009-03-07 17:17:38.000000000 +0000
++++ libvisual-0.4.0/libvisual/lv_defines.h	2009-03-07 17:24:17.000000000 +0000
+@@ -63,13 +63,13 @@
+ 
+ /* Compiler specific optimalization macros */
+ #if __GNUC__ >= 3
+-# define inline			inline __attribute__ ((always_inline))
++# define lv_inline		inline __attribute__ ((always_inline))
+ # define __malloc		__attribute__ ((malloc))
+ # define __packed		__attribute__ ((packed))
+ # define VIS_LIKELY(x)		__builtin_expect (!!(x), 1)
+ # define VIS_UNLIKELY(x)	__builtin_expect (!!(x), 0)
+ #else
+-# define inline			/* no inline */
++# define lv_inline		/* no inline */
+ # define __malloc		/* no malloc */
+ # define __packed		/* no packed */
+ # define VIS_LIKELY(x)		(x)
+diff -ru libvisual-0.4.0.orig/libvisual/lv_time.h libvisual-0.4.0/libvisual/lv_time.h
+--- libvisual-0.4.0.orig/libvisual/lv_time.h	2009-03-07 17:17:38.000000000 +0000
++++ libvisual-0.4.0/libvisual/lv_time.h	2009-03-07 17:25:15.000000000 +0000
+@@ -101,7 +101,7 @@
+  *
+  * @return Nothing.
+  */
+-static inline void visual_timer_tsc_get (uint32_t *lo, uint32_t *hi)
++static lv_inline void visual_timer_tsc_get (uint32_t *lo, uint32_t *hi)
+ {
+ #if defined(VISUAL_ARCH_X86) || defined(VISUAL_ARCH_X86_64)
+ 	__asm __volatile
+@@ -115,7 +115,7 @@
+ }
+ 
+ /* FIXME use uint64_t here, make sure type exists */
+-static inline unsigned long long visual_timer_tsc_get_returned ()
++static lv_inline unsigned long long visual_timer_tsc_get_returned ()
+ {
+ 	uint32_t lo, hi;
+ 

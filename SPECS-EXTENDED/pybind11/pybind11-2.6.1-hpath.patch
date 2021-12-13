@@ -1,0 +1,30 @@
+diff -up pybind11-2.6.1/pybind11/commands.py.hpath pybind11-2.6.1/pybind11/commands.py
+--- pybind11-2.6.1/pybind11/commands.py.hpath	2020-11-11 22:33:21.000000000 +0100
++++ pybind11-2.6.1/pybind11/commands.py	2020-11-12 13:22:07.355000414 +0100
+@@ -1,22 +1,8 @@
+ # -*- coding: utf-8 -*-
+ import os
+ 
+-
+-DIR = os.path.abspath(os.path.dirname(__file__))
+-
+-
+ def get_include(user=False):
+-    # type: (bool) -> str
+-    installed_path = os.path.join(DIR, "include")
+-    source_path = os.path.join(os.path.dirname(DIR), "include")
+-    return installed_path if os.path.exists(installed_path) else source_path
+-
++    return '/usr/include/pybind11'
+ 
+ def get_cmake_dir():
+-    # type: () -> str
+-    cmake_installed_path = os.path.join(DIR, "share", "cmake", "pybind11")
+-    if os.path.exists(cmake_installed_path):
+-        return cmake_installed_path
+-    else:
+-        msg = "pybind11 not installed, installation required to access the CMake files"
+-        raise ImportError(msg)
++    return '/usr/share/cmake/pybind11'
+diff -up pybind11-2.6.1/pybind11/__init__.py.hpath pybind11-2.6.1/pybind11/__init__.py
+diff -up pybind11-2.6.1/pybind11/__main__.py.hpath pybind11-2.6.1/pybind11/__main__.py

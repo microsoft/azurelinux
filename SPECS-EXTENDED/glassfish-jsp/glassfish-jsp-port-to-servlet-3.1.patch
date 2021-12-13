@@ -1,0 +1,26 @@
+From c1b2515c5994ba581827e9543ffa10897ab1f035 Mon Sep 17 00:00:00 2001
+From: Michal Srb <msrb@redhat.com>
+Date: Thu, 2 Jan 2014 16:20:40 +0100
+Subject: [PATCH] Port to servlet 3.1
+
+---
+ src/main/java/org/apache/jasper/servlet/JspCServletContext.java | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/main/java/org/apache/jasper/servlet/JspCServletContext.java b/src/main/java/org/apache/jasper/servlet/JspCServletContext.java
+index ff89225..01cd21a 100644
+--- a/src/main/java/org/apache/jasper/servlet/JspCServletContext.java
++++ b/src/main/java/org/apache/jasper/servlet/JspCServletContext.java
+@@ -883,4 +883,9 @@ public class JspCServletContext implements ServletContext {
+             return this.jspPropertyGroups;
+         }
+     }
++
++    @Override
++    public String getVirtualServerName() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
+ }
+-- 
+1.8.3.1
+

@@ -1,0 +1,22 @@
+From f71f7eb5c492720c24033901ef8c6c420e188ff2 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 10 May 2012 14:47:35 -0400
+Subject: [PATCH] Don't count our dummy mach_kernel as real MacOS X.
+
+---
+ os-probes/mounted/powerpc/20macosx |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: b/os-probes/mounted/powerpc/20macosx
+===================================================================
+--- a/os-probes/mounted/powerpc/20macosx
++++ b/os-probes/mounted/powerpc/20macosx
+@@ -21,7 +21,7 @@ esac
+ # but I don't think it exists on Mac OS <= 9, and it's XML so parsing in
+ # shell will be nasty.
+ 
+-if [ -e "$2/mach_kernel" ]; then
++if [ -e "$2/mach_kernel" ] && ! dd if="$2/mach_kernel" count=1 bs=5 2>/dev/null | grep -aq Dummy ; then
+   label="$(count_next_label MacOSX)"
+   result "$1:Mac OS X:$label:macosx"
+   exit 0

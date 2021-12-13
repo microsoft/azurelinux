@@ -1,0 +1,6 @@
+#!/usr/bin/sh
+
+MACHINE_TYPE=`uname -m`
+
+source /usr/bin/pbs-config-$MACHINE_TYPE
+

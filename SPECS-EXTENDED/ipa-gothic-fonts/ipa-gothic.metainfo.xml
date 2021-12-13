@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2015 Akira TAGOH <tagoh@redhat.com> -->
+<component type="font">
+ <id>ipa-gothic</id>
+ <metadata_license>CC-BY-3.0</metadata_license>
+ <project_license>IPA</project_license>
+ <name>IPAGothic</name>
+ <summary>Japanese Gothic-typeface OpenType font by IPA</summary>
+ <description>
+  <p>
+   IPA Font is a Japanese OpenType fonts that is JIS X 0213:2004
+   compliant, provided by Information-technology Promotion Agency, Japan.
+  </p>
+  <p>
+   This font is a sans-serif based typeface.
+  </p>
+ </description>
+ <url type="homepage">http://ossipedia.ipa.go.jp/ipafont/</url>
+ <updatecontact>tagoh@redhat.com</updatecontact>
+</component>
+

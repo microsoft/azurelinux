@@ -1,0 +1,21 @@
+--- elinks-0.11.0/src/network/ssl/ssl.c.noegd	2006-01-10 09:24:50.000000000 +0100
++++ elinks-0.11.0/src/network/ssl/ssl.c	2006-01-10 09:25:01.000000000 +0100
+@@ -44,18 +44,6 @@ SSL_CTX *context = NULL;
+ static void
+ init_openssl(struct module *module)
+ {
+-	unsigned char f_randfile[PATH_MAX];
+-
+-	/* In a nutshell, on OS's without a /dev/urandom, the OpenSSL library
+-	 * cannot initialize the PRNG and so every attempt to use SSL fails.
+-	 * It's actually an OpenSSL FAQ, and according to them, it's up to the
+-	 * application coders to seed the RNG. -- William Yodlowsky */
+-	if (RAND_egd(RAND_file_name(f_randfile, sizeof(f_randfile))) < 0) {
+-		/* Not an EGD, so read and write to it */
+-		if (RAND_load_file(f_randfile, -1))
+-			RAND_write_file(f_randfile);
+-	}
+-
+ 	SSLeay_add_ssl_algorithms();
+ 	context = SSL_CTX_new(SSLv23_client_method());
+ 	SSL_CTX_set_options(context, SSL_OP_ALL);

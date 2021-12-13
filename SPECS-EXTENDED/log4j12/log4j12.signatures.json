@@ -1,0 +1,12 @@
+{
+ "Signatures": {
+  "log4j-1.2.17.tar.gz": "a528e3771ee6234661b5eb0fa02e14faee89dfec38de94088c163ddf2a0a8663",
+  "log4j-chainsaw.desktop": "44b1dde33c2217a3ccf4be0649d3d4feeba3e0255714b4688b5e6dc746dade9b",
+  "log4j-chainsaw.png": "c5e0a6768847fbde583d9d34a3ad378b79aa4ee11969e4dec5e500708186a878",
+  "log4j-chainsaw.sh": "16cfe8ba623f187af5a4d8ac742e58d4e5ddf3f42b6cca0861a02efcacd7f39c",
+  "log4j-logfactor5.desktop": "51e075141c0c2aa3750bdcc4ec3c06869d70b670e377ddc688502434cf8d1d35",
+  "log4j-logfactor5.png": "53ff5c48822434cb626ef6dcd8e78776978157275945b957fc54d5f410647f36",
+  "log4j-logfactor5.sh": "481fba488062f649b5cdbafeb7de4a6a0e595e793cfe70cf44ea0435dbd71ac3",
+  "log4j.catalog": "dcbc15ab7a0e47fb72171f6847065bbfebaadd289266590ece9f9c7907030723"
+ }
+}

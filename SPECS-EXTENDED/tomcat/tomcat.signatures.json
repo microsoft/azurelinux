@@ -1,0 +1,17 @@
+{
+ "Signatures": {
+  "apache-tomcat-9.0.39-src.tar.gz": "2f6ed1a6ae4f9a67da9e75f79ba6629ce309f7101bce072e1b52c7abb6e2a93c",
+  "tomcat-9.0-digest.script": "9c72ba76c0a8d1f83fb9974264ec59e2700dd015306e74f905e50a823985f884",
+  "tomcat-9.0-jsvc.service": "d0ac947eb01462b0058ee723b2f3772eee765af7f1b06f08873f2c4c69832977",
+  "tomcat-9.0-tool-wrapper.script": "068032f3ed04a0e2c1d46a748f23f95ebc8c818e20cda4389b0292f86c72e653",
+  "tomcat-9.0.conf": "1687e1f0ce08cfa3d9d01fb7b44cf1f83a9c7a447c61b3eb0361683b9d3880da",
+  "tomcat-9.0.logrotate": "d45985ef7bf666d1501490fd4ad5917b7cec1a7aabcfc23181e7abeab27cfdcb",
+  "tomcat-9.0.service": "053b116b959575e35a4a04e4a06ea4cf6b0f8be198aea89a5806210c803d4e9c",
+  "tomcat-9.0.sysconfig": "ba318c60080f7e3232e4baecf042004e3e803fef3fd1bab299e509dab6c56a16",
+  "tomcat-9.0.wrapper": "4d53858a5738eb6aba432f3b24e24e2d72cf232e568382de39d05333c9f84b44",
+  "tomcat-functions": "b688d1175d7c58cfd4ec79e4d6372690272629db6bde98310fc8e4d594474732",
+  "tomcat-named.service": "4b3a3afefeea18bf1ca15e43d8bcd2b860efe1b5fed4c39be83ff43bbcb4b79c",
+  "tomcat-preamble": "48596c9f64715aa2fab9511c644b0efa83c7e1c37d620c2497fb33a1b0947607",
+  "tomcat-server": "9e6a9e1bbe27607f4e9f1822c791bbb204101823c4f03d2cf887105ea529b949"
+ }
+}

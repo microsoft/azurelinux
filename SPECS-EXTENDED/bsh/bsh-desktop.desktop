@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=BeanShell Desktop
+Exec=bsh-desktop
+Icon=bsh
+Terminal=false
+Type=Application
+StartupWMClass=bsh-Console
+Categories=Development;Java;
+Version=1.0

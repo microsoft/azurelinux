@@ -1,7 +1,7 @@
 Summary:        Python wrapper module around the OpenSSL library
 Name:           pyOpenSSL
 Version:        18.0.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,7 @@ BuildRequires:  python3-cffi
 BuildRequires:  python3-cryptography
 BuildRequires:  python3-idna
 BuildRequires:  python3-packaging
+BuildRequires:  python3-pip
 BuildRequires:  python3-pyasn1
 BuildRequires:  python3-pycparser
 BuildRequires:  python3-six
@@ -47,10 +48,7 @@ High-level wrapper around a subset of the OpenSSL library.
 %py3_install
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pretend
-$easy_install_3 flaky
-$easy_install_3 pytest
+pip3 install pretend flaky pytest
 PATH=%{buildroot}%{_bindir}:${PATH} \
 LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
     pytest
@@ -61,6 +59,9 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 18.0.0-8
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 18.0.0-7
 - Add license to python3 package
 - Remove python2 package

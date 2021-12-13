@@ -1,0 +1,25 @@
+From a73e1ecfbfbc42bfc4798a98a4afd90bd35eb7f0 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Fri, 17 Feb 2017 16:21:48 +0100
+Subject: [PATCH] configure.in: recognize recent versions of GCC
+
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 6bcfeec..28c685d 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1588,7 +1588,7 @@ if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
+       # alternative is just too ugly. Thanks gcc guys!! ;)
+       CFLAGS="$CFLAGS -fno-strict-aliasing"
+       ;;
+-    4.*)
++    4.*|5.*|6.*|7)
+       # Do not show warnings related to (char * | unsigned char *) type
+       # difference.
+       CFLAGS="$CFLAGS -fno-strict-aliasing -Wno-pointer-sign"
+-- 
+2.11.1
+

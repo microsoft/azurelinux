@@ -1,0 +1,52 @@
+From c907dbe205257d29ca74d9e30cf2e100d85f277b Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Wed, 15 Aug 2018 14:26:19 +0200
+Subject: [PATCH 1/2] endSessionDialog: Immediately add buttons to the dialog
+
+Immediately add buttons to the dialog instead of first building an
+array of button-info structs.
+
+This is a preparation patch for adding support changing the "Reboot"
+button into a "Boot Options" button when Alt is pressed.
+---
+ js/ui/endSessionDialog.js | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/js/ui/endSessionDialog.js b/js/ui/endSessionDialog.js
+index ff1aa0ddf..27ddf6804 100644
+--- a/js/ui/endSessionDialog.js
++++ b/js/ui/endSessionDialog.js
+@@ -369,15 +369,17 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+     }
+ 
+     _updateButtons() {
+-        let dialogContent = DialogContent[this._type];
+-        let buttons = [{ action: this.cancel.bind(this),
++        this.clearButtons();
++
++        this.addButton({ action: this.cancel.bind(this),
+                          label: _("Cancel"),
+-                         key: Clutter.KEY_Escape }];
++                         key: Clutter.KEY_Escape });
+ 
++        let dialogContent = DialogContent[this._type];
+         for (let i = 0; i < dialogContent.confirmButtons.length; i++) {
+             let signal = dialogContent.confirmButtons[i].signal;
+             let label = dialogContent.confirmButtons[i].label;
+-            buttons.push({
++            let button = this.addButton({
+                 action: () => {
+                     this.close(true);
+                     let signalId = this.connect('closed', () => {
+@@ -388,8 +390,6 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+                 label,
+             });
+         }
+-
+-        this.setButtons(buttons);
+     }
+ 
+     close(skipSignal) {
+-- 
+2.24.1
+

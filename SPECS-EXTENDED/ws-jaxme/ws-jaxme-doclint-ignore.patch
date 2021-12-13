@@ -1,0 +1,11 @@
+diff --git a/ant/docs.xml b/ant/docs.xml
+--- a/ant/docs.xml
++++ b/ant/docs.xml
+@@ -84,6 +84,7 @@
+         </path>
+         <javadoc
+                          access="protected"
++                         additionalparam="-Xdoclint:none"
+                          author="true"
+                    classpathref="docs.class.path"
+                         destdir="${build.apidocs}"

@@ -1,0 +1,31 @@
+diff --git a/pom.xml b/pom.xml
+index 53db856..cec146f 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -135,12 +135,9 @@
+                 <configuration>
+                     <source>1.7</source>
+                     <target>1.7</target>
+-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
++                    <!-- compilerArgument>-Xlint:unchecked</compilerArgument -->
+                     <excludes>
+                         <exclude>
+-                            org/apache/jasper/compiler/JDTJavaCompiler.java
+-                        </exclude>
+-                        <exclude>
+                             org/apache/jasper/compiler/AntJavaCompiler.java
+                         </exclude>
+                         <exclude>
+diff --git a/src/main/java/org/apache/jasper/compiler/JDTJavaCompiler.java b/src/main/java/org/apache/jasper/compiler/JDTJavaCompiler.java
+index 9008e9b..33b925e 100644
+--- a/src/main/java/org/apache/jasper/compiler/JDTJavaCompiler.java
++++ b/src/main/java/org/apache/jasper/compiler/JDTJavaCompiler.java
+@@ -248,6 +248,8 @@ public class JDTJavaCompiler implements JavaCompiler {
+                 return className.toCharArray();
+             }
+             
++            public boolean ignoreOptionalProblems() {return false;}
++
+             public char[] getContents() {
+                 char[] result = null;
+                 Reader reader = null;
