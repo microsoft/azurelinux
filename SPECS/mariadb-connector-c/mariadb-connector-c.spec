@@ -1,14 +1,5 @@
-# For deep debugging we need to build binaries with extra debug info
-# Enable CMake in-source builds
-#   This is is a workaround for the https://fedoraproject.org/wiki/Changes/CMake_to_do_out-of-source_builds
-#   which reverts the CMake behaviour to before F33
-#   The Change owners offered themselves to help fix the affected packages via ProvenPackager rights.
-#   I'm generally in favor of this change, however when I tried to adapt it, I encountered a number of issues.
-#   That's why I disabled it for now.
 %global __cmake_in_source_build 1
 %bcond_with     debug
-# Enable building and packing of the testsuite
-%bcond_without  testsuite
 Summary:        The MariaDB Native Client library (C driver)
 Name:           mariadb-connector-c
 Version:        3.1.10
@@ -31,9 +22,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 Requires:       %{_sysconfdir}/my.cnf
 # More information: https://mariadb.com/kb/en/mariadb/building-connectorc-from-source/
-%if %{with testsuite}
 Patch1:         testsuite.patch
-%endif
 
 %description
 The MariaDB Native Client library (C driver) is used to connect applications
@@ -51,7 +40,6 @@ Conflicts:      community-mysql-devel
 Development files for mariadb-connector-c.
 Contains everything needed to build against libmariadb.so >=3 client library.
 
-%if %{with testsuite}
 %package        test
 Summary:        Testsuite files for mariadb-connector-c
 Requires:       %{name} = %{version}-%{release}
@@ -62,7 +50,6 @@ Recommends:     mariadb-server
 Testsuite files for mariadb-connector-c.
 Contains binaries and a prepared CMake ctest file.
 Requires running MariaDB / MySQL server with create database "test".
-%endif
 
 
 %package        config
@@ -77,11 +64,7 @@ Other packages should only put their files into %{_sysconfdir}/my.cnf.d director
 and require this package, so the %{_sysconfdir}/my.cnf file is present.
 
 %prep
-%setup -q -n %{name}-%{version}-src
-%patch0 -p1
-%if %{with testsuite}
-%patch1 -p1
-%endif
+%autosetup -p1 -n %{name}-%{version}-src
 
 # Remove unsused parts
 rm -r win win-iconv zlib examples
@@ -117,9 +100,7 @@ rm -r win win-iconv zlib examples
        -DINSTALL_PLUGINDIR="%{_lib}/mariadb/plugin" \
        -DINSTALL_PCDIR="%{_lib}/pkgconfig" \
 \
-%if %{with testsuite}
        -DWITH_UNIT_TESTS=ON
-%endif
 
 # Override all optimization flags when making a debug build
 %if %{with debug}
@@ -161,11 +142,9 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/my.cnf.d/client.cnf
 # - don't run mytap tests
 # - ignore the testsuite result for now. Enable tests now, fix them later.
 # Note: there must be a database called 'test' created for the testcases to be run
-%if %{with testsuite}
 pushd unittest/libmariadb/
 %ctest || :
 popd
-%endif
 
 
 %files
@@ -200,12 +179,10 @@ popd
 %config(noreplace) %{_sysconfdir}/my.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/client.cnf
 
-%if %{with testsuite}
 %files test
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/*
 %{_libdir}/libcctap.so
-%endif
 
 
 # Opened issues on the upstream tracker:
@@ -216,15 +193,9 @@ popd
 #      DESCRIPTION: Make testsuite independent / portable
 #      NEW:         PR submitted, problem explained, waiting on upstream response
 
-# Downstream issues:
-#   Start running this package testsuite at the build time
-#      It requires a running MariaDB server
-#         mariadb-server package pulls in mariadb-connector-c as a dependency
-#         Need to ensure, that the testsuite is ran against the newly build library, instead of the one from the pulled package
-#      Need to ensure, that the testsuite will also run properly on 'fedpkg local' buid, not damaging the host machine
-
 %changelog
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 3.1.10-4
+- Remove testsuite conditionals
 - License verified
 - Lint spec
 

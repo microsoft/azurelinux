@@ -7,8 +7,8 @@ Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.gnome.org
-Source0:        http://ftp.gnome.org/pub/GNOME/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
+URL:            https://www.gnome.org
+Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
 Patch0:         disable-gtk.patch
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gdk-pixbuf2-devel

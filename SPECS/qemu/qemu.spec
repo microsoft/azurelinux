@@ -292,28 +292,6 @@ BuildRequires:  vte291-devel
 BuildRequires:  zlib-devel
 # qemu-keymap
 BuildRequires:  pkgconfig(xkbcommon)
-Requires:       %{name}-img = %{version}-%{release}
-Requires:       %{name}-system-aarch64 = %{version}-%{release}
-Requires:       %{name}-system-alpha = %{version}-%{release}
-Requires:       %{name}-system-arm = %{version}-%{release}
-Requires:       %{name}-system-avr = %{version}-%{release}
-Requires:       %{name}-system-cris = %{version}-%{release}
-Requires:       %{name}-system-m68k = %{version}-%{release}
-Requires:       %{name}-system-microblaze = %{version}-%{release}
-Requires:       %{name}-system-mips = %{version}-%{release}
-Requires:       %{name}-system-nios2 = %{version}-%{release}
-Requires:       %{name}-system-or1k = %{version}-%{release}
-Requires:       %{name}-system-riscv = %{version}-%{release}
-Requires:       %{name}-system-rx = %{version}-%{release}
-Requires:       %{name}-system-s390x = %{version}-%{release}
-Requires:       %{name}-system-sh4 = %{version}-%{release}
-Requires:       %{name}-system-tricore = %{version}-%{release}
-Requires:       %{name}-system-x86 = %{version}-%{release}
-Requires:       %{name}-system-xtensa = %{version}-%{release}
-Requires:       %{name}-tools = %{version}-%{release}
-# Requires for the 'qemu' metapackage
-Requires:       %{name}-user = %{version}-%{release}
-Requires:       qemu-pr-helper = %{version}-%{release}
 %if %{have_usbredir}
 BuildRequires:  usbredir-devel >= %{usbredir_version}
 %endif
@@ -390,6 +368,28 @@ BuildRequires:  liburing-devel
 # jack audio driver
 BuildRequires:  jack-audio-connection-kit-devel
 %endif
+Requires:       %{name}-img = %{version}-%{release}
+Requires:       %{name}-system-aarch64 = %{version}-%{release}
+Requires:       %{name}-system-alpha = %{version}-%{release}
+Requires:       %{name}-system-arm = %{version}-%{release}
+Requires:       %{name}-system-avr = %{version}-%{release}
+Requires:       %{name}-system-cris = %{version}-%{release}
+Requires:       %{name}-system-m68k = %{version}-%{release}
+Requires:       %{name}-system-microblaze = %{version}-%{release}
+Requires:       %{name}-system-mips = %{version}-%{release}
+Requires:       %{name}-system-nios2 = %{version}-%{release}
+Requires:       %{name}-system-or1k = %{version}-%{release}
+Requires:       %{name}-system-riscv = %{version}-%{release}
+Requires:       %{name}-system-rx = %{version}-%{release}
+Requires:       %{name}-system-s390x = %{version}-%{release}
+Requires:       %{name}-system-sh4 = %{version}-%{release}
+Requires:       %{name}-system-tricore = %{version}-%{release}
+Requires:       %{name}-system-x86 = %{version}-%{release}
+Requires:       %{name}-system-xtensa = %{version}-%{release}
+Requires:       %{name}-tools = %{version}-%{release}
+# Requires for the 'qemu' metapackage
+Requires:       %{name}-user = %{version}-%{release}
+Requires:       qemu-pr-helper = %{version}-%{release}
 %if %{with ppc_support}
 Requires:       %{name}-system-ppc = %{version}-%{release}
 %endif

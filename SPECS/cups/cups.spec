@@ -89,6 +89,10 @@ BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  pkgconfig(gnutls)
 BuildRequires:  pkgconfig(libsystemd)
 BuildRequires:  pkgconfig(libusb-1.0)
+%if %{lspp}
+BuildRequires:  audit-libs-devel
+BuildRequires:  libselinux-devel
+%endif
 Requires:       %{name}-client = %{version}-%{release}
 Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
@@ -111,14 +115,16 @@ Recommends:     avahi
 # just recommend nss-mdns for Fedora for now to have working default, but
 # don't hardwire it for resolved users
 Recommends:     nss-mdns
-%if %{lspp}
-BuildRequires:  audit-libs-devel
-BuildRequires:  libselinux-devel
-%endif
 # Make sure we have some filters for converting to raster format.
 %if 0%{with missing_dependencies}
 Requires:       cups-filters
 %endif
+
+%description
+CUPS printing system provides a portable printing layer for
+UNIX® operating systems. It has been developed by Apple Inc.
+to promote a standard printing solution for all UNIX vendors and users.
+CUPS provides the System V and Berkeley command-line interfaces.
 
 %package        client
 Summary:        CUPS printing system - client programs
@@ -135,6 +141,11 @@ Provides:       %{_bindir}/lprm
 Provides:       %{_bindir}/lpstat
 %endif
 
+%description client
+CUPS printing system provides a portable printing layer for
+UNIX® operating systems. This package contains command-line client
+programs.
+
 %package        devel
 Summary:        CUPS printing system - development environment
 License:        ASL 2.0 with exceptions
@@ -143,14 +154,32 @@ Requires:       gnutls-devel
 Requires:       krb5-devel
 Requires:       zlib-devel
 
+%description devel
+CUPS printing system provides a portable printing layer for
+UNIX® operating systems. This is the development package for creating
+additional printer drivers, and other CUPS services.
+
 %package        libs
 Summary:        CUPS printing system - libraries
 License:        ASL 2.0 with exceptions and zlib
+
+%description libs
+CUPS printing system provides a portable printing layer for
+UNIX® operating systems. It has been developed by Apple Inc.
+to promote a standard printing solution for all UNIX vendors and users.
+CUPS provides the System V and Berkeley command-line interfaces.
+The cups-libs package provides libraries used by applications to use CUPS
+natively, without needing the lp/lpr commands.
 
 %package        filesystem
 Summary:        CUPS printing system - directory layout
 License:        ASL 2.0 with exceptions
 BuildArch:      noarch
+
+%description filesystem
+CUPS printing system provides a portable printing layer for
+UNIX® operating systems. This package provides some directories which are
+required by other packages that add CUPS drivers (i.e. filters, backends etc.).
 
 %package        lpd
 Summary:        CUPS printing system - lpd emulation
@@ -158,6 +187,11 @@ License:        ASL 2.0 with exceptions
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Provides:       lpd
+
+%description lpd
+CUPS printing system provides a portable printing layer for
+UNIX® operating systems. This is the package that provides standard
+lpd emulation.
 
 %package        ipptool
 Summary:        CUPS printing system - tool for performing IPP requests
@@ -172,6 +206,9 @@ Requires:       avahi
 # don't hardwire it for resolved users
 Recommends:     nss-mdns
 
+%description ipptool
+Sends IPP requests to the specified URI and tests and/or displays the results.
+
 %package        printerapp
 Summary:        CUPS printing system - tools for printer application
 License:        ASL 2.0 with exceptions
@@ -184,43 +221,6 @@ Requires:       avahi
 # just recommend nss-mdns for Fedora for now to have working default, but
 # don't hardwire it for resolved users
 Recommends:     nss-mdns
-
-%description
-CUPS printing system provides a portable printing layer for
-UNIX® operating systems. It has been developed by Apple Inc.
-to promote a standard printing solution for all UNIX vendors and users.
-CUPS provides the System V and Berkeley command-line interfaces.
-
-%description client
-CUPS printing system provides a portable printing layer for
-UNIX® operating systems. This package contains command-line client
-programs.
-
-%description devel
-CUPS printing system provides a portable printing layer for
-UNIX® operating systems. This is the development package for creating
-additional printer drivers, and other CUPS services.
-
-%description libs
-CUPS printing system provides a portable printing layer for
-UNIX® operating systems. It has been developed by Apple Inc.
-to promote a standard printing solution for all UNIX vendors and users.
-CUPS provides the System V and Berkeley command-line interfaces.
-The cups-libs package provides libraries used by applications to use CUPS
-natively, without needing the lp/lpr commands.
-
-%description filesystem
-CUPS printing system provides a portable printing layer for
-UNIX® operating systems. This package provides some directories which are
-required by other packages that add CUPS drivers (i.e. filters, backends etc.).
-
-%description lpd
-CUPS printing system provides a portable printing layer for
-UNIX® operating systems. This is the package that provides standard
-lpd emulation.
-
-%description ipptool
-Sends IPP requests to the specified URI and tests and/or displays the results.
 
 %description printerapp
 Provides IPP everywhere printer application ippeveprinter and tools for printing
@@ -440,9 +440,6 @@ do
   fi
 done
 
-
-exit 0
-
 %post client
 %if %{use_alternatives}
 %{_sbindir}/alternatives --install %{_bindir}/lpr print %{_bindir}/lpr.cups 40 \
@@ -460,17 +457,14 @@ exit 0
 	 --slave %{_mandir}/man1/lprm.1.gz print-lprmman %{_mandir}/man1/lprm-cups.1.gz \
 	 --slave %{_mandir}/man1/lpstat.1.gz print-lpstatman %{_mandir}/man1/lpstat-cups.1.gz
 %endif
-exit 0
 
 %post lpd
 %systemd_post cups-lpd.socket
-exit 0
 
 %ldconfig_scriptlets libs
 
 %preun
 %systemd_preun %{name}.path %{name}.socket %{name}.service
-exit 0
 
 %preun client
 %if %{use_alternatives}
@@ -478,24 +472,19 @@ if [ $1 -eq 0 ] ; then
 	%{_sbindir}/alternatives --remove print %{_bindir}/lpr.cups
 fi
 %endif
-exit 0
 
 %preun lpd
 %systemd_preun cups-lpd.socket
-exit 0
 
 %postun
 # ignore the messages due #1614751 (systemd bug)
 %systemd_postun_with_restart %{name}.path %{name}.socket %{name}.service > /dev/null 2>&1
-exit 0
 
 %postun lpd
 %systemd_postun_with_restart cups-lpd.socket
-exit 0
 
 %triggerin -- samba-client
 ln -sf %{_libexecdir}/samba/cups_backend_smb %{cups_serverbin}/backend/smb || :
-exit 0
 
 %triggerun -- samba-client
 [ $2 = 0 ] || exit 0

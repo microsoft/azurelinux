@@ -56,6 +56,9 @@ BuildRequires:  pkgconfig(xinerama)
 BuildRequires:  pkgconfig(xkbcommon)
 BuildRequires:  pkgconfig(xrandr) >= %{xrandr_version}
 BuildRequires:  pkgconfig(xrender)
+%if 0%{?with_sysprof}
+BuildRequires:  pkgconfig(sysprof-capture-4)
+%endif
 # standard icons
 Requires:       adwaita-icon-theme
 Requires:       atk >= %{atk_version}
@@ -76,9 +79,6 @@ Requires:       pango >= %{pango_version}
 # make sure we have a reasonable gsettings backend
 Recommends:     dconf
 Provides:       adwaita-gtk3-theme = %{version}-%{release}
-%if 0%{?with_sysprof}
-BuildRequires:  pkgconfig(sysprof-capture-4)
-%endif
 
 %description
 GTK+ is a multi-platform toolkit for creating graphical user
