@@ -1,0 +1,10 @@
+--- mariadb-connector-c-3.1.3-src/unittest/libmariadb/CMakeLists.txt	2019-07-25 10:03:48.000000000 -0400
++++ mariadb-connector-c-3.1.3-src/unittest/libmariadb/CMakeLists.txt_patched	2019-08-19 17:02:26.317247605 -0400
+@@ -71,3 +71,7 @@ FOREACH(API_TEST ${MANUAL_TESTS})
+   ADD_EXECUTABLE(${API_TEST} ${API_TEST}.c)
+   TARGET_LINK_LIBRARIES(${API_TEST} cctap ma_getopt mariadbclient)
+ ENDFOREACH()
++
++INSTALL(TARGETS ${API_TESTS} DESTINATION ${SHAREDIR}/mariadb-connector-c/tests COMPONENT Tests)
++INSTALL(FILES ${CC_SOURCE_DIR}/unittest/mytap/libcctap.so PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE DESTINATION ${INSTALL_LIBDIR} COMPONENT Tests)
++INSTALL(FILES ${CC_SOURCE_DIR}/unittest/libmariadb/CTestTestfile.cmake DESTINATION ${SHAREDIR}/mariadb-connector-c/tests COMPONENT Tests)

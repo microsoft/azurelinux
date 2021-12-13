@@ -1,0 +1,13 @@
+Index: lynx2.8.9rel.1/lynx.cfg
+===================================================================
+--- lynx2.8.9rel.1/lynx.cfg
++++ lynx2.8.9rel.1/lynx.cfg
+@@ -2335,7 +2335,7 @@ MINIMAL_COMMENTS:TRUE
+ # XLOADIMAGE_COMMAND definition.
+ # If you use xli, you may want to add the -quiet flag.
+ #
+-#XLOADIMAGE_COMMAND:xli %s &
++XLOADIMAGE_COMMAND:xli %s &
+ 
+ .h2 VIEWER
+ # MIME types may be assigned to external viewers using

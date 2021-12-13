@@ -1,0 +1,208 @@
+diff -r -c -N ../mcpp-2.7.2-old/noconfig/vc2010.dif ./noconfig/vc2010.dif
+*** ../mcpp-2.7.2-old/noconfig/vc2010.dif	Wed Dec 31 20:30:00 1969
+--- ./noconfig/vc2010.dif	Fri May 14 12:47:22 2010
+***************
+*** 0 ****
+--- 1,67 ----
++ *** noconfig.H	Thu Sep 25 15:34:56 2008
++ --- noconfig.H.vc2005	Thu Sep 25 17:23:49 2008
++ ***************
++ *** 15,21 ****
++    */
++   
++   /* Define target operating-system.  */
++ ! #define SYSTEM              SYS_FREEBSD
++   
++   /* Define target compiler.          */
++   #ifndef COMPILER
++ --- 15,21 ----
++    */
++   
++   /* Define target operating-system.  */
++ ! #define SYSTEM              SYS_WIN32
++   
++   /* Define target compiler.          */
++   #ifndef COMPILER
++ ***************
++ *** 26,36 ****
++   #define HOST_SYSTEM         SYSTEM
++   
++   /* Define host compiler.            */
++ ! #define HOST_COMPILER       GNUC
++   
++   /* Version message.                 */
++   /* "MCPP V.2.* (200y/mm) compiled by " precedes VERSION_MSG */
++ ! #define VERSION_MSG         "GCC 3.4"
++   #if     0
++       "LCC-Win32 2006-03"
++       "Visual C 2005"
++ --- 26,36 ----
++   #define HOST_SYSTEM         SYSTEM
++   
++   /* Define host compiler.            */
++ ! #define HOST_COMPILER       MSC
++   
++   /* Version message.                 */
++   /* "MCPP V.2.* (200y/mm) compiled by " precedes VERSION_MSG */
++ ! #define VERSION_MSG         "Visual C 2010"
++   #if     0
++       "LCC-Win32 2006-03"
++       "Visual C 2005"
++ ***************
++ *** 212,221 ****
++   #define ONE_PASS            TRUE
++   #endif
++   #define COMPILER_EXT        "_MSC_VER"
++ ! #define COMPILER_EXT_VAL    "1500"      /* VC 6.0: "1200"   */
++       /* VC 2002: "1300", VC 2003: "1310", VC 2005: "1400", VC 2008: "1500"   */
++   #define COMPILER_EXT2       "_MSC_FULL_VER"
++ ! #define COMPILER_EXT2_VAL   "150021022" /* VC 6.0: "12008804"       */
++       /* VC 2002: "13009466", VC 2003: "13103077", VC 2005: "140050320"       */
++       /* VC 2008: "150021022" */
++   #define COMPILER_SP1        "_MSC_EXTENSIONS"
++ --- 212,221 ----
++   #define ONE_PASS            TRUE
++   #endif
++   #define COMPILER_EXT        "_MSC_VER"
++ ! #define COMPILER_EXT_VAL    "1600"      /* VC 6.0: "1200"   */
++       /* VC 2002: "1300", VC 2003: "1310", VC 2005: "1400", VC 2008: "1500"   */
++   #define COMPILER_EXT2       "_MSC_FULL_VER"
++ ! #define COMPILER_EXT2_VAL   "160030319" /* VC 6.0: "12008804"       */
++       /* VC 2002: "13009466", VC 2003: "13103077", VC 2005: "140050320"       */
++       /* VC 2008: "150021022" */
++   #define COMPILER_SP1        "_MSC_EXTENSIONS"
+diff -r -c -N ../mcpp-2.7.2-old/src/internal.H ./src/internal.H
+*** ../mcpp-2.7.2-old/src/internal.H	Wed Aug 27 10:31:16 2008
+--- ./src/internal.H	Fri May 14 12:40:56 2010
+***************
+*** 390,395 ****
+--- 390,397 ----
+  extern char     identifier[];       /* Lastly scanned name          */
+  extern IFINFO   ifstack[];          /* Information of #if nesting   */
+  extern char     work_buf[];
++ extern FILEINFO * sh_file;
++ extern int      sh_line;
+          /* Temporary buffer for directive line and macro expansion  */
+  
+  /* main.c   */
+***************
+*** 557,562 ****
+  #endif
+  #endif
+  
+! #if HOST_HAVE_STPCPY
+  extern char *   stpcpy( char * dest, const char * src);
+  #endif
+--- 559,564 ----
+  #endif
+  #endif
+  
+! #if HOST_HAVE_STPCPY && !defined(stpcpy)
+  extern char *   stpcpy( char * dest, const char * src);
+  #endif
+diff -r -c -N ../mcpp-2.7.2-old/src/main.c ./src/main.c
+*** ../mcpp-2.7.2-old/src/main.c	Wed Nov  5 05:04:46 2008
+--- ./src/main.c	Fri May 14 12:40:56 2010
+***************
+*** 326,331 ****
+--- 326,333 ----
+              = FALSE;
+      option_flags.trig = TRIGRAPHS_INIT;
+      option_flags.dig = DIGRAPHS_INIT;
++     sh_file = NULL;
++     sh_line = 0;
+  }
+  
+  int     mcpp_lib_main
+diff -r -c -N ../mcpp-2.7.2-old/src/support.c ./src/support.c
+*** ../mcpp-2.7.2-old/src/support.c	Tue Jun 10 06:02:33 2008
+--- ./src/support.c	Fri May 14 12:40:56 2010
+***************
+*** 188,194 ****
+      size_t      length
+  )
+  {
+!     if (mem_buf_p->bytes_avail < length) {  /* Need to allocate more memory */
+          size_t size = MAX( BUF_INCR_SIZE, length);
+  
+          if (mem_buf_p->buffer == NULL) {            /* 1st append   */
+--- 188,194 ----
+      size_t      length
+  )
+  {
+!     if (mem_buf_p->bytes_avail < length + 1) {  /* Need to allocate more memory */
+          size_t size = MAX( BUF_INCR_SIZE, length);
+  
+          if (mem_buf_p->buffer == NULL) {            /* 1st append   */
+***************
+*** 1722,1727 ****
+--- 1722,1729 ----
+                      sp -= 2;
+                      while (*sp != '\n')     /* Until end of line    */
+                          mcpp_fputc( *sp++, OUT);
++                     mcpp_fputc( '\n', OUT);
++                     wrong_line = TRUE;
+                  }
+                  goto  end_line;
+              default:                        /* Not a comment        */
+diff -r -c -N ../mcpp-2.7.2-old/src/system.c ./src/system.c
+*** ../mcpp-2.7.2-old/src/system.c      2008-11-26 10:53:51.000000000 +0100
+--- ./src/system.c      2011-02-21 16:18:05.678058106 +0100
+***************
+*** 3534,3539 ****
+--- 3534,3565 ----
+      FILEINFO *      file;
+      const char *    too_many_include_nest =
+              "More than %.0s%ld nesting of #include";    /* _F_ _W4_ */
++             
++     //
++     // When encoding is UTF-8, skip BOM if present.
++     //
++     if(mbchar == UTF8 && fp != NULL && ftell(fp) == 0)
++     {
++         const unsigned char UTF8_BOM[3] = {0xEF, 0xBB, 0xBF};
++         unsigned char FILE_HEAD[3] = {0, 0, 0};
++         int i;
++         for(i = 0; i < 3; ++i)
++         {
++             FILE_HEAD[i] = getc(fp);
++             if(FILE_HEAD[i] != UTF8_BOM[i])
++             {
++                 if(FILE_HEAD[i] == (unsigned char)EOF)
++                 {
++                     i--;
++                 }
++                 for(; i >= 0; --i)
++                 {
++                     ungetc(FILE_HEAD[i], fp);
++                 }
++                 break;
++             }
++         }
++     }
+  
+      filename = set_fname( filename);    /* Search or append to fnamelist[]  */
+      fullname = set_fname( fullname);    /* Search or append to fnamelist[]  */
+***************
+*** 3858,3863 ****
+--- 3884,3892 ----
+  }
+  #endif
+  
++ FILEINFO*       sh_file;
++ int             sh_line;
++ 
+  void    sharp(
+      FILEINFO *  sharp_file,
+      int         flag        /* Flag to append to the line for GCC   */
+***************
+*** 3868,3875 ****
+   * else (i.e. 'sharp_file' is NULL) 'infile'.
+   */
+  {
+-     static FILEINFO *   sh_file;
+-     static int  sh_line;
+      FILEINFO *  file;
+      int         line;
+  
+--- 3897,3902 ----
