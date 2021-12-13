@@ -501,9 +501,9 @@ python3-test-3.7.10-3.cm2.aarch64.rpm
 python3-tools-3.7.10-3.cm2.aarch64.rpm
 python3-xml-3.7.10-3.cm2.aarch64.rpm
 python-markupsafe-debuginfo-1.1.1-3.cm2.aarch64.rpm
-readline-7.0-5.cm2.aarch64.rpm
-readline-debuginfo-7.0-5.cm2.aarch64.rpm
-readline-devel-7.0-5.cm2.aarch64.rpm
+readline-8.1-1.cm2.aarch64.rpm
+readline-debuginfo-8.1-1.cm2.aarch64.rpm
+readline-devel-8.1-1.cm2.aarch64.rpm
 rpm-4.17.0-1.cm2.aarch64.rpm
 rpm-build-4.17.0-1.cm2.aarch64.rpm
 rpm-build-libs-4.17.0-1.cm2.aarch64.rpm

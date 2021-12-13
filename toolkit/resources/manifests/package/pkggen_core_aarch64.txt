@@ -37,8 +37,8 @@ ncurses-compat-6.2-4.cm2.aarch64.rpm
 ncurses-devel-6.2-4.cm2.aarch64.rpm
 ncurses-libs-6.2-4.cm2.aarch64.rpm
 ncurses-term-6.2-4.cm2.aarch64.rpm
-readline-7.0-5.cm2.aarch64.rpm
-readline-devel-7.0-5.cm2.aarch64.rpm
+readline-8.1-1.cm2.aarch64.rpm
+readline-devel-8.1-1.cm2.aarch64.rpm
 coreutils-8.32-1.cm2.aarch64.rpm
 coreutils-lang-8.32-1.cm2.aarch64.rpm
 bash-5.1.8-1.cm2.aarch64.rpm
