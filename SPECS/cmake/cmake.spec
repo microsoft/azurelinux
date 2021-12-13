@@ -64,7 +64,7 @@ sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{majo
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
 rm %{_lib64dir}/lib{stdc++,gfortran}.a
 
-%make_build test
+bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %files
 %defattr(-,root,root)
@@ -81,6 +81,7 @@ rm %{_lib64dir}/lib{stdc++,gfortran}.a
 %changelog
 * Sun Dec 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.4-2
 - Adding a workaround for two failing "ParseImplicitLinkInfo" test cases until a fix is available.
+- Adjusted test command to re-run flaky tests.
 - Bringing back generation of debug symbols.
 
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.4-1
