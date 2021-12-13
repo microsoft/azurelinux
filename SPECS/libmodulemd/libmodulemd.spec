@@ -2,7 +2,7 @@
 Summary:        Module manipulating metadata files
 Name:           libmodulemd
 Version:        2.13.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
 Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{version}/modulemd-%{version}.tar.xz
@@ -42,11 +42,6 @@ It contains the libraries and header files.
 
 %build
 %meson \
-    -Ddeveloper_build=false \
-    -Dbuild_api_v1=true \
-    -Dbuild_api_v2=true \
-    -Dwith_py3_overrides=true \
-    -Dwith_py2_overrides=false \
 %if %{with docs}
     -Dwith_docs=true \
 %else
@@ -82,6 +77,9 @@ export LC_CTYPE=C.utf8
 %{_includedir}/modulemd-2.0/*
 
 %changelog
+* Sun Dec 12 2021 Chris Co <chrco@microsoft.com> - 2.13.0-2
+- Fix build options with new meson
+
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 2.13.0-1
 - Upgrade to latest version
 - Use updated source URL
