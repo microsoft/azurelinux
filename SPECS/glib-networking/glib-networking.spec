@@ -1,7 +1,7 @@
 Summary:        Glib networking modules
 Name:           glib-networking
 Version:        2.59.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+ with exceptions
 URL:            https://gitlab.gnome.org/GNOME/glib-networking/
 Group:          System Environment/Development
@@ -45,10 +45,7 @@ These are the additional language files of glib-networking.
 %build
 mkdir build &&
 cd    build &&
-meson --prefix=/usr            \
-      -Dlibproxy_support=false \
-      -Dgnome_proxy_support=false \
-      -Dpkcs11_support=false .. &&
+meson --prefix=/usr  &&
 ninja
 
 %install
@@ -72,6 +69,9 @@ ninja test
 %defattr(-,root,root)
 
 %changelog
+* Sun Dec 12 2021 Chris Co <chrco@microsoft.com> - 2.59.1-8
+- Fix build options with new meson
+
 *   Tue Apr 13 2021 Rachel Menge <rachelmengem@microsoft.com> - 2.59.1-7
 -   Bump release to rebuild with new nettle (3.7.2)
 *   Tue Aug 18 2020 Henry Beberman <hebeberm@microsoft.com> - 2.59.1-6
