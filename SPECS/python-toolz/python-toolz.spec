@@ -28,7 +28,7 @@ suitable for most developers.
 Summary:        A functional standard library for Python
 Name:           python-%{srcname}
 Version:        0.11.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,8 +43,10 @@ BuildArch:      noarch
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        A functional standard library for Python %{python3_version}
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-nose
 BuildRequires:  python%{python3_pkgversion}-setuptools
+%if %{with_check}
+BuildRequires:  python%{python3_pkgversion}-pip
+%endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
 %{desc}
@@ -59,6 +61,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 %py3_install
 
 %check
+pip3 install nose
 nosetests-%{python3_version}
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -67,6 +70,9 @@ nosetests-%{python3_version}
 %{python3_sitelib}/tlz/
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.11.1-4
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.11.1-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

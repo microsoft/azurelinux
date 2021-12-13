@@ -1,11 +1,7 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-#
-# tdnf spec file
-#
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        2.1.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +39,7 @@ BuildRequires:  createrepo_c
 BuildRequires:  glib
 BuildRequires:  libxml2
 BuildRequires:  python3-requests
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %endif
@@ -112,8 +109,7 @@ cmake \
 make %{?_smp_mflags} && make python
 
 %check
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-$easy_install_3 pytest
+pip3 install pytest
 cd build && make %{?_smp_mflags} check
 
 %install
@@ -201,6 +197,9 @@ find %{buildroot} -name '*.pyc' -delete
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-8
+- Replace easy_install usage with pip in %%check sections
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-7
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

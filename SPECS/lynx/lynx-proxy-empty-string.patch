@@ -1,0 +1,15 @@
+Index: lynx2.8.9rel.1/WWW/Library/Implementation/HTAccess.c
+===================================================================
+--- lynx2.8.9rel.1/WWW/Library/Implementation/HTAccess.c	2014-02-22 20:28:32.000000000 +0000
++++ lynx2.8.9rel.1/WWW/Library/Implementation/HTAccess.c	2014-02-22 20:28:45.000000000 +0000
+@@ -513,6 +513,9 @@ static int get_physical(const char *addr
+ 	else
+ 	    sprintf(gateway_parameter, "%s_proxy", acc_method);
+ 	proxy = LYGetEnv(gateway_parameter);
++	if (proxy)
++	    if (*proxy == '\0')
++		proxy = NULL;
+ 	FREE(gateway_parameter);
+ 
+ 	if (gateway)
+

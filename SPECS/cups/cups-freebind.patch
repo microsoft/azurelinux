@@ -1,0 +1,15 @@
+diff -up cups-2.0.2/cups/http-addr.c.freebind cups-2.0.2/cups/http-addr.c
+--- cups-2.0.2/cups/http-addr.c.freebind	2015-02-10 14:46:33.000000000 +0100
++++ cups-2.0.2/cups/http-addr.c	2015-02-10 14:50:35.074759141 +0100
+@@ -186,6 +186,10 @@ httpAddrListen(http_addr_t *addr,	/* I -
+   val = 1;
+   setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, CUPS_SOCAST &val, sizeof(val));
+ 
++#ifdef __linux
++  setsockopt(fd, IPPROTO_IP, IP_FREEBIND, CUPS_SOCAST &val, sizeof(val));
++#endif /* __linux */
++
+ #ifdef IPV6_V6ONLY
+   if (addr->addr.sa_family == AF_INET6)
+     setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, CUPS_SOCAST &val, sizeof(val));
+diff -up cups-2.0.2/scheduler/listen.c.freebind cups-2.0.2/scheduler/listen.c

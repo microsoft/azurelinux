@@ -39,7 +39,7 @@
 
 %py_install_egg() %{expand:\\\
   mkdir -p %{buildroot}%{python_sitelib}
-  easy_install -m --prefix %{buildroot}%{_prefix} -Z dist/*-py%{python_version}.egg %{?*}
+  %{__python} -m easy_install -m --prefix %{buildroot}%{_prefix} -Z dist/*-py%{python_version}.egg %{?*}
   rm -rfv %{buildroot}%{_bindir}/__pycache__
 }
 

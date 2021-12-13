@@ -1,0 +1,233 @@
+From ed9b3f505718f9a877f5029a002bd097635840fc Mon Sep 17 00:00:00 2001
+From: Matthias Clasen <mclasen@redhat.com>
+Date: Thu, 1 Apr 2021 15:15:47 -0400
+Subject: [PATCH] Revert Compose sequence changes
+
+This was breaking muscle memory of people with
+the us intl keyboard layout, for important keys
+such as '. The unfortunate side-effect is that
+our handling of <dead_acute> is a bit hampered
+by sequences that don't fit the pattern. But
+such is life.
+
+Fixes: #3807
+---
+ gtk/compose/gtk-compose-lookaside.txt |  4 --
+ gtk/compose/gtk-compose-remove.txt    | 14 -----
+ gtk/gtkimcontextsimpleseqs.h          | 73 ++++++++++++++++-----------
+ 3 files changed, 43 insertions(+), 48 deletions(-)
+ delete mode 100644 gtk/compose/gtk-compose-remove.txt
+
+diff --git a/gtk/compose/gtk-compose-lookaside.txt b/gtk/compose/gtk-compose-lookaside.txt
+index c846cc8121..3f3b23c69c 100644
+--- a/gtk/compose/gtk-compose-lookaside.txt
++++ b/gtk/compose/gtk-compose-lookaside.txt
+@@ -403,7 +403,3 @@
+ <Multi_key> <Greek_omicron> <apostrophe> 			: "ό" U03CC
+ <Multi_key> <Greek_upsilon> <apostrophe> 			: "ύ" U03CD
+ <Multi_key> <Greek_omega> <apostrophe> 			: "ώ" U03CE
+-
+-# This sequence matches our handling of dead keys better.
+-# We remove the xorg sequence that maps this to '
+-<dead_acute> <space> : "´" acute # ACUTE ACCENT
+diff --git a/gtk/compose/gtk-compose-remove.txt b/gtk/compose/gtk-compose-remove.txt
+deleted file mode 100644
+index 620df9e9ce..0000000000
+--- a/gtk/compose/gtk-compose-remove.txt
++++ /dev/null
+@@ -1,14 +0,0 @@
+-<dead_tilde> <dead_tilde>        	: "~"   asciitilde # TILDE
+-<dead_acute> <space>             	: "'"   apostrophe # APOSTROPHE
+-<dead_acute> <dead_acute>        	: "´"   acute # ACUTE ACCENT
+-<dead_grave> <dead_grave>        	: "`"   grave # GRAVE ACCENT
+-<dead_abovering> <dead_abovering> 	: "°"   degree # DEGREE SIGN
+-<dead_macron> <dead_macron>      	: "¯"   macron # MACRON
+-<dead_breve> <dead_breve>        	: "˘"   breve # BREVE
+-<dead_abovedot> <dead_abovedot>  	: "˙"   abovedot # DOT ABOVE
+-<dead_diaeresis> <dead_diaeresis> 	: "¨"   diaeresis # DIAERESIS
+-<dead_doubleacute> <dead_doubleacute> 	: "˝"   U2dd # DOUBLE ACUTE ACCENT
+-<dead_caron> <dead_caron>        	: "ˇ"   caron # CARON
+-<dead_cedilla> <dead_cedilla>    	: "¸"   cedilla # CEDILLA
+-<dead_ogonek> <dead_ogonek>      	: "˛"   ogonek # OGONEK
+-<dead_iota> <dead_iota>          	: "ͺ"   U37a # GREEK YPOGEGRAMMENI
+diff --git a/gtk/gtkimcontextsimpleseqs.h b/gtk/gtkimcontextsimpleseqs.h
+index 9cbf37d078..b480ca1a2d 100644
+--- a/gtk/gtkimcontextsimpleseqs.h
++++ b/gtk/gtkimcontextsimpleseqs.h
+@@ -66,35 +66,35 @@
+ 
+ static const guint16 gtk_compose_seqs_compact[] = {
+ GDK_KEY_Greek_accentdieresis, 180, 184, 184, 184, 184, 
+-GDK_KEY_dead_grave, 184, 244, 331, 543, 543, 
+-GDK_KEY_dead_acute, 543, 605, 701, 977, 977, 
+-GDK_KEY_dead_circumflex, 977, 1101, 1101, 1301, 1301, 
+-GDK_KEY_dead_tilde, 1301, 1383, 1446, 1586, 1586, 
+-GDK_KEY_dead_macron, 1586, 1630, 1648, 1720, 1720, 
+-GDK_KEY_dead_breve, 1720, 1768, 1768, 1792, 1792, 
+-GDK_KEY_dead_abovedot, 1792, 1820, 1823, 1859, 1859, 
+-GDK_KEY_dead_diaeresis, 1859, 1945, 1957, 1981, 1981, 
+-GDK_KEY_dead_abovering, 1981, 1989, 1989, 1989, 1989, 
+-GDK_KEY_dead_doubleacute, 1989, 1997, 1997, 1997, 1997, 
+-GDK_KEY_dead_caron, 1997, 2037, 2037, 2045, 2045, 
+-GDK_KEY_dead_cedilla, 2045, 2055, 2061, 2061, 2061, 
+-GDK_KEY_dead_ogonek, 2061, 2069, 2069, 2069, 2069, 
+-GDK_KEY_dead_iota, 2069, 2089, 2188, 2620, 3280, 
+-GDK_KEY_dead_voiced_sound, 3280, 3326, 3326, 3326, 3326, 
+-GDK_KEY_dead_semivoiced_sound, 3326, 3336, 3336, 3336, 3336, 
+-GDK_KEY_dead_belowdot, 3336, 3352, 3352, 3368, 3368, 
+-GDK_KEY_dead_hook, 3368, 3446, 3449, 3505, 3505, 
+-GDK_KEY_dead_horn, 3505, 3515, 3515, 3515, 3515, 
+-GDK_KEY_dead_stroke, 3515, 3603, 3615, 3615, 3615, 
+-GDK_KEY_dead_psili, 3615, 3643, 3643, 3643, 3643, 
+-GDK_KEY_dead_dasia, 3643, 3675, 3675, 3675, 3675, 
+-GDK_KEY_dead_belowring, 3675, 3677, 3677, 3677, 3677, 
+-GDK_KEY_dead_belowtilde, 3677, 3679, 3679, 3679, 3679, 
+-GDK_KEY_dead_belowdiaeresis, 3679, 3679, 3682, 3682, 3682, 
+-GDK_KEY_dead_belowcomma, 3682, 3696, 3696, 3696, 3696, 
+-GDK_KEY_dead_currency, 3696, 3794, 3800, 3800, 3800, 
+-GDK_KEY_dead_greek, 3800, 3902, 3926, 3926, 3926, 
+-GDK_KEY_Multi_key, 3926, 3926, 10637, 14345, 16220, 
++GDK_KEY_dead_grave, 184, 246, 333, 545, 545, 
++GDK_KEY_dead_acute, 545, 609, 705, 981, 981, 
++GDK_KEY_dead_circumflex, 981, 1105, 1105, 1305, 1305, 
++GDK_KEY_dead_tilde, 1305, 1389, 1452, 1592, 1592, 
++GDK_KEY_dead_macron, 1592, 1638, 1656, 1728, 1728, 
++GDK_KEY_dead_breve, 1728, 1778, 1778, 1802, 1802, 
++GDK_KEY_dead_abovedot, 1802, 1832, 1835, 1871, 1871, 
++GDK_KEY_dead_diaeresis, 1871, 1959, 1971, 1995, 1995, 
++GDK_KEY_dead_abovering, 1995, 2005, 2005, 2005, 2005, 
++GDK_KEY_dead_doubleacute, 2005, 2015, 2015, 2015, 2015, 
++GDK_KEY_dead_caron, 2015, 2057, 2057, 2065, 2065, 
++GDK_KEY_dead_cedilla, 2065, 2077, 2083, 2083, 2083, 
++GDK_KEY_dead_ogonek, 2083, 2093, 2093, 2093, 2093, 
++GDK_KEY_dead_iota, 2093, 2115, 2214, 2646, 3306, 
++GDK_KEY_dead_voiced_sound, 3306, 3352, 3352, 3352, 3352, 
++GDK_KEY_dead_semivoiced_sound, 3352, 3362, 3362, 3362, 3362, 
++GDK_KEY_dead_belowdot, 3362, 3378, 3378, 3394, 3394, 
++GDK_KEY_dead_hook, 3394, 3472, 3475, 3531, 3531, 
++GDK_KEY_dead_horn, 3531, 3541, 3541, 3541, 3541, 
++GDK_KEY_dead_stroke, 3541, 3629, 3641, 3641, 3641, 
++GDK_KEY_dead_psili, 3641, 3669, 3669, 3669, 3669, 
++GDK_KEY_dead_dasia, 3669, 3701, 3701, 3701, 3701, 
++GDK_KEY_dead_belowring, 3701, 3703, 3703, 3703, 3703, 
++GDK_KEY_dead_belowtilde, 3703, 3705, 3705, 3705, 3705, 
++GDK_KEY_dead_belowdiaeresis, 3705, 3705, 3708, 3708, 3708, 
++GDK_KEY_dead_belowcomma, 3708, 3722, 3722, 3722, 3722, 
++GDK_KEY_dead_currency, 3722, 3820, 3826, 3826, 3826, 
++GDK_KEY_dead_greek, 3826, 3928, 3952, 3952, 3952, 
++GDK_KEY_Multi_key, 3952, 3952, 10663, 14371, 16246, 
+ GDK_KEY_Greek_iota, 0x0390, 
+ GDK_KEY_Greek_upsilon, 0x03B0, 
+ GDK_KEY_space, 0x0060, 
+@@ -127,6 +127,7 @@ GDK_KEY_Greek_iota, 0x1F76,
+ GDK_KEY_Greek_omicron, 0x1F78, 
+ GDK_KEY_Greek_upsilon, 0x1F7A, 
+ GDK_KEY_Greek_omega, 0x1F7C, 
++GDK_KEY_dead_grave, 0x0060, 
+ GDK_KEY_dead_diaeresis, GDK_KEY_Greek_iota, 0x1FD2, 
+ GDK_KEY_dead_diaeresis, GDK_KEY_Greek_upsilon, 0x1FE2, 
+ GDK_KEY_dead_psili, GDK_KEY_Greek_ALPHA, 0x1F0A, 
+@@ -209,7 +210,7 @@ GDK_KEY_Multi_key, GDK_KEY_macron, GDK_KEY_E, 0x1E14,
+ GDK_KEY_Multi_key, GDK_KEY_macron, GDK_KEY_O, 0x1E50, 
+ GDK_KEY_Multi_key, GDK_KEY_macron, GDK_KEY_e, 0x1E15, 
+ GDK_KEY_Multi_key, GDK_KEY_macron, GDK_KEY_o, 0x1E51, 
+-GDK_KEY_space, 0x00B4, 
++GDK_KEY_space, 0x0027, 
+ GDK_KEY_V, 0x01D7, 
+ GDK_KEY_v, 0x01D8, 
+ GDK_KEY_nobreakspace, 0x0301, 
+@@ -240,6 +241,7 @@ GDK_KEY_Greek_iota, 0x03AF,
+ GDK_KEY_Greek_omicron, 0x03CC, 
+ GDK_KEY_Greek_upsilon, 0x03CD, 
+ GDK_KEY_Greek_omega, 0x03CE, 
++GDK_KEY_dead_acute, 0x00B4, 
+ GDK_KEY_dead_diaeresis, GDK_KEY_space, 0x0385, 
+ GDK_KEY_dead_diaeresis, GDK_KEY_Greek_iota, 0x0390, 
+ GDK_KEY_dead_diaeresis, GDK_KEY_Greek_upsilon, 0x03B0, 
+@@ -494,6 +496,7 @@ GDK_KEY_Greek_omega, 0x1FF6,
+ 0x1F61, 0x1F67, 
+ 0x1F68, 0x1F6E, 
+ 0x1F69, 0x1F6F, 
++GDK_KEY_dead_tilde, 0x007E, 
+ GDK_KEY_dead_diaeresis, GDK_KEY_Greek_iota, 0x1FD7, 
+ GDK_KEY_dead_diaeresis, GDK_KEY_Greek_upsilon, 0x1FE7, 
+ GDK_KEY_dead_psili, GDK_KEY_Greek_ALPHA, 0x1F0E, 
+@@ -572,6 +575,7 @@ GDK_KEY_Greek_UPSILON, 0x1FE9,
+ GDK_KEY_Greek_alpha, 0x1FB1, 
+ GDK_KEY_Greek_iota, 0x1FD1, 
+ GDK_KEY_Greek_upsilon, 0x1FE1, 
++GDK_KEY_dead_macron, 0x00AF, 
+ GDK_KEY_dead_greek, GDK_KEY_A, 0x1FB9, 
+ GDK_KEY_dead_greek, GDK_KEY_I, 0x1FD9, 
+ GDK_KEY_dead_greek, GDK_KEY_U, 0x1FE9, 
+@@ -620,6 +624,7 @@ GDK_KEY_Greek_UPSILON, 0x1FE8,
+ GDK_KEY_Greek_alpha, 0x1FB0, 
+ GDK_KEY_Greek_iota, 0x1FD0, 
+ GDK_KEY_Greek_upsilon, 0x1FE0, 
++GDK_KEY_dead_breve, 0x02D8, 
+ GDK_KEY_Multi_key, GDK_KEY_exclam, GDK_KEY_A, 0x1EB6, 
+ GDK_KEY_Multi_key, GDK_KEY_exclam, GDK_KEY_a, 0x1EB7, 
+ GDK_KEY_Multi_key, GDK_KEY_comma, GDK_KEY_E, 0x1E1C, 
+@@ -640,6 +645,7 @@ GDK_KEY_Amacron, 0x01E0,
+ GDK_KEY_Omacron, 0x0230, 
+ GDK_KEY_amacron, 0x01E1, 
+ GDK_KEY_omacron, 0x0231, 
++GDK_KEY_dead_abovedot, 0x02D9, 
+ GDK_KEY_dead_stroke, GDK_KEY_j, 0x025F, 
+ GDK_KEY_Multi_key, GDK_KEY_exclam, GDK_KEY_S, 0x1E68, 
+ GDK_KEY_Multi_key, GDK_KEY_exclam, GDK_KEY_s, 0x1E69, 
+@@ -693,6 +699,7 @@ GDK_KEY_Greek_IOTA, 0x03AA,
+ GDK_KEY_Greek_UPSILON, 0x03AB, 
+ GDK_KEY_Greek_iota, 0x03CA, 
+ GDK_KEY_Greek_upsilon, 0x03CB, 
++GDK_KEY_dead_diaeresis, 0x00A8, 
+ GDK_KEY_dead_acute, GDK_KEY_space, 0x0385, 
+ GDK_KEY_dead_acute, GDK_KEY_Greek_iota, 0x0390, 
+ GDK_KEY_dead_acute, GDK_KEY_Greek_upsilon, 0x03B0, 
+@@ -707,10 +714,12 @@ GDK_KEY_space, 0x00B0,
+ GDK_KEY_nobreakspace, 0x030A, 
+ GDK_KEY_Aacute, 0x01FA, 
+ GDK_KEY_aacute, 0x01FB, 
++GDK_KEY_dead_abovering, 0x00B0, 
+ GDK_KEY_space, 0x02DD, 
+ GDK_KEY_nobreakspace, 0x030B, 
+ GDK_KEY_Cyrillic_u, 0x04F3, 
+ GDK_KEY_Cyrillic_U, 0x04F2, 
++GDK_KEY_dead_doubleacute, 0x02DD, 
+ GDK_KEY_space, 0x02C7, 
+ GDK_KEY_parenleft, 0x208D, 
+ GDK_KEY_parenright, 0x208E, 
+@@ -731,6 +740,7 @@ GDK_KEY_V, 0x01D9,
+ GDK_KEY_v, 0x01DA, 
+ GDK_KEY_nobreakspace, 0x030C, 
+ 0x01F2, 0x01C5, 
++GDK_KEY_dead_caron, 0x02C7, 
+ GDK_KEY_Multi_key, GDK_KEY_quotedbl, GDK_KEY_U, 0x01D9, 
+ GDK_KEY_Multi_key, GDK_KEY_quotedbl, GDK_KEY_u, 0x01DA, 
+ GDK_KEY_space, 0x00B8, 
+@@ -738,12 +748,14 @@ GDK_KEY_nobreakspace, 0x0327,
+ GDK_KEY_cent, 0x20B5, 
+ GDK_KEY_Cacute, 0x1E08, 
+ GDK_KEY_cacute, 0x1E09, 
++GDK_KEY_dead_cedilla, 0x00B8, 
+ GDK_KEY_dead_currency, GDK_KEY_C, 0x20B5, 
+ GDK_KEY_dead_currency, GDK_KEY_c, 0x20B5, 
+ GDK_KEY_space, 0x02DB, 
+ GDK_KEY_nobreakspace, 0x0328, 
+ GDK_KEY_Omacron, 0x01EC, 
+ GDK_KEY_omacron, 0x01ED, 
++GDK_KEY_dead_ogonek, 0x02DB, 
+ GDK_KEY_space, 0x037A, 
+ GDK_KEY_Greek_alphaaccent, 0x1FB4, 
+ GDK_KEY_Greek_etaaccent, 0x1FC4, 
+@@ -754,6 +766,7 @@ GDK_KEY_Greek_OMEGA, 0x1FFC,
+ GDK_KEY_Greek_alpha, 0x1FB3, 
+ GDK_KEY_Greek_eta, 0x1FC3, 
+ GDK_KEY_Greek_omega, 0x1FF3, 
++GDK_KEY_dead_iota, 0x037A, 
+ GDK_KEY_dead_grave, GDK_KEY_Greek_alpha, 0x1FB2, 
+ GDK_KEY_dead_grave, GDK_KEY_Greek_eta, 0x1FC2, 
+ GDK_KEY_dead_grave, GDK_KEY_Greek_omega, 0x1FF2, 
+-- 
+GitLab
+

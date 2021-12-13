@@ -10,7 +10,7 @@
 
 Name:          systemtap
 Version:       4.1
-Release:       7%{?dist}
+Release:       8%{?dist}
 Summary:       Programmable system-wide instrumentation system
 Group:         Development/System
 Vendor:         Microsoft Corporation
@@ -319,7 +319,7 @@ fi
 
 %files python
 %defattr(-,root,root)
-%{_libdir}/python3.7/site-packages/*
+%{python3_sitelib}/*
 %{_libexecdir}/systemtap/python/stap-resolve-module-function.py
 
 %files runtime
@@ -361,6 +361,9 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-8
+- Don't hardcode python site-packages directory (enables Python 3.9 build)
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 4.1-7
 - Remove epoch
 

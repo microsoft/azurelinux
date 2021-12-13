@@ -1,0 +1,44 @@
+From ae74d9344a1052408a0d8edb19d75cf7cffddcc2 Mon Sep 17 00:00:00 2001
+From: Christian Boltz <gitlab2@cboltz.de>
+Date: Mon, 18 Nov 2019 20:16:33 +0000
+Subject: [PATCH] Merge branch 'fix-autoconf-check-for-python-3.8' into
+ 'master'
+
+Fix a Python 3.8 autoconf check
+
+See merge request apparmor/apparmor!430
+
+Acked-by: Christian Boltz <apparmor@cboltz.de> for master and 2.13
+Acked-by: Steve Beattie <steve@nxnw.org> for master and 2.13
+
+(cherry picked from commit 3db14e8e49dea227b8b95f4aef47dbf505beac2d)
+
+ccbf1e0b Fix a Python 3.8 autoconf check
+---
+ libraries/libapparmor/m4/ac_python_devel.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libraries/libapparmor/m4/ac_python_devel.m4 b/libraries/libapparmor/m4/ac_python_devel.m4
+index 2ea7dc77a..29cf090d4 100644
+--- a/libraries/libapparmor/m4/ac_python_devel.m4
++++ b/libraries/libapparmor/m4/ac_python_devel.m4
+@@ -139,7 +139,7 @@ sys.stdout.write('%s\n' % distutils.sysconfig.get_python_lib(0,0));"`
+         if test -z "$PYTHON_EXTRA_LIBS"; then
+            PYTHON_EXTRA_LIBS=`$PYTHON -c "import sys; import distutils.sysconfig; \
+ conf = distutils.sysconfig.get_config_var; \
+-sys.stdout.write('%s %s\n' % (conf('LOCALMODLIBS'), conf('LIBS')))"`
++sys.stdout.write('%s %s %s\n' % (conf('BLDLIBRARY'), conf('LOCALMODLIBS'), conf('LIBS')))"`
+         fi
+         AC_MSG_RESULT([$PYTHON_EXTRA_LIBS])
+         AC_SUBST(PYTHON_EXTRA_LIBS)
+@@ -164,7 +164,7 @@ sys.stdout.write('%s\n' % conf('LINKFORSHARED'))"`
+         # save current global flags
+         ac_save_LIBS="$LIBS"
+         ac_save_CPPFLAGS="$CPPFLAGS"
+-        LIBS="$ac_save_LIBS $PYTHON_LDFLAGS"
++        LIBS="$ac_save_LIBS $PYTHON_LDFLAGS $PYTHON_EXTRA_LIBS"
+         CPPFLAGS="$ac_save_CPPFLAGS $PYTHON_CPPFLAGS"
+         AC_TRY_LINK([
+                 #include <Python.h>
+-- 
+GitLab

@@ -1,7 +1,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        19.2.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,9 +60,7 @@ ln -s cftp %{buildroot}/%{_bindir}/cftp3
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 chmod g+w . -R
 useradd test -G root -m
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pip
-pip install --upgrade tox
+pip3 install --upgrade tox
 chmod g+w . -R
 LANG=en_US.UTF-8 sudo -u test tox -e py36-tests
 
@@ -89,6 +87,9 @@ LANG=en_US.UTF-8 sudo -u test tox -e py36-tests
 %{_bindir}/cftp3
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 19.2.1-8
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 19.2.1-7
 - Remove python2 package, move default bindaries to python3 package
 - Lint spec

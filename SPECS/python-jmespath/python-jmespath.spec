@@ -1,7 +1,7 @@
 Summary:        Query Language for JSON
 Name:           python-jmespath
 Version:        0.9.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
+BuildRequires:  python3-pip
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 %endif
@@ -39,8 +40,7 @@ JMESPath (pronounced “james path”) allows you to declaratively specify how t
 ln -sfv jp.py %{buildroot}%{_bindir}/jp.py-%{python3_version}
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 nose
+pip3 install nose
 %python3 setup.py test
 
 %files -n python3-jmespath
@@ -51,6 +51,9 @@ $easy_install_3 nose
 %{_bindir}/jp.py-%{python3_version}
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.3-6
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.3-5
 - Add license to python3 package
 - Remove python2 package,

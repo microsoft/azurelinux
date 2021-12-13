@@ -1,0 +1,218 @@
+From a09ea6bd74d6234be8456e7039403bc1c1d078bd Mon Sep 17 00:00:00 2001
+From: Christophe Fergeau <cfergeau@redhat.com>
+Date: Mon, 20 Jun 2016 12:05:48 +0200
+Subject: [PATCH 1/4] xml-node: Use GString in rest_xml_node_print()
+
+The current code is using xml = g_strconcat (xml, ...) which is causing
+some leaks as g_strconcat returns a newly allocated string. Using
+GString avoids this issue without constantly freeing the intermediate
+strings.
+
+This fixes multiple leaks like:
+
+==16611== 18 bytes in 1 blocks are definitely lost in loss record 124 of 301
+==16611==    at 0x4C2BBAD: malloc (vg_replace_malloc.c:299)
+==16611==    by 0x5F5CE58: g_malloc (gmem.c:94)
+==16611==    by 0x5F75B8E: g_strconcat (gstrfuncs.c:585)
+==16611==    by 0x4E450CF: rest_xml_node_print (rest-xml-node.c:287)
+==16611==    by 0x4E451DA: rest_xml_node_print (rest-xml-node.c:305)
+==16611==    by 0x4E450F8: rest_xml_node_print (rest-xml-node.c:292)
+==16611==    by 0x4009A0: main (xml.c:40)
+---
+ rest/rest-xml-node.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/rest/rest-xml-node.c b/rest/rest-xml-node.c
+index 57a942667f06..a8156dbbd432 100644
+--- a/rest/rest-xml-node.c
++++ b/rest/rest-xml-node.c
+@@ -283,38 +283,41 @@ rest_xml_node_print (RestXmlNode *node)
+ {
+   GHashTableIter iter;
+   gpointer       key, value;
+-  char          *xml = g_strconcat ("<", node->name, NULL);
++  GString        *xml = g_string_new (NULL);
+   RestXmlNode   *n;
+ 
++  g_string_append (xml, "<");
++  g_string_append (xml, node->name);
++
+   g_hash_table_iter_init (&iter, node->attrs);
+   while (g_hash_table_iter_next (&iter, &key, &value))
+-    xml = g_strconcat (xml, " ", key, "=\'", value, "\'", NULL);
++    g_string_append_printf (xml, " %s =\'%s\'", (char *)key, (char *)value);
+ 
+-  xml = g_strconcat (xml, ">", NULL);
++  g_string_append (xml, ">");
+ 
+   g_hash_table_iter_init (&iter, node->children);
+   while (g_hash_table_iter_next (&iter, &key, &value))
+     {
+       char *child = rest_xml_node_print ((RestXmlNode *) value);
+ 
+-      xml = g_strconcat (xml, child, NULL);
++      g_string_append (xml, child);
+       g_free (child);
+     }
+ 
+   if (node->content)
+-    xml = g_strconcat (xml, node->content, "</", node->name, ">", NULL);
+-  else
+-    xml = g_strconcat (xml, "</", node->name, ">", NULL);
++    g_string_append (xml, node->content);
++
++  g_string_append_printf (xml, "</%s>", node->name);
+ 
+   for (n = node->next; n; n = n->next)
+     {
+       char *sibling = rest_xml_node_print (n);
+ 
+-      xml = g_strconcat (xml, sibling, NULL);
++      g_string_append (xml, sibling);
+       g_free (sibling);
+     }
+ 
+-  return xml;
++  return g_string_free (xml, FALSE);
+ }
+ 
+ /**
+-- 
+2.14.2
+
+
+From a34d02947c4f102e6d16b9d328941a4b2946c8e8 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Fri, 13 Oct 2017 18:53:39 +0200
+Subject: [PATCH 2/4] xml-node: Remove stray blank space
+
+This had broken tests/xml.c.
+
+Fallout from 61a7b231bd8b9d1b8d02dca120389e79d38b428d
+
+https://bugzilla.gnome.org/show_bug.cgi?id=788960
+---
+ rest/rest-xml-node.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rest/rest-xml-node.c b/rest/rest-xml-node.c
+index a8156dbbd432..d3a7c995affd 100644
+--- a/rest/rest-xml-node.c
++++ b/rest/rest-xml-node.c
+@@ -291,7 +291,7 @@ rest_xml_node_print (RestXmlNode *node)
+ 
+   g_hash_table_iter_init (&iter, node->attrs);
+   while (g_hash_table_iter_next (&iter, &key, &value))
+-    g_string_append_printf (xml, " %s =\'%s\'", (char *)key, (char *)value);
++    g_string_append_printf (xml, " %s=\'%s\'", (char *)key, (char *)value);
+ 
+   g_string_append (xml, ">");
+ 
+-- 
+2.14.2
+
+
+From f184db2bff0618b99c4de3316082fe80439f124c Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Fri, 13 Oct 2017 19:14:16 +0200
+Subject: [PATCH 3/4] xml-node: Define the order in which attributes & children
+ are printed
+
+The order in which GHashTable returns its key-value pairs is undefined.
+Therefore the output of rest_xml_node_print can change based on the
+GHashTable implementation. While not strictly necessary, it would be
+nice to avoid that. Having a stable order, even if it is not
+documented and depends on the current RestXmlNode code, is handy for
+testing.
+
+This was the main reason behind the tests/xml.c breakage.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=788960
+---
+ rest/rest-xml-node.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/rest/rest-xml-node.c b/rest/rest-xml-node.c
+index d3a7c995affd..973ebcf6c3fa 100644
+--- a/rest/rest-xml-node.c
++++ b/rest/rest-xml-node.c
+@@ -283,6 +283,9 @@ rest_xml_node_print (RestXmlNode *node)
+ {
+   GHashTableIter iter;
+   gpointer       key, value;
++  GList          *attrs = NULL;
++  GList          *children = NULL;
++  GList          *l;
+   GString        *xml = g_string_new (NULL);
+   RestXmlNode   *n;
+ 
+@@ -291,13 +294,29 @@ rest_xml_node_print (RestXmlNode *node)
+ 
+   g_hash_table_iter_init (&iter, node->attrs);
+   while (g_hash_table_iter_next (&iter, &key, &value))
+-    g_string_append_printf (xml, " %s=\'%s\'", (char *)key, (char *)value);
++    {
++      char *attr = g_strdup_printf ("%s=\'%s\'", (char *)key, (char *)value);
++      attrs = g_list_prepend (attrs, attr);
++    }
++
++  attrs = g_list_sort (attrs, (GCompareFunc) g_strcmp0);
++  for (l = attrs; l; l = l->next)
++    {
++      const char *attr = (const char *) l->data;
++      g_string_append_printf (xml, " %s", attr);
++    }
+ 
+   g_string_append (xml, ">");
+ 
+   g_hash_table_iter_init (&iter, node->children);
+   while (g_hash_table_iter_next (&iter, &key, &value))
++    children = g_list_prepend (children, key);
++
++  children = g_list_sort (children, (GCompareFunc) g_strcmp0);
++  for (l = children; l; l = l->next)
+     {
++      const char *name = (const char *) l->data;
++      RestXmlNode *value = (RestXmlNode *) g_hash_table_lookup (node->children, name);
+       char *child = rest_xml_node_print ((RestXmlNode *) value);
+ 
+       g_string_append (xml, child);
+@@ -317,6 +336,8 @@ rest_xml_node_print (RestXmlNode *node)
+       g_free (sibling);
+     }
+ 
++  g_list_free_full (attrs, g_free);
++  g_list_free (children);
+   return g_string_free (xml, FALSE);
+ }
+ 
+-- 
+2.14.2
+
+
+From e5ee6ef751ee5a38d7b9fadcd631cf6ecec7b240 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Fri, 13 Oct 2017 19:16:55 +0200
+Subject: [PATCH 4/4] tests: Re-enable the XML test
+
+This reverts commit 2d1dbfe7073b1e153ff881426b40a9a517fb796b
+
+https://bugzilla.gnome.org/show_bug.cgi?id=788960
+---
+ tests/Makefile.am | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 5d77f9cf5445..5ffdd4634e9a 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -1,6 +1,4 @@
+ TESTS = proxy proxy-continuous threaded oauth oauth-async oauth2 flickr lastfm xml custom-serialize
+-# TODO: fix this test case
+-XFAIL_TESTS = xml
+ 
+ AM_CPPFLAGS = $(SOUP_CFLAGS) -I$(top_srcdir) $(GCOV_CFLAGS)
+ AM_LDFLAGS = $(SOUP_LIBS) $(GCOV_LDFLAGS) \
+-- 
+2.14.2
+
