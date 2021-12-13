@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "apache-commons-io-build.xml": "3661f04824b5f93033dfc9f993a97f1435ff467f7e3cf5e2846f2d63a690ad3b",
+  "commons-io-2.8.0-src.tar.gz": "1e44c2b038bf825526305f0320b2e24dce039f399968326aab30c475ab765612",
+  "commons-io-2.8.0-src.tar.gz.asc": "5df617e9034a4e31cf7671af111edae1537dd14dc8d5e2fa4392a038f912df61"
+ }
+}

@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "macros.openmpi": "2a589b2f51029b89b1c764932b2ba9cd641a2207506029576490134d777893d4",
+  "openmpi-4.0.3.tar.bz2": "1402feced8c3847b3ab8252165b90f7d1fa28c23b6b2ca4632b6e4971267fd03",
+  "openmpi.module.in": "695a70da40deac62deb3dc69a00320d8001fc7a85cc41ee5a4bf5a2b4bdfbe41",
+  "openmpi.pth.py2": "7122de4b159a057cc390f97970a0b07f627298c87af4c1e2976bfce131dde925",
+  "openmpi.pth.py3": "2acaeda51628ea81b01876497dc4c84fe056317391262cab92e9dd40b0721e74"
+ }
+}

@@ -1,0 +1,223 @@
+<!-- 
+Open Source Metadata Framework (OMF XML DTD) Version 1.1
+
+Copyright (C) 1999, 2000  Kendall Grant Clark. All rights reserved.
+
+$Id: scrollkeeper-omf.dtd,v 1.3 2002/04/20 03:56:48 muet Exp $
+
+To use the OMF.dtd, an FPI like the following works:
+
+"-//Open Source Metadata Framework (OMF) //DTD OMF.dtd V1.1//EN"
+
+Permission to use, copy, modify and distribute the OMF DTD and its
+accompanying documentation for any purpose and without fee is hereby
+granted in perpetuity, provided that the above copyright notice and
+this paragraph appear in all copies.  The copyright holders make no
+representation about the suitability of the DTD for any purpose.  It
+is provided "as is" without expressed or implied warranty. If you
+modify the OMF DTD in any way, except for declaring and referencing
+additional sets of general entities, declaring additional notations,
+please label your DTD as a variant of OMF. This license requirement is
+stated solely in the interests of maintaining data interchange
+capability.
+     
+Please direct all queries, comments, and suggestions about OMF to
+Kendall Grant Clark, kclark@ntlug.org, or to Open Source Research
+Team's mailing list:ldp-meta@franklin.oic.unc.edu 
+
+                                                                   -->
+
+<!--
+Scrollkeeper Open Source Metadata Framework (SK OMF XML DTD) Version 1.0
+
+Copyright (C) 2002 Eric Baudais. All rights reserved.
+
+To use the scrollkeeper.dtd, an FPI like the following works:
+"-//OMF//DTD Scrollkeeper OMF Variant V1.0//EN"
+
+Permission to use, copy, modify and distribute the OMF DTD and its
+accompanying documentation for any purpose and without fee is hereby
+granted in perpetuity, provided that the above copyright notice and
+this paragraph appear in all copies.  The copyright holders make no
+representation about the suitability of the DTD for any purpose.  It
+is provided "as is" without expressed or implied warranty. If you
+modify the Scrollkeeper OMF DTD in any way, except for declaring and 
+referencing additional sets of general entities, declaring additional 
+notations, please label your DTD as a variant of Scrollkeeper. This 
+license requirement is stated solely in the interests of maintaining 
+data interchange capability.
+                                                                   -->
+
+<!-- ............................................................. -->
+<!-- Entity Sets ................................................. -->
+<!-- ............................................................. -->
+
+<!ENTITY % licenseTypes PUBLIC
+"-//Open Source Metadata Framework (OMF)//ENTITIES License Types//EN"
+"licenseTypes.mod"                                                   >
+<!-- %licenseTypes; -->
+
+<!ENTITY % countryCodes PUBLIC
+"-//Open Source Metadata Framework (OMF)//ENTITIES Country Codes//EN"
+"countryCodes.mod"                                                   >
+<!-- %countryCodes; -->
+
+<!ENTITY % languageCodes PUBLIC
+"-//Open Source Metadata Framework (OMF)//ENTITIES Language Codes//EN"
+"languageCodes.mod"                                                  >
+<!-- %languageCodes; -->
+
+<!ENTITY % linuxDistributions PUBLIC
+"-//Open Source Metadata Framework (OMF)//ENTITIES Linux Distributions//EN"
+"linuxDistributions.mod"                                             >
+<!-- %linuxDistributions; -->
+
+<!-- ............................................................. -->
+<!-- ............................................................. -->
+
+<!-- ............................................................. -->
+<!-- Internal Entities ........................................... -->
+<!-- ............................................................. -->
+<!ENTITY % base.attribute.set
+"id        ID                                 #IMPLIED
+modified   CDATA                              #IMPLIED
+created    CDATA                              #IMPLIED"              >
+
+<!ENTITY % core.attribute.set
+"%base.attribute.set;
+agent      CDATA                              #IMPLIED
+status     CDATA                              #IMPLIED"              >
+
+<!ENTITY % url.attribute.set
+"url       CDATA                              #REQUIRED
+%core.attribute.set;"                                                >
+
+<!ENTITY % value.attribute.set
+"value     CDATA                              #REQUIRED
+%core.attribute.set;"                                                >
+
+<!-- ............................................................. -->
+<!-- ............................................................. -->
+
+<!-- ............................................................. -->
+<!-- Element Declarations......................................... -->
+<!-- ............................................................. -->
+<!--                    omf root element                           -->
+<!ELEMENT  omf          (resource)+                                  >
+<!ATTLIST  omf
+             %base.attribute.set;                                    >
+
+<!--                    resource                                   -->
+<!ELEMENT  resource     (creator+, maintainer*, contributor*, title, 
+                         date, version*, subject*, description?, 
+                         type*, coverage*, format, identifier, 
+                         language, relation, source*, rights*)       >
+
+<!ATTLIST  resource
+             %core.attribute.set;                                    >
+<!--                    creator                                    -->
+<!ELEMENT  creator      (#PCDATA)                                    >
+<!ATTLIST  creator
+             %core.attribute.set;                                    >
+
+<!--                    maintainer                                 -->
+<!ELEMENT  maintainer   (#PCDATA)                                    >
+<!ATTLIST  maintainer
+             %core.attribute.set;                                    >
+
+<!--                    contributor                                -->
+<!ELEMENT  contributor  (#PCDATA)                                    >
+<!ATTLIST  contributor
+             %core.attribute.set;                                    >
+
+<!--                    title                                      -->
+<!ELEMENT  title        (#PCDATA)                                    >
+<!ATTLIST  title
+             %core.attribute.set;                                    >
+
+<!--                    version                                    -->
+<!ELEMENT  version      EMPTY                                        >
+<!ATTLIST  version
+             identifier CDATA                              #REQUIRED
+             date       CDATA                              #REQUIRED
+             description CDATA                             #IMPLIED
+             %core.attribute.set;                                    >
+
+<!--                    date                                       -->
+<!ELEMENT  date         (#PCDATA)                                    >
+<!ATTLIST  date
+             %core.attribute.set;                                    >
+<!--                    description                                -->
+<!ELEMENT  description  (#PCDATA)                                    >
+<!ATTLIST  description
+             %core.attribute.set;                                    >
+
+<!--                    subject                                    -->
+<!ELEMENT  subject      EMPTY                                        >
+<!ATTLIST  subject
+             category   CDATA                              #REQUIRED
+             %core.attribute.set;                                    >
+
+<!--                    type                                       -->
+<!--                    See coreTypes.mod, an entity set
+                        comprising a formal vocabulary for type    -->
+<!ELEMENT  type         (#PCDATA)                                    >
+<!ATTLIST  type
+             %core.attribute.set;                                    >
+
+<!--                    format                                     -->
+<!ELEMENT  format       EMPTY                                        >
+<!ATTLIST  format
+             mime       CDATA                              #REQUIRED 
+             dtd        CDATA                              #IMPLIED
+             %core.attribute.set;                                    >
+
+<!--                    identifier                                 -->
+<!ELEMENT  identifier   EMPTY                                        >
+<!ATTLIST  identifier
+             %url.attribute.set;                                     >
+ 
+<!--                    source                                     -->
+<!ELEMENT  source       (#PCDATA)                                    >
+<!ATTLIST  source
+             %core.attribute.set;                                    >
+
+<!--                    language                                   -->
+<!--                    see languageCodes.mod, an entity set
+                        comprising a formal vocabulary for
+                        language, derived from ISO 639 and 639-2   -->
+<!ELEMENT  language     EMPTY                                        >
+<!ATTLIST  language
+             code       CDATA                              #REQUIRED
+             name       CDATA                              #IMPLIED
+             src        CDATA                              #IMPLIED
+             %core.attribute.set;                                    >
+
+<!--                    relation                                   -->
+<!ELEMENT  relation     EMPTY                                        >
+<!ATTLIST  relation
+             seriesid   CDATA                              #REQUIRED
+             %core.attribute.set;                                    >
+
+<!--                    coverage                                   -->
+<!ELEMENT  coverage     EMPTY                                        >
+<!ATTLIST  coverage
+             geographic   CDATA                            #IMPLIED
+             distribution CDATA                            #IMPLIED
+             kernel       CDATA                            #IMPLIED
+             architecture CDATA                            #IMPLIED
+             os           CDATA                            #IMPLIED
+             %core.attribute.set;                                    >
+<!--                    rights                                     -->
+<!--                    see licenseTypes.mod, an entity set
+                        comprising a formal vocabulary for rights  -->
+<!ELEMENT  rights       EMPTY                                        >
+<!ATTLIST  rights
+             type       CDATA                              #IMPLIED
+             license    CDATA                              #IMPLIED
+             license.version CDATA                         #IMPLIED
+             holder     CDATA                              #IMPLIED
+             %core.attribute.set;                                    >
+<!-- ............................................................. -->
+<!-- ............................................................. -->
+

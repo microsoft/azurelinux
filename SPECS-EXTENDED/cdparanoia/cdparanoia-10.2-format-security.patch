@@ -1,0 +1,16 @@
+diff -Naur cdparanoia-III-10.2.orig/main.c cdparanoia-III-10.2/main.c
+--- cdparanoia-III-10.2.orig/main.c	2008-09-11 23:11:02.000000000 +0200
++++ cdparanoia-III-10.2/main.c	2014-04-14 21:24:10.023000000 +0200
+@@ -588,10 +588,10 @@
+ 	    buffer[aheadposition+19]='>';
+ 	}
+    
+-	fprintf(stderr,buffer);
++	fprintf(stderr, "%s", buffer);
+        
+ 	if (logfile != NULL && function==-1) {
+-	  fprintf(logfile,buffer+1);
++	  fprintf(logfile, "%s", buffer+1);
+ 	  fprintf(logfile,"\n\n");
+ 	  fflush(logfile);
+ 	}

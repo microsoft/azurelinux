@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "jack-audio-connection-kit-LICENSE.txt": "55d61e21cf6b123d6b6ecd1d65d210942a1c9db7566916a2907c4e8edbf94300",
+  "jack-audio-connection-kit-README.Fedora": "81770c501bd84381b767c2c8988cbd81ef0f71d77530a1b53e1003215ee4352c",
+  "jack-audio-connection-kit-limits.conf": "d5009eb955eba735709107d377001e3dbd994335d7170aaf7e0d4d21d94c9199",
+  "jack-audio-connection-kit-script.pa": "c5f895b9e9de805f775bef69d71c6beea1acce4aa7303a1e303285930a9c426c",
+  "jack2-1.9.14.tar.gz": "a20a32366780c0061fd58fbb5f09e514ea9b7ce6e53b080a44b11a558a83217c",
+  "svnversion.h": "fe594fd286748b939358f1683f88092592a2341568b99fb0745792c25102c3b6"
+ }
+}

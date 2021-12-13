@@ -1,0 +1,52 @@
+diff --git a/libdbusmenu-glib/Makefile.am b/libdbusmenu-glib/Makefile.am
+index 2dea5f6..01832ce 100644
+--- a/libdbusmenu-glib/Makefile.am
++++ b/libdbusmenu-glib/Makefile.am
+@@ -66,7 +66,7 @@ libdbusmenu_glib_la_LDFLAGS = \
+ libdbusmenu_glib_la_CFLAGS = \
+ 	$(DBUSMENUGLIB_CFLAGS) \
+ 	$(COVERAGE_CFLAGS) \
+-	-Wall -Werror -Wno-error=deprecated-declarations \
++	-Wall -Wno-error=deprecated-declarations \
+ 	-DG_LOG_DOMAIN="\"LIBDBUSMENU-GLIB\""
+ 
+ libdbusmenu_glib_la_LIBADD = \
+diff --git a/libdbusmenu-gtk/Makefile.am b/libdbusmenu-gtk/Makefile.am
+index 9a7a2b0..a9a2b49 100644
+--- a/libdbusmenu-gtk/Makefile.am
++++ b/libdbusmenu-gtk/Makefile.am
+@@ -66,7 +66,7 @@ libdbusmenu_gtk_la_CFLAGS = \
+ 	$(DBUSMENUGTK_CFLAGS) \
+ 	$(COVERAGE_CFLAGS) \
+ 	-I$(top_srcdir) \
+-	-Wall -Werror -Wno-error=deprecated-declarations \
++	-Wall -Wno-error=deprecated-declarations \
+ 	-DG_LOG_DOMAIN="\"LIBDBUSMENU-GTK\""
+ 
+ libdbusmenu_gtk_la_LIBADD = \
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 64e3e75..699c2c9 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -103,7 +103,7 @@ TESTS_ENVIRONMENT = env GI_TYPELIB_PATH=$(top_builddir)/libdbusmenu-glib:$(top_b
+ ############################################
+ 
+ DBUSMENU_GLIB_TEST_CFLAGS = \
+-	-Wall -Werror \
++	-Wall \
+ 	-DG_DISABLE_DEPRECATED \
+ 	-I$(top_srcdir) \
+ 	$(DBUSMENUTESTS_CFLAGS) \
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 029b73e..2258cca 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -16,7 +16,7 @@ dbusmenu_dumper_CFLAGS = \
+ 	-I $(srcdir)/.. \
+ 	$(DBUSMENUGLIB_CFLAGS) \
+ 	$(DBUSMENUDUMPER_CFLAGS) \
+-	-Wall -Werror
++	-Wall
+ 
+ dbusmenu_dumper_LDADD = \
+ 	../libdbusmenu-glib/libdbusmenu-glib.la \

@@ -1,0 +1,28 @@
+Index: commons-logging-1.1.3-src/build.xml
+===================================================================
+--- commons-logging-1.1.3-src.orig/build.xml
++++ commons-logging-1.1.3-src/build.xml
+@@ -719,7 +719,8 @@
+     -   ant -Dtestmatch=**/FooTestCase testall
+     -->
+ 
+-  <target name="test" depends="log4j12-test-warning, compile.tests"
++  <target name="test" depends="log4j12-test-warning, compile.tests, junit-present"
++   if="junit.present"
+    description="Run all unit tests">
+     <echo message="Test output can be found in directory ${build.home}/test-reports."/>
+     <delete dir="${build.home}/test-reports"/>
+@@ -773,4 +774,13 @@
+     </fail>
+   </target>
+ 
++  <target name="test-junit-present">
++    <available classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" property="junit.present"/>
++  </target>
++  <target name="junit-present" depends="test-junit-present" unless="junit.present">
++    <echo>================================= WARNING ================================</echo>
++    <echo> Junit isn&apos;t present in your $ANT_HOME/lib directory. Tests not executed. </echo>
++    <echo>==========================================================================</echo>
++  </target>
++
+ </project>

@@ -1,0 +1,1611 @@
+From c8d1de91c950a80508e23b791c475bca9b377616 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Fri, 10 May 2019 10:40:17 +0100
+Subject: [PATCH 1/2] Avoid unnecessary dep on istack-commons
+
+---
+ core/pom.xml                                  |   6 +-
+ .../sun/xml/bind/marshaller/SAX2DOMEx.java    |   4 +-
+ .../v2/model/annotation/AnnotationReader.java |   4 -
+ .../xml/bind/v2/model/core/PropertyInfo.java  |   3 +-
+ .../java/com/sun/xml/bind/api/Bridge.java     |  54 ++++----
+ .../com/sun/xml/bind/api/ClassResolver.java   |   4 +-
+ .../com/sun/xml/bind/api/JAXBRIContext.java   |  52 ++++---
+ .../com/sun/xml/bind/v2/ContextFactory.java   |   6 +-
+ .../v2/model/impl/ByteArrayDataSource.java    |  95 +++++++++++++
+ .../xml/bind/v2/model/impl/ClassInfoImpl.java |   8 +-
+ .../bind/v2/model/impl/ElementInfoImpl.java   |   6 +-
+ .../model/impl/ElementPropertyInfoImpl.java   |   4 +-
+ .../impl/RuntimeBuiltinLeafInfoImpl.java      |   1 -
+ .../v2/model/impl/RuntimeClassInfoImpl.java   |   3 +-
+ .../v2/model/impl/RuntimeModelBuilder.java    |   3 +-
+ .../xml/bind/v2/runtime/BridgeAdapter.java    |  11 +-
+ .../sun/xml/bind/v2/runtime/BridgeImpl.java   |   9 +-
+ .../bind/v2/runtime/ClassBeanInfoImpl.java    |   6 +-
+ .../v2/runtime/ContentHandlerAdaptor.java     |  14 +-
+ .../xml/bind/v2/runtime/FilterTransducer.java |   3 +-
+ .../v2/runtime/InlineBinaryTransducer.java    |   3 +-
+ .../xml/bind/v2/runtime/JAXBContextImpl.java  |  16 +--
+ .../sun/xml/bind/v2/runtime/JaxBeanInfo.java  |   3 +-
+ .../bind/v2/runtime/NamespaceContext2.java    |   3 +-
+ .../com/sun/xml/bind/v2/runtime/Pool.java     | 131 ++++++++++++++++++
+ .../sun/xml/bind/v2/runtime/Transducer.java   |   7 +-
+ .../v2/runtime/ValueListBeanInfoImpl.java     |   4 +-
+ .../xml/bind/v2/runtime/XMLSerializer.java    |  12 +-
+ .../bind/v2/runtime/output/C14nXmlOutput.java |   4 +-
+ .../runtime/output/NamespaceContextImpl.java  |   6 +-
+ .../xml/bind/v2/runtime/reflect/Accessor.java |   3 +-
+ .../xml/bind/v2/runtime/reflect/Lister.java   |   4 +-
+ .../runtime/reflect/TransducedAccessor.java   |  10 +-
+ .../v2/runtime/unmarshaller/Base64Data.java   |   7 +-
+ .../unmarshaller/UnmarshallingContext.java    |  12 +-
+ .../runtime/unmarshaller/XsiTypeLoader.java   |   3 +-
+ .../bind/v2/schemagen/XmlSchemaGenerator.java |   6 +-
+ 37 files changed, 359 insertions(+), 171 deletions(-)
+ create mode 100644 runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ByteArrayDataSource.java
+ create mode 100644 runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/Pool.java
+
+diff --git a/core/pom.xml b/core/pom.xml
+index 10be5d6..6330d8a 100644
+--- a/core/pom.xml
++++ b/core/pom.xml
+@@ -67,10 +67,6 @@ holder.
+             <artifactId>txw2</artifactId>
+             <version>${project.version}</version>
+         </dependency>
+-        <dependency>
+-            <groupId>com.sun.istack</groupId>
+-            <artifactId>istack-commons-runtime</artifactId>
+-        </dependency>
+     </dependencies>
+ 
+-</project>
+\ No newline at end of file
++</project>
+diff --git a/core/src/main/java/com/sun/xml/bind/marshaller/SAX2DOMEx.java b/core/src/main/java/com/sun/xml/bind/marshaller/SAX2DOMEx.java
+index fd63b6b..0b97a47 100644
+--- a/core/src/main/java/com/sun/xml/bind/marshaller/SAX2DOMEx.java
++++ b/core/src/main/java/com/sun/xml/bind/marshaller/SAX2DOMEx.java
+@@ -46,7 +46,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
+ import javax.xml.parsers.ParserConfigurationException;
+ 
+ import com.sun.xml.bind.util.Which;
+-import com.sun.istack.FinalArrayList;
++import java.util.ArrayList;
+ 
+ import com.sun.xml.bind.v2.util.XmlFactory;
+ import org.w3c.dom.Document;
+@@ -68,7 +68,7 @@ public class SAX2DOMEx implements ContentHandler {
+     private Node node = null;
+     private boolean isConsolidate;
+     protected final Stack<Node> nodeStack = new Stack<Node>();
+-    private final FinalArrayList<String> unprocessedNamespaces = new FinalArrayList<String>();
++    private final ArrayList<String> unprocessedNamespaces = new ArrayList<String>();
+     /**
+      * Document object that owns the specified node.
+      */
+diff --git a/core/src/main/java/com/sun/xml/bind/v2/model/annotation/AnnotationReader.java b/core/src/main/java/com/sun/xml/bind/v2/model/annotation/AnnotationReader.java
+index 744d806..a5e5623 100644
+--- a/core/src/main/java/com/sun/xml/bind/v2/model/annotation/AnnotationReader.java
++++ b/core/src/main/java/com/sun/xml/bind/v2/model/annotation/AnnotationReader.java
+@@ -44,7 +44,6 @@ import java.lang.annotation.Annotation;
+ import java.lang.reflect.Field;
+ import java.lang.reflect.Method;
+ 
+-import com.sun.istack.Nullable;
+ import com.sun.xml.bind.v2.model.core.ErrorHandler;
+ 
+ /**
+@@ -140,20 +139,17 @@ public interface AnnotationReader<T,C,F,M> {
+      * @return null
+      *      if the annotation was not found.
+      */
+-    @Nullable
+     <A extends Annotation> A getMethodParameterAnnotation(
+             Class<A> annotation, M method, int paramIndex, Locatable srcPos );
+ 
+     /**
+      * Reads an annotation on a class.
+      */
+-    @Nullable
+     <A extends Annotation> A getClassAnnotation(Class<A> annotation, C clazz, Locatable srcpos) ;
+ 
+     /**
+      * Reads an annotation on the package that the given class belongs to.
+      */
+-    @Nullable
+     <A extends Annotation> A getPackageAnnotation(Class<A> annotation, C clazz, Locatable srcpos);
+ 
+     /**
+diff --git a/core/src/main/java/com/sun/xml/bind/v2/model/core/PropertyInfo.java b/core/src/main/java/com/sun/xml/bind/v2/model/core/PropertyInfo.java
+index badcdd6..f483fea 100644
+--- a/core/src/main/java/com/sun/xml/bind/v2/model/core/PropertyInfo.java
++++ b/core/src/main/java/com/sun/xml/bind/v2/model/core/PropertyInfo.java
+@@ -49,7 +49,6 @@ import javax.xml.bind.annotation.XmlType;
+ import javax.xml.bind.annotation.XmlSchemaType;
+ import javax.xml.namespace.QName;
+ 
+-import com.sun.istack.Nullable;
+ import com.sun.xml.bind.v2.model.annotation.AnnotationSource;
+ 
+ /**
+@@ -163,5 +162,5 @@ public interface PropertyInfo<T,C> extends AnnotationSource {
+      * when this returns non-null, it overrides the type names of all types
+      * that are in this property.)
+      */
+-    @Nullable QName getSchemaType();
++    QName getSchemaType();
+ }
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/api/Bridge.java b/runtime/impl/src/main/java/com/sun/xml/bind/api/Bridge.java
+index 23a688b..e7aba9e 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/api/Bridge.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/api/Bridge.java
+@@ -54,8 +54,6 @@ import javax.xml.stream.XMLStreamWriter;
+ import javax.xml.transform.Result;
+ import javax.xml.transform.Source;
+ 
+-import com.sun.istack.NotNull;
+-import com.sun.istack.Nullable;
+ import com.sun.xml.bind.v2.runtime.BridgeContextImpl;
+ import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
+ 
+@@ -91,7 +89,7 @@ public abstract class Bridge<T> {
+      *
+      * @since 2.1
+      */
+-    public @NotNull JAXBRIContext getContext() {
++    public  JAXBRIContext getContext() {
+         return context;
+     }
+ 
+@@ -113,11 +111,11 @@ public abstract class Bridge<T> {
+         context.marshallerPool.recycle(m);
+     }
+ 
+-    public final void marshal(@NotNull BridgeContext context,T object,XMLStreamWriter output) throws JAXBException {
++    public final void marshal( BridgeContext context,T object,XMLStreamWriter output) throws JAXBException {
+         marshal( ((BridgeContextImpl)context).marshaller, object, output );
+     }
+ 
+-    public abstract void marshal(@NotNull Marshaller m,T object,XMLStreamWriter output) throws JAXBException;
++    public abstract void marshal( Marshaller m,T object,XMLStreamWriter output) throws JAXBException;
+ 
+ 
+     /**
+@@ -147,11 +145,11 @@ public abstract class Bridge<T> {
+         context.marshallerPool.recycle(m);
+     }
+ 
+-    public final void marshal(@NotNull BridgeContext context,T object,OutputStream output, NamespaceContext nsContext) throws JAXBException {
++    public final void marshal( BridgeContext context,T object,OutputStream output, NamespaceContext nsContext) throws JAXBException {
+         marshal( ((BridgeContextImpl)context).marshaller, object, output, nsContext );
+     }
+ 
+-    public abstract void marshal(@NotNull Marshaller m,T object,OutputStream output, NamespaceContext nsContext) throws JAXBException;
++    public abstract void marshal( Marshaller m,T object,OutputStream output, NamespaceContext nsContext) throws JAXBException;
+ 
+ 
+     public final void marshal(T object,Node output) throws JAXBException {
+@@ -160,11 +158,11 @@ public abstract class Bridge<T> {
+         context.marshallerPool.recycle(m);
+     }
+ 
+-    public final void marshal(@NotNull BridgeContext context,T object,Node output) throws JAXBException {
++    public final void marshal( BridgeContext context,T object,Node output) throws JAXBException {
+         marshal( ((BridgeContextImpl)context).marshaller, object, output );
+     }
+ 
+-    public abstract void marshal(@NotNull Marshaller m,T object,Node output) throws JAXBException;
++    public abstract void marshal( Marshaller m,T object,Node output) throws JAXBException;
+ 
+ 
+     /**
+@@ -183,10 +181,10 @@ public abstract class Bridge<T> {
+         m.setAttachmentMarshaller(null);
+         context.marshallerPool.recycle(m);
+     }
+-    public final void marshal(@NotNull BridgeContext context,T object, ContentHandler contentHandler) throws JAXBException {
++    public final void marshal( BridgeContext context,T object, ContentHandler contentHandler) throws JAXBException {
+         marshal( ((BridgeContextImpl)context).marshaller, object, contentHandler );
+     }
+-    public abstract void marshal(@NotNull Marshaller m,T object, ContentHandler contentHandler) throws JAXBException;
++    public abstract void marshal( Marshaller m,T object, ContentHandler contentHandler) throws JAXBException;
+ 
+     /**
+      * @since 2.0 EA4
+@@ -196,10 +194,10 @@ public abstract class Bridge<T> {
+         marshal(m,object,result);
+         context.marshallerPool.recycle(m);
+     }
+-    public final void marshal(@NotNull BridgeContext context,T object, Result result) throws JAXBException {
++    public final void marshal( BridgeContext context,T object, Result result) throws JAXBException {
+         marshal( ((BridgeContextImpl)context).marshaller, object, result );
+     }
+-    public abstract void marshal(@NotNull Marshaller m,T object, Result result) throws JAXBException;
++    public abstract void marshal( Marshaller m,T object, Result result) throws JAXBException;
+ 
+ 
+ 
+@@ -225,21 +223,21 @@ public abstract class Bridge<T> {
+      *
+      * @since 2.0 EA1
+      */
+-    public final @NotNull T unmarshal(@NotNull XMLStreamReader in) throws JAXBException {
++    public final  T unmarshal( XMLStreamReader in) throws JAXBException {
+         return unmarshal(in,null);
+     }
+     /**
+      * @since 2.0.3
+      */
+-    public final @NotNull T unmarshal(@NotNull XMLStreamReader in, @Nullable AttachmentUnmarshaller au) throws JAXBException {
++    public final  T unmarshal( XMLStreamReader in,  AttachmentUnmarshaller au) throws JAXBException {
+         Unmarshaller u = context.unmarshallerPool.take();
+         u.setAttachmentUnmarshaller(au);
+         return exit(unmarshal(u,in),u);
+     }
+-    public final @NotNull T unmarshal(@NotNull BridgeContext context, @NotNull XMLStreamReader in) throws JAXBException {
++    public final  T unmarshal( BridgeContext context,  XMLStreamReader in) throws JAXBException {
+         return unmarshal( ((BridgeContextImpl)context).unmarshaller, in );
+     }
+-    public abstract @NotNull T unmarshal(@NotNull Unmarshaller u, @NotNull XMLStreamReader in) throws JAXBException;
++    public abstract  T unmarshal( Unmarshaller u,  XMLStreamReader in) throws JAXBException;
+ 
+     /**
+      * Unmarshals the specified type object.
+@@ -257,21 +255,21 @@ public abstract class Bridge<T> {
+      *
+      * @since 2.0 EA1
+      */
+-    public final @NotNull T unmarshal(@NotNull Source in) throws JAXBException {
++    public final  T unmarshal( Source in) throws JAXBException {
+         return unmarshal(in,null);
+     }
+     /**
+      * @since 2.0.3
+      */
+-    public final @NotNull T unmarshal(@NotNull Source in, @Nullable AttachmentUnmarshaller au) throws JAXBException {
++    public final  T unmarshal( Source in,  AttachmentUnmarshaller au) throws JAXBException {
+         Unmarshaller u = context.unmarshallerPool.take();
+         u.setAttachmentUnmarshaller(au);
+         return exit(unmarshal(u,in),u);
+     }
+-    public final @NotNull T unmarshal(@NotNull BridgeContext context, @NotNull Source in) throws JAXBException {
++    public final  T unmarshal( BridgeContext context,  Source in) throws JAXBException {
+         return unmarshal( ((BridgeContextImpl)context).unmarshaller, in );
+     }
+-    public abstract @NotNull T unmarshal(@NotNull Unmarshaller u, @NotNull Source in) throws JAXBException;
++    public abstract  T unmarshal( Unmarshaller u,  Source in) throws JAXBException;
+ 
+     /**
+      * Unmarshals the specified type object.
+@@ -289,14 +287,14 @@ public abstract class Bridge<T> {
+      *
+      * @since 2.0 EA1
+      */
+-    public final @NotNull T unmarshal(@NotNull InputStream in) throws JAXBException {
++    public final  T unmarshal( InputStream in) throws JAXBException {
+         Unmarshaller u = context.unmarshallerPool.take();
+         return exit(unmarshal(u,in),u);
+     }
+-    public final @NotNull T unmarshal(@NotNull BridgeContext context, @NotNull InputStream in) throws JAXBException {
++    public final  T unmarshal( BridgeContext context,  InputStream in) throws JAXBException {
+         return unmarshal( ((BridgeContextImpl)context).unmarshaller, in );
+     }
+-    public abstract @NotNull T unmarshal(@NotNull Unmarshaller u, @NotNull InputStream in) throws JAXBException;
++    public abstract  T unmarshal( Unmarshaller u,  InputStream in) throws JAXBException;
+ 
+     /**
+      * Unmarshals the specified type object.
+@@ -312,21 +310,21 @@ public abstract class Bridge<T> {
+      *
+      * @since 2.0 FCS
+      */
+-    public final @NotNull T unmarshal(@NotNull Node n) throws JAXBException {
++    public final  T unmarshal( Node n) throws JAXBException {
+         return unmarshal(n,null);
+     }
+     /**
+      * @since 2.0.3
+      */
+-    public final @NotNull T unmarshal(@NotNull Node n, @Nullable AttachmentUnmarshaller au) throws JAXBException {
++    public final  T unmarshal( Node n,  AttachmentUnmarshaller au) throws JAXBException {
+         Unmarshaller u = context.unmarshallerPool.take();
+         u.setAttachmentUnmarshaller(au);
+         return exit(unmarshal(u,n),u);
+     }
+-    public final @NotNull T unmarshal(@NotNull BridgeContext context, @NotNull Node n) throws JAXBException {
++    public final  T unmarshal( BridgeContext context,  Node n) throws JAXBException {
+         return unmarshal( ((BridgeContextImpl)context).unmarshaller, n );
+     }
+-    public abstract @NotNull T unmarshal(@NotNull Unmarshaller context, @NotNull Node n) throws JAXBException;
++    public abstract  T unmarshal( Unmarshaller context,  Node n) throws JAXBException;
+ 
+     /**
+      * Gets the {@link TypeReference} from which this bridge was created.
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/api/ClassResolver.java b/runtime/impl/src/main/java/com/sun/xml/bind/api/ClassResolver.java
+index 37bbf61..659f5a3 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/api/ClassResolver.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/api/ClassResolver.java
+@@ -45,8 +45,6 @@ import javax.xml.bind.Unmarshaller;
+ import javax.xml.bind.ValidationEventHandler;
+ import javax.xml.bind.annotation.XmlAnyElement;
+ 
+-import com.sun.istack.NotNull;
+-import com.sun.istack.Nullable;
+ 
+ /**
+  * Dynamically locates classes to represent elements discovered during the unmarshalling.
+@@ -115,5 +113,5 @@ public abstract class ClassResolver {
+      *      reproted to {@link ValidationEventHandler} (just like any other error
+      *      during the unmarshalling.)
+      */
+-    public abstract @Nullable Class<?> resolveElementName(@NotNull String nsUri, @NotNull String localName) throws Exception;
++    public abstract  Class<?> resolveElementName( String nsUri,  String localName) throws Exception;
+ }
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/api/JAXBRIContext.java b/runtime/impl/src/main/java/com/sun/xml/bind/api/JAXBRIContext.java
+index 05a2b4d..814b291 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/api/JAXBRIContext.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/api/JAXBRIContext.java
+@@ -55,8 +55,6 @@ import javax.xml.bind.annotation.XmlAttachmentRef;
+ import javax.xml.namespace.QName;
+ import javax.xml.transform.Result;
+ 
+-import com.sun.istack.NotNull;
+-import com.sun.istack.Nullable;
+ import com.sun.xml.bind.api.impl.NameConverter;
+ import com.sun.xml.bind.v2.ContextFactory;
+ import com.sun.xml.bind.v2.model.annotation.RuntimeAnnotationReader;
+@@ -103,11 +101,11 @@ public abstract class JAXBRIContext extends JAXBContext {
+      *      Can be null.
+      * @since JAXB 2.1 EA2
+      */
+-    public static JAXBRIContext newInstance(@NotNull Class[] classes,
+-       @Nullable Collection<TypeReference> typeRefs,
+-       @Nullable Map<Class,Class> subclassReplacements,
+-       @Nullable String defaultNamespaceRemap, boolean c14nSupport,
+-       @Nullable RuntimeAnnotationReader ar) throws JAXBException {
++    public static JAXBRIContext newInstance( Class[] classes,
++        Collection<TypeReference> typeRefs,
++        Map<Class,Class> subclassReplacements,
++        String defaultNamespaceRemap, boolean c14nSupport,
++        RuntimeAnnotationReader ar) throws JAXBException {
+         return newInstance(classes, typeRefs, subclassReplacements,
+                 defaultNamespaceRemap, c14nSupport, ar, false, false, false, false);
+     }
+@@ -145,11 +143,11 @@ public abstract class JAXBRIContext extends JAXBContext {
+      * @param supressAccessorWarnings
+      *      See {@link #SUPRESS_ACCESSOR_WARNINGS} for the meaning of this parameter.
+      */
+-    public static JAXBRIContext newInstance(@NotNull Class[] classes,
+-       @Nullable Collection<TypeReference> typeRefs,
+-       @Nullable Map<Class,Class> subclassReplacements,
+-       @Nullable String defaultNamespaceRemap, boolean c14nSupport,
+-       @Nullable RuntimeAnnotationReader ar,
++    public static JAXBRIContext newInstance( Class[] classes,
++        Collection<TypeReference> typeRefs,
++        Map<Class,Class> subclassReplacements,
++        String defaultNamespaceRemap, boolean c14nSupport,
++        RuntimeAnnotationReader ar,
+        boolean xmlAccessorFactorySupport, 
+        boolean allNillable, 
+        boolean retainPropertyInfo, 
+@@ -171,9 +169,9 @@ public abstract class JAXBRIContext extends JAXBContext {
+      * @deprecated
+      *      Compatibility with older versions.
+      */
+-    public static JAXBRIContext newInstance(@NotNull Class[] classes,
+-        @Nullable Collection<TypeReference> typeRefs,
+-        @Nullable String defaultNamespaceRemap, boolean c14nSupport ) throws JAXBException {
++    public static JAXBRIContext newInstance( Class[] classes,
++         Collection<TypeReference> typeRefs,
++         String defaultNamespaceRemap, boolean c14nSupport ) throws JAXBException {
+         return newInstance(classes,typeRefs, Collections.<Class,Class>emptyMap(),
+                 defaultNamespaceRemap,c14nSupport,null);
+     }
+@@ -197,7 +195,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      *
+      * @since 2.0 EA1
+      */
+-    public abstract @Nullable QName getElementName(@NotNull Object o) throws JAXBException;
++    public abstract  QName getElementName( Object o) throws JAXBException;
+ 
+     /**
+      * Allows to retrieve the element name based on Class.
+@@ -206,7 +204,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      * @throws javax.xml.bind.JAXBException
+      * @since 2.1.10
+      */
+-    public abstract @Nullable QName getElementName(@NotNull Class o) throws JAXBException;
++    public abstract  QName getElementName( Class o) throws JAXBException;
+ 
+     /**
+      * Creates a mini-marshaller/unmarshaller that can process a {@link TypeReference}.
+@@ -216,7 +214,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      *
+      * @since 2.0 EA1
+      */
+-    public abstract Bridge createBridge(@NotNull TypeReference ref);
++    public abstract Bridge createBridge( TypeReference ref);
+ 
+     /**
+      * Creates a new {@link BridgeContext} instance.
+@@ -226,7 +224,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      *
+      * @since 2.0 EA1
+      */
+-    public abstract @NotNull BridgeContext createBridgeContext();
++    public abstract  BridgeContext createBridgeContext();
+ 
+     /**
+      * Gets a {@link RawAccessor} for the specified element property of the specified wrapper bean class.
+@@ -274,7 +272,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      *
+      * @since 2.0 EA2
+      */
+-    public abstract @NotNull List<String> getKnownNamespaceURIs();
++    public abstract  List<String> getKnownNamespaceURIs();
+ 
+ 
+     /**
+@@ -302,7 +300,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      *      if {@link SchemaOutputResolver} throws an {@link IOException}.
+      */
+     @Override
+-    public abstract void generateSchema(@NotNull SchemaOutputResolver outputResolver) throws IOException;
++    public abstract void generateSchema( SchemaOutputResolver outputResolver) throws IOException;
+ 
+     /**
+      * Returns the name of the XML Type bound to the
+@@ -319,7 +317,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      * @return null
+      *      if the referenced type is an anonymous and therefore doesn't have a name.
+      */
+-    public abstract QName getTypeName(@NotNull TypeReference tr);
++    public abstract QName getTypeName( TypeReference tr);
+ 
+     /**
+      * Gets the build information of the JAXB runtime.
+@@ -328,7 +326,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      *      may be null, if the runtime is loaded by a class loader that doesn't support
+      *      the access to the manifest informatino.
+      */
+-    public abstract @NotNull String getBuildId();
++    public abstract  String getBuildId();
+ 
+     /**
+      * Generates the episode file that represents the binding known to this {@link JAXBContext},
+@@ -372,7 +370,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      * @return
+      *      Typically, this method returns "nameLikeThis".
+      */
+-    public static @NotNull String mangleNameToVariableName(@NotNull String localName) {
++    public static  String mangleNameToVariableName( String localName) {
+         return NameConverter.standard.toVariableName(localName);
+     }
+ 
+@@ -385,7 +383,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      * @return
+      *      Typically, this method returns "NameLikeThis".
+      */
+-    public static @NotNull String mangleNameToClassName(@NotNull String localName) {
++    public static  String mangleNameToClassName( String localName) {
+         return NameConverter.standard.toClassName(localName);
+     }
+ 
+@@ -400,7 +398,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      * @return
+      *      Typically, this method returns "NameLikeThis".
+      */
+-    public static @NotNull String mangleNameToPropertyName(@NotNull String localName) {
++    public static  String mangleNameToPropertyName( String localName) {
+         return NameConverter.standard.toPropertyName(localName);
+     }
+ 
+@@ -430,7 +428,7 @@ public abstract class JAXBRIContext extends JAXBContext {
+      *      or null if the type is not assignable to the base type.
+      * @since 2.0 FCS
+      */
+-    public static @Nullable Type getBaseType(@NotNull Type type, @NotNull Class baseType) {
++    public static  Type getBaseType( Type type,  Class baseType) {
+         return Utils.REFLECTION_NAVIGATOR.getBaseClass(type, baseType);
+     }
+ 
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/ContextFactory.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/ContextFactory.java
+index 94dce69..879dedb 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/ContextFactory.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/ContextFactory.java
+@@ -55,7 +55,7 @@ import java.util.logging.Level;
+ import javax.xml.bind.JAXBContext;
+ import javax.xml.bind.JAXBException;
+ 
+-import com.sun.istack.FinalArrayList;
++import java.util.ArrayList;
+ import com.sun.xml.bind.Util;
+ import com.sun.xml.bind.api.JAXBRIContext;
+ import com.sun.xml.bind.api.TypeReference;
+@@ -243,7 +243,7 @@ public class ContextFactory {
+      */
+     public static JAXBContext createContext( String contextPath,
+                                              ClassLoader classLoader, Map<String,Object> properties ) throws JAXBException {
+-        FinalArrayList<Class> classes = new FinalArrayList<Class>();
++        ArrayList<Class> classes = new ArrayList<Class>();
+         StringTokenizer tokens = new StringTokenizer(contextPath,":");
+         List<Class> indexedClasses;
+ 
+@@ -306,7 +306,7 @@ public class ContextFactory {
+         BufferedReader in =
+                 new BufferedReader(new InputStreamReader(resourceAsStream, "UTF-8"));
+         try {
+-            FinalArrayList<Class> classes = new FinalArrayList<Class>();
++            ArrayList<Class> classes = new ArrayList<Class>();
+             String className = in.readLine();
+             while (className != null) {
+                 className = className.trim();
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ByteArrayDataSource.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ByteArrayDataSource.java
+new file mode 100644
+index 0000000..9c46637
+--- /dev/null
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ByteArrayDataSource.java
+@@ -0,0 +1,95 @@
++/*
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
++ *
++ * Copyright (c) 1997-2014 Oracle and/or its affiliates. All rights reserved.
++ *
++ * The contents of this file are subject to the terms of either the GNU
++ * General Public License Version 2 only ("GPL") or the Common Development
++ * and Distribution License("CDDL") (collectively, the "License").  You
++ * may not use this file except in compliance with the License.  You can
++ * obtain a copy of the License at
++ * http://glassfish.java.net/public/CDDL+GPL_1_1.html
++ * or packager/legal/LICENSE.txt.  See the License for the specific
++ * language governing permissions and limitations under the License.
++ *
++ * When distributing the software, include this License Header Notice in each
++ * file and include the License file at packager/legal/LICENSE.txt.
++ *
++ * GPL Classpath Exception:
++ * Oracle designates this particular file as subject to the "Classpath"
++ * exception as provided by Oracle in the GPL Version 2 section of the License
++ * file that accompanied this code.
++ *
++ * Modifications:
++ * If applicable, add the following below the License Header, with the fields
++ * enclosed by brackets [] replaced by your own identifying information:
++ * "Portions Copyright [year] [name of copyright owner]"
++ *
++ * Contributor(s):
++ * If you wish your version of this file to be governed by only the CDDL or
++ * only the GPL Version 2, indicate your decision by adding "[Contributor]
++ * elects to include this software in this distribution under the [CDDL or GPL
++ * Version 2] license."  If you don't indicate a single choice of license, a
++ * recipient has the option to distribute your version of this file under
++ * either the CDDL, the GPL Version 2 or to extend the choice of license to
++ * its licensees as provided above.  However, if you add GPL Version 2 code
++ * and therefore, elected the GPL Version 2 license, then the option applies
++ * only if the new code is made subject to such option by the copyright
++ * holder.
++ */
++
++package com.sun.xml.bind.v2.model.impl;
++
++import javax.activation.DataSource;
++import java.io.InputStream;
++import java.io.ByteArrayInputStream;
++import java.io.OutputStream;
++
++/**
++ * {@link DataSource} backed by a byte buffer.
++ *
++ * @author Kohsuke Kawaguchi
++ */
++public final class ByteArrayDataSource implements DataSource {
++
++    private final String contentType;
++    private final byte[] buf;
++    private final int len;
++
++    /**
++     * @param buf input buffer - the byte array isn't being copied; used directly
++     * @param contentType
++     */
++    public ByteArrayDataSource(byte[] buf, String contentType) {
++        this(buf,buf.length,contentType);
++    }
++
++    /**
++     * @param buf input buffer - the byte array isn't being copied; used directly
++     * @param length
++     * @param contentType
++     */
++    public ByteArrayDataSource(byte[] buf, int length, String contentType) {
++        this.buf = buf;
++        this.len = length;
++        this.contentType = contentType;
++    }
++
++    public String getContentType() {
++        if(contentType==null)
++            return "application/octet-stream";
++        return contentType;
++    }
++
++    public InputStream getInputStream() {
++        return new ByteArrayInputStream(buf,0,len);
++    }
++
++    public String getName() {
++        return null;
++    }
++
++    public OutputStream getOutputStream() {
++        throw new UnsupportedOperationException();
++    }
++}
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ClassInfoImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ClassInfoImpl.java
+index 7b092a5..d6dd439 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ClassInfoImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ClassInfoImpl.java
+@@ -82,7 +82,7 @@ import javax.xml.bind.annotation.XmlValue;
+ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+ import javax.xml.namespace.QName;
+ 
+-import com.sun.istack.FinalArrayList;
++import java.util.ArrayList;
+ import com.sun.xml.bind.annotation.OverrideAnnotationOf;
+ import com.sun.xml.bind.v2.model.annotation.Locatable;
+ import com.sun.xml.bind.v2.model.annotation.MethodLocatable;
+@@ -124,7 +124,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
+      *
+      * @see #getProperties()
+      */
+-    private FinalArrayList<PropertyInfoImpl<T,C,F,M>> properties;
++    private ArrayList<PropertyInfoImpl<T,C,F,M>> properties;
+ 
+     /**
+      * The property order.
+@@ -306,7 +306,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
+         // check the access type first
+         XmlAccessType at = getAccessType();
+ 
+-        properties = new FinalArrayList<PropertyInfoImpl<T,C,F,M>>();
++        properties = new ArrayList<PropertyInfoImpl<T,C,F,M>>();
+ 
+         findFieldProperties(clazz,at);
+ 
+@@ -579,7 +579,7 @@ public class ClassInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M>
+     }
+ 
+     private static <T> List<T> makeSet( T... args ) {
+-        List<T> l = new FinalArrayList<T>();
++        List<T> l = new ArrayList<T>();
+         for( T arg : args )
+             if(arg!=null)   l.add(arg);
+         return l;
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ElementInfoImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ElementInfoImpl.java
+index f20bf49..28994b5 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ElementInfoImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ElementInfoImpl.java
+@@ -56,7 +56,7 @@ import javax.xml.bind.annotation.XmlSchema;
+ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+ import javax.xml.namespace.QName;
+ 
+-import com.sun.istack.FinalArrayList;
++import java.util.ArrayList;
+ import com.sun.xml.bind.v2.TODO;
+ import com.sun.xml.bind.v2.model.annotation.AnnotationSource;
+ import com.sun.xml.bind.v2.model.annotation.Locatable;
+@@ -107,7 +107,7 @@ class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementI
+      * This could be null.
+      * @see #link()
+      */
+-    private FinalArrayList<ElementInfoImpl<T,C,F,M>> substitutionMembers;
++    private ArrayList<ElementInfoImpl<T,C,F,M>> substitutionMembers;
+ 
+     /**
+      * The factory method from which this mapping was created.
+@@ -435,7 +435,7 @@ class ElementInfoImpl<T,C,F,M> extends TypeInfoImpl<T,C,F,M> implements ElementI
+ 
+     private void addSubstitutionMember(ElementInfoImpl<T,C,F,M> child) {
+         if(substitutionMembers==null)
+-            substitutionMembers = new FinalArrayList<ElementInfoImpl<T,C,F,M>>();
++            substitutionMembers = new ArrayList<ElementInfoImpl<T,C,F,M>>();
+         substitutionMembers.add(child);
+     }
+ 
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ElementPropertyInfoImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ElementPropertyInfoImpl.java
+index 4a0169e..3693240 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ElementPropertyInfoImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/ElementPropertyInfoImpl.java
+@@ -49,7 +49,7 @@ import javax.xml.bind.annotation.XmlElements;
+ import javax.xml.bind.annotation.XmlList;
+ import javax.xml.namespace.QName;
+ 
+-import com.sun.istack.FinalArrayList;
++import java.util.ArrayList;
+ import com.sun.xml.bind.v2.model.core.ElementPropertyInfo;
+ import com.sun.xml.bind.v2.model.core.ID;
+ import com.sun.xml.bind.v2.model.core.PropertyKind;
+@@ -105,7 +105,7 @@ class ElementPropertyInfoImpl<TypeT,ClassDeclT,FieldT,MethodT>
+ 
+     public List<? extends TypeRefImpl<TypeT,ClassDeclT>> getTypes() {
+         if(types==null) {
+-            types = new FinalArrayList<TypeRefImpl<TypeT,ClassDeclT>>();
++            types = new ArrayList<TypeRefImpl<TypeT,ClassDeclT>>();
+             XmlElement[] ann=null;
+ 
+             XmlElement xe = seed.readAnnotation(XmlElement.class);
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeBuiltinLeafInfoImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeBuiltinLeafInfoImpl.java
+index 56aaa65..8c99fe4 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeBuiltinLeafInfoImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeBuiltinLeafInfoImpl.java
+@@ -91,7 +91,6 @@ import javax.xml.transform.Transformer;
+ import javax.xml.transform.TransformerException;
+ import javax.xml.transform.stream.StreamResult;
+ 
+-import com.sun.istack.ByteArrayDataSource;
+ import com.sun.xml.bind.DatatypeConverterImpl;
+ import com.sun.xml.bind.WhiteSpaceProcessor;
+ import com.sun.xml.bind.api.AccessorException;
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeClassInfoImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeClassInfoImpl.java
+index 370ba4f..5a75bde 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeClassInfoImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeClassInfoImpl.java
+@@ -53,7 +53,6 @@ import javax.xml.bind.JAXBException;
+ import javax.xml.namespace.QName;
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.NotNull;
+ import com.sun.xml.bind.AccessorFactory;
+ import com.sun.xml.bind.AccessorFactoryImpl;
+ import com.sun.xml.bind.InternalAccessorFactory;
+@@ -374,7 +373,7 @@ class RuntimeClassInfoImpl extends ClassInfoImpl<Type,Class,Field,Method>
+             }
+         }
+ 
+-        public @NotNull CharSequence print(BeanT o) throws AccessorException {
++        public  CharSequence print(BeanT o) throws AccessorException {
+             try {
+                 CharSequence value = xacc.print(o);
+                 if(value==null)
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeModelBuilder.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeModelBuilder.java
+index aefa835..a5427ed 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeModelBuilder.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/model/impl/RuntimeModelBuilder.java
+@@ -65,7 +65,6 @@ import com.sun.xml.bind.v2.runtime.SchemaTypeTransducer;
+ import com.sun.xml.bind.v2.runtime.Transducer;
+ import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
+ import com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext;
+-import com.sun.istack.Nullable;
+ 
+ import com.sun.xml.bind.v2.WellKnownNamespace;
+ import javax.xml.namespace.QName;
+@@ -86,7 +85,7 @@ public class RuntimeModelBuilder extends ModelBuilder<Type,Class,Field,Method> {
+      * The {@link JAXBContextImpl} for which the model is built.
+      * Null when created for reflection.
+      */
+-    public final @Nullable JAXBContextImpl context;
++    public final  JAXBContextImpl context;
+ 
+     public RuntimeModelBuilder(JAXBContextImpl context, RuntimeAnnotationReader annotationReader, Map<Class, Class> subclassReplacements, String defaultNamespaceRemap) {
+         super(annotationReader, Utils.REFLECTION_NAVIGATOR, subclassReplacements, defaultNamespaceRemap);
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/BridgeAdapter.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/BridgeAdapter.java
+index 0e1346c..1a5d6f6 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/BridgeAdapter.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/BridgeAdapter.java
+@@ -57,7 +57,6 @@ import javax.xml.stream.XMLStreamWriter;
+ import javax.xml.transform.Result;
+ import javax.xml.transform.Source;
+ 
+-import com.sun.istack.NotNull;
+ import com.sun.xml.bind.api.Bridge;
+ import com.sun.xml.bind.api.TypeReference;
+ import com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallerImpl;
+@@ -122,19 +121,19 @@ final class BridgeAdapter<OnWire,InMemory> extends InternalBridge<InMemory> {
+     }
+ 
+ 
+-    public @NotNull InMemory unmarshal(Unmarshaller u, XMLStreamReader in) throws JAXBException {
++    public  InMemory unmarshal(Unmarshaller u, XMLStreamReader in) throws JAXBException {
+         return adaptU(u, core.unmarshal(u,in));
+     }
+ 
+-    public @NotNull InMemory unmarshal(Unmarshaller u, Source in) throws JAXBException {
++    public  InMemory unmarshal(Unmarshaller u, Source in) throws JAXBException {
+         return adaptU(u, core.unmarshal(u,in));
+     }
+ 
+-    public @NotNull InMemory unmarshal(Unmarshaller u, InputStream in) throws JAXBException {
++    public  InMemory unmarshal(Unmarshaller u, InputStream in) throws JAXBException {
+         return adaptU(u, core.unmarshal(u,in));
+     }
+ 
+-    public @NotNull InMemory unmarshal(Unmarshaller u, Node n) throws JAXBException {
++    public  InMemory unmarshal(Unmarshaller u, Node n) throws JAXBException {
+         return adaptU(u, core.unmarshal(u,n));
+     }
+ 
+@@ -142,7 +141,7 @@ final class BridgeAdapter<OnWire,InMemory> extends InternalBridge<InMemory> {
+         return core.getTypeReference();
+     }
+ 
+-    private @NotNull InMemory adaptU(Unmarshaller _u, OnWire v) throws JAXBException {
++    private  InMemory adaptU(Unmarshaller _u, OnWire v) throws JAXBException {
+         UnmarshallerImpl u = (UnmarshallerImpl) _u;
+         XmlAdapter<OnWire,InMemory> a = u.coordinator.getAdapter(adapter);
+         u.coordinator.pushCoordinator();
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/BridgeImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/BridgeImpl.java
+index 231f4d2..eb3d739 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/BridgeImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/BridgeImpl.java
+@@ -55,7 +55,6 @@ import javax.xml.stream.XMLStreamWriter;
+ import javax.xml.transform.Result;
+ import javax.xml.transform.Source;
+ 
+-import com.sun.istack.NotNull;
+ import com.sun.xml.bind.api.Bridge;
+ import com.sun.xml.bind.api.TypeReference;
+ import com.sun.xml.bind.marshaller.SAX2DOMEx;
+@@ -119,22 +118,22 @@ final class BridgeImpl<T> extends InternalBridge<T> {
+         m.write(tagName,bi,t, m.createXmlOutput(result),m.createPostInitAction(result));
+     }
+ 
+-    public @NotNull T unmarshal(Unmarshaller _u, XMLStreamReader in) throws JAXBException {
++    public  T unmarshal(Unmarshaller _u, XMLStreamReader in) throws JAXBException {
+         UnmarshallerImpl u = (UnmarshallerImpl)_u;
+         return ((JAXBElement<T>)u.unmarshal0(in,bi)).getValue();
+     }
+ 
+-    public @NotNull T unmarshal(Unmarshaller _u, Source in) throws JAXBException {
++    public  T unmarshal(Unmarshaller _u, Source in) throws JAXBException {
+         UnmarshallerImpl u = (UnmarshallerImpl)_u;
+         return ((JAXBElement<T>)u.unmarshal0(in,bi)).getValue();
+     }
+ 
+-    public @NotNull T unmarshal(Unmarshaller _u, InputStream in) throws JAXBException {
++    public  T unmarshal(Unmarshaller _u, InputStream in) throws JAXBException {
+         UnmarshallerImpl u = (UnmarshallerImpl)_u;
+         return ((JAXBElement<T>)u.unmarshal0(in,bi)).getValue();
+     }
+ 
+-    public @NotNull T unmarshal(Unmarshaller _u, Node n) throws JAXBException {
++    public  T unmarshal(Unmarshaller _u, Node n) throws JAXBException {
+         UnmarshallerImpl u = (UnmarshallerImpl)_u;
+         return ((JAXBElement<T>)u.unmarshal0(n,bi)).getValue();
+     }
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ClassBeanInfoImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ClassBeanInfoImpl.java
+index c7763bf..e1a5595 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ClassBeanInfoImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ClassBeanInfoImpl.java
+@@ -57,7 +57,7 @@ import javax.xml.bind.helpers.ValidationEventImpl;
+ import javax.xml.namespace.QName;
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.FinalArrayList;
++import java.util.ArrayList;
+ import com.sun.xml.bind.Util;
+ import com.sun.xml.bind.api.AccessorException;
+ import com.sun.xml.bind.v2.ClassFactory;
+@@ -237,8 +237,8 @@ public final class ClassBeanInfoImpl<BeanT> extends JaxBeanInfo<BeanT> implement
+         }
+ 
+         // create a list of attribute/URI handlers
+-        List<AttributeProperty> attProps = new FinalArrayList<AttributeProperty>();
+-        List<Property> uriProps = new FinalArrayList<Property>();
++        List<AttributeProperty> attProps = new ArrayList<AttributeProperty>();
++        List<Property> uriProps = new ArrayList<Property>();
+         for (ClassBeanInfoImpl bi = this; bi != null; bi = bi.superClazz) {
+             for (int i = 0; i < bi.properties.length; i++) {
+                 Property p = bi.properties[i];
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ContentHandlerAdaptor.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ContentHandlerAdaptor.java
+index 81cceaf..4d57df7 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ContentHandlerAdaptor.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ContentHandlerAdaptor.java
+@@ -40,8 +40,8 @@
+ 
+ package com.sun.xml.bind.v2.runtime;
+ 
+-import com.sun.istack.FinalArrayList;
+-import com.sun.istack.SAXException2;
++import java.util.ArrayList;
++import org.xml.sax.SAXException;
+ import org.xml.sax.Attributes;
+ import org.xml.sax.SAXException;
+ import org.xml.sax.helpers.DefaultHandler;
+@@ -59,7 +59,7 @@ import java.io.IOException;
+ final class ContentHandlerAdaptor extends DefaultHandler {
+ 
+     /** Stores newly declared prefix-URI mapping. */
+-    private final FinalArrayList<String> prefixMap = new FinalArrayList<String>();
++    private final ArrayList<String> prefixMap = new ArrayList<String>();
+ 
+     /** Events will be sent to this object. */
+     private final XMLSerializer serializer;
+@@ -136,9 +136,9 @@ final class ContentHandlerAdaptor extends DefaultHandler {
+             prefixMap.clear();
+             serializer.endAttributes();
+         } catch (IOException e) {
+-            throw new SAXException2(e);
++            throw new SAXException(e);
+         } catch (XMLStreamException e) {
+-            throw new SAXException2(e);
++            throw new SAXException(e);
+         }
+     }
+ 
+@@ -153,9 +153,9 @@ final class ContentHandlerAdaptor extends DefaultHandler {
+             flushText();
+             serializer.endElement();
+         } catch (IOException e) {
+-            throw new SAXException2(e);
++            throw new SAXException(e);
+         } catch (XMLStreamException e) {
+-            throw new SAXException2(e);
++            throw new SAXException(e);
+         }
+     }
+     
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/FilterTransducer.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/FilterTransducer.java
+index fa14713..4ee809a 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/FilterTransducer.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/FilterTransducer.java
+@@ -45,7 +45,6 @@ import java.io.IOException;
+ import javax.xml.namespace.QName;
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.NotNull;
+ import com.sun.xml.bind.api.AccessorException;
+ 
+ import org.xml.sax.SAXException;
+@@ -76,7 +75,7 @@ public abstract class FilterTransducer<T> implements Transducer<T> {
+         core.declareNamespace(o, w);
+     }
+ 
+-    public @NotNull CharSequence print(@NotNull T o) throws AccessorException {
++    public  CharSequence print( T o) throws AccessorException {
+         return core.print(o);
+     }
+ 
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/InlineBinaryTransducer.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/InlineBinaryTransducer.java
+index a09ef5d..1bf7c49 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/InlineBinaryTransducer.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/InlineBinaryTransducer.java
+@@ -44,7 +44,6 @@ import java.io.IOException;
+ 
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.NotNull;
+ import com.sun.xml.bind.api.AccessorException;
+ 
+ import org.xml.sax.SAXException;
+@@ -60,7 +59,7 @@ public class InlineBinaryTransducer<V> extends FilterTransducer<V> {
+     }
+ 
+     @Override
+-    public @NotNull CharSequence print(@NotNull V o) throws AccessorException {
++    public  CharSequence print( V o) throws AccessorException {
+         XMLSerializer w = XMLSerializer.getInstance();
+         boolean old = w.setInlineBinaryFlag(true);
+         try {
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/JAXBContextImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/JAXBContextImpl.java
+index c215971..6ade739 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/JAXBContextImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/JAXBContextImpl.java
+@@ -83,8 +83,6 @@ import javax.xml.transform.TransformerFactory;
+ import javax.xml.transform.sax.SAXTransformerFactory;
+ import javax.xml.transform.sax.TransformerHandler;
+ 
+-import com.sun.istack.NotNull;
+-import com.sun.istack.Pool;
+ import com.sun.xml.bind.v2.WellKnownNamespace;
+ import com.sun.xml.bind.api.AccessorException;
+ import com.sun.xml.bind.api.Bridge;
+@@ -174,13 +172,13 @@ public final class JAXBContextImpl extends JAXBRIContext {
+      * Pool of {@link Marshaller}s.
+      */
+     public final Pool<Marshaller> marshallerPool = new Pool.Impl<Marshaller>() {
+-        protected @NotNull Marshaller create() {
++        protected  Marshaller create() {
+             return createMarshaller();
+         }
+     };
+ 
+     public final Pool<Unmarshaller> unmarshallerPool = new Pool.Impl<Unmarshaller>() {
+-        protected @NotNull Unmarshaller create() {
++        protected  Unmarshaller create() {
+             return createUnmarshaller();
+         }
+     };
+@@ -241,10 +239,10 @@ public final class JAXBContextImpl extends JAXBRIContext {
+ 
+     private WeakReference<RuntimeTypeInfoSet> typeInfoSetCache;
+ 
+-    private @NotNull RuntimeAnnotationReader annotationReader;
++    private  RuntimeAnnotationReader annotationReader;
+ 
+     private /*almost final*/ boolean hasSwaRef;
+-    private final @NotNull Map<Class,Class> subclassReplacements;
++    private final  Map<Class,Class> subclassReplacements;
+ 
+     /**
+      * If true, we aim for faster {@link JAXBContext} instantiation performance,
+@@ -917,7 +915,7 @@ public final class JAXBContextImpl extends JAXBRIContext {
+         return bridges.get(ref);
+     }
+ 
+-    public @NotNull BridgeContext createBridgeContext() {
++    public  BridgeContext createBridgeContext() {
+         return new BridgeContextImpl(this);
+     }
+ 
+@@ -1030,8 +1028,8 @@ public final class JAXBContextImpl extends JAXBRIContext {
+         private boolean retainPropertyInfo = false;
+         private boolean supressAccessorWarnings = false;
+         private String defaultNsUri = "";
+-        private @NotNull RuntimeAnnotationReader annotationReader = new RuntimeInlineAnnotationReader();
+-        private @NotNull Map<Class,Class> subclassReplacements = Collections.emptyMap();
++        private  RuntimeAnnotationReader annotationReader = new RuntimeInlineAnnotationReader();
++        private  Map<Class,Class> subclassReplacements = Collections.emptyMap();
+         private boolean c14nSupport = false;
+         private Class[] classes;
+         private Collection<TypeReference> typeRefs;
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/JaxBeanInfo.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/JaxBeanInfo.java
+index a4bfc9e..eafcbf9 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/JaxBeanInfo.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/JaxBeanInfo.java
+@@ -58,7 +58,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
+ import javax.xml.namespace.QName;
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.NotNull;
+ import com.sun.xml.bind.Util;
+ import com.sun.xml.bind.v2.model.runtime.RuntimeTypeInfo;
+ import com.sun.xml.bind.v2.runtime.unmarshaller.Loader;
+@@ -302,7 +301,7 @@ public abstract class JaxBeanInfo<BeanT> {
+      * instance, but there's a few exceptions (most notably {@link XMLGregorianCalendar}),
+      * so as a general rule we need an instance to determine it.
+      */
+-    public QName getTypeName(@NotNull BeanT instance) {
++    public QName getTypeName( BeanT instance) {
+         if(typeName==null)  return null;
+         if(typeName instanceof QName)   return (QName)typeName;
+         return ((QName[])typeName)[0];
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/NamespaceContext2.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/NamespaceContext2.java
+index a6205fb..7ac839a 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/NamespaceContext2.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/NamespaceContext2.java
+@@ -42,7 +42,6 @@ package com.sun.xml.bind.v2.runtime;
+ 
+ import javax.xml.namespace.NamespaceContext;
+ 
+-import com.sun.istack.NotNull;
+ 
+ /**
+  * Maintains namespace&lt;->prefix bindings.
+@@ -99,5 +98,5 @@ public interface NamespaceContext2 extends NamespaceContext
+      * simply returns the assigned prefix index. Otherwise a new
+      * declaration will be put. 
+      */
+-    int force(@NotNull String uri, @NotNull String prefix);
++    int force( String uri,  String prefix);
+ }
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/Pool.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/Pool.java
+new file mode 100644
+index 0000000..71fea42
+--- /dev/null
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/Pool.java
+@@ -0,0 +1,131 @@
++/*
++ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
++ *
++ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
++ *
++ * The contents of this file are subject to the terms of either the GNU
++ * General Public License Version 2 only ("GPL") or the Common Development
++ * and Distribution License("CDDL") (collectively, the "License").  You
++ * may not use this file except in compliance with the License.  You can
++ * obtain a copy of the License at
++ * http://glassfish.java.net/public/CDDL+GPL_1_1.html
++ * or packager/legal/LICENSE.txt.  See the License for the specific
++ * language governing permissions and limitations under the License.
++ *
++ * When distributing the software, include this License Header Notice in each
++ * file and include the License file at packager/legal/LICENSE.txt.
++ *
++ * GPL Classpath Exception:
++ * Oracle designates this particular file as subject to the "Classpath"
++ * exception as provided by Oracle in the GPL Version 2 section of the License
++ * file that accompanied this code.
++ *
++ * Modifications:
++ * If applicable, add the following below the License Header, with the fields
++ * enclosed by brackets [] replaced by your own identifying information:
++ * "Portions Copyright [year] [name of copyright owner]"
++ *
++ * Contributor(s):
++ * If you wish your version of this file to be governed by only the CDDL or
++ * only the GPL Version 2, indicate your decision by adding "[Contributor]
++ * elects to include this software in this distribution under the [CDDL or GPL
++ * Version 2] license."  If you don't indicate a single choice of license, a
++ * recipient has the option to distribute your version of this file under
++ * either the CDDL, the GPL Version 2 or to extend the choice of license to
++ * its licensees as provided above.  However, if you add GPL Version 2 code
++ * and therefore, elected the GPL Version 2 license, then the option applies
++ * only if the new code is made subject to such option by the copyright
++ * holder.
++ */
++
++package com.sun.xml.bind.v2.runtime;
++
++import java.util.concurrent.ConcurrentLinkedQueue;
++import java.lang.ref.WeakReference;
++
++/**
++ * Pool of reusable objects that are indistinguishable from each other,
++ * such as JAXB marshallers.
++ *
++ * @author Kohsuke Kawaguchi
++ */
++public interface Pool<T> {
++
++    /**
++     * Gets a new object from the pool.
++     *
++     * <p>
++     * If no object is available in the pool, this method creates a new one.
++     */
++    T take();
++
++    /**
++     * Returns an object back to the pool.
++     */
++    void recycle(T t);
++
++    /**
++     * Default implementation that uses {@link ConcurrentLinkedQueue}
++     * as the data store.
++     *
++     * <h2>Note for Implementors</h2>
++     * <p>
++     * Don't rely on the fact that this class extends from {@link ConcurrentLinkedQueue}.
++     */
++    public abstract class Impl<T> implements Pool<T> {
++
++        private volatile WeakReference<ConcurrentLinkedQueue<T>> queue;
++
++        /**
++         * Gets a new object from the pool.
++         *
++         * <p>
++         * If no object is available in the pool, this method creates a new one.
++         *
++         * @return
++         *      always non-null.
++         */
++        public final T take() {
++            T t = getQueue().poll();
++            if(t==null) {
++                return create();
++            }
++            return t;
++        }
++
++        /**
++         * Returns an object back to the pool.
++         */
++        public final void recycle(T t) {
++            getQueue().offer(t);
++        }
++
++        private ConcurrentLinkedQueue<T> getQueue() {
++            WeakReference<ConcurrentLinkedQueue<T>> q = queue;
++            if (q != null) {
++                ConcurrentLinkedQueue<T> d = q.get();
++                if (d != null) {
++                    return d;
++                }
++            }
++            // overwrite the queue
++            ConcurrentLinkedQueue<T> d = new ConcurrentLinkedQueue<T>();
++            queue = new WeakReference<ConcurrentLinkedQueue<T>>(d);
++
++            return d;
++        }
++
++        /**
++         * Creates a new instance of object.
++         *
++         * <p>
++         * This method is used when someone wants to
++         * {@link #take() take} an object from an empty pool.
++         *
++         * <p>
++         * Also note that multiple threads may call this method
++         * concurrently.
++         */
++        protected abstract T create();
++    }
++}
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/Transducer.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/Transducer.java
+index 55aa437..3b9f791 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/Transducer.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/Transducer.java
+@@ -47,7 +47,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
+ import javax.xml.namespace.QName;
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.NotNull;
+ import com.sun.xml.bind.api.AccessorException;
+ import com.sun.xml.bind.v2.model.runtime.RuntimePropertyInfo;
+ import com.sun.xml.bind.v2.runtime.reflect.opt.OptimizedTransducedAccessorFactory;
+@@ -104,7 +103,7 @@ public interface Transducer<ValueT> {
+      * @return
+      *      always non-null valid lexical representation.
+      */
+-    @NotNull CharSequence print(@NotNull ValueT o) throws AccessorException;
++     CharSequence print( ValueT o) throws AccessorException;
+ 
+     /**
+      * Converts the lexical representation to a value object.
+@@ -132,7 +131,7 @@ public interface Transducer<ValueT> {
+      * to one of the {@link XMLSerializer#leafElement(Name, String, String)} method.
+      * but with the best representation of the value, not necessarily String.
+      */
+-    void writeLeafElement(XMLSerializer w, Name tagName, @NotNull ValueT o, String fieldName) throws IOException, SAXException, XMLStreamException, AccessorException;
++    void writeLeafElement(XMLSerializer w, Name tagName,  ValueT o, String fieldName) throws IOException, SAXException, XMLStreamException, AccessorException;
+ 
+     /**
+      * Transducers implicitly work against a single XML type,
+@@ -145,5 +144,5 @@ public interface Transducer<ValueT> {
+      *      Most of the time this method returns null, in which case
+      *      the implicitly associated type will be used.
+      */
+-    QName getTypeName(@NotNull ValueT instance);
++    QName getTypeName( ValueT instance);
+ }
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ValueListBeanInfoImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ValueListBeanInfoImpl.java
+index 6574c1d..0af82ce 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ValueListBeanInfoImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/ValueListBeanInfoImpl.java
+@@ -49,7 +49,7 @@ import javax.xml.bind.ValidationEvent;
+ import javax.xml.bind.helpers.ValidationEventImpl;
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.FinalArrayList;
++import java.util.ArrayList;
+ import com.sun.xml.bind.WhiteSpaceProcessor;
+ import com.sun.xml.bind.api.AccessorException;
+ import com.sun.xml.bind.v2.runtime.unmarshaller.Loader;
+@@ -77,7 +77,7 @@ final class ValueListBeanInfoImpl extends JaxBeanInfo {
+     private final Loader loader = new Loader(true) {
+         @Override
+         public void text(UnmarshallingContext.State state, CharSequence text) throws SAXException {
+-            List<Object> r = new FinalArrayList<Object>();
++            List<Object> r = new ArrayList<Object>();
+ 
+             int idx = 0;
+             int len = text.length();
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/XMLSerializer.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/XMLSerializer.java
+index d4db0f4..05b3a53 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/XMLSerializer.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/XMLSerializer.java
+@@ -66,7 +66,7 @@ import javax.xml.transform.Transformer;
+ import javax.xml.transform.TransformerException;
+ import javax.xml.transform.sax.SAXResult;
+ 
+-import com.sun.istack.SAXException2;
++import org.xml.sax.SAXException;
+ import com.sun.xml.bind.CycleRecoverable;
+ import com.sun.xml.bind.api.AccessorException;
+ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+@@ -239,14 +239,14 @@ public final class XMLSerializer extends Coordinator {
+         try {
+             handler = marshaller.getEventHandler();
+         } catch( JAXBException e ) {
+-            throw new SAXException2(e);
++            throw new SAXException(e);
+         }
+ 
+         if(!handler.handleEvent(ve)) {
+             if(ve.getLinkedException() instanceof Exception)
+-                throw new SAXException2((Exception)ve.getLinkedException());
++                throw new SAXException((Exception)ve.getLinkedException());
+             else
+-                throw new SAXException2(ve.getMessage());
++                throw new SAXException(ve.getMessage());
+         }
+     }
+ 
+@@ -434,9 +434,9 @@ public final class XMLSerializer extends Coordinator {
+         try {
+             out.attribute(prefix,local,value);
+         } catch (IOException e) {
+-            throw new SAXException2(e);
++            throw new SAXException(e);
+         } catch (XMLStreamException e) {
+-            throw new SAXException2(e);
++            throw new SAXException(e);
+         }
+     }
+ 
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/output/C14nXmlOutput.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/output/C14nXmlOutput.java
+index b570114..d9f6a49 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/output/C14nXmlOutput.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/output/C14nXmlOutput.java
+@@ -47,7 +47,7 @@ import java.util.Collections;
+ 
+ import com.sun.xml.bind.api.JAXBRIContext;
+ import com.sun.xml.bind.v2.runtime.Name;
+-import com.sun.istack.FinalArrayList;
++import java.util.ArrayList;
+ import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
+ 
+ /**
+@@ -85,7 +85,7 @@ public class C14nXmlOutput extends UTF8XmlOutput {
+      * As long as this map is empty, there's no need for sorting.
+      * see {@link com.sun.xml.bind.api.C14nSupport_ArchitectureDocument} for more details.
+      */
+-    private final FinalArrayList<DynamicAttribute> otherAttributes = new FinalArrayList<DynamicAttribute>();
++    private final ArrayList<DynamicAttribute> otherAttributes = new ArrayList<DynamicAttribute>();
+ 
+     /**
+      * True if {@link JAXBRIContext} is created with c14n support on,
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/output/NamespaceContextImpl.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/output/NamespaceContextImpl.java
+index 90eb105..6085609 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/output/NamespaceContextImpl.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/output/NamespaceContextImpl.java
+@@ -47,8 +47,6 @@ import java.util.Iterator;
+ import javax.xml.XMLConstants;
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.NotNull;
+-import com.sun.istack.Nullable;
+ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+ import com.sun.xml.bind.v2.WellKnownNamespace;
+ import com.sun.xml.bind.v2.runtime.Name;
+@@ -237,7 +235,7 @@ public final class NamespaceContextImpl implements NamespaceContext2 {
+         }
+     }
+ 
+-    public int force(@NotNull String uri, @NotNull String prefix) {
++    public int force( String uri,  String prefix) {
+         // check for the existing binding
+ 
+         for( int i=size-1; i>=0; i-- ) {
+@@ -265,7 +263,7 @@ public final class NamespaceContextImpl implements NamespaceContext2 {
+      * @return
+      *      the index of this new binding.
+      */
+-    public int put(@NotNull String uri, @Nullable String prefix) {
++    public int put( String uri,  String prefix) {
+         if(size==nsUris.length) {
+             // reallocate
+             String[] u = new String[nsUris.length*2];
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/Accessor.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/Accessor.java
+index a4e5ba2..8c1a46e 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/Accessor.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/Accessor.java
+@@ -55,7 +55,6 @@ import java.util.logging.Logger;
+ import javax.xml.bind.JAXBElement;
+ import javax.xml.bind.annotation.adapters.XmlAdapter;
+ 
+-import com.sun.istack.Nullable;
+ import com.sun.xml.bind.Util;
+ import com.sun.xml.bind.api.AccessorException;
+ import com.sun.xml.bind.api.JAXBRIContext;
+@@ -104,7 +103,7 @@ public abstract class Accessor<BeanT, ValueT> implements Receiver {
+      *                (See {@link RuntimeModelBuilder#context}.)
+      * @return At least the implementation can return <tt>this</tt>.
+      */
+-    public Accessor<BeanT, ValueT> optimize(@Nullable JAXBContextImpl context) {
++    public Accessor<BeanT, ValueT> optimize( JAXBContextImpl context) {
+         return this;
+     }
+ 
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/Lister.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/Lister.java
+index 56ce1cb..3060979 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/Lister.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/Lister.java
+@@ -60,7 +60,7 @@ import java.util.concurrent.Callable;
+ 
+ import javax.xml.bind.JAXBException;
+ 
+-import com.sun.istack.SAXException2;
++import org.xml.sax.SAXException;
+ import com.sun.xml.bind.api.AccessorException;
+ import com.sun.xml.bind.v2.ClassFactory;
+ import com.sun.xml.bind.v2.TODO;
+@@ -405,7 +405,7 @@ public abstract class Lister<BeanT,PropT,ItemT,PackT> {
+                         } catch (SAXException e) {
+                             throw e;
+                         } catch (Exception e) {
+-                            throw new SAXException2(e);
++                            throw new SAXException(e);
+                         }
+ 
+                         if(t==null) {
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/TransducedAccessor.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/TransducedAccessor.java
+index 171ce1d..af18dbc 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/TransducedAccessor.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/reflect/TransducedAccessor.java
+@@ -47,9 +47,7 @@ import javax.xml.bind.JAXBException;
+ import javax.xml.bind.annotation.XmlValue;
+ import javax.xml.stream.XMLStreamException;
+ 
+-import com.sun.istack.NotNull;
+-import com.sun.istack.Nullable;
+-import com.sun.istack.SAXException2;
++import org.xml.sax.SAXException;
+ import com.sun.xml.bind.WhiteSpaceProcessor;
+ import com.sun.xml.bind.api.AccessorException;
+ import com.sun.xml.bind.v2.model.core.ID;
+@@ -110,7 +108,7 @@ public abstract class TransducedAccessor<BeanT> {
+      * @return
+      *      if the accessor didn't yield a value, return null.
+      */
+-    public abstract @Nullable CharSequence print(@NotNull BeanT o) throws AccessorException, SAXException;
++    public abstract  CharSequence print( BeanT o) throws AccessorException, SAXException;
+ 
+     /**
+      * Parses the text value into the responsible field of the given bean.
+@@ -321,7 +319,7 @@ public abstract class TransducedAccessor<BeanT> {
+             } catch (RuntimeException e) {// from callable.call
+                 throw e;
+             } catch (Exception e) {// from callable.call
+-                throw new SAXException2(e);
++                throw new SAXException(e);
+             }
+             if(t!=null) {
+                 assign(bean,t,context);
+@@ -344,7 +342,7 @@ public abstract class TransducedAccessor<BeanT> {
+                         } catch (RuntimeException e) {// from callable.call
+                             throw e;
+                         } catch (Exception e) {// from callable.call
+-                            throw new SAXException2(e);
++                            throw new SAXException(e);
+                         }
+                     }
+                 });
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/Base64Data.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/Base64Data.java
+index ac479ec..8e61905 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/Base64Data.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/Base64Data.java
+@@ -55,7 +55,6 @@ import com.sun.xml.bind.v2.runtime.XMLSerializer;
+ import com.sun.xml.bind.v2.runtime.output.Pcdata;
+ import com.sun.xml.bind.v2.runtime.output.UTF8XmlOutput;
+ import com.sun.xml.bind.v2.util.ByteArrayOutputStreamEx;
+-import com.sun.istack.Nullable;
+ 
+ /**
+  * Fed to unmarshaller when the 'text' data is actually
+@@ -90,7 +89,7 @@ public final class Base64Data extends Pcdata {
+      * Unused when {@link #dataHandler} is set.
+      * Use {@link DataHandler#getContentType()} in that case.
+      */
+-    private @Nullable
++    private 
+     String mimeType;
+ 
+     /**
+@@ -99,7 +98,7 @@ public final class Base64Data extends Pcdata {
+      * @param len
+      *      data[0] to data[len-1] are treated as the data.
+      */
+-    public void set(byte[] data, int len, @Nullable String mimeType) {
++    public void set(byte[] data, int len,  String mimeType) {
+         this.data = data;
+         this.dataLen = len;
+         this.dataHandler = null;
+@@ -112,7 +111,7 @@ public final class Base64Data extends Pcdata {
+      * @param data
+      *      this buffer may be owned directly by the unmarshaleld JAXB object.
+      */
+-    public void set(byte[] data, @Nullable String mimeType) {
++    public void set(byte[] data,  String mimeType) {
+         set(data, data.length, mimeType);
+     }
+ 
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext.java
+index 265032d..35118e3 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext.java
+@@ -64,9 +64,7 @@ import javax.xml.bind.helpers.ValidationEventImpl;
+ import javax.xml.namespace.NamespaceContext;
+ import javax.xml.namespace.QName;
+ 
+-import com.sun.istack.NotNull;
+-import com.sun.istack.Nullable;
+-import com.sun.istack.SAXParseException2;
++import org.xml.sax.SAXParseException;
+ import com.sun.xml.bind.IDResolver;
+ import com.sun.xml.bind.Util;
+ import com.sun.xml.bind.api.AccessorException;
+@@ -119,7 +117,7 @@ public final class UnmarshallingContext extends Coordinator
+         DUMMY_INSTANCE = new LocatorExWrapper(loc);
+     }
+ 
+-    private @NotNull LocatorEx locator = DUMMY_INSTANCE;
++    private  LocatorEx locator = DUMMY_INSTANCE;
+ 
+     /** Root object that is being unmarshalled. */
+     private Object result;
+@@ -190,13 +188,13 @@ public final class UnmarshallingContext extends Coordinator
+     /**
+      * Used to discover additional classes when we hit unknown elements/types.
+      */
+-    public @Nullable ClassResolver classResolver;
++    public  ClassResolver classResolver;
+ 
+     /**
+      * User-supplied {@link ClassLoader} for converting name to {@link Class}.
+      * For backward compatibility, when null, use thread context classloader.
+      */
+-    public @Nullable ClassLoader classLoader;
++    public  ClassLoader classLoader;
+ 
+     /**
+      * The variable introduced to avoid reporting n^10 similar errors.
+@@ -737,7 +735,7 @@ public final class UnmarshallingContext extends Coordinator
+         if(!recover)    aborted = true;
+ 
+         if( !canRecover || !recover )
+-            throw new SAXParseException2( event.getMessage(), locator,
++            throw new SAXParseException( event.getMessage(), locator,
+                 new UnmarshalException(
+                     event.getMessage(),
+                     event.getLinkedException() ) );
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/XsiTypeLoader.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/XsiTypeLoader.java
+index 4766583..3cbec32 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/XsiTypeLoader.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/runtime/unmarshaller/XsiTypeLoader.java
+@@ -45,7 +45,6 @@ import javax.xml.namespace.QName;
+ import com.sun.xml.bind.DatatypeConverterImpl;
+ import com.sun.xml.bind.v2.WellKnownNamespace;
+ import com.sun.xml.bind.v2.runtime.JaxBeanInfo;
+-import com.sun.istack.Nullable;
+ 
+ import java.util.Collection;
+ import java.util.Collections;
+@@ -80,7 +79,7 @@ public class XsiTypeLoader extends Loader {
+         loader.startElement(state,ea);
+     }
+ 
+-    /*pacakge*/ static JaxBeanInfo parseXsiType(UnmarshallingContext.State state, TagName ea, @Nullable JaxBeanInfo defaultBeanInfo) throws SAXException {
++    /*pacakge*/ static JaxBeanInfo parseXsiType(UnmarshallingContext.State state, TagName ea,  JaxBeanInfo defaultBeanInfo) throws SAXException {
+         UnmarshallingContext context = state.getContext();
+         JaxBeanInfo beanInfo = null;
+ 
+diff --git a/runtime/impl/src/main/java/com/sun/xml/bind/v2/schemagen/XmlSchemaGenerator.java b/runtime/impl/src/main/java/com/sun/xml/bind/v2/schemagen/XmlSchemaGenerator.java
+index c8380a3..cc85be8 100644
+--- a/runtime/impl/src/main/java/com/sun/xml/bind/v2/schemagen/XmlSchemaGenerator.java
++++ b/runtime/impl/src/main/java/com/sun/xml/bind/v2/schemagen/XmlSchemaGenerator.java
+@@ -63,8 +63,6 @@ import javax.xml.namespace.QName;
+ import javax.xml.transform.Result;
+ import javax.xml.transform.stream.StreamResult;
+ 
+-import com.sun.istack.Nullable;
+-import com.sun.istack.NotNull;
+ import com.sun.xml.bind.Util;
+ import com.sun.xml.bind.api.CompositeStructure;
+ import com.sun.xml.bind.api.ErrorListener;
+@@ -504,7 +502,7 @@ public final class XmlSchemaGenerator<T,C,F,M> {
+      * Schema components are organized per namespace.
+      */
+     private class Namespace {
+-        final @NotNull String uri;
++        final  String uri;
+ 
+         /**
+          * Other {@link Namespace}s that this namespace depends on.
+@@ -588,7 +586,7 @@ public final class XmlSchemaGenerator<T,C,F,M> {
+             }
+         }
+ 
+-        private void addDependencyTo(@Nullable QName qname) {
++        private void addDependencyTo( QName qname) {
+             // even though the Element interface says getElementName() returns non-null,
+             // ClassInfo always implements Element (even if an instance of ClassInfo might not be an Element).
+             // so this check is still necessary
+-- 
+2.20.1
+

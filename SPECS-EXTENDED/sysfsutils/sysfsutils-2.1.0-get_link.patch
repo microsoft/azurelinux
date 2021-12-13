@@ -1,0 +1,164 @@
+diff -upr sysfsutils-2.1.0-old/lib/sysfs_utils.c sysfsutils-2.1.0/lib/sysfs_utils.c
+--- sysfsutils-2.1.0-old/lib/sysfs_utils.c	2006-08-07 07:08:01.000000000 +0200
++++ sysfsutils-2.1.0/lib/sysfs_utils.c	2008-05-13 07:42:50.000000000 +0200
+@@ -117,84 +117,104 @@ int sysfs_get_link(const char *path, cha
+ {
+ 	char devdir[SYSFS_PATH_MAX];
+ 	char linkpath[SYSFS_PATH_MAX];
+-	char temp_path[SYSFS_PATH_MAX];
+-	char *d = NULL, *s = NULL;
+-	int slashes = 0, count = 0;
++	char *d, *s;
++	int count;
+ 
+ 	if (!path || !target || len == 0) {
+ 		errno = EINVAL;
+ 		return -1;
+ 	}
+ 
+-	memset(devdir, 0, SYSFS_PATH_MAX);
+-	memset(linkpath, 0, SYSFS_PATH_MAX);
+-	memset(temp_path, 0, SYSFS_PATH_MAX);
+-	safestrcpy(devdir, path);
+-
+-	if ((readlink(path, linkpath, SYSFS_PATH_MAX)) < 0) {
++	count = readlink(path, linkpath, SYSFS_PATH_MAX);
++	if (count < 0)
+ 		return -1;
+-	}
+-	d = linkpath;
++	else
++		linkpath[count] = '\0';
+ 	/*
+ 	 * Three cases here:
+ 	 * 1. relative path => format ../..
+ 	 * 2. absolute path => format /abcd/efgh
+ 	 * 3. relative path _from_ this dir => format abcd/efgh
+ 	 */
+-	switch (*d) {
+-		case '.':
++	if (*linkpath == '/') {
++		/* absolute path - copy as is */
++		safestrcpymax(target, linkpath, len);
++		return 0;
++	}
++
++	safestrcpy(devdir, path);
++	s = strrchr(devdir, '/');
++	if (s == NULL)
++		s = devdir - 1;
++	d = linkpath;
++	while (*d == '.') {
++		if (*(d+1) == '/') {
+ 			/*
+ 			 * handle the case where link is of type ./abcd/xxx
+ 			 */
+-			safestrcpy(temp_path, devdir);
+-			if (*(d+1) == '/')
+-				d += 2;
+-			else if (*(d+1) == '.')
+-				goto parse_path;
+-			s = strrchr(temp_path, '/');
+-			if (s != NULL) {
+-				*(s+1) = '\0';
+-				safestrcat(temp_path, d);
+-			} else {
+-				safestrcpy(temp_path, d);
+-			}
+-			safestrcpymax(target, temp_path, len);
+-			break;
++			d += 2;
++			while (*d == '/')
++				d++;
++			continue;
++		} else if (*(d+1) != '.' || *(d+2) != '/')
+ 			/*
+-			 * relative path, getting rid of leading "../.."
++			 * relative path from this directory, starting
++			 * with a hidden directory
+ 			 */
+-parse_path:
+-			while (*d == '/' || *d == '.') {
+-				if (*d == '/')
+-					slashes++;
+-				d++;
+-			}
+-			d--;
+-			s = &devdir[strlen(devdir)-1];
+-			while (s != NULL && count != (slashes+1)) {
++			break;
++
++		/*
++		 * relative path, getting rid of leading "../.."; must
++		 * be careful here since any path component of devdir
++		 * could be a symlink again
++		 */
++		for (;;) {
++			while (s > devdir && *s == '/') {
+ 				s--;
+-				if (*s == '/')
+-					count++;
++				if (*s == '.'
++				    && (s == devdir || *(s-1) == '/'))
++					s--;
+ 			}
+-			safestrcpymax(s, d, (SYSFS_PATH_MAX-strlen(devdir)));
+-			safestrcpymax(target, devdir, len);
+-			break;
+-		case '/':
+-			/* absolute path - copy as is */
+-			safestrcpymax(target, linkpath, len);
+-			break;
+-		default:
+-			/* relative path from this directory */
+-			safestrcpy(temp_path, devdir);
+-			s = strrchr(temp_path, '/');
+-			if (s != NULL) {
+-				*(s+1) = '\0';
+-				safestrcat(temp_path, linkpath);
+-			} else {
+-				safestrcpy(temp_path, linkpath);
++			*(s+1) = '\0';
++			if (*devdir == '\0' || sysfs_path_is_link(devdir))
++				/*
++				 * condition will be true eventually
++				 * because we already know that all
++				 * but the last component of path
++				 * resolve to a directory
++				 */
++				break;
++			if (sysfs_get_link(devdir, devdir, SYSFS_PATH_MAX))
++				return -1;
++			s = devdir + strlen(devdir) - 1;
++		}
++		while (s >= devdir) {
++			if (*s == '/') {
++				if (*(s+1) != '.' || *(s+2) != '.'
++				    || *(s+3) != '\0') {
++					d += 3;
++					while (*d == '/')
++						d++;
++				} else
++					s += 2;
++				break;
+ 			}
+-			safestrcpymax(target, temp_path, len);
++			s--;
++		}
++		if (s < devdir || *(s+1) == '\0')
++			break;
+ 	}
++
++	/*
++	 * appending to devdir a slash and the (possibly shortened)
++	 * relative path to the link source
++	 */
++	s++;
++	if (s > devdir && *s == '\0')
++		*s++ = '/';
++	*s = '\0';
++	safestrcpymax(s, d, SYSFS_PATH_MAX-(s-devdir));
++	safestrcpymax(target, devdir, len);
+ 	return 0;
+ }
+ 

@@ -1,0 +1,18 @@
+# Systemd unit file for jetty
+#
+# Multiple copies of this service (i.e. multiple concurrently running
+# jetty servers) are not supported right now. Expect this to come with
+# future updates
+
+[Unit]
+Description=Jetty Web Application Server
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/share/jetty/bin/jetty.sh
+User=jetty
+Group=jetty
+
+[Install]
+WantedBy=multi-user.target

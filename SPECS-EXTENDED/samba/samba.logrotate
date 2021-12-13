@@ -1,0 +1,10 @@
+/var/log/samba/log.* {
+    compress
+    dateext
+    maxage 365
+    rotate 99
+    notifempty
+    olddir /var/log/samba/old
+    missingok
+    copytruncate
+}

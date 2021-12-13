@@ -1,0 +1,22 @@
+diff -up ./scripts/ypMakefile.in.nonedomain ./scripts/ypMakefile.in
+--- ./scripts/ypMakefile.in.nonedomain	2013-05-06 18:30:46.772434725 +0200
++++ ./scripts/ypMakefile.in	2013-05-06 18:31:59.429495323 +0200
+@@ -106,10 +106,18 @@ NETMASKS    = $(YPSRCDIR)/netmasks
+ YPSERVERS = $(YPDIR)/ypservers	# List of all NIS slave servers
+ 
+ target: Makefile
++ifeq ($(shell /bin/domainname), (none))
++	@echo "Domain name cannot be (none)"
++else
++ifeq ($(shell /bin/domainname), )
++	@echo "Domain name must be set"
++else
+ 	@test ! -d $(LOCALDOMAIN) && mkdir $(LOCALDOMAIN) ; \
+ 	cd $(LOCALDOMAIN)  ; \
+ 	$(NOPUSH) || $(MAKE) -f ../Makefile ypservers; \
+ 	$(MAKE) -f ../Makefile all
++endif
++endif
+ 
+ # If you don't want some of these maps built, feel free to comment
+ # them out from this list.

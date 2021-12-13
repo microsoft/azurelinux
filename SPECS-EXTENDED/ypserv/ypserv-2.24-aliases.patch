@@ -1,0 +1,34 @@
+diff -up ypserv-2.32/acinclude.m4.aliases ypserv-2.32/acinclude.m4
+--- ypserv-2.32/acinclude.m4.aliases	2005-04-07 14:38:44.000000000 +0200
++++ ypserv-2.32/acinclude.m4	2013-11-18 09:57:05.082162773 +0100
+@@ -92,3 +92,18 @@ AC_DEFUN([TYPE_SOCKLEN_T],
+ fi
+ AC_MSG_RESULT($ac_cv___attribute__)
+ ])
++
++
++dnl
++dnl Find where aliases file is located
++dnl It can be in /etc/aliases or /etc/mail/aliases
++dnl If file path is specified in argument and file path exists, it is used.
++dnl 
++AC_DEFUN([FIND_ALIASES_PATH], [
++AC_MSG_CHECKING(for aliases file path)
++tmp_aliases="$1"
++test -f /etc/mail/aliases && tmp_aliases="/etc/mail/aliases"
++test -f /etc/aliases && tmp_aliases="/etc/aliases"
++AC_MSG_RESULT($tmp_aliases)
++AC_SUBST(ALIASES, $tmp_aliases)
++])
+diff -up ypserv-2.32/configure.ac.aliases ypserv-2.32/configure.ac
+--- ypserv-2.32/configure.ac.aliases	2013-11-18 09:51:17.094758957 +0100
++++ ypserv-2.32/configure.ac	2013-11-18 09:52:07.859844276 +0100
+@@ -151,7 +151,7 @@ fi
+ AC_SUBST(MAKE)
+ 
+ dnl Check for aliases path
+-AC_PATH_PROG(ALIASES, aliases, /etc/mail/aliases, /etc/mail:/etc)
++FIND_ALIASES_PATH(/etc/aliases)
+ 
+ dnl Should we use a gethostbyname after gethostname to use FQDN ? default yes
+ AC_ARG_ENABLE(fqdn, AS_HELP_STRING([--disable-fqdn],

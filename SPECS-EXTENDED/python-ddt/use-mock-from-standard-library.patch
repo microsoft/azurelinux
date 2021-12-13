@@ -1,0 +1,22 @@
+This patch is a subset of:
+https://github.com/datadriventests/ddt/pull/74
+
+Not all the files touched by the pull request are in the PyPI sdist, so
+those chunks have been removed.
+
+diff --git a/test/test_functional.py b/test/test_functional.py
+index 5049928..9275ffc 100644
+--- a/test/test_functional.py
++++ b/test/test_functional.py
+@@ -2,7 +2,10 @@
+ import json
+ 
+ import six
+-import mock
++try:
++    from unittest import mock
++except ImportError:
++    import mock
+ 
+ from ddt import ddt, data, file_data
+ from nose.tools import (

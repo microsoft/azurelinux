@@ -1,0 +1,50 @@
+--- CONFIG/include/atlconf.h	2011-05-14 13:33:24.000000000 -0400
++++ CONFIG/include/atlconf.h.new	2011-08-30 14:25:41.427136391 -0400
+@@ -16,7 +16,7 @@
+ 
+ enum ARCHFAM {AFOther=0, AFPPC, AFSPARC, AFALPHA, AFX86, AFIA64, AFMIPS};
+ 
+-#define NMACH 37
++#define NMACH 38
+ static char *machnam[NMACH] =
+    {"UNKNOWN", "POWER3", "POWER4", "POWER5", "PPCG4", "PPCG5",
+     "POWER6", "POWER7",
+@@ -25,7 +25,7 @@
+     "Efficeon", "K7", "HAMMER", "AMD64K10h", "UNKNOWNx86",
+     "IA64Itan", "IA64Itan2",
+     "USI", "USII", "USIII", "USIV", "UST2", "UnknownUS",
+-    "MIPSR1xK", "MIPSICE9"};
++    "MIPSR1xK", "MIPSICE9", "ARM"};
+ enum MACHTYPE {MACHOther, IbmPwr3, IbmPwr4, IbmPwr5, PPCG4, PPCG5,
+                IbmPwr6, IbmPwr7,
+                IntP5, IntP5MMX, IntPPRO, IntPII, IntPIII, IntPM, IntCoreS,
+@@ -34,7 +34,8 @@
+                IA64Itan, IA64Itan2,
+                SunUSI, SunUSII, SunUSIII, SunUSIV, SunUST2, SunUSX,
+                MIPSR1xK, /* includes R10K, R12K, R14K, R16K */
+-               MIPSICE9   /* SiCortex ICE9 -- like MIPS5K */
++               MIPSICE9,   /* SiCortex ICE9 -- like MIPS5K */
++	       ARM
+                };
+ #define MachIsX86(mach_) \
+    ( (mach_) >= IntP5 && (mach_) <= x86X )
+@@ -51,6 +52,8 @@
+ #endif
+ #define MachIsPPC(mach_) \
+    ( (mach_) >= PPCG4 && (mach_) <= PPCG5 )
++#define MachIsARM(mach_) \
++   ( (mach_) == ARM )
+ 
+ static char *f2c_namestr[5] = {"UNKNOWN","Add_", "Add__", "NoChange", "UpCase"};
+ static char *f2c_intstr[5] =
+--- CONFIG/src/probe_comp.c	2011-05-14 13:33:24.000000000 -0400
++++ CONFIG/src/probe_comp.c.new	2011-08-30 14:28:31.103015151 -0400
+@@ -507,6 +507,8 @@
+ 
+    if (MachIsIA64(arch))
+       return(sp);
++   if (MachIsARM(arch))
++      return(sp);
+    if (MachIsMIPS(arch))
+       return((ptrbits == 64) ? "-mabi=64" : "-mabi=n32");
+    if (!CompIsGcc(comp))

@@ -1,0 +1,74 @@
+diff -up imap-2007e/src/osdep/unix/Makefile.shared imap-2007e/src/osdep/unix/Makefile
+--- imap-2007e/src/osdep/unix/Makefile.shared	2009-07-07 19:28:02.909755512 -0500
++++ imap-2007e/src/osdep/unix/Makefile	2009-07-07 19:29:35.870006799 -0500
+@@ -170,6 +170,10 @@ BUILD=$(MAKE) build EXTRACFLAGS='$(EXTRA
+  EXTRADRIVERS='$(EXTRADRIVERS)' EXTRAAUTHENTICATORS='$(EXTRAAUTHENTICATORS)'\
+  PASSWDTYPE=$(PASSWDTYPE) SSLTYPE=$(SSLTYPE) IP=$(IP)
+ 
++# Need this for the shared library rule to work correctly
++.SUFFIXES: .o .so
++SOFILES=${BINARIES:.o=.so}
++
+ 
+ # Here if no make argument established
+ 
+@@ -845,18 +849,24 @@ vu2:	# VAX Ultrix 2.3, etc.
+ 
+ # Build it!
+ 
+-build:	clean once $(ARCHIVE)
++build:	clean once $(ARCHIVE) $(SHLIBNAME)
+ 
+-all:	$(ARCHIVE)
++all:	$(ARCHIVE) $(SHLIBNAME)
+ 
+ $(ARCHIVE): $(BINARIES)
+ 	sh -c '$(RM) $(ARCHIVE) || true'
+ 	@$(CAT) ARCHIVE
+ 	@$(SH) ARCHIVE
+ 
+-.c.o:
+-	`$(CAT) CCTYPE` -c `$(CAT) CFLAGS` $*.c
++$(SHLIBNAME):	$(SOFILES)
++	gcc -shared -Wl,-soname,$(SHLIBNAME) -o $(SHLIBNAME) $(SOFILES) `cat LDFLAGS`
++	ln -s $(SHLIBNAME) lib$(SHLIBBASE).so
+ 
++.c.so:	osdep.h
++	$(CC) -fPIC -DPIC -D_REENTRANT -c `$(CAT) CFLAGS` ${@:.so=.c} -o $@
++
++.c.o:
++	$(CC) -fPIC -DPIC -D_REENTRANT -c `$(CAT) CFLAGS` $*.c
+ 
+ # Cleanup
+ 
+@@ -895,8 +905,7 @@ utf8aux.o: mail.h misc.h osdep.h utf8.h
+ 
+ 
+ # OS-dependent
+-
+-osdep.o:mail.h misc.h env.h fs.h ftl.h nl.h tcp.h \
++OSDEPS= mail.h misc.h env.h fs.h ftl.h nl.h tcp.h \
+ 	osdep.h env_unix.h tcp_unix.h \
+ 	osdep.c env_unix.c fs_unix.c ftl_unix.c nl_unix.c tcp_unix.c ip_unix.c\
+ 	auths.c crexcl.c flockcyg.c flocklnx.c flocksim.c fsync.c \
+@@ -910,12 +919,19 @@ osdep.o:mail.h misc.h env.h fs.h ftl.h n
+ 	write.c sslstdio.c \
+ 	strerror.c strpbrk.c strstr.c strtok.c strtoul.c \
+ 	OSCFLAGS
++
++osdep.o:	$(OSDEPS)
++	$(CC) -fPIC -DPIC -D_REENTRANT `$(CAT) CFLAGS` `$(CAT) OSCFLAGS` -c osdep.c
++	@echo ========================================================================
+ 	@echo Building OS-dependent module
+ 	@echo If you get No such file error messages for files x509.h, ssl.h,
+ 	@echo pem.h, buffer.h, bio.h, and crypto.h, that means that OpenSSL
+ 	@echo is not installed on your system.  Either install OpenSSL first
+ 	@echo or build with command: make `$(CAT) OSTYPE` SSLTYPE=none
+-	`$(CAT) CCTYPE` -c `$(CAT) CFLAGS` `$(CAT) OSCFLAGS` -c osdep.c
++	@echo ========================================================================
++
++osdep.so:	$(OSDEPS)
++	$(CC) -fPIC -DPIC -D_REENTRANT `$(CAT) CFLAGS` `cat OSCFLAGS` -c osdep.c -o $@
+ 
+ osdep.c: osdepbas.c osdepckp.c osdeplog.c osdepssl.c
+ 	$(CAT) osdepbas.c osdepckp.c osdeplog.c osdepssl.c > osdep.c

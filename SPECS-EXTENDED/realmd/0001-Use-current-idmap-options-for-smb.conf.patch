@@ -1,0 +1,185 @@
+From e683fb573bc09893ec541be29751560cea30ce3f Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Wed, 30 May 2018 13:10:57 +0200
+Subject: [PATCH] Use current idmap options for smb.conf
+
+Samba change some time ago the way how to configure id-mapping. With
+this patch realmd will use the current supported options when creating
+smb.conf.
+
+A new option --legacy-samba-config is added to use the old options if
+realmd is used with Samba 3.5 or earlier.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1484072
+---
+ dbus/realm-dbus-constants.h   |  1 +
+ doc/manual/realmd.conf.xml    | 17 ++++++++++++
+ service/realm-samba-enroll.c  |  2 +-
+ service/realm-samba-enroll.h  |  3 +++
+ service/realm-samba-winbind.c | 63 ++++++++++++++++++++++++++++++++++---------
+ 5 files changed, 72 insertions(+), 14 deletions(-)
+
+diff --git a/dbus/realm-dbus-constants.h b/dbus/realm-dbus-constants.h
+index 9cd30ef..40ffa2d 100644
+--- a/dbus/realm-dbus-constants.h
++++ b/dbus/realm-dbus-constants.h
+@@ -69,6 +69,7 @@ G_BEGIN_DECLS
+ #define   REALM_DBUS_OPTION_COMPUTER_NAME          "computer-name"
+ #define   REALM_DBUS_OPTION_OS_NAME                "os-name"
+ #define   REALM_DBUS_OPTION_OS_VERSION             "os-version"
++#define   REALM_DBUS_OPTION_LEGACY_SMB_CONF        "legacy-samba-config"
+ 
+ #define   REALM_DBUS_IDENTIFIER_ACTIVE_DIRECTORY   "active-directory"
+ #define   REALM_DBUS_IDENTIFIER_WINBIND            "winbind"
+diff --git a/doc/manual/realmd.conf.xml b/doc/manual/realmd.conf.xml
+index 7853230..a2b577c 100644
+--- a/doc/manual/realmd.conf.xml
++++ b/doc/manual/realmd.conf.xml
+@@ -192,6 +192,23 @@ automatic-install = no
+ 	</listitem>
+ 	</varlistentry>
+ 
++	<varlistentry>
++	<term><option>legacy-samba-config</option></term>
++	<listitem>
++		<para>Set this to <parameter>yes</parameter> to create a Samba
++		configuration file with id-mapping options used by Samba-3.5
++		and earlier version.</para>
++
++		<informalexample>
++<programlisting language="js">
++[service]
++legacy-samba-config = no
++# legacy-samba-config = yes
++</programlisting>
++		</informalexample>
++	</listitem>
++	</varlistentry>
++
+ 	</variablelist>
+ </refsect1>
+ 
+diff --git a/service/realm-samba-enroll.c b/service/realm-samba-enroll.c
+index c81aed2..76e7b79 100644
+--- a/service/realm-samba-enroll.c
++++ b/service/realm-samba-enroll.c
+@@ -69,7 +69,7 @@ join_closure_free (gpointer data)
+ 	g_free (join);
+ }
+ 
+-static gchar *
++gchar *
+ fallback_workgroup (const gchar *realm)
+ {
+ 	const gchar *pos;
+diff --git a/service/realm-samba-enroll.h b/service/realm-samba-enroll.h
+index 84e8b2f..310ec65 100644
+--- a/service/realm-samba-enroll.h
++++ b/service/realm-samba-enroll.h
+@@ -46,6 +46,9 @@ void               realm_samba_enroll_leave_async          (RealmDisco *disco,
+ gboolean           realm_samba_enroll_leave_finish         (GAsyncResult *result,
+                                                             GError **error);
+ 
++gchar *
++fallback_workgroup (const gchar *realm);
++
+ G_END_DECLS
+ 
+ #endif /* __REALM_SAMBA_ENROLL_H__ */
+diff --git a/service/realm-samba-winbind.c b/service/realm-samba-winbind.c
+index a7ddec3..9335e26 100644
+--- a/service/realm-samba-winbind.c
++++ b/service/realm-samba-winbind.c
+@@ -21,8 +21,10 @@
+ #include "realm-options.h"
+ #include "realm-samba-config.h"
+ #include "realm-samba-winbind.h"
++#include "realm-samba-enroll.h"
+ #include "realm-settings.h"
+ #include "realm-service.h"
++#include "dbus/realm-dbus-constants.h"
+ 
+ #include <glib/gstdio.h>
+ 
+@@ -80,6 +82,10 @@ realm_samba_winbind_configure_async (RealmIniConfig *config,
+ 	RealmIniConfig *pwc;
+ 	GTask *task;
+ 	GError *error = NULL;
++	gchar *workgroup = NULL;
++	gchar *idmap_config_backend = NULL;
++	gchar *idmap_config_range = NULL;
++	gchar *idmap_config_schema_mode = NULL;
+ 
+ 	g_return_if_fail (config != NULL);
+ 	g_return_if_fail (invocation != NULL || G_IS_DBUS_METHOD_INVOCATION (invocation));
+@@ -100,23 +106,54 @@ realm_samba_winbind_configure_async (RealmIniConfig *config,
+ 		                      "template shell", realm_settings_string ("users", "default-shell"),
+ 		                      NULL);
+ 
+-		if (realm_options_automatic_mapping (options, domain_name)) {
+-			realm_ini_config_set (config, REALM_SAMBA_CONFIG_GLOBAL,
+-			                      "idmap uid", "10000-2000000",
+-			                      "idmap gid", "10000-2000000",
+-			                      "idmap backend", "tdb",
+-			                      "idmap schema", NULL,
+-			                      NULL);
++		if (realm_settings_boolean ("service", REALM_DBUS_OPTION_LEGACY_SMB_CONF, FALSE)) {
++			if (realm_options_automatic_mapping (options, domain_name)) {
++				realm_ini_config_set (config, REALM_SAMBA_CONFIG_GLOBAL,
++						      "idmap uid", "10000-2000000",
++						      "idmap gid", "10000-2000000",
++						      "idmap backend", "tdb",
++						      "idmap schema", NULL,
++						      NULL);
++			} else {
++				realm_ini_config_set (config, REALM_SAMBA_CONFIG_GLOBAL,
++						      "idmap uid", "500-4294967296",
++						      "idmap gid", "500-4294967296",
++						      "idmap backend", "ad",
++						      "idmap schema", "rfc2307",
++						      NULL);
++			}
+ 		} else {
+-			realm_ini_config_set (config, REALM_SAMBA_CONFIG_GLOBAL,
+-			                      "idmap uid", "500-4294967296",
+-			                      "idmap gid", "500-4294967296",
+-			                      "idmap backend", "ad",
+-			                      "idmap schema", "rfc2307",
+-			                      NULL);
++			workgroup = realm_ini_config_get (config, REALM_SAMBA_CONFIG_GLOBAL, "workgroup");
++			if (workgroup == NULL) {
++				workgroup = fallback_workgroup (domain_name);
++			}
++			idmap_config_backend = g_strdup_printf ("idmap config %s : backend", workgroup != NULL ? workgroup : "PLEASE_REPLACE");
++			idmap_config_range = g_strdup_printf ("idmap config %s : range", workgroup != NULL ? workgroup : "PLEASE_REPLACE");
++			idmap_config_schema_mode = g_strdup_printf ("idmap config %s : schema_mode", workgroup != NULL ? workgroup : "PLEASE_REPLACE");
++			g_free (workgroup);
++
++			if (realm_options_automatic_mapping (options, domain_name)) {
++				realm_ini_config_set (config, REALM_SAMBA_CONFIG_GLOBAL,
++						      "idmap config * : backend", "tdb",
++						      "idmap config * : range", "10000-999999",
++						      idmap_config_backend != NULL ? idmap_config_backend : "idmap config PLEASE_REPLACE : backend", "rid",
++						      idmap_config_range != NULL ? idmap_config_range: "idmap config PLEASE_REPLACE : range", "2000000-2999999",
++						      idmap_config_schema_mode != NULL ? idmap_config_schema_mode: "idmap config PLEASE_REPLACE : schema_mode", NULL,
++						      NULL);
++			} else {
++				realm_ini_config_set (config, REALM_SAMBA_CONFIG_GLOBAL,
++						      "idmap config * : backend", "tdb",
++						      "idmap config * : range", "10000000-10999999",
++						      idmap_config_backend != NULL ? idmap_config_backend : "idmap config PLEASE_REPLACE : backend", "ad",
++						      idmap_config_range != NULL ? idmap_config_range: "idmap config PLEASE_REPLACE : range", "500-999999",
++						      idmap_config_schema_mode != NULL ? idmap_config_schema_mode: "idmap config PLEASE_REPLACE : schema_mode", "rfc2307",
++						      NULL);
++			}
+ 		}
+ 
+ 		realm_ini_config_finish_change (config, &error);
++		g_free (idmap_config_backend);
++		g_free (idmap_config_range);
+ 	}
+ 
+ 	/* Setup pam_winbind.conf with decent defaults matching our expectations */
+-- 
+2.14.4
+

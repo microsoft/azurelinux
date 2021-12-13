@@ -1,0 +1,82 @@
+From b6753bd048b4012b11d60c094d1ab6ca181ee50d Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Thu, 21 Feb 2019 21:16:26 +0100
+Subject: [PATCH] tests: ignore order in test_update_domain
+
+Individual options of a domain or in general for a section in an ini
+file are stored by realmd in a hash table. When writing out the ini file
+the options can show up in any order and the unit tests should be aware
+of it.
+
+Resolves: https://gitlab.freedesktop.org/realmd/realmd/issues/19
+---
+ tests/test-sssd-config.c | 41 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 39 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test-sssd-config.c b/tests/test-sssd-config.c
+index 59eab75..8f3fec5 100644
+--- a/tests/test-sssd-config.c
++++ b/tests/test-sssd-config.c
+@@ -163,12 +163,49 @@ test_add_domain_only (Test *test,
+ 	g_free (output);
+ }
+ 
++static void check_for_test_update_domain (char *new)
++{
++	char *token;
++	char *saveptr;
++	size_t c;
++	int result = 0;
++
++	token = strtok_r (new, "\n", &saveptr);
++	g_assert_nonnull (token);
++	g_assert_cmpstr (token, ==, "[domain/one]");
++
++	for (c = 0; c < 3; c++) {
++		token = strtok_r (NULL, "\n", &saveptr);
++		g_assert_nonnull (token);
++		if (strcmp (token, "val=1") == 0) {
++			result += 1;
++		} else if (strcmp (token, "uno = 1") == 0) {
++			result += 2;
++		} else if (strcmp (token, "eins = one") == 0) {
++			result += 4;
++		} else {
++			g_assert_not_reached ();
++		}
++	}
++	g_assert_cmpint (result, ==, 7);
++
++	token = strtok_r (NULL, "\n", &saveptr);
++	g_assert_nonnull (token);
++	g_assert_cmpstr (token, ==, "[sssd]");
++
++	token = strtok_r (NULL, "\n", &saveptr);
++	g_assert_nonnull (token);
++	g_assert_cmpstr (token, ==, "domains=one");
++
++	token = strtok_r (NULL, "\n", &saveptr);
++	g_assert_null (token);
++}
++
+ static void
+ test_update_domain (Test *test,
+                     gconstpointer unused)
+ {
+ 	const gchar *data = "[domain/one]\nval=1\n[sssd]\ndomains=one";
+-	const gchar *check = "[domain/one]\nval=1\nuno = 1\neins = one\n[sssd]\ndomains=one";
+ 	GError *error = NULL;
+ 	gchar *output;
+ 	gboolean ret;
+@@ -190,7 +227,7 @@ test_update_domain (Test *test,
+ 	g_assert_no_error (error);
+ 	g_assert (ret == TRUE);
+ 
+-	g_assert_cmpstr (check, ==, output);
++	check_for_test_update_domain (output);
+ 	g_free (output);
+ }
+ 
+-- 
+2.20.1
+

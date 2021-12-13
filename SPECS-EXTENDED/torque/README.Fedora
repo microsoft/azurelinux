@@ -1,0 +1,84 @@
+This README describes how to get the most basic working
+torque service on a single host.
+
+To setup a basic single-node localhost-only batch system, install the
+torque-server, torque-mom, and torque-scheduler packages, and do something like
+this:
+
+0) If torque is built with munge support then this 
+   must be enabled first on all nodes. The munge
+   package should allready be installed.
+
+   Create a munge key with 
+
+   /usr/sbin/create-munge-key
+
+   Copy resulting key /etc/munge/munge.key to 
+   all torque nodes in your cluster including
+   pbs_server, pbs_mom and client (qstat,qsub) nodes.
+
+1) Get your full hostname with
+
+# /bin/hostname --long
+
+e.g myhost.example.org
+
+2) Edit /etc/torque/server_name 
+to contain the single line
+
+myhost.example.org
+
+3) Edit /etc/torque/mom/config 
+to contain the single line
+
+$pbsserver myhost.example.org
+
+4) Create a torque serverdb file.
+# /usr/sbin/pbs_server -D -t create
+
+Warning this will remove any existing serverdb 
+file located at /var/lib/torque/server_priv/serverdb
+
+You will have to Ctrl^C the pbs_server command, it will
+only take a moment to create this file.
+
+5) Start the pbs_server and configure it.
+service pbs_server start
+# qmgr -c "s s scheduling=true"
+# qmgr -c "c q batch queue_type=execution"
+# qmgr -c "s q batch started=true"
+# qmgr -c "s q batch enabled=true"
+# qmgr -c "s q batch resources_default.nodes=1"
+# qmgr -c "s q batch resources_default.walltime=3600"
+# qmgr -c "s s default_queue=batch"
+
+6) Add one batch worker to your pbs_server.
+
+# qmgr -c "c n myhost.example.org"
+
+7) Start the pbs_mom and pbs_sched deamons.
+
+# service pbs_mom start
+# service pbs_sched start
+
+8) Use chkconfig to start the services at boot time.
+
+# /sbin/chkconfig pbs_mom on
+# /sbin/chkconfig pbs_server on
+# /sbin/chkconfig pbs_sched on
+# /sbin/chkconfig munge on
+
+9) Submit a test job.
+As a user not as root run the following
+
+$ qsub <<EOF
+hostname 
+echo "Hi I am a batch job running in torque"
+EOF
+
+10 ) Monitor the state of that job with qstat.
+
+In case of problems first of all look in /var/log/torque
+
+
+

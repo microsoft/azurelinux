@@ -1,0 +1,27 @@
+--- build.xml.orig	2014-12-18 21:38:42.035192783 +0000
++++ build.xml	2014-12-18 21:39:34.233460061 +0000
+@@ -95,15 +95,9 @@
+         <mkdir dir="dist"/>
+         <jarjar jarfile="${jarfile}">
+             <fileset dir="build/main"/>
+-            <zipfileset src="lib/asm-4.0.jar"/>
+-            <zipfileset src="lib/asm-commons-4.0.jar">
+-                <include name="org/objectweb/asm/commons/Remap*.class"/>
+-                <include name="org/objectweb/asm/commons/LocalVariablesSorter.class"/>
+-            </zipfileset>
+         	<keep pattern="com.tonicsystems.jarjar.Main"/>
+             <keep pattern="com.tonicsystems.jarjar.JarJarTask"/>
+             <rule pattern="com.tonicsystems.jarjar.util.**" result="com.tonicsystems.jarjar.ext_util.@1"/>
+-            <rule pattern="org.objectweb.asm.**" result="com.tonicsystems.jarjar.asm.@1"/>
+             <manifest>
+                 <attribute name="Main-Class" value="com.tonicsystems.jarjar.Main"/>
+                 <attribute name="Implementation-Version" value="${version}"/>
+@@ -199,7 +199,7 @@
+     </target>
+ 
+     <target name="test-rejar" depends="jar">
+-        <taskdef name="jarjar2" classname="com.tonicsystems.jarjar.JarJarTask" classpath="${jarfile}"/>
++        <taskdef name="jarjar2" classname="com.tonicsystems.jarjar.JarJarTask" classpath="${jarfile}:lib/asm-4.0.jar:lib/asm-commons-4.0.jar"/>
+         <delete file="${test.jar}"/>
+         <jarjar2 jarfile="${test.jar}">
+             <fileset dir="build/main"/>

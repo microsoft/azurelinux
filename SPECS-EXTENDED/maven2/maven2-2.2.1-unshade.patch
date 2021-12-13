@@ -1,0 +1,89 @@
+diff -up ./apache-maven/pom.xml.sav ./apache-maven/pom.xml
+--- ./apache-maven/pom.xml.sav	2009-08-06 15:11:25.000000000 -0400
++++ ./apache-maven/pom.xml	2010-06-15 16:21:15.000000000 -0400
+@@ -71,53 +71,40 @@
+                   <exclude>xml-apis:xml-apis</exclude>
+                   <exclude>junit:junit</exclude>
+                   <exclude>jmock:jmock</exclude>
++                  <exclude>backport-util-concurrent:backport-util-concurrent</exclude>
++                  <exclude>com.jcraft:jsch</exclude>
++                  <exclude>commons-cli:commons-cli</exclude>
++                  <exclude>commons-codec:commons-codec:jar</exclude>
++                  <exclude>commons-httpclient:commons-httpclient:jar</exclude>
++                  <exclude>jdom:jdom</exclude>
++                  <exclude>nekohtml:nekohtml</exclude>
++                  <exclude>nekohtml:xercesMinimal</exclude>
++                  <exclude>org.apache.maven.doxia:doxia-logging-api</exclude>
++                  <exclude>org.apache.maven.doxia:doxia-sink-api</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-file</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-http</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-http-lightweight</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-http-shared</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-provider-api</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-ssh</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-ssh-common</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-ssh-external</exclude>
++                  <exclude>org.apache.maven.wagon:wagon-webdav-jackrabbit</exclude>
++                  <exclude>org.apache.jackrabbit:jackrabbit-webdav</exclude>
++                  <exclude>org.apache.jackrabbit:jackrabbit-jcr-commons</exclude>
++                  <exclude>org.codehaus.plexus:plexus-container-default</exclude>
++                  <exclude>org.codehaus.plexus:plexus-interactivity-api</exclude>
++                  <exclude>org.codehaus.plexus:plexus-interpolation</exclude>
++                  <exclude>org.codehaus.plexus:plexus-sec-dispatcher</exclude>
++                  <exclude>org.codehaus.plexus:plexus-utils</exclude>
++                  <exclude>org.slf4j:jcl-over-slf4j</exclude>
++                  <exclude>org.slf4j:slf4j-api</exclude>
++                  <exclude>org.slf4j:slf4j-nop</exclude>
++                  <exclude>org.slf4j:slf4j-jdk14</exclude>
++                  <exclude>org.sonatype.plexus:plexus-cipher</exclude>
++                  <exclude>xerces:xerces</exclude>
+                 </excludes>
+               </artifactSet>
+-              <relocations>
+-                <!-- for jackrabbit webdav wagon -->
+-                <relocation>
+-                  <pattern>org.apache.jackrabbit</pattern>
+-                </relocation>
+-
+-                <!-- For http/webdav wagons -->
+-                <relocation>
+-                  <pattern>org.apache.commons.httpclient</pattern>
+-                </relocation>
+-                <relocation>
+-                  <pattern>org.apache.commons.logging</pattern>
+-                </relocation>
+-                <relocation>
+-                  <pattern>org.slf4j</pattern>
+-                </relocation>
+-
+-                <!-- For maven-artifact-manager -->
+-                <relocation>
+-                  <pattern>edu.emory.mathcs.backport</pattern>
+-                </relocation>
+-
+-                <!-- For jsch wagon -->
+-                <relocation>
+-                  <pattern>org.apache.commons.codec</pattern>
+-                </relocation>
+-
+-                <!-- For wagon API -->
+-                <relocation>
+-                  <pattern>org.cyberneko</pattern>
+-                </relocation>
+-                <relocation>
+-                  <pattern>org.apache.xerces</pattern>
+-                </relocation>
+-
+-                <relocation>
+-                  <pattern>org.codehaus.plexus.util</pattern>
+-                  <excludes>
+-                    <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
+-                    <exclude>org.codehaus.plexus.util.xml.pull.XmlPullParser</exclude>
+-                    <exclude>org.codehaus.plexus.util.xml.pull.XmlPullParserException</exclude>
+-                    <exclude>org.codehaus.plexus.util.xml.pull.XmlSerializer</exclude>
+-                  </excludes>
+-                </relocation>
+-              </relocations>
+             </configuration>
+           </execution>
+         </executions>

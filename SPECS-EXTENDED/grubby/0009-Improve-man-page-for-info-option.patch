@@ -1,0 +1,30 @@
+From 64f91f29b03639b0726f0c46f004a20f11379e22 Mon Sep 17 00:00:00 2001
+From: Jan Stodola <jstodola@redhat.com>
+Date: Sat, 1 Dec 2018 02:33:23 +0100
+Subject: [PATCH] Improve man page for --info option
+
+1) commit 941d4a0b removed description of --info DEFAULT
+2) Add description of --info ALL
+---
+ grubby.8 | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/grubby.8 b/grubby.8
+index 355b6eb6908..9ffef895b0f 100644
+--- a/grubby.8
++++ b/grubby.8
+@@ -132,7 +132,10 @@ is the default on ia32 platforms.
+ 
+ .TP
+ \fB-\-info\fR=\fIkernel-path\fR
+-Display information on all boot entries which match \fIkernel-path\fR. I
++Display information on all boot entries which match \fIkernel-path\fR. If
++\fIkernel-path\fR is \fBDEFAULT\fR, then information on the default kernel
++is displayed. If \fIkernel-path\fR is \fBALL\fR, then information on all boot
++entries are displayed.
+ 
+ .TP
+ \fB-\-initrd\fR=\fIinitrd-path\fR
+-- 
+2.19.1
+

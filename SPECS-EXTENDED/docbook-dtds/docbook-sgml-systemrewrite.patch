@@ -1,0 +1,209 @@
+diff -urNp docbook-dtds-1.0-orig/3.0-sgml/docbook.cat docbook-dtds-1.0/3.0-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/3.0-sgml/docbook.cat	2009-02-05 16:44:15.000000000 +0100
++++ docbook-dtds-1.0/3.0-sgml/docbook.cat	2009-02-05 16:48:58.000000000 +0100
+@@ -30,6 +30,12 @@
+ DTDDECL "-//Davenport//DTD DocBook V3.0//EN" "docbook.dcl"
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/sgml/3.0/docbook.dtd"
++       "docbook.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//Davenport//DTD DocBook V3.0//EN" "docbook.dtd"
+diff -urNp docbook-dtds-1.0-orig/3.1-sgml/docbook.cat docbook-dtds-1.0/3.1-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/3.1-sgml/docbook.cat	2009-02-05 16:44:15.000000000 +0100
++++ docbook-dtds-1.0/3.1-sgml/docbook.cat	2009-02-05 16:56:51.000000000 +0100
+@@ -22,6 +22,12 @@
+ DTDDECL "-//OASIS//DTD DocBook V3.1//EN" "docbook.dcl"
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/sgml/3.1/docbook.dtd"
++       "docbook.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook V3.1//EN" "docbook.dtd"
+diff -urNp docbook-dtds-1.0-orig/4.0-sgml/docbook.cat docbook-dtds-1.0/4.0-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/4.0-sgml/docbook.cat	2009-02-05 16:44:16.000000000 +0100
++++ docbook-dtds-1.0/4.0-sgml/docbook.cat	2009-02-05 16:49:06.000000000 +0100
+@@ -22,6 +22,12 @@
+ DTDDECL "-//OASIS//DTD DocBook V4.0//EN" "docbook.dcl"
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/sgml/4.0/docbook.dtd"
++       "docbook.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook V4.0//EN" "docbook.dtd"
+diff -urNp docbook-dtds-1.0-orig/4.1-sgml/docbook.cat docbook-dtds-1.0/4.1-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/4.1-sgml/docbook.cat	2009-02-05 16:44:16.000000000 +0100
++++ docbook-dtds-1.0/4.1-sgml/docbook.cat	2009-02-05 16:49:27.000000000 +0100
+@@ -22,6 +22,12 @@
+ DTDDECL "-//OASIS//DTD DocBook V4.1//EN" "docbook.dcl"
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++SYSTEM "http://www.oasis-open.org/docbook/sgml/4.1/docbook.dtd"
++       "docbook.dtd"
++
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook V4.1//EN" "docbook.dtd"
+diff -urNp docbook-dtds-1.0-orig/4.1.2-xml/docbook.cat docbook-dtds-1.0/4.1.2-xml/docbook.cat
+--- docbook-dtds-1.0-orig/4.1.2-xml/docbook.cat	2000-08-27 17:19:42.000000000 +0200
++++ docbook-dtds-1.0/4.1.2-xml/docbook.cat	2009-02-05 16:52:16.000000000 +0100
+@@ -17,6 +17,12 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
++       "docbookx.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "docbookx.dtd"
+diff -urNp docbook-dtds-1.0-orig/4.2-sgml/docbook.cat docbook-dtds-1.0/4.2-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/4.2-sgml/docbook.cat	2009-02-05 16:44:17.000000000 +0100
++++ docbook-dtds-1.0/4.2-sgml/docbook.cat	2009-02-05 16:50:10.000000000 +0100
+@@ -17,6 +17,12 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/sgml/4.2/docbook.dtd"
++       "docbook.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook V4.2//EN"
+diff -urNp docbook-dtds-1.0-orig/4.2-xml/docbook.cat docbook-dtds-1.0/4.2-xml/docbook.cat
+--- docbook-dtds-1.0-orig/4.2-xml/docbook.cat	2002-07-17 18:14:41.000000000 +0200
++++ docbook-dtds-1.0/4.2-xml/docbook.cat	2009-02-05 16:52:53.000000000 +0100
+@@ -17,6 +17,12 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
++       "docbookx.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+diff -urNp docbook-dtds-1.0-orig/4.3-sgml/docbook.cat docbook-dtds-1.0/4.3-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/4.3-sgml/docbook.cat	2009-02-05 16:44:18.000000000 +0100
++++ docbook-dtds-1.0/4.3-sgml/docbook.cat	2009-02-05 16:50:37.000000000 +0100
+@@ -17,6 +17,13 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/sgml/4.3/docbook.dtd"
++       "docbook.dtd"
++
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook V4.3//EN"
+diff -urNp docbook-dtds-1.0-orig/4.3-xml/docbook.cat docbook-dtds-1.0/4.3-xml/docbook.cat
+--- docbook-dtds-1.0-orig/4.3-xml/docbook.cat	2004-03-31 13:22:18.000000000 +0200
++++ docbook-dtds-1.0/4.3-xml/docbook.cat	2009-02-05 16:53:12.000000000 +0100
+@@ -17,6 +17,12 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
++       "docbookx.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+diff -urNp docbook-dtds-1.0-orig/4.4-sgml/docbook.cat docbook-dtds-1.0/4.4-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/4.4-sgml/docbook.cat	2009-02-05 16:44:18.000000000 +0100
++++ docbook-dtds-1.0/4.4-sgml/docbook.cat	2009-02-05 16:50:57.000000000 +0100
+@@ -17,6 +17,12 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/sgml/4.4/docbook.dtd"
++       "docbook.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook V4.4//EN"
+diff -urNp docbook-dtds-1.0-orig/4.4-xml/docbook.cat docbook-dtds-1.0/4.4-xml/docbook.cat
+--- docbook-dtds-1.0-orig/4.4-xml/docbook.cat	2005-01-27 14:57:19.000000000 +0100
++++ docbook-dtds-1.0/4.4-xml/docbook.cat	2009-02-05 16:53:30.000000000 +0100
+@@ -17,6 +17,12 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
++       "docbookx.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+diff -urNp docbook-dtds-1.0-orig/4.5-sgml/docbook.cat docbook-dtds-1.0/4.5-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/4.5-sgml/docbook.cat	2006-10-03 15:27:50.000000000 +0200
++++ docbook-dtds-1.0/4.5-sgml/docbook.cat	2009-02-05 16:51:22.000000000 +0100
+@@ -17,6 +17,12 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/sgml/4.5/docbook.dtd"
++       "docbook.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+diff -urNp docbook-dtds-1.0-orig/4.5-xml/docbook.cat docbook-dtds-1.0/4.5-xml/docbook.cat
+--- docbook-dtds-1.0-orig/4.5-xml/docbook.cat	2006-10-03 15:26:00.000000000 +0200
++++ docbook-dtds-1.0/4.5-xml/docbook.cat	2009-02-05 16:55:45.000000000 +0100
+@@ -17,6 +17,12 @@
+   --
+ 
+   -- ...................................................................... --
++  -- SYSTEM rewrite of web URL .............. ............................. --
++
++SYSTEM "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
++       "docbookx.dtd"
++
++  -- ...................................................................... --
+   -- DocBook driver file .................................................. --
+ 
+ PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"

@@ -1,0 +1,47 @@
+From 7fc5106b58e9270e0d92b4c054a120628320b410 Mon Sep 17 00:00:00 2001
+From: Vincent Untz <vuntz@gnome.org>
+Date: Tue, 21 Feb 2012 15:26:47 +0100
+Subject: [PATCH] gconf-dbus: Add gconf_engine_key_is_writable()
+
+This went missing in the dbus port, and so we broke ABI.
+It's really the same code as in the corba code.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=668948
+---
+ gconf/gconf-dbus.c |   23 +++++++++++++++++++++++
+ 1 files changed, 23 insertions(+), 0 deletions(-)
+
+Index: GConf-3.2.6/gconf/gconf-dbus.c
+===================================================================
+--- GConf-3.2.6.orig/gconf/gconf-dbus.c	2013-06-06 02:39:13.243932775 +0200
++++ GConf-3.2.6/gconf/gconf-dbus.c	2013-06-06 02:39:13.239932729 +0200
+@@ -2195,6 +2195,29 @@
+     }
+ }
+ 
++gboolean
++gconf_engine_key_is_writable (GConfEngine *conf,
++                              const gchar *key,
++                              GError     **err)
++{
++  gboolean is_writable = TRUE;
++  GConfValue *val;
++
++  CHECK_OWNER_USE (conf);
++
++  /* FIXME implement IDL to allow getting only writability
++   * (not that urgent since GConfClient caches this crap
++   * anyway)
++   */
++
++  val = gconf_engine_get_full(conf, key, NULL, TRUE,
++                              NULL, &is_writable, err);
++
++  gconf_value_free (val);
++
++  return is_writable;
++}
++
+ static void
+ cnxn_get_all_func (gpointer key,
+ 		   gpointer value,

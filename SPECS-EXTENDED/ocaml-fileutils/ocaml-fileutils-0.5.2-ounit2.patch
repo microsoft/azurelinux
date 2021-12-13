@@ -1,0 +1,30 @@
+diff -ur ocaml-fileutils-0.5.2.old/setup.ml ocaml-fileutils-0.5.2.new/setup.ml
+--- ocaml-fileutils-0.5.2.old/setup.ml	2017-05-23 21:12:33.000000000 +0100
++++ ocaml-fileutils-0.5.2.new/setup.ml	2020-02-27 08:52:42.964618292 +0000
+@@ -7621,7 +7621,7 @@
+                            InternalLibrary "fileutils";
+                            InternalLibrary "fileutils-str";
+                            FindlibPackage
+-                             ("oUnit",
++                             ("ounit2",
+                                Some (OASISVersion.VGreaterEqual "2.0.0"))
+                         ];
+                       bs_build_tools = [ExternalTool "ocamlbuild"];
+diff -ur ocaml-fileutils-0.5.2.old/_tags ocaml-fileutils-0.5.2.new/_tags
+--- ocaml-fileutils-0.5.2.old/_tags	2017-05-23 21:12:33.000000000 +0100
++++ ocaml-fileutils-0.5.2.new/_tags	2020-02-27 08:52:38.020680545 +0000
+@@ -25,12 +25,12 @@
+ <test/BenchFind.{native,byte}>: pkg_unix
+ <test/BenchFind.{native,byte}>: use_fileutils
+ # Executable test
+-"test/test.byte": pkg_oUnit
++"test/test.byte": pkg_ounit2
+ "test/test.byte": pkg_str
+ "test/test.byte": pkg_unix
+ "test/test.byte": use_fileutils
+ "test/test.byte": use_fileutils-str
+-<test/*.ml{,i,y}>: pkg_oUnit
++<test/*.ml{,i,y}>: pkg_ounit2
+ <test/*.ml{,i,y}>: pkg_str
+ <test/*.ml{,i,y}>: pkg_unix
+ <test/*.ml{,i,y}>: use_fileutils

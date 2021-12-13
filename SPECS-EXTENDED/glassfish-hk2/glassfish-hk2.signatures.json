@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "glassfish-hk2-2.5.0.tar.gz": "7252007d7261d49bb5fc7ca50328e4e4f8c063e7a1853796d6cfe9480841eb23",
+  "glassfish-hk2-extra-1.0.3.tar.gz": "fdcef072c6638ca089bd8ba45f1baa69c2381fcf19060c4adfcce766437605c4",
+  "hk2-inhabitant-generator-osgi.bundle": "fcaf8dda5b3361355e31e67a2ac036e410358b1193dd541dbfa8be911ac2ad53"
+ }
+}

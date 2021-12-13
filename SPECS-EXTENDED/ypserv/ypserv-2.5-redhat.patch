@@ -1,0 +1,13 @@
+--- ./scripts/ypMakefile.in.redhat	2017-03-31 16:43:23.318556329 +0200
++++ ./scripts/ypMakefile.in	2017-03-31 16:49:27.917561370 +0200
+@@ -107,8 +107,8 @@ target: Makefile
+ # If you don't want some of these maps built, feel free to comment
+ # them out from this list.
+ 
+-all:  passwd group hosts rpc services netid protocols netgrp mail \
+-	shadow publickey # networks ethers bootparams printcap \
++all:  passwd group hosts rpc services netid protocols mail \
++	# netgrp shadow publickey networks ethers bootparams printcap \
+ 	# amd.home autofs passwd.adjunct \
+ 	# timezone locale netmasks
+ 

@@ -1,0 +1,29 @@
+From ab8b06cdc1075abc67f77e7c3bb684e20071d614 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Thu, 10 Apr 2014 10:09:41 +0200
+Subject: [PATCH 25/27] pppd: install pppd binary using standard perms (755)
+
+---
+ pppd/Makefile.linux | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
+index 0e8107f..534ccc2 100644
+--- a/pppd/Makefile.linux
++++ b/pppd/Makefile.linux
+@@ -223,10 +223,10 @@ all: $(TARGETS)
+ install: pppd
+ 	mkdir -p $(BINDIR) $(MANDIR)
+ 	$(EXTRAINSTALL)
+-	$(INSTALL) -c -m 555 pppd $(BINDIR)/pppd
++	$(INSTALL) -c -m 755 pppd $(BINDIR)/pppd
+ 	if chgrp pppusers $(BINDIR)/pppd 2>/dev/null; then \
+ 	  chmod o-rx,u+s $(BINDIR)/pppd; fi
+-	$(INSTALL) -c -m 444 pppd.8 $(MANDIR)
++	$(INSTALL) -c -m 644 pppd.8 $(MANDIR)
+ 
+ pppd: $(PPPDOBJS)
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o pppd $(PPPDOBJS) $(LIBS)
+-- 
+1.8.3.1
+

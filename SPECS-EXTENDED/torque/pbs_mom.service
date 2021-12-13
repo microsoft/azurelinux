@@ -1,0 +1,11 @@
+[Unit]
+Description=pbs-mom
+After=syslog.target network.target trqauthd.service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/pbs_mom
+PIDFile=/var/lib/torque/mom_priv/mom.lock
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Smart Card Manager
+Comment=Enterprise Security Client Smart Card Manager
+Categories=System;Application;SystemSetup;X-Red-Hat-Base;
+Exec=esc
+Icon=esc.png

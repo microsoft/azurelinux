@@ -1,0 +1,63 @@
+diff -up sblim-cmpi-base-1.6.4/OSBase_OperatingSystem.c.orig sblim-cmpi-base-1.6.4/OSBase_OperatingSystem.c
+--- sblim-cmpi-base-1.6.4/OSBase_OperatingSystem.c.orig	2020-02-04 13:55:31.565801631 +0100
++++ sblim-cmpi-base-1.6.4/OSBase_OperatingSystem.c	2020-02-04 13:58:39.514189758 +0100
+@@ -88,13 +88,21 @@ int get_operatingsystem_data( struct cim
+     bytes_read = fread(buf, 1, sizeof(buf)-1, fhd);
+     buf[bytes_read] = 0; /* safeguard end of buffer */
+     ptr = strstr(buf,"MemTotal");
+-    sscanf(ptr, "%*s %lld", &((*sptr)->totalPhysMem));
++    if( ptr != NULL ) {
++      sscanf(ptr, "%*s %lld", &((*sptr)->totalPhysMem));
++    }
+     ptr = strstr(buf,"MemFree");
+-    sscanf(ptr, "%*s %lld", &((*sptr)->freePhysMem));
++    if( ptr != NULL ) {
++      sscanf(ptr, "%*s %lld", &((*sptr)->freePhysMem));
++    }
+     ptr = strstr(buf,"SwapTotal");
+-    sscanf(ptr, "%*s %lld", &((*sptr)->totalSwapMem));
++    if( ptr != NULL ) {
++      sscanf(ptr, "%*s %lld", &((*sptr)->totalSwapMem));
++    }
+     ptr = strstr(buf,"SwapFree");
+-    sscanf(ptr, "%*s %lld", &((*sptr)->freeSwapMem));
++    if( ptr != NULL ) {
++      sscanf(ptr, "%*s %lld", &((*sptr)->freeSwapMem));
++    }
+     fclose(fhd);
+   }
+   /* TotalVirtualMemorySize */
+diff -up sblim-cmpi-base-1.6.4/OSBase_OperatingSystemStatisticalData.c.orig sblim-cmpi-base-1.6.4/OSBase_OperatingSystemStatisticalData.c
+--- sblim-cmpi-base-1.6.4/OSBase_OperatingSystemStatisticalData.c.orig	2020-02-04 13:55:31.557801615 +0100
++++ sblim-cmpi-base-1.6.4/OSBase_OperatingSystemStatisticalData.c	2020-02-04 14:09:01.613474453 +0100
+@@ -109,13 +109,15 @@ int get_queue_info_24(struct os_statisti
+     if ((f = fopen("/proc/loadavg","r")) != NULL) {
+         fgets(buf,127,f);
+         strptr = strstr(buf,"/");
+-        *strptr = '\0';
+-        while (*strptr != ' ') {
+-            strptr--;
++        if (strptr != NULL) {
++          *strptr = '\0';
++          while (*strptr != ' ') {
++              strptr--;
++          }
++          stats->run_queue_length = atoll(strptr);
++          res = 1;
+         }
+-        stats->run_queue_length = atoll(strptr);
+         fclose(f);
+-        res = 1;
+     } else {
+         _OSBASE_TRACE(1,("get_queue_info: could not open /proc/loadavg: %s",strerror(errno)));
+     }
+@@ -173,7 +175,8 @@ int get_cpu_page_data_24(struct os_stati
+              *
+              * page <in> <out>
+             */
+-            if (sscanf(strptr,"page %lld %lld",&pages_in, &pages_out) == 2) {
++            if (strptr != NULL &&
++                sscanf(strptr,"page %lld %lld",&pages_in, &pages_out) == 2) {
+                 stats->pages_in = pages_in;
+                 stats->pages_out = pages_out;
+                 res = 1;

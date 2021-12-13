@@ -1,0 +1,25 @@
+diff -uNr SDL2-2.0.0.orig/sdl2-config.in SDL2-2.0.0/sdl2-config.in
+--- SDL2-2.0.0.orig/sdl2-config.in	2013-08-12 06:57:54.000000000 +0400
++++ SDL2-2.0.0/sdl2-config.in	2013-08-24 12:50:01.630268642 +0400
+@@ -3,7 +3,6 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ exec_prefix_set=no
+-libdir=@libdir@
+ 
+ @ENABLE_STATIC_FALSE@usage="\
+ @ENABLE_STATIC_FALSE@Usage: $0 [--prefix[=DIR]] [--exec-prefix[=DIR]] [--version] [--cflags] [--libs]"
+@@ -45,11 +44,11 @@
+       echo -I@includedir@/SDL2 @SDL_CFLAGS@
+       ;;
+ @ENABLE_SHARED_TRUE@    --libs)
+-@ENABLE_SHARED_TRUE@      echo -L@libdir@ @SDL_RLD_FLAGS@ @SDL_LIBS@
++@ENABLE_SHARED_TRUE@      echo @SDL_RLD_FLAGS@ @SDL_LIBS@
+ @ENABLE_SHARED_TRUE@      ;;
+ @ENABLE_STATIC_TRUE@@ENABLE_SHARED_TRUE@    --static-libs)
+ @ENABLE_STATIC_TRUE@@ENABLE_SHARED_FALSE@    --libs|--static-libs)
+-@ENABLE_STATIC_TRUE@      echo -L@libdir@ @SDL_RLD_FLAGS@ @SDL_STATIC_LIBS@
++@ENABLE_STATIC_TRUE@      echo @SDL_RLD_FLAGS@ @SDL_STATIC_LIBS@
+ @ENABLE_STATIC_TRUE@      ;;
+     *)
+       echo "${usage}" 1>&2

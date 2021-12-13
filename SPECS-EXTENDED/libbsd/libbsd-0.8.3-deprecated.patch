@@ -1,0 +1,28 @@
+diff -up libbsd-0.8.3/include/bsd/stdio.h~ libbsd-0.8.3/include/bsd/stdio.h
+--- libbsd-0.8.3/include/bsd/stdio.h~	2015-09-22 23:59:34.000000000 -0600
++++ libbsd-0.8.3/include/bsd/stdio.h	2016-12-23 00:47:24.464930157 -0700
+@@ -41,15 +41,21 @@
+ #include <sys/cdefs.h>
+ #include <sys/types.h>
+ 
++#if (__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ < 5))
++#define DEPRECATED(x) __attribute__((deprecated))
++#else
++#define DEPRECATED(x) __attribute__((deprecated(x)))
++#endif
++
+ __BEGIN_DECLS
+ const char *fmtcheck(const char *, const char *);
+ 
+ /* XXX: The function requires cooperation from the system libc to store the
+  * line buffer in the FILE struct itself. */
+ char *fgetln(FILE *fp, size_t *lenp)
+-	__attribute__((deprecated("This functions cannot be safely ported, "
+-	                          "use getline(3) instead, as it is supported "
+-	                          "by GNU and POSIX.1-2008.")));
++        DEPRECATED("This functions cannot be safely ported, "
++		   "use getline(3) instead, as it is supported "
++		   "by GNU and POSIX.1-2008.");
+ 
+ /*
+  * Note: We diverge from the FreeBSD, OpenBSD and DragonFlyBSD declarations,

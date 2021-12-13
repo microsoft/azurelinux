@@ -1,0 +1,217 @@
+From b3a6187e1843e55c47b6e55d11e01399ab3894a0 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 28 May 2013 13:44:02 +0200
+Subject: [PATCH 1/6] Remove the --quiet (-q) option from vorbiscomment.1 man page.
+
+---
+ vorbiscomment/vorbiscomment.1 |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
+
+diff --git a/vorbiscomment/vorbiscomment.1 b/vorbiscomment/vorbiscomment.1
+index 0108e78..2bceb83 100644
+--- a/vorbiscomment/vorbiscomment.1
++++ b/vorbiscomment/vorbiscomment.1
+@@ -39,13 +39,11 @@ Reads, modifies, and appends Ogg Vorbis audio file metadata tags.
+ .IP "-a, --append"
+ Append comments.
+ .IP "-c file, --commentfile file"
+-Take comments from a file. The file is the same format as is output by the the -l option or given to the -t option: one element per line in 'tag=value' format. If the file is /dev/null and -w was passed, the existing comments will be removed.
++Take comments from a file. The file is the same format as is output by the -l option or given to the -t option: one element per line in 'tag=value' format. If the file is /dev/null and -w was passed, the existing comments will be removed.
+ .IP "-h, --help"
+ Show command help.
+ .IP "-l, --list"
+ List the comments in the Ogg Vorbis file.
+-.IP "-q, --quiet"
+-Quiet mode.  No messages are displayed.
+ .IP "-t 'name=value', --tag 'name=value'"
+ Specify a new tag on the command line. Each tag is given as a single string. The part before the '=' is treated as the tag name and the part after as the value.
+ .IP "-w, --write"
+-- 
+1.7.1
+
+
+From 78ade241f35c6e4119e40ad879748a6d6a1a1821 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 28 May 2013 13:46:31 +0200
+Subject: [PATCH 2/6] Mention the -V option in ogginfo.1 man page.
+
+---
+ ogginfo/ogginfo.1 |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/ogginfo/ogginfo.1 b/ogginfo/ogginfo.1
+index 126da20..bde5490 100644
+--- a/ogginfo/ogginfo.1
++++ b/ogginfo/ogginfo.1
+@@ -49,6 +49,8 @@ Quiet mode. This may be specified multiple times. Doing so once will remove
+ the detailed informative messages, twice will remove warnings as well.
+ .IP -v
+ Verbose mode. At the current time, this does not do anything.
++.IP -V
++Output version information and exit.
+ 
+ .SH AUTHORS
+ .br
+-- 
+1.7.1
+
+
+From fa810af21f475cf073891088d40bbaf952fd1e28 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 28 May 2013 13:48:06 +0200
+Subject: [PATCH 3/6] Fix typos in oggdec.1 man page.
+
+---
+ oggdec/oggdec.1 |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/oggdec/oggdec.1 b/oggdec/oggdec.1
+index fb12b18..1035cb6 100644
+--- a/oggdec/oggdec.1
++++ b/oggdec/oggdec.1
+@@ -6,7 +6,7 @@ oggdec - simple decoder, Ogg Vorbis file to PCM audio file (Wave or RAW).
+ .SH "SYNOPSIS"
+ .B oggdec
+ [
+-.B -Qhv
++.B -QhV
+ ] [
+ .B -b bits_per_sample
+ ] [
+@@ -48,7 +48,7 @@ Print help message.
+ Display version information.
+ .IP "-b n, --bits=n"
+ Bits per sample.  Valid values are 8 or 16.
+-.IP "-e n, --endian=n"
++.IP "-e n, --endianness=n"
+ Set endianness for 16-bit output.  0 (default) is little-endian (Intel byte order).  1 is big-endian (sane byte order).
+ .IP "-R, --raw"
+ Output in raw format.  If not specified, writes Wave file (RIFF headers).
+-- 
+1.7.1
+
+
+From 8c8d416cc17cb07dac72ad71d3ef0cc5e09c3bd3 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 28 May 2013 14:00:07 +0200
+Subject: [PATCH 4/6] Document the --scale option of oggenc.
+
+---
+ oggenc/man/oggenc.1 |    5 +++++
+ oggenc/oggenc.c     |    1 +
+ 2 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/oggenc/man/oggenc.1 b/oggenc/man/oggenc.1
+index 411e2a9..633e5ec 100755
+--- a/oggenc/man/oggenc.1
++++ b/oggenc/man/oggenc.1
+@@ -47,6 +47,9 @@ oggenc \- encode audio into the Ogg Vorbis format
+ .B --downmix 
+ ]
+ [
++.B --scale
++]
++[
+ .B -s
+ .I serial
+ ]
+@@ -164,6 +167,8 @@ useful for downsampling for lower-bitrate encoding.
+ .IP "--downmix"
+ Downmix input from stereo to mono (has no effect on non-stereo streams). Useful
+ for lower-bitrate encoding.
++.IP "--scale"
++Input scaling factor (helps with clipping inputs).
+ .IP "--advanced-encode-option optionname=value"
+ Sets an advanced option. See the Advanced Options section for details.
+ .IP "-s, --serial"
+diff --git a/oggenc/oggenc.c b/oggenc/oggenc.c
+index 9c3e9cd..ea105b2 100644
+--- a/oggenc/oggenc.c
++++ b/oggenc/oggenc.c
+@@ -513,6 +513,7 @@ static void usage(void)
+         " --resample n         Resample input data to sampling rate n (Hz)\n"
+         " --downmix            Downmix stereo to mono. Only allowed on stereo\n"
+         "                      input.\n"
++        " --scale              Input scaling factor (helps with clipping inputs).\n"
+         " -s, --serial         Specify a serial number for the stream. If encoding\n"
+         "                      multiple files, this will be incremented for each\n"
+         "                      stream after the first.\n"));
+-- 
+1.7.1
+
+
+From 3dcdecdcb520150b53a7e3e7d346e23a49f4018a Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 28 May 2013 14:05:22 +0200
+Subject: [PATCH 5/6] Document --remote and -delay in ogg123.1 man page.
+
+---
+ ogg123/ogg123.1 |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/ogg123/ogg123.1 b/ogg123/ogg123.1
+index 160a876..935cab6 100644
+--- a/ogg123/ogg123.1
++++ b/ogg123/ogg123.1
+@@ -73,6 +73,10 @@ Specify output file for file devices.  The filename "-" writes to standard
+ out.  If the file already exists,
+ .B ogg123
+ will overwrite it.
++.IP "-l s, --delay s"
++Set termination timeout in milliseconds. ogg123 will skip to the next song on
++SIGINT (Ctrl-C), and will terminate if two SIGINTs are received within the
++specified timeout 's'. (default 500)
+ .IP "-h, --help"
+ Show command help.
+ .IP "-k n, --skip n"
+@@ -106,6 +110,8 @@ times slower than normal speed.  May be with -x for interesting fractional
+ speeds.
+ .IP "-r, --repeat"
+ Repeat playlist indefinitely.
++.IP "-R, --remote"
++Use remote control interface.
+ .IP "-z, --shuffle"
+ Play files in pseudo-random order.
+ .IP "-Z, --random"
+-- 
+1.7.1
+
+
+From ecd9cd8d881fadbb24bc948980bb6125f7b2c710 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 28 May 2013 14:14:32 +0200
+Subject: [PATCH 6/6] Document the --config (-c) option of ogg123.
+
+---
+ ogg123/cmdline_options.c |    1 +
+ ogg123/ogg123.1          |    2 ++
+ 2 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/ogg123/cmdline_options.c b/ogg123/cmdline_options.c
+index d663cc6..8abf4c5 100644
+--- a/ogg123/cmdline_options.c
++++ b/ogg123/cmdline_options.c
+@@ -373,6 +373,7 @@ void cmdline_usage (void)
+   printf ("\n");
+ 
+   printf (_("Miscellaneous options\n"));
++  printf (_("  -c c, --config c        Config options from command-line.\n"));
+   printf (_("  -l s, --delay s         Set termination timeout in milliseconds. ogg123\n"
+ 	    "                          will skip to the next song on SIGINT (Ctrl-C),\n"
+ 	    "                          and will terminate if two SIGINTs are received\n"
+diff --git a/ogg123/ogg123.1 b/ogg123/ogg123.1
+index 935cab6..1b419f7 100644
+--- a/ogg123/ogg123.1
++++ b/ogg123/ogg123.1
+@@ -73,6 +73,8 @@ Specify output file for file devices.  The filename "-" writes to standard
+ out.  If the file already exists,
+ .B ogg123
+ will overwrite it.
++.IP "-c c, --config c"
++Config options from command-line.
+ .IP "-l s, --delay s"
+ Set termination timeout in milliseconds. ogg123 will skip to the next song on
+ SIGINT (Ctrl-C), and will terminate if two SIGINTs are received within the
+-- 
+1.7.1
+

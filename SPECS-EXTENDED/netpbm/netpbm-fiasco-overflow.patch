@@ -1,0 +1,12 @@
+diff -up netpbm-10.47.09/converter/other/fiasco/lib/image.h.fiasco-overflow netpbm-10.47.09/converter/other/fiasco/lib/image.h
+--- netpbm-10.47.09/converter/other/fiasco/lib/image.h.fiasco-overflow	2010-01-25 09:00:48.000000000 +0100
++++ netpbm-10.47.09/converter/other/fiasco/lib/image.h	2010-01-27 10:29:48.000000000 +0100
+@@ -29,7 +29,7 @@ typedef struct image
+  *  Image data
+  */
+ {
+-   char      id [7];
++   char      id [8];
+    unsigned  reference_count;
+    unsigned  width;			/* Width of the image */
+    unsigned  height;			/* Height of the image */

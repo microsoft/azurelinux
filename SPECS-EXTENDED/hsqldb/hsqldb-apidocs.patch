@@ -1,0 +1,20 @@
+diff --git a/build/build.xml b/build/build.xml
+index 9c46389..c523220 100644
+--- a/build/build.xml
++++ b/build/build.xml
+@@ -128,6 +128,7 @@ examples:
+           There is no performance penalty, since the javadoc task regenerates
+           everything each run.
+       -->
++     <mkdir dir="doc/apidocs"/>
+      <copy todir="doc/apidocs">
+        <!-- IMPORTANT:
+             Add a fixcrlf if we add non-binary files to doc/apidocs. -->
+@@ -974,7 +975,6 @@ examples:
+                         src/org/hsqldb/auth/LdapAuthBean.java,
+                         src/org/hsqldb/auth/LdapAuthBeanTester.java"
+            destdir="doc/apidocs"
+-           stylesheetfile="doc/apidocs/javadoc.css"
+            docencoding="UTF-8"
+            charset="UTF-8"
+            author="true"

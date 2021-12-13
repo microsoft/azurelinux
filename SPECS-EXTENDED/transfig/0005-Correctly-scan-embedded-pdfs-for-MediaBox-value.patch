@@ -1,0 +1,324 @@
+From f116dfdff70c6a289a86e93f6b2fe64a54198534 Mon Sep 17 00:00:00 2001
+From: Thomas Loimer <thomas.loimer@tuwien.ac.at>
+Date: Sat, 14 Dec 2019 23:10:04 +0100
+Subject: [PATCH 5/8] Correctly scan embedded pdfs for /MediaBox value
+
+This applies two patches from the opensuse source rpm,
+https://download.opensuse.org/repositories/openSUSE:/Factory/standard/src/xfig-3.2.7b-1.1.src.rpm
+transfig.3.2.5-binderman.dif and transfig.3.2.5d-mediaboxrealnb.dif.
+---
+ CHANGES                      |  1 +
+ fig2dev/dev/readeps.c        | 31 ++++++++------
+ fig2dev/tests/Makefile.am    | 15 ++++---
+ fig2dev/tests/bitmaps.at     |  5 +++
+ fig2dev/tests/data/cross.pdf | 62 +++++++++++++++++++++++++++
+ fig2dev/tests/test2.c        | 82 ++++++++++++++++++++++++++++++++++++
+ transfig/sys.c               |  3 ++
+ 7 files changed, 182 insertions(+), 17 deletions(-)
+ create mode 100644 fig2dev/tests/data/cross.pdf
+ create mode 100644 fig2dev/tests/test2.c
+
+diff --git a/CHANGES b/CHANGES
+index b2f7006..4a414fa 100644
+--- a/CHANGES
++++ b/CHANGES
+@@ -6,6 +6,7 @@ Patchlevel Xx (Xxx 20xx)
+ 
+ BUGS FIXED:
+ 	Ticket numbers refer to https://sourceforge.net/p/mcj/tickets/#.
++	o Correctly scan embedded pdfs for /MediaBox value.
+ 	o Convert polygons having too few points to polylines. Ticket #56.
+ 	o Reject huge arrow types causing integer overflow. Ticket #57.
+ 	o Allow Fig v2 text strings ending with multiple ^A. Ticket #55.
+diff --git a/fig2dev/dev/readeps.c b/fig2dev/dev/readeps.c
+index ec25504..502f4bb 100644
+--- a/fig2dev/dev/readeps.c
++++ b/fig2dev/dev/readeps.c
+@@ -1,7 +1,9 @@
+ /*
+  * Fig2dev: Translate Fig code to various Devices
+- * Parts Copyright (c) 1989-2007 by Brian V. Smith
+- * Parts Copyright (c) 2015-2017 by Thomas Loimer
++ * Copyright (c) 1991 by Micah Beck
++ * Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
++ * Parts Copyright (c) 1989-2015 by Brian V. Smith
++ * Parts Copyright (c) 2015-2019 by Thomas Loimer
+  *
+  * Any party obtaining a copy of these files is granted, free of charge, a
+  * full and unrestricted irrevocable, world-wide, paid up, royalty-free,
+@@ -83,18 +85,23 @@ read_eps_pdf(FILE *file, int filetype, F_pic *pic, int *llx, int* lly,
+ 	while (fgets(buf, BUFSIZ, file) != NULL) {
+ 	    /* look for /MediaBox for pdf file */
+ 	    if (pdf_flag) {
+-		if (!strncmp(buf, "/MediaBox", 9)) {	/* look for the MediaBox spec */
+-		    c = strchr(buf, '[') + 1;
+-		    if (c && sscanf(c, "%d %d %d %d", llx, lly, &urx, &ury) < 4)
+-		    {
+-			*llx = *lly = 0;
+-			urx = paperdef[0].width*72;
+-			ury = paperdef[0].height*72;
+-			put_msg("Bad MediaBox in imported PDF file %s, assuming %s size",
+-				pic->file, metric? "A4" : "Letter" );
++		for (c = buf; (c = strchr(c,'/')); ++c) {
++		    if (!strncmp(c, "/MediaBox", 9)) {
++			c = strchr(c, '[');
++			if (c && sscanf(c + 1, "%d %d %d %d",
++				    llx, lly, &urx, &ury) < 4) {
++			    *llx = *lly = 0;
++			    urx = paperdef[0].width*72;
++			    ury = paperdef[0].height*72;
++			    put_msg("Bad MediaBox in imported PDF file %s, assuming %s size",
++				    pic->file, metric? "A4" : "Letter" );
++			}
++			pic->bit_size.x = urx - (*llx);
++			pic->bit_size.y = ury - (*lly);
++			break;
+ 		    }
+ 		}
+-	    /* look for bounding box for EPS file */
++		/* look for bounding box for EPS file */
+ 	    } else if (!nested && !strncmp(buf, "%%BoundingBox:", 14)) {
+ 		c = buf + 14;
+ 		/* skip past white space */
+diff --git a/fig2dev/tests/Makefile.am b/fig2dev/tests/Makefile.am
+index 4b83e0b..389f984 100644
+--- a/fig2dev/tests/Makefile.am
++++ b/fig2dev/tests/Makefile.am
+@@ -4,7 +4,7 @@
+ # Copyright (c) 1991 by Micah Beck
+ # Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
+ # Parts Copyright (c) 1989-2015 by Brian V. Smith
+-# Parts Copyright (c) 2015-2018 by Thomas Loimer
++# Parts Copyright (c) 2015-2019 by Thomas Loimer
+ #
+ # Any party obtaining a copy of these files is granted, free of charge, a
+ # full and unrestricted irrevocable, world-wide, paid up, royalty-free,
+@@ -16,7 +16,7 @@
+ # and this permission notice remain intact.
+ 
+ # fig2dev/tests/Makefile.am
+-# Author: Thomas Loimer, 2016-2018.
++# Author: Thomas Loimer, 2016-2019.
+ 
+ 
+ # testsuite and package.m4 must be distributed, hence they are
+@@ -39,8 +39,8 @@ $(srcdir)/package.m4: $(top_srcdir)/configure.ac
+ 	  echo 'm4_define([AT_PACKAGE_URL], [@PACKAGE_URL@])'; \
+ 	} >'$(srcdir)/package.m4'
+ 
+-check_PROGRAMS = test1
+-# test1 calls malloc(). AC_FUNC_MALLOC may replace malloc() by rpl_malloc()
++check_PROGRAMS = test1 test2
++# test1 called malloc(). AC_FUNC_MALLOC may replace malloc() by rpl_malloc()
+ # which is defined in malloc.o. The latter is contained in $(LIBOBJS) in
+ # ${LIBOBJDIR}. Specifically, ./configure CFLAGS="-fsanitize=address" causes
+ # this replacment. Unfortunately, using test1_LDADD, causes make distcheck to
+@@ -54,9 +54,14 @@ check_PROGRAMS = test1
+ 
+ # keep the definitions below in sync with those in ../dev/Makefile.am
+ if ENABLE_I18N
+-AM_CPPFLAGS = -DI18N_DATADIR="\"$(i18ndir)\""
++test1_CPPFLAGS = -DI18N_DATADIR="\"$(i18ndir)\""
+ endif
+ 
++test2_CPPFLAGS = -I$(top_srcdir)/fig2dev
++test2_LDADD = $(top_builddir)/fig2dev/dev/readeps.$(OBJEXT)
++test2_DEPENDENCIES = $(test2_LDADD)
++
++
+ check-local: atconfig $(TESTSUITE) atlocal
+ 	$(SHELL) '$(TESTSUITE)' INSTALLCHECK=no $(TESTSUITEFLAGS)
+ 
+diff --git a/fig2dev/tests/bitmaps.at b/fig2dev/tests/bitmaps.at
+index 91d5b54..1fea0f8 100644
+--- a/fig2dev/tests/bitmaps.at
++++ b/fig2dev/tests/bitmaps.at
+@@ -235,3 +235,8 @@ EOF`
+ #		1433 on ubuntu 16.04.2 with ghostscript 9.18
+ AT_CHECK([test $blackpixels -gt 1431 && test $blackpixels -lt 1494])
+ AT_CLEANUP
++
++AT_SETUP([find /MediaBox in pdf file])
++AT_KEYWORDS(pdf)
++AT_CHECK(["$abs_builddir"/test2 "$srcdir/data/cross.pdf"], 0, ignore)
++AT_CLEANUP
+diff --git a/fig2dev/tests/data/cross.pdf b/fig2dev/tests/data/cross.pdf
+new file mode 100644
+index 0000000..e1e7e4d
+--- /dev/null
++++ b/fig2dev/tests/data/cross.pdf
+@@ -0,0 +1,62 @@
++%PDF-1.4
++5 0 obj
++<</Length 6 0 R/Filter /FlateDecode>>
++stream
++xúMä±Ä0{OÒ'Q¸xj`
++R 
++÷$Ñ–'ùnáiÇ=º^öt±BZ¬)ÜA‹‘Ñ◊–í{4ÒLıDD÷ÊÿæÁWﬁß∞j_„.≥årdÙ?endstream
++endobj
++6 0 obj
++91
++endobj
++4 0 obj
++<</Type/Page/MediaBox [0 0 72 72]
++/Parent 3 0 R
++/Resources<</ProcSet[/PDF]
++/ExtGState 8 0 R
++>>
++/Contents 5 0 R
++>>
++endobj
++3 0 obj
++<< /Type /Pages /Kids [
++4 0 R
++] /Count 1
++>>
++endobj
++1 0 obj
++<</Type /Catalog /Pages 3 0 R
++>>
++endobj
++7 0 obj
++<</Type/ExtGState
++/BM/Normal
++/OPM 1
++/TK true>>endobj
++8 0 obj
++<</R7
++7 0 R>>
++endobj
++2 0 obj
++<</Producer(GPL Ghostscript 9.27)
++/CreationDate(D:20191110165654+01'00')
++/ModDate(D:20191110165654+01'00')
++/Creator( XeTeX 2019.11.10:1656)>>endobj
++xref
++0 9
++0000000000 65535 f 
++0000000376 00000 n 
++0000000514 00000 n 
++0000000317 00000 n 
++0000000188 00000 n 
++0000000009 00000 n 
++0000000170 00000 n 
++0000000424 00000 n 
++0000000485 00000 n 
++trailer
++<< /Size 10 /Root 1 0 R /Info 2 0 R
++/ID [<EAB28CF54E276D36634D7BBB3C4603B7><EAB28CF54E276D36634D7BBB3C4603B7>]
++>>
++startxref
++670
++%%EOF
+diff --git a/fig2dev/tests/test2.c b/fig2dev/tests/test2.c
+new file mode 100644
+index 0000000..04e92d7
+--- /dev/null
++++ b/fig2dev/tests/test2.c
+@@ -0,0 +1,82 @@
++/*
++ * Fig2dev: Translate Fig code to various Devices
++ * Copyright (c) 1991 by Micah Beck
++ * Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
++ * Parts Copyright (c) 1989-2015 by Brian V. Smith
++ * Parts Copyright (c) 2015-2019 by Thomas Loimer
++ *
++ * Any party obtaining a copy of these files is granted, free of charge, a
++ * full and unrestricted irrevocable, world-wide, paid up, royalty-free,
++ * nonexclusive right and license to deal in this software and documentation
++ * files (the "Software"), including without limitation the rights to use,
++ * copy, modify, merge, publish, distribute, sublicense and/or sell copies
++ * of the Software, and to permit persons who receive copies from any such
++ * party to do so, with the only requirement being that the above copyright
++ * and this permission notice remain intact.
++ *
++ */
++
++/*
++ * test2.c: Check, whether read_pdf() finds the bounding box of a pdf file.
++ * Author: Thomas Loimer, 2019-12-14
++ */
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++
++#include "bool.h"
++#include "object.h"
++
++/* the function to be tested, in $(top_srcdir)/fig2dev/dev/readeps.c */
++extern int	read_pdf(FILE *file, int type, F_pic *pic, int *llx, int *lly);
++
++/* symbols that are needed when calling read_pdf() */
++int		urx = 0;
++int		ury = 0;
++int		metric = 0;
++FILE		*tfp;
++const struct _paperdef		/* from fig2dev.h */
++{
++	char	*name;
++	int	width;
++	int	height;
++}	paperdef[1] = {{"letter", 8, 12}};
++
++
++void	put_msg(const char *fmt, const char *file, const char *size)
++{
++	fprintf(stderr, fmt, file, size);
++}
++
++int
++main(int argc, char *argv[])
++{
++	(void)	argc;
++	int	llx = -1;
++	int	lly = -1;
++	FILE	*file;
++	F_pic	pic;
++
++	tfp = stdout;
++	pic.file = argv[1];
++
++	file = fopen(argv[1], "rb");
++	if (file == NULL) {
++		fprintf(stderr, "Test file %s not found.\n", argv[1]);
++		exit(EXIT_FAILURE);
++	}
++
++	if (read_pdf(file, 0, &pic, &llx, &lly) == 1 &&
++			pic.bit_size.x != 10 && pic.bit_size.y != 10) {
++		fprintf(stdout, "read_pdf found: width = %d, height = %d\n",
++				pic.bit_size.x, pic.bit_size.y);
++		exit(EXIT_SUCCESS);
++	} else {
++		exit(EXIT_FAILURE);
++	}
++}
+diff --git a/transfig/sys.c b/transfig/sys.c
+index c070ee6..30e8d3d 100644
+--- a/transfig/sys.c
++++ b/transfig/sys.c
+@@ -2,6 +2,8 @@
+  * TransFig: Facility for Translating Fig code
+  * Copyright (c) 1991 by Micah Beck
+  * Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
++ * Parts Copyright (c) 1989-2015 by Brian V. Smith
++ * Parts Copyright (c) 2015-2019 by Thomas Loimer
+  *
+  * Any party obtaining a copy of these files is granted, free of charge, a
+  * full and unrestricted irrevocable, world-wide, paid up, royalty-free,
+@@ -39,6 +41,7 @@ sysls(void)
+ 	i += 1;
+ 	c = fgetc(ls);
+   }
++  pclose(ls);
+   sysbuf[i] = '\0';
+   return sysbuf;
+ }
+-- 
+2.24.1
+

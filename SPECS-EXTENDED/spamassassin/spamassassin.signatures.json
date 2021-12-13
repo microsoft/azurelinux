@@ -1,0 +1,21 @@
+{
+ "Signatures": {
+  "Mail-SpamAssassin-3.4.4.tar.bz2": "4e2bc79e24cdbb3d8262e6ec4f5bb3dde670de9caaa739d50c698b6d45ac453d",
+  "Mail-SpamAssassin-rules-3.4.4.r1873061.tgz": "d4cbd90fa22b9104ee095d1fe08a9d1cd3b3a0f6022c52214c025443ffffe241",
+  "README.RHEL.Fedora": "4374dab2a9b940eccf8c8ec4dfc2cdee4dc64e499523343cb965a7a98314f16e",
+  "redhat_local.cf": "a3c005c31b6878a94ca3fee177f4647d75532041f398daf45c1e42ad819a2d17",
+  "sa-update.cronscript": "06b2e7c36175725cf1ded97a23b0b7350d81075a106c36a8892f7f7e13cf8a00",
+  "sa-update.crontab": "f33820645cec139e543f92143b1bf89f88414607a6b76fec6d4a445f91b0ca81",
+  "sa-update.force-sysconfig": "d16ead6e4fc2031bbf09ccf001406134f98155e986361ea34608a87565e20a5e",
+  "sa-update.logrotate": "3fabc43b70827970f71af8f8a94c7b524a0221da49d4450c1257ad41cc882d23",
+  "sa-update.service": "e7119943e1cf91a0fbfbe77334a74fadbfe5a26197907ebcf02b59e0182beda2",
+  "sa-update.timer": "03bf43869b92f3d1cfd9cc6a7185259efb8c0e3773af2b05656a7512611e3c15",
+  "spamassassin-default.rc": "0c08c751bcfa37275035f56b919ae095a615c2e2109e28436f6169f9d542355a",
+  "spamassassin-helper.sh": "08a6a71059f88109559fbf3652c7c6bc9cff86b75c8406ab64df2e108eefbdf0",
+  "spamassassin-official.conf": "3bdd8167d9beef32737870dad616bd4ab9a601f85db1474ced2e3ce14bb6a0d4",
+  "spamassassin-spamc.rc": "8b15724cec90d8360daf5c5a88bf964db0c24bcd39a22ee88d6522f2a6ca49f4",
+  "spamassassin.service": "bc45fa4496a8ab1cdabc57a844a41e58b67f925c3b853022ae719b2939572f70",
+  "spamassassin.sysconfig": "f47614a712f4c057d82ada486e4ed6e9192da3702bc6affeafb77c6f6e164d63",
+  "spamassassin.sysconfig.el": "ece6de27638448d341dd23bf2f098f32d98adf9d592de2c7671ba908bf25d2f3"
+ }
+}

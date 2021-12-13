@@ -1,0 +1,32 @@
+From d9996b2b6b3cdcd41485804eabadbf576506c8fa Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Tue, 28 May 2019 16:39:22 +0200
+Subject: [PATCH] quotaops: Make error string translatable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add forgotten translation quotes to the error string.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ quotaops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/quotaops.c b/quotaops.c
+index 16475e8..1a8d7fe 100644
+--- a/quotaops.c
++++ b/quotaops.c
+@@ -131,7 +131,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int ignore_noquo
+ 				continue;
+ 
+ 			if (errno == ECONNREFUSED) {
+-				estr = "Cannot connect to RPC quota service";
++				estr = _("Cannot connect to RPC quota service");
+ 			} else {
+ 				estr = strerror(errno);
+ 			}
+-- 
+2.20.1
+

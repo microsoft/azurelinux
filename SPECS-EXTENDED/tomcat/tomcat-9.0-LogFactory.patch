@@ -1,0 +1,20 @@
+diff -up ./java/org/apache/juli/logging/LogFactory.java.orig ./java/org/apache/juli/logging/LogFactory.java
+--- ./java/org/apache/juli/logging/LogFactory.java.orig	2020-11-06 13:22:26.231141049 +0800
++++ ./java/org/apache/juli/logging/LogFactory.java	2020-11-06 13:24:03.941098001 +0800
+@@ -21,8 +21,6 @@ import java.nio.file.FileSystems;
+ import java.util.ServiceLoader;
+ import java.util.logging.LogManager;
+ 
+-import aQute.bnd.annotation.spi.ServiceConsumer;
+-
+ /**
+  * This is a modified LogFactory that uses a simple {@link ServiceLoader} based
+  * discovery mechanism with a default of using JDK based logging. An
+@@ -63,7 +61,6 @@ import aQute.bnd.annotation.spi.ServiceC
+  * @author Costin Manolache
+  * @author Richard A. Sitze
+  */
+-@ServiceConsumer(value=org.apache.juli.logging.Log.class)
+ public class LogFactory {
+ 
+     private static final LogFactory singleton = new LogFactory();

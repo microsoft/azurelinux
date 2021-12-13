@@ -1,0 +1,21 @@
+diff --git a/Bindings/Java/NativeLibrary.java b/Bindings/Java/NativeLibrary.java
+index 5780e34..8383821 100644
+--- a/Bindings/Java/NativeLibrary.java
++++ b/Bindings/Java/NativeLibrary.java
+@@ -26,7 +26,15 @@ public class NativeLibrary {
+   }
+ 
+   static {
+-    System.loadLibrary("brlapi_java");
++    try {
++         System.load( "/usr/lib64/brltty/libbrlapi_java.so" );
++    } catch( UnsatisfiedLinkError e ) {
++         try {
++             System.load( "/usr/lib/brltty/libbrlapi_java.so" );
++         } catch( UnsatisfiedLinkError f ) {
++             throw new UnsatisfiedLinkError("brlapi_java library load failed");
++         }
++    }
+     new NativeLibrary().initializeNativeData();
+   }
+ }

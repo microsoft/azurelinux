@@ -1,0 +1,130 @@
+Fix -Werror=format-security errors
+Also fix incorrect printf() format specifiers
+https://bugs.gentoo.org/show_bug.cgi?id=520988
+
+* gen.c: In function 'genHdr':
+* gen.c:3869:17: error: format not a string literal and no format arguments [-Werror=format-security]
+
+--- cdrdao-1.2.4/pccts/antlr/bits.c
++++ cdrdao-1.2.4/pccts/antlr/bits.c
+@@ -574,13 +574,13 @@
+ 	else
+ 		fprintf(DefFile, "extern SetWordType zzerr%d[];\n", esetnum);
+ 	if ( name!=NULL ) {
+-		fprintf(ErrFile, "SetWordType %s%s[%d] = {",
++		fprintf(ErrFile, "SetWordType %s%s[%lu] = {",
+ 				name,
+                 suffix,
+ 				NumWords(TokenNum-1)*sizeof(unsigned));
+ 	}
+ 	else {
+-		fprintf(ErrFile, "SetWordType zzerr%d[%d] = {",
++		fprintf(ErrFile, "SetWordType zzerr%d[%lu] = {",
+ 				esetnum,
+ 				NumWords(TokenNum-1)*sizeof(unsigned));
+ 	}
+@@ -642,20 +642,20 @@
+ 	esetnum++;
+ 
+ 	if ( name!=NULL ) {
+-		fprintf(Parser_h, "\tstatic SetWordType %s%s[%d];\n", name, suffix,
++		fprintf(Parser_h, "\tstatic SetWordType %s%s[%lu];\n", name, suffix,
+ 				NumWords(TokenNum-1)*sizeof(unsigned));
+-		fprintf(Parser_c, "SetWordType %s::%s%s[%d] = {",
++		fprintf(Parser_c, "SetWordType %s::%s%s[%lu] = {",
+ 				CurrentClassName,
+ 				name,
+ 				suffix,
+ 				NumWords(TokenNum-1)*sizeof(unsigned));
+ 	}
+ 	else {
+-		fprintf(Parser_c, "SetWordType %s::err%d[%d] = {",
++		fprintf(Parser_c, "SetWordType %s::err%d[%lu] = {",
+ 				CurrentClassName,
+ 				esetnum,
+ 				NumWords(TokenNum-1)*sizeof(unsigned));
+-		fprintf(Parser_h, "\tstatic SetWordType err%d[%d];\n", esetnum,
++		fprintf(Parser_h, "\tstatic SetWordType err%d[%lu];\n", esetnum,
+ 				NumWords(TokenNum-1)*sizeof(unsigned));
+ 	}
+ 
+@@ -788,7 +788,7 @@
+ 
+ 	/* Build constructors */
+ 	fprintf(Parser_c, "\n%s::", CurrentClassName);
+-	fprintf(Parser_c,	"%s(ANTLRTokenBuffer *input) : %s(input,%d,%d,%d,%d)\n",
++	fprintf(Parser_c,	"%s(ANTLRTokenBuffer *input) : %s(input,%d,%d,%d,%lu)\n",
+ 						CurrentClassName,
+ 						(BaseClassName == NULL ? "ANTLRParser" : BaseClassName),
+ 						OutputLL_k,
+@@ -913,7 +913,7 @@
+ #ifdef DUM
+ 	if ( LexGen ) fprintf(ErrFile, "#define zzEOF_TOKEN %d\n", (TokenInd!=NULL?TokenInd[EofToken]:EofToken));
+ #endif
+-	fprintf(ErrFile, "#define zzSET_SIZE %d\n", NumWords(TokenNum-1)*sizeof(unsigned));
++	fprintf(ErrFile, "#define zzSET_SIZE %lu\n", NumWords(TokenNum-1)*sizeof(unsigned));
+ 	if ( DemandLookahead ) fprintf(ErrFile, "#define DEMAND_LOOK\n");
+ 	fprintf(ErrFile, "#include \"antlr.h\"\n");
+ 	if ( GenAST ) fprintf(ErrFile, "#include \"ast.h\"\n");
+--- cdrdao-1.2.4/pccts/antlr/gen.c
++++ cdrdao-1.2.4/pccts/antlr/gen.c
+@@ -159,7 +159,7 @@
+ #define gen6(s,a,b,c,d,e,f)	{tab(); fprintf(output, s,a,b,c,d,e,f);}
+ #define gen7(s,a,b,c,d,e,f,g)	{tab(); fprintf(output, s,a,b,c,d,e,f,g);}
+ 
+-#define _gen(s)			{fprintf(output, s);}
++#define _gen(s)			{fprintf(output, "%s", s);}
+ #define _gen1(s,a)		{fprintf(output, s,a);}
+ #define _gen2(s,a,b)	{fprintf(output, s,a,b);}
+ #define _gen3(s,a,b,c)	{fprintf(output, s,a,b,c);}
+@@ -3911,7 +3911,7 @@
+ 	}
+ #endif
+ 	/* ###WARNING: This will have to change when SetWordSize changes */
+-	if ( !GenCC ) _gen1("#define zzSET_SIZE %d\n", NumWords(TokenNum-1)*sizeof(unsigned));
++	if ( !GenCC ) _gen1("#define zzSET_SIZE %lu\n", NumWords(TokenNum-1)*sizeof(unsigned));
+     if (TraceGen) {
+       _gen("#ifndef zzTRACE_RULES\n");  /* MR20 */
+       _gen("#define zzTRACE_RULES\n");  /* MR20 */
+@@ -4125,7 +4125,7 @@
+ 	if ( LexGen ) fprintf(f, "#define zzEOF_TOKEN %d\n", (TokenInd!=NULL?TokenInd[EofToken]:EofToken));
+ #endif
+ 	/* ###WARNING: This will have to change when SetWordSize changes */
+-	fprintf(f, "#define zzSET_SIZE %d\n", NumWords(TokenNum-1)*sizeof(unsigned));
++	fprintf(f, "#define zzSET_SIZE %lu\n", NumWords(TokenNum-1)*sizeof(unsigned));
+     if (TraceGen) {
+       fprintf(f,"#ifndef zzTRACE_RULES\n");  /* MR20 */
+       fprintf(f,"#define zzTRACE_RULES\n");  /* MR20 */
+--- cdrdao-1.2.4/pccts/antlr/set.c
++++ cdrdao-1.2.4/pccts/antlr/set.c
+@@ -263,7 +263,7 @@
+ 	static set a;
+ 
+ 	if ( b == nil ) return( empty );
+-	set_new(a, b);
++	set_new(a, (long unsigned int) b);
+ 	a.setword[DIVWORD(b)] = bitmask[MODWORD(b)];
+ 
+ 	return(a);
+--- cdrdao-1.2.4/pccts/dlg/set.c
++++ cdrdao-1.2.4/pccts/dlg/set.c
+@@ -263,7 +263,7 @@
+ 	static set a;
+ 
+ 	if ( b == nil ) return( empty );
+-	set_new(a, b);
++	set_new(a, (long unsigned int) b);
+ 	a.setword[DIVWORD(b)] = bitmask[MODWORD(b)];
+ 
+ 	return(a);
+--- cdrdao-1.2.4/pccts/h/set.h
++++ cdrdao-1.2.4/pccts/h/set.h
+@@ -55,7 +55,7 @@
+ /* make arg1 a set big enough to hold max elem # of arg2 */
+ #define set_new(a,_max) \
+ if (((a).setword=(unsigned *)calloc(NumWords(_max),BytesPerWord))==NULL) \
+-        fprintf(stderr, "set_new: Cannot allocate set with max of %d\n", _max); \
++        fprintf(stderr, "set_new: Cannot allocate set with max of %lu\n", _max); \
+         (a).n = NumWords(_max);
+ 
+ #define set_free(a)									\

@@ -1,0 +1,143 @@
+From 3afc4c0ed28d443bb71956b07fd45c8cfb07566f Mon Sep 17 00:00:00 2001
+From: Nathaniel McCallum <npmccallum@redhat.com>
+Date: Fri, 2 Mar 2018 14:59:32 -0500
+Subject: [PATCH 2/8] Change return type in getRootSpecifier()
+
+Rather than returning a new allocation of the prefix, just return the
+length of the prefix. This change accomplishes a couple things. First,
+it reduces some memory leaks since the return value was often never
+freed.  Second, it simplifies the caller who is usually only interested
+in the length of the prefix.
+---
+ grubby.c | 54 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/grubby.c b/grubby.c
+index d4ebb86168d..a062ef8e567 100644
+--- a/grubby.c
++++ b/grubby.c
+@@ -675,7 +675,7 @@ static int lineWrite(FILE * out, struct singleLine * line,
+ 		     struct configFileInfo * cfi);
+ static int getNextLine(char ** bufPtr, struct singleLine * line,
+ 		       struct configFileInfo * cfi);
+-static char * getRootSpecifier(char * str);
++static size_t getRootSpecifier(const char *str);
+ static void requote(struct singleLine *line, struct configFileInfo * cfi);
+ static void insertElement(struct singleLine * line,
+ 			  const char * item, int insertHere,
+@@ -1840,7 +1840,7 @@ int suitableImage(struct singleEntry * entry, const char * bootPrefix,
+     char * fullName;
+     int i;
+     char * dev;
+-    char * rootspec;
++    size_t rs;
+     char * rootdev;
+ 
+     if (skipRemoved && entry->skip) {
+@@ -1866,12 +1866,11 @@ int suitableImage(struct singleEntry * entry, const char * bootPrefix,
+ 
+     fullName = alloca(strlen(bootPrefix) + 
+ 		      strlen(line->elements[1].item) + 1);
+-    rootspec = getRootSpecifier(line->elements[1].item);
+-    int rootspec_offset = rootspec ? strlen(rootspec) : 0;
++    rs = getRootSpecifier(line->elements[1].item);
+     int hasslash = endswith(bootPrefix, '/') ||
+-    	beginswith(line->elements[1].item + rootspec_offset, '/');
++	    beginswith(line->elements[1].item + rs, '/');
+     sprintf(fullName, "%s%s%s", bootPrefix, hasslash ? "" : "/",
+-            line->elements[1].item + rootspec_offset);
++		line->elements[1].item + rs);
+     if (access(fullName, R_OK)) {
+ 	notSuitablePrintf(entry, 0, "access to %s failed\n", fullName);
+ 	return 0;
+@@ -1952,7 +1951,6 @@ struct singleEntry * findEntryByPath(struct grubConfig * config,
+     struct singleLine * line;
+     int i;
+     char * chptr;
+-    char * rootspec = NULL;
+     enum lineType_e checkType = LT_KERNEL;
+ 
+     if (isdigit(*kernel)) {
+@@ -2044,11 +2042,10 @@ struct singleEntry * findEntryByPath(struct grubConfig * config,
+ 
+ 		if (line && line->type != LT_MENUENTRY &&
+ 			line->numElements >= 2) {
+-		    rootspec = getRootSpecifier(line->elements[1].item);
+-		    if (!strcmp(line->elements[1].item + 
+-				((rootspec != NULL) ? strlen(rootspec) : 0),
+-				kernel + strlen(prefix)))
+-			break;
++                       if (!strcmp(line->elements[1].item +
++                               getRootSpecifier(line->elements[1].item),
++                               kernel + strlen(prefix)))
++                           break;
+ 		}
+ 		if(line->type == LT_MENUENTRY &&
+ 			!strcmp(line->elements[1].item, kernel))
+@@ -2797,11 +2794,11 @@ struct singleLine * addLineTmpl(struct singleEntry * entry,
+ 
+ 	/* but try to keep the rootspec from the template... sigh */
+ 	if (tmplLine->type & (LT_HYPER|LT_KERNEL|LT_MBMODULE|LT_INITRD|LT_KERNEL_EFI|LT_INITRD_EFI|LT_KERNEL_16|LT_INITRD_16)) {
+-	    char * rootspec = getRootSpecifier(tmplLine->elements[1].item);
+-	    if (rootspec != NULL) {
+-		free(newLine->elements[1].item);
+-		newLine->elements[1].item = 
+-		    sdupprintf("%s%s", rootspec, val);
++            size_t rs = getRootSpecifier(tmplLine->elements[1].item);
++            if (rs > 0) {
++                free(newLine->elements[1].item);
++                newLine->elements[1].item = sdupprintf("%.*s%s", (int) rs,
++                    tmplLine->elements[1].item, val);
+ 	    }
+ 	}
+     }
+@@ -3729,15 +3726,19 @@ int checkForElilo(struct grubConfig * config) {
+     return 1;
+ }
+ 
+-static char * getRootSpecifier(char * str) {
+-    char * idx, * rootspec = NULL;
++static size_t getRootSpecifier(const char *str)
++{
++    size_t rs = 0;
+ 
+     if (*str == '(') {
+-        idx = rootspec = strdup(str);
+-        while(*idx && (*idx != ')') && (!isspace(*idx))) idx++;
+-        *(++idx) = '\0';
++        for (; str[rs] != ')' && !isspace(str[rs]); rs++) {
++	    if (!str[rs])
++                return rs;
++        }
++        rs++;
+     }
+-    return rootspec;
++
++    return rs;
+ }
+ 
+ static char * getInitrdVal(struct grubConfig * config,
+@@ -4616,7 +4617,7 @@ int main(int argc, const char ** argv) {
+     if (displayDefault) {
+ 	struct singleLine * line;
+ 	struct singleEntry * entry;
+-        char * rootspec;
++        size_t rs;
+ 
+ 	if (config->defaultImage == -1) return 0;
+ 	if (config->defaultImage == DEFAULT_SAVED_GRUB2 &&
+@@ -4629,9 +4630,8 @@ int main(int argc, const char ** argv) {
+ 	line = getLineByType(LT_KERNEL|LT_HYPER|LT_KERNEL_EFI|LT_KERNEL_16, entry->lines);
+ 	if (!line) return 0;
+ 
+-        rootspec = getRootSpecifier(line->elements[1].item);
+-        printf("%s%s\n", bootPrefix, line->elements[1].item + 
+-               ((rootspec != NULL) ? strlen(rootspec) : 0));
++        rs = getRootSpecifier(line->elements[1].item);
++        printf("%s%s\n", bootPrefix, line->elements[1].item + rs);
+ 
+ 	return 0;
+ 
+-- 
+2.17.1
+

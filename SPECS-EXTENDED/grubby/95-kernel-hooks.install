@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+
+if ! [[ $KERNEL_INSTALL_MACHINE_ID ]]; then
+    exit 0
+fi
+
+COMMAND="$1"
+KERNEL_VERSION="$2"
+BOOT_DIR_ABS="$3"
+
+# If $BOOT_DIR_ABS exists, some other boot loader is active.
+[[ -d "$BOOT_DIR_ABS" ]] && exit 0
+
+run_hooks()
+{
+    local f
+    local files="$1"
+    for f in $files ; do
+        [ -x "$f" ] || continue
+        "$f" "$KERNEL_VERSION" "/boot/vmlinuz-$KERNEL_VERSION"
+    done
+}
+
+case "$COMMAND" in
+    add)
+        run_hooks "/etc/kernel/postinst.d/*[^~] /etc/kernel/postinst.d/$KERNEL_VERSION/*[^~]"
+        ;;
+    remove)
+        run_hooks "/etc/kernel/prerm.d/*[^~] /etc/kernel/prerm.d/$KERNEL_VERSION/*[^~]"
+        ;;
+    *)
+        exit 0
+esac

@@ -1,0 +1,36 @@
+diff -up libsrtp-2.3.0/Makefile.in.sharedfix libsrtp-2.3.0/Makefile.in
+--- libsrtp-2.3.0/Makefile.in.sharedfix	2020-01-07 09:48:36.004217062 -0500
++++ libsrtp-2.3.0/Makefile.in	2020-01-07 09:53:08.117725096 -0500
+@@ -106,12 +106,14 @@ bindir = @bindir@
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libsrtp2.pc
+ 
+-SHAREDLIBVERSION = 1
++SHAREDLIBMINIVER = 1
++SHAREDLIBVERSION = $(SHAREDLIBMINIVER).0.0
+ ifneq (,$(or $(findstring linux,@host@), $(findstring gnu,@host@)))
+ SHAREDLIB_DIR = $(libdir)
+-SHAREDLIB_LDFLAGS = -shared -Wl,-soname,$@
+ SHAREDLIBSUFFIXNOVER = so
++SHAREDLIBMINISUFFIX = $(SHAREDLIBSUFFIXNOVER).$(SHAREDLIBMINIVER)
+ SHAREDLIBSUFFIX = $(SHAREDLIBSUFFIXNOVER).$(SHAREDLIBVERSION)
++SHAREDLIB_LDFLAGS = -shared -Wl,-soname,libsrtp2.$(SHAREDLIBMINISUFFIX)
+ else ifneq (,$(or $(findstring cygwin,@host@), $(findstring mingw,@host@)))
+ SHAREDLIB_DIR = $(bindir)
+ SHAREDLIB_LDFLAGS = -shared -Wl,--out-implib,libsrtp2.dll.a
+@@ -166,6 +168,7 @@ libsrtp2.$(SHAREDLIBSUFFIX): $(srtpobj)
+ 	$(CC) -shared -o $@ $(SHAREDLIB_LDFLAGS) \
+ 				$^ $(LDFLAGS) $(LIBS)
+ 	if [ -n "$(SHAREDLIBVERSION)" ]; then \
++		ln -sfn $@ libsrtp2.$(SHAREDLIBMINISUFFIX); \
+ 		ln -sfn $@ libsrtp2.$(SHAREDLIBSUFFIXNOVER); \
+ 	fi
+ 
+@@ -288,6 +291,7 @@ install:
+ 		cp libsrtp2.$(SHAREDLIBSUFFIXNOVER) $(DESTDIR)$(SHAREDLIB_DIR)/; \
+ 		if [ -n "$(SHAREDLIBVERSION)" ]; then \
+ 			ln -sfn libsrtp2.$(SHAREDLIBSUFFIX) $(DESTDIR)$(SHAREDLIB_DIR)/libsrtp2.$(SHAREDLIBSUFFIXNOVER); \
++			ln -sfn libsrtp2.$(SHAREDLIBSUFFIX) $(DESTDIR)$(SHAREDLIB_DIR)/libsrtp2.$(SHAREDLIBMINISUFFIX); \
+ 		fi; \
+ 	fi
+ 	$(INSTALL) -d $(DESTDIR)$(pkgconfigdir)

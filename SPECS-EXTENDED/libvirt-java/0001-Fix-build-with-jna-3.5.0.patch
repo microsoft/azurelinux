@@ -1,0 +1,230 @@
+From 307ba7a1974bf7fdd920b85c73015887873a4502 Mon Sep 17 00:00:00 2001
+Message-Id: <307ba7a1974bf7fdd920b85c73015887873a4502.1363641114.git.crobinso@redhat.com>
+From: Jiri Denemark <jdenemar@redhat.com>
+Date: Tue, 27 Nov 2012 18:33:22 +0100
+Subject: [PATCH] Fix build with jna >= 3.5.0
+
+Since jna-3.5.0, all subclasses of com.sun.jna.Structure are required to
+implement getFieldOrder method which is supposed to return a list of
+fields the wrapped structure contains.
+---
+ src/main/java/org/libvirt/jna/virConnectAuth.java          | 5 +++++
+ src/main/java/org/libvirt/jna/virConnectCredential.java    | 6 ++++++
+ src/main/java/org/libvirt/jna/virDomainBlockInfo.java      | 4 ++++
+ src/main/java/org/libvirt/jna/virDomainBlockStats.java     | 5 +++++
+ src/main/java/org/libvirt/jna/virDomainInfo.java           | 5 +++++
+ src/main/java/org/libvirt/jna/virDomainInterfaceStats.java | 5 +++++
+ src/main/java/org/libvirt/jna/virDomainJobInfo.java        | 7 +++++++
+ src/main/java/org/libvirt/jna/virDomainMemoryStats.java    | 4 ++++
+ src/main/java/org/libvirt/jna/virError.java                | 6 ++++++
+ src/main/java/org/libvirt/jna/virNodeInfo.java             | 8 +++++++-
+ src/main/java/org/libvirt/jna/virSchedParameter.java       | 5 +++++
+ src/main/java/org/libvirt/jna/virStoragePoolInfo.java      | 5 +++++
+ src/main/java/org/libvirt/jna/virStorageVolInfo.java       | 6 +++++-
+ src/main/java/org/libvirt/jna/virVcpuInfo.java             | 4 ++++
+ 14 files changed, 73 insertions(+), 2 deletions(-)
+
+diff --git a/src/main/java/org/libvirt/jna/virConnectAuth.java b/src/main/java/org/libvirt/jna/virConnectAuth.java
+index 74dd65c..369d2e5 100644
+--- a/src/main/java/org/libvirt/jna/virConnectAuth.java
++++ b/src/main/java/org/libvirt/jna/virConnectAuth.java
+@@ -11,4 +11,9 @@ public class virConnectAuth extends Structure {
+     public int ncredtype;
+     public Libvirt.VirConnectAuthCallback cb;
+     public Pointer cbdata;
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "credtype", "ncredtype", "cb", "cbdata" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virConnectCredential.java b/src/main/java/org/libvirt/jna/virConnectCredential.java
+index ba47482..dbfc38e 100644
+--- a/src/main/java/org/libvirt/jna/virConnectCredential.java
++++ b/src/main/java/org/libvirt/jna/virConnectCredential.java
+@@ -13,4 +13,10 @@ public class virConnectCredential extends Structure implements Structure.ByRefer
+     // public Pointer result;
+     public String result;
+     public int resultlen;
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "type", "prompt", "challenge", "defresult",
++            "result", "resultlen" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virDomainBlockInfo.java b/src/main/java/org/libvirt/jna/virDomainBlockInfo.java
+index 234a381..cbd7385 100644
+--- a/src/main/java/org/libvirt/jna/virDomainBlockInfo.java
++++ b/src/main/java/org/libvirt/jna/virDomainBlockInfo.java
+@@ -7,4 +7,8 @@ public class virDomainBlockInfo extends Structure {
+     public long allocation;
+     public long physical;
+ 
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "capacity", "allocation", "physical" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virDomainBlockStats.java b/src/main/java/org/libvirt/jna/virDomainBlockStats.java
+index f29dba0..71041cc 100644
+--- a/src/main/java/org/libvirt/jna/virDomainBlockStats.java
++++ b/src/main/java/org/libvirt/jna/virDomainBlockStats.java
+@@ -16,4 +16,9 @@ public class virDomainBlockStats extends Structure {
+     // is correct
+     public long errs; // this is a long long in the code, so a long mapping is
+     // correct
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "rd_req", "rd_bytes", "wr_req", "wr_bytes", "errs" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virDomainInfo.java b/src/main/java/org/libvirt/jna/virDomainInfo.java
+index a93c0a5..994042a 100644
+--- a/src/main/java/org/libvirt/jna/virDomainInfo.java
++++ b/src/main/java/org/libvirt/jna/virDomainInfo.java
+@@ -12,4 +12,9 @@ public class virDomainInfo extends Structure {
+     public NativeLong memory;
+     public short nrVirtCpu;
+     public long cpuTime;
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "state", "maxMem", "memory", "nrVirtCpu", "cpuTime" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virDomainInterfaceStats.java b/src/main/java/org/libvirt/jna/virDomainInterfaceStats.java
+index 1cb0e66..dcdd529 100644
+--- a/src/main/java/org/libvirt/jna/virDomainInterfaceStats.java
++++ b/src/main/java/org/libvirt/jna/virDomainInterfaceStats.java
+@@ -23,4 +23,9 @@ public class virDomainInterfaceStats extends Structure {
+     public long tx_drop; // this is a long long in the code, so a long mapping
+     // is correct
+ 
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "rx_bytes", "rx_packets", "rx_errs", "rx_drop",
++            "tx_bytes", "tx_packets", "tx_errs", "tx_drop" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virDomainJobInfo.java b/src/main/java/org/libvirt/jna/virDomainJobInfo.java
+index 98b4f59..af934ad 100644
+--- a/src/main/java/org/libvirt/jna/virDomainJobInfo.java
++++ b/src/main/java/org/libvirt/jna/virDomainJobInfo.java
+@@ -15,4 +15,11 @@ public class virDomainJobInfo extends Structure {
+     public long fileTotal;
+     public long fileProcessed;
+     public long fileRemaining;
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "type", "timeElapsed", "timeRemaining", "dataTotal",
++            "dataProcessed", "dataRemaining", "memTotal", "memProcessed",
++            "memRemaining", "fileTotal", "fileProcessed", "fileRemaining" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virDomainMemoryStats.java b/src/main/java/org/libvirt/jna/virDomainMemoryStats.java
+index 7a9f5d2..ec7b29e 100644
+--- a/src/main/java/org/libvirt/jna/virDomainMemoryStats.java
++++ b/src/main/java/org/libvirt/jna/virDomainMemoryStats.java
+@@ -5,4 +5,8 @@ import com.sun.jna.Structure;
+ public class virDomainMemoryStats extends Structure {
+     public int tag ;
+     public long val ;
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] { "tag", "val" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virError.java b/src/main/java/org/libvirt/jna/virError.java
+index e2580dd..9009280 100644
+--- a/src/main/java/org/libvirt/jna/virError.java
++++ b/src/main/java/org/libvirt/jna/virError.java
+@@ -19,4 +19,10 @@ public class virError extends Structure {
+     public int int1;
+     public int int2;
+     public NetworkPointer net;
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "code", "domain", "message", "level", "conn", "dom",
++            "str1", "str2", "str3", "int1", "int2", "net" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virNodeInfo.java b/src/main/java/org/libvirt/jna/virNodeInfo.java
+index 532aad9..f13eddc 100644
+--- a/src/main/java/org/libvirt/jna/virNodeInfo.java
++++ b/src/main/java/org/libvirt/jna/virNodeInfo.java
+@@ -21,4 +21,10 @@ public class virNodeInfo extends Structure {
+     public int sockets;
+     public int cores;
+     public int threads;
+-}
+\ No newline at end of file
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "model", "memory", "cpus", "mhz", "nodes",
++            "sockets", "cores", "threads" });
++    }
++}
+diff --git a/src/main/java/org/libvirt/jna/virSchedParameter.java b/src/main/java/org/libvirt/jna/virSchedParameter.java
+index 0013fff..9496121 100644
+--- a/src/main/java/org/libvirt/jna/virSchedParameter.java
++++ b/src/main/java/org/libvirt/jna/virSchedParameter.java
+@@ -9,4 +9,9 @@ public class virSchedParameter extends Structure {
+     public byte field[] = new byte[Libvirt.VIR_DOMAIN_SCHED_FIELD_LENGTH];
+     public int type;
+     public virSchedParameterValue value;
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "field", "type", "value" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virStoragePoolInfo.java b/src/main/java/org/libvirt/jna/virStoragePoolInfo.java
+index 5a98e08..7f370cd 100644
+--- a/src/main/java/org/libvirt/jna/virStoragePoolInfo.java
++++ b/src/main/java/org/libvirt/jna/virStoragePoolInfo.java
+@@ -13,4 +13,9 @@ public class virStoragePoolInfo extends Structure {
+     // mapping is correct
+     public long available; // this is a long long in the code, so a long mapping
+     // is correct
++
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "state", "capacity", "allocation", "available" });
++    }
+ }
+diff --git a/src/main/java/org/libvirt/jna/virStorageVolInfo.java b/src/main/java/org/libvirt/jna/virStorageVolInfo.java
+index db8a5bd..a02219e 100644
+--- a/src/main/java/org/libvirt/jna/virStorageVolInfo.java
++++ b/src/main/java/org/libvirt/jna/virStorageVolInfo.java
+@@ -12,4 +12,8 @@ public class virStorageVolInfo extends Structure {
+     public long allocation; // this is a long long in the code, so a long
+     // mapping is correct
+ 
+-}
+\ No newline at end of file
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "type", "capacity", "allocation" });
++    }
++}
+diff --git a/src/main/java/org/libvirt/jna/virVcpuInfo.java b/src/main/java/org/libvirt/jna/virVcpuInfo.java
+index 16f237d..e5f4363 100644
+--- a/src/main/java/org/libvirt/jna/virVcpuInfo.java
++++ b/src/main/java/org/libvirt/jna/virVcpuInfo.java
+@@ -12,4 +12,8 @@ public class virVcpuInfo extends Structure {
+     // is correct
+     public int cpu;
+ 
++    protected java.util.List getFieldOrder() {
++        return java.util.Arrays.asList(new String[] {
++            "number", "state", "cpuTime", "cpu" });
++    }
+ }
+-- 
+1.8.1.4
+

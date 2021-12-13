@@ -1,0 +1,378 @@
+From 85097245b57f190337225dbdbf6e33b58616c092 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Thu, 19 Dec 2019 07:22:33 +0100
+Subject: [PATCH 5/6] add option use-ldaps
+
+In general using the LDAP port with GSS-SPNEGO should satifiy all
+requirements an AD DC should have for authentication on an encrypted
+LDAP connection.
+
+But if e.g. the LDAP port is blocked by a firewall using the LDAPS port
+with TLS encryption might be an alternative. For this use case the
+--use-ldaps option is added.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1762420
+---
+ doc/adcli.xml    | 24 +++++++++++++++
+ library/adconn.c | 79 ++++++++++++++++++++++++++++++++++++++++++------
+ library/adconn.h |  4 +++
+ tools/computer.c | 10 ++++++
+ tools/entry.c    | 11 +++++++
+ 5 files changed, 119 insertions(+), 9 deletions(-)
+
+diff --git a/doc/adcli.xml b/doc/adcli.xml
+index dd30435..acced25 100644
+--- a/doc/adcli.xml
++++ b/doc/adcli.xml
+@@ -128,6 +128,30 @@
+ 			If not specified, then an appropriate domain controller
+ 			is automatically discovered.</para></listitem>
+ 		</varlistentry>
++		<varlistentry>
++			<term><option>--use-ldaps</option></term>
++			<listitem><para>Connect to the domain controller
++			with LDAPS. By default the LDAP port is used and SASL
++			GSS-SPNEGO or GSSAPI is used for authentication and to
++			establish encryption. This should satisfy all
++			requirements set on the server side and LDAPS should
++			only be used if the LDAP port is not accessible due to
++			firewalls or other reasons.</para>
++			<para> Please note that the place where CA certificates
++			can be found to validate the AD DC certificates
++			must be configured in the OpenLDAP configuration
++			file, e.g. <filename>/etc/openldap/ldap.conf</filename>.
++			As an alternative it can be specified with the help of
++			an environment variable, e.g.
++<programlisting>
++$ LDAPTLS_CACERT=/path/to/ad_dc_ca_cert.pem adcli join --use-ldaps -D domain.example.com
++...
++</programlisting>
++			Please see
++			<citerefentry><refentrytitle>ldap.conf</refentrytitle>
++			<manvolnum>5</manvolnum></citerefentry> for details.
++			</para></listitem>
++		</varlistentry>
+ 		<varlistentry>
+ 			<term><option>-C, --login-ccache=<parameter>ccache_name</parameter></option></term>
+ 			<listitem><para>Use the specified kerberos credential
+diff --git a/library/adconn.c b/library/adconn.c
+index ffb54f9..7bab852 100644
+--- a/library/adconn.c
++++ b/library/adconn.c
+@@ -70,6 +70,7 @@ struct _adcli_conn_ctx {
+ 	char *domain_name;
+ 	char *domain_realm;
+ 	char *domain_controller;
++	bool use_ldaps;
+ 	char *canonical_host;
+ 	char *domain_short;
+ 	char *domain_sid;
+@@ -773,7 +774,8 @@ int ldap_init_fd (ber_socket_t fd, int proto, LDAP_CONST char *url, struct ldap
+ 
+ static LDAP *
+ connect_to_address (const char *host,
+-                    const char *canonical_host)
++                    const char *canonical_host,
++                    bool use_ldaps)
+ {
+ 	struct addrinfo *res = NULL;
+ 	struct addrinfo *ai;
+@@ -783,6 +785,16 @@ connect_to_address (const char *host,
+ 	char *url;
+ 	int sock;
+ 	int rc;
++	int opt_rc;
++	const char *port = "389";
++	const char *proto = "ldap";
++	const char *errmsg = NULL;
++
++	if (use_ldaps) {
++		port = "636";
++		proto = "ldaps";
++		_adcli_info ("Using LDAPS to connect to %s", host);
++	}
+ 
+ 	memset (&hints, '\0', sizeof(hints));
+ #ifdef AI_ADDRCONFIG
+@@ -794,7 +806,7 @@ connect_to_address (const char *host,
+ 	if (!canonical_host)
+ 		canonical_host = host;
+ 
+-	rc = getaddrinfo (host, "389", &hints, &res);
++	rc = getaddrinfo (host, port, &hints, &res);
+ 	if (rc != 0) {
+ 		_adcli_err ("Couldn't resolve host name: %s: %s", host, gai_strerror (rc));
+ 		return NULL;
+@@ -810,7 +822,7 @@ connect_to_address (const char *host,
+ 			close (sock);
+ 		} else {
+ 			error = 0;
+-			if (asprintf (&url, "ldap://%s", canonical_host) < 0)
++			if (asprintf (&url, "%s://%s", proto, canonical_host) < 0)
+ 				return_val_if_reached (NULL);
+ 			rc = ldap_init_fd (sock, 1, url, &ldap);
+ 			free (url);
+@@ -820,6 +832,25 @@ connect_to_address (const char *host,
+ 				            ldap_err2string (rc));
+ 				break;
+ 			}
++
++			if (use_ldaps) {
++				rc = ldap_install_tls (ldap);
++				if (rc != LDAP_SUCCESS) {
++					opt_rc = ldap_get_option (ldap,
++					                          LDAP_OPT_DIAGNOSTIC_MESSAGE,
++					                          (void *) &errmsg);
++					if (opt_rc != LDAP_SUCCESS) {
++						errmsg = NULL;
++					}
++					_adcli_err ("Couldn't initialize TLS [%s]: %s",
++					            ldap_err2string (rc),
++					            errmsg == NULL ? "- no details -"
++					                           : errmsg);
++					ldap_unbind_ext_s (ldap, NULL, NULL);
++					ldap = NULL;
++					break;
++				}
++			}
+ 		}
+ 	}
+ 
+@@ -856,7 +887,8 @@ connect_and_lookup_naming (adcli_conn *conn,
+ 	if (!canonical_host)
+ 		canonical_host = disco->host_addr;
+ 
+-	ldap = connect_to_address (disco->host_addr, canonical_host);
++	ldap = connect_to_address (disco->host_addr, canonical_host,
++	                           adcli_conn_get_use_ldaps (conn));
+ 	if (ldap == NULL)
+ 		return ADCLI_ERR_DIRECTORY;
+ 
+@@ -1041,14 +1073,28 @@ authenticate_to_directory (adcli_conn *conn)
+ 	status = gss_krb5_ccache_name (&minor, conn->login_ccache_name, NULL);
+ 	return_unexpected_if_fail (status == 0);
+ 
+-	/* Clumsily tell ldap + cyrus-sasl that we want encryption */
+-	ssf = 1;
+-	ret = ldap_set_option (conn->ldap, LDAP_OPT_X_SASL_SSF_MIN, &ssf);
+-	return_unexpected_if_fail (ret == 0);
++	if (adcli_conn_get_use_ldaps (conn)) {
++		/* do not use SASL encryption on LDAPS connection */
++		ssf = 0;
++		ret = ldap_set_option (conn->ldap, LDAP_OPT_X_SASL_SSF_MIN, &ssf);
++		return_unexpected_if_fail (ret == 0);
++		ret = ldap_set_option (conn->ldap, LDAP_OPT_X_SASL_SSF_MAX, &ssf);
++		return_unexpected_if_fail (ret == 0);
++	} else {
++		/* Clumsily tell ldap + cyrus-sasl that we want encryption */
++		ssf = 1;
++		ret = ldap_set_option (conn->ldap, LDAP_OPT_X_SASL_SSF_MIN, &ssf);
++		return_unexpected_if_fail (ret == 0);
++	}
+ 
+-	if (adcli_conn_server_has_sasl_mech (conn, "GSS-SPNEGO")) {
++	/* There are issues with cryrus-sasl and GSS-SPNEGO with TLS even if
++	 * ssf_max is set to 0. To be on the safe side GSS-SPNEGO is only used
++	 * without LDAPS. */
++	if (adcli_conn_server_has_sasl_mech (conn, "GSS-SPNEGO")
++	                     && !adcli_conn_get_use_ldaps (conn)) {
+ 		mech =  "GSS-SPNEGO";
+ 	}
++	_adcli_info ("Using %s for SASL bind", mech);
+ 
+ 	ret = ldap_sasl_interactive_bind_s (conn->ldap, NULL, mech, NULL, NULL,
+ 	                                    LDAP_SASL_QUIET, sasl_interact, NULL);
+@@ -1230,6 +1276,7 @@ adcli_conn_new (const char *domain_name)
+ 	conn->refs = 1;
+ 	conn->logins_allowed = ADCLI_LOGIN_COMPUTER_ACCOUNT | ADCLI_LOGIN_USER_ACCOUNT;
+ 	adcli_conn_set_domain_name (conn, domain_name);
++	adcli_conn_set_use_ldaps (conn, false);
+ 	return conn;
+ }
+ 
+@@ -1389,6 +1436,20 @@ adcli_conn_set_domain_controller (adcli_conn *conn,
+ 	no_more_disco (conn);
+ }
+ 
++bool
++adcli_conn_get_use_ldaps (adcli_conn *conn)
++{
++	return_val_if_fail (conn != NULL, NULL);
++	return conn->use_ldaps;
++}
++
++void
++adcli_conn_set_use_ldaps (adcli_conn *conn, bool value)
++{
++	return_if_fail (conn != NULL);
++	conn->use_ldaps = value;
++}
++
+ const char *
+ adcli_conn_get_domain_short (adcli_conn *conn)
+ {
+diff --git a/library/adconn.h b/library/adconn.h
+index 37ebdd9..1d5faa8 100644
+--- a/library/adconn.h
++++ b/library/adconn.h
+@@ -89,6 +89,10 @@ const char *        adcli_conn_get_domain_controller (adcli_conn *conn);
+ void                adcli_conn_set_domain_controller (adcli_conn *conn,
+                                                       const char *value);
+ 
++bool                adcli_conn_get_use_ldaps         (adcli_conn *conn);
++void                adcli_conn_set_use_ldaps         (adcli_conn *conn,
++                                                      bool value);
++
+ const char *        adcli_conn_get_domain_short      (adcli_conn *conn);
+ 
+ const char *        adcli_conn_get_domain_sid        (adcli_conn *conn);
+diff --git a/tools/computer.c b/tools/computer.c
+index 840e334..292c4d8 100644
+--- a/tools/computer.c
++++ b/tools/computer.c
+@@ -113,12 +113,14 @@ typedef enum {
+ 	opt_add_service_principal,
+ 	opt_remove_service_principal,
+ 	opt_description,
++	opt_use_ldaps,
+ } Option;
+ 
+ static adcli_tool_desc common_usages[] = {
+ 	{ opt_domain, "active directory domain name" },
+ 	{ opt_domain_realm, "kerberos realm for the domain" },
+ 	{ opt_domain_controller, "domain controller to connect to" },
++	{ opt_use_ldaps, "use LDAPS port for communication" },
+ 	{ opt_host_fqdn, "override the fully qualified domain name of the\n"
+ 	                 "local machine" },
+ 	{ opt_host_keytab, "filename for the host kerberos keytab" },
+@@ -311,6 +313,9 @@ parse_option (Option opt,
+ 	case opt_description:
+ 		adcli_enroll_set_description (enroll, optarg);
+ 		return ADCLI_SUCCESS;
++	case opt_use_ldaps:
++		adcli_conn_set_use_ldaps (conn, true);
++		return ADCLI_SUCCESS;
+ 	case opt_verbose:
+ 		return ADCLI_SUCCESS;
+ 
+@@ -357,6 +362,7 @@ adcli_tool_computer_join (adcli_conn *conn,
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
+ 		{ "domain-server", required_argument, NULL, opt_domain_controller }, /* compat */
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "user", required_argument, NULL, opt_login_user }, /* compat */
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+@@ -688,6 +694,7 @@ adcli_tool_computer_preset (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "domain-ou", required_argument, NULL, opt_domain_ou },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+@@ -800,6 +807,7 @@ adcli_tool_computer_reset (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+ 		{ "login-type", required_argument, NULL, opt_login_type },
+@@ -888,6 +896,7 @@ adcli_tool_computer_delete (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+ 		{ "no-password", no_argument, 0, opt_no_password },
+@@ -985,6 +994,7 @@ adcli_tool_computer_show (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+ 		{ "login-type", required_argument, NULL, opt_login_type },
+diff --git a/tools/entry.c b/tools/entry.c
+index f361845..05e4313 100644
+--- a/tools/entry.c
++++ b/tools/entry.c
+@@ -53,6 +53,7 @@ typedef enum {
+ 	opt_unix_gid,
+ 	opt_unix_shell,
+ 	opt_nis_domain,
++	opt_use_ldaps,
+ } Option;
+ 
+ static adcli_tool_desc common_usages[] = {
+@@ -67,6 +68,7 @@ static adcli_tool_desc common_usages[] = {
+ 	{ opt_domain, "active directory domain name" },
+ 	{ opt_domain_realm, "kerberos realm for the domain" },
+ 	{ opt_domain_controller, "domain directory server to connect to" },
++	{ opt_use_ldaps, "use LDAPS port for communication" },
+ 	{ opt_login_ccache, "kerberos credential cache file which contains\n"
+ 	                    "ticket to used to connect to the domain" },
+ 	{ opt_login_user, "user (usually administrative) login name of\n"
+@@ -136,6 +138,9 @@ parse_option (Option opt,
+ 			stdin_password = 1;
+ 		}
+ 		return ADCLI_SUCCESS;
++	case opt_use_ldaps:
++		adcli_conn_set_use_ldaps (conn, true);
++		return ADCLI_SUCCESS;
+ 	case opt_verbose:
+ 		return ADCLI_SUCCESS;
+ 	default:
+@@ -172,6 +177,7 @@ adcli_tool_user_create (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+ 		{ "no-password", no_argument, 0, opt_no_password },
+@@ -306,6 +312,7 @@ adcli_tool_user_delete (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+ 		{ "no-password", no_argument, 0, opt_no_password },
+@@ -394,6 +401,7 @@ adcli_tool_group_create (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "domain-ou", required_argument, NULL, opt_domain_ou },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+@@ -496,6 +504,7 @@ adcli_tool_group_delete (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+ 		{ "no-password", no_argument, 0, opt_no_password },
+@@ -622,6 +631,7 @@ adcli_tool_member_add (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+ 		{ "no-password", no_argument, 0, opt_no_password },
+@@ -722,6 +732,7 @@ adcli_tool_member_remove (adcli_conn *conn,
+ 		{ "domain", required_argument, NULL, opt_domain },
+ 		{ "domain-realm", required_argument, NULL, opt_domain_realm },
+ 		{ "domain-controller", required_argument, NULL, opt_domain_controller },
++		{ "use-ldaps", no_argument, 0, opt_use_ldaps },
+ 		{ "login-user", required_argument, NULL, opt_login_user },
+ 		{ "login-ccache", optional_argument, NULL, opt_login_ccache },
+ 		{ "no-password", no_argument, 0, opt_no_password },
+-- 
+2.25.1
+

@@ -1,0 +1,27 @@
+A corrupt header specifying zero channels would send read_channels()
+into an infinite loop.  Prevent this by sanity checking the channel
+count in open_read().  Also add an upper bound to prevent overflow
+in multiplication.
+---
+ src/xa.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/xa.c b/src/xa.c
+index 81a767720d93..9fc086eca2b2 100644
+--- a/src/xa.c
++++ b/src/xa.c
+@@ -143,6 +143,12 @@ static int startread(sox_format_t * ft)
+         lsx_report("User options overriding rate read in .xa header");
+     }
+ 
++    if (ft->signal.channels == 0 || ft->signal.channels > UINT16_MAX) {
++        lsx_fail_errno(ft, SOX_EFMT, "invalid channel count %d",
++                       ft->signal.channels);
++        return SOX_EOF;
++    }
++
+     /* Check for supported formats */
+     if (ft->encoding.bits_per_sample != 16) {
+         lsx_fail_errno(ft, SOX_EFMT, "%d-bit sample resolution not supported.",
+-- 
+2.17.0

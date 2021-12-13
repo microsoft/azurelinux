@@ -1,0 +1,36 @@
+From e9bf85e48e204392ba26fcb5767a02ac31486583 Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <dueno@redhat.com>
+Date: Mon, 28 Oct 2013 17:28:26 +0900
+Subject: [PATCH] Invoke ibus-setup-hangul with the absolute path
+
+Partially revert 8d3735e4, which installs ibus-setup-hangul under
+bindir.
+---
+ src/engine.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+Index: ibus-hangul-1.5.0/src/engine.c
+===================================================================
+--- ibus-hangul-1.5.0.orig/src/engine.c
++++ ibus-hangul-1.5.0/src/engine.c
+@@ -1337,10 +1337,18 @@ ibus_hangul_engine_property_activate (IB
+     if (strcmp(prop_name, "setup") == 0) {
+         GError *error = NULL;
+         gchar *argv[2] = { NULL, };
++        gchar *path;
++        const char* libexecdir;
+ 
+-        argv[0] = "ibus-setup-hangul";
++        libexecdir = g_getenv("LIBEXECDIR");
++        if (libexecdir == NULL)
++            libexecdir = LIBEXECDIR;
++
++        path = g_build_filename(libexecdir, "ibus-setup-hangul", NULL);
++        argv[0] = path;
+         argv[1] = NULL;
+-        g_spawn_async (NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &error);
++        g_spawn_async (NULL, argv, NULL, 0, NULL, NULL, NULL, &error);
++        g_free(path);
+     } else if (strcmp(prop_name, "InputMode") == 0) {
+         IBusHangulEngine *hangul = (IBusHangulEngine *) engine;
+ 

@@ -1,0 +1,894 @@
+diff -up pbm2ppa-0.8.6/CALIBRATION.20000205 pbm2ppa-0.8.6/CALIBRATION
+--- pbm2ppa-0.8.6/CALIBRATION.20000205	1998-08-22 14:44:07.000000000 +0100
++++ pbm2ppa-0.8.6/CALIBRATION	2008-09-24 15:15:53.000000000 +0100
+@@ -10,9 +10,22 @@ during this procedure (like 600)]
+   The 'pbmtpg' program generates a full-page (8.5"x11") test pattern in
+ pbmraw (P4) format on stdout.  The output may be fed directly into pbm2ppa
+ in order to print a calibration pattern on your printer with commands such as:
++Assuming you printer is on /dev/lp0
+ 
+-    pbmtpg | pbm2ppa > /dev/lp1
++    pbmtpg | pbm2ppa > /dev/lp0
+       ( as root )
++(Note: /dev/lp0 is the default device for the primary parallel port on systems
++with 2.2.x or later Linux kernels; it is /dev/lp1 on  systems with
++older Linux 2.0.x kernels)
++
++For other papersizes, the command must specify a valid size, for both
++pbmtpg and pbm2ppa:
++
++    pbmtpg -a4 | pbm2ppa -s a4 > /dev/lp0
++    pbmtpg -legal | pbm2ppa -s legal > /dev/lp0
++    pbmtpg -letter | pbm2ppa -s letter > /dev/lp0
++
++For A4, US Legal of US Letter (default).
+ 
+       - or -
+ 
+@@ -33,3 +46,7 @@ paper.  Also, the margins should be able
+ causing the printer to choke with 'blinking lights syndrome'.
+ 
+ [TODO: Add shearing adjustments to pbm2ppa and explain here]
++
++
++
++
+diff -up pbm2ppa-0.8.6/defaults.1000.h.20000205 pbm2ppa-0.8.6/defaults.1000.h
+--- pbm2ppa-0.8.6/defaults.1000.h.20000205	1998-08-22 14:44:12.000000000 +0100
++++ pbm2ppa-0.8.6/defaults.1000.h	2008-09-24 15:17:47.000000000 +0100
+@@ -1,19 +0,0 @@
+-/* defaults.h
+- * Default printer values.  Edit these and recompile if so desired.
+- * [Note: a /etc/pbm2ppa.conf file will override these]
+- */
+-#ifndef _DEFAULTS_H
+-#define _DEFAULTS_H
+-
+-#define DEFAULT_PRINTER        ( HP1000 )
+-
+-/* Refer to CALIBRATION file about these settings */
+-#define DEFAULT_X_OFFSET       (   100 )
+-#define DEFAULT_Y_OFFSET       (  -650 )
+-
+-#define DEFAULT_TOP_MARGIN     (   150 )
+-#define DEFAULT_LEFT_MARGIN    (   150 )
+-#define DEFAULT_RIGHT_MARGIN   (   150 )
+-#define DEFAULT_BOTTOM_MARGIN  (   150 )
+-
+-#endif
+diff -up pbm2ppa-0.8.6/defaults.720.h.20000205 pbm2ppa-0.8.6/defaults.720.h
+--- pbm2ppa-0.8.6/defaults.720.h.20000205	1998-08-22 14:44:12.000000000 +0100
++++ pbm2ppa-0.8.6/defaults.720.h	2008-09-24 15:17:47.000000000 +0100
+@@ -1,19 +0,0 @@
+-/* defaults.h
+- * Default printer values.  Edit these and recompile if so desired.
+- * [Note: a /etc/pbm2ppa.conf file will override these]
+- */
+-#ifndef _DEFAULTS_H
+-#define _DEFAULTS_H
+-
+-#define DEFAULT_PRINTER        ( HP720 )
+-
+-/* Refer to CALIBRATION file about these settings */
+-#define DEFAULT_X_OFFSET       (   169 )
+-#define DEFAULT_Y_OFFSET       (  -569 )
+-
+-#define DEFAULT_TOP_MARGIN     (   150 )
+-#define DEFAULT_LEFT_MARGIN    (   150 )
+-#define DEFAULT_RIGHT_MARGIN   (   150 )
+-#define DEFAULT_BOTTOM_MARGIN  (   150 )
+-
+-#endif
+diff -up pbm2ppa-0.8.6/defaults.820.h.20000205 pbm2ppa-0.8.6/defaults.820.h
+--- pbm2ppa-0.8.6/defaults.820.h.20000205	1998-08-22 14:44:12.000000000 +0100
++++ pbm2ppa-0.8.6/defaults.820.h	2008-09-24 15:17:47.000000000 +0100
+@@ -1,19 +0,0 @@
+-/* defaults.h
+- * Default printer values.  Edit these and recompile if so desired.
+- * [Note: a /etc/pbm2ppa.conf file will override these]
+- */
+-#ifndef _DEFAULTS_H
+-#define _DEFAULTS_H
+-
+-#define DEFAULT_PRINTER        ( HP820 )
+-
+-/* Refer to CALIBRATION file about these settings */
+-#define DEFAULT_X_OFFSET       (    75 )
+-#define DEFAULT_Y_OFFSET       (  -500 )
+-
+-#define DEFAULT_TOP_MARGIN     (    80 )
+-#define DEFAULT_LEFT_MARGIN    (    80 )
+-#define DEFAULT_RIGHT_MARGIN   (    80 )
+-#define DEFAULT_BOTTOM_MARGIN  (   150 )
+-
+-#endif
+diff -up /dev/null pbm2ppa-0.8.6/defaults.h
+--- /dev/null	2008-09-24 08:53:03.196006296 +0100
++++ pbm2ppa-0.8.6/defaults.h	2008-09-24 15:15:53.000000000 +0100
+@@ -0,0 +1,53 @@
++/* defaults.h
++ * Default printer values.  Edit these and recompile if so desired.
++ * [Note: a /etc/pbm2ppa.conf file will override these]
++ */
++
++#ifndef _DEFAULTS_H
++#define _DEFAULTS_H
++
++#ifndef DEFAULT_PRINTER
++#define DEFAULT_PRINTER        ( HP720 )
++#endif
++
++/* for HP720 series */
++/* Refer to CALIBRATION file about these settings */
++#define HP720_X_OFFSET       (   169 )
++#define HP720_Y_OFFSET       (  -569 )
++
++#define HP720_TOP_MARGIN     (   150 )
++#define HP720_LEFT_MARGIN    (   150 )
++#define HP720_RIGHT_MARGIN   (   150 )
++#define HP720_BOTTOM_MARGIN  (   150 )
++
++/* for HP820 series */
++/* Refer to CALIBRATION file about these settings */
++#define HP820_X_OFFSET       (    75 )
++#define HP820_Y_OFFSET       (  -500 )
++
++#define HP820_TOP_MARGIN     (    80 )
++#define HP820_LEFT_MARGIN    (    80 )
++#define HP820_RIGHT_MARGIN   (    80 )
++#define HP820_BOTTOM_MARGIN  (   150 )
++
++/* for HP1000 series */
++/* Refer to CALIBRATION file about these settings */
++#define HP1000_X_OFFSET       (   100 )
++#define HP1000_Y_OFFSET       (  -650 )
++
++#define HP1000_TOP_MARGIN     (   150 )
++#define HP1000_LEFT_MARGIN    (   150 )
++#define HP1000_RIGHT_MARGIN   (   150 )
++#define HP1000_BOTTOM_MARGIN  (   150 )
++
++#endif
++
++
++
++
++
++
++
++
++
++
+diff -up pbm2ppa-0.8.6/INSTALL.20000205 pbm2ppa-0.8.6/INSTALL
+--- pbm2ppa-0.8.6/INSTALL.20000205	1998-10-19 02:27:16.000000000 +0100
++++ pbm2ppa-0.8.6/INSTALL	2008-09-24 15:15:53.000000000 +0100
+@@ -1,6 +1,6 @@
+ Overview
+ --------
+-This file contains some quick notes on installation in general.  For a
++	This file contains some quick notes on installation in general.  For a
+ complete step-by-step instruction on how to install pbm2ppa for your
+ printer, please see INSTALL-MORE.  (It was written for the 820, but it
+ should work for all supported models) Thanks to Michael Buehlmann for
+@@ -9,14 +9,19 @@ writing that guide!
+ Compilation
+ -----------
+ 	To compile, you should simply run 'make' with the series of your
+-printer.  The following options are supported:
++printer. This will set the default printer to the HP720 series.
++To specify a different default printyer, the following options are supported:
+ 
+ make 720	# for 720 series - e.g. 722C
+ make 820	# for 820 series - e.g. 820Cse
+ make 1000	# for 1000 series
+ 
+-If you choose to recompile for a different printer series, you must 'make
+-clean' first.
++	If you choose to recompile for a different default  printer series, 
++you must 'make clean' first.  However, the default printer choice
++selected at compilation time can be overridden with e.g., the 
++"pbm2pppa -v  820 ..."	command line option, or specified by e.g., 
++a "version 820" entry in the /etc/pbm2ppa.conf file.
++Type "pbm2ppa -h" to see the list of options.
+ 
+ Installation
+ ------------
+@@ -26,17 +31,23 @@ but you might want to tweak them).  See 
+ 
+ 	The other binary created, pbm2ppa, is a converter from a PBM
+ image to a stream of PPA data that can be sent directly to the printer.
+-The PBM image is expected to be 600 dpi, 8.5"x11".  These files can be
++The PBM image is expected to be 600 dpi, and the paper size
++can be   8.5"x11" (US Letter), 8.5"x14" (US Legal) or A4.  These files can be
+ generated with ghostscript.  Both the pbm and pbmraw devices are supported.
+ pbmraw is MUCH faster, so use it if you have it available!
++IMPORTANT: the PAPERSIZE option passed to ghostscript must match
++the paper size specified for pbm2ppa.
++Valid papersizes are: "letter" = "us" , "legal" , and "a4" .
+ 
+ Use
+ ---
+-	To print a postscript file with this program, I use a simple
+-shell script:
++	To print a postscript file with this program, on US Letter
++paper and a HP 710/720 series printer, I use a simple shell script:
+ 
+-cat $1 | gs -sDEVICE=pbm -q -dNOPAUSE -r600 -sOutputFile=- - | \
+-pbm2ppa - - | lpr
++cat $1 | gs -sDEVICE=pbm -q -dNOPAUSE -r600  -sPAPERSIZE=letter -sOutputFile=- - | \
++pbm2ppa -s letter -v 720 - - | lpr -l 
++
++Valid printer versions are "720", "820" and "1000".
+ 
+ 	You can also set up a printer filter.  See the documentation for
+ your print spooler for information on how to do that, or look in
+diff -up pbm2ppa-0.8.6/INSTALL-MORE.20000205 pbm2ppa-0.8.6/INSTALL-MORE
+--- pbm2ppa-0.8.6/INSTALL-MORE.20000205	1998-10-19 02:27:17.000000000 +0100
++++ pbm2ppa-0.8.6/INSTALL-MORE	2008-09-24 15:15:53.000000000 +0100
+@@ -36,14 +36,21 @@ or put in your printer number (720, 820 
+ file).
+ 
+ 
+-2. To adjust the paper size to DIN A4, use the -s a4 option to pbm2ppa or
++2. To adjust the paper size to US Legal (8.5"x14"), use the -s legal option 
++to pbm2ppa or change your pbm2ppa.conf file to read "papersize legal" 
++To adjust the paper size to DIN A4, use the -s a4 option to pbm2ppa or
+ change your pbm2ppa.conf file to read "papersize a4" (see step 5).
+-
++For US Letter (8.5"x11") paper is the default; "-s us", "-s letter",
++"papersize us" and "papersize letter" also specif this size. 
+ 
+ 3. You can now calibrate the printer with 
+ 
+-For US size paper:
++For US Letter size paper:
+ # pbmtpg | pbm2ppa > /dev/lp1 ( as root )
++or
++# pbmtpg -letter | pbm2ppa > /dev/lp1 ( as root )
++For US Legal  size paper:
++# pbmtpg -legal | pbm2ppa -s a4 > /dev/lp1 ( as root )
+ For A4 size paper:
+ # pbmtpg -a4 | pbm2ppa -s a4 > /dev/lp1 ( as root )
+ 
+diff -up pbm2ppa-0.8.6/Makefile.20000205 pbm2ppa-0.8.6/Makefile
+--- pbm2ppa-0.8.6/Makefile.20000205	1998-10-11 16:17:16.000000000 +0100
++++ pbm2ppa-0.8.6/Makefile	2008-09-24 15:15:53.000000000 +0100
+@@ -1,36 +1,23 @@
+ CC=gcc
+-CFLAGS=-Wall -O2
++CFLAGS=-Wall -O2 
+ LDFLAGS=
++PRINTER=HP720
+ 
+-default:
+-	@echo Please specify the type of printer you wish to compile this
+-	@echo software for.  Supported options are:
+-	@echo
+-	@echo make 720
+-	@echo make 820
+-	@echo make 1000
+-	@echo
+-	@exit
++default: all
+ 
+-720.h:
+-	cp defaults.720.h defaults.h
++720: PRINTER=HP720
++720:  all
+ 
+-820.h:
+-	cp defaults.820.h defaults.h
++820: PRINTER=HP820
++820:  all
+ 
+-1000.h:
+-	cp defaults.1000.h defaults.h
++1000: PRINTER=HP1000
++1000: all
+ 
+-720: 720.h all
+-
+-820: 820.h all
+-
+-1000: 1000.h all
+-
+-all: defaults.h pbm2ppa pbmtpg
++all: pbm2ppa pbmtpg
+ 
+ clean:
+-	rm -f *.o *~ pbmtpg pbm2ppa defaults.h
++	rm -f *.o *~ pbmtpg pbm2ppa 
+ 
+ pbm2ppa: pbm2ppa.o ppa.o pbm.o cutswath.o
+ 	$(CC) $(LDFLAGS) -o pbm2ppa pbm2ppa.o ppa.o pbm.o cutswath.o
+@@ -39,4 +26,11 @@ pbmtpg: pbmtpg.o
+ 	$(CC) $(CFLAGS) -o pbmtpg pbmtpg.o -lm
+ 
+ .c.o: $*.c ppa.h pbm.h
+-	$(CC) $(CFLAGS) -c $*.c
++	$(CC) $(CFLAGS) -DDEFAULT_PRINTER=$(PRINTER)  -c $*.c
++
++
++
++
++
++
++
+diff -up /dev/null pbm2ppa-0.8.6/pbm2ppa.1
+--- /dev/null	2008-09-24 08:53:03.196006296 +0100
++++ pbm2ppa-0.8.6/pbm2ppa.1	2008-09-24 15:15:53.000000000 +0100
+@@ -0,0 +1,135 @@
++.TH pnm2ppa "5 Feb 2000"
++.SH NAME
++pbm2ppa - convert portable bitmap (PBM) to HP's Printing Performance Architecture (PPA) file format
++.SH SYNOPSIS
++pbm2ppa [options] [ <\fIinfile\fR] > [ <\fIoutfile\fR]> ] ]
++
++.SH DESCRIPTION
++Reads portable bitmap (PBM) format as input.  Outputs a stream suitable for 
++processing by  Hewlett-Packard's range of Printing Performance Architecture 
++(PPA) printers. 
++pnm2ppa supports the HP 710c, 712c, 720c, 722c, 820c, and 1000c 
++series printers. 
++.PP
++(Portable bitmap (PBM) format output can be produced from PostScript(tm) input 
++by the GhostScript driver "pbmraw".)
++.PP
++
++
++.SH OPTIONS
++.\"{{{	infile  
++.IP "\fB\\fIinfile\fR \fP"
++Input file \fIinfile\fR is either a path to a file or device, or '-' to indicate stdin (defaults to stdin)
++.\"}}}
++
++
++.\"{{{	outfile 
++.IP "\fB\\fIoutfile\fR  \fP"
++Output file \fIoutfile\fR is either a path to a file or device, or '-' to indicate stdout (defaults to stdout)
++.\"}}}
++
++
++.\"{{{	-b bottommargin
++.IP "\fB\-b \fIbottommargin\fR\fP"
++Sets the bottom margin \fIbottommargin\fR in units of 1/600 inches (e.g.,  -b 150 = 0.25")
++.\"}}}
++
++
++.\"{{{	-d
++.IP "\fB\-d\fP"
++Displays the current configuration
++.\"}}}
++
++
++.\"{{{	-f configfile
++.IP "\fB\-f \fIconfigfile\fR\fP"
++Overrides reading the configuration from /etc/pnm2ppa.conf, and uses 
++\fIconfigfile\fR instead.
++.\"}}}
++
++
++.\"{{{	-h
++.IP "\fB\-h\fP"
++Displays program usage
++.\"}}}
++
++
++
++.\"{{{	-l leftmargin
++.IP "\fB\-l \fIleftmargin\fR\fP"
++Sets the left margin \fIleftmargin\fR in units of 1/600 inches (e.g., -l 150 = 0.25")
++.\"}}}
++
++
++.\"{{{	-r rightmargin
++.IP "\fB\-r \fIrightmargin\fR\fP"
++Sets the right margin \fIrightmargin\fR in units of 1/600 inches (e.g., -r 150 = 0.25")
++.\"}}}
++
++.\"{{{	-s  papersize
++.IP "\fB\-s \fIpapersize\fR\fP"
++Sets the paper size. Possible values for \fIpapersize\fR are \fBa4\fP (A4),
++\fBletter\fP or \fBus\fP (US Letter, 8.5"x11"), and \fBlegal\fR (US Legal,
++8.5"x14").
++The default is US Letter.
++.\"}}}
++
++.\"{{{	-t topmargin
++.IP "\fB\-t \fItopmargin\fR\fP"
++Sets the top margin \fItopmargin\fR in units of 1/600 inches (ie -t 150 = 0.25")
++.\"}}}
++
++.\"{{{	-v  printertype
++.IP "\fB\-v \fIprintertype\fP"
++Selects the printer model.  Possible values of \fIprintertype\fR are:
++\fB710\fP, \fB712\fP, \fB720\fP, \fB722\fP, \fB820\fP and \fB1000\fP.
++The default is the HP DeskJet 7X0 Series (710, 712, 720, 722).
++.\"}}}
++
++
++.\"{{{	-x xoffset
++.IP "\fB\-x \fIxoffset\fR\fP"
++Sets the x-offset \fBxoffset\fR from the left of the page. Units are 1/600 inches
++.\"}}}
++
++.\"{{{	-y yoffset
++.IP "\fB\-y \fIyoffset\fR\fP"
++Sets the y-offset \fByoffset\fR from the top of the page. Units are 1/600 inches
++.\"}}}
++
++ 
++.SH NOTES
++The configuration file is read in first. Command line arguments then modify the resulting definitions.
++.PP
++The -x and -y options accumulate. The -v option resets all definitions back to
++an inbuilt default for that printer and should be used before subsequent -b -l -r, -t,  -x, and -y arguments.
++.SH "SEE ALSO"
++pbm(5)
++
++.SH FILES
++
++.\"{{{	/etc/pbm2ppa.conf
++.IP "\fB\fI/etc/pbm2ppa.conf\fR\fP"
++Default configuration file
++.\"}}}
++
++
++.SH AUTHOR
++This code is licensed under the GNU Public License version 2. See
++LICENSE for details.
++.PP
++(c) 1998	Tim Norman
++.PP
++.SH HISTORY
++This program was written by Tim Norman. It originally 
++supported black and white output on the 820 series. This program is
++almost obsolete; its successor pnm2ppa will support color printing.
++.SH BUGS
++This is a stable driver, but does not support color printing.
++
++
++
++
++
++
++
+diff -up pbm2ppa-0.8.6/pbm2ppa.c.20000205 pbm2ppa-0.8.6/pbm2ppa.c
+--- pbm2ppa-0.8.6/pbm2ppa.c.20000205	1998-09-16 01:00:27.000000000 +0100
++++ pbm2ppa-0.8.6/pbm2ppa.c	2008-09-24 15:15:53.000000000 +0100
+@@ -17,10 +17,15 @@
+ 
+ /* Paper sizes in 600ths of an inch. */
+ 
+-/* US is 8.5 in by 11 in */
++/* US Letter is 8.5 in by 11 in */
+ 
+-#define USWIDTH  (5100)
+-#define USHEIGHT (6600)
++#define LETTERWIDTH  (5100)
++#define LETTERHEIGHT (6600)
++
++/* US Legal is 8.5 in by 14 in */
++
++#define LEGALWIDTH  (5100)
++#define LEGALHEIGHT (8400)
+ 
+ /* A4 is 210 mm by 297 mm == 8.27 in by 11.69 in */
+ 
+@@ -121,16 +126,35 @@ int print_pbm (FILE *in)
+ 
+ void set_printer_specific_defaults()
+ {
+-  printer.x_offset=DEFAULT_X_OFFSET;
+-  printer.y_offset=DEFAULT_Y_OFFSET;
+   switch(printer.version)
+   {
+   case HP720:
++    printer.x_offset=HP720_X_OFFSET;
++    printer.y_offset=HP720_Y_OFFSET;
++    printer.top_margin=HP720_TOP_MARGIN;
++    printer.left_margin=HP720_LEFT_MARGIN;
++    printer.right_margin=HP720_RIGHT_MARGIN;
++    printer.bottom_margin=HP720_BOTTOM_MARGIN;
+     printer.marg_diff=2;
+     printer.bufsize = 200*1024;
+     break;
+   case HP820:
++    printer.x_offset=HP820_X_OFFSET;
++    printer.y_offset=HP820_Y_OFFSET;
++    printer.top_margin=HP820_TOP_MARGIN;
++    printer.left_margin=HP820_LEFT_MARGIN;
++    printer.right_margin=HP820_RIGHT_MARGIN;
++    printer.bottom_margin=HP820_BOTTOM_MARGIN;
++    printer.marg_diff=0x62;
++    printer.bufsize = 100*1024;
++    break;
+   case HP1000:
++    printer.x_offset=HP1000_X_OFFSET;
++    printer.y_offset=HP1000_Y_OFFSET;
++    printer.top_margin=HP1000_TOP_MARGIN;
++    printer.left_margin=HP1000_LEFT_MARGIN;
++    printer.right_margin=HP1000_RIGHT_MARGIN;
++    printer.bottom_margin=HP1000_BOTTOM_MARGIN;
+     printer.marg_diff=0x62;
+     printer.bufsize = 100*1024;
+     break;
+@@ -144,15 +168,17 @@ void show_usage(char* prog)
+ {
+   printf("usage: %s [ options ] [ <infile> [ <outfile> ] ]\n\n",prog);
+   printf("  Prints a pbm- or pbmraw-format <infile> to HP720/820/1000-format <outfile>.\n\n");
+-  printf("    -v <version>    printer version (720, 820, or 1000)\n");
+-  printf("    -x <xoff>       vertical offset adjustment in 1\"/600\n");
+-  printf("    -y <yoff>       horizontal offset adjustment in 1\"/600\n");
+-  printf("    -t <topmarg>    top margin in 1\"/600    (default: 150 = 0.25\")\n");
+-  printf("    -l <leftmarg>   left margin in 1\"/600   (default: 150 = 0.25\")\n");
+-  printf("    -r <rightmarg>  right margin in 1\"/600  (default: 150 = 0.25\")\n");
+-  printf("    -b <botmarg>    bottom margin in 1\"/600 (default: 150 = 0.25\")\n");
+-  printf("    -s <paper>      paper size (us, a4, default: us)\n");
++  printf("    -b <margin>    bottom margin in 1\"/600 (default: 150 = 0.25\")\n");
++  printf("    -d              dumps the configuration to stdout");
+   printf("    -f <cfgfile>    read <cfgfile> as parameters\n\n");
++  printf("    -h              displays this help text");
++  printf("    -l <margin>     left margin in 1\"/600   (default: 150 = 0.25\")\n");
++  printf("    -r <margin>     right margin in 1\"/600  (default: 150 = 0.25\")\n");
++  printf("    -s <paper>      paper size (us,letter,legal,a4, default: us)\n");
++  printf("    -t <margin>     top margin in 1\"/600    (default: 150 = 0.25\")\n");
++  printf("    -v <model>      printer model (710, 712, 720, 722,  820, or 1000)\n");
++  printf("    -x <offset>     vertical offset adjustment in 1\"/600\n");
++  printf("    -y <offset>     horizontal offset adjustment in 1\"/600\n");
+   printf("  The -x and -y options accumulate.  The -v option resets the horizontal and\n");
+   printf("  vertical adjustments to an internal default.  <infile> and <outfile> default\n");
+   printf("  to stdin and stdout.  '-' is a synonym for stdin and stdout.\n\n");
+@@ -173,7 +199,13 @@ void show_usage(char* prog)
+ 
+ void parm_version(char* arg)
+ {
+-  if(!strcasecmp(arg,"hp720") || !strcmp(arg,"720"))
++  if(!strcasecmp(arg,"hp710") || !strcmp(arg,"710"))
++    printer.version=HP720;
++  else if(!strcasecmp(arg,"hp712") || !strcmp(arg,"712"))
++    printer.version=HP720;
++  else if(!strcasecmp(arg,"hp720") || !strcmp(arg,"720"))
++    printer.version=HP720;
++  else if(!strcasecmp(arg,"hp722") || !strcmp(arg,"722"))
+     printer.version=HP720;
+   else if(!strcasecmp(arg,"hp820") || !strcmp(arg,"820"))
+     printer.version=HP820;
+@@ -191,7 +223,10 @@ void parm_iversion(int arg)
+ {
+   switch(arg)
+   {
++  case 710:
++  case 712:
+   case 720:
++  case 722:
+     printer.version=HP720;
+     break;
+   case 820:
+@@ -262,10 +297,15 @@ void read_config_file(char* fname)
+ 	printer.bottom_margin=value;
+       else if(!strncmp(key,"papersize",len))
+       {
+-	if(!strcmp(buf,"us"))
++	if(!strcmp(buf,"us") || !strcmp(buf,"letter"))
++	{
++	  Width = LETTERWIDTH;
++	  Height = LETTERHEIGHT;
++	}
++	else if(!strcmp(buf,"legal"))
+ 	{
+-	  Width = USWIDTH;
+-	  Height = USHEIGHT;
++	  Width = LEGALWIDTH;
++	  Height = LEGALHEIGHT;
+ 	}
+ 	else if(!strcmp(buf,"a4"))
+ 	{
+@@ -313,15 +353,9 @@ int main (int argc, char *argv[])
+   FILE *in=stdin, *out=stdout;
+   struct stat tmpstat;
+ 
+-  printer.version       = DEFAULT_PRINTER;
+-  printer.x_offset      = DEFAULT_X_OFFSET;
+-  printer.y_offset      = DEFAULT_Y_OFFSET;
+-  printer.top_margin    = DEFAULT_TOP_MARGIN;
+-  printer.left_margin   = DEFAULT_LEFT_MARGIN;
+-  printer.right_margin  = DEFAULT_RIGHT_MARGIN;
+-  printer.bottom_margin = DEFAULT_BOTTOM_MARGIN;
+-  Width = USWIDTH;
+-  Height = USHEIGHT;
++  printer.version = DEFAULT_PRINTER;
++  Width = LETTERWIDTH;
++  Height = LETTERHEIGHT;
+   set_printer_specific_defaults();
+ 
+   if(!stat(defaultcfgfile,&tmpstat))
+@@ -356,10 +390,15 @@ int main (int argc, char *argv[])
+       else if(!strcmp(argv[argn],"-s"))
+       {
+ 	argn++;
+-	if(!strcmp(argv[argn],"us"))
++	if(!strcmp(argv[argn],"us") || !strcmp(argv[argn],"letter"))
+ 	{
+-	  Width = USWIDTH;
+-	  Height = USHEIGHT;
++	  Width = LETTERWIDTH;
++	  Height = LETTERHEIGHT;
++	}
++	else if(!strcmp(argv[argn],"legal"))
++	{
++	  Width = LEGALWIDTH;
++	  Height = LEGALHEIGHT;
+ 	}
+ 	else if(!strcmp(argv[argn],"a4"))
+ 	{
+@@ -414,3 +453,4 @@ int main (int argc, char *argv[])
+   return print_pbm (in);
+ }
+ 
++
+diff -up /dev/null pbm2ppa-0.8.6/pbm2ppa.conf
+--- /dev/null	2008-09-24 08:53:03.196006296 +0100
++++ pbm2ppa-0.8.6/pbm2ppa.conf	2008-09-24 15:15:53.000000000 +0100
+@@ -0,0 +1,58 @@
++# Sample configuration file for the HP720/HP820/HP1000 PPA Printers
++#
++# This file will be automatically read upon startup if it's placed in
++# /etc/pbm2ppa.conf
++#
++
++# uncomment  options (remove "#" at beginning of line) to activate them
++
++#valid printer  versions are 710, 712, 720, 722. 820, 100
++# 710 = 712 = 720 = 722: 	HP DeskJet 710C, 712C, 720C, 722C (default)
++# 820:				HP DeskJet 820Cse, 820Cxi
++# 1000: 			HP DeskJet 1000Cse, 1000Cxi
++#version  720
++#version  820
++#version  1000
++#
++
++# valid papersizes are us, letter, legal, a4
++# US Letter (8.5"x11"): us, letter   (default)
++# US Legal  (8.5"x14"): legal
++# A4                  : a4
++#papersize	letter
++#papersize	legal
++#papersize	a4
++
++
++#Defaults for 720 series:
++# X-offset, Y-Offset: (Adjust these for your printer, see CALIBRATE)
++#xoff     169 
++#yoff    -569 
++# 1/4 inch margins all around (at 600 DPI)
++#top      150
++#bottom   150
++#left     150
++#right    150
++
++#Defaults for 820 series:
++# X-offset, Y-Offset: (Adjust these for your printer, see CALIBRATE)
++#xoff      75 
++#yoff    -500 
++# 1/4 inch margins all around (at 600 DPI)
++#top       80
++#bottom   150
++#left      80
++#right     80
++
++#Defaults for 820 series:
++# X-offset, Y-Offset: (Adjust these for your printer, see CALIBRATE)
++#xoff     100 
++#yoff    -650 
++# 1/4 inch margins all around (at 600 DPI)
++#top      150
++#bottom   150
++#left     150
++#right    150
++
++
++
+diff -up pbm2ppa-0.8.6/pbm2ppa.conf.hp1000.20000205 pbm2ppa-0.8.6/pbm2ppa.conf.hp1000
+--- pbm2ppa-0.8.6/pbm2ppa.conf.hp1000.20000205	1998-10-19 02:27:19.000000000 +0100
++++ pbm2ppa-0.8.6/pbm2ppa.conf.hp1000	2008-09-24 15:17:47.000000000 +0100
+@@ -1,18 +0,0 @@
+-# Sample configuration file for the HP720
+-#
+-# This file will be automatically read upon startup if it's placed in
+-# /etc/pbm2ppa.conf
+-#
+-
+-version  1000
+-
+-papersize	us
+-
+-xoff     100 # \ Adjust these for your printer.
+-yoff    -650 # / (see CALIBRATE)
+-
+-# 1/4 inch margins all around (at 600 DPI)
+-top      150
+-bottom   150
+-left     150
+-right    150
+diff -up pbm2ppa-0.8.6/pbm2ppa.conf.hp720.20000205 pbm2ppa-0.8.6/pbm2ppa.conf.hp720
+--- pbm2ppa-0.8.6/pbm2ppa.conf.hp720.20000205	1998-10-19 02:27:20.000000000 +0100
++++ pbm2ppa-0.8.6/pbm2ppa.conf.hp720	2008-09-24 15:17:47.000000000 +0100
+@@ -1,18 +0,0 @@
+-# Sample configuration file for the HP720
+-#
+-# This file will be automatically read upon startup if it's placed in
+-# /etc/pbm2ppa.conf
+-#
+-
+-version  720
+-
+-papersize	us
+-
+-xoff     169 # \ Adjust these for your printer.
+-yoff    -569 # / (see CALIBRATE)
+-
+-# 1/4 inch margins all around (at 600 DPI)
+-top      150
+-bottom   150
+-left     150
+-right    150
+diff -up pbm2ppa-0.8.6/pbm2ppa.conf.hp820.20000205 pbm2ppa-0.8.6/pbm2ppa.conf.hp820
+--- pbm2ppa-0.8.6/pbm2ppa.conf.hp820.20000205	1998-10-19 02:27:21.000000000 +0100
++++ pbm2ppa-0.8.6/pbm2ppa.conf.hp820	2008-09-24 15:17:47.000000000 +0100
+@@ -1,18 +0,0 @@
+-# Sample configuration file for the HP820
+-#
+-# This file will be automatically read upon startup if it's placed in
+-# /etc/pbm2ppa.conf
+-#
+-
+-version  820
+-
+-papersize	us
+-
+-xoff      75 # \ Adjust these for your printer.
+-yoff    -500 # / (see CALIBRATE)
+-
+-# 1/4 inch margins all around (at 600 DPI)
+-top       80
+-bottom   150
+-left      80
+-right     80
+diff -up pbm2ppa-0.8.6/pbmtpg.c.20000205 pbm2ppa-0.8.6/pbmtpg.c
+--- pbm2ppa-0.8.6/pbmtpg.c.20000205	1998-09-16 01:00:28.000000000 +0100
++++ pbm2ppa-0.8.6/pbmtpg.c	2008-09-24 15:15:53.000000000 +0100
+@@ -1,13 +1,19 @@
+ #include <math.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ 
+-/* Support both US and A4. */
++/* Support  US Letter, Legal,  and A4. */
+ 
+-/* US is 8.5 in by 11 in */
++/* US Letter is 8.5 in by 11 in */
+ 
+-#define USWIDTH  (5100)
+-#define USHEIGHT (6600)
++#define LETTERWIDTH  (5100)
++#define LETTERHEIGHT (6600)
++
++/* US Legal is 8.5 in by 14 in */
++
++#define LEGALWIDTH  (5100)
++#define LEGALHEIGHT (8400)
+ 
+ /* A4 is 210 mm by 297 mm == 8.27 in by 11.69 in */
+ 
+@@ -137,8 +143,24 @@ int main(int argc,char** argv)
+   char buf[128];
+   char *progname = *argv;
+ 
+-  Width = USWIDTH;
+-  Height = USHEIGHT;
++  Width = LETTERWIDTH;
++  Height = LETTERHEIGHT;
++  if(argc>1 && strcmp(argv[1], "-letter")==0)
++  {
++    Width = LETTERWIDTH;
++    Height = LETTERHEIGHT;
++    argc--;
++    argv++;
++  }
++
++  if(argc>1 && strcmp(argv[1], "-legal")==0)
++  {
++    Width = LEGALWIDTH;
++    Height = LEGALHEIGHT;
++    argc--;
++    argv++;
++  }
++
+   if(argc>1 && strcmp(argv[1], "-a4")==0)
+   {
+     Width = A4WIDTH;
+@@ -146,6 +168,9 @@ int main(int argc,char** argv)
+     argc--;
+     argv++;
+   }
++
++
++
+   Pwidth = (Width+7)/8;
+   bitmap = (char *)malloc(Pwidth*Height);
+ 
+@@ -192,6 +217,7 @@ int main(int argc,char** argv)
+     return 1;
+   }
+ 
++  Width = 8*Pwidth ; /* here need 8*Pwidth as the Width ! */
+   printf("P4\n%d %d\n",Width,Height);
+ 
+   for(x=0; x<Pwidth*Height; x++)
+@@ -199,3 +225,10 @@ int main(int argc,char** argv)
+ 
+   return 0;
+ }
++
++
++
++
++
++
++
+diff -up pbm2ppa-0.8.6/README.REDHAT.20000205 pbm2ppa-0.8.6/README.REDHAT
+--- pbm2ppa-0.8.6/README.REDHAT.20000205	1998-08-22 14:48:40.000000000 +0100
++++ pbm2ppa-0.8.6/README.REDHAT	2008-09-24 15:15:53.000000000 +0100
+@@ -1,12 +1,28 @@
+-RedHat users may find the following tip from Panayotis Vryonis <vrypan@hol.gr>
+-helpful!
++The best way to integrate support for the HP PPA Printers into RedHat's
++Linux Print System Manager (printtool) is to replace e.g., the
++rhs-printfilters-1.57-3 RPM package that comes with Red Hat 6.1,
++with a  PPA-aware version from the pnm2ppa project  whic h has a
++homepage at http://www.sourceforge.net/projects/?group_id=1322
+ 
+-Here is a tip to intergrate HP720C support in RedHat's printtool:
++At the time of writing, the latest release is
++     rhs-printfilters-1.57-4ppa1
++This package includes support for both pbm2ppa and the new
++color driver pnm2ppa.
+ 
+-Install pbm2ppa. Copy pbm2ppa to /usr/bin.
+-Edit "printerdb" (in my system it is found in
+-/usr/lib/rhs/rhs-printfilters )
+-and append the following lines:
++   -------------------------------------
++
++If for some reason, they cannot use this PPA-aware version of
++rhs-printfilters, RedHat users may still find the following tip from 
++Panayotis Vryonis <vrypan@hol.gr> helpful!  
++It will work with the standard rhs-printfilters that comes with  the 
++Red Hat release:
++	
++	Here is a tip to integrate HP720C support in RedHat's printtool:
++
++	Install pbm2ppa. Copy pbm2ppa to /usr/bin.
++	Edit "printerdb" (in my system it is found in	
++	/usr/lib/rhs/rhs-printfilters )
++	and append the following lines:
+ ----------------------Cut here
+ -------------------------------------------
+ StartEntry: DeskJet720C
+@@ -23,7 +39,11 @@ StartEntry: DeskJet720C
+ EndEntry
+ --------------------------------------------------------------------------
+ 
+-Now you can add an HP720C printer just like any other, using printtool.
++	Now you can add an HP720C printer just like any other, using printtool.
++
++	[Author's (P. Vryonis) Note: The same should work for the 820 and 
++	1000, but it hasn't been tested.  Also, use the pbmraw GSDriver if 
++	you have it; it's faster. ]
++
++
+ 
+-[Author's Note: The same should work for the 820 and 1000, but it hasn't
+-been tested.  Also, use the pbmraw GSDriver if you have it; it's faster. ]

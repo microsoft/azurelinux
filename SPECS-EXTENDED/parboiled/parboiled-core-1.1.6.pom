@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.parboiled</groupId>
+    <artifactId>parboiled-core</artifactId>
+    <packaging>bundle</packaging>
+    <description>Elegant parsing in Java and Scala - lightweight, easy-to-use, powerful</description>
+    <url>http://parboiled.org</url>
+    <version>1.1.6</version>
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <name>parboiled-core</name>
+    <inceptionYear>2009</inceptionYear>
+    <organization>
+        <name>org.parboiled</name>
+        <url>http://parboiled.org</url>
+    </organization>
+    <scm>
+        <url>git@github.com:sirthias/parboiled.git</url>
+        <connection>scm:git:git@github.com:sirthias/parboiled.git</connection>
+    </scm>
+    <developers>
+        <developer>
+            <id>sirthias</id>
+            <name>Mathias Doenitz</name>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>5.14.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.9.3</artifactId>
+            <version>1.9.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

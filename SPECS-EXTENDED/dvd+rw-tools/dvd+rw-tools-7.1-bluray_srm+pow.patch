@@ -1,0 +1,12 @@
+diff -up dvd+rw-tools-7.1/growisofs_mmc.cpp.wrk dvd+rw-tools-7.1/growisofs_mmc.cpp
+--- dvd+rw-tools-7.1/growisofs_mmc.cpp.wrk	2013-06-24 14:18:38.898344970 +0200
++++ dvd+rw-tools-7.1/growisofs_mmc.cpp	2013-06-24 14:20:00.428025541 +0200
+@@ -756,6 +756,8 @@ static void bd_r_format (Scsi_Command &c
+ 
+     wait_for_unit (cmd);
+ 
++    bdr_plus_pow = 1;
++
+     cmd[0] = 0x35;	// FLUSH CACHE
+     cmd[9] = 0;
+     cmd.transport();

@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "10-mod_security.conf": "01a1e5ed3357a2de6b9dbd0f6b02cde2d92ebf0fcb6d6adcfa2b064c7fcdf0a0",
+  "mod_security.conf": "c945d2d940121ee8eaa8a29c5b1eabdcc589d46644a152e9d809fb3340a1e368",
+  "modsecurity-2.9.3.tar.gz": "4192019d169d3f1dd82cc4714db6986df54c6ceb4ee1c8f253de78d1a6b62118",
+  "modsecurity_localrules.conf": "9aa9e822f13552d5159ab5543d92551d1200a3ae52870907f1b0dafcf0c67c22"
+ }
+}

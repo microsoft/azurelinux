@@ -1,0 +1,77 @@
+From a4f9b41e228c943c9997851a3581326ca1435058 Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Thu, 28 Nov 2019 14:56:30 +0100
+Subject: [PATCH 2/2] autostart-app: Place launched applications into a systemd
+ scope
+
+Try to place launched applications into a systemd scope. This will only
+have an effect on systemd managed sessions, where it will e.g. protect
+gnome-session from OOM actions to a child resulting in a service
+shutdown.
+---
+ gnome-session/gsm-autostart-app.c | 14 ++++++++++++++
+ meson.build                       |  5 ++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/gnome-session/gsm-autostart-app.c b/gnome-session/gsm-autostart-app.c
+index 6fd5915a..28b1a88e 100644
+--- a/gnome-session/gsm-autostart-app.c
++++ b/gnome-session/gsm-autostart-app.c
+@@ -28,6 +28,11 @@
+ #include <gio/gio.h>
+ #include <gio/gdesktopappinfo.h>
+ 
++#ifdef HAVE_GNOME_SYSTEMD
++#define GNOME_DESKTOP_USE_UNSTABLE_API
++#include <libgnome-desktop/gnome-systemd.h>
++#endif
++
+ #ifdef HAVE_SYSTEMD
+ #ifdef ENABLE_SYSTEMD_JOURNAL
+ #include <systemd/sd-journal.h>
+@@ -960,6 +965,15 @@ app_launched (GAppLaunchContext *ctx,
+         g_variant_lookup (platform_data, "startup-notification-id", "s", &sn_id);
+         app->priv->pid = pid;
+         app->priv->startup_id = sn_id;
++
++#ifdef HAVE_GNOME_SYSTEMD
++        /* We are not interested in the result. */
++        gnome_start_systemd_scope (app->priv->desktop_id,
++                                   pid,
++                                   NULL,
++                                   NULL,
++                                   NULL, NULL, NULL);
++#endif
+ }
+ 
+ #ifdef ENABLE_SYSTEMD_JOURNAL
+diff --git a/meson.build b/meson.build
+index fc0fa683..1a62113b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -99,11 +99,12 @@ xtrans_dep = dependency('xtrans')
+ ice_dep = dependency('ice')
+ sm_dep = dependency('sm')
+ x11_dep = dependency('x11')
++gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>= 3.34.2')
+ 
+ session_deps = [
+   gio_dep,
+   glib_dep,
+-  dependency('gnome-desktop-3.0', version: '>= 3.18.0'),
++  gnome_desktop_dep,
+   dependency('json-glib-1.0', version: '>= 0.10')
+ ]
+ 
+@@ -171,6 +172,8 @@ config_h.set('ENABLE_SYSTEMD_SESSION', enable_systemd_session)
+ config_h.set('ENABLE_SYSTEMD_JOURNAL', enable_systemd_journal)
+ config_h.set('HAVE_CONSOLEKIT', enable_consolekit)
+ config_h.set10('USE_SYSTEMD_SESSION', use_systemd_session)
++# Added in gnome-desktop 3.34.2/3.35.2
++config_h.set('HAVE_GNOME_SYSTEMD', cc.has_header('libgnome-desktop/gnome-systemd.h', dependencies: gnome_desktop_dep))
+ 
+ configure_file(
+   output: 'config.h',
+-- 
+2.23.0
+

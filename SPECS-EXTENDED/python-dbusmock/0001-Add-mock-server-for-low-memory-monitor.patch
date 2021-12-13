@@ -1,0 +1,130 @@
+From 157499e2f07e6cf77e6ddd1619a55932809f99cb Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Thu, 14 Nov 2019 14:09:44 +0100
+Subject: [PATCH] Add mock server for low-memory-monitor
+
+API version 2.0
+
+https://gitlab.freedesktop.org/hadess/low-memory-monitor/
+---
+ dbusmock/templates/low_memory_monitor.py | 38 +++++++++++++++
+ tests/test_low_memory_monitor.py         | 62 ++++++++++++++++++++++++
+ 2 files changed, 100 insertions(+)
+ create mode 100644 dbusmock/templates/low_memory_monitor.py
+ create mode 100644 tests/test_low_memory_monitor.py
+
+diff --git a/dbusmock/templates/low_memory_monitor.py b/dbusmock/templates/low_memory_monitor.py
+new file mode 100644
+index 0000000..bb9a757
+--- /dev/null
++++ b/dbusmock/templates/low_memory_monitor.py
+@@ -0,0 +1,38 @@
++'''low-memory-monitor mock template
++
++This creates the expected methods and properties of the main
++org.freedesktop.LowMemoryMonitor object.
++
++This provides only the 2.0 D-Bus API of low-memory-monitor.
++'''
++
++# This program is free software; you can redistribute it and/or modify it under
++# the terms of the GNU Lesser General Public License as published by the Free
++# Software Foundation; either version 3 of the License, or (at your option) any
++# later version.  See http://www.gnu.org/copyleft/lgpl.html for the full text
++# of the license.
++
++__author__ = 'Bastien Nocera'
++__email__ = 'hadess@hadess.net'
++__copyright__ = '(c) 2019, Red Hat Inc.'
++__license__ = 'LGPL 3+'
++
++import dbus
++
++from dbusmock import MOCK_IFACE, mockobject
++import dbusmock
++
++BUS_NAME = 'org.freedesktop.LowMemoryMonitor'
++MAIN_OBJ = '/org/freedesktop/LowMemoryMonitor'
++MAIN_IFACE = 'org.freedesktop.LowMemoryMonitor'
++SYSTEM_BUS = True
++
++
++def load(mock, parameters):
++    # Loaded!
++    mock.loaded = True
++
++@dbus.service.method(MOCK_IFACE,
++                     in_signature='y', out_signature='')
++def EmitWarning(self, state):
++    self.EmitSignal(MAIN_IFACE, 'LowMemoryWarning', 'y', [dbus.Byte(state)])
+diff --git a/tests/test_low_memory_monitor.py b/tests/test_low_memory_monitor.py
+new file mode 100644
+index 0000000..b4b1fd7
+--- /dev/null
++++ b/tests/test_low_memory_monitor.py
+@@ -0,0 +1,62 @@
++#!/usr/bin/python3
++
++# This program is free software; you can redistribute it and/or modify it under
++# the terms of the GNU Lesser General Public License as published by the Free
++# Software Foundation; either version 3 of the License, or (at your option) any
++# later version.  See http://www.gnu.org/copyleft/lgpl.html for the full text
++# of the license.
++
++__author__ = 'Bastien Nocera'
++__email__ = 'hadess@hadess.net'
++__copyright__ = '(c) 2019 Red Hat Inc.'
++__license__ = 'LGPL 3+'
++
++import unittest
++import sys
++import subprocess
++import dbus
++import dbus.mainloop.glib
++import dbusmock
++import fcntl
++import os
++
++from gi.repository import GLib
++
++dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++class TestLowMemoryMonitor(dbusmock.DBusTestCase):
++    '''Test mocking gnome-screensaver'''
++
++    @classmethod
++    def setUpClass(klass):
++        klass.start_system_bus()
++        klass.dbus_con = klass.get_dbus(True)
++
++    def setUp(self):
++        (self.p_mock, self.obj_lmm) = self.spawn_server_template(
++            'low_memory_monitor', {}, stdout=subprocess.PIPE)
++        # set log to nonblocking
++        flags = fcntl.fcntl(self.p_mock.stdout, fcntl.F_GETFL)
++        fcntl.fcntl(self.p_mock.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
++        self.last_warning = -1
++        self.dbusmock = dbus.Interface(self.obj_lmm, dbusmock.MOCK_IFACE)
++
++    def tearDown(self):
++        self.p_mock.terminate()
++        self.p_mock.wait()
++
++    def test_low_memory_warning_signal(self):
++        '''LowMemoryWarning signal'''
++
++        self.dbusmock.EmitWarning(100)
++        log = self.p_mock.stdout.read()
++        self.assertRegex(log, b'[0-9.]+ emit .*LowMemoryWarning 100\n')
++
++        self.dbusmock.EmitWarning(255)
++        log = self.p_mock.stdout.read()
++        self.assertRegex(log, b'[0-9.]+ emit .*LowMemoryWarning 255\n')
++
++
++if __name__ == '__main__':
++    # avoid writing to stderr
++    unittest.main(testRunner=unittest.TextTestRunner(stream=sys.stdout, verbosity=2))
+-- 
+2.21.0
+

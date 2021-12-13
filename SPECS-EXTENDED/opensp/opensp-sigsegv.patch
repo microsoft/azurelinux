@@ -1,0 +1,20 @@
+--- OpenSP-1.5.2/lib/ExtendEntityManager.cxx	2005-11-05 10:05:20.000000000 +0100
++++ OpenSP-1.5.2.new/lib/ExtendEntityManager.cxx	2007-06-21 12:56:26.000000000 +0200
+@@ -1238,7 +1238,8 @@ StorageObjectSpec::StorageObjectSpec()
+ }
+ 
+ StorageObjectSpec::StorageObjectSpec(const StorageObjectSpec& x)
+-: codingSystemName(x.codingSystemName),
++: storageManager(x.storageManager),
++  codingSystemName(x.codingSystemName),
+   codingSystem(x.codingSystem),
+   specId(x.specId),
+   baseId(x.baseId),
+@@ -1253,6 +1254,7 @@ StorageObjectSpec::StorageObjectSpec(con
+ StorageObjectSpec& StorageObjectSpec::operator=(const StorageObjectSpec& x)
+ {
+   if (this != &x) {
++    storageManager = x.storageManager;
+     codingSystemName = x.codingSystemName;
+     codingSystem = x.codingSystem;
+     specId = x.specId;

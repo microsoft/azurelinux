@@ -1,0 +1,13 @@
+diff -urNp gst-plugins-bad-1.16.2.orig/common/gst-glib-gen.mak gst-plugins-bad-1.16.2/common/gst-glib-gen.mak
+--- gst-plugins-bad-1.16.2.orig/common/gst-glib-gen.mak	2020-03-20 14:57:08.587740695 +0100
++++ gst-plugins-bad-1.16.2/common/gst-glib-gen.mak	2020-03-20 15:00:42.584798988 +0100
+@@ -8,7 +8,8 @@
+ #glib_gen_decl_banner=GST_EXPORT
+ #glib_gen_decl_include=\#include <gst/foo/foo-prelude.h>
+ 
+-enum_headers=$(foreach h,$(glib_enum_headers),\n\#include \"$(h)\")
++hash:=\#
++enum_headers=$(foreach h,$(glib_enum_headers),\n$(hash)include \"$(h)\")
+ 
+ # these are all the rules generating the relevant files
+ $(glib_gen_basename)-marshal.h: $(glib_gen_basename)-marshal.list

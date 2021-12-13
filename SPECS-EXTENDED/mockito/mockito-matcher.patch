@@ -1,0 +1,39 @@
+From 02df4868e1614b9fd224e40c1556b78eeb01cd3d Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Wed, 4 Dec 2013 16:52:24 +0100
+Subject: [PATCH] mockito matcher
+
+Signed-off-by: Michael Simacek <msimacek@redhat.com>
+---
+ src/org/mockito/internal/matchers/LocalizedMatcher.java | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/org/mockito/internal/matchers/LocalizedMatcher.java b/src/org/mockito/internal/matchers/LocalizedMatcher.java
+index d6dda04..9dffe06 100644
+--- a/src/org/mockito/internal/matchers/LocalizedMatcher.java
++++ b/src/org/mockito/internal/matchers/LocalizedMatcher.java
+@@ -22,6 +22,12 @@ public class LocalizedMatcher implements Matcher, ContainsExtraTypeInformation,
+         this.location = new LocationImpl();
+     }
+ 
++    /* This is a hack for Fedora. Bug has been filed here:
++     * https://code.google.com/p/mockito/issues/detail?id=428 */
++    public void describeMismatch(Object item, Description mismatchDescription) {
++        mismatchDescription.appendText("was ").appendValue(item);
++    }
++
+     public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
+         // yeah right
+     }
+@@ -37,7 +43,7 @@ public class LocalizedMatcher implements Matcher, ContainsExtraTypeInformation,
+     public Location getLocation() {
+         return location;
+     }
+-    
++
+     @Override
+     public String toString() {
+         return "Localized: " + this.actualMatcher;
+-- 
+1.8.3.1
+

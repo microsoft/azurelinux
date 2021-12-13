@@ -1,0 +1,75 @@
+From c36cd3c3eaad3ce9486d7c49c50b9d309a0d5fe1 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Tue, 24 Nov 2015 12:59:13 +0100
+Subject: [PATCH 2/2] Port to current maven-artifact
+
+---
+ .../apache/maven/plugin/testing/stubs/StubArtifactCollector.java    | 6 +++---
+ .../org/apache/maven/plugin/testing/stubs/StubArtifactResolver.java | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactCollector.java b/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactCollector.java
+index be7e156..c6a059e 100644
+--- a/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactCollector.java
++++ b/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactCollector.java
+@@ -51,7 +51,7 @@ public class StubArtifactCollector
+     }
+ 
+     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+-                                             Map managedVersions, ArtifactResolutionRequest repositoryRequest,
++            Map<String, Artifact> managedVersions, ArtifactResolutionRequest repositoryRequest,
+                                              ArtifactMetadataSource source, ArtifactFilter filter,
+                                              List<ResolutionListener> listeners,
+                                              List<ConflictResolver> conflictResolvers )
+@@ -60,7 +60,7 @@ public class StubArtifactCollector
+     }
+ 
+     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+-                                             Map managedVersions, ArtifactRepository localRepository,
++            Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
+                                              List<ArtifactRepository> remoteRepositories,
+                                              ArtifactMetadataSource source, ArtifactFilter filter,
+                                              List<ResolutionListener> listeners,
+@@ -70,7 +70,7 @@ public class StubArtifactCollector
+     }
+ 
+     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+-                                             Map managedVersions, ArtifactRepository localRepository,
++            Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
+                                              List<ArtifactRepository> remoteRepositories,
+                                              ArtifactMetadataSource source, ArtifactFilter filter,
+                                              List<ResolutionListener> listeners )
+diff --git a/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactResolver.java b/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactResolver.java
+index cc02ec0..2d90152 100644
+--- a/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactResolver.java
++++ b/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactResolver.java
+@@ -141,7 +141,7 @@ public class StubArtifactResolver
+      * @see org.apache.maven.artifact.resolver.ArtifactResolver#resolveTransitively(java.util.Set, org.apache.maven.artifact.Artifact, java.util.Map, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List, org.apache.maven.artifact.metadata.ArtifactMetadataSource)
+      */
+     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+-                                                        Map managedVersions, ArtifactRepository localRepository,
++            Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source )
+         throws ArtifactResolutionException, ArtifactNotFoundException
+     {
+@@ -153,7 +153,7 @@ public class StubArtifactResolver
+      * @see org.apache.maven.artifact.resolver.ArtifactResolver#resolveTransitively(java.util.Set, org.apache.maven.artifact.Artifact, java.util.Map, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List, org.apache.maven.artifact.metadata.ArtifactMetadataSource, org.apache.maven.artifact.resolver.filter.ArtifactFilter)
+      */
+     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+-                                                        Map managedVersions, ArtifactRepository localRepository,
++            Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source,
+                                                         ArtifactFilter filter )
+         throws ArtifactResolutionException, ArtifactNotFoundException
+@@ -166,7 +166,7 @@ public class StubArtifactResolver
+      * @see org.apache.maven.artifact.resolver.ArtifactResolver#resolveTransitively(java.util.Set, org.apache.maven.artifact.Artifact, java.util.Map, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List, org.apache.maven.artifact.metadata.ArtifactMetadataSource, org.apache.maven.artifact.resolver.filter.ArtifactFilter, java.util.List)
+      */
+     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+-                                                        Map managedVersions, ArtifactRepository localRepository,
++            Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source,
+                                                         ArtifactFilter filter, List<ResolutionListener> listeners )
+         throws ArtifactResolutionException, ArtifactNotFoundException
+-- 
+2.5.0
+

@@ -1,0 +1,46 @@
+Notes for Spamassassin for RHEL or Fedora
+=========================================
+spamassassin-3.3.x RPM package for RHEL 5+ or Fedora 11+ contains some new 
+functionality beyond the upstream spamassassin documentation.
+
+Upstream spamassassin-3.3.0 is no longer distributed with rules.  Our package 
+contains rules in order to be less of a surprise to system administrators.
+However just as you wouldn't rely on antivirus software without signature
+updates, spamassassin cannot be relied upon without regular rule updates.
+
+1) For these reasons, our RPM package now runs nightly sa-update by default.
+
+/etc/cron.d/sa-update
+The default cron runs sa-update once every night.  You may edit this cron 
+file to change the schedule of sa-update or to disable it entirely.  If you 
+had modified this file in the past you may need to restore the new file 
+from /etc/cron.d/sa-update.rpmnew
+
+2) /usr/share/spamassassin/sa-update.cron
+This script is executed by cron.  It runs sa-update only if a known spam 
+daemon is running: spamd, amavisd, or mimedefang.  If you do not run any
+of these spam daemons but wish to have nightly sa-update, you may 
+override the daemon check in /etc/sysconfig/sa-update
+
+3) /etc/mail/spamassassin/channel.d
+All sa-update channels are defined in files contained in this directory.
+See the existing config files as examples for writing your own config file.
+
+4) SOUGHT Anti-Fraud Rule Channel is Enabled by Default
+http://wiki.apache.org/spamassassin/SoughtRules
+
+General Warnings
+================
+* DO NOT USE SARE or OpenProtect rules.  They are old and outdated, and
+  can be dangerous.  Many of the useful rules have been integrated into
+  upstream spamassassin.
+
+Note about -d option
+====================
+
+With spamassassin 3.4.0, this package has switched the way spamd is started. 
+You should no longer use the '-d' option in /etc/sysconfig/spamassassin. Doing 
+so will result in spamd starting and stopping in a loop. The default 
+/etc/sysconfig/spamassassin file has been adjusted for this, please merge 
+this change into that file if you have made any changes to it. 
+

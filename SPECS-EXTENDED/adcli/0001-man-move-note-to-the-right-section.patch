@@ -1,0 +1,48 @@
+From d2d3879bdfcea70757a8b0527882e79e8b5c6e70 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Wed, 27 Nov 2019 18:26:44 +0100
+Subject: [PATCH 1/6] man: move note to the right section
+
+Unfortunately the note about the password lifetime was added to the join
+section. This patch move it to the update section where it belongs to.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1738573
+           https://bugzilla.redhat.com/show_bug.cgi?id=1745931
+           https://bugzilla.redhat.com/show_bug.cgi?id=1774622
+---
+ doc/adcli.xml | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/doc/adcli.xml b/doc/adcli.xml
+index 4f201e0..9faf96a 100644
+--- a/doc/adcli.xml
++++ b/doc/adcli.xml
+@@ -330,11 +330,7 @@ Password for Administrator:
+ 			important here is currently the
+ 			<option>workgroup</option> option, see
+ 			<citerefentry><refentrytitle>smb.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+-			for details.</para>
+-			<para>Note that if the machine account password is not
+-			older than 30 days, you have to pass
+-			<option>--computer-password-lifetime=0</option> to
+-			force the update.</para></listitem>
++			for details.</para></listitem>
+ 		</varlistentry>
+ 		<varlistentry>
+ 			<term><option>--samba-data-tool=<parameter>/path/to/net</parameter></option></term>
+@@ -472,7 +468,11 @@ $ adcli update --login-ccache=/tmp/krbcc_123
+ 			important here is currently the
+ 			<option>workgroup</option> option, see
+ 			<citerefentry><refentrytitle>smb.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+-			for details.</para></listitem>
++			for details.</para>
++			<para>Note that if the machine account password is not
++			older than 30 days, you have to pass
++			<option>--computer-password-lifetime=0</option> to
++			force the update.</para></listitem>
+ 		</varlistentry>
+ 		<varlistentry>
+ 			<term><option>--samba-data-tool=<parameter>/path/to/net</parameter></option></term>
+-- 
+2.25.1
+

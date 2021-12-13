@@ -1,0 +1,76 @@
+
+Drop "Configure Command" from phpinfo as it doesn't
+provide any useful information.
+The available extensions are not related to this command.
+
+diff -up a/ext/standard/info.c.phpinfo v/ext/standard/info.c
+--- a/ext/standard/info.c.phpinfo	2015-08-18 23:39:24.000000000 +0200
++++ b/ext/standard/info.c	2015-08-22 07:56:18.344761928 +0200
+@@ -809,9 +809,6 @@ PHPAPI void php_print_info(int flag)
+ #ifdef ARCHITECTURE
+ 		php_info_print_table_row(2, "Architecture", ARCHITECTURE);
+ #endif
+-#ifdef CONFIGURE_COMMAND
+-		php_info_print_table_row(2, "Configure Command", CONFIGURE_COMMAND );
+-#endif
+ 
+ 		if (sapi_module.pretty_name) {
+ 			php_info_print_table_row(2, "Server API", sapi_module.pretty_name );
+diff -up a/ext/standard/tests/general_functions/phpinfo.phpt.phpinfo b/ext/standard/tests/general_functions/phpinfo.phpt
+--- a/ext/standard/tests/general_functions/phpinfo.phpt.phpinfo	2015-08-18 23:39:22.000000000 +0200
++++ b/ext/standard/tests/general_functions/phpinfo.phpt	2015-08-22 07:56:18.344761928 +0200
+@@ -20,7 +20,6 @@ PHP Version => %s
+ 
+ System => %s
+ Build Date => %s%a
+-Configure Command => %s
+ Server API => Command Line Interface
+ Virtual Directory Support => %s
+ Configuration File (php.ini) Path => %s
+
+
+Backported  from 8.0:
+
+From ad0d2e438fddc089917e71e5d8909d145db9da8a Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Fri, 3 Jul 2020 10:08:09 +0200
+Subject: [PATCH] display info about system used to build and its provider
+
+---
+ configure.ac        | 5 +++++
+ ext/standard/info.c | 6 ++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index d9e6329314a3..77f12a55569a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1328,6 +1328,11 @@ PHP_UNAME=${PHP_UNAME:-$UNAME}
+ AC_DEFINE_UNQUOTED(PHP_UNAME,"$PHP_UNAME",[uname -a output])
+ PHP_OS=`uname | xargs`
+ AC_DEFINE_UNQUOTED(PHP_OS,"$PHP_OS",[uname output])
++PHP_BUILD_SYSTEM=${PHP_BUILD_SYSTEM:-$PHP_UNAME}
++AC_DEFINE_UNQUOTED(PHP_BUILD_SYSTEM,"$PHP_BUILD_SYSTEM",[builder uname output])
++if test -n "${PHP_BUILD_PROVIDER}"; then
++  AC_DEFINE_UNQUOTED(PHP_BUILD_PROVIDER,"$PHP_BUILD_PROVIDER",[build provider])
++fi
+ 
+ PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
+ 
+diff --git a/ext/standard/info.c b/ext/standard/info.c
+index 262e95ae2731..f652efd23657 100644
+--- a/ext/standard/info.c
++++ b/ext/standard/info.c
+@@ -803,6 +803,12 @@ PHPAPI ZEND_COLD void php_print_info(int flag)
+ 		php_info_print_table_start();
+ 		php_info_print_table_row(2, "System", ZSTR_VAL(php_uname));
+ 		php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__);
++#ifdef PHP_BUILD_SYSTEM
++		php_info_print_table_row(2, "Build System", PHP_BUILD_SYSTEM);
++#endif
++#ifdef PHP_BUILD_PROVIDER
++		php_info_print_table_row(2, "Build Provider", PHP_BUILD_PROVIDER);
++#endif
+ #ifdef COMPILER
+ 		php_info_print_table_row(2, "Compiler", COMPILER);
+ #endif

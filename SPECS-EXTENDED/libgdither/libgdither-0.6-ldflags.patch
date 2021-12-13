@@ -1,0 +1,11 @@
+--- libgdither-0.6/Makefile	2018-04-10 18:23:46.000822954 +0200
++++ libgdither-0.6/Makefile	2018-04-10 18:25:25.783013273 +0200
+@@ -10,7 +10,7 @@
+ 	$(CC) $(CFLAGS) -c gdither.c
+ 
+ libgdither.so: gdither.o
+-	$(CC) -shared gdither.o -Wl,-soname,libgdither.so.1 -o libgdither.so.1.0
++	$(CC) $(LDFLAGS) -shared gdither.o -Wl,-soname,libgdither.so.1 -o libgdither.so.1.0
+ 
+ libgdither.pc: libgdither.pc.in Makefile
+ 	sed -e 's|@VERSION@|$(VERSION)|' -e 's|@PREFIX@|$(PREFIX)|' \

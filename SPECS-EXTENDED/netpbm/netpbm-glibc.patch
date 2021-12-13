@@ -1,0 +1,13 @@
+--- netpbm-10.35/converter/other/pnmtotiffcmyk.c.glibc	2006-09-18 12:20:06.000000000 +0200
++++ netpbm-10.35/converter/other/pnmtotiffcmyk.c	2007-08-23 09:18:30.000000000 +0200
+@@ -974,8 +974,8 @@ int main( int argc, char **argv ) {
+ 
+   if ( (err = parseOpts( argc, argv, rt )) ) goto exit ;
+   
+-  if ( (err = rt->in->open( rt->in, rt )) ) goto exit ;
+-  if ( (err = rt->out->open( rt->out, rt )) ) goto exit ;
++  if ( (err = (rt->in->open)( rt->in, rt )) ) goto exit ;
++  if ( (err = (rt->out->open)( rt->out, rt )) ) goto exit ;
+ 
+   while ( rt->in->hasMore( rt->in ) ) {
+     if ( (err = rt->in->next( rt->in, &r, &g, &b )) ) goto exit ;

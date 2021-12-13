@@ -1,0 +1,58 @@
+--- a/src/wav.c
++++ b/src/wav.c
+@@ -712,6 +712,11 @@
+         ft->signal.channels = wChannels;
+     else
+         lsx_report("User options overriding channels read in .wav header");
++
++    if (ft->signal.channels == 0) {
++        lsx_fail_errno(ft, SOX_EHDR, "Channel count is zero");
++        return SOX_EOF;
++    }
+ 
+     if (ft->signal.rate == 0 || ft->signal.rate == dwSamplesPerSecond)
+         ft->signal.rate = dwSamplesPerSecond;
+--- a/src/hcom.c
++++ b/src/hcom.c
+@@ -73,6 +73,14 @@
+   size_t pos;                /* Where next byte goes */
+ } priv_t;
+ 
++static int dictvalid(int n, int size, int left, int right)
++{
++        if (n > 0 && left < 0)
++                return 1;
++
++        return (unsigned)left < size && (unsigned)right < size;
++}
++
+ static int startread(sox_format_t * ft)
+ {
+         priv_t *p = (priv_t *) ft->priv;
+@@ -150,6 +158,11 @@
+                 lsx_debug("%d %d",
+                        p->dictionary[i].dict_leftson,
+                        p->dictionary[i].dict_rightson);
++                if (!dictvalid(i, dictsize, p->dictionary[i].dict_leftson,
++                               p->dictionary[i].dict_rightson)) {
++                        lsx_fail_errno(ft, SOX_EHDR, "Invalid dictionary");
++                        return SOX_EOF;
++                }
+         }
+         rc = lsx_skipbytes(ft, (size_t) 1); /* skip pad byte */
+         if (rc)
+--- a/src/wav.c
++++ b/src/wav.c
+@@ -1381,6 +1381,12 @@
+     int bytespersample; /* (uncompressed) bytes per sample (per channel) */
+     long blocksWritten = 0;
+     sox_bool isExtensible = sox_false;    /* WAVE_FORMAT_EXTENSIBLE? */
++
++    if (ft->signal.channels > UINT16_MAX) {
++        lsx_fail_errno(ft, SOX_EOF, "Too many channels (%u)",
++                       ft->signal.channels);
++        return SOX_EOF;
++    }
+ 
+     dwSamplesPerSecond = ft->signal.rate;
+     wChannels = ft->signal.channels;

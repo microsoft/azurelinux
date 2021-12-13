@@ -1,0 +1,24 @@
+converterSample.asl     37:     Method(MAIN) {
+Remark   2120 -                          ^ Control Method should be made Serialized (due to creation of named objects within)
+
+converterSample.asl     48:             Name(b,0);
+Remark   2089 -    Object is not referenced ^  (Name [B___] is within a method [MAIN])
+
+converterSample.asl     65:     Method(SCOP)
+Remark   2120 -                          ^ Control Method should be made Serialized (due to creation of named objects within)
+
+converterSample.asl     68:         Name (a1, 0x04)
+Remark   2089 -  Object is not referenced ^  (Name [A1__] is within a method [SCOP])
+
+converterSample.asl     76:         Offset(0),//c37
+Remark   2158 -                           ^ Unnecessary/redundant use of Offset operator
+
+
+Intel ACPI Component Architecture
+ASL+ Optimizing Compiler/Disassembler version VVVVVVVV
+Copyright (c) 2000 - 2019 Intel Corporation
+
+ASL Input:     converterSample.asl -    1968 bytes     11 keywords     85 source lines
+AML Output:    converterSample.aml -     180 bytes      2 opcodes       9 named objects
+
+Compilation successful. 0 Errors, 0 Warnings, 5 Remarks, 12 Optimizations, 1 Constants Folded

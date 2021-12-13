@@ -1,0 +1,19 @@
+--- commons-collections4-4.1-src/build.xml	2015-11-25 22:52:41.000000000 +0100
++++ commons-collections4-4.1-src/build.xml	2019-02-25 13:29:35.562798645 +0100
+@@ -29,7 +29,6 @@
+     <property file="${user.home}/build.properties"/>
+     <property file="${basedir}/build.properties"/>
+     <property file="${basedir}/default.properties"/>
+-    <property name="jdk.javadoc" value="http://download.oracle.com/javase/1.5.0/docs/api/"/>
+ 
+     <!-- ========== Construct compile classpath =============================== -->
+     <path id="compile.classpath">
+@@ -125,8 +124,6 @@
+                  encoding="${compile.encoding}"
+                  source="${compile.source}">
+             <classpath refid="compile.classpath"/>
+-            <link href="${jdk.javadoc}"/>
+-            <link href="${collections.javadoc}"/>
+         </javadoc>
+     </target>
+ 

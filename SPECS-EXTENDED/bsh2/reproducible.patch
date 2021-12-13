@@ -1,0 +1,11 @@
+--- beanshell-2.0b6/build.xml.orig	2016-02-05 17:16:07.000000000 +0000
++++ beanshell-2.0b6/build.xml	2016-03-16 17:16:55.240594000 +0000
+@@ -202,7 +202,7 @@
+ 		<copy file="${engine-config}" todir="${build-dir}/META-INF/services" />
+ 
+ 		<tstamp>
+-			<format property="DATE" pattern="yyyy-MM-dd hh:mm:ss" />
++			<format property="DATE" pattern="" />
+ 		</tstamp>
+ 	</target>
+ 

@@ -1,0 +1,42 @@
+From 61e57e73a6c63ad50825182ca80bc2a5fcb3e1e2 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Tue, 30 Jul 2019 17:25:46 +0200
+Subject: [PATCH] quotacheck: Skip checking of filesystems with hidded quota
+ files early
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Currently when filesystem tracks quotas in hidden quota files (but is
+also capable of tracking it in regular files), we scan the whole
+filesystem and only after that find out we cannot actually make use of
+newly created quota files. Just detect this case before scanning the fs
+and skip it.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ quotacheck.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/quotacheck.c b/quotacheck.c
+index 2cdf475..1311c10 100644
+--- a/quotacheck.c
++++ b/quotacheck.c
+@@ -1181,11 +1181,11 @@ static int check_all(void)
+ 			continue;
+ 		}
+ 		cfmt = fmt;
+-		if (uwant && me_hasquota(mnt, USRQUOTA))
++		if (uwant && me_hasquota(mnt, USRQUOTA) && mnt->me_qfmt[USRQUOTA] != QF_META)
+ 			ucheck = 1;
+ 		else
+ 			ucheck = 0;
+-		if (gwant && me_hasquota(mnt, GRPQUOTA))
++		if (gwant && me_hasquota(mnt, GRPQUOTA) && mnt->me_qfmt[GRPQUOTA] != QF_META)
+ 			gcheck = 1;
+ 		else
+ 			gcheck = 0;
+-- 
+2.21.0
+

@@ -1,0 +1,27 @@
+diff -ur dvd+rw-tools-7.0/Makefile.m4 dvd+rw-tools-7.0-manpatch/Makefile.m4
+--- dvd+rw-tools-7.0/Makefile.m4	2006-09-24 19:55:19.000000000 +0200
++++ dvd+rw-tools-7.0-manpatch/Makefile.m4	2006-10-09 10:44:31.000000000 +0200
+@@ -191,7 +191,7 @@
+ LINK.o	=$(LINK.cc)
+ 
+ prefix?=/usr/local
+-manprefix?=$(shell case $(prefix) in (*/usr/?*) echo $(prefix)/man ;; (*) echo $(prefix)/share/man ;; esac)
++mandir?=$(shell case $(prefix) in (*/usr/?*) echo $(prefix)/man ;; (*) echo $(prefix)/share/man ;; esac)
+ 
+ bin_mode?=0755	# yes, default is *no* set-uid
+ minus_o:=$(shell [[ `id -u` == 0 ]] && echo "-o root")
+@@ -199,10 +199,10 @@
+ install:	dvd+rw-tools
+ 	[[ -d $(prefix)/bin ]] || mkdir -p $(prefix)/bin
+ 	install $(minus_o) -m $(bin_mode) $(CHAIN) $(prefix)/bin
+-	[[ -d $(manprefix)/man1 ]] || mkdir -p $(manprefix)/man1
+-	install $(minus_o) -m 0644 growisofs.1 $(manprefix)/man1
+-	-[[ -f rpl8 ]] && install $(minus_o) -m $(bin_mode) rpl8 $(prefix)/bin; :
+-	-[[ -f btcflash ]] && install $(minus_o) -m $(bin_mode) btcflash $(prefix)/bin; :
++	[[ -d $(mandir)/man1 ]] || mkdir -p $(mandir)/man1
++	install $(minus_o) -m 0644 growisofs.1 $(mandir)/man1
++	-[[ -f rpl8 ]] && install $(minus_o) -m $(bin_mode) rpl8 $(prefix)/bin || :
++	-[[ -f btcflash ]] && install $(minus_o) -m $(bin_mode) btcflash $(prefix)/bin || :
+ ])
+ 
+ # common section

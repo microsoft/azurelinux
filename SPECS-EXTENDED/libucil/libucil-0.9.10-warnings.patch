@@ -1,0 +1,454 @@
+ src/colorspace.c     |   15 ---
+ src/ucil_gstreamer.c |   12 --
+ src/ucil_ppm.c       |    1 +
+ src/ucil_rawavi.c    |   29 -----
+ src/ucil_theora.c    |  280 --------------------------------------------------
+ src/video_file.c     |    8 --
+ 6 files changed, 1 insertions(+), 344 deletions(-)
+
+diff --git a/src/colorspace.c b/src/colorspace.c
+index 01ec086..2345270 100644
+--- a/src/colorspace.c
++++ b/src/colorspace.c
+@@ -108,7 +108,6 @@ static void y4202rgb32( __u8 *dest, __u8 *source, int width, int height );
+ static void y8002rgb24( __u8 *dest, __u8 *source, int width, int height );
+ static void y8002rgb32( __u8 *dest, __u8 *source, int width, int height );
+ static void rgb242y800( __u8 *dest, __u8 *source, int width, int height );
+-static void rgb322y800( __u8 *dest, __u8 *source, int width, int height );
+ static void uyvytoyuv422p( __u8 *dest, __u8 *src, int width, int height );
+ static void uyvytoyuv420p( __u8 *dest, __u8 *src, int width, int height );
+ static void yuv420ptouyvy( __u8 *dest, __u8 *src, int width, int height );
+@@ -2832,20 +2831,6 @@ static void rgb242y800( __u8 *dest, __u8 *source, int width, int height )
+    }
+ }
+ 
+-static void rgb322y800( __u8 *dest, __u8 *source, int width, int height )
+-{
+-   int i;
+-   int dest_offset = 0;
+-   int source_size = width * height * 4;
+-   
+-   for( i = 1; i < source_size; i += 4 ){
+-      __u8 y;
+-      y = source[i];
+-      dest[dest_offset++] = y;
+-   }
+-}
+-
+-
+ static void y8002rgb32( __u8 *dest, __u8 *source, int width, int height )
+ {
+    int i;
+diff --git a/src/ucil_gstreamer.c b/src/ucil_gstreamer.c
+index 1c707fe..eaf025f 100644
+--- a/src/ucil_gstreamer.c
++++ b/src/ucil_gstreamer.c
+@@ -269,18 +269,6 @@ static void destroy_vobj( ucil_gstreamer_video_file_object_t *vobj )
+    g_free( vobj );
+ }
+ 
+-static void parse_ogg_theora_parameters( GstElement *encoder, ucil_gstreamer_video_file_object_t *vobj, guint n_parameters, GParameter *parameters )
+-{
+-   int i;
+-   for( i = 0; i < n_parameters; i++ ){
+-      if( !strcmp( parameters[i].name, "quality" ) ){
+-	 g_object_set( encoder, "quality", g_value_get_int( &parameters[i].value ), NULL );
+-      } else if ( !strcmp( parameters[i].name, "bitrate" ) ){
+-	 g_object_set( encoder, "bitrate", g_value_get_int( &parameters[i].value ), NULL );
+-      }
+-   }
+-}
+-
+ static void parse_parameters( ucil_gstreamer_video_file_object_t *vobj, guint n_parameters, GParameter *parameters )
+ {
+    int i;
+diff --git a/src/ucil_ppm.c b/src/ucil_ppm.c
+index f02240a..c536d3e 100644
+--- a/src/ucil_ppm.c
++++ b/src/ucil_ppm.c
+@@ -1,6 +1,7 @@
+ #include "ucil.h"
+ #include "ucil_private.h"
+ 
++#include <ctype.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <errno.h>
+diff --git a/src/ucil_rawavi.c b/src/ucil_rawavi.c
+index 8b6f7b4..de25da5 100644
+--- a/src/ucil_rawavi.c
++++ b/src/ucil_rawavi.c
+@@ -77,7 +77,6 @@ struct _ucil_rawavi_video_file_object
+ #define AVI_PAD_SIZE 4096
+ 
+ static void avi_add_chunk( avi_buffer_t *buffer, __u32 fourcc, __u32 size, __u8 *data );
+-static __u32 avi_add_list_hdr( avi_buffer_t *buffer, __u32 fourcc, __u32 size );
+ static __u32 avi_add_chunk_hdr( avi_buffer_t *buffer, __u32 fourcc, __u32 size );
+ static void avi_list_pad( avi_buffer_t *list, int offset, int padding );
+ static int avi_write_buffer( FILE *f, avi_buffer_t *buffer );
+@@ -137,7 +136,6 @@ static void *ucil_rawavi_encode_thread( ucil_rawavi_video_file_object_t *vobj )
+ static int write_avi_header( FILE *f )
+ {
+    __u32 hdr[3];
+-   int res = 0;
+ 
+    hdr[0] = UCIL_FOURCC( 'R', 'I', 'F', 'F');
+    hdr[1] = 0;
+@@ -229,33 +227,6 @@ static void avi_list_pad( avi_buffer_t *list, int offset, int padding )
+ }
+ 
+ 
+-static __u32 avi_add_list_hdr( avi_buffer_t *buffer, __u32 fourcc, __u32 size )
+-{
+-   avi_list_t list;
+-   __u32 ret;
+-   
+-   list.dwList = UCIL_FOURCC( 'L', 'I', 'S', 'T' );
+-   list.dwSize = size + 4;
+-   list.dwFourCC = fourcc;
+-   
+-   if( buffer->dwBufferSize < ( buffer->dwPtr + sizeof( list ) ) )
+-   {
+-      __u8 *tmp;
+-      
+-      tmp = malloc( buffer->dwPtr + sizeof( list ) );
+-      memcpy( tmp, buffer->bData, buffer->dwPtr );
+-      free( buffer->bData );
+-      buffer->bData = tmp;
+-      buffer->dwBufferSize = buffer->dwPtr + sizeof( list );
+-   }
+-
+-   memcpy( buffer->bData + buffer->dwPtr, &list, sizeof( list ) );
+-   ret = buffer->dwPtr;
+-   buffer->dwPtr += sizeof( list );
+-   
+-   return ret;
+-}
+-
+ static int avi_write_list_hdr( FILE *f, __u32 fourcc, __u32 size )
+ {
+    avi_list_t list;
+diff --git a/src/ucil_theora.c b/src/ucil_theora.c
+index e2d00ef..bf95004 100644
+--- a/src/ucil_theora.c
++++ b/src/ucil_theora.c
+@@ -947,286 +947,6 @@ static void *ucil_theora_encode_thread( ucil_theora_video_file_object_t *vobj )
+    return NULL;
+ }
+ 
+-static void copy_yuv( unsigned char *dst, yuv_buffer *yuv, theora_info *ti )
+-{
+-   int y;
+-   unsigned char *yoff;
+-   unsigned char *uvoff;
+-   unsigned char *dstoff;
+-   int crop_offset;
+-   
+-   dstoff = dst;
+-   crop_offset = ti->offset_x + yuv->y_stride * ti->offset_y;
+-   yoff = yuv->y + crop_offset;
+-   
+-   for( y = 0; y < yuv->y_height; y++ )
+-   {
+-      memcpy( dstoff, yoff, yuv->y_width );
+-      dstoff += yuv->y_width;
+-      yoff += yuv->y_stride;
+-   }
+-
+-   crop_offset = ( ti->offset_x / 2 ) + ( yuv->uv_stride ) * ( ti->offset_y / 2 );
+-   uvoff = yuv->u + crop_offset;
+-
+-   for( y = 0; y < yuv->uv_height; y++ )
+-   {
+-      memcpy( dstoff, uvoff, yuv->uv_width );
+-      dstoff += yuv->uv_width;
+-      uvoff += yuv->uv_stride;
+-   }
+-   
+-   uvoff = yuv->v;
+-   
+-   for( y = 0; y < yuv->uv_height; y++ )
+-   {
+-      memcpy( dstoff, uvoff, yuv->uv_width );
+-      dstoff += yuv->uv_width;
+-      uvoff += yuv->uv_stride;
+-   }
+-}
+-
+-// Video Playback disabled - see ucview_videoplay_plugin on how to play back video files
+-#if 0
+-
+-static void *ucil_theora_worker_thread( ucil_theora_input_file_object_t *vobj )
+-{
+-   unicap_data_buffer_t new_frame_buffer;
+-
+-   struct timeval ltime;
+-   int eos = 0;
+-
+-   unicap_copy_format( &new_frame_buffer.format, &vobj->format );
+-   new_frame_buffer.type = UNICAP_BUFFER_TYPE_SYSTEM;
+-   new_frame_buffer.buffer_size = new_frame_buffer.format.buffer_size;
+-   new_frame_buffer.data = malloc( new_frame_buffer.format.buffer_size );
+-
+-   gettimeofday( &ltime, NULL );
+-   
+-   while( !vobj->quit_capture_thread )
+-   {
+-      struct timespec abs_timeout;
+-      struct timeval  ctime;
+-      GList *entry;
+-      ogg_page og;
+-      ogg_packet op;
+-      size_t bytes;
+-
+-      int buffer_ready = 0;
+-      
+-
+-
+-      if( !eos && ( ogg_stream_packetout( &vobj->os, &op ) > 0 ) )
+-      {
+-	 yuv_buffer yuv;
+-
+-	 theora_decode_packetin( &vobj->th, &op );
+-	 theora_decode_YUVout( &vobj->th, &yuv );
+-	 copy_yuv( new_frame_buffer.data, &yuv, &vobj->ti );
+-
+-	 buffer_ready = 1;
+-      } 
+-      else if( !eos )
+-      {
+-	 bytes = buffer_data( vobj->f, &vobj->oy );      
+-	 if( !bytes )
+-	 {
+-	    TRACE( "End of stream\n" );
+-	    eos = 1;
+-	    
+-	 }
+-	 
+-	 while( ogg_sync_pageout( &vobj->oy, &og ) > 0 )
+-	 {
+-	    ogg_stream_pagein( &vobj->os, &og );
+-	 }
+-	 continue;
+-      }
+-      else
+-      {
+-	 buffer_ready = 1;
+-      }
+-
+-      gettimeofday( &ctime, NULL );
+-      abs_timeout.tv_sec = ctime.tv_sec + 1;
+-      abs_timeout.tv_nsec = ctime.tv_usec * 1000;      
+-      if( sem_timedwait( &vobj->sema, &abs_timeout ) )
+-      {
+-	 TRACE( "SEM_WAIT FAILED\n" );
+-	 continue;
+-      }
+-
+-      if( buffer_ready && vobj->event_callback )
+-      {
+-	 vobj->event_callback( vobj->event_unicap_handle, UNICAP_EVENT_NEW_FRAME, &new_frame_buffer );
+-	 TRACE( "New frame\n" );
+-      }
+-      
+-      unicap_data_buffer_t *data_buffer = g_queue_pop_head( vobj->in_queue );
+-      if( data_buffer )
+-      {
+-	 unicap_copy_format( &data_buffer->format, &vobj->format );
+-	 memcpy( data_buffer->data, new_frame_buffer.data, vobj->format.buffer_size );
+-	 
+-	 g_queue_push_tail( vobj->out_queue, data_buffer );
+-      }
+-
+-      sem_post( &vobj->sema );
+-      
+-      if( buffer_ready )
+-      {
+-	 gettimeofday( &ctime, NULL );
+-	 if( ctime.tv_usec < ltime.tv_usec )
+-	 {
+-	    ctime.tv_usec += 1000000;
+-	    ctime.tv_sec -= 1;
+-	 }
+-	 
+-	 ctime.tv_usec -= ltime.tv_usec;
+-	 ctime.tv_sec -= ltime.tv_sec;
+-	 
+-	 if( ( ctime.tv_sec == 0 ) &&
+-	     ( ctime.tv_usec < vobj->frame_intervall ) )
+-	 {
+-	    usleep( vobj->frame_intervall - ctime.tv_usec );
+-	 }
+-      
+-	 gettimeofday( &ltime, NULL );
+-      }
+-   }
+-
+-   free( new_frame_buffer.data );
+-   return NULL;
+-}
+-
+-
+-static unicap_status_t theoracpi_reenumerate_formats( ucil_theora_input_file_object_t vobj, int *count )
+-{
+-   *count = 1;
+-
+-   return STATUS_SUCCESS;
+-}
+-
+-static unicap_status_t theoracpi_enumerate_formats( ucil_theora_input_file_object_t *vobj, unicap_format_t *format, int index )
+-{
+-   unicap_status_t status = STATUS_NO_MATCH;
+-   if( index == 0 )
+-   {
+-      unicap_copy_format( format, &vobj->format );
+-      status = STATUS_SUCCESS;
+-   }
+-   
+-   return status;
+-}
+-
+-static unicap_status_t theoracpi_set_format( ucil_theora_input_file_object_t *vobj, unicap_format_t *format )
+-{
+-   unicap_status_t status = STATUS_SUCCESS;
+-   if( ( format->size.width != vobj->format.size.width ) || 
+-       ( format->size.height != vobj->format.size.height ) ||
+-       ( format->bpp != vobj->format.bpp ) )
+-   {
+-      char buffer[1024];
+-      size_t size = 1024;
+-
+-      unicap_describe_format( format, buffer, &size );
+-      TRACE( "Could not set format: %s\n", buffer );
+-      size = 1024;
+-      unicap_describe_format( &vobj->format, buffer, &size );
+-      TRACE( "Stored: %s\n" );
+-      status = STATUS_FAILURE;
+-   }   
+-   
+-   return status;
+-}
+-
+-static unicap_status_t theoracpi_get_format( ucil_theora_input_file_object_t *vobj, unicap_format_t *format )
+-{
+-   unicap_copy_format( format, &vobj->format );
+-   return STATUS_SUCCESS;
+-}
+-
+-static unicap_status_t theoracpi_reenumerate_properties( ucil_theora_input_file_object_t *vobj, int *count )
+-{
+-   *count = 0;
+-   return STATUS_SUCCESS;
+-}
+-
+-static unicap_status_t theoracpi_enumerate_properties( ucil_theora_input_file_object_t *vobj, unicap_property_t *property, int index )
+-{
+-   return STATUS_NO_MATCH;
+-}
+-
+-static unicap_status_t theoracpi_set_property( ucil_theora_input_file_object_t *vobj, unicap_property_t *property )
+-{
+-   return STATUS_FAILURE;
+-}
+-
+-static unicap_status_t theoracpi_get_property( ucil_theora_input_file_object_t *vobj, unicap_property_t *property )
+-{
+-   return STATUS_FAILURE;
+-}
+-
+-static unicap_status_t theoracpi_capture_start( ucil_theora_input_file_object_t *vobj )
+-{
+-   unicap_status_t status = STATUS_SUCCESS;
+-   
+-   if( pthread_create( &vobj->worker_thread, NULL, (void*(*)(void*))ucil_theora_worker_thread, vobj ) )
+-   {
+-      TRACE( "Failed to create worker thread!\n" );
+-      return STATUS_FAILURE;
+-   }
+-
+-   return status;
+-}
+-
+-static unicap_status_t theoracpi_capture_stop( ucil_theora_input_file_object_t *vobj )
+-{
+-   int res;
+-
+-   vobj->quit_capture_thread = 1;
+-   res = pthread_join( vobj->worker_thread, NULL );
+-
+-   return ( res == 0 ) ? STATUS_SUCCESS : STATUS_FAILURE;
+-}
+-
+-static unicap_status_t theoracpi_queue_buffer( ucil_theora_input_file_object_t *vobj, unicap_data_buffer_t *buffer )
+-{
+-   unicap_status_t status = STATUS_SUCCESS;
+-   
+-   g_queue_push_tail( vobj->in_queue, buffer );
+-
+-   return status;
+-}
+-
+-static unicap_status_t theoracpi_dequeue_buffer( ucil_theora_input_file_object_t *vobj, unicap_data_buffer_t **buffer )
+-{
+-   unicap_status_t status = STATUS_SUCCESS;
+-   return status;
+-}
+-
+-static unicap_status_t theoracpi_wait_buffer( ucil_theora_input_file_object_t *vobj, unicap_data_buffer_t **buffer )
+-{
+-   unicap_status_t status = STATUS_SUCCESS;
+-   return status;
+-}
+-
+-static unicap_status_t theoracpi_poll_buffer( ucil_theora_input_file_object_t *vobj, int *count )
+-{
+-   *count = 1;
+-   return STATUS_SUCCESS;
+-}
+-
+-static unicap_status_t theoracpi_set_event_notify( ucil_theora_input_file_object_t *vobj, unicap_event_callback_t func, unicap_handle_t handle )
+-{
+-   vobj->event_callback = func;
+-   vobj->event_unicap_handle = handle;
+-
+-   return STATUS_SUCCESS;
+-}
+-
+-#endif
+-
+ static void encode_parse_parameters( ucil_theora_video_file_object_t *vobj, guint n_parameters, GParameter *parameters )
+ {
+    int i;
+diff --git a/src/video_file.c b/src/video_file.c
+index 9c9a3f1..547a3dc 100644
+--- a/src/video_file.c
++++ b/src/video_file.c
+@@ -38,7 +38,6 @@
+ 
+ 
+ #define MAX_CODECS 8
+-static gboolean ucil_video_is_initialized = FALSE;
+ 
+ struct video_codec_cpi {
+    const gchar **                 codec_names;
+@@ -158,7 +157,6 @@ static enum ucil_codec_id get_codec_id( const char *codec )
+ 
+    for (id = 0; id < sizeof(codecs) / sizeof(video_codec_cpi); id ++)
+    {
+-      gboolean found = FALSE;
+       int i;
+       
+       for( i = 0; codecs[id].codec_names[i] != NULL; i++ ){
+@@ -171,12 +169,6 @@ static enum ucil_codec_id get_codec_id( const char *codec )
+ }
+ 
+ 
+-static void ucil_video_initialize( void )
+-{
+-/*    load_vcp_modules(); */
+-}
+-
+-
+ ucil_video_file_object_t *ucil_create_video_filev( const char *path, unicap_format_t *format, const char *codec, 
+ 						   guint n_parameters, GParameter *parameters )
+ {

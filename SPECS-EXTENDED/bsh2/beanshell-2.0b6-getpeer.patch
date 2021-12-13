@@ -1,0 +1,15 @@
+--- beanshell-2.0b6/src/bsh/util/AWTConsole.java	2017-09-20 10:34:59.026403121 +0200
++++ beanshell-2.0b6/src/bsh/util/AWTConsole.java	2017-09-20 10:36:05.353110242 +0200
+@@ -214,8 +214,11 @@
+ 		Great.  What a piece of crap.
+ 	*/
+ 	public void setCaretPosition( int pos ) {
+-		((java.awt.peer.TextComponentPeer)getPeer()).setCaretPosition( 
++		try {
++			((java.awt.peer.TextComponentPeer)getClass().getMethod("getPeer").invoke(this, null)).setCaretPosition( 
+ 			pos + countNLs() );
++		} catch (Exception e) {
++		}
+ 	}
+ 
+ 	/*

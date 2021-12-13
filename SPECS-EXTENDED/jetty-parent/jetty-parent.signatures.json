@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  ".rpmlint": "14232259ba4376dea3eff505629dfab3181f47073db06f593564e183a285c252",
+  "LICENSE-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+  "epl-v10.html": "a40741b59364cc49449255e9b9bfe1fcfe6a2e7ab4d37ca89db3bacbfb14e9d2",
+  "jetty-parent-19.pom": "ee6548778eadb9e126833d207effc34d275e34fe54b3e21dc9399e203c11e8dd"
+ }
+}

@@ -1,0 +1,61 @@
+From 18c3c498a8099dca74127abbc958d696b4397825 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Wed, 18 Sep 2019 16:00:51 +0100
+Subject: [PATCH 1/2] Allow building against OSGi APIs newer than R4
+
+---
+ .../ctc/wstx/osgi/WstxBundleActivator.java    | 24 ++++++++++++++-----
+ 1 file changed, 18 insertions(+), 6 deletions(-)
+
+diff --git a/src/main/java/com/ctc/wstx/osgi/WstxBundleActivator.java b/src/main/java/com/ctc/wstx/osgi/WstxBundleActivator.java
+index b233267..cedf476 100644
+--- a/src/main/java/com/ctc/wstx/osgi/WstxBundleActivator.java
++++ b/src/main/java/com/ctc/wstx/osgi/WstxBundleActivator.java
+@@ -1,6 +1,8 @@
+ package com.ctc.wstx.osgi;
+ 
+ import java.util.Dictionary;
++import java.util.Hashtable;
++import java.util.Properties;
+ 
+ import org.osgi.framework.BundleActivator;
+ import org.osgi.framework.BundleContext;
+@@ -30,19 +32,29 @@ public class WstxBundleActivator
+     public void start(BundleContext ctxt)
+     {
+         InputFactoryProviderImpl inputP = new InputFactoryProviderImpl();
+-        final Dictionary inputProps = inputP.getProperties();
+-        ctxt.registerService(Stax2InputFactoryProvider.class.getName(), inputP, inputProps);
++        ctxt.registerService(Stax2InputFactoryProvider.class.getName(), inputP, convertPropsToDict(inputP.getProperties()));
+         OutputFactoryProviderImpl outputP = new OutputFactoryProviderImpl();
+-        final Dictionary outputProps = outputP.getProperties();
+-        ctxt.registerService(Stax2OutputFactoryProvider.class.getName(), outputP, outputProps);
++        ctxt.registerService(Stax2OutputFactoryProvider.class.getName(), outputP, convertPropsToDict(outputP.getProperties()));
+         ValidationSchemaFactoryProviderImpl[] impls = ValidationSchemaFactoryProviderImpl.createAll();
+         for (int i = 0, len = impls.length; i < len; ++i) {
+             ValidationSchemaFactoryProviderImpl impl = impls[i];
+-            final Dictionary implProps = impl.getProperties();
+-            ctxt.registerService(Stax2ValidationSchemaFactoryProvider.class.getName(), impl, implProps);
++            ctxt.registerService(Stax2ValidationSchemaFactoryProvider.class.getName(), impl, convertPropsToDict(impl.getProperties()));
+         }
+     }
+ 
++    /**
++     * A Properties object is a Dictionary<Object,Object> but the OSGi API got
++     * more restrictive and requires a Dictionary<String,Object>, so we must do
++     * a quick conversion here.
++     */
++    private Dictionary<String,Object> convertPropsToDict(Properties props) {
++		Dictionary<String,Object> dict = new Hashtable<String,Object>();
++		for (Object key : props.keySet()) {
++			dict.put(key.toString(), props.get(key));
++		}
++		return dict;
++    }
++
+     @Override
+     public void stop(BundleContext ctxt) {
+         // Nothing to do here: OSGi automatically de-registers services upon
+-- 
+2.28.0
+

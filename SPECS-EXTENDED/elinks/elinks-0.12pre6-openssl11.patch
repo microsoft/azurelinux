@@ -1,0 +1,73 @@
+From d83c0edf4c6ae42359ff856d7a879ecba5769595 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Fri, 17 Feb 2017 16:51:41 +0100
+Subject: [PATCH 1/2] fix compatibility with OpenSSL 1.1
+
+---
+ src/network/ssl/socket.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/network/ssl/socket.c b/src/network/ssl/socket.c
+index c9e2be4..467fc48 100644
+--- a/src/network/ssl/socket.c
++++ b/src/network/ssl/socket.c
+@@ -83,7 +83,7 @@ static void
+ ssl_set_no_tls(struct socket *socket)
+ {
+ #ifdef CONFIG_OPENSSL
+-	((ssl_t *) socket->ssl)->options |= SSL_OP_NO_TLSv1;
++	SSL_set_options((ssl_t *) socket->ssl, SSL_OP_NO_TLSv1);
+ #elif defined(CONFIG_GNUTLS)
+ 	{
+ 		/* GnuTLS does not support SSLv2 because it is "insecure".
+@@ -419,7 +419,7 @@ ssl_connect(struct socket *socket)
+ 		}
+ 
+ 		if (client_cert) {
+-			SSL_CTX *ctx = ((SSL *) socket->ssl)->ctx;
++			SSL_CTX *ctx = SSL_get_SSL_CTX((SSL *) socket->ssl);
+ 
+ 			SSL_CTX_use_certificate_chain_file(ctx, client_cert);
+ 			SSL_CTX_use_PrivateKey_file(ctx, client_cert,
+-- 
+2.7.4
+
+
+From ec952cc5b79973bee73fcfc813159d40c22b7228 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tmraz@fedoraproject.org>
+Date: Fri, 17 Feb 2017 16:44:11 +0100
+Subject: [PATCH 2/2] drop disablement of TLS1.0 on second attempt to connect
+
+It would not work correctly anyway and the code does not build
+with OpenSSL-1.1.0.
+---
+ src/network/ssl/socket.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/network/ssl/socket.c b/src/network/ssl/socket.c
+index 467fc48..b981c1e 100644
+--- a/src/network/ssl/socket.c
++++ b/src/network/ssl/socket.c
+@@ -82,6 +82,11 @@
+ static void
+ ssl_set_no_tls(struct socket *socket)
+ {
++#if 0
++/* This implements the insecure renegotiation, which should not be used.
++ * The code also would not work on current Fedora (>= Fedora 23) anyway,
++ * because it would just switch off TLS 1.0 keeping TLS 1.1 and 1.2 enabled.
++ */
+ #ifdef CONFIG_OPENSSL
+ 	SSL_set_options((ssl_t *) socket->ssl, SSL_OP_NO_TLSv1);
+ #elif defined(CONFIG_GNUTLS)
+@@ -96,6 +101,7 @@ ssl_set_no_tls(struct socket *socket)
+ 		gnutls_protocol_set_priority(*(ssl_t *) socket->ssl, protocol_priority);
+ 	}
+ #endif
++#endif
+ }
+ 
+ #ifdef USE_OPENSSL
+-- 
+2.7.4
+

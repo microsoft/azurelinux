@@ -1,0 +1,280 @@
+--- xerces-2_12_0/build.xml	2018-11-18 20:10:36.933534130 +0100
++++ xerces-2_12_0/build.xml	2018-11-18 20:12:28.714126419 +0100
+@@ -38,13 +38,6 @@
+   <property name="tests.dir" value="./tests"/>
+   <property name="tools.dir" value="./tools"/>
+ 
+-  <!-- enable compilation under JDK 1.4 and above -->
+-  <taskdef name="xjavac" classname="org.apache.xerces.util.XJavac">
+-    <classpath>
+-      <pathelement location="${tools.dir}/bin/xjavac.jar"/>
+-    </classpath>
+-  </taskdef>
+-
+   <!-- Allow properties following these statements to be overridden -->
+   <!-- Note that all of these don't have to exist.  They've just been defined
+        incase they are used. -->
+@@ -71,7 +64,6 @@
+     <property name='jar.junit' value='junit.jar'/>
+     <property name='jar.ant' value='ant.jar'/>
+     <property name='jar.ant.nodeps' value='ant-nodeps.jar'/>
+-    <property name='jar.xjavac' value='xjavac.jar'/>
+     
+     <property name='default.parser.config.name' value='XIncludeAwareParserConfiguration'/>
+     <property name='default.parser.config.qualified' value='org.apache.xerces.parsers.XIncludeAwareParserConfiguration'/>
+@@ -108,7 +100,6 @@
+     <property name="distsrc.dir" value="${build.dir}/${parser.shortname}-${parser_version}"/>
+     <property name="disttools.dir" value="${build.dir}/tools"/>
+     <property name="distbin.dir" value="${build.dir}/${parser.shortname}-${parser_version}"/>
+-    <property name='src.apis.zip' value="${tools.dir}/xml-commons-external-src.zip"/>
+ 
+     <filter token="year" value="${year}"/>
+     <filter token="version" value="${parser.Version}"/>
+@@ -135,7 +126,6 @@
+     <echo message=" jars --> generates xercesImpl &amp; xercesSamples jars"/>
+     <echo message=" jar-schema11 --> 'jar' + XML Schema 1.1 support"/>
+     <echo message=" jars-schema11 --> 'jars' + XML Schema 1.1 support"/>
+-    <echo message=" xjavac-jar --> generates the xjavac.jar file"/>
+     <echo message=" docs     --> generates the HTML documentation"/>
+     <echo message=" javadocs --> generates the API docs (needs Java 1.2 or higher)"/>
+     <echo message=" samples  --> compiles the samples source code"/>
+@@ -247,30 +237,6 @@
+     <copy file="${src.dir}/org/apache/xerces/impl/xpath/regex/message.properties"
+       tofile="${build.src}/org/apache/xerces/impl/xpath/regex/message_en.properties"/>
+ 
+-    <!-- now deal with API's:  -->
+-    <unzip src="${src.apis.zip}" dest="${build.src}">
+-        <patternset
+-            includes="org/xml/sax/** 
+-                javax/xml/**
+-                javax/xml/datatype/**
+-                javax/xml/namespace/**
+-                javax/xml/parsers/**
+-                javax/xml/stream/**
+-                javax/xml/transform/**
+-                javax/xml/validation/**
+-                javax/xml/xpath/**
+-                org/w3c/dom/*
+-                org/w3c/dom/bootstrap/**
+-                org/w3c/dom/events/**
+-                org/w3c/dom/html/**
+-                org/w3c/dom/ls/**
+-                org/w3c/dom/ranges/**
+-                org/w3c/dom/traversal/**
+-                org/w3c/dom/views/**
+-                org/w3c/dom/xpath/**"
+-        />
+-    </unzip>
+-    
+     <!-- substitute tokens as needed -->
+     <replace file="${build.dir}/src/org/apache/xerces/impl/Version.java" 
+              token="@@VERSION@@" value="${parser.Name} ${parser.Version}"/>
+@@ -286,7 +252,7 @@
+       </fileset>
+     </copy>
+ 
+-    <xjavac srcdir="${build.src}"
++    <javac srcdir="${build.src}"
+            destdir="${build.dest}"
+            source="${javac.source}"
+            target="${javac.target}"
+@@ -354,7 +320,7 @@
+     <copy todir="${build.samples}" >
+         <fileset dir="${samples.dir}"/>
+     </copy>
+-    <xjavac srcdir="${build.samples}"
++    <javac srcdir="${build.samples}"
+            destdir="${build.dest}"
+            source="${javac.source}"
+            target="${javac.target}"
+@@ -374,7 +340,7 @@
+         <fileset dir="${tests.dir}"
+          excludes="dom/rename/**" />
+     </copy>
+-    <xjavac srcdir="${build.tests}"
++    <javac srcdir="${build.tests}"
+            destdir="${build.dest}"
+            source="${javac.source}"
+            target="${javac.target}"
+@@ -438,7 +404,7 @@
+   </target>
+ 
+ 
+-  <target name="javadoc-replace" unless="additional.param">
++  <target name="javadoc-replace">
+     <replace token="@xerces.internal" dir="${build.src}">
+       <replacevalue><![CDATA[<DL><DT><H1 style="font-size:110%">INTERNAL:</H1><DD>Usage of this class is not supported. It may be altered or removed at any time.</DD></DT></DL>]]></replacevalue>
+     </replace>
+@@ -453,46 +419,33 @@
+   <!-- =================================================================== -->
+   <target name="javadocs" depends="prepare-src">	
+   		
+-    <condition property="additional.param" value=" -taglet org.apache.xerces.util.ExperimentalTaglet -taglet org.apache.xerces.util.InternalTaglet -tagletpath ${tools.dir}/bin/xerces2taglets.jar">
+-      <available classname="com.sun.tools.doclets.Taglet"/>
+-    </condition>
+-  	
+     <antcall target="javadoc-replace" />
+   	
+-    <condition property="additional.param" value="">
+-      <not>
+-        <available classname="com.sun.tools.doclets.Taglet"/>
+-      </not>
+-    </condition>
+-  	
+     <mkdir dir='${build.dir}/docs/javadocs/api'/>
+     <javadoc packagenames='javax.xml.*,org.w3c.*,org.xml.*'
+-      locale='en_US'
++      locale='en_US' source="${javac.source}"
+       sourcepath='${build.src}' destdir='${build.dir}/docs/javadocs/api'
+       author='true' version='true'
+       windowtitle='XML Standard API' doctitle='XML Standard API'
+       bottom='${copyright}'
+-      additionalparam='${additional.param}'
+       />
+     <mkdir dir='${build.dir}/docs/javadocs/xni'/>
+     <javadoc packagenames='org.apache.xerces.xni.*'
+-      locale='en_US'
++      locale='en_US' source="${javac.source}"
+       sourcepath='${build.src}' destdir='${build.dir}/docs/javadocs/xni'
+       author='true' version='true'
+       windowtitle='Xerces Native Interface' 
+       doctitle='Xerces Native Interface'
+       bottom='${copyright}'
+-      additionalparam='${additional.param}'
+       />
+     <mkdir dir='${build.dir}/docs/javadocs/xs'/>
+     <javadoc packagenames='org.apache.xerces.xs, org.apache.xerces.xs.datatypes'
+-      locale='en_US'
++      locale='en_US' source="${javac.source}"
+       sourcepath='${build.src}' destdir='${build.dir}/docs/javadocs/xs'
+       author='true' version='true'
+       windowtitle='XML Schema API' 
+       doctitle='XML Schema API'
+       bottom='${copyright}'
+-      additionalparam='${additional.param}'
+       />
+     
+     <mkdir dir='${build.dir}/docs/javadocs/xerces2'/>
+@@ -504,25 +457,23 @@
+                            org.apache.xerces.util,
+                            org.apache.xerces.xinclude,
+                            org.apache.xerces.xpointer'
+-      locale='en_US'
++      locale='en_US' source="${javac.source}"
+       sourcepath='${build.src}' destdir='${build.dir}/docs/javadocs/xerces2'
+       classpath='${tools.dir}/${jar.resolver}:${tools.dir}/${jar.serializer}'
+       author='true' version='true'
+       windowtitle='Xerces2 Implementation' 
+       doctitle='Xerces2 Implementation'
+       bottom='${copyright}'
+-      additionalparam='${additional.param}'
+       />
+     <mkdir dir='${build.dir}/docs/javadocs/other'/>
+     <javadoc packagenames='org.apache.html.*,
+                            org.apache.wml.*,
+                            org.apache.xml.serialize.*'
+-      locale='en_US'
++      locale='en_US' source="${javac.source}"
+       sourcepath='${build.src}' destdir='${build.dir}/docs/javadocs/other'
+       author='true' version='true'
+       windowtitle='Other Classes' doctitle='Other Classes'
+       bottom='${copyright}'
+-      additionalparam='${additional.param}'
+       />
+   </target>
+ 
+@@ -998,7 +949,7 @@
+       </fileset>
+     </copy>
+ 
+-    <xjavac srcdir="${build.src}"
++    <javac srcdir="${build.src}"
+            destdir="${build.dest}"
+            source="${javac.source}"
+            target="${javac.target}"
+@@ -1233,30 +1184,6 @@
+     <replace file="${build.dir}/src/org/apache/xerces/parsers/AbstractSAXParser.java"
+              token="return (fConfiguration instanceof XML11Configurable);" value="return false;"/>
+  
+-    <!-- now deal with API's:  -->
+-    <unzip src="${src.apis.zip}" dest="${build.src}">
+-        <patternset
+-            includes="org/xml/sax/** 
+-                javax/xml/**
+-                javax/xml/datatype/**
+-                javax/xml/namespace/**
+-                javax/xml/parsers/**
+-                javax/xml/stream/**
+-                javax/xml/transform/**
+-                javax/xml/validation/**
+-                javax/xml/xpath/**
+-                org/w3c/dom/*
+-                org/w3c/dom/bootstrap/**
+-                org/w3c/dom/events/**
+-                org/w3c/dom/html/**
+-                org/w3c/dom/ls/**
+-                org/w3c/dom/ranges/**
+-                org/w3c/dom/traversal/**
+-                org/w3c/dom/views/**
+-                org/w3c/dom/xpath/**"
+-        />
+-    </unzip>
+-
+ 
+     <!-- substitute tokens as needed -->
+     <replace file="${build.dir}/src/org/apache/xerces/impl/Version.java" 
+@@ -1297,7 +1224,7 @@
+       </fileset>
+     </copy>
+ 
+-    <xjavac srcdir="${build.src}"
++    <javac srcdir="${build.src}"
+            destdir="${build.dest}"
+            source="${javac.source}"
+            target="${javac.target}"
+@@ -1448,7 +1375,7 @@
+           </fileset>
+         </copy>
+ 
+-        <xjavac srcdir="${build.src}"
++        <javac srcdir="${build.src}"
+                destdir="${build.dest}"
+                source="${javac.source}"
+                target="${javac.target}"
+@@ -1512,36 +1439,4 @@
+     <copy file="${tools.dir}/${jar.serializer}" tofile="${build.dir}/${jar.serializer}"/>
+   </target>
+ 
+-  <!-- =================================================================== -->
+-  <!-- Builds the xjavac jar file                                          -->
+-  <!-- =================================================================== -->
+-  <target name="xjavac-jar" depends="prepare">
+-    <mkdir dir="${build.src}"/>
+-    <mkdir dir="${build.dest}"/>
+-  	
+-    <copy file="${tools.dir}/src/XJavac.java"
+-          tofile="${build.src}/org/apache/xerces/util/XJavac.java"/>
+-  	
+-    <javac srcdir="${build.src}"
+-           destdir="${build.dest}"
+-           source="${javac.source}"
+-           target="${javac.target}"
+-           classpath="${build.dir}/classes:${tools.dir}/${jar.ant}:${tools.dir}/${jar.ant.nodeps}"
+-           debug="${debug}"
+-           debuglevel="${debuglevel}"
+-           deprecation="${deprecation}"
+-           optimize="${optimize}"
+-           includeAntRuntime="false"
+-           includeJavaRuntime="false"/>
+-  	
+-    <jar jarfile="${build.dir}/${jar.xjavac}"
+-         basedir="${build.dest}"
+-         compress="true"
+-         includes="org/apache/xerces/util/XJavac.class">
+-      <manifest>
+-        <attribute name="Ant-Version" value="${ant.version}"/>
+-      </manifest>
+-      <metainf dir="." includes="LICENSE,NOTICE"/>
+-    </jar>
+-  </target>
+ </project>

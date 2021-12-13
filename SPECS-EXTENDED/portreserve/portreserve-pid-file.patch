@@ -1,0 +1,13 @@
+diff -up portreserve-0.0.5/src/portreserve.c.pid-file portreserve-0.0.5/src/portreserve.c
+--- portreserve-0.0.5/src/portreserve.c.pid-file	2011-06-23 16:50:21.000000000 +0100
++++ portreserve-0.0.5/src/portreserve.c	2013-11-27 09:48:01.073647566 +0000
+@@ -314,6 +314,9 @@ portreserve (void)
+ 
+ 	free (cfgfile);
+ 
++	/* Give init a chance to spot our PID file (bug #901988). */
++	sleep (1);
++
+ 	return 0;
+ }
+ 

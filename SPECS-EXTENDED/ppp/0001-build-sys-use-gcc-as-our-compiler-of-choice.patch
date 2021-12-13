@@ -1,0 +1,25 @@
+From 486e36d184cbaee7e34bb582ea6fdf3bfa9ca531 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Fri, 4 Apr 2014 11:23:42 +0200
+Subject: [PATCH 01/27] build-sys: use gcc as our compiler of choice
+
+---
+ pppd/Makefile.linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
+index a74c914..1d9ea78 100644
+--- a/pppd/Makefile.linux
++++ b/pppd/Makefile.linux
+@@ -30,7 +30,7 @@ ifeq (.depend,$(wildcard .depend))
+ include .depend
+ endif
+ 
+-# CC = gcc
++CC = gcc
+ #
+ COPTS = -O2 -pipe -Wall -g
+ LIBS =
+-- 
+1.8.3.1
+

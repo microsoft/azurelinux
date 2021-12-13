@@ -1,0 +1,36 @@
+From 32645f2fc1ddfb2eed7069fd749602619f26ed37 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pavel=20B=C5=99ezina?= <pbrezina@redhat.com>
+Date: Mon, 19 Feb 2018 11:51:06 +0100
+Subject: [PATCH] switch to authselect
+
+---
+ service/realmd-redhat.conf | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/service/realmd-redhat.conf b/service/realmd-redhat.conf
+index e39fad525c716d1ed99715280cd5d497b9039427..26cf6147f352e1b48c3261fa42707d816428f879 100644
+--- a/service/realmd-redhat.conf
++++ b/service/realmd-redhat.conf
+@@ -23,15 +23,15 @@ adcli = /usr/sbin/adcli
+ freeipa-client = /usr/sbin/ipa-client-install
+ 
+ [commands]
+-winbind-enable-logins = /usr/bin/sh -c "/usr/sbin/authconfig --update --enablewinbind --enablewinbindauth --enablemkhomedir --nostart && /usr/bin/systemctl enable oddjobd.service && /usr/bin/systemctl start oddjobd.service"
+-winbind-disable-logins = /usr/sbin/authconfig --update --disablewinbind --disablewinbindauth --nostart
++winbind-enable-logins = /usr/bin/sh -c "/usr/bin/authselect select winbind with-mkhomedir --force && /usr/bin/systemctl enable oddjobd.service && /usr/bin/systemctl start oddjobd.service"
++winbind-disable-logins = /usr/bin/authselect select sssd with-mkhomedir
+ winbind-enable-service = /usr/bin/systemctl enable winbind.service
+ winbind-disable-service = /usr/bin/systemctl disable winbind.service
+ winbind-restart-service = /usr/bin/systemctl restart winbind.service
+ winbind-stop-service = /usr/bin/systemctl stop winbind.service
+ 
+-sssd-enable-logins = /usr/bin/sh -c "/usr/sbin/authconfig --update --enablesssd --enablesssdauth --enablemkhomedir --nostart && /usr/bin/systemctl enable oddjobd.service && /usr/bin/systemctl start oddjobd.service"
+-sssd-disable-logins = /usr/sbin/authconfig --update --disablesssdauth --nostart
++sssd-enable-logins = /usr/bin/sh -c "/usr/bin/authselect select sssd with-mkhomedir --force && /usr/bin/systemctl enable oddjobd.service && /usr/bin/systemctl start oddjobd.service"
++sssd-disable-logins = /usr/bin/authselect select sssd with-mkhomedir
+ sssd-enable-service = /usr/bin/systemctl enable sssd.service
+ sssd-disable-service = /usr/bin/systemctl disable sssd.service
+ sssd-restart-service = /usr/bin/systemctl restart sssd.service
+-- 
+2.9.3
+

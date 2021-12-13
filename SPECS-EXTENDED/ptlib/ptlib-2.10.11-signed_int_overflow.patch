@@ -1,0 +1,13 @@
+https://github.com/joegen/opalvoip-ptlib/blame/master/src/ptlib/common/contain.cxx#L1466
+
+--- ptlib-2.10.11/src/ptlib/common/contain.cxx				2013-08-15 01:20:26.000000000 +0200
++++ ptlib-2.10.11/src/ptlib/common/contain.cxx.signed_int_overflow	2019-05-16 19:04:17.308321710 +0200
+@@ -1223,7 +1223,7 @@
+   if (len <= 0 || start < 0)
+     return Empty();
+ 
+-  if (start+len < start) // Beware of wraparound
++  if (len == P_MAX_INDEX || start+len < start) // If open ended or check for wraparound
+     return operator()(start, P_MAX_INDEX);
+   else
+     return operator()(start, start+len-1);

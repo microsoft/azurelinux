@@ -1,0 +1,34 @@
+ make.tmpl.in | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/make.tmpl.in b/make.tmpl.in
+index 2a26153..1f1d1e5 100644
+--- a/make.tmpl.in
++++ b/make.tmpl.in
+@@ -23,20 +23,18 @@ SOFLAG += @SOFLAG@
+ # Setup directory variables
+ prefix = $(DESTDIR)@prefix@
+ exec_prefix = $(DESTDIR)@exec_prefix@
+-bindir = @bindir@
++bindir = $(DESTDIR)@bindir@
+ ifeq ("@KLIBC@", "no")
+-  libdir = @libdir@
+-  sbindir = @sbindir@
+-  includedir = @includedir@
+-  infodir = @infodir@
+-  mandir = @mandir@
++  libdir = $(DESTDIR)@libdir@
++  sbindir = $(DESTDIR)@sbindir@
++  includedir = $(DESTDIR)@includedir@
+ else
+   libdir = $(DESTDIR)@KLIBC_LIB_DIR@
+   sbindir = $(DESTDIR)@KLIBC_SBIN_DIR@
+   includedir = $(DESTDIR)@KLIBC_INCLUDE_DIR@
+-  infodir = @infodir@
+-  mandir = @mandir@
+ endif
++infodir = $(DESTDIR)@infodir@
++mandir = $(DESTDIR)@mandir@
+ 
+ 
+ # setup misc variables

@@ -1,0 +1,15 @@
+--- base64coder-2010-12-19/build.xml	2011-06-06 21:16:10.000000000 +0200
++++ base64coder-2010-12-19/build.xml	2018-10-30 08:48:38.236120805 +0100
+@@ -59,12 +59,6 @@
+       bottom="&lt;br&gt;&lt;span style='font-size: 10pt; font-family: Arial, Helvetica, sans-serif'&gt;Home page: &lt;a href='http://www.source-code.biz'&gt;http://www.source-code.biz&lt;/a&gt;&lt;/span&gt;">
+  <!-- Because it's only a single HTML file, we move it out of the JavaDoc dir. -->
+  </javadoc>
+-  <copy file="${javaDocDir}/biz/source_code/base64Coder/Base64Coder.html" todir="target"/>
+-  <replace dir="target" includes="Base64Coder.html">
+-   <replacefilter token="../../../biz/source_code/base64Coder/" value=""/>
+-   <replacefilter token="../../../" value=""/>
+-  </replace>
+- <delete dir="${javaDocDir}" failonerror="true"/>
+ </target>
+ 
+ <target name="test" description="Runs the JUnit tests." depends="compileTest, getJUnitJar">

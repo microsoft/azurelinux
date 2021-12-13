@@ -1,0 +1,12 @@
+diff -up lapack-3.4.1/LAPACKE/src/Makefile.disable-functions lapack-3.4.1/LAPACKE/src/Makefile
+--- lapack-3.4.1/LAPACKE/src/Makefile.disable-functions	2012-10-24 11:19:46.054150834 -0400
++++ lapack-3.4.1/LAPACKE/src/Makefile	2012-10-24 11:19:54.430152048 -0400
+@@ -2040,7 +2040,7 @@ lapacke_slagsy_work.o \
+ lapacke_zlagsy.o \
+ lapacke_zlagsy_work.o
+ 
+-ALLOBJ = $(SRC_OBJ) $(MATGEN_OBJ) 
++ALLOBJ = $(SRC_OBJ) 
+ 
+ ifdef USEXBLAS
+ ALLXOBJ = $(SXLASRC) $(DXLASRC) $(CXLASRC) $(ZXLASRC)

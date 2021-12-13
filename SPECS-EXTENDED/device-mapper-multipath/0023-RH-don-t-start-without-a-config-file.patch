@@ -1,0 +1,106 @@
+From 4e4c589657eecfe5d37636ce91eb2945f63fc0a6 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 15 Oct 2014 10:39:30 -0500
+Subject: [PATCH] RH: don't start without a config file
+
+If /etc/multipath.conf doesn't exist, don't start multipathd and blacklist
+all devices when running multipath.  A completely blank configuration file
+is almost never what users want.  Also, people may have the multipath
+packages installed but don't want to use them.  This patch provides a
+simple way to disable multipath.  Simply removing or renaming
+/etc/multipath.conf will keep multipath from doing anything.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/config.c         | 15 +++++++++++++++
+ libmultipath/config.h         |  1 +
+ multipath/multipath.rules     |  1 +
+ multipathd/multipathd.8       |  2 ++
+ multipathd/multipathd.service |  1 +
+ 5 files changed, 20 insertions(+)
+
+diff --git a/libmultipath/config.c b/libmultipath/config.c
+index 20e3b8bf..c36bc69c 100644
+--- a/libmultipath/config.c
++++ b/libmultipath/config.c
+@@ -26,6 +26,7 @@
+ #include "devmapper.h"
+ #include "mpath_cmd.h"
+ #include "propsel.h"
++#include "version.h"
+ 
+ static int
+ hwe_strmatch (const struct hwentry *hwe1, const struct hwentry *hwe2)
+@@ -743,6 +744,20 @@ load_config (char * file)
+ 			goto out;
+ 		}
+ 		factorize_hwtable(conf->hwtable, builtin_hwtable_size, file);
++	} else {
++		condlog(0, "/etc/multipath.conf does not exist, blacklisting all devices.");
++		if (conf->blist_devnode == NULL) {
++			conf->blist_devnode = vector_alloc();
++			if (!conf->blist_devnode) {
++				condlog(0, "cannot allocate blacklist\n");
++				goto out;
++			}
++		}
++		if (store_ble(conf->blist_devnode, strdup(".*"),
++		              ORIGIN_NO_CONFIG)) {
++			condlog(0, "cannot store default no-config blacklist\n");
++			goto out;
++		}
+ 	}
+ 
+ 	conf->processed_main_config = 1;
+diff --git a/libmultipath/config.h b/libmultipath/config.h
+index ffec3103..6dbf553d 100644
+--- a/libmultipath/config.h
++++ b/libmultipath/config.h
+@@ -9,6 +9,7 @@
+ 
+ #define ORIGIN_DEFAULT 0
+ #define ORIGIN_CONFIG  1
++#define ORIGIN_NO_CONFIG 2
+ 
+ /*
+  * In kernel, fast_io_fail == 0 means immediate failure on rport delete.
+diff --git a/multipath/multipath.rules b/multipath/multipath.rules
+index 9df11a95..0486bf70 100644
+--- a/multipath/multipath.rules
++++ b/multipath/multipath.rules
+@@ -9,6 +9,7 @@ IMPORT{cmdline}="nompath"
+ ENV{nompath}=="?*", GOTO="end_mpath"
+ IMPORT{cmdline}="multipath"
+ ENV{multipath}=="off", GOTO="end_mpath"
++TEST!="/etc/multipath.conf", GOTO="end_mpath"
+ 
+ ENV{DEVTYPE}!="partition", GOTO="test_dev"
+ IMPORT{parent}="DM_MULTIPATH_DEVICE_PATH"
+diff --git a/multipathd/multipathd.8 b/multipathd/multipathd.8
+index 048a838d..8bd47a80 100644
+--- a/multipathd/multipathd.8
++++ b/multipathd/multipathd.8
+@@ -39,6 +39,8 @@ map regains its maximum performance and redundancy.
+ This daemon executes the external \fBmultipath\fR tool when events occur.
+ In turn, the multipath tool signals the multipathd daemon when it is done with
+ devmap reconfiguration, so that it can refresh its failed path list.
++
++In this Linux distribution, multipathd does not run unless a /etc/multipath.conf file exists.
+ .
+ .
+ .\" ----------------------------------------------------------------------------
+diff --git a/multipathd/multipathd.service b/multipathd/multipathd.service
+index ba24983e..17434cef 100644
+--- a/multipathd/multipathd.service
++++ b/multipathd/multipathd.service
+@@ -4,6 +4,7 @@ Wants=systemd-udev-trigger.service systemd-udev-settle.service
+ Before=iscsi.service iscsid.service lvm2-activation-early.service
+ Before=local-fs-pre.target blk-availability.service
+ After=multipathd.socket systemd-udev-trigger.service systemd-udev-settle.service
++ConditionPathExists=/etc/multipath.conf
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+ ConditionKernelCommandLine=!nompath
+-- 
+2.17.2
+

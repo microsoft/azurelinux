@@ -1,0 +1,75 @@
+--- ttmkfdir-3.0.9/encoding.l~	2005-08-03 19:33:07.000000000 +0900
++++ ttmkfdir-3.0.9/encoding.l	2005-08-03 21:52:15.000000000 +0900
+@@ -115,7 +115,7 @@
+     }
+     
+     /* avoid a crash issue */
+-    if (cur_enc->size < i2)
++    if ((int) (cur_enc->size) < i2)
+ 	cur_enc->size = i2;
+     if (!is_created_map)
+ 	create_mapping();
+@@ -127,8 +127,8 @@
+ }
+ 
+ <INSIDE_MAP_BLOCK>{NUMBER}({WHITESPACES}{NUMBER}){0,2} {
+-    unsigned int start_range;
+-    int numbers[3], i = 0, end_range, target, res;
++    unsigned int start_range = 0, i = 0, end_range = 0;
++    int numbers[3], target = 0, res;
+     char *startptr;
+     char *endptr = yytext;
+ 
+--- ttmkfdir-3.0.9/commandline.cpp~	2002-12-09 17:29:11.000000000 +0900
++++ ttmkfdir-3.0.9/commandline.cpp	2005-08-03 21:12:40.000000000 +0900
+@@ -1,6 +1,8 @@
+ #include <cstdlib>
+ 
++#ifndef _GNU_SOURCE
+ #define _GNU_SOURCE
++#endif
+ #include <getopt.h>
+ 
+ #include "commandline.h"
+--- ttmkfdir-3.0.9/ttmkfdir.cpp~	2003-01-20 08:33:11.000000000 +0900
++++ ttmkfdir-3.0.9/ttmkfdir.cpp	2005-08-03 21:08:43.000000000 +0900
+@@ -76,7 +76,7 @@
+ 	return 1;
+     }
+ 
+-    fprintf (output, "%d\n", fontdir.size ());
++    fprintf (output, "%d\n", (int)(fontdir.size ()));
+ 
+     for (vector<string>::const_iterator i = fontdir.begin (); i != fontdir.end (); i++) {
+ 	fprintf (output, "%s\n", i->c_str ());
+--- ttmkfdir-3.0.9/ttf.cpp~	2005-08-03 19:33:07.000000000 +0900
++++ ttmkfdir-3.0.9/ttf.cpp	2005-08-03 21:31:48.000000000 +0900
+@@ -533,7 +533,7 @@
+ const char *
+ Face::Weight (void) const
+ {
+-    const char *result;
++    const char *result = NULL;
+     
+     if (cmdline::instance()->option ("panose") && ((result = PanoseWeight ()) != 0)) {
+ 	return result;
+@@ -614,7 +614,7 @@
+ const char *
+ Face::Width (void) const
+ {
+-    const char *result;
++    const char *result = NULL;
+     
+     if (cmdline::instance()->option ("panose") && ((result = PanoseWidth ()) != 0)) {
+ 	return result;
+--- ttmkfdir-3.0.9/encoding.cpp~	2005-08-03 19:33:07.000000000 +0900
++++ ttmkfdir-3.0.9/encoding.cpp	2005-08-03 21:31:44.000000000 +0900
+@@ -121,7 +121,7 @@
+ 
+     NumericMapping *m = new NumericMapping (size, b->mapdata.platform, b->mapdata.encoding);
+ 
+-    for (int i = 0; i < size; i++)
++    for (unsigned int i = 0; i < size; i++)
+ 	(*m)[i] = b->mapdata.mappingtable[i];
+ 
+     AddMapping (m);

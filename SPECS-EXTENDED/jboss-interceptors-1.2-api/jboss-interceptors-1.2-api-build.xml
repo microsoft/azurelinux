@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="jboss-interceptors-api_spec" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="build.properties"/>
+
+  <property name="spec.version" value="1.2"/>
+  
+  <property name="project.groupId" value="org.jboss.spec.javax.interceptor"/>
+  <property name="project.artifactId" value="jboss-interceptors-api_${spec.version}_spec"/>
+  <property name="project.version" value="1.0.0.Final"/>
+  <property name="project.name" value="Java(TM) EE Interceptors ${spec.version} API"/>
+  <property name="project.description" value="The ${project.name} classes from JSR 318."/>
+  <property name="project.organization.name" value="JBoss by Red Hat"/>
+  
+  <property name="compiler.source" value="1.6"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src/main/java"/>
+  <property name="build.resourceDir" value="src/main/resources"/>
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath"/>
+  <path id="build.test.classpath"/>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           nowarn="true" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+      </src>
+      <classpath refid="build.classpath"/>
+    </javac>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir}" 
+             packagenames="*" 
+             destdir="${reporting.outputDirectory}/apidocs" 
+             access="protected" 
+             source="${compiler.source}" 
+             verbose="false" 
+             version="true" 
+             use="true" 
+             author="true" 
+             splitindex="false" 
+             nodeprecated="false" 
+             nodeprecatedlist="false" 
+             notree="false" 
+             noindex="false" 
+             nohelp="false" 
+             nonavbar="false" 
+             serialwarn="false" 
+             charset="ISO-8859-1" 
+             linksource="false" 
+             breakiterator="false">
+      <header>&lt;![CDATA[&lt;b&gt;${project.name} ${project.version}&lt;/b&gt;]]&gt;</header>
+      <footer>&lt;![CDATA[&lt;b&gt;${project.name} ${project.version}&lt;/b&gt;]]&gt;</footer>
+    </javadoc>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar" 
+         compress="true" 
+         index="true" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html">
+      <manifest>
+		<attribute name="Bundle-Description" value="${project.description}"/>
+		<attribute name="Bundle-DocURL" value="http://www.jboss.org"/>
+		<attribute name="Bundle-License" value="http://repository.jboss.org/licenses/cddl.txt, http://repository.jboss.org/licenses/gpl-2.0-ce.txt"/>
+		<attribute name="Bundle-ManifestVersion" value="2"/>
+		<attribute name="Bundle-Name" value="${project.name}"/>
+		<attribute name="Bundle-SymbolicName" value="${project.groupId}.${project.artifactId}"/>
+		<attribute name="Bundle-Vendor" value="${project.organization.name}"/>
+		<attribute name="Bundle-Version" value="${project.version}"/>
+		<attribute name="Export-Package" value="javax.interceptor;version=&quot;${spec.version}&quot;"/>
+		<attribute name="Implementation-Title" value="${project.name}"/>
+		<attribute name="Implementation-URL" value="http://www.jboss.org/${project.artifactId}"/>
+		<attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+		<attribute name="Implementation-Vendor-Id" value="${project.groupId}"/>
+		<attribute name="Implementation-Version" value="${project.version}"/>
+		<attribute name="JavaPackages-ArtifactId" value="${project.artifactId}"/>
+		<attribute name="JavaPackages-GroupId" value="${project.groupId}"/>
+		<attribute name="JavaPackages-Version" value="${project.version}"/>
+		<attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+		<attribute name="Specification-Title" value="${project.description}"/>
+		<attribute name="Specification-Vendor" value="Oracle"/>
+		<attribute name="Specification-Version" value="${spec.version}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

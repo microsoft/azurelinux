@@ -1,0 +1,491 @@
+From 773858e1afd21cdf3ceef2cd35509f0b4882bf16 Mon Sep 17 00:00:00 2001
+From: Vendula Poncova <vponcova@redhat.com>
+Date: Tue, 1 Aug 2017 16:54:24 +0200
+Subject: [PATCH 3/3] Support transformation between D-Bus errors and
+ exceptions.
+
+Exceptions can be registered with decorators, raised in a remote
+method and recreated after return from the remote call.
+---
+ doc/tutorial.rst       |  47 ++++++++++++++++++
+ pydbus/error.py        |  97 ++++++++++++++++++++++++++++++++++++
+ pydbus/proxy_method.py |  18 +++++--
+ pydbus/registration.py |  16 ++++--
+ tests/error.py         |  67 +++++++++++++++++++++++++
+ tests/publish_error.py | 132 +++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/run.sh           |   2 +
+ 7 files changed, 371 insertions(+), 8 deletions(-)
+ create mode 100644 pydbus/error.py
+ create mode 100644 tests/error.py
+ create mode 100644 tests/publish_error.py
+
+diff --git a/doc/tutorial.rst b/doc/tutorial.rst
+index b8479cf..7fe55e1 100644
+--- a/doc/tutorial.rst
++++ b/doc/tutorial.rst
+@@ -341,6 +341,53 @@ See ``help(bus.request_name)`` and ``help(bus.register_object)`` for details.
+ 
+ .. --------------------------------------------------------------------
+ 
++Error handling
++==============
++
++You can map D-Bus errors to your exception classes for better error handling.
++To handle D-Bus errors, use the ``@map_error`` decorator::
++
++    from pydbus.error import map_error
++
++    @map_error("org.freedesktop.DBus.Error.InvalidArgs")
++    class InvalidArgsException(Exception):
++        pass
++
++    try:
++        ...
++    catch InvalidArgsException as e:
++        print(e)
++
++To register new D-Bus errors, use the ``@register_error`` decorator::
++
++    from pydbus.error import register_error
++
++    @map_error("net.lew21.pydbus.TutorialExample.MyError", MY_DOMAIN, MY_EXCEPTION_CODE)
++    class MyException(Exception):
++        pass
++
++Then you can raise ``MyException`` from the D-Bus method of the remote object::
++
++    def Method():
++        raise MyException("Message")
++
++And catch the same exception on the client side::
++
++    try:
++        proxy.Method()
++    catch MyException as e:
++        print(e)
++
++To handle all unknown D-Bus errors, use the ``@map_by_default`` decorator to specify the default exception::
++
++    from pydbus.error import map_by_default
++
++    @map_by_default
++    class DefaultException(Exception):
++        pass
++
++.. --------------------------------------------------------------------
++
+ Data types
+ ==========
+ 
+diff --git a/pydbus/error.py b/pydbus/error.py
+new file mode 100644
+index 0000000..aaa3510
+--- /dev/null
++++ b/pydbus/error.py
+@@ -0,0 +1,97 @@
++from gi.repository import GLib, Gio
++
++
++def register_error(name, domain, code):
++	"""Register and map decorated exception class to a DBus error."""
++	def decorated(cls):
++		error_registration.register_error(cls, name, domain, code)
++		return cls
++
++	return decorated
++
++
++def map_error(error_name):
++	"""Map decorated exception class to a DBus error."""
++	def decorated(cls):
++		error_registration.map_error(cls, error_name)
++		return cls
++
++	return decorated
++
++
++def map_by_default(cls):
++	"""Map decorated exception class to all unknown DBus errors."""
++	error_registration.map_by_default(cls)
++	return cls
++
++
++class ErrorRegistration(object):
++	"""Class for mapping exceptions to DBus errors."""
++
++	_default = None
++	_map = dict()
++	_reversed_map = dict()
++
++	def map_by_default(self, exception_cls):
++		"""Set the exception class as a default."""
++		self._default = exception_cls
++
++	def map_error(self, exception_cls, name):
++		"""Map the exception class to a DBus name."""
++		self._map[name] = exception_cls
++		self._reversed_map[exception_cls] = name
++
++	def register_error(self, exception_cls, name, domain, code):
++		"""Map and register the exception class to a DBus name."""
++		self.map_error(exception_cls, name)
++		return Gio.DBusError.register_error(domain, code, name)
++
++	def is_registered_exception(self, obj):
++		"""Is the exception registered?"""
++		return obj.__class__ in self._reversed_map
++
++	def get_dbus_name(self, obj):
++		"""Get the DBus name of the exception."""
++		return self._reversed_map.get(obj.__class__)
++
++	def get_exception_class(self, name):
++		"""Get the exception class mapped to the DBus name."""
++		return self._map.get(name, self._default)
++
++	def transform_message(self, name, message):
++		"""Transform the message of the exception."""
++		prefix = "{}:{}: ".format("GDBus.Error", name)
++
++		if message.startswith(prefix):
++			return message[len(prefix):]
++
++		return message
++
++	def transform_exception(self, e):
++		"""Transform the remote error to the exception."""
++		if not isinstance(e, GLib.Error):
++			return e
++
++		if not Gio.DBusError.is_remote_error(e):
++			return e
++
++		# Get DBus name of the error.
++		name = Gio.DBusError.get_remote_error(e)
++		# Get the exception class.
++		exception_cls = self.get_exception_class(name)
++
++		# Return the original exception.
++		if not exception_cls:
++			return e
++
++		# Return new exception.
++		message = self.transform_message(name, e.message)
++		exception = exception_cls(message)
++		exception.dbus_name = name
++		exception.dbus_domain = e.domain
++		exception.dbus_code = e.code
++		return exception
++
++
++# Default error registration.
++error_registration = ErrorRegistration()
+diff --git a/pydbus/proxy_method.py b/pydbus/proxy_method.py
+index 442fe07..a73f9eb 100644
+--- a/pydbus/proxy_method.py
++++ b/pydbus/proxy_method.py
+@@ -2,6 +2,7 @@ from gi.repository import GLib
+ from .generic import bound_method
+ from .identifier import filter_identifier
+ from .timeout import timeout_to_glib
++from .error import error_registration
+ 
+ try:
+ 	from inspect import Signature, Parameter
+@@ -87,9 +88,20 @@ class ProxyMethod(object):
+ 			call_args += (self._finish_async_call, (callback, callback_args))
+ 			instance._bus.con.call(*call_args)
+ 			return None
++
+ 		else:
+-			ret = instance._bus.con.call_sync(*call_args)
+-			return self._unpack_return(ret)
++			result = None
++			error = None
++
++			try:
++				result = instance._bus.con.call_sync(*call_args)
++			except Exception as e:
++				error = error_registration.transform_exception(e)
++
++			if error:
++				raise error
++
++			return self._unpack_return(result)
+ 
+ 	def _unpack_return(self, values):
+ 		ret = values.unpack()
+@@ -108,7 +120,7 @@ class ProxyMethod(object):
+ 			ret = source.call_finish(result)
+ 			return_args = self._unpack_return(ret)
+ 		except Exception as err:
+-			error = err
++			error = error_registration.transform_exception(err)
+ 
+ 		callback, callback_args = user_data
+ 		callback(*callback_args, returned=return_args, error=error)
+diff --git a/pydbus/registration.py b/pydbus/registration.py
+index f531539..1d2cbcb 100644
+--- a/pydbus/registration.py
++++ b/pydbus/registration.py
+@@ -5,6 +5,7 @@ from . import generic
+ from .exitable import ExitableWithAliases
+ from functools import partial
+ from .method_call_context import MethodCallContext
++from .error import error_registration
+ import logging
+ 
+ try:
+@@ -91,11 +92,16 @@ class ObjectWrapper(ExitableWithAliases("unwrap")):
+ 			logger = logging.getLogger(__name__)
+ 			logger.exception("Exception while handling %s.%s()", interface_name, method_name)
+ 
+-			#TODO Think of a better way to translate Python exception types to DBus error types.
+-			e_type = type(e).__name__
+-			if not "." in e_type:
+-				e_type = "unknown." + e_type
+-			invocation.return_dbus_error(e_type, str(e))
++			if error_registration.is_registered_exception(e):
++				name = error_registration.get_dbus_name(e)
++				invocation.return_dbus_error(name, str(e))
++			else:
++				logger.info("name is not registered")
++				e_type = type(e).__name__
++				if not "." in e_type:
++					e_type = "unknown." + e_type
++
++				invocation.return_dbus_error(e_type, str(e))
+ 
+ 	def Get(self, interface_name, property_name):
+ 		type = self.readable_properties[interface_name + "." + property_name]
+diff --git a/tests/error.py b/tests/error.py
+new file mode 100644
+index 0000000..3ec507d
+--- /dev/null
++++ b/tests/error.py
+@@ -0,0 +1,67 @@
++from pydbus.error import ErrorRegistration
++
++
++class ExceptionA(Exception):
++	pass
++
++
++class ExceptionB(Exception):
++	pass
++
++
++class ExceptionC(Exception):
++	pass
++
++
++class ExceptionD(Exception):
++	pass
++
++
++class ExceptionE(Exception):
++	pass
++
++
++def test_error_mapping():
++	r = ErrorRegistration()
++	r.map_error(ExceptionA, "net.lew21.pydbus.tests.ErrorA")
++	r.map_error(ExceptionB, "net.lew21.pydbus.tests.ErrorB")
++	r.map_error(ExceptionC, "net.lew21.pydbus.tests.ErrorC")
++
++	assert r.is_registered_exception(ExceptionA("Test"))
++	assert r.is_registered_exception(ExceptionB("Test"))
++	assert r.is_registered_exception(ExceptionC("Test"))
++	assert not r.is_registered_exception(ExceptionD("Test"))
++	assert not r.is_registered_exception(ExceptionE("Test"))
++
++	assert r.get_dbus_name(ExceptionA("Test")) == "net.lew21.pydbus.tests.ErrorA"
++	assert r.get_dbus_name(ExceptionB("Test")) == "net.lew21.pydbus.tests.ErrorB"
++	assert r.get_dbus_name(ExceptionC("Test")) == "net.lew21.pydbus.tests.ErrorC"
++
++	assert r.get_exception_class("net.lew21.pydbus.tests.ErrorA") == ExceptionA
++	assert r.get_exception_class("net.lew21.pydbus.tests.ErrorB") == ExceptionB
++	assert r.get_exception_class("net.lew21.pydbus.tests.ErrorC") == ExceptionC
++	assert r.get_exception_class("net.lew21.pydbus.tests.ErrorD") is None
++	assert r.get_exception_class("net.lew21.pydbus.tests.ErrorE") is None
++
++	r.map_by_default(ExceptionD)
++	assert not r.is_registered_exception(ExceptionD("Test"))
++	assert r.get_exception_class("net.lew21.pydbus.tests.ErrorD") == ExceptionD
++	assert r.get_exception_class("net.lew21.pydbus.tests.ErrorE") == ExceptionD
++
++
++def test_transform_message():
++	r = ErrorRegistration()
++	n1 = "net.lew21.pydbus.tests.ErrorA"
++	m1 = "GDBus.Error:net.lew21.pydbus.tests.ErrorA: Message1"
++
++	n2 = "net.lew21.pydbus.tests.ErrorB"
++	m2 = "GDBus.Error:net.lew21.pydbus.tests.ErrorB: Message2"
++
++	assert r.transform_message(n1, m1) == "Message1"
++	assert r.transform_message(n2, m2) == "Message2"
++	assert r.transform_message(n1, m2) == m2
++	assert r.transform_message(n2, m1) == m1
++
++
++test_error_mapping()
++test_transform_message()
+diff --git a/tests/publish_error.py b/tests/publish_error.py
+new file mode 100644
+index 0000000..aa8a18a
+--- /dev/null
++++ b/tests/publish_error.py
+@@ -0,0 +1,132 @@
++import sys
++from threading import Thread
++from gi.repository import GLib, Gio
++from pydbus import SessionBus
++from pydbus.error import register_error, map_error, map_by_default, error_registration
++
++import logging
++logger = logging.getLogger('pydbus.registration')
++logger.disabled = True
++
++loop = GLib.MainLoop()
++DOMAIN = Gio.DBusError.quark()  # TODO: Register new domain.
++
++
++@register_error("net.lew21.pydbus.tests.ErrorA", DOMAIN, 1000)
++class ExceptionA(Exception):
++	pass
++
++
++@register_error("net.lew21.pydbus.tests.ErrorB", DOMAIN, 2000)
++class ExceptionB(Exception):
++	pass
++
++
++@map_error("org.freedesktop.DBus.Error.InvalidArgs")
++class ExceptionC(Exception):
++	pass
++
++
++@map_by_default
++class ExceptionD(Exception):
++	pass
++
++
++class ExceptionE(Exception):
++	pass
++
++
++class TestObject(object):
++	'''
++<node>
++	<interface name='net.lew21.pydbus.tests.TestInterface'>
++		<method name='RaiseA'>
++			<arg type='s' name='msg' direction='in'/>
++		</method>
++		<method name='RaiseB'>
++			<arg type='s' name='msg' direction='in'/>
++		</method>
++		<method name='RaiseD'>
++			<arg type='s' name='msg' direction='in'/>
++		</method>
++		<method name='RaiseE'>
++			<arg type='s' name='msg' direction='in'/>
++		</method>
++	</interface>
++</node>
++	'''
++
++	def RaiseA(self, msg):
++		raise ExceptionA(msg)
++
++	def RaiseB(self, msg):
++		raise ExceptionB(msg)
++
++	def RaiseD(self, msg):
++		raise ExceptionD(msg)
++
++	def RaiseE(self, msg):
++		raise ExceptionE(msg)
++
++bus = SessionBus()
++
++with bus.publish("net.lew21.pydbus.tests.Test", TestObject()):
++	remote = bus.get("net.lew21.pydbus.tests.Test")
++
++	def t_func():
++		# Test new registered errors.
++		try:
++			remote.RaiseA("Test A")
++		except ExceptionA as e:
++			assert str(e) == "Test A"
++
++		try:
++			remote.RaiseB("Test B")
++		except ExceptionB as e:
++			assert str(e) == "Test B"
++
++		# Test mapped errors.
++		try:
++			remote.Get("net.lew21.pydbus.tests.TestInterface", "Foo")
++		except ExceptionC as e:
++			assert str(e) == "No such property 'Foo'"
++
++		# Test default errors.
++		try:
++			remote.RaiseD("Test D")
++		except ExceptionD as e:
++			assert str(e) == "Test D"
++
++		try:
++			remote.RaiseE("Test E")
++		except ExceptionD as e:
++			assert str(e) == "Test E"
++
++		# Test with no default errors.
++		error_registration.map_by_default(None)
++
++		try:
++			remote.RaiseD("Test D")
++		except Exception as e:
++			assert not isinstance(e, ExceptionD)
++
++		try:
++			remote.RaiseE("Test E")
++		except Exception as e:
++			assert not isinstance(e, ExceptionD)
++			assert not isinstance(e, ExceptionE)
++
++		loop.quit()
++
++	t = Thread(None, t_func)
++	t.daemon = True
++
++	def handle_timeout():
++		print("ERROR: Timeout.")
++		sys.exit(1)
++
++	GLib.timeout_add_seconds(4, handle_timeout)
++
++	t.start()
++	loop.run()
++	t.join()
+diff --git a/tests/run.sh b/tests/run.sh
+index 271c58a..a08baf8 100755
+--- a/tests/run.sh
++++ b/tests/run.sh
+@@ -10,10 +10,12 @@ PYTHON=${1:-python}
+ 
+ "$PYTHON" $TESTS_DIR/context.py
+ "$PYTHON" $TESTS_DIR/identifier.py
++"$PYTHON" $TESTS_DIR/error.py
+ if [ "$2" != "dontpublish" ]
+ then
+ 	"$PYTHON" $TESTS_DIR/publish.py
+ 	"$PYTHON" $TESTS_DIR/publish_properties.py
+ 	"$PYTHON" $TESTS_DIR/publish_multiface.py
+ 	"$PYTHON" $TESTS_DIR/publish_async.py
++	"$PYTHON" $TESTS_DIR/publish_error.py
+ fi
+-- 
+2.13.5
+

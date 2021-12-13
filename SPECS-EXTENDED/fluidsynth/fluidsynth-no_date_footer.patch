@@ -1,0 +1,34 @@
+diff -rupN fluidsynth-1.1.9.org/doc/Doxyfile fluidsynth-1.1.9/doc/Doxyfile
+--- fluidsynth-1.1.9.org/doc/Doxyfile	2018-01-02 10:14:56.000000000 -0500
++++ fluidsynth-1.1.9/doc/Doxyfile	2018-01-06 18:01:17.505234645 -0500
+@@ -121,7 +121,7 @@ GENERATE_HTML = YES
+ HTML_OUTPUT = html
+ HTML_FILE_EXTENSION = .html
+ HTML_HEADER = 
+-HTML_FOOTER = 
++HTML_FOOTER = no_date_footer.html
+ HTML_STYLESHEET = 
+ HTML_ALIGN_MEMBERS = YES
+ GENERATE_HTMLHELP = NO
+diff -rupN fluidsynth-1.1.9.org/doc/Doxyfile.cmake fluidsynth-1.1.9/doc/Doxyfile.cmake
+--- fluidsynth-1.1.9.org/doc/Doxyfile.cmake	2018-01-02 10:14:56.000000000 -0500
++++ fluidsynth-1.1.9/doc/Doxyfile.cmake	2018-01-06 18:01:54.625555496 -0500
+@@ -121,7 +121,7 @@ GENERATE_HTML = YES
+ HTML_OUTPUT = html
+ HTML_FILE_EXTENSION = .html
+ HTML_HEADER = 
+-HTML_FOOTER = 
++HTML_FOOTER = @CMAKE_SOURCE_DIR@/doc/no_date_footer.html
+ HTML_STYLESHEET = 
+ HTML_ALIGN_MEMBERS = YES
+ GENERATE_HTMLHELP = NO
+diff -rupN fluidsynth-1.1.9.org/doc/no_date_footer.html fluidsynth-1.1.9/doc/no_date_footer.html
+--- fluidsynth-1.1.9.org/doc/no_date_footer.html	1969-12-31 19:00:00.000000000 -0500
++++ fluidsynth-1.1.9/doc/no_date_footer.html	2018-01-06 18:02:46.340762582 -0500
+@@ -0,0 +1,6 @@
++<hr size="1"><address style="text-align: right;"><small>
++Generated for $projectname by <a href="http://www.doxygen.org/
++index.html"><img src="doxygen.png" alt="doxygen" align="middle" border="0"></a>
++$doxygenversion</small></address>
++</body>
++</html>

@@ -1,0 +1,26 @@
+From 8015a0ef23a874f288d5e77ffafe1d7f4281725d Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Fri, 4 Apr 2014 18:59:24 +0200
+Subject: [PATCH 10/27] build-sys: enable CBCP
+
+Resolves: #199278
+---
+ pppd/Makefile.linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
+index 95c2598..65700fa 100644
+--- a/pppd/Makefile.linux
++++ b/pppd/Makefile.linux
+@@ -68,7 +68,7 @@ HAVE_INET6=y
+ PLUGIN=y
+ 
+ # Enable Microsoft proprietary Callback Control Protocol
+-#CBCP=y
++CBCP=y
+ 
+ # Enable EAP SRP-SHA1 authentication (requires libsrp)
+ #USE_SRP=y
+-- 
+1.8.3.1
+

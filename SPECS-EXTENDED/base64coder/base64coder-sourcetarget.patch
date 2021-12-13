@@ -1,0 +1,20 @@
+--- base64coder-2010-12-19/build.xml	2011-06-06 21:16:10.000000000 +0200
++++ base64coder-2010-12-19/build.xml	2018-10-30 08:39:39.281314416 +0100
+@@ -28,7 +28,7 @@
+  <delete dir="${classesDir}" failonerror="true"/>
+  <mkdir dir="${classesDir}"/>
+  <javac srcdir="${srcDir}" deprecation="true" includeAntRuntime="false" debug="true" debuglevel="lines,source"
+-    source="1.5" target="1.5" destdir="${classesDir}">
++    destdir="${classesDir}">
+   <compilerarg line="-Xlint -Xmaxerrs 6"/>
+  </javac>
+  <jar destfile="${jarFile}">
+@@ -42,7 +42,7 @@
+  <mkdir dir="${testClassesDir}"/>
+  <!-- Note: The "Sun proprietary" warnings cannot be suppressed as of 2010-02. -->
+  <javac srcdir="${testSrcDir}" deprecation="true" includeAntRuntime="false" debug="true" debuglevel="lines,source"
+-    source="1.5" target="1.5" destdir="${testClassesDir}">
++    destdir="${testClassesDir}">
+   <compilerarg line="-Xlint -Xmaxerrs 6"/>
+   <classpath>
+    <pathelement location="${jUnitJar}"/>

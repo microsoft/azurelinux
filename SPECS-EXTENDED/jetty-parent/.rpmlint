@@ -1,0 +1,7 @@
+# don't needs these because it's just pom file
+addFilter('W: no-%prep-section')
+addFilter('W: no-%build-section')
+
+# license is part of pom
+addFilter('W: no-documentation')
+

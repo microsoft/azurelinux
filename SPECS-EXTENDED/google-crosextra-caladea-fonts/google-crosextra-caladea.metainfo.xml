@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Parag Nemade <pnemade AT redhat DOT com> -->
+<component type="font">
+  <id>google-crosextra-caladea</id>
+  <metadata_license>CC-BY-3.0</metadata_license>
+  <name>Caladea</name>
+  <summary>Serif font metric-compatible with Cambria font</summary>
+  <description>
+    <p>
+      Caladea is metric-compatible with Cambria font. This font is a serif
+      typeface family based on Lato.
+    </p>
+  </description>
+  <updatecontact>pnemade_at_redhat_dot_com</updatecontact>
+  <url type="homepage">http://code.google.com/p/chromium/issues/detail?id=168879</url>
+</component>
+

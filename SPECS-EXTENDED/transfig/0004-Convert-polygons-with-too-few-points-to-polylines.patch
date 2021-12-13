@@ -1,0 +1,85 @@
+From c379fe50574e5b5dd6e17f15d8473c5713d1b823 Mon Sep 17 00:00:00 2001
+From: Thomas Loimer <thomas.loimer@tuwien.ac.at>
+Date: Wed, 11 Dec 2019 21:36:46 +0100
+Subject: [PATCH 4/8] Convert polygons with too few points to polylines
+
+As a side effect, this also fixes ticket #56.
+---
+ CHANGES               |  1 +
+ fig2dev/read.c        | 16 ++++++++++++++++
+ fig2dev/tests/read.at | 11 +++++++++++
+ 3 files changed, 28 insertions(+)
+
+diff --git a/CHANGES b/CHANGES
+index 964dc84..b2f7006 100644
+--- a/CHANGES
++++ b/CHANGES
+@@ -6,6 +6,7 @@ Patchlevel Xx (Xxx 20xx)
+ 
+ BUGS FIXED:
+ 	Ticket numbers refer to https://sourceforge.net/p/mcj/tickets/#.
++	o Convert polygons having too few points to polylines. Ticket #56.
+ 	o Reject huge arrow types causing integer overflow. Ticket #57.
+ 	o Allow Fig v2 text strings ending with multiple ^A. Ticket #55.
+ 	o Embed images in pdfs with their original compression type, i.e., leave
+diff --git a/fig2dev/read.c b/fig2dev/read.c
+index 09bd17d..9500091 100644
+--- a/fig2dev/read.c
++++ b/fig2dev/read.c
+@@ -793,8 +793,10 @@ read_ellipseobject(void)
+ /*
+  * Sanitize line objects. Return 0 on success, -1 otherwise.
+  * On error, call free_linestorage(l) after sanitize_lineobject().
++ *
+  * polylines: remove fill, if less than 3 points
+  *		remove arrows, if only one point
++ * polygons: convert to polyline if less than 3 unique points
+  * rectangles, polygons: last point must coincide with first point
+  * rectangle: convert to polygon, if not 5 points
+  * rectangle with rounded corners: error, if not 5 points
+@@ -854,6 +856,20 @@ sanitize_lineobject(
+ 	    q->y = l->points->y;
+ 	}
+ 
++	if (l->type == T_POLYGON) {
++		int	npts;
++
++		q = l->points;
++		for (npts = 1; q->next && npts < 4; q = q->next)
++			++npts;
++		if (npts < 4 ) {
++			put_msg("A polygon with %d points at line %d - convert to a polyline.",
++			npts, line_no);
++			l->type = T_POLYLINE;
++			return 0;
++		}
++	}
++
+ 	if (l->type == T_BOX || l->type == T_ARC_BOX || l->type == T_PIC_BOX) {
+ 	    int	npts = 1;
+ 	    for (q = l->points; q->next; q = q->next)
+diff --git a/fig2dev/tests/read.at b/fig2dev/tests/read.at
+index e9a71a3..4ef8747 100644
+--- a/fig2dev/tests/read.at
++++ b/fig2dev/tests/read.at
+@@ -147,6 +147,17 @@ EOF
+ ])
+ AT_CLEANUP
+ 
++AT_SETUP([convert short polygon to polyline, ticket #56])
++AT_KEYWORDS(read.c polygon)
++AT_CHECK([fig2dev -L ptk <<EOF
++FIG_FILE_TOP
++2 3 0 1 -1 -1 50 -1 -1 0.0 0 0 -1 0 0 1
++	0 0
++EOF
++], 0, ignore, [A polygon with 1 points at line 11 - convert to a polyline.
++])
++AT_CLEANUP
++
+ AT_SETUP([reject negative font type])
+ AT_KEYWORDS(read.c font)
+ AT_CHECK([fig2dev -L box <<EOF
+-- 
+2.24.1
+

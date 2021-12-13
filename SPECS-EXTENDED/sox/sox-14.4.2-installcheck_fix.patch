@@ -1,0 +1,23 @@
+From 9c0842680a4a46ef64990d6c40de05aa30286d54 Mon Sep 17 00:00:00 2001
+From: Jiri Kucera <jkucera@redhat.com>
+Date: Thu, 25 Jan 2018 21:53:30 +0100
+Subject: [PATCH] Added $(DESTDIR) in front of ${bindir} so proper sox binary
+ is invoked during tests
+
+---
+ src/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 7cceaaf..caf9864 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -194,6 +194,6 @@ loc:
+ # would run the test suite, but an uninstalled libltdl build cannot
+ # currently load its formats and effects, so the checks would fail.
+ installcheck:
+-	$(srcdir)/tests.sh --bindir=${bindir} --builddir=${builddir} --srcdir=${srcdir}
+-	$(srcdir)/testall.sh --bindir=${bindir} --srcdir=${srcdir}
++	$(srcdir)/tests.sh --bindir=$(DESTDIR)${bindir} --builddir=${builddir} --srcdir=${srcdir}
++	$(srcdir)/testall.sh --bindir=$(DESTDIR)${bindir} --srcdir=${srcdir}
+ 

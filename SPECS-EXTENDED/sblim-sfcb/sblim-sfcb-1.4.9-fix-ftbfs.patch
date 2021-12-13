@@ -1,0 +1,12 @@
+diff -up sblim-sfcb-1.4.9/control.c.orig sblim-sfcb-1.4.9/control.c
+--- sblim-sfcb-1.4.9/control.c.orig	2015-07-13 15:06:21.331660336 +0200
++++ sblim-sfcb-1.4.9/control.c	2015-07-13 15:08:38.031308917 +0200
+@@ -83,7 +83,7 @@ long            httpReqHandlerTimeout;
+  * Kindly null terminate, always, even if might overwrite
+  * the last char of the truncated string. 
+ */
+-inline char *strncpy_kind(char *to, char *from, size_t size) {
++char *strncpy_kind(char *to, char *from, size_t size) {
+   strncpy(to, from, size);
+   *(to + size - 1) = '\0';
+   return to;

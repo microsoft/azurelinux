@@ -1,0 +1,8 @@
+#!/bin/bash
+if [[ -x @@LIBEXECDIR@@/installkernel ]] ; then
+	exec @@LIBEXECDIR@@/installkernel "${@}"
+elif [[ -x @@LIBEXECDIR@@/installkernel-bls ]] ; then
+	exec @@LIBEXECDIR@@/installkernel-bls "${@}"
+fi
+echo "installkernel is not installed correctly." >>/dev/stderr
+exit 1

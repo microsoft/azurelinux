@@ -1,0 +1,12 @@
+diff -up ./setup.py.orig ./setup.py
+--- ./setup.py.orig	2020-06-25 22:17:42.000000000 +0200
++++ ./setup.py	2020-06-26 14:19:41.522967518 +0200
+@@ -48,7 +48,7 @@ setup(
+         'License :: OSI Approved :: MIT License',
+         'Topic :: Software Development'],
+     install_requires=[
+-        "requests~=2.16",
++        "requests",
+         "requests_oauthlib>=0.5.0",
+         "isodate>=0.6.0",
+         "certifi>=2017.4.17",

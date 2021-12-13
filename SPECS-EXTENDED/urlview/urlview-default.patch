@@ -1,0 +1,91 @@
+diff -up urlview/url_handler.sh.default urlview/url_handler.sh
+--- urlview/url_handler.sh.default	2013-10-23 05:08:01.000000000 +0200
++++ urlview/url_handler.sh	2015-04-22 11:04:42.247546697 +0200
+@@ -28,15 +28,15 @@
+ # VT: Launch in the same terminal
+ 
+ # The lists of programs to be executed are
+-https_prgs="/usr/X11R6/bin/netscape:XW /usr/bin/lynx:XT"
+-http_prgs="/usr/bin/lynx:XT /usr/X11R6/bin/netscape:XW"
++https_prgs="/usr/bin/htmlview:XW /usr/bin/firefox:XW /usr/bin/seamonkey:XW /usr/bin/konqueror:XW /usr/bin/epiphany:XW /usr/bin/links:XT /usr/bin/lynx:XT"
++http_prgs="/usr/bin/htmlview:XW /usr/bin/firefox:XW /usr/bin/seamonkey:XW /usr/bin/konqueror:XW /usr/bin/epiphany:XW /usr/bin/links:XT /usr/bin/lynx:XT"
+ mailto_prgs="/usr/bin/mutt:VT /usr/bin/elm:VT /usr/bin/pine:VT /usr/bin/mail:VT"
+-gopher_prgs="/usr/bin/lynx:XT /usr/bin/gopher:XT"
+-ftp_prgs="/usr/bin/lynx:XT /usr/bin/ncftp:XT"
++gopher_prgs="/usr/bin/lynx:XT"
++ftp_prgs="/usr/bin/ncftp:XT /usr/bin/wget:XT /usr/bin/lynx:XT"
+ 
+ # Program used as an xterm (if it doesn't support -T you'll need to change
+ # the command line in getprg)
+-XTERM=/usr/X11R6/bin/xterm
++XTERM=/usr/bin/xterm
+ 
+ 
+ ###########################################################################
+@@ -100,9 +100,7 @@ gopher)
+     prg=`getprg $gopher_prgs`
+     ;;
+ *)
+-    echo "Unknown URL type.  Please report URL and viewer to:"
+-    echo "joey@debian.org."
+-    echo -n "Press enter to continue."; read x
++    echo -n "Unknown URL type.  Press enter to continue."; read x
+     exit
+     ;;
+ esac
+diff -up urlview/urlview.c.default urlview/urlview.c
+--- urlview/urlview.c.default	2013-10-23 05:08:01.000000000 +0200
++++ urlview/urlview.c	2015-04-22 11:04:42.248546700 +0200
+@@ -50,8 +50,8 @@
+ #include "quote.h"
+ 
+ #define DEFAULT_REGEXP "(((http|https|ftp|gopher)|mailto):(//)?[^ <>\"\t]*|(www|ftp)[0-9]?\\.[-a-z0-9.]+)[^ .,;\t\n\r<\">\\):]?[^, <>\"\t]*[^ .,;\t\n\r<\">\\):]"
+-#define DEFAULT_COMMAND "/etc/urlview/url_handler.sh %s"
+-#define SYSTEM_INITFILE "/etc/urlview/system.urlview"
++#define DEFAULT_COMMAND "/usr/bin/url_handler.sh %s"
++#define SYSTEM_INITFILE "/etc/urlview.conf"
+ 
+ #define OFFSET 2
+ #define PAGELEN (LINES - 1 - OFFSET)
+diff -up urlview/urlview.conf.suse.default urlview/urlview.conf.suse
+--- urlview/urlview.conf.suse.default	2013-10-23 05:08:01.000000000 +0200
++++ urlview/urlview.conf.suse	2015-04-22 11:04:42.248546700 +0200
+@@ -4,6 +4,6 @@
+ #
+ # The defaults are shown here:
+ #
+-# REGEXP  (((https?|ftp|gopher)://|(mailto|file|news):)[^' \t<>"]+|(www|web|w3)\.[-a-z0-9.]+)[^' \t.,;<>"\):]
+-# COMMAND url_handler.sh '%s'
++# REGEXP (((http|https|ftp|gopher)|mailto):(//)?[^ <>\"\t]*|(www|ftp)[0-9]?\\.[-a-z0-9.]+)[^ .,;\t\n\r<\">\\):]?[^, <>\"\t]*[^ .,;\t\n\r<\">\\):]
++# COMMAND /usr/bin/url_handler.sh %s
+ #
+diff -up urlview/urlview.man.default urlview/urlview.man
+--- urlview/urlview.man.default	2013-10-23 05:08:01.000000000 +0200
++++ urlview/urlview.man	2015-04-22 11:05:51.930740825 +0200
+@@ -35,7 +35,7 @@ attempts to read
+ upon startup.  If this file
+ doesn't exist, it will try to read a system wide file 
+ in 
+-.IR /etc/urlview/system.urlview .
++.IR /etc/urlview.conf .
+ There are two configuration commands (order does not matter):
+ .TP
+ REGEXP \fIregexp\fP
+@@ -63,7 +63,7 @@ with the URL that was requested, otherwi
+ the COMMAND string.  The default COMMAND is:
+ .br
+ .sp
+-/etc/urlview/url_handler.sh
++/usr/bin/url_handler.sh
+ .PP
+ .B Note:
+ You should 
+@@ -84,7 +84,7 @@ QUITONLAUNCH
+ Will cause urlview to quit after you launch a URL.
+ .SH FILES
+ .PP
+-.IP "/etc/urlview/system.urlview"
++.IP "/etc/urlview.conf"
+ system-wide urlview configuration file
+ .IP "~/.urlview"
+ urlview configuration file

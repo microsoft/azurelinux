@@ -1,0 +1,1634 @@
+Patch downloaded from
+http://bugs.gentoo.org/show_bug.cgi?id=121871
+http://bugs.gentoo.org/attachment.cgi?id=98094
+
+--- libdv-0.104-old/libdv/asm_common.S
++++ libdv-0.104/libdv/asm_common.S
+@@ -0,0 +1,29 @@
++/* public domain, do what you want */
++
++#ifdef __PIC__
++# define MUNG(sym)                 sym##@GOTOFF(%ebp)
++# define MUNG_ARR(sym, args...)    sym##@GOTOFF(%ebp,##args)
++#else
++# define MUNG(sym)                 sym
++# define MUNG_ARR(sym, args...)    sym(,##args)
++#endif
++
++#ifdef __PIC__
++# undef __i686 /* gcc define gets in our way */
++# define LOAD_PIC_REG(reg) \
++	.ifndef  __i686.get_pc_thunk.reg; \
++	.section .gnu.linkonce.t.__i686.get_pc_thunk.reg,"ax",@progbits; \
++	.global  __i686.get_pc_thunk.reg; \
++	.hidden  __i686.get_pc_thunk.reg; \
++	.type    __i686.get_pc_thunk.reg,@function; \
++	__i686.get_pc_thunk.reg: \
++	movl (%esp), %e##reg; \
++	ret; \
++	.size __i686.get_pc_thunk.reg,.-__i686.get_pc_thunk.reg; \
++	.previous; \
++	.endif; \
++	call __i686.get_pc_thunk.reg; \
++	addl $_GLOBAL_OFFSET_TABLE_, %e##reg
++#else
++# define LOAD_PIC_REG(reg)
++#endif
+--- libdv-0.104-old/libdv/dct_block_mmx.S
++++ libdv-0.104/libdv/dct_block_mmx.S
+@@ -55,19 +55,22 @@ scratch2:       .quad 0
+ 
+ .section .note.GNU-stack, "", @progbits
+ 
++#include "asm_common.S"
++
+ .text
+ 
+ .align 8	
+ .global _dv_dct_88_block_mmx
+ .hidden _dv_dct_88_block_mmx
+ .type   _dv_dct_88_block_mmx,@function
+ _dv_dct_88_block_mmx:
+ 
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 
+-	movl    8(%ebp), %esi          # source
++	LOAD_PIC_REG(bp)
++
++	movl    12(%esp), %esi          # source
+ 
+ # column 0
+ 	movq 16*0(%esi), %mm0          # v0
+@@ -88,22 +93,22 @@ _dv_dct_88_block_mmx:
+ 
+ 	movq 16*3(%esi), %mm5          # v3
+ 	movq 16*4(%esi), %mm7          # v4
+-	movq  %mm7, scratch1           # scratch1: v4   ; 
++	movq  %mm7, MUNG(scratch1)     # scratch1: v4   ; 
+ 	movq  %mm5, %mm7               # duplicate v3 
+-	paddw scratch1, %mm5           # v03: v3+v4  
+-	psubw scratch1, %mm7           # v04: v3-v4  
+-	movq  %mm5, scratch2           # scratch2: v03
++	paddw MUNG(scratch1), %mm5     # v03: v3+v4  
++	psubw MUNG(scratch1), %mm7     # v04: v3-v4  
++	movq  %mm5, MUNG(scratch2)     # scratch2: v03
+ 	movq  %mm0, %mm5               # mm5: v00
+ 
+-	paddw scratch2, %mm0           # v10: v00+v03   
+-	psubw scratch2, %mm5           # v13: v00-v03   
+-	movq  %mm3, scratch3           # scratch3: v02
++	paddw MUNG(scratch2), %mm0     # v10: v00+v03   
++	psubw MUNG(scratch2), %mm5     # v13: v00-v03   
++	movq  %mm3, MUNG(scratch3)     # scratch3: v02
+ 	movq  %mm1, %mm3               # duplicate v01
+ 
+-	paddw scratch3, %mm1          # v11: v01+v02
+-	psubw scratch3, %mm3          # v12: v01-v02
++	paddw MUNG(scratch3), %mm1    # v11: v01+v02
++	psubw MUNG(scratch3), %mm3    # v12: v01-v02
+ 
+-	movq  %mm6, scratch4           # scratch4: v05
++	movq  %mm6, MUNG(scratch4)     # scratch4: v05
+ 	movq  %mm0, %mm6               # duplicate v10
+ 
+ 	paddw %mm1, %mm0              # v10+v11
+@@ -113,10 +118,10 @@ _dv_dct_88_block_mmx:
+ 	movq  %mm6, 16*4(%esi)         # out4: v10-v11 
+ 
+ 	movq  %mm4, %mm0               # mm0: v06
+-	paddw scratch4, %mm4          # v15: v05+v06 
++	paddw MUNG(scratch4), %mm4    # v15: v05+v06 
+ 	paddw  %mm2, %mm0             # v16: v07+v06
+ 
+-	pmulhw WA3, %mm4               # v35~: WA3*v15
++	pmulhw MUNG(WA3), %mm4         # v35~: WA3*v15
+ 	psllw  $1, %mm4                # v35: compensate the coeefient scale
+ 
+ 	movq   %mm4, %mm6              # duplicate v35
+@@ -125,7 +130,7 @@ _dv_dct_88_block_mmx:
+ 
+ 	paddw  %mm5, %mm3             # v22: v12+v13
+ 
+-	pmulhw WA1, %mm3               # v32~: WA1*v22
++	pmulhw MUNG(WA1), %mm3         # v32~: WA1*v22
+ 	psllw  $16-NSHIFT, %mm3        # v32: compensate the coeefient scale
+ 	movq   %mm5, %mm6              # duplicate v13
+ 
+@@ -136,13 +141,13 @@ _dv_dct_88_block_mmx:
+ 	movq  %mm6, 16*6(%esi)         # out6: v13-v32 
+ 
+ 
+-	paddw  scratch4, %mm7         # v14n: v04+v05
++	paddw  MUNG(scratch4), %mm7   # v14n: v04+v05
+ 	movq   %mm0, %mm5              # duplicate v16
+ 
+ 	psubw  %mm7, %mm0             # va1: v16-v14n
+-	pmulhw WA5, %mm0               # va0~:  va1*WA5
+-	pmulhw WA4, %mm5               # v36~~: v16*WA4
+-	pmulhw WA2, %mm7               # v34~~: v14n*WA2
++	pmulhw MUNG(WA5), %mm0         # va0~:  va1*WA5
++	pmulhw MUNG(WA4), %mm5         # v36~~: v16*WA4
++	pmulhw MUNG(WA2), %mm7         # v34~~: v14n*WA2
+ 	psllw  $16-WA4_SHIFT, %mm5     # v36: compensate the coeefient scale 
+ 	psllw  $16-NSHIFT, %mm7        # v34: compensate the coeefient scale
+ 
+@@ -190,22 +195,22 @@ _dv_dct_88_block_mmx:
+ 
+ 	movq 16*3(%esi), %mm5              # v3
+ 	movq 16*4(%esi), %mm7              # v4
+-	movq  %mm7, scratch1                    # scratch1: v4   ; 
++	movq  %mm7, MUNG(scratch1)     # scratch1: v4   ; 
+ 	movq  %mm5, %mm7               # duplicate v3 
+-	paddw scratch1, %mm5           # v03: v3+v4  
+-	psubw scratch1, %mm7           # v04: v3-v4  
+-	movq  %mm5, scratch2        # scratch2: v03
++	paddw MUNG(scratch1), %mm5     # v03: v3+v4  
++	psubw MUNG(scratch1), %mm7     # v04: v3-v4  
++	movq  %mm5, MUNG(scratch2)     # scratch2: v03
+ 	movq  %mm0, %mm5               # mm5: v00
+ 
+-	paddw scratch2, %mm0           # v10: v00+v03   
+-	psubw scratch2, %mm5           # v13: v00-v03   
+-	movq  %mm3, scratch3         # scratc3: v02
++	paddw MUNG(scratch2), %mm0     # v10: v00+v03   
++	psubw MUNG(scratch2), %mm5     # v13: v00-v03   
++	movq  %mm3, MUNG(scratch3)     # scratc3: v02
+ 	movq  %mm1, %mm3               # duplicate v01
+ 
+-	paddw scratch3, %mm1           # v11: v01+v02
+-	psubw scratch3, %mm3           # v12: v01-v02
++	paddw MUNG(scratch3), %mm1     # v11: v01+v02
++	psubw MUNG(scratch3), %mm3     # v12: v01-v02
+ 
+-	movq  %mm6, scratch4         # scratc4: v05
++	movq  %mm6, MUNG(scratch4)     # scratc4: v05
+ 	movq  %mm0, %mm6               # duplicate v10
+ 
+ 	paddw %mm1, %mm0                            # v10+v11
+@@ -215,10 +220,10 @@ _dv_dct_88_block_mmx:
+ 	movq  %mm6, 16*4(%esi)          # out4: v10-v11 
+ 
+ 	movq  %mm4, %mm0             # mm0: v06
+-	paddw scratch4, %mm4         # v15: v05+v06 
++	paddw MUNG(scratch4), %mm4     # v15: v05+v06 
+ 	paddw  %mm2, %mm0                       # v16: v07+v06
+ 
+-	pmulhw WA3, %mm4           # v35~: WA3*v15
++	pmulhw MUNG(WA3), %mm4         # v35~: WA3*v15
+ 	psllw  $16-NSHIFT, %mm4       # v35: compensate the coeefient scale
+ 
+ 	movq   %mm4, %mm6            # duplicate v35
+@@ -227,7 +232,7 @@ _dv_dct_88_block_mmx:
+ 
+ 	paddw  %mm5, %mm3            # v22: v12+v13
+ 
+-	pmulhw WA1, %mm3           # v32~: WA3*v15
++	pmulhw MUNG(WA1), %mm3         # v32~: WA3*v15
+ 	psllw  $16-NSHIFT, %mm3       # v32: compensate the coeefient scale
+ 	movq   %mm5, %mm6            # duplicate v13
+ 
+@@ -237,13 +242,13 @@ _dv_dct_88_block_mmx:
+ 	movq  %mm5, 16*2(%esi)          # out2: v13+v32 
+ 	movq  %mm6, 16*6(%esi)          # out6: v13-v32 
+ 
+-	paddw  scratch4, %mm7                           # v14n: v04+v05
++	paddw  MUNG(scratch4), %mm7     # v14n: v04+v05
+ 	movq   %mm0, %mm5                               # duplicate v16
+ 
+ 	psubw  %mm7, %mm0                               # va1: v16-v14n
+-	pmulhw WA2, %mm7                # v34~~: v14n*WA2
+-	pmulhw WA5, %mm0                # va0~:  va1*WA5
+-	pmulhw WA4, %mm5                        # v36~~: v16*WA4
++	pmulhw MUNG(WA2), %mm7          # v34~~: v14n*WA2
++	pmulhw MUNG(WA5), %mm0          # va0~:  va1*WA5
++	pmulhw MUNG(WA4), %mm5          # v36~~: v16*WA4
+ 	psllw  $16-NSHIFT, %mm7
+ 	psllw  $16-WA4_SHIFT, %mm5      # v36: compensate the coeffient 
+ 		# scale note that WA4 is shifted 1 bit less than the others
+@@ -755,11 +762,12 @@ _dv_dct_block_mmx_postscale_88:
+ _dv_dct_248_block_mmx:
+ 
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 	pushl   %edi
+ 
+-	movl    8(%ebp), %esi          # source
++	LOAD_PIC_REG(bp)
++
++	movl    16(%esp), %esi          # source
+ 
+ # column 0
+ 
+@@ -781,7 +791,7 @@ _dv_dct_248_block_mmx:
+ 	paddw %mm1, %mm0	       # v20: v10+v11
+ 	psubw %mm1, %mm3	       # v21: v10-v11
+ 
+-	pmulhw WA1, %mm5               # v32~: WA1*v22
++	pmulhw MUNG(WA1), %mm5         # v32~: WA1*v22
+ 	movq  %mm4, %mm2	
+ 	psllw  $16-NSHIFT, %mm5        # v32: compensate the coeffient scale
+ 
+@@ -820,7 +830,7 @@ _dv_dct_248_block_mmx:
+ 	paddw %mm1, %mm0	       # v20: v10+v11
+ 	psubw %mm1, %mm3	       # v21: v10-v11
+ 
+-	pmulhw WA1, %mm5               # v32~: WA1*v22
++	pmulhw MUNG(WA1), %mm5         # v32~: WA1*v22
+ 	movq  %mm4, %mm2	
+ 	psllw  $16-NSHIFT, %mm5        # v32: compensate the coeffient scale
+ 
+@@ -857,7 +867,7 @@ _dv_dct_248_block_mmx:
+ 	paddw %mm1, %mm0	       # v20: v10+v11
+ 	psubw %mm1, %mm3	       # v21: v10-v11
+ 
+-	pmulhw WA1, %mm5               # v32~: WA1*v22
++	pmulhw MUNG(WA1), %mm5         # v32~: WA1*v22
+ 	movq  %mm4, %mm2	
+ 	psllw  $16-NSHIFT, %mm5        # v32: compensate the coeffient scale
+ 
+@@ -894,7 +904,7 @@ _dv_dct_248_block_mmx:
+ 	paddw %mm1, %mm0	       # v20: v10+v11
+ 	psubw %mm1, %mm3	       # v21: v10-v11
+ 
+-	pmulhw WA1, %mm5               # v32~: WA1*v22
++	pmulhw MUNG(WA1), %mm5         # v32~: WA1*v22
+ 	movq  %mm4, %mm2	
+ 	psllw  $16-NSHIFT, %mm5        # v32: compensate the coeffient scale
+ 
+--- libdv-0.104-old/libdv/dv.c
++++ libdv-0.104/libdv/dv.c
+@@ -205,6 +205,9 @@ dv_reconfigure(int clamp_luma, int clamp
+ } /* dv_reconfigure */
+ 
+ 
++extern uint8_t dv_quant_offset[4];
++extern uint8_t dv_quant_shifts[22][4];
++
+ static inline void 
+ dv_decode_macroblock(dv_decoder_t *dv, dv_macroblock_t *mb, unsigned int quality) {
+   int i;
+@@ -218,7 +221,7 @@ dv_decode_macroblock(dv_decoder_t *dv, d
+       dv_idct_248 (co248, mb->b[i].coeffs);
+     } else {
+ #if ARCH_X86
+-      _dv_quant_88_inverse_x86(mb->b[i].coeffs,mb->qno,mb->b[i].class_no);
++      _dv_quant_88_inverse_x86(mb->b[i].coeffs,mb->qno,mb->b[i].class_no,dv_quant_offset,dv_quant_shifts);
+       _dv_idct_88(mb->b[i].coeffs);
+ #elif ARCH_X86_64
+       _dv_quant_88_inverse_x86_64(mb->b[i].coeffs,mb->qno,mb->b[i].class_no);
+@@ -250,7 +253,7 @@ dv_decode_video_segment(dv_decoder_t *dv
+ 	dv_idct_248 (co248, mb->b[b].coeffs);
+       } else {
+ #if ARCH_X86
+-	_dv_quant_88_inverse_x86(bl->coeffs,mb->qno,bl->class_no);
++	_dv_quant_88_inverse_x86(bl->coeffs,mb->qno,bl->class_no,dv_quant_offset,dv_quant_shifts);
+ 	_dv_weight_88_inverse(bl->coeffs);
+ 	_dv_idct_88(bl->coeffs);
+ #elif ARCH_X86_64
+--- libdv-0.104-old/libdv/encode.c
++++ libdv-0.104/libdv/encode.c
+@@ -521,7 +521,8 @@ static void reorder_block(dv_block_t *bl
+ }
+ 
+ extern unsigned long _dv_vlc_encode_block_mmx(dv_coeff_t* coeffs,
+-					  dv_vlc_entry_t ** out);
++					  dv_vlc_entry_t ** out,
++					  dv_vlc_entry_t * lookup);
+ 
+ extern unsigned long _dv_vlc_encode_block_mmx_x86_64(dv_coeff_t* coeffs,
+ 					  dv_vlc_entry_t ** out);
+@@ -558,7 +559,7 @@ static unsigned long vlc_encode_block(dv
+ #elif ARCH_X86
+ 	int num_bits;
+ 
+-	num_bits = _dv_vlc_encode_block_mmx(coeffs, &o);
++	num_bits = _dv_vlc_encode_block_mmx(coeffs, &o, vlc_encode_lookup);
+ 	emms();
+ #else
+ 	int num_bits;
+@@ -574,7 +575,7 @@ static unsigned long vlc_encode_block(dv
+ 	return num_bits;
+ }
+ 
+-extern unsigned long _dv_vlc_num_bits_block_x86(dv_coeff_t* coeffs);
++extern unsigned long _dv_vlc_num_bits_block_x86(dv_coeff_t* coeffs, unsigned char* lookup);
+ extern unsigned long _dv_vlc_num_bits_block_x86_64(dv_coeff_t* coeffs);
+ 
+ extern unsigned long _dv_vlc_num_bits_block(dv_coeff_t* coeffs)
+@@ -600,7 +601,7 @@ extern unsigned long _dv_vlc_num_bits_bl
+ #elif ARCH_X86_64
+ 	return _dv_vlc_num_bits_block_x86_64(coeffs);
+ #else
+-	return _dv_vlc_num_bits_block_x86(coeffs);
++	return _dv_vlc_num_bits_block_x86(coeffs, vlc_num_bits_lookup);
+ #endif
+ }
+ 
+--- libdv-0.104-old/libdv/encode_x86.S
++++ libdv-0.104/libdv/encode_x86.S
+@@ -23,9 +23,6 @@
+  *  The libdv homepage is http://libdv.sourceforge.net/.  
+  */
+ 
+-.data
+-ALLONE:		.word 1,1,1,1
+-VLCADDMASK:	.byte 255,0,0,0,255,0,0,0
+ 		
+ 
+ .section .note.GNU-stack, "", @progbits
+@@ -49,11 +47,14 @@ _dv_vlc_encode_block_mmx:	
+ 
+ 	movl	$63, %ecx
+ 
+-	movl	vlc_encode_lookup, %esi
++	movl	4+4*4+8(%esp), %esi              # vlc_encode_lookup
+ 
+ 	pxor	%mm0, %mm0
+ 	pxor	%mm2, %mm2
+-	movq	VLCADDMASK, %mm1
++	pushl	$0x000000FF                      # these four lines
++	pushl	$0x000000FF                      # load VLCADDMASK
++	movq	(%esp), %mm1                     # into %mm1 off the stack
++	addl	$8, %esp                         #  --> no TEXTRELs
+ 	xorl	%ebp, %ebp
+ 	subl	$8, %edx
+ vlc_encode_block_mmx_loop:
+@@ -125,7 +128,7 @@ _dv_vlc_num_bits_block_x86:	
+ 	addl	$2, %edi
+ 
+ 	movl	$63, %ecx
+-	movl	vlc_num_bits_lookup, %esi
++	movl	4+4*4+4(%esp), %esi              # vlc_num_bits_lookup
+ 	
+ vlc_num_bits_block_x86_loop:
+ 	movw	(%edi), %ax
+@@ -583,8 +594,11 @@ _dv_need_dct_248_mmx_rows:
+ 	paddw	%mm5, %mm1
+ 
+ 	paddw	%mm1, %mm0
+-	
+-	pmaddwd	ALLONE, %mm0	
++
++	pushl	$0x00010001              # these four lines
++	pushl	$0x00010001              # load ALLONE
++	pmaddwd	(%esp), %mm0             # into %mm0 off the stack
++	addl	$8, %esp                 #  --> no TEXTRELs
+ 	movq	%mm0, %mm1
+ 	psrlq	$32, %mm1
+ 	paddd	%mm1, %mm0
+--- libdv-0.104-old/libdv/idct_block_mmx.S
++++ libdv-0.104/libdv/idct_block_mmx.S
+@@ -8,17 +8,21 @@
+ 
+ .section .note.GNU-stack, "", @progbits
+ 
++#include "asm_common.S"
++
+ .text
+ 	.align 4
+ .global _dv_idct_block_mmx
+ .hidden _dv_idct_block_mmx
+ .type   _dv_idct_block_mmx,@function
+ _dv_idct_block_mmx:
+ 	pushl	 %ebp
+-	movl	 %esp,%ebp
+ 	pushl	 %esi
+-	leal	 preSC, %ecx
+-	movl	 8(%ebp),%esi		/* source matrix */
++
++	LOAD_PIC_REG(bp)
++
++	leal	 MUNG(preSC), %ecx
++	movl	 12(%esp),%esi		/* source matrix */
+ 
+ /* 
+  *	column 0: even part
+@@ -34,7 +40,7 @@ _dv_idct_block_mmx:
+ 	movq %mm1, %mm2			/* added 11/1/96 */
+ 	pmulhw 8*8(%esi),%mm5		/* V8 */
+ 	psubsw %mm0, %mm1		/* V16 */
+-	pmulhw x5a825a825a825a82, %mm1	/* 23170 ->V18 */
++	pmulhw MUNG(x5a825a825a825a82), %mm1	/* 23170 ->V18 */
+ 	paddsw %mm0, %mm2		/* V17 */
+ 	movq %mm2, %mm0			/* duplicate V17 */
+ 	psraw $1, %mm2			/* t75=t82 */
+@@ -75,7 +81,7 @@ _dv_idct_block_mmx:
+ 	paddsw %mm0, %mm3		/* V29 ; free mm0 */
+ 	movq %mm7, %mm1			/* duplicate V26 */
+ 	psraw $1, %mm3			/* t91=t94 */
+-	pmulhw x539f539f539f539f,%mm7	/* V33 */
++	pmulhw MUNG(x539f539f539f539f),%mm7	/* V33 */
+ 	psraw $1, %mm1			/* t96 */
+ 	movq %mm5, %mm0			/* duplicate V2 */
+ 	psraw $2, %mm4			/* t85=t87 */
+@@ -83,15 +89,15 @@ _dv_idct_block_mmx:
+ 	psubsw %mm4, %mm0		/* V28 ; free mm4 */
+ 	movq %mm0, %mm2			/* duplicate V28 */
+ 	psraw $1, %mm5			/* t90=t93 */
+-	pmulhw x4546454645464546,%mm0	/* V35 */
++	pmulhw MUNG(x4546454645464546),%mm0	/* V35 */
+ 	psraw $1, %mm2			/* t97 */
+ 	movq %mm5, %mm4			/* duplicate t90=t93 */
+ 	psubsw %mm2, %mm1		/* V32 ; free mm2 */
+-	pmulhw x61f861f861f861f8,%mm1	/* V36 */
++	pmulhw MUNG(x61f861f861f861f8),%mm1	/* V36 */
+ 	psllw $1, %mm7			/* t107 */
+ 	paddsw %mm3, %mm5		/* V31 */
+ 	psubsw %mm3, %mm4		/* V30 ; free mm3 */
+-	pmulhw x5a825a825a825a82,%mm4	/* V34 */
++	pmulhw MUNG(x5a825a825a825a82),%mm4	/* V34 */
+ 	nop
+ 	psubsw %mm1, %mm0		/* V38 */
+ 	psubsw %mm7, %mm1		/* V37 ; free mm7 */
+@@ -158,7 +164,7 @@ _dv_idct_block_mmx:
+ 	psubsw %mm7, %mm1		/* V50 */
+ 	pmulhw 8*9(%esi), %mm5		/* V9 */
+ 	paddsw %mm7, %mm2		/* V51 */
+-	pmulhw x5a825a825a825a82, %mm1	/* 23170 ->V52 */
++	pmulhw MUNG(x5a825a825a825a82), %mm1	/* 23170 ->V52 */
+ 	movq %mm2, %mm6			/* duplicate V51 */
+ 	psraw $1, %mm2			/* t138=t144 */
+ 	movq %mm3, %mm4			/* duplicate V1 */
+@@ -199,11 +205,11 @@ _dv_idct_block_mmx:
+  * even more by doing the correction step in a later stage when the number
+  * is actually multiplied by 16
+  */
+-	paddw x0005000200010001, %mm4
++	paddw MUNG(x0005000200010001), %mm4
+ 	psubsw %mm6, %mm3		/* V60 ; free mm6 */
+ 	psraw $1, %mm0			/* t154=t156 */
+ 	movq %mm3, %mm1			/* duplicate V60 */
+-	pmulhw x539f539f539f539f, %mm1	/* V67 */
++	pmulhw MUNG(x539f539f539f539f), %mm1	/* V67 */
+ 	movq %mm5, %mm6			/* duplicate V3 */
+ 	psraw $2, %mm4			/* t148=t150 */
+ 	paddsw %mm4, %mm5		/* V61 */
+@@ -212,13 +218,13 @@ _dv_idct_block_mmx:
+ 	psllw $1, %mm1			/* t169 */
+ 	paddsw %mm0, %mm5		/* V65 -> result */
+ 	psubsw %mm0, %mm4		/* V64 ; free mm0 */
+-	pmulhw x5a825a825a825a82, %mm4	/* V68 */
++	pmulhw MUNG(x5a825a825a825a82), %mm4	/* V68 */
+ 	psraw $1, %mm3			/* t158 */
+ 	psubsw %mm6, %mm3		/* V66 */
+ 	movq %mm5, %mm2			/* duplicate V65 */
+-	pmulhw x61f861f861f861f8, %mm3	/* V70 */
++	pmulhw MUNG(x61f861f861f861f8), %mm3	/* V70 */
+ 	psllw $1, %mm6			/* t165 */
+-	pmulhw x4546454645464546, %mm6	/* V69 */
++	pmulhw MUNG(x4546454645464546), %mm6	/* V69 */
+ 	psraw $1, %mm2			/* t172 */
+ /* moved from next block */
+ 	movq 8*5(%esi), %mm0		/* V56 */
+@@ -343,7 +349,7 @@ _dv_idct_block_mmx:
+ *	movq 8*13(%esi), %mm4		tmt13
+ */
+ 	psubsw %mm4, %mm3		/* V134 */
+-	pmulhw x5a825a825a825a82, %mm3	/* 23170 ->V136 */
++	pmulhw MUNG(x5a825a825a825a82), %mm3	/* 23170 ->V136 */
+ 	movq 8*9(%esi), %mm6		/* tmt9 */
+ 	paddsw %mm4, %mm5		/* V135 ; mm4 free */
+ 	movq %mm0, %mm4			/* duplicate tmt1 */
+@@ -372,17 +378,17 @@ _dv_idct_block_mmx:
+ 	psubsw %mm7, %mm0		/* V144 */
+ 	movq %mm0, %mm3			/* duplicate V144 */
+ 	paddsw %mm7, %mm2		/* V147 ; free mm7 */
+-	pmulhw x539f539f539f539f, %mm0	/* 21407-> V151 */
++	pmulhw MUNG(x539f539f539f539f), %mm0	/* 21407-> V151 */
+ 	movq %mm1, %mm7			/* duplicate tmt3 */
+ 	paddsw %mm5, %mm7		/* V145 */
+ 	psubsw %mm5, %mm1		/* V146 ; free mm5 */
+ 	psubsw %mm1, %mm3		/* V150 */
+ 	movq %mm7, %mm5			/* duplicate V145 */
+-	pmulhw x4546454645464546, %mm1	/* 17734-> V153 */
++	pmulhw MUNG(x4546454645464546), %mm1	/* 17734-> V153 */
+ 	psubsw %mm2, %mm5		/* V148 */
+-	pmulhw x61f861f861f861f8, %mm3	/* 25080-> V154 */
++	pmulhw MUNG(x61f861f861f861f8), %mm3	/* 25080-> V154 */
+ 	psllw $2, %mm0			/* t311 */
+-	pmulhw x5a825a825a825a82, %mm5	/* 23170-> V152 */
++	pmulhw MUNG(x5a825a825a825a82), %mm5	/* 23170-> V152 */
+ 	paddsw %mm2, %mm7		/* V149 ; free mm2 */
+ 	psllw $1, %mm1			/* t313 */
+ 	nop	/* without the nop - freeze here for one clock */
+@@ -408,7 +414,7 @@ _dv_idct_block_mmx:
+ 	paddsw %mm3, %mm6		/* V164 ; free mm3 */
+ 	movq %mm4, %mm3			/* duplicate V142 */
+ 	psubsw %mm5, %mm4		/* V165 ; free mm5 */
+-	movq %mm2, scratch7		/* out7 */
++	movq %mm2, MUNG(scratch7)		/* out7 */
+ 	psraw $4, %mm6
+ 	psraw $4, %mm4
+ 	paddsw %mm5, %mm3		/* V162 */
+@@ -419,11 +425,11 @@ _dv_idct_block_mmx:
+  */
+ 	movq %mm6, 8*9(%esi)		/* out9 */
+ 	paddsw %mm1, %mm0		/* V161 */
+-	movq %mm3, scratch5		/* out5 */
++	movq %mm3, MUNG(scratch5)		/* out5 */
+ 	psubsw %mm1, %mm5		/* V166 ; free mm1 */
+ 	movq %mm4, 8*11(%esi)		/* out11 */
+ 	psraw $4, %mm5
+-	movq %mm0, scratch3		/* out3 */
++	movq %mm0, MUNG(scratch3)		/* out3 */
+ 	movq %mm2, %mm4			/* duplicate V140 */
+ 	movq %mm5, 8*13(%esi)		/* out13 */
+ 	paddsw %mm7, %mm2		/* V160 */
+@@ -433,7 +439,7 @@ _dv_idct_block_mmx:
+ /* moved from the next block */
+ 	movq 8*3(%esi), %mm7
+ 	psraw $4, %mm4
+-	movq %mm2, scratch1		/* out1 */
++	movq %mm2, MUNG(scratch1)		/* out1 */
+ /* moved from the next block */
+ 	movq %mm0, %mm1
+ 	movq %mm4, 8*15(%esi)		/* out15 */
+@@ -490,15 +496,15 @@ _dv_idct_block_mmx:
+ 	paddsw %mm4, %mm3		/* V113 ; free mm4 */
+ 	movq %mm0, %mm4			/* duplicate V110 */
+ 	paddsw %mm1, %mm2		/* V111 */
+-	pmulhw x539f539f539f539f, %mm0	/* 21407-> V117 */
++	pmulhw MUNG(x539f539f539f539f), %mm0	/* 21407-> V117 */
+ 	psubsw %mm1, %mm5		/* V112 ; free mm1 */
+ 	psubsw %mm5, %mm4		/* V116 */
+ 	movq %mm2, %mm1			/* duplicate V111 */
+-	pmulhw x4546454645464546, %mm5	/* 17734-> V119 */
++	pmulhw MUNG(x4546454645464546), %mm5	/* 17734-> V119 */
+ 	psubsw %mm3, %mm2		/* V114 */
+-	pmulhw x61f861f861f861f8, %mm4	/* 25080-> V120 */
++	pmulhw MUNG(x61f861f861f861f8), %mm4	/* 25080-> V120 */
+ 	paddsw %mm3, %mm1		/* V115 ; free mm3 */
+-	pmulhw x5a825a825a825a82, %mm2	/* 23170-> V118 */
++	pmulhw MUNG(x5a825a825a825a82), %mm2	/* 23170-> V118 */
+ 	psllw $2, %mm0			/* t266 */
+ 	movq %mm1, (%esi)		/* save V115 */
+ 	psllw $1, %mm5			/* t268 */
+@@ -516,7 +522,7 @@ _dv_idct_block_mmx:
+ 	movq %mm6, %mm3			/* duplicate tmt4 */
+ 	psubsw %mm0, %mm6		/* V100 */
+ 	paddsw %mm0, %mm3		/* V101 ; free mm0 */
+-	pmulhw x5a825a825a825a82, %mm6	/* 23170 ->V102 */
++	pmulhw MUNG(x5a825a825a825a82), %mm6	/* 23170 ->V102 */
+ 	movq %mm7, %mm5			/* duplicate tmt0 */
+ 	movq 8*8(%esi), %mm1		/* tmt8 */
+ 	paddsw %mm1, %mm7		/* V103 */
+@@ -550,10 +556,10 @@ _dv_idct_block_mmx:
+ 	movq 8*2(%esi), %mm3		/* V123 */
+ 	paddsw %mm4, %mm7		/* out0 */
+ /* moved up from next block */
+-	movq scratch3, %mm0
++	movq MUNG(scratch3), %mm0
+ 	psraw $4, %mm7
+ /* moved up from next block */
+-	movq scratch5, %mm6 
++	movq MUNG(scratch5), %mm6 
+ 	psubsw %mm4, %mm1		/* out14 ; free mm4 */
+ 	paddsw %mm3, %mm5		/* out2 */
+ 	psraw $4, %mm1
+@@ -564,7 +570,7 @@ _dv_idct_block_mmx:
+ 	movq %mm5, 8*2(%esi)		/* out2 ; free mm5 */
+ 	psraw $4, %mm2
+ /* moved up to the prev block */
+-	movq scratch7, %mm4
++	movq MUNG(scratch7), %mm4
+ /* moved up to the prev block */
+ 	psraw $4, %mm0
+ 	movq %mm2, 8*12(%esi)		/* out12 ; free mm2 */
+@@ -578,7 +584,7 @@ _dv_idct_block_mmx:
+  *	psraw $4, %mm0
+  *	psraw $4, %mm6
+ */
+-	movq scratch1, %mm1
++	movq MUNG(scratch1), %mm1
+ 	psraw $4, %mm4
+ 	movq %mm0, 8*3(%esi)		/* out3 */
+ 	psraw $4, %mm1
+--- libdv-0.104-old/libdv/parse.c
++++ libdv-0.104/libdv/parse.c
+@@ -477,6 +477,13 @@ dv_parse_ac_coeffs(dv_videosegment_t *se
+   exit(0);
+ #endif
+ } /* dv_parse_ac_coeffs */
++#if defined __GNUC__ && __ELF__
++# define dv_strong_hidden_alias(name, aliasname) \
++    extern __typeof (name) aliasname __attribute__ ((alias (#name), visibility ("hidden")))
++dv_strong_hidden_alias(dv_parse_ac_coeffs, asm_dv_parse_ac_coeffs);
++#else
++int asm_dv_parse_ac_coeffs(dv_videosegment_t *seg) { return dv_parse_ac_coeffs(seg); }
++#endif
+ 
+ /* ---------------------------------------------------------------------------
+  */
+--- libdv-0.104-old/libdv/quant.c
++++ libdv-0.104/libdv/quant.c
+@@ -144,7 +144,7 @@ uint8_t  dv_quant_offset[4] = { 6,3,0,1 
+ uint32_t	dv_quant_248_mul_tab [2] [22] [64];
+ uint32_t dv_quant_88_mul_tab [2] [22] [64];
+ 
+-extern void             _dv_quant_x86(dv_coeff_t *block,int qno,int klass);
++extern void             _dv_quant_x86(dv_coeff_t *block,int qno,int klass,uint8_t *dv_quant_offset,uint8_t *dv_quant_shifts);
+ extern void             _dv_quant_x86_64(dv_coeff_t *block,int qno,int klass);
+ static void quant_248_inverse_std(dv_coeff_t *block,int qno,int klass,dv_248_coeff_t *co);
+ static void quant_248_inverse_mmx(dv_coeff_t *block,int qno,int klass,dv_248_coeff_t *co);
+@@ -210,7 +210,7 @@ void _dv_quant(dv_coeff_t *block,int qno
+ 		_dv_quant_x86_64(block, qno, klass);
+ 		emms();
+ #else
+-		_dv_quant_x86(block, qno, klass);
++		_dv_quant_x86(block, qno, klass, dv_quant_offset, dv_quant_shifts);
+ 		emms();
+ #endif
+ 	}
+--- libdv-0.104-old/libdv/quant.h
++++ libdv-0.104/libdv/quant.h
+@@ -27,7 +27,7 @@ extern void _dv_quant(dv_coeff_t *block,
+ extern void _dv_quant_88_inverse(dv_coeff_t *block,int qno,int klass);
+ extern void (*_dv_quant_248_inverse) (dv_coeff_t *block,int qno,int klass,
+                                   dv_248_coeff_t *co);
+-extern void _dv_quant_88_inverse_x86(dv_coeff_t *block,int qno,int klass);
++extern void _dv_quant_88_inverse_x86(dv_coeff_t *block,int qno,int klass, uint8_t *offset, uint8_t *shifts);
+ extern void _dv_quant_88_inverse_x86_64(dv_coeff_t *block,int qno,int klass);
+ extern void dv_quant_init (void);
+ #ifdef __cplusplus
+--- libdv-0.104-old/libdv/quant_x86.S
++++ libdv-0.104/libdv/quant_x86.S
+@@ -73,10 +75,13 @@ _dv_quant_88_inverse_x86:	
+ 	
+ 	/*  pq = dv_quant_shifts[qno + dv_quant_offset[class]]; */
+ 	movl	ARGn(1),%eax	/* qno */
++	movl	ARGn(3),%ebx	/* dv_quant_offset */
++	addl	ARGn(2),%ebx	/* class */
++	movzbl	(%ebx),%ecx
+ 	movl	ARGn(2),%ebx	/* class */
+-	movzbl	dv_quant_offset(%ebx),%ecx
+ 	addl	%ecx,%eax
+-	leal	dv_quant_shifts(,%eax,4),%edx	/* edx is pq */
++	movl	ARGn(4),%edx	/* dv_quant_shifts */
++	leal	(%edx,%eax,4),%edx	/* edx is pq */
+ 
+ 	/* extra = (class == 3); */
+ 				/*  0   1   2   3 */
+@@ -214,11 +221,13 @@ _dv_quant_x86:	
+ 	
+ 	/*  pq = dv_quant_shifts[qno + dv_quant_offset[class]]; */
+ 	movl	ARGn(1),%eax	/* qno */
++	movl	ARGn(3),%ebx	/* offset */
++	addl	ARGn(2),%ebx	/* class */
++	movzbl	(%ebx),%ecx
+ 	movl	ARGn(2),%ebx	/* class */
+-
+-	movzbl	dv_quant_offset(%ebx),%ecx
++	movl	ARGn(4),%edx	/* shifts */
+ 	addl	%ecx,%eax
+-	leal	dv_quant_shifts(,%eax,4),%edx	/* edx is pq */
++	leal	(%edx,%eax,4),%edx	/* edx is pq */
+ 
+ 	/* extra = (class == 3); */
+ 				/*  0   1   2   3 */
+--- libdv-0.104-old/libdv/rgbtoyuv.S
++++ libdv-0.104/libdv/rgbtoyuv.S
+@@ -41,9 +41,6 @@
+ #define DV_WIDTH_SHORT_HALF 720
+ #define DV_WIDTH_BYTE_HALF  360	
+ 		
+-.global _dv_rgbtoycb_mmx
+-# .global yuvtoycb_mmx
+-
+ .data
+ 
+ .align 8
+@@ -110,25 +107,26 @@ VR0GR:  .long   0,0
+ VBG0B:  .long   0,0
+ 	
+ #endif	
+-	
++
++#include "asm_common.S"
++
+ .section .note.GNU-stack, "", @progbits
+ 
+ .text
+ 
+-#define _inPtr     8
+-#define _rows      12
+-#define _columns   16
+-#define _outyPtr   20
+-#define _outuPtr   24
+-#define _outvPtr   28
++#define _inPtr     24+8
++#define _rows      24+12
++#define _columns   24+16
++#define _outyPtr   24+20
++#define _outuPtr   24+24
++#define _outvPtr   24+28
+ 
+ .global _dv_rgbtoycb_mmx
+ .hidden _dv_rgbtoycb_mmx
+ .type   _dv_rgbtoycb_mmx,@function
+ _dv_rgbtoycb_mmx:
+ 
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %eax
+ 	pushl   %ebx
+ 	pushl   %ecx
+@@ -133,46 +134,47 @@ _dv_rgbtoycb_mmx:
+ 	pushl   %esi
+ 	pushl   %edi
+ 
+-	leal    ZEROSX, %eax    #This section gets around a bug
++	LOAD_PIC_REG(bp)
++
++	leal    MUNG(ZEROSX), %eax    #This section gets around a bug
+ 	movq    (%eax), %mm0    #unlikely to persist
+-	movq    %mm0, ZEROS
+-	leal    OFFSETDX, %eax
++	movq    %mm0, MUNG(ZEROS)
++	leal    MUNG(OFFSETDX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, OFFSETD
+-	leal    OFFSETWX, %eax
++	movq    %mm0, MUNG(OFFSETD)
++	leal    MUNG(OFFSETWX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, OFFSETW
+-	leal    OFFSETBX, %eax
++	movq    %mm0, MUNG(OFFSETW)
++	leal    MUNG(OFFSETBX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, OFFSETB
+-	leal    YR0GRX, %eax
++	movq    %mm0, MUNG(OFFSETB)
++	leal    MUNG(YR0GRX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, YR0GR
+-	leal    YBG0BX, %eax
++	movq    %mm0, MUNG(YR0GR)
++	leal    MUNG(YBG0BX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, YBG0B
+-	leal    UR0GRX, %eax
++	movq    %mm0, MUNG(YBG0B)
++	leal    MUNG(UR0GRX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, UR0GR
+-	leal    UBG0BX, %eax
++	movq    %mm0, MUNG(UR0GR)
++	leal    MUNG(UBG0BX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, UBG0B
+-	leal    VR0GRX, %eax
++	movq    %mm0, MUNG(UBG0B)
++	leal    MUNG(VR0GRX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, VR0GR
+-	leal    VBG0BX, %eax
++	movq    %mm0, MUNG(VR0GR)
++	leal    MUNG(VBG0BX), %eax
+ 	movq    (%eax), %mm0
+-	movq    %mm0, VBG0B
+-	
+-	movl    _rows(%ebp), %eax
+-	movl    _columns(%ebp), %ebx
++	movq    %mm0, MUNG(VBG0B)
++	movl    _rows(%esp), %eax
++	movl    _columns(%esp), %ebx
+ 	mull    %ebx            #number pixels
+ 	shrl    $3, %eax        #number of loops
+ 	movl    %eax, %edi      #loop counter in edi
+-	movl    _inPtr(%ebp), %eax
+-	movl    _outyPtr(%ebp), %ebx
+-	movl    _outuPtr(%ebp), %ecx
+-	movl    _outvPtr(%ebp), %edx
++	movl    _inPtr(%esp), %eax
++	movl    _outyPtr(%esp), %ebx
++	movl    _outuPtr(%esp), %ecx
++	movl    _outvPtr(%esp), %edx
+ rgbtoycb_mmx_loop: 
+ 	movq    (%eax), %mm1    #load G2R2B1G1R1B0G0R0
+ 	pxor    %mm6, %mm6      #0 -> mm6
+@@ -186,29 +188,29 @@ rgbtoycb_mmx_loop: 
+ 	punpcklbw %mm6, %mm1     #B1G1R1B0 -> mm1
+ 	movq    %mm0, %mm2      #R1B0G0R0 -> mm2
+ 
+-	pmaddwd YR0GR, %mm0     #yrR1,ygG0+yrR0 -> mm0
++	pmaddwd MUNG(YR0GR), %mm0     #yrR1,ygG0+yrR0 -> mm0
+ 	movq    %mm1, %mm3      #B1G1R1B0 -> mm3
+ 
+-	pmaddwd YBG0B, %mm1     #ybB1+ygG1,ybB0 -> mm1
++	pmaddwd MUNG(YBG0B), %mm1     #ybB1+ygG1,ybB0 -> mm1
+ 	movq    %mm2, %mm4      #R1B0G0R0 -> mm4
+ 
+-	pmaddwd UR0GR, %mm2     #urR1,ugG0+urR0 -> mm2
++	pmaddwd MUNG(UR0GR), %mm2     #urR1,ugG0+urR0 -> mm2
+ 	movq    %mm3, %mm5      #B1G1R1B0 -> mm5
+ 
+-	pmaddwd UBG0B, %mm3     #ubB1+ugG1,ubB0 -> mm3
++	pmaddwd MUNG(UBG0B), %mm3     #ubB1+ugG1,ubB0 -> mm3
+ 	punpckhbw       %mm6, %mm7 #    00G2R2 -> mm7
+ 
+-	pmaddwd VR0GR, %mm4     #vrR1,vgG0+vrR0 -> mm4
++	pmaddwd MUNG(VR0GR), %mm4     #vrR1,vgG0+vrR0 -> mm4
+ 	paddd   %mm1, %mm0      #Y1Y0 -> mm0
+ 
+-	pmaddwd VBG0B, %mm5     #vbB1+vgG1,vbB0 -> mm5
++	pmaddwd MUNG(VBG0B), %mm5     #vbB1+vgG1,vbB0 -> mm5
+ 
+ 	movq    8(%eax), %mm1   #R5B4G4R4B3G3R3B2 -> mm1
+ 	paddd   %mm3, %mm2      #U1U0 -> mm2
+ 
+ 	movq    %mm1, %mm6      #R5B4G4R4B3G3R3B2 -> mm6
+ 
+-	punpcklbw       ZEROS, %mm1     #B3G3R3B2 -> mm1
++	punpcklbw       MUNG(ZEROS), %mm1     #B3G3R3B2 -> mm1
+ 	paddd   %mm5, %mm4      #V1V0 -> mm4
+ 
+ 	movq    %mm1, %mm5      #B3G3R3B2 -> mm5
+@@ -216,29 +218,29 @@ rgbtoycb_mmx_loop: 
+ 
+ 	paddd   %mm7, %mm1      #R3B200+00G2R2=R3B2G2R2->mm1
+ 
+-	punpckhbw       ZEROS, %mm6     #R5B4G4R3 -> mm6
++	punpckhbw       MUNG(ZEROS), %mm6     #R5B4G4R3 -> mm6
+ 	movq    %mm1, %mm3      #R3B2G2R2 -> mm3
+ 
+-	pmaddwd YR0GR, %mm1     #yrR3,ygG2+yrR2 -> mm1
++	pmaddwd MUNG(YR0GR), %mm1     #yrR3,ygG2+yrR2 -> mm1
+ 	movq    %mm5, %mm7      #B3G3R3B2 -> mm7
+ 
+-	pmaddwd YBG0B, %mm5     #ybB3+ygG3,ybB2 -> mm5
++	pmaddwd MUNG(YBG0B), %mm5     #ybB3+ygG3,ybB2 -> mm5
+ 	psrad   $FIXPSHIFT, %mm0       #32-bit scaled Y1Y0 -> mm0
+ 
+-	movq    %mm6, TEMP0     #R5B4G4R4 -> TEMP0
++	movq    %mm6, MUNG(TEMP0)     #R5B4G4R4 -> TEMP0
+ 	movq    %mm3, %mm6      #R3B2G2R2 -> mm6
+-	pmaddwd UR0GR, %mm6     #urR3,ugG2+urR2 -> mm6
++	pmaddwd MUNG(UR0GR), %mm6     #urR3,ugG2+urR2 -> mm6
+ 	psrad   $FIXPSHIFT, %mm2       #32-bit scaled U1U0 -> mm2
+ 
+ 	paddd   %mm5, %mm1      #Y3Y2 -> mm1
+ 	movq    %mm7, %mm5      #B3G3R3B2 -> mm5
+-	pmaddwd UBG0B, %mm7     #ubB3+ugG3,ubB2
++	pmaddwd MUNG(UBG0B), %mm7     #ubB3+ugG3,ubB2
+ 	psrad   $FIXPSHIFT, %mm1 #32-bit scaled Y3Y2 -> mm1
+ 
+-	pmaddwd VR0GR, %mm3     #vrR3,vgG2+vgR2
++	pmaddwd MUNG(VR0GR), %mm3     #vrR3,vgG2+vgR2
+ 	packssdw        %mm1, %mm0      #Y3Y2Y1Y0 -> mm0
+ 
+-	pmaddwd VBG0B, %mm5     #vbB3+vgG3,vbB2 -> mm5
++	pmaddwd MUNG(VBG0B), %mm5     #vbB3+vgG3,vbB2 -> mm5
+ 	psrad   $FIXPSHIFT, %mm4       #32-bit scaled V1V0 -> mm4
+ 
+ 	movq    16(%eax), %mm1  #B7G7R7B6G6R6B5G5 -> mm7
+@@ -253,58 +255,58 @@ rgbtoycb_mmx_loop: 
+ 	movq    %mm7, %mm5      #R7B6G6R6B5G500 -> mm5
+ 	psrad   $FIXPSHIFT, %mm3       #32-bit scaled V3V2 -> mm3
+ 
+-	paddw	OFFSETY, %mm0
++	paddw	MUNG(OFFSETY), %mm0
+ 	movq    %mm0, (%ebx)     #store Y3Y2Y1Y0 
+ 	packssdw %mm6, %mm2      #32-bit scaled U3U2U1U0 -> mm2
+ 
+-	movq    TEMP0, %mm0     #R5B4G4R4 -> mm0
++	movq    MUNG(TEMP0), %mm0     #R5B4G4R4 -> mm0
+ 	addl	$8, %ebx
+-	
+-	punpcklbw       ZEROS, %mm7     #B5G500 -> mm7
++
++	punpcklbw       MUNG(ZEROS), %mm7     #B5G500 -> mm7
+ 	movq    %mm0, %mm6      #R5B4G4R4 -> mm6
+ 
+-	movq    %mm2, TEMPU     #32-bit scaled U3U2U1U0 -> TEMPU
++	movq    %mm2, MUNG(TEMPU)     #32-bit scaled U3U2U1U0 -> TEMPU
+ 	psrlq   $32, %mm0       #00R5B4 -> mm0
+ 
+ 	paddw   %mm0, %mm7      #B5G5R5B4 -> mm7
+ 	movq    %mm6, %mm2      #B5B4G4R4 -> mm2
+ 
+-	pmaddwd YR0GR, %mm2     #yrR5,ygG4+yrR4 -> mm2
++	pmaddwd MUNG(YR0GR), %mm2     #yrR5,ygG4+yrR4 -> mm2
+ 	movq    %mm7, %mm0      #B5G5R5B4 -> mm0
+ 
+-	pmaddwd YBG0B, %mm7     #ybB5+ygG5,ybB4 -> mm7
++	pmaddwd MUNG(YBG0B), %mm7     #ybB5+ygG5,ybB4 -> mm7
+ 	packssdw        %mm3, %mm4      #32-bit scaled V3V2V1V0 -> mm4
+ 
+ 	addl    $24, %eax       #increment RGB count
+ 
+-	movq    %mm4, TEMPV     #(V3V2V1V0)/256 -> mm4
++	movq    %mm4, MUNG(TEMPV)     #(V3V2V1V0)/256 -> mm4
+ 	movq    %mm6, %mm4      #B5B4G4R4 -> mm4
+ 
+-	pmaddwd UR0GR, %mm6     #urR5,ugG4+urR4
++	pmaddwd MUNG(UR0GR), %mm6     #urR5,ugG4+urR4
+ 	movq    %mm0, %mm3      #B5G5R5B4 -> mm0
+ 
+-	pmaddwd UBG0B, %mm0     #ubB5+ugG5,ubB4
++	pmaddwd MUNG(UBG0B), %mm0     #ubB5+ugG5,ubB4
+ 	paddd   %mm7, %mm2      #Y5Y4 -> mm2
+ 
+-	pmaddwd         VR0GR, %mm4     #vrR5,vgG4+vrR4 -> mm4
++	pmaddwd         MUNG(VR0GR), %mm4     #vrR5,vgG4+vrR4 -> mm4
+ 	pxor    %mm7, %mm7      #0 -> mm7
+ 
+-	pmaddwd VBG0B, %mm3     #vbB5+vgG5,vbB4 -> mm3
++	pmaddwd MUNG(VBG0B), %mm3     #vbB5+vgG5,vbB4 -> mm3
+ 	punpckhbw       %mm7, %mm1      #B7G7R7B6 -> mm1
+ 
+ 	paddd   %mm6, %mm0      #U5U4 -> mm0
+ 	movq    %mm1, %mm6      #B7G7R7B6 -> mm6
+ 
+-	pmaddwd YBG0B, %mm6     #ybB7+ygG7,ybB6 -> mm6
++	pmaddwd MUNG(YBG0B), %mm6     #ybB7+ygG7,ybB6 -> mm6
+ 	punpckhbw       %mm7, %mm5      #R7B6G6R6 -> mm5
+ 
+ 	movq    %mm5, %mm7      #R7B6G6R6 -> mm7
+ 	paddd   %mm4, %mm3      #V5V4 -> mm3
+ 
+-	pmaddwd YR0GR, %mm5     #yrR7,ygG6+yrR6 -> mm5
++	pmaddwd MUNG(YR0GR), %mm5     #yrR7,ygG6+yrR6 -> mm5
+ 	movq    %mm1, %mm4      #B7G7R7B6 -> mm4
+ 
+-	pmaddwd UBG0B, %mm4     #ubB7+ugG7,ubB6 -> mm4
++	pmaddwd MUNG(UBG0B), %mm4     #ubB7+ugG7,ubB6 -> mm4
+ 	psrad   $FIXPSHIFT, %mm0       #32-bit scaled U5U4 -> mm0
+ 
+ 	psrad   $FIXPSHIFT, %mm2       #32-bit scaled Y5Y4 -> mm2
+@@ -312,25 +314,25 @@ rgbtoycb_mmx_loop: 
+ 	paddd   %mm5, %mm6      #Y7Y6 -> mm6
+ 	movq    %mm7, %mm5      #R7B6G6R6 -> mm5
+ 
+-	pmaddwd UR0GR, %mm7     #urR7,ugG6+ugR6 -> mm7
++	pmaddwd MUNG(UR0GR), %mm7     #urR7,ugG6+ugR6 -> mm7
+ 	psrad   $FIXPSHIFT, %mm3       #32-bit scaled V5V4 -> mm3
+ 
+-	pmaddwd VBG0B, %mm1     #vbB7+vgG7,vbB6 -> mm1
++	pmaddwd MUNG(VBG0B), %mm1     #vbB7+vgG7,vbB6 -> mm1
+ 	psrad   $FIXPSHIFT, %mm6 #32-bit scaled Y7Y6 -> mm6
+ 
+ 	packssdw %mm6, %mm2     #Y7Y6Y5Y4 -> mm2
+ 
+-	pmaddwd VR0GR, %mm5     #vrR7,vgG6+vrR6 -> mm5
++	pmaddwd MUNG(VR0GR), %mm5     #vrR7,vgG6+vrR6 -> mm5
+ 	paddd   %mm4, %mm7      #U7U6 -> mm7    
+ 
+ 	psrad   $FIXPSHIFT, %mm7       #32-bit scaled U7U6 -> mm7
+-	paddw	OFFSETY, %mm2
++	paddw	MUNG(OFFSETY), %mm2
+ 	movq	%mm2, (%ebx)    #store Y7Y6Y5Y4 
+ 
+-	movq	ALLONE, %mm6
++	movq	MUNG(ALLONE), %mm6
+ 	packssdw %mm7, %mm0     #32-bit scaled U7U6U5U4 -> mm0
+ 
+-	movq    TEMPU, %mm4     #32-bit scaled U3U2U1U0 -> mm4
++	movq    MUNG(TEMPU), %mm4     #32-bit scaled U3U2U1U0 -> mm4
+ 	pmaddwd	%mm6, %mm0      #U7U6U5U4 averaged -> (U7U6)(U5U4)=UU3 UU2->mm0
+ 	
+ 	pmaddwd	%mm6, %mm4      #U3U2U1U0 averaged -> (U3U2)(U1U0)=UU1 UU0->mm4
+@@ -340,8 +342,8 @@ rgbtoycb_mmx_loop: 
+ 
+ 	psrad   $FIXPSHIFT, %mm1       #32-bit scaled V7V6 -> mm1
+ 	psraw	$1, %mm4 	#divide UU3 UU2 UU1 UU0 by 2 -> mm4
+-		
+-	movq    TEMPV, %mm5     #32-bit scaled V3V2V1V0 -> mm5
++
++	movq    MUNG(TEMPV), %mm5     #32-bit scaled V3V2V1V0 -> mm5
+ 
+ 	movq	%mm4, (%ecx)    # store U	
+ 
+@@ -429,14 +433,15 @@ _dv_ppm_copy_y_block_mmx:
+ _dv_pgm_copy_y_block_mmx:
+ 
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 	pushl	%edi
+-	
+-	movl    8(%ebp), %edi          # dest
+-	movl    12(%ebp), %esi         # src
+ 
+-	movq	OFFSETY, %mm7
++	LOAD_PIC_REG(bp)
++
++	movl    16(%esp), %edi          # dest
++	movl    20(%esp), %esi         # src
++
++	movq	MUNG(OFFSETY), %mm7
+ 	pxor	%mm6, %mm6
+ 	
+ 	movq	(%esi), %mm0
+@@ -571,14 +578,15 @@ _dv_pgm_copy_y_block_mmx:
+ _dv_video_copy_y_block_mmx:
+ 
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 	pushl	%edi
+-	
+-	movl    8(%ebp), %edi          # dest
+-	movl    12(%ebp), %esi         # src
+ 
+-	movq	OFFSETBX, %mm7
++	LOAD_PIC_REG(bp)
++
++	movl    16(%esp), %edi          # dest
++	movl    20(%esp), %esi         # src
++
++	movq	MUNG(OFFSETBX), %mm7
+ 	pxor	%mm6, %mm6
+ 	
+ 	movq	(%esi), %mm0
+@@ -859,16 +871,16 @@ _dv_ppm_copy_pal_c_block_mmx:
+ _dv_pgm_copy_pal_c_block_mmx:
+ 				
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 	pushl	%edi
+ 	pushl	%ebx
+-	
+-	movl    8(%ebp), %edi          # dest
+-	movl    12(%ebp), %esi         # src
+ 
++	LOAD_PIC_REG(bp)
++
++	movl    20(%esp), %edi          # dest
++	movl    24(%esp), %esi         # src
+ 
+-	movq	OFFSETBX, %mm7
++	movq	MUNG(OFFSETBX), %mm7
+ 	pxor	%mm6, %mm6
+ 
+ 	
+@@ -1007,15 +1021,16 @@ _dv_pgm_copy_pal_c_block_mmx:
+ _dv_video_copy_pal_c_block_mmx:
+ 				
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 	pushl	%edi
+ 	pushl	%ebx
+-	
+-	movl    8(%ebp), %edi          # dest
+-	movl    12(%ebp), %esi         # src
+ 
+-	movq	OFFSETBX, %mm7
++	LOAD_PIC_REG(bp)
++
++	movl    20(%esp), %edi          # dest
++	movl    24(%esp), %esi         # src
++
++	movq	MUNG(OFFSETBX), %mm7
+ 	paddw	%mm7, %mm7
+ 	pxor	%mm6, %mm6
+ 
+@@ -1102,18 +1119,18 @@ video_copy_pal_c_block_mmx_loop:	
+ _dv_ppm_copy_ntsc_c_block_mmx:
+ 				
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 	pushl	%edi
+ 	pushl	%ebx
+-	
+-	movl    8(%ebp), %edi          # dest
+-	movl    12(%ebp), %esi         # src
++
++	LOAD_PIC_REG(bp)
++
++	movl    20(%esp), %edi          # dest
++	movl    24(%esp), %esi         # src
+ 
+ 	movl	$4, %ebx	
+ 
+-	movq	ALLONE, %mm6
+-	
++	movq	MUNG(ALLONE), %mm6
+ ppm_copy_ntsc_c_block_mmx_loop:	
+ 	
+ 	movq	(%esi), %mm0
+@@ -1175,14 +1194,15 @@ ppm_copy_ntsc_c_block_mmx_loop:	
+ _dv_pgm_copy_ntsc_c_block_mmx:
+ 				
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 	pushl	%edi
+-	
+-	movl    8(%ebp), %edi          # dest
+-	movl    12(%ebp), %esi         # src
+ 
+-	movq	OFFSETBX, %mm7
++	LOAD_PIC_REG(bp)
++
++	movl    16(%esp), %edi          # dest
++	movl    20(%esp), %esi         # src
++
++	movq	MUNG(OFFSETBX), %mm7
+ 	paddw	%mm7, %mm7
+ 	pxor	%mm6, %mm6
+ 
+@@ -1332,15 +1354,16 @@ _dv_pgm_copy_ntsc_c_block_mmx:
+ _dv_video_copy_ntsc_c_block_mmx:
+ 				
+ 	pushl   %ebp
+-	movl    %esp, %ebp
+ 	pushl   %esi
+ 	pushl	%edi
+ 	pushl	%ebx
+-	
+-	movl    8(%ebp), %edi          # dest
+-	movl    12(%ebp), %esi         # src
+ 
+-	movq	OFFSETBX, %mm7
++	LOAD_PIC_REG(bp)
++
++	movl    20(%esp), %edi          # dest
++	movl    24(%esp), %esi         # src
++
++	movq	MUNG(OFFSETBX), %mm7
+ 	paddw	%mm7, %mm7
+ 	pxor	%mm6, %mm6
+ 
+--- libdv-0.104-old/libdv/rgbtoyuv_x86_64.S
++++ libdv-0.104/libdv/rgbtoyuv_x86_64.S
+@@ -41,9 +41,6 @@
+ #define DV_WIDTH_SHORT_HALF 720
+ #define DV_WIDTH_BYTE_HALF  360	
+ 		
+-.global _dv_rgbtoycb_mmx_x86_64
+-# .global yuvtoycb_mmx_x86_64
+-
+ .data
+ 
+ .align 8
+--- libdv-0.104-old/libdv/vlc_x86.S
++++ libdv-0.104/libdv/vlc_x86.S
+@@ -1,31 +1,39 @@
+ 	#include "asmoff.h"
+ .section .note.GNU-stack, "", @progbits
++	#include "asm_common.S"
+ 
+ .text
+ 	.align 4
+ .globl dv_decode_vlc 
++.globl asm_dv_decode_vlc 
++.hidden asm_dv_decode_vlc
++asm_dv_decode_vlc = dv_decode_vlc
++
+ 	.type	 dv_decode_vlc,@function
+ dv_decode_vlc:
+ 	pushl %ebx
++	pushl %ebp
++
++	LOAD_PIC_REG(bp)
+ 
+-	/* Args are at 8(%esp). */
+-	movl  8(%esp),%eax		/* %eax is bits */
+-	movl  12(%esp),%ebx		/* %ebx is maxbits */
++	/* Args are at 12(%esp). */
++	movl  12(%esp),%eax		/* %eax is bits */
++	movl  16(%esp),%ebx		/* %ebx is maxbits */
+ 	andl  $0x3f,%ebx		/* limit index range STL*/
+ 
+-	movl  dv_vlc_class_index_mask(,%ebx,4),%edx
++	movl  MUNG_ARR(dv_vlc_class_index_mask,%ebx,4),%edx
+ 	andl  %eax,%edx
+-	movl  dv_vlc_class_index_rshift(,%ebx,4),%ecx
++	movl  MUNG_ARR(dv_vlc_class_index_rshift,%ebx,4),%ecx
+ 	sarl  %cl,%edx
+-	movl  dv_vlc_classes(,%ebx,4),%ecx
++	movl  MUNG_ARR(dv_vlc_classes,%ebx,4),%ecx
+ 	movsbl  (%ecx,%edx,1),%edx	/* %edx is class */
+ 			
+-	movl  dv_vlc_index_mask(,%edx,4),%ebx
+-	movl  dv_vlc_index_rshift(,%edx,4),%ecx
++	movl  MUNG_ARR(dv_vlc_index_mask,%edx,4),%ebx
++	movl  MUNG_ARR(dv_vlc_index_rshift,%edx,4),%ecx
+ 	andl  %eax,%ebx
+ 	sarl  %cl,%ebx
+ 
+-	movl  dv_vlc_lookups(,%edx,4),%edx
++	movl  MUNG_ARR(dv_vlc_lookups,%edx,4),%edx
+ 	movl  (%edx,%ebx,4),%edx
+ 
+ 	/* Now %edx holds result, like this:
+@@ -43,7 +52,7 @@ dv_decode_vlc:
+ 	movl  %edx,%ecx
+ 	sarl  $8,%ecx
+ 	andl  $0xff,%ecx
+-	movl  sign_mask(,%ecx,4),%ebx
++	movl  MUNG_ARR(sign_mask,%ecx,4),%ebx
+ 	andl  %ebx,%eax
+ 	negl  %eax
+ 	sarl  $31,%eax
+@@ -64,14 +73,14 @@ dv_decode_vlc:
+ 	    *result = broken;
+ 	Note that the 'broken' pattern is all ones (i.e. 0xffffffff)
+ 	*/
+-	movl  12(%esp),%ebx		/* %ebx is maxbits */
++	movl  16(%esp),%ebx		/* %ebx is maxbits */
+ 	subl  %ecx,%ebx
+ 	sbbl  %ebx,%ebx
+ 	orl   %ebx,%edx
+ 
+-	movl  16(%esp),%eax
++	movl  20(%esp),%eax
+ 	movl  %edx,(%eax)
+-	
++	popl  %ebp
+ 	popl  %ebx
+ 	ret
+ 	
+@@ -81,21 +90,28 @@ dv_decode_vlc:
+ 	.type	 __dv_decode_vlc,@function
+ __dv_decode_vlc:
+ 	pushl %ebx
++	pushl %ebp
++
++	LOAD_PIC_REG(bp)
+ 
+-	/* Args are at 8(%esp). */
+-	movl  8(%esp),%eax		/* %eax is bits */
++	/* Args are at 12(%esp). */
++	movl  12(%esp),%eax		/* %eax is bits */
+ 	
+ 	movl  %eax,%edx			/* %edx is class */
+ 	andl  $0xfe00,%edx
+ 	sarl  $9,%edx
++#ifdef __PIC__
++	movsbl dv_vlc_class_lookup5@GOTOFF(%ebp,%edx),%edx
++#else
+ 	movsbl dv_vlc_class_lookup5(%edx),%edx
+-	
+-	movl  dv_vlc_index_mask(,%edx,4),%ebx
+-	movl  dv_vlc_index_rshift(,%edx,4),%ecx
++#endif
++
++	movl  MUNG_ARR(dv_vlc_index_mask,%edx,4),%ebx
++	movl  MUNG_ARR(dv_vlc_index_rshift,%edx,4),%ecx
+ 	andl  %eax,%ebx
+ 	sarl  %cl,%ebx
+ 
+-	movl  dv_vlc_lookups(,%edx,4),%edx
++	movl  MUNG_ARR(dv_vlc_lookups,%edx,4),%edx
+ 	movl  (%edx,%ebx,4),%edx
+ 
+ 	/* Now %edx holds result, like this:
+@@ -113,7 +129,7 @@ __dv_decode_vlc:
+ 	movl  %edx,%ecx
+ 	sarl  $8,%ecx
+ 	andl  $0xff,%ecx
+-	movl  sign_mask(,%ecx,4),%ecx
++	movl  MUNG_ARR(sign_mask,%ecx,4),%ecx
+ 	andl  %ecx,%eax
+ 	negl  %eax
+ 	sarl  $31,%eax
+@@ -128,9 +144,9 @@ __dv_decode_vlc:
+ 	xorl  %eax,%edx
+ 	subl  %eax,%edx
+ 
+-	movl  12(%esp),%eax
++	movl  16(%esp),%eax
+ 	movl  %edx,(%eax)
+-	
++	popl  %ebp
+ 	popl  %ebx
+ 	ret
+ 
+@@ -141,14 +157,20 @@ void dv_parse_ac_coeffs_pass0(bitstream_
+ */
+ .text
+ 	.align	4
++.globl asm_dv_parse_ac_coeffs_pass0
++.hidden asm_dv_parse_ac_coeffs_pass0
++	asm_dv_parse_ac_coeffs_pass0 = dv_parse_ac_coeffs_pass0
++
+ .globl	dv_parse_ac_coeffs_pass0
+ .type	dv_parse_ac_coeffs_pass0,@function
+ dv_parse_ac_coeffs_pass0:
+ 	pushl	%ebx
+ 	pushl	%edi
+ 	pushl	%esi
+ 	pushl	%ebp
+ 
++	LOAD_PIC_REG(si)
++
+ #define ARGn(N)  (20+(4*(N)))(%esp)
+ 
+ 	/*
+@@ -160,8 +183,10 @@ dv_parse_ac_coeffs_pass0:
+ 	ebp	bl
+ 	*/
+ 	movl    ARGn(2),%ebp
++#ifndef __PIC__
+ 	movl	ARGn(0),%esi
+ 	movl	bitstream_t_buf(%esi),%esi
++#endif
+ 	movl	dv_block_t_offset(%ebp),%edi
+ 	movl	dv_block_t_reorder(%ebp),%ebx
+ 
+@@ -171,7 +196,11 @@ dv_parse_ac_coeffs_pass0:
+ 	
+ 	movq    dv_block_t_coeffs(%ebp),%mm1
+ 	pxor    %mm0,%mm0
++#ifdef __PIC__
++	pand    const_f_0_0_0@GOTOFF(%esi),%mm1
++#else
+ 	pand    const_f_0_0_0,%mm1
++#endif
+ 	movq    %mm1,dv_block_t_coeffs(%ebp)
+ 	movq    %mm0,(dv_block_t_coeffs + 8)(%ebp)
+ 	movq    %mm0,(dv_block_t_coeffs + 16)(%ebp)
+@@ -192,9 +221,17 @@ dv_parse_ac_coeffs_pass0:
+ readloop:
+ 	movl	%edi,%ecx
+ 	shrl	$3,%ecx
++#ifdef __PIC__
++	movl    ARGn(0),%eax
++	addl    bitstream_t_buf(%eax),%ecx
++	movzbl  (%ecx),%eax
++	movzbl  1(%ecx),%edx
++	movzbl  2(%ecx),%ecx
++#else
+ 	movzbl  (%esi,%ecx,1),%eax
+ 	movzbl  1(%esi,%ecx,1),%edx
+ 	movzbl  2(%esi,%ecx,1),%ecx
++#endif
+ 	shll	$16,%eax
+ 	shll	$8,%edx
+ 	orl	%ecx,%eax
+@@ -218,7 +255,11 @@ readloop:
+ 
+ 	/* Attempt to use the shortcut first.  If it hits, then
+ 	   this vlc term has been decoded. */
++#ifdef __PIC__
++	movl	dv_vlc_class1_shortcut@GOTOFF(%esi,%ecx,4),%edx
++#else
+ 	movl	dv_vlc_class1_shortcut(,%ecx,4),%edx
++#endif
+ 	test	$0x80,%edx
+ 	je	done_decode
+ 
+@@ -229,12 +270,19 @@ readloop:
+ 	movl	%ebx,dv_block_t_reorder(%ebp)
+ 
+ 	/* %eax is bits */
+-	
++#ifdef __PIC__
++	movsbl dv_vlc_class_lookup5@GOTOFF(%esi,%ecx),%ecx
++
++	movl  dv_vlc_index_mask@GOTOFF(%esi,%ecx,4),%ebx
++	movl  dv_vlc_lookups@GOTOFF(%esi,%ecx,4),%edx
++	movl  dv_vlc_index_rshift@GOTOFF(%esi,%ecx,4),%ecx
++#else
+ 	movsbl dv_vlc_class_lookup5(%ecx),%ecx
+ 
+ 	movl  dv_vlc_index_mask(,%ecx,4),%ebx
+ 	movl  dv_vlc_lookups(,%ecx,4),%edx
+ 	movl  dv_vlc_index_rshift(,%ecx,4),%ecx
++#endif
+ 	andl  %eax,%ebx
+ 	sarl  %cl,%ebx
+ 
+@@ -257,7 +305,11 @@ readloop:
+ 	movl  %edx,%ecx
+ 	sarl  $8,%ecx
+ 	andl  $0xff,%ecx
++#ifdef __PIC__
++	movl  sign_mask@GOTOFF(%esi,%ecx,4),%ecx
++#else
+ 	movl  sign_mask(,%ecx,4),%ecx
++#endif
+ 	andl  %ecx,%eax
+ 	negl  %eax
+ 	sarl  $31,%eax
+@@ -327,10 +379,16 @@ alldone:
+ 
+ slowpath:
+ 	/* slow path:	 use dv_decode_vlc */;
++#ifdef __PIC__
++	pushl	%esi
++	leal	vlc@GOTOFF(%esi),%esi
++	xchgl	%esi,(%esp)	/* last parameter is &vlc */
++#else
+ 	pushl	$vlc		/* last parameter is &vlc */
++#endif
+ 	pushl	%edx		/* bits_left */
+ 	pushl	%eax		/* bits */
+-	call	dv_decode_vlc
++	call	asm_dv_decode_vlc
+ 	addl	$12,%esp
+ 	test	$0x80,%edx	/* If (vlc.run < 0) break */
+ 	jne	escape
+@@ -367,6 +425,8 @@ show16:
+ 	pushl	%esi
+ 	pushl	%ebp
+ 
++	LOAD_PIC_REG(si)
++
+ #define ARGn(N)  (20+(4*(N)))(%esp)
+ 
+ 	movl	ARGn(1),%eax			/* quality */
+@@ -374,7 +435,11 @@ dv_parse_video_segment:
+ 	jz	its_mono
+ 	movl	$6,%ebx
+ its_mono:
++#ifdef __PIC__
++	movl	%ebx,n_blocks@GOTOFF(%esi)
++#else
+ 	movl	%ebx,n_blocks
++#endif
+ 	
+ 	/*
+ 	 *	ebx	seg/b
+@@ -385,15 +450,22 @@ its_mono:
+ 	 *	ebp	bl
+ 	 */
+ 	movl	ARGn(0),%ebx
++#ifndef __PIC__
+ 	movl	dv_videosegment_t_bs(%ebx),%esi
+ 	movl	bitstream_t_buf(%esi),%esi
++#endif
+ 	leal	dv_videosegment_t_mb(%ebx),%edi
+ 
+ 	movl	$0,%eax
+ 	movl	$0,%ecx
+ macloop:
++#ifdef __PIC__
++	movl	%eax,m@GOTOFF(%esi)
++	movl	%ecx,mb_start@GOTOFF(%esi)
++#else
+ 	movl	%eax,m
+ 	movl	%ecx,mb_start
++#endif
+ 
+ 	movl	ARGn(0),%ebx
+ 	
+@@ -401,7 +473,13 @@ macloop:
+ 	/* mb->qno = bitstream_get(bs,4); */
+ 	movl	%ecx,%edx
+ 	shr	$3,%edx
++#ifdef __PIC__
++	movl	dv_videosegment_t_bs(%ebx),%ecx
++	movl	bitstream_t_buf(%ecx),%ecx
++	movzbl	3(%ecx,%edx,1),%edx
++#else
+ 	movzbl	3(%esi,%edx,1),%edx
++#endif
+ 	andl	$0xf,%edx
+ 	movl	%edx,dv_macroblock_t_qno(%edi)
+ 
+@@ -412,7 +490,11 @@ macloop:
+ 	movl	%edx,dv_macroblock_t_eob_count(%edi)
+ 
+ 	/* mb->i = (seg->i + dv_super_map_vertical[m]) % (seg->isPAL?12:10); */
++#ifdef __PIC__
++	movl	dv_super_map_vertical@GOTOFF(%esi,%eax,4),%edx
++#else
+ 	movl	dv_super_map_vertical(,%eax,4),%edx
++#endif
+ 	movl	dv_videosegment_t_i(%ebx),%ecx
+ 	addl	%ecx,%edx
+ 
+@@ -423,11 +505,20 @@ skarly:	
+ 	andl	$1,%ecx
+ 	shll	$5,%ecx		/* ecx = (isPAL ? 32 : 0) */
+ 
++#ifdef __PIC__
++	leal	mod_10@GOTOFF(%esi),%edx
++	movzbl	(%edx,%ecx,1),%edx	/* uses mod_12 for PAL */
++#else
+ 	movzbl	mod_10(%edx,%ecx,1),%edx	/* uses mod_12 for PAL */
++#endif
+ 	movl	%edx,dv_macroblock_t_i(%edi)
+ 
+ 	/*  mb->j = dv_super_map_horizontal[m]; */	
++#ifdef __PIC__
++	movl	dv_super_map_horizontal@GOTOFF(%esi,%eax,4),%edx
++#else
+ 	movl	dv_super_map_horizontal(,%eax,4),%edx
++#endif
+ 	movl	%edx,dv_macroblock_t_j(%edi)
+ 
+ 	/* mb->k = seg->k; */
+@@ -446,12 +537,28 @@ blkloop:
+ 	        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ 	*/
+ 	/* dc = bitstream_get(bs,9); */
++#ifdef __PIC__
++	movl	mb_start@GOTOFF(%esi),%ecx
++#else
+ 	movl	mb_start,%ecx
++#endif
+ 	shr	$3,%ecx
++#ifdef __PIC__
++	movzbl	blk_start@GOTOFF(%esi,%ebx),%edx
++#else
+ 	movzbl	blk_start(%ebx),%edx
++#endif
+ 	addl	%ecx,%edx
++#ifdef __PIC__
++	movl	ARGn(0),%ecx
++	movl	dv_videosegment_t_bs(%ecx),%ecx
++	movl	bitstream_t_buf(%ecx),%ecx
++	movzbl	(%ecx,%edx,1),%eax	/* hi byte */
++	movzbl	1(%ecx,%edx,1),%ecx	/* lo byte */
++#else
+ 	movzbl	(%esi,%edx,1),%eax	/* hi byte */
+ 	movzbl	1(%esi,%edx,1),%ecx	/* lo byte */
++#endif
+ 	shll	$8,%eax
+ 	orl	%ecx,%eax
+ 
+@@ -478,7 +585,11 @@ blkloop:
+ 
+ 	/* bl->reorder = &dv_reorder[bl->dct_mode][1]; */
+ 	shll	$6,%eax
++#ifdef __PIC__
++	leal	dv_reorder@GOTOFF+1(%esi,%eax),%eax
++#else
+ 	addl	$(dv_reorder+1),%eax
++#endif
+ 	movl	%eax,dv_block_t_reorder(%ebp)
+ 
+ 	/* bl->reorder_sentinel = bl->reorder + 63; */
+@@ -486,13 +597,22 @@ blkloop:
+ 	movl	%eax,dv_block_t_reorder_sentinel(%ebp)
+ 
+ 	/* bl->offset= mb_start + dv_parse_bit_start[b]; */
++#ifdef __PIC__
++	movl	mb_start@GOTOFF(%esi),%ecx
++	movl	dv_parse_bit_start@GOTOFF(%esi,%ebx,4),%eax
++#else
+ 	movl	mb_start,%ecx
+ 	movl	dv_parse_bit_start(,%ebx,4),%eax
++#endif
+ 	addl	%ecx,%eax
+ 	movl	%eax,dv_block_t_offset(%ebp)
+ 
+ 	/* bl->end= mb_start + dv_parse_bit_end[b]; */
++#ifdef __PIC__
++	movl	dv_parse_bit_end@GOTOFF(%esi,%ebx,4),%eax
++#else
+ 	movl	dv_parse_bit_end(,%ebx,4),%eax
++#endif
+ 	addl	%ecx,%eax
+ 	movl	%eax,dv_block_t_end(%ebp)
+ 
+@@ -504,7 +624,11 @@ blkloop:
+ 	/* no AC pass.  Just zero out the remaining coeffs */
+ 	movq    dv_block_t_coeffs(%ebp),%mm1
+ 	pxor    %mm0,%mm0
++#ifdef __PIC__
++	pand    const_f_0_0_0@GOTOFF(%esi),%mm1
++#else
+ 	pand    const_f_0_0_0,%mm1
++#endif
+ 	movq    %mm1,dv_block_t_coeffs(%ebp)
+ 	movq    %mm0,(dv_block_t_coeffs + 8)(%ebp)
+ 	movq    %mm0,(dv_block_t_coeffs + 16)(%ebp)
+@@ -529,18 +653,27 @@ do_ac_pass:
+ 	pushl	%ebp
+ 	pushl	%edi
+ 	pushl	%eax
+-	call	dv_parse_ac_coeffs_pass0
++	call	asm_dv_parse_ac_coeffs_pass0
+ 	addl	$12,%esp
+ done_ac:
+ 
++#ifdef __PIC__
++	movl	n_blocks@GOTOFF(%esi),%eax
++#else
+ 	movl	n_blocks,%eax
++#endif
+ 	addl	$dv_block_t_size,%ebp
+ 	incl	%ebx
+ 	cmpl	%eax,%ebx
+ 	jnz	blkloop
+ 
++#ifdef __PIC__
++	movl	m@GOTOFF(%esi),%eax
++	movl	mb_start@GOTOFF(%esi),%ecx
++#else
+ 	movl	m,%eax
+ 	movl	mb_start,%ecx
++#endif
+ 	addl	$(8 * 80),%ecx
+ 	addl	$dv_macroblock_t_size,%edi
+ 	incl	%eax
+@@ -558,7 +691,7 @@ done_ac:
+ 
+ 	andl	$DV_QUALITY_AC_MASK,%eax
+ 	cmpl	$DV_QUALITY_AC_2,%eax
+-	jz	dv_parse_ac_coeffs
++	jz	asm_dv_parse_ac_coeffs
+ 	movl	$0,%eax
+ 	ret
+ 

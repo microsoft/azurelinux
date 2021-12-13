@@ -1,0 +1,173 @@
+From 3e5779207e2bfab25978e80ac62e8af8c3685f8e Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Tue, 14 Aug 2018 14:41:43 +0200
+Subject: [PATCH 1/2] Add support for new ConfirmedRebootToBootOptions signal
+ send by org.gnome.SessionManager.EndSessionDialog
+
+In order to allow the user to choose advanced boot-options on systems where
+the boot menu is not shown by default at boot, gnome-shell's endSessionDialog.js
+may emit a new ConfirmedRebootToBootOptions signal to indicate that
+gnome-session should reboot the system in such a way that the boot-menu will
+be shown next boot.
+
+This implements the backend for the "Boot Options" button from:
+https://wiki.gnome.org/Design/OS/BootOptions
+
+Note that at the moment ConfirmedRebootToBootOptions is just treated as an
+alias to ConfirmedReboot, since there is no bootloader agnostic way yet to
+indicate the menu should be shown.
+
+For now the FIXME may be patched with a distro specific patch to implement
+this for the distro's chosen bootloader. I will start a discussion on
+systemd-devel to come up with a distro / bootloader agnostic interface
+for this.
+---
+ gnome-session/gsm-manager.c | 28 ++++++++++++++++++++++++++++
+ gnome-session/gsm-shell.c   | 10 ++++++++++
+ gnome-session/gsm-shell.h   |  7 ++++---
+ 3 files changed, 42 insertions(+), 3 deletions(-)
+
+diff --git a/gnome-session/gsm-manager.c b/gnome-session/gsm-manager.c
+index d41bdcac..e0c05d82 100644
+--- a/gnome-session/gsm-manager.c
++++ b/gnome-session/gsm-manager.c
+@@ -117,6 +117,7 @@ typedef enum
+         GSM_MANAGER_LOGOUT_NONE,
+         GSM_MANAGER_LOGOUT_LOGOUT,
+         GSM_MANAGER_LOGOUT_REBOOT,
++        GSM_MANAGER_LOGOUT_REBOOT_TO_BOOT_OPTIONS,
+         GSM_MANAGER_LOGOUT_REBOOT_INTERACT,
+         GSM_MANAGER_LOGOUT_SHUTDOWN,
+         GSM_MANAGER_LOGOUT_SHUTDOWN_INTERACT,
+@@ -176,6 +177,7 @@ struct GsmManagerPrivate
+         guint                   shell_end_session_dialog_confirmed_logout_id;
+         guint                   shell_end_session_dialog_confirmed_shutdown_id;
+         guint                   shell_end_session_dialog_confirmed_reboot_id;
++        guint                   shell_end_session_dialog_confirmed_reboot_to_boot_options_id;
+ };
+ 
+ enum {
+@@ -490,6 +492,7 @@ gsm_manager_quit (GsmManager *manager)
+                 gsm_quit ();
+                 break;
+         case GSM_MANAGER_LOGOUT_REBOOT:
++        case GSM_MANAGER_LOGOUT_REBOOT_TO_BOOT_OPTIONS:
+         case GSM_MANAGER_LOGOUT_REBOOT_INTERACT:
+                 gsm_system_complete_shutdown (manager->priv->system);
+                 gsm_quit ();
+@@ -1161,6 +1164,7 @@ end_session_or_show_shell_dialog (GsmManager *manager)
+                 type = GSM_SHELL_END_SESSION_DIALOG_TYPE_LOGOUT;
+                 break;
+         case GSM_MANAGER_LOGOUT_REBOOT:
++        case GSM_MANAGER_LOGOUT_REBOOT_TO_BOOT_OPTIONS:
+         case GSM_MANAGER_LOGOUT_REBOOT_INTERACT:
+                 type = GSM_SHELL_END_SESSION_DIALOG_TYPE_RESTART;
+                 break;
+@@ -3450,6 +3454,12 @@ disconnect_shell_dialog_signals (GsmManager *manager)
+                 manager->priv->shell_end_session_dialog_confirmed_reboot_id = 0;
+         }
+ 
++        if (manager->priv->shell_end_session_dialog_confirmed_reboot_to_boot_options_id != 0) {
++                g_signal_handler_disconnect (manager->priv->shell,
++                                             manager->priv->shell_end_session_dialog_confirmed_reboot_to_boot_options_id);
++                manager->priv->shell_end_session_dialog_confirmed_reboot_to_boot_options_id = 0;
++        }
++
+         if (manager->priv->shell_end_session_dialog_open_failed_id != 0) {
+                 g_signal_handler_disconnect (manager->priv->shell,
+                                              manager->priv->shell_end_session_dialog_open_failed_id);
+@@ -3512,6 +3522,14 @@ on_shell_end_session_dialog_confirmed_reboot (GsmShell   *shell,
+         disconnect_shell_dialog_signals (manager);
+ }
+ 
++static void
++on_shell_end_session_dialog_confirmed_reboot_to_boot_options (GsmShell   *shell,
++                                                           GsmManager *manager)
++{
++        _handle_end_session_dialog_response (manager, GSM_MANAGER_LOGOUT_REBOOT_TO_BOOT_OPTIONS);
++        disconnect_shell_dialog_signals (manager);
++}
++
+ static void
+ connect_shell_dialog_signals (GsmManager *manager)
+ {
+@@ -3547,6 +3565,12 @@ connect_shell_dialog_signals (GsmManager *manager)
+                                   "end-session-dialog-confirmed-reboot",
+                                   G_CALLBACK (on_shell_end_session_dialog_confirmed_reboot),
+                                   manager);
++
++        manager->priv->shell_end_session_dialog_confirmed_reboot_to_boot_options_id =
++                g_signal_connect (manager->priv->shell,
++                                  "end-session-dialog-confirmed-reboot-to-boot-options",
++                                  G_CALLBACK (on_shell_end_session_dialog_confirmed_reboot_to_boot_options),
++                                  manager);
+ }
+ 
+ static void
+@@ -3820,6 +3844,10 @@ do_query_end_session_exit (GsmManager *manager)
+         case GSM_MANAGER_LOGOUT_REBOOT_INTERACT:
+                 reboot = TRUE;
+                 break;
++        case GSM_MANAGER_LOGOUT_REBOOT_TO_BOOT_OPTIONS:
++                /* FIXME tell bootmanager to show menu on next boot */
++                reboot = TRUE;
++                break;
+         case GSM_MANAGER_LOGOUT_SHUTDOWN:
+         case GSM_MANAGER_LOGOUT_SHUTDOWN_INTERACT:
+                 shutdown = TRUE;
+diff --git a/gnome-session/gsm-shell.c b/gnome-session/gsm-shell.c
+index 04cfa2f5..d727232d 100644
+--- a/gnome-session/gsm-shell.c
++++ b/gnome-session/gsm-shell.c
+@@ -69,6 +69,7 @@ enum {
+         END_SESSION_DIALOG_CONFIRMED_LOGOUT,
+         END_SESSION_DIALOG_CONFIRMED_SHUTDOWN,
+         END_SESSION_DIALOG_CONFIRMED_REBOOT,
++        END_SESSION_DIALOG_CONFIRMED_REBOOT_TO_BOOT_OPTIONS,
+         NUMBER_OF_SIGNALS
+ };
+ 
+@@ -179,6 +180,14 @@ gsm_shell_class_init (GsmShellClass *shell_class)
+                               NULL, NULL, NULL,
+                               G_TYPE_NONE, 0);
+ 
++        signals [END_SESSION_DIALOG_CONFIRMED_REBOOT_TO_BOOT_OPTIONS] =
++                g_signal_new ("end-session-dialog-confirmed-reboot-to-boot-options",
++                              G_OBJECT_CLASS_TYPE (object_class),
++                              G_SIGNAL_RUN_LAST,
++                              G_STRUCT_OFFSET (GsmShellClass, end_session_dialog_confirmed_reboot_to_boot_options),
++                              NULL, NULL, NULL,
++                              G_TYPE_NONE, 0);
++
+         g_type_class_add_private (shell_class, sizeof (GsmShellPrivate));
+ }
+ 
+@@ -342,6 +351,7 @@ on_end_session_dialog_dbus_signal (GDBusProxy *proxy,
+                 { "Canceled", END_SESSION_DIALOG_CANCELED },
+                 { "ConfirmedLogout", END_SESSION_DIALOG_CONFIRMED_LOGOUT },
+                 { "ConfirmedReboot", END_SESSION_DIALOG_CONFIRMED_REBOOT },
++                { "ConfirmedRebootToBootOptions", END_SESSION_DIALOG_CONFIRMED_REBOOT_TO_BOOT_OPTIONS },
+                 { "ConfirmedShutdown", END_SESSION_DIALOG_CONFIRMED_SHUTDOWN },
+                 { NULL, -1 }
+         };
+diff --git a/gnome-session/gsm-shell.h b/gnome-session/gsm-shell.h
+index e236493a..b1cdd457 100644
+--- a/gnome-session/gsm-shell.h
++++ b/gnome-session/gsm-shell.h
+@@ -64,9 +64,10 @@ struct _GsmShellClass
+         void (* end_session_dialog_closed)        (GsmShell *shell);
+         void (* end_session_dialog_canceled)      (GsmShell *shell);
+ 
+-        void (* end_session_dialog_confirmed_logout)   (GsmShell *shell);
+-        void (* end_session_dialog_confirmed_shutdown) (GsmShell *shell);
+-        void (* end_session_dialog_confirmed_reboot)   (GsmShell *shell);
++        void (* end_session_dialog_confirmed_logout)                 (GsmShell *shell);
++        void (* end_session_dialog_confirmed_shutdown)               (GsmShell *shell);
++        void (* end_session_dialog_confirmed_reboot)                 (GsmShell *shell);
++        void (* end_session_dialog_confirmed_reboot_to_boot_options) (GsmShell *shell);
+ 
+ };
+ 
+-- 
+2.23.0
+

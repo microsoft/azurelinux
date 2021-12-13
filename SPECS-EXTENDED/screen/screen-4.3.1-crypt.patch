@@ -1,0 +1,15 @@
+check crypt output (rhbz#815605)
+
+diff --git a/misc.c b/misc.c
+index 2022a06..235c82f 100644
+--- a/misc.c
++++ b/misc.c
+@@ -57,6 +57,8 @@ register const char *str;
+ {
+   register char *cp;
+ 
++  if(str == NULL)
++    Panic(0, "SaveStr() received NULL - possibly failed crypt()");
+   if ((cp = malloc(strlen(str) + 1)) == NULL)
+     Panic(0, "%s", strnomem);
+   else

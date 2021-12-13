@@ -1,0 +1,12 @@
+diff -up opencryptoki-3.11.0/configure.ac.me opencryptoki-3.11.0/configure.ac
+--- opencryptoki-3.11.0/configure.ac.me	2019-01-30 17:10:19.660952694 +0100
++++ opencryptoki-3.11.0/configure.ac	2019-01-30 17:13:54.150089964 +0100
+@@ -62,7 +62,7 @@ AC_SUBST([OPENLDAP_LIBS])
+ 
+ dnl Define custom variables
+ 
+-lockdir=$localstatedir/lock/opencryptoki
++lockdir=/run/lock/opencryptoki
+ AC_SUBST(lockdir)
+ 
+ logdir=$localstatedir/log/opencryptoki

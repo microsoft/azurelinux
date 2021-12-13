@@ -1,0 +1,28 @@
+diff --git a/jmx_prometheus_javaagent/pom.xml b/jmx_prometheus_javaagent/pom.xml
+index 5a14679..fb47a94 100644
+--- a/jmx_prometheus_javaagent/pom.xml
++++ b/jmx_prometheus_javaagent/pom.xml
+@@ -62,9 +62,11 @@
+                 <include>javax.servlet.**</include>
+                 <include>org.eclipse.**</include>
+                 <include>org.yaml.**</include>
++                <include>biz.source_code.**</include>
++                <include>org.apache.**</include>
+               </includes>
+               <excludes>
+-                <exclude>io.prometheus.jmx.shaded.**</exclude>
++                <exclude>io.prometheus.jmx.**</exclude>
+               </excludes>
+             </relocation>
+           </relocations>
+@@ -81,8 +83,8 @@
+           <transformers>
+             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <manifestEntries>
+-              <Premain-Class>io.prometheus.jmx.shaded.io.prometheus.jmx.JavaAgent</Premain-Class>
+-              <Agent-Class>io.prometheus.jmx.shaded.io.prometheus.jmx.JavaAgent</Agent-Class>
++              <Premain-Class>io.prometheus.jmx.JavaAgent</Premain-Class>
++              <Agent-Class>io.prometheus.jmx.JavaAgent</Agent-Class>
+               <Implementation-Version>${project.version}</Implementation-Version>
+               <Implementation-Title>${project.artifactId}</Implementation-Title>
+              </manifestEntries>

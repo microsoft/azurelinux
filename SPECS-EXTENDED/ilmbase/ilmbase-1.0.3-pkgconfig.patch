@@ -1,0 +1,8 @@
+diff -up ilmbase-1.0.3/IlmBase.pc.in.pkgconfig ilmbase-1.0.3/IlmBase.pc.in
+--- ilmbase-1.0.3/IlmBase.pc.in.pkgconfig	2012-07-17 18:27:25.000000000 -0500
++++ ilmbase-1.0.3/IlmBase.pc.in	2012-09-08 11:11:15.913468312 -0500
+@@ -9,3 +9,4 @@ Description: Base math and exception lib
+ Version: @ILMBASE_VERSION@
+ Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread @PTHREAD_LIBS@
+ Cflags: @PTHREAD_CFLAGS@ -I${OpenEXR_includedir}
++Requires.private: gl glu

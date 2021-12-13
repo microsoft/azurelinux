@@ -1,0 +1,13 @@
+# Macros needed for building srpms of Haskell packages
+
+# from ghc-7.8 ghci is supported on all arch's
+# former archs: armv5tel ppc sparcv9
+%ghc_arches_with_ghci %{ix86} x86_64 armv7hl ppc64 ppc64le aarch64 s390 s390x %{mips}
+
+# ghc_arches is not used in current packages but still here for back compat
+# former archs: alpha ppc sparcv9 armv5tel
+%ghc_arches %{ix86} x86_64 armv7hl ppc64 ppc64le aarch64 s390 s390x
+
+# control whether to BR devel or prof library packages
+# (prof subpackages were introduced in F31)
+%ghc_devel_prof prof

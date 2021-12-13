@@ -1,0 +1,55 @@
+From 2adad987d89aa6ab94fa1351756730c3c09dd35d Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 12 Oct 2015 13:03:40 +0200
+Subject: [PATCH] Remove Maven 3.0 specific code
+
+---
+ .../collection/ArtifactTransitivityFilter.java     | 32 +---------------------
+ 1 file changed, 1 insertion(+), 31 deletions(-)
+
+diff --git a/src/main/java/org/apache/maven/shared/artifact/filter/collection/ArtifactTransitivityFilter.java b/src/main/java/org/apache/maven/shared/artifact/filter/collection/ArtifactTransitivityFilter.java
+index 7db1664..df749db 100644
+--- a/src/main/java/org/apache/maven/shared/artifact/filter/collection/ArtifactTransitivityFilter.java
++++ b/src/main/java/org/apache/maven/shared/artifact/filter/collection/ArtifactTransitivityFilter.java
+@@ -116,37 +116,7 @@ public class ArtifactTransitivityFilter
+             }
+             else
+             {
+-                try
+-                {
+-                    @SuppressWarnings( "unchecked" ) List<org.sonatype.aether.graph.Dependency> dependencies =
+-                        (List<org.sonatype.aether.graph.Dependency>) Invoker.invoke( resolutionResult,
+-                                                                                     "getDependencies" );
+-
+-                    for ( org.sonatype.aether.graph.Dependency dependency : dependencies )
+-                    {
+-                        Artifact mavenArtifact = 
+-                                        (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
+-                                                                    org.sonatype.aether.artifact.Artifact.class,
+-                                                                    dependency.getArtifact() );
+-
+-                        transitiveArtifacts.add( mavenArtifact.getDependencyConflictId() );
+-                    }
+-                }
+-                catch ( IllegalAccessException e )
+-                {
+-                    // don't want to pollute method signature with ReflectionExceptions
+-                    throw new RuntimeException( e.getMessage(), e );
+-                }
+-                catch ( InvocationTargetException e )
+-                {
+-                    // don't want to pollute method signature with ReflectionExceptions
+-                    throw new RuntimeException( e.getMessage(), e );
+-                }
+-                catch ( NoSuchMethodException e )
+-                {
+-                    // don't want to pollute method signature with ReflectionExceptions
+-                    throw new RuntimeException( e.getMessage(), e );
+-                }
++                throw new RuntimeException( "Maven older than 3.1 are not supported" );
+             }
+         }
+     }
+-- 
+2.7.4
+

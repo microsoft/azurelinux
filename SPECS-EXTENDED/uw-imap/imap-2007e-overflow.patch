@@ -1,0 +1,13 @@
+diff -up imap-2007e/src/c-client/rfc822.c.overflow imap-2007e/src/c-client/rfc822.c
+--- imap-2007e/src/c-client/rfc822.c.overflow	2008-12-12 11:08:26.000000000 -0600
++++ imap-2007e/src/c-client/rfc822.c	2009-07-07 19:27:20.057772757 -0500
+@@ -384,6 +384,9 @@ void rfc822_parse_content (BODY *body,ST
+ 	if (CHR (bs) == '\012'){/* following LF? */
+ 	  c = SNX (bs); i--;	/* yes, slurp it */
+ 	}
++	if (!i)			/* Make sure we don't get an overflow for */
++	  break;		/* messages ending on \015 (or the following */
++				/* i-- will cause i to be MAXINT. Not good.) */
+       case '\012':		/* at start of a line, start with -- ? */
+ 	if (!(i && i-- && ((c = SNX (bs)) == '-') && i-- &&
+ 	      ((c = SNX (bs)) == '-'))) break;

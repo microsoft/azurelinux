@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="commons-configuration" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="build.properties"/>
+  
+  <property name="javacc.home" value="lib"/>
+  
+  <property name="compiler.source" value="1.6"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+  
+  <property name="project.groupId" value="commons-configuration"/>
+  <property name="project.artifactId" value="commons-configuration"/>
+  <property name="project.version" value="1.10"/>
+  <property name="project.name" value="Apache Commons Configuration"/>
+  <property name="project.description" value="Tools to assist in the reading of configuration/preferences files in various formats."/>
+  <property name="project.url" value="${project.url}"/>
+  <property name="project.license.url" value="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
+  <property name="project.organization.name" value="The Apache Software Foundation"/>
+  <property name="project.organization.id" value="org.apache"/>
+  <property name="project.parent.groupId" value="org.apache.commons"/>
+  
+  <property name="bundle.version" value="${project.version}.0"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src/main/java"/>
+  <property name="build.javaccDir" value="src/main/javacc"/>
+  <property name="build.javaccOutputDir" value="${build.dir}/generated-sources/javacc"/>
+  <property name="build.resourceDir.0" value="src/main/resources"/>
+  <property name="build.resourceDir.1" value="."/>
+  <property name="build.testOutputDir" value="${build.dir}/test-classes"/>
+  <property name="build.testDir" value="src/test/java"/>
+  <property name="build.testResourceDir.0" value="src/test/resources"/>
+  <property name="build.testResourceDir.1" value="src/main/resources"/>
+  <property name="build.testResourceDir.2" value="."/>
+  <property name="test.reports" value="${build.dir}/test-reports"/>
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath">
+    <fileset dir="lib">
+      <!-- commons-beanutils commons-codec commons-collections commons-digester
+           commons-jexl commons-jxpath commons-lang commons-logging commons-vfs2
+           glassfish-servlet-api xml-resolver 
+           javacc -->
+      <include name="**/*"/>
+    </fileset>
+  </path>
+  <path id="build.test.classpath">
+    <fileset dir="lib">
+      <!-- commons-beanutils commons-codec commons-collections commons-digester
+           commons-jexl commons-jxpath commons-lang commons-logging commons-vfs2
+           glassfish-servlet-api xml-resolver 
+           javacc 
+           mockobjects junit junit-addons dbunit commons-dbcp -->
+      <include name="**/*"/>
+    </fileset>
+  </path>
+  
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Source generation target                                               -->
+  <!-- ====================================================================== -->
+
+  <target name="gen-sources" description="Generate the sources using javacc">
+    <mkdir dir="${build.javaccOutputDir}/org/apache/commons/configuration/plist"/>
+    <javacc target="${build.javaccDir}/PropertyListParser.jj"
+            outputdirectory="${build.javaccOutputDir}/org/apache/commons/configuration/plist"
+            javacchome="${javacc.home}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" depends="gen-sources" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           encoding="iso-8859-1" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <classpath refid="build.classpath"/>
+      <src>
+        <pathelement location="${build.srcDir}"/>
+        <pathelement location="${build.javaccOutputDir}"/>
+      </src>
+    </javac>
+    <copy todir="${build.outputDir}">
+      <fileset dir="${build.resourceDir.0}"/>
+    </copy>
+    <mkdir dir="${build.outputDir}/META-INF"/>
+    <copy todir="${build.outputDir}/META-INF">
+      <fileset dir="${build.resourceDir.1}">
+        <include name="NOTICE.txt"/>
+        <include name="LICENSE.txt"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Test-compilation target                                                -->
+  <!-- ====================================================================== -->
+
+  <target name="compile-tests" 
+          depends="compile" 
+          description="Compile the test code" 
+          unless="test.skip">
+    <mkdir dir="${build.testOutputDir}"/>
+    <javac destdir="${build.testOutputDir}" 
+           encoding="iso-8859-1" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.testDir}"/>
+      </src>
+      <classpath>
+        <path refid="build.test.classpath"/>
+        <pathelement location="${build.outputDir}"/>
+      </classpath>
+    </javac>
+    <copy todir="${build.testOutputDir}">
+      <fileset dir="${build.testResourceDir.0}"/>
+    </copy>
+    <copy todir="${build.testOutputDir}">
+      <fileset dir="${build.testResourceDir.1}">
+        <include name="*.dtd"/>
+      </fileset>
+    </copy>
+    <mkdir dir="${build.testOutputDir}/META-INF"/>
+    <copy todir="${build.testOutputDir}/META-INF">
+      <fileset dir="${build.testResourceDir.2}">
+        <include name="NOTICE.txt"/>
+        <include name="LICENSE.txt"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Run all tests                                                          -->
+  <!-- ====================================================================== -->
+
+  <target name="test" 
+          depends="compile-tests, junit-missing" 
+          unless="junit.skipped" 
+          description="Run the test cases">
+    <mkdir dir="${test.reports}"/>
+    <junit printSummary="yes" haltonerror="true" haltonfailure="true" fork="true" dir=".">
+      <sysproperty key="basedir" value="."/>
+      <formatter type="xml"/>
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+        <path refid="build.test.classpath"/>
+        <pathelement location="${build.outputDir}"/>
+        <pathelement location="${build.testOutputDir}"/>
+      </classpath>
+      <batchtest todir="${test.reports}" unless="test">
+        <fileset dir="${build.testDir}">
+          <include name="**/Test*.java"/>
+          <include name="**/*Test.java"/>
+          <include name="**/*TestCase.java"/>
+          <exclude name="**/TestWebdavConfigurationBuilder.java"/>
+        </fileset>
+      </batchtest>
+      <batchtest todir="${test.reports}" if="test">
+        <fileset dir="${build.testDir}">
+          <include name="**/${test}.java"/>
+          <exclude name="**/TestWebdavConfigurationBuilder.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="test-junit-present">
+    <available classname="junit.framework.Test" property="junit.present" classpathref="build.test.classpath"/>
+  </target>
+
+  <target name="test-junit-status" 
+          depends="test-junit-present">
+    <condition property="junit.missing">
+      <and>
+        <isfalse value="${junit.present}"/>
+        <isfalse value="${test.skip}"/>
+      </and>
+    </condition>
+    <condition property="junit.skipped">
+      <or>
+        <isfalse value="${junit.present}"/>
+        <istrue value="${test.skip}"/>
+      </or>
+    </condition>
+  </target>
+
+  <target name="junit-missing" 
+          depends="test-junit-status" 
+          if="junit.missing">
+    <echo>=================================== WARNING ===================================</echo>
+    <echo> JUnit is not present in the test classpath or your $ANT_HOME/lib directory. Tests not executed.</echo>
+    <echo>===============================================================================</echo>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" depends="gen-sources" description="Generates the Javadoc of the application">
+     <javadoc packagenames="*" 
+             destdir="${reporting.outputDirectory}/apidocs" 
+             access="protected" 
+             classpathref="build.classpath" 
+             verbose="false" 
+             encoding="iso-8859-1" 
+             version="true" 
+             use="true" 
+             author="true" 
+             splitindex="false" 
+             nodeprecated="false" 
+             nodeprecatedlist="false" 
+             notree="false" 
+             noindex="false" 
+             nohelp="false" 
+             nonavbar="false" 
+             serialwarn="false" 
+             source="${compiler.source}" 
+             linksource="true" 
+             breakiterator="false">
+      <fileset dir="${build.srcDir}"/>
+      <fileset dir="${build.javaccOutputDir}"/>
+    </javadoc>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile,test" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html">
+      <manifest>
+        <attribute name="Bundle-Description" value="${project.description}"/>
+        <attribute name="Bundle-DocURL" value="${project.url}"/>
+        <attribute name="Bundle-License" value="${project.license.url}"/>
+        <attribute name="Bundle-ManifestVersion" value="2"/>
+        <attribute name="Bundle-Name" value="${project.name}"/>
+        <attribute name="Bundle-SymbolicName" value="${project.parent.groupId}.${project.artifactId}"/>
+        <attribute name="Bundle-Vendor" value="${project.organization.name}"/>
+        <attribute name="Bundle-Version" value="${bundle.version}"/>
+        <attribute name="Export-Package" value="org.apache.commons.configuration;version=&quot;${project.version}&quot;,org.apache.commons.configuration.beanutils;version=&quot;${project.version}&quot;,org.apache.commons.configuration.event;version=&quot;${project.version}&quot;,org.apache.commons.configuration.interpol;version=&quot;${project.version}&quot;,org.apache.commons.configuration.plist;version=&quot;${project.version}&quot;,org.apache.commons.configuration.reloading;version=&quot;${project.version}&quot;,org.apache.commons.configuration.resolver;version=&quot;${project.version}&quot;,org.apache.commons.configuration.tree;version=&quot;${project.version}&quot;,org.apache.commons.configuration.tree.xpath;version=&quot;${project.version}&quot;,org.apache.commons.configuration.web;version=&quot;${project.version}&quot;"/>
+        <attribute name="Implementation-Title" value="${project.name}"/>
+        <attribute name="Implementation-URL" value="${project.url}"/>
+        <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+        <attribute name="Implementation-Vendor-Id" value="${project.organization.id}"/>
+        <attribute name="Implementation-Version" value="${project.version}"/>
+        <attribute name="Import-Package" value="org.apache.commons.beanutils;resolution:=optional,org.apache.commons.digester;resolution:=optional,org.apache.commons.digester.substitution;resolution:=optional,org.apache.commons.digester.xmlrules;resolution:=optional,org.apache.commons.collections;resolution:=optional,org.apache.commons.codec.binary;resolution:=optional,org.apache.commons.jxpath;resolution:=optional,org.apache.commons.jxpath.ri;resolution:=optional,org.apache.commons.jxpath.ri.compiler;resolution:=optional,org.apache.commons.jxpath.ri.model;resolution:=optional,org.apache.xml.resolver;resolution:=optional,org.apache.xml.resolver.helpers;resolution:=optional,org.apache.xml.resolver.readers;resolution:=optional,org.apache.xml.resolver.tools;resolution:=optional,javax.servlet;resolution:=optional,org.apache.commons.jexl2;resolution:=optional,org.apache.commons.vfs2;resolution:=optional,org.apache.commons.vfs2.provider;resolution:=optional,javax.naming,javax.sql,javax.xml.parsers,javax.xml.transform,javax.xml.transform.dom,javax.xml.transform.stream,org.apache.commons.lang,org.apache.commons.lang.exception,org.apache.commons.lang.text,org.apache.commons.logging,org.apache.commons.logging.impl,org.w3c.dom,org.xml.sax,org.xml.sax.helpers"/>
+        <attribute name="Include-Resource" value="PropertyList-1.0.dtd=src/main/resources/PropertyList-1.0.dtd,digesterRules.xml=src/main/resources/digesterRules.xml,properties.dtd=src/main/resources/properties.dtd,META-INF/NOTICE.txt=NOTICE.txt,META-INF/LICENSE.txt=LICENSE.txt"/>
+        <attribute name="JavaPackages-ArtifactId" value="${project.artifactId}"/>
+        <attribute name="JavaPackages-GroupId" value="${project.groupId}"/>
+        <attribute name="JavaPackages-Version" value="${project.version}"/>
+        <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+        <attribute name="Specification-Title" value="${project.name}"/>
+        <attribute name="Specification-Vendor" value="${project.organization.name}"/>
+        <attribute name="Specification-Version" value="${project.version}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

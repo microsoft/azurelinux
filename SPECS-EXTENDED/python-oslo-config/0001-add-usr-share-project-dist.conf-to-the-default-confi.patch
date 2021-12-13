@@ -1,0 +1,48 @@
+From 9e78caadf9a668f799de1274a729d0b157a83330 Mon Sep 17 00:00:00 2001
+From: Javier Pena <jpena@redhat.com>
+Date: Fri, 2 Dec 2016 17:02:46 +0100
+Subject: [PATCH] add /usr/share/$project/*-dist.conf to the default config set
+
+This will lookup /usr/share/$project/$project-dist.conf
+and /usr/share/$project/$prog-dist.conf
+in the correct precedence order by default.
+For example from command line utils which don't specify
+the --config-file option.  Note if daemon init scripts
+explicitly specify a --config-file then they must specify
+all required.
+
+For reference the precedence order is that later --config-file
+options will override settings from previous ones.
+So when no --config-file option is specified, we insert
+the "dist" config file as the first to be parsed,
+and settings from there are overridden by any from
+/etc/$project/$project.conf and /etc/$prog.conf respectively.
+
+For completeness, note settings in configs from --config-dir
+take precedence over any of the --config-file settings above.
+---
+ oslo_config/cfg.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/oslo_config/cfg.py b/oslo_config/cfg.py
+index b7b10bf..564341a 100644
+--- a/oslo_config/cfg.py
++++ b/oslo_config/cfg.py
+@@ -651,8 +651,12 @@ def _find_config_files(project, prog, extension):
+             prog = prog[:-3]
+ 
+     cfg_dirs = _get_config_dirs(project)
+-    config_files = (_search_dirs(cfg_dirs, p, extension)
+-                    for p in [project, prog] if p)
++    config_files = [_search_dirs(['/usr/share/%s/' % project], p,
++                                 '-dist%s' % extension)
++                    for p in [project, prog] if p]
++    config_files_default = (_search_dirs(cfg_dirs, p, extension)
++                            for p in [project, prog] if p)
++    config_files.extend([x for x in config_files_default if x])
+ 
+     return [x for x in config_files if x]
+ 
+-- 
+2.7.4
+

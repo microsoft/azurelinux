@@ -1,0 +1,12 @@
+diff -up dvd+rw-tools-7.1/growisofs_mmc.cpp.lastshort dvd+rw-tools-7.1/growisofs_mmc.cpp
+--- dvd+rw-tools-7.1/growisofs_mmc.cpp.lastshort	2012-04-13 18:09:31.047641524 +0200
++++ dvd+rw-tools-7.1/growisofs_mmc.cpp	2012-04-13 18:09:34.451763587 +0200
+@@ -540,7 +540,7 @@ ssize_t poor_mans_pwrite64 (int fd,const
+ 	// own higher HZ value and disrespects the user-land one.
+ 	// Sending them down as milliseconds is just safer...
+ 	//
+-	if (!(errcode=cmd.transport (WRITE,(void *)buff,size)))
++	if (!(errcode=cmd.transport (WRITE,(void *)buff,nbl*2048)))
+ 	    break;
+ 
+ 	//--- WRITE failed ---//

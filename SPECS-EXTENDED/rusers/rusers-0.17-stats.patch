@@ -1,0 +1,126 @@
+--- netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.stats	Wed Jan 23 14:59:13 2002
++++ netkit-rusers-0.17/rpc.rstatd/rstat_proc.c	Wed Jan 23 15:40:50 2002
+@@ -295,7 +295,7 @@
+ int sincelastreq = 0;		/* number of alarms since last request */
+ extern int closedown;
+ 
+-union {
++struct {
+ 	struct stats s1;
+ 	struct statsswtch s2;
+ 	struct statstime s3;
+@@ -415,14 +415,32 @@
+     b = strstr(buff, "cpu ");
+     if(b)
+     sscanf(b, "cpu  %lu %lu %lu %lu", cuse, cice, csys, cide);
++    b = strstr(buff, "disk ");
++    if(b)
++      sscanf(b, "disk %u %u %u %u", &d->xfer[0], &d->xfer[1], &d->xfer[2], &d->xfer[3]);
++    b = strstr(buff, "disk_rio ");
++    if(b)
++      sscanf(b, "disk_rio %u %u %u %u", &d->rio[0], &d->rio[1], &d->rio[2], &d->rio[3]);
++    b = strstr(buff, "disk_wio ");
++    if(b)
++      sscanf(b, "disk_wio %u %u %u %u", &d->wio[0], &d->wio[1], &d->wio[2], &d->wio[3]);
++    b = strstr(buff, "disk_rblk ");
++    if(b)
++      sscanf(b, "disk_rblk %u %u %u %u", &d->rblk[0], &d->rblk[1], &d->rblk[2], &d->rblk[3]);
++    b = strstr(buff, "disk_wblk ");
++    if(b)
++      sscanf(b, "disk_wblk %u %u %u %u", &d->wblk[0], &d->wblk[1], &d->wblk[2], &d->wblk[3]);
++
+     b = strstr(buff, "disk_io:");
+-    ndisks = 0;
+-    while ( (b = strstr(b, "):")) != NULL && ndisks < MAX_DISKS ) {
+-      sscanf (b, "):(%u,%u,%u,%u,%u)", &d->xfer[ndisks], 
+-	      &d->rio[ndisks], &d->rblk[ndisks], 
+-	      &d->wio[ndisks], &d->wblk[ndisks]);
+-      ndisks++;
+-      b += 2;
++    if(b) {
++      ndisks = 0;
++      while ( (b = strstr(b, "):")) != NULL && ndisks < MAX_DISKS ) {
++        sscanf (b, "):(%u,%u,%u,%u,%u)", &d->xfer[ndisks], 
++	        &d->rio[ndisks], &d->rblk[ndisks], 
++	        &d->wio[ndisks], &d->wblk[ndisks]);
++        ndisks++;
++        b += 2;
++      }
+     }
+ 
+     b = strstr(buff, "page ");
+@@ -637,18 +655,29 @@
+ 
+ 	memset(&stats_all, 0, sizeof(stats_all));
+ 
+-	for (i = 0; i < dk_ndrive && i < DK_NDRIVE; i++)
++	for (i = 0; i < dk_ndrive && i < DK_NDRIVE; i++) {
+ 		stats_all.s1.dk_xfer[i] = cur.dk_xfer[i];
++		stats_all.s2.dk_xfer[i] = cur.dk_xfer[i];
++		stats_all.s3.dk_xfer[i] = cur.dk_xfer[i];
++        }
+ 
+-	for (i = 0; i < CPUSTATES; i++)
++	for (i = 0; i < CPUSTATES; i++) {
+ 		stats_all.s1.cp_time[i] += cur.cp_time[cp_xlat[i]];
++		stats_all.s2.cp_time[i] += cur.cp_time[cp_xlat[i]];
++		stats_all.s3.cp_time[i] += cur.cp_time[cp_xlat[i]];
++        }
+ 
+ 	stats_all.s2.avenrun[0] = avrun[0] * FSCALE;
+ 	stats_all.s2.avenrun[1] = avrun[1] * FSCALE;
+ 	stats_all.s2.avenrun[2] = avrun[2] * FSCALE;
++	stats_all.s3.avenrun[0] = avrun[0] * FSCALE;
++	stats_all.s3.avenrun[1] = avrun[1] * FSCALE;
++	stats_all.s3.avenrun[2] = avrun[2] * FSCALE;
+ 
+ 	stats_all.s2.boottime.tv_sec = btm.tv_sec;
+ 	stats_all.s2.boottime.tv_usec = btm.tv_usec;
++	stats_all.s3.boottime.tv_sec = btm.tv_sec;
++	stats_all.s3.boottime.tv_usec = btm.tv_usec;
+ 
+ #ifdef DEBUG
+ 	syslog(LOG_DEBUG, "%d %d %d %d", stats_all.s1.cp_time[0],
+@@ -661,10 +690,25 @@
+ 	stats_all.s1.v_pswpin = cnt.v_pswpin;
+ 	stats_all.s1.v_pswpout = cnt.v_pswpout;
+ 	stats_all.s1.v_intr = cnt.v_intr;
++	stats_all.s2.v_pgpgin = cnt.v_pgpgin;
++	stats_all.s2.v_pgpgout = cnt.v_pgpgout;
++	stats_all.s2.v_pswpin = cnt.v_pswpin;
++	stats_all.s2.v_pswpout = cnt.v_pswpout;
++	stats_all.s2.v_intr = cnt.v_intr;
++	stats_all.s3.v_pgpgin = cnt.v_pgpgin;
++	stats_all.s3.v_pgpgout = cnt.v_pgpgout;
++	stats_all.s3.v_pswpin = cnt.v_pswpin;
++	stats_all.s3.v_pswpout = cnt.v_pswpout;
++	stats_all.s3.v_intr = cnt.v_intr;
+ 	gettimeofday(&tm, (struct timezone *) 0);
+ 	stats_all.s1.v_intr -= hz*(tm.tv_sec - btm.tv_sec) +
+ 	    hz*(tm.tv_usec - btm.tv_usec)/1000000;
++	stats_all.s2.v_intr -= hz*(tm.tv_sec - btm.tv_sec) +
++	    hz*(tm.tv_usec - btm.tv_usec)/1000000;
++	stats_all.s3.v_intr -= hz*(tm.tv_sec - btm.tv_sec) +
++	    hz*(tm.tv_usec - btm.tv_usec)/1000000;
+ 	stats_all.s2.v_swtch = cnt.v_swtch;
++	stats_all.s3.v_swtch = cnt.v_swtch;
+ 
+     {	FILE *fh;
+ 	if ((fh = fopen("/proc/net/dev", "r")) != NULL) {
+@@ -683,6 +727,16 @@
+ 		stats_all.s1.if_ierrors += ife->stats.rx_errors;
+ 		stats_all.s1.if_oerrors += ife->stats.tx_errors;
+ 		stats_all.s1.if_collisions += ife->stats.collisions;
++		stats_all.s2.if_ipackets += ife->stats.rx_packets;
++		stats_all.s2.if_opackets += ife->stats.tx_packets;
++		stats_all.s2.if_ierrors += ife->stats.rx_errors;
++		stats_all.s2.if_oerrors += ife->stats.tx_errors;
++		stats_all.s2.if_collisions += ife->stats.collisions;
++		stats_all.s3.if_ipackets += ife->stats.rx_packets;
++		stats_all.s3.if_opackets += ife->stats.tx_packets;
++		stats_all.s3.if_ierrors += ife->stats.rx_errors;
++		stats_all.s3.if_oerrors += ife->stats.tx_errors;
++		stats_all.s3.if_collisions += ife->stats.collisions;
+ 	    }
+ 
+ 	    fclose(fh);

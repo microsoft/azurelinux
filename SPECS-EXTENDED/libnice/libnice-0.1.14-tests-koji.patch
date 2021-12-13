@@ -1,0 +1,36 @@
+From 527c30ba453753e75d3d31be29a277ea6adc17c0 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Fri, 9 Feb 2018 19:10:20 +0100
+Subject: [PATCH] tests: make the test-suite more verbose
+
+... and skip test-gstreamer if user's home is /builddir (a heuristic
+to detect mock) because multicast traffic is blocked on Koji buildhosts.
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 16988ad..b7b74fa 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -12,7 +12,7 @@ AC_CANONICAL_TARGET
+ 
+ AC_CONFIG_SRCDIR([agent/agent.c])
+ AC_CONFIG_HEADERS([config.h])
+-AM_INIT_AUTOMAKE([1.12 -Wall -Wno-portability subdir-objects])
++AM_INIT_AUTOMAKE([1.12 -Wall -Wno-portability subdir-objects serial-tests])
+ 
+ AC_CONFIG_FILES([
+ 	Makefile
+@@ -263,7 +263,7 @@ AC_SUBST(gstplugindir)
+ AC_SUBST(gstplugin010dir)
+ 
+ AM_CONDITIONAL(WITH_GSTREAMER, test "$with_gstreamer" = yes)
+-AM_CONDITIONAL(HAVE_GST_CHECK, test "$have_gst_check" = yes)
++AM_CONDITIONAL(HAVE_GST_CHECK, test "$have_gst_check" = yes -a "$HOME" != /builddir)
+ AM_CONDITIONAL(WITH_GSTREAMER010, test "$with_gstreamer010" = yes)
+ 
+ GUPNP_IGD_REQUIRED=0.2.4
+-- 
+2.13.6
+

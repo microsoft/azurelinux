@@ -1,0 +1,12 @@
+diff -puN lib/sysfs_class.c~sysfsutils_class_dup lib/sysfs_class.c
+--- sysfsutils-2.1.0/lib/sysfs_class.c~sysfsutils_class_dup	2006-09-07 17:01:26.000000000 -0500
++++ sysfsutils-2.1.0-bjking1/lib/sysfs_class.c	2006-09-07 17:01:26.000000000 -0500
+@@ -66,7 +66,7 @@ static int cdev_name_equal(void *a, void
+ 		return 0;
+ 
+ 	if (strncmp((char *)a, ((struct sysfs_class_device *)b)->name,
+-				strlen((char *)a)) == 0)
++				SYSFS_NAME_LEN) == 0)
+ 		return 1;
+ 
+ 	return 0;

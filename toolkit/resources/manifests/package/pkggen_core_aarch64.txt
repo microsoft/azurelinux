@@ -236,3 +236,4 @@ python3-libs-3.9.9-1.cm2.aarch64.rpm
 python3-setuptools-3.9.9-1.cm2.noarch.rpm
 which-2.21-7.cm2.aarch64.rpm
 libselinux-3.2-1.cm2.aarch64.rpm
+msopenjdk-11-11.0.13+8-LTS-4.aarch64.rpm

@@ -1,0 +1,53 @@
+--- docbook-dtds-1.0/4.3-sgml/docbook.cat.ents	2005-12-13 13:14:24.000000000 +0000
++++ docbook-dtds-1.0/4.3-sgml/docbook.cat	2005-12-13 13:14:38.000000000 +0000
+@@ -51,6 +51,7 @@
+ 
+   -- ...................................................................... --
+   -- ISO entity sets ...................................................... --
++--
+ 
+ PUBLIC "ISO 8879:1986//ENTITIES Diacritical Marks//EN"
+        "iso-dia.gml"
+@@ -109,5 +110,6 @@
+ PUBLIC "ISO 8879:1986//ENTITIES Non-Russian Cyrillic//EN"
+        "iso-cyr2.gml"
+ 
++--
+   -- End of catalog data for DocBook V4.3 ................................. --
+   -- ...................................................................... --
+--- docbook-dtds-1.0/4.4-sgml/docbook.cat.ents	2005-12-13 13:14:51.000000000 +0000
++++ docbook-dtds-1.0/4.4-sgml/docbook.cat	2005-12-13 13:14:59.000000000 +0000
+@@ -54,6 +54,7 @@
+ 
+   -- ...................................................................... --
+   -- ISO entity sets ...................................................... --
++--
+ 
+ PUBLIC "ISO 8879:1986//ENTITIES Diacritical Marks//EN"
+        "iso-dia.gml"
+@@ -112,5 +113,6 @@
+ PUBLIC "ISO 8879:1986//ENTITIES Non-Russian Cyrillic//EN"
+        "iso-cyr2.gml"
+ 
++--
+   -- End of catalog data for DocBook V4.4 ................................. --
+   -- ...................................................................... --
+diff -urNp docbook-dtds-1.0-orig/4.5-sgml/docbook.cat docbook-dtds-1.0/4.5-sgml/docbook.cat
+--- docbook-dtds-1.0-orig/4.5-sgml/docbook.cat	2009-02-19 13:45:22.000000000 +0100
++++ docbook-dtds-1.0/4.5-sgml/docbook.cat	2009-02-19 13:47:31.000000000 +0100
+@@ -60,6 +60,7 @@ PUBLIC "-//OASIS//ENTITIES DocBook Chara
+ 
+   -- ...................................................................... --
+   -- ISO entity sets ...................................................... --
++--
+ 
+ PUBLIC "ISO 8879:1986//ENTITIES Diacritical Marks//EN"
+        "iso-dia.gml"
+@@ -118,5 +119,7 @@ PUBLIC "ISO 8879:1986//ENTITIES Russian 
+ PUBLIC "ISO 8879:1986//ENTITIES Non-Russian Cyrillic//EN"
+        "iso-cyr2.gml"
+ 
++--
++
+   -- End of catalog data for DocBook V4.5 ................................. --
+   -- ...................................................................... --

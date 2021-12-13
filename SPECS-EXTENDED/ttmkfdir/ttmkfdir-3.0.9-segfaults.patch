@@ -1,0 +1,20 @@
+--- ttmkfdir-3.0.9/directory.cpp.back	2005-10-08 14:25:37.839328408 +0800
++++ ttmkfdir-3.0.9/directory.cpp	2005-10-08 14:26:00.021956136 +0800
+@@ -1,5 +1,6 @@
+ #include <cctype>
+ #include <dirent.h>
++#include <stdio.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
+ 
+@@ -13,6 +14,10 @@
+ directory::scan (const std::string &dir)
+ {
+     DIR *ttfdir = opendir(dir.c_str ());
++    if (!ttfdir) {
++        printf("%s is not exist!\n", dir.c_str ());
++        exit(-1);
++    }
+ 
+     this->clear ();
+     dirpath = dir;

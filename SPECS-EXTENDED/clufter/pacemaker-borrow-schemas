@@ -1,0 +1,72 @@
+#!/bin/sh
+# Copyright 2020 Red Hat, Inc.
+# Part of clufter project
+# Licensed under GPLv2+ (a copy included | http://gnu.org/licenses/gpl-2.0.txt)
+
+# A helper for "borrow validation schemas from pacemaker" process.
+
+die() { echo; echo "$@"; exit 1; }
+
+# $1 ... input directory with original pacemaker schemas
+# $2 ... output directory with consolidated schemas
+# $3 ... schemas to skip (as posix-egrep expression)
+# $4 ... postprocess XSLT
+# $5 ... clobber existing files?  (true if set and non-null)
+consolidate() {
+	inputdir="${1}"; outputdir="${2}"; skipschemas="${3}"; postprocess="${4}"
+	test "${#}" -lt 5 || clobber="${5}"
+	mkdir -p -- "${outputdir}"
+	# for all the schema versions at the boundary of the "major" bump,
+	# except for the lower boundary of the first one (i.e. pacemaker-1.0)
+	# -- the versions in between are not interesting from validation POV
+	for base in $(
+	  find "${inputdir}" -regextype posix-egrep -regex "${skipschemas}" -prune \
+	    -o -name 'pacemaker-*.rng' -printf '%P\n' | sort -V \
+	  | sed -e 'N;/^\(pacemaker-[0-9]\)\.\([0-9][0-9]*\)\.rng\n\1\.\([0-9][0-9]*\)\.rng$/!p;D'); do
+		f="${inputdir}/${base}"
+		printf "processing: ${f} ... "
+		test -f "${f}" || continue
+		sentinel=10; old=/dev/null; new="${f}"
+		# until the jing output converged (simplification gets idempotent)
+		# as prescribed by did-size-change heuristic (or sentinel is hit)
+		while [ "$(stat -c '%s' "${old}")" != "$(stat -c '%s' "${new}")" ]; do
+			[ "$((sentinel -= 1))" -gt 0 ] || break
+			[ "${old}" = "${f}" ] && old="${outputdir}/${base}";
+			[ "${new}" = "${f}" ] \
+			  && { old="${f}"; new="${outputdir}/${base}.new"; } \
+			  || cp -f "${new}" "${old}"
+			jing -is "${old}" > "${new}"
+			#printf "(%d -> %d) " "$(stat -c '%s' "${old}")" "$(stat -c '%s' "${new}")"
+		done
+		printf "%d iterations" "$((10 - ${sentinel}))"
+		test -z "${clobber-}" && test -s "${old}" && die "file ${old} already exists" || :
+		if [ -z "${postprocess}" ]; then
+			mv "${new}" "${old}"
+			printf ", moved\n"
+		else
+			# xmllint drops empty lines caused by the applied transformation
+			xsltproc --stringparam filename-or-version "${base}" \
+			  "${postprocess}" "${new}" \
+			  | xmllint --format - > "${old}"
+			rm -f -- "${new}"
+			printf ", postprocessed\n"
+		fi
+	done
+}
+
+which jing >/dev/null 2>&1 || die "jing (from jing-trang project) required"
+
+: "${INPUTDIR=$(pkg-config --variable schemadir pacemaker-schemas 2>/dev/null \
+     || pkg-config --variable schemadir pacemaker-cib)}"
+test -n "${INPUTDIR}" || die "Input dir with pacemaker schemas not known"
+
+: "${OUTPUTDIR=schemas-consolidated}"
+test -n "${OUTPUTDIR}" || die "Output dir for consolidated schemas not known"
+
+: "${POSTPROCESS=$(dirname "${0}")/fix-jing-simplified-rng.xsl}"
+
+# skip non-defaults of upstream releases
+#: "${SKIPSCHEMAS=.*/pacemaker-(1\.0|2\.[126]).rng}"
+: "${SKIPSCHEMAS=".*/pacemaker-next\.rng"}"  # only skip WIP schema by default
+
+consolidate "${INPUTDIR}" "${OUTPUTDIR}" "${SKIPSCHEMAS}" "${POSTPROCESS}" "${@}"

@@ -1,0 +1,121 @@
+From 779d51dcaff09fc8910d5a71e74d735f573ece9e Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Mon, 6 Nov 2017 21:39:28 -0600
+Subject: [PATCH] RH: warn on invalid regex instead of failing
+
+multipath.conf used to allow "*" as a match everything regular expression,
+instead of requiring ".*". Instead of erroring when the old style
+regular expressions are used, it should print a warning and convert
+them.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/dict.c   | 27 +++++++++++++++++++++------
+ libmultipath/parser.c | 13 +++++++++++++
+ libmultipath/parser.h |  1 +
+ 3 files changed, 35 insertions(+), 6 deletions(-)
+
+diff --git a/libmultipath/dict.c b/libmultipath/dict.c
+index 1b3d0373..695c8404 100644
+--- a/libmultipath/dict.c
++++ b/libmultipath/dict.c
+@@ -58,6 +58,21 @@ set_str(vector strvec, void *ptr)
+ 	return 0;
+ }
+ 
++static int
++set_regex(vector strvec, void *ptr)
++{
++	char **str_ptr = (char **)ptr;
++
++	if (*str_ptr)
++		FREE(*str_ptr);
++	*str_ptr = set_regex_value(strvec);
++
++	if (!*str_ptr)
++		return 1;
++
++	return 0;
++}
++
+ static int
+ set_yes_no(vector strvec, void *ptr)
+ {
+@@ -1422,7 +1437,7 @@ ble_ ## option ## _handler (struct config *conf, vector strvec)		\
+ 	if (!conf->option)						\
+ 		return 1;						\
+ 									\
+-	buff = set_value(strvec);					\
++	buff = set_regex_value(strvec);					\
+ 	if (!buff)							\
+ 		return 1;						\
+ 									\
+@@ -1438,7 +1453,7 @@ ble_ ## option ## _ ## name ## _handler (struct config *conf, vector strvec) \
+ 	if (!conf->option)						\
+ 		return 1;						\
+ 									\
+-	buff = set_value(strvec);					\
++	buff = set_regex_value(strvec);					\
+ 	if (!buff)							\
+ 		return 1;						\
+ 									\
+@@ -1541,16 +1556,16 @@ device_handler(struct config *conf, vector strvec)
+ 	return 0;
+ }
+ 
+-declare_hw_handler(vendor, set_str)
++declare_hw_handler(vendor, set_regex)
+ declare_hw_snprint(vendor, print_str)
+ 
+-declare_hw_handler(product, set_str)
++declare_hw_handler(product, set_regex)
+ declare_hw_snprint(product, print_str)
+ 
+-declare_hw_handler(revision, set_str)
++declare_hw_handler(revision, set_regex)
+ declare_hw_snprint(revision, print_str)
+ 
+-declare_hw_handler(bl_product, set_str)
++declare_hw_handler(bl_product, set_regex)
+ declare_hw_snprint(bl_product, print_str)
+ 
+ declare_hw_handler(hwhandler, set_str)
+diff --git a/libmultipath/parser.c b/libmultipath/parser.c
+index e00c5fff..15495d26 100644
+--- a/libmultipath/parser.c
++++ b/libmultipath/parser.c
+@@ -382,6 +382,19 @@ oom:
+ 	return NULL;
+ }
+ 
++void *
++set_regex_value(vector strvec)
++{
++	char *buff = set_value(strvec);
++
++	if (buff && strcmp("*", buff) == 0) {
++		condlog(0, "Invalid regular expression \"*\" in multipath.conf. Using \".*\"");
++		FREE(buff);
++		return strdup(".*");
++	}
++	return buff;
++}
++
+ /* non-recursive configuration stream handler */
+ static int kw_level = 0;
+ 
+diff --git a/libmultipath/parser.h b/libmultipath/parser.h
+index 62906e98..b7917052 100644
+--- a/libmultipath/parser.h
++++ b/libmultipath/parser.h
+@@ -77,6 +77,7 @@ extern void dump_keywords(vector keydump, int level);
+ extern void free_keywords(vector keywords);
+ extern vector alloc_strvec(char *string);
+ extern void *set_value(vector strvec);
++extern void *set_regex_value(vector strvec);
+ extern int process_file(struct config *conf, char *conf_file);
+ extern struct keyword * find_keyword(vector keywords, vector v, char * name);
+ int snprint_keyword(char *buff, int len, char *fmt, struct keyword *kw,
+-- 
+2.17.2
+

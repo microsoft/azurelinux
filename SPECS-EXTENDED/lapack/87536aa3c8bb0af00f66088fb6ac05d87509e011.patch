@@ -1,0 +1,138 @@
+From 87536aa3c8bb0af00f66088fb6ac05d87509e011 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9bastien=20Villemot?= <sebastien@debian.org>
+Date: Sat, 23 Nov 2019 12:22:20 +0100
+Subject: [PATCH] Restore missing prototypes for deprecated LAPACK functions
+
+Some LAPACK functions prototypes were inadvertedly dropped in 3.9.0. As a
+consequence, LAPACKE has several unresolved symbols.
+
+Closes #365
+---
+ LAPACKE/include/lapack.h | 100 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 100 insertions(+)
+
+diff --git a/LAPACKE/include/lapack.h b/LAPACKE/include/lapack.h
+index 3f425325f..5c131d844 100644
+--- a/LAPACKE/include/lapack.h
++++ b/LAPACKE/include/lapack.h
+@@ -1842,6 +1842,28 @@ void LAPACK_zgeqlf(
+     lapack_complex_double* work, lapack_int const* lwork,
+     lapack_int* info );
+ 
++#define LAPACK_sgeqpf LAPACK_GLOBAL(sgeqpf,SGEQPF)
++void LAPACK_sgeqpf( lapack_int* m, lapack_int* n, float* a, lapack_int* lda,
++                    lapack_int* jpvt, float* tau, float* work,
++                    lapack_int *info );
++
++#define LAPACK_dgeqpf LAPACK_GLOBAL(dgeqpf,DGEQPF)
++void LAPACK_dgeqpf( lapack_int* m, lapack_int* n, double* a, lapack_int* lda,
++                    lapack_int* jpvt, double* tau, double* work,
++                    lapack_int *info );
++
++#define LAPACK_cgeqpf LAPACK_GLOBAL(cgeqpf,CGEQPF)
++void LAPACK_cgeqpf( lapack_int* m, lapack_int* n, lapack_complex_float* a,
++                    lapack_int* lda, lapack_int* jpvt,
++                    lapack_complex_float* tau, lapack_complex_float* work,
++                    float* rwork, lapack_int *info );
++
++#define LAPACK_zgeqpf LAPACK_GLOBAL(zgeqpf,ZGEQPF)
++void LAPACK_zgeqpf( lapack_int* m, lapack_int* n, lapack_complex_double* a,
++                    lapack_int* lda, lapack_int* jpvt,
++                    lapack_complex_double* tau, lapack_complex_double* work,
++                    double* rwork, lapack_int *info );
++
+ #define LAPACK_cgeqp3 LAPACK_GLOBAL(cgeqp3,CGEQP3)
+ void LAPACK_cgeqp3(
+     lapack_int const* m, lapack_int const* n,
+@@ -3617,6 +3639,47 @@ void LAPACK_zggrqf(
+     lapack_complex_double* work, lapack_int const* lwork,
+     lapack_int* info );
+ 
++#define LAPACK_sggsvd LAPACK_GLOBAL(sggsvd,SGGSVD)
++lapack_int LAPACKE_sggsvd( int matrix_layout, char jobu, char jobv, char jobq,
++                           lapack_int m, lapack_int n, lapack_int p,
++                           lapack_int* k, lapack_int* l, float* a,
++                           lapack_int lda, float* b, lapack_int ldb,
++                           float* alpha, float* beta, float* u, lapack_int ldu,
++                           float* v, lapack_int ldv, float* q, lapack_int ldq,
++                           lapack_int* iwork );
++
++#define LAPACK_dggsvd LAPACK_GLOBAL(dggsvd,DGGSVD)
++lapack_int LAPACKE_dggsvd( int matrix_layout, char jobu, char jobv, char jobq,
++                           lapack_int m, lapack_int n, lapack_int p,
++                           lapack_int* k, lapack_int* l, double* a,
++                           lapack_int lda, double* b, lapack_int ldb,
++                           double* alpha, double* beta, double* u,
++                           lapack_int ldu, double* v, lapack_int ldv, double* q,
++                           lapack_int ldq, lapack_int* iwork );
++
++#define LAPACK_cggsvd LAPACK_GLOBAL(cggsvd,CGGSVD)
++lapack_int LAPACKE_cggsvd( int matrix_layout, char jobu, char jobv, char jobq,
++                           lapack_int m, lapack_int n, lapack_int p,
++                           lapack_int* k, lapack_int* l,
++                           lapack_complex_float* a, lapack_int lda,
++                           lapack_complex_float* b, lapack_int ldb,
++                           float* alpha, float* beta, lapack_complex_float* u,
++                           lapack_int ldu, lapack_complex_float* v,
++                           lapack_int ldv, lapack_complex_float* q,
++                           lapack_int ldq, lapack_int* iwork );
++
++#define LAPACK_zggsvd LAPACK_GLOBAL(zggsvd,ZGGSVD)
++lapack_int LAPACKE_zggsvd( int matrix_layout, char jobu, char jobv, char jobq,
++                           lapack_int m, lapack_int n, lapack_int p,
++                           lapack_int* k, lapack_int* l,
++                           lapack_complex_double* a, lapack_int lda,
++                           lapack_complex_double* b, lapack_int ldb,
++                           double* alpha, double* beta,
++                           lapack_complex_double* u, lapack_int ldu,
++                           lapack_complex_double* v, lapack_int ldv,
++                           lapack_complex_double* q, lapack_int ldq,
++                           lapack_int* iwork );
++
+ #define LAPACK_cggsvd3 LAPACK_GLOBAL(cggsvd3,CGGSVD3)
+ void LAPACK_cggsvd3(
+     char const* jobu, char const* jobv, char const* jobq,
+@@ -3679,6 +3742,43 @@ void LAPACK_zggsvd3(
+     lapack_int* iwork,
+     lapack_int* info );
+ 
++#define LAPACK_sggsvp LAPACK_GLOBAL(sggsvp,SGGSVP)
++lapack_int LAPACKE_sggsvp( int matrix_layout, char jobu, char jobv, char jobq,
++                           lapack_int m, lapack_int p, lapack_int n, float* a,
++                           lapack_int lda, float* b, lapack_int ldb, float tola,
++                           float tolb, lapack_int* k, lapack_int* l, float* u,
++                           lapack_int ldu, float* v, lapack_int ldv, float* q,
++                           lapack_int ldq );
++
++#define LAPACK_dggsvp LAPACK_GLOBAL(dggsvp,DGGSVP)
++lapack_int LAPACKE_dggsvp( int matrix_layout, char jobu, char jobv, char jobq,
++                           lapack_int m, lapack_int p, lapack_int n, double* a,
++                           lapack_int lda, double* b, lapack_int ldb,
++                           double tola, double tolb, lapack_int* k,
++                           lapack_int* l, double* u, lapack_int ldu, double* v,
++                           lapack_int ldv, double* q, lapack_int ldq );
++
++#define LAPACK_cggsvp LAPACK_GLOBAL(cggsvp,CGGSVP)
++lapack_int LAPACKE_cggsvp( int matrix_layout, char jobu, char jobv, char jobq,
++                           lapack_int m, lapack_int p, lapack_int n,
++                           lapack_complex_float* a, lapack_int lda,
++                           lapack_complex_float* b, lapack_int ldb, float tola,
++                           float tolb, lapack_int* k, lapack_int* l,
++                           lapack_complex_float* u, lapack_int ldu,
++                           lapack_complex_float* v, lapack_int ldv,
++                           lapack_complex_float* q, lapack_int ldq );
++
++#define LAPACK_zggsvp LAPACK_GLOBAL(zggsvp,ZGGSVP)
++lapack_int LAPACKE_zggsvp( int matrix_layout, char jobu, char jobv, char jobq,
++                           lapack_int m, lapack_int p, lapack_int n,
++                           lapack_complex_double* a, lapack_int lda,
++                           lapack_complex_double* b, lapack_int ldb,
++                           double tola, double tolb, lapack_int* k,
++                           lapack_int* l, lapack_complex_double* u,
++                           lapack_int ldu, lapack_complex_double* v,
++                           lapack_int ldv, lapack_complex_double* q,
++                           lapack_int ldq );
++
+ #define LAPACK_cggsvp3 LAPACK_GLOBAL(cggsvp3,CGGSVP3)
+ void LAPACK_cggsvp3(
+     char const* jobu, char const* jobv, char const* jobq,

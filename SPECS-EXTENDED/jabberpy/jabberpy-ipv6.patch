@@ -1,0 +1,45 @@
+--- jabber/xmlstream.py	2011-04-07 11:13:18.000000000 +0200
++++ jabber/xmlstream.py	2011-06-22 14:37:49.369669567 +0200
+@@ -458,13 +458,34 @@ 
+             self._setupComms()
+             return
+ 
+-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+-        try:
+-            if self._proxy: self._sock.connect((self._proxy['host'], self._proxy['port']))
+-            else: self._sock.connect((self._hostIP, self._port))
+-        except socket.error, e:
+-            self.DEBUG("socket error: "+str(e),DBG_CONN_ERROR)
+-            raise
++        if self._proxy:
++            results = socket.getaddrinfo(self._proxy['host'],
++                self._proxy['port'], socket.AF_UNSPEC, socket.SOCK_STREAM)
++        else:
++            results = socket.getaddrinfo(self._hostIP, self._port,
++                socket.AF_UNSPEC, socket.SOCK_STREAM)
++
++        for r in results:
++            af, socktype, proto, canonname, sa = r
++            try:
++                self._sock = socket.socket(af, socktype, proto)
++            except socket.error, msg:
++                self._sock = None
++                continue
++            try:
++                if self._proxy:
++                    self._sock.connect((self._proxy['host'], self._proxy['port']))
++                else:
++                    self._sock.connect((self._hostIP, self._port))
++            except socket.error, e:
++                self._sock.close()
++                self._sock = None
++                self.DEBUG("socket error: "+str(e),DBG_CONN_ERROR)
++                continue
++            break
++
++        if self._sock is None:
++            raise socket.error("Unable to connect to the host and port specified")
+ 
+         if self._connection == TCP_SSL:
+             try:
+

@@ -1,0 +1,43 @@
+--- netkit-telnet-0.17.orig/telnetd/telnetd.c	2007-03-13 16:31:20.000000000 +0000
++++ netkit-telnet-0.17.orig/telnetd/telnetd.c	2007-03-13 16:31:26.000000000 +0000
+@@ -653,6 +653,11 @@ doit(struct sockaddr *who, socklen_t who
+ 
+ 	error = getnameinfo(who, wholen, namebuf, sizeof(namebuf), NULL, 0, 0);
+ 	
++	/* if we can't get a hostname now, settle for an address */	
++	if(error == EAI_AGAIN)
++		error = getnameinfo(who, wholen, namebuf, sizeof(namebuf),
++				NULL, 0, NI_NUMERICHOST);
++		
+ 	if (error) {
+ 		perror("getnameinfo: localhost");
+ 		perror(gai_strerror(error));
+@@ -681,7 +686,7 @@ doit(struct sockaddr *who, socklen_t who
+ 	/* Get local host name */
+ 	{
+ 		struct addrinfo hints;
+-		struct addrinfo *res;
++		struct addrinfo *res = 0;
+ 		int e;
+ 
+ 		memset(&hints, '\0', sizeof(hints));
+@@ -690,11 +695,14 @@ doit(struct sockaddr *who, socklen_t who
+ 
+ 		gethostname(host_name, sizeof(host_name));
+ 		if ((e = getaddrinfo(host_name, NULL, &hints, &res)) != 0) {
+-			perror("getaddrinfo: localhost");
+-			perror(gai_strerror(e));
+-			exit(1);
++			if(e != EAI_AGAIN) {
++				fprintf(stderr, "getaddrinfo: localhost %s\n", 
++				        gai_strerror(e));
++				exit(1);
++			}
+ 		}
+-		freeaddrinfo(res);
++		if(res)
++			freeaddrinfo(res);
+ 	}
+ 
+ #if	defined(AUTHENTICATE) || defined(ENCRYPT)
+

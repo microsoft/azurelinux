@@ -1,0 +1,716 @@
+From 6a4c8a3177ad95989baa4df28d8a3479faf8be8c Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 12 Oct 2015 15:48:16 +0200
+Subject: [PATCH] Port to Maven 3 API
+
+---
+ enforcer-rules/pom.xml                             |  8 +++-
+ .../plugins/enforcer/AbstractBanDependencies.java  | 14 ++++--
+ .../enforcer/BanTransitiveDependencies.java        |  7 ++-
+ .../plugins/enforcer/DependencyConvergence.java    | 31 +++++-------
+ .../plugins/enforcer/RequireMavenVersion.java      |  5 +-
+ .../plugins/enforcer/RequireNoRepositories.java    |  9 +---
+ .../plugins/enforcer/RequirePluginVersions.java    | 45 +++++++-----------
+ .../plugins/enforcer/RequireUpperBoundDeps.java    | 32 +++++--------
+ .../enforcer/utils/DependencyVersionMap.java       |  4 +-
+ .../plugins/enforcer/utils/EnforcerRuleUtils.java  | 55 +++++-----------------
+ maven-enforcer-plugin/pom.xml                      |  4 --
+ .../maven/plugins/enforcer/DisplayInfoMojo.java    |  4 +-
+ pom.xml                                            | 19 +++++---
+ 13 files changed, 94 insertions(+), 143 deletions(-)
+
+diff --git a/enforcer-rules/pom.xml b/enforcer-rules/pom.xml
+index 5ecd495..379bef0 100644
+--- a/enforcer-rules/pom.xml
++++ b/enforcer-rules/pom.xml
+@@ -43,17 +43,21 @@
+     </dependency>
+     <dependency>
+       <groupId>org.apache.maven</groupId>
+-      <artifactId>maven-project</artifactId>
++      <artifactId>maven-core</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>org.apache.maven</groupId>
+-      <artifactId>maven-core</artifactId>
++      <artifactId>maven-compat</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>org.apache.maven.shared</groupId>
+       <artifactId>maven-common-artifact-filters</artifactId>
+     </dependency>
+     <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-artifact-transfer</artifactId>
++    </dependency>
++    <dependency>
+       <groupId>org.codehaus.plexus</groupId>
+       <artifactId>plexus-utils</artifactId>
+     </dependency>
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/AbstractBanDependencies.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/AbstractBanDependencies.java
+index 960ef40..954ea2b 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/AbstractBanDependencies.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/AbstractBanDependencies.java
+@@ -23,12 +23,15 @@ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+ import org.apache.maven.plugin.logging.Log;
++import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
++import org.apache.maven.project.ProjectBuildingRequest;
+ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+ import org.apache.maven.shared.dependency.graph.DependencyNode;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
++
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+@@ -58,10 +61,11 @@ public abstract class AbstractBanDependencies
+     {
+ 
+         // get the project
+-        MavenProject project = null;
++        ProjectBuildingRequest projectBuildingRequest = null;
+         try
+         {
+-            project = (MavenProject) helper.evaluate( "${project}" );
++            projectBuildingRequest = new DefaultProjectBuildingRequest( (ProjectBuildingRequest) helper.evaluate( "${session.projectBuildingRequest}" ) );
++            projectBuildingRequest.setProject( (MavenProject) helper.evaluate( "${project}" ) );
+         }
+         catch ( ExpressionEvaluationException eee )
+         {
+@@ -88,7 +92,7 @@ public abstract class AbstractBanDependencies
+         }
+ 
+         // get the correct list of dependencies
+-        Set<Artifact> dependencies = getDependenciesToCheck( project );
++        Set<Artifact> dependencies = getDependenciesToCheck( projectBuildingRequest );
+ 
+         // look for banned dependencies
+         Set<Artifact> foundExcludes = checkDependencies( dependencies, helper.getLog() );
+@@ -119,12 +123,12 @@ public abstract class AbstractBanDependencies
+         return "Found Banned Dependency: " + artifact.getId() + "\n";
+     }
+ 
+-    protected Set<Artifact> getDependenciesToCheck( MavenProject project )
++    protected Set<Artifact> getDependenciesToCheck( ProjectBuildingRequest projectBuildingRequest )
+     {
+         Set<Artifact> dependencies = null;
+         try
+         {
+-            DependencyNode node = graphBuilder.buildDependencyGraph( project, null );
++            DependencyNode node = graphBuilder.buildDependencyGraph( projectBuildingRequest, null );
+             if ( searchTransitive )
+             {
+                 dependencies = getAllDescendants( node );
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/BanTransitiveDependencies.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/BanTransitiveDependencies.java
+index c40e057..deb149c 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/BanTransitiveDependencies.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/BanTransitiveDependencies.java
+@@ -27,7 +27,9 @@ import org.apache.maven.enforcer.rule.api.EnforcerRule;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+ import org.apache.maven.plugins.enforcer.utils.ArtifactMatcher;
++import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
++import org.apache.maven.project.ProjectBuildingRequest;
+ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+ import org.apache.maven.shared.dependency.graph.DependencyNode;
+ import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyGraphBuilder;
+@@ -156,8 +158,9 @@ public class BanTransitiveDependencies
+ 
+         try
+         {
+-            MavenProject project = (MavenProject) helper.evaluate( "${project}" );
+-            rootNode = createDependencyGraphBuilder().buildDependencyGraph( project, null );
++            ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest( (ProjectBuildingRequest) helper.evaluate( "${session.projectBuildingRequest}" ) );
++            projectBuildingRequest.setProject( (MavenProject) helper.evaluate( "${project}" ) );
++            rootNode = createDependencyGraphBuilder().buildDependencyGraph( projectBuildingRequest, null );
+         }
+         catch ( Exception e )
+         {
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/DependencyConvergence.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/DependencyConvergence.java
+index 6d42810..46ed075 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/DependencyConvergence.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/DependencyConvergence.java
+@@ -24,20 +24,19 @@ import java.util.Collections;
+ import java.util.List;
+ 
+ import org.apache.maven.artifact.Artifact;
+-import org.apache.maven.artifact.factory.ArtifactFactory;
+-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+ import org.apache.maven.artifact.repository.ArtifactRepository;
+-import org.apache.maven.artifact.resolver.ArtifactCollector;
+ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+ import org.apache.maven.enforcer.rule.api.EnforcerRule;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+ import org.apache.maven.plugin.logging.Log;
+ import org.apache.maven.plugins.enforcer.utils.DependencyVersionMap;
++import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
+-import org.apache.maven.shared.dependency.tree.DependencyNode;
+-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
+-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
++import org.apache.maven.project.ProjectBuildingRequest;
++import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
++import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
++import org.apache.maven.shared.dependency.graph.DependencyNode;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+ import org.codehaus.plexus.i18n.I18N;
+@@ -77,18 +76,14 @@ public class DependencyConvergence
+     {
+         try
+         {
+-            MavenProject project = (MavenProject) helper.evaluate( "${project}" );
+-            DependencyTreeBuilder dependencyTreeBuilder =
+-                (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class );
++            ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest( (ProjectBuildingRequest) helper.evaluate( "${session.projectBuildingRequest}" ) );
++            projectBuildingRequest.setProject( (MavenProject) helper.evaluate( "${project}" ) );
++            DependencyGraphBuilder dependencyGraphBuilder =
++                (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class );
+             ArtifactRepository repository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
+-            ArtifactFactory factory = (ArtifactFactory) helper.getComponent( ArtifactFactory.class );
+-            ArtifactMetadataSource metadataSource =
+-                (ArtifactMetadataSource) helper.getComponent( ArtifactMetadataSource.class );
+-            ArtifactCollector collector = (ArtifactCollector) helper.getComponent( ArtifactCollector.class );
+             ArtifactFilter filter = null; // we need to evaluate all scopes
+-            DependencyNode node =
+-                dependencyTreeBuilder.buildDependencyTree( project, repository, factory, metadataSource, filter,
+-                                                           collector );
++            projectBuildingRequest.setLocalRepository( repository );
++            DependencyNode node = dependencyGraphBuilder.buildDependencyGraph( projectBuildingRequest, filter );
+             return node;
+         }
+         catch ( ExpressionEvaluationException e )
+@@ -99,9 +94,9 @@ public class DependencyConvergence
+         {
+             throw new EnforcerRuleException( "Unable to lookup a component " + e.getLocalizedMessage(), e );
+         }
+-        catch ( DependencyTreeBuilderException e )
++        catch ( DependencyGraphBuilderException e )
+         {
+-            throw new EnforcerRuleException( "Could not build dependency tree " + e.getLocalizedMessage(), e );
++            throw new EnforcerRuleException( "Could not build dependency graph " + e.getLocalizedMessage(), e );
+         }
+     }
+ 
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireMavenVersion.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireMavenVersion.java
+index 46f83fd..5fab507 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireMavenVersion.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireMavenVersion.java
+@@ -20,9 +20,10 @@ package org.apache.maven.plugins.enforcer;
+  */
+ 
+ import org.apache.maven.artifact.versioning.ArtifactVersion;
++import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+-import org.apache.maven.execution.RuntimeInformation;
++import org.apache.maven.rtinfo.RuntimeInformation;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+ 
+ /**
+@@ -46,7 +47,7 @@ public class RequireMavenVersion
+         try
+         {
+             RuntimeInformation rti = (RuntimeInformation) helper.getComponent( RuntimeInformation.class );
+-            ArtifactVersion detectedMavenVersion = rti.getApplicationVersion();
++            ArtifactVersion detectedMavenVersion = new DefaultArtifactVersion( rti.getMavenVersion() );
+             helper.getLog().debug( "Detected Maven Version: " + detectedMavenVersion );
+             enforceVersion( helper.getLog(), "Maven", getVersion(), detectedMavenVersion );
+         }
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireNoRepositories.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireNoRepositories.java
+index bc225b7..9bc9762 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireNoRepositories.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireNoRepositories.java
+@@ -25,14 +25,13 @@ import java.util.ArrayList;
+ import java.util.Collections;
+ import java.util.List;
+ 
+-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+ import org.apache.maven.model.Model;
+ import org.apache.maven.model.Repository;
+ import org.apache.maven.plugins.enforcer.utils.EnforcerRuleUtils;
+ import org.apache.maven.project.MavenProject;
++import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.util.StringUtils;
+ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+@@ -192,11 +191,7 @@ public class RequireNoRepositories
+         {
+             throw new EnforcerRuleException( e.getLocalizedMessage() );
+         }
+-        catch ( ArtifactResolutionException e )
+-        {
+-            throw new EnforcerRuleException( e.getLocalizedMessage() );
+-        }
+-        catch ( ArtifactNotFoundException e )
++        catch ( ArtifactResolverException e )
+         {
+             throw new EnforcerRuleException( e.getLocalizedMessage() );
+         }
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequirePluginVersions.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequirePluginVersions.java
+index 4b1a8b4..f6754b9 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequirePluginVersions.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequirePluginVersions.java
+@@ -40,7 +40,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
+ import org.apache.maven.artifact.repository.ArtifactRepository;
+ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+-import org.apache.maven.artifact.resolver.ArtifactResolver;
+ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+ import org.apache.maven.artifact.versioning.VersionRange;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+@@ -66,8 +65,12 @@ import org.apache.maven.plugin.version.PluginVersionNotFoundException;
+ import org.apache.maven.plugin.version.PluginVersionResolutionException;
+ import org.apache.maven.plugins.enforcer.utils.EnforcerRuleUtils;
+ import org.apache.maven.plugins.enforcer.utils.PluginWrapper;
++import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
++import org.apache.maven.project.ProjectBuildingRequest;
+ import org.apache.maven.settings.Settings;
++import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
++import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+ import org.codehaus.plexus.util.ReflectionUtils;
+@@ -169,12 +172,6 @@ public class RequirePluginVersions
+     /** The resolver. */
+     ArtifactResolver resolver;
+ 
+-    /** The local. */
+-    ArtifactRepository local;
+-
+-    /** The remote repositories. */
+-    List<ArtifactRepository> remoteRepositories;
+-
+     /** The log. */
+     Log log;
+ 
+@@ -223,8 +220,8 @@ public class RequirePluginVersions
+             pluginManager = (PluginManager) helper.getComponent( PluginManager.class );
+             factory = (ArtifactFactory) helper.getComponent( ArtifactFactory.class );
+             resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
+-            local = (ArtifactRepository) helper.evaluate( "${localRepository}" );
+-            remoteRepositories = project.getRemoteArtifactRepositories();
++            ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest( (ProjectBuildingRequest) helper.evaluate( "${session.projectBuildingRequest}" ) );
++            projectBuildingRequest.setProject( project );
+ 
+             utils = new EnforcerRuleUtils( helper );
+ 
+@@ -296,7 +293,7 @@ public class RequirePluginVersions
+                     {
+                         newMsg.append( ". \tThe version currently in use is " );
+ 
+-                        Plugin currentPlugin = findCurrentPlugin( plugin, project );
++                        Plugin currentPlugin = findCurrentPlugin( plugin, projectBuildingRequest );
+ 
+                         if ( currentPlugin != null )
+                         {
+@@ -345,11 +342,7 @@ public class RequirePluginVersions
+         {
+             throw new EnforcerRuleException( e.getLocalizedMessage() );
+         }
+-        catch ( ArtifactResolutionException e )
+-        {
+-            throw new EnforcerRuleException( e.getLocalizedMessage() );
+-        }
+-        catch ( ArtifactNotFoundException e )
++        catch ( ArtifactResolverException e )
+         {
+             throw new EnforcerRuleException( e.getLocalizedMessage() );
+         }
+@@ -519,12 +512,12 @@ public class RequirePluginVersions
+      * @param project project to search
+      * @return matching plugin, <code>null</code> if not found.
+      */
+-    protected Plugin findCurrentPlugin( Plugin plugin, MavenProject project )
++    protected Plugin findCurrentPlugin( Plugin plugin, ProjectBuildingRequest projectBuildingRequest )
+     {
+         Plugin found = null;
+         try
+         {
+-            Model model = project.getModel();
++            Model model = projectBuildingRequest.getProject().getModel();
+             @SuppressWarnings( "unchecked" )
+             Map<String, Plugin> plugins = model.getBuild().getPluginsAsMap();
+             found = plugins.get( plugin.getKey() );
+@@ -536,7 +529,7 @@ public class RequirePluginVersions
+ 
+         if ( found == null )
+         {
+-            found = resolvePlugin( plugin, project );
++            found = resolvePlugin( plugin, projectBuildingRequest );
+         }
+ 
+         return found;
+@@ -549,25 +542,20 @@ public class RequirePluginVersions
+      * @param project the project
+      * @return the plugin
+      */
+-    protected Plugin resolvePlugin( Plugin plugin, MavenProject project )
++    protected Plugin resolvePlugin( Plugin plugin, ProjectBuildingRequest projectBuildingRequest )
+     {
+ 
+         @SuppressWarnings( "unchecked" )
+-        List<ArtifactRepository> pluginRepositories = project.getPluginArtifactRepositories();
+         Artifact artifact =
+             factory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(),
+                                           VersionRange.createFromVersion( "LATEST" ) );
+ 
+         try
+         {
+-            this.resolver.resolve( artifact, pluginRepositories, this.local );
++            this.resolver.resolveArtifact( projectBuildingRequest, artifact );
+             plugin.setVersion( artifact.getVersion() );
+         }
+-        catch ( ArtifactResolutionException e )
+-        {
+-            //What does this mean?
+-        }
+-        catch ( ArtifactNotFoundException e )
++        catch ( ArtifactResolverException e )
+         {
+             //What does this mean?
+         }
+@@ -1048,13 +1036,12 @@ public class RequirePluginVersions
+      *
+      * @param project the project
+      * @return the all plugin entries wrapped in a PluginWrapper Object
+-     * @throws ArtifactResolutionException the artifact resolution exception
+-     * @throws ArtifactNotFoundException the artifact not found exception
++     * @throws ArtifactResolverException the artifact resolution exception
+      * @throws IOException Signals that an I/O exception has occurred.
+      * @throws XmlPullParserException the xml pull parser exception
+      */
+     protected List<PluginWrapper> getAllPluginEntries( MavenProject project )
+-        throws ArtifactResolutionException, ArtifactNotFoundException, IOException, XmlPullParserException
++        throws ArtifactResolverException, IOException, XmlPullParserException
+     {
+         List<PluginWrapper> plugins = new ArrayList<PluginWrapper>();
+         // get all the pom models
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireUpperBoundDeps.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireUpperBoundDeps.java
+index 71210e2..5642746 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireUpperBoundDeps.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireUpperBoundDeps.java
+@@ -26,10 +26,7 @@ import java.util.List;
+ import java.util.Map;
+ 
+ import org.apache.maven.artifact.Artifact;
+-import org.apache.maven.artifact.factory.ArtifactFactory;
+-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+ import org.apache.maven.artifact.repository.ArtifactRepository;
+-import org.apache.maven.artifact.resolver.ArtifactCollector;
+ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+ import org.apache.maven.artifact.versioning.ArtifactVersion;
+ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+@@ -37,11 +34,13 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+ import org.apache.maven.plugin.logging.Log;
++import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
+-import org.apache.maven.shared.dependency.tree.DependencyNode;
+-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
+-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+-import org.apache.maven.shared.dependency.tree.traversal.DependencyNodeVisitor;
++import org.apache.maven.project.ProjectBuildingRequest;
++import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
++import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
++import org.apache.maven.shared.dependency.graph.DependencyNode;
++import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+ import org.codehaus.plexus.i18n.I18N;
+@@ -92,18 +91,11 @@ public class RequireUpperBoundDeps
+     {
+         try
+         {
+-            MavenProject project = (MavenProject) helper.evaluate( "${project}" );
+-            DependencyTreeBuilder dependencyTreeBuilder =
+-                (DependencyTreeBuilder) helper.getComponent( DependencyTreeBuilder.class );
+-            ArtifactRepository repository = (ArtifactRepository) helper.evaluate( "${localRepository}" );
+-            ArtifactFactory factory = (ArtifactFactory) helper.getComponent( ArtifactFactory.class );
+-            ArtifactMetadataSource metadataSource =
+-                (ArtifactMetadataSource) helper.getComponent( ArtifactMetadataSource.class );
+-            ArtifactCollector collector = (ArtifactCollector) helper.getComponent( ArtifactCollector.class );
+-            ArtifactFilter filter = null; // we need to evaluate all scopes
+-            DependencyNode node =
+-                dependencyTreeBuilder.buildDependencyTree( project, repository, factory, metadataSource, filter,
+-                                                           collector );
++            ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest( (ProjectBuildingRequest) helper.evaluate( "${session.projectBuildingRequest}" ) );
++            projectBuildingRequest.setProject( (MavenProject) helper.evaluate( "${project}" ) );
++            DependencyGraphBuilder dependencyGraphBuilder =
++                (DependencyGraphBuilder) helper.getComponent( DependencyGraphBuilder.class );
++            DependencyNode node = dependencyGraphBuilder.buildDependencyGraph( projectBuildingRequest, null );
+             return node;
+         }
+         catch ( ExpressionEvaluationException e )
+@@ -114,7 +106,7 @@ public class RequireUpperBoundDeps
+         {
+             throw new EnforcerRuleException( "Unable to lookup a component " + e.getLocalizedMessage(), e );
+         }
+-        catch ( DependencyTreeBuilderException e )
++        catch ( DependencyGraphBuilderException e )
+         {
+             throw new EnforcerRuleException( "Could not build dependency tree " + e.getLocalizedMessage(), e );
+         }
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/DependencyVersionMap.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/DependencyVersionMap.java
+index 2ec4ac2..ece772b 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/DependencyVersionMap.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/DependencyVersionMap.java
+@@ -26,8 +26,8 @@ import java.util.Map;
+ 
+ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.plugin.logging.Log;
+-import org.apache.maven.shared.dependency.tree.DependencyNode;
+-import org.apache.maven.shared.dependency.tree.traversal.DependencyNodeVisitor;
++import org.apache.maven.shared.dependency.graph.DependencyNode;
++import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
+ 
+ /**
+  * @author Brian Fox
+diff --git a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/EnforcerRuleUtils.java b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/EnforcerRuleUtils.java
+index 386b629..cb83e92 100644
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/EnforcerRuleUtils.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/EnforcerRuleUtils.java
+@@ -28,9 +28,6 @@ import java.util.List;
+ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.artifact.factory.ArtifactFactory;
+ import org.apache.maven.artifact.repository.ArtifactRepository;
+-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+-import org.apache.maven.artifact.resolver.ArtifactResolver;
+ import org.apache.maven.enforcer.rule.api.EnforcerRuleHelper;
+ import org.apache.maven.model.Model;
+ import org.apache.maven.model.Parent;
+@@ -38,7 +35,11 @@ import org.apache.maven.model.Plugin;
+ import org.apache.maven.model.ReportPlugin;
+ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+ import org.apache.maven.plugin.logging.Log;
++import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
++import org.apache.maven.project.ProjectBuildingRequest;
++import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
++import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+ import org.codehaus.plexus.util.ReaderFactory;
+@@ -60,45 +61,16 @@ public class EnforcerRuleUtils
+     /** The resolver. */
+     ArtifactResolver resolver;
+ 
+-    /** The local. */
+-    ArtifactRepository local;
+-
+-    /** The remote repositories. */
+-    List<ArtifactRepository> remoteRepositories;
+-
+     /** The log. */
+     Log log;
+ 
+-    /** The project. */
+-    MavenProject project;
++    ProjectBuildingRequest projectBuildingRequest;
+ 
+     private EnforcerRuleHelper helper;
+ 
+     /**
+      * Instantiates a new enforcer rule utils.
+      *
+-     * @param theFactory the the factory
+-     * @param theResolver the the resolver
+-     * @param theLocal the the local
+-     * @param theRemoteRepositories the the remote repositories
+-     * @param project the project
+-     * @param theLog the the log
+-     */
+-    public EnforcerRuleUtils( ArtifactFactory theFactory, ArtifactResolver theResolver, ArtifactRepository theLocal,
+-                              List<ArtifactRepository> theRemoteRepositories, MavenProject project, Log theLog )
+-    {
+-        super();
+-        this.factory = theFactory;
+-        this.resolver = theResolver;
+-        this.local = theLocal;
+-        this.remoteRepositories = theRemoteRepositories;
+-        this.log = theLog;
+-        this.project = project;
+-    }
+-
+-    /**
+-     * Instantiates a new enforcer rule utils.
+-     *
+      * @param helper the helper
+      */
+     @SuppressWarnings( "unchecked" )
+@@ -112,9 +84,8 @@ public class EnforcerRuleUtils
+         {
+             factory = (ArtifactFactory) helper.getComponent( ArtifactFactory.class );
+             resolver = (ArtifactResolver) helper.getComponent( ArtifactResolver.class );
+-            local = (ArtifactRepository) helper.evaluate( "${localRepository}" );
+-            project = (MavenProject) helper.evaluate( "${project}" );
+-            remoteRepositories = project.getRemoteArtifactRepositories();
++            projectBuildingRequest = new DefaultProjectBuildingRequest( (ProjectBuildingRequest) helper.evaluate( "${session.projectBuildingRequest}" ) );
++            projectBuildingRequest.setProject( (MavenProject) helper.evaluate( "${project}" ) );
+         }
+         catch ( ComponentLookupException e )
+         {
+@@ -163,13 +134,12 @@ public class EnforcerRuleUtils
+      * @param version the version
+      * @param pom the pom
+      * @return the pom model
+-     * @throws ArtifactResolutionException the artifact resolution exception
+-     * @throws ArtifactNotFoundException the artifact not found exception
++     * @throws ArtifactResolverException the artifact resolution exception
+      * @throws XmlPullParserException the xml pull parser exception
+      * @throws IOException Signals that an I/O exception has occurred.
+      */
+     private Model getPomModel( String groupId, String artifactId, String version, File pom )
+-        throws ArtifactResolutionException, ArtifactNotFoundException, IOException, XmlPullParserException
++        throws ArtifactResolverException, IOException, XmlPullParserException
+     {
+         Model model = null;
+ 
+@@ -206,7 +176,7 @@ public class EnforcerRuleUtils
+         if ( !found )
+         {
+             Artifact pomArtifact = factory.createArtifact( groupId, artifactId, version, null, "pom" );
+-            resolver.resolve( pomArtifact, remoteRepositories, local );
++            resolver.resolveArtifact( projectBuildingRequest, pomArtifact );
+             model = readModel( pomArtifact.getFile() );
+         }
+ 
+@@ -221,13 +191,12 @@ public class EnforcerRuleUtils
+      * @param version the version
+      * @param pom the pom
+      * @return the models recursively
+-     * @throws ArtifactResolutionException the artifact resolution exception
+-     * @throws ArtifactNotFoundException the artifact not found exception
++     * @throws ArtifactResolverException the artifact resolution exception
+      * @throws IOException Signals that an I/O exception has occurred.
+      * @throws XmlPullParserException the xml pull parser exception
+      */
+     public List<Model> getModelsRecursively( String groupId, String artifactId, String version, File pom )
+-        throws ArtifactResolutionException, ArtifactNotFoundException, IOException, XmlPullParserException
++        throws ArtifactResolverException, IOException, XmlPullParserException
+     {
+         List<Model> models = null;
+         Model model = getPomModel( groupId, artifactId, version, pom );
+diff --git a/maven-enforcer-plugin/pom.xml b/maven-enforcer-plugin/pom.xml
+index 7dbab66..1448df3 100644
+--- a/maven-enforcer-plugin/pom.xml
++++ b/maven-enforcer-plugin/pom.xml
+@@ -49,10 +49,6 @@
+     </dependency>
+     <dependency>
+       <groupId>org.apache.maven</groupId>
+-      <artifactId>maven-project</artifactId>
+-    </dependency>
+-    <dependency>
+-      <groupId>org.apache.maven</groupId>
+       <artifactId>maven-core</artifactId>
+     </dependency>
+     <dependency>
+diff --git a/maven-enforcer-plugin/src/main/java/org/apache/maven/plugins/enforcer/DisplayInfoMojo.java b/maven-enforcer-plugin/src/main/java/org/apache/maven/plugins/enforcer/DisplayInfoMojo.java
+index 8133809..f7b7fc2 100644
+--- a/maven-enforcer-plugin/src/main/java/org/apache/maven/plugins/enforcer/DisplayInfoMojo.java
++++ b/maven-enforcer-plugin/src/main/java/org/apache/maven/plugins/enforcer/DisplayInfoMojo.java
+@@ -21,7 +21,6 @@ package org.apache.maven.plugins.enforcer;
+ 
+ import org.apache.commons.lang.SystemUtils;
+ import org.apache.maven.execution.MavenSession;
+-import org.apache.maven.execution.RuntimeInformation;
+ import org.apache.maven.plugin.AbstractMojo;
+ import org.apache.maven.plugin.MojoExecution;
+ import org.apache.maven.plugin.MojoExecutionException;
+@@ -30,6 +29,7 @@ import org.apache.maven.plugins.annotations.Mojo;
+ import org.apache.maven.plugins.annotations.Parameter;
+ import org.apache.maven.project.MavenProject;
+ import org.apache.maven.project.path.PathTranslator;
++import org.apache.maven.rtinfo.RuntimeInformation;
+ import org.codehaus.plexus.PlexusConstants;
+ import org.codehaus.plexus.PlexusContainer;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+@@ -96,7 +96,7 @@ public class DisplayInfoMojo
+             DefaultEnforcementRuleHelper helper = new DefaultEnforcementRuleHelper( session, evaluator, getLog(),
+                                                                                     container );
+             RuntimeInformation rti = (RuntimeInformation) helper.getComponent( RuntimeInformation.class );
+-            getLog().info( "Maven Version: " + rti.getApplicationVersion() );
++            getLog().info( "Maven Version: " + rti.getMavenVersion() );
+             getLog().info( "JDK Version: " + SystemUtils.JAVA_VERSION + " normalized as: "
+                                + RequireJavaVersion.normalizeJDKVersion( SystemUtils.JAVA_VERSION_TRIMMED ) );
+             RequireOS os = new RequireOS();
+diff --git a/pom.xml b/pom.xml
+index 423b7f7..a33d992 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -37,7 +37,7 @@
+   <inceptionYear>2007</inceptionYear>
+ 
+   <prerequisites>
+-    <maven>2.2.1</maven>
++    <maven>3.3.3</maven>
+   </prerequisites>
+ 
+   <modules>
+@@ -66,7 +66,7 @@
+     </site>
+   </distributionManagement>
+   <properties>
+-    <maven.version>2.2.1</maven.version>
++    <maven.version>3.3.3</maven.version>
+     <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
+     <maven.site.path>enforcer-archives/enforcer-LATEST</maven.site.path>
+   </properties>
+@@ -102,18 +102,23 @@
+       </dependency>
+       <dependency>
+         <groupId>org.apache.maven</groupId>
+-        <artifactId>maven-project</artifactId>
++        <artifactId>maven-core</artifactId>
+         <version>${maven.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.apache.maven</groupId>
+-        <artifactId>maven-core</artifactId>
++        <artifactId>maven-compat</artifactId>
+         <version>${maven.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.apache.maven.shared</groupId>
+         <artifactId>maven-common-artifact-filters</artifactId>
+-        <version>1.4</version>
++        <version>3.0-SNAPSHOT</version>
++      </dependency>
++      <dependency>
++        <groupId>org.apache.maven.shared</groupId>
++        <artifactId>maven-artifact-transfer</artifactId>
++        <version>3.0-SNAPSHOT</version>
+       </dependency>
+       <dependency>
+         <groupId>org.codehaus.plexus</groupId>
+@@ -144,12 +149,12 @@
+       <dependency>
+         <groupId>org.apache.maven.plugin-testing</groupId>
+         <artifactId>maven-plugin-testing-harness</artifactId>
+-        <version>1.3</version>
++        <version>3.3.0</version>
+       </dependency>
+       <dependency>
+         <groupId>org.apache.maven.shared</groupId>
+         <artifactId>maven-dependency-tree</artifactId>
+-        <version>2.2</version>
++        <version>3.0</version>
+       </dependency>
+     </dependencies>
+   </dependencyManagement>
+-- 
+2.4.3
+

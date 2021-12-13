@@ -81,12 +81,6 @@ findutils-lang-4.8.0-1.cm2.aarch64.rpm
 flex-2.6.4-7.cm2.aarch64.rpm
 flex-debuginfo-2.6.4-7.cm2.aarch64.rpm
 flex-devel-2.6.4-7.cm2.aarch64.rpm
-fontconfig-2.13.91-1.cm2.aarch64.rpm
-fontconfig-debuginfo-2.13.91-1.cm2.aarch64.rpm
-fontconfig-devel-2.13.91-1.cm2.aarch64.rpm
-freetype-2.9.1-5.cm2.aarch64.rpm
-freetype-debuginfo-2.9.1-5.cm2.aarch64.rpm
-freetype-devel-2.9.1-5.cm2.aarch64.rpm
 gawk-5.1.0-1.cm2.aarch64.rpm
 gawk-debuginfo-5.1.0-1.cm2.aarch64.rpm
 gcc-11.2.0-1.cm2.aarch64.rpm
@@ -237,6 +231,7 @@ meson-0.57.1-2.cm2.noarch.rpm
 mpfr-4.1.0-1.cm2.aarch64.rpm
 mpfr-debuginfo-4.1.0-1.cm2.aarch64.rpm
 mpfr-devel-4.1.0-1.cm2.aarch64.rpm
+msopenjdk-11-11.0.13+8-LTS-4.aarch64.rpm
 ncurses-6.2-4.cm2.aarch64.rpm
 ncurses-compat-6.2-4.cm2.aarch64.rpm
 ncurses-debuginfo-6.2-4.cm2.aarch64.rpm
@@ -251,12 +246,6 @@ npth-devel-1.6-4.cm2.aarch64.rpm
 nspr-4.21-2.cm2.aarch64.rpm
 nspr-debuginfo-4.21-2.cm2.aarch64.rpm
 nspr-devel-4.21-2.cm2.aarch64.rpm
-openjdk8-1.8.0.292-2.cm2.aarch64.rpm
-openjdk8-debuginfo-1.8.0.292-2.cm2.aarch64.rpm
-openjdk8-doc-1.8.0.292-2.cm2.aarch64.rpm
-openjdk8-sample-1.8.0.292-2.cm2.aarch64.rpm
-openjdk8-src-1.8.0.292-2.cm2.aarch64.rpm
-openjre8-1.8.0.292-2.cm2.aarch64.rpm
 openssl-1.1.1k-5.cm2.aarch64.rpm
 openssl-debuginfo-1.1.1k-5.cm2.aarch64.rpm
 openssl-devel-1.1.1k-5.cm2.aarch64.rpm

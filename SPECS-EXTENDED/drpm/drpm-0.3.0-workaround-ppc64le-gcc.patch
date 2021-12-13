@@ -1,0 +1,39 @@
+diff -up drpm-0.3.0/CMakeLists.txt.than drpm-0.3.0/CMakeLists.txt
+diff -up drpm-0.3.0/src/CMakeLists.txt.than drpm-0.3.0/src/CMakeLists.txt
+--- drpm-0.3.0/src/CMakeLists.txt.than	2017-03-23 13:32:42.043858861 -0400
++++ drpm-0.3.0/src/CMakeLists.txt	2017-03-23 13:33:07.444304342 -0400
+@@ -16,7 +16,7 @@ configure_file(config.h.in ${CMAKE_BINAR
+ add_library(drpm SHARED ${DRPM_SOURCES})
+ 
+ set_source_files_properties(${DRPM_SOURCES} PROPERTIES
+-   COMPILE_FLAGS "-std=c99 -pedantic -Wall -Wextra -DHAVE_CONFIG_H -I${CMAKE_BINARY_DIR}"
++   COMPILE_FLAGS "-std=c99 -fno-builtin-strcmp -pedantic -Wall -Wextra -DHAVE_CONFIG_H -I${CMAKE_BINARY_DIR}"
+ )
+ 
+ target_link_libraries(drpm ${DRPM_LINK_LIBRARIES})
+diff -up drpm-0.3.0/test/CMakeLists.txt.than drpm-0.3.0/test/CMakeLists.txt
+--- drpm-0.3.0/test/CMakeLists.txt.than	2017-03-23 13:38:06.729554341 -0400
++++ drpm-0.3.0/test/CMakeLists.txt	2017-03-23 13:38:42.840187780 -0400
+@@ -33,7 +33,7 @@ endif()
+ add_executable(drpm_api_tests ${DRPM_TEST_SOURCES})
+ 
+ set_source_files_properties(${DRPM_TEST_SOURCES} PROPERTIES
+-   COMPILE_FLAGS "-std=c99 -pedantic -Wall -Wextra -DHAVE_CONFIG_H -I${CMAKE_BINARY_DIR}"
++   COMPILE_FLAGS "-std=c99 -fno-builtin-strcmp -pedantic -Wall -Wextra -DHAVE_CONFIG_H -I${CMAKE_BINARY_DIR}"
+ )
+ 
+ target_link_libraries(drpm_api_tests ${DRPM_LINK_LIBRARIES} ${CMOCKA_LIBRARIES})
+@@ -52,13 +52,3 @@ if (BASH_PROGRAM)
+    )
+    set_tests_properties(drpm_cmp_files PROPERTIES DEPENDS drpm_api_tests)
+ endif()
+-
+-
+-if (VALGRIND_PROGRAM)
+-   add_test(
+-      NAME drpm_memcheck
+-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+-      COMMAND valgrind ${DRPM_TEST_ARGS_VALGRIND} ./drpm_api_tests
+-   )
+-endif()
+-

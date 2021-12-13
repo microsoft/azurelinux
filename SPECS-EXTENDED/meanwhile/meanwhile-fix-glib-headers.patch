@@ -1,0 +1,279 @@
+Index: meanwhile-1.1.0/samples/logging_proxy.c
+===================================================================
+--- meanwhile-1.1.0.orig/samples/logging_proxy.c
++++ meanwhile-1.1.0/samples/logging_proxy.c
+@@ -25,7 +25,6 @@
+ #include <unistd.h>
+ 
+ #include <glib.h>
+-#include <glib/glist.h>
+ 
+ #include <mw_cipher.h>
+ #include <mw_common.h>
+Index: meanwhile-1.1.0/samples/login_server.c
+===================================================================
+--- meanwhile-1.1.0.orig/samples/login_server.c
++++ meanwhile-1.1.0/samples/login_server.c
+@@ -19,7 +19,6 @@
+ #include <unistd.h>
+ 
+ #include <glib.h>
+-#include <glib/glist.h>
+ 
+ #include <mw_cipher.h>
+ #include <mw_common.h>
+Index: meanwhile-1.1.0/samples/nocipher_proxy.c
+===================================================================
+--- meanwhile-1.1.0.orig/samples/nocipher_proxy.c
++++ meanwhile-1.1.0/samples/nocipher_proxy.c
+@@ -29,7 +29,6 @@
+ #include <unistd.h>
+ 
+ #include <glib.h>
+-#include <glib/glist.h>
+ 
+ #include <mw_common.h>
+ #include <mw_message.h>
+Index: meanwhile-1.1.0/samples/redirect_server.c
+===================================================================
+--- meanwhile-1.1.0.orig/samples/redirect_server.c
++++ meanwhile-1.1.0/samples/redirect_server.c
+@@ -22,7 +22,6 @@
+ #include <unistd.h>
+ 
+ #include <glib.h>
+-#include <glib/glist.h>
+ 
+ #include <mw_common.h>
+ #include <mw_message.h>
+Index: meanwhile-1.1.0/src/channel.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/channel.c
++++ meanwhile-1.1.0/src/channel.c
+@@ -19,8 +19,6 @@
+ */
+ 
+ #include <glib.h>
+-#include <glib/ghash.h>
+-#include <glib/glist.h>
+ #include <string.h>
+ 
+ #include "mw_channel.h"
+Index: meanwhile-1.1.0/src/mw_debug.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/mw_debug.c
++++ meanwhile-1.1.0/src/mw_debug.c
+@@ -19,7 +19,7 @@
+ */
+ 
+ 
+-#include <glib/gstring.h>
++#include <glib.h>
+ 
+ #include "mw_debug.h"
+ 
+Index: meanwhile-1.1.0/src/mw_message.h
+===================================================================
+--- meanwhile-1.1.0.orig/src/mw_message.h
++++ meanwhile-1.1.0/src/mw_message.h
+@@ -22,7 +22,7 @@
+ #define _MW_MESSAGE_H
+ 
+ 
+-#include <glib/glist.h>
++#include <glib.h>
+ #include "mw_common.h"
+ 
+ 
+Index: meanwhile-1.1.0/src/mw_srvc_conf.h
+===================================================================
+--- meanwhile-1.1.0.orig/src/mw_srvc_conf.h
++++ meanwhile-1.1.0/src/mw_srvc_conf.h
+@@ -22,7 +22,7 @@
+ #define _MW_SRVC_CONF_H
+ 
+ 
+-#include <glib/glist.h>
++#include <glib.h>
+ #include "mw_common.h"
+ 
+ 
+Index: meanwhile-1.1.0/src/mw_srvc_dir.h
+===================================================================
+--- meanwhile-1.1.0.orig/src/mw_srvc_dir.h
++++ meanwhile-1.1.0/src/mw_srvc_dir.h
+@@ -22,7 +22,6 @@
+ 
+ 
+ #include <glib.h>
+-#include <glib/glist.h>
+ 
+ 
+ #ifdef __cplusplus
+Index: meanwhile-1.1.0/src/mw_srvc_place.h
+===================================================================
+--- meanwhile-1.1.0.orig/src/mw_srvc_place.h
++++ meanwhile-1.1.0/src/mw_srvc_place.h
+@@ -22,7 +22,7 @@
+ #define _MW_SRVC_PLACE_H
+ 
+ 
+-#include <glib/glist.h>
++#include <glib.h>
+ #include "mw_common.h"
+ 
+ 
+Index: meanwhile-1.1.0/src/mw_srvc_resolve.h
+===================================================================
+--- meanwhile-1.1.0.orig/src/mw_srvc_resolve.h
++++ meanwhile-1.1.0/src/mw_srvc_resolve.h
+@@ -23,7 +23,6 @@
+ 
+ 
+ #include <glib.h>
+-#include <glib/glist.h>
+ 
+ 
+ #ifdef __cplusplus
+Index: meanwhile-1.1.0/src/mw_st_list.h
+===================================================================
+--- meanwhile-1.1.0.orig/src/mw_st_list.h
++++ meanwhile-1.1.0/src/mw_st_list.h
+@@ -30,7 +30,6 @@
+ 
+ 
+ #include <glib.h>
+-#include <glib/glist.h>
+ #include "mw_common.h"
+ 
+ 
+Index: meanwhile-1.1.0/src/mw_util.h
+===================================================================
+--- meanwhile-1.1.0.orig/src/mw_util.h
++++ meanwhile-1.1.0/src/mw_util.h
+@@ -23,9 +23,6 @@
+ 
+ 
+ #include <glib.h>
+-#include <glib/ghash.h>
+-#include <glib/glist.h>
+-
+ 
+ #define map_guint_new() \
+   g_hash_table_new(g_direct_hash, g_direct_equal)
+Index: meanwhile-1.1.0/src/srvc_aware.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/srvc_aware.c
++++ meanwhile-1.1.0/src/srvc_aware.c
+@@ -19,8 +19,6 @@
+ */
+ 
+ #include <glib.h>
+-#include <glib/ghash.h>
+-#include <glib/glist.h>
+ #include <string.h>
+ 
+ #include "mw_channel.h"
+Index: meanwhile-1.1.0/src/srvc_conf.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/srvc_conf.c
++++ meanwhile-1.1.0/src/srvc_conf.c
+@@ -19,8 +19,6 @@
+ */
+ 
+ #include <glib.h>
+-#include <glib/ghash.h>
+-#include <glib/glist.h>
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+Index: meanwhile-1.1.0/src/srvc_dir.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/srvc_dir.c
++++ meanwhile-1.1.0/src/srvc_dir.c
+@@ -18,7 +18,7 @@
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include <glib/ghash.h>
++#include <glib.h>
+ 
+ #include "mw_channel.h"
+ #include "mw_common.h"
+Index: meanwhile-1.1.0/src/srvc_ft.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/srvc_ft.c
++++ meanwhile-1.1.0/src/srvc_ft.c
+@@ -19,7 +19,7 @@
+ */
+ 
+ 
+-#include <glib/glist.h>
++#include <glib.h>
+ 
+ #include "mw_channel.h"
+ #include "mw_common.h"
+Index: meanwhile-1.1.0/src/srvc_im.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/srvc_im.c
++++ meanwhile-1.1.0/src/srvc_im.c
+@@ -19,7 +19,6 @@
+ */
+ 
+ #include <glib.h>
+-#include <glib/glist.h>
+ #include <string.h>
+ 
+ #include "mw_channel.h"
+Index: meanwhile-1.1.0/src/srvc_place.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/srvc_place.c
++++ meanwhile-1.1.0/src/srvc_place.c
+@@ -19,8 +19,6 @@
+ */
+ 
+ #include <glib.h>
+-#include <glib/ghash.h>
+-#include <glib/glist.h>
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+Index: meanwhile-1.1.0/src/srvc_resolve.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/srvc_resolve.c
++++ meanwhile-1.1.0/src/srvc_resolve.c
+@@ -18,7 +18,7 @@
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include <glib/ghash.h>
++#include <glib.h>
+ 
+ #include "mw_channel.h"
+ #include "mw_common.h"
+Index: meanwhile-1.1.0/src/srvc_store.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/srvc_store.c
++++ meanwhile-1.1.0/src/srvc_store.c
+@@ -18,7 +18,7 @@
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+-#include <glib/glist.h>
++#include <glib.h>
+ 
+ #include "mw_channel.h"
+ #include "mw_debug.h"
+Index: meanwhile-1.1.0/src/st_list.c
+===================================================================
+--- meanwhile-1.1.0.orig/src/st_list.c
++++ meanwhile-1.1.0/src/st_list.c
+@@ -20,7 +20,7 @@
+ 
+ #include <stdio.h>
+ #include <string.h>
+-#include <glib/gstring.h>
++#include <glib.h>
+ 
+ #include "mw_debug.h"
+ #include "mw_util.h"

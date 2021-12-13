@@ -1,0 +1,62 @@
+From 373f2e03736dfd87d50f02208b99d462cf34d891 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Thu, 27 Sep 2018 13:04:47 +0200
+Subject: [PATCH] IPA: do not call sssd-enable-logins
+
+It is expected that ipa-client-install will do all PAM and NSS
+configuration. To avoid changing IPA default realmd will not try to
+update the related configuration.
+---
+ service/realm-sssd-ipa.c | 24 +-----------------------
+ 1 file changed, 1 insertion(+), 23 deletions(-)
+
+diff --git a/service/realm-sssd-ipa.c b/service/realm-sssd-ipa.c
+index 5029f6b..70f8b0e 100644
+--- a/service/realm-sssd-ipa.c
++++ b/service/realm-sssd-ipa.c
+@@ -109,41 +109,19 @@ enroll_closure_free (gpointer data)
+ 	g_free (enroll);
+ }
+ 
+-static void
+-on_enable_nss_done (GObject *source,
+-                    GAsyncResult *result,
+-                    gpointer user_data)
+-{
+-	GTask *task = G_TASK (user_data);
+-	GError *error = NULL;
+-	gint status;
+-
+-	status = realm_command_run_finish (result, NULL, &error);
+-	if (error == NULL && status != 0)
+-		g_set_error (&error, REALM_ERROR, REALM_ERROR_INTERNAL,
+-		             _("Enabling SSSD in nsswitch.conf and PAM failed."));
+-	if (error != NULL)
+-		g_task_return_error (task, error);
+-	else
+-		g_task_return_boolean (task, TRUE);
+-	g_object_unref (task);
+-}
+-
+ static void
+ on_restart_done (GObject *source,
+                  GAsyncResult *result,
+                  gpointer user_data)
+ {
+ 	GTask *task = G_TASK (user_data);
+-	EnrollClosure *enroll = g_task_get_task_data (task);
+ 	RealmSssd *sssd = g_task_get_source_object (task);
+ 	GError *error = NULL;
+ 
+ 	realm_service_enable_and_restart_finish (result, &error);
+ 	if (error == NULL) {
+ 		realm_sssd_update_properties (sssd);
+-		realm_command_run_known_async ("sssd-enable-logins", NULL, enroll->invocation,
+-		                               on_enable_nss_done, g_object_ref (task));
++		g_task_return_boolean (task, TRUE);
+ 	} else {
+ 		g_task_return_error (task, error);
+ 	}
+-- 
+2.17.1
+

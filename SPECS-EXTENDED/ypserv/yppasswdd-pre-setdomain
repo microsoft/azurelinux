@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# yppasswdd-pre-setdomain
+#
+# description: This is part of former ypserv init script, which is used 
+#              to setup proper domainname before starting yppasswdd daemon
+#              itself. If $NISDOMAIN is not defined, it fails. 
+#
+
+DOMAINNAME=`domainname`
+if [ "$DOMAINNAME" = "(none)" -o "$DOMAINNAME" = "" ]; then
+    echo -n $"Setting NIS domain: "
+    if [ -n "$NISDOMAIN" ]; then
+        domainname $NISDOMAIN
+        echo $"'$NISDOMAIN' (environment variable)"
+    else # no domainname found
+        logger -t yppasswdd $"domain not found"
+        exit 1
+    fi
+fi
+

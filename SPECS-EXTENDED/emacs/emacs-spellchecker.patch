@@ -1,0 +1,16 @@
+diff --git a/lisp/textmodes/ispell.el b/lisp/textmodes/ispell.el
+index 1d28de7..1daec44 100644
+--- a/lisp/textmodes/ispell.el
++++ b/lisp/textmodes/ispell.el
+@@ -200,9 +200,9 @@
+ ;; cause an error; and one of the other spelling engines below is
+ ;; almost certainly installed in any case, for enchant to use.
+ (defcustom ispell-program-name
+-  (or (executable-find "aspell")
++  (or (executable-find "hunspell")
++      (executable-find "aspell")
+       (executable-find "ispell")
+-      (executable-find "hunspell")
+       "ispell")
+   "Program invoked by \\[ispell-word] and \\[ispell-region] commands."
+   :type 'string

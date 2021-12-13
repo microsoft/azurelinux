@@ -14,12 +14,15 @@
 # published by the Open Source Initiative.
 #
 
-#need to disable debuginfo till we bring in x11 deps
+# need to disable debuginfo till we bring in x11 deps
 %define debug_package %{nil}
+# Don't generate requires on java-headless
+%global __requires_exclude_from %{_datadir}/maven-metadata
+
 Summary:        Java Native Access
 Name:           jna
 Version:        5.5.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,12 +35,9 @@ BuildRequires:  dos2unix
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  libffi
 BuildRequires:  libffi-devel
-BuildRequires:  openjdk8
-BuildRequires:  openjre8
-Requires:       openjre8
-
-# Temp: Do not build with x86_64 due to docker build issue
-ExclusiveArch:  aarch64
+BuildRequires:  msopenjdk-11
+BuildRequires:  javapackages-tools
+Requires:       msopenjdk-11
 
 %description
 JNA provides Java programs easy access to native shared libraries
@@ -78,6 +78,7 @@ rm -rf %{buildroot}
 
 
 %build
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 build-jar-repository -s -p lib ant
 ant \
     jar \
@@ -138,6 +139,9 @@ ant
 %license LICENSE
 
 %changelog
+* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.5.0-3
+- Modify to build with JDK 11
+
 * Wed Nov 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.0-2
 - License verified.
 

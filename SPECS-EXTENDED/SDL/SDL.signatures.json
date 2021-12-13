@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "SDL-1.2.15.tar.gz.sig": "6adff9b5b6e982c5c8a350bdd809f725f916ac2ca3d3b54b4b824187facf00d6",
+  "SDL-1.2.15_repackaged.tar.gz": "1fa95210712231342d62939a6e2fa4b5717dca11fdf6542b65f6373acd908e89",
+  "SDL_config.h": "ba92a6bcb9b66ec357db62067cccf32bda9f40f495737f084221bb1a71cfd8d1",
+  "repackage.sh": "272016711deed5ba22f6e3623ba6230f77342645bd97ed4a2052293c1f4c982b",
+  "slouken-pubkey.asc": "9a599c27df4e9fcbb318475f05e95bc9281beb5901eca79229f30c4cdf62bab6"
+ }
+}
