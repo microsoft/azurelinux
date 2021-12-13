@@ -22,6 +22,7 @@ ignore_list=" \
   kernel-signed-aarch64 \
   kernel-signed-x86_64 \
   kf5 \
+  lcms2 \
   mariner-repos \
   mariner-rpm-macros \
   moby-buildx \
