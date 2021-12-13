@@ -4,8 +4,6 @@
 package schedulerutils
 
 import (
-	"path/filepath"
-	"strings"
 	"sync"
 
 	"microsoft.com/pkggen/internal/logger"
@@ -60,14 +58,18 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 
 // canUseCacheForNode checks if the cache can be used for a given node.
 // - It will check if the node corresponds to an entry in packagesToRebuild.
-// - It will check if all dependencies of the node were also cached.
+// - It will check if all dependencies of the node were also cached. Exceptions:
+//		- "TypePreBuilt" nodes must use the cache and have no dependencies to check.
 func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState) (canUseCache bool) {
-	const specSuffix = ".spec"
+	// The "TypePreBuilt" nodes always use the cache.
+	if node.Type == pkggraph.TypePreBuilt {
+		canUseCache = true
+		return
+	}
 
 	// Check if the node corresponds to an entry in packagesToRebuild
-	specName := strings.TrimSuffix(filepath.Base(node.SpecPath), specSuffix)
-	canUseCache = (node.Type == pkggraph.TypePreBuilt) ||
-		(sliceutils.Find(packagesToRebuild, specName, sliceutils.StringMatch) == -1)
+	specName := node.SpecName()
+	canUseCache = !sliceutils.Contains(packagesToRebuild, specName, sliceutils.StringMatch)
 	if !canUseCache {
 		logger.Log.Debugf("Marking (%s) for rebuild per user request", specName)
 		return

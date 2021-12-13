@@ -11,6 +11,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
@@ -674,6 +675,18 @@ func (n *PkgNode) FriendlyName() string {
 	default:
 		return "UNKNOWN NODE TYPE"
 	}
+}
+
+// SpecName returns the name of the spec associated with this node.
+// Returns "." if the node doesn't have a spec file path or URL.
+func (n *PkgNode) SpecName() string {
+	return strings.TrimSuffix(filepath.Base(n.SpecPath), ".spec")
+}
+
+// SRPMFileName returns the name of the SRPM file associated with this node.
+// Returns "." if the node doesn't have an SRPM file path or URL.
+func (n *PkgNode) SRPMFileName() string {
+	return filepath.Base(n.SrpmPath)
 }
 
 func (n *PkgNode) String() string {
