@@ -6164,8 +6164,8 @@
         "type": "other",
         "other": {
           "name": "procps-ng",
-          "version": "3.3.15",
-          "downloadUrl": "http://sourceforge.net/projects/procps-ng/files/Production/procps-ng-3.3.15.tar.xz"
+          "version": "3.3.17",
+          "downloadUrl": "http://sourceforge.net/projects/procps-ng/files/Production/procps-ng-3.3.17.tar.xz"
         }
       }
     },

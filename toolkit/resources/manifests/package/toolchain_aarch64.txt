@@ -479,10 +479,10 @@ popt-1.16-7.cm2.aarch64.rpm
 popt-debuginfo-1.16-7.cm2.aarch64.rpm
 popt-devel-1.16-7.cm2.aarch64.rpm
 popt-lang-1.16-7.cm2.aarch64.rpm
-procps-ng-3.3.15-5.cm2.aarch64.rpm
-procps-ng-debuginfo-3.3.15-5.cm2.aarch64.rpm
-procps-ng-devel-3.3.15-5.cm2.aarch64.rpm
-procps-ng-lang-3.3.15-5.cm2.aarch64.rpm
+procps-ng-3.3.17-1.cm2.aarch64.rpm
+procps-ng-debuginfo-3.3.17-1.cm2.aarch64.rpm
+procps-ng-devel-3.3.17-1.cm2.aarch64.rpm
+procps-ng-lang-3.3.17-1.cm2.aarch64.rpm
 python3-3.9.9-1.cm2.aarch64.rpm
 python3-cracklib-2.9.7-3.cm2.aarch64.rpm
 python3-curses-3.9.9-1.cm2.aarch64.rpm
