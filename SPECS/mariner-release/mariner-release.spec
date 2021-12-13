@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,7 @@ cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="Mariner"
 DISTRIB_RELEASE="%{mariner_release_version}"
 DISTRIB_CODENAME=Mariner
-DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version}"
+DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version} Preview-A"
 EOF
 
 version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
@@ -62,6 +62,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Mon Dec 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-2
+- CBL-Mariner 2.0 Public Preview Release version.
+
 * Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
 - Updating version and distrotag for future looking 2.0 branch.  Formatting fixes.
 - Remove %%clean section, buildroot cleaning step (both automatically done by RPM)

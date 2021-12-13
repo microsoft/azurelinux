@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
-Version:        0.1
-Release:        23%{?dist}
+Version:        2.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,10 +55,12 @@ Requires:       gzip
 Requires:       libtool
 Requires:       lz4
 Requires:       mariner-release
-Requires:       mariner-repos
+Requires:       mariner-repos-preview
+Requires:       mariner-repos-extended-preview
+Requires:       mariner-repos-extras-preview
 %ifarch x86_64
 # Temporarily exclude aarch64 from including the microsoft repo until content is available in the repo
-Requires:       mariner-repos-microsoft
+Requires:       mariner-repos-microsoft-preview
 %endif
 Requires:       mariner-rpm-macros
 Requires:       ncurses-libs
@@ -94,6 +96,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Mon Dec 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
+- Update core-package to include new repositories for default Mariner 2.0 Preview Images
+
 * Sat Jul 24 2021 Jon Slobodzian <joslobo@microsoft.com> - 0.1-23
 - Include new Microsoft repo for x86_64 architectures (temporarily exclude from aarch64)
 
