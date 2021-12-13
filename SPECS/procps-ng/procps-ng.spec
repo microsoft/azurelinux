@@ -6,8 +6,8 @@ License:        GPLv2 AND LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
-URL:            http://procps.sourceforge.net/
-Source0:        http://sourceforge.net/projects/procps-ng/files/Production/%{name}-%{version}.tar.xz
+URL:            https://gitlab.com/procps-ng/procps
+Source0:        https://sourceforge.net/projects/procps-ng/files/Production/%{name}-%{version}.tar.xz
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 Conflicts:      toybox
