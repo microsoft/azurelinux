@@ -7,7 +7,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.gnome.org/GNOME/gdk-pixbuf
-Source0:        https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/%{version}/gdk-pixbuf-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/gdk-pixbuf/2.40/gdk-pixbuf-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  gtk-doc
 BuildRequires:  jasper-devel
