@@ -1,7 +1,5 @@
 %{?!WITH_COMPAT_DNSSD:  %global WITH_COMPAT_DNSSD 1}
 %{?!WITH_COMPAT_HOWL:   %global WITH_COMPAT_HOWL  1}
-# http://bugzilla.redhat.com/1008395 - no hardened build
-%global _hardened_build 1
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.7
@@ -24,7 +22,6 @@ BuildRequires:  gdbm-devel
 BuildRequires:  glib2-devel
 BuildRequires:  intltool
 BuildRequires:  libcap-devel
-#BuildRequires:    gobject-introspection-devel
 BuildRequires:  libdaemon-devel >= 0.11
 BuildRequires:  libtool
 BuildRequires:  perl-XML-Parser
@@ -88,7 +85,6 @@ This library contains a GObject wrapper for the Avahi API
 Summary:        Libraries and header files for Avahi GObject development
 Requires:       %{name}-devel = %{version}-%{release}
 Requires:       %{name}-gobject = %{version}-%{release}
-#Requires:         %{name}-glib-devel = %{version}-%{release}
 
 %description gobject-devel
 The avahi-gobject-devel package contains the header files and libraries
@@ -181,8 +177,9 @@ rm -fv docs/INSTALL
 rm -fv missing
 NOCONFIGURE=1 ./autogen.sh
 
+# Note that "--with-distro=none" is necessary to prevent initscripts from being installed
 %configure \
-        --with-distro=fedora \
+        --with-distro=none \
         --disable-monodoc \
         --with-avahi-user=avahi \
         --with-avahi-group=avahi \
@@ -245,9 +242,6 @@ ln -s avahi-compat-libdns_sd/dns_sd.h %{buildroot}/%{_includedir}/
 # unpackaged files
 rm -fv  %{buildroot}%{_datadir}/applications/{bssh,bvnc}.desktop
 rm -fv  %{buildroot}%{_datadir}/avahi/interfaces/avahi-discover.ui
-
-rm -fv %{buildroot}%{_sysconfdir}/rc.d/init.d/avahi-daemon
-rm -fv %{buildroot}%{_sysconfdir}/rc.d/init.d/avahi-dnsconfd
 
 %find_lang %{name}
 
@@ -376,15 +370,11 @@ exit 0
 
 %files gobject
 %{_libdir}/libavahi-gobject.so.*
-#%{_libdir}/girepository-1.0/Avahi-0.6.typelib
-#%{_libdir}/girepository-1.0/AvahiCore-0.6.typelib
 
 %files gobject-devel
 %{_libdir}/libavahi-gobject.so
 %{_includedir}/avahi-gobject
 %{_libdir}/pkgconfig/avahi-gobject.pc
-#%{_datadir}/gir-1.0/Avahi-0.6.gir
-#%{_datadir}/gir-1.0/AvahiCore-0.6.gir
 
 %if %{WITH_COMPAT_HOWL}
 %files compat-howl
