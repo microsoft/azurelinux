@@ -62,7 +62,7 @@ sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{majo
 %check
 # Removing static libraries to fix issues with the "ParseImplicitLinkInfo" test runs for the "craype-C-Cray-8.7.input" and "craype-CXX-Cray-8.7.input" inputs.
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
-rm %{_lib64dir}/lib{stdc++,gfortran}.a
+rm -f %{_lib64dir}/lib{stdc++,gfortran}.a
 
 bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
