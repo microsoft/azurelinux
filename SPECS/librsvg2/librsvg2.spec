@@ -29,7 +29,6 @@ BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(gthread-2.0)
-BuildRequires:  pkgconfig(libcroco-0.6)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(pangocairo)
 BuildRequires:  pkgconfig(pangoft2)
@@ -111,6 +110,7 @@ rm -vrf %{buildroot}%{_docdir}
 %changelog
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.48.9-4
 - License verified
+- Remove unneeded libcroco dependency
 - Lint spec
 
 * Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.48.9-3
