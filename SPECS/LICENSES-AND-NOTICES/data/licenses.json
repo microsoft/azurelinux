@@ -371,7 +371,6 @@
             "license": "Following [openSUSE guidelines](https://en.opensuse.org/openSUSE:Specfile_guidelines#Specfile_Licensing)",
             "specs": [
                 "ant",
-                "ant-contrib",
                 "bazel-workspaces",
                 "boringssl",
                 "cni",
@@ -674,8 +673,6 @@
                 "nvme-cli",
                 "oniguruma",
                 "OpenIPMI",
-                "openjdk8",
-                "openjdk8_aarch64",
                 "openldap",
                 "openscap",
                 "openssh",
