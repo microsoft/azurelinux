@@ -52,7 +52,7 @@ python3 ./run_tests.py
 %{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
 
 %changelog
-* Fri Dec 08 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.60.2-1
+* Wed Dec 08 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.60.2-1
 - Updating to 0.60.2.
 - License Verified
 

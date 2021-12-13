@@ -4,14 +4,12 @@ Name:           libmodulemd
 Version:        2.13.0
 Release:        2%{?dist}
 License:        MIT
-URL:            https://github.com/fedora-modularity/libmodulemd
-Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{version}/modulemd-%{version}.tar.xz
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
+Group:          Applications/System
+URL:            https://github.com/fedora-modularity/libmodulemd
+Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{version}/modulemd-%{version}.tar.xz
 Patch1:         test_import_headers_timeout.patch
-
 BuildRequires:  clang-devel
 BuildRequires:  gcc
 BuildRequires:  glib
@@ -31,8 +29,8 @@ C Library for manipulating module metadata files
 
 %package        devel
 Summary:        Header and development files for libmodulemd
-Requires:       libyaml-devel
 Requires:       %{name} = %{version}-%{release}
+Requires:       libyaml-devel
 
 %description    devel
 It contains the libraries and header files.
@@ -71,7 +69,7 @@ export LC_CTYPE=C.utf8
 %endif
 %{python3_sitelib}/*
 
-%files  devel
+%files devel
 %{_libdir}/libmodulemd.so
 %{_libdir}/pkgconfig/modulemd-2.0.pc
 %{_includedir}/modulemd-2.0/*
@@ -90,15 +88,21 @@ export LC_CTYPE=C.utf8
 
 *   Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 2.5.0-5
 -   Improve test reliability by increasing timeout.
+
 *   Thu Nov 19 2020 Andrew Phelps <anphel@microsoft.com> 2.5.0-4
 -   Fix check test.
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.5.0-3
 -   Added %%license line automatically
+
 *   Tue Apr 07 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.5.0-2
 -   Remove python3-autopep8 from BuildRequires.
+
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 2.5.0-1
 -   Update to 2.5.0. Source0 URL Fixed. License verified.
+
 *   Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> 2.4.0-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Wed May 15 2019 Ankit Jain <ankitja@vmware.com> 2.4.0-1
 -   Initial build. First version
