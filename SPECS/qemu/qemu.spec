@@ -390,12 +390,6 @@ BuildRequires:  liburing-devel
 # jack audio driver
 BuildRequires:  jack-audio-connection-kit-devel
 %endif
-%if %{user_static}
-BuildRequires:  glib2-static
-BuildRequires:  glibc-static
-BuildRequires:  pcre-static
-BuildRequires:  zlib-static
-%endif
 %if %{with ppc_support}
 Requires:       %{name}-system-ppc = %{version}-%{release}
 %endif
@@ -533,8 +527,6 @@ Requires:       mesa-libGL
 This package provides opengl support.
 %endif
 
-
-# Fedora specific
 %package        block-dmg
 Summary:        QEMU block driver for DMG disk images
 Requires:       %{name}-common%{?_isa} = %{version}-%{release}
@@ -806,11 +798,7 @@ Summary:        QEMU user mode emulation of qemu targets
 Requires:       %{name}-user = %{version}-%{release}
 Requires(post): systemd-units
 Requires(postun): systemd-units
-# qemu-user-binfmt + qemu-user-static both provide binfmt rules
-# Temporarily disable to get fedora CI working. Re-enable
-# once this CI issue let's us deal with subpackage conflicts:
-# https://pagure.io/fedora-ci/general/issue/184
-#Conflicts: qemu-user-static
+
 %description user-binfmt
 This package provides the user mode emulation of qemu targets
 
@@ -1156,10 +1144,6 @@ This package provides the QEMU system emulator for Xtensa boards.
 
 %global qemu_kvm_build qemu_kvm_build
 mkdir -p %{qemu_kvm_build}
-%global static_builddir static_builddir
-mkdir -p %{static_builddir}
-
-
 
 %build
 %define disable_everything         \\\
@@ -1497,20 +1481,6 @@ run_configure \
 %make_build
 popd
 
-# Fedora build for qemu-user-static
-%if %{user_static}
-pushd %{static_builddir}
-
-run_configure \
-  --enable-attr \
-  --enable-linux-user \
-  --enable-tcg \
-  --disable-blobs \
-  --static
-
-%make_build
-popd  # static
-%endif
 # endif !tools_only
 %endif
 
@@ -1659,7 +1629,6 @@ rm -rf %{buildroot}%{_datadir}/%{name}/QEMU,tcx.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/QEMU,cgthree.bin
 %endif
 
-# Fedora specific stuff below
 %find_lang %{name}
 
 # Generate qemu-system-* man pages
@@ -1672,7 +1641,7 @@ for emu in %{buildroot}%{_bindir}/qemu-system-*; do
 %if %{need_qemu_kvm}
 ln -sf qemu.1.gz %{buildroot}%{_mandir}/man1/qemu-kvm.1.gz
 ln -sf qemu-system-x86_64 %{buildroot}%{_bindir}/qemu-kvm
-   %endif
+%endif
 
 
 # Install binfmt
@@ -1682,37 +1651,6 @@ mkdir -p %{binfmt_dir}
 ./scripts/qemu-binfmt-conf.sh --systemd ALL --exportdir %{binfmt_dir} --qemu-path %{_bindir}
 for i in %{binfmt_dir}/*; do mv $i $(echo $i | sed 's/.conf/-dynamic.conf/'); done
 
-
-# Install qemu-user-static tree
-%if %{user_static}
-%define static_buildroot %{buildroot}/static/
-mkdir -p %{static_buildroot}
-
-pushd %{static_builddir}
-make DESTDIR=%{static_buildroot} install
-popd  # static
-
-# Rename all QEMU user emulators to have a -static suffix
-for src in %{static_buildroot}%{_bindir}/qemu-*; do
-    mv $src %{buildroot}%{_bindir}/$(basename $src)-static; done
-
-# Rename trace files to match -static suffix
-for src in %{static_buildroot}%{_datadir}/systemtap/tapset/qemu-*.stp; do
-  dst=`echo $src | sed -e 's/.stp/-static.stp/'`
-  mv $src $dst
-  perl -i -p -e 's/(qemu-\w+)/$1-static/g; s/(qemu\.user\.\w+)/$1.static/g' $dst
-  mv $dst %{buildroot}%{_datadir}/systemtap/tapset
- done
-
-for regularfmt in %{binfmt_dir}/*; do
-  staticfmt="$(echo $regularfmt | sed 's/-dynamic/-static/g')"
-  cat $regularfmt | tr -d '\n' | sed "s/:$/-static:F/" > $staticfmt
-  done
-
-rm -rf %{static_buildroot}
-# endif user_static
- %endif
-# end Fedora specific
 # endif !tools_only
 %endif
 
@@ -1762,13 +1700,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %postun user-binfmt
 /bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
 
-%if %{user_static}
-%post user-static
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
-
-%postun user-static
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
-%endif
 # endif !tools_only
 %endif
 
@@ -1817,7 +1748,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_datadir}/%{name}/dump-guest-memory.py*
 %{_datadir}/%{name}/trace-events-all
 %{_mandir}/man1/qemu-trace-stap.1*
-# Fedora specific
 %{_bindir}/elf2dmp
 
 %files docs
@@ -1846,7 +1776,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %endif
 %config(noreplace) %{_sysconfdir}/sasl2/%{name}.conf
 
-# Fedora specific
 %{_datadir}/applications/qemu.desktop
 %exclude %{_datadir}/%{name}/qemu-nsis.bmp
 %{_libexecdir}/virtfs-proxy-helper
@@ -2058,16 +1987,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %files user-binfmt
 %{_libdir}/binfmt.d/qemu-*-dynamic.conf
 
-%if %{user_static}
-%files user-static
-# Just use wildcard matches here: we will catch any new/missing files
-# in the qemu-user filelists
-%{_libdir}/binfmt.d/qemu-*-static.conf
-%{_bindir}/qemu-*-static
-%{_datadir}/systemtap/tapset/qemu-*-static.stp
-%endif
-
-
 %files system-aarch64
 
 %files system-aarch64-core
@@ -2270,6 +2189,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %changelog
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-12
 - Lint spec
+- Remove user-static subpackage references- no plans to support at this time
 
 * Fri Dec 10 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-11
 - License verified.
