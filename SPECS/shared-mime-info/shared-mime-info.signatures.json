@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "eog-defaults.list": "ba33a764012f4631b0282a1d021660fe6452cdff17f0843eb69c8889a3eee68d",
+  "evince-defaults.list": "6f66fa4238e1f05a8304f58f3d92bc7fc1dd61eb578bb71d3dbdfe35d48a5cb8",
+  "file-roller-defaults.list": "f0552d63dbd3e034c7ad0d6d0a4d4f90302aa8e3eeb4b2f65c90a2370de6966b",
+  "gnome-mimeapps.list": "a36889ded19ff811b30b9a40be22750c222ff041a21a58cd3050fc13e1e25c61",
+  "shared-mime-info-1.15.tar.xz": "f482b027437c99e53b81037a9843fccd549243fd52145d016e9c7174a4f5db90",
+  "totem-defaults.list": "c9d4fdc5a1351d798b4c812124b844a910c332c47f75284b6ea05c11a53fa11e"
+ }
+}

@@ -22,10 +22,12 @@ ignore_list=" \
   kernel-signed-aarch64 \
   kernel-signed-x86_64 \
   kf5 \
+  lcms2 \
   mariner-repos \
   mariner-rpm-macros \
   moby-buildx \
   moby-containerd \
+  multilib-rpm-config \
   openjdk8 \
   patterns-ceph-containers \
   python-markupsafe \
@@ -34,9 +36,7 @@ ignore_list=" \
   python-pywbem \
   python-pywbem \
   python-repoze-lru \
-  python-repoze-lru \
   python-requests \
-  python-sphinxcontrib-websupport \
   python-sphinxcontrib-websupport \
   python-yamlloader \
   python-yamlloader \
@@ -47,7 +47,8 @@ ignore_list=" \
   verity-read-only-root \
   xorg-x11-apps \
   xorg-x11-font-utils \
-  xorg-x11-xkb-utils"
+  xorg-x11-xkb-utils \
+  xorg-x11-server-utils"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/
