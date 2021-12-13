@@ -54,6 +54,7 @@ python3 ./run_tests.py
 %changelog
 * Fri Dec 08 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.60.2-1
 - Updating to 0.60.2.
+- License Verified
 
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.57.1-2
 - Merge the following releases from 1.0 to dev branch
