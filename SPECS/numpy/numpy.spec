@@ -1,7 +1,7 @@
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
 Version:        1.16.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 # The custom license is inside numpy/core/src/multiarray/dragon4.c.
 License:        BSD and ZLIB custom
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 Url:            https://numpy.org/
 Source0:        https://github.com/numpy/numpy/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         fix-setup-py-install.patch
 BuildRequires:  lapack-devel
 BuildRequires:  unzip
 BuildRequires:  python3
@@ -41,7 +42,7 @@ This package includes a version of f2py that works properly with NumPy.
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 # xlocale.h has been removed from glibc 2.26
@@ -66,10 +67,15 @@ rm -rf test
 %{_bindir}/f2py3
 
 %files -n python3-numpy-f2py
+%{_bindir}/f2py
 %{_bindir}/f2py3
 %{_bindir}/f2py%{python3_version}
 
 %changelog
+* Tue Dec 14 2021 Chris Co <chrco@microsoft.com> - 1.16.6-3
+- Backport patch to fix python3 setup.py install error
+- Add f2py to packaging
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.6-2
 - Remove python2 subpackage
 - Replace easy_insall usage with pip in %%check section
