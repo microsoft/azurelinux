@@ -3,7 +3,7 @@
 %define __os_install_post %{_libdir}/rpm/brp-compress %{nil}
 Summary:        Correct, reproducible, and fast builds for everyone.
 Name:           bazel
-Version:        4.1.0
+Version:        4.2.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -13,22 +13,27 @@ Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{versio
 Patch0:         fix-bazel-version-check.patch
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
-BuildRequires:  openjdk8
+BuildRequires:  msopenjdk-11
 BuildRequires:  python3
 BuildRequires:  unzip
 BuildRequires:  zip
-Requires:       openjdk8
-
-# Temp: Do not build with 2.0 toolchain
-ExclusiveArch:  mips
+Requires:       msopenjdk-11
 
 %description
 A fast, scalable, multi-language and extensible build system.
 
 %prep
 %autosetup -p1 -c -n %{name}-%{version}
+# Modify source to "#include <limits>" which resolves gcc11 errors:
+# graphcycles.cc:451:26: error: 'numeric_limits' is not a member of 'std'"
+sed -i 's/#include <string.h>/#include <string.h>\n#include <limits>/g' third_party/ijar/common.h
+sed -i 's/<limits.h>/<limits>\n#include <climits>/g' src/main/cpp/util/numbers.cc
+# abseil-cpp source contains graphcycles.cc in "derived/distdir/df3ea785d8c30a9503321a3d35ee7d35808f190d.tar.gz"
+# since graphcycles.cc fails to compile on gcc11 and already includes <utility>, force inclusion of <limits>
+sed -i 's/#include <utility>/#include <utility>\n#include <limits>/g' /usr/include/c++/11.2.0/array
 
 %build
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 ln -s %{_bindir}/python3 %{_bindir}/python
 
 EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" ./compile.sh
@@ -47,6 +52,9 @@ rm -rf %{buildroot}
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
+* Mon Nov 29 2021 Andrew Phelps <anphel@microsoft.com> - 4.2.1-1
+- Update to version 4.2.1
+
 * Tue Sep 14 2021 Henry Li <lihl@microsoft.com> - 4.1.0-1
 - Upgrade to version 4.1.0
 - Remove jni-build-error patch

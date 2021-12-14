@@ -1,0 +1,19 @@
+diff -up cups-1.7rc1/cgi-bin/admin.c.web-devices-timeout cups-1.7rc1/cgi-bin/admin.c
+--- cups-1.7rc1/cgi-bin/admin.c.web-devices-timeout	2013-05-29 12:51:34.000000000 +0100
++++ cups-1.7rc1/cgi-bin/admin.c	2013-08-16 16:01:17.308264287 +0100
+@@ -1019,13 +1019,13 @@ do_am_printer(http_t *http,		/* I - HTTP
+     }
+ 
+    /*
+-    * Scan for devices for up to 30 seconds...
++    * Scan for devices for up to 10 seconds...
+     */
+ 
+     fputs("DEBUG: Getting list of devices...\n", stderr);
+ 
+     current_device = 0;
+-    if (cupsGetDevices(http, 5, CUPS_INCLUDE_ALL, CUPS_EXCLUDE_NONE,
++    if (cupsGetDevices(http, 10, CUPS_INCLUDE_ALL, CUPS_EXCLUDE_NONE,
+                        (cups_device_cb_t)choose_device_cb,
+ 		       (void *)title) == IPP_OK)
+     {

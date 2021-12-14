@@ -1,7 +1,7 @@
 Summary:        YAML parser and emitter for Python
 Name:           PyYAML
 Version:        3.13
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Patch2:         change_default_loader.patch
 Patch3:         PyYAML-lib3-CVE-2017-18342.patch
 BuildRequires:  libyaml-devel
 BuildRequires:  python3
+BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 Requires:       libyaml
@@ -37,8 +38,10 @@ configuration files to object serialization and persistence.
 
 %prep
 %autosetup -p 1 -n PyYAML-%{version}
+find -type f -name "*.c" -delete -print
 
 %build
+export PYYAML_FORCE_CYTHON=1
 %py3_build
 
 %install
@@ -56,6 +59,9 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-8
+- Rebuild C source files using Cython for Python 3.9 compatibility
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-7
 - Remove python2 package, have main package contain python3 version
 - Add license to python3 package

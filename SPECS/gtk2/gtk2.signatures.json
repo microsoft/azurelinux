@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "gtk+-2.24.32.tar.xz": "b6c8a93ddda5eabe3bfee1eb39636c9a03d2a56c7b62828b359bf197943c582e",
+  "im-cedilla.conf": "d48985f4d257e2b9476bd5f1435c6c497b83fa69ad320000f550c8bea5dd9933",
+  "update-gtk-immodules": "319d2a05b23411c0c671624c516cff6763c9cf519ac64d0371f92fdab0b250d2",
+  "update-gtk-immodules.1": "c820a9b7e6ac61f04b8a3783276b7e0ba88bf6c3029896eec1deb5c74cf78d96"
+ }
+}

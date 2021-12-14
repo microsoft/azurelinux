@@ -1,42 +1,33 @@
 # pkgconf acts as pkgconfig for Mariner
 %bcond_without pkgconfig_compat
-
 %if %{with pkgconfig_compat}
 %global pkgconfig_ver 0.29.1
 # For obsoleting pkgconfig
 %global pkgconfig_verrel %{pkgconfig_ver}-3
 %global pkgconfig_evr 1:%{pkgconfig_verrel}
 %endif
-
 # Search path for pc files for pkgconf
 %global pkgconf_libdirs %{_libdir}/pkgconfig:%{_datadir}/pkgconfig
-
-Name:           pkgconf
-Version:        1.7.0
-Release:        3%{?dist}
 Summary:        Package compiler and linker metadata toolkit
+Name:           pkgconf
+Version:        1.8.0
+Release:        1%{?dist}
+License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-License:        ISC
 URL:            http://pkgconf.org/
 # Mirror at https://releases.pagure.org/pkgconf/pkgconf/
 Source0:        https://distfiles.dereferenced.org/%{name}/%{name}-%{version}.tar.xz
-
 # Simple wrapper script to offer platform versions of pkgconfig
 Source1:        platform-pkg-config.in
-
-BuildRequires:  gcc
-BuildRequires:  make
-
 # For regenerating autotools scripts
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  gcc
 BuildRequires:  libtool
-
+BuildRequires:  make
 # pkgconf uses libpkgconf internally
 Requires:       lib%{name}%{?_isa} = %{version}-%{release}
-
 # This is defined within pkgconf code as a virtual pc (just like in pkgconfig)
 Provides:       pkgconfig(pkgconf) = %{version}
 
@@ -47,6 +38,7 @@ and handles .pc files in a similar manner as pkg-config.
 
 %package -n lib%{name}
 Summary:        Backend library for %{name}
+License:        ISC
 
 %description -n lib%{name}
 This package provides libraries for applications to use the functionality
@@ -54,6 +46,7 @@ of %{name}.
 
 %package -n lib%{name}-devel
 Summary:        Development files for lib%{name}
+License:        ISC
 Requires:       lib%{name}%{?_isa} = %{version}-%{release}
 
 %description -n lib%{name}-devel
@@ -63,18 +56,21 @@ to use functionality provided by %{name}.
 %if %{with pkgconfig_compat}
 %package m4
 Summary:        m4 macros for pkgconf
-License:        GPLv2+ with exceptions
-BuildArch:      noarch
+License:        GPLv2+ WITH exceptions
 # Ensure that it Conflicts and Obsoletes pkgconfig since it contains content formerly from it
 Conflicts:      pkgconfig < %{pkgconfig_evr}
 Obsoletes:      pkgconfig < %{pkgconfig_evr}
+BuildArch:      noarch
 
 %description m4
 This package includes m4 macros used to support PKG_CHECK_MODULES
 when using pkgconf with autotools.
 
 %package pkg-config
-Summary:        %{name} shim to provide /usr/bin/pkg-config
+Summary:        %{name} shim to provide %{_bindir}/pkg-config
+License:        ISC
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-m4 = %{version}-%{release}
 # Ensure that it Conflicts with pkgconfig and is considered "better"
 Conflicts:      pkgconfig < %{pkgconfig_evr}
 Obsoletes:      pkgconfig < %{pkgconfig_evr}
@@ -85,8 +81,6 @@ Provides:       pkgconfig(pkg-config) = %{version}
 # Generic pkg-config Provides for those who might use alternate package name
 Provides:       pkg-config = %{pkgconfig_verrel}
 Provides:       pkg-config%{?_isa} = %{pkgconfig_verrel}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-m4 = %{version}-%{release}
 
 %description pkg-config
 This package provides the shim links for pkgconf to be automatically
@@ -111,7 +105,7 @@ autoreconf -fiv
 %install
 %make_install
 
-find %{buildroot} -name '*.la' -print -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 mkdir -p %{buildroot}%{_sysconfdir}/pkgconfig/personality.d
 mkdir -p %{buildroot}%{_datadir}/pkgconfig/personality.d
@@ -184,6 +178,9 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %endif
 
 %changelog
+* Tue Dec 07 2021 Chris Co <chrco@microsoft.com> - 1.8.0-1
+- Update to 1.8.0
+
 * Thu Oct 08 2020 Joe Schmitt <joschmit@microsoft.com> - 1.7.0-3
 - License verified.
 

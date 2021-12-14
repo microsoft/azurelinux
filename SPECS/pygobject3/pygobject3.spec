@@ -1,6 +1,6 @@
 Name:           pygobject3
 Version:        3.36.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Python bindings for GObject Introspection
 
 License:        LGPLv2+
@@ -71,8 +71,7 @@ This package contains files required to embed PyGObject
 %meson_install
 
 %check
-easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-$easy_install_3 pytest
+pip3 install pytest
 python3 setup.py test
 
 %files -n python3-gobject
@@ -93,6 +92,9 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-5
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-4
 - Remove unused python-setuptools dependency
 

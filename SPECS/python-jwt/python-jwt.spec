@@ -1,4 +1,3 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 # what it's called on pypi
 %global srcname PyJWT
 # what it's imported as
@@ -7,7 +6,6 @@
 %global eggname %{srcname}
 # package name fragment
 %global pkgname %{libname}
-%global python3_version 3.7
 
 %bcond_without  python3
 
@@ -19,7 +17,7 @@ encrypted JSON objects.}
 
 Name:           python-%{pkgname}
 Version:        1.7.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -70,11 +68,13 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %license LICENSE
 %{python3_sitelib}/%{libname}
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
-#%{python3_sitelib}/%{eggname}-%{version}-py3.7.egg-info
 %{_bindir}/pyjwt
 %endif
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.1-10
+- Remove hardcoded %%python3_version macro to enable use of Python 3.9
+
 * Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.1-9
 - Pass check section
 

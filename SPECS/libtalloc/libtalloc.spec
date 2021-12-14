@@ -2,7 +2,7 @@
 Summary:        Talloc is a hierarchical, reference counted memory pool system
 Name:           libtalloc
 Version:        2.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Some files are GPL, others LGPL. Info in source.
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
@@ -78,7 +78,7 @@ make check
 
 %files -n python-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
-%{_libdir}/python3.7/site-packages/*
+%{python3_sitelib}/*
 
 %files -n python-talloc-devel
 %{_includedir}/pytalloc.h
@@ -86,33 +86,36 @@ make check
 %{_libdir}/libpytalloc-util.cpython*.so
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.1-2
+- Use %%{python3_sitelib} macro to enable building with Python 3.9
+
 * Mon Jan 11 2021 Joe Schmitt <joschmit@microsoft.com> - 2.3.1-1
 - Upgrade to v2.3.1.
 - Provide python3-talloc and python3-talloc-devel.
 
-*   Thu Jun 06 2020 Joe Schmitt <joschmit@microsoft.com> 2.1.16-4
--   Added %%license macro.
+* Thu Jun 06 2020 Joe Schmitt <joschmit@microsoft.com> - 2.1.16-4
+- Added %%license macro.
 
-*   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 2.1.16-3
--   Renaming docbook-xsl to docbook-style-xsl
+* Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.1.16-3
+- Renaming docbook-xsl to docbook-style-xsl
 
-*   Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> 2.1.16-2
--   Updated Source0, License. License verified.
+* Thu Apr 23 2020 Nick Samson <nisamson@microsoft.com> - 2.1.16-2
+- Updated Source0, License. License verified.
 
-*   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 2.1.16-1
--   Update to 2.1.16. Move to python3. License verified.
+* Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.1.16-1
+- Update to 2.1.16. Move to python3. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.1.14-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.1.14-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 2.1.14-2
--   Added BuildRequires python2-devel
+* Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> - 2.1.14-2
+- Added BuildRequires python2-devel
 
-*   Tue Sep 11 2018 Bo Gan <ganb@vmware.com> 2.1.14-1
--   Update to 2.1.14
+* Tue Sep 11 2018 Bo Gan <ganb@vmware.com> - 2.1.14-1
+- Update to 2.1.14
 
-*   Thu Aug 03 2017 Chang Lee <changlee@vmware.com> 2.1.9-2
--   Copy libraries and add a patch for path regarding %check
+* Thu Aug 03 2017 Chang Lee <changlee@vmware.com> - 2.1.9-2
+- Copy libraries and add a patch for path regarding %check
 
-*   Wed Apr 05 2017 Anish Swaminathan <anishs@vmware.com> 2.1.9-1
--   Initial packaging
+* Wed Apr 05 2017 Anish Swaminathan <anishs@vmware.com> - 2.1.9-1
+- Initial packaging

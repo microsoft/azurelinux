@@ -1,0 +1,61 @@
+# Copyright (C) 1999 - 2004 Red Hat, Inc. All rights reserved. This
+# copyrighted material is made available to anyone wishing to use, modify,
+# copy, or redistribute it subject to the terms and conditions of the
+# GNU General Public License version 2.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# xinitrc-common
+#
+# This is common code shared by both Xsession and xinitrc scripts.  Be sure
+# to take this into account when fixing bugs or adding new functionality.
+
+# Set up i18n environment
+if [ -r /etc/profile.d/lang.sh ]; then
+  . /etc/profile.d/lang.sh
+fi
+
+[ -r $HOME/.profile ] && . $HOME/.profile
+
+userresources=$HOME/.Xresources
+usermodmap=$HOME/.Xmodmap
+userxkbmap=$HOME/.Xkbmap
+
+sysresources=/etc/X11/Xresources
+sysmodmap=/etc/X11/Xmodmap
+sysxkbmap=/etc/X11/Xkbmap
+
+# merge in defaults
+[ -r "$sysresources" ] && xrdb -nocpp -merge "$sysresources"
+[ -r "$userresources" ] && xrdb -merge "$userresources"
+
+# merge in keymaps
+if [ -r "$sysxkbmap" ]; then
+    setxkbmap $(cat "$sysxkbmap")
+fi
+
+if [ -r "$userxkbmap" ]; then
+    setxkbmap $(cat "$userxkbmap")
+fi
+
+# xkb and xmodmap don't play nice together
+if ! [ -r "$sysxkbmap" -o -r "$userxkbmap" ] ; then
+    [ -r "$sysmodmap" ] && xmodmap "$sysmodmap"
+    [ -r "$usermodmap" ] && xmodmap "$usermodmap"
+fi
+
+# run all system xinitrc shell scripts.
+for file in /etc/X11/xinit/xinitrc.d/* ; do
+        . $file
+done
+
+# Prefix launch of session with ssh-agent if available and not already running.
+if [ -z "$SSH_AGENT" ] && [ -z "$SSH_AUTH_SOCK" ] && [ -z "$SSH_AGENT_PID" ] && [ -x /usr/bin/ssh-agent ]; then
+    if [ "x$TMPDIR" != "x" ]; then
+        SSH_AGENT="/usr/bin/ssh-agent /bin/env TMPDIR=$TMPDIR"
+    else
+        SSH_AGENT="/usr/bin/ssh-agent"
+    fi
+fi
