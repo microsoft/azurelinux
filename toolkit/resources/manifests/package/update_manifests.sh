@@ -79,7 +79,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
     sed -i '/lua-devel/d' $TmpPkgGen
-    sed -ri '/mariner-repos-(extras|ui|microsoft)/d' $TmpPkgGen
+    sed -ri '/mariner-repos-(debuginfo|extended|extras|microsoft)/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
     sed -i '/perl-5/d' $TmpPkgGen
@@ -283,7 +283,7 @@ generate_pkggen_core () {
         grep "^pinentry-" $TmpPkgGen
         grep "^gnupg2-" $TmpPkgGen
         grep "^gpgme-" $TmpPkgGen
-        grep "^mariner-repos-" $TmpPkgGen
+        grep "^mariner-repos-preview" $TmpPkgGen
         grep "^libffi-" $TmpPkgGen
         grep "^libtasn1-" $TmpPkgGen
         grep "^p11-kit-" $TmpPkgGen
