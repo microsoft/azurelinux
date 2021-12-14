@@ -47,6 +47,7 @@ install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.ninja
 %changelog
 *   Mon Dec 06 2021 Max Brodeur-Urbas <maxbr@microsoft.com> 1.10.2-1
 -   Updated to version 1.10.2.
+-   Removed reference to missing HACKING doc file.
 
 *   Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.2-3
 -   License verified.
