@@ -9,7 +9,7 @@ https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
 https://ftp.gnu.org/gnu/gdbm/gdbm-1.21.tar.gz
 http://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
 http://ftp.gnu.org/gnu/gperf/gperf-3.1.tar.gz
-https://gcc.gnu.org/pub/libffi/libffi-3.2.1.tar.gz
+https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz
 http://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.xz
 http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz
 https://ftp.gnu.org/gnu/make/make-4.3.tar.gz
