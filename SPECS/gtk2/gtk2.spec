@@ -231,7 +231,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/X11/xinit/xinput.d
 cp %{SOURCE3} %{buildroot}%{_sysconfdir}/X11/xinit/xinput.d
 
 # Use python3 shebang instead of ambiguous python
-pathfix.py -pn -i python3 %{buildroot}%{_bindir}/gtk-builder-convert
+pathfix.py -i %{python3} -pn %{buildroot}%{_bindir}/gtk-builder-convert
 
 # Remove unpackaged files
 find %{buildroot} -type f -name "*.la" -delete -print

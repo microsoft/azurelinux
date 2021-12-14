@@ -78,7 +78,7 @@ BuildRequires:  valgrind-devel
 %endif
 
 %if %{with udev}
-BuildRequires:  pkgconfig(udev)
+BuildRequires:  systemd-devel
 %endif
 
 %description

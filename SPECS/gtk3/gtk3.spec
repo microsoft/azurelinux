@@ -34,7 +34,7 @@ BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(atk) >= %{atk_version}
 BuildRequires:  pkgconfig(atk-bridge-2.0)
 BuildRequires:  pkgconfig(avahi-gobject)
-BuildRequires:  pkgconfig(colord)
+BuildRequires:  colord-devel
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(epoxy)
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0) >= %{gdk_pixbuf_version}
@@ -72,10 +72,12 @@ Requires:       gtk-update-icon-cache
 # required for icon theme apis to work
 Requires:       hicolor-icon-theme
 Requires:       libXrandr >= %{xrandr_version}
+Requires:       colord-libs
 Requires:       libepoxy >= %{epoxy_version}
 Requires:       libwayland-client >= %{wayland_version}
 Requires:       libwayland-cursor >= %{wayland_version}
 Requires:       pango >= %{pango_version}
+
 # make sure we have a reasonable gsettings backend
 Recommends:     dconf
 Provides:       adwaita-gtk3-theme = %{version}-%{release}
