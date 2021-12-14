@@ -1,8 +1,7 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Extremely fast and user friendly build system
 Name:           meson
-Version:        0.57.1
-Release:        2%{?dist}
+Version:        0.60.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +51,10 @@ python3 ./run_tests.py
 %{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
 
 %changelog
+* Wed Dec 08 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.60.2-1
+- Updating to 0.60.2.
+- License Verified
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.57.1-2
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 0.56.0-1: Removing 'python3-xml' from '*Requires'.
@@ -59,14 +62,14 @@ python3 ./run_tests.py
 * Thu Feb 25 2021 Henry Li <lihl@microsoft.com> - 0.57.1-1
 - Update to 0.57.1.
 
-*   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 0.49.2-1
--   Update to 0.49.2.
+* Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> 0.49.2-1
+- Update to 0.49.2.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.47.2-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.47.2-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Mon Sep 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 0.47.2-1
--   Update to version 0.47.2
+* Mon Sep 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 0.47.2-1
+- Update to version 0.47.2
 
-*   Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> 0.44.0-1
--   Initial packaging
+* Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> 0.44.0-1
+- Initial packaging
