@@ -219,18 +219,19 @@ popd
 rm -rf file-5.40
 touch /logs/status_file_complete
 
-echo Readline-7.0
-tar xf readline-7.0.tar.gz
-pushd readline-7.0
+echo Readline-8.1
+tar xf readline-8.1.tar.gz
+pushd readline-8.1
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/readline-7.0
+            --with-curses    \
+            --docdir=/usr/share/doc/readline-8.1
 make SHLIB_LIBS="-L/tools/lib -lncursesw"
-make SHLIB_LIBS="-L/tools/lib -lncurses" install
+make SHLIB_LIBS="-L/tools/lib -lncursesw" install
 popd
-rm -rf readline-7.0
+rm -rf readline-8.1
 touch /logs/status_readline_complete
 
 echo M4-1.4.19

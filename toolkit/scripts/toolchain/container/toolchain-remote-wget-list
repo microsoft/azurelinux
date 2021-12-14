@@ -36,7 +36,7 @@ http://www.linuxfromscratch.org/patches/blfs/9.0/lua-5.3.5-shared_library-1.patc
 https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
 https://ftp.gnu.org/gnu/glibc/glibc-2.34.tar.xz
 https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.34-fhs-1.patch
-http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
+https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz
 https://ftp.gnu.org/gnu/tar/tar-1.34.tar.xz
 http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz
 https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz

@@ -7674,8 +7674,8 @@
         "type": "other",
         "other": {
           "name": "readline",
-          "version": "7.0",
-          "downloadUrl": "http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz"
+          "version": "8.1",
+          "downloadUrl": "https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz"
         }
       }
     },

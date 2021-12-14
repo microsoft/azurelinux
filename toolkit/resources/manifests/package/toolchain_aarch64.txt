@@ -500,9 +500,9 @@ python3-setuptools-3.9.9-1.cm2.noarch.rpm
 python3-test-3.9.9-1.cm2.aarch64.rpm
 python3-tools-3.9.9-1.cm2.aarch64.rpm
 python-markupsafe-debuginfo-1.1.1-4.cm2.aarch64.rpm
-readline-7.0-5.cm2.aarch64.rpm
-readline-debuginfo-7.0-5.cm2.aarch64.rpm
-readline-devel-7.0-5.cm2.aarch64.rpm
+readline-8.1-1.cm2.aarch64.rpm
+readline-debuginfo-8.1-1.cm2.aarch64.rpm
+readline-devel-8.1-1.cm2.aarch64.rpm
 rpm-4.17.0-1.cm2.aarch64.rpm
 rpm-build-4.17.0-1.cm2.aarch64.rpm
 rpm-build-libs-4.17.0-1.cm2.aarch64.rpm
