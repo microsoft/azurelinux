@@ -697,9 +697,9 @@ popd
 rm -rf elfutils-0.185
 touch /logs/status_libelf_complete
 
-echo Libffi-3.2.1
-tar xf libffi-3.2.1.tar.gz
-pushd libffi-3.2.1
+echo Libffi-3.4.2
+tar xf libffi-3.4.2.tar.gz
+pushd libffi-3.4.2
 # TODO: set generic build to avoid optimizations causing illegal operation errors on other processors
 # options: https://gcc.gnu.org/onlinedocs/gcc-9.2.0/gcc/x86-Options.html
 #          https://gcc.gnu.org/onlinedocs/gcc-9.2.0/gcc/AArch64-Options.html#AArch64-Options
@@ -729,11 +729,11 @@ esac
 unset GCC_ARCH
 #	CFLAGS="-O2 -g" \
 #	CXXFLAGS="-O2 -g" \
-# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.2.1-7.cm1.x86_64//usr/lib64': No such file or directory
+# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.4.2-1.cm1.x86_64//usr/lib64': No such file or directory
 make -j$(nproc)
 make install
 popd
-rm -rf libffi-3.2.1
+rm -rf libffi-3.4.2
 touch /logs/status_libffi_complete
 
 echo "Perl Test::Warnings"
