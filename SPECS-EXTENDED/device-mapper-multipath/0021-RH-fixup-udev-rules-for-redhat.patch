@@ -1,0 +1,66 @@
+From c1df27f4efd0c36d6ceecf5c850a68859e7d5fe5 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 13 Apr 2017 07:22:23 -0500
+Subject: [PATCH] RH: fixup udev rules for redhat
+
+The multipath rules need to run after scsi_id is run. This means moving
+them after 60-persistent-storage.rules for redhat. Redhat also uses a
+different naming scheme for partitions than SuSE.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ Makefile.inc        | 2 +-
+ kpartx/kpartx.rules | 2 +-
+ multipath/Makefile  | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 56c3eda0..2e8946ca 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -53,7 +53,7 @@ endif
+ prefix		=
+ exec_prefix	= $(prefix)
+ usr_prefix	= $(prefix)
+-bindir		= $(exec_prefix)/sbin
++bindir		= $(exec_prefix)/usr/sbin
+ libudevdir	= $(prefix)/$(SYSTEMDPATH)/udev
+ udevrulesdir	= $(libudevdir)/rules.d
+ multipathdir	= $(TOPDIR)/libmultipath
+diff --git a/kpartx/kpartx.rules b/kpartx/kpartx.rules
+index 8f990494..8a3a1718 100644
+--- a/kpartx/kpartx.rules
++++ b/kpartx/kpartx.rules
+@@ -32,6 +32,6 @@ LABEL="mpath_kpartx_end"
+ GOTO="kpartx_end"
+ 
+ LABEL="run_kpartx"
+-RUN+="/sbin/kpartx -un -p -part /dev/$name"
++RUN+="/sbin/kpartx -un /dev/$name"
+ 
+ LABEL="kpartx_end"
+diff --git a/multipath/Makefile b/multipath/Makefile
+index 0828a8f7..b9bbb3cf 100644
+--- a/multipath/Makefile
++++ b/multipath/Makefile
+@@ -24,7 +24,7 @@ install:
+ 	$(INSTALL_PROGRAM) -m 755 $(EXEC) $(DESTDIR)$(bindir)/
+ 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(udevrulesdir)
+ 	$(INSTALL_PROGRAM) -m 644 11-dm-mpath.rules $(DESTDIR)$(udevrulesdir)
+-	$(INSTALL_PROGRAM) -m 644 $(EXEC).rules $(DESTDIR)$(libudevdir)/rules.d/56-multipath.rules
++	$(INSTALL_PROGRAM) -m 644 $(EXEC).rules $(DESTDIR)$(libudevdir)/rules.d/62-multipath.rules
+ 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(man8dir)
+ 	$(INSTALL_PROGRAM) -m 644 $(EXEC).8.gz $(DESTDIR)$(man8dir)
+ 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(man5dir)
+@@ -33,7 +33,7 @@ install:
+ uninstall:
+ 	$(RM) $(DESTDIR)$(bindir)/$(EXEC)
+ 	$(RM) $(DESTDIR)$(udevrulesdir)/11-dm-mpath.rules
+-	$(RM) $(DESTDIR)$(libudevdir)/rules.d/56-multipath.rules
++	$(RM) $(DESTDIR)$(libudevdir)/rules.d/62-multipath.rules
+ 	$(RM) $(DESTDIR)$(man8dir)/$(EXEC).8.gz
+ 	$(RM) $(DESTDIR)$(man5dir)/$(EXEC).conf.5.gz
+ 
+-- 
+2.17.2
+

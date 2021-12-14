@@ -1,0 +1,25 @@
+! /etc/X11/Xmodmap
+!
+! global Xmodmap file -- used by both xdm and xinit (startx)
+
+! keycode and keysym remapping should generally be used only if the X
+! server config file has been configured to disable the XKEYBOARD
+! extension
+
+! i386 and alpha
+! keycode 22 = BackSpace
+! keycode 107 = Delete           
+
+! powerpc
+! keycode 59 = BackSpace
+! keycode 125 = Delete
+
+! sparc
+! keycode 50 = BackSpace
+! keycode 73 = Delete
+
+! Euro sign support
+! keycode 26 = e E currency
+! keycode 54 = c C cent
+! keycode 113 = Mode_switch Mode_switch Multi_key
+

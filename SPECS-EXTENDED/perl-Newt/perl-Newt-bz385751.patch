@@ -1,0 +1,12 @@
+diff -up Newt-1.08/Newt.pm.BAD Newt-1.08/Newt.pm
+--- Newt-1.08/Newt.pm.BAD	2008-04-04 13:58:00.000000000 -0400
++++ Newt-1.08/Newt.pm	2008-04-04 13:58:18.000000000 -0400
+@@ -8,6 +8,8 @@ use AutoLoader;
+ require Exporter;
+ require DynaLoader;
+ 
++*Newt::Form::AUTOLOAD = \&Newt::AUTOLOAD;
++
+ @ISA = qw(Exporter DynaLoader);
+ # Items to export into callers namespace by default. Note: do not export
+ # names by default without a very good reason. Use EXPORT_OK instead.

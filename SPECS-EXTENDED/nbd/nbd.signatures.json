@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "nbd-3.20.tar.xz": "e0e1b3538ab7ae5accf56180afd1a9887d415b98d21223b8ad42592b4af7d6cd",
+  "nbd-server.service": "2c3ff56374614a3dcd957c73455af17f4cfe9f5b941ce66f8b8dd37ed1f0a555",
+  "nbd-server.sysconfig": "bd81a6672244ded8de2b84baeabdc44ae89e3558e57f4abf40b170183f71070a"
+ }
+}

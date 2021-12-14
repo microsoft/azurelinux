@@ -1,0 +1,91 @@
+--- OpenSP-1.5.2/configure.in.multilib	2005-12-23 14:15:21.000000000 +0000
++++ OpenSP-1.5.2/configure.in	2006-06-13 13:36:49.000000000 +0100
+@@ -90,7 +90,7 @@
+ #define SP_SIZEOF_BOOL_1
+ #endif
+ 
+-#if (SIZEOF_WCHAR_T == SIZEOF_UNSIGNED_SHORT)
++#if (WCHAR_MAX == SHRT_MAX)
+ #define SP_WCHAR_T_USHORT
+ #endif
+ 
+--- OpenSP-1.5.2/lib/parser_inst.cxx.multilib	2005-07-21 16:33:41.000000000 +0100
++++ OpenSP-1.5.2/lib/parser_inst.cxx	2006-06-13 13:36:49.000000000 +0100
+@@ -9,6 +9,7 @@
+ // Copyright (c) 1994 James Clark
+ // See the file COPYING for copying permission.
+ 
++#include <limits.h>
+ #include "splib.h"
+ 
+ #ifdef SP_MANUAL_INST
+@@ -1338,7 +1339,7 @@
+ #endif
+ #endif
+  // we really just want to test if size_t == unsigned int
+-#if !defined(SIZEOF_SIZE_T) || !defined(SIZEOF_UNSIGNED_INT) || (SIZEOF_SIZE_T != SIZEOF_UNSIGNED_INT)
++#if INT_MAX != SSIZE_MAX
+ #ifdef __DECCXX
+ #pragma define_template Vector<unsigned int>
+ #else
+--- OpenSP-1.5.2/lib/parser_inst.m4.multilib	2005-05-14 10:17:35.000000000 +0100
++++ OpenSP-1.5.2/lib/parser_inst.m4	2006-06-13 13:36:49.000000000 +0100
+@@ -1,6 +1,7 @@
+ // Copyright (c) 1994 James Clark
+ // See the file COPYING for copying permission.
+ 
++#include <limits.h>
+ #include "splib.h"
+ 
+ #ifdef SP_MANUAL_INST
+@@ -166,7 +167,7 @@
+ __instantiate(Vector<LeafContentToken*>)
+ __instantiate(Vector<size_t>)
+  // we really just want to test if size_t == unsigned int
+-#if !defined(SIZEOF_SIZE_T) || !defined(SIZEOF_UNSIGNED_INT) || (SIZEOF_SIZE_T != SIZEOF_UNSIGNED_INT)
++#if INT_MAX != SSIZE_MAX
+ __instantiate(Vector<unsigned int>)
+ #endif
+ 
+--- OpenSP-1.5.2/config.h.in.multilib	2005-11-05 09:43:42.000000000 +0000
++++ OpenSP-1.5.2/config.h.in	2006-06-13 13:41:45.000000000 +0100
+@@ -1,5 +1,7 @@
+ /* config.h.in.  Generated from configure.in by autoheader.  */
+ 
++#include <limits.h>
++
+ /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
+    systems. This function is required for `alloca.c' support on those systems.
+    */
+@@ -333,22 +335,6 @@
+ /* The size of a `bool', as computed by sizeof. */
+ #undef SIZEOF_BOOL
+ 
+-/* The size of a `size_t', as computed by sizeof. */
+-#undef SIZEOF_SIZE_T
+-
+-/* The size of a `unsigned int', as computed by sizeof. */
+-#undef SIZEOF_UNSIGNED_INT
+-
+-/* The size of a `unsigned short', as computed by sizeof. */
+-#undef SIZEOF_UNSIGNED_SHORT
+-
+-/* The size of a `wchar_t', as computed by sizeof. */
+-#undef SIZEOF_WCHAR_T
+-
+-/* Define as the maximum value of type 'size_t', if the system doesn't define
+-   it. */
+-#undef SIZE_MAX
+-
+ /* define this if h_errno should be declared extern int */
+ #undef SP_DECLARE_H_ERRNO
+ 
+@@ -503,7 +489,7 @@
+ #define SP_SIZEOF_BOOL_1
+ #endif
+ 
+-#if (SIZEOF_WCHAR_T == SIZEOF_UNSIGNED_SHORT)
++#if (WCHAR_MAX == SHRT_MAX)
+ #define SP_WCHAR_T_USHORT
+ #endif
+ 

@@ -1,0 +1,9 @@
+MySQL is distributed under GPL v2, but there are some licensing exceptions
+that allow the client libraries to be linked with a non-GPL application,
+so long as the application is under a license approved by Oracle.
+For details see
+
+http://www.mysql.com/about/legal/licensing/foss-exception/
+
+Some innobase code from Percona and Google is under BSD license.
+Some code related to test-suite is under LGPLv2.

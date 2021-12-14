@@ -1,0 +1,35 @@
+diff -ruN paps-0.6.8.orig/src/Makefile.am paps-0.6.8/src/Makefile.am
+--- paps-0.6.8.orig/src/Makefile.am	2006-04-17 16:42:08.000000000 +0900
++++ paps-0.6.8/src/Makefile.am	2007-11-16 11:50:07.000000000 +0900
+@@ -1,15 +1,15 @@
+ man_MANS = paps.1
+-lib_LIBRARIES = libpaps.a
+-libpaps_a_SOURCES = libpaps.c
+-libpaps_a_inc_HEADERS = libpaps.h
+-libpaps_a_incdir = $(includedir)
++lib_LTLIBRARIES = libpaps.la
++libpaps_la_SOURCES = libpaps.c
++libpapsinc_HEADERS = libpaps.h
++libpapsincdir = $(includedir)
+ 
+ bin_PROGRAMS = paps
+ paps_CFLAGS  = -Wall 
+ paps_SOURCES = paps.c
+-paps_LDADD = $(lib_LIBRARIES) $(all_libraries)
++paps_LDADD = $(lib_LTLIBRARIES) $(all_libraries)
+ paps_LDFLAGS = `pkg-config --libs pangoft2`
+-paps_DEPENDENCIES = $(lib_LIBRARIES)
++paps_DEPENDENCIES = $(lib_LTLIBRARIES)
+ 
+ EXTRA_DIST = test_libpaps.c paps.1
+ 
+@@ -21,7 +21,7 @@
+ 
+ 
+ test_libpaps_SOURCES = test_libpaps.c
+-test_libpaps_LDADD = $(lib_LIBRARIES) $(all_libraries)
++test_libpaps_LDADD = $(lib_LTLIBRARIES) $(all_libraries)
+ test_libpaps_LDFLAGS = `pkg-config --libs pangoft2`
+-test_libpaps_DEPENDENCIES = $(lib_LIBRARIES) 
++test_libpaps_DEPENDENCIES = $(lib_LTLIBRARIES) 
+ 

@@ -1,0 +1,241 @@
+From 302c1b736cb656c7885a0cba270fd953a672d8a8 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Mon, 7 Apr 2014 13:56:34 +0200
+Subject: [PATCH 13/27] everywhere: O_CLOEXEC harder
+
+---
+ pppd/eap.c       |  2 +-
+ pppd/main.c      |  4 ++--
+ pppd/options.c   |  4 ++--
+ pppd/sys-linux.c | 22 +++++++++++-----------
+ pppd/tdb.c       |  4 ++--
+ pppd/tty.c       |  4 ++--
+ pppd/utils.c     |  6 +++---
+ 7 files changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/pppd/eap.c b/pppd/eap.c
+index 6ea6c1f..faced53 100644
+--- a/pppd/eap.c
++++ b/pppd/eap.c
+@@ -1226,7 +1226,7 @@ mode_t modebits;
+ 
+ 	if ((path = name_of_pn_file()) == NULL)
+ 		return (-1);
+-	fd = open(path, modebits, S_IRUSR | S_IWUSR);
++	fd = open(path, modebits, S_IRUSR | S_IWUSR | O_CLOEXEC);
+ 	err = errno;
+ 	free(path);
+ 	errno = err;
+diff --git a/pppd/main.c b/pppd/main.c
+index 6d50d1b..4880377 100644
+--- a/pppd/main.c
++++ b/pppd/main.c
+@@ -420,7 +420,7 @@ main(argc, argv)
+ 	die(0);
+ 
+     /* Make sure fds 0, 1, 2 are open to somewhere. */
+-    fd_devnull = open(_PATH_DEVNULL, O_RDWR);
++    fd_devnull = open(_PATH_DEVNULL, O_RDWR | O_CLOEXEC);
+     if (fd_devnull < 0)
+ 	fatal("Couldn't open %s: %m", _PATH_DEVNULL);
+     while (fd_devnull <= 2) {
+@@ -1679,7 +1679,7 @@ device_script(program, in, out, dont_wait)
+     if (log_to_fd >= 0)
+ 	errfd = log_to_fd;
+     else
+-	errfd = open(_PATH_CONNERRS, O_WRONLY | O_APPEND | O_CREAT, 0600);
++	errfd = open(_PATH_CONNERRS, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0600);
+ 
+     ++conn_running;
+     pid = safe_fork(in, out, errfd);
+diff --git a/pppd/options.c b/pppd/options.c
+index 1d754ae..8e62635 100644
+--- a/pppd/options.c
++++ b/pppd/options.c
+@@ -1544,9 +1544,9 @@ setlogfile(argv)
+ 	option_error("unable to drop permissions to open %s: %m", *argv);
+ 	return 0;
+     }
+-    fd = open(*argv, O_WRONLY | O_APPEND | O_CREAT | O_EXCL, 0644);
++    fd = open(*argv, O_WRONLY | O_APPEND | O_CREAT | O_EXCL | O_CLOEXEC, 0644);
+     if (fd < 0 && errno == EEXIST)
+-	fd = open(*argv, O_WRONLY | O_APPEND);
++	fd = open(*argv, O_WRONLY | O_APPEND | O_CLOEXEC);
+     err = errno;
+     if (!privileged_option && seteuid(euid) == -1)
+ 	fatal("unable to regain privileges: %m");
+diff --git a/pppd/sys-linux.c b/pppd/sys-linux.c
+index 8a12fa0..00a2cf5 100644
+--- a/pppd/sys-linux.c
++++ b/pppd/sys-linux.c
+@@ -459,7 +459,7 @@ int generic_establish_ppp (int fd)
+ 	    goto err;
+ 	}
+ 	dbglog("using channel %d", chindex);
+-	fd = open("/dev/ppp", O_RDWR);
++	fd = open("/dev/ppp", O_RDWR | O_CLOEXEC);
+ 	if (fd < 0) {
+ 	    error("Couldn't reopen /dev/ppp: %m");
+ 	    goto err;
+@@ -619,7 +619,7 @@ static int make_ppp_unit()
+ 		dbglog("in make_ppp_unit, already had /dev/ppp open?");
+ 		close(ppp_dev_fd);
+ 	}
+-	ppp_dev_fd = open("/dev/ppp", O_RDWR);
++	ppp_dev_fd = open("/dev/ppp", O_RDWR | O_CLOEXEC);
+ 	if (ppp_dev_fd < 0)
+ 		fatal("Couldn't open /dev/ppp: %m");
+ 	flags = fcntl(ppp_dev_fd, F_GETFL);
+@@ -693,7 +693,7 @@ int bundle_attach(int ifnum)
+ 	if (!new_style_driver)
+ 		return -1;
+ 
+-	master_fd = open("/dev/ppp", O_RDWR);
++	master_fd = open("/dev/ppp", O_RDWR | O_CLOEXEC);
+ 	if (master_fd < 0)
+ 		fatal("Couldn't open /dev/ppp: %m");
+ 	if (ioctl(master_fd, PPPIOCATTACH, &ifnum) < 0) {
+@@ -1715,7 +1715,7 @@ int sifproxyarp (int unit, u_int32_t his_adr)
+ 	if (tune_kernel) {
+ 	    forw_path = path_to_procfs("/sys/net/ipv4/ip_forward");
+ 	    if (forw_path != 0) {
+-		int fd = open(forw_path, O_WRONLY);
++		int fd = open(forw_path, O_WRONLY | O_CLOEXEC);
+ 		if (fd >= 0) {
+ 		    if (write(fd, "1", 1) != 1)
+ 			error("Couldn't enable IP forwarding: %m");
+@@ -2030,7 +2030,7 @@ int ppp_available(void)
+     sscanf(utsname.release, "%d.%d.%d", &osmaj, &osmin, &ospatch);
+     kernel_version = KVERSION(osmaj, osmin, ospatch);
+ 
+-    fd = open("/dev/ppp", O_RDWR);
++    fd = open("/dev/ppp", O_RDWR | O_CLOEXEC);
+     if (fd >= 0) {
+ 	new_style_driver = 1;
+ 
+@@ -2208,7 +2208,7 @@ void logwtmp (const char *line, const char *name, const char *host)
+ #if __GLIBC__ >= 2
+     updwtmp(_PATH_WTMP, &ut);
+ #else
+-    wtmp = open(_PATH_WTMP, O_APPEND|O_WRONLY);
++    wtmp = open(_PATH_WTMP, O_APPEND|O_WRONLY|O_CLOEXEC);
+     if (wtmp >= 0) {
+ 	flock(wtmp, LOCK_EX);
+ 
+@@ -2394,7 +2394,7 @@ int sifaddr (int unit, u_int32_t our_adr, u_int32_t his_adr,
+ 	int fd;
+ 
+ 	path = path_to_procfs("/sys/net/ipv4/ip_dynaddr");
+-	if (path != 0 && (fd = open(path, O_WRONLY)) >= 0) {
++	if (path != 0 && (fd = open(path, O_WRONLY | O_CLOEXEC)) >= 0) {
+ 	    if (write(fd, "1", 1) != 1)
+ 		error("Couldn't enable dynamic IP addressing: %m");
+ 	    close(fd);
+@@ -2570,7 +2570,7 @@ get_pty(master_fdp, slave_fdp, slave_name, uid)
+     /*
+      * Try the unix98 way first.
+      */
+-    mfd = open("/dev/ptmx", O_RDWR);
++    mfd = open("/dev/ptmx", O_RDWR | O_CLOEXEC);
+     if (mfd >= 0) {
+ 	int ptn;
+ 	if (ioctl(mfd, TIOCGPTN, &ptn) >= 0) {
+@@ -2581,7 +2581,7 @@ get_pty(master_fdp, slave_fdp, slave_name, uid)
+ 	    if (ioctl(mfd, TIOCSPTLCK, &ptn) < 0)
+ 		warn("Couldn't unlock pty slave %s: %m", pty_name);
+ #endif
+-	    if ((sfd = open(pty_name, O_RDWR | O_NOCTTY)) < 0)
++	    if ((sfd = open(pty_name, O_RDWR | O_NOCTTY | O_CLOEXEC)) < 0)
+ 		warn("Couldn't open pty slave %s: %m", pty_name);
+ 	}
+     }
+@@ -2592,10 +2592,10 @@ get_pty(master_fdp, slave_fdp, slave_name, uid)
+ 	for (i = 0; i < 64; ++i) {
+ 	    slprintf(pty_name, sizeof(pty_name), "/dev/pty%c%x",
+ 		     'p' + i / 16, i % 16);
+-	    mfd = open(pty_name, O_RDWR, 0);
++	    mfd = open(pty_name, O_RDWR | O_CLOEXEC, 0);
+ 	    if (mfd >= 0) {
+ 		pty_name[5] = 't';
+-		sfd = open(pty_name, O_RDWR | O_NOCTTY, 0);
++		sfd = open(pty_name, O_RDWR | O_NOCTTY | O_CLOEXEC, 0);
+ 		if (sfd >= 0) {
+ 		    fchown(sfd, uid, -1);
+ 		    fchmod(sfd, S_IRUSR | S_IWUSR);
+diff --git a/pppd/tdb.c b/pppd/tdb.c
+index bdc5828..c7ab71c 100644
+--- a/pppd/tdb.c
++++ b/pppd/tdb.c
+@@ -1724,7 +1724,7 @@ TDB_CONTEXT *tdb_open_ex(const char *name, int hash_size, int tdb_flags,
+ 		goto internal;
+ 	}
+ 
+-	if ((tdb->fd = open(name, open_flags, mode)) == -1) {
++	if ((tdb->fd = open(name, open_flags | O_CLOEXEC, mode)) == -1) {
+ 		TDB_LOG((tdb, 5, "tdb_open_ex: could not open file %s: %s\n",
+ 			 name, strerror(errno)));
+ 		goto fail;	/* errno set by open(2) */
+@@ -1967,7 +1967,7 @@ int tdb_reopen(TDB_CONTEXT *tdb)
+ 	}
+ 	if (close(tdb->fd) != 0)
+ 		TDB_LOG((tdb, 0, "tdb_reopen: WARNING closing tdb->fd failed!\n"));
+-	tdb->fd = open(tdb->name, tdb->open_flags & ~(O_CREAT|O_TRUNC), 0);
++	tdb->fd = open(tdb->name, (tdb->open_flags & ~(O_CREAT|O_TRUNC)) | O_CLOEXEC, 0);
+ 	if (tdb->fd == -1) {
+ 		TDB_LOG((tdb, 0, "tdb_reopen: open failed (%s)\n", strerror(errno)));
+ 		goto fail;
+diff --git a/pppd/tty.c b/pppd/tty.c
+index d571b11..bc96695 100644
+--- a/pppd/tty.c
++++ b/pppd/tty.c
+@@ -569,7 +569,7 @@ int connect_tty()
+ 				status = EXIT_OPEN_FAILED;
+ 				goto errret;
+ 			}
+-			real_ttyfd = open(devnam, O_NONBLOCK | O_RDWR, 0);
++			real_ttyfd = open(devnam, O_NONBLOCK | O_RDWR | O_CLOEXEC, 0);
+ 			err = errno;
+ 			if (prio < OPRIO_ROOT && seteuid(0) == -1)
+ 				fatal("Unable to regain privileges");
+@@ -723,7 +723,7 @@ int connect_tty()
+ 	if (connector == NULL && modem && devnam[0] != 0) {
+ 		int i;
+ 		for (;;) {
+-			if ((i = open(devnam, O_RDWR)) >= 0)
++			if ((i = open(devnam, O_RDWR | O_CLOEXEC)) >= 0)
+ 				break;
+ 			if (errno != EINTR) {
+ 				error("Failed to reopen %s: %m", devnam);
+diff --git a/pppd/utils.c b/pppd/utils.c
+index 29bf970..6051b9a 100644
+--- a/pppd/utils.c
++++ b/pppd/utils.c
+@@ -918,14 +918,14 @@ lock(dev)
+     slprintf(lock_file, sizeof(lock_file), "%s/LCK..%s", LOCK_DIR, dev);
+ #endif
+ 
+-    while ((fd = open(lock_file, O_EXCL | O_CREAT | O_RDWR, 0644)) < 0) {
++    while ((fd = open(lock_file, O_EXCL | O_CREAT | O_RDWR | O_CLOEXEC, 0644)) < 0) {
+ 	if (errno != EEXIST) {
+ 	    error("Can't create lock file %s: %m", lock_file);
+ 	    break;
+ 	}
+ 
+ 	/* Read the lock file to find out who has the device locked. */
+-	fd = open(lock_file, O_RDONLY, 0);
++	fd = open(lock_file, O_RDONLY | O_CLOEXEC, 0);
+ 	if (fd < 0) {
+ 	    if (errno == ENOENT) /* This is just a timing problem. */
+ 		continue;
+@@ -1004,7 +1004,7 @@ relock(pid)
+ 
+     if (lock_file[0] == 0)
+ 	return -1;
+-    fd = open(lock_file, O_WRONLY, 0);
++    fd = open(lock_file, O_WRONLY | O_CLOEXEC, 0);
+     if (fd < 0) {
+ 	error("Couldn't reopen lock file %s: %m", lock_file);
+ 	lock_file[0] = 0;
+-- 
+1.8.3.1
+

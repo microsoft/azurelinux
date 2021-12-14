@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Launch the necessary OpenSM daemons for systemd
+#
+# sysconfig: /etc/sysconfig/opensm
+# config: /etc/rdma/opensm.conf
+#
+
+shopt -s nullglob
+
+prog=/usr/sbin/opensm
+[ -f /etc/sysconfig/opensm ] && . /etc/sysconfig/opensm
+
+[ -n "$PRIORITY" ] && prio="-p $PRIORITY"
+
+if [ -z "$GUIDS" ]; then
+	CONFIGS=""
+	CONFIG_CNT=0
+	for conf in /etc/rdma/opensm.conf.[0-9]*; do
+		CONFIGS="$CONFIGS $conf"
+		let CONFIG_CNT++
+	done
+else
+	GUID_CNT=0
+	for guid in $GUIDS; do
+		let GUID_CNT++
+	done
+fi
+# Start opensm
+if [ -n "$GUIDS" ]; then
+	SUBNET_COUNT=0
+	for guid in $GUIDS; do
+		SUBNET_PREFIX=`printf "0xfe800000000000%02d" $SUBNET_COUNT`
+		(while true; do $prog $prio -g $guid --subnet_prefix $SUBNET_PREFIX; sleep 30; done) &
+		let SUBNET_COUNT++
+	done
+elif [ -n "$CONFIGS" ]; then
+	for config in $CONFIGS; do
+		(while true; do $prog $prio -F $config; sleep 30; done) &
+	done
+else
+	(while true; do $prog $prio; sleep 30; done) &
+fi
+exit 0

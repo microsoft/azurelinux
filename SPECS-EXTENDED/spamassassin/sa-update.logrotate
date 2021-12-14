@@ -1,0 +1,5 @@
+/var/log/sa-update.log {
+    monthly
+    notifempty
+    missingok
+}

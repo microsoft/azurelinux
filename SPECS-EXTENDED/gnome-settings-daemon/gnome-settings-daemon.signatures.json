@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "gnome-settings-daemon-3.36.1.tar.xz": "3e33dbd319b562a5ab602dcab6de3ca81b85f8346672e90ec632b36bbf15ee4b",
+  "org.gnome.settings-daemon.plugins.power.gschema.override": "dd8e62afe544cecb21c2c61113249bd76c3fc0aa478fca788bc0786c2992c094"
+ }
+}

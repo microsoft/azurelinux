@@ -1,0 +1,148 @@
+diff --git a/src/java/org/apache/commons/collections/MultiHashMap.java b/src/java/org/apache/commons/collections/MultiHashMap.java
+index 25158b4..ab0ca71 100644
+--- a/src/java/org/apache/commons/collections/MultiHashMap.java
++++ b/src/java/org/apache/commons/collections/MultiHashMap.java
+@@ -331,21 +331,21 @@ public class MultiHashMap extends HashMap implements MultiMap {
+      * @param item  the value to remove
+      * @return the value removed (which was passed in), null if nothing removed
+      */
+-    public Object remove(Object key, Object item) {
++    public boolean remove(Object key, Object item) {
+         Collection valuesForKey = getCollection(key);
+         if (valuesForKey == null) {
+-            return null;
++            return false;
+         }
+         boolean removed = valuesForKey.remove(item);
+         if (removed == false) {
+-            return null;
++            return false;
+         }
+         // remove the list if it is now empty
+         // (saves space, and allows equals to work)
+         if (valuesForKey.isEmpty()){
+             remove(key);
+         }
+-        return item;
++        return true;
+     }
+ 
+     /**
+diff --git a/src/java/org/apache/commons/collections/MultiMap.java b/src/java/org/apache/commons/collections/MultiMap.java
+index 8cd7212..60f22ae 100644
+--- a/src/java/org/apache/commons/collections/MultiMap.java
++++ b/src/java/org/apache/commons/collections/MultiMap.java
+@@ -66,7 +66,7 @@ public interface MultiMap extends Map {
+      * @throws ClassCastException if the key or value is of an invalid type
+      * @throws NullPointerException if the key or value is null and null is invalid
+      */
+-    public Object remove(Object key, Object item);
++    public boolean remove(Object key, Object item);
+ 
+     //-----------------------------------------------------------------------
+     /**
+@@ -144,7 +144,7 @@ public interface MultiMap extends Map {
+      * @throws ClassCastException if the key is of an invalid type
+      * @throws NullPointerException if the key is null and null keys are invalid
+      */
+-    Object remove(Object key);
++    //boolean remove(Object key);
+ 
+     /**
+      * Gets a collection containing all the values in the map.
+diff --git a/src/java/org/apache/commons/collections/map/MultiKeyMap.java b/src/java/org/apache/commons/collections/map/MultiKeyMap.java
+index 1ba1cea..3523b5c 100644
+--- a/src/java/org/apache/commons/collections/map/MultiKeyMap.java
++++ b/src/java/org/apache/commons/collections/map/MultiKeyMap.java
+@@ -197,7 +197,7 @@ public class MultiKeyMap
+      * @param key2  the second key
+      * @return the value mapped to the removed key, null if key not in map
+      */
+-    public Object remove(Object key1, Object key2) {
++    public boolean remove(Object key1, Object key2) {
+         int hashCode = hash(key1, key2);
+         int index = map.hashIndex(hashCode, map.data.length);
+         AbstractHashedMap.HashEntry entry = map.data[index];
+@@ -206,12 +206,14 @@ public class MultiKeyMap
+             if (entry.hashCode == hashCode && isEqualKey(entry, key1, key2)) {
+                 Object oldValue = entry.getValue();
+                 map.removeMapping(entry, index, previous);
+-                return oldValue;
++                //return oldValue;
++                return true;
+             }
+             previous = entry;
+             entry = entry.next;
+         }
+-        return null;
++        //return null;
++        return false;
+     }
+ 
+     /**
+diff --git a/src/java/org/apache/commons/collections/map/MultiValueMap.java b/src/java/org/apache/commons/collections/map/MultiValueMap.java
+index cc74fd7..b347e84 100644
+--- a/src/java/org/apache/commons/collections/map/MultiValueMap.java
++++ b/src/java/org/apache/commons/collections/map/MultiValueMap.java
+@@ -153,19 +153,19 @@ public class MultiValueMap extends AbstractMapDecorator implements MultiMap {
+      * @param value the value to remove
+      * @return the value removed (which was passed in), null if nothing removed
+      */
+-    public Object remove(Object key, Object value) {
++    public boolean remove(Object key, Object value) {
+         Collection valuesForKey = getCollection(key);
+         if (valuesForKey == null) {
+-            return null;
++            return false;
+         }
+         boolean removed = valuesForKey.remove(value);
+         if (removed == false) {
+-            return null;
++            return false;
+         }
+         if (valuesForKey.isEmpty()) {
+             remove(key);
+         }
+-        return value;
++        return true;
+     }
+ 
+     /**
+diff --git a/src/test/org/apache/commons/collections/TestMultiHashMap.java b/src/test/org/apache/commons/collections/TestMultiHashMap.java
+index 722bec0..2268d85 100644
+--- a/src/test/org/apache/commons/collections/TestMultiHashMap.java
++++ b/src/test/org/apache/commons/collections/TestMultiHashMap.java
+@@ -464,11 +464,11 @@ public class TestMultiHashMap extends AbstractTestMap {
+         map.put("A", "AA");
+         map.put("A", "AB");
+         map.put("A", "AC");
+-        assertEquals(null, map.remove("C", "CA"));
+-        assertEquals(null, map.remove("A", "AD"));
+-        assertEquals("AC", map.remove("A", "AC"));
+-        assertEquals("AB", map.remove("A", "AB"));
+-        assertEquals("AA", map.remove("A", "AA"));
++        assertEquals(false, map.remove("C", "CA"));
++        assertEquals(false, map.remove("A", "AD"));
++        assertEquals(true, map.remove("A", "AC"));
++        assertEquals(true, map.remove("A", "AB"));
++        assertEquals(true, map.remove("A", "AA"));
+         assertEquals(new MultiHashMap(), map);
+     }
+ 
+diff --git a/src/test/org/apache/commons/collections/map/TestMultiKeyMap.java b/src/test/org/apache/commons/collections/map/TestMultiKeyMap.java
+index 6e528fb..9faabf7 100644
+--- a/src/test/org/apache/commons/collections/map/TestMultiKeyMap.java
++++ b/src/test/org/apache/commons/collections/map/TestMultiKeyMap.java
+@@ -315,10 +315,10 @@ public class TestMultiKeyMap extends AbstractTestIterableMap {
+             switch (key.size()) {
+                 case 2:
+                 assertEquals(true, multimap.containsKey(key.getKey(0), key.getKey(1)));
+-                assertEquals(value, multimap.remove(key.getKey(0), key.getKey(1)));
++                assertEquals(true, multimap.remove(key.getKey(0), key.getKey(1)));
+                 assertEquals(false, multimap.containsKey(key.getKey(0), key.getKey(1)));
+                 assertEquals(size - 1, multimap.size());
+-                assertEquals(null, multimap.remove(key.getKey(0), key.getKey(1)));
++                assertEquals(false, multimap.remove(key.getKey(0), key.getKey(1)));
+                 assertEquals(false, multimap.containsKey(key.getKey(0), key.getKey(1)));
+                 break;
+                 case 3:

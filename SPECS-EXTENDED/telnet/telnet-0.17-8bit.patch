@@ -1,0 +1,33 @@
+diff -ru netkit-telnet-0.17.orig/telnet/main.c netkit-telnet-0.17/telnet/main.c
+--- netkit-telnet-0.17.orig/telnet/main.c	2003-05-15 20:07:40.000000000 +0200
++++ netkit-telnet-0.17/telnet/main.c	2003-05-16 00:18:28.000000000 +0200
+@@ -143,7 +143,7 @@
+ 	while ((ch = getopt(argc, argv, "78DEKLS:X:ab:cde:fFk:l:n:rt:x")) != -1) {
+ 		switch(ch) {
+ 		case '8':
+-			eight = 3;	/* binary output and input */
++			binary = 3;	/* send TELNET BINARY option for output and input */
+ 			break;
+ 		case '7':
+ 			eight = 0;
+@@ -165,7 +165,7 @@
+ #endif
+ 			break;
+ 		case 'L':
+-			eight |= 2;	/* binary output only */
++			binary = 2;	/* send TELNET BINARY option for output only */
+ 			break;
+ 		case 'S':
+ 		    {
+diff -ru netkit-telnet-0.17.orig/telnet/telnet.1 netkit-telnet-0.17/telnet/telnet.1
+--- netkit-telnet-0.17.orig/telnet/telnet.1	2003-05-15 20:07:40.000000000 +0200
++++ netkit-telnet-0.17/telnet/telnet.1	2003-05-15 23:38:37.000000000 +0200
+@@ -76,6 +76,8 @@
+ .Pp
+ The options are as follows:
+ .Bl -tag -width Ds
++.It Fl 7
++Strip 8th bit on input and output. Telnet is 8-bit clean by default but doesn't send the TELNET BINARY option unless forced.
+ .It Fl 8
+ Specifies an 8-bit data path.
+ This causes an attempt to negotiate the

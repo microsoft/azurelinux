@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "hivex-1.3.18.tar.gz": "8a1e788fd9ea9b6e8a99705ebd0ff8a65b1bdee28e319c89c4a965430d0a7445",
+  "hivex-1.3.18.tar.gz.sig": "a571bdac71f53fd95598fe3857b7c3d319d69360d5499c2c41a82bf60a43fad8",
+  "libguestfs.keyring": "de74373a15bd572ad74f276ee063d2cefa915470863829c0dda6af488d6315d8"
+ }
+}

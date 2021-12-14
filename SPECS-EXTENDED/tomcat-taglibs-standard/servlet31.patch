@@ -1,0 +1,25 @@
+--- impl/src/main/java/org/apache/taglibs/standard/tag/common/core/ImportSupport.java.sav	2015-02-10 20:17:58.000000000 +0200
++++ impl/src/main/java/org/apache/taglibs/standard/tag/common/core/ImportSupport.java	2015-03-04 17:17:25.951076750 +0200
+@@ -450,6 +450,14 @@ public abstract class ImportSupport exte
+             public void write(int b) throws IOException {
+                 bos.write(b);
+             }
++            
++            public void setWriteListener(javax.servlet.WriteListener listener) {
++            	throw new UnsupportedOperationException("Not implemented yet.");
++            }
++            
++            public boolean isReady() {
++            	return false;
++            }
+         };
+ 
+         /**
+@@ -548,6 +556,7 @@ public abstract class ImportSupport exte
+                 return "";
+             }        // target didn't write anything
+         }
++        
+     }
+ 
+     //*********************************************************************

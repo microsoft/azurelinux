@@ -1,0 +1,35 @@
+diff -up wvstreams-4.6.1/include/wvtask.h.magic wvstreams-4.6.1/include/wvtask.h
+--- wvstreams-4.6.1/include/wvtask.h.magic	2008-07-14 21:11:35.000000000 +0200
++++ wvstreams-4.6.1/include/wvtask.h	2012-06-03 17:24:47.909187849 +0200
+@@ -45,7 +45,8 @@ class WvTask
+     typedef void TaskFunc(void *userdata);
+     
+     static int taskcount, numtasks, numrunning;
+-    int magic_number, *stack_magic;
++    int volatile magic_number;
++    int *stack_magic;
+     WvString name;
+     int tid;
+     
+@@ -84,7 +85,7 @@ class WvTaskMan
+     static WvTaskMan *singleton;
+     static int links;
+     
+-    static int magic_number;
++    static int volatile magic_number;
+     static WvTaskList all_tasks, free_tasks;
+     
+     static void get_stack(WvTask &task, size_t size);
+diff -up wvstreams-4.6.1/utils/wvtask.cc.magic wvstreams-4.6.1/utils/wvtask.cc
+--- wvstreams-4.6.1/utils/wvtask.cc.magic	2009-05-13 23:42:52.000000000 +0200
++++ wvstreams-4.6.1/utils/wvtask.cc	2012-06-03 14:29:09.729656804 +0200
+@@ -58,7 +58,8 @@ char *alloca ();
+ int WvTask::taskcount, WvTask::numtasks, WvTask::numrunning;
+ 
+ WvTaskMan *WvTaskMan::singleton;
+-int WvTaskMan::links, WvTaskMan::magic_number;
++int WvTaskMan::links;
++int volatile WvTaskMan::magic_number;
+ WvTaskList WvTaskMan::all_tasks, WvTaskMan::free_tasks;
+ ucontext_t WvTaskMan::stackmaster_task, WvTaskMan::get_stack_return,
+     WvTaskMan::toplevel;

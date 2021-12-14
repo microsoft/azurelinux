@@ -1,0 +1,8 @@
+# Optionas to pass to rpc.rquotad daemon. See rpc.rquotad(8) manual page for
+# more details.
+# -I, --autofs          Ignore autofs mount points
+# -p port, --port port  Listen on alternative port
+# -s, --no-setquota     Don't allow setting quotas with RPC (default)
+# -S, --setquota        Allow setting quotas with RPC
+# -x path, --xtab path  Use alternative NFSD export table
+RPCRQUOTADOPTS=""

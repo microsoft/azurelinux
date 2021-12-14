@@ -1,0 +1,32 @@
+--- docbook.cat	Tue Dec 10 16:35:22 1996
++++ catalog	Mon Jun  5 11:08:34 2000
+@@ -41,29 +41,6 @@
+ PUBLIC "-//Davenport//ELEMENTS DocBook Information Pool V3.0//EN" "dbpool.mod"
+ PUBLIC "-//Davenport//ELEMENTS DocBook Document Hierarchy V3.0//EN" "dbhier.mod"
+ PUBLIC "-//Davenport//ENTITIES DocBook Additional General Entities V3.0//EN" "dbgenent.mod"
+-
+-  -- ...................................................................... --
+-  -- ISO entity sets ...................................................... --
+-
+-PUBLIC "ISO 8879:1986//ENTITIES Diacritical Marks//EN" "iso-dia.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Numeric and Special Graphic//EN" "iso-num.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Publishing//EN" "iso-pub.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES General Technical//EN" "iso-tech.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Added Latin 1//EN" "iso-lat1.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Added Latin 2//EN" "iso-lat2.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN" "iso-grk1.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Monotoniko Greek//EN" "iso-grk2.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Greek Symbols//EN" "iso-grk3.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Alternative Greek Symbols//EN" "iso-grk4.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Added Math Symbols: Arrow Relations//EN" "iso-amsa.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Added Math Symbols: Binary Operators//EN" "iso-amsb.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Added Math Symbols: Delimiters//EN" "iso-amsc.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Added Math Symbols: Negated Relations//EN" "iso-amsn.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Added Math Symbols: Ordinary//EN" "iso-amso.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Added Math Symbols: Relations//EN" "iso-amsr.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Box and Line Drawing//EN" "iso-box.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Russian Cyrillic//EN" "iso-cyr1.gml"
+-PUBLIC "ISO 8879:1986//ENTITIES Non-Russian Cyrillic//EN" "iso-cyr2.gml"
+ 
+   -- End of catalog data for DocBook V3.0 ................................. --
+   -- ...................................................................... --

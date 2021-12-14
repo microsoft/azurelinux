@@ -1,0 +1,20 @@
+commit 59fc5f964bf6971da552d059520d7798fccbd4fc
+Author: Neil Horman <nhorman@hmswarspite.think-freely.org>
+Date:   Tue Nov 12 08:53:50 2019 -0500
+
+    fixup interpreter to be python3
+    
+    This should never have been there, platform-python is an old distro-ism.
+    
+    Signed-off-by: Neil Horman <nhorman@tuxdriver.com>
+
+diff --git a/redfish-finder b/redfish-finder
+index 6637d92..9a185b3 100644
+--- a/redfish-finder
++++ b/redfish-finder
+@@ -1,4 +1,4 @@
+-#!/usr/libexec/platform-python
++#!/usr/bin/python3
+ 
+ import sys
+ import os

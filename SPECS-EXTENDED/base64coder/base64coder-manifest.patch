@@ -1,0 +1,24 @@
+--- base64coder-2010-12-19/build.xml	2011-06-06 21:16:10.000000000 +0200
++++ base64coder-2010-12-19/build.xml	2019-02-05 08:57:29.416226180 +0100
+@@ -33,6 +33,21 @@
+  </javac>
+  <jar destfile="${jarFile}">
+   <fileset dir="${classesDir}"/>
++  <manifest>
++   <attribute name="Bundle-Description" value="A Base64 encoder/decoder in Java."/>
++   <attribute name="Bundle-DocURL" value="http://www.source-code.biz/base64coder/java"/>
++   <attribute name="Bundle-License" value="http://www.eclipse.org/legal, http://www.gnu.org/licenses/lgpl.html, http://www.gnu.org/licenses/lgpl.html, http://www.apache.org/licenses, http://www.opensource.org/licenses/bsd-license.php"/>
++   <attribute name="Bundle-ManifestVersion" value="2"/>
++   <attribute name="Bundle-Name" value="Base64Coder"/>
++   <attribute name="Bundle-SymbolicName" value="biz.source_code.base64coder"/>
++   <attribute name="Bundle-Vendor" value="source-code.biz"/>
++   <attribute name="Bundle-Version" value="1.0.0.2010-12-19"/>
++   <attribute name="Export-Package" value="biz.source_code.base64Coder;version=&quot;1.0.0&quot;"/>
++   <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=1.6))&quot;"/>
++   <attribute name="JavaPackages-ArtifactId" value="base64coder"/>
++   <attribute name="JavaPackages-GroupId" value="biz.source_code"/>
++   <attribute name="JavaPackages-Version" value="2010-12-19"/>
++  </manifest>
+  </jar>
+  <delete dir="${classesDir}" failonerror="true"/>
+ </target>

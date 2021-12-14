@@ -1,0 +1,10 @@
+[Unit]
+Description=trqauthd
+After=syslog.target network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/trqauthd
+
+[Install]
+WantedBy=multi-user.target

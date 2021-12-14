@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<!-- $Rev$ $Date$ -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache.geronimo.genesis.config</groupId>
+        <artifactId>project-config</artifactId>
+        <version>1.5</version>
+    </parent>
+
+    <groupId>org.apache.geronimo.specs</groupId>
+    <artifactId>specs-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>Geronimo Specifications</name>
+    <version>1.6</version>
+
+    <description>
+        Provides open-source implementations of Sun specifications.
+    </description>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/geronimo/specs/tags/specs-parent-1.6</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/geronimo/specs/tags/specs-parent-1.6</developerConnection>
+        <url>http://svn.apache.org/viewvc/geronimo/specs/tags/specs-parent-1.6</url>
+    </scm>
+
+    <url>http://geronimo.apache.org/maven/${siteId}/${version}</url>
+    <distributionManagement>
+        <site>
+            <id>geronimo-website</id>
+            <url>${staging.siteURL}/${siteId}/${version}</url>
+        </site>
+    </distributionManagement>
+
+    <properties>
+        <siteId>specs</siteId>
+        <projectName>Apache Geronimo Specifications</projectName>
+        <!--
+              |
+              | Geronimo OSGi properties
+              |
+              | Note: when modules can override these properties.
+              |
+              -->
+        <geronimo.osgi.import.pkg>*</geronimo.osgi.import.pkg>
+        <geronimo.osgi.export.pkg>*</geronimo.osgi.export.pkg>
+        <geronimo.osgi.private.pkg />
+        <geronimo.osgi.export>!META-INF*,${geronimo.osgi.export.pkg}*;version=${geronimo.osgi.export.version}</geronimo.osgi.export>
+        <geronimo.osgi.export.version>${project.version}</geronimo.osgi.export.version>
+        <geronimo.osgi.import>!META-INF*,${geronimo.osgi.import.pkg}</geronimo.osgi.import>
+        <geronimo.osgi.symbolic.name>${groupId}.${artifactId}</geronimo.osgi.symbolic.name>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-idea-plugin</artifactId>
+                <configuration>
+                    <jdkName>1.5</jdkName>
+                    <linkModules>true</linkModules>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.2.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Name>${artifactId}</Bundle-Name>
+                        <Bundle-SymbolicName>${geronimo.osgi.symbolic.name}</Bundle-SymbolicName>
+                        <Export-Package>${geronimo.osgi.export}</Export-Package>
+                        <Import-Package>${geronimo.osgi.import}</Import-Package>
+                        <Private-Package>${geronimo.osgi.private.pkg}</Private-Package>
+                        <Implementation-Title>Apache Geronimo</Implementation-Title>
+                        <Implementation-Version>${project.version}</Implementation-Version>
+                    </instructions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <targetJdk>1.5</targetJdk>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    
+</project>

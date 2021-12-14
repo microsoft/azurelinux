@@ -1,0 +1,45 @@
+From f171cd8a95735c7f2fbcd20c323b2d936d8cc01b Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Wed, 7 Sep 2016 16:36:53 +0200
+Subject: [PATCH] Port to current javacc
+
+---
+ src/main/java/org/apache/commons/jexl2/parser/SimpleNode.java  |  2 ++
+ .../java/org/apache/commons/jexl2/parser/TokenMgrError.java    | 10 ++++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/src/main/java/org/apache/commons/jexl2/parser/SimpleNode.java b/src/main/java/org/apache/commons/jexl2/parser/SimpleNode.java
+index cab2378..4d83b1d 100644
+--- a/src/main/java/org/apache/commons/jexl2/parser/SimpleNode.java
++++ b/src/main/java/org/apache/commons/jexl2/parser/SimpleNode.java
+@@ -180,6 +180,8 @@ public class SimpleNode implements Node {
+             }
+         }
+     }
++
++    public int getId() { return id; }
+ }
+ 
+ /* JavaCC - OriginalChecksum=7dff880883d088a37c1e3197e4b455a0 (do not edit this line) */
+diff --git a/src/main/java/org/apache/commons/jexl2/parser/TokenMgrError.java b/src/main/java/org/apache/commons/jexl2/parser/TokenMgrError.java
+index 1e9b623..3e1236e 100644
+--- a/src/main/java/org/apache/commons/jexl2/parser/TokenMgrError.java
++++ b/src/main/java/org/apache/commons/jexl2/parser/TokenMgrError.java
+@@ -142,4 +142,14 @@ public class TokenMgrError extends Error {
+         current = curChar;
+         errorCode = reason;
+     }
++
++    public TokenMgrError(boolean EOFSeen, int lexState, int errorLine, int errorColumn, String errorAfter, int curChar, int reason) {
++        eof = EOFSeen;
++        state = lexState;
++        line = errorLine;
++        column = errorColumn;
++        after = errorAfter;
++        current = (char)curChar;
++        errorCode = reason;
++    }
+ }
+-- 
+2.7.4
+

@@ -1,0 +1,12 @@
+diff -up gnome-session-3.6.2/data/hardware-compatibility.jx gnome-session-3.6.2/data/hardware-compatibility
+--- gnome-session-3.6.2/data/hardware-compatibility.jx	2012-12-10 12:43:06.000000000 -0500
++++ gnome-session-3.6.2/data/hardware-compatibility	2012-12-10 12:43:50.424352484 -0500
+@@ -23,7 +23,7 @@
+ -Gallium .* on NV3[0-9A-F]$
+ 
+ # Old Mesa software GL renderer
+--software rasterizer
++#software rasterizer
+ 
+ # Gallium has softpipe; we explicitly enable llvmpipe
+ -softpipe

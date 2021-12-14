@@ -1,0 +1,59 @@
+#! /bin/sh
+
+ADMON_GRAPHICS=/usr/share/sgml/docbook/dsssl-stylesheets/images/*.gif
+
+output=docbook2html-dir
+skip=0
+dbdircleanup=1
+outputdone=0
+for arg in "$@"
+do
+  if [ $skip -gt 0 ]
+  then
+    skip=$(($skip - 1))
+    continue
+  fi
+  case $arg in
+  -h|--help|-v|--version)	break
+				;;
+  -n|--nostd|-u|--nochunks)	;;
+  -o|--output)   outputdone=1
+	         ;;
+
+  -*)				skip=1
+				;;
+  *)    dbdircleanup=0
+        if [ ${outputdone} -eq 1 ];
+        then
+          output="$(echo $arg | sed 's,\.sgml$,,;s,\.sgm$,,;s,\.xml,,')"
+          outputfile="$basename "$output""
+          outputdone=2
+        elif [ ${outputdone} -eq 2 ];
+        then
+          outputfile="$(echo $arg | sed 's,\.sgml$,,;s,\.sgm$,,;s,\.xml,,' | \
+                      rev | cut -d'/' -f1 | rev)"
+        else
+          output="$(echo $arg | sed 's,\.sgml$,,;s,\.sgm$,,;s,\.xml,,')"
+          outputfile=$(basename "$output")
+        fi
+	;;
+  esac
+done
+
+if [ ${dbdircleanup} -eq 0 ];
+then
+  echo "Output is $output/$outputfile.html"
+fi
+if [ -d ${output} ]
+then
+  rm -rf ${output}.junk
+  mv ${output} ${output}.junk
+fi
+mkdir ${output}
+mkdir ${output}/stylesheet-images
+cp ${ADMON_GRAPHICS} ${output}/stylesheet-images
+jw -f docbook -b html -o ${output} "$@"
+if [ ${dbdircleanup} -eq 1 ];
+then
+  rm -rf ${output}
+fi

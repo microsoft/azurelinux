@@ -1,0 +1,32 @@
+From cf8a0c3d75005436d3ed3ea0ae258cdef5b10ebe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 14 Jan 2019 12:10:21 +0100
+Subject: [PATCH] Use system glext.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+mesa-18.2.6 changed GL_GLEXT_VERSION and that conflicts with the bundled
+glext.h definitions. Use system glext.h instead via GL/gl.h.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ include/SDL_opengl.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/SDL_opengl.h b/include/SDL_opengl.h
+index 3d791d6..3a77b11 100644
+--- a/include/SDL_opengl.h
++++ b/include/SDL_opengl.h
+@@ -33,6 +33,8 @@
+ #endif
+ #include <windows.h>
+ #endif
++/* mesa changes GL_GLEXT_VERSION, use system glext.h instead via GL/gl.h */
++#define NO_SDL_GLEXT
+ #ifndef NO_SDL_GLEXT
+ #define __glext_h_  /* Don't let gl.h include glext.h */
+ #endif
+-- 
+2.17.2
+

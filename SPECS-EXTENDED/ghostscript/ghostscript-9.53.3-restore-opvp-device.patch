@@ -1,0 +1,46 @@
+From c6ce09aa5c9ed0c66c597478a2c4fb75aa25267f Mon Sep 17 00:00:00 2001
+From: Chris Liddell <chris.liddell@artifex.com>
+Date: Wed, 7 Oct 2020 17:41:36 +0100
+Subject: [PATCH] Revert "Remove deprecated opvp/oprp devices from default
+ build"
+
+This reverts commit 66c2469c7d4543f32d6dc93edf1d649e809b8419.
+
+A user got in touch to say that he maintains a printer driver "back end" that
+uses the opvp device. So reinstating it - at least we know it's getting
+tested.
+---
+ configure.ac | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 640aca7f0..fafe37c36 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2638,8 +2638,7 @@ IBM_DEVS='ibmpro jetp3852'
+ OKI_DEVS='oki182 okiibm oki4w'
+ JAPAN_DEVS='lips4 lips4v ljet4pjl lj4dithp dj505j picty180 lips2p bjc880j pr201 pr150 pr1000 pr1000_4 jj100 bj10v bj10vh mj700v2c mj500c mj6000c mj8000c fmpr fmlbp ml600 lbp310 lbp320 md50Mono md50Eco md1xMono escpage lp2000 npdl rpdl'
+ MISC_PDEVS='uniprint ap3250 atx23 atx24 atx38 itk24i itk38 coslw2p coslwxl declj250 fs600 imagen lj250 m8510 necp6 oce9050 r4081 sj48 tek4696 t4693d2 t4693d4 t4693d8 dl2100 la50 la70 la75 la75plus ln03 xes md2k md5k gdi samsunggdi'
+-
+-AC_ARG_WITH([openprinting],, OPVP_DEVS='opvp oprp', OPVP_DEVS='')
++OPVP_DEVS='opvp oprp'
+ 
+ ETS_HALFTONING_DEVS='rinkj'
+ 
+@@ -2679,12 +2678,10 @@ while test -n "$drivers"; do
+         PRINTERS)
+                 P_DEVS0="$P_DEVS0 $CANON_DEVS $EPSON_DEVS $HP_DEVS $LEXMARK_DEVS $BROTHER_DEVS $APPLE_DEVS $IBM_DEVS $OKI_DEVS $JAPAN_DEVS $MISC_PDEVS $ETS_HALFTONING_DEVS $URF_DEVS"
+                 IJS_DEVS0="$IJSDEVS"
+-                if test x"$OPVP_DEVS" != x"" ; then
+-                  if test x$ac_cv_lib_dl_dlopen != xno -a x$found_iconv != xno; then
+-                    P_DEVS0="$P_DEVS0 $OPVP_DEVS"
+-                  else
+-                    AC_MSG_ERROR(Unable to include opvp/oprp driver due to missing or disabled prerequisites...)
+-                  fi
++                if test x$ac_cv_lib_dl_dlopen != xno -a x$found_iconv != xno; then
++                        P_DEVS0="$P_DEVS0 $OPVP_DEVS"
++                else
++                        AC_MSG_WARN(Unable to include opvp/oprp driver due to missing or disabled prerequisites...)
+                 fi
+                 ;;
+         FILES)

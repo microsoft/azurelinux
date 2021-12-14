@@ -15,7 +15,7 @@ BuildRequires:  curl-devel
 BuildRequires:  gfortran
 BuildRequires:  glibc-iconv
 BuildRequires:  make
-BuildRequires:  openjdk8
+BuildRequires:  msopenjdk-11
 BuildRequires:  pcre
 BuildRequires:  pcre2
 BuildRequires:  pcre2-devel
@@ -24,9 +24,6 @@ BuildRequires:  which
 BuildRequires:  xz
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
-
-# Temp: Do not build with x86_64 due to docker build issue
-ExclusiveArch:  aarch64
 
 %description
 R is a language and environment for statistical computing and graphics.
@@ -120,6 +117,8 @@ TZ="Europe/Paris" make check -k -i
 %endif
 
 %changelog
+* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 4.1.0-2
+- Build with JDK 11
 * Wed Jun 16 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.1.0-1
 - Add R spec.
 - License verified

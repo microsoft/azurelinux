@@ -1,0 +1,58 @@
+diff -rupN jack-1.9.9.5.old/common/JackControlAPI.cpp jack-1.9.9.5/common/JackControlAPI.cpp
+--- jack-1.9.9.5.old/common/JackControlAPI.cpp	2012-12-10 04:26:56.000000000 -0500
++++ jack-1.9.9.5/common/JackControlAPI.cpp	2012-12-15 21:40:01.639927082 -0500
+@@ -32,6 +32,7 @@
+ #include <stdio.h>
+ #include <assert.h>
+ #include <signal.h>
++#include <sys/utsname.h>
+ 
+ #include "jslist.h"
+ #include "driver_interface.h"
+@@ -756,7 +757,14 @@ SERVER_EXPORT jackctl_server_t * jackctl
+         goto fail_free_parameters;
+     }
+ 
+-    value.i = 10;
++    struct utsname utsname;
++    int success;
++    success = uname( &utsname );
++    if( success == 0 && strstr( utsname.version, "PREEMPT RT" ) )
++	value.i = 60;
++    else
++	value.i = 20;
++
+     if (jackctl_add_parameter(
+             &server_ptr->parameters,
+             "realtime-priority",
+diff -rupN jack-1.9.9.5.old/common/JackServerGlobals.cpp jack-1.9.9.5/common/JackServerGlobals.cpp
+--- jack-1.9.9.5.old/common/JackServerGlobals.cpp	2012-12-10 04:26:56.000000000 -0500
++++ jack-1.9.9.5/common/JackServerGlobals.cpp	2012-12-15 21:45:43.793194190 -0500
+@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridg
+ #include "shm.h"
+ #include <getopt.h>
+ #include <errno.h>
++#include <sys/utsname.h>
+ 
+ static char* server_name = NULL;
+ 
+@@ -96,9 +97,18 @@ void JackServerGlobals::Delete()
+ 
+ bool JackServerGlobals::Init()
+ {
++    struct utsname utsname;
++    int success;
++    success = uname( &utsname );
++
+     int realtime = 0;
+     int client_timeout = 0; /* msecs; if zero, use period size. */
+-    int realtime_priority = 10;
++    int realtime_priority;
++    if( success == 0 && strstr( utsname.version, "PREEMPT RT" ) )
++      realtime_priority = 60;
++    else
++      realtime_priority = 20;
++
+     int verbose_aux = 0;
+     unsigned int port_max = 128;
+     int temporary = 0;

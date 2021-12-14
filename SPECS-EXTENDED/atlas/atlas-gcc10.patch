@@ -1,0 +1,49 @@
+From 9a3e640a517926c47b5655ba0033d4f56df4a66e Mon Sep 17 00:00:00 2001
+From: Jakub Martisko <jamartis@redhat.com>
+Date: Wed, 22 Jan 2020 14:24:46 +0100
+Subject: [PATCH] test
+
+---
+ interfaces/blas/C/testing/c_dblat1.f | 4 ++--
+ interfaces/blas/C/testing/c_sblat1.f | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/interfaces/blas/C/testing/c_dblat1.f b/interfaces/blas/C/testing/c_dblat1.f
+index 55ea989..7269601 100644
+--- a/interfaces/blas/C/testing/c_dblat1.f
++++ b/interfaces/blas/C/testing/c_dblat1.f
+@@ -247,11 +247,11 @@
+             IF (ICASE.EQ.7) THEN
+ *              .. DNRM2TEST ..
+                STEMP(1) = DTRUE1(NP1)
+-               CALL STEST1(DNRM2TEST(N,SX,INCX),STEMP,STEMP,SFAC)
++               CALL STEST1(DNRM2TEST(N,SX,INCX),STEMP(1),STEMP,SFAC)
+             ELSE IF (ICASE.EQ.8) THEN
+ *              .. DASUMTEST ..
+                STEMP(1) = DTRUE3(NP1)
+-               CALL STEST1(DASUMTEST(N,SX,INCX),STEMP,STEMP,SFAC)
++               CALL STEST1(DASUMTEST(N,SX,INCX),STEMP(1),STEMP,SFAC)
+             ELSE IF (ICASE.EQ.9) THEN
+ *              .. DSCALTEST ..
+                CALL DSCALTEST(N,SA((INCX-1)*5+NP1),SX,INCX)
+diff --git a/interfaces/blas/C/testing/c_sblat1.f b/interfaces/blas/C/testing/c_sblat1.f
+index 1fc6dce..b97ed0b 100644
+--- a/interfaces/blas/C/testing/c_sblat1.f
++++ b/interfaces/blas/C/testing/c_sblat1.f
+@@ -247,11 +247,11 @@
+             IF (ICASE.EQ.7) THEN
+ *              .. SNRM2TEST ..
+                STEMP(1) = DTRUE1(NP1)
+-               CALL STEST1(SNRM2TEST(N,SX,INCX),STEMP,STEMP,SFAC)
++               CALL STEST1(SNRM2TEST(N,SX,INCX),STEMP(1),STEMP,SFAC)
+             ELSE IF (ICASE.EQ.8) THEN
+ *              .. SASUMTEST ..
+                STEMP(1) = DTRUE3(NP1)
+-               CALL STEST1(SASUMTEST(N,SX,INCX),STEMP,STEMP,SFAC)
++               CALL STEST1(SASUMTEST(N,SX,INCX),STEMP(1),STEMP,SFAC)
+             ELSE IF (ICASE.EQ.9) THEN
+ *              .. SSCALTEST ..
+                CALL SSCALTEST(N,SA((INCX-1)*5+NP1),SX,INCX)
+-- 
+2.24.1
+

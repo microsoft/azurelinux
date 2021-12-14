@@ -1,0 +1,11 @@
+--- dovecot-1.0.beta2/doc/mkcert.sh.configfile	2006-01-16 21:14:54.000000000 +0100
++++ dovecot-1.0.beta2/doc/mkcert.sh	2006-01-26 14:28:38.000000000 +0100
+@@ -29,6 +29,7 @@
+ fi
+ 
+ $OPENSSL req -new -x509 -nodes -config $OPENSSLCONFIG -out $CERTFILE -keyout $KEYFILE -days 365 || exit 2
+-chmod 0600 $KEYFILE
++chown root:root $CERTFILE $KEYFILE
++chmod 0600 $CERTFILE $KEYFILE
+ echo 
+ $OPENSSL x509 -subject -fingerprint -noout -in $CERTFILE || exit 2

@@ -1,0 +1,371 @@
+From ff93fae7cfc2e097c3b37947fd1501bab25481fc Mon Sep 17 00:00:00 2001
+From: Paul Howarth <paul@city-fan.org>
+Date: Fri, 21 Jul 2017 11:50:35 +0100
+Subject: [PATCH] Change default spell check tool from aspell to hunspell
+
+This is on the basis that most downstream users are already doing
+or have migrated from aspell to hunspell due to hunspell being
+actively maintained, unlike aspell.
+
+https://wiki.ubuntu.com/ConsolidateSpellingLibs
+https://wiki.gnome.org/Initiatives/SpellChecking
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=860895
+https://fedoraproject.org/wiki/Releases/FeatureDictionary
+
+Unfortunately, hunspell prior to about version 1.2.12 (2010) had
+problems with ASCII apostrophes, thus flagging errors for words
+like "doesn't", "isn't" etc., which makes 1.2.12 pretty much a
+minimum version requirement if incorporating this change.
+---
+ .travis.yml                                   |  4 ++--
+ bin/perlcritic                                |  2 +-
+ .../BuiltinFunctions/ProhibitBooleanGrep.pm   |  2 ++
+ .../BuiltinFunctions/ProhibitLvalueSubstr.pm  |  2 +-
+ .../BuiltinFunctions/ProhibitShiftRef.pm      |  2 +-
+ .../Policy/Documentation/PodSpelling.pm       | 20 +++++++++----------
+ .../RequireCheckingReturnValueOfEval.pm       |  2 +-
+ .../Policy/Modules/RequireBarewordIncludes.pm |  2 ++
+ .../ProhibitCaptureWithoutTest.pm             |  2 ++
+ .../ProhibitComplexRegexes.pm                 |  2 +-
+ .../ProhibitFixedStringMatches.pm             |  2 ++
+ .../ProhibitSingleCharAlternation.pm          |  2 ++
+ .../ProhibitUnusedCapture.pm                  |  2 +-
+ .../ProhibitUnusualDelimiters.pm              |  2 ++
+ .../RequireBracesForMultiline.pm              |  2 ++
+ .../Variables/ProhibitPunctuationVars.pm      |  2 ++
+ .../Variables/RequireLexicalLoopIterators.pm  |  2 +-
+ lib/Perl/Critic/Utils.pm                      |  2 ++
+ lib/Perl/Critic/Utils/PPI.pm                  |  2 +-
+ t/20_policy_pod_spelling.t                    |  4 ++--
+ xt/40_perlcriticrc-code                       |  2 +-
+ 21 files changed, 41 insertions(+), 23 deletions(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index c907085f..9a01a667 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -2,8 +2,8 @@
+ addons:
+   apt:
+     packages:
+-      - aspell
+-      - aspell-en
++      - hunspell
++      - hunspell-en-us
+ language: perl
+ perl:
+   # blead and dev don't play nicely with Module::Build
+diff --git a/bin/perlcritic b/bin/perlcritic
+index bff0b3ad..6fc3dd05 100644
+--- a/bin/perlcritic
++++ b/bin/perlcritic
+@@ -30,7 +30,7 @@ __END__
+ 
+ =for stopwords DGR INI-style vim-fu minibuffer -noprofile API
+ -profileproto -profile-proto ben Jore formatter Peshak pbp Komodo
+-screenshots tty emacs gVIM plugin Perlish templating ActivePerl
++screenshots tty emacs grep gVIM plugin Perlish templating ActivePerl
+ ActiveState Twitter
+ 
+ =head1 NAME
+diff --git a/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitBooleanGrep.pm b/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitBooleanGrep.pm
+index 1a45f86b..eb7263c7 100644
+--- a/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitBooleanGrep.pm
++++ b/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitBooleanGrep.pm
+@@ -86,6 +86,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords grep
++
+ =head1 NAME
+ 
+ Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep - Use C<List::MoreUtils::any> instead of C<grep> in boolean context.
+diff --git a/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitLvalueSubstr.pm b/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitLvalueSubstr.pm
+index 1b011623..3c903e91 100644
+--- a/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitLvalueSubstr.pm
++++ b/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitLvalueSubstr.pm
+@@ -64,7 +64,7 @@ __END__
+ 
+ =pod
+ 
+-=for stopwords perlfunc substr 4th
++=for stopwords perl5005delta perlfunc substr 4th
+ 
+ =head1 NAME
+ 
+diff --git a/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitShiftRef.pm b/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitShiftRef.pm
+index e9ce1990..ff612557 100644
+--- a/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitShiftRef.pm
++++ b/lib/Perl/Critic/Policy/BuiltinFunctions/ProhibitShiftRef.pm
+@@ -94,7 +94,7 @@ modules.
+ =head2 Background
+ 
+ Often, C<\shift> is used to create references that act much like an alias.  By
+-creating an ‘alias’ that is named, the code becomes more readable.  For example,
++creating an 'alias' that is named, the code becomes more readable.  For example,
+ 
+     sub routine {
+         my $longstring = \shift;
+diff --git a/lib/Perl/Critic/Policy/Documentation/PodSpelling.pm b/lib/Perl/Critic/Policy/Documentation/PodSpelling.pm
+index 41a59f92..e6464e9a 100644
+--- a/lib/Perl/Critic/Policy/Documentation/PodSpelling.pm
++++ b/lib/Perl/Critic/Policy/Documentation/PodSpelling.pm
+@@ -39,7 +39,7 @@ sub supported_parameters {
+         {
+             name            => 'spell_command',
+             description     => 'The command to invoke to check spelling.',
+-            default_string  => 'aspell list',
++            default_string  => 'hunspell -l',
+             behavior        => 'string',
+         },
+         {
+@@ -202,11 +202,11 @@ sub _run_spell_command {
+         # run spell command and fetch output
+         local $SIG{PIPE} = sub { $got_sigpipe = 1; };
+         my $command_line = join $SPACE, @{$self->_get_spell_command_line()};
+-        open my $aspell_out_fh, q{-|}, "$command_line < $outfile"  ## Is this portable??
++        open my $speller_out_fh, q{-|}, "$command_line < $outfile"  ## Is this portable??
+             or throw_generic "Failed to open handle to spelling program: $OS_ERROR";
+ 
+-        @words = uniq( <$aspell_out_fh> );
+-        close $aspell_out_fh
++        @words = uniq( <$speller_out_fh> );
++        close $speller_out_fh
+             or throw_generic "Failed to close handle to spelling program: $OS_ERROR";
+ 
+         for (@words) {
+@@ -326,11 +326,11 @@ set a global list of spelling exceptions.  To do this, put entries in
+ a F<.perlcriticrc> file like this:
+ 
+     [Documentation::PodSpelling]
+-    spell_command = aspell list
++    spell_command = hunspell -l
+     stop_words = gibbles foobar
+     stop_words_file = some/path/with/stop/words.txt
+ 
+-The default spell command is C<aspell list> and it is interpreted as a
++The default spell command is C<hunspell -l> and it is interpreted as a
+ shell command.  We parse the individual arguments via
+ L<Text::ParseWords|Text::ParseWords> so feel free to use quotes around
+ your arguments.  If the executable path is an absolute file name, it
+@@ -360,13 +360,13 @@ together into a single list of exemptions.
+ 
+ A spell checking program is not included with Perl::Critic.
+ 
+-The results of failures for this policy can be confusing when F<aspell>
++The results of failures for this policy can be confusing when F<hunspell>
+ complains about words containing punctuation such as hyphens and apostrophes.
+-In this situation F<aspell> will often only emit part of the word that it
+-thinks is misspelled.  For example, if you ask F<aspell> to check
++In this situation F<hunspell> will often only emit part of the word that it
++thinks is misspelled.  For example, if you ask F<hunspell> to check
+ "foobie-bletch", the output only complains about "foobie".  Unfortunately,
+ you'll have to look through your POD to figure out what the real word that
+-F<aspell> is complaining about is.  One thing to try is looking at the output
++F<hunspell> is complaining about is.  One thing to try is looking at the output
+ of C<< perl -MPod::Spell -e 'print
+ Pod::Spell->new()->parse_from_file("lib/Your/Module.pm")' >> to see what is
+ actually being checked for spelling.
+diff --git a/lib/Perl/Critic/Policy/ErrorHandling/RequireCheckingReturnValueOfEval.pm b/lib/Perl/Critic/Policy/ErrorHandling/RequireCheckingReturnValueOfEval.pm
+index f5ed7526..14438cc1 100644
+--- a/lib/Perl/Critic/Policy/ErrorHandling/RequireCheckingReturnValueOfEval.pm
++++ b/lib/Perl/Critic/Policy/ErrorHandling/RequireCheckingReturnValueOfEval.pm
+@@ -317,7 +317,7 @@ __END__
+ 
+ =pod
+ 
+-=for stopwords destructors
++=for stopwords destructors perl5
+ 
+ =head1 NAME
+ 
+diff --git a/lib/Perl/Critic/Policy/Modules/RequireBarewordIncludes.pm b/lib/Perl/Critic/Policy/Modules/RequireBarewordIncludes.pm
+index 9cdcb29d..3da67de7 100644
+--- a/lib/Perl/Critic/Policy/Modules/RequireBarewordIncludes.pm
++++ b/lib/Perl/Critic/Policy/Modules/RequireBarewordIncludes.pm
+@@ -46,6 +46,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords Perl4
++
+ =head1 NAME
+ 
+ Perl::Critic::Policy::Modules::RequireBarewordIncludes - Write C<require Module> instead of C<require 'Module.pm'>.
+diff --git a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitCaptureWithoutTest.pm b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitCaptureWithoutTest.pm
+index 193d8a2e..ddadae5f 100644
+--- a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitCaptureWithoutTest.pm
++++ b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitCaptureWithoutTest.pm
+@@ -307,6 +307,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords regexp
++
+ =head1 NAME
+ 
+ Perl::Critic::Policy::RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional.
+diff --git a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitComplexRegexes.pm b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitComplexRegexes.pm
+index fe3bb7cd..46090ef5 100644
+--- a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitComplexRegexes.pm
++++ b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitComplexRegexes.pm
+@@ -99,7 +99,7 @@ __END__
+ 
+ =pod
+ 
+-=for stopwords BNF Tatsuhiko Miyagawa
++=for stopwords BNF regexp RFC822 Tatsuhiko Miyagawa
+ 
+ =head1 NAME
+ 
+diff --git a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitFixedStringMatches.pm b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitFixedStringMatches.pm
+index ce4d8c07..f8cce2fe 100644
+--- a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitFixedStringMatches.pm
++++ b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitFixedStringMatches.pm
+@@ -82,6 +82,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords regexp
++
+ =head1 NAME
+ 
+ Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches - Use C<eq> or hash instead of fixed-pattern regexps.
+diff --git a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitSingleCharAlternation.pm b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitSingleCharAlternation.pm
+index 5d8de1ba..d4a4d036 100644
+--- a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitSingleCharAlternation.pm
++++ b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitSingleCharAlternation.pm
+@@ -83,6 +83,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords regexp
++
+ =head1 NAME
+ 
+ Perl::Critic::Policy::RegularExpressions::ProhibitSingleCharAlternation - Use C<[abc]> instead of C<a|b|c>.
+diff --git a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitUnusedCapture.pm b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitUnusedCapture.pm
+index 1f27bdb6..2e16b6a4 100644
+--- a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitUnusedCapture.pm
++++ b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitUnusedCapture.pm
+@@ -715,7 +715,7 @@ __END__
+ 
+ =pod
+ 
+-=for stopwords refactored
++=for stopwords refactored regexp
+ 
+ =head1 NAME
+ 
+diff --git a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitUnusualDelimiters.pm b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitUnusualDelimiters.pm
+index 1537726e..19c06b76 100644
+--- a/lib/Perl/Critic/Policy/RegularExpressions/ProhibitUnusualDelimiters.pm
++++ b/lib/Perl/Critic/Policy/RegularExpressions/ProhibitUnusualDelimiters.pm
+@@ -77,6 +77,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords regexp
++
+ =head1 NAME
+ 
+ Perl::Critic::Policy::RegularExpressions::ProhibitUnusualDelimiters - Use only C<//> or C<{}> to delimit regexps.
+diff --git a/lib/Perl/Critic/Policy/RegularExpressions/RequireBracesForMultiline.pm b/lib/Perl/Critic/Policy/RegularExpressions/RequireBracesForMultiline.pm
+index cf14cdf7..f87f46d6 100644
+--- a/lib/Perl/Critic/Policy/RegularExpressions/RequireBracesForMultiline.pm
++++ b/lib/Perl/Critic/Policy/RegularExpressions/RequireBracesForMultiline.pm
+@@ -77,6 +77,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords regexp
++
+ =head1 NAME
+ 
+ Perl::Critic::Policy::RegularExpressions::RequireBracesForMultiline - Use C<{> and C<}> to delimit multi-line regexps.
+diff --git a/lib/Perl/Critic/Policy/Variables/ProhibitPunctuationVars.pm b/lib/Perl/Critic/Policy/Variables/ProhibitPunctuationVars.pm
+index 5f9e25ca..9ab0c802 100644
+--- a/lib/Perl/Critic/Policy/Variables/ProhibitPunctuationVars.pm
++++ b/lib/Perl/Critic/Policy/Variables/ProhibitPunctuationVars.pm
+@@ -367,6 +367,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords regexp
++
+ =head1 NAME
+ 
+ Perl::Critic::Policy::Variables::ProhibitPunctuationVars - Write C<$EVAL_ERROR> instead of C<$@>.
+diff --git a/lib/Perl/Critic/Policy/Variables/RequireLexicalLoopIterators.pm b/lib/Perl/Critic/Policy/Variables/RequireLexicalLoopIterators.pm
+index 6632c996..d04664ba 100644
+--- a/lib/Perl/Critic/Policy/Variables/RequireLexicalLoopIterators.pm
++++ b/lib/Perl/Critic/Policy/Variables/RequireLexicalLoopIterators.pm
+@@ -66,7 +66,7 @@ __END__
+ 
+ =pod
+ 
+-=for stopwords foreach perlsyn
++=for stopwords foreach perl5004delta perlsyn
+ 
+ =head1 NAME
+ 
+diff --git a/lib/Perl/Critic/Utils.pm b/lib/Perl/Critic/Utils.pm
+index 38b91ea6..0813d310 100644
+--- a/lib/Perl/Critic/Utils.pm
++++ b/lib/Perl/Critic/Utils.pm
+@@ -1397,6 +1397,8 @@ __END__
+ 
+ =pod
+ 
++=for stopwords foo
++
+ =head1 NAME
+ 
+ Perl::Critic::Utils - General utility subroutines and constants for Perl::Critic and derivative distributions.
+diff --git a/lib/Perl/Critic/Utils/PPI.pm b/lib/Perl/Critic/Utils/PPI.pm
+index 0c58081d..376087d7 100644
+--- a/lib/Perl/Critic/Utils/PPI.pm
++++ b/lib/Perl/Critic/Utils/PPI.pm
+@@ -235,7 +235,7 @@ __END__
+ 
+ =pod
+ 
+-=for stopwords
++=for stopwords FOO
+ 
+ =head1 NAME
+ 
+diff --git a/t/20_policy_pod_spelling.t b/t/20_policy_pod_spelling.t
+index 4e782bd7..71d6c620 100644
+--- a/t/20_policy_pod_spelling.t
++++ b/t/20_policy_pod_spelling.t
+@@ -58,10 +58,10 @@ $code = <<'END_PERL';
+ =cut
+ END_PERL
+ 
+-# Sorry about the double negative. The idea is that if aspell fails (say,
++# Sorry about the double negative. The idea is that if hunspell fails (say,
+ # because it can not find the right dictionary) or pcritique returns a
+ # non-zero number we want to skip. We have to negate the eval to catch the
+-# aspell failure, and then negate pcritique because we negated the eval.
++# hunspell failure, and then negate pcritique because we negated the eval.
+ # Clearer code welcome.
+ if ( ! eval { ! pcritique($policy, \$code) } ) {
+    skip 'Test environment is not English', $NUMBER_OF_TESTS;
+diff --git a/xt/40_perlcriticrc-code b/xt/40_perlcriticrc-code
+index 25d5a933..b488284e 100644
+--- a/xt/40_perlcriticrc-code
++++ b/xt/40_perlcriticrc-code
+@@ -17,7 +17,7 @@ strict = 1
+ [-CodeLayout::RequireTidyCode]
+ 
+ [Documentation::PodSpelling]
+-spell_command = aspell list -l en_US
++spell_command = hunspell -l -d en_US
+ stop_words_file = xt/40_stop_words
+ 
+ [Documentation::RequirePodSections]
+-- 
+2.21.0
+

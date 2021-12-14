@@ -1,0 +1,51 @@
+From 826c100b0cbe72c5d770614cea8898afec09628c Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Mon, 9 Sep 2019 16:18:33 -0500
+Subject: [PATCH] mpathpersist: remove broken/unused code
+
+The test for an empty pp->dev in updatepaths() dates back to when
+disassemble_map() didn't fill in pp->dev for newly added paths, and it
+was meant to catch paths that got added by disassemble_map().  With the
+mpathpersist speedup code, all paths get added by disassemble_map().
+However, disassemble_map() now calls devt2devname() to set pp->dev if
+possible.  This means that there is no point in calling devt2devname()
+again in updatepaths(). If for some reason it did return success, the
+current code would still fail, since it doesn't set pp->udev in this
+code path. The best thing to do if disassemble_map() couldn't set
+pp->dev is simply to fail the path.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmpathpersist/mpath_persist.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
+
+diff --git a/libmpathpersist/mpath_persist.c b/libmpathpersist/mpath_persist.c
+index 53022f5b..603cfc3b 100644
+--- a/libmpathpersist/mpath_persist.c
++++ b/libmpathpersist/mpath_persist.c
+@@ -82,18 +82,10 @@ updatepaths (struct multipath * mpp)
+ 
+ 		vector_foreach_slot (pgp->paths, pp, j){
+ 			if (!strlen(pp->dev)){
+-				if (devt2devname(pp->dev, FILE_NAME_SIZE,
+-						 pp->dev_t)){
+-					/*
+-					 * path is not in sysfs anymore
+-					 */
+-					pp->state = PATH_DOWN;
+-					continue;
+-				}
+-				pp->mpp = mpp;
+-				conf = get_multipath_config();
+-				pathinfo(pp, conf, DI_ALL);
+-				put_multipath_config(conf);
++				/*
++				 * path is not in sysfs anymore
++				 */
++				pp->state = PATH_DOWN;
+ 				continue;
+ 			}
+ 			pp->mpp = mpp;
+-- 
+2.17.2
+

@@ -1,0 +1,183 @@
+From 3937a2a7db90611aa7a93248233b0c5d31e85a3e Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Wed, 27 Nov 2019 14:48:32 +0100
+Subject: [PATCH 3/6] add description option to join and update
+
+This new option allows to set the description LDAP attribute for the AD
+computer object.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1737342
+---
+ doc/adcli.xml      | 10 ++++++++++
+ library/adenroll.c | 29 +++++++++++++++++++++++++++++
+ library/adenroll.h |  4 ++++
+ tools/computer.c   |  7 +++++++
+ 4 files changed, 50 insertions(+)
+
+diff --git a/doc/adcli.xml b/doc/adcli.xml
+index 1f93186..dd30435 100644
+--- a/doc/adcli.xml
++++ b/doc/adcli.xml
+@@ -275,6 +275,11 @@ Password for Administrator:
+ 			<listitem><para>Set the operating system version on the computer
+ 			account. Not set by default.</para></listitem>
+ 		</varlistentry>
++		<varlistentry>
++			<term><option>--description=<parameter>description</parameter></option></term>
++			<listitem><para>Set the description attribute on the computer
++			account. Not set by default.</para></listitem>
++		</varlistentry>
+ 		<varlistentry>
+ 			<term><option>--service-name=<parameter>service</parameter></option></term>
+ 			<listitem><para>Additional service name for a kerberos
+@@ -416,6 +421,11 @@ $ adcli update --login-ccache=/tmp/krbcc_123
+ 			<listitem><para>Set the operating system version on the computer
+ 			account. Not set by default.</para></listitem>
+ 		</varlistentry>
++		<varlistentry>
++			<term><option>--description=<parameter>description</parameter></option></term>
++			<listitem><para>Set the description attribute on the computer
++			account. Not set by default.</para></listitem>
++		</varlistentry>
+ 		<varlistentry>
+ 			<term><option>--service-name=<parameter>service</parameter></option></term>
+ 			<listitem><para>Additional service name for a Kerberos
+diff --git a/library/adenroll.c b/library/adenroll.c
+index 8d2adeb..246f658 100644
+--- a/library/adenroll.c
++++ b/library/adenroll.c
+@@ -83,6 +83,7 @@ static char *default_ad_ldap_attrs[] =  {
+ 	"operatingSystemServicePack",
+ 	"pwdLastSet",
+ 	"userAccountControl",
++	"description",
+ 	NULL,
+ };
+ 
+@@ -143,6 +144,7 @@ struct _adcli_enroll {
+ 	char *samba_data_tool;
+ 	bool trusted_for_delegation;
+ 	int trusted_for_delegation_explicit;
++	char *description;
+ };
+ 
+ static adcli_result
+@@ -756,6 +758,8 @@ create_computer_account (adcli_enroll *enroll,
+ 	char *vals_userPrincipalName[] = { enroll->user_principal, NULL };
+ 	LDAPMod userPrincipalName = { LDAP_MOD_ADD, "userPrincipalName", { vals_userPrincipalName, }, };
+ 	LDAPMod servicePrincipalName = { LDAP_MOD_ADD, "servicePrincipalName", { enroll->service_principals, } };
++	char *vals_description[] = { enroll->description, NULL };
++	LDAPMod description = { LDAP_MOD_ADD, "description", { vals_description, }, };
+ 
+ 	char *val = NULL;
+ 
+@@ -774,6 +778,7 @@ create_computer_account (adcli_enroll *enroll,
+ 		&operatingSystemServicePack,
+ 		&userPrincipalName,
+ 		&servicePrincipalName,
++		&description,
+ 		NULL
+ 	};
+ 
+@@ -1460,6 +1465,14 @@ update_computer_account (adcli_enroll *enroll)
+ 		res |= update_computer_attribute (enroll, ldap, mods);
+ 	}
+ 
++	if (res == ADCLI_SUCCESS && enroll->description != NULL) {
++		char *vals_description[] = { enroll->description, NULL };
++		LDAPMod description = { LDAP_MOD_REPLACE, "description", { vals_description, }, };
++		LDAPMod *mods[] = { &description, NULL, };
++
++		res |= update_computer_attribute (enroll, ldap, mods);
++	}
++
+ 	if (res != 0)
+ 		_adcli_info ("Updated existing computer account: %s", enroll->computer_dn);
+ }
+@@ -2899,6 +2912,22 @@ adcli_enroll_set_trusted_for_delegation (adcli_enroll *enroll,
+ 	enroll->trusted_for_delegation_explicit = 1;
+ }
+ 
++void
++adcli_enroll_set_description (adcli_enroll *enroll, const char *value)
++{
++	return_if_fail (enroll != NULL);
++	if (value != NULL && value[0] != '\0') {
++		_adcli_str_set (&enroll->description, value);
++	}
++}
++
++const char *
++adcli_enroll_get_desciption (adcli_enroll *enroll)
++{
++	return_val_if_fail (enroll != NULL, NULL);
++	return enroll->description;
++}
++
+ const char **
+ adcli_enroll_get_service_principals_to_add (adcli_enroll *enroll)
+ {
+diff --git a/library/adenroll.h b/library/adenroll.h
+index 11eb517..0606169 100644
+--- a/library/adenroll.h
++++ b/library/adenroll.h
+@@ -126,6 +126,10 @@ bool               adcli_enroll_get_trusted_for_delegation (adcli_enroll *enroll
+ void               adcli_enroll_set_trusted_for_delegation (adcli_enroll *enroll,
+                                                             bool value);
+ 
++const char *       adcli_enroll_get_desciption          (adcli_enroll *enroll);
++void               adcli_enroll_set_description         (adcli_enroll *enroll,
++                                                         const char *value);
++
+ krb5_kvno          adcli_enroll_get_kvno                (adcli_enroll *enroll);
+ 
+ void               adcli_enroll_set_kvno                (adcli_enroll *enroll,
+diff --git a/tools/computer.c b/tools/computer.c
+index c8b96a4..840e334 100644
+--- a/tools/computer.c
++++ b/tools/computer.c
+@@ -112,6 +112,7 @@ typedef enum {
+ 	opt_trusted_for_delegation,
+ 	opt_add_service_principal,
+ 	opt_remove_service_principal,
++	opt_description,
+ } Option;
+ 
+ static adcli_tool_desc common_usages[] = {
+@@ -142,6 +143,7 @@ static adcli_tool_desc common_usages[] = {
+ 	                              "in the userAccountControl attribute", },
+ 	{ opt_add_service_principal, "add the given service principal to the account\n" },
+ 	{ opt_remove_service_principal, "remove the given service principal from the account\n" },
++	{ opt_description, "add a description to the account\n" },
+ 	{ opt_no_password, "don't prompt for or read a password" },
+ 	{ opt_prompt_password, "prompt for a password if necessary" },
+ 	{ opt_stdin_password, "read a password from stdin (until EOF) if\n"
+@@ -306,6 +308,9 @@ parse_option (Option opt,
+ 	case opt_remove_service_principal:
+ 		adcli_enroll_add_service_principal_to_remove (enroll, optarg);
+ 		return ADCLI_SUCCESS;
++	case opt_description:
++		adcli_enroll_set_description (enroll, optarg);
++		return ADCLI_SUCCESS;
+ 	case opt_verbose:
+ 		return ADCLI_SUCCESS;
+ 
+@@ -369,6 +374,7 @@ adcli_tool_computer_join (adcli_conn *conn,
+ 		{ "os-name", required_argument, NULL, opt_os_name },
+ 		{ "os-version", required_argument, NULL, opt_os_version },
+ 		{ "os-service-pack", optional_argument, NULL, opt_os_service_pack },
++		{ "description", optional_argument, NULL, opt_description },
+ 		{ "user-principal", optional_argument, NULL, opt_user_principal },
+ 		{ "trusted-for-delegation", required_argument, NULL, opt_trusted_for_delegation },
+ 		{ "add-service-principal", required_argument, NULL, opt_add_service_principal },
+@@ -487,6 +493,7 @@ adcli_tool_computer_update (adcli_conn *conn,
+ 		{ "os-name", required_argument, NULL, opt_os_name },
+ 		{ "os-version", required_argument, NULL, opt_os_version },
+ 		{ "os-service-pack", optional_argument, NULL, opt_os_service_pack },
++		{ "description", optional_argument, NULL, opt_description },
+ 		{ "user-principal", optional_argument, NULL, opt_user_principal },
+ 		{ "computer-password-lifetime", optional_argument, NULL, opt_computer_password_lifetime },
+ 		{ "trusted-for-delegation", required_argument, NULL, opt_trusted_for_delegation },
+-- 
+2.25.1
+

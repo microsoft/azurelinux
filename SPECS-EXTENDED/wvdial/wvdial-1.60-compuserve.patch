@@ -1,0 +1,16 @@
+#change Compuserve "Classic" login prompt to the "new" style (#146664)
+
+diff -urNp wvdial-1.60.orig/wvdialbrain.cc wvdial-1.60/wvdialbrain.cc
+--- wvdial-1.60.orig/wvdialbrain.cc	2007-07-19 23:22:26.000000000 +0200
++++ wvdial-1.60/wvdialbrain.cc	2008-04-02 10:37:51.000000000 +0200
+@@ -124,7 +124,9 @@ const char * WvDialBrain::check_prompt( 
+     	WvString login = dialer->options.login;
+ 	if (dialer->options.compuserve &&
+ 	    strstr (dialer->options.login, "/noint") == 0) {
+-	   login = WvString("%s%s", login, "/noint/go:pppconnect");
++	    //login = WvString("%s%s", login, "/noint/go:pppconnect");
++	    //use "new" Compuserve "Classic" format
++	    login = WvString("%s%s", login, "/noint/ppp:cisppp");
+ 	}
+     	dialer->log( "Looks like a login prompt.\n"
+     		     "Sending: %s\n", login );

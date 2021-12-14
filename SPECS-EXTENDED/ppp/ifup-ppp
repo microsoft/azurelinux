@@ -1,0 +1,157 @@
+#! /bin/bash
+
+. /etc/init.d/functions
+
+cd /etc/sysconfig/network-scripts
+. ./network-functions
+
+# ifup-post for PPP is handled through /etc/ppp/ip-up
+if [ "${1}" = daemon ] ; then
+  # we've been called from ppp-watch, so don't invoke it for persistence
+  shift
+else
+  # just in case a full path to the configuration file is passed in
+  CONFIG=${1##*/} # CONFIG=$(basename $1)
+  [ -f "${CONFIG}" ] || CONFIG=ifcfg-${1}
+  source_config
+  # don't start ppp-watch by xDSL
+  if [ "${DEMAND}" != yes -a "$TYPE" != "xDSL" ] ; then
+    # let ppp-watch do the right thing
+    exec /sbin/ppp-watch "${CONFIG##ifcfg-}" "$2"
+  fi
+fi
+
+CONFIG=$1
+[ -f "${CONFIG}" ] || CONFIG=ifcfg-${1}
+source_config
+
+if [ -z "${DISCONNECTTIMEOUT}" ]; then
+  DISCONNECTTIMEOUT=2
+fi
+
+if [ -z "${RETRYTIMEOUT}" ]; then
+  RETRYTIMEOUT=30
+fi
+
+if [ -z "${IDLETIMEOUT}" ]; then
+  IDLETIMEOUT=600
+fi
+
+if [ "${2}" = "boot" -a "${ONBOOT}" = "no" ]; then
+  exit
+fi
+
+[ -x /usr/sbin/pppd ] || {
+  echo $"pppd does not exist or is not executable"
+  echo $"ifup-ppp for ${DEVICE} exiting"
+  /usr/bin/logger -p daemon.info -t ifup-ppp \
+    $"pppd does not exist or is not executable for ${DEVICE}"
+  exit 1
+}
+
+# check that xDSL connection
+if [ "$TYPE" = "xDSL" ] ; then
+    if [ -x /usr/sbin/adsl-start ] ; then
+        adsl-start /etc/sysconfig/network-scripts/$CONFIG
+        exit $?
+    else
+        /usr/bin/logger -p daemon.info -t ifup-ppp \
+            $"adsl-start does not exist or is not executable for ${DEVICE}"
+        exit 1
+    fi
+fi
+
+PEERCONF=/etc/ppp/peers/${DEVNAME}
+
+if [ "${DEBUG}" = "yes" ]; then
+  CHATDBG="-v"
+fi
+
+if [ ! -f ${PEERCONF} ]; then
+  if [ -z "${WVDIALSECT}" ] ; then
+    CHATSCRIPT=/etc/sysconfig/network-scripts/chat-${DEVNAME}
+    [ -f ${CHATSCRIPT} ] || {
+     echo $"/etc/sysconfig/network-scripts/chat-${DEVNAME} does not exist"
+     echo $"ifup-ppp for ${DEVNAME} exiting"
+     /usr/bin/logger -p daemon.info -t ifup-ppp \
+       $"/etc/sysconfig/network-scripts/chat-${DEVNAME} does not exist for ${DEVICE}"
+     exit 1
+    }
+  fi
+  /usr/bin/logger -s -p daemon.notice -t ifup-ppp \
+    $"Setting up a new ${PEERCONF} config file"
+  if [ -f /etc/ppp/peers/${DEVICE} ]; then
+    cp -f /etc/ppp/peers/${DEVICE} ${PEERCONF}
+  else
+    touch ${PEERCONF}
+  fi
+  if [ "${WVDIALSECT}" ]; then
+    echo "connect \"/usr/bin/wvdial --remotename ${DEVNAME} --chat '${WVDIALSECT}'\"" >> ${PEERCONF}
+  else
+    echo "connect \"/usr/sbin/chat ${CHATDBG} -f ${CHATSCRIPT}\"" >> ${PEERCONF}
+  fi
+fi
+    
+opts="lock"
+if [ "${HARDFLOWCTL}" != no ] ; then
+  opts="$opts modem crtscts"
+fi
+if [ "${ESCAPECHARS}" != yes ] ; then
+  opts="$opts asyncmap 00000000"
+fi
+if [ "${DEFROUTE}" != no ] ; then
+  # pppd will no longer delete an existing default route
+  # so we have to help it out a little here.
+  DEFRT=$(ip route list match 0.0.0.0/0)
+  [ -n "${DEFRT}" ] && echo "$DEFRT" > /etc/default-routes
+  echo "$DEFRT" | while read spec; do
+      ip route del $spec;
+  done
+  opts="$opts defaultroute"
+fi
+if [ "${PEERDNS}" != no ] ; then
+  cp -f /etc/resolv.conf /etc/resolv.conf.save
+  opts="$opts usepeerdns"
+fi
+if [ -n "${MRU}" ] ; then
+  opts="$opts mru ${MRU}"
+fi
+if [ -n "${MTU}" ] ; then
+  opts="$opts mtu ${MTU}"
+fi
+if [ -n "${IPADDR}${REMIP}" ] ; then
+  # if either IP address is set, the following will work.
+  opts="$opts ${IPADDR}:${REMIP}"
+fi
+if [ -n "${PAPNAME}" ] ; then
+  opts="$opts user ${PAPNAME} remotename ${DEVNAME}"
+fi
+if [ "${DEBUG}" = yes ] ; then
+  opts="$opts debug"
+fi
+
+if [ ${DEMAND} = yes ] ; then
+  opts="$opts demand ktune idle ${IDLETIMEOUT} holdoff ${RETRYTIMEOUT}"
+  exec=
+else
+  opts="$opts nodetach"
+  exec=exec
+fi
+
+/usr/bin/logger -p daemon.info -t ifup-ppp \
+  $"pppd started for ${DEVNAME} on ${MODEMPORT} at ${LINESPEED}"
+
+$exec pppd $opts ${MODEMPORT} ${LINESPEED} \
+    ipparam ${DEVNAME} linkname ${DEVNAME} call ${DEVNAME}\
+    noauth \
+    ${PPPOPTIONS} || exit
+
+if [ "${DEMAND}" = "yes" ] ; then
+  # pppd is a tad slow to write the pid-file.
+  sleep 2
+  if [ -f /var/run/ppp-${DEVNAME}.pid ] ; then
+    REALDEVICE=$(tail -1 /var/run/ppp-${DEVNAME}.pid)
+    /etc/sysconfig/network-scripts/ifup-routes ${REALDEVICE} ${DEVNAME}
+  fi
+fi
+

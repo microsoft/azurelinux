@@ -1,0 +1,32 @@
+--- commons-dbcp2-2.1.1-src/build.xml	2018-05-15 11:17:10.227422992 +0200
++++ commons-dbcp2-2.1.1-src/build.xml	2018-05-15 11:24:49.257464289 +0200
+@@ -58,7 +58,8 @@
+       <property name="src.java.dir" value="${src.dir}/main/java"/>
+       <property name="src.resource.dir" value="${src.dir}/main/resources"/>
+       <property name="src.test.dir" value="${src.dir}/test/java"/>
+-      <property name="javac.source" value="1.7" />
++      <property name="javac.source" value="8" />
++      <property name="javac.target" value="8" />
+ 
+       <property name="test.failonerror" value="true" /> 
+       <property name="test.runner" value="junit.textui.TestRunner" /> 
+@@ -161,7 +160,8 @@
+              debug="${javac.debug}"
+              deprecation="${javac.deprecation}"
+              optimize="${javac.optimize}"
+-             source="${javac.source}">
++             source="${javac.source}"
++             target="${javac.target}">
+       </javac>
+       <copy todir="${build.classes.dir}" >
+         <fileset dir="${src.resource.dir}"/>
+@@ -176,7 +176,8 @@
+              includeantruntime="false"
+              deprecation="${javac.deprecation}"
+              optimize="${javac.optimize}"
+-             source="${javac.source}">
++             source="${javac.source}"
++             target="${javac.target}">
+         <classpath>
+           <pathelement location="${build.classes.dir}" /> 
+           <pathelement location="${build.test-classes.dir}" /> 

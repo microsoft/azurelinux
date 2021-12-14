@@ -1,0 +1,26 @@
+From 0fdb22ef3d3cc3b297372451d60bd6c61d047d27 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Thu, 10 Apr 2014 10:08:41 +0200
+Subject: [PATCH 24/27] build-sys: install pppoatm plugin files with standard
+ perms
+
+---
+ pppd/plugins/pppoatm/Makefile.linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pppd/plugins/pppoatm/Makefile.linux b/pppd/plugins/pppoatm/Makefile.linux
+index 769794b..4c5826f 100644
+--- a/pppd/plugins/pppoatm/Makefile.linux
++++ b/pppd/plugins/pppoatm/Makefile.linux
+@@ -37,7 +37,7 @@ $(PLUGIN): $(PLUGIN_OBJS)
+ 
+ install: all
+ 	$(INSTALL) -d -m 755 $(LIBDIR)
+-	$(INSTALL) -c -m 4550 $(PLUGIN) $(LIBDIR)
++	$(INSTALL) -c -m 755 $(PLUGIN) $(LIBDIR)
+ 
+ clean:
+ 	rm -f *.o *.so
+-- 
+1.8.3.1
+

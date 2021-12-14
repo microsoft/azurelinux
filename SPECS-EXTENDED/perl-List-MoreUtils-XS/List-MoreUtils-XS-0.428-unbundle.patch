@@ -1,0 +1,41 @@
+--- Makefile.PL
++++ Makefile.PL
+@@ -13,18 +13,8 @@ BEGIN
+     }
+ }
+ 
+-use inc::latest 'Capture::Tiny';
+-use inc::latest 'Config::AutoConf';
+-
+-if (inc::latest->can("write"))
+-{
+-    inc::latest->write("inc");
+-    for my $mod (inc::latest->loaded_modules)
+-    {
+-        inc::latest->bundle_module($mod, "inc");
+-    }
+-}
+-
++use Capture::Tiny;
++use Config::AutoConf;
+ use ExtUtils::MakeMaker;
+ 
+ use inc::Config::AutoConf::LMU ();
+@@ -48,7 +38,6 @@ my %RUN_DEPS = (
+     'XSLoader' => "0.22",
+ );
+ my %BUNDLE_CONFIGURE_DEPS = (
+-    'inc::latest'      => '0.500',
+     'Config::AutoConf' => '0.315',
+ );
+ my %CONFIGURE_DEPS = (
+--- t/lib/Test/LMU.pm
++++ t/lib/Test/LMU.pm
+@@ -16,7 +16,6 @@ my $CLASS = __PACKAGE__;
+ eval "use Storable qw();";
+ $@ or Storable->import(qw(freeze));
+ __PACKAGE__->can("freeze") or eval <<'EOFR';
+-use inc::latest 'JSON::PP';
+ use JSON::PP qw();
+ sub freeze {
+     my $json = JSON::PP->new();

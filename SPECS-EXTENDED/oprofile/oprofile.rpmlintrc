@@ -1,0 +1,7 @@
+# This line is mandatory to access the configuration functions
+from Config import *
+
+# Because reference via bfd_abort()
+addFilter ("oprofile.*shared-lib-calls-exit")
+# Because the library is called libopagent1
+addFilter ("oprofile-devel.*no-dependency-on")

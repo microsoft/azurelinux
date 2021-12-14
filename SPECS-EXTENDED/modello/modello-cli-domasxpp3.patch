@@ -1,0 +1,22 @@
+--- modello-1.9.1/modello-core/src/main/java/org/codehaus/modello/ModelloCli.java	2019-03-15 15:06:08.911975772 +0100
++++ modello-1.9.1/modello-core/src/main/java/org/codehaus/modello/ModelloCli.java	2019-03-15 15:07:02.920265437 +0100
+@@ -121,6 +121,11 @@
+         {
+             parameters.setProperty( ModelloParameterConstants.ENCODING, args[6] );
+         }
++
++        if ( args.length > 7 )
++        {
++            parameters.setProperty( ModelloParameterConstants.DOM_AS_XPP3, args[7] );
++        }
+     }
+ 
+     // ----------------------------------------------------------------------
+@@ -130,6 +135,6 @@
+     private static void usage()
+     {
+         System.err.println( "Usage: modello <model> <outputType> <output directory> <modelVersion> <packageWithVersion>"
+-                            + "<useJava5> [<encoding>]" );
++                            + " <useJava5> [<encoding> [<domAsXpp3>]]" );
+     }
+ }

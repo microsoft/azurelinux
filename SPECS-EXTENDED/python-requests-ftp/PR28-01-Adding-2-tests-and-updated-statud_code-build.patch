@@ -1,0 +1,22 @@
+diff -purN requests-ftp-0.3.1.orig/requests_ftp/ftp.py requests-ftp-0.3.1/requests_ftp/ftp.py
+--- requests-ftp-0.3.1.orig/requests_ftp/ftp.py	2015-08-13 16:57:27.000000000 -0400
++++ requests-ftp-0.3.1/requests_ftp/ftp.py	2018-08-02 10:13:15.801731787 -0400
+@@ -99,7 +99,7 @@ def build_text_response(request, data, c
+ 
+ def build_binary_response(request, data, code):
+     '''Build a response for data whose encoding is unknown.'''
+-    return build_response(request, data, code,  None)
++    return build_response(request, data, code, None)
+ 
+ 
+ def build_response(request, data, code, encoding):
+@@ -113,7 +113,8 @@ def build_response(request, data, code,
+     response.raw = data
+     response.url = request.url
+     response.request = request
+-    response.status_code = int(code.split()[0])
++    last_valid_line_from_code = [line for line in code.split('\n') if line][-1]
++    response.status_code = int(last_valid_line_from_code.split()[0])
+     if hasattr(data, "content_len"):
+         response.headers['Content-Length'] = str(data.content_len)
+ 

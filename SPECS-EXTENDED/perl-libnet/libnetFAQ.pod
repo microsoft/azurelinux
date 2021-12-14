@@ -1,0 +1,6 @@
+=encoding utf-8
+
+The L<libnetFAQ document is not distributed because of the
+license|https://rt.cpan.org/Public/Bug/Display.html?id=117888>. You can
+access the original document on
+L<http://search.cpan.org/~shay/libnet/lib/Net/libnetFAQ.pod>.

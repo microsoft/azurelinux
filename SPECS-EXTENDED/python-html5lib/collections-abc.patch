@@ -1,0 +1,44 @@
+From 322a2d57bfdc52a9ce14bee93f9abb372cc08487 Mon Sep 17 00:00:00 2001
+From: 5j9 <5j9@users.noreply.github.com>
+Date: Sun, 23 Sep 2018 11:32:46 +0330
+Subject: [PATCH] Try to import MutableMapping from collections.abc
+
+Note that collections.abc has been added in Python 3.3.
+
+Fixes #402
+---
+ html5lib/_trie/_base.py      | 5 ++++-
+ html5lib/treebuilders/dom.py | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/html5lib/_trie/_base.py b/html5lib/_trie/_base.py
+index a1158bbb..6b71975f 100644
+--- a/html5lib/_trie/_base.py
++++ b/html5lib/_trie/_base.py
+@@ -1,6 +1,9 @@
+ from __future__ import absolute_import, division, unicode_literals
+ 
+-from collections import Mapping
++try:
++    from collections.abc import Mapping
++except ImportError:  # Python 2.7
++    from collections import Mapping
+ 
+ 
+ class Trie(Mapping):
+diff --git a/html5lib/treebuilders/dom.py b/html5lib/treebuilders/dom.py
+index dcfac220..d8b53004 100644
+--- a/html5lib/treebuilders/dom.py
++++ b/html5lib/treebuilders/dom.py
+@@ -1,7 +1,10 @@
+ from __future__ import absolute_import, division, unicode_literals
+ 
+ 
+-from collections import MutableMapping
++try:
++    from collections.abc import MutableMapping
++except ImportError:  # Python 2.7
++    from collections import MutableMapping
+ from xml.dom import minidom, Node
+ import weakref
+ 

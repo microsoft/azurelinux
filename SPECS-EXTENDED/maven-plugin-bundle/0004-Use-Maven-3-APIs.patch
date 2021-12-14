@@ -1,0 +1,77 @@
+From e0f3d1cddc9ce70d8290aafbdaa36e3aa56e5e9d Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 12 Oct 2016 23:43:00 +0200
+Subject: [PATCH 4/4] Use Maven 3 APIs
+
+---
+ pom.xml                                                 | 17 +++++++++++------
+ .../org/apache/felix/bundleplugin/BundlePlugin.java     |  4 ++--
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 144f5ad..cf3d7dc 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -182,7 +192,17 @@
+   <dependency>
+    <groupId>org.apache.maven</groupId>
+    <artifactId>maven-core</artifactId>
+-   <version>2.2.0</version>
++   <version>3.3.9</version>
++  </dependency>
++  <dependency>
++   <groupId>org.apache.maven</groupId>
++   <artifactId>maven-compat</artifactId>
++   <version>3.3.9</version>
++  </dependency>
++  <dependency>
++   <groupId>org.apache.maven.reporting</groupId>
++   <artifactId>maven-reporting-impl</artifactId>
++   <version>2.4</version>
+   </dependency>
+   <dependency>
+    <groupId>org.apache.maven</groupId>
+@@ -225,11 +234,6 @@
+    <version>1.1</version>
+    <scope>test</scope>
+   </dependency>
+-  <dependency>
+-   <groupId>org.jdom</groupId>
+-   <artifactId>jdom</artifactId>
+-   <version>1.1</version>
+-  </dependency>
+  </dependencies>
+ 
+  <reporting>
+diff --git a/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java b/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
+index c858b6b..5023569 100644
+--- a/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
++++ b/src/main/java/org/apache/felix/bundleplugin/BundlePlugin.java
+@@ -46,7 +46,6 @@ import java.util.TreeMap;
+ import java.util.jar.Attributes;
+ import java.util.jar.Manifest;
+ 
+-import org.apache.felix.bundleplugin.pom.PomWriter;
+ import org.apache.maven.archiver.ManifestSection;
+ import org.apache.maven.archiver.MavenArchiveConfiguration;
+ import org.apache.maven.archiver.MavenArchiver;
+@@ -63,6 +62,7 @@ import org.apache.maven.model.Exclusion;
+ import org.apache.maven.model.License;
+ import org.apache.maven.model.Model;
+ import org.apache.maven.model.Resource;
++import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+ import org.apache.maven.plugin.AbstractMojo;
+ import org.apache.maven.plugin.MojoExecutionException;
+ import org.apache.maven.plugin.MojoFailureException;
+@@ -864,7 +864,7 @@ public class BundlePlugin extends AbstractMojo
+ 
+                 try
+                 {
+-                    PomWriter.write( w, model, true );
++                    new MavenXpp3Writer().write( w, model );
+                 }
+                 finally
+                 {
+-- 
+2.14.3
+

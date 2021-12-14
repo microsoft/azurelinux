@@ -1,0 +1,78 @@
+diff --git a/.classpath b/.classpath
+index 010483ca2..b7324e612 100644
+--- a/.classpath
++++ b/.classpath
+@@ -30,7 +30,6 @@
+ 	<classpathentry kind="lib" path="/usr/share/java/idm-console-base.jar"/>
+ 	<classpathentry kind="lib" path="/usr/share/java/idm-console-mcc.jar"/>
+ 	<classpathentry kind="lib" path="/usr/share/java/idm-console-nmclf.jar"/>
+-	<classpathentry kind="lib" path="/usr/share/java/jakarta-commons-httpclient.jar"/>
+ 	<classpathentry kind="lib" path="/usr/share/java/junit.jar"/>
+ 	<classpathentry kind="lib" path="/usr/share/java/ldapjdk.jar"/>
+ 	<classpathentry kind="lib" path="/usr/share/java/jaxb-api.jar"/>
+diff --git a/base/common/src/main/java/com/netscape/certsrv/client/PKIConnection.java b/base/common/src/main/java/com/netscape/certsrv/client/PKIConnection.java
+index 769a640cd..4f5d4f97c 100644
+--- a/base/common/src/main/java/com/netscape/certsrv/client/PKIConnection.java
++++ b/base/common/src/main/java/com/netscape/certsrv/client/PKIConnection.java
+@@ -33,7 +33,6 @@ import java.util.List;
+ 
+ import javax.ws.rs.client.WebTarget;
+ 
+-import org.apache.commons.httpclient.ConnectTimeoutException;
+ import org.apache.http.Header;
+ import org.apache.http.HttpEntity;
+ import org.apache.http.HttpEntityEnclosingRequest;
+@@ -288,8 +287,7 @@ public class PKIConnection {
+                 InetSocketAddress localAddress,
+                 HttpParams params)
+                 throws IOException,
+-                UnknownHostException,
+-                ConnectTimeoutException {
++                UnknownHostException {
+ 
+             // Make sure certificate database is already initialized,
+             // otherwise SSLSocket will throw UnsatisfiedLinkError.
+diff --git a/pki.spec b/pki.spec
+index 50484a71d..542b5b101 100644
+--- a/pki.spec
++++ b/pki.spec
+@@ -172,7 +172,6 @@ BuildRequires:    apache-commons-codec
+ BuildRequires:    apache-commons-io
+ BuildRequires:    apache-commons-lang3 >= 3.2
+ BuildRequires:    apache-commons-net
+-BuildRequires:    jakarta-commons-httpclient
+ BuildRequires:    glassfish-jaxb-api
+ BuildRequires:    slf4j
+ BuildRequires:    slf4j-jdk14
+@@ -421,7 +420,6 @@ Requires:         apache-commons-io
+ Requires:         apache-commons-lang3 >= 3.2
+ Requires:         apache-commons-logging
+ Requires:         apache-commons-net
+-Requires:         jakarta-commons-httpclient
+ Requires:         glassfish-jaxb-api
+ Requires:         slf4j
+ Requires:         slf4j-jdk14
+diff --git a/scripts/compose_pki_test_package b/scripts/compose_pki_test_package
+index 9a43baefe..1e4ac1a8f 100755
+--- a/scripts/compose_pki_test_package
++++ b/scripts/compose_pki_test_package
+@@ -116,7 +116,6 @@ CLASSPATH=$CLASSPATH:/usr/share/java/commons-httpclient.jar
+ CLASSPATH=$CLASSPATH:/usr/share/java/idm-console-base-1.1.7.jar
+ CLASSPATH=$CLASSPATH:/usr/share/java/idm-console-mcc.jar
+ CLASSPATH=$CLASSPATH:/usr/share/java/idm-console-nmclf.jar
+-CLASSPATH=$CLASSPATH:/usr/share/java/jakarta-commons-httpclient.jar
+ CLASSPATH=$CLASSPATH:/usr/share/java/jaxb-api.jar
+ CLASSPATH=$CLASSPATH:/usr/share/java/jaxb/jaxb-impl.jar
+ CLASSPATH=$CLASSPATH:/usr/share/java/jakarta-activation/jakarta.activation.jar
+diff --git a/tests/dogtag/dev_java_tests/run_junit_tests.sh b/tests/dogtag/dev_java_tests/run_junit_tests.sh
+index 86fe71864..55df6c391 100644
+--- a/tests/dogtag/dev_java_tests/run_junit_tests.sh
++++ b/tests/dogtag/dev_java_tests/run_junit_tests.sh
+@@ -52,7 +52,6 @@ run_dev_junit_tests() {
+     CLASSPATH=$CLASSPATH:/usr/share/java/idm-console-base-1.1.7.jar
+     CLASSPATH=$CLASSPATH:/usr/share/java/idm-console-mcc.jar
+     CLASSPATH=$CLASSPATH:/usr/share/java/idm-console-nmclf.jar
+-    CLASSPATH=$CLASSPATH:/usr/share/java/jakarta-commons-httpclient.jar
+     CLASSPATH=$CLASSPATH:/usr/share/java/jaxb-api.jar
+     CLASSPATH=$CLASSPATH:/usr/share/java/jakarta-activation/jakarta.activation.jar
+     CLASSPATH=$CLASSPATH:/usr/share/java/ldapjdk.jar

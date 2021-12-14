@@ -1,11 +1,7 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-
 %global upname cython
-
 Name:           Cython
 Version:        0.29.13
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Language for writing Python extension modules
 Vendor:         Microsoft
 Distribution:   Mariner
@@ -13,6 +9,7 @@ License:        ASL 2.0
 URL:            https://www.cython.org
 #Source0:       https://github.com/%{upname}/%{upname}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         cython-py38.patch
 
 BuildRequires:  gcc
 BuildRequires:  python3-devel
@@ -39,7 +36,7 @@ Requires:      python3
 Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex). It makes writing C extensions for Python as easy as Python itself.
 
 %prep
-%setup -n %{upname}-%{version}
+%autosetup -p1 -n %{upname}-%{version}
 
 %build
 python3 setup.py build
@@ -50,7 +47,7 @@ python3 setup.py install --skip-build --root=%{buildroot}
 rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %files -n python3-%{name}
-%license LICENSE.txt
+%license LICENSE.txt COPYING.txt
 %doc *.txt Demos Doc Tools
 %{_bindir}/cython
 %{_bindir}/cygdb
@@ -62,6 +59,10 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 %{python3_sitearch}/__pycache__/%{upname}.*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.29.13-7
+- Add upstream patch to enable generating code for Python >= 3.8
+- License verified
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.29.13-6
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 

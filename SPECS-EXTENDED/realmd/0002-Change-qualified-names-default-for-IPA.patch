@@ -1,0 +1,113 @@
+From 21ab1fdd127d242a9b4e95c3c90dd2bf3159d149 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Tue, 14 Aug 2018 16:44:39 +0200
+Subject: [PATCH 2/3] Change qualified names default for IPA
+
+In a FreeIPA domain it is typically expected that the IPA accounts use
+sort names while accounts from trusted domains have fully qualified
+names. This is automatically done by SSSD's IPA provider so there is no
+need to force fully qualified names in the SSSD configuration.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1575538
+---
+ service/realm-options.c       | 9 +++++----
+ service/realm-options.h       | 3 ++-
+ service/realm-samba-winbind.c | 2 +-
+ service/realm-sssd-ad.c       | 2 +-
+ service/realm-sssd-ipa.c      | 2 +-
+ 5 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/service/realm-options.c b/service/realm-options.c
+index bd804ea..34a209f 100644
+--- a/service/realm-options.c
++++ b/service/realm-options.c
+@@ -98,7 +98,7 @@ realm_options_automatic_mapping (GVariant *options,
+ 
+ 	if (realm_name && !option) {
+ 		section = g_utf8_casefold (realm_name, -1);
+-		mapping = realm_settings_boolean (realm_name, REALM_DBUS_OPTION_AUTOMATIC_ID_MAPPING, TRUE);
++		mapping = realm_settings_boolean (section, REALM_DBUS_OPTION_AUTOMATIC_ID_MAPPING, TRUE);
+ 		g_free (section);
+ 	}
+ 
+@@ -112,20 +112,21 @@ realm_options_automatic_join (const gchar *realm_name)
+ 	gboolean mapping;
+ 
+ 	section = g_utf8_casefold (realm_name, -1);
+-	mapping = realm_settings_boolean (realm_name, "automatic-join", FALSE);
++	mapping = realm_settings_boolean (section, "automatic-join", FALSE);
+ 	g_free (section);
+ 
+ 	return mapping;
+ }
+ 
+ gboolean
+-realm_options_qualify_names (const gchar *realm_name)
++realm_options_qualify_names (const gchar *realm_name,
++                             gboolean def)
+ {
+ 	gchar *section;
+ 	gboolean qualify;
+ 
+ 	section = g_utf8_casefold (realm_name, -1);
+-	qualify = realm_settings_boolean (realm_name, "fully-qualified-names", TRUE);
++	qualify = realm_settings_boolean (section, "fully-qualified-names", def);
+ 	g_free (section);
+ 
+ 	return qualify;
+diff --git a/service/realm-options.h b/service/realm-options.h
+index 7a1355e..b71d219 100644
+--- a/service/realm-options.h
++++ b/service/realm-options.h
+@@ -37,7 +37,8 @@ const gchar *  realm_options_user_principal           (GVariant *options,
+ gboolean       realm_options_automatic_mapping        (GVariant *options,
+ 						       const gchar *realm_name);
+ 
+-gboolean       realm_options_qualify_names            (const gchar *realm_name);
++gboolean       realm_options_qualify_names            (const gchar *realm_name,
++                                                       gboolean def);
+ 
+ gboolean       realm_options_check_domain_name        (const gchar *domain_name);
+ 
+diff --git a/service/realm-samba-winbind.c b/service/realm-samba-winbind.c
+index 9335e26..61988eb 100644
+--- a/service/realm-samba-winbind.c
++++ b/service/realm-samba-winbind.c
+@@ -102,7 +102,7 @@ realm_samba_winbind_configure_async (RealmIniConfig *config,
+ 		                      "winbind enum groups", "no",
+ 		                      "winbind offline logon", "yes",
+ 		                      "winbind refresh tickets", "yes",
+-		                      "winbind use default domain", realm_options_qualify_names (domain_name )? "no" : "yes",
++		                      "winbind use default domain", realm_options_qualify_names (domain_name, TRUE )? "no" : "yes",
+ 		                      "template shell", realm_settings_string ("users", "default-shell"),
+ 		                      NULL);
+ 
+diff --git a/service/realm-sssd-ad.c b/service/realm-sssd-ad.c
+index 8543ca8..de7ce30 100644
+--- a/service/realm-sssd-ad.c
++++ b/service/realm-sssd-ad.c
+@@ -172,7 +172,7 @@ configure_sssd_for_domain (RealmIniConfig *config,
+ 	gchar *home;
+ 
+ 	home = realm_sssd_build_default_home (realm_settings_string ("users", "default-home"));
+-	qualify = realm_options_qualify_names (disco->domain_name);
++	qualify = realm_options_qualify_names (disco->domain_name, TRUE);
+ 	shell = realm_settings_string ("users", "default-shell");
+ 	explicit_computer_name = realm_options_computer_name (options, disco->domain_name);
+ 	realmd_tags = g_string_new ("");
+diff --git a/service/realm-sssd-ipa.c b/service/realm-sssd-ipa.c
+index ff1dc8a..5029f6b 100644
+--- a/service/realm-sssd-ipa.c
++++ b/service/realm-sssd-ipa.c
+@@ -201,7 +201,7 @@ on_ipa_client_do_restart (GObject *source,
+ 
+ 		realm_sssd_config_update_domain (config, domain, &error,
+ 		                                 "cache_credentials", "True",
+-		                                 "use_fully_qualified_names", realm_options_qualify_names (domain) ? "True" : "False",
++		                                 "use_fully_qualified_names", realm_options_qualify_names (domain, FALSE) ? "True" : "False",
+ 		                                 "krb5_store_password_if_offline", "True",
+ 		                                 "default_shell", shell,
+ 		                                 "fallback_homedir", home,
+-- 
+2.17.1
+

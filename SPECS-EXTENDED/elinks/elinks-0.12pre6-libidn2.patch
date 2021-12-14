@@ -1,0 +1,110 @@
+From 496afe1f27481eb45ac14df0bfdb287b95eefbdd Mon Sep 17 00:00:00 2001
+From: Robert Scheck <redhat-bugzilla@linuxnetz.de>
+Date: Fri, 30 May 2014 15:28:54 +0200
+Subject: [PATCH] Add support for GNU Libidn2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Patch by Robert Scheck <robert@fedoraproject.org> for elinks >= 0.12 which replaces current
+GNU Libidn support (IDNA 2003) by GNU Libidn2 support (IDNA 2008). This is e.g. allowing
+the 'ß' character in domain names. See also the Red Hat Bugzilla #1098789 for some further
+information: https://bugzilla.redhat.com/show_bug.cgi?id=1098789
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ Makefile.config.in      |  2 +-
+ configure.in            |  4 ++--
+ src/osdep/win32/win32.c |  2 +-
+ src/protocol/uri.c      | 18 +++++++-----------
+ 4 files changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/Makefile.config.in b/Makefile.config.in
+index fe1a559..829d350 100644
+--- a/Makefile.config.in
++++ b/Makefile.config.in
+@@ -130,7 +130,7 @@ CONFIG_GOPHER = @CONFIG_GOPHER@
+ CONFIG_GPM = @CONFIG_GPM@
+ CONFIG_GZIP = @CONFIG_GZIP@
+ CONFIG_HTML_HIGHLIGHT = @CONFIG_HTML_HIGHLIGHT@
+-CONFIG_IDN = @CONFIG_IDN@
++CONFIG_IDN2 = @CONFIG_IDN2@
+ CONFIG_INTERLINK = @CONFIG_INTERLINK@
+ CONFIG_IPV6 = @CONFIG_IPV6@
+ CONFIG_JW = @CONFIG_JW@
+diff --git a/configure.in b/configure.in
+index 3ef8603..3f74d9c 100644
+--- a/configure.in
++++ b/configure.in
+@@ -473,8 +473,8 @@ EL_CONFIG_OPTIONAL_LIBRARY(CONFIG_GZIP, zlib, zlib.h, z, gzclearerr,
+ EL_CONFIG_OPTIONAL_LIBRARY(CONFIG_BZIP2, bzlib, bzlib.h, bz2, BZ2_bzReadOpen,
+ 	[  --without-bzlib         disable bzlib support])
+ 
+-EL_CONFIG_OPTIONAL_LIBRARY(CONFIG_IDN, idn, idna.h, idn, stringprep_check_version,
+-	[  --without-idn           disable international domain names support])
++EL_CONFIG_OPTIONAL_LIBRARY(CONFIG_IDN2, idn2, idn2.h, idn2, idn2_lookup_ul,
++	[  --without-idn2           disable international domain names support])
+ 
+ if test "x${with_gc}" != xno; then
+ 	EL_CONFIG_OPTIONAL_LIBRARY(CONFIG_GC, gc, gc.h, gc, GC_init,
+diff --git a/src/osdep/win32/win32.c b/src/osdep/win32/win32.c
+index 66b2128..e870a6e 100644
+--- a/src/osdep/win32/win32.c
++++ b/src/osdep/win32/win32.c
+@@ -48,7 +48,7 @@ init_osdep(void)
+ #ifdef HAVE_LOCALE_H
+ 	setlocale(LC_ALL, "");
+ #endif
+-#ifdef CONFIG_IDN
++#ifdef CONFIG_IDN2
+ 	{
+ 		char buf[60];
+ 		UINT cp = GetACP();
+diff --git a/src/protocol/uri.c b/src/protocol/uri.c
+index 5e23ea2..8987567 100644
+--- a/src/protocol/uri.c
++++ b/src/protocol/uri.c
+@@ -6,8 +6,8 @@
+ 
+ #include <ctype.h>
+ #include <errno.h>
+-#ifdef HAVE_IDNA_H
+-#include <idna.h>
++#ifdef HAVE_IDN2_H
++#include <idn2.h>
+ #endif
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -531,24 +531,20 @@ add_uri_to_string(struct string *string, const struct uri *uri,
+ 		 * --pasky */
+ 		if (uri->ipv6 && wants(URI_PORT)) add_char_to_string(string, '[');
+ #endif
+-#ifdef CONFIG_IDN
++#ifdef CONFIG_IDN2
+ 		/* Support for the GNU International Domain Name library.
+ 		 *
+-		 * http://www.gnu.org/software/libidn/manual/html_node/IDNA-Functions.html
+-		 *
+-		 * Now it is probably not perfect because idna_to_ascii_lz()
+-		 * will be using a ``zero terminated input string encoded in
+-		 * the current locale's character set''. Anyway I don't know
+-		 * how to convert anything to UTF-8 or Unicode. --jonas */
++		 * http://www.gnu.org/software/libidn/libidn2/manual/libidn2.html
++		 */
+ 		if (wants(URI_IDN)) {
+ 			unsigned char *host = memacpy(uri->host, uri->hostlen);
+ 
+ 			if (host) {
+ 				char *idname;
+-				int code = idna_to_ascii_lz(host, &idname, 0);
++				int code = idn2_lookup_ul(host, &idname, 0);
+ 
+ 				/* FIXME: Return NULL if it coughed? --jonas */
+-				if (code == IDNA_SUCCESS) {
++				if (code == IDN2_OK) {
+ 					add_to_string(string, idname);
+ 					free(idname);
+ 					add_host = 0;
+-- 
+1.9.3
+

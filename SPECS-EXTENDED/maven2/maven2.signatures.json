@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "generate-tarball.sh": "ca71be6973216d7e35e447330fd859a3cafb2bda9187bf1ad583a1f21ca6707b",
+  "maven2-2.2.1.tar.gz": "39f7e06bd98ef28178a90e917ce8ee7c74db0829da6938a49cd72272cfedfcb3",
+  "maven2-build.tar.xz": "64cf4a8d5e78dfc7dceab7c9170591883a79c66ffd5e5b7d7e083070ef978c57"
+ }
+}

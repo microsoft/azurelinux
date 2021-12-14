@@ -1,0 +1,13 @@
+--- src/st_list.c.orig	2008-08-27 11:32:47.000000000 +1000
++++ src/st_list.c	2008-08-27 10:24:34.000000000 +1000
+@@ -662,7 +662,9 @@
+   g_return_if_fail(b != NULL);
+ 
+   mwString_get(b, &str);
+-  list_get(str, l);
+-  g_free(str);
++  if (str) {
++    list_get(str, l);
++    g_free(str);
++  }
+ }

@@ -1,0 +1,11 @@
+--- netpbm-10.35/converter/other/xwdtopnm.c.xwdfix	2006-09-18 13:24:50.000000000 +0200
++++ netpbm-10.35/converter/other/xwdtopnm.c	2006-09-18 13:27:26.000000000 +0200
+@@ -945,7 +945,7 @@ getpix(pixelReader * const rdrP) {
+             unsigned long const bitsToTakeMask = lsbmask[nBitsToTake];
+                 /* E.g. if nbitsToTake is 4, this is 0x0000000F */
+ 
+-            unsigned long bitsToTake;
++            unsigned int bitsToTake;
+                 /* The actual bits we take, in the 'nBitsToTake' low bits */
+ 
+             assert(nBitsToTake <= 32);

@@ -1,0 +1,219 @@
+Author: Mark Salter <msalter@redhat.com>
+
+Index: ATLAS/CONFIG/include/atlconf.h
+===================================================================
+--- ATLAS.orig/CONFIG/include/atlconf.h
++++ ATLAS/CONFIG/include/atlconf.h
+@@ -16,9 +16,9 @@ enum OSTYPE {OSOther=0, OSLinux, OSSunOS
+                        ((OS_) == OSWin64) )
+ 
+ enum ARCHFAM {AFOther=0, AFPPC, AFSPARC, AFALPHA, AFX86, AFIA64, AFMIPS,
+-              AFARM, AFS390};
++              AFARM, AFS390, AFAARCH64};
+ 
+-#define NMACH 52
++#define NMACH 53
+ static char *machnam[NMACH] =
+    {"UNKNOWN", "POWER3", "POWER4", "POWER5", "PPCG4", "PPCG5",
+     "POWER6", "POWER7", "POWERe6500", "IBMz9", "IBMz10", "IBMz196",
+@@ -29,7 +29,7 @@ static char *machnam[NMACH] =
+     "Efficeon", "K7", "HAMMER", "AMD64K10h", "AMDLLANO", "AMDDOZER","AMDDRIVER",
+     "UNKNOWNx86", "IA64Itan", "IA64Itan2",
+     "USI", "USII", "USIII", "USIV", "UST1", "UST2", "UnknownUS",
+-    "MIPSR1xK", "MIPSICE9", "ARMv7"};
++    "MIPSR1xK", "MIPSICE9", "ARMv7", "AARCH64"};
+ enum MACHTYPE {MACHOther, IbmPwr3, IbmPwr4, IbmPwr5, PPCG4, PPCG5,
+                IbmPwr6, IbmPwr7, Pwre6500,
+                IbmZ9, IbmZ10, IbmZ196,  /* s390(x) in Linux */
+@@ -42,7 +42,8 @@ enum MACHTYPE {MACHOther, IbmPwr3, IbmPw
+                SunUSI, SunUSII, SunUSIII, SunUSIV, SunUST1, SunUST2, SunUSX,
+                MIPSR1xK, /* includes R10K, R12K, R14K, R16K */
+                MIPSICE9,  /* SiCortex ICE9 -- like MIPS5K */
+-               ARMv7      /* includes Cortex A8, A9 */
++               ARMv7,     /* includes Cortex A8, A9 */
++               AARCH64
+                };
+ #define MachIsX86(mach_) \
+    ( (mach_) >= x86x87 && (mach_) <= x86X )
+@@ -63,6 +64,8 @@ enum MACHTYPE {MACHOther, IbmPwr3, IbmPw
+    ( (mach_) == ARMv7 )
+ #define MachIsS390(mach_) \
+    ( (mach_) >= IbmZ9 && (mach_) <= IbmZ196 )
++#define MachIsAARCH64(mach_) \
++   ( (mach_) == AARCH64 )
+ 
+ 
+ static char *f2c_namestr[5] = {"UNKNOWN","Add_", "Add__", "NoChange", "UpCase"};
+@@ -84,13 +87,13 @@ enum ISAEXT
+    {ISA_None=0, ISA_VSX, ISA_AV, ISA_AVXMAC, ISA_AVXFMA4, ISA_AVX,
+     ISA_SSE3, ISA_SSE2, ISA_SSE1, ISA_3DNow, ISA_NEON};
+ 
+-#define NASMD 9
++#define NASMD 10
+ enum ASMDIA
+    {ASM_None=0, gas_x86_32, gas_x86_64, gas_sparc, gas_ppc, gas_parisc,
+-    gas_mips, gas_arm, gas_s390};
++    gas_mips, gas_arm, gas_s390, gas_aarch64};
+ static char *ASMNAM[NASMD] =
+    {"",     "GAS_x8632", "GAS_x8664", "GAS_SPARC", "GAS_PPC", "GAS_PARISC",
+-    "GAS_MIPS", "GAS_ARM", "GAS_S390"};
++    "GAS_MIPS", "GAS_ARM", "GAS_S390", "GAS_AARCH64"};
+ 
+ /*
+  * Used for archinfo probes (can pack in bitfield)
+Index: ATLAS/CONFIG/src/Makefile
+===================================================================
+--- ATLAS.orig/CONFIG/src/Makefile
++++ ATLAS/CONFIG/src/Makefile
+@@ -260,6 +260,11 @@ IRun_BINDP :
+                 redir=config0.out
+ 	- cat config0.out
+ 
++IRun_GAS_AARCH64 :
++	$(CC) $(CCFLAGS) -o xprobe_gas_aarch64 $(SRCdir)/backend/probe_this_asm.c $(SRCdir)/backend/probe_gas_aarch64.S
++	$(MAKE) $(atlrun) atldir=$(mydir) exe=xprobe_gas_aarch64 args="$(args)" \
++                redir=config0.out
++	- cat config0.out
+ IRun_GAS_S390 :
+ 	$(CC) $(CCFLAGS) -o xprobe_gas_s390 $(SRCdir)/backend/probe_this_asm.c $(SRCdir)/backend/probe_gas_s390.S
+ 	$(MAKE) $(atlrun) atldir=$(mydir) exe=xprobe_gas_s390 args="$(args)" \
+Index: ATLAS/CONFIG/src/SpewMakeInc.c
+===================================================================
+--- ATLAS.orig/CONFIG/src/SpewMakeInc.c
++++ ATLAS/CONFIG/src/SpewMakeInc.c
+@@ -391,6 +391,8 @@ char *GetPtrbitsFlag(enum OSTYPE OS, enu
+ 
+    if (MachIsIA64(arch))
+       return(sp);
++   if (MachIsAARCH64(arch))
++      return(sp);
+    if (MachIsMIPS(arch))
+       return((ptrbits == 64) ? "-mabi=64" : "-mabi=n32");
+    if (MachIsS390(arch))
+Index: ATLAS/CONFIG/src/atlcomp.txt
+===================================================================
+--- ATLAS.orig/CONFIG/src/atlcomp.txt
++++ ATLAS/CONFIG/src/atlcomp.txt
+@@ -267,6 +267,17 @@ MACH=ARMv7 OS=ALL LVL=1000 COMPS=dmc,dkc
+ MACH=ARMv7 OS=ALL LVL=1000 COMPS=f77
+    'gfortran' '-mcpu=cortex-a8 -mfpu=vfpv3 -mfloat-abi=softfp -O'
+ #
++# AArch64 defaults
++#
++MACH=AARCH64 OS=ALL LVL=1000 COMPS=xcc
++   'gcc' '-O2'
++MACH=AARCH64 OS=ALL LVL=1000 COMPS=smc,skc,gcc,icc
++   'gcc' '-O2'
++MACH=AARCH64 OS=ALL LVL=1000 COMPS=dmc,dkc
++   'gcc' '-O2'
++MACH=AARCH64 OS=ALL LVL=1000 COMPS=f77
++   'gfortran' '-O'
++#
+ # Generic defaults
+ #
+ MACH=ALL OS=ALL LVL=5 COMPS=icc,smc,dmc,skc,dkc,xcc,gcc
+Index: ATLAS/CONFIG/src/atlconf_misc.c
+===================================================================
+--- ATLAS.orig/CONFIG/src/atlconf_misc.c
++++ ATLAS/CONFIG/src/atlconf_misc.c
+@@ -563,6 +563,7 @@ enum ARCHFAM ProbeArchFam(char *targ)
+       else if (strstr(res, "ia64")) fam = AFIA64;
+       else if (strstr(res, "mips")) fam = AFMIPS;
+       else if (strstr(res, "arm")) fam = AFARM;
++      else if (strstr(res, "aarch64")) fam = AFAARCH64;
+       else if (strstr(res, "s390")) fam = AFS390;
+       else if ( strstr(res, "i686") || strstr(res, "i586") ||
+                 strstr(res, "i486") || strstr(res, "i386") ||
+@@ -588,6 +589,7 @@ enum ARCHFAM ProbeArchFam(char *targ)
+                    strstr(res, "x86_64") ) fam = AFX86;
+          else if (strstr(res, "mips")) fam = AFMIPS;
+          else if (strstr(res, "arm")) fam = AFARM;
++         else if (strstr(res, "aarch64")) fam = AFAARCH64;
+          else if (strstr(res, "s390")) fam = AFS390;
+          free(res);
+       }
+Index: ATLAS/CONFIG/src/backend/Make.ext
+===================================================================
+--- ATLAS.orig/CONFIG/src/backend/Make.ext
++++ ATLAS/CONFIG/src/backend/Make.ext
+@@ -57,6 +57,8 @@ probe_gas_arm.S : $(basf)
+ 	$(extC) -b $(basf) -o probe_gas_arm.S rout=probe_gas_arm.S
+ probe_gas_s390.S : $(basf)
+ 	$(extC) -b $(basf) -o probe_gas_s390.S rout=probe_gas_s390.S
++probe_gas_aarch64.S : $(basf)
++	$(extC) -b $(basf) -o probe_gas_aarch64.S rout=probe_gas_aarch64.S
+ probe_AVXMAC.S : $(basf)
+ 	$(extC) -b $(basf) -o probe_AVXMAC.S rout=probe_AVXMAC.S
+ probe_AVXFMA4.S : $(basf)
+Index: ATLAS/CONFIG/src/backend/archinfo_linux.c
+===================================================================
+--- ATLAS.orig/CONFIG/src/backend/archinfo_linux.c
++++ ATLAS/CONFIG/src/backend/archinfo_linux.c
+@@ -267,6 +267,14 @@ enum MACHTYPE ProbeArch()
+          free(res);
+       }
+       break;
++   case AFAARCH64:
++      res = atlsys_1L(NULL, "fgrep 'Processor' /proc/cpuinfo", 0, 0);
++      if (res)
++      {
++         if (strstr(res, "AArch64")) mach = AARCH64;
++         free(res);
++      }
++      break;
+    default:
+ #if 0
+       if (!CmndOneLine(NULL, "fgrep 'cpu family' /proc/cpuinfo", res))
+Index: ATLAS/CONFIG/src/backend/probe_gas_aarch64.S
+===================================================================
+--- /dev/null
++++ ATLAS/CONFIG/src/backend/probe_gas_aarch64.S
+@@ -0,0 +1,14 @@
++#define ATL_GAS_AARCH64
++#include "atlas_asm.h"
++#
++# Linux AArch64 assembler for:
++# int asm_probe(int i)
++# RETURNS: i*3
++#
++.text
++.globl  ATL_asmdecor(asm_probe)
++.type   ATL_asmdecor(asm_probe), %function
++ATL_asmdecor(asm_probe):
++        add     w0, w0, w0, LSL #1
++        ret
++.size ATL_asmdecor(asm_probe),.-ATL_asmdecor(asm_probe)
+Index: ATLAS/CONFIG/src/probe_comp.c
+===================================================================
+--- ATLAS.orig/CONFIG/src/probe_comp.c
++++ ATLAS/CONFIG/src/probe_comp.c
+@@ -582,7 +582,7 @@ char *GetPtrbitsFlag(enum OSTYPE OS, enu
+    char *sp = "";
+    int i, j, k;
+ 
+-   if (MachIsIA64(arch))
++   if (MachIsIA64(arch) || MachIsAARCH64(arch))
+       return(sp);
+    if (MachIsMIPS(arch))
+       return((ptrbits == 64) ? "-mabi=64" : "-mabi=n32");
+Index: ATLAS/include/atlas_genparse.h
+===================================================================
+--- ATLAS.orig/include/atlas_genparse.h
++++ ATLAS/include/atlas_genparse.h
+@@ -6,13 +6,13 @@
+ #include <assert.h>
+ #include <string.h>
+ #include <ctype.h>
+-#define NASMD 9
++#define NASMD 10
+ enum ASMDIA
+    {ASM_None=0, gas_x86_32, gas_x86_64, gas_sparc, gas_ppc, gas_parisc,
+-    gas_mips, gas_arm, gas_s390};
++    gas_mips, gas_arm, gas_s390, gas_aarch64};
+ static char *ASMNAM[NASMD] =
+    {"",     "GAS_x8632", "GAS_x8664", "GAS_SPARC", "GAS_PPC", "GAS_PARISC",
+-    "GAS_MIPS", "GAS_ARM", "GAS_S390"};
++    "GAS_MIPS", "GAS_ARM", "GAS_S390", "GAS_AARCH64"};
+ /*
+  * Basic data structure for forming queues with some minimal info
+  */

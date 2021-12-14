@@ -1,0 +1,111 @@
+diff -up rp-pppoe-3.12/man/pppoe-server.8.ip-allocation rp-pppoe-3.12/man/pppoe-server.8
+--- rp-pppoe-3.12/man/pppoe-server.8.ip-allocation	2015-11-11 16:10:01.000000000 +0100
++++ rp-pppoe-3.12/man/pppoe-server.8	2015-11-16 16:48:52.457927211 +0100
+@@ -96,6 +96,11 @@ valid remote IP address to \fBpppd\fR.
+ of 10.67.15.1 is used.
+ 
+ .TP
++.B \-D
++Delegate the allocation of IP addresses to \fBpppd\fR.  If specified, no
++local and remote addresses passed to pppd.
++
++.TP
+ .B \-N \fInum\fR
+ Allows at most \fInum\fR concurrent PPPoE sessions.  If not specified,
+ the default is 64.
+diff -up rp-pppoe-3.12/src/pppoe-server.c.ip-allocation rp-pppoe-3.12/src/pppoe-server.c
+--- rp-pppoe-3.12/src/pppoe-server.c.ip-allocation	2015-11-11 16:10:04.000000000 +0100
++++ rp-pppoe-3.12/src/pppoe-server.c	2015-11-16 16:50:53.209195100 +0100
+@@ -176,6 +176,9 @@ char PppoeOptions[SMALLBUF] = "";
+ unsigned char LocalIP[IPV4ALEN] = {10, 0, 0, 1}; /* Counter optionally STARTS here */
+ unsigned char RemoteIP[IPV4ALEN] = {10, 67, 15, 1}; /* Counter STARTS here */
+ 
++/* Delegates the allocation of IP addresses to pppd (as the pptpd doing) */
++int DelegateIPAllocation = 0;
++
+ /* Do we increment local IP for each connection? */
+ int IncrLocalIP = 0;
+ 
+@@ -241,8 +244,8 @@ childHandler(pid_t pid, int status, void
+ 
+     memset(&conn, 0, sizeof(conn));
+     conn.hostUniq = NULL;
+-
+-    syslog(LOG_INFO,
++    if (!DelegateIPAllocation) {
++     syslog(LOG_INFO,
+ 	   "Session %u closed for client "
+ 	   "%02x:%02x:%02x:%02x:%02x:%02x (%d.%d.%d.%d) on %s",
+ 	   (unsigned int) ntohs(session->sess),
+@@ -251,6 +254,15 @@ childHandler(pid_t pid, int status, void
+ 	   (int) session->realpeerip[0], (int) session->realpeerip[1],
+ 	   (int) session->realpeerip[2], (int) session->realpeerip[3],
+ 	   session->ethif->name);
++    } else {
++		syslog(LOG_INFO,
++      "Session %u closed for client "
++      "%02x:%02x:%02x:%02x:%02x:%02x on %s",
++      (unsigned int) ntohs(session->sess),
++      session->eth[0], session->eth[1], session->eth[2],
++      session->eth[3], session->eth[4], session->eth[5],
++      session->ethif->name);
++    }
+     memcpy(conn.myEth, session->ethif->mac, ETH_ALEN);
+     conn.discoverySocket = session->ethif->sock;
+     conn.session = session->sess;
+@@ -1134,6 +1146,7 @@ usage(char const *argv0)
+     fprintf(stderr, "   -L ip          -- Set local IP address.\n");
+     fprintf(stderr, "   -l             -- Increment local IP address for each session.\n");
+     fprintf(stderr, "   -R ip          -- Set start address of remote IP pool.\n");
++    fprintf(stderr, "   -D             -- Delegates the allocation of IP addresses to pppd.\n");
+     fprintf(stderr, "   -S name        -- Advertise specified service-name.\n");
+     fprintf(stderr, "   -O fname       -- Use PPPD options from specified file\n");
+     fprintf(stderr, "                     (default %s).\n", PPPOE_SERVER_OPTIONS);
+@@ -1200,9 +1213,9 @@ main(int argc, char **argv)
+ #endif
+ 
+ #ifndef HAVE_LINUX_KERNEL_PPPOE
+-    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:sp:lrudPc:S:1q:Q:";
++    char *options = "X:ix:hI:C:L:R:DT:m:FN:f:O:o:sp:lrudPc:S:1q:Q:";
+ #else
+-    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPc:S:1q:Q:";
++    char *options = "X:ix:hI:C:L:R:DT:m:FN:f:O:o:skp:lrudPc:S:1q:Q:";
+ #endif
+ 
+     if (getuid() != geteuid() ||
+@@ -1401,6 +1414,10 @@ main(int argc, char **argv)
+ 	    }
+ 	    break;
+ 
++	case 'D':
++	    DelegateIPAllocation = 1;
++	    break;
++
+ 	case 'T':
+ 	case 'm':
+ 	    /* These just get passed to pppoe */
+@@ -1915,6 +1932,7 @@ startPPPDUserMode(ClientSession *session
+     argv[c++] = "file";
+     argv[c++] = pppoptfile;
+ 
++    if (!DelegateIPAllocation) {
+     snprintf(buffer, SMALLBUF, "%d.%d.%d.%d:%d.%d.%d.%d",
+ 	    (int) session->myip[0], (int) session->myip[1],
+ 	    (int) session->myip[2], (int) session->myip[3],
+@@ -1930,6 +1948,16 @@ startPPPDUserMode(ClientSession *session
+ 	   session->ethif->name,
+ 	   session->serviceName);
+     argv[c++] = strdup(buffer);
++    } else {
++	syslog(LOG_INFO,
++	    "Session %u created for client %02x:%02x:%02x:%02x:%02x:%02x on %s using Service-Name '%s'",
++	    (unsigned int) ntohs(session->sess),
++	    session->eth[0], session->eth[1], session->eth[2],
++	    session->eth[3], session->eth[4], session->eth[5],
++	    session->ethif->name,
++	    session->serviceName);
++    }
++    
+     if (!argv[c-1]) {
+ 	/* TODO: Send a PADT */
+ 	exit(EXIT_FAILURE);

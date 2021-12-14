@@ -1,0 +1,20 @@
+--- netkit-rusers-0.17/rup/rup.c.timeout	2003-05-21 15:09:29.000000000 -0400
++++ netkit-rusers-0.17/rup/rup.c	2003-05-21 15:09:44.000000000 -0400
+@@ -245,7 +245,7 @@ onehost(const char *host)
+ {
+ 	CLIENT *rstat_clnt;
+ 	statstime host_stat;
+-	struct timeval foo;
++	struct timeval timeout = { 25, 0 };
+ 	
+ 	rstat_clnt = clnt_create(host, RSTATPROG, RSTATVERS_TIME, "udp");
+ 	if (rstat_clnt == NULL) {
+@@ -259,7 +259,7 @@ onehost(const char *host)
+ 		      (xdrproc_t) xdr_statstime,
+ 		      (caddr_t) &host_stat, 
+ 
+-		      foo) != RPC_SUCCESS) 
++		      timeout) != RPC_SUCCESS) 
+ 	{
+ 		warnx("%s",  clnt_sperror(rstat_clnt, host));
+ 		return;

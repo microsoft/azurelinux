@@ -1,0 +1,22 @@
+diff --git a/lib/metadata/metadata.c b/lib/metadata/metadata.c
+index eb8af10..4da6b64 100644
+--- a/lib/metadata/metadata.c
++++ b/lib/metadata/metadata.c
+@@ -2096,7 +2096,7 @@ get_metadata(struct lib_context *lc, enum action action,
+ 
+ 	if (!count_devices(lc, DEVICE)) {
+ 		log_print(lc, "no block devices found");
+-		return 1;
++		return 0;
+ 	}
+ 
+ 	if (!(M_RAID & p->metadata))
+@@ -2118,7 +2118,7 @@ get_metadata(struct lib_context *lc, enum action action,
+ 	if (!OPT_HOT_SPARE_SET(lc) && !OPT_CREATE(lc)
+ 	    && !count_devices(lc, RAID)) {
+ 		format_error(lc, "disks", argv);
+-		return 1;
++		return 0;
+ 	}
+ 
+ 	if (M_SET & p->metadata) {

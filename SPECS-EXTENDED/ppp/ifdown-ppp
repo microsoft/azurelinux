@@ -1,0 +1,51 @@
+#! /bin/bash
+
+cd /etc/sysconfig/network-scripts
+. ./network-functions
+
+CONFIG=$1
+source_config
+
+if [ "$TYPE" = "xDSL" ] && [ -x /usr/sbin/adsl-stop ] ; then
+    adsl-stop /etc/sysconfig/network-scripts/$CONFIG
+    exit $?
+fi
+
+CONFIG=${CONFIG##ifcfg-}
+
+if [ "${DEMAND}" = "yes" ] && [ -f /var/run/ppp-${CONFIG}.pid ] ; then
+    PID=$(head -1 /var/run/ppp-${CONFIG}.pid)
+    kill -TERM ${PID}
+    sleep 2
+    [ ! -d /proc/${PID} ] && exit 0
+    sleep 5
+    [ ! -d /proc/${PID} ] && exit 0
+    kill -TERM ${PID}
+    [ ! -d /proc/${PID} ] && exit 0
+    exit 1
+fi
+
+file=/var/run/pppwatch-${DEVICE}.pid
+
+if [ ! -f $file ]; then
+    # ppp isn't running, or we didn't start it
+    exit 0
+fi
+
+PID=$(cat $file)
+[ -n "${PID}" ] || exit 1
+
+kill -TERM ${PID} > /dev/null 2>&1
+[ ! -d /proc/${PID} ] && exit 0
+sleep 2
+[ ! -d /proc/${PID} ] && exit 0
+sleep 5
+[ ! -d /proc/${PID} ] && exit 0
+sleep 10
+[ ! -d /proc/${PID} ] && exit 0
+
+# killing ppp-watch twice in a row causes it to send a SIGKILL to pppd pgrp
+kill -TERM ${PID} > /dev/null 2>&1
+[ ! -d /proc/${PID} ] && exit 0
+
+exit 1

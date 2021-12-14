@@ -1,0 +1,22 @@
+We now need to explicitly link to libraries that we use because we can no
+longer depend on our dependencies to pull them in for us.  See
+http://fedoraproject.org/wiki/UnderstandingDSOLinkChange
+
+--- libdv-1.0.0/playdv/#Makefile.am~	2010-02-15 14:49:06.000000000 -0500
++++ libdv-1.0.0/playdv/Makefile.am	2010-02-15 14:49:06.000000000 -0500
+@@ -15,4 +15,4 @@ bin_PROGRAMS= playdv
+ noinst_HEADERS=  display.h oss.h
+ 
+ playdv_SOURCES= playdv.c display.c display.h oss.c
+-playdv_LDADD= $(SDL_LIBS) $(GTK_LIBS) $(XV_LIB) ../libdv/libdv.la $(POPT_LIB)
++playdv_LDADD= $(SDL_LIBS) $(GTK_LIBS) $(XV_LIB) ../libdv/libdv.la $(POPT_LIB) -lX11 -lXext
+--- libdv-1.0.0/Makefile.orig.am	2006-08-06 22:10:42.000000000 +0200
++++ libdv-1.0.0/Makefile.am	2016-08-01 12:31:11.622234099 +0200
+@@ -5,6 +5,7 @@
+ endif
+ 
+ SUBDIRS                   = libdv encodedv $(gtk_subdirs)
++ACLOCAL_AMFLAGS           = -I m4
+ 
+ AUX_DIST                  = $(ac_aux_dir)/config.guess \
+                                    $(ac_aux_dir)/config.sub \

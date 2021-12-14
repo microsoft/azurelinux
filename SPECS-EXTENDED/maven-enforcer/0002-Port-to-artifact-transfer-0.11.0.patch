@@ -1,0 +1,37 @@
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequirePluginVersions.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequirePluginVersions.java
+@@ -69,8 +69,8 @@
+ import org.apache.maven.project.MavenProject;
+ import org.apache.maven.project.ProjectBuildingRequest;
+ import org.apache.maven.settings.Settings;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+ import org.codehaus.plexus.util.ReflectionUtils;
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireNoRepositories.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/RequireNoRepositories.java
+@@ -31,7 +31,7 @@
+ import org.apache.maven.model.Repository;
+ import org.apache.maven.plugins.enforcer.utils.EnforcerRuleUtils;
+ import org.apache.maven.project.MavenProject;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.util.StringUtils;
+ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+--- a/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/EnforcerRuleUtils.java
++++ b/enforcer-rules/src/main/java/org/apache/maven/plugins/enforcer/utils/EnforcerRuleUtils.java
+@@ -38,8 +38,8 @@
+ import org.apache.maven.project.DefaultProjectBuildingRequest;
+ import org.apache.maven.project.MavenProject;
+ import org.apache.maven.project.ProjectBuildingRequest;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolver;
+-import org.apache.maven.shared.artifact.resolve.ArtifactResolverException;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
++import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+ import org.codehaus.plexus.util.ReaderFactory;

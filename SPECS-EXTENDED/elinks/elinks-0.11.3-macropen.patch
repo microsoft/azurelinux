@@ -1,0 +1,16 @@
+ src/encoding/encoding.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/encoding/encoding.c b/src/encoding/encoding.c
+index d019dab..9648da3 100644
+--- a/src/encoding/encoding.c
++++ b/src/encoding/encoding.c
+@@ -124,7 +124,7 @@ open_encoded(int fd, enum stream_encoding encoding)
+ 	if (!stream) return NULL;
+ 
+ 	stream->encoding = encoding;
+-	if (decoding_backends[stream->encoding]->open(stream, fd) >= 0)
++	if ((decoding_backends[stream->encoding]->open)(stream, fd) >= 0)
+ 		return stream;
+ 
+ 	mem_free(stream);

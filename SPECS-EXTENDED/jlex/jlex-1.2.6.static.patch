@@ -1,0 +1,107 @@
+--- Main.java.orig	2003-03-26 11:47:18.000000000 +0100
++++ Main.java	2003-03-26 11:47:21.000000000 +0100
+@@ -1072,8 +1072,15 @@
+ 	// Added 6/24/98 Raimondas Lencevicius
+ 	// May be made more efficient by replacing String operations
+ 	// Assumes correctly formed input String. Performs no error checking
++
++	if (Main.staticFlag) {		// S.M.Pericas
++	m_outstream.println("\tstatic private int[][] unpackFromString"+
++			    "(int size1, int size2, String st) {");
++	}
++	else {
+ 	m_outstream.println("\tprivate int[][] unpackFromString"+
+ 			    "(int size1, int size2, String st) {");
++	}
+ 	m_outstream.println("\t\tint colonIndex = -1;");
+ 	m_outstream.println("\t\tString lengthString;");
+ 	m_outstream.println("\t\tint sequenceLength = 0;");
+@@ -1216,13 +1223,23 @@
+ 	int[] yy_cmap = new int[m_spec.m_ccls_map.length];
+ 	for (i = 0; i < m_spec.m_ccls_map.length; ++i)
+ 	    yy_cmap[i] = m_spec.m_col_map[m_spec.m_ccls_map[i]];
++	if (Main.staticFlag) {
++	m_outstream.print("\tstatic private int yy_cmap[] = unpackFromString(");
++	}
++	else {
+ 	m_outstream.print("\tprivate int yy_cmap[] = unpackFromString(");
++	}
+ 	emit_table_as_string(new int[][] { yy_cmap });
+ 	m_outstream.println(")[0];");
+ 	m_outstream.println();
+ 
+ 	// CSA: modified yy_rmap to use string packing 9-Aug-1999
++	if (Main.staticFlag) {
++	m_outstream.print("\tstatic private int yy_rmap[] = unpackFromString(");
++	}
++	else {
+ 	m_outstream.print("\tprivate int yy_rmap[] = unpackFromString(");
++	}
+ 	emit_table_as_string(new int[][] { m_spec.m_row_map });
+ 	m_outstream.println(")[0];");
+ 	m_outstream.println();
+@@ -1237,8 +1254,14 @@
+ 	    CUtility.ASSERT(dtrans.m_dtrans.length==m_spec.m_dtrans_ncols);
+ 	    yy_nxt[elem] = dtrans.m_dtrans;
+ 	}
++	if (Main.staticFlag) {
++	m_outstream.print
++	  ("\tstatic private int yy_nxt[][] = unpackFromString(");
++	}
++	else {
+ 	m_outstream.print
+ 	  ("\tprivate int yy_nxt[][] = unpackFromString(");
++	}
+ 	emit_table_as_string(yy_nxt);
+ 	m_outstream.println(");");
+ 	m_outstream.println();
+@@ -3825,26 +3848,43 @@
+   /***************************************************************
+     Function: main
+     **************************************************************/
++  public static boolean staticFlag = false;
++
++  public static void printUsage() {
++    System.out.println("Usage: JLex.Main [-static] <filename>");
++    System.exit(1);
++  }
++
+   public static void main
+     (
+      String arg[]
+      )
+     throws java.io.IOException
+       {
++	int i;
+ 	CLexGen lg;
+ 
+-	if (arg.length < 1)
+-	  {
+-	    System.out.println("Usage: JLex.Main <filename>");
+-	    return;
+-	  }
++	// Parse options starting with '-'
++	for (i = 0; i < arg.length && arg[i].charAt(0) == '-'; i++) {
++	    if (arg[i].equals("-static")) {
++		staticFlag = true;
++	    }
++	    else {
++		printUsage();
++	    }
++	}
++
++	// Enough arguments left ?
++	if (arg.length - i < 1) {
++	    printUsage();
++	}
+ 
+ 	/* Note: For debuging, it may be helpful to remove the try/catch
+ 	   block and permit the Exception to propagate to the top level. 
+ 	   This gives more information. */
+ 	try 
+ 	  {	
+-	    lg = new CLexGen(arg[0]);
++	    lg = new CLexGen(arg[i]);
+ 	    lg.generate();
+ 	  }
+ 	catch (Error e)

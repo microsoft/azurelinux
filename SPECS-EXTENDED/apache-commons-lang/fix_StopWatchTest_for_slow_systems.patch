@@ -1,0 +1,44 @@
+--- src/test/java/org/apache/commons/lang/time/StopWatchTest.java.orig	2018-03-20 10:26:19.502634655 +0100
++++ src/test/java/org/apache/commons/lang/time/StopWatchTest.java	2018-03-20 10:27:17.022772530 +0100
+@@ -41,7 +41,7 @@
+         assertEquals(time, watch.getTime());
+         
+         assertTrue(time >= 500);
+-        assertTrue(time < 700);
++        assertTrue(time < 1400);
+         
+         watch.reset();
+         assertEquals(0, watch.getTime());
+@@ -54,7 +54,7 @@
+         
+         watch.start();
+             try {Thread.sleep(500);} catch (InterruptedException ex) {}
+-        assertTrue(watch.getTime() < 2000);
++        assertTrue(watch.getTime() < 4000);
+     }
+     
+     public void testStopWatchSplit(){
+@@ -73,9 +73,9 @@
+         assertEquals("Formatted split string not the correct length", 
+                      splitStr.length(), 11);
+         assertTrue(splitTime >= 500);
+-        assertTrue(splitTime < 700);
++        assertTrue(splitTime < 1400);
+         assertTrue(totalTime >= 1500);
+-        assertTrue(totalTime < 1900);
++        assertTrue(totalTime < 3800);
+     }
+     
+     public void testStopWatchSuspend(){
+@@ -91,9 +91,9 @@
+         long totalTime = watch.getTime();
+         
+         assertTrue(suspendTime >= 500);
+-        assertTrue(suspendTime < 700);
++        assertTrue(suspendTime < 1400);
+         assertTrue(totalTime >= 1000);
+-        assertTrue(totalTime < 1300);
++        assertTrue(totalTime < 3000);
+     }
+ 
+     public void testLang315() {

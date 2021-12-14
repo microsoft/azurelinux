@@ -1,0 +1,17 @@
+--- conf/tomcat-users.xml~	2008-01-28 17:41:06.000000000 -0500
++++ conf/tomcat-users.xml	2008-03-07 19:40:07.000000000 -0500
+@@ -23,4 +23,14 @@
+   <user username="both" password="<must-be-changed>" roles="tomcat,role1"/>
+   <user username="role1" password="<must-be-changed>" roles="role1"/>
+ -->
++
++<!-- <role rolename="admin"/> -->
++<!-- <role rolename="admin-gui"/> -->
++<!-- <role rolename="admin-script"/> -->
++<!-- <role rolename="manager"/> -->
++<!-- <role rolename="manager-gui"/> -->
++<!-- <role rolename="manager-script"/> -->
++<!-- <role rolename="manager-jmx"/> -->
++<!-- <role rolename="manager-status"/> -->
++<!-- <user name="admin" password="<must-be-changed>" roles="admin,manager,admin-gui,admin-script,manager-gui,manager-script,manager-jmx,manager-status" /> -->
+ </tomcat-users>

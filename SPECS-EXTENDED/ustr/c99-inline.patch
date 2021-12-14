@@ -1,0 +1,30 @@
+diff -rup ustr-1.0.4-orig/ustr-compiler.h ustr-1.0.4/ustr-compiler.h
+--- ustr-1.0.4-orig/ustr-compiler.h	2008-02-15 15:12:28.000000000 -0500
++++ ustr-1.0.4/ustr-compiler.h	2008-06-13 15:25:18.000000000 -0400
+@@ -113,17 +113,23 @@
+ #endif
+ 
+ #ifndef USTR_CONF_EI_PROTO /* external inline */
+-# if USTR_CONF_INCLUDE_CODEONLY_HEADERS
++# if USTR_CONF_INCLUDE_CODEONLY_HEADERS || ! defined(__GNUC__) || \
++     ! USTR_CONF_COMPILE_USE_INLINE
+ #  define USTR_CONF_EI_PROTO static USTR__INLINE
+ # else
+ #  define USTR_CONF_EI_PROTO extern
+ # endif
+ #endif
+ #ifndef USTR_CONF_II_PROTO /* implementation of inline */
+-# if USTR_CONF_INCLUDE_CODEONLY_HEADERS
++# if USTR_CONF_INCLUDE_CODEONLY_HEADERS || ! defined(__GNUC__) || \
++     ! USTR_CONF_COMPILE_USE_INLINE
+ #  define USTR_CONF_II_PROTO static USTR__INLINE
+ # else
+-#  define USTR_CONF_II_PROTO extern inline
++#  if defined(__GNUC_STDC_INLINE__) || defined(__GNUC_GNU_INLINE__)
++#   define USTR_CONF_II_PROTO extern inline __attribute__ ((__gnu_inline__))
++#  else
++#   define USTR_CONF_II_PROTO extern inline
++#  endif
+ # endif
+ #endif
+ 

@@ -1,0 +1,11 @@
+{
+ "Signatures": {
+  "ReadMe.txt": "c6a3f97d9423857b4dc79110b528a73188e6829b5117a4d80b22d4886446b179",
+  "copyright.html": "e64365d338b707f1bac79d9391c7579eb6db270c49b711bc1665ae8e7e36173d",
+  "emoji-data.txt": "d2686f400a638c80775d7c662556fb8fa8dd3bbe4aa548d9d31624264c6e1bb1",
+  "emoji-sequences.txt": "5a864aab19aa703d019647f01a5b6fe127b7dbedff3a9569242224b4a4e9341a",
+  "emoji-test.txt": "dbd8a566962e1d8b67f2c531ea0241b2ea791c736850a9fdb61fc8a0c62ae0ba",
+  "emoji-variation-sequences.txt": "2efb7e9461e19c5f8e8fdb3b9a8122fb8148f50a901f0c2d4c8ba42209b5b55a",
+  "emoji-zwj-sequences.txt": "1d8f06c1dca8ebecb0ca7b753bc52efacdf44c60a921f2ab04f02b42ce1389bf"
+ }
+}

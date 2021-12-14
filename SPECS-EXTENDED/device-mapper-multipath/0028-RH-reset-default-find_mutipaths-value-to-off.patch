@@ -1,0 +1,29 @@
+From 1f5156bc77ef05f5d93e7a9df6e270a587eb6a30 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 7 Jun 2018 17:43:52 -0500
+Subject: [PATCH] RH: reset default find_mutipaths value to off
+
+Upstream has changed to default find_multipaths to "strict". For now
+Redhat will retain the previous default of "off".
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/defaults.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libmultipath/defaults.h b/libmultipath/defaults.h
+index 4dfe007c..d910da51 100644
+--- a/libmultipath/defaults.h
++++ b/libmultipath/defaults.h
+@@ -20,7 +20,7 @@
+ #define DEFAULT_NO_PATH_RETRY	NO_PATH_RETRY_UNDEF
+ #define DEFAULT_VERBOSITY	2
+ #define DEFAULT_REASSIGN_MAPS	0
+-#define DEFAULT_FIND_MULTIPATHS	FIND_MULTIPATHS_STRICT
++#define DEFAULT_FIND_MULTIPATHS	FIND_MULTIPATHS_OFF
+ #define DEFAULT_FAST_IO_FAIL	5
+ #define DEFAULT_DEV_LOSS_TMO	600
+ #define DEFAULT_RETAIN_HWHANDLER RETAIN_HWHANDLER_ON
+-- 
+2.17.2
+

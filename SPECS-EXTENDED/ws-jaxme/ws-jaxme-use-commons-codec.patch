@@ -1,0 +1,28 @@
+--- ./src/jaxme/org/apache/ws/jaxme/util/Base64Binary.java.sav	2007-02-12 12:33:45.000000000 -0500
++++ ./src/jaxme/org/apache/ws/jaxme/util/Base64Binary.java	2007-02-12 12:35:20.000000000 -0500
+@@ -18,8 +18,7 @@
+ 
+ import java.io.IOException;
+ 
+-import sun.misc.BASE64Decoder;
+-import sun.misc.BASE64Encoder;
++import org.apache.commons.codec.binary.Base64;
+ 
+ 
+ /** A utility class for working with base64 encoding.
+@@ -37,13 +36,13 @@
+ 	 * base64 encoded byte array.
+ 	 */
+ 	public static byte[] decode(String pValue) throws IOException {
+-		return (new BASE64Decoder()).decodeBuffer(pValue);
++		return (new Base64()).decode(pValue.getBytes());
+ 	}
+ 
+ 	/** Converts the base64 encoded byte array <code>pValue</code>
+ 	 * into a string.
+ 	 */
+ 	public static String encode(byte[] pValue) {
+-		return (new BASE64Encoder()).encode(pValue);
++		return new String((new Base64()).encodeBase64(pValue));
+ 	}
+ }

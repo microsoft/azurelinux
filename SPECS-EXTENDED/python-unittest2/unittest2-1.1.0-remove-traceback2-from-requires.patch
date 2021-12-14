@@ -1,0 +1,21 @@
+--- setup.py.orig	2015-11-12 16:19:17.850638394 +0100
++++ setup.py	2015-11-12 16:19:33.605809230 +0100
+@@ -12,8 +12,7 @@
+ 
+ class late_version:
+     def __str__(self):
+-        from unittest2 import __version__ as VERSION
+-        return VERSION
++        return '1.1.0'
+     def __add__(self, other):
+         return str(self) + other
+     def replace(self, old, new):
+@@ -57,7 +56,7 @@
+ # Both install and setup requires - because we read VERSION from within the
+ # package, and the package also exports all the APIs.
+ # six for compat helpers
+-REQUIRES = ['six>=1.4', 'traceback2'],
++REQUIRES = ['six>=1.4'],
+ 
+ params = dict(
+     name=NAME,

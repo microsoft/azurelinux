@@ -14,32 +14,34 @@
 # published by the Open Source Initiative.
 #
 
-%global debug_package %{nil}
-%global ant_home %{_datadir}/ant
+%global debug_package   %{nil}
+%global ant_home        %{_datadir}/ant
+%global _mavenpomdir    %{_datadir}/maven-poms
+# Don't generate requires on java-headless
+%global __requires_exclude_from %{_datadir}/maven-metadata
+
 Summary:        Apache Ant
 Name:           ant
-Version:        1.10.9
-Release:        7%{?dist}
+Version:        1.10.11
+Release:        1%{?dist}
 License:        ASL 2.0 AND W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Building
 URL:            https://ant.apache.org/
-Source0:        https://archive.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.xz
+Source0:        https://archive.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz
 Source1:        ant.conf
 Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
 Patch1:         apache-ant-bootstrap.patch
-BuildRequires:  java-devel >= 1.8
+BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
-Requires:       java-devel >= 1.8
+Requires:       msopenjdk-11
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
 Provides:       ant-trax = %{version}-%{release}
-# Temp: Do not build with x86_64 due to docker build issue
-ExclusiveArch:  aarch64
-#BuildArch:      noarch
+BuildArch:      noarch
 
 
 %description
@@ -113,7 +115,7 @@ mv LICENSE.utf8 LICENSE
 export OPT_JAR_LIST=:
 
 export GC_MAXIMUM_HEAP_SIZE="134217728" #128M
-export JAVA_HOME=$(find %{_libdir}/jvm -name "OpenJDK*")
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 sh -x ./build.sh --noconfig jars
 
 %install
@@ -261,6 +263,9 @@ popd
 %{_bindir}/*.py*
 
 %changelog
+* Wed Dec 08 2021 Andrew Phelps <anphel@microsoft.com> - 1.10.11-1
+- Update to build with jdk11
+
 * Fri Nov 19 2021 Andrew Phelps <anphel@microsoft.com> - 1.10.9-7
 - Disable debuginfo package
 

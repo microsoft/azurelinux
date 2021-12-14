@@ -1,0 +1,21 @@
+diff -purN meanwhile-1.1.0.orig/src/mw_debug.c meanwhile-1.1.0/src/mw_debug.c
+--- meanwhile-1.1.0.orig/src/mw_debug.c	2013-12-03 14:32:31.828241985 +1100
++++ meanwhile-1.1.0/src/mw_debug.c	2013-12-03 14:34:30.152967856 +1100
+@@ -92,7 +92,7 @@ void mw_debug_datav(const guchar *buf, g
+   }
+   pretty_print(str, buf, len);
+ 
+-  g_debug(str->str);
++  g_debug("%s", str->str);
+   g_string_free(str, TRUE);
+ }
+ 
+@@ -149,7 +149,7 @@ void mw_mailme_datav(const guchar *buf,
+ 
+   g_string_append(str, MW_MAILME_CUT_STOP);
+ 
+-  g_debug(str->str);
++  g_debug("%s", str->str);
+   g_string_free(str, TRUE);
+ 
+ #else

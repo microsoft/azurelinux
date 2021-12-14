@@ -1,0 +1,10 @@
+diff --git a/contrib/url-normalizer.pl b/contrib/url-normalizer.pl
+index 4cb0480..4b89910 100755
+--- a/contrib/url-normalizer.pl
++++ b/contrib/url-normalizer.pl
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/perl -Tw
++#!/usr/bin/perl -Tw
+ #
+ # * Copyright (C) 1996-2020 The Squid Software Foundation and contributors
+ # *

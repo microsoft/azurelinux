@@ -1,0 +1,11 @@
+--- alsa-lib-1.0.14/aserver/aserver.c	2007-05-31 10:05:13.000000000 +0200
++++ alsa-lib-1.0.14.lennart/aserver/aserver.c	2007-08-15 15:53:32.000000000 +0200
+@@ -35,6 +35,8 @@
+ 
+ #include "aserver.h"
+ 
++#undef open
++
+ char *command;
+ 
+ #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)

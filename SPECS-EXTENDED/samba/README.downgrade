@@ -1,0 +1,29 @@
+Downgrading Samba
+=================
+
+Short version: data-preserving downgrades between Samba versions are not supported
+
+Long version:
+With Samba development there are cases when on-disk database format evolves.
+In general, Samba Team attempts to maintain forward compatibility and
+automatically upgrade databases during runtime when requires.
+However, when downgrade is required Samba will not perform downgrade to
+existing databases. It may be impossible if new features that caused database
+upgrade are in use. Thus, one needs to consider a downgrade procedure before
+actually downgrading Samba setup.
+
+Please always perform back up prior both upgrading and downgrading across major
+version changes. Restoring database files is easiest and simplest way to get to
+previously working setup.
+
+Easiest way to downgrade is to remove all created databases and start from scratch.
+This means losing all authentication and domain relationship data, as well as
+user databases (in case of tdb storage), printers, registry settings, and winbindd
+caches.
+
+Remove databases in following locations:
+/var/lib/samba/*.tdb
+/var/lib/samba/private/*.tdb
+
+In particular, registry settings are known to prevent running downgraded versions
+(Samba 4 to Samba 3) as registry format has changed between Samba 3 and Samba 4.

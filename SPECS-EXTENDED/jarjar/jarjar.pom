@@ -1,0 +1,25 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>tonic</groupId>
+  <artifactId>jarjar</artifactId>
+  <version>1.4</version>
+  <distributionManagement>
+    <relocation>
+      <groupId>com.tonicsystems</groupId>
+      <artifactId>jarjar</artifactId>
+      <version>1.4</version>
+    </relocation>
+  </distributionManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>5.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-util</artifactId>
+      <version>5.0.3</version>
+    </dependency>
+  </dependencies>
+</project>

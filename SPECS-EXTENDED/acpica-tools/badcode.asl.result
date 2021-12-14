@@ -1,0 +1,266 @@
+badcode.asl     25:     Mutex (MTX1, 32)
+Error    6125 -                      ^ SyncLevel must be in the range 0-15
+
+badcode.asl     29:     Name (BIG, 0x1234567887654321)
+Warning  3038 -                                    ^ Truncating 64-bit constant found in 32-bit table
+
+badcode.asl     33:     Name (PKG1, Package(5) {0,1})
+Remark   2063 -                            ^ Initializer list shorter than declared package length
+
+badcode.asl     37:     Name (PATH, Buffer() {"\_SB_.PCI2._CRS"})
+Warning  3046 -                                ^ Invalid or unknown escape sequence
+
+badcode.asl     41:     Name (ESC1, "abcdefg\x00hijklmn")
+Warning  3055 -                                ^ Invalid Hex/Octal Escape - Non-ASCII or NULL
+
+badcode.asl     49:         FLD1, 8
+Error    6030 -               ^ Access width of Field Unit extends beyond region limit
+
+badcode.asl     55:     Field (OPR2, DWordAcc, NoLock, Preserve)
+Error    6100 -                  ^ Host Operation Region requires ByteAcc access
+
+badcode.asl     60:     Field (OPR3, WordAcc, NoLock, Preserve)
+Error    6099 -                  ^ Host Operation Region requires BufferAcc access
+
+badcode.asl     67:     Method (MTH1, 0, NotSerialized, 32)
+Error    6125 -     SyncLevel must be in the range 0-15 ^ 
+
+badcode.asl     71:         Store (Arg3, Local0)
+Warning  3144 -                              ^ Method Local is set but never used (Local0)
+
+badcode.asl     71:         Store (Arg3, Local0)
+Error    6006 -                      ^ Method argument is not initialized (Arg3)
+
+badcode.asl     71:         Store (Arg3, Local0)
+Remark   2087 -                      ^ Not a parameter, used as local only (Arg3)
+
+badcode.asl     72:         Store (Local1, Local2)
+Warning  3144 -                                ^ Method Local is set but never used (Local2)
+
+badcode.asl     72:         Store (Local1, Local2)
+Error    6066 -                        ^ Method local variable is not initialized (Local1)
+
+badcode.asl     76:         Subtract (MTX1, 4, Local3)
+Warning  3144 - Method Local is set but never used ^  (Local3)
+
+badcode.asl     76:         Subtract (MTX1, 4, Local3)
+Error    6058 -            Invalid type ^  ([Mutex] found, Subtract operator requires [Integer|String|Buffer])
+
+badcode.asl     80:         CreateField (BUF1, 0, Subtract (4, 4), FLD1)
+Remark   2089 -                             Object is not referenced ^  (Name [FLD1] is within a method [MTH1])
+
+badcode.asl     80:         CreateField (BUF1, 0, Subtract (4, 4), FLD1)
+Warning  3083 -              Field length must be non-zero ^ 
+
+badcode.asl     84:         Acquire (MTX1, 100)
+Warning  3130 -                             ^ Result is not used, possible operator timeout will be missed
+
+badcode.asl     85:         Wait (EVT1, 1)
+Warning  3130 -                        ^ Result is not used, possible operator timeout will be missed
+
+badcode.asl     89:         Add (INT1, 8)
+Error    6114 -                    ^ Result is not used, operator has no effect
+
+badcode.asl     94:         Store (5, INT1)
+Warning  3134 -                   ^ Statement is unreachable
+
+badcode.asl     97:     Method (MTH2)
+Remark   2119 -                   ^ Control Method marked Serialized (Due to use of Switch operator)
+
+badcode.asl     97:     Method (MTH2)
+Warning  3115 -                   ^ Not all control paths return a value (MTH2)
+
+badcode.asl    101:         Switch (ToInteger (INT1))
+Error    6078 -                            ^ No Case statements under Switch
+
+badcode.asl    120:         Store (MTH2 (), Local0)
+Warning  3144 -                                 ^ Method Local is set but never used (Local0)
+
+badcode.asl    120:         Store (MTH2 (), Local0)
+Warning  3122 -                      ^ Called method may not always return a value
+
+badcode.asl    126:     Method (MTH5) {Store (MTH4(), Local0)}
+Warning  3144 -        Method Local is set but never used ^  (Local0)
+
+badcode.asl    126:     Method (MTH5) {Store (MTH4(), Local0)}
+Error    6080 -  Called method returns no value ^ 
+
+badcode.asl    132:         Name (_HID, "*PNP0C0A")     // Illegal leading asterisk
+Error    6061 -        Invalid leading asterisk ^  (*PNP0C0A)
+
+badcode.asl    136:         Name (_HID, "PNP")          // Too short, must be 7 or 8 chars
+Error    6033 -                            ^ _HID string must be exactly 7 or 8 characters (PNP)
+
+badcode.asl    140:         Name (_HID, "MYDEVICE01")   // Too long, must be 7 or 8 chars
+Error    6033 -                                   ^ _HID string must be exactly 7 or 8 characters (MYDEVICE01)
+
+badcode.asl    144:         Name (_HID, "acpi0001")     // non-hex chars must be uppercase
+Error    6034 -                                 ^ _HID prefix must be all uppercase or decimal digits (acpi0001)
+
+badcode.asl    148:         Name (_HID, "PNP-123")      // HID must be alphanumeric
+Error    6002 -                                ^ String must be entirely alphanumeric (PNP-123)
+
+badcode.asl    152:         Name (_HID, "")             // Illegal Null HID
+Error    6091 -                         ^ Invalid zero-length (null) string
+
+badcode.asl    153:         Name (_CID, "")             // Illegal Null CID
+Error    6091 -                         ^ Invalid zero-length (null) string
+
+badcode.asl    158:     Name (_PRW, 4)
+Error    6105 -                    ^ Invalid object type for reserved name (_PRW: found Integer, Package required)
+
+badcode.asl    159:     Name (_FDI, Buffer () {0})
+Error    6105 -                         ^ Invalid object type for reserved name (_FDI: found Buffer, Package required)
+
+badcode.asl    164:     Method (_OSC, 5)
+Warning  3101 -                   ^ Reserved method has too many arguments (_OSC requires 4)
+
+badcode.asl    164:     Method (_OSC, 5)
+Warning  3107 -                   ^ Reserved method must return a value (Buffer required for _OSC)
+
+badcode.asl    170:     Name (_L01, 1)
+Error    6103 -                 ^ Reserved name must be a control method (with zero arguments)
+
+badcode.asl    171:     Name (_E02, 2)
+Error    6103 -                 ^ Reserved name must be a control method (with zero arguments)
+
+badcode.asl    172:     Name (_Q03, 3)
+Error    6103 -                 ^ Reserved name must be a control method (with zero arguments)
+
+badcode.asl    173:     Name (_ON,  0)
+Error    6103 -                ^ Reserved name must be a control method (with zero arguments)
+
+badcode.asl    174:     Name (_INI, 1)
+Error    6103 -                 ^ Reserved name must be a control method (with zero arguments)
+
+badcode.asl    175:     Name (_PTP, 2)
+Error    6103 -                 ^ Reserved name must be a control method (with arguments)
+
+badcode.asl    184:         Method (_E1D)
+Error    6032 -                       ^ Name conflicts with a previous GPE method (_L1D)
+
+badcode.asl    193:         Return (Buffer(1){0x33})
+Warning  3104 -                         ^ Reserved method should not return a value (_FDM)
+
+badcode.asl    197:         Return ("Unexpected Return Value")
+Warning  3104 -  Reserved method should not return a value ^  (_Q22)
+
+badcode.asl    203:     Device (EC)
+Warning  3141 -                 ^ Missing dependency (Device object requires a _HID or _ADR in same scope)
+
+badcode.asl    205:         Method (_REG, 2)
+Warning  3079 -                       ^ _REG has no corresponding Operation Region
+
+badcode.asl    219:             StartDependentFn (0, 0)
+Error    6019 -                                  ^ Dependent function macros cannot be nested
+
+badcode.asl    225:     })
+Error    6070 -        ^ Missing EndDependentFn() macro in dependent resource list
+
+badcode.asl    242:             0x00002000,         // Length
+Error    6049 -                         ^ Length is larger than Min/Max window
+
+badcode.asl    247:             0x00001001,         // Range Minimum
+Error    6001 -                         ^ Must be a multiple of alignment/granularity value
+
+badcode.asl    248:             0x00002002,         // Range Maximum
+Error    6001 -                         ^ Must be a multiple of alignment/granularity value
+
+badcode.asl    255:             0xFFFF,             // Address
+Warning  3060 -                     ^ Maximum 10-bit ISA address (0x3FF)
+
+badcode.asl    264:             0x05                // Access Size
+Error    6042 -                   ^ Invalid AccessSize (Maximum is 4 - QWord access)
+
+badcode.asl    268:         QWordSpace (0xB0, ResourceConsumer, PosDecode, MinFixed, MaxFixed, 0xA5,
+Error    6139 -     Constant out of range ^  (0xB0, allowable: 0xC0-0xFF)
+
+badcode.asl    279:             0x0200,             // Range Minimum
+Error    6051 -                     ^ Address Min is greater than Address Max
+
+badcode.asl    291:             0x00001002,         // Length
+Error    6049 -                         ^ Length is larger than Min/Max window
+
+badcode.asl    296:             0x00000010,
+Error    6048 -                         ^ Granularity must be zero or a power of two minus one
+
+badcode.asl    305:             0x0000000000000B02, // Range Minimum
+Error    6001 -                                 ^ Must be a multiple of alignment/granularity value
+
+badcode.asl    315:             0x00000000002FFFFE, // Range Maximum
+Error    6001 -                                 ^ Must be a multiple of alignment/granularity value (-1)
+
+badcode.asl    326:             0x00000000,         // Length
+Error    6043 -                         ^ Invalid combination of Length and Min/Max fixed flags
+
+badcode.asl    335:             0x00000100,         // Length
+Error    6043 -                         ^ Invalid combination of Length and Min/Max fixed flags
+
+badcode.asl    344:             0x00000200,         // Length
+Error    6043 -                         ^ Invalid combination of Length and Min/Max fixed flags
+
+badcode.asl    349:             0x0000000F,         // Granularity
+Error    6047 -                         ^ Granularity must be zero for fixed Min/Max
+
+badcode.asl    358:         DWordIO (ResourceProducer, MinFixed, MaxFixed, PosDecode, EntireRange,
+Error    6090 -                                    ^ Min/Max/Length/Gran are all zero, but no resource tag
+
+badcode.asl    368:         EndDependentFn ()
+Error    6071 -                            ^ Missing StartDependentFn() macro in dependent resource list
+
+badcode.asl    388:         CreateWordField (RSC3, \DWI1._LEN, LEN)
+Warning  3128 -              ResourceTag larger than Field ^  (Size mismatch, Tag: 32 bits, Field: 16 bits)
+
+badcode.asl    388:         CreateWordField (RSC3, \DWI1._LEN, LEN)
+Remark   2089 -                        Object is not referenced ^  (Name [LEN_] is within a method [REM1])
+
+badcode.asl    389:         CreateByteField (RSC3, \DWI1._MIN, MIN)
+Warning  3128 -              ResourceTag larger than Field ^  (Size mismatch, Tag: 32 bits, Field: 8 bits)
+
+badcode.asl    389:         CreateByteField (RSC3, \DWI1._MIN, MIN)
+Remark   2089 -                        Object is not referenced ^  (Name [MIN_] is within a method [REM1])
+
+badcode.asl    390:         CreateBitField (RSC3, \DWI1._RNG, RNG1)
+Warning  3128 -             ResourceTag larger than Field ^  (Size mismatch, Tag: 2 bits, Field: 1 bit)
+
+badcode.asl    390:         CreateBitField (RSC3, \DWI1._RNG, RNG1)
+Remark   2089 -                        Object is not referenced ^  (Name [RNG1] is within a method [REM1])
+
+badcode.asl    394:         CreateQWordField (RSC3, \DWI1._MAX, MAX)
+Warning  3129 -              ResourceTag smaller than Field ^  (Size mismatch, Tag: 32 bits, Field: 64 bits)
+
+badcode.asl    394:         CreateQWordField (RSC3, \DWI1._MAX, MAX)
+Remark   2089 -                         Object is not referenced ^  (Name [MAX_] is within a method [REM1])
+
+badcode.asl    395:         CreateBitField (RSC3, \DWI1._GRA, GRA)
+Warning  3128 -             ResourceTag larger than Field ^  (Size mismatch, Tag: 32 bits, Field: 1 bit)
+
+badcode.asl    395:         CreateBitField (RSC3, \DWI1._GRA, GRA)
+Remark   2089 -                       Object is not referenced ^  (Name [GRA_] is within a method [REM1])
+
+badcode.asl    396:         CreateField (RSC3, \DWI1._MIF, 5, MIF)
+Warning  3129 -         ResourceTag smaller than Field ^  (Size mismatch, Tag: 1 bit, Field: 5 bits)
+
+badcode.asl    396:         CreateField (RSC3, \DWI1._MIF, 5, MIF)
+Remark   2089 -                       Object is not referenced ^  (Name [MIF_] is within a method [REM1])
+
+badcode.asl    397:         CreateField (RSC3, \DWI1._RNG, 3, RNG2)
+Warning  3129 -         ResourceTag smaller than Field ^  (Size mismatch, Tag: 2 bits, Field: 3 bits)
+
+badcode.asl    397:         CreateField (RSC3, \DWI1._RNG, 3, RNG2)
+Remark   2089 -                        Object is not referenced ^  (Name [RNG2] is within a method [REM1])
+
+badcode.asl    404:         Store (40, Local0)
+Warning  3144 -                            ^ Method Local is set but never used (Local0)
+
+
+Intel ACPI Component Architecture
+ASL+ Optimizing Compiler/Disassembler version VVVVVVVV
+Copyright (c) 2000 - 2019 Intel Corporation
+
+Ignoring all errors, forcing AML file generation
+
+ASL Input:     badcode.asl -   11587 bytes     81 keywords    408 source lines
+AML Output:    badcode.aml -    1195 bytes     20 opcodes      61 named objects
+
+Compilation successful. 45 Errors, 29 Warnings, 11 Remarks, 16 Optimizations, 1 Constants Folded

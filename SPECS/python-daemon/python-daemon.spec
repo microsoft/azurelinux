@@ -1,7 +1,7 @@
 Summary:        Library to implement a well-behaved Unix daemon process.
 Name:           python-daemon
 Version:        2.2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,7 @@ BuildRequires:  python3-xml
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
+BuildRequires:  python3-pip
 %endif
 Requires:       python3
 Requires:       python3-lockfile
@@ -44,10 +45,7 @@ sed -i 's/distclass=version.ChangelogAwareDistribution,/ /g' setup.py
 %py3_install
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 mock
-$easy_install_3 testscenarios
-$easy_install_3 testtools
+pip3 install mock testscenarios testtools
 %python3 -m unittest discover
 
 %files -n python3-daemon
@@ -55,6 +53,9 @@ $easy_install_3 testtools
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-6
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-5
 - Add license to python3 package
 - Remove python2 package

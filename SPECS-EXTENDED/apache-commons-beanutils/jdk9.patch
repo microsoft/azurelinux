@@ -1,0 +1,17 @@
+Index: commons-beanutils-1.9.3-src/build.xml
+===================================================================
+--- commons-beanutils-1.9.3-src.orig/build.xml
++++ commons-beanutils-1.9.3-src/build.xml
+@@ -62,10 +62,10 @@
+ 
+ 
+   <!-- Compiler source JDK version -->
+-  <property name="compile.source"          value="1.5"/>
++  <property name="compile.source"          value="8"/>
+ 
+   <!-- Compiler target JDK version -->
+-  <property name="compile.target"          value="1.5"/>
++  <property name="compile.target"          value="8"/>
+ 
+   <!-- Should Java compilations set the 'debug' compiler option? -->
+   <property name="compile.debug"           value="true"/>

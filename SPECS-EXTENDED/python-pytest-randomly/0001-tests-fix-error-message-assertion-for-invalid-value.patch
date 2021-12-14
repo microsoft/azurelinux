@@ -1,0 +1,32 @@
+From 9e1d313fecc87662245607b4682835eb9a87cdac Mon Sep 17 00:00:00 2001
+From: Dan Callaghan <dan.callaghan@opengear.com>
+Date: Thu, 30 Jan 2020 18:09:18 +1000
+Subject: [PATCH] tests: fix error message assertion for invalid value
+
+This was failing in Fedora because the message we see is worded
+differently to what the upstream test suite is expecting.
+
+    E       Failed: nomatch: "pytest: error: argument --randomly-seed: 'invalidvalue' is not an integer or the string 'last'"
+    E           and: 'usage: pytest.py [options] [file_or_dir] [file_or_dir] [...]'
+    E           and: "pytest.py: error: argument --randomly-seed: invalid int value: 'invalidvalue'"
+    E       remains unmatched: "pytest: error: argument --randomly-seed: 'invalidvalue' is not an integer or the string 'last'"
+
+See also:
+https://github.com/pytest-dev/pytest-randomly/issues/218#issuecomment-560501423
+
+diff --git a/tests/test_pytest_randomly.py b/tests/test_pytest_randomly.py
+index f81284d..13e15b1 100644
+--- a/tests/test_pytest_randomly.py
++++ b/tests/test_pytest_randomly.py
+@@ -121,7 +121,7 @@ def test_passing_nonsense_for_randomly_seed(ourtestdir):
+     out.stderr.fnmatch_lines(
+         [
+             (
+-                "pytest: error: argument --randomly-seed: 'invalidvalue' "
++                "*: error: argument --randomly-seed: 'invalidvalue' "
+                 + "is not an integer or the string 'last'"
+             )
+         ]
+-- 
+2.21.1
+

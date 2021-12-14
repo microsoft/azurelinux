@@ -1,0 +1,15 @@
+https://bugs.gentoo.org/580056
+
+--- a/libfs/devices.c
++++ b/libfs/devices.c
+@@ -30,6 +30,10 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
++#if HAVE_SYS_SYSMACROS_H
++#include <sys/sysmacros.h>
++#endif
++
+ #ifdef HAVE_SYS_MOUNT_H
+ #ifdef HAVE_SYS_PARAM_H
+ #include <sys/param.h>

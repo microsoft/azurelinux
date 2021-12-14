@@ -1,0 +1,14 @@
+diff -up dovecot-2.2.27/doc/mkcert.sh.mkcert-paths dovecot-2.2.27/doc/mkcert.sh
+--- dovecot-2.2.27/doc/mkcert.sh.mkcert-paths	2016-12-05 10:26:07.913515286 +0100
++++ dovecot-2.2.27/doc/mkcert.sh	2016-12-05 10:28:25.439634417 +0100
+@@ -5,8 +5,8 @@
+ 
+ umask 077
+ OPENSSL=${OPENSSL-openssl}
+-SSLDIR=${SSLDIR-/etc/ssl}
+-OPENSSLCONFIG=${OPENSSLCONFIG-dovecot-openssl.cnf}
++SSLDIR=${SSLDIR-/etc/pki/dovecot}
++OPENSSLCONFIG=${OPENSSLCONFIG-/etc/pki/dovecot/dovecot-openssl.cnf}
+ 
+ CERTDIR=$SSLDIR/certs
+ KEYDIR=$SSLDIR/private

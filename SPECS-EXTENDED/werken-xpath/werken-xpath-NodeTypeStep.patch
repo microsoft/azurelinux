@@ -1,0 +1,22 @@
+--- src/com/werken/xpath/impl/NodeTypeStep.java.sav	2006-05-05 20:09:00.000000000 +0200
++++ src/com/werken/xpath/impl/NodeTypeStep.java	2006-05-05 20:09:25.000000000 +0200
+@@ -84,16 +84,16 @@
+     {
+       if ( isAbsolute() )
+       {
+-        results.addAll(  applyToNodes( ((Element)node).getDocument().getMixedContent() ) );
++        results.addAll(  applyToNodes( ((Element)node).getDocument().getContent() ) );
+       }
+       else
+       {
+-        results.addAll( applyToNodes( ((Element)node).getMixedContent() ) );
++        results.addAll( applyToNodes( ((Element)node).getContent() ) );
+       }
+     }
+     else if ( node instanceof Document )
+     {
+-      results.addAll( applyToNodes( ((Document)node).getMixedContent() ) );
++      results.addAll( applyToNodes( ((Document)node).getContent() ) );
+     }
+ 
+     return results;

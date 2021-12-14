@@ -1,0 +1,112 @@
+From d91fc0569da44e7b9ebb6883974703b8e982098b Mon Sep 17 00:00:00 2001
+From: Honggang Li <honli@redhat.com>
+Date: Mon, 10 Feb 2020 04:59:36 -0500
+Subject: [PATCH] Fix multiple definition issues
+
+Signed-off-by: Honggang Li <honli@redhat.com>
+---
+ psm_error.h        | 2 +-
+ psm_utils.c        | 6 ++++++
+ psm_utils.h        | 7 ++-----
+ ptl_am/ptl_fwd.h   | 2 +-
+ ptl_ips/ptl_fwd.h  | 4 ++--
+ ptl_self/ptl_fwd.h | 2 +-
+ 6 files changed, 13 insertions(+), 10 deletions(-)
+
+diff --git a/psm_error.h b/psm_error.h
+index f335382..cb1b4ba 100644
+--- a/psm_error.h
++++ b/psm_error.h
+@@ -65,7 +65,7 @@
+ #define PSMI_EP_NORETURN	    ((psm2_ep_t) -2)
+ #define PSMI_EP_LOGEVENT	    ((psm2_ep_t) -3)
+ 
+-psm2_ep_errhandler_t psmi_errhandler_global;
++extern psm2_ep_errhandler_t psmi_errhandler_global;
+ 
+ psm2_error_t MOCKABLE(psmi_handle_error)(psm2_ep_t ep, psm2_error_t error,
+ 			      const char *buf, ...)
+diff --git a/psm_utils.c b/psm_utils.c
+index 521467f..7787f53 100644
+--- a/psm_utils.c
++++ b/psm_utils.c
+@@ -62,6 +62,12 @@ int psmi_ep_device_is_enabled(const psm2_ep_t ep, int devid);
+ 
+ struct psmi_epid_table psmi_epid_table;
+ 
++/*
++ * Global model so we can tune defaults better for specific cpu's
++ */
++uint32_t psmi_cpu_model;
++
++
+ /* Iterator to access the epid table.
+  * 'ep' can be NULL if remote endpoints from all endpoint handles are requested
+  */
+diff --git a/psm_utils.h b/psm_utils.h
+index fc38153..b94443d 100644
+--- a/psm_utils.h
++++ b/psm_utils.h
+@@ -317,10 +317,7 @@ uint32_t psmi_crc(unsigned char *buf, int len);
+ #define CPUID_GENUINE_INTEL     0xf0000000
+ #define CPUID_MODEL_UNDEFINED   -1
+ 
+-/*
+- * Global model so we can tune defaults better for specific cpu's
+- */
+-uint32_t psmi_cpu_model;
++extern uint32_t psmi_cpu_model;
+ 
+ /*
+  * Diagnostics, all in psm_diags.c
+@@ -337,7 +334,7 @@ void psmi_multi_ep_init();
+  * Fault injection
+  */
+ struct psmi_faultinj_spec;
+-int psmi_faultinj_enabled;	/* use macro to test */
++extern int psmi_faultinj_enabled;	/* use macro to test */
+ #if 1				/* possible to disable at compile time */
+ #define PSMI_FAULTINJ_ENABLED()	(!!psmi_faultinj_enabled)
+ #else
+diff --git a/ptl_am/ptl_fwd.h b/ptl_am/ptl_fwd.h
+index e1bd064..1d0fec4 100644
+--- a/ptl_am/ptl_fwd.h
++++ b/ptl_am/ptl_fwd.h
+@@ -57,7 +57,7 @@
+ #define _PTL_FWD_AMSH_H
+ 
+ /* Symbol in am ptl */
+-struct ptl_ctl_init psmi_ptl_amsh;
++extern struct ptl_ctl_init psmi_ptl_amsh;
+ 
+ extern int psmi_shm_mq_rv_thresh;
+ 
+diff --git a/ptl_ips/ptl_fwd.h b/ptl_ips/ptl_fwd.h
+index 3702fba..b774260 100644
+--- a/ptl_ips/ptl_fwd.h
++++ b/ptl_ips/ptl_fwd.h
+@@ -61,7 +61,7 @@ typedef struct ips_epaddr ips_epaddr_t;
+ typedef struct ips_msgctl ips_msgctl_t;
+ 
+ /* Symbol in ips ptl */
+-struct ptl_ctl_init psmi_ptl_ips;
++extern struct ptl_ctl_init psmi_ptl_ips;
+ 
+-struct ptl_ctl_rcvthread psmi_ptl_ips_rcvthread;
++extern struct ptl_ctl_rcvthread psmi_ptl_ips_rcvthread;
+ #endif /* _PTL_FWD_IPS_H */
+diff --git a/ptl_self/ptl_fwd.h b/ptl_self/ptl_fwd.h
+index 77ee7f9..7ee6b73 100644
+--- a/ptl_self/ptl_fwd.h
++++ b/ptl_self/ptl_fwd.h
+@@ -57,6 +57,6 @@
+ #define _PTL_FWD_SELF_H
+ 
+ /* Symbol in am ptl */
+-struct ptl_ctl_init psmi_ptl_self;
++extern struct ptl_ctl_init psmi_ptl_self;
+ 
+ #endif
+-- 
+2.25.0
+

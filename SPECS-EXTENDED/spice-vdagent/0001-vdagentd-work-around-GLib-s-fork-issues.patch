@@ -1,0 +1,103 @@
+From 9b8c0ebb9fb573e6ce3c5416371509f416503d0c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jakub=20Jank=C5=AF?= <jjanku@redhat.com>
+Date: Fri, 20 Mar 2020 10:36:03 +0100
+Subject: [PATCH 1/2] vdagentd: work around GLib's fork issues
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Creating threads is not compatible with forking as only the thread
+that calls fork() is inherited.
+
+Handlers registered with g_unix_signal_add() create a thread so
+move these calls after fork.
+
+Also call g_socket_service_start() after fork to avoid creation of
+new threads before it is necessary.
+
+Fixes: https://gitlab.freedesktop.org/spice/linux/vd_agent/issues/18
+
+Also see: https://gitlab.gnome.org/GNOME/glib/issues/2073
+
+Signed-off-by: Jakub Janků <jjanku@redhat.com>
+Acked-by: Frediano Ziglio <fziglio@redhat.com>
+---
+ src/udscs.c             | 6 ++++++
+ src/udscs.h             | 2 ++
+ src/vdagentd/vdagentd.c | 9 +++++----
+ 3 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/src/udscs.c b/src/udscs.c
+index 4de75f8..7c99eed 100644
+--- a/src/udscs.c
++++ b/src/udscs.c
+@@ -186,6 +186,7 @@ struct udscs_server *udscs_server_new(
+     server->read_callback = read_callback;
+     server->error_cb = error_cb;
+     server->service = g_socket_service_new();
++    g_socket_service_stop(server->service);
+ 
+     g_signal_connect(server->service, "incoming",
+         G_CALLBACK(udscs_server_accept_cb), server);
+@@ -223,6 +224,11 @@ void udscs_server_listen_to_address(struct udscs_server *server,
+     g_object_unref(sock_addr);
+ }
+ 
++void udscs_server_start(struct udscs_server *server)
++{
++    g_socket_service_start(server->service);
++}
++
+ void udscs_server_destroy_connection(struct udscs_server *server,
+                                      UdscsConnection     *conn)
+ {
+diff --git a/src/udscs.h b/src/udscs.h
+index 45ebd3f..4f7ea36 100644
+--- a/src/udscs.h
++++ b/src/udscs.h
+@@ -98,6 +98,8 @@ void udscs_server_listen_to_address(struct udscs_server *server,
+                                     const gchar         *addr,
+                                     GError             **err);
+ 
++void udscs_server_start(struct udscs_server *server);
++
+ void udscs_server_destroy_connection(struct udscs_server *server,
+                                      UdscsConnection     *conn);
+ 
+diff --git a/src/vdagentd/vdagentd.c b/src/vdagentd/vdagentd.c
+index cfd0a51..1b63ec8 100644
+--- a/src/vdagentd/vdagentd.c
++++ b/src/vdagentd/vdagentd.c
+@@ -1184,10 +1184,6 @@ int main(int argc, char *argv[])
+         uinput_device = g_strdup(DEFAULT_UINPUT_DEVICE);
+     }
+ 
+-    g_unix_signal_add(SIGINT, signal_handler, NULL);
+-    g_unix_signal_add(SIGHUP, signal_handler, NULL);
+-    g_unix_signal_add(SIGTERM, signal_handler, NULL);
+-
+     openlog("spice-vdagentd", do_daemonize ? 0 : LOG_PERROR, LOG_USER);
+ 
+     /* Setup communication with vdagent process(es) */
+@@ -1240,6 +1236,10 @@ int main(int argc, char *argv[])
+     }
+ #endif
+ 
++    g_unix_signal_add(SIGINT, signal_handler, NULL);
++    g_unix_signal_add(SIGHUP, signal_handler, NULL);
++    g_unix_signal_add(SIGTERM, signal_handler, NULL);
++
+     if (want_session_info)
+         session_info = session_info_create(debug);
+     if (session_info) {
+@@ -1252,6 +1252,7 @@ int main(int argc, char *argv[])
+ 
+     active_xfers = g_hash_table_new(g_direct_hash, g_direct_equal);
+ 
++    udscs_server_start(server);
+     loop = g_main_loop_new(NULL, FALSE);
+     g_main_loop_run(loop);
+ 
+-- 
+2.25.1
+

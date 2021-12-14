@@ -1,13 +1,14 @@
 Summary:        Lightweight in-process concurrent programming
 Name:           python-greenlet
 Version:        0.4.15
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT OR Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/greenlet
 Source0:        https://files.pythonhosted.org/packages/f8/e8/b30ae23b45f69aa3f024b46064c0ac8e5fcb4f22ace0dca8d6f9c8bbe5e7/greenlet-%{version}.tar.gz
+Patch0:         greenlet-py39.patch
 
 %description
 The greenlet package is a spin-off of Stackless, a version of CPython that supports micro-threads called “tasklets”.
@@ -22,7 +23,7 @@ The greenlet package is a spin-off of Stackless, a version of CPython that suppo
 A “greenlet”, on the other hand, is a still more primitive notion of micro-thread with no implicit scheduling; coroutines, in other words. This is useful when you want to control exactly when your code runs. You can build custom scheduled micro-threads on top of greenlet; however, it seems that greenlets are useful on their own as a way to make advanced control flow structures. For example, we can recreate generators; the difference with Python’s own generators is that our generators can call nested functions and the nested functions can yield values too. Additionally, you don’t need a “yield” keyword. See the example in tests/test_generator.py.
 
 %prep
-%autosetup -n greenlet-%{version}
+%autosetup -p1 -n greenlet-%{version}
 
 %build
 %py3_build
@@ -38,9 +39,12 @@ A “greenlet”, on the other hand, is a still more primitive notion of micro-t
 %defattr(-,root,root,-)
 %license LICENSE
 %{python3_sitelib}/*
-%{_includedir}/python3.7m/greenlet/greenlet.h
+%{_includedir}/python%{python3_version}/greenlet/greenlet.h
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.15-7
+- Add upstream patch to enable build with Python 3.9
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.15-6
 - Add license to python3 package
 - Remove python2 package

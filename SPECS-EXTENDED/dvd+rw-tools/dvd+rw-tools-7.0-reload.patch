@@ -1,0 +1,12 @@
+diff -Nrup dvd+rw-tools-7.0/growisofs_mmc.cpp dvd+rw-tools-7.0_mod/growisofs_mmc.cpp
+--- dvd+rw-tools-7.0/growisofs_mmc.cpp	2006-09-23 20:45:49.000000000 +0800
++++ dvd+rw-tools-7.0_mod/growisofs_mmc.cpp	2007-11-19 18:20:46.000000000 +0800
+@@ -138,7 +138,7 @@ int media_reload (char *name=NULL,struct
+ 		cmd[0] = 0x1B;		// START/STOP UNIT
+ 		cmd[4] = 0x2;		// "Eject"
+ 		cmd[5] = 0;
+-		if (cmd.transport()) return 1;
++		cmd.transport();
+ 	    }
+ #if defined(__sun) || defined(sun)
+ 	    else if (volmgt_running())

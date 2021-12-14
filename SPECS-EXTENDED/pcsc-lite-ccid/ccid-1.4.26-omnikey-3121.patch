@@ -1,0 +1,133 @@
+diff -up ccid-1.4.26/src/ccid.c.omnikey ccid-1.4.26/src/ccid.c
+--- ccid-1.4.26/src/ccid.c.omnikey	2017-02-24 10:04:25.742132234 +0100
++++ ccid-1.4.26/src/ccid.c	2017-02-24 10:07:26.145976335 +0100
+@@ -55,8 +55,16 @@ int ccid_open_hack_pre(unsigned int read
+ {
+ 	_ccid_descriptor *ccid_descriptor = get_ccid_descriptor(reader_index);
+ 
++	ccid_descriptor->dwNonStandardFlags = 0;
++
+ 	switch (ccid_descriptor->readerID)
+ 	{
++		case CARDMAN3121:
++			ccid_descriptor->dwNonStandardFlags = CCID_NON_STAND_OMK_3121_T1;
++			ccid_descriptor->dwFeatures &= ~CCID_CLASS_EXCHANGE_MASK;
++			ccid_descriptor->dwFeatures |= CCID_CLASS_TPDU;
++			break;
++
+ 		case MYSMARTPAD:
+ 			ccid_descriptor->dwMaxIFSD = 254;
+ 			break;
+diff -up ccid-1.4.26/src/ccid.h.omnikey ccid-1.4.26/src/ccid.h
+--- ccid-1.4.26/src/ccid.h.omnikey	2017-01-07 15:50:47.000000000 +0100
++++ ccid-1.4.26/src/ccid.h	2017-02-24 10:04:25.742132234 +0100
+@@ -137,6 +137,7 @@ typedef struct
+ 	 */
+ 	char zlp;
+ #endif
++	unsigned int dwNonStandardFlags;
+ } _ccid_descriptor;
+ 
+ /* Features from dwFeatures */
+@@ -153,6 +154,9 @@ typedef struct
+ #define CCID_CLASS_EXTENDED_APDU	0x00040000
+ #define CCID_CLASS_EXCHANGE_MASK	0x00070000
+ 
++/* Features from the swNonStandardFlags */
++#define CCID_NON_STAND_OMK_3121_T1	0x00000001
++
+ /* Features from bPINSupport */
+ #define CCID_CLASS_PIN_VERIFY		0x01
+ #define CCID_CLASS_PIN_MODIFY		0x02
+diff -up ccid-1.4.26/src/commands.c.omnikey ccid-1.4.26/src/commands.c
+--- ccid-1.4.26/src/commands.c.omnikey	2017-01-07 15:50:47.000000000 +0100
++++ ccid-1.4.26/src/commands.c	2017-02-24 10:11:21.297778870 +0100
+@@ -1292,6 +1292,39 @@ RESPONSECODE CmdXfrBlock(unsigned int re
+ 	return return_value;
+ } /* CmdXfrBlock */
+ 
++static RESPONSECODE omnikey_transmit_tpdu(unsigned int reader_index,
++        _ccid_descriptor *ccid_descriptor, unsigned int tx_length,
++        const unsigned char *tx_buffer)
++{
++	unsigned char cmd[11+CMD_BUF_SIZE];	 /* CCID + APDU buffer */
++	status_t ret;
++
++	cmd[0] = 0x6B; 				/* 3121 escape */
++	i2dw(tx_length+1, cmd+1); 	/* APDU length */
++	cmd[5] = ccid_descriptor->bCurrentSlotIndex;	/* slot number */
++	cmd[6] = (*ccid_descriptor->pbSeq)++;
++	cmd[7] = 0;
++	cmd[8] = 0;
++	cmd[9] = 0;
++	cmd[10] = 0x1A;
++
++	/* check that the command is not too large */
++	if (tx_length > CMD_BUF_SIZE)
++	{
++		DEBUG_CRITICAL2("TX Length too big: %d", tx_length);
++		return IFD_NOT_SUPPORTED;
++	}
++
++	memcpy(cmd+11, tx_buffer, tx_length);
++
++	ret = WritePort(reader_index, 11+tx_length, cmd);
++	if (STATUS_NO_SUCH_DEVICE == ret)
++		return IFD_NO_SUCH_DEVICE;
++	if (ret != STATUS_SUCCESS)
++		return IFD_COMMUNICATION_ERROR;
++
++	return IFD_SUCCESS;
++} /* omnikey_transmit_tpdu */
+ 
+ /*****************************************************************************
+  *
+@@ -1348,6 +1381,13 @@ RESPONSECODE CCID_Transmit(unsigned int
+ 	}
+ #endif
+ 
++	/* hack for Onmikey 3121 */
++	if ((ccid_descriptor->dwNonStandardFlags & CCID_NON_STAND_OMK_3121_T1) &&
++		(ccid_descriptor->cardProtocol == SCARD_PROTOCOL_T1)) {
++		return omnikey_transmit_tpdu(reader_index, ccid_descriptor, tx_length, 
++				tx_buffer);
++	}
++
+ 	cmd[0] = 0x6F; /* XfrBlock */
+ 	i2dw(tx_length, cmd+1);	/* APDU length */
+ 	cmd[5] = ccid_descriptor->bCurrentSlotIndex;	/* slot number */
+@@ -1373,8 +1413,9 @@ RESPONSECODE CCID_Transmit(unsigned int
+ RESPONSECODE CCID_Receive(unsigned int reader_index, unsigned int *rx_length,
+ 	unsigned char rx_buffer[], unsigned char *chain_parameter)
+ {
+-	unsigned char cmd[10+CMD_BUF_SIZE];	/* CCID + APDU buffer */
++	unsigned char cmd[11+CMD_BUF_SIZE];	/* CCID + APDU buffer */
+ 	unsigned int length;
++	unsigned char *rx_ptr = cmd+10;
+ 	RESPONSECODE return_value = IFD_SUCCESS;
+ 	status_t ret;
+ 	_ccid_descriptor *ccid_descriptor = get_ccid_descriptor(reader_index);
+@@ -1565,6 +1606,14 @@ time_request:
+ 	}
+ 
+ 	length = dw2i(cmd, 1);
++
++	if (length && 
++	  (ccid_descriptor->dwNonStandardFlags & CCID_NON_STAND_OMK_3121_T1) &&
++	  (ccid_descriptor->cardProtocol == SCARD_PROTOCOL_T1)) {
++		length--;
++		rx_ptr = cmd+11;
++	}
++
+ 	if (length <= *rx_length)
+ 		*rx_length = length;
+ 	else
+@@ -1581,7 +1630,7 @@ time_request:
+ 		return_value = IFD_COMMUNICATION_ERROR;
+ 	}
+ 	else
+-		memcpy(rx_buffer, cmd+10, length);
++		memcpy(rx_buffer, rx_ptr, length);
+ 
+ 	/* Extended case?
+ 	 * Only valid for RDR_to_PC_DataBlock frames */

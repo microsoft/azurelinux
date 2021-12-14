@@ -1,0 +1,24 @@
+diff -up openhpi-3.7.0/docs/man/Makefile.am.orig openhpi-3.7.0/docs/man/Makefile.am
+--- openhpi-3.7.0/docs/man/Makefile.am.orig	2017-12-20 16:47:26.698845572 +0100
++++ openhpi-3.7.0/docs/man/Makefile.am	2017-12-20 16:48:39.398099242 +0100
+@@ -47,7 +47,7 @@ EXTRA_DIST		= openhpi.7.pod   openhpid.8
+ SUFFIXES=.pod
+ 
+ .pod:
+-	pod2man --release=$(VERSION) --name=`echo $@ | sed 's/\..*//'` \
++	pod2man --release=$(VERSION) --date=2017-05-27 --name=`echo $@ | sed 's/\..*//'` \
+ 		-s `echo $@ | sed 's/.*\.//'` -c "OpenHPI" $< $@
+ 
+ #mandir = $(datadir)/man
+diff -up openhpi-3.7.0/docs/man/Makefile.in.orig openhpi-3.7.0/docs/man/Makefile.in
+--- openhpi-3.7.0/docs/man/Makefile.in.orig	2017-12-20 16:49:00.671295613 +0100
++++ openhpi-3.7.0/docs/man/Makefile.in	2017-12-20 16:49:23.724424748 +0100
+@@ -729,7 +729,7 @@ uninstall-man: uninstall-man1 uninstall-
+ 
+ 
+ .pod:
+-	pod2man --release=$(VERSION) --name=`echo $@ | sed 's/\..*//'` \
++	pod2man --release=$(VERSION) --date=2017-05-27 --name=`echo $@ | sed 's/\..*//'` \
+ 		-s `echo $@ | sed 's/.*\.//'` -c "OpenHPI" $< $@
+ 
+ clean-local: am_config_clean-local

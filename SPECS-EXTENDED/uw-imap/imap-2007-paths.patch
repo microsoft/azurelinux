@@ -1,0 +1,18 @@
+diff -up imap-2007/src/osdep/unix/Makefile.paths imap-2007/src/osdep/unix/Makefile
+--- imap-2007/src/osdep/unix/Makefile.paths	2007-12-17 16:10:24.000000000 -0600
++++ imap-2007/src/osdep/unix/Makefile	2007-12-21 09:30:04.000000000 -0600
+@@ -96,11 +96,11 @@ CHECKPW=std
+ LOGINPW=std
+ SIGTYPE=bsd
+ CRXTYPE=std
+-ACTIVEFILE=/usr/lib/news/active
+-SPOOLDIR=/usr/spool
++ACTIVEFILE=/var/lib/news/active
++SPOOLDIR=/var/spool
+ MAILSPOOL=$(SPOOLDIR)/mail
+ NEWSSPOOL=$(SPOOLDIR)/news
+-RSHPATH=/usr/ucb/rsh
++RSHPATH=/usr/bin/rsh
+ MD5PWD=/etc/cram-md5.pwd
+ # Tries one of the test alternatives below if not specified.
+ LOCKPGM=

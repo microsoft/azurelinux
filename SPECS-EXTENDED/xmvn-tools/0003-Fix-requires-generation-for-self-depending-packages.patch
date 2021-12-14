@@ -1,0 +1,115 @@
+From a07c7079d6e7ed3f799454a827836b3ca3033e45 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 1 Jul 2019 12:22:04 +0200
+Subject: [PATCH 3/3] Fix requires generation for self-depending packages
+
+---
+ .../tools/install/impl/DefaultInstaller.java  |  5 ++++
+ .../tools/install/impl/InstallerTest.java     |  9 +++++++
+ .../test/resources/self-requires-resolved.xml | 25 +++++++++++++++++++
+ .../src/test/resources/self-requires.xml      | 24 ++++++++++++++++++
+ 4 files changed, 63 insertions(+)
+ create mode 100644 xmvn-tools/xmvn-install/src/test/resources/self-requires-resolved.xml
+ create mode 100644 xmvn-tools/xmvn-install/src/test/resources/self-requires.xml
+
+diff --git a/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/DefaultInstaller.java b/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/DefaultInstaller.java
+index e051e823..671d79d3 100644
+--- a/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/DefaultInstaller.java
++++ b/xmvn-tools/xmvn-install/src/main/java/org/fedoraproject/xmvn/tools/install/impl/DefaultInstaller.java
+@@ -275,6 +275,11 @@ public class DefaultInstaller
+                 dependency.setNamespace( resolvedMetadata.getNamespace() );
+                 return;
+             }
++        }
++
++        for ( String version : Arrays.asList( dependency.getRequestedVersion(), Artifact.DEFAULT_VERSION ) )
++        {
++            Artifact dependencyArtifact = dependency.toArtifact().setVersion( version );
+ 
+             // Next try system artifact resolver
+             ResolutionRequest request = new ResolutionRequest( dependencyArtifact );
+diff --git a/xmvn-tools/xmvn-install/src/test/java/org/fedoraproject/xmvn/tools/install/impl/InstallerTest.java b/xmvn-tools/xmvn-install/src/test/java/org/fedoraproject/xmvn/tools/install/impl/InstallerTest.java
+index 48db907d..ccbbf63d 100644
+--- a/xmvn-tools/xmvn-install/src/test/java/org/fedoraproject/xmvn/tools/install/impl/InstallerTest.java
++++ b/xmvn-tools/xmvn-install/src/test/java/org/fedoraproject/xmvn/tools/install/impl/InstallerTest.java
+@@ -204,6 +204,15 @@ public class InstallerTest
+                              installRoot.resolve( "usr/share/maven-metadata/test-pkg.xml" ) );
+     }
+ 
++    @Test
++    public void testSelfRequires()
++        throws Exception
++    {
++        install( "self-requires.xml" );
++        assertMetadataEqual( getResource( "self-requires-resolved.xml" ),
++                             installRoot.resolve( "usr/share/maven-metadata/test-pkg.xml" ) );
++    }
++
+     @Test
+     public void testSubpackage()
+         throws Exception
+diff --git a/xmvn-tools/xmvn-install/src/test/resources/self-requires-resolved.xml b/xmvn-tools/xmvn-install/src/test/resources/self-requires-resolved.xml
+new file mode 100644
+index 00000000..59e8ad61
+--- /dev/null
++++ b/xmvn-tools/xmvn-install/src/test/resources/self-requires-resolved.xml
+@@ -0,0 +1,25 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<metadata xmlns="http://fedorahosted.org/xmvn/METADATA/3.0.0">
++  <uuid>bfb4d47f-4bf2-49bc-bd85-1d3528e97746</uuid>
++  <artifacts>
++    <artifact>
++      <groupId>org.apache.maven.wagon</groupId>
++      <artifactId>wagon-provider-api</artifactId>
++      <version>3.3.2</version>
++      <path>???example.jar</path>
++    </artifact>
++    <artifact>
++      <groupId>org.apache.maven.wagon</groupId>
++      <artifactId>wagon-file</artifactId>
++      <version>3.3.2</version>
++      <path>???example.jar</path>
++      <dependencies>
++        <dependency>
++          <groupId>org.apache.maven.wagon</groupId>
++          <artifactId>wagon-provider-api</artifactId>
++          <requestedVersion>3.3.2</requestedVersion>
++        </dependency>
++      </dependencies>
++    </artifact>
++  </artifacts>
++</metadata>
+diff --git a/xmvn-tools/xmvn-install/src/test/resources/self-requires.xml b/xmvn-tools/xmvn-install/src/test/resources/self-requires.xml
+new file mode 100644
+index 00000000..16a78328
+--- /dev/null
++++ b/xmvn-tools/xmvn-install/src/test/resources/self-requires.xml
+@@ -0,0 +1,24 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<metadata xmlns="http://fedorahosted.org/xmvn/METADATA/3.2.0">
++  <artifacts>
++    <artifact>
++      <groupId>org.apache.maven.wagon</groupId>
++      <artifactId>wagon-provider-api</artifactId>
++      <version>3.3.2</version>
++      <path>src/test/resources/example.jar</path>
++    </artifact>
++    <artifact>
++      <groupId>org.apache.maven.wagon</groupId>
++      <artifactId>wagon-file</artifactId>
++      <version>3.3.2</version>
++      <path>src/test/resources/example.jar</path>
++      <dependencies>
++        <dependency>
++          <groupId>org.apache.maven.wagon</groupId>
++          <artifactId>wagon-provider-api</artifactId>
++          <requestedVersion>3.3.2</requestedVersion>
++        </dependency>
++      </dependencies>
++    </artifact>
++  </artifacts>
++</metadata>
+\ No newline at end of file
+-- 
+2.21.0
+

@@ -1,7 +1,7 @@
 Summary:        Core utilities for Python packages
 Name:           python-packaging
 Version:        17.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Requires:       python3-six
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-pyparsing
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
@@ -43,8 +44,7 @@ Core utilities for Python packages
 %py3_install
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pretend pytest
+pip3 install pretend pytest
 PYTHONPATH=./ pytest
 
 %files -n python3-packaging
@@ -53,6 +53,9 @@ PYTHONPATH=./ pytest
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 17.1-8
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 17.1-7
 - Add license to python3 package
 - Remove python2 package

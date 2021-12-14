@@ -1,0 +1,13 @@
+--- commons-collections-3.2.2-src/build.xml	2017-09-14 12:45:40.626106146 +0200
++++ commons-collections-3.2.2-src/build.xml	2017-09-14 13:04:45.932517074 +0200
+@@ -460,6 +460,10 @@
+                doctitle="${tf.title} ${tf.version} API;"
+             windowtitle="${tf.title} ${tf.version} API"
+                  bottom="Copyright &amp;copy; 2001-${year} Apache Software Foundation. All Rights Reserved.">
++      <classpath>
++        <pathelement location="${build.classes}"/>
++        <pathelement location="${junit.jar}"/>
++      </classpath>
+       <fileset dir="${source.test}">
+         <include name="**/AbstractTest*.java"/>
+         <include name="**/BulkTest*.java"/>

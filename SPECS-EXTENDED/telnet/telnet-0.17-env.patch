@@ -1,0 +1,84 @@
+--- netkit-telnet-0.17-pre-20000204/telnet/commands.c.env	Thu Apr  8 19:30:20 1999
++++ netkit-telnet-0.17-pre-20000204/telnet/commands.c	Tue May 16 17:19:47 2000
+@@ -1815,11 +1815,11 @@
+ }
+ 
+ 	unsigned char *
+-env_getvalue(unsigned char *var)
++env_getvalue(unsigned char *var, int exported_only)
+ {
+-	struct env_lst *ep;
++	struct env_lst *ep = env_find(var);
+ 
+-	if ((ep = env_find(var)))
++	if (ep && (!exported_only || ep->export))
+ 		return(ep->value);
+ 	return(NULL);
+ }
+--- netkit-telnet-0.17-pre-20000204/telnet/telnet.c.env	Tue May 16 17:19:47 2000
++++ netkit-telnet-0.17-pre-20000204/telnet/telnet.c	Tue May 16 17:19:47 2000
+@@ -438,7 +438,7 @@
+ #endif
+ 
+ 	    case TELOPT_XDISPLOC:	/* X Display location */
+-		if (env_getvalue((unsigned char *)"DISPLAY"))
++		if (env_getvalue((unsigned char *)"DISPLAY", 0))
+ 		    new_state_ok = 1;
+ 		break;
+ 
+@@ -693,7 +693,7 @@
+ 		resettermname = 0;
+ 		if (tnamep && tnamep != unknown)
+ 			free(tnamep);
+-		if ((tname = (char *)env_getvalue((unsigned char *)"TERM")) &&
++		if ((tname = (char *)env_getvalue((unsigned char *)"TERM", 0)) &&
+ 				(setupterm(tname, 1, &errret) == 0)) {
+ 			tnamep = mklist(ttytype, tname);
+ 		} else {
+@@ -870,7 +870,7 @@
+ 	    unsigned char temp[50], *dp;
+ 	    int len;
+ 
+-	    if ((dp = env_getvalue((unsigned char *)"DISPLAY")) == NULL) {
++	    if ((dp = env_getvalue((unsigned char *)"DISPLAY", 0)) == NULL) {
+ 		/*
+ 		 * Something happened, we no longer have a DISPLAY
+ 		 * variable.  So, turn off the option.
+@@ -1527,7 +1527,7 @@
+ 			env_opt_add(ep);
+ 		return;
+ 	}
+-	vp = env_getvalue(ep);
++	vp = env_getvalue(ep, 1);
+ 	if (opt_replyp + (vp ? strlen((char *)vp) : 0) +
+ 				strlen((char *)ep) + 6 > opt_replyend)
+ 	{
+@@ -2170,7 +2170,7 @@
+ 	send_will(TELOPT_LINEMODE, 1);
+ 	send_will(TELOPT_NEW_ENVIRON, 1);
+ 	send_do(TELOPT_STATUS, 1);
+-	if (env_getvalue((unsigned char *)"DISPLAY"))
++	if (env_getvalue((unsigned char *)"DISPLAY", 0))
+ 	    send_will(TELOPT_XDISPLOC, 1);
+ 	if (binary)
+ 	    tel_enter_binary(binary);
+--- netkit-telnet-0.17-pre-20000204/telnet/externs.h.env	Mon Feb  8 15:56:11 1999
++++ netkit-telnet-0.17-pre-20000204/telnet/externs.h	Tue May 16 17:19:47 2000
+@@ -203,7 +203,7 @@
+ void env_send (unsigned char *);
+ void env_list (void);
+ unsigned char * env_default(int init, int welldefined);
+-unsigned char * env_getvalue(unsigned char *var);
++unsigned char * env_getvalue(unsigned char *var, int exported_only);
+ 
+ void set_escape_char(char *s);
+ unsigned long sourceroute(char *arg, char **cpp, int *lenp);
+@@ -335,7 +335,7 @@
+ void     env_opt_end (int);
+ 
+ unsigned char     *env_default (int, int);
+-unsigned char     *env_getvalue (unsigned char *);
++unsigned char     *env_getvalue (unsigned char *, int);
+ 
+ int get_status (void);
+ int dosynch (void);

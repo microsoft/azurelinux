@@ -1,0 +1,163 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.
+  -->
+
+  <!ENTITY dhfirstname "<firstname>Thibaut</firstname>">
+  <!ENTITY dhsurname   "<surname>Paumard</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>February 6, 2008</date>">
+  <!ENTITY dhsection   "<manvolnum>8</manvolnum>">
+  <!ENTITY dhemail     "<email>&lt;paumard@users.sourceforge.net&gt;</email>">
+  <!ENTITY dhusername  "Thibaut Paumard">
+  <!ENTITY dhucpackage "<refentrytitle>ZEROFREE</refentrytitle>">
+  <!ENTITY dhpackage   "zerofree">
+
+  <!ENTITY debian      "<productname>Debian</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2003</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </refentryinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>&dhpackage;</refname>
+
+    <refpurpose>zero free blocks from ext2/3 file-systems</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+
+      <arg><option>-n</option></arg>
+
+      <arg><option>-v</option></arg>
+
+      <arg choice=req><replaceable>filesystem</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para><command>&dhpackage;</command> finds the unallocated,
+       non-zeroed blocks in an ext2 or ext3
+       <replaceable>filesystem</replaceable> (e.g. /dev/hda1) and
+       fills them with zeroes. This is useful if the device on which
+       this file-system resides is a disk image. In this case,
+       depending on the type of disk image, a secondary utility may be
+       able to reduce the size of the disk image after zerofree has
+       been run.</para>
+
+    <para>The usual way to achieve the same result (zeroing the
+       unallocated blocks) is to run <command>dd</command> (1) to
+       create a file full of zeroes that takes up the entire free
+       space on the drive, and then delete this file. This has many
+       disadvantages, which zerofree alleviates:</para>
+    <itemizedlist>
+    <listitem><para>it is slow;</para></listitem>
+
+    <listitem><para>it makes the disk image (temporarily) grow to its maximal
+      extent;</para></listitem>
+
+    <listitem><para>it (temporarily) uses all free space on the disk, so other
+      concurrent write actions may fail.</para></listitem>
+
+    </itemizedlist>
+
+    <para><replaceable>filesystem</replaceable> has to be unmounted or
+    mounted read-only for <command>&dhpackage;</command> to work. It
+    will exit with an error message if the
+    <replaceable>filesystem</replaceable> is mounted writable. To
+    remount the root file-system readonly, you can first switch to
+    single user runlevel (<command>telinit 1</command>) then use
+    <command>mount -o remount,ro
+    <replaceable>filesystem</replaceable></command>.</para>
+
+    <para><command>&dhpackage;</command> has been written to be
+      run from GNU/Linux systems installed as guest OSes inside a
+      virtual machine. It may however be useful in other
+      situations.</para>
+
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+
+    <variablelist>
+      <varlistentry>
+        <term><option>-n</option>
+        </term>
+        <listitem>
+          <para>Perform a dry run  (do not modify the file-system);</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-v</option>
+        </term>
+        <listitem>
+          <para>Be verbose.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+
+    <para>dd (1).</para>
+
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>This manual page was written by &dhusername; &dhemail; for
+      the &debian; system (but may be used by others).  Permission is
+      granted to copy, distribute and/or modify this document under
+      the terms of the &gnu; General Public License, Version 2 or any 
+	  later version published by the Free Software Foundation.
+    </para>
+	<para>
+	  On Debian systems, the complete text of the GNU General Public
+	  License can be found in /usr/share/common-licenses/GPL-2.
+	</para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
+

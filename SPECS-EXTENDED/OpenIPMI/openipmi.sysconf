@@ -1,0 +1,68 @@
+## Path:        Hardware/IPMI
+## Description: Enable standard hardware interfaces (KCS, BT, SMIC)
+## Type:        yesno
+## Default:     "yes"
+## Config:      ipmi
+# Enable standard hardware interfaces (KCS, BT, SMIC)
+# You probably want this enabled.
+IPMI_SI=yes
+
+## Path:        Hardware/IPMI
+## Description: Enable /dev/ipmi0 interface, used by ipmitool, ipmicmd,
+## Type:        yesno
+## Default:     "yes"
+## Config:      ipmi
+# Enable /dev/ipmi0 interface, used by ipmitool, ipmicmd,
+# and other userspace IPMI-using applications.
+# You probably want this enabled.
+DEV_IPMI=yes
+
+## Path:        Hardware/IPMI
+## Description: Enable IPMI_WATCHDOG if you want the IPMI watchdog
+## Type:        yesno
+## Default:     "no"
+## Config:      ipmi
+# Enable IPMI_WATCHDOG if you want the IPMI watchdog
+# to reboot the system if it hangs
+IPMI_WATCHDOG=no
+
+## Path:        Hardware/IPMI
+## Description: Watchdog options - modinfo ipmi_watchdog for details
+## Type:        string
+## Default:     "timeout=60"
+## Config:      ipmi
+# Watchdog options - modinfo ipmi_watchdog for details
+# watchdog timeout value in seconds
+# as there is no userspace ping application that runs during shutdown,
+# be sure to give it enough time for any device drivers to
+# do their cleanup (e.g. megaraid cache flushes)
+# without the watchdog triggering prematurely
+IPMI_WATCHDOG_OPTIONS="timeout=60"
+
+## Path:        Hardware/IPMI
+## Description: Enable IPMI_POWEROFF if you want the IPMI poweroff module to be loaded.
+## Type:        yesno
+## Default:     "no"
+## Config:      ipmi
+# Enable IPMI_POWEROFF if you want the IPMI
+# poweroff module to be loaded.
+IPMI_POWEROFF=no
+
+## Path:        Hardware/IPMI
+## Description: Enable IPMI_POWERCYCLE if you want the system to be power-cycled on reboot
+## Type:        yesno
+## Default:     "no"
+## Config:      ipmi
+# Enable IPMI_POWERCYCLE if you want the system to be power-cycled (power
+# down, delay briefly, power on) rather than power off, on systems
+# that support such.  IPMI_POWEROFF=yes is also required.
+IPMI_POWERCYCLE=no
+
+## Path:        Hardware/IPMI
+## Description: Enable "legacy" interfaces for applications
+## Type:        yesno
+## Default:     "no"
+## Config:      ipmi
+# Enable "legacy" interfaces for applications
+# Intel IMB driver interface
+IPMI_IMB=no

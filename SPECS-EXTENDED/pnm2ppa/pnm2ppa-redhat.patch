@@ -1,0 +1,33 @@
+diff -up pnm2ppa-1.04/Makefile.rh pnm2ppa-1.04/Makefile
+--- pnm2ppa-1.04/Makefile.rh	2000-11-02 18:33:08.000000000 +0000
++++ pnm2ppa-1.04/Makefile	2008-09-24 15:18:26.000000000 +0100
+@@ -10,7 +10,7 @@ CC=gcc
+ INSTALL=install
+ 
+ # production build
+-CFLAGS=-Wall -pedantic -O2 -g -DNDEBUG 
++CFLAGS=$(RPM_OPT_FLAGS) -DNDEBUG 
+ LDFLAGS=-lm
+ OBJS = pnm2ppa.o syslog.o ppa.o image.o dither.o cutswath.o hash_ink.o gamma.o
+ SRC =  pnm2ppa.c syslog.c ppa.c image.c dither.c cutswath.c hash_ink.c gamma.c
+diff -up pnm2ppa-1.04/pbm2ppa-0.8.6/Makefile.rh pnm2ppa-1.04/pbm2ppa-0.8.6/Makefile
+--- pnm2ppa-1.04/pbm2ppa-0.8.6/Makefile.rh	2008-09-24 15:18:26.000000000 +0100
++++ pnm2ppa-1.04/pbm2ppa-0.8.6/Makefile	2008-09-24 15:18:26.000000000 +0100
+@@ -1,5 +1,5 @@
+ CC=gcc
+-CFLAGS=-Wall -O2 
++CFLAGS=$(RPM_OPT_FLAGS)
+ LDFLAGS=
+ PRINTER=HP720
+ 
+diff -up pnm2ppa-1.04/pnm2ppa.conf.rh pnm2ppa-1.04/pnm2ppa.conf
+--- pnm2ppa-1.04/pnm2ppa.conf.rh	2000-10-28 16:02:57.000000000 +0100
++++ pnm2ppa-1.04/pnm2ppa.conf	2008-09-24 15:18:26.000000000 +0100
+@@ -12,7 +12,6 @@
+ # will be used.   The printer version can also be set with the command line
+ # option e.g., "-v 720".
+ 
+-version   ERROR    # PNM2PPA WIIL *NOT* WORK UNTIUL THIS ENTRY IS REMOVED!!!!
+ #version  720	# 710, 712, 722 also acceptable
+ #version  820
+ #version 1000

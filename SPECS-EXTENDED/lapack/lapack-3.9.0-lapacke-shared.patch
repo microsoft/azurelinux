@@ -1,0 +1,21 @@
+diff -up lapack-3.9.0/INSTALL/make.inc.gfortran.shared lapack-3.9.0/INSTALL/make.inc.gfortran
+--- lapack-3.9.0/INSTALL/make.inc.gfortran.shared	2019-11-26 09:19:38.689118934 -0500
++++ lapack-3.9.0/INSTALL/make.inc.gfortran	2019-11-26 09:20:52.442628214 -0500
+@@ -81,3 +81,4 @@ CBLASLIB     = $(TOPSRCDIR)/libcblas.a
+ LAPACKLIB    = $(TOPSRCDIR)/liblapack.a
+ TMGLIB       = $(TOPSRCDIR)/libtmglib.a
+ LAPACKELIB   = $(TOPSRCDIR)/liblapacke.a
++SHLIB_LAPACKE = $(TOPSRCDIR)/liblapacke.so
+diff -up lapack-3.9.0/LAPACKE/Makefile.shared lapack-3.9.0/LAPACKE/Makefile
+--- lapack-3.9.0/LAPACKE/Makefile.shared	2019-11-26 09:19:38.689118934 -0500
++++ lapack-3.9.0/LAPACKE/Makefile	2019-11-26 09:21:59.977268139 -0500
+@@ -54,6 +54,9 @@ lapacke: include/lapacke_mangling.h
+ include/lapacke_mangling.h: include/lapacke_mangling_with_flags.h.in
+ 	cp include/lapacke_mangling_with_flags.h.in $@
+ 
++shlib: lapacke
++	$(CC) $(CFLAGS) -shared -Wl,-soname,liblapacke.so.@SHORTVER@ -o $(SHLIB_LAPACKE).@LONGVER@ src/*.o utils/*.o $(LDFLAGS) $(LIBS) -lgfortran -lc -L.. -llapack
++
+ .PHONY: lapacke_example
+ lapacke_example: lapacke
+ 	$(MAKE) -C example

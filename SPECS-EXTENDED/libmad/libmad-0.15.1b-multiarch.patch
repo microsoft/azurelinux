@@ -1,0 +1,37 @@
+diff -up libmad-0.15.1b/Makefile.am.orig libmad-0.15.1b/Makefile.am
+--- libmad-0.15.1b/Makefile.am.orig	2009-01-25 14:35:56.000000000 +0200
++++ libmad-0.15.1b/Makefile.am	2009-01-25 18:35:07.000000000 +0200
+@@ -110,15 +110,28 @@ mad.h: config.status config.h Makefile.a
+ 	echo "# ifdef __cplusplus";  \
+ 	echo 'extern "C" {';  \
+ 	echo "# endif"; echo;  \
+-	if [ ".$(FPM)" != "." ]; then  \
+-		echo ".$(FPM)" | sed -e 's|^\.-D|# define |'; echo;  \
+-	fi;  \
++	echo "# ifdef __i386__"; \
++	echo "# define FPM_INTEL"; \
++	echo "# define SIZEOF_LONG 4"; \
++	echo "# endif"; \
++	echo "#ifdef __x86_64__";\
++	echo "# define FPM_64BIT"; \
++	echo "# define SIZEOF_LONG 8"; \
++	echo "# endif"; \
++	echo "#ifdef __powerpc__"; \
++	echo "#define FPM_PPC"; \
++	echo "#define SIZEOF_LONG 4"; \
++	echo "#endif"; \
++	echo "#ifdef __powerpc64__"; \
++	echo "#define FPM_PPC"; \
++	echo "#define SIZEOF_LONG 8"; \
++	echo "#endif"; echo; \
+ 	sed -ne 's/^# *define  *\(HAVE_.*_ASM\).*/# define \1/p'  \
+ 		config.h; echo;  \
+ 	sed -ne 's/^# *define  *OPT_\(SPEED\|ACCURACY\).*/# define OPT_\1/p'  \
+ 		config.h; echo;  \
+-	sed -ne 's/^# *define  *\(SIZEOF_.*\)/# define \1/p'  \
+-		config.h; echo;  \
++	echo "# define SIZEOF_INT 4"; \
++	echo "# define SIZEOF_LONG_LONG 8"; echo; \
+ 	for header in $(exported_headers); do  \
+ 		echo;  \
+ 		sed -n -f $(srcdir)/mad.h.sed $(srcdir)/$$header;  \

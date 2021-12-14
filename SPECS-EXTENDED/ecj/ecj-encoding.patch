@@ -1,0 +1,10 @@
+--- ecj-4.12/build.xml	2019-09-25 08:54:14.517407464 +0200
++++ ecj-4.12/build.xml	2019-09-25 08:55:02.281660671 +0200
+@@ -25,6 +25,7 @@
+ 
+ 		<javac srcdir="${basedir}" destdir="${output}"
+ 					debuglevel="lines,source"
++					encoding="utf-8"
+ 					source="1.8"
+ 					target="1.8">
+ 			<compilerarg line="-Xlint:none"/>

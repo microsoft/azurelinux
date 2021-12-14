@@ -1,0 +1,87 @@
+--- build.xml.orig	2014-12-31 16:43:56.000000000 +0000
++++ build.xml	2015-06-22 09:20:12.859059775 +0100
+@@ -81,6 +81,7 @@
+   <target name="compile" depends="clean, prepare">
+     <javac srcdir="src" destdir="${src.classes.dir}" source="1.5" target="1.5" debug="true" deprecation="true" nowarn="true">
+       <classpath refid="compile.classpath" />
++      <compilerarg value="-Xlint:none" />
+     </javac>
+   </target>
+ 
+@@ -207,18 +208,14 @@
+     	<delete file="${target.dir}/${jar.core.osgified}" />
+   </target>
+ 	
+-  <target name="jar" depends="jar.all">
+-    <jarjar jarfile="${target.dir}/${jar.core}">
++  <target name="jar" depends="compile">
++    <jar jarfile="${target.dir}/${jar.core}">
+       <manifest>
+         <attribute name="Built-By" value="${user.name}"/>
+         <attribute name="Implementation-Version" value="${version}"/>
+       </manifest>
+-      <fileset dir="${lib.dir.repackaged}" includes="*.txt" />
+-      <fileset dir="." file="LICENSE" />
+-      <fileset dir="." file="NOTICE" />
+       <fileset dir="${src.classes.dir}" />
+-      <zipfileset src="${lib.dir.repackaged}/cglib-and-asm-1.0.jar"/>
+-    </jarjar>
++    </jar>
+   </target>
+ 	
+   <target name="sources" >
+@@ -319,53 +316,10 @@
+           <h1><a href="org/mockito/Mockito.html">Click to see examples</a>. Mockito ${version} API.</h1>
+         ]]>
+       </doctitle>
+-      <header>
+-        <![CDATA[
+-          <!-- Note there is a weird javadoc task bug if using the double quote char \" that causes an 'illegal package name' error -->
+-
+-          <!-- using the beautify plugin for jQuery from https://bitbucket.org/larscorneliussen/beautyofcode/ -->
+-          <script type="text/javascript">
+-              var shBaseURL = '{@docRoot}/js/sh-2.1.382/';
+-          </script>
+-          <script type="text/javascript" src="{@docRoot}/js/jquery-1.7.min.js"></script>
+-          <script type="text/javascript" src="{@docRoot}/js/jquery.beautyOfCode-min.js"></script>
+-
+-          <script type="text/javascript">
+-              /* Apply beautification of code */
+-              var usingOldIE = false;
+-              if($.browser.msie && parseInt($.browser.version) < 9) usingOldIE = true;
+-
+-              if(!usingOldIE) {
+-                  $.beautyOfCode.init({
+-                    theme : 'Eclipse',
+-                    brushes: ['Java']
+-                  });
+-
+-                  var version = ${version};
+-
+-                  /* Add name & version to header */
+-                  $(function() {
+-                    $('td.NavBarCell1[colspan=2]').each(function(index, element) {
+-                      var jqueryTD = $(element);
+-                      jqueryTD.after(
+-                        $('<td><em><strong>Mockito ${version} API</strong></em></td>').attr('class','NavBarCell1').attr('id','mockito-version-header')
+-                      );
+-                      jqueryTD.removeAttr('colspan');
+-                    })
+-                  })
+-              }
+-          </script>
+-        ]]>
+-      </header>
+       <group title="Main package" packages="org.mockito"/>
+       <classpath refid="compile.classpath" />
+     </javadoc>
+-  	<copy todir="${javadoc.dir}/org/mockito" file="javadoc/img/logo.jpg" />
+-  	<copy todir="${javadoc.dir}/js" file="javadoc/js/jquery-1.7.min.js" />
+-  	<copy todir="${javadoc.dir}/js" file="javadoc/js/jquery.beautyOfCode-min.js" />
+-    <copy todir="${javadoc.dir}/js/sh-2.1.382">
+-      <fileset dir="javadoc/js/sh-2.1.382"/>
+-    </copy>
++    <copy todir="${javadoc.dir}/org/mockito" file="javadoc/org/mockito/logo.jpg" />
+   </target>
+ 
+   <target name="repackage-tests" depends="compile.test">

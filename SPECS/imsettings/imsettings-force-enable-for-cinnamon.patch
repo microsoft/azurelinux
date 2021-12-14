@@ -1,0 +1,23 @@
+diff -pruN imsettings-1.6.6.orig/data/imsettings-target-checker.sh.in imsettings-1.6.6/data/imsettings-target-checker.sh.in
+--- imsettings-1.6.6.orig/data/imsettings-target-checker.sh.in	2013-10-10 20:15:29.000000000 +0900
++++ imsettings-1.6.6/data/imsettings-target-checker.sh.in	2013-10-10 20:44:39.000000000 +0900
+@@ -89,19 +89,6 @@ case $(get_desktop) in
+ 	    exit 1
+ 	fi
+ 	;;
+-    cinnamon*)
+-	dbus_send 'org.Cinnamon' '/' 'org.freedesktop.DBus.Peer.Ping'
+-	if [ $? = 0 ]; then
+-	    if gsettings_get_bool org.cinnamon.settings-daemon.plugins.keyboard active; then
+-		log "** org.cinnamon.settings-daemon.plugins.keyboard.active is true. imsettings is going to be disabled."
+-		exit 0
+-	    else
+-		exit 1
+-	    fi
+-	else
+-	    exit 1
+-	fi
+-	;;
+     *)
+ 	exit 1
+ 	;;

@@ -1,0 +1,48 @@
+From f6ea43966cc3b739ba8cd9be20b141a1bad32a8e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 31 Aug 2021 18:50:33 +0100
+Subject: [PATCH] target/i386: add missing bits to CR4_RESERVED_MASK
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Booting Fedora kernels with -cpu max hangs very early in boot. Disabling
+the la57 CPUID bit fixes the problem. git bisect traced the regression to
+
+  commit 213ff024a2f92020290296cb9dc29c2af3d4a221 (HEAD, refs/bisect/bad)
+  Author: Lara Lazier <laramglazier@gmail.com>
+  Date:   Wed Jul 21 17:26:50 2021 +0200
+
+    target/i386: Added consistency checks for CR4
+
+    All MBZ bits in CR4 must be zero. (APM2 15.5)
+    Added reserved bitmask and added checks in both
+    helper_vmrun and helper_write_crN.
+
+    Signed-off-by: Lara Lazier <laramglazier@gmail.com>
+    Message-Id: <20210721152651.14683-2-laramglazier@gmail.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+In this commit CR4_RESERVED_MASK is missing CR4_LA57_MASK and
+two others. Adding this lets Fedora kernels boot once again.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ target/i386/cpu.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 6c50d3ab4f..ce85f1a29d 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -257,6 +257,7 @@ typedef enum X86Seg {
+                 | CR4_DE_MASK | CR4_PSE_MASK | CR4_PAE_MASK \
+                 | CR4_MCE_MASK | CR4_PGE_MASK | CR4_PCE_MASK \
+                 | CR4_OSFXSR_MASK | CR4_OSXMMEXCPT_MASK |CR4_UMIP_MASK \
++                | CR4_LA57_MASK | CR4_VMXE_MASK | CR4_SMXE_MASK \
+                 | CR4_FSGSBASE_MASK | CR4_PCIDE_MASK | CR4_OSXSAVE_MASK \
+                 | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK))
+ 
+-- 
+2.32.0
+

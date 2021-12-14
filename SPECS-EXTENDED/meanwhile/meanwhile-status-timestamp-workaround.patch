@@ -1,0 +1,21 @@
+# User Mikael Berthe <mikael.berthe@lilotux.net>
+# Date 1195749751 -3600
+Fix Awareness status timestamps with recent Sametime clients
+
+For some reason the status timestamps I receive from people with a recent
+Sametime client make no sense.  This patch simply sets the timestamp to 0,
+as I have no idea how to interpret these time values.
+
+diff -r 17977a4e7da1 -r e7601af90b31 src/common.c
+--- a/src/common.c	Thu Nov 08 18:58:33 2007 +0100
++++ b/src/common.c	Thu Nov 22 17:42:31 2007 +0100
+@@ -688,6 +688,9 @@ void mwUserStatus_get(struct mwGetBuffer
+   guint16_get(b, &stat->status);
+   guint32_get(b, &stat->time);
+   mwString_get(b, &stat->desc);
++
++  // Quick'n ugly hack for recent Sametime clients
++  stat->time = 0;
+ }
+ 
+ 

@@ -1,0 +1,34 @@
+From d31c2ffbf5181053330fa32e4f03c47283bd1448 Mon Sep 17 00:00:00 2001
+From: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+Date: Sat, 17 Dec 2016 10:28:31 +0100
+Subject: [PATCH 1/3] xmlrpc_server_abyss: use va_args properly
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+../src/xmlrpc_server_abyss.c: In function ‘createServer’:
+../src/xmlrpc_server_abyss.c:783:13: error: format not a string literal and no format arguments [-Werror=format-security]
+             xmlrpc_faultf(envP, error);
+             ^~~~~~~~~~~~~
+
+Signed-off-by: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+---
+ src/xmlrpc_server_abyss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/xmlrpc_server_abyss.c b/src/xmlrpc_server_abyss.c
+index 8aacb4b..58f5ba0 100644
+--- a/src/xmlrpc_server_abyss.c
++++ b/src/xmlrpc_server_abyss.c
+@@ -780,7 +780,7 @@ createServer(xmlrpc_env *                      const envP,
+         ServerInit2(abyssServerP, &error);
+ 
+         if (error) {
+-            xmlrpc_faultf(envP, error);
++            xmlrpc_faultf(envP, "%s", error);
+             xmlrpc_strfree(error);
+         }
+     }
+-- 
+2.13.1
+

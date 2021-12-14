@@ -1,0 +1,75 @@
+From 1439bf7acc88b6a398e1a390045dcac9e3163e53 Mon Sep 17 00:00:00 2001
+From: Martin Wilck <mwilck@suse.com>
+Date: Thu, 15 Aug 2019 14:46:56 +0000
+Subject: [PATCH] multipath.conf.5: document foreign library support
+
+Add documentation for foreign library support, and for the
+"enable_foreign" parameter.
+
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ multipath/multipath.conf.5 | 40 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/multipath/multipath.conf.5 b/multipath/multipath.conf.5
+index ac8eadd0..101e1a88 100644
+--- a/multipath/multipath.conf.5
++++ b/multipath/multipath.conf.5
+@@ -1222,6 +1222,21 @@ makes multipath immediately mark a device with only ghost paths as ready.
+ The default is: \fBno\fR
+ .RE
+ .
++.
++.TP
++.B enable_foreign
++Enables or disables foreign libraries (see section
++.I FOREIGN MULTIPATH SUPPORT
++below). The value is a regular expression; foreign libraries are loaded
++if their name (e.g. \(dqnvme\(dq) matches the expression. By default,
++all foreign libraries are enabled.
++.RS
++.TP
++The default is: \fB\(dq\(dq\fR (the empty regular expression)
++.RE
++.
++.
++
+ .
+ .\" ----------------------------------------------------------------------------
+ .SH "blacklist and blacklist_exceptions sections"
+@@ -1765,6 +1780,31 @@ unpredictable ways. If the \(dqmarginal_path\(dq method is active, the
+ .
+ .
+ .\" ----------------------------------------------------------------------------
++.SH "FOREIGN MULTIPATH SUPPORT"
++.\" ----------------------------------------------------------------------------
++.
++multipath and multipathd can load \(dqforeign\(dq libraries to add
++support for other multipathing technologies besides the Linux device mapper.
++Currently this support is limited to printing detected information about
++multipath setup. In topology output, the names of foreign maps are prefixed by
++the foreign library name in square brackets, as in this example:
++.
++.P
++.EX
++# multipath -ll
++uuid.fedcba98-3579-4567-8765-123456789abc [nvme]:nvme4n9 NVMe,Some NVMe controller,FFFFFFFF
++size=167772160 features='n/a' hwhandler='ANA' wp=rw
++|-+- policy='n/a' prio=50 status=optimized
++| `- 4:38:1    nvme4c38n1 0:0     n/a   optimized    live
++`-+- policy='n/a' prio=50 status=optimized
++  `- 4:39:1    nvme4c39n1 0:0     n/a   optimized    live
++.EE
++.
++.P
++The \(dqnvme\(dq foreign library provides support for NVMe native multipathing
++in the kernel. It is part of the standard multipath package.
++.
++.\" ----------------------------------------------------------------------------
+ .SH "KNOWN ISSUES"
+ .\" ----------------------------------------------------------------------------
+ .
+-- 
+2.17.2
+

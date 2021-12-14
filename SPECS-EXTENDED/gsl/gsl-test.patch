@@ -1,0 +1,15 @@
+diff -up gsl-2.1/rstat/test.c.than gsl-2.1/rstat/test.c
+diff -up gsl-2.1/test/results.c.than gsl-2.1/test/results.c
+--- gsl-2.1/test/results.c.than	2016-03-10 18:08:17.013928401 -0500
++++ gsl-2.1/test/results.c	2016-03-10 18:42:45.717980023 -0500
+@@ -131,6 +131,10 @@ gsl_test_rel (double result, double expe
+     {
+       status = -1;
+     }
++  else if (fabs(result-expected) < relative_error)
++    {
++        status = 0;
++    }
+   else if (expected != 0 ) 
+     {
+       status = (fabs(result-expected)/fabs(expected) > relative_error) ;

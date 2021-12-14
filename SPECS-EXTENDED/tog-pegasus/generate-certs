@@ -1,0 +1,14 @@
+#!/bin/bash
+cd /etc/Pegasus
+
+if [ ! -e /etc/Pegasus/ssl-ca.cnf ] || [ ! -e /etc/Pegasus/ssl-service.cnf ] || [ ! -e /etc/pki/Pegasus/server.pem ] ||
+     [ ! -e /etc/pki/Pegasus/file.pem ]  || [ ! -e /etc/pki/Pegasus/client.pem ]; then
+         if [ -x /usr/share/Pegasus/scripts/genOpenPegasusSSLCerts ]; then
+            # Create self-signed certificates for initial usage
+            /usr/share/Pegasus/scripts/genOpenPegasusSSLCerts
+            # Add the self-signed certificate to the local trust store
+            cp /etc/pki/Pegasus/ca.crt \
+               /etc/pki/ca-trust/source/anchors/localhost-pegasus.pem
+            /usr/bin/update-ca-trust extract
+         fi;
+      fi;

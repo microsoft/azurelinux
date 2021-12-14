@@ -1,0 +1,11 @@
+--- ./ant/docs.xml.sav	2006-05-19 19:59:02.000000000 -0400
++++ ./ant/docs.xml	2006-05-19 19:59:07.000000000 -0400
+@@ -69,7 +69,7 @@
+         <fail>Missing DocBook, terminating.</fail>
+     </target>
+ 
+-    <target name="Docs.all" depends="javadoc,docbook.html,old.releases,forrest,replace"
++    <target name="Docs.all" depends="javadoc,docbook.html,old.releases"
+           description="Generates the documentation"/>
+ 
+     <target name="javadoc" depends="all"

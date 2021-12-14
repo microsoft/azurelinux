@@ -1,0 +1,38 @@
+From affda75b7d868350d7ef9e7a67367826fb3e950d Mon Sep 17 00:00:00 2001
+From: Nils Philippsen <nils@redhat.com>
+Date: Wed, 4 Sep 2013 17:13:49 +0200
+Subject: [PATCH] Report errors with LCMS version 2.x.
+
+---
+ dcraw.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/dcraw.c b/dcraw.c
+index 6f8dbbe..d80db64 100644
+--- a/dcraw.c
++++ b/dcraw.c
+@@ -8902,6 +8902,13 @@ notraw:
+ }
+ 
+ #ifndef NO_LCMS
++static void lcms2_error_show_handler (cmsContext ContextID,
++                                      cmsUInt32Number ErrorCode,
++                                      const char *Text)
++{
++  fprintf (stderr, "lcms2: Error #%d; %s\n", ErrorCode, Text);
++}
++
+ void CLASS apply_profile (const char *input, const char *output)
+ {
+   char *prof;
+@@ -8910,6 +8917,7 @@ void CLASS apply_profile (const char *input, const char *output)
+   FILE *fp;
+   unsigned size;
+ 
++  cmsSetLogErrorHandler (lcms2_error_show_handler);
+   if (strcmp (input, "embed"))
+     hInProfile = cmsOpenProfileFromFile (input, "r");
+   else if (profile_length) {
+-- 
+1.9.0
+

@@ -1,0 +1,124 @@
+From a6f795ba3d6048b32d7863468688bf7f42b2cafd Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Fri, 11 Oct 2019 16:39:25 +0200
+Subject: [PATCH 4/6] Use GSS-SPNEGO if available
+
+Currently adcli uses the GSSAPI SASL mechanism for LDAP authentication
+and to establish encryption. While this works in general it does not
+handle some of the more advanced features which can be required by AD
+DCs.
+
+The GSS-SPNEGO mechanism can handle them and is used with this patch by
+adcli if the AD DC indicates that it supports it.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1762420
+---
+ library/adconn.c | 35 ++++++++++++++++++++++++++++++++++-
+ library/adconn.h |  3 +++
+ 2 files changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/library/adconn.c b/library/adconn.c
+index bcaced8..ffb54f9 100644
+--- a/library/adconn.c
++++ b/library/adconn.c
+@@ -77,6 +77,7 @@ struct _adcli_conn_ctx {
+ 	char *default_naming_context;
+ 	char *configuration_naming_context;
+ 	char **supported_capabilities;
++	char **supported_sasl_mechs;
+ 
+ 	/* Connect state */
+ 	LDAP *ldap;
+@@ -845,6 +846,7 @@ connect_and_lookup_naming (adcli_conn *conn,
+ 		"defaultNamingContext",
+ 		"configurationNamingContext",
+ 		"supportedCapabilities",
++		"supportedSASLMechanisms",
+ 		NULL
+ 	};
+ 
+@@ -897,6 +899,11 @@ connect_and_lookup_naming (adcli_conn *conn,
+ 		                                                         "supportedCapabilities");
+ 	}
+ 
++	if (conn->supported_sasl_mechs == NULL) {
++		conn->supported_sasl_mechs = _adcli_ldap_parse_values (ldap, results,
++		                                                       "supportedSASLMechanisms");
++	}
++
+ 	ldap_msgfree (results);
+ 
+ 	if (conn->default_naming_context == NULL) {
+@@ -1022,6 +1029,7 @@ authenticate_to_directory (adcli_conn *conn)
+ 	OM_uint32 minor;
+ 	ber_len_t ssf;
+ 	int ret;
++	const char *mech = "GSSAPI";
+ 
+ 	if (conn->ldap_authenticated)
+ 		return ADCLI_SUCCESS;
+@@ -1038,7 +1046,11 @@ authenticate_to_directory (adcli_conn *conn)
+ 	ret = ldap_set_option (conn->ldap, LDAP_OPT_X_SASL_SSF_MIN, &ssf);
+ 	return_unexpected_if_fail (ret == 0);
+ 
+-	ret = ldap_sasl_interactive_bind_s (conn->ldap, NULL, "GSSAPI", NULL, NULL,
++	if (adcli_conn_server_has_sasl_mech (conn, "GSS-SPNEGO")) {
++		mech =  "GSS-SPNEGO";
++	}
++
++	ret = ldap_sasl_interactive_bind_s (conn->ldap, NULL, mech, NULL, NULL,
+ 	                                    LDAP_SASL_QUIET, sasl_interact, NULL);
+ 
+ 	/* Clear the credential cache GSSAPI to use (for this thread) */
+@@ -1231,6 +1243,7 @@ conn_free (adcli_conn *conn)
+ 	free (conn->default_naming_context);
+ 	free (conn->configuration_naming_context);
+ 	_adcli_strv_free (conn->supported_capabilities);
++	_adcli_strv_free (conn->supported_sasl_mechs);
+ 
+ 	free (conn->computer_name);
+ 	free (conn->host_fqdn);
+@@ -1606,6 +1619,26 @@ adcli_conn_server_has_capability (adcli_conn *conn,
+ 	return 0;
+ }
+ 
++bool
++adcli_conn_server_has_sasl_mech (adcli_conn *conn,
++                                 const char *mech)
++{
++	int i;
++
++	return_val_if_fail (conn != NULL, false);
++	return_val_if_fail (mech != NULL, false);
++
++	if (!conn->supported_sasl_mechs)
++		return false;
++
++	for (i = 0; conn->supported_sasl_mechs[i] != NULL; i++) {
++		if (strcasecmp (mech, conn->supported_sasl_mechs[i]) == 0)
++			return true;
++	}
++
++	return false;
++}
++
+ bool adcli_conn_is_writeable (adcli_conn *conn)
+ {
+ 	disco_dance_if_necessary (conn);
+diff --git a/library/adconn.h b/library/adconn.h
+index 1ad5715..37ebdd9 100644
+--- a/library/adconn.h
++++ b/library/adconn.h
+@@ -149,6 +149,9 @@ void                adcli_conn_set_krb5_conf_dir     (adcli_conn *conn,
+ int                 adcli_conn_server_has_capability (adcli_conn *conn,
+                                                       const char *capability);
+ 
++bool                adcli_conn_server_has_sasl_mech  (adcli_conn *conn,
++                                                      const char *mech);
++
+ bool                adcli_conn_is_writeable          (adcli_conn *conn);
+ 
+ #endif /* ADCONN_H_ */
+-- 
+2.25.1
+

@@ -1,0 +1,65 @@
+diff -up ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.ypxfrd/rpc.ypxfrd.8.xml.manfix ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.ypxfrd/rpc.ypxfrd.8.xml
+--- ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.ypxfrd/rpc.ypxfrd.8.xml.manfix	2018-06-11 14:52:20.441724121 +0200
++++ ypserv-5bfba760283060087aefeb417342bcc66d349b2e/rpc.ypxfrd/rpc.ypxfrd.8.xml	2018-06-11 15:07:10.266529912 +0200
+@@ -58,6 +58,12 @@
+         since it starts very slowly, it should be started after
+         <command>ypserv</command> from <command>/etc/init.d/ypxfrd</command>.
+       </para>
++      <para>
++        It is possible to pass <emphasis remap='B'>OPTIONS</emphasis> to
++        <command>rpc.ypxfrd</command> using the environment variable
++        YPXFRD_ARGS and this variable can be set in
++        <filename>/etc/sysconfig/network</filename>.
++      </para>
+     </refsect1>
+ 
+   <refsect1 id='options'>
+@@ -155,6 +161,14 @@
+           <para>Configuration file for access rights</para>
+         </listitem>
+       </varlistentry>
++      <varlistentry>
++        <term><filename>/etc/sysconfig/network</filename></term>
++        <listitem>
++          <para>
++            Setting additional arguments to <command>rpc.ypxfrd</command>
++          </para>
++        </listitem>
++      </varlistentry>
+     </variablelist>
+   </refsect1>
+ 
+diff -up ypserv-5bfba760283060087aefeb417342bcc66d349b2e/ypserv/ypserv.8.xml.manfix ypserv-5bfba760283060087aefeb417342bcc66d349b2e/ypserv/ypserv.8.xml
+--- ypserv-5bfba760283060087aefeb417342bcc66d349b2e/ypserv/ypserv.8.xml.manfix	2018-06-11 15:08:05.639332959 +0200
++++ ypserv-5bfba760283060087aefeb417342bcc66d349b2e/ypserv/ypserv.8.xml	2018-06-11 15:12:38.261286488 +0200
+@@ -61,7 +61,16 @@ but must be running somewhere
+ on the network. On startup
+ <emphasis remap='B'>ypserv</emphasis>
+ parses the file
+-<filename>/etc/ypserv.conf.</filename></para>
++<filename>/etc/ypserv.conf.</filename>
++It is also possible to pass
++<emphasis remap='B'>OPTIONS</emphasis>
++to 
++<command>ypserv</command>
++using the environment variable 
++YPSERV_ARGS
++and this variable can be set in 
++<filename>/etc/sysconfig/network</filename>.
++</para>
+ 
+ </refsect1>
+ 
+@@ -184,6 +193,12 @@ for a map.</para>
+ <para>which hosts are allowed to contact <command>ypserv</command>.</para>
+   </listitem>
+   </varlistentry>
++  <varlistentry>
++  <term><filename>/etc/sysconfig/network</filename></term>
++  <listitem>
++<para>setting additional arguments to <command>ypserv</command>.</para>
++  </listitem>
++  </varlistentry>
+ </variablelist>
+ </refsect1>
+ 

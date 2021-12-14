@@ -1,0 +1,37 @@
+--- src/org/objectweb/util/ant/MultipleCopy.java
++++ src/org/objectweb/util/ant/MultipleCopy.java
+@@ -10,6 +10,8 @@
+ import org.apache.tools.ant.taskdefs.Copy;
+ import org.apache.tools.ant.types.FileSet;
+ import org.apache.tools.ant.types.PatternSet;
++import org.apache.tools.ant.types.Resource;
++import org.apache.tools.ant.types.ResourceCollection;
+ 
+ import java.io.File;
+ import java.util.StringTokenizer;
+@@ -100,9 +102,11 @@
+ 			}
+ 		}
+ 
+-		// deal with the filesets
+-		for (int i = 0; i < filesets.size(); i++) {
+-			FileSet fs = (FileSet) filesets.elementAt(i);
++		// deal with the ResourceCollections
++		for (int i = 0; i < rcs.size(); i++) {
++			ResourceCollection rc = (ResourceCollection) rcs.elementAt(i);
++			if (rc instanceof FileSet && rc.isFilesystemOnly()) {
++				FileSet fs = (FileSet) rc;
+ 			DirectoryScanner ds = fs.getDirectoryScanner(project);
+ 			File fromDir = fs.getDir(project);
+ 
+@@ -110,6 +114,10 @@
+ 			String[] srcDirs = ds.getIncludedDirectories();
+ 
+ 			scan(fromDir, destDir, srcFiles, srcDirs);
++			} else {
++				throw new BuildException(
++					"ResourceCollections are not fully implemented");
++			}
+ 		}
+ 
+ 		// do all the copy operations now...

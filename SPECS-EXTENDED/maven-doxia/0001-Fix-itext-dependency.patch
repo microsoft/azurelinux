@@ -1,0 +1,245 @@
+From 71a78088dff0081a290a860a184166bf993d04bf Mon Sep 17 00:00:00 2001
+From: Stanislav Ochotnicky <sochotnicky@redhat.com>
+Date: Mon, 29 Apr 2013 11:37:12 +0200
+Subject: [PATCH 1/4] Fix itext dependency
+
+---
+ doxia-modules/doxia-module-itext/pom.xml           |  2 +-
+ .../apache/maven/doxia/module/itext/ITextFont.java | 16 ++---
+ .../apache/maven/doxia/module/itext/ITextSink.java |  6 +-
+ .../apache/maven/doxia/module/itext/ITextUtil.java | 69 +---------------------
+ .../doxia/module/itext/ITextSinkTestCase.java      | 22 -------
+ 5 files changed, 13 insertions(+), 102 deletions(-)
+
+diff --git a/doxia-modules/doxia-module-itext/pom.xml b/doxia-modules/doxia-module-itext/pom.xml
+index 94f94f3..8293f04 100644
+--- a/doxia-modules/doxia-module-itext/pom.xml
++++ b/doxia-modules/doxia-module-itext/pom.xml
+@@ -58,7 +58,7 @@ under the License.
+     <dependency>
+       <groupId>com.lowagie</groupId>
+       <artifactId>itext</artifactId>
+-      <version>1.4</version>
++      <version>2.1.7</version>
+     </dependency>
+   </dependencies>
+ 
+diff --git a/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextFont.java b/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextFont.java
+index 2cc8ef1..5dfc882 100644
+--- a/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextFont.java
++++ b/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextFont.java
+@@ -24,7 +24,7 @@ import java.awt.Color;
+ import com.lowagie.text.ExceptionConverter;
+ import com.lowagie.text.Font;
+ import com.lowagie.text.FontFactory;
+-import com.lowagie.text.markup.MarkupTags;
++import com.lowagie.text.html.Markup;
+ import com.lowagie.text.pdf.BaseFont;
+ 
+ /**
+@@ -38,16 +38,16 @@ import com.lowagie.text.pdf.BaseFont;
+ public class ITextFont
+ {
+     /** A normal font style */
+-    public static final String NORMAL = MarkupTags.CSS_VALUE_NORMAL;
++    public static final String NORMAL = Markup.CSS_VALUE_NORMAL;
+ 
+     /** A bold font style */
+-    public static final String BOLD = MarkupTags.CSS_VALUE_BOLD;
++    public static final String BOLD = Markup.CSS_VALUE_BOLD;
+ 
+     /** A italic font style */
+-    public static final String ITALIC = MarkupTags.CSS_VALUE_ITALIC;
++    public static final String ITALIC = Markup.CSS_VALUE_ITALIC;
+ 
+     /** An underline font style */
+-    public static final String UNDERLINE = MarkupTags.CSS_VALUE_UNDERLINE;
++    public static final String UNDERLINE = Markup.CSS_VALUE_UNDERLINE;
+ 
+     /** A default font name */
+     public static final String DEFAULT_FONT_NAME = FontFactory.HELVETICA;
+@@ -262,7 +262,7 @@ public class ITextFont
+     {
+         Font font = getCurrentFont();
+ 
+-        return String.valueOf( font.color().getBlue() );
++        return String.valueOf( font.getColor().getBlue() );
+     }
+ 
+     /**
+@@ -274,7 +274,7 @@ public class ITextFont
+     {
+         Font font = getCurrentFont();
+ 
+-        return String.valueOf( font.color().getGreen() );
++        return String.valueOf( font.getColor().getGreen() );
+     }
+ 
+     /**
+@@ -286,7 +286,7 @@ public class ITextFont
+     {
+         Font font = getCurrentFont();
+ 
+-        return String.valueOf( font.color().getRed() );
++        return String.valueOf( font.getColor().getRed() );
+     }
+ 
+     /**
+diff --git a/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextSink.java b/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextSink.java
+index 2847413..c85f81f 100644
+--- a/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextSink.java
++++ b/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextSink.java
+@@ -1232,9 +1232,9 @@ public class ITextSink
+         try
+         {
+             Image image = Image.getInstance( new URL( urlName ) );
+-            image.scaleToFit( ITextUtil.getDefaultPageSize().width() / 2, ITextUtil.getDefaultPageSize().height() / 2 );
+-            width = image.plainWidth();
+-            height = image.plainHeight();
++            image.scaleToFit( ITextUtil.getDefaultPageSize().getWidth() / 2, ITextUtil.getDefaultPageSize().getHeight() / 2 );
++            width = image.getPlainWidth();
++            height = image.getPlainHeight();
+         }
+         catch ( BadElementException e )
+         {
+diff --git a/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextUtil.java b/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextUtil.java
+index 4363413..141646c 100644
+--- a/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextUtil.java
++++ b/doxia-modules/doxia-module-itext/src/main/java/org/apache/maven/doxia/module/itext/ITextUtil.java
+@@ -22,9 +22,6 @@ package org.apache.maven.doxia.module.itext;
+ import com.lowagie.text.DocumentException;
+ import com.lowagie.text.PageSize;
+ import com.lowagie.text.Rectangle;
+-import com.lowagie.text.xml.XmlToHtml;
+-import com.lowagie.text.xml.XmlToPdf;
+-import com.lowagie.text.xml.XmlToRtf;
+ 
+ import java.io.InputStream;
+ import java.io.OutputStream;
+@@ -77,7 +74,7 @@ public class ITextUtil
+                 if ( currentField.getType().equals( Rectangle.class ) )
+                 {
+                     Rectangle fPageSize = (Rectangle) currentField.get( null );
+-                    if ( ( rect.width() == fPageSize.width() ) && ( rect.height() == fPageSize.height() ) )
++                    if ( ( rect.getWidth() == fPageSize.getWidth() ) && ( rect.getHeight() == fPageSize.getHeight() ) )
+                     {
+                         return currentField.getName();
+                     }
+@@ -114,68 +111,4 @@ public class ITextUtil
+ 
+         return false;
+     }
+-
+-    /**
+-     * Parse an iText XML from the specified <CODE>InputStream</CODE>, writing an Pdf document
+-     * specified <CODE>OutputStream</CODE>.
+-     *
+-     * @param is the <CODE>InputStream</CODE> from which the XML is read.
+-     * @param os the <CODE>OutputStream</CODE> to which the result as Pdf is written.
+-     * @see com.lowagie.text.xml.XmlToPdf
+-     */
+-    public static void writePdf( InputStream is, OutputStream os )
+-    {
+-        try
+-        {
+-            XmlToPdf x = new XmlToPdf();
+-
+-            x.parse( is, os );
+-        }
+-        catch ( DocumentException e )
+-        {
+-            throw new RuntimeException( "DocumentException : " + e.getMessage(), e );
+-        }
+-    }
+-
+-    /**
+-     * Parse an iText XML from the specified <CODE>InputStream</CODE>, writing an rtf document
+-     * specified <CODE>OutputStream</CODE>.
+-     *
+-     * @param is the <CODE>InputStream</CODE> from which the XML is read.
+-     * @param os the <CODE>OutputStream</CODE> to which the result as RTF is written.
+-     * @see com.lowagie.text.xml.XmlToRtf
+-     */
+-    public static void writeRtf( InputStream is, OutputStream os )
+-    {
+-        try
+-        {
+-            XmlToRtf x = new XmlToRtf();
+-            x.parse( is, os );
+-        }
+-        catch ( DocumentException e )
+-        {
+-            throw new RuntimeException( "DocumentException : " + e.getMessage(), e );
+-        }
+-    }
+-
+-    /**
+-     * Parse an iText XML from the specified <CODE>InputStream</CODE>, writing an html document
+-     * specified <CODE>OutputStream</CODE>.
+-     *
+-     * @param is the <CODE>InputStream</CODE> from which the XML is read.
+-     * @param os the <CODE>OutputStream</CODE> to which the result as Html is written.
+-     * @see com.lowagie.text.xml.XmlToHtml
+-     */
+-    public static void writeHtml( InputStream is, OutputStream os )
+-    {
+-        try
+-        {
+-            XmlToHtml x = new XmlToHtml();
+-            x.parse( is, os );
+-        }
+-        catch ( DocumentException e )
+-        {
+-            throw new RuntimeException( "DocumentException : " + e.getMessage(), e );
+-        }
+-    }
+ }
+diff --git a/doxia-modules/doxia-module-itext/src/test/java/org/apache/maven/doxia/module/itext/ITextSinkTestCase.java b/doxia-modules/doxia-module-itext/src/test/java/org/apache/maven/doxia/module/itext/ITextSinkTestCase.java
+index 6bcd2be..a9674a0 100644
+--- a/doxia-modules/doxia-module-itext/src/test/java/org/apache/maven/doxia/module/itext/ITextSinkTestCase.java
++++ b/doxia-modules/doxia-module-itext/src/test/java/org/apache/maven/doxia/module/itext/ITextSinkTestCase.java
+@@ -81,20 +81,6 @@ public class ITextSinkTestCase
+     }
+ 
+     /**
+-     * Test PDF generation
+-     *
+-     * @throws Exception
+-     */
+-    public void testGeneratingPDFFromITextXml()
+-        throws Exception
+-    {
+-        File f = new File( getBasedir(), "src/test/resources/itext/itext.xml" );
+-
+-        ITextUtil.writePdf( new FileInputStream( f ),
+-                            new FileOutputStream( getGeneratedFile( "test_itext", "pdf" ) ) );
+-    }
+-
+-    /**
+      * Generate a pdf and a rtf from the standart test model.
+      *
+      * @throws Exception if any
+@@ -107,11 +93,6 @@ public class ITextSinkTestCase
+         SinkTestDocument.generate( sink );
+ 
+         sink.close();
+-
+-        ITextUtil.writePdf( new FileInputStream( getGeneratedFile( "test_model", "xml" ) ),
+-                            new FileOutputStream( getGeneratedFile( "test_model", "pdf" ) ) );
+-        ITextUtil.writeRtf( new FileInputStream( getGeneratedFile( "test_model", "xml" ) ),
+-                            new FileOutputStream( getGeneratedFile( "test_model", "rtf" ) ) );
+     }
+ 
+     /**
+@@ -148,8 +129,5 @@ public class ITextSinkTestCase
+ 
+         sink.flush();
+         sink.close();
+-
+-        ITextUtil.writePdf( new FileInputStream( getGeneratedFile( "empty_anchor", "xml" ) ),
+-                            new FileOutputStream( getGeneratedFile( "empty_anchor", "pdf" ) ) );
+     }
+ }
+-- 
+2.5.5
+

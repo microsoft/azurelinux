@@ -1,0 +1,45 @@
+diff -up gpm-1.20.6/contrib/Makefile.in.multilib gpm-1.20.6/contrib/Makefile.in
+--- gpm-1.20.6/contrib/Makefile.in.multilib	2008-06-19 07:48:48.000000000 +0200
++++ gpm-1.20.6/contrib/Makefile.in	2009-02-24 10:36:09.000000000 +0100
+@@ -9,10 +9,10 @@ top_builddir = ..
+ 
+ include $(top_builddir)/Makefile.include
+ 
+-all: $(srcdir)/$(ELISP)
++all: $(filter-out %.elc,$(srcdir)/$(ELISP))
+ 
+ install: all
+-	if [ -n "$(ELISP)" ]; then for i in `echo $(ELISP)`; do \
++	if [ -n "$(filter-out %.elc,$(ELISP))" ]; then for i in `echo $(filter-out %.elc,$(ELISP))`; do \
+ 		$(INSTALL_DATA) $(srcdir)/$$i $(lispdir)/`basename $$i` ;\
+ 	done; fi
+ 
+@@ -20,7 +20,7 @@ install: all
+ 	$(EMACS) -batch -l $(srcdir)/emacs/exec.el -exec '(byte-compile-file "$<")'
+ 
+ uninstall:
+-	if [ -n "$(ELISP)" ]; then for i in `echo $(ELISP)`; do \
++	if [ -n "$(filter-out %.elc,$(ELISP))" ]; then for i in `echo $(filter-out %.elc,$(ELISP))`; do \
+ 		rm -f $(lispdir)/$$i ;\
+ 	done; fi 
+ 
+@@ -28,4 +28,4 @@ dist:
+ 	$(CP) -r $(srcdir) $(top_builddir)/gpm-$(release)/
+ 
+ clean distclean:
+-	$(RM) -f $(srcdir)/emacs/*.elc Makefile
++	$(RM) $(srcdir)/emacs/*.elc Makefile
+diff -up gpm-1.20.6/doc/Makefile.in.multilib gpm-1.20.6/doc/Makefile.in
+--- gpm-1.20.6/doc/Makefile.in.multilib	2009-02-09 10:58:53.000000000 +0100
++++ gpm-1.20.6/doc/Makefile.in	2009-02-24 10:36:09.000000000 +0100
+@@ -130,8 +130,8 @@ install:	all installdirs
+ 	#i keep all my infopages compressed and i'm tired to do it by
+ 	#hand, so check if there are any compressed pages and do this
+ 	#one too
+-	-ls $(infodir)/*[-.]info.gz >/dev/null 2>&1 \
+-		&& gzip -f $(infodir)/gpm.info
++	#-ls $(infodir)/*[-.]info.gz >/dev/null 2>&1 \
++	#	&& gzip -f $(infodir)/gpm.info
+ 	# Hmm.... shouldn't man pages be compressed too?
+    # maybe they should, but at least at my system they are not.
+ 

@@ -1,0 +1,28 @@
+From a0f3d7108f688d48ad8653c380dba575fcd2fc3f Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Mon, 15 Apr 2019 10:53:25 -0400
+Subject: [PATCH] data: disable wayland if modesetting is disabled
+
+wayland requires working modesetting, so don't even
+bother trying it if modesetting is disabled.
+
+This is more efficient and side-steps a bug in the fallback
+logic if start up is unreasonably slow.
+---
+ data/61-gdm.rules.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/data/61-gdm.rules.in b/data/61-gdm.rules.in
+index ad5b87d4c..ebdbfe9c1 100644
+--- a/data/61-gdm.rules.in
++++ b/data/61-gdm.rules.in
+@@ -1,4 +1,6 @@
+ # disable Wayland on Hi1710 chipsets
+ ATTR{vendor}=="0x19e5", ATTR{device}=="0x1711", RUN+="@libexecdir@/gdm-disable-wayland"
+ # disable Wayland when using the proprietary nvidia driver
+ DRIVER=="nvidia", RUN+="@libexecdir@/gdm-disable-wayland"
++# disable Wayland if modesetting is disabled
++IMPORT{cmdline}="nomodeset", RUN+="@libexecdir@/gdm-disable-wayland"
+-- 
+2.20.1
+

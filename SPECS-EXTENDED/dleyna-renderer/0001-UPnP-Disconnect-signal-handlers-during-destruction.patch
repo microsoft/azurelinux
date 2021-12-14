@@ -1,0 +1,77 @@
+From 916daa1bf04bfb1d8823c3f677a021bf41df1db0 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@freedesktop.org>
+Date: Tue, 20 Jan 2015 13:59:33 +0100
+Subject: [PATCH] Disconnect signal handlers during destruction
+
+A GUPnPContextManager can outlive a dlr_upnp_t because it might be
+using asynchronous operations during its construction (eg.,
+GUPnPNetworkManager) which retain references to it. This can be
+demonstrated if the service is spawned as a result of the following
+command:
+$ gdbus call \
+    --session \
+    --dest com.intel.dleyna-renderer \
+    --object-path /com/intel/dLeynaRenderer \
+    --method com.intel.dLeynaRenderer.Manager.Release
+
+This leads to the signal handlers being invoked with an invalid
+dlr_upnp_t and the outcome is a crash.
+
+To avoid this, we should disconnect the callbacks listening to the
+context manager and the control points belonging to it.
+---
+ libdleyna/renderer/upnp.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/libdleyna/renderer/upnp.c b/libdleyna/renderer/upnp.c
+index 17cbda720bc1..707dc09aaf5a 100644
+--- a/libdleyna/renderer/upnp.c
++++ b/libdleyna/renderer/upnp.c
+@@ -45,6 +45,7 @@ struct dlr_upnp_t_ {
+ 	void *user_data;
+ 	GHashTable *server_udn_map;
+ 	GHashTable *server_uc_map;
++	GList *cps;
+ 	dlr_host_service_t *host_service;
+ };
+ 
+@@ -352,6 +353,7 @@ static void prv_on_context_available(GUPnPContextManager *context_manager,
+ 
+ 	gssdp_resource_browser_set_active(GSSDP_RESOURCE_BROWSER(cp), TRUE);
+ 	gupnp_context_manager_manage_control_point(upnp->context_manager, cp);
++	upnp->cps = g_list_prepend (upnp->cps, g_object_ref (cp));
+ 	g_object_unref(cp);
+ }
+ 
+@@ -390,10 +392,28 @@ dlr_upnp_t *dlr_upnp_new(dleyna_connector_id_t connection,
+ void dlr_upnp_delete(dlr_upnp_t *upnp)
+ {
+ 	if (upnp) {
++		GList *l;
++
++		for (l = upnp->cps; l != NULL; l = l->next) {
++			GUPnPControlPoint *cp = GUPNP_CONTROL_POINT (l->data);
++
++			g_signal_handlers_disconnect_by_func (cp,
++							      prv_server_available_cb,
++							      upnp);
++			g_signal_handlers_disconnect_by_func (cp,
++							      prv_server_unavailable_cb,
++							      upnp);
++		}
++
++		g_signal_handlers_disconnect_by_func (upnp->context_manager,
++						      prv_on_context_available,
++						      upnp);
++
+ 		dlr_host_service_delete(upnp->host_service);
+ 		g_object_unref(upnp->context_manager);
+ 		g_hash_table_unref(upnp->server_udn_map);
+ 		g_hash_table_unref(upnp->server_uc_map);
++		g_list_free_full (upnp->cps, g_object_unref);
+ 
+ 		g_free(upnp);
+ 	}
+-- 
+2.9.5
+

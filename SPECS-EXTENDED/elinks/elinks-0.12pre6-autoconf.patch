@@ -1,0 +1,35 @@
+From d7380abead73dc753023ef598b87944756c08d40 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 25 Feb 2013 15:31:07 +0100
+Subject: [PATCH] configure.in: add missing AC_LANG_PROGRAM
+
+... around the first argument of AC_COMPILE_IFELSE
+---
+ configure.in |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 2629ac3..4290e45 100644
+--- a/configure.in
++++ b/configure.in
+@@ -220,7 +220,7 @@ AC_STRUCT_TM
+ AC_C_CONST
+ AC_C_INLINE
+ AC_MSG_CHECKING([[for C99-conforming inline]])
+-AC_COMPILE_IFELSE([[
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ 	int add(int change);
+ 
+ 	static int sum;
+@@ -236,7 +236,7 @@ AC_COMPILE_IFELSE([[
+ 	sub(int change)
+ 	{
+ 		return add(-change);
+-	}]],
++	}]])],
+ 	[AC_MSG_RESULT([[yes]])
+ 	 AC_DEFINE([NONSTATIC_INLINE], [inline],
+ 		[Define as inline if the compiler lets you declare a function without inline, then define it with inline, and have that definition refer to identifiers with internal linkage.  This is allowed by C99 6.7.4p6 and 6.7.4p3 together.  Otherwise define as nothing.])],
+-- 
+1.7.1
+

@@ -1,0 +1,39 @@
+--- pinfo-0.6.9/src/manual.c.mansection	2006-03-16 15:14:30.000000000 +0100
++++ pinfo-0.6.9/src/manual.c	2007-02-23 14:52:30.000000000 +0100
+@@ -167,16 +167,29 @@
+ 	}
+ 	i = len;
+ 	/* find the beginning of the last token */
+-	for (i = len - 1;(i > 0) &&(!isspace(name1[i])); i--);
+-
+-	/* if we've found space, then we move to the first nonspace character */
+-	if (i > 0)
+-		i++;
++	for (i = len - 1;(i >= 0) &&(!isspace(name1[i])); i--)
++		;
++	i++;
+ 
+ 	/* filename->name */
+-	strcpy(manualhistory[0].name, &name1[i]);
++	snprintf(manualhistory[0].name, 256, "%s", &name1[i]);
++
+ 	/* section unknown */
+-	strcpy(manualhistory[0].sect, "");
++	manualhistory[0].sect[0] = 0;
++
++	/* try to find section */
++	if (i > 1) {
++		for (i--; (i >= 0) && isspace(name1[i]); i--)
++			;
++		if (i >= 0) {
++			name1[i + 1] = 0;
++			for (; (i >= 0) && !isspace(name1[i]); i--)
++				;
++			i++;
++			snprintf(manualhistory[0].sect, 32, "%s", &name1[i]);
++		}
++	}
++
+ 	/* selected unknown */
+ 	manualhistory[0].selected = -1;
+ 	/* pos=0 */

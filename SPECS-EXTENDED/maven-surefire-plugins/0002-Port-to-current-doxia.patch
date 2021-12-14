@@ -1,0 +1,25 @@
+From 16e1a53ff612f4a9a777e09cdc45988e9abbe2e2 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Fri, 29 Jun 2018 12:44:37 +0200
+Subject: [PATCH 2/4] Port to current doxia
+
+---
+ .../maven/plugins/surefire/report/SurefireReportGenerator.java  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/maven-surefire-report-plugin/src/main/java/org/apache/maven/plugins/surefire/report/SurefireReportGenerator.java b/maven-surefire-report-plugin/src/main/java/org/apache/maven/plugins/surefire/report/SurefireReportGenerator.java
+index f9b9480..f142c8d 100644
+--- a/maven-surefire-report-plugin/src/main/java/org/apache/maven/plugins/surefire/report/SurefireReportGenerator.java
++++ b/maven-surefire-report-plugin/src/main/java/org/apache/maven/plugins/surefire/report/SurefireReportGenerator.java
+@@ -26,7 +26,7 @@ import java.util.Locale;
+ import java.util.Map;
+ import org.apache.maven.doxia.markup.HtmlMarkup;
+ import org.apache.maven.doxia.sink.Sink;
+-import org.apache.maven.doxia.sink.SinkEventAttributeSet;
++import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
+ import org.apache.maven.doxia.util.DoxiaUtils;
+ import org.apache.maven.plugin.surefire.log.api.ConsoleLogger;
+ import org.apache.maven.reporting.MavenReportException;
+-- 
+2.17.1
+

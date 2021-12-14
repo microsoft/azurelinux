@@ -1,0 +1,246 @@
+diff --git a/cf/cf/submit.mc b/cf/cf/submit.mc
+index b9dfb16..cb325cc 100644
+--- a/cf/cf/submit.mc
++++ b/cf/cf/submit.mc
+@@ -22,6 +22,8 @@ define(`__OSTYPE__',`')dnl dirty hack to keep proto.m4 from complaining
+ define(`_USE_DECNET_SYNTAX_', `1')dnl support DECnet
+ define(`confTIME_ZONE', `USE_TZ')dnl
+ define(`confDONT_INIT_GROUPS', `True')dnl
++dnl # If you're operating in a DSCP/RFC-4594 environment with QoS
++dnl define(`confINET_QOS', `AF11')dnl
+ define(`confPID_FILE', `/run/sm-client.pid')dnl
+ dnl define(`confDIRECT_SUBMISSION_MODIFIERS',`C')dnl
+ FEATURE(`use_ct_file')dnl
+diff --git a/cf/m4/proto.m4 b/cf/m4/proto.m4
+index 5a5963b..0df3416 100644
+--- a/cf/m4/proto.m4
++++ b/cf/m4/proto.m4
+@@ -251,6 +251,9 @@ _OPTION(SevenBitInput, `confSEVEN_BIT_INPUT', `False')
+ # 8-bit data handling
+ _OPTION(EightBitMode, `confEIGHT_BIT_HANDLING', `pass8')
+ 
++# DSCP marking of traffic (IP_TOS)
++_OPTION(InetQoS, `confINET_QOS', `none')
++
+ # wait for alias file rebuild (default units: minutes)
+ _OPTION(AliasWait, `confALIAS_WAIT', `5m')
+ 
+diff --git a/sendmail/conf.c b/sendmail/conf.c
+index cbb9c76..1b55533 100644
+--- a/sendmail/conf.c
++++ b/sendmail/conf.c
+@@ -6430,6 +6430,10 @@ char	*FFRCompileOptions[] =
+ #if _FFR_QF_PARANOIA
+ 	"_FFR_QF_PARANOIA",
+ #endif
++#if _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
++	/* QoS */
++	"_FFR_QOS",
++#endif /* _FFR_QOS && defined(SOL_IP) && defined(IP_TOS) */
+ #if _FFR_QUEUE_GROUP_SORTORDER
+ 	/* Allow QueueSortOrder per queue group. */
+ /* XXX: Still need to actually use qgrp->qg_sortorder */
+diff --git a/sendmail/daemon.c b/sendmail/daemon.c
+index 4288365..86fe319 100644
+--- a/sendmail/daemon.c
++++ b/sendmail/daemon.c
+@@ -104,6 +104,10 @@ static int	NDaemons = 0;			/* actual number of daemons */
+ 
+ static time_t	NextDiskSpaceCheck = 0;
+ 
++#if _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
++int		InetQoS = 0;			/* none by default */
++#endif /* _FFR_QOS && defined(SOL_IP) && defined(IP_TOS) */
++
+ /*
+ **  GETREQUESTS -- open mail IPC port and get requests.
+ **
+@@ -1139,6 +1143,16 @@ opendaemonsocket(d, firsttime)
+ 			(void) setsockopt(d->d_socket, SOL_SOCKET,
+ 					  SO_KEEPALIVE, (char *)&on, sizeof(on));
+ 
++#if _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
++			if (InetQoS != 0x00
++			 && (d->d_addr.sa.sa_family == AF_INET
++			  || (d->d_addr.sin6.sin6_family == AF_INET6 && IN6_IS_ADDR_V4MAPPED(d->d_addr.sin6.sin6_addr.s6_addr32)))) {
++				if (setsockopt(d->d_socket, SOL_IP,
++						  IP_TOS, (char *)&InetQoS, sizeof(InetQoS)) < 0)
++					syserr("opendaemonsock: daemon %s: setsockopt(IP_TOS)", d->d_name);
++			}
++#endif /* _FFR_QOS && defined(SOL_IP) && defined(IP_TOS) */
++
+ #ifdef SO_RCVBUF
+ 			if (d->d_tcprcvbufsize > 0)
+ 			{
+@@ -2571,6 +2585,16 @@ gothostent:
+ 			return EX_TEMPFAIL;
+ 		}
+ 
++#if _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
++		if (InetQoS != 0x00
++		 && (family == AF_INET
++		  || (family == AF_INET6 && IN6_IS_ADDR_V4MAPPED(addr.sin6.sin6_addr.s6_addr32))))
++		{
++			if (setsockopt(s, SOL_IP, IP_TOS,
++					  (char *)&InetQoS, sizeof(InetQoS)) < 0)
++				syserr("makeconnection: setsockopt(IP_TOS)");
++		}
++#endif /* _FFR_QOS && defined(SOL_IP) && defined(IP_TOS) */
+ #ifdef SO_SNDBUF
+ 		if (ClientSettings[family].d_tcpsndbufsize > 0)
+ 		{
+diff --git a/sendmail/readcf.c b/sendmail/readcf.c
+index 2b0fbf7..86892f5 100644
+--- a/sendmail/readcf.c
++++ b/sendmail/readcf.c
+@@ -18,6 +18,7 @@ SM_RCSID("@(#)$Id: readcf.c,v 8.692 2013-11-22 20:51:56 ca Exp $")
+ 
+ #if NETINET || NETINET6
+ # include <arpa/inet.h>
++# include <netinet/ip.h>
+ #endif /* NETINET || NETINET6 */
+ 
+ 
+@@ -2888,8 +2889,8 @@ static struct optioninfo
+ # define O_RCPTTHROTDELAY	0xe6
+ 	{ "BadRcptThrottleDelay",	O_RCPTTHROTDELAY,	OI_SAFE	},
+ #endif /* _FFR_RCPTTHROTDELAY */
+-#if 0 && _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
+-# define O_INETQOS	0xe7	/* reserved for FFR_QOS */
++#if _FFR_QOS && defined(SOL_IP) && defined(IP_TOS)
++# define O_INETQOS		0xe7
+ 	{ "InetQoS",			O_INETQOS,	OI_NONE },
+ #endif
+ #if STARTTLS && _FFR_FIPSMODE
+@@ -2914,6 +2915,77 @@ static struct optioninfo
+ 	{ NULL,				'\0',		OI_NONE	}
+ };
+ 
++#ifdef O_INETQOS
++static struct qosmap
++{
++	char	*name;		/* name of the setting */
++	int	value;		/* corresponding setsockopt() value */
++} QoSMap[] = {
++#ifdef IPTOS_CLASS_CS0
++	{ "CS0",	IPTOS_CLASS_CS0 },
++#endif
++#ifdef IPTOS_CLASS_CS1
++	{ "CS1",	IPTOS_CLASS_CS1 },
++#endif
++#ifdef IPTOS_DSCP_AF11
++	{ "AF11",	IPTOS_DSCP_AF11 },
++#endif
++#ifdef IPTOS_DSCP_AF12
++	{ "AF12",	IPTOS_DSCP_AF12 },
++#endif
++#ifdef IPTOS_DSCP_AF13
++	{ "AF13",	IPTOS_DSCP_AF13 },
++#endif
++#ifdef IPTOS_CLASS_CS2
++	{ "CS2",	IPTOS_CLASS_CS2 },
++#endif
++#ifdef IPTOS_DSCP_AF21
++	{ "AF21",	IPTOS_DSCP_AF21 },
++#endif
++#ifdef IPTOS_DSCP_AF22
++	{ "AF22",	IPTOS_DSCP_AF22 },
++#endif
++#ifdef IPTOS_DSCP_AF23
++	{ "AF23",	IPTOS_DSCP_AF23 },
++#endif
++#ifdef IPTOS_CLASS_CS3
++	{ "CS3",	IPTOS_CLASS_CS3 },
++#endif
++#ifdef IPTOS_DSCP_AF31
++	{ "AF31",	IPTOS_DSCP_AF31 },
++#endif
++#ifdef IPTOS_DSCP_AF32
++	{ "AF32",	IPTOS_DSCP_AF32 },
++#endif
++#ifdef IPTOS_DSCP_AF33
++	{ "AF33",	IPTOS_DSCP_AF33 },
++#endif
++#ifdef IPTOS_CLASS_CS4
++	{ "CS4",	IPTOS_CLASS_CS4 },
++#endif
++#ifdef IPTOS_DSCP_AF41
++	{ "AF41",	IPTOS_DSCP_AF41 },
++#endif
++#ifdef IPTOS_DSCP_AF42
++	{ "AF42",	IPTOS_DSCP_AF42 },
++#endif
++#ifdef IPTOS_DSCP_AF43
++	{ "AF43",	IPTOS_DSCP_AF43 },
++#endif
++#ifdef IPTOS_CLASS_CS5
++	{ "CS5",	IPTOS_CLASS_CS5 },
++#endif
++#ifdef IPTOS_CLASS_CS6
++	{ "CS6",	IPTOS_CLASS_CS6 },
++#endif
++#ifdef IPTOS_CLASS_CS7
++	{ "CS7",	IPTOS_CLASS_CS7 },
++#endif
++	{ "none",	0x00 },
++	{ NULL,		0    }
++};
++#endif
++
+ # define CANONIFY(val)
+ 
+ # define SET_OPT_DEFAULT(opt, val)	opt = val
+@@ -4540,6 +4612,33 @@ setoption(opt, val, safe, sticky, e)
+ 		UseCompressedIPv6Addresses = atobool(val);
+ 		break;
+ 
++#ifdef O_INETQOS
++	  case O_INETQOS:
++		{
++			struct qosmap *qmp;
++			InetQoS = -1;
++
++			for (qmp = QoSMap; qmp->name != NULL; ++qmp) {
++				if (!strcmp(val, qmp->name)) {
++					InetQoS = qmp->value;
++					break;
++				}
++			}
++
++			/*
++			** we could allow writing it as a hex value, but
++			** we don't at this time.
++			**/
++			if (qmp->name == NULL) {
++				(void) sm_io_fprintf(smioout, SM_TIME_DEFAULT,
++						     "Warning: Option: %s unknown parameter '%s'\n",
++						     OPTNAME, val);
++				break;
++			}
++			break;
++		}
++#endif
++
+ 	  default:
+ 		if (tTd(37, 1))
+ 		{
+diff --git a/sendmail/sendmail.h b/sendmail/sendmail.h
+index b2d0211..3bcc2e2 100644
+--- a/sendmail/sendmail.h
++++ b/sendmail/sendmail.h
+@@ -2537,7 +2537,14 @@ EXTERN struct termescape	TermEscape;	/* terminal escape codes */
+ EXTERN SOCKADDR	ConnectOnlyTo;	/* override connection address (for testing) */
+ EXTERN SOCKADDR RealHostAddr;	/* address of host we are talking to */
+ extern const SM_EXC_TYPE_T EtypeQuickAbort; /* type of a QuickAbort exception */
+-
++#if _FFR_QOS
++# if !defined(SOL_IP) && defined(IPPROTO_IP)
++#  define SOL_IP IPPROTO_IP
++# endif
++# if defined(SOL_IP) && defined(IP_TOS)
++EXTERN int	InetQoS;	/* QoS mapping */
++# endif
++#endif
+ 
+ EXTERN int ConnectionRateWindowSize;
+ #if STARTTLS && USE_OPENSSL_ENGINE

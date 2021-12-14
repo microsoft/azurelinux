@@ -1,0 +1,17 @@
+--- src/manifest.xerces	2018-04-21 06:02:09.000000000 +0200
++++ src/manifest.xerces	2018-11-18 18:43:12.785381090 +0100
+@@ -1,5 +1,14 @@
+ Manifest-Version: 1.0
+ Created-By: @java.version@ (@java.vendor@)
++Bundle-RequiredExecutionEnvironment: J2SE-1.5
++Bundle-SymbolicName: org.apache.xerces
++Bundle-ManifestVersion: 2
++Bundle-Name: @impl.name@
++Bundle-Localization: plugin
++Bundle-Version: @impl.version@
++Bundle-Vendor: Apache Software Foundation
++Require-Bundle: system.bundle,javax.xml;visibility:=reexport, org.apache.xml.resolver;bundle-version="[1.2.0,2.0.0)";visibility:=reexport,org.apache.xml.serializer;bundle-version="[2.7.1,3.0.0)"
++Export-Package: META-INF.services;version="@impl.version@",org.apache.html.dom;version="@impl.version@",org.apache.wml;version="@impl.version@",org.apache.wml.dom;version="@impl.version@",org.apache.xerces.dom;version="@impl.version@",org.apache.xerces.dom.events;version="@impl.version@",org.apache.xerces.dom3.as;version="@impl.version@",org.apache.xerces.impl;version="@impl.version@",org.apache.xerces.impl.dtd;version="@impl.version@",org.apache.xerces.impl.dtd.models;version="@impl.version@",org.apache.xerces.impl.dv;version="@impl.version@",org.apache.xerces.impl.dv.dtd;version="@impl.version@",org.apache.xerces.impl.dv.util;version="@impl.version@",org.apache.xerces.impl.dv.xs;version="@impl.version@",org.apache.xerces.impl.io;version="@impl.version@",org.apache.xerces.impl.msg;version="@impl.version@",org.apache.xerces.impl.validation;version="@impl.version@",org.apache.xerces.impl.xpath;version="@impl.version@",org.apache.xerces.impl.xpath.regex;version="@impl.version@",org.apache.xerces.impl.xs;version="@impl.version@",org.apache.xerces.impl.xs.identity;version="@impl.version@",org.apache.xerces.impl.xs.models;version="@impl.version@",org.apache.xerces.impl.xs.opti;version="@impl.version@",org.apache.xerces.impl.xs.traversers;version="@impl.version@",org.apache.xerces.impl.xs.util;version="@impl.version@",org.apache.xerces.jaxp;version="@impl.version@",org.apache.xerces.jaxp.datatype;version="@impl.version@",org.apache.xerces.jaxp.validation;version="@impl.version@",org.apache.xerces.parsers;version="@impl.version@",org.apache.xerces.stax;version="@impl.version@",org.apache.xerces.stax.events;version="@impl.version@",org.apache.xerces.util;version="@impl.version@",org.apache.xerces.xinclude;version="@impl.version@",org.apache.xerces.xni;version="@impl.version@",org.apache.xerces.xni.grammars;version="@impl.version@",org.apache.xerces.xni.parser;version="@impl.version@",org.apache.xerces.xpointer;version="@impl.version@",org.apache.xerces.xs;version="@impl.version@",org.apache.xerces.xs.datatypes;version="@impl.version@",org.apache.xml.serialize;version="@impl.version@",org.w3c.dom.html;version="@impl.version@"
+ 
+ Name: org/apache/xerces/impl/
+ Comment: @impl.name@ 

@@ -1,0 +1,16 @@
+{
+ "Signatures": {
+  "README.RedHat.SSL": "f80998d8cfd165bb6180ac1970aacc76d96f322c8f03cf49d3b921d58f33d5b8",
+  "README.RedHat.Security": "3166eba0a71867ca86671a821dc26ba6acc50c89b2dfae33cd58dd40e08f6a38",
+  "access.conf": "87ed661f402bed0425d7fb97a9e2367d3914dd93eea94b3f7133410b1332c563",
+  "cim_schema_2.38.0Experimental-MOFs.zip": "c1f4a0e1a5ac470ba543c59c499d2f1691890b9caa6e3c37bd7ee6e43b57650e",
+  "cimprovagt-wrapper.sh": "7906161eb05d404b2b43b3cfe212214f37cc71dd11196346162122fb88d4a519",
+  "cmpiOSBase_OperatingSystemProvider-cimprovagt.example": "fcedda34baf295b3e15976677dd44c80f50b0867537e8430da7b5eaec18561d4",
+  "generate-certs": "37c7beb1dc7bf756a87a7228142e2b5a61ff71a840d09d78325af37f1dd9807d",
+  "pegasus-2.14.1.tar.gz": "9f2f13a35da218f3cb6e8478246ff7c4d3010560bb4d5de9cbf4272d48e353fb",
+  "repupgrade.1.gz": "e23652b6db0a5a864268894d89275a179a5ff8fa226d3cd98b82df9c69212491",
+  "snmptrapd.conf": "465291512aa215e5048cce7f57c0e5a654addd3cfba654f88c656467cb871bc5",
+  "tog-pegasus.service": "789d53b948902d89aa53da49c015b7ac3b77a37b62d3c46b4f23454e1c9cfc3c",
+  "tog-pegasus.tmpfiles": "b1beb02536cdeccfdbb9275e373a03ed450c10358d217ef89114bbc190035466"
+ }
+}

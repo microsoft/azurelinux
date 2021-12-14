@@ -1,0 +1,30 @@
+diff --git a/libjbig/jbig.c b/libjbig/jbig.c
+index 751ceff..3c76e07 100644
+--- a/libjbig/jbig.c
++++ b/libjbig/jbig.c
+@@ -889,7 +889,7 @@ void jbg_enc_options(struct jbg_enc_state *s, int order, int options,
+   if (order >= 0 && order <= 0x0f) s->order = order;
+   if (options >= 0) s->options = options;
+   if (l0 > 0) s->l0 = l0;
+-  if (mx >= 0 && my < 128) s->mx = mx;
++  if (mx >= 0 && mx < 128) s->mx = mx;
+   if (my >= 0 && my < 256) s->my = my;
+ 
+   return;
+diff --git a/pbmtools/Makefile b/pbmtools/Makefile
+index 85e1783..6ae2d33 100644
+--- a/pbmtools/Makefile
++++ b/pbmtools/Makefile
+@@ -56,9 +56,9 @@ test82: pbmtojbg jbgtopbm
+ 	make IMG=sandra    "OPTIONSP=-o 2" OPTIONSJ=       dotest2g
+ 	make IMG=multi      OPTIONSP=      OPTIONSJ=       dotest2g
+ 	make IMG=multi      OPTIONSP=-b    OPTIONSJ=-b     dotest2g
+-	make IMG=mx        "OPTIONSP=-q -s 3 -m 128"       dotest1
+-	make IMG=mx        "OPTIONSP=-q -s 3 -m 128"       dotest2b
+-	make IMG=mx        "OPTIONSP=-q -s 3 -m 128 -p 92" dotest2b
++	make IMG=mx        "OPTIONSP=-q -s 3 -m 127"       dotest1
++	make IMG=mx        "OPTIONSP=-q -s 3 -m 127"       dotest2b
++	make IMG=mx        "OPTIONSP=-q -s 3 -m 127 -p 92" dotest2b
+ 	make IMG=mx        "OPTIONSP=-q -Y -1"             dotest2b
+ 	make IMG=mx        "OPTIONSP=-Y -1"                dotest2b
+ 	rm -f test-*.jbg test-*.pbm test-*.pgm

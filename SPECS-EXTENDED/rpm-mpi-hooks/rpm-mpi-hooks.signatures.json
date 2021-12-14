@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "LICENSE": "ed63cac2509574c03d471698565e1dc056a48b41bcbbd29ddcae9d5e2cc7325c",
+  "mpi.attr": "8b8458d93356b88b85d2321f729da18537363462787df531a57502f895bd42b1",
+  "mpi.prov": "155536d6ae3eb2898cf6db6f977a9a920fe448589eb16fa8b76d22c1885bd1bb",
+  "mpi.req": "051774abfef2c481471b844e55b7b3c64dbc8ad48786efd6117aa65faa4771a3",
+  "mpilibsymlink.attr": "8584e0f1a07eeacced37833918ac261fc18d16c8d9b0f8f1832cb34ba9c7d21b"
+ }
+}

@@ -1,0 +1,57 @@
+--- XOM/build.xml
++++ XOM/build.xml
+@@ -201,8 +201,8 @@
+            debug="${debug}"
+            optimize="${optimize}"
+            deprecation="${deprecation}"
+-           target="1.2"
+-           source="1.3"
++           target="1.6"
++           source="1.6"
+            encoding="UTF-8"
+            excludes="nu/xom/pantry/* nu/xom/tools/* nu/xom/samples/*Servlet.java">
+        <classpath refid="compile.class.path"/>
+@@ -228,8 +228,8 @@
+            debug="${debug}"
+            optimize="${optimize}"
+            deprecation="${deprecation}"
+-           target="1.2"
+-           source="1.3"
++           target="1.6"
++           source="1.6"
+            encoding="UTF-8">
+        <classpath refid="compile.class.path"/>
+        <include name="nu/xom/samples/*Servlet.java" />
+@@ -244,8 +244,8 @@
+            debug="${debug}"
+            optimize="${optimize}"
+            deprecation="${deprecation}"
+-           target="1.2"
+-           source="1.3"
++           target="1.6"
++           source="1.6"
+            encoding="UTF-8"
+            failonerror="false">
+        <classpath refid="compile.class.path"/>
+@@ -462,8 +462,8 @@
+            debug="${debug}"
+            optimize="${optimize}"
+            deprecation="${deprecation}"
+-           target="1.2"
+-           source="1.3"
++           target="1.6"
++           source="1.6"
+            encoding="UTF-8"
+            includes="nu/xom/tools/*">
+       <classpath>
+@@ -705,8 +705,8 @@
+            debug="${debug}"
+            optimize="${optimize}"
+            deprecation="${deprecation}"
+-           target="1.2"
+-           source="1.3"
++           target="1.6"
++           source="1.6"
+            encoding="UTF-8"
+            includeAntRuntime="no"
+            excludes="org/jaxen/dom/** 

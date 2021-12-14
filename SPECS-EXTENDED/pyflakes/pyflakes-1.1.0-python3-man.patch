@@ -1,0 +1,23 @@
+diff -up pyflakes-1.1.0/debian/pyflakes3.1.orig pyflakes-1.1.0/debian/pyflakes3.1
+--- pyflakes-1.1.0/debian/pyflakes3.1.orig	2015-11-06 18:24:51.000000000 +0200
++++ pyflakes-1.1.0/debian/pyflakes3.1	2016-03-01 23:05:17.179563833 +0200
+@@ -1,15 +1,15 @@
+-.TH "PYFLAKES3" "1" "10/01/2007" "" ""
++.TH "PYTHON3-PYFLAKES" "1" "10/01/2007" "" ""
+ .\" disable hyphenation
+ .nh
+ .\" disable justification (adjust text to left margin only)
+ .ad l
+ .SH "NAME"
+-pyflakes3 - simple Python 3 source checker
++python3-pyflakes - simple Python 3 source checker
+ .SH "SYNOPSIS"
+ .PP
+-\fBpyflakes\fR [\fIfile-or-directory\fR ...]
++\fBpython3-pyflakes\fR [\fIfile-or-directory\fR ...]
+ .SH "DESCRIPTION"
+-pyflakes3 is a simple program which checks Python source files for errors.
++python3-pyflakes is a simple program which checks Python source files for errors.
+ It is similar to PyChecker in scope, but differs in that it does not
+ execute the modules to check them. This is both safer and faster, although
+ it does not perform as many checks. Unlike PyLint, Pyflakes checks only

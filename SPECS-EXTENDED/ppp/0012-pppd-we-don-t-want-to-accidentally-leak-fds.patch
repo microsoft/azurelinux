@@ -1,0 +1,143 @@
+From 82cd789df0f022eb6f3d28646e7a61d1d0715805 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Mon, 7 Apr 2014 12:23:36 +0200
+Subject: [PATCH 12/27] pppd: we don't want to accidentally leak fds
+
+---
+ pppd/auth.c      | 20 ++++++++++----------
+ pppd/options.c   |  2 +-
+ pppd/sys-linux.c |  4 ++--
+ 3 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/pppd/auth.c b/pppd/auth.c
+index 4271af6..9e957fa 100644
+--- a/pppd/auth.c
++++ b/pppd/auth.c
+@@ -428,7 +428,7 @@ setupapfile(argv)
+ 	option_error("unable to reset uid before opening %s: %m", fname);
+ 	return 0;
+     }
+-    ufile = fopen(fname, "r");
++    ufile = fopen(fname, "re");
+     if (seteuid(euid) == -1)
+ 	fatal("unable to regain privileges: %m");
+     if (ufile == NULL) {
+@@ -1413,7 +1413,7 @@ check_passwd(unit, auser, userlen, apasswd, passwdlen, msg)
+     filename = _PATH_UPAPFILE;
+     addrs = opts = NULL;
+     ret = UPAP_AUTHNAK;
+-    f = fopen(filename, "r");
++    f = fopen(filename, "re");
+     if (f == NULL) {
+ 	error("Can't open PAP password file %s: %m", filename);
+ 
+@@ -1512,7 +1512,7 @@ null_login(unit)
+     if (ret <= 0) {
+ 	filename = _PATH_UPAPFILE;
+ 	addrs = NULL;
+-	f = fopen(filename, "r");
++	f = fopen(filename, "re");
+ 	if (f == NULL)
+ 	    return 0;
+ 	check_access(f, filename);
+@@ -1559,7 +1559,7 @@ get_pap_passwd(passwd)
+     }
+ 
+     filename = _PATH_UPAPFILE;
+-    f = fopen(filename, "r");
++    f = fopen(filename, "re");
+     if (f == NULL)
+ 	return 0;
+     check_access(f, filename);
+@@ -1597,7 +1597,7 @@ have_pap_secret(lacks_ipp)
+     }
+ 
+     filename = _PATH_UPAPFILE;
+-    f = fopen(filename, "r");
++    f = fopen(filename, "re");
+     if (f == NULL)
+ 	return 0;
+ 
+@@ -1642,7 +1642,7 @@ have_chap_secret(client, server, need_ip, lacks_ipp)
+     }
+ 
+     filename = _PATH_CHAPFILE;
+-    f = fopen(filename, "r");
++    f = fopen(filename, "re");
+     if (f == NULL)
+ 	return 0;
+ 
+@@ -1684,7 +1684,7 @@ have_srp_secret(client, server, need_ip, lacks_ipp)
+     struct wordlist *addrs;
+ 
+     filename = _PATH_SRPFILE;
+-    f = fopen(filename, "r");
++    f = fopen(filename, "re");
+     if (f == NULL)
+ 	return 0;
+ 
+@@ -1740,7 +1740,7 @@ get_secret(unit, client, server, secret, secret_len, am_server)
+ 	addrs = NULL;
+ 	secbuf[0] = 0;
+ 
+-	f = fopen(filename, "r");
++	f = fopen(filename, "re");
+ 	if (f == NULL) {
+ 	    error("Can't open chap secret file %s: %m", filename);
+ 	    return 0;
+@@ -1797,7 +1797,7 @@ get_srp_secret(unit, client, server, secret, am_server)
+ 	filename = _PATH_SRPFILE;
+ 	addrs = NULL;
+ 
+-	fp = fopen(filename, "r");
++	fp = fopen(filename, "re");
+ 	if (fp == NULL) {
+ 	    error("Can't open srp secret file %s: %m", filename);
+ 	    return 0;
+@@ -2203,7 +2203,7 @@ scan_authfile(f, client, server, secret, addrs, opts, filename, flags)
+ 	     */
+ 	    if (word[0] == '@' && word[1] == '/') {
+ 		strlcpy(atfile, word+1, sizeof(atfile));
+-		if ((sf = fopen(atfile, "r")) == NULL) {
++		if ((sf = fopen(atfile, "re")) == NULL) {
+ 		    warn("can't open indirect secret file %s", atfile);
+ 		    continue;
+ 		}
+diff --git a/pppd/options.c b/pppd/options.c
+index 45fa742..1d754ae 100644
+--- a/pppd/options.c
++++ b/pppd/options.c
+@@ -427,7 +427,7 @@ options_from_file(filename, must_exist, check_prot, priv)
+ 	option_error("unable to drop privileges to open %s: %m", filename);
+ 	return 0;
+     }
+-    f = fopen(filename, "r");
++    f = fopen(filename, "re");
+     err = errno;
+     if (check_prot && seteuid(euid) == -1)
+ 	fatal("unable to regain privileges");
+diff --git a/pppd/sys-linux.c b/pppd/sys-linux.c
+index 72a7727..8a12fa0 100644
+--- a/pppd/sys-linux.c
++++ b/pppd/sys-linux.c
+@@ -1412,7 +1412,7 @@ static char *path_to_procfs(const char *tail)
+ 	/* Default the mount location of /proc */
+ 	strlcpy (proc_path, "/proc", sizeof(proc_path));
+ 	proc_path_len = 5;
+-	fp = fopen(MOUNTED, "r");
++	fp = fopen(MOUNTED, "re");
+ 	if (fp != NULL) {
+ 	    while ((mntent = getmntent(fp)) != NULL) {
+ 		if (strcmp(mntent->mnt_type, MNTTYPE_IGNORE) == 0)
+@@ -1472,7 +1472,7 @@ static int open_route_table (void)
+     close_route_table();
+ 
+     path = path_to_procfs("/net/route");
+-    route_fd = fopen (path, "r");
++    route_fd = fopen (path, "re");
+     if (route_fd == NULL) {
+ 	error("can't open routing table %s: %m", path);
+ 	return 0;
+-- 
+1.8.3.1
+

@@ -1,0 +1,97 @@
+--- procmail-3.22/Makefile.rhconfig	2001-09-10 22:53:09.000000000 -0600
++++ procmail-3.22/Makefile	2003-09-12 07:44:34.000000000 -0600
+@@ -23,7 +23,7 @@
+ 
+ # Uncomment to install compressed man pages (possibly add extra suffix
+ # to the definitions of MAN?DIR and/or MAN?SUFFIX by hand)
+-#MANCOMPRESS = compress
++# MANCOMPRESS = compress
+ 
+ ############################*#
+ # Things that can be made are:
+@@ -55,7 +55,7 @@
+ 
+ LOCKINGTEST=__defaults__
+ 
+-#LOCKINGTEST=/tmp .	# Uncomment and add any directories you see fit.
++LOCKINGTEST=/tmp .	# Uncomment and add any directories you see fit.
+ #			If LOCKINGTEST is defined, autoconf will NOT
+ #			prompt you to enter additional directories.
+ #			See INSTALL for more information about the
+@@ -65,7 +65,7 @@
+ # Only edit below this line if you *think* you know what you are doing #
+ ########################################################################
+ 
+-#LOCKINGTEST=100	# Uncomment (and change) if you think you know
++LOCKINGTEST=100	# Uncomment (and change) if you think you know
+ #			it better than the autoconf lockingtests.
+ #			This will cause the lockingtests to be hotwired.
+ #			100	to enable fcntl()
+@@ -74,8 +74,8 @@
+ #			Or them together to get the desired combination.
+ 
+ # Optional system libraries we search for
+-SEARCHLIBS = -lm -ldir -lx -lsocket -lnet -linet -lnsl_s -lnsl_i -lnsl -lsun \
+- -lgen -lsockdns -ldl
++SEARCHLIBS = -lm -ldir -lx -lsocket -lnet -linet -lnsl_s -lnsl_i -lsun \
++ -lgen -lsockdns
+ #			-lresolv	# not really needed, is it?
+ 
+ # Informal list of directories where we look for the libraries in SEARCHLIBS
+@@ -86,8 +86,8 @@
+  #-Wimplicit -Wshadow -Wid-clash-6 #-Wuninitialized
+ 
+ # The place to put your favourite extra cc flag
+-CFLAGS0 = -O #$(GCC_WARNINGS)
+-LDFLAGS0= -s
++CFLAGS0 = $(RPM_OPT_FLAGS) #$(GCC_WARNINGS)
++LDFLAGS0= 
+ # Read my libs :-)
+ LIBS=
+ 
+--- procmail-3.22/config.h.rhconfig	2001-09-10 22:53:50.000000000 -0600
++++ procmail-3.22/config.h	2003-09-12 07:41:40.000000000 -0600
+@@ -35,7 +35,8 @@
+  */
+ /*#define DEFSPATH	"PATH=/bin:/usr/bin"			/* */
+ /*#define DEFPATH	"PATH=$HOME/bin:/bin:/usr/bin"		/* */
+-
++#define DEFPATH	"PATH=$HOME/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/X11R6/bin"		/* */
++ 
+ /* every environment variable appearing in PRESTENV will be set or wiped
+  * out of the environment (variables without an '=' sign will be thrown
+  * out), e.g. you could define PRESTENV as follows:
+@@ -46,13 +47,13 @@
+  */
+ #define PRESTENV	{"IFS","ENV","PWD",0}
+ 
+-/*#define GROUP_PER_USER			/* uncomment this if each
++#define GROUP_PER_USER			/* uncomment this if each
+ 						   user has his or her own
+ 	group and procmail can therefore trust a $HOME/.procmailrc that
+ 	is group writable or contained in a group writable home directory
+ 	if the group involved is the user's default group. */
+ 
+-/*#define LMTP					/* uncomment this if you
++#define LMTP					/* uncomment this if you
+ 						   want to use procmail
+ 	as an LMTP (rfc2033) server, presumably for invocation by an MTA.
+ 	The file examples/local_procmail_lmtp.m4 contains info on how to
+@@ -79,7 +80,7 @@
+ 
+ /*#define NO_fcntl_LOCK		/* uncomment any of these three if you	     */
+ /*#define NO_lockf_LOCK		/* definitely do not want procmail to make   */
+-/*#define NO_flock_LOCK		/* use of those kernel-locking methods	     */
++#define NO_flock_LOCK		/* use of those kernel-locking methods	     */
+ 				/* If you set LOCKINGTEST to a binary number
+ 	than there's no need to set these.  These #defines are only useful
+ 	if you want to disable particular locking styles but are unsure which
+@@ -91,7 +92,7 @@
+ 	mail present.  procmail automatically suppresses this when it isn't
+ 	needed or under heavy load. */
+ 
+-/*#define DEFsendmail	"/usr/sbin/sendmail"	/* uncomment and/or change if
++#define DEFsendmail	"/usr/sbin/sendmail"	/* uncomment and/or change if
+ 						   the autoconfigured default
+ 	SENDMAIL is not suitable.  This program should quack like a sendmail:
+ 	it should accept the -oi flag (to tell it to _not_ treat a line

@@ -1,0 +1,13 @@
+Index: os-prober/os-probes/mounted/x86/83haiku
+===================================================================
+--- os-prober.orig/os-probes/mounted/x86/83haiku
++++ os-prober/os-probes/mounted/x86/83haiku
+@@ -13,7 +13,7 @@ case "$type" in
+ 	*) debug "$partition is not a BeFS partition: exiting"; exit 1 ;;
+ esac
+ 
+-if head -c 512 "$partition" | grep -qs "system.haiku_loader"; then
++if head -c 512 "$partition" | grep -aqs "system.haiku_loader"; then
+ 	debug "Stage 1 bootloader found"
+ else
+ 	debug "Stage 1 bootloader not found: exiting"

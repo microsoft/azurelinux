@@ -1,0 +1,2422 @@
+Open Virtual Machine Firmware (OVMF) Status Report
+July 2014 (with updates in August 2014 - January 2015)
+
+Author: Laszlo Ersek <lersek@redhat.com>
+Copyright (C) 2014-2015, Red Hat, Inc.
+CC BY-SA 4.0 <http://creativecommons.org/licenses/by-sa/4.0/>
+
+Abstract
+--------
+
+The Unified Extensible Firmware Interface (UEFI) is a specification that
+defines a software interface between an operating system and platform firmware.
+UEFI is designed to replace the Basic Input/Output System (BIOS) firmware
+interface.
+
+Hardware platform vendors have been increasingly adopting the UEFI
+Specification to govern their boot firmware developments. OVMF (Open Virtual
+Machine Firmware), a sub-project of Intel's EFI Development Kit II (edk2),
+enables UEFI support for Ia32 and X64 Virtual Machines.
+
+This paper reports on the status of the OVMF project, treats features and
+limitations, gives end-user hints, and examines some areas in-depth.
+
+Keywords: ACPI, boot options, CSM, edk2, firmware, flash, fw_cfg, KVM, memory
+map, non-volatile variables, OVMF, PCD, QEMU, reset vector, S3, Secure Boot,
+Smbios, SMM, TianoCore, UEFI, VBE shim, Virtio
+
+Table of Contents
+-----------------
+
+- Motivation
+- Scope
+- Example qemu invocation
+- Installation of OVMF guests with virt-manager and virt-install
+- Supported guest operating systems
+- Compatibility Support Module (CSM)
+- Phases of the boot process
+- Project structure
+- Platform Configuration Database (PCD)
+- Firmware image structure
+- S3 (suspend to RAM and resume)
+- A comprehensive memory map of OVMF
+- Known Secure Boot limitations
+- Variable store and LockBox in SMRAM
+- Select features
+  - X64-specific reset vector for OVMF
+  - Client library for QEMU's firmware configuration interface
+  - Guest ACPI tables
+  - Guest SMBIOS tables
+  - Platform-specific boot policy
+  - Virtio drivers
+  - Platform Driver
+  - Video driver
+- Afterword
+
+Motivation
+----------
+
+OVMF extends the usual benefits of virtualization to UEFI. Reasons to use OVMF
+include:
+
+- Legacy-free guests. A UEFI-based environment eliminates dependencies on
+  legacy address spaces and devices. This is especially beneficial when used
+  with physically assigned devices where the legacy operating mode is
+  troublesome to support, ex. assigned graphics cards operating in legacy-free,
+  non-VGA mode in the guest.
+
+- Future proof guests. The x86 market is steadily moving towards a legacy-free
+  platform and guest operating systems may eventually require a UEFI
+  environment. OVMF provides that next generation firmware support for such
+  applications.
+
+- GUID partition tables (GPTs). MBR partition tables represent partition
+  offsets and sizes with 32-bit integers, in units of 512 byte sectors. This
+  limits the addressable portion of the disk to 2 TB. GPT represents logical
+  block addresses with 64 bits.
+
+- Liberating boot loader binaries from residing in contested and poorly defined
+  space between the partition table and the partitions.
+
+- Support for booting off disks (eg. pass-through physical SCSI devices) with a
+  4kB physical and logical sector size, i.e. which don't have 512-byte block
+  emulation.
+
+- Development and testing of Secure Boot-related features in guest operating
+  systems. Although OVMF's Secure Boot implementation is currently not secure
+  against malicious UEFI drivers, UEFI applications, and guest kernels,
+  trusted guest code that only uses standard UEFI interfaces will find a valid
+  Secure Boot environment under OVMF, with working key enrollment and signature
+  validation. This enables development and testing of portable, Secure
+  Boot-related guest code.
+
+- Presence of non-volatile UEFI variables. This furthers development and
+  testing of OS installers, UEFI boot loaders, and unique, dependent guest OS
+  features. For example, an efivars-backed pstore (persistent storage)
+  file system works under Linux.
+
+- Altogether, a near production-level UEFI environment for virtual machines
+  when Secure Boot is not required.
+
+Scope
+-----
+
+UEFI and especially Secure Boot have been topics fraught with controversy and
+political activism. This paper sidesteps these aspects and strives to focus on
+use cases, hands-on information for end users, and technical details.
+
+Unless stated otherwise, the expression "X supports Y" means "X is technically
+compatible with interfaces provided or required by Y". It does not imply
+support as an activity performed by natural persons or companies.
+
+We discuss the status of OVMF at a state no earlier than edk2 SVN revision
+16158. The paper concentrates on upstream projects and communities, but
+occasionally it pans out about OVMF as it is planned to be shipped (as
+Technical Preview) in Red Hat Enterprise Linux 7.1. Such digressions are marked
+with the [RHEL] margin notation.
+
+Although other VMMs and accelerators are known to support (or plan to support)
+OVMF to various degrees -- for example, VirtualBox, Xen, BHyVe --, we'll
+emphasize OVMF on qemu/KVM, because QEMU and KVM have always been Red Hat's
+focus wrt. OVMF.
+
+The recommended upstream QEMU version is 2.1+. The recommended host Linux
+kernel (KVM) version is 3.10+. The recommended QEMU machine type is
+"qemu-system-x86_64 -M pc-i440fx-2.1" or later.
+
+The term "TianoCore" is used interchangeably with "edk2" in this paper.
+
+Example qemu invocation
+-----------------------
+
+The following commands give a quick foretaste of installing a UEFI operating
+system on OVMF, relying only on upstream edk2 and qemu.
+
+- Clone and build OVMF:
+
+  git clone https://github.com/tianocore/edk2.git
+  cd edk2
+  nice OvmfPkg/build.sh -a X64 -n $(getconf _NPROCESSORS_ONLN)
+
+  (Note that this ad-hoc build will not include the Secure Boot feature.)
+
+- The build output file, "OVMF.fd", includes not only the executable firmware
+  code, but the non-volatile variable store as well. For this reason, make a
+  VM-specific copy of the build output (the variable store should be private to
+  the virtual machine):
+
+  cp Build/OvmfX64/DEBUG_GCC4?/FV/OVMF.fd fedora.flash
+
+  (The variable store and the firmware executable are also available in the
+  build output as separate files: "OVMF_VARS.fd" and "OVMF_CODE.fd". This
+  enables central management and updates of the firmware executable, while each
+  virtual machine can retain its own variable store.)
+
+- Download a Fedora LiveCD:
+
+  wget https://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Xfce-x86_64-20-1.iso
+
+- Create a virtual disk (qcow2 format, 20 GB in size):
+
+  qemu-img create -f qcow2 fedora.img 20G
+
+- Create the following qemu wrapper script under the name "fedora.sh":
+
+  # Basic virtual machine properties: a recent i440fx machine type, KVM
+  # acceleration, 2048 MB RAM, two VCPUs.
+  OPTS="-M pc-i440fx-2.1 -enable-kvm -m 2048 -smp 2"
+
+  # The OVMF binary, including the non-volatile variable store, appears as a
+  # "normal" qemu drive on the host side, and it is exposed to the guest as a
+  # persistent flash device.
+  OPTS="$OPTS -drive if=pflash,format=raw,file=fedora.flash"
+
+  # The hard disk is exposed to the guest as a virtio-block device. OVMF has a
+  # driver stack that supports such a disk. We specify this disk as first boot
+  # option. OVMF recognizes the boot order specification.
+  OPTS="$OPTS -drive id=disk0,if=none,format=qcow2,file=fedora.img"
+  OPTS="$OPTS -device virtio-blk-pci,drive=disk0,bootindex=0"
+
+  # The Fedora installer disk appears as an IDE CD-ROM in the guest. This is
+  # the 2nd boot option.
+  OPTS="$OPTS -drive id=cd0,if=none,format=raw,readonly"
+  OPTS="$OPTS,file=Fedora-Live-Xfce-x86_64-20-1.iso"
+  OPTS="$OPTS -device ide-cd,bus=ide.1,drive=cd0,bootindex=1"
+
+  # The following setting enables S3 (suspend to RAM). OVMF supports S3
+  # suspend/resume.
+  OPTS="$OPTS -global PIIX4_PM.disable_s3=0"
+
+  # OVMF emits a number of info / debug messages to the QEMU debug console, at
+  # ioport 0x402. We configure qemu so that the debug console is indeed
+  # available at that ioport. We redirect the host side of the debug console to
+  # a file.
+  OPTS="$OPTS -global isa-debugcon.iobase=0x402 -debugcon file:fedora.ovmf.log"
+
+  # QEMU accepts various commands and queries from the user on the monitor
+  # interface. Connect the monitor with the qemu process's standard input and
+  # output.
+  OPTS="$OPTS -monitor stdio"
+
+  # A USB tablet device in the guest allows for accurate pointer tracking
+  # between the host and the guest.
+  OPTS="$OPTS -device piix3-usb-uhci -device usb-tablet"
+
+  # Provide the guest with a virtual network card (virtio-net).
+  #
+  # Normally, qemu provides the guest with a UEFI-conformant network driver
+  # from the iPXE project, in the form of a PCI expansion ROM. For this test,
+  # we disable the expansion ROM and allow OVMF's built-in virtio-net driver to
+  # take effect.
+  #
+  # On the host side, we use the SLIRP ("user") network backend, which has
+  # relatively low performance, but it doesn't require extra privileges from
+  # the user executing qemu.
+  OPTS="$OPTS -netdev id=net0,type=user"
+  OPTS="$OPTS -device virtio-net-pci,netdev=net0,romfile="
+
+  # A Spice QXL GPU is recommended as the primary VGA-compatible display
+  # device. It is a full-featured virtual video card, with great operating
+  # system driver support. OVMF supports it too.
+  OPTS="$OPTS -device qxl-vga"
+
+  qemu-system-x86_64 $OPTS
+
+- Start the Fedora guest:
+
+  sh fedora.sh
+
+- The above command can be used for both installation and later boots of the
+  Fedora guest.
+
+- In order to verify basic OVMF network connectivity:
+
+  - Assuming that the non-privileged user running qemu belongs to group G
+    (where G is a numeric identifier), ensure as root on the host that the
+    group range in file "/proc/sys/net/ipv4/ping_group_range" includes G.
+
+  - As the non-privileged user, boot the guest as usual.
+
+  - On the TianoCore splash screen, press ESC.
+
+  - Navigate to Boot Manager | EFI Internal Shell
+
+  - In the UEFI Shell, issue the following commands:
+
+    ifconfig -s eth0 dhcp
+    ping A.B.C.D
+
+    where A.B.C.D is a public IPv4 address in dotted decimal notation that your
+    host can reach.
+
+  - Type "quit" at the (qemu) monitor prompt.
+
+Installation of OVMF guests with virt-manager and virt-install
+--------------------------------------------------------------
+
+(1) Assuming OVMF has been installed on the host with the following files:
+    - /usr/share/OVMF/OVMF_CODE.fd
+    - /usr/share/OVMF/OVMF_VARS.fd
+
+    locate the "nvram" stanza in "/etc/libvirt/qemu.conf", and edit it as
+    follows:
+
+    nvram = [ "/usr/share/OVMF/OVMF_CODE.fd:/usr/share/OVMF/OVMF_VARS.fd" ]
+
+(2) Restart libvirtd with your Linux distribution's service management tool;
+    for example,
+
+    systemctl restart libvirtd
+
+(3) In virt-manager, proceed with the guest installation as usual:
+    - select File | New Virtual Machine,
+    - advance to Step 5 of 5,
+    - in Step 5, check "Customize configuration before install",
+    - click Finish;
+    - in the customization dialog, select Overview | Firmware, and choose UEFI,
+    - click Apply and Begin Installation.
+
+(4) With virt-install:
+
+    LDR="loader=/usr/share/OVMF/OVMF_CODE.fd,loader_ro=yes,loader_type=pflash"
+    virt-install \
+      --name fedora20 \
+      --memory 2048 \
+      --vcpus 2 \
+      --os-variant fedora20 \
+      --boot hd,cdrom,$LDR \
+      --disk size=20 \
+      --disk path=Fedora-Live-Xfce-x86_64-20-1.iso,device=cdrom,bus=scsi
+
+(5) A popular, distribution-independent, bleeding-edge OVMF package is
+    available under <https://www.kraxel.org/repos/>, courtesy of Gerd Hoffmann.
+
+    The "edk2.git-ovmf-x64" package provides the following files, among others:
+    - /usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-efi.fd
+    - /usr/share/edk2.git/ovmf-x64/OVMF_VARS-pure-efi.fd
+
+    When using this package, adapt steps (1) and (4) accordingly.
+
+(6) Additionally, the "edk2.git-ovmf-x64" package seeks to simplify the
+    enablement of Secure Boot in a virtual machine (strictly for development
+    and testing purposes).
+
+    - Boot the virtual machine off the CD-ROM image called
+      "/usr/share/edk2.git/ovmf-x64/UefiShell.iso"; before or after installing
+      the main guest operating system.
+
+    - When the UEFI shell appears, issue the following commands:
+
+      EnrollDefaultKeys.efi
+      reset -s
+
+    - The EnrollDefaultKeys.efi utility enrolls the following keys:
+
+      - A static example X.509 certificate (CN=TestCommonName) as Platform Key
+        and first Key Exchange Key.
+
+        The private key matching this certificate has been destroyed (but you
+        shouldn't trust this statement).
+
+      - "Microsoft Corporation KEK CA 2011" as second Key Exchange Key
+        (SHA1: 31:59:0b:fd:89:c9:d7:4e:d0:87:df:ac:66:33:4b:39:31:25:4b:30).
+
+      - "Microsoft Windows Production PCA 2011" as first DB entry
+        (SHA1: 58:0a:6f:4c:c4:e4:b6:69:b9:eb:dc:1b:2b:3e:08:7b:80:d0:67:8d).
+
+      - "Microsoft Corporation UEFI CA 2011" as second DB entry
+        (SHA1: 46:de:f6:3b:5c:e6:1c:f8:ba:0d:e2:e6:63:9c:10:19:d0:ed:14:f3).
+
+      These keys suffice to boot released versions of popular Linux
+      distributions (through the shim.efi utility), and Windows 8 and Windows
+      Server 2012 R2, in Secure Boot mode.
+
+Supported guest operating systems
+---------------------------------
+
+Upstream OVMF does not favor some guest operating systems over others for
+political or ideological reasons. However, some operating systems are harder to
+obtain and/or technically more difficult to support. The general expectation is
+that recent UEFI OSes should just work. Please consult the "OvmfPkg/README"
+file.
+
+The following guest OSes were tested with OVMF:
+- Red Hat Enterprise Linux 6
+- Red Hat Enterprise Linux 7
+- Fedora 18
+- Fedora 19
+- Fedora 20
+- Windows Server 2008 R2 SP1
+- Windows Server 2012
+- Windows 8
+
+Notes about Windows Server 2008 R2 (paraphrasing the "OvmfPkg/README" file):
+
+- QEMU should be started with one of the "-device qxl-vga" and "-device VGA"
+  options.
+
+- Only one video mode, 1024x768x32, is supported at OS runtime.
+
+  Please refer to the section about QemuVideoDxe (OVMF's built-in video driver)
+  for more details on this limitation.
+
+- The qxl-vga video card is recommended ("-device qxl-vga"). After booting the
+  installed guest OS, select the video card in Device Manager, and upgrade the
+  video driver to the QXL XDDM one.
+
+  The QXL XDDM driver can be downloaded from
+  <http://www.spice-space.org/download.html>, under Guest | Windows binaries.
+
+  This driver enables additional graphics resolutions at OS runtime, and
+  provides S3 (suspend/resume) capability.
+
+Notes about Windows Server 2012 and Windows 8:
+
+- QEMU should be started with the "-device qxl-vga,revision=4" option (or a
+  later revision, if available).
+
+- The guest OS's builtin video driver inherits the video mode / frame buffer
+  from OVMF. There's no way to change the resolution at OS runtime.
+
+  For this reason, a platform driver has been developed for OVMF, which allows
+  users to change the preferred video mode in the firmware. Please refer to the
+  section about PlatformDxe for details.
+
+- It is recommended to upgrade the guest OS's video driver to the QXL WDDM one,
+  via Device Manager.
+
+  Binaries for the QXL WDDM driver can be found at
+  <http://people.redhat.com/~vrozenfe/qxlwddm> (pick a version greater than or
+  equal to 0.6), while the source code resides at
+  <https://github.com/vrozenfe/qxl-dod>.
+
+  This driver enables additional graphics resolutions at OS runtime, and
+  provides S3 (suspend/resume) capability.
+
+Compatibility Support Module (CSM)
+----------------------------------
+
+Collaboration between SeaBIOS and OVMF developers has enabled SeaBIOS to be
+built as a Compatibility Support Module, and OVMF to embed and use it.
+
+Benefits of a SeaBIOS CSM include:
+
+- The ability to boot legacy (non-UEFI) operating systems, such as legacy Linux
+  systems, Windows 7, OpenBSD 5.2, FreeBSD 8/9, NetBSD, DragonflyBSD, Solaris
+  10/11.
+
+- Legacy (non-UEFI-compliant) PCI expansion ROMs, such as a VGA BIOS, mapped by
+  QEMU in emulated devices' ROM BARs, are loaded and executed by OVMF.
+
+  For example, this grants the Windows Server 2008 R2 SP1 guest's native,
+  legacy video driver access to all modes of all QEMU video cards.
+
+Building the CSM target of the SeaBIOS source tree is out of scope for this
+report. Additionally, upstream OVMF does not enable the CSM by default.
+
+Interested users and developers should look for OVMF's "-D CSM_ENABLE"
+build-time option, and check out the <https://www.kraxel.org/repos/> continuous
+integration repository, which provides CSM-enabled OVMF builds.
+
+[RHEL] The "OVMF_CODE.fd" firmware image made available on the Red Hat
+       Enterprise Linux 7.1 host does not include a Compatibility Support
+       Module, for the following reasons:
+
+       - Virtual machines running officially supported, legacy guest operating
+         systems should just use the standalone SeaBIOS firmware. Firmware
+         selection is flexible in virtualization, see eg. "Installation of OVMF
+         guests with virt-manager and virt-install" above.
+
+       - The 16-bit thunking interface between OVMF and SeaBIOS is very complex
+         and presents a large debugging and support burden, based on past
+         experience.
+
+       - Secure Boot is incompatible with CSM.
+
+       - Inter-project dependencies should be minimized whenever possible.
+
+       - Using the default QXL video card, the Windows 2008 R2 SP1 guest can be
+         installed with its built-in, legacy video driver. Said driver will
+         select the only available video mode, 1024x768x32. After installation,
+         the video driver can be upgraded to the full-featured QXL XDDM driver.
+
+Phases of the boot process
+--------------------------
+
+The PI and UEFI specifications, and Intel's UEFI and EDK II Learning and
+Development materials provide ample information on PI and UEFI concepts. The
+following is an absolutely minimal, rough glossary that is included only to
+help readers new to PI and UEFI understand references in later, OVMF-specific
+sections. We defer heavily to the official specifications and the training
+materials, and frequently quote them below.
+
+A central concept to mention early is the GUID -- globally unique identifier. A
+GUID is a 128-bit number, written as XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,
+where each X stands for a hexadecimal nibble. GUIDs are used to name everything
+in PI and in UEFI. Programmers introduce new GUIDs with the "uuidgen" utility,
+and standards bodies standardize well-known services by positing their GUIDs.
+
+The boot process is roughly divided in the following phases:
+
+- Reset vector code.
+
+- SEC: Security phase. This phase is the root of firmware integrity.
+
+- PEI: Pre-EFI Initialization. This phase performs "minimal processor, chipset
+  and platform configuration for the purpose of discovering memory". Modules in
+  PEI collectively save their findings about the platform in a list of HOBs
+  (hand-off blocks).
+
+  When developing PEI code, the Platform Initialization (PI) specification
+  should be consulted.
+
+- DXE: Driver eXecution Environment, pronounced as "Dixie". This "is the phase
+  where the bulk of the booting occurs: devices are enumerated and initialized,
+  UEFI services are supported, and protocols and drivers are implemented. Also,
+  the tables that create the UEFI interface are produced".
+
+  On the PEI/DXE boundary, the HOBs produced by PEI are consumed. For example,
+  this is how the memory space map is configured initially.
+
+- BDS: Boot Device Selection. It is "responsible for determining how and where
+  you want to boot the operating system".
+
+  When developing DXE and BDS code, it is mainly the UEFI specification that
+  should be consulted. When speaking about DXE, BDS is frequently considered to
+  be a part of it.
+
+The following concepts are tied to specific boot process phases:
+
+- PEIM: a PEI Module (pronounced "PIM"). A binary module running in the PEI
+  phase, consuming some PPIs and producing other PPIs, and producing HOBs.
+
+- PPI: PEIM-to-PEIM interface. A structure of function pointers and related
+  data members that establishes a PEI service, or an instance of a PEI service.
+  PPIs are identified by GUID.
+
+  An example is EFI_PEI_S3_RESUME2_PPI (6D582DBC-DB85-4514-8FCC-5ADF6227B147).
+
+- DXE driver: a binary module running in the DXE and BDS phases, consuming some
+  protocols and producing other protocols.
+
+- Protocol: A structure of function pointers and related data members that
+  establishes a DXE service, or an instance of a DXE service. Protocols are
+  identified by GUID.
+
+  An example is EFI_BLOCK_IO_PROTOCOL (964E5B21-6459-11D2-8E39-00A0C969723B).
+
+- Architectural protocols: a set of standard protocols that are foundational to
+  the working of a UEFI system. Each architectural protocol has at most one
+  instance. Architectural protocols are implemented by a subset of DXE drivers.
+  DXE drivers explicitly list the set of protocols (including architectural
+  protocols) that they need to work. UEFI drivers can only be loaded once all
+  architectural protocols have become available during the DXE phase.
+
+  An example is EFI_VARIABLE_WRITE_ARCH_PROTOCOL
+  (6441F818-6362-4E44-B570-7DBA31DD2453).
+
+Project structure
+-----------------
+
+The term "OVMF" usually denotes the project (community and development effort)
+that provide and maintain the subject matter UEFI firmware for virtual
+machines. However the term is also frequently applied to the firmware binary
+proper that a virtual machine executes.
+
+OVMF emerges as a compilation of several modules from the edk2 source
+repository. "edk2" stands for EFI Development Kit II; it is a "modern,
+feature-rich, cross-platform firmware development environment for the UEFI and
+PI specifications".
+
+The composition of OVMF is dictated by the following build control files:
+
+  OvmfPkg/OvmfPkgIa32.dsc
+  OvmfPkg/OvmfPkgIa32.fdf
+
+  OvmfPkg/OvmfPkgIa32X64.dsc
+  OvmfPkg/OvmfPkgIa32X64.fdf
+
+  OvmfPkg/OvmfPkgX64.dsc
+  OvmfPkg/OvmfPkgX64.fdf
+
+The format of these files is described in the edk2 DSC and FDF specifications.
+Roughly, the DSC file determines:
+- library instance resolutions for library class requirements presented by the
+  modules to be compiled,
+- the set of modules to compile.
+
+The FDF file roughly determines:
+- what binary modules (compilation output files, precompiled binaries, graphics
+  image files, verbatim binary sections) to include in the firmware image,
+- how to lay out the firmware image.
+
+The Ia32 flavor of these files builds a firmware where both PEI and DXE phases
+are 32-bit. The Ia32X64 flavor builds a firmware where the PEI phase consists
+of 32-bit modules, and the DXE phase is 64-bit. The X64 flavor builds a purely
+64-bit firmware.
+
+The word size of the DXE phase must match the word size of the runtime OS -- a
+32-bit DXE can't cooperate with a 64-bit OS, and a 64-bit DXE can't work a
+32-bit OS.
+
+OVMF pulls together modules from across the edk2 tree. For example:
+
+- common drivers and libraries that are platform independent are usually
+  located under MdeModulePkg and MdePkg,
+
+- common but hardware-specific drivers and libraries that match QEMU's
+  pc-i440fx-* machine type are pulled in from IntelFrameworkModulePkg,
+  PcAtChipsetPkg and UefiCpuPkg,
+
+- the platform independent UEFI Shell is built from ShellPkg,
+
+- OvmfPkg includes drivers and libraries that are useful for virtual machines
+  and may or may not be specific to QEMU's pc-i440fx-* machine type.
+
+Platform Configuration Database (PCD)
+-------------------------------------
+
+Like the "Phases of the boot process" section, this one introduces a concept in
+very raw form. We defer to the PCD related edk2 specifications, and we won't
+discuss implementation details here. Our purpose is only to offer the reader a
+usable (albeit possibly inaccurate) definition, so that we can refer to PCDs
+later on.
+
+Colloquially, when we say "PCD", we actually mean "PCD entry"; that is, an
+entry stored in the Platform Configuration Database.
+
+The Platform Configuration Database is
+- a firmware-wide
+- name-value store
+- of scalars and buffers
+- where each entry may be
+  - build-time constant, or
+  - run-time dynamic, or
+  - theoretically, a middle option: patchable in the firmware file itself,
+    using a dedicated tool. (OVMF does not utilize externally patchable
+    entries.)
+
+A PCD entry is declared in the DEC file of the edk2 top-level Package directory
+whose modules (drivers and libraries) are the primary consumers of the PCD
+entry. (See for example OvmfPkg/OvmfPkg.dec). Basically, a PCD in a DEC file
+exposes a simple customization point.
+
+Interest in a PCD entry is communicated to the build system by naming the PCD
+entry in the INF file of the interested module (application, driver or
+library). The module may read and -- dependent on the PCD entry's category --
+write the PCD entry.
+
+Let's investigate the characteristics of the Database and the PCD entries.
+
+- Firmware-wide: technically, all modules may access all entries they are
+  interested in, assuming they advertise their interest in their INF files.
+  With careful design, PCDs enable inter-driver propagation of (simple) system
+  configuration. PCDs are available in both PEI and DXE.
+
+  (UEFI drivers meant to be portable (ie. from third party vendors) are not
+  supposed to use PCDs, since PCDs qualify internal to the specific edk2
+  firmware in question.)
+
+- Name-value store of scalars and buffers: each PCD has a symbolic name, and a
+  fixed scalar type (UINT16, UINT32 etc), or VOID* for buffers. Each PCD entry
+  belongs to a namespace, where a namespace is (obviously) a GUID, defined in
+  the DEC file.
+
+- A DEC file can permit several categories for a PCD:
+  - build-time constant ("FixedAtBuild"),
+  - patchable in the firmware image ("PatchableInModule", unused in OVMF),
+  - runtime modifiable ("Dynamic").
+
+The platform description file (DSC) of a top-level Package directory may choose
+the exact category for a given PCD entry that its modules wish to use, and
+assign a default (or constant) initial value to it.
+
+In addition, the edk2 build system too can initialize PCD entries to values
+that it calculates while laying out the flash device image. Such PCD
+assignments are described in the FDF control file.
+
+Firmware image structure
+------------------------
+
+(We assume the common X64 choice for both PEI and DXE, and the default DEBUG
+build target.)
+
+The OvmfPkg/OvmfPkgX64.fdf file defines the following layout for the flash
+device image "OVMF.fd":
+
+  Description                     Compression type        Size
+  ------------------------------  ----------------------  -------
+  Non-volatile data storage       open-coded binary data   128 KB
+    Variable store                                          56 KB
+    Event log                                                4 KB
+    Working block                                            4 KB
+    Spare area                                              64 KB
+
+  FVMAIN_COMPACT                  uncompressed            1712 KB
+    FV Firmware File System file  LZMA compressed
+      PEIFV                       uncompressed             896 KB
+        individual PEI modules    uncompressed
+      DXEFV                       uncompressed            8192 KB
+        individual DXE modules    uncompressed
+
+  SECFV                           uncompressed             208 KB
+    SEC driver
+    reset vector code
+
+The top-level image consists of three regions (three firmware volumes):
+- non-volatile data store (128 KB),
+- main firmware volume (FVMAIN_COMPACT, 1712 KB),
+- firmware volume containing the reset vector code and the SEC phase code (208
+  KB).
+
+In total, the OVMF.fd file has size 128 KB + 1712 KB + 208 KB == 2 MB.
+
+(1) The firmware volume with non-volatile data store (128 KB) has the following
+    internal structure, in blocks of 4 KB:
+
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  L: event log
+       LIVE | varstore                  |L|W|  W: working block
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      SPARE |                               |
+            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    The first half of this firmware volume is "live", while the second half is
+    "spare". The spare half is important when the variable driver reclaims
+    unused storage and reorganizes the variable store.
+
+    The live half dedicates 14 blocks (56 KB) to the variable store itself. On
+    top of those, one block is set aside for an event log, and one block is
+    used as the working block of the fault tolerant write protocol. Fault
+    tolerant writes are used to recover from an occasional (virtual) power loss
+    during variable updates.
+
+    The blocks in this firmware volume are accessed, in stacking order from
+    least abstract to most abstract, by:
+
+    - EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL (provided by
+      OvmfPkg/QemuFlashFvbServicesRuntimeDxe),
+
+    - EFI_FAULT_TOLERANT_WRITE_PROTOCOL (provided by
+      MdeModulePkg/Universal/FaultTolerantWriteDxe),
+
+    - architectural protocols instrumental to the runtime UEFI variable
+      services:
+      - EFI_VARIABLE_ARCH_PROTOCOL,
+      - EFI_VARIABLE_WRITE_ARCH_PROTOCOL.
+
+      In a non-secure boot build, the DXE driver providing these architectural
+      protocols is MdeModulePkg/Universal/Variable/RuntimeDxe. In a secure boot
+      build, where authenticated variables are available, the DXE driver
+      offering these protocols is SecurityPkg/VariableAuthenticated/RuntimeDxe.
+
+(2) The main firmware volume (FVMAIN_COMPACT, 1712 KB) embeds further firmware
+    volumes. The outermost layer is a Firmware File System (FFS), carrying a
+    single file. This file holds an LZMA-compressed section, which embeds two
+    firmware volumes: PEIFV (896 KB) with PEIMs, and DXEFV (8192 KB) with DXE
+    and UEFI drivers.
+
+    This scheme enables us to build 896 KB worth of PEI drivers and 8192 KB
+    worth of DXE and UEFI drivers, compress them all with LZMA in one go, and
+    store the compressed result in 1712 KB, saving room in the flash device.
+
+(3) The SECFV firmware volume (208 KB) is not compressed. It carries the
+    "volume top file" with the reset vector code, to end at 4 GB in
+    guest-physical address space, and the SEC phase driver (OvmfPkg/Sec).
+
+    The last 16 bytes of the volume top file (mapped directly under 4 GB)
+    contain a NOP slide and a jump instruction. This is where QEMU starts
+    executing the firmware, at address 0xFFFF_FFF0. The reset vector and the
+    SEC driver run from flash directly.
+
+    The SEC driver locates FVMAIN_COMPACT in the flash, and decompresses the
+    main firmware image to RAM. The rest of OVMF (PEI, DXE, BDS phases) run
+    from RAM.
+
+As already mentioned, the OVMF.fd file is mapped by qemu's
+"hw/block/pflash_cfi01.c" device just under 4 GB in guest-physical address
+space, according to the command line option
+
+  -drive if=pflash,format=raw,file=fedora.flash
+
+(refer to the Example qemu invocation). This is a "ROMD device", which can
+switch out of "ROMD mode" and back into it.
+
+Namely, in the default ROMD mode, the guest-physical address range backed by
+the flash device reads and executes as ROM (it does not trap from KVM to QEMU).
+The first write access in this mode traps to QEMU, and flips the device out of
+ROMD mode.
+
+In non-ROMD mode, the flash chip is programmed by storing CFI (Common Flash
+Interface) command values at the flash-covered addresses; both reads and writes
+trap to QEMU, and the flash contents are modified and synchronized to the
+host-side file. A special CFI command flips the flash device back to ROMD mode.
+
+Qemu implements the above based on the KVM_CAP_READONLY_MEM / KVM_MEM_READONLY
+KVM features, and OVMF puts it to use in its EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL
+implementation, under "OvmfPkg/QemuFlashFvbServicesRuntimeDxe".
+
+IMPORTANT: Never pass OVMF.fd to qemu with the -bios option. That option maps
+the firmware image as ROM into the guest's address space, and forces OVMF to
+emulate non-volatile variables with a fallback driver that is bound to have
+insufficient and confusing semantics.
+
+The 128 KB firmware volume with the variable store, discussed under (1), is
+also built as a separate host-side file, named "OVMF_VARS.fd". The "rest" is
+built into a third file, "OVMF_CODE.fd", which is only 1920 KB in size. The
+variable store is mapped into its usual location, at 4 GB - 2 MB = 0xFFE0_0000,
+through the following qemu options:
+
+  -drive if=pflash,format=raw,readonly,file=OVMF_CODE.fd   \
+  -drive if=pflash,format=raw,file=fedora.varstore.fd
+
+This way qemu configures two flash chips consecutively, with start addresses
+growing downwards, which is transparent to OVMF.
+
+[RHEL] Red Hat Enterprise Linux 7.1 ships a Secure Boot-enabled, X64, DEBUG
+       firmware only. Furthermore, only the split files ("OVMF_VARS.fd" and
+       "OVMF_CODE.fd") are available.
+
+S3 (suspend to RAM and resume)
+------------------------------
+
+As noted in Example qemu invocation, the
+
+  -global PIIX4_PM.disable_s3=0
+
+command line option tells qemu and OVMF if the user would like to enable S3
+support. (This is corresponds to the /domain/pm/suspend-to-mem/@enabled libvirt
+domain XML attribute.)
+
+Implementing / orchestrating S3 was a considerable community effort in OVMF. A
+detailed description exceeds the scope of this report; we only make a few
+statements.
+
+(1) S3-related PPIs and protocols are well documented in the PI specification.
+
+(2) Edk2 contains most modules that are needed to implement S3 on a given
+    platform. One abstraction that is central to the porting / extending of the
+    S3-related modules to a new platform is the LockBox library interface,
+    which a specific platform can fill in by implementing its own LockBox
+    library instance.
+
+    The LockBox library provides a privileged name-value store (to be addressed
+    by GUIDs). The privilege separation stretches between the firmware and the
+    operating system. That is, the S3-related machinery of the firmware saves
+    some items in the LockBox securely, under well-known GUIDs, before booting
+    the operating system. During resume (which is a form of warm reset), the
+    firmware is activated again, and retrieves items from the LockBox. Before
+    jumping to the OS's resume vector, the LockBox is secured again.
+
+    We'll return to this later when we separately discuss SMRAM and SMM.
+
+(3) During resume, the DXE and later phases are never reached; only the reset
+    vector, and the SEC and PEI phases of the firmware run. The platform is
+    supposed to detect a resume in progress during PEI, and to store that fact
+    in the BootMode field of the Phase Handoff Information Table (PHIT) HOB.
+    OVMF keys this off the CMOS, see OvmfPkg/PlatformPei.
+
+    At the end of PEI, the DXE IPL PEIM (Initial Program Load PEI Module, see
+    MdeModulePkg/Core/DxeIplPeim) examines the Boot Mode, and if it says "S3
+    resume in progress", then the IPL branches to the PEIM that exports
+    EFI_PEI_S3_RESUME2_PPI (provided by UefiCpuPkg/Universal/Acpi/S3Resume2Pei)
+    rather than loading the DXE core.
+
+    S3Resume2Pei executes the technical steps of the resumption, relying on the
+    contents of the LockBox.
+
+(4) During first boot (or after a normal platform reset), when DXE does run,
+    hardware drivers in the DXE phase are encouraged to "stash" their hardware
+    configuration steps (eg. accesses to PCI config space, I/O ports, memory
+    mapped addresses, and so on) in a centrally maintained, so called "S3 boot
+    script". Hardware accesses are represented with opcodes of a special binary
+    script language.
+
+    This boot script is to be replayed during resume, by S3Resume2Pei. The
+    general goal is to bring back hardware devices -- which have been powered
+    off during suspend -- to their original after-first-boot state, and in
+    particular, to do so quickly.
+
+    At the moment, OVMF saves only one opcode in the S3 resume boot script: an
+    INFORMATION opcode, with contents 0xDEADBEEF (in network byte order). The
+    consensus between Linux developers seems to be that boot firmware is only
+    responsible for restoring basic chipset state, which OVMF does during PEI
+    anyway, independently of S3 vs. normal reset. (One example is the power
+    management registers of the i440fx chipset.) Device and peripheral state is
+    the responsibility of the runtime operating system.
+
+    Although an experimental OVMF S3 boot script was at one point captured for
+    the virtual Cirrus VGA card, such a boot script cannot follow eg. video
+    mode changes effected by the OS. Hence the operating system can never avoid
+    restoring device state, and most Linux display drivers (eg. stdvga, QXL)
+    already cover S3 resume fully.
+
+    The XDDM and WDDM driver models used under Windows OSes seem to recognize
+    this notion of runtime OS responsibility as well. (See the list of OSes
+    supported by OVMF in a separate section.)
+
+(5) The S3 suspend/resume data flow in OVMF is included here tersely, for
+    interested developers.
+
+    (a) BdsLibBootViaBootOption()
+          EFI_ACPI_S3_SAVE_PROTOCOL [AcpiS3SaveDxe]
+          - saves ACPI S3 Context to LockBox  ---------------------+
+            (including FACS address -- FACS ACPI table             |
+            contains OS waking vector)                             |
+                                                                   |
+          - prepares boot script:                                  |
+            EFI_S3_SAVE_STATE_PROTOCOL.Write() [S3SaveStateDxe]    |
+              S3BootScriptLib [PiDxeS3BootScriptLib]               |
+              - opcodes & arguments are saved in NVS.  --+         |
+                                                         |         |
+          - issues a notification by installing          |         |
+            EFI_DXE_SMM_READY_TO_LOCK_PROTOCOL           |         |
+                                                         |         |
+    (b) EFI_S3_SAVE_STATE_PROTOCOL [S3SaveStateDxe]      |         |
+          S3BootScriptLib [PiDxeS3BootScriptLib]         |         |
+          - closes script with special opcode  <---------+         |
+          - script is available in non-volatile memory             |
+            via PcdS3BootScriptTablePrivateDataPtr  --+            |
+                                                      |            |
+        BootScriptExecutorDxe                         |            |
+          S3BootScriptLib [PiDxeS3BootScriptLib]      |            |
+          - Knows about boot script location by  <----+            |
+            synchronizing with the other library                   |
+            instance via                                           |
+            PcdS3BootScriptTablePrivateDataPtr.                    |
+          - Copies relocated image of itself to                    |
+            reserved memory. --------------------------------+     |
+          - Saved image contains pointer to boot script.  ---|--+  |
+                                                             |  |  |
+    Runtime:                                                 |  |  |
+                                                             |  |  |
+    (c) OS is booted, writes OS waking vector to FACS,       |  |  |
+        suspends machine                                     |  |  |
+                                                             |  |  |
+    S3 Resume (PEI):                                         |  |  |
+                                                             |  |  |
+    (d) PlatformPei sets S3 Boot Mode based on CMOS          |  |  |
+                                                             |  |  |
+    (e) DXE core is skipped and EFI_PEI_S3_RESUME2 is        |  |  |
+        called as last step of PEI                           |  |  |
+                                                             |  |  |
+    (f) S3Resume2Pei retrieves from LockBox:                 |  |  |
+        - ACPI S3 Context (path to FACS)  <------------------|--|--+
+                                          |                  |  |
+                                          +------------------|--|--+
+        - Boot Script Executor Image  <----------------------+  |  |
+                                                                |  |
+    (g) BootScriptExecutorDxe                                   |  |
+          S3BootScriptLib [PiDxeS3BootScriptLib]                |  |
+          - executes boot script  <-----------------------------+  |
+                                                                   |
+    (h) OS waking vector available from ACPI S3 Context / FACS  <--+
+        is called
+
+A comprehensive memory map of OVMF
+----------------------------------
+
+The following section gives a detailed analysis of memory ranges below 4 GB
+that OVMF statically uses.
+
+In the rightmost column, the PCD entry is identified by which the source refers
+to the address or size in question.
+
+The flash-covered range has been discussed previously in "Firmware image
+structure", therefore we include it only for completeness. Due to the fact that
+this range is always backed by a memory mapped device (and never RAM), it is
+unaffected by S3 (suspend to RAM and resume).
+
++--------------------------+ 4194304 KB
+|                          |
+|          SECFV           | size: 208 KB
+|                          |
++--------------------------+ 4194096 KB
+|                          |
+|      FVMAIN_COMPACT      | size: 1712 KB
+|                          |
++--------------------------+ 4192384 KB
+|                          |
+|      variable store      | size: 64 KB   PcdFlashNvStorageFtwSpareSize
+|        spare area        |
+|                          |
++--------------------------+ 4192320 KB    PcdOvmfFlashNvStorageFtwSpareBase
+|                          |
+|    FTW working block     | size: 4 KB    PcdFlashNvStorageFtwWorkingSize
+|                          |
++--------------------------+ 4192316 KB    PcdOvmfFlashNvStorageFtwWorkingBase
+|                          |
+|       Event log of       | size: 4 KB    PcdOvmfFlashNvStorageEventLogSize
+|   non-volatile storage   |
+|                          |
++--------------------------+ 4192312 KB    PcdOvmfFlashNvStorageEventLogBase
+|                          |
+|      variable store      | size: 56 KB   PcdFlashNvStorageVariableSize
+|                          |
++--------------------------+ 4192256 KB    PcdOvmfFlashNvStorageVariableBase
+
+The flash-mapped image of OVMF.fd covers the entire structure above (2048 KB).
+
+When using the split files, the address 4192384 KB
+(PcdOvmfFlashNvStorageFtwSpareBase + PcdFlashNvStorageFtwSpareSize) is the
+boundary between the mapped images of OVMF_VARS.fd (56 KB + 4 KB + 4 KB + 64 KB
+= 128 KB) and OVMF_CODE.fd (1712 KB + 208 KB = 1920 KB).
+
+With regard to RAM that is statically used by OVMF, S3 (suspend to RAM and
+resume) complicates matters. Many ranges have been introduced only to support
+S3, hence for all ranges below, the following questions will be audited:
+
+(a) when and how a given range is initialized after first boot of the VM,
+(b) how it is protected from memory allocations during DXE,
+(c) how it is protected from the OS,
+(d) how it is accessed on the S3 resume path,
+(e) how it is accessed on the warm reset path.
+
+Importantly, the term "protected" is meant as protection against inadvertent
+reallocations and overwrites by co-operating DXE and OS modules. It does not
+imply security against malicious code.
+
++--------------------------+ 17408 KB
+|                          |
+|DXEFV from FVMAIN_COMPACT | size: 8192 KB PcdOvmfDxeMemFvSize
+|  decompressed firmware   |
+| volume with DXE modules  |
+|                          |
++--------------------------+ 9216 KB       PcdOvmfDxeMemFvBase
+|                          |
+|PEIFV from FVMAIN_COMPACT | size: 896 KB  PcdOvmfPeiMemFvSize
+|  decompressed firmware   |
+| volume with PEI modules  |
+|                          |
++--------------------------+ 8320 KB       PcdOvmfPeiMemFvBase
+|                          |
+| permanent PEI memory for | size: 32 KB   PcdS3AcpiReservedMemorySize
+|   the S3 resume path     |
+|                          |
++--------------------------+ 8288 KB       PcdS3AcpiReservedMemoryBase
+|                          |
+|  temporary SEC/PEI heap  | size: 32 KB   PcdOvmfSecPeiTempRamSize
+|         and stack        |
+|                          |
++--------------------------+ 8256 KB       PcdOvmfSecPeiTempRamBase
+|                          |
+|          unused          | size: 32 KB
+|                          |
++--------------------------+ 8224 KB
+|                          |
+|      SEC's table of      | size: 4 KB    PcdGuidedExtractHandlerTableSize
+| GUIDed section handlers  |
+|                          |
++--------------------------+ 8220 KB       PcdGuidedExtractHandlerTableAddress
+|                          |
+|     LockBox storage      | size: 4 KB    PcdOvmfLockBoxStorageSize
+|                          |
++--------------------------+ 8216 KB       PcdOvmfLockBoxStorageBase
+|                          |
+| early page tables on X64 | size: 24 KB   PcdOvmfSecPageTablesSize
+|                          |
++--------------------------+ 8192 KB       PcdOvmfSecPageTablesBase
+
+(1) Early page tables on X64:
+
+  (a) when and how it is initialized after first boot of the VM
+
+    The range is filled in during the SEC phase
+    [OvmfPkg/ResetVector/Ia32/PageTables64.asm]. The CR3 register is verified
+    against the base address in SecCoreStartupWithStack()
+    [OvmfPkg/Sec/SecMain.c].
+
+  (b) how it is protected from memory allocations during DXE
+
+    If S3 was enabled on the QEMU command line (see "-global
+    PIIX4_PM.disable_s3=0" earlier), then InitializeRamRegions()
+    [OvmfPkg/PlatformPei/MemDetect.c] protects the range with an AcpiNVS memory
+    allocation HOB, in PEI.
+
+    If S3 was disabled, then this range is not protected. DXE's own page tables
+    are first built while still in PEI (see HandOffToDxeCore()
+    [MdeModulePkg/Core/DxeIplPeim/X64/DxeLoadFunc.c]). Those tables are located
+    in permanent PEI memory. After CR3 is switched over to them (which occurs
+    before jumping to the DXE core entry point), we don't have to preserve the
+    initial tables.
+
+  (c) how it is protected from the OS
+
+    If S3 is enabled, then (1b) reserves it from the OS too.
+
+    If S3 is disabled, then the range needs no protection.
+
+  (d) how it is accessed on the S3 resume path
+
+    It is rewritten same as in (1a), which is fine because (1c) reserved it.
+
+  (e) how it is accessed on the warm reset path
+
+    It is rewritten same as in (1a).
+
+(2) LockBox storage:
+
+  (a) when and how it is initialized after first boot of the VM
+
+    InitializeRamRegions() [OvmfPkg/PlatformPei/MemDetect.c] zeroes out the
+    area during PEI. This is correct but not strictly necessary, since on first
+    boot the area is zero-filled anyway.
+
+    The LockBox signature of the area is filled in by the PEI module or DXE
+    driver that has been linked against OVMF's LockBoxLib and is run first. The
+    signature is written in LockBoxLibInitialize()
+    [OvmfPkg/Library/LockBoxLib/LockBoxLib.c].
+
+    Any module calling SaveLockBox() [OvmfPkg/Library/LockBoxLib/LockBoxLib.c]
+    will co-populate this area.
+
+  (b) how it is protected from memory allocations during DXE
+
+    If S3 is enabled, then InitializeRamRegions()
+    [OvmfPkg/PlatformPei/MemDetect.c] protects the range as AcpiNVS.
+
+    Otherwise, the range is covered with a BootServicesData memory allocation
+    HOB.
+
+  (c) how it is protected from the OS
+
+    If S3 is enabled, then (2b) protects it sufficiently.
+
+    Otherwise the range requires no runtime protection, and the
+    BootServicesData allocation type from (2b) ensures that the range will be
+    released to the OS.
+
+  (d) how it is accessed on the S3 resume path
+
+    The S3 Resume PEIM restores data from the LockBox, which has been correctly
+    protected in (2c).
+
+  (e) how it is accessed on the warm reset path
+
+    InitializeRamRegions() [OvmfPkg/PlatformPei/MemDetect.c] zeroes out the
+    range during PEI, effectively emptying the LockBox. Modules will
+    re-populate the LockBox as described in (2a).
+
+(3) SEC's table of GUIDed section handlers
+
+  (a) when and how it is initialized after first boot of the VM
+
+    The following two library instances are linked into SecMain:
+    - IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib,
+    - MdePkg/Library/BaseExtractGuidedSectionLib.
+
+    The first library registers its LZMA decompressor plugin (which is a called
+    a "section handler") by calling the second library:
+
+    LzmaDecompressLibConstructor() [GuidedSectionExtraction.c]
+      ExtractGuidedSectionRegisterHandlers() [BaseExtractGuidedSectionLib.c]
+
+    The second library maintains its table of registered "section handlers", to
+    be indexed by GUID, in this fixed memory area, independently of S3
+    enablement.
+
+    (The decompression of FVMAIN_COMPACT's FFS file section that contains the
+    PEIFV and DXEFV firmware volumes occurs with the LZMA decompressor
+    registered above. See (6) and (7) below.)
+
+  (b) how it is protected from memory allocations during DXE
+
+    There is no need to protect this area from DXE: because nothing else in
+    OVMF links against BaseExtractGuidedSectionLib, the area loses its
+    significance as soon as OVMF progresses from SEC to PEI, therefore DXE is
+    allowed to overwrite the region.
+
+  (c) how it is protected from the OS
+
+    When S3 is enabled, we cover the range with an AcpiNVS memory allocation
+    HOB in InitializeRamRegions().
+
+    When S3 is disabled, the range is not protected.
+
+  (d) how it is accessed on the S3 resume path
+
+    The table of registered section handlers is again managed by
+    BaseExtractGuidedSectionLib linked into SecMain exclusively. Section
+    handler registrations update the table in-place (based on GUID matches).
+
+  (e) how it is accessed on the warm reset path
+
+    If S3 is enabled, then the OS won't damage the table (due to (3c)), thus
+    see (3d).
+
+    If S3 is disabled, then the OS has most probably overwritten the range with
+    its own data, hence (3a) -- complete reinitialization -- will come into
+    effect, based on the table signature check in BaseExtractGuidedSectionLib.
+
+(4) temporary SEC/PEI heap and stack
+
+  (a) when and how it is initialized after first boot of the VM
+
+    The range is configured in [OvmfPkg/Sec/X64/SecEntry.S] and
+    SecCoreStartupWithStack() [OvmfPkg/Sec/SecMain.c]. The stack half is read &
+    written by the CPU transparently. The heap half is used for memory
+    allocations during PEI.
+
+    Data is migrated out (to permanent PEI stack & memory) in (or soon after)
+    PublishPeiMemory() [OvmfPkg/PlatformPei/MemDetect.c].
+
+  (b) how it is protected from memory allocations during DXE
+
+    It is not necessary to protect this range during DXE because its use ends
+    still in PEI.
+
+  (c) how it is protected from the OS
+
+    If S3 is enabled, then InitializeRamRegions()
+    [OvmfPkg/PlatformPei/MemDetect.c] reserves it as AcpiNVS.
+
+    If S3 is disabled, then the range doesn't require protection.
+
+  (d) how it is accessed on the S3 resume path
+
+    Same as in (4a), except the target area of the migration triggered by
+    PublishPeiMemory() [OvmfPkg/PlatformPei/MemDetect.c] is different -- see
+    (5).
+
+  (e) how it is accessed on the warm reset path
+
+    Same as in (4a). The stack and heap halves both may contain garbage, but it
+    doesn't matter.
+
+(5) permanent PEI memory for the S3 resume path
+
+  (a) when and how it is initialized after first boot of the VM
+
+    No particular initialization or use.
+
+  (b) how it is protected from memory allocations during DXE
+
+    We don't need to protect this area during DXE.
+
+  (c) how it is protected from the OS
+
+    When S3 is enabled, InitializeRamRegions()
+    [OvmfPkg/PlatformPei/MemDetect.c] makes sure the OS stays away by covering
+    the range with an AcpiNVS memory allocation HOB.
+
+    When S3 is disabled, the range needs no protection.
+
+  (d) how it is accessed on the S3 resume path
+
+    PublishPeiMemory() installs the range as permanent RAM for PEI. The range
+    will serve as stack and will satisfy allocation requests during the rest of
+    PEI. OS data won't overlap due to (5c).
+
+  (e) how it is accessed on the warm reset path
+
+    Same as (5a).
+
+(6) PEIFV -- decompressed firmware volume with PEI modules
+
+  (a) when and how it is initialized after first boot of the VM
+
+    DecompressMemFvs() [OvmfPkg/Sec/SecMain.c] populates the area, by
+    decompressing the flash-mapped FVMAIN_COMPACT volume's contents. (Refer to
+    "Firmware image structure".)
+
+  (b) how it is protected from memory allocations during DXE
+
+    When S3 is disabled, PeiFvInitialization() [OvmfPkg/PlatformPei/Fv.c]
+    covers the range with a BootServicesData memory allocation HOB.
+
+    When S3 is enabled, the same is coverage is ensured, just with the stronger
+    AcpiNVS memory allocation type.
+
+  (c) how it is protected from the OS
+
+    When S3 is disabled, it is not necessary to keep the range from the OS.
+
+    Otherwise the AcpiNVS type allocation from (6b) provides coverage.
+
+  (d) how it is accessed on the S3 resume path
+
+    Rather than decompressing it again from FVMAIN_COMPACT, GetS3ResumePeiFv()
+    [OvmfPkg/Sec/SecMain.c] reuses the protected area for parsing / execution
+    from (6c).
+
+  (e) how it is accessed on the warm reset path
+
+    Same as (6a).
+
+(7) DXEFV -- decompressed firmware volume with DXE modules
+
+  (a) when and how it is initialized after first boot of the VM
+
+    Same as (6a).
+
+  (b) how it is protected from memory allocations during DXE
+
+    PeiFvInitialization() [OvmfPkg/PlatformPei/Fv.c] covers the range with a
+    BootServicesData memory allocation HOB.
+
+  (c) how it is protected from the OS
+
+    The OS is allowed to release and reuse this range.
+
+  (d) how it is accessed on the S3 resume path
+
+    It's not; DXE never runs during S3 resume.
+
+  (e) how it is accessed on the warm reset path
+
+    Same as in (7a).
+
+Known Secure Boot limitations
+-----------------------------
+
+Under "Motivation" we've mentioned that OVMF's Secure Boot implementation is
+not suitable for production use yet -- it's only good for development and
+testing of standards-conformant, non-malicious guest code (UEFI and operating
+system alike).
+
+Now that we've examined the persistent flash device, the workings of S3, and
+the memory map, we can discuss two currently known shortcomings of OVMF's
+Secure Boot that in fact make it insecure. (Clearly problems other than these
+two might exist; the set of issues considered here is not meant to be
+exhaustive.)
+
+One trait of Secure Boot is tamper-evidence. Secure Boot may not prevent
+malicious modification of software components (for example, operating system
+drivers), but by being the root of integrity on a platform, it can catch (or
+indirectly contribute to catching) unauthorized changes, by way of signature
+and certificate checks at the earliest phases of boot.
+
+If an attacker can tamper with key material stored in authenticated and/or
+boot-time only persistent variables (for example, PK, KEK, db, dbt, dbx), then
+the intended security of this scheme is compromised. The UEFI 2.4A
+specification says
+
+- in section 28.3.4:
+
+  Platform Keys:
+
+    The public key must be stored in non-volatile storage which is tamper and
+    delete resistant.
+
+  Key Exchange Keys:
+
+    The public key must be stored in non-volatile storage which is tamper
+    resistant.
+
+- in section 28.6.1:
+
+  The signature database variables db, dbt, and dbx must be stored in
+  tamper-resistant non-volatile storage.
+
+(1) The combination of QEMU, KVM, and OVMF does not provide this kind of
+    resistance. The variable store in the emulated flash chip is directly
+    accessible to, and reprogrammable by, UEFI drivers, applications, and
+    operating systems.
+
+(2) Under "S3 (suspend to RAM and resume)" we pointed out that the LockBox
+    storage must be similarly secure and tamper-resistant.
+
+    On the S3 resume path, the PEIM providing EFI_PEI_S3_RESUME2_PPI
+    (UefiCpuPkg/Universal/Acpi/S3Resume2Pei) restores and interprets data from
+    the LockBox that has been saved there during boot. This PEIM, being part of
+    the firmware, has full access to the platform. If an operating system can
+    tamper with the contents of the LockBox, then at the next resume the
+    platform's integrity might be subverted.
+
+    OVMF stores the LockBox in normal guest RAM (refer to the memory map
+    section above). Operating systems and third party UEFI drivers and UEFI
+    applications that respect the UEFI memory map will not inadvertently
+    overwrite the LockBox storage, but there's nothing to prevent eg. a
+    malicious kernel from modifying the LockBox.
+
+One means to address these issues is SMM and SMRAM (System Management Mode and
+System Management RAM).
+
+During boot and resume, the firmware can enter and leave SMM and access SMRAM.
+Before the DXE phase is left, and control is transferred to the BDS phase (when
+third party UEFI drivers and applications can be loaded, and an operating
+system can be loaded), SMRAM is locked in hardware, and subsequent modules
+cannot access it directly. (See EFI_DXE_SMM_READY_TO_LOCK_PROTOCOL.)
+
+Once SMRAM has been locked, UEFI drivers and the operating system can enter SMM
+by raising a System Management Interrupt (SMI), at which point trusted code
+(part of the platform firmware) takes control. SMRAM is also unlocked by
+platform reset, at which point the boot firmware takes control again.
+
+Variable store and LockBox in SMRAM
+-----------------------------------
+
+Edk2 provides almost all components to implement the variable store and the
+LockBox in SMRAM. In this section we summarize ideas for utilizing those
+facilities.
+
+The SMRAM and SMM infrastructure in edk2 is built up as follows:
+
+(1) The platform hardware provides SMM / SMI / SMRAM.
+
+    Qemu/KVM doesn't support these features currently and should implement them
+    in the longer term.
+
+(2) The platform vendor (in this case, OVMF developers) implement device
+    drivers for the platform's System Management Mode:
+
+    - EFI_SMM_CONTROL2_PROTOCOL: for raising a synchronous (and/or) periodic
+      SMI(s); that is, for entering SMM.
+
+    - EFI_SMM_ACCESS2_PROTOCOL: for describing and accessing SMRAM.
+
+    These protocols are documented in the PI Specification, Volume 4.
+
+(3) The platform DSC file is to include the following platform-independent
+    modules:
+
+    - MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf: SMM Initial Program Load
+    - MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf: SMM Core
+
+(4) At this point, modules of type DXE_SMM_DRIVER can be loaded.
+
+    Such drivers are privileged. They run in SMM, have access to SMRAM, and are
+    separated and switched from other drivers through SMIs. Secure
+    communication between unprivileged (non-SMM) and privileged (SMM) drivers
+    happens through EFI_SMM_COMMUNICATION_PROTOCOL (implemented by the SMM
+    Core, see (3)).
+
+    DXE_SMM_DRIVER modules must sanitize their input (coming from unprivileged
+    drivers) carefully.
+
+(5) The authenticated runtime variable services driver (for Secure Boot builds)
+    is located under "SecurityPkg/VariableAuthenticated/RuntimeDxe". OVMF
+    currently builds the driver (a DXE_RUNTIME_DRIVER module) with the
+    "VariableRuntimeDxe.inf" control file (refer to "OvmfPkg/OvmfPkgX64.dsc"),
+    which does not use SMM.
+
+    The directory includes two more INF files:
+
+    - VariableSmm.inf -- module type: DXE_SMM_DRIVER. A privileged driver that
+      runs in SMM and has access to SMRAM.
+
+    - VariableSmmRuntimeDxe.inf -- module type: DXE_RUNTIME_DRIVER. A
+      non-privileged driver that implements the variable runtime services
+      (replacing the current "VariableRuntimeDxe.inf" file) by communicating
+      with the above privileged SMM half via EFI_SMM_COMMUNICATION_PROTOCOL.
+
+(6) An SMRAM-based LockBox implementation needs to be discussed in two parts,
+    because the LockBox is accessed in both PEI and DXE.
+
+    (a) During DXE, drivers save data in the LockBox. A save operation is
+        layered as follows:
+
+        - The unprivileged driver wishing to store data in the LockBox links
+          against the "MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf"
+          library instance.
+
+          The library allows the unprivileged driver to format requests for the
+          privileged SMM LockBox driver (see below), and to parse responses.
+
+        - The privileged SMM LockBox driver is built from
+          "MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf". This
+          driver has module type DXE_SMM_DRIVER and can access SMRAM.
+
+          The driver delegates command parsing and response formatting to
+          "MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf".
+
+        - The above two halves (unprivileged and privileged) mirror what we've
+          seen in case of the variable service drivers, under (5).
+
+    (b) In PEI, the S3 Resume PEIM (UefiCpuPkg/Universal/Acpi/S3Resume2Pei)
+        retrieves data from the LockBox.
+
+        Presumably, S3Resume2Pei should be considered an "unprivileged PEIM",
+        and the SMRAM access should be layered as seen in DXE. Unfortunately,
+        edk2 does not implement all of the layers in PEI -- the code either
+        doesn't exist, or it is not open source:
+
+  role         | DXE: protocol/module           | PEI: PPI/module
+  -------------+--------------------------------+------------------------------
+  unprivileged | any                            | S3Resume2Pei.inf
+  driver       |                                |
+  -------------+--------------------------------+------------------------------
+  command      | LIBRARY_CLASS = LockBoxLib     | LIBRARY_CLASS = LockBoxLib
+  formatting   |                                |
+  and response | SmmLockBoxDxeLib.inf           | SmmLockBoxPeiLib.inf
+  parsing      |                                |
+  -------------+--------------------------------+------------------------------
+  privilege    | EFI_SMM_COMMUNICATION_PROTOCOL | EFI_PEI_SMM_COMMUNICATION_PPI
+  separation   |                                |
+               | PiSmmCore.inf                  | missing!
+  -------------+--------------------------------+------------------------------
+  platform SMM | EFI_SMM_CONTROL2_PROTOCOL      | PEI_SMM_CONTROL_PPI
+  and SMRAM    | EFI_SMM_ACCESS2_PROTOCOL       | PEI_SMM_ACCESS_PPI
+  access       |                                |
+               | to be done in OVMF             | to be done in OVMF
+  -------------+--------------------------------+------------------------------
+  command      | LIBRARY_CLASS = LockBoxLib     | LIBRARY_CLASS = LockBoxLib
+  parsing and  |                                |
+  response     | SmmLockBoxSmmLib.inf           | missing!
+  formatting   |                                |
+  -------------+--------------------------------+------------------------------
+  privileged   | SmmLockBox.inf                 | missing!
+  LockBox      |                                |
+  driver       |                                |
+
+        Alternatively, in the future OVMF might be able to provide a LockBoxLib
+        instance (an SmmLockBoxPeiLib substitute) for S3Resume2Pei that
+        accesses SMRAM directly, eliminating the need for deeper layers in the
+        stack (that is, EFI_PEI_SMM_COMMUNICATION_PPI and deeper).
+
+        In fact, a "thin" EFI_PEI_SMM_COMMUNICATION_PPI implementation whose
+        sole Communicate() member invariably returns EFI_NOT_STARTED would
+        cause the current SmmLockBoxPeiLib library instance to directly perform
+        full-depth SMRAM access and LockBox search, obviating the "missing"
+        cells. (With reference to A Tour Beyond BIOS: Implementing S3 Resume
+        with EDK2, by Jiewen Yao and Vincent Zimmer, October 2014.)
+
+Select features
+---------------
+
+In this section we'll browse the top-level "OvmfPkg" package directory, and
+discuss the more interesting drivers and libraries that have not been mentioned
+thus far.
+
+X64-specific reset vector for OVMF
+..................................
+
+The "OvmfPkg/ResetVector" directory customizes the reset vector (found in
+"UefiCpuPkg/ResetVector/Vtf0") for "OvmfPkgX64.fdf", that is, when the SEC/PEI
+phases run in 64-bit (ie. long) mode.
+
+The reset vector's control flow looks roughly like:
+
+  resetVector                               [Ia16/ResetVectorVtf0.asm]
+  EarlyBspInitReal16                        [Ia16/Init16.asm]
+  Main16                                    [Main.asm]
+    EarlyInit16                             [Ia16/Init16.asm]
+
+    ; Transition the processor from
+    ; 16-bit real mode to 32-bit flat mode
+    TransitionFromReal16To32BitFlat         [Ia16/Real16ToFlat32.asm]
+
+    ; Search for the
+    ; Boot Firmware Volume (BFV)
+    Flat32SearchForBfvBase                  [Ia32/SearchForBfvBase.asm]
+
+    ; Search for the SEC entry point
+    Flat32SearchForSecEntryPoint            [Ia32/SearchForSecEntry.asm]
+
+    %ifdef ARCH_IA32
+      ; Jump to the 32-bit SEC entry point
+    %else
+      ; Transition the processor
+      ; from 32-bit flat mode
+      ; to 64-bit flat mode
+      Transition32FlatTo64Flat              [Ia32/Flat32ToFlat64.asm]
+
+        SetCr3ForPageTables64               [Ia32/PageTables64.asm]
+          ; set CR3 to page tables
+          ; built into the ROM image
+
+        ; enable PAE
+        ; set LME
+        ; enable paging
+
+      ; Jump to the 64-bit SEC entry point
+    %endif
+
+On physical platforms, the initial page tables referenced by
+SetCr3ForPageTables64 are built statically into the flash device image, and are
+present in ROM at runtime. This is fine on physical platforms because the
+pre-built page table entries have the Accessed and Dirty bits set from the
+start.
+
+Accordingly, for OVMF running in long mode on qemu/KVM, the initial page tables
+were mapped as a KVM_MEM_READONLY slot, as part of QEMU's pflash device (refer
+to "Firmware image structure" above).
+
+In spite of the Accessed and Dirty bits being pre-set in the read-only,
+in-flash PTEs, in a virtual machine attempts are made to update said PTE bits,
+differently from physical hardware. The component attempting to update the
+read-only PTEs can be one of the following:
+
+- The processor itself, if it supports nested paging, and the user enables that
+  processor feature,
+
+- KVM code implementing shadow paging, otherwise.
+
+The first case presents no user-visible symptoms, but the second case (KVM,
+shadow paging) used to cause a triple fault, prior to Linux commit ba6a354
+("KVM: mmu: allow page tables to be in read-only slots").
+
+For compatibility with earlier KVM versions, the OvmfPkg/ResetVector directory
+adapts the generic reset vector code as follows:
+
+      Transition32FlatTo64Flat         [UefiCpuPkg/.../Ia32/Flat32ToFlat64.asm]
+
+        SetCr3ForPageTables64       [OvmfPkg/ResetVector/Ia32/PageTables64.asm]
+
+          ; dynamically build the initial page tables in RAM, at address
+          ; PcdOvmfSecPageTablesBase (refer to the memory map above),
+          ; identity-mapping the first 4 GB of address space
+
+          ; set CR3 to PcdOvmfSecPageTablesBase
+
+        ; enable PAE
+        ; set LME
+        ; enable paging
+
+This way the PTEs that earlier KVM versions try to update (during shadow
+paging) are located in a read-write memory slot, and the write attempts
+succeed.
+
+Client library for QEMU's firmware configuration interface
+..........................................................
+
+QEMU provides a write-only, 16-bit wide control port, and a read-write, 8-bit
+wide data port for exchanging configuration elements with the firmware.
+
+The firmware writes a selector (a key) to the control port (0x510), and then
+reads the corresponding configuration data (produced by QEMU) from the data
+port (0x511).
+
+If the selected entry is writable, the firmware may overwrite it. If QEMU has
+associated a callback with the entry, then when the entry is completely
+rewritten, QEMU runs the callback. (OVMF does not rewrite any entries at the
+moment.)
+
+A number of selector values (keys) are predefined. In particular, key 0x19
+selects (returns) a directory of { name, selector, size } triplets, roughly
+speaking.
+
+The firmware can request configuration elements by well-known name as well, by
+looking up the selector value first in the directory, by name, and then writing
+the selector to the control port. The number of bytes to read subsequently from
+the data port is known from the directory entry's "size" field.
+
+By convention, directory entries (well-known symbolic names of configuration
+elements) are formatted as POSIX pathnames. For example, the array selected by
+the "etc/system-states" name indicates (among other things) whether the user
+enabled S3 support in QEMU.
+
+The above interface is called "fw_cfg".
+
+The binary data associated with a symbolic name is called an "fw_cfg file".
+
+OVMF's fw_cfg client library is found in "OvmfPkg/Library/QemuFwCfgLib". OVMF
+discovers many aspects of the virtual system with it; we refer to a few
+examples below.
+
+Guest ACPI tables
+.................
+
+An operating system discovers a good amount of its hardware by parsing ACPI
+tables, and by interpreting ACPI objects and methods. On physical hardware, the
+platform vendor's firmware installs ACPI tables in memory that match both the
+hardware present in the system and the user's firmware configuration ("BIOS
+setup").
+
+Under qemu/KVM, the owner of the (virtual) hardware configuration is QEMU.
+Hardware can easily be reconfigured on the command line. Furthermore, features
+like CPU hotplug, PCI hotplug, memory hotplug are continuously developed for
+QEMU, and operating systems need direct ACPI support to exploit these features.
+
+For this reason, QEMU builds its own ACPI tables dynamically, in a
+self-descriptive manner, and exports them to the firmware through a complex,
+multi-file fw_cfg interface. It is rooted in the "etc/table-loader" fw_cfg
+file. (Further details of this interface are out of scope for this report.)
+
+OVMF's AcpiPlatformDxe driver fetches the ACPI tables, and installs them for
+the guest OS with the EFI_ACPI_TABLE_PROTOCOL (which is in turn provided by the
+generic "MdeModulePkg/Universal/Acpi/AcpiTableDxe" driver).
+
+For earlier QEMU versions and machine types (which we generally don't recommend
+for OVMF; see "Scope"), the "OvmfPkg/AcpiTables" directory contains a few
+static ACPI table templates. When the "etc/table-loader" fw_cfg file is
+unavailable, AcpiPlatformDxe installs these default tables (with a little bit
+of dynamic patching).
+
+When OVMF runs in a Xen domU, AcpiTableDxe also installs ACPI tables that
+originate from the hypervisor's environment.
+
+Guest SMBIOS tables
+...................
+
+Quoting the SMBIOS Reference Specification,
+
+  [...] the System Management BIOS Reference Specification addresses how
+  motherboard and system vendors present management information about their
+  products in a standard format [...]
+
+In practice SMBIOS tables are just another set of tables that the platform
+vendor's firmware installs in RAM for the operating system, and, importantly,
+for management applications running on the OS. Without rehashing the "Guest
+ACPI tables" section in full, let's map the OVMF roles seen there from ACPI to
+SMBIOS:
+
+  role                     | ACPI                    | SMBIOS
+  -------------------------+-------------------------+-------------------------
+  fw_cfg file              | etc/table-loader        | etc/smbios/smbios-tables
+  -------------------------+-------------------------+-------------------------
+  OVMF driver              | AcpiPlatformDxe         | SmbiosPlatformDxe
+  under "OvmfPkg"          |                         |
+  -------------------------+-------------------------+-------------------------
+  Underlying protocol,     | EFI_ACPI_TABLE_PROTOCOL | EFI_SMBIOS_PROTOCOL
+  implemented by generic   |                         |
+  driver under             | Acpi/AcpiTableDxe       | SmbiosDxe
+  "MdeModulePkg/Universal" |                         |
+  -------------------------+-------------------------+-------------------------
+  default tables available | yes                     | [RHEL] yes, Type0 and
+  for earlier QEMU machine |                         |        Type1 tables
+  types, with hot-patching |                         |
+  -------------------------+-------------------------+-------------------------
+  tables fetched in Xen    | yes                     | yes
+  domUs                    |                         |
+
+Platform-specific boot policy
+.............................
+
+OVMF's BDS (Boot Device Selection) phase is implemented by
+IntelFrameworkModulePkg/Universal/BdsDxe. Roughly speaking, this large driver:
+
+- provides the EFI BDS architectural protocol (which DXE transfers control to
+  after dispatching all DXE drivers),
+
+- connects drivers to devices,
+
+- enumerates boot devices,
+
+- auto-generates boot options,
+
+- provides "BIOS setup" screens, such as:
+
+  - Boot Manager, for booting an option,
+
+  - Boot Maintenance Manager, for adding, deleting, and reordering boot
+    options, changing console properties etc,
+
+  - Device Manager, where devices can register configuration forms, including
+
+    - Secure Boot configuration forms,
+
+    - OVMF's Platform Driver form (see under PlatformDxe).
+
+Firmware that includes the "IntelFrameworkModulePkg/Universal/BdsDxe" driver
+can customize its behavior by providing an instance of the PlatformBdsLib
+library class. The driver links against this platform library, and the
+platform library can call Intel's BDS utility functions from
+"IntelFrameworkModulePkg/Library/GenericBdsLib".
+
+OVMF's PlatformBdsLib instance can be found in
+"OvmfPkg/Library/PlatformBdsLib". The main function where the BdsDxe driver
+enters the library is PlatformBdsPolicyBehavior(). We mention two OVMF
+particulars here.
+
+(1) OVMF is capable of loading kernel images directly from fw_cfg, matching
+    QEMU's -kernel, -initrd, and -append command line options. This feature is
+    useful for rapid, repeated Linux kernel testing, and is implemented in the
+    following call tree:
+
+    PlatformBdsPolicyBehavior() [OvmfPkg/Library/PlatformBdsLib/BdsPlatform.c]
+      TryRunningQemuKernel() [OvmfPkg/Library/PlatformBdsLib/QemuKernel.c]
+        LoadLinux*() [OvmfPkg/Library/LoadLinuxLib/Linux.c]
+
+    OvmfPkg/Library/LoadLinuxLib ports the efilinux bootloader project into
+    OvmfPkg.
+
+(2) OVMF seeks to comply with the boot order specification passed down by QEMU
+    over fw_cfg.
+
+    (a) About Boot Modes
+
+      During the PEI phase, OVMF determines and stores the Boot Mode in the
+      PHIT HOB (already mentioned in "S3 (suspend to RAM and resume)"). The
+      boot mode is supposed to influence the rest of the system, for example it
+      distinguishes S3 resume (BOOT_ON_S3_RESUME) from a "normal" boot.
+
+      In general, "normal" boots can be further differentiated from each other;
+      for example for speed reasons. When the firmware can tell during PEI that
+      the chassis has not been opened since last power-up, then it might want
+      to save time by not connecting all devices and not enumerating all boot
+      options from scratch; it could just rely on the stored results of the
+      last enumeration. The matching BootMode value, to be set during PEI,
+      would be BOOT_ASSUMING_NO_CONFIGURATION_CHANGES.
+
+      OVMF only sets one of the following two boot modes, based on CMOS
+      contents:
+      - BOOT_ON_S3_RESUME,
+      - BOOT_WITH_FULL_CONFIGURATION.
+
+      For BOOT_ON_S3_RESUME, please refer to "S3 (suspend to RAM and resume)".
+      The other boot mode supported by OVMF, BOOT_WITH_FULL_CONFIGURATION, is
+      an appropriate "catch-all" for a virtual machine, where hardware can
+      easily change from boot to boot.
+
+    (b) Auto-generation of boot options
+
+      Accordingly, when not resuming from S3 sleep (*), OVMF always connects
+      all devices, and enumerates all bootable devices as new boot options
+      (non-volatile variables called Boot####).
+
+      (*) During S3 resume, DXE is not reached, hence BDS isn't either.
+
+      The auto-enumerated boot options are stored in the BootOrder non-volatile
+      variable after any preexistent options. (Boot options may exist before
+      auto-enumeration eg. because the user added them manually with the Boot
+      Maintenance Manager or the efibootmgr utility. They could also originate
+      from an earlier auto-enumeration.)
+
+      PlatformBdsPolicyBehavior()                   [OvmfPkg/.../BdsPlatform.c]
+        TryRunningQemuKernel()                       [OvmfPkg/.../QemuKernel.c]
+        BdsLibConnectAll()           [IntelFrameworkModulePkg/.../BdsConnect.c]
+        BdsLibEnumerateAllBootOption()  [IntelFrameworkModulePkg/.../BdsBoot.c]
+          BdsLibBuildOptionFromHandle() [IntelFrameworkModulePkg/.../BdsBoot.c]
+            BdsLibRegisterNewOption()   [IntelFrameworkModulePkg/.../BdsMisc.c]
+              //
+              // Append the new option number to the original option order
+              //
+
+    (c) Relative UEFI device paths in boot options
+
+      The handling of relative ("short-form") UEFI device paths is best
+      demonstrated through an example, and by quoting the UEFI 2.4A
+      specification.
+
+      A short-form hard drive UEFI device path could be (displaying each device
+      path node on a separate line for readability):
+
+        HD(1,GPT,14DD1CC5-D576-4BBF-8858-BAF877C8DF61,0x800,0x64000)/
+        \EFI\fedora\shim.efi
+
+      This device path lacks prefix nodes (eg. hardware or messaging type
+      nodes) that would lead to the hard drive. During load option processing,
+      the above short-form or relative device path could be matched against the
+      following absolute device path:
+
+        PciRoot(0x0)/
+        Pci(0x4,0x0)/
+        HD(1,GPT,14DD1CC5-D576-4BBF-8858-BAF877C8DF61,0x800,0x64000)/
+        \EFI\fedora\shim.efi
+
+      The motivation for this type of device path matching / completion is to
+      allow the user to move around the hard drive (for example, to plug a
+      controller in a different PCI slot, or to expose the block device on a
+      different iSCSI path) and still enable the firmware to find the hard
+      drive.
+
+      The UEFI specification says,
+
+        9.3.6 Media Device Path
+        9.3.6.1 Hard Drive
+
+          [...] Section 3.1.2 defines special rules for processing the Hard
+          Drive Media Device Path. These special rules enable a disk's location
+          to change and still have the system boot from the disk. [...]
+
+        3.1.2 Load Option Processing
+
+          [...] The boot manager must [...] support booting from a short-form
+          device path that starts with the first element being a hard drive
+          media device path [...]. The boot manager must use the GUID or
+          signature and partition number in the hard drive device path to match
+          it to a device in the system. If the drive supports the GPT
+          partitioning scheme the GUID in the hard drive media device path is
+          compared with the UniquePartitionGuid field of the GUID Partition
+          Entry [...]. If the drive supports the PC-AT MBR scheme the signature
+          in the hard drive media device path is compared with the
+          UniqueMBRSignature in the Legacy Master Boot Record [...]. If a
+          signature match is made, then the partition number must also be
+          matched. The hard drive device path can be appended to the matching
+          hardware device path and normal boot behavior can then be used. If
+          more than one device matches the hard drive device path, the boot
+          manager will pick one arbitrarily. Thus the operating system must
+          ensure the uniqueness of the signatures on hard drives to guarantee
+          deterministic boot behavior.
+
+      Edk2 implements and exposes the device path completion logic in the
+      already referenced "IntelFrameworkModulePkg/Library/GenericBdsLib"
+      library, in the BdsExpandPartitionPartialDevicePathToFull() function.
+
+    (d) Filtering and reordering the boot options based on fw_cfg
+
+      Once we have an "all-inclusive", partly preexistent, partly freshly
+      auto-generated boot option list from bullet (b), OVMF loads QEMU's
+      requested boot order from fw_cfg, and filters and reorders the list from
+      (b) with it:
+
+      PlatformBdsPolicyBehavior()                   [OvmfPkg/.../BdsPlatform.c]
+        TryRunningQemuKernel()                       [OvmfPkg/.../QemuKernel.c]
+        BdsLibConnectAll()           [IntelFrameworkModulePkg/.../BdsConnect.c]
+        BdsLibEnumerateAllBootOption()  [IntelFrameworkModulePkg/.../BdsBoot.c]
+        SetBootOrderFromQemu()                    [OvmfPkg/.../QemuBootOrder.c]
+
+      According to the (preferred) "-device ...,bootindex=N" and the (legacy)
+      '-boot order=drives' command line options, QEMU requests a boot order
+      from the firmware through the "bootorder" fw_cfg file. (For a bootindex
+      example, refer to the "Example qemu invocation" section.)
+
+      This fw_cfg file consists of OpenFirmware (OFW) device paths -- note: not
+      UEFI device paths! --, one per line. An example list is:
+
+        /pci@i0cf8/scsi@4/disk@0,0
+        /pci@i0cf8/ide@1,1/drive@1/disk@0
+        /pci@i0cf8/ethernet@3/ethernet-phy@0
+
+      OVMF filters and reorders the boot option list from bullet (b) with the
+      following nested loops algorithm:
+
+        new_uefi_order := <empty>
+        for each qemu_ofw_path in QEMU's OpenFirmware device path list:
+          qemu_uefi_path_prefix := translate(qemu_ofw_path)
+
+          for each boot_option in current_uefi_order:
+            full_boot_option := complete(boot_option)
+
+            if match(qemu_uefi_path_prefix, full_boot_option):
+              append(new_uefi_order, boot_option)
+              break
+
+        for each unmatched boot_option in current_uefi_order:
+          if survives(boot_option):
+            append(new_uefi_order, boot_option)
+
+        current_uefi_order := new_uefi_order
+
+      OVMF iterates over QEMU's OFW device paths in order, translates each to a
+      UEFI device path prefix, tries to match the translated prefix against the
+      UEFI boot options (which are completed from relative form to absolute
+      form for the purpose of prefix matching), and if there's a match, the
+      matching boot option is appended to the new boot order (which starts out
+      empty).
+
+      (We elaborate on the translate() function under bullet (e). The
+      complete() function has been explained in bullet (c).)
+
+      In addition, UEFI boot options that remain unmatched after filtering and
+      reordering are post-processed, and some of them "survive". Due to the
+      fact that OpenFirmware device paths have less expressive power than their
+      UEFI counterparts, some UEFI boot options are simply inexpressible (hence
+      unmatchable) by the nested loops algorithm.
+
+      An important example is the memory-mapped UEFI shell, whose UEFI device
+      path is inexpressible by QEMU's OFW device paths:
+
+        MemoryMapped(0xB,0x900000,0x10FFFFF)/
+        FvFile(7C04A583-9E3E-4F1C-AD65-E05268D0B4D1)
+
+      (Side remark: notice that the address range visible in the MemoryMapped()
+      node corresponds to DXEFV under "comprehensive memory map of OVMF"! In
+      addition, the FvFile() node's GUID originates from the FILE_GUID entry of
+      "ShellPkg/Application/Shell/Shell.inf".)
+
+      The UEFI shell can be booted by pressing ESC in OVMF on the TianoCore
+      splash screen, and navigating to Boot Manager | EFI Internal Shell. If
+      the "survival policy" was not implemented, the UEFI shell's boot option
+      would always be filtered out.
+
+      The current "survival policy" preserves all boot options that start with
+      neither PciRoot() nor HD().
+
+    (e) Translating QEMU's OpenFirmware device paths to UEFI device path
+        prefixes
+
+      In this section we list the (strictly heuristical) mappings currently
+      performed by OVMF.
+
+      The "prefix only" nature of the translation output is rooted minimally in
+      the fact that QEMU's OpenFirmware device paths cannot carry pathnames
+      within filesystems. There's no way to specify eg.
+
+        \EFI\fedora\shim.efi
+
+      in an OFW device path, therefore a UEFI device path translated from an
+      OFW device path can at best be a prefix (not a full match) of a UEFI
+      device path that ends with "\EFI\fedora\shim.efi".
+
+      - IDE disk, IDE CD-ROM:
+
+        OpenFirmware device path:
+
+          /pci@i0cf8/ide@1,1/drive@0/disk@0
+               ^         ^ ^       ^      ^
+               |         | |       |      master or slave
+               |         | |       primary or secondary
+               |         PCI slot & function holding IDE controller
+               PCI root at system bus port, PIO
+
+        UEFI device path prefix:
+
+          PciRoot(0x0)/Pci(0x1,0x1)/Ata(Primary,Master,0x0)
+                                                       ^
+                                                       fixed LUN
+
+      - Floppy disk:
+
+        OpenFirmware device path:
+
+          /pci@i0cf8/isa@1/fdc@03f0/floppy@0
+               ^         ^     ^           ^
+               |         |     |           A: or B:
+               |         |     ISA controller io-port (hex)
+               |         PCI slot holding ISA controller
+               PCI root at system bus port, PIO
+
+        UEFI device path prefix:
+
+          PciRoot(0x0)/Pci(0x1,0x0)/Floppy(0x0)
+                                           ^
+                                           ACPI UID (A: or B:)
+
+      - Virtio-block disk:
+
+        OpenFirmware device path:
+
+          /pci@i0cf8/scsi@6[,3]/disk@0,0
+               ^          ^  ^       ^ ^
+               |          |  |       fixed
+               |          |  PCI function corresponding to disk (optional)
+               |          PCI slot holding disk
+               PCI root at system bus port, PIO
+
+        UEFI device path prefixes (dependent on the presence of a nonzero PCI
+        function in the OFW device path):
+
+          PciRoot(0x0)/Pci(0x6,0x0)/HD(
+          PciRoot(0x0)/Pci(0x6,0x3)/HD(
+
+      - Virtio-scsi disk and virtio-scsi passthrough:
+
+        OpenFirmware device path:
+
+          /pci@i0cf8/scsi@7[,3]/channel@0/disk@2,3
+               ^          ^             ^      ^ ^
+               |          |             |      | LUN
+               |          |             |      target
+               |          |             channel (unused, fixed 0)
+               |          PCI slot[, function] holding SCSI controller
+               PCI root at system bus port, PIO
+
+        UEFI device path prefixes (dependent on the presence of a nonzero PCI
+        function in the OFW device path):
+
+          PciRoot(0x0)/Pci(0x7,0x0)/Scsi(0x2,0x3)
+          PciRoot(0x0)/Pci(0x7,0x3)/Scsi(0x2,0x3)
+
+      - Emulated and passed-through (physical) network cards:
+
+        OpenFirmware device path:
+
+          /pci@i0cf8/ethernet@3[,2]
+               ^              ^
+               |              PCI slot[, function] holding Ethernet card
+               PCI root at system bus port, PIO
+
+        UEFI device path prefixes (dependent on the presence of a nonzero PCI
+        function in the OFW device path):
+
+          PciRoot(0x0)/Pci(0x3,0x0)
+          PciRoot(0x0)/Pci(0x3,0x2)
+
+Virtio drivers
+..............
+
+UEFI abstracts various types of hardware resources into protocols, and allows
+firmware developers to implement those protocols in device drivers. The Virtio
+Specification defines various types of virtual hardware for virtual machines.
+Connecting the two specifications, OVMF provides UEFI drivers for QEMU's
+virtio-block, virtio-scsi, and virtio-net devices.
+
+The following diagram presents the protocol and driver stack related to Virtio
+devices in edk2 and OVMF. Each node in the graph identifies a protocol and/or
+the edk2 driver that produces it. Nodes on the top are more abstract.
+
+  EFI_BLOCK_IO_PROTOCOL                             EFI_SIMPLE_NETWORK_PROTOCOL
+  [OvmfPkg/VirtioBlkDxe]                              [OvmfPkg/VirtioNetDxe]
+             |                                                   |
+             |         EFI_EXT_SCSI_PASS_THRU_PROTOCOL           |
+             |             [OvmfPkg/VirtioScsiDxe]               |
+             |                        |                          |
+             +------------------------+--------------------------+
+                                      |
+                           VIRTIO_DEVICE_PROTOCOL
+                                      |
+                +---------------------+---------------------+
+                |                                           |
+  [OvmfPkg/VirtioPciDeviceDxe]                  [custom platform drivers]
+                |                                           |
+                |                                           |
+       EFI_PCI_IO_PROTOCOL                [OvmfPkg/Library/VirtioMmioDeviceLib]
+ [MdeModulePkg/Bus/Pci/PciBusDxe]              direct MMIO register access
+
+The top three drivers produce standard UEFI abstractions: the Block IO
+Protocol, the Extended SCSI Pass Thru Protocol, and the Simple Network
+Protocol, for virtio-block, virtio-scsi, and virtio-net devices, respectively.
+
+Comparing these device-specific virtio drivers to each other, we can determine:
+
+- They all conform to the UEFI Driver Model. This means that their entry point
+  functions don't immediately start to search for devices and to drive them,
+  they only register instances of the EFI_DRIVER_BINDING_PROTOCOL. The UEFI
+  Driver Model then enumerates devices and chains matching drivers
+  automatically.
+
+- They are as minimal as possible, while remaining correct (refer to source
+  code comments for details). For example, VirtioBlkDxe and VirtioScsiDxe both
+  support only one request in flight.
+
+  In theory, VirtioBlkDxe could implement EFI_BLOCK_IO2_PROTOCOL, which allows
+  queueing. Similarly, VirtioScsiDxe does not support the non-blocking mode of
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL.PassThru(). (Which is permitted by the UEFI
+  specification.) Both VirtioBlkDxe and VirtioScsiDxe delegate synchronous
+  request handling to "OvmfPkg/Library/VirtioLib". This limitation helps keep
+  the implementation simple, and testing thus far seems to imply satisfactory
+  performance, for a virtual boot firmware.
+
+  VirtioNetDxe cannot avoid queueing, because EFI_SIMPLE_NETWORK_PROTOCOL
+  requires it on the interface level. Consequently, VirtioNetDxe is
+  significantly more complex than VirtioBlkDxe and VirtioScsiDxe. Technical
+  notes are provided in "OvmfPkg/VirtioNetDxe/TechNotes.txt".
+
+- None of these drivers access hardware directly. Instead, the Virtio Device
+  Protocol (OvmfPkg/Include/Protocol/VirtioDevice.h) collects / extracts virtio
+  operations defined in the Virtio Specification, and these backend-independent
+  virtio device drivers go through the abstract VIRTIO_DEVICE_PROTOCOL.
+
+  IMPORTANT: the VIRTIO_DEVICE_PROTOCOL is not a standard UEFI protocol. It is
+  internal to edk2 and not described in the UEFI specification. It should only
+  be used by drivers and applications that live inside the edk2 source tree.
+
+Currently two providers exist for VIRTIO_DEVICE_PROTOCOL:
+
+- The first one is the "more traditional" virtio-pci backend, implemented by
+  OvmfPkg/VirtioPciDeviceDxe. This driver also complies with the UEFI Driver
+  Model. It consumes an instance of the EFI_PCI_IO_PROTOCOL, and, if the PCI
+  device/function under probing appears to be a virtio device, it produces a
+  Virtio Device Protocol instance for it. The driver translates abstract virtio
+  operations to PCI accesses.
+
+- The second provider, the virtio-mmio backend, is a library, not a driver,
+  living in OvmfPkg/Library/VirtioMmioDeviceLib. This library translates
+  abstract virtio operations to MMIO accesses.
+
+  The virtio-mmio backend is only a library -- rather than a standalone, UEFI
+  Driver Model-compliant driver -- because the type of resource it consumes, an
+  MMIO register block base address, is not enumerable.
+
+  In other words, while the PCI root bridge driver and the PCI bus driver
+  produce instances of EFI_PCI_IO_PROTOCOL automatically, thereby enabling the
+  UEFI Driver Model to probe devices and stack up drivers automatically, no
+  such enumeration exists for MMIO register blocks.
+
+  For this reason, VirtioMmioDeviceLib needs to be linked into thin, custom
+  platform drivers that dispose over this kind of information. As soon as a
+  driver knows about the MMIO register block base addresses, it can pass each
+  to the library, and then the VIRTIO_DEVICE_PROTOCOL will be instantiated
+  (assuming a valid virtio-mmio register block of course). From that point on
+  the UEFI Driver Model again takes care of the chaining.
+
+  Typically, such a custom driver does not conform to the UEFI Driver Model
+  (because that would presuppose auto-enumeration for MMIO register blocks).
+  Hence it has the following responsibilities:
+
+  - it shall behave as a "wrapper" UEFI driver around the library,
+
+  - it shall know virtio-mmio base addresses,
+
+  - in its entry point function, it shall create a new UEFI handle with an
+    instance of the EFI_DEVICE_PATH_PROTOCOL for each virtio-mmio device it
+    knows the base address for,
+
+  - it shall call VirtioMmioInstallDevice() on those handles, with the
+    corresponding base addresses.
+
+  OVMF itself does not employ VirtioMmioDeviceLib. However, the library is used
+  (or has been tested as Proof-of-Concept) in the following 64-bit and 32-bit
+  ARM emulator setups:
+
+  - in "RTSM_VE_FOUNDATIONV8_EFI.fd" and "FVP_AARCH64_EFI.fd", on ARM Holdings'
+    ARM(R) v8-A Foundation Model and ARM(R) AEMv8-A Base Platform FVP
+    emulators, respectively:
+
+                           EFI_BLOCK_IO_PROTOCOL
+                           [OvmfPkg/VirtioBlkDxe]
+                                      |
+                           VIRTIO_DEVICE_PROTOCOL
+        [ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf]
+                                      |
+                    [OvmfPkg/Library/VirtioMmioDeviceLib]
+                         direct MMIO register access
+
+  - in "RTSM_VE_CORTEX-A15_EFI.fd" and "RTSM_VE_CORTEX-A15_MPCORE_EFI.fd", on
+    "qemu-system-arm -M vexpress-a15":
+
+        EFI_BLOCK_IO_PROTOCOL            EFI_SIMPLE_NETWORK_PROTOCOL
+        [OvmfPkg/VirtioBlkDxe]             [OvmfPkg/VirtioNetDxe]
+                   |                                  |
+                   +------------------+---------------+
+                                      |
+                           VIRTIO_DEVICE_PROTOCOL
+        [ArmPlatformPkg/ArmVExpressPkg/ArmVExpressDxe/ArmFvpDxe.inf]
+                                      |
+                    [OvmfPkg/Library/VirtioMmioDeviceLib]
+                         direct MMIO register access
+
+  In the above ARM / VirtioMmioDeviceLib configurations, VirtioBlkDxe was
+  tested with booting Linux distributions, while VirtioNetDxe was tested with
+  pinging public IPv4 addresses from the UEFI shell.
+
+Platform Driver
+...............
+
+Sometimes, elements of persistent firmware configuration are best exposed to
+the user in a friendly way. OVMF's platform driver (OvmfPkg/PlatformDxe)
+presents such settings on the "OVMF Platform Configuration" dialog:
+
+- Press ESC on the TianoCore splash screen,
+- Navigate to Device Manager | OVMF Platform Configuration.
+
+At the moment, OVMF's platform driver handles only one setting: the preferred
+graphics resolution. This is useful for two purposes:
+
+- Some UEFI shell commands, like DRIVERS and DEVICES, benefit from a wide
+  display. Using the MODE shell command, the user can switch to a larger text
+  resolution (limited by the graphics resolution), and see the command output
+  in a more easily consumable way.
+
+  [RHEL] The list of text modes available to the MODE command is also limited
+         by ConSplitterDxe (found under MdeModulePkg/Universal/Console).
+         ConSplitterDxe builds an intersection of text modes that are
+         simultaneously supported by all consoles that ConSplitterDxe
+         multiplexes console output to.
+
+         In practice, the strongest text mode restriction comes from
+         TerminalDxe, which provides console I/O on serial ports. TerminalDxe
+         has a very limited built-in list of text modes, heavily pruning the
+         intersection built by ConSplitterDxe, and made available to the MODE
+         command.
+
+         On the Red Hat Enterprise Linux 7.1 host, TerminalDxe's list of modes
+         has been extended with text resolutions that match the Spice QXL GPU's
+         common graphics resolutions. This way a "full screen" text mode should
+         always be available in the MODE command.
+
+- The other advantage of controlling the graphics resolution lies with UEFI
+  operating systems that don't (yet) have a native driver for QEMU's virtual
+  video cards  -- eg. the Spice QXL GPU. Such OSes may choose to inherit the
+  properties of OVMF's EFI_GRAPHICS_OUTPUT_PROTOCOL (provided by
+  OvmfPkg/QemuVideoDxe, see later).
+
+  Although the display can be used at runtime in such cases, by direct
+  framebuffer access, its properties, for example, the resolution, cannot be
+  modified. The platform driver allows the user to select the preferred GOP
+  resolution, reboot, and let the guest OS inherit that preferred resolution.
+
+The platform driver has three access points: the "normal" driver entry point, a
+set of HII callbacks, and a GOP installation callback.
+
+(1) Driver entry point: the PlatformInit() function.
+
+    (a) First, this function loads any available settings, and makes them take
+        effect. For the preferred graphics resolution in particular, this means
+        setting the following PCDs:
+
+          gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+          gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+
+        These PCDs influence the GraphicsConsoleDxe driver (located under
+        MdeModulePkg/Universal/Console), which switches to the preferred
+        graphics mode, and produces EFI_SIMPLE_TEXT_OUTPUT_PROTOCOLs on GOPs:
+
+                    EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
+          [MdeModulePkg/Universal/Console/GraphicsConsoleDxe]
+                                   |
+                      EFI_GRAPHICS_OUTPUT_PROTOCOL
+                         [OvmfPkg/QemuVideoDxe]
+                                   |
+                          EFI_PCI_IO_PROTOCOL
+                   [MdeModulePkg/Bus/Pci/PciBusDxe]
+
+  (b) Second, the driver entry point registers the user interface, including
+      HII callbacks.
+
+  (c) Third, the driver entry point registers a GOP installation callback.
+
+(2) HII callbacks and the user interface.
+
+    The Human Interface Infrastructure (HII) "is a set of protocols that allow
+    a UEFI driver to provide the ability to register user interface and
+    configuration content with the platform firmware".
+
+    OVMF's platform driver:
+
+    - provides a static, basic, visual form (PlatformForms.vfr), written in the
+      Visual Forms Representation language,
+
+    - includes a UCS-16 encoded message catalog (Platform.uni),
+
+    - includes source code that dynamically populates parts of the form, with
+      the help of MdeModulePkg/Library/UefiHiiLib -- this library simplifies
+      the handling of IFR (Internal Forms Representation) opcodes,
+
+    - processes form actions that the user takes (Callback() function),
+
+    - loads and saves platform configuration in a private, non-volatile
+      variable (ExtractConfig() and RouteConfig() functions).
+
+    The ExtractConfig() HII callback implements the following stack of
+    conversions, for loading configuration and presenting it to the user:
+
+          MultiConfigAltResp       -- form engine / HII communication
+                  ^
+                  |
+           [BlockToConfig]
+                  |
+           MAIN_FORM_STATE         -- binary representation of form/widget
+                  ^                   state
+                  |
+      [PlatformConfigToFormState]
+                  |
+           PLATFORM_CONFIG         -- accessible to DXE and UEFI drivers
+                  ^
+                  |
+         [PlatformConfigLoad]
+                  |
+        UEFI non-volatile variable -- accessible to external utilities
+
+    The layers are very similar for the reverse direction, ie. when taking
+    input from the user, and saving the configuration (RouteConfig() HII
+    callback):
+
+             ConfigResp            -- form engine / HII communication
+                  |
+           [ConfigToBlock]
+                  |
+                  v
+           MAIN_FORM_STATE         -- binary representation of form/widget
+                  |                   state
+      [FormStateToPlatformConfig]
+                  |
+                  v
+           PLATFORM_CONFIG         -- accessible to DXE and UEFI drivers
+                  |
+         [PlatformConfigSave]
+                  |
+                  v
+        UEFI non-volatile variable -- accessible to external utilities
+
+(3) When the platform driver starts, a GOP may not be available yet. Thus the
+    driver entry point registers a callback (the GopInstalled() function) for
+    GOP installations.
+
+    When the first GOP is produced (usually by QemuVideoDxe, or potentially by
+    a third party video driver), PlatformDxe retrieves the list of graphics
+    modes the GOP supports, and dynamically populates the drop-down list of
+    available resolutions on the form. The GOP installation callback is then
+    removed.
+
+Video driver
+............
+
+OvmfPkg/QemuVideoDxe is OVMF's built-in video driver. We can divide its
+services in two parts: graphics output protocol (primary), and Int10h (VBE)
+shim (secondary).
+
+(1) QemuVideoDxe conforms to the UEFI Driver Model; it produces an instance of
+    the EFI_GRAPHICS_OUTPUT_PROTOCOL (GOP) on each PCI display that it supports
+    and is connected to:
+
+                      EFI_GRAPHICS_OUTPUT_PROTOCOL
+                         [OvmfPkg/QemuVideoDxe]
+                                   |
+                          EFI_PCI_IO_PROTOCOL
+                   [MdeModulePkg/Bus/Pci/PciBusDxe]
+
+    It supports the following QEMU video cards:
+
+    - Cirrus 5430 ("-device cirrus-vga"),
+    - Standard VGA ("-device VGA"),
+    - QXL VGA ("-device qxl-vga", "-device qxl").
+
+    For Cirrus the following resolutions and color depths are available:
+    640x480x32, 800x600x32, 1024x768x24. On stdvga and QXL a long list of
+    resolutions is available. The list is filtered against the frame buffer
+    size during initialization.
+
+    The size of the QXL VGA compatibility framebuffer can be changed with the
+
+      -device qxl-vga,vgamem_mb=$NUM_MB
+
+    QEMU option. If $NUM_MB exceeds 32, then the following is necessary
+    instead:
+
+      -device qxl-vga,vgamem_mb=$NUM_MB,ram_size_mb=$((NUM_MB*2))
+
+    because the compatibility framebuffer can't cover more than half of PCI BAR
+    #0. The latter defaults to 64MB in size, and is controlled by the
+    "ram_size_mb" property.
+
+(2) When QemuVideoDxe binds the first Standard VGA or QXL VGA device, and there
+    is no real VGA BIOS present in the C to F segments (which could originate
+    from a legacy PCI option ROM -- refer to "Compatibility Support Module
+    (CSM)"), then QemuVideoDxe installs a minimal, "fake" VGA BIOS -- an Int10h
+    (VBE) "shim".
+
+    The shim is implemented in 16-bit assembly in
+    "OvmfPkg/QemuVideoDxe/VbeShim.asm". The "VbeShim.sh" shell script assembles
+    it and formats it as a C array ("VbeShim.h") with the help of the "nasm"
+    utility. The driver's InstallVbeShim() function copies the shim in place
+    (the C segment), and fills in the VBE Info and VBE Mode Info structures.
+    The real-mode 10h interrupt vector is pointed to the shim's handler.
+
+    The shim is (correctly) irrelevant and invisible for all UEFI operating
+    systems we know about -- except Windows Server 2008 R2 and other Windows
+    operating systems in that family.
+
+    Namely, the Windows 2008 R2 SP1 (and Windows 7) UEFI guest's default video
+    driver dereferences the real mode Int10h vector, loads the pointed-to
+    handler code, and executes what it thinks to be VGA BIOS services in an
+    internal real-mode emulator. Consequently, video mode switching used not to
+    work in Windows 2008 R2 SP1 when it ran on the "pure UEFI" build of OVMF,
+    making the guest uninstallable. Hence the (otherwise optional, non-default)
+    Compatibility Support Module (CSM) ended up a requirement for running such
+    guests.
+
+    The hard dependency on the sophisticated SeaBIOS CSM and the complex
+    supporting edk2 infrastructure, for enabling this family of guests, was
+    considered suboptimal by some members of the upstream community,
+
+    [RHEL] and was certainly considered a serious maintenance disadvantage for
+           Red Hat Enterprise Linux 7.1 hosts.
+
+    Thus, the shim has been collaboratively developed for the Windows 7 /
+    Windows Server 2008 R2 family. The shim provides a real stdvga / QXL
+    implementation for the few services that are in fact necessary for the
+    Windows 2008 R2 SP1 (and Windows 7) UEFI guest, plus some "fakes" that the
+    guest invokes but whose effect is not important. The only supported mode is
+    1024x768x32, which is enough to install the guest and then upgrade its
+    video driver to the full-featured QXL XDDM one.
+
+    The C segment is not present in the UEFI memory map prepared by OVMF.
+    Memory space that would cover it is never added (either in PEI, in the form
+    of memory resource descriptor HOBs, or in DXE, via gDS->AddMemorySpace()).
+    This way the handler body is invisible to all other UEFI guests, and the
+    rest of edk2.
+
+    The Int10h real-mode IVT entry is covered with a Boot Services Code page,
+    making that too inaccessible to the rest of edk2. Due to the allocation
+    type, UEFI guest OSes different from the Windows Server 2008 family can
+    reclaim the page at zero. (The Windows 2008 family accesses that page
+    regardless of the allocation type.)
+
+Afterword
+---------
+
+After the bulk of this document was written in July 2014, OVMF development has
+not stopped. To name two significant code contributions from the community: in
+January 2015, OVMF runs on the "q35" machine type of QEMU, and it features a
+driver for Xen paravirtual block devices (and another for the underlying Xen
+bus).
+
+Furthermore, a dedicated virtualization platform has been contributed to
+ArmPlatformPkg that plays a role parallel to OvmfPkg's. It targets the "virt"
+machine type of qemu-system-arm and qemu-system-aarch64. Parts of OvmfPkg are
+being refactored and modularized so they can be reused in
+"ArmPlatformPkg/ArmVirtualizationPkg/ArmVirtualizationQemu.dsc".

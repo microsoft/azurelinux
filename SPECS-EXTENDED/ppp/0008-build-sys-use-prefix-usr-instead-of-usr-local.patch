@@ -1,0 +1,89 @@
+From 343728d5de6e44bd67923503e62eefaad50760a4 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Fri, 4 Apr 2014 18:47:01 +0200
+Subject: [PATCH 08/27] build-sys: use prefix /usr instead of /usr/local
+
+---
+ configure           | 2 +-
+ pppd/Makefile.linux | 4 ++--
+ scripts/ppp-on-rsh  | 2 +-
+ scripts/ppp-on-ssh  | 4 ++--
+ scripts/secure-card | 2 +-
+ 5 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/configure b/configure
+index 6a55e0f..db54d77 100755
+--- a/configure
++++ b/configure
+@@ -2,7 +2,7 @@
+ # $Id: configure,v 1.38 2008/06/15 07:08:49 paulus Exp $
+ 
+ # Where to install stuff by default
+-DESTDIR=/usr/local
++DESTDIR=/usr
+ SYSCONF=/etc
+ 
+ #  if [ -d /NextApps ]; then
+diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
+index 4f27100..95c2598 100644
+--- a/pppd/Makefile.linux
++++ b/pppd/Makefile.linux
+@@ -99,8 +99,8 @@ endif
+ 
+ # EAP SRP-SHA1
+ ifdef USE_SRP
+-CFLAGS	+= -DUSE_SRP -DOPENSSL -I/usr/local/ssl/include
+-LIBS	+= -lsrp -L/usr/local/ssl/lib -lcrypto
++CFLAGS	+= -DUSE_SRP -DOPENSSL -I/usr/include/openssl
++LIBS	+= -lsrp -L/usr/lib -lcrypto
+ TARGETS	+= srp-entry
+ EXTRAINSTALL = $(INSTALL) -c -m 555 srp-entry $(BINDIR)/srp-entry
+ MANPAGES += srp-entry.8
+diff --git a/scripts/ppp-on-rsh b/scripts/ppp-on-rsh
+index 30a50db..a80616a 100755
+--- a/scripts/ppp-on-rsh
++++ b/scripts/ppp-on-rsh
+@@ -26,7 +26,7 @@ PPPD_RHOST=myremotehost
+ # For this example, we assume that pppd on both local and remote
+ # machines reside in the same place, /usr/local/bin/pppd
+ #
+-PPPD_LOC=/usr/local/bin/pppd
++PPPD_LOC=/usr/sbin/pppd
+ 
+ #
+ # The location of local options file (where rsh client is running).
+diff --git a/scripts/ppp-on-ssh b/scripts/ppp-on-ssh
+index 0e41aca..c27e80a 100755
+--- a/scripts/ppp-on-ssh
++++ b/scripts/ppp-on-ssh
+@@ -26,7 +26,7 @@ PPPD_RHOST=myremotehost
+ # For this example, we assume that pppd on both local and remote
+ # machines reside in the same place, /usr/local/bin/pppd
+ #
+-PPPD_LOC=/usr/local/bin/pppd
++PPPD_LOC=/usr/sbin/pppd
+ 
+ #
+ # The location of local options file (where ssh client is running).
+@@ -52,7 +52,7 @@ PPPD_REM_OPT=/etc/ppp/options-ssh-rem
+ #
+ # The location of ssh client on the local machine
+ #
+-SSH_LOC=/usr/local/bin/ssh
++SSH_LOC=/usr/bin/ssh
+ 
+ export PPPD_LOC PPPD_LOC_OPT PPPD_REM_OPT PPPD_RHOST SSH_LOC
+ 
+diff --git a/scripts/secure-card b/scripts/secure-card
+index 0002365..ae3ae50 100755
+--- a/scripts/secure-card
++++ b/scripts/secure-card
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/expect -f
++#!/usr/bin/expect -f
+ #
+ # This  script was  written  by  Jim Isaacson  <jcisaac@crl.com>.  It is
+ # designed to work  as a script to use the  SecureCARD(tm) device.  This
+-- 
+1.8.3.1
+

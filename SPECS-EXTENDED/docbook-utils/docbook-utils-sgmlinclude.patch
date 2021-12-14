@@ -1,0 +1,24 @@
+diff -urNp docbook-utils-0.6.14-orig/backends/man.in docbook-utils-0.6.14/backends/man.in
+--- docbook-utils-0.6.14-orig/backends/man.in	2009-07-24 15:17:42.000000000 +0200
++++ docbook-utils-0.6.14/backends/man.in	2009-07-24 15:20:57.000000000 +0200
+@@ -7,7 +7,7 @@ HELPER=$SGML_BASE_DIR/docbook/utils-@VER
+ TMPDIR=`mktemp -d /tmp/man.XXXXXX` || \
+  { echo >&2 "man backend: could not create secure temporary directory"; exit 1;}
+ trap 'rm -rf "${TMPDIR}"' EXIT
+-nsgmls "$SGML_FILE" > "${TMPDIR}/nsgmls.tmp"
++nsgmls ${SGML_INCLUDE} "$SGML_FILE" > "${TMPDIR}/nsgmls.tmp"
+ sgmlspl $HELPER <"${TMPDIR}/nsgmls.tmp" 2>"${TMPDIR}/errs"
+ if [ $? -ne 0 ]
+ then
+diff -urNp docbook-utils-0.6.14-orig/bin/jw.in docbook-utils-0.6.14/bin/jw.in
+--- docbook-utils-0.6.14-orig/bin/jw.in	2009-07-24 15:17:42.000000000 +0200
++++ docbook-utils-0.6.14/bin/jw.in	2009-07-24 15:18:51.000000000 +0200
+@@ -423,7 +423,7 @@ echo "Using catalogs: `echo $SGML_CATALO
+ echo "Using stylesheet: $SGML_STYLESHEET"
+ echo "Working on: $SGML_FILE"
+ cd "$SGML_OUTPUT_DIRECTORY"
+-export SGML_JADE SGML_FILE_NAME SGML_ARGUMENTS
++export SGML_JADE SGML_FILE_NAME SGML_ARGUMENTS SGML_INCLUDE
+ export SGML_CATALOG_FILES SGML_BASE_DIR SGML_FILE SGML_STYLESHEET
+ NOCHUNKS=`echo $SGML_OPTIONS | grep nochunks`
+ if [ -z "$NOCHUNKS" ]

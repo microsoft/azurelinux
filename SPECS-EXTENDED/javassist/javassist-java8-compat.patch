@@ -1,0 +1,52 @@
+diff -urEbwB javassist-rel_3_23_1_ga/src/main/javassist/Loader.java javassist-rel_3_23_1_ga.new/src/main/javassist/Loader.java
+--- javassist-rel_3_23_1_ga/src/main/javassist/Loader.java	2018-07-01 19:27:13.000000000 +0200
++++ javassist-rel_3_23_1_ga.new/src/main/javassist/Loader.java	2019-04-15 10:53:53.377698340 +0200
+@@ -379,9 +379,6 @@
+     }
+ 
+     private boolean isDefinedPackage(String name) {
+-        if (ClassFile.MAJOR_VERSION >= ClassFile.JAVA_9)
+-            return getDefinedPackage(name) == null;
+-        else
+             return getPackage(name) == null;
+     }
+ 
+diff -urEbwB javassist-rel_3_23_1_ga/src/main/javassist/util/proxy/DefineClassHelper.java javassist-rel_3_23_1_ga.new/src/main/javassist/util/proxy/DefineClassHelper.java
+--- javassist-rel_3_23_1_ga/src/main/javassist/util/proxy/DefineClassHelper.java	2018-07-01 19:27:13.000000000 +0200
++++ javassist-rel_3_23_1_ga.new/src/main/javassist/util/proxy/DefineClassHelper.java	2019-04-15 10:53:53.381698361 +0200
+@@ -253,23 +253,5 @@
+         }
+     }
+ 
+-    /**
+-     * Loads a class file by {@code java.lang.invoke.MethodHandles.Lookup}.
+-     *
+-     * @since 3.22
+-     */
+-    static Class<?> toPublicClass(String className, byte[] bcode)
+-        throws CannotCompileException
+-    {
+-        try {
+-            Lookup lookup = MethodHandles.lookup();
+-            lookup = lookup.dropLookupMode(java.lang.invoke.MethodHandles.Lookup.PRIVATE);
+-            return lookup.defineClass(bcode);
+-        }
+-        catch (Throwable t) {
+-            throw new CannotCompileException(t);
+-        }
+-    }
+-
+     private DefineClassHelper() {}
+ }
+diff -urEbwB javassist-rel_3_23_1_ga/src/main/javassist/util/proxy/FactoryHelper.java javassist-rel_3_23_1_ga.new/src/main/javassist/util/proxy/FactoryHelper.java
+--- javassist-rel_3_23_1_ga/src/main/javassist/util/proxy/FactoryHelper.java	2018-07-01 19:27:13.000000000 +0200
++++ javassist-rel_3_23_1_ga.new/src/main/javassist/util/proxy/FactoryHelper.java	2019-04-15 10:56:19.942478868 +0200
+@@ -123,8 +123,6 @@
+     {
+         try {
+             byte[] b = toBytecode(cf);
+-            if (ProxyFactory.onlyPublicMethods)
+-                return DefineClassHelper.toPublicClass(cf.getName(), b);
+             return DefineClassHelper.toClass(cf.getName(), loader, domain, b);
+         }
+         catch (IOException e) {

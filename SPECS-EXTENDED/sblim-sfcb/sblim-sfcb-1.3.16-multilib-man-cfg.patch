@@ -1,0 +1,41 @@
+diff -up sblim-sfcb-1.3.16/man/sfcbd.1.pre.in.orig sblim-sfcb-1.3.16/man/sfcbd.1.pre.in
+--- sblim-sfcb-1.3.16/man/sfcbd.1.pre.in.orig	2014-02-26 14:05:32.213091734 +0100
++++ sblim-sfcb-1.3.16/man/sfcbd.1.pre.in	2014-02-26 15:10:54.476196379 +0100
+@@ -151,7 +151,7 @@ Default=\fI@localstatedir@/lib/sfcb/regi
+ .TP
+ .B providerDirs
+ A space separated list of directories where sfcb is looking for provider
+-libraries. Default=\fI@libdir@\ @libdir@/cmpi\fR
++libraries. Default=\fI/usr/lib\ /usr/lib/cmpi /usr/lib64\ /usr/lib64/cmpi\fR
+ .TP
+ .B providerSampleInterval
+ The interval in seconds at which the provider manager is checking for
+@@ -275,11 +275,11 @@ SSL private key file for sfcb.
+ SSL client certificate / trust store for sfcb.
+ .SH LIBRARIES
+ .TP
+-.I @libdir@/libsfc*
++.I /usr/lib/libsfc* /usr/lib64/libsfc*
+ Binaries for sfcb runtime libraries.
+ .TP
+-.I @libdir@/cmpi/*
+-Binaries for providers
++.I /usr/lib/cmpi/* /usr/lib64/cmpi/*
++Binaries for providers.
+ .SH AUTHOR
+ Adrian Schuur <schuur@de.ibm.com>
+ .SH CONRIBUTORS
+diff -up sblim-sfcb-1.3.16/sfcb.cfg.pre.in.orig sblim-sfcb-1.3.16/sfcb.cfg.pre.in
+--- sblim-sfcb-1.3.16/sfcb.cfg.pre.in.orig	2014-02-26 15:35:43.133869718 +0100
++++ sblim-sfcb-1.3.16/sfcb.cfg.pre.in	2014-02-26 15:38:12.794240532 +0100
+@@ -121,8 +121,8 @@ maxMsgLen:      100000000
+ registrationDir: @localstatedir@/lib/sfcb/registration
+ 
+ ## Locations to look for provider libraries. Delimit paths with a space.
+-## Default is @libdir@/sfcb @libdir@ @libdir@/cmpi
+-providerDirs: @libdir@/sfcb @libdir@ @libdir@/cmpi
++## Default is /usr/lib/sfcb /usr/lib64/sfcb /usr/lib /usr/lib64 /usr/lib/cmpi /usr/lib64/cmpi
++providerDirs: /usr/lib/sfcb /usr/lib64/sfcb /usr/lib /usr/lib64 /usr/lib/cmpi /usr/lib64/cmpi
+ 
+ ## Enable the root/interop namespace (affects indications)
+ ## Default: true

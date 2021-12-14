@@ -1,0 +1,13 @@
+{
+ "Signatures": {
+  "dom4j-1.6.1-debian.tar.bz2": "d72427a11a23df97f8957331269df7fde4fcc982ac3b9d399a49e4df8598b94a",
+  "jaxen-1.1.1-src.tar.bz2": "4f037aacfa3fcfa6a255a55b54011130a083bf7d424863ee0dcdb73fe0c265fb",
+  "jaxen-1.1.1.pom": "3a51fed7a4f80761f6d8f2f3498451d60475a4903cf3ebe9b7961baed893d580",
+  "jdom-1.1.3.pom": "59636ecfc3a66c0c1481c1fd00afa13180211b20571ebb330634543c4a99ea20",
+  "jdom-1.1.3.tar.gz": "d471718c4ac7a1a2f10715b93cb3fcd2ecbab60384b73ad1c089712e47bd8d1f",
+  "saxpath-1.0-FCS.pom": "e65a253f3275a961cef0dc256ca44eac3021ea6eca2b6c83d848f5b865999ed1",
+  "saxpath-1.0.tar.bz2": "67863cb4111628f382b8f7cd7c628ff4750d23c1a6fce9cee48c091ac5a411c2",
+  "xom-1.2.5.pom": "e3ae8ebe47ffad614d5f3f6edef4a3304cd68a2af960449207adcf38f4ae9419",
+  "xom-1.2b1-src.tar.bz2": "63e96ced3183a62a6aa5ef6c8bab0106d9931cafe0036905eab8a7904c12dda7"
+ }
+}

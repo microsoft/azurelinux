@@ -9,7 +9,7 @@
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        5.3.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +19,7 @@ Source0:        %{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
-BuildRequires:  java-devel
+BuildRequires:  msopenjdk-11
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
@@ -30,7 +30,7 @@ BuildRequires:  xmlto
 Requires:       coreutils
 Requires:       findutils
 # default JRE
-Requires:       java-1.8.0-openjdk-headless
+Requires:       msopenjdk-11
 Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}
@@ -74,7 +74,7 @@ packaging in Linux distributions
 %package -n javapackages-local-bootstrap
 Summary:        Non-essential macros and scripts for Java packaging support
 Requires:       %{name} = %{version}-%{release}
-Requires:       java-1.8.0-openjdk-devel
+Requires:       msopenjdk-11
 Requires:       python3
 Requires:       python3-javapackages = %{version}-%{release}
 
@@ -87,7 +87,7 @@ It is a lightweight version with minimal runtime requirements.
 %patch0 -p1
 
 %build
-%define jdk_home $(find %{_libdir}/jvm -name "OpenJDK*")
+%define jdk_home $(find %{_libdir}/jvm -name "msopenjdk*")
 %define jre_home %{jdk_home}/jre
 
 %configure --pyinterpreter=%{python_interpreter} \
@@ -119,6 +119,10 @@ rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 %license LICENSE
 
 %changelog
+* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.3.0-13
+- Update to build with JDK 11
+- License verified
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-12
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

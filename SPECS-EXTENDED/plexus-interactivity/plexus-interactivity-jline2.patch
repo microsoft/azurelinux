@@ -1,0 +1,33 @@
+diff --git a/plexus-interactivity-jline/pom.xml b/plexus-interactivity-jline/pom.xml
+index fc9b185..afffd1d 100644
+--- a/plexus-interactivity-jline/pom.xml
++++ b/plexus-interactivity-jline/pom.xml
+@@ -12,7 +12,7 @@
+     <dependency>
+       <groupId>jline</groupId>
+       <artifactId>jline</artifactId>
+-      <version>0.9.1</version>
++      <version>2.10</version>
+     </dependency>
+     <dependency>
+       <groupId>org.codehaus.plexus</groupId>
+@@ -20,4 +20,4 @@
+       <version>1.0-alpha-6</version>
+     </dependency>
+   </dependencies>
+-</project>
+\ No newline at end of file
++</project>
+diff --git a/plexus-interactivity-jline/src/main/java/org/codehaus/plexus/components/interactivity/jline/JLineInputHandler.java b/plexus-interactivity-jline/src/main/java/org/codehaus/plexus/components/interactivity/jline/JLineInputHandler.java
+index 69e7b78..2a23942 100755
+--- a/plexus-interactivity-jline/src/main/java/org/codehaus/plexus/components/interactivity/jline/JLineInputHandler.java
++++ b/plexus-interactivity-jline/src/main/java/org/codehaus/plexus/components/interactivity/jline/JLineInputHandler.java
+@@ -24,7 +24,7 @@ package org.codehaus.plexus.components.interactivity.jline;
+  * SOFTWARE.
+  */
+ 
+-import jline.ConsoleReader;
++import jline.console.ConsoleReader;
+ import org.codehaus.plexus.components.interactivity.AbstractInputHandler;
+ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;

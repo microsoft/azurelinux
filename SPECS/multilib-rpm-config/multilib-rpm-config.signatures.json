@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "COPYING": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+  "README": "063ad35ea4d5d4cc2d8cb5b11bd896c7f33475e08131a028ac8b2bb6ab1941cd",
+  "macros.ml": "cce8ea8b3bc3b7c143c99303b2ab9b19bfa2ee6a33681ee19c7eea255740a2ea",
+  "multilib-fix": "ee830f5bbfab3187510513a0a723176a4f0709c06a5876f54d6282ffda2cf89d",
+  "multilib-info": "782895c542382e8629bac2575b23f295936d28656400a74910651664cd4e9f5d",
+  "multilib-library": "777ff205f60c4f781f727cb80ed2a2abec3be4b79e4f7ea28ac527e5cdfb6e19"
+ }
+}

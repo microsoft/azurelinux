@@ -1,0 +1,38 @@
+From 75b13978f85b32c7a121aa289d8ebf41ba14ee5a Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Thu, 5 Sep 2019 09:57:09 +0200
+Subject: [PATCH] Make const the return value of caml_named_value()
+
+With OCaml >= 4.09 caml_named_value() returns a const value *, so keep
+the constness to build also in this case.
+
+Signed-off-by: Pino Toscano <ptoscano@redhat.com>
+---
+ libvirt/libvirt_c_oneoffs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libvirt/libvirt_c_oneoffs.c b/libvirt/libvirt_c_oneoffs.c
+index 6f56f10..e23c0db 100644
+--- a/libvirt/libvirt_c_oneoffs.c
++++ b/libvirt/libvirt_c_oneoffs.c
+@@ -1207,7 +1207,7 @@ ocaml_libvirt_event_run_default_impl (value unitv)
+ #define DOMAIN_CALLBACK_BEGIN(NAME)                              \
+   value connv, domv, callback_id, result;                        \
+   connv = domv = callback_id = result = Val_int(0);              \
+-  static value *callback = NULL;                                 \
++  static const value *callback = NULL;                           \
+   caml_leave_blocking_section();                                 \
+   if (callback == NULL)                                          \
+     callback = caml_named_value(NAME);                           \
+@@ -1433,7 +1433,7 @@ timeout_callback(int timer, void *opaque)
+ {
+   value callback_id, result;
+   callback_id = result = Val_int(0);
+-  static value *callback = NULL;
++  static const value *callback = NULL;
+   caml_leave_blocking_section();
+   if (callback == NULL)
+     callback = caml_named_value("Libvirt.timeout_callback");
+-- 
+2.23.0
+

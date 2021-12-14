@@ -1,0 +1,11 @@
+--- a/src/gnutls.c     2016-01-24 10:29:58.000000000 +0100
++++ b/src/gnutls.c     2016-02-02 09:32:28.477274274 +0100
+@@ -1557,7 +1557,7 @@
+   gnutls_certificate_credentials_t x509_cred = NULL;
+   gnutls_anon_client_credentials_t anon_cred = NULL;
+   Lisp_Object global_init;
+-  char const *priority_string_ptr = "NORMAL"; /* default priority string.  */
++  char const *priority_string_ptr = "@SYSTEM"; /* default priority string.  */
+   char *c_hostname;
+ 
+   /* Placeholders for the property list elements.  */

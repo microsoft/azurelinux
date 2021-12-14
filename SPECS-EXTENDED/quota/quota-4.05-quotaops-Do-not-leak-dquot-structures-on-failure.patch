@@ -1,0 +1,68 @@
+From 7942290a0a6230fcc56eae42bf436e6eeca88777 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Fri, 24 May 2019 12:25:15 +0200
+Subject: [PATCH 3/4] quotaops: Do not leak dquot structures on failure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some error paths in getprivs() were not properly freeing already fetched
+structures. Free them properly in case of error.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ quotaops.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/quotaops.c b/quotaops.c
+index 3d65490..e067d29 100644
+--- a/quotaops.c
++++ b/quotaops.c
+@@ -80,7 +80,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int ignore_noquo
+ 				if (euid != id && euid != 0) {
+ 					uid2user(id, name);
+ 					errstr(_("%s (uid %d): Permission denied\n"), name, id);
+-					return (struct dquot *)NULL;
++					goto out_err;
+ 				}
+ 				break;
+ 			case GRPQUOTA:
+@@ -92,7 +92,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int ignore_noquo
+ 					if (!gidsetp) {
+ 						gid2group(id, name);
+ 						errstr(_("%s (gid %d): gid set allocation (%d): %s\n"), name, id, ngroups, strerror(errno));
+-						return (struct dquot *)NULL;
++						goto out_err;
+ 					}
+ 				}
+ 				else
+@@ -103,7 +103,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int ignore_noquo
+ 						free(gidsetp);
+ 					gid2group(id, name);
+ 					errstr(_("%s (gid %d): error while trying getgroups(): %s\n"), name, id, strerror(errno));
+-					return (struct dquot *)NULL;
++					goto out_err;
+ 				}
+ 
+ 				for (j = 0; j < ngroups; j++)
+@@ -115,7 +115,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int ignore_noquo
+ 					gid2group(id, name);
+ 					errstr(_("%s (gid %d): Permission denied\n"),
+ 						name, id);
+-					return (struct dquot *)NULL;
++					goto out_err;
+ 				}
+ 				break;
+ 			default:
+@@ -134,6 +134,7 @@ struct dquot *getprivs(qid_t id, struct quota_handle **handles, int ignore_noquo
+ 			id2name(id, handles[i]->qh_type, name);
+ 			errstr(_("error while getting quota from %s for %s (id %u): %s\n"),
+ 				handles[i]->qh_quotadev, name, id, strerror(olderrno));
++out_err:
+ 			freeprivs(qhead);
+ 			return NULL;
+ 		}
+-- 
+2.20.1
+

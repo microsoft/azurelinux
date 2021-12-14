@@ -1,0 +1,11 @@
+diff -urNp wvstreams-4.5-orig/install.mk wvstreams-4.5/install.mk
+--- wvstreams-4.5-orig/install.mk	2008-10-21 17:31:58.000000000 +0200
++++ wvstreams-4.5/install.mk	2008-11-21 16:17:28.000000000 +0100
+@@ -45,3 +45,7 @@ install-uniconfd: uniconf/daemon/uniconf
+ install-wsd: ipstreams/tests/wsd
+ 	$(INSTALL) -d $(DESTDIR)$(bindir)
+ 	$(INSTALL_PROGRAM) ipstreams/tests/wsd $(DESTDIR)$(bindir)/
++
++install-xplc: ipstreams/tests/xplctest
++	$(INSTALL) -d $(DESTDIR)$(bindir)
++	$(INSTALL_PROGRAM) ipstreams/tests/xplctest $(DESTDIR)$(bindir)/

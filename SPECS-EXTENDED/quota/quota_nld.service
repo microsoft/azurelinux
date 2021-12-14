@@ -1,0 +1,13 @@
+[Unit]
+Description=Disk quota netlink message daemon
+After=syslog.target
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/sysconfig/quota_nld
+ExecStart=/usr/sbin/quota_nld $QUOTA_NLD_OPTS
+PIDFile=/run/quota_nld.pid
+Group=tty
+
+[Install]
+WantedBy=multi-user.target

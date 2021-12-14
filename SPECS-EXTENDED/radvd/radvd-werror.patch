@@ -1,0 +1,35 @@
+From 6e45acbf3d64b9bd945adcb3de622fd7d059ceb9 Mon Sep 17 00:00:00 2001
+From: Pavel Zhukov <pzhukov@redhat.com>
+Date: Fri, 6 Apr 2018 15:04:02 +0200
+Subject: [PATCH] Drop unused variable
+
+Compillation with Werror=all is now successfull.
+---
+ gram.y | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/gram.y b/gram.y
+index cc0dd4b..5db3bde 100644
+--- a/gram.y
++++ b/gram.y
+@@ -408,7 +408,6 @@ v6addrlist_rasrcaddress	: IPV6ADDR ';'
+ prefixdef	: prefixhead optional_prefixplist ';'
+ 		{
+ 			if (prefix) {
+-				unsigned int dst;
+ 
+ 				if (prefix->AdvPreferredLifetime > prefix->AdvValidLifetime)
+ 				{
+diff --git a/send.c b/send.c
+index 8bc16a8..62e3e68 100644
+--- a/send.c
++++ b/send.c
+@@ -797,7 +797,7 @@ static int send_ra(int sock, struct Interface *iface, struct in6_addr const *des
+ 		}
+ 
+ 		// RA built, now send it.
+-		dlog(LOG_DEBUG, 5, "sending RA to %s on %s (%s), %lu options (using %lu/%u bytes)", dest_text, iface->props.name,
++		dlog(LOG_DEBUG, 5, "sending RA to %s on %s (%s), %lu options (using %zd/%u bytes)", dest_text, iface->props.name,
+ 		     src_text, option_count, sb->used, iface->props.max_ra_option_size);
+ 		int err = really_send(sock, dest, &iface->props, sb);
+ 		if (err < 0) {

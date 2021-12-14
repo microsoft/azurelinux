@@ -1,0 +1,27 @@
+From 27cf17a1eea310b8d75efc7fc9d4d733fffcbdc1 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Fri, 19 Oct 2018 15:25:30 +0200
+Subject: [PATCH] Change global settings
+
+---
+ src/java/org/apache/ivy/ant/IvyAntSettings.java | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/java/org/apache/ivy/ant/IvyAntSettings.java b/src/java/org/apache/ivy/ant/IvyAntSettings.java
+index 660ebbe..85cf97f 100644
+--- a/src/java/org/apache/ivy/ant/IvyAntSettings.java
++++ b/src/java/org/apache/ivy/ant/IvyAntSettings.java
+@@ -354,6 +354,10 @@ public class IvyAntSettings extends DataType {
+                 break;
+             }
+         }
++        if (!file.exists() && task.getProject().getProperty("ivy.mode") != null) {
++            file = new File("/etc/ivy/ivysettings.xml");
++            task.log("searching settings file: trying " + file, Project.MSG_VERBOSE);
++        }
+         if (!file.exists()) {
+             file = null;
+             if (Boolean.valueOf(getProject().getProperty("ivy.14.compatible")).booleanValue()) {
+-- 
+2.17.2
+

@@ -1,0 +1,96 @@
+--- netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.2.4	Wed Feb 14 20:54:31 2001
++++ netkit-rusers-0.17/rpc.rstatd/rstat_proc.c	Wed Feb 14 20:55:08 2001
+@@ -385,12 +385,14 @@
+ 
+ #if defined(__linux__)
+ 
++#define MAX_DISKS 4
++
+ struct _ldisk {
+-	unsigned int xfer[4];
+-	unsigned int rio[4];
+-	unsigned int wio[4];
+-	unsigned int rblk[4];
+-	unsigned int wblk[4];
++	unsigned int xfer[MAX_DISKS];
++	unsigned int rio[MAX_DISKS];
++	unsigned int wio[MAX_DISKS];
++	unsigned int rblk[MAX_DISKS];
++	unsigned int wblk[MAX_DISKS];
+ };
+ 
+ static void
+@@ -401,7 +403,8 @@
+   static int stat;
+ #define	BUFFSIZE	1024
+   char buff[BUFFSIZE];
+-
++  int ndisks;
++  
+   if ((stat=open("/proc/stat", O_RDONLY, 0)) != -1) {
+     char* b;
+     buff[BUFFSIZE-1] = 0;  /* ensure null termination in buffer */
+@@ -410,24 +413,29 @@
+     *itot = 0; 
+     *i1 = 1;   /* ensure assert below will fail if the sscanf bombs */
+     b = strstr(buff, "cpu ");
++    if(b)
+     sscanf(b, "cpu  %lu %lu %lu %lu", cuse, cice, csys, cide);
+-    b = strstr(buff, "disk ");
+-    sscanf(b, "disk %u %u %u %u", d->xfer+0, d->xfer+1, d->xfer+2, d->xfer+3);
+-    b = strstr(buff, "disk_rio ");
+-    sscanf(b, "disk_rio %u %u %u %u", d->rio+0, d->rio+1, d->rio+2, d->rio+3);
+-    b = strstr(buff, "disk_wio ");
+-    sscanf(b, "disk_rio %u %u %u %u", d->wio+0, d->wio+1, d->wio+2, d->wio+3);
+-    b = strstr(buff, "disk_rblk ");
+-    sscanf(b, "disk_rblk %u %u %u %u", d->rblk+0,d->rblk+1,d->rblk+2,d->rblk+3);
+-    b = strstr(buff, "disk_wblk ");
+-    sscanf(b, "disk_wblk %u %u %u %u", d->wblk+0,d->wblk+1,d->wblk+2,d->wblk+3);
++    b = strstr(buff, "disk_io:");
++    ndisks = 0;
++    while ( (b = strstr(b, "):")) != NULL && ndisks < MAX_DISKS ) {
++      sscanf (b, "):(%u,%u,%u,%u,%u)", &d->xfer[ndisks], 
++	      &d->rio[ndisks], &d->rblk[ndisks], 
++	      &d->wio[ndisks], &d->wblk[ndisks]);
++      ndisks++;
++      b += 2;
++    }
++
+     b = strstr(buff, "page ");
++    if(b)
+     sscanf(b, "page %u %u", pin, pout);
+     b = strstr(buff, "swap ");
++    if(b)
+     sscanf(b, "swap %u %u", sin, sout);
+     b = strstr(buff, "intr ");
++    if(b)
+     sscanf(b, "intr %u %u", itot, i1);
+     b = strstr(buff, "ctxt ");
++    if(b)
+     sscanf(b, "ctxt %u", ct);
+     assert(*itot>*i1);
+   }
+@@ -477,6 +485,7 @@
+ {
+     switch (procnetdev_vsn) {
+     case 3:
++	if(bp)
+ 	sscanf(bp,
+ 	"%ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld",
+ 	       &ife->stats.rx_bytes,
+@@ -498,6 +507,7 @@
+ 	       &ife->stats.tx_compressed);
+ 	break;
+     case 2:
++	if(bp)
+ 	sscanf(bp, "%ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld",
+ 	       &ife->stats.rx_bytes,
+ 	       &ife->stats.rx_packets,
+@@ -516,6 +526,7 @@
+ 	ife->stats.rx_multicast = 0;
+ 	break;
+     case 1:
++	if(bp)
+ 	sscanf(bp, "%ld %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld",
+ 	       &ife->stats.rx_packets,
+ 	       &ife->stats.rx_errors,

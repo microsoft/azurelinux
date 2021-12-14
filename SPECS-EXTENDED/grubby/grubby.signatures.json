@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "95-kernel-hooks.install": "a238bf9184e9db9511a4f4b589d1bda1296a957fc6dc7ec7344eac008da8e7fd",
+  "grubby-8.40.tar.gz": "85f1c678484f74c8978e8643451594967defce463a86c35cb1ee56d12767a9df",
+  "grubby-bls": "3cb1c175708414ab693bcf3523b995bab739e3670b1e63d364ef234c4cce2182",
+  "grubby.in": "16ad1bf489a8eae8e77af491e5ffae49ae8f88928dd13f3278a5b0c0f52b3e16",
+  "installkernel-bls": "9b2f41d7607ce81095b0c62e6453dd273f820934b4f1963e05e3fab64178b180",
+  "installkernel.in": "facf0ec40ea42976d0c73b8d8442755ca297cb91f589c4a8ee1fd6c6e2c4f8f1"
+ }
+}
