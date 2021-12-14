@@ -45,11 +45,11 @@ EOF
 ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
 
 cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel \r (\l)
+Welcome to CBL-Mariner %{mariner_release_version} Preview-A (%{_arch}) - Kernel \r (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel %r (%t)
+Welcome to CBL-Mariner %{mariner_release_version} Preview-A (%{_arch}) - Kernel %r (%t)
 EOF
 
 %files
