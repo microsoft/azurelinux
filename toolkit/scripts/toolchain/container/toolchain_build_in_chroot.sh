@@ -233,17 +233,14 @@ popd
 rm -rf readline-7.0
 touch /logs/status_readline_complete
 
-echo M4-1.4.18
-tar xf m4-1.4.18.tar.xz
-pushd m4-1.4.18
-# patch issues building with glibc 2.34
-patch -Np1 -i /tools/04-fix-sigstksz.patch
-patch -Np1 -i /tools/m4-1.4.18-glibc-change-work-around.patch
+echo M4-1.4.19
+tar xf m4-1.4.19.tar.gz
+pushd m4-1.4.19
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf m4-1.4.18
+rm -rf m4-1.4.19
 touch /logs/status_m4_complete
 
 echo Binutils-2.37

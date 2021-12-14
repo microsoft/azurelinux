@@ -210,8 +210,8 @@ lua-static-5.3.5-11.cm2.aarch64.rpm
 lz4-1.9.2-2.cm2.aarch64.rpm
 lz4-debuginfo-1.9.2-2.cm2.aarch64.rpm
 lz4-devel-1.9.2-2.cm2.aarch64.rpm
-m4-1.4.18-5.cm2.aarch64.rpm
-m4-debuginfo-1.4.18-5.cm2.aarch64.rpm
+m4-1.4.19-1.cm2.aarch64.rpm
+m4-debuginfo-1.4.19-1.cm2.aarch64.rpm
 make-4.3-1.cm2.aarch64.rpm
 make-debuginfo-4.3-1.cm2.aarch64.rpm
 mariner-check-macros-2.0-9.cm2.noarch.rpm

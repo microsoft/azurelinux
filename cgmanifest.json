@@ -4661,8 +4661,8 @@
         "type": "other",
         "other": {
           "name": "m4",
-          "version": "1.4.18",
-          "downloadUrl": "http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.gz"
+          "version": "1.4.19",
+          "downloadUrl": "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz"
         }
       }
     },
