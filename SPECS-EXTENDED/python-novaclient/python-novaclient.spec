@@ -34,7 +34,7 @@ BuildRequires:  git
 %package -n python%{pyver}-%{sname}
 Summary:          Python API and CLI for OpenStack Nova
 %{?python_provide:%python_provide python%{pyver}-novaclient}
-%if %{pyver} == 3
+%if "%{pyver}" == "3"
 Obsoletes: python2-%{sname} < %{version}-%{release}
 %endif
 
@@ -52,7 +52,7 @@ Requires:         python%{pyver}-pbr >= 2.0.0
 Requires:         python%{pyver}-prettytable >= 0.7.2
 Requires:         python%{pyver}-six >= 1.10.0
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:         python-simplejson >= 3.5.1
 %else
 Requires:         python%{pyver}-simplejson >= 3.5.1

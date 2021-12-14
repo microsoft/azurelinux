@@ -54,7 +54,7 @@ Requires:         python%{pyver}-six
 Requires:         python%{pyver}-cmd2 >= 0.6.7
 Requires:         python%{pyver}-pyparsing
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:         PyYAML
 Requires:         python%{pyver}-unicodecsv
 %else
@@ -77,7 +77,7 @@ BuildRequires:    python%{pyver}-testtools
 BuildRequires:    python%{pyver}-testscenarios
 BuildRequires:    python%{pyver}-testrepository
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 BuildRequires:    python-docutils
 BuildRequires:    PyYAML
 BuildRequires:    python%{pyver}-unicodecsv
@@ -95,7 +95,7 @@ Requires:         python%{pyver}-testtools
 Requires:         python%{pyver}-testscenarios
 Requires:         python%{pyver}-testrepository
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:         PyYAML
 Requires:         python%{pyver}-unicodecsv
 %else

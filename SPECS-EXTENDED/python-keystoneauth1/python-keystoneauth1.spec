@@ -61,7 +61,7 @@ BuildRequires: python%{pyver}-iso8601
 BuildRequires: python%{pyver}-requests-mock >= 1.1
 
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 BuildRequires: PyYAML
 BuildRequires: python-lxml
 BuildRequires: python-requests-kerberos

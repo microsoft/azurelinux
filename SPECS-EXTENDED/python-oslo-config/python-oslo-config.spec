@@ -41,7 +41,7 @@ parsing library from the Oslo project.
 %package -n python%{pyver}-%{pypi_name}
 Summary:    OpenStack common configuration library
 %{?python_provide:%python_provide python%{pyver}-%{pypi_name}}
-%if %{pyver} == 3
+%if "%{pyver}" == "3"
 Obsoletes: python2-%{pypi_name} < %{version}-%{release}
 %endif
 
@@ -53,7 +53,7 @@ Requires:   python%{pyver}-six >= 1.10.0
 Requires:   python%{pyver}-stevedore >= 1.20.0
 Requires:   python%{pyver}-debtcollector >= 1.2.0
 Requires:   python%{pyver}-netaddr >= 0.7.18
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:   python-enum34
 Requires:   PyYAML >= 3.10
 %else
@@ -74,7 +74,7 @@ BuildRequires: python%{pyver}-oslotest
 BuildRequires: python%{pyver}-requests-mock
 BuildRequires: python%{pyver}-netaddr
 BuildRequires: python%{pyver}-stevedore
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 BuildRequires: python-enum34
 BuildRequires: PyYAML
 %else

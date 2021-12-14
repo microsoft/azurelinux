@@ -288,7 +288,7 @@ mvn test
 
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.15.0-2
+* Sun Dec 12 2021 Thomas Crain <thcrain@microsoft.com> - 2.15.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 
 * Sun Dec 12 2021 Sérgio Basto <sergio@serjux.com> - 2.15.0-1

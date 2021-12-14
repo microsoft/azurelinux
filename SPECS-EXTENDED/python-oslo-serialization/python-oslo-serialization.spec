@@ -48,7 +48,7 @@ BuildRequires:  python%{pyver}-msgpack >= 0.5.2
 BuildRequires:  python%{pyver}-netaddr
 BuildRequires:  python%{pyver}-simplejson
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 BuildRequires:  python-ipaddress
 %endif
 
@@ -59,7 +59,7 @@ Requires:       python%{pyver}-six
 Requires:       python%{pyver}-msgpack >= 0.5.2
 Requires:       python%{pyver}-pytz
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:       python-ipaddress
 %endif
 
