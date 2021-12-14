@@ -24,6 +24,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "adwaita-icon-theme",
+          "version": "3.36.1",
+          "downloadUrl": "https://download.gnome.org/sources/adwaita-icon-theme/3.36/adwaita-icon-theme-3.36.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "alsa-lib",
           "version": "1.2.2",
           "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.2.tar.bz2"
@@ -55,8 +65,8 @@
         "type": "other",
         "other": {
           "name": "ant",
-          "version": "1.10.9",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.gz"
+          "version": "1.10.11",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },
@@ -154,6 +164,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "at-spi2-atk",
+          "version": "2.34.2",
+          "downloadUrl": "https://download.gnome.org/sources/at-spi2-atk/2.34/at-spi2-atk-2.34.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "at-spi2-core",
+          "version": "2.36.1",
+          "downloadUrl": "https://download.gnome.org/sources/at-spi2-core/2.36/at-spi2-core-2.36.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "atf",
           "version": "0.20",
           "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.20/atf-0.20.tar.gz"
@@ -167,6 +197,16 @@
           "name": "atftp",
           "version": "0.7.5",
           "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "atk",
+          "version": "2.36.0",
+          "downloadUrl": "https://download.gnome.org/sources/atk/2.36/atk-2.36.0.tar.xz"
         }
       }
     },
@@ -274,6 +314,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "avahi",
+          "version": "0.7",
+          "downloadUrl": "https://github.com/lathiat/avahi/releases/download/v0.7/avahi-0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azure-iot-sdk-c",
           "version": "2020.02.04.1",
           "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/LTS_02_2020_Ref01.tar.gz"
@@ -345,8 +395,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "4.1.0",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/4.1.0/bazel-4.1.0-dist.zip"
+          "version": "4.2.1",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/4.2.1/bazel-4.2.1-dist.zip"
         }
       }
     },
@@ -394,10 +444,11 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
         "other": {
-          "name": "bigreqsproto",
-          "version": "1.1.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/bigreqsproto-1.1.2.tar.bz2"
+          "name": "bdftopcf",
+          "version": "1.1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/bdftopcf-1.1.tar.bz2"
         }
       }
     },
@@ -875,9 +926,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "compositeproto",
-          "version": "0.4.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/compositeproto-0.4.2.tar.bz2"
+          "name": "colord",
+          "version": "1.4.4",
+          "downloadUrl": "https://www.freedesktop.org/software/colord/releases/colord-1.4.4.tar.xz"
         }
       }
     },
@@ -1056,8 +1107,8 @@
         "type": "other",
         "other": {
           "name": "cups",
-          "version": "2.2.4",
-          "downloadUrl": "https://github.com/apple/cups/releases/download/v2.2.4/cups-2.2.4-source.tar.gz"
+          "version": "2.3.3op2",
+          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.3.3op2/cups-2.3.3op2-source.tar.gz"
         }
       }
     },
@@ -1095,16 +1146,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "damageproto",
-          "version": "1.2.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/damageproto-1.2.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dbus",
           "version": "1.13.6",
           "downloadUrl": "http://dbus.freedesktop.org/releases/dbus/dbus-1.13.6.tar.gz"
@@ -1128,6 +1169,16 @@
           "name": "dbus-python",
           "version": "1.2.16",
           "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dconf",
+          "version": "0.36.0",
+          "downloadUrl": "https://download.gnome.org/sources/dconf/0.36/dconf-0.36.0.tar.xz"
         }
       }
     },
@@ -1246,16 +1297,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dmxproto",
-          "version": "2.3.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/dmxproto-2.3.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dnf",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.8.0.tar.gz"
@@ -1366,26 +1407,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dri2proto",
-          "version": "2.8",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/dri2proto-2.8.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "dri3proto",
-          "version": "1.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/dri3proto-1.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dstat",
           "version": "0.7.4",
           "downloadUrl": "https://github.com/dstat-real/dstat/archive/v0.7.4.tar.gz"
@@ -1427,8 +1448,8 @@
         "type": "other",
         "other": {
           "name": "e2fsprogs",
-          "version": "1.45.6",
-          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.45.6.tar.gz"
+          "version": "1.46.4",
+          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.46.4.tar.gz"
         }
       }
     },
@@ -1676,16 +1697,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fixesproto",
-          "version": "5.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/fixesproto-5.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "flannel",
           "version": "0.14.0",
           "downloadUrl": "https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz"
@@ -1918,6 +1929,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gdk-pixbuf2",
+          "version": "2.40.0",
+          "downloadUrl": "https://download.gnome.org/sources/gdk-pixbuf/2.40/gdk-pixbuf-2.40.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gettext",
           "version": "0.21",
           "downloadUrl": "http://ftp.gnu.org/gnu/gettext/gettext-0.21.tar.xz"
@@ -1981,16 +2002,6 @@
           "name": "glibmm24",
           "version": "2.56.0",
           "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.56/glibmm-2.56.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "glproto",
-          "version": "1.4.17",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/glproto-1.4.17.tar.bz2"
         }
       }
     },
@@ -2268,6 +2279,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gtk-update-icon-cache",
+          "version": "3.24.26",
+          "downloadUrl": "https://gitlab.gnome.org/Community/gentoo/gtk-update-icon-cache/-/archive/3.24.26/gtk-update-icon-cache-3.24.26.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gtk2",
+          "version": "2.24.32",
+          "downloadUrl": "https://download.gnome.org/sources/gtk+/2.24/gtk+-2.24.32.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gtk3",
+          "version": "3.24.28",
+          "downloadUrl": "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.28.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "guile",
           "version": "2.0.14",
           "downloadUrl": "ftp://ftp.gnu.org/pub/gnu/guile/guile-2.0.14.tar.gz"
@@ -2368,6 +2409,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hicolor-icon-theme",
+          "version": "0.17",
+          "downloadUrl": "https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "http-parser",
           "version": "2.8.1",
           "downloadUrl": "https://github.com/nodejs/http-parser/archive/v2.8.1.tar.gz"
@@ -2437,10 +2488,41 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "iceauth",
+          "version": "1.0.8",
+          "downloadUrl": "https://www.x.org/pub/individual/app/iceauth-1.0.8.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "other": {
           "name": "icu",
           "version": "68.2.0.6",
           "downloadUrl": "https://github.com/microsoft/icu/archive/v68.2.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "im-chooser",
+          "version": "1.7.3",
+          "downloadUrl": "https://releases.pagure.org/im-chooser/im-chooser-1.7.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "imsettings",
+          "version": "1.8.2",
+          "downloadUrl": "https://bitbucket.org/tagoh/imsettings/downloads/imsettings-1.8.2.tar.bz2"
         }
       }
     },
@@ -2461,16 +2543,6 @@
           "name": "inotify-tools",
           "version": "3.14",
           "downloadUrl": "https://github.com/downloads/rvoicilas/inotify-tools/inotify-tools-3.14.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "inputproto",
-          "version": "2.3.2",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/inputproto-2.3.2.tar.bz2"
         }
       }
     },
@@ -2648,6 +2720,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jasper",
+          "version": "2.0.24",
+          "downloadUrl": "https://github.com/jasper-software/jasper/archive/version-2.0.24.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "javapackages-tools",
           "version": "5.3.0",
           "downloadUrl": "https://github.com/fedora-java/javapackages/archive/5.3.0.tar.gz"
@@ -2721,16 +2803,6 @@
           "name": "kbd",
           "version": "2.2.0",
           "downloadUrl": "http://ftp.altlinux.org/pub/people/legion/kbd/kbd-2.2.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kbproto",
-          "version": "1.0.7",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/kbproto-1.0.7.tar.bz2"
         }
       }
     },
@@ -2928,6 +3000,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lcms2",
+          "version": "2.9",
+          "downloadUrl": "https://www.littlecms.com/lcms2-2.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "less",
           "version": "590",
           "downloadUrl": "http://www.greenwoodsoftware.com/less/less-590.tar.gz"
@@ -3118,9 +3200,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libdb",
-          "version": "5.3.28",
-          "downloadUrl": "http://download.oracle.com/berkeley-db/db-5.3.28.tar.gz"
+          "name": "libdaemon",
+          "version": "0.14",
+          "downloadUrl": "https://0pointer.de/lennart/projects/libdaemon/libdaemon-0.14.tar.gz"
         }
       }
     },
@@ -3128,9 +3210,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libdmx",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libdmx-1.1.3.tar.bz2"
+          "name": "libdb",
+          "version": "5.3.28",
+          "downloadUrl": "http://download.oracle.com/berkeley-db/db-5.3.28.tar.gz"
         }
       }
     },
@@ -3249,8 +3331,8 @@
         "type": "other",
         "other": {
           "name": "libffi",
-          "version": "3.2.1",
-          "downloadUrl": "https://gcc.gnu.org/pub/libffi/libffi-3.2.1.tar.gz"
+          "version": "3.4.2",
+          "downloadUrl": "https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz"
         }
       }
     },
@@ -3261,16 +3343,6 @@
           "name": "libfontenc",
           "version": "1.1.3",
           "downloadUrl": "ftp://ftp.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libFS",
-          "version": "1.0.7",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libFS-1.0.7.tar.bz2"
         }
       }
     },
@@ -3331,6 +3403,26 @@
           "name": "libgudev",
           "version": "232",
           "downloadUrl": "https://download.gnome.org/sources/libgudev/232/libgudev-232.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libgusb",
+          "version": "0.3.5",
+          "downloadUrl": "https://people.freedesktop.org/~hughsient/releases/libgusb-0.3.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libgxim",
+          "version": "0.5.0",
+          "downloadUrl": "https://bitbucket.org/tagoh/libgxim/downloads/libgxim-0.5.0.tar.bz2"
         }
       }
     },
@@ -3598,6 +3690,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnotify",
+          "version": "0.7.9",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libnotify/0.7/libnotify-0.7.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libnsl2",
           "version": "1.2.0",
           "downloadUrl": "https://github.com/thkukuk/libnsl/archive/v1.2.0/libnsl-1.2.0.tar.gz"
@@ -3628,16 +3730,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libpciaccess",
-          "version": "0.16",
-          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.16.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libpipeline",
           "version": "1.5.0",
           "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz"
@@ -3651,6 +3743,16 @@
           "name": "libpng",
           "version": "1.6.37",
           "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.37.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpq",
+          "version": "12.2",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.2/postgresql-12.2.tar.bz2"
         }
       }
     },
@@ -3711,6 +3813,16 @@
           "name": "librepo",
           "version": "1.14.2",
           "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.14.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "librsvg2",
+          "version": "2.48.9",
+          "downloadUrl": "https://download.gnome.org/sources/librsvg/2.48/librsvg-2.48.9.tar.xz"
         }
       }
     },
@@ -4038,6 +4150,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libXcomposite",
+          "version": "0.4.5",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.5.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libxcrypt",
           "version": "4.4.17",
           "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
@@ -4088,6 +4210,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libxfce4util",
+          "version": "4.14.0",
+          "downloadUrl": "https://archive.xfce.org/src/xfce/libxfce4util/4.14/libxfce4util-4.14.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libXfixes",
           "version": "5.0.3",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-5.0.3.tar.bz2"
@@ -4129,8 +4261,8 @@
         "type": "other",
         "other": {
           "name": "libXinerama",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXinerama-1.1.3.tar.bz2"
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXinerama-1.1.4.tar.bz2"
         }
       }
     },
@@ -4218,26 +4350,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libXres",
-          "version": "1.0.7",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXres-1.0.7.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXScrnSaver",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXScrnSaver-1.2.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libxshmfence",
           "version": "1.3",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libxshmfence-1.3.tar.bz2"
@@ -4271,36 +4383,6 @@
           "name": "libXtst",
           "version": "1.2.3",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXv",
-          "version": "1.0.11",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXv-1.0.11.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXvMC",
-          "version": "1.0.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXvMC-1.0.10.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libXxf86dga",
-          "version": "1.1.4",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXxf86dga-1.1.4.tar.bz2"
         }
       }
     },
@@ -4538,6 +4620,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lynx",
+          "version": "2.9.0~dev.9",
+          "downloadUrl": "https://invisible-mirror.net/archives/lynx/tarballs/lynx2.9.0dev.9.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "lz4",
           "version": "1.9.2",
           "downloadUrl": "https://github.com/lz4/lz4/archive/v1.9.2/lz4-1.9.2.tar.gz"
@@ -4569,8 +4661,8 @@
         "type": "other",
         "other": {
           "name": "m4",
-          "version": "1.4.18",
-          "downloadUrl": "http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.gz"
+          "version": "1.4.19",
+          "downloadUrl": "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz"
         }
       }
     },
@@ -4638,9 +4730,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mariadb-connector-c",
+          "version": "3.1.10",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/connector-c-3.1.10/mariadb-connector-c-3.1.10-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mc",
           "version": "4.8.21",
           "downloadUrl": "https://ftp.midnight-commander.org/mc-4.8.21.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mcpp",
+          "version": "2.7.2",
+          "downloadUrl": "https://downloads.sourceforge.net/mcpp/mcpp-2.7.2.tar.gz"
         }
       }
     },
@@ -4823,6 +4935,26 @@
           "name": "msgpack",
           "version": "3.2.1",
           "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "msopenjdk-11",
+          "version": "11.0.13+8-LTS-4.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13+8-LTS-4.aarch64.rpm"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "msopenjdk-11",
+          "version": "11.0.13+8-LTS-4.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13+8-LTS-4.x86_64.rpm"
         }
       }
     },
@@ -5261,26 +5393,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "openjdk8",
-          "version": "1.8.0.302",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-jdk8u/archive/jdk8u302-b04.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "openjdk8_aarch64",
-          "version": "1.8.0.292",
-          "downloadUrl": "https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/archive/aarch64-shenandoah-jdk8u292-b10.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "openldap",
           "version": "2.4.57",
           "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.4.57.tgz"
@@ -5491,9 +5603,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Bit-Vector",
+          "version": "7.4",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/ST/STBEY/Bit-Vector-7.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Canary-Stability",
           "version": "2012",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-2012.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Carp-Clan",
+          "version": "6.08",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Carp-Clan-6.08.tar.gz"
         }
       }
     },
@@ -5554,6 +5686,16 @@
           "name": "perl-Crypt-SSLeay",
           "version": "0.72",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NA/NANIS/Crypt-SSLeay-0.72.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Date-Calc",
+          "version": "6.4",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/ST/STBEY/Date-Calc-6.4.tar.gz"
         }
       }
     },
@@ -5882,8 +6024,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-Parser",
-          "version": "2.44",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.44.tar.gz"
+          "version": "2.46",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.46.tar.gz"
         }
       }
     },
@@ -5962,8 +6104,8 @@
         "type": "other",
         "other": {
           "name": "pkgconf",
-          "version": "1.7.0",
-          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.7.0.tar.xz"
+          "version": "1.8.0",
+          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.8.0.tar.xz"
         }
       }
     },
@@ -6021,19 +6163,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "presentproto",
-          "version": "1.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/presentproto-1.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "procps-ng",
-          "version": "3.3.15",
-          "downloadUrl": "http://sourceforge.net/projects/procps-ng/files/Production/procps-ng-3.3.15.tar.xz"
+          "version": "3.3.17",
+          "downloadUrl": "http://sourceforge.net/projects/procps-ng/files/Production/procps-ng-3.3.17.tar.xz"
         }
       }
     },
@@ -6781,16 +6913,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-nose",
-          "version": "1.3.7",
-          "downloadUrl": "https://pypi.python.org/packages/source/n/nose/nose-1.3.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-ntplib",
           "version": "0.3.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/29/8b/85a86e01c510665b0790d3a9fd4532ad98aba9e185a676113a0ae3879350/ntplib-0.3.3.tar.gz"
@@ -7412,8 +7534,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.10",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.10/Python-3.7.10.tar.xz"
+          "version": "3.9.9",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tar.xz"
         }
       }
     },
@@ -7451,9 +7573,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qemu-kvm",
-          "version": "4.2.0",
-          "downloadUrl": "https://download.qemu.org/qemu-4.2.0.tar.xz"
+          "name": "qemu",
+          "version": "6.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-6.1.0.tar.xz"
         }
       }
     },
@@ -7521,16 +7643,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "randrproto",
-          "version": "1.5.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/randrproto-1.5.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rapidjson",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz"
@@ -7562,8 +7674,8 @@
         "type": "other",
         "other": {
           "name": "readline",
-          "version": "7.0",
-          "downloadUrl": "http://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz"
+          "version": "8.1",
+          "downloadUrl": "https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz"
         }
       }
     },
@@ -7591,19 +7703,20 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "renderproto",
-          "version": "0.11.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/renderproto-0.11.1.tar.bz2"
+          "name": "rest",
+          "version": "0.8.1",
+          "downloadUrl": "https://download.gnome.org/sources/rest/0.8/rest-0.8.1.tar.xz"
         }
       }
     },
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
         "other": {
-          "name": "resourceproto",
-          "version": "1.2.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/resourceproto-1.2.0.tar.bz2"
+          "name": "rgb",
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/rgb-1.0.6.tar.bz2"
         }
       }
     },
@@ -8580,6 +8693,17 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "sessreg",
+          "version": "1.1.0",
+          "downloadUrl": "https://www.x.org/pub/individual/app/sessreg-1.1.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "other": {
           "name": "setools",
           "version": "4.4.0",
@@ -8625,6 +8749,16 @@
           "name": "shadow-utils",
           "version": "4.9",
           "downloadUrl": "https://github.com/shadow-maint/shadow/releases/download/v4.9/shadow-4.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "shared-mime-info",
+          "version": "1.15",
+          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/b27eb88e4155d8fccb8bb3cd12025d5b/shared-mime-info-1.15.tar.xz"
         }
       }
     },
@@ -8962,6 +9096,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tinycdb",
+          "version": "0.78",
+          "downloadUrl": "https://www.corpit.ru/mjt/tinycdb/tinycdb-0.78.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tinyxml2",
           "version": "7.1.0",
           "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/7.1.0.tar.gz"
@@ -9212,16 +9356,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "videoproto",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/videoproto-2.3.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "vim",
           "version": "8.2.3582",
           "downloadUrl": "https://github.com/vim/vim/archive/v8.2.3582.tar.gz"
@@ -9265,6 +9399,16 @@
           "name": "vsftpd",
           "version": "3.0.3",
           "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "vte291",
+          "version": "0.60.3",
+          "downloadUrl": "https://download.gnome.org/sources/vte/0.60/vte-0.60.3.tar.xz"
         }
       }
     },
@@ -9466,61 +9610,11 @@
     {
       "component": {
         "type": "other",
-        "other": {
-          "name": "xextproto",
-          "version": "7.3.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xextproto-7.3.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xeyes",
           "version": "1.1.2",
           "downloadUrl": "https://www.x.org/pub/individual/app/xeyes-1.1.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xf86bigfontproto",
-          "version": "1.2.0",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xf86bigfontproto-1.2.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xf86dgaproto",
-          "version": "2.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xf86dgaproto-2.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xf86driproto",
-          "version": "2.1.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xf86driproto-2.1.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "xf86vidmodeproto",
-          "version": "2.3.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xf86vidmodeproto-2.3.1.tar.bz2"
         }
       }
     },
@@ -9559,10 +9653,22 @@
     {
       "component": {
         "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
         "other": {
-          "name": "xineramaproto",
-          "version": "1.2.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xineramaproto-1.2.1.tar.bz2"
+          "name": "xgamma",
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xgamma-1.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xhost",
+          "version": "1.0.7",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xhost-1.0.7.tar.bz2"
         }
       }
     },
@@ -9573,6 +9679,28 @@
           "name": "xinetd",
           "version": "2.3.15",
           "downloadUrl": "https://github.com/xinetd-org/xinetd/archive/xinetd-2-3-15.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xinput",
+          "version": "1.6.3",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xinput-1.6.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xiswayland",
+          "version": "1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xiswayland-1.tar.xz"
         }
       }
     },
@@ -9627,6 +9755,17 @@
           "name": "xkeyboard-config",
           "version": "2.30",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-2.30.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xkill",
+          "version": "1.0.5",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xkill-1.0.5.tar.bz2"
         }
       }
     },
@@ -9708,6 +9847,27 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xmltoman",
+          "version": "0.4",
+          "downloadUrl": "https://downloads.sourceforge.net/xmltoman/xmltoman-0.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xmodmap",
+          "version": "1.0.9",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xmodmap-1.0.9.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xorg-x11-drv-libinput",
           "version": "0.30.0",
           "downloadUrl": "ftp://ftp.x.org/pub/individual/driver/xf86-input-libinput-0.30.0.tar.bz2"
@@ -9748,6 +9908,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xorg-x11-xbitmaps",
+          "version": "1.1.1",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/data/xbitmaps-1.1.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xorg-x11-xinit",
+          "version": "1.4.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/app/xinit-1.4.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xorg-x11-xtrans-devel",
           "version": "1.4.0",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.4.0.tar.bz2"
@@ -9772,6 +9952,83 @@
           "name": "xproto",
           "version": "7.0.31",
           "downloadUrl": "https://www.x.org/pub/individual/proto/xproto-7.0.31.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xrandr",
+          "version": "1.5.0",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xrandr-1.5.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xrdb",
+          "version": "1.1.1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xrdb-1.1.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xrefresh",
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xrefresh-1.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xset",
+          "version": "1.2.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xset-1.2.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xsetpointer",
+          "version": "1.0.1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xsetpointer-1.0.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xsetroot",
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xsetroot-1.1.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
+        "other": {
+          "name": "xstdcmap",
+          "version": "1.0.3",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xstdcmap-1.0.3.tar.bz2"
         }
       }
     },

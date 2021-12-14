@@ -1,10 +1,7 @@
-%define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-%define python3_version 3.7
-%define python3_version_nodots 37
 Summary:        Lossless compression algorithm
 Name:           brotli
 Version:        1.0.7
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,9 +12,6 @@ Patch0:         CVE-2020-8927.patch
 BuildRequires:  cmake
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with_check}
-BuildRequires:  python3-xml
-%endif
 
 %description
 Brotli is a generic-purpose lossless compression algorithm that compresses
@@ -61,9 +55,6 @@ chmod 644 c/include/brotli/*.h
 chmod 644 c/tools/brotli.c
 
 %build
-%if 0%{?rhel} == 7
-. /opt/rh/devtoolset-7/enable
-%endif
 mkdir -p build
 cd build
 %cmake .. -DCMAKE_INSTALL_PREFIX="%{_prefix}" \
@@ -73,9 +64,6 @@ cd ..
 python3 setup.py build
 
 %install
-%if 0%{?rhel} == 7
-. /opt/rh/devtoolset-7/enable
-%endif
 cd build
 %make_install
 
@@ -128,6 +116,10 @@ python3 setup.py test
 %{_mandir}/man3/types.h.3brotli*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.7-10
+- Remove hardcoded %%python_version macros to enable building with Python 3.9
+- License verified
+
 * Fri Oct 30 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.7-9
 - Patch CVE-2020-8927
 - Remove sha1 hash

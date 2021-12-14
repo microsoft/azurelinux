@@ -1,0 +1,52 @@
+'\" t
+.\"     Title: update-gtk-immodules
+.\"    Author: Matthias Clasen <mclasen@redhat.com>
+.\"      Date: 06/26/2013
+.\"    Manual: User Commands
+.\"    Source: GTK+
+.\"  Language: English
+.\"
+.TH "UPDATE\-GTK\-IMMODULES" "1" "" "GTK+" "User Commands"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+update-gtk-immodules - Update GTK+ immodule cache
+.SH "SYNOPSIS"
+.HP \w'\fBupdate-gtk-immodules\fR\ 'u
+\fBupdate-gtk-immodules\fR [HOST_TRIPLET]
+.SH "DESCRIPTION"
+.PP
+\fBupdate-gtk-immodules\fR
+is a wrapper around gtk-query-immodules-2.0 that tries to help with
+multilib installations. It is meant to be used in %post scripts of rpm
+packages that install input method modules for GTK+ 2.x.
+
+.PP
+It needs to be given a GNU-style host triplet as argument, such as
+"x86_64-redhat-linux-gnu". This argument determines where the tool
+saves the gtk.immodules file that it creates. It must be the same
+as the host triplet that GTK+ was configured with.
+
+.SH "FILES"
+.PP
+$libdir/gtk-2.0/2.10.0/immodules.cache - the file created by update-gtk-immodules.
+
+.SH "SEE ALSO"
+.BR gtk-query-immodules-2.0 "(1)"

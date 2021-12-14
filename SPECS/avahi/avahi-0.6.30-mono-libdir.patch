@@ -1,0 +1,50 @@
+diff -uNr avahi-0.6.30.old/avahi-sharp/Makefile.am avahi-0.6.30/avahi-sharp/Makefile.am
+--- avahi-0.6.30.old/avahi-sharp/Makefile.am	2010-06-29 05:30:35.000000000 +0200
++++ avahi-0.6.30/avahi-sharp/Makefile.am	2011-11-27 17:03:04.933192204 +0100
+@@ -73,10 +73,10 @@
+ endif
+ 
+ install-data-hook: $(ASSEMBLY)
+-	$(AM_V_GEN)MONO_SHARED_DIR=. $(GACUTIL) /i $(ASSEMBLY) /package avahi-sharp /gacdir $(libdir) /root $(DESTDIR)$(libdir)
++	$(AM_V_GEN)MONO_SHARED_DIR=. $(GACUTIL) /i $(ASSEMBLY) /package avahi-sharp /gacdir $(prefix)/lib /root $(DESTDIR)$(prefix)/lib
+ 
+ uninstall-hook: $(ASSEMBLY)
+-	$(AM_V_GEN)MONO_SHARED_DIR=. $(GACUTIL) /u avahi-sharp /package avahi-sharp /gacdir $(libdir) /root $(DESTDIR)$(libdir)
++	$(AM_V_GEN)MONO_SHARED_DIR=. $(GACUTIL) /u avahi-sharp /package avahi-sharp /gacdir $(prefix)/lib /root $(DESTDIR)$(prefix)/lib
+ 
+ endif
+ endif
+diff -uNr avahi-0.6.30.old/avahi-sharp.pc.in avahi-0.6.30/avahi-sharp.pc.in
+--- avahi-0.6.30.old/avahi-sharp.pc.in	2010-06-25 02:54:22.000000000 +0200
++++ avahi-0.6.30/avahi-sharp.pc.in	2011-11-27 17:00:05.482192846 +0100
+@@ -5,4 +5,4 @@
+ Name: avahi-sharp
+ Description: Mono bindings for the Avahi mDNS/DNS-SD stack
+ Version: @PACKAGE_VERSION@
+-Libs: -r:${libdir}/mono/avahi-sharp/avahi-sharp.dll
++Libs: -r:${prefix}/lib/mono/avahi-sharp/avahi-sharp.dll
+diff -uNr avahi-0.6.30.old/avahi-ui-sharp/Makefile.am avahi-0.6.30/avahi-ui-sharp/Makefile.am
+--- avahi-0.6.30.old/avahi-ui-sharp/Makefile.am	2010-06-29 05:30:35.000000000 +0200
++++ avahi-0.6.30/avahi-ui-sharp/Makefile.am	2011-11-27 17:04:59.812193067 +0100
+@@ -60,10 +60,10 @@
+ endif
+ 
+ install-data-hook: $(ASSEMBLY)
+-	$(GACUTIL) /i $(ASSEMBLY) /package avahi-ui-sharp /gacdir $(libdir) /root $(DESTDIR)$(libdir)
++	$(GACUTIL) /i $(ASSEMBLY) /package avahi-ui-sharp /gacdir $(prefix)/lib /root $(DESTDIR)$(prefix)/lib
+ 
+ uninstall-hook: $(ASSEMBLY)
+-	$(GACUTIL) /u avahi-ui-sharp /package avahi-ui-sharp /gacdir $(libdir) /root $(DESTDIR)$(libdir)
++	$(GACUTIL) /u avahi-ui-sharp /package avahi-ui-sharp /gacdir $(prefix)/lib /root $(DESTDIR)$(prefix)/lib
+ 
+ endif
+ endif
+diff -uNr avahi-0.6.30.old/avahi-ui-sharp.pc.in avahi-0.6.30/avahi-ui-sharp.pc.in
+--- avahi-0.6.30.old/avahi-ui-sharp.pc.in	2010-06-25 02:54:22.000000000 +0200
++++ avahi-0.6.30/avahi-ui-sharp.pc.in	2011-11-27 17:04:05.077192737 +0100
+@@ -6,4 +6,4 @@
+ Description: Mono bindings for the Avahi mDNS/DNS-SD stack
+ Version: @PACKAGE_VERSION@
+ Requires: gtk-sharp-2.0
+-Libs: -r:${libdir}/mono/avahi-ui-sharp/avahi-ui-sharp.dll
++Libs: -r:${prefix}/lib/mono/avahi-ui-sharp/avahi-ui-sharp.dll

@@ -295,7 +295,6 @@ chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
 
 build_rpm_in_chroot_no_install wget
-build_rpm_in_chroot_no_install freetype
 
 # build and install additional openjdk build dependencies
 build_rpm_in_chroot_no_install pcre
@@ -316,35 +315,21 @@ build_rpm_in_chroot_no_install python3
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3
 
-
-# openjdk needs fontconfig to build, which needs libxml
+# libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 copy_rpm_subpackage python3-libxml2
 chroot_and_install_rpms libxml2
-chroot_and_install_rpms expat
-chroot_and_install_rpms freetype
-build_rpm_in_chroot_no_install fontconfig
-chroot_and_install_rpms fontconfig
 
-
-# Build OpenJDK and OpenJRE
-echo Java bootstrap version:
+# Download JDK rpms
+echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        echo $($LFS/usr/lib/jvm/OpenJDK-212-b04-bootstrap/bin/java -version)
-        build_rpm_in_chroot_no_install openjdk8
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13%2B8-LTS-4.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        echo $($LFS/usr/lib/jvm/OpenJDK-1.8.0.181-bootstrap/bin/java -version)
-        build_rpm_in_chroot_no_install openjdk8_aarch64
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13%2B8-LTS-4.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
-
-# Install OpenJDK and OpenJRE
-chroot_and_install_rpms openjdk8
-# Copy OpenJRE
-cp -v $CHROOT_RPMS_DIR_ARCH/openjre8* $FINISHED_RPM_DIR
-chroot_and_install_rpms openjre8
 
 # PCRE needs to be installed (above) for grep to build with perl regexp support
 build_rpm_in_chroot_no_install grep

@@ -12,3 +12,6 @@ OUTPUT_FILE=$2
 #
 # The below sed command will extract every spec name that follows the above pattern and place it in $OUTPUT_FILE.
 sed -nE 's/^\s*build_rpm_in_chroot_no_install\s+(\w+)/\1/p' $TOOLCHAIN_BUILD_FILE > $OUTPUT_FILE
+
+# Special case to add msopenjdk-11 RPM which is downloaded instead of built
+echo "msopenjdk-11" >> $OUTPUT_FILE

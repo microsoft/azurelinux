@@ -1,8 +1,7 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.2.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
 URL:            https://lxml.de
@@ -15,10 +14,8 @@ Patch0:         lxml-make-check-fix.patch
 
 BuildRequires:  libxslt
 BuildRequires:  libxslt-devel
-BuildRequires:  python3
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 
 %description
 The lxml XML toolkit is a Pythonic binding for the C libraries libxml2 and libxslt. It is unique in that it combines the speed and XML feature completeness of these libraries with the simplicity of a native Python API, mostly compatible but superior to the well-known ElementTree API.
@@ -27,7 +24,6 @@ The lxml XML toolkit is a Pythonic binding for the C libraries libxml2 and libxs
 Summary:        python-lxml
 Requires:       libxslt
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-lxml
 Python 3 version.
@@ -35,12 +31,13 @@ Python 3 version.
 %prep
 %setup -q -n lxml-%{version}
 %patch0 -p1
+find -type f -name "*.c" -delete -print
 
 %build
-python3 setup.py build
+%{py3_build "--with-cython"}
 
 %install
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%py3_install
 
 %check
 export LC_ALL=en_US.UTF-8
@@ -59,6 +56,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 4.2.4-8
+- Regenerate C sources at build-time to fix build break with Python 3.9
+
 *   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> 4.2.4-7
 -   Remove python2 support.
 -   License verified.
