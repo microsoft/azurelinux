@@ -37,7 +37,7 @@ This package provides a library build of mcpp.
 
 %package -n     libmcpp-devel
 Summary:        Alternative C/C++ preprocessor (development package for library build)
-Requires:       libmcpp = %{version}-%{version}
+Requires:       libmcpp = %{version}-%{release}
 
 %description -n libmcpp-devel
 Development package for libmcpp.
@@ -91,6 +91,7 @@ rm -f %{buildroot}%{_libdir}/libmcpp.la
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-27
 - License verified
 - Lint spec
+- Fixed libmcpp-devel requires
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.2-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
