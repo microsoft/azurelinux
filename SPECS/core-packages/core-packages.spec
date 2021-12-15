@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        0.1
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,14 +16,12 @@ Summary:        Metapackage defining the basic set of packages (no kernel) used 
 Requires:       %{name}-container = %{version}-%{release}
 Requires:       bc
 Requires:       bridge-utils
-Requires:       check-restart
 Requires:       chrony
 Requires:       cpio
 Requires:       cracklib-dicts
 Requires:       cryptsetup
 Requires:       dbus
 Requires:       dnf
-Requires:       dnf-automatic
 Requires:       dnf-utils
 Requires:       file
 Requires:       gdbm
@@ -97,6 +95,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Wed Dec 15 2021 Chris Co <chrco@microsoft.com> - 0.1-26
+- Remove check-restart and dnf-automatic from core set of packages
+
 * Wed Aug 11 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 0.1-25
 - Add check-restart to the base image
 
