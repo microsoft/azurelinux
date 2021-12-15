@@ -2,7 +2,7 @@
 Summary:        Prebuilt version of ca-certificates package.
 Name:           prebuilt-ca-certificates
 Version:        20200720
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,9 +19,9 @@ Prebuilt version of the ca-certificates package with no runtime dependencies.
 
 %prep -q
 
-# We don't want the pre-installed base set of certificates
-# to get mixed into the bundle provided by 'ca-certificates'.
-rpm -e ca-certificates-base
+# Remove 'ca-certificate-base', if present. We don't want them
+# to get mixed into the bundle provided by 'ca-certificates-base'.
+if rpm -q ca-certificates-base &>/dev/null ; then rpm -e ca-certificates-base; fi
 
 %build
 
@@ -44,6 +44,9 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Wed Dec 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-21
+- Making removal of 'ca-certificates-base' account for the package not being installed.
+
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-20
 - Removing conflicts with 'ca-certificates-shared'.
 

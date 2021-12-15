@@ -44,7 +44,7 @@ Name:           ca-certificates
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -317,6 +317,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Wed Dec 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-21
+- Making 'Release' match with 'prebuilt-ca-certificates-base'.
+
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-20
 - Making 'Release' match with 'prebuilt-ca-certificates*'.
 
