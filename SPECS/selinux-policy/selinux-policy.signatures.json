@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "refpolicy-2.20210203.tar.bz2": "48cbf2c63ff9003bef05e03c8d3cdddb4e8f63fef2a072ae51c987301f0b874d",
+  "refpolicy-2.20210908.tar.bz2": "4d3140d9fbb91322f5de36d73959464ce1d8946dcd149e36fcaf60e92444e902",
   "Makefile.devel": "cd065e896d7eb11e238a05b9102359ea370ec75b27785a81935c985899ed2df6",
   "booleans_targeted.conf": "bdefca5cc433e5fd372cd68105412db279673140f6477148744ea22c7395fec1"
  }

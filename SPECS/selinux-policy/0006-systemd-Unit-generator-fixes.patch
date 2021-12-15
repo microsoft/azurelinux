@@ -1,7 +1,7 @@
-From ca7569adf5381a95d740c3fb31c6fbd62af45741 Mon Sep 17 00:00:00 2001
+From 9aa2befcb46858ddf5a846b1f218d170f95f5d39 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Sep 2021 19:47:07 +0000
-Subject: systemd: Unit generator fixes.
+Subject: [PATCH 06/12] systemd: Unit generator fixes.
 
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---
@@ -9,10 +9,10 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/systemd.te   |  5 ++++-
  2 files changed, 24 insertions(+), 1 deletion(-)
 
-MSFT_TAG: pending
+MSFT_TAG: upstreamed
 
 diff --git a/policy/modules/system/miscfiles.if b/policy/modules/system/miscfiles.if
-index ba34f0929..f8ba6137f 100644
+index a19739412..1339c011e 100644
 --- a/policy/modules/system/miscfiles.if
 +++ b/policy/modules/system/miscfiles.if
 @@ -486,6 +486,26 @@ interface(`miscfiles_read_hwdata',`
@@ -43,10 +43,10 @@ index ba34f0929..f8ba6137f 100644
  ## <summary>
  ##	Allow process to setattr localization info
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index ad69d4d93..00a9d335e 100644
+index 4797972f8..5fbd070ca 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
-@@ -432,11 +432,12 @@ allow systemd_generator_t self:capability dac_override;
+@@ -439,11 +439,12 @@ allow systemd_generator_t self:capability dac_override;
  allow systemd_generator_t self:process setfscreate;
 
  corecmd_exec_shell(systemd_generator_t)
@@ -60,14 +60,14 @@ index ad69d4d93..00a9d335e 100644
 
  files_read_etc_files(systemd_generator_t)
  files_search_runtime(systemd_generator_t)
-@@ -473,6 +474,8 @@ systemd_log_parse_environment(systemd_generator_t)
+@@ -480,6 +481,8 @@ systemd_log_parse_environment(systemd_generator_t)
 
  term_use_unallocated_ttys(systemd_generator_t)
 
 +udev_search_runtime(systemd_generator_t)
 +
- optional_policy(`
- 	fstools_exec(systemd_generator_t)
+ ifdef(`distro_gentoo',`
+ 	corecmd_shell_entry_type(systemd_generator_t)
  ')
 --
 2.17.1

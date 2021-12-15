@@ -1,14 +1,14 @@
-From ee2c186fe4ffa047d2d4113406209dad58f323ed Mon Sep 17 00:00:00 2001
+From 3350e19ab2973ecef57af1d225f80758ab0cbab8 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Sep 2021 19:44:10 +0000
-Subject: ntp: Handle symlink to drift directory.
+Subject: [PATCH 05/12] ntp: Handle symlink to drift directory.
 
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---
  policy/modules/services/ntp.te | 1 +
  1 file changed, 1 insertion(+)
 
-MSFT_TAG: pending
+MSFT_TAG: upstreamed
 
 diff --git a/policy/modules/services/ntp.te b/policy/modules/services/ntp.te
 index 4d7e00243..2f4ce73d9 100644

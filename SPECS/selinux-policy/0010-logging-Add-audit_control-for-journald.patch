@@ -1,19 +1,19 @@
-From e8f14030d1b22390ae540a38040ec486f92efe4c Mon Sep 17 00:00:00 2001
+From 755cae2df559647263785982fa96536afe80297a Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Sep 2021 20:28:21 +0000
-Subject: logging: Add audit_control for journald.
+Subject: [PATCH 10/12] logging: Add audit_control for journald.
 
 ---
  policy/modules/system/logging.te | 1 +
  1 file changed, 1 insertion(+)
 
-MSFT_TAG: pending
+MSFT_TAG: upstreamed
 
 diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index 6c002e01c..5a59062ac 100644
+index f9e41ae6d..5117e790d 100644
 --- a/policy/modules/system/logging.te
 +++ b/policy/modules/system/logging.te
-@@ -510,6 +510,7 @@ userdom_dontaudit_search_user_home_dirs(syslogd_t)
+@@ -517,6 +517,7 @@ userdom_dontaudit_search_user_home_dirs(syslogd_t)
 
  ifdef(`init_systemd',`
  	# for systemd-journal

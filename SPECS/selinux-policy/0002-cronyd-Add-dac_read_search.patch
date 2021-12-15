@@ -1,7 +1,7 @@
-From 83cb68e5c78713cd46943c27428dd08423f39e33 Mon Sep 17 00:00:00 2001
+From 05665b31b3b98b16296caaab06423f1966ca293c Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Fri, 20 Aug 2021 18:11:23 +0000
-Subject: cronyd: Add dac_read_search.
+Subject: [PATCH 02/12] cronyd: Add dac_read_search.
 
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---

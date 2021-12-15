@@ -1,7 +1,7 @@
-From 239c03e1bf200708ff4a46d59020d38d61543816 Mon Sep 17 00:00:00 2001
+From 3d68b8403691102f67b905f465046d86b6580a25 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Fri, 20 Aug 2021 17:08:38 +0000
-Subject: Makefile: Revise relabel targets to relabel all
+Subject: [PATCH 01/12] Makefile: Revise relabel targets to relabel all
  seclabel filesystems.
 
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>

@@ -1,20 +1,20 @@
-From c0c69aee84d9bdf7de73f515d85c8b0f90bb7361 Mon Sep 17 00:00:00 2001
+From 89dbb59fda3fb34ea0790fa8fa8da6ded5f32051 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Sep 2021 19:57:45 +0000
-Subject: systemd: User runtime reads user cgroup files.
+Subject: [PATCH 09/12] systemd: User runtime reads user cgroup files.
 
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---
  policy/modules/system/systemd.te | 2 ++
  1 file changed, 2 insertions(+)
 
-MSFT_TAG: pending
+MSFT_TAG: upstreamed
 
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index d02855a08..97e6f5f8d 100644
+index fb8945b56..fdfea6038 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
-@@ -1539,6 +1539,8 @@ fs_getattr_tmpfs(systemd_user_runtime_dir_t)
+@@ -1585,6 +1585,8 @@ fs_getattr_tmpfs(systemd_user_runtime_dir_t)
  fs_list_tmpfs(systemd_user_runtime_dir_t)
  fs_unmount_tmpfs(systemd_user_runtime_dir_t)
  fs_relabelfrom_tmpfs_dirs(systemd_user_runtime_dir_t)
@@ -22,7 +22,7 @@ index d02855a08..97e6f5f8d 100644
 +fs_getattr_cgroup(systemd_user_runtime_dir_t)
 
  kernel_read_kernel_sysctls(systemd_user_runtime_dir_t)
-
+ kernel_dontaudit_getattr_proc(systemd_user_runtime_dir_t)
 --
 2.17.1
 

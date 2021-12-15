@@ -3,7 +3,7 @@
 %define monolithic n
 %define policy_name targeted
 %define refpolicy_major 2
-%define refpolicy_minor 20210203
+%define refpolicy_minor 20210908
 %define POLICYCOREUTILSVER 3.2
 %define CHECKPOLICYVER 3.2
 Summary:        SELinux policy
@@ -17,31 +17,27 @@ URL:            https://github.com/SELinuxProject/refpolicy
 Source0:        %{url}/releases/download/RELEASE_${refpolicy_major}_${refpolicy_minor}/refpolicy-%{version}.tar.bz2
 Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
-Patch0:         0001-various-systemd-user-fixes-and-additional-support.patch
-Patch1:         0002-Allow-use-of-systemd-UNIX-sockets-created-at-initrd-.patch
-Patch2:         0003-files-init-systemd-various-fixes.patch
-Patch3:         0004-Enable-factory-directory-support-in-systemd-tmpfiles.patch
-Patch4:         0005-Makefile-Revise-relabel-targets-to-relabel-all-secla.patch
-Patch5:         0006-cronyd-Add-dac_read_search.patch
-Patch6:         0007-systemd-ssh-ntp-Read-fips_enabled-crypto-sysctl.patch
-Patch7:         0008-udev-Manage-EFI-variables.patch
-Patch8:         0009-ntp-Handle-symlink-to-drift-directory.patch
-Patch9:         0010-systemd-Unit-generator-fixes.patch
-Patch10:        0011-logging-Allow-auditd-to-stat-dispatcher-executables.patch
-Patch11:        0012-systemd-Revise-tmpfiles-factory-to-allow-writing-all.patch
-Patch12:        0013-systemd-User-runtime-reads-user-cgroup-files.patch
-Patch13:        0014-logging-Add-audit_control-for-journald.patch
-Patch14:        0015-Temporary-fix-for-wrong-audit-log-directory.patch
-Patch15:        0016-Set-default-login-to-unconfined_u.patch
+Patch1:         0001-Makefile-Revise-relabel-targets-to-relabel-all-secla.patch
+Patch2:         0002-cronyd-Add-dac_read_search.patch
+Patch3:         0003-systemd-ssh-ntp-Read-fips_enabled-crypto-sysctl.patch
+Patch4:         0004-udev-Manage-EFI-variables.patch
+Patch5:         0005-ntp-Handle-symlink-to-drift-directory.patch
+Patch6:         0006-systemd-Unit-generator-fixes.patch
+Patch7:         0007-logging-Allow-auditd-to-stat-dispatcher-executables.patch
+Patch8:         0008-systemd-Revise-tmpfiles-factory-to-allow-writing-all.patch
+Patch9:         0009-systemd-User-runtime-reads-user-cgroup-files.patch
+Patch10:        0010-logging-Add-audit_control-for-journald.patch
+Patch11:        0011-Temporary-fix-for-wrong-audit-log-directory.patch
+Patch12:        0012-Set-default-login-to-unconfined_u.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
 BuildRequires:  policycoreutils-devel >= %{POLICYCOREUTILSVER}
 BuildRequires:  python3
 BuildRequires:  python3-xml
-Provides:       selinux-policy-targeted
 Requires(pre):  coreutils
 Requires(pre):  policycoreutils >= %{POLICYCOREUTILSVER}
+Provides:       selinux-policy-targeted
 BuildArch:      noarch
 
 %description
@@ -280,7 +276,8 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Tue Dec 14 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20210203-2
+* Wed Dec 15 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20210908-1
+- Update to version 2.20210908.
 - Fix setup process to apply patches.
 - Correct files listing to include the module store files.
 - Create a booleans.conf for the build process, to override upstream Boolean

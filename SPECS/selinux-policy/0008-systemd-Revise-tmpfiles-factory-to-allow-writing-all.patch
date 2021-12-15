@@ -1,16 +1,17 @@
-From 41798c436d938860e05ba07aceadbaae39d93a5d Mon Sep 17 00:00:00 2001
+From 54066a15dee26f75faef07df208e62be46a9f918 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Sep 2021 19:55:01 +0000
-Subject: systemd: Revise tmpfiles factory to allow writing all configs.
+Subject: [PATCH 08/12] systemd: Revise tmpfiles factory to allow writing all
+ configs.
 
 ---
- policy/modules/system/systemd.te | 31 ++++++++++---------------------
- 1 file changed, 10 insertions(+), 21 deletions(-)
+ policy/modules/system/systemd.te | 35 +++++++++-----------------------
+ 1 file changed, 10 insertions(+), 25 deletions(-)
 
-MSFT_TAG: pending
+MSFT_TAG: upstreamed
 
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 00a9d335e..d02855a08 100644
+index 5fbd070ca..fb8945b56 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
 @@ -45,14 +45,6 @@ gen_tunable(systemd_socket_proxyd_bind_any, false)
@@ -28,7 +29,7 @@ index 00a9d335e..d02855a08 100644
  attribute systemd_log_parse_env_type;
  attribute systemd_tmpfiles_conf_type;
  attribute systemd_user_session_type;
-@@ -1302,6 +1294,9 @@ allow systemd_tmpfiles_t self:process { setfscreate getcap };
+@@ -1340,6 +1332,9 @@ allow systemd_tmpfiles_t self:process { setfscreate getcap };
  allow systemd_tmpfiles_t systemd_coredump_var_lib_t:dir { manage_dir_perms relabel_dir_perms };
  allow systemd_tmpfiles_t systemd_coredump_var_lib_t:file manage_file_perms;
 
@@ -38,7 +39,7 @@ index 00a9d335e..d02855a08 100644
  allow systemd_tmpfiles_t systemd_pstore_var_lib_t:dir { manage_dir_perms relabel_dir_perms };
  allow systemd_tmpfiles_t systemd_pstore_var_lib_t:file manage_file_perms;
 
-@@ -1335,13 +1330,18 @@ files_manage_all_runtime_dirs(systemd_tmpfiles_t)
+@@ -1373,13 +1368,18 @@ files_manage_all_runtime_dirs(systemd_tmpfiles_t)
  files_delete_usr_files(systemd_tmpfiles_t)
  files_list_home(systemd_tmpfiles_t)
  files_list_locks(systemd_tmpfiles_t)
@@ -58,7 +59,7 @@ index 00a9d335e..d02855a08 100644
  files_relabel_all_runtime_dirs(systemd_tmpfiles_t)
  files_relabel_all_tmp_dirs(systemd_tmpfiles_t)
  files_relabel_var_dirs(systemd_tmpfiles_t)
-@@ -1387,6 +1387,7 @@ logging_setattr_syslogd_tmp_dirs(systemd_tmpfiles_t)
+@@ -1428,6 +1428,7 @@ logging_setattr_syslogd_tmp_dirs(systemd_tmpfiles_t)
 
  miscfiles_manage_man_pages(systemd_tmpfiles_t)
  miscfiles_relabel_man_cache(systemd_tmpfiles_t)
@@ -66,7 +67,7 @@ index 00a9d335e..d02855a08 100644
 
  seutil_read_config(systemd_tmpfiles_t)
  seutil_read_file_contexts(systemd_tmpfiles_t)
-@@ -1408,18 +1409,6 @@ tunable_policy(`systemd_tmpfiles_manage_all',`
+@@ -1449,22 +1450,6 @@ tunable_policy(`systemd_tmpfiles_manage_all',`
  	files_relabel_non_security_files(systemd_tmpfiles_t)
  ')
 
@@ -75,11 +76,15 @@ index 00a9d335e..d02855a08 100644
 -	allow systemd_tmpfiles_t systemd_factory_conf_t:file read_file_perms;
 -
 -	files_manage_etc_files(systemd_tmpfiles_t)
+-	files_relabel_config_dirs(systemd_tmpfiles_t)
+-	files_relabel_config_files(systemd_tmpfiles_t)
 -',`
 -	dontaudit systemd_tmpfiles_t systemd_factory_conf_t:dir list_dir_perms;
 -	dontaudit systemd_tmpfiles_t systemd_factory_conf_t:file read_file_perms;
 -
 -	files_dontaudit_manage_etc_files(systemd_tmpfiles_t)
+-	files_dontaudit_relabel_config_dirs(systemd_tmpfiles_t)
+-	files_dontaudit_relabel_config_files(systemd_tmpfiles_t)
 -')
 -
  optional_policy(`
