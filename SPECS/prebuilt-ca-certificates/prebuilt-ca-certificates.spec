@@ -47,6 +47,7 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 * Wed Dec 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-1
 - Making removal of 'ca-certificates-base' account for the package not being installed.
 - Updating 'URL' and 'Version' tags for CBL-Mariner 2.0.
+- License verified.
 
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-20
 - Removing conflicts with 'ca-certificates-shared'.
