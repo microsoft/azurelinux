@@ -19,6 +19,10 @@ Prebuilt version of the ca-certificates-base package with no runtime dependencie
 
 %prep -q
 
+# Remove 'ca-certificate', if present. We don't want them
+# to get mixed into the bundle provided by 'ca-certificates-base'.
+if rpm -q ca-certificates &>/dev/null; then rpm -e ca-certificates; fi
+
 %build
 
 %install
