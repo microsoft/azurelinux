@@ -46,6 +46,7 @@ find %{buildroot} -name README -delete
 %changelog
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-20
 - Removing conflicts with 'ca-certificates-shared'.
+- License verified.
 
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-19
 - Making 'Release' match with 'ca-certificates'.
