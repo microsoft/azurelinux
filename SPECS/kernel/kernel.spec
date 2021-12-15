@@ -1,6 +1,9 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
+%ifarch aarch64
+%define debug_package %{nil}
+%endif
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.78.1
@@ -533,6 +536,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/sound
 %ifarch x86_64
 %exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
+%endif
+%ifarch aarch64
+%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
+%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux
 %endif
 
 %files docs
