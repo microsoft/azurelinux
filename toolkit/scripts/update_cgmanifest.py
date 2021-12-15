@@ -129,7 +129,7 @@ def process_spec(spec_path, components, update_mode):
     version = spec.version    
     source_url = ""
     if len(spec.sources) > 0:
-        source_url = replace_macros(spec.sources[0],spec)
+        source_url = replace_macros(spec.sources[0], spec)
     
     if not validators.url(source_url):
         print(f"WARNING: first 'Source' tag ({source_url}) is not a valid URL, skipping.")
