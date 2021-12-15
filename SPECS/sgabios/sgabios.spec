@@ -1,19 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
-%define cross 0
-
-
 %global hash 72f39d4
 %global date 20180715
-
-
+# Sgabios is noarch, but required on architectures which cannot build it.
+# Disable debuginfo because it is of no use to us.
+%global debug_package %{nil}
+Summary:        Serial graphics BIOS option rom
 Name:           sgabios
 Version:        0.%{date}git
-Release:        6%{?dist}
-Summary:        Serial graphics BIOS option rom
-
+Release:        7%{?dist}
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/qemu/sgabios
 # There are no upstream releases.  This archive is prepared as follows:
 #
@@ -22,21 +18,10 @@ URL:            https://github.com/qemu/sgabios
 # hash=`git log -1 --format='%h'`
 # date=`git log -1 --format='%cd' --date=short | tr -d -`
 # git archive --prefix sgabios-${date}-git${hash}/ ${hash} | xz -7e > ../openbios-${date}-git${hash}.tar.xz
-Source0:        sgabios-%{date}-git%{hash}.tar.xz
-
-%if 0%{?cross}
-BuildRequires:  binutils-x86_64-linux-gnu gcc-x86_64-linux-gnu
-Buildarch: noarch
-%else
-ExclusiveArch: %{ix86} x86_64
-%endif
+Source0:        %{name}-%{date}-git%{hash}.tar.xz
 BuildRequires:  gcc
-
-Requires: %{name}-bin = %{version}-%{release}
-
-# Sgabios is noarch, but required on architectures which cannot build it.
-# Disable debuginfo because it is of no use to us.
-%global debug_package %{nil}
+Requires:       %{name}-bin = %{version}-%{release}
+ExclusiveArch:  x86_64
 
 %description
 SGABIOS is designed to be inserted into a BIOS as an option rom to provide over
@@ -44,10 +29,9 @@ a serial port the display and input capabilities normally handled by a VGA
 adapter and a keyboard, and additionally provide hooks for logging displayed
 characters for later collection after an operating system boots.
 
-
-%package bin
-Summary: Sgabios for x86
-Buildarch: noarch
+%package        bin
+Summary:        Sgabios for x86
+BuildArch:      noarch
 
 %description bin
 SGABIOS is designed to be inserted into a BIOS as an option rom to provide over
@@ -55,40 +39,31 @@ a serial port the display and input capabilities normally handled by a VGA
 adapter and a keyboard, and additionally provide hooks for logging displayed
 characters for later collection after an operating system boots.
 
-
 %prep
-%setup -q -n sgabios-%{date}-git%{hash}
-%autopatch
-
+%autosetup -n sgabios-%{date}-git%{hash}
 
 %build
 unset MAKEFLAGS
-make \
-        HOSTCC=gcc \
-%if 0%{?cross}
-        CC=x86_64-linux-gnu-gcc \
-        AS=x86_64-linux-gnu-as \
-        LD=x86_64-linux-gnu-ld \
-        OBJCOPY=x86_64-linux-gnu-objcopy \
-        OBJDUMP=x86_64-linux-gnu-objdump
-%endif
-
+make HOSTCC=gcc
 
 %install
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/sgabios
-install -m 0644 sgabios.bin $RPM_BUILD_ROOT%{_datadir}/sgabios
-
+mkdir -p %{buildroot}%{_datadir}/sgabios
+install -m 0644 sgabios.bin %{buildroot}%{_datadir}/sgabios
 
 %files
-%doc COPYING design.txt
-
+%doc design.txt
 
 %files bin
+%license COPYING
 %dir %{_datadir}/sgabios/
 %{_datadir}/sgabios/sgabios.bin
 
-
 %changelog
+* Tue Dec 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.20180715git-7
+- Lint spec
+- License verified
+- Remove cross-compilation pieces
+
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 0.20180715git-6
 - Remove epoch
 

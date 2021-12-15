@@ -43,6 +43,7 @@ ignore_list=" \
   python-zope-interface \
   qt5-rpm-macros \
   runc \
+  sgabios \
   shim \
   verity-read-only-root \
   xorg-x11-apps \

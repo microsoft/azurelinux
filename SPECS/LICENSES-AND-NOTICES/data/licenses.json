@@ -248,6 +248,7 @@
                 "sanlock",
                 "seabios",
                 "secilc",
+                "sgabios",
                 "selinux-policy",
                 "setools",
                 "sgml-common",
