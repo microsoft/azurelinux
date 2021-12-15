@@ -19,18 +19,22 @@ Prebuilt version of the ca-certificates-base package with no runtime dependencie
 
 %prep -q
 
+# Remove 'ca-certificates', if present. We don't want them
+# to get mixed into the bundle provided by 'ca-certificates-base'.
+if rpm -q ca-certificates &>/dev/null; then rpm -e --nodeps ca-certificates; fi
+
 %build
 
 %install
 
-mkdir -p %{buildroot}%{_sysconfdir}/pki/
+mkdir -p %{buildroot}%{_sysconfdir}/pki/{tls/certs,ca-trust/extracted,java}
 
-cp -r %{_sysconfdir}/pki/* %{buildroot}%{_sysconfdir}/pki/
+cp %{_sysconfdir}/pki/tls/cert.pem %{buildroot}%{_sysconfdir}/pki/tls/
+cp -r %{_sysconfdir}/pki/tls/certs/* %{buildroot}%{_sysconfdir}/pki/tls/certs/
+cp -r %{_sysconfdir}/pki/ca-trust/extracted/* %{buildroot}%{_sysconfdir}/pki/ca-trust/extracted/
+cp %{_sysconfdir}/pki/java/cacerts %{buildroot}%{_sysconfdir}/pki/java/
 
 find %{buildroot} -name README -delete
-
-rm %{buildroot}%{_sysconfdir}/pki/tls/*.cnf
-rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 
 %files
 # Base certs bundle file with trust
@@ -42,6 +46,7 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %changelog
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-20
 - Removing conflicts with 'ca-certificates-shared'.
+- License verified.
 
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-19
 - Making 'Release' match with 'ca-certificates'.
