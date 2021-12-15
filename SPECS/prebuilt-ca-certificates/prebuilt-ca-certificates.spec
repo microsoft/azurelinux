@@ -27,14 +27,14 @@ rpm -e ca-certificates-base
 
 %install
 
-mkdir -p %{buildroot}%{_sysconfdir}/pki/
+mkdir -p %{buildroot}%{_sysconfdir}/pki/{tls/certs,ca-trust/extracted,java}
 
-cp -r %{_sysconfdir}/pki/* %{buildroot}%{_sysconfdir}/pki/
+cp %{_sysconfdir}/pki/tls/cert.pem %{buildroot}%{_sysconfdir}/pki/tls/
+cp -r %{_sysconfdir}/pki/tls/certs/* %{buildroot}%{_sysconfdir}/pki/tls/certs/
+cp -r %{_sysconfdir}/pki/ca-trust/extracted/* %{buildroot}%{_sysconfdir}/pki/ca-trust/extracted/
+cp %{_sysconfdir}/pki/java/cacerts %{buildroot}%{_sysconfdir}/pki/java/
 
 find %{buildroot} -name README -delete
-
-rm %{buildroot}%{_sysconfdir}/pki/tls/*.cnf
-rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 
 %files
 # Certs bundle file with trust
