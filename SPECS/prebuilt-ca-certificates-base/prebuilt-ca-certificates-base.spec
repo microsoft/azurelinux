@@ -1,6 +1,7 @@
-# When updating, "Version" AND "Release" tags must be updated in the "ca-certificates" package as well.
 Summary:        Prebuilt version of ca-certificates-base package.
 Name:           prebuilt-ca-certificates-base
+# When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
+Epoch:          1
 Version:        2.0.0
 Release:        1%{?dist}
 License:        MIT
@@ -44,7 +45,7 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
-* Wed Dec 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-1
+* Wed Dec 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.0-1
 - Updating 'URL' and 'Version' tags for CBL-Mariner 2.0.
 
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-20
