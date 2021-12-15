@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 

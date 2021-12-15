@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 from bisect import bisect_left
 from enum import Enum
