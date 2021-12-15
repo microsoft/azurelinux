@@ -1,13 +1,13 @@
 # When updating, "Version" AND "Release" tags must be updated in the "ca-certificates" package as well.
 Summary:        Prebuilt version of ca-certificates-base package.
 Name:           prebuilt-ca-certificates-base
-Version:        20200720
-Release:        21%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
-URL:            https://hg.mozilla.org
+URL:            https://docs.microsoft.com/en-us/security/trusted-root/program-requirements
 BuildArch:      noarch
 
 BuildRequires:  ca-certificates-base = %{version}-%{release}
@@ -44,8 +44,9 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
-* Wed Dec 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-21
+* Wed Dec 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-1
 - Removing 'ca-certificates' from the prebuilt base set.
+- Updating 'URL' and 'Version' tags for CBL-Mariner 2.0.
 
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-20
 - Removing conflicts with 'ca-certificates-shared'.
