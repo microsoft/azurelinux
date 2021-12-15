@@ -21,7 +21,7 @@ Prebuilt version of the ca-certificates package with no runtime dependencies.
 
 # Remove 'ca-certificate-base', if present. We don't want them
 # to get mixed into the bundle provided by 'ca-certificates'.
-if rpm -q ca-certificates-base &>/dev/null ; then rpm -e ca-certificates-base; fi
+if rpm -q ca-certificates-base &>/dev/null ; then rpm -e --nodeps ca-certificates-base; fi
 
 %build
 
