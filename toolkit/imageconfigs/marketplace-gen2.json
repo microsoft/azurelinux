@@ -23,6 +23,12 @@
                 {
                     "ID": "rootfs",
                     "Start": 9,
+                    "End": 999,
+                    "FsType": "ext4"
+                },
+                {
+                    "ID": "data",
+                    "Start": 999,
                     "End": 0,
                     "FsType": "ext4"
                 }
@@ -42,6 +48,10 @@
                 {
                     "ID": "rootfs",
                     "MountPoint": "/"
+                },
+                {
+                    "ID": "data",
+                    "MountPoint": "/boot"
                 }
             ],
             "PackageLists": [
