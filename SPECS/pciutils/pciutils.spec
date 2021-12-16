@@ -35,9 +35,6 @@ make DESTDIR=%{buildroot} \
     install install-lib
 chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING

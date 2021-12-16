@@ -71,9 +71,6 @@ if [ "$1" = 0 ]; then
     /sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir || :
 fi
  
-%clean
-rm -rf ${RPM_BUILD_ROOT}
- 
 %files
 %defattr(-,root,root,-)
 %license COPYING

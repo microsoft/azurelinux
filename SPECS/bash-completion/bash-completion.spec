@@ -53,9 +53,6 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/nmcli
 rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 {cal,chsh,dmesg,eject,hexdump,ionice,hwclock,ionice,look,mount,renice,rtcwake,su,umount}
 
-%clean
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-
 %files
 %defattr(-,root,root)
 %license COPYING

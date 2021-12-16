@@ -65,9 +65,6 @@ find %{buildroot} -name '*.la' -delete
 %check
 make %{?_smp_mflags} check
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %post
 /sbin/ldconfig
 

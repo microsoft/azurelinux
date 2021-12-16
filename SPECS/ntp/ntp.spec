@@ -150,9 +150,6 @@ fi
 %systemd_postun_with_restart ntpd.service
 %systemd_postun ntpdate.service
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYRIGHT LICENSE.PTR

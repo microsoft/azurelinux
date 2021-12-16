@@ -41,9 +41,6 @@ make %{?_smp_mflags} check
 
 %post -p /sbin/ldconfig
 
-%clean
-[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != '/' ] && rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root)
 %license COPYING

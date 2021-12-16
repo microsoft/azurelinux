@@ -111,9 +111,6 @@ if [ $1 -eq 0 ] ; then
 fi
 %systemd_postun_with_restart atftpd.socket
 
-%clean
-[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != '/' ] && rm -rf $RPM_BUILD_ROOT
-
 %files
 %license LICENSE
 %dir %attr(0750,nobody,nobody) %{_var}/lib/tftpboot

@@ -47,9 +47,6 @@ make DISABLE_DOCUMENTATION=1 %{?_smp_mflags}
 #disabled the documentation
 make DISABLE_DOCUMENTATION=1 mandir=%{_mandir} bindir=%{_sbindir} libdir=%{_libdir} incdir=%{_includedir} install DESTDIR=%{buildroot}
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %license COPYING

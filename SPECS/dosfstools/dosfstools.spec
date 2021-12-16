@@ -19,8 +19,6 @@ make %{?_smp_mflags}
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} PREFIX="/usr" install
-%clean
-rm -rf %{buildroot}/*
 %files
 %defattr(-,root,root)
 %license COPYING

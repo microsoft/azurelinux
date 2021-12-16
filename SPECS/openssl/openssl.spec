@@ -318,10 +318,6 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %post   libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}
-
-
 %changelog
 * Thu Jul 22 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-5
 - In FIPS mode, perform Linux RNG concatenation even if adin/pers functions

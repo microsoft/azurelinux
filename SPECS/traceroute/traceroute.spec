@@ -39,9 +39,6 @@ pushd %{buildroot}%{_mandir}/man8
 ln -s traceroute.8 tcptraceroute.8
 popd
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root,-)
 %license COPYING

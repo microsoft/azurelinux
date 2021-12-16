@@ -40,9 +40,6 @@ cd cmake
 make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}/usr/cmake
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-, root, root, -)
 %license LICENSE

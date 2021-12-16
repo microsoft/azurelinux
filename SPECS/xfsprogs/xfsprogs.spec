@@ -55,9 +55,6 @@ find %{buildroot}/%{_lib64dir} -name '*.a' -delete
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
-%clean
-rm -rf %{buildroot}/*
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig

@@ -47,8 +47,6 @@ make DESTDIR="%{buildroot}" PREFIX="%{_prefix}" install
 mkdir -p %{buildroot}/%{_unitdir}
 install -m 644 -p init/%{name}.service %{buildroot}/%{_unitdir}
 
-%clean
-
 %files
 %doc AUTHORS
 %license COPYING

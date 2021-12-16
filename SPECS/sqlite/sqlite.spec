@@ -64,10 +64,6 @@ make %{?_smp_mflags} check
 %post libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %defattr(-,root,root)
 %license tea/license.terms

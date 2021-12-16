@@ -20,7 +20,6 @@ Dstat gives you detailed selective information in columns and clearly indicates 
 %{__rm} -rf %{buildroot}
 %{__make} install DESTDIR="%{buildroot}"
 
-%clean
 %{__rm} -rf %{buildroot}
 
 %files

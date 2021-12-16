@@ -127,8 +127,6 @@ rm -rf %{buildroot}/%{_libdir}/*.la
 %{_tmpfilesdir}/cryptsetup.conf
 %ghost %dir /run/cryptsetup
  
-%clean
- 
 %changelog
 * Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> - 2.3.3-2
 - Fix Source0 URL.

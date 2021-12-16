@@ -73,9 +73,6 @@ make -f Makefile.rhnlib
 %endif
 
 
-%clean
-
-
 %files
 
 %if 0%{?build_py3}

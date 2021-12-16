@@ -150,9 +150,6 @@ fi
 %postun
 %systemd_postun_with_restart syslog-ng.service
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING GPL.txt LGPL.txt

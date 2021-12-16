@@ -85,9 +85,6 @@ install -m 755 intermediate/builddir/release/bin/auomscollect   %{buildroot}/opt
 install -m 755 intermediate/builddir/release/bin/auoms          %{buildroot}/opt/microsoft/auoms/bin
 install -m 755 intermediate/builddir/release/bin/auomsctl       %{buildroot}/opt/microsoft/auoms/bin
 
-%clean
-rm -rf %{buildroot}
-
 %pre
 #!/bin/sh
 

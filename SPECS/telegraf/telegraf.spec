@@ -47,9 +47,6 @@ install -m 755 -D scripts/%{name}.service %{buildroot}%{_unitdir}/%{name}.servic
 install -m 755 -D etc/logrotate.d/%{name} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 install -m 755 -D etc/telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
 
-%clean
-rm -rf %{buildroot}/*
-
 %pre
 getent group telegraf >/dev/null || groupadd -r telegraf
 getent passwd telegraf >/dev/null || useradd -c "Telegraf" -d %{_localstatedir}/lib/%{name} -g %{name} \

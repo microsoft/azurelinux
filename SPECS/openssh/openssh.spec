@@ -204,9 +204,6 @@ if [ $1 -eq 0 ] ; then
     fi
 fi
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license LICENCE
 

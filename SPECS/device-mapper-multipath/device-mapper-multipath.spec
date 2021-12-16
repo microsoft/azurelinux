@@ -61,10 +61,6 @@ make install DESTDIR=%{buildroot} \
 
 install -vd %{buildroot}%{_sysconfdir}/multipath
 
-%clean
-rm -rf %{buildroot}
-
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 

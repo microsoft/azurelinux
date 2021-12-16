@@ -87,9 +87,6 @@ make %{?_smp_mflags} release
 export PATH=$PATH:/root/.cargo/bin/
 make %{?_smp_mflags} install DESTDIR=$RPM_BUILD_ROOT unitdir=%{_unitdir} docdir=%{_docdir}/iotedge-%{version}
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %pre
 # Check for container runtime
 if ! /usr/bin/getent group docker >/dev/null; then

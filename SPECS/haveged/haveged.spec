@@ -73,9 +73,6 @@ popd
 # We don't ship .la files.
 rm -rf %{buildroot}%{_libdir}/libhavege.*a
 
-%clean
-rm -rf %{buildroot}
-
 %post
 /sbin/ldconfig
 %systemd_post haveged.service

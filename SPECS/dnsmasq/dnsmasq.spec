@@ -54,9 +54,6 @@ EOF
 
 %post
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %license COPYING

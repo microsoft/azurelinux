@@ -97,9 +97,6 @@ sed -i "s!%{buildroot}%{_datadir}/%{name}/%{version}/help!%{_datadir}/%{name}/%{
     %{buildroot}%{_datadir}/zsh/%{version}/functions/{run-help,_run-help}
 
 
-%clean
-rm -rf %{buildroot}
-
 %post
 if [ "$1" = 1 ]; then
   if [ ! -f %{_sysconfdir}/shells ] ; then

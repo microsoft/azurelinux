@@ -99,10 +99,6 @@ make BASEDIR=%{buildroot} BINDIR=%{_bindir} SBINDIR=%{_sbindir} install
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %defattr(-,root,root)
 %license COPYING

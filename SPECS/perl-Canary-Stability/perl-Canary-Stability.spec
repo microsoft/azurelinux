@@ -33,9 +33,6 @@ make pure_install DESTDIR=%{buildroot}
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %license COPYING
 %{perl_vendorlib}/*

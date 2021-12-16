@@ -46,9 +46,6 @@ make install DESTDIR=%{buildroot}
 %check
 make %{?_smp_mflags} -k check TIMEOUT_DURATION=1200
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING

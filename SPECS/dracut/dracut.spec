@@ -111,10 +111,6 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %check
 make %{?_smp_mflags} -k clean  check
 
-%clean
-rm -rf -- %{buildroot}
-
-
 %files
 %defattr(-,root,root,0755)
 %{!?_licensedir:%global license %%doc}

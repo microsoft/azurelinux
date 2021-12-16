@@ -74,9 +74,6 @@ make DESTDIR=%{buildroot} install
 install -d -m755 %{buildroot}%{_bindir}
 install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_provision  %{buildroot}%{_bindir}/tpm_device_provision
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-, root, root, -)
 %license LICENSE

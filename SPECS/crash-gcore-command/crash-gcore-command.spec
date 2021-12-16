@@ -34,9 +34,6 @@ make -f gcore.mk ARCH=SUPPORTED TARGET=ARM64
 mkdir -p %{buildroot}%{_libdir}/crash/extensions/
 install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 
-%clean
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-
 %files
 %defattr(-,root,root)
 %license COPYING

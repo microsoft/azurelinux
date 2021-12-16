@@ -27,9 +27,6 @@ make DESTDIR=%{buildroot} install
 ln -sf fping %{buildroot}%{_sbindir}/fping6
 rm -rf %{buildroot}%{_infodir}
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-, root, root)
 %license COPYING

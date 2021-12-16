@@ -89,9 +89,6 @@ fi
 /sbin/ldconfig
 %systemd_postun_with_restart rpcbind.service rpcbind.socket
 
-%clean
-rm -rf %{buildroot}/*
-
 %changelog
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.5-3
 - Added %%license line automatically

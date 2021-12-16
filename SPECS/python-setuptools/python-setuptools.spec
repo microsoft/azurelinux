@@ -42,10 +42,6 @@ chmod +x %{buildroot}%{python2_sitelib}/setuptools/command/easy_install.py
 %check
 python2 setup.py test
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
 %defattr(-, root, root)
 %license LICENSE

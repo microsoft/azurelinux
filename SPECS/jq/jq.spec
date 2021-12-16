@@ -50,9 +50,6 @@ make check
 
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license COPYING
 %{_bindir}/*

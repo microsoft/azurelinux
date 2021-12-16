@@ -27,8 +27,6 @@ make DESTDIR=%{buildroot} \
 gzip -9 %{buildroot}%{_mandir}/man8/%{name}.8
 gzip -9 %{buildroot}%{_mandir}/man8/efibootdump.8
 
-%clean
-rm -rf %{buildroot}/*
 %files
 %defattr(-,root,root)
 %license COPYING

@@ -24,9 +24,6 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}
 make prefix=%{_prefix}	DESTDIR=%{buildroot} install
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING

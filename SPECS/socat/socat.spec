@@ -29,9 +29,6 @@ find %{buildroot} -name '*.a' -delete
 %check
 make %{?_smp_mflags} test
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING

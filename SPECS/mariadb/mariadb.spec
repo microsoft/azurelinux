@@ -140,10 +140,6 @@ fi
 %preun server
 %systemd_preun mariadb.service
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
 %defattr(-,root,root)
 %{_libdir}/libmysqlclient.so

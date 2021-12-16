@@ -53,8 +53,6 @@ cpan local::lib
 cpan HTTP::Daemon
 make  %{?_smp_mflags} check
 
-%clean
-rm -rf %{buildroot}/*
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING

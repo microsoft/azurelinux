@@ -51,9 +51,6 @@ install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/crictl.md
 %{_bindir}/*
 %{_datadir}/doc/%{name}
 
-%clean
-rm -rf %{buildroot}/*
-
 %changelog
 *   Thu Sep 16 2021 Andrew Phelps <anphel@microsoft.com> 1.22.0-1
 -   Update version to 1.22.0

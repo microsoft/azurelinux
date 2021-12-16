@@ -40,9 +40,6 @@ make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}%{_datadir}/doc/snappy/
 find %{buildroot} -name '*.la' -delete
 
-%clean
-rm -rf %{buildroot}
-
 %check
 cd testdata
 cmake ../ && make

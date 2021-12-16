@@ -33,21 +33,17 @@ f=CHANGES ; iconv -f iso-8859-1 -t utf-8 $f -o $f.utf8 ; mv $f.utf8 $f
 
 %build
 autoreconf -if
-%configure --enable-shared --disable-static \
+%configure --enable-shared \
+           --disable-static \
            --disable-dependency-tracking
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 rm -f %{buildroot}/%{_libdir}/libcares.la
 
 %check
-make %{?_smp_mflags} check
-
-%{clean}
-rm -rf %{buildroot}
-
-
+%make_build check
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig

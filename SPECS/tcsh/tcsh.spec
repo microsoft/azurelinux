@@ -82,10 +82,6 @@ chmod g+w . -R
 useradd test -G root -m
 sudo -u test make check && userdel test -r -f
 
-%clean
-rm -rf %{buildroot}
-
-
 %post
 if [ $1 -eq 1 ] ; then
   if [ ! -f %{_sysconfdir}/shells ]; then

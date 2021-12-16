@@ -128,9 +128,6 @@ mkdir -p /usr/share/cracklib
 cp $RPM_BUILD_ROOT%{_datadir}/cracklib/* /usr/share/cracklib/
 make %{?_smp_mflags} test
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %post
 /sbin/ldconfig
 [ $1 = 1 ] || exit 0

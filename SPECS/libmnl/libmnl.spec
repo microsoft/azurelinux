@@ -39,9 +39,6 @@ make %{?_smp_mflags} -k check
 %postun
 /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING

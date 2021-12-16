@@ -194,9 +194,6 @@ install -m 644 initscript/logrotate.stap-server %{buildroot}%{_sysconfdir}/logro
 %check
 make %{?_smp_mflags} check
 
-%clean
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-
 %pre
 getent group stap-server >/dev/null || groupadd -g 155 -r stap-server || groupadd -r stap-server
 

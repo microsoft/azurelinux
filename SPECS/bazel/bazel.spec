@@ -43,9 +43,6 @@ mkdir -p %{buildroot}/%{_bindir}
 cp output/bazel %{buildroot}/%{_bindir}/bazel-real
 cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root)
 %attr(0755,root,root) %{_bindir}/bazel

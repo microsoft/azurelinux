@@ -34,10 +34,6 @@ rm -Rf $RPM_BUILD_ROOT
 mkdir -p %{buildroot}%{_libdir}/crash/extensions/
 cp %{_builddir}/ptdump-%{version}/ptdump.so %{buildroot}%{_libdir}/crash/extensions/
 
-%clean
-rm -rf %{buildroot}
-rm -Rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root)
 %{_libdir}/crash/extensions/ptdump.so

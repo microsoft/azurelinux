@@ -80,9 +80,6 @@ rm -f %{buildroot}%{python3_sitelib}/six.*
 #%check
 #Commented out %check due to no test existence
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT

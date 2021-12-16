@@ -46,9 +46,6 @@ find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null \;
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %{perl_vendorlib}/*

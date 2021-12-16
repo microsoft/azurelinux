@@ -63,10 +63,6 @@ install -v -d -m755 %{buildroot}/%{_datadir}/licenses/
 install -D -m755 LICENSE %{buildroot}/%{_datadir}/licenses/LICENSE
 install -D -m755 README %{buildroot}/%{_datadir}/licenses/README
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
 %defattr(-,root,root)
 %license LICENSE

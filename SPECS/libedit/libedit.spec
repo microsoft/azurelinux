@@ -70,9 +70,6 @@ rm -rf %{buildroot}/%{_mandir}/man3/history.3*
     # First argument is 0 => Uninstall
     # First argument is 1 => Upgrade
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license COPYING
     %defattr(-,root,root,0755)

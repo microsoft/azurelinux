@@ -61,9 +61,6 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license LICENSE
 %{_bindir}/etcd*

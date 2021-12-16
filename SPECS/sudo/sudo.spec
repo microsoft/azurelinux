@@ -67,9 +67,6 @@ fi
 
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license doc/LICENSE

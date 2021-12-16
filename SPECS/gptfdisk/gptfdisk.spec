@@ -32,8 +32,6 @@ make DESTDIR=%{buildroot} install POPT=1
 %{_fixperms} %{buildroot}/*
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
-%clean
-rm -rf %{buildroot}/*
 %files
 %defattr(-,root,root)
 %license COPYING

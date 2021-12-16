@@ -23,9 +23,6 @@ make
 %install
 make install BUILD_ROOT=%{buildroot} MANDIR=%{_mandir}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license debian/copyright

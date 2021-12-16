@@ -46,9 +46,6 @@ cp %{SOURCE1} %{buildroot}/lib/systemd/system/xinetd.service
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable xinetd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-xinetd.preset
 
-%clean
-rm -rf %{buildroot}
-
 %post
 %{_sbindir}/ldconfig
 %systemd_post xinetd.service

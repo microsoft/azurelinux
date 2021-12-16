@@ -96,9 +96,6 @@ ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/%{name}
 cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(0644,root,root,0755)
 %doc LICENSE README docs/JUnitPerf.html

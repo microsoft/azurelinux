@@ -37,9 +37,6 @@ sed -i -e 's@\(.\+\)\.py$@\1.py*@' \
        "INSTALLED_FILES"
 echo "%dir %{python2_sitelib}/iotop" >> INSTALLED_FILES
 
-%clean
-rm -rf %{buildroot}/*
-
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
 %license COPYING

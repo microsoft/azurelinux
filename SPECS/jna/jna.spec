@@ -73,10 +73,6 @@ dos2unix OTHERS
 
 sed -i 's|@LIBDIR@|%{_libdir}/%{name}|' src/com/sun/jna/Native.java
 
-%clean
-rm -rf %{buildroot}
-
-
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 build-jar-repository -s -p lib ant

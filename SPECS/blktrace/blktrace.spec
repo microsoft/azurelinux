@@ -28,9 +28,6 @@ make
 %install
 make install DESTDIR=%{buildroot} prefix=%{_prefix} mandir=%{_mandir}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %doc README
 %defattr(-,root,root)

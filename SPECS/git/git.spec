@@ -120,8 +120,6 @@ if [ $1 -eq 1 ];then
     exit 0
 fi
 
-%clean
-rm -rf %{buildroot}/*
 %files
 %defattr(-,root,root)
 %license COPYING

@@ -51,9 +51,6 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %license COPYING
 %{perl_vendorlib}/Types/

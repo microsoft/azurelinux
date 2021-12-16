@@ -54,9 +54,6 @@ install -m0755 %{SOURCE1} %{buildroot}%{_libdir}/pkgconfig
     # First argument is 1 => New Installation
     # First argument is 2 => Upgrade
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license libraries/liblmdb/LICENSE
 %{_mandir}/*

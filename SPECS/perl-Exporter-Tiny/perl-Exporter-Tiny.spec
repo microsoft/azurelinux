@@ -50,9 +50,6 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %license LICENSE
 %{perl_vendorlib}/Exporter/

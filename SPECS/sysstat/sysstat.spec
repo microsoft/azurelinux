@@ -40,9 +40,6 @@ install -D -m 0644 %{_builddir}/%{name}-%{version}/cron/sysstat-collect.service 
 
 %find_lang %{name}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING

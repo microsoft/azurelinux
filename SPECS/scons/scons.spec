@@ -34,9 +34,6 @@ python setup.py install \
     --optimize=1 \
     --install-data=%{_datadir}
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %license LICENSE.txt

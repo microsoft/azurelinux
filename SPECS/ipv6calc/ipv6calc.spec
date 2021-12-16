@@ -193,9 +193,6 @@ install ipv6calcweb/ipv6calcweb.conf %{buildroot}%{_sysconfdir}/httpd/conf.d/
 install -m 755 ipv6calcweb/ipv6calcweb.cgi  %{buildroot}%{_localstatedir}/www/cgi-bin/
 install -m 644 ipv6calcweb/ipv6calcweb-databases-in-var.te  %{buildroot}%{_datadir}/%{name}/selinux/
 
-%clean
-rm -rf %{buildroot}
-
 %check
 %ifnarch ppc64
 	make test

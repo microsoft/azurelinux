@@ -38,9 +38,6 @@ make test -C build
 %install
 %make_install -C build
 
-%clean
-rm -rf %{buildroot}/*
-
 %files devel
 %defattr(-,root,root)
 %doc README.md

@@ -89,9 +89,6 @@ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{buildroot}%{_libdir}"
 cd releng
 ./run_all_auto -x ../xorriso/xorriso || (cat releng_generated_data/log.*; exit 1)
 
-%clean
-rm -rf %{buildroot}
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 

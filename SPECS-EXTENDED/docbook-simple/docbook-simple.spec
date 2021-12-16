@@ -61,10 +61,6 @@ install -p -m 644 %{SOURCE3} $SGML_CAT_DIR
 
 cp -p %{SOURCE1} ./README
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-rm -rf ../%{version}
-
 %files
 %doc sdocbook.css
 %doc README

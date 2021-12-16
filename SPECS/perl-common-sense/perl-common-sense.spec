@@ -61,9 +61,6 @@ pod2man sense.pod > %{buildroot}%{_mandir}/man3/common::sense.3pm
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %license LICENSE
 %dir %{perl_vendorarch}/common/

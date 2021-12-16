@@ -44,9 +44,6 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
     # First argument is 1 => New Installation
     # First argument is 2 => Upgrade
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license LICENSE
 %doc LICENSE CHANGES

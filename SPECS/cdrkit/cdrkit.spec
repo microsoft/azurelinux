@@ -35,9 +35,6 @@ make %{?_smp_mflags}
 env PREFIX=%{buildroot}%{_prefix} make install
 ln -s  genisoimage  %{buildroot}%{_prefix}/bin/mkisofs
 
-%clean
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-
 %files
 %license COPYING
 %{_bindir}/*

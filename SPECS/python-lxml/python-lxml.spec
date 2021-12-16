@@ -44,9 +44,6 @@ export LC_ALL=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 

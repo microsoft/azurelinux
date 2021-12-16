@@ -48,9 +48,6 @@ rm -rf %{buildroot}/etc/rc.d
 %preun
 %systemd_preun autofs.service
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING

@@ -63,9 +63,6 @@ install -p -m 644 minilzo/minilzo.h $RPM_BUILD_ROOT%{_includedir}/lzo
 %check
 make check test
 
-%clean
-rm -rf %{buildroot}
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig

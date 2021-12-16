@@ -68,10 +68,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 
 %find_lang %{name}
 
-%clean
-rm -rf %{buildroot}
-
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}

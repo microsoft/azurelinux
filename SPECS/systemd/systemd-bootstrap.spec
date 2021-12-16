@@ -139,9 +139,6 @@ systemctl preset-all
 
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE.GPL2
