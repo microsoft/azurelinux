@@ -31,7 +31,7 @@ Source0:        https://invisible-mirror.net/archives/%{name}/tarballs/%{name}%{
 Patch0:         lynx-charset.patch
 Patch1:         lynx-enable_xli.patch
 # bugs
-Patch3:         lynx-proxy-empty-string.patch
+Patch2:         lynx-proxy-empty-string.patch
 BuildRequires:  dos2unix
 BuildRequires:  gcc
 BuildRequires:  gettext
@@ -50,10 +50,7 @@ based and therefore makes it possible to use WWW resources on text
 terminals.
 
 %prep
-%setup -q -n %{name}%{tarbase}
-%patch0
-%patch1
-%patch3 -p1
+%autosetup -p1 -n %{name}%{tarbase}
 
 %build
 %configure --enable-debug --with-build-cflags="%{optflags} -DNO_BUILDSTAMP" \
@@ -101,6 +98,7 @@ chmod ogu-x scripts/conf.mingw.sh scripts/config.djgpp.sh
 
 %changelog
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.0~dev.9-4
+- Reformat patches, use autosetup
 - License verified
 - Lint spec
 

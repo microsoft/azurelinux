@@ -79,7 +79,7 @@ BuildRequires:  pam-devel
 BuildRequires:  pkgconf-pkg-config
 # Make sure we get postscriptdriver tags.
 #BuildRequires: python3-cups
-BuildRequires:  systemd
+BuildRequires:  systemd-devel
 # needed for systemd rpm macros according FPG
 BuildRequires:  systemd-rpm-macros
 # needed for decompressing functions when reading from gzipped ppds
@@ -87,7 +87,6 @@ BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(avahi-client)
 BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  pkgconfig(gnutls)
-BuildRequires:  pkgconfig(libsystemd)
 BuildRequires:  pkgconfig(libusb-1.0)
 %if %{lspp}
 BuildRequires:  audit-libs-devel
