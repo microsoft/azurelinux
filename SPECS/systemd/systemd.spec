@@ -1,7 +1,7 @@
 Summary:        Systemd-249
 Name:           systemd
 Version:        249.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -259,6 +259,9 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 249.7-3
+- Removing the explicit %%clean stage.
+
 * Wed Dec 08 2021 Henry Beberman <henry.beberman@microsoft.com> 249.7-2
 - Update systemd boot args to force cgroups V1 with systemd.unified_cgroup_hierarchy=0
 - Update 99-dhcp-en.network with SendRelease=false so DHCP leases arent released on reboot

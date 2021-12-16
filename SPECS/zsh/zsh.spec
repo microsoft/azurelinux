@@ -3,7 +3,7 @@
 Summary:        Z shell
 Name:           zsh
 Version:        5.8
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT AND GPLv2.0 AND GPLv3.0 AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -133,6 +133,9 @@ fi
 %doc Doc/*.html
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.8-5
+- Removing the explicit %%clean stage.
+
 * Tue Nov 10 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.8-4
 - Adding a patch to skip globbing test if ran as root.
 - Removing redundant 'sed' and 'chmod' commands in %%install.

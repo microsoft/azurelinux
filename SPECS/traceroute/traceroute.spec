@@ -1,7 +1,7 @@
 Name:           traceroute
 Summary:        Traces the route taken by packets over an IPv4/IPv6 network
 Version:        2.1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Group:          Applications/Internet
 Url:            http://traceroute.sourceforge.net
@@ -49,6 +49,9 @@ popd
 
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-6
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.1.0-5
 - Added %%license line automatically
 

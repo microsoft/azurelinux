@@ -1,7 +1,7 @@
 Summary:        GSL: Guidelines Support Library
 Name:           GSL
 Version:        2.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Group:          Applications/File
 URL:            https://github.com/Microsoft/GSL
@@ -47,6 +47,9 @@ rm -rf %{buildroot}/usr/cmake
 %{_includedir}/gsl/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-4
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.0-3
 - Added %%license line automatically
 

@@ -2,7 +2,7 @@
 Summary:	An exporter with the features of Sub::Exporter but only core dependencies
 Name:		perl-Exporter-Tiny
 Version:	1.002001
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:	(GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Exporter-Tiny/
@@ -58,6 +58,9 @@ make test
 %{_mandir}/man3/Exporter::Tiny::Manual*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.002001-5
+- Removing the explicit %%clean stage.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.002001-4
 - Use new perl package names.
 - Provide perl(Exporter::*).

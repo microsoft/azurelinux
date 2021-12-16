@@ -1,7 +1,7 @@
 Summary:       Jansson json parser
 Name:          jansson
 Version:       2.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 Group:         System Environment/Libraries
 Vendor:         Microsoft Corporation
 License:       MIT
@@ -55,6 +55,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11-4
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.11-3
 - Added %%license line automatically
 

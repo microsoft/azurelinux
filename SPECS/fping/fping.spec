@@ -1,7 +1,7 @@
 Summary:       Utility to send ICMP echo probes to network hosts
 Name:          fping
 Version:       4.2
-Release:       2%{?dist}
+Release:       3%{?dist}
 License:       BSD with advertising
 Group:         Productivity/Networking/Diagnostic
 Vendor:         Microsoft Corporation
@@ -36,6 +36,9 @@ rm -rf %{buildroot}%{_infodir}
 %doc %{_mandir}/man8/fping.8*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2-3
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.2-2
 - Added %%license line automatically
 

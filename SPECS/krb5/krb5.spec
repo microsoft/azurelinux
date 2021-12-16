@@ -1,7 +1,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.18
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -119,6 +119,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18-2
+- Removing the explicit %%clean stage.
+
 * Mon Aug 16 2021 Muhammad Falak <mwani@microsoft.com> - 1.18-1
 - Bump version to 1.18
 

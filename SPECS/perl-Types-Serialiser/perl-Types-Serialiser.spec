@@ -2,7 +2,7 @@
 Summary:	Simple data types for common serialization formats
 Name:		perl-Types-Serialiser
 Version:	1.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Types-Serialiser/
@@ -57,6 +57,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-7
+- Removing the explicit %%clean stage.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.0-6
 - Use new perl package names.
 - Provide perl(Types::Serialiser*).

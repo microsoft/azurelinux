@@ -1,7 +1,7 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
 Version:        1.18.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ rm -f %{buildroot}/%{_libdir}/libcares.la
 %{_mandir}/man3/ares_*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.1-2
+- Removing the explicit %%clean stage.
+
 * Sun Nov 28 2021 Muhammad Falak <mwani@microsoft.com> - 1.18.1-1
 - Bump version to fix CVE-2021-3672
 - License verified

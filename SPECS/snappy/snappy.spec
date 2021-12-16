@@ -1,7 +1,7 @@
 Summary:        Fast compression and decompression library
 Name:           snappy
 Version:        1.1.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            https://google.github.io/snappy/
 #Source0:       https://github.com/google/%{name}/archive/%{version}.tar.gz
@@ -63,6 +63,9 @@ make test
 %{_lib64dir}/libsnappy.so
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.7-6
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.7-5
 - Added %%license line automatically
 

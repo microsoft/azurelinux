@@ -3,7 +3,7 @@
 Summary:        A free, distributed source control management tool.
 Name:           mercurial
 Version:        5.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 URL:            https://www.mercurial-scm.org
 Group:          System Environment/Security
@@ -64,6 +64,9 @@ popd
 %{python2_sitelib}/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4-3
+-   Removing the explicit %%clean stage.
+
 *   Tue Jan 26 2021 Andrew Phelps <anphel@microsoft.com> 5.4-2
 -   Fix check tests
 *   Tue May 19 2020 Andrew Phelps <anphel@microsoft.com> 5.4-1

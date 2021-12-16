@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.33.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://git-scm.com/
 Group:          System Environment/Programming
@@ -156,6 +156,9 @@ fi
 %endif
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.33.0-3
+- Removing the explicit %%clean stage.
+
 * Fri Sep 03 2021 Muhammad Falak <mwani@microsoft.com> - 2.33.0-2
 - Export `daemon`, `subtree` & `svn` subpackages.
 

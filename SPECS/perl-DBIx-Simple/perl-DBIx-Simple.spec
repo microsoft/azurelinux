@@ -2,7 +2,7 @@
 Summary:        Easy-to-use OO interface to DBI
 Name:           perl-DBIx-Simple
 Version:        1.37
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Public Domain
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/J/JU/JUERD/DBIx-Simple-%{version}.tar.gz
@@ -52,6 +52,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.37-4
+-   Removing the explicit %%clean stage.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.37-3
 -   Use new perl package names.
 -   Provide perl(DBIx::*).

@@ -2,7 +2,7 @@
 Summary:        A General Purpose Malloc Implementation
 Name:           jemalloc
 Version:        5.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 # build-aux/config.guess is under GPLv3+
 # build-aux/install-sh is under MIT
 # msvc/test_threads/test_threads.cpp is under Public Domain
@@ -59,6 +59,9 @@ find %{buildroot}%{_libdir}/ -name '*.a' -exec rm -vf {} ';'
 %{_mandir}/man3/jemalloc.3*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-2
+- Removing the explicit %%clean stage.
+
 * Mon Dec 14 2020 Henry Li <lihl@microsoft.com> - 5.2.1-1
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - License verified.

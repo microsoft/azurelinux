@@ -1,7 +1,7 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Name:           scons
 Version:        3.0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An Open Source software construction tool
 Group:          Development/Tools
 License:        MIT
@@ -42,6 +42,9 @@ python setup.py install \
 %{_datadir}/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.1-5
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.0.1-4
 - Added %%license line automatically
 

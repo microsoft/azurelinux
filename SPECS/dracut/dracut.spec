@@ -5,7 +5,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        055
-Release:        1%{?dist}
+Release:        2%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -175,6 +175,9 @@ make %{?_smp_mflags} -k clean  check
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 055-2
+- Removing the explicit %%clean stage.
+
 * Wed Dec 01 2021 Henry Beberman <henry.beberman@microsoft.com> - 055-1
 - Update to version 055. Port mkinitrd forward for compatibility.
 

@@ -1,7 +1,7 @@
 Summary:        Tracks system calls that are made by a running process
 Name:           strace
 Version:        5.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPL-2.1+ and GPL-2.0+
 URL:            https://strace.io/
 Group:          Development/Debuggers
@@ -53,6 +53,9 @@ make %{?_smp_mflags} -k check TIMEOUT_DURATION=1200
 %{_mandir}/man1/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.1-4
+-   Removing the explicit %%clean stage.
+
 *   Wed Jan 06 2021 Andrew Phelps <anphel@microsoft.com> 5.1-3
 -   Patch tests with expected results. Increase test timeout.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 5.1-2

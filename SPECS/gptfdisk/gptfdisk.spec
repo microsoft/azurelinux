@@ -1,7 +1,7 @@
 Summary:	gptfdisk-1.0.4
 Name:		gptfdisk
 Version:	1.0.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	GPLv2+
 URL:		http://sourceforge.net/projects/gptfdisk/
 Group:		System Environment/Filesystem and Disk management
@@ -38,6 +38,9 @@ make DESTDIR=%{buildroot} install POPT=1
 /sbin/*
 %{_mandir}/man8/*
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-4
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.4-3
 - Added %%license line automatically
 

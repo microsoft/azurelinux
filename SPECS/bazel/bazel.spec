@@ -4,7 +4,7 @@
 Summary:        Correct, reproducible, and fast builds for everyone.
 Name:           bazel
 Version:        4.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,9 @@ cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.1-2
+- Removing the explicit %%clean stage.
+
 * Mon Nov 29 2021 Andrew Phelps <anphel@microsoft.com> - 4.2.1-1
 - Update to version 4.2.1
 

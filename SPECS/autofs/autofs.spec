@@ -2,7 +2,7 @@
 Summary:        A kernel-based automounter for Linux
 Name:           autofs
 Version:        5.1.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 URL:            http://www.kernel.org/pub/linux/daemons/autofs
 Group:          System Environment/Daemons
@@ -67,6 +67,9 @@ rm -rf %{buildroot}/etc/rc.d
 /lib/systemd/system/autofs.service
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.1.8-2
+-   Removing the explicit %%clean stage.
+
 *   Wed Nov 10 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 5.1.8-1
 -   Upgrade to version 5.1.8
 -   License verified

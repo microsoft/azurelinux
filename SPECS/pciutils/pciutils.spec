@@ -1,7 +1,7 @@
 Summary:	System utilities to list pci devices
 Name:		pciutils
 Version:	3.6.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	GPLv2
 URL:		https://www.kernel.org/pub/software/utils/pciutils/
 Group:		System Environment/System Utilities
@@ -50,6 +50,9 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 %{_includedir}/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.2-4
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.6.2-3
 - Added %%license line automatically
 

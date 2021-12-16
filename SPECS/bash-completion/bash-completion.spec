@@ -1,6 +1,6 @@
 Name:          bash-completion
 Version:       2.7
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       Programmable completion for bash
 Group:         Applications/Shells
 Vendor:        Microsoft Corporation
@@ -71,6 +71,9 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 %{_datadir}/pkgconfig/bash-completion.pc
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-5
+- Removing the explicit %%clean stage.
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 2.7-4
 - Remove epoch
 

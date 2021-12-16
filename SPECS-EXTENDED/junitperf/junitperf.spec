@@ -22,7 +22,7 @@ Distribution:   Mariner
 
 Name:           junitperf
 Version:        1.9.1
-Release:        26%{?dist}
+Release:        27%{?dist}
 Summary:        JUnit extension for performance and scalability testing
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
@@ -112,6 +112,9 @@ cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
 %{_datadir}/%{name}
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-27
+- Removing the explicit %%clean stage.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-26
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

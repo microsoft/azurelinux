@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: docbook-simple
 Version: 1.1
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary: Simplified DocBook is a small subset of the DocBook XML DTD
 License: Freely redistributable without restriction
 URL: http://www.oasis-open.org/docbook/xml/simple/
@@ -153,6 +153,9 @@ if [ "$1" = 0 ]; then
 fi
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-25
+- Removing the explicit %%clean stage.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

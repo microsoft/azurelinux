@@ -1,6 +1,6 @@
 Name:          crash-gcore-command
 Version:       1.5.1
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       gcore extension module for crash utility
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -41,6 +41,9 @@ install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 %doc COPYING
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.1-2
+-   Removing the explicit %%clean stage.
+
 *   Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> 1.5.1-1
 -   Update version to 1.5.1.
 -   Update URL.

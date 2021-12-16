@@ -1,7 +1,7 @@
 Summary:        The OpenSource IPsec-based VPN Solution
 Name:           strongswan
 Version:        5.7.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 URL:            https://www.strongswan.org/
 Group:          System Environment/Security
@@ -49,6 +49,9 @@ make check
 %{_datadir}/strongswan/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.7.2-4
+-   Removing the explicit %%clean stage.
+
 *   Mon Oct 05 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 5.7.2-3
 -   Adding a patch to extend the timeout for the ''valid/invalid data' test case.
 -   Switching to %%autosetup.

@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary: Python libraries for the Spacewalk project
 Name: rhnlib
 Version: 2.8.6
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL:     https://github.com/spacewalkproject/spacewalk
 Source0: https://github.com/spacewalkproject/spacewalk/archive/%{name}-%{version}.tar.gz
 Patch0: rhnlib-2.8.6-1-to-rhnlib-2.8.6-2-el8.patch
@@ -82,6 +82,9 @@ make -f Makefile.rhnlib
 %endif
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.6-10
+- Removing the explicit %%clean stage.
+
 * Fri Mar 05 2021 Henry Li <lihl@microsoft.com> 2.8.6-9
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - Fix distro condition checking to enable python3 build

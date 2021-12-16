@@ -1,7 +1,7 @@
 Summary:	Dos Filesystem tools
 Name:		dosfstools
 Version:	4.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:	GPLv3+
 URL:		http://github.com/dosfstools/dosfstools
 Group:		Filesystem Tools
@@ -26,6 +26,9 @@ make DESTDIR=%{buildroot} PREFIX="/usr" install
 %{_mandir}/man8/*
 %{_docdir}/dosfstools/*
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-5
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.1-4
 - Added %%license line automatically
 

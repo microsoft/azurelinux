@@ -1,7 +1,7 @@
 Summary:        RPC program number mapper
 Name:           rpcbind
 Version:        1.2.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 URL:            http://nfsv4.bullopensource.org
 Group:          Applications/Daemons
@@ -90,6 +90,9 @@ fi
 %systemd_postun_with_restart rpcbind.service rpcbind.socket
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.5-4
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.5-3
 - Added %%license line automatically
 

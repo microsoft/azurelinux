@@ -1,7 +1,7 @@
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.2.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
 URL:            https://lxml.de
@@ -53,6 +53,9 @@ make test
 %{python3_sitelib}/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.4-9
+- Removing the explicit %%clean stage.
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 4.2.4-8
 - Regenerate C sources at build-time to fix build break with Python 3.9
 

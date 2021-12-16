@@ -1,6 +1,6 @@
 Name:       btrfs-progs
 Version:    4.19
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:    Userspace programs for btrfs
 Group:      System Environment/Base
 License:    GPLv2+
@@ -72,6 +72,9 @@ make DISABLE_DOCUMENTATION=1 mandir=%{_mandir} bindir=%{_sbindir} libdir=%{_libd
 %{_libdir}/libbtrfsutil.so
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.19-4
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.19-3
 - Added %%license line automatically
 

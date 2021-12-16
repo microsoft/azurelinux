@@ -1,7 +1,7 @@
 Summary:    A minimalistic user-space library oriented to Netlink developers.
 Name:       libmnl
 Version:    1.0.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:    LGPLv2.1+
 URL:        http://netfilter.org/projects/libmnl
 Group:      System Environment/libraries
@@ -52,6 +52,9 @@ make %{?_smp_mflags} -k check
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-6
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.4-5
 - Added %%license line automatically
 

@@ -2,7 +2,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
 Version:        3.34.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -82,6 +82,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.34.1-2
+- Removing the explicit %%clean stage.
+
 * Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.34.1-1
 - Update to 3.34.1 to fix CVE-2021-20227
 - Remove Obsoletes tags

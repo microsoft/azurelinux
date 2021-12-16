@@ -5,7 +5,7 @@
 Summary:	"Common sense" Perl defaults
 Name:		perl-common-sense
 Version:	3.74
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/common-sense
@@ -69,6 +69,9 @@ make test
 %{_mandir}/man3/common::sense.3*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.74-7
+- Removing the explicit %%clean stage.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 3.74-6
 - Use new perl package names.
 - Provide perl(common::sense).
