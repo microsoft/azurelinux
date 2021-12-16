@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -177,6 +177,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-preview.repo
 
 %changelog
+* Thu Dec 16 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-3
+- Corrected Repo URLS for 2.0.
+
 * Thu Dec 09 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-2
 - Updating repo URLs for 2.0.
 - License verified.
