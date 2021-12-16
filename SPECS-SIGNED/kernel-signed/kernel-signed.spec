@@ -89,13 +89,18 @@ The kernel package contains the signed Linux kernel.
 %prep
 
 %build
-# This spec's whole purpose is to inject the signed kernel binary
-rpm2cpio %{SOURCE0} | cpio -idmv
-cp %{SOURCE1} ./boot/vmlinuz-%{uname_r}
+mkdir rpm_contents
+pushd rpm_contents
+     # This spec's whole purpose is to inject the signed kernel binary
+     rpm2cpio %{SOURCE0} | cpio -idmv
+     cp %{SOURCE1} ./boot/vmlinuz-%{uname_r}
+popd
 
 %install
-# Don't use * wildcard. It does not copy over hidden files in the root folder...
-cp -rp ./. %{buildroot}/
+pushd rpm_contents
+     # Don't use * wildcard. It does not copy over hidden files in the root folder...
+     cp -rp ./. %{buildroot}/
+popd
 
 # Recalculate sha512hmac for FIPS
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
