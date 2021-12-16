@@ -1,7 +1,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,18 +39,13 @@ operating system and in a compiler-independent manner.
 %autosetup -p1
 
 %build
-# Disable symbol generation
-export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
-export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
-
-ncores="$(%{_bindir}/getconf _NPROCESSORS_ONLN)"
 ./bootstrap \
     --prefix=%{_prefix} \
     --system-expat \
     --system-zlib \
     --system-libarchive \
     --system-bzip2 \
-    --parallel=$ncores
+    --parallel=$(nproc)
 %make_build
 
 %install
@@ -59,7 +54,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 
 %check
-%make_build test
+# Removing static libraries to fix issues with the "ParseImplicitLinkInfo" test runs for the "craype-C-Cray-8.7.input" and "craype-CXX-Cray-8.7.input" inputs.
+# Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
+rm -f %{_lib64dir}/lib{stdc++,gfortran}.a
+
+bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %files
 %defattr(-,root,root)
@@ -74,6 +73,11 @@ install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Sun Dec 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.4-2
+- Adding a workaround for two failing "ParseImplicitLinkInfo" test cases until a fix is available.
+- Adjusted test command to re-run flaky tests.
+- Bringing back generation of debug symbols.
+
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.4-1
 - Update to version 3.21.4.
 - License verified.
