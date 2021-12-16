@@ -125,7 +125,7 @@ endif
 RELEASE_VERSION    ?= $(RELEASE_MAJOR_ID)$(RELEASE_MINOR_ID)
 
 # Image tag - empty by default. Does not apply to the initrd.
-IMAGE_TAG          ?= Preview-A
+IMAGE_TAG          ?= Preview-B
 
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
