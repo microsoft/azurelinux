@@ -1,13 +1,14 @@
 Summary:        linear algebra package
 Name:           lapack
 Version:        3.8.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            http://www.netlib.org/lapack/
 License:        BSD
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.netlib.org/%{name}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-4048.patch
 %define         sha1 %{name}=55ac9d6be510883c5442c8aca967722cdf58fb29
 
 BuildRequires:  cmake
@@ -26,7 +27,7 @@ The lapack-devel package contains libraries and header files for
 developing applications that use lapack.
 
 %prep
-%setup
+%autosetup -p1
 
 %build
 mkdir -p build
@@ -68,6 +69,9 @@ mv %{buildroot}/%{_includedir}/*.h %{buildroot}/%{_includedir}/lapacke/.
 %exclude %{_libdir}/cmake/*
 
 %changelog
+* Fri Dec 17 2021 Bala <balakumaran.kannan@microsoft.com> - 3.8.0-4
+- Fix CVE-2021-4048
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.8.0-3
 - Added %%license line automatically
 
