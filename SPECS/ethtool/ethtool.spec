@@ -1,7 +1,7 @@
 Summary:	Standard Linux utility for controlling network drivers and hardware
 Name:		ethtool
 Version:    5.0
-Release:    2%{?dist}
+Release:    3%{?dist}
 License:	GPLv2
 URL:		https://www.kernel.org/pub/software/network/ethtool/
 Group:		Productivity/Networking/Diagnostic
@@ -27,9 +27,6 @@ make install DESTDIR=%{buildroot}
 %check
 make %{?_smp_mflags} check
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %doc AUTHORS COPYING NEWS README ChangeLog
 %defattr(-,root,root)
@@ -38,6 +35,9 @@ rm -rf %{buildroot}/*
 %{_mandir}
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0-3
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.0-2
 - Added %%license line automatically
 

@@ -1,7 +1,7 @@
 Summary:          Multipurpose relay (SOcket CAT)
 Name:             socat
 Version:          1.7.3.4
-Release:          2%{?dist}
+Release:          3%{?dist}
 License:          GPL2
 URL:              http://www.dest-unreach.org/socat
 Group:            Applications/Internet
@@ -29,9 +29,6 @@ find %{buildroot} -name '*.a' -delete
 %check
 make %{?_smp_mflags} test
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -39,6 +36,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.3.4-3
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.7.3.4-2
 - Added %%license line automatically
 

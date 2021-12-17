@@ -1,7 +1,7 @@
 Summary:        Networking Tools
 Name:           net-tools
 Version:        1.60
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -99,10 +99,6 @@ make BASEDIR=%{buildroot} BINDIR=%{_bindir} SBINDIR=%{_sbindir} install
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -113,6 +109,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.60-16
+- Removing the explicit %%clean stage.
+
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 1.60-15
 - Provide hostname.
 

@@ -1,7 +1,7 @@
 Summary:        Log for C++
 Name:           log4cpp
 Version:        1.1.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
@@ -38,7 +38,6 @@ CC=%{__cc} CXX=%{__cxx} ./configure --prefix=%{_prefix}
 %{__rm} -rf $RPM_BUILD_ROOT
 make DESTDIR=%{buildroot} install
 
-%clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
 %post	-p /sbin/ldconfig
@@ -60,6 +59,9 @@ make DESTDIR=%{buildroot} install
 %_prefix/share/aclocal/*.m4
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.3-7
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.3-6
 - Added %%license line automatically
 

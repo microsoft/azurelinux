@@ -2,7 +2,7 @@
 Summary:        Auditd plugin that forwards audit events to OMS Agent for Linux
 Name:           auoms
 Version:        2.2.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,9 +84,6 @@ install -m 444 installer/auoms.service                          %{buildroot}/opt
 install -m 755 intermediate/builddir/release/bin/auomscollect   %{buildroot}/opt/microsoft/auoms/bin
 install -m 755 intermediate/builddir/release/bin/auoms          %{buildroot}/opt/microsoft/auoms/bin
 install -m 755 intermediate/builddir/release/bin/auomsctl       %{buildroot}/opt/microsoft/auoms/bin
-
-%clean
-rm -rf %{buildroot}
 
 %pre
 #!/bin/sh
@@ -191,6 +188,9 @@ done
 %{_var}/opt/microsoft/auoms/data/outputs
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.5-7
+- Removing the explicit %%clean stage.
+
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 2.2.5-6
 - Fix gcc11 compilation issues
 - License verified

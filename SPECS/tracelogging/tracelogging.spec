@@ -1,7 +1,7 @@
 Summary:        tracelogging one-line structure logging API on top of LTTNG
 Name:           tracelogging
 Version:        0.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/tracelogging
 Group:          System Environment
@@ -52,9 +52,6 @@ make test -C build
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %doc README.md
@@ -69,6 +66,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/tracelogging
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2-3
+-   Removing the explicit %%clean stage.
+
 *   Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.2-2
 -   Added source URL.
 -   License verified.

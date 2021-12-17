@@ -3,7 +3,7 @@
 Summary:        A single-file header-only version of a C++20-like span for C++98, C++11 and later
 Name:           span-lite
 Version:        0.7.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Boost
 URL:            https://github.com/martinmoene/span-lite
 Group:          System Environment
@@ -38,9 +38,6 @@ make test -C build
 %install
 %make_install -C build
 
-%clean
-rm -rf %{buildroot}/*
-
 %files devel
 %defattr(-,root,root)
 %doc README.md
@@ -49,6 +46,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/span-lite
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.0-3
+- Removing the explicit %%clean stage.
+
 * Thu Oct 15 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.7.0-2
 - License verified.
 - Added source URL.

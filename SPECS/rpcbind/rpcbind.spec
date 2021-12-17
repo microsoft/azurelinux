@@ -1,12 +1,11 @@
 Summary:        RPC program number mapper
 Name:           rpcbind
 Version:        1.2.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 URL:            http://nfsv4.bullopensource.org
 Group:          Applications/Daemons
 Source0:        http://downloads.sourceforge.net/rpcbind/%{name}-%{version}.tar.bz2
-%define sha1 rpcbind=e9f8046b69b45efe2396a8cca1c1f090644c6d31
 Source1:        rpcbind.service
 Source2:        rpcbind.socket
 Source3:        rpcbind.sysconfig
@@ -89,10 +88,11 @@ fi
 /sbin/ldconfig
 %systemd_postun_with_restart rpcbind.service rpcbind.socket
 
-%clean
-rm -rf %{buildroot}/*
-
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.5-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.5-3
 - Added %%license line automatically
 

@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -318,11 +318,10 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %post   libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}
-
-
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1k-6
+- Removing the explicit %%clean stage.
+
 * Thu Jul 22 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-5
 - In FIPS mode, perform Linux RNG concatenation even if adin/pers functions
 - aren't defined in given DRBG

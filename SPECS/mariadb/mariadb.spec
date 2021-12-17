@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.3.28
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -139,10 +139,6 @@ fi
 
 %preun server
 %systemd_preun mariadb.service
-
-%clean
-rm -rf %{buildroot}
-
 
 %files
 %defattr(-,root,root)
@@ -370,6 +366,9 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.3.28-3
+- Removing the explicit %%clean stage.
+
 * Fri Nov 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.3.28-2
 - Adding a fix to work with newer version of cmake.
 

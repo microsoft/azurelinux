@@ -646,16 +646,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ca-certificates",
-          "version": "20200720",
-          "downloadUrl": "https://hg.mozilla.org/releases/mozilla-release/raw-file/712412cb974c0392afe31fd9ce974b26ae3993c3/security/nss/lib/ckfw/builtins/certdata.txt"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cairo",
           "version": "1.17.4",
           "downloadUrl": "https://cairographics.org/snapshots/cairo-1.17.4.tar.xz"
@@ -1036,6 +1026,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "crash-ptdump-command",
+          "version": "1.0.7",
+          "downloadUrl": "https://github.com/crash-utility/crash-extensions/blob/master/ptdump-1.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "createrepo_c",
           "version": "0.17.5",
           "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.17.5.tar.gz"
@@ -1310,6 +1310,16 @@
           "name": "docbook-dtd-xml",
           "version": "4.5",
           "downloadUrl": "https://docbook.org/xml/4.5/docbook-xml-4.5.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "docbook-simple",
+          "version": "1.1",
+          "downloadUrl": "http://www.docbook.org/xml/simple/1.1/docbook-simple-1.1.zip"
         }
       }
     },
@@ -2783,6 +2793,16 @@
           "name": "jsonbuilder",
           "version": "0.2.1",
           "downloadUrl": "https://github.com/microsoft/jsonbuilder/archive/v0.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "junitperf",
+          "version": "1.9.1",
+          "downloadUrl": "https://github.com/clarkware/junitperf/archive/refs/tags/1.9.1.zip"
         }
       }
     },
@@ -4473,6 +4493,16 @@
           "name": "log4cpp",
           "version": "1.1.3",
           "downloadUrl": "https://sourceforge.net/projects/log4cpp/files/log4cpp-1.1.x%20%28new%29/log4cpp-1.1/log4cpp-1.1.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "log4j",
+          "version": "2.15.0",
+          "downloadUrl": "https://www.apache.org/dist/logging/log4j/2.15.0/apache-log4j-2.15.0-src.tar.gz"
         }
       }
     },
@@ -6433,6 +6463,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cliff",
+          "version": "2.16.0",
+          "downloadUrl": "https://pypi.io/packages/source/c/cliff/cliff-2.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-conda-package-handling",
           "version": "1.7.2",
           "downloadUrl": "https://github.com/conda/conda-package-handling/archive/1.7.2/conda-package-handling-1.7.2.tar.gz"
@@ -6773,6 +6813,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-keystoneauth1",
+          "version": "3.17.1",
+          "downloadUrl": "https://tarballs.openstack.org/keystoneauth/keystoneauth1-3.17.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-keystoneclient",
+          "version": "3.21.0",
+          "downloadUrl": "https://tarballs.openstack.org/python-keystoneclient/python-keystoneclient-3.21.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-kubernetes",
           "version": "11.0.0",
           "downloadUrl": "https://github.com/kubernetes-client/python/archive/v11.0.0.tar.gz"
@@ -6903,6 +6963,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-novaclient",
+          "version": "15.1.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/python-novaclient/python-novaclient-15.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-ntplib",
           "version": "0.3.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/29/8b/85a86e01c510665b0790d3a9fd4532ad98aba9e185a676113a0ae3879350/ntplib-0.3.3.tar.gz"
@@ -6916,6 +6986,36 @@
           "name": "python-oauthlib",
           "version": "2.1.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-2.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-oslo-config",
+          "version": "6.11.1",
+          "downloadUrl": "https://tarballs.openstack.org/oslo.config/oslo.config-6.11.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-oslo-serialization",
+          "version": "2.29.2",
+          "downloadUrl": "https://tarballs.openstack.org/oslo.serialization/oslo.serialization-2.29.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-oslo-utils",
+          "version": "3.41.1",
+          "downloadUrl": "https://tarballs.openstack.org/oslo.utils/oslo.utils-3.41.1.tar.gz"
         }
       }
     },
@@ -7707,6 +7807,16 @@
           "name": "rgb",
           "version": "1.0.6",
           "downloadUrl": "https://www.x.org/pub/individual/app/rgb-1.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rhnlib",
+          "version": "2.8.6",
+          "downloadUrl": "https://github.com/spacewalkproject/spacewalk/archive/refs/tags/rhnlib-2.8.6-1.tar.gz"
         }
       }
     },
@@ -8726,6 +8836,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sgabios",
+          "version": "0.20180715git",
+          "downloadUrl": "https://gitlab.com/qemu-project/sgabios/-/archive/72f39d48bedf044e202fd51fecf3e2218fc2ae66/sgabios-72f39d48bedf044e202fd51fecf3e2218fc2ae66.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sgml-common",
           "version": "0.6.3",
           "downloadUrl": "https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/sgml-common-0.6.3.tgz"
@@ -8829,6 +8949,16 @@
           "name": "span-lite",
           "version": "0.7.0",
           "downloadUrl": "https://github.com/martinmoene/span-lite/archive/v0.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "spausedd",
+          "version": "20201112",
+          "downloadUrl": "https://github.com/jfriesse/spausedd/releases/download/20201112/spausedd-20201112.tar.gz"
         }
       }
     },

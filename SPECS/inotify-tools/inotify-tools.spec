@@ -1,7 +1,7 @@
 Summary:        Command line utility for i-node notifications and management.
 Name:           inotify-tools
 Version:        3.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 URL:            https://github.com/inotify-tools/inotify-tools/wiki
 Source0:        https://github.com/downloads/rvoicilas/%{name}/%{name}-%{version}.tar.gz
 License:        GPLv2
@@ -41,9 +41,6 @@ make %{?_smp_mflags} check
 
 %post -p /sbin/ldconfig
 
-%clean
-[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != '/' ] && rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -60,6 +57,10 @@ make %{?_smp_mflags} check
 /%{_libdir}/libinotifytools.la
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.14-3
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.14-2
 - Added %%license line automatically
 

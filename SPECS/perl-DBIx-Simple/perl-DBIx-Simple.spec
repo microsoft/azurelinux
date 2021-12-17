@@ -2,11 +2,11 @@
 Summary:        Easy-to-use OO interface to DBI
 Name:           perl-DBIx-Simple
 Version:        1.37
-Release:        3%{?dist}
-License:        Public Domain
+Release:        4%{?dist}
+# License not mentioned in any of the source files and CPAN web page explicitly says it's unknown.
+License:        Unknown
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/J/JU/JUERD/DBIx-Simple-%{version}.tar.gz
-%define sha1 DBIx-Simple=7ca4c4ed5c1b6a8f32734e7d5692750b4e01aa17
 URL:            http://search.cpan.org/dist/DBIx-Simple/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,15 +46,16 @@ find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null \;
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.37-4
+-   Removing the explicit %%clean stage.
+-   License verified.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.37-3
 -   Use new perl package names.
 -   Provide perl(DBIx::*).

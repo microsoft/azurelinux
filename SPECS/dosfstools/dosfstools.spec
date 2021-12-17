@@ -1,33 +1,40 @@
 Summary:	Dos Filesystem tools
 Name:		dosfstools
 Version:	4.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:	GPLv3+
 URL:		http://github.com/dosfstools/dosfstools
 Group:		Filesystem Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	http://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
-%define sha1 dosfstools=db39f667c3cb51bdf321f07f9cf17c726ca50323
+
 %description
 dosfstools contains utilities for making and checking MS-DOS FAT filesystems.
+
 %prep
 %setup -q
+
 %build
 ./configure --prefix=%{_prefix} --enable-compat-symlinks
 make %{?_smp_mflags}
+
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} PREFIX="/usr" install
-%clean
-rm -rf %{buildroot}/*
+
 %files
 %defattr(-,root,root)
 %license COPYING
 %{_sbindir}/*
 %{_mandir}/man8/*
 %{_docdir}/dosfstools/*
+
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-5
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.1-4
 - Added %%license line automatically
 

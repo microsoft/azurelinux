@@ -42,14 +42,15 @@ touch -r %{SOURCE23} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2}
 Summary:        Certificate Authority certificates
 Name:           ca-certificates
 
-# When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
-Version:        20200720
-Release:        20%{?dist}
+# When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
+Epoch:          1
+Version:        2.0.0
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
-URL:            https://hg.mozilla.org
+URL:            https://docs.microsoft.com/en-us/security/trusted-root/program-requirements
 Source2:        update-ca-trust
 Source3:        trust-fixes
 Source4:        certdata2pem.py
@@ -317,6 +318,10 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Wed Dec 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.0-1
+- Making 'Release' match with 'prebuilt-ca-certificates-base'.
+- Updating 'URL' and 'Version' tags for CBL-Mariner 2.0.
+
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-20
 - Making 'Release' match with 'prebuilt-ca-certificates*'.
 

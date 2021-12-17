@@ -23,7 +23,7 @@ The OpenStack Oslo Utility library. \
 
 Name:           python-oslo-utils
 Version:        3.41.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        OpenStack Oslo Utility library
 
 License:        ASL 2.0
@@ -61,7 +61,7 @@ BuildRequires:  python%{pyver}-netaddr
 # Required to compile translation files
 BuildRequires:  python%{pyver}-babel
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 BuildRequires:  python-netifaces
 BuildRequires:  pytz
 BuildRequires:  python%{pyver}-monotonic
@@ -78,7 +78,7 @@ Requires:       python%{pyver}-debtcollector >= 1.2.0
 Requires:       python%{pyver}-pyparsing
 Requires:       python%{pyver}-netaddr >= 0.7.18
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:       pytz
 Requires:       python-netifaces >= 0.10.4
 Requires:       python%{pyver}-monotonic
@@ -180,6 +180,9 @@ stestr-%{pyver} run --black-regex oslo_utils.tests.test_reflection.CallbackEqual
 %license LICENSE
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.41.1-5
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.41.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

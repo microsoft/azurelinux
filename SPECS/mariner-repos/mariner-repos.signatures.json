@@ -2,8 +2,8 @@
  "Signatures": {
   "MICROSOFT-METADATA-GPG-KEY": "1824ecffeda90cfe4178a99bddde450f09fd40e8faf4f0124fba16ea79998c4c",
   "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
-  "mariner-debuginfo-preview.repo": "d7459bbc24f2c8d431d26b9eded48fdc88d5ca055082ac956dae601fc0068cea",
-  "mariner-debuginfo.repo": "dd411da6a92cec9f380375c8bf4ad480d19148090901af72f620aa9d21db1e3a",
+  "mariner-debuginfo-preview.repo": "29cb315de45902ba2455fe3ad61be04f21979db924dba8231c534346b4647739",
+  "mariner-debuginfo.repo": "30fa6120d3b0a11926f46151b0c0747dd05c63d82887383bd0dfece8e2cb41b8",
   "mariner-extended-preview.repo": "b7d5d89bb5ce1b1deade6c34aae8c9c9e62890eb235ac4a8557e5444a57b5ec9",
   "mariner-extended.repo": "fda0174a7e397ad730f73c27732b71ae1c5e8e44b7e15e5493545bf501a4e3c4",
   "mariner-extras-preview.repo": "81f54331c41562b551fc7979e24bba3a0fc3267101f0d8c2400afefe984df5c8",
@@ -11,6 +11,6 @@
   "mariner-microsoft-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
   "mariner-microsoft.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
   "mariner-official-base.repo": "8c9f409574e378a90196b2e626c6974565980abde294e27f4a64cddf0b41ecac",
-  "mariner-official-preview.repo": "a13a35cd29232dcb067e5a8824ca18a8307141426c28169524dd596264bdf50d"
+  "mariner-official-preview.repo": "db4d5a7df5a0e6876b60d06d06715b27ae87e3433ec51c98be16eefbe9375aaf"
  }
 }

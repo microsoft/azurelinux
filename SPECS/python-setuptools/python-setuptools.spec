@@ -2,7 +2,7 @@
 Summary:        Download, build, install, upgrade, and uninstall Python packages
 Name:           python-setuptools
 Version:        40.2.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,10 +42,6 @@ chmod +x %{buildroot}%{python2_sitelib}/setuptools/command/easy_install.py
 %check
 python2 setup.py test
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
 %defattr(-, root, root)
 %license LICENSE
@@ -53,6 +49,9 @@ rm -rf %{buildroot}
 %{python2_sitelib}/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 40.2.0-8
+- Removing the explicit %%clean stage.
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 40.2.0-7
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 40.2.0-6: Adding explicit runtime dependency on 'python-xml'.
