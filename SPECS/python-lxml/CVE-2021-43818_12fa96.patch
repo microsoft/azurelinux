@@ -1,0 +1,56 @@
+From 12fa9669007180a7bb87d990c375cf91ca5b664a Mon Sep 17 00:00:00 2001
+From: Stefan Behnel <stefan_ml@behnel.de>
+Date: Thu, 11 Nov 2021 12:20:57 +0100
+Subject: [PATCH] Cleaner: Prevent "@import" from re-occurring in the CSS after
+ replacements, e.g. "@@importimport".
+
+Reported as GHSL-2021-1037
+---
+ src/lxml/html/clean.py            |  2 ++
+ src/lxml/html/tests/test_clean.py | 20 ++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
+
+diff --git a/src/lxml/html/clean.py b/src/lxml/html/clean.py
+index 0494357e5..25844e873 100644
+--- a/src/lxml/html/clean.py
++++ b/src/lxml/html/clean.py
+@@ -541,6 +541,8 @@ def _has_sneaky_javascript(self, style):
+             return True
+         if 'expression(' in style:
+             return True
++        if '@import' in style:
++            return True
+         if '</noscript' in style:
+             # e.g. '<noscript><style><a title="</noscript><img src=x onerror=alert(1)>">'
+             return True
+diff --git a/src/lxml/html/tests/test_clean.py b/src/lxml/html/tests/test_clean.py
+index 45c2e83ab..d395d5141 100644
+--- a/src/lxml/html/tests/test_clean.py
++++ b/src/lxml/html/tests/test_clean.py
+@@ -123,6 +123,26 @@ def test_sneaky_js_in_math_style(self):
+             b'<math><style>/* deleted */</style></math>',
+             lxml.html.tostring(clean_html(s)))
+ 
++    def test_sneaky_import_in_style(self):
++        # Prevent "@@importimport" -> "@import" replacement.
++        style_codes = [
++            "@@importimport(extstyle.css)",
++            "@ @  import import(extstyle.css)",
++            "@ @ importimport(extstyle.css)",
++            "@@  import import(extstyle.css)",
++            "@ @import import(extstyle.css)",
++            "@@importimport()",
++        ]
++        for style_code in style_codes:
++            html = '<style>%s</style>' % style_code
++            s = lxml.html.fragment_fromstring(html)
++
++            cleaned = lxml.html.tostring(clean_html(s))
++            self.assertEqual(
++                b'<style>/* deleted */</style>',
++                cleaned,
++                "%s  ->  %s" % (style_code, cleaned))
++
+     def test_formaction_attribute_in_button_input(self):
+         # The formaction attribute overrides the form's action and should be
+         # treated as a malicious link attribute

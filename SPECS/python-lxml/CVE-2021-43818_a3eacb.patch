@@ -1,0 +1,78 @@
+From a3eacbc0dcf1de1c822ec29fb7d090a4b1712a9c Mon Sep 17 00:00:00 2001
+From: Stefan Behnel <stefan_ml@behnel.de>
+Date: Sun, 12 Dec 2021 15:10:58 +0100
+Subject: [PATCH] Prepare release of 4.6.5.
+
+---
+ CHANGES.txt          |  2 +-
+ doc/main.txt         | 10 +++++++---
+ src/lxml/__init__.py |  2 +-
+ 3 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/CHANGES.txt b/CHANGES.txt
+index 8314e6e91..2a0e1e22e 100644
+--- a/CHANGES.txt
++++ b/CHANGES.txt
+@@ -2,7 +2,7 @@
+ lxml changelog
+ ==============
+ 
+-4.6.5 (2021-12-??)
++4.6.5 (2021-12-12)
+ ==================
+ 
+ Bugs fixed
+diff --git a/doc/main.txt b/doc/main.txt
+index 75fedd5ec..55e32d545 100644
+--- a/doc/main.txt
++++ b/doc/main.txt
+@@ -159,8 +159,8 @@ Index <http://pypi.python.org/pypi/lxml/>`_ (PyPI).  It has the source
+ that compiles on various platforms.  The source distribution is signed
+ with `this key <pubkey.asc>`_.
+ 
+-The latest version is `lxml 4.6.4`_, released 2021-11-01
+-(`changes for 4.6.4`_).  `Older versions <#old-versions>`_
++The latest version is `lxml 4.6.5`_, released 2021-12-12
++(`changes for 4.6.5`_).  `Older versions <#old-versions>`_
+ are listed below.
+ 
+ Please take a look at the
+@@ -256,7 +256,9 @@ See the websites of lxml
+ ..
+    and the `latest in-development version <http://lxml.de/dev/>`_.
+ 
+-.. _`PDF documentation`: lxmldoc-4.6.4.pdf
++.. _`PDF documentation`: lxmldoc-4.6.5.pdf
++
++* `lxml 4.6.5`_, released 2021-12-12 (`changes for 4.6.5`_)
+ 
+ * `lxml 4.6.4`_, released 2021-11-01 (`changes for 4.6.4`_)
+ 
+@@ -284,6 +286,7 @@ See the websites of lxml
+ 
+ * `older releases <http://lxml.de/4.3/#old-versions>`_
+ 
++.. _`lxml 4.6.5`: /files/lxml-4.6.5.tgz
+ .. _`lxml 4.6.4`: /files/lxml-4.6.4.tgz
+ .. _`lxml 4.6.3`: /files/lxml-4.6.3.tgz
+ .. _`lxml 4.6.2`: /files/lxml-4.6.2.tgz
+@@ -297,6 +300,7 @@ See the websites of lxml
+ .. _`lxml 4.4.1`: /files/lxml-4.4.1.tgz
+ .. _`lxml 4.4.0`: /files/lxml-4.4.0.tgz
+ 
++.. _`changes for 4.6.5`: /changes-4.6.5.html
+ .. _`changes for 4.6.4`: /changes-4.6.4.html
+ .. _`changes for 4.6.3`: /changes-4.6.3.html
+ .. _`changes for 4.6.2`: /changes-4.6.2.html
+diff --git a/src/lxml/__init__.py b/src/lxml/__init__.py
+index 6670d16bb..eb968d5cc 100644
+--- a/src/lxml/__init__.py
++++ b/src/lxml/__init__.py
+@@ -1,6 +1,6 @@
+ # this is a package
+ 
+-__version__ = "4.6.4"
++__version__ = "4.6.5"
+ 
+ 
+ def get_include():

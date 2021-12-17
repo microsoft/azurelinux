@@ -2,7 +2,7 @@
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.6.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
@@ -11,6 +11,9 @@ Distribution:   Mariner
 URL:            https://lxml.de
 # Source0:      https://files.pythonhosted.org/packages/e5/21/a2e4517e3d216f0051687eea3d3317557bde68736f038a3b105ac3809247/lxml-%{version}.tar.gz
 Source0:        lxml-%{version}.tar.gz
+Patch0: CVE-2021-43818_12fa96.patch
+Patch1: CVE-2021-43818_a3eacb.patch
+Patch2: CVE-2021-43818_f23302.patch
 
 BuildRequires:  libxslt
 BuildRequires:  libxslt-devel
@@ -32,7 +35,7 @@ Requires:       python3-libs
 Python 3 version.
 
 %prep
-%setup -q -n lxml-%{version}
+%autosetup -n lxml-%{version}
 
 %build
 python3 setup.py build
@@ -58,6 +61,9 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Fri Dec 17 2021 Mariner Autopatcher <cblmargh@microsoft.com> 4.6.3-2
+-   Added patch file(s) CVE-2021-43818_12fa96.patch,
+-   CVE-2021-43818_a3eacb.patch, CVE-2021-43818_f23302.patch
 *   Thu Aug 05 2021 Andrew Phelps <anphel@microsoft.com> 4.6.3-1
 -   Update to 4.6.3 to fix CVEs
 -   Remove lxml-make-check-fix.patch which is no longer applicable
