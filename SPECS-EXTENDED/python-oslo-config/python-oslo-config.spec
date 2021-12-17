@@ -17,7 +17,7 @@ Distribution:   Mariner
 
 Name:       python-oslo-config
 Version:    6.11.1
-Release:    5%{?dist}
+Release:    6%{?dist}
 Summary:    OpenStack common configuration library
 
 Group:      Development/Languages
@@ -163,6 +163,9 @@ PYTHON=%{pyver_bin} stestr-%{pyver} run
 %endif
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.11.1-6
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 6.11.1-5
 - Remove epoch
 

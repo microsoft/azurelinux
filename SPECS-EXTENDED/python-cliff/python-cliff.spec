@@ -24,7 +24,7 @@ http://readthedocs.org/docs/cliff/en/latest/
 
 Name:             python-%{modname}
 Version:          2.16.0
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          Command Line Interface Formulation Framework
 
 Group:            Development/Libraries
@@ -135,6 +135,9 @@ PYTHON=python%{pyver} %{pyver_bin} setup.py test
 %{pyver_sitelib}/%{modname}/tests
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.16.0-5
+- License verified.
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 2.16.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove Fedora version check for python version

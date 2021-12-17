@@ -19,7 +19,7 @@ the OpenStack Nova API.
 
 Name:             python-novaclient
 Version:          15.1.0
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          Python API and CLI for OpenStack Nova
 License:          ASL 2.0
 URL:              https://launchpad.net/%{name}
@@ -129,6 +129,9 @@ rm -fr doc/build/html/.doctrees doc/build/html/.buildinfo doc/build/html/.htacce
 %endif
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 15.1.0-5
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 15.1.0-4
 - Remove epoch
 

@@ -19,7 +19,7 @@ storable formats.
 
 Name:           python-%{pkg_name}
 Version:        2.29.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        OpenStack oslo.serialization library
 
 License:        ASL 2.0
@@ -135,6 +135,9 @@ PYTHON=python%{pyver} stestr-%{pyver} --test-path $OS_TEST_PATH run
 %{pyver_sitelib}/oslo_serialization/tests
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.29.2-5
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.29.2-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

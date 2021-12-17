@@ -23,7 +23,7 @@ Name:           python-%{pypi_name}
 Version:        3.17.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Authentication Library for OpenStack Clients
 License:        ASL 2.0
 URL:            https://pypi.io/pypi/%{pypi_name}
@@ -140,6 +140,9 @@ PYTHON=python%{pyver} stestr-%{pyver} run
 %endif
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.17.1-4
+- License verified.
+
 * Thu Jun 09 2021 Jon Slobodzian <joslobo@microsoft.com> 3.17.1-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Fixed pyver_sitelib macro evaluation and minor formatting changes 

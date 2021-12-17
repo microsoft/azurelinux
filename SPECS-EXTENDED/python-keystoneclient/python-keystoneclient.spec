@@ -18,7 +18,7 @@ Identity API.
 
 Name:       python-keystoneclient
 Version:    3.21.0
-Release:    5%{?dist}
+Release:    6%{?dist}
 Summary:    Client library for OpenStack Identity API
 License:    ASL 2.0
 URL:        https://launchpad.net/python-keystoneclient
@@ -169,6 +169,9 @@ PYTHON=python%{pyver} stestr-%{pyver} --test-path=./keystoneclient/tests/unit ru
 %{pyver_sitelib}/%{sname}/tests
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.0-6
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.21.0-5
 - Remove epoch
 
