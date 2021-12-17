@@ -53,9 +53,6 @@ cpan local::lib
 cpan HTTP::Daemon
 make  %{?_smp_mflags} check
 
-%clean
-echo "Whatever"
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
