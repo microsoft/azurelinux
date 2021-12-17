@@ -21,22 +21,20 @@ jobs:
         run: |
           git fetch origin ${{ github.base_ref }}
           echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV 
-          echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
 
       - name: Get base commit for Pushes
         if: ${{ github.event_name == 'push' }}
         run: |
           git fetch origin ${{ github.event.before }}
           echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV 
-          echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
 
       - name: Check the modified spec files
         run: |
-          echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
           changed_specs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
 
           for spec in $changed_specs
           do
+            echo "Checking '%$spec'."
             if grep -q "^\s*%clean" "$spec"
             then
               1>&2 echo "ERROR: spec '$spec' contains a %clean stage, which should be unnecessary for CBL-Mariner. Please remove it or add an exception for this spec file."
