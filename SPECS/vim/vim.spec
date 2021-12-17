@@ -10,7 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-4019.patch
-Patch1: CVE-2021-4069.patch
+Patch1:         CVE-2021-4069.patch
 BuildRequires:  ncurses-devel
 
 %description
@@ -192,8 +192,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
-*   Wed Dec 08 2021 Mariner Autopatcher <cblmargh@microsoft.com> 8.2.3668-3
--   Added patch file(s) CVE-2021-4069.patch
+* Wed Dec 08 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 8.2.3668-3
+- Added patch file(s) CVE-2021-4069.patch
+
 * Sat Dec 04 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 8.2.3668-2
 - Added patch file(s) CVE-2021-4019.patch
 
