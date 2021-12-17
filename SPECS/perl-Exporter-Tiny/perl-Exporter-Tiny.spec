@@ -7,7 +7,6 @@ License:	(GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Exporter-Tiny/
 Source0:	https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-%{version}.tar.gz
-%define sha1 Exporter-Tiny=9ecca5df5613f948a0d50335ba9fd7854238464b
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch

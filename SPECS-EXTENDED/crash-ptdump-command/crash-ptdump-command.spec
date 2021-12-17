@@ -36,8 +36,8 @@ cp %{_builddir}/ptdump-%{version}/ptdump.so %{buildroot}%{_libdir}/crash/extensi
 
 %files
 %defattr(-,root,root)
+%license COPYING
 %{_libdir}/crash/extensions/ptdump.so
-%doc COPYING
 
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.7-3

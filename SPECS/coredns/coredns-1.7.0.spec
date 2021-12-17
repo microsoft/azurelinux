@@ -4,7 +4,7 @@ Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.7.0
 Release:        4%{?dist}
-License:        Apache License 2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries

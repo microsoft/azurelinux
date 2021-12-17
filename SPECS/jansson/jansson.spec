@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 License:       MIT
 URL:           http://www.digip.org/jansson
 Source0:       http://www.digip.org/jansson/releases/%{name}-%{version}.tar.gz
-%define sha1 %{name}-%{version}=0c99636416499960214ce6c095d26af541d3c244
 Distribution:   Mariner
 
 %description

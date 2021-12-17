@@ -2,7 +2,7 @@ Summary:       Utility to send ICMP echo probes to network hosts
 Name:          fping
 Version:       4.2
 Release:       3%{?dist}
-License:       BSD with advertising
+License:       BSD
 Group:         Productivity/Networking/Diagnostic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

@@ -6,7 +6,6 @@ Group:          System Environment/Libraries
 License:        GPLv2+
 URL:            http://www.oberhumer.com/opensource/lzo/
 Source0:        http://www.oberhumer.com/opensource/lzo/download/%{name}-%{version}.tar.gz
-%define sha1 lzo=4924676a9bae5db58ef129dc1cebce3baa3c4b5d
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  zlib-devel

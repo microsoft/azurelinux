@@ -2,7 +2,7 @@ Summary:        Tracks system calls that are made by a running process
 Name:           strace
 Version:        5.1
 Release:        4%{?dist}
-License:        LGPL-2.1+ and GPL-2.0+
+License:        GPLv2+ and LGPLv2+
 URL:            https://strace.io/
 Group:          Development/Debuggers
 Vendor:         Microsoft Corporation

@@ -6,7 +6,6 @@ License:        BSD
 URL:            http://nfsv4.bullopensource.org
 Group:          Applications/Daemons
 Source0:        http://downloads.sourceforge.net/rpcbind/%{name}-%{version}.tar.bz2
-%define sha1 rpcbind=e9f8046b69b45efe2396a8cca1c1f090644c6d31
 Source1:        rpcbind.service
 Source2:        rpcbind.socket
 Source3:        rpcbind.sysconfig

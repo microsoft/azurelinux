@@ -2,14 +2,14 @@ Summary:    A minimalistic user-space library oriented to Netlink developers.
 Name:       libmnl
 Version:    1.0.4
 Release:        6%{?dist}
-License:    LGPLv2.1+
+License:    LGPLv2+
 URL:        http://netfilter.org/projects/libmnl
 Group:      System Environment/libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:     http://netfilter.org/projects/libmnl/files/%{name}-%{version}.tar.bz2
-%define sha1 libmnl=2db40dea612e88c62fd321906be40ab5f8f1685a
 Obsoletes:  libmnl-static
+
 %description
 libmnl is a minimalistic user-space library oriented to Netlink developers. There are a lot of common tasks in parsing, validating, constructing of both the Netlink header and TLVs that are repetitive and easy to get wrong. This library aims to provide simple helpers that allows you to re-use code and to avoid re-inventing the wheel.
 

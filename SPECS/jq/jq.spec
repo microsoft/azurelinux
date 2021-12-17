@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 License:       MIT
 URL:           https://github.com/stedolan/jq
 Source0:       https://github.com/stedolan/jq/releases/download/jq-1.5/jq-1.5.tar.gz
-%define sha1 jq=6eef3705ac0a322e8aa0521c57ce339671838277
 #https://github.com/stedolan/jq/commit/8eb1367ca44e772963e704a700ef72ae2e12babd
 Patch0:        CVE-2015-8863.patch
 #https://github.com/wmark/jq/commit/e6f32d647b180006a90e080ab61ce6f09c3134d7

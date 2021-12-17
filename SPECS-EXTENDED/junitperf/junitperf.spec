@@ -24,7 +24,7 @@ Name:           junitperf
 Version:        1.9.1
 Release:        27%{?dist}
 Summary:        JUnit extension for performance and scalability testing
-License:        BSD-3-Clause
+License:        BSD
 Group:          Development/Libraries/Java
 Url:            https://github.com/clarkware/junitperf
 # Source0:      https://github.com/clarkware/junitperf/archive/refs/tags/1.9.1.zip

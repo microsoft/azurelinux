@@ -8,7 +8,7 @@ Group:		System Environment/System Utilities
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	https://www.kernel.org/pub/software/utils/pciutils/%{name}-%{version}.tar.gz
-%define sha1 pciutils=8c6da8d8b1bff1b4c847a2ea380cfff9ccfe2566
+
 %description
 The pciutils package contains a set of programs for listing PCI devices, inspecting their status and setting their configuration registers.
 

@@ -77,7 +77,8 @@ make -f Makefile.rhnlib
 
 %if 0%{?build_py3}
 %files -n python3-rhnlib
-%doc ChangeLog COPYING README TODO
+%license COPYING
+%doc ChangeLog README TODO
 %{python3_sitelib}/*
 %endif
 

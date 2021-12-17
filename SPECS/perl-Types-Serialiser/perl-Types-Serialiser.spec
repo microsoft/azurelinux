@@ -7,7 +7,6 @@ License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Types-Serialiser/
 Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-%{version}.tar.gz
-%define sha1 Types-Serialiser=72ba9d1d97bb582360c79bcbdb158e73573adb70
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:	noarch

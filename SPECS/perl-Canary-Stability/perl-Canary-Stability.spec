@@ -6,7 +6,6 @@ License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Canary-Stability/
 Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-%{version}.tar.gz
-%define sha1 Canary-Stability=9d3c5476081da9200ef59cacafea55bd011b6d8a
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch

@@ -5,7 +5,7 @@ Summary:        Simple and easy way to configure a layer 3 network fabric design
 Name:           flannel
 Version:        0.14.0
 Release:        2%{?dist}
-License:        Apache License 2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries

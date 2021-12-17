@@ -10,6 +10,7 @@ Source0: http://www.docbook.org/xml/simple/1.1/%{name}-%{version}.zip
 Source1: %{name}.README.redhat
 Source2: %{name}.xml
 Source3: %{name}.cat
+Source4: LICENSE.PTR
 BuildArch: noarch
 BuildRequires: unzip
 Requires: sgml-common
@@ -61,7 +62,10 @@ install -p -m 644 %{SOURCE3} $SGML_CAT_DIR
 
 cp -p %{SOURCE1} ./README
 
+cp %{SOURCE4} .
+
 %files
+%license LICENSE.PTR
 %doc sdocbook.css
 %doc README
 %dir %{_datadir}/xml/docbook/simple/
