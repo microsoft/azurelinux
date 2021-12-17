@@ -2812,7 +2812,7 @@
         "other": {
           "name": "junitperf",
           "version": "1.9.1",
-          "downloadUrl": "https://github.com/clarkware/junitperf/archive/refs/tags/junitperf-1.9.1.zip"
+          "downloadUrl": "https://github.com/clarkware/junitperf/archive/refs/tags/1.9.1.zip"
         }
       }
     },
@@ -7826,7 +7826,7 @@
         "other": {
           "name": "rhnlib",
           "version": "2.8.6",
-          "downloadUrl": "https://github.com/spacewalkproject/spacewalk/archive/rhnlib-2.8.6.tar.gz"
+          "downloadUrl": "https://github.com/spacewalkproject/spacewalk/archive/refs/tags/rhnlib-2.8.6-1.tar.gz"
         }
       }
     },

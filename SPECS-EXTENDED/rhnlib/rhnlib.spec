@@ -7,7 +7,7 @@ Name: rhnlib
 Version: 2.8.6
 Release: 10%{?dist}
 URL:     https://github.com/spacewalkproject/spacewalk
-Source0: https://github.com/spacewalkproject/spacewalk/archive/%{name}-%{version}.tar.gz
+Source0: https://github.com/spacewalkproject/spacewalk/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 Patch0: rhnlib-2.8.6-1-to-rhnlib-2.8.6-2-el8.patch
 Patch1: rhnlib-2.8.6-2-el8-to-rhnlib-2.8.6-3-el8.patch
 Patch2: rhnlib-2.8.6-3-el8-to-rhnlib-2.8.6-4-el8.patch

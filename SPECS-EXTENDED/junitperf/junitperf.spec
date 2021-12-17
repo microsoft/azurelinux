@@ -27,8 +27,7 @@ Summary:        JUnit extension for performance and scalability testing
 License:        BSD
 Group:          Development/Libraries/Java
 Url:            https://github.com/clarkware/junitperf
-# Source0:      https://github.com/clarkware/junitperf/archive/refs/tags/1.9.1.zip
-Source0:        https://github.com/clarkware/junitperf/archive/refs/tags/junitperf-1.9.1.zip
+Source0:        https://github.com/clarkware/junitperf/archive/refs/tags/1.9.1.zip#/%{name}-%{version}.zip
 Patch0:         junitperf-1.9.1-javadoc.patch
 Requires:       junit >= 3.2
 BuildRequires:  ant
