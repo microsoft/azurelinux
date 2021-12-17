@@ -1,7 +1,7 @@
 Summary:        Library to enable creation and expansion of ISO-9660 filesystems
 Name:           libisoburn
 Version:        1.4.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -89,9 +89,6 @@ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{buildroot}%{_libdir}"
 cd releng
 ./run_all_auto -x ../xorriso/xorriso || (cat releng_generated_data/log.*; exit 1)
 
-%clean
-rm -rf %{buildroot}
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -119,6 +116,10 @@ rm -rf %{buildroot}
 %{_infodir}/xorrisofs.info*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.8-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Mon Jan 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.8-3
 - Add BRs for check section
 

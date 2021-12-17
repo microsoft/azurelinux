@@ -1,7 +1,7 @@
 Summary:        Versatile resource statistics tool
 Name:           dstat
 Version:        0.7.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://github.com/dstat-real/dstat
 #Source0:       %{url}/archive/v%{version}.tar.gz
@@ -20,7 +20,6 @@ Dstat gives you detailed selective information in columns and clearly indicates 
 %{__rm} -rf %{buildroot}
 %{__make} install DESTDIR="%{buildroot}"
 
-%clean
 %{__rm} -rf %{buildroot}
 
 %files
@@ -31,6 +30,9 @@ Dstat gives you detailed selective information in columns and clearly indicates 
 %{_datadir}/dstat/
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.4-3
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.7.4-2
 - Added %%license line automatically
 

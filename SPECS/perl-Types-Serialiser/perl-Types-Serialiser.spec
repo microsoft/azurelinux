@@ -2,12 +2,11 @@
 Summary:	Simple data types for common serialization formats
 Name:		perl-Types-Serialiser
 Version:	1.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Types-Serialiser/
 Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-%{version}.tar.gz
-%define sha1 Types-Serialiser=72ba9d1d97bb582360c79bcbdb158e73573adb70
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:	noarch
@@ -51,15 +50,16 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %license COPYING
 %{perl_vendorlib}/Types/
 %{_mandir}/man3/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-7
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.0-6
 - Use new perl package names.
 - Provide perl(Types::Serialiser*).

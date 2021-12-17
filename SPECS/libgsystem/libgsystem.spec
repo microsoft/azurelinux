@@ -1,7 +1,7 @@
 Summary:        GIO-based library with Unix/Linux specific API
 Name:           libgsystem
 Version:        2015.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Group:          Development/Libraries
 Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{version}.tar.xz/e388e3ad3c2b527479cc8512f6ad9a37/%{name}-%{version}.tar.xz
 License:        LGPLv2+
@@ -65,9 +65,6 @@ find %{buildroot} -name '*.la' -delete
 %check
 make %{?_smp_mflags} check
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %post
 /sbin/ldconfig
 
@@ -87,6 +84,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/gir-*/*.gir
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2015.2-7
+- Removing the explicit %%clean stage.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2015.2-6
 - Remove unused gobject-introspection-python requirement
 - Explicity specify python3-gobject-introspection requirement

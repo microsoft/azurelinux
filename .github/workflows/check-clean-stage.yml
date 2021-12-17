@@ -1,0 +1,50 @@
+name: Spec %clean stage check
+
+on:
+  push:
+    branches: [main, dev, 1.0*, 2-0*]
+  pull_request:
+    branches: [main, dev, 1.0*, 2-0*]
+
+jobs:
+  spec-clean-stage-check:
+    name: Spec %clean stage check
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v2
+
+      - name: Get base commit for PRs
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV 
+
+      - name: Get base commit for Pushes
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          git fetch origin ${{ github.event.before }}
+          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV 
+
+      - name: Check the modified spec files
+        run: |
+          changed_specs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
+
+          for spec in $changed_specs
+          do
+            echo "Checking '$spec'."
+            if grep -q "^\s*%clean" "$spec"
+            then
+              1>&2 echo "**** ERROR ****"
+              1>&2 echo "Spec '$spec' contains a %clean stage, which should be unnecessary for CBL-Mariner. Please remove it or add an exception for this spec file."
+              1>&2 echo "**** ERROR ****"
+              error_found=1
+            fi
+          done
+
+          if [[ -n $error_found ]]
+          then
+            exit 1
+          fi

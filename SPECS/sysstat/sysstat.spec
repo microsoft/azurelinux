@@ -1,7 +1,7 @@
 Summary:        The Sysstat package contains utilities to monitor system performance and usage activity
 Name:           sysstat
 Version:        12.3.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 URL:            http://sebastien.godard.pagesperso-orange.fr/
 Group:          Development/Debuggers
@@ -40,9 +40,6 @@ install -D -m 0644 %{_builddir}/%{name}-%{version}/cron/sysstat-collect.service 
 
 %find_lang %{name}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
@@ -57,7 +54,10 @@ rm -rf %{buildroot}/*
 
 
 %changelog
-* Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.3.3-2
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.3.3-4
+- Removing the explicit %%clean stage.
+
+* Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.3.3-3
 - Updating dependencies from "cronie" to "cronie-anacron" after splitting of "cronie".
 
 * Mon Nov 16 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.3.3-2

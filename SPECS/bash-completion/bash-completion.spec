@@ -1,6 +1,6 @@
 Name:          bash-completion
 Version:       2.7
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       Programmable completion for bash
 Group:         Applications/Shells
 Vendor:        Microsoft Corporation
@@ -53,9 +53,6 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/nmcli
 rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 {cal,chsh,dmesg,eject,hexdump,ionice,hwclock,ionice,look,mount,renice,rtcwake,su,umount}
 
-%clean
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -74,6 +71,9 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 %{_datadir}/pkgconfig/bash-completion.pc
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-5
+- Removing the explicit %%clean stage.
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 2.7-4
 - Remove epoch
 

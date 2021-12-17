@@ -7,7 +7,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -204,9 +204,6 @@ if [ $1 -eq 0 ] ; then
     fi
 fi
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license LICENCE
 
@@ -259,6 +256,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.8p1-3
+- Removing the explicit %%clean stage.
+
 * Tue Oct 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.8p1-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

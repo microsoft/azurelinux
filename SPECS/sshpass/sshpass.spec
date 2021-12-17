@@ -1,11 +1,10 @@
 Summary:	Noninteractive ssh password provider
 Name:		sshpass
 Version:	1.06
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	GPLv2+
 URL:		http://sourceforge.net/projects/sshpass/
 Source0:	http://downloads.sourceforge.net/project/sshpass/%{name}/%{version}/%{name}-%{version}.tar.gz
-%define sha1 sshpass=633652e2160819ac7c7e1a351327027d2faa4fd6
 Group:		Applications/Networking
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,9 +23,6 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}
 make prefix=%{_prefix}	DESTDIR=%{buildroot} install
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -35,6 +31,10 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.06-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.06-3
 - Added %%license line automatically
 

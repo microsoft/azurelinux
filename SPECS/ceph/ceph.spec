@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -972,9 +972,6 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/ceph/bootstrap-rbd-mirror
 # prometheus alerts
 install -m 644 -D monitoring/prometheus/alerts/ceph_default_alerts.yml %{buildroot}/etc/prometheus/ceph/ceph_default_alerts.yml
 
-%clean
-rm -rf %{buildroot}
-
 #################################################################################
 # files and systemd scriptlets
 #################################################################################
@@ -1804,6 +1801,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.0-6
+- Removing the explicit %%clean stage.
+
 * Tue Sep 21 2021 Henry Li <lihl@microsoft.com> - 16.2.0-5
 - Use util-linux-devel as BR instead of util-linux-libs
 

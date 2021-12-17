@@ -1,12 +1,11 @@
 Summary:        Canary to check perl compatibility for Schmorp's modules
 Name:           perl-Canary-Stability
 Version:        2012
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Canary-Stability/
 Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-%{version}.tar.gz
-%define sha1 Canary-Stability=9d3c5476081da9200ef59cacafea55bd011b6d8a
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
@@ -33,15 +32,16 @@ make pure_install DESTDIR=%{buildroot}
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %license COPYING
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2012-6
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2012-5
 - Use new perl package names.
 - Provide perl(Canary::Stability).

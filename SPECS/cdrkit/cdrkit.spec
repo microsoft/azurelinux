@@ -1,7 +1,7 @@
 Summary:        Utilities for writing cds.
 Name:           cdrkit
 Version:        1.1.11
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -35,9 +35,6 @@ make %{?_smp_mflags}
 env PREFIX=%{buildroot}%{_prefix} make install
 ln -s  genisoimage  %{buildroot}%{_prefix}/bin/mkisofs
 
-%clean
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-
 %files
 %license COPYING
 %{_bindir}/*
@@ -45,6 +42,9 @@ ln -s  genisoimage  %{buildroot}%{_prefix}/bin/mkisofs
 %{_datadir}/man/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.11-10
+-   Removing the explicit %%clean stage.
+
 *   Mon May 17 2021 Muhammad Falak <mwani@microsoft.com> - 1.1.11-9
 -   Add an explicit provides for `genisoimage`
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.1.11-8

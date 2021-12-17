@@ -1,7 +1,7 @@
 Summary:       Linux Virtual Server administration
 Name:          ipvsadm
 Version:       1.29
-Release:       5%{?dist}
+Release:       6%{?dist}
 License:       GPLv2
 URL:           http://www.kernel.org/
 Group:         System Environment/tools
@@ -23,9 +23,6 @@ make
 %install
 make install BUILD_ROOT=%{buildroot} MANDIR=%{_mandir}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license debian/copyright
@@ -34,6 +31,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.29-6
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.29-5
 - Added %%license line automatically
 
