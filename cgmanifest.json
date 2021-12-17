@@ -886,26 +886,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "conda",
-          "version": "4.10.1",
-          "downloadUrl": "https://github.com/conda/conda/archive/4.10.1/conda-4.10.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "conmon",
-          "version": "2.0.29",
-          "downloadUrl": "https://github.com/containers/conmon/archive/v2.0.29.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "collectd",
           "version": "5.12.0",
           "downloadUrl": "https://github.com/collectd/collectd/releases/download/collectd-5.12.0/collectd-5.12.0.tar.bz2"
@@ -939,6 +919,16 @@
           "name": "conda",
           "version": "4.10.1",
           "downloadUrl": "https://github.com/conda/conda/archive/4.10.1/conda-4.10.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "conmon",
+          "version": "2.0.29",
+          "downloadUrl": "https://github.com/containers/conmon/archive/v2.0.29.tar.gz"
         }
       }
     },
@@ -1427,9 +1417,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dwz",
-          "version": "0.13",
-          "downloadUrl": "https://sourceware.org/ftp/dwz/releases/dwz-0.13.tar.xz"
+          "name": "dwarves",
+          "version": "1.21",
+          "downloadUrl": "https://fedorapeople.org/~acme/dwarves/dwarves-1.21.tar.xz"
         }
       }
     },
@@ -1437,9 +1427,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dwarves",
-          "version": "1.21",
-          "downloadUrl": "https://fedorapeople.org/~acme/dwarves/dwarves-1.21.tar.xz"
+          "name": "dwz",
+          "version": "0.13",
+          "downloadUrl": "https://sourceware.org/ftp/dwz/releases/dwz-0.13.tar.xz"
         }
       }
     },
@@ -1849,9 +1839,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fuse3",
-          "version": "3.10.5",
-          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.10.5.tar.gz"
+          "name": "fuse-zip",
+          "version": "0.7.2",
+          "downloadUrl": "https://bitbucket.org/agalanin/fuse-zip/downloads/fuse-zip-0.7.2.tar.gz"
         }
       }
     },
@@ -1859,9 +1849,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fuse-zip",
-          "version": "0.7.2",
-          "downloadUrl": "https://bitbucket.org/agalanin/fuse-zip/downloads/fuse-zip-0.7.2.tar.gz"
+          "name": "fuse3",
+          "version": "3.10.5",
+          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.10.5.tar.gz"
         }
       }
     },
@@ -3110,6 +3100,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libcacard",
+          "version": "2.7.0",
+          "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libcap",
           "version": "2.26",
           "downloadUrl": "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.26.tar.xz"
@@ -3123,16 +3123,6 @@
           "name": "libcap-ng",
           "version": "0.7.9",
           "downloadUrl": "http://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.7.9.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libcacard",
-          "version": "2.7.0",
-          "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz"
         }
       }
     },
@@ -4490,6 +4480,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "log4j",
+          "version": "2.15.0",
+          "downloadUrl": "https://www.apache.org/dist/logging/log4j/2.15.0/apache-log4j-2.15.0-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "logrotate",
           "version": "3.18.1",
           "downloadUrl": "https://github.com/logrotate/logrotate/releases/download/3.18.1/logrotate-3.18.1.tar.gz"
@@ -5743,9 +5743,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "perl-File-HomeDir",
-          "version": "1.004",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-HomeDir-1.004.tar.gz"
+          "name": "perl-Fedora-VSP",
+          "version": "0.001",
+          "downloadUrl": "https://ppisar.fedorapeople.org/Fedora-VSP/Fedora-VSP-0.001.tar.gz"
         }
       }
     },
@@ -5753,9 +5753,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "perl-Fedora-VSP",
-          "version": "0.001",
-          "downloadUrl": "https://ppisar.fedorapeople.org/Fedora-VSP/Fedora-VSP-0.001.tar.gz"
+          "name": "perl-File-HomeDir",
+          "version": "1.004",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-HomeDir-1.004.tar.gz"
         }
       }
     },
@@ -6443,6 +6443,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cliff",
+          "version": "2.16.0",
+          "downloadUrl": "https://pypi.io/packages/source/c/cliff/cliff-2.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-conda-package-handling",
           "version": "1.7.2",
           "downloadUrl": "https://github.com/conda/conda-package-handling/archive/1.7.2/conda-package-handling-1.7.2.tar.gz"
@@ -6783,6 +6793,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-keystoneauth1",
+          "version": "3.17.1",
+          "downloadUrl": "https://tarballs.openstack.org/keystoneauth/keystoneauth1-3.17.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-keystoneclient",
+          "version": "3.21.0",
+          "downloadUrl": "https://tarballs.openstack.org/python-keystoneclient/python-keystoneclient-3.21.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-kubernetes",
           "version": "11.0.0",
           "downloadUrl": "https://github.com/kubernetes-client/python/archive/v11.0.0.tar.gz"
@@ -6913,6 +6943,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-novaclient",
+          "version": "15.1.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/python-novaclient/python-novaclient-15.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-ntplib",
           "version": "0.3.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/29/8b/85a86e01c510665b0790d3a9fd4532ad98aba9e185a676113a0ae3879350/ntplib-0.3.3.tar.gz"
@@ -6926,6 +6966,36 @@
           "name": "python-oauthlib",
           "version": "2.1.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-2.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-oslo-config",
+          "version": "6.11.1",
+          "downloadUrl": "https://tarballs.openstack.org/oslo.config/oslo.config-6.11.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-oslo-serialization",
+          "version": "2.29.2",
+          "downloadUrl": "https://tarballs.openstack.org/oslo.serialization/oslo.serialization-2.29.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-oslo-utils",
+          "version": "3.41.1",
+          "downloadUrl": "https://tarballs.openstack.org/oslo.utils/oslo.utils-3.41.1.tar.gz"
         }
       }
     },
@@ -7353,16 +7423,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-sphinx_rtd_theme",
-          "version": "0.4.3",
-          "downloadUrl": "https://github.com/rtfd/sphinx_rtd_theme/archive/0.4.3/sphinx_rtd_theme-0.4.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-sphinx-theme-alabaster",
           "version": "0.7.11",
           "downloadUrl": "https://files.pythonhosted.org/packages/3f/46/9346ea429931d80244ab7f11c4fce83671df0b7ae5a60247a2b588592c46/alabaster-0.7.11.tar.gz"
@@ -7376,6 +7436,16 @@
           "name": "python-sphinx-theme-py3doc-enhanced",
           "version": "2.3.2",
           "downloadUrl": "https://pypi.io/packages/source/s/sphinx_py3doc_enhanced_theme/sphinx-py3doc-enhanced-theme-2.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinx_rtd_theme",
+          "version": "0.4.3",
+          "downloadUrl": "https://github.com/rtfd/sphinx_rtd_theme/archive/0.4.3/sphinx_rtd_theme-0.4.3.tar.gz"
         }
       }
     },
@@ -9146,16 +9216,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ttembed",
-          "version": "1.1",
-          "downloadUrl": "https://github.com/hisdeedsaredust/ttembed/archive/v1.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tpm2-abrmd",
           "version": "2.3.3",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.3.3/tpm2-abrmd-2.3.3.tar.gz"
@@ -9219,6 +9279,16 @@
           "name": "trousers",
           "version": "0.3.14",
           "downloadUrl": "https://sourceforge.net/projects/trousers/files/trousers/0.3.14/trousers-0.3.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ttembed",
+          "version": "1.1",
+          "downloadUrl": "https://github.com/hisdeedsaredust/ttembed/archive/v1.1.tar.gz"
         }
       }
     },

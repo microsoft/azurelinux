@@ -62,7 +62,7 @@ findutils-lang-4.8.0-1.cm2.x86_64.rpm
 gettext-0.21-2.cm2.x86_64.rpm
 gzip-1.11-1.cm2.x86_64.rpm
 make-4.3-1.cm2.x86_64.rpm
-mariner-release-2.0-2.cm2.noarch.rpm
+mariner-release-2.0-3.cm2.noarch.rpm
 patch-2.7.6-7.cm2.x86_64.rpm
 util-linux-2.37.2-1.cm2.x86_64.rpm
 util-linux-devel-2.37.2-1.cm2.x86_64.rpm
@@ -217,7 +217,7 @@ npth-1.6-4.cm2.x86_64.rpm
 pinentry-1.2.0-1.cm2.x86_64.rpm
 gnupg2-2.3.3-1.cm2.x86_64.rpm
 gpgme-1.16.0-1.cm2.x86_64.rpm
-mariner-repos-preview-2.0-2.cm2.noarch.rpm
+mariner-repos-preview-2.0-3.cm2.noarch.rpm
 libffi-3.4.2-1.cm2.x86_64.rpm
 libffi-devel-3.4.2-1.cm2.x86_64.rpm
 libtasn1-4.14-3.cm2.x86_64.rpm
