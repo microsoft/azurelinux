@@ -32,17 +32,17 @@ def binary_search(arr, searched, comparator, lower_bound = 0, upper_bound = -1):
     if upper_bound == -1:
         upper_bound = len(arr) - 1
 
-    while lower_bound <= upper_bound: 
+    while lower_bound <= upper_bound:
         current = (upper_bound + lower_bound) // 2
         comparison_result = comparator(arr[current], searched)
- 
+
         if comparison_result < 0:
-            lower_bound = current + 1 
+            lower_bound = current + 1
         elif comparison_result > 0:
-            upper_bound = current - 1 
+            upper_bound = current - 1
         else:
             return current
- 
+
     return -1
 
 # Custom implementation with our own comparator because "bisect_left" doesn't support
@@ -69,7 +69,7 @@ def component(name, version, url):
     return {
         "component": {
             "type": "other",
-            "other": {                
+            "other": {
                 "name": f"{name}",
                 "version": f"{version}",
                 "downloadUrl": f"{url}"
@@ -98,7 +98,7 @@ def components_compare_name(item1, item2):
         return -1
     elif name1 > name2:
         return 1
-    
+
     return 0
 
 
@@ -178,7 +178,7 @@ WARNING: failed to retrieve the URL of the source tarball - first 'Source' tag (
 'Source' not a valid URL: {spec_path}
 """)
         return
-    
+
     processed_component = component(name, version, source_url)
 
     insertion_index = -1
@@ -214,7 +214,7 @@ if __name__ == '__main__':
 
     cgmanifest["Registrations"].sort(key=COMPONENT_KEY_NAME_AND_VERSION)
     for spec in args.specs:
-        process_spec(spec.name, cgmanifest["Registrations"], args.update_mode)    
+        process_spec(spec.name, cgmanifest["Registrations"], args.update_mode)
     cgmanifest["Registrations"].sort(key=COMPONENT_KEY_NAME_AND_VERSION)
 
     with (open(args.cgmanifest_file.name, "w")) as cgmanifest_file:

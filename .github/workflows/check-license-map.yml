@@ -25,7 +25,7 @@ jobs:
 
       - name: Run license map checking script
         run: |
-          ./toolkit/scripts/licenses/license_map.py \
+          python3 ./toolkit/scripts/licenses/license_map.py \
           ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
           ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
           ./SPECS \
