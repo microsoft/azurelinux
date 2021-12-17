@@ -646,16 +646,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ca-certificates",
-          "version": "20200720",
-          "downloadUrl": "https://hg.mozilla.org/releases/mozilla-release/raw-file/712412cb974c0392afe31fd9ce974b26ae3993c3/security/nss/lib/ckfw/builtins/certdata.txt"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cairo",
           "version": "1.17.4",
           "downloadUrl": "https://cairographics.org/snapshots/cairo-1.17.4.tar.xz"

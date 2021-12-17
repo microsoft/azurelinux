@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 from typing import FrozenSet, List, Set
 from pyrpm.spec import Spec
 
@@ -56,11 +60,11 @@ def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet]) ->
 
 
 def check_version_release_match_groups(base_path: str) -> Set[FrozenSet]:
-    return check_spec_tags(base_path, ['version', 'release'], version_release_matching_groups)
+    return check_spec_tags(base_path, ['epoch', 'version', 'release'], version_release_matching_groups)
 
 
 def check_version_match_groups(base_path: str) -> Set[FrozenSet]:
-    return check_spec_tags(base_path, ['version'], version_matching_groups)
+    return check_spec_tags(base_path, ['epoch', 'version'], version_matching_groups)
 
 
 def check_matches(base_path: str):
@@ -75,13 +79,13 @@ def check_matches(base_path: str):
 
         if len(version_match_errors):
             print(
-                '\nPlease update the following sets of specs to have the same Version tags:')
+                '\nPlease update the following sets of specs to have the same "Epoch" and "Version" tags:')
             for e in version_match_errors:
                 printer.pprint(e)
 
         if len(version_release_match_errors):
             print(
-                '\nPlease update the following sets of specs to have the same Version and Release tags:')
+                '\nPlease update the following sets of specs to have the same "Epoch", "Version", and "Release" tags:')
             for e in version_release_match_errors:
                 printer.pprint(e)
         sys.exit(1)

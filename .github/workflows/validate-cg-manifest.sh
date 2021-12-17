@@ -14,6 +14,7 @@
 # Ignore some specs, mostly those with Source0 files that are not from an external source, or have very odd URLs
 ignore_list=" \
   byacc \
+  ca-certificates \
   Cython \
   grub2-efi-binary-signed-aarch64 \
   grub2-efi-binary-signed-x86_64 \
@@ -45,8 +46,8 @@ ignore_list=" \
   verity-read-only-root \
   xorg-x11-apps \
   xorg-x11-font-utils \
-  xorg-x11-xkb-utils \
-  xorg-x11-server-utils"
+  xorg-x11-server-utils \
+  xorg-x11-xkb-utils"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/

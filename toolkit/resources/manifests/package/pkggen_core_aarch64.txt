@@ -223,10 +223,10 @@ libffi-devel-3.4.2-1.cm2.aarch64.rpm
 libtasn1-4.14-3.cm2.aarch64.rpm
 p11-kit-0.23.22-3.cm2.aarch64.rpm
 p11-kit-trust-0.23.22-3.cm2.aarch64.rpm
-ca-certificates-shared-20200720-20.cm2.noarch.rpm
-ca-certificates-tools-20200720-20.cm2.noarch.rpm
-ca-certificates-base-20200720-20.cm2.noarch.rpm
-ca-certificates-20200720-20.cm2.noarch.rpm
+ca-certificates-shared-2.0.0-1.cm2.noarch.rpm
+ca-certificates-tools-2.0.0-1.cm2.noarch.rpm
+ca-certificates-base-2.0.0-1.cm2.noarch.rpm
+ca-certificates-2.0.0-1.cm2.noarch.rpm
 dwz-0.13-4.cm2.aarch64.rpm
 unzip-6.0-19.cm2.aarch64.rpm
 python3-3.9.9-1.cm2.aarch64.rpm
