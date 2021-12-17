@@ -54,6 +54,7 @@ make %{?_smp_mflags} -k check
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-6
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.4-5
 - Added %%license line automatically

@@ -114,6 +114,7 @@ cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-27
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-26
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).

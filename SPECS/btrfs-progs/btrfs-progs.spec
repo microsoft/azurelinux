@@ -74,6 +74,7 @@ make DISABLE_DOCUMENTATION=1 mandir=%{_mandir} bindir=%{_sbindir} libdir=%{_libd
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.19-4
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.19-3
 - Added %%license line automatically

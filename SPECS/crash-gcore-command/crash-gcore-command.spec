@@ -43,6 +43,7 @@ install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 %changelog
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.1-2
 -   Removing the explicit %%clean stage.
+-   License verified.
 
 *   Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> 1.5.1-1
 -   Update version to 1.5.1.

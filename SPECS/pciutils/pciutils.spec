@@ -52,6 +52,7 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.2-4
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.6.2-3
 - Added %%license line automatically

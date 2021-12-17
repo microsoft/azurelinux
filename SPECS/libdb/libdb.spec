@@ -96,6 +96,7 @@ install -D -m755 README %{buildroot}/%{_datadir}/licenses/README
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.3.28-6
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.28-5
 - Create utils subpackage.

@@ -49,6 +49,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-2
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Thu Sep 16 2021 Andrew Phelps <anphel@microsoft.com> 0.14.0-1
 - Update to version 0.14.0

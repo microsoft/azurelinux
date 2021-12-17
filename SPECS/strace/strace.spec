@@ -55,6 +55,7 @@ make %{?_smp_mflags} -k check TIMEOUT_DURATION=1200
 %changelog
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.1-4
 -   Removing the explicit %%clean stage.
+-   License verified.
 
 *   Wed Jan 06 2021 Andrew Phelps <anphel@microsoft.com> 5.1-3
 -   Patch tests with expected results. Increase test timeout.

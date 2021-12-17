@@ -60,6 +60,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-4
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.7.0-3
 - Increment release to force republishing using golang 1.15.13.

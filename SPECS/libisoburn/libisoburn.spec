@@ -118,6 +118,7 @@ cd releng
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.8-4
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Mon Jan 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.8-3
 - Add BRs for check section

@@ -155,6 +155,7 @@ fi
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-25
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

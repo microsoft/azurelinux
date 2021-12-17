@@ -84,6 +84,7 @@ make %{?_smp_mflags} check
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.34.1-2
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.34.1-1
 - Update to 3.34.1 to fix CVE-2021-20227

@@ -59,6 +59,7 @@ make test
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-7
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.0-6
 - Use new perl package names.

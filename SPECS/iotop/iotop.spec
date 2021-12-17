@@ -46,6 +46,7 @@ echo "%dir %{python2_sitelib}/iotop" >> INSTALLED_FILES
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6-8
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.6-7
 - Added %%license line automatically

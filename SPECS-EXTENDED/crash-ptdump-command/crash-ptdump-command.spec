@@ -42,6 +42,7 @@ cp %{_builddir}/ptdump-%{version}/ptdump.so %{buildroot}%{_libdir}/crash/extensi
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.7-3
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Sun Jul 25 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0.7-2
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).

@@ -158,6 +158,7 @@ fi
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.33.0-3
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Fri Sep 03 2021 Muhammad Falak <mwani@microsoft.com> - 2.33.0-2
 - Export `daemon`, `subtree` & `svn` subpackages.

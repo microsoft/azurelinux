@@ -92,6 +92,7 @@ fi
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.5-4
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.5-3
 - Added %%license line automatically

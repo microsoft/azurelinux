@@ -81,6 +81,7 @@ rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.8-3
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.4.8-2
 - Initial CBL-Mariner import from Fedora 27 (license: MIT).

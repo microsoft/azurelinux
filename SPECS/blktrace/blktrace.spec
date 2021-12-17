@@ -38,6 +38,7 @@ make install DESTDIR=%{buildroot} prefix=%{_prefix} mandir=%{_mandir}
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-7
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Mon Jan 11 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.2.0-6
 - Provide iowatcher.

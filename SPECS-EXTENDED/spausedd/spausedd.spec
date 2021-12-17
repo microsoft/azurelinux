@@ -66,6 +66,7 @@ install -m 644 -p init/%{name}.service %{buildroot}/%{_unitdir}
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201112-3
 - Removing the explicit %%clean stage.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201112-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
