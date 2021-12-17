@@ -10,7 +10,10 @@ from pyrpm.spec import Spec, replace_macros
 
 import argparse
 import json
+import re
 import rpm
+import shlex
+import subprocess
 import validators
 
 class ElementSelection(Enum):
@@ -115,6 +118,33 @@ def components_compare_name_and_version(item1, item2):
 
 COMPONENT_KEY_NAME_AND_VERSION = cmp_to_key(components_compare_name_and_version)
 
+# Can't rely on the 'pyrpm.spec' module - it's not as good with parsing the spec as 'rpmspec' and tends to leave unexpanded macros.
+RPMSPEC_COMMAND_COMMON="rpmspec --parse -D 'forgemeta %{nil}' -D 'py3_dist X' -D 'with_check 0' -D 'dist .cm2' -D '__python3 python3' -D '_sourcedir SPECS-EXTENDED/python-oslo-config' -D 'fillup_prereq fillup'"
+SOURCE0_LINE_REGEX = re.compile(r"^\s*Source0*:")
+SOURCE_VALUE_REGEX = re.compile(r"(?<=[\s:])[^\s#]+", )
+def read_spec_tag(spec_path, tag):
+    return str(subprocess.check_output(shlex.split(f"{RPMSPEC_COMMAND_COMMON} --srpm --qf '%{{{tag}}}' -q {spec_path}"), stderr=subprocess.DEVNULL),
+                       encoding="utf-8",
+                       errors="strict")
+
+
+def read_spec_name(spec_path):
+    return read_spec_tag(spec_path, "NAME")
+
+
+def read_spec_source0(spec_path):
+    process = subprocess.Popen(shlex.split(f"{RPMSPEC_COMMAND_COMMON}  --parse {spec_path}"), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    lines = [ str(x, encoding="utf-8", errors="strict").strip() for x in process.stdout ]
+
+    source0_line = list(filter(SOURCE0_LINE_REGEX.match, lines))
+    if len(source0_line) == 0:
+        return None
+    return SOURCE_VALUE_REGEX.search(source0_line[0]).group()
+
+
+def read_spec_version(spec_path):
+    return read_spec_tag(spec_path, "VERSION")
+
 
 def update_component(component, name, url, version):
     component["component"]["other"]["name"] = name
@@ -123,18 +153,30 @@ def update_component(component, name, url, version):
 
 
 def process_spec(spec_path, components, update_mode):
-    print(f"Processing {spec_path}.")
+    print(f"Processing: {spec_path}")
 
-    spec = Spec.from_file(spec_path)
+    name = read_spec_name(spec_path)
+    version = read_spec_version(spec_path)
+    source_url = read_spec_source0(spec_path)
 
-    name = spec.name
-    version = spec.version    
-    source_url = ""
-    if len(spec.sources) > 0:
-        source_url = replace_macros(spec.sources[0], spec)
-    
+    if source_url is None:
+        print(f"""
+WARNING: failed to retrieve the URL of the source tarball - spec contains no 'Source' tags.
+         If that's correct, you must ignore the spec inside the '.github/workflows/validate-cg-manifest.sh' script.
+         If this is incorrect and the spec should build with a source tarball, please update the spec accordingly.
+
+No 'Source' tag: {spec_path}
+""")
+        return
+
     if not validators.url(source_url):
-        print(f"WARNING: first 'Source' tag ({source_url}) is not a valid URL, skipping.")
+        print(f"""
+WARNING: failed to retrieve the URL of the source tarball - first 'Source' tag ({source_url}) is not a valid URL.
+         Please make sure at least the first 'Source' tag contains a valid URL to the source tarball required to build that package.
+         If tag is correct and the package build doesn't rely on any source tarballs, you must ignore the spec inside the '.github/workflows/validate-cg-manifest.sh' script.
+
+'Source' not a valid URL: {spec_path}
+""")
         return
     
     processed_component = component(name, version, source_url)
