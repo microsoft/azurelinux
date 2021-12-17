@@ -48,6 +48,7 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/ltrace.conf
 %{_bindir}/*
 %{_datadir}
+
 %changelog
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.3-7
 - Removing the explicit %%clean stage.
