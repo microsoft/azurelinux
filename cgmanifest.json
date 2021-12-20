@@ -6275,8 +6275,8 @@
         "type": "other",
         "other": {
           "name": "python-lxml",
-          "version": "4.6.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/e5/21/a2e4517e3d216f0051687eea3d3317557bde68736f038a3b105ac3809247/lxml-4.6.3.tar.gz"
+          "version": "4.7.1",
+          "downloadUrl": "https://github.com/lxml/lxml/releases/download/lxml-4.7.1/lxml-4.7.1.tar.gz"
         }
       }
     },
