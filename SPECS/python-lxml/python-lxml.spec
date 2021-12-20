@@ -1,7 +1,7 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        XML and HTML with Python
 Name:           python-lxml
-Version:        4.6.3
+Version:        4.7.1
 Release:        1%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD AND GPLv2+
@@ -9,11 +9,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 URL:            https://lxml.de
-# Source0:      https://files.pythonhosted.org/packages/e5/21/a2e4517e3d216f0051687eea3d3317557bde68736f038a3b105ac3809247/lxml-%{version}.tar.gz
-Source0:        lxml-%{version}.tar.gz
+Source0:        https://github.com/lxml/lxml/releases/download/lxml-%{version}/lxml-%{version}.tar.gz
 
-BuildRequires:  libxslt
 BuildRequires:  libxslt-devel
+BuildRequires:  libxml2-devel
 BuildRequires:  python3
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
@@ -58,6 +57,8 @@ rm -rf %{buildroot}
 %{python3_sitelib}/*
 
 %changelog
+*   Mon Dec 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> 4.7.1-1
+-   Update to 4.7.1 to fix CVE-2021-43818
 *   Thu Aug 05 2021 Andrew Phelps <anphel@microsoft.com> 4.6.3-1
 -   Update to 4.6.3 to fix CVEs
 -   Remove lxml-make-check-fix.patch which is no longer applicable
