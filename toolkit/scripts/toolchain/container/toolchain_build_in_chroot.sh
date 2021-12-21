@@ -1073,7 +1073,6 @@ tar xf nss-3.73.tar.gz
 pushd nss-3.73
 patch -Np1 -i ../nss-3.73-standalone-1.patch
 cd nss
-export NSS_DISABLE_GTESTS=1
 # Build with single processor due to errors seen with parallel make
 make -j1 BUILD_OPT=1                    \
     NSPR_INCLUDE_DIR=/usr/include/nspr  \
@@ -1081,6 +1080,7 @@ make -j1 BUILD_OPT=1                    \
     ZLIB_LIBS=-lz                       \
     NSS_ENABLE_WERROR=0                 \
     USE_64=1                            \
+    NSS_DISABLE_GTESTS=1                \
     $([ -f /usr/include/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)
 cd ../dist
 install -v -m755 Linux*/lib/*.so              /usr/lib
