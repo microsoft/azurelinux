@@ -1,0 +1,29 @@
+From 94848b463118314ff5e11a49a68ff6fd9c30690a Mon Sep 17 00:00:00 2001
+From: Shreenidhi Shedi <sshedi@vmware.com>
+Date: Wed, 25 Aug 2021 19:48:43 +0530
+Subject: [PATCH] Change default policy
+
+Let's have DI_DEFAULT_POLICY as DI_ENABLED if no DS is found, or else
+cloud-init services won't get started during boot and gosc tests fail.
+
+Signed-off-by: Shreenidhi Shedi <sshedi@vmware.com>
+---
+ tools/ds-identify | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/ds-identify b/tools/ds-identify
+index f509f566..2aeb1655 100755
+--- a/tools/ds-identify
++++ b/tools/ds-identify
+@@ -94,7 +94,7 @@ DI_MAIN=${DI_MAIN:-main}
+ 
+ DI_BLKID_EXPORT_OUT=""
+ DI_GEOM_LABEL_STATUS_OUT=""
+-DI_DEFAULT_POLICY="search,found=all,maybe=all,notfound=${DI_DISABLED}"
++DI_DEFAULT_POLICY="search,found=all,maybe=all,notfound=${DI_ENABLED}"
+ DI_DEFAULT_POLICY_NO_DMI="search,found=all,maybe=all,notfound=${DI_ENABLED}"
+ DI_DMI_CHASSIS_ASSET_TAG=""
+ DI_DMI_PRODUCT_NAME=""
+-- 
+2.32.0
+

@@ -1,0 +1,27 @@
+diff --git a/libfakeroot.c b/libfakeroot.c
+index 3e80e38..d3fb56f 100644
+--- a/libfakeroot.c
++++ b/libfakeroot.c
+@@ -90,6 +90,22 @@
+ #define SEND_GET_XATTR64(a,b,c) send_get_xattr64(a,b)
+ #endif
+ 
++#ifndef _STAT_VER
++ #if defined (__aarch64__)
++  #define _STAT_VER 0
++ #elif defined (__powerpc__) && __WORDSIZE == 64
++  #define _STAT_VER 1
++ #elif defined (__riscv) && __riscv_xlen==64
++  #define _STAT_VER 0
++ #elif defined (__s390x__)
++  #define _STAT_VER 1
++ #elif defined (__x86_64__)
++  #define _STAT_VER 1
++ #else
++  #define _STAT_VER 3
++ #endif
++#endif
++
+ /*
+    These INT_* (which stands for internal) macros should always be used when
+    the fakeroot library owns the storage of the stat variable.

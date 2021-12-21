@@ -7,8 +7,8 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.34
-Release:        1%{?dist}
-License:        LGPLv2+
+Release:        2%{?dist}
+License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -40,12 +40,15 @@ Patch11:        CVE-2018-20796.nopatch
 #Patch15:        CVE-2021-3326.patch
 #Patch16:        CVE-2020-27618.patch
 Patch17:        glibc-2.34_pthread_cond_wait.patch
+
+BuildRequires:  perl(File::Find)
+
 Requires:       filesystem
+
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       /sbin/ldconfig
 Provides:       nss_db = %{version}-%{release}
 Provides:       rtld(GNU_HASH)
-Provides:	    glibc
 ExcludeArch:    armv7 ppc i386 i686
 
 %description
@@ -61,7 +64,6 @@ Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-headers = %{version}-%{release}
 Provides:       %{name}-static = %{version}-%{release}
 Provides:       %{name}-static%{?_isa} = %{version}-%{release}
-Provides:	    glibc-devel
 
 %description devel
 These are the header files of glibc.
@@ -181,24 +183,24 @@ rm -rf %{buildroot}%{_infodir}
 cat > %{buildroot}%{_sysconfdir}/nsswitch.conf <<- "EOF"
 #       Begin /etc/nsswitch.conf
 
-	passwd: files
-	group: files
-	shadow: files
+    passwd: files
+    group: files
+    shadow: files
 
-	hosts: files dns
-	networks: files
+    hosts: files dns
+    networks: files
 
-	protocols: files
-	services: files
-	ethers: files
-	rpc: files
+    protocols: files
+    services: files
+    ethers: files
+    rpc: files
 #       End /etc/nsswitch.conf
 EOF
 cat > %{buildroot}%{_sysconfdir}/ld.so.conf <<- "EOF"
 #       Begin /etc/ld.so.conf
-	%{_prefix}/local/lib
-	/opt/lib
-	include %{_sysconfdir}/ld.so.conf.d/*.conf
+    %{_prefix}/local/lib
+    /opt/lib
+    include %{_sysconfdir}/ld.so.conf.d/*.conf
 EOF
 popd
 %find_lang %{name} --all-name
@@ -240,7 +242,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %files
 %defattr(-,root,root)
-%license LICENSES
+%license COPYING COPYING.LIB LICENSES
 %{_libdir}/locale/*
 %dir %{_sysconfdir}/ld.so.conf.d
 %config(noreplace) %{_sysconfdir}/nsswitch.conf
@@ -306,6 +308,11 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Thu Nov 04 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 2.34-2
+- Adding missing BR on "perl(File::Find)".
+- Fixing licensing information.
+- Removing redundant 'Provides'.
+
 * Thu Oct 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.34-1
 - Upgrade to version 2.34
 - License verified

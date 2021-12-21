@@ -262,10 +262,10 @@ chroot_and_install_rpms zlib
 build_rpm_in_chroot_no_install perl
 chroot_and_install_rpms perl
 
-build_rpm_in_chroot_no_install nss
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
+build_rpm_in_chroot_no_install mariner-release
 
 # Need to install perl-DBI in order for perl-DBD-SQLite to build
 build_rpm_in_chroot_no_install perl-DBI
@@ -374,8 +374,9 @@ build_rpm_in_chroot_no_install kbd
 chroot_and_install_rpms e2fsprogs
 build_rpm_in_chroot_no_install krb5
 
-# curl needs libssh2
+# curl needs libssh2, krb5
 chroot_and_install_rpms libssh2
+chroot_and_install_rpms krb5
 build_rpm_in_chroot_no_install curl
 
 # python3-setuptools needs python3-xml
@@ -479,8 +480,6 @@ chroot_and_install_rpms file
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 
-build_rpm_in_chroot_no_install libpwquality
-build_rpm_in_chroot_no_install json-c
 build_rpm_in_chroot_no_install libsepol
 
 # libselinux requires libsepol
@@ -489,12 +488,24 @@ build_rpm_in_chroot_no_install libselinux
 # util-linux and rpm require libselinux
 chroot_and_install_rpms libselinux
 build_rpm_in_chroot_no_install util-linux
+# rpm requires debugedit
+build_rpm_in_chroot_no_install debugedit
+chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
 
 # rebuild pam with selinux support
 build_rpm_in_chroot_no_install pam
 
-# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson
+# python-jinja2 needs python3-markupsafe
+# python3-setuptools, python3-xml are also needed but already installed
+build_rpm_in_chroot_no_install python-markupsafe
+copy_rpm_subpackage python3-markupsafe
+chroot_and_install_rpms python3-markupsafe
+build_rpm_in_chroot_no_install python-jinja2
+copy_rpm_subpackage python3-jinja2
+
+# systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
+# gperf is also needed, but is installed earlier
 chroot_and_install_rpms libcap
 chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
@@ -502,55 +513,15 @@ chroot_and_install_rpms kbd
 chroot_and_install_rpms kmod
 chroot_and_install_rpms util-linux
 chroot_and_install_rpms meson
-build_rpm_in_chroot_no_install systemd-bootstrap
-build_rpm_in_chroot_no_install libaio
-
-# Removed 'lvm2', might not need: libselinux, libsepol, ncurses, libaio,
-chroot_and_install_rpms libselinux
-chroot_and_install_rpms libsepol
-chroot_and_install_rpms ncurses
-chroot_and_install_rpms libaio
-
-# Removed 'cryptsetup', might not need: popt, libpwquality, json-c
-chroot_and_install_rpms popt
-chroot_and_install_rpms libpwquality
-chroot_and_install_rpms json-c
-
-# Removed 'systemd', might not need: intltool, gperf
 chroot_and_install_rpms intltool
-chroot_and_install_rpms gperf
+chroot_and_install_rpms python3-jinja2
+build_rpm_in_chroot_no_install systemd-bootstrap
 
-build_rpm_in_chroot_no_install golang-1.17
-build_rpm_in_chroot_no_install groff
+# Removed 'lvm2', might not need: ncurses
+chroot_and_install_rpms ncurses
 
-# libtiprc needs krb5
-chroot_and_install_rpms krb5
-build_rpm_in_chroot_no_install libtirpc
-build_rpm_in_chroot_no_install rpcsvc-proto
-
-# libnsl2 needs libtirpc and rpcsvc-proto
-chroot_and_install_rpms libtirpc
-chroot_and_install_rpms rpcsvc-proto
-build_rpm_in_chroot_no_install libnsl2
-
-# Removed 'tcp_wrappers', might not need: libnsl2
-chroot_and_install_rpms libnsl2
-
-# groff needs perl-File-HomeDir installed to run
-# perl-File-HomeDir needs perl-File-Which installed to run
-build_rpm_in_chroot_no_install perl-File-Which
-chroot_and_install_rpms perl-File-Which
-build_rpm_in_chroot_no_install perl-File-HomeDir
-chroot_and_install_rpms perl-File-HomeDir
-
-# Removed 'openldap', might not need: groff
-chroot_and_install_rpms groff
-
-build_rpm_in_chroot_no_install libcap-ng
-
-# Removed 'audit', might not need: golang, libcap-ng
-chroot_and_install_rpms golang
-chroot_and_install_rpms libcap-ng
+# Removed 'cryptsetup', might not need: popt
+chroot_and_install_rpms popt
 
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1

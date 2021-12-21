@@ -1,153 +1,24 @@
-diff --git a/lsinitrd.sh b/lsinitrd.sh
-index b19a66a..7bb1188 100755
---- a/lsinitrd.sh
-+++ b/lsinitrd.sh
-@@ -92,15 +92,7 @@ if [[ $1 ]]; then
+diff -Naur a/lsinitrd.sh b/lsinitrd.sh
+--- a/lsinitrd.sh       2021-05-27 12:34:19.000000000 +0000
++++ b/lsinitrd.sh       2021-12-04 22:52:58.491629173 +0000
+@@ -109,19 +109,7 @@
          exit 1
      fi
  else
--    [[ -f /etc/machine-id ]] && read MACHINE_ID < /etc/machine-id
+-    [[ -f /etc/machine-id ]] && read -r MACHINE_ID < /etc/machine-id
 -
--    if [[ -d /boot/loader/entries || -L /boot/loader/entries ]] \
+-    if [[ -d /efi/loader/entries || -L /efi/loader/entries ]] \
 -        && [[ $MACHINE_ID ]] \
--        && [[ -d /boot/${MACHINE_ID} || -L /boot/${MACHINE_ID} ]] ; then
+-        && [[ -d /efi/${MACHINE_ID} || -L /efi/${MACHINE_ID} ]]; then
+-        image="/efi/${MACHINE_ID}/${KERNEL_VERSION}/initrd"
+-    elif [[ -d /boot/loader/entries || -L /boot/loader/entries ]] \
+-        && [[ $MACHINE_ID ]] \
+-        && [[ -d /boot/${MACHINE_ID} || -L /boot/${MACHINE_ID} ]]; then
 -        image="/boot/${MACHINE_ID}/${KERNEL_VERSION}/initrd"
 -    else
 -        image="/boot/initramfs-${KERNEL_VERSION}.img"
 -    fi
 +    image="/boot/initrd.img-${KERNEL_VERSION}"
  fi
- 
+
  shift
-diff --git a/mkinitrd-dracut.sh b/mkinitrd-dracut.sh
-index da34e34..638280a 100755
---- a/mkinitrd-dracut.sh
-+++ b/mkinitrd-dracut.sh
-@@ -1,5 +1,5 @@
- #!/bin/bash --norc
--kver=$(uname -r)
-+kernel_ver_dir='/var/lib/initramfs/kernel'
- 
- boot_dir="/boot"
- quiet=0
-@@ -48,63 +48,16 @@ read_arg() {
-     fi
- }
- 
--# Taken over from SUSE mkinitrd
-+# For mariner
- default_kernel_images() {
--    local regex kernel_image kernel_version version_version initrd_image
--    local qf='%{NAME}-%{VERSION}-%{RELEASE}\n'
--
--    case "$(uname -m)" in
--        s390|s390x)
--            regex='image'
--            ;;
--        ppc|ppc64)
--            regex='vmlinux'
--            ;;
--        i386|x86_64)
--            regex='vmlinuz'
--            ;;
--        arm*)
--            regex='[uz]Image'
--            ;;
--        aarch64)
--            regex='Image'
--            ;;
--        *)  regex='vmlinu.'
--            ;;
--    esac
-+    local kernel_version
- 
--    # user mode linux
--    if grep -q UML /proc/cpuinfo; then
--            regex='linux'
--    fi
-+    for kernel_version in $(ls $kernel_ver_dir) ; do
-+
-+        # Take this directory as the source of truth
-+        kernels="$kernels $kernel_version"
-+        targets="$targets $boot_dir/initrd.img-$kernel_version"
- 
--    kernel_images=""
--    initrd_images=""
--    for kernel_image in $(ls $boot_dir \
--            | sed -ne "\|^$regex\(-[0-9.]\+-[0-9]\+-[a-z0-9]\+$\)\?|p" \
--            | grep -v kdump$ ) ; do
--
--        # Note that we cannot check the RPM database here -- this
--        # script is itself called from within the binary kernel
--        # packages, and rpm does not allow recursive calls.
--
--        [ -L "$boot_dir/$kernel_image" ] && continue
--        [ "${kernel_image%%.gz}" != "$kernel_image" ] && continue
--        kernel_version=$(/usr/bin/get_kernel_version \
--                         $boot_dir/$kernel_image 2> /dev/null)
--        initrd_image=$(echo $kernel_image | sed -e "s|${regex}|initrd|")
--        if [ "$kernel_image" != "$initrd_image" -a \
--             -n "$kernel_version" -a \
--             -d "/lib/modules/$kernel_version" ]; then
--                kernel_images="$kernel_images $boot_dir/$kernel_image"
--                initrd_images="$initrd_images $boot_dir/$initrd_image"
--        fi
--    done
--    for kernel_image in $kernel_images;do
--	kernels="$kernels ${kernel_image#*-}"
--    done
--    for initrd_image in $initrd_images;do
--	targets="$targets $initrd_image"
-     done
-     host_only=1
-     force=1
-@@ -187,7 +140,7 @@ while (($# > 0)); do
- done
- 
- [[ $targets && $kernels ]] || default_kernel_images
--[[ $targets && $kernels ]] || (error "No kernel found in $boot_dir" && usage)
-+[[ $targets && $kernels ]] || (error "No Kernel Registered")
- 
- # We can have several targets/kernels, transform the list to an array
- targets=( $targets )
-@@ -196,7 +149,6 @@ targets=( $targets )
- [[ $host_only == 1 ]] && dracut_args="${dracut_args} -H"
- [[ $force == 1 ]]     && dracut_args="${dracut_args} -f"
- 
--echo "Creating: target|kernel|dracut args|basicmodules "
- for ((i=0 ; $i<${#targets[@]} ; i++)); do
- 
-     if [[ $img_vers ]];then
-@@ -206,21 +158,27 @@ for ((i=0 ; $i<${#targets[@]} ; i++)); do
-     fi
-     kernel="${kernels[$i]}"
- 
-+    if [[ -s "$kernel_ver_dir/$kernel" ]]; then
-+        readarray -t kernel_cfg < <(xargs -n1 -a $kernel_ver_dir/$kernel)
-+    else
-+        kernel_cfg=()
-+    fi
-+
-     # Duplicate code: No way found how to redirect output based on $quiet
-     if [[ $quiet == 1 ]];then
--	echo "$target|$kernel|$dracut_args|$basicmodules"
-+	echo "Creating $target"
- 	if [[ $basicmodules ]]; then
--            dracut $dracut_args --add-drivers "$basicmodules" "$target" \
-+            dracut $dracut_args --add-drivers "$basicmodules" "${kernel_cfg[@]}" "$target" \
- 		"$kernel" &>/dev/null
- 	else
--            dracut $dracut_args "$target" "$kernel" &>/dev/null
-+            dracut $dracut_args "${kernel_cfg[@]}" "$target" "$kernel" &>/dev/null
- 	fi
-     else
- 	if [[ $basicmodules ]]; then
--            dracut $dracut_args --add-drivers "$basicmodules" "$target" \
-+            dracut $dracut_args --add-drivers "$basicmodules" "${kernel_cfg[@]}" "$target" \
- 		"$kernel"
- 	else
--            dracut $dracut_args "$target" "$kernel"
-+            dracut $dracut_args "${kernel_cfg[@]}" "$target" "$kernel"
- 	fi
-     fi
- done

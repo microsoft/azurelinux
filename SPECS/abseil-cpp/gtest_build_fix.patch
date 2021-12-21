@@ -1,0 +1,62 @@
+From c0bfec53ad2508c3d666adf7423ae0b1dc8da8dc Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawelwi@microsoft.com>
+Date: Tue, 16 Nov 2021 13:03:43 -0800
+Subject: [PATCH] GTest macros fix.
+
+---
+ absl/container/btree_test.cc   | 5 +++++
+ absl/strings/cord_ring_test.cc | 5 +++++
+ absl/strings/cord_test.cc      | 5 +++++
+ 3 files changed, 15 insertions(+)
+
+diff --git a/absl/container/btree_test.cc b/absl/container/btree_test.cc
+index d27cf27..f7bc3a3 100644
+--- a/absl/container/btree_test.cc
++++ b/absl/container/btree_test.cc
+@@ -40,6 +40,11 @@
+ #include "absl/strings/string_view.h"
+ #include "absl/types/compare.h"
+ 
++#if !defined(GTEST_FLAG_GET)
++#define GTEST_FLAG_GET(name) ::testing::GTEST_FLAG(name)
++#define GTEST_FLAG_SET(name, value) (void)(::testing::GTEST_FLAG(name) = value)
++#endif  // !defined(GTEST_FLAG_GET)
++
+ ABSL_FLAG(int, test_values, 10000, "The number of values to use for tests");
+ 
+ namespace absl {
+diff --git a/absl/strings/cord_ring_test.cc b/absl/strings/cord_ring_test.cc
+index f131859..a1f950e 100644
+--- a/absl/strings/cord_ring_test.cc
++++ b/absl/strings/cord_ring_test.cc
+@@ -29,6 +29,11 @@
+ #include "absl/strings/str_cat.h"
+ #include "absl/strings/string_view.h"
+ 
++#if !defined(GTEST_FLAG_GET)
++#define GTEST_FLAG_GET(name) ::testing::GTEST_FLAG(name)
++#define GTEST_FLAG_SET(name, value) (void)(::testing::GTEST_FLAG(name) = value)
++#endif  // !defined(GTEST_FLAG_GET)
++
+ extern thread_local bool cord_ring;
+ 
+ namespace absl {
+diff --git a/absl/strings/cord_test.cc b/absl/strings/cord_test.cc
+index cced9bb..e30284d 100644
+--- a/absl/strings/cord_test.cc
++++ b/absl/strings/cord_test.cc
+@@ -41,6 +41,11 @@
+ #include "absl/strings/str_format.h"
+ #include "absl/strings/string_view.h"
+ 
++#if !defined(GTEST_FLAG_GET)
++#define GTEST_FLAG_GET(name) ::testing::GTEST_FLAG(name)
++#define GTEST_FLAG_SET(name, value) (void)(::testing::GTEST_FLAG(name) = value)
++#endif  // !defined(GTEST_FLAG_GET)
++
+ typedef std::mt19937_64 RandomEngine;
+ 
+ static std::string RandomLowercaseString(RandomEngine* rng);
+-- 
+2.17.1
+

@@ -47,7 +47,7 @@
 # Required for proper ELF symbol versioning support.
 %global _ld_strict_symbol_defs 1
 # override_glibc and glibcversion are temporary to make libxcrypt install on top of glibc
-%define glibcversion 2.28
+%define glibcversion 2.34
 %bcond_without override_glibc
 # Build the static library?
 %bcond_with new_api
@@ -102,7 +102,7 @@
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
 Version:        4.4.17
-Release:        3%{?dist}
+Release:        4%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -452,6 +452,9 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
+* Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> - 4.4.17-4
+- Update required glibc version to 2.34
+
 * Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.17-3
 - Replace %%ldconfig_scriptlets with actual post/postun sections
 

@@ -42,7 +42,6 @@ generate_toolchain () {
 # Remove specific packages that are not needed in pkggen_core
 remove_packages_for_pkggen_core () {
     sed -i '/alsa-lib-/d' $TmpPkgGen
-    sed -i '/ca-certificates-[0-9]/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
     sed -i '/libpkgconf-devel/d' $TmpPkgGen
@@ -72,7 +71,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
-    sed -i '/libcap-ng-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
@@ -112,8 +110,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-File-Dos/d' $TmpPkgGen
     sed -i '/perl-File-Fetch/d' $TmpPkgGen
     sed -i '/perl-File-Find/d' $TmpPkgGen
-    sed -i '/perl-File-HomeDir/d' $TmpPkgGen
-    sed -i '/perl-File-Which/d' $TmpPkgGen
     sed -i '/perl-FileCache/d' $TmpPkgGen
     sed -i '/perl-filetest/d' $TmpPkgGen
     sed -i '/perl-Filter/d' $TmpPkgGen
@@ -185,7 +181,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-version/d' $TmpPkgGen
     sed -i '/perl-vmsish/d' $TmpPkgGen
     sed -i '/perl-libintl/d' $TmpPkgGen
-    sed -i '/perl-Object-Accessor/d' $TmpPkgGen
     sed -i '/perl-Test-Warnings/d' $TmpPkgGen
     sed -i '/perl-Text-Template/d' $TmpPkgGen
     sed -i '/python3-audit/d' $TmpPkgGen
@@ -194,7 +189,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/python3-libxml2/d' $TmpPkgGen
     sed -i '/python3-magic/d' $TmpPkgGen
     sed -i '/python3-pip/d' $TmpPkgGen
-    sed -i '/python3-pwquality/d' $TmpPkgGen
     sed -i '/python3-rpm/d' $TmpPkgGen
     sed -i '/python3-test/d' $TmpPkgGen
     sed -i '/python3-tools/d' $TmpPkgGen
@@ -264,11 +258,13 @@ generate_pkggen_core () {
         grep "^openssl-" $TmpPkgGen
         grep "^libcap-" $TmpPkgGen
         grep "^libdb-" $TmpPkgGen
+        grep "^debugedit-" $TmpPkgGen
         grep "^rpm-" $TmpPkgGen
         grep "^cpio-" $TmpPkgGen
         grep "^e2fsprogs-" $TmpPkgGen
         grep "^libsolv-" $TmpPkgGen
         grep "^libssh2-" $TmpPkgGen
+        grep "^krb5-" $TmpPkgGen
         grep "^curl-" $TmpPkgGen
         grep "^tdnf-" $TmpPkgGen
         grep "^createrepo_c-" $TmpPkgGen
@@ -277,7 +273,6 @@ generate_pkggen_core () {
         grep "^glib-" $TmpPkgGen
         grep "^libltdl-" $TmpPkgGen
         grep "^pcre-" $TmpPkgGen
-        grep "^krb5-" $TmpPkgGen
         grep "^lua-" $TmpPkgGen
         grep "^mariner-rpm-macros-" $TmpPkgGen
         grep "^mariner-check-" $TmpPkgGen
@@ -296,6 +291,7 @@ generate_pkggen_core () {
         grep "^ca-certificates-shared-" $TmpPkgGen
         grep "^ca-certificates-tools-" $TmpPkgGen
         grep "^ca-certificates-base-" $TmpPkgGen
+        grep "^ca-certificates-[0-9]" $TmpPkgGen
         grep "^dwz-" $TmpPkgGen
         grep "^unzip-" $TmpPkgGen
         grep "^python3-" $TmpPkgGen

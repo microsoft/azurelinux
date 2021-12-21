@@ -8,8 +8,8 @@
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        6.1.0
-Release:        3%{?dist}
-License:        LGPL
+Release:        4%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Virtualization/Libraries
@@ -50,7 +50,7 @@ BuildRequires:  numactl-devel
 BuildRequires:  numad
 BuildRequires:  parted
 BuildRequires:  polkit
-BuildRequires:  python-docutils
+BuildRequires:  python3-docutils
 BuildRequires:  python3-devel
 BuildRequires:  readline-devel
 BuildRequires:  rpcsvc-proto
@@ -1053,6 +1053,10 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-4
+- Use python3-docutils dependency instead of python-docutils
+- License verified (specify as LGPLv2+ rather than just LGPL)
+
 *   Mon Jul 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-3
 -   Extending with subpackages using Fedora 33 spec (license: MIT).
 -   Added subpackages:

@@ -1,29 +1,15 @@
-From a0998009aa0cf6c9536338c725adc7f4cdc8e08a Mon Sep 17 00:00:00 2001
-From: Thomas Crain <thcrain@microsoft.com>
-Date: Sun, 6 Jun 2021 13:02:09 -0500
-Subject: [PATCH] Add RPM_LD_FLAGS definition to %%{__build_pre} macro
-
-Adapted from Fedora downstream: https://src.fedoraproject.org/rpms/rpm/blob/rawhide/f/rpm-4.15.x-ldflags.patch
-
----
- macros.in | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/macros.in b/macros.in
-index a6069ee..5d6855b 100644
---- a/macros.in
-+++ b/macros.in
-@@ -801,9 +801,10 @@ package or when debugging this package.\
+--- orig-rpm-4.17.0-release/macros.in	2021-09-03 02:41:20.000000000 -0700
++++ fixed-rpm-4.17.0-release/macros.in	2021-12-02 21:35:53.475842878 -0800
+@@ -742,10 +742,11 @@
    RPM_SOURCE_DIR=\"%{u2p:%{_sourcedir}}\"\
    RPM_BUILD_DIR=\"%{u2p:%{_builddir}}\"\
    RPM_OPT_FLAGS=\"%{optflags}\"\
 +  RPM_LD_FLAGS=\"%{?build_ldflags}\"\
    RPM_ARCH=\"%{_arch}\"\
    RPM_OS=\"%{_os}\"\
--  export RPM_SOURCE_DIR RPM_BUILD_DIR RPM_OPT_FLAGS RPM_ARCH RPM_OS\
-+  export RPM_SOURCE_DIR RPM_BUILD_DIR RPM_OPT_FLAGS RPM_LD_FLAGS RPM_ARCH RPM_OS\
+   RPM_BUILD_NCPUS=\"%{_smp_build_ncpus}\"\
+-  export RPM_SOURCE_DIR RPM_BUILD_DIR RPM_OPT_FLAGS RPM_ARCH RPM_OS RPM_BUILD_NCPUS\
++  export RPM_SOURCE_DIR RPM_BUILD_DIR RPM_OPT_FLAGS RPM_ARCH RPM_OS RPM_BUILD_NCPUS RPM_LD_FLAGS\
    RPM_DOC_DIR=\"%{_docdir}\"\
    export RPM_DOC_DIR\
    RPM_PACKAGE_NAME=\"%{NAME}\"\
--- 
-2.30.2

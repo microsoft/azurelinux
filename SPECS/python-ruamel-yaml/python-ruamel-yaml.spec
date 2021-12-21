@@ -4,7 +4,7 @@
 Summary:        YAML 1.2 loader/dumper package for Python
 Name:           python-%{srcname}
 Version:        0.16.6
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,10 +21,8 @@ It is a derivative of Kirill Simonov’s PyYAML 3.11
 Summary:        YAML 1.2 loader/dumper package for Python
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-typing
 Requires:       python%{python3_pkgversion}-ruamel-yaml-clib
 Requires:       python%{python3_pkgversion}-setuptools
-Requires:       python%{python3_pkgversion}-typing
 # For tests
 %if %{with_check}
 BuildRequires:  python3-pip
@@ -56,6 +54,9 @@ python3 setup.py install --single-version-externally-managed --skip-build --root
 %{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.16.6-7
+- Remove requirement on python3-typing (not needed for python >= 3.5)
+
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.16.6-6
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

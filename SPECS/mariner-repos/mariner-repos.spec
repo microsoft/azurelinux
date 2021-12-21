@@ -1,32 +1,99 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        1%{?dist}
-License:        Apache License
+Release:        2%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 Source0:        MICROSOFT-RPM-GPG-KEY
 Source1:        MICROSOFT-METADATA-GPG-KEY
-Source2:        mariner-official-base.repo
-Source3:        mariner-official-update.repo
-Source4:        mariner-preview.repo
-Source5:        mariner-ui.repo
-Source6:        mariner-ui-preview.repo
-Source7:        mariner-extras.repo
-Source8:        mariner-extras-preview.repo
-Source9:        mariner-microsoft.repo
-Source10:       mariner-microsoft-preview.repo
+Source2:        mariner-debuginfo.repo
+Source3:        mariner-debuginfo-preview.repo
+Source4:        mariner-extended.repo
+Source5:        mariner-extended-preview.repo
+Source6:        mariner-extras.repo
+Source7:        mariner-extras-preview.repo
+Source8:        mariner-microsoft.repo
+Source9:        mariner-microsoft-preview.repo
+Source10:       mariner-official-base.repo
+Source11:       mariner-official-preview.repo
 
-Requires(post):  gpgme
-Requires(post):  rpm
+Requires(post): gpgme
+Requires(post): rpm
+
 Requires(preun): gpgme
 Requires(preun): rpm
-BuildArch:       noarch
+
+BuildArch:      noarch
 
 %description
 CBL-Mariner repo files and gpg keys
+
+%package debuginfo
+Summary:        CBL-Mariner Debuginfo repo file.
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
+%description debuginfo
+%{summary}
+
+%package debuginfo-preview
+Summary:        CBL-Mariner Debuginfo preview repo file.
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
+%description debuginfo-preview
+%{summary}
+
+%package extended
+Summary:        CBL-Mariner Extended repo file.
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
+%description extended
+%{summary}
+
+%package extended-preview
+Summary:        CBL-Mariner Extended preview repo file.
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
+%description extended-preview
+%{summary}
+
+%package extras
+Summary:        CBL-Mariner Extras repo file.
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
+%description extras
+%{summary}
+
+%package extras-preview
+Summary:        CBL-Mariner Extras preview repo file.
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
+%description extras-preview
+%{summary}
+
+%package microsoft
+Summary:        CBL-Mariner Microsoft repo file.
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
+%description microsoft
+%{summary}
+
+%package microsoft-preview
+Summary:        CBL-Mariner Microsoft preview repo file.
+Group:          System Environment/Base
+Requires:       %{name} = %{version}-%{release}
+
+%description microsoft-preview
+%{summary}
 
 %package preview
 Summary:        CBL-Mariner preview repo file.
@@ -36,56 +103,7 @@ Requires:       %{name} = %{version}-%{release}
 %description preview
 %{summary}
 
-%package ui
-Summary:        CBL-Mariner UI repo file.
-Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
-
-%description ui
-%{summary}
-
-%package ui-preview
-Summary:        CBL-Mariner UI preview repo file.
-Group:          System Environment/Base
-Requires:       %{name}-ui = %{version}-%{release}
-
-%description ui-preview
-
-%package extras
-Summary:        CBL-Mariner extras repository.
-Group:          System Envrionment/Base
-Requires:       %{name} = %{version}-%{release}
-
-%description extras
-%{summary}
-
-%package extras-preview
-Summary:        CBL-Mariner extras repository.
-Group:          System Envrionment/Base
-Requires:       %{name} = %{version}-%{release}
-
-%description extras-preview
-%{summary}
-
-%package microsoft
-Summary:  CBL-Mariner Microsoft repository.
-Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
-
-%description microsoft
-%{summary}
-
-%package microsoft-preview
-Summary:  CBL-Mariner Microsoft Preview repository.
-Group:    System Envrionment/Base
-Requires: %{name} = %{version}-%{release}
-
-%description microsoft-preview
-%{summary}
-
-
 %install
-rm -rf %{buildroot}
 export REPO_DIRECTORY="%{buildroot}%{_sysconfdir}/yum.repos.d"
 install -d -m 755 $REPO_DIRECTORY
 install -m 644 %{SOURCE2} $REPO_DIRECTORY
@@ -97,15 +115,13 @@ install -m 644 %{SOURCE7} $REPO_DIRECTORY
 install -m 644 %{SOURCE8} $REPO_DIRECTORY
 install -m 644 %{SOURCE9} $REPO_DIRECTORY
 install -m 644 %{SOURCE10} $REPO_DIRECTORY
+install -m 644 %{SOURCE11} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
 install -d -m 755 $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE0} $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE1} $RPM_GPG_DIRECTORY
-
-%clean
-rm -rf %{buildroot}
 
 %posttrans
 gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
@@ -123,19 +139,22 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-base.repo
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-update.repo
 
-%files preview
+%files debuginfo
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-debuginfo.repo
 
-%files ui
+%files debuginfo-preview
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-ui.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-debuginfo-preview.repo
 
-%files ui-preview
+%files extended
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-ui-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended.repo
+
+%files extended-preview
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-preview.repo
 
 %files extras
 %defattr(-,root,root,-)
@@ -147,13 +166,20 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
 %files microsoft
 %defattr(-,root,root,-)
-%config(noreplace) /etc/yum.repos.d/mariner-microsoft.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-microsoft.repo
 
 %files microsoft-preview
 %defattr(-,root,root,-)
-%config(noreplace) /etc/yum.repos.d/mariner-microsoft-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-microsoft-preview.repo
+
+%files preview
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-preview.repo
 
 %changelog
+* Thu Dec 09 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-2
+- Updating repo URLs for 2.0.
+- License verified.
 
 * Tue Jul 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
 - Add microsoft and microsoft-preview repo configuration packages.  

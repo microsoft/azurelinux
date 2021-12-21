@@ -1,7 +1,7 @@
 Summary:        NVIDIA container runtime
 Name:           nvidia-container-runtime
 Version:        3.4.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,20 +19,22 @@ containers.
 %setup -q
 
 %build
-cd src/
-make build
-mkdir -p %{buildroot}%{_bindir}
-cp %{name} %{buildroot}%{_bindir}
+cd src
+%make_build build
 
 %install
-cd src
-install -m 755 %{name} %{buildroot}%{_bindir}/%{name}
+mkdir -p %{buildroot}%{_bindir}
+install -m 755 src/%{name} %{buildroot}%{_bindir}/%{name}
 
 %files
 %license LICENSE
 %{_bindir}/%{name}
 
 %changelog
+* Wed Nov 17 2021 Mateusz Malisz <mateusz.malisz@microsoft.com> 3.4.2-5
+- Move buildroot directory tree creation to install step
+- Use make macros.
+
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 3.4.2-4
 - Increment release to force republishing using golang 1.15.13.
 

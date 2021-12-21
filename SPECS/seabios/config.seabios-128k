@@ -1,0 +1,27 @@
+# for qemu machine types 1.7 + older
+# need to turn off features (xhci,uas) to make it fit into 128k
+CONFIG_QEMU=y
+CONFIG_ROM_SIZE=128
+CONFIG_ATA_DMA=n
+CONFIG_BOOTSPLASH=n
+CONFIG_XEN=n
+CONFIG_USB_OHCI=n
+CONFIG_USB_XHCI=n
+CONFIG_USB_UAS=n
+CONFIG_SDCARD=n
+CONFIG_TCGBIOS=n
+CONFIG_MPT_SCSI=n
+CONFIG_ESP_SCSI=n
+CONFIG_MEGASAS=n
+CONFIG_PVSCSI=n
+CONFIG_NVME=n
+CONFIG_USE_SMM=n
+CONFIG_VGAHOOKS=n
+CONFIG_HOST_BIOS_GEOMETRY=n
+CONFIG_ACPI_PARSE=n
+# Patch 0002 generates different rom sizes than qemu's
+# seabios build, so we need to disable additional bits
+# to fit under the rom size limit. For some reason this
+# doesn't affect RHEL8 builds, maybe gcc version factors
+# in too.
+CONFIG_SERCON=n

@@ -1,25 +1,19 @@
-Summary:       Utilities for managing filesystem extended attributes
-Name:          attr
-Vendor:        Microsoft Corporation
-Group:         System Environment/Security
-Distribution:  Mariner
-Version:       2.4.48
-Release:       6%{?dist}
-Source:        https://download-mirror.savannah.gnu.org/releases/attr/attr-%{version}.tar.gz
-%define sha1 %{name}=d7c88cb5db51c5e255a511b0a15e832fcdda5b4f
+Summary:        Utilities for managing filesystem extended attributes
+Name:           attr
+Version:        2.5.1
+Release:        1%{?dist}
+License:        GPLv2+ AND LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://savannah.nongnu.org/projects/attr
+Source:         https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 
-# fix test-suite failure with perl-5.26.0 (#1473853)
-Patch1:  0001-attr-2.4.48-test-suite-perl.patch
+BuildRequires:  flex-devel
+BuildRequires:  gettext
+BuildRequires:  libtool
 
-# fix conflict with fakechroot (https://github.com/dex4er/fakechroot/issues/57)
-Patch2:  0002-attr-2.4.48-switch-back-to-syscall.patch
-
-License: GPLv2+
-URL: https://savannah.nongnu.org/projects/attr
-BuildRequires: gettext
-BuildRequires: libtool
-BuildRequires: flex-devel
-Requires: libattr = %{version}-%{release}
+Requires:       libattr = %{version}-%{release}
 
 %description
 A set of tools for manipulating extended attributes on filesystem
@@ -27,27 +21,26 @@ objects, in particular getfattr(1) and setfattr(1).
 An attr(1) command is also provided which is largely compatible
 with the SGI IRIX tool of the same name.
 
-
 %package -n libattr
-Summary: Dynamic library for extended attribute support
-License: LGPLv2+
-# Hopefully does not conflict with Mariner version
-#Conflicts: filesystem < 3
+Summary:        Dynamic library for extended attribute support
+License:        LGPLv2+
 
 %description -n libattr
 This package contains the libattr.so dynamic library which contains
 the extended attribute system calls and library functions.
 
 %package -n libattr-devel
-Summary: Files needed for building programs with libattr
-License: LGPLv2+
-Requires: libattr = %{version}-%{release}
+Summary:        Files needed for building programs with libattr
+License:        LGPLv2+
+
+Provides:       %{name}-devel = %{version}-%{release}
 
 # for <sys/xattr.h> which <attr/xattr.h> is symlinked to
-Requires: glibc-devel
+Requires:       glibc-devel
+Requires:       libattr = %{version}-%{release}
 
 # provides {,f,l}{get,list,remove,set}xattr.2 man pages
-Recommends: man-pages
+Recommends:     man-pages
 
 %description -n libattr-devel
 This package contains header files and documentation needed to
@@ -64,18 +57,8 @@ You should install libattr-devel if you want to develop programs
 which make use of extended attributes.  If you install libattr-devel,
 you'll also want to install attr.
 
-%package devel
-Summary: Alias for libattr-devel
-License: LGPLv2+
-Requires: libattr-devel = %{version}-%{release}
-
-%description devel
-Alias for libattr-devel. For more information, see libattr-devel.
-
 %prep
-%setup -q
-%patch1 -p1
-%patch2 -p1
+%autosetup
 
 # FIXME: root tests are not ready for SELinux
 sed -e 's|test/root/getfattr.test||' \
@@ -84,36 +67,29 @@ sed -e 's|test/root/getfattr.test||' \
 %build
 %configure
 
-make %{?_smp_mflags}
+%make_build
 
 %check
-if ./setfattr -n user.name -v value .; then
-    make check || exit $?
-else
-    echo '*** xattrs are probably not supported by the file system,' \
-         'the test-suite will NOT run ***'
-fi
+%make_build check || exit $?
 
 %install
 %make_install
 
 # get rid of libattr.a and libattr.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/libattr.{l,}a
+rm -f %{buildroot}%{_libdir}/libattr.{l,}a
 
 # drop already installed documentation, we will use an RPM macro to install it
-rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}*
+rm -rf %{buildroot}%{_docdir}/%{name}*
 
 # temporarily provide attr/xattr.h symlink until users are migrated (#1601482)
-ln -fs ../sys/xattr.h $RPM_BUILD_ROOT%{_includedir}/attr/xattr.h
+ln -fs ../sys/xattr.h %{buildroot}%{_includedir}/attr/xattr.h
 
 %find_lang %{name}
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files -f %{name}.lang
 %doc doc/CHANGES
-%{!?_licensedir:%global license %%doc}
 %license doc/COPYING*
 %{_bindir}/attr
 %{_bindir}/getfattr
@@ -132,9 +108,13 @@ ln -fs ../sys/xattr.h $RPM_BUILD_ROOT%{_includedir}/attr/xattr.h
 %{_libdir}/libattr.so.*
 %config(noreplace) %{_sysconfdir}/xattr.conf
 
-%files devel
-
 %changelog
+* Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.1-1
+- Updating to version 2.5.1.
+- License verified.
+- Removed outdated patches.
+- Replaced empty "attr-devel" subpackage with a "Provides: attr-devel" in "libattr-devel".
+
 * Thu Nov 14 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.48-6
 - Initial CBL-Mariner import from Fedora 30 (license: MIT).
 - Add attr-devel as alias for libattr-devel

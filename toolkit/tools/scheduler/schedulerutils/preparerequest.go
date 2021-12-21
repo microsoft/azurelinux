@@ -66,7 +66,8 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pac
 
 	// Check if the node corresponds to an entry in packagesToRebuild
 	specName := strings.TrimSuffix(filepath.Base(node.SpecPath), specSuffix)
-	canUseCache = (sliceutils.Find(packagesToRebuild, specName, sliceutils.StringMatch) == -1)
+	canUseCache = (node.Type == pkggraph.TypePreBuilt) ||
+		(sliceutils.Find(packagesToRebuild, specName, sliceutils.StringMatch) == -1)
 	if !canUseCache {
 		logger.Log.Debugf("Marking (%s) for rebuild per user request", specName)
 		return

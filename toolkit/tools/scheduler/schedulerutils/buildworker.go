@@ -66,7 +66,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
 			}
 
-		case pkggraph.TypeRun, pkggraph.TypeGoal, pkggraph.TypeRemote, pkggraph.TypePureMeta:
+		case pkggraph.TypeRun, pkggraph.TypeGoal, pkggraph.TypeRemote, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
 			res.UsedCache = req.CanUseCache
 
 		case pkggraph.TypeUnknown:
@@ -86,7 +86,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int) (usedCache bool, builtFiles []string, logFile string, err error) {
 	baseSrpmName := filepath.Base(node.SrpmPath)
 	if canUseCache {
-		usedCache, builtFiles = isSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
+		usedCache, builtFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
 		if usedCache {
 			logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
 			return

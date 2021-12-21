@@ -1,0 +1,117 @@
+From 4d08ebd4f8dc19dfc36495473b34c34d53650632 Mon Sep 17 00:00:00 2001
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Mon, 31 Oct 2016 19:33:05 +0100
+Subject: vgabios: Reorder video modes to work around a Windows bug
+
+RH-Author: Ladi Prosek <lprosek@redhat.com>
+Message-id: <1477924385-6169-1-git-send-email-lprosek@redhat.com>
+Patchwork-id: 72677
+O-Subject: [RHEL-7.4/7.3.z seabios PATCH] vgabios: Reorder video modes to work around a Windows bug
+Bugzilla: 1392028
+RH-Acked-by: Laszlo Ersek <lersek@redhat.com>
+RH-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+RH-Acked-by: vrozenfe <vrozenfe@redhat.com>
+
+Windows Server 2016 and Windows 10 RS1 come with a bug in its blue screen
+of death rendering logic which prevents it from generating crash dumps.
+
+The bug does not manifest if Windows sees a suitable 32 bpp video mode
+before a suitable 24 bpp video mode in the list of modes returned from
+vgabios. This commit moves all 32 bpp modes to the front of the list to
+make sure that this is always the case.
+
+Upstream patch:
+https://www.coreboot.org/pipermail/seabios/2016-October/010963.html
+
+There are valid concerns upstream about the breaking nature of the fix
+but for the limited set of operating systems supported by RHEL/RHEV we
+can easily verify that they are unaffected. So as things stand now, this
+is a downstream-only patch which will be reverted in the near future;
+the exact time will depend on Windows 10 RS2 schedule and other factors.
+The goal is to make sure that our customers running Windows 10 VMs can
+generate crash dumps.
+
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+Signed-off-by: Miroslav Rezanina <mrezanin@redhat.com>
+
+diff --git a/vgasrc/svgamodes.c b/vgasrc/svgamodes.c
+index 6e494c7..008f1b9 100644
+--- a/vgasrc/svgamodes.c
++++ b/vgasrc/svgamodes.c
+@@ -12,6 +12,25 @@
+ #include "svgamodes.h"
+ 
+ struct generic_svga_mode svga_modes[] VAR16 = {
++    /* 32 bpp BOCHS modes */
++    { 0x140, { MM_DIRECT, 320,  200,  32, 8, 16, SEG_GRAPH } },
++    { 0x141, { MM_DIRECT, 640,  400,  32, 8, 16, SEG_GRAPH } },
++    { 0x142, { MM_DIRECT, 640,  480,  32, 8, 16, SEG_GRAPH } },
++    { 0x143, { MM_DIRECT, 800,  600,  32, 8, 16, SEG_GRAPH } },
++    { 0x144, { MM_DIRECT, 1024, 768,  32, 8, 16, SEG_GRAPH } },
++    { 0x145, { MM_DIRECT, 1280, 1024, 32, 8, 16, SEG_GRAPH } },
++    { 0x147, { MM_DIRECT, 1600, 1200, 32, 8, 16, SEG_GRAPH } },
++    { 0x14c, { MM_DIRECT, 1152, 864,  32, 8, 16, SEG_GRAPH } },
++    { 0x177, { MM_DIRECT, 1280, 768,  32, 8, 16, SEG_GRAPH } },
++    { 0x17a, { MM_DIRECT, 1280, 800,  32, 8, 16, SEG_GRAPH } },
++    { 0x17d, { MM_DIRECT, 1280, 960,  32, 8, 16, SEG_GRAPH } },
++    { 0x180, { MM_DIRECT, 1440, 900,  32, 8, 16, SEG_GRAPH } },
++    { 0x183, { MM_DIRECT, 1400, 1050, 32, 8, 16, SEG_GRAPH } },
++    { 0x186, { MM_DIRECT, 1680, 1050, 32, 8, 16, SEG_GRAPH } },
++    { 0x189, { MM_DIRECT, 1920, 1200, 32, 8, 16, SEG_GRAPH } },
++    { 0x18c, { MM_DIRECT, 2560, 1600, 32, 8, 16, SEG_GRAPH } },
++    { 0x18f, { MM_DIRECT, 1280, 720,  32, 8, 16, SEG_GRAPH } },
++    { 0x192, { MM_DIRECT, 1920, 1080, 32, 8, 16, SEG_GRAPH } },
+     /* standard modes */
+     { 0x100, { MM_PACKED, 640,  400,  8,  8, 16, SEG_GRAPH } },
+     { 0x101, { MM_PACKED, 640,  480,  8,  8, 16, SEG_GRAPH } },
+@@ -41,49 +60,32 @@ struct generic_svga_mode svga_modes[] VAR16 = {
+     { 0x11E, { MM_DIRECT, 1600, 1200, 16, 8, 16, SEG_GRAPH } },
+     { 0x11F, { MM_DIRECT, 1600, 1200, 24, 8, 16, SEG_GRAPH } },
+     /* other modes */
+-    { 0x140, { MM_DIRECT, 320,  200,  32, 8, 16, SEG_GRAPH } },
+-    { 0x141, { MM_DIRECT, 640,  400,  32, 8, 16, SEG_GRAPH } },
+-    { 0x142, { MM_DIRECT, 640,  480,  32, 8, 16, SEG_GRAPH } },
+-    { 0x143, { MM_DIRECT, 800,  600,  32, 8, 16, SEG_GRAPH } },
+-    { 0x144, { MM_DIRECT, 1024, 768,  32, 8, 16, SEG_GRAPH } },
+-    { 0x145, { MM_DIRECT, 1280, 1024, 32, 8, 16, SEG_GRAPH } },
++    /* 8, 15, 16, and 24 bpp BOCHS modes */
+     { 0x146, { MM_PACKED, 320,  200,  8,  8, 16, SEG_GRAPH } },
+-    { 0x147, { MM_DIRECT, 1600, 1200, 32, 8, 16, SEG_GRAPH } },
+     { 0x148, { MM_PACKED, 1152, 864,  8,  8, 16, SEG_GRAPH } },
+     { 0x149, { MM_DIRECT, 1152, 864,  15, 8, 16, SEG_GRAPH } },
+     { 0x14a, { MM_DIRECT, 1152, 864,  16, 8, 16, SEG_GRAPH } },
+     { 0x14b, { MM_DIRECT, 1152, 864,  24, 8, 16, SEG_GRAPH } },
+-    { 0x14c, { MM_DIRECT, 1152, 864,  32, 8, 16, SEG_GRAPH } },
+     { 0x175, { MM_DIRECT, 1280, 768,  16, 8, 16, SEG_GRAPH } },
+     { 0x176, { MM_DIRECT, 1280, 768,  24, 8, 16, SEG_GRAPH } },
+-    { 0x177, { MM_DIRECT, 1280, 768,  32, 8, 16, SEG_GRAPH } },
+     { 0x178, { MM_DIRECT, 1280, 800,  16, 8, 16, SEG_GRAPH } },
+     { 0x179, { MM_DIRECT, 1280, 800,  24, 8, 16, SEG_GRAPH } },
+-    { 0x17a, { MM_DIRECT, 1280, 800,  32, 8, 16, SEG_GRAPH } },
+     { 0x17b, { MM_DIRECT, 1280, 960,  16, 8, 16, SEG_GRAPH } },
+     { 0x17c, { MM_DIRECT, 1280, 960,  24, 8, 16, SEG_GRAPH } },
+-    { 0x17d, { MM_DIRECT, 1280, 960,  32, 8, 16, SEG_GRAPH } },
+     { 0x17e, { MM_DIRECT, 1440, 900,  16, 8, 16, SEG_GRAPH } },
+     { 0x17f, { MM_DIRECT, 1440, 900,  24, 8, 16, SEG_GRAPH } },
+-    { 0x180, { MM_DIRECT, 1440, 900,  32, 8, 16, SEG_GRAPH } },
+     { 0x181, { MM_DIRECT, 1400, 1050, 16, 8, 16, SEG_GRAPH } },
+     { 0x182, { MM_DIRECT, 1400, 1050, 24, 8, 16, SEG_GRAPH } },
+-    { 0x183, { MM_DIRECT, 1400, 1050, 32, 8, 16, SEG_GRAPH } },
+     { 0x184, { MM_DIRECT, 1680, 1050, 16, 8, 16, SEG_GRAPH } },
+     { 0x185, { MM_DIRECT, 1680, 1050, 24, 8, 16, SEG_GRAPH } },
+-    { 0x186, { MM_DIRECT, 1680, 1050, 32, 8, 16, SEG_GRAPH } },
+     { 0x187, { MM_DIRECT, 1920, 1200, 16, 8, 16, SEG_GRAPH } },
+     { 0x188, { MM_DIRECT, 1920, 1200, 24, 8, 16, SEG_GRAPH } },
+-    { 0x189, { MM_DIRECT, 1920, 1200, 32, 8, 16, SEG_GRAPH } },
+     { 0x18a, { MM_DIRECT, 2560, 1600, 16, 8, 16, SEG_GRAPH } },
+     { 0x18b, { MM_DIRECT, 2560, 1600, 24, 8, 16, SEG_GRAPH } },
+-    { 0x18c, { MM_DIRECT, 2560, 1600, 32, 8, 16, SEG_GRAPH } },
+     { 0x18d, { MM_DIRECT, 1280, 720,  16, 8, 16, SEG_GRAPH } },
+     { 0x18e, { MM_DIRECT, 1280, 720,  24, 8, 16, SEG_GRAPH } },
+-    { 0x18f, { MM_DIRECT, 1280, 720,  32, 8, 16, SEG_GRAPH } },
+     { 0x190, { MM_DIRECT, 1920, 1080, 16, 8, 16, SEG_GRAPH } },
+     { 0x191, { MM_DIRECT, 1920, 1080, 24, 8, 16, SEG_GRAPH } },
+-    { 0x192, { MM_DIRECT, 1920, 1080, 32, 8, 16, SEG_GRAPH } },
+ 
+     /* custom resolutions for 16:9 displays */
+     { 0x193, { MM_DIRECT, 1600,  900, 16, 8, 16, SEG_GRAPH } },

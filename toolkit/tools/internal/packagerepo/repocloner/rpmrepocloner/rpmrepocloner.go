@@ -62,7 +62,6 @@ const (
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
 	chroot         *safechroot.Chroot
-	useUpdateRepo  bool
 	usePreviewRepo bool
 	cloneDir       string
 }
@@ -77,10 +76,9 @@ func New() *RpmRepoCloner {
 //  - tmpDir is the directory to create a chroot
 //  - workerTar is the path to the worker tar used to seed the chroot
 //  - existingRpmsDir is the directory with prebuilt RPMs
-//  - useUpdateRepo if set, the upstream update repository will be used.
 //  - usePreviewRepo if set, the upstream preview repository will be used.
 //  - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, useUpdateRepo, usePreviewRepo bool, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false
 
@@ -93,11 +91,6 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		overlayUpperDirectory = "/overlaywork/upper"
 		overlaySource         = "overlay"
 	)
-
-	r.useUpdateRepo = useUpdateRepo
-	if useUpdateRepo {
-		logger.Log.Info("Enabling update repo")
-	}
 
 	r.usePreviewRepo = usePreviewRepo
 	if usePreviewRepo {
@@ -313,15 +306,11 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", previewRepoID))
 			}
 
-			if !r.useUpdateRepo {
-				completeArgs = append(completeArgs, fmt.Sprintf("--disablerepo=%s", updateRepoID))
-			}
-
 			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
 			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
 
 			if err != nil {
-				logger.Log.Errorf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
+				logger.Log.Debugf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
 				return
 			}
 
@@ -478,11 +467,6 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		// and will not been initialized until ConvertDownloadedPackagesIntoRepo is called on it
 		// when all cloning is complete.
 		args = append(args, fmt.Sprintf("--disablerepo=%s", fetcherRepoID))
-
-		// Explicitly disable the update repo if it is turned off.
-		if !r.useUpdateRepo {
-			args = append(args, fmt.Sprintf("--disablerepo=%s", updateRepoID))
-		}
 
 		if !r.usePreviewRepo {
 			args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))

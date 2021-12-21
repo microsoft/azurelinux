@@ -574,6 +574,8 @@ func (mp *ManualPartitionWidget) unmarshalPartitionTable() (err error) {
 		partitions[i].Start = diskCursor / basePartitionUnit
 		partitions[i].End = nextCursor / basePartitionUnit
 
+		partitionSettings[i].MountIdentifier = configuration.MountIdentifierDefault
+
 		if partitionSettings[i].MountPoint == rootMountPoint {
 			foundRootPartition = true
 		}

@@ -173,13 +173,15 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 
 	partitionSettings := []configuration.PartitionSetting{
 		configuration.PartitionSetting{
-			ID:           bootPartitionName,
-			MountPoint:   bootMountPoint,
-			MountOptions: bootMountOptions,
+			ID:              bootPartitionName,
+			MountPoint:      bootMountPoint,
+			MountOptions:    bootMountOptions,
+			MountIdentifier: configuration.MountIdentifierDefault,
 		},
 		configuration.PartitionSetting{
-			ID:         rootPartitionName,
-			MountPoint: rootMountPoint,
+			ID:              rootPartitionName,
+			MountPoint:      rootMountPoint,
+			MountIdentifier: configuration.MountIdentifierDefault,
 		},
 	}
 
@@ -221,8 +223,9 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 			FsType: bootDirPartitionFsType,
 		}
 		bootDirPartitionSetting := configuration.PartitionSetting{
-			ID:         bootDirPartitionName,
-			MountPoint: bootDirMountPoint,
+			ID:              bootDirPartitionName,
+			MountPoint:      bootDirMountPoint,
+			MountIdentifier: configuration.MountIdentifierDefault,
 		}
 
 		// Update the default root partition to move it farther down

@@ -1,28 +1,25 @@
 Summary:        Programs for processing and formatting text
 Name:           groff
-Version:        1.22.3
-Release:        7%{?dist}
+Version:        1.22.4
+Release:        1%{?dist}
 License:        GPLv3+
-URL:            http://www.gnu.org/software/groff
-Group:          Applications/Text
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://ftp.gnu.org/gnu/groff/%{name}-%{version}.tar.gz
+Group:          Applications/Text
+URL:            https://www.gnu.org/software/groff/
+Source0:        https://ftp.gnu.org/gnu/groff/%{name}-%{version}.tar.gz
 # No patch has been made available for CVE-2000-0803
 Patch0:         CVE-2000-0803.nopatch
-
+Requires:       perl-DBD-SQLite
+Requires:       perl-DBI
+Requires:       perl-DBIx-Simple
+Requires:       perl-File-HomeDir
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(oop_fh.pl) = %{version}-%{release}
 Provides:       perl(main_subs.pl) = %{version}-%{release}
 Provides:       perl(man.pl) = %{version}-%{release}
 Provides:       perl(subs.pl) = %{version}-%{release}
 Provides:       groff-base = %{version}-%{release}
-
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl-DBI
-Requires:       perl-DBIx-Simple
-Requires:       perl-DBD-SQLite
-Requires:       perl-File-HomeDir
-
 AutoReq:        no
 
 %description
@@ -52,7 +49,6 @@ done
 rm -rf %{buildroot}%{_infodir}
 
 %post	-p /sbin/ldconfig
-
 %postun	-p /sbin/ldconfig
 
 %files
@@ -65,31 +61,35 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
-*   Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 1.22.3-7
--   Adding Fedora's symbolic links to provide the same set of file paths.
+* Sat Nov 20 2021 Chris Co <chrco@microsoft.com> - 1.22.4-1
+- Update to 1.22.4
+- License verified
 
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.22.3-6 (from dev branch)
--   Use new perl package names.
--   Provide groff-base.
+* Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.3-7
+- Adding Fedora's symbolic links to provide the same set of file paths.
 
-*   Mon Oct 05 2020 Daniel Burgener <daburgen@microsoft.com> 1.22.3-6 (from 1.0 branch)
--   Ensure build without X11 support
--   Don't automatically add requirements when built in the toolchain
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.22.3-6 (from dev branch)
+- Use new perl package names.
+- Provide groff-base.
 
-*   Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> 1.22.3-5
--   Nopatch CVE-2000-0803.nopatch
+* Mon Oct 05 2020 Daniel Burgener <daburgen@microsoft.com> - 1.22.3-6 (from 1.0 branch)
+- Ensure build without X11 support
+- Don't automatically add requirements when built in the toolchain
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.22.3-4
--   Added %%license line automatically
+* Mon Sep 28 2020 Daniel McIlvaney <damcilva@microsoft.com> - 1.22.3-5
+- Nopatch CVE-2000-0803.nopatch
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.22.3-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.22.3-4
+- Added %%license line automatically
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.22.3-2
--   GA - Bump release of all rpms
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.22.3-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Feb 23 2016 Xiaolin Li <xiaolinl@vmware.com> 1.22.3-1
--   Updated to version 1.22.3
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 1.22.3-2
+- GA - Bump release of all rpms
 
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.22.2-1
--   Initial build. First version
+* Tue Feb 23 2016 Xiaolin Li <xiaolinl@vmware.com> - 1.22.3-1
+- Updated to version 1.22.3
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 1.22.2-1
+- Initial build. First version

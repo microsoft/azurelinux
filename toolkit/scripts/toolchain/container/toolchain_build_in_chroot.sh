@@ -67,14 +67,16 @@ set -e
 #
 cd /sources
 
-echo Linux-5.10.74.1 API Headers
-tar xf kernel-5.10.74.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
+echo Linux-5.10.78.1 API Headers
+tar xf kernel-5.10.78.1.tar.gz
+cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1/
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
+patch -p1 -i 0002-add-linux-syscall-license-info.patch
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.74.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -543,17 +545,17 @@ popd
 rm -rf grep-3.7
 touch /logs/status_grep_complete
 
-echo Bash-4.4.18
-tar xf bash-4.4.18.tar.gz
-pushd bash-4.4.18
-./configure --prefix=/usr                    \
-            --docdir=/usr/share/doc/bash-4.4.18 \
-            --without-bash-malloc            \
+echo Bash-5.1.8
+tar xf bash-5.1.8.tar.gz
+pushd bash-5.1.8
+./configure --prefix=/usr                      \
+            --docdir=/usr/share/doc/bash-5.1.8 \
+            --without-bash-malloc              \
             --with-installed-readline
 make -j$(nproc)
 make install
 cd /sources
-rm -rf bash-4.4.18
+rm -rf bash-5.1.8
 touch /logs/status_bash_complete
 
 echo Libtool-2.4.6
@@ -588,17 +590,17 @@ popd
 rm -rf gperf-3.1
 touch /logs/status_gperf_complete
 
-echo Expat-2.2.6
-tar xf expat-2.2.6.tar.bz2
-pushd expat-2.2.6
+echo Expat-2.4.1
+tar xf expat-2.4.1.tar.bz2
+pushd expat-2.4.1
 sed -i 's|usr/bin/env |bin/|' run.sh.in
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/expat-2.2.6
+            --docdir=/usr/share/doc/expat-2.4.1
 make -j$(nproc)
 make install
 popd
-rm -rf expat-2.2.6
+rm -rf expat-2.4.1
 touch /logs/status_expat_complete
 
 echo Perl-5.32.0
@@ -632,14 +634,14 @@ popd
 rm -rf autoconf-2.69
 touch /logs/status_autoconf_complete
 
-echo Automake-1.16.1
-tar xf automake-1.16.1.tar.xz
-pushd automake-1.16.1
-./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.1
+echo Automake-1.16.5
+tar xf automake-1.16.5.tar.gz
+pushd automake-1.16.5
+./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.16.5
 make -j$(nproc)
 make install
 popd
-rm -rf automake-1.16.1
+rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
 echo Xz-5.2.5
@@ -883,19 +885,14 @@ popd
 rm -rf libpipeline-1.5.0
 touch /logs/status_libpipeline_complete
 
-echo Make-4.2.1
-tar xf make-4.2.1.tar.gz
-pushd make-4.2.1
-# fix errors caused by glibc 2.34
-# Note: upgrading to make 4.3 fixes the glob errors, but also caused the following errors: (possibly faccessat2 docker issue)
-# make[1]: /bin/sh: Operation not permitted
-sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
-sed -i '215 d; 223 d;' glob/glob.c
+echo Make-4.3
+tar xf make-4.3.tar.gz
+pushd make-4.3
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf make-4.2.1
+rm -rf make-4.3
 touch /logs/status_make_complete
 
 echo Patch-2.7.6
@@ -1069,32 +1066,6 @@ popd
 rm -rf db-5.3.28
 touch /logs/status_libdb_complete
 
-echo nss-3.44
-tar xf nss-3.44.tar.gz
-pushd nss-3.44
-patch -Np1 -i ../nss-3.44-standalone-1.patch
-cd nss
-export NSS_DISABLE_GTESTS=1
-# Build with single processor due to errors seen with parallel make
-make -j1 BUILD_OPT=1                    \
-    NSPR_INCLUDE_DIR=/usr/include/nspr  \
-    USE_SYSTEM_ZLIB=1                   \
-    ZLIB_LIBS=-lz                       \
-    NSS_ENABLE_WERROR=0                 \
-    USE_64=1                            \
-    $([ -f /usr/include/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)
-cd ../dist
-install -v -m755 Linux*/lib/*.so              /usr/lib
-install -v -m644 Linux*/lib/{*.chk,libcrmf.a} /usr/lib
-install -v -m755 -d                           /usr/include/nss
-cp -v -RL {public,private}/nss/*              /usr/include/nss
-chmod -v 644                                  /usr/include/nss/*
-install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} /usr/bin
-install -v -m644 Linux*/lib/pkgconfig/nss.pc  /usr/lib/pkgconfig
-popd
-rm -rf nss-3.44
-touch /logs/status_nss_complete
-
 echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2
 pushd cpio-2.13
@@ -1166,28 +1137,57 @@ popd
 rm -rf lua-5.3.5
 touch /logs/status_lua_complete
 
-echo rpm-4.14.2.1
-tar xjf rpm-4.14.2.1.tar.bz2
-pushd rpm-4.14.2.1
+DEBUGEDIT_WITH_VERSION=debugedit-5.0
+echo $DEBUGEDIT_WITH_VERSION
+tar xf "$DEBUGEDIT_WITH_VERSION".tar.xz
+pushd "$DEBUGEDIT_WITH_VERSION"
+./configure --prefix=/usr
+make
+make install
+popd
+rm -rf "$DEBUGEDIT_WITH_VERSION"
+touch /logs/status_debugedit_complete
+
+RPM_WITH_VERSION=rpm-4.17.0
+RPM_FOLDER="$RPM_WITH_VERSION"-release
+echo $RPM_WITH_VERSION
+tar xf "$RPM_WITH_VERSION"-release.tar.gz
+mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
+pushd "$RPM_FOLDER"
+
+# Still not in the upstream
 patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
+
+# Do not build docs - pandoc dependency is not supplied in the toolchain.
+sed -iE '/SUBDIRS/ s/docs //' Makefile.am
+sed -iE '/Always build/,+16 d' Makefile.am
+
+./autogen.sh --noconfigure
 ./configure --prefix=/usr \
-    --enable-posixmutexes \
-    --without-selinux \
-    --with-vendor=mariner \
-    --without-python \
-    --with-lua \
-    --without-javaglue
+        --enable-ndb \
+        --without-selinux \
+        --with-crypto=openssl \
+        --with-vendor=mariner
+
 make -j$(nproc)
 make install
 install -d /var/lib/rpm
+
 rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
-rm -rf rpm-4.14.2.1
+
+rm -rf "$RPM_FOLDER"
+
+# Fix the interpreter path for python replacing the first line
+sed -i '1 s:.*:#!/usr/bin/python3:' pythondistdeps.py
+install -p pythondistdeps.py /usr/lib/rpm/pythondistdeps.py
+install -p pythondeps.sh /usr/lib/rpm/pythondeps.sh
+install -p python.attr /usr/lib/rpm/fileattrs/python.attr
+
 touch /logs/status_rpm_complete
 
 # Cleanup
 rm -rf /tmp/*
-unset BUILD_TARGET
 
 echo sanity check - raw toolchain - after build complete - gcc -v
 gcc -v
