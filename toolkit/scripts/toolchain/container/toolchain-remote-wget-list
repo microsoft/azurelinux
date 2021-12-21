@@ -57,7 +57,7 @@ https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.26.t
 http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz
 http://download.savannah.gnu.org/releases/man-db/man-db-2.8.4.tar.xz
 https://archive.mozilla.org/pub/nspr/releases/v4.33/src/nspr-4.33.tar.gz
-http://www.linuxfromscratch.org/patches/downloads/nss/nss-3.44-standalone-1.patch
+http://www.linuxfromscratch.org/patches/downloads/nss/nss-3.73-standalone-1.patch
 https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_73_RTM/src/nss-3.73.tar.gz
 https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.028.tar.gz
 https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.51.tar.gz
