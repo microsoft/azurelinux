@@ -1,6 +1,6 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.36.1
+Version:        2.37
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
+Patch0:         CVE-2021-45078.patch
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -99,7 +100,6 @@ make %{?_smp_mflags} check
 %{_includedir}/ansidecl.h
 %{_includedir}/bfdlink.h
 %{_includedir}/dis-asm.h
-%{_includedir}/bfd_stdint.h
 %{_includedir}/diagnostics.h
 %{_includedir}/ctf-api.h
 %{_includedir}/ctf.h
@@ -118,6 +118,10 @@ make %{?_smp_mflags} check
 %{_libdir}/libctf.so.0.*
 
 %changelog
+*   Tue Dec 21 2021 Nicolasg Guibourge <anphel@microsoft.com> 2.37-1
+-   Update to version 2.37
+-   Fix CVE-2021-45078
+
 *   Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> 2.36.1-1
 -   Update to version 2.36.1
 
