@@ -19,7 +19,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Source0:        https://archive.mozilla.org/pub/security/nss/releases/NSS_3_73_RTM/src/%{name}-%{version}.tar.gz
-Patch0:         nss-3.44-standalone-1.patch
+Patch0:         nss-3.73-standalone-1.patch
 
 BuildRequires:  nspr-devel
 BuildRequires:  sqlite-devel

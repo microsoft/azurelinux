@@ -1018,9 +1018,9 @@ popd
 rm -rf sqlite-autoconf-3320100
 touch /logs/status_sqlite-autoconf_complete
 
-echo nspr-4.21
-tar xf nspr-4.21.tar.gz
-pushd nspr-4.21
+echo nspr-4.33
+tar xf nspr-4.33.tar.gz
+pushd nspr-4.33
 cd nspr
 sed -ri 's#^(RELEASE_BINS =).*#\1#' pr/src/misc/Makefile.in
 sed -i 's#$(LIBRARY) ##'            config/rules.mk
@@ -1031,7 +1031,7 @@ sed -i 's#$(LIBRARY) ##'            config/rules.mk
 make -j$(nproc)
 make install
 popd
-rm -rf nspr-4.21
+rm -rf nspr-4.33
 touch /logs/status_nspr_complete
 
 echo popt-1.16
@@ -1068,10 +1068,10 @@ popd
 rm -rf db-5.3.28
 touch /logs/status_libdb_complete
 
-echo nss-3.44
-tar xf nss-3.44.tar.gz
-pushd nss-3.44
-patch -Np1 -i ../nss-3.44-standalone-1.patch
+echo nss-3.73
+tar xf nss-3.73.tar.gz
+pushd nss-3.73
+patch -Np1 -i ../nss-3.73-standalone-1.patch
 cd nss
 export NSS_DISABLE_GTESTS=1
 # Build with single processor due to errors seen with parallel make
@@ -1091,7 +1091,7 @@ chmod -v 644                                  /usr/include/nss/*
 install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} /usr/bin
 install -v -m644 Linux*/lib/pkgconfig/nss.pc  /usr/lib/pkgconfig
 popd
-rm -rf nss-3.44
+rm -rf nss-3.73
 touch /logs/status_nss_complete
 
 echo cpio-2.13
