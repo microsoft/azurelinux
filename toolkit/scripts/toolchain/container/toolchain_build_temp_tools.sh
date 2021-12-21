@@ -185,9 +185,10 @@ rm -rf gcc-9.1.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
 
-echo Binutils-2.36.1 - Pass 2
-tar xf binutils-2.36.1.tar.xz
-pushd binutils-2.36.1
+echo Binutils-2.37 - Pass 2
+tar xf binutils-2.37.tar.xz
+pushd binutils-2.37
+patch -Np1 -i /tools/CVE-2021-45078.patch
 mkdir -v build
 cd build
 CC=$LFS_TGT-gcc                  \
@@ -205,7 +206,7 @@ make -C ld clean
 make -C ld LIB_PATH=/usr/lib:/lib
 cp -v ld/ld-new /tools/bin
 popd
-rm -rf binutils-2.36.1
+rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
