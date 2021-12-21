@@ -38,8 +38,6 @@ CC=%{__cc} CXX=%{__cxx} ./configure --prefix=%{_prefix}
 %{__rm} -rf $RPM_BUILD_ROOT
 make DESTDIR=%{buildroot} install
 
-%{__rm} -rf $RPM_BUILD_ROOT
-
 %post	-p /sbin/ldconfig
 
 %postun	-p /sbin/ldconfig

@@ -20,8 +20,6 @@ Dstat gives you detailed selective information in columns and clearly indicates 
 %{__rm} -rf %{buildroot}
 %{__make} install DESTDIR="%{buildroot}"
 
-%{__rm} -rf %{buildroot}
-
 %files
 %defattr(-, root, root, 0755)
 %license COPYING
