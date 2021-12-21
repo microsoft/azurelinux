@@ -16,9 +16,10 @@ touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
 cat /home/lfs/.bashrc
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 
-echo Binutils-2.36.1 - Pass 1
-tar xf binutils-2.36.1.tar.xz
-pushd binutils-2.36.1
+echo Binutils-2.37 - Pass 1
+tar xf binutils-2.37.tar.xz
+pushd binutils-2.37
+patch -Np1 -i /tools/CVE-2021-45078.patch
 mkdir -v build
 cd build
 ../configure --prefix=/tools \
@@ -31,7 +32,7 @@ make -j$(nproc)
 mkdir -v /tools/lib && ln -sv lib /tools/lib64
 make install
 popd
-rm -rf binutils-2.36.1
+rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 

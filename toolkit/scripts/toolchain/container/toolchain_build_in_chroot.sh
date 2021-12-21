@@ -237,9 +237,10 @@ popd
 rm -rf m4-1.4.18
 touch /logs/status_m4_complete
 
-echo Binutils-2.36.1
-tar xf binutils-2.36.1.tar.xz
-pushd binutils-2.36.1
+echo Binutils-2.37
+tar xf binutils-2.37.tar.xz
+pushd binutils-2.37
+patch -Np1 -i /tools/CVE-2021-45078.patch
 sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
 mkdir -v build
 cd build
@@ -256,7 +257,7 @@ cd build
 make -j$(nproc) tooldir=/usr
 make tooldir=/usr install
 popd
-rm -rf binutils-2.36.1
+rm -rf binutils-2.37
 touch /logs/status_binutils_complete
 
 echo GMP-6.1.2
