@@ -1,7 +1,7 @@
 Summary:        Microsoft Bond Library
 Name:           bond
 Version:        8.0.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ BuildRequires:  boost-devel
 BuildRequires:  clang
 BuildRequires:  cmake
 BuildRequires:  gmp-devel
+BuildRequires:  libffi-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  rapidjson-devel
 BuildRequires:  zlib-devel
@@ -68,6 +69,9 @@ chmod 0755 %{buildroot}%{_bindir}/gbc
 %{_libdir}/%{name}/*
 
 %changelog
+* Wed Dec 22 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0.1-6
+- Requires libffi-devel to build.
+
 * Tue Nov 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.1-5
 - Updating package build steps.
 
