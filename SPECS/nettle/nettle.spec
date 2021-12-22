@@ -1,6 +1,6 @@
 Summary:	Low level cryptographic libraries
 Name:		nettle
-Version:    3.7.2
+Version:    3.7.3
 Release:    1%{?dist}
 License:	LGPLv3+ or GPLv2+
 URL:        https://www.lysator.liu.se/~nisse/nettle/
@@ -63,6 +63,8 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Dec 21 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.7.3-1
+- Updgrading to 3.7.3
 * Mon Apr 12 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.7.2-1
 - Update to 3.7.2 for CVE-2021-20305
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.4.1-2
