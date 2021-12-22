@@ -5,6 +5,7 @@ Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+ExclusiveArch:  x86_64
 URL:            https://github.com/microsoft/bond
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -14,7 +15,6 @@ BuildRequires:  boost-devel
 BuildRequires:  clang
 BuildRequires:  cmake
 BuildRequires:  gmp-devel
-BuildRequires:  libffi-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  rapidjson-devel
 BuildRequires:  zlib-devel
@@ -70,7 +70,7 @@ chmod 0755 %{buildroot}%{_bindir}/gbc
 
 %changelog
 * Wed Dec 22 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0.1-6
-- Requires libffi-devel to build.
+- Only build it for x86_64.
 
 * Tue Nov 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.1-5
 - Updating package build steps.
