@@ -206,7 +206,7 @@
         "other": {
           "name": "autoconf213",
           "version": "2.13",
-          "downloadUrl": "ftp://prep.ai.mit.edu/pub/gnu/autoconf/autoconf-2.13.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/pub/gnu/autoconf/autoconf-2.13.tar.gz"
         }
       }
     },
@@ -495,8 +495,8 @@
         "type": "other",
         "other": {
           "name": "busybox",
-          "version": "1.32.0",
-          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.32.0.tar.bz2"
+          "version": "1.34.1",
+          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.34.1.tar.bz2"
         }
       }
     },
@@ -1415,8 +1415,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.2.6",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_2_6/expat-2.2.6.tar.bz2"
+          "version": "2.4.1",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_1/expat-2.4.1.tar.bz2"
         }
       }
     },
@@ -4575,8 +4575,8 @@
         "type": "other",
         "other": {
           "name": "nspr",
-          "version": "4.21",
-          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.21/src/nspr-4.21.tar.gz"
+          "version": "4.33",
+          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.33/src/nspr-4.33.tar.gz"
         }
       }
     },
@@ -4585,8 +4585,8 @@
         "type": "other",
         "other": {
           "name": "nss",
-          "version": "3.44",
-          "downloadUrl": "https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/nss-3.44.tar.gz"
+          "version": "3.73",
+          "downloadUrl": "https://archive.mozilla.org/pub/security/nss/releases/NSS_3_73_RTM/src/nss-3.73.tar.gz"
         }
       }
     },
@@ -6275,8 +6275,8 @@
         "type": "other",
         "other": {
           "name": "python-lxml",
-          "version": "4.6.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/e5/21/a2e4517e3d216f0051687eea3d3317557bde68736f038a3b105ac3809247/lxml-4.6.3.tar.gz"
+          "version": "4.7.1",
+          "downloadUrl": "https://github.com/lxml/lxml/releases/download/lxml-4.7.1/lxml-4.7.1.tar.gz"
         }
       }
     },
