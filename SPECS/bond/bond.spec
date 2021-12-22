@@ -1,7 +1,7 @@
 Summary:        Microsoft Bond Library
 Name:           bond
 Version:        8.0.1
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,9 +69,6 @@ chmod 0755 %{buildroot}%{_bindir}/gbc
 %{_libdir}/%{name}/*
 
 %changelog
-* Wed Dec 22 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0.1-6
-- Only build it for x86_64.
-
 * Tue Nov 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.1-5
 - Updating package build steps.
 
