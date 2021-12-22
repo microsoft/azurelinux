@@ -11,16 +11,16 @@
 %{nil}
 Summary:        Security client
 Name:           nss
-Version:        3.44
-Release:        6%{?dist}
+Version:        3.73
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
-Source0:        https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/%{name}-%{version}.tar.gz
-Patch0:         nss-3.44-standalone-1.patch
-Patch1:         CVE-2020-12403.patch
+Source0:        https://archive.mozilla.org/pub/security/nss/releases/NSS_3_73_RTM/src/%{name}-%{version}.tar.gz
+Patch0:         nss-3.73-standalone-1.patch
+
 BuildRequires:  nspr-devel
 BuildRequires:  sqlite-devel
 Requires:       nspr
@@ -54,9 +54,7 @@ Requires:       sqlite-libs
 This package contains minimal set of shared nss libraries.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 export NSS_FORCE_FIPS=1
@@ -118,6 +116,9 @@ popd
 %{unsupported_tools_directory}/shlibsign
 
 %changelog
+*   Sat Dec 18 2021 Jon Slobodzian <joslobo@microsoft.com> 3.73-1
+-   Upgrade to fix CVE-2021-43527
+
 *   Thu Jun 10 2021 Henry Beberman <henry.beberman@microsoft.com> 3.44-6
 -   Patch CVE-2020-12403
 

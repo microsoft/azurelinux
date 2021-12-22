@@ -1,7 +1,7 @@
 Summary:        HA monitor built upon LVS, VRRP and services poller
 Name:           keepalived
 Version:        2.0.10
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,7 +11,7 @@ URL:            https://www.keepalived.org/
 #Source0:       https://github.com/acassen/keepalived/archive/v%{version}.zip
 Source0:        %{name}-%{version}.zip
 Source1:        %{name}.service
-
+Patch0:         CVE-2021-44225.patch
 BuildRequires:  ipset-devel
 BuildRequires:  iptables-devel
 BuildRequires:  libmnl-devel
@@ -21,7 +21,6 @@ BuildRequires:  net-snmp-devel
 BuildRequires:  openssl-devel
 BuildRequires:  systemd
 BuildRequires:  unzip
-
 Requires:       libnl3-devel
 Requires:       net-snmp
 Requires:       systemd
@@ -39,7 +38,7 @@ failover. So in short keepalived is a userspace daemon for LVS cluster nodes
 healthchecks and LVS directors failover.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 autoreconf -f -i
@@ -90,6 +89,9 @@ fi
 %{_mandir}/man8/%{name}.8*
 
 %changelog
+* Sat Dec 04 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 2.0.10-7
+- Added patch file(s) CVE-2021-44225.patch
+
 * Thu Apr 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.10-6
 - Adding an explicit run-time dependency on 'net-snmp'.
 - Bumping up release number to link against newer version of 'net-snmp' libraries.
