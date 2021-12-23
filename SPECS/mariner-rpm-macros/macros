@@ -102,6 +102,27 @@
   LDFLAGS="${LDFLAGS:-%{build_ldflags}}" ; export LDFLAGS ; \
   LT_SYS_LIBRARY_PATH="${LT_SYS_LIBRARY_PATH:-%_libdir:}" ; export LT_SYS_LIBRARY_PATH
 
+# Internal-only.  Do not use.  Expand a variable and strip the flags
+# not suitable to extension builders.
+%__extension_strip_flags() %{lua:
+local name = rpm.expand("%{1}")
+local value = " " .. rpm.expand("%{build_" .. name .. "}")
+local specs_pattern = "%s+-specs=[^%s]+"
+local lto_flags_pattern = rpm.expand("%{?_lto_cflags}"):gsub("[%-%.]", "%%%1")
+local module_info_pattern = "%s*%-Wl,%-dT,[^%s]+module_info%.ld"
+local leading_spaces_pattern = "^%s+"
+local result = value:gsub(specs_pattern, " "):gsub(lto_flags_pattern, ""):gsub(module_info_pattern, ""):gsub(leading_spaces_pattern, "")
+print(result)
+}
+
+# Variants of CFLAGS, CXXFLAGS, FFLAGS, LDFLAGS for use within
+# extension builders.
+# https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
+%extension_cflags %{__extension_strip_flags cflags}
+%extension_cxxflags %{__extension_strip_flags cxxflags}
+%extension_fflags %{__extension_strip_flags fflags}
+%extension_ldflags %{__extension_strip_flags ldflags}
+
 %configure \
   %{set_build_flags}; \
   %{_configure} --host=%{_host} --build=%{_build} \\\
