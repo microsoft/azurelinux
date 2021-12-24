@@ -4,6 +4,7 @@
 
 from enum import Enum
 from functools import cmp_to_key
+from os.path import dirname
 
 import argparse
 import json
@@ -125,9 +126,14 @@ COMPONENT_KEY_NAME_AND_VERSION = cmp_to_key(
     components_compare_name_and_version)
 
 # Can't rely on Python's 'pyrpm.spec' module - it's not as good with parsing the spec as 'rpmspec' and may leave unexpanded macros.
-RPMSPEC_COMMAND_COMMON = "rpmspec --parse -D 'forgemeta %{nil}' -D 'py3_dist X' -D 'with_check 0' -D 'dist .cm2' -D '__python3 python3' -D '_sourcedir SPECS-EXTENDED/python-oslo-config' -D 'fillup_prereq fillup'"
+RPMSPEC_COMMAND_COMMON = "rpmspec --parse -D 'forgemeta %{{nil}}' -D 'py3_dist X' -D 'with_check 0' -D 'dist .cm2' -D '__python3 python3' -D '_sourcedir {source_dir}' -D 'fillup_prereq fillup'"
 SOURCE0_LINE_REGEX = re.compile(r"^\s*Source0*:")
 SOURCE_VALUE_REGEX = re.compile(r"(?<=[\s:])[^\s#]+")
+
+
+def formatted_rpmspec_command(spec_path):
+    source_dir = dirname(spec_path)
+    return f"{RPMSPEC_COMMAND_COMMON.format(source_dir=source_dir)}"
 
 
 def read_spec_name(spec_path):
@@ -135,8 +141,10 @@ def read_spec_name(spec_path):
 
 
 def read_spec_source0(spec_path):
-    process = subprocess.Popen(shlex.split(
-        f"{RPMSPEC_COMMAND_COMMON}  --parse {spec_path}"), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    command = formatted_rpmspec_command(spec_path)
+    process = subprocess.Popen(shlex.split(f"{command}  --parse {spec_path}"),
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.DEVNULL)
     lines = [str(x, encoding="utf-8", errors="strict").strip()
              for x in process.stdout]
 
@@ -147,9 +155,10 @@ def read_spec_source0(spec_path):
 
 
 def read_spec_tag(spec_path, tag):
-    return str(subprocess.check_output(shlex.split(f"{RPMSPEC_COMMAND_COMMON} --srpm --qf '%{{{tag}}}' -q {spec_path}"), stderr=subprocess.DEVNULL),
-               encoding="utf-8",
-               errors="strict")
+    command = formatted_rpmspec_command(spec_path)
+    raw_output = subprocess.check_output(shlex.split(f"{command} --srpm --qf '%{{{tag}}}' -q {spec_path}"),
+                                         stderr=subprocess.DEVNULL)
+    return str(raw_output, encoding="utf-8", errors="strict")
 
 
 def read_spec_version(spec_path):
