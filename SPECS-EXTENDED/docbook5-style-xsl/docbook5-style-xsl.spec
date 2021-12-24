@@ -20,7 +20,7 @@ Requires(postun): libxml2 >= 2.4.8
 Conflicts: passivetex < 1.21
 
 BuildArch: noarch
-Source0: https://github.com/docbook/xslt10-stylesheets/releases/download/release%2F{%version}/docbook-xsl-%{version}.tar.bz2
+Source0: https://github.com/docbook/xslt10-stylesheets/releases/download/release%2F%{version}/docbook-xsl-%{version}.tar.bz2
 
 %description
 These XSL namespace aware stylesheets allow you to transform any
