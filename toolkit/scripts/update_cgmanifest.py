@@ -2,11 +2,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-from bisect import bisect_left
 from enum import Enum
 from functools import cmp_to_key
-from sys import version
-from pyrpm.spec import Spec, replace_macros
 
 import argparse
 import json
@@ -15,6 +12,7 @@ import rpm
 import shlex
 import subprocess
 import validators
+
 
 class ElementSelection(Enum):
     first = 'first'
@@ -27,8 +25,10 @@ class ElementSelection(Enum):
 # Custom implementation with our own comparator because "bisect_left" doesn't support
 # a custom "key" argument before Python 3.10.
 #
-# Returns the index of any matching element or -1, if the elements is not there.
-def binary_search(arr, searched, comparator, lower_bound = 0, upper_bound = -1):
+# Returns:
+# - the index of ANY matching element, or
+# - -1, if the elements is not there.
+def binary_search(arr, searched, comparator, lower_bound=0, upper_bound=-1):
     if upper_bound == -1:
         upper_bound = len(arr) - 1
 
@@ -48,19 +48,24 @@ def binary_search(arr, searched, comparator, lower_bound = 0, upper_bound = -1):
 # Custom implementation with our own comparator because "bisect_left" doesn't support
 # a custom "key" argument before Python 3.10.
 #
-# Returns the index of the first or last matching element or -1, if the elements is not there.
-def binary_search_specific(arr, searched, comparator, element_selection, lower_bound = 0, upper_bound = -1):
+# Returns:
+# - the index of the FIRST OR LAST matching element, or
+# - -1, if the elements is not there.
+def binary_search_specific(arr, searched, comparator, element_selection, lower_bound=0, upper_bound=-1):
     if upper_bound == -1:
         upper_bound = len(arr) - 1
 
     first_index = -1
-    new_first = binary_search(arr, searched, comparator, lower_bound = lower_bound, upper_bound = upper_bound)
+    new_first = binary_search(
+        arr, searched, comparator, lower_bound=lower_bound, upper_bound=upper_bound)
     while new_first != -1:
         first_index = new_first
         if element_selection == ElementSelection.first:
-            new_first = binary_search(arr, searched, comparator, lower_bound = lower_bound, upper_bound = new_first - 1)
+            new_first = binary_search(
+                arr, searched, comparator, lower_bound=lower_bound, upper_bound=new_first - 1)
         else:
-            new_first = binary_search(arr, searched, comparator, lower_bound = new_first + 1, upper_bound = upper_bound)
+            new_first = binary_search(
+                arr, searched, comparator, lower_bound=new_first + 1, upper_bound=upper_bound)
 
     return first_index
 
@@ -76,18 +81,6 @@ def component(name, version, url):
             }
         }
     }
-
-
-def component_name(component):
-    return component["component"]["other"]["name"]
-
-
-def component_url(component):
-    return component["component"]["other"]["downloadUrl"]
-
-
-def component_version(component):
-    return component["component"]["other"]["version"]
 
 
 def components_compare_name(item1, item2):
@@ -116,16 +109,25 @@ def components_compare_name_and_version(item1, item2):
     return rpm.labelCompare(evr1, evr2)
 
 
-COMPONENT_KEY_NAME_AND_VERSION = cmp_to_key(components_compare_name_and_version)
+def component_name(component):
+    return component["component"]["other"]["name"]
 
-# Can't rely on the 'pyrpm.spec' module - it's not as good with parsing the spec as 'rpmspec' and tends to leave unexpanded macros.
-RPMSPEC_COMMAND_COMMON="rpmspec --parse -D 'forgemeta %{nil}' -D 'py3_dist X' -D 'with_check 0' -D 'dist .cm2' -D '__python3 python3' -D '_sourcedir SPECS-EXTENDED/python-oslo-config' -D 'fillup_prereq fillup'"
+
+def component_url(component):
+    return component["component"]["other"]["downloadUrl"]
+
+
+def component_version(component):
+    return component["component"]["other"]["version"]
+
+
+COMPONENT_KEY_NAME_AND_VERSION = cmp_to_key(
+    components_compare_name_and_version)
+
+# Can't rely on Python's 'pyrpm.spec' module - it's not as good with parsing the spec as 'rpmspec' and may leave unexpanded macros.
+RPMSPEC_COMMAND_COMMON = "rpmspec --parse -D 'forgemeta %{nil}' -D 'py3_dist X' -D 'with_check 0' -D 'dist .cm2' -D '__python3 python3' -D '_sourcedir SPECS-EXTENDED/python-oslo-config' -D 'fillup_prereq fillup'"
 SOURCE0_LINE_REGEX = re.compile(r"^\s*Source0*:")
-SOURCE_VALUE_REGEX = re.compile(r"(?<=[\s:])[^\s#]+", )
-def read_spec_tag(spec_path, tag):
-    return str(subprocess.check_output(shlex.split(f"{RPMSPEC_COMMAND_COMMON} --srpm --qf '%{{{tag}}}' -q {spec_path}"), stderr=subprocess.DEVNULL),
-                       encoding="utf-8",
-                       errors="strict")
+SOURCE_VALUE_REGEX = re.compile(r"(?<=[\s:])[^\s#]+")
 
 
 def read_spec_name(spec_path):
@@ -133,13 +135,21 @@ def read_spec_name(spec_path):
 
 
 def read_spec_source0(spec_path):
-    process = subprocess.Popen(shlex.split(f"{RPMSPEC_COMMAND_COMMON}  --parse {spec_path}"), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    lines = [ str(x, encoding="utf-8", errors="strict").strip() for x in process.stdout ]
+    process = subprocess.Popen(shlex.split(
+        f"{RPMSPEC_COMMAND_COMMON}  --parse {spec_path}"), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    lines = [str(x, encoding="utf-8", errors="strict").strip()
+             for x in process.stdout]
 
     source0_line = list(filter(SOURCE0_LINE_REGEX.match, lines))
     if len(source0_line) == 0:
         return None
     return SOURCE_VALUE_REGEX.search(source0_line[0]).group()
+
+
+def read_spec_tag(spec_path, tag):
+    return str(subprocess.check_output(shlex.split(f"{RPMSPEC_COMMAND_COMMON} --srpm --qf '%{{{tag}}}' -q {spec_path}"), stderr=subprocess.DEVNULL),
+               encoding="utf-8",
+               errors="strict")
 
 
 def read_spec_version(spec_path):
@@ -161,34 +171,32 @@ def process_spec(spec_path, components, update_mode):
 
     if source_url is None:
         print(f"""
-WARNING: failed to retrieve the URL of the source tarball - spec contains no 'Source' tags.
-         If that's correct, you must ignore the spec inside the '.github/workflows/validate-cg-manifest.sh' script.
-         If this is incorrect and the spec should build with a source tarball, please update the spec accordingly.
+WARNING! NO 'SOURCE' TAG: {spec_path}
 
-No 'Source' tag: {spec_path}
+        Failed to retrieve the URL of the source tarball - spec contains no 'Source' tags.
+        If that's correct, you must ignore the spec inside the '.github/workflows/validate-cg-manifest.sh' script.
+        If this is incorrect and the spec should build with a source tarball, please update the spec accordingly.
 """)
         return
 
     if not validators.url(source_url):
         print(f"""
-WARNING: failed to retrieve the URL of the source tarball - first 'Source' tag ({source_url}) is not a valid URL.
-         Please make sure at least the first 'Source' tag contains a valid URL to the source tarball required to build that package.
-         If tag is correct and the package build doesn't rely on any source tarballs, you must ignore the spec inside the '.github/workflows/validate-cg-manifest.sh' script.
+WARNING! 'SOURCE'/'SOURCE0' TAG IS NOT A VALID URL: {spec_path}
 
-'Source' not a valid URL: {spec_path}
+        Failed to retrieve the URL of the source tarball - the 'Source'/'Source0' tag ({source_url}) is not a valid URL.
+        Please make sure the 'Source'/'Source0' tag contains a valid URL to the source tarball required to build that package.
+        If the tag is correct and the package build doesn't rely on any source tarballs, you must ignore the spec inside the '.github/workflows/validate-cg-manifest.sh' script.
 """)
         return
 
     processed_component = component(name, version, source_url)
 
-    insertion_index = -1
-    if update_mode != ElementSelection.new:
-        insertion_index = binary_search_specific(components, processed_component, components_compare_name, update_mode)
-
-    if insertion_index == -1:
+    update_index = -1 if (update_mode == ElementSelection.new) else binary_search_specific(components, processed_component, components_compare_name, update_mode)
+    if update_index == -1:
         components.insert(0, processed_component)
     else:
-        update_component(components[insertion_index], name, source_url, version)
+        update_component(components[update_index], name, source_url, version)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
