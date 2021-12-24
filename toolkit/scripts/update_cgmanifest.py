@@ -149,9 +149,7 @@ def read_spec_source0(spec_path):
              for x in process.stdout]
 
     source0_line = list(filter(SOURCE0_LINE_REGEX.match, lines))
-    if len(source0_line) == 0:
-        return None
-    return SOURCE_VALUE_REGEX.search(source0_line[0]).group()
+    return None if (len(source0_line) == 0) else SOURCE_VALUE_REGEX.search(source0_line[0]).group()
 
 
 def read_spec_tag(spec_path, tag):
