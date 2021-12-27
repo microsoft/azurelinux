@@ -8641,8 +8641,8 @@
         "type": "other",
         "other": {
           "name": "kmod",
-          "version": "25",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-25.tar.xz"
+          "version": "29",
+          "downloadUrl": "http://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-29.tar.xz"
         }
       }
     },

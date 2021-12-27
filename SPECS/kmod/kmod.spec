@@ -1,7 +1,7 @@
 Summary:        Utilities for loading kernel modules
 Name:           kmod
-Version:        25
-Release:        6%{?dist}
+Version:        29
+Release:        1%{?dist}
 License:        LGPLv2.1+ and GPLv2+
 URL:            http://www.kernel.org/pub/linux/utils/kernel/kmod
 Group:          Applications/System
@@ -61,6 +61,9 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/*.so
 
 %changelog
+* Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> -  29-1
+- Updated to version 29
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 25-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
