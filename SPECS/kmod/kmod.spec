@@ -11,7 +11,6 @@ Source0:        http://www.kernel.org/pub/linux/utils/kernel/kmod/%{name}-%{vers
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 Requires:       xz
-
 Provides:       module-init-tools
 Provides:       /sbin/modprobe
 
@@ -21,6 +20,7 @@ The Kmod package contains libraries and utilities for loading kernel modules
 %package        devel
 Summary:        Header and development files for kmod
 Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files to create applications.
 
