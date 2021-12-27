@@ -4,74 +4,71 @@ Initial Package Version: 2.4.4
 Comment:                 rediffed for version 2.4.10 (Fernando de Oliveira
                          <famobr at yahoo dot com dot br>)
                          rediffed for version 2.4.34 (thomas)
+                         rediffed for version 2.4.52 (renodr)
 Upstream Status:         Not applicable
 Origin:                  Self
 Description:             Patches the build system to install stuff into BLFS
                          specific paths, and adjusts proper permissions
                          on installed files and directories.
 
-diff -Naur httpd-2.4.34.orig/config.layout httpd-2.4.34/config.layout
---- httpd-2.4.34.orig/config.layout	2018-02-09 11:30:35.000000000 +0100
-+++ httpd-2.4.34/config.layout	2018-07-15 07:31:23.216202917 +0200
+diff -Naurp httpd-2.4.52.orig/config.layout httpd-2.4.52/config.layout
+--- httpd-2.4.52.orig/config.layout	2021-12-22 21:30:04.372594375 -0600
++++ httpd-2.4.52/config.layout	2021-12-22 21:37:33.176710886 -0600
 @@ -9,6 +9,30 @@
  ##    (This may become a configurable parameter at some point.)
  ##
  
 +<Layout BLFS>
-+    prefix:
-+    exec_prefix:     ${prefix}/usr
-+    bindir:          ${exec_prefix}/bin
-+    sbindir:         ${exec_prefix}/sbin
-+    libdir:          ${exec_prefix}/lib
-+    libexecdir:      ${exec_prefix}/lib/httpd/modules
-+    mandir:          ${exec_prefix}/share/man
-+    sysconfdir:      ${prefix}/etc/httpd
-+    datadir:         ${exec_prefix}/share/httpd
-+    iconsdir:        ${datadir}/icons
-+    htdocsdir:       ${prefix}/srv/www
-+    manualdir:       ${datadir}/manual
-+    cgidir:          ${exec_prefix}/lib/httpd/cgi-bin
-+    includedir:      ${exec_prefix}/include/httpd
-+    localstatedir:   ${prefix}/var/lock/httpd
-+    runtimedir:      ${prefix}/var/run/httpd
-+    logfiledir:      ${prefix}/var/log/httpd
-+    proxycachedir:   ${prefix}/var/cache/httpd/proxy
-+    infodir:         ${exec_prefix}/share/info
++    prefix:       
++    exec_prefix:  ${prefix}/usr
++    bindir:       ${exec_prefix}/bin
++    sbindir:      ${exec_prefix}/sbin
++    libdir:       ${exec_prefix}/lib
++    libexecdir:   ${exec_prefix}/lib/httpd/modules
++    mandir:       ${exec_prefix}/share/man
++    sysconfdir:   ${prefix}/etc/httpd
++    datadir:      ${exec_prefix}/share/httpd
++    iconsdir:     ${datadir}/icons
++    htdocsdir:    ${prefix}/srv/www
++    manualdir:    ${datadir}/manual
++    cgidir:       ${exec_prefix}/lib/httpd/cgi-bin
++    includedir:   ${exec_prefix}/include/httpd
++    localstatedir: ${prefix}/var/lock/httpd
++    runtimedir:   ${prefix}/var/run/httpd
++    logfiledir:   ${prefix}/var/log/httpd
++    proxycachedir: ${prefix}/var/cache/httpd/proxy
++    infodir:      ${exec_prefix}/share/info
 +    installbuilddir: ${datadir}/build
-+    errordir:        ${datadir}/error
++    errordir:     ${datadir}/error
 +</Layout>
 +
  #   Classical Apache path layout.
  <Layout Apache>
      prefix:        /usr/local/apache2
-diff -Naur httpd-2.4.34.orig/configure httpd-2.4.34/configure
---- httpd-2.4.34.orig/configure	2018-07-10 15:55:14.000000000 +0200
-+++ httpd-2.4.34/configure	2018-07-15 07:31:23.232202853 +0200
-@@ -39653,17 +39653,17 @@
+diff -Naurp httpd-2.4.52.orig/configure httpd-2.4.52/configure
+--- httpd-2.4.52.orig/configure	2021-12-22 21:30:04.300594740 -0600
++++ httpd-2.4.52/configure	2021-12-22 21:39:27.298277251 -0600
+@@ -41848,13 +41848,13 @@ done
+ ap_prefix="${ap_cur}"
  
  
- cat >>confdefs.h <<_ACEOF
--#define HTTPD_ROOT "${ap_prefix}"
-+#define HTTPD_ROOT "/etc/httpd"
- _ACEOF
+-printf "%s\n" "#define HTTPD_ROOT \"${ap_prefix}\"" >>confdefs.h
++printf "%s\n" "#define HTTPD_ROOT \"/etc/httpd\"" >>confdefs.h
  
  
- cat >>confdefs.h <<_ACEOF
--#define SERVER_CONFIG_FILE "${rel_sysconfdir}/${progname}.conf"
-+#define SERVER_CONFIG_FILE "${progname}.conf"
- _ACEOF
+-printf "%s\n" "#define SERVER_CONFIG_FILE \"${rel_sysconfdir}/${progname}.conf\"" >>confdefs.h
++printf "%s\n" "#define SERVER_CONFIG_FILE \"${progname}.conf\"" >>confdefs.h
  
  
- cat >>confdefs.h <<_ACEOF
--#define AP_TYPES_CONFIG_FILE "${rel_sysconfdir}/mime.types"
-+#define AP_TYPES_CONFIG_FILE "mime.types"
- _ACEOF
+-printf "%s\n" "#define AP_TYPES_CONFIG_FILE \"${rel_sysconfdir}/mime.types\"" >>confdefs.h
++printf "%s\n" "#define AP_TYPES_CONFIG_FILE \"mime.types\"" >>confdefs.h
  
  
-diff -Naur httpd-2.4.34.orig/configure.in httpd-2.4.34/configure.in
---- httpd-2.4.34.orig/configure.in	2018-05-30 21:09:00.000000000 +0200
-+++ httpd-2.4.34/configure.in	2018-07-15 07:31:23.235202841 +0200
-@@ -871,11 +871,11 @@
+ perlbin=`$ac_aux_dir/PrintPath perl`
+diff -Naurp httpd-2.4.52.orig/configure.in httpd-2.4.52/configure.in
+--- httpd-2.4.52.orig/configure.in	2021-12-22 21:30:04.369594390 -0600
++++ httpd-2.4.52/configure.in	2021-12-22 22:03:11.263761074 -0600
+@@ -878,11 +878,11 @@ rm -f modules.c
  echo $MODLIST | $AWK -f $srcdir/build/build-modules-c.awk > modules.c
  
  APR_EXPAND_VAR(ap_prefix, $prefix)
@@ -86,9 +83,9 @@ diff -Naur httpd-2.4.34.orig/configure.in httpd-2.4.34/configure.in
  	[Location of the MIME types config file, relative to the Apache root directory])
  
  perlbin=`$ac_aux_dir/PrintPath perl`
-diff -Naur httpd-2.4.34.orig/docs/conf/httpd.conf.in httpd-2.4.34/docs/conf/httpd.conf.in
---- httpd-2.4.34.orig/docs/conf/httpd.conf.in	2016-08-17 01:12:07.000000000 +0200
-+++ httpd-2.4.34/docs/conf/httpd.conf.in	2018-07-15 07:31:23.236202837 +0200
+diff -Naurp httpd-2.4.52.orig/docs/conf/httpd.conf.in httpd-2.4.52/docs/conf/httpd.conf.in
+--- httpd-2.4.52.orig/docs/conf/httpd.conf.in	2021-12-22 21:30:04.368594395 -0600
++++ httpd-2.4.52/docs/conf/httpd.conf.in	2021-12-22 22:09:08.498074966 -0600
 @@ -28,7 +28,7 @@
  # same ServerRoot for multiple httpd daemons, you will need to change at
  # least PidFile.
@@ -98,7 +95,7 @@ diff -Naur httpd-2.4.34.orig/docs/conf/httpd.conf.in httpd-2.4.34/docs/conf/http
  
  #
  # Mutex: Allows you to set the mutex mechanism and mutex file directory
-@@ -74,8 +74,8 @@
+@@ -74,8 +74,8 @@ Listen @@Port@@
  # It is usually good practice to create a dedicated user and group for
  # running httpd, as with most system services.
  #
@@ -109,7 +106,7 @@ diff -Naur httpd-2.4.34.orig/docs/conf/httpd.conf.in httpd-2.4.34/docs/conf/http
  
  </IfModule>
  
-@@ -96,7 +96,7 @@
+@@ -96,7 +96,7 @@ Group daemon
  # e-mailed.  This address appears on some server-generated pages, such
  # as error documents.  e.g. admin@your-domain.com
  #
@@ -118,7 +115,7 @@ diff -Naur httpd-2.4.34.orig/docs/conf/httpd.conf.in httpd-2.4.34/docs/conf/http
  
  #
  # ServerName gives the name and port that the server uses to identify itself.
-@@ -105,7 +105,7 @@
+@@ -105,7 +105,7 @@ ServerAdmin you@example.com
  #
  # If your host doesn't have a registered DNS name, enter its IP address here.
  #
@@ -127,7 +124,7 @@ diff -Naur httpd-2.4.34.orig/docs/conf/httpd.conf.in httpd-2.4.34/docs/conf/http
  
  #
  # Deny access to the entirety of your server's filesystem. You must
-@@ -181,7 +181,7 @@
+@@ -181,7 +181,7 @@ DocumentRoot "@exp_htdocsdir@"
  # logged here.  If you *do* define an error logfile for a <VirtualHost>
  # container, that host's errors will be logged there and not here.
  #
@@ -136,7 +133,7 @@ diff -Naur httpd-2.4.34.orig/docs/conf/httpd.conf.in httpd-2.4.34/docs/conf/http
  
  #
  # LogLevel: Control the number of messages logged to the error_log.
-@@ -210,13 +210,13 @@
+@@ -210,13 +210,13 @@ LogLevel warn
      # define per-<VirtualHost> access logfiles, transactions will be
      # logged therein and *not* in this file.
      #
@@ -152,9 +149,9 @@ diff -Naur httpd-2.4.34.orig/docs/conf/httpd.conf.in httpd-2.4.34/docs/conf/http
  </IfModule>
  
  <IfModule alias_module>
-diff -Naur httpd-2.4.34.orig/include/ap_config_layout.h.in httpd-2.4.34/include/ap_config_layout.h.in
---- httpd-2.4.34.orig/include/ap_config_layout.h.in	2006-07-11 22:55:32.000000000 +0200
-+++ httpd-2.4.34/include/ap_config_layout.h.in	2018-07-15 07:31:23.237202833 +0200
+diff -Naurp httpd-2.4.52.orig/include/ap_config_layout.h.in httpd-2.4.52/include/ap_config_layout.h.in
+--- httpd-2.4.52.orig/include/ap_config_layout.h.in	2021-12-22 21:30:04.302594730 -0600
++++ httpd-2.4.52/include/ap_config_layout.h.in	2021-12-22 22:09:54.363879293 -0600
 @@ -60,5 +60,6 @@
  #define DEFAULT_REL_LOGFILEDIR "@rel_logfiledir@"
  #define DEFAULT_EXP_PROXYCACHEDIR "@exp_proxycachedir@"
@@ -162,10 +159,10 @@ diff -Naur httpd-2.4.34.orig/include/ap_config_layout.h.in httpd-2.4.34/include/
 +#define DEFAULT_PIDLOG "/var/run/httpd/httpd.pid"
  
  #endif /* AP_CONFIG_LAYOUT_H */
-diff -Naur httpd-2.4.34.orig/include/httpd.h httpd-2.4.34/include/httpd.h
---- httpd-2.4.34.orig/include/httpd.h	2018-05-31 15:19:12.000000000 +0200
-+++ httpd-2.4.34/include/httpd.h	2018-07-15 07:31:23.238202829 +0200
-@@ -109,7 +109,7 @@
+diff -Naurp httpd-2.4.52.orig/include/httpd.h httpd-2.4.52/include/httpd.h
+--- httpd-2.4.52.orig/include/httpd.h	2021-12-22 21:30:04.301594735 -0600
++++ httpd-2.4.52/include/httpd.h	2021-12-22 22:10:28.107733907 -0600
+@@ -109,7 +109,7 @@ extern "C" {
  #define DOCUMENT_LOCATION  HTTPD_ROOT "/docs"
  #else
  /* Set default for non OS/2 file system */
@@ -174,10 +171,10 @@ diff -Naur httpd-2.4.34.orig/include/httpd.h httpd-2.4.34/include/httpd.h
  #endif
  #endif /* DOCUMENT_LOCATION */
  
-diff -Naur httpd-2.4.34.orig/Makefile.in httpd-2.4.34/Makefile.in
---- httpd-2.4.34.orig/Makefile.in	2018-05-30 21:09:00.000000000 +0200
-+++ httpd-2.4.34/Makefile.in	2018-07-15 07:31:23.244202804 +0200
-@@ -121,9 +121,9 @@
+diff -Naurp httpd-2.4.52.orig/Makefile.in httpd-2.4.52/Makefile.in
+--- httpd-2.4.52.orig/Makefile.in	2021-12-22 21:30:04.422594121 -0600
++++ httpd-2.4.52/Makefile.in	2021-12-22 22:14:28.465670029 -0600
+@@ -121,9 +121,9 @@ install-conf:
  	    done ; \
  	done ; \
  	if test -f "$(builddir)/envvars-std"; then \
@@ -185,48 +182,48 @@ diff -Naur httpd-2.4.34.orig/Makefile.in httpd-2.4.34/Makefile.in
 -	    if test ! -f $(DESTDIR)$(sbindir)/envvars; then \
 -	        cp -p envvars-std $(DESTDIR)$(sbindir)/envvars ; \
 +	    install -o root -g root -m644 envvars-std $(DESTDIR)$(installbuilddir); \
-+	    if test ! -f $(DESTDIR)$(sysconfdir)/envvars; then \
-+	        install -o root -g root -m644 envvars-std $(DESTDIR)$(sysconfdir)/envvars ; \
++		 if test ! -f $(DESTDIR)$(sysconfdir)/envvars; then \
++		 	install -o root -g root -m644 envvars-std $(DESTDIR)$(sysconfdir)/envvars; \
  	    fi ; \
  	fi
  
-@@ -175,7 +175,7 @@
+@@ -195,7 +195,7 @@ install-htdocs:
  	    if test -d $(htdocs-srcdir) && test "x$(RSYNC)" != "x" && test -x $(RSYNC) ; then \
  		$(RSYNC) --exclude .svn -rlpt --numeric-ids $(htdocs-srcdir)/ $(DESTDIR)$(htdocsdir)/; \
  	    else \
 -		test -d $(htdocs-srcdir) && (cd $(htdocs-srcdir) && cp -rp * $(DESTDIR)$(htdocsdir)) ; \
-+		test -d $(htdocs-srcdir) && (cd $(htdocs-srcdir) && cp -rp * $(DESTDIR)$(htdocsdir) && chown -R root:root $(DESTDIR)$(htdocsdir)) ; \
++  	   test -d $(htdocs-srcdir) && (cd $(htdocs-srcdir) && cp -rp * $(DESTDIR)$(htdocsdir) && chown -R root:root $(DESTDIR)$(htdocsdir)) ; \
  		cd $(DESTDIR)$(htdocsdir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
  	    fi; \
  	fi
-@@ -186,7 +186,7 @@
+@@ -206,7 +206,7 @@ install-error:
          else \
  	    echo Installing error documents ; \
  	    $(MKINSTALLDIRS) $(DESTDIR)$(errordir) ; \
 -	    cd $(top_srcdir)/docs/error && cp -rp * $(DESTDIR)$(errordir) ; \
-+	    cd $(top_srcdir)/docs/error && cp -rp * $(DESTDIR)$(errordir) && chown -R root:root $(DESTDIR)$(errordir); \
++		 cd $(top_srcdir)/docs/error && cp -rp * $(DESTDIR)$(errordir) && chown -R root:root $(DESTDIR)$(errordir); \
  	    test "x$(errordir)" != "x" && cd $(DESTDIR)$(errordir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
  	fi
  
-@@ -196,7 +196,7 @@
+@@ -216,7 +216,7 @@ install-icons:
          else \
  	    echo Installing icons ; \
  	    $(MKINSTALLDIRS) $(DESTDIR)$(iconsdir) ; \
 -	    cd $(top_srcdir)/docs/icons && cp -rp * $(DESTDIR)$(iconsdir) ; \
-+	    cd $(top_srcdir)/docs/icons && cp -rp * $(DESTDIR)$(iconsdir) && chown -R root:root $(DESTDIR)$(iconsdir); \
++		 cd $(top_srcdir)/docs/icons && cp -rp * $(DESTDIR)$(iconsdir) && chown -R root:root $(DESTDIR)$(iconsdir); \
  	    test "x$(iconsdir)" != "x" && cd $(DESTDIR)$(iconsdir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
  	fi
  
-@@ -206,7 +206,7 @@
+@@ -226,7 +226,7 @@ install-cgi:
  	else \
  	   echo Installing CGIs ; \
  	   $(MKINSTALLDIRS) $(DESTDIR)$(cgidir) ; \
 -	   cd $(top_srcdir)/docs/cgi-examples && cp -rp * $(DESTDIR)$(cgidir) ; \
-+	   cd $(top_srcdir)/docs/cgi-examples && cp -rp * $(DESTDIR)$(cgidir) && chown -R root:root $(DESTDIR)$(cgidir); \
++		cd $(top_srcdir)/docs/cgi-examples && cp -rp * $(DESTDIR)$(cgidir) && chown -R root:root $(DESTDIR)$(cgidir); \
  	   test "x$(cgidir)" != "x" && cd $(DESTDIR)$(cgidir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
  	fi
  
-@@ -260,12 +260,12 @@
+@@ -280,12 +280,12 @@ install-man:
  	@test -d $(DESTDIR)$(mandir)/man1 || $(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man1
  	@test -d $(DESTDIR)$(mandir)/man8 || $(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man8
  	@test -d $(DESTDIR)$(manualdir)   || $(MKINSTALLDIRS) $(DESTDIR)$(manualdir)
@@ -238,14 +235,14 @@ diff -Naur httpd-2.4.34.orig/Makefile.in httpd-2.4.34/Makefile.in
  	  $(RSYNC) --exclude .svn -rlpt --numeric-ids $(top_srcdir)/docs/manual/ $(DESTDIR)$(manualdir)/; \
  	else \
 -	  cd $(top_srcdir)/docs/manual && cp -rp * $(DESTDIR)$(manualdir); \
-+	  cd $(top_srcdir)/docs/manual && cp -rp * $(DESTDIR)$(manualdir) && chown -R root:root $(DESTDIR)$(manualdir); \
++	cd $(top_srcdir)/docs/manual && cp -rp * $(DESTDIR)$(manualdir) && chown -R root:root $(DESTDIR)$(manualdir); \
  	  cd $(DESTDIR)$(manualdir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
  	fi
  
-diff -Naur httpd-2.4.34.orig/support/apachectl.in httpd-2.4.34/support/apachectl.in
---- httpd-2.4.34.orig/support/apachectl.in	2012-02-01 04:47:28.000000000 +0100
-+++ httpd-2.4.34/support/apachectl.in	2018-07-15 07:31:23.244202804 +0200
-@@ -45,8 +45,8 @@
+diff -Naurp httpd-2.4.52.orig/support/apachectl.in httpd-2.4.52/support/apachectl.in
+--- httpd-2.4.52.orig/support/apachectl.in	2021-12-22 21:30:04.370594385 -0600
++++ httpd-2.4.52/support/apachectl.in	2021-12-22 22:14:57.782537475 -0600
+@@ -45,8 +45,8 @@ ARGV="$@"
  HTTPD='@exp_sbindir@/@progname@'
  #
  # pick up any necessary environment variables
@@ -256,10 +253,10 @@ diff -Naur httpd-2.4.34.orig/support/apachectl.in httpd-2.4.34/support/apachectl
  fi
  #
  # a command that outputs a formatted text version of the HTML at the
-diff -Naur httpd-2.4.34.orig/support/Makefile.in httpd-2.4.34/support/Makefile.in
---- httpd-2.4.34.orig/support/Makefile.in	2018-02-09 11:17:30.000000000 +0100
-+++ httpd-2.4.34/support/Makefile.in	2018-07-15 07:31:23.245202800 +0200
-@@ -16,23 +16,23 @@
+diff -Naurp httpd-2.4.52.orig/support/Makefile.in httpd-2.4.52/support/Makefile.in
+--- httpd-2.4.52.orig/support/Makefile.in	2021-12-22 21:30:04.371594380 -0600
++++ httpd-2.4.52/support/Makefile.in	2021-12-22 22:21:06.319836693 -0600
+@@ -16,23 +16,23 @@ install:
  	@test -d $(DESTDIR)$(bindir) || $(MKINSTALLDIRS) $(DESTDIR)$(bindir)
  	@test -d $(DESTDIR)$(sbindir) || $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
  	@test -d $(DESTDIR)$(libexecdir) || $(MKINSTALLDIRS) $(DESTDIR)$(libexecdir)
@@ -271,14 +268,14 @@ diff -Naur httpd-2.4.34.orig/support/Makefile.in httpd-2.4.34/support/Makefile.i
  	    if test -f "$(builddir)/$$i"; then \
 -	        cp -p $$i $(DESTDIR)$(bindir); \
 -	        chmod 755 $(DESTDIR)$(bindir)/$$i; \
-+	        install -o root -g root -m755 $$i $(DESTDIR)$(bindir); \
++	        install -o root -g root -m755 $$i $(DESTDIR)$(bindir);\
  	    fi ; \
  	done
  	@for i in apachectl; do \
  	    if test -f "$(builddir)/$$i"; then \
 -	        cp -p $$i $(DESTDIR)$(sbindir); \
 -	        chmod 755 $(DESTDIR)$(sbindir)/$$i; \
-+	        install -o root -g root -m755 $$i $(DESTDIR)$(sbindir); \
++	        install -o root -g root -m755 $$i $(DESTDIR)$(sbindir);\
  	    fi ; \
  	done
  	@if test -f "$(builddir)/envvars-std"; then \
@@ -286,8 +283,8 @@ diff -Naur httpd-2.4.34.orig/support/Makefile.in httpd-2.4.34/support/Makefile.i
 -	    if test ! -f $(DESTDIR)$(sbindir)/envvars; then \
 -	        cp -p envvars-std $(DESTDIR)$(sbindir)/envvars ; \
 +	    install -o root -g root -m644 envvars-std $(DESTDIR)$(installbuilddir); \
-+	    if test ! -f $(DESTDIR)$(sysconfdir)/envvars; then \
-+	        install -o root -g root -m644 envvars-std $(DESTDIR)$(sysconfdir)/envvars ; \
++		 if test ! -f $(DESTDIR)$(sysconfdir)/envvars; then \
++		 	install -o root -g root -m644 envvars-std $(DESTDIR)$(sysconfdir)/envvars; \
  	    fi ; \
  	fi
  
