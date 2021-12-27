@@ -207,7 +207,7 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
-*   Mon Dec 27 2021 Nicolas Guibourge <nicolasg@microsoft.com> 2.4.51-2
+*   Mon Dec 27 2021 Nicolas Guibourge <nicolasg@microsoft.com> 2.4.52-1
 -   Upgraded to 2.4.52 to fix CVE-2021-44224, CVE-2021-44790
 *   Wed Oct 13 2021 Nick Samson <nisamson@microsoft.com> 2.4.51-1
 -   Upgraded to 2.4.51 to fix CVE-2021-42013, CVE-2021-41773, CVE-2021-41524
