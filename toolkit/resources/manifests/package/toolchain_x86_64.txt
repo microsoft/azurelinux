@@ -131,9 +131,9 @@ itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
 kernel-headers-5.10.78.1-1.cm2.noarch.rpm
-kmod-25-6.cm2.x86_64.rpm
-kmod-debuginfo-25-6.cm2.x86_64.rpm
-kmod-devel-25-6.cm2.x86_64.rpm
+kmod-29-1.cm2.x86_64.rpm
+kmod-debuginfo-29-1.cm2.x86_64.rpm
+kmod-devel-29-1.cm2.x86_64.rpm
 krb5-1.18-2.cm2.x86_64.rpm
 krb5-debuginfo-1.18-2.cm2.x86_64.rpm
 krb5-devel-1.18-2.cm2.x86_64.rpm
