@@ -58,6 +58,7 @@ COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
        "./toolchain-local-wget-list", \
        "./texinfo-perl-fix.patch", \
+       "./CVE-2021-45078.patch", \
        "./toolchain-jdk8-wget.sh", \
        "./0002-add-linux-syscall-license-info.patch", \
        "$LFS/tools/" ]
