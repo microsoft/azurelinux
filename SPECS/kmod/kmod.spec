@@ -3,16 +3,18 @@ Name:           kmod
 Version:        29
 Release:        1%{?dist}
 License:        LGPLv2.1+ and GPLv2+
-URL:            http://www.kernel.org/pub/linux/utils/kernel/kmod
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            http://www.kernel.org/pub/linux/utils/kernel/kmod
 Source0:        http://www.kernel.org/pub/linux/utils/kernel/kmod/%{name}-%{version}.tar.xz
-Provides:       module-init-tools
-Provides:       /sbin/modprobe
+
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 Requires:       xz
+Provides:       module-init-tools
+Provides:       /sbin/modprobe
+
 %description
 The Kmod package contains libraries and utilities for loading kernel modules
 
@@ -24,6 +26,7 @@ It contains the libraries and header files to create applications.
 
 %prep
 %setup -q
+
 %build
 ./configure \
     --prefix=%{_prefix} \
@@ -35,16 +38,18 @@ It contains the libraries and header files to create applications.
     --with-zlib \
     --disable-silent-rules
 make VERBOSE=1 %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} pkgconfigdir=%{_libdir}/pkgconfig install
 install -vdm 755 %{buildroot}/sbin
 for target in depmod insmod lsmod modinfo modprobe rmmod; do
     ln -sv /bin/kmod %{buildroot}/sbin/$target
 done
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
 %license COPYING
