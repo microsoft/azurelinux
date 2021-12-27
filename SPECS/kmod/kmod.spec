@@ -2,16 +2,16 @@ Summary:        Utilities for loading kernel modules
 Name:           kmod
 Version:        29
 Release:        1%{?dist}
-License:        LGPLv2.1+ and GPLv2+
+License:        LGPLv2.1+ AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
-URL:            http://www.kernel.org/pub/linux/utils/kernel/kmod
+URL:            https://www.kernel.org/pub/linux/utils/kernel/kmod
 Source0:        http://www.kernel.org/pub/linux/utils/kernel/kmod/%{name}-%{version}.tar.xz
-
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 Requires:       xz
+
 Provides:       module-init-tools
 Provides:       /sbin/modprobe
 
