@@ -61,7 +61,7 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/*.so
 
 %changelog
-* Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> -  29-1
+* Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 29-1
 - Updated to version 29
 - Verified license.
 
