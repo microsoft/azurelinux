@@ -63,6 +63,7 @@ find %{buildroot} -name '*.la' -delete
 %changelog
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> -  29-1
 - Updated to version 29
+- Verified license.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 25-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
