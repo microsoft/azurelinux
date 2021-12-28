@@ -2066,6 +2066,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "colorize",
+          "version": "0.3.4",
+          "downloadUrl": "https://web.archive.org/web/20040604132106/http://colorize.raszi.hu/downloads/colorize_0.3.4.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "community-mysql",
           "version": "8.0.23",
           "downloadUrl": "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.23.tar.gz"
@@ -7463,6 +7473,16 @@
           "name": "intltool",
           "version": "0.51.0",
           "downloadUrl": "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ioping",
+          "version": "1.1",
+          "downloadUrl": "https://github.com/koct9i/ioping/archive/v1.1/ioping-1.1.tar.gz"
         }
       }
     },
@@ -23273,6 +23293,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-ntlm-auth",
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/jborean93/ntlm-auth/archive/v1.5.0/ntlm-auth-1.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-ntplib",
           "version": "0.3.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/29/8b/85a86e01c510665b0790d3a9fd4532ad98aba9e185a676113a0ae3879350/ntplib-0.3.3.tar.gz"
@@ -23983,6 +24013,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-requests_ntlm",
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/requests/requests-ntlm/archive/v1.1.0/requests_ntlm-1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-requests-oauthlib",
           "version": "1.2.0",
           "downloadUrl": "https://github.com/requests/requests-oauthlib/archive/v1.2.0.tar.gz"
@@ -24584,8 +24624,8 @@
         "type": "other",
         "other": {
           "name": "python-werkzeug",
-          "version": "0.14.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/9f/08/a3bb1c045ec602dc680906fc0261c267bed6b3bb4609430aff92c3888ec8/Werkzeug-0.14.1.tar.gz"
+          "version": "1.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/10/27/a33329150147594eff0ea4c33c2036c0eadd933141055be0ff911f7f8d04/Werkzeug-1.0.1.tar.gz"
         }
       }
     },
@@ -24613,9 +24653,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-winrm",
+          "version": "0.4.1",
+          "downloadUrl": "https://github.com/diyan/pywinrm/archive/v0.4.1/winrm-0.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-wrapt",
           "version": "1.11.2",
           "downloadUrl": "https://github.com/GrahamDumpleton/wrapt/archive/1.11.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-xmltodict",
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/martinblech/xmltodict/archive/v0.12.0/xmltodict-0.12.0.tar.gz"
         }
       }
     },
