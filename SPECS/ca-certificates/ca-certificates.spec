@@ -80,10 +80,10 @@ BuildRequires:  openssl
 BuildRequires:  perl
 BuildRequires:  python3
 
-Requires:       %{name}-shared = %{version}-%{release}
-Requires(post): %{name}-tools = %{version}-%{release}
+Requires:       %{name}-shared = %{epoch}:%{version}-%{release}
+Requires(post): %{name}-tools = %{epoch}:%{version}-%{release}
 Requires(post): coreutils
-Requires(postun): %{name}-tools = %{version}-%{release}
+Requires(postun): %{name}-tools = %{epoch}:%{version}-%{release}
 
 Provides:       ca-certificates-microsoft = %{version}-%{release}
 Provides:       ca-certificates-mozilla = %{version}-%{release}
@@ -110,10 +110,10 @@ Group:          System Environment/Security
 Summary:        Basic set of trusted CAs required to authenticate the packages repository.
 Group:          System Environment/Security
 
-Requires:       %{name}-shared = %{version}-%{release}
-Requires(post): %{name}-tools = %{version}-%{release}
+Requires:       %{name}-shared = %{epoch}:%{version}-%{release}
+Requires(post): %{name}-tools = %{epoch}:%{version}-%{release}
 Requires(post): coreutils
-Requires(postun): %{name}-tools = %{version}-%{release}
+Requires(postun): %{name}-tools = %{epoch}:%{version}-%{release}
 
 %description base
 %{summary}
@@ -132,7 +132,7 @@ Set of scripts to generate certificates out of a certdata.txt file.
 Summary:        Support for legacy certificates configuration.
 Group:          System Environment/Security
 
-Requires:       %{name}-shared = %{version}-%{release}
+Requires:       %{name}-shared = %{epoch}:%{version}-%{release}
 
 %description legacy
 Provides a legacy version of ca-bundle.crt in the format of "[hash].0 -> [hash].pem"

@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 from pyrpm.spec import Spec
 
 import argparse
@@ -10,21 +14,20 @@ license_regex = re.compile(
 valid_release_tag_regex = re.compile(
     r'^([1-9]\d*|%\{release_number\})%\{\?dist\}$')
 
-valid_source_attributions = [
-    r'\n-\s+Original version for CBL-Mariner( \(license: MIT\))?(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from Azure( \(license: MIT\))?(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
-    r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
-]
+valid_source_attributions = {
+    "Microsoft":                    r'\n-\s+(Original version for CBL-Mariner|Initial CBL-Mariner import from Azure)( \(license: MIT\))?(\.|\n|$)',
+    "CentOS":                       r'\n-\s+Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)(\.|\n|$)',
+    "Ceph source":                  r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
+    "Fedora":                       r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
+    "Magnus Edenhill Open Source":  r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
+    "NVIDIA":                       r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',
+    "OpenMamba":                    r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',
+    "OpenSUSE":                     r'\n-\s+Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
+    "Photon":                       r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
+}
 
-valid_source_attributions_regex = [ re.compile(x) for x in valid_source_attributions ]
-valid_source_attributions_one_per_line = "\n".join(f"- '{x}'" for x in valid_source_attributions)
+valid_source_attributions_regex = [ re.compile(x) for x in valid_source_attributions.values() ]
+valid_source_attributions_one_per_line = "\n".join(f"- {key}: '{value}'" for key, value in valid_source_attributions.items())
 
 
 def check_release_tag(spec_path: str):

@@ -11,7 +11,7 @@ Group:          System Environment/Security
 URL:            https://docs.microsoft.com/en-us/security/trusted-root/program-requirements
 BuildArch:      noarch
 
-BuildRequires:  ca-certificates-base = %{version}-%{release}
+BuildRequires:  ca-certificates-base = %{epoch}:%{version}-%{release}
 
 Conflicts:      prebuilt-ca-certificates
 
