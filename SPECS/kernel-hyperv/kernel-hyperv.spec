@@ -4,7 +4,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.10.78.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -273,6 +273,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Tue Dec 28 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
+- Bump release number to match kernel release
+
 * Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
 - Add patch to fix SPDX-License-Identifier in headers
