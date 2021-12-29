@@ -25294,6 +25294,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ripgrep",
+          "version": "13.0.0",
+          "downloadUrl": "https://github.com/BurntSushi/ripgrep/archive/13.0.0/ripgrep-13.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rng-tools",
           "version": "5",
           "downloadUrl": "https://github.com/nhorman/rng-tools/archive/rng-tools-5.tar.gz"
@@ -25457,6 +25467,16 @@
           "name": "rubygem-addressable",
           "version": "2.7.0",
           "downloadUrl": "https://rubygems.org/downloads/addressable-2.7.0.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-asciidoctor",
+          "version": "2.0.15",
+          "downloadUrl": "https://rubygems.org/downloads/asciidoctor-2.0.15.gem"
         }
       }
     },
