@@ -106,6 +106,7 @@ install -Dm 644 complete/_rg %{buildroot}%{_datadir}/zsh/site-functions/_rg
 %changelog
 * Tue Dec 28 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 13.0.0-3
 - Initial CBL-Mariner import from openSUSE (license: same as "License" tag).
+- License verified
 - Converted 'Release' tag to the '[number].[distribution]' format
 - Renamed vendor.tar.xz to %{name}-%{version}-vendor.tar.xz
 

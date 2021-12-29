@@ -8,7 +8,7 @@ Version:        2.0.15
 Release:        1%{?dist}
 Group:          Development/Languages
 License:        MIT
-Vendor:		    Microsoft Corporation
+Vendor:		Microsoft Corporation
 Distribution:	Mariner
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
