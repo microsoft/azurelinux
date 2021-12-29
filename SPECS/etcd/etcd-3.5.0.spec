@@ -54,7 +54,7 @@ tools.
 
 %prep
 %setup -q
-tar -xf %{SOURCE2}
+tar --no-same-owner -xf %{SOURCE2}
 
 %build
 %define ETCD_OUT_DIR %{_builddir}/%{name}-%{version}/bin
@@ -63,7 +63,7 @@ mkdir -p %{ETCD_OUT_DIR}
 # build etcd
 for component in server etcdctl etcdutl; do
     pushd $component
-    tar -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
@@ -76,7 +76,7 @@ mkdir -p %{ETCD_TOOLS_OUT_DIR}
 
 for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
-    tar -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
     go build \
         -o %{ETCD_TOOLS_OUT_DIR}
     popd
