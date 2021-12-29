@@ -1,7 +1,7 @@
 Summary:       xinetd -- A better inetd.
 Name:          xinetd
 Version:       2.3.15
-Release:       12%{?dist}
+Release:       13%{?dist}
 License:       BSD
 Group:         System Environment/Daemons
 Vendor:        Microsoft Corporation
@@ -46,9 +46,6 @@ cp %{SOURCE1} %{buildroot}/lib/systemd/system/xinetd.service
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable xinetd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-xinetd.preset
 
-%clean
-rm -rf %{buildroot}
-
 %post
 %{_sbindir}/ldconfig
 %systemd_post xinetd.service
@@ -71,6 +68,10 @@ rm -rf %{buildroot}
 %{_libdir}/systemd/system-preset/50-xinetd.preset
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.15-13
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.3.15-12
 - Added %%license line automatically
 

@@ -1,14 +1,14 @@
 Summary:	System utilities to list pci devices
 Name:		pciutils
 Version:	3.6.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	GPLv2
 URL:		https://www.kernel.org/pub/software/utils/pciutils/
 Group:		System Environment/System Utilities
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	https://www.kernel.org/pub/software/utils/pciutils/%{name}-%{version}.tar.gz
-%define sha1 pciutils=8c6da8d8b1bff1b4c847a2ea380cfff9ccfe2566
+
 %description
 The pciutils package contains a set of programs for listing PCI devices, inspecting their status and setting their configuration registers.
 
@@ -35,9 +35,6 @@ make DESTDIR=%{buildroot} \
     install install-lib
 chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -53,6 +50,10 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.2-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.6.2-3
 - Added %%license line automatically
 

@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,7 @@ cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="Mariner"
 DISTRIB_RELEASE="%{mariner_release_version}"
 DISTRIB_CODENAME=Mariner
-DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version} Preview-A"
+DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version} Preview-B"
 EOF
 
 version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
@@ -45,11 +45,11 @@ EOF
 ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
 
 cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} Preview-A (%{_arch}) - Kernel \r (\l)
+Welcome to CBL-Mariner %{mariner_release_version} Preview-B (%{_arch}) - Kernel \r (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} Preview-A (%{_arch}) - Kernel %r (%t)
+Welcome to CBL-Mariner %{mariner_release_version} Preview-B (%{_arch}) - Kernel %r (%t)
 EOF
 
 %files
@@ -62,6 +62,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Thu Dec 16 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-3
+- CBL-Mariner 2.0 Public Preview Release version with fixed repo configuration files.
+
 * Mon Dec 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-2
 - CBL-Mariner 2.0 Public Preview Release version.
 

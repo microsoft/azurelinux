@@ -1,7 +1,7 @@
 Summary:        Implementation of a YAML 1.1 parser and emitter
 Name:           libyaml
 Version:        0.2.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,10 +40,6 @@ make %{?_smp_mflags} check
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
 %defattr(-, root, root, 0755)
 %license License
@@ -57,6 +53,10 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.5-3
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.5-2
 - Remove libtool archive files from final packaging
 

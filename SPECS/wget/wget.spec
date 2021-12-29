@@ -1,7 +1,7 @@
 Summary:        A network utility to retrieve files from the Web
 Name:           wget
 Version:        1.20.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/wget/wget.html
 Group:          System Environment/NetworkingPrograms
@@ -53,8 +53,6 @@ cpan local::lib
 cpan HTTP::Daemon
 make  %{?_smp_mflags} check
 
-%clean
-rm -rf %{buildroot}/*
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
@@ -63,6 +61,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.3-4
+- Removing the explicit %%clean stage.
+
 * Fri Nov 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.3-3
 - Adding 'local::lib' perl5 library to fix test dependencies.
 

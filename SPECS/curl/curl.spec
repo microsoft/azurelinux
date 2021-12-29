@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,10 +77,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -100,6 +96,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.76.0-6
+- Removing the explicit %%clean stage.
+
 * Wed Jul 21 2021 Chris Co <chrco@microsoft.com> - 7.76.0-5
 - Address CVE-2021-22922, CVE-2021-22923, CVE-2021-22924, CVE-2021-22925
 

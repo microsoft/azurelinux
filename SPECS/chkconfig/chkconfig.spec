@@ -1,7 +1,7 @@
 Summary:        A system tool for maintaining the %{_sysconfdir}/rc*.d hierarchy
 Name:           chkconfig
 Version:        1.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,10 +68,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 
 %find_lang %{name}
 
-%clean
-rm -rf %{buildroot}
-
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
@@ -98,6 +94,9 @@ rm -rf %{buildroot}
 %{_mandir}/*/ntsysv.8*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11-4
+- Removing the explicit %%clean stage.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.11-3
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

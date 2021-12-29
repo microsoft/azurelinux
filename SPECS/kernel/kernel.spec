@@ -1,10 +1,13 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
+%ifarch aarch64
+%define debug_package %{nil}
+%endif
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.78.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -534,6 +537,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %ifarch x86_64
 %exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
 %endif
+%ifarch aarch64
+%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
+%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux
+%endif
 
 %files docs
 %defattr(-,root,root)
@@ -588,6 +595,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Dec 28 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
+- Enable CONFIG_COMPAT kernel configs
+
 * Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
 - Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327, CVE-2021-43389

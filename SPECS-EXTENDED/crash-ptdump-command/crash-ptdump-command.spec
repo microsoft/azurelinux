@@ -6,7 +6,7 @@ Distribution:   Mariner
 Summary: ptdump extension module for the crash utility
 Name: crash-ptdump-command
 Version: 1.0.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: Development/Debuggers
 Source: https://github.com/crash-utility/crash-extensions/blob/master/ptdump-%{version}.tar.gz
@@ -34,16 +34,16 @@ rm -Rf $RPM_BUILD_ROOT
 mkdir -p %{buildroot}%{_libdir}/crash/extensions/
 cp %{_builddir}/ptdump-%{version}/ptdump.so %{buildroot}%{_libdir}/crash/extensions/
 
-%clean
-rm -rf %{buildroot}
-rm -Rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root)
+%license COPYING
 %{_libdir}/crash/extensions/ptdump.so
-%doc COPYING
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.7-3
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sun Jul 25 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0.7-2
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - Modified spec to provide architecture arguments to make

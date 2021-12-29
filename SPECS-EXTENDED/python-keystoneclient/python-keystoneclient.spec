@@ -18,7 +18,7 @@ Identity API.
 
 Name:       python-keystoneclient
 Version:    3.21.0
-Release:    5%{?dist}
+Release:    6%{?dist}
 Summary:    Client library for OpenStack Identity API
 License:    ASL 2.0
 URL:        https://launchpad.net/python-keystoneclient
@@ -35,7 +35,7 @@ BuildRequires: /usr/bin/openssl
 %package -n python%{pyver}-%{sname}
 Summary:    Client library for OpenStack Identity API
 %{?python_provide:%python_provide python%{pyver}-%{sname}}
-%if %{pyver} == 3
+%if "%{pyver}" == "3"
 Obsoletes: python2-%{sname} < %{version}-%{release}
 %endif
 
@@ -55,7 +55,7 @@ Requires: python%{pyver}-pbr >= 2.0.0
 Requires: python%{pyver}-debtcollector >= 1.2.0
 Requires: python%{pyver}-keystoneauth1 >= 3.4.0
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires: python-keyring >= 5.5.1
 %else
 Requires: python%{pyver}-keyring >= 5.5.1
@@ -85,7 +85,7 @@ BuildRequires:  python%{pyver}-testresources
 BuildRequires:  python%{pyver}-testscenarios
 BuildRequires:  python%{pyver}-requests-mock
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 BuildRequires:  python-keyring >= 5.5.1
 BuildRequires:  python-lxml
 %else
@@ -104,7 +104,7 @@ Requires:  python%{pyver}-testresources
 Requires:  python%{pyver}-testscenarios
 Requires:  python%{pyver}-requests-mock
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:  python-lxml
 %else
 Requires:  python%{pyver}-lxml
@@ -169,6 +169,9 @@ PYTHON=python%{pyver} stestr-%{pyver} --test-path=./keystoneclient/tests/unit ru
 %{pyver_sitelib}/%{sname}/tests
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.21.0-6
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.21.0-5
 - Remove epoch
 

@@ -5,6 +5,7 @@ Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+ExclusiveArch:  x86_64
 URL:            https://github.com/microsoft/bond
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

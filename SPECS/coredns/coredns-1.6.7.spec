@@ -3,8 +3,8 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.6.7
-Release:        3%{?dist}
-License:        Apache License 2.0
+Release:        4%{?dist}
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
@@ -52,15 +52,16 @@ make
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/%{name}
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.7-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.6.7-3
 - Increment release to force republishing using golang 1.15.13.
 * Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.6.7-2

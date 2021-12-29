@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        5.10.78.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -89,13 +89,22 @@ The kernel package contains the signed Linux kernel.
 %prep
 
 %build
+mkdir rpm_contents
+pushd rpm_contents
+
 # This spec's whole purpose is to inject the signed kernel binary
 rpm2cpio %{SOURCE0} | cpio -idmv
 cp %{SOURCE1} ./boot/vmlinuz-%{uname_r}
 
+popd
+
 %install
+pushd rpm_contents
+
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
 cp -rp ./. %{buildroot}/
+
+popd
 
 # Recalculate sha512hmac for FIPS
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
@@ -146,6 +155,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Tue Dec 28 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
+- Bump release number to match kernel release
+
 * Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
 
