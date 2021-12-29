@@ -61,11 +61,7 @@ rm -rf %{buildroot}/*
 %{_bindir}/%{name}
 
 %changelog
-<<<<<<< HEAD
-* Tue Dec 21 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.8.4-1
-=======
-* Mon Dec 27 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.8.4-1
->>>>>>> f6148f202fde8e86ce934eaaa3a335c69800bb5f
+* Tue Dec 28 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.4-1
 - Update to version  "1.8.4".
 
 * Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.0-2
