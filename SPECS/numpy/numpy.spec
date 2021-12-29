@@ -1,7 +1,7 @@
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
 Version:        1.16.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 # The custom license is inside numpy/core/src/multiarray/dragon4.c.
 License:        BSD AND ZLIB custom
 Vendor:         Microsoft Corporation
@@ -10,6 +10,7 @@ Group:          Development/Languages/Python
 URL:            https://numpy.org/
 Source0:        https://github.com/numpy/numpy/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         fix-setup-py-install.patch
+Patch1:         CVE-2021-41496.patch
 BuildRequires:  lapack-devel
 BuildRequires:  python3
 BuildRequires:  python3-devel
@@ -73,6 +74,9 @@ rm -rf test
 %{_bindir}/f2py%{python3_version}
 
 %changelog
+* Tue Dec 28 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.16.6-4
+- Backported upstream patch for CVE-2021-41496
+
 * Tue Dec 14 2021 Chris Co <chrco@microsoft.com> - 1.16.6-3
 - Backport patch to fix python3 setup.py install error
 - Add f2py to packaging
