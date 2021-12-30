@@ -4,7 +4,7 @@
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
 Version:        1.16.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 # The custom license is inside numpy/core/src/multiarray/dragon4.c.
 License:        BSD and ZLIB custom
 Group:          Development/Languages/Python
@@ -12,6 +12,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            https://numpy.org/
 Source0:        https://github.com/numpy/numpy/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-41496.patch
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -59,7 +60,7 @@ This package includes a version of f2py that works properly with NumPy.
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 # xlocale.h has been removed from glibc 2.26
@@ -112,6 +113,8 @@ rm -rf test
 #{python2_sitearch}/{name}/f2py
 
 %changelog
+*   Tue Dec 28 2021 Henry Beberman <henry.beberman@microsoft.com> 1.16.6-2
+-   Backported upstream patch for CVE-2021-41496
 *   Mon Jun 08 2020 Paul Monson <paulmon@microsoft.com> 1.16.6-1
 -   Update to 1.16.6 to fix CVE-2019-6446
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.15.1-6
