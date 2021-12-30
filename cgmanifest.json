@@ -27217,8 +27217,8 @@
         "type": "other",
         "other": {
           "name": "sos",
-          "version": "4.1",
-          "downloadUrl": "https://github.com/sosreport/sos/archive/4.1.tar.gz"
+          "version": "4.2",
+          "downloadUrl": "https://github.com/sosreport/sos/archive/4.2.tar.gz"
         }
       }
     },
