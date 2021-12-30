@@ -19,6 +19,7 @@ LFS_TGT=$(uname -m)-lfs-linux-gnu
 echo Binutils-2.36.1 - Pass 1
 tar xf binutils-2.36.1.tar.xz
 pushd binutils-2.36.1
+patch -Np1 -i /tools/CVE-2021-45078.patch
 mkdir -v build
 cd build
 ../configure --prefix=/tools \
@@ -187,6 +188,7 @@ touch $LFS/logs/temptoolchain/status_libstdc++_complete
 echo Binutils-2.36.1 - Pass 2
 tar xf binutils-2.36.1.tar.xz
 pushd binutils-2.36.1
+patch -Np1 -i /tools/CVE-2021-45078.patch
 mkdir -v build
 cd build
 CC=$LFS_TGT-gcc                  \

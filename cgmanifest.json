@@ -844,6 +844,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "coredns",
+          "version": "1.8.4",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "coreutils",
           "version": "8.30",
           "downloadUrl": "http://ftp.gnu.org/gnu/coreutils/coreutils-8.30.tar.xz"
@@ -1396,7 +1406,17 @@
         "other": {
           "name": "etcd",
           "version": "3.4.13",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.13.tar.gz"
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/refs/tags/v3.4.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "etcd",
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/refs/tags/v3.5.0.tar.gz"
         }
       }
     },
@@ -5645,8 +5665,8 @@
         "type": "other",
         "other": {
           "name": "powershell",
-          "version": "7.0.2",
-          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.0.2/powershell-7.0.2-linux-x64.tar.gz"
+          "version": "7.2.1",
+          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-x64.tar.gz"
         }
       }
     },
