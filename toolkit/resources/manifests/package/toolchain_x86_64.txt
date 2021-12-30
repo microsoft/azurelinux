@@ -238,8 +238,8 @@ ncurses-debuginfo-6.2-4.cm2.x86_64.rpm
 ncurses-devel-6.2-4.cm2.x86_64.rpm
 ncurses-libs-6.2-4.cm2.x86_64.rpm
 ncurses-term-6.2-4.cm2.x86_64.rpm
-ninja-build-1.8.2-3.cm2.x86_64.rpm
-ninja-build-debuginfo-1.8.2-3.cm2.x86_64.rpm
+ninja-build-1.10.2-1.cm2.x86_64.rpm
+ninja-build-debuginfo-1.10.2-1.cm2.x86_64.rpm
 npth-1.6-4.cm2.x86_64.rpm
 npth-debuginfo-1.6-4.cm2.x86_64.rpm
 npth-devel-1.6-4.cm2.x86_64.rpm

@@ -14583,8 +14583,8 @@
         "type": "other",
         "other": {
           "name": "ninja-build",
-          "version": "1.8.2",
-          "downloadUrl": "https://github.com/ninja-build/ninja/archive/v1.8.2.tar.gz"
+          "version": "1.10.2",
+          "downloadUrl": "https://github.com/ninja-build/ninja/archive/v1.10.2.tar.gz"
         }
       }
     },
