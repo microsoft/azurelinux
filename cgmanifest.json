@@ -21414,8 +21414,8 @@
         "type": "other",
         "other": {
           "name": "powershell",
-          "version": "7.0.2",
-          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.0.2/powershell-7.0.2-linux-x64.tar.gz"
+          "version": "7.2.1",
+          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-x64.tar.gz"
         }
       }
     },
