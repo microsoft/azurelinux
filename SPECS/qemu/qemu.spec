@@ -201,7 +201,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.1.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -2188,6 +2188,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Mon Jan 03 2022 Bala <balakumaran.kannan@microsoft.com> - 6.1.0-13
+- Skip qos test from ptest as it hungs indefinitely
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-12
 - Lint spec
 - Remove user-static subpackage references- no plans to support at this time
