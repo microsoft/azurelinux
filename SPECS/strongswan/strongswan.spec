@@ -1,7 +1,7 @@
 Summary:        The OpenSource IPsec-based VPN Solution
 Name:           strongswan
-Version:        5.7.2
-Release:        4%{?dist}
+Version:        5.9.3
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://www.strongswan.org/
 Group:          System Environment/Security
@@ -49,6 +49,9 @@ make check
 %{_datadir}/strongswan/*
 
 %changelog
+*   Mon Jan 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.9.3-1
+-   Updated to version 5.9.3.
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.7.2-4
 -   Removing the explicit %%clean stage.
 
