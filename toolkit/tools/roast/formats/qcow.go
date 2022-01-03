@@ -20,11 +20,16 @@ type Qcow struct {
 
 // Convert converts the image in the qcow2 format
 func (v *Qcow) Convert(input, output string, isInputFile bool) (err error) {
+	const (
+		outputFormat = "qcow2"
+		squashErrors = false
+	)
+
 	if !isInputFile {
 		return fmt.Errorf("qcow2 conversion requires a RAW file as an input")
 	}
 
-	err = shell.ExecuteLive(false, "qemu-img", "convert", "-O", "qcow2", input, output)
+	err = shell.ExecuteLive(squashErrors, "qemu-img", "convert", "-O", outputFormat, input, output)
 	return
 }
 
