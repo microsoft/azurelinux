@@ -78,11 +78,6 @@
 %define requires_audio_alsa Requires: %{name}-audio-alsa = %{evr}
 %define requires_audio_oss Requires: %{name}-audio-oss = %{evr}
 %define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
-%if %{with brltty}
-%define requires_char_baum Requires: %{name}-char-baum = %{evr}
-%else
-%define requires_char_baum %{nil}
-%endif
 %define requires_device_usb_host Requires: %{name}-device-usb-host = %{evr}
 %define requires_device_usb_redirect Requires: %{name}-device-usb-redirect = %{evr}
 %define requires_device_usb_smartcard Requires: %{name}-device-usb-smartcard = %{evr}
@@ -97,21 +92,6 @@
 %define requires_device_display_virtio_gpu_ccw Requires: %{name}-device-display-virtio-gpu-ccw = %{evr}
 %define requires_device_display_virtio_vga Requires: %{name}-device-display-virtio-vga = %{evr}
 %define requires_device_display_virtio_vga_gl Requires: %{name}-device-display-virtio-vga-gl = %{evr}
-%if %{with libssh}
-%define requires_block_ssh Requires: %{name}-block-ssh = %{evr}
-%else
-%define requires_block_ssh %{nil}
-%endif
-%if %{with pulseaudio}
-%define requires_audio_pa Requires: %{name}-audio-pa = %{evr}
-%else
-%define requires_audio_pa %{nil}
-%endif
-%if %{with sdl}
-%define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
-%else
-%define requires_ui_sdl %{nil}
-%endif
 %if %{have_virgl}
 %define requires_device_display_vhost_user_gpu Requires: %{name}-device-display-vhost-user-gpu = %{evr}
 %else
@@ -192,6 +172,26 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 %bcond_with libssh
 %bcond_with pulseaudio
 %bcond_with sdl
+%if %{with brltty}
+%define requires_char_baum Requires: %{name}-char-baum = %{evr}
+%else
+%define requires_char_baum %{nil}
+%endif
+%if %{with libssh}
+%define requires_block_ssh Requires: %{name}-block-ssh = %{evr}
+%else
+%define requires_block_ssh %{nil}
+%endif
+%if %{with pulseaudio}
+%define requires_audio_pa Requires: %{name}-audio-pa = %{evr}
+%else
+%define requires_audio_pa %{nil}
+%endif
+%if %{with sdl}
+%define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
+%else
+%define requires_ui_sdl %{nil}
+%endif
 %if %{without ppc_support}
 %global excluded_targets %{excluded_targets},ppc-softmmu,ppc64-softmmu,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user
 %endif
@@ -293,6 +293,28 @@ BuildRequires:  vte291-devel
 BuildRequires:  zlib-devel
 # qemu-keymap
 BuildRequires:  pkgconfig(xkbcommon)
+Requires:       %{name}-img = %{version}-%{release}
+Requires:       %{name}-system-aarch64 = %{version}-%{release}
+Requires:       %{name}-system-alpha = %{version}-%{release}
+Requires:       %{name}-system-arm = %{version}-%{release}
+Requires:       %{name}-system-avr = %{version}-%{release}
+Requires:       %{name}-system-cris = %{version}-%{release}
+Requires:       %{name}-system-m68k = %{version}-%{release}
+Requires:       %{name}-system-microblaze = %{version}-%{release}
+Requires:       %{name}-system-mips = %{version}-%{release}
+Requires:       %{name}-system-nios2 = %{version}-%{release}
+Requires:       %{name}-system-or1k = %{version}-%{release}
+Requires:       %{name}-system-riscv = %{version}-%{release}
+Requires:       %{name}-system-rx = %{version}-%{release}
+Requires:       %{name}-system-s390x = %{version}-%{release}
+Requires:       %{name}-system-sh4 = %{version}-%{release}
+Requires:       %{name}-system-tricore = %{version}-%{release}
+Requires:       %{name}-system-x86 = %{version}-%{release}
+Requires:       %{name}-system-xtensa = %{version}-%{release}
+Requires:       %{name}-tools = %{version}-%{release}
+# Requires for the 'qemu' metapackage
+Requires:       %{name}-user = %{version}-%{release}
+Requires:       qemu-pr-helper = %{version}-%{release}
 %if %{have_usbredir}
 BuildRequires:  usbredir-devel >= %{usbredir_version}
 %endif
@@ -369,28 +391,6 @@ BuildRequires:  liburing-devel
 # jack audio driver
 BuildRequires:  jack-audio-connection-kit-devel
 %endif
-Requires:       %{name}-img = %{version}-%{release}
-Requires:       %{name}-system-aarch64 = %{version}-%{release}
-Requires:       %{name}-system-alpha = %{version}-%{release}
-Requires:       %{name}-system-arm = %{version}-%{release}
-Requires:       %{name}-system-avr = %{version}-%{release}
-Requires:       %{name}-system-cris = %{version}-%{release}
-Requires:       %{name}-system-m68k = %{version}-%{release}
-Requires:       %{name}-system-microblaze = %{version}-%{release}
-Requires:       %{name}-system-mips = %{version}-%{release}
-Requires:       %{name}-system-nios2 = %{version}-%{release}
-Requires:       %{name}-system-or1k = %{version}-%{release}
-Requires:       %{name}-system-riscv = %{version}-%{release}
-Requires:       %{name}-system-rx = %{version}-%{release}
-Requires:       %{name}-system-s390x = %{version}-%{release}
-Requires:       %{name}-system-sh4 = %{version}-%{release}
-Requires:       %{name}-system-tricore = %{version}-%{release}
-Requires:       %{name}-system-x86 = %{version}-%{release}
-Requires:       %{name}-system-xtensa = %{version}-%{release}
-Requires:       %{name}-tools = %{version}-%{release}
-# Requires for the 'qemu' metapackage
-Requires:       %{name}-user = %{version}-%{release}
-Requires:       qemu-pr-helper = %{version}-%{release}
 %if %{with ppc_support}
 Requires:       %{name}-system-ppc = %{version}-%{release}
 %endif
@@ -861,7 +861,6 @@ Requires:       %{name}-common = %{version}-%{release}
 %description system-alpha-core
 This package provides the QEMU system emulator for Alpha systems.
 
-
 %package        system-arm
 Summary:        QEMU system emulator for ARM
 Requires:       %{name}-system-arm-core = %{version}-%{release}
@@ -876,7 +875,6 @@ Requires:       %{name}-common = %{version}-%{release}
 
 %description system-arm-core
 This package provides the QEMU system emulator for ARM boards.
-
 
 %package        system-avr
 Summary:        QEMU system emulator for AVR
@@ -893,7 +891,6 @@ Requires:       %{name}-common = %{version}-%{release}
 %description system-avr-core
 This package provides the QEMU system emulator for AVR systems.
 
-
 %package        system-cris
 Summary:        QEMU system emulator for CRIS
 Requires:       %{name}-system-cris-core = %{version}-%{release}
@@ -908,7 +905,6 @@ Requires:       %{name}-common = %{version}-%{release}
 
 %description system-cris-core
 This package provides the system emulator for CRIS boards.
-
 
 %package        system-hppa
 Summary:        QEMU system emulator for HPPA
@@ -925,7 +921,6 @@ Requires:       %{name}-common = %{version}-%{release}
 %description system-hppa-core
 This package provides the QEMU system emulator for HPPA.
 
-
 %package        system-m68k
 Summary:        QEMU system emulator for ColdFire (m68k)
 Requires:       %{name}-system-m68k-core = %{version}-%{release}
@@ -940,7 +935,6 @@ Requires:       %{name}-common = %{version}-%{release}
 
 %description system-m68k-core
 This package provides the QEMU system emulator for ColdFire boards.
-
 
 %package        system-microblaze
 Summary:        QEMU system emulator for Microblaze
@@ -957,7 +951,6 @@ Requires:       %{name}-common = %{version}-%{release}
 %description system-microblaze-core
 This package provides the QEMU system emulator for Microblaze boards.
 
-
 %package        system-mips
 Summary:        QEMU system emulator for MIPS
 Requires:       %{name}-system-mips-core = %{version}-%{release}
@@ -973,7 +966,6 @@ Requires:       %{name}-common = %{version}-%{release}
 %description system-mips-core
 This package provides the QEMU system emulator for MIPS systems.
 
-
 %package        system-nios2
 Summary:        QEMU system emulator for nios2
 Requires:       %{name}-system-nios2-core = %{version}-%{release}
@@ -988,7 +980,6 @@ Requires:       %{name}-common = %{version}-%{release}
 
 %description system-nios2-core
 This package provides the QEMU system emulator for NIOS2.
-
 
 %package        system-or1k
 Summary:        QEMU system emulator for OpenRisc32
@@ -1041,7 +1032,6 @@ Requires:       %{name}-common = %{version}-%{release}
 %description system-riscv-core
 This package provides the QEMU system emulator for RISC-V systems.
 
-
 %package        system-rx
 Summary:        QEMU system emulator for RX
 Requires:       %{name}-system-rx-core = %{version}-%{release}
@@ -1057,7 +1047,6 @@ Requires:       %{name}-common = %{version}-%{release}
 %description system-rx-core
 This package provides the QEMU system emulator for RX systems.
 
-
 %package        system-s390x
 Summary:        QEMU system emulator for S390
 Requires:       %{name}-system-s390x-core = %{version}-%{release}
@@ -1072,7 +1061,6 @@ Requires:       %{name}-common = %{version}-%{release}
 
 %description system-s390x-core
 This package provides the QEMU system emulator for S390 systems.
-
 
 %package        system-sh4
 Summary:        QEMU system emulator for SH4
@@ -1122,7 +1110,6 @@ Requires:       %{name}-common = %{version}-%{release}
 
 %description system-tricore-core
 This package provides the QEMU system emulator for Tricore.
-
 
 %package        system-xtensa
 Summary:        QEMU system emulator for Xtensa
@@ -1276,7 +1263,7 @@ mkdir -p %{qemu_kvm_build}
 
 run_configure() {
     ../configure  \
-        --cc=%{__cc} \
+        --cc=gcc \
         --cxx=/bin/false \
         --prefix="%{_prefix}" \
         --libdir="%{_libdir}" \
