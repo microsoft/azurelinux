@@ -221,6 +221,7 @@ Source36:       README.tests
 # https://bugzilla.redhat.com/show_bug.cgi?id=1999700
 Patch1:         0001-target-i386-add-missing-bits-to-CR4_RESERVED_MASK.patch
 Patch2:         fixing-glibc-struct-statx-usage.patch
+Patch3:         disable_qos_test.patch
 # alsa audio output
 BuildRequires:  alsa-lib-devel
 # reading bzip2 compressed dmg images
@@ -1658,7 +1659,7 @@ for i in %{binfmt_dir}/*; do mv $i $(echo $i | sed 's/.conf/-dynamic.conf/'); do
 
 %check
 # Suppress check as it stall the pipeline indefinetly
-%if !%{tools_only} && 0%{?mariner_failing_tests}
+%if !%{tools_only}
 
 pushd %{qemu_kvm_build}
 echo "Testing %{name}-build"
