@@ -16,6 +16,7 @@ Patch2:         CVE-2020-25637.patch
 Patch3:         CVE-2020-10701.patch
 BuildRequires:  cyrus-sasl
 BuildRequires:  device-mapper-devel
+BuildRequires:  dnsmasq
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  gnutls-devel
 BuildRequires:  libcap-ng-devel
@@ -31,8 +32,12 @@ BuildRequires:  python3-devel
 BuildRequires:  readline-devel
 BuildRequires:  rpcsvc-proto
 BuildRequires:  systemd-devel
+BuildRequires:  yajl-devel
+Requires:       ebtables
 Requires:       cyrus-sasl
 Requires:       device-mapper
+Requires:       dmidecode
+Requires:       dnsmasq
 Requires:       e2fsprogs
 Requires:       gnutls
 Requires:       libcap-ng
@@ -79,7 +84,8 @@ cd %{_vpath_builddir}
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
     --with-udev=no \
-    --with-pciaccess=no
+    --with-pciaccess=no \
+    --with-qemu=yes
 
 make %{?_smp_mflags}
 
@@ -105,6 +111,7 @@ make check
 %{_libdir}/systemd/system/*
 %{_libexecdir}/*
 %{_sbindir}/*
+%{_usr}/share/libvirt/*
 
 %config(noreplace)%{_sysconfdir}/sasl2/libvirt.conf
 %config(noreplace)%{_sysconfdir}/libvirt/*.conf
@@ -117,6 +124,8 @@ make check
 %{_includedir}/libvirt/*
 %{_libdir}/libvirt*.so
 %{_libdir}/pkgconfig/libvirt*
+%{_libdir}/libnss_libvirt.so.2
+%{_libdir}/libnss_libvirt_guest.so.2
 
 %dir %{_datadir}/libvirt/api/
 %{_datadir}/libvirt/api/libvirt-api.xml
@@ -132,6 +141,9 @@ make check
 %{_mandir}/*
 
 %changelog
+* Tue Jan 4 2022 Andrii Ostapenko <aostapenko@microsoft.com> - 6.1.0-4
+- Enable qemu support for libvirt and add related dependencies
+
 * Tue Jun 15 2021 Nicolas Ontiveros <niontive@microsoft.com> - 6.1.0-3
 - Patch CVE-2020-10701
 
