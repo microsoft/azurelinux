@@ -54,8 +54,8 @@ BuildRequires:  numactl-devel
 BuildRequires:  numad
 BuildRequires:  parted
 BuildRequires:  polkit
-BuildRequires:  python3-docutils
 BuildRequires:  python3-devel
+BuildRequires:  python3-docutils
 BuildRequires:  readline-devel
 BuildRequires:  rpcsvc-proto
 BuildRequires:  sanlock-devel
@@ -257,12 +257,12 @@ Summary:        Storage driver plugin including all backends for the libvirtd da
 
 Requires:       %{name}-daemon-driver-storage-core = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-disk = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-logical = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-mpath = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-rbd = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-scsi = %{version}-%{release}
-Requires:       %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
-Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
 
 %description daemon-driver-storage
 The storage driver plugin for the libvirtd daemon, providing
