@@ -1276,7 +1276,7 @@ mkdir -p %{qemu_kvm_build}
 
 run_configure() {
     ../configure  \
-        --cc=%{__cc} \
+        --cc=gcc \
         --cxx=/bin/false \
         --prefix="%{_prefix}" \
         --libdir="%{_libdir}" \
