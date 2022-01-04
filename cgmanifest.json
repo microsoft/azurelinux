@@ -28877,8 +28877,8 @@
         "type": "other",
         "other": {
           "name": "vnstat",
-          "version": "2.6",
-          "downloadUrl": "https://github.com/vergoh/vnstat/archive/v2.6.tar.gz"
+          "version": "2.7",
+          "downloadUrl": "https://github.com/vergoh/vnstat/archive/v2.7.tar.gz"
         }
       }
     },

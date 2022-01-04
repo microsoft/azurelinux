@@ -1,6 +1,6 @@
 Summary:        Console-based network traffic monitor
 Name:           vnstat
-Version:        2.6
+Version:        2.7
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -46,6 +46,9 @@ mkdir -p %{buildroot}%{_unitdir}/
 %{_mandir}/*
 
 %changelog
+* Tue Jan 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.7-1
+- Update to version 2.7
+
 * Fri Feb 05 2021 Henry Beberman <henry.beberman@microsoft.com> 2.6-1
 - Add vnstat spec
 - License verified
