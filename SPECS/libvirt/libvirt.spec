@@ -522,7 +522,6 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
 %meson_build
 
 %install
-# DESTDIR=%{buildroot} SYSTEMD_UNIT_DIR=%{_unitdir} V=1
 %meson_install
 
 find %{buildroot} -type f -name "*.la" -delete -print
