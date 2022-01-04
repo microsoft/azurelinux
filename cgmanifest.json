@@ -27527,8 +27527,8 @@
         "type": "other",
         "other": {
           "name": "strongswan",
-          "version": "5.7.2",
-          "downloadUrl": "https://download.strongswan.org/strongswan-5.7.2.tar.bz2"
+          "version": "5.9.3",
+          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.3.tar.bz2"
         }
       }
     },
