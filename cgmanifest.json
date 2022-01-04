@@ -155,8 +155,8 @@
         "type": "other",
         "other": {
           "name": "alsa-lib",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.2.tar.bz2"
+          "version": "1.2.6.1",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
         }
       }
     },
@@ -185,8 +185,8 @@
         "type": "other",
         "other": {
           "name": "alsa-utils",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/utils/alsa-utils-1.2.2.tar.bz2"
+          "version": "1.2.6",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/utils/alsa-utils-1.2.6.tar.bz2"
         }
       }
     },
@@ -225,8 +225,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.9.18",
-          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.18.tar.gz"
+          "version": "2.12.1",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.12.1.tar.gz"
         }
       }
     },
