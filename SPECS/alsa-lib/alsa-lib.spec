@@ -1,7 +1,7 @@
 Summary:        ALSA library
 Name:           alsa-lib
-Version:        1.2.2
-Release:        2%{?dist}
+Version:        1.2.6.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ make DESTDIR=%{buildroot} install
 %{_includedir}/*
 
 %changelog
+* Tue Jan 4 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.2.6.1-1
+- Update to version 1.2.6.1
+
 * Wed May 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.2-2
 - Replace python2 dependencies with python3
 - License verified
