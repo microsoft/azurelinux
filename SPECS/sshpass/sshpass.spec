@@ -1,13 +1,13 @@
-Summary:	    Noninteractive ssh password provider
-Name:		    sshpass
-Version:	    1.09
+Summary:        Noninteractive ssh password provider
+Name:           sshpass
+Version:        1.09
 Release:        1%{?dist}
-License:	    GPLv2+
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Group:		    Applications/Networking
-URL:	    	http://sourceforge.net/projects/sshpass/
-Source0:    	http://downloads.sourceforge.net/project/sshpass/%{name}/%{version}/%{name}-%{version}.tar.gz
+Group:          Applications/Networking
+URL:            http://sourceforge.net/projects/sshpass/
+Source0:        http://downloads.sourceforge.net/project/sshpass/%{name}/%{version}/%{name}-%{version}.tar.gz
 Requires:       openssh
 
 %description
