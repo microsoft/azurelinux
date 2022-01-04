@@ -151,7 +151,7 @@ make test %{?_smp_mflags}
 %{_libdir}/liblua.so
 
 %changelog
-*   Mon Jan 03 2022 Daniel McIlvaney <damcilva@microsoft.com> 5.4.3-1
+*   Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.3-1
 -   Update to version 5.4.3
 -   Apply patch CVE-2021-43519
 
