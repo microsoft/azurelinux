@@ -1707,8 +1707,8 @@
         "type": "other",
         "other": {
           "name": "ceph",
-          "version": "16.2.0",
-          "downloadUrl": "https://download.ceph.com/tarballs/ceph-16.2.0.tar.gz"
+          "version": "16.2.5",
+          "downloadUrl": "https://download.ceph.com/tarballs/ceph-16.2.5.tar.gz"
         }
       }
     },

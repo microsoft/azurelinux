@@ -4,8 +4,8 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        16.2.0
-Release:        6%{?dist}
+Version:        16.2.5
+Release:        1%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -1247,6 +1247,7 @@ fi
 %{_datadir}/ceph/mgr/localpool
 %{_datadir}/ceph/mgr/mds_autoscaler
 %{_datadir}/ceph/mgr/mirroring
+%{_datadir}/ceph/mgr/nfs
 %{_datadir}/ceph/mgr/orchestrator
 %{_datadir}/ceph/mgr/osd_perf_query
 %{_datadir}/ceph/mgr/osd_support
@@ -1801,6 +1802,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Mon Jan 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 16.2.5-1
+- Updated to version 16.2.5.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.0-6
 - Removing the explicit %%clean stage.
 
