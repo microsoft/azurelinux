@@ -27437,8 +27437,8 @@
         "type": "other",
         "other": {
           "name": "sshpass",
-          "version": "1.06",
-          "downloadUrl": "http://downloads.sourceforge.net/project/sshpass/sshpass/1.06/sshpass-1.06.tar.gz"
+          "version": "1.09",
+          "downloadUrl": "http://downloads.sourceforge.net/project/sshpass/sshpass/1.09/sshpass-1.09.tar.gz"
         }
       }
     },
