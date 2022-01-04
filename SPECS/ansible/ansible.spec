@@ -1,4 +1,5 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
 Version:        2.12.1
@@ -12,10 +13,16 @@ Source0:        https://github.com/ansible/ansible/archive/refs/tags/v%{version}
 BuildRequires:  python-setuptools
 BuildRequires:  python3
 BuildRequires:  python3-libs
+%if %{with_check}
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+%endif
+
 Requires:       python3
-# Required for %check
-Requires:       python3-devel
 Requires:       python3-libs
+Requires:       python3-yamlloader
+Requires:       python3-jinja2
+
 BuildArch:      noarch
 
 %description
