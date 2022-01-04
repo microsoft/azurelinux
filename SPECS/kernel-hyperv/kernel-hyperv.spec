@@ -17,6 +17,7 @@ Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         0002-add-linux-syscall-license-info.patch
+Patch2:         0003-CVE-2021-43976.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -94,6 +95,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 make mrproper
