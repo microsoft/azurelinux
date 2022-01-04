@@ -3,16 +3,15 @@ Name:           strongswan
 Version:        5.9.3
 Release:        1%{?dist}
 License:        GPLv2+
-URL:            https://www.strongswan.org/
-Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://www.strongswan.org/
 Source0:        https://download.strongswan.org/%{name}-%{version}.tar.bz2
-
-BuildRequires:  autoconf
-BuildRequires:  gmp-devel
 Patch0:         strongswan-fix-make-check.patch
 Patch1:         0001-Extending-timeout-for-test-cases-with-multiple-read-.patch
+BuildRequires:  autoconf
+BuildRequires:  gmp-devel
 
 %description
 strongSwan is a complete IPsec implementation for Linux 2.6, 3.x, and 4.x kernels.
