@@ -2,7 +2,7 @@
 Summary:        Create new systemd timer to check for system restart
 Name:           check-restart
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,5 +39,8 @@ install -m644 %{SOURCE1} %{buildroot}%{_bindir}/%{name}.sh
 %{_bindir}/%{name}.sh
 
 %changelog
+* Tue Jan 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-2
+- Update timer and service to avoid starting service on system reboot.
+
 * Mon Aug 02 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner.
