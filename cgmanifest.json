@@ -27687,8 +27687,8 @@
         "type": "other",
         "other": {
           "name": "sysstat",
-          "version": "12.3.3",
-          "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.3.3.tar.gz"
+          "version": "12.5.4",
+          "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.5.4.tar.gz"
         }
       }
     },
