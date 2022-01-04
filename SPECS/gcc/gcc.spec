@@ -182,7 +182,7 @@ make %{?_smp_mflags} check-gcc
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_lib}/libcc1.*
+%{_lib64dir}/libcc1.*
 
 %files -n libstdc++
 %defattr(-,root,root)
