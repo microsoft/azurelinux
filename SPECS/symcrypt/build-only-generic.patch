@@ -1,0 +1,15 @@
+--- module/CMakeLists.txt	2021-12-27 12:31:23.648898400 -0800
++++ module/CMakeLists.txt	2021-12-27 12:32:35.298898400 -0800
+@@ -1,6 +1,6 @@
+ add_subdirectory(linux_common) # Common functionality for Linux modules
+ add_subdirectory(generic_linux) # Generic Linux module
+-if(CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64")
+-    add_subdirectory(oe_full) # OpenEnclave with all functionality
+-endif()
+-add_subdirectory(embedded) # Embedded Linux module
+\ No newline at end of file
++#if(CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64")
++#    add_subdirectory(oe_full) # OpenEnclave with all functionality
++#endif()
++#add_subdirectory(embedded) # Embedded Linux module
+\ No newline at end of file
