@@ -17,7 +17,7 @@ Distribution:	Mariner
 URL:		http://github.com/hpricot/hpricot
 # Non-free file removed, see Source10
 # Source0:	http://gems.rubyforge.org/gems/%{gem_name}-%{version}.gem
-Source0:	http://gems.rubyforge.org/gems/%{gem_name}-%{version}.gem#/%{gem_name}-%{version}-modified.gem
+Source0:	https://rubygems.org/downloads/%{gem_name}-%{version}.gem#/%{gem_name}-%{version}-modified.gem
 Source10:	rubygem-hpricot-create-free-gem.sh
 
 Requires:	ruby(release)
