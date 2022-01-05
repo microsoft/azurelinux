@@ -1651,10 +1651,27 @@ for emu in %{buildroot}%{_bindir}/qemu-system-*; do
     ln -sf qemu.1.gz %{buildroot}%{_mandir}/man1/$(basename $emu).1.gz
  done
 
+%ifarch x86_64
 # Install kvm specific source bits, and qemu-kvm manpage
 %if %{need_qemu_kvm}
 ln -sf qemu.1.gz %{buildroot}%{_mandir}/man1/qemu-kvm.1.gz
 ln -sf qemu-system-x86_64 %{buildroot}%{_bindir}/qemu-kvm
+%endif
+%else
+# Needed until CBL-Mariner starts cross-compiling 'ipxe', 'seabios' and 'sgabios' for other architectures.
+rm -rf %{buildroot}%{_bindir}/qemu-system-i386
+rm -rf %{buildroot}%{_bindir}/qemu-system-x86_64
+rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-i386.so
+rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-x86_64.so
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-i386*.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-x86_64*.stp
+rm -rf %{buildroot}%{_mandir}/man1/qemu-system-i386.1*
+rm -rf %{buildroot}%{_mandir}/man1/qemu-system-x86_64.1*
+rm -rf %{buildroot}%{_datadir}/%{name}/kvmvapic.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/linuxboot.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/multiboot.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/pvh.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/qboot.rom
 %endif
 
 
