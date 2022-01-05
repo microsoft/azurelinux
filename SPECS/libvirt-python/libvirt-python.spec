@@ -1,21 +1,28 @@
+# Don't want provides for python shared objects
+%{?filter_provides_in: %{filter_provides_in} %{python3_sitearch}/.*\.so}
+
+Summary:        The libvirt virtualization API python3 binding
+Name:           libvirt-python
+Version:        7.10.0
+Release:        1%{?dist}
+License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://libvirt.org
+Source0:        https://libvirt.org/sources/python/%{name}-%{version}.tar.gz
 
-Summary: The libvirt virtualization API python3 binding
-Name: libvirt-python
-Version: 7.10.0
-Release: 1%{?dist}
-Source0: https://libvirt.org/sources/python/%{name}-%{version}.tar.gz
-Url: https://libvirt.org
-License: LGPLv2+
-BuildRequires: libvirt-devel == %{version}
-BuildRequires: python3-devel
-BuildRequires: python3-pytest
-BuildRequires: python3-lxml
-BuildRequires: gcc
+BuildRequires:  gcc
+BuildRequires:  libvirt-devel = %{version}
+BuildRequires:  python3-devel
+BuildRequires:  python3-lxml
+%if 0%{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-six
+%endif
 
-# Don't want provides for python shared objects
-%{?filter_provides_in: %filter_provides_in %{python3_sitearch}/.*\.so}
 %{?filter_setup}
 
 %description
@@ -25,11 +32,11 @@ supplied by the libvirt library to use the virtualization capabilities
 of recent versions of Linux (and other OSes).
 
 %package -n python3-libvirt
-Summary: The libvirt virtualization API python3 binding
-Url: http://libvirt.org
+Summary:        The libvirt virtualization API python3 binding
+URL:            https://libvirt.org
 %{?python_provide:%python_provide python3-libvirt}
-Provides: libvirt-python3 = %{version}-%{release}
-Obsoletes: libvirt-python3 <= 3.6.0-1%{?dist}
+Provides:       libvirt-python3 = %{version}-%{release}
+Obsoletes:      libvirt-python3 <= 3.6.0-1%{?dist}
 
 %description -n python3-libvirt
 The python3-libvirt package contains a module that permits applications
@@ -52,10 +59,14 @@ find examples -type f -exec chmod 0644 \{\} \;
 %py3_install
 
 %check
-%{__python3} setup.py test
+pip3 install \
+    more-itertools \
+    pluggy
+python3 setup.py test
 
 %files -n python3-libvirt
-%doc ChangeLog AUTHORS README COPYING COPYING.LESSER examples/
+%license COPYING COPYING.LESSER
+%doc ChangeLog AUTHORS README examples/
 %{python3_sitearch}/libvirt.py*
 %{python3_sitearch}/libvirtaio.py*
 %{python3_sitearch}/libvirt_qemu.py*
@@ -70,7 +81,9 @@ find examples -type f -exec chmod 0644 \{\} \;
 %changelog
 * Wed Jan 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.10.0-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 - Updated version to 7.10.0.
+- Added BRs for tests.
 
 * Wed Nov  3 2021 Daniel P. Berrangé <berrange@redhat.com> - 7.9.0-1
 - Update to 7.9.0 release

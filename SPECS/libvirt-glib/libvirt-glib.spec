@@ -1,45 +1,43 @@
+Summary:        libvirt glib integration for events
+Name:           libvirt-glib
+Version:        4.0.0
+Release:        4%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# -*- rpm-spec -*-
+URL:            https://libvirt.org/
+Source0:        https://libvirt.org/sources/glib/%{name}-%{version}.tar.xz
+Patch1:         %{name}-%{version}-cast-align.patch
 
-Name: libvirt-glib
-Version: 4.0.0
-Release: 4%{?dist}
-Summary: libvirt glib integration for events
-License: LGPLv2+
-URL: https://libvirt.org/
-Source0: https://libvirt.org/sources/glib/%{name}-%{version}.tar.xz
-Patch1: %{name}-%{version}-cast-align.patch
-
-BuildRequires: meson
-BuildRequires: glib2-devel
-BuildRequires: libvirt-devel
-BuildRequires: gobject-introspection-devel
-BuildRequires: libxml2-devel
-BuildRequires: vala
-BuildRequires: gettext
-BuildRequires: gtk-doc
+BuildRequires:  gettext
+BuildRequires:  glib2-devel
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  gtk-doc
+BuildRequires:  libvirt-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  meson
+BuildRequires:  vala
 
 %package devel
-Summary: libvirt glib integration for events development files
-Requires: %{name} = %{version}-%{release}
+Summary:        libvirt glib integration for events development files
+Requires:       %{name} = %{version}-%{release}
 
 %package -n libvirt-gconfig
-Summary: libvirt object APIs for processing object configuration
+Summary:        libvirt object APIs for processing object configuration
 
 %package -n libvirt-gobject
-Summary: libvirt object APIs for managing virtualization hosts
+Summary:        libvirt object APIs for managing virtualization hosts
 
 %package -n libvirt-gconfig-devel
-Summary: libvirt object APIs for processing object configuration development files
-Requires: libvirt-gconfig = %{version}-%{release}
+Summary:        libvirt object APIs for processing object configuration development files
+Requires:       libvirt-gconfig = %{version}-%{release}
 
 %package -n libvirt-gobject-devel
-Summary: libvirt object APIs for managing virtualization hosts development files
-Requires: %{name}-devel = %{version}-%{release}
-Requires: libvirt-gconfig-devel = %{version}-%{release}
-Requires: libvirt-gobject = %{version}-%{release}
-Requires: libvirt-devel
+Summary:        libvirt object APIs for managing virtualization hosts development files
+Requires:       %{name}-devel = %{version}-%{release}
+Requires:       libvirt-devel
+Requires:       libvirt-gconfig-devel = %{version}-%{release}
+Requires:       libvirt-gobject = %{version}-%{release}
 
 %description
 This package provides integration between libvirt and the glib
@@ -87,7 +85,8 @@ managing virtualization host objects
 %ldconfig_scriptlets -n libvirt-gobject
 
 %files -f %{name}.lang
-%doc README COPYING AUTHORS NEWS
+%license COPYING
+%doc README AUTHORS NEWS
 %{_libdir}/libvirt-glib-1.0.so.*
 %{_libdir}/girepository-1.0/LibvirtGLib-1.0.typelib
 
@@ -141,6 +140,7 @@ managing virtualization host objects
 %changelog
 * Wed Jan 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.0-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Mon Aug 23 2021 Kalev Lember <klember@redhat.com> - 4.0.0-3
 - BR vala instead of vala-tools
