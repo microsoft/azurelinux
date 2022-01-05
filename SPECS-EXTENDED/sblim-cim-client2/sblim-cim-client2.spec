@@ -6,7 +6,7 @@ Distribution:   Mariner
 
 Name:           sblim-cim-client2
 Version:        2.2.5
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Java CIM Client library
 
 License:        EPL
@@ -19,7 +19,7 @@ BuildRequires:  java-devel >= 1.4
 BuildRequires:  jpackage-utils >= 1.5.32
 BuildRequires:  ant >= 1.6
 
-Requires:       java-headless >= 1.4
+Requires:       java >= 1.4
 Requires:       jpackage-utils >= 1.5.32
 
 %description
@@ -111,6 +111,9 @@ cp -pr %{archive_folder}/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.2.5-15
+- Rename java-headless dependency to java
+
 * Wed Nov 03 2021 Muhammad Falak <mwani@microsft.com> - 2.2.5-14
 - Remove epoch
 

@@ -60,7 +60,7 @@ Distribution:   Mariner
 
 Name:          tomcat
 Version:       %{major_version}.%{minor_version}.%{micro_version}
-Release:       5%{?dist}
+Release:       6%{?dist}
 Summary:       Apache Servlet/JSP Engine, RI for Servlet %{servletspec}/JSP %{jspspec} API
 
 License:       ASL 2.0
@@ -109,7 +109,7 @@ BuildRequires: wsdl4j
 BuildRequires: systemd
 
 Requires:      apache-commons-daemon
-Requires:      java-headless >= 1.8.0
+Requires:      java >= 1.8.0
 Requires:      javapackages-tools
 Requires:      procps
 Requires:      %{name}-lib = %{version}-%{release}
@@ -628,6 +628,9 @@ fi
 %attr(0660,tomcat,tomcat) %verify(not size md5 mtime) %{logdir}/catalina.out
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 9.0.39-6
+- Rename java-headless dependency to java
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 9.0.39-5
 - Remove epoch
 
