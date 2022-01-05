@@ -53,6 +53,7 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 %changelog
 * Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.17-3
 - Update build requires to python3-defusedxml
+- License verified.
 
 * Wed Dec 16 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.17-2
 - Remove buildarch
