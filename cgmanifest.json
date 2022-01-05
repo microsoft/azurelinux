@@ -25996,7 +25996,7 @@
         "other": {
           "name": "rubygem-hpricot",
           "version": "0.8.6",
-          "downloadUrl": "https://rubygems.org/downloads/hpricot-0.8.6.gem"
+          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/rubygem-hpricot/hpricot-0.8.6-modified.gem/5d737234720f3847cc5def6c0047f2e4/hpricot-0.8.6-modified.gem"
         }
       }
     },
