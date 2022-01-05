@@ -9,7 +9,7 @@
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        5.3.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ URL:            https://github.com/fedora-java/javapackages
 #Source0:       https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch
+Patch1:         remove-headless-from-java-requires.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
 BuildRequires:  msopenjdk-11
@@ -27,6 +28,9 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  which
 BuildRequires:  xmlto
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 Requires:       coreutils
 Requires:       findutils
 # default JRE
@@ -45,7 +49,6 @@ This package provides macros and scripts to support Java packaging.
 
 %package -n javapackages-filesystem
 Summary:        Java packages filesystem layout
-Obsoletes:      eclipse-filesystem < 2
 Provides:       eclipse-filesystem = %{version}-%{release}
 
 %description -n javapackages-filesystem
@@ -65,7 +68,6 @@ artifact resolution using XMvn resolver.
 Summary:        Module for handling various files for Java packaging
 Requires:       python3-lxml
 Requires:       python3-six
-Obsoletes:      python-javapackages < %{version}-%{release}
 
 %description -n python3-javapackages
 Module for handling, querying and manipulating of various files for Java
@@ -83,8 +85,7 @@ This package provides non-essential macros and scripts to support Java packaging
 It is a lightweight version with minimal runtime requirements.
 
 %prep
-%setup -q -n javapackages-%{version}
-%patch0 -p1
+%autosetup -p1 -n javapackages-%{version}
 
 %build
 %define jdk_home $(find %{_libdir}/jvm -name "msopenjdk*")
@@ -105,6 +106,7 @@ rm -rf %{buildroot}%{_datadir}/gradle-local
 rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 
 %check
+pip3 install -r test-requirements.txt
 ./check
 
 %files -f files-tools
@@ -119,6 +121,12 @@ rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 %license LICENSE
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 5.3.0-14
+- Add patch to replace generated dependency on "java-headless" with "java"
+- Amend epoch patch to fix expected test results
+- Remove obsoletes statements that don't apply to Mariner
+- Install test requirements with pip during check section
+
 * Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.3.0-13
 - Update to build with JDK 11
 - License verified
