@@ -18,19 +18,39 @@ BuildRequires:  libxml2-devel
 BuildRequires:  meson
 BuildRequires:  vala
 
+%description
+This package provides integration between libvirt and the glib
+event loop.
+
 %package devel
 Summary:        libvirt glib integration for events development files
 Requires:       %{name} = %{version}-%{release}
 
+%description devel
+This package provides development header files and libraries for
+integration between libvirt and the glib event loop.
+
 %package -n libvirt-gconfig
 Summary:        libvirt object APIs for processing object configuration
+
+%description -n libvirt-gconfig
+This package provides APIs for processing the object configuration
+data
 
 %package -n libvirt-gobject
 Summary:        libvirt object APIs for managing virtualization hosts
 
+%description -n libvirt-gobject
+This package provides APIs for managing virtualization host
+objects
+
 %package -n libvirt-gconfig-devel
 Summary:        libvirt object APIs for processing object configuration development files
 Requires:       libvirt-gconfig = %{version}-%{release}
+
+%description -n libvirt-gconfig-devel
+This package provides development header files and libraries for
+the object configuration APIs.
 
 %package -n libvirt-gobject-devel
 Summary:        libvirt object APIs for managing virtualization hosts development files
@@ -38,26 +58,6 @@ Requires:       %{name}-devel = %{version}-%{release}
 Requires:       libvirt-devel
 Requires:       libvirt-gconfig-devel = %{version}-%{release}
 Requires:       libvirt-gobject = %{version}-%{release}
-
-%description
-This package provides integration between libvirt and the glib
-event loop.
-
-%description devel
-This package provides development header files and libraries for
-integration between libvirt and the glib event loop.
-
-%description -n libvirt-gconfig
-This package provides APIs for processing the object configuration
-data
-
-%description -n libvirt-gconfig-devel
-This package provides development header files and libraries for
-the object configuration APIs.
-
-%description -n libvirt-gobject
-This package provides APIs for managing virtualization host
-objects
 
 %description -n libvirt-gobject-devel
 This package provides development header files and libraries for
