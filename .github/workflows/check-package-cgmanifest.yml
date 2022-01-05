@@ -33,7 +33,7 @@ jobs:
     - name: Get the changed files
       run: |
         echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
-        changed_specs=$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
+        changed_specs=$(git diff-tree --diff-filter=d  --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "\.spec$" || test $? = 1; })
         echo "Files to validate: '${changed_specs}'"
         echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
 
