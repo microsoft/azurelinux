@@ -7,7 +7,7 @@ Group:          Development/Tools/Doc Generators
 Url:            https://www.doxygen.nl
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
-Source0:        http://doxygen.nl/files/%{name}-%{version}.src.tar.gz
+Source0:        https://sourceforge.net/projects/%{name}/files/rel-%{version}/%{name}-%{version}.src.tar.gz
 
 %global debug_package %{nil}
 
@@ -52,7 +52,8 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 
 %changelog
 * Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.17-3
-- Update build requires to python3-defusedxml
+- Updated build requires to python3-defusedxml
+- Updated source url.
 - License verified.
 
 * Wed Dec 16 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.17-2
