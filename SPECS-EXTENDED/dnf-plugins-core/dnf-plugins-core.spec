@@ -15,7 +15,7 @@ Release:        5%{?dist}
 Summary:        Core Plugins for DNF
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/dnf-plugins-core
-Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -69,7 +69,7 @@ Summary:    Core Plugins for DNF
 BuildRequires:  python3-devel
 BuildRequires:  python3-dnf >= %{dnf_lowest_compatible}
 %if %{with_check}
-BuildRequires:  python3-nose
+BuildRequires:  python3-nose2
 %endif
 Requires:       python3-distro
 
@@ -400,6 +400,9 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %endif
 
 %changelog
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com>  - 4.0.18-6
+- upgrade to undeprecated python3-nose2
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 4.0.18-5
 - Only require python3-nose when building tests
 - License verified

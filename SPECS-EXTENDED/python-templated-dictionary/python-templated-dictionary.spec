@@ -7,7 +7,7 @@
 
 Name:       python-%{srcname}
 Version:    1.1
-Release:    4%{?dist}
+Release:    6%{?dist}
 Summary:    Dictionary with Jinja2 expansion
 
 License:    GPLv2+
@@ -16,7 +16,7 @@ URL:        https://github.com/xsuchy/templated-dictionary
 # Source is created by:
 # git clone https://github.com/xsuchy/templated-dictionary && cd templated-dictionary
 # tito build --tgz --tag %%name-%%version-%%release
-Source0:    %name-%version.tar.gz
+Source0:    %{name}-%{version}.tar.gz
 
 BuildArch: noarch
 
@@ -49,9 +49,9 @@ version="%version" python3 setup.py install -O1 --skip-build --root %{buildroot}
 
 %files -n python3-%{srcname}
 %license LICENSE
-/usr/lib/python3.7/site-packages/templated_dictionary-*.egg-info/
-/usr/lib/python3.7/site-packages/templated_dictionary/
-
+# Annoyingly, the build produces templated_dictionary with an '_', 
+# not matching up with srcname which uses '-'
+%{python3_sitelib}/templated_dictionary*
 
 %changelog
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-4

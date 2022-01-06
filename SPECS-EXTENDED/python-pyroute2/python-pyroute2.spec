@@ -9,14 +9,13 @@
 
 Name: python-%{srcname}
 Version: 0.5.14
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Pure Python netlink library
 License: GPLv2+
 URL: https://github.com/svinota/%{srcname}
 
 BuildArch: noarch
-# Source: https://pypi.io/packages/source/p/pyroute2/pyroute2-%{version}.tar.gz
-Source0:    %name-%version.tar.gz
+Source0: https://pypi.io/packages/source/p/pyroute2/pyroute2-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 %description
 PyRoute2 provides several levels of API to work with Netlink
@@ -38,6 +37,7 @@ IPQ.
 
 %prep
 %setup -q -n %{srcname}-%{version}
+cat README.rst | python3 ./docs/conv.py >README.md
 
 %build
 python3 setup.py build '--executable=/usr/bin/python3 -s'
@@ -49,9 +49,12 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %{_bindir}/ss2
 %{_bindir}/%{srcname}-cli
 %doc README* LICENSE.GPL.v2 LICENSE.Apache.v2
-/usr/lib/python3.7/site-packages/%{srcname}*
+%{python3_sitelib}/%{srcname}*
 
 %changelog
+* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 0.5.14-4
+- Add to SPECS-EXTENDED from Fedora
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.14-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

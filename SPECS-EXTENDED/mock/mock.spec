@@ -1,61 +1,34 @@
 %bcond_with lint
 %bcond_without tests
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
-# mock group id allocate for Fedora
+# mock group id allocate (Must not overlap with any other gid in Mariner)
 %global mockgid 135
 
 %global __python %{__python3}
 %global python_sitelib %{python3_sitelib}
-%if 0%{?rhel} == 7
-%endif
 
 Summary: Builds packages inside chroots
 Name: mock
 Version: 2.15
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 # Source is created by
 # git clone https://github.com/rpm-software-management/mock.git
 # cd mock
 # git reset --hard %%{name}-%%{version}
 # tito build --tgz
-Source: %{name}-%{version}.tar.gz
+Source: https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 URL: https://github.com/rpm-software-management/mock/
 BuildArch: noarch
 Requires: tar
 Requires: pigz
-%if 0%{?mageia}
-Requires: usermode-consoleonly
-%else
 Requires: usermode
-%endif
 Requires: createrepo_c
-
-# We know that the current version of mock isn't compatible with older variants,
-# and we want to enforce automatic upgrades.
-Conflicts: mock-core-configs < 33
-
 # Requires 'mock-core-configs', or replacement (GitHub PR#544).
 Requires: mock-configs
 Requires: %{name}-filesystem
-%if 0%{?fedora} || 0%{?rhel} >= 8
-# This is still preferred package providing 'mock-configs'
-Suggests: mock-core-configs
-%endif
-
 Requires: systemd
-%if 0%{?fedora} || 0%{?rhel} >= 8
-Requires: systemd-container
-%endif
 Requires: coreutils
-%if 0%{?fedora}
-Suggests: iproute
-%endif
-%if 0%{?mageia}
-Suggests: iproute2
-%endif
 BuildRequires: bash-completion
 Requires: python3-distro
 Requires: python3-jinja2
@@ -67,7 +40,6 @@ BuildRequires: python3-devel
 %if %{with lint}
 BuildRequires: pylint
 %endif
-%if 0%{?fedora} || 0%{?mageia} || 0%{?rhel} >= 8
 Requires: dnf
 Suggests: yum
 Requires: dnf-plugins-core
@@ -76,29 +48,18 @@ Recommends: dnf-utils
 Suggests: qemu-user-static
 Suggests: procenv
 Suggests: podman
-%else
-%if 0%{?rhel} == 7
-Requires: btrfs-progs
-Requires: yum >= 2.4
-Requires: yum-utils
-%endif
-%endif
 
 %if %{with tests}
-BuildRequires: python-distro
-BuildRequires: python-jinja2
-BuildRequires: python-pyroute2
-BuildRequires: python-pytest
-BuildRequires: python-pytest-cov
-BuildRequires: python-requests
-BuildRequires: python-templated-dictionary
+BuildRequires: python3-distro
+BuildRequires: python3-jinja2
+BuildRequires: python3-pyroute2
+BuildRequires: python3-pytest
+BuildRequires: python3-pytest-cov
+BuildRequires: python3-requests
+BuildRequires: python3-templated-dictionary
 %endif
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
-BuildRequires: perl-interpreter
-%else
 BuildRequires: perl
-%endif
 # hwinfo plugin
 Requires: util-linux
 Requires: coreutils
@@ -107,6 +68,15 @@ Requires: procps-ng
 
 %description
 Mock takes an SRPM and builds it in a chroot.
+
+%package lvm
+Summary: LVM plugin for mock
+Requires: %{name} = %{version}-%{release}
+Requires: lvm2
+
+%description lvm
+Mock plugin that enables using LVM as a backend and support creating snapshots
+of the buildroot.
 
 %package filesystem
 Summary:  Mock filesystem layout
@@ -234,6 +204,10 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %dir %{_localstatedir}/cache/mock
 %dir %{_localstatedir}/lib/mock
 
+%files lvm
+%{python_sitelib}/mockbuild/plugins/lvm_root.*
+%{python3_sitelib}/mockbuild/plugins/__pycache__/lvm_root.*.py*
+
 %files filesystem
 %license COPYING
 %dir  %{_sysconfdir}/mock
@@ -243,6 +217,9 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %dir  %{_datadir}/cheat
 
 %changelog
+* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 2.15-2
+- Add to SPECS-EXTENDED from Fedora, lint spec
+
 * Thu Nov 18 2021 Pavel Raiskup <praiskup@redhat.com> 2.15-1
 - argparse: handle old-style commands *before* ignoring "--" (awilliam@redhat.com)
 - Update mock.1 (cheese@nosuchhost.net)
