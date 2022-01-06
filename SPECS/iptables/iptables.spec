@@ -98,7 +98,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
-* Wed Jan 5 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-1
+* Wed Jan 05 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-1
 - Update to version 1.8.7
 
 * Wed Nov 10 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.8.3-8
