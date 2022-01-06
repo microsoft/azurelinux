@@ -33,6 +33,7 @@ make install BINDIR=%{buildroot}%{_bindir} \
 %changelog
 * Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.0-1
 - Update to version 1.8.0.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.7.0-3
 - Added %%license line automatically
