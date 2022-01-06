@@ -36,6 +36,7 @@ in ways you never expected.
 %changelog
 * Thu Jan 06 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.4-3
 - Use python3 in place of ambiguous "/usr/bin/env python" in installed scripts
+- Add patch to fix DeprecationWarning
 - Add explicit dependency on python3-six
 - Lint spec
 
