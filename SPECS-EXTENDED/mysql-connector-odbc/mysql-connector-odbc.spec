@@ -80,6 +80,7 @@ rm -rf %{buildroot}/usr/test
 %changelog
 * Mon Jan 03 2022 Thomas Crain <thcrain@microsoft.com> - 8.0.23-3
 - Require mysql-devel instead of community-mysql-devel
+- License verified
 
 * Fri Oct 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.23-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
