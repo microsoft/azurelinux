@@ -37,10 +37,7 @@ BuildRequires:  rubygem(test-unit)
 BuildRequires:  ruby
 Requires:	ruby(rubygems)
 Provides:	rubygem(%{gem_name}) = %{version}-%{release}
-%if 0%{?fedora} >= 17
-Obsoletes:	ruby-%{gem_name} <= %{version}-%{release}
 Provides:	ruby-%{gem_name} = %{version}-%{release}
-%endif
 
 %description
 Hpricot is a very flexible HTML parser, based on Tanaka Akira's
@@ -108,20 +105,9 @@ popd
 mkdir -p %{buildroot}%{gem_dir}
 cp -a ./%{gem_dir}/* %{buildroot}%{gem_dir}
 
-%if 0%{?fedora} >= 21 || 0%{?rhel} > 7
-mkdir -p %{buildroot}%{gem_extdir_mri}
-cp -a ./%{gem_extdir_mri}/* %{buildroot}%{gem_extdir_mri}/
-
-pushd %{buildroot}
-rm -f .%{gem_extdir_mri}/{gem_make.out,mkmf.log}
-popd
-
-%else
 mkdir -p %{buildroot}%{gem_extdir_mri}/lib
 mv %{buildroot}%{gem_libdir}/*.so %{buildroot}%{gem_extdir_mri}/lib
-%endif
 
-# Shebang
 for f in $(find %{buildroot}%{gem_instdir} -name \*.rb)
 do
 	sed -i -e '/^#!/d' $f
@@ -143,7 +129,6 @@ DIR=%{buildroot}%{gem_libdir}/universal-java*
 [ -d $DIR ] && rmdir $DIR
 
 
-# Fix permission (bug 487654)
 pushd %{buildroot}
 find . -type f '(' -name '[A-Z]*' -or -name '*.java' -or -name '*.rb' -or -name '*gem*' ')' \
 	-print0 | xargs -0 chmod 0644

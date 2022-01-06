@@ -1,12 +1,9 @@
-# Generated from metaclass-0.0.1.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name metaclass
-
 
 Summary:        Adds a metaclass method to all Ruby objects
 Name:           rubygem-%{gem_name}
 Version:        0.0.4
 Release:        14%{?dist}
-# https://github.com/floehopper/metaclass/issues/1
 License:        MIT
 Vendor:	        Microsoft Corporation
 Distribution:	Mariner

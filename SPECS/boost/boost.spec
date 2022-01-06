@@ -41,6 +41,7 @@ The boost-static package contains boost static libraries.
 
 %install
 ./b2 install threading=multi
+rm -rf %{buildroot}%{_libdir}/cmake
 
 %ldconfig_scriptlets
 
@@ -48,8 +49,6 @@ The boost-static package contains boost static libraries.
 %defattr(-,root,root)
 %license LICENSE_1_0.txt
 %{_libdir}/libboost_*.so.*
-%{_libdir}/cmake/*.cmake
-%{_libdir}/cmake/*/*.cmake
 
 %files devel
 %defattr(-,root,root)

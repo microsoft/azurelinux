@@ -26,6 +26,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
 
 %files
 %defattr(-,root,root,-)
+%license %{gemdir}/gems/%{gem_name}-%{version}/COPYING
 %{gemdir}
 
 %changelog

@@ -5,8 +5,8 @@ Summary:        Ruby bindings for Augeas
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
 License:        LGPLv2+
-URL:            http://augeas.net
-Source0:        http://download.augeas.net/ruby/ruby-augeas-%{version}.tgz
+URL:            https://augeas.net
+Source0:        https://download.augeas.net/ruby/ruby-augeas-%{version}.tgz
 
 BuildRequires:  ruby rubygem(test-unit)
 BuildRequires:  ruby

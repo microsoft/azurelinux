@@ -1,15 +1,13 @@
-# Generated from introspection-0.0.2.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name introspection
 
 Name:          rubygem-%{gem_name}
 Version:       0.0.4
 Release:       12%{?dist}
 Summary:       Dynamic inspection of the hierarchy of method definitions on a Ruby object
-# https://github.com/floehopper/introspection/issues/1
 License:       MIT
 Vendor:	       Microsoft Corporation
 Distribution:  Mariner
-URL:           http://jamesmead.org
+URL:           https://jamesmead.org
 Source0:       https://rubygems.org/gems/%{gem_name}-%{version}.gem
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
