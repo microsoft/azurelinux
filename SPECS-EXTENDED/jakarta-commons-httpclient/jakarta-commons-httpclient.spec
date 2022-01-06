@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           jakarta-commons-httpclient
 Version:        3.1
-Release:        35%{?dist}
+Release:        36%{?dist}
 Summary: Jakarta Commons HTTPClient implements the client side of HTTP standards
 License:        ASL 2.0 and (ASL 2.0 or LGPLv2+)
 URL:            http://jakarta.apache.org/commons/httpclient/
@@ -30,7 +30,7 @@ BuildRequires:  apache-commons-codec
 BuildRequires:  apache-commons-logging >= 1.0.3
 BuildRequires:  junit
 
-Requires:       java-headless
+Requires:       java
 Requires:       apache-commons-logging >= 1.0.3
 Requires:       apache-commons-codec
 Provides:       deprecated()
@@ -131,11 +131,11 @@ ln -s %{_javadocdir}/%{name} dist/docs/apidocs
 
 
 %files -f .mfiles
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 %doc README RELEASE_NOTES
 
 %files javadoc -f .mfiles-javadoc
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 
 %files demo
 %{_datadir}/%{name}
@@ -145,6 +145,10 @@ ln -s %{_javadocdir}/%{name} dist/docs/apidocs
 
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 3.1-36
+- Rename java-headless dependency to java
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.1-35
 - Remove epoch
 

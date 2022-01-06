@@ -1446,6 +1446,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bsh",
+          "version": "2.0",
+          "downloadUrl": "https://github.com/beanshell/beanshell/archive/2.0b6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bsh2",
           "version": "2.0.0.b6",
           "downloadUrl": "https://github.com/beanshell/beanshell/archive/2.0b6.tar.gz"
@@ -28088,7 +28098,7 @@
         "other": {
           "name": "tomcat",
           "version": "9.0.39",
-          "downloadUrl": "http://www.apache.org/dist/tomcat/tomcat-9/v9.0.39/src/apache-tomcat-9.0.39-src.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.39/src/apache-tomcat-9.0.39-src.tar.gz"
         }
       }
     },

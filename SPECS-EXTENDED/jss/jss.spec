@@ -9,7 +9,7 @@ URL:            http://www.dogtagpki.org/wiki/JSS
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 
 Version:        4.8.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 #global         _phase -a1
 
 # To generate the source tarball:
@@ -57,7 +57,7 @@ BuildRequires:  apache-commons-lang3
 BuildRequires:  junit
 
 Requires:       nss >= 3.44
-Requires:       java-headless
+Requires:       java
 Requires:       jpackage-utils
 Requires:       slf4j
 Requires:       glassfish-jaxb-api
@@ -166,6 +166,10 @@ ctest --output-on-failure
 
 ################################################################################
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 4.8.1-4
+- Rename java-headless dependency to java
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.1-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
