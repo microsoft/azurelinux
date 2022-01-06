@@ -11671,8 +11671,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "6.1.0",
-          "downloadUrl": "https://libvirt.org/sources/libvirt-6.1.0.tar.xz"
+          "version": "7.10.0",
+          "downloadUrl": "https://libvirt.org/sources/libvirt-7.10.0.tar.xz"
         }
       }
     },
