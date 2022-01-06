@@ -631,6 +631,7 @@ fi
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 9.0.39-6
 - Rename java-headless dependency to java
+- License verified
 
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 9.0.39-5
 - Remove epoch
