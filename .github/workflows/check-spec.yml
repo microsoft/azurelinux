@@ -54,4 +54,4 @@ jobs:
       
       - name: Verify .spec files
         if: ${{ env.updated-specs != '' }}
-        run: python3 .github/workflows/check_spec_guidelines.py ${{ env.updated-specs }}
+        run: python3 toolkit/scripts/check_spec_guidelines.py ${{ env.updated-specs }}

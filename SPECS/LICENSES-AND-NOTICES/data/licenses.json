@@ -5,9 +5,9 @@
         "License",
         "Specs"
     ],
-    "licenses": [
+    "licenses":
         {
-            "origin": "Fedora",
+        "Fedora": {
             "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
                 "abseil-cpp",
@@ -298,8 +298,7 @@
                 "zipper"
             ]
         },
-        {
-            "origin": "Microsoft",
+        "Microsoft": {
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
                 "application-gateway-kubernetes-ingress",
@@ -410,8 +409,7 @@
                 "zstd"
             ]
         },
-        {
-            "origin": "OpenSUSE",
+        "OpenSUSE": {
             "license": "Following [openSUSE guidelines](https://en.opensuse.org/openSUSE:Specfile_guidelines#Specfile_Licensing)",
             "specs": [
                 "ant",
@@ -431,8 +429,7 @@
                 "xcursor-themes"
             ]
         },
-        {
-            "origin": "Photon",
+        "Photon": {
             "license": "[Photon License](LICENSE-PHOTON.md) and [Photon Notice](NOTICE.APACHE2). <br>  Also see [LICENSE-EXCEPTIONS.PHOTON](LICENSE-EXCEPTIONS.PHOTON).",
             "specs": [
                 "acl",
@@ -935,15 +932,13 @@
                 "zsh"
             ]
         },
-        {
-            "origin": "OpenMamba",
+        "OpenMamba": {
             "license": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
             "specs": [
                 "bash-completion"
             ]
         },
-        {
-            "origin": "Nvidia",
+        "Nvidia": {
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
                 "libnvidia-container",
@@ -952,26 +947,23 @@
                 "nvidia-docker2"
             ]
         },
-        {
-            "origin": "Magnus Edenhill Open Source",
+        "Magnus Edenhill Open Source": {
             "license": "[Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING)",
             "specs": [
                 "librdkafka"
             ]
         },
-        {
-            "origin": "Ceph Source",
+        "Ceph Source": {
             "license": "[LGPL2.1](https://github.com/ceph/ceph/blob/master/COPYING-LGPL2.1)",
             "specs": [
                 "ceph"
             ]
         },
-        {
-            "origin": "Numad source",
+        "Numad source": {
             "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
             "specs": [
                 "numad"
             ]
         }
-    ]
+    }
 }
