@@ -1296,16 +1296,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "bond",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/microsoft/bond/archive/8.0.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "boom-boot",
           "version": "1.2",
           "downloadUrl": "https://github.com/snapshotmanager/boom/archive/1.2/boom-1.2.tar.gz"
