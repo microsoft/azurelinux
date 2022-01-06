@@ -9,7 +9,7 @@ URL:		https://github.com/xsuchy/distribution-gpg-keys
 # git clone git://github.com/xsuchy/distribution-gpg-keys.git
 # cd distribution-gpg-keys
 # tito build --tgz
-Source0:	%{name}-%{version}.tar.gz
+Source0:	https://github.com/xsuchy/distribution-gpg-keys/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:	noarch
 
 %description
