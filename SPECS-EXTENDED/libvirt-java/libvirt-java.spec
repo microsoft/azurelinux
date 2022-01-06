@@ -4,7 +4,7 @@ Summary:    Java bindings for the libvirt virtualization API
 Name:       libvirt-java
 Version:    0.4.9
 Prefix:     libvirt
-Release:    18%{?dist}
+Release:    17%{?dist}
 License:    MIT
 BuildArch:  noarch
 Source:     http://libvirt.org/sources/java/%{name}-%{version}.tar.gz
@@ -16,7 +16,7 @@ URL:        http://libvirt.org/
 Requires:   jna
 Requires:   libvirt-client >= 0.9.12
 
-Requires:   java >= 1.5.0
+Requires:   java-headless >= 1.5.0
 
 
 
@@ -75,8 +75,7 @@ cp -r target/javadoc/* %{buildroot}%{_javadocdir}/%{name}-%{version}
 ant test
 
 %files
-%license LICENCE
-%doc AUTHORS NEWS README INSTALL
+%doc AUTHORS LICENCE NEWS README INSTALL
 %{_javadir}/*.jar
 
 %files devel
@@ -88,10 +87,6 @@ ant test
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 0.4.9-18
-- Rename java-headless dependency to java
-- License verified
-
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.9-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
