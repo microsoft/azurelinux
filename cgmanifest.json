@@ -745,8 +745,8 @@
         "type": "other",
         "other": {
           "name": "at",
-          "version": "3.1.23",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.1.23.orig.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.2.2.orig.tar.gz"
         }
       }
     },

@@ -1,6 +1,6 @@
-diff -up at-3.1.20/atd.c.lock-locks at-3.1.20/atd.c
---- at-3.1.20/atd.c.lock-locks	2016-07-01 10:41:50.640867692 +0200
-+++ at-3.1.20/atd.c	2016-07-01 10:42:32.345844967 +0200
+diff -ur b/atd.c a/atd.c
+--- b/atd.c	2021-04-25 03:31:30.000000000 +0200
++++ a/atd.c	2021-05-21 13:00:45.135020670 +0200
 @@ -74,6 +74,9 @@
  #include <syslog.h>
  #endif
@@ -11,7 +11,7 @@ diff -up at-3.1.20/atd.c.lock-locks at-3.1.20/atd.c
  /* Local headers */
  
  #include "privs.h"
-@@ -288,7 +291,7 @@ run_file(const char *filename, uid_t uid
+@@ -275,7 +278,7 @@
   * mail to the user.
   */
      pid_t pid;
@@ -20,7 +20,7 @@ diff -up at-3.1.20/atd.c.lock-locks at-3.1.20/atd.c
      char jobbuf[9];
      char *mailname = NULL;
      int mailsize = 128;
-@@ -410,6 +413,10 @@ run_file(const char *filename, uid_t uid
+@@ -390,6 +393,10 @@
  
      fcntl(fd_in, F_SETFD, fflags & ~FD_CLOEXEC);
  
@@ -31,7 +31,7 @@ diff -up at-3.1.20/atd.c.lock-locks at-3.1.20/atd.c
      /*
       * If the spool directory is mounted via NFS `atd' isn't able to
       * read from the job file and will bump out here.  The file is
-@@ -553,10 +560,7 @@ run_file(const char *filename, uid_t uid
+@@ -520,10 +527,7 @@
  	PRIV_END
      }
      /* We're the parent.  Let's wait.
@@ -43,7 +43,7 @@ diff -up at-3.1.20/atd.c.lock-locks at-3.1.20/atd.c
         non-blocking waitpid. So this blocking one will eventually
         return with an ECHILD error. 
       */
-@@ -573,14 +577,14 @@ run_file(const char *filename, uid_t uid
+@@ -548,14 +552,14 @@
      /* some sendmail implementations are confused if stdout, stderr are
       * not available, so let them point to /dev/null
       */
@@ -63,7 +63,7 @@ diff -up at-3.1.20/atd.c.lock-locks at-3.1.20/atd.c
  
      if (unlink(filename) == -1)
          syslog(LOG_WARNING, "Warning: removing output file for job %li failed: %s",
-@@ -588,7 +592,12 @@ run_file(const char *filename, uid_t uid
+@@ -563,7 +567,12 @@
  
      /* The job is now finished.  We can delete its input file.
       */
@@ -77,31 +77,31 @@ diff -up at-3.1.20/atd.c.lock-locks at-3.1.20/atd.c
      unlink(newname);
      free(newname);
  
-@@ -723,16 +732,18 @@ run_loop()
+@@ -673,16 +682,18 @@
  
  	/* Skip lock files */
  	if (queue == '=') {
 -            /* FIXME: calhariz */
--            /* I think the following code is broken, but commenting
--               may haven unknow side effects.  Make a release and see
+-            /* I think the following code is broken, but commenting it
+-               may cause unknow side effects.  Make a release and see
 -               in the wild how it works. For more information see:
--               https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=818508/*
+-               https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=818508 */
 -
 -	    /* if ((buf.st_nlink == 1) && (run_time + CHECK_INTERVAL <= now)) { */
 -	    /*     /\* Remove stale lockfile FIXME: lock the lockfile, if you fail, it's still in use. *\/ */
 -	    /*     unlink(dirent->d_name); */
 -	    /* } */
-+	    if ((buf.st_nlink == 1) && (run_time + CHECK_INTERVAL <= now)) {
-+		int fd;
++	    if ((buf.st_nlink == 1) && (run_time + CHECK_INTERVAL <= now)) { 
++		    int fd;
 +
-+		fd = open(dirent->d_name, O_RDONLY);
-+		if (fd != -1) {
-+			if (flock(fd, LOCK_EX | LOCK_NB) == 0) {
-+				unlink(dirent->d_name);
-+				syslog(LOG_NOTICE, "removing stale lock file %s\n", dirent->d_name);
-+			}
-+			(void)close(fd);
-+		}
++            fd = open(dirent->d_name, O_RDONLY);
++            if (fd != -1) {
++                if (flock(fd, LOCK_EX | LOCK_NB) == 0) {
++                    unlink(dirent->d_name);
++                    syslog(LOG_NOTICE, "removing stale lock file %s\n", dirent->d_name);
++                }
++                (void)close(fd);
++            }
 +	    }
  	    continue;
  	}
