@@ -1,0 +1,68 @@
+commit 34650cd9ea2f7e4aa1e61b84ecf9913b87870680
+Author: Tom Hughes <tom@compton.nu>
+Date:   Fri Feb 19 10:45:49 2021 +0000
+
+    Patch for non-constant SIGSTKSZ
+
+diff --git a/include/internal/catch_fatal_condition.hpp b/include/internal/catch_fatal_condition.hpp
+index 1dcd545d..f7d9e10d 100644
+--- a/include/internal/catch_fatal_condition.hpp
++++ b/include/internal/catch_fatal_condition.hpp
+@@ -136,7 +136,7 @@ namespace Catch {
+         static bool isSet;
+         static struct sigaction oldSigActions [sizeof(signalDefs)/sizeof(SignalDefs)];
+         static stack_t oldSigStack;
+-        static char altStackMem[SIGSTKSZ];
++        static char altStackMem[32768];
+ 
+         static void handleSignal( int sig ) {
+             std::string name = "<unknown signal>";
+@@ -156,7 +156,7 @@ namespace Catch {
+             isSet = true;
+             stack_t sigStack;
+             sigStack.ss_sp = altStackMem;
+-            sigStack.ss_size = SIGSTKSZ;
++            sigStack.ss_size = 32768;
+             sigStack.ss_flags = 0;
+             sigaltstack(&sigStack, &oldSigStack);
+             struct sigaction sa = { 0 };
+@@ -188,7 +188,7 @@ namespace Catch {
+     bool FatalConditionHandler::isSet = false;
+     struct sigaction FatalConditionHandler::oldSigActions[sizeof(signalDefs)/sizeof(SignalDefs)] = {};
+     stack_t FatalConditionHandler::oldSigStack = {};
+-    char FatalConditionHandler::altStackMem[SIGSTKSZ] = {};
++    char FatalConditionHandler::altStackMem[32768] = {};
+ 
+ 
+ } // namespace Catch
+diff --git a/single_include/catch.hpp b/single_include/catch.hpp
+index fdb046fe..d64fd1a5 100644
+--- a/single_include/catch.hpp
++++ b/single_include/catch.hpp
+@@ -6540,7 +6540,7 @@ namespace Catch {
+         static bool isSet;
+         static struct sigaction oldSigActions [sizeof(signalDefs)/sizeof(SignalDefs)];
+         static stack_t oldSigStack;
+-        static char altStackMem[SIGSTKSZ];
++        static char altStackMem[32768];
+ 
+         static void handleSignal( int sig ) {
+             std::string name = "<unknown signal>";
+@@ -6560,7 +6560,7 @@ namespace Catch {
+             isSet = true;
+             stack_t sigStack;
+             sigStack.ss_sp = altStackMem;
+-            sigStack.ss_size = SIGSTKSZ;
++            sigStack.ss_size = 32768;
+             sigStack.ss_flags = 0;
+             sigaltstack(&sigStack, &oldSigStack);
+             struct sigaction sa = { 0 };
+@@ -6591,7 +6591,7 @@ namespace Catch {
+     bool FatalConditionHandler::isSet = false;
+     struct sigaction FatalConditionHandler::oldSigActions[sizeof(signalDefs)/sizeof(SignalDefs)] = {};
+     stack_t FatalConditionHandler::oldSigStack = {};
+-    char FatalConditionHandler::altStackMem[SIGSTKSZ] = {};
++    char FatalConditionHandler::altStackMem[32768] = {};
+ 
+ } // namespace Catch
+ 
