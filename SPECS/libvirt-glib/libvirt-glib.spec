@@ -91,10 +91,12 @@ managing virtualization host objects
 %{_libdir}/girepository-1.0/LibvirtGLib-1.0.typelib
 
 %files -n libvirt-gconfig
+%license COPYING
 %{_libdir}/libvirt-gconfig-1.0.so.*
 %{_libdir}/girepository-1.0/LibvirtGConfig-1.0.typelib
 
 %files -n libvirt-gobject
+%license COPYING
 %{_libdir}/libvirt-gobject-1.0.so.*
 %{_libdir}/girepository-1.0/LibvirtGObject-1.0.typelib
 
