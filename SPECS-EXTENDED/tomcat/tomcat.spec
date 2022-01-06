@@ -65,7 +65,7 @@ Summary:       Apache Servlet/JSP Engine, RI for Servlet %{servletspec}/JSP %{js
 
 License:       ASL 2.0
 URL:           http://tomcat.apache.org/
-Source0:       http://www.apache.org/dist/tomcat/tomcat-%{major_version}/v%{version}/src/%{packdname}.tar.gz
+Source0:       https://archive.apache.org/dist/%{name}/%{name}-%{major_version}/v%{version}/src/%{packdname}.tar.gz
 Source1:       %{name}-%{major_version}.%{minor_version}.conf
 Source3:       %{name}-%{major_version}.%{minor_version}.sysconfig
 Source4:       %{name}-%{major_version}.%{minor_version}.wrapper
@@ -631,6 +631,7 @@ fi
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 9.0.39-6
 - Rename java-headless dependency to java
+- Change Source URL to pull from Apache arhive
 - License verified
 
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 9.0.39-5
