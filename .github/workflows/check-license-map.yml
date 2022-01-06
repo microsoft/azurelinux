@@ -4,9 +4,9 @@ name: Spec License Map Check
 
 on:
   push:
-    branches: [main, dev, 1.0*]
+    branches: [main, dev, 1.0*, 2.0*]
   pull_request:
-    branches: [main, dev, 1.0*]
+    branches: [main, dev, 1.0*, 2.0*]
 
 jobs:
   check:
@@ -29,4 +29,5 @@ jobs:
           ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
           ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
           ./SPECS \
+          ./SPECS-EXTENDED \
           ./SPECS-SIGNED
