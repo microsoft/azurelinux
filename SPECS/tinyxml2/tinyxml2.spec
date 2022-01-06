@@ -1,5 +1,5 @@
-Name:           tinyxml2
 Summary:        Simple, small, efficient, C++ XML parser that can be easily integrated into other programs. 
+Name:           tinyxml2
 Version:        9.0.0
 Release:        1%{?dist}
 License:        zlib
@@ -7,9 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/leethomason/tinyxml2/
 Source0:        https://github.com/leethomason/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildRequires:  cmake
 BuildRequires:  build-essential
+BuildRequires:  cmake
 
 %description
 TinyXML2 is a simple, small, efficient, C++ XML parser that can be easily integrated into other programs.
@@ -49,16 +48,16 @@ make install DESTDIR=%{buildroot}
 /usr/lib64/pkgconfig/tinyxml2.pc
 
 %changelog
-*   Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.0-1
--   Update to version 9.0.0.
+* Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.0-1
+- Update to version 9.0.0.
 
-*   Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.1.0-1
--   Updated to version 7.1.0.
--   Enabled building *-debuginfo package.
--   Added 'Vendor' and 'Distribution' tags.
--   Added teh %%license macro.
--   Updated 'URL' and 'Source0' tags.
--   License verified.
+* Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 7.1.0-1
+- Updated to version 7.1.0.
+- Enabled building *-debuginfo package.
+- Added 'Vendor' and 'Distribution' tags.
+- Added teh %%license macro.
+- Updated 'URL' and 'Source0' tags.
+- License verified.
 
-*   Thu Apr 09 2020 Jonathan Chiu <jochi@microsoft.com> 7.0.1-1
--   Original version for CBL-Mariner.
+* Thu Apr 09 2020 Jonathan Chiu <jochi@microsoft.com> 7.0.1-1
+- Original version for CBL-Mariner.
