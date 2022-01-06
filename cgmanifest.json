@@ -7581,8 +7581,8 @@
         "type": "other",
         "other": {
           "name": "iptables",
-          "version": "1.8.3",
-          "downloadUrl": "http://www.netfilter.org/projects/iptables/files/iptables-1.8.3.tar.bz2"
+          "version": "1.8.7",
+          "downloadUrl": "http://www.netfilter.org/projects/iptables/files/iptables-1.8.7.tar.bz2"
         }
       }
     },
