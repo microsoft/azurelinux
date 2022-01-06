@@ -78,7 +78,7 @@ rm -rf %{buildroot}/usr/test
 %{_lib64dir}/lib*so
 
 %changelog
-* Mon Jan 03 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.23-3
+* Mon Jan 03 2022 Thomas Crain <thcrain@microsoft.com> - 8.0.23-3
 - Require mysql-devel instead of community-mysql-devel
 
 * Fri Oct 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.23-2
