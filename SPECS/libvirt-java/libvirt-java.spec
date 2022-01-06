@@ -1,94 +1,75 @@
+# The "ant-junit" package is currently unavailable in CBL-Mariner but is only needed to run the "%check" section.
+%bcond_with junit
+
+Summary:        Java bindings for the libvirt virtualization API
+Name:           libvirt-java
+Version:        0.5.2
+Release:        1%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary:    Java bindings for the libvirt virtualization API
-Name:       libvirt-java
-Version:    0.4.9
-Prefix:     libvirt
-Release:    17%{?dist}
-License:    MIT
-BuildArch:  noarch
-Source:     http://libvirt.org/sources/java/%{name}-%{version}.tar.gz
+URL:            https://libvirt.org/
+Source:         https://libvirt.org/sources/java/%{name}-%{version}.tar.gz
 
-# Fix FTBFS issue (bz #914153)
-Patch0001: 0001-Fix-build-with-jna-3.5.0.patch
-URL:        http://libvirt.org/
+BuildArch:      noarch
 
-Requires:   jna
-Requires:   libvirt-client >= 0.9.12
-
-Requires:   java-headless >= 1.5.0
-
-
-
-Requires:   jpackage-utils
 BuildRequires:  ant
-BuildRequires:  jna
-BuildRequires:  ant-junit
 BuildRequires:  java-devel >= 1.5.0
+BuildRequires:  jna
 BuildRequires:  jpackage-utils
+%if 0%{with_check} && 0%{with junit}
+BuildRequires:  ant-junit
+%endif
 
-#
-# the jpackage-utils should provide a %{java_home} macro
-# to select a different Java JVM from the default one use the following
-# rpmbuild --define 'java_home /usr/lib/jvm/your_jvm_of_choice'
-#
+Requires:       jna
+Requires:       jpackage-utils
+Requires:       libvirt-client >= 0.9.12
+Requires:       msopenjdk-11
 
 %description
 Libvirt-java is a base framework allowing to use libvirt, the virtualization
 API though the Java programming language.
 It requires libvirt-client >= 0.9.12
 
-%package    devel
-Summary:    Compressed Java source files for %{name}
-Requires:   %{name} = %{version}-%{release}
-
-%description    devel
-Libvirt-java is a base framework allowing to use libvirt, the virtualization
-API though the Java programming language. This is the development part needed
-to build applications with Libvirt-java.
-
-
-%package    javadoc
-Summary:    Java documentation for %{name}
-Requires:   jpackage-utils
-
-%description    javadoc
-API documentation for %{name}.
 %prep
-%setup -q
-
-# Fix FTBFS issue (bz #914153)
-%patch0001 -p1
+%autosetup -p1
 
 %build
-ant build docs
+ant build jar
 
 %install
-rm -fr %{buildroot}
 install -d -m0755 %{buildroot}%{_javadir}
 install -d -m0755 %{buildroot}%{_javadocdir}/%{name}-%{version}
-cp target/%{prefix}-%{version}.jar %{buildroot}%{_javadir}/%{prefix}.jar
-cp -r target/javadoc/* %{buildroot}%{_javadocdir}/%{name}-%{version}
-%{__ln_s} %{_javadocdir}/%{name}-%{version} %{buildroot}%{_javadocdir}/%{name}
+cp target/libvirt-%{version}.jar %{buildroot}%{_javadir}/libvirt.jar
 
 %check
+%if 0%{with junit}
 ant test
+%endif
 
 %files
-%doc AUTHORS LICENCE NEWS README INSTALL
-%{_javadir}/*.jar
-
-%files devel
-%doc src/test/java/test.java
-
-
-%files javadoc
-%{_javadocdir}/%{name}-%{version}
-%{_javadocdir}/%{name}
+%license LICENSE
+%doc AUTHORS NEWS README INSTALL
+%{_javadir}/libvirt.jar
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.9-17
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jan 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.2-1
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+- Updated version to 0.5.2.
+- Removed the documentation and "devel" subpackages.
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.9-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.9-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.9-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat Jul 11 2020 Jiri Vanek <jvanek@redhat.com> - 0.4.9-17
+- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.9-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -193,10 +174,10 @@ ant test
 * Thu Oct 29 2009 Bryan Kearney <bkearney@redhat.com> - 0.3.1-1
 - Added maven building tools.
 - Fixed connection and domain bugs found by Thomas Treutner
-    
+
 * Wed Jul 29 2009 Bryan Kearney <bkearney@redhat.com> - 0.3.0-1
 - refactored the code to use jna (https://jna.dev.java.net/)
-    
+
 * Fri Jul 18 2008 Daniel Veillard <veillard@redhat.com> - 0.2.0-1
 - new release 0.2.0
 - finished cleanup of APIs
@@ -209,4 +190,3 @@ ant test
 
 * Tue Jun 24 2008 Daniel Veillard <veillard@redhat.com> - 0.1.0-1
 - created
-
