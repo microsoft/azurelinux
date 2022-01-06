@@ -29187,8 +29187,8 @@
         "type": "other",
         "other": {
           "name": "websocketpp",
-          "version": "0.8.1",
-          "downloadUrl": "https://github.com/zaphoyd/websocketpp/archive/0.8.1.tar.gz"
+          "version": "0.8.2",
+          "downloadUrl": "https://github.com/zaphoyd/websocketpp/archive/0.8.2.tar.gz"
         }
       }
     },
