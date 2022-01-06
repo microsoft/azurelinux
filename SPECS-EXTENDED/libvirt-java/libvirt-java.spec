@@ -75,7 +75,8 @@ cp -r target/javadoc/* %{buildroot}%{_javadocdir}/%{name}-%{version}
 ant test
 
 %files
-%doc AUTHORS LICENCE NEWS README INSTALL
+%license LICENCE
+%doc AUTHORS NEWS README INSTALL
 %{_javadir}/*.jar
 
 %files devel
@@ -89,6 +90,7 @@ ant test
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 0.4.9-18
 - Rename java-headless dependency to java
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.9-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

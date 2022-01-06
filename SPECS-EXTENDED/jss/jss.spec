@@ -168,6 +168,7 @@ ctest --output-on-failure
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 4.8.1-4
 - Rename java-headless dependency to java
+- License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.1-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.

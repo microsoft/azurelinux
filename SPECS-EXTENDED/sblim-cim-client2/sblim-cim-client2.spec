@@ -96,7 +96,7 @@ cp -pr %{archive_folder}/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 %dir %{_pkgdocdir}
 %config(noreplace) %{_sysconfdir}/java/sblim-cim-client2.properties
 %config(noreplace) %{_sysconfdir}/java/sblim-slp-client2.properties
-%doc %{_pkgdocdir}/COPYING
+%license %{_pkgdocdir}/COPYING
 %doc %{_pkgdocdir}/README
 %doc %{_pkgdocdir}/ChangeLog
 %doc %{_pkgdocdir}/NEWS
@@ -106,13 +106,13 @@ cp -pr %{archive_folder}/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %files manual
-%doc %{_pkgdocdir}/COPYING
+%license %{_pkgdocdir}/COPYING
 %doc %{_pkgdocdir}/org
-
 
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.2.5-15
 - Rename java-headless dependency to java
+- License verified
 
 * Wed Nov 03 2021 Muhammad Falak <mwani@microsft.com> - 2.2.5-14
 - Remove epoch

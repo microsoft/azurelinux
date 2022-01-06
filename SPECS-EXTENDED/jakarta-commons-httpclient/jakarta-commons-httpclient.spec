@@ -131,11 +131,11 @@ ln -s %{_javadocdir}/%{name} dist/docs/apidocs
 
 
 %files -f .mfiles
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 %doc README RELEASE_NOTES
 
 %files javadoc -f .mfiles-javadoc
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 
 %files demo
 %{_datadir}/%{name}
@@ -147,6 +147,7 @@ ln -s %{_javadocdir}/%{name} dist/docs/apidocs
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 3.1-36
 - Rename java-headless dependency to java
+- License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.1-35
 - Remove epoch

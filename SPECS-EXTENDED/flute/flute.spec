@@ -40,16 +40,17 @@ mkdir -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 cp -rp build/api $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %files
-%doc COPYRIGHT.html
+%license COPYRIGHT.html
 %{_javadir}/*.jar
 
 %files javadoc
-%doc COPYRIGHT.html
+%license COPYRIGHT.html
 %{_javadocdir}/%{name}
 
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 1.3.0-24
 - Rename java-headless dependency to java
+- License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.0-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

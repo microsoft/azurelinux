@@ -138,13 +138,13 @@ ant -f build.xml \
 
 %defattr(-,root,root)
 %doc README
-%doc LICENSE
 %{_javadir}/*
 
 ################################################################################
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 7.6.1-4
 - Rename java-headless dependency to java
+- License verified
 
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 7.6.1-3
 - Drop epoch from tomcat.

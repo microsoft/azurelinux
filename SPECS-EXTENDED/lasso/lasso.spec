@@ -319,6 +319,7 @@ rm -fr %{buildroot}%{_defaultdocdir}/%{name}
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.6.0-24
 - Rename java-headless dependency to java
+- License verified
 
 * Wed Jul 14 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.6.0-23
 - Add explict provides 'lasso-python'

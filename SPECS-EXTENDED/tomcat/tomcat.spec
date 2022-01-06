@@ -521,7 +521,8 @@ fi
 
 %files 
 %defattr(0664,root,tomcat,0755)
-%doc {LICENSE,NOTICE,RELEASE*}
+%license LICENSE
+%doc {NOTICE,RELEASE*}
 %attr(0755,root,root) %{_bindir}/%{name}-digest
 %attr(0755,root,root) %{_bindir}/%{name}-tool-wrapper
 %attr(0755,root,root) %{_sbindir}/%{name}
@@ -607,11 +608,11 @@ fi
 %exclude %{_javadir}/%{name}-jsp-%{jspspec}*.jar
 
 %files servlet-%{servletspec}-api -f output/dist/src/res/maven/.mfiles-tomcat-servlet-api
-%doc LICENSE
+%license LICENSE
 %{_javadir}/%{name}-servlet-%{servletspec}*.jar
 
 %files el-%{elspec}-api -f output/dist/src/res/maven/.mfiles-tomcat-el-api
-%doc LICENSE
+%license LICENSE
 %{_javadir}/%{name}-el-%{elspec}-api.jar
 %{libdir}/%{name}-el-%{elspec}-api.jar
 

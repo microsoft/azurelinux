@@ -362,6 +362,7 @@ make check
 %changelog
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 4.0.3x-5
 - Rename java-headless dependency to java
+- License verified
 
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 4.0.3x-4
 - Change JDK dir to match JDK version
