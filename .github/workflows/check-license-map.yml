@@ -29,5 +29,4 @@ jobs:
           ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
           ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
           ./SPECS \
-          ./SPECS-EXTENDED \
           ./SPECS-SIGNED
