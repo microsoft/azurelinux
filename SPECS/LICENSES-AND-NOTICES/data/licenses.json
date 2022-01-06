@@ -303,7 +303,6 @@
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
                 "application-gateway-kubernetes-ingress",
-                "auoms",
                 "azure-iot-sdk-c",
                 "azure-iotedge",
                 "azure-storage-cpp",

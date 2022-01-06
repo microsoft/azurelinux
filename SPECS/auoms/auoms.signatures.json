@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "auoms-2.2.5.tar.gz": "77fb7b561c597a99333d933fa738e184a6070c5f3c37fa09fb5bc8c5faacb0c3",
-  "msgpack-c-cpp-2.0.0.zip": "9f3860bc014355dbdf6519ffb78d54d120bb8d134dcb4eba35eb5103c1ac3cd1",
-  "pal-1.6.6-0.tar.gz": "f55a83636ed721ab2a347837b7ed517ece41fd179848995111032ebcd2370405",
-  "rapidjson-1.0.2.tar.gz": "c3711ed2b3c76a5565ee9f0128bb4ec6753dbcc23450b713842df8f236d08666"
- }
-}
