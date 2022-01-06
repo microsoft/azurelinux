@@ -1,13 +1,13 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
-Version:        0.14.1
-Release:        7%{?dist}
+Version:        1.0.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/Werkzeug
-Source0:        https://files.pythonhosted.org/packages/9f/08/a3bb1c045ec602dc680906fc0261c267bed6b3bb4609430aff92c3888ec8/Werkzeug-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/10/27/a33329150147594eff0ea4c33c2036c0eadd933141055be0ff911f7f8d04/Werkzeug-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -18,12 +18,16 @@ Summary:        The Swiss Army knife of Python web development
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-Requires:       python3
+BuildRequires:  python3-libs
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-requests
+BuildRequires:  python3-pip
 %endif
+
+Requires:       python3
+BuildRequires:  python3-libs
 
 %description -n python3-werkzeug
 Werkzeug started as simple collection of various utilities for WSGI applications and has become one of the most advanced WSGI utility modules. It includes a powerful debugger, full featured request and response objects, HTTP utilities to handle entity tags, cache control headers, HTTP dates, cookie handling, file uploads, a powerful URL routing system and a bunch of community contributed addon modules.
@@ -38,18 +42,18 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %py3_install
 
 %check
-# Remove unmaintained cache tests. See https://github.com/pallets/werkzeug/pull/1391
-rm -vf tests/contrib/test_cache.py
-rm -vf tests/contrib/cache/test_cache.py
-pip install tox
-LANG=en_US.UTF-8 tox -e py37
+pip3 install pytest hypothesis
+LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
 
 %files -n python3-werkzeug
 %defattr(-,root,root)
-%license LICENSE
+%license LICENSE.rst
 %{python3_sitelib}/*
 
 %changelog
+* Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.0.1-1
+- Updated to version 1.0.1
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.14.1-7
 - Add license to python3 package
 - Remove python2 package, switch check section to python3

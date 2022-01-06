@@ -1,7 +1,7 @@
 Summary:        Library providing serialization and deserialization support for the JSON format
 Name:           json-glib
 Version:        1.4.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2+
 Group:          Development/Libraries
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/%{name}-%{version}.tar.xz
@@ -61,9 +61,6 @@ cd build
 meson test
 
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -89,6 +86,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/installed-tests/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.4-8
+- Removing the explicit %%clean stage.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4-7
 - Replace python2 with python3
 - Remove pkgconf provides

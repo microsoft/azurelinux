@@ -1,7 +1,7 @@
 Summary:        Fast compression and decompression library
 Name:           snappy
 Version:        1.1.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            https://google.github.io/snappy/
 #Source0:       https://github.com/google/%{name}/archive/%{version}.tar.gz
@@ -40,9 +40,6 @@ make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}%{_datadir}/doc/snappy/
 find %{buildroot} -name '*.la' -delete
 
-%clean
-rm -rf %{buildroot}
-
 %check
 cd testdata
 cmake ../ && make
@@ -66,6 +63,10 @@ make test
 %{_lib64dir}/libsnappy.so
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.7-6
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.7-5
 - Added %%license line automatically
 

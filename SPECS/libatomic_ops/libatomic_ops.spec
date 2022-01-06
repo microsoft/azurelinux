@@ -1,12 +1,11 @@
 Summary:    Atomic memory update operations portable implementation
 Name:       libatomic_ops
 Version:    7.6.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:    GPLv2 and MIT
 URL:        https://github.com/ivmai/libatomic_ops
 Group:      Development/Libraries
 Source0:    http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-%{version}.tar.gz
-%define sha1 libatomic_ops=89a320bc94860fc63069615a0a7ee6f38eee9b70
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
@@ -44,9 +43,6 @@ make check
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -66,6 +62,10 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/atomic_ops.pc
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.6.6-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 7.6.6-3
 - Added %%license line automatically
 

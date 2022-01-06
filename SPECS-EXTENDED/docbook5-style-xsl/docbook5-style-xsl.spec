@@ -2,13 +2,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: docbook5-style-xsl
 Version: 1.79.2
-Release: 10%{?dist}
+Release: 11%{?dist}
 
 Summary: Norman Walsh's XSL stylesheets for DocBook 5.X
 
 # Package is licensed as MIT/X (http://wiki.docbook.org/topic/DocBookLicense),
-# some .js files under ./slides/browser/ are licensed MPLv1.1
-License: MIT and MPLv1.1
+# some .js files inside ./slides/ are either Public Domain or licensed under W3C
+License: MIT and Public Domain and W3C
 URL: https://github.com/docbook/xslt10-stylesheets
 
 Provides: docbook-xsl-ns = %{version}
@@ -20,7 +20,7 @@ Requires(postun): libxml2 >= 2.4.8
 Conflicts: passivetex < 1.21
 
 BuildArch: noarch
-Source0: https://github.com/docbook/xslt10-stylesheets/releases/download/release%2F{%version}/docbook-xsl-%{version}.tar.bz2
+Source0: https://github.com/docbook/xslt10-stylesheets/releases/download/release%2F%{version}/docbook-xsl-%{version}.tar.bz2
 
 %description
 These XSL namespace aware stylesheets allow you to transform any
@@ -90,6 +90,9 @@ if [ "$1" = 0 ]; then
 fi
 
 %changelog
+* Fri Dec 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.79.2-11
+- License verified.
+
 * Mon Jun 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.79.2-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removing the "*-extensions" subpackage.

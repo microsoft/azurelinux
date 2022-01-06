@@ -2,7 +2,7 @@
 
 Name:           log4j
 Version:        2.15.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Java logging package
 BuildArch:      noarch
 License:        ASL 2.0
@@ -269,8 +269,9 @@ mvn test
 %endif
 
 %files -f .mfiles
+%license LICENSE.txt
+%doc NOTICE.txt
 %dir %{_javadir}/%{name}
-%doc LICENSE.txt NOTICE.txt
 
 %files slf4j -f .mfiles-slf4j
 %files jcl -f .mfiles-jcl
@@ -288,7 +289,10 @@ mvn test
 
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.15.0-2
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.15.0-3
+- License verified.
+
+* Sun Dec 12 2021 Thomas Crain <thcrain@microsoft.com> - 2.15.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 
 * Sun Dec 12 2021 Sérgio Basto <sergio@serjux.com> - 2.15.0-1

@@ -1,13 +1,12 @@
 Summary:       Jansson json parser
 Name:          jansson
 Version:       2.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 Group:         System Environment/Libraries
 Vendor:         Microsoft Corporation
 License:       MIT
 URL:           http://www.digip.org/jansson
 Source0:       http://www.digip.org/jansson/releases/%{name}-%{version}.tar.gz
-%define sha1 %{name}-%{version}=0c99636416499960214ce6c095d26af541d3c244
 Distribution:   Mariner
 
 %description
@@ -44,9 +43,6 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
     # First argument is 1 => New Installation
     # First argument is 2 => Upgrade
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license LICENSE
 %doc LICENSE CHANGES
@@ -58,6 +54,10 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.11-3
 - Added %%license line automatically
 

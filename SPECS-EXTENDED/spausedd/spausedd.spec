@@ -5,7 +5,7 @@ Distribution:   Mariner
 Name: spausedd
 Summary: Utility to detect and log scheduler pause
 Version: 20201112
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ISC
 URL: https://github.com/jfriesse/spausedd
 Source0: https://github.com/jfriesse/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
@@ -47,8 +47,6 @@ make DESTDIR="%{buildroot}" PREFIX="%{_prefix}" install
 mkdir -p %{buildroot}/%{_unitdir}
 install -m 644 -p init/%{name}.service %{buildroot}/%{_unitdir}
 
-%clean
-
 %files
 %doc AUTHORS
 %license COPYING
@@ -66,6 +64,10 @@ install -m 644 -p init/%{name}.service %{buildroot}/%{_unitdir}
 %systemd_postun spausedd.service
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201112-3
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201112-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

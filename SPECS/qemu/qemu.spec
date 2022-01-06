@@ -208,7 +208,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.1.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -228,6 +228,7 @@ Source36:       README.tests
 # https://bugzilla.redhat.com/show_bug.cgi?id=1999700
 Patch1:         0001-target-i386-add-missing-bits-to-CR4_RESERVED_MASK.patch
 Patch2:         fixing-glibc-struct-statx-usage.patch
+Patch3:         disable_qos_test.patch
 # alsa audio output
 BuildRequires:  alsa-lib-devel
 # reading bzip2 compressed dmg images
@@ -1289,7 +1290,7 @@ mkdir -p %{qemu_kvm_build}
 
 run_configure() {
     ../configure  \
-        --cc=%{__cc} \
+        --cc=gcc \
         --cxx=/bin/false \
         --prefix="%{_prefix}" \
         --libdir="%{_libdir}" \
@@ -1689,7 +1690,7 @@ for i in %{binfmt_dir}/*; do mv $i $(echo $i | sed 's/.conf/-dynamic.conf/'); do
 
 %check
 # Suppress check as it stall the pipeline indefinetly
-%if !%{tools_only} && 0%{?mariner_failing_tests}
+%if !%{tools_only}
 
 pushd %{qemu_kvm_build}
 echo "Testing %{name}-build"
@@ -2220,9 +2221,12 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
-* Mon Jan 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-13
+* Mon Jan 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-14
 - Disabling 'qemu-system-x86*' subpackages build for non-AMD64 architectures.
 - Disabling dependency on 'ipxe' for non-AMD64 architectures.
+
+* Mon Jan 03 2022 Bala <balakumaran.kannan@microsoft.com> - 6.1.0-13
+- Skip qos test from ptest as it hungs indefinitely
 
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-12
 - Lint spec
