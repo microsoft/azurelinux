@@ -163,11 +163,11 @@ perl-5.32.0-464.cm2.x86_64.rpm
 texinfo-6.8-1.cm2.x86_64.rpm
 autoconf-2.69-11.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
-openssl-1.1.1k-6.cm2.x86_64.rpm
-openssl-devel-1.1.1k-6.cm2.x86_64.rpm
-openssl-libs-1.1.1k-6.cm2.x86_64.rpm
-openssl-perl-1.1.1k-6.cm2.x86_64.rpm
-openssl-static-1.1.1k-6.cm2.x86_64.rpm
+openssl-1.1.1k-7.cm2.x86_64.rpm
+openssl-devel-1.1.1k-7.cm2.x86_64.rpm
+openssl-libs-1.1.1k-7.cm2.x86_64.rpm
+openssl-perl-1.1.1k-7.cm2.x86_64.rpm
+openssl-static-1.1.1k-7.cm2.x86_64.rpm
 libcap-2.26-2.cm2.x86_64.rpm
 libcap-devel-2.26-2.cm2.x86_64.rpm
 debugedit-5.0-1.cm2.x86_64.rpm
