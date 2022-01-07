@@ -10,6 +10,12 @@ URL:            https://github.com/rhboot/shim
 Source0:        https://github.com/rhboot/shim/releases/download/%{version}/shim-%{version}.tar.bz2
 Source1:        sbat.csv.in
 Source100:      cbl-mariner-ca-20211013.der
+Patch0:         Don-t-call-QueryVariableInfo-on-EFI-1.10-machines.patch
+Patch1:         Fix-handling-of-ignore_db-and-user_insecure_mode.patch
+Patch2:         Fix-a-broken-file-header-on-ia32.patch
+Patch3:         mok-allocate-MOK-config-table-as-BootServicesData.patch
+Patch4:         shim-another-attempt-to-fix-load-options-handling.patch
+Patch5:         Relax-the-check-for-import_mok_state.patch
 BuildRequires:  dos2unix
 BuildRequires:  vim-extra
 ExclusiveArch:  x86_64
