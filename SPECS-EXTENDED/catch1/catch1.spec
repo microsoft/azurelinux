@@ -61,6 +61,7 @@ ctest -V %{?_smp_mflags}
 %changelog
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.12.2-7
 - Add catch1-sigstksz patch.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
