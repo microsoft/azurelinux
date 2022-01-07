@@ -18,12 +18,12 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "Photon":                       r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
 }
 
-VALID_SOURCE_ATTRIBUTIONS_REGEX = { key : re.compile(value) for key, value in VALID_SOURCE_ATTRIBUTIONS.items() }
+valid_source_attributions_regex = { key : re.compile(value) for key, value in VALID_SOURCE_ATTRIBUTIONS.items() }
 
 def get_spec_source(spec_path):
     spec = Spec.from_file(spec_path)
 
-    for source, attribution_regex in VALID_SOURCE_ATTRIBUTIONS_REGEX.items():
+    for source, attribution_regex in valid_source_attributions_regex.items():
         if attribution_regex.findall(spec.changelog):
             return source
 

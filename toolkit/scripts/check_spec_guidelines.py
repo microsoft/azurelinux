@@ -9,7 +9,7 @@ import argparse
 import re
 import sys
 
-from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS, VALID_SOURCE_ATTRIBUTIONS_REGEX
+from internal_utils.specs.spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
 
 license_regex = re.compile(
     r"\b(license verified|verified license)\b", re.IGNORECASE)
