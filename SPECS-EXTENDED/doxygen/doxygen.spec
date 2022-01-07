@@ -2,7 +2,7 @@ Name:           doxygen
 Version:        1.8.17
 Release:        3%{?dist}
 Summary:        Automated C, C++, and Java Documentation Generator
-License:        GPL
+License:        GPLv2
 Group:          Development/Tools/Doc Generators
 Url:            https://www.doxygen.nl
 Vendor:		Microsoft Corporation
