@@ -1,6 +1,5 @@
 [Unit]
 Description=Checks if system needs to be restarted due to recent version updates
-Requires=check-restart.service
 
 [Timer]
 Unit=check-restart.service

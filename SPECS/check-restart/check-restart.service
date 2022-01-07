@@ -5,6 +5,3 @@ Wants=check-restart.timer
 [Service]
 Type=oneshot
 ExecStart=/bin/bash /usr/bin/check-restart.sh
-
-[Install]
-WantedBy=multi-user.target
