@@ -905,8 +905,8 @@
         "type": "other",
         "other": {
           "name": "autoconf-archive",
-          "version": "2018.03.13",
-          "downloadUrl": "http://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2018.03.13.tar.xz"
+          "version": "2021.02.19",
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2021.02.19.tar.xz"
         }
       }
     },
