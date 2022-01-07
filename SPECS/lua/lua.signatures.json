@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "LICENSE.PTR": "1cf3e48430c4fc4d5289a2459a38f56a39a8682c7a80fd9cbb49d42e9f634897",
-  "lua-5.3.6.tar.gz": "fc5fd69bb8736323f026672b1b7235da613d7177e72558893a0bdcd320466d60",
+  "lua-5.3.5.tar.gz": "0c2eed3f960446e1a3e4b9a1ca2f3ff893b6ce41942cf54d5dd59ab4b3b058ac",
   "lua-5.4.3.tar.gz": "f8612276169e3bfcbcfb8f226195bfc6e466fe13042f1076cbde92b7ec96bbfb"
  }
 }

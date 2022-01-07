@@ -3,24 +3,24 @@
 
 # If you are incrementing major_version, enable bootstrapping and adjust accordingly.
 # Version should be the latest prior build. If you don't do this, RPM will break.
-%global bootstrap 0
+%global bootstrap 1
 %global bootstrap_major_version 5.3
-%global bootstrap_version %{bootstrap_major_version}.6
+%global bootstrap_version %{bootstrap_major_version}.5
 
 Summary:        Programming language
 Name:           lua
 Version:        5.4.3
 Release:        1%{?dist}
 License:        MIT
-URL:            http://www.lua.org
+URL:            https://www.lua.org
 Group:          Development/Tools
-Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Vendor:	        Microsoft Corporation
+Distribution:   Mariner
 
-Source0:        http://www.lua.org/ftp/%{name}-%{version}.tar.gz
+Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
 
 %if 0%{?bootstrap}
-Source1:       http://www.lua.org/ftp/lua-%{bootstrap_version}.tar.gz
+Source1:       https://www.lua.org/ftp/lua-%{bootstrap_version}.tar.gz
 %endif
 Source2:       %{LICENSE_PATH}
 
@@ -32,8 +32,8 @@ Patch1:        lua-%{bootstrap_version}-shared-library.patch
 
 Patch2:        CVE-2021-43519.patch
 
-BuildRequires:  readline-devel
-Requires:       readline
+BuildRequires: readline-devel
+Requires:      readline
 
 %description
 Lua is a powerful light-weight programming language designed for
@@ -46,8 +46,8 @@ memory management with garbage collection, making it ideal for
 configuration, scripting, and rapid prototyping.
 
 %package devel
-Summary:    Development files for %{name}
-Requires:	%{name} = %{version}
+Summary:      Development files for %{name}
+Requires:     %{name} = %{version}
 
 %description devel
 This package contains development files for %{name}.
