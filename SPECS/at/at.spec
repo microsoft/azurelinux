@@ -166,6 +166,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %changelog
 * Thu Jan 06 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.2-1
 - upgrade to version 3.2.2
+- License verified
 
 * Mon Apr 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.1.23-7
 - Fix installation of atd.service
