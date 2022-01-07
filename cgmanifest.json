@@ -775,8 +775,8 @@
         "type": "other",
         "other": {
           "name": "atf",
-          "version": "0.20",
-          "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.20/atf-0.20.tar.gz"
+          "version": "0.21",
+          "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.21/atf-0.21.tar.gz"
         }
       }
     },
