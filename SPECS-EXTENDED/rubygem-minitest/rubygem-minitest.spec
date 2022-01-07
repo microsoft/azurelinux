@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name: rubygem-%{gem_name}
 Version: 5.14.2
-Release: 201%{?dist}
+Release: 202%{?dist}
 Summary: minitest provides a complete suite of testing facilities
 License: MIT
 URL: https://github.com/seattlerb/minitest
@@ -77,8 +77,7 @@ ruby -Ilib:test -e 'Dir.glob "./test/minitest/test_*.rb", &method(:require)'
 popd
 
 %files
-%license README.rdoc
-%doc %{gem_instdir}/README.rdoc
+%license %{gem_instdir}/README.rdoc
 %dir %{gem_instdir}
 %exclude %{gem_instdir}/.*
 %{gem_libdir}
@@ -94,6 +93,10 @@ popd
 %{gem_instdir}/design_rationale.rb
 
 %changelog
+* Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.14.2-202
+- Fix build failure.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.14.2-201
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
