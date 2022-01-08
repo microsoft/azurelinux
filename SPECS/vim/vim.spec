@@ -1,17 +1,14 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.3668
-Release:        4%{?dist}
+Version:        8.2.4006
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-4019.patch
-Patch1:         CVE-2021-4069.patch
-Patch2:         CVE-2021-4136.patch
 BuildRequires:  ncurses-devel
 Provides:       vi = %{release}-%{version}
 Provides:       %{name}-minimal = %{version}-%{release}
@@ -195,6 +192,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Jan 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.4006-1
+- Update version to 8.2.4006 to fix CVE CVE-2021-4166.
+
 * Tue Dec 28 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.2.3668-4
 - Backported patch for CVE-2021-4136 from upstream
 
@@ -295,3 +295,4 @@ fi
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 7.4-1
 - Initial build First version.
+
