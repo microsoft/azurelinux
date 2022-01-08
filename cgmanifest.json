@@ -2467,8 +2467,8 @@
         "type": "other",
         "other": {
           "name": "Cython",
-          "version": "0.28.5",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.28.5.tar.gz"
+          "version": "0.29.24",
+          "downloadUrl": "https://github.com/cython/cython/archive/0.29.24.tar.gz"
         }
       }
     },
@@ -14843,8 +14843,8 @@
         "type": "other",
         "other": {
           "name": "numpy",
-          "version": "1.16.6",
-          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.16.6/numpy-1.16.6.tar.gz"
+          "version": "1.22.0",
+          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.22.0/numpy-1.22.0.tar.gz"
         }
       }
     },
@@ -28947,8 +28947,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.3668",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.3668.tar.gz"
+          "version": "8.2.4006",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4006.tar.gz"
         }
       }
     },
