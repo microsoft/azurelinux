@@ -63,9 +63,10 @@ popd
 %{_libdir}/cmake/%{name}/%{name}*.cmake
 
 %changelog
-* Fri Jan 07 2021 Henry Li <lihl@microsoft.com> - 2.1.2-1
+* Fri Jan 07 2022 Henry Li <lihl@microsoft.com> - 2.1.2-1
 - Upgrade to version 2.1.2
 - Add related cmake files to libjpeg-turbo-devel pacakge
+- License Verified
 
 * Fri Jul 26 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.0.0-9
 - Patch CVE-2020-17541 (JOSLOBO: Dash rolled for merge)
