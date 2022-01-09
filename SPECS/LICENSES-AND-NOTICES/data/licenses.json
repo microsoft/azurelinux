@@ -2408,12 +2408,6 @@
                 "zstd"
             ]
         },
-        "Numad source": {
-            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
-            "specs": [
-                "numad"
-            ]
-        },
         "NVIDIA": {
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
