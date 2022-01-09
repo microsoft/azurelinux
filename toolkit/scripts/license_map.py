@@ -4,15 +4,15 @@
 # Licensed under the MIT License.
 
 import argparse
+from collections import OrderedDict
 import json
 from os.path import isdir, isfile
 from pathlib import Path
 import sys
-from collections import OrderedDict
 
 from spec_source_attributions import get_spec_source, KNOWN_SOURCE_ORIGINS
 
-# Packages with specs not present in any "SPECS*" directory.
+# Packages with specs not present in any "SPECS*" directory, which still need to be included in the list.
 spec_exceptions = {
     "Microsoft": {
         "kubernetes-1.18.14",
@@ -148,7 +148,7 @@ def process_licenses(json_filename, markdown_filename, file_paths, check, update
             print_specs_error_by_origin("Specs present in the JSON file that are not present in the spec files:", specs_not_in_files)
             print_specs_error("Specs from unknown distributions:", specs_unknown_distro)
 
-            print(f"Specs' license information is out of date. Run '{__file__} JSON_file_path markdown_file_path --update --remove_missing [spec_directory ...]' to regenerate.")
+            print(f"Specs' license information is out of date. Run '{__file__} licenses.json_file_path LICENSES-MAP.md_file_path --update --remove_missing [spec_directory ...]' to regenerate.")
 
             sys.exit(1)
 
@@ -157,7 +157,7 @@ def is_valid_path(parser, file_path):
     if isdir(file_path) or isfile(file_path):
         return Path(file_path)
 
-    parser.error(f"The path '{file_path}' must be either a directory or a regular, existing file!")
+    parser.error(f"The path '{file_path}' must exist and be either a directory or a regular file!")
 
 
 if __name__ == '__main__':
