@@ -18,6 +18,8 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "Photon":                       r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
 }
 
+KNOWN_SOURCE_ORIGINS = VALID_SOURCE_ATTRIBUTIONS.keys()
+
 valid_source_attributions_regex = { key : re.compile(value) for key, value in VALID_SOURCE_ATTRIBUTIONS.items() }
 
 def get_spec_source(spec_path):

@@ -5,14 +5,15 @@
 
 import argparse
 import json
+from os.path import isdir, isfile
 from pathlib import Path
 import sys
 from collections import OrderedDict
 
-from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
+from spec_source_attributions import get_spec_source, KNOWN_SOURCE_ORIGINS
 
 # Packages with specs not present in any "SPECS*" directory.
-spec_dir_exceptions = {
+spec_exceptions = {
     "Microsoft": {
         "kubernetes-1.18.14",
         "kubernetes-1.18.17",
@@ -48,39 +49,53 @@ def generate_markdown(license_collection):
     return '\n'.join(res) + '\n'
 
 
-def get_missing_specs(spec_directories, license_collection):
-    specs_in_json = set()
-    for distro_licenses in license_collection["licenses"].values():
-        specs_in_json.update(distro_licenses["specs"])
+def sort_licenses(license_collection):
+    license_collection["licenses"] = OrderedDict(sorted(license_collection["licenses"].items(), key=lambda item:str.lower(item[0])))
+    for details in license_collection["licenses"].values():
+        # Remove duplicates with "set()" and return a sorted list.
+        details["specs"] = sorted(set(details["specs"]), key=str.lower)
 
-    specs_in_all_dirs = set()
+
+def process_file(spec_path, license_collection, specs_in_files, specs_unknown_distro):
+    spec_name = spec_path.stem
+
+    distribution = get_spec_source(spec_path)
+    if distribution is None:
+        specs_unknown_distro.add(spec_name)
+    else:
+        specs_in_files[distribution].add(spec_name)
+        license_collection["licenses"][distribution]["specs"].append(spec_name)
+
+
+def retrieve_license_info(file_paths, license_collection):
+    specs_in_json = {}
+    for origin, details in license_collection["licenses"].items():
+        specs_in_json[origin] = set(details["specs"])
+
+    specs_in_files = {}
+    for origin in KNOWN_SOURCE_ORIGINS:
+        specs_in_files[origin] = set()
+
     specs_unknown_distro = set()
     updated_license_collection = license_collection
-    updated_license_collection["licenses"] = OrderedDict(sorted(license_collection["licenses"].items(), key=lambda item:str.lower(item[0])))
-    for details in updated_license_collection["licenses"].values():
-        details["specs"] = set(details["specs"])
 
-    for directory in spec_directories:
-        for spec_path in directory.glob('**/*.spec'):
-            spec_name = spec_path.stem
-            specs_in_all_dirs.add(spec_name)
+    for file_path in file_paths:
+        if isdir(file_path):
+            for spec_path in file_path.glob('**/*.spec'):
+                process_file(spec_path, updated_license_collection, specs_in_files, specs_unknown_distro)
+        else:
+                process_file(file_path, updated_license_collection, specs_in_files, specs_unknown_distro)
 
-            distribution = get_spec_source(spec_path)
-            if distribution is None:
-                specs_unknown_distro += spec_name
-            else:
-                updated_license_collection["licenses"][distribution]["specs"].add(spec_name)
+    specs_not_in_json = {}
+    specs_not_in_files = {}
+    for origin, specs_in_files_for_origin in specs_in_files.items():
+        specs_not_in_json[origin] = specs_in_files_for_origin - specs_in_json[origin]
+        specs_not_in_files[origin] = specs_in_json[origin] - specs_in_files_for_origin
 
-    specs_not_in_json = specs_in_all_dirs - specs_in_json 
+    for origin, specs_exceptions_for_origin in spec_exceptions.items():
+        specs_not_in_files[origin] -= specs_exceptions_for_origin
 
-    specs_not_in_dir =  specs_in_json - specs_in_all_dirs
-    for specs_exceptions in spec_dir_exceptions.values():
-        specs_not_in_dir -= specs_exceptions
-
-    for details in updated_license_collection["licenses"].values():
-        details["specs"] = sorted(details["specs"], key=str.lower)
-
-    return specs_not_in_json, specs_not_in_dir, specs_unknown_distro, updated_license_collection
+    return specs_not_in_json, specs_not_in_files, specs_unknown_distro, updated_license_collection
 
 
 def print_specs_error(header_message, specs_list):
@@ -91,41 +106,73 @@ def print_specs_error(header_message, specs_list):
         print()
 
 
-def process_licenses(input_filename, output_filename, spec_directories, only_update):
-    with open(input_filename, 'r') as input_file:
+def remove_missing_specs(license_collection, specs_not_in_files):
+    for origin, specs_not_in_files_for_origin in specs_not_in_files.items():
+        origin_licenses_set = set(license_collection["licenses"][origin]["specs"])
+        license_collection["licenses"][origin]["specs"] = list(origin_licenses_set - specs_not_in_files_for_origin)
+
+
+def print_specs_error_by_origin(header_message, specs_by_origin_list):
+    for origin, specs in specs_by_origin_list.items():
+        if len(specs):
+            print_specs_error(f"[Origin '{origin}]' {header_message}", specs)
+
+
+def process_licenses(json_filename, markdown_filename, file_paths, check, update, remove_missing):
+    with open(json_filename, 'r') as input_file:
         license_collection = json.load(input_file)
 
-    with open(output_filename, 'r') as output_file:
-        old_content = output_file.read()
+    specs_not_in_json, specs_not_in_files, specs_unknown_distro, updated_license_collection = retrieve_license_info(file_paths, license_collection)
 
-    specs_not_in_json, specs_not_in_dir, specs_unknown_distro, updated_license_collection = get_missing_specs(spec_directories, license_collection)
-    
-    with (open(input_filename, "w")) as licenses_file:
-        json.dump(updated_license_collection, licenses_file, indent=4)
-        licenses_file.write("\n")
+    if remove_missing:
+        remove_missing_specs(updated_license_collection, specs_not_in_files)
+    sort_licenses(updated_license_collection)
 
-    new_content = generate_markdown(updated_license_collection)
-    with open(output_filename, 'w') as output_file:
-        output_file.write(new_content)
+    if update:
+        with (open(json_filename, "w")) as licenses_file:
+            json.dump(updated_license_collection, licenses_file, indent=4)
+            licenses_file.write("\n")
 
-    if only_update:
-        return
+        new_content = generate_markdown(updated_license_collection)
+        with open(markdown_filename, 'w') as output_file:
+            output_file.write(new_content)
 
-    if len(specs_not_in_json) or len(specs_not_in_dir) or len(specs_unknown_distro) or old_content != new_content:
-        print_specs_error("Specs present in spec directories that are not present in data file:", specs_not_in_json)
-        print_specs_error("Specs present in data file that are not present in spec directories:", specs_not_in_dir)
-        print_specs_error("Specs from unknown distributions:", specs_unknown_distro)
+    if check:
+        missing_specs = False
+        for origin in specs_not_in_json.keys():
+            if len(specs_not_in_json[origin]) or len(specs_not_in_files[origin]):
+                missing_specs = True
+                break
 
-        if old_content != new_content:
-            print("License map file is out of date.")
+        if missing_specs or len(specs_unknown_distro):
+            print_specs_error_by_origin("Specs present in the spec files that are not present in the JSON file:", specs_not_in_json)
+            print_specs_error_by_origin("Specs present in the JSON file that are not present in the spec files:", specs_not_in_files)
+            print_specs_error("Specs from unknown distributions:", specs_unknown_distro)
 
-        sys.exit(1)
+            print(f"Specs' license information is out of date. Run '{__file__} JSON_file_path markdown_file_path --update --remove_missing [spec_directory ...]' to regenerate.")
+
+            sys.exit(1)
+
+
+def is_valid_path(parser, file_path):
+    if isdir(file_path) or isfile(file_path):
+        return Path(file_path)
+
+    parser.error(f"The path '{file_path}' must be either a directory or a regular, existing file!")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Processes spec license data, find missing entries, and regenerate license map file.')
-    parser.add_argument('input_filename', type=Path, help='Path to data file with license data.')
-    parser.add_argument('output_filename', type=Path, help='Path to license map markdown file.')
-    parser.add_argument('spec_directories', type=Path, nargs='+', help='Directories containing specs.')
-    parser.add_argument('--only_update', help='Does not perform a check, only updates the markdown file according to the input JSON.', action='store_true')
+    parser.add_argument('json_filename', type=Path, help='Path to data file with license data.')
+    parser.add_argument('markdown_filename', type=Path, help='Path to license map markdown file.')
+    parser.add_argument('file_paths', type=lambda file_path: is_valid_path(parser, file_path), nargs='+', help='Directories containing specs or spec files themselves.')
+    parser.add_argument('--no_check', dest="check", help='Don\'t compare the spec information from the JSON file with the information from the spec files.', action='store_false')
+    parser.add_argument('--remove_missing', help='Remove entries from the JSON file, which are not present in any of the spec files.', action='store_true')
+    parser.add_argument('--update', help='Removes licenses not found in the provided directories and spec files from the JSON and markdown files.', action='store_true')
     p = parser.parse_args()
-    process_licenses(p.input_filename, p.output_filename, p.spec_directories, p.only_update)
+
+    if not p.check and not p.update:
+        print("WARNING: nothing to do. Must at least check or update the spec licenses.")
+        exit(1)
+
+    process_licenses(p.json_filename, p.markdown_filename, p.file_paths, p.check, p.update, p.remove_missing)
