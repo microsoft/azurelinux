@@ -114,13 +114,12 @@ def remove_missing_specs(license_collection, specs_not_in_files):
 
 def print_specs_error_by_origin(header_message, specs_by_origin_list):
     for origin, specs in specs_by_origin_list.items():
-        if len(specs):
-            print_specs_error(f"[Origin '{origin}]' {header_message}", specs)
+        print_specs_error(f"[Origin '{origin}]' {header_message}", specs)
 
 
 def process_licenses(json_filename, markdown_filename, file_paths, check, update, remove_missing):
-    with open(json_filename, 'r') as input_file:
-        license_collection = json.load(input_file)
+    with open(json_filename, 'r') as licenses_file:
+        license_collection = json.load(licenses_file)
 
     specs_not_in_json, specs_not_in_files, specs_unknown_distro, updated_license_collection = retrieve_license_info(file_paths, license_collection)
 
