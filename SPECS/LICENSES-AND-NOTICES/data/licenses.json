@@ -6,6 +6,21 @@
         "Specs"
     ],
     "licenses": {
+        "CentOS": {
+            "license": "[GPLv2 License](https://www.centos.org/legal/#licensing-policy)",
+            "specs": [
+                "crash-ptdump-command",
+                "delve",
+                "nodejs-nodemon",
+                "rhnlib"
+            ]
+        },
+        "Ceph source": {
+            "license": "[LGPL2.1](https://github.com/ceph/ceph/blob/master/COPYING-LGPL2.1)",
+            "specs": [
+                "ceph"
+            ]
+        },
         "Fedora": {
             "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
@@ -2265,6 +2280,12 @@
                 "zziplib"
             ]
         },
+        "Magnus Edenhill Open Source": {
+            "license": "[Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING)",
+            "specs": [
+                "librdkafka"
+            ]
+        },
         "Microsoft": {
             "license": "[Microsoft MIT License](/LICENSES-AND-NOTICES/LICENSE.md)",
             "specs": [
@@ -2385,6 +2406,27 @@
                 "verity-read-only-root",
                 "vnstat",
                 "zstd"
+            ]
+        },
+        "Numad source": {
+            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
+            "specs": [
+                "numad"
+            ]
+        },
+        "NVIDIA": {
+            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
+            "specs": [
+                "libnvidia-container",
+                "nvidia-container-runtime",
+                "nvidia-container-toolkit",
+                "nvidia-docker2"
+            ]
+        },
+        "OpenMamba": {
+            "license": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
+            "specs": [
+                "bash-completion"
             ]
         },
         "OpenSUSE": {
@@ -3105,48 +3147,6 @@
                 "zip",
                 "zlib",
                 "zsh"
-            ]
-        },
-        "OpenMamba": {
-            "license": "[Openmamba GPLv2 License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)",
-            "specs": [
-                "bash-completion"
-            ]
-        },
-        "NVIDIA": {
-            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
-            "specs": [
-                "libnvidia-container",
-                "nvidia-container-runtime",
-                "nvidia-container-toolkit",
-                "nvidia-docker2"
-            ]
-        },
-        "Magnus Edenhill Open Source": {
-            "license": "[Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING)",
-            "specs": [
-                "librdkafka"
-            ]
-        },
-        "Ceph source": {
-            "license": "[LGPL2.1](https://github.com/ceph/ceph/blob/master/COPYING-LGPL2.1)",
-            "specs": [
-                "ceph"
-            ]
-        },
-        "Numad source": {
-            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
-            "specs": [
-                "numad"
-            ]
-        },
-        "CentOS": {
-            "license": "[GPLv2 License](https://www.centos.org/legal/#licensing-policy)",
-            "specs": [
-                "crash-ptdump-command",
-                "delve",
-                "nodejs-nodemon",
-                "rhnlib"
             ]
         }
     }

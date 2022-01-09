@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
-from types import SimpleNamespace
+from collections import OrderedDict
 
 from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
 
@@ -52,43 +52,33 @@ def get_missing_specs(spec_directories, license_collection):
     specs_in_json = set()
     for distro_licenses in license_collection["licenses"].values():
         specs_in_json.update(distro_licenses["specs"])
-    
-    specs_by_distro = dict()
-    for distribution in VALID_SOURCE_ATTRIBUTIONS.keys():
-        specs_by_distro[distribution] = []
 
     specs_in_all_dirs = set()
     specs_unknown_distro = set()
     updated_license_collection = license_collection
+    updated_license_collection["licenses"] = OrderedDict(sorted(license_collection["licenses"].items(), key=lambda item:str.lower(item[0])))
+    for details in updated_license_collection["licenses"].values():
+        details["specs"] = set(details["specs"])
 
     for directory in spec_directories:
-        specs_in_current_dir = set()
         for spec_path in directory.glob('**/*.spec'):
             spec_name = spec_path.stem
-            specs_in_current_dir.add(spec_name)
+            specs_in_all_dirs.add(spec_name)
 
             distribution = get_spec_source(spec_path)
             if distribution is None:
                 specs_unknown_distro += spec_name
             else:
-                specs_by_distro[distribution].append(spec_name)
-        
-        specs_in_all_dirs = specs_in_all_dirs.union(specs_in_current_dir)
-
-    for distribution, specs in specs_by_distro.items():
-        if distribution not in updated_license_collection["licenses"]:
-            updated_license_collection["licenses"][distribution] = []
-
-        if distribution in spec_dir_exceptions:
-            specs += spec_dir_exceptions[distribution]
-
-        updated_license_collection["licenses"][distribution]["specs"] = sorted(specs, key=str.lower)
+                updated_license_collection["licenses"][distribution]["specs"].add(spec_name)
 
     specs_not_in_json = specs_in_all_dirs - specs_in_json 
 
     specs_not_in_dir =  specs_in_json - specs_in_all_dirs
     for specs_exceptions in spec_dir_exceptions.values():
         specs_not_in_dir -= specs_exceptions
+
+    for details in updated_license_collection["licenses"].values():
+        details["specs"] = sorted(details["specs"], key=str.lower)
 
     return specs_not_in_json, specs_not_in_dir, specs_unknown_distro, updated_license_collection
 
