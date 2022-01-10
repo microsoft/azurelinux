@@ -274,7 +274,7 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Mon Jan 10 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
+* Mon Jan 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
 - Update to version 2.20220106.
 - Fix setup process to apply patches.
 - Correct files listing to include the module store files.
