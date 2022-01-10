@@ -27117,8 +27117,8 @@
         "type": "other",
         "other": {
           "name": "sg3_utils",
-          "version": "1.44",
-          "downloadUrl": "https://github.com/hreinecke/sg3_utils/archive/v1.44.tar.gz"
+          "version": "1.46",
+          "downloadUrl": "https://github.com/hreinecke/sg3_utils/archive/v1.46.tar.gz"
         }
       }
     },
@@ -27557,8 +27557,8 @@
         "type": "other",
         "other": {
           "name": "squashfs-tools",
-          "version": "4.3",
-          "downloadUrl": "http://downloads.sourceforge.net/squashfs/squashfs4.3.tar.gz"
+          "version": "4.4",
+          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.4.tar.gz"
         }
       }
     },
@@ -28407,8 +28407,8 @@
         "type": "other",
         "other": {
           "name": "tree",
-          "version": "1.7.0",
-          "downloadUrl": "http://mama.indstate.edu/users/ice/tree/src/tree-1.7.0.tgz"
+          "version": "1.8.0",
+          "downloadUrl": "http://mama.indstate.edu/users/ice/tree/src/tree-1.8.0.tgz"
         }
       }
     },
