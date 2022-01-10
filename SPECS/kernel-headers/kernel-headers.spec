@@ -41,7 +41,7 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
-* Mon Jan 3 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-1
+* Mon Jan 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-1
 - Update Kernel source to 5.10.88.1
 - Apply patch to address CVE-2021-43976
 

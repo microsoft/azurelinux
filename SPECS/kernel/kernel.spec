@@ -322,8 +322,9 @@ Group:          System Environment/Kernel
 This package contains common device tree blobs (dtb)
 
 %package -n bpftool
-Summary: Inspection and simple manipulation of eBPF programs and maps
 License: GPLv2
+Summary:        Inspection and simple manipulation of eBPF programs and maps
+
 
 %description -n bpftool
 This package contains the bpftool, which allows inspection and simple
@@ -573,9 +574,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
-
 %changelog
-* Mon Jan 3 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-1
+* Mon Jan 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-1
 - Update Kernel source to 5.10.88.1
 - Addressed CVE-2021-43975
 - Patch for CVE-2021-43976
