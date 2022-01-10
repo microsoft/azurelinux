@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "bond-8.0.1.tar.gz": "d22428a40ab158813c6b0d6548a9a4c1304c1873bd4f2f62a0f36c0ba2855a8b",
-  "gbc-0.11.0.3-aarch64": "2fa232b3ceb79ff2e002ad06f8da93bd59f81599102f95258b4dadb84d6b847d",
-  "gbc-0.11.0.3-x86_64": "c64f9db841b8cccad4c8ec0bd724e52d28b51a15af145fe40223cd92d7356d71"
- }
-}

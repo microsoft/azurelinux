@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "at_3.1.23.orig.tar.gz": "97450aa954aaa8a70218cc8e61a33df9fee9f86527e9f861de302fb7a3c81710",
+  "at_3.2.2.orig.tar.gz": "2211da14914fde1f9cc83592838fb6385a32fb11fcecb7816c77700df6559088",
   "atd.sysconf": "6d93ffd140d05b26f86f3c24ca0a8ad3e674f5e5dea5b2b31540128eeba3b287",
   "atd.systemd": "da0da49ca99a8e86b7b24ea7b7a61bb852b04e875009162662e98f6714a41c06",
   "pam_atd": "33e3d5ae213ba007258f08cb72554efd2457d6d696803b3eece1dbe9582a5017"

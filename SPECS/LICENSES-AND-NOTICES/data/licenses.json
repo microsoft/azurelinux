@@ -310,7 +310,6 @@
                 "bpftrace",
                 "blobfuse",
                 "bmon",
-                "bond",
                 "ccache",
                 "cert-manager",
                 "clamav",

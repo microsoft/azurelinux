@@ -155,8 +155,8 @@
         "type": "other",
         "other": {
           "name": "alsa-lib",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.2.tar.bz2"
+          "version": "1.2.6.1",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
         }
       }
     },
@@ -185,8 +185,8 @@
         "type": "other",
         "other": {
           "name": "alsa-utils",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/utils/alsa-utils-1.2.2.tar.bz2"
+          "version": "1.2.6",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/utils/alsa-utils-1.2.6.tar.bz2"
         }
       }
     },
@@ -225,8 +225,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.9.18",
-          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.18.tar.gz"
+          "version": "2.12.1",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.12.1.tar.gz"
         }
       }
     },
@@ -615,8 +615,8 @@
         "type": "other",
         "other": {
           "name": "apr",
-          "version": "1.6.5",
-          "downloadUrl": "http://archive.apache.org/dist/apr/apr-1.6.5.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.0.tar.gz"
         }
       }
     },
@@ -745,8 +745,8 @@
         "type": "other",
         "other": {
           "name": "at",
-          "version": "3.1.23",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.1.23.orig.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.2.2.orig.tar.gz"
         }
       }
     },
@@ -775,8 +775,8 @@
         "type": "other",
         "other": {
           "name": "atf",
-          "version": "0.20",
-          "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.20/atf-0.20.tar.gz"
+          "version": "0.21",
+          "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.21/atf-0.21.tar.gz"
         }
       }
     },
@@ -905,8 +905,8 @@
         "type": "other",
         "other": {
           "name": "autoconf-archive",
-          "version": "2018.03.13",
-          "downloadUrl": "http://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2018.03.13.tar.xz"
+          "version": "2021.02.19",
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2021.02.19.tar.xz"
         }
       }
     },
@@ -1289,16 +1289,6 @@
           "name": "bolt",
           "version": "0.9.1",
           "downloadUrl": "https://gitlab.freedesktop.org/bolt/bolt/-/archive/0.9.1/bolt-0.9.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "bond",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/microsoft/bond/archive/8.0.1.tar.gz"
         }
       }
     },
