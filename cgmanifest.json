@@ -1005,8 +1005,8 @@
         "type": "other",
         "other": {
           "name": "babeltrace2",
-          "version": "2.0.1",
-          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.1.tar.bz2"
+          "version": "2.0.4",
+          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.4.tar.bz2"
         }
       }
     },
@@ -1065,8 +1065,8 @@
         "type": "other",
         "other": {
           "name": "bash-completion",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/scop/bash-completion/releases/download/2.7/bash-completion-2.7.tar.xz"
+          "version": "2.11",
+          "downloadUrl": "https://github.com/scop/bash-completion/archive/refs/tags/2.11.tar.gz"
         }
       }
     },
@@ -1207,8 +1207,8 @@
         "type": "other",
         "other": {
           "name": "blktrace",
-          "version": "1.2.0",
-          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/blktrace-1.2.0.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://brick.kernel.dk/snaps/blktrace-1.3.0.tar.gz"
         }
       }
     },
@@ -1237,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "bmake",
-          "version": "20201010",
-          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20201010.tar.gz"
+          "version": "20211221",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20211221.tar.gz"
         }
       }
     },
