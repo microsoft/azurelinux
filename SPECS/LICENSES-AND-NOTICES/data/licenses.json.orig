@@ -38,6 +38,7 @@
                 "afflib",
                 "aide",
                 "alsa-firmware",
+                "alsa-lib",
                 "alsa-plugins",
                 "amtk",
                 "amtterm",
@@ -2295,7 +2296,11 @@
                 "bazel",
                 "blobfuse",
                 "bmon",
+<<<<<<< HEAD
+                "bond",
                 "bpftrace",
+=======
+>>>>>>> main
                 "ccache",
                 "cert-manager",
                 "clamav",

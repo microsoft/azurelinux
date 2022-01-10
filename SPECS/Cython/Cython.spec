@@ -1,15 +1,14 @@
 %global upname cython
 Name:           Cython
-Version:        0.29.13
-Release:        7%{?dist}
+Version:        0.29.24
+Release:        1%{?dist}
 Summary:        Language for writing Python extension modules
 Vendor:         Microsoft
 Distribution:   Mariner
 License:        ASL 2.0
 URL:            https://www.cython.org
 #Source0:       https://github.com/%{upname}/%{upname}/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Patch0:         cython-py38.patch
+Source0:        %{upname}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  python3-devel
@@ -59,6 +58,9 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 %{python3_sitearch}/__pycache__/%{upname}.*
 
 %changelog
+* Thu Jan 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.29.24-1
+- Update version to 0.29.24
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.29.13-7
 - Add upstream patch to enable generating code for Python >= 3.8
 - License verified

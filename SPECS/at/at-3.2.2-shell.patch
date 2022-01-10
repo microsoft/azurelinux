@@ -1,6 +1,6 @@
-diff -up at-3.1.20/at.c.shell at-3.1.20/at.c
---- at-3.1.20/at.c.shell	2016-07-01 09:47:13.392684445 +0200
-+++ at-3.1.20/at.c	2016-07-01 09:48:47.679931959 +0200
+diff -ur b/at.c a/at.c
+--- b/at.c	2021-04-25 03:31:30.000000000 +0200
++++ a/at.c	2021-05-21 12:51:48.123335137 +0200
 @@ -62,11 +62,8 @@
  #include <stdlib.h>
  #include <string.h>
@@ -13,7 +13,7 @@ diff -up at-3.1.20/at.c.shell at-3.1.20/at.c
  
  #ifdef HAVE_UNISTD_H
  #include <unistd.h>
-@@ -239,6 +236,12 @@ writefile(time_t runtimer, char queue)
+@@ -245,6 +242,12 @@
      int kill_errno;
      int rc;
      int mailsize = 128;
@@ -26,7 +26,7 @@ diff -up at-3.1.20/at.c.shell at-3.1.20/at.c
  
  /* Install the signal handler for SIGINT; terminate after removing the
   * spool file if necessary
-@@ -465,6 +468,9 @@ writefile(time_t runtimer, char queue)
+@@ -492,6 +495,9 @@
      fprintf(fp, " || {\n\t echo 'Execution directory "
  	    "inaccessible' >&2\n\t exit 1\n}\n");
  
@@ -35,8 +35,8 @@ diff -up at-3.1.20/at.c.shell at-3.1.20/at.c
 +
      istty = isatty(fileno(stdin));
      if (istty) {
- 	fprintf(stderr, "at> ");
-@@ -480,7 +486,7 @@ writefile(time_t runtimer, char queue)
+ 	runtime = localtime(&runtimer);
+@@ -512,7 +518,7 @@
      if (istty) {
  	fprintf(stderr, "<EOT>\n");
      }
@@ -45,3 +45,4 @@ diff -up at-3.1.20/at.c.shell at-3.1.20/at.c
      if (ferror(fp))
  	panic("Output error");
      fflush(fp);
+Only in a: .vscode

@@ -1,6 +1,6 @@
-alsa-lib-1.2.2-2.cm2.aarch64.rpm
-alsa-lib-debuginfo-1.2.2-2.cm2.aarch64.rpm
-alsa-lib-devel-1.2.2-2.cm2.aarch64.rpm
+alsa-lib-1.2.6.1-1.cm2.aarch64.rpm
+alsa-lib-debuginfo-1.2.6.1-1.cm2.aarch64.rpm
+alsa-lib-devel-1.2.6.1-1.cm2.aarch64.rpm
 asciidoc-9.1.0-1.cm2.noarch.rpm
 autoconf-2.69-11.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
