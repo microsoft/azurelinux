@@ -48,6 +48,7 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 %changelog
 * Mon Aug 02 2021 Nicolas Guibourge <nicolasg@microsoft.com> 4.4-1
 - Move to version 4.4 to address CVE-2015-4646
+- License verified
 
 * Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 4.3-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
