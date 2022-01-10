@@ -4,12 +4,13 @@ Distribution:   Mariner
 
 Name:           catch1
 Version:        1.12.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A modern, C++-native, header-only, framework for unit-tests, TDD and BDD
 
 License:        Boost
 URL:            https://github.com/philsquared/Catch
 Source0:        https://github.com/philsquared/Catch/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         catch1-sigstksz.patch
 
 BuildRequires:  cmake make gcc-c++
 
@@ -37,7 +38,7 @@ is packaged up as a single header for extra convenience.
 
 
 %build
-%cmake . -Bbuild
+%cmake . -Bbuild -DCATCH_ENABLE_WERROR=OFF
 %make_build -Cbuild
 
 
@@ -58,6 +59,10 @@ ctest -V %{?_smp_mflags}
 
 
 %changelog
+* Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.12.2-7
+- Add catch1-sigstksz patch.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

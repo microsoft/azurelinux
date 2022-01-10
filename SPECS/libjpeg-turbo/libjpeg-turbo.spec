@@ -1,16 +1,13 @@
 Summary:        fork of the original IJG libjpeg which uses SIMD.
 Name:           libjpeg-turbo
-Version:        2.0.0
-Release:        9%{?dist}
+Version:        2.1.2
+Release:        1%{?dist}
 License:        IJG
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://sourceforge.net/projects/libjpeg-turbo
 Source0:        http://downloads.sourceforge.net/libjpeg-turbo/%{name}-%{version}.tar.gz
-Patch0:         CVE-2018-20330.patch
-Patch1:         CVE-2018-19664.patch
-Patch2:         CVE-2020-17541.patch
 BuildRequires:  cmake
 Provides:       libjpeg = 6b-47
 Provides:       turbojpeg = %{version}-%{release}
@@ -33,7 +30,7 @@ Provides:       turbojpeg-devel = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
 mkdir build
@@ -63,8 +60,14 @@ popd
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+%{_libdir}/cmake/%{name}/%{name}*.cmake
 
 %changelog
+* Fri Jan 07 2022 Henry Li <lihl@microsoft.com> - 2.1.2-1
+- Upgrade to version 2.1.2
+- Add related cmake files to libjpeg-turbo-devel pacakge
+- License Verified
+
 * Fri Jul 26 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.0.0-9
 - Patch CVE-2020-17541 (JOSLOBO: Dash rolled for merge)
 

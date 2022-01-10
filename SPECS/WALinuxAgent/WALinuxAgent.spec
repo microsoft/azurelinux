@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.2.54.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,7 @@ mkdir -p %{buildroot}/%{_localstatedir}/log
 touch %{buildroot}/%{_localstatedir}/log/waagent.log
 install -vdm 755 %{buildroot}/%{_sysconfdir}/udev/rules.d
 install -m 644 config/99-azure-product-uuid.rules %{buildroot}/%{_sysconfdir}/udev/rules.d
+install -m 644 config/66-azure-storage.rules %{buildroot}/%{_sysconfdir}/udev/rules.d
 # python refers to python2 version on CBL-Mariner hence update to use python3
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
@@ -80,6 +81,9 @@ python3 setup.py check && python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Dec 14 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2.54.2-4
+- Include the 66-azure-storage udev rule.
+
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.2.54.2-3
 - Include the 99-azure-product-uuid udev rule.
 

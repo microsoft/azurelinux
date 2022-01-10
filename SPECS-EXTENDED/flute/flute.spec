@@ -2,14 +2,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: flute
 Version: 1.3.0
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary: Java CSS parser using SAC
 # The entire source code is W3C except ParseException.java which is LGPLv2+
 License: W3C and LGPLv2+
 Source0: http://downloads.sourceforge.net/jfreereport/%{name}-%{version}-OOo31.zip
 URL: http://www.w3.org/Style/CSS/SAC/
 BuildRequires: ant, java-devel, jpackage-utils, sac
-Requires: java-headless, jpackage-utils sac
+Requires: java, jpackage-utils sac
 BuildArch: noarch
 
 %description
@@ -40,14 +40,18 @@ mkdir -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 cp -rp build/api $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %files
-%doc COPYRIGHT.html
+%license COPYRIGHT.html
 %{_javadir}/*.jar
 
 %files javadoc
-%doc COPYRIGHT.html
+%license COPYRIGHT.html
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 1.3.0-24
+- Rename java-headless dependency to java
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.0-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

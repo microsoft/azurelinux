@@ -1,8 +1,8 @@
 %bcond_without pam
 Summary:        Job spooling tools
 Name:           at
-Version:        3.1.23
-Release:        7%{?dist}
+Version:        3.2.2
+Release:        1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:        GPLv3+ AND GPLv2+ AND ISC AND MIT AND Public Domain
@@ -15,28 +15,30 @@ Source1:        pam_atd
 Source3:        atd.sysconf
 Source5:        atd.systemd
 Patch0:         at-aarch64.patch
-Patch1:         at-3.1.18-make.patch
-Patch2:         at-3.1.20-pam.patch
-Patch4:         at-3.1.14-opt_V.patch
-Patch5:         at-3.1.20-shell.patch
-Patch6:         at-3.1.18-nitpicks.patch
-Patch8:         at-3.1.14-fix_no_export.patch
-Patch9:         at-3.1.14-mailwithhostname.patch
-Patch10:        at-3.1.14-usePOSIXtimers.patch
-Patch12:        at-3.1.20-aborted-jobs.patch
-Patch13:        at-3.1.18-noabort.patch
-Patch14:        at-3.1.16-fclose-error.patch
-Patch15:        at-3.1.16-clear-nonjobs.patch
-Patch16:        at-3.1.18-utc-dst.patch
-Patch17:        at-3.1.20-lock-locks.patch
-Patch18:        at-3.1.23-document-n.patch
-Patch19:        at-3.1.20-log-jobs.patch
+Patch1:         at-3.2.2-make.patch
+Patch2:         at-3.2.2-pam.patch
+Patch3:         at-3.1.14-opt_V.patch
+Patch4:         at-3.2.2-shell.patch
+Patch5:         at-3.1.18-nitpicks.patch
+Patch6:         at-3.1.14-fix_no_export.patch
+Patch7:         at-3.1.14-mailwithhostname.patch
+Patch8:         at-3.1.14-usePOSIXtimers.patch
+Patch9:         at-3.1.20-aborted-jobs.patch
+Patch10:        at-3.1.18-noabort.patch
+Patch11:        at-3.1.16-fclose-error.patch
+Patch12:        at-3.1.16-clear-nonjobs.patch
+Patch13:        at-3.2.2-lock-locks.patch
+Patch14:        at-3.1.23-document-n.patch
+Patch15:        at-3.1.20-log-jobs.patch
+Patch16:        at-3.2.23-coverity-fix.patch
+
 BuildRequires:  autoconf
 BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  flex-devel
 BuildRequires:  gcc
 BuildRequires:  libselinux-devel >= 1.27.9
+BuildRequires:  make
 BuildRequires:  perl
 BuildRequires:  systemd
 Requires(post): systemd
@@ -63,23 +65,7 @@ use crontab instead.
 %prep
 %setup -q
 cp %{SOURCE1} .
-%patch0 -p1 -b .arm
-%patch1 -p1 -b .make
-%patch2 -p1 -b .pam
-%patch4 -p1 -b .opt_V
-%patch5 -p1 -b .shell
-%patch6 -p1 -b .nit
-%patch8 -p1 -b .export
-%patch9 -p1 -b .mail
-%patch10 -p1 -b .posix
-%patch12 -p1 -b .aborted
-%patch13 -p1 -b .noabort
-%patch14 -p1 -b .fclose
-%patch15 -p1 -b .clear-nojobs
-%patch16 -p1 -b .dst
-%patch17 -p1 -b .lock-locks
-%patch18 -p1 -b .document-n
-%patch19 -p1 -b .log-jobs
+%autopatch -p1
 
 %build
 # patch9 touches configure.in
@@ -178,6 +164,10 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root) /lib/systemd/system/atd.service
 
 %changelog
+* Thu Jan 06 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.2-1
+- upgrade to version 3.2.2
+- License verified
+
 * Mon Apr 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.1.23-7
 - Fix installation of atd.service
 - Add systemd to BR

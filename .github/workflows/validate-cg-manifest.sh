@@ -13,13 +13,16 @@
 
 # Ignore some specs, mostly those with Source0 files that are not from an external source, or have very odd URLs
 ignore_list=" \
+  appstream-data \
   byacc \
   ca-certificates \
   Cython \
+  dbus-x11 \
   grub2-efi-binary-signed-aarch64 \
   grub2-efi-binary-signed-x86_64 \
   initramfs \
   installkernel \
+  kde-filesystem \
   kernel-signed-aarch64 \
   kernel-signed-x86_64 \
   kf5 \
@@ -29,6 +32,7 @@ ignore_list=" \
   moby-buildx \
   moby-containerd \
   multilib-rpm-config \
+  opencl-filesystem \
   openjdk8 \
   patterns-ceph-containers \
   python-markupsafe \
@@ -44,6 +48,8 @@ ignore_list=" \
   sgabios \
   shim \
   verity-read-only-root \
+  web-assets \
+  xmvn \
   xorg-x11-apps \
   xorg-x11-font-utils \
   xorg-x11-server-utils \

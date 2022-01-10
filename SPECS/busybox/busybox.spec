@@ -1,7 +1,7 @@
 Summary:        Statically linked binary providing simplified versions of system commands
 Name:           busybox
-Version:        1.32.0
-Release:        2%{?dist}
+Version:        1.35.0
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,7 +10,6 @@ Source:         https://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 Source1:        busybox-static.config
 Source2:        busybox-petitboot.config
 Patch0:         busybox-1.31.1-stime-fix.patch
-Patch1:         CVE-2021-28831.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  libselinux-devel >= 1.27.7-2
@@ -43,7 +42,6 @@ better suited to normal use.
 %prep
 %setup -q
 %patch0 -p1 -b .stime
-%patch1 -p1
 
 %build
 # create static busybox - the executable is kept as busybox-static
@@ -130,6 +128,9 @@ install -m 644 docs/busybox.petitboot.1 %{buildroot}/%{_mandir}/man1/busybox.pet
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
+* Thu Jan 06 2022 Henry Li <lihl@microsoft.com> - 1.35.0-1
+- Upgrade to version 1.35.0
+
 * Fri Mar 26 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.32.0-2
 - Patch CVE-2021-28831
 

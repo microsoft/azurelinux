@@ -11,7 +11,7 @@
             ],
             "Partitions": [
                 {
-                    "ID": "boot",
+                    "ID": "reserved",
                     "Flags": [
                         "grub"
                     ],
@@ -20,8 +20,14 @@
                     "FsType": "fat32"
                 },
                 {
-                    "ID": "rootfs",
+                    "ID": "boot",
                     "Start": 9,
+                    "End": 509,
+                    "FsType": "ext4"
+                },
+                {
+                    "ID": "rootfs",
+                    "Start": 509,
                     "End": 0,
                     "FsType": "ext4"
                 }
@@ -34,8 +40,12 @@
             "BootType": "legacy",
             "PartitionSettings": [
                 {
-                    "ID": "boot",
+                    "ID": "reserved",
                     "MountPoint": ""
+                },
+                {
+                    "ID": "boot",
+                    "MountPoint": "/boot"
                 },
                 {
                     "ID": "rootfs",

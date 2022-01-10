@@ -1,0 +1,10 @@
+--- a/CMakeLists.txt~	2020-12-09 04:17:13.000000000 -0600
++++ b/CMakeLists.txt	2021-03-09 09:33:46.038471009 -0600
+@@ -65,7 +65,6 @@
+ file(GLOB_RECURSE ALL_LEATHERMAN_SOURCES */src/*.cc */inc/*.hpp)
+ add_subdirectory(locales)
+ 
+-add_leatherman_dir(catch EXCLUDE_FROM_VARS)
+ add_leatherman_dir(nowide)
+ add_leatherman_dir(util)
+ add_leatherman_dir(locale)

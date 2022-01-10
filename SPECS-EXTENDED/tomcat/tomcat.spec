@@ -60,12 +60,12 @@ Distribution:   Mariner
 
 Name:          tomcat
 Version:       %{major_version}.%{minor_version}.%{micro_version}
-Release:       5%{?dist}
+Release:       6%{?dist}
 Summary:       Apache Servlet/JSP Engine, RI for Servlet %{servletspec}/JSP %{jspspec} API
 
 License:       ASL 2.0
 URL:           http://tomcat.apache.org/
-Source0:       http://www.apache.org/dist/tomcat/tomcat-%{major_version}/v%{version}/src/%{packdname}.tar.gz
+Source0:       https://archive.apache.org/dist/%{name}/%{name}-%{major_version}/v%{version}/src/%{packdname}.tar.gz
 Source1:       %{name}-%{major_version}.%{minor_version}.conf
 Source3:       %{name}-%{major_version}.%{minor_version}.sysconfig
 Source4:       %{name}-%{major_version}.%{minor_version}.wrapper
@@ -109,7 +109,7 @@ BuildRequires: wsdl4j
 BuildRequires: systemd
 
 Requires:      apache-commons-daemon
-Requires:      java-headless >= 1.8.0
+Requires:      java >= 1.8.0
 Requires:      javapackages-tools
 Requires:      procps
 Requires:      %{name}-lib = %{version}-%{release}
@@ -521,7 +521,8 @@ fi
 
 %files 
 %defattr(0664,root,tomcat,0755)
-%doc {LICENSE,NOTICE,RELEASE*}
+%license LICENSE
+%doc {NOTICE,RELEASE*}
 %attr(0755,root,root) %{_bindir}/%{name}-digest
 %attr(0755,root,root) %{_bindir}/%{name}-tool-wrapper
 %attr(0755,root,root) %{_sbindir}/%{name}
@@ -607,11 +608,11 @@ fi
 %exclude %{_javadir}/%{name}-jsp-%{jspspec}*.jar
 
 %files servlet-%{servletspec}-api -f output/dist/src/res/maven/.mfiles-tomcat-servlet-api
-%doc LICENSE
+%license LICENSE
 %{_javadir}/%{name}-servlet-%{servletspec}*.jar
 
 %files el-%{elspec}-api -f output/dist/src/res/maven/.mfiles-tomcat-el-api
-%doc LICENSE
+%license LICENSE
 %{_javadir}/%{name}-el-%{elspec}-api.jar
 %{libdir}/%{name}-el-%{elspec}-api.jar
 
@@ -628,6 +629,11 @@ fi
 %attr(0660,tomcat,tomcat) %verify(not size md5 mtime) %{logdir}/catalina.out
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 9.0.39-6
+- Rename java-headless dependency to java
+- Change Source URL to pull from Apache arhive
+- License verified
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 9.0.39-5
 - Remove epoch
 
