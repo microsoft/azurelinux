@@ -1,7 +1,7 @@
 # Shared object version of libkcapi.
 %global vmajor            1
-%global vminor            2
-%global vpatch            0
+%global vminor            3
+%global vpatch            1
 # This package needs at least Linux Kernel v4.10.0.
 %global min_kernel_ver    4.10.0
 # Do we need to tweak sysctl.d? In newer versions of the Linux
@@ -58,7 +58,7 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        5%{?dist}
+Release:        1%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -256,6 +256,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libexecdir}/%{name}/*
 
 %changelog
+* Mon Jan 10 2022 Henry Li <lihl@microsoft.com> - 1.3.1-1
+- Upgrade to version 1.3.1
+
 * Fri Feb 05 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.2.0-5
 - Use OpenSSL to perform hmac calculations
 
