@@ -8,7 +8,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -163,6 +163,8 @@ export OPT="%{extension_cflags} %{openssl_flags}"
 # and install fails. We will install these two bundled wheels manually.
 # https://github.com/pypa/pip/issues/3063
 # https://bugs.python.org/issue31916
+# Bootstrap pip3 which casues ptest build failure
+./python Lib/ensurepip
 pushd Lib/ensurepip/_bundled
 pip3 install --no-cache-dir --no-index --ignore-installed \
     --root %{buildroot} \
@@ -267,6 +269,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Jan 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.9-3
+- Fix pip3 bootstrap which causes a build break in ptest
+
 * Wed Dec 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-2
 - Use filtered flags when compiling extensions
 
