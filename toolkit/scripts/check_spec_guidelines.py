@@ -3,10 +3,13 @@
 # Licensed under the MIT License.
 
 from pyrpm.spec import Spec
+from os.path import dirname, realpath
 
 import argparse
 import re
 import sys
+
+from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
 
 license_regex = re.compile(
     r"\b(license verified|verified license)\b", re.IGNORECASE)
@@ -14,20 +17,7 @@ license_regex = re.compile(
 valid_release_tag_regex = re.compile(
     r'^([1-9]\d*|%\{release_number\})%\{\?dist\}$')
 
-valid_source_attributions = {
-    "Microsoft":                    r'\n-\s+(Original version for CBL-Mariner|Initial CBL-Mariner import from Azure)( \(license: MIT\))?(\.|\n|$)',
-    "CentOS":                       r'\n-\s+Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)(\.|\n|$)',
-    "Ceph source":                  r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
-    "Fedora":                       r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
-    "Magnus Edenhill Open Source":  r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
-    "NVIDIA":                       r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',
-    "OpenMamba":                    r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',
-    "OpenSUSE":                     r'\n-\s+Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
-    "Photon":                       r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
-}
-
-valid_source_attributions_regex = [ re.compile(x) for x in valid_source_attributions.values() ]
-valid_source_attributions_one_per_line = "\n".join(f"- {key}: '{value}'" for key, value in valid_source_attributions.items())
+valid_source_attributions_one_per_line = "\n".join(f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items())
 
 
 def check_release_tag(spec_path: str):
@@ -78,11 +68,9 @@ ERROR: license not verified.
 
 def check_source_attribution(spec_path: str):
     """Checks if we have indicated the source of the spec file in the changelog. """
-    spec = Spec.from_file(spec_path)
 
-    for attribution_regex in valid_source_attributions_regex:
-        if attribution_regex.findall(spec.changelog):
-            return True
+    if get_spec_source(spec_path) is not None:
+        return True
 
     print(f"""
 ERROR: no valid source attribution.
@@ -93,7 +81,7 @@ ERROR: no valid source attribution.
 {valid_source_attributions_one_per_line}
 
     If you're importing a spec from a source, which doesn't fit the currently supported list,
-    please update the 'valid_source_attributions' variable inside the '{__file__}' script.
+    please update the 'VALID_SOURCE_ATTRIBUTIONS' variable inside the '{dirname(realpath(__file__))}/spec_source_attributions.py' script.
 """)
 
     return False
