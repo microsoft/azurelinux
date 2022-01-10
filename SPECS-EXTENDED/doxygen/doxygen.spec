@@ -1,13 +1,13 @@
 Name:           doxygen
 Version:        1.8.17
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Automated C, C++, and Java Documentation Generator
-License:        GPL
+License:        GPLv2
 Group:          Development/Tools/Doc Generators
 Url:            https://www.doxygen.nl
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
-Source0:        http://doxygen.nl/files/%{name}-%{version}.src.tar.gz
+Source0:        https://sourceforge.net/projects/%{name}/files/rel-%{version}/%{name}-%{version}.src.tar.gz
 
 %global debug_package %{nil}
 
@@ -17,7 +17,7 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  python3
 BuildRequires:  python3-xml
-BuildRequires:  python-defusedxml
+BuildRequires:  python3-defusedxml
 Obsoletes:      doxygen-doc
 
 %description
@@ -51,6 +51,11 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 %license LICENSE
 
 %changelog
+* Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.17-3
+- Updated build requires to python3-defusedxml
+- Updated source url.
+- License verified.
+
 * Wed Dec 16 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.17-2
 - Remove buildarch
 

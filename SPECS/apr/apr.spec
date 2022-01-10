@@ -1,13 +1,13 @@
 Summary:        The Apache Portable Runtime
 Name:           apr
-Version:        1.6.5
-Release:        6%{?dist}
+Version:        1.7.0
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://apr.apache.org/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://dlcdn.apache.org/%{name}/%{name}-%{version}.tar.gz
 %define         aprver  1
 
 %if %{with_check}
@@ -62,6 +62,8 @@ make -j1 check
 %{_libdir}/pkgconfig
 
 %changelog
+* Tue Jan 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.7.0-1
+- Upgrade to version 1.7.0.
 * Thu Oct 28 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 1.6.5-6
 - Fixing tests further by making them run on a single thread.
 - Removed `%%sha1` macro.

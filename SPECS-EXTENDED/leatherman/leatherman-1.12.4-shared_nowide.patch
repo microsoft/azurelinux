@@ -1,0 +1,101 @@
+--- a/nowide/CMakeLists.txt~	2020-12-09 04:17:13.000000000 -0600
++++ b/nowide/CMakeLists.txt	2021-03-09 08:57:57.469391575 -0600
+@@ -1,7 +1,5 @@
+ find_package(Boost 1.54 REQUIRED)
+ 
+-add_leatherman_includes(${Boost_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/nowide/include")
+-add_leatherman_headers(../vendor/nowide/include/boost)
+ if(WIN32)
+     add_leatherman_library(../vendor/nowide/src/iostream.cpp)
+ endif()
+--- a/execution/CMakeLists.txt~	2020-12-09 04:17:13.000000000 -0600
++++ b/execution/CMakeLists.txt	2021-03-09 08:59:46.136860198 -0600
+@@ -1,4 +1,4 @@
+-find_package(Boost 1.54 REQUIRED COMPONENTS regex filesystem system)
++find_package(Boost 1.73 REQUIRED COMPONENTS regex filesystem system nowide)
+ 
+ add_leatherman_deps("${Boost_LIBRARIES}")
+ if ("${CMAKE_SYSTEM_NAME}" MATCHES "SunOS")
+@@ -10,7 +10,6 @@
+ add_leatherman_includes("${Boost_INCLUDE_DIRS}")
+ 
+ leatherman_dependency(util)
+-leatherman_dependency(nowide)
+ leatherman_dependency(locale)
+ leatherman_dependency(logging)
+ leatherman_dependency(file_util)
+--- a/file_util/CMakeLists.txt~	2020-12-09 04:17:13.000000000 -0600
++++ b/file_util/CMakeLists.txt	2021-03-09 09:00:26.641683668 -0600
+@@ -1,9 +1,8 @@
+-find_package(Boost 1.54 REQUIRED COMPONENTS regex filesystem system)
++find_package(Boost 1.54 REQUIRED COMPONENTS regex filesystem system nowide)
+ 
+ add_leatherman_deps("${Boost_LIBRARIES}")
+ add_leatherman_includes("${Boost_INCLUDE_DIRS}")
+ 
+-leatherman_dependency(nowide)
+ leatherman_dependency(locale)
+ leatherman_dependency(logging)
+ leatherman_dependency(util)
+--- a/logging/CMakeLists.txt~	2020-12-09 04:17:13.000000000 -0600
++++ b/logging/CMakeLists.txt	2021-03-09 09:01:03.565522737 -0600
+@@ -4,7 +4,6 @@
+ add_leatherman_deps(${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+ add_leatherman_includes("${Boost_INCLUDE_DIRS}")
+ 
+-leatherman_dependency(nowide)
+ leatherman_dependency(locale)
+ 
+ if (CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "SunOS")
+--- a/tests/CMakeLists.txt~	2020-12-09 04:17:13.000000000 -0600
++++ b/tests/CMakeLists.txt	2021-03-09 09:01:47.352331908 -0600
+@@ -1,8 +1,8 @@
+-set(BOOST_REQUIRED_COMPONENTS system date_time chrono log log_setup thread filesystem regex)
++set(BOOST_REQUIRED_COMPONENTS system date_time chrono log log_setup thread filesystem regex nowide)
+ if (LEATHERMAN_USE_LOCALES)
+     set(BOOST_REQUIRED_COMPONENTS ${BOOST_REQUIRED_COMPONENTS} locale)
+ endif()
+-find_package(Boost "1.54" REQUIRED COMPONENTS ${BOOST_REQUIRED_COMPONENTS})
++find_package(Boost "1.73" REQUIRED COMPONENTS ${BOOST_REQUIRED_COMPONENTS})
+ 
+ include_directories(BEFORE ${LEATHERMAN_CATCH_INCLUDE} ${LEATHERMAN_INCLUDE_DIRS})
+ add_executable(leatherman_test main.cc ${LEATHERMAN_TEST_SRCS})
+--- a/file_util/src/file.cc~	2020-12-09 04:17:13.000000000 -0600
++++ b/file_util/src/file.cc	2021-03-09 09:02:58.297022731 -0600
+@@ -1,6 +1,6 @@
+ #include <leatherman/file_util/file.hpp>
+ #include <boost/nowide/fstream.hpp>
+-#include <boost/nowide/cenv.hpp>
++#include <boost/nowide/cstdlib.hpp>
+ #include <boost/filesystem.hpp>
+ #include <sstream>
+ #include <leatherman/logging/logging.hpp>
+--- a/util/src/environment.cc~	2020-12-09 04:17:13.000000000 -0600
++++ b/util/src/environment.cc	2021-03-09 09:03:39.013845293 -0600
+@@ -1,5 +1,5 @@
+ #include <leatherman/util/environment.hpp>
+-#include <boost/nowide/cenv.hpp>
++#include <boost/nowide/cstdlib.hpp>
+ #include <stdexcept>
+ 
+ using namespace std;
+--- a/util/tests/environment.cc~	2020-12-09 04:17:13.000000000 -0600
++++ b/util/tests/environment.cc	2021-03-09 09:04:22.487655817 -0600
+@@ -1,6 +1,6 @@
+ #include <catch.hpp>
+ #include <leatherman/util/environment.hpp>
+-#include <boost/nowide/cenv.hpp>
++#include <boost/nowide/cstdlib.hpp>
+ 
+ using namespace std;
+ using namespace leatherman::util;
+--- a/util/CMakeLists.txt~	2020-12-09 04:17:13.000000000 -0600
++++ b/util/CMakeLists.txt	2021-03-18 09:40:55.004699613 -0500
+@@ -1,6 +1,6 @@
+ find_package(Boost 1.54 REQUIRED date_time chrono system)
+ 
+-add_leatherman_deps(${Boost_LIBRARIES})
++add_leatherman_deps(${Boost_LIBRARIES} -lboost_nowide)
+ add_leatherman_includes("${Boost_INCLUDE_DIRS}")
+ 
+ leatherman_dependency(nowide)

@@ -1,7 +1,7 @@
 Summary:        The Sysstat package contains utilities to monitor system performance and usage activity
 Name:           sysstat
-Version:        12.3.3
-Release:        4%{?dist}
+Version:        12.5.4
+Release:        1%{?dist}
 License:        GPLv2
 URL:            http://sebastien.godard.pagesperso-orange.fr/
 Group:          Development/Debuggers
@@ -54,6 +54,9 @@ install -D -m 0644 %{_builddir}/%{name}-%{version}/cron/sysstat-collect.service 
 
 
 %changelog
+* Mon Jan 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 12.5.4-1
+- Updating to version 12.5.4.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.3.3-4
 - Removing the explicit %%clean stage.
 

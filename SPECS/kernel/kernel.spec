@@ -2,12 +2,12 @@
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 %ifarch aarch64
-%define debug_package %{nil}
+%global __provides_exclude_from %{_libdir}/debug/.build-id/
 %endif
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.78.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -402,7 +402,7 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 %define __spec_install_post\
     %{?__debug_package:%{__debug_install_post}}\
     %{__arch_install_post}\
-    %__os_install_post\
+    %{__os_install_post}\
     %{__modules_install_post}\
 %{nil}
 
@@ -595,6 +595,13 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jan 04 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-3
+- Add provides exclude for debug build-id for aarch64 to generate debuginfo rpm
+- Fix missing brackets for __os_install_post.
+
+* Tue Dec 28 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
+- Enable CONFIG_COMPAT kernel configs
+
 * Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
 - Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327, CVE-2021-43389

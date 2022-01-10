@@ -48,7 +48,14 @@
 # LTO still has issues with qemu on armv7hl and aarch64
 # https://bugzilla.redhat.com/show_bug.cgi?id=1952483
 %global _lto_cflags %{nil}
+
+# Needed until CBL-Mariner starts cross-compiling 'ipxe', 'seabios' and 'sgabios' for other architectures.
+%ifarch x86_64
 %global firmwaredirs "%{_datadir}/qemu-firmware:%{_datadir}/ipxe/qemu:%{_datadir}/seavgabios:%{_datadir}/seabios:%{_datadir}/sgabios"
+%else
+%global firmwaredirs "%{_datadir}/qemu-firmware"
+%endif
+
 %global qemudocdir %{_docdir}/%{name}
 %define evr %{version}-%{release}
 %define requires_block_curl Requires: %{name}-block-curl = %{evr}
@@ -201,7 +208,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.1.0
-Release:        12%{?dist}
+Release:        14%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -221,6 +228,7 @@ Source36:       README.tests
 # https://bugzilla.redhat.com/show_bug.cgi?id=1999700
 Patch1:         0001-target-i386-add-missing-bits-to-CR4_RESERVED_MASK.patch
 Patch2:         fixing-glibc-struct-statx-usage.patch
+Patch3:         disable_qos_test.patch
 # alsa audio output
 BuildRequires:  alsa-lib-devel
 # reading bzip2 compressed dmg images
@@ -384,7 +392,6 @@ Requires:       %{name}-system-rx = %{version}-%{release}
 Requires:       %{name}-system-s390x = %{version}-%{release}
 Requires:       %{name}-system-sh4 = %{version}-%{release}
 Requires:       %{name}-system-tricore = %{version}-%{release}
-Requires:       %{name}-system-x86 = %{version}-%{release}
 Requires:       %{name}-system-xtensa = %{version}-%{release}
 Requires:       %{name}-tools = %{version}-%{release}
 # Requires for the 'qemu' metapackage
@@ -396,6 +403,9 @@ Requires:       %{name}-system-ppc = %{version}-%{release}
 %if %{with sparc_support}
 Requires:       %{name}-system-sparc = %{version}-%{release}
 %endif
+%ifarch x86_64
+Requires:       %{name}-system-x86 = %{version}-%{release}
+%endif
 
 %description
 %{name} is an open source virtualizer that provides hardware
@@ -405,7 +415,9 @@ hardware for a full system such as a PC and its associated peripherals.
 
 %package        common
 Summary:        QEMU common files needed by all QEMU targets
+%ifarch x86_64
 Requires:       ipxe >= %{ipxe_version}
+%endif
 Requires(post): %{_bindir}/getent
 Requires(post): %{_sbindir}/groupadd
 Requires(post): %{_sbindir}/useradd
@@ -820,6 +832,8 @@ Requires:       edk2-aarch64
 %description system-aarch64-core
 This package provides the QEMU system emulator for AArch64.
 
+# Needed until CBL-Mariner starts cross-compiling 'ipxe', 'seabios' and 'sgabios' for other architectures.
+%ifarch x86_64
 %package        system-x86
 Summary:        QEMU system emulator for x86
 Requires:       %{name}-system-x86-core = %{version}-%{release}
@@ -844,6 +858,7 @@ Requires:       edk2-ovmf
 This package provides the QEMU system emulator for x86. When being run in a x86
 machine that supports it, this package also provides the KVM virtualization
 platform.
+%endif
 
 %package        system-alpha
 Summary:        QEMU system emulator for Alpha
@@ -1275,7 +1290,7 @@ mkdir -p %{qemu_kvm_build}
 
 run_configure() {
     ../configure  \
-        --cc=%{__cc} \
+        --cc=gcc \
         --cxx=/bin/false \
         --prefix="%{_prefix}" \
         --libdir="%{_libdir}" \
@@ -1637,10 +1652,27 @@ for emu in %{buildroot}%{_bindir}/qemu-system-*; do
     ln -sf qemu.1.gz %{buildroot}%{_mandir}/man1/$(basename $emu).1.gz
  done
 
+%ifarch x86_64
 # Install kvm specific source bits, and qemu-kvm manpage
 %if %{need_qemu_kvm}
 ln -sf qemu.1.gz %{buildroot}%{_mandir}/man1/qemu-kvm.1.gz
 ln -sf qemu-system-x86_64 %{buildroot}%{_bindir}/qemu-kvm
+%endif
+%else
+# Needed until CBL-Mariner starts cross-compiling 'ipxe', 'seabios' and 'sgabios' for other architectures.
+rm -rf %{buildroot}%{_bindir}/qemu-system-i386
+rm -rf %{buildroot}%{_bindir}/qemu-system-x86_64
+rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-i386.so
+rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-x86_64.so
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-i386*.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-x86_64*.stp
+rm -rf %{buildroot}%{_mandir}/man1/qemu-system-i386.1*
+rm -rf %{buildroot}%{_mandir}/man1/qemu-system-x86_64.1*
+rm -rf %{buildroot}%{_datadir}/%{name}/kvmvapic.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/linuxboot.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/multiboot.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/pvh.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/qboot.rom
 %endif
 
 
@@ -1658,7 +1690,7 @@ for i in %{binfmt_dir}/*; do mv $i $(echo $i | sed 's/.conf/-dynamic.conf/'); do
 
 %check
 # Suppress check as it stall the pipeline indefinetly
-%if !%{tools_only} && 0%{?mariner_failing_tests}
+%if !%{tools_only}
 
 pushd %{qemu_kvm_build}
 echo "Testing %{name}-build"
@@ -1994,6 +2026,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-aarch64*.stp
 %{_mandir}/man1/qemu-system-aarch64.1*
 
+%ifarch x86_64
 %files system-x86
 
 %files system-x86-core
@@ -2013,6 +2046,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %if %{need_qemu_kvm}
 %{_bindir}/qemu-kvm
 %{_mandir}/man1/qemu-kvm.1*
+%endif
 %endif
 
 %files system-alpha
@@ -2187,6 +2221,13 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Mon Jan 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-14
+- Disabling 'qemu-system-x86*' subpackages build for non-AMD64 architectures.
+- Disabling dependency on 'ipxe' for non-AMD64 architectures.
+
+* Mon Jan 03 2022 Bala <balakumaran.kannan@microsoft.com> - 6.1.0-13
+- Skip qos test from ptest as it hungs indefinitely
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-12
 - Lint spec
 - Remove user-static subpackage references- no plans to support at this time
