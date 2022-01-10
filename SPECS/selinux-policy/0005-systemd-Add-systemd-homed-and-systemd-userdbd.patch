@@ -1,0 +1,380 @@
+From 139e3befeb08bd27c8a4ec1b0aefff1e64b29c6a Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 3 Jan 2022 20:12:14 +0000
+Subject: [PATCH 5/8] systemd: Add systemd-homed and systemd-userdbd.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/admin/aide.te        |   4 +
+ policy/modules/kernel/files.if      |  18 ++++
+ policy/modules/services/redis.te    |   4 +
+ policy/modules/services/ssh.if      |   1 +
+ policy/modules/system/init.if       |  19 ++++
+ policy/modules/system/init.te       |   1 +
+ policy/modules/system/systemd.fc    |   5 ++
+ policy/modules/system/systemd.if    |   3 +-
+ policy/modules/system/systemd.te    | 129 ++++++++++++++++++++++++++++
+ policy/modules/system/userdomain.if |   4 +
+ 10 files changed, 187 insertions(+), 1 deletion(-)
+
+MSFT_TAG: not ready for upstreaming
+
+diff --git a/policy/modules/admin/aide.te b/policy/modules/admin/aide.te
+index 29acc50d4..2c91f79dd 100644
+--- a/policy/modules/admin/aide.te
++++ b/policy/modules/admin/aide.te
+@@ -58,3 +58,7 @@ tunable_policy(`aide_mmap_files',`
+ optional_policy(`
+ 	seutil_use_newrole_fds(aide_t)
+ ')
++
++optional_policy(`
++	systemd_stream_connect_userdb(aide_t)
++')
+diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
+index 495cbe2f4..d4be27094 100644
+--- a/policy/modules/kernel/files.if
++++ b/policy/modules/kernel/files.if
+@@ -3849,6 +3849,24 @@ interface(`files_relabelfrom_home',`
+ 	allow $1 home_root_t:dir relabelfrom;
+ ')
+
++########################################
++## <summary>
++##	Watch the user home root (/home).
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`files_watch_home',`
++		gen_require(`
++			type home_root_t;
++		')
++
++		allow $1 home_root_t:dir watch;
++')
++
+ ########################################
+ ## <summary>
+ ##	Create objects in /home.
+diff --git a/policy/modules/services/redis.te b/policy/modules/services/redis.te
+index 923caac7c..8395cf1da 100644
+--- a/policy/modules/services/redis.te
++++ b/policy/modules/services/redis.te
+@@ -72,3 +72,7 @@ miscfiles_read_generic_certs(redis_t)
+ miscfiles_read_localization(redis_t)
+
+ sysnet_dns_name_resolve(redis_t)
++
++optional_policy(`
++	systemd_stream_connect_userdb(redis_t)
++')
+diff --git a/policy/modules/services/ssh.if b/policy/modules/services/ssh.if
+index ae23e1995..b9ed26bc8 100644
+--- a/policy/modules/services/ssh.if
++++ b/policy/modules/services/ssh.if
+@@ -277,6 +277,7 @@ template(`ssh_server_template', `
+
+ 	optional_policy(`
+ 		systemd_read_logind_sessions_files($1_t)
++		systemd_stream_connect_userdb($1_t)
+ 	')
+ ')
+
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 0171ee299..c2d3f4a9a 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -1354,6 +1354,25 @@ interface(`init_relabel_var_lib_dirs',`
+ 	allow $1 init_var_lib_t:dir relabel_dir_perms;
+ ')
+
++########################################
++## <summary>
++##	Read files in /var/lib/systemd.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_read_var_lib_files',`
++		gen_require(`
++			type init_var_lib_t;
++		')
++
++		read_files_pattern($1, init_var_lib_t, init_var_lib_t)
++		files_search_var_lib($1)
++')
++
+ ########################################
+ ## <summary>
+ ##	Manage files in /var/lib/systemd/.
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 6561e3d32..b855e262c 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -506,6 +506,7 @@ ifdef(`init_systemd',`
+ 	systemd_manage_userdb_runtime_sock_files(init_t)
+ 	systemd_manage_userdb_runtime_dirs(init_t)
+ 	systemd_filetrans_userdb_runtime_dirs(init_t)
++	systemd_stream_connect_userdb(init_t)
+
+ 	term_create_devpts_dirs(init_t)
+ 	term_create_ptmx(init_t)
+diff --git a/policy/modules/system/systemd.fc b/policy/modules/system/systemd.fc
+index 34db8c034..6f50e2d67 100644
+--- a/policy/modules/system/systemd.fc
++++ b/policy/modules/system/systemd.fc
+@@ -29,6 +29,8 @@
+ /usr/lib/systemd/systemd-binfmt		--	gen_context(system_u:object_r:systemd_binfmt_exec_t,s0)
+ /usr/lib/systemd/systemd-cgroups-agent	--	gen_context(system_u:object_r:systemd_cgroups_exec_t,s0)
+ /usr/lib/systemd/systemd-coredump	--	gen_context(system_u:object_r:systemd_coredump_exec_t,s0)
++/usr/lib/systemd/systemd-homed  	--	gen_context(system_u:object_r:systemd_homed_exec_t,s0)
++/usr/lib/systemd/systemd-homework   --  gen_context(system_u:object_r:systemd_homed_exec_t,s0)
+ /usr/lib/systemd/systemd-hostnamed	--	gen_context(system_u:object_r:systemd_hostnamed_exec_t,s0)
+ /usr/lib/systemd/systemd-localed	--	gen_context(system_u:object_r:systemd_locale_exec_t,s0)
+ /usr/lib/systemd/systemd-logind		--	gen_context(system_u:object_r:systemd_logind_exec_t,s0)
+@@ -43,6 +45,8 @@
+ /usr/lib/systemd/systemd-update-done	--	gen_context(system_u:object_r:systemd_update_done_exec_t,s0)
+ /usr/lib/systemd/systemd-user-runtime-dir	--	gen_context(system_u:object_r:systemd_user_runtime_dir_exec_t,s0)
+ /usr/lib/systemd/systemd-user-sessions	--	gen_context(system_u:object_r:systemd_sessions_exec_t,s0)
++/usr/lib/systemd/systemd-userdbd	--	gen_context(system_u:object_r:systemd_userdb_exec_t,s0)
++/usr/lib/systemd/systemd-userwork	--	gen_context(system_u:object_r:systemd_userdb_exec_t,s0)
+
+ # Systemd unit files
+ HOME_DIR/\.config/systemd(/.*)?		gen_context(system_u:object_r:systemd_conf_home_t,s0)
+@@ -62,6 +66,7 @@ HOME_DIR/\.local/share/systemd(/.*)?		gen_context(system_u:object_r:systemd_data
+ /usr/lib/systemd/system/systemd-networkd.*		gen_context(system_u:object_r:systemd_networkd_unit_t,s0)
+ /usr/lib/systemd/system/systemd-rfkill.*	--	gen_context(system_u:object_r:systemd_rfkill_unit_t,s0)
+ /usr/lib/systemd/system/systemd-socket-proxyd\.service	--	gen_context(system_u:object_r:systemd_socket_proxyd_unit_file_t,s0)
++/usr/lib/systemd/system/systemd-userdbd\.(service|socket)		--	gen_context(system_u:object_r:systemd_userdb_unit_t,s0)
+
+ /usr/share/factory(/.*)?	gen_context(system_u:object_r:systemd_factory_conf_t,s0)
+
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index 38adf050c..9fbc3e317 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -1046,12 +1046,13 @@ interface(`systemd_manage_userdb_runtime_sock_files', `
+ #
+ interface(`systemd_stream_connect_userdb', `
+ 	gen_require(`
+-		type systemd_userdb_runtime_t;
++		type systemd_userdb_t, systemd_userdb_runtime_t;
+ 	')
+
+ 	init_search_runtime($1)
+ 	allow $1 systemd_userdb_runtime_t:dir list_dir_perms;
+ 	allow $1 systemd_userdb_runtime_t:sock_file write_sock_file_perms;
++	stream_connect_pattern($1, systemd_userdb_runtime_t, systemd_userdb_runtime_t, systemd_userdb_t)
+ 	init_unix_stream_socket_connectto($1)
+ ')
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 09874fcf0..3601680da 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -115,6 +115,16 @@ typealias systemd_generator_t alias { systemd_fstab_generator_t systemd_gpt_gene
+ typealias systemd_generator_exec_t alias { systemd_fstab_generator_exec_t systemd_gpt_generator_exec_t };
+ init_system_domain(systemd_generator_t, systemd_generator_exec_t)
+
++type systemd_homed_t;
++type systemd_homed_exec_t;
++init_daemon_domain(systemd_homed_t, systemd_homed_exec_t)
++
++type systemd_homed_runtime_t;
++files_runtime_file(systemd_homed_runtime_t)
++
++type systemd_homed_tmpfs_t;
++files_tmpfs_file(systemd_homed_tmpfs_t)
++
+ type systemd_hostnamed_t;
+ type systemd_hostnamed_exec_t;
+ init_daemon_domain(systemd_hostnamed_t, systemd_hostnamed_exec_t)
+@@ -294,9 +304,16 @@ init_system_domain(systemd_user_runtime_dir_t, systemd_user_runtime_dir_exec_t)
+ type systemd_user_tmpfs_t;
+ userdom_user_tmpfs_file(systemd_user_tmpfs_t)
+
++type systemd_userdb_t;
++type systemd_userdb_exec_t;
++init_daemon_domain(systemd_userdb_t, systemd_userdb_exec_t)
++
+ type systemd_userdb_runtime_t;
+ files_runtime_file(systemd_userdb_runtime_t)
+
++type systemd_userdb_unit_t;
++init_unit_file(systemd_userdb_unit_t)
++
+ type systemd_user_unit_t;
+ init_unit_file(systemd_user_unit_t)
+
+@@ -465,6 +482,8 @@ kernel_use_fds(systemd_generator_t)
+ kernel_read_system_state(systemd_generator_t)
+ kernel_read_kernel_sysctls(systemd_generator_t)
+ kernel_dontaudit_getattr_proc(systemd_generator_t)
++# Where an unlabeled mountpoint is encounted:
++kernel_dontaudit_search_unlabeled(systemd_generator_t)
+
+ storage_raw_read_fixed_disk(systemd_generator_t)
+
+@@ -489,6 +508,76 @@ optional_policy(`
+ 	miscfiles_read_localization(systemd_generator_t)
+ ')
+
++#######################################
++#
++# systemd-homed policy
++#
++
++allow systemd_homed_t self:capability sys_admin;
++#dontaudit systemd_homed_t self:capability sys_resource;
++allow systemd_homed_t self:process { getsched setfscreate };
++allow systemd_homed_t self:unix_dgram_socket sendto;
++allow systemd_homed_t self:netlink_kobject_uevent_socket create_socket_perms;
++allow systemd_homed_t self:unix_dgram_socket create_socket_perms;
++
++can_exec(systemd_homed_t, systemd_homed_exec_t)
++
++allow systemd_homed_t systemd_homed_runtime_t:file manage_file_perms;
++files_runtime_filetrans(systemd_homed_t, systemd_homed_runtime_t, file)
++files_home_filetrans(systemd_homed_t, systemd_homed_runtime_t, file)
++
++manage_sock_files_pattern(systemd_homed_t, systemd_userdb_runtime_t, systemd_homed_runtime_t)
++filetrans_pattern(systemd_homed_t, systemd_userdb_runtime_t, systemd_homed_runtime_t, sock_file)
++
++manage_dirs_pattern(systemd_homed_t, systemd_homed_runtime_t, systemd_homed_runtime_t)
++init_runtime_filetrans(systemd_homed_t, systemd_homed_runtime_t, dir)
++
++allow systemd_homed_t systemd_homed_tmpfs_t:file manage_file_perms;
++fs_tmpfs_filetrans(systemd_homed_t, systemd_homed_tmpfs_t, file)
++
++corecmd_search_bin(systemd_homed_t)
++
++dev_create_generic_dirs(systemd_homed_t)
++dev_rw_loop_control(systemd_homed_t)
++dev_read_rand(systemd_homed_t)
++dev_read_urand(systemd_homed_t)
++# Entries such as /sys/devices/virtual/block/loop1/uevent:
++dev_read_sysfs(systemd_homed_t)
++
++# loopback:
++storage_raw_read_fixed_disk(systemd_homed_t)
++storage_raw_write_fixed_disk(systemd_homed_t)
++
++files_watch_home(systemd_homed_t)
++files_read_etc_files(systemd_homed_t)
++
++fs_getattr_all_fs(systemd_homed_t)
++fs_get_xattr_fs_quotas(systemd_homed_t)
++
++init_list_var_lib_dirs(systemd_homed_t)
++init_read_var_lib_files(systemd_homed_t)
++
++kernel_read_kernel_sysctls(systemd_homed_t)
++kernel_read_crypto_sysctls(systemd_homed_t)
++kernel_read_system_state(systemd_homed_t)
++
++seutil_read_file_contexts(systemd_homed_t)
++
++systemd_log_parse_environment(systemd_homed_t)
++
++udev_read_runtime_files(systemd_homed_t)
++
++optional_policy(`
++	dbus_system_bus_client(systemd_homed_t)
++	dbus_connect_system_bus(systemd_homed_t)
++
++	init_dbus_chat(systemd_homed_t)
++')
++
++optional_policy(`
++	unconfined_dbus_send(systemd_homed_t)
++')
++
+ #######################################
+ #
+ # Hostnamed policy
+@@ -619,6 +708,8 @@ allow systemd_logind_t systemd_sessions_runtime_t:dir manage_dir_perms;
+ allow systemd_logind_t systemd_sessions_runtime_t:file manage_file_perms;
+ allow systemd_logind_t systemd_sessions_runtime_t:fifo_file manage_fifo_file_perms;
+
++stream_connect_pattern(systemd_logind_t, systemd_userdb_runtime_t, systemd_userdb_runtime_t, systemd_userdb_t)
++
+ kernel_dontaudit_getattr_proc(systemd_logind_t)
+ kernel_read_kernel_sysctls(systemd_logind_t)
+
+@@ -782,6 +873,8 @@ allow systemd_machined_t systemd_machined_devpts_t:chr_file manage_chr_file_perm
+ manage_files_pattern(systemd_machined_t, systemd_machined_runtime_t, systemd_machined_runtime_t)
+ allow systemd_machined_t systemd_machined_runtime_t:lnk_file manage_lnk_file_perms;
+
++manage_sock_files_pattern(systemd_machined_t, systemd_userdb_runtime_t, systemd_userdb_runtime_t)
++
+ kernel_read_kernel_sysctls(systemd_machined_t)
+ kernel_read_system_state(systemd_machined_t)
+
+@@ -1573,6 +1666,42 @@ udev_list_runtime(systemd_user_session_type)
+
+ seutil_libselinux_linked(systemd_user_session_type)
+
++########################################
++#
++# systemd-userdbd local policy
++#
++
++allow systemd_userdb_t self:capability dac_read_search;
++allow systemd_userdb_t self:process signal;
++
++stream_connect_pattern(systemd_userdb_t, systemd_homed_runtime_t, systemd_homed_runtime_t, systemd_homed_t)
++
++manage_dirs_pattern(systemd_userdb_t, systemd_userdb_runtime_t, systemd_userdb_runtime_t)
++manage_files_pattern(systemd_userdb_t, systemd_userdb_runtime_t, systemd_userdb_runtime_t)
++manage_sock_files_pattern(systemd_userdb_t, systemd_userdb_runtime_t, systemd_userdb_runtime_t)
++init_runtime_filetrans(systemd_userdb_t, systemd_userdb_runtime_t, dir)
++
++can_exec(systemd_userdb_t systemd_userdb_exec_t)
++
++auth_read_shadow(systemd_userdb_t)
++auth_use_nsswitch(systemd_userdb_t)
++
++dev_read_urand(systemd_userdb_t)
++
++files_read_etc_files(systemd_userdb_t)
++files_read_etc_runtime_files(systemd_userdb_t)
++files_read_usr_files(systemd_userdb_t)
++
++fs_read_efivarfs_files(systemd_userdb_t)
++
++init_stream_connect(systemd_userdb_t)
++init_search_runtime(systemd_userdb_t)
++init_read_state(systemd_userdb_t)
++
++kernel_read_kernel_sysctls(systemd_userdb_t)
++
++systemd_log_parse_environment(systemd_userdb_t)
++
+ #########################################
+ #
+ # systemd-user-runtime-dir local policy
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index 22b3c1bf7..ba30ecab3 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -903,6 +903,10 @@ template(`userdom_common_user_template',`
+ 		usernetctl_run($1_t, $1_r)
+ 	')
+
++	optional_policy(`
++		systemd_stream_connect_userdb($1_t)
++	')
++
+ 	optional_policy(`
+ 		virt_home_filetrans_virt_home($1_t, dir, ".libvirt")
+ 		virt_home_filetrans_virt_home($1_t, dir, ".virtinst")
+--
+2.17.1
+

@@ -3,13 +3,13 @@
 %define monolithic n
 %define policy_name targeted
 %define refpolicy_major 2
-%define refpolicy_minor 20210908
+%define refpolicy_minor 20220106
 %define POLICYCOREUTILSVER 3.2
 %define CHECKPOLICYVER 3.2
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,16 +19,12 @@ Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
 Patch1:         0001-Makefile-Revise-relabel-targets-to-relabel-all-secla.patch
 Patch2:         0002-cronyd-Add-dac_read_search.patch
-Patch3:         0003-systemd-ssh-ntp-Read-fips_enabled-crypto-sysctl.patch
-Patch4:         0004-udev-Manage-EFI-variables.patch
-Patch5:         0005-ntp-Handle-symlink-to-drift-directory.patch
-Patch6:         0006-systemd-Unit-generator-fixes.patch
-Patch7:         0007-logging-Allow-auditd-to-stat-dispatcher-executables.patch
-Patch8:         0008-systemd-Revise-tmpfiles-factory-to-allow-writing-all.patch
-Patch9:         0009-systemd-User-runtime-reads-user-cgroup-files.patch
-Patch10:        0010-logging-Add-audit_control-for-journald.patch
-Patch11:        0011-Temporary-fix-for-wrong-audit-log-directory.patch
-Patch12:        0012-Set-default-login-to-unconfined_u.patch
+Patch3:         0003-Temporary-fix-for-wrong-audit-log-directory.patch
+Patch4:         0004-Set-default-login-to-unconfined_u.patch
+Patch5:         0005-systemd-Add-systemd-homed-and-systemd-userdbd.patch
+Patch6:         0006-systemd-ssh-Crypto-sysctl-use.patch
+Patch7:         0007-systemd-Additional-fixes-for-fs-getattrs.patch
+Patch8:         0008-systemd-Updates-for-generators-and-kmod-static-nodes.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -105,7 +101,7 @@ enforced by the kernel when running with SELinux enabled.
 %ghost %{_sharedstatedir}/selinux/%{policy_name}/active/seusers.linked
 %ghost %{_sharedstatedir}/selinux/%{policy_name}/active/users_extra.linked
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
-%verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
+%{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
 
 %package devel
 Summary:        SELinux policy devel
@@ -143,16 +139,18 @@ SELinux policy documentation package
 %{_mandir}/ru/*/*
 %doc %{_usr}/share/doc/%{name}
 
+%define common_makeopts DISTRO=%{distro} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} SYSTEMD=y DIRECT_INITRC=n MLS_CATS=1024 MCS_CATS=1024
+
 %define makeCmds() \
-%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 bare \
-%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 conf \
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} bare \
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} conf \
 install -m0644 %{_sourcedir}/booleans_%{1}.conf policy/booleans.conf
 %define installCmds() \
-%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 base.pp \
-%make_build validate UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 modules \
-make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 install \
-make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 install-appconfig \
-make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} DISTRO=%{distro} UBAC=n DIRECT_INITRC=%{3} MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} SYSTEMD=y MLS_CATS=1024 MCS_CATS=1024 SEMODULE="semodule -p %{buildroot} -X 100 " load \
+%make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} base.pp \
+%make_build validate UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} modules \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} install \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} install-appconfig \
+make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} SEMODULE="semodule -p %{buildroot} -X 100 " load \
 mkdir -p %{buildroot}/%{_sysconfdir}/selinux/%{1}/logins \
 touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.subs \
 install -m0644 config/appconfig-%{2}/securetty_types %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/securetty_types \
@@ -226,8 +224,8 @@ rm -rf %{buildroot}%{_sharedstatedir}/selinux/%{policy_name}/previous
 
 mkdir -p %{buildroot}%{_mandir}
 cp -R  man/* %{buildroot}%{_mandir}
-make UNK_PERMS=allow NAME=%{policy_name} TYPE=mcs DISTRO=%{distro} UBAC=n DIRECT_INITRC=n MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} PKGNAME=%{name} MLS_CATS=1024 MCS_CATS=1024 install-docs
-make UNK_PERMS=allow NAME=%{policy_name} TYPE=mcs DISTRO=%{distro} UBAC=n DIRECT_INITRC=n MONOLITHIC=%{monolithic} DESTDIR=%{buildroot} PKGNAME=%{name} MLS_CATS=1024 MCS_CATS=1024 install-headers
+make UNK_PERMS=allow NAME=%{policy_name} TYPE=mcs UBAC=%{3} PKGNAME=%{name} %{common_makeopts} install-docs
+make UNK_PERMS=allow NAME=%{policy_name} TYPE=mcs UBAC=%{3} PKGNAME=%{name} %{common_makeopts} install-headers
 mkdir %{buildroot}%{_usr}/share/selinux/devel/
 mv %{buildroot}%{_usr}/share/selinux/%{policy_name}/include %{buildroot}%{_usr}/share/selinux/devel/include
 install -m 644 %{SOURCE1} %{buildroot}%{_usr}/share/selinux/devel/Makefile
@@ -276,12 +274,12 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Wed Dec 15 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20210908-1
-- Update to version 2.20210908.
+* Mon Jan 10 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
+- Update to version 2.20220106.
 - Fix setup process to apply patches.
 - Correct files listing to include the module store files.
 - Create a booleans.conf for the build process, to override upstream Boolean
-  values.
+  default values.
 - Fix build to include systemd rules.
 
 * Tue Sep 07 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20210203-1
