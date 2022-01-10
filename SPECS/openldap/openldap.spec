@@ -2,7 +2,7 @@
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.4.57
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,9 +37,10 @@ libraries, and documentation for OpenLDAP.
 %build
 autoconf
 sed -i '/6.0.20/ a\\t__db_version_compat' configure
-export CPPFLAGS="-D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D_AVL_H"
+export CPPFLAGS="${CPPFLAGS} -D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D_AVL_H"
 %configure \
         --disable-static    \
+        --enable-dynamic    \
         --disable-debug     \
         --disable-slapd     \
         --with-tls=openssl  \
@@ -70,6 +71,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sysconfdir}/openldap/*
 
 %changelog
+* Wed Jan 05 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.4.57-6
+- Set --enable-dynamic to disable rpath in ldap tools
+- Ensure that default CPPFLAGS are preserved
+
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.57-5
 - Removing dependency on "cyrus-sasl".
 

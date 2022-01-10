@@ -8,7 +8,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -134,10 +134,17 @@ The test package contains all regression tests for Python as well as the modules
 %autosetup -p1 -n Python-%{version}
 
 %build
-export OPT="%{optflags} %{openssl_flags}"
+# Remove GCC specs and build environment linker scripts
+# from the flags used when compiling outside of an RPM environment
+# https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
+export CFLAGS="%{extension_cflags} %{openssl_flags}"
+export CFLAGS_NODIST="%{build_cflags} %{openssl_flags}"
+export CXXFLAGS="%{extension_cxxflags} %{openssl_flags}"
+export LDFLAGS="%{extension_ldflags}"
+export LDFLAGS_NODIST="%{build_ldflags}"
+export OPT="%{extension_cflags} %{openssl_flags}"
+
 %configure \
-    CFLAGS="%{optflags} %{openssl_flags}" \
-    CXXFLAGS="%{optflags} %{openssl_flags}" \
     --enable-shared \
     --with-platlibdir=%{_lib} \
     --with-system-expat \
@@ -260,6 +267,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed Dec 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-2
+- Use filtered flags when compiling extensions
+
 * Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-1
 - Upgrade to latest release in 3.9 series
 - Add profile guided optimization to configuration

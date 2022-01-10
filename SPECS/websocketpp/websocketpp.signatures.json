@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "websocketpp-0.8.1.tar.gz": "178899de48c02853b55b1ea8681599641cedcdfce59e56beaff3dd0874bf0286",
-  "websocketpp.pc": "2b537bf843a06ded5128d2f1ad25c4cd7a85f7e58b3ea2c1563ddf0c6fb7f8c7"
+  "websocketpp-0.8.2.tar.gz": "6ce889d85ecdc2d8fa07408d6787e7352510750daa66b5ad44aacb47bea76755",
+  "websocketpp.pc": "35b289e216fc9f56546bcb6d5aacd6a7b68ac2fc9ac1e91049a8adfe7d676583"
  }
 }

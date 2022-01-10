@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,9 @@ Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
+%if %{with_check}
+BuildRequires:  perl
+%endif
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       glibc
 Requires:       libgcc
@@ -319,6 +322,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.1k-7
+- Add build requires perl for tests.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1k-6
 - Removing the explicit %%clean stage.
 

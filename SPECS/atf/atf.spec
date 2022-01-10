@@ -1,14 +1,13 @@
 Name:          atf
-Version:       0.20
-Release:       16%{?dist}
+Version:       0.21
+Release:       1%{?dist}
 License:       BSD
 Summary:       Automated Testing Framework
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://github.com/jmmv/atf
-
-Source0: https://github.com/jmmv/atf/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-Source1: README
+Source0:       https://github.com/jmmv/atf/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source1:       README
 
 %define _testsdir %{_libexecdir}/atf/tests
 
@@ -93,10 +92,12 @@ ATF C bindings.
 
 %files -n libatf-c
 %license COPYING
-%{_libdir}/libatf-c.so.0
-%{_libdir}/libatf-c.so.0.0.0
+%{_libdir}/libatf-c.so.1
+%{_libdir}/libatf-c.so.1.0.0
 %{_datadir}/man/man1/atf-test-program.1.gz
 %{_datadir}/man/man4/atf-test-case.4.gz
+%{_mandir}/man7/atf.7.gz
+%{_mandir}/man3/atf-c.3.gz
 
 %ldconfig_scriptlets -n libatf-c
 
@@ -120,7 +121,6 @@ develop tests that use the ATF C bindings.
 %{_libdir}/pkgconfig/atf-c.pc
 %{_mandir}/man3/atf-c-api.3.gz
 
-
 %package -n libatf-c++
 Summary: Automated Testing Framework - C++ bindings
 
@@ -132,11 +132,11 @@ ATF C++ bindings.
 
 %files -n libatf-c++
 %license COPYING
-%{_libdir}/libatf-c++.so.1
-%{_libdir}/libatf-c++.so.1.0.0
+%{_libdir}/libatf-c++.so.2
+%{_libdir}/libatf-c++.so.2.0.0
+%{_mandir}/man3/atf-c++.3.gz
 
 %ldconfig_scriptlets -n libatf-c++
-
 
 %package -n libatf-c++-devel
 Summary: Automated Testing Framework - C++ bindings (headers)
@@ -158,7 +158,6 @@ develop applications that use the ATF C++ bindings.
 %{_libdir}/pkgconfig/atf-c++.pc
 %{_mandir}/man3/atf-c++-api.3.gz
 
-
 %package -n libatf-sh
 Summary: Automated Testing Framework - POSIX shell bindings
 Requires: libatf-c++ = %{version}-%{release}
@@ -177,7 +176,7 @@ ATF POSIX shell bindings.
 %{_datadir}/atf
 %{_libexecdir}/atf-check
 %{_mandir}/man1/atf-sh.1.gz
-
+%{_mandir}/man3/atf-sh.3.gz
 
 %package -n libatf-sh-devel
 Summary: Automated Testing Framework - POSIX shell bindings (headers)
@@ -196,6 +195,9 @@ applications that use the ATF POSIX shell bindings.
 %{_mandir}/man3/atf-sh-api.3.gz
 
 %changelog
+* Thu Jan 06 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.21-1
+- Upgrade to version 0.21.
+
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 0.20-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Update URL.

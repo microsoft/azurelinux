@@ -1,41 +1,15 @@
 Summary: Utility for the creation of squashfs filesystems
 Name: squashfs-tools
-Version: 4.3
-Release: 26%{?dist}
+Version: 4.4
+Release: 1%{?dist}
 License: GPLv2+
-URL: http://squashfs.sourceforge.net/
-Source0: http://downloads.sourceforge.net/squashfs/squashfs%{version}.tar.gz
-# manpages from http://ftp.debian.org/debian/pool/main/s/squashfs-tools/squashfs-tools_4.2+20121212-1.debian.tar.xz
-# The man pages have been modified for 4.3 for Fedora.
+URL: https://github.com/plougher/squashfs-tools
+# source0: https://github.com/plougher/squashfs-tools/archive/refs/tags/4.4.tar.gz
+Source0: %{name}-%{version}.tar.gz
 Source1: mksquashfs.1
 Source2: unsquashfs.1
-# From master branch (55f7ba830d40d438f0b0663a505e0c227fc68b6b).
-# 32 bit process can use too much memory when using PAE or 64 bit kernels
-Patch0:  PAE.patch
-# From master branch (604b607d8ac91eb8afc0b6e3d917d5c073096103).
-# Prevent overflows when using the -mem option.
-Patch1:  mem-overflow.patch
-# From squashfs-devel@lists.sourceforge.net by Guan Xin <guanx.bac@gmail.com>
-# For https://bugzilla.redhat.com/show_bug.cgi?id=1141206
-Patch2:  2gb.patch
-# From https://github.com/gcanalesb/sasquatch/commit/6777e08cc38bc780d27c69c1d8c272867b74524f
-# Which is forked from Phillip's squashfs-tools, though it looks like
-# the issue applies to us.
-Patch3:  cve-2015-4645.patch
-# Update formats to match changes in cve-2015-4645.patch
-Patch4:  local-cve-fix.patch
-# sys/sysmacros.h is no longer included by sys/types.h
-Patch5:  glibc.patch
-# zstd compression support from https://github.com/plougher/squashfs-tools
-Patch6:  0001-squashfs-tools-Add-zstd-support.patch
-# create_dir_entry needs a qualifier to ensure a copy is emitted if it
-# is not inlined to every caller
-Patch7:  inline.patch
-# gcc10 tighter checking caught a problem. It was fixed upstream
-# a couple of weeks ago.
-Patch8:  gcc10.patch
 
-BuildRequires:  gcc
+BuildRequires: gcc
 BuildRequires: zlib-devel
 BuildRequires: xz-devel
 BuildRequires: lzo-devel
@@ -48,16 +22,7 @@ Squashfs is a highly compressed read-only filesystem for Linux.  This package
 contains the utilities for manipulating squashfs filesystems.
 
 %prep
-%setup -q -n squashfs%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p0
-%patch3 -p1
-%patch4 -p0
-%patch5 -p0
-%patch6 -p1
-%patch7 -p1
-%patch8 -p0
+%setup -q -n %{name}-%{version}
 
 %build
 %set_build_flags
@@ -72,7 +37,7 @@ install -m 644 %{SOURCE1} %{buildroot}%{_mandir}/man1/mksquashfs.1
 install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 
 %files
-%doc README ACKNOWLEDGEMENTS DONATIONS PERFORMANCE.README README-4.3 CHANGES pseudo-file.example COPYING
+%doc README ACKNOWLEDGEMENTS README-%{version} CHANGES USAGE INSTALL COPYING
 
 %doc README
 %{_mandir}/man1/*
@@ -81,6 +46,10 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 %{_sbindir}/unsquashfs
 
 %changelog
+* Mon Aug 02 2021 Nicolas Guibourge <nicolasg@microsoft.com> 4.4-1
+- Move to version 4.4 to address CVE-2015-4646
+- License verified
+
 * Fri Aug 07 2020 Mateusz Malisz <mamalisz@microsoft.com> 4.3-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

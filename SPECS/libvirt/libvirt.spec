@@ -3,40 +3,39 @@
 %define qemu_group  qemu
 
 %bcond_with missing_dependencies
-%bcond_with glusterfs
+%bcond_with netcf
 
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
-Version:        6.1.0
-Release:        4%{?dist}
+Version:        7.10.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Virtualization/Libraries
 URL:            https://libvirt.org/
 Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz
-# The fix for this CVE is already in 6.1.0.
-Patch0:         CVE-2019-3886.nopatch
-# The fix for this CVE is already in 6.1.0.
-Patch1:         CVE-2017-1000256.nopatch
-Patch2:         CVE-2020-25637.patch
 
 BuildRequires:  %{_bindir}/qemu-img
+BuildRequires:  audit-libs-devel
 BuildRequires:  augeas
 BuildRequires:  bash-completion
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  dbus-devel
 BuildRequires:  device-mapper-devel
+BuildRequires:  dnsmasq >= 2.41
 BuildRequires:  e2fsprogs-devel
-%if 0%{with glusterfs}
+BuildRequires:  fuse-devel >= 2.8.6
 BuildRequires:  glusterfs-api-devel >= 3.4.1
 BuildRequires:  glusterfs-devel >= 3.4.1
-%endif
 BuildRequires:  gnutls-devel
 BuildRequires:  iscsi-initiator-utils
 BuildRequires:  libacl-devel
+BuildRequires:  libattr-devel
 BuildRequires:  libcap-ng-devel
+BuildRequires:  libiscsi-devel
 BuildRequires:  libnl3-devel
+BuildRequires:  libpcap-devel >= 1.5.0
 BuildRequires:  libpciaccess-devel
 BuildRequires:  librados2-devel
 BuildRequires:  librbd1-devel
@@ -46,12 +45,17 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt
 BuildRequires:  lvm2
+BuildRequires:  meson >= 0.54.0
+%if %{with netcf}
+BuildRequires:  netcf-devel >= 0.2.2
+%endif
+BuildRequires:  ninja-build
 BuildRequires:  numactl-devel
 BuildRequires:  numad
 BuildRequires:  parted
 BuildRequires:  polkit
-BuildRequires:  python3-docutils
 BuildRequires:  python3-devel
+BuildRequires:  python3-docutils
 BuildRequires:  readline-devel
 BuildRequires:  rpcsvc-proto
 BuildRequires:  sanlock-devel
@@ -92,23 +96,15 @@ Libvirt is collection of software that provides a convenient way to manage virtu
 %package admin
 Summary:        Set of tools to control libvirt daemon
 
-Requires:       %{name}-bash-completion = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       readline
 
 %description admin
 The client side utilities to control the libvirt daemon.
 
-%package bash-completion
-Summary:        Bash completion script
-
-%description bash-completion
-Bash completion script stub.
-
 %package client
 Summary:        Client side utilities of the libvirt library
 
-Requires:       %{name}-bash-completion = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 # Needed by libvirt-guests.sh script.
 Requires:       gettext
@@ -175,21 +171,20 @@ Summary:        Interface driver plugin for the libvirtd daemon
 
 Requires:       %{name}-daemon = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
-%if 0%{with missing_dependencies}
+%if 0%{with netcf}
 Requires:       netcf-libs >= 0.2.2
 %endif
 
 %description daemon-driver-interface
 The interface driver plugin for the libvirtd daemon, providing
-an implementation of the network interface APIs using the
-netcf library
+an implementation of the host network interface APIs.
 
 %package daemon-driver-network
 Summary:        Network driver plugin for the libvirtd daemon
 
 Requires:       %{name}-daemon = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
-Requires:       dnsmasq
+Requires:       dnsmasq >= 2.41
 Requires:       iptables
 
 %if 0%{with missing_dependencies}
@@ -262,14 +257,12 @@ Summary:        Storage driver plugin including all backends for the libvirtd da
 
 Requires:       %{name}-daemon-driver-storage-core = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-disk = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
+Requires:       %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-logical = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-mpath = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-rbd = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-scsi = %{version}-%{release}
-Requires:       %{name}-daemon-driver-storage-iscsi = %{version}-%{release}
-%if 0%{with glusterfs}
-Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
-%endif
 
 %description daemon-driver-storage
 The storage driver plugin for the libvirtd daemon, providing
@@ -303,7 +296,6 @@ Requires:       parted
 The storage driver backend adding implementation of the storage APIs for block
 volumes using the host disks.
 
-%if 0%{with glusterfs}
 %package daemon-driver-storage-gluster
 Summary:        Storage driver plugin for gluster
 
@@ -315,7 +307,6 @@ Requires:       glusterfs-client >= 2.0.1
 %description daemon-driver-storage-gluster
 The storage driver backend adding implementation of the storage APIs for gluster
 volumes using libgfapi.
-%endif
 
 %package daemon-driver-storage-iscsi
 Summary:        Storage driver plugin for iscsi
@@ -470,50 +461,68 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
 %define _vpath_builddir build
 
 %build
-mkdir %{_vpath_builddir}
-cd %{_vpath_builddir}
-../configure \
-    --bindir=%{_bindir} \
-    --disable-silent-rules \
-    --libdir=%{_libdir} \
-    --prefix=%{_prefix} \
-    --with-driver-modules \
-    --with-libvirtd \
-    --with-macvtap \
-    --with-network \
-    --with-nss-plugin \
-    --with-numactl \
-    --with-numad \
-    --with-pciaccess \
-    --with-polkit \
-    --with-qemu \
-    --with-qemu-user=%{qemu_user} \
-    --with-qemu-group=%{qemu_group} \
-    --with-sanlock \
-    --with-sasl \
-    --with-storage-disk \
-%if 0%{with glusterfs}
-    --with-storage-gluster \
+%meson \
+    -Daudit=enabled \
+    -Dbash_completion=enabled \
+    -Dbash_completion_dir="%{_datadir}/bash-completion/completions" \
+    -Ddriver_libvirtd=enabled \
+    -Ddriver_network=enabled \
+    -Ddriver_qemu=enabled \
+    -Dfuse=enabled \
+    -Dglusterfs=enabled \
+    -Dlibssh2=enabled \
+%if 0%{with netcf}
+    -Dnetcf=enabled \
 %endif
-    --with-storage-iscsi \
-    --with-storage-lvm \
-    --with-storage-mpath \
-    --with-storage-rbd \
-    --with-udev \
-    --with-yajl \
-    --without-firewalld-zone \
-    --without-libxl \
-    --without-login-shell \
-    --without-lxc \
-    --without-storage-iscsi-direct \
-    --without-storage-sheepdog \
-    --without-storage-zfs
+    -Dnss=enabled \
+    -Dnumactl=enabled \
+    -Dnumad=enabled \
+    -Dpciaccess=enabled \
+    -Dpolkit=enabled \
+    -Dqemu_group=%{qemu_group} \
+    -Dqemu_user=%{qemu_user} \
+    -Dsanlock=enabled \
+    -Dsasl=enabled \
+    -Dselinux=enabled \
+    -Dselinux_mount="/sys/fs/selinux" \
+    -Dstorage_disk=enabled \
+    -Dstorage_gluster=enabled \
+    -Dstorage_iscsi=enabled \
+    -Dstorage_lvm=enabled \
+    -Dstorage_mpath=enabled \
+    -Dstorage_rbd=enabled \
+    -Dudev=enabled \
+    -Dyajl=enabled \
+    -Dapparmor=disabled \
+    -Dapparmor_profiles=disabled \
+    -Dcurl=disabled \
+    -Ddriver_bhyve=disabled \
+    -Ddriver_ch=disabled \
+    -Ddriver_esx=disabled \
+    -Ddriver_hyperv=disabled \
+    -Ddriver_libxl=disabled \
+    -Ddriver_lxc=disabled \
+    -Ddriver_vz=disabled \
+    -Dfirewalld_zone=disabled \
+    -Dlibssh=disabled \
+    -Dlogin_shell=disabled \
+%if ! 0%{with netcf}
+    -Dnetcf=disabled \
+%endif
+    -Dopenwsman=disabled \
+    -Dpm_utils=disabled \
+    -Drpath=disabled \
+    -Dsecdriver_apparmor=disabled \
+    -Dstorage_iscsi_direct=disabled \
+    -Dstorage_sheepdog=disabled \
+    -Dstorage_vstorage=disabled \
+    -Dstorage_zfs=disabled \
+    -Dwireshark_dissector=disabled
 
-make %{?_smp_mflags}
+%meson_build
 
 %install
-cd %{_vpath_builddir}
-%make_install DESTDIR=%{buildroot} SYSTEMD_UNIT_DIR=%{_unitdir} V=1
+%meson_install
 
 find %{buildroot} -type f -name "*.la" -delete -print
 
@@ -559,8 +568,7 @@ rm -rf %{buildroot}%{_sysconfdir}/logrotate.d/libvirtd.lxc
 %find_lang %{name}
 
 %check
-cd %{_vpath_builddir}
-make check
+VIR_TEST_DEBUG=1 %meson_test --no-suite syntax-check
 
 %preun client
 
@@ -729,9 +737,6 @@ exit 0
 %{_bindir}/virt-admin
 %{_datadir}/bash-completion/completions/virt-admin
 
-%files bash-completion
-%{_datadir}/bash-completion/completions/vsh
-
 %files client
 %{_mandir}/man1/virsh.1*
 %{_mandir}/man1/virt-xml-validate.1*
@@ -739,6 +744,7 @@ exit 0
 %{_mandir}/man1/virt-host-validate.1*
 %{_bindir}/virsh
 %{_bindir}/virt-xml-validate
+%{_bindir}/virt-pki-query-dn
 %{_bindir}/virt-pki-validate
 %{_bindir}/virt-host-validate
 
@@ -777,6 +783,7 @@ exit 0
 %config(noreplace) %{_sysconfdir}/sysconfig/libvirtd
 %config(noreplace) %{_sysconfdir}/sysconfig/virtlogd
 %config(noreplace) %{_sysconfdir}/sysconfig/virtlockd
+%config(noreplace) %{_sysconfdir}/sysconfig/virtproxyd
 %config(noreplace) %{_sysconfdir}/libvirt/libvirtd.conf
 %config(noreplace) %{_sysconfdir}/libvirt/virtproxyd.conf
 %config(noreplace) %{_sysconfdir}/libvirt/virtlogd.conf
@@ -797,6 +804,8 @@ exit 0
 %dir %attr(0755, root, root) %{_libdir}/libvirt/
 %dir %attr(0755, root, root) %{_libdir}/libvirt/connection-driver/
 %dir %attr(0755, root, root) %{_libdir}/libvirt/lock-driver
+
+%attr(0755, root, root) %{_bindir}/virt-ssh-helper
 %attr(0755, root, root) %{_libdir}/libvirt/lock-driver/lockd.so
 
 %{_datadir}/augeas/lenses/libvirtd.aug
@@ -826,6 +835,7 @@ exit 0
 %{_mandir}/man8/libvirtd.8*
 %{_mandir}/man8/virtlogd.8*
 %{_mandir}/man8/virtlockd.8*
+%{_mandir}/man8/virtproxyd.8*
 %{_mandir}/man7/virkey*.7*
 
 %files daemon-config-network
@@ -840,6 +850,7 @@ exit 0
 %ghost %{_sysconfdir}/libvirt/nwfilter/*.xml
 
 %files daemon-driver-interface
+%config(noreplace) %{_sysconfdir}/sysconfig/virtinterfaced
 %config(noreplace) %{_sysconfdir}/libvirt/virtinterfaced.conf
 %{_datadir}/augeas/lenses/virtinterfaced.aug
 %{_datadir}/augeas/lenses/tests/test_virtinterfaced.aug
@@ -849,8 +860,10 @@ exit 0
 %{_unitdir}/virtinterfaced-admin.socket
 %attr(0755, root, root) %{_sbindir}/virtinterfaced
 %{_libdir}/%{name}/connection-driver/libvirt_driver_interface.so
+%{_mandir}/man8/virtinterfaced.8*
 
 %files daemon-driver-network
+%config(noreplace) %{_sysconfdir}/sysconfig/virtnetworkd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnetworkd.conf
 %{_datadir}/augeas/lenses/virtnetworkd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnetworkd.aug
@@ -867,8 +880,10 @@ exit 0
 %dir %attr(0755, root, root) %{_localstatedir}/lib/libvirt/dnsmasq/
 %attr(0755, root, root) %{_libexecdir}/libvirt_leaseshelper
 %{_libdir}/%{name}/connection-driver/libvirt_driver_network.so
+%{_mandir}/man8/virtnetworkd.8*
 
 %files daemon-driver-nodedev
+%config(noreplace) %{_sysconfdir}/sysconfig/virtnodedevd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnodedevd.conf
 %{_datadir}/augeas/lenses/virtnodedevd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnodedevd.aug
@@ -878,8 +893,10 @@ exit 0
 %{_unitdir}/virtnodedevd-admin.socket
 %attr(0755, root, root) %{_sbindir}/virtnodedevd
 %{_libdir}/%{name}/connection-driver/libvirt_driver_nodedev.so
+%{_mandir}/man8/virtnodedevd.8*
 
 %files daemon-driver-nwfilter
+%config(noreplace) %{_sysconfdir}/sysconfig/virtnwfilterd
 %config(noreplace) %{_sysconfdir}/libvirt/virtnwfilterd.conf
 %{_datadir}/augeas/lenses/virtnwfilterd.aug
 %{_datadir}/augeas/lenses/tests/test_virtnwfilterd.aug
@@ -891,8 +908,10 @@ exit 0
 %dir %attr(0700, root, root) %{_sysconfdir}/libvirt/nwfilter/
 %ghost %dir %{_rundir}/libvirt/network/
 %{_libdir}/%{name}/connection-driver/libvirt_driver_nwfilter.so
+%{_mandir}/man8/virtnwfilterd.8*
 
 %files daemon-driver-qemu
+%config(noreplace) %{_sysconfdir}/sysconfig/virtqemud
 %config(noreplace) %{_sysconfdir}/libvirt/virtqemud.conf
 %{_datadir}/augeas/lenses/virtqemud.aug
 %{_datadir}/augeas/lenses/tests/test_virtqemud.aug
@@ -916,8 +935,10 @@ exit 0
 %dir %attr(0711, root, root) %{_localstatedir}/log/swtpm/libvirt/qemu/
 %{_bindir}/virt-qemu-run
 %{_mandir}/man1/virt-qemu-run.1*
+%{_mandir}/man8/virtqemud.8*
 
 %files daemon-driver-secret
+%config(noreplace) %{_sysconfdir}/sysconfig/virtsecretd
 %config(noreplace) %{_sysconfdir}/libvirt/virtsecretd.conf
 %{_datadir}/augeas/lenses/virtsecretd.aug
 %{_datadir}/augeas/lenses/tests/test_virtsecretd.aug
@@ -927,10 +948,12 @@ exit 0
 %{_unitdir}/virtsecretd-admin.socket
 %attr(0755, root, root) %{_sbindir}/virtsecretd
 %{_libdir}/%{name}/connection-driver/libvirt_driver_secret.so
+%{_mandir}/man8/virtsecretd.8*
 
 %files daemon-driver-storage
 
 %files daemon-driver-storage-core
+%config(noreplace) %{_sysconfdir}/sysconfig/virtstoraged
 %config(noreplace) %{_sysconfdir}/libvirt/virtstoraged.conf
 %{_datadir}/augeas/lenses/virtstoraged.aug
 %{_datadir}/augeas/lenses/tests/test_virtstoraged.aug
@@ -943,15 +966,14 @@ exit 0
 %{_libdir}/%{name}/connection-driver/libvirt_driver_storage.so
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_fs.so
 %{_libdir}/%{name}/storage-file/libvirt_storage_file_fs.so
+%{_mandir}/man8/virtstoraged.8*
 
 %files daemon-driver-storage-disk
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_disk.so
 
-%if 0%{with glusterfs}
 %files daemon-driver-storage-gluster
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_gluster.so
 %{_libdir}/%{name}/storage-file/libvirt_storage_file_gluster.so
-%endif
 
 %files daemon-driver-storage-iscsi
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_iscsi.so
@@ -971,6 +993,7 @@ exit 0
 %files daemon-kvm
 
 %files daemon-driver-vbox
+%config(noreplace) %{_sysconfdir}/sysconfig/virtvboxd
 %config(noreplace) %{_sysconfdir}/libvirt/virtvboxd.conf
 %{_datadir}/augeas/lenses/virtvboxd.aug
 %{_datadir}/augeas/lenses/tests/test_virtvboxd.aug
@@ -980,6 +1003,7 @@ exit 0
 %{_unitdir}/virtvboxd-admin.socket
 %attr(0755, root, root) %{_sbindir}/virtvboxd
 %{_libdir}/%{name}/connection-driver/libvirt_driver_vbox.so
+%{_mandir}/man8/virtvboxd.8*
 
 %files daemon-vbox
 
@@ -995,10 +1019,10 @@ exit 0
 %{_datadir}/libvirt/api/libvirt-lxc-api.xml
 
 %files docs
-%doc AUTHORS ChangeLog NEWS README README.md
-%doc %{_vpath_builddir}/libvirt-docs/*
+%doc AUTHORS.rst NEWS.rst README.rst
+%doc libvirt-docs/*
 
-%files libs -f %{_vpath_builddir}/%{name}.lang
+%files libs -f %{name}.lang
 %license COPYING COPYING.LESSER
 %config(noreplace) %{_sysconfdir}/libvirt/libvirt.conf
 %config(noreplace) %{_sysconfdir}/libvirt/libvirt-admin.conf
@@ -1010,28 +1034,7 @@ exit 0
 %dir %{_datadir}/libvirt/schemas/
 %dir %attr(0755, root, root) %{_localstatedir}/lib/libvirt/
 
-%{_datadir}/libvirt/schemas/basictypes.rng
-%{_datadir}/libvirt/schemas/capability.rng
-%{_datadir}/libvirt/schemas/cputypes.rng
-%{_datadir}/libvirt/schemas/domain.rng
-%{_datadir}/libvirt/schemas/domainbackup.rng
-%{_datadir}/libvirt/schemas/domaincaps.rng
-%{_datadir}/libvirt/schemas/domaincheckpoint.rng
-%{_datadir}/libvirt/schemas/domaincommon.rng
-%{_datadir}/libvirt/schemas/domainsnapshot.rng
-%{_datadir}/libvirt/schemas/interface.rng
-%{_datadir}/libvirt/schemas/network.rng
-%{_datadir}/libvirt/schemas/networkcommon.rng
-%{_datadir}/libvirt/schemas/networkport.rng
-%{_datadir}/libvirt/schemas/nodedev.rng
-%{_datadir}/libvirt/schemas/nwfilter.rng
-%{_datadir}/libvirt/schemas/nwfilter_params.rng
-%{_datadir}/libvirt/schemas/nwfilterbinding.rng
-%{_datadir}/libvirt/schemas/secret.rng
-%{_datadir}/libvirt/schemas/storagecommon.rng
-%{_datadir}/libvirt/schemas/storagepool.rng
-%{_datadir}/libvirt/schemas/storagepoolcaps.rng
-%{_datadir}/libvirt/schemas/storagevol.rng
+%{_datadir}/libvirt/schemas/*.rng
 
 %{_datadir}/libvirt/cpu_map/*.xml
 
@@ -1053,6 +1056,11 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
+* Tue Jan 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.10.0-1
+- Updating to version 7.10.0.
+- Switched to building with "meson".
+- Removed obsolete 'libvirt-bash-completion' subpackage.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-4
 - Use python3-docutils dependency instead of python-docutils
 - License verified (specify as LGPLv2+ rather than just LGPL)

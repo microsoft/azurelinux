@@ -11,7 +11,7 @@
             ],
             "Partitions": [
                 {
-                    "ID": "boot",
+                    "ID": "efi",
                     "Flags": [
                         "esp",
                         "boot"
@@ -21,8 +21,14 @@
                     "FsType": "fat32"
                 },
                 {
-                    "ID": "rootfs",
+                    "ID": "boot",
                     "Start": 9,
+                    "End": 509,
+                    "FsType": "ext4"
+                },
+                {
+                    "ID": "rootfs",
+                    "Start": 509,
                     "End": 0,
                     "FsType": "ext4"
                 }
@@ -35,9 +41,13 @@
             "BootType": "efi",
             "PartitionSettings": [
                 {
-                    "ID": "boot",
+                    "ID": "efi",
                     "MountPoint": "/boot/efi",
                     "MountOptions" : "umask=0077"
+                },
+                {
+                    "ID": "boot",
+                    "MountPoint": "/boot"
                 },
                 {
                     "ID": "rootfs",
