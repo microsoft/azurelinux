@@ -10171,8 +10171,8 @@
         "type": "other",
         "other": {
           "name": "libjpeg-turbo",
-          "version": "2.0.0",
-          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.0.0.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.2.tar.gz"
         }
       }
     },
