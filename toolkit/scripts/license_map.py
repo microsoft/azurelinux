@@ -56,7 +56,7 @@ def sort_licenses(license_collection):
         details["specs"] = sorted(set(details["specs"]), key=str.lower)
 
 
-def process_file(spec_path, license_collection, specs_in_files, specs_unknown_distro):
+def process_spec_file(spec_path, license_collection, specs_in_files, specs_unknown_distro):
     spec_name = spec_path.stem
 
     distribution = get_spec_source(spec_path)
@@ -82,9 +82,9 @@ def retrieve_license_info(file_paths, license_collection):
     for file_path in file_paths:
         if isdir(file_path):
             for spec_path in file_path.glob('**/*.spec'):
-                process_file(spec_path, updated_license_collection, specs_in_files, specs_unknown_distro)
+                process_spec_file(spec_path, updated_license_collection, specs_in_files, specs_unknown_distro)
         else:
-                process_file(file_path, updated_license_collection, specs_in_files, specs_unknown_distro)
+                process_spec_file(file_path, updated_license_collection, specs_in_files, specs_unknown_distro)
 
     specs_not_in_json = {}
     specs_not_in_files = {}
