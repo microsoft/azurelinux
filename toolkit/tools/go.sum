@@ -7,8 +7,8 @@ github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 h1:JYp7IbQjafo
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d h1:UQZhZ2O0vMHr2cI+DC1Mbh0TJxzA3RcLoMsFw+aXw7E=
 github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d/go.mod h1:rBZYJk541a8SKzHPHnH3zbiI+7dagKZ0cgpgrD7Fyho=
-github.com/bendahl/uinput v1.4.1 h1:ecxSLcVxWk0EFyZBtmCTnOKjK/HCNdsUcWXRTkNt06k=
-github.com/bendahl/uinput v1.4.1/go.mod h1:Np7w3DINc9wB83p12fTAM3DPPhFnAKP0WTXRqCQJ6Z8=
+github.com/bendahl/uinput v1.5.0 h1:W+QLck2vvOQeo8McsZzPgFJZEg8KP4IIYOB3mbVvTWY=
+github.com/bendahl/uinput v1.5.0/go.mod h1:Np7w3DINc9wB83p12fTAM3DPPhFnAKP0WTXRqCQJ6Z8=
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/cavaliercoder/go-cpio v0.0.0-20180626203310-925f9528c45e h1:hHg27A0RSSp2Om9lubZpiMgVbvn39bsUmW9U5h0twqc=
 github.com/cavaliercoder/go-cpio v0.0.0-20180626203310-925f9528c45e/go.mod h1:oDpT4efm8tSYHXV5tHSdRvBet/b/QzxZ+XyyPehvm3A=
