@@ -2,22 +2,24 @@ Summary:        Library for talking to WWAN modems and devices
 Name:           libmbim
 Version:        1.26.2
 Release:        1%{?dist}
-URL:            https://www.freedesktop.org/wiki/Software/libmbim/
-Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 License:        GPLv2
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://www.freedesktop.org/wiki/Software/libmbim/
+Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  libgudev-devel
 Requires:       libgudev
+
 %description
 The libmbim package contains a GLib-based library for talking to WWAN modems
 and devices which speak the Mobile Interface Broadband Model (MBIM) protocol.
 
 %package    devel
-Summary:    Header and development files for libmbim
-Requires:   %{name} = %{version}
-Requires:   libgudev-devel
+Summary:        Header and development files for libmbim
+Requires:       %{name} = %{version}
+Requires:       libgudev-devel
+
 %description    devel
 It contains the libraries and header files for libmbim
 
@@ -63,7 +65,9 @@ make  %{?_smp_mflags} check
 
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.18.2-1
 -   Update to 1.18.2. URL fixed. Source0 URL fixed. License verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.16.2-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Dec 10 2018 Alexey Makhalov <amakhalov@vmware.com> 1.16.2-1
 -   Initial build. First version
