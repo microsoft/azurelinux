@@ -1,7 +1,7 @@
 Summary:        Library for talking to WWAN modems and devices
 Name:           libmbim
-Version:        1.18.2
-Release:        2%{?dist}
+Version:        1.26.2
+Release:        1%{?dist}
 URL:            https://www.freedesktop.org/wiki/Software/libmbim/
 Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 License:        GPLv2
@@ -55,6 +55,9 @@ make  %{?_smp_mflags} check
 %{_datadir}/gtk-doc/*
 
 %changelog
+* Mon Jan 10 2022 Henry Li <lihl@microsoft.com> - 1.26.2-1
+- Upgrade to version 1.26.2
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.18.2-2
 - Added %%license line automatically
 
