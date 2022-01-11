@@ -2,7 +2,7 @@ Summary:        Terminal multiplexer
 Name:           tmux
 Version:        3.2a
 Release:        1%{?dist}
-License:        GPLv3+
+License:        ISC and BSD
 URL:            https://tmux.github.io/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -40,6 +40,7 @@ make  %{?_smp_mflags} check
 %changelog
 * Mon Jan 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2a-1
 - Update to version 3.2a.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7-3
 - Added %%license line automatically
