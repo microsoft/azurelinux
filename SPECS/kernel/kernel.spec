@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.78.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -221,6 +221,7 @@ Patch1182:      CVE-2021-43267.nopatch
 Patch1183:      CVE-2021-42739.nopatch
 Patch1184:      CVE-2021-42327.nopatch
 Patch1185:      CVE-2021-43389.nopatch
+Patch1186: CVE-2021-45480.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -572,6 +573,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 
 %changelog
+*   Tue Jan 11 2022 Mariner Autopatcher <cblmargh@microsoft.com> 5.10.78.1-3
+-   Added patch file(s) CVE-2021-45480.patch
 * Mon Nov 29 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
 - Enable CONFIG_COMPAT kernel configs
 
