@@ -1,7 +1,7 @@
 Summary:        Library for Neighbor Discovery Protocol
 Name:           libndp
-Version:        1.7
-Release:        3%{?dist}
+Version:        1.8
+Release:        1%{?dist}
 License:        LGPLv2+
 URL:            http://www.libndp.org/
 Source:         http://www.libndp.org/files/%{name}-%{version}.tar.gz
@@ -26,7 +26,6 @@ Headers and libraries for the libndp.
 %setup -q
 
 %build
-./autogen.sh
 %configure --disable-static
 make %{?_smp_mflags}
 
@@ -50,6 +49,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 1.8-1
+- Upgrade to version 1.8
+- Remove calling autogen, which does not exist in latest version
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.7-3
 - Remove libtool archive files from final packaging
 

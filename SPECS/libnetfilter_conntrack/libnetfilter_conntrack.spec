@@ -1,7 +1,7 @@
 Summary:    Netfilter conntrack userspace library
 Name:       libnetfilter_conntrack
-Version:    1.0.7
-Release:        5%{?dist}
+Version:    1.0.8
+Release:        1%{?dist}
 License:    GPLv2+
 URL:        http://www.netfilter.org/projects/libnetfilter_conntrack/index.html
 Group:      System Environment/Libraries
@@ -53,6 +53,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so
 
 %changelog
+* Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 1.0.8-1
+- Upgrade to version 1.0.8
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.7-5
 - Remove libtool archive files from final packaging
 
