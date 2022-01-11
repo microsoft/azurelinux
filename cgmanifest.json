@@ -10181,8 +10181,8 @@
         "type": "other",
         "other": {
           "name": "libkcapi",
-          "version": "1.2.0",
-          "downloadUrl": "https://www.chronox.de/libkcapi/libkcapi-1.2.0.tar.xz"
+          "version": "1.3.1",
+          "downloadUrl": "https://www.chronox.de/libkcapi/libkcapi-1.3.1.tar.xz"
         }
       }
     },
@@ -10281,8 +10281,8 @@
         "type": "other",
         "other": {
           "name": "liblognorm",
-          "version": "2.0.3",
-          "downloadUrl": "https://www.liblognorm.com/files/download/liblognorm-2.0.3.tar.gz"
+          "version": "2.0.6",
+          "downloadUrl": "https://www.liblognorm.com/files/download/liblognorm-2.0.6.tar.gz"
         }
       }
     },
@@ -10321,8 +10321,8 @@
         "type": "other",
         "other": {
           "name": "libmaxminddb",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.5.0/libmaxminddb-1.5.0.tar.gz"
+          "version": "1.6.0",
+          "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.6.0/libmaxminddb-1.6.0.tar.gz"
         }
       }
     },
