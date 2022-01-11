@@ -39,6 +39,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Fri Jan 07 2022 Henry Li <lihl@microsoft.com> - 5.10.78.1-3
+- Update to kernel release 5.10.78.1-3
+
 * Mon Nov 29 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
 - Update to kernel release 5.10.78.1-2
 
