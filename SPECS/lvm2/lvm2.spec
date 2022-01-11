@@ -336,6 +336,7 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %changelog
 * Fri Jan 07 2022 Thomas Crain <thcrain@microsoft.com> - 2.03.05-9
 - Remove references to lvmetad (removed from upstream in 2.03.0)
+- Bump required systemd version to 249
 - Use non-FTP source URL
 - Remove references to old patch files
 - License verified
