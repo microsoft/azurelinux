@@ -52,6 +52,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 1.8-1
 - Upgrade to version 1.8
 - Remove calling autogen, which does not exist in latest version
+- Verified License
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.7-3
 - Remove libtool archive files from final packaging
