@@ -158,13 +158,22 @@ export OPT="%{extension_cflags} %{openssl_flags}"
 %make_install
 %{_fixperms} %{buildroot}/*
 
+# Bootstrap pip3 which casues ptest build failure
+# The manual installation of pip in the RPM buildroot requires pip
+# to be already present in the chroot.
+# For toolchain builds, `pip` requirement is staisfied by raw-toolchain's
+# version of python, so it does not do anything.
+# For builds other than toolchain, we would require pip to be present.
+# The line below install pip in the build root using the recently
+# compiled python3.
+# NOTE: This is a NO-OP for the toolchain build.
+python3 Lib/ensurepip
+
 # Installing pip/setuptools via ensurepip fails in our toolchain.
 # The versions of these tools from the raw toolchain are detected,
 # and install fails. We will install these two bundled wheels manually.
 # https://github.com/pypa/pip/issues/3063
 # https://bugs.python.org/issue31916
-# Bootstrap pip3 which casues ptest build failure
-./python Lib/ensurepip
 pushd Lib/ensurepip/_bundled
 pip3 install --no-cache-dir --no-index --ignore-installed \
     --root %{buildroot} \
