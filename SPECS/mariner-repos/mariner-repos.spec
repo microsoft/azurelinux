@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,11 +20,7 @@ Source9:        mariner-microsoft-preview.repo
 Source10:       mariner-official-base.repo
 Source11:       mariner-official-preview.repo
 
-Requires(post): gpgme
-Requires(post): rpm
-
-Requires(preun): gpgme
-Requires(preun): rpm
+Requires:       %{name}-shared = %{version}-%{release}
 
 BuildArch:      noarch
 
@@ -34,7 +30,7 @@ CBL-Mariner repo files and gpg keys
 %package debuginfo
 Summary:        CBL-Mariner Debuginfo repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description debuginfo
 %{summary}
@@ -42,7 +38,7 @@ Requires:       %{name} = %{version}-%{release}
 %package debuginfo-preview
 Summary:        CBL-Mariner Debuginfo preview repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description debuginfo-preview
 %{summary}
@@ -50,7 +46,7 @@ Requires:       %{name} = %{version}-%{release}
 %package extended
 Summary:        CBL-Mariner Extended repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description extended
 %{summary}
@@ -58,7 +54,7 @@ Requires:       %{name} = %{version}-%{release}
 %package extended-preview
 Summary:        CBL-Mariner Extended preview repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description extended-preview
 %{summary}
@@ -66,7 +62,7 @@ Requires:       %{name} = %{version}-%{release}
 %package extras
 Summary:        CBL-Mariner Extras repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description extras
 %{summary}
@@ -74,7 +70,7 @@ Requires:       %{name} = %{version}-%{release}
 %package extras-preview
 Summary:        CBL-Mariner Extras preview repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description extras-preview
 %{summary}
@@ -82,7 +78,7 @@ Requires:       %{name} = %{version}-%{release}
 %package microsoft
 Summary:        CBL-Mariner Microsoft repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description microsoft
 %{summary}
@@ -90,7 +86,7 @@ Requires:       %{name} = %{version}-%{release}
 %package microsoft-preview
 Summary:        CBL-Mariner Microsoft preview repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description microsoft-preview
 %{summary}
@@ -98,9 +94,22 @@ Requires:       %{name} = %{version}-%{release}
 %package preview
 Summary:        CBL-Mariner preview repo file.
 Group:          System Environment/Base
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-shared = %{version}-%{release}
 
 %description preview
+%{summary}
+
+%package shared
+Summary:        Directories and files needed by all %{name} configurations.
+Group:          System Environment/Base
+
+Requires(post): gpgme
+Requires(post): rpm
+
+Requires(preun): gpgme
+Requires(preun): rpm
+
+%description shared
 %{summary}
 
 %install
@@ -123,11 +132,11 @@ install -d -m 755 $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE0} $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE1} $RPM_GPG_DIRECTORY
 
-%posttrans
+%posttrans shared
 gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
-%preun
+%preun shared
 # Remove the MICROSOFT-METADATA-GPG-KEY
 gpg --batch --yes --delete-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF
 # Remove the MICROSOFT-RPM-GPG-KEY
@@ -135,9 +144,6 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
 %files
 %defattr(-,root,root,-)
-%dir %{_sysconfdir}/yum.repos.d
-%{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
-%{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-base.repo
 
 %files debuginfo
@@ -176,7 +182,16 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-preview.repo
 
+%files shared
+%dir %{_sysconfdir}/yum.repos.d
+%{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
+%{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+
 %changelog
+* Mon Jan 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-4
+- Creating a separate "mariner-repos-shared" subpackage to make repo configurations
+  independent of each other.
+
 * Thu Dec 16 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-3
 - Corrected Repo URLS for 2.0.
 
