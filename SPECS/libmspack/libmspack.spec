@@ -1,7 +1,7 @@
 Summary:        A library that provides compression and decompression of file formats used by Microsoft
 Name:           libmspack
-Version:        0.7.1alpha
-Release:        4%{?dist}
+Version:        0.10.1alpha
+Release:        1%{?dist}
 License:        LGPLv2+
 URL:            http://www.cabextract.org.uk/libmspack/libmspack-0.5alpha.tar.gz
 Group:          Applications/System
@@ -39,11 +39,8 @@ cd test
 
 %files
 %defattr(-,root,root)
+%doc README TODO ChangeLog AUTHORS
 %license COPYING.LIB
-%{_bindir}/cabrip
-%{_bindir}/chmextract
-%{_bindir}/msexpand
-%{_bindir}/oabextract
 %{_libdir}/*.so.*
 
 %files  devel
@@ -53,6 +50,11 @@ cd test
 %{_libdir}/*.so
 
 %changelog
+* Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 0.10.1alpha-1
+- Upgrade to version 0.10.1alpha
+- Remove binaries under /usr/bin
+- Add README, TODO, ChangeLog, AUTHORS to the main package
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.1alpha-4
 - Remove libtool archive files from final packaging
 
