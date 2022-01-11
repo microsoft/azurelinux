@@ -158,13 +158,13 @@ export OPT="%{extension_cflags} %{openssl_flags}"
 %make_install
 %{_fixperms} %{buildroot}/*
 
-# Bootstrap pip3 which casues ptest build failure
+# Bootstrap `pip3` which casues ptest build failure.
 # The manual installation of pip in the RPM buildroot requires pip
 # to be already present in the chroot.
-# For toolchain builds, `pip` requirement is staisfied by raw-toolchain's
+# For toolchain builds, `pip3` requirement is staisfied by raw-toolchain's
 # version of python, so it does not do anything.
 # For builds other than toolchain, we would require pip to be present.
-# The line below install pip in the build root using the recently
+# The line below install pip in the build chroot using the recently
 # compiled python3.
 # NOTE: This is a NO-OP for the toolchain build.
 python3 Lib/ensurepip
