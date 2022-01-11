@@ -11,7 +11,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        kernel-%{version}.tar.gz
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         0002-add-linux-syscall-license-info.patch
-Patch2:         0003-CVE-2021-43976.patch
+Patch2:         CVE-2021-43976.patch
 BuildArch:      noarch
 
 %description

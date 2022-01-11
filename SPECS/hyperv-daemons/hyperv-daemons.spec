@@ -29,7 +29,7 @@ Source201:      hypervfcopyd.service
 Source202:      hypervfcopy.rules
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         0002-add-linux-syscall-license-info.patch
-Patch2:         0003-CVE-2021-43976.patch
+Patch2:         CVE-2021-43976.patch
 BuildRequires:  gcc
 Requires:       hypervfcopyd = %{version}-%{release}
 Requires:       hypervkvpd = %{version}-%{release}

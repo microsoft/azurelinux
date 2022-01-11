@@ -17,7 +17,7 @@ Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         0002-add-linux-syscall-license-info.patch
-Patch2:         0003-CVE-2021-43976.patch
+Patch2:         CVE-2021-43976.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
