@@ -12672,7 +12672,7 @@
         "other": {
           "name": "lvm2",
           "version": "2.03.05",
-          "downloadUrl": "ftp://sourceware.org/pub/lvm2/releases/LVM2.2.03.05.tgz"
+          "downloadUrl": "https://sourceware.org/pub/lvm2/LVM2.2.03.05.tgz"
         }
       }
     },
