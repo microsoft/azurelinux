@@ -1,4 +1,4 @@
-Summary:        Simple, small, efficient, C++ XML parser that can be easily integrated into other programs. 
+Summary:        Simple, small, efficient, C++ XML parser that can be easily integrated into other programs.
 Name:           tinyxml2
 Version:        9.0.0
 Release:        1%{?dist}
@@ -39,13 +39,13 @@ make install DESTDIR=%{buildroot}
 %files
 %doc readme.md
 %license LICENSE.txt
-/usr/lib64/*.so.*
+%{_lib64dir}/*.so.*
 
 %files devel
 %{_includedir}/*
-/usr/lib64/cmake/tinyxml2
-/usr/lib64/*.so
-/usr/lib64/pkgconfig/tinyxml2.pc
+%{_lib64dir}/cmake/tinyxml2
+%{_lib64dir}/*.so
+%{_lib64dir}/pkgconfig/tinyxml2.pc
 
 %changelog
 * Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.0-1
