@@ -1,8 +1,8 @@
 %global srcname nose2
 
 Name:           python-%{srcname}
-Version:        0.9.1
-Release:        5%{?dist}
+Version:        0.10.0
+Release:        1%{?dist}
 Summary:        Next generation of nicer testing for Python
 
 License:        BSD
@@ -15,14 +15,7 @@ BuildRequires: python%{python3_pkgversion}-devel
 BuildRequires: python%{python3_pkgversion}-setuptools
 BuildRequires: python%{python3_pkgversion}-six
 BuildRequires: python%{python3_pkgversion}-mock
-BuildRequires: python%{python3_pkgversion}-cov-core
-%if 0%{?with_python3_other}
-BuildRequires:  python%{python3_other_pkgversion}-devel
-BuildRequires:  python%{python3_other_pkgversion}-setuptools
-BuildRequires:  python%{python3_other_pkgversion}-six
-BuildRequires:  python%{python3_other_pkgversion}-mock
-BuildRequires:  python%{python3_other_pkgversion}-cov-core
-%endif
+BuildRequires: python%{python3_pkgversion}-coverage
 
 %description
 nose2 is the next generation of nicer testing for Python, based on the plugins
@@ -42,7 +35,7 @@ Summary:        Next generation of nicer testing for Python
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Requires:       python%{python3_pkgversion}-setuptools
 Requires:       python%{python3_pkgversion}-six >= 1.6
-Requires:       python%{python3_pkgversion}-cov-core >= 1.12
+Requires:       python%{python3_pkgversion}-coverage
 Conflicts:      python2-%{srcname} < 0.7.4-3
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -58,53 +51,20 @@ In service of some those goals, some features of nose will not be supported in
 nose2. See the documentation for a thorough rundown.
 
 
-%if 0%{?with_python3_other}
-%package -n python%{python3_other_pkgversion}-%{srcname}
-Summary:        Next generation of nicer testing for Python
-%{?python_provide:%python_provide python%{python3_other_pkgversion}-%{srcname}}
-Requires:       python%{python3_other_pkgversion}-setuptools
-Requires:       python%{python3_other_pkgversion}-six >= 1.6
-Requires:       python%{python3_other_pkgversion}-cov-core >= 1.12
-
-%description -n python%{python3_other_pkgversion}-%{srcname}
-nose2 is the next generation of nicer testing for Python, based on the plugins
-branch of unittest2. nose2 aims to improve on nose by:
-- providing a better plugin API
-- being easier for users to configure
-- simplifying internal interfaces and processes
-- supporting Python 2 and 3 from the same codebase, without translation
-- encouraging greater community involvement in its development
-
-In service of some those goals, some features of nose will not be supported in
-nose2. See the documentation for a thorough rundown.
-%endif
-
-
 %prep
 %autosetup -n %{srcname}-%{version} -p0
 
 
 %build
 %py3_build
-%if 0%{?with_python3_other}
-%py3_other_build
-%endif
 
 
 %install
-# Must do the default install last because the scripts in /usr/bin are
-# overwritten with every setup.py install.
-%if 0%{?with_python3_other}
-%py3_other_install
-%endif
 %py3_install
 
 
 %check
 PYTHONPATH=`pwd` %{__python3} -m nose2.__main__ -v
-%if 0%{?with_python3_other}
-PYTHONPATH=`pwd` %{__python3_other} -m nose2.__main__ -v
-%endif
 
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -114,18 +74,11 @@ PYTHONPATH=`pwd` %{__python3_other} -m nose2.__main__ -v
 %{_bindir}/nose2-%{python3_version}
 %{_bindir}/nose2
 
-%if 0%{?with_python3_other}
-%files -n python%{python3_other_pkgversion}-%{srcname}
-%license license.txt
-%doc README.rst
-%{python3_other_sitelib}/*
-%{_bindir}/nose2-%{python3_other_version}
-%endif
-
 
 %changelog
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 0.9.1-5
-- Add to SPECS-EXTENDED from Fedora
+- Initial CBL-Mariner import from Fedora 33 (license: BSD)
+- Update source to 0.10.0
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

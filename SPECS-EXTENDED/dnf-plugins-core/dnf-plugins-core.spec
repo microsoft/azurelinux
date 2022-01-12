@@ -10,8 +10,8 @@ Distribution:   Mariner
 %bcond_without yumutils
 
 Name:           dnf-plugins-core
-Version:        4.0.18
-Release:        5%{?dist}
+Version:        4.0.24
+Release:        1%{?dist}
 Summary:        Core Plugins for DNF
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/dnf-plugins-core
@@ -30,6 +30,7 @@ Provides:       dnf-command(debug-dump)
 Provides:       dnf-command(debug-restore)
 Provides:       dnf-command(debuginfo-install)
 Provides:       dnf-command(download)
+Provides:       dnf-command(groups-manager)
 Provides:       dnf-command(repoclosure)
 Provides:       dnf-command(repograph)
 Provides:       dnf-command(repomanage)
@@ -45,6 +46,7 @@ Provides:       dnf-plugin-debuginfo-install = %{version}-%{release}
 Provides:       dnf-plugin-download = %{version}-%{release}
 Provides:       dnf-plugin-generate_completion_cache = %{version}-%{release}
 Provides:       dnf-plugin-needs_restarting = %{version}-%{release}
+Provides:       dnf-plugin-groups-manager = %{version}-%{release}
 Provides:       dnf-plugin-repoclosure = %{version}-%{release}
 Provides:       dnf-plugin-repodiff = %{version}-%{release}
 Provides:       dnf-plugin-repograph = %{version}-%{release}
@@ -59,20 +61,21 @@ Conflicts:      dnf-plugins-extras-common-data < %{dnf_plugins_extra}
 
 %description
 Core Plugins for DNF. This package enhances DNF with builddep, config-manager,
-copr, debug, debuginfo-install, download, needs-restarting, repoclosure,
+copr, debug, debuginfo-install, download, needs-restarting, groups-manager, repoclosure,
 repograph, repomanage, reposync, changelog and repodiff commands. Additionally
 provides generate_completion_cache passive plugin.
 
 %package -n python3-%{name}
 Summary:    Core Plugins for DNF
 %{?python_provide:%python_provide python3-%{name}}
+BuildRequires:  python3-dbus
 BuildRequires:  python3-devel
 BuildRequires:  python3-dnf >= %{dnf_lowest_compatible}
 %if %{with_check}
 BuildRequires:  python3-nose2
 %endif
 Requires:       python3-distro
-
+Requires:       python3-dbus
 Requires:       python3-dnf >= %{dnf_lowest_compatible}
 Requires:       python3-hawkey >= %{hawkey_version}
 Requires:       python3-dateutil
@@ -93,7 +96,8 @@ Conflicts:      python-%{name} < %{version}-%{release}
 %description -n python3-%{name}
 Core Plugins for DNF, Python 3 interface. This package enhances DNF with builddep,
 config-manager, copr, debug, debuginfo-install, download, needs-restarting,
-repoclosure, repograph, repomanage, reposync, changelog and repodiff commands.
+groups-manager, repoclosure, repograph, repomanage, reposync, changelog
+and repodiff commands.
 Additionally provides generate_completion_cache passive plugin.
 
 %if %{with yumutils}
@@ -115,8 +119,8 @@ Summary:        Yum-utils CLI compatibility layer
 %description -n %{yum_utils_subpackage_name}
 As a Yum-utils CLI compatibility layer, supplies in CLI shims for
 debuginfo-install, repograph, package-cleanup, repoclosure, repomanage,
-repoquery, reposync, repotrack, repodiff, builddep, config-manager, debug
-and download that use new implementations using DNF.
+repoquery, reposync, repotrack, repodiff, builddep, config-manager, debug,
+download and yum-groups-manager that use new implementations using DNF.
 %endif
 
 %package -n python3-dnf-plugin-leaves
@@ -234,6 +238,7 @@ ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yum-builddep
 ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yum-config-manager
 ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yum-debug-dump
 ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yum-debug-restore
+ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yum-groups-manager
 ln -sf %{_libexecdir}/dnf-utils %{buildroot}%{_bindir}/yumdownloader
 # These commands don't have a dedicated man page, so let's just point them
 # to the utils page which contains their descriptions.
@@ -254,6 +259,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %{_mandir}/man8/dnf-debuginfo-install.*
 %{_mandir}/man8/dnf-download.*
 %{_mandir}/man8/dnf-generate_completion_cache.*
+%{_mandir}/man8/dnf-groups-manager.*
 %{_mandir}/man8/dnf-needs-restarting.*
 %{_mandir}/man8/dnf-repoclosure.*
 %{_mandir}/man8/dnf-repodiff.*
@@ -283,6 +289,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %{python3_sitelib}/dnf-plugins/debuginfo-install.py
 %{python3_sitelib}/dnf-plugins/download.py
 %{python3_sitelib}/dnf-plugins/generate_completion_cache.py
+%{python3_sitelib}/dnf-plugins/groups_manager.py
 %{python3_sitelib}/dnf-plugins/needs_restarting.py
 %{python3_sitelib}/dnf-plugins/repoclosure.py
 %{python3_sitelib}/dnf-plugins/repodiff.py
@@ -297,6 +304,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %{python3_sitelib}/dnf-plugins/__pycache__/debuginfo-install.*
 %{python3_sitelib}/dnf-plugins/__pycache__/download.*
 %{python3_sitelib}/dnf-plugins/__pycache__/generate_completion_cache.*
+%{python3_sitelib}/dnf-plugins/__pycache__/groups_manager.*
 %{python3_sitelib}/dnf-plugins/__pycache__/needs_restarting.*
 %{python3_sitelib}/dnf-plugins/__pycache__/repoclosure.*
 %{python3_sitelib}/dnf-plugins/__pycache__/repodiff.*
@@ -323,6 +331,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %{_bindir}/yum-config-manager
 %{_bindir}/yum-debug-dump
 %{_bindir}/yum-debug-restore
+%{_bindir}/yum-groups-manager
 %{_bindir}/yumdownloader
 %{_mandir}/man1/debuginfo-install.*
 %{_mandir}/man1/needs-restarting.*
@@ -335,6 +344,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %{_mandir}/man1/yum-config-manager.*
 %{_mandir}/man1/yum-debug-dump.*
 %{_mandir}/man1/yum-debug-restore.*
+%{_mandir}/man1/yum-groups-manager.*
 %{_mandir}/man1/yumdownloader.*
 %{_mandir}/man1/package-cleanup.*
 %{_mandir}/man1/dnf-utils.*
@@ -356,6 +366,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %exclude %{_mandir}/man1/yum-config-manager.*
 %exclude %{_mandir}/man1/yum-debug-dump.*
 %exclude %{_mandir}/man1/yum-debug-restore.*
+%exclude %{_mandir}/man1/yum-groups-manager.*
 %exclude %{_mandir}/man1/yumdownloader.*
 %exclude %{_mandir}/man1/package-cleanup.*
 %exclude %{_mandir}/man1/dnf-utils.*
@@ -400,8 +411,9 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %endif
 
 %changelog
-* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com>  - 4.0.18-6
-- upgrade to undeprecated python3-nose2
+* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 4.0.24-1
+- Upgrade to undeprecated python3-nose2
+- Update source to 4.0.24
 
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 4.0.18-5
 - Only require python3-nose when building tests

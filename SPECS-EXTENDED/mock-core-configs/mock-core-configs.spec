@@ -1,6 +1,6 @@
 Name:       mock-core-configs
-Version:    36.3
-Release:    2%{?dist}
+Version:    36.4
+Release:    1%{?dist}
 Summary:    Mock core config files basic chroots
 
 License:    GPLv2+
@@ -24,20 +24,6 @@ Requires:   mock >= 2.5
 Requires:   mock-filesystem
 
 Requires(post): coreutils
-%if 0%{?fedora} || 0%{?mageia} || 0%{?rhel} > 7
-# to detect correct default.cfg
-Requires(post): python3-dnf
-Requires(post): python3-hawkey
-Requires(post): system-release
-Requires(post): python3
-Requires(post): sed
-%endif
-%if 0%{?rhel} && 0%{?rhel} <= 7
-# to detect correct default.cfg
-Requires(post): python
-Requires(post): yum
-Requires(post): /etc/os-release
-%endif
 
 %description
 Config files which allow you to create chroots for:
@@ -48,33 +34,10 @@ Config files which allow you to create chroots for:
  * OpenSuse Tumbleweed and Leap
 
 %prep
-%setup -q
+%setup -q -n mock-%{name}-%{version}-1/mock-core-configs
 
 
 %build
-HOST=none
-%if 0%{?fedora}
-HOST="fedora-%{fedora}"
-%endif
-%if 0%{?rhel}
-HOST="rhel-%{rhel}"
-%endif
-
-# host overrides
-case $HOST in
-  rhel-7)
-    # RPM on EL7 doesn't link against libzstd, and newer Fedora is compressed
-    # using ZSTD.  We need to enable bootstrap image here to be able to
-    # initialize the Fedora bootstrap chroot.
-    for config in etc/mock/fedora-*-*.cfg; do
-        version=$(echo "$config" | cut -d- -f2)
-        if test $version = rawhide || test $version -ge 31; then
-            echo "config_opts['use_bootstrap_image'] = True" >> "$config"
-        fi
-    done
-    ;;
-esac
-
 
 %install
 mkdir -p %{buildroot}%{_sysusersdir}
@@ -108,30 +71,9 @@ sed -i "s~@MOCK_DOCS@~$mock_docs~" %{buildroot}%{_sysconfdir}/mock/site-defaults
 
 %post
 if [ -s /etc/os-release ]; then
-    # fedora and rhel7+
-    if grep -Fiq Rawhide /etc/os-release; then
-        ver=rawhide
-    # mageia
-    elif [ -s /etc/mageia-release ]; then
-        if grep -Fiq Cauldron /etc/mageia-release; then
-           ver=cauldron
-        fi
-    else
-        ver=$(source /etc/os-release && echo $VERSION_ID | cut -d. -f1 | grep -o '[0-9]\+')
-    fi
-else
-    # something obsure, use buildtime version
-    ver=%{?rhel}%{?fedora}%{?mageia}
+    ver=$(source /etc/os-release && echo $VERSION_ID | cut -d. -f1 | grep -o '[0-9]\+')
 fi
-%if 0%{?fedora} || 0%{?mageia} || 0%{?rhel} > 7
-if [ -s /etc/mageia-release ]; then
-    mock_arch=$(sed -n '/^$/!{$ s/.* \(\w*\)$/\1/p}' /etc/mageia-release)
-else
-    mock_arch=$(python3 -c "import dnf.rpm; import hawkey; print(dnf.rpm.basearch(hawkey.detect_arch()))")
-fi
-%else
 mock_arch=$(python -c "import rpmUtils.arch; baseArch = rpmUtils.arch.getBaseArch(); print baseArch")
-%endif
 cfg=%{?fedora:fedora}%{?rhel:epel}%{?mageia:mageia}-$ver-${mock_arch}.cfg
 if [ -e %{_sysconfdir}/mock/$cfg ]; then
     if [ "$(readlink %{_sysconfdir}/mock/default.cfg)" != "$cfg" ]; then
@@ -149,8 +91,9 @@ fi
 %ghost %config(noreplace,missingok) %{_sysconfdir}/mock/default.cfg
 
 %changelog
-* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 36.3-2
-- Add to SPECS-EXTENDED from Fedora
+* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 36.4-1
+- Initial CBL-Mariner import from Fedora 33 (license: GPLv2)
+- Update to 36.4 source
 
 * Fri Oct 29 2021 Pavel Raiskup <praiskup@redhat.com> 36.3-1
 - add EuroLinux 8 aarch64 (alex@euro-linux.com)

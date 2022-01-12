@@ -1,12 +1,5 @@
 %global srcname pyroute2
 
-%{!?python3_pkgversion:%global python3_pkgversion 3}
-
-# FIXME(hguemar): Fix for EL7, in summary
-# Fedora => python3 only
-# EL7 => python2 only
-# EL>7 => python3 only
-
 Name: python-%{srcname}
 Version: 0.5.14
 Release: 4%{?dist}
@@ -53,7 +46,7 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 
 %changelog
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 0.5.14-4
-- Add to SPECS-EXTENDED from Fedora
+- Initial CBL-Mariner import from Fedora 33 (license: GPLv2)
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.14-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

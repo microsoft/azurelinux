@@ -1,16 +1,14 @@
-%bcond_with lint
 %bcond_without tests
 
 # mock group id allocate (Must not overlap with any other gid in Mariner)
 %global mockgid 135
 
-%global __python %{__python3}
 %global python_sitelib %{python3_sitelib}
 
 Summary: Builds packages inside chroots
 Name: mock
-Version: 2.15
-Release: 2%{?dist}
+Version: 2.16
+Release: 1%{?dist}
 License: GPLv2+
 # Source is created by
 # git clone https://github.com/rpm-software-management/mock.git
@@ -24,7 +22,6 @@ Requires: tar
 Requires: pigz
 Requires: usermode
 Requires: createrepo_c
-# Requires 'mock-core-configs', or replacement (GitHub PR#544).
 Requires: mock-configs
 Requires: %{name}-filesystem
 Requires: systemd
@@ -37,9 +34,6 @@ Requires: python3-rpm
 Requires: python3-pyroute2
 Requires: python3-templated-dictionary
 BuildRequires: python3-devel
-%if %{with lint}
-BuildRequires: pylint
-%endif
 Requires: dnf
 Suggests: yum
 Requires: dnf-plugins-core
@@ -86,10 +80,7 @@ Requires(pre):  shadow-utils
 Filesystem layout and group for Mock.
 
 %prep
-%setup -q
-for file in py/mock.py py/mock-parse-buildlog.py; do
-  sed -i 1"s|#!/usr/bin/python3 |#!%{__python} |" $file
-done
+%setup -q -n mock-%{name}-%{version}-1/mock
 
 %build
 for i in py/mock.py py/mock-parse-buildlog.py; do
@@ -154,11 +145,6 @@ getent group mock > /dev/null || groupadd -f -g %mockgid -r mock
 exit 0
 
 %check
-%if %{with lint}
-# ignore the errors for now, just print them and hopefully somebody will fix it one day
-pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
-%endif
-
 %if %{with tests}
 ./run-tests.sh
 %endif
@@ -217,8 +203,9 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %dir  %{_datadir}/cheat
 
 %changelog
-* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 2.15-2
-- Add to SPECS-EXTENDED from Fedora, lint spec
+* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 2.16-1
+- Initial CBL-Mariner import from Fedora 33 (license: GPLv2)
+- Update to 2.16 source
 
 * Thu Nov 18 2021 Pavel Raiskup <praiskup@redhat.com> 2.15-1
 - argparse: handle old-style commands *before* ignoring "--" (awilliam@redhat.com)

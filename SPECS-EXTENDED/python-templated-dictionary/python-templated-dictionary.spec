@@ -1,13 +1,9 @@
 %global srcname templated-dictionary
 %global python3_pkgversion 3
 
-%if 0%{?rhel} == 7
-%global python3_pkgversion 36
-%endif
-
 Name:       python-%{srcname}
 Version:    1.1
-Release:    6%{?dist}
+Release:    5%{?dist}
 Summary:    Dictionary with Jinja2 expansion
 
 License:    GPLv2+
@@ -38,7 +34,7 @@ Summary: %{summary}
 
 
 %prep
-%setup -q
+%setup -q -n %{srcname}-%{version}
 
 
 %build
@@ -49,14 +45,14 @@ version="%version" python3 setup.py install -O1 --skip-build --root %{buildroot}
 
 
 %files -n python3-%{srcname}
-%license LICENSE
+# %%license LICENSE
 # Annoyingly, the build produces templated_dictionary with an '_', 
 # not matching up with srcname which uses '-'
 %{python3_sitelib}/templated_dictionary*
 
 %changelog
-* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 1.60-2
-- Add to SPECS-EXTENDED from Fedora
+* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 1.1-5
+- Initial CBL-Mariner import from Fedora 33 (license: GPLv2)
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
