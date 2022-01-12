@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://www.libndp.org/
 Source:         http://www.libndp.org/files/%{name}-%{version}.tar.gz
-%define sha1 libndp=1458d2a70c6bc4cdcbf525e02582060e799778bc
 
 %description
 This package contains a library which provides a wrapper
@@ -53,6 +52,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Upgrade to version 1.8
 - Remove calling autogen, which does not exist in latest version
 - Verified License
+- Remove sha1 macro
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.7-3
 - Remove libtool archive files from final packaging

@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.netfilter.org/projects/libnetfilter_conntrack/index.html
 Source0:        http://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
-%define sha1 libnetfilter_conntrack=5ea797b62b5add69ad2c769734f7a6f597c71ebd
 BuildRequires:  kernel-headers
 BuildRequires:  libmnl-devel
 BuildRequires:  libnfnetlink-devel
@@ -55,6 +54,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 1.0.8-1
 - Upgrade to version 1.0.8
 - Verified License
+- Remove sha1 macro
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.7-5
 - Remove libtool archive files from final packaging
