@@ -1,9 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-rt20-%{release}
-%ifarch aarch64
-%global __provides_exclude_from %{_libdir}/debug/.build-id/
-%endif
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        5.15.2.1
@@ -19,7 +16,7 @@ Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
 Patch1:         0002-add-linux-syscall-license-info.patch
-Patch2:        0003-realtime20.patch
+Patch2:         0003-realtime20.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -145,12 +142,6 @@ arch="x86_64"
 archdir="x86"
 %endif
 
-%ifarch aarch64
-cp %{SOURCE2} .config
-arch="arm64"
-archdir="arm64"
-%endif
-
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=${arch} oldconfig
@@ -171,7 +162,7 @@ if [ -s config_diff ]; then
 fi
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
+cp %{SOURCE3} certs/mariner.pem
 
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
 
@@ -208,11 +199,6 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
-%endif
-
-%ifarch aarch64
-install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
-install -D -m 640 arch/arm64/boot/dts/freescale/imx8mq-evk.dtb %{buildroot}/boot/dtb/fsl-imx8mq-evk.dtb
 %endif
 
 # Restrict the permission on System.map-X file
@@ -258,10 +244,6 @@ install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
-
-%ifarch aarch64
-cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
-%endif
 
 # disable (JOBS=1) parallel build to fix this issue:
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
@@ -321,10 +303,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
-%ifarch aarch64
-%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
-%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux
-%endif
 
 %files docs
 %defattr(-,root,root)
@@ -349,9 +327,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %ifarch x86_64
 %{_lib64dir}/traceevent
 %endif
-%ifarch aarch64
-%{_libdir}/traceevent
-%endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file
@@ -364,16 +339,15 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files -n python3-perf
 %{python3_sitearch}/*
 
-%ifarch aarch64
-%files dtb
-/boot/dtb/fsl-imx8mq-evk.dtb
-%endif
-
 %files -n bpftool
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jan 11 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-1
+- Create realtime variant of kernel-5.15.2.1
+- Remove all references to aarch64
+
 * Thu Jan 06 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-1
 - Update source to 5.15.2.1
 
