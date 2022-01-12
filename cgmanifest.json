@@ -16134,8 +16134,8 @@
         "type": "other",
         "other": {
           "name": "parted",
-          "version": "3.2",
-          "downloadUrl": "http://ftp.gnu.org/gnu/parted/parted-3.2.tar.xz"
+          "version": "3.4",
+          "downloadUrl": "http://ftp.gnu.org/gnu/parted/parted-3.4.tar.xz"
         }
       }
     },

@@ -52,6 +52,7 @@ rm -rf %{buildroot}%{_infodir}/dir
 %changelog
 * Tue Dec 21 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.4-1
 - Upgrading to 3.4
+- License verified.
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-12
 - Remove libtool archive files from final packaging
