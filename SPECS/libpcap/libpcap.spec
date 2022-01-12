@@ -1,7 +1,7 @@
 Summary:        C/C++ library for network traffic capture
 Name:           libpcap
-Version:        1.9.1
-Release:        2%{?dist}
+Version:        1.10.1
+Release:        1%{?dist}
 License:        BSD
 URL:            https://www.tcpdump.org/
 Group:          Networking/Libraries
@@ -68,6 +68,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man7/*
 
 %changelog
+* Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.10.1-1
+- Upgrade to version 1.10.1
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.9.1-2
 - Added %%license line automatically
 

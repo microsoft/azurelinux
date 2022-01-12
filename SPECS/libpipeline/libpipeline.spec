@@ -1,7 +1,7 @@
 Summary:        Library for manipulating pipelines
 Name:           libpipeline
-Version:        1.5.0
-Release:        5%{?dist}
+Version:        1.5.5
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://libpipeline.nongnu.org
 Group:          Applications/System
@@ -54,6 +54,9 @@ make -C tests check
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.5.5-1
+- Upgrade to version 1.5.5
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.0-5
 - Remove libtool archive files from final packaging
 

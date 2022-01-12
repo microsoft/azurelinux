@@ -10581,8 +10581,8 @@
         "type": "other",
         "other": {
           "name": "libnl3",
-          "version": "3.4.0",
-          "downloadUrl": "https://github.com/thom311/libnl/releases/download/libnl3_4_0/libnl-3.4.0.tar.gz"
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/thom311/libnl/releases/download/libnl3_5_0/libnl-3.5.0.tar.gz"
         }
       }
     },
@@ -10601,8 +10601,8 @@
         "type": "other",
         "other": {
           "name": "libnsl2",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/thkukuk/libnsl/archive/v1.2.0/libnsl-1.2.0.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/thkukuk/libnsl/archive/v2.0.0/libnsl-2.0.0.tar.gz"
         }
       }
     },
@@ -10791,8 +10791,8 @@
         "type": "other",
         "other": {
           "name": "libpcap",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz"
+          "version": "1.10.1",
+          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.1.tar.gz"
         }
       }
     },
@@ -10831,8 +10831,8 @@
         "type": "other",
         "other": {
           "name": "libpipeline",
-          "version": "1.5.0",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz"
+          "version": "1.5.5",
+          "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.5.tar.gz"
         }
       }
     },
@@ -10891,8 +10891,8 @@
         "type": "other",
         "other": {
           "name": "libpsl",
-          "version": "0.20.2",
-          "downloadUrl": "https://github.com/rockdaboot/libpsl/releases/download/libpsl-0.20.2/libpsl-0.20.2.tar.gz"
+          "version": "0.21.1",
+          "downloadUrl": "https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz"
         }
       }
     },

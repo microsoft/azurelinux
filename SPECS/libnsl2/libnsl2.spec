@@ -1,8 +1,8 @@
 Summary:        Libraries for the public client interface for NIS(YP) and NIS+.
 Name:           libnsl2
-Version:        1.2.0
-Release:        5%{?dist}
-Source0:        https://github.com/thkukuk/libnsl/archive/v1.2.0/libnsl-1.2.0.tar.gz
+Version:        2.0.0
+Release:        1%{?dist}
+Source0:        https://github.com/thkukuk/libnsl/archive/v%{version}/libnsl-%{version}.tar.gz
 License:        BSD and GPLv2+
 Group:          System Environment/Libraries
 URL:            https://github.com/thkukuk/libnsl
@@ -56,6 +56,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 2.0.0-1
+- Upgrade to version 2.0.0
+- Modify Source0 field to use macros
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.0-5
 - Remove libtool archive files from final packaging
 
