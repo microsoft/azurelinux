@@ -28147,8 +28147,8 @@
         "type": "other",
         "other": {
           "name": "tinyxml2",
-          "version": "7.1.0",
-          "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/7.1.0.tar.gz"
+          "version": "9.0.0",
+          "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/9.0.0.tar.gz"
         }
       }
     },
