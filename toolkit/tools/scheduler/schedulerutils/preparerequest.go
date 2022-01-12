@@ -14,7 +14,7 @@ import (
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
 // - It will group similar build nodes together into AncillaryNodes.
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, isCacheAllowed bool, forceUseCache bool, noDepRebuild string) (requests []*BuildRequest) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -34,7 +34,11 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			AncillaryNodes: []*pkggraph.PkgNode{node},
 		}
 
-		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState)
+        if forceUseCache == true {
+            req.CanUseCache = true
+        } else {
+		    req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, noDepRebuild)
+        }
 
 		requests = append(requests, req)
 	}
@@ -48,7 +52,11 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			AncillaryNodes: nodes,
 		}
 
-		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState)
+        if forceUseCache == true {
+            req.CanUseCache = true
+        } else {
+		    req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, noDepRebuild)
+        }
 
 		requests = append(requests, req)
 	}
@@ -60,7 +68,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 // - It will check if the node corresponds to an entry in packagesToRebuild.
 // - It will check if all dependencies of the node were also cached. Exceptions:
 //		- "TypePreBuilt" nodes must use the cache and have no dependencies to check.
-func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState) (canUseCache bool) {
+func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []string, buildState *GraphBuildState, noDepRebuild string) (canUseCache bool) {
 	// The "TypePreBuilt" nodes always use the cache.
 	if node.Type == pkggraph.TypePreBuilt {
 		canUseCache = true
@@ -74,6 +82,12 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pac
 		logger.Log.Debugf("Marking (%s) for rebuild per user request", specName)
 		return
 	}
+
+    // Don't rebuild package even if its dependency is newly built. Makes sense while running TestRPM
+    if noDepRebuild == "y" {
+        canUseCache = true
+        return
+    }
 
 	// If any of the node's dependencies were built instead of being cached then a build is required.
 	dependencies := pkgGraph.From(node.ID())

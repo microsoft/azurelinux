@@ -73,6 +73,7 @@ var (
 
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
+    rpmHydratedTest = app.Flag("rpm-hydrated-test", "Is this just a TestRPM build with all RPMs hydrated?").String()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -228,7 +229,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, chann
 	// Start the workers now so they begin working as soon as a new job is queued.
 	for i := 0; i < workers; i++ {
 		logger.Log.Debugf("Starting worker #%d", i)
-		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts, ignoredPackages)
+		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts, ignoredPackages, *rpmHydratedTest)
 	}
 
 	return
@@ -263,7 +264,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
-		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, buildState, canUseCache)
+		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, buildState, canUseCache, false, *rpmHydratedTest)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
 			channels.Requests <- req
@@ -287,7 +288,29 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		// Process the the next build result
 		res := <-channels.Results
 		schedulerutils.PrintBuildResult(res)
-		buildState.RecordBuildResult(res)
+        if res.Err == nil {
+		    buildState.RecordBuildResult(res)
+        } else {
+            if *rpmHydratedTest == "n" {
+		        buildState.RecordBuildResult(res)
+            } else {
+                logger.Log.Warnf("Failed to build '%s'. Rebuilding it with to use from cache", res.Node.SRPMFileName())
+                var pkgToBuild []*pkggraph.PkgNode
+                pkgToBuild = append(pkgToBuild, res.Node)
+	    	    newRequests = schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, pkgToBuild, packagesNamesToRebuild, buildState, canUseCache, true, *rpmHydratedTest)
+        		for _, req := range newRequests {
+                    logger.Log.Warnf("Re Firing build '%s'", req.Node.SRPMFileName())
+	        		buildState.RecordBuildRequest(req)
+	    	    	channels.Requests <- req
+        		}
+                newRequests = nil
+
+    	    	// Process the the next build result
+	        	res = <-channels.Results
+    		    schedulerutils.PrintBuildResult(res)
+    		    buildState.RecordBuildResult(res)
+            }
+        }
 
 		if !stopBuilding {
 			if res.Err == nil {

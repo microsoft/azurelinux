@@ -45,7 +45,7 @@ type BuildResult struct {
 }
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
-func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, ignoredPackages []string) {
+func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, ignoredPackages []string, rpmHydratedBuild string) {
 	for req := range channels.Requests {
 		select {
 		case <-channels.Cancel:
@@ -61,7 +61,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 		switch req.Node.Type {
 		case pkggraph.TypeBuild:
-			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
+			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages, rpmHydratedBuild)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
@@ -85,7 +85,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string, rpmHydratedBuild string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
 	baseSrpmName := node.SRPMFileName()
 	usedCache, builtFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
 	skipped = sliceutils.Contains(ignoredPackages, node.SpecName(), sliceutils.StringMatch)
@@ -100,12 +100,21 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 		return
 	}
 
+    oldUsedCache := usedCache
 	usedCache = false
 
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
 	logger.Log.Infof("Building %s", baseSrpmName)
 	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, dependencies)
+
+    if ((rpmHydratedBuild == "y") && (err != nil)) {
+        if (oldUsedCache) {
+            err = nil
+            usedCache = oldUsedCache
+            logger.Log.Infof("Build failed. Using PreBuilt RPM: %s", baseSrpmName)
+        }
+    }
 	return
 }
 
