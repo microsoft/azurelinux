@@ -10511,8 +10511,8 @@
         "type": "other",
         "other": {
           "name": "libndp",
-          "version": "1.7",
-          "downloadUrl": "http://www.libndp.org/files/libndp-1.7.tar.gz"
+          "version": "1.8",
+          "downloadUrl": "http://www.libndp.org/files/libndp-1.8.tar.gz"
         }
       }
     },
@@ -10531,8 +10531,8 @@
         "type": "other",
         "other": {
           "name": "libnetfilter_conntrack",
-          "version": "1.0.7",
-          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.7.tar.bz2"
+          "version": "1.0.8",
+          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.8.tar.bz2"
         }
       }
     },
@@ -10561,8 +10561,8 @@
         "type": "other",
         "other": {
           "name": "libnetfilter_queue",
-          "version": "1.0.3",
-          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_queue/files/libnetfilter_queue-1.0.3.tar.bz2"
+          "version": "1.0.5",
+          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_queue/files/libnetfilter_queue-1.0.5.tar.bz2"
         }
       }
     },
@@ -10591,8 +10591,8 @@
         "type": "other",
         "other": {
           "name": "libnftnl",
-          "version": "1.1.9",
-          "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.1.9.tar.bz2"
+          "version": "1.2.1",
+          "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.2.1.tar.bz2"
         }
       }
     },
