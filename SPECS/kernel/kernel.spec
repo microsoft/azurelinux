@@ -579,7 +579,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Mon Jan 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-1
 - Update Kernel source to 5.10.88.1
-- Addressed CVE-2021-43975
+- Addressed CVE-2021-43975, CVE-2021-45480, CVE-2021-45486
 - Patch for CVE-2021-43976
 
 * Mon Nov 29 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
