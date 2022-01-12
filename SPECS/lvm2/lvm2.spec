@@ -1,15 +1,15 @@
-%global systemd_version 239
+%global systemd_version 249
 
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.05
-Release:        8%{?dist}
-License:        GPLv2, BSD 2-Clause AND LGPLv2.1
+Release:        9%{?dist}
+License:        GPLv2 AND BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://sourceware.org/lvm2/
-Source0:        ftp://sourceware.org/pub/lvm2/releases/LVM2.%{version}.tgz
+Source0:        https://sourceware.org/pub/lvm2/LVM2.%{version}.tgz
 Source1:        lvm2-activate.service
 Patch0:         lvm2-set-default-preferred_names.patch
 BuildRequires:  libaio-devel
@@ -167,8 +167,6 @@ the device-mapper event library.
 %prep
 %setup -q -n LVM2.%{version}
 %patch0 -p1 -b .preferred_names
-#%patch1 -p1 -b .enable_lvmetad
-#%patch2 -p1 -b .udev_no_mpath
 
 %build
 %define _default_pid_dir /run
@@ -186,9 +184,7 @@ the device-mapper event library.
     --enable-dmeventd \
     --enable-fsadm \
     --enable-lvm1_fallback \
-    --enable-lvmetad \
     --enable-pkgconfig \
-    --enable-use_lvmetad \
     --enable-write_install \
     --with-cache=internal \
     --with-cluster=internal --with-clvmd=none \
@@ -215,25 +211,23 @@ cp %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/lvm2-activate.service
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable lvm2-activate.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-lvm2.preset
 echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-preset/50-lvm2.preset
-echo "disable lvm2-lvmeatd.socket" >> %{buildroot}%{_libdir}/systemd/system-preset/50-lvm2.preset
-echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-preset/50-lvm2.preset
 
 %preun
-%systemd_preun lvm2-lvmetad.service lvm2-lvmetad.socket lvm2-monitor.service lvm2-activate.service
+%systemd_preun lvm2-monitor.service lvm2-activate.service
 
 %preun dbusd
 %systemd_preun lvm2-lvmdbusd.service
 
 %post
 /sbin/ldconfig
-%systemd_post lvm2-lvmetad.service lvm2-lvmetad.socket lvm2-monitor.service lvm2-activate.service
+%systemd_post lvm2-monitor.service lvm2-activate.service
 
 %post dbusd
 %systemd_post lvm2-lvmdbusd.service
 
 %postun
 /sbin/ldconfig
-%systemd_postun_with_restart lvm2-lvmetad.service lvm2-lvmetad.socket lvm2-monitor.service lvm2-activate.service
+%systemd_postun_with_restart lvm2-monitor.service lvm2-activate.service
 
 %postun dbusd
 %systemd_postun lvm2-lvmdbusd.service
@@ -340,6 +334,13 @@ echo "disable lvm2-lvmeatd.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Fri Jan 07 2022 Thomas Crain <thcrain@microsoft.com> - 2.03.05-9
+- Remove references to lvmetad (removed from upstream in 2.03.0)
+- Bump required systemd version to 249
+- Use non-FTP source URL
+- Remove references to old patch files
+- License verified
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.03.05-8
 - Adding the 'lvm2-dbusd' package using Fedora 32 (license: MIT) specs as guidance.
 

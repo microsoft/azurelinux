@@ -8,7 +8,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -158,6 +158,17 @@ export OPT="%{extension_cflags} %{openssl_flags}"
 %make_install
 %{_fixperms} %{buildroot}/*
 
+# Bootstrap `pip3` which casues ptest build failure.
+# The manual installation of pip in the RPM buildroot requires pip
+# to be already present in the chroot.
+# For toolchain builds, `pip3` requirement is staisfied by raw-toolchain's
+# version of python, so it does not do anything.
+# For builds other than toolchain, we would require pip to be present.
+# The line below install pip in the build chroot using the recently
+# compiled python3.
+# NOTE: This is a NO-OP for the toolchain build.
+python3 Lib/ensurepip
+
 # Installing pip/setuptools via ensurepip fails in our toolchain.
 # The versions of these tools from the raw toolchain are detected,
 # and install fails. We will install these two bundled wheels manually.
@@ -267,6 +278,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Jan 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.9-3
+- Fix pip3 bootstrap which causes a build break in ptest
+
 * Wed Dec 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-2
 - Use filtered flags when compiling extensions
 
