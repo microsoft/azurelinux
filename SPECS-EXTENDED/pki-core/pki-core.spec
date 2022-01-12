@@ -13,7 +13,7 @@ Name:             pki-core
 
 Summary:          %{brand} PKI Core Package
 URL:              https://www.dogtagpki.org
-# The entire source code is GPLv2 except for 'pki-tps' which is LGPLv2+, "base/common" which is LGPLv3, and "base/tps-client/apache".
+# The entire source code is GPLv2 except for 'pki-tps' which is LGPLv2+, "base/common" which is LGPLv3, and "base/tps-client/apache" which is ASL 2.0.
 License:          ASL 2.0 and GPLv2 and LGPLv2+ and LGPLv3
 
 # For development (i.e. unsupported) releases, use x.y.z-0.n.<phase>.
