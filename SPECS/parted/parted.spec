@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/parted/
-Source0:        http://ftp.gnu.org/gnu/parted/%{name}-%{version}.tar.xz
+Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Conflicts:      toybox
 Provides:       %{name}-devel = %{version}-%{release}
 
