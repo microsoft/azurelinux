@@ -3,11 +3,11 @@ Name:           rsync
 Version:        3.2.3
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            https://rsync.samba.org/
-Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz
-Group:          Appication/Internet
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Appication/Internet
+URL:            https://rsync.samba.org/
+Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz
 BuildRequires:  lz4-devel
 BuildRequires:  systemd
 BuildRequires:  zlib-devel
@@ -35,10 +35,10 @@ cat << EOF >> %{buildroot}/%{_libdir}/systemd/system/rsyncd.service
 [Unit]
 Description=Rsync Server
 After=local-fs.target
-ConditionPathExists=/etc/rsyncd.conf
+ConditionPathExists=%{_sysconfdir}/rsyncd.conf
 
 [Service]
-ExecStart=/usr/bin/rsync --daemon --no-detach
+ExecStart=%{_bindir}/rsync --daemon --no-detach
 
 [Install]
 WantedBy=multi-user.target
@@ -47,15 +47,14 @@ EOF
 %check
 make %{?_smp_mflags} check
 
-%post
-/sbin/ldconfig
+%post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
 %license COPYING
 %exclude %{_libdir}/debug
-%exclude /usr/src/debug
+%exclude %{_prefix}/src/debug
 %{_bindir}/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
