@@ -2,27 +2,27 @@ Summary:        Libraries for the public client interface for NIS(YP) and NIS+.
 Name:           libnsl2
 Version:        2.0.0
 Release:        1%{?dist}
-Source0:        https://github.com/thkukuk/libnsl/archive/v%{version}/libnsl-%{version}.tar.gz
-License:        BSD and GPLv2+
-Group:          System Environment/Libraries
-URL:            https://github.com/thkukuk/libnsl
+License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Requires:       libtirpc
-Requires:       rpcsvc-proto
+Group:          System Environment/Libraries
+URL:            https://github.com/thkukuk/libnsl
+Source0:        https://github.com/thkukuk/libnsl/archive/v%{version}/libnsl-%{version}.tar.gz
 BuildRequires:  libtirpc-devel
 BuildRequires:  rpcsvc-proto-devel
+Requires:       libtirpc
+Requires:       rpcsvc-proto
 
 %description
 The libnsl package contains the public client interface for NIS(YP) and NIS+.
 It replaces the NIS library that used to be in glibc.
 
 %package    devel
-Summary:    Development files for the libnsl library
-Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
-Requires:   libtirpc-devel
-Requires:   rpcsvc-proto-devel
+Summary:        Development files for the libnsl library
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+Requires:       libtirpc-devel
+Requires:       rpcsvc-proto-devel
 
 %description    devel
 This package includes header files and libraries necessary for developing programs which use the nsl library.
@@ -39,11 +39,8 @@ make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name "*.la" -delete -print
 
-%post
-/sbin/ldconfig
-
-%postun
-/sbin/ldconfig
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %license COPYING
@@ -70,7 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 -   Rename libnsl to libnsl2.
 -   Remove sha1 macro.
 -   License verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.2.0-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> 1.2.0-1
 - Initial version

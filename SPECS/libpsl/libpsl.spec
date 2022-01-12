@@ -8,10 +8,8 @@ Distribution:   Mariner
 Group:          System Environment/Development
 URL:            https://github.com/rockdaboot/libpsl
 Source0:        https://github.com/rockdaboot/libpsl/releases/download/%{version}/%{name}-%{version}.tar.gz
-
 BuildRequires:  icu-devel
 BuildRequires:  python3
-
 Requires:       icu
 
 %description
