@@ -70,6 +70,7 @@ make test
 %changelog
 * Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.004-15
 - Rename File-Slurp-Tiny-0.003-old-Test::More.patch to accomodate git clone from Windows.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.004-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
