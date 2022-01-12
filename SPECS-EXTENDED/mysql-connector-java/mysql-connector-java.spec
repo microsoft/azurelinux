@@ -77,7 +77,7 @@ sed -i 's/>@.*</>%{version}</' src/build/misc/pom.xml
 
 %build
 
-export JAVA_HOME=$(find %{_libdir}/jvm -name "OpenJDK*")
+export JAVA_HOME="%{java_home}"
 
 # We need both JDK1.5 (for JDBC3.0; appointed by $JAVA_HOME) and JDK1.6 (for JDBC4.0; appointed in the build.xml)
 export CLASSPATH=$(build-classpath jdbc-stdext junit slf4j commons-logging.jar)

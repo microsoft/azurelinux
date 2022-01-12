@@ -838,7 +838,7 @@ This package contains PKI test suite.
 %build
 ################################################################################
 
-export JAVA_HOME=$(find %{_libdir}/jvm -name "OpenJDK*")
+export JAVA_HOME="%{java_home}"
 
 # get Java <major>.<minor> version number
 java_version=`${JAVA_HOME}/bin/java -XshowSettings:properties -version 2>&1 | sed -n 's/ *java.version *= *\([0-9]\+\.[0-9]\+\).*/\1/p'`

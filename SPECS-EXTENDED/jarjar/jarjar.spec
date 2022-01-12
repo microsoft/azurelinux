@@ -90,7 +90,7 @@ rm -f lib/*.jar
 find . -name JarJarMojo.java -delete
 
 %build
-export JAVA_HOME=$(find %{_lib}/jvm -name "OpenJDK*")
+export JAVA_HOME="%{java_home}"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 pushd lib
 ln -sf $(build-classpath objectweb-asm/asm) asm-4.0.jar

@@ -162,10 +162,6 @@ make install install-data DESTDIR=%{buildroot}
 - Don't display _vf suffix on NPAR devices with single function
 - Fix PCIe/PIRQ slot mapping
 
-<<<<<<< HEAD
-=======
-
->>>>>>> f16
 * Thu Apr 21 2011 Praveen K Paladugu <praveen_paladugu@dell.com> - 0.3.8-1
 - Add changes to parse VPD structure for device mapping on NPAR devices
 - Fix pathname

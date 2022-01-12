@@ -74,12 +74,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_mandir}
 make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}/cs
 
 %files
-<<<<<<< HEAD
-||||||| parent of c11a2d90... Save work
-%license at/COPYING binutils/COPYING wget/COPYING grep/COPYING procps/COPYING coreutils/COPYING lynx/COPYING procmain/COPYING cdp/COPYING gnu-ghostscript/COPYING
-=======
 %license at/COPYING binutils/COPYING wget/COPYING grep/COPYING procps/COPYING coreutils/COPYING lynx/COPYING procmain/COPYING cdp/COPYING gnu-ghostscript/COPYING bzip2/LICENSE gnu-ghostscript/LICENSE
->>>>>>> c11a2d90... Save work
 %doc CONTRIB README README.Czech Changelog
 %{_mandir}/cs/man*/*
 

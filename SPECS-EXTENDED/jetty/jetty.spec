@@ -67,6 +67,7 @@ Source6:        LICENSE-MIT
 
 Patch1:         0001-Distro-jetty.home.patch
 
+BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  maven-local
 BuildRequires:  mvn(javax.servlet:javax.servlet-api)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
@@ -833,7 +834,7 @@ ln -sf %{_javadir}/ecj.jar $ecj
 # ln -sf %{_jnidir}/jetty-setuid/libsetuid-linux.so %{buildroot}%{homedir}/lib/setuid/
 
 ( cat << EO_RC
-JAVA_HOME=/usr/lib/jvm/java
+JAVA_HOME="%{java_home}"
 JAVA_OPTIONS=
 JETTY_HOME=%{homedir}
 JETTY_CONSOLE=%{logdir}/jetty-console.log

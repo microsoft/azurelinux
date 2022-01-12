@@ -30,6 +30,7 @@ Patch0:         %{name}-java8compat.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
+BuildRequires:  javapackages-local-bootstrap
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
 
@@ -58,6 +59,7 @@ classes.
 mv gnu/getopt/buildx.xml build.xml
 
 %build
+export JAVA_HOME="%{java_home}"
 ant jar javadoc
 
 %install
