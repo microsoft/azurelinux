@@ -4,7 +4,7 @@ Distribution:   Mariner
 Summary:       Official JDBC driver for MySQL
 Name:          mysql-connector-java
 Version:       8.0.21
-Release:       2%{?dist}
+Release:       3%{?dist}
 License:       GPLv2 with exceptions
 URL:           http://dev.mysql.com/downloads/connector/j/
 Source0:       %{name}-%{version}-nojars.tar.xz
@@ -104,6 +104,9 @@ ant -Dcom.mysql.cj.build.jdk="$JAVA_HOME" \
 %license LICENSE
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.21-3
+- License verified.
+
 * Mon Oct 04 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.21-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fixing 'JSON_HOME' path.

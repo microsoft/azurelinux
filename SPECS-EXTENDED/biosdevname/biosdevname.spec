@@ -1,6 +1,6 @@
 Name:		biosdevname
 Version:	0.7.3
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Udev helper for naming devices per BIOS names
 License:	GPLv2
 Vendor:         Microsoft Corporation
@@ -47,6 +47,9 @@ make install install-data DESTDIR=%{buildroot}
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.3-7
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.3-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

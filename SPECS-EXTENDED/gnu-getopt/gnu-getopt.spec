@@ -20,7 +20,7 @@ Distribution:   Mariner
 
 Name:           gnu-getopt
 Version:        1.0.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Java getopt Implementation
 License:        LGPL-2.1-or-later
 Group:          Development/Libraries/Java
@@ -82,6 +82,9 @@ cp -a build/api/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.14-3
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.14-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

@@ -19,7 +19,7 @@ License:          GPLv2 and LGPLv2
 # For development (i.e. unsupported) releases, use x.y.z-0.n.<phase>.
 # For official (i.e. supported) releases, use x.y.z-r where r >=1.
 Version:          10.10.3
-Release:          9%{?dist}
+Release:          10%{?dist}
 #global           _phase -beta1
 
 # To create a tarball from a version tag:
@@ -1390,6 +1390,9 @@ fi
 
 ################################################################################
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.10.3-10
+- License verified.
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 10.10.3-9
 - Drop epoch from tomcat
 

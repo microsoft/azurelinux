@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: Czech man pages from the Linux Documentation Project
 Name: man-pages-cs
 Version: 0.18.20090209
-Release: 30%{?dist}
+Release: 31%{?dist}
 # GPLv3 .. coreutils/
 # BSD   .. openssh/
 License: GPLv2 and GPLv3 and BSD
@@ -79,6 +79,9 @@ make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}/cs
 %{_mandir}/cs/man*/*
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.20090209-31
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.20090209-30
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

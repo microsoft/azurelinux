@@ -52,7 +52,7 @@ Distribution:   Mariner
 
 Name:           jetty
 Version:        9.4.31
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Java Webserver and Servlet Container
 
 # Jetty is dual licensed under both ASL 2.0 and EPL 1.0, see NOTICE.txt
@@ -977,6 +977,9 @@ exit 0
 %license LICENSE NOTICE.txt LICENSE-MIT
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.4.31-4
+- License verified.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.4.31-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
