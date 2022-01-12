@@ -28197,8 +28197,8 @@
         "type": "other",
         "other": {
           "name": "tmux",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/tmux/tmux/releases/download/2.7/tmux-2.7.tar.gz"
+          "version": "3.2a",
+          "downloadUrl": "https://github.com/tmux/tmux/releases/download/3.2a/tmux-3.2a.tar.gz"
         }
       }
     },
