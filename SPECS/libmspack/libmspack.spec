@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.cabextract.org.uk/libmspack/libmspack-0.5alpha.tar.gz
 Source0:        http://www.cabextract.org.uk/libmspack/%{name}-%{version}.tar.gz
-%define sha1    libmspack=073348180586d7b0f61fd7f971162ffb5c1f6621
 
 %description
 A library that provides compression and decompression of file formats used by Microsoft
@@ -57,6 +56,7 @@ cd test
 - Remove binaries under /usr/bin
 - Add README, TODO, ChangeLog, AUTHORS to the main package
 - License Verified
+- Remove the sha1 macro
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.1alpha-4
 - Remove libtool archive files from final packaging
