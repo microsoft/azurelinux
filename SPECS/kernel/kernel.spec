@@ -224,8 +224,8 @@ Patch1184:      CVE-2021-42327.nopatch
 Patch1185:      CVE-2021-43389.nopatch
 Patch1186:      CVE-2021-43975.nopatch
 Patch1187:      CVE-2021-45480.nopatch
-Patch1188:      CVE-2021-45485.nopatch
-Patch1189:      CVE-2021-45486.nopatch
+Patch1188:      CVE-2021-45486.nopatch
+Patch1189:      CVE-2021-45485.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
