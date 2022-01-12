@@ -7,7 +7,6 @@ Version:       8.0.21
 Release:       3%{?dist}
 License:       GPLv2 with exceptions
 URL:           http://dev.mysql.com/downloads/connector/j/
-Source0:       %{name}-%{version}-nojars.tar.xz
 
 # Mysql has a mirror redirector for its downloads
 # You can get this tarball by following a link from:
@@ -30,6 +29,7 @@ Source0:       %{name}-%{version}-nojars.tar.xz
 # To make it easier a script generate-tarball.sh has been created:
 # ./generate-tarball.sh version
 # will create a new tarball compressed with xz and without those jar files.
+Source0:       https://github.com/mysql/mysql-connector-j/archive/%{version}.tar.gz#/%{name}-%{version}-nojars.tar.xz
 Source1:       generate-tarball.sh
 
 Patch1:        remove-coverage-test.patch

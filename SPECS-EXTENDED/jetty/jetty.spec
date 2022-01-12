@@ -56,7 +56,7 @@ Release:        4%{?dist}
 Summary:        Java Webserver and Servlet Container
 
 # Jetty is dual licensed under both ASL 2.0 and EPL 1.0, see NOTICE.txt
-License:        ASL 2.0 or EPL-1.0
+License:        (ASL 2.0 or EPL-1.0) and BSD and CDDL and GPLv2 and MIT
 URL:            http://www.eclipse.org/jetty/
 Source0:        https://github.com/eclipse/%{name}.project/archive/%{name}-%{version}%{addver}.tar.gz
 Source1:        jetty.sh

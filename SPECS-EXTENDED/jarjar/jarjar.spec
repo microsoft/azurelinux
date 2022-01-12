@@ -23,7 +23,7 @@ Name:           jarjar
 Version:        1.4
 Release:        5%{?dist}
 Summary:        Tool to repackage Java libraries
-License:        GPL-2.0-or-later
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 Url:            https://github.com/google/jarjar
 Source0:        https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/%{name}/%{name}-src-%{version}.zip
@@ -131,7 +131,7 @@ cp -pr dist/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files
-%doc COPYING
+%license COPYING
 %{_javadir}/%{name}.jar
 %{_javadir}/%{name}-util.jar
 %{_mavenpomdir}/*

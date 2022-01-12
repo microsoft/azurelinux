@@ -22,7 +22,7 @@ Name:           gnu-getopt
 Version:        1.0.14
 Release:        3%{?dist}
 Summary:        Java getopt Implementation
-License:        LGPL-2.1-or-later
+License:        GPLv2
 Group:          Development/Libraries/Java
 URL:            http://www.urbanophile.com/arenn/hacking/download.html
 Source0:        http://www.urbanophile.com/arenn/hacking/getopt/java-getopt-%{version}.tar.gz
@@ -74,7 +74,8 @@ cp -a build/api/* %{buildroot}%{_javadocdir}/%{name}
 
 %files
 %defattr(0644,root,root,0755)
-%doc gnu/getopt/COPYING.LIB gnu/getopt/README
+%license gnu/getopt/COPYING.LIB
+%doc gnu/getopt/README
 %{_javadir}/*
 
 %files javadoc

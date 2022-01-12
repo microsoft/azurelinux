@@ -155,8 +155,8 @@
         "type": "other",
         "other": {
           "name": "alsa-lib",
-          "version": "1.2.6.1",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
+          "version": "1.2.3.2",
+          "downloadUrl": "ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.2.3.2.tar.bz2"
         }
       }
     },
@@ -165,8 +165,8 @@
         "type": "other",
         "other": {
           "name": "alsa-lib",
-          "version": "1.2.3.2",
-          "downloadUrl": "ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.2.3.2.tar.bz2"
+          "version": "1.2.6.1",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
         }
       }
     },
@@ -1198,7 +1198,7 @@
         "other": {
           "name": "biosdevname",
           "version": "0.7.3",
-          "downloadUrl": "http://linux.dell.com/files/biosdevname/biosdevname-0.7.3/biosdevname-0.7.3.tar.gz"
+          "downloadUrl": "https://github.com/dell/biosdevname/archive/refs/tags/v0.7.3.tar.gz"
         }
       }
     },
@@ -1307,8 +1307,8 @@
         "type": "other",
         "other": {
           "name": "boost",
-          "version": "1.76.0",
-          "downloadUrl": "https://downloads.sourceforge.net/boost/boost_1_76_0.tar.bz2"
+          "version": "1.69.0",
+          "downloadUrl": "https://sourceforge.net/projects/boost/files/boost/1.69.0/boost_1_69_0.tar.bz2"
         }
       }
     },
@@ -1317,8 +1317,8 @@
         "type": "other",
         "other": {
           "name": "boost",
-          "version": "1.69.0",
-          "downloadUrl": "https://sourceforge.net/projects/boost/files/boost/1.69.0/boost_1_69_0.tar.bz2"
+          "version": "1.76.0",
+          "downloadUrl": "https://downloads.sourceforge.net/boost/boost_1_76_0.tar.bz2"
         }
       }
     },
@@ -5499,16 +5499,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "hiera",
-          "version": "3.7.0",
-          "downloadUrl": "http://downloads.puppetlabs.com/hiera/hiera-3.7.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "hfsplus-tools",
           "version": "540.1.linux3",
           "downloadUrl": "http://cavan.codon.org.uk/~mjg59/diskdev_cmds/diskdev_cmds-540.1.linux3.tar.gz"
@@ -5522,6 +5512,16 @@
           "name": "hicolor-icon-theme",
           "version": "0.17",
           "downloadUrl": "https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hiera",
+          "version": "3.7.0",
+          "downloadUrl": "http://downloads.puppetlabs.com/hiera/hiera-3.7.0.tar.gz"
         }
       }
     },
@@ -14135,6 +14135,16 @@
           "name": "mysql",
           "version": "8.0.24",
           "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.24.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mysql-connector-java",
+          "version": "8.0.21",
+          "downloadUrl": "https://github.com/mysql/mysql-connector-j/archive/8.0.21.tar.gz"
         }
       }
     },
@@ -25954,9 +25964,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-hocon",
-          "version": "1.3.1",
-          "downloadUrl": "https://rubygems.org/downloads/hocon-1.3.1.gem"
+          "name": "rubygem-hirb",
+          "version": "0.7.3",
+          "downloadUrl": "https://rubygems.org/downloads/hirb-0.7.3.gem"
         }
       }
     },
@@ -25964,9 +25974,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-hirb",
-          "version": "0.7.3",
-          "downloadUrl": "https://rubygems.org/downloads/hirb-0.7.3.gem"
+          "name": "rubygem-hocon",
+          "version": "1.3.1",
+          "downloadUrl": "https://rubygems.org/downloads/hocon-1.3.1.gem"
         }
       }
     },
@@ -26344,9 +26354,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-rdkafka",
-          "version": "0.7.0",
-          "downloadUrl": "https://rubygems.org/downloads/rdkafka-0.7.0.gem"
+          "name": "rubygem-rdiscount",
+          "version": "2.2.0.2",
+          "downloadUrl": "https://rubygems.org/gems/rdiscount-2.2.0.2.gem"
         }
       }
     },
@@ -26354,9 +26364,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-rdiscount",
-          "version": "2.2.0.2",
-          "downloadUrl": "https://rubygems.org/gems/rdiscount-2.2.0.2.gem"
+          "name": "rubygem-rdkafka",
+          "version": "0.7.0",
+          "downloadUrl": "https://rubygems.org/downloads/rdkafka-0.7.0.gem"
         }
       }
     },
