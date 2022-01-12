@@ -14533,8 +14533,8 @@
         "type": "other",
         "other": {
           "name": "nettle",
-          "version": "3.7.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.2.tar.gz"
+          "version": "3.7.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.3.tar.gz"
         }
       }
     },
