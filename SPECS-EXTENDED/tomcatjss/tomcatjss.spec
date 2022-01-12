@@ -10,7 +10,7 @@ License:          LGPLv2+
 BuildArch:        noarch
 
 Version:          7.6.1
-Release:          3%{?dist}
+Release:          4%{?dist}
 #global           _phase -a1
 
 # To generate the source tarball:
@@ -68,7 +68,7 @@ BuildRequires:    tomcat >= 9.0.7
 # Java
 Requires:         apache-commons-lang3
 
-Requires:         java-headless
+Requires:         java
 
 
 
@@ -138,11 +138,14 @@ ant -f build.xml \
 
 %defattr(-,root,root)
 %doc README
-%doc LICENSE
 %{_javadir}/*
 
 ################################################################################
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 7.6.1-4
+- Rename java-headless dependency to java
+- License verified
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 7.6.1-3
 - Drop epoch from tomcat.
 

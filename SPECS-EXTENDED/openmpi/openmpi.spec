@@ -35,7 +35,7 @@ Distribution:   Mariner
 
 Name:            openmpi%{?_cc_name_suffix}
 Version:         4.0.3x
-Release:         4%{?dist}
+Release:         5%{?dist}
 Summary:         Open Message Passing Interface
 License:         BSD and MIT and Romio
 URL:             http://www.open-mpi.org/
@@ -128,7 +128,7 @@ Contains development headers and libraries for openmpi.
 Summary:    Java library
 Requires:   %{name} = %{version}-%{release}
 
-Requires:   java-headless
+Requires:   java
 
 
 
@@ -360,6 +360,10 @@ make check
 
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 4.0.3x-5
+- Rename java-headless dependency to java
+- License verified
+
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 4.0.3x-4
 - Change JDK dir to match JDK version
 

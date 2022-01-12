@@ -4,10 +4,9 @@ Distribution:   Mariner
 Summary:       Official JDBC driver for MySQL
 Name:          mysql-connector-java
 Version:       8.0.21
-Release:       2%{?dist}
+Release:       3%{?dist}
 License:       GPLv2 with exceptions
 URL:           http://dev.mysql.com/downloads/connector/j/
-Source0:       %{name}-%{version}-nojars.tar.xz
 
 # Mysql has a mirror redirector for its downloads
 # You can get this tarball by following a link from:
@@ -30,6 +29,7 @@ Source0:       %{name}-%{version}-nojars.tar.xz
 # To make it easier a script generate-tarball.sh has been created:
 # ./generate-tarball.sh version
 # will create a new tarball compressed with xz and without those jar files.
+Source0:       https://github.com/mysql/mysql-connector-j/archive/%{version}.tar.gz#/%{name}-%{version}-nojars.tar.xz
 Source1:       generate-tarball.sh
 
 Patch1:        remove-coverage-test.patch
@@ -77,7 +77,7 @@ sed -i 's/>@.*</>%{version}</' src/build/misc/pom.xml
 
 %build
 
-export JAVA_HOME=$(find %{_libdir}/jvm -name "OpenJDK*")
+export JAVA_HOME="%{java_home}"
 
 # We need both JDK1.5 (for JDBC3.0; appointed by $JAVA_HOME) and JDK1.6 (for JDBC4.0; appointed in the build.xml)
 export CLASSPATH=$(build-classpath jdbc-stdext junit slf4j commons-logging.jar)
@@ -104,6 +104,9 @@ ant -Dcom.mysql.cj.build.jdk="$JAVA_HOME" \
 %license LICENSE
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.21-3
+- License verified.
+
 * Mon Oct 04 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.21-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fixing 'JSON_HOME' path.
