@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 5.10.78.1 Kernel Configuration
+# Linux/x86_64 5.10.88.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 9.1.0"
 CONFIG_CC_IS_GCC=y
@@ -373,7 +373,6 @@ CONFIG_X86_IO_APIC=y
 
 CONFIG_X86_VSYSCALL_EMULATION=y
 # CONFIG_X86_IOPL_IOPERM is not set
-# CONFIG_I8K is not set
 # CONFIG_MICROCODE is not set
 CONFIG_X86_MSR=m
 CONFIG_X86_CPUID=m
@@ -2999,7 +2998,6 @@ CONFIG_HID_APPLE=m
 # CONFIG_HID_AUREAL is not set
 CONFIG_HID_BELKIN=m
 CONFIG_HID_CHERRY=m
-# CONFIG_HID_CHICONY is not set
 # CONFIG_HID_COUGAR is not set
 # CONFIG_HID_MACALLY is not set
 # CONFIG_HID_CMEDIA is not set
@@ -3039,7 +3037,6 @@ CONFIG_HID_MONTEREY=m
 # CONFIG_HID_PLANTRONICS is not set
 # CONFIG_HID_PRIMAX is not set
 # CONFIG_HID_SAITEK is not set
-# CONFIG_HID_SAMSUNG is not set
 # CONFIG_HID_SPEEDLINK is not set
 # CONFIG_HID_STEAM is not set
 # CONFIG_HID_STEELSERIES is not set
