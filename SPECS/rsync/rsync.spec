@@ -22,7 +22,7 @@ Rsync is a fast and extraordinarily versatile file copying tool. It can copy loc
 %setup -q
 
 %build
-%configure --disable-xxhash
+%configure --with-included-zlib=no --disable-xxhash
 make %{?_smp_mflags}
 
 %install
