@@ -6,6 +6,7 @@
 %global bootstrap 1
 %global bootstrap_major_version 5.3
 %global bootstrap_version %{bootstrap_major_version}.5
+%global bootstrap_previous_version %{bootstrap_major_version}.4
 
 Summary:        Programming language
 Name:           lua
@@ -125,8 +126,8 @@ rmdir %{buildroot}%{_libdir}/lua/%{major_version} %{buildroot}%{_libdir}/lua
 %if 0%{?bootstrap}
 pushd lua-%{bootstrap_version}
 mkdir -p %{buildroot}/installdir
-lua_make_install %{buildroot}/installdir/usr %{bootstrap_major_version} %{bootstrap_version}
-cp -a %{buildroot}/installdir/%{_libdir}/liblua.so.%{bootstrap_version} %{buildroot}%{_libdir}
+lua_make_install %{buildroot}/installdir/usr %{bootstrap_major_version} %{bootstrap_previous_version}
+cp -a %{buildroot}/installdir/%{_libdir}/liblua.so.%{bootstrap_previous_version} %{buildroot}%{_libdir}
 cp -a %{buildroot}/installdir/%{_libdir}/liblua.so.%{bootstrap_major_version} %{buildroot}%{_libdir}
 rm -rf %{buildroot}/installdir
 popd
