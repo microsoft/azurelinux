@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
-Version:        2.2.54.2
-Release:        4%{?dist}
+Version:        2.3.1.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,6 +81,9 @@ python3 setup.py check && python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jan 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.1.1-1
+- Update to version 2.3.1.1.
+
 * Tue Dec 14 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2.54.2-4
 - Include the 66-azure-storage udev rule.
 
