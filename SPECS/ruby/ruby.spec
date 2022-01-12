@@ -1,7 +1,7 @@
 Summary:        Ruby
 Name:           ruby
 Version:        2.6.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,9 @@ Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
 Source0:        https://cache.ruby-lang.org/pub/ruby/2.6/%{name}-%{version}.tar.xz
 Patch0:         CVE-2021-32066.patch
+Patch1: CVE-2021-41817_3959ac.patch
+Patch2: CVE-2021-41817_8f2d7a.patch
+Patch3: CVE-2021-41817_376c65.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -62,6 +65,9 @@ sudo -u test make test TESTS="-v"
 %{_mandir}/man5/*
 
 %changelog
+*   Wed Jan 12 2022 Mariner Autopatcher <cblmargh@microsoft.com> 2.6.7-3
+-   Added patch file(s) CVE-2021-41817_3959ac.patch,
+-   CVE-2021-41817_8f2d7a.patch, CVE-2021-41817_376c65.patch
 * Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.7-2
 - Patching CVE-2021-32066.
 
