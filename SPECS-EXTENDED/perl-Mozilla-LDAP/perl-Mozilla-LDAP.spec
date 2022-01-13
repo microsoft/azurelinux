@@ -15,6 +15,9 @@ BuildRequires: perl(ExtUtils::MakeMaker)
 BuildRequires: nspr-devel
 BuildRequires: nss-devel
 BuildRequires: openldap-devel >= 2.4.22
+%if %{with_check}
+BuildRequires: perl(AutoLoader)
+%endif
 # Source0: https://metacpan.org/dist/perldap/source
 Source0: ftp://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/%{version}/src/perl-mozldap-%{version}.tar.gz
 Source1: ftp://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5/src/Makefile.PL.rpm
@@ -48,7 +51,6 @@ chmod +x %{__perl_requires}
 
 LDAPPKGNAME=openldap CFLAGS="$RPM_OPT_FLAGS" perl %{SOURCE1} PREFIX=$RPM_BUILD_ROOT%{_prefix} INSTALLDIRS=vendor < /dev/null
 make OPTIMIZE="$RPM_OPT_FLAGS" CFLAGS="$RPM_OPT_FLAGS" 
-make test
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -78,6 +80,9 @@ if [ "$(cat %{name}-%{version}-%{release}-filelist)X" = "X" ] ; then
     echo "ERROR: EMPTY FILE LIST"
     exit 1
 fi
+
+%check
+make test
 
 %files -f %{name}-%{version}-%{release}-filelist
 %doc CREDITS ChangeLog README MPL-1.1.txt

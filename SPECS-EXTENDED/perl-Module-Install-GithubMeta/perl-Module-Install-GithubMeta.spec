@@ -22,6 +22,7 @@ BuildRequires: perl(Fcntl)
 BuildRequires: perl(File::Path)
 BuildRequires: perl(File::Find)
 BuildRequires: perl(File::Spec)
+BuildRequires: perl(FindBin)
 BuildRequires: perl(Module::Build)
 BuildRequires: perl(Module::Install) >= 0.85
 BuildRequires: perl(strict)

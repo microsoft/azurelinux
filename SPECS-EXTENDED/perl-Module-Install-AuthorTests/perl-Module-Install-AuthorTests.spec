@@ -14,6 +14,7 @@ BuildRequires:  perl(inc::Module::Install)
 # XXX: We cannot remove ./inc because it build-requires this module (bootstrap)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(FindBin)
 # Run-time:
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Module::Install::Base)
