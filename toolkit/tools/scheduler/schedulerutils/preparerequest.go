@@ -34,11 +34,11 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			AncillaryNodes: []*pkggraph.PkgNode{node},
 		}
 
-        if forceUseCache == true {
-            req.CanUseCache = true
-        } else {
-		    req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, noDepRebuild)
-        }
+		if forceUseCache == true {
+			req.CanUseCache = true
+		} else {
+			req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, noDepRebuild)
+		}
 
 		requests = append(requests, req)
 	}
@@ -52,11 +52,11 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			AncillaryNodes: nodes,
 		}
 
-        if forceUseCache == true {
-            req.CanUseCache = true
-        } else {
-		    req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, noDepRebuild)
-        }
+		if forceUseCache == true {
+			req.CanUseCache = true
+		} else {
+			req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, noDepRebuild)
+		}
 
 		requests = append(requests, req)
 	}
@@ -83,11 +83,11 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pac
 		return
 	}
 
-    // Don't rebuild package even if its dependency is newly built. Makes sense while running TestRPM
-    if noDepRebuild == "y" {
-        canUseCache = true
-        return
-    }
+	// Don't rebuild package even if its dependency is newly built. Makes sense while running TestRPM
+	if noDepRebuild == "y" {
+		canUseCache = true
+		return
+	}
 
 	// If any of the node's dependencies were built instead of being cached then a build is required.
 	dependencies := pkgGraph.From(node.ID())

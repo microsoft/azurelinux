@@ -38,9 +38,9 @@ var (
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
 
-	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
-	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
-    removeUnresolvedDep = app.Flag("remove-unresolved-dep", "Remove a depedency if its not resolvable").String()
+	inputSummaryFile    = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
+	outputSummaryFile   = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
+	removeUnresolvedDep = app.Flag("remove-unresolved-dep", "Remove a depedency if its not resolvable").String()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -112,12 +112,12 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 				// Failing to clone a dependency should not halt a build.
 				// The build should continue and attempt best effort to build as many packages as possible.
 				if resolveErr != nil {
-                    if *removeUnresolvedDep == "y" {
-                        // Let the build proceed and fail. We'll get the detail from the build log
-                        logger.Log.Warnf("Removing unresolved node: %s", n.FriendlyName())
-                        dependencyGraph.RemovePkgNode(n)
-                        continue
-                    }
+					if *removeUnresolvedDep == "y" {
+						// Let the build proceed and fail. We'll get the detail from the build log
+						logger.Log.Warnf("Removing unresolved node: %s", n.FriendlyName())
+						dependencyGraph.RemovePkgNode(n)
+						continue
+					}
 					errorMessage := strings.Builder{}
 					errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
 					errorMessage.WriteString("Nodes which have this as a dependency:\n")

@@ -100,7 +100,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 		return
 	}
 
-    oldUsedCache := usedCache
+	oldUsedCache := usedCache
 	usedCache = false
 
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
@@ -108,13 +108,13 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	logger.Log.Infof("Building %s", baseSrpmName)
 	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, dependencies)
 
-    if ((rpmHydratedBuild == "y") && (err != nil)) {
-        if (oldUsedCache) {
-            err = nil
-            usedCache = oldUsedCache
-            logger.Log.Infof("Build failed. Using PreBuilt RPM: %s", baseSrpmName)
-        }
-    }
+	if (rpmHydratedBuild == "y") && (err != nil) {
+		if oldUsedCache {
+			err = nil
+			usedCache = oldUsedCache
+			logger.Log.Infof("Build failed. Using PreBuilt RPM: %s", baseSrpmName)
+		}
+	}
 	return
 }
 
