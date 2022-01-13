@@ -1,7 +1,7 @@
 Summary:        user space RCU (read-copy-update)
 Name:           userspace-rcu
-Version:        0.10.1
-Release:        5%{?dist}
+Version:        0.13.0
+Release:        1%{?dist}
 License:        LGPLv2+
 URL:            https://liburcu.org
 #Source0:       https://github.com/urcu/userspace-rcu/archive/v%{version}.tar.gz
@@ -56,8 +56,10 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 %{_includedir}/*
 
-
 %changelog
+* Wed Jan 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.13.0-1
+- Update to version 0.13.0.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 0.10.1-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
