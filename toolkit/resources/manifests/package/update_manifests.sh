@@ -283,6 +283,7 @@ generate_pkggen_core () {
         grep "^pinentry-" $TmpPkgGen
         grep "^gnupg2-" $TmpPkgGen
         grep "^gpgme-" $TmpPkgGen
+        grep "^mariner-repos-shared" $TmpPkgGen
         grep "^mariner-repos-preview" $TmpPkgGen
         grep "^libffi-" $TmpPkgGen
         grep "^libtasn1-" $TmpPkgGen
