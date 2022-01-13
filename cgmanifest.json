@@ -14933,8 +14933,8 @@
         "type": "other",
         "other": {
           "name": "ocaml",
-          "version": "4.10.0",
-          "downloadUrl": "http://caml.inria.fr/pub/distrib/ocaml-4.10/ocaml-4.10.0.tar.xz"
+          "version": "4.13.1",
+          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13/ocaml-4.13.1.tar.xz"
         }
       }
     },
