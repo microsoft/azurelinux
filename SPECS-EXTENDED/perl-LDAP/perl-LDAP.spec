@@ -26,7 +26,9 @@ Patch2:         perl-ldap-0.66-Correct-a-shell-bang-in-data-regenerate_cert.sh.p
 BuildArch:      noarch
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::AutoInstall)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)

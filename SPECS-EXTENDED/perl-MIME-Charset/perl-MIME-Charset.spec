@@ -15,7 +15,9 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::Win32)
 BuildRequires:  perl(Module::Install::WriteAll)

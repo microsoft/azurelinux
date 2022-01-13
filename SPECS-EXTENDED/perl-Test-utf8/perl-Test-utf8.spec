@@ -19,6 +19,7 @@ BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)
 BuildRequires:  sed
@@ -27,6 +28,7 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(charnames)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(Test::Builder)
 BuildRequires:  perl(warnings)

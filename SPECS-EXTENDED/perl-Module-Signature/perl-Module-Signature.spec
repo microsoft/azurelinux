@@ -14,7 +14,9 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install) >= 0.92
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Can)
 BuildRequires:  perl(Module::Install::External)
 BuildRequires:  perl(Module::Install::Makefile)

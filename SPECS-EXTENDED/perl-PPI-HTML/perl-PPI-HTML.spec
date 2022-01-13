@@ -14,7 +14,9 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(Module::CoreList)
 # Module Run-time:
 BuildRequires:  perl(CSS::Tiny) >= 1.10
 BuildRequires:  perl(Params::Util) >= 0.05
