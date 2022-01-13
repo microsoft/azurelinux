@@ -20,6 +20,13 @@ Requires:       pciutils = %{version}-%{release}
 %description devel
 Library files for doing development with pciutils.
 
+%package libs
+Summary:        Linux PCI library
+
+%description libs
+This package contains a library for inspecting and setting
+devices connected to the PCI bus.
+
 %prep
 %setup -q
 
@@ -39,11 +46,14 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 
 %files
 %defattr(-,root,root)
-%license COPYING
 %{_sbindir}/*
 %{_libdir}/*.so.*
 %{_datadir}/misc/*
 %{_mandir}/*
+
+%files libs
+%license COPYING
+%{_libdir}/libpci.so.*
 
 %files devel
 %defattr(-,root,root)
@@ -54,6 +64,7 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 %changelog
 * Wed Dec 29 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.7.0-1
 - Upgrading to 3.7.0
+- Adding libs subpackage.
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.2-4
 - Removing the explicit %%clean stage.
