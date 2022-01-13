@@ -1,12 +1,12 @@
 Summary:        DWARF optimization and duplicate removal tool
 Name:           dwz
-Version:        0.13
-Release:        4%{?dist}
+Version:        0.14
+Release:        1%{?dist}
 License:        GPLv2+ and GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://sourceware.org/dwz
-Source:         https://sourceware.org/ftp/dwz/releases/%{name}-%{version}.tar.xz
+Source:         https://sourceware.org/ftp/dwz/releases/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc, elfutils-libelf-devel
 
 %description
@@ -36,6 +36,9 @@ make DESTDIR=%{buildroot} prefix=%{_prefix} mandir=%{_mandir} bindir=%{_bindir} 
 %{_mandir}/man1/dwz.1*
 
 %changelog
+* Wed Jan 12 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.14-1
+- Update source to 0.14
+
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> - 0.13-4
 - Add URL.
 - License verified.
