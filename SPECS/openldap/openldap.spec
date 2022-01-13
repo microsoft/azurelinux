@@ -2,7 +2,7 @@
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.4.57
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        OpenLDAP
 URL:            https://www.openldap.org/
 Group:          System Environment/Security
@@ -38,10 +38,11 @@ autoconf
 
 sed -i '/6.0.20/ a\\t__db_version_compat' configure
 
-export CPPFLAGS="-D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D_AVL_H"
+export CPPFLAGS="${CPPFLAGS} -D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D_AVL_H"
 
 %configure \
         --disable-static    \
+        --enable-dynamic    \
         --disable-debug     \
         --disable-slapd     \
         --with-tls=openssl
@@ -77,6 +78,8 @@ rm -rf %{buildroot}/*
 /etc/openldap/*
 
 %changelog
+*   Wed Jan 05 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.4.57-3
+-   Set --enable-dynamic to disable rpath in ldap tools
 *   Thu Feb 25 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.57-2
 -   Resolve CVE-2021-27212
 *   Fri Jan 29 2021 Henry Li <lihl@microsoft.com> - 2.4.57-1
