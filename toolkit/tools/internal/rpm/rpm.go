@@ -41,6 +41,9 @@ const (
 	// WithCheckDefine specifies the with_check option for rpm tool commands
 	WithCheckDefine = "with_check"
 
+	// ELFHeaderPackageNoteDefine specifies _include_mariner_package_note to enable embedding ELF note headers
+	ELFHeaderPackageNoteDefine = "_include_mariner_package_note"
+
 	// NoCompatibleArchError specifies the error message when processing a SPEC written for a different architecture.
 	NoCompatibleArchError = "error: No compatible architectures found for build"
 )
