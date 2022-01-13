@@ -1487,8 +1487,8 @@
         "type": "other",
         "other": {
           "name": "byacc",
-          "version": "1.9.20200330",
-          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20200330.tgz"
+          "version": "1.9.20220109",
+          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20220109.tgz"
         }
       }
     },
@@ -1617,8 +1617,8 @@
         "type": "other",
         "other": {
           "name": "catch",
-          "version": "2.13.7",
-          "downloadUrl": "https://github.com/catchorg/Catch2/archive/v2.13.7/catch-2.13.7.tar.gz/Catch2-2.13.7.tar.gz"
+          "version": "2.13.8",
+          "downloadUrl": "https://github.com/catchorg/Catch2/archive/refs/tags/v2.13.8.tar.gz"
         }
       }
     },
@@ -1777,8 +1777,8 @@
         "type": "other",
         "other": {
           "name": "chkconfig",
-          "version": "1.11",
-          "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/1.11.tar.gz"
+          "version": "1.20",
+          "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/refs/tags/1.20.tar.gz"
         }
       }
     },

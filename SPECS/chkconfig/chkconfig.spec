@@ -1,21 +1,17 @@
 Summary:        A system tool for maintaining the %{_sysconfdir}/rc*.d hierarchy
 Name:           chkconfig
-Version:        1.11
-Release:        4%{?dist}
+Version:        1.20
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://github.com/fedora-sysv/chkconfig
-#Source0: https://github.com/fedora-sysv/%{name}/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Patch0:         chkconfig-shortopt.patch
-Patch1:         ignore-priorities.patch
-Patch2:         chkconfig-runlevel.patch
-Patch3:         print-service-on-off.patch
+Source0:        https://github.com/fedora-sysv/chkconfig/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gettext
 BuildRequires:  libselinux-devel
 BuildRequires:  newt-devel
+BuildRequires:  pkg-config
 BuildRequires:  popt-devel
 Requires:       libselinux
 Requires:       libsepol
@@ -25,6 +21,7 @@ Requires:       slang
 Conflicts:      initscripts <= 5.30-1
 Provides:       alternatives = %{version}-%{release}
 Provides:       update-alternatives = %{version}-%{release}
+Provides:       /sbin/chkconfig
 
 %description
 Chkconfig is a basic system utility.  It updates and queries runlevel
@@ -46,17 +43,19 @@ page), ntsysv configures the current runlevel (5 if you're using X).
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 %build
-
 make RPM_OPT_FLAGS="%{optflags}" LDFLAGS="$RPM_LD_FLAGS" %{?_smp_mflags}
 
+%check
+make check
+
 %install
-make DESTDIR=%{buildroot} MANDIR=%{_mandir} SBINDIR=%{_sbindir} install
+make DESTDIR=%{buildroot} \
+     MANDIR=%{_mandir} \
+     SBINDIR=%{_sbindir} \
+     SYSTEMDUTILDIR=%{_libdir}/systemd \
+     install
 
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
 ln -s rc.d/init.d %{buildroot}%{_sysconfdir}/init.d
@@ -72,21 +71,22 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 %defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
 %license COPYING
-%dir %{_sysconfdir}/alternatives
-/sbin/chkconfig
-%{_sbindir}/update-alternatives
-%{_sbindir}/alternatives
+%{_sbindir}/chkconfig
 %{_sysconfdir}/chkconfig.d
 %{_sysconfdir}/init.d
 %{_sysconfdir}/rc.d
 %{_sysconfdir}/rc.d/init.d
 %{_sysconfdir}/rc[0-6].d
 %{_sysconfdir}/rc.d/rc[0-6].d
-%dir %{_sharedstatedir}/alternatives
 %{_mandir}/*/chkconfig*
+%{_libdir}/systemd/systemd-sysv-install
+
+%dir %{_sysconfdir}/alternatives
+%{_sbindir}/update-alternatives
+%{_sbindir}/alternatives
 %{_mandir}/*/update-alternatives*
 %{_mandir}/*/alternatives*
-%{_libdir}/systemd/systemd-sysv-install
+%dir %{_sharedstatedir}/alternatives
 
 %files -n ntsysv
 %defattr(-,root,root)
@@ -94,8 +94,8 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 %{_mandir}/*/ntsysv.8*
 
 %changelog
-* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11-4
-- Removing the explicit %%clean stage.
+* Tue Jan 11 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.20-1
+- Upgrade to 1.20.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.11-3
 - Replace incorrect %%{_lib} usage with %%{_libdir}
