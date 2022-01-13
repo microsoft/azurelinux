@@ -10,7 +10,7 @@
 Summary:	Encoding and decoding of UTF-8 encoding form
 Name:		perl-Unicode-UTF8
 Version:	0.62
-Release:	12%{?dist}
+Release:	13%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -102,6 +102,9 @@ make test
 %{_mandir}/man3/Unicode::UTF8.3*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.62-13
+- License verified.
+
 
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.62-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

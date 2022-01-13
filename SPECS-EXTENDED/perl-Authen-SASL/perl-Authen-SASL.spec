@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Authen-SASL
 Version:        2.16
-Release:        20%{?dist}
+Release:        21%{?dist}
 Summary:        SASL Authentication framework for Perl
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Authen-SASL
@@ -70,6 +70,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.16-21
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.16-20
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

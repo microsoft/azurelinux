@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: LDAP Perl module that wraps the OpenLDAP C SDK
 Name: perl-Mozilla-LDAP
 Version: 1.5.3
-Release: 32%{?dist}
+Release: 33%{?dist}
 License: GPLv2+ and LGPLv2+ and MPLv1.1
 URL: https://metacpan.org/dist/perldap
 Requires: perl-interpreter >= 2:5.8.0
@@ -88,6 +88,9 @@ make test
 %doc CREDITS ChangeLog README MPL-1.1.txt
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.3-33
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.3-32
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,6 +1,6 @@
 Name:           perl-Module-Install-AuthorRequires
 Version:        0.02
-Release:        22%{?dist}
+Release:        23%{?dist}
 Summary:        Declare author-only dependencies
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -52,6 +52,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-23
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

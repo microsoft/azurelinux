@@ -11,7 +11,7 @@ Distribution:   Mariner
 
 Name:           perl-LDAP
 Version:        0.66
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        LDAP Perl module
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/perl-ldap
@@ -229,6 +229,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.66-10
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.66-9
 - Remove epoch
 

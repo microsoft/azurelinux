@@ -1,6 +1,6 @@
 Name:           perl-Module-Install-AuthorTests
 Version:        0.002
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Designate tests only run by module authors
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -51,6 +51,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.002-24
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.002-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
