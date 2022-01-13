@@ -18345,7 +18345,7 @@
         "other": {
           "name": "perl-Locale-Msgfmt",
           "version": "0.15",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SZ/SZABGAB/Locale-Msgfmt-0.15.tar.gz"
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-0.15.tar.gz"
         }
       }
     },
@@ -18775,7 +18775,7 @@
         "other": {
           "name": "perl-Mozilla-LDAP",
           "version": "1.5.3",
-          "downloadUrl": "ftp://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5.3/src/perl-mozldap-1.5.3.tar.gz"
+          "downloadUrl": "https://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5.3/src/perl-mozldap-1.5.3.tar.gz"
         }
       }
     },

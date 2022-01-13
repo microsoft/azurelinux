@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Install-AuthorTests
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Module-Install-AuthorTests-%{version}.tar.gz#/perl-Module-Install-AuthorTests-%{version}.tar.gz
+Source1:        LICENSE.PTR
 BuildArch:      noarch
 BuildRequires:  perl-generators
 BuildRequires:  perl(inc::Module::Install)
@@ -42,10 +43,13 @@ find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
 find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
 %{_fixperms} $RPM_BUILD_ROOT/*
 
+cp %{SOURCE1} .
+
 %check
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*

@@ -7,6 +7,7 @@ Summary:        SASL Authentication framework for Perl
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Authen-SASL
 Source0:        https://cpan.metacpan.org/authors/id/G/GB/GBARR/Authen-SASL-%{version}.tar.gz#/perl-Authen-SASL-%{version}.tar.gz
+Source1:        LICENSE.PTR
 # Update the function WRITE to properly handle string which is shorter than
 # provided length
 Patch0:         Authen-SASL-RT85294-Fix-WRITE.patch
@@ -61,10 +62,13 @@ make pure_install DESTDIR=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -type f -name .packlist -delete
 %{_fixperms} $RPM_BUILD_ROOT
 
+cp %{SOURCE1} .
+
 %check
 make test
 
 %files
+%license LICENSE.PTR
 %doc api.txt Changes example_pl
 %{perl_vendorlib}/*
 %{_mandir}/man3/*

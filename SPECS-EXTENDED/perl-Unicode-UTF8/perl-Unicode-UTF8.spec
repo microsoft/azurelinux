@@ -96,7 +96,8 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 make test
 
 %files
-%doc Changes README
+%license README
+%doc Changes
 %{perl_vendorarch}/Unicode/
 %{perl_vendorarch}/auto/Unicode/
 %{_mandir}/man3/Unicode::UTF8.3*
@@ -104,7 +105,6 @@ make test
 %changelog
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.62-13
 - License verified.
-
 
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.62-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

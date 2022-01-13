@@ -14,6 +14,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:		https://metacpan.org/release/Test-LeakTrace
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-LeakTrace-%{version}.tar.gz#/perl-Test-LeakTrace-%{version}.tar.gz
+Source1:	LICENSE.PTR
 # Module Build
 BuildRequires:	coreutils
 BuildRequires:	findutils
@@ -98,10 +99,13 @@ find %{buildroot} -type f -name .packlist -delete
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
+cp %{SOURCE1} .
+
 %check
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes README benchmark/ example/ %{?perl_default_filter:t/ xt/}
 %{perl_vendorarch}/auto/Test/
 %{perl_vendorarch}/Test/

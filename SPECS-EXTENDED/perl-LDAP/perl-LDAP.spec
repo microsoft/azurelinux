@@ -16,6 +16,7 @@ Summary:        LDAP Perl module
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/perl-ldap
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MARSCHAP/perl-ldap-%{version}.tar.gz
+Source1:        LICENSE.PTR
 # Optional tests need to know a location of an LDAP server executable
 Patch0:         perl-ldap-0.65-Configure-usr-sbin-slapd-for-tests.patch
 # Remove an unreliable cancelling test
@@ -206,10 +207,13 @@ EOF
 chmod +x %{buildroot}/%{_libexecdir}/%{name}/test
 %{_fixperms} %{buildroot}/*
 
+cp %{SOURCE1} .
+
 %check
 make test
  
 %files
+%license LICENSE.PTR
 %doc Changes CREDITS
 %doc contrib/ bin/
 %{perl_vendorlib}/Bundle/

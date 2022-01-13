@@ -47,7 +47,8 @@ find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
 make test
 
 %files
-%doc Changes README
+%license README
+%doc Changes
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 

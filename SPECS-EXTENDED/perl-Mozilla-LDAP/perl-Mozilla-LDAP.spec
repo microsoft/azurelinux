@@ -4,7 +4,7 @@ Summary: LDAP Perl module that wraps the OpenLDAP C SDK
 Name: perl-Mozilla-LDAP
 Version: 1.5.3
 Release: 33%{?dist}
-License: GPLv2+ and LGPLv2+ and MPLv1.1
+License: MPLv1.1
 URL: https://metacpan.org/dist/perldap
 Requires: perl-interpreter >= 2:5.8.0
 BuildRequires:  gcc
@@ -19,8 +19,8 @@ BuildRequires: openldap-devel >= 2.4.22
 BuildRequires: perl(AutoLoader)
 %endif
 # Source0: https://metacpan.org/dist/perldap/source
-Source0: ftp://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/%{version}/src/perl-mozldap-%{version}.tar.gz
-Source1: ftp://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5/src/Makefile.PL.rpm
+Source0: https://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/%{version}/src/perl-mozldap-%{version}.tar.gz
+Source1: https://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5/src/Makefile.PL.rpm
 
 %description
 %{summary}.
@@ -85,7 +85,8 @@ fi
 make test
 
 %files -f %{name}-%{version}-%{release}-filelist
-%doc CREDITS ChangeLog README MPL-1.1.txt
+%license MPL-1.1.txt
+%doc CREDITS ChangeLog README
 
 %changelog
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.3-33

@@ -6,7 +6,7 @@ Release:        28%{?dist}
 Summary:        Compile .po files to .mo files
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Locale-Msgfmt
-Source0:        https://cpan.metacpan.org/authors/id/S/SZ/SZABGAB/Locale-Msgfmt-%{version}.tar.gz#/perl-Locale-Msgfmt-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-%{version}.tar.gz#/perl-Locale-Msgfmt-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils

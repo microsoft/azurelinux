@@ -2,7 +2,7 @@ Summary:        Basic perl modules for handling Plain Old Documentation (POD)
 Name:           perl-Pod-Parser
 Version:        1.63
 Release:        450%{?dist}
-License:        Artistic
+License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Pod-Parser
@@ -64,7 +64,8 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 make test
 
 %files
-%doc ANNOUNCE CHANGES README TODO
+%license README
+%doc ANNOUNCE CHANGES TODO
 %{_bindir}/podselect
 %{perl_vendorlib}/*
 %{_mandir}/man1/*

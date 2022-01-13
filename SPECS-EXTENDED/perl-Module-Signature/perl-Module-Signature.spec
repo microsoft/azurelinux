@@ -2,7 +2,7 @@ Name:           perl-Module-Signature
 Version:        0.83
 Release:        8%{?dist}
 Summary:        CPAN signature management utilities and modules
-License:        CC0
+License:        CC0 and (GPL+ or Artistic)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Signature
@@ -83,7 +83,8 @@ export GNUPGHOME=$(pwd)/gnupghome
 make test
 
 %files
-%doc AUTHORS Changes README *.pub
+%license README
+%doc AUTHORS Changes *.pub
 %{_bindir}/cpansign
 %{perl_vendorlib}/Module/
 %{_mandir}/man1/cpansign.1*
