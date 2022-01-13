@@ -19,7 +19,6 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
-#%patch0 -p1
 %patch1 -p1
 
 %build
