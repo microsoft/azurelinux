@@ -3118,8 +3118,8 @@
         "type": "other",
         "other": {
           "name": "dwz",
-          "version": "0.13",
-          "downloadUrl": "https://sourceware.org/ftp/dwz/releases/dwz-0.13.tar.xz"
+          "version": "0.14",
+          "downloadUrl": "https://sourceware.org/ftp/dwz/releases/dwz-0.14.tar.xz"
         }
       }
     },
