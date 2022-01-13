@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -123,6 +123,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Wed Jan 12 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-11
+- Include module_info.ld in macros only when _include_mariner_package_note is set
+
 * Wed Dec 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-10
 - Add Fedora's macros for passing flags to extension builders (license: MIT)
 
