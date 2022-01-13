@@ -1,6 +1,6 @@
 Summary: Utility for the creation of squashfs filesystems
 Name: squashfs-tools
-Version: 4.4
+Version: 4.5
 Release: 1%{?dist}
 License: GPLv2+
 URL: https://github.com/plougher/squashfs-tools
@@ -46,6 +46,9 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 %{_sbindir}/unsquashfs
 
 %changelog
+* Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.5-1
+- Update to version 4.5.
+
 * Mon Aug 02 2021 Nicolas Guibourge <nicolasg@microsoft.com> 4.4-1
 - Move to version 4.4 to address CVE-2015-4646
 - License verified

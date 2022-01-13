@@ -1,7 +1,7 @@
 Summary:    ODBC driver manager
 Name:       unixODBC
-Version:    2.3.7
-Release:        3%{?dist}
+Version:    2.3.9
+Release:        1%{?dist}
 License:    GPLv2+ and LGPLv2+
 URL:        http://www.unixodbc.org/
 Group:      System Environment/Libraries
@@ -71,12 +71,17 @@ rm -rf %{buildroot}%{_datadir}/libtool
 %{_libdir}/pkgconfig
 
 %changelog
+* Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.9-1
+- Update to version 2.3.9.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.3.7-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.3.7-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Sep 10 2018 Michelle Wang <michellew@vmware.com> 2.3.7-1
--   Update version to 2.3.7.
-*   Wed Oct 26 2016 Anish Swaminathan <anishs@vmware.com> 2.3.4-1
--   Initial build.  First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.3.7-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Sep 10 2018 Michelle Wang <michellew@vmware.com> 2.3.7-1
+- Update version to 2.3.7.
+
+* Wed Oct 26 2016 Anish Swaminathan <anishs@vmware.com> 2.3.4-1
+- Initial build.  First version

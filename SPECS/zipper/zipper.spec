@@ -1,7 +1,7 @@
 Name:           zipper
 Summary:        C++ wrapper around minizip compression library
-Version:        1.0.1
-Release:        2%{?dist}
+Version:        1.0.3
+Release:        1%{?dist}
 URL:            https://github.com/sebastiandev/zipper
 Group:          Applications/File
 Vendor:         Microsoft Corporation
@@ -82,14 +82,21 @@ make test -C build
 %defattr(-,root,root)
 %doc README.md VERSION.txt
 %license LICENSE.md minizip/LICENSE
+%{_bindir}/Zipper-test
 %{_libdir}/libZipper.so.*
 
 %files devel
 %defattr(-,root,root)
+%{_libdir}/cmake/*.cmake
 %{_libdir}/libZipper.so
+%{_libdir}/libZipper.a
+%{_datadir}/pkgconfig/zipper.pc
 %{_includedir}/zipper/
 
 %changelog
+* Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.3-1
+- Update to version 1.0.3.
+
 * Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0.1-2
 - Added source URL.
 - Switching to published GitHub source from the custom-made one.
