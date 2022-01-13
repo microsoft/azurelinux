@@ -155,16 +155,6 @@
         "type": "other",
         "other": {
           "name": "alsa-lib",
-          "version": "1.2.3.2",
-          "downloadUrl": "ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.2.3.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "alsa-lib",
           "version": "1.2.6.1",
           "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
         }
@@ -18355,7 +18345,7 @@
         "other": {
           "name": "perl-Locale-Msgfmt",
           "version": "0.15",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SZ/SZABGAB/Locale-Msgfmt-0.15.tar.gz"
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-0.15.tar.gz"
         }
       }
     },
@@ -18785,7 +18775,7 @@
         "other": {
           "name": "perl-Mozilla-LDAP",
           "version": "1.5.3",
-          "downloadUrl": "ftp://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5.3/src/perl-mozldap-1.5.3.tar.gz"
+          "downloadUrl": "https://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5.3/src/perl-mozldap-1.5.3.tar.gz"
         }
       }
     },
