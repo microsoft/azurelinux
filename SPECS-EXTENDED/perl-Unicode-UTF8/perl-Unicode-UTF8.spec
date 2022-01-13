@@ -24,6 +24,7 @@ BuildRequires:	make
 BuildRequires:	perl-interpreter
 BuildRequires:	perl-devel
 BuildRequires:	perl-generators
+BuildRequires:	perl(FindBin)
 %if %{with perl_Unicode_UTF8_enables_Module_Install_ReadmeFromPod}
 BuildRequires:	perl(inc::Module::Install)
 BuildRequires:	perl(Module::Install::ReadmeFromPod)

@@ -9,6 +9,7 @@ URL:            https://metacpan.org/release/Module-Install-AuthorRequires
 Source0:        https://cpan.metacpan.org/authors/id/F/FL/FLORA/Module-Install-AuthorRequires-%{version}.tar.gz#/perl-Module-Install-AuthorRequires-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl-generators
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install)
 BuildRequires:  perl(Module::Install)
 # Run-time:

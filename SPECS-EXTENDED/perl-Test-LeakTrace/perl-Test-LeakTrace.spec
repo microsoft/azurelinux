@@ -22,8 +22,10 @@ BuildRequires:	make
 BuildRequires:	perl-devel
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
+BuildRequires:	perl(FindBin)
 BuildRequires:	perl(ExtUtils::MakeMaker)
 BuildRequires:	perl(inc::Module::Install)
+BuildRequires:	perl(Module::CoreList)
 BuildRequires:	perl(Module::Install::AuthorTests)
 BuildRequires:	perl(Module::Install::Repository)
 BuildRequires:	sed
