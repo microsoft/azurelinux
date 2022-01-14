@@ -6,7 +6,6 @@ Group:      System Environment/Base
 License:    GPLv2+
 URL:        http://btrfs.wiki.kernel.org/index.php/Main_Page
 Source0:    https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/%{name}-v%{version}.tar.xz#/%{name}-%{version}.tar.xz
-%define sha1 btrfs-progs=df4d34b8ecf5eaac177a0b121b41e67fce9612e1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  lzo-devel
@@ -18,7 +17,8 @@ BuildRequires:  asciidoc
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-Requires:   e2fsprogs, lzo
+Requires:   e2fsprogs
+Requires:   lzo
 
 %description
 The btrfs-progs package provides all the userspace programs needed to create,
