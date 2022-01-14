@@ -50,8 +50,8 @@ diffutils-3.8-1.cm2.x86_64.rpm
 diffutils-debuginfo-3.8-1.cm2.x86_64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
 docbook-style-xsl-1.79.1-13.cm2.noarch.rpm
-dwz-0.13-4.cm2.x86_64.rpm
-dwz-debuginfo-0.13-4.cm2.x86_64.rpm
+dwz-0.14-1.cm2.x86_64.rpm
+dwz-debuginfo-0.14-1.cm2.x86_64.rpm
 e2fsprogs-1.46.4-1.cm2.x86_64.rpm
 e2fsprogs-debuginfo-1.46.4-1.cm2.x86_64.rpm
 e2fsprogs-devel-1.46.4-1.cm2.x86_64.rpm
@@ -169,9 +169,9 @@ libltdl-2.4.6-7.cm2.x86_64.rpm
 libltdl-devel-2.4.6-7.cm2.x86_64.rpm
 libmpc-1.2.1-1.cm2.x86_64.rpm
 libmpc-debuginfo-1.2.1-1.cm2.x86_64.rpm
-libpipeline-1.5.5-1.cm2.x86_64.rpm
-libpipeline-debuginfo-1.5.5-1.cm2.x86_64.rpm
-libpipeline-devel-1.5.5-1.cm2.x86_64.rpm
+libpipeline-1.5.0-5.cm2.x86_64.rpm
+libpipeline-debuginfo-1.5.0-5.cm2.x86_64.rpm
+libpipeline-devel-1.5.0-5.cm2.x86_64.rpm
 libpkgconf-1.8.0-1.cm2.x86_64.rpm
 libpkgconf-devel-1.8.0-1.cm2.x86_64.rpm
 libselinux-3.2-1.cm2.x86_64.rpm
