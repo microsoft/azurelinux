@@ -1,0 +1,452 @@
+From 9f1a39a5d1cd7989ada2d1cb32f97d84360e050f Mon Sep 17 00:00:00 2001
+From: Bram Moolenaar <Bram@vim.org>
+Date: Sat, 8 Jan 2022 15:39:39 +0000
+Subject: [PATCH] patch 8.2.4040: keeping track of allocated lines is too
+ complicated
+
+Problem:    Keeping track of allocated lines in user functions is too
+            complicated.
+Solution:   Instead of freeing individual lines keep them all until the end.
+---
+ src/alloc.c                    | 17 ++++++++--
+ src/message.c                  |  2 +-
+ src/proto/alloc.pro            |  3 +-
+ src/proto/userfunc.pro         |  2 +-
+ src/testdir/test_vim9_func.vim | 16 ++++++++-
+ src/usercmd.c                  |  4 +--
+ src/userfunc.c                 | 62 ++++++++++++++++++----------------
+ src/version.c                  |  2 ++
+ src/vim9compile.c              | 17 ++++++----
+ src/viminfo.c                  |  4 +--
+ 10 files changed, 82 insertions(+), 47 deletions(-)
+
+diff --git a/src/alloc.c b/src/alloc.c
+index 3651a2e59967..e3cd8578f6ef 100644
+--- a/src/alloc.c
++++ b/src/alloc.c
+@@ -702,7 +702,7 @@ ga_init(garray_T *gap)
+ }
+ 
+     void
+-ga_init2(garray_T *gap, int itemsize, int growsize)
++ga_init2(garray_T *gap, size_t itemsize, int growsize)
+ {
+     ga_init(gap);
+     gap->ga_itemsize = itemsize;
+@@ -789,7 +789,7 @@ ga_concat_strings(garray_T *gap, char *sep)
+  * When out of memory nothing changes and FAIL is returned.
+  */
+     int
+-ga_add_string(garray_T *gap, char_u *p)
++ga_copy_string(garray_T *gap, char_u *p)
+ {
+     char_u *cp = vim_strsave(p);
+ 
+@@ -805,6 +805,19 @@ ga_add_string(garray_T *gap, char_u *p)
+     return OK;
+ }
+ 
++/*
++ * Add string "p" to "gap".
++ * When out of memory "p" is freed and FAIL is returned.
++ */
++    int
++ga_add_string(garray_T *gap, char_u *p)
++{
++    if (ga_grow(gap, 1) == FAIL)
++	return FAIL;
++    ((char_u **)(gap->ga_data))[gap->ga_len++] = p;
++    return OK;
++}
++
+ /*
+  * Concatenate a string to a growarray which contains bytes.
+  * When "s" is NULL does not do anything.
+diff --git a/src/message.c b/src/message.c
+index 17c541f95f9b..04a51fbf3592 100644
+--- a/src/message.c
++++ b/src/message.c
+@@ -587,7 +587,7 @@ ignore_error_for_testing(char_u *error)
+     if (STRCMP("RESET", error) == 0)
+ 	ga_clear_strings(&ignore_error_list);
+     else
+-	ga_add_string(&ignore_error_list, error);
++	ga_copy_string(&ignore_error_list, error);
+ }
+ 
+     static int
+diff --git a/src/proto/alloc.pro b/src/proto/alloc.pro
+index 2069ca8ca28e..18281adaaf87 100644
+--- a/src/proto/alloc.pro
++++ b/src/proto/alloc.pro
+@@ -17,10 +17,11 @@ void ga_clear(garray_T *gap);
+ void ga_clear_strings(garray_T *gap);
+ int ga_copy_strings(garray_T *from, garray_T *to);
+ void ga_init(garray_T *gap);
+-void ga_init2(garray_T *gap, int itemsize, int growsize);
++void ga_init2(garray_T *gap, size_t itemsize, int growsize);
+ int ga_grow(garray_T *gap, int n);
+ int ga_grow_inner(garray_T *gap, int n);
+ char_u *ga_concat_strings(garray_T *gap, char *sep);
++int ga_copy_string(garray_T *gap, char_u *p);
+ int ga_add_string(garray_T *gap, char_u *p);
+ void ga_concat(garray_T *gap, char_u *s);
+ void ga_concat_len(garray_T *gap, char_u *s, size_t len);
+diff --git a/src/proto/userfunc.pro b/src/proto/userfunc.pro
+index 311cee2e1288..6b054ffe61c5 100644
+--- a/src/proto/userfunc.pro
++++ b/src/proto/userfunc.pro
+@@ -38,7 +38,7 @@ char_u *untrans_function_name(char_u *name);
+ char_u *get_scriptlocal_funcname(char_u *funcname);
+ char_u *save_function_name(char_u **name, int *is_global, int skip, int flags, funcdict_T *fudi);
+ void list_functions(regmatch_T *regmatch);
+-ufunc_T *define_function(exarg_T *eap, char_u *name_arg, char_u **line_to_free);
++ufunc_T *define_function(exarg_T *eap, char_u *name_arg, garray_T *lines_to_free);
+ void ex_function(exarg_T *eap);
+ void ex_defcompile(exarg_T *eap);
+ int eval_fname_script(char_u *p);
+diff --git a/src/testdir/test_vim9_func.vim b/src/testdir/test_vim9_func.vim
+index 9e420ade748b..75d0dd0b65e8 100644
+--- a/src/testdir/test_vim9_func.vim
++++ b/src/testdir/test_vim9_func.vim
+@@ -1757,6 +1757,21 @@ def Test_nested_function_with_args_split()
+   CheckScriptFailure(lines, 'E1173: Text found after endfunction: BBBB')
+ enddef
+ 
++def Test_error_in_function_args()
++  var lines =<< trim END
++      def FirstFunction()
++        def SecondFunction(J  =
++        # Nois
++        # one
++         
++         enddef|BBBB
++      enddef
++      # Compile all functions
++      defcompile
++  END
++  CheckScriptFailure(lines, 'E488:')
++enddef
++
+ def Test_return_type_wrong()
+   CheckScriptFailure([
+         'def Func(): number',
+@@ -2048,7 +2063,6 @@ func Test_free_dict_while_in_funcstack()
+ endfunc
+ 
+ def Run_Test_free_dict_while_in_funcstack()
+-
+   # this was freeing the TermRun() default argument dictionary while it was
+   # still referenced in a funcstack_T
+   var lines =<< trim END
+diff --git a/src/usercmd.c b/src/usercmd.c
+index de985f8a24b1..40790a1f5631 100644
+--- a/src/usercmd.c
++++ b/src/usercmd.c
+@@ -1021,7 +1021,7 @@ may_get_cmd_block(exarg_T *eap, char_u *p, char_u **tofree, int *flags)
+ 	char_u	    *line = NULL;
+ 
+ 	ga_init2(&ga, sizeof(char_u *), 10);
+-	if (ga_add_string(&ga, p) == FAIL)
++	if (ga_copy_string(&ga, p) == FAIL)
+ 	    return retp;
+ 
+ 	// If the argument ends in "}" it must have been concatenated already
+@@ -1038,7 +1038,7 @@ may_get_cmd_block(exarg_T *eap, char_u *p, char_u **tofree, int *flags)
+ 		    emsg(_(e_missing_rcurly));
+ 		    break;
+ 		}
+-		if (ga_add_string(&ga, line) == FAIL)
++		if (ga_copy_string(&ga, line) == FAIL)
+ 		    break;
+ 		if (*skipwhite(line) == '}')
+ 		    break;
+diff --git a/src/userfunc.c b/src/userfunc.c
+index 3617e7b10619..020d1bcfcb19 100644
+--- a/src/userfunc.c
++++ b/src/userfunc.c
+@@ -166,13 +166,13 @@ one_function_arg(
+ 
+ /*
+  * Handle line continuation in function arguments or body.
+- * Get a next line, store it in "eap" if appropriate and use "line_to_free" to
+- * handle freeing the line later.
++ * Get a next line, store it in "eap" if appropriate and put the line in
++ * "lines_to_free" to free the line later.
+  */
+     static char_u *
+ get_function_line(
+ 	exarg_T		*eap,
+-	char_u		**line_to_free,
++	garray_T	*lines_to_free,
+ 	int		indent,
+ 	getline_opt_T	getline_options)
+ {
+@@ -184,10 +184,11 @@ get_function_line(
+ 	theline = eap->getline(':', eap->cookie, indent, getline_options);
+     if (theline != NULL)
+     {
+-	if (*eap->cmdlinep == *line_to_free)
++	if (lines_to_free->ga_len > 0
++		&& *eap->cmdlinep == ((char_u **)lines_to_free->ga_data)
++						   [lines_to_free->ga_len - 1])
+ 	    *eap->cmdlinep = theline;
+-	vim_free(*line_to_free);
+-	*line_to_free = theline;
++	ga_add_string(lines_to_free, theline);
+     }
+ 
+     return theline;
+@@ -210,7 +211,7 @@ get_function_args(
+     garray_T	*default_args,
+     int		skip,
+     exarg_T	*eap,
+-    char_u	**line_to_free)
++    garray_T	*lines_to_free)
+ {
+     int		mustend = FALSE;
+     char_u	*arg;
+@@ -241,7 +242,7 @@ get_function_args(
+ 			 && (*p == NUL || (VIM_ISWHITE(*whitep) && *p == '#')))
+ 	{
+ 	    // End of the line, get the next one.
+-	    char_u *theline = get_function_line(eap, line_to_free, 0,
++	    char_u *theline = get_function_line(eap, lines_to_free, 0,
+ 							  GETLINE_CONCAT_CONT);
+ 
+ 	    if (theline == NULL)
+@@ -677,7 +678,7 @@ get_function_body(
+ 	exarg_T	    *eap,
+ 	garray_T    *newlines,
+ 	char_u	    *line_arg_in,
+-	char_u	    **line_to_free)
++	garray_T    *lines_to_free)
+ {
+     linenr_T	sourcing_lnum_top = SOURCING_LNUM;
+     linenr_T	sourcing_lnum_off;
+@@ -744,7 +745,7 @@ get_function_body(
+ 	}
+ 	else
+ 	{
+-	    theline = get_function_line(eap, line_to_free, indent,
++	    theline = get_function_line(eap, lines_to_free, indent,
+ 							      getline_options);
+ 	}
+ 	if (KeyTyped)
+@@ -854,14 +855,20 @@ get_function_body(
+ 		    {
+ 			// Another command follows. If the line came from "eap"
+ 			// we can simply point into it, otherwise we need to
+-			// change "eap->cmdlinep".
++			// change "eap->cmdlinep" to point to the last fetched
++			// line.
+ 			eap->nextcmd = nextcmd;
+-			if (*line_to_free != NULL
+-					    && *eap->cmdlinep != *line_to_free)
++			if (lines_to_free->ga_len > 0
++				&& *eap->cmdlinep !=
++					    ((char_u **)lines_to_free->ga_data)
++						   [lines_to_free->ga_len - 1])
+ 			{
++			    // *cmdlinep will be freed later, thus remove the
++			    // line from lines_to_free.
+ 			    vim_free(*eap->cmdlinep);
+-			    *eap->cmdlinep = *line_to_free;
+-			    *line_to_free = NULL;
++			    *eap->cmdlinep = ((char_u **)lines_to_free->ga_data)
++						   [lines_to_free->ga_len - 1];
++			    --lines_to_free->ga_len;
+ 			}
+ 		    }
+ 		    break;
+@@ -1118,7 +1125,6 @@ lambda_function_body(
+     garray_T	newlines;
+     char_u	*cmdline = NULL;
+     int		ret = FAIL;
+-    char_u	*line_to_free = NULL;
+     partial_T	*pt;
+     char_u	*name;
+     int		lnum_save = -1;
+@@ -1144,12 +1150,9 @@ lambda_function_body(
+     }
+ 
+     ga_init2(&newlines, (int)sizeof(char_u *), 10);
+-    if (get_function_body(&eap, &newlines, NULL, &line_to_free) == FAIL)
+-    {
+-	if (cmdline != line_to_free)
+-	    vim_free(cmdline);
++    if (get_function_body(&eap, &newlines, NULL,
++					     &evalarg->eval_tofree_ga) == FAIL)
+ 	goto erret;
+-    }
+ 
+     // When inside a lambda must add the function lines to evalarg.eval_ga.
+     evalarg->eval_break_count += newlines.ga_len;
+@@ -1208,8 +1211,6 @@ lambda_function_body(
+ 	{
+ 	    ((char_u **)(tfgap->ga_data))[tfgap->ga_len++] = cmdline;
+ 	    evalarg->eval_using_cmdline = TRUE;
+-	    if (cmdline == line_to_free)
+-		line_to_free = NULL;
+ 	}
+     }
+     else
+@@ -1278,7 +1279,6 @@ lambda_function_body(
+ erret:
+     if (lnum_save >= 0)
+ 	SOURCING_LNUM = lnum_save;
+-    vim_free(line_to_free);
+     ga_clear_strings(&newlines);
+     if (newargs != NULL)
+ 	ga_clear_strings(newargs);
+@@ -3957,10 +3957,11 @@ list_functions(regmatch_T *regmatch)
+  * ":function" also supporting nested ":def".
+  * When "name_arg" is not NULL this is a nested function, using "name_arg" for
+  * the function name.
++ * "lines_to_free" is a list of strings to be freed later.
+  * Returns a pointer to the function or NULL if no function defined.
+  */
+     ufunc_T *
+-define_function(exarg_T *eap, char_u *name_arg, char_u **line_to_free)
++define_function(exarg_T *eap, char_u *name_arg, garray_T *lines_to_free)
+ {
+     int		j;
+     int		c;
+@@ -4229,7 +4230,7 @@ define_function(exarg_T *eap, char_u *name_arg, char_u **line_to_free)
+     if (get_function_args(&p, ')', &newargs,
+ 			eap->cmdidx == CMD_def ? &argtypes : NULL, FALSE,
+ 			 NULL, &varargs, &default_args, eap->skip,
+-			 eap, line_to_free) == FAIL)
++			 eap, lines_to_free) == FAIL)
+ 	goto errret_2;
+     whitep = p;
+ 
+@@ -4339,7 +4340,7 @@ define_function(exarg_T *eap, char_u *name_arg, char_u **line_to_free)
+ 
+     // Do not define the function when getting the body fails and when
+     // skipping.
+-    if (get_function_body(eap, &newlines, line_arg, line_to_free) == FAIL
++    if (get_function_body(eap, &newlines, line_arg, lines_to_free) == FAIL
+ 	    || eap->skip)
+ 	goto erret;
+ 
+@@ -4645,10 +4646,11 @@ define_function(exarg_T *eap, char_u *name_arg, char_u **line_to_free)
+     void
+ ex_function(exarg_T *eap)
+ {
+-    char_u *line_to_free = NULL;
++    garray_T lines_to_free;
+ 
+-    (void)define_function(eap, NULL, &line_to_free);
+-    vim_free(line_to_free);
++    ga_init2(&lines_to_free, sizeof(char_u *), 50);
++    (void)define_function(eap, NULL, &lines_to_free);
++    ga_clear_strings(&lines_to_free);
+ }
+ 
+ /*
+diff --git a/src/version.c b/src/version.c
+index 542227c903a2..9e4ae19cb02b 100644
+--- a/src/version.c
++++ b/src/version.c
+@@ -750,6 +750,8 @@ static char *(features[]) =
+ 
+ static int included_patches[] =
+ {   /* Add new patch number below this line */
++/**/
++    4040,
+ /**/
+     4039,
+ /**/
+diff --git a/src/vim9compile.c b/src/vim9compile.c
+index 5af30fd719b2..90d7adbb7981 100644
+--- a/src/vim9compile.c
++++ b/src/vim9compile.c
+@@ -810,7 +810,7 @@ func_needs_compiling(ufunc_T *ufunc, compiletype_T compile_type)
+  * Compile a nested :def command.
+  */
+     static char_u *
+-compile_nested_function(exarg_T *eap, cctx_T *cctx, char_u **line_to_free)
++compile_nested_function(exarg_T *eap, cctx_T *cctx, garray_T *lines_to_free)
+ {
+     int		is_global = *eap->arg == 'g' && eap->arg[1] == ':';
+     char_u	*name_start = eap->arg;
+@@ -876,7 +876,7 @@ compile_nested_function(exarg_T *eap, cctx_T *cctx, char_u **line_to_free)
+ 	goto theend;
+     }
+ 
+-    ufunc = define_function(eap, lambda_name, line_to_free);
++    ufunc = define_function(eap, lambda_name, lines_to_free);
+     if (ufunc == NULL)
+     {
+ 	r = eap->skip ? OK : FAIL;
+@@ -2496,7 +2496,7 @@ compile_def_function(
+ 	cctx_T		*outer_cctx)
+ {
+     char_u	*line = NULL;
+-    char_u	*line_to_free = NULL;
++    garray_T	lines_to_free;
+     char_u	*p;
+     char	*errormsg = NULL;	// error message
+     cctx_T	cctx;
+@@ -2514,6 +2514,9 @@ compile_def_function(
+ #endif
+     int		debug_lnum = -1;
+ 
++    // allocated lines are freed at the end
++    ga_init2(&lines_to_free, sizeof(char_u *), 50);
++
+     // When using a function that was compiled before: Free old instructions.
+     // The index is reused.  Otherwise add a new entry in "def_functions".
+     if (ufunc->uf_dfunc_idx > 0)
+@@ -2681,8 +2684,8 @@ compile_def_function(
+ 	    if (line != NULL)
+ 	    {
+ 		line = vim_strsave(line);
+-		vim_free(line_to_free);
+-		line_to_free = line;
++		if (ga_add_string(&lines_to_free, line) == FAIL)
++		    goto erret;
+ 	    }
+ 	}
+ 
+@@ -2926,7 +2929,7 @@ compile_def_function(
+ 	    case CMD_def:
+ 	    case CMD_function:
+ 		    ea.arg = p;
+-		    line = compile_nested_function(&ea, &cctx, &line_to_free);
++		    line = compile_nested_function(&ea, &cctx, &lines_to_free);
+ 		    break;
+ 
+ 	    case CMD_return:
+@@ -3236,7 +3239,7 @@ compile_def_function(
+     if (do_estack_push)
+ 	estack_pop();
+ 
+-    vim_free(line_to_free);
++    ga_clear_strings(&lines_to_free);
+     free_imported(&cctx);
+     free_locals(&cctx);
+     ga_clear(&cctx.ctx_type_stack);
+diff --git a/src/viminfo.c b/src/viminfo.c
+index 3f9e5f3beb71..ac0d3856e7f9 100644
+--- a/src/viminfo.c
++++ b/src/viminfo.c
+@@ -2730,7 +2730,7 @@ read_viminfo_barline(vir_T *virp, int got_encoding, int force, int writing)
+     {
+ 	// Continuation line of an unrecognized item.
+ 	if (writing)
+-	    ga_add_string(&virp->vir_barlines, virp->vir_line);
++	    ga_copy_string(&virp->vir_barlines, virp->vir_line);
+     }
+     else
+     {
+@@ -2769,7 +2769,7 @@ read_viminfo_barline(vir_T *virp, int got_encoding, int force, int writing)
+ 	    default:
+ 		// copy unrecognized line (for future use)
+ 		if (writing)
+-		    ga_add_string(&virp->vir_barlines, virp->vir_line);
++		    ga_copy_string(&virp->vir_barlines, virp->vir_line);
+ 	}
+ 	for (i = 0; i < values.ga_len; ++i)
+ 	{
