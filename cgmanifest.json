@@ -28927,8 +28927,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4006",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4006.tar.gz"
+          "version": "8.2.4081",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4081.tar.gz"
         }
       }
     },
