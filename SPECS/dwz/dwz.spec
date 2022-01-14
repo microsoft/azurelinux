@@ -6,8 +6,9 @@ License:        GPLv2+ and GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://sourceware.org/dwz
-Source:         https://sourceware.org/ftp/dwz/releases/%{name}-%{version}.tar.xz#/%{name}-%{version}.tar.xz
-BuildRequires:  gcc, elfutils-libelf-devel
+Source0:        https://sourceware.org/ftp/dwz/releases/%{name}-%{version}.tar.xz
+BuildRequires:  elfutils-libelf-devel
+BuildRequires:  gcc
 
 %description
 The dwz package contains a program that attempts to optimize DWARF
