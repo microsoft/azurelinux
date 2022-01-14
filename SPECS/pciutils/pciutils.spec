@@ -39,6 +39,7 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 
 %files
 %defattr(-,root,root)
+%license COPYING
 %{_sbindir}/*
 %{_libdir}/*.so.*
 %{_datadir}/misc/*
