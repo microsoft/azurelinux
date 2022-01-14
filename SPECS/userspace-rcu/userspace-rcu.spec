@@ -12,7 +12,6 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  elfutils-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  m4
-BuildRequires:  nss-devel
 BuildRequires:  popt-devel
 
 %description
