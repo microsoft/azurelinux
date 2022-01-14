@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "LICENSE.PTR": "b79802341531765e5fccc5c4705fd5ec30b9d791a36bcd8ba71f69ab3a62f484",
   "perl-Module-Install-AuthorTests-0.002.tar.gz": "4025722de6357edf53c28501b00e7da92cd2f9fc611ba0753761a0e1dff32d88"
  }
 }

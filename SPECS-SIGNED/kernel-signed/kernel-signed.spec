@@ -150,6 +150,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
+%exclude /module_info.ld
 %ifarch x86_64
 %exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
 %endif

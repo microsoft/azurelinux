@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "LICENSE.PTR": "8359cf187c9eb081985221687c31cb8ae23cead5573b8a0c5d5b96ac14f8f9b6",
   "perl-Test-utf8-1.02.tar.gz": "df82f09c5940830b25a49f1c8162fa24d371e602880edef8d9a4d4bfd66b8bd7"
  }
 }

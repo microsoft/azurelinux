@@ -97,8 +97,8 @@ elfutils-libelf-lang-0.185-1.cm2.x86_64.rpm
 expat-2.4.1-1.cm2.x86_64.rpm
 expat-devel-2.4.1-1.cm2.x86_64.rpm
 expat-libs-2.4.1-1.cm2.x86_64.rpm
-libpipeline-1.5.0-5.cm2.x86_64.rpm
-libpipeline-devel-1.5.0-5.cm2.x86_64.rpm
+libpipeline-1.5.5-1.cm2.x86_64.rpm
+libpipeline-devel-1.5.5-1.cm2.x86_64.rpm
 gdbm-1.21-1.cm2.x86_64.rpm
 gdbm-devel-1.21-1.cm2.x86_64.rpm
 gdbm-lang-1.21-1.cm2.x86_64.rpm
@@ -217,7 +217,8 @@ npth-1.6-4.cm2.x86_64.rpm
 pinentry-1.2.0-1.cm2.x86_64.rpm
 gnupg2-2.3.3-1.cm2.x86_64.rpm
 gpgme-1.16.0-1.cm2.x86_64.rpm
-mariner-repos-preview-2.0-3.cm2.noarch.rpm
+mariner-repos-shared-2.0-4.cm2.noarch.rpm
+mariner-repos-preview-2.0-4.cm2.noarch.rpm
 libffi-3.4.2-1.cm2.x86_64.rpm
 libffi-devel-3.4.2-1.cm2.x86_64.rpm
 libtasn1-4.14-3.cm2.x86_64.rpm

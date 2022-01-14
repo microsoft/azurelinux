@@ -1,12 +1,13 @@
 Name:           perl-Module-Install-AuthorTests
 Version:        0.002
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Designate tests only run by module authors
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Install-AuthorTests
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Module-Install-AuthorTests-%{version}.tar.gz#/perl-Module-Install-AuthorTests-%{version}.tar.gz
+Source1:        LICENSE.PTR
 BuildArch:      noarch
 BuildRequires:  perl-generators
 BuildRequires:  perl(inc::Module::Install)
@@ -14,6 +15,7 @@ BuildRequires:  perl(inc::Module::Install)
 # XXX: We cannot remove ./inc because it build-requires this module (bootstrap)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(FindBin)
 # Run-time:
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Module::Install::Base)
@@ -41,15 +43,21 @@ find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
 find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
 %{_fixperms} $RPM_BUILD_ROOT/*
 
+cp %{SOURCE1} .
+
 %check
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.002-24
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.002-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
