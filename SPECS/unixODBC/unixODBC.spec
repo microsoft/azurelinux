@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://www.unixodbc.org/
-Source0:        ftp://ftp.unixodbc.org/pub/unixODBC/%{name}-%{version}.tar.gz
+Source0:        http://www.unixodbc.org/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool

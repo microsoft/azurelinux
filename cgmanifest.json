@@ -28668,7 +28668,7 @@
         "other": {
           "name": "unixODBC",
           "version": "2.3.9",
-          "downloadUrl": "ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-2.3.9.tar.gz"
+          "downloadUrl": "http://www.unixodbc.org/unixODBC-2.3.9.tar.gz"
         }
       }
     },
