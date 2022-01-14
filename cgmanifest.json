@@ -27557,8 +27557,8 @@
         "type": "other",
         "other": {
           "name": "squashfs-tools",
-          "version": "4.4",
-          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.4.tar.gz"
+          "version": "4.5",
+          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.5.tar.gz"
         }
       }
     },
@@ -28667,8 +28667,8 @@
         "type": "other",
         "other": {
           "name": "unixODBC",
-          "version": "2.3.7",
-          "downloadUrl": "ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-2.3.7.tar.gz"
+          "version": "2.3.9",
+          "downloadUrl": "http://www.unixodbc.org/unixODBC-2.3.9.tar.gz"
         }
       }
     },
@@ -28817,8 +28817,8 @@
         "type": "other",
         "other": {
           "name": "utf8proc",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/JuliaStrings/utf8proc/archive/v2.2.0.tar.gz"
+          "version": "2.6.1",
+          "downloadUrl": "https://github.com/JuliaStrings/utf8proc/archive/v2.6.1.tar.gz"
         }
       }
     },
@@ -30320,8 +30320,8 @@
         "type": "other",
         "other": {
           "name": "zchunk",
-          "version": "1.1.5",
-          "downloadUrl": "https://github.com/zchunk/zchunk/archive/1.1.5.tar.gz"
+          "version": "1.1.16",
+          "downloadUrl": "https://github.com/zchunk/zchunk/archive/1.1.16.tar.gz"
         }
       }
     },
@@ -30380,8 +30380,8 @@
         "type": "other",
         "other": {
           "name": "zipper",
-          "version": "1.0.1",
-          "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.1.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.3.tar.gz"
         }
       }
     },
