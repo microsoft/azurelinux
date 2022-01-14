@@ -20,13 +20,6 @@ Requires:       %{name} = %{version}-%{release}
 %description devel
 Libraries and header files for the libatomic_ops library.
 
-%package        static
-Summary:        Static libraries for libatomic_ops
-Requires:       %{name}-devel = %{version}-%{release}
-
-%description static
-Static libraries for the libatomic_ops library
-
 %prep
 %autosetup
 
@@ -40,6 +33,7 @@ Static libraries for the libatomic_ops library
 %install
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -type f -name "*.a" -delete -print
 # We will package these files manually using the %%license macro
 rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSING.txt}
 
@@ -62,15 +56,10 @@ rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSING.txt}
 %{_libdir}/libatomic_ops_gpl.so
 %{_libdir}/pkgconfig/atomic_ops.pc
 
-%files static
-%defattr(-,root,root)
-%{_libdir}/libatomic_ops.a
-%{_libdir}/libatomic_ops_gpl.a
-
 %changelog
 * Wed Jan 12 2022 Thomas Crain <thcrain@microsoft.com> - 7.6.12-1
 - Upgrade to latest upstream version
-- Move static libraries to a separate subpackage
+- Remove static libraries
 - Install licenses using just the %%license macro
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.6.6-4
