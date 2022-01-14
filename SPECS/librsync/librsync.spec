@@ -1,7 +1,7 @@
 Summary:        Rsync libraries
 Name:           librsync
-Version:        2.0.2
-Release:        4%{?dist}
+Version:        2.3.2
+Release:        1%{?dist}
 URL:            https://librsync.github.io/
 License:        LGPLv2+ and CC0
 Group:          System Environment/Libraries
@@ -90,6 +90,9 @@ make test
 %{_libdir}/*.so
 
 %changelog
+* Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 2.3.2-1
+- Upgrade to version 2.3.2
+
 *   Wed Dec 09 2020 Andrew Phelps <anphel@microsoft.com> 2.0.2-4
 -   Fix check tests
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.0.2-3
