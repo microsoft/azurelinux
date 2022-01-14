@@ -228,7 +228,7 @@ ca-certificates-shared-2.0.0-1.cm2.noarch.rpm
 ca-certificates-tools-2.0.0-1.cm2.noarch.rpm
 ca-certificates-base-2.0.0-1.cm2.noarch.rpm
 ca-certificates-2.0.0-1.cm2.noarch.rpm
-dwz-0.13-4.cm2.x86_64.rpm
+dwz-0.14-1.cm2.x86_64.rpm
 unzip-6.0-19.cm2.x86_64.rpm
 python3-3.9.9-3.cm2.x86_64.rpm
 python3-devel-3.9.9-3.cm2.x86_64.rpm
