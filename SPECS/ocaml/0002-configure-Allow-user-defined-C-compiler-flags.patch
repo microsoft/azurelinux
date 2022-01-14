@@ -1,18 +1,18 @@
-From 3a5dfecb2e4078bcd7388412783b50014006e7c9 Mon Sep 17 00:00:00 2001
+From 9966786a7389dc6621f2bc2dce7c690c5a38b67d Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 29 May 2012 20:44:18 +0100
-Subject: [PATCH 2/5] configure: Allow user defined C compiler flags.
+Subject: [PATCH 2/3] configure: Allow user defined C compiler flags.
 
 ---
  configure.ac | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index e3e28fb6f..0648f0553 100644
+index 3698c7cbf..e2a3cbea0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -590,6 +590,10 @@ AS_CASE([$host],
-       internal_cflags="$gcc_warnings"],
+@@ -669,6 +669,10 @@ AS_CASE([$host],
+       internal_cflags="$cc_warnings"],
      [common_cflags="-O"])])
  
 +# Allow CFLAGS and LDFLAGS to be added.
@@ -23,5 +23,4 @@ index e3e28fb6f..0648f0553 100644
  
  # Enable SSE2 on x86 mingw to avoid using 80-bit registers.
 -- 
-2.25.0
-
+2.32.0
