@@ -1437,8 +1437,8 @@
         "type": "other",
         "other": {
           "name": "btrfs-progs",
-          "version": "4.19",
-          "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v4.19.tar.xz"
+          "version": "5.16",
+          "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v5.16.tar.xz"
         }
       }
     },
