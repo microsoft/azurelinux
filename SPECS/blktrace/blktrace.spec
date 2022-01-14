@@ -6,8 +6,8 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools/Other
-URL:            https://git.kernel.org/cgit/linux/kernel/git/axboe/blktrace.git/tree/README
-Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.gz
+URL:            https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/about
+Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/%{name}-%{version}.tar.gz
 BuildRequires:  libaio-devel
 Requires:       libaio
 Provides:       iowatcher = %{version}-%{release}
