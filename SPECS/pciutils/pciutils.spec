@@ -13,19 +13,12 @@ Source0:        https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{vers
 The pciutils package contains a set of programs for listing PCI devices, inspecting their status and setting their configuration registers.
 
 %package devel
-Summary:        Development Libraries for openssl
+Summary:        Linux PCI development library
 Group:          Development/Libraries
 Requires:       pciutils = %{version}-%{release}
 
 %description devel
 Library files for doing development with pciutils.
-
-%package libs
-Summary:        Linux PCI library
-
-%description libs
-This package contains a library for inspecting and setting
-devices connected to the PCI bus.
 
 %prep
 %setup -q
@@ -51,10 +44,6 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 %{_datadir}/misc/*
 %{_mandir}/*
 
-%files libs
-%license COPYING
-%{_libdir}/libpci.so.*
-
 %files devel
 %defattr(-,root,root)
 %{_libdir}/pkgconfig/*
@@ -64,7 +53,6 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 %changelog
 * Wed Dec 29 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.7.0-1
 - Upgrading to 3.7.0
-- Adding libs subpackage.
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.2-4
 - Removing the explicit %%clean stage.
