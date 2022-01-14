@@ -47,7 +47,7 @@ find %{buildroot} -name '*.la' -delete
 %exclude %{_libdir}/debug
 
 %changelog
-* Fri Jan 14 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.13.2-1
+* Fri Jan 14 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.13.2-1
 - Upgrading to 2.13.2
 - Updated source url.
 - Updating lttng-ust requirement to version 2.13.1
