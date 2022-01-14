@@ -1,15 +1,15 @@
-%define BaseVersion 2.64
+%define BaseVersion 3.0
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
-Version:        %{BaseVersion}.0
-Release:        7%{?dist}
+Version:        %{BaseVersion}.4
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Development
 URL:            https://wiki.gnome.org/LibSoup
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{BaseVersion}/%{name}-%{version}.tar.xz
-Patch0:         libsoup-fix-make-check.patch
+BuildRequires:  meson
 BuildRequires:  autogen
 BuildRequires:  glib-devel
 BuildRequires:  glib-networking
@@ -20,17 +20,14 @@ BuildRequires:  intltool
 BuildRequires:  krb5-devel
 BuildRequires:  libpsl-devel
 BuildRequires:  libxml2-devel
-BuildRequires:  python2
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-BuildRequires:  python2-tools
+BuildRequires:  python3
+BuildRequires:  python3-devel
+BuildRequires:  python3-libs
+BuildRequires:  python3-tools
 BuildRequires:  sqlite-devel
 Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
-%if %{with_check}
-BuildRequires:  krb5-devel
-%endif
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -61,22 +58,17 @@ Requires:       %{name} = %{version}-%{release}
 These are the additional language files of libsoup.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup
 
 %build
-%configure --disable-vala --enable-introspection=yes
-make %{?_smp_mflags}
+%meson -Dgtk_doc=true	
+%meson_build
 
 %install
-rm -rf %{buildroot}%{_infodir}
-make DESTDIR=%{buildroot} install
+%meson_install
 find %{buildroot} -type f -name "*.la" -delete -print
-
 %find_lang %{name}
 
-%check
-make  check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig

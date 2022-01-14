@@ -1,13 +1,14 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
-Version:        2.60.1
-Release:        5%{?dist}
+Version:        2.71.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
-Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{version}.tar.xz
+#Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{version}.tar.xz
+Source0:        %{name}-%{version}.tar.xz
 Patch0:         CVE-2019-12450.patch
 Patch1:         CVE-2020-35457.patch
 # CVE-2021-27218 and CVE-2021-27219 are both solved by the patch for the first
