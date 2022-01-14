@@ -1,6 +1,6 @@
 Name:       btrfs-progs
 Version:    5.16
-Release:    1%{?dist}
+Release:    101%{?dist}
 Summary:    Userspace programs for btrfs
 Group:      System Environment/Base
 License:    GPLv2+
@@ -72,7 +72,7 @@ make DISABLE_DOCUMENTATION=1 mandir=%{_mandir} bindir=%{_sbindir} libdir=%{_libd
 %{_libdir}/libbtrfsutil.a
 %{_libdir}/libbtrfs.so
 %{_libdir}/libbtrfsutil.so
-/lib/udev/rules.d/64-btrfs-dm.rules
+%{_libdir}/udev/rules.d/64-btrfs-dm.rules
 %{_libdir}/pkgconfig/libbtrfsutil.pc
 
 
