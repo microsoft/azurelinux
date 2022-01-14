@@ -50,8 +50,8 @@ diffutils-3.8-1.cm2.aarch64.rpm
 diffutils-debuginfo-3.8-1.cm2.aarch64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
 docbook-style-xsl-1.79.1-13.cm2.noarch.rpm
-dwz-0.13-4.cm2.aarch64.rpm
-dwz-debuginfo-0.13-4.cm2.aarch64.rpm
+dwz-0.14-1.cm2.aarch64.rpm
+dwz-debuginfo-0.14-1.cm2.aarch64.rpm
 e2fsprogs-1.46.4-1.cm2.aarch64.rpm
 e2fsprogs-debuginfo-1.46.4-1.cm2.aarch64.rpm
 e2fsprogs-devel-1.46.4-1.cm2.aarch64.rpm
