@@ -190,7 +190,7 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
-* Thu Jan 13 2022 Rachel Menge <rachelmenge@microsoft.com> 8.2.4081-1
+* Thu Jan 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 8.2.4081-1
 - Update version to 8.2.4081 to fix CVE-2022-0128.
 
 * Thu Jan 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.4006-1
