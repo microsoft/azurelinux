@@ -1005,8 +1005,8 @@
         "type": "other",
         "other": {
           "name": "babeltrace2",
-          "version": "2.0.1",
-          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.1.tar.bz2"
+          "version": "2.0.4",
+          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.4.tar.bz2"
         }
       }
     },
@@ -1065,8 +1065,8 @@
         "type": "other",
         "other": {
           "name": "bash-completion",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/scop/bash-completion/releases/download/2.7/bash-completion-2.7.tar.xz"
+          "version": "2.11",
+          "downloadUrl": "https://github.com/scop/bash-completion/archive/refs/tags/2.11.tar.gz"
         }
       }
     },
@@ -1207,8 +1207,8 @@
         "type": "other",
         "other": {
           "name": "blktrace",
-          "version": "1.2.0",
-          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/blktrace-1.2.0.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/blktrace-1.3.0.tar.gz"
         }
       }
     },
@@ -1237,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "bmake",
-          "version": "20201010",
-          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20201010.tar.gz"
+          "version": "20211221",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20211221.tar.gz"
         }
       }
     },
@@ -1377,8 +1377,8 @@
         "type": "other",
         "other": {
           "name": "bridge-utils",
-          "version": "1.6",
-          "downloadUrl": "https://kernel.org/pub/linux/utils/net/bridge-utils/bridge-utils-1.6.tar.xz"
+          "version": "1.7.1",
+          "downloadUrl": "https://kernel.org/pub/linux/utils/net/bridge-utils/bridge-utils-1.7.1.tar.xz"
         }
       }
     },
@@ -1397,8 +1397,8 @@
         "type": "other",
         "other": {
           "name": "brotli",
-          "version": "1.0.7",
-          "downloadUrl": "https://github.com/google/brotli/archive/v1.0.7/brotli-1.0.7.tar.gz"
+          "version": "1.0.9",
+          "downloadUrl": "https://github.com/google/brotli/archive/refs/tags/v1.0.9.tar.gz"
         }
       }
     },
@@ -1487,8 +1487,8 @@
         "type": "other",
         "other": {
           "name": "byacc",
-          "version": "1.9.20200330",
-          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20200330.tgz"
+          "version": "1.9.20220109",
+          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20220109.tgz"
         }
       }
     },
@@ -1617,8 +1617,8 @@
         "type": "other",
         "other": {
           "name": "catch",
-          "version": "2.13.7",
-          "downloadUrl": "https://github.com/catchorg/Catch2/archive/v2.13.7/catch-2.13.7.tar.gz/Catch2-2.13.7.tar.gz"
+          "version": "2.13.8",
+          "downloadUrl": "https://github.com/catchorg/Catch2/archive/refs/tags/v2.13.8.tar.gz"
         }
       }
     },
@@ -1777,8 +1777,8 @@
         "type": "other",
         "other": {
           "name": "chkconfig",
-          "version": "1.11",
-          "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/1.11.tar.gz"
+          "version": "1.20",
+          "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/refs/tags/1.20.tar.gz"
         }
       }
     },

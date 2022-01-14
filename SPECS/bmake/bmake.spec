@@ -1,7 +1,7 @@
 Summary:       The NetBSD make(1) tool
 Name:          bmake
-Version:       20201010
-Release:       2%{?dist}
+Version:       20211221
+Release:       1%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -37,8 +37,6 @@ shared libraries.
 %autosetup -n %{name}
 sed -i.timestamp -e 's|cp_f=-f|cp_f=-pf|' mk/install-mk
 sed -i.python -e '1 s|^#!/usr/bin/env python|#!/usr/bin/python3|' mk/meta2deps.py
-sed -i.makefile '/ksh/d' unit-tests/Makefile
-sed -i.makefile '/csh/d' unit-tests/Makefile
 
 %build
 %configure --with-default-sys-path=%{_datadir}/mk
@@ -62,6 +60,9 @@ chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 %{_datadir}/mk
 
 %changelog
+* Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20211221-1
+- Upgrade to 20211221
+
 * Fri Apr 16 2021 Vincent Tam <vtam@microsoft.com> - 20201010-2
 - Disable tests for tcsh / ksh
 - License verified
