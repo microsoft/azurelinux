@@ -1,0 +1,52 @@
+From 5f25c3855071bd7e26255c68bf458b1b5cf92f39 Mon Sep 17 00:00:00 2001
+From: Bram Moolenaar <Bram@vim.org>
+Date: Sun, 9 Jan 2022 13:36:28 +0000
+Subject: [PATCH] patch 8.2.4049: Vim9: reading before the start of the line
+ with "$"
+
+Problem:    Vim9: reading before the start of the line with "$" by itself.
+Solution:   Do not subtract one when reporting the error.
+---
+ src/testdir/test_vim9_expr.vim | 1 +
+ src/version.c                  | 2 ++
+ src/vim9expr.c                 | 2 +-
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/testdir/test_vim9_expr.vim b/src/testdir/test_vim9_expr.vim
+index 01b45385084e..52237e33fdfe 100644
+--- a/src/testdir/test_vim9_expr.vim
++++ b/src/testdir/test_vim9_expr.vim
+@@ -2853,6 +2853,7 @@ def Test_expr7_environment()
+   CheckDefAndScriptSuccess(lines)
+ 
+   CheckDefAndScriptFailure(["var x = $$$"], ['E1002:', 'E15:'], 1)
++  CheckDefAndScriptFailure(["$"], ['E1002:', 'E15:'], 1)
+ enddef
+ 
+ def Test_expr7_register()
+diff --git a/src/version.c b/src/version.c
+index be49f09e2b50..cf0665c02ce5 100644
+--- a/src/version.c
++++ b/src/version.c
+@@ -750,6 +750,8 @@ static char *(features[]) =
+ 
+ static int included_patches[] =
+ {   /* Add new patch number below this line */
++/**/
++    4049,
+ /**/
+     4048,
+ /**/
+diff --git a/src/vim9expr.c b/src/vim9expr.c
+index 83c68a9ffa28..edaee509976a 100644
+--- a/src/vim9expr.c
++++ b/src/vim9expr.c
+@@ -1233,7 +1233,7 @@ compile_get_env(char_u **arg, cctx_T *cctx)
+     len = get_env_len(arg);
+     if (len == 0)
+     {
+-	semsg(_(e_syntax_error_at_str), start - 1);
++	semsg(_(e_syntax_error_at_str), start);
+ 	return FAIL;
+     }
+ 
