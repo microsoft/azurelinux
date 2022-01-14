@@ -1,7 +1,3 @@
-%global debug_package %{nil}
-%define soname 1
-%define _source_payload w9.gzdio
-%define _binary_payload w9.gzdio
 Summary:        The Apache Kafka C library
 Name:           librdkafka
 Version:        1.8.2
@@ -17,6 +13,10 @@ Group:          Development/Libraries/C and C++
 URL:            https://github.com/edenhill/librdkafka
 #Source0:        https://github.com/edenhill/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+%global debug_package %{nil}
+%define soname 1
+%define _source_payload w9.gzdio
+%define _binary_payload w9.gzdio
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  gcc >= 4.1
 BuildRequires:  libstdc++-devel
