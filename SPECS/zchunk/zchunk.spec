@@ -90,6 +90,7 @@ DESTDIR=%{buildroot}/ ninja install
 %changelog
 * Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.16-1
 - Update to version 1.1.16.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.1.5-2
 - Added %%license line automatically

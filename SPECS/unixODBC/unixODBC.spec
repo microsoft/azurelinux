@@ -73,6 +73,7 @@ rm -rf %{buildroot}%{_datadir}/libtool
 %changelog
 * Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.9-1
 - Update to version 2.3.9.
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.3.7-3
 - Added %%license line automatically
