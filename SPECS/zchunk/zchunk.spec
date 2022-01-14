@@ -3,15 +3,14 @@ Name:           zchunk
 Version:        1.1.16
 Release:        1%{?dist}
 License:        BSD 2-Clause AND MIT
-URL:            https://github.com/zchunk/zchunk
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://github.com/zchunk/zchunk
 #Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz
 Source0:        https://github.com/zchunk/zchunk/archive/%{name}-%{version}.tar.gz
-
-BuildRequires:  meson
 BuildRequires:  curl-devel
+BuildRequires:  meson
 BuildRequires:  openssl-devel
 Requires:       %{name}-libs = %{version}-%{release}
 
@@ -75,7 +74,6 @@ DESTDIR=%{buildroot}/ ninja install
 %files
 %license LICENSE
 %doc README.md contrib
-%doc LICENSE
 %doc zchunk_format.txt
 %{_bindir}/zck*
 %{_bindir}/unzck
