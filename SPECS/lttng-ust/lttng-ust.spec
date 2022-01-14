@@ -62,6 +62,8 @@ rm -vf %{buildroot}%{_libdir}/*.la
 %{_libdir}/pkgconfig/lttng-ust*.pc
 
 %changelog
+*   Fri Jan 14 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.13.1-1
+-   Upgrading to 2.13.1
 *   Thu May 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.11.2-1
 -   Updating to version 2.11.2.
 -   Updating the "Source0" and "URL" tags.

@@ -4,7 +4,7 @@ Version:        2.13.2
 Release:        1%{?dist}
 License:        GPLv2 and LGPLv2+
 URL:            https://lttng.org/
-Source0:        https://lttng.org/files/lttng-tools/%{name}-%{version}.tar.bz2
+Source0:        https://lttng.org/files/%{name}/%{name}-%{version}.tar.bz2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,11 @@ find %{buildroot} -name '*.la' -delete
 %exclude %{_libdir}/debug
 
 %changelog
+* Fri Jan 14 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.13.2-1
+- Upgrading to 2.13.2
+- Updated source url.
+- Updating lttng-ust requirement to version 2.13.1
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.11.2-2
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
