@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.103.2
-Release:        3%{?dist}
+Version:        0.104.2
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jan 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.104.2-1
+- Upgrade to 0.104.2
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-3
 - Remove libtool archive files from final packaging
 
