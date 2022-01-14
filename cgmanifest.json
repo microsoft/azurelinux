@@ -12531,8 +12531,8 @@
         "type": "other",
         "other": {
           "name": "lttng-tools",
-          "version": "2.11.2",
-          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.11.2.tar.bz2"
+          "version": "2.13.2",
+          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.13.2.tar.bz2"
         }
       }
     },
@@ -12541,8 +12541,8 @@
         "type": "other",
         "other": {
           "name": "lttng-ust",
-          "version": "2.11.2",
-          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.11.2.tar.bz2"
+          "version": "2.13.1",
+          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.13.1.tar.bz2"
         }
       }
     },

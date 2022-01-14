@@ -1,6 +1,6 @@
 Summary:        LTTng-UST is an Userspace Tracer library
 Name:           lttng-ust
-Version:        2.11.2
+Version:        2.13.1
 Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://lttng.org
@@ -51,7 +51,6 @@ rm -vf %{buildroot}%{_libdir}/*.la
 
 %files
 %defattr(-,root,root)
-%license COPYING
 %{_bindir}/*
 %{_libdir}/*.so.*
 %{_datadir}/*
