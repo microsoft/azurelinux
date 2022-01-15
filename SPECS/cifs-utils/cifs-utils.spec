@@ -44,6 +44,7 @@ Provides header files needed for Cifs-Utils development.
 %build
 autoreconf -fiv
 %configure
+%configure --prefix=/usr ROOTSBINDIR=%{_sbindir}
 %make_build
 
 %install
@@ -56,7 +57,10 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 %license COPYING
 %{_bindir}/cifscreds
-/sbin/mount.cifs
+%{_bindir}/smb2-quota
+%{_bindir}/smbinfo
+%{_sbindir}/mount.cifs
+%{_sbindir}/mount.smb3
 
 %files -n pam_cifscreds
 %{_libdir}/security/pam_cifscreds.so

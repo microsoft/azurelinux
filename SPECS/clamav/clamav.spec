@@ -7,14 +7,28 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.clamav.net
-Source0:        %{url}/downloads/production/%{name}-%{version}.tar.gz
-# Workaround for coreutils missing requirement flex
-BuildRequires:  flex-devel
-BuildRequires:  libtool
+Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-%{version}.tar.gz
+
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  gdb
+BuildRequires:  make
+BuildRequires:  python3
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  valgrind
+
+BuildRequires:  bzip2-devel
+BuildRequires:  check-devel
+BuildRequires:  json-c-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
-# Required to produce systemd files
+BuildRequires:  pcre2-devel
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
+
 Requires:       openssl
 Requires:       zlib
 Provides:       %{name}-devel = %{version}-%{release}
@@ -30,8 +44,30 @@ line scanner and an advanced tool for automatic database updates.
 %autosetup
 
 %build
-%configure
-%make_build
+mkdir -p build
+cd build
+
+# Notes:
+# - milter must be disable because CBL-Mariner does not provide 'sendmail' packages 
+#   which provides the necessary pieces to build 'clamav-milter'
+# - systemd should be enabled because default value is off
+cmake .. \
+    -D CMAKE_INSTALL_PREFIX=/usr \
+    -D CMAKE_INSTALL_LIBDIR=lib \
+    -D APP_CONFIG_DIRECTORY=/etc/clamav \
+    -D DATABASE_DIRECTORY=/var/lib/clamav \
+    -D ENABLE_SYSTEMD=ON \
+    -D ENABLE_MILTER=OFF \
+    -D ENABLE_EXAMPLES=OFF \
+    -D ENABLE_TESTS=OFF
+cmake --build .
+# ctest
+# sudo cmake --build . --target install
+
+echo "!!!!! DEBUG ALWAYS FAIL !!!!!"
+exit 1
+# %configure
+# %make_build
 
 %install
 %make_install
