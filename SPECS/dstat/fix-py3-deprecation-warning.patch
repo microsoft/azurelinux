@@ -1,0 +1,33 @@
+From 513a0b5db8a269ed70cceb52674922d4a8b6b20c Mon Sep 17 00:00:00 2001
+From: Thomas Crain <thcrain@microsoft.com>
+Date: Thu, 6 Jan 2022 12:53:49 -0800
+Subject: [PATCH] Fix DeprecationWarning with collections.Sequence
+
+---
+ dstat | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/dstat b/dstat
+index 9359965..da3630b 100755
+--- a/dstat
++++ b/dstat
+@@ -20,6 +20,7 @@ from __future__ import absolute_import, division, generators, print_function
+ __metaclass__ = type
+ 
+ import collections
++import collections.abc
+ import fnmatch
+ import getopt
+ import getpass
+@@ -512,7 +513,7 @@ class dstat:
+                 scale = self.scales[i]
+             else:
+                 scale = self.scale
+-            if isinstance(self.val[name], collections.Sequence) and not isinstance(self.val[name], six.string_types):
++            if isinstance(self.val[name], collections.abc.Sequence) and not isinstance(self.val[name], six.string_types):
+                 line = line + cprintlist(self.val[name], ctype, self.width, scale)
+                 sep = theme['frame'] + char['colon']
+                 if i + 1 != len(self.vars):
+-- 
+2.25.1
+

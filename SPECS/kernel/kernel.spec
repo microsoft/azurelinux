@@ -3,7 +3,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.78.1
+Version:        5.10.88.1
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -18,7 +18,8 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         0002-add-linux-syscall-license-info.patch
-Patch2:         0003-export-mmput_async.patch
+Patch2:         CVE-2021-43976.patch
+Patch3:         0003-export-mmput_async.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -222,6 +223,10 @@ Patch1182:      CVE-2021-43267.nopatch
 Patch1183:      CVE-2021-42739.nopatch
 Patch1184:      CVE-2021-42327.nopatch
 Patch1185:      CVE-2021-43389.nopatch
+Patch1186:      CVE-2021-43975.nopatch
+Patch1187:      CVE-2021-45480.nopatch
+Patch1188:      CVE-2021-45486.nopatch
+Patch1189:      CVE-2021-45485.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -321,8 +326,9 @@ Group:          System Environment/Kernel
 This package contains common device tree blobs (dtb)
 
 %package -n bpftool
-Summary: Inspection and simple manipulation of eBPF programs and maps
 License: GPLv2
+Summary:        Inspection and simple manipulation of eBPF programs and maps
+
 
 %description -n bpftool
 This package contains the bpftool, which allows inspection and simple
@@ -333,6 +339,7 @@ manipulation of eBPF programs and maps.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 make mrproper
@@ -421,7 +428,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_lib}/debug/lib/modules/%{uname_r}/vmlinu
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M lockdown=none
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M lockdown=integrity
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -572,11 +579,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
-
 %changelog
-* Fri Jan 07 2022 Henry Li <lihl@microsoft.com> - 5.10.78.1-3
+* Fri Jan 14 2022 Henry Li <lihl@microsoft.com> - 5.10.88.1-3
 - Add patch to export mmput_async
-- Disable lockdown to enable adding kernel modules
+
+* Wed Jan 12 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-2
+- Addressed CVE-2021-45485
+
+* Mon Jan 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-1
+- Update Kernel source to 5.10.88.1
+- Addressed CVE-2021-43975, CVE-2021-45480, CVE-2021-45486
+- Patch for CVE-2021-43976
 
 * Mon Nov 29 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
 - Enable CONFIG_COMPAT kernel configs
