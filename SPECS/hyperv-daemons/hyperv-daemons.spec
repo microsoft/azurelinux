@@ -8,7 +8,7 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.10.88.1
+Version:        5.10.89.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -28,8 +28,7 @@ Source102:      hypervvss.rules
 Source201:      hypervfcopyd.service
 Source202:      hypervfcopy.rules
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         0002-add-linux-syscall-license-info.patch
-Patch2:         CVE-2021-43976.patch
+Patch1:         CVE-2021-43976.patch
 BuildRequires:  gcc
 Requires:       hypervfcopyd = %{version}-%{release}
 Requires:       hypervkvpd = %{version}-%{release}
@@ -225,6 +224,10 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Sun Jan 16 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.89.1-1
+- Update source to 5.10.89.1
+- Remove patch add-linux-syscall-license-info.patch
+
 * Mon Jan 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-1
 - Update Kernel source to 5.10.88.1
 - Apply patch to address CVE-2021-43976
