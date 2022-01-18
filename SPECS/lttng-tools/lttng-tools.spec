@@ -10,16 +10,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 BuildRequires: libxml2-devel >= 2.7.6
-BuildRequires: nss-devel
 BuildRequires: m4
 BuildRequires: elfutils-devel
 BuildRequires: popt-devel
 BuildRequires: userspace-rcu-devel >= 0.8.0
-BuildRequires: lttng-ust-devel >= 2.9.0
+BuildRequires: lttng-ust-devel >= 2.13.1
 Requires:      lttng-ust >= 2.13.1
-Requires:      userspace-rcu
+Requires:      userspace-rcu >= 0.8.0
 Requires:      elfutils
-Requires:      nss
 Requires:      libxml2
 
 %description
@@ -50,7 +48,9 @@ find %{buildroot} -name '*.la' -delete
 * Fri Jan 14 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.13.2-1
 - Upgrading to 2.13.2
 - Updated source url.
-- Updating lttng-ust requirement to version 2.13.1
+- Updating lttng-ust requirement to version 2.13.1.
+- Removing unnecessary nss requirement.
+- Updating userspace-rcu requirement version.
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.11.2-2
 - Replace incorrect %%{_lib} usage with %%{_libdir}
