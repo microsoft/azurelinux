@@ -57,6 +57,7 @@ make %{?_smp_mflags} check
 %changelog
 * Tue Jan 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 6.0-1
 - Upgraded to v6.0
+- License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.0-3
 - Added %%license line automatically
