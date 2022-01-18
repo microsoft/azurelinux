@@ -27717,8 +27717,8 @@
         "type": "other",
         "other": {
           "name": "subversion",
-          "version": "1.14.0",
-          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.0.tar.bz2"
+          "version": "1.14.1",
+          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.1.tar.bz2"
         }
       }
     },
@@ -27827,8 +27827,8 @@
         "type": "other",
         "other": {
           "name": "syslog-ng",
-          "version": "3.23.1",
-          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.23.1/syslog-ng-3.23.1.tar.gz"
+          "version": "3.33.2",
+          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.33.2/syslog-ng-3.33.2.tar.gz"
         }
       }
     },
@@ -27887,8 +27887,8 @@
         "type": "other",
         "other": {
           "name": "systemtap",
-          "version": "4.1",
-          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.1.tar.gz"
+          "version": "4.5",
+          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.5.tar.gz"
         }
       }
     },
@@ -28607,8 +28607,8 @@
         "type": "other",
         "other": {
           "name": "unbound",
-          "version": "1.10.0",
-          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.10.0.tar.gz"
+          "version": "1.13.2",
+          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.13.2.tar.gz"
         }
       }
     },
