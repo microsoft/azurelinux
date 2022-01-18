@@ -16184,16 +16184,6 @@
         "type": "other",
         "other": {
           "name": "pciutils",
-          "version": "3.6.2",
-          "downloadUrl": "https://www.kernel.org/pub/software/utils/pciutils/pciutils-3.6.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "pciutils",
           "version": "3.7.0",
           "downloadUrl": "https://www.kernel.org/pub/software/utils/pciutils/pciutils-3.7.0.tar.xz"
         }
