@@ -108,7 +108,6 @@ Contains tools and scripts useful for Hyper-V guests.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 pushd tools/hv
