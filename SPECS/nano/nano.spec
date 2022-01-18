@@ -1,11 +1,11 @@
 Summary:	Text editor
 Name:		nano
-Version:	3.0
-Release:        3%{?dist}
+Version:	6.0
+Release:        1%{?dist}
 License:	GPLv3+
 URL:		http://www.nano-editor.org/
 Group:		Applications/Editors
-Source0:	http://www.nano-editor.org/dist/v3/%{name}-%{version}.tar.xz
+Source0:	http://www.nano-editor.org/dist/v6/%{name}-%{version}.tar.xz
 %define sha1 nano=0396d85df64a7927ca2d3425a0263dacf8502220
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,6 +53,9 @@ make %{?_smp_mflags} check
 %{_datadir}/doc/%{name}-%{version}/*
 
 %changelog
+* Tue Jan 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 6.0-1
+- Upgraded to v6.0
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.0-3
 - Added %%license line automatically
 
