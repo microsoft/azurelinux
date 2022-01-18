@@ -1892,15 +1892,15 @@ func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelComman
 
 func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
 	const (
-		selinuxPattern     = "{{.SELinux}}"
-		selinuxSettings    = "lsm=selinux selinux=1"
-		selinuxForceEnable = "enforcing=1"
+		selinuxPattern        = "{{.SELinux}}"
+		selinuxSettings       = "security=selinux selinux=1"
+		selinuxForceEnforcing = "enforcing=1"
 	)
 	var selinux string
 
 	switch kernelCommandline.SELinux {
 	case configuration.SELinuxForceEnforcing:
-		selinux = fmt.Sprintf("%s %s", selinuxSettings, selinuxForceEnable)
+		selinux = fmt.Sprintf("%s %s", selinuxSettings, selinuxForceEnforcing)
 	case configuration.SELinuxPermissive, configuration.SELinuxEnforcing:
 		selinux = selinuxSettings
 	case configuration.SELinuxOff:
