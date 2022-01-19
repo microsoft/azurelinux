@@ -1,4 +1,4 @@
-%global 		underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
+%global         underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
 Version:        2.4.3
