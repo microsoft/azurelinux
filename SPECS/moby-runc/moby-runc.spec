@@ -114,7 +114,7 @@ cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
-* Wed Jan 19 2021 Henry Li <lihl@microsoft.com> - 1.1.0+azure-1
+* Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.1.0+azure-1
 - Upgrade to version 1.1.0+azure to resolve CVE-2021-43784
 - Update Source0 URL
 
