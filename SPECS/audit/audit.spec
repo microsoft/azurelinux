@@ -4,7 +4,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
 Patch0:         refuse-manual-stop.patch
 License:        GPLv2+
@@ -173,6 +173,9 @@ make %{?_smp_mflags} check
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.0-10
+- Increment release for force republishing using golang 1.16.12
+
 * Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-9
 - Increment release for force republishing using golang 1.16.9
 
