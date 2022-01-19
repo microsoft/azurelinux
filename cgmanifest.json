@@ -2978,8 +2978,8 @@
         "type": "other",
         "other": {
           "name": "doxygen",
-          "version": "1.8.17",
-          "downloadUrl": "https://sourceforge.net/projects/doxygen/files/rel-1.8.17/doxygen-1.8.17.src.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://doxygen.nl/files/doxygen-1.9.3.src.tar.gz"
         }
       }
     },
@@ -2988,8 +2988,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "18.11.2",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz"
+          "version": "21.11",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.tar.xz"
         }
       }
     },
