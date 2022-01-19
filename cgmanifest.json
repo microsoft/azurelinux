@@ -28147,8 +28147,8 @@
         "type": "other",
         "other": {
           "name": "tdnf",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/vmware/tdnf/archive/v2.1.0.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.2.2.tar.gz"
         }
       }
     },
