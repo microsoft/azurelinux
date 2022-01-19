@@ -3,7 +3,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.23.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD and GPLv2+ and LGPLv2+
 URL:            https://syslog-ng.org/
 Group:          System Environment/Daemons
@@ -34,6 +34,8 @@ BuildRequires:  curl-devel
 BuildRequires:  python3-pip
 %endif
 Obsoletes:      eventlog
+
+Provides: syslog
 
 %description
  The syslog-ng application is a flexible and highly scalable
@@ -188,6 +190,9 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.23.1-5
+- Added "Provides: syslog".
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.23.1-4
 - Removing the explicit %%clean stage.
 

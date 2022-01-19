@@ -1,7 +1,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.37.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,7 @@ Provides:       %{name}-mmsnmptrapd = %{version}-%{release}
 Provides:       %{name}-pgsql = %{version}-%{release}
 Provides:       %{name}-relp = %{version}-%{release}
 Provides:       %{name}-snmp = %{version}-%{release}
+Provides:       syslog
 
 %description
 RSYSLOG is the rocket-fast system for log processing.
@@ -152,6 +153,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.37.0-8
+- Added "Provides: syslog".
+
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.37.0-7
 - Add /etc/rsyslog.d directory.
 
