@@ -1,19 +1,24 @@
 Summary:        Bourne-Again SHell
 Name:           bash
-Version:        4.4.18
-Release:        6%{?dist}
+Version:        4.4.23
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/bash/
-Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-4.4.18.tar.gz
 Source1:        bash_completion
 Patch0:         bash-4.4.patch
 # CVE-2019-18276 has a negligible security impact, 
 # since we don't ship bash with suid.
 # Backporting the patch is non-trivial, as well.
 Patch1:         CVE-2019-18276.nopatch
+Patch2:         bash44-019.patch
+Patch3:         bash44-020.patch
+Patch4:         bash44-021.patch
+Patch5:         bash44-022.patch
+Patch6:         bash44-023.patch
 BuildRequires:  readline
 Requires:       readline
 Requires(post):   /bin/cp
@@ -44,7 +49,7 @@ Requires:       bash >= 4.4
 These are the additional language files of bash.
 
 %prep
-%autosetup -p 1
+%autosetup -p0 -n %{name}-4.4.18
 
 %build
 %configure \
@@ -332,6 +337,11 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Tue Jan 18 2022 Henry Beberman <henry.beberman@microsoft.com> - 4.4.23-1
+- Resolving a rare hang that was fixed in 4.4.20
+- Update bash to version 4.4.23
+- Update bash-4.4.patch for autosetup -p0
+
 * Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.18-6
 - Nopatch CVE-2019-18276
 
