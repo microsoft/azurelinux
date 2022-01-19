@@ -114,6 +114,10 @@ cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
+* Wed Jan 19 2021 Henry Li <lihl@microsoft.com> - 1.1.0+azure-1
+- Upgrade to version 1.1.0+azure to resolve CVE-2021-43784
+- Update Source0 URL
+
 * Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.0~rc95+azure-4
 - Increment release for force republishing using golang 1.16.9
 
