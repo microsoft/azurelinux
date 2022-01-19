@@ -15,7 +15,7 @@ Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
-Patch1:         0002-add-linux-syscall-license-info.patch
+Patch0:         0002-add-linux-syscall-license-info.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -85,7 +85,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
-%patch1 -p1
+%patch0 -p1
 
 %build
 make mrproper

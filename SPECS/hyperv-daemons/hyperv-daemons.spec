@@ -27,7 +27,7 @@ Source102:      hypervvss.rules
 # HYPERV FCOPY DAEMON
 Source201:      hypervfcopyd.service
 Source202:      hypervfcopy.rules
-Patch1:         0002-add-linux-syscall-license-info.patch
+Patch0:         0002-add-linux-syscall-license-info.patch
 BuildRequires:  gcc
 Requires:       hypervfcopyd = %{version}-%{release}
 Requires:       hypervkvpd = %{version}-%{release}
@@ -105,7 +105,7 @@ Contains tools and scripts useful for Hyper-V guests.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
-%patch1 -p1
+%patch0 -p1
 
 %build
 pushd tools/hv

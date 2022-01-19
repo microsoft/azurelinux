@@ -19,7 +19,7 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
-Patch1:         0002-add-linux-syscall-license-info.patch
+Patch0:         0002-add-linux-syscall-license-info.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -133,7 +133,7 @@ manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
-%patch1 -p1
+%patch0 -p1
 
 %build
 make mrproper
