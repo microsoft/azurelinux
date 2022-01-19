@@ -28367,8 +28367,8 @@
         "type": "other",
         "other": {
           "name": "tracelogging",
-          "version": "0.2",
-          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.2.tar.gz"
+          "version": "0.3",
+          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.3.tar.gz"
         }
       }
     },
