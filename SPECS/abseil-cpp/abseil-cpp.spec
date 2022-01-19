@@ -86,7 +86,7 @@ ctest --output-on-failure -E 'absl_symbolize_test|absl_sysinfo_test'
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Mon Jan 17 2021 Muhammad Falak <mwani@microsoft.com> - 20211102.0-2
+* Mon Jan 17 2022 Muhammad Falak <mwani@microsoft.com> - 20211102.0-2
 - Exclude tests `absl_symbolize_test` & `absl_sysinfo_test`.
 
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20211102.0-1
