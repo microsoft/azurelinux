@@ -14,7 +14,9 @@ Source2:        cache-updateinfo.service
 Source3:        cache-updateinfo.timer
 Source4:        tdnfrepogpgcheck.conf
 
-Patch8:         tdnf-mandatory-space-list-output.patch
+Patch0:         tdnf-mandatory-space-list-output.patch
+Patch1:         tdnf-default-mariner-release.patch
+#Patch2:         tdnf-add-download-no-deps-command.patch
 
 #Cmake requires binutils
 BuildRequires:  binutils
@@ -67,7 +69,7 @@ Requires:       tdnf = %{version}-%{release}
 %description devel
 Development files for tdnf
 
-%package	cli-libs
+%package        cli-libs
 Summary:        Library providing cli libs for tdnf like clients
 Group:          Development/Libraries
 
