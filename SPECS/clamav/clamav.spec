@@ -52,26 +52,26 @@ cd build
 #   which provides the necessary pieces to build 'clamav-milter'
 # - systemd should be enabled because default value is off
 cmake .. \
-    -D CMAKE_INSTALL_PREFIX=/usr \
-    -D CMAKE_INSTALL_LIBDIR=lib \
-    -D APP_CONFIG_DIRECTORY=/etc/clamav \
-    -D DATABASE_DIRECTORY=/var/lib/clamav \
+    -D CMAKE_INSTALL_LIBDIR=%{buildroot}%{_libdir} \
+    -D CMAKE_INSTALL_BINDIR=%{buildroot}%{_bindir} \
+    -D CMAKE_INSTALL_SBINDIR=%{buildroot}%{_sbindir} \
+    -D CMAKE_INSTALL_MANDIR=%{buildroot}%{_mandir} \
+    -D CMAKE_INSTALL_DOCDIR=%{buildroot}%{_docdir} \
+    -D CMAKE_INSTALL_INCLUDEDIR=%{buildroot}%{_includedir} \
+    -D SYSTEMD_UNIT_DIR=%{buildroot}%{_libdir}/systemd/system \
+    -D APP_CONFIG_DIRECTORY=%{buildroot}%{_sysconfdir}/clamav \
+    -D DATABASE_DIRECTORY=%{buildroot}%{_sharedstatedir}/clamav \
     -D ENABLE_SYSTEMD=ON \
     -D ENABLE_MILTER=OFF \
     -D ENABLE_EXAMPLES=OFF \
     -D ENABLE_TESTS=OFF
 cmake --build .
-# ctest
-# sudo cmake --build . --target install
-
-echo "!!!!! DEBUG ALWAYS FAIL !!!!!"
-exit 1
-# %configure
-# %make_build
 
 %install
-%make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+cd build
+cmake --build . --target install
+rm -rf %{buildroot}%{_docdir}
+# find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 %make_build check
@@ -80,15 +80,15 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %defattr(-,root,root)
-%license COPYING COPYING.bzip2 COPYING.file COPYING.getopt COPYING.LGPL COPYING.llvm COPYING.lzma COPYING.pcre COPYING.regex COPYING.unrar COPYING.YARA COPYING.zlib
-%{_bindir}/*
-%{_sysconfdir}/*.sample
-%{_includedir}/*.h
+%license COPYING.txt COPYING/COPYING.LGPL COPYING/COPYING.bzip2 COPYING/COPYING.file COPYING/COPYING.llvm COPYING/COPYING.pcre COPYING/COPYING.unrar COPYING/COPYING.YARA COPYING/COPYING.curl COPYING/COPYING.getopt COPYING/COPYING.lzma COPYING/COPYING.regex COPYING/COPYING.zlib
 %{_libdir}/*.so
 %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/*.pc
-%{_unitdir}/*
+%{_libdir}/systemd/system/*
+%{_bindir}/*
 %{_sbindir}/*
+%{_sysconfdir}/clamav/*.sample
+%{_includedir}/*.h
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
