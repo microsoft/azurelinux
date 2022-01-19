@@ -1,13 +1,13 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-runc
-Version:        1.0.0~rc95+azure
-Release:        4%{?dist}
+Version:        1.1.0+azure
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://runc.io/
 
 # See generate-sources.sh for creating runc source tarball
-#Source0:       https://github.com/opencontainers/runc/releases/download/v1.0.0-rc95/runc.tar.xz
-Source0:        runc-v1.0.0-rc95.tar.gz
+#Source0:       https://github.com/opencontainers/runc/archive/refs/tags/v1.1.0.tar.gz
+Source0:        runc-v1.1.0.tar.gz
 #Source1:       https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz
 Source1:        logrus-v1.8.1.tar.gz
 #Source2:       https://github.com/opencontainers/runtime-spec/archive/v1.0.2.tar.gz
