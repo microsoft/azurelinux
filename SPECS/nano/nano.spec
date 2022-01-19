@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.nano-editor.org/
 Source0:        http://www.nano-editor.org/dist/v6/%{name}-%{version}.tar.xz
-%define sha1 nano=0396d85df64a7927ca2d3425a0263dacf8502220
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 
@@ -17,7 +16,7 @@ The Nano package contains a small, simple text editor
 
 %package lang
 Summary:        Lang for nano
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{version}-%{release}
 
 %description lang
 Lang for nano
@@ -26,9 +25,7 @@ Lang for nano
 %setup -q
 
 %build
-./configure --prefix=%{_prefix}      \
-            --sysconfdir=%{_sysconfdir} \
-            --enable-utf8     \
+%configure  --enable-utf8     \
             --infodir=%{_infodir}/%{name}-%{version} \
             --docdir=%{_docdir}/%{name}-%{version}
 make
@@ -57,6 +54,9 @@ make %{?_smp_mflags} check
 %changelog
 * Tue Jan 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 6.0-1
 - Upgraded to v6.0
+- Tightening requirements in lang subpackage.
+- Using configure macro.
+- Removing sha1 definition.
 - License verified.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.0-3
