@@ -64,6 +64,7 @@ EOF
 %changelog
 * Wed Jan 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-4
 - CBL-Mariner 2.0 Public Preview C Release.
+- License verified
 
 * Thu Dec 16 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-3
 - CBL-Mariner 2.0 Public Preview B Release version with fixed repo configuration files.
