@@ -9,28 +9,28 @@ Group:          System Environment/Security
 URL:            https://www.clamav.net
 Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-%{version}.tar.gz
 
+BuildRequires:  bzip2-devel
+BuildRequires:  check-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gdb
-BuildRequires:  make
-BuildRequires:  python3
-BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
-BuildRequires:  valgrind
-
-BuildRequires:  bzip2-devel
-BuildRequires:  check-devel
 BuildRequires:  json-c-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre2-devel
+BuildRequires:  python3
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 BuildRequires:  systemd-devel
+BuildRequires:  valgrind
 BuildRequires:  zlib-devel
 
 Requires:       openssl
 Requires:       zlib
+
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}-lib = %{version}-%{release}
 
@@ -63,20 +63,18 @@ cmake .. \
     -D DATABASE_DIRECTORY=%{buildroot}%{_sharedstatedir}/clamav \
     -D ENABLE_SYSTEMD=ON \
     -D ENABLE_MILTER=OFF \
-    -D ENABLE_EXAMPLES=OFF \
-    -D ENABLE_TESTS=OFF
+    -D ENABLE_EXAMPLES=OFF
 cmake --build .
+
+%check
+cd build
+ctest --verbose
 
 %install
 cd build
 cmake --build . --target install
+# do not install html doc ('clamav' cmake has no flag to specify that => remove the doc)
 rm -rf %{buildroot}%{_docdir}
-# find %{buildroot} -type f -name "*.la" -delete -print
-
-%check
-%make_build check
-
-%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
