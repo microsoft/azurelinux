@@ -106,7 +106,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 %prep
-%setup -q -n dpdk-%{version}
+%autosetup -p1 -n dpdk-%{version}
 
 %build
 CFLAGS="$(echo %{optflags} -fcommon)" \
