@@ -269,18 +269,18 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		logger.Log.Debugf("Cloning: %s", pkgName)
 		args := []string{
-			"--destdir",
+			"--downloaddir",
 			chrootDownloadDir,
 			pkgName,
 		}
 
 		// special case to skip dependencies for msopenjdk-11
 		if strings.HasPrefix(pkgName, "msopenjdk-") {
-			args = append([]string{"download-nodeps"}, args...)
+			args = append([]string{"install", "--download-nodeps"}, args...)
 		} else if cloneDeps {
-			args = append([]string{"download", "--alldeps"}, args...)
+			args = append([]string{"install", "--downloadonly"}, args...)
 		} else {
-			args = append([]string{"download-nodeps"}, args...)
+			args = append([]string{"install", "--download-nodeps"}, args...)
 		}
 
 		err = r.chroot.Run(func() (err error) {
