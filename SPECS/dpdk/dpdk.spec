@@ -174,7 +174,6 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %{_bindir}/dpdk-test-*
 %{_bindir}/dpdk-*.py
 %endif
- 
 %if %{with examples}
 %files examples
 %{_bindir}/dpdk_example_*
