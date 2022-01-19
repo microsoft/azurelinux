@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.17.5
+Version:        1.16.12
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -22,6 +22,7 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         CVE-2021-29923.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 
@@ -36,6 +37,7 @@ mv -v go go-bootstrap
 
 # Setup go source and patch
 %setup -q -n go
+%patch1 -p1
 
 %build
 # Build go 1.4 bootstrap
@@ -63,7 +65,7 @@ popd
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{goroot}
 
-cp -R api bin doc lib pkg src misc VERSION %{buildroot}%{goroot}
+cp -R api bin doc favicon.ico lib pkg robots.txt src misc VERSION %{buildroot}%{goroot}
 
 # remove the unnecessary zoneinfo file (Go will always use the system one first)
 rm -rfv %{buildroot}%{goroot}/lib/time
@@ -116,10 +118,8 @@ fi
 %{_bindir}/*
 
 %changelog
-* Mon Jan 18 2022 Henry Li <lihl@microsoft.com> - 1.17.5-1
-- Upgrade to version 1.75.1 to fix CVE-2021-44716
-- Remove patch CVE-2021-29923
-- Remove coping files that no longer exist
+* Tue Jan 18 2022 Henry Li <lihl@microsoft.com> - 1.16.12-1
+- Upgrade to version 1.16.12 to resolve CVE-2021-44716
 
 * Thu Nov 11 2021 Nick Samson <nisamson@microsoft.com> - 1.16.10-1
 - Updated to version 1.16.10 to fix CVE-2021-41771 and CVE-2021-41772
