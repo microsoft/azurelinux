@@ -143,8 +143,6 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 
 %files devel
 #BSD
-	
-#BSD
 %{incdir}/
 %{sdkdir}
 %ghost %{sdkdir}/mk/exec-env/bsdapp
