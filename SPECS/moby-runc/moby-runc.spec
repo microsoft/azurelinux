@@ -3,8 +3,10 @@ Name:           moby-runc
 Version:        1.1.0+azure
 Release:        1%{?dist}
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Virtualization/Libraries
 URL:            https://runc.io/
-
 # See generate-sources.sh for creating runc source tarball
 #Source0:       https://github.com/opencontainers/runc/archive/refs/tags/v1.1.0.tar.gz
 Source0:        runc-v1.1.0.tar.gz
@@ -20,38 +22,30 @@ Source4:        https://github.com/golang/sys/archive/golang-sys-b0526f3d87448f0
 Source5:        https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz
 Source6:        NOTICE
 Source7:        LICENSE
-
-Group:          Virtualization/Libraries
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
 BuildRequires:  curl
 BuildRequires:  gawk
+BuildRequires:  git
+BuildRequires:  go-md2man
 BuildRequires:  golang
 BuildRequires:  iptables-devel
-BuildRequires:  pkg-config
 BuildRequires:  libaio-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libseccomp
 BuildRequires:  libseccomp-devel
-BuildRequires:  protobuf-devel
+BuildRequires:  pkgconfig
 BuildRequires:  protobuf-c-devel
+BuildRequires:  protobuf-devel
 BuildRequires:  python2-devel
 BuildRequires:  unzip
-BuildRequires:  go-md2man
-Buildrequires:  which
-Buildrequires:  git
-
+BuildRequires:  which
 Requires:       glibc
 Requires:       libgcc
 Requires:       libseccomp
-
 # conflicting packages
-Conflicts: runc
-Conflicts: runc-io
-
-Obsoletes: runc
-Obsoletes: runc-io
+Conflicts:      runc
+Conflicts:      runc-io
+Obsoletes:      runc
+Obsoletes:      runc-io
 
 %description
 runC is a CLI tool for spawning and running containers according to the OCI specification. Containers are started as a child process of runC and can be embedded into various other systems without having to run a daemon.
@@ -59,7 +53,7 @@ runC is a CLI tool for spawning and running containers according to the OCI spec
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%setup -q -n %{name}-%{version} -c
+%setup -q -c
 mkdir -p %{OUR_GOPATH}/src/github.com/opencontainers
 ln -svfT %{_topdir}/BUILD/%{name}-%{version}/runc %{OUR_GOPATH}/src/github.com/opencontainers/runc
 
@@ -103,14 +97,14 @@ for i in man/man8/*; do
     install -T -p -m 644 "${i}" "%{buildroot}%{_mandir}/man8/$(basename $i)"
 done
 
-mkdir -p %{buildroot}/usr/share/doc/%{name}-%{version}
-cp %{SOURCE6} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
-cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
+mkdir -p %{buildroot}%{_docdir}/%{name}-%{version}
+cp %{SOURCE6} %{buildroot}%{_docdir}/%{name}-%{version}/NOTICE
+cp %{SOURCE7} %{buildroot}%{_docdir}/%{name}-%{version}/LICENSE
 
 %files
-%license /usr/share/doc/%{name}-%{version}/LICENSE
+%license %{_docdir}/%{name}-%{version}/LICENSE
 %{_bindir}/runc
-/usr/share/doc/%{name}-%{version}/*
+%{_docdir}/%{name}-%{version}/*
 %{_mandir}/*/*
 
 %changelog
@@ -126,23 +120,33 @@ cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 
 * Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.0.0~rc95+azure-3
 - Increment release to force republishing using golang 1.16.7.
+
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.0.0~rc95+azure-2
 - Increment release to force republishing using golang 1.15.13.
+
 * Wed May 19 2021 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc95+azure-1
 - Update to version 1.0.0~rc95+azure to fix CVE-2021-30465
+
 * Thu May 13 2021 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc94+azure-1
 - Update to version 1.0.0~rc94+azure
+
 * Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.0.0~rc10+azure-6
 - Increment release to force republishing using golang 1.15.11.
+
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc10+azure-5
 - Increment release to force republishing using golang 1.15.
+
 * Wed May 20 2020 Joe Schmitt <joschmit@microsoft.com> 1.0.0~rc10+azure-4
 - Remove reliance on existing GOPATH environment variable.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.0.0~rc10+azure-3
 - Added %%license line automatically
+
 * Fri May 01 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.0~rc10+azure-2
 - Renaming go to golang
+
 * Fri Apr 03 2020 Mohan Datla <mdatla@microsoft.com> 1.0.0~rc10+azure-1
 - Initial CBL-Mariner import from Azure.
+
 * Thu Jan 23 2020 Brian Goff <brgoff@microsoft.com>
 - Initial version
