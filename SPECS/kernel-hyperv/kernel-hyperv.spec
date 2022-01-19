@@ -4,7 +4,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.10.88.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -273,6 +273,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Fri Jan 14 2022 Henry Li <lihl@microsoft.com> - 5.10.88.1-3
+- Bump release number to match kernel release
+
 * Wed Jan 12 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-2
 - Bump release number to match kernel release
 

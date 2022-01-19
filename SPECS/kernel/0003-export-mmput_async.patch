@@ -1,0 +1,12 @@
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 3f96400..66541bd 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -1127,6 +1127,7 @@ void mmput_async(struct mm_struct *mm)
+ 		schedule_work(&mm->async_put_work);
+ 	}
+ }
++EXPORT_SYMBOL_GPL(mmput_async);
+ #endif
+ 
+ /**

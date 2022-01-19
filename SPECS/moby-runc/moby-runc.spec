@@ -118,6 +118,9 @@ cp %{SOURCE7} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
 - Upgrade to version 1.1.0+azure to resolve CVE-2021-43784
 - Update Source0 URL
 
+* Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.0.0~rc95+azure-5
+- Increment release for force republishing using golang 1.16.12
+
 * Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.0~rc95+azure-4
 - Increment release for force republishing using golang 1.16.9
 
