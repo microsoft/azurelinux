@@ -1,13 +1,13 @@
 Name:           doxygen
-Version:        1.8.17
-Release:        3%{?dist}
+Version:        1.9.3
+Release:        1%{?dist}
 Summary:        Automated C, C++, and Java Documentation Generator
 License:        GPLv2
 Group:          Development/Tools/Doc Generators
 Url:            https://www.doxygen.nl
-Vendor:		Microsoft Corporation
+Vendor:         Microsoft Corporation
 Distribution:	Mariner
-Source0:        https://sourceforge.net/projects/%{name}/files/rel-%{version}/%{name}-%{version}.src.tar.gz
+Source0:        https://doxygen.nl/files/%{name}-%{version}.src.tar.gz
 
 %global debug_package %{nil}
 
@@ -51,6 +51,9 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 %license LICENSE
 
 %changelog
+* Wed Jan 12 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.9.3-1
+- Update to version 1.9.3
+
 * Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.17-3
 - Updated build requires to python3-defusedxml
 - Updated source url.

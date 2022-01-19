@@ -2978,8 +2978,8 @@
         "type": "other",
         "other": {
           "name": "doxygen",
-          "version": "1.8.17",
-          "downloadUrl": "https://sourceforge.net/projects/doxygen/files/rel-1.8.17/doxygen-1.8.17.src.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://doxygen.nl/files/doxygen-1.9.3.src.tar.gz"
         }
       }
     },
@@ -2988,8 +2988,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "18.11.2",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz"
+          "version": "21.11",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.tar.xz"
         }
       }
     },
@@ -3468,8 +3468,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.1",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_1/expat-2.4.1.tar.bz2"
+          "version": "2.4.3",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_3/expat-2.4.3.tar.bz2"
         }
       }
     },
@@ -12531,8 +12531,8 @@
         "type": "other",
         "other": {
           "name": "lttng-tools",
-          "version": "2.11.2",
-          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.11.2.tar.bz2"
+          "version": "2.13.2",
+          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.13.2.tar.bz2"
         }
       }
     },
@@ -12541,8 +12541,8 @@
         "type": "other",
         "other": {
           "name": "lttng-ust",
-          "version": "2.11.2",
-          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.11.2.tar.bz2"
+          "version": "2.13.1",
+          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.13.1.tar.bz2"
         }
       }
     },
@@ -16176,16 +16176,6 @@
           "name": "pcaudiolib",
           "version": "1.1",
           "downloadUrl": "https://github.com/espeak-ng/pcaudiolib/archive/1.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "pciutils",
-          "version": "3.6.2",
-          "downloadUrl": "https://www.kernel.org/pub/software/utils/pciutils/pciutils-3.6.2.tar.gz"
         }
       }
     },
@@ -28937,8 +28927,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4006",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4006.tar.gz"
+          "version": "8.2.4081",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4081.tar.gz"
         }
       }
     },
