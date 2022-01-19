@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.27
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,9 @@ Development headers for developing applications linking to maridb
 %autosetup -p1
 
 %build
+# Disabling flaky 'invalid_metadata' test.
+sed -i "s/\(invalid_metadata\)/DISABLED_\1/" router/tests/component/test_routing_splicer.cc
+
 cmake . \
       -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
       -DWITH_BOOST=boost/boost_1_73_0 \
@@ -86,6 +89,9 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Tue Jan 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.27-2
+- Disabled flaky 'invalid_metadata' test.
+
 * Sat Oct 30 2021 Jon Slobodzian <joslobo@microsoft.com> - 8.0.27-1
 - Upgrade to 8.0.27 to fix 36 CVEs
 
