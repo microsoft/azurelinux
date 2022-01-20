@@ -1,4 +1,3 @@
-%if 0%{?el8}
 %bcond_without rpm_macros
 
 %global lua_conflict 5.4.0-7
