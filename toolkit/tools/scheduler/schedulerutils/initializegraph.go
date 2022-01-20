@@ -16,7 +16,7 @@ const (
 	buildGoalNodeName = "PackagesToBuild"
 )
 
-func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, packagesToBuild []*pkgjson.PackageVer) (err error) {
+func ReplaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, packagesToBuild []*pkgjson.PackageVer) (err error) {
 	for _, node := range pkgGraph.AllNodes() {
 
 		//TODO: Update Build nodes to UpToDate if it is not part of packagesToBuild

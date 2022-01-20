@@ -188,8 +188,8 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 		return
 	}
 
-	if hydratedBuild == "y" {
-		schedulerutils.replaceRunNodesWithPrebuiltNodes(pkgGraph, goalNode, packagesToBuild)
+	if *hydratedBuild == "y" {
+		schedulerutils.ReplaceRunNodesWithPrebuiltNodes(pkgGraph, goalNode, packagesToBuild)
 	}
 
 	// Setup and start the worker pool and scheduler routine.
