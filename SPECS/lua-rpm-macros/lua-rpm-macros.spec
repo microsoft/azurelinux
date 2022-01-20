@@ -53,18 +53,18 @@ cp -a %{sources} .
 %build
 
 %install
-mkdir -p %{buildroot}%{rpmmacrodir}
-install -pm 644 macros.* %{buildroot}%{rpmmacrodir}/
+mkdir -p %{buildroot}%{_libdir}/rpm
+install -pm 644 macros.* %{buildroot}%{_libdir}/rpm/
 install -Dpm 0644 lua.attr %{buildroot}/%{_fileattrsdir}/lua.attr
 
 %files
 %license LICENSE
 %{_fileattrsdir}/lua.attr
-%{rpmmacrodir}/macros.lua
+%{_libdir}/rpm/macros.lua
 
 %files -n lua-srpm-macros
 %license LICENSE
-%{rpmmacrodir}/macros.lua-srpm
+%{_libdir}/rpm/macros.lua-srpm
 
 
 %changelog
