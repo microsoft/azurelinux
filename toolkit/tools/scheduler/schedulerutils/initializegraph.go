@@ -17,43 +17,42 @@ const (
 )
 
 func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, packagesToBuild []*pkgjson.PackageVer) (err error) {
-    for _, node := range pkgGraph.AllNodes() {
+	for _, node := range pkgGraph.AllNodes() {
 
-        //TODO: Update Build nodes to UpToDate if it is not part of packagesToBuild
+		//TODO: Update Build nodes to UpToDate if it is not part of packagesToBuild
 
-        if node.Type != pkggraph.TypeRun {
-            continue
-        }
+		if node.Type != pkggraph.TypeRun {
+			continue
+		}
 
-        isPrebuilt, _ := pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, nil)
+		isPrebuilt, _ := pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, nil)
 
-        if isPrebuilt == false {
-            continue
-        }
+		if isPrebuilt == false {
+			continue
+		}
 
-        preBuiltNode := pkgGraph.CloneNode(node)
+		preBuiltNode := pkgGraph.CloneNode(node)
 		preBuiltNode.State = pkggraph.StateUpToDate
 		preBuiltNode.Type = pkggraph.TypePreBuilt
 
-
 		parentNodes := pkgGraph.To(node.ID())
 		for parentNodes.Next() {
-		    parentNode := parentNodes.Node().(*pkggraph.PkgNode)
+			parentNode := parentNodes.Node().(*pkggraph.PkgNode)
 
-            if parentNode.Type == pkggraph.TypeBuild {
-                pkgGraph.RemoveEdge(parentNode.ID(), node.ID())
+			if parentNode.Type == pkggraph.TypeBuild {
+				pkgGraph.RemoveEdge(parentNode.ID(), node.ID())
 
-		        logger.Log.Infof("Adding a 'PreBuilt' node '%s' with id %d. For '%s'", preBuiltNode.FriendlyName(), preBuiltNode.ID(), parentNode.FriendlyName())
-                err = pkgGraph.AddEdge(parentNode, preBuiltNode)
+				logger.Log.Infof("Adding a 'PreBuilt' node '%s' with id %d. For '%s'", preBuiltNode.FriendlyName(), preBuiltNode.ID(), parentNode.FriendlyName())
+				err = pkgGraph.AddEdge(parentNode, preBuiltNode)
 
-                if err != nil {
-                    logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
-                }
-            }
+				if err != nil {
+					logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
+				}
+			}
 		}
-    }
+	}
 
-    return
+	return
 }
 
 // InitializeGraph initializes and prepares a graph dot file for building.

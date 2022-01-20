@@ -63,7 +63,7 @@ var (
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache              = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure        = app.Flag("stop-on-failure", "Stop on failed build").Bool()
-    hydratedBuild        = app.Flag("hydrated-build", "Build individual packages with Hydrated RPMs").String()
+	hydratedBuild        = app.Flag("hydrated-build", "Build individual packages with Hydrated RPMs").String()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -188,9 +188,9 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 		return
 	}
 
-    if hydratedBuild == "y" {
-        schedulerutils.replaceRunNodesWithPrebuiltNodes(pkgGraph, goalNode, packagesToBuild)
-    }
+	if hydratedBuild == "y" {
+		schedulerutils.replaceRunNodesWithPrebuiltNodes(pkgGraph, goalNode, packagesToBuild)
+	}
 
 	// Setup and start the worker pool and scheduler routine.
 	numberOfNodes := pkgGraph.Nodes().Len()
