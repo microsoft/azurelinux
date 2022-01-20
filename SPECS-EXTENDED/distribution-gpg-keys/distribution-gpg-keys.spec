@@ -47,7 +47,7 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 
 %changelog
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 1.60-2
-- Initial CBL-Mariner import from Fedora 33 (license: CC0)
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
 
 * Thu Nov 04 2021 Miroslav Suchý <msuchy@redhat.com> 1.60-1
 - update copr keys

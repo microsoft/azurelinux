@@ -187,6 +187,7 @@
                 "ding-libs",
                 "discount",
                 "disruptor",
+                "distribution-gpg-keys",
                 "dleyna-connector-dbus",
                 "dleyna-core",
                 "dleyna-renderer",
@@ -1076,6 +1077,7 @@
                 "nss_wrapper",
                 "ntfs-3g",
                 "ntfs-3g-system-compression",
+                "numad",
                 "numatop",
                 "nvmetcli",
                 "nvml",
@@ -1743,7 +1745,6 @@
                 "python-CommonMark",
                 "python-conda-package-handling",
                 "python-configshell",
-                "python-cov-core",
                 "python-cpuinfo",
                 "python-crypto",
                 "python-cups",
@@ -2433,10 +2434,25 @@
                 "zstd"
             ]
         },
+        "Mock source": {
+            "license": "[GPLv2+ License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)",
+            "specs": [
+                "dnf-plugins-core",
+                "mock-core-configs",
+                "python-pyroute2",
+                "python-templated-dictionary"
+            ]
+        },
         "Netplan source": {
             "license": "[GPLv3](https://github.com/canonical/netplan/blob/main/COPYING)",
             "specs": [
                 "netplan"
+            ]
+        },
+        "Numad source": {
+            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
+            "specs": [
+                "numad"
             ]
         },
         "NVIDIA": {
@@ -3168,21 +3184,6 @@
                 "zip",
                 "zlib",
                 "zsh"
-            ]
-        },
-        "Numad source": {
-            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
-            "specs": [
-                "numad"
-            ]
-        },
-        "Mock source": {
-            "license": "[GPLv2+ License](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)",
-            "specs": [
-                "mock-core-configs",
-                "dnf-plugins-core",
-                "python-pyroute2",
-                "python-templated-dictionary"
             ]
         },
         "python-nose2 source": {

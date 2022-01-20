@@ -2808,18 +2808,8 @@
         "type": "other",
         "other": {
           "name": "dnf-plugins-core",
-          "version": "4.0.18",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf-plugins-core/archive/4.0.18/dnf-plugins-core-4.0.18.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "dnf-plugins-core",
-          "version": "4.0.18",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf-plugins-core/archive/4.0.18/dnf-plugins-core-4.0.18.tar.gz"
+          "version": "4.0.24",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf-plugins-core/archive/4.0.24/dnf-plugins-core-4.0.24.tar.gz"
         }
       }
     },
@@ -13803,8 +13793,8 @@
         "type": "other",
         "other": {
           "name": "mock",
-          "version": "2.15",
-          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-2.15-1.tar.gz"
+          "version": "2.16",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-2.16-1.tar.gz"
         }
       }
     },
@@ -13813,8 +13803,8 @@
         "type": "other",
         "other": {
           "name": "mock-core-configs",
-          "version": "36.3",
-          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-core-configs-36.3-1/mock-core-configs-36.3-1.tar.gz"
+          "version": "36.4",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-core-configs-36.4-1/mock-core-configs-36.4-1.tar.gz"
         }
       }
     },
@@ -23634,8 +23624,8 @@
         "type": "other",
         "other": {
           "name": "python-nose2",
-          "version": "0.9.1",
-          "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.9.1.tar.gz"
+          "version": "0.10.0",
+          "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.10.0.tar.gz"
         }
       }
     },
