@@ -2,6 +2,9 @@
 
 %global lua_conflict 5.4.0-7
 
+# Place rpm-macros into proper location.
+%global rpmmacrodir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+
 # requires RPM >= 4.16
 %bcond_without requires_generator
 
@@ -86,7 +89,7 @@ install -Dpm 0644 lua.attr %{buildroot}/%{_fileattrsdir}/lua.attr
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
 - Added URL and Group
-- Removed Fedora distro version specific checks.
+- Removed Fedora distro version specific checks and add rpmmacrodir.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
