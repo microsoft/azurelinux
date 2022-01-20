@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           hfsplus-tools
 Version:        540.1.linux3
-Release:        21%{?dist}
+Release:        20%{?dist}
 Summary:        Tools to create/check Apple HFS+ filesystems
 
 License:        APSL 2.0
@@ -14,10 +14,14 @@ Patch1: hfsplus-tools-learn-to-stdarg.patch
 
 Source100:      http://www.opensource.org/licenses/apsl-2.0.txt
 
-BuildRequires: gcc
+BuildRequires:  gcc
 BuildRequires: openssl-devel 
 BuildRequires: libuuid-devel
-BuildRequires: systemd-devel
+
+# those tools are outdated, given the rebuilt mkfs/fsck.hfsplus in this
+# package.  However, I don't want to Obsolete that package yet, as some people
+# may have a valid use for it on their systems. 
+Conflicts: hfsplusutils
 
 # we want this to end up with the other mkfs.*'s, in /sbin
 %define _exec_prefix /
@@ -88,9 +92,6 @@ ln -s fsck.hfsplus.8 fsck.hfs.8
 
 
 %changelog
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 540.1.linux3-21
-- Add BR on systemd-devel
-
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 540.1.linux3-20
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
