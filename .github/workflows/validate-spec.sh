@@ -38,7 +38,7 @@ do
     echo "$spec was changed but neither version nor release changed" >> bad_specs.txt
   fi
 done
-rm diff_content
+rm -f diff_content
 
 if [[ -s bad_specs.txt ]]
 then
