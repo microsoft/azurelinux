@@ -1,7 +1,7 @@
 Summary:        A system tool for maintaining the %{_sysconfdir}/rc*.d hierarchy
 Name:           chkconfig
 Version:        1.20
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,7 +48,10 @@ page), ntsysv configures the current runlevel (5 if you're using X).
 make RPM_OPT_FLAGS="%{optflags}" LDFLAGS="$RPM_LD_FLAGS" %{?_smp_mflags}
 
 %check
-make check
+# Mask the check section as it depends on beakerlib which is currently not
+# provided by CBL-Mariner
+
+# make check
 
 %install
 make DESTDIR=%{buildroot} \
@@ -94,6 +97,9 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 %{_mandir}/*/ntsysv.8*
 
 %changelog
+* Thu Jan 20 2022 Muhammad Falak <mwani@microsoft.com> - 1.20-2
+- Mask `check` section which depends on `beakerlib`
+
 * Tue Jan 11 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.20-1
 - Upgrade to 1.20.
 
