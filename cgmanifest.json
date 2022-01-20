@@ -2377,8 +2377,8 @@
         "type": "other",
         "other": {
           "name": "cryptsetup",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/cryptsetup/v2.3/cryptsetup-2.3.3.tar.xz"
+          "version": "2.4.3",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/cryptsetup/v2.4/cryptsetup-2.4.3.tar.xz"
         }
       }
     },
