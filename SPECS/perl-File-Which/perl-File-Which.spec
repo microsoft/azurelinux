@@ -1,7 +1,7 @@
 Summary:        File-Which
 Name:           perl-File-Which
 Version:        1.22
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPL+ OR Artistic 
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            http://search.cpan.org/dist/File-Which/
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::Spec) >= 0.60
@@ -56,6 +57,9 @@ find %{buildroot} -name 'perllocal.pod' -delete
 
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22-7
+- Adding 'BuildRequires: perl-generators'.
+
 * Mon Aug 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.22-6
 - Bump release to represent package's move to toolchain
 - Lint spec

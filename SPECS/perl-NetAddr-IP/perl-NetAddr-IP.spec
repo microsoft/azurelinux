@@ -1,7 +1,7 @@
 Summary:        Manages IPv4 and IPv6 addresses and subnets
 Name:           perl-NetAddr-IP
 Version:        4.079
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ or Artistic
 Group:          Development/Libraries
 URL:            https://metacpan.org/release/NetAddr-IP
@@ -10,6 +10,7 @@ Source0:        https://cpan.metacpan.org/authors/id/M/MI/MIKER/NetAddr-IP-%{ver
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Math::BigInt)
@@ -46,6 +47,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.079-5
+- Adding 'BuildRequires: perl-generators'.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.079-4
 - Use new perl package names.
 - Change perl_vendorlib to perl_vendorarch directory for packaging.

@@ -6,7 +6,7 @@
 Summary:        Build and install Perl modules
 Name:           perl-Module-Build
 Version:        0.4224
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Build/
@@ -17,6 +17,7 @@ Distribution:   Mariner
 BuildArch:      noarch
 
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(CPAN::Meta) >= 2.142060
@@ -79,6 +80,9 @@ LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4224-5
+- Adding 'BuildRequires: perl-generators'.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.4224-4
 - Use new perl package names.
 - Provide perl(Module::Build*)

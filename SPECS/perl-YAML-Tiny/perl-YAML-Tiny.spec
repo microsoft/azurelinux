@@ -2,7 +2,7 @@
 Summary:        Read/Write YAML files with as little code as possible
 Name:           perl-YAML-Tiny
 Version:        1.73
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML-Tiny/
@@ -12,6 +12,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 Requires:       perl(Exporter)
@@ -45,6 +46,9 @@ make test
 %{_mandir}/man3/YAML::Tiny.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.73-5
+- Adding 'BuildRequires: perl-generators'.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.73-4
 - Use new perl package names.
 - Provide perl(YAML::Tiny).

@@ -1,7 +1,7 @@
 Summary:        Cross-platform path specification manipulation for Perl
 Name:           perl-Text-Template
 Version:        1.51
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            https://metacpan.org/pod/Text::Template
 License:        The Perl 5 License (Artistic 1 & GPL 1)
 Group:          Development/Libraries
@@ -15,6 +15,7 @@ Requires:       perl-libs
 Requires:       perl(Carp)
 Requires:       perl-Test-Warnings
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 BuildRequires:  perl-Test-Warnings
 
 Provides:       perl(Text::Template) = %{version}-%{release}
@@ -43,6 +44,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.51-4
+-   Adding 'BuildRequires: perl-generators'.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.51-3
 -   Use new perl package names.
 -   Disable PACK_LIST for packaging.

@@ -7,7 +7,7 @@
 
 Name:           perl-Compress-Bzip2
 Version:        2.28
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Interface to Bzip2 compression library
 # bzlib-src/win-tst-dlltest.c (unbundled):  Public Domain
 # bzlib-src/LICENSE (unbundled):            BSD
@@ -94,6 +94,9 @@ make test
 %{_mandir}/man3/*.3pm*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-3
+- Adding 'BuildRequires: perl-generators'.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 2.28-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Explicitly provide perl(Compress::*).

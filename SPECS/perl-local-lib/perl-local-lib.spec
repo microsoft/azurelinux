@@ -1,6 +1,6 @@
 Name:           perl-local-lib
 Version:        2.000024
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Create and use a local lib/ for perl modules
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
@@ -15,6 +15,7 @@ BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl(CPAN)
 BuildRequires:  perl(CPAN::HandleConfig)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 7.00
@@ -104,6 +105,9 @@ make test
 %{_sysconfdir}/profile.d/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.000024-10
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.000024-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

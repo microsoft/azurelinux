@@ -1,7 +1,7 @@
 Summary:        Interface to create per object accessors
 Name:           perl-Object-Accessor
 Version:        0.48
-Release:        7%{?dist}
+Release:        8%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Object-Accessor
@@ -12,6 +12,7 @@ Distribution:   Mariner
 BuildArch:      noarch
 
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       perl-libs
 Requires:       perl(deprecate)
 
@@ -44,6 +45,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+*   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-8
+-   Adding 'BuildRequires: perl-generators'.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.48-7
 -   Use new perl package names.
 -   Provide perl(Object::Accessor).

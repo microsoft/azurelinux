@@ -2,7 +2,7 @@
 Summary:	Internationalization library for Perl, compatible with gettext
 Name:		perl-libintl-perl
 Version:	1.29
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	LGPLv2+
 Group: 		Development/Libraries
 URL: 		http://search.cpan.org/dist/libintl-perl/
@@ -10,6 +10,7 @@ Source: 	https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-%{version}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       perl-libs
 Requires:       perl(Carp)
 Requires:       perl(Encode::Alias)
@@ -198,6 +199,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.29-6
+- Adding 'BuildRequires: perl-generators'.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.29-5
 - Use new perl package names.
 - Provide perl(Locale::*).
