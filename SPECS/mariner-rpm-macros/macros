@@ -55,7 +55,8 @@
     } \
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
-%{nil}
+    find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's/-Wl,-dT,\/usr\/src\/mariner\/BUILD\/module_info.ld//' {}
+    %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
 %%install\
@@ -127,23 +128,3 @@
 %_ld_as_needed_flags    %{?_ld_as_needed:-Wl,--as-needed}
 
 %__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags}%{?_legacy_common_support: -fcommon}
-
-# Expand a variable and strip the flags not suitable to extension builders.
-%__extension_strip_flags() %{lua:
-  local name = rpm.expand("%{1}")
-  local value = " " .. rpm.expand("%{" .. name .. "}")
-  local specs_pattern = "%s+-specs=[^%s]+"
-  local lto_flags_pattern = rpm.expand("%{?_lto_cflags}"):gsub("[%-%.]", "%%%1")
-  local module_info_pattern = "%s*%-Wl,%-dT,[^%s]+module_info%.ld"
-  local leading_spaces_pattern = "^%s+"
-  local result = value:gsub(specs_pattern, " "):gsub(lto_flags_pattern, ""):gsub(module_info_pattern, ""):gsub(leading_spaces_pattern, "")
-  print(result)
-}
-  
-# Variants of CFLAGS, CXXFLAGS, FFLAGS, LDFLAGS for use within
-# extension builders.
-# https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
-%extension_cflags %{__extension_strip_flags build_cflags}
-%extension_cxxflags %{__extension_strip_flags build_cxxflags}
-%extension_fflags %{__extension_strip_flags build_fflags}
-%extension_ldflags %{__extension_strip_flags build_ldflags}

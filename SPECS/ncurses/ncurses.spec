@@ -1,7 +1,7 @@
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.2
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,8 +85,8 @@ for abi in 5 6; do
             [ $progs = yes ] || echo --without-progs
         )
 
-        make %{?_smp_mflags} libs BUILD_LDFLAGS="%{build_ldflags}" LDFLAGS="-Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags}"
-        [ $progs = yes ] && make %{?_smp_mflags} -C progs BUILD_LDFLAGS="%{build_ldflags}" LDFLAGS="-Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags}"
+        make %{?_smp_mflags} libs 
+        [ $progs = yes ] && make %{?_smp_mflags} -C progs
 
         popd
     done
