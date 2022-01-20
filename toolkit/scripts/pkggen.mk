@@ -179,6 +179,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(chroot_worker) $(go-schedu
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
+		--hydrated-build="$(HYDRATED_BUILD)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \

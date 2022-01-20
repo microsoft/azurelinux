@@ -45,6 +45,7 @@ NUM_OF_ANALYTICS_RESULTS        ?= 10
 CLEANUP_PACKAGE_BUILDS          ?= y
 USE_PACKAGE_BUILD_CACHE         ?= y
 REBUILD_DEP_CHAINS              ?= y
+HYDRATED_BUILD                  ?= n
 
 # Folder defines
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
