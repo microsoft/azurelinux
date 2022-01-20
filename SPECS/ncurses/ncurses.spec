@@ -85,7 +85,7 @@ for abi in 5 6; do
             [ $progs = yes ] || echo --without-progs
         )
 
-        make %{?_smp_mflags} libs 
+        make %{?_smp_mflags} libs
         [ $progs = yes ] && make %{?_smp_mflags} -C progs
 
         popd
@@ -207,7 +207,7 @@ xz NEWS
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.2-6
-- Filter out references to module_info.ld in pkgconfigs
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 
 * Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 6.2-5
 - Add patch for CVE-2021-39537

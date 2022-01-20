@@ -68,7 +68,7 @@ make  %{?_smp_mflags} check
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0.14-3
-- Filter out references to module_info.ld in pkgconfigs
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.14-2
 - Added %%license line automatically

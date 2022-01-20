@@ -106,7 +106,7 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.9-4
-- Filter out references to module_info.ld in pkgconfigs
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 
 * Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> - 5.9-3
 - Modify check section to run only unit-tests

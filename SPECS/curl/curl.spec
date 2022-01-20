@@ -99,7 +99,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 7.76.0-8
-- Filter out references to module_info.ld in pkgconfigs
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 
 * Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 7.76.0-7
 - Add nopatch for CVE-2021-22926

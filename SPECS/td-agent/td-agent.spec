@@ -201,7 +201,7 @@ sudo systemctl start td-agent
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.0.1-4
-- Filter out references to module_info.ld in pkgconfigs
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 
 * Wed May 05 2021 Henry Li <lihl@microsoft.com> - 4.0.1-3
 - Update patch to use ruby 2.6.7
