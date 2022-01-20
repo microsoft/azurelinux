@@ -6,7 +6,7 @@ Subject: [PATCH] Merged PR 221: Add download option to TDNF
 Add a `download` command to TDNF that will download RPMs to a directory.
 
 Usage:
-- `tdnf download <package1, package2, ...> --destdir /path/to/download/folder>`
+- `tdnf download <package1, package2, ...> --downloaddir /path/to/download/folder>`
 - To download a package and all of its dependencies even if the system already has them installed, add the `--alldeps` option.
 
 Behavior:
@@ -14,41 +14,29 @@ Behavior:
 - `tdnf download` will respond to other tdnf options, such as silent, no gpg check, etc.
 - `tdnf download` will skip RPMs if the correct version already exists in the destination directory.
 - `tdnf download` will check GPG signatures unless otherwise specified.
----
- client/api.c              | 81 +++++++++++++++++++++++++++------------
- client/goal.c             |  3 +-
- client/init.c             |  9 +++++
- client/resolve.c          |  3 +-
- client/rpmtrans.c         | 68 ++++++++++++++++++++++----------
- include/tdnf.h            |  7 ++++
- include/tdnfcli.h         |  6 +++
- include/tdnfclitypes.h    |  6 +++
- include/tdnftypes.h       |  5 ++-
- solv/prototypes.h         |  8 ++--
- solv/tdnfpool.c           |  5 ++-
- solv/tdnfrepo.c           | 57 ++++++++++++++++++++-------
- tools/cli/lib/api.c       | 75 ++++++++++++++++++++++++++++++++++++
- tools/cli/lib/help.c      |  3 ++
- tools/cli/lib/parseargs.c | 10 +++++
- tools/cli/main.c          | 13 ++++++-
- tools/cli/prototypes.h    |  6 +++
- 17 files changed, 297 insertions(+), 68 deletions(-)
+
+From: Mateusz Malisz <mamalisz@microsoft.com>
+Updated: Thu, 20 Jan 2022 21:54:04+0000
+
+Updated code to work with tdnf 3.2.2. Removed --destdir argument in favor of reusing --downloaddir instead.
 
 diff --git a/client/api.c b/client/api.c
-index b8f9364..002fe88 100644
+index ef25d09..6209aa9 100644
 --- a/client/api.c
 +++ b/client/api.c
-@@ -678,8 +678,8 @@ TDNFOpenHandle(
-     )
+@@ -629,10 +629,10 @@ TDNFOpenHandle(
  {
      uint32_t dwError = 0;
-+    const int nSkipInstalledRpms = 0;
      PTDNF pTdnf = NULL;
 -    PSolvSack pSack = NULL;
+     char *pszCacheDir = NULL;
+     char *pszRepoDir = NULL;
+     int nHasOptReposdir = 0;
++    const int nSkipInstalledRpms = 0;
  
      if(!pArgs || !ppTdnf)
      {
-@@ -702,28 +702,9 @@ TDNFOpenHandle(
+@@ -704,25 +704,7 @@ TDNFOpenHandle(
      dwError = TDNFLoadPlugins(pTdnf);
      BAIL_ON_TDNF_ERROR(dwError);
  
@@ -67,18 +55,15 @@ index b8f9364..002fe88 100644
 -    dwError = TDNFRepoListFinalize(pTdnf);
 -    BAIL_ON_TDNF_ERROR(dwError);
 -
--    dwError = TDNFRefreshSack(
--                  pTdnf,
--                  pSack,
--                  pTdnf->pArgs->nRefresh);
-+    dwError = TDNFResetSack(pTdnf, nSkipInstalledRpms);
-     BAIL_ON_TDNF_ERROR(dwError);
- 
+-    dwError = TDNFInitCmdLineRepo(pTdnf, pSack);
+-    BAIL_ON_TDNF_ERROR(dwError);
+-
 -    pTdnf->pSack = pSack;
++    dwError = TDNFResetSack(pTdnf, nSkipInstalledRpms);
      *ppTdnf = pTdnf;
  
  cleanup:
-@@ -738,10 +719,6 @@ error:
+@@ -739,10 +721,6 @@ error:
      {
          *ppTdnf = NULL;
      }
@@ -89,10 +74,19 @@ index b8f9364..002fe88 100644
      goto cleanup;
  }
  
-@@ -879,6 +856,60 @@ error:
-     goto cleanup;
- }
+@@ -1463,7 +1441,7 @@ TDNFRepoQuery(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
  
+-    /* get results in list */ 
++    /* get results in list */
+     dwError = SolvGetQueryResult(pQuery, &pPkgList);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+@@ -1939,3 +1917,53 @@ TDNFGetPackageName(
+ {
+     return PACKAGE_NAME;
+ }
 +uint32_t
 +TDNFResetSack(
 +    PTDNF pTdnf,
@@ -109,28 +103,25 @@ index b8f9364..002fe88 100644
 +    }
 +
 +    dwError = SolvInitSack(
-+                  &pSack,
-+                  pTdnf->pConf->pszCacheDir,
-+                  pTdnf->pArgs->pszInstallRoot,
-+                  nSkipInstalledRpms);
++        &pSack,
++        pTdnf->pConf->pszCacheDir,
++        pTdnf->pArgs->pszInstallRoot,
++        nSkipInstalledRpms);
 +    BAIL_ON_TDNF_ERROR(dwError);
 +
 +    dwError = TDNFLoadRepoData(
-+                  pTdnf,
-+                  REPOLISTFILTER_ALL,
-+                  &pTdnf->pRepos);
++        pTdnf,
++        REPOLISTFILTER_ALL,
++        &pTdnf->pRepos);
 +    BAIL_ON_TDNF_ERROR(dwError);
 +
 +    dwError = TDNFRepoListFinalize(pTdnf);
 +    BAIL_ON_TDNF_ERROR(dwError);
 +
-+    dwError = TDNFRefreshSack(
-+                  pTdnf,
-+                  pSack,
-+                  pTdnf->pArgs->nRefresh);
++    dwError = TDNFInitCmdLineRepo(pTdnf, pSack);
 +    BAIL_ON_TDNF_ERROR(dwError);
 +
-+    if (!pTdnf->pSack)
++    if(!pTdnf->pSack)
 +    {
 +        SolvFreeSack(pTdnf->pSack);
 +    }
@@ -146,24 +137,11 @@ index b8f9364..002fe88 100644
 +    }
 +    goto cleanup;
 +}
-+
- //Resolve alter command before presenting
- //the goal steps to user for approval
- uint32_t
 diff --git a/client/goal.c b/client/goal.c
-index 0f36e0b..34f12e6 100644
+index 916388c..3700df5 100644
 --- a/client/goal.c
 +++ b/client/goal.c
-@@ -30,7 +30,7 @@ TDNFGetPackagesWithSpecifiedType(
-     uint32_t dwError = 0;
-     uint32_t dwCount = 0;
-     PSolvPackageList pPkgList = NULL;
--
-+
-     if(!pTdnf || !pTdnf->pSack|| !pTrans || !pPkgInfo)
-     {
-         dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -509,6 +509,7 @@ TDNFAddGoal(
+@@ -514,6 +514,7 @@ TDNFAddGoal(
              break;
          case ALTER_REINSTALL:
          case ALTER_INSTALL:
@@ -172,10 +150,10 @@ index 0f36e0b..34f12e6 100644
              dwError = SolvAddPkgInstallJob(pQueueJobs, dwId);
              BAIL_ON_TDNF_ERROR(dwError);
 diff --git a/client/init.c b/client/init.c
-index d08733a..5cc71c4 100644
+index 871dae7..1bee9f5 100644
 --- a/client/init.c
 +++ b/client/init.c
-@@ -36,6 +36,7 @@ TDNFCloneCmdArgs(
+@@ -37,6 +37,7 @@ TDNFCloneCmdArgs(
                    (void**)&pCmdArgs);
      BAIL_ON_TDNF_ERROR(dwError);
  
@@ -183,26 +161,11 @@ index d08733a..5cc71c4 100644
      pCmdArgs->nAllowErasing  = pCmdArgsIn->nAllowErasing;
      pCmdArgs->nAssumeNo      = pCmdArgsIn->nAssumeNo;
      pCmdArgs->nAssumeYes     = pCmdArgsIn->nAssumeYes;
-@@ -74,6 +75,14 @@ TDNFCloneCmdArgs(
-         BAIL_ON_TDNF_ERROR(dwError);
-     }
- 
-+    if(!IsNullOrEmptyString(pCmdArgsIn->pszDestDir))
-+    {
-+        dwError = TDNFAllocateString(
-+                      pCmdArgsIn->pszDestDir,
-+                      &pCmdArgs->pszDestDir);
-+        BAIL_ON_TDNF_ERROR(dwError);
-+    }
-+
-     if(!IsNullOrEmptyString(pCmdArgsIn->pszReleaseVer))
-     {
-         dwError = TDNFAllocateString(
 diff --git a/client/resolve.c b/client/resolve.c
-index 5353589..f370757 100644
+index b9164e8..125d4b2 100644
 --- a/client/resolve.c
 +++ b/client/resolve.c
-@@ -348,7 +348,8 @@ TDNFPrepareSinglePkg(
+@@ -378,7 +378,8 @@ TDNFPrepareSinglePkg(
                        pszPkgName);
          BAIL_ON_TDNF_ERROR(dwError);
      }
@@ -213,126 +176,48 @@ index 5353589..f370757 100644
          dwError = TDNFAddPackagesForInstall(
                        pSack,
 diff --git a/client/rpmtrans.c b/client/rpmtrans.c
-index d63b559..4b8434d 100644
+index 8fa055a..99098b8 100644
 --- a/client/rpmtrans.c
 +++ b/client/rpmtrans.c
-@@ -90,8 +90,11 @@ TDNFRpmExecTransaction(
-     dwError = TDNFPopulateTransaction(&ts, pTdnf, pSolvedInfo);
-     BAIL_ON_TDNF_ERROR(dwError);
+@@ -41,7 +41,9 @@ TDNFRpmExecTransaction(
  
--    dwError = TDNFRunTransaction(&ts, pTdnf);
--    BAIL_ON_TDNF_ERROR(dwError);
-+    if (nAlterType != ALTER_INSTALL_ONLY_DOWNLOAD)
-+    {
-+        dwError = TDNFRunTransaction(&ts, pTdnf);
-+        BAIL_ON_TDNF_ERROR(dwError);
-+    }
+     ts.nQuiet = pTdnf->pArgs->nQuiet;
+     nKeepCachedRpms = pTdnf->pConf->nKeepCache;
+-    nDownloadOnly = pTdnf->pArgs->nDownloadOnly;
++    nDownloadOnly = pTdnf->pArgs->nDownloadOnly ||
++                    nAlterType != ALTER_INSTALL_ONLY_DOWNLOAD;
++
  
- cleanup:
-     if(ts.pTS)
-@@ -105,7 +108,7 @@ cleanup:
-     }
-     if(ts.pCachedRpmsArray)
-     {
--        if(!nKeepCachedRpms)
-+        if(!nKeepCachedRpms && nAlterType != ALTER_INSTALL_ONLY_DOWNLOAD)
-         {
-             TDNFRemoveCachedRpms(ts.pCachedRpmsArray);
-         }
-@@ -400,27 +403,51 @@ TDNFTransAddInstallPkg(
-     char* pszRpmCacheDir = NULL;
-     char* pszFilePath = NULL;
-     char* pszFilePathCopy = NULL;
-+    char* pszPackageLocationCopy = NULL;
+     dwError = TDNFAllocateMemory(
+                   1,
+@@ -509,6 +511,12 @@ TDNFTransAddInstallPkg(
      Header rpmHeader = NULL;
-     FD_t fp = NULL;
-     char* pszDownloadCacheDir = NULL;
-     char* pszUrlGPGKey = NULL;
      PTDNF_CACHED_RPM_ENTRY pRpmCache = NULL;
  
--    dwError = TDNFAllocateStringPrintf(
--                  &pszRpmCacheDir,
--                  "%s/%s/%s",
--                  pTdnf->pConf->pszCacheDir,
--                  pszRepoName,
--                  "rpms");
--    BAIL_ON_TDNF_ERROR(dwError);
 +    if (!pTdnf || !pTdnf->pConf)
 +    {
 +        dwError = ERROR_TDNF_INVALID_PARAMETER;
 +        BAIL_ON_TDNF_ERROR(dwError);
 +    }
- 
--    dwError = TDNFAllocateStringPrintf(
--                  &pszFilePath,
--                  "%s/%s",
--                  pszRpmCacheDir,
--                  pszPackageLocation);
-+    // dirname() may modify the contents of path, so it may be desirable to
-+    // pass a copy when calling this function.
-+    dwError = TDNFAllocateString(pszPackageLocation, &pszPackageLocationCopy);
-     BAIL_ON_TDNF_ERROR(dwError);
- 
-+    if (IsNullOrEmptyString(pTdnf->pArgs->pszDestDir))
-+    {
-+        dwError = TDNFAllocateStringPrintf(
-+                    &pszRpmCacheDir,
-+                    "%s/%s/%s",
-+                    pTdnf->pConf->pszCacheDir,
-+                    pszRepoName,
-+                    "rpms");
-+        BAIL_ON_TDNF_ERROR(dwError);
 +
-+        dwError = TDNFAllocateStringPrintf(
-+                    &pszFilePath,
-+                    "%s/%s",
-+                    pszRpmCacheDir,
-+                    pszPackageLocationCopy);
-+        BAIL_ON_TDNF_ERROR(dwError);
-+    }
-+    else
-+    {
-+        dwError = TDNFAllocateStringPrintf(
-+                    &pszFilePath,
-+                    "%s/%s",
-+                    pTdnf->pArgs->pszDestDir,
-+                    basename(pszPackageLocationCopy));
-+        BAIL_ON_TDNF_ERROR(dwError);
-+    }
-+
-     // dirname() may modify the contents of path, so it may be desirable to
-     // pass a copy when calling this function.
-     dwError = TDNFAllocateString(pszFilePath, &pszFilePathCopy);
-@@ -501,11 +528,11 @@ TDNFTransAddInstallPkg(
+     if (pszPackageLocation[0] == '/')
+     {
+         dwError = TDNFAllocateString(
+@@ -519,7 +527,8 @@ TDNFTransAddInstallPkg(
      }
- 
-     dwError = rpmtsAddInstallElement(
--                  pTS->pTS,
--                  rpmHeader,
--                  (fnpyKey)pszFilePath,
--                  nUpgrade,
--                  NULL);
-+                pTS->pTS,
-+                rpmHeader,
-+                (fnpyKey)pszFilePath,
-+                nUpgrade,
-+                NULL);
-     BAIL_ON_TDNF_RPM_ERROR(dwError);
- 
-     if(pTS->pCachedRpmsArray)
-@@ -520,6 +547,7 @@ TDNFTransAddInstallPkg(
-         pTS->pCachedRpmsArray->pHead = pRpmCache;
-     }
- cleanup:
-+    TDNF_SAFE_FREE_MEMORY(pszPackageLocationCopy);
-     TDNF_SAFE_FREE_MEMORY(pszFilePathCopy);
-     TDNF_SAFE_FREE_MEMORY(pszUrlGPGKey);
-     TDNF_SAFE_FREE_MEMORY(pszRpmCacheDir);
+     else
+     {
+-        if (!pTdnf->pArgs->nDownloadOnly || pTdnf->pArgs->pszDownloadDir == NULL)
++        if (!pTdnf->pArgs->nDownloadOnly ||
++            IsNullOrEmptyString(pTdnf->pArgs->pszDownloadDir))
+         {
+             dwError = TDNFDownloadPackageToCache(
+                           pTdnf,
 diff --git a/include/tdnf.h b/include/tdnf.h
-index daefaa1..fbe7e24 100644
+index d15ea62..38be638 100644
 --- a/include/tdnf.h
 +++ b/include/tdnf.h
-@@ -152,6 +152,13 @@ TDNFSearchCommand(
+@@ -173,6 +173,13 @@ TDNFSearchCommand(
      uint32_t* pdwCount
      );
  
@@ -347,10 +232,10 @@ index daefaa1..fbe7e24 100644
  //return solved pkg info which has descriptive
  //info about steps to reach current goal.
 diff --git a/include/tdnfcli.h b/include/tdnfcli.h
-index 9ad7b98..0afea1c 100644
+index 4644cd0..964062f 100644
 --- a/include/tdnfcli.h
 +++ b/include/tdnfcli.h
-@@ -142,6 +142,12 @@ TDNFCliInfoCommand(
+@@ -169,6 +169,12 @@ TDNFCliInfoCommand(
      PTDNF_CMD_ARGS pCmdArgs
      );
  
@@ -364,11 +249,11 @@ index 9ad7b98..0afea1c 100644
  TDNFCliSearchCommand(
      PTDNF_CLI_CONTEXT pContext,
 diff --git a/include/tdnfclitypes.h b/include/tdnfclitypes.h
-index 65de395..11f76ea 100644
+index b7b33d1..6d00be5 100644
 --- a/include/tdnfclitypes.h
 +++ b/include/tdnfclitypes.h
-@@ -107,6 +107,11 @@ typedef uint32_t
-     PTDNF_REPO_DATA *
+@@ -121,6 +121,11 @@ typedef uint32_t
+     uint32_t *
      );
  
 +typedef uint32_t
@@ -379,16 +264,16 @@ index 65de395..11f76ea 100644
  typedef uint32_t
  (*PFN_TDNF_RESOLVE)(
      PTDNF_CLI_CONTEXT,
-@@ -148,6 +153,7 @@ typedef struct _TDNF_CLI_CONTEXT_
+@@ -162,6 +167,7 @@ typedef struct _TDNF_CLI_CONTEXT_
      PFN_TDNF_LIST               pFnList;
      PFN_TDNF_PROVIDES           pFnProvides;
      PFN_TDNF_REPOLIST           pFnRepoList;
 +    PFN_TDNF_RESET_SACK         pFnResetSack;
+     PFN_TDNF_REPOSYNC           pFnRepoSync;
+     PFN_TDNF_REPOQUERY          pFnRepoQuery;
      PFN_TDNF_RESOLVE            pFnResolve;
-     PFN_TDNF_SEARCH             pFnSearch;
-     PFN_TDNF_UPDATEINFO         pFnUpdateInfo;
 diff --git a/include/tdnftypes.h b/include/tdnftypes.h
-index df75732..e58bf12 100644
+index a547b8a..db77ada 100644
 --- a/include/tdnftypes.h
 +++ b/include/tdnftypes.h
 @@ -54,7 +54,8 @@ typedef enum
@@ -401,27 +286,28 @@ index df75732..e58bf12 100644
  }TDNF_ALTERTYPE;
  
  typedef enum
-@@ -217,6 +218,7 @@ typedef struct _TDNF_CMD_ARGS
+@@ -231,6 +232,7 @@ typedef struct _TDNF_CMD_ARGS
      //Represent options in the dnf cmd line.
      //All options are one to one maps to dnf command line
      //options (incomplete)
-+    int nAllDeps;          //add all package dependencies
++    int nAllDeps;          //add all package dependencies when resolving
      int nAllowErasing;     //allow erasures when solving
      int nAssumeNo;         //assume no for all questions
      int nAssumeYes;        //assume yes for all questions
-@@ -237,6 +239,7 @@ typedef struct _TDNF_CMD_ARGS
+@@ -250,7 +252,7 @@ typedef struct _TDNF_CMD_ARGS
+     int nIPv6;             //resolve to IPv6 addresses only
+     int nDisableExcludes;  //disable excludes from tdnf.conf
+     int nDownloadOnly;     //download packages only, no install
+-    char* pszDownloadDir;  //directory for download, if nDownloadOnly is set
++    char* pszDownloadDir;  //directory for download, if nDownloadOnly is set or install command is called
      char* pszInstallRoot;  //set install root
      char* pszConfFile;     //set conf file location
      char* pszReleaseVer;   //Release version
-+    char* pszDestDir;      //set destination directory for package downloads
- 
-     //Commands and args that do not fall in options
-     char** ppszCmds;
 diff --git a/solv/prototypes.h b/solv/prototypes.h
-index b848932..c5246c0 100644
+index 04e877e..b04411d 100644
 --- a/solv/prototypes.h
 +++ b/solv/prototypes.h
-@@ -279,7 +279,8 @@ uint32_t
+@@ -315,7 +315,8 @@ uint32_t
  SolvInitSack(
      PSolvSack *ppSack,
      const char* pszCacheDir,
@@ -431,7 +317,7 @@ index b848932..c5246c0 100644
      );
  
  
-@@ -446,10 +447,11 @@ SolvCountPackages(
+@@ -502,10 +503,11 @@ SolvCountPackages(
      );
  
  uint32_t
@@ -469,10 +355,15 @@ index b22de1d..6a64f43 100644
  
      pool_set_installed(pPool, pRepo);
 diff --git a/solv/tdnfrepo.c b/solv/tdnfrepo.c
-index 7b416a1..9f3bb47 100644
+index d98d9c7..437d931 100644
 --- a/solv/tdnfrepo.c
 +++ b/solv/tdnfrepo.c
-@@ -227,14 +227,52 @@ error:
+@@ -1,4 +1,3 @@
+-
+ /*
+  * Copyright (C) 2015-2021 VMware, Inc. All Rights Reserved.
+  *
+@@ -270,15 +269,14 @@ error:
  uint32_t
  SolvReadInstalledRpms(
      Pool* pPool,
@@ -485,86 +376,81 @@ index 7b416a1..9f3bb47 100644
 -    Repo *pRepo = NULL;
      FILE *pCacheFile = NULL;
      int  dwFlags = 0;
+-    if(!pPool || !ppRepo)
++    if(!pPool || !pRepo)
+     {
+         dwError = ERROR_TDNF_INVALID_PARAMETER;
+         BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
+@@ -310,7 +308,6 @@ SolvReadInstalledRpms(
+         dwError = ERROR_TDNF_SOLV_IO;
+         BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
+     }
+-    *ppRepo = pRepo;
+ 
+ cleanup:
+     if (pCacheFile)
+@@ -325,6 +322,55 @@ error:
+     goto cleanup;
+ }
+ 
++uint32_t
++SolvInitializeSystemRepo(
++        Pool* pPool,
++        Repo** ppRepo,
++        const char*  pszCacheFileName,
++        int nSkipInstalledRpms
++        )
++{
++    uint32_t dwError = 0;
++    Repo* pRepo = NULL;
++
 +    if(!pPool || !pRepo)
 +    {
 +        dwError = ERROR_TDNF_INVALID_PARAMETER;
 +        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
 +    }
 +
-+    if(pszCacheFileName)
++    pRepo = repo_create(pPool, SYSTEM_REPO_NAME);
++    if(pRepo == NULL)
 +    {
-+        pCacheFile = fopen(pszCacheFileName, "r");
++        dwError = ERROR_TDNF_INVALID_PARAMETER;
++        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
 +    }
 +
-+    dwFlags = REPO_REUSE_REPODATA | RPM_ADD_WITH_HDRID | REPO_USE_ROOTDIR;
-+    dwError = repo_add_rpmdb_reffp(pRepo, pCacheFile, dwFlags);
++    if(!nSkipInstalledRpms)
++    {
++        dwError = SolvReadInstalledRpms(pPool, pRepo, pszCacheFileName);
++        BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
++    }
 +
 +    if (dwError)
 +    {
 +        dwError = ERROR_TDNF_SOLV_IO;
 +        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
 +    }
++    *ppRepo = pRepo;
 +
 +cleanup:
-+    if (pCacheFile)
-+        fclose(pCacheFile);
 +    return dwError;
 +
 +error:
++    if(pRepo)
++    {
++        repo_free(pRepo, 1);
++    }
 +    goto cleanup;
 +}
 +
-+uint32_t
-+SolvInitializeSystemRepo(
-+    Pool* pPool,
-+    Repo** ppRepo,
-+    const char*  pszCacheFileName,
-+    int nSkipInstalledRpms
-+    )
-+{
-+    uint32_t dwError = 0;
-+    Repo *pRepo = NULL;
-     if(!pPool || !ppRepo)
-     {
-         dwError = ERROR_TDNF_INVALID_PARAMETER;
-@@ -248,19 +286,12 @@ SolvReadInstalledRpms(
-         BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
-     }
- 
--    if(pszCacheFileName && access(pszCacheFileName, F_OK) == 0)
-+    if (!nSkipInstalledRpms)
-     {
--        pCacheFile = fopen(pszCacheFileName, "r");
--        if(!pCacheFile)
--        {
--            dwError = errno;
--            BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
--        }
-+        dwError = SolvReadInstalledRpms(pPool, pRepo, pszCacheFileName);
-+        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
-     }
- 
--    dwFlags = REPO_REUSE_REPODATA | RPM_ADD_WITH_HDRID | REPO_USE_ROOTDIR;
--    dwError = repo_add_rpmdb_reffp(pRepo, pCacheFile, dwFlags);
--
-     if (dwError)
-     {
-         dwError = ERROR_TDNF_SOLV_IO;
-@@ -269,8 +300,6 @@ SolvReadInstalledRpms(
-     *ppRepo = pRepo;
- 
- cleanup:
--    if (pCacheFile)
--        fclose(pCacheFile);
-     return dwError;
- 
- error:
++
+ uint32_t
+ SolvCalculateCookieForFile(
+     char *pszFilePath,
 diff --git a/tools/cli/lib/api.c b/tools/cli/lib/api.c
-index 431dfab..cb9b160 100644
+index f277b7c..1080bc7 100644
 --- a/tools/cli/lib/api.c
 +++ b/tools/cli/lib/api.c
-@@ -217,6 +217,81 @@ error:
-     goto cleanup;
+@@ -718,3 +718,77 @@ TDNFCliRefresh(
+     return TDNFRefresh(pContext->hTdnf);
  }
  
 +uint32_t
@@ -572,7 +458,7 @@ index 431dfab..cb9b160 100644
 +    PTDNF_CLI_CONTEXT pContext,
 +    PTDNF_CMD_ARGS pCmdArgs
 +    )
-+{
++    {
 +    uint32_t dwError = 0;
 +    char** ppszPackageArgs = NULL;
 +    int nPackageCount = 0;
@@ -584,7 +470,7 @@ index 431dfab..cb9b160 100644
 +    if(!pContext ||
 +       !pContext->hTdnf ||
 +       !pCmdArgs ||
-+       IsNullOrEmptyString(pCmdArgs->pszDestDir))
++       IsNullOrEmptyString(pCmdArgs->pszDownloadDir))
 +    {
 +        dwError = ERROR_TDNF_INVALID_PARAMETER;
 +        BAIL_ON_CLI_ERROR(dwError);
@@ -641,37 +527,31 @@ index 431dfab..cb9b160 100644
 +error:
 +    goto cleanup;
 +}
-+
- uint32_t
- TDNFCliInfoCommand(
-     PTDNF_CLI_CONTEXT pContext,
 diff --git a/tools/cli/lib/help.c b/tools/cli/lib/help.c
-index b645ba7..c223ea2 100644
+index 369e4e2..acc51c6 100644
 --- a/tools/cli/lib/help.c
 +++ b/tools/cli/lib/help.c
-@@ -37,7 +37,9 @@ TDNFCliShowHelp(
-     printf("\n");
+@@ -39,6 +39,7 @@ TDNFCliShowHelp(
+     pr_crit("\n");
  
-     printf("options    [-c [config file]]\n");
-+    printf("           [--alldeps]\n");
-     printf("           [--debugsolver]\n");
-+    printf("           [--destdir [path]]\n");
-     printf("           [--disablerepo=<repoid>]\n");
-     printf("           [--enablerepo=<repoid>]\n");
-     printf("           [--noplugins]\n");
-@@ -63,6 +65,7 @@ TDNFCliShowHelp(
-     printf("check-update              Check for available package upgrades\n");
-     printf("clean                     Remove cached data\n");
-     printf("distro-sync               Synchronize installed packages to the latest available versions\n");
-+    printf("download                  download a package\n");
-     printf("downgrade                 downgrade a package\n");
-     printf("erase                     Remove a package or packages from your system\n");
-     printf("help                      Display a helpful usage message\n");
+     pr_crit("options    [-c [config file]]\n");
++    pr_crit("           [--alldeps]\n");
+     pr_crit("           [--debugsolver]\n");
+     pr_crit("           [--disablerepo=<repoid>]\n");
+     pr_crit("           [--enablerepo=<repoid>]\n");
+@@ -108,6 +109,7 @@ TDNFCliShowHelp(
+     pr_crit("check-update              Check for available package upgrades\n");
+     pr_crit("clean                     Remove cached data\n");
+     pr_crit("distro-sync               Synchronize installed packages to the latest available versions\n");
++    pr_crit("download                  download a package\n");
+     pr_crit("downgrade                 downgrade a package\n");
+     pr_crit("erase                     Remove a package or packages from your system\n");
+     pr_crit("help                      Display a helpful usage message\n");
 diff --git a/tools/cli/lib/parseargs.c b/tools/cli/lib/parseargs.c
-index b42b64a..0f1498c 100644
+index a022e13..e3093c8 100644
 --- a/tools/cli/lib/parseargs.c
 +++ b/tools/cli/lib/parseargs.c
-@@ -26,6 +26,7 @@ static TDNF_CMD_ARGS _opt = {0};
+@@ -74,6 +74,7 @@ static TDNF_CMD_ARGS _opt = {0};
  //options - incomplete
  static struct option pstOptions[] =
  {
@@ -679,15 +559,7 @@ index b42b64a..0f1498c 100644
      {"allowerasing",  no_argument, &_opt.nAllowErasing, 1},//--allowerasing
      {"assumeno",      no_argument, &_opt.nAssumeNo, 1},    //--assumeno
      {"assumeyes",     no_argument, 0, 'y'},                //--assumeyes
-@@ -34,6 +35,7 @@ static struct option pstOptions[] =
-     {"config",        required_argument, 0, 'c'},          //-c, --config
-     {"debuglevel",    required_argument, 0, 'd'},          //-d, --debuglevel
-     {"debugsolver",   no_argument, &_opt.nDebugSolver, 1}, //--debugsolver
-+    {"destdir",       required_argument, 0, 0},            //--destdir
-     {"disablerepo",   required_argument, 0, 0},            //--disablerepo
-     {"enablerepo",    required_argument, 0, 0},            //--enablerepo
-     {"errorlevel",    required_argument, 0, 'e'},          //-e --errorlevel
-@@ -225,6 +227,7 @@ TDNFCopyOptions(
+@@ -326,6 +327,7 @@ TDNFCopyOptions(
          BAIL_ON_CLI_ERROR(dwError);
      }
  
@@ -695,45 +567,32 @@ index b42b64a..0f1498c 100644
      pArgs->nAllowErasing  = pOptionArgs->nAllowErasing;
      pArgs->nAssumeNo      = pOptionArgs->nAssumeNo;
      pArgs->nAssumeYes     = pOptionArgs->nAssumeYes;
-@@ -291,6 +294,13 @@ ParseOption(
-                                       optarg);
-         BAIL_ON_CLI_ERROR(dwError);
-     }
-+    else if(!strcasecmp(pszName, "destdir"))
-+    {
-+        dwError = TDNFAllocateString(
-+                      optarg,
-+                      &pCmdArgs->pszDestDir);
-+        BAIL_ON_CLI_ERROR(dwError);
-+    }
-     else if(!strcasecmp(pszName, "disablerepo"))
-     {
-         dwError = AddSetOptWithValues(pCmdArgs,
 diff --git a/tools/cli/main.c b/tools/cli/main.c
-index d1ef159..d638640 100644
+index 203f50a..a6c50a2 100644
 --- a/tools/cli/main.c
 +++ b/tools/cli/main.c
-@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
+@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
+         {"clean",              TDNFCliCleanCommand},
          {"count",              TDNFCliCountCommand},
          {"distro-sync",        TDNFCliDistroSyncCommand},
-         {"downgrade",          TDNFCliDowngradeCommand},
 +        {"download",           TDNFCliDownloadCommand},
+         {"downgrade",          TDNFCliDowngradeCommand},
          {"erase",              TDNFCliEraseCommand},
          {"help",               TDNFCliHelpCommand},
-         {"info",               TDNFCliInfoCommand},
-@@ -82,8 +83,9 @@ int main(int argc, char* argv[])
-     _context.pFnProvides = TDNFCliInvokeProvides;
-     _context.pFnRepoList = TDNFCliInvokeRepoList;
-     //Alter and resolve will address commands like
--    //install, upgrade, erase, downgrade, distrosync
-+    //install, upgrade, erase, downgrade, download, distrosync
+@@ -109,9 +110,10 @@ int main(int argc, char* argv[])
+ 
+     /*
+      * Alter and resolve will address commands like
+-     * install, upgrade, erase, downgrade, distrosync
++     * install, upgrade, erase, download, downgrade, distrosync
+      */
      _context.pFnAlter = TDNFCliInvokeAlter;
 +    _context.pFnResetSack = TDNFCliInvokeResetSack;
      _context.pFnResolve = TDNFCliInvokeResolve;
      _context.pFnSearch = TDNFCliInvokeSearch;
      _context.pFnUpdateInfo = TDNFCliInvokeUpdateInfo;
-@@ -362,6 +364,15 @@ TDNFCliInvokeRepoList(
-     return TDNFRepoList(pContext->hTdnf, nFilter, ppRepos);
+@@ -527,3 +529,11 @@ TDNFCliInvokeUpdateInfoSummary(
+                ppSummary);
  }
  
 +uint32_t
@@ -744,27 +603,17 @@ index d1ef159..d638640 100644
 +{
 +    return TDNFResetSack(pContext->hTdnf, nSkipInstalledRpms);
 +}
-+
- uint32_t
- TDNFCliInvokeResolve(
-     PTDNF_CLI_CONTEXT pContext,
 diff --git a/tools/cli/prototypes.h b/tools/cli/prototypes.h
-index 41fe0f0..053f4a7 100644
+index 0afba59..84d5bd5 100644
 --- a/tools/cli/prototypes.h
 +++ b/tools/cli/prototypes.h
-@@ -91,6 +91,12 @@ TDNFCliInvokeRepoList(
-     PTDNF_REPO_DATA *ppRepos
+@@ -369,3 +369,9 @@ void
+ TDNFFreeListArgs(
+     PTDNF_LIST_ARGS pListArgs
      );
- 
++
 +uint32_t
 +TDNFCliInvokeResetSack(
 +    PTDNF_CLI_CONTEXT pContext,
 +    int nSkipInstalledRpms
 +    );
-+
- uint32_t
- TDNFCliInvokeResolve(
-     PTDNF_CLI_CONTEXT pContext,
--- 
-2.17.1
-
