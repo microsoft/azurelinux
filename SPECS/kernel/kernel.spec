@@ -228,6 +228,8 @@ Patch1188:      CVE-2021-45486.nopatch
 Patch1189:      CVE-2021-45485.nopatch
 Patch1190:      CVE-2021-44733.nopatch
 Patch1191:      CVE-2021-45469.nopatch
+Patch1192:      CVE-2021-28714.nopatch
+Patch1193:      CVE-2021-28715.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -582,7 +584,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Sun Jan 16 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.89.1-1
 - Update source to 5.10.89.1
-- Address CVE-2021-44733, CVE-2021-45469
+- Address CVE-2021-44733, CVE-2021-45469, CVE-2021-28714, CVE-2021-28715
 - Remove patch add-linux-syscall-license-info.patch
 
 * Fri Jan 14 2022 Henry Li <lihl@microsoft.com> - 5.10.88.1-3
