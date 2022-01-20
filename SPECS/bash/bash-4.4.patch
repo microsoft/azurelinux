@@ -1,6 +1,6 @@
-diff -dupr a/config-top.h b/config-top.h
---- a/config-top.h	2016-05-19 11:34:02.000000000 -0700
-+++ b/config-top.h	2017-01-13 19:48:28.940934708 -0800
+diff -dupr config-top.h config-top.h
+--- config-top.h	2016-05-19 11:34:02.000000000 -0700
++++ config-top.h	2017-01-13 19:48:28.940934708 -0800
 @@ -87,7 +87,7 @@
  #define DEFAULT_BASHRC "~/.bashrc"
  
