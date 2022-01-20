@@ -29,22 +29,22 @@
 %bcond_without tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
-Version:        18.11.2
-Release:        7%{?dist}
+Version:        21.11
+Release:        1%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://dpdk.org
 Source0:        https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
-Patch0:         app-pie.patch
-Patch1:         fcf-protection.patch
-Patch2:         dpdk-rte-ether-align.patch
+BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  kernel-headers
 BuildRequires:  libnuma-devel
 BuildRequires:  libpcap-devel
 BuildRequires:  mariner-rpm-macros
+BuildRequires:  meson
+BuildRequires:  python3-pyelftools
 BuildRequires:  python3-sphinx
 BuildRequires:  zlib-devel
 #
@@ -106,149 +106,27 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 %prep
-%setup -q -n dpdk-stable-%{version}
-%patch0 -p1
-%ifarch x86_64 i686
-%patch1 -p1
-%endif
-%patch2 -p1
+%autosetup -p1 -n dpdk-%{version}
 
 %build
-%{set_build_flags}
-# set up a method for modifying the resulting .config file
-function setconf() {
-	if grep -q ^$1= %{target}/.config; then
-		sed -i "s:^$1=.*$:$1=$2:g" %{target}/.config
-	else
-		echo $1=$2 >> %{target}/.config
-	fi
-}
-
-# In case dpdk-devel is installed, we should ignore its hints about the SDK directories
-unset RTE_SDK RTE_INCLUDE RTE_TARGET
-
-# Avoid appending second -Wall to everything, it breaks upstream warning
-# disablers in makefiles. Strip expclit -march= from optflags since they
-# will only guarantee build failures, DPDK is picky with that.
-# Note: _hardening_ldflags has to go on the extra cflags line because dpdk is
-# astoundingly convoluted in how it processes its linker flags.  Fixing it in
-# dpdk is the preferred solution, but adjusting to allow a gcc option in the
-# ldflags, even when gcc is used as the linker, requires large tree-wide changes
-touch obj.o
-gcc -### obj.o 2>&1 | awk '/.*collect2.*/ { print $0}' > ./noopts.txt
-gcc -### $(rpm --eval '%{build_ldflags}') obj.o 2>&1 | awk '/.*collect2.*/ {print $0}' > ./opts.txt
-EXTRA_RPM_LDFLAGS=$(wdiff -3 -n ./noopts.txt ./opts.txt | sed -e"/^=\+$/d" -e"/^.*\.res.*/d" -e"s/\[-//g" -e"s/\-\]//g" -e"s/{+//g" -e"s/+}//g" -e"s/\/.*\.o //g" -e"s/ \/.*\.o$//g" -e"s/-z .*//g" | tr '\n' ' ')
-rm -f obj.o
-
-export EXTRA_CFLAGS="$(echo %{optflags} | sed -e 's:-Wall::g' -e 's:-march=[[:alnum:]]* ::g') -Wformat -fPIC %{_hardening_ldflags}"
-%ifarch x86_64 i686
-export EXTRA_CFLAGS="$EXTRA_CFLAGS -fcf-protection=full"
-%endif
-export EXTRA_LDFLAGS=$(echo %{build_ldflags} | sed -e's/-Wl,//g' -e's/-spec.*//')
-export HOST_EXTRA_CFLAGS="$EXTRA_CFLAGS $EXTRA_RPM_LDFLAGS"
-export EXTRA_HOST_LDFLAGS=$(echo %{build_ldflags} | sed -e's/-spec.*//')
-
-# DPDK defaults to using builder-specific compiler flags.  However,
-# the config has been changed by specifying CONFIG_RTE_MACHINE=default
-# in order to build for a more generic host.  NOTE: It is possible that
-# the compiler flags used still won't work for all Fedora-supported
-# machines, but runtime checks in DPDK will catch those situations.
-
-make V=1 O=%{target} T=%{target} %{?_smp_mflags} config
-
-setconf CONFIG_RTE_MACHINE '"%{machine}"'
-# Disable experimental features
-setconf CONFIG_RTE_NEXT_ABI n
-setconf CONFIG_RTE_LIBRTE_MBUF_OFFLOAD n
-# Disable unmaintained features
-setconf CONFIG_RTE_LIBRTE_POWER n
-
-# Enable automatic driver loading from this path
-setconf CONFIG_RTE_EAL_PMD_PATH '"%{pmddir}"'
-
-setconf CONFIG_RTE_LIBRTE_BNX2X_PMD y
-setconf CONFIG_RTE_LIBRTE_PMD_PCAP y
-setconf CONFIG_RTE_LIBRTE_VHOST_NUMA y
-
-setconf CONFIG_RTE_EAL_IGB_UIO n
-setconf CONFIG_RTE_LIBRTE_KNI n
-setconf CONFIG_RTE_KNI_KMOD n
-setconf CONFIG_RTE_KNI_PREEMPT_DEFAULT n
-
-setconf CONFIG_RTE_APP_EVENTDEV n
-
-setconf CONFIG_RTE_LIBRTE_NFP_PMD y
-
-%ifarch aarch64
-setconf CONFIG_RTE_LIBRTE_DPAA_BUS n
-setconf CONFIG_RTE_LIBRTE_DPAA_MEMPOOL n
-setconf CONFIG_RTE_LIBRTE_DPAA_PMD n
-%endif
-
-setconf CONFIG_RTE_BUILD_SHARED_LIB y
-
-make V=1 O=%{target} %{?_smp_mflags} -Wimplicit-fallthrough=0
-
+CFLAGS="$(echo %{optflags} -fcommon)" \
+%meson --includedir=include/dpdk \
+       -Ddrivers_install_subdir=dpdk-pmds \
+       -Denable_docs=true \
+       -Dmachine=default \
 %if %{with examples}
-make V=1 O=%{target}/examples T=%{target} %{?_smp_mflags} examples
+       -Dexamples=all \
 %endif
+%if %{with shared}
+  --default-library=shared
+%else
+  --default-library=static
+%endif
+ 
+%meson_build
 
 %install
-# In case dpdk-devel is installed
-unset RTE_SDK RTE_INCLUDE RTE_TARGET
-
-%make_install O=%{target} prefix=%{_usr} libdir=%{_libdir}
-
-%if ! %{with tools}
-rm -rf %{buildroot}%{sdkdir}/usertools
-rm -rf %{buildroot}%{_sbindir}/dpdk_nic_bind
-rm -rf %{buildroot}%{_bindir}/dpdk-test-crypto-perf
-rm -rf %{buildroot}%{_bindir}/testbbdev
-%else
-mv %{buildroot}%{_bindir}/testbbdev %{buildroot}%{_bindir}/dpdk-test-bbdev
-%endif
-rm -f %{buildroot}%{sdkdir}/usertools/dpdk-setup.sh
-rm -f %{buildroot}%{sdkdir}/usertools/meson.build
-
-%if %{with examples}
-find %{target}/examples/ -name "*.map" | xargs rm -f
-for f in %{target}/examples/*/%{target}/app/*; do
-    bn=`basename ${f}`
-    cp -p ${f} %{buildroot}%{_bindir}/dpdk_example_${bn}
-done
-%endif
-
-# Replace /usr/bin/env python with /usr/bin/python3
-find %{buildroot}%{sdkdir}/ -name "*.py" -exec \
-  sed -i -e 's|#!\s*/usr/bin/env python|#!/usr/bin/python3|' {} +
-
-# Create a driver directory with symlinks to all pmds
-mkdir -p %{buildroot}/%{pmddir}
-for f in %{buildroot}/%{_libdir}/*_pmd_*.so.*; do
-    bn=$(basename ${f})
-    ln -s ../${bn} %{buildroot}%{pmddir}/${bn}
-done
-
-# Setup RTE_SDK environment as expected by apps etc
-mkdir -p %{buildroot}/%{_sysconfdir}/profile.d
-cat << EOF > %{buildroot}/%{_sysconfdir}/profile.d/dpdk-sdk-%{_arch}.sh
-if [ -z "\${RTE_SDK}" ]; then
-    export RTE_SDK="%{sdkdir}"
-    export RTE_TARGET="%{target}"
-    export RTE_INCLUDE="%{incdir}"
-fi
-EOF
-
-cat << EOF > %{buildroot}/%{_sysconfdir}/profile.d/dpdk-sdk-%{_arch}.csh
-if ( ! \$?RTE_SDK ) then
-    setenv RTE_SDK "%{sdkdir}"
-    setenv RTE_TARGET "%{target}"
-    setenv RTE_INCLUDE "%{incdir}"
-endif
-EOF
-
-# Fixup target machine mismatch
-sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profile.d/dpdk-sdk*
+%meson_install
 
 %files
 # BSD
@@ -258,45 +136,53 @@ sed -i -e 's:-%{machine_tmpl}-:-%{machine}-:g' %{buildroot}/%{_sysconfdir}/profi
 %license license/exceptions.txt
 %license license/gpl-2.0.txt
 %license license/lgpl-2.1.txt
-%{_bindir}/testpmd
-%{_bindir}/dpdk-procinfo
+%{_bindir}/dpdk-testpmd
+%{_bindir}/dpdk-proc-info
 %{_libdir}/*.so.*
-%{pmddir}/
+%{pmddir}/*.so.*
 
 %files devel
 #BSD
 %{incdir}/
 %{sdkdir}
-
+%ghost %{sdkdir}/mk/exec-env/bsdapp
+%ghost %{sdkdir}/mk/exec-env/linuxapp
 %if %{with tools}
-%exclude %{sdkdir}/usertools/
+%exclude %{_bindir}/dpdk-*.py
 %endif
-
 %if %{with examples}
 %exclude %{sdkdir}/examples/
 %endif
-
-%{_sysconfdir}/profile.d/dpdk-sdk-*.*
+%if ! %{with shared}
+%{_libdir}/*.a
+%exclude %{_libdir}/*.so
+%exclude %{pmddir}/*.so
+%else
 %{_libdir}/*.so
+%{pmddir}/*.so
+%exclude %{_libdir}/*.a
+%endif
+%{_libdir}/pkgconfig/libdpdk.pc
+%{_libdir}/pkgconfig/libdpdk-libs.pc
 
 %if %{with tools}
 %files tools
-%{sdkdir}/usertools/
-%{_sbindir}/dpdk-devbind
 %{_bindir}/dpdk-pdump
-%{_bindir}/dpdk-pmdinfo
-%{_bindir}/dpdk-test-bbdev
-%{_bindir}/dpdk-test-crypto-perf
+%{_bindir}/dpdk-test
+%{_bindir}/dpdk-test-*
+%{_bindir}/dpdk-*.py
 %endif
-
 %if %{with examples}
 %files examples
-%doc %{sdkdir}/examples
 %{_bindir}/dpdk_example_*
+%doc %{sdkdir}/examples
 %endif
 
 %changelog
-* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 18.11.2-7
+* Wed Jan 12 2022 Rachel Menge <rachelmenge@microsoft.com> - 21.11-1
+- Update to version 21.11
+
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsoft.com> - 18.11.2-7
 - Remove epoch
 
 * Sat Sep 25 2021 Muhammad Falak <mwani@microsoft.com> - 2:18.11.2-6

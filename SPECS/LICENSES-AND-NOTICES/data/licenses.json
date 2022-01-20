@@ -1186,7 +1186,6 @@
                 "patchelf",
                 "patchutils",
                 "pbzip2",
-                "pciutils",
                 "pcp",
                 "pcsc-lite",
                 "pcsc-lite-ccid",
@@ -1377,7 +1376,6 @@
                 "perl-IPC-System-Simple",
                 "perl-JSON",
                 "perl-LDAP",
-                "perl-libnet",
                 "perl-libwww-perl",
                 "perl-libxml-perl",
                 "perl-Lingua-EN-Inflect",
@@ -1571,7 +1569,6 @@
                 "perl-Test-Requires",
                 "perl-Test-RequiresInternet",
                 "perl-Test-Script",
-                "perl-Test-Simple",
                 "perl-Test-SubCalls",
                 "perl-Test-Synopsis",
                 "perl-Test-Taint",
@@ -2401,6 +2398,12 @@
                 "verity-read-only-root",
                 "vnstat",
                 "zstd"
+            ]
+        },
+        "Netplan source": {
+            "license": "[GPLv3](https://github.com/canonical/netplan/blob/main/COPYING)",
+            "specs": [
+                "netplan"
             ]
         },
         "NVIDIA": {

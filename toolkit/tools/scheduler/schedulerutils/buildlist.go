@@ -7,12 +7,17 @@ import (
 	"microsoft.com/pkggen/imagegen/configuration"
 	"microsoft.com/pkggen/imagegen/installutils"
 	"microsoft.com/pkggen/internal/logger"
+	"microsoft.com/pkggen/internal/pkggraph"
 	"microsoft.com/pkggen/internal/pkgjson"
 )
 
 // CalculatePackagesToBuild generates a comprehensive list of all PackageVers that the scheduler should attempt to build.
-// The build list is a superset of packagesNamesToBuild, packagesNamesToRebuild, packages listed in the image config, and kernels in the image config.
-func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []string, imageConfig, baseDirPath string) (packageVersToBuild []*pkgjson.PackageVer, err error) {
+// The build list is a superset of:
+//	- packagesNamesToBuild,
+//	- packagesNamesToRebuild,
+//	- local packages listed in the image config, and
+//	- kernels in the image config (if built locally).
+func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []string, inputGraphFile, imageConfig, baseDirPath string) (packageVersToBuild []*pkgjson.PackageVer, err error) {
 	packageVersToBuild = convertPackageNamesIntoPackageVers(packagesNamesToBuild)
 	packageVersToBuild = append(packageVersToBuild, convertPackageNamesIntoPackageVers(packagesNamesToRebuild)...)
 
@@ -21,6 +26,11 @@ func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []str
 	}
 
 	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
+	if err != nil {
+		return
+	}
+
+	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, inputGraphFile)
 	if err != nil {
 		return
 	}
@@ -58,6 +68,32 @@ func extractPackagesFromConfig(configFile, baseDirPath string) (packageList []*p
 
 	// Add kernel packages from KernelOptions
 	packageList = append(packageList, installutils.KernelPackages(cfg)...)
+
+	return
+}
+
+// filterLocalPackagesOnly returns the subset of packageVersionsInConfig that only contains local packages.
+func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inputGraph string) (filteredPackages []*pkgjson.PackageVer, err error) {
+	logger.Log.Debug("Filtering out external packages from list of packages extracted from the image config file.")
+
+	dependencyGraph := pkggraph.NewPkgGraph()
+	err = pkggraph.ReadDOTGraphFile(dependencyGraph, inputGraph)
+	if err != nil {
+		return
+	}
+
+	for _, pkgVer := range packageVersionsInConfig {
+		pkgNode, _ := dependencyGraph.FindBestPkgNode(pkgVer)
+
+		// A pkgNode for a local package has the following characteristics:
+		// 1) The pkgNode exists in the graph (is not nil).
+		// 2) The pkgNode doesn't have the 'StateUnresolved' or 'StateCached' state. These are reserved for external dependencies nodes.
+		if pkgNode != nil && pkgNode.RunNode.State != pkggraph.StateUnresolved && pkgNode.RunNode.State != pkggraph.StateCached {
+			filteredPackages = append(filteredPackages, pkgVer)
+		} else {
+			logger.Log.Debugf("Found external package to filter out: %v.", pkgVer)
+		}
+	}
 
 	return
 }

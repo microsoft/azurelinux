@@ -1,8 +1,8 @@
 Name:           perl-Module-Signature
 Version:        0.83
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        CPAN signature management utilities and modules
-License:        CC0
+License:        CC0 and (GPL+ or Artistic)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Signature
@@ -14,7 +14,9 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install) >= 0.92
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Can)
 BuildRequires:  perl(Module::Install::External)
 BuildRequires:  perl(Module::Install::Makefile)
@@ -81,13 +83,17 @@ export GNUPGHOME=$(pwd)/gnupghome
 make test
 
 %files
-%doc AUTHORS Changes README *.pub
+%license README
+%doc AUTHORS Changes *.pub
 %{_bindir}/cpansign
 %{perl_vendorlib}/Module/
 %{_mandir}/man1/cpansign.1*
 %{_mandir}/man3/Module::Signature.3*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.83-8
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.83-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

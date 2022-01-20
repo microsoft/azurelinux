@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           catch
-Version:        2.13.7
+Version:        2.13.8
 Release:        1%{?dist}
 Summary:        Modern, C++-native, header-only, framework for unit-tests, TDD and BDD
 Vendor:         Microsoft Corporation
@@ -9,7 +9,7 @@ Distribution:   Mariner
 Group:          Applications/File
 License:        Boost
 URL:            https://github.com/catchorg/Catch2
-Source0:        https://github.com/catchorg/Catch2/archive/v%{version}/%{name}-%{version}.tar.gz#/Catch2-%{version}.tar.gz
+Source0:        https://github.com/catchorg/Catch2/archive/refs/tags/v%{version}.tar.gz#/Catch2-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  make
 BuildRequires:  python3
@@ -55,6 +55,9 @@ ctest -V %{?_smp_mflags}
 %{_libdir}/cmake/Catch2/
 
 %changelog
+* Tue Jan 11 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.13.8-1
+- Upgrade to 2.13.8
+
 * Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 2.13.7-1
 - Upgrade to latest upstream version for glibc > 2.33 compatibility
 

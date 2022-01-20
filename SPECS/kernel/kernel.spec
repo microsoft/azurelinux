@@ -6,8 +6,8 @@
 %endif
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.78.1
-Release:        3%{?dist}
+Version:        5.15.2.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,9 +19,7 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20210127.pem
-Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         pthread_stack_min_int_cast.patch
-Patch2:         0002-add-linux-syscall-license-info.patch
+Patch0:         0002-add-linux-syscall-license-info.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -29,207 +27,12 @@ Patch2:         0002-add-linux-syscall-license-info.patch
 # To indicate a kernel CVE is fixed to our automated tooling, add nopatch files
 # but do not apply them as a real patch. Each nopatch file should contain
 # information on why the CVE nopatch was applied.
-Patch1000:      CVE-2020-8992.nopatch
-Patch1001:      CVE-2020-12770.nopatch
-Patch1002:      CVE-2020-13143.nopatch
-Patch1003:      CVE-2020-11884.nopatch
-Patch1004:      CVE-2020-11494.nopatch
-Patch1005:      CVE-2020-11565.nopatch
-Patch1006:      CVE-2020-12655.nopatch
-Patch1007:      CVE-2020-12771.nopatch
-Patch1008:      CVE-2020-13974.nopatch
-Patch1009:      CVE-2020-15393.nopatch
-Patch1010:      CVE-2020-8647.nopatch
-Patch1011:      CVE-2020-8648.nopatch
-Patch1012:      CVE-2020-8649.nopatch
-Patch1013:      CVE-2020-9383.nopatch
-Patch1014:      CVE-2020-11725.nopatch
-Patch1015:      CVE-2020-10757.nopatch
-Patch1016:      CVE-2020-12653.nopatch
-Patch1017:      CVE-2020-12657.nopatch
-Patch1018:      CVE-2010-3865.nopatch
-Patch1019:      CVE-2020-11668.nopatch
-Patch1020:      CVE-2020-12654.nopatch
-Patch1021:      CVE-2020-24394.nopatch
-Patch1022:      CVE-2020-8428.nopatch
-Patch1023:      CVE-2018-1000026.nopatch
-Patch1024:      CVE-2018-16880.nopatch
-Patch1025:      CVE-2020-12464.nopatch
-Patch1026:      CVE-2020-12465.nopatch
-Patch1027:      CVE-2020-12659.nopatch
-Patch1028:      CVE-2020-15780.nopatch
-Patch1029:      CVE-2020-14356.nopatch
-Patch1030:      CVE-2020-14386.nopatch
-Patch1031:      CVE-2020-25645.nopatch
-Patch1032:      CVE-2020-25643.nopatch
-Patch1033:      CVE-2020-25211.nopatch
-Patch1034:      CVE-2020-25212.nopatch
-Patch1035:      CVE-2008-4609.nopatch
-Patch1036:      CVE-2020-14331.nopatch
-Patch1037:      CVE-2010-0298.nopatch
-Patch1038:      CVE-2020-10690.nopatch
-Patch1039:      CVE-2020-25285.nopatch
-Patch1040:      CVE-2020-10711.nopatch
-Patch1041:      CVE-2019-3887.nopatch
-Patch1042:      CVE-2020-14390.nopatch
-Patch1043:      CVE-2019-19338.nopatch
-Patch1044:      CVE-2019-20810.nopatch
-Patch1045:      CVE-2020-10766.nopatch
-Patch1046:      CVE-2020-10767.nopatch
-Patch1047:      CVE-2020-10768.nopatch
-Patch1048:      CVE-2020-10781.nopatch
-Patch1049:      CVE-2020-12768.nopatch
-Patch1050:      CVE-2020-14314.nopatch
-Patch1051:      CVE-2020-14385.nopatch
-Patch1052:      CVE-2020-25641.nopatch
-Patch1053:      CVE-2020-26088.nopatch
-Patch1054:      CVE-2020-10942.nopatch
-Patch1055:      CVE-2020-12826.nopatch
-Patch1056:      CVE-2019-3016.nopatch
-Patch1057:      CVE-2019-3819.nopatch
-Patch1058:      CVE-2020-16166.nopatch
-Patch1059:      CVE-2020-11608.nopatch
-Patch1060:      CVE-2020-11609.nopatch
-Patch1061:      CVE-2020-25284.nopatch
-Patch1062:      CVE-2020-12888.nopatch
-Patch1063:      CVE-2017-8244.nopatch
-Patch1064:      CVE-2017-8245.nopatch
-Patch1065:      CVE-2017-8246.nopatch
-Patch1066:      CVE-2009-4484.nopatch
-Patch1067:      CVE-2015-5738.nopatch
-Patch1068:      CVE-2007-4998.nopatch
-Patch1069:      CVE-2010-0309.nopatch
-Patch1070:      CVE-2011-0640.nopatch
-Patch1071:      CVE-2020-12656.nopatch
-Patch1072:      CVE-2011-2519.nopatch
-Patch1073:      CVE-1999-0656.nopatch
-Patch1074:      CVE-2010-4563.nopatch
-Patch1075:      CVE-2019-20794.nopatch
-Patch1076:      CVE-1999-0524.nopatch
-Patch1077:      CVE-2020-25705.nopatch
-Patch1078:      CVE-2020-15436.nopatch
-Patch1079:      CVE-2020-28974.nopatch
-Patch1080:      CVE-2020-29368.nopatch
-Patch1081:      CVE-2020-29369.nopatch
-Patch1082:      CVE-2020-29370.nopatch
-Patch1083:      CVE-2020-29374.nopatch
-Patch1084:      CVE-2020-29373.nopatch
-Patch1085:      CVE-2020-28915.nopatch
-Patch1086:      CVE-2020-28941.nopatch
-Patch1087:      CVE-2020-27675.nopatch
-Patch1088:      CVE-2020-15437.nopatch
-Patch1089:      CVE-2020-29371.nopatch
-# CVE-2020-29372 - Introducing commit not in stable tree. No fix necessary at this time.
-Patch1090:      CVE-2020-29372.nopatch
-# CVE-2020-27194 - Introducing commit not in stable tree. No fix necessary at this time.
-Patch1091:      CVE-2020-27194.nopatch
-# CVE-2020-27152 - Introducing commit not in stable tree. No fix necessary at this time.
-Patch1092:      CVE-2020-27152.nopatch
-Patch1093:      CVE-2020-14351.nopatch
-Patch1094:      CVE-2020-14381.nopatch
-Patch1095:      CVE-2020-25656.nopatch
-Patch1096:      CVE-2020-25704.nopatch
-Patch1097:      CVE-2020-29534.nopatch
-Patch1098:      CVE-2020-29660.nopatch
-Patch1099:      CVE-2020-29661.nopatch
-Patch1100:      CVE-2020-27777.nopatch
-Patch1101:      CVE-2020-29569.nopatch
-Patch1102:      CVE-2020-28374.nopatch
-Patch1103:      CVE-2020-36158.nopatch
-Patch1104:      CVE-2021-26930.nopatch
-Patch1105:      CVE-2020-35499.nopatch
-Patch1106:      CVE-2021-26931.nopatch
-Patch1107:      CVE-2021-26932.nopatch
-Patch1108:      CVE-2021-27365.nopatch
-Patch1109:      CVE-2021-27364.nopatch
-Patch1110:      CVE-2021-27363.nopatch
-Patch1111:      CVE-2020-27170.nopatch
-Patch1112:      CVE-2020-27171.nopatch
-Patch1113:      CVE-2021-28375.nopatch
-Patch1114:      CVE-2021-28660.nopatch
-Patch1115:      CVE-2021-28950.nopatch
-Patch1116:      CVE-2021-28951.nopatch
-Patch1117:      CVE-2021-28952.nopatch
-Patch1118:      CVE-2021-28971.nopatch
-Patch1119:      CVE-2021-28972.nopatch
-Patch1120:      CVE-2021-29266.nopatch
-Patch1121:      CVE-2021-28964.nopatch
-Patch1122:      CVE-2020-35508.nopatch
-Patch1123:      CVE-2020-16120.nopatch
-Patch1124:      CVE-2021-29264.nopatch
-Patch1125:      CVE-2021-29265.nopatch
-Patch1126:      CVE-2021-29646.nopatch
-Patch1127:      CVE-2021-29647.nopatch
-Patch1128:      CVE-2021-29649.nopatch
-Patch1129:      CVE-2021-29650.nopatch
-Patch1130:      CVE-2021-30002.nopatch
-# CVE-2021-29648 - Introducing commit not in stable tree. No fix necessary at this time.
-Patch1131:      CVE-2021-29648.nopatch
-Patch1132:      CVE-2021-23133.nopatch
-Patch1133:      CVE-2021-29154.nopatch
-# CVE-2021-30178 - Introducing commit not in stable tree. No fix necessary at this time.
-Patch1134:      CVE-2021-30178.nopatch
-Patch1135:      CVE-2021-23134.nopatch
-Patch1136:      CVE-2021-29155.nopatch
-Patch1137:      CVE-2021-31829.nopatch
-Patch1138:      CVE-2021-31916.nopatch
-Patch1139:      CVE-2021-32399.nopatch
-Patch1140:      CVE-2021-33033.nopatch
-Patch1141:      CVE-2021-33034.nopatch
-Patch1142:      CVE-2021-3483.nopatch
-Patch1143:      CVE-2021-3501.nopatch
-Patch1144:      CVE-2021-3506.nopatch
-Patch1145:      CVE-2020-25672.nopatch
-Patch1146:      CVE-2021-33200.nopatch
-Patch1147:      CVE-2021-34693.nopatch
-Patch1148:      CVE-2021-33624.nopatch
-Patch1149:      CVE-2021-35039.nopatch
-Patch1150:      CVE-2021-33909.nopatch
-Patch1151:      CVE-2021-37576.nopatch
-Patch1152:      CVE-2021-34556.nopatch
-Patch1153:      CVE-2021-35477.nopatch
-Patch1154:      CVE-2021-28691.nopatch
-Patch1155:      CVE-2021-3564.nopatch
-Patch1156:      CVE-2020-25639.nopatch
-Patch1157:      CVE-2021-29657.nopatch
-Patch1158:      CVE-2021-38199.nopatch
-# CVE-2021-38201 - Introducing commit not in stable tree. No fix necessary at this time.
-Patch1159:      CVE-2021-38201.nopatch
-# CVE-2021-38202  - Introducing commit not in stable tree. No fix necessary at this time.
-Patch1160:      CVE-2021-38202.nopatch
-Patch1161:      CVE-2021-38207.nopatch
-Patch1162:      CVE-2021-38204.nopatch
-Patch1163:      CVE-2021-38206.nopatch
-Patch1164:      CVE-2021-38208.nopatch
-# CVE-2021-38200 - Introducing commit not in stable tree / powerpc not supported.
-Patch1165:      CVE-2021-38200.nopatch
-# CVE-2021-38203 - Introducing commit not in stable tree. No fix necessary at this time.
-Patch1166:      CVE-2021-38203.nopatch
-Patch1167:      CVE-2021-38160.nopatch
-Patch1168:      CVE-2021-3679.nopatch
-Patch1169:      CVE-2021-38198.nopatch
-Patch1170:      CVE-2021-38209.nopatch
-Patch1171:      CVE-2021-3655.nopatch
-Patch1172:      CVE-2021-38166.nopatch
-Patch1173:      CVE-2021-38205.nopatch
-Patch1174:      CVE-2021-3573.nopatch
-Patch1175:      CVE-2021-40490.nopatch
-# CVE-2021-38300 - MIPS not supported.
-Patch1176:      CVE-2021-38300.nopatch
-Patch1177:      CVE-2021-41073.nopatch
-Patch1178:      CVE-2021-3653.nopatch
-Patch1179:      CVE-2021-42008.nopatch
-Patch1180:      CVE-2021-41864.nopatch
-Patch1181:      CVE-2021-42252.nopatch
-Patch1182:      CVE-2021-43267.nopatch
-Patch1183:      CVE-2021-42739.nopatch
-Patch1184:      CVE-2021-42327.nopatch
-Patch1185:      CVE-2021-43389.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
 BuildRequires:  dwarves
+BuildRequires:  elfutils-libelf-devel
 BuildRequires:  glib-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
@@ -298,16 +101,6 @@ Requires:       python3
 %description docs
 This package contains the Linux kernel doc files
 
-%ifarch x86_64
-%package oprofile
-Summary:        Kernel driver for oprofile, a statistical profiler for Linux systems
-Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
-
-%description oprofile
-Kernel driver for oprofile, a statistical profiler for Linux systems
-%endif
-
 %package tools
 Summary:        This package contains the 'perf' performance analysis tools for Linux kernel
 Group:          System/Tools
@@ -341,8 +134,6 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
 make mrproper
@@ -513,11 +304,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
-%ifarch x86_64
-%post oprofile
-/sbin/depmod -a %{uname_r}
-%endif
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -534,9 +320,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
-%ifarch x86_64
-%exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
-%endif
 %ifarch aarch64
 %exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 %exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux
@@ -559,12 +342,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
 
-%ifarch x86_64
-%files oprofile
-%defattr(-,root,root)
-/lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
-%endif
-
 %files tools
 %defattr(-,root,root)
 %{_libexecdir}
@@ -581,6 +358,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_docdir}/*
 %{_libdir}/perf/examples/bpf/*
 %{_libdir}/perf/include/bpf/*
+%{_includedir}/perf/perf_dlfilter.h
 
 %files -n python3-perf
 %{python3_sitearch}/*
@@ -595,6 +373,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 06 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-1
+- Update source to 5.15.2.1
+
 * Tue Jan 04 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-3
 - Add provides exclude for debug build-id for aarch64 to generate debuginfo rpm
 - Fix missing brackets for __os_install_post.
