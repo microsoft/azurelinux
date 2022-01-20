@@ -1,58 +1,62 @@
+Summary:        Low-level interface to lzma compression library
+Name:           perl-Compress-Raw-Lzma
+Version:        2.101
+Release:        4%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Perform optional tests
-%bcond_without perl_Compress_Raw_Lzma_enables_optional_test
+URL:            https://metacpan.org/release/Compress-Raw-Lzma
+Source0:        https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Lzma-%{version}.tar.gz
+Source1:        LICENSE.PTR
 
-Name:		perl-Compress-Raw-Lzma
-Version:	2.101
-Release:	3%{?dist}
-Summary:	Low-level interface to lzma compression library
-License:	GPL+ or Artistic
-URL:		https://metacpan.org/release/Compress-Raw-Lzma
-Source0:	https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Lzma-%{version}.tar.gz
 # Module Build
-BuildRequires:	coreutils
-BuildRequires:	findutils
-BuildRequires:	gcc
-BuildRequires:	make
-BuildRequires:	perl-devel
-BuildRequires:	perl-generators
-BuildRequires:	perl-interpreter
-BuildRequires:	perl(Config)
-BuildRequires:	perl(ExtUtils::Constant)
-BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:	perl(File::Copy)
-BuildRequires:	perl(File::Spec::Functions)
-BuildRequires:	perl(lib)
-BuildRequires:	xz-devel
-# Module Runtime
-BuildRequires:	perl(AutoLoader)
-BuildRequires:	perl(bytes)
-BuildRequires:	perl(Carp)
-BuildRequires:	perl(constant)
-BuildRequires:	perl(Exporter)
-BuildRequires:	perl(Scalar::Util)
-BuildRequires:	perl(strict)
-BuildRequires:	perl(UNIVERSAL)
-BuildRequires:	perl(warnings)
-BuildRequires:	perl(XSLoader)
-# Test Suite
-BuildRequires:	perl(File::Path)
-BuildRequires:	perl(Test::More)
-%if %{with perl_Compress_Raw_Lzma_enables_optional_test}
-# Optional Tests
-BuildRequires:	perl(Test::CPAN::Meta)
-BuildRequires:	perl(Test::CPAN::Meta::JSON)
-BuildRequires:	perl(Test::NoWarnings)
-BuildRequires:	perl(Test::Pod) >= 1.00
-BuildRequires:	xz
-%endif
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:	perl(XSLoader)
-# Built-against version is embedded in module, so we have a strict version dependency
-Requires:	xz-libs%{?_isa} = %((pkg-config --modversion liblzma 2>/dev/null || echo 0) | tr -dc '[0-9.]')
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  xz-devel
+BuildRequires:  perl(Config)
+BuildRequires:  perl(ExtUtils::Constant)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(File::Copy)
+BuildRequires:  perl(File::Spec::Functions)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(Module::CoreList)
 
+# Module Runtime
+BuildRequires:  perl(AutoLoader)
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(UNIVERSAL)
+BuildRequires:  perl(XSLoader)
+BuildRequires:  perl(bytes)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
+%if %{with_check}
+# Test Suite
+BuildRequires:  perl(File::Path)
+BuildRequires:  perl(Test::More)
+
+# Optional Tests
+BuildRequires:  xz
+BuildRequires:  perl(Test::CPAN::Meta)
+BuildRequires:  perl(Test::CPAN::Meta::JSON)
+BuildRequires:  perl(Test::NoWarnings)
+BuildRequires:  perl(Test::Pod) >= 1.00
+%endif
+
+# Built-against version is embedded in module, so we have a strict version dependency
+Requires:       xz-libs%{?_isa} = %((pkg-config --modversion liblzma 2>/dev/null || echo 0) | tr -dc '[0-9.]')
+# Runtime
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(XSLoader)
 # Don't "provide" private Perl libs
 %{?perl_default_filter}
 
@@ -73,23 +77,30 @@ perl Makefile.PL \
   NO_PACKLIST=1 \
   NO_PERLLOCAL=1 \
   OPTIMIZE="%{optflags}"
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
+cp %{SOURCE1} .
+
 %check
-make test
+%make_build test
 
 %files
+%license LICENSE.PTR
 %doc Changes README
 %{perl_vendorarch}/auto/Compress/
 %{perl_vendorarch}/Compress/
 %{_mandir}/man3/Compress::Raw::Lzma.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.101-4
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.101-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

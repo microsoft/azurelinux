@@ -1,21 +1,27 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((Term::ANSIColor)\\)\s*$
+
+Summary:        Encode to colored JSON
 Name:           perl-JSON-Color
 Version:        0.133
-Release:        2%{?dist}
-Summary:        Encode to colored JSON
-License:        GPL+ or Artistic
+Release:        3%{?dist}
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/JSON-Color/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-%{version}.tar.gz
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.10.1
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+
 # Run-time
 BuildRequires:  perl(Color::ANSI::Util)
 BuildRequires:  perl(ColorTheme::NoColor)
@@ -24,24 +30,25 @@ BuildRequires:  perl(ColorThemeRole::ANSI)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(Graphics::ColorNamesLite::WWW)
 BuildRequires:  perl(Module::Load::Util) >= 0.004
-BuildRequires:  perl(parent)
 BuildRequires:  perl(Role::Tiny)
-# Not used for tests - Scalar::Util::LooksLikeNumber
 BuildRequires:  perl(Term::ANSIColor) >= 3.00
-# Tests
-BuildRequires:  perl(blib)
+BuildRequires:  perl(parent)
+
+%if %{with_check}
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More) >= 0.98
+# Tests
+BuildRequires:  perl(blib)
+%endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(ColorTheme::NoColor)
 Requires:       perl(Module::Load::Util) >= 0.004
 Requires:       perl(Role::Tiny)
 Requires:       perl(Term::ANSIColor) >= 3.00
 Recommends:     perl(Scalar::Util::LooksLikeNumber)
-
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((Term::ANSIColor)\\)\s*$
 
 %description
 This module generates JSON, colorized with ANSI escape sequences.
@@ -60,7 +67,7 @@ with "%{_libexecdir}/%{name}/test".
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 # Help file to recognise the Perl scripts
 for F in t/*.t; do
@@ -69,7 +76,7 @@ for F in t/*.t; do
 done
 
 %install
-%{make_install}
+%make_install
 %{_fixperms} %{buildroot}/*
 
 # Install tests
@@ -85,7 +92,7 @@ chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 %check
 export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 unset AUTHOR_TESTING
-make test
+%make_build test
 
 %files
 %license LICENSE
@@ -97,6 +104,10 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.133-3
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+
 * Thu Jan 06 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.133-2
 - Added missing requires perl(ColorTheme::NoColor)
 

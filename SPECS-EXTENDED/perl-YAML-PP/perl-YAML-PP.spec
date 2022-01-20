@@ -1,13 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Scalar::Util\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(YAML::PP::Test)\s*$
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
+
+Summary:        YAML 1.2 processor
 Name:           perl-YAML-PP
 Version:        0.031
-Release:        1%{?dist}
-Summary:        YAML 1.2 processor
-License:        GPL+ or Artistic
+Release:        2%{?dist}
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/YAML-PP/
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-PP-%{version}.tar.gz
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
@@ -16,15 +21,16 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.8.0
 BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(File::Copy)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+
 # Run-time
 BuildRequires:  perl(B)
 BuildRequires:  perl(B::Deparse)
-BuildRequires:  perl(base)
-BuildRequires:  perl(boolean)
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(constant)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
@@ -34,27 +40,32 @@ BuildRequires:  perl(HTML::Entities)
 BuildRequires:  perl(JSON::PP)
 BuildRequires:  perl(MIME::Base64)
 BuildRequires:  perl(Module::Load)
-BuildRequires:  perl(overload)
 BuildRequires:  perl(Scalar::Util) >= 1.07
 BuildRequires:  perl(Term::ANSIColor) >= 4.02
 BuildRequires:  perl(Tie::Array)
 BuildRequires:  perl(Tie::Hash)
 BuildRequires:  perl(Tie::StdArray)
 BuildRequires:  perl(Tie::StdHash)
-# Tests
-BuildRequires:  perl(blib) >= 1.01
+BuildRequires:  perl(base)
+BuildRequires:  perl(boolean)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(overload)
+
+%if %{with_check}
 BuildRequires:  perl(File::Spec)
-BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
-BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Deep)
 BuildRequires:  perl(Test::More) >= 0.98
 BuildRequires:  perl(Test::Warn)
 BuildRequires:  perl(Tie::IxHash)
+# Tests
+BuildRequires:  perl(blib) >= 1.01
+BuildRequires:  perl(lib)
+%endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(boolean)
 Requires:       perl(B::Deparse)
 Requires:       perl(Cpanel::JSON::XS)
 Requires:       perl(HTML::Entities)
@@ -64,6 +75,7 @@ Requires:       perl(Scalar::Util) >= 1.07
 Requires:       perl(Term::ANSIColor)
 Requires:       perl(Tie::IxHash)
 Requires:       perl(YAML::PP::Schema::Include)
+Requires:       perl(boolean)
 # bin/yamlpp-load can use various YAML implementations on user's request:
 Suggests:       perl(YAML)
 Suggests:       perl(YAML::PP::LibYAML)
@@ -71,10 +83,6 @@ Suggests:       perl(YAML::PP::LibYAML::Parser)
 Suggests:       perl(YAML::Syck)
 Suggests:       perl(YAML::Tiny)
 Suggests:       perl(YAML::XS)
-
-%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Scalar::Util\\)$
-%global __requires_exclude %{__requires_exclude}|^perl\\(YAML::PP::Test)\s*$
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
 
 %description
 YAML::PP is a modern, modular YAML processor.
@@ -105,10 +113,10 @@ done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 %{_fixperms} %{buildroot}/*
 
 # Install tests
@@ -131,7 +139,7 @@ chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
 export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
-make test
+%make_build test
 
 %files
 %license LICENSE
@@ -144,6 +152,10 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.031-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+
 * Mon Jan 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.031-1
 - 0.031 bump
 
