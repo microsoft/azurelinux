@@ -7,7 +7,7 @@ Name:           azure-iot-sdk-c
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
 Version:        2020.02.04.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 # Source0: https://github.com/Azure/%{name}/archive/LTS_02_2020_Ref01.tar.gz
 # The below tarball includes all submodules.
 
@@ -74,9 +74,6 @@ make DESTDIR=%{buildroot} install
 install -d -m755 %{buildroot}%{_bindir}
 install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_provision  %{buildroot}%{_bindir}/tpm_device_provision
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-, root, root, -)
 %license LICENSE
@@ -95,6 +92,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/cmake/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.02.04.1-8
+-   Removing the explicit %%clean stage.
+
 *   Thu Nov 11 2021 Andrew Phelps <anphel@microsoft.com> 2020.02.04.1-7
 -   Fix build with gcc11
 *   Mon Jun 22 2020 Saravanan Somasundaram <sarsoma@microsoft.com> 2020.02.04.1-6

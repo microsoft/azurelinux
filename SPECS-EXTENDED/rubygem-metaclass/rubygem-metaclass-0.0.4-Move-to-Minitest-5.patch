@@ -1,0 +1,62 @@
+From cff40cbace639d3b66d7913d99e74e56f91905b8 Mon Sep 17 00:00:00 2001
+From: Josef Stribny <jstribny@redhat.com>
+Date: Mon, 19 Jan 2015 10:54:48 +0100
+Subject: [PATCH] Move to Minitest 5
+
+---
+ metaclass.gemspec           | 4 +++-
+ test/object_methods_test.rb | 6 +++---
+ test/test_helper.rb         | 2 +-
+ 3 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/metaclass.gemspec b/metaclass.gemspec
+index 3208ff8..d84b516 100644
+--- a/metaclass.gemspec
++++ b/metaclass.gemspec
+@@ -17,4 +17,6 @@ Gem::Specification.new do |s|
+   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+   s.require_paths = ["lib"]
+-end
+\ No newline at end of file
++
++  s.add_development_dependency 'minitest'
++end
+diff --git a/test/object_methods_test.rb b/test/object_methods_test.rb
+index b4d9c2a..7fa7494 100644
+--- a/test/object_methods_test.rb
++++ b/test/object_methods_test.rb
+@@ -1,6 +1,6 @@
+ require "test_helper"
+ 
+-class ObjectMethodsTest < Test::Unit::TestCase
++class ObjectMethodsTest < Minitest::Test
+ 
+   def setup
+     @klass = Class.new
+@@ -11,7 +11,7 @@ def test_define_method_on_only_one_instance_of_a_class
+     assert_raises(NoMethodError) { instance.success? }
+ 
+     instance.__metaclass__.class_eval { def success?; true; end }
+-    assert_nothing_raised(NoMethodError) { assert instance.success? }
++    assert instance.success?
+ 
+     another_instance = @klass.new
+     assert_raises(NoMethodError) { another_instance.success? }
+@@ -28,4 +28,4 @@ def test_metaclass_is_itself_a_class
+     assert instance.__metaclass__.is_a?(Class)
+   end
+ 
+-end
+\ No newline at end of file
++end
+diff --git a/test/test_helper.rb b/test/test_helper.rb
+index 1573fa8..3b403de 100644
+--- a/test/test_helper.rb
++++ b/test/test_helper.rb
+@@ -2,4 +2,4 @@
+ require "bundler/setup"
+ 
+ require "metaclass"
+-require "test/unit"
++require "minitest/autorun"

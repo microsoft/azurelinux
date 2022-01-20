@@ -1,0 +1,6 @@
+License information taken from Makefile.PL:
+
+(...)
+author          'Peter Marschall <peter@adpm.de>';
+license         'perl';
+...

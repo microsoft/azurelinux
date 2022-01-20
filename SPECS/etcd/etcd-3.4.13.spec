@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.4.13
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/etcd-io/etcd/
 Group:          System Environment/Security
@@ -61,9 +61,6 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license LICENSE
 %{_bindir}/etcd*
@@ -74,6 +71,9 @@ rm -rf %{buildroot}/*
 %config(noreplace) %{_sysconfdir}/etcd/etcd-default-conf.yml
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.13-4
+-   Removing the explicit %%clean stage.
+
 *   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 3.4.13-3
 -   Increment release to force republishing using golang 1.15.13.
 *   Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.4.13-2

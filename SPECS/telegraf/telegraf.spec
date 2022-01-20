@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.14.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -47,9 +47,6 @@ install -m 755 -D scripts/%{name}.service %{buildroot}%{_unitdir}/%{name}.servic
 install -m 755 -D etc/logrotate.d/%{name} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 install -m 755 -D etc/telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
 
-%clean
-rm -rf %{buildroot}/*
-
 %pre
 getent group telegraf >/dev/null || groupadd -r telegraf
 getent passwd telegraf >/dev/null || useradd -c "Telegraf" -d %{_localstatedir}/lib/%{name} -g %{name} \
@@ -80,6 +77,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.5-8
+-   Removing the explicit %%clean stage.
+
 *   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.14.5-7
 -   Increment release to force republishing using golang 1.15.13.
 *   Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.14.5-6

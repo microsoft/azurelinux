@@ -11,7 +11,7 @@ Distribution:   Mariner
 #   https://dev.mysql.com/doc/connectors/en/connector-odbc-installation-source-unix.html
 Name:           mysql-connector-odbc
 Version:        8.0.23
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        ODBC driver for MySQL
 License:        GPLv2 with exceptions
 URL:            https://dev.mysql.com/downloads/connector/odbc/
@@ -22,7 +22,7 @@ Patch0:         myodbc-64bit.patch
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
-BuildRequires:  community-mysql-devel >= 8
+BuildRequires:  mysql-devel >= 8
 BuildRequires:  libiodbc-devel
 BuildRequires:  libzstd-devel
 BuildRequires:  unixODBC-devel
@@ -78,6 +78,10 @@ rm -rf %{buildroot}/usr/test
 %{_lib64dir}/lib*so
 
 %changelog
+* Mon Jan 03 2022 Thomas Crain <thcrain@microsoft.com> - 8.0.23-3
+- Require mysql-devel instead of community-mysql-devel
+- License verified
+
 * Fri Oct 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.23-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Adding a missing BR for 'libiodbc-devel'.

@@ -1,6 +1,6 @@
 Name:          crash
 Version:       7.2.9
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -48,9 +48,6 @@ mkdir -p %{buildroot}%{_includedir}/crash
 chmod 0644 defs.h
 cp -p defs.h %{buildroot}%{_includedir}/crash
 
-%clean
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-
 %files
 %defattr(-,root,root)
 %license COPYING3
@@ -64,6 +61,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.2.9-3
+- Removing the explicit %%clean stage.
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 7.2.9-2
 - Remove epoch
 

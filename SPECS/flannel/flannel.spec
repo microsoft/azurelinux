@@ -4,8 +4,8 @@
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
 Version:        0.14.0
-Release:        1%{?dist}
-License:        Apache License 2.0
+Release:        2%{?dist}
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
@@ -41,15 +41,16 @@ make dist/flanneld
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/flanneld
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-2
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Thu Sep 16 2021 Andrew Phelps <anphel@microsoft.com> 0.14.0-1
 - Update to version 0.14.0
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 0.12.0-3

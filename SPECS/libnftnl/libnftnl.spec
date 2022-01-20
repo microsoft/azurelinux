@@ -1,6 +1,6 @@
 Summary:        Library for low-level netlink programming interface to the in-kernel nf_tables subsystem
 Name:           libnftnl
-Version:        1.1.9
+Version:        1.2.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -56,6 +56,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/%{name}
 
 %changelog
+* Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 1.2.1-1
+- Upgrade to version 1.2.1
+- Verified License
+
 * Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 1.1.9-1
 - Update to version 1.1.9
 - Remove sha1 macro

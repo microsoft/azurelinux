@@ -4,7 +4,7 @@
 Summary:        The NetBSD Editline library
 Name:           libedit
 Version:        3.1.20180525
-Release:        5%{?dist}
+Release:        6%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.thrysoee.dk/editline/libedit-%{libedit_release}-%{libedit_version}.tar.gz
@@ -70,9 +70,6 @@ rm -rf %{buildroot}/%{_mandir}/man3/history.3*
     # First argument is 0 => Uninstall
     # First argument is 1 => Upgrade
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license COPYING
     %defattr(-,root,root,0755)
@@ -87,6 +84,9 @@ rm -rf %{buildroot}/*
     %{_includedir}/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.20180525-6
+-   Removing the explicit %%clean stage.
+
 *   Wed Aug 05 2020 Andrew Phelps <anphel@microsoft.com> 3.1.20180525-5
 -   Remove conflicting file _mandir/man3/history.3*
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1.20180525-4

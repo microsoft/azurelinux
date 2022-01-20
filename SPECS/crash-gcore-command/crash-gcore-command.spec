@@ -1,6 +1,6 @@
 Name:          crash-gcore-command
 Version:       1.5.1
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       gcore extension module for crash utility
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -34,9 +34,6 @@ make -f gcore.mk ARCH=SUPPORTED TARGET=ARM64
 mkdir -p %{buildroot}%{_libdir}/crash/extensions/
 install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 
-%clean
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -44,6 +41,10 @@ install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 %doc COPYING
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.1-2
+-   Removing the explicit %%clean stage.
+-   License verified.
+
 *   Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> 1.5.1-1
 -   Update version to 1.5.1.
 -   Update URL.

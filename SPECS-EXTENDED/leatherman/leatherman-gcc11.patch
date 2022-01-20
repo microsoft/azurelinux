@@ -1,0 +1,38 @@
+diff --git a/curl/src/client.cc b/curl/src/client.cc
+index 558db6d..d27bb36 100644
+--- a/curl/src/client.cc
++++ b/curl/src/client.cc
+@@ -1,3 +1,4 @@
++#include <cstddef>
+ #include <leatherman/curl/client.hpp>
+ #include <leatherman/curl/request.hpp>
+ #include <leatherman/curl/response.hpp>
+diff --git a/util/src/posix/scoped_descriptor.cc b/util/src/posix/scoped_descriptor.cc
+index 6fd1495..8294d0b 100644
+--- a/util/src/posix/scoped_descriptor.cc
++++ b/util/src/posix/scoped_descriptor.cc
+@@ -1,3 +1,5 @@
++#include <cstddef>
++
+ #include <leatherman/util/posix/scoped_descriptor.hpp>
+ 
+ using namespace std;
+diff --git a/util/src/scope_exit.cc b/util/src/scope_exit.cc
+index 764c2fb..441855a 100644
+--- a/util/src/scope_exit.cc
++++ b/util/src/scope_exit.cc
+@@ -1,3 +1,4 @@
++#include <cstddef>
+ #include <leatherman/util/scope_exit.hpp>
+ 
+ using namespace std;
+diff --git a/util/src/scoped_env.cc b/util/src/scoped_env.cc
+index 6c6a041..df26645 100644
+--- a/util/src/scoped_env.cc
++++ b/util/src/scoped_env.cc
+@@ -1,3 +1,5 @@
++#include <cstddef>
++
+ #include <leatherman/util/scoped_env.hpp>
+ #include <leatherman/util/environment.hpp>
+ 

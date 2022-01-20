@@ -1,7 +1,7 @@
 Summary:        DNS proxy with integrated DHCP server
 Name:           dnsmasq
 Version:        2.85
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 or GPLv3
 Group:          System Environment/Daemons
 URL:            http://www.thekelleys.org.uk/dnsmasq/
@@ -54,9 +54,6 @@ EOF
 
 %post
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %license COPYING
@@ -69,6 +66,9 @@ rm -rf %{buildroot}
 %config  /usr/share/dnsmasq/trust-anchors.conf
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.85-2
+- Removing the explicit %%clean stage.
+
 * Fri Apr 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.85-1
 - Upgrade to version 2.85 to fix  CVE-2021-3348
 

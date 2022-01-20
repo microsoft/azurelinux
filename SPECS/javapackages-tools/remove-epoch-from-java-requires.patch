@@ -1,4 +1,15 @@
+From e07e0151799de936535c48fbc65770160a64dfdd Mon Sep 17 00:00:00 2001
+From: Thomas Crain <thcrain@microsoft.com>
+Date: Wed, 5 Jan 2022 10:59:13 -0800
+Subject: [PATCH 1/2] Remove epoch from java requires generation
+
+---
+ depgenerators/maven.req |  4 ++--
+ test/maven_req_test.py  | 12 ++++++------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
 diff --git a/depgenerators/maven.req b/depgenerators/maven.req
+index b3597f7..1179ffc 100755
 --- a/depgenerators/maven.req
 +++ b/depgenerators/maven.req
 @@ -295,9 +295,9 @@ class TagBuilder(object):
@@ -13,3 +24,64 @@ diff --git a/depgenerators/maven.req b/depgenerators/maven.req
  
      def _parse_java_requires(self, req):
          match = re.match(r'^(\d+)(?:\.(\d+))?$', req)
+diff --git a/test/maven_req_test.py b/test/maven_req_test.py
+index 9cc9711..d7cb969 100644
+--- a/test/maven_req_test.py
++++ b/test/maven_req_test.py
+@@ -30,7 +30,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1:1.6")
++                "java-headless >= 1.6")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java2/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -38,7 +38,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1:1.8")
++                "java-headless >= 1.8")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java3/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -46,7 +46,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1:1.8")
++                "java-headless >= 1.8")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java9/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -54,7 +54,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1:9")
++                "java-headless >= 9")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java10/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -62,7 +62,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1:10")
++                "java-headless >= 10")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java9and10/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -70,7 +70,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1:10")
++                "java-headless >= 10")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java-fail/buildroot/usr/share/maven-metadata/require.xml"])
+-- 
+2.25.1
+

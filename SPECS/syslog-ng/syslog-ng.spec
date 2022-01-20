@@ -3,7 +3,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.23.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD and GPLv2+ and LGPLv2+
 URL:            https://syslog-ng.org/
 Group:          System Environment/Daemons
@@ -150,9 +150,6 @@ fi
 %postun
 %systemd_postun_with_restart syslog-ng.service
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYING GPL.txt LGPL.txt
@@ -191,6 +188,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.23.1-4
+- Removing the explicit %%clean stage.
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.23.1-3
 - Replace easy_install usage with pip in %%check sections
 

@@ -1,7 +1,7 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
 Version:        0.8.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -61,10 +61,6 @@ make install DESTDIR=%{buildroot} \
 
 install -vd %{buildroot}%{_sysconfdir}/multipath
 
-%clean
-rm -rf %{buildroot}
-
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -100,6 +96,9 @@ rm -rf %{buildroot}
 %{_mandir}/man8/kpartx.8.gz
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.6-3
+- Removing the explicit %%clean stage.
+
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> 0.8.6-2
 - Fix gcc11 build error
 

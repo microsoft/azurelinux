@@ -1,8 +1,8 @@
 Summary:        The Berkley DB database library for C
 Name:           libdb
 Version:        5.3.28
-Release:        5%{?dist}
-License:        BSD AND LGPLv2 AND Sleepycat
+Release:        6%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Libraries
@@ -63,10 +63,6 @@ install -v -d -m755 %{buildroot}/%{_datadir}/licenses/
 install -D -m755 LICENSE %{buildroot}/%{_datadir}/licenses/LICENSE
 install -D -m755 README %{buildroot}/%{_datadir}/licenses/README
 
-%clean
-rm -rf %{buildroot}
-
-
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -98,6 +94,10 @@ rm -rf %{buildroot}
 %{_bindir}/db*_tuner
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.3.28-6
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.28-5
 - Create utils subpackage.
 

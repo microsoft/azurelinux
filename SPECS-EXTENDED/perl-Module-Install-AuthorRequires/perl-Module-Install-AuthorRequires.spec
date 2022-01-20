@@ -1,6 +1,6 @@
 Name:           perl-Module-Install-AuthorRequires
 Version:        0.02
-Release:        22%{?dist}
+Release:        23%{?dist}
 Summary:        Declare author-only dependencies
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ URL:            https://metacpan.org/release/Module-Install-AuthorRequires
 Source0:        https://cpan.metacpan.org/authors/id/F/FL/FLORA/Module-Install-AuthorRequires-%{version}.tar.gz#/perl-Module-Install-AuthorRequires-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl-generators
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install)
 BuildRequires:  perl(Module::Install)
 # Run-time:
@@ -46,11 +47,15 @@ find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
 make test
 
 %files
-%doc Changes README
+%license README
+%doc Changes
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-23
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

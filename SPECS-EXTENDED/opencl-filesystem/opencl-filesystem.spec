@@ -1,32 +1,25 @@
+Summary:        OpenCL filesystem layout
+Name:           opencl-filesystem
+Version:        1.0
+Release:        13%{?dist}
+License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		opencl-filesystem
-Version:	1.0
-Release:	13%{?dist}
-Summary:	OpenCL filesystem layout
-
-License:	Public Domain
-URL:		http://www.khronos.org/registry/cl/
-
-BuildArch:	noarch
-
+URL:            http://www.khronos.org/registry/cl/
+BuildArch:      noarch
 
 %description
 This package provides some directories required by packages which use OpenCL.
 
-
 %prep
-
 
 %install
 # ICD Loader Vendor Enumeration
 # http://www.khronos.org/registry/cl/extensions/khr/cl_khr_icd.txt
 mkdir -p %{buildroot}/%{_sysconfdir}/OpenCL/vendors/
 
-
 %files
 %{_sysconfdir}/OpenCL/
-
 
 %changelog
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0-13

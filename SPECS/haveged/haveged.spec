@@ -3,7 +3,7 @@
 Summary:        A Linux entropy source using the HAVEGE algorithm
 Name:           haveged
 Version:        1.9.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,9 +73,6 @@ popd
 # We don't ship .la files.
 rm -rf %{buildroot}%{_libdir}/libhavege.*a
 
-%clean
-rm -rf %{buildroot}
-
 %post
 /sbin/ldconfig
 %systemd_post haveged.service
@@ -106,6 +103,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.8-3
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.9.8-2
 - Added %%license line automatically
 

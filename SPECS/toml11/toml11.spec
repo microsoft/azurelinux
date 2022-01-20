@@ -4,7 +4,7 @@
 Summary:        toml11 - header-only C++11 TOML parser/generator
 Name:           toml11
 Version:        3.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/ToruNiina/toml11
 Group:          System Environment
@@ -49,9 +49,6 @@ make test -C build
 %install
 %make_install -C build
 
-%clean
-rm -rf %{buildroot}/*
-
 %files devel
 %defattr(-,root,root)
 %doc README.md
@@ -61,6 +58,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/toml11
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-2
+-   Removing the explicit %%clean stage.
+
 *   Fri Nov 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-1
 -   Update to version 3.7.0 to fix GCC 11 building issues.
 *   Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.3.0-2

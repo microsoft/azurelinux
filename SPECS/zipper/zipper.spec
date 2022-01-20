@@ -1,30 +1,27 @@
-Name:           zipper
 Summary:        C++ wrapper around minizip compression library
-Version:        1.0.1
-Release:        2%{?dist}
-URL:            https://github.com/sebastiandev/zipper
-Group:          Applications/File
+Name:           zipper
+Version:        1.0.3
+Release:        1%{?dist}
+# zlib licenses comes from minizip/ source code
+License:        MIT AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# zlib licenses comes from minizip/ source code
-License:        MIT and zlib
-
+Group:          Applications/File
+URL:            https://github.com/sebastiandev/zipper
 #Source0:       https://github.com/sebastiandev/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # The 1.0.1 version requires the 'minizip' sources from the following commit: https://github.com/sebastiandev/minizip/tree/0b46a2b4ca317b80bc53594688883f7188ac4d08
 Source1:        minizip.tar.gz
-
-BuildRequires: cmake
-BuildRequires: gcc
-BuildRequires: zlib-devel
-
-Provides: bundled(minizip) = 1.2.8
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  zlib-devel
+Provides:       bundled(minizip) = 1.2.8
 
 %description
 Zipper's goal is to bring the power and simplicity of minizip to a more
 object oriented/c++ user friendly library.
 It was born out of the necessiyty of a compression library that would be
-reliable, simple and flexible. 
+reliable, simple and flexible.
 By flexibility I mean supporting all kinds of inputs and outputs,
 but specifically been able to compress into memory instead of being
 restricted to file compression only, and using data from memory instead
@@ -38,9 +35,8 @@ Features:
 - Multi platform
 
 %package devel
-Summary: Development files of %{name}
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Development files of %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This package provides header files, shared and static library files of %{name}.
@@ -82,14 +78,21 @@ make test -C build
 %defattr(-,root,root)
 %doc README.md VERSION.txt
 %license LICENSE.md minizip/LICENSE
+%{_bindir}/Zipper-test
 %{_libdir}/libZipper.so.*
 
 %files devel
 %defattr(-,root,root)
+%{_libdir}/cmake/*.cmake
 %{_libdir}/libZipper.so
+%{_libdir}/libZipper.a
+%{_datadir}/pkgconfig/zipper.pc
 %{_includedir}/zipper/
 
 %changelog
+* Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.3-1
+- Update to version 1.0.3.
+
 * Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0.1-2
 - Added source URL.
 - Switching to published GitHub source from the custom-made one.

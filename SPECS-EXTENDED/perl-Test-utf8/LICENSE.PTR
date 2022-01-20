@@ -1,0 +1,7 @@
+License information taken from Makefile.PL:
+
+(...)
+license 'perl';
+githubmeta;
+author_tests('xt');
+...

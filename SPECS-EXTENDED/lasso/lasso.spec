@@ -53,7 +53,7 @@ Distribution:   Mariner
 Summary: Liberty Alliance Single Sign On
 Name: lasso
 Version: 2.6.0
-Release: 23%{?dist}
+Release: 24%{?dist}
 License: GPLv2+
 URL: http://lasso.entrouvert.org/
 Source: http://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
@@ -144,7 +144,7 @@ Perl language bindings for the lasso (Liberty Alliance Single Sign On) library.
 %if %{with_java}
 %package -n java-%{name}
 Summary: Liberty Alliance Single Sign On (lasso) Java bindings
-Requires: java-headless
+Requires: java
 Requires: jpackage-utils
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %if %{obsolete_old_lang_subpackages}
@@ -317,6 +317,10 @@ rm -fr %{buildroot}%{_defaultdocdir}/%{name}
 %endif
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.6.0-24
+- Rename java-headless dependency to java
+- License verified
+
 * Wed Jul 14 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.6.0-23
 - Add explict provides 'lasso-python'
 
