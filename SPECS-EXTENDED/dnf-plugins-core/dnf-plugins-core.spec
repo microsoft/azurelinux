@@ -402,6 +402,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %changelog
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 4.0.18-5
 - Only require python3-nose when building tests
+- License verified
 
 * Tue Aug 10 2021 Thomas Crain <thcrain@microsoft.com>  - 4.0.18-4
 - Remove python2 support, distro-specific checks
