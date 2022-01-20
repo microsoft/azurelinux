@@ -107,6 +107,7 @@ make %{?_smp_mflags} test
 %changelog
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-6
 - Adding 'BuildRequires: perl-generators'.
+- License verified.
 
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.26-5
 - Merge the following releases from 1.0 to dev branch

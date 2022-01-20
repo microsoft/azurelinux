@@ -6,7 +6,6 @@ License:        GPLv2+ or Artistic
 Group:          Development/Libraries
 URL:            https://metacpan.org/release/NetAddr-IP
 Source0:        https://cpan.metacpan.org/authors/id/M/MI/MIKER/NetAddr-IP-%{version}.tar.gz
-%define sha1    NetAddr-IP=41f0048dccf016077e65b93a681e40b4f6b28336
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl
@@ -42,13 +41,14 @@ find %{buildroot} -name 'perllocal.pod' -delete
 make test
 
 %files
-%license Copying
+%license Artistic Copying
 %{perl_vendorarch}/*
 %{_mandir}/man3/*
 
 %changelog
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.079-5
 - Adding 'BuildRequires: perl-generators'.
+- License verified.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.079-4
 - Use new perl package names.

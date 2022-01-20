@@ -2,11 +2,10 @@ Summary:        Wrapper Class for the various JSON classes
 Name:           perl-JSON-Any
 Version:        1.39
 Release:        9%{?dist}
-License:        Perl Artistic License 2.0
+License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
 Source:         http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-%{version}.tar.gz
-%define sha1 JSON-Any=2c7e404fc4a398359693d62e9c74994f9273dd4c
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch

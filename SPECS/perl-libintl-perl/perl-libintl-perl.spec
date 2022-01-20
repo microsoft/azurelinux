@@ -2,8 +2,8 @@
 Summary:	Internationalization library for Perl, compatible with gettext
 Name:		perl-libintl-perl
 Version:	1.29
-Release:        6%{?dist}
-License:	LGPLv2+
+Release:	6%{?dist}
+License:	GPLv3+
 Group: 		Development/Libraries
 URL: 		http://search.cpan.org/dist/libintl-perl/
 Source: 	https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-%{version}.tar.gz
@@ -201,6 +201,7 @@ make test
 %changelog
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.29-6
 - Adding 'BuildRequires: perl-generators'.
+- License verified.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.29-5
 - Use new perl package names.

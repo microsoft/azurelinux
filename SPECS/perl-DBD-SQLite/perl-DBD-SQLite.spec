@@ -59,6 +59,7 @@ make test
 %changelog
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62-5
 - Adding 'BuildRequires: perl-generators'.
+- License verified.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.62-4
 - Use new perl package names.

@@ -7,12 +7,12 @@ Name:           perl-Module-Install
 Version:        1.19
 Release:        5%{?dist}
 License:        GPL+ or Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Install/
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Module-Install-%{version}.tar.gz
-%define sha1 Module-Install=6c77b2ec0cd84e07d7c7ae03d1cfa5c21d758f81
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Source1:        LICENSE.PTR
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
@@ -79,6 +79,8 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 rm -rf %{buildroot}/blib/lib/auto/share/dist/Module-Install/dist_file.txt
 %{_fixperms} %{buildroot}/*
 
+cp %{SOURCE1} .
+
 %check
 export PERL_MM_USE_DEFAULT=1
 cpan local::lib
@@ -86,13 +88,14 @@ cpan File::Remove
 make %{?_smp_mflags} test AUTOMATED_TESTING=1
 
 %files
-%license xt/licenses.t
+%license LICENSE.PTR
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.19-5
 - Adding 'BuildRequires: perl-generators'.
+- License verified.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.19-4
 - Use new perl package names.

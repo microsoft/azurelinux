@@ -7,7 +7,6 @@ License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML-Tiny/
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/YAML-Tiny-%{version}.tar.gz
-%define sha1 YAML-Tiny=32ee7a7d499c7d8c2b4672f9735901fb4de1ab88
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
@@ -48,6 +47,7 @@ make test
 %changelog
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.73-5
 - Adding 'BuildRequires: perl-generators'.
+- License verified.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.73-4
 - Use new perl package names.

@@ -3,12 +3,11 @@ Name:           perl-Text-Template
 Version:        1.51
 Release:        4%{?dist}
 URL:            https://metacpan.org/pod/Text::Template
-License:        The Perl 5 License (Artistic 1 & GPL 1)
+License:        GPL+ or Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source:         https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-%{version}.tar.gz
-%define sha1    Text-Template=423945fbe09c31f341d51afafcf635d2fbe6850b
 
 BuildArch:      noarch
 Requires:       perl-libs
@@ -46,6 +45,7 @@ make test
 %changelog
 *   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.51-4
 -   Adding 'BuildRequires: perl-generators'.
+-   License verified.
 
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.51-3
 -   Use new perl package names.

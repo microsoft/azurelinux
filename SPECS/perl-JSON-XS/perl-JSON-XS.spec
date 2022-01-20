@@ -8,7 +8,6 @@ License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/JSON-XS/
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-%{version}.tar.gz
-%define sha1 JSON-XS=582f874f3c4ad8a0bbf6986f7af2676a92e91b8a
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
@@ -58,6 +57,7 @@ make test
 %changelog
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:3.04-5
 - Adding 'BuildRequires: perl-generators'.
+- License verified.
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1:3.04-4
 - Use new perl package names.
