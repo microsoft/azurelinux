@@ -10,6 +10,7 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "Microsoft":                    r'\n-\s+(Original version for CBL-Mariner|Initial CBL-Mariner import from Azure)( \(license: MIT\))?(\.|\n|$)',
     "CentOS":                       r'\n-\s+Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)(\.|\n|$)',
     "Ceph source":                  r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
+    "Netplan source":               r'\n-\s+Initial CBL-Mariner import from Netplan source \(license: GPLv3\)(\.|\n|$)',
     "Fedora":                       r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
     "Magnus Edenhill Open Source":  r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
     "NVIDIA":                       r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',

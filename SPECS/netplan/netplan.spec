@@ -105,8 +105,9 @@ make check
 
 %changelog
 * Fri Sep 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.95-1
-- Initial CBL-Mariner import from netplan source (license: GPLv3)
+- Initial CBL-Mariner import from Netplan source (license: GPLv3)
 - License verified
+- Update netplan to Netplan
 
 * Fri Dec 14 2018 Mathieu Trudel-Lapierre <mathieu.trudel-lapierre@canonical.com> - 0.95
 - Update to 0.95
