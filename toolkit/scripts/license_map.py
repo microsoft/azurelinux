@@ -156,7 +156,7 @@ def process_licenses(json_filename, markdown_filename, file_paths, check, update
             if outdated_markdown:
                 print(f"License map '{markdown_filename}' is out of date.")
 
-            print(f"Specs' license information is out of date. Run '{__file__} licenses.json_file_path LICENSES-MAP.md_file_path --update --remove_missing [spec_directory ...]' to regenerate.")
+            print(f"Specs' license information is out of date. Run '{__file__} licenses.json_file_path LICENSES-MAP.md_file_path --no_check --update --remove_missing [spec_directory ...]' to regenerate.")
 
             sys.exit(1)
 
