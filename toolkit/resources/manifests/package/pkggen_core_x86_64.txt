@@ -203,8 +203,8 @@ libltdl-2.4.6-7.cm2.x86_64.rpm
 libltdl-devel-2.4.6-7.cm2.x86_64.rpm
 pcre-8.44-3.cm2.x86_64.rpm
 pcre-libs-8.44-3.cm2.x86_64.rpm
-lua-5.3.5-11.cm2.x86_64.rpm
-lua-libs-5.3.5-11.cm2.x86_64.rpm
+lua-5.4.3-1.cm2.x86_64.rpm
+lua-libs-5.4.3-1.cm2.x86_64.rpm
 mariner-rpm-macros-2.0-10.cm2.noarch.rpm
 mariner-check-macros-2.0-10.cm2.noarch.rpm
 libassuan-2.5.5-1.cm2.x86_64.rpm
