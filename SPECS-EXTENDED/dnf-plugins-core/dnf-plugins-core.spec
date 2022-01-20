@@ -11,7 +11,7 @@ Distribution:   Mariner
 
 Name:           dnf-plugins-core
 Version:        4.0.18
-Release:        15%{?dist}
+Release:        5%{?dist}
 Summary:        Core Plugins for DNF
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/dnf-plugins-core
