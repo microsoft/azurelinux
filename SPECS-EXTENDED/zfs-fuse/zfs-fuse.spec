@@ -3,7 +3,7 @@ Distribution:   Mariner
 %define _hardened_build 1
 Name:             zfs-fuse
 Version:          0.7.2.2
-Release:          15%{?dist}
+Release:          16%{?dist}
 Summary:          ZFS ported to Linux FUSE
 License:          CDDL
 URL:              https://github.com/gordan-bobic/zfs-fuse
@@ -52,7 +52,6 @@ chmod -x contrib/test-datasets
 chmod -x contrib/find-binaries
 chmod -x contrib/solaris/fixfiles.py
 chmod -x contrib/zfsstress.py
-cp -f /usr/lib/rpm/config.{guess,sub} src/lib/libumem/
 
 %build
 export CCFLAGS="%{optflags}"
@@ -128,6 +127,9 @@ rm -rf /var/lock/zfs
 %{_mandir}/man8/zstreamdump.8.gz
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.2.2-16
+- Remove copying of RPM's config.guess/config.sub into build dir (not shipped by RPM anymore)
+
 * Thu Jun 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2.2-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making SConstruct split 'CFLAGS' before saving them to the build environment.
