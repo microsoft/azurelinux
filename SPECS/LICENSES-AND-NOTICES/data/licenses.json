@@ -2400,7 +2400,7 @@
                 "zstd"
             ]
         },
-        "netplan": {
+        "netplan source": {
             "license": "[GPLv3](https://github.com/canonical/netplan/blob/main/COPYING)",
             "specs": [
                 "netplan"
