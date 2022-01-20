@@ -1,7 +1,7 @@
 Summary:        Utilities for manipulating .desktop files
 Name:           desktop-file-utils
-Version:        0.24
-Release:        3%{?dist}
+Version:        0.26
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ update-desktop-database &> /dev/null || :
 %{_mandir}/man1/desktop-file-edit.1.gz
 
 %changelog
+* Thu Jan 20 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.26-1
+- Upgrade to 0.26.
+
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.24-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Using '%%make*' macros for building and installation.

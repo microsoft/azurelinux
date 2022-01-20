@@ -1,14 +1,13 @@
 Summary:        Dynamic Kernel Module Support
 Name:           dkms
-Version:        2.8.1
-Release:        5%{?dist}
+Version:        3.0.3
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://github.com/dell/dkms
-#Source0:      https://github.com/dell/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/dell/dkms/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  systemd
 Requires:       systemd
 BuildArch:      noarch
@@ -60,6 +59,9 @@ echo "disable dkms.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-dk
 %{_localstatedir}/lib/dkms/dkms_dbversion
 
 %changelog
+* Thu Jan 20 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.0.3-1
+- Upgrade to 3.0.3
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.8.1-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
