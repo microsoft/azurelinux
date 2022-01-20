@@ -2707,6 +2707,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "distribution-gpg-keys",
+          "version": "1.60",
+          "downloadUrl": "https://github.com/xsuchy/distribution-gpg-keys/archive/refs/tags/distribution-gpg-keys-1.60-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dkms",
           "version": "3.0.3",
           "downloadUrl": "https://github.com/dell/dkms/archive/refs/tags/v3.0.3.tar.gz"
@@ -2790,6 +2800,16 @@
           "name": "dnf",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dnf-plugins-core",
+          "version": "4.0.18",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf-plugins-core/archive/4.0.18/dnf-plugins-core-4.0.18.tar.gz"
         }
       }
     },
@@ -13782,6 +13802,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mock",
+          "version": "2.15",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-2.15-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mock-core-configs",
+          "version": "36.3",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-core-configs-36.3-1/mock-core-configs-36.3-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mod_auth_gssapi",
           "version": "1.6.1",
           "downloadUrl": "https://github.com/modauthgssapi/mod_auth_gssapi/releases/download/v1.6.1/mod_auth_gssapi-1.6.1.tar.gz"
@@ -22473,6 +22513,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-cov-core",
+          "version": "1.15.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cov-core/cov-core-1.15.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-coverage",
           "version": "4.5.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-4.5.1.tar.gz"
@@ -23583,6 +23633,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-nose2",
+          "version": "0.9.1",
+          "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.9.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-novaclient",
           "version": "15.1.0",
           "downloadUrl": "https://pypi.io/packages/source/p/python-novaclient/python-novaclient-15.1.0.tar.gz"
@@ -24066,6 +24126,16 @@
           "name": "python-pyperclip",
           "version": "1.6.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyperclip/pyperclip-1.6.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pyroute2",
+          "version": "0.5.14",
+          "downloadUrl": "https://pypi.io/packages/source/p/pyroute2/pyroute2-0.5.14.tar.gz"
         }
       }
     },
@@ -24716,6 +24786,16 @@
           "name": "python-tempita",
           "version": "0.5.1",
           "downloadUrl": "http://pypi.python.org/packages/source/T/Tempita/Tempita-0.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-templated-dictionary",
+          "version": "1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz"
         }
       }
     },
