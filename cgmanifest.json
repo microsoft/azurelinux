@@ -14512,6 +14512,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netplan",
+          "version": "0.95",
+          "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "netsniff-ng",
           "version": "0.6.7",
           "downloadUrl": "http://www.netsniff-ng.org/pub/netsniff-ng/netsniff-ng-0.6.7.tar.xz"
