@@ -7,7 +7,7 @@ Release:          16%{?dist}
 Summary:          ZFS ported to Linux FUSE
 License:          CDDL
 URL:              https://github.com/gordan-bobic/zfs-fuse
-Source00:         http://github.com/gordan-bobic/zfs-fuse/archive/%{name}-%{version}.tar.gz
+Source00:         http://github.com/gordan-bobic/zfs-fuse/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source01:         zfs-fuse.service
 Source02:         zfs-fuse.scrub
 Source03:         zfs-fuse.sysconfig
@@ -129,6 +129,7 @@ rm -rf /var/lock/zfs
 %changelog
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.2.2-16
 - Remove copying of RPM's config.guess/config.sub into build dir (not shipped by RPM anymore)
+- Update Source0 URL
 - License verified
 
 * Thu Jun 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2.2-15
