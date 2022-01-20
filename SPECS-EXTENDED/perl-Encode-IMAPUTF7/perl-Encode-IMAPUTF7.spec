@@ -36,7 +36,7 @@ modification specified in RFC2060 section 5.1.3.
 
 %prep
 %autosetup -n Encode-IMAPUTF7-%{version}
-%{remove_lf} README Changes
+%remove_lf README Changes
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
