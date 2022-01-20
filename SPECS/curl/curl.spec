@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.4*
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 7.76.0-8
+- Filter out references to module_info.ld in pkgconfigs
+
 * Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 7.76.0-7
 - Add nopatch for CVE-2021-22926
 - Switch to new upstream URL
