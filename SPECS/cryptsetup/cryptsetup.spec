@@ -1,9 +1,9 @@
-%global         urlversion  2.3
+%global         urlversion  2.4
 
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
-Version:        2.3.3
-Release:        3%{?dist}
+Version:        2.4.3
+Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -11,9 +11,25 @@ Distribution:   Mariner
 URL:            https://gitlab.com/cryptsetup/cryptsetup
 Source0:        https://www.kernel.org/pub/linux/utils/cryptsetup/v%{urlversion}/%{name}-%{version}.tar.xz
 Patch0:         cryptsetup-add-system-library-paths.patch
-BuildRequires:  openssl-devel, popt-devel, device-mapper-devel
-BuildRequires:  gcc, util-linux
-BuildRequires:  libpwquality-devel, json-c-devel
+BuildRequires:  openssl-devel
+BuildRequires:  popt-devel
+BuildRequires:  device-mapper-devel
+BuildRequires:  gcc
+BuildRequires:  util-linux
+BuildRequires:  libpwquality-devel
+BuildRequires:  json-c-devel
+
+
+BuildRequires:  pkgconfig
+BuildRequires:  libblkid-devel
+BuildRequires:  findutils
+BuildRequires:  libtool 
+BuildRequires:  gettext-devel
+
+# Currently disabling  SSH tokens with --disable-ssh-token until libssh is available
+#BuildRequires:  libssh-devel
+
+
 Provides:       cryptsetup-luks = %{version}-%{release}
 Requires:       cryptsetup-libs = %{version}-%{release}
 Requires:       libpwquality >= 1.2.0
@@ -75,7 +91,8 @@ can be used for offline reencryption of disk in situ.
 chmod -x misc/dracut_90reencrypt/*
  
 %build
-%configure --enable-fips --enable-pwquality --enable-internal-sse-argon2 --with-crypto_backend=openssl --with-default-luks-format=LUKS2
+./autogen.sh
+%configure --enable-fips --enable-pwquality --enable-internal-sse-argon2 --with-default-luks-format=LUKS2 --disable-ssh-token
 make %{?_smp_mflags}
  
 %install
@@ -128,8 +145,9 @@ rm -rf %{buildroot}/%{_libdir}/*.la
 %ghost %dir /run/cryptsetup
  
 %changelog
-* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3-3
-- Removing the explicit %%clean stage.
+* Tue Jan 18 2020 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.3-1
+- Update to version 2.4.3
+- We currently do not support SSH tokens, re-enable once libssh is available
 
 * Wed Jun 17 2020 Joe Schmitt <joschmit@microsoft.com> - 2.3.3-2
 - Fix Source0 URL.
