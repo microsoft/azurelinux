@@ -1,12 +1,7 @@
-%bcond_without rpm_macros
-
 %global lua_conflict 5.4.0-7
 
 # Place rpm-macros into proper location.
 %global rpmmacrodir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
-
-# requires RPM >= 4.16
-%bcond_without requires_generator
 
 Name:           lua-rpm-macros
 Version:        1
@@ -33,7 +28,7 @@ BuildArch:      noarch
 Requires:       lua-srpm-macros = %{version}-%{release}
 
 # files were moved from here
-%{?lua_conflict:Conflicts: lua-devel < %{lua_conflict}}
+Conflicts: lua-devel < %{lua_conflict}
 
 %description
 This package contains Lua RPM macros.
@@ -54,30 +49,18 @@ RPM macros for building Lua source packages.
 %prep
 %autosetup -c -T
 cp -a %{sources} .
-%if %{without rpm_macros}
-rm macros.lua
-%endif
-
 
 %build
-
 
 %install
 mkdir -p %{buildroot}%{rpmmacrodir}
 install -pm 644 macros.* %{buildroot}%{rpmmacrodir}/
-%if %{with requires_generator}
 install -Dpm 0644 lua.attr %{buildroot}/%{_fileattrsdir}/lua.attr
-%endif
 
-
-%if %{with rpm_macros}
 %files
 %license LICENSE
-%if %{with requires_generator}
 %{_fileattrsdir}/lua.attr
-%endif
 %{rpmmacrodir}/macros.lua
-%endif
 
 %files -n lua-srpm-macros
 %license LICENSE
