@@ -2400,6 +2400,12 @@
                 "zstd"
             ]
         },
+        "Netplan source": {
+            "license": "[GPLv3](https://github.com/canonical/netplan/blob/main/COPYING)",
+            "specs": [
+                "netplan"
+            ]
+        },
         "NVIDIA": {
             "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
