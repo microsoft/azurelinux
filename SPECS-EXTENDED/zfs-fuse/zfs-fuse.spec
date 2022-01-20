@@ -129,6 +129,7 @@ rm -rf /var/lock/zfs
 %changelog
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.2.2-16
 - Remove copying of RPM's config.guess/config.sub into build dir (not shipped by RPM anymore)
+- License verified
 
 * Thu Jun 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2.2-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
