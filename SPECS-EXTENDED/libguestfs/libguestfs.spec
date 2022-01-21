@@ -152,7 +152,9 @@ BuildRequires: rubygem(json)
 BuildRequires: rubygem(rdoc)
 BuildRequires: rubygem(test-unit)
 BuildRequires: rubygem(irb)
+%if %{with php}
 BuildRequires: php-devel
+%endif 
 BuildRequires: gobject-introspection-devel
 #BuildRequires: gjs
 BuildRequires: vala
@@ -347,7 +349,9 @@ Language bindings:
               lua-guestfs  Lua bindings
    ocaml-libguestfs-devel  OCaml bindings
          perl-Sys-Guestfs  Perl bindings
+%if %{with php}
            php-libguestfs  PHP bindings
+%endif
        python3-libguestfs  Python 3 bindings
           ruby-libguestfs  Ruby bindings
           libguestfs-vala  Vala language bindings
@@ -663,7 +667,7 @@ Provides:      ruby(guestfs) = %{version}
 %description -n ruby-%{name}
 ruby-%{name} contains Ruby bindings for %{name}.
 
-
+%if %{with php}
 %package -n php-%{name}
 Summary:       PHP bindings for %{name}
 Requires:      %{name}%{?_isa} = %{version}-%{release}
@@ -672,7 +676,7 @@ Requires:	php(api) = %{php_core_api}
 
 %description -n php-%{name}
 php-%{name} contains PHP bindings for %{name}.
-
+%endif
 
 %package -n lua-guestfs
 Summary:       Lua bindings for %{name}
@@ -779,13 +783,16 @@ sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
 
 
 %build
+# "--with-distro=REDHAT" is used to indicated Mariner is "Fedora-like" in package naming
 %{configure} \
   PYTHON=%{__python3} \
   --with-distro=REDHAT \
   --with-supermin-packager-config=$(pwd)/yum.conf \
   --with-default-backend=libvirt \
   --with-qemu="qemu-system-%{_build_arch} qemu" \
+%if %{without php}
   --disable-php \
+%endif
 %ifnarch %{golang_arches}
   --disable-golang \
 %endif
@@ -1124,13 +1131,13 @@ rm ocaml/html/.gitignore
 %{ruby_vendorarchdir}/_guestfs.so
 %{_mandir}/man3/guestfs-ruby.3*
 
-# Temporarily disabled by Fedora
-#%files -n php-%{name}
-#%doc php/README-PHP
-#%dir %{_sysconfdir}/php.d
-#%{_sysconfdir}/php.d/guestfs_php.ini
-#%{_libdir}/php/modules/guestfs_php.so
-
+%if %{with php}
+%files -n php-%{name}
+%doc php/README-PHP
+%dir %{_sysconfdir}/php.d
+%{_sysconfdir}/php.d/guestfs_php.ini
+%{_libdir}/php/modules/guestfs_php.so
+%endif
 
 %files -n lua-guestfs
 %doc lua/examples/*.lua
@@ -1181,15 +1188,13 @@ rm ocaml/html/.gitignore
 
 
 %changelog
-* Thu Jan 20 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-4
-- Patch ocaml support, RPM config support
-- Disable inspect-icons support by default (we don't have ghostscript)
-- Remove reiserfs, nilfs, jfs, hfsplus completely
-
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-3
+* Thu Jan 20 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-3
 - Remove Fedora-specific comments/macros
 - Remove link to highjacked upstream bug tracker
 - Conditionally include PHP deps (off by default)
+- Patch ocaml support, RPM config support
+- Disable inspect-icons support by default (we don't have ghostscript)
+- Remove reiserfs, nilfs, jfs, hfsplus completely
 - License verified
 
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.44.0-2
