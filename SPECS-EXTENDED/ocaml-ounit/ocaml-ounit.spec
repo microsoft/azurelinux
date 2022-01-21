@@ -23,7 +23,7 @@ Source0:        %{url}/releases/download/v%{version}/%{srcname}-v%{version}.tbz
 # compatibility package for older OCaml installations.  Patch it out instead.
 # Upstream does not want this patch until stdlib-shims is obsolete.
 Patch0:         %{name}-stdlib-shims.patch
-# Source: Fedora 35
+# Enable ocaml 4.13 compatibility. Source: Fedora 35
 # https://src.fedoraproject.org/rpms/ocaml-ounit/blob/f35/f/ounit-v2.2.4-remove-Thread-kill.patch
 Patch1:         remove-thread-kill.patch
 
