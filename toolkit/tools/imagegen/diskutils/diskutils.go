@@ -8,6 +8,7 @@ package diskutils
 import (
 	"encoding/json"
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -62,6 +63,22 @@ const (
 	MiB = 1024 * 1024
 	GiB = 1024 * 1024 * 1024
 	TiB = 1024 * 1024 * 1024 * 1024
+)
+
+const (
+	// Command running under flock --timeout x returns 134 (128 + SIGALRM) when
+	// timed out.
+	// Sadly, this return code is sometime returned while the command effectively
+	// did what it should do (e.g. mark the partition table type as gpt).
+	// So, each time we call flock --timeout x, we will check if the partition is
+	// in the expected state to conclude if an error occurred.
+	EXIT_TIMEOUT = 134
+
+	// partprobe segfault for unknown reasons.
+	// But it sometimes segfault while giving successful output.
+	// So, if it returns this return code we will check its output to see if
+	// everything is OK or not.
+	EXIT_SEGFAULT = 139
 )
 
 var (
@@ -332,9 +349,42 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 	}
 	_, stderr, err = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
 	if err != nil {
-		logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
-		return
+		if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() != EXIT_TIMEOUT {
+			logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
+			return
+		}
+
+		// Deal specifically with EXIT_TIMEOUT.
+		var stdout string
+
+		previousCommandErr := err
+
+		// In my case, the above command return 134 (128 + SIGALRM), meaning parted
+		// timed out while it successfully changed partition table type.
+		// Thus, instead of returning we will first check if the partition type was
+		// changed.
+		stdout, stderr, err = shell.Execute("parted", diskDevPath, "print")
+		if err != nil {
+			logger.Log.Warnf("Failed to get partition table type using parted : %v", err)
+			// We do not return here because the above parted command can terminate
+			// with:
+			// Aborted (core dump)
+			// and returning 134.
+			// So better to check if we have an output to guess if something wrong
+			// occurred.
+		}
+
+		err = previousCommandErr
+
+		// If partition table was not changed there was indeed an error.
+		if !strings.Contains(stdout, string(partedArgument)) {
+			logger.Log.Warnf("Failed to set partition table type using parted: %v", err)
+			return
+		}
 	}
+
+	// This is safe to reset err here as we should have handle error cases above.
+	err = nil
 
 	// Partitions assumed to be defined in sorted order
 	for idx, partition := range disk.Partitions {
@@ -386,20 +436,40 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 
 	fsType := partition.FsType
 
+	var ifError error
+	var stderr string
+
 	// Currently assumes we only make primary partitions.
 	if end == 0 {
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fillToEndOption)
-		if err != nil {
-			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
-			return "", err
-		}
+		_, stderr, ifError = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fillToEndOption)
 	} else {
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fmt.Sprintf(mibFmt, end))
-		if err != nil {
+		_, stderr, ifError = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fmt.Sprintf(mibFmt, end))
+	}
+
+	if ifError != nil {
+		if exitError, ok := ifError.(*exec.ExitError); ok && exitError.ExitCode() != EXIT_TIMEOUT {
 			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
-			return "", err
+			return "", ifError
+		}
+
+		var stdout string
+
+		stdout, stderr, err = shell.Execute("parted", diskDevPath, "print")
+		if err != nil {
+			logger.Log.Warnf("Failed to get partition table using parted : %v", err)
+		}
+
+		// parted output format can vary a bit.
+		// First, there is a partition number, then we have 3 sizes which are
+		// matched by \d+(.\d+)\w+ to match something like 21.5GB.
+		// Sometime, file system name is not printed thus (\w+\s+)?.
+		// Finally, "primary" should appear if the partition was just created.
+		if ok, _ := regexp.MatchString(`\d\s+\d+(.\d+)?\w+\s+\d+(.\d+)?\w+\s+\d+(.\d+)?\w+\s+(\w+\s+)?primary`, stdout); !ok {
+			logger.Log.Warnf("Failed to create partition using parted: %v", ifError)
+			return "", ifError
 		}
 	}
+
 	// Update kernel partition table information
 	//
 	// There can be a timing issue where partition creation finishes but the
@@ -415,8 +485,16 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	// to prevent us from possibly waiting forever.
 	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to execute partprobe: %v", stderr)
-		return "", err
+		if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() != EXIT_SEGFAULT {
+			logger.Log.Warnf("Failed to execute partprobe: %v", err)
+			return "", err
+		}
+
+		// Check if output is correct even if it segfaulted.
+		if ok, _ := regexp.MatchString(fmt.Sprintf(`%s:\s%s\spartitions\s1`, diskDevPath, partitionTableType), stdout); !ok {
+			logger.Log.Warnf("Failed to execute partprobe: %v", err)
+			return "", err
+		}
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 	return InitializeSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
@@ -506,12 +584,25 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	}
 
 	// Make sure all partition information is actually updated.
-	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
+	stdout, _, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to execute partprobe after partition initialization: %v", stderr)
-		return "", err
+		if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() != EXIT_SEGFAULT {
+			logger.Log.Warnf("Failed to execute partprobe after partition initialization: %v", err)
+			return "", err
+		}
+
+		// Check if output is correct even if it segfaulted.
+		if ok, _ := regexp.MatchString(fmt.Sprintf(`%s:\s%s\spartitions\s1`, diskDevPath, partitionTableType), stdout); !ok {
+			logger.Log.Warnf("Failed to execute partprobe after partition initialization: %v", err)
+			return "", err
+		}
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
+
+	// If we arrive here, everything should be OK since we already deal with
+	// previous error above.
+	// So, it is safe to err to nil.
+	err = nil
 
 	return
 }
