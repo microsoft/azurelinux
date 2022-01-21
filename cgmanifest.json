@@ -15333,8 +15333,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ppxlib",
-          "version": "0.22.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/archive/0.22.0/ppxlib-0.22.0.tar.gz"
+          "version": "0.24.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/releases/download/0.24.0/ppxlib-0.24.0.tbz"
         }
       }
     },
