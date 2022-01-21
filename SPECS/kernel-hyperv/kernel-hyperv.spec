@@ -4,7 +4,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.10.89.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
-Source3:        cbl-mariner-ca-20210127.pem
+Source3:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         CVE-2021-43976.patch
 BuildRequires:  audit-devel
@@ -271,6 +271,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Thu Jan 20 2022 Chris Co <chrco@microsoft.com> - 5.10.89.1-2
+- Rotate Mariner cert 
+
 * Sun Jan 16 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.89.1-1
 - Update source to 5.10.89.1
 - Remove patch add-linux-syscall-license-info.patch

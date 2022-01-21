@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.89.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,7 @@ Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20210127.pem
+Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         CVE-2021-43976.patch
 Patch2:         0003-export-mmput_async.patch
@@ -582,6 +582,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 20 2022 Chris Co <chrco@microsoft.com> - 5.10.89.1-2
+- Rotate Mariner cert 
+
 * Sun Jan 16 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.89.1-1
 - Update source to 5.10.89.1
 - Address CVE-2021-44733, CVE-2021-45469, CVE-2021-28714, CVE-2021-28715
