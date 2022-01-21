@@ -47,6 +47,7 @@ BuildRequires:  python3-xml
 
 Requires:       curl
 Requires:       libsolv
+Requires:       libmetalink
 Requires:       openssl-libs
 Requires:       rpm-libs
 Requires:       tdnf-cli-libs = %{version}-%{release}
