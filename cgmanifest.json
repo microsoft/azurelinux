@@ -7631,8 +7631,8 @@
         "type": "other",
         "other": {
           "name": "ipvsadm",
-          "version": "1.29",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/ipvsadm/ipvsadm-1.29.tar.xz"
+          "version": "1.31",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/ipvsadm/ipvsadm-1.31.tar.xz"
         }
       }
     },
