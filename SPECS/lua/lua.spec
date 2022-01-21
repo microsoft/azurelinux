@@ -215,7 +215,7 @@ popd
 %changelog
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.3-1
 - Update lua version to 5.4.3
-- CVE fix 
+- Apply patch for CVE-2021-43519.
 
 * Thu Oct 01 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-11
 - Nopatch CVE-2020-24342

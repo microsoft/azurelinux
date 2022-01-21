@@ -53,18 +53,18 @@ cp -a %{sources} .
 %build
 
 %install
-mkdir -p %{buildroot}%{_libdir}/rpm
-install -pm 644 macros.* %{buildroot}%{_libdir}/rpm/
+mkdir -p %{buildroot}/%{rpmmacrodir}
+install -pm 644 macros.* %{buildroot}/%{rpmmacrodir}
 install -Dpm 0644 lua.attr %{buildroot}/%{_fileattrsdir}/lua.attr
 
 %files
 %license LICENSE
 %{_fileattrsdir}/lua.attr
-%{_libdir}/rpm/macros.lua
+%{rpmmacrodir}/macros.lua
 
 %files -n lua-srpm-macros
 %license LICENSE
-%{_libdir}/rpm/macros.lua-srpm
+%{rpmmacrodir}/macros.lua-srpm
 
 
 %changelog
@@ -72,7 +72,7 @@ install -Dpm 0644 lua.attr %{buildroot}/%{_fileattrsdir}/lua.attr
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
 - Added URL and Group
-- Removed Fedora distro version specific checks and add rpmmacrodir.
+- Removed Fedora distro version specific checks and added rpmmacrodir path.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
