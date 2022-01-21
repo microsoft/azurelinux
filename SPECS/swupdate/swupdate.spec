@@ -1,7 +1,7 @@
 Summary:        Software Update for Embedded Systems
 Name:           swupdate
-Version:        2019.11
-Release:        7%{?dist}
+Version:        2021.04
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,16 +129,13 @@ fi
 
 %files devel
 %defattr(-,-,-,-)
-%dir "/usr"
-%dir "/usr/include"
-"/usr/include/progress_ipc.h"
-"/usr/include/network_ipc.h"
-"/usr/include/swupdate_status.h"
-%dir "/usr/lib"
-"/usr/lib/libswupdate.a"
-
+%{_libdir}/libswupdate.so
+%{_libdir}/libswupdate.so.*
 
 %changelog
+* Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2021.04-1
+- Update to version 2021.04.
+
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 2019.11-7
 - Use libconfig-devel at build-time, instead of libconfig
 
