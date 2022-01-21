@@ -337,7 +337,7 @@ build_rpm_in_chroot_no_install grep
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
 
-# Build tdnf-3.3.2
+# Build tdnf-3.2.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
