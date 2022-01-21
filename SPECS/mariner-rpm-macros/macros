@@ -55,7 +55,7 @@
     } \
     %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
     %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
-    find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's/-Wl,-dT,\/usr\/src\/mariner\/BUILD\/module_info.ld//' {} \
+    find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's@-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld@ @' {} \
     %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
