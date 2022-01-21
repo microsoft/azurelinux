@@ -7,8 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://sbabic.github.io/swupdate/
-#Source0:       https://github.com/sbabic/swupdate/archive/%%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/sbabic/swupdate/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        .config
 BuildRequires:  curl-devel
 BuildRequires:  json-c-devel
