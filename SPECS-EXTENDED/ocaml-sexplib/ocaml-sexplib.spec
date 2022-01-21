@@ -125,6 +125,10 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod 0755 {} \+
 %endif
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+- Upgrade to latest version
+- License verified
+
 * Thu Dec  2 2021 Muhammad Falak <mwani@microsoft.com> - 0.14.0-7
 - Remove epoch.
 

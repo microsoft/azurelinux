@@ -15393,8 +15393,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib0",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.14.0/sexplib0-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.15.0/sexplib0-0.15.0.tar.gz"
         }
       }
     },
