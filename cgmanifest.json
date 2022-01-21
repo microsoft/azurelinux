@@ -15403,8 +15403,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-stdio",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.14.0/stdio-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.15.0/stdio-0.15.0.tar.gz"
         }
       }
     },
