@@ -7,26 +7,15 @@ Distribution:   Mariner
 %bcond_with ocaml
 %endif
 
-# Verify tarball signature with GPGv2.
-%global verify_tarball_signature 1
-
 Name:           hivex
 Version:        1.3.18
-Release:        22%{?dist}
+Release:        23%{?dist}
 Summary:        Read and write Windows Registry binary hive files
 
-License:        LGPLv2
+License:        LGPLv2+
 URL:            http://libguestfs.org/
 
 Source0:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz
-%if 0%{verify_tarball_signature}
-Source1:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz.sig
-%endif
-
-# Keyring used to verify tarball signature.
-%if 0%{verify_tarball_signature}
-Source2:       libguestfs.keyring
-%endif
 
 # Patches - all upstream since 1.3.18.
 Patch0001:      0001-Win-Hivex-Regedit-Accept-CRLF-line-endings.patch
@@ -65,9 +54,6 @@ BuildRequires:  rubygem(minitest)
 BuildRequires:  rubygem(rdoc)
 BuildRequires:  readline-devel
 BuildRequires:  libxml2-devel
-%if 0%{verify_tarball_signature}
-BuildRequires: gnupg2
-%endif
 
 # https://fedoraproject.org/wiki/Packaging:No_Bundled_Libraries#Packages_granted_exceptions
 Provides:      bundled(gnulib)
@@ -180,9 +166,6 @@ ruby-%{name} contains Ruby bindings for %{name}.
 
 
 %prep
-%if 0%{verify_tarball_signature}
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%endif
 %setup -q
 %autopatch -p1
 
@@ -226,7 +209,8 @@ if ! make check -k; then
 fi
 
 %files -f %{name}.lang
-%doc README LICENSE
+%license LICENSE
+%doc README
 %{_bindir}/hivexget
 %{_bindir}/hivexml
 %{_bindir}/hivexsh
@@ -237,7 +221,6 @@ fi
 
 
 %files devel
-%doc LICENSE
 %{_libdir}/libhivex.so
 %{_mandir}/man3/hivex.3*
 %{_includedir}/hivex.h
@@ -245,7 +228,6 @@ fi
 
 
 %files static
-%doc LICENSE
 %{_libdir}/libhivex.a
 
 
@@ -289,6 +271,10 @@ fi
 
 
 %changelog
+* Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.18-23
+- Removing in-spec verification of source tarballs.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.18-22
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

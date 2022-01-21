@@ -1,8 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# If we should verify tarball signature with GPGv2.
-%global verify_tarball_signature 1
-
 # If there are patches which touch autotools files, set this to 1.
 %global patches_touch_autotools %{nil}
 
@@ -11,18 +8,13 @@ Distribution:   Mariner
 
 Name:          virt-v2v
 Version:       1.42.0
-Release:       6%{?dist}
+Release:       7%{?dist}
 Summary:       Convert a virtual machine to run on KVM
 
 License:       GPLv2+
 URL:           https://github.com/libguestfs/virt-v2v
 
 Source0:       http://download.libguestfs.org/virt-v2v/%{source_directory}/%{name}-%{version}.tar.gz
-%if 0%{verify_tarball_signature}
-Source1:       http://download.libguestfs.org/virt-v2v/%{source_directory}/%{name}-%{version}.tar.gz.sig
-# Keyring used to verify tarball signature.
-Source2:       libguestfs.keyring
-%endif
 
 # libguestfs hasn't been built on i686 for a while since there is no
 # kernel built for this architecture any longer and libguestfs rather
@@ -63,10 +55,6 @@ BuildRequires: ocaml-gettext-devel
 BuildRequires: ocaml-ounit-devel
 
 BuildRequires: nbdkit-python-plugin
-
-%if 0%{verify_tarball_signature}
-BuildRequires: gnupg2
-%endif
 
 Requires:      libguestfs%{?_isa} >= 1.40
 Requires:      libguestfs-tools-c >= 1.40
@@ -129,9 +117,6 @@ for %{name}.
 
 
 %prep
-%if 0%{verify_tarball_signature}
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%endif
 %autosetup -p1
 %if 0%{patches_touch_autotools}
 autoreconf -i
@@ -228,6 +213,10 @@ rm -r $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs/dllv2v_test_harness*
 
 
 %changelog
+* Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.42.0-7
+- Removing in-spec verification of source tarballs.
+- License verified.
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 1.42.0-6
 - Remove epoch
 

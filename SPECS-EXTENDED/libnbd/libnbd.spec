@@ -1,6 +1,3 @@
-# If we should verify tarball signature with GPGv2.
-%global verify_tarball_signature 1
-
 # If there are patches which touch autotools files, set this to 1.
 %global patches_touch_autotools %{nil}
 
@@ -9,7 +6,7 @@
 
 Name:           libnbd
 Version:        1.3.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        NBD client library in userspace
 
 License:        LGPLv2+
@@ -18,18 +15,9 @@ Distribution:   Mariner
 URL:            https://github.com/libguestfs/libnbd
 
 Source0:        http://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
-Source1:        http://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz.sig
-# Keyring used to verify tarball signature.  This contains the single
-# key from here:
-# https://pgp.key-server.io/pks/lookup?search=rjones%40redhat.com&fingerprint=on&op=vindex
-Source2:       libguestfs.keyring
 
 %if 0%{patches_touch_autotools}
 BuildRequires: autoconf, automake, libtool
-%endif
-
-%if 0%{verify_tarball_signature}
-BuildRequires:  gnupg2
 %endif
 
 # For the core library.
@@ -91,7 +79,7 @@ The key features are:
 
 %package devel
 Summary:        Development headers for %{name}
-License:        LGPLv2+ and BSD
+License:        BSD and LGPLv2+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 
@@ -110,6 +98,7 @@ This package contains OCaml language bindings for %{name}.
 
 %package -n ocaml-%{name}-devel
 Summary:        OCaml language development package for %{name}
+License:        BSD and LGPLv2+
 Requires:       ocaml-%{name}%{?_isa} = %{version}-%{release}
 
 
@@ -135,7 +124,7 @@ python3-%{name} contains Python 3 bindings for %{name}.
 
 %package -n nbdfuse
 Summary:        FUSE support for %{name}
-License:        LGPLv2+ and BSD
+License:        BSD and LGPLv2+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 
@@ -158,9 +147,6 @@ for %{name}.
 
 
 %prep
-%if 0%{verify_tarball_signature}
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%endif
 %autosetup -p1
 %if 0%{patches_touch_autotools}
 autoreconf -i
@@ -270,6 +256,10 @@ make %{?_smp_mflags} check || {
 
 
 %changelog
+* Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.6-3
+- Removing in-spec verification of source tarballs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.6-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
