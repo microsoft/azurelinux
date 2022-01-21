@@ -7,7 +7,7 @@ Summary:        Convert OCaml parsetrees between different major versions
 
 License:        LGPLv2+ with exceptions
 URL:            https://github.com/ocaml-ppx/ocaml-migrate-parsetree
-Source0:        https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v%{version/%{name}-%{version}.tbz
+Source0:        https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v%{version}/%{name}-%{version}.tbz
 
 BuildRequires:  ocaml
 BuildRequires:  ocaml-dune
