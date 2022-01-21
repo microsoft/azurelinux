@@ -36,12 +36,14 @@ Distribution:   Mariner
 # Unbreak the linker.
 %undefine _strict_symbol_defs_build
 
-%bcond_with applicances
+%bcond_without applicances
+%bcond_with php
+%bcond_with inspect-icons
 
 Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Version:       1.44.0
-Release:       2%{?dist}
+Release:       4%{?dist}
 License:       LGPLv2+
 
 # Source and patches.
@@ -59,6 +61,10 @@ Source6:       yum.conf.in
 
 # Maintainer script which helps with handling patches.
 Source8:       copy-patches.sh
+
+# Upstream patches not present in 1.44.0
+Patch0:        libguestfs-ocaml413compat.patch
+Patch1:        libguestfs-config-rpm.patch
 
 %if 0%{patches_touch_autotools}
 BuildRequires: autoconf, automake, libtool, gettext-devel
@@ -99,7 +105,9 @@ BuildRequires: xz-devel
 BuildRequires: zip
 BuildRequires: unzip
 BuildRequires: systemd-units
+%if %{with inspect-icons}
 BuildRequires: netpbm-progs
+%endif
 BuildRequires: icoutils
 BuildRequires: libvirt-daemon-kvm >= 5.3.0
 BuildRequires: perl(Expect)
@@ -144,7 +152,9 @@ BuildRequires: rubygem(json)
 BuildRequires: rubygem(rdoc)
 BuildRequires: rubygem(test-unit)
 BuildRequires: rubygem(irb)
+%if %{with php}
 BuildRequires: php-devel
+%endif 
 BuildRequires: gobject-introspection-devel
 #BuildRequires: gjs
 BuildRequires: vala
@@ -187,11 +197,9 @@ BuildRequires: genisoimage
 BuildRequires: gfs2-utils
 BuildRequires: grep
 BuildRequires: gzip
-BuildRequires: hfsplus-tools
 BuildRequires: hivex
 BuildRequires: iproute
 BuildRequires: iputils
-BuildRequires: jfsutils
 BuildRequires: kernel
 BuildRequires: kmod
 BuildRequires: kpartx
@@ -205,7 +213,6 @@ BuildRequires: lsscsi
 BuildRequires: lvm2
 BuildRequires: lzop
 BuildRequires: mdadm
-BuildRequires: nilfs-utils
 BuildRequires: ntfs-3g ntfsprogs ntfs-3g-system-compression
 BuildRequires: openssh-clients
 BuildRequires: parted
@@ -215,7 +222,6 @@ BuildRequires: policycoreutils
 BuildRequires: procps
 BuildRequires: psmisc
 BuildRequires: qemu-img
-BuildRequires: reiserfs-utils
 BuildRequires: rsync
 BuildRequires: scrub
 BuildRequires: sed
@@ -323,11 +329,7 @@ For enhanced features, install:
 
      libguestfs-forensics  adds filesystem forensics support
           libguestfs-gfs2  adds Global Filesystem (GFS2) support
-       libguestfs-hfsplus  adds HFS+ (Mac filesystem) support
  libguestfs-inspect-icons  adds support for inspecting guest icons
-           libguestfs-jfs  adds JFS support
-         libguestfs-nilfs  adds NILFS v2 support
-      libguestfs-reiserfs  adds ReiserFS support
         libguestfs-rescue  enhances virt-rescue shell with more tools
          libguestfs-rsync  rsync to/from guest filesystems
            libguestfs-ufs  adds UFS (BSD) support
@@ -347,7 +349,9 @@ Language bindings:
               lua-guestfs  Lua bindings
    ocaml-libguestfs-devel  OCaml bindings
          perl-Sys-Guestfs  Perl bindings
+%if %{with php}
            php-libguestfs  PHP bindings
+%endif
        python3-libguestfs  Python 3 bindings
           ruby-libguestfs  Ruby bindings
           libguestfs-vala  Vala language bindings
@@ -385,47 +389,7 @@ Requires:      %{name}%{?_isa} = %{version}-%{release}
 
 %description gfs2
 This adds GFS2 support to %{name}.  Install it if you want to process
-disk images containing GFS2.
-
-
-%package hfsplus
-Summary:       HFS+ support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
-%description hfsplus
-This adds HFS+ support to %{name}.  Install it if you want to process
-disk images containing HFS+ / Mac OS Extended filesystems.
-
-
-%package jfs
-Summary:       JFS support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
-%description jfs
-This adds JFS support to %{name}.  Install it if you want to process
-disk images containing JFS.
-
-
-%package nilfs
-Summary:       NILFS support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
-%description nilfs
-This adds NILFS v2 support to %{name}.  Install it if you want to process
-disk images containing NILFS v2.
-
-
-%package reiserfs
-Summary:       ReiserFS support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
-%description reiserfs
-This adds ReiserFS support to %{name}.  Install it if you want to process
-disk images containing ReiserFS.
+disk images containing GFS2.Exiting due to strict setting
 
 
 %package rescue
@@ -480,6 +444,7 @@ disk images containing ZFS.
 %endif
 
 
+%if %{with inspect-icons}
 %package inspect-icons
 Summary:       Additional dependencies for inspecting guest icons
 License:       LGPLv2+
@@ -497,6 +462,7 @@ inspect non-Linux guests and display icons from them.
 
 The only reason this is a separate package is to avoid core libguestfs
 having to depend on Perl.  See https://bugzilla.redhat.com/1194158
+%endif
 
 
 %package tools-c
@@ -701,7 +667,7 @@ Provides:      ruby(guestfs) = %{version}
 %description -n ruby-%{name}
 ruby-%{name} contains Ruby bindings for %{name}.
 
-
+%if %{with php}
 %package -n php-%{name}
 Summary:       PHP bindings for %{name}
 Requires:      %{name}%{?_isa} = %{version}-%{release}
@@ -710,7 +676,7 @@ Requires:	php(api) = %{php_core_api}
 
 %description -n php-%{name}
 php-%{name} contains PHP bindings for %{name}.
-
+%endif
 
 %package -n lua-guestfs
 Summary:       Lua bindings for %{name}
@@ -809,13 +775,24 @@ fi
 mv README README.orig
 sed 's/@VERSION@/%{version}/g' < %{SOURCE4} > README
 
+mkdir cachedir repo
+find /var/cache/{dnf,tdnf} -type f -name '*.rpm' -print0 | \
+  xargs -0 -n 1 cp -t repo
+createrepo_c repo
+sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
+
 
 %build
+# "--with-distro=REDHAT" is used to indicate Mariner is "Fedora-like" in package naming
 %{configure} \
   PYTHON=%{__python3} \
+  --with-distro=REDHAT \
+  --with-supermin-packager-config=$(pwd)/yum.conf \
   --with-default-backend=libvirt \
   --with-qemu="qemu-system-%{_build_arch} qemu" \
+%if %{without php}
   --disable-php \
+%endif
 %ifnarch %{golang_arches}
   --disable-golang \
 %endif
@@ -912,16 +889,11 @@ function move_to
 }
 
 move_to curl            zz-packages-dib
-move_to debootstrap     zz-packages-dib
 move_to kpartx          zz-packages-dib
 move_to qemu-img        zz-packages-dib
 move_to which           zz-packages-dib
 move_to sleuthkit       zz-packages-forensics
 move_to gfs2-utils      zz-packages-gfs2
-move_to hfsplus-tools   zz-packages-hfsplus
-move_to jfsutils        zz-packages-jfs
-move_to nilfs-utils     zz-packages-nilfs
-move_to reiserfs-utils  zz-packages-reiserfs
 move_to iputils         zz-packages-rescue
 move_to lsof            zz-packages-rescue
 move_to openssh-clients zz-packages-rescue
@@ -933,10 +905,6 @@ move_to xfsprogs        zz-packages-xfs
 %ifnarch aarch64
 move_to zfs-fuse        zz-packages-zfs
 %endif
-
-# On Fedora you need kernel-modules-extra to be able to mount
-# UFS (BSD) filesystems.
-echo "kernel-modules-extra" > zz-packages-ufs
 
 popd
 %endif
@@ -1008,18 +976,6 @@ rm ocaml/html/.gitignore
 %files gfs2
 %{_libdir}/guestfs/supermin.d/zz-packages-gfs2
 
-%files hfsplus
-%{_libdir}/guestfs/supermin.d/zz-packages-hfsplus
-
-%files jfs
-%{_libdir}/guestfs/supermin.d/zz-packages-jfs
-
-%files nilfs
-%{_libdir}/guestfs/supermin.d/zz-packages-nilfs
-
-%files reiserfs
-%{_libdir}/guestfs/supermin.d/zz-packages-reiserfs
-
 %files rsync
 %{_libdir}/guestfs/supermin.d/zz-packages-rsync
 
@@ -1039,8 +995,10 @@ rm ocaml/html/.gitignore
 
 %endif
 
+%if %{with inspect-icons}
 %files inspect-icons
 # no files
+%endif
 
 %files tools-c
 %doc README
@@ -1173,13 +1131,13 @@ rm ocaml/html/.gitignore
 %{ruby_vendorarchdir}/_guestfs.so
 %{_mandir}/man3/guestfs-ruby.3*
 
-# Temporarily disabled by Fedora
-#%files -n php-%{name}
-#%doc php/README-PHP
-#%dir %{_sysconfdir}/php.d
-#%{_sysconfdir}/php.d/guestfs_php.ini
-#%{_libdir}/php/modules/guestfs_php.so
-
+%if %{with php}
+%files -n php-%{name}
+%doc php/README-PHP
+%dir %{_sysconfdir}/php.d
+%{_sysconfdir}/php.d/guestfs_php.ini
+%{_libdir}/php/modules/guestfs_php.so
+%endif
 
 %files -n lua-guestfs
 %doc lua/examples/*.lua
@@ -1230,6 +1188,15 @@ rm ocaml/html/.gitignore
 
 
 %changelog
+* Thu Jan 20 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-3
+- Remove Fedora-specific comments/macros
+- Remove link to highjacked upstream bug tracker
+- Conditionally include PHP deps (off by default)
+- Patch ocaml support, RPM config support
+- Disable inspect-icons support by default (we don't have ghostscript)
+- Remove reiserfs, nilfs, jfs, hfsplus completely
+- License verified
+
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.44.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Remove epoch
