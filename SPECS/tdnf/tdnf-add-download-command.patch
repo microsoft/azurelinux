@@ -15,13 +15,18 @@ Behavior:
 - `tdnf download` will skip RPMs if the correct version already exists in the destination directory.
 - `tdnf download` will check GPG signatures unless otherwise specified.
 
+From: Joe Schmitt <joschmit@microsoft.com>
+Date: Tue, 28 Jul 2020 15:49:55 -0700
+Subject: [PATCH] Add download-nodeps command
+
 From: Mateusz Malisz <mamalisz@microsoft.com>
-Updated: Thu, 20 Jan 2022 21:54:04+0000
+Date: Thu, 20 Jan 2022 21:54:04+0000
+Subject: [PATCH] Update download commands to work with tdnf-3.2.2.
 
 Updated code to work with tdnf 3.2.2. Removed --destdir argument in favor of reusing --downloaddir instead.
 
 diff --git a/client/api.c b/client/api.c
-index ef25d09..6209aa9 100644
+index ef25d09..0fefa1d 100644
 --- a/client/api.c
 +++ b/client/api.c
 @@ -629,10 +629,10 @@ TDNFOpenHandle(
@@ -83,7 +88,7 @@ index ef25d09..6209aa9 100644
      dwError = SolvGetQueryResult(pQuery, &pPkgList);
      BAIL_ON_TDNF_ERROR(dwError);
  
-@@ -1939,3 +1917,53 @@ TDNFGetPackageName(
+@@ -1939,3 +1917,183 @@ TDNFGetPackageName(
  {
      return PACKAGE_NAME;
  }
@@ -137,6 +142,136 @@ index ef25d09..6209aa9 100644
 +    }
 +    goto cleanup;
 +}
++
++//Downloads all requested packages without any of their dependencies.
++uint32_t
++TDNFDownloadNoDepsCommand(
++    PTDNF pTdnf,
++    TDNF_SCOPE nScope,
++    char** ppszPackageNameSpecs,
++    PTDNF_PKG_INFO* ppPkgInfo,
++    uint32_t* pdwCount
++    )
++{
++    const int nSkipInstalledRpms = 1;
++    const int nUpgrade = 0;
++
++    uint32_t dwError = 0;
++    uint32_t dwCount = 0;
++    uint32_t dwIndex = 0;
++
++    PSolvQuery pQuery = NULL;
++    PTDNF_PKG_INFO pPkgInfo = NULL;
++    PTDNF_PKG_INFO pPkg = NULL;
++    PSolvPackageList pPkgList = NULL;
++
++    TDNFRPMTS ts = {0};
++
++    if(!pTdnf || !pTdnf->pSack ||!pdwCount || !ppPkgInfo ||
++       !ppszPackageNameSpecs || IsNullOrEmptyString(pTdnf->pArgs->pszDownloadDir))
++    {
++        dwError = ERROR_TDNF_INVALID_PARAMETER;
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
++    dwError = TDNFResetSack(pTdnf, nSkipInstalledRpms);
++    BAIL_ON_TDNF_ERROR(dwError);
++
++    dwError = SolvCreateQuery(pTdnf->pSack, &pQuery);
++    BAIL_ON_TDNF_ERROR(dwError);
++
++    dwError = TDNFApplyScopeFilter(pQuery, nScope);
++    BAIL_ON_TDNF_ERROR(dwError);
++
++    dwError = SolvApplyPackageFilter(pQuery, ppszPackageNameSpecs);
++    BAIL_ON_TDNF_ERROR(dwError);
++
++    dwError = SolvApplyListQuery(pQuery);
++    BAIL_ON_TDNF_ERROR(dwError);
++
++    dwError = SolvGetQueryResult(pQuery, &pPkgList);
++    BAIL_ON_TDNF_ERROR(dwError);
++
++    dwError = TDNFPopulatePkgInfoArray(
++                  pTdnf->pSack,
++                  pPkgList,
++                  DETAIL_INFO,
++                  &pPkgInfo,
++                  &dwCount);
++    BAIL_ON_TDNF_ERROR(dwError);
++
++    if(dwError == ERROR_TDNF_NO_MATCH && !*ppszPackageNameSpecs)
++    {
++        dwError = 0;
++    }
++
++    *ppPkgInfo = pPkgInfo;
++    *pdwCount = dwCount;
++
++    ts.nQuiet = pTdnf->pArgs->nQuiet;
++
++    ts.pTS = rpmtsCreate();
++    if(!ts.pTS)
++    {
++        dwError = ERROR_TDNF_RPMTS_CREATE_FAILED;
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
++    ts.nTransFlags = rpmtsSetFlags (ts.pTS, RPMTRANS_FLAG_NONE);
++
++    if(rpmtsSetNotifyCallback(ts.pTS, TDNFRpmCB, (void*)&ts))
++    {
++        dwError = ERROR_TDNF_RPMTS_SET_CB_FAILED;
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
++    for(dwIndex = 0; dwIndex < dwCount; ++dwIndex)
++    {
++        pPkg = &pPkgInfo[dwIndex];
++
++        dwError = TDNFTransAddInstallPkg(
++                    &ts,
++                    pTdnf,
++                    pPkg->pszLocation,
++                    pPkg->pszName,
++                    pPkg->pszRepoName,
++                    nUpgrade);
++        BAIL_ON_TDNF_ERROR(dwError);
++        rpmtsEmpty(ts.pTS);
++    }
++
++cleanup:
++    if(pQuery)
++    {
++        SolvFreeQuery(pQuery);
++    }
++    if(pPkgList)
++    {
++        SolvFreePackageList(pPkgList);
++    }
++    if(ts.pTS)
++    {
++        rpmtsCloseDB(ts.pTS);
++        rpmtsFree(ts.pTS);
++    }
++
++    return dwError;
++
++error:
++    if(ppPkgInfo)
++    {
++        *ppPkgInfo = NULL;
++    }
++    if(pdwCount)
++    {
++        *pdwCount = 0;
++    }
++    if(pPkgInfo)
++    {
++        TDNFFreePackageInfoArray(pPkgInfo, dwCount);
++    }
++    goto cleanup;
++}
 diff --git a/client/goal.c b/client/goal.c
 index 916388c..3700df5 100644
 --- a/client/goal.c
@@ -161,6 +296,29 @@ index 871dae7..1bee9f5 100644
      pCmdArgs->nAllowErasing  = pCmdArgsIn->nAllowErasing;
      pCmdArgs->nAssumeNo      = pCmdArgsIn->nAssumeNo;
      pCmdArgs->nAssumeYes     = pCmdArgsIn->nAssumeYes;
+diff --git a/client/packageutils.c b/client/packageutils.c
+index e130d66..510c337 100644
+--- a/client/packageutils.c
++++ b/client/packageutils.c
+@@ -186,6 +186,13 @@ TDNFPopulatePkgInfoArray(
+                           dwPkgId,
+                           &pPkgInfo->pszDescription);
+             BAIL_ON_TDNF_ERROR(dwError);
++
++            dwError = SolvGetPkgLocationFromId(
++                          pSack,
++                          dwPkgId,
++                          &pPkgInfo->pszLocation);
++            BAIL_ON_TDNF_ERROR(dwError);
++
+         }
+         else if (nDetail == DETAIL_CHANGELOG)
+         {
+@@ -1211,4 +1218,3 @@ cleanup:
+ error:
+     goto cleanup;
+ }
+-
 diff --git a/client/resolve.c b/client/resolve.c
 index b9164e8..125d4b2 100644
 --- a/client/resolve.c
@@ -232,10 +390,10 @@ index d15ea62..38be638 100644
  //return solved pkg info which has descriptive
  //info about steps to reach current goal.
 diff --git a/include/tdnfcli.h b/include/tdnfcli.h
-index 4644cd0..964062f 100644
+index 4644cd0..f33f9d4 100644
 --- a/include/tdnfcli.h
 +++ b/include/tdnfcli.h
-@@ -169,6 +169,12 @@ TDNFCliInfoCommand(
+@@ -169,6 +169,18 @@ TDNFCliInfoCommand(
      PTDNF_CMD_ARGS pCmdArgs
      );
  
@@ -245,11 +403,17 @@ index 4644cd0..964062f 100644
 +    PTDNF_CMD_ARGS pCmdArgs
 +    );
 +
++uint32_t
++TDNFCliDownloadNoDepsCommand(
++    PTDNF_CLI_CONTEXT pContext,
++    PTDNF_CMD_ARGS pCmdArgs
++    );
++
  uint32_t
  TDNFCliSearchCommand(
      PTDNF_CLI_CONTEXT pContext,
 diff --git a/include/tdnfclitypes.h b/include/tdnfclitypes.h
-index b7b33d1..6d00be5 100644
+index b7b33d1..3a6178e 100644
 --- a/include/tdnfclitypes.h
 +++ b/include/tdnfclitypes.h
 @@ -121,6 +121,11 @@ typedef uint32_t
@@ -264,7 +428,23 @@ index b7b33d1..6d00be5 100644
  typedef uint32_t
  (*PFN_TDNF_RESOLVE)(
      PTDNF_CLI_CONTEXT,
-@@ -162,6 +167,7 @@ typedef struct _TDNF_CLI_CONTEXT_
+@@ -147,6 +152,15 @@ typedef uint32_t
+     PTDNF_UPDATEINFO_ARGS,
+     PTDNF_UPDATEINFO_SUMMARY *);
+ 
++typedef uint32_t
++(*PFN_TDNF_DOWNLOAD_NO_DEPS)(
++    PTDNF_CLI_CONTEXT,
++    PTDNF_LIST_ARGS,
++    PTDNF_PKG_INFO *,
++    uint32_t *
++    );
++
++
+ typedef struct _TDNF_CLI_CONTEXT_
+ {
+     HTDNF hTdnf;
+@@ -162,12 +176,14 @@ typedef struct _TDNF_CLI_CONTEXT_
      PFN_TDNF_LIST               pFnList;
      PFN_TDNF_PROVIDES           pFnProvides;
      PFN_TDNF_REPOLIST           pFnRepoList;
@@ -272,6 +452,13 @@ index b7b33d1..6d00be5 100644
      PFN_TDNF_REPOSYNC           pFnRepoSync;
      PFN_TDNF_REPOQUERY          pFnRepoQuery;
      PFN_TDNF_RESOLVE            pFnResolve;
+     PFN_TDNF_SEARCH             pFnSearch;
+     PFN_TDNF_UPDATEINFO         pFnUpdateInfo;
+     PFN_TDNF_UPDATEINFO_SUMMARY pFnUpdateInfoSummary;
++    PFN_TDNF_DOWNLOAD_NO_DEPS   pFnDownloadNoDeps;
+ }TDNF_CLI_CONTEXT, *PTDNF_CLI_CONTEXT;
+ 
+ #ifdef __cplusplus
 diff --git a/include/tdnftypes.h b/include/tdnftypes.h
 index a547b8a..db77ada 100644
 --- a/include/tdnftypes.h
@@ -446,10 +633,10 @@ index d98d9c7..437d931 100644
  SolvCalculateCookieForFile(
      char *pszFilePath,
 diff --git a/tools/cli/lib/api.c b/tools/cli/lib/api.c
-index f277b7c..1080bc7 100644
+index f277b7c..2fd99af 100644
 --- a/tools/cli/lib/api.c
 +++ b/tools/cli/lib/api.c
-@@ -718,3 +718,77 @@ TDNFCliRefresh(
+@@ -718,3 +718,123 @@ TDNFCliRefresh(
      return TDNFRefresh(pContext->hTdnf);
  }
  
@@ -527,8 +714,54 @@ index f277b7c..1080bc7 100644
 +error:
 +    goto cleanup;
 +}
++
++uint32_t
++TDNFCliDownloadNoDepsCommand(
++    PTDNF_CLI_CONTEXT pContext,
++    PTDNF_CMD_ARGS pCmdArgs
++    )
++{
++    uint32_t dwError = 0;
++
++    PTDNF_PKG_INFO pPkgInfo = NULL;
++    PTDNF_LIST_ARGS pInfoArgs = NULL;
++
++    uint32_t dwCount = 0;
++
++    if(!pContext ||
++       !pContext->hTdnf ||
++       !pContext->pFnDownloadNoDeps ||
++       !pCmdArgs ||
++       IsNullOrEmptyString(pCmdArgs->pszDownloadDir))
++    {
++        dwError = ERROR_TDNF_INVALID_PARAMETER;
++        BAIL_ON_CLI_ERROR(dwError);
++    }
++
++    dwError = TDNFCliParseInfoArgs(pCmdArgs, &pInfoArgs);
++    BAIL_ON_CLI_ERROR(dwError);
++
++    dwError = pContext->pFnDownloadNoDeps(pContext, pInfoArgs, &pPkgInfo, &dwCount);
++    BAIL_ON_CLI_ERROR(dwError);
++
++    printf("Download %d packages\n", dwCount);
++
++cleanup:
++    if(pInfoArgs)
++    {
++        TDNFCliFreeListArgs(pInfoArgs);
++    }
++    if(pPkgInfo)
++    {
++        TDNFFreePackageInfoArray(pPkgInfo, dwCount);
++    }
++    return dwError;
++
++error:
++    goto cleanup;
++}
 diff --git a/tools/cli/lib/help.c b/tools/cli/lib/help.c
-index 369e4e2..acc51c6 100644
+index 369e4e2..8b48c3c 100644
 --- a/tools/cli/lib/help.c
 +++ b/tools/cli/lib/help.c
 @@ -39,6 +39,7 @@ TDNFCliShowHelp(
@@ -539,11 +772,12 @@ index 369e4e2..acc51c6 100644
      pr_crit("           [--debugsolver]\n");
      pr_crit("           [--disablerepo=<repoid>]\n");
      pr_crit("           [--enablerepo=<repoid>]\n");
-@@ -108,6 +109,7 @@ TDNFCliShowHelp(
+@@ -108,6 +109,8 @@ TDNFCliShowHelp(
      pr_crit("check-update              Check for available package upgrades\n");
      pr_crit("clean                     Remove cached data\n");
      pr_crit("distro-sync               Synchronize installed packages to the latest available versions\n");
 +    pr_crit("download                  download a package\n");
++    pr_crit("download-nodeps           download a package without dependencies\n");
      pr_crit("downgrade                 downgrade a package\n");
      pr_crit("erase                     Remove a package or packages from your system\n");
      pr_crit("help                      Display a helpful usage message\n");
@@ -568,18 +802,19 @@ index a022e13..e3093c8 100644
      pArgs->nAssumeNo      = pOptionArgs->nAssumeNo;
      pArgs->nAssumeYes     = pOptionArgs->nAssumeYes;
 diff --git a/tools/cli/main.c b/tools/cli/main.c
-index 203f50a..a6c50a2 100644
+index 203f50a..eeeabdb 100644
 --- a/tools/cli/main.c
 +++ b/tools/cli/main.c
-@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
+@@ -43,6 +43,8 @@ int main(int argc, char* argv[])
          {"clean",              TDNFCliCleanCommand},
          {"count",              TDNFCliCountCommand},
          {"distro-sync",        TDNFCliDistroSyncCommand},
 +        {"download",           TDNFCliDownloadCommand},
++        {"download-nodeps",    TDNFCliDownloadNoDepsCommand},
          {"downgrade",          TDNFCliDowngradeCommand},
          {"erase",              TDNFCliEraseCommand},
          {"help",               TDNFCliHelpCommand},
-@@ -109,9 +110,10 @@ int main(int argc, char* argv[])
+@@ -109,13 +111,15 @@ int main(int argc, char* argv[])
  
      /*
       * Alter and resolve will address commands like
@@ -591,7 +826,12 @@ index 203f50a..a6c50a2 100644
      _context.pFnResolve = TDNFCliInvokeResolve;
      _context.pFnSearch = TDNFCliInvokeSearch;
      _context.pFnUpdateInfo = TDNFCliInvokeUpdateInfo;
-@@ -527,3 +529,11 @@ TDNFCliInvokeUpdateInfoSummary(
+     _context.pFnUpdateInfoSummary = TDNFCliInvokeUpdateInfoSummary;
++    _context.pFnDownloadNoDeps = TDNFCliInvokeDownloadNoDeps;
+ 
+     dwError = TDNFCliParseArgs(argc, argv, &pCmdArgs);
+     BAIL_ON_CLI_ERROR(dwError);
+@@ -527,3 +531,26 @@ TDNFCliInvokeUpdateInfoSummary(
                 ppSummary);
  }
  
@@ -603,11 +843,26 @@ index 203f50a..a6c50a2 100644
 +{
 +    return TDNFResetSack(pContext->hTdnf, nSkipInstalledRpms);
 +}
++
++uint32_t
++TDNFCliInvokeDownloadNoDeps(
++        PTDNF_CLI_CONTEXT pContext,
++        PTDNF_LIST_ARGS pInfoArgs,
++        PTDNF_PKG_INFO *ppPkgInfo,
++        uint32_t *pdwCount
++        )
++{
++    return TDNFDownloadNoDepsCommand(pContext->hTdnf,
++                   pInfoArgs->nScope,
++                   pInfoArgs->ppszPackageNameSpecs,
++                   ppPkgInfo,
++                   pdwCount);
++}
 diff --git a/tools/cli/prototypes.h b/tools/cli/prototypes.h
-index 0afba59..84d5bd5 100644
+index 0afba59..daff8be 100644
 --- a/tools/cli/prototypes.h
 +++ b/tools/cli/prototypes.h
-@@ -369,3 +369,9 @@ void
+@@ -369,3 +369,17 @@ void
  TDNFFreeListArgs(
      PTDNF_LIST_ARGS pListArgs
      );
@@ -616,4 +871,12 @@ index 0afba59..84d5bd5 100644
 +TDNFCliInvokeResetSack(
 +    PTDNF_CLI_CONTEXT pContext,
 +    int nSkipInstalledRpms
++    );
++
++uint32_t
++TDNFCliInvokeDownloadNoDeps(
++    PTDNF_CLI_CONTEXT pContext,
++    PTDNF_LIST_ARGS pInfoArgs,
++    PTDNF_PKG_INFO *ppPkgInfo,
++    uint32_t *pdwCount
 +    );
