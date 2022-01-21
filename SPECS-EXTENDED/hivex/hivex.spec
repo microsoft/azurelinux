@@ -12,7 +12,7 @@ Version:        1.3.18
 Release:        23%{?dist}
 Summary:        Read and write Windows Registry binary hive files
 
-License:        LGPLv2
+License:        LGPLv2+
 URL:            http://libguestfs.org/
 
 Source0:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz
@@ -209,7 +209,8 @@ if ! make check -k; then
 fi
 
 %files -f %{name}.lang
-%doc README LICENSE
+%license LICENSE
+%doc README
 %{_bindir}/hivexget
 %{_bindir}/hivexml
 %{_bindir}/hivexsh
@@ -220,7 +221,6 @@ fi
 
 
 %files devel
-%doc LICENSE
 %{_libdir}/libhivex.so
 %{_mandir}/man3/hivex.3*
 %{_includedir}/hivex.h
@@ -228,7 +228,6 @@ fi
 
 
 %files static
-%doc LICENSE
 %{_libdir}/libhivex.a
 
 
@@ -274,6 +273,7 @@ fi
 %changelog
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.18-23
 - Removing in-spec verification of source tarballs.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.18-22
 - Switching to using full number for the 'Release' tag.

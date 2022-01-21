@@ -962,6 +962,7 @@ make %{?_smp_mflags} check || {
 %changelog
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-3
 - Removing in-spec verification of source tarballs.
+- License verified.
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

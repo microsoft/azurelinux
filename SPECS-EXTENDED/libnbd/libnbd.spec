@@ -79,7 +79,7 @@ The key features are:
 
 %package devel
 Summary:        Development headers for %{name}
-License:        LGPLv2+ and BSD
+License:        BSD and LGPLv2+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 
@@ -98,6 +98,7 @@ This package contains OCaml language bindings for %{name}.
 
 %package -n ocaml-%{name}-devel
 Summary:        OCaml language development package for %{name}
+License:        BSD and LGPLv2+
 Requires:       ocaml-%{name}%{?_isa} = %{version}-%{release}
 
 
@@ -123,7 +124,7 @@ python3-%{name} contains Python 3 bindings for %{name}.
 
 %package -n nbdfuse
 Summary:        FUSE support for %{name}
-License:        LGPLv2+ and BSD
+License:        BSD and LGPLv2+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 
@@ -257,6 +258,7 @@ make %{?_smp_mflags} check || {
 %changelog
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.6-3
 - Removing in-spec verification of source tarballs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.6-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

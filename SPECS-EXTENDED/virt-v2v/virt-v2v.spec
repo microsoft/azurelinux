@@ -215,6 +215,7 @@ rm -r $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs/dllv2v_test_harness*
 %changelog
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.42.0-7
 - Removing in-spec verification of source tarballs.
+- License verified.
 
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 1.42.0-6
 - Remove epoch
