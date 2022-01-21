@@ -845,8 +845,8 @@
         "type": "other",
         "other": {
           "name": "audit",
-          "version": "3.0",
-          "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.0-alpha8.tar.gz"
+          "version": "3.0.6",
+          "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.0.6.tar.gz"
         }
       }
     },
@@ -1437,8 +1437,8 @@
         "type": "other",
         "other": {
           "name": "btrfs-progs",
-          "version": "4.19",
-          "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v4.19.tar.xz"
+          "version": "5.16",
+          "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v5.16.tar.xz"
         }
       }
     },
@@ -6760,8 +6760,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.78.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
         }
       }
     },
@@ -7631,8 +7631,8 @@
         "type": "other",
         "other": {
           "name": "ipvsadm",
-          "version": "1.29",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/ipvsadm/ipvsadm-1.29.tar.xz"
+          "version": "1.31",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/ipvsadm/ipvsadm-1.31.tar.xz"
         }
       }
     },
@@ -8551,8 +8551,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.78.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
         }
       }
     },
@@ -8561,8 +8561,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.78.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
         }
       }
     },
@@ -8571,8 +8571,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.78.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
         }
       }
     },
@@ -14373,8 +14373,8 @@
         "type": "other",
         "other": {
           "name": "nano",
-          "version": "3.0",
-          "downloadUrl": "http://www.nano-editor.org/dist/v3/nano-3.0.tar.xz"
+          "version": "6.0",
+          "downloadUrl": "http://www.nano-editor.org/dist/v6/nano-6.0.tar.xz"
         }
       }
     },
@@ -14505,6 +14505,16 @@
           "name": "netlabel_tools",
           "version": "0.30.0",
           "downloadUrl": "https://github.com/netlabel/netlabel_tools/releases/download/v0.30.0/netlabel_tools-0.30.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "netplan",
+          "version": "0.95",
+          "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
         }
       }
     },
@@ -14963,8 +14973,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-base",
-          "version": "0.14.1",
-          "downloadUrl": "https://github.com/janestreet/base/archive/v0.14.1/base-0.14.1.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/base/archive/v0.15.0/base-0.15.0.tar.gz"
         }
       }
     },
@@ -15162,6 +15172,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ocaml-gettext",
+          "version": "0.4.2",
+          "downloadUrl": "https://github.com/gildor478/ocaml-gettext/releases/download/v0.4.2/gettext-v0.4.2.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ocaml-integers",
           "version": "0.4.0",
           "downloadUrl": "https://github.com/ocamllabs/ocaml-integers/archive/0.4.0/ocaml-integers-0.4.0.tar.gz"
@@ -15223,8 +15243,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-migrate-parsetree",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/archive/v2.1.0/ocaml-migrate-parsetree-2.1.0.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v2.3.0/ocaml-migrate-parsetree-2.3.0.tbz"
         }
       }
     },
@@ -15293,8 +15313,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-parsexp",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/parsexp/archive/v0.14.0/parsexp-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/parsexp/archive/v0.15.0/parsexp-0.15.0.tar.gz"
         }
       }
     },
@@ -15313,8 +15333,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ppxlib",
-          "version": "0.22.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/archive/0.22.0/ppxlib-0.22.0.tar.gz"
+          "version": "0.24.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/releases/download/0.24.0/ppxlib-0.24.0.tbz"
         }
       }
     },
@@ -15363,8 +15383,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib/archive/v0.14.0/sexplib-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib/archive/v0.15.0/sexplib-0.15.0.tar.gz"
         }
       }
     },
@@ -15373,8 +15393,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib0",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.14.0/sexplib0-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.15.0/sexplib0-0.15.0.tar.gz"
         }
       }
     },
@@ -15383,8 +15403,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-stdio",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.14.0/stdio-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.15.0/stdio-0.15.0.tar.gz"
         }
       }
     },
@@ -16124,8 +16144,8 @@
         "type": "other",
         "other": {
           "name": "parted",
-          "version": "3.4",
-          "downloadUrl": "http://ftp.gnu.org/gnu/parted/parted-3.4.tar.xz"
+          "version": "3.2",
+          "downloadUrl": "http://ftp.gnu.org/gnu/parted/parted-3.2.tar.xz"
         }
       }
     },
@@ -27767,8 +27787,8 @@
         "type": "other",
         "other": {
           "name": "subversion",
-          "version": "1.14.0",
-          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.0.tar.bz2"
+          "version": "1.14.1",
+          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.1.tar.bz2"
         }
       }
     },
@@ -27807,8 +27827,8 @@
         "type": "other",
         "other": {
           "name": "supermin",
-          "version": "5.2.0",
-          "downloadUrl": "http://download.libguestfs.org/supermin/5.2-stable/supermin-5.2.0.tar.gz"
+          "version": "5.2.1",
+          "downloadUrl": "http://download.libguestfs.org/supermin/5.2-stable/supermin-5.2.1.tar.gz"
         }
       }
     },
@@ -27837,8 +27857,8 @@
         "type": "other",
         "other": {
           "name": "swupdate",
-          "version": "2019.11",
-          "downloadUrl": "https://github.com/sbabic/swupdate/archive/2019.11.tar.gz"
+          "version": "2021.04",
+          "downloadUrl": "https://github.com/sbabic/swupdate/archive/2021.04.tar.gz"
         }
       }
     },
@@ -27877,8 +27897,8 @@
         "type": "other",
         "other": {
           "name": "syslog-ng",
-          "version": "3.23.1",
-          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.23.1/syslog-ng-3.23.1.tar.gz"
+          "version": "3.33.2",
+          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.33.2/syslog-ng-3.33.2.tar.gz"
         }
       }
     },
@@ -27937,8 +27957,8 @@
         "type": "other",
         "other": {
           "name": "systemtap",
-          "version": "4.1",
-          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.1.tar.gz"
+          "version": "4.5",
+          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.5.tar.gz"
         }
       }
     },
@@ -28657,8 +28677,8 @@
         "type": "other",
         "other": {
           "name": "unbound",
-          "version": "1.10.0",
-          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.10.0.tar.gz"
+          "version": "1.13.2",
+          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.13.2.tar.gz"
         }
       }
     },

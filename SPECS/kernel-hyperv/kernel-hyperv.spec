@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.10.78.1
-Release:        3%{?dist}
+Version:        5.15.2.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,13 +15,13 @@ Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20210127.pem
-Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         pthread_stack_min_int_cast.patch
-Patch2:         0002-add-linux-syscall-license-info.patch
+Patch0:         0002-add-linux-syscall-license-info.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  diffutils
+BuildRequires:  dwarves
+BuildRequires:  elfutils-libelf-devel
 BuildRequires:  glib-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
@@ -31,7 +31,7 @@ BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
-BuildRequires:  python3
+BuildRequires:  python3-devel
 BuildRequires:  sed
 BuildRequires:  xerces-c-devel
 Requires:       filesystem
@@ -74,14 +74,6 @@ Requires:       python3
 %description docs
 This package contains the Linux kernel doc files
 
-%package oprofile
-Summary:        Kernel driver for oprofile, a statistical profiler for Linux systems
-Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
-
-%description oprofile
-Kernel driver for oprofile, a statistical profiler for Linux systems
-
 %package tools
 Summary:        This package contains the 'perf' performance analysis tools for Linux kernel
 Group:          System/Tools
@@ -94,8 +86,6 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
 make mrproper
@@ -226,9 +216,6 @@ fi
 /sbin/depmod -a %{uname_r}
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
-%post oprofile
-/sbin/depmod -a %{uname_r}
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -244,7 +231,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
-%exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
 
 %files docs
 %defattr(-,root,root)
@@ -255,14 +241,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /lib/modules/%{uname_r}/build
 %{_prefix}/src/linux-headers-%{uname_r}
 
-%files oprofile
-%defattr(-,root,root)
-/lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
-
 %files tools
 %defattr(-,root,root)
 %{_libexecdir}
-%exclude %{_libdir}/debug
 %{_lib64dir}/traceevent
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
@@ -271,8 +252,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_docdir}/*
 %{_libdir}/perf/examples/bpf/*
 %{_libdir}/perf/include/bpf/*
+%{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Jan 06 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-1
+- Update source to 5.15.2.1
+
 * Tue Jan 04 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-3
 - Bump release number to match kernel release
 

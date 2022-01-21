@@ -1,5 +1,5 @@
 filesystem-1.1-8.cm2.aarch64.rpm
-kernel-headers-5.10.78.1-3.cm2.noarch.rpm
+kernel-headers-5.15.2.1-1.cm2.noarch.rpm
 glibc-2.34-2.cm2.aarch64.rpm
 glibc-devel-2.34-2.cm2.aarch64.rpm
 glibc-i18n-2.34-2.cm2.aarch64.rpm
@@ -61,8 +61,8 @@ findutils-4.8.0-1.cm2.aarch64.rpm
 findutils-lang-4.8.0-1.cm2.aarch64.rpm
 gettext-0.21-2.cm2.aarch64.rpm
 gzip-1.11-1.cm2.aarch64.rpm
-make-4.3-1.cm2.aarch64.rpm
-mariner-release-2.0-3.cm2.noarch.rpm
+make-4.3-2.cm2.aarch64.rpm
+mariner-release-2.0-4.cm2.noarch.rpm
 patch-2.7.6-7.cm2.aarch64.rpm
 util-linux-2.37.2-1.cm2.aarch64.rpm
 util-linux-devel-2.37.2-1.cm2.aarch64.rpm

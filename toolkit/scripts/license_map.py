@@ -125,14 +125,18 @@ def process_licenses(json_filename, markdown_filename, file_paths, check, update
 
     if remove_missing:
         remove_missing_specs(updated_license_collection, specs_not_in_files)
+
     sort_licenses(updated_license_collection)
+
+    with open(markdown_filename, 'r') as output_file:
+        old_content = output_file.read()
+    new_content = generate_markdown(updated_license_collection)
 
     if update:
         with (open(json_filename, "w")) as licenses_file:
             json.dump(updated_license_collection, licenses_file, indent=4)
             licenses_file.write("\n")
 
-        new_content = generate_markdown(updated_license_collection)
         with open(markdown_filename, 'w') as output_file:
             output_file.write(new_content)
 
@@ -143,12 +147,16 @@ def process_licenses(json_filename, markdown_filename, file_paths, check, update
                 missing_specs = True
                 break
 
-        if missing_specs or len(specs_unknown_distro):
+        outdated_markdown = old_content != new_content
+        if missing_specs or len(specs_unknown_distro) or outdated_markdown:
             print_specs_error_by_origin("Specs present in the spec files that are not present in the JSON file:", specs_not_in_json)
             print_specs_error_by_origin("Specs present in the JSON file that are not present in the spec files:", specs_not_in_files)
             print_specs_error("Specs from unknown distributions:", specs_unknown_distro)
 
-            print(f"Specs' license information is out of date. Run '{__file__} licenses.json_file_path LICENSES-MAP.md_file_path --update --remove_missing [spec_directory ...]' to regenerate.")
+            if outdated_markdown:
+                print(f"License map '{markdown_filename}' is out of date.")
+
+            print(f"Specs' license information is out of date. Run '{__file__} licenses.json_file_path LICENSES-MAP.md_file_path --no_check --update --remove_missing [spec_directory ...]' to regenerate.")
 
             sys.exit(1)
 
