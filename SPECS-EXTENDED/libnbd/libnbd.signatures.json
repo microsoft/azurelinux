@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "libguestfs.keyring": "de74373a15bd572ad74f276ee063d2cefa915470863829c0dda6af488d6315d8",
-  "libnbd-1.3.6.tar.gz": "0f3cc65bc69d2e7637ed424b6546bd0af32be2bd58c9e6bdf494074cbb07ac05",
-  "libnbd-1.3.6.tar.gz.sig": "c6308755badfa0f750c816330e4a83ac8e6219aab631a35fe0efdb19dc68bb0a"
+  "libnbd-1.3.6.tar.gz": "0f3cc65bc69d2e7637ed424b6546bd0af32be2bd58c9e6bdf494074cbb07ac05"
  }
 }
