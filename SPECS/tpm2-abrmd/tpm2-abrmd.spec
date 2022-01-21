@@ -1,6 +1,6 @@
 Summary:    TPM2 Access Broker & Resource Management Daemon implementing the TCG spec
 Name:       tpm2-abrmd
-Version:    2.3.3
+Version:    2.4.0
 Release:    1%{?dist}
 License:    BSD 2-Clause
 URL:        https://github.com/tpm2-software/tpm2-abrmd/releases/
@@ -58,6 +58,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man7
 
 %changelog
+* Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-1
+- Update to version 2.4.0
+
 *   Sun Sep 27 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.3.3-1
 -   Update to 2.3.3 to solve incompatibility with tpm2-tss 2.4.0
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.1.1-2
