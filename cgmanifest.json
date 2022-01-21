@@ -15172,6 +15172,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ocaml-gettext",
+          "version": "0.4.2",
+          "downloadUrl": "https://github.com/gildor478/ocaml-gettext/releases/download/v0.4.2/gettext-v0.4.2.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ocaml-integers",
           "version": "0.4.0",
           "downloadUrl": "https://github.com/ocamllabs/ocaml-integers/archive/0.4.0/ocaml-integers-0.4.0.tar.gz"
