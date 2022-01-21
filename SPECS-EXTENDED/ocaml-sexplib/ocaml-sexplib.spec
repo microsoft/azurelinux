@@ -9,8 +9,8 @@ Distribution:   Mariner
 %global srcname sexplib
 
 Name:           ocaml-%{srcname}
-Version:        0.14.0
-Release:        7%{?dist}
+Version:        0.15.0
+Release:        1%{?dist}
 Summary:        Automated S-expression conversion
 
 # The project as a whole is MIT, but code in the src subdirectory is BSD.
