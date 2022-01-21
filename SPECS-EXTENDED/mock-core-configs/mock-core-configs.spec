@@ -92,7 +92,7 @@ fi
 
 %changelog
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 36.4-1
-- Initial CBL-Mariner import from Fedora 33 (license: GPLv2)
+- Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update to 36.4 source
 
 * Fri Oct 29 2021 Pavel Raiskup <praiskup@redhat.com> 36.3-1
