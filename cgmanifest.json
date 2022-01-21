@@ -245,8 +245,8 @@
         "type": "other",
         "other": {
           "name": "ant-antlr",
-          "version": "1.10.9",
-          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.xz"
+          "version": "1.10.11",
+          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },
@@ -275,8 +275,8 @@
         "type": "other",
         "other": {
           "name": "ant-junit",
-          "version": "1.10.9",
-          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.xz"
+          "version": "1.10.11",
+          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },

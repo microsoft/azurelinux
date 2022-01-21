@@ -26,18 +26,15 @@ Distribution:   Mariner
 %bcond_with junit5
 %bcond_without antlr
 Name:           ant-antlr
-Version:        1.10.9
-Release:        3%{?dist}
+Version:        1.10.11
+Release:        1%{?dist}
 Summary:        Antlr Task for ant
-License:        Apache-2.0
+License:        ASL 2.0 AND W3C
 Group:          Development/Tools/Building
 URL:            https://ant.apache.org/
-Source0:        https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.xz
+Source0:        https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz
 Source1:        apache-ant-1.8.ant.conf
 Source10:       ant-bootstrap.pom.in
-Source1000:     pre_checkin.sh
-Source1001:     https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.xz.asc
-Source1002:     ant.keyring
 Patch0:         apache-ant-no-test-jar.patch
 Patch1:         apache-ant-class-path-in-manifest.patch
 Patch2:         apache-ant-bootstrap.patch
@@ -223,21 +220,6 @@ Apache Ant is a Java-based build tool.
 
 This package contains optional apache bcel tasks for Apache Ant.
 
-%package -n ant-apache-log4j
-Summary:        Optional apache log4j tasks for ant
-License:        Apache-2.0
-Group:          Development/Tools/Building
-BuildRequires:  log4j12-mini
-Requires:       log4j12
-%ant_antlr_requires_eq    ant
-Provides:       ant-jakarta-log4j = %{version}
-Obsoletes:      ant-jakarta-log4j < %{version}
-
-%description -n ant-apache-log4j
-Apache Ant is a Java-based build tool.
-
-This package contains optional apache log4j tasks for Apache Ant.
-
 %package -n ant-apache-oro
 Summary:        Optional apache oro tasks for ant
 License:        Apache-2.0
@@ -383,6 +365,11 @@ find -name \*.jar -print -delete
 # clean jar files
 find . -name "*.jar" -print -delete
 
+# Log4jListener is deprecated by upstream: Apache Log4j (1) is not
+# developed any more. Last release is 1.2.17 from 26 May 2012 and
+# contains vulnerability issues.
+rm src/main/org/apache/tools/ant/listener/Log4jListener.java
+
 # failing testcases. TODO see why
 %if %{with antlr} || %{with junit}
 rm  src/tests/junit/org/apache/tools/mail/MailMessageTest.java \
@@ -400,7 +387,7 @@ build-jar-repository -s -p lib/optional junit5 opentest4j
 %endif
 %if %{with antlr}
 # we need to build junit in antlr, but we remove it later
-build-jar-repository -s -p lib/optional xerces-j2 xml-commons-apis-bootstrap antlr-bootstrap bcel javamail/mailapi jdepend junit4 log4j12/log4j-12 oro regexp bsf commons-logging commons-net jsch xalan-j2 xalan-j2-serializer xml-resolver xz-java
+build-jar-repository -s -p lib/optional xerces-j2 xml-commons-apis-bootstrap antlr-bootstrap bcel javamail/mailapi jdepend junit4 oro regexp bsf commons-logging commons-net jsch xalan-j2 xalan-j2-serializer xml-resolver xz-java
 %endif
 
 # Fix file-not-utf8 rpmlint warning
@@ -427,6 +414,9 @@ sh -x ./build.sh --noconfig jars
 
 %endif
 %?strip_all_nondeterminism
+
+# log4j logging is deprecated
+rm -f build/lib/ant-apache-log4j.jar
 
 %install
 # ANT_HOME and subdirs
@@ -578,7 +568,6 @@ echo "xml-resolver ant/ant-apache-resolver" > %{buildroot}%{_sysconfdir}/ant.d/a
 echo "apache-commons-logging ant/ant-commons-logging" > %{buildroot}%{_sysconfdir}/ant.d/commons-logging
 echo "apache-commons-net ant/ant-commons-net" > %{buildroot}%{_sysconfdir}/ant.d/commons-net
 echo "bcel ant/ant-apache-bcel" > %{buildroot}%{_sysconfdir}/ant.d/apache-bcel
-echo "log4j12/log4j-12 ant/ant-apache-log4j" > %{buildroot}%{_sysconfdir}/ant.d/apache-log4j
 echo "oro ant/ant-apache-oro" > %{buildroot}%{_sysconfdir}/ant.d/apache-oro
 echo "regexp ant/ant-apache-regexp" > %{buildroot}%{_sysconfdir}/ant.d/apache-regexp
 echo "xalan-j2 ant/ant-apache-xalan2" > %{buildroot}%{_sysconfdir}/ant.d/apache-xalan2
@@ -699,10 +688,6 @@ popd
 %{ant_home}/lib/ant-apache-bcel.jar
 %config(noreplace) %{_sysconfdir}/ant.d/apache-bcel
 
-%files -n ant-apache-log4j -f .mfiles-ant-apache-log4j
-%{ant_home}/lib/ant-apache-log4j.jar
-%config(noreplace) %{_sysconfdir}/ant.d/apache-log4j
-
 %files -n ant-apache-oro -f .mfiles-ant-apache-oro
 %{ant_home}/lib/ant-apache-oro.jar
 %{ant_home}%{_sysconfdir}/maudit-frames.xsl
@@ -747,6 +732,11 @@ popd
 %endif
 
 %changelog
+* Thu Jan 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.11-1
+- Removing dependency on 'log4j' using Fedora 36 spec for guidance (license: MIT).
+- Updated version to 1.10.11.
+- License verified.
+
 * Thu Dec 09 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.9-3
 - Replace usage of removed %%requires_eq macro
 
