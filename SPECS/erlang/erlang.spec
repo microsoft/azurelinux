@@ -1,8 +1,8 @@
 %define  debug_package %{nil}
 Name:         erlang
 Summary:      erlang
-Version:      22.0.7
-Release:      2%{?dist}
+Version:      24.2
+Release:      1%{?dist}
 Group:        Development/Languages
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,7 @@ make
 
 %install
 
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 
 %post
 
@@ -39,6 +39,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %exclude %{_libdir}/debug
 
 %changelog
+* Wed Jan 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 24.2-1
+- Update source to 24.2
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 22.0.7-2
 - Added %%license line automatically
 
