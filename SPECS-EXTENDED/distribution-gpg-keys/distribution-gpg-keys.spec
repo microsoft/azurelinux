@@ -3,7 +3,7 @@ Version:	1.60
 Release:	2%{?dist}
 Summary:	GPG keys of various Linux distributions
 
-License:	MIT
+License:	CC0
 URL:		https://github.com/xsuchy/distribution-gpg-keys
 # Sources can be obtained by
 # git clone git://github.com/xsuchy/distribution-gpg-keys.git
@@ -48,6 +48,7 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 %changelog
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 1.60-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
 
 * Thu Nov 04 2021 Miroslav Suchý <msuchy@redhat.com> 1.60-1
 - update copr keys

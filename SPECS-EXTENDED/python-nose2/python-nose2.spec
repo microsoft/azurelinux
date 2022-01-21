@@ -79,6 +79,7 @@ PYTHONPATH=`pwd` %{__python3} -m nose2.__main__ -v
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 0.9.1-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update source to 0.10.0
+- License verified
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

@@ -53,6 +53,7 @@ version="%version" python3 setup.py install -O1 --skip-build --root %{buildroot}
 %changelog
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 1.1-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
+- License verified
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

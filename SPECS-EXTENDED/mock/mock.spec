@@ -206,6 +206,7 @@ exit 0
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 2.16-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update to 2.16 source
+- License verified
 
 * Thu Nov 18 2021 Pavel Raiskup <praiskup@redhat.com> 2.15-1
 - argparse: handle old-style commands *before* ignoring "--" (awilliam@redhat.com)

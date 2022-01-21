@@ -94,6 +94,7 @@ fi
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 36.4-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update to 36.4 source
+- License verified
 
 * Fri Oct 29 2021 Pavel Raiskup <praiskup@redhat.com> 36.3-1
 - add EuroLinux 8 aarch64 (alex@euro-linux.com)

@@ -414,6 +414,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 * Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 4.0.24-1
 - Upgrade to undeprecated python3-nose2
 - Update source to 4.0.24
+- License verified
 
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 4.0.18-5
 - Only require python3-nose when building tests
