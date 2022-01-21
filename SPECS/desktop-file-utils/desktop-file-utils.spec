@@ -9,6 +9,7 @@ URL:            https://www.freedesktop.org/software/desktop-file-utils
 Source0:        https://www.freedesktop.org/software/desktop-file-utils/releases/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
+BuildRequires:  meson
 
 %description
 .desktop files are used to describe an application for inclusion in
@@ -22,11 +23,11 @@ fixing it up in the process.
 %autosetup -p1
 
 %build
-%configure
-%make_build
+%meson
+%meson_build
 
 %install
-%make_install INSTALL="install -p"
+%meson_install
 
 # We don't support the 'emacs' bits.
 rm %{buildroot}%{_datadir}/emacs/site-lisp/desktop-entry-mode.el
@@ -41,10 +42,7 @@ update-desktop-database &> /dev/null || :
 %doc AUTHORS README NEWS
 %license COPYING
 %{_bindir}/*
-%{_mandir}/man1/desktop-file-install.1.gz
-%{_mandir}/man1/desktop-file-validate.1.gz
-%{_mandir}/man1/update-desktop-database.1.gz
-%{_mandir}/man1/desktop-file-edit.1.gz
+%{_mandir}/*
 
 %changelog
 * Thu Jan 20 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.26-1
