@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/parted/
 Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         0001-freelocale-bug-fix.patch
 Conflicts:      toybox
 Provides:       %{name}-devel = %{version}-%{release}
 
@@ -19,6 +20,7 @@ command-line frontend, parted, which can also be used in scripts.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 #Add a header to allow building with glibc-2.28 or later
@@ -52,6 +54,7 @@ rm -rf %{buildroot}%{_infodir}/dir
 %changelog
 * Tue Dec 21 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.4-1
 - Upgrading to 3.4
+- Adding 0001-freelocale-bug-fix.patch.
 - License verified.
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-12
