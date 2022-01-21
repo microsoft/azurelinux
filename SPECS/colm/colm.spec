@@ -8,7 +8,7 @@ Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.colm.net/open-source/colm/
-Source0:        https://github.com/adrian-thurston/colm/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/adrian-thurston/colm/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  asciidoc
 BuildRequires:  autoconf

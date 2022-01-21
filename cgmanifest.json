@@ -2028,7 +2028,7 @@
         "other": {
           "name": "colm",
           "version": "0.14.7",
-          "downloadUrl": "https://github.com/adrian-thurston/colm/archive/refs/tags/0.13.0.7.tar.gz"
+          "downloadUrl": "https://github.com/adrian-thurston/colm/archive/0.14.7.tar.gz"
         }
       }
     },
@@ -2218,7 +2218,7 @@
         "other": {
           "name": "cpprest",
           "version": "2.10.18",
-          "downloadUrl": "https://github.com/microsoft/cpprestsdk/archive/refs/tag/2.10.18.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/cpprestsdk/archive/2.10.18.tar.gz"
         }
       }
     },
