@@ -90,6 +90,7 @@ fi
 %changelog
 *   Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.6-1
 -   Update to version 2.4.6
+-   Verified license
 
 *   Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.0-2
 -   Remove libtool archive files from final packaging

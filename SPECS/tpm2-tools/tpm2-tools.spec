@@ -2,7 +2,7 @@ Summary:        The source repository for the TPM (Trusted Platform Module) 2 to
 Name:           tpm2-tools
 Version:        4.3.2
 Release:        1%{?dist}
-License:        BSD 3-Clause
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
@@ -42,6 +42,7 @@ make DESTDIR=%{buildroot} install
 %changelog
 *   Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.3.2-1
 -   Update to 4.3.2.
+-   Verified license
 
 *   Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2-2
 -   CVE-2021-3565 fix
