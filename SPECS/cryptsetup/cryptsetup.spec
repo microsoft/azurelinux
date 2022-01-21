@@ -19,7 +19,7 @@ BuildRequires:  libblkid-devel
 BuildRequires:  libpwquality-devel
 BuildRequires:  libtool
 BuildRequires:  openssl-devel
-BuildRequires:  pkg-config
+BuildRequires:  pkgconfig
 BuildRequires:  popt-devel
 BuildRequires:  util-linux
 Requires:       cryptsetup-libs = %{version}-%{release}
@@ -36,7 +36,7 @@ disk encryption using dm-crypt kernel module.
 Summary:        Headers and libraries for using encrypted file systems
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       pkg-config
+Requires:       pkgconfig
 Provides:       cryptsetup-luks-devel = %{version}-%{release}
 
 %description devel
