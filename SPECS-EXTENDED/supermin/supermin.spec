@@ -17,9 +17,6 @@ Distribution:   Mariner
 # https://github.com/libguestfs/supermin/commit/9bb57e1a8d0f3b57eb09f65dd574f702b67e1c2f
 %bcond_without dietlibc
 
-# Whether we should verify tarball signature with GPGv2.
-%global verify_tarball_signature %{nil}
-
 # The source directory.
 %global source_directory 5.2-stable
 
@@ -31,8 +28,6 @@ License:       GPLv2+
 URL:           https://github.com/libguestfs/supermin
 Source0:       https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
 Source1:       https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz.sig
-# Keyring used to verify tarball signature.
-Source2:       libguestfs.keyring
 Patch0:        %{name}-mariner.patch
 
 BuildRequires: /usr/bin/pod2man
@@ -50,9 +45,6 @@ BuildRequires: dietlibc-devel
 BuildRequires: glibc-static
 %endif
 BuildRequires: ocaml, ocaml-findlib-devel
-%if 0%{verify_tarball_signature}
-BuildRequires: gnupg2
-%endif
 
 # These are required only to run the tests.  We could patch out the
 # tests to not require these packages.
@@ -105,10 +97,6 @@ from supermin appliances.
 
 
 %prep
-%if 0%{verify_tarball_signature}
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%endif
-
 %autosetup -p1
 
 %build
@@ -127,6 +115,11 @@ mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/
 install -m 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/
 install -m 0755 %{SOURCE4} $RPM_BUILD_ROOT%{_rpmconfigdir}/
 
+%check
+make check || {
+    cat tests/test-suite.log
+    exit 1
+}
 
 %files
 %license COPYING
@@ -134,11 +127,9 @@ install -m 0755 %{SOURCE4} $RPM_BUILD_ROOT%{_rpmconfigdir}/
 %{_bindir}/supermin
 %{_mandir}/man1/supermin.1*
 
-
 %files devel
 %{_rpmconfigdir}/fileattrs/supermin.attr
 %{_rpmconfigdir}/supermin-find-requires
-
 
 %changelog
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 5.2.1-1
