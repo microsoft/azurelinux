@@ -783,7 +783,7 @@ sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
 
 
 %build
-# "--with-distro=REDHAT" is used to indicated Mariner is "Fedora-like" in package naming
+# "--with-distro=REDHAT" is used to indicate Mariner is "Fedora-like" in package naming
 %{configure} \
   PYTHON=%{__python3} \
   --with-distro=REDHAT \
