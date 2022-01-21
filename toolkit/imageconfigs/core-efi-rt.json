@@ -47,7 +47,8 @@
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json"
+                "packagelists/cloud-init-packages.json",
+                "packagelists/rt-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel-rt"

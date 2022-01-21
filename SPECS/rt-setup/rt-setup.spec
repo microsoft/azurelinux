@@ -1,7 +1,7 @@
 Summary:       Setup RHEL-RT environment details
 Name:          rt-setup
 Version:       2.1
-Release:       3%{?dist}
+Release:       4%{?dist}
 License:       GPL+
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -91,11 +91,14 @@ rm -rf %{buildroot}
 %attr(0755, root, root) %{_bindir}/slub_cpu_partial_off
 %attr(0755, root, root) %{_sbindir}/rt-entsk
 %attr(0755, root, root) %{_sbindir}/kernel-is-rt
-%attr(0644, root, root) /usr/%{_unitdir}/rt-setup.service
+%attr(0644, root, root) %{_unitdir}/rt-setup.service
 %attr(0755, root, root) %{_bindir}/rt-setup
-%attr(0644, root, root) /usr/%{_unitdir}/rt-entsk.service
+%attr(0644, root, root) %{_unitdir}/rt-entsk.service
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 2.1-4
+- Initial import into CBL Mariner (License: GPL+)
+
 * Tue Mar 16 2021 Hernan Gatta <hegatta@microsoft.com> 2.1-3
 - Initial import into ECF Mariner (License: GPL+)
 - Removed dependency on annobin

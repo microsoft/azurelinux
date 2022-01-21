@@ -3,7 +3,7 @@
 Summary:       Programs that test various rt-features
 Name:          rt-tests
 Version:       1.8
-Release:       12%{?dist}
+Release:       15%{?dist}
 License:       GPLv2
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -68,7 +68,6 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %license COPYING
-%{python3_sitelib}/hwlatdetect.py*
 %caps(cap_sys_rawio+ep) /usr/bin/cyclictest
 /usr/bin/pi_stress
 /usr/bin/signaltest
@@ -88,7 +87,8 @@ rm -rf %{buildroot}
 /usr/bin/determine_maximum_mpps.sh
 /usr/bin/get_cpuinfo_mhz.sh
 /usr/bin/get_cyclictest_snapshot
-%{python3_sitelib}/get_cyclictest_snapshot.py*
+%{python3_sitelib}/__pycache__/*
+%{python3_sitelib}/*
 %doc
 /usr/share/man/man8/cyclictest.8.gz
 /usr/share/man/man8/hackbench.8.gz
@@ -109,14 +109,17 @@ rm -rf %{buildroot}
 /usr/share/man/man8/get_cyclictest_snapshot.8.gz
 
 %changelog
-* Wed Mar 17 2021 Hernan Gatta <hegatta@microsoft.com> 1.8.12
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-14
+- Initial import into CBL Mariner (License: GPL+)
+
+* Wed Mar 17 2021 Hernan Gatta <hegatta@microsoft.com> 1.8-12
 - Initial import into ECF Mariner (License: GPLv2)
 
-* Thu Aug 20 2020 John Kacur <jkacur@redhat.com> - 1.8.11
+* Thu Aug 20 2020 John Kacur <jkacur@redhat.com> - 1.8-11
 - Add SPDX license to oslat, and reformat source code to match suite
 Resolves: rhbz#1870666
 
-* Wed Aug 19 2020 John Kacur <jkacur@redhat.com> - 1.8.10
+* Wed Aug 19 2020 John Kacur <jkacur@redhat.com> - 1.8-10
 - Remove undated Obsoletes from the specfile
 Resolves: rhbz#1870212
 

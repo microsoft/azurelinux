@@ -1,6 +1,3 @@
-
-%define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-
 #%%global prerelease rc
 #%%global prereleasenum 1
 
@@ -10,7 +7,7 @@
 Summary:      A dynamic adaptive system tuning daemon
 Name:         tuned
 Version:      2.15.0
-Release:      3%{?prerel1}%{?dist}
+Release:      4%{?prerel1}%{?dist}
 License:      GPLv2+
 Vendor:       Microsoft Corporation
 Distribution: Mariner
@@ -38,7 +35,7 @@ Requires: python3-dbus
 Requires: python3-decorator
 Requires: python3-linux-procfs
 Requires: python3-perf
-Requires: python3-pygobject
+Requires: python3-gobject
 Requires: python3-pyudev
 Requires: python3-schedutils
 # Requires: python3-syspurpose
@@ -410,6 +407,9 @@ fi
 %{_mandir}/man7/tuned-profiles-postgresql.7*
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 2.15.0-4
+- Initial import into CBL Mariner (License: GPL+)
+
 * Fri Aug 13 2021 Hernan Gatta <hegatta@microsoft.com> - 2.15.0-3
 - Remove dependency on desktop-file-utils
 

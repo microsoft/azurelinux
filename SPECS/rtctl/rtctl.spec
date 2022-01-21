@@ -1,6 +1,6 @@
 Name:       rtctl
 Version:    1.13
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    Scripts for controlling scheduling priorities of system threads
 Group:      Applications/System
 License:    GPL
@@ -44,6 +44,9 @@ systemctl disable rtctl
 fi
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.13-4
+- Initial import into CBL Mariner (License: GPL+)
+
 * Tue Mar 09 2021 Hernan Gatta <hegatta@microsoft.com> - 1.13-3
 - Initial import into ECF mariner
 
