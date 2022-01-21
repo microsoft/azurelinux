@@ -14973,8 +14973,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-base",
-          "version": "0.14.1",
-          "downloadUrl": "https://github.com/janestreet/base/archive/v0.14.1/base-0.14.1.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/base/archive/v0.15.0/base-0.15.0.tar.gz"
         }
       }
     },
@@ -15172,6 +15172,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ocaml-gettext",
+          "version": "0.4.2",
+          "downloadUrl": "https://github.com/gildor478/ocaml-gettext/releases/download/v0.4.2/gettext-v0.4.2.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ocaml-integers",
           "version": "0.4.0",
           "downloadUrl": "https://github.com/ocamllabs/ocaml-integers/archive/0.4.0/ocaml-integers-0.4.0.tar.gz"
@@ -15233,8 +15243,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-migrate-parsetree",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/archive/v2.1.0/ocaml-migrate-parsetree-2.1.0.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v2.3.0/ocaml-migrate-parsetree-2.3.0.tbz"
         }
       }
     },
@@ -15303,8 +15313,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-parsexp",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/parsexp/archive/v0.14.0/parsexp-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/parsexp/archive/v0.15.0/parsexp-0.15.0.tar.gz"
         }
       }
     },
@@ -15323,8 +15333,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ppxlib",
-          "version": "0.22.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/archive/0.22.0/ppxlib-0.22.0.tar.gz"
+          "version": "0.24.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/releases/download/0.24.0/ppxlib-0.24.0.tbz"
         }
       }
     },
@@ -15373,8 +15383,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib/archive/v0.14.0/sexplib-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib/archive/v0.15.0/sexplib-0.15.0.tar.gz"
         }
       }
     },
@@ -15383,8 +15393,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib0",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.14.0/sexplib0-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.15.0/sexplib0-0.15.0.tar.gz"
         }
       }
     },
@@ -15393,8 +15403,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-stdio",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.14.0/stdio-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.15.0/stdio-0.15.0.tar.gz"
         }
       }
     },
@@ -27757,8 +27767,8 @@
         "type": "other",
         "other": {
           "name": "supermin",
-          "version": "5.2.0",
-          "downloadUrl": "http://download.libguestfs.org/supermin/5.2-stable/supermin-5.2.0.tar.gz"
+          "version": "5.2.1",
+          "downloadUrl": "http://download.libguestfs.org/supermin/5.2-stable/supermin-5.2.1.tar.gz"
         }
       }
     },
