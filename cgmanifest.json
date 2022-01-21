@@ -1807,8 +1807,8 @@
         "type": "other",
         "other": {
           "name": "cifs-utils",
-          "version": "6.8",
-          "downloadUrl": "https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-6.8.tar.bz2"
+          "version": "6.14",
+          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-6.14.tar.bz2"
         }
       }
     },
@@ -1847,8 +1847,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.103.2",
-          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.2.tar.gz"
+          "version": "0.104.2",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.104.2.tar.gz"
         }
       }
     },
@@ -2027,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "colm",
-          "version": "0.13.0.7",
-          "downloadUrl": "https://www.colm.net/files/colm/colm-0.13.0.7.tar.gz"
+          "version": "0.14.7",
+          "downloadUrl": "https://github.com/adrian-thurston/colm/archive/0.14.7.tar.gz"
         }
       }
     },
@@ -2217,8 +2217,8 @@
         "type": "other",
         "other": {
           "name": "cpprest",
-          "version": "2.10.14",
-          "downloadUrl": "https://github.com/Microsoft/cpprestsdk/archive/v2.10.14.tar.gz"
+          "version": "2.10.18",
+          "downloadUrl": "https://github.com/microsoft/cpprestsdk/archive/2.10.18.tar.gz"
         }
       }
     },
@@ -2477,8 +2477,8 @@
         "type": "other",
         "other": {
           "name": "dbus-glib",
-          "version": "0.110",
-          "downloadUrl": "http://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-0.110.tar.gz"
+          "version": "0.112",
+          "downloadUrl": "http://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-0.112.tar.gz"
         }
       }
     },
@@ -2588,8 +2588,8 @@
         "type": "other",
         "other": {
           "name": "desktop-file-utils",
-          "version": "0.24",
-          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.24.tar.xz"
+          "version": "0.26",
+          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.26.tar.xz"
         }
       }
     },
@@ -2698,8 +2698,8 @@
         "type": "other",
         "other": {
           "name": "dkms",
-          "version": "2.8.1",
-          "downloadUrl": "https://github.com/dell/dkms/archive/v2.8.1.tar.gz"
+          "version": "3.0.3",
+          "downloadUrl": "https://github.com/dell/dkms/archive/refs/tags/v3.0.3.tar.gz"
         }
       }
     },
