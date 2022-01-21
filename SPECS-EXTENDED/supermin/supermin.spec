@@ -27,7 +27,6 @@ Release:       1%{?dist}
 License:       GPLv2+
 URL:           https://github.com/libguestfs/supermin
 Source0:       https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
-Source1:       https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz.sig
 Patch0:        %{name}-mariner.patch
 
 BuildRequires: /usr/bin/pod2man
