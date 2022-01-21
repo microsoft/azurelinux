@@ -15,12 +15,7 @@ Distribution:   Mariner
 #
 # See also:
 # https://github.com/libguestfs/supermin/commit/9bb57e1a8d0f3b57eb09f65dd574f702b67e1c2f
-
-%ifarch aarch64 %{arm} %{ix86} %{power} s390x x86_64
 %bcond_without dietlibc
-%else
-%bcond_with dietlibc
-%endif
 
 # Whether we should verify tarball signature with GPGv2.
 %global verify_tarball_signature %{nil}
@@ -30,25 +25,15 @@ Distribution:   Mariner
 
 Summary:       Tool for creating supermin appliances
 Name:          supermin
-Version:       5.2.0
-Release:       3%{?dist}
+Version:       5.2.1
+Release:       1%{?dist}
 License:       GPLv2+
-
-%if 0%{?rhel} >= 7
-ExclusiveArch: x86_64
-%endif
-
-ExcludeArch:   %{ix86}
-
-URL:           http://people.redhat.com/~rjones/supermin/
-Source0:       http://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
-Source1:       http://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz.sig
+URL:           https://github.com/libguestfs/supermin
+Source0:       https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
+Source1:       https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz.sig
 # Keyring used to verify tarball signature.
 Source2:       libguestfs.keyring
-
-# Fix: ppc64le: ibmvscsi driver missing from supermin appliance.
-# Upstream patch, fixes RHBZ#1819019
-Patch1:        0001-supermin-Fix-IBM-Virtual-SCSI-driver-name.patch
+Patch0:        %{name}-mariner.patch
 
 BuildRequires: /usr/bin/pod2man
 BuildRequires: /usr/bin/pod2html
@@ -71,14 +56,15 @@ BuildRequires: gnupg2
 
 # These are required only to run the tests.  We could patch out the
 # tests to not require these packages.
+%if %{with_check}
 BuildRequires: augeas hivex kernel tar
+%endif
 
 # For complicated reasons, this is required so that
 # /bin/kernel-install puts the kernel directly into /boot, instead of
-# into a /boot/<machine-id> subdirectory (in Fedora >= 23).  Read the
+# into a /boot/<machine-id> subdirectory.  Read the
 # kernel-install script to understand why.
 BuildRequires: grubby
-# https://bugzilla.redhat.com/show_bug.cgi?id=1331012
 BuildRequires: systemd-udev
 
 Requires:      rpm
@@ -122,9 +108,8 @@ from supermin appliances.
 %if 0%{verify_tarball_signature}
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %endif
-%setup -q
-%autopatch -p1
 
+%autosetup -p1
 
 %build
 %configure --disable-network-tests
@@ -136,26 +121,16 @@ make %{?_smp_mflags}
 
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 
 mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/
 install -m 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/
 install -m 0755 %{SOURCE4} $RPM_BUILD_ROOT%{_rpmconfigdir}/
 
 
-%check
-
-
-
-
-make check || {
-    cat tests/test-suite.log
-    exit 1
-}
-
-
 %files
-%doc COPYING README examples/build-basic-vm.sh
+%license COPYING
+%doc README examples/build-basic-vm.sh
 %{_bindir}/supermin
 %{_mandir}/man1/supermin.1*
 
@@ -166,6 +141,11 @@ make check || {
 
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 5.2.1-1
+- Upgrade to latest upstream stable release
+- Enable full mariner support via patch
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
