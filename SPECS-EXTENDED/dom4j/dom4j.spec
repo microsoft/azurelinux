@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # Copyright (c) 2000-2007, JPackage Project
 # All rights reserved.
 #
@@ -29,26 +27,28 @@ Distribution:   Mariner
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
+Summary:        Open Source XML framework for Java
 Name:           dom4j
 Version:        2.0.3
 Release:        3%{?dist}
-Summary:        Open Source XML framework for Java
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://dom4j.github.io/
-BuildArch:      noarch
-
 Source0:        https://github.com/dom4j/dom4j/archive/version-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://repo1.maven.org/maven2/org/%{name}/%{name}/%{version}/%{name}-%{version}.pom
 
-BuildRequires:  maven-local
-BuildRequires:  mvn(jaxen:jaxen)
-BuildRequires:  mvn(javax.xml.bind:jaxb-api)
+BuildArch:      noarch
 
-# Test deps
+BuildRequires:  maven-local
+BuildRequires:  mvn(javax.xml.bind:jaxb-api)
+BuildRequires:  mvn(jaxen:jaxen)
+
+%if %{with_check}
 BuildRequires:  mvn(org.testng:testng)
-BuildRequires:  mvn(xerces:xercesImpl)
 BuildRequires:  mvn(xalan:xalan)
+BuildRequires:  mvn(xerces:xercesImpl)
+%endif
 
 %description
 dom4j is an Open Source XML framework for Java. dom4j allows you to read,
@@ -61,20 +61,21 @@ Summary:        Javadoc for %{name}
 %description javadoc
 Javadoc for %{name}.
 
-
 %prep
 %autosetup -p1 -n %{name}-version-%{version}
 
-%mvn_alias org.%{name}:%{name} %{name}:%{name}
-%mvn_file : %{name}/%{name} %{name}
+%{mvn_alias} org.%{name}:%{name} %{name}:%{name}
+%{mvn_file} : %{name}/%{name} %{name}
 
 cp %{SOURCE1} pom.xml
 sed -i 's/runtime/compile/' pom.xml
 
+%if %{with_check}
 # test deps missing from pom
 %pom_add_dep xalan:xalan::test
 %pom_add_dep org.testng:testng:6.8.21:test
 %pom_add_dep xerces:xercesImpl::test
+%endif
 
 # Remove support for code which depends on ancient / deprecated classes
 # xpp2 (deprecated and not developed since 2003)
@@ -96,14 +97,17 @@ rm src/test/java/org/dom4j/io/XPP3ReaderTest.java
 rm src/test/java/org/dom4j/ThreadingTest.java
 rm src/test/java/org/dom4j/util/PerThreadSingletonTest.java
 
-
 %build
-%mvn_build -- -Dproject.build.sourceEncoding=UTF-8 -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
-
+%mvn_build -- \
+  -Dproject.build.sourceEncoding=UTF-8 \
+%if !%{with_check}
+  -Dmaven.test.skip=true
+%endif
+  -Dmaven.compiler.source=1.8 \
+  -Dmaven.compiler.target=1.8
 
 %install
 %mvn_install
-
 
 %files -f .mfiles
 %license LICENSE
@@ -111,7 +115,6 @@ rm src/test/java/org/dom4j/util/PerThreadSingletonTest.java
 
 %files javadoc -f .mfiles-javadoc
 %license LICENSE
-
 
 %changelog
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.3-3

@@ -2927,6 +2927,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dom4j",
+          "version": "2.0.3",
+          "downloadUrl": "https://github.com/dom4j/dom4j/archive/version-2.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dos2unix",
           "version": "7.4.1",
           "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1.tar.gz"
