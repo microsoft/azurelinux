@@ -16723,6 +16723,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Compress-Raw-Lzma",
+          "version": "2.101",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Lzma-2.101.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Config-AutoConf",
           "version": "0.318",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/Config-AutoConf-0.318.tar.gz"
@@ -17423,6 +17433,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Encode-IMAPUTF7",
+          "version": "1.05",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PM/PMAKHOLM/Encode-IMAPUTF7-1.05.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Encode-Locale",
           "version": "1.05",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GA/GAAS/Encode-Locale-1.05.tar.gz"
@@ -18113,6 +18133,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-IO-Compress-Lzma",
+          "version": "2.101",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Compress-Lzma-2.101.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-IO-HTML",
           "version": "1.001",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/C/CJ/CJM/IO-HTML-1.001.tar.gz"
@@ -18236,6 +18266,16 @@
           "name": "perl-JSON-Any",
           "version": "1.39",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-1.39.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-JSON-Color",
+          "version": "0.133",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-0.133.tar.gz"
         }
       }
     },
@@ -20923,6 +20963,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-XXX",
+          "version": "0.38",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/XXX-0.38.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-YAML",
           "version": "1.26",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-1.26.tar.gz"
@@ -20936,6 +20986,16 @@
           "name": "perl-YAML-LibYAML",
           "version": "0.81",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/YAML/YAML-LibYAML-0.81.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-YAML-PP",
+          "version": "0.031",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-PP-0.031.tar.gz"
         }
       }
     },

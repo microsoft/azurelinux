@@ -1,16 +1,16 @@
 Summary:        Wrapper Class for the various JSON classes
 Name:           perl-JSON-Any
 Version:        1.39
-Release:        8%{?dist}
-License:        Perl Artistic License 2.0
+Release:        9%{?dist}
+License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
 Source:         http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-%{version}.tar.gz
-%define sha1 JSON-Any=2c7e404fc4a398359693d62e9c74994f9273dd4c
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Requires:       perl(Carp)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -45,6 +45,10 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.39-9
+- Adding 'BuildRequires: perl-generators'.
+- License verified.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.39-8
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.39-7: Adding 'local::lib' perl5 library to fix test dependencies.

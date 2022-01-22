@@ -5,7 +5,7 @@
 
 Name:           perl-Module-Install-ReadmeFromPod
 Version:        0.30
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        Module::Install extension to automatically convert POD to a README
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -22,8 +22,10 @@ BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Config)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::AutoLicense)
 BuildRequires:  perl(Module::Install::AuthorRequires) >= 0.02
 BuildRequires:  perl(Module::Install::GithubMeta)
@@ -107,6 +109,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.30-13
+- License verified.
+
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.30-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Explicitly turn off perl_Module_Install_ReadmeFromPod_enables_pdf.

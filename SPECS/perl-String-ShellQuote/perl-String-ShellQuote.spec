@@ -1,6 +1,6 @@
 Name:           perl-String-ShellQuote
 Version:        1.04
-Release:        30%{?dist}
+Release:        31%{?dist}
 Summary:        Perl module for quoting strings for passing through the shell
 License:        (GPL+ OR Artistic) and GPLv2+
 Group:          Development/Libraries
@@ -11,6 +11,7 @@ Source0:        https://cpan.metacpan.org/authors/id/R/RO/ROSCH/String-ShellQuot
 BuildArch:      noarch
 # Build
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Runtime
 BuildRequires:  perl(Carp)
@@ -50,6 +51,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.04-31
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.04-30
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
