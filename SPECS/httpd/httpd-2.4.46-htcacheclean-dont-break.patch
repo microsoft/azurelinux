@@ -1,0 +1,13 @@
+diff --git a/support/htcacheclean.c b/support/htcacheclean.c
+index 958ba6d..0a7fe3c 100644
+--- a/support/htcacheclean.c
++++ b/support/htcacheclean.c
+@@ -557,8 +557,6 @@ static int list_urls(char *path, apr_pool_t *pool, apr_off_t round)
+                                         }
+                                     }
+                                 }
+-
+-                                break;
+                             }
+                         }
+                     }

@@ -1,0 +1,45 @@
+diff --git a/Makefile.in b/Makefile.in
+index 0b088ac..9eeb5c7 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -4,7 +4,7 @@ CLEAN_SUBDIRS = test
+ 
+ PROGRAM_NAME         = $(progname)
+ PROGRAM_SOURCES      = modules.c
+-PROGRAM_LDADD        = buildmark.o $(HTTPD_LDFLAGS) $(PROGRAM_DEPENDENCIES) $(PCRE_LIBS) $(EXTRA_LIBS) $(AP_LIBS) $(LIBS)
++PROGRAM_LDADD        = buildmark.o $(HTTPD_LDFLAGS) $(PROGRAM_DEPENDENCIES) $(HTTPD_LIBS) $(EXTRA_LIBS) $(AP_LIBS) $(LIBS)
+ PROGRAM_PRELINK      = $(COMPILE) -c $(top_srcdir)/server/buildmark.c
+ PROGRAM_DEPENDENCIES = \
+   server/libmain.la \
+diff --git a/acinclude.m4 b/acinclude.m4
+index 2a7e5d1..eb28321 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -624,6 +624,7 @@ case $host in
+       if test "${ac_cv_header_systemd_sd_daemon_h}" = "no" || test -z "${SYSTEMD_LIBS}"; then
+         AC_MSG_WARN([Your system does not support systemd.])
+       else
++        APR_ADDTO(HTTPD_LIBS, [$SYSTEMD_LIBS])
+         AC_DEFINE(HAVE_SYSTEMD, 1, [Define if systemd is supported])
+       fi
+    fi
+diff --git a/configure.in b/configure.in
+index 3618a5a..74a782b 100644
+--- a/configure.in
++++ b/configure.in
+@@ -234,6 +234,7 @@ if test "$PCRE_CONFIG" != "false"; then
+   AC_MSG_NOTICE([Using external PCRE library from $PCRE_CONFIG])
+   APR_ADDTO(PCRE_INCLUDES, [`$PCRE_CONFIG --cflags`])
+   APR_ADDTO(PCRE_LIBS, [`$PCRE_CONFIG --libs`])
++  APR_ADDTO(HTTPD_LIBS, [\$(PCRE_LIBS)])
+ else
+   AC_MSG_ERROR([pcre-config for libpcre not found. PCRE is required and available from http://pcre.org/])
+ fi
+@@ -710,6 +711,7 @@ APACHE_SUBST(OS_DIR)
+ APACHE_SUBST(BUILTIN_LIBS)
+ APACHE_SUBST(SHLIBPATH_VAR)
+ APACHE_SUBST(OS_SPECIFIC_VARS)
++APACHE_SUBST(HTTPD_LIBS)
+ 
+ PRE_SHARED_CMDS='echo ""'
+ POST_SHARED_CMDS='echo ""'

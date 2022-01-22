@@ -1,0 +1,60 @@
+diff --git a/configure.in b/configure.in
+index c8f9aa2..cb43246 100644
+--- a/configure.in
++++ b/configure.in
+@@ -484,6 +484,11 @@ getloadavg
+ dnl confirm that a void pointer is large enough to store a long integer
+ APACHE_CHECK_VOID_PTR_LEN
+ 
++AC_CHECK_LIB(selinux, is_selinux_enabled, [
++   AC_DEFINE(HAVE_SELINUX, 1, [Defined if SELinux is supported])
++   APR_ADDTO(HTTPD_LIBS, [-lselinux])
++])
++
+ AC_CACHE_CHECK([for gettid()], ac_cv_gettid,
+ [AC_TRY_RUN(#define _GNU_SOURCE
+ #include <unistd.h>
+diff --git a/server/core.c b/server/core.c
+index dc0f17a..7ed9527 100644
+--- a/server/core.c
++++ b/server/core.c
+@@ -59,6 +59,10 @@
+ #include <unistd.h>
+ #endif
+ 
++#ifdef HAVE_SELINUX
++#include <selinux/selinux.h>
++#endif
++
+ /* LimitRequestBody handling */
+ #define AP_LIMIT_REQ_BODY_UNSET         ((apr_off_t) -1)
+ #define AP_DEFAULT_LIMIT_REQ_BODY       ((apr_off_t) 0)
+@@ -5015,6 +5019,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+     }
+ #endif
+ 
++#ifdef HAVE_SELINUX
++    {
++        static int already_warned = 0;
++        int is_enabled = is_selinux_enabled() > 0;
++        
++        if (is_enabled && !already_warned) {
++            security_context_t con;
++            
++            if (getcon(&con) == 0) {
++                
++                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
++                             "SELinux policy enabled; "
++                             "httpd running as context %s", con);
++                
++                already_warned = 1;
++                
++                freecon(con);
++            }
++        }
++    }
++#endif
++
+     return OK;
+ }
+ 

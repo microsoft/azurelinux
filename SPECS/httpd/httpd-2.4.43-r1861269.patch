@@ -1,0 +1,20 @@
+diff --git a/modules/ssl/ssl_engine_config.c b/modules/ssl/ssl_engine_config.c
+index b53f3f8..979489c 100644
+--- a/modules/ssl/ssl_engine_config.c
++++ b/modules/ssl/ssl_engine_config.c
+@@ -812,8 +812,14 @@ const char *ssl_cmd_SSLCipherSuite(cmd_parms *cmd,
+ static const char *ssl_cmd_check_file(cmd_parms *parms,
+                                       const char **file)
+ {
+-    const char *filepath = ap_server_root_relative(parms->pool, *file);
++    const char *filepath;
+ 
++    /* If only dumping the config, don't verify the paths */
++    if (ap_state_query(AP_SQ_RUN_MODE) == AP_SQ_RM_CONFIG_DUMP) {
++        return NULL;
++    }
++
++    filepath = ap_server_root_relative(parms->pool, *file);
+     if (!filepath) {
+         return apr_pstrcat(parms->pool, parms->cmd->name,
+                            ": Invalid file path ", *file, NULL);

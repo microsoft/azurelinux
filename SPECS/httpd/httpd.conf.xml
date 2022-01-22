@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+<!--
+ Copyright 2018 Red Hat, Inc.
+
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<refentry>
+  <refentryinfo>
+    <title>httpd.conf</title>
+    <productname>httpd</productname>
+    <author><contrib>Author</contrib><surname>Orton</surname><firstname>Joe</firstname><email>jorton@redhat.com</email></author>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>httpd.conf</refentrytitle>
+    <manvolnum>5</manvolnum>
+  </refmeta>
+  
+  <refnamediv>
+    <refname>httpd.conf</refname>
+    <refpurpose>Configuration files for httpd</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <para>
+      <filename>/etc/httpd/conf/httpd.conf</filename>, 
+      <filename>/etc/httpd/conf.modules.d</filename>,
+      <filename>/etc/httpd/conf.d</filename>
+    </para>
+  </refsynopsisdiv>
+  
+  <refsect1>
+    <title>Description</title>
+
+    <para>The main configuration file for the <command>httpd</command> daemon is
+    <filename>/etc/httpd/conf/httpd.conf</filename>.  The syntax of
+    this file is described at <ulink
+    url="https://httpd.apache.org/docs/2.4/configuring.html"/>, and
+    the full set of available directives is listed at <ulink
+    url="https://httpd.apache.org/docs/2.4/mod/directives.html"/>.
+    </para>
+
+    <refsect2>
+      <title>Configuration structure</title>
+
+      <para>The main configuration file
+      (<filename>httpd.conf</filename>) sets up various defaults and
+      includes configuration files from two directories -
+      <filename>/etc/httpd/conf.modules.d</filename> and
+      <filename>/etc/httpd/conf.d</filename>.  Packages containing
+      loadable modules (like <option>mod_ssl.so</option>) place files
+      in the <filename>conf.modules.d</filename> directory with the
+      appropriate <option>LoadModule</option> directive so that module
+      is loaded by default.</para>
+
+      <para>Some notable configured defaults are:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term><option>DocumentRoot @DOCROOT@/html</option></term>
+          <listitem><para>The default document root from which content
+          is served.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>Listen 80</option></term>
+          <listitem><para>The daemon listens on TCP port 80.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>ErrorLog "logs/error_log"</option></term>
+          <listitem><para>Error messages are logged to
+          <filename>@LOGDIR@/error_log</filename>.</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>ScriptAlias /cgi-bin/ "@DOCROOT@/cgi-bin/"</option></term>
+          <listitem><para>CGI scripts are served via the URL-path <option>/cgi-bin/</option>.</para></listitem>
+        </varlistentry>
+        
+      </variablelist>
+
+      <para>To remove any of the default configuration provided in
+      separate files covered below, replace that file with an empty
+      file rather than removing it from the filesystem, otherwise it
+      may be restored to the original when the package which provides
+      it is upgraded.</para>
+      
+    </refsect2>
+
+    <refsect2>
+      <title>MPM configuration</title>
+
+      <para>The configuration file at
+      <filename>/etc/httpd/conf.modules.d/00-mpm.conf</filename> is
+      used to select the multi-processing module (MPM), which governs
+      how <command>httpd</command> divides work between processes
+      and/or threads at run-time.  Exactly one
+      <option>LoadModule</option> directive must be uncommented in
+      this file; by default the <option>@MPM@</option> MPM is enabled.
+      For more information on MPMs, see <ulink
+      url="https://httpd.apache.org/docs/2.4/mpm.html"/>.</para>
+
+      <para>If using the <emphasis>prefork</emphasis> MPM, the
+      "httpd_graceful_shutdown" SELinux boolean should also be
+      enabled, since with this MPM, httpd needs to establish TCP
+      connections to local ports to successfully complete a graceful
+      restart or shutdown. This boolean can be enabled by running the
+      command: <command>semanage boolean -m --on
+      httpd_graceful_shutdown</command></para>
+    </refsect2>
+    
+    <refsect2>
+      <title>Module configuration files</title>
+      
+      <para>Module configuration files are provided in the
+      <filename>/etc/httpd/conf.modules.d/</filename> directory.
+      Filenames in this directory are by convention prefixed with two
+      digit numeric prefix to ensure they are processed in the desired
+      order.  Core modules provided with the <command>httpd</command>
+      package are loaded by files with a <option>0x-</option> prefix
+      to ensure these load first.  Only filenames with a
+      <option>.conf</option> suffix in this directory will be
+      processed.</para>
+
+      <para>Other provided configuration files are listed below.
+      
+      <variablelist>
+        <varlistentry>
+          <term><filename>/etc/httpd/conf.modules.d/00-base.conf</filename></term>
+          <listitem><para>The set of core modules included with
+          <command>httpd</command> which are all loaded by
+          default.</para></listitem>
+        </varlistentry>
+        
+        <varlistentry>
+          <term><filename>/etc/httpd/conf.modules.d/00-optional.conf</filename></term>
+          <listitem><para>The set of non-core modules included with
+          <command>httpd</command> which are <emphasis>not</emphasis>
+          loaded by default.</para></listitem>
+        </varlistentry>
+        
+
+        <varlistentry>
+          <term><filename>/etc/httpd/conf.modules.d/00-systemd.conf</filename></term>
+          <listitem><para>This file loads <option>mod_systemd</option>
+          which is necessary for the correct operation of the
+          <command>httpd.service</command> systemd unit, and should
+          not be removed or disabled.</para></listitem>
+        </varlistentry>
+      </variablelist>
+      </para>
+    </refsect2>
+        
+    <refsect2>
+      <title>Other configuration files</title>
+
+      <para>Default module configuration files and site-specific
+      configuration files are loaded from the
+      <filename>/etc/httpd/conf.d/</filename> directory.  Only files
+      with a <option>.conf</option> suffix will be loaded.  The
+      following files are provided:
+
+      <variablelist>
+        <varlistentry>
+          <term><filename>/etc/httpd/conf.d/userdir.conf</filename></term>
+          <listitem><para>This file gives an example configuration for
+          <option>mod_userdir</option> to map URLs such as
+          <option>http://localhost/~jim/</option> to
+          <filename>/home/jim/public_html/</filename>. Userdir mapping
+          is disabled by default.</para></listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><filename>/etc/httpd/conf.d/autoindex.conf</filename></term>
+          <listitem><para>This file provides the default configuration
+          for <option>mod_autoindex</option> which generates HTML
+          directory listings when enabled.  It also makes file icon
+          image files available at the <option>/icons/</option>
+          URL-path.</para></listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><filename>/etc/httpd/conf.d/welcome.conf</filename></term>
+          <listitem><para>This file enables a "welcome page" at
+          <option>http://localhost/</option> if no content is present
+          in the default documentation root
+          <filename>/var/www/html</filename>.</para></listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><filename>/etc/httpd/conf.d/ssl.conf</filename> (present only if <option>mod_ssl</option> is installed)</term>
+          <listitem><para>This file configures a TLS
+          <option>VirtualHost</option> listening on port
+          <option>443</option>.  If the default configuration is used,
+          the referenced test certificate and private key are
+          generated the first time <command>httpd.service</command> is
+          started; see
+          <citerefentry><refentrytitle>httpd-init.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+          for more information.</para></listitem>
+        </varlistentry>
+        
+      </variablelist></para>
+    </refsect2>
+    
+    <refsect2>
+      <title>Instantiated services</title>
+
+      <para>As an alternative to (or in addition to) the
+      <command>httpd.service</command> unit, the instantiated template
+      service <command>httpd@.service</command> unit file can be used,
+      which starts <command>httpd</command> using a different
+      configuration file to the default. For example,
+      <command>systemctl start httpd@foobar.service</command> will
+      start httpd using the configuration file
+      <filename>/etc/httpd/conf/foobar.conf</filename>.  See <citerefentry><refentrytitle>httpd@.service</refentrytitle><manvolnum>8</manvolnum></citerefentry> for more information.</para>
+    </refsect2>
+      
+  </refsect1>
+  <refsect1>
+    <title>Files</title>
+
+    <para>
+      <filename>/etc/httpd/conf/httpd.conf</filename>, 
+      <filename>/etc/httpd/conf.d</filename>, 
+      <filename>/etc/httpd/conf.modules.d</filename>
+    </para>
+  </refsect1>
+  
+  <refsect1>
+    <title>See also</title>
+
+    <para>
+    <citerefentry><refentrytitle>httpd</refentrytitle><manvolnum>8</manvolnum></citerefentry>, 
+    <citerefentry><refentrytitle>httpd.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <ulink url="https://httpd.apache.org/docs/2.4/configuring.html"/>,
+    <ulink url="https://httpd.apache.org/docs/2.4/mod/directives.html"/>
+    </para>
+  </refsect1>
+
+</refentry>
+
+<!-- LocalWords:  systemd PidFile
+-->

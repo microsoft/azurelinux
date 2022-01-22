@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">[
+
+]>
+<!--
+ Copyright 2020 Red Hat, Inc.
+
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements. See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License. You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<refentry>
+  <refentryinfo>
+    <title>apachectl</title>
+    <productname>httpd</productname>
+    <author><contrib>Apache man page</contrib><othername>Apache Software Foundation contributors</othername></author>
+    <author><contrib>Fedora man page</contrib><surname>Dana</surname><firstname>Frank</firstname></author>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>apachectl</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>apachectl</refname>
+    <refpurpose>Server control interface for httpd</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv id='synopsis'>
+    <cmdsynopsis>
+      <command>apachectl</command>
+      <arg choice='opt'><replaceable>command</replaceable> </arg>
+      <sbr/>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+<!-- body begins here -->
+  <refsect1 id='description'>
+    <title>Description</title>
+
+    <para><command>apachectl</command> is a front end to the Apache HyperText
+    Transfer Protocol (HTTP) server. It is designed to help the
+    administrator control the functioning of the Apache
+    <command>httpd</command> daemon.</para>
+
+    <para>The <command>apachectl</command> script takes one-word arguments like
+    <option>start</option>,
+    <option>restart</option>, and
+    <option>stop</option>, and translates them
+    into appropriate signals to <command>httpd</command>.</para>
+
+    <para>The <command>apachectl</command> script returns a 0 exit value on
+    success, and &gt;0 if an error occurs.</para>
+
+    <refsect2 id="compatibility">
+      <title>Compatibility</title>
+
+      <para>The version of <command>apachectl</command> used on this
+      system is a replacement script intended to be mostly (but not
+      completely) compatible with version provided with
+      <emphasis>Apache httpd</emphasis>.  This
+      <command>apachectl</command> mostly acts as a wrapper around
+      <command>systemctl</command> and manipulates the
+      <command>systemd</command> service for <command>httpd</command>.
+      The interface to the <emphasis>Apache</emphasis> version of
+      <command>apachectl</command> is described at <ulink
+      url="https://httpd.apache.org/docs/2.4/programs/apachectl.html"/>.</para>
+
+      <para>The following differences are present in the version of
+      <command>apachectl</command> present on this system:
+
+      <itemizedlist>
+        <listitem><para>Option arguments passed when starting
+        <command>httpd</command> are not allowed.  These should be
+        configured in the systemd service directly (see <citerefentry><refentrytitle>httpd.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>).</para></listitem>
+
+        <listitem><para>The <command>"fullstatus"</command> option is
+        not available.</para></listitem>
+
+        <listitem><para>The <command>"status"</command> option does
+        not use or rely on the running server's
+        <emphasis>server-status</emphasis> output.</para></listitem>
+      </itemizedlist>
+
+      </para>
+    </refsect2>
+  </refsect1>
+
+  <refsect1 id='options'>
+    <title>Options</title>
+    <variablelist remap='TP'>
+      <varlistentry>
+        <term><option>start</option></term>
+        <listitem>
+          <para>Start the Apache <command>httpd</command> daemon. Gives an error if it
+          is already running. This is equivalent to <command>systemctl start httpd.service</command>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>stop</option></term>
+        <listitem>
+          <para>Stops the Apache <command>httpd</command> daemon. This is equivalent to
+          <command>systemctl stop httpd.service</command>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>restart</option></term>
+        <listitem>
+          <para>Restarts the Apache <command>httpd</command> daemon. If the daemon is
+          not running, it is started. This is equivalent
+          to <command>systemctl restart httpd.service</command>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>status</option></term>
+        <listitem>
+          <para>Displays a brief status report. This is equivalent to <command>systemctl status httpd.service.</command></para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>graceful</option></term>
+        <listitem>
+          <para>Gracefully restarts the Apache <command>httpd</command> daemon. If the
+          daemon is not running, it is started. This differs from a normal
+          restart in that currently open connections are not aborted. A side
+          effect is that old log files will not be closed immediately. This
+          means that if used in a log rotation script, a substantial delay may
+          be necessary to ensure that the old log files are closed before
+          processing them. This is equivalent to
+          <command>systemctl kill --signal=SIGUSR1 --kill-who=main httpd.service</command>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>graceful-stop</option></term>
+        <listitem>
+          <para>Gracefully stops the Apache <command>httpd</command> daemon.
+          This differs from a normal stop in that currently open connections are not
+          aborted. A side effect is that old log files will not be closed immediately.
+          This is equivalent to
+          <command>systemctl kill --signal=SIGWINCH --kill-who=main httpd.service</command>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>configtest</option></term>
+        <listitem>
+          <para>Run a configuration file syntax test. It parses the configuration
+          files and either reports <literal>Syntax OK</literal>
+          or detailed information about the particular syntax error. This is
+          equivalent to <command>httpd -t</command>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 id='bugs'>
+    <title>Bugs</title>
+    <para>Please report bugs by filing an issue in Bugzilla via <ulink url='https://bugzilla.redhat.com/'/>.</para>
+  </refsect1>
+
+    <refsect1>
+    <title>See also</title>
+
+    <para>
+    <citerefentry><refentrytitle>httpd</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>httpd.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemctl</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>httpd.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+    </para>
+  </refsect1>
+
+</refentry>

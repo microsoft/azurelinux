@@ -1,0 +1,16 @@
+diff --git a/configure.in b/configure.in
+index f8f9442..f276550 100644
+--- a/configure.in
++++ b/configure.in
+@@ -786,9 +786,9 @@ APACHE_SUBST(INSTALL_SUEXEC)
+ 
+ dnl APR should go after the other libs, so the right symbols can be picked up
+ if test x${apu_found} != xobsolete; then
+-  AP_LIBS="$AP_LIBS `$apu_config --avoid-ldap --link-libtool --libs`"
++  AP_LIBS="$AP_LIBS `$apu_config --avoid-ldap --link-libtool`"
+ fi
+-AP_LIBS="$AP_LIBS `$apr_config --link-libtool --libs`" 
++AP_LIBS="$AP_LIBS `$apr_config --link-libtool`" 
+ APACHE_SUBST(AP_LIBS)
+ APACHE_SUBST(AP_BUILD_SRCLIB_DIRS)
+ APACHE_SUBST(AP_CLEAN_SRCLIB_DIRS)

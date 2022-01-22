@@ -1,0 +1,58 @@
+diff --git a/support/apxs.in b/support/apxs.in
+index b2705fa..c331631 100644
+--- a/support/apxs.in
++++ b/support/apxs.in
+@@ -35,7 +35,18 @@ if ($ddi >= 0) {
+ 
+ my %config_vars = ();
+ 
+-my $installbuilddir = "@exp_installbuilddir@";
++# Awful hack to make apxs libdir-agnostic:
++my $pkg_config = "/usr/bin/pkg-config";
++if (! -x "$pkg_config") {
++    error("$pkg_config not found!");
++    exit(1);
++}
++
++my $libdir = `pkg-config --variable=libdir apr-1`;
++chomp $libdir;
++
++my $installbuilddir = $libdir . "/httpd/build";
++
+ get_config_vars($destdir . "$installbuilddir/config_vars.mk",\%config_vars);
+ 
+ # read the configuration variables once
+@@ -285,7 +296,7 @@ if ($opt_g) {
+     $data =~ s|%NAME%|$name|sg;
+     $data =~ s|%TARGET%|$CFG_TARGET|sg;
+     $data =~ s|%PREFIX%|$prefix|sg;
+-    $data =~ s|%INSTALLBUILDDIR%|$installbuilddir|sg;
++    $data =~ s|%LIBDIR%|$libdir|sg;
+ 
+     my ($mkf, $mods, $src) = ($data =~ m|^(.+)-=#=-\n(.+)-=#=-\n(.+)|s);
+ 
+@@ -463,11 +474,11 @@ if ($opt_c) {
+     my $ldflags = "$CFG_LDFLAGS";
+     if ($opt_p == 1) {
+         
+-        my $apr_libs=`$apr_config --cflags --ldflags --link-libtool --libs`;
++        my $apr_libs=`$apr_config --cflags --ldflags --link-libtool`;
+         chomp($apr_libs);
+         my $apu_libs="";
+         if ($apr_major_version < 2) {
+-            $apu_libs=`$apu_config --ldflags --link-libtool --libs`;
++            $apu_libs=`$apu_config --ldflags --link-libtool`;
+             chomp($apu_libs);
+         }
+         
+@@ -682,8 +693,8 @@ __DATA__
+ 
+ builddir=.
+ top_srcdir=%PREFIX%
+-top_builddir=%PREFIX%
+-include %INSTALLBUILDDIR%/special.mk
++top_builddir=%LIBDIR%/httpd
++include %LIBDIR%/httpd/build/special.mk
+ 
+ #   the used tools
+ APACHECTL=apachectl

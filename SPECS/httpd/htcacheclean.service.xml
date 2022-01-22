@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+<!--
+ Copyright 2018 Red Hat, Inc.
+
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language overning permissions and
+ limitations under the License.
+-->
+<refentry>
+  <refentryinfo>
+    <title>htcacheclean systemd unit</title>
+    <productname>httpd</productname>
+    <author><contrib>Author</contrib><surname>Orton</surname><firstname>Joe</firstname><email>jorton@redhat.com</email></author>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>htcacheclean.service</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>htcacheclean.service</refname>
+    <refpurpose>htcacheclean unit file for systemd</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <para>
+      <filename>/usr/lib/systemd/system/htcacheclean.service</filename>
+    </para>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+
+    <para>This manual page describes the <command>systemd</command>
+    unit file for the <command>htcacheclean</command> daemon.  This
+    unit file provides a service which runs
+    <command>htcacheclean</command> in daemon mode,
+    periodically cleaning the disk cache root to ensure disk space
+    usage is within configured limits.</para>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+
+    <para>The service is configured by configuration file
+    <filename>/etc/sysconfig/htcacheclean</filename>. The following
+    variables are used, following standard <command>systemd</command>
+    <varname>EnvironmentFile=</varname> syntax:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><varname>INTERVAL=</varname></term>
+
+        <listitem><para>Sets the interval between cache clean runs, in
+        minutes.  By default this is configured as
+        <emphasis>15</emphasis>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><varname>CACHE_ROOT=</varname></term>
+
+        <listitem><para>Sets the directory name used for the cache
+        root.  By default this is configured as
+        <filename>/var/cache/httpd/proxy</filename>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><varname>LIMIT=</varname></term>
+
+        <listitem><para>Sets the total disk cache space limit, in
+        bytes.  Use a <emphasis>K</emphasis> or <emphasis>M</emphasis>
+        suffix to signify kilobytes or megabytes.  By default this is
+        set to <emphasis>100M</emphasis>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><varname>OPTIONS=</varname></term>
+
+        <listitem><para>Any other options to pass to
+        <command>htcacheclean</command>.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>Files</title>
+
+    <para><filename>/usr/lib/systemd/system/htcacheclean.service</filename>,
+    <filename>/etc/sysconfig/htcacheclean</filename></para>
+  </refsect1>
+
+  <refsect1>
+    <title>See also</title>
+
+    <para>
+    <citerefentry><refentrytitle>htcacheclean</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>httpd</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>httpd.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemd.exec</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+    </para>
+  </refsect1>
+
+</refentry>
+
+<!-- LocalWords:  systemd httpd htcacheclean
+-->

@@ -1,0 +1,271 @@
+diff --git a/configure.in b/configure.in
+index cb43246..0bb6b0d 100644
+--- httpd-2.4.43/configure.in.r1861793+
++++ httpd-2.4.43/configure.in
+@@ -465,6 +465,28 @@
+ AC_SEARCH_LIBS(crypt, crypt)
+ CRYPT_LIBS="$LIBS"
+ APACHE_SUBST(CRYPT_LIBS)
++
++if test "$ac_cv_search_crypt" != "no"; then
++   # Test crypt() with the SHA-512 test vector from https://akkadia.org/drepper/SHA-crypt.txt
++   AC_CACHE_CHECK([whether crypt() supports SHA-2], [ap_cv_crypt_sha2], [
++    AC_RUN_IFELSE([AC_LANG_PROGRAM([[
++#include <crypt.h>
++#include <stdlib.h>
++#include <string.h>
++
++#define PASSWD_0 "Hello world!"
++#define SALT_0 "\$6\$saltstring"
++#define EXPECT_0 "\$6\$saltstring\$svn8UoSVapNtMuq1ukKS4tPQd8iKwSMHWjl/O817G3uBnIFNjnQJu" \
++               "esI68u4OTLiBFdcbYEdFCoEOfaS35inz1"
++]], [char *result = crypt(PASSWD_0, SALT_0);
++     if (!result) return 1;
++     if (strcmp(result, EXPECT_0)) return 2;
++])], [ap_cv_crypt_sha2=yes], [ap_cv_crypt_sha2=no])])
++   if test "$ap_cv_crypt_sha2" = yes; then
++     AC_DEFINE([HAVE_CRYPT_SHA2], 1, [Define if crypt() supports SHA-2 hashes])
++   fi
++fi
++
+ LIBS="$saved_LIBS"
+ 
+ dnl See Comment #Spoon
+--- httpd-2.4.43/docs/man/htpasswd.1.r1861793+
++++ httpd-2.4.43/docs/man/htpasswd.1
+@@ -27,16 +27,16 @@
+ .SH "SYNOPSIS"
+  
+ .PP
+-\fB\fBhtpasswd\fR [ -\fBc\fR ] [ -\fBi\fR ] [ -\fBm\fR | -\fBB\fR | -\fBd\fR | -\fBs\fR | -\fBp\fR ] [ -\fBC\fR \fIcost\fR ] [ -\fBD\fR ] [ -\fBv\fR ] \fIpasswdfile\fR \fIusername\fR\fR
++\fB\fBhtpasswd\fR [ -\fBc\fR ] [ -\fBi\fR ] [ -\fBm\fR | -\fBB\fR | -\fB2\fR | -\fB5\fR | -\fBd\fR | -\fBs\fR | -\fBp\fR ] [ -\fBr\fR \fIrounds\fR ] [ -\fBC\fR \fIcost\fR ] [ -\fBD\fR ] [ -\fBv\fR ] \fIpasswdfile\fR \fIusername\fR\fR
+  
+ .PP
+-\fB\fBhtpasswd\fR -\fBb\fR [ -\fBc\fR ] [ -\fBm\fR | -\fBB\fR | -\fBd\fR | -\fBs\fR | -\fBp\fR ] [ -\fBC\fR \fIcost\fR ] [ -\fBD\fR ] [ -\fBv\fR ] \fIpasswdfile\fR \fIusername\fR \fIpassword\fR\fR
++\fB\fBhtpasswd\fR -\fBb\fR [ -\fBc\fR ] [ -\fBm\fR | -\fBB\fR | -\fB2\fR | -\fB5\fR | -\fBd\fR | -\fBs\fR | -\fBp\fR ] [ -\fBr\fR \fIrounds\fR ] [ -\fBC\fR \fIcost\fR ] [ -\fBD\fR ] [ -\fBv\fR ] \fIpasswdfile\fR \fIusername\fR \fIpassword\fR\fR
+  
+ .PP
+-\fB\fBhtpasswd\fR -\fBn\fR [ -\fBi\fR ] [ -\fBm\fR | -\fBB\fR | -\fBd\fR | -\fBs\fR | -\fBp\fR ] [ -\fBC\fR \fIcost\fR ] \fIusername\fR\fR
++\fB\fBhtpasswd\fR -\fBn\fR [ -\fBi\fR ] [ -\fBm\fR | -\fBB\fR | -\fB2\fR | -\fB5\fR | -\fBd\fR | -\fBs\fR | -\fBp\fR ] [ -\fBr\fR \fIrounds\fR ] [ -\fBC\fR \fIcost\fR ] \fIusername\fR\fR
+  
+ .PP
+-\fB\fBhtpasswd\fR -\fBnb\fR [ -\fBm\fR | -\fBB\fR | -\fBd\fR | -\fBs\fR | -\fBp\fR ] [ -\fBC\fR \fIcost\fR ] \fIusername\fR \fIpassword\fR\fR
++\fB\fBhtpasswd\fR -\fBnb\fR [ -\fBm\fR | -\fBB\fR | -\fB2\fR | -\fB5\fR | -\fBd\fR | -\fBs\fR | -\fBp\fR ] [ -\fBr\fR \fIrounds\fR ] [ -\fBC\fR \fIcost\fR ] \fIusername\fR \fIpassword\fR\fR
+  
+ 
+ .SH "SUMMARY"
+@@ -48,7 +48,7 @@
+ Resources available from the Apache HTTP server can be restricted to just the users listed in the files created by \fBhtpasswd\fR\&. This program can only manage usernames and passwords stored in a flat-file\&. It can encrypt and display password information for use in other types of data stores, though\&. To use a DBM database see dbmmanage or htdbm\&.
+  
+ .PP
+-\fBhtpasswd\fR encrypts passwords using either bcrypt, a version of MD5 modified for Apache, SHA1, or the system's \fBcrypt()\fR routine\&. Files managed by \fBhtpasswd\fR may contain a mixture of different encoding types of passwords; some user records may have bcrypt or MD5-encrypted passwords while others in the same file may have passwords encrypted with \fBcrypt()\fR\&.
++\fBhtpasswd\fR encrypts passwords using either bcrypt, a version of MD5 modified for Apache, SHA-1, or the system's \fBcrypt()\fR routine\&. SHA-2-based hashes (SHA-256 and SHA-512) are supported for \fBcrypt()\fR\&. Files managed by \fBhtpasswd\fR may contain a mixture of different encoding types of passwords; some user records may have bcrypt or MD5-encrypted passwords while others in the same file may have passwords encrypted with \fBcrypt()\fR\&.
+  
+ .PP
+ This manual page only lists the command line arguments\&. For details of the directives necessary to configure user authentication in httpd see the Apache manual, which is part of the Apache distribution or can be found at http://httpd\&.apache\&.org/\&.
+@@ -73,17 +73,26 @@
+ \fB-m\fR
+ Use MD5 encryption for passwords\&. This is the default (since version 2\&.2\&.18)\&.  
+ .TP
++\fB-2\fR
++Use SHA-256 \fBcrypt()\fR based hashes for passwords\&. This is supported on most Unix platforms\&.  
++.TP
++\fB-5\fR
++Use SHA-512 \fBcrypt()\fR based hashes for passwords\&. This is supported on most Unix platforms\&.  
++.TP
+ \fB-B\fR
+ Use bcrypt encryption for passwords\&. This is currently considered to be very secure\&.  
+ .TP
+ \fB-C\fR
+ This flag is only allowed in combination with \fB-B\fR (bcrypt encryption)\&. It sets the computing time used for the bcrypt algorithm (higher is more secure but slower, default: 5, valid: 4 to 17)\&.  
+ .TP
++\fB-r\fR
++This flag is only allowed in combination with \fB-2\fR or \fB-5\fR\&. It sets the number of hash rounds used for the SHA-2 algorithms (higher is more secure but slower; the default is 5,000)\&.  
++.TP
+ \fB-d\fR
+ Use \fBcrypt()\fR encryption for passwords\&. This is not supported by the httpd server on Windows and Netware\&. This algorithm limits the password length to 8 characters\&. This algorithm is \fBinsecure\fR by today's standards\&. It used to be the default algorithm until version 2\&.2\&.17\&.  
+ .TP
+ \fB-s\fR
+-Use SHA encryption for passwords\&. Facilitates migration from/to Netscape servers using the LDAP Directory Interchange Format (ldif)\&. This algorithm is \fBinsecure\fR by today's standards\&.  
++Use SHA-1 (160-bit) encryption for passwords\&. Facilitates migration from/to Netscape servers using the LDAP Directory Interchange Format (ldif)\&. This algorithm is \fBinsecure\fR by today's standards\&.  
+ .TP
+ \fB-p\fR
+ Use plaintext passwords\&. Though \fBhtpasswd\fR will support creation on all platforms, the httpd daemon will only accept plain text passwords on Windows and Netware\&.  
+@@ -152,10 +161,13 @@
+ When using the \fBcrypt()\fR algorithm, note that only the first 8 characters of the password are used to form the password\&. If the supplied password is longer, the extra characters will be silently discarded\&.
+  
+ .PP
+-The SHA encryption format does not use salting: for a given password, there is only one encrypted representation\&. The \fBcrypt()\fR and MD5 formats permute the representation by prepending a random salt string, to make dictionary attacks against the passwords more difficult\&.
++The SHA-1 encryption format does not use salting: for a given password, there is only one encrypted representation\&. The \fBcrypt()\fR and MD5 formats permute the representation by prepending a random salt string, to make dictionary attacks against the passwords more difficult\&.
++ 
++.PP
++The SHA-1 and \fBcrypt()\fR formats are insecure by today's standards\&.
+  
+ .PP
+-The SHA and \fBcrypt()\fR formats are insecure by today's standards\&.
++The SHA-2-based \fBcrypt()\fR formats (SHA-256 and SHA-512) are supported on most modern Unix systems, and follow the specification at https://www\&.akkadia\&.org/drepper/SHA-crypt\&.txt\&.
+  
+ .SH "RESTRICTIONS"
+  
+--- httpd-2.4.43/support/htpasswd.c.r1861793+
++++ httpd-2.4.43/support/htpasswd.c
+@@ -109,17 +109,21 @@
+             "for it." NL
+         " -i  Read password from stdin without verification (for script usage)." NL
+         " -m  Force MD5 encryption of the password (default)." NL
+-        " -B  Force bcrypt encryption of the password (very secure)." NL
++        " -2  Force SHA-256 crypt() hash of the password (very secure)." NL
++        " -5  Force SHA-512 crypt() hash of the password (very secure)." NL
++        " -B  Force bcrypt encryption of the password (very secure)." NL
+         " -C  Set the computing time used for the bcrypt algorithm" NL
+         "     (higher is more secure but slower, default: %d, valid: 4 to 17)." NL
++        " -r  Set the number of rounds used for the SHA-256, SHA-512 algorithms" NL
++        "     (higher is more secure but slower, default: 5000)." NL
+         " -d  Force CRYPT encryption of the password (8 chars max, insecure)." NL
+-        " -s  Force SHA encryption of the password (insecure)." NL
++        " -s  Force SHA-1 encryption of the password (insecure)." NL
+         " -p  Do not encrypt the password (plaintext, insecure)." NL
+         " -D  Delete the specified user." NL
+         " -v  Verify password for the specified user." NL
+         "On other systems than Windows and NetWare the '-p' flag will "
+             "probably not work." NL
+-        "The SHA algorithm does not use a salt and is less secure than the "
++        "The SHA-1 algorithm does not use a salt and is less secure than the "
+             "MD5 algorithm." NL,
+         BCRYPT_DEFAULT_COST
+     );
+@@ -178,7 +182,7 @@
+     if (rv != APR_SUCCESS)
+         exit(ERR_SYNTAX);
+ 
+-    while ((rv = apr_getopt(state, "cnmspdBbDiC:v", &opt, &opt_arg)) == APR_SUCCESS) {
++    while ((rv = apr_getopt(state, "cnmspdBbDi25C:r:v", &opt, &opt_arg)) == APR_SUCCESS) {
+         switch (opt) {
+         case 'c':
+             *mask |= APHTP_NEWFILE;
+--- httpd-2.4.43/support/passwd_common.c.r1861793+
++++ httpd-2.4.43/support/passwd_common.c
+@@ -179,16 +179,21 @@
+ int mkhash(struct passwd_ctx *ctx)
+ {
+     char *pw;
+-    char salt[16];
++    char salt[17];
+     apr_status_t rv;
+     int ret = 0;
+ #if CRYPT_ALGO_SUPPORTED
+     char *cbuf;
+ #endif
++#ifdef HAVE_CRYPT_SHA2
++    const char *setting;
++    char method;
++#endif
+ 
+-    if (ctx->cost != 0 && ctx->alg != ALG_BCRYPT) {
++    if (ctx->cost != 0 && ctx->alg != ALG_BCRYPT
++        && ctx->alg != ALG_CRYPT_SHA256 && ctx->alg != ALG_CRYPT_SHA512 ) {
+         apr_file_printf(errfile,
+-                        "Warning: Ignoring -C argument for this algorithm." NL);
++                        "Warning: Ignoring -C/-r argument for this algorithm." NL);
+     }
+ 
+     if (ctx->passwd == NULL) {
+@@ -246,6 +251,34 @@
+         break;
+ #endif /* CRYPT_ALGO_SUPPORTED */
+ 
++#ifdef HAVE_CRYPT_SHA2
++    case ALG_CRYPT_SHA256:
++    case ALG_CRYPT_SHA512:
++        ret = generate_salt(salt, 16, &ctx->errstr, ctx->pool);
++        if (ret != 0)
++            break;
++
++        method = ctx->alg == ALG_CRYPT_SHA256 ? '5': '6';
++
++        if (ctx->cost) 
++            setting = apr_psprintf(ctx->pool, "$%c$rounds=%d$%s",
++                                   method, ctx->cost, salt);
++        else
++            setting = apr_psprintf(ctx->pool, "$%c$%s",
++                                   method, salt);
++
++        cbuf = crypt(pw, setting);
++        if (cbuf == NULL) {
++            rv = APR_FROM_OS_ERROR(errno);
++            ctx->errstr = apr_psprintf(ctx->pool, "crypt() failed: %pm", &rv);
++            ret = ERR_PWMISMATCH;
++            break;
++        }
++
++        apr_cpystrn(ctx->out, cbuf, ctx->out_len - 1);
++        break;
++#endif /* HAVE_CRYPT_SHA2 */
++
+ #if BCRYPT_ALGO_SUPPORTED
+     case ALG_BCRYPT:
+         rv = apr_generate_random_bytes((unsigned char*)salt, 16);
+@@ -294,6 +327,19 @@
+     case 's':
+         ctx->alg = ALG_APSHA;
+         break;
++#ifdef HAVE_CRYPT_SHA2
++    case '2':
++        ctx->alg = ALG_CRYPT_SHA256;
++        break;
++    case '5':
++        ctx->alg = ALG_CRYPT_SHA512;
++        break;
++#else
++    case '2':
++    case '5':
++        ctx->errstr = "SHA-2 crypt() algorithms are not supported on this platform.";
++        return ERR_ALG_NOT_SUPP;
++#endif
+     case 'p':
+         ctx->alg = ALG_PLAIN;
+ #if !PLAIN_ALGO_SUPPORTED
+@@ -324,11 +370,12 @@
+         return ERR_ALG_NOT_SUPP;
+ #endif
+         break;
+-    case 'C': {
++    case 'C':
++    case 'r': {
+             char *endptr;
+             long num = strtol(opt_arg, &endptr, 10);
+             if (*endptr != '\0' || num <= 0) {
+-                ctx->errstr = "argument to -C must be a positive integer";
++                ctx->errstr = "argument to -C/-r must be a positive integer";
+                 return ERR_SYNTAX;
+             }
+             ctx->cost = num;
+--- httpd-2.4.43/support/passwd_common.h.r1861793+
++++ httpd-2.4.43/support/passwd_common.h
+@@ -28,6 +28,8 @@
+ #include "apu_version.h"
+ #endif
+ 
++#include "ap_config_auto.h"
++
+ #define MAX_STRING_LEN 256
+ 
+ #define ALG_PLAIN 0
+@@ -35,6 +37,8 @@
+ #define ALG_APMD5 2
+ #define ALG_APSHA 3
+ #define ALG_BCRYPT 4
++#define ALG_CRYPT_SHA256 5
++#define ALG_CRYPT_SHA512 6
+ 
+ #define BCRYPT_DEFAULT_COST 5
+ 
+@@ -84,7 +88,7 @@
+     apr_size_t      out_len;
+     char            *passwd;
+     int             alg;
+-    int             cost;
++    int             cost; /* cost for bcrypt, rounds for SHA-2 */
+     enum {
+         PW_PROMPT = 0,
+         PW_ARG,

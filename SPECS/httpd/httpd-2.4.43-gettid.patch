@@ -1,0 +1,93 @@
+From d4e5b6e1e5585d341d1e51f1ddc637c099111076 Mon Sep 17 00:00:00 2001
+From: Joe Orton <jorton@redhat.com>
+Date: Tue, 7 Jul 2020 09:48:01 +0100
+Subject: [PATCH] Check and use gettid() directly with glibc 2.30+.
+
+* configure.in: Check for gettid() and define HAVE_SYS_GETTID if
+  gettid() is only usable via syscall().
+
+* server/log.c (log_tid): Use gettid() directly if available.
+---
+ configure.in | 14 +++++++++-----
+ server/log.c |  8 ++++++--
+ 2 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 423d58d4b9a..60cbf7b7f81 100644
+--- httpd-2.4.43/configure.in.gettid
++++ httpd-2.4.43/configure.in
+@@ -478,7 +500,8 @@
+ timegm \
+ getpgid \
+ fopen64 \
+-getloadavg
++getloadavg \
++gettid
+ )
+ 
+ dnl confirm that a void pointer is large enough to store a long integer
+@@ -489,16 +512,19 @@
+    APR_ADDTO(HTTPD_LIBS, [-lselinux])
+ ])
+ 
+-AC_CACHE_CHECK([for gettid()], ac_cv_gettid,
++if test $ac_cv_func_gettid = no; then
++  # On Linux before glibc 2.30, gettid() is only usable via syscall()
++  AC_CACHE_CHECK([for gettid() via syscall], ap_cv_gettid,
+ [AC_TRY_RUN(#define _GNU_SOURCE
+ #include <unistd.h>
+ #include <sys/syscall.h>
+ #include <sys/types.h>
+ int main(int argc, char **argv) {
+ pid_t t = syscall(SYS_gettid); return t == -1 ? 1 : 0; },
+-[ac_cv_gettid=yes], [ac_cv_gettid=no], [ac_cv_gettid=no])])
+-if test "$ac_cv_gettid" = "yes"; then
+-    AC_DEFINE(HAVE_GETTID, 1, [Define if you have gettid()])
++  [ap_cv_gettid=yes], [ap_cv_gettid=no], [ap_cv_gettid=no])])
++  if test "$ap_cv_gettid" = "yes"; then
++      AC_DEFINE(HAVE_SYS_GETTID, 1, [Define if you have gettid() via syscall()])
++  fi
+ fi
+ 
+ dnl ## Check for the tm_gmtoff field in struct tm to get the timezone diffs
+--- httpd-2.4.43/server/log.c.gettid
++++ httpd-2.4.43/server/log.c
+@@ -55,7 +55,7 @@
+ #include "ap_mpm.h"
+ #include "ap_listen.h"
+ 
+-#if HAVE_GETTID
++#if HAVE_SYS_GETTID
+ #include <sys/syscall.h>
+ #include <sys/types.h>
+ #endif
+@@ -625,14 +625,18 @@
+ #if APR_HAS_THREADS
+     int result;
+ #endif
+-#if HAVE_GETTID
++#if defined(HAVE_GETTID) || defined(HAVE_SYS_GETTID)
+     if (arg && *arg == 'g') {
++#ifdef HAVE_GETTID
++        pid_t tid = gettid();
++#else
+         pid_t tid = syscall(SYS_gettid);
++#endif
+         if (tid == -1)
+             return 0;
+         return apr_snprintf(buf, buflen, "%"APR_PID_T_FMT, tid);
+     }
+-#endif
++#endif /* HAVE_GETTID || HAVE_SYS_GETTID */
+ #if APR_HAS_THREADS
+     if (ap_mpm_query(AP_MPMQ_IS_THREADED, &result) == APR_SUCCESS
+         && result != AP_MPMQ_NOT_SUPPORTED)
+@@ -966,7 +970,7 @@
+ #if APR_HAS_THREADS
+         field_start = len;
+         len += cpystrn(buf + len, ":tid ", buflen - len);
+-        item_len = log_tid(info, NULL, buf + len, buflen - len);
++        item_len = log_tid(info, "g", buf + len, buflen - len);
+         if (!item_len)
+             len = field_start;
+         else

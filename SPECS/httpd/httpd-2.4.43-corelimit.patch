@@ -1,0 +1,30 @@
+diff --git a/server/core.c b/server/core.c
+index 79b2a82..dc0f17a 100644
+--- a/server/core.c
++++ b/server/core.c
+@@ -4996,6 +4996,25 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+     }
+     apr_pool_cleanup_register(pconf, NULL, ap_mpm_end_gen_helper,
+                               apr_pool_cleanup_null);
++
++#ifdef RLIMIT_CORE
++    if (ap_coredumpdir_configured) {
++        struct rlimit lim;
++
++        if (getrlimit(RLIMIT_CORE, &lim) == 0 && lim.rlim_cur == 0) {
++            lim.rlim_cur = lim.rlim_max;
++            if (setrlimit(RLIMIT_CORE, &lim) == 0) {
++                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
++                             "core dump file size limit raised to %lu bytes",
++                             lim.rlim_cur);
++            } else {
++                ap_log_error(APLOG_MARK, APLOG_NOTICE, errno, NULL,
++                             "core dump file size is zero, setrlimit failed");
++            }
++        }
++    }
++#endif
++
+     return OK;
+ }
+ 

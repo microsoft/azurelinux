@@ -1,0 +1,99 @@
+diff --git a/modules/ssl/ssl_engine_config.c b/modules/ssl/ssl_engine_config.c
+index 27e7a53..b53f3f8 100644
+--- a/modules/ssl/ssl_engine_config.c
++++ b/modules/ssl/ssl_engine_config.c
+@@ -119,7 +119,7 @@ static void modssl_ctx_init(modssl_ctx_t *mctx, apr_pool_t *p)
+     mctx->ticket_key          = NULL;
+ #endif
+ 
+-    mctx->protocol            = SSL_PROTOCOL_DEFAULT;
++    mctx->protocol            = SSL_PROTOCOL_NONE;
+     mctx->protocol_set        = 0;
+ 
+     mctx->pphrase_dialog_type = SSL_PPTYPE_UNSET;
+@@ -263,6 +263,7 @@ static void modssl_ctx_cfg_merge(apr_pool_t *p,
+     if (add->protocol_set) {
+         mrg->protocol_set = 1;
+         mrg->protocol = add->protocol;
++        mrg->protocol_set = 1;
+     }
+     else {
+         mrg->protocol_set = base->protocol_set;
+
+diff --git a/modules/ssl/ssl_engine_init.c b/modules/ssl/ssl_engine_init.c
+index bfad47a..b0fcf81 100644
+--- a/modules/ssl/ssl_engine_init.c
++++ b/modules/ssl/ssl_engine_init.c
+@@ -577,6 +577,7 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
+     MODSSL_SSL_METHOD_CONST SSL_METHOD *method = NULL;
+     char *cp;
+     int protocol = mctx->protocol;
++    int protocol_set = mctx->protocol_set;
+     SSLSrvConfigRec *sc = mySrvConfig(s);
+ #if OPENSSL_VERSION_NUMBER >= 0x10100000L
+     int prot;
+@@ -586,12 +587,18 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
+      *  Create the new per-server SSL context
+      */
+     if (protocol == SSL_PROTOCOL_NONE) {
+-        ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO(02231)
+-                "No SSL protocols available [hint: SSLProtocol]");
+-        return ssl_die(s);
+-    }
++        if (protocol_set) {
++            ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO(02231)
++                    "No SSL protocols available [hint: SSLProtocol]");
++            return ssl_die(s);
++        }
+ 
+-    cp = apr_pstrcat(p,
++        ap_log_error(APLOG_MARK, APLOG_TRACE3, 0, s, 
++                     "Using OpenSSL/system default SSL/TLS protocols");
++        cp = "default";
++    }
++    else {
++        cp = apr_pstrcat(p,
+ #ifndef OPENSSL_NO_SSL3
+                      (protocol & SSL_PROTOCOL_SSLV3 ? "SSLv3, " : ""),
+ #endif
+@@ -604,7 +611,8 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
+ #endif
+ #endif
+                      NULL);
+-    cp[strlen(cp)-2] = NUL;
++        cp[strlen(cp)-2] = NUL;
++    }
+ 
+     ap_log_error(APLOG_MARK, APLOG_TRACE3, 0, s,
+                  "Creating new SSL context (protocols: %s)", cp);
+@@ -705,13 +713,15 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
+         prot = SSL3_VERSION;
+ #endif
+     } else {
+-        SSL_CTX_free(ctx);
+-        mctx->ssl_ctx = NULL;
+-        ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO(03378)
+-                "No SSL protocols available [hint: SSLProtocol]");
+-        return ssl_die(s);
++        if (protocol_set) {
++            SSL_CTX_free(ctx);
++            mctx->ssl_ctx = NULL;
++            ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO(03378)
++                    "No SSL protocols available [hint: SSLProtocol]");
++            return ssl_die(s);
++        }
+     }
+-    SSL_CTX_set_max_proto_version(ctx, prot);
++    if (protocol != SSL_PROTOCOL_NONE) SSL_CTX_set_max_proto_version(ctx, prot);
+ 
+     /* Next we scan for the minimal protocol version we should provide,
+      * but we do not allow holes between max and min */
+@@ -731,7 +741,7 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
+         prot = SSL3_VERSION;
+     }
+ #endif
+-    SSL_CTX_set_min_proto_version(ctx, prot);
++    if (protocol != SSL_PROTOCOL_NONE) SSL_CTX_set_min_proto_version(ctx, prot);
+ #endif /* if OPENSSL_VERSION_NUMBER < 0x10100000L */
+ 
+ #ifdef SSL_OP_CIPHER_SERVER_PREFERENCE

@@ -1,0 +1,26 @@
+# This is a template for httpd instances.
+# See httpd@.service(8) for more information.
+
+[Unit]
+Description=The Apache HTTP Server
+After=network.target remote-fs.target nss-lookup.target
+Documentation=man:httpd@.service(8)
+
+[Service]
+Type=notify
+Environment=LANG=C
+Environment=HTTPD_INSTANCE=%i
+ExecStartPre=/bin/mkdir -m 710 -p /run/httpd/instance-%i
+ExecStartPre=/bin/chown root.apache /run/httpd/instance-%i
+ExecStartPre=/bin/mkdir -m 700 -p /var/lib/httpd/instance-%i
+ExecStartPre=/bin/chown apache.apache /var/lib/httpd/instance-%i
+ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND -f conf/%i.conf
+ExecReload=/usr/sbin/httpd $OPTIONS -k graceful -f conf/%i.conf
+# Send SIGWINCH for graceful stop
+KillSignal=SIGWINCH
+KillMode=mixed
+PrivateTmp=true
+OOMPolicy=continue
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,96 @@
+
+More verbose startup logging for mod_systemd.
+
+--- httpd-2.4.43/modules/arch/unix/mod_systemd.c.mod_systemd
++++ httpd-2.4.43/modules/arch/unix/mod_systemd.c
+@@ -29,11 +29,14 @@
+ #include "mpm_common.h"
+ 
+ #include "systemd/sd-daemon.h"
++#include "systemd/sd-journal.h"
+ 
+ #if APR_HAVE_UNISTD_H
+ #include <unistd.h>
+ #endif
+ 
++static char describe_listeners[30];
++
+ static int systemd_pre_config(apr_pool_t *pconf, apr_pool_t *plog,
+                               apr_pool_t *ptemp)
+ {
+@@ -44,6 +47,20 @@
+     return OK;
+ }
+ 
++static char *dump_listener(ap_listen_rec *lr, apr_pool_t *p)
++{
++    apr_sockaddr_t *sa = lr->bind_addr;
++    char addr[128];
++
++    if (apr_sockaddr_is_wildcard(sa)) {
++        return apr_pstrcat(p, "port ", apr_itoa(p, sa->port), NULL);
++    }
++
++    apr_sockaddr_ip_getbuf(addr, sizeof addr, sa);
++
++    return apr_psprintf(p, "%s port %u", addr, sa->port);
++}
++
+ /* Report the service is ready in post_config, which could be during
+  * startup or after a reload.  The server could still hit a fatal
+  * startup error after this point during ap_run_mpm(), so this is
+@@ -51,19 +68,51 @@
+  * the TCP ports so new connections will not be rejected.  There will
+  * always be a possible async failure event simultaneous to the
+  * service reporting "ready", so this should be good enough. */
+-static int systemd_post_config(apr_pool_t *p, apr_pool_t *plog,
++static int systemd_post_config(apr_pool_t *pconf, apr_pool_t *plog,
+                                apr_pool_t *ptemp, server_rec *main_server)
+ {
++    ap_listen_rec *lr;
++    apr_size_t plen = sizeof describe_listeners;
++    char *p = describe_listeners;
++
++    if (ap_state_query(AP_SQ_MAIN_STATE) == AP_SQ_MS_CREATE_PRE_CONFIG)
++        return OK;
++
++    for (lr = ap_listeners; lr; lr = lr->next) {
++        char *s = dump_listener(lr, ptemp);
++
++        if (strlen(s) + 3 < plen) {
++            char *newp = apr_cpystrn(p, s, plen);
++            if (lr->next)
++                newp = apr_cpystrn(newp, ", ", 3);
++            plen -= newp - p;
++            p = newp;
++        }
++        else {
++            if (plen < 4) {
++                p = describe_listeners + sizeof describe_listeners - 4;
++                plen = 4;
++            }
++            apr_cpystrn(p, "...", plen);
++            break;
++        }
++    }
++
+     sd_notify(0, "READY=1\n"
+               "STATUS=Configuration loaded.\n");
++
++    sd_journal_print(LOG_INFO, "Server configured, listening on: %s",
++                     describe_listeners);
++
+     return OK;
+ }
+ 
+ static int systemd_pre_mpm(apr_pool_t *p, ap_scoreboard_e sb_type)
+ {
+     sd_notifyf(0, "READY=1\n"
+-               "STATUS=Processing requests...\n"
+-               "MAINPID=%" APR_PID_T_FMT, getpid());
++               "STATUS=Started, listening on: %s\n"
++               "MAINPID=%" APR_PID_T_FMT,
++               describe_listeners, getpid());
+ 
+     return OK;
+ }

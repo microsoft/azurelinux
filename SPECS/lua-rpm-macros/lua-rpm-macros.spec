@@ -32,19 +32,14 @@ Conflicts: lua-devel < %{lua_conflict}
 
 %description
 This package contains Lua RPM macros.
-
 You should not need to install this package manually as lua-devel requires it.
 
 
 %package -n lua-srpm-macros
 Summary:        RPM macros for building Lua source packages
 
-# For directory structure
-Requires:       rpm
-
 %description -n lua-srpm-macros
 RPM macros for building Lua source packages.
-
 
 %prep
 %autosetup -c -T

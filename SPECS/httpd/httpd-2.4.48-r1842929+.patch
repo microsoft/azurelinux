@@ -1,0 +1,229 @@
+diff --git a/Makefile.in b/Makefile.in
+index 6747aea..40c7076 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -233,6 +233,7 @@ install-cgi:
+ install-other:
+ 	@test -d $(DESTDIR)$(logfiledir) || $(MKINSTALLDIRS) $(DESTDIR)$(logfiledir)
+ 	@test -d $(DESTDIR)$(runtimedir) || $(MKINSTALLDIRS) $(DESTDIR)$(runtimedir)
++	@test -d $(DESTDIR)$(statedir) || $(MKINSTALLDIRS) $(DESTDIR)$(statedir)
+ 	@for ext in dll x; do \
+ 		file=apachecore.$$ext; \
+ 		if test -f $$file; then \
+diff --git a/acinclude.m4 b/acinclude.m4
+index b6ef442..98f1441 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -45,6 +45,7 @@ AC_DEFUN([APACHE_GEN_CONFIG_VARS],[
+   APACHE_SUBST(installbuilddir)
+   APACHE_SUBST(runtimedir)
+   APACHE_SUBST(proxycachedir)
++  APACHE_SUBST(statedir)
+   APACHE_SUBST(other_targets)
+   APACHE_SUBST(progname)
+   APACHE_SUBST(prefix)
+@@ -665,6 +666,7 @@ AC_DEFUN([APACHE_EXPORT_ARGUMENTS],[
+   APACHE_SUBST_EXPANDED_ARG(runtimedir)
+   APACHE_SUBST_EXPANDED_ARG(logfiledir)
+   APACHE_SUBST_EXPANDED_ARG(proxycachedir)
++  APACHE_SUBST_EXPANDED_ARG(statedir)
+ ])
+ 
+ dnl 
+diff --git a/configure.in b/configure.in
+index 37346b2..f303784 100644
+--- a/configure.in
++++ b/configure.in
+@@ -41,7 +41,7 @@ dnl Something seems broken here.
+ AC_PREFIX_DEFAULT(/usr/local/apache2)
+ 
+ dnl Get the layout here, so we can pass the required variables to apr
+-APR_ENABLE_LAYOUT(Apache, [errordir iconsdir htdocsdir cgidir])
++APR_ENABLE_LAYOUT(Apache, [errordir iconsdir htdocsdir cgidir statedir])
+ 
+ dnl reparse the configure arguments.
+ APR_PARSE_ARGUMENTS
+diff --git a/include/ap_config_layout.h.in b/include/ap_config_layout.h.in
+index 2b4a70c..e076f41 100644
+--- a/include/ap_config_layout.h.in
++++ b/include/ap_config_layout.h.in
+@@ -60,5 +60,7 @@
+ #define DEFAULT_REL_LOGFILEDIR "@rel_logfiledir@"
+ #define DEFAULT_EXP_PROXYCACHEDIR "@exp_proxycachedir@"
+ #define DEFAULT_REL_PROXYCACHEDIR "@rel_proxycachedir@"
++#define DEFAULT_EXP_STATEDIR "@exp_statedir@"
++#define DEFAULT_REL_STATEDIR "@rel_statedir@"
+ 
+ #endif /* AP_CONFIG_LAYOUT_H */
+diff --git a/include/http_config.h b/include/http_config.h
+index 77657ae..384a90f 100644
+--- a/include/http_config.h
++++ b/include/http_config.h
+@@ -757,6 +757,14 @@ AP_DECLARE(char *) ap_server_root_relative(apr_pool_t *p, const char *fname);
+  */
+ AP_DECLARE(char *) ap_runtime_dir_relative(apr_pool_t *p, const char *fname);
+ 
++/**
++ * Compute the name of a persistent state file (e.g. a database or
++ * long-lived cache) relative to the appropriate state directory.
++ * Absolute paths are returned as-is.  The state directory is
++ * configured via the DefaultStateDir directive or at build time.
++ */
++AP_DECLARE(char *) ap_state_dir_relative(apr_pool_t *p, const char *fname);
++
+ /* Finally, the hook for dynamically loading modules in... */
+ 
+ /**
+diff --git a/modules/dav/fs/mod_dav_fs.c b/modules/dav/fs/mod_dav_fs.c
+index addfd7e..2389f8f 100644
+--- a/modules/dav/fs/mod_dav_fs.c
++++ b/modules/dav/fs/mod_dav_fs.c
+@@ -29,6 +29,10 @@ typedef struct {
+ 
+ extern module AP_MODULE_DECLARE_DATA dav_fs_module;
+ 
++#ifndef DEFAULT_DAV_LOCKDB
++#define DEFAULT_DAV_LOCKDB "davlockdb"
++#endif
++
+ const char *dav_get_lockdb_path(const request_rec *r)
+ {
+     dav_fs_server_conf *conf;
+@@ -57,6 +61,24 @@ static void *dav_fs_merge_server_config(apr_pool_t *p,
+     return newconf;
+ }
+ 
++static apr_status_t dav_fs_post_config(apr_pool_t *p, apr_pool_t *plog,
++                                       apr_pool_t *ptemp, server_rec *base_server)
++{
++    server_rec *s;
++
++    for (s = base_server; s; s = s->next) {
++        dav_fs_server_conf *conf;
++
++        conf = ap_get_module_config(s->module_config, &dav_fs_module);
++
++        if (!conf->lockdb_path) {
++            conf->lockdb_path = ap_state_dir_relative(p, DEFAULT_DAV_LOCKDB);
++        }
++    }
++
++    return OK;
++}
++
+ /*
+  * Command handler for the DAVLockDB directive, which is TAKE1
+  */
+@@ -87,6 +109,8 @@ static const command_rec dav_fs_cmds[] =
+ 
+ static void register_hooks(apr_pool_t *p)
+ {
++    ap_hook_post_config(dav_fs_post_config, NULL, NULL, APR_HOOK_MIDDLE);
++
+     dav_hook_gather_propsets(dav_fs_gather_propsets, NULL, NULL,
+                              APR_HOOK_MIDDLE);
+     dav_hook_find_liveprop(dav_fs_find_liveprop, NULL, NULL, APR_HOOK_MIDDLE);
+diff --git a/server/core.c b/server/core.c
+index d135764..c2176b9 100644
+--- a/server/core.c
++++ b/server/core.c
+@@ -142,6 +142,8 @@ AP_DECLARE_DATA int ap_main_state = AP_SQ_MS_INITIAL_STARTUP;
+ AP_DECLARE_DATA int ap_run_mode = AP_SQ_RM_UNKNOWN;
+ AP_DECLARE_DATA int ap_config_generation = 0;
+ 
++static const char *core_state_dir;
++
+ static void *create_core_dir_config(apr_pool_t *a, char *dir)
+ {
+     core_dir_config *conf;
+@@ -1444,13 +1446,16 @@ AP_DECLARE(const char *) ap_resolve_env(apr_pool_t *p, const char * word)
+     return res_buf;
+ }
+ 
+-static int reset_config_defines(void *dummy)
++/* pconf cleanup - clear global variables set from config here. */
++static apr_status_t reset_config(void *dummy)
+ {
+     ap_server_config_defines = saved_server_config_defines;
+     saved_server_config_defines = NULL;
+     server_config_defined_vars = NULL;
+     ap_runtime_dir = NULL;
+-    return OK;
++    core_state_dir = NULL;
++
++    return APR_SUCCESS;
+ }
+ 
+ /*
+@@ -3220,6 +3225,24 @@ static const char *set_runtime_dir(cmd_parms *cmd, void *dummy, const char *arg)
+     return NULL;
+ }
+ 
++static const char *set_state_dir(cmd_parms *cmd, void *dummy, const char *arg)
++{
++    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++
++    if (err != NULL) {
++        return err;
++    }
++
++    if ((apr_filepath_merge((char**)&core_state_dir, NULL,
++                            ap_server_root_relative(cmd->temp_pool, arg),
++                            APR_FILEPATH_TRUENAME, cmd->pool) != APR_SUCCESS)
++        || !ap_is_directory(cmd->temp_pool, core_state_dir)) {
++        return "DefaultStateDir must be a valid directory, absolute or relative to ServerRoot";
++    }
++
++    return NULL;
++}
++
+ static const char *set_timeout(cmd_parms *cmd, void *dummy, const char *arg)
+ {
+     const char *err = ap_check_cmd_context(cmd, NOT_IN_DIR_CONTEXT);
+@@ -4521,6 +4544,8 @@ AP_INIT_TAKE1("ServerRoot", set_server_root, NULL, RSRC_CONF | EXEC_ON_READ,
+   "Common directory of server-related files (logs, confs, etc.)"),
+ AP_INIT_TAKE1("DefaultRuntimeDir", set_runtime_dir, NULL, RSRC_CONF | EXEC_ON_READ,
+   "Common directory for run-time files (shared memory, locks, etc.)"),
++AP_INIT_TAKE1("DefaultStateDir", set_state_dir, NULL, RSRC_CONF | EXEC_ON_READ,
++  "Common directory for persistent state (databases, long-lived caches, etc.)"),
+ AP_INIT_TAKE1("ErrorLog", set_server_string_slot,
+   (void *)APR_OFFSETOF(server_rec, error_fname), RSRC_CONF,
+   "The filename of the error log"),
+@@ -5055,8 +5080,7 @@ static int core_pre_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptem
+ 
+     if (!saved_server_config_defines)
+         init_config_defines(pconf);
+-    apr_pool_cleanup_register(pconf, NULL, reset_config_defines,
+-                              apr_pool_cleanup_null);
++    apr_pool_cleanup_register(pconf, NULL, reset_config, apr_pool_cleanup_null);
+ 
+     ap_regcomp_set_default_cflags(AP_REG_DEFAULT);
+ 
+@@ -5303,6 +5327,27 @@ AP_DECLARE(int) ap_state_query(int query)
+     }
+ }
+ 
++AP_DECLARE(char *) ap_state_dir_relative(apr_pool_t *p, const char *file)
++{
++    char *newpath = NULL;
++    apr_status_t rv;
++    const char *state_dir;
++
++    state_dir = core_state_dir
++        ? core_state_dir
++        : ap_server_root_relative(p, DEFAULT_REL_STATEDIR);
++
++    rv = apr_filepath_merge(&newpath, state_dir, file, APR_FILEPATH_TRUENAME, p);
++    if (newpath && (rv == APR_SUCCESS || APR_STATUS_IS_EPATHWILD(rv)
++                                      || APR_STATUS_IS_ENOENT(rv)
++                                      || APR_STATUS_IS_ENOTDIR(rv))) {
++        return newpath;
++    }
++    else {
++        return NULL;
++    }
++}
++
+ static apr_random_t *rng = NULL;
+ #if APR_HAS_THREADS
+ static apr_thread_mutex_t *rng_mutex = NULL;

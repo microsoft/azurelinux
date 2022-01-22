@@ -1,0 +1,36 @@
+# ./pullrev.sh 1894152
+http://svn.apache.org/viewvc?view=revision&revision=1894152
+
+--- httpd-2.4.51/modules/filters/mod_deflate.c.r1894152
++++ httpd-2.4.51/modules/filters/mod_deflate.c
+@@ -835,6 +835,7 @@
+     while (!APR_BRIGADE_EMPTY(bb))
+     {
+         apr_bucket *b;
++        apr_status_t rv;
+ 
+         /*
+          * Optimization: If we are a HEAD request and bytes_sent is not zero
+@@ -914,8 +915,6 @@
+         }
+ 
+         if (APR_BUCKET_IS_FLUSH(e)) {
+-            apr_status_t rv;
+-
+             /* flush the remaining data from the zlib buffers */
+             zRC = flush_libz_buffer(ctx, c, f->c->bucket_alloc, deflate,
+                                     Z_SYNC_FLUSH, NO_UPDATE_CRC);
+@@ -947,7 +946,12 @@
+         }
+ 
+         /* read */
+-        apr_bucket_read(e, &data, &len, APR_BLOCK_READ);
++        rv = apr_bucket_read(e, &data, &len, APR_BLOCK_READ);
++        if (rv) {
++            ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r, APLOGNO(10298)
++                          "failed reading from %s bucket", e->type->name);
++            return rv;
++        }
+         if (!len) {
+             apr_bucket_delete(e);
+             continue;

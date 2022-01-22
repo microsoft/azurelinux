@@ -1,0 +1,2 @@
+d /run/httpd   710 root apache
+d /run/httpd/htcacheclean   700 apache apache

@@ -1,0 +1,374 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+<!--
+ Copyright 2018 Red Hat, Inc.
+
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<refentry>
+  <refentryinfo>
+    <title>httpd systemd units</title>
+    <productname>httpd</productname>
+    <author><contrib>Author</contrib><surname>Orton</surname><firstname>Joe</firstname><email>jorton@redhat.com</email></author>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>httpd.service</refentrytitle>
+    <manvolnum>8</manvolnum>
+  </refmeta>
+  
+  <refnamediv>
+    <refname>httpd.service</refname>
+    <refname>httpd@.service</refname>
+    <refname>httpd.socket</refname>
+    <refname>httpd-init.service</refname>
+    <refpurpose>httpd unit files for systemd</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <para>
+      <filename>/usr/lib/systemd/system/httpd.service</filename>, 
+      <filename>/usr/lib/systemd/system/httpd@.service</filename>,
+      <filename>/usr/lib/systemd/system/httpd-init.service</filename>,
+      <filename>/usr/lib/systemd/system/httpd.socket</filename>
+    </para>
+  </refsynopsisdiv>
+  
+  <refsect1>
+    <title>Description</title>
+
+    <para>This manual page describes the <command>systemd</command>
+    unit files used to integrate the <command>httpd</command> daemon
+    with <command>systemd</command>. Two main unit files are
+    available: <command>httpd.service</command> allows the
+    <command>httpd</command> daemon to be run as a system service, and
+    <command>httpd.socket</command> allows httpd to be started via
+    socket-based activation. Most systems will use
+    <command>httpd.service</command>.</para>
+
+    <para>The <command>apachectl</command> command has been modified
+    to invoke <command>systemctl</command> for most uses, so for
+    example, running <command>apachectl start</command> is equivalent
+    to running <command>systemctl start httpd.service</command>.  This
+    ensures that the running httpd daemon is tracked and managed by
+    <command>systemd</command>.  In contrast, running
+    <command>httpd</command> directly from a root shell will start the
+    service outside of <command>systemd</command>; in this case,
+    default security restrictions described below (including, but not
+    limited to, SELinux) will not be enforced.</para>
+
+    <refsect2>
+      <title>Changing default behaviour</title>
+
+      <para>To change the default behaviour of the httpd service, an
+      <emphasis>over-ride</emphasis> file should be created, rather
+      than changing
+      <filename>/usr/lib/systemd/system/httpd.service</filename>
+      directly, since such changes would be lost over package
+      upgrades. Running <command>systemctl edit
+      httpd.service</command> or <command>systemctl edit
+      httpd.socket</command> as root will create a drop-in file (in
+      the former case, in
+      <filename>/etc/systemd/system/httpd.service.d</filename>) which
+      over-rides the system defaults.</para>
+
+      <para>For example, to set the <option>LD_LIBRARY_PATH</option>
+      environment variable for the daemon, run <command>systemctl edit
+      httpd.service</command> and enter:
+
+      <programlisting>[Service]
+Environment=LD_LIBRARY_PATH=/opt/vendor/lib</programlisting></para>
+    </refsect2>
+    
+    <refsect2>
+      <title>Starting the service at boot time</title>
+
+      <para>The httpd.service and httpd.socket units are
+      <emphasis>disabled</emphasis> by default. To start the httpd
+      service at boot time, run: <command>systemctl enable
+      httpd.service</command>. In the default configuration, the
+      httpd daemon will accept connections on port 80 (and, if mod_ssl
+      is installed, TLS connections on port 443) for any configured
+      IPv4 or IPv6 address.</para>
+
+      <para>If httpd is configured to depend on any specific IP
+      address (for example, with a "Listen" directive) which may only
+      become available during start-up, or if httpd depends on other
+      services (such as a database daemon), the service
+      <emphasis>must</emphasis> be configured to ensure correct
+      start-up ordering.</para>
+
+      <para>For example, to ensure httpd is only running after all
+      configured network interfaces are configured, create a drop-in
+      file (as described above) with the following section:
+
+      <programlisting>[Unit]
+After=network-online.target
+Wants=network-online.target</programlisting>
+
+      See <ulink
+      url="https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/"/>
+      for more information on start-up ordering with systemd.</para>
+
+    </refsect2>
+
+    <refsect2>
+      <title>SSL/TLS certificate generation</title>
+
+      <para>The <command>httpd-init.service</command> unit is provided
+      with the mod_ssl package. This oneshot unit automatically
+      creates a TLS server certificate and key (using a generated
+      self-signed CA certificate and key) for testing purposes before
+      httpd is started. To inhibit certificate generation, use
+      <command>systemctl mask httpd-init.service</command> after
+      installing mod_ssl, and adjust the mod_ssl configuration to use
+      an appropriate certificate and key.</para>
+
+    </refsect2>
+
+    <refsect2>
+      <title>Reloading and stopping the service</title>
+
+      <para>When running <command>systemctl reload
+      httpd.service</command>, a <emphasis>graceful</emphasis>
+      restart is used, which sends a signal to the httpd parent
+      process to reload the configuration and re-open log files. Any
+      children with open connections at the time of reload will
+      terminate only once they have completed serving requests. This
+      prevents users of the server seeing errors (or potentially
+      losing data) due to the reload, but means some there is some
+      delay before any configuration changes take effect for all
+      users.</para>
+
+      <para>Similarly, a <emphasis>graceful stop</emphasis> is used
+      when <command>systemctl stop httpd.service</command> is run,
+      which terminates the server only once active connections have
+      been processed.</para>
+
+      <para>To "ungracefully" stop the server without waiting for
+      requests to complete, use <command>systemctl kill
+      --kill-who=main httpd</command>; similarly to "ungracefully"
+      reload the configuration, use <command>systemctl kill
+      --kill-who=main --signal=HUP httpd</command>.</para>
+    </refsect2>
+
+    <refsect2>
+      <title>Automated service restarts</title>
+
+      <para>System packages (including the httpd package itself) may
+      restart the httpd service automatically after packages are
+      upgraded, installed, or removed. This is done using the
+      <command>systemctl try-restart httpd.service</command>, which
+      stops then starts the service if it is running.</para>
+
+      <para>To disable automatic restarts, create the file
+      <filename>/etc/sysconfig/httpd-disable-posttrans</filename>.
+      When <command>httpd</command> interfaces are added in an update,
+      it may not be safe to <emphasis>reload</emphasis> a running
+      service after upgrading, if updated modules require interfaces
+      only available in the updated httpd.  It is recommended to allow
+      automatic restarts for this reason.</para>
+    </refsect2>
+
+    <refsect2>
+      <title>Changing the default MPM (Multi-Processing Module)</title>
+
+      <para>httpd offers a choice of multi-processing modules (MPMs),
+      which can be configured in
+      <filename>/etc/httpd/conf.modules.d/00-mpm.conf</filename>.
+      See
+      <citerefentry><refentrytitle>httpd.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+      for more information on changing the MPM.</para>
+    </refsect2>
+
+    <refsect2>
+      <title>systemd integration and mod_systemd</title>
+
+      <para>The httpd service uses the <option>notify</option> systemd
+      service type. The <literal>mod_systemd</literal> module must be
+      loaded (as in the default configuration) for this to work
+      correctly - the service will fail if this module is not
+      loaded. <literal>mod_systemd</literal> also makes worker and
+      request statistics available when running <command>systemctl status
+      httpd</command>. See
+      <citerefentry><refentrytitle>systemd.exec</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+      for more information on systemd service types.</para>
+    </refsect2>
+    
+    <refsect2>
+      <title>Security and SELinux</title>
+
+      <para>The default SELinux policy restricts the httpd service in
+      various ways. For example, the default policy limits the ports
+      to which httpd can bind (using the <literal>Listen</literal>
+      directive), which parts of the filesystem can be accessed, and
+      whether outgoing TCP connections are possible. Many of these
+      restrictions can be relaxed or adjusted by using
+      <command>semanage</command> to change booleans or other
+      types. See
+      <citerefentry><refentrytitle>httpd_selinux</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+      for more information.</para>
+    </refsect2>
+
+    <refsect2>
+      <title>Process policies and restrictions</title>
+
+      <para>The httpd service uses the following options:
+
+      <itemizedlist>
+        <listitem><para><emphasis>PrivateTmp</emphasis> is enabled by
+        default. The <filename>/tmp</filename> and
+        <filename>/var/tmp</filename> directories available within the
+        httpd process (and CGI scripts, etc) are not shared by other
+        processes.</para></listitem>
+
+        <listitem><para><emphasis>OOMPolicy</emphasis> is set to
+        <emphasis>continue</emphasis> by default.  Under the default
+        Out-of-Memory policy, the entire service will be terminated if
+        any process is killed by the kernel OOM killer.  By setting
+        the policy to <emphasis>continue</emphasis>, httpd will
+        continue to run (and recover) if a single child is terminated
+        because of excess memory consumption.</para></listitem>
+      </itemizedlist>
+
+      See
+      <citerefentry><refentrytitle>systemd.exec</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+      and
+      <citerefentry><refentrytitle>systemd.service</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+      for more information.</para>
+    </refsect2>
+
+    <refsect2>
+      <title>Logging and log file rotation</title>
+
+      <para>The <command>httpd</command> daemon is configured to log
+      to the <filename>/var/log/httpd</filename> directory by default,
+      and a drop-in for <command>logrotate</command> is provided at
+      <filename>/etc/logrotate.d/httpd</filename> to enable log file
+      rotation.  The <command>httpd.service</command> systemd unit is
+      reloaded after a <command>logrotate</command> run.</para>
+
+      <para>Log file compression is not enabled by default; since
+      <command>httpd</command> can continue writing to open log files
+      for some time after a reload (graceful restart), if compression
+      is enabled the <literal>delaycompress</literal> option must be
+      present (as in the default) to delay compression of log files to
+      a later rotation run.</para>
+    </refsect2>
+
+    <refsect2>
+      <title>Socket activation</title>
+
+      <para>Socket activation (see
+      <citerefentry><refentrytitle>systemd.socket</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+      for more information) can be used with <command>httpd</command>
+      by enabling the <command>httpd.socket</command> unit.  The
+      <command>httpd</command> listener configuration must exactly
+      match the <literal>ListenStream</literal> options configured for
+      the <command>httpd.socket</command> unit.  The default
+      <command>httpd.socket</command> has a
+      <literal>ListenStream=80</literal> and, if mod_ssl is installed,
+      <literal>ListenStream=443</literal> by a drop-in file. If
+      additional <literal>Listen</literal> directives are added to the
+      httpd configuration, corresponding
+      <literal>ListenStream</literal> options should be added via
+      drop-in files, for example via <command>systemctl edit
+      httpd.socket</command>.</para>
+
+      <para>If using socket activation with httpd, only one listener
+      on any given TCP port is supported; a configuration with both
+      "<literal>Listen 127.0.0.1:80</literal>" and "<literal>Listen
+      192.168.1.2:80</literal>" will not work.</para>
+    </refsect2>
+
+    <refsect2>
+      <title>Instantiated services</title>
+
+      <para>The <command>httpd@.service</command> unit is a template
+      for creating instantiated services. An instance of this unit
+      will be started using the configuration file
+      <filename>/etc/httpd/conf/INSTANCE.conf</filename>, where
+      <emphasis>INSTANCE</emphasis> is replaced with the instance
+      name.  For example, <command>systemctl start
+      httpd@foobar.service</command> will start httpd using the
+      configuration file
+      <filename>/etc/httpd/conf/foobar.conf</filename>.  The
+      <option>HTTPD_INSTANCE</option> environment variable is set to
+      the instance name by the unit and is available for use within
+      the configuration file.</para>
+
+      <para>To allow multiple instances of httpd to run
+      simultaneously, a number of configuration directives must be
+      changed, such as <command>PidFile</command> and
+      <command>DefaultRuntimeDir</command> to pick non-conflicting
+      paths, and <command>Listen</command> to choose different ports.
+      The example configuration file
+      <filename>/usr/share/doc/httpd/instance.conf</filename>
+      demonstrates how to make such changes using the
+      <option>HTTPD_INSTANCE</option> variable.</para>
+
+      <para>It can be useful to configure instances of
+      <command>httpd@.service</command> to reload when
+      <command>httpd.service</command> is reloaded; for example,
+      <command>logrotate</command> will reload only
+      <command>httpd.service</command> when logs are rotated. If this
+      behaviour is required, create a drop-in file for the instance as
+      follows:
+
+      <programlisting>[Unit]
+ReloadPropagatedFrom=httpd.service</programlisting>
+
+      As with normal units, drop-in files for instances can be created
+      using <command>systemctl edit</command>, e.g. <command>systemctl edit
+      httpd@foobar.service</command>.</para>
+    </refsect2>
+
+  </refsect1>
+
+  <refsect1>
+    <title>Files</title>
+
+    <para><filename>/usr/lib/systemd/system/httpd.service</filename>,
+    <filename>/usr/lib/systemd/system/httpd.socket</filename>,
+    <filename>/usr/lib/systemd/system/httpd@.service</filename>,
+    <filename>/etc/systemd/systemd/httpd.service.d</filename></para>
+  </refsect1>
+  
+  <refsect1>
+    <title>See also</title>
+
+    <para>
+    <citerefentry><refentrytitle>httpd</refentrytitle><manvolnum>8</manvolnum></citerefentry>, 
+    <citerefentry><refentrytitle>httpd.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry>, 
+    <citerefentry><refentrytitle>systemctl</refentrytitle><manvolnum>1</manvolnum></citerefentry>, 
+    <citerefentry><refentrytitle>systemd.service</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemd.exec</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemd.socket</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>httpd_selinux</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>semanage</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>logrotate</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+    </para>
+  </refsect1>
+
+</refentry>
+
+<!-- LocalWords:  systemd PidFile
+-->
