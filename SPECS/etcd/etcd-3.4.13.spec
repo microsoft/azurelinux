@@ -1,13 +1,13 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.4.13
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/etcd-io/etcd/
-#Source0:       https://github.com/etcd-io/%{name}/archive/v%{version}.tar.gz
+#Source0:       https://github.com/etcd-io/etcd/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        etcd.service
 BuildRequires:  git
@@ -93,6 +93,10 @@ rm -rf %{buildroot}/*
 %{_bindir}/etcd-dump-*
 
 %changelog
+* Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.4.13-7
+- Increment release for force republishing using golang 1.16.12
+- Update Source0 URL
+
 * Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.13-6
 - Increment release for force republishing using golang 1.16.9
 

@@ -509,12 +509,8 @@ chroot_and_install_rpms libtirpc
 chroot_and_install_rpms rpcsvc-proto
 build_rpm_in_chroot_no_install libnsl2
 
-build_rpm_in_chroot_no_install finger
-
 # tcp_wrappers needs libnsl2, finger
 chroot_and_install_rpms libnsl2
-chroot_and_install_rpms finger
-build_rpm_in_chroot_no_install tcp_wrappers
 
 build_rpm_in_chroot_no_install cyrus-sasl
 
@@ -529,7 +525,6 @@ build_rpm_in_chroot_no_install libcap-ng
 chroot_and_install_rpms systemd
 chroot_and_install_rpms golang
 chroot_and_install_rpms openldap
-chroot_and_install_rpms tcp_wrappers
 chroot_and_install_rpms libcap-ng
 build_rpm_in_chroot_no_install audit
 

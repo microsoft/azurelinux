@@ -60,7 +60,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
     sed -i '/openj/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
-    sed -i '/finger-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
@@ -93,7 +92,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-Text-Template/d' $TmpPkgGen
     sed -i '/python/d' $TmpPkgGen
     sed -i '/shadow/d' $TmpPkgGen
-    sed -i '/tcp_wrappers-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/unzip/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen

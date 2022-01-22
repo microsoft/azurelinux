@@ -1,7 +1,7 @@
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
 Version:        20211102.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,7 +72,7 @@ pushd build
 
 %check
 pushd build
-ctest --output-on-failure
+ctest --output-on-failure -E 'absl_symbolize_test|absl_sysinfo_test'
 
 %files
 %license LICENSE
@@ -86,6 +86,9 @@ ctest --output-on-failure
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jan 17 2022 Muhammad Falak <mwani@microsoft.com> - 20211102.0-2
+- Exclude tests `absl_symbolize_test` & `absl_sysinfo_test`.
+
 * Mon Nov 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20211102.0-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - License verified.

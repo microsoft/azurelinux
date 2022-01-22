@@ -3,7 +3,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.88.1
+Version:        5.10.89.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -15,10 +15,10 @@ Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20210127.pem
+Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         0002-add-linux-syscall-license-info.patch
-Patch2:         CVE-2021-43976.patch
+Patch1:         CVE-2021-43976.patch
+Patch2:         0003-export-mmput_async.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -226,6 +226,10 @@ Patch1186:      CVE-2021-43975.nopatch
 Patch1187:      CVE-2021-45480.nopatch
 Patch1188:      CVE-2021-45486.nopatch
 Patch1189:      CVE-2021-45485.nopatch
+Patch1190:      CVE-2021-44733.nopatch
+Patch1191:      CVE-2021-45469.nopatch
+Patch1192:      CVE-2021-28714.nopatch
+Patch1193:      CVE-2021-28715.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -578,6 +582,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 20 2022 Chris Co <chrco@microsoft.com> - 5.10.89.1-2
+- Rotate Mariner cert 
+
+* Sun Jan 16 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.89.1-1
+- Update source to 5.10.89.1
+- Address CVE-2021-44733, CVE-2021-45469, CVE-2021-28714, CVE-2021-28715
+- Remove patch add-linux-syscall-license-info.patch
+
+* Fri Jan 14 2022 Henry Li <lihl@microsoft.com> - 5.10.88.1-3
+- Add patch to export mmput_async
+
 * Wed Jan 12 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.88.1-2
 - Addressed CVE-2021-45485
 
