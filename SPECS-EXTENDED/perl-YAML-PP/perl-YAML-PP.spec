@@ -60,7 +60,6 @@ BuildRequires:  perl(Test::Deep)
 BuildRequires:  perl(Test::More) >= 0.98
 BuildRequires:  perl(Test::Warn)
 BuildRequires:  perl(Tie::IxHash)
-# Tests
 BuildRequires:  perl(blib) >= 1.01
 BuildRequires:  perl(lib)
 %endif
