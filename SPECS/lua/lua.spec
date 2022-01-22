@@ -48,7 +48,6 @@ Static libraries and header files for the support library for lua
 %patch0 -p1
 %patch1 -p1
 %patch4 -p1
-%patch5 -p1
 sed -i '/#define LUA_ROOT/s:/usr/local/:/usr/:' src/luaconf.h
 sed -i 's/CFLAGS= -fPIC -O2 /CFLAGS+= -fPIC -O2 -DLUA_COMPAT_MODULE /' src/Makefile
 cp %{SOURCE1} ./
