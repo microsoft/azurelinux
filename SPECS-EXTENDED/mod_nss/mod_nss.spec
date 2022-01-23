@@ -23,12 +23,14 @@ BuildRequires: libtool
 BuildRequires: flex
 BuildRequires: bison
 # Needed for make check
+%if %{with_check}
 BuildRequires: openssl
 BuildRequires: python3-nose
 BuildRequires: python3-requests >= 2.7.0
 BuildRequires: python3-ndg_httpsclient
 BuildRequires: hostname
 BuildRequires: nss-tools
+%endif
 Requires: httpd-mmn
 Requires(post): httpd, nss-tools
 Requires: nss%{?_isa} >= 3.14.0.0
