@@ -28417,8 +28417,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-abrmd",
-          "version": "2.3.3",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.3.3/tpm2-abrmd-2.3.3.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.4.0/tpm2-abrmd-2.4.0.tar.gz"
         }
       }
     },
@@ -28437,8 +28437,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tools",
-          "version": "4.2",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/4.2/tpm2-tools-4.2.tar.gz"
+          "version": "4.3.2",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/4.3.2/tpm2-tools-4.3.2.tar.gz"
         }
       }
     },
@@ -28447,8 +28447,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "2.4.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.0/tpm2-tss-2.4.0.tar.gz"
+          "version": "2.4.6",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.6/tpm2-tss-2.4.6.tar.gz"
         }
       }
     },
