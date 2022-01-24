@@ -83,7 +83,7 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
-* Tue Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.2.5-1
+* Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.2.5-1
 - Update to version 6.2.5.
 - Modified patch to apply to new version.
 

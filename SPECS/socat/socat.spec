@@ -36,7 +36,7 @@ make %{?_smp_mflags} test
 %{_mandir}/man1/*
 
 %changelog
-* Tue Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.4.3-1
+* Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.4.3-1
 - Update to version 1.7.4.3.
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.3.4-3

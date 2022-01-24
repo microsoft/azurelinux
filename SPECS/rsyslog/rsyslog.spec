@@ -152,7 +152,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_docdir}/%{name}/html
 
 %changelog
-* Tue Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2108.0-1
+* Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2108.0-1
 - Update to version 8.2108.0.
 
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.37.0-7
