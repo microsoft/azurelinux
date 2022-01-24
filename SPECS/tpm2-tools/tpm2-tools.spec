@@ -40,24 +40,24 @@ make DESTDIR=%{buildroot} install
 %{_datarootdir}/bash-completion/completions/tss2_*
 
 %changelog
-*   Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.3.2-1
--   Update to 4.3.2.
--   Verified license
+* Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.3.2-1
+- Update to 4.3.2.
+- Verified license
 
-*   Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2-2
--   CVE-2021-3565 fix
+* Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2-2
+- CVE-2021-3565 fix
 
-*   Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2-1
--   Update to 4.2.
+* Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> 4.2-1
+- Update to 4.2.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1.4-2
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1.4-2
+- Added %%license line automatically
 
-*   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 3.1.4-1
--   Update to version 3.1.4.
+* Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 3.1.4-1
+- Update to version 3.1.4.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1.3-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1.3-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Thu Feb 21 2019 Alexey Makhalov <amakhalov@vmware.com> 3.1.3-1
--   Initial build. First version
+* Thu Feb 21 2019 Alexey Makhalov <amakhalov@vmware.com> 3.1.3-1
+- Initial build. First version

@@ -88,24 +88,24 @@ fi
 %{_mandir}/man7/*
 
 %changelog
-*   Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.6-1
--   Update to version 2.4.6
--   Verified license
+* Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.6-1
+- Update to version 2.4.6
+- Verified license
 
-*   Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.0-2
--   Remove libtool archive files from final packaging
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.0-2
+- Remove libtool archive files from final packaging
 
-*   Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.0-1
--   Update to 2.4.0.
+* Tue Aug 25 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.4.0-1
+- Update to 2.4.0.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.0-4
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.0-4
+- Added %%license line automatically
 
-*   Fri Apr 10 2020 Nick Samson <nisamson@microsoft.com> 2.2.0-3
--   Updated Source0. Removed %%define sha1. Updated license abbreviation and validated license.
+* Fri Apr 10 2020 Nick Samson <nisamson@microsoft.com> 2.2.0-3
+- Updated Source0. Removed %%define sha1. Updated license abbreviation and validated license.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.2.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.2.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Thu Feb 21 2019 Alexey Makhalov <amakhalov@vmware.com> 2.2.0-1
--   Initial build. First version
+* Thu Feb 21 2019 Alexey Makhalov <amakhalov@vmware.com> 2.2.0-1
+- Initial build. First version

@@ -65,20 +65,20 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man7
 
 %changelog
-*   Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-1
--   Update to version 2.4.0
+* Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-1
+- Update to version 2.4.0
 
-*   Sun Sep 27 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.3.3-1
--   Update to 2.3.3 to solve incompatibility with tpm2-tss 2.4.0
+* Sun Sep 27 2020 Daniel McIlvaney <damcilva@microsoft.com> 2.3.3-1
+- Update to 2.3.3 to solve incompatibility with tpm2-tss 2.4.0
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.1.1-2
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.1.1-2
+- Added %%license line automatically
 
-*   Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 2.1.1-1
--   Update to 2.1.1. Fix URL. Fix Source0 URL. License verified.
+* Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 2.1.1-1
+- Update to 2.1.1. Fix URL. Fix Source0 URL. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.1.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.1.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Thu Feb 21 2019 Alexey Makhalov <amakhalov@vmware.com> 2.1.0-1
--   Initial build. First version
+* Thu Feb 21 2019 Alexey Makhalov <amakhalov@vmware.com> 2.1.0-1
+- Initial build. First version
