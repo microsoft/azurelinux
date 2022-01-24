@@ -2447,8 +2447,8 @@
         "type": "other",
         "other": {
           "name": "Cython",
-          "version": "0.29.24",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.29.24.tar.gz"
+          "version": "0.29.26",
+          "downloadUrl": "https://github.com/cython/cython/archive/0.29.26.tar.gz"
         }
       }
     },
