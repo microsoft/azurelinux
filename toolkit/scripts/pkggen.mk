@@ -31,6 +31,7 @@ validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 specs_file        = $(PKGBUILD_DIR)/specs.json
 graph_file        = $(PKGBUILD_DIR)/graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
+scrubbed_file     = $(PKGBUILD_DIR)/scrubbed_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
@@ -123,6 +124,22 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--output=$(cached_file) && \
 	touch $@
 
+graphscrubber_extra_flags :=
+ifeq ($(HYDRATED_BUILD), y)
+graphscrubber_extra_flags += --hydrated-build
+endif
+
+$(scrubbed_file): $(cached_file)
+	$(go-graphscrubber) \
+		--input=$(graph_file) \
+		$(graphscrubber_extra_flags) \
+		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
+		--packages="$(PACKAGE_BUILD_LIST)" \
+		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
+		--image-config-file="$(CONFIG_FILE)" \
+		$(logging_command) \
+		--output=$@ && \
+	touch $@
 ######## PACKAGE BUILD ########
 
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
@@ -156,9 +173,9 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(scrubbed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
 	$(go-scheduler) \
-		--input="$(cached_file)" \
+		--input="$(scrubbed_file)" \
 		--output="$(built_file)" \
 		--workers="$(CONCURRENT_PACKAGE_BUILDS)" \
 		--work-dir="$(CHROOT_DIR)" \
@@ -179,7 +196,6 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(chroot_worker) $(go-schedu
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
-		--hydrated-build="$(HYDRATED_BUILD)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
