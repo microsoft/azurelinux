@@ -1,7 +1,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
-Version:        8.37.0
-Release:        7%{?dist}
+Version:        8.2108.0
+Release:        1%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -152,6 +152,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Tue Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2108.0-1
+- Update to version 8.2108.0.
+
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.37.0-7
 - Add /etc/rsyslog.d directory.
 
