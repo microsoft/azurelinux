@@ -1031,16 +1031,16 @@ popd
 rm -rf nspr-4.21
 touch /logs/status_nspr_complete
 
-echo popt-1.16
-tar xf popt-1.16.tar.gz
-pushd popt-1.16
+echo popt-1.18
+tar xf popt-1.18.tar.gz
+pushd popt-1.18
 ./configure --prefix=/usr \
         --disable-static \
         --build=$BUILD_TARGET
 make -j$(nproc)
 make install
 popd
-rm -rf popt-1.16
+rm -rf popt-1.18
 touch /logs/status_popt_complete
 
 echo libdb - aka Berkely DB-5.3.28

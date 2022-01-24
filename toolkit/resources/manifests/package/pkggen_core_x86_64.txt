@@ -78,9 +78,9 @@ libtool-2.4.6-7.cm2.x86_64.rpm
 flex-2.6.4-7.cm2.x86_64.rpm
 flex-devel-2.6.4-7.cm2.x86_64.rpm
 bison-3.7.6-1.cm2.x86_64.rpm
-popt-1.16-7.cm2.x86_64.rpm
-popt-devel-1.16-7.cm2.x86_64.rpm
-popt-lang-1.16-7.cm2.x86_64.rpm
+popt-1.18-1.cm2.x86_64.rpm
+popt-devel-1.18-1.cm2.x86_64.rpm
+popt-lang-1.18-1.cm2.x86_64.rpm
 nspr-4.21-2.cm2.x86_64.rpm
 nspr-devel-4.21-2.cm2.x86_64.rpm
 sqlite-3.34.1-2.cm2.x86_64.rpm

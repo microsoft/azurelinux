@@ -4810,8 +4810,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.6.14",
-          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.14.tar.xz"
+          "version": "3.7.3",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.3.tar.xz"
         }
       }
     },
@@ -21694,8 +21694,8 @@
         "type": "other",
         "other": {
           "name": "popt",
-          "version": "1.16",
-          "downloadUrl": "ftp://anduin.linuxfromscratch.org/BLFS/svn/p/popt-1.16.tar.gz"
+          "version": "1.18",
+          "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz"
         }
       }
     },
