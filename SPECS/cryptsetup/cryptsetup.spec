@@ -99,26 +99,22 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %postun -n cryptsetup-libs -p /sbin/ldconfig
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc AUTHORS FAQ docs/*ReleaseNotes
 %{_mandir}/man8/cryptsetup.8.gz
 %{_sbindir}/cryptsetup
 
 %files -n veritysetup
-%{!?_licensedir:%global license %%doc}
 %license COPYING
 %{_mandir}/man8/veritysetup.8.gz
 %{_sbindir}/veritysetup
 
 %files -n integritysetup
-%{!?_licensedir:%global license %%doc}
 %license COPYING
 %{_mandir}/man8/integritysetup.8.gz
 %{_sbindir}/integritysetup
 
 %files reencrypt
-%{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc misc/dracut_90reencrypt
 %{_mandir}/man8/cryptsetup-reencrypt.8.gz
@@ -131,7 +127,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/libcryptsetup.pc
 
 %files libs -f cryptsetup.lang
-%{!?_licensedir:%global license %%doc}
 %license COPYING COPYING.LGPL
 %{_libdir}/libcryptsetup.so.*
 %{_tmpfilesdir}/cryptsetup.conf
