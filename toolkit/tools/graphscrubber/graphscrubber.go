@@ -33,41 +33,12 @@ var (
 	logLevel = exe.LogLevelFlag(app)
 )
 
-func isNodeInList(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToBuild []*pkgjson.PackageVer) bool {
-	for _, pkgVer := range packagesToBuild {
-
-		lookupNode, err := pkgGraph.FindExactPkgNodeFromPkg(pkgVer)
-		if err != nil {
-			continue
-		}
-
-		if lookupNode != nil {
-			switch node.Type {
-			case pkggraph.TypeBuild:
-				if node.ID() == lookupNode.BuildNode.ID() {
-					logger.Log.Infof("Lookup match - Build: %s", node.FriendlyName())
-					return true
-				}
-			case pkggraph.TypeRun:
-				if node.ID() == lookupNode.RunNode.ID() {
-					logger.Log.Infof("Lookup match - Run: %s", node.FriendlyName())
-					return true
-				}
-			}
-		}
-	}
-
-	return false
-}
-
 func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph, skipPkgs []*pkgjson.PackageVer) (err error) {
 	for _, node := range pkgGraph.AllNodes() {
 
 		if node.Type != pkggraph.TypeRun {
 			continue
 		}
-
-		isNodeInList(pkgGraph, node, skipPkgs)
 
 		isPrebuilt, _ := pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, nil)
 
@@ -86,7 +57,7 @@ func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph, skipPkgs []*p
 			if parentNode.Type != pkggraph.TypeGoal {
 				pkgGraph.RemoveEdge(parentNode.ID(), node.ID())
 
-				//logger.Log.Infof("Adding a 'PreBuilt' node '%s' with id %d. For '%s'", preBuiltNode.FriendlyName(), preBuiltNode.ID(), parentNode.FriendlyName())
+				logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d. For '%s'", preBuiltNode.FriendlyName(), preBuiltNode.ID(), parentNode.FriendlyName())
 				err = pkgGraph.AddEdge(parentNode, preBuiltNode)
 
 				if err != nil {
@@ -102,10 +73,10 @@ func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph, skipPkgs []*p
 func removeExistingGoalNode(pkgGraph *pkggraph.PkgGraph, goalNodeName string) {
 	goalNode := pkgGraph.FindGoalNode(goalNodeName)
 	if goalNode != nil {
-		logger.Log.Warnf("Found goalNode: %s. Removing it.", goalNodeName)
+		logger.Log.Infof("Found goalNode: %s. Removing it.", goalNodeName)
 		pkgGraph.RemoveNode(goalNode.ID())
 	} else {
-		logger.Log.Warnf("Can't find goalNode: %s", goalNodeName)
+		logger.Log.Warnf("Can't find goalNode: %s. Skipping Removal", goalNodeName)
 	}
 	return
 }
@@ -117,75 +88,15 @@ func subGraphPkgsToBuild(pkgGraph *pkggraph.PkgGraph, packageVersToBuild []*pkgj
 	if schedulerutils.CanSubGraph(pkgGraph, pkgToBuildGoalNode, true) {
 		optimizedGraph, err = pkgGraph.CreateSubGraph(pkgToBuildGoalNode)
 		if err != nil {
-			logger.Log.Warnf("Failed to create subgraph error: %s", err)
+			logger.Log.Panicf("Failed to create subgraph error: %s", err)
 			return
 		}
 	} else {
-		logger.Log.Warnf("OOPS: Its not possible to subgraph")
+		logger.Log.Warnf("Not possible to subgraph")
 		return
 	}
 
 	return
-}
-
-func isNodeInListt(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToBuild []*pkgjson.PackageVer) bool {
-	for _, pkgVer := range packagesToBuild {
-
-		lookupNode, err := pkgGraph.FindExactPkgNodeFromPkg(pkgVer)
-		if err != nil {
-			continue
-		}
-
-		if lookupNode != nil {
-			switch node.Type {
-			case pkggraph.TypeBuild:
-				if node.ID() == lookupNode.BuildNode.ID() {
-					logger.Log.Infof("Lookup match - Build: %s", node.FriendlyName())
-					return true
-				}
-			case pkggraph.TypeRun:
-				if node.ID() == lookupNode.RunNode.ID() {
-					logger.Log.Infof("Lookup match - Run: %s", node.FriendlyName())
-					return true
-				}
-			}
-		}
-	}
-
-	return false
-}
-
-func resetToBuildNodes(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjson.PackageVer) {
-	goalNode := pkgGraph.FindGoalNode(allGoalNodeName)
-
-	firstLevelRunNodes := pkgGraph.From(goalNode.ID())
-	for firstLevelRunNodes.Next() {
-		runNode := firstLevelRunNodes.Node().(*pkggraph.PkgNode)
-		runNode.Type = pkggraph.TypeRun
-		runNode.State = pkggraph.StateMeta
-	}
-	return
-}
-
-func skipNodesNotInPkgsToBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjson.PackageVer) {
-	for _, node := range pkgGraph.AllNodes() {
-		if node.Type == pkggraph.TypeBuild {
-			node.State = pkggraph.StateUpToDate
-		}
-	}
-
-	for _, node := range pkgGraph.AllNodes() {
-
-		if node.Type != pkggraph.TypeBuild {
-			continue
-		}
-
-		isNodeTobeRebuild := isNodeInListt(pkgGraph, node, packagesToBuild)
-		if isNodeTobeRebuild {
-			logger.Log.Infof("Adding package from building: '%s'", node.FriendlyName())
-			node.State = pkggraph.StateBuild
-		}
-	}
 }
 
 func main() {
@@ -202,14 +113,11 @@ func main() {
 
 	if !*hydratedBuild {
 		err = pkggraph.WriteDOTGraphFile(scrubbedGraph, *outputGraphFile)
-		logger.Log.Warnf("Not scrubbing the graph")
 		if err != nil {
 			logger.Log.Panicf("Failed to write cache graph to file, %s. Error: %s", *outputGraphFile, err)
 		}
 		return
 	}
-
-	//ignoredPackages := exe.ParseListArgument(*ignoredPackages)
 
 	// Generate the list of packages that need to be built.
 	// If none are requested then all packages will be built.
@@ -232,7 +140,7 @@ func main() {
 		logger.Log.Panicf("Failed to replace run nodes with preBuilt nodes. Error: %s", err)
 	}
 
-	logger.Log.Warnf("Nodes before subgraphing: %d", len(scrubbedGraph.AllNodes()))
+	logger.Log.Infof("Nodes before subgraphing: %d", len(scrubbedGraph.AllNodes()))
 
 	optimizedGraph, err := subGraphPkgsToBuild(scrubbedGraph, pkgVersToBuild)
 	if err != nil {
@@ -241,15 +149,7 @@ func main() {
 	}
 	scrubbedGraph = optimizedGraph
 
-	logger.Log.Warnf("Nodes after subgraphing: %d", len(scrubbedGraph.AllNodes()))
-
-	resetToBuildNodes(scrubbedGraph, pkgVersToBuild)
-
-	//TODO: Ideally there shouldn't any build nodes to be skipped
-	skipNodesNotInPkgsToBuild(scrubbedGraph, pkgVersToBuild)
-	if err != nil {
-		logger.Log.Panicf("Failed while skipping build nodes. Error: %s", err)
-	}
+	logger.Log.Infof("Nodes after subgraphing: %d", len(scrubbedGraph.AllNodes()))
 
 	err = pkggraph.WriteDOTGraphFile(scrubbedGraph, *outputGraphFile)
 	if err != nil {
