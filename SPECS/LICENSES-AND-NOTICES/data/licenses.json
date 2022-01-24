@@ -775,7 +775,6 @@
                 "liblqr-1",
                 "libmad",
                 "libmediaart",
-                "libmemcached",
                 "libmetalink",
                 "libmicrohttpd",
                 "libmikmod",
@@ -821,7 +820,6 @@
                 "libpwquality",
                 "libqb",
                 "libqxp",
-                "librabbitmq",
                 "libraqm",
                 "LibRaw",
                 "libraw1394",
@@ -2277,6 +2275,13 @@
                 "zfs-fuse",
                 "zipper",
                 "zziplib"
+            ]
+        },
+        "Fedora (Copyright Remi Collet)": {
+            "license": "[CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/legalcode)",
+            "specs": [
+                "libmemcached-awesome",
+                "librabbitmq"
             ]
         },
         "Magnus Edenhill Open Source": {
