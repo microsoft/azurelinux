@@ -1,7 +1,7 @@
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 URL:            https://invisible-island.net/ncurses/
 Group:          Applications/System
@@ -208,6 +208,8 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+*   Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.2-5
+-   Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 *   Thu Aug 06 2020 Mateusz Malisz <mamalisz@microsoft.com> 6.2-4
 -   Sync build process with Fedora 32.
 -   Add libtinfo

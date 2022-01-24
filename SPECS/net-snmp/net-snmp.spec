@@ -2,7 +2,7 @@
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
 Version:        5.9
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -101,6 +101,9 @@ popd
 %exclude %{_libdir}/perl5/perllocal.pod
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.9-7
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-6
 - Remove libtool archive files from final packaging
 
