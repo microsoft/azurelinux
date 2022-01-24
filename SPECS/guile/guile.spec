@@ -1,7 +1,7 @@
 Summary:	GNU Ubiquitous Intelligent Language for Extensions
 Name:		guile
 Version:    2.0.14
-Release:    2%{?dist}
+Release:    3%{?dist}
 License: 	LGPLv3+
 URL:		https://www.gnu.org/software/guile/
 Source0: 	ftp://ftp.gnu.org/pub/gnu/guile/%{name}-%{version}.tar.gz
@@ -67,6 +67,9 @@ make  %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0.14-3
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.0.14-2
 - Added %%license line automatically
 

@@ -1,7 +1,7 @@
 Summary:        Ruby
 Name:           ruby
 Version:        2.6.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,9 @@ sudo -u test make test TESTS="-v"
 %{_mandir}/man5/*
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.6.7-3
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
+
 * Wed Aug 11 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.7-2
 - Patching CVE-2021-32066.
 
