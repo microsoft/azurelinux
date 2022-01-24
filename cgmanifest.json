@@ -10340,6 +10340,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libmemcached-awesome",
+          "version": "1.1.1",
+          "downloadUrl": "https://github.com/awesomized/libmemcached/archive/refs/tags/1.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmetalink",
           "version": "0.1.3",
           "downloadUrl": "https://launchpad.net/libmetalink/trunk/libmetalink-0.1.3/+download/libmetalink-0.1.3.tar.bz2"
@@ -13521,8 +13531,8 @@
         "type": "other",
         "other": {
           "name": "memcached",
-          "version": "1.5.22",
-          "downloadUrl": "https://www.memcached.org/files/memcached-1.5.22.tar.gz"
+          "version": "1.6.13",
+          "downloadUrl": "https://www.memcached.org/files/memcached-1.6.13.tar.gz"
         }
       }
     },
