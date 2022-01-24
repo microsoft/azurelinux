@@ -1,12 +1,11 @@
 Name:           traceroute
 Summary:        Traces the route taken by packets over an IPv4/IPv6 network
 Version:        2.1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Group:          Applications/Internet
 Url:            http://traceroute.sourceforge.net
 Source0:        http://downloads.sourceforge.net/project/traceroute/traceroute/traceroute-%{version}/traceroute-%{version}.tar.gz
-%define sha1    traceroute=bc5c6c8022187511be5665b3818d919be5987dcc
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
@@ -39,9 +38,6 @@ pushd %{buildroot}%{_mandir}/man8
 ln -s traceroute.8 tcptraceroute.8
 popd
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root,-)
 %license COPYING
@@ -52,6 +48,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-6
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.1.0-5
 - Added %%license line automatically
 

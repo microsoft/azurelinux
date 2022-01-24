@@ -24,7 +24,7 @@ http://readthedocs.org/docs/cliff/en/latest/
 
 Name:             python-%{modname}
 Version:          2.16.0
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          Command Line Interface Formulation Framework
 
 Group:            Development/Libraries
@@ -54,7 +54,7 @@ Requires:         python%{pyver}-six
 Requires:         python%{pyver}-cmd2 >= 0.6.7
 Requires:         python%{pyver}-pyparsing
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:         PyYAML
 Requires:         python%{pyver}-unicodecsv
 %else
@@ -77,7 +77,7 @@ BuildRequires:    python%{pyver}-testtools
 BuildRequires:    python%{pyver}-testscenarios
 BuildRequires:    python%{pyver}-testrepository
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 BuildRequires:    python-docutils
 BuildRequires:    PyYAML
 BuildRequires:    python%{pyver}-unicodecsv
@@ -95,7 +95,7 @@ Requires:         python%{pyver}-testtools
 Requires:         python%{pyver}-testscenarios
 Requires:         python%{pyver}-testrepository
 # Handle python2 exception
-%if %{pyver} == 2
+%if "%{pyver}" == "2"
 Requires:         PyYAML
 Requires:         python%{pyver}-unicodecsv
 %else
@@ -135,6 +135,9 @@ PYTHON=python%{pyver} %{pyver_bin} setup.py test
 %{pyver_sitelib}/%{modname}/tests
 
 %changelog
+* Fri Dec 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.16.0-5
+- License verified.
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 2.16.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove Fedora version check for python version

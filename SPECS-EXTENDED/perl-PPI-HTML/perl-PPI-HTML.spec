@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-PPI-HTML
 Version:        1.08
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Generate syntax-highlighted HTML for Perl using PPI
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/PPI-HTML
@@ -14,7 +14,9 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(Module::CoreList)
 # Module Run-time:
 BuildRequires:  perl(CSS::Tiny) >= 1.10
 BuildRequires:  perl(Params::Util) >= 0.05
@@ -68,6 +70,9 @@ make test
 %{_mandir}/man3/PPI::HTML.3*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.08-24
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.08-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

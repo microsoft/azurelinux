@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "ripgrep-13.0.0.tar.gz": "0fb17aaf285b3eee8ddab17b833af1e190d73de317ff9648751ab0660d763ed2",
+  "ripgrep-13.0.0-vendor.tar.xz": "2be7c23543d01804acbf95238a0b274f73f29f2f79defe593ed5c5df15fe1843",
+  "cargo_config": "6eecdb513f92e130bb05679b32eb54d67aaefbf6a2086e275c3048ebcc972128"
+ }
+}

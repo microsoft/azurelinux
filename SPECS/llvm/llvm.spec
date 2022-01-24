@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,9 +68,6 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 cd build
 ninja check-all
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
@@ -91,6 +88,9 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0.1-2
+- Removing the explicit %%clean stage.
+
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
 - Update to 12.0.1
 

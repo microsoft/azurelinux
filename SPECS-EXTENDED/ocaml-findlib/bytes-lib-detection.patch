@@ -1,0 +1,26 @@
+From 5f1b253a84215d7f83e43bb8a5e247cf44fff569 Mon Sep 17 00:00:00 2001
+From: Thomas Crain <thcrain@microsoft.com>
+Date: Tue, 18 Jan 2022 15:12:19 -0800
+Subject: [PATCH] Make bytes lib detection work for ocaml 4.13
+
+---
+ configure | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 64656f2..630c319 100755
+--- a/configure
++++ b/configure
+@@ -543,7 +543,8 @@ fi
+ # bytes?
+ 
+ if [ -f "${ocaml_core_stdlib}/bytes.cmi" -o \
+-     -f "${ocaml_core_stdlib}/stdlib__bytes.cmi" ]; then
++     -f "${ocaml_core_stdlib}/stdlib__bytes.cmi" -o \
++     -f "${ocaml_core_stdlib}/stdlib__Bytes.cmi" ]; then
+     echo "bytes: found, installing fake library"
+     lbytes="bytes"
+     cbytes=0
+-- 
+2.25.1
+

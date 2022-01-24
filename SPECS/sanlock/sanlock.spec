@@ -1,7 +1,7 @@
 Summary:        A shared storage lock manager
 Name:           sanlock
-Version:        3.8.1
-Release:        2%{?dist}
+Version:        3.8.4
+Release:        1%{?dist}
 License:        GPLv2 AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -183,6 +183,9 @@ common sanlock lockspace.
 %{_mandir}/man8/sanlk-reset*
 
 %changelog
+* Tue Dec 28 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 3.8.4-1
+- Update to version 3.8.4.
+
 * Mon Jul 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Added %%license macro.

@@ -33,7 +33,7 @@
 
 Name:           bsh
 Version:        2.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 Summary:        Lightweight Scripting for Java
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,7 +60,7 @@ BuildRequires:  ImageMagick
 BuildRequires:  desktop-file-utils
 %endif
 
-Requires:       java-headless
+Requires:       java
 Requires:       bsf
 Requires:       jline
 # Explicit javapackages-tools requires since scripts use
@@ -171,6 +171,10 @@ cat scripts/bshdoc.bsh >> %{buildroot}%{_bindir}/bshdoc
 %license LICENSE NOTICE
 
 %changelog
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.0-20
+- Rename java-headless dependency to java
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.0-19
 - Remove epoch
 

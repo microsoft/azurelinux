@@ -1,0 +1,66 @@
+From 5eff09224929f8fa1a2e19f9a15befd3a4a395ea Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Fri, 26 Apr 2019 16:16:29 +0100
+Subject: [PATCH 3/3] configure: Remove incorrect assumption about
+ cross-compiling.
+
+See https://github.com/ocaml/ocaml/issues/8647#issuecomment-487094390
+
+The error seen without this patch is:
+
+sh: line 1: x86_64-pc-linux-gnu-as: command not found
+---
+ configure.ac | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e2a3cbea0..07c005f09 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -560,10 +560,11 @@ AS_IF(
+ 
+ # Are we building a cross-compiler
+ 
+-AS_IF(
+-  [test x"$host" = x"$target"],
+-    [cross_compiler=false],
+-    [cross_compiler=true])
++#AS_IF(
++#  [test x"$host" = x"$target"],
++#    [cross_compiler=false],
++#    [cross_compiler=true])
++cross_compiler=false
+ 
+ # Checks for programs
+ 
+@@ -1186,17 +1187,17 @@ AS_CASE([$arch],
+ 
+ # Assembler
+ 
+-AS_IF([test -n "$target_alias"],
+-  [toolpref="${target_alias}-"
+-  as_target="$target"
+-  as_cpu="$target_cpu"],
+-  [AS_IF([test -n "$host_alias"],
+-    [toolpref="${host_alias}-"
+-    as_target="$host"
+-    as_cpu="$host_cpu"],
+-    [toolpref=""
+-    as_target="$build"
+-    as_cpu="$build_cpu"])])
++dnl AS_IF([test -n "$target_alias"],
++dnl   [toolpref="${target_alias}-"
++dnl   as_target="$target"
++dnl   as_cpu="$target_cpu"],
++dnl   [AS_IF([test -n "$host_alias"],
++dnl     [toolpref="${host_alias}-"
++dnl     as_target="$host"
++dnl     as_cpu="$host_cpu"],
++dnl     [toolpref=""
++dnl     as_target="$build"
++dnl     as_cpu="$build_cpu"])])
+ 
+ # Finding the assembler
+ # The OCaml build system distinguishes two different assemblers:
+-- 
+2.32.0

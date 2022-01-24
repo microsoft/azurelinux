@@ -1,12 +1,11 @@
 Name:           lzo
 Version:        2.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Data compression library with very fast (de)compression
 Group:          System Environment/Libraries
 License:        GPLv2+
 URL:            http://www.oberhumer.com/opensource/lzo/
 Source0:        http://www.oberhumer.com/opensource/lzo/download/%{name}-%{version}.tar.gz
-%define sha1 lzo=4924676a9bae5db58ef129dc1cebce3baa3c4b5d
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  zlib-devel
@@ -63,9 +62,6 @@ install -p -m 644 minilzo/minilzo.h $RPM_BUILD_ROOT%{_includedir}/lzo
 %check
 make check test
 
-%clean
-rm -rf %{buildroot}
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
@@ -93,6 +89,10 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/lzo2.pc
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.10-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.10-3
 - Added %%license line automatically
 

@@ -1,16 +1,16 @@
 Name:		biosdevname
 Version:	0.7.3
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Udev helper for naming devices per BIOS names
 License:	GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		http://linux.dell.com/files/%{name}
+URL:		https://github.com/dell/biosdevname
 # SMBIOS only exists on these arches.  It's also likely that other
 # arches don't expect the PCI bus to be sorted breadth-first, or of
 # so, there haven't been any comments about that on LKML.
 ExclusiveArch:	%{ix86} x86_64
-Source0:	http://linux.dell.com/files/%{name}/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source0:	https://github.com/dell/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -41,12 +41,17 @@ make %{?_smp_mflags}
 make install install-data DESTDIR=%{buildroot}
 
 %files
-%doc COPYING README
+%license COPYING
+%doc README
 %{_sbindir}/%{name}
 %{_prefix}/lib/udev/rules.d/*.rules
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.3-7
+- License verified.
+- Updated source and project URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.3-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -162,10 +167,6 @@ make install install-data DESTDIR=%{buildroot}
 - Don't display _vf suffix on NPAR devices with single function
 - Fix PCIe/PIRQ slot mapping
 
-<<<<<<< HEAD
-=======
-
->>>>>>> f16
 * Thu Apr 21 2011 Praveen K Paladugu <praveen_paladugu@dell.com> - 0.3.8-1
 - Add changes to parse VPD structure for device mapping on NPAR devices
 - Fix pathname

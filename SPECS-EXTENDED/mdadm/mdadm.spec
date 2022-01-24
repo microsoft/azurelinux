@@ -1,37 +1,39 @@
-Name:        mdadm
-Version:     4.1
-#define subversion rc2
-Release:     6%{?dist}
-Summary:     The mdadm program controls Linux md devices (software RAID arrays)
+%bcond_with libreport
+Summary:        The mdadm program controls Linux md devices (software RAID arrays)
+Name:           mdadm
+Version:        4.1
+Release:        7%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:         http://www.kernel.org/pub/linux/utils/raid/mdadm/
-License:     GPLv2+
-
-Source:      http://www.kernel.org/pub/linux/utils/raid/mdadm/%{name}-%{version}%{?subversion:-%{subversion}}.tar.xz
-Source1:     raid-check
-Source2:     mdadm.rules
-Source3:     mdadm-raid-check-sysconfig
-Source4:     mdmonitor.service
-Source5:     mdadm.conf
-Source6:     mdadm_event.conf
-Source7:     raid-check.timer
-Source8:     raid-check.service
-
+URL:            https://www.kernel.org/pub/linux/utils/raid/mdadm/
+Source0:        http://www.kernel.org/pub/linux/utils/raid/mdadm/%{name}-%{version}.tar.xz
+Source1:        raid-check
+Source2:        mdadm.rules
+Source3:        mdadm-raid-check-sysconfig
+Source4:        mdmonitor.service
+Source5:        mdadm.conf
+Source6:        mdadm_event.conf
+Source7:        raid-check.timer
+Source8:        raid-check.service
 # Build without -Werror.  From Debian.
-Patch00:     https://sources.debian.org/data/main/m/mdadm/4.1-2/debian/patches/debian-no-Werror.diff#/mdadm-4.1-no-Werror.patch
-
+Patch00:        https://sources.debian.org/data/main/m/mdadm/4.1-2/debian/patches/debian-no-Werror.diff#/mdadm-4.1-no-Werror.patch
 # Fedora customization patches
-Patch97:     mdadm-3.3-udev.patch
-Patch98:     mdadm-2.5.2-static.patch
-
-BuildRequires: systemd-rpm-macros binutils-devel gcc
-Requires: libreport-filesystem
-Requires(post): systemd coreutils
+Patch97:        mdadm-3.3-udev.patch
+Patch98:        mdadm-2.5.2-static.patch
+BuildRequires:  binutils-devel
+BuildRequires:  gcc
+BuildRequires:  systemd-rpm-macros
+Requires(post): coreutils
+Requires(post): systemd
+Requires(postun): coreutils
+Requires(postun): systemd
 Requires(preun): systemd
-Requires(postun): systemd coreutils
+%if %{with libreport}
+Requires:       libreport-filesystem
+%endif
 
-%description 
+%description
 The mdadm program is used to create, manage, and monitor Linux MD (software
 RAID) devices.  As such, it provides similar functionality to the raidtools
 package.  However, mdadm is a single program, and it can perform
@@ -42,10 +44,10 @@ file can be used to help with some common tasks.
 %autosetup -p1 -n %{name}-%{version}%{?subversion:_%{subversion}}
 
 %build
-make %{?_smp_mflags} CXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" SYSCONFDIR="%{_sysconfdir}" mdadm mdmon
+make %{?_smp_mflags} CXFLAGS="%{optflags}" LDFLAGS="$RPM_LD_FLAGS" SYSCONFDIR="%{_sysconfdir}" mdadm mdmon
 
 %install
-make DESTDIR=%{buildroot} MANDIR=%{_mandir} BINDIR=%{_sbindir} SYSTEMD_DIR=%{_unitdir} UDEVDIR=/usr/lib/udev/ install install-systemd
+make DESTDIR=%{buildroot} MANDIR=%{_mandir} BINDIR=%{_sbindir} SYSTEMD_DIR=%{_unitdir} UDEVDIR=%{_libdir}/udev/ install install-systemd
 install -Dp -m 755 %{SOURCE1} %{buildroot}%{_sbindir}/raid-check
 install -Dp -m 644 %{SOURCE2} %{buildroot}%{_udevrulesdir}/65-md-incremental.rules
 install -Dp -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/raid-check
@@ -64,8 +66,10 @@ mkdir -p %{buildroot}%{_localstatedir}/run/
 install -d -m 0710 %{buildroot}/run/%{name}/
 
 # abrt
-mkdir -p %{buildroot}/etc/libreport/events.d
-install -m644 %{SOURCE6} %{buildroot}/etc/libreport/events.d
+%if %{with libreport}
+mkdir -p %{buildroot}%{_sysconfdir}/libreport/events.d
+install -m644 %{SOURCE6} %{buildroot}%{_sysconfdir}/libreport/events.d
+%endif
 
 %post
 %systemd_post mdmonitor.service raid-check.timer
@@ -83,13 +87,20 @@ install -m644 %{SOURCE6} %{buildroot}/etc/libreport/events.d
 %{_sbindir}/*
 %{_unitdir}/*
 %{_mandir}/man*/md*
-/usr/lib/systemd/system-shutdown/*
+%{_libdir}/systemd/system-shutdown/*
 %config(noreplace) %{_sysconfdir}/sysconfig/*
 %dir /run/%{name}/
 %config(noreplace) %{_tmpfilesdir}/%{name}.conf
-/etc/libreport/events.d/*
+%if %{with libreport}
+%{_sysconfdir}/libreport/events.d/*
+%endif
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 4.1-7
+- Disable usage of libreport by default
+- License verified
+- Lint spec
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
@@ -150,7 +161,7 @@ install -m644 %{SOURCE6} %{buildroot}/etc/libreport/events.d
 * Mon Jul 09 2018 Xiao Ni <xni@redhat.com> 4.1-rc1-1
 - Update to latest upstream version 4.1-rc1
 - Resolves bz1556591
- 
+
 * Wed Jul  4 2018 Peter Robinson <pbrobinson@fedoraproject.org> 4.0-7
 - Cleanup spec, use %%licenece, drop old sys-v migration bits
 
@@ -215,6 +226,7 @@ install -m644 %{SOURCE6} %{buildroot}/etc/libreport/events.d
 * Tue Aug 26 2014 Jes Sorensen <Jes.Sorensen@redhat.com> - 3.3.2-1
 - Upgrade to mdadm-3.3.2
 - Resolves bz1132847
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.3.1-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
@@ -831,7 +843,7 @@ install -m644 %{SOURCE6} %{buildroot}/etc/libreport/events.d
 * Thu Apr 17 2008 Bill Nottingham <notting@redhat.com> - 2.6.4-4
 - make /dev/md if necessary in incremental mode (#429604)
 - open RAID devices with O_EXCL to avoid racing against other --incremental processes (#433932)
- 
+
 * Fri Feb  1 2008 Bill Nottingham <notting@redhat.com> - 2.6.4-3
 - add a udev rules file for device assembly (#429604)
 

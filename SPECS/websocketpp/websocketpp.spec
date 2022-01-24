@@ -1,8 +1,7 @@
-
 Name:       websocketpp
 Summary:    C++ WebSocket Protocol Library
-Version:    0.8.1
-Release:    9%{?dist}
+Version:    0.8.2
+Release:    1%{?dist}
 Group:      Applications/File
 License:    BSD and MIT
 Url:        https://www.zaphoyd.com/websocketpp
@@ -25,18 +24,13 @@ Patch2: websocketpp-0.8.1-cmake-configversion-compatibility-anynewerversion.patc
 # Disable the following tests, which fail occasionally: test_transport, test_transport_asio_timers
 Patch3: websocketpp-0.7.0-disable-test_transport-test_transport_asio_timers.patch
 
-# Update version number in CMakeLists.txt to 0.8.1
-# Upstream commit: https://github.com/zaphoyd/websocketpp/commit/72e2760
-Patch4: websocketpp-0.8.1-fix_CMakeLists.txt_version_number.patch
-
-# Upstream PR: https://github.com/zaphoyd/websocketpp/pull/814
-Patch5: websocketpp-0.8.1-boost_1.70.patch
-
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 BuildRequires:  boost-devel
 BuildRequires:  cmake
+BuildRequires:  gcc-c++
+BuildRequires:  pkgconf-pkg-config
 # needed for tests mostly
 BuildRequires:  openssl
 BuildRequires:  zlib-devel
@@ -60,13 +54,7 @@ iostreams and one based on Boost Asio.
 
 
 %prep
-%setup
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-
+%autosetup -p1
 
 %build
 mkdir %{_target_platform}
@@ -76,7 +64,6 @@ pushd %{_target_platform}
 
 make %{?_smp_mflags}
 popd
-
 
 %install
 make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
@@ -90,7 +77,6 @@ rm -rfv %{buildroot}%{_includedir}/test_connection/
 %check
 make test -C %{_target_platform}
 
-
 %files devel
 %doc changelog.md readme.md roadmap.md
 %license COPYING
@@ -99,8 +85,10 @@ make test -C %{_target_platform}
 %{_datadir}/cmake/websocketpp/
 %{_datadir}/pkgconfig/websocketpp.pc
 
-
 %changelog
+* Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 0.8.2-1
+- Update version to 0.8.2
+
 * Tue Mar 31 2020 Paul Monson <paulmon@microsoft.com> 0.8.1-9
 - Fix Source0 URL. License verified.
 

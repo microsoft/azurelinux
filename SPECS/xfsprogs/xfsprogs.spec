@@ -1,7 +1,7 @@
 Summary:        Utilities for managing the XFS filesystem
 Name:           xfsprogs
 Version:        5.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ and LGPLv2+
 URL:            http://oss.sgi.com/projects/xfs/
 Group:          System Environment/Base
@@ -55,9 +55,6 @@ find %{buildroot}/%{_lib64dir} -name '*.a' -delete
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
-%clean
-rm -rf %{buildroot}/*
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
@@ -87,6 +84,9 @@ rm -rf %{buildroot}/*
 %defattr(-,root,root)
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0.0-3
+- Removing the explicit %%clean stage.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 5.0.0-2
 - Added %%license line automatically
 

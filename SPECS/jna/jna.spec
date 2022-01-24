@@ -22,7 +22,7 @@
 Summary:        Java Native Access
 Name:           jna
 Version:        5.5.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,10 +72,6 @@ dos2unix OTHERS
 %patch0 -p1
 
 sed -i 's|@LIBDIR@|%{_libdir}/%{name}|' src/com/sun/jna/Native.java
-
-%clean
-rm -rf %{buildroot}
-
 
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
@@ -139,6 +135,9 @@ ant
 %license LICENSE
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.0-4
+- Removing the explicit %%clean stage.
+
 * Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.5.0-3
 - Modify to build with JDK 11
 

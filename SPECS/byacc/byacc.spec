@@ -1,15 +1,14 @@
-%define byaccdate 20200330
+%define byaccdate 20220109
 
 Summary:      Berkeley Yacc, a parser generator
 Name:         byacc
 Version:      1.9.%{byaccdate}
-Release:      3%{?dist}
+Release:      1%{?dist}
 License:      Public Domain
-URL:          https://invisible-island.net/byacc/byacc.html
+URL:          https://invisible-island.net/byacc
 Vendor:       Microsoft Corporation
 Distribution: Mariner
-#Source0:     https://invisible-mirror.net/archives/%{name}/%{name}-%{byaccdate}.tgz
-Source0:      %{name}-%{version}.tar.gz 
+Source0:      https://invisible-mirror.net/archives/%{name}/%{name}-%{byaccdate}.tgz 
 
 BuildRequires: gcc
 
@@ -54,6 +53,9 @@ echo ====================TESTING END=====================
 %{_mandir}/man1/byacc.1*
 
 %changelog
+* Tue Jan 11 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.9.20220109-1
+- Upgrade to 1.9.20220109
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.9.20200330-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified

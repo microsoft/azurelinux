@@ -1,0 +1,108 @@
+diff -ur b/atd.c a/atd.c
+--- b/atd.c	2021-04-25 03:31:30.000000000 +0200
++++ a/atd.c	2021-05-21 13:00:45.135020670 +0200
+@@ -74,6 +74,9 @@
+ #include <syslog.h>
+ #endif
+ 
++#include <sys/file.h>
++#include <utime.h>
++
+ /* Local headers */
+ 
+ #include "privs.h"
+@@ -275,7 +278,7 @@
+  * mail to the user.
+  */
+     pid_t pid;
+-    int fd_out, fd_in;
++    int fd_out, fd_in, fd_std;
+     char jobbuf[9];
+     char *mailname = NULL;
+     int mailsize = 128;
+@@ -390,6 +393,10 @@
+ 
+     fcntl(fd_in, F_SETFD, fflags & ~FD_CLOEXEC);
+ 
++    if (flock(fd_in, LOCK_EX | LOCK_NB) != 0)
++	    perr("Somebody already locked the job %8lu (%.500s) - "
++	     "aborting", jobno, filename);
++
+     /*
+      * If the spool directory is mounted via NFS `atd' isn't able to
+      * read from the job file and will bump out here.  The file is
+@@ -520,10 +527,7 @@
+ 	PRIV_END
+     }
+     /* We're the parent.  Let's wait.
+-     */
+-    close(fd_in);
+-
+-    /* We inherited the master's SIGCHLD handler, which does a
++       We inherited the master's SIGCHLD handler, which does a
+        non-blocking waitpid. So this blocking one will eventually
+        return with an ECHILD error. 
+      */
+@@ -548,14 +552,14 @@
+     /* some sendmail implementations are confused if stdout, stderr are
+      * not available, so let them point to /dev/null
+      */
+-    if ((fd_in = open("/dev/null", O_WRONLY)) < 0)
++    if ((fd_std = open("/dev/null", O_WRONLY)) < 0)
+ 	perr("Could not open /dev/null.");
+-    if (dup2(fd_in, STDOUT_FILENO) < 0)
++    if (dup2(fd_std, STDOUT_FILENO) < 0)
+ 	perr("Could not use /dev/null as standard output.");
+-    if (dup2(fd_in, STDERR_FILENO) < 0)
++    if (dup2(fd_std, STDERR_FILENO) < 0)
+ 	perr("Could not use /dev/null as standard error.");
+-    if (fd_in != STDOUT_FILENO && fd_in != STDERR_FILENO)
+-	close(fd_in);
++    if (fd_std != STDOUT_FILENO && fd_std != STDERR_FILENO)
++	close(fd_std);
+ 
+     if (unlink(filename) == -1)
+         syslog(LOG_WARNING, "Warning: removing output file for job %li failed: %s",
+@@ -563,7 +567,12 @@
+ 
+     /* The job is now finished.  We can delete its input file.
+      */
+-    chdir(ATJOB_DIR);
++    if (chdir(ATJOB_DIR) != 0)
++	perr("Somebody removed %s directory from under us.", ATJOB_DIR);
++
++    /* This also removes the flock */
++    (void)close(fd_in);
++
+     unlink(newname);
+     free(newname);
+ 
+@@ -673,16 +682,18 @@
+ 
+ 	/* Skip lock files */
+ 	if (queue == '=') {
+-            /* FIXME: calhariz */
+-            /* I think the following code is broken, but commenting it
+-               may cause unknow side effects.  Make a release and see
+-               in the wild how it works. For more information see:
+-               https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=818508 */
+-
+-	    /* if ((buf.st_nlink == 1) && (run_time + CHECK_INTERVAL <= now)) { */
+-	    /*     /\* Remove stale lockfile FIXME: lock the lockfile, if you fail, it's still in use. *\/ */
+-	    /*     unlink(dirent->d_name); */
+-	    /* } */
++	    if ((buf.st_nlink == 1) && (run_time + CHECK_INTERVAL <= now)) { 
++		    int fd;
++
++            fd = open(dirent->d_name, O_RDONLY);
++            if (fd != -1) {
++                if (flock(fd, LOCK_EX | LOCK_NB) == 0) {
++                    unlink(dirent->d_name);
++                    syslog(LOG_NOTICE, "removing stale lock file %s\n", dirent->d_name);
++                }
++                (void)close(fd);
++            }
++	    }
+ 	    continue;
+ 	}
+ 	/* Skip any other file types which may have been invented in

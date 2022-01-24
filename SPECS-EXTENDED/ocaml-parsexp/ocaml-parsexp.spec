@@ -7,18 +7,18 @@ Distribution:   Mariner
 %global srcname parsexp
 
 Name:           ocaml-%{srcname}
-Version:        0.14.0
-Release:        9%{?dist}
+Version:        0.15.0
+Release:        1%{?dist}
 Summary:        S-expression parsing library
 
 License:        MIT
 URL:            https://github.com/janestreet/parsexp
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.04.2
-BuildRequires:  ocaml-base-devel >= 0.14
+BuildRequires:  ocaml >= 4.08.0
+BuildRequires:  ocaml-base-devel >= 0.15
 BuildRequires:  ocaml-dune >= 2.0.0
-BuildRequires:  ocaml-sexplib0-devel >= 0.14
+BuildRequires:  ocaml-sexplib0-devel >= 0.15
 
 %description
 This library provides generic parsers for parsing S-expressions from
@@ -95,6 +95,10 @@ dune runtest
 %{_libdir}/ocaml/%{srcname}/*.mli
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+- Upgrade to latest version
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-9
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

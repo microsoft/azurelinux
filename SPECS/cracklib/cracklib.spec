@@ -4,7 +4,7 @@
 Summary:          A password strength-checking library.
 Name:             cracklib
 Version:          2.9.7
-Release:          3%{?dist}
+Release:          4%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
@@ -128,9 +128,6 @@ mkdir -p /usr/share/cracklib
 cp $RPM_BUILD_ROOT%{_datadir}/cracklib/* /usr/share/cracklib/
 make %{?_smp_mflags} test
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %post
 /sbin/ldconfig
 [ $1 = 1 ] || exit 0
@@ -188,6 +185,9 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-4
+-   Removing the explicit %%clean stage.
+
 *   Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.9.7-3
 -   Removed python2 support
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9.7-2

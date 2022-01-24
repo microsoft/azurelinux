@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
 Version:        1.9.5p2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -67,9 +67,6 @@ fi
 
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license doc/LICENSE
@@ -92,6 +89,9 @@ rm -rf %{buildroot}/*
 %exclude  /etc/sudoers.dist
 
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.5p2-3
+-   Removing the explicit %%clean stage.
+
 *   Mon Feb 22 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-2
 -   Move sudo/wheel groups before @includedir to not override user's settings.
 *   Tue Jan 26 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.9.5p2-1

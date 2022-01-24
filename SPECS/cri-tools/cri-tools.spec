@@ -3,7 +3,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.22.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubernetes-sigs/cri-tools
 #Source0:       https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz
@@ -51,10 +51,10 @@ install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/crictl.md
 %{_bindir}/*
 %{_datadir}/doc/%{name}
 
-%clean
-rm -rf %{buildroot}/*
-
 %changelog
+*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.0-2
+-   Removing the explicit %%clean stage.
+
 *   Thu Sep 16 2021 Andrew Phelps <anphel@microsoft.com> 1.22.0-1
 -   Update version to 1.22.0
 *   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.11.1-8

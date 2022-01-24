@@ -1,7 +1,7 @@
 Summary:        Network Time Protocol reference implementation
 Name:           ntp
 Version:        4.2.8p15
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT AND OpenLDAP AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -150,9 +150,6 @@ fi
 %systemd_postun_with_restart ntpd.service
 %systemd_postun ntpdate.service
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license COPYRIGHT LICENSE.PTR
@@ -202,6 +199,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.8p15-3
+- Removing the explicit %%clean stage.
+
 * Wed Nov 17 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.8p15-2
 - License verified.
 - Added "LICENSE.PTR" to clarify licensing.

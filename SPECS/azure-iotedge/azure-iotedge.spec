@@ -1,7 +1,7 @@
 Summary:        Azure IoT Edge Security Daemon
 Name:           azure-iotedge
 Version:        1.1.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 
 # A buildable azure-iotedge environments needs functioning submodules that do not work from the archive download
 # Tracking github issue is: https://github.com/Azure/iotedge/issues/1685
@@ -86,9 +86,6 @@ make %{?_smp_mflags} release
 %install
 export PATH=$PATH:/root/.cargo/bin/
 make %{?_smp_mflags} install DESTDIR=$RPM_BUILD_ROOT unitdir=%{_unitdir} docdir=%{_docdir}/iotedge-%{version}
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %pre
 # Check for container runtime
@@ -179,6 +176,9 @@ echo "==========================================================================
 %doc %{_docdir}/iotedge-%{version}/trademark
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-3
+- Removing the explicit %%clean stage.
+
 * Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.8-2
 - Removing stale dependency on an older version of "rust".
 - Adding a patch to fix compiling with "rust" 1.56.1 version.

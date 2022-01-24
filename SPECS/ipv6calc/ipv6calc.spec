@@ -29,7 +29,7 @@
 Summary:        IPv6 address format change and calculation utility
 Name:           ipv6calc
 Version:        2.2.0
-Release:        41%{?dist}
+Release:        42%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -193,9 +193,6 @@ install ipv6calcweb/ipv6calcweb.conf %{buildroot}%{_sysconfdir}/httpd/conf.d/
 install -m 755 ipv6calcweb/ipv6calcweb.cgi  %{buildroot}%{_localstatedir}/www/cgi-bin/
 install -m 644 ipv6calcweb/ipv6calcweb-databases-in-var.te  %{buildroot}%{_datadir}/%{name}/selinux/
 
-%clean
-rm -rf %{buildroot}
-
 %check
 %ifnarch ppc64
 	make test
@@ -249,6 +246,9 @@ rm -rf %{buildroot}
 %{_sbindir}/ldconfig
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.0-42
+- Removing the explicit %%clean stage.
+
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.2.0-41
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.

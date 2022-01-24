@@ -10,7 +10,7 @@
 
 Name:          systemtap
 Version:       4.1
-Release:       8%{?dist}
+Release:       9%{?dist}
 Summary:       Programmable system-wide instrumentation system
 Group:         Development/System
 Vendor:         Microsoft Corporation
@@ -194,9 +194,6 @@ install -m 644 initscript/logrotate.stap-server %{buildroot}%{_sysconfdir}/logro
 %check
 make %{?_smp_mflags} check
 
-%clean
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-
 %pre
 getent group stap-server >/dev/null || groupadd -g 155 -r stap-server || groupadd -r stap-server
 
@@ -361,6 +358,9 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-9
+- Removing the explicit %%clean stage.
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-8
 - Don't hardcode python site-packages directory (enables Python 3.9 build)
 
