@@ -28938,7 +28938,7 @@
         "other": {
           "name": "velocity",
           "version": "1.7",
-          "downloadUrl": "http://www.apache.org/dist/velocity/engine/1.7/velocity-1.7.tar.gz"
+          "downloadUrl": "https://github.com/apache/velocity-engine/archive/refs/tags/1.7.tar.gz"
         }
       }
     },
