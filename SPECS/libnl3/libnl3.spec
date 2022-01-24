@@ -1,40 +1,41 @@
 Summary:        Netlink Protocol Library Suite
 Name:           libnl3
-Version:        3.4.0
-Release:        7%{?dist}
+Version:        3.5.0
+Release:        1%{?dist}
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.infradead.org/~tgr/libnl/
 # It seems like the website no longer has the latest version of the source; this seems to be the correct source.
 # Note that a branch tag made it into the name using underscores in the semver. This will have to be updated with versions.
 Source0:        https://github.com/thom311/libnl/releases/download/%{name}_4_0/libnl-%{version}.tar.gz
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-BuildRequires:  glib-devel
 BuildRequires:  dbus-devel
-Requires:       glib
+BuildRequires:  glib-devel
 Requires:       dbus
+Requires:       glib
 
 %description
 The libnl suite is a collection of libraries providing APIs to netlink protocol based Linux kernel interfaces.
 Netlink is a IPC mechanism primarly between the kernel and user space processes. It was designed to be a more flexible successor to ioctl to provide mainly networking related kernel configuration and monitoring interfaces.
 
 %package devel
-Summary:	Libraries and headers for the libnl
-Requires:	libnl3
-Provides:   pkgconfig(libnl-3.0)
-Provides:   pkgconfig(libnl-cli-3.0)
-Provides:   pkgconfig(libnl-genl-3.0)
-Provides:   pkgconfig(libnl-idiag-3.0)
-Provides:   pkgconfig(libnl-nf-3.0)
-Provides:   pkgconfig(libnl-route-3.0)
-Provides:   pkgconfig(libnl-xfrm-3.0)
+Summary:        Libraries and headers for the libnl
+Requires:       libnl3
+Provides:       pkgconfig(libnl-3.0)
+Provides:       pkgconfig(libnl-cli-3.0)
+Provides:       pkgconfig(libnl-genl-3.0)
+Provides:       pkgconfig(libnl-idiag-3.0)
+Provides:       pkgconfig(libnl-nf-3.0)
+Provides:       pkgconfig(libnl-route-3.0)
+Provides:       pkgconfig(libnl-xfrm-3.0)
 
 %description devel
 Headers and static libraries for the libnl
 
 %prep
 %setup -q -n libnl-%{version}
+
 %build
 %configure
 make %{?_smp_mflags}
@@ -72,6 +73,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/libnl-xfrm-3.0.pc
 
 %changelog
+* Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 3.5.0-1
+- Upgrade to version 3.5.0
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.0-7
 - Remove libtool archive files from final packaging
 

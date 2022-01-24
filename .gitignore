@@ -20,6 +20,7 @@ SPECS/**/*.msp
 SPECS/**/*.rar
 SPECS/**/*.rpm
 SPECS/**/*.tar
+SPECS/**/*.tbz
 SPECS/**/*.tgz
 SPECS/**/*.txz
 SPECS/**/*.xar

@@ -1,7 +1,7 @@
 Summary:        unbound dns server
 Name:           unbound
-Version:        1.10.0
-Release:        5%{?dist}
+Version:        1.13.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,10 +10,6 @@ URL:            https://nlnetlabs.nl/projects/unbound/about/
 #Source0:       https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz
 Source0:        %{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
-# CVE-2020-12662.patch also fixes CVE-2020-12663
-Patch0:         CVE-2020-12662.patch
-Patch1:         CVE-2020-12663.nopatch
-Patch2:         CVE-2020-28935.patch
 BuildRequires:  expat-devel
 BuildRequires:  python3-devel
 BuildRequires:  swig
@@ -98,6 +94,9 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.2-1
+- Update to version 1.13.2.
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.0-5
 - Add provides for libs subpackage from base package
 - Add python3 modules subpackage

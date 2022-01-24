@@ -45,6 +45,7 @@ Provides:       %{name}-mmsnmptrapd = %{version}-%{release}
 Provides:       %{name}-pgsql = %{version}-%{release}
 Provides:       %{name}-relp = %{version}-%{release}
 Provides:       %{name}-snmp = %{version}-%{release}
+Provides:       syslog
 
 %description
 RSYSLOG is the rocket-fast system for log processing.
@@ -154,6 +155,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2108.0-1
 - Update to version 8.2108.0.
+
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.37.0-8
+- Added "Provides: syslog".
 
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.37.0-7
 - Add /etc/rsyslog.d directory.

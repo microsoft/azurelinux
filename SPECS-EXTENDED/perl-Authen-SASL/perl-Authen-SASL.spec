@@ -2,11 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Authen-SASL
 Version:        2.16
-Release:        20%{?dist}
+Release:        21%{?dist}
 Summary:        SASL Authentication framework for Perl
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Authen-SASL
 Source0:        https://cpan.metacpan.org/authors/id/G/GB/GBARR/Authen-SASL-%{version}.tar.gz#/perl-Authen-SASL-%{version}.tar.gz
+Source1:        LICENSE.PTR
 # Update the function WRITE to properly handle string which is shorter than
 # provided length
 Patch0:         Authen-SASL-RT85294-Fix-WRITE.patch
@@ -17,6 +18,7 @@ BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
 BuildRequires:  perl(inc::Module::Install)
+BuildRequires:	perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Makefile)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)
@@ -60,15 +62,21 @@ make pure_install DESTDIR=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -type f -name .packlist -delete
 %{_fixperms} $RPM_BUILD_ROOT
 
+cp %{SOURCE1} .
+
 %check
 make test
 
 %files
+%license LICENSE.PTR
 %doc api.txt Changes example_pl
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.16-21
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.16-20
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

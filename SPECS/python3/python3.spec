@@ -8,7 +8,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.9
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -134,10 +134,17 @@ The test package contains all regression tests for Python as well as the modules
 %autosetup -p1 -n Python-%{version}
 
 %build
-export OPT="%{optflags} %{openssl_flags}"
+# Remove GCC specs and build environment linker scripts
+# from the flags used when compiling outside of an RPM environment
+# https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
+export CFLAGS="%{extension_cflags} %{openssl_flags}"
+export CFLAGS_NODIST="%{build_cflags} %{openssl_flags}"
+export CXXFLAGS="%{extension_cxxflags} %{openssl_flags}"
+export LDFLAGS="%{extension_ldflags}"
+export LDFLAGS_NODIST="%{build_ldflags}"
+export OPT="%{extension_cflags} %{openssl_flags}"
+
 %configure \
-    CFLAGS="%{optflags} %{openssl_flags}" \
-    CXXFLAGS="%{optflags} %{openssl_flags}" \
     --enable-shared \
     --with-platlibdir=%{_lib} \
     --with-system-expat \
@@ -150,6 +157,17 @@ export OPT="%{optflags} %{openssl_flags}"
 %install
 %make_install
 %{_fixperms} %{buildroot}/*
+
+# Bootstrap `pip3` which casues ptest build failure.
+# The manual installation of pip in the RPM buildroot requires pip
+# to be already present in the chroot.
+# For toolchain builds, `pip3` requirement is staisfied by raw-toolchain's
+# version of python, so it does not do anything.
+# For builds other than toolchain, we would require pip to be present.
+# The line below install pip in the build chroot using the recently
+# compiled python3.
+# NOTE: This is a NO-OP for the toolchain build.
+python3 Lib/ensurepip
 
 # Installing pip/setuptools via ensurepip fails in our toolchain.
 # The versions of these tools from the raw toolchain are detected,
@@ -260,6 +278,12 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Jan 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.9-3
+- Fix pip3 bootstrap which causes a build break in ptest
+
+* Wed Dec 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-2
+- Use filtered flags when compiling extensions
+
 * Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-1
 - Upgrade to latest release in 3.9 series
 - Add profile guided optimization to configuration

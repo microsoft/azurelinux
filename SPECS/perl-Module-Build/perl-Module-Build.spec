@@ -6,17 +6,18 @@
 Summary:        Build and install Perl modules
 Name:           perl-Module-Build
 Version:        0.4224
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Build/
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-%{version}.tar.gz
-%define sha1 Module-Build=4f78f28187d6525a59cc2e1887e4788964c8029c
+Source1:        LICENSE.PTR
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(CPAN::Meta) >= 2.142060
@@ -66,19 +67,25 @@ perl Build.PL installdirs=vendor
 ./Build install destdir=%{buildroot} create_packlist=0
 %{_fixperms} %{buildroot}/*
 
+cp %{SOURCE1} .
+
 %check
 rm t/signature.t
 LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 
 %files
-%license LICENSE
-%doc Changes contrib LICENSE README
+%license LICENSE.PTR
+%doc Changes contrib README
 %{_bindir}/config_data
 %{perl_vendorlib}/*
 %{_mandir}/man1/*
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4224-5
+- Adding 'BuildRequires: perl-generators'.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.4224-4
 - Use new perl package names.
 - Provide perl(Module::Build*)

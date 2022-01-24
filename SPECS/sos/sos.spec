@@ -1,8 +1,8 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
-Version:        4.1
-Release:        3%{?dist}
+Version:        4.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,6 +68,9 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
+* Thu Dec 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2-1
+- Update to version 4.2
+
 * Wed May 12 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-3
 - Fix build break due to doubly-packaged license/doc files
 

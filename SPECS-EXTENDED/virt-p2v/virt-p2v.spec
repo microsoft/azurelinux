@@ -1,7 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Verify tarball signature with GPGv2.
-%global verify_tarball_signature 1
 
 # So far there are no ELF binaries in this package, so the list
 # of files in the debuginfo package will be empty, triggering
@@ -11,8 +9,8 @@ Distribution:   Mariner
 Summary:       Convert a physical machine to run on KVM
 Name:          virt-p2v
 Version:       1.42.0
-Release:       4%{?dist}
-License:       GPLv2+
+Release:       5%{?dist}
+License:       GPLv2+ and LGPLv2+
 
 # virt-p2v works only on x86_64 at the moment.  It requires porting
 # to properly detect the hardware on other architectures, and furthermore
@@ -22,14 +20,6 @@ ExclusiveArch: x86_64
 # Source and patches.
 URL:           http://libguestfs.org/
 Source0:       http://download.libguestfs.org/%{name}/%{name}-%{version}.tar.gz
-%if 0%{verify_tarball_signature}
-Source1:       http://download.libguestfs.org/%{name}/%{name}-%{version}.tar.gz.sig
-%endif
-
-# Keyring used to verify tarball signature.
-%if 0%{verify_tarball_signature}
-Source2:       libguestfs.keyring
-%endif
 
 # Basic build requirements.
 BuildRequires: gcc
@@ -44,9 +34,6 @@ BuildRequires: xz
 BuildRequires: gtk3-devel
 BuildRequires: dbus-devel
 BuildRequires: m4
-%if 0%{verify_tarball_signature}
-BuildRequires: gnupg2
-%endif
 
 # Test suite requirements.
 BuildRequires: /usr/bin/qemu-nbd
@@ -86,9 +73,6 @@ To convert virtual machines from other hypervisors, see virt-v2v.
 
 
 %prep
-%if 0%{verify_tarball_signature}
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%endif
 %setup -q
 %autopatch -p1
 
@@ -119,7 +103,7 @@ rm $RPM_BUILD_ROOT%{_mandir}/man1/p2v-release-notes.1*
 
 %files
 %doc README
-%license COPYING
+%license COPYING COPYING.LIB
 %{_bindir}/virt-p2v-make-disk
 %{_bindir}/virt-p2v-make-kickstart
 %{_bindir}/virt-p2v-make-kiwi
@@ -133,6 +117,10 @@ rm $RPM_BUILD_ROOT%{_mandir}/man1/p2v-release-notes.1*
 
 
 %changelog
+* Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.42.0-5
+- Removing in-spec verification of source tarballs.
+- License verified.
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 1.42.0-4
 - Remove epoch
 

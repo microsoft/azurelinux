@@ -105,7 +105,7 @@ func main() {
 		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackages)
 	}
 
-	packageVersToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild, *imageConfig, *baseDirPath)
+	packageVersToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild, *inputGraphFile, *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Unable to generate package build list, error: %s", err)
 	}

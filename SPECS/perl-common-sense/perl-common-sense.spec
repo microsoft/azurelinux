@@ -5,7 +5,7 @@
 Summary:	"Common sense" Perl defaults
 Name:		perl-common-sense
 Version:	3.74
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/common-sense
@@ -13,6 +13,7 @@ Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{ver
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(common::sense) = %{version}-%{release}
@@ -68,6 +69,9 @@ make test
 %{_mandir}/man3/common::sense.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.74-8
+- Adding 'BuildRequires: perl-generators'.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.74-7
 - Removing the explicit %%clean stage.
 - License verified.

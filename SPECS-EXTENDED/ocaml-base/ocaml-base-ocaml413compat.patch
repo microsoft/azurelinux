@@ -1,0 +1,26 @@
+--- a/shadow-stdlib/gen/mapper.mll	2021-11-19 11:05:01.000000000 -0700
++++ b/shadow-stdlib/gen/mapper.mll	2021-11-23 15:17:54.018455142 -0700
+@@ -110,10 +110,13 @@ let val_replacement = function
+   | "abs"                 -> No_equivalent
+   | "abs_float"           -> No_equivalent
+   | "acos"                -> Repl "Float.acos"
++  | "acosh"               -> Repl "Float.acosh"
+   | "asin"                -> Repl "Float.asin"
++  | "asinh"               -> Repl "Float.asinh"
+   | "at_exit"             -> No_equivalent
+   | "atan"                -> Repl "Float.atan"
+   | "atan2"               -> Repl "Float.atan2"
++  | "atanh"               -> Repl "Float.atanh"
+   | "bool_of_string"      -> Repl "Bool.of_string"
+   | "bool_of_string_opt"  -> No_equivalent
+   | "ceil"                -> Repl "Float.round_up"
+--- a/src/dune	2021-11-19 11:05:01.000000000 -0700
++++ b/src/dune	2021-11-23 15:29:54.579266675 -0700
+@@ -9,6 +9,7 @@
+ 
+ (library (name base) (public_name base)
+  (libraries base_internalhash_types caml sexplib0 shadow_stdlib)
++ (flags :standard -w -55)
+  (c_flags :standard -D_LARGEFILE64_SOURCE (:include mpopcnt.sexp))
+  (c_names exn_stubs int_math_stubs hash_stubs am_testing)
+  (preprocess no_preprocessing)

@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        8.2.3582
+Version:        8.2.4081
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -27,7 +27,7 @@ Conflicts:      toybox
 The vim extra package contains a extra files for powerful text editor.
 
 %prep
-%autosetup
+%autosetup -p1
 echo '#define SYS_VIMRC_FILE "%{_sysconfdir}/vimrc"' >> src/feature.h
 
 %build
@@ -192,6 +192,24 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Jan 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 8.2.4081-1
+- Update version to 8.2.4081 to fix CVE-2022-0128.
+
+* Thu Jan 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.4006-1
+- Update version to 8.2.4006 to fix CVE CVE-2021-4166.
+
+* Tue Dec 28 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.2.3668-4
+- Backported patch for CVE-2021-4136 from upstream
+
+* Wed Dec 08 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 8.2.3668-3
+- Added patch file(s) CVE-2021-4069.patch
+
+* Sat Dec 04 2021 Mariner Autopatcher <cblmargh@microsoft.com> - 8.2.3668-2
+- Added patch file(s) CVE-2021-4019.patch
+
+* Thu Nov 25 2021 Muhammad Falak <mwani@microsoft.com> - 8.2.3668-1
+- Bump version to 8.2.3668 to fix CVE-2021-3968,CVE-2021-3973,CVE-2021-3974
+
 * Wed Nov 10 2021 Nick Samson <nisamson@microsoft.com> - 8.2.3582-1
 - Upgrade to 8.2.3582 to fix CVE-2021-3927 and CVE-2021-3928
 
@@ -214,10 +232,6 @@ fi
 
 * Mon Sep 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.3441-1
 - Fix CVE-2021-3778 and CVE-2021-3796 CVEs by updating to 8.2.3441.
-
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 8.1.1667-2
-- Merge the following releases from dev to 1.0 spec
-- lihl@microsoft.com, 8.1.0388-8: Provides vi and vim-minimal from vim.
 
 * Fri Oct 30 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.1.1667-1
 - Fix CVE-2019-20807 by updating to 8.1.1667.
@@ -284,3 +298,4 @@ fi
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 7.4-1
 - Initial build First version.
+

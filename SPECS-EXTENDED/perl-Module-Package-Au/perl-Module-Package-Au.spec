@@ -1,6 +1,6 @@
 Name:		perl-Module-Package-Au
 Version:	2
-Release:	17%{?dist}
+Release:	18%{?dist}
 Summary:	Reusable Module::Install bits
 License:	CC0
 Vendor:         Microsoft Corporation
@@ -11,6 +11,8 @@ Patch0:		perl-Module-Package-Au-no-bundle.patch
 BuildArch:	noarch
 BuildRequires:	perl-generators
 BuildRequires:	perl(ExtUtils::MakeMaker)
+BuildRequires:	perl(FindBin)
+BuildRequires:	perl(Module::CoreList)
 BuildRequires:	perl(Module::Install::AuthorTests)
 BuildRequires:	perl(Module::Install::GithubMeta)
 BuildRequires:	perl(Module::Install::ReadmeFromPod)
@@ -50,11 +52,15 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 make test
 
 %files
+%license README
 %doc Changes README
 %{perl_vendorlib}/Module/Package/
 %{_mandir}/man3/Module::Package::Au.3pm*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2-18
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
