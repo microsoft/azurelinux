@@ -2,8 +2,7 @@ Summary:        DataStax C/C++ Driver for Apache Cassandra and DataStax Products
 Name:           cassandra-cpp-driver
 Version:        2.16.0
 Release:        1%{?dist}
-Epoch:          1
-License:        Apache 2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
@@ -42,8 +41,7 @@ cd build
 cd build
 %make_install
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license LICENSE.txt
