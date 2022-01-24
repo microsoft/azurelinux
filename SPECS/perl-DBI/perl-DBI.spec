@@ -11,7 +11,7 @@
 Summary:        A database access API for perl
 Name:           perl-DBI
 Version:        1.641
-Release:        4%{?dist}
+Release:        5%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -23,6 +23,7 @@ Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.ta
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       perl-libs
 Requires:       perl(FileHandle)
 Requires:       perl(Math::BigInt)
@@ -163,6 +164,10 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.641-5
+- Adding 'BuildRequires: perl-generators'.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.641-4
 - Use new perl package names.
 - Provide perl(DB*)

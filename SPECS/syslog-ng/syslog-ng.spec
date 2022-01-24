@@ -3,7 +3,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.33.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,8 @@ Requires:       json-c
 Requires:       json-glib
 Requires:       systemd
 Obsoletes:      eventlog
+
+Provides: syslog
 
 %description
  The syslog-ng application is a flexible and highly scalable
@@ -199,6 +201,9 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.33.2-2
+- Added "Provides: syslog".
+
 * Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.33.2-1
 - Update to version 3.33.2.
 

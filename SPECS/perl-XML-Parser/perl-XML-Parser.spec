@@ -1,7 +1,7 @@
 Summary:        XML-Parser perl module
 Name:           perl-XML-Parser
 Version:        2.46
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://metacpan.org/pod/XML::Parser
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-%{version}.tar.gz
 BuildRequires:  expat-devel
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       expat
 Requires:       perl-libs
 Requires:       perl(IO::File)
@@ -46,6 +47,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.46-2
+- Adding 'BuildRequires: perl-generators'.
+
 * Tue Dec 07 2021 Chris Co <chrco@microsoft.com> - 2.46-1
 - Update to 2.46
 

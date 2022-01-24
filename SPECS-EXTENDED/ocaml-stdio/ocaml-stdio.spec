@@ -9,8 +9,8 @@ Distribution:   Mariner
 %global srcname stdio
 
 Name:           ocaml-%{srcname}
-Version:        0.14.0
-Release:        10%{?dist}
+Version:        0.15.0
+Release:        1%{?dist}
 Summary:        Jane Street Standard I/O library for OCaml
 
 License:        MIT
@@ -76,7 +76,7 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %endif
 
 %files
-%doc CHANGES.md README.org
+%doc CHANGES.md
 %license LICENSE.md
 %dir %{_libdir}/ocaml/%{srcname}/
 %{_libdir}/ocaml/%{srcname}/META
@@ -107,6 +107,10 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %endif
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+- Upgrade to latest version
+- License verified
+
 * Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 0.14.0-10
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Remove docs circular dependencies
