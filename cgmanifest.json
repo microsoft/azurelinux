@@ -15023,8 +15023,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-camlp5",
-          "version": "7.12",
-          "downloadUrl": "https://github.com/camlp5/camlp5/archive/rel712.tar.gz"
+          "version": "8.00.02",
+          "downloadUrl": "https://github.com/camlp5/camlp5/archive/rel8.00.02.tar.gz"
         }
       }
     },
