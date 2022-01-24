@@ -21,7 +21,7 @@ Query Language along with extensions for DataStax Products.
 %package devel
 Summary:        Development libraries for ${name}
 Group:          Development/Tools
-Requires:       %{name} = %{epoch}:%{version}-%{release}
+Requires:       %{name} = 1:%{version}-%{release}
 Requires:       libuv-devel
 
 %description devel
