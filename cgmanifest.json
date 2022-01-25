@@ -2027,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "colm",
-          "version": "0.14.7",
-          "downloadUrl": "https://github.com/adrian-thurston/colm/archive/0.14.7.tar.gz"
+          "version": "0.13.0.7",
+          "downloadUrl": "https://www.colm.net/files/colm/colm-0.13.0.7.tar.gz"
         }
       }
     },
