@@ -7,8 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.freedesktop.org/wiki/Software/systemd/
-#Source0:       https://github.com/systemd/systemd-stable/archive/v250.3.tar.gz
-Source0:        systemd-%{version}.tar.gz
+Source0:        https://github.com/systemd/systemd-stable/archive/v%{version}.tar.gz#/systemd-%{version}.tar.gz
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
