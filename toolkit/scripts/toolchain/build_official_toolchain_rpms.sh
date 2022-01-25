@@ -412,8 +412,8 @@ build_rpm_in_chroot_no_install meson
 # gtk-doc needs itstool, meson, python3-pygments
 chroot_and_install_rpms itstool
 chroot_and_install_rpms meson
-build_rpm_in_chroot_no_install python3-pygments
-chroot_and_install_rpms python3-pygments
+build_rpm_in_chroot_no_install python-pygments
+chroot_and_install_rpms python-pygments
 
 # gtk-doc and ca-certificates require libxslt
 chroot_and_install_rpms docbook-dtd-xml
