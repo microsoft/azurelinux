@@ -156,7 +156,18 @@ def process_licenses(json_filename, markdown_filename, file_paths, check, update
             if outdated_markdown:
                 print(f"License map '{markdown_filename}' is out of date.")
 
-            print(f"Specs' license information is out of date. Run '{__file__} licenses.json_file_path LICENSES-MAP.md_file_path --no_check --update --remove_missing [spec_directory ...]' to regenerate.")
+            print(f"""
+Specs' license information is out of date. Run the following command to regenerate:
+
+    {__file__} --no_check --update --remove_missing \\
+        {json_filename} \\
+        {markdown_filename} \\
+        SPECS SPECS-EXTENDED SPECS-SIGNED
+
+NOTE: the script requires installation of the 'python-rpm-spec' module:
+
+    python3 -m pip install python-rpm-spec
+""")
 
             sys.exit(1)
 
