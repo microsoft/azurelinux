@@ -148,9 +148,9 @@ libassuan-devel-2.5.5-1.cm2.aarch64.rpm
 libcap-2.26-2.cm2.aarch64.rpm
 libcap-debuginfo-2.26-2.cm2.aarch64.rpm
 libcap-devel-2.26-2.cm2.aarch64.rpm
-libffi-3.4.2-1.cm2.aarch64.rpm
-libffi-debuginfo-3.4.2-1.cm2.aarch64.rpm
-libffi-devel-3.4.2-1.cm2.aarch64.rpm
+libffi-3.4.2-2.cm2.aarch64.rpm
+libffi-debuginfo-3.4.2-2.cm2.aarch64.rpm
+libffi-devel-3.4.2-2.cm2.aarch64.rpm
 libgcc-11.2.0-2.cm2.aarch64.rpm
 libgcc-atomic-11.2.0-2.cm2.aarch64.rpm
 libgcc-devel-11.2.0-2.cm2.aarch64.rpm

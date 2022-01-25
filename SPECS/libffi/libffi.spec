@@ -1,14 +1,13 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           libffi
 Version:        3.4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/GeneralLibraries
 URL:            https://sourceware.org/libffi/
 Source0:        https://github.com/libffi/libffi/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Provides:       pkgconfig(libffi)
 #%if %{with_check}
 #BuildRequires:  dejagnu
 #%endif
@@ -76,6 +75,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 3.4.2-2
+- Remove incorrect pkgconfig provides in main package
+
 * Tue Dec 07 2021 Chris Co <chrco@microsoft.com> - 3.4.2-1
 - Update to 3.4.2
 - Update Source0 to point to new github URL
