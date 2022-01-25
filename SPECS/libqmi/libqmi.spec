@@ -1,7 +1,7 @@
 Summary:        Library for talking to WWAN modems and devices
 Name:           libqmi
-Version:        1.22.4
-Release:        3%{?dist}
+Version:        1.30.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,9 @@ It contains the libraries and header files for libqmi
 %{_datadir}/gtk-doc/*
 
 %changelog
+* Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.30.2-1
+- Upgrade to version 1.30.2
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.22.4-3
 - Add compatibility provides for utils subpackage
 - Lint spec

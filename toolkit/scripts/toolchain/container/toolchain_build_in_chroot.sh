@@ -1098,12 +1098,12 @@ popd
 rm -rf libarchive-3.4.2
 touch /logs/status_libarchive_complete
 
-echo lua-5.3.5
-tar xf lua-5.3.5.tar.gz
-pushd lua-5.3.5
+echo lua-5.4.3
+tar xf lua-5.4.3.tar.gz
+pushd lua-5.4.3
 cat > lua.pc << "EOF"
-V=5.3
-R=5.3.5
+V=5.4
+R=5.4.3
 prefix=/usr
 INSTALL_BIN=${prefix}/bin
 INSTALL_INC=${prefix}/include
@@ -1121,19 +1121,19 @@ Requires:
 Libs: -L${libdir} -llua -lm -ldl
 Cflags: -I${includedir}
 EOF
-patch -Np1 -i ../lua-5.3.5-shared_library-1.patch
+patch -Np1 -i ../lua-5.4.3-shared_library-1.patch
 sed -i '/#define LUA_ROOT/s:/usr/local/:/usr/:' src/luaconf.h
 make MYCFLAGS="-DLUA_COMPAT_5_2 -DLUA_COMPAT_5_1" linux
 make INSTALL_TOP=/usr                \
      INSTALL_DATA="cp -d"            \
      INSTALL_MAN=/usr/share/man/man1 \
-     TO_LIB="liblua.so liblua.so.5.3 liblua.so.5.3.4" \
+     TO_LIB="liblua.so liblua.so.5.4 liblua.so.5.4.3" \
      install
-mkdir -pv                      /usr/share/doc/lua-5.3.5
-cp -v doc/*.{html,css,gif,png} /usr/share/doc/lua-5.3.5
+mkdir -pv                      /usr/share/doc/lua-5.4.3
+cp -v doc/*.{html,css,gif,png} /usr/share/doc/lua-5.4.3
 install -v -m644 -D lua.pc /usr/lib/pkgconfig/lua.pc
 popd
-rm -rf lua-5.3.5
+rm -rf lua-5.4.3
 touch /logs/status_lua_complete
 
 DEBUGEDIT_WITH_VERSION=debugedit-5.0

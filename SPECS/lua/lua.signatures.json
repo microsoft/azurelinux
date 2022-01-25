@@ -1,9 +1,9 @@
 {
  "Signatures": {
-  "lua-5.3.4-tests.tar.gz": "b80771238271c72565e5a1183292ef31bd7166414cd0d43a8eb79845fa7f599f",
+  "lua-5.4.3.tar.gz": "f8612276169e3bfcbcfb8f226195bfc6e466fe13042f1076cbde92b7ec96bbfb",
+  "lua-5.4.3-tests.tar.gz": "5d29c3022897a8290f280ebe1c6853248dfa35a668e1fc02ba9c8cde4e7bf110",
   "lua-5.3.5.tar.gz": "0c2eed3f960446e1a3e4b9a1ca2f3ff893b6ce41942cf54d5dd59ab4b3b058ac",
   "luaconf.h": "88e9751d81e778de9546db7c57eab5aeba4dfd8051e010f53ae36fbbce115e45",
-  "macros.lua": "7b76da36607dfca54757b3f0f711be8651bb06782c55fab3b06276cf32436db0",
   "mit.txt": "ac92bb84aa21edfecf0112e59c96c75620313d504ada0d66e8e78fe6788d3a4d"
  }
 }
