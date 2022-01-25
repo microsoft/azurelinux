@@ -27937,8 +27937,8 @@
         "type": "other",
         "other": {
           "name": "systemd",
-          "version": "249.7",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz"
+          "version": "250.3",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v250.3.tar.gz"
         }
       }
     },
@@ -27957,8 +27957,8 @@
         "type": "other",
         "other": {
           "name": "systemd-bootstrap",
-          "version": "249.7",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz"
+          "version": "250.3",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v250.3.tar.gz"
         }
       }
     },
