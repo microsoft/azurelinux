@@ -1,6 +1,6 @@
 Name:           colm
-Version:        0.14.7
-Release:        1%{?dist}
+Version:        0.13.0.7
+Release:        4%{?dist}
 Summary:        Programming language designed for the analysis of computer languages
 # aapl/ and some headers from src/ are the LGPLv2+
 License:        MIT AND LGPLv2+
@@ -8,15 +8,15 @@ Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.colm.net/open-source/colm/
-Source0:        https://github.com/adrian-thurston/colm/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://www.colm.net/files/%{name}/%{name}-%{version}.tar.gz
 
-BuildRequires:  asciidoc
+BuildRequires:  gcc
+BuildRequires:  libstdc++
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  make
+BuildRequires:  asciidoc
 
 # Unfortunately, upstream doesn't exist and not possible to find version
 Provides:       bundled(aapl)
@@ -39,15 +39,13 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
-./autogen.sh
-./configure --prefix=%{buildroot}/usr
-make
+autoreconf -vfi
+%configure --disable-static
+%make_build
 
 %install
-make install
-# do not install/remove .la files and doc files
+%make_install
 find %{buildroot}%{_libdir} -type f -name '*.la' -print -delete
-rm -rf %{buildroot}%{_datadir}
 install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{name}.vim
 
 %post -p /sbin/ldconfig
@@ -55,26 +53,19 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 
 %files
 %license COPYING
-%doc README
-%{_bindir}/*
+%doc ChangeLog README
+%{_bindir}/%{name}
 %{_libdir}/lib%{name}-%{version}.so
-%{_libdir}/lib%{name}.so
-%{_libdir}/libfsm-%{version}.so
-%{_libdir}/libfsm.so
 %dir %{_datadir}/vim
 %dir %{_datadir}/vim/vimfiles
 %dir %{_datadir}/vim/vimfiles/syntax
 %{_datadir}/vim/vimfiles/syntax/%{name}.vim
 
 %files devel
-%{_libdir}/lib%{name}.a
-%{_libdir}/libfsm.a
-%{_includedir}/
+%{_libdir}/lib%{name}.so
+%{_includedir}/%{name}/
 
 %changelog
-* Wed Jan 19 2022 Nicolas Guibourge <nicolasg@microsft.com> - 0.14.7-1
-- Ugradte to 0.14.7
-
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 0.13.0.7-4
 - Remove epoch
 
