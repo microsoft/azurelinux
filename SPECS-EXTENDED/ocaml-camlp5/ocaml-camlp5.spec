@@ -1,32 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
-%if !%{opt}
-%global debug_package %{nil}
-%endif
-
-%global major 7
-%global minor 12
-
-Name:           ocaml-camlp5
-Version:        %{major}.%{minor}
-Release:        11%{?dist}
-Summary:        Classical version of camlp4 OCaml preprocessor
-
-License:        BSD
-URL:            https://camlp5.github.io/
-
-Source0:        https://github.com/camlp5/camlp5/archive/rel%{major}%{minor}.tar.gz
-
-# Kill -warn-error A
-Patch0:         camlp5-6.11-kill-warn-error.patch
-
-BuildRequires: make
-BuildRequires:  ocaml
-BuildRequires:  ocaml-ocamldoc
-
 %global __ocaml_requires_opts -i Asttypes -i Parsetree -i Pa_extend
 %global __ocaml_provides_opts -i Dynlink -i Dynlinkaux -i Pa_extend
+Summary:        Classical version of camlp4 OCaml preprocessor
+Name:           ocaml-camlp5
+Version:        8.00.02
+Release:        11%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://camlp5.github.io/
+Source0:        https://github.com/camlp5/camlp5/archive/rel%{version}.tar.gz#/camlp5-rel%{version}.tar.gz
+BuildRequires:  make
+BuildRequires:  ocaml
+BuildRequires:  ocaml-ocamldoc
+BuildRequires:  perl
 
 %description
 Camlp5 is a preprocessor-pretty-printer of OCaml.
@@ -37,29 +23,17 @@ OCaml 3.10 and above have an official camlp4 which is incompatible
 with classical (<= 3.09) versions.  You can find that in the
 ocaml-camlp4 package.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
-
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-
 %prep
-%setup -q -n camlp5-rel%{major}%{minor}
-%autopatch -p1
+%autosetup -p1 -n camlp5-rel%{version}
 find . -name .gitignore -delete
-
-# Fix to build with 4.11.1.
-pushd ocaml_stuff
-ln -s 4.11.0 4.11.1
-popd
-pushd ocaml_src/lib/versdep
-ln -s 4.11.0.ml 4.11.1.ml
-popd
 
 # Build with debug information
 sed -i 's,WARNERR="",WARNERR="-g",' configure
@@ -68,7 +42,6 @@ for fil in compile/compile.sh $(find . -name Makefile); do
   sed -i 's,\$[({]OCAMLN[})]c,& -g,;s,\$[({]OCAMLN[})]opt,& -g,;s,LINKFLAGS=,&-g ,' $fil
 done
 
-
 %build
 # Upstream uses hand-written configure, grrrrrr.
 ./configure \
@@ -76,52 +49,48 @@ done
     --bindir %{_bindir} \
     --libdir %{_libdir}/ocaml \
     --mandir %{_mandir}
-%if %opt
-make %{_smp_mflags} world.opt
-%else
-make %{_smp_mflags} world
-%endif
-make -C doc/htmlp -j1
+%make_build world.opt
 
 %install
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/ocaml
+mkdir -p %{buildroot}%{_libdir}/ocaml
 # This is a hack because the make install rule is broken upstream.
 # We move the file later.
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/ocaml/ocaml
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-mkdir -p $RPM_BUILD_ROOT%{_mandir}
-make install DESTDIR=$RPM_BUILD_ROOT
-cp -p etc/META $RPM_BUILD_ROOT%{_libdir}/ocaml/camlp5
+mkdir -p %{buildroot}%{_libdir}/ocaml/ocaml
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_mandir}
+%make_install
+cp -p etc/META %{buildroot}%{_libdir}/ocaml/camlp5
 rm -f doc/htmlp/{*.sh,Makefile,html2*}
+mv %{buildroot}%{_libdir}/ocaml/{ocaml/topfind.camlp5,}
 
 
 %files
 %license LICENSE
 %doc README.md
 %{_libdir}/ocaml/camlp5
-%if %opt
+%{_libdir}/ocaml/topfind.camlp5
 %exclude %{_libdir}/ocaml/camlp5/*.a
 %exclude %{_libdir}/ocaml/camlp5/*.cmxa
 %exclude %{_libdir}/ocaml/camlp5/*.cmx
-%endif
 %exclude %{_libdir}/ocaml/camlp5/*.mli
-
 
 %files devel
 %doc CHANGES ICHANGES DEVEL UPGRADING doc/html
-%if %opt
 %{_libdir}/ocaml/camlp5/*.a
 %{_libdir}/ocaml/camlp5/*.cmxa
 %{_libdir}/ocaml/camlp5/*.cmx
-%endif
 %{_libdir}/ocaml/camlp5/*.mli
 %{_bindir}/camlp5*
 %{_bindir}/mkcamlp5*
 %{_bindir}/ocpp5
 %{_mandir}/man1/*.1*
 
-
 %changelog
+* Fri Jan 21 2022 Thomas Crain <thcrain@microsoft.com> - 8.00.02-1
+- Upgrade to latest upstream version
+- Lint spec
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.12-11
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

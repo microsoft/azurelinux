@@ -2,16 +2,15 @@
 %define minor 10
 
 Name:           cpprest
-Version:        2.10.14
-Release:        6%{?dist}
+Version:        2.10.18
+Release:        1%{?dist}
 Summary:        C++ REST library
 Group:          Applications/File
 License:        MIT
-Url:            https://github.com/Microsoft/cpprestsdk
-#Source0:       https://github.com/Microsoft/cpprestsdk/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Url:            https://github.com/microsoft/cpprestsdk
+Source0:        https://github.com/microsoft/cpprestsdk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Disable outside, failing and sometimes failing tests
-Patch1:         cpprest-2.10.9-disable-outside-and-failing-tests.patch
+Patch1:         cpprest-2.10.17-disable-outside-and-failing-tests.patch
 # Disable tests with long timeouts
 Patch2:         cpprest-2.10.9-disable-tests-long-timeouts.patch
 # Disable test extract_floating_point, which fails on ppc64le and aarch64
@@ -91,6 +90,9 @@ cd Release/build.release/Binaries
 
 
 %changelog
+* Wed Jan 19 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.10.18-1
+- Upgrade to 2.10.18
+
 * Tue Dec 08 2020 Andrew Phelps <anphel@microsoft.com> - 2.10.14-6
 - Remove -DBUILD_TESTS=OFF to allow running tests
 
