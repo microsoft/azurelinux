@@ -72,7 +72,7 @@ mv libpwquality.so.* %{buildroot}%{_pwqlibdir}
 ln -sf %{_pwqlibdir}/libpwquality.so.*.* libpwquality.so
 popd
 %endif
-find %{buildroot} -type f -name "*.la" -delete -print
+rm -f %{buildroot}%{_libdir}/*.la
 rm -f %{buildroot}%{_moduledir}/*.la
 
 mkdir %{buildroot}%{_secconfdir}/pwquality.conf.d

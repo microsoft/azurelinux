@@ -77,7 +77,6 @@ make test
 %files
 %defattr(-,root,root)
 %license COPYING
-%license COPYING
 %doc AUTHORS
 %{_bindir}/rdiff
 %{_libdir}/*.so.*
