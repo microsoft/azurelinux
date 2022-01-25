@@ -2,13 +2,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.2.4081
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: CVE-2022-0261.patch
 BuildRequires:  ncurses-devel
 
 %description
@@ -190,6 +191,8 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+*   Tue Jan 25 2022 Mariner Autopatcher <cblmargh@microsoft.com> 8.2.4081-2
+-   Added patch file(s) CVE-2022-0261.patch
 * Thu Jan 13 2022 Rachel Menge <rachelmenge@microsoft.com> - 8.2.4081-1
 - Update version to 8.2.4081 to fix CVE-2022-0128.
 
