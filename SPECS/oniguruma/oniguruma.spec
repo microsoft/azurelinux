@@ -1,15 +1,15 @@
-%define         subversion 1
+%define major_version %(echo %{version} | cut -d. -f1-3)
 
 Summary:        Regular expressions library
 Name:           oniguruma
-Version:        6.9.7
+Version:        6.9.7.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/kkos/oniguruma/
-Source0:        https://github.com/kkos/oniguruma/releases/download/v%{version}.%{subversion}/onig-%{version}.%{subversion}.tar.gz
+Source0:        https://github.com/kkos/oniguruma/releases/download/v%{version}/onig-%{version}.tar.gz
 
 %description
 Oniguruma is a regular expressions library.
@@ -26,7 +26,7 @@ Requires:       oniguruma = %{version}-%{release}
 Development files for libonig
 
 %prep
-%autosetup -n onig-%{version} -p1
+%autosetup -n onig-%{major_version} -p1
 
 %build
 %configure                     \
@@ -65,7 +65,7 @@ make  check
 %changelog
 * Mon Jan 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 6.9.7.1-1
 - Upgraded to 6.9.7.1
-- Added subversion variable.
+- Added majorversion variable.
 - License verified.
 - Linted.
 
