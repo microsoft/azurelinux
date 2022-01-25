@@ -68,6 +68,7 @@ make test ARGS="--output-on-failure --timeout 300" -C %{_target_platform} ||:
 %changelog
 * Tue Jan 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.90.0-1
 - Update source to 5.90.0
+- License verified
 
 * Mon Mar 30 2020 Joe Schmitt <joschmit@microsoft.com> - 5.61.0-3
 - Update Vendor and Distribution tags
