@@ -90,6 +90,7 @@ meson  --prefix %{_prefix}                                            \
        -Dsplit-usr=false                                              \
        -Dsysusers=true                                                \
        -Dpam=true                                                     \
+       -Dhomed=false                                                  \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
        -Dlz4=true                                                     \
@@ -228,6 +229,7 @@ systemctl preset-all
 %changelog
 * Mon Jan 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 250.3-1
 - Update to systemd-stable version 250.3
+- Explicitly disable systemd-homed
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 249.7-3
 - Removing the explicit %%clean stage.
