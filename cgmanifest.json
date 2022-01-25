@@ -23344,8 +23344,8 @@
         "type": "other",
         "other": {
           "name": "python-netaddr",
-          "version": "0.7.19",
-          "downloadUrl": "https://github.com/netaddr/netaddr/archive/netaddr-0.7.19.tar.gz"
+          "version": "0.8.0",
+          "downloadUrl": "https://github.com/netaddr/netaddr/archive/refs/tags/0.8.0.tar.gz"
         }
       }
     },
