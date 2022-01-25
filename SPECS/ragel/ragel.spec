@@ -1,6 +1,6 @@
 Name:           ragel
-Version:        7.0.0.12
-Release:        6%{?dist}
+Version:        7.0.4
+Release:        1%{?dist}
 Summary:        Finite state machine compiler
 # aapl/ is the LGPLv2+
 License:        MIT AND LGPLv2+
@@ -16,7 +16,7 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 BuildRequires:  make
-BuildRequires:  colm-devel = 0.13.0.7
+BuildRequires:  colm-devel = 0.14.7
 
 %description
 Ragel compiles executable finite state machines from regular languages.
@@ -38,6 +38,10 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
+# Removing dependecy on absent .la files from 'colm'
+sed -i "/LIBCOLM_LA/d" configure.ac
+sed -i "/LIBFSM_LA/d" configure.ac
+
 autoreconf -vfi
 %configure --disable-static
 %make_build
@@ -70,6 +74,9 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 %{_includedir}/%{name}/
 
 %changelog
+* Mon Jan 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.4-1
+- Updating to version 7.0.4 to allow usage of newer version of 'colm'.
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 7.0.0.12-6
 - Remove epoch
 

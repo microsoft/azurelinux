@@ -660,12 +660,14 @@ func (n *PkgNode) FriendlyName() string {
 	case TypeRun:
 		return fmt.Sprintf("%s-%s-RUN<%s>", n.VersionedPkg.Name, n.VersionedPkg.Version, n.State.String())
 	case TypeRemote:
-		ver1 := fmt.Sprintf("%s%s", n.VersionedPkg.Condition, n.VersionedPkg.Version)
-		ver2 := ""
-		if len(n.VersionedPkg.SCondition) > 0 || len(n.VersionedPkg.SVersion) > 0 {
-			ver2 = fmt.Sprintf("%s,%s%s", ver1, n.VersionedPkg.SCondition, n.VersionedPkg.SVersion)
+		versionDetails := fmt.Sprintf("%s%s", n.VersionedPkg.Condition, n.VersionedPkg.Version)
+		if n.VersionedPkg.SCondition != "" || n.VersionedPkg.SVersion != "" {
+			versionDetails = fmt.Sprintf("%s,%s%s", versionDetails, n.VersionedPkg.SCondition, n.VersionedPkg.SVersion)
 		}
-		return fmt.Sprintf("%s-%s-REMOTE<%s>", n.VersionedPkg.Name, ver2, n.State.String())
+		if versionDetails != "" {
+			versionDetails = fmt.Sprintf("[%s]", versionDetails)
+		}
+		return fmt.Sprintf("%s%s-REMOTE<%s>", n.VersionedPkg.Name, versionDetails, n.State.String())
 	case TypeGoal:
 		return n.GoalName
 	case TypePureMeta:

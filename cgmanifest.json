@@ -25114,8 +25114,8 @@
         "type": "other",
         "other": {
           "name": "ragel",
-          "version": "7.0.0.12",
-          "downloadUrl": "https://www.colm.net/files/ragel/ragel-7.0.0.12.tar.gz"
+          "version": "7.0.4",
+          "downloadUrl": "https://www.colm.net/files/ragel/ragel-7.0.4.tar.gz"
         }
       }
     },
