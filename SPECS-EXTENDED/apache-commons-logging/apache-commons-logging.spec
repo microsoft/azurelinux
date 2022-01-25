@@ -38,7 +38,6 @@ BuildRequires:  glassfish-servlet-api
 BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  junit
-BuildRequires:  log4j12-mini >= 1.2
 Requires:       java >= 1.8
 Provides:       jakarta-%{short_name} = %{version}-%{release}
 Obsoletes:      jakarta-%{short_name} < %{version}
