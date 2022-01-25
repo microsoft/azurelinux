@@ -39,11 +39,13 @@ sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
 # Removing dependecy on absent .la files from 'colm'
-sed -i "/LIBCOLM_LA/d" configure.ac
-sed -i "/LIBFSM_LA/d" configure.ac
+sed -E -i "/LIB(COLM|FSM)_LA/d" configure.ac
 
 autoreconf -vfi
-%configure --disable-static
+%configure \
+    --disable-static \
+    --with-colm=%{_prefix} \
+    --disable-manual
 %make_build
 
 %install
