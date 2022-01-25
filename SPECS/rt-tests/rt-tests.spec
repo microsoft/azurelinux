@@ -9,7 +9,7 @@ Vendor:        Microsoft Corporation
 Distribution:  Mariner
 Group:         Development/Tools
 URL:           git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
-Source0:       https://www.kernel.org/pub/linux/utils/rt-tests/%{name}-%{version}.tar.xz
+Source0:       https://www.kernel.org/pub/linux/utils/rt-tests/older/%{name}-%{version}.tar.xz
 ExclusiveArch: x86_64
 Requires:      bash
 Requires:      bc
@@ -111,6 +111,7 @@ rm -rf %{buildroot}
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-14
 - Initial import into CBL Mariner (License: GPL+)
+- License verified
 
 * Wed Mar 17 2021 Hernan Gatta <hegatta@microsoft.com> 1.8-12
 - Initial import into ECF Mariner (License: GPLv2)
