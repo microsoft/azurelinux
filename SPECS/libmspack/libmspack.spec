@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
-URL:            https://www.cabextract.org.uk/libmspack/libmspack-0.5alpha.tar.gz
+URL:            https://www.cabextract.org.uk/libmspack/
 Source0:        http://www.cabextract.org.uk/libmspack/%{name}-%{version}.tar.gz
 
 %description
@@ -57,6 +57,7 @@ cd test
 - Add README, TODO, ChangeLog, AUTHORS to the main package
 - License Verified
 - Remove the sha1 macro
+- Fix URL field
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.1alpha-4
 - Remove libtool archive files from final packaging
