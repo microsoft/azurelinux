@@ -1,6 +1,6 @@
+%define subversion 1
 Name:           oniguruma
 Version:        6.9.7
-Subversion:     1
 Release:        1%{?dist}
 License:        BSD
 Summary:        Regular expressions library
@@ -63,6 +63,9 @@ make  check
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Mon Jan 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> 6.9.7.1-1
+- Upgraded to 6.9.7.1
+- Added subversion variable.
 * Thu Oct 15 2020 Emre Girgin <mrgirgin@microsoft.com> 6.9.5-2
 - Fix CVE-2020-26159. 
 * Tue May 19 2020 Andrew Phelps <anphel@microsoft.com> 6.9.5-1
