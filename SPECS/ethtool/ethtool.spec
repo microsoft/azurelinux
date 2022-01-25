@@ -1,13 +1,15 @@
 Summary:	Standard Linux utility for controlling network drivers and hardware
 Name:		ethtool
-Version:    5.0
-Release:    3%{?dist}
+Version:    5.16
+Release:    1%{?dist}
 License:	GPLv2
 URL:		https://www.kernel.org/pub/software/network/ethtool/
 Group:		Productivity/Networking/Diagnostic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:	https://www.kernel.org/pub/software/network/%{name}/%{name}-%{version}.tar.xz
+
+BuildRequires: libmnl-devel
 
 %description
 ethtool is the standard Linux utility for controlling network drivers and hardware,
@@ -33,8 +35,12 @@ make %{?_smp_mflags} check
 %license LICENSE
 /sbin/*
 %{_mandir}
+%{_datadir}/bash-completion/completions/ethtool
 
 %changelog
+* Mon Jan 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.16-1
+- Update source to 5.16
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0-3
 - Removing the explicit %%clean stage.
 
