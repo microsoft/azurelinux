@@ -1,7 +1,7 @@
 Summary:        File-HomeDir
 Name:           perl-File-HomeDir
 Version:        1.004
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPL+ OR Artistic 
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/File-HomeDir/
@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 %if %{with_check}
 BuildRequires:  perl-File-Which
 %endif
@@ -74,6 +75,9 @@ find %{buildroot} -name 'perllocal.pod' -delete
 %{_mandir}/man3/File::HomeDir::Windows.3pm.gz
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.004-7
+- Adding 'BuildRequires: perl-generators'.
+
 * Mon Aug 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.004-6
 - Bump release to represent package's move to toolchain
 - Lint spec

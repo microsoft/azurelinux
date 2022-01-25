@@ -12,6 +12,5 @@ modulesdir=@PWD@/modules
 [local]
 name=local
 baseurl=file://@PWD@/repo
-failovermethod=priority
 enabled=1
 gpgcheck=0

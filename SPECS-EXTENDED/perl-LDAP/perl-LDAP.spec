@@ -11,11 +11,12 @@ Distribution:   Mariner
 
 Name:           perl-LDAP
 Version:        0.66
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        LDAP Perl module
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/perl-ldap
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MARSCHAP/perl-ldap-%{version}.tar.gz
+Source1:        LICENSE.PTR
 # Optional tests need to know a location of an LDAP server executable
 Patch0:         perl-ldap-0.65-Configure-usr-sbin-slapd-for-tests.patch
 # Remove an unreliable cancelling test
@@ -26,7 +27,9 @@ Patch2:         perl-ldap-0.66-Correct-a-shell-bang-in-data-regenerate_cert.sh.p
 BuildArch:      noarch
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::AutoInstall)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)
@@ -204,10 +207,13 @@ EOF
 chmod +x %{buildroot}/%{_libexecdir}/%{name}/test
 %{_fixperms} %{buildroot}/*
 
+cp %{SOURCE1} .
+
 %check
 make test
  
 %files
+%license LICENSE.PTR
 %doc Changes CREDITS
 %doc contrib/ bin/
 %{perl_vendorlib}/Bundle/
@@ -227,6 +233,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.66-10
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.66-9
 - Remove epoch
 

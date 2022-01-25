@@ -1,13 +1,13 @@
 Summary:        Kernel Audit Tool
 Name:           audit
-Version:        3.0
-Release:        8%{?dist}
+Version:        3.0.6
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://people.redhat.com/sgrubb/audit/
-Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
+Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}.tar.gz
 Patch0:         refuse-manual-stop.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  golang
@@ -133,6 +133,7 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/audisp-remote.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/plugins.d/au-remote.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/libaudit.conf
+%{_datadir}/%{name}/sample-rules/*
 
 %files libs
 %license COPYING
@@ -152,6 +153,9 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 10 2021 Chris Co <chrco@microsoft.com> - 3.0.6-1
+- Update to 3.0.6
+
 * Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-8
 - Remove tcp_wrappers dependency due to package removal
 - License verified

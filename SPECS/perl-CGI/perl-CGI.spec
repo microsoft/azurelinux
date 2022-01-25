@@ -3,16 +3,16 @@
 Summary:        Handle Common Gateway Interface requests and responses
 Name:           perl-CGI
 Version:        4.40
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-%{version}.tar.gz
 URL:            http://search.cpan.org/dist/CGI
-%define sha1 CGI=cbbd078f6e8d7dfcc5821e9c56e0212e0c0731a8
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
@@ -84,6 +84,10 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*.3*
 
 %changelog
+*   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.40-4
+-   Adding 'BuildRequires: perl-generators'.
+-   License verified.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 4.40-3
 -   Use new perl package names.
 -   Provide perl(CGI::*).

@@ -1,6 +1,6 @@
 Name:           ocaml-findlib
 Version:        1.8.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Objective CAML package manager and build helper
 License:        BSD
 
@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://projects.camlcity.org/projects/findlib.html
 Source0:        http://download.camlcity.org/download/findlib-%{version}.tar.gz
-
+Patch0:         bytes-lib-detection.patch
 BuildRequires:  ocaml >= 4.02.0
 # BuildRequires:  ocaml-labltk-devel
 BuildRequires:  ocaml-ocamlbuild-devel
@@ -37,7 +37,7 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q -n findlib-%{version}
+%autosetup -p1 -n findlib-%{version}
 
 
 %build
@@ -69,7 +69,8 @@ make install \
 
 
 %files
-%doc LICENSE doc/README
+%license LICENSE
+%doc doc/README
 %config(noreplace) %{_sysconfdir}/ocamlfind.conf
 %{_bindir}/*
 %{_mandir}/man1/*
@@ -90,7 +91,7 @@ make install \
 
 
 %files devel
-%doc LICENSE doc/README doc/guide-html
+%doc doc/README doc/guide-html
 %ifarch %{ocaml_native_compiler}
 %{_libdir}/ocaml/findlib/*.a
 %{_libdir}/ocaml/findlib/*.cmxa
@@ -100,6 +101,10 @@ make install \
 
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.1-15
+- Patch stdlib bytes library detection for ocaml 4.13
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.1-14
 - Switching to using full number for the 'Release' tag.
 

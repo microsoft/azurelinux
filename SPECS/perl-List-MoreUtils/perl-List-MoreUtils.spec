@@ -2,7 +2,7 @@
 Summary:        Provide the stuff missing in List::Util
 Name:           perl-List-MoreUtils
 Version:        0.428
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0 AND (GPLv1 OR Artistic)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/List-MoreUtils/
@@ -13,6 +13,7 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Exporter-Tiny
+BuildRequires:  perl-generators
 
 Requires:       perl-Exporter-Tiny
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -53,6 +54,9 @@ make test
 %{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.428-8
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.428-7
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.26-4: Adding 'local::lib' perl5 library to fix test dependencies.

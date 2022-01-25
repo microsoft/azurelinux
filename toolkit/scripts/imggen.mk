@@ -71,6 +71,7 @@ fetch-external-image-packages: $(image_external_package_cache_summary)
 # Changes to files located outside the base directory will not be detected.
 validate-image-config: $(validate-config)
 $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(config_other_files)
+	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imageconfigvalidator) \
 		--input=$(CONFIG_FILE) \
 		--dir=$(CONFIG_BASE_DIR) && \
@@ -86,7 +87,7 @@ ifeq ($(USE_PREVIEW_REPO),y)
 imagepkgfetcher_extra_flags += --use-preview-repo
 endif
 
-$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(packagelist_files) $(RPMS_DIR) $(imggen_rpms)
+$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \
@@ -109,7 +110,7 @@ $(imager_disk_output_dir): $(STATUS_FLAGS_DIR)/imager_disk_output.flag
 	@touch $@
 	@echo Finished updating $@
 
-$(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_summary) $(imggen_local_repo) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(packagelist_files) $(assets_files) $(imggen_packagelist_files)
+$(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_summary) $(imggen_local_repo) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(assets_files)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	mkdir -p $(imager_disk_output_dir) && \
 	rm -rf $(imager_disk_output_dir)/* && \
@@ -142,7 +143,7 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		--log-file=$(LOGS_DIR)/imggen/roast.log \
 		--image-tag=$(IMAGE_TAG)
 
-$(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
+$(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(chroot_worker) $(graph_file) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \

@@ -1,0 +1,8 @@
+License information retrieved from Makefile.PL:
+
+(...)
+name          ('Module-Install-AuthorTests');
+author        ('Ricardo Signes <rjbs@cpan.org>');
+license       ('perl');
+all_from      ('lib/Module/Install/AuthorTests.pm');
+...

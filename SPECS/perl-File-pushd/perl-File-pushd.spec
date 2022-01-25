@@ -1,6 +1,6 @@
 Name:           perl-File-pushd
 Version:        1.016
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Change directory temporarily for a limited scope
 License:        ASL 2.0
 Group:          Development/Libraries
@@ -13,6 +13,7 @@ BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Module Runtime
 BuildRequires:  perl(Carp)
@@ -65,6 +66,9 @@ make test
 %{_mandir}/man3/File::pushd.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.016-9
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.016-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

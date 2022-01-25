@@ -1,7 +1,7 @@
 Summary:        Recursive directory listing command.
 Name:           tree
-Version:        1.7.0
-Release:        3%{?dist}
+Version:        1.8.0
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            http://mama.indstate.edu/users/ice/tree/
 Group:          Applications
@@ -31,10 +31,15 @@ make install BINDIR=%{buildroot}%{_bindir} \
 %{_mandir}/man1/*
 
 %changelog
+* Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.0-1
+- Update to version 1.8.0.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.7.0-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.7.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Thu Dec 01 2016 Xiaolin Li <xiaolinl@vmware.com> 1.7.0-1
--   Add tree package.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.7.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Thu Dec 01 2016 Xiaolin Li <xiaolinl@vmware.com> 1.7.0-1
+- Add tree package.

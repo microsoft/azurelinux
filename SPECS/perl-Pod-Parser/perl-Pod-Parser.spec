@@ -1,7 +1,7 @@
 Summary:        Basic perl modules for handling Plain Old Documentation (POD)
 Name:           perl-Pod-Parser
 Version:        1.63
-Release:        449%{?dist}
+Release:        450%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
+BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.5.0
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
@@ -63,13 +64,18 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 make test
 
 %files
-%doc ANNOUNCE CHANGES README TODO
+%license README
+%doc ANNOUNCE CHANGES TODO
 %{_bindir}/podselect
 %{perl_vendorlib}/*
 %{_mandir}/man1/*
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.63-450
+- Adding BR on "perl-generators" to automatically provide Perl modules.
+- License verified.
+
 * Fri Aug 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.63-449
 - Removing unnecessary BR on `Perl(IO::String)'.
 

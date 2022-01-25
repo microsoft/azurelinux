@@ -21,9 +21,9 @@ Distribution:   Mariner
 %define section free
 Name:           jarjar
 Version:        1.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Tool to repackage Java libraries
-License:        GPL-2.0-or-later
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 Url:            https://github.com/google/jarjar
 Source0:        https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/%{name}/%{name}-src-%{version}.zip
@@ -90,7 +90,7 @@ rm -f lib/*.jar
 find . -name JarJarMojo.java -delete
 
 %build
-export JAVA_HOME=$(find %{_lib}/jvm -name "OpenJDK*")
+export JAVA_HOME="%{java_home}"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
 pushd lib
 ln -sf $(build-classpath objectweb-asm/asm) asm-4.0.jar
@@ -131,7 +131,7 @@ cp -pr dist/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files
-%doc COPYING
+%license COPYING
 %{_javadir}/%{name}.jar
 %{_javadir}/%{name}-util.jar
 %{_mavenpomdir}/*
@@ -147,6 +147,9 @@ cp -pr dist/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-5
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

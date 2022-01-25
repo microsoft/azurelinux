@@ -2,11 +2,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Locale-Msgfmt
 Version:        0.15
-Release:        27%{?dist}
+Release:        28%{?dist}
 Summary:        Compile .po files to .mo files
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Locale-Msgfmt
-Source0:        https://cpan.metacpan.org/authors/id/S/SZ/SZABGAB/Locale-Msgfmt-%{version}.tar.gz#/perl-Locale-Msgfmt-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-%{version}.tar.gz#/perl-Locale-Msgfmt-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -26,6 +26,7 @@ BuildRequires:  perl(warnings)
 BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  perl(Locale::Maketext::Gettext)
 BuildRequires:  perl(Test::More)
@@ -65,6 +66,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15-28
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15-27
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

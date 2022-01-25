@@ -2,7 +2,7 @@
 Summary:        SQLite DBI Driver
 Name:           perl-DBD-SQLite
 Version:        1.62
-Release:        4%{?dist}
+Release:        5%{?dist}
 Group:          Development/Libraries
 License:        (GPL+ or Artistic) and Public Domain
 URL:            http://search.cpan.org/dist/DBD-SQLite/
@@ -14,6 +14,7 @@ BuildRequires:  sqlite-devel >= 3.22.0
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-DBI
 Requires:       perl-DBI
+BuildRequires:  perl-generators
 Requires:       perl-libs
 
 Provides:       perl(DBD::SQLite) = %{version}-%{release}
@@ -56,6 +57,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62-5
+- Adding 'BuildRequires: perl-generators'.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.62-4
 - Use new perl package names.
 - Provide perl(DBD::SQLite::*).
