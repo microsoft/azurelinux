@@ -9,12 +9,6 @@ Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
 #Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{version}.tar.xz
 Source0:        %{name}-%{version}.tar.xz
-Patch0:         CVE-2019-12450.patch
-Patch1:         CVE-2020-35457.patch
-# CVE-2021-27218 and CVE-2021-27219 are both solved by the patch for the first
-Patch3:         CVE-2021-27218.patch
-Patch4:         CVE-2021-27219.nopatch
-Patch5:         CVE-2021-28153.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -26,6 +20,7 @@ BuildRequires:  python3-xml
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
+BuildRequires:  python3-pygments
 Requires:       libffi
 Requires:       libselinux
 Requires:       pcre-libs
@@ -80,9 +75,6 @@ The glib2-doc package includes documentation for the GLib library.
 %autosetup -p1
 
 %build
-# Bug 1324770: Also explicitly remove PCRE sources since we use --with-pcre=system
-rm glib/pcre/*.[ch]
-
 %meson \
     -Dgtk_doc=true \
     --default-library=both
@@ -137,6 +129,11 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Fri Jan 21 2022 Henry Li <lihl@microsoft.com> - 2.71.0-1
+- Upgrade to version 2.71.0
+- Add python3-pygments as BR
+- Don't remove pcre sources which no longer apply for the new version
+
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.60.1-5
 - Removed python2 support
 * Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4

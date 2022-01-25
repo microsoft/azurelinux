@@ -4570,8 +4570,8 @@
         "type": "other",
         "other": {
           "name": "glib",
-          "version": "2.60.1",
-          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.60/glib-2.60.1.tar.xz"
+          "version": "2.71.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.71/glib-2.71.0.tar.xz"
         }
       }
     },
@@ -5200,8 +5200,8 @@
         "type": "other",
         "other": {
           "name": "gtk-doc",
-          "version": "1.29",
-          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/gtk-doc/1.29/gtk-doc-1.29.tar.xz"
+          "version": "1.33.2",
+          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/gtk-doc/1.33/gtk-doc-1.33.2.tar.xz"
         }
       }
     },
@@ -11251,8 +11251,8 @@
         "type": "other",
         "other": {
           "name": "libsoup",
-          "version": "2.64.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/2.64/libsoup-2.64.0.tar.xz"
+          "version": "3.0.4",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/3.0/libsoup-3.0.4.tar.xz"
         }
       }
     },
@@ -28707,8 +28707,8 @@
         "type": "other",
         "other": {
           "name": "vala",
-          "version": "0.34.6",
-          "downloadUrl": "http://download.gnome.org/sources/vala/0.34/vala-0.34.6.tar.xz"
+          "version": "0.54.6",
+          "downloadUrl": "http://download.gnome.org/sources/vala/0.54/vala-0.54.6.tar.xz"
         }
       }
     },

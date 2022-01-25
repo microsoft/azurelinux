@@ -34,7 +34,7 @@
 Name:			graphviz
 Summary:		Graph Visualization Tools
 Version:		2.42.4
-Release:		3%{?dist}
+Release:		4%{?dist}
 License:		EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,7 +51,7 @@ BuildRequires:		python2-devel
 %endif
 BuildRequires:		python3-devel, java-devel
 BuildRequires:		pkgconfig(cairo) >= 1.1.10, pango-devel, gmp-devel, lua-devel
-BuildRequires:		gd-devel, perl-devel, swig >= 1.3.33, automake, autoconf, libtool
+BuildRequires:		gd-devel, perl-devel, perl, swig >= 1.3.33, automake, autoconf, libtool
 # Temporary workaound for perl(Carp) not pulled
 BuildRequires:		perl-Carp
 %if %{PHP}
@@ -509,6 +509,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Mon Jan 24 2022 Henry Li <lihl@microsoft.com> - 2.42.4-4
+- Add perl as BR 
+
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.42.4-3
 - Use pkgconfig(cairo) instead of cairo-devel build requirement
 

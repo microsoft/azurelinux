@@ -25,6 +25,13 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-tools
 BuildRequires:  sqlite-devel
+BuildRequires:  cmake
+BuildRequires:  libnghttp2-devel
+BuildRequires:  brotli-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  vala
+BuildRequires:  gtk-doc
+BuildRequires:  python3-pygments
 Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
@@ -61,14 +68,20 @@ These are the additional language files of libsoup.
 %autosetup
 
 %build
-%meson -Dgtk_doc=true	
+%meson \
+    -Dgtk_doc=true \
+    -Dsysprof=disabled \
+    -Dautobahn=disabled \
+    -Dhttp2_tests=disabled \
+    -Dntlm=disabled \
+    -Dtests=false
 %meson_build
 
 %install
 %meson_install
 find %{buildroot} -type f -name "*.la" -delete -print
-%find_lang %{name}
 
+%find_lang %{name}-%{BaseVersion}
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -86,15 +99,26 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %exclude %{_libdir}/*.a
 %{_libdir}/pkgconfig/*
 %{_datadir}/gir-1.0/*
+%dir %{_datadir}/vala
+%dir %{_datadir}/vala/vapi
+%{_datadir}/vala/vapi/%{name}-%{BaseVersion}.deps
+%{_datadir}/vala/vapi/%{name}-%{BaseVersion}.vapi
 
 %files doc
 %defattr(-,root,root)
 %{_datadir}/gtk-doc/html/*
 
-%files lang -f %{name}.lang
+%files lang -f %{name}-%{BaseVersion}.lang
 %defattr(-,root,root)
 
 %changelog
+* Mon Jan 24 2022 Henry Li <lihl@microsoft.com> - 3.0.4-1
+- Upgrade to version 3.0.4
+- Add cmake, libnghttp2-devel, brotli-devel, gnutls-devel, 
+  gtk-doc, vala and python3-pygments as BR
+- Use meson to build and install
+- Add additional files to libsoup-devel 
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.64.0-7
 - Remove libtool archive files from final packaging
 
