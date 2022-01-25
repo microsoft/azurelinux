@@ -65,6 +65,7 @@ cd tests && make check-TESTS
 - Add meson and python3-pygments as BR
 - Use meson to build and install
 - Disable test, which will cause circular dependency with glib2
+- License Verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.29-6
 - Added %%license line automatically

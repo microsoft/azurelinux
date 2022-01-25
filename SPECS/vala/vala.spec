@@ -162,6 +162,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Add subpackages vala-doc, valadoc and valadoc-devel
 - Remove /usr/bin/vapicheck* since the files no longer exist
 - Remove duplicate %license COPYING from main package  
+- License Verified
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.34.6-4
 - Remove libtool archive files from final packaging

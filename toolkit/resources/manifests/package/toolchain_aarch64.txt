@@ -123,7 +123,7 @@ grep-lang-3.7-1.cm2.aarch64.rpm
 gtest-1.11.0-1.cm2.aarch64.rpm
 gtest-debuginfo-1.11.0-1.cm2.aarch64.rpm
 gtest-devel-1.11.0-1.cm2.aarch64.rpm
-gtk-doc-1.29-6.cm2.noarch.rpm
+gtk-doc-1.33.2-1.cm2.noarch.rpm
 gzip-1.11-1.cm2.aarch64.rpm
 gzip-debuginfo-1.11-1.cm2.aarch64.rpm
 intltool-0.51.0-7.cm2.noarch.rpm
@@ -182,10 +182,10 @@ libselinux-utils-3.2-1.cm2.aarch64.rpm
 libsepol-3.2-2.cm2.aarch64.rpm
 libsepol-debuginfo-3.2-2.cm2.aarch64.rpm
 libsepol-devel-3.2-2.cm2.aarch64.rpm
-libsolv-0.7.19-2.cm2.aarch64.rpm
-libsolv-debuginfo-0.7.19-2.cm2.aarch64.rpm
-libsolv-devel-0.7.19-2.cm2.aarch64.rpm
-libsolv-tools-0.7.19-2.cm2.aarch64.rpm
+libsolv-0.7.20-1.cm2.aarch64.rpm
+libsolv-debuginfo-0.7.20-1.cm2.aarch64.rpm
+libsolv-devel-0.7.20-1.cm2.aarch64.rpm
+libsolv-tools-0.7.20-1.cm2.aarch64.rpm
 libssh2-1.9.0-1.cm2.aarch64.rpm
 libssh2-debuginfo-1.9.0-1.cm2.aarch64.rpm
 libssh2-devel-1.9.0-1.cm2.aarch64.rpm
@@ -495,6 +495,7 @@ python3-libxml2-2.9.12-2.cm2.aarch64.rpm
 python3-magic-5.40-1.cm2.noarch.rpm
 python3-markupsafe-1.1.1-4.cm2.aarch64.rpm
 python3-pip-3.9.9-2.cm2.noarch.rpm
+python3-pygments-2.4.2-7.cm2.noarch.rpm
 python3-rpm-4.17.0-1.cm2.aarch64.rpm
 python3-setuptools-3.9.9-2.cm2.noarch.rpm
 python3-test-3.9.9-2.cm2.aarch64.rpm

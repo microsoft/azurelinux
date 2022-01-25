@@ -118,6 +118,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
   gtk-doc, vala and python3-pygments as BR
 - Use meson to build and install
 - Add additional files to libsoup-devel 
+- License Verified
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.64.0-7
 - Remove libtool archive files from final packaging
