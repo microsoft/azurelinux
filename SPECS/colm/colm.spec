@@ -1,6 +1,6 @@
 Name:           colm
 Version:        0.14.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Programming language designed for the analysis of computer languages
 # aapl/ and some headers from src/ are the LGPLv2+
 License:        MIT AND LGPLv2+
@@ -41,12 +41,12 @@ sed -i -e "/dist_doc_DATA/d" Makefile.am
 %build
 ./autogen.sh
 ./configure --prefix=%{buildroot}/usr
-make
+%make_build
 
 %install
-make install
-# do not install/remove .la files and doc files
-find %{buildroot}%{_libdir} -type f -name '*.la' -print -delete
+%make_install
+# Remove .a files and docs
+find %{buildroot}%{_libdir} -type f -name '*.a' -print -delete
 rm -rf %{buildroot}%{_datadir}
 install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{name}.vim
 
@@ -58,20 +58,24 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 %doc README
 %{_bindir}/*
 %{_libdir}/lib%{name}-%{version}.so
-%{_libdir}/lib%{name}.so
 %{_libdir}/libfsm-%{version}.so
-%{_libdir}/libfsm.so
 %dir %{_datadir}/vim
 %dir %{_datadir}/vim/vimfiles
 %dir %{_datadir}/vim/vimfiles/syntax
 %{_datadir}/vim/vimfiles/syntax/%{name}.vim
 
 %files devel
-%{_libdir}/lib%{name}.a
-%{_libdir}/libfsm.a
+%{_libdir}/lib%{name}.so
+%{_libdir}/libfsm.so
+%{_libdir}/lib%{name}.la
+%{_libdir}/libfsm.la
 %{_includedir}/
 
 %changelog
+* Mon Jan 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.7-2
+- Adding .la files to the "-devel" subpackage.
+- Moving library links out of the default packages into "-devel".
+
 * Wed Jan 19 2022 Nicolas Guibourge <nicolasg@microsft.com> - 0.14.7-1
 - Ugradte to 0.14.7
 

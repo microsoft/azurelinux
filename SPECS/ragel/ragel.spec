@@ -38,9 +38,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
-# Removing dependecy on absent .la files from 'colm'
-sed -E -i "/LIB(COLM|FSM)_LA/d" configure.ac
-
 autoreconf -vfi
 %configure \
     --disable-static \
