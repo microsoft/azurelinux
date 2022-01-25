@@ -40,7 +40,7 @@ sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
 ./autogen.sh
-%configure
+./configure --prefix=%{buildroot}/usr
 make
 
 %install
@@ -56,20 +56,20 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 %files
 %license COPYING
 %doc README
-%{_bindir}/*
-%{_libdir}/lib%{name}-%{version}.so
-%{_libdir}/libfsm-%{version}.so
 %dir %{_datadir}/vim
 %dir %{_datadir}/vim/vimfiles
 %dir %{_datadir}/vim/vimfiles/syntax
+%{_bindir}/*
 %{_datadir}/vim/vimfiles/syntax/%{name}.vim
+%{_libdir}/lib%{name}-%{version}.so
+%{_libdir}/libfsm-%{version}.so
 
 %files devel
-%{_libdir}/lib%{name}.so
-%{_libdir}/libfsm.so
-%{_libdir}/lib%{name}.la
-%{_libdir}/libfsm.la
 %{_includedir}/
+%{_libdir}/lib%{name}.la
+%{_libdir}/lib%{name}.so
+%{_libdir}/libfsm.la
+%{_libdir}/libfsm.so
 
 %changelog
 * Mon Jan 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.7-2
