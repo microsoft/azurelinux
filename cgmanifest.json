@@ -5610,8 +5610,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.46",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.46.tar.bz2"
+          "version": "2.4.52",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.52.tar.bz2"
         }
       }
     },
@@ -12551,8 +12551,8 @@
         "type": "other",
         "other": {
           "name": "lua",
-          "version": "5.3.5",
-          "downloadUrl": "https://www.lua.org/ftp/lua-5.3.5.tar.gz"
+          "version": "5.4.3",
+          "downloadUrl": "https://www.lua.org/ftp/lua-5.4.3.tar.gz"
         }
       }
     },

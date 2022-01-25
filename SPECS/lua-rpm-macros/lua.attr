@@ -1,0 +1,19 @@
+%__lua_requires() %{lua:
+    -- Match buildroot paths of the form
+    --    /PATH/OF/BUILDROOT/usr/lib(64)/lua/MAJOR.MINOR/ and
+    --    /PATH/OF/BUILDROOT/usr/share/pythonMAJOR.MINOR/
+    -- generating a line of the form:
+    --    lua(abi) = MAJOR.MINOR
+    local path = rpm.expand('%1')
+    local datadir = rpm.expand('%_datadir')
+    local libdir = rpm.expand('%_libdir')
+    for i, dir in ipairs({datadir, libdir}) do
+        if path:match(dir .. '/lua/%d+%.%d+/.*') then
+            local requires = path:gsub('.*' .. dir .. '/lua/(%d+%.%d+)/.*', 'lua(abi) = %1')
+            print(requires)
+            break
+        end
+    end
+}
+
+%__lua_path ^(%{_datadir}|%{_libdir})/lua/[[:digit:]]+\\.[[:digit:]]+/.+

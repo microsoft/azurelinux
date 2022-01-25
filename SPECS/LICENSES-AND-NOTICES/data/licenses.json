@@ -938,6 +938,7 @@
                 "lua-lpeg",
                 "lua-lunit",
                 "lua-posix",
+                "lua-rpm-macros",
                 "lua-term",
                 "luksmeta",
                 "lutok",

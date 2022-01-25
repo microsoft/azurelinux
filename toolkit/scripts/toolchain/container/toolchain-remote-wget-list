@@ -26,13 +26,13 @@ https://zlib.net/zlib-1.2.11.tar.xz
 https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2
 http://anduin.linuxfromscratch.org/BLFS/bdb/db-5.3.28.tar.gz
 https://github.com/libarchive/libarchive/releases/download/v3.4.2/libarchive-3.4.2.tar.gz
-http://www.lua.org/ftp/lua-5.3.5.tar.gz
+http://www.lua.org/ftp/lua-5.4.3.tar.gz
 ftp://anduin.linuxfromscratch.org/BLFS/popt/popt-1.16.tar.gz
 https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
-http://www.linuxfromscratch.org/patches/blfs/9.0/lua-5.3.5-shared_library-1.patch
+https://www.linuxfromscratch.org/patches/blfs/svn/lua-5.4.3-shared_library-1.patch
 https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
 https://ftp.gnu.org/gnu/glibc/glibc-2.34.tar.xz
 https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.34-fhs-1.patch
