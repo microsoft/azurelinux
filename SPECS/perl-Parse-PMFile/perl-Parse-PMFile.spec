@@ -1,6 +1,6 @@
 Name:           perl-Parse-PMFile
 Version:        0.42
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Parses .pm file as PAUSE does
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
@@ -13,6 +13,7 @@ Patch0:         Parse-PMFile-0.41-Do-not-use-ExtUtils-MakeMaker-CPANfile.patch
 BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
@@ -65,6 +66,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.42-5
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.42-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

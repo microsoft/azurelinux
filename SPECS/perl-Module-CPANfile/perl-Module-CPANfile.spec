@@ -1,6 +1,6 @@
 Name:           perl-Module-CPANfile
 Version:        1.1004
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Parse cpanfile
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
@@ -11,6 +11,7 @@ Source0:        https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/Module-CPANfi
 BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl(base)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Cwd)
@@ -69,6 +70,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1004-9
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1004-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

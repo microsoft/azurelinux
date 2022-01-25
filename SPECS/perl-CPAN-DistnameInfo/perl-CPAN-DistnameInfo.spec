@@ -1,6 +1,6 @@
 Name:           perl-CPAN-DistnameInfo
 Version:        0.12
-Release:        19%{?dist}
+Release:        20%{?dist}
 Summary:        Extract distribution name and version from a distribution filename
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
@@ -11,6 +11,7 @@ Source0:        https://cpan.metacpan.org/authors/id/G/GB/GBARR/CPAN-DistnameInf
 BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl(version)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
@@ -55,6 +56,9 @@ make test
 %{_mandir}/man3/CPAN::DistnameInfo.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12-20
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.12-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

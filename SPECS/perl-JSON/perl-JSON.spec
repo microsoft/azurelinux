@@ -3,7 +3,7 @@
 Summary:        Parse and convert to JSON (JavaScript Object Notation)
 Name:           perl-JSON
 Version:        4.02
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Encode)
@@ -94,6 +95,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.02-7
+- Adding 'BuildRequires: perl-generators'.
+
 * Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 4.02-6
 - Manually define tests subpackage, taken from Fedora 34 (license: MIT)
 

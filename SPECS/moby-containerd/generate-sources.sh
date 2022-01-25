@@ -5,8 +5,8 @@
 # Git clone is a standard practice of producing source files for moby-* packages.
 
 CONTAINERD_REPO=https://github.com/containerd/containerd.git
-CONTAINERD_COMMIT=05f951a3781f4f2c1911b05e61c160e9c30eaa8e
-VERSION=1.4.4+azure
+CONTAINERD_COMMIT=1407cab509ff0d96baa4f0eb6ff9980270e6e620
+VERSION=1.5.9+azure
 
 mkdir -p /build/containerd-src
 cd /build/containerd-src
