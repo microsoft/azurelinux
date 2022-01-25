@@ -6,25 +6,27 @@ Name:           azure-iot-sdk-c
 # For apt-get packages they fix the version number to 0.2.0 and increase the release number with each release.
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
-Version:        2020.02.04.1
-Release:        8%{?dist}
-# Source0: https://github.com/Azure/%{name}/archive/LTS_02_2020_Ref01.tar.gz
-# The below tarball includes all submodules.
-
-# This tarball is created using the following command:
-# git clone --recursive --single-branch --branch LTS_02_2020_Ref01 --depth 1 https://github.com/Azure/azure-iot-sdk-c.git
-# tar cjvf azure-iot-sdk-c-2020.02.04.1.tar.bz2 azure-iot-sdk-c/
-Source0:        %{name}-%{version}.tar.bz2
+Version:        2022.01.21
+Release:        1%{?dist}
 License:        MIT
 Group:          Applications/File
 URL:            https://github.com/Azure/azure-iot-sdk-c
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+# Source0: https://github.com/Azure/%{name}/archive/LTS_01_2022_Ref01.tar.gz
+# The below tarball includes all submodules.
+
+# This tarball is created using the following command:
+# git clone --recursive --single-branch --branch LTS_01_2022_Ref01 --depth 1 https://github.com/Azure/azure-iot-sdk-c.git
+# tar cjvf azure-iot-sdk-c-2022.01.21.tar.bz2 azure-iot-sdk-c/
+Source0:        %{name}-%{version}.tar.bz2
+
 BuildRequires:  cmake
 BuildRequires:  build-essential
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  util-linux-devel
+BuildRequires:  valgrind
 Requires:       util-linux
 Requires:       curl
 Requires:       openssl
@@ -64,6 +66,7 @@ export CFLAGS=" %{build_cflags}        \
 
 cmake \
     -Duse_prov_client:BOOL=ON \
+    -DCMAKE_SYSTEM_NAME=Linux \
     -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} ..
 make %{?_smp_mflags}
 
@@ -77,21 +80,15 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 %files
 %defattr(-, root, root, -)
 %license LICENSE
-%dir %{_includedir}/azureiot
-%{_includedir}/azureiot/*
-%dir %{_includedir}/iothub_service_client
-%{_includedir}/iothub_service_client/*
-%dir %{_includedir}/umock_c
-%{_includedir}/umock_c/*
-%dir %{_includedir}/azure_macro_utils
-%{_includedir}/azure_macro_utils/*
-%dir %{_includedir}/azure_prov_client
-%{_includedir}/azure_prov_client/*
+%{_includedir}/*
 %{_bindir}/tpm_device_provision
-%{_lib64dir}/*
+%{_libdir}/*
 /usr/cmake/*
 
 %changelog
+*   Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2022.01.21-1
+-   Upgrade to 2022.01.21.
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.02.04.1-8
 -   Removing the explicit %%clean stage.
 
