@@ -40,11 +40,11 @@ sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
 ./autogen.sh
-./configure --prefix=%{buildroot}/usr
-%make_build
+%configure
+make
 
 %install
-%make_install
+make install
 # Remove .a files and docs
 find %{buildroot}%{_libdir} -type f -name '*.a' -print -delete
 rm -rf %{buildroot}%{_datadir}
