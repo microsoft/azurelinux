@@ -1,4 +1,5 @@
 Name:           ragel
+# WARNING: each version requires an one specific version of 'colm-devel'. Check 'EXPECTED_COLM_VER' inside 'configure.ac'.
 Version:        7.0.4
 Release:        1%{?dist}
 Summary:        Finite state machine compiler
@@ -38,12 +39,13 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
+ls -la /usr/lib/
 autoreconf -vfi
 %configure \
     --disable-static \
     --with-colm=%{_prefix} \
     --disable-manual
-%make_build
+make
 
 %install
 %make_install
@@ -74,7 +76,7 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 
 %changelog
 * Mon Jan 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.4-1
-- Updating to version 7.0.4 to allow usage of newer version of 'colm'.
+- Updating to version 7.0.4 to build with 'colm' 0.14.7.
 
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 7.0.0.12-6
 - Remove epoch

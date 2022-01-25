@@ -1,4 +1,5 @@
 Name:           colm
+# WARNING: the 'ragel' package always requires one specific version of 'colm'. Make sure to update both in tandem.
 Version:        0.14.7
 Release:        2%{?dist}
 Summary:        Programming language designed for the analysis of computer languages
@@ -75,6 +76,7 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 * Mon Jan 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.7-2
 - Adding .la files to the "-devel" subpackage.
 - Moving library links out of the default packages into "-devel".
+- Removing static libraries.
 
 * Wed Jan 19 2022 Nicolas Guibourge <nicolasg@microsft.com> - 0.14.7-1
 - Ugradte to 0.14.7
