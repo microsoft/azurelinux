@@ -25284,8 +25284,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "5.0.5",
-          "downloadUrl": "http://download.redis.io/releases/redis-5.0.5.tar.gz"
+          "version": "6.2.5",
+          "downloadUrl": "http://download.redis.io/releases/redis-6.2.5.tar.gz"
         }
       }
     },
@@ -25535,8 +25535,8 @@
         "type": "other",
         "other": {
           "name": "rsyslog",
-          "version": "8.37.0",
-          "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.37.0.tar.gz"
+          "version": "8.2108.0",
+          "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2108.0.tar.gz"
         }
       }
     },
@@ -27407,8 +27407,8 @@
         "type": "other",
         "other": {
           "name": "socat",
-          "version": "1.7.3.4",
-          "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.3.4.tar.gz"
+          "version": "1.7.4.3",
+          "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.4.3.tar.gz"
         }
       }
     },
