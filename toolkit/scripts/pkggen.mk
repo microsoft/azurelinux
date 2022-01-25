@@ -129,7 +129,7 @@ ifeq ($(HYDRATED_BUILD), y)
 graphscrubber_extra_flags += --hydrated-build
 endif
 
-$(scrubbed_file): $(cached_file)
+$(scrubbed_file): $(cached_file) $(go-graphscrubber)
 	$(go-graphscrubber) \
 		--input=$(graph_file) \
 		$(graphscrubber_extra_flags) \
