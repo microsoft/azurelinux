@@ -1,20 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %bcond_with bootstrap
 
+Summary:        Java plugin based web server
 Name:           xbean
 Version:        4.18
 Release:        6%{?dist}
-Summary:        Java plugin based web server
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://geronimo.apache.org/xbean/
-BuildArch:      noarch
-
 Source0:        https://repo1.maven.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}-source-release.zip
-
 Patch1:         0001-Remove-unused-import.patch
 Patch2:         0002-Unbundle-ASM.patch
 Patch3:         0003-Remove-dependency-on-log4j-and-commons-logging.patch
+
+BuildArch:      noarch
 
 BuildRequires:  maven-local
 %if %{with bootstrap}
