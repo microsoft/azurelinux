@@ -58,7 +58,7 @@ pronounceable passwords from Python applications.
 %configure \
 	--with-securedir=%{_moduledir} \
 	--with-pythonsitedir=%{python3_sitearch} \
-	--with-python-binary=python3 \
+	--with-python-binary=%{__python3} \
 	--disable-static
 
 make %{?_smp_mflags}
