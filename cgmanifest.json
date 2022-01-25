@@ -10931,8 +10931,8 @@
         "type": "other",
         "other": {
           "name": "libpwquality",
-          "version": "1.4.2",
-          "downloadUrl": "https://github.com/libpwquality/libpwquality/releases/download/libpwquality-1.4.2/libpwquality-1.4.2.tar.bz2"
+          "version": "1.4.4",
+          "downloadUrl": "https://github.com/libpwquality/libpwquality/releases/download/libpwquality-1.4.4/libpwquality-1.4.4.tar.bz2"
         }
       }
     },
@@ -10951,8 +10951,8 @@
         "type": "other",
         "other": {
           "name": "libqmi",
-          "version": "1.22.4",
-          "downloadUrl": "https://www.freedesktop.org/software/libqmi/libqmi-1.22.4.tar.xz"
+          "version": "1.30.2",
+          "downloadUrl": "https://www.freedesktop.org/software/libqmi/libqmi-1.30.2.tar.xz"
         }
       }
     },
@@ -11011,18 +11011,8 @@
         "type": "other",
         "other": {
           "name": "librdkafka",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/edenhill/librdkafka/archive/v1.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "librdkafka",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/edenhill/librdkafka/archive/v1.5.0.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://github.com/edenhill/librdkafka/archive/v1.8.2.tar.gz"
         }
       }
     },
@@ -11081,8 +11071,8 @@
         "type": "other",
         "other": {
           "name": "librsync",
-          "version": "2.0.2",
-          "downloadUrl": "https://github.com/librsync/librsync/archive/v2.0.2.tar.gz"
+          "version": "2.3.2",
+          "downloadUrl": "https://github.com/librsync/librsync/archive/v2.3.2.tar.gz"
         }
       }
     },
@@ -11111,8 +11101,8 @@
         "type": "other",
         "other": {
           "name": "libseccomp",
-          "version": "2.4.1",
-          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.4.1/libseccomp-2.4.1.tar.gz"
+          "version": "2.5.3",
+          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.3/libseccomp-2.5.3.tar.gz"
         }
       }
     },
