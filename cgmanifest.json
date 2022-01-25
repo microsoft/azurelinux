@@ -27308,7 +27308,7 @@
         "other": {
           "name": "slang",
           "version": "2.3.2",
-          "downloadUrl": "http://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2"
+          "downloadUrl": "https://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2"
         }
       }
     },

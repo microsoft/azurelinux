@@ -73,14 +73,7 @@ while read -r package || [ -n "$package" ]; do
 
     echo "Adding RPM DB entry to worker chroot: $package."  | tee -a "$chroot_log"
 
-    if [[ "$package" == *"msopenjdk"* ]]; then
-        echo "Will install msopenjdk with --noscripts option: $package"
-        SCRIPTS_OPTION="--noscripts"
-    else
-        SCRIPTS_OPTION=""
-    fi
-
-    chroot "$chroot_builder_folder" rpm -i -v --nodeps --noorder --force $SCRIPTS_OPTION --dbpath="$TEMP_DB_PATH" --justdb "$package" &>> "$chroot_log"
+    chroot "$chroot_builder_folder" rpm -i -v --nodeps --noorder --force --dbpath="$TEMP_DB_PATH" --justdb "$package" &>> "$chroot_log"
     chroot "$chroot_builder_folder" rm $package
 done < "$packages"
 
