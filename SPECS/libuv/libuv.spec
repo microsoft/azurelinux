@@ -76,6 +76,7 @@ sudo -u test make -k check
 %changelog
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.43.0-1
 - Upgrade to version 1.43.0
+- License Verified
 
 *   Fri Dec 04 2020 Andrew Phelps <anphel@microsoft.com> - 1.38.0-2
 -   Fix check tests.
