@@ -1,17 +1,18 @@
-%define libsepolver 2.9-1
-%define libselinuxver 2.9-1
-%{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+
+%define libsepolver 3.2-1
+%define libselinuxver 3.2-1
 Summary:        SELinux binary policy manipulation library
 Name:           libsemanage
-Version:        2.9
-Release:        4%{?dist}
+Version:        3.2
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/SELinuxProject/selinux
-Source0:        %{url}/releases/download/20190315/%{name}-%{version}.tar.gz
+URL:            https://github.com/SELinuxProject/selinux/wiki
+Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        semanage.conf
-Patch0001:      0001-libsemanage-Fix-RESOURCE_LEAK-and-USE_AFTER_FREE-cov.patch
+Patch0:         libsemanage-Fix-RESOURCE_LEAK-and-USE_AFTER_FREE-cov.patch
 BuildRequires:  audit-devel
 BuildRequires:  bison
 BuildRequires:  bzip2
@@ -46,6 +47,7 @@ on binary policies such as customizing policy boolean settings.
 %package devel
 Summary:        Header files and libraries used to build policy manipulation tools
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Provides:       %{name}-static = %{version}-%{release}
 
 %description devel
 The semanage-devel package contains the libraries and header files
@@ -53,22 +55,22 @@ needed for developing applications that manipulate binary policies.
 
 %package python3
 Summary:        semanage python 3 bindings for libsemanage
+Provides:       python3-%{name} = %{version}-%{release}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libselinux-python3
+Requires:       libselinux-python3 >= %{libselinuxver}
 
 %description python3
 The libsemanage-python3 package contains the python 3 bindings for developing
 SELinux management applications.
 
 %prep
-%autosetup -n libsemanage-%{version} -p 2
-
+%autosetup -p2
 
 %build
-make clean
-make %{?_smp_mflags} swigify CFLAGS="%{build_cflags} -Wno-error=strict-overflow"
-make LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" all
-make LIBDIR="%{_libdir}" %{?_smp_mflags} PYTHON=%{_bindir}/python3 pywrap
+%make_build clean
+%make_build swigify CFLAGS="%{build_cflags} -Wno-error=strict-overflow -fno-semantic-interposition"
+%make_build LIBDIR="%{_libdir}" SHLIBDIR="%{_lib}" all
+%make_build LIBDIR="%{_libdir}" PYTHON=%{_bindir}/python3 pywrap
 
 %install
 mkdir -p %{buildroot}%{_libdir}
@@ -78,18 +80,17 @@ mkdir -p %{buildroot}%{_sharedstatedir}/selinux/tmp
 make DESTDIR=%{buildroot} LIBDIR="%{_libdir}" SHLIBDIR="/%{_lib}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" PYTHON=%{_bindir}/python3 install install-pywrap
 
 cp %{SOURCE1} %{buildroot}%{_sysconfdir}/selinux/semanage.conf
-ln -sf  %{_libdir}/libsemanage.so.1 %{buildroot}/%{_libdir}/libsemanage.so
-
-sed -i '1s%\(#! *%{_bindir}/python\)\([^3].*\|\)$%\13\2%' %{buildroot}%{_libexecdir}/selinux/semanage_migrate_store
+ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 
 %post -p /sbin/ldconfig
+
 %postun -p /sbin/ldconfig
 
 %files
 %license COPYING
 %dir %{_sysconfdir}/selinux
 %config(noreplace) %{_sysconfdir}/selinux/semanage.conf
-%{_libdir}/libsemanage.so.1
+%{_libdir}/libsemanage.so.2
 %{_mandir}/man5/*
 %{_mandir}/ru/man5/*
 %dir %{_libexecdir}/selinux
@@ -110,6 +111,14 @@ sed -i '1s%\(#! *%{_bindir}/python\)\([^3].*\|\)$%\13\2%' %{buildroot}%{_libexec
 %{_libexecdir}/selinux/semanage_migrate_store
 
 %changelog
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+- Upgrade to latest upstream version and rebase patch
+- Add -fno-semantic-interposition to CFLAGS as recommended by upstream
+- Add static subpackage provides to devel subpackage
+- Update source URL to new format
+- Lint spec
+- License verified
+
 * Tue Aug 25 2020 Daniel Burgener <daburgen@microsoft.com> - 2.9-4
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - License verified
