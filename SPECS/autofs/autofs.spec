@@ -81,20 +81,20 @@ rm -rf %{buildroot}%{_sysconfdir}/{init.d,rc.d}
 * Wed May 13 2020 Nick Samson <nisamson@microsoft.com> - 5.1.4-6
 - Added %%license line automatically
 
-*   Tue May 12 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.1.4-5
--   Undo specific changes for Docker build.
+* Tue May 12 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 5.1.4-5
+- Undo specific changes for Docker build.
 
-*   Thu Apr 30 2020 Andrew Phelps <anphel@microsoft.com> 5.1.4-4
--   Modify to build in Docker based environment.
+* Thu Apr 30 2020 Andrew Phelps <anphel@microsoft.com> - 5.1.4-4
+- Modify to build in Docker based environment.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5.1.4-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 5.1.4-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> 5.1.4-2
--   Use rpcsvc-proto and libtirpc
+* Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> - 5.1.4-2
+- Use rpcsvc-proto and libtirpc
 
-*   Thu Sep 06 2018 Anish Swaminathan <anishs@vmware.com> 5.1.4-1
--   Update version to 5.1.4
+* Thu Sep 06 2018 Anish Swaminathan <anishs@vmware.com> - 5.1.4-1
+- Update version to 5.1.4
 
-*   Thu Jul 06 2017 Xiaolin Li <xiaolinl@vmware.com> 5.1.3-1
--   Initial build. First version
+* Thu Jul 06 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.1.3-1
+- Initial build. First version
