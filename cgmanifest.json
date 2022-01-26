@@ -1606,6 +1606,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cassandra-cpp-driver",
+          "version": "2.16.0",
+          "downloadUrl": "https://github.com/datastax/cpp-driver/archive/refs/tags/2.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "catatonit",
           "version": "0.1.5",
           "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.5.tar.gz"
