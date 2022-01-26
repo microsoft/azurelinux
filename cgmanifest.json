@@ -22424,8 +22424,8 @@
         "type": "other",
         "other": {
           "name": "python-distro",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/nir0s/distro/archive/v1.4.0.tar.gz"
+          "version": "1.6.0",
+          "downloadUrl": "https://github.com/python-distro/distro/releases/download/v1.6.0/distro-1.6.0.tar.gz"
         }
       }
     },
