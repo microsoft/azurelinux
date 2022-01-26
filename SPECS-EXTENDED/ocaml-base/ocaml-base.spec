@@ -8,17 +8,17 @@ Distribution:   Mariner
 %global srcname base
 
 Name:           ocaml-%{srcname}
-Version:        0.14.1
-Release:        2%{?dist}
+Version:        0.15.0
+Release:        1%{?dist}
 Summary:        Jane Street standard library for OCaml
 
 License:        MIT
 URL:            https://opensource.janestreet.com/base/
 Source0:        https://github.com/janestreet/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
-
+Patch0:         %{name}-ocaml413compat.patch
 BuildRequires:  ocaml >= 4.07.0
 BuildRequires:  ocaml-dune-devel >= 2.0.0
-BuildRequires:  ocaml-sexplib0-devel >= 0.14
+BuildRequires:  ocaml-sexplib0-devel >= 0.15
 
 %description
 Base is a standard library for OCaml.  It provides a standard set of
@@ -116,6 +116,11 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %{_libdir}/ocaml/%{srcname}/*/*.mli
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+- Upgrade to latest upstream version
+- Add patch for OCaml 4.13.0 compatibility
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.1-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

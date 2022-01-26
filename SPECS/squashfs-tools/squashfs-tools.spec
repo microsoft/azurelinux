@@ -1,31 +1,32 @@
-Summary: Utility for the creation of squashfs filesystems
-Name: squashfs-tools
-Version: 4.4
-Release: 1%{?dist}
-License: GPLv2+
-URL: https://github.com/plougher/squashfs-tools
+Summary:        Utility for the creation of squashfs filesystems
+Name:           squashfs-tools
+Version:        4.5
+Release:        1%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/plougher/squashfs-tools
 # source0: https://github.com/plougher/squashfs-tools/archive/refs/tags/4.4.tar.gz
-Source0: %{name}-%{version}.tar.gz
-Source1: mksquashfs.1
-Source2: unsquashfs.1
-
-BuildRequires: gcc
-BuildRequires: zlib-devel
-BuildRequires: xz-devel
-BuildRequires: lzo-devel
-BuildRequires: libattr-devel
-BuildRequires: lz4-devel
-BuildRequires: zstd-devel
+Source0:        %{name}-%{version}.tar.gz
+Source1:        mksquashfs.1
+Source2:        unsquashfs.1
+BuildRequires:  gcc
+BuildRequires:  libattr-devel
+BuildRequires:  lz4-devel
+BuildRequires:  lzo-devel
+BuildRequires:  xz-devel
+BuildRequires:  zlib-devel
+BuildRequires:  zstd-devel
 
 %description
 Squashfs is a highly compressed read-only filesystem for Linux.  This package
 contains the utilities for manipulating squashfs filesystems.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 %build
-%set_build_flags
+%{set_build_flags}
 pushd squashfs-tools
 CFLAGS="%{optflags}" XZ_SUPPORT=1 LZO_SUPPORT=1 LZMA_XZ_SUPPORT=1 LZ4_SUPPORT=1 ZSTD_SUPPORT=1 make %{?_smp_mflags}
 
@@ -37,7 +38,8 @@ install -m 644 %{SOURCE1} %{buildroot}%{_mandir}/man1/mksquashfs.1
 install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 
 %files
-%doc README ACKNOWLEDGEMENTS README-%{version} CHANGES USAGE INSTALL COPYING
+%license COPYING
+%doc README ACKNOWLEDGEMENTS README-%{version} CHANGES USAGE INSTALL
 
 %doc README
 %{_mandir}/man1/*
@@ -46,6 +48,9 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 %{_sbindir}/unsquashfs
 
 %changelog
+* Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.5-1
+- Update to version 4.5.
+
 * Mon Aug 02 2021 Nicolas Guibourge <nicolasg@microsoft.com> 4.4-1
 - Move to version 4.4 to address CVE-2015-4646
 - License verified

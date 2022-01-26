@@ -1,46 +1,33 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
-
-Name:           ocaml-gettext
-Version:        0.3.8
-Release:        1%{?dist}
-Summary:        OCaml library for i18n
-
-License:        LGPLv2+ with exceptions
-URL:            https://github.com/gildor478/ocaml-gettext
-
-#Source0:        https://github.com/gildor478/%{name}/archive/%{version}.tar.gz
-# Temporarily using a preview of 0.3.8 built from git:
-# git archive --format=tar --prefix=ocaml-gettext-0.3.8/ 3aecf8e5350f | gzip > ocaml-gettext-0.3.8-3aecf8e5350f.tar.gz
-Source0:        ocaml-gettext-0.3.8-3aecf8e5350f.tar.gz
-
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-compiler-libs
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-fileutils-devel >= 0.4.4-4
-BuildRequires:  ocaml-dune-devel
-BuildRequires:  docbook-style-xsl
-BuildRequires:  libxslt
-BuildRequires:  libxml2
-BuildRequires:  chrpath
-BuildRequires:  autoconf
-%if !0%{?rhel}
-BuildRequires:  ocaml-ounit-devel
-BuildRequires:  ocaml-camomile-devel >= 0.8.6-3
-BuildRequires:  ocaml-camomile-data
-%endif
-BuildRequires:  autoconf, automake
-
-%if !0%{?rhel}
-# ocaml-gettext program needs camomile data files
-Requires:       ocaml-camomile-data
-%endif
-
 %global __ocaml_requires_opts -i Asttypes -i Parsetree
 %global __ocaml_provides_opts -i Pr_gettext
-
+Summary:        OCaml library for i18n
+Name:           ocaml-gettext
+Version:        0.4.2
+Release:        1%{?dist}
+License:        LGPLv2+ with exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/gildor478/ocaml-gettext
+Source0:        https://github.com/gildor478/ocaml-gettext/releases/download/v%{version}/gettext-v%{version}.tbz
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  chrpath
+BuildRequires:  docbook-style-xsl
+BuildRequires:  libxml2
+BuildRequires:  libxslt
+BuildRequires:  ocaml >= 4.00.1
+BuildRequires:  ocaml-camomile-data
+BuildRequires:  ocaml-camomile-devel >= 0.8.6-3
+BuildRequires:  ocaml-compiler-libs
+BuildRequires:  ocaml-cppo
+BuildRequires:  ocaml-dune-devel
+BuildRequires:  ocaml-fileutils-devel >= 0.4.4-4
+BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
+BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-ounit-devel
+# ocaml-gettext program needs camomile data files
+Requires:       ocaml-camomile-data
 
 %description
 Ocaml-gettext provides support for internationalization of Ocaml
@@ -53,47 +40,36 @@ Constraints :
 * provides a way to automatically extract translatable
   strings from Ocaml source code.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
-
 # BZ 446919.
 Requires:       ocaml-fileutils-devel >= 0.4.0
-
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-
-%if !0%{?rhel}
 %package        camomile
 Summary:        Parts of %{name} which depend on Camomile
 Requires:       %{name} = %{version}-%{release}
-
 
 %description    camomile
 The %{name}-camomile package contains the parts of %{name} which
 depend on Camomile.
 
-
 %package        camomile-devel
 Summary:        Development files for %{name}-camomile
-Requires:       %{name}-devel = %{version}-%{release}
 Requires:       %{name}-camomile = %{version}-%{release}
-
+Requires:       %{name}-devel = %{version}-%{release}
 
 %description    camomile-devel
 The %{name}-camomile-devel package contains libraries and
 signature files for developing applications that use
 %{name}-camomile.
-%endif
-
 
 %prep
-%setup -q
-#autopatch -p1
+%autosetup -n gettext-v%{version}
 
 # Remove dependency on batteries.
 sed -i -e 's/batteries//' test/dune
@@ -110,20 +86,19 @@ make build
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/ocaml
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-dune install --destdir=$RPM_BUILD_ROOT
+mkdir -p %{buildroot}%{_libdir}/ocaml
+mkdir -p %{buildroot}%{_bindir}
+dune install --destdir=%{buildroot}
 
 # Remove this, we will use our own rules for documentation.
-rm -rf $RPM_BUILD_ROOT/usr/doc
+rm -rf %{buildroot}%{_prefix}/doc
 
 
 %files
-%doc COPYING
+%license LICENSE.txt
 %{_libdir}/ocaml/gettext
 %{_libdir}/ocaml/gettext-stub
-%if %opt
-%exclude %{_libdir}/ocaml/gettext/*.a
+%if %{opt}
 %exclude %{_libdir}/ocaml/gettext/*.cmxa
 %exclude %{_libdir}/ocaml/gettext/*/*.a
 %exclude %{_libdir}/ocaml/gettext/*/*.cmxa
@@ -137,12 +112,9 @@ rm -rf $RPM_BUILD_ROOT/usr/doc
 %exclude %{_libdir}/ocaml/gettext-stub/*.ml
 %{_libdir}/ocaml/stublibs/*.so
 
-
 %files devel
-%doc README.md CHANGELOG THANKS TODO.md
-# %doc build/share/doc/html/*
-%if %opt
-%{_libdir}/ocaml/gettext/*.a
+%doc README.md CHANGES.md THANKS TODO.md
+%if %{opt}
 %{_libdir}/ocaml/gettext/*.cmxa
 %{_libdir}/ocaml/gettext/*/*.a
 %{_libdir}/ocaml/gettext/*/*.cmxa
@@ -156,32 +128,36 @@ rm -rf $RPM_BUILD_ROOT/usr/doc
 %{_libdir}/ocaml/gettext-stub/*.ml
 %{_bindir}/ocaml-gettext
 %{_bindir}/ocaml-xgettext
+%{_mandir}/man1/ocaml-gettext.1*
+%{_mandir}/man1/ocaml-xgettext.1*
+%{_mandir}/man5/ocaml-gettext.5*
 
-
-%if !0%{?rhel}
 %files camomile
-%doc COPYING
+%license LICENSE.txt
 %{_libdir}/ocaml/gettext-camomile
-%if %opt
+%if %{opt}
 %exclude %{_libdir}/ocaml/gettext-camomile/*.a
 %exclude %{_libdir}/ocaml/gettext-camomile/*.cmxa
 %exclude %{_libdir}/ocaml/gettext-camomile/*.cmx
 %endif
 %exclude %{_libdir}/ocaml/gettext-camomile/*.mli
 
-
 %files camomile-devel
 %doc README.md
-%if %opt
+%if %{opt}
 %{_libdir}/ocaml/gettext-camomile/*.a
 %{_libdir}/ocaml/gettext-camomile/*.cmxa
 %{_libdir}/ocaml/gettext-camomile/*.cmx
 %endif
 %{_libdir}/ocaml/gettext-camomile/*.mli
-%endif
-
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.4.2-1
+- Upgrade to latest upstream version
+- Remove RHEL distro check macros
+- Lint spec
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.8-1
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

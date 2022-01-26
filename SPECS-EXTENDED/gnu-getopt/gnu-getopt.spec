@@ -20,9 +20,9 @@ Distribution:   Mariner
 
 Name:           gnu-getopt
 Version:        1.0.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Java getopt Implementation
-License:        LGPL-2.1-or-later
+License:        GPLv2
 Group:          Development/Libraries/Java
 URL:            http://www.urbanophile.com/arenn/hacking/download.html
 Source0:        http://www.urbanophile.com/arenn/hacking/getopt/java-getopt-%{version}.tar.gz
@@ -30,6 +30,7 @@ Patch0:         %{name}-java8compat.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
+BuildRequires:  javapackages-local-bootstrap
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
 
@@ -58,6 +59,7 @@ classes.
 mv gnu/getopt/buildx.xml build.xml
 
 %build
+export JAVA_HOME="%{java_home}"
 ant jar javadoc
 
 %install
@@ -72,7 +74,8 @@ cp -a build/api/* %{buildroot}%{_javadocdir}/%{name}
 
 %files
 %defattr(0644,root,root,0755)
-%doc gnu/getopt/COPYING.LIB gnu/getopt/README
+%license gnu/getopt/COPYING.LIB
+%doc gnu/getopt/README
 %{_javadir}/*
 
 %files javadoc
@@ -80,6 +83,9 @@ cp -a build/api/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.14-3
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.14-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

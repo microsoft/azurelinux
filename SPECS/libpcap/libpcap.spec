@@ -1,12 +1,12 @@
 Summary:        C/C++ library for network traffic capture
 Name:           libpcap
-Version:        1.9.1
-Release:        2%{?dist}
+Version:        1.10.1
+Release:        1%{?dist}
 License:        BSD
-URL:            https://www.tcpdump.org/
-Group:          Networking/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Networking/Libraries
+URL:            https://www.tcpdump.org/
 #Source0:       https://github.com/the-tcpdump-group/%{name}/archive/%{name}-%{version}.tar.gz
 Source0:        %{name}-%{name}-%{version}.tar.gz
 
@@ -68,6 +68,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man7/*
 
 %changelog
+* Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.10.1-1
+- Upgrade to version 1.10.1
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.9.1-2
 - Added %%license line automatically
 
@@ -81,20 +84,28 @@ make DESTDIR=%{buildroot} install
 -   Fixed "Source0" and "URL" tags.
 -   License verified.
 -   Removing tabs and aligning changelog.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.9.0-3
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Nov 26 2018 Ashwin H <ashwinh@vmware.com> 1.9.0-2
 -   Fix %check
+
 *   Sun Sep 30 2018 Bo Gan <ganb@vmware.com> 1.9.0-1
 -   Update to 1.9.0
 -   Split devel package
+
 *   Tue Apr 11 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.1-1
 -   Updated to version 1.8.1
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.7.4-2
 -   GA - Bump release of all rpms
+
 *   Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 1.7.4-1
 -   Updated to version 1.7.4
+
 *   Mon Apr 6 2015 Mahmoud Bassiouny <mbassiouny@vmware.com> 1.7.2-1
 -   Version upgrade to 1.7.2
+
 *   Wed Jan 21 2015 Divya Thaluru <dthaluru@vmware.com> 1.6.2-1
 -   Initial build. First version

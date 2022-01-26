@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary:	Create bubble-babble fingerprints
 Name:		perl-Digest-BubbleBabble
 Version:	0.02
-Release:	28%{?dist}
+Release:	29%{?dist}
 License:	GPL+ or Artistic
 URL:		https://metacpan.org/release/Digest-BubbleBabble
 Source0:	https://cpan.metacpan.org/modules/by-module/Digest/Digest-BubbleBabble-%{version}.tar.gz#/perl-Digest-BubbleBabble-%{version}.tar.gz
@@ -14,7 +14,9 @@ BuildRequires:	findutils
 BuildRequires:	make
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
+BuildRequires:	perl(FindBin)
 BuildRequires:	perl(inc::Module::Install)
+BuildRequires:	perl(Module::CoreList)
 BuildRequires:	perl(Module::Install::AuthorTests)
 BuildRequires:	perl(Module::Install::Include)
 BuildRequires:	perl(Module::Install::Metadata)
@@ -71,11 +73,15 @@ make test
 make test TEST_FILES="xt/*.t"
 
 %files
+%license README
 %doc Changes README
 %{perl_vendorlib}/Digest/
 %{_mandir}/man3/Digest::BubbleBabble.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-29
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-28
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

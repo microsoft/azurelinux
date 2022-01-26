@@ -1,6 +1,6 @@
 Name:		perl-Unicode-EastAsianWidth
 Version:	12.0
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	East Asian Width properties
 License:	CC0
 Vendor:         Microsoft Corporation
@@ -13,10 +13,12 @@ BuildRequires:	perl-generators
 BuildRequires:	perl(base)
 BuildRequires:	perl(Exporter)
 BuildRequires:	perl(ExtUtils::MakeMaker)
-BuildRequires:	perl(Test)
+BuildRequires:	perl(FindBin)
+BuildRequires:	perl(Module::CoreList)
 BuildRequires:	perl(Module::Package)
-BuildRequires:	perl(Pod::Markdown)
 BuildRequires:	perl(Module::Package::Au)
+BuildRequires:	perl(Pod::Markdown)
+BuildRequires:	perl(Test)
 Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 # Don't "provide" private Perl libs
@@ -46,11 +48,15 @@ find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 make test
 
 %files
+%license README
 %doc Changes README
 %{perl_vendorlib}/Unicode/
 %{_mandir}/man3/Unicode::EastAsianWidth.3pm*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0-4
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

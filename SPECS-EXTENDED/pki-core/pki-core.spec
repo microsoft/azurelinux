@@ -13,13 +13,13 @@ Name:             pki-core
 
 Summary:          %{brand} PKI Core Package
 URL:              https://www.dogtagpki.org
-# The entire source code is GPLv2 except for 'pki-tps' which is LGPLv2
-License:          GPLv2 and LGPLv2
+# The entire source code is GPLv2 except for 'pki-tps' which is LGPLv2+, "base/common" which is LGPLv3, and "base/tps-client/apache" which is ASL 2.0.
+License:          ASL 2.0 and GPLv2 and LGPLv2+ and LGPLv3
 
 # For development (i.e. unsupported) releases, use x.y.z-0.n.<phase>.
 # For official (i.e. supported) releases, use x.y.z-r where r >=1.
 Version:          10.10.3
-Release:          9%{?dist}
+Release:          10%{?dist}
 #global           _phase -beta1
 
 # To create a tarball from a version tag:
@@ -838,7 +838,7 @@ This package contains PKI test suite.
 %build
 ################################################################################
 
-export JAVA_HOME=$(find %{_libdir}/jvm -name "OpenJDK*")
+export JAVA_HOME="%{java_home}"
 
 # get Java <major>.<minor> version number
 java_version=`${JAVA_HOME}/bin/java -XshowSettings:properties -version 2>&1 | sed -n 's/ *java.version *= *\([0-9]\+\.[0-9]\+\).*/\1/p'`
@@ -1390,6 +1390,9 @@ fi
 
 ################################################################################
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.10.3-10
+- License verified.
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 10.10.3-9
 - Drop epoch from tomcat
 

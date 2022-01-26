@@ -377,13 +377,11 @@
                 "httpcomponents-project",
                 "hunspell",
                 "hunspell-af",
-                "hunspell-am",
                 "hunspell-ar",
                 "hunspell-as",
                 "hunspell-ast",
                 "hunspell-az",
                 "hunspell-be",
-                "hunspell-ber",
                 "hunspell-bg",
                 "hunspell-bn",
                 "hunspell-br",
@@ -475,7 +473,6 @@
                 "hunspell-te",
                 "hunspell-tet",
                 "hunspell-th",
-                "hunspell-ti",
                 "hunspell-tk",
                 "hunspell-tl",
                 "hunspell-tn",
@@ -778,7 +775,6 @@
                 "liblqr-1",
                 "libmad",
                 "libmediaart",
-                "libmemcached",
                 "libmetalink",
                 "libmicrohttpd",
                 "libmikmod",
@@ -824,11 +820,9 @@
                 "libpwquality",
                 "libqb",
                 "libqxp",
-                "librabbitmq",
                 "libraqm",
                 "LibRaw",
                 "libraw1394",
-                "librdkafka",
                 "libreport",
                 "librevenge",
                 "librsvg2",
@@ -944,6 +938,7 @@
                 "lua-lpeg",
                 "lua-lunit",
                 "lua-posix",
+                "lua-rpm-macros",
                 "lua-term",
                 "luksmeta",
                 "lutok",
@@ -1189,7 +1184,6 @@
                 "patchelf",
                 "patchutils",
                 "pbzip2",
-                "pciutils",
                 "pcp",
                 "pcsc-lite",
                 "pcsc-lite-ccid",
@@ -1236,6 +1230,7 @@
                 "perl-Class-XSAccessor",
                 "perl-Clone",
                 "perl-Compress-Bzip2",
+                "perl-Compress-Raw-Lzma",
                 "perl-Config-AutoConf",
                 "perl-Config-INI",
                 "perl-Config-INI-Reader-Multiline",
@@ -1302,6 +1297,7 @@
                 "perl-Email-Date-Format",
                 "perl-Encode-Detect",
                 "perl-Encode-EUCJPASCII",
+                "perl-Encode-IMAPUTF7",
                 "perl-Encode-Locale",
                 "perl-Env-ShellWords",
                 "perl-Error",
@@ -1368,6 +1364,7 @@
                 "perl-Inline-Files",
                 "perl-IO-All",
                 "perl-IO-CaptureOutput",
+                "perl-IO-Compress-Lzma",
                 "perl-IO-HTML",
                 "perl-IO-Multiplex",
                 "perl-IO-SessionData",
@@ -1379,8 +1376,8 @@
                 "perl-IPC-Run3",
                 "perl-IPC-System-Simple",
                 "perl-JSON",
+                "perl-JSON-Color",
                 "perl-LDAP",
-                "perl-libnet",
                 "perl-libwww-perl",
                 "perl-libxml-perl",
                 "perl-Lingua-EN-Inflect",
@@ -1574,7 +1571,6 @@
                 "perl-Test-Requires",
                 "perl-Test-RequiresInternet",
                 "perl-Test-Script",
-                "perl-Test-Simple",
                 "perl-Test-SubCalls",
                 "perl-Test-Synopsis",
                 "perl-Test-Taint",
@@ -1633,7 +1629,9 @@
                 "perl-XML-XPath",
                 "perl-XML-XPathEngine",
                 "perl-XString",
+                "perl-XXX",
                 "perl-YAML-LibYAML",
+                "perl-YAML-PP",
                 "perl-YAML-Syck",
                 "perltidy",
                 "pesign",
@@ -2279,6 +2277,13 @@
                 "zziplib"
             ]
         },
+        "Fedora (Copyright Remi Collet)": {
+            "license": "[CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/legalcode)",
+            "specs": [
+                "libmemcached-awesome",
+                "librabbitmq"
+            ]
+        },
         "Magnus Edenhill Open Source": {
             "license": "[Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING)",
             "specs": [
@@ -2404,6 +2409,12 @@
                 "verity-read-only-root",
                 "vnstat",
                 "zstd"
+            ]
+        },
+        "Netplan source": {
+            "license": "[GPLv3](https://github.com/canonical/netplan/blob/main/COPYING)",
+            "specs": [
+                "netplan"
             ]
         },
         "NVIDIA": {

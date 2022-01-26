@@ -1,14 +1,16 @@
+%define debug_package %{nil}
+
 Summary:        Dynamic Kernel Module Support
 Name:           dkms
-Version:        2.8.1
-Release:        5%{?dist}
+Version:        3.0.3
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://github.com/dell/dkms
-#Source0:      https://github.com/dell/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/dell/dkms/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  make
 BuildRequires:  systemd
 Requires:       systemd
 BuildArch:      noarch
@@ -22,7 +24,8 @@ Dynamic Kernel Module Support (DKMS) is a program/framework that enables generat
 %build
 
 %install
-make install-redhat-systemd DESTDIR=%{buildroot} \
+make install-redhat \
+    DESTDIR=%{buildroot} \
     SBIN=%{buildroot}%{_sbindir} \
     VAR=%{buildroot}%{_localstatedir}/lib/%{name} \
     MAN=%{buildroot}%{_mandir}/man8 \
@@ -46,20 +49,16 @@ echo "disable dkms.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-dk
 %files
 %defattr(-,root,root)
 %license COPYING
-%{_sysconfdir}/bash_completion.d/dkms
-%{_sysconfdir}/%{name}/framework.conf
-%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
-%{_sysconfdir}/%{name}/template-dkms-redhat-kmod.spec
-%{_sysconfdir}/kernel/postinst.d/dkms
-%{_sysconfdir}/kernel/prerm.d/dkms
-%{_unitdir}/dkms.service
-%{_libdir}/systemd/system-preset/50-dkms.preset
-%{_libdir}/%{name}/*
-%{_sbindir}/dkms
-%{_mandir}/man8/dkms.8.gz
-%{_localstatedir}/lib/dkms/dkms_dbversion
+%{_sysconfdir}/*
+%{_unitdir}/*
+%{_libdir}/*
+%{_sbindir}/*
+%{_mandir}/*
 
 %changelog
+* Thu Jan 20 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.0.3-1
+- Upgrade to 3.0.3
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.8.1-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

@@ -52,11 +52,11 @@ Distribution:   Mariner
 
 Name:           jetty
 Version:        9.4.31
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Java Webserver and Servlet Container
 
 # Jetty is dual licensed under both ASL 2.0 and EPL 1.0, see NOTICE.txt
-License:        ASL 2.0 or EPL-1.0
+License:        (ASL 2.0 or EPL-1.0) and BSD and CDDL and GPLv2 and MIT
 URL:            http://www.eclipse.org/jetty/
 Source0:        https://github.com/eclipse/%{name}.project/archive/%{name}-%{version}%{addver}.tar.gz
 Source1:        jetty.sh
@@ -67,6 +67,7 @@ Source6:        LICENSE-MIT
 
 Patch1:         0001-Distro-jetty.home.patch
 
+BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  maven-local
 BuildRequires:  mvn(javax.servlet:javax.servlet-api)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
@@ -833,7 +834,7 @@ ln -sf %{_javadir}/ecj.jar $ecj
 # ln -sf %{_jnidir}/jetty-setuid/libsetuid-linux.so %{buildroot}%{homedir}/lib/setuid/
 
 ( cat << EO_RC
-JAVA_HOME=/usr/lib/jvm/java
+JAVA_HOME="%{java_home}"
 JAVA_OPTIONS=
 JETTY_HOME=%{homedir}
 JETTY_CONSOLE=%{logdir}/jetty-console.log
@@ -976,6 +977,9 @@ exit 0
 %license LICENSE NOTICE.txt LICENSE-MIT
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.4.31-4
+- License verified.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.4.31-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.

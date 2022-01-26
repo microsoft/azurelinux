@@ -1,8 +1,6 @@
 {
  "Signatures": {
-  "libguestfs.keyring": "de74373a15bd572ad74f276ee063d2cefa915470863829c0dda6af488d6315d8",
-  "supermin-5.2.0.tar.gz": "fac7e128198b9b05afca99041fa9d5256cc80c1e3cd97eb3130a794b185cf107",
-  "supermin-5.2.0.tar.gz.sig": "93b88f63070a759b0304d93ebdc38b00044e3aa47fee281e8f6592f542c11e26",
+  "supermin-5.2.1.tar.gz": "c45d8479b6da8ea55ca2c4b82b2c8bc7c2e6f724cf59c980df1dec93fb578ffb",
   "supermin-find-requires": "2adbf0ddcd86bde7151679abb8876ba769807c2cfc92306cfecab976cdfc4935",
   "supermin.attr": "6046070fd8ddb5452292a9e21fe5c8235ac12f1993f7d64f828c099bf22493c6"
  }

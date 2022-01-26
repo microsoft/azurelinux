@@ -1,18 +1,16 @@
-Summary:    Netfilter conntrack userspace library
-Name:       libnetfilter_conntrack
-Version:    1.0.7
-Release:        5%{?dist}
-License:    GPLv2+
-URL:        http://www.netfilter.org/projects/libnetfilter_conntrack/index.html
-Group:      System Environment/Libraries
+Summary:        Netfilter conntrack userspace library
+Name:           libnetfilter_conntrack
+Version:        1.0.8
+Release:        1%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:    http://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
-%define sha1 libnetfilter_conntrack=5ea797b62b5add69ad2c769734f7a6f597c71ebd
-
+Group:          System Environment/Libraries
+URL:            https://www.netfilter.org/projects/libnetfilter_conntrack/index.html
+Source0:        http://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
+BuildRequires:  kernel-headers
 BuildRequires:  libmnl-devel
 BuildRequires:  libnfnetlink-devel
-BuildRequires:  kernel-headers
 
 %description
 libnetfilter_conntrack is a userspace library providing a programming interface (API) to the in-kernel connection tracking state table. The library libnetfilter_conntrack has been previously known as libnfnetlink_conntrack and libctnetlink.
@@ -21,8 +19,8 @@ libnetfilter_conntrack is a userspace library providing a programming interface 
 Summary:        Development files for %{name}
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       libnfnetlink-devel
 Requires:       kernel-headers
+Requires:       libnfnetlink-devel
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
@@ -53,6 +51,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so
 
 %changelog
+* Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 1.0.8-1
+- Upgrade to version 1.0.8
+- Verified License
+- Remove sha1 macro
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.7-5
 - Remove libtool archive files from final packaging
 
@@ -61,9 +64,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.7-3
 -   Renaming linux-api-headers to kernel-headers
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0.7-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Sep 17 2018 Bo Gan <ganb@vmware.com> 1.0.7-1
 -   Update to 1.0.7
+
 *   Wed Apr 05 2017 Anish Swaminathan <anishs@vmware.com> 1.0.6-1
 -   Initial packaging

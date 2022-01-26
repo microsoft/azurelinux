@@ -1,0 +1,7 @@
+License information taken from META.yml:
+
+(...)
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+...

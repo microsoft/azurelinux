@@ -1,12 +1,13 @@
 Name:           perl-Test-utf8
 Version:        1.02
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Handy utf8 tests
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-utf8
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-utf8-%{version}.tar.gz#/perl-Test-utf8-%{version}.tar.gz
+Source1:        LICENSE.PTR
 # Do not require author's dependencies
 Patch0:         Test-utf8-1.02-Drop-useless-build-time-dependencies.patch
 # Until the POD has changed, there is no point in regenerating README. This
@@ -19,6 +20,7 @@ BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(inc::Module::Install)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)
 BuildRequires:  sed
@@ -27,6 +29,7 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(charnames)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(Test::Builder)
 BuildRequires:  perl(warnings)
@@ -56,15 +59,21 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{make_install}
 %{_fixperms} -c %{buildroot}
 
+cp %{SOURCE1} .
+
 %check
 make test
 
 %files
+%license LICENSE.PTR
 %doc CHANGES README
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::utf8.3*
 
 %changelog
+* Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.02-3
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.02-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

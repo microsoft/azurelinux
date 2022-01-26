@@ -7,7 +7,7 @@
 Summary:        Perl extension interface for libcurl
 Name:           perl-WWW-Curl
 Version:        4.17
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Patch1:         WWW-Curl-4.17-Adapt-to-changes-in-cURL-7.69.0.patch
 
 BuildRequires:  curl-devel
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 BuildRequires:  perl-Module-Install
 BuildRequires:  perl-YAML-Tiny
 BuildRequires:  curl-devel
@@ -75,6 +76,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.17-12
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 4.17-11
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 4.17-10: Adapting Fedora 32 patch (license: MIT) for "curl" versions >= 7.69.0.

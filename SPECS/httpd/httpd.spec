@@ -2,8 +2,8 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.46
-Release:        10%{?dist}
+Version:        2.4.52
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,13 +21,10 @@ Source8:        10-listen443.conf
 Source9:        httpd-init.service
 Source10:       httpd-ssl-gencerts
 
-Patch0:         httpd-blfs_layout-1.patch
+# https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.52-blfs_layout-1.patch
+Patch0:         httpd-2.4.52-blfs_layout-1.patch
 Patch1:         httpd-uncomment-ServerName.patch
-Patch2:         CVE-2020-13950.patch
-Patch3:         CVE-2020-35452.patch
-Patch4:         CVE-2021-26690.patch
-Patch5:         CVE-2021-30641.patch
-Patch6:         CVE-2021-26691.patch
+
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
 Patch100:       CVE-1999-0236.nopatch
 # CVE-1999-1412 applies only to MacOS X
@@ -145,11 +142,6 @@ Security (TLS) protocols.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
 
 %build
 %configure \
@@ -350,6 +342,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.4.52-1
+- Update httpd version to 2.4.52.
+
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.4.46-10
 - Add explicit requires for libdb.
 

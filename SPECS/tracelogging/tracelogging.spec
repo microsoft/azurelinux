@@ -1,23 +1,18 @@
 Summary:        tracelogging one-line structure logging API on top of LTTNG
 Name:           tracelogging
-Version:        0.2
-Release:        3%{?dist}
+Version:        0.3
+Release:        1%{?dist}
 License:        MIT
-URL:            https://github.com/microsoft/tracelogging
-Group:          System Environment
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-#Source0:       https://github.com/microsoft/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-
-BuildRequires:  catch-devel
-BuildRequires:  cmake
+Group:          System Environment
+URL:            https://github.com/microsoft/tracelogging
+Source0:        https://github.com/microsoft/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  cmake >= 3.6
 BuildRequires:  gcc
-BuildRequires:  lttng-ust-devel
-
+BuildRequires:  lttng-ust-devel >= 2.13
 %if %{with_check}
-BuildRequires:  catch-devel
+BuildRequires:  catch-devel > 2.0
 %endif
 
 %description
@@ -27,30 +22,34 @@ available tracelogging for ETW project in the Windows SDK.
 
 %package        devel
 Summary:        Development files for tracelogging
-License:        MIT
 Group:          System Environment/Libraries
-Requires:       tracelogging = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 This package contains the headers and symlinks for instrumenting
 applications and libraries with tracelogging.
 
 %prep
-%setup
+%autosetup
 
 %build
 mkdir build && cd build
-%cmake ..
+%cmake \
+%if %{with_check}
+    -DTRACELOGGING_BUILD_TESTS=ON \
+%else
+    -DTRACELOGGING_BUILD_TESTS=OFF \
+%endif
+    ..
 %make_build
 
 %check
-make test -C build
+%make_build test -C build
 
 %install
 %make_install -C build
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
@@ -66,11 +65,18 @@ make test -C build
 %{_libdir}/cmake/tracelogging
 
 %changelog
-*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2-3
--   Removing the explicit %%clean stage.
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.3-1
+- Upgrade to latest upstream version for lttng-ust 2.13 compatibility
+- Use CMake options to avoid pulling in catch-devel in non-test builds
+- Add version constraints to requirements
+- Lint spec
 
-*   Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.2-2
--   Added source URL.
--   License verified.
-*   Tue Feb 11 2020 Nick Bopp <nichbop@microsoft.com> 0.2-1
--   Original version for CBL-Mariner.
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2-3
+- Removing the explicit %%clean stage.
+
+* Wed Oct 14 2020 Pawel Winogrodzki <pawelwi@microsoft.com> = 0.2-2
+- Added source URL.
+- License verified.
+
+* Tue Feb 11 2020 Nick Bopp <nichbop@microsoft.com> 0.2-1
+- Original version for CBL-Mariner.
