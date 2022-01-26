@@ -233,6 +233,7 @@ Patch1193:      CVE-2021-28715.nopatch
 Patch1194:      CVE-2021-46283.nopatch
 Patch1195:      CVE-2021-45095.nopatch
 Patch1196:      CVE-2022-0185.nopatch
+Patch1197:      CVE-2022-23222.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -587,7 +588,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Mon Jan 24 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-1
 - Update source to 5.10.93.1
-- Address CVE-2021-46283, CVE-2021-45095, CVE-2022-0185
+- Address CVE-2021-46283, CVE-2021-45095, CVE-2022-0185, CVE-2022-23222
 
 * Thu Jan 20 2022 Chris Co <chrco@microsoft.com> - 5.10.89.1-2
 - Rotate Mariner cert 
