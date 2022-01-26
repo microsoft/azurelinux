@@ -1,13 +1,13 @@
 Summary:        Implementation of ASN.1 types and codecs in Python programming language
 Name:           python-pyasn1
-Version:        0.4.4
-Release:        4%{?dist}
+Version:        0.4.8
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-URL:            https://pypi.python.org/pypi/pyasn1
-Source0:        https://files.pythonhosted.org/packages/10/46/059775dc8e50f722d205452bced4b3cc965d27e8c3389156acd3b1123ae3/pyasn1-%{version}.tar.gz
+URL:            https://pypi.org/project/pyasn1
+Source0:        https://files.pythonhosted.org/packages/source/p/pyasn1/pyasn1-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -19,7 +19,9 @@ BuildRequires:  python3-devel
 Requires:       python3
 
 %description -n python3-pyasn1
-This is an implementation of ASN.1 types and codecs in Python programming language. It has been first written to support particular protocol (SNMP) but then generalized to be suitable for a wide range of protocols based on ASN.1 specification.
+This is an implementation of ASN.1 types and codecs in Python programming language.
+It has been first written to support particular protocol (SNMP) but then generalized
+to be suitable for a wide range of protocols based on ASN.1 specification.
 
 %prep
 %autosetup -n pyasn1-%{version}
@@ -31,7 +33,7 @@ This is an implementation of ASN.1 types and codecs in Python programming langua
 %py3_install
 
 %check
-%{python3} setup.py test
+%python3 setup.py test
 
 %files -n python3-pyasn1
 %defattr(-,root,root,-)
@@ -39,6 +41,11 @@ This is an implementation of ASN.1 types and codecs in Python programming langua
 %{python3_sitelib}/*
 
 %changelog
+* Mon Jan 03 2022 Thomas Crain <thcrain@microsoft.com> - 0.4.8-1
+- Upgrade to latest upstream version
+- Use nicer Source0
+- License verified
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.4-4
 - Add license to python3 package
 - Remove python2 package
