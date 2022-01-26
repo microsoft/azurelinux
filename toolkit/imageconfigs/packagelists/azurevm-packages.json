@@ -5,6 +5,7 @@
         "dhcp-client",
         "hyperv-daemons",
         "openssh-server",
+        "python3-distro",
         "WALinuxAgent"
     ]
 }
