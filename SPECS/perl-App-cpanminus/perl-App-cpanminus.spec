@@ -1,6 +1,6 @@
 Name:           perl-App-cpanminus
 Version:        1.7044
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Get, unpack, build and install CPAN modules
 # Other files:  GPL+ OR Artistic
 ## unbundled
@@ -19,6 +19,7 @@ BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl-Pod-Parser
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.30
 BuildRequires:  perl(File::Path)
@@ -145,6 +146,9 @@ make test
 %{_bindir}/cpanm
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7044-10
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.7044-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
-Version:        1.8.4
-Release:        9%{?dist}
+Version:        1.9.3
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,19 +86,6 @@ The %{name}-smis-plugin package contains plug-in for generic SMI-S array
 support.
 
 
-%package        netapp-plugin
-Summary:        Files for NetApp array support for %{name}
-Requires:       python3-%{name} = %{version}
-Requires(post): python3-%{name} = %{version}
-Requires(postun): python3-%{name} = %{version}
-Requires:       python3-%{name} = %{version}-%{release}
-BuildArch:      noarch
-
-%description    netapp-plugin
-The %{name}-netapp-plugin package contains plug-in for NetApp array
-support.
-
-
 %package        targetd-plugin
 Summary:        Files for targetd array support for %{name}
 Requires:       python3-%{name} = %{version}
@@ -110,17 +97,6 @@ BuildArch:      noarch
 The %{name}-targetd-plugin package contains plug-in for targetd array
 support.
 
-
-%package        nstor-plugin
-Summary:        Files for NexentaStor array support for %{name}
-Requires:       python3-%{name} = %{version}
-Requires(post): python3-%{name} = %{version}
-Requires(postun): python3-%{name} = %{version}
-BuildArch:      noarch
-
-%description    nstor-plugin
-The %{name}-nstor-plugin package contains plug-in for NexentaStor array
-support.
 
 %package        udev
 Summary:        Udev files for %{name}
@@ -255,19 +231,6 @@ if [ $1 -eq 0 ]; then
 fi
 
 # Need to restart lsmd if plugin is new installed or removed.
-%post netapp-plugin
-if [ $1 -eq 1 ]; then
-    # New install.
-    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-fi
-
-%postun netapp-plugin
-if [ $1 -eq 0 ]; then
-    # Remove
-    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-fi
-
-# Need to restart lsmd if plugin is new installed or removed.
 %post targetd-plugin
 if [ $1 -eq 1 ]; then
     # New install.
@@ -275,19 +238,6 @@ if [ $1 -eq 1 ]; then
 fi
 
 %postun targetd-plugin
-if [ $1 -eq 0 ]; then
-    # Remove
-    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-fi
-
-# Need to restart lsmd if plugin is new installed or removed.
-%post nstor-plugin
-if [ $1 -eq 1 ]; then
-    # New install.
-    %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
-fi
-
-%postun nstor-plugin
 if [ $1 -eq 0 ]; then
     # Remove
     %{_bindir}/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
@@ -386,8 +336,6 @@ fi
 %files -n python3-%{name}
 %dir %{python3_sitelib}/lsm
 %{python3_sitelib}/lsm/__init__.*
-%dir %{python3_sitelib}/lsm/external
-%{python3_sitelib}/lsm/external/*
 %{python3_sitelib}/lsm/_client.*
 %{python3_sitelib}/lsm/_common.*
 %{python3_sitelib}/lsm/_local_disk.*
@@ -397,23 +345,20 @@ fi
 %{python3_sitelib}/lsm/_transport.*
 %{python3_sitelib}/lsm/__pycache__/
 %{python3_sitelib}/lsm/version.*
-%dir %{python3_sitelib}/lsm/plugin
-%{python3_sitelib}/lsm/plugin/__init__.*
-%{python3_sitelib}/lsm/plugin/__pycache__/
-%dir %{python3_sitelib}/lsm/plugin/sim
-%{python3_sitelib}/lsm/plugin/sim/__pycache__/
-%{python3_sitelib}/lsm/plugin/sim/__init__.*
-%{python3_sitelib}/lsm/plugin/sim/simulator.*
-%{python3_sitelib}/lsm/plugin/sim/simarray.*
 %dir %{python3_sitelib}/lsm/lsmcli
 %{python3_sitelib}/lsm/lsmcli/__init__.*
 %{python3_sitelib}/lsm/lsmcli/__pycache__/
 %{python3_sitelib}/lsm/lsmcli/data_display.*
 %{python3_sitelib}/lsm/lsmcli/cmdline.*
+%dir %{python3_sitearch}/sim_plugin
+%{python3_sitearch}/sim_plugin/__pycache__/
+%{python3_sitearch}/sim_plugin/__init__.*
+%{python3_sitearch}/sim_plugin/simulator.*
+%{python3_sitearch}/sim_plugin/simarray.*
 %{_bindir}/sim_lsmplugin
 %dir %{_libexecdir}/lsm.d
 %{_libexecdir}/lsm.d/find_unused_lun.py*
-%{_libexecdir}/lsm.d/local_sanity_check.py*
+%{_libexecdir}/lsm.d/local_check.py*
 %config(noreplace) %{_sysconfdir}/lsm/pluginconf.d/sim.conf
 %{_mandir}/man1/sim_lsmplugin.1*
 
@@ -421,112 +366,98 @@ fi
 %{python3_sitelib}/lsm/_clib.*
 
 %files smis-plugin
-%dir %{python3_sitelib}/lsm/plugin/smispy
-%dir %{python3_sitelib}/lsm/plugin/smispy/__pycache__
-%{python3_sitelib}/lsm/plugin/smispy/__pycache__/*
-%{python3_sitelib}/lsm/plugin/smispy/__init__.*
-%{python3_sitelib}/lsm/plugin/smispy/smis.*
-%{python3_sitelib}/lsm/plugin/smispy/dmtf.*
-%{python3_sitelib}/lsm/plugin/smispy/utils.*
-%{python3_sitelib}/lsm/plugin/smispy/smis_common.*
-%{python3_sitelib}/lsm/plugin/smispy/smis_cap.*
-%{python3_sitelib}/lsm/plugin/smispy/smis_sys.*
-%{python3_sitelib}/lsm/plugin/smispy/smis_pool.*
-%{python3_sitelib}/lsm/plugin/smispy/smis_disk.*
-%{python3_sitelib}/lsm/plugin/smispy/smis_vol.*
-%{python3_sitelib}/lsm/plugin/smispy/smis_ag.*
+%dir %{python3_sitelib}/smispy_plugin
+%dir %{python3_sitelib}/smispy_plugin/__pycache__
+%{python3_sitelib}/smispy_plugin/__pycache__/*
+%{python3_sitelib}/smispy_plugin/__init__.*
+%{python3_sitelib}/smispy_plugin/smis.*
+%{python3_sitelib}/smispy_plugin/dmtf.*
+%{python3_sitelib}/smispy_plugin/utils.*
+%{python3_sitelib}/smispy_plugin/smis_common.*
+%{python3_sitelib}/smispy_plugin/smis_cap.*
+%{python3_sitelib}/smispy_plugin/smis_sys.*
+%{python3_sitelib}/smispy_plugin/smis_pool.*
+%{python3_sitelib}/smispy_plugin/smis_disk.*
+%{python3_sitelib}/smispy_plugin/smis_vol.*
+%{python3_sitelib}/smispy_plugin/smis_ag.*
 %{_bindir}/smispy_lsmplugin
 %{_mandir}/man1/smispy_lsmplugin.1*
 
-%files netapp-plugin
-%dir %{python3_sitelib}/lsm/plugin/ontap
-%dir %{python3_sitelib}/lsm/plugin/ontap/__pycache__
-%{python3_sitelib}/lsm/plugin/ontap/__pycache__/*
-%{python3_sitelib}/lsm/plugin/ontap/__init__.*
-%{python3_sitelib}/lsm/plugin/ontap/na.*
-%{python3_sitelib}/lsm/plugin/ontap/ontap.*
-%{_bindir}/ontap_lsmplugin
-%{_mandir}/man1/ontap_lsmplugin.1*
-
 %files targetd-plugin
-%dir %{python3_sitelib}/lsm/plugin/targetd
-%dir %{python3_sitelib}/lsm/plugin/targetd/__pycache__
-%{python3_sitelib}/lsm/plugin/targetd/__pycache__/*
-%{python3_sitelib}/lsm/plugin/targetd/__init__.*
-%{python3_sitelib}/lsm/plugin/targetd/targetd.*
+%dir %{python3_sitelib}/targetd_plugin
+%dir %{python3_sitelib}/targetd_plugin/__pycache__
+%{python3_sitelib}/targetd_plugin/__pycache__/*
+%{python3_sitelib}/targetd_plugin/__init__.*
+%{python3_sitelib}/targetd_plugin/targetd.*
 %{_bindir}/targetd_lsmplugin
 %{_mandir}/man1/targetd_lsmplugin.1*
-
-%files nstor-plugin
-%dir %{python3_sitelib}/lsm/plugin/nstor
-%dir %{python3_sitelib}/lsm/plugin/nstor/__pycache__
-%{python3_sitelib}/lsm/plugin/nstor/__pycache__/*
-%{python3_sitelib}/lsm/plugin/nstor/__init__.*
-%{python3_sitelib}/lsm/plugin/nstor/nstor.*
-%{_bindir}/nstor_lsmplugin
-%{_mandir}/man1/nstor_lsmplugin.1*
 
 %files udev
 %{_udevrulesdir}/../scan-scsi-target
 %{_udevrulesdir}/90-scsi-ua.rules
 
 %files megaraid-plugin
-%dir %{python3_sitelib}/lsm/plugin/megaraid
-%dir %{python3_sitelib}/lsm/plugin/megaraid/__pycache__
-%{python3_sitelib}/lsm/plugin/megaraid/__pycache__/*
-%{python3_sitelib}/lsm/plugin/megaraid/__init__.*
-%{python3_sitelib}/lsm/plugin/megaraid/megaraid.*
-%{python3_sitelib}/lsm/plugin/megaraid/utils.*
+%dir %{python3_sitelib}/megaraid_plugin
+%dir %{python3_sitelib}/megaraid_plugin/__pycache__
+%{python3_sitelib}/megaraid_plugin/__pycache__/*
+%{python3_sitelib}/megaraid_plugin/__init__.*
+%{python3_sitelib}/megaraid_plugin/megaraid.*
+%{python3_sitelib}/megaraid_plugin/utils.*
 %{_bindir}/megaraid_lsmplugin
 %config(noreplace) %{_sysconfdir}/lsm/pluginconf.d/megaraid.conf
 %{_mandir}/man1/megaraid_lsmplugin.1*
 
 %files hpsa-plugin
-%dir %{python3_sitelib}/lsm/plugin/hpsa
-%dir %{python3_sitelib}/lsm/plugin/hpsa/__pycache__
-%{python3_sitelib}/lsm/plugin/hpsa/__pycache__/*
-%{python3_sitelib}/lsm/plugin/hpsa/__init__.*
-%{python3_sitelib}/lsm/plugin/hpsa/hpsa.*
-%{python3_sitelib}/lsm/plugin/hpsa/utils.*
+%dir %{python3_sitelib}/hpsa_plugin
+%dir %{python3_sitelib}/hpsa_plugin/__pycache__
+%{python3_sitelib}/hpsa_plugin/__pycache__/*
+%{python3_sitelib}/hpsa_plugin/__init__.*
+%{python3_sitelib}/hpsa_plugin/hpsa.*
+%{python3_sitelib}/hpsa_plugin/utils.*
 %{_bindir}/hpsa_lsmplugin
 %config(noreplace) %{_sysconfdir}/lsm/pluginconf.d/hpsa.conf
 %{_mandir}/man1/hpsa_lsmplugin.1*
 
 %files nfs-plugin
-%dir %{python3_sitelib}/lsm/plugin/nfs
-%dir %{python3_sitelib}/lsm/plugin/nfs/__pycache__
-%{python3_sitelib}/lsm/plugin/nfs/__pycache__/*
-%{python3_sitelib}/lsm/plugin/nfs/__init__.*
-%{python3_sitelib}/lsm/plugin/nfs/nfs.*
+%dir %{python3_sitearch}/nfs_plugin
+%dir %{python3_sitearch}/nfs_plugin/__pycache__
+%{python3_sitearch}/nfs_plugin/__pycache__/*
+%{python3_sitearch}/nfs_plugin/__init__.*
+%{python3_sitearch}/nfs_plugin/nfs.*
 %config(noreplace) %{_sysconfdir}/lsm/pluginconf.d/nfs.conf
 %{_bindir}/nfs_lsmplugin
 %{_mandir}/man1/nfs_lsmplugin.1*
 
 %files nfs-plugin-clibs
-%{python3_sitelib}/lsm/plugin/nfs/nfs_clib.*
+%{python3_sitearch}/nfs_plugin/nfs_clib.*
 
 %files arcconf-plugin
-%dir %{python3_sitelib}/lsm/plugin/arcconf
-%dir %{python3_sitelib}/lsm/plugin/arcconf/__pycache__
-%{python3_sitelib}/lsm/plugin/arcconf/__pycache__/*
-%{python3_sitelib}/lsm/plugin/arcconf/__init__.*
-%{python3_sitelib}/lsm/plugin/arcconf/arcconf.*
-%{python3_sitelib}/lsm/plugin/arcconf/utils.*
+%dir %{python3_sitelib}/arcconf_plugin
+%dir %{python3_sitelib}/arcconf_plugin/__pycache__
+%{python3_sitelib}/arcconf_plugin/__pycache__/*
+%{python3_sitelib}/arcconf_plugin/__init__.*
+%{python3_sitelib}/arcconf_plugin/arcconf.*
+%{python3_sitelib}/arcconf_plugin/utils.*
 %{_bindir}/arcconf_lsmplugin
 %config(noreplace) %{_sysconfdir}/lsm/pluginconf.d/arcconf.conf
 %{_mandir}/man1/arcconf_lsmplugin.1*
 
 %files local-plugin
-%dir %{python3_sitelib}/lsm/plugin/local
-%dir %{python3_sitelib}/lsm/plugin/local/__pycache__
-%{python3_sitelib}/lsm/plugin/local/__pycache__/*
-%{python3_sitelib}/lsm/plugin/local/__init__.*
-%{python3_sitelib}/lsm/plugin/local/local.*
+%dir %{python3_sitelib}/local_plugin
+%dir %{python3_sitelib}/local_plugin/__pycache__
+%{python3_sitelib}/local_plugin/__pycache__/*
+%{python3_sitelib}/local_plugin/__init__.*
+%{python3_sitelib}/local_plugin/local.*
 %config(noreplace) %{_sysconfdir}/lsm/pluginconf.d/local.conf
 %{_bindir}/local_lsmplugin
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.9.3-1
+- Upgrade to version 1.9.3
+- Remove subpackage libstoragemgmt-netapp-plugin and libstoragemgmt-nstor-plugin
+- Fix file paths
+
 * Mon Nov 29 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.4-9
 - Fix build issue due to gcc 11.2 and CFLAGS
 

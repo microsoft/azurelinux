@@ -3,10 +3,10 @@ Distribution:   Mariner
 Summary: Czech man pages from the Linux Documentation Project
 Name: man-pages-cs
 Version: 0.18.20090209
-Release: 30%{?dist}
+Release: 31%{?dist}
 # GPLv3 .. coreutils/
-# BSD   .. openssh/
-License: GPLv2 and GPLv3 and BSD
+# BSD and MIT and Public Domain  .. openssh/
+License: BSD and GPLv2 and GPLv3 and MIT and Public Domain
 URL: http://tropikhajma.sweb.cz/man-pages-cs/
 Source: http://tropikhajma.sweb.cz/%{name}/%{name}-%{version}.tar.lzma
 
@@ -74,16 +74,14 @@ mkdir -p $RPM_BUILD_ROOT/%{_mandir}
 make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}/cs
 
 %files
-<<<<<<< HEAD
-||||||| parent of c11a2d90... Save work
-%license at/COPYING binutils/COPYING wget/COPYING grep/COPYING procps/COPYING coreutils/COPYING lynx/COPYING procmain/COPYING cdp/COPYING gnu-ghostscript/COPYING
-=======
-%license at/COPYING binutils/COPYING wget/COPYING grep/COPYING procps/COPYING coreutils/COPYING lynx/COPYING procmain/COPYING cdp/COPYING gnu-ghostscript/COPYING bzip2/LICENSE gnu-ghostscript/LICENSE
->>>>>>> c11a2d90... Save work
+%license at/COPYING binutils/COPYING wget/COPYING grep/COPYING procps/COPYING coreutils/COPYING lynx/COPYING openssh/LICENCE procmain/COPYING cdp/COPYING gnu-ghostscript/COPYING bzip2/LICENSE gnu-ghostscript/LICENSE
 %doc CONTRIB README README.Czech Changelog
 %{_mandir}/cs/man*/*
 
 %changelog
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.20090209-31
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.20090209-30
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

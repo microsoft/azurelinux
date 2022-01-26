@@ -7,8 +7,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.9.9
-Release:        2%{?dist}
+Version:        3.9.10
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,7 +56,8 @@ Requires:       expat >= 2.1.0
 Requires:       libffi >= 3.0.13
 Requires:       ncurses
 Requires:       sqlite-libs
-# python3-xml is provided for Mariner 1.0 compatibility
+# python3-xml was provided as a separate package in Mariner 1.0
+# We fold this into the libs subpackage in Mariner 2.0
 Provides:       %{name}-xml = %{version}-%{release}
 
 %description    libs
@@ -157,6 +158,17 @@ export OPT="%{extension_cflags} %{openssl_flags}"
 %install
 %make_install
 %{_fixperms} %{buildroot}/*
+
+# Bootstrap `pip3` which casues ptest build failure.
+# The manual installation of pip in the RPM buildroot requires pip
+# to be already present in the chroot.
+# For toolchain builds, `pip3` requirement is staisfied by raw-toolchain's
+# version of python, so it does not do anything.
+# For builds other than toolchain, we would require pip to be present.
+# The line below install pip in the build chroot using the recently
+# compiled python3.
+# NOTE: This is a NO-OP for the toolchain build.
+python3 Lib/ensurepip
 
 # Installing pip/setuptools via ensurepip fails in our toolchain.
 # The versions of these tools from the raw toolchain are detected,
@@ -267,6 +279,12 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 3.9.10-1
+- Upgrade to latest bugfix release for the 3.9 series
+
+* Mon Jan 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.9-3
+- Fix pip3 bootstrap which causes a build break in ptest
+
 * Wed Dec 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-2
 - Use filtered flags when compiling extensions
 

@@ -1,6 +1,6 @@
 Name:           perl-Module-Package
 Version:        0.30
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Postmodern Perl Module Packaging
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -16,6 +16,7 @@ BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(File::Path)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::All) >= 0.41
 BuildRequires:  perl(Module::Install) >= 1.01
 BuildRequires:  perl(Module::Install::AuthorRequires) >= 0.02
@@ -51,11 +52,15 @@ find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
 make test
 
 %files
-%doc Changes LICENSE README
+%license LICENSE
+%doc Changes README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.30-24
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.30-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

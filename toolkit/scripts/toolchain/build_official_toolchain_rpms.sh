@@ -505,9 +505,6 @@ build_rpm_in_chroot_no_install systemd-bootstrap
 # Removed 'lvm2', might not need: ncurses
 chroot_and_install_rpms ncurses
 
-# Removed 'cryptsetup', might not need: popt
-chroot_and_install_rpms popt
-
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
 chroot_and_install_rpms systemd-bootstrap
@@ -520,6 +517,18 @@ build_rpm_in_chroot_no_install asciidoc
 chroot_and_install_rpms p11-kit
 chroot_and_install_rpms asciidoc
 build_rpm_in_chroot_no_install ca-certificates
+
+# slang needs readline
+build_rpm_in_chroot_no_install slang
+
+# newt needs popt and slang
+chroot_and_install_rpms popt
+chroot_and_install_rpms slang
+build_rpm_in_chroot_no_install newt
+
+# chkconfig needs newt, popt and slang
+chroot_and_install_rpms newt
+build_rpm_in_chroot_no_install chkconfig
 
 build_rpm_in_chroot_no_install mariner-repos
 

@@ -13,7 +13,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        2.2.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Unit test framework for OCaml
 
 License:        MIT
@@ -23,6 +23,9 @@ Source0:        %{url}/releases/download/v%{version}/%{srcname}-v%{version}.tbz
 # compatibility package for older OCaml installations.  Patch it out instead.
 # Upstream does not want this patch until stdlib-shims is obsolete.
 Patch0:         %{name}-stdlib-shims.patch
+# Enable ocaml 4.13 compatibility. Source: Fedora 35
+# https://src.fedoraproject.org/rpms/ocaml-ounit/blob/f35/f/ounit-v2.2.4-remove-Thread-kill.patch
+Patch1:         remove-thread-kill.patch
 
 BuildRequires:  ocaml >= 4.02.3
 BuildRequires:  ocaml-dune >= 1.11.0
@@ -50,28 +53,23 @@ unit-tests for OCaml code.  It is loosely based on HUnit, a unit testing
 framework for Haskell.  It is similar to JUnit, and other xUnit testing
 frameworks.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}2-devel = %{version}-%{release}
 
-
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
-
 
 %package        lwt
 Summary:        Helper functions for building Lwt tests using OUnit
 Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}2-lwt = %{version}-%{release}
 
-
 %description    lwt
 This package contains helper functions for building Lwt tests using
 OUnit.
-
 
 %package        lwt-devel
 Summary:        Development files for %{name}-lwt
@@ -80,24 +78,19 @@ Requires:       %{name}-lwt = %{version}-%{release}
 Requires:       ocaml-lwt-devel%{?_isa}
 Provides:       %{name}2-lwt-devel = %{version}-%{release}
 
-
 %description    lwt-devel
 The %{name}-lwt-devel package contains libraries and signature
 files for developing applications that use %{name}-lwt.
-
 
 %package        doc
 Summary:        Documentation for %{name}
 BuildArch:      noarch
 
-
 %description    doc
 Documentation for %{name}.
 
-
 %prep
 %autosetup -n %{srcname}-v%{version} -p1
-
 
 %build
 dune build %{?_smp_mflags}
@@ -105,10 +98,8 @@ dune build %{?_smp_mflags}
 dune build %{?_smp_mflags} @doc
 %endif
 
-
 %check
 dune runtest
-
 
 %install
 dune install --destdir=%{buildroot}
@@ -125,7 +116,6 @@ rm -fr %{buildroot}%{_prefix}/doc
 # Add missing executable bits
 find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %endif
-
 
 %files
 %doc CHANGES.md README.md
@@ -145,7 +135,6 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %{_libdir}/ocaml/%{srcname}2/*.cmxs
 %{_libdir}/ocaml/%{srcname}2/*/*.cmxs
 %endif
-
 
 %files devel
 %{_libdir}/ocaml/%{srcname}/dune-package
@@ -169,7 +158,6 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %{_libdir}/ocaml/%{srcname}2/*/*.ml
 %{_libdir}/ocaml/%{srcname}2/*/*.mli
 
-
 %files lwt
 %dir %{_libdir}/ocaml/%{srcname}-lwt/
 %dir %{_libdir}/ocaml/%{srcname}2-lwt/
@@ -180,7 +168,6 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %ifarch %{ocaml_native_compiler}
 %{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.cmxs
 %endif
-
 
 %files lwt-devel
 %{_libdir}/ocaml/%{srcname}-lwt/dune-package
@@ -195,7 +182,6 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.cmt
 %{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.ml
 
-
 %if %{with doc}
 %files doc
 %doc _build/default/_doc/_html/
@@ -204,8 +190,11 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %license LICENSE.txt
 %endif
 
-
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 2.2.2-5
+- Take Fedora patch (license: MIT) to fix building with OCaml 4.13.0
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.2-4
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

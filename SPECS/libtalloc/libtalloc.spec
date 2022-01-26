@@ -58,7 +58,7 @@ make %{?_smp_mflags} V=1
 
 %install
 %make_install
-rm -f %{buildroot}/usr/share/swig/*/talloc.i
+rm -f %{buildroot}%{_datadir}/swig/*/talloc.i
 
 %check
 make check

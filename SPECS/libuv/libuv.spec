@@ -2,18 +2,17 @@ Summary:        Cross-platform asynchronous I/O
 Name:           libuv
 Version:        1.43.0
 Release:        1%{?dist}
-License:        MIT and CC-BY
-URL:            https://libuv.org/
-Source0:        https://dist.libuv.org/dist/v%{version}/%{name}-v%{version}.tar.gz
-Group:          Applications/System
+License:        MIT AND CC-BY
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  coreutils
+Group:          Applications/System
+URL:            https://libuv.org/
+Source0:        https://dist.libuv.org/dist/v%{version}/%{name}-v%{version}.tar.gz
 BuildRequires:  build-essential
-
+BuildRequires:  coreutils
 %if %{with_check}
-BuildRequires:  sudo
 BuildRequires:  shadow-utils
+BuildRequires:  sudo
 %endif
 
 %description
@@ -21,20 +20,22 @@ libuv is a multi-platform support library with a focus on asynchronous I/O.
 It was primarily developed for use by Node.js, but it's also used by Luvit, Julia, pyuv, and others.
 
 %package devel
-Summary:    %{name} development libraries
-Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Summary:        %{name} development libraries
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+
 %description devel
 %{summary}.
 
 %package static
-Summary:    %{name} static files
-Group:      Development/Libraries
+Summary:        %{name} static files
+Group:          Development/Libraries
+
 %description static
 %{summary}.
 
 %prep
-%setup -qn %{name}-v%{version}
+%setup -q -n %{name}-v%{version}
 
 %build
 ./autogen.sh
@@ -43,7 +44,7 @@ Group:      Development/Libraries
 
 %install
 %make_install
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 # The libuv test suite cannot be run as root

@@ -2,28 +2,26 @@ Summary:        ASN.1 library
 Name:           libtasn1
 Version:        4.18.0
 Release:        1%{?dist}
-License:        GPLv3+ and LGPLv2+
-URL:            https://www.gnu.org/software/libtasn1/
-Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
-Group:          System Environment/Libraries
+License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-Provides: libtasn1-tools = %{version}-%{release}
+Group:          System Environment/Libraries
+URL:            https://www.gnu.org/software/libtasn1/
+Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
+Provides:       libtasn1-tools = %{version}-%{release}
 
 %description
 Libtasn1 library provides Abstract Syntax Notation One (ASN.1, as specified by the X.680 ITU-T recommendation) parsing and structures management,
 and Distinguished Encoding Rules (DER, as per X.690) encoding and decoding functions.
 
 %package devel
-Summary:    Development libraries and header files for libtasn1
-Requires:   libtasn1
-Provides:   pkgconfig(libtasn1) = %{version}-%{release}
+Summary:        Development libraries and header files for libtasn1
+Requires:       libtasn1
+Provides:       pkgconfig(libtasn1) = %{version}-%{release}
 
 %description devel
 The package contains libraries and header files for
 developing applications that use libtasn1.
-
 
 %prep
 %setup -q
@@ -36,7 +34,7 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 rm %{buildroot}%{_infodir}/*
-find %{buildroot}%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 make %{?_smp_mflags} check

@@ -1,17 +1,15 @@
 Summary:        libpsl - C library to handle the Public Suffix List
 Name:           libpsl
-Version:        0.20.2
-Release:        6%{?dist}
+Version:        0.21.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Development
 URL:            https://github.com/rockdaboot/libpsl
-Source0:        https://github.com/rockdaboot/libpsl/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-
+Source0:        https://github.com/rockdaboot/libpsl/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  icu-devel
-BuildRequires:  python2
-
+BuildRequires:  python3
 Requires:       icu
 
 %description
@@ -94,6 +92,11 @@ make check
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 0.21.1-1
+- Upgrade to version 0.21.1
+- Use python3 as BR instead of python2
+- Modify the Source0 field
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.20.2-6
 - Remove libtool archive files from final packaging
 

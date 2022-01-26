@@ -3,15 +3,13 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
-# Only applies to the Power9 ISA
-Patch1:         CVE-2019-15847.nopatch
 Requires:       gcc-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
@@ -21,6 +19,22 @@ Requires:       libmpc
 Requires:       libstdc++-devel = %{version}-%{release}
 Provides:       cpp = %{version}-%{release}
 Provides:       gcc-plugin-devel = %{version}-%{release}
+Provides:       libasan = %{version}-%{release}
+Provides:       libasan%{?_isa} = %{version}-%{release}
+Provides:       libasan-static = %{version}-%{release}
+Provides:       libasan-static%{?_isa} = %{version}-%{release}
+Provides:       liblsan = %{version}-%{release}
+Provides:       liblsan%{?_isa} = %{version}-%{release}
+Provides:       liblsan-static = %{version}-%{release}
+Provides:       liblsan-static%{?_isa} = %{version}-%{release}
+Provides:       libtsan = %{version}-%{release}
+Provides:       libtsan%{?_isa} = %{version}-%{release}
+Provides:       libtsan-static = %{version}-%{release}
+Provides:       libtsan-static%{?_isa} = %{version}-%{release}
+Provides:       libubsan = %{version}-%{release}
+Provides:       libubsan%{?_isa} = %{version}-%{release}
+Provides:       libubsan-static = %{version}-%{release}
+Provides:       libubsan-static%{?_isa} = %{version}-%{release}
 Provides:       libquadmath = %{version}-%{release}
 Provides:       libquadmath-devel = %{version}-%{release}
 Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
@@ -254,6 +268,10 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 11.2.0-2
+- Add provides for libasan, liblsan, libtsan, and libubsan (and their static counterparts) to the main package
+- Remove CVE-2019-15847 nopatch file (not relevant to our version of GCC)
+
 * Mon Oct 18 2021 Andrew Phelps <anphel@microsoft.com> - 11.2.0-1
 - Update to version 11.2.0
 

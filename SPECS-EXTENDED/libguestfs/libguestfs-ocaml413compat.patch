@@ -1,0 +1,32 @@
+From cc4ecbe236914f9b391ecf3815008547472632f8 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 2 Mar 2021 10:39:15 +0000
+Subject: [PATCH] mlstdutils/std_utils.ml: Fix for OCaml 4.12.
+
+We were using a default function from somewhere called "compare"
+instead of the actual function (Pervasives.compare / Stdlib.compare).
+Since the wrong default function was used it had a different type from
+what we expected:
+
+File "std_utils.ml", line 312, characters 36-37:
+312 |       | (y, y') :: _ when cmp x y = 0 -> y'
+                                          ^
+Error: This expression has type int but an expression was expected of type
+         'weak1 list -> int
+---
+ common/mlstdutils/std_utils.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/mlstdutils/std_utils.ml b/common/mlstdutils/std_utils.ml
+index 4237ea5..8847717 100644
+--- a/common/mlstdutils/std_utils.ml
++++ b/common/mlstdutils/std_utils.ml
+@@ -307,7 +307,7 @@ module List = struct
+       | x::xs, y::ys, z::zs -> (x, y, z) :: combine3 xs ys zs
+       | _ -> invalid_arg "combine3"
+ 
+-    let rec assoc_lbl ?(cmp = compare) ~default x = function
++    let rec assoc_lbl ?(cmp = Pervasives.compare) ~default x = function
+       | [] -> default
+       | (y, y') :: _ when cmp x y = 0 -> y'
+       | _ :: ys -> assoc_lbl ~cmp ~default x ys

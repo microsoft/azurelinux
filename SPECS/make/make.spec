@@ -1,7 +1,7 @@
 Summary:        Program for compiling packages
 Name:           make
 Version:        4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.gnu.org/software/make
 Source0:        https://ftp.gnu.org/gnu/make/%{name}-%{version}.tar.gz
 
 %if %{with_check}
+BuildRequires: perl(lib)
 BuildRequires: perl(FindBin)
 %endif
 
@@ -42,6 +43,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
+* Thu Jan 20 2022 Muhammad Falak <mwani@microsoft.com> - 4.3-2
+- Fix ptest with an explicit BR on `perl(lib)`.
+
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.3-1
 - Updated to version 4.3.
 - Adding a test BR on "perl(FindBin)".

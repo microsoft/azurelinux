@@ -9,7 +9,6 @@ Group:          System Environment/Libraries
 URL:            https://webmproject.org/
 #Source0:       https://github.com/webmproject/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  libpng-devel
 BuildRequires:  libtiff-devel
@@ -23,6 +22,7 @@ The libwebp package contains a library and support programs to encode and decode
 %package        devel
 Summary:        Header and development files
 Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files to create applications
 
@@ -44,7 +44,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-find %{buildroot} -type f -name '*.la' -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig

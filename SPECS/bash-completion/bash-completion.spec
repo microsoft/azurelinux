@@ -1,13 +1,12 @@
 Name:          bash-completion
-Version:       2.7
-Release:       5%{?dist}
+Version:       2.11
+Release:       1%{?dist}
 Summary:       Programmable completion for bash
 Group:         Applications/Shells
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://github.com/scop/bash-completion
-Source0:       https://github.com/scop/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
-Patch0:        bash-completion-2.1-bash-4.3.patch
+Source0:       https://github.com/scop/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 License:       GPLv2+
 
 Requires:      bash
@@ -27,7 +26,6 @@ This package contains files need for development.
 
 %prep
 %setup -q
-%patch0 -p0
 
 %build
 autoreconf -f -i
@@ -71,6 +69,9 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 %{_datadir}/pkgconfig/bash-completion.pc
 
 %changelog
+* Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.11-1
+- Upgrade to 2.11.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-5
 - Removing the explicit %%clean stage.
 

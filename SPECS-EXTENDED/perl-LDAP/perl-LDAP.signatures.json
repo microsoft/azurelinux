@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "LICENSE.PTR": "ed4d07cc72917c7e805e424222a97709ce2ae1d2d182ba0e0438527fed352276",
   "perl-ldap-0.66.tar.gz": "09263ce6166e80c98d689d41d09995b813389fd069b784601f6dc57f8e2b4102"
  }
 }
