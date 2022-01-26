@@ -11361,8 +11361,8 @@
         "type": "other",
         "other": {
           "name": "libtalloc",
-          "version": "2.3.1",
-          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.3.1.tar.gz"
+          "version": "2.3.3",
+          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.3.3.tar.gz"
         }
       }
     },
@@ -11381,8 +11381,8 @@
         "type": "other",
         "other": {
           "name": "libtasn1",
-          "version": "4.14",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.14.tar.gz"
+          "version": "4.18.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.18.0.tar.gz"
         }
       }
     },
@@ -11561,8 +11561,8 @@
         "type": "other",
         "other": {
           "name": "libunwind",
-          "version": "1.2",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/libunwind/libunwind-1.2.tar.gz"
+          "version": "1.6.2",
+          "downloadUrl": "http://download.savannah.gnu.org/releases/libunwind/libunwind-1.6.2.tar.gz"
         }
       }
     },
@@ -11621,8 +11621,8 @@
         "type": "other",
         "other": {
           "name": "libuv",
-          "version": "1.38.0",
-          "downloadUrl": "https://dist.libuv.org/dist/v1.38.0/libuv-v1.38.0.tar.gz"
+          "version": "1.43.0",
+          "downloadUrl": "https://dist.libuv.org/dist/v1.43.0/libuv-v1.43.0.tar.gz"
         }
       }
     },
@@ -11791,8 +11791,8 @@
         "type": "other",
         "other": {
           "name": "libwebp",
-          "version": "1.0.3",
-          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.0.3.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.2.2.tar.gz"
         }
       }
     },
