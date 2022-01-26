@@ -1,13 +1,14 @@
 Summary:       A toolkit for defining and handling authorizations.
 Name:          polkit
 Version:       0.116
-Release:       5%{?dist}
+Release:       6%{?dist}
 Group:         Applications/System
 Vendor:        Microsoft Corporation
 License:       LGPLv2+
 URL:           https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html
 Source0:       https://www.freedesktop.org/software/polkit/releases/%{name}-%{version}.tar.gz
 Patch0:        CVE-2021-3560.patch
+Patch1:        CVE-2021-4034.patch
 Distribution:  Mariner
 BuildRequires: autoconf
 BuildRequires: expat-devel
@@ -115,6 +116,9 @@ fi
 %{_datadir}/gettext/its/polkit.loc
 
 %changelog
+*   Wed Jan 26 2022 Neha Agarwal <nehagarwal@microsoft.com> - 0.116-6
+-   Add patch for CVE-2021-4034.
+
 *   Thu Jun 03 2021 Andrew Phelps <anphel@microsoft.com> - 0.116-5
 -   Enable check tests (with exception of unsupported "polkitbackend" tests)
 
