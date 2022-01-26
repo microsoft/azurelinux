@@ -7,12 +7,12 @@ Distribution:   Mariner
 %global srcname sexplib0
 
 Name:           ocaml-%{srcname}
-Version:        0.14.0
-Release:        8%{?dist}
+Version:        0.15.0
+Release:        1%{?dist}
 Summary:        Definition of S-expressions and some base converters
 
 License:        MIT
-URL:            https://github.com/janestreet/%{srcname}
+URL:            https://github.com/janestreet/sexplib0
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.04.2
@@ -75,6 +75,9 @@ chmod a+x %{buildroot}%{_libdir}/ocaml/%{srcname}/%{srcname}.cmxs
 %{_libdir}/ocaml/%{srcname}/*.mli
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+- Upgrade to latest version
+- License verified
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-8
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

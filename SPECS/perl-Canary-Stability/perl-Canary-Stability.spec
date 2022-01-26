@@ -1,7 +1,7 @@
 Summary:        Canary to check perl compatibility for Schmorp's modules
 Name:           perl-Canary-Stability
 Version:        2012
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Canary-Stability/
@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(Canary::Stability) = %{version}-%{release}
 
@@ -38,6 +39,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2012-7
+- Adding 'BuildRequires: perl-generators'.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2012-6
 - Removing the explicit %%clean stage.
 - License verified.

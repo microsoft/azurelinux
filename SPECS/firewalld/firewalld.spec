@@ -2,7 +2,7 @@
 
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
-Version:        0.9.4
+Version:        1.0.3
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -11,7 +11,7 @@ URL:            https://www.firewalld.org
 Source0:        https://github.com/firewalld/firewalld/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        FedoraServer.xml
 Source2:        FedoraWorkstation.xml
-Patch0:         firewalld-0.2.6-MDNS-default.patch
+Patch0:         firewalld-only-MDNS-default.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -26,6 +26,7 @@ BuildRequires:  intltool
 BuildRequires:  ipset
 BuildRequires:  iptables
 BuildRequires:  libxslt
+BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  systemd-units
 
@@ -79,6 +80,12 @@ Summary:        Firewalld directory layout and rpm macros
 %description -n firewalld-filesystem
 This package provides directories and rpm macros which
 are required by other packages that add firewalld configuration files.
+	
+%package -n firewalld-test
+Summary: Firewalld testsuite
+ 
+%description -n firewalld-test
+This package provides the firewalld testsuite.
 
 %package -n firewall-applet
 Summary:        Firewall panel applet
@@ -120,7 +127,7 @@ firewalld.
 %autosetup -p1
 
 %build
-%configure --enable-sysconfig --enable-rpmmacros PYTHON="python3 %{py3_shbang_opts}"
+%configure --enable-sysconfig --enable-rpmmacros PYTHON="%{__python3} %{py3_shbang_opts}"
 # Enable the make line if there are patches affecting man pages to
 # regenerate them
 %make_build
@@ -275,6 +282,18 @@ fi
 %dir %{_libdir}/firewalld/zones
 %{_rpmconfigdir}/macros.d/macros.firewalld
 
+%files -n firewalld-test
+%dir %{_datadir}/firewalld/testsuite
+%{_datadir}/firewalld/testsuite/README
+%{_datadir}/firewalld/testsuite/testsuite
+%dir %{_datadir}/firewalld/testsuite/integration
+%{_datadir}/firewalld/testsuite/integration/testsuite
+%dir %{_datadir}/firewalld/testsuite/python
+%{_datadir}/firewalld/testsuite/python/firewalld_config.py
+%{_datadir}/firewalld/testsuite/python/firewalld_direct.py
+%{_datadir}/firewalld/testsuite/python/firewalld_rich.py
+%{_datadir}/firewalld/testsuite/python/firewalld_test.py
+
 %files -n firewall-applet
 %{_bindir}/firewall-applet
 %defattr(0644,root,root)
@@ -297,6 +316,11 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
+* Fri Jan 21 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.0.3-1
+- Update to 1.0.3
+- Add firewalld-test subpackage
+- Fix configure command to point to python3
+
 * Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.4-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Updated to version 0.9.4 to drop dependency on 'python3-slip-dbus' and 'python3-decorator'.

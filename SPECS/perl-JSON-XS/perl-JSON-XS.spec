@@ -3,18 +3,18 @@ Summary:        JSON serializing/deserializing, done correctly and fast
 Name:           perl-JSON-XS
 Epoch:          1
 Version:        3.04
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/JSON-XS/
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-%{version}.tar.gz
-%define sha1 JSON-XS=582f874f3c4ad8a0bbf6986f7af2676a92e91b8a
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Canary-Stability
-BuildRequires:  perl-Types-Serialiser
 BuildRequires:  perl-common-sense
+BuildRequires:  perl-generators
+BuildRequires:  perl-Types-Serialiser
 
 Requires:  perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:  perl-Canary-Stability
@@ -55,6 +55,10 @@ make test
 %{_mandir}/man[13]/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:3.04-5
+- Adding 'BuildRequires: perl-generators'.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1:3.04-4
 - Use new perl package names.
 - Provide perl(JSON::XS).

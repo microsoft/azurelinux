@@ -12,6 +12,7 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "Ceph source":                  r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
     "Netplan source":               r'\n-\s+Initial CBL-Mariner import from Netplan source \(license: GPLv3\)(\.|\n|$)',
     "Fedora":                       r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
+    "Fedora (Copyright Remi Collet)": r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: CC-BY-SA\)(\.|\n|$)',
     "Magnus Edenhill Open Source":  r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
     "NVIDIA":                       r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',
     "OpenMamba":                    r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',

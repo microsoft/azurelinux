@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-migrate-parsetree
-Version:        2.1.0
-Release:        2%{?dist}
+Version:        2.3.0
+Release:        1%{?dist}
 Summary:        Convert OCaml parsetrees between different major versions
 
 License:        LGPLv2+ with exceptions
 URL:            https://github.com/ocaml-ppx/ocaml-migrate-parsetree
-Source0:        https://github.com/ocaml-ppx/ocaml-migrate-parsetree/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v%{version}/%{name}-%{version}.tbz
 
 BuildRequires:  ocaml
 BuildRequires:  ocaml-dune
@@ -68,7 +68,6 @@ dune runtest
 
 %files devel
 %doc README.md CHANGES.md
-%license LICENSE.md
 %ifarch %{ocaml_native_compiler}
 %{_libdir}/ocaml/*/{,*/}*.a
 %{_libdir}/ocaml/*/{,*/}*.cmxa
@@ -81,6 +80,10 @@ dune runtest
 
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 2.3.0-1
+- Upgrade to latest upstream version
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 
