@@ -45,6 +45,7 @@ find %{buildroot} -name '*.la' -delete
 %changelog
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.6.2-1
 - Upgrade to version 1.6.2
+- License Verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2-4
 - Added %%license line automatically
