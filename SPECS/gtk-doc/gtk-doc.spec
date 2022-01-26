@@ -15,6 +15,8 @@ Requires:       libxslt
 Requires:       docbook-dtd-xml
 Requires:       docbook-style-xsl
 Requires:       python3
+Requires:       python3-pygments
+Requires:       python3-lxml
 
 BuildRequires:  docbook-dtd-xml >= 4.5
 BuildRequires:  docbook-style-xsl >= 1.78.1
