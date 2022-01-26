@@ -3408,8 +3408,8 @@
         "type": "other",
         "other": {
           "name": "ethtool",
-          "version": "5.0",
-          "downloadUrl": "https://www.kernel.org/pub/software/network/ethtool/ethtool-5.0.tar.xz"
+          "version": "5.16",
+          "downloadUrl": "https://www.kernel.org/pub/software/network/ethtool/ethtool-5.16.tar.xz"
         }
       }
     },
