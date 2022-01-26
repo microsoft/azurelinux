@@ -1,7 +1,7 @@
 Summary:        ASN.1 library
 Name:           libtasn1
-Version:        4.14
-Release:        3%{?dist}
+Version:        4.18.0
+Release:        1%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.gnu.org/software/libtasn1/
 Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
@@ -32,6 +32,7 @@ developing applications that use libtasn1.
 ./configure \
     --prefix=%{_prefix}
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 rm %{buildroot}%{_infodir}/*
@@ -42,9 +43,10 @@ make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
+
 %files
 %defattr(-,root,root)
-%license LICENSE
+%license COPYING doc/COPYING*
 %{_libdir}/*.so.*
 %{_bindir}/*
 %{_mandir}/man1/*
@@ -58,6 +60,10 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 4.18.0-1
+- Upgrade to version 4.18.0
+- Fix license files
+
 * Tue Jul 20 2021 Muhammad Falak Wani <mwani@microsoft.com> - 4.14-3
 - Add an explicit provides for `libtasn1-tools`.
 - Add version-release to pkgconfig(libtans1)

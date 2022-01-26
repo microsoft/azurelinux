@@ -1,7 +1,7 @@
 Summary:        Cross-platform asynchronous I/O
 Name:           libuv
-Version:        1.38.0
-Release:        2%{?dist}
+Version:        1.43.0
+Release:        1%{?dist}
 License:        MIT and CC-BY
 URL:            https://libuv.org/
 Source0:        https://dist.libuv.org/dist/v%{version}/%{name}-v%{version}.tar.gz
@@ -74,7 +74,11 @@ sudo -u test make -k check
 %{_libdir}/%{name}.a
 
 %changelog
+* Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.43.0-1
+- Upgrade to version 1.43.0
+
 *   Fri Dec 04 2020 Andrew Phelps <anphel@microsoft.com> - 1.38.0-2
 -   Fix check tests.
+
 *   Wed May 27 2020 Daniel McIlvaney <damcilva@microsoft.com> - 1.38.0-1
 -   Original version for CBL-Mariner

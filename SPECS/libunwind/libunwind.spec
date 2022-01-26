@@ -1,11 +1,10 @@
 Summary:	Portable and efficient C programming interface (API) to determine the call-chain of a program.
 Name:		libunwind
-Version:	1.2
-Release:        4%{?dist}
+Version:	1.6.2
+Release:    1%{?dist}
 License:	X11
 URL:		http://www.nongnu.org/libunwind/
 Source0:	http://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
-%define sha1 libunwind=a33e52d7ecd18b9375508369b566eeb2cc6eec3b
 Group:		Utilities/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +43,9 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/pkgconfig/libunwind*
 
 %changelog
+* Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.6.2-1
+- Upgrade to version 1.6.2
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2-4
 - Added %%license line automatically
 
