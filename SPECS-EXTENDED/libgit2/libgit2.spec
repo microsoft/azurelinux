@@ -76,8 +76,9 @@ rm -vr deps
 %{_includedir}/git2/
 
 %changelog
-* Tue Jan 25 2022 Kate Goldenring <kagold@microsoft.com> 1.1.0-1
+* Tue Jan 25 2022 Kate Goldenring <kagold@microsoft.com> - 1.1.0-1
 - Update to 1.1.0
+- License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.0.1-4
 - Remove epoch
