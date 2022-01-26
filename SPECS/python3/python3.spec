@@ -7,8 +7,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.9.9
-Release:        3%{?dist}
+Version:        3.9.10
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,7 +56,8 @@ Requires:       expat >= 2.1.0
 Requires:       libffi >= 3.0.13
 Requires:       ncurses
 Requires:       sqlite-libs
-# python3-xml is provided for Mariner 1.0 compatibility
+# python3-xml was provided as a separate package in Mariner 1.0
+# We fold this into the libs subpackage in Mariner 2.0
 Provides:       %{name}-xml = %{version}-%{release}
 
 %description    libs
@@ -278,6 +279,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 3.9.10-1
+- Upgrade to latest bugfix release for the 3.9 series
+
 * Mon Jan 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.9-3
 - Fix pip3 bootstrap which causes a build break in ptest
 
