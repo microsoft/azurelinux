@@ -11351,8 +11351,8 @@
         "type": "other",
         "other": {
           "name": "libstoragemgmt",
-          "version": "1.8.4",
-          "downloadUrl": "https://github.com/libstorage/libstoragemgmt/releases/download/1.8.4/libstoragemgmt-1.8.4.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://github.com/libstorage/libstoragemgmt/releases/download/1.9.3/libstoragemgmt-1.9.3.tar.gz"
         }
       }
     },
