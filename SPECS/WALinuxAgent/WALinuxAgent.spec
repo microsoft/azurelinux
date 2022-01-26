@@ -1,14 +1,13 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.3.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Daemons
 URL:            https://github.com/Azure/WALinuxAgent
-#Source0:       https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -23,6 +22,7 @@ Requires:       openssl
 Requires:       python3-pyasn1
 Requires:       python3-xml
 Requires:       python3
+Requires:       python3-distro
 Requires:       python3-libs
 Requires:       sudo
 Requires:       systemd
@@ -81,6 +81,10 @@ python3 setup.py check && python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 25 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.3.1.1-2
+- Add python3-distro as a Requires
+- Update Source0 to use source tar renaming
+
 * Wed Jan 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.1.1-1
 - Update to version 2.3.1.1.
 
