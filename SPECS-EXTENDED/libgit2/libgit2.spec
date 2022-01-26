@@ -1,19 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
 Version:        1.1.0
 Release:        5%{?dist}
-Summary:        C implementation of the Git core methods as a library with a solid API
 License:        GPLv2 with exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://libgit2.org/
 Source0:        https://github.com/libgit2/libgit2/archive/v%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  gcc
 BuildRequires:  cmake >= 3.5.1
-BuildRequires:  ninja-build
+BuildRequires:  gcc
 BuildRequires:  http-parser-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libssh2-devel
+BuildRequires:  ninja-build
 BuildRequires:  openssl-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  python3
