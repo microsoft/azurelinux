@@ -1,7 +1,7 @@
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -206,6 +206,9 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.2-6
+- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
+
 * Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 6.2-5
 - Add patch for CVE-2021-39537
 - Use HTTPS source instead of FTP

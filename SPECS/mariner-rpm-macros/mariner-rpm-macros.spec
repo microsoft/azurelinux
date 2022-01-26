@@ -1,7 +1,7 @@
 Summary:	Mariner specific rpm macro files
 Name:		mariner-rpm-macros
 Version:	1.0
-Release:	6%{?dist}
+Release:	7%{?dist}
 License:	GPL+
 Group:		Development/System
 Vendor:		Microsoft Corporation
@@ -56,15 +56,23 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.0-7
+- add sed step to os_install_post to remove references to module_info.ld in pkgconfigs
+
 * Tue Nov 02 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-6
 - Generate module_info.ld directory as needed.
+
 * Mon Aug 23 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-5
 - Add gen-ld-script.sh to generate ELF note metadata
+
 * Wed Jun 30 2021 Andrew Phelps <anphel@microsoft.com> - 1.0-4
 - Modify macros to only strip debug symbols when debug_package is enabled
+
 * Tue Jun 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.0-3
 - Add macros.check to support non-fatal check section runs for log collection.
+
 * Mon Jun 08 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.0-2
 - Add vendor folder. Add optflags related macros and rpmrc derived from Fedora 32.
+
 * Fri May 22 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.0-1
 - Original version for CBL-Mariner
