@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.27
-Release:        2%{?dist}
+Version:        8.0.28
+Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -87,8 +87,15 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/*.a
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
+/usr/lib/private/icudt69l/brkitr/*.res
+/usr/lib/private/icudt69l/brkitr/*.brk
+/usr/lib/private/icudt69l/brkitr/*.dict
+/usr/lib/private/icudt69l/unames.icu
 
 %changelog
+* Wed Jan 26 2022 Neha Agarwal <pawelwi@microsoft.com> - 8.0.28-1
+- Upgrade to v8.0.28 to fix 16 CVEs.
+
 * Tue Jan 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.27-2
 - Disabled flaky 'invalid_metadata' test.
 
