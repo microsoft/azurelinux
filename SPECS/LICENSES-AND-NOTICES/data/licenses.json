@@ -1209,6 +1209,7 @@
                 "perl-B-Lint",
                 "perl-bareword-filehandles",
                 "perl-Bit-Vector",
+                "perl-boolean",
                 "perl-Browser-Open",
                 "perl-BSD-Resource",
                 "perl-Business-ISBN",

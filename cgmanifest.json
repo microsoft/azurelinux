@@ -16493,6 +16493,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-boolean",
+          "version": "0.46",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/boolean-0.46.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Browser-Open",
           "version": "0.04",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/C/CF/CFRANKS/Browser-Open-0.04.tar.gz"
