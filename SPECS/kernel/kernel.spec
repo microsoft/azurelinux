@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.93.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -234,6 +234,7 @@ Patch1194:      CVE-2021-46283.nopatch
 Patch1195:      CVE-2021-45095.nopatch
 Patch1196:      CVE-2022-0185.nopatch
 Patch1197:      CVE-2022-23222.nopatch
+Patch1198:      CVE-2021-4083.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -586,6 +587,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 26 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-2
+- Address CVE-2021-4083
+
 * Mon Jan 24 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-1
 - Update source to 5.10.93.1
 - Address CVE-2021-46283, CVE-2021-45095, CVE-2022-0185, CVE-2022-23222
