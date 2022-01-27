@@ -511,6 +511,7 @@ php --no-php-ini \
 %changelog
 * Wed Jan 26 2022 Henry Li <lihl@microsoft.com> - 2.42.4-4
 - Add perl as BR
+- License Verified
 
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.42.4-3
 - Use pkgconfig(cairo) instead of cairo-devel build requirement

@@ -22,7 +22,7 @@ Distribution:   Mariner
 %define lname libgd3
 Name:           gd
 Version:        2.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 License:        MIT
 URL:            https://libgd.github.io/
@@ -153,6 +153,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+* Wed Jan 26 2022 Henry Li <lihl@microsoft.com> - 2.3.0-3
+- License Verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
