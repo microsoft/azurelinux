@@ -1,5 +1,21 @@
-%bcond_with python2
-%bcond_with php
+#
+# spec file for package graphviz
+#
+# Copyright (c) 2022 SUSE LLC
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
+#
+
+
 %global SHARP  0
 %global ARRRR  0
 %global DEVIL  0
@@ -8,88 +24,105 @@
 %global QTAPPS 0
 %global MING   0
 %global OCAML  0
-
-%if %{with php}
-%global PHP 1
-%else
-%global PHP 0
-%endif
-
 # Plugins version
 %global pluginsver 6
-
 %global php_extdir %(php-config --extension-dir 2>/dev/null || echo %{_libdir}/php4)
-
 %if "%{php_version}" < "5.6"
 %global ini_name     %{name}.ini
 %else
 %global ini_name     40-%{name}.ini
 %endif
-
 # Fix for the 387 extended precision (rhbz#772637)
 %ifarch i386 i686
 %global FFSTORE -ffloat-store
 %endif
-
-Name:			graphviz
-Summary:		Graph Visualization Tools
-Version:		2.42.4
-Release:		3%{?dist}
-License:		EPL-1.0
+%bcond_with python2
+%bcond_with php
+%if %{with php}
+%global PHP 1
+%else
+%global PHP 0
+%endif
+Name:           graphviz
+Version:        2.42.4
+Release:        4%{?dist}
+Summary:        Graph Visualization Tools
+License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:			http://www.graphviz.org/
-Source0:		https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
+URL:            https://www.graphviz.org/
+Source0:        https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
 # rhbz#1505230
-Patch0:			graphviz-2.42.2-dotty-menu-fix.patch
-Patch1:			graphviz-2.42.2-coverity-scan-fixes.patch
-BuildRequires:		zlib-devel, libpng-devel, libjpeg-devel, expat-devel, freetype-devel >= 2
-BuildRequires:		bison, m4, flex, swig, sed, tcl-devel >= 8.3
-BuildRequires:		fontconfig-devel, libtool-ltdl-devel, guile-devel
-%if %{with python2}
-BuildRequires:		python2-devel
-%endif
-BuildRequires:		python3-devel, java-devel
-BuildRequires:		pkgconfig(cairo) >= 1.1.10, pango-devel, gmp-devel, lua-devel
-BuildRequires:		gd-devel, perl-devel, swig >= 1.3.33, automake, autoconf, libtool
+Patch0:         graphviz-2.42.2-dotty-menu-fix.patch
+Patch1:         graphviz-2.42.2-coverity-scan-fixes.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  bison
+BuildRequires:  expat-devel
+BuildRequires:  flex
+BuildRequires:  fontconfig-devel
+BuildRequires:  freetype-devel >= 2
+BuildRequires:  gd-devel
+BuildRequires:  gmp-devel
+BuildRequires:  guile-devel
+BuildRequires:  java-devel
+BuildRequires:  libjpeg-devel
+BuildRequires:  libpng-devel
+BuildRequires:  libtool
+BuildRequires:  libtool-ltdl-devel
+BuildRequires:  lua-devel
+BuildRequires:  m4
+BuildRequires:  pango-devel
+BuildRequires:  perl
 # Temporary workaound for perl(Carp) not pulled
-BuildRequires:		perl-Carp
+BuildRequires:  perl-Carp
+BuildRequires:  perl-devel
+BuildRequires:  pkgconfig
+BuildRequires:  python3-devel
+BuildRequires:  sed
+BuildRequires:  swig >= 1.3.33
+BuildRequires:  tcl-devel >= 8.3
+BuildRequires:  zlib-devel
+BuildRequires:  pkgconfig(cairo) >= 1.1.10
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
+%if %{with python2}
+BuildRequires:  python2-devel
+%endif
 %if %{PHP}
-BuildRequires:		php-devel
+BuildRequires:  php-devel
 %endif
 %if %{SHARP}
-BuildRequires:		mono-core
+BuildRequires:  mono-core
 %endif
 %if %{DEVIL}
-BuildRequires:		DevIL-devel
+BuildRequires:  DevIL-devel
 %endif
 %if %{ARRRR}
-BuildRequires:		R-devel
+BuildRequires:  R-devel
 %endif
 %if %{OCAML}
-BuildRequires:		ocaml
+BuildRequires:  ocaml
 %endif
 %if %{QTAPPS}
-BuildRequires:		qt-devel
+BuildRequires:  qt-devel
 %endif
 %if %{GTS}
-BuildRequires:		gts-devel
+BuildRequires:  gts-devel
 %endif
 %if %{LASI}
-BuildRequires:		lasi-devel
+BuildRequires:  lasi-devel
 %endif
-
-Requires(post):		/sbin/ldconfig
-Requires(postun):	/sbin/ldconfig
 
 %description
 A collection of tools for the manipulation and layout of graphs (as in nodes
 and edges, not as in barcharts).
 
 %package devel
-Summary:		Development package for graphviz
-Requires:		%{name} = %{version}-%{release}, pkgconfig
-Requires:		%{name}-gd = %{version}-%{release}
+Summary:        Development package for graphviz
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-gd = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 A collection of tools for the manipulation and layout of graphs (as in nodes
@@ -98,8 +131,8 @@ graphviz.
 
 %if %{DEVIL}
 %package devil
-Summary:		Graphviz plugin for renderers based on DevIL
-Requires:		%{name} = %{version}-%{release}
+Summary:        Graphviz plugin for renderers based on DevIL
+Requires:       %{name} = %{version}-%{release}
 
 %description devil
 Graphviz plugin for renderers based on DevIL. (Unless you absolutely have
@@ -108,16 +141,18 @@ supported directly by the cairo+pango based renderer in the base graphviz rpm.)
 %endif
 
 %package doc
-Summary:		PDF and HTML documents for graphviz
+Summary:        PDF and HTML documents for graphviz
 
 %description doc
 Provides some additional PDF and HTML documentation for graphviz.
 
 %package gd
-Summary:		Graphviz plugin for renderers based on gd
-Requires:		%{name} = %{version}-%{release}
-Requires(post):		%{_bindir}/dot /sbin/ldconfig
-Requires(postun):	%{_bindir}/dot /sbin/ldconfig
+Summary:        Graphviz plugin for renderers based on gd
+Requires:       %{name} = %{version}-%{release}
+Requires(post): %{_bindir}/dot
+Requires(post): /sbin/ldconfig
+Requires(postun): %{_bindir}/dot
+Requires(postun): /sbin/ldconfig
 
 %description gd
 Graphviz plugin for renderers based on gd.  (Unless you absolutely have to use
@@ -125,22 +160,23 @@ GIF, you are recommended to use the PNG format instead because of the better
 quality anti-aliased lines provided by the cairo+pango based renderer.)
 
 %package graphs
-Summary:		Demo graphs for graphviz
+Summary:        Demo graphs for graphviz
 
 %description graphs
 Some demo graphs for graphviz.
 
 %package lua
-Summary:		Lua extension for graphviz
-Requires:		%{name} = %{version}-%{release}, lua
+Summary:        Lua extension for graphviz
+Requires:       %{name} = %{version}-%{release}
+Requires:       lua
 
 %description lua
 Lua extension for graphviz.
 
 %if %{MING}
 %package ming
-Summary:		Graphviz plugin for flash renderer based on ming
-Requires:		%{name} = %{version}-%{release}
+Summary:        Graphviz plugin for flash renderer based on ming
+Requires:       %{name} = %{version}-%{release}
 
 %description ming
 Graphviz plugin for -Tswf (flash) renderer based on ming.
@@ -148,27 +184,28 @@ Graphviz plugin for -Tswf (flash) renderer based on ming.
 
 %if %{OCAML}
 %package ocaml
-Summary:		Ocaml extension for graphviz
-Requires:		%{name} = %{version}-%{release}, ocaml
+Summary:        Ocaml extension for graphviz
+Requires:       %{name} = %{version}-%{release}
+Requires:       ocaml
 
 %description ocaml
 Ocaml extension for graphviz.
 %endif
 
 %package perl
-Summary:		Perl extension for graphviz
-Requires:		%{name} = %{version}-%{release}
-Requires:		perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Summary:        Perl extension for graphviz
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description perl
 Perl extension for graphviz.
 
 %if %{PHP}
 %package php
-Summary:		PHP extension for graphviz
-Requires:		%{name} = %{version}-%{release}
-Requires:	php(zend-abi) = %{?php_zend_api}%{?!php_zend_api:UNDEFINED}
-Requires:	php(api) = %{?php_core_api}%{?!php_core_api:UNDEFINED}
+Summary:        PHP extension for graphviz
+Requires:       %{name} = %{version}-%{release}
+Requires:       php(api) = %{?php_core_api}%{?!php_core_api:UNDEFINED}
+Requires:       php(zend-abi) = %{?php_zend_api}%{?!php_zend_api:UNDEFINED}
 
 %description php
 PHP extension for graphviz.
@@ -176,35 +213,36 @@ PHP extension for graphviz.
 
 %if %{with python2}
 %package python2
-Summary:		Python extension for graphviz
-Requires:		%{name} = %{version}-%{release}
+Summary:        Python extension for graphviz
+Requires:       %{name} = %{version}-%{release}
 # Manually add provides that would be generated automatically if .egg-info was present
-Provides: python2dist(gv) = %{version}
-Provides: python%{python2_version}dist(gv) = %{version}
+Provides:       python2dist(gv) = %{version}
+Provides:       python%{python2_version}dist(gv) = %{version}
 # Remove before F30
-Provides: %{name}-python = %{version}-%{release}
-Provides: %{name}-python%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-python < 2.40.1-25
-Obsoletes: python2-%{name} < 2.40.1-25
+Provides:       %{name}-python = %{version}-%{release}
+Provides:       %{name}-python%{?_isa} = %{version}-%{release}
+Obsoletes:      %{name}-python < 2.40.1-25
+Obsoletes:      python2-%{name} < 2.40.1-25
 
 %description python2
 Python extension for graphviz.
 %endif
 
 %package python3
-Summary:		Python 3 extension for graphviz
-Requires:		%{name} = %{version}-%{release}
+Summary:        Python 3 extension for graphviz
+Requires:       %{name} = %{version}-%{release}
 # Manually add provides that would be generated automatically if .egg-info was present
-Provides: python3dist(gv) = %{version}
-Provides: python%{python3_version}dist(gv) = %{version}
+Provides:       python3dist(gv) = %{version}
+Provides:       python%{python3_version}dist(gv) = %{version}
 
 %description python3
 Python 3 extension for graphviz.
 
 %if %{ARRRR}
 %package R
-Summary:		R extension for graphviz
-Requires:		%{name} = %{version}-%{release}, R-core
+Summary:        R extension for graphviz
+Requires:       %{name} = %{version}-%{release}
+Requires:       R-core
 
 %description R
 R extension for graphviz.
@@ -212,16 +250,18 @@ R extension for graphviz.
 
 %if %{SHARP}
 %package sharp
-Summary:		C# extension for graphviz
-Requires:		%{name} = %{version}-%{release}, mono-core
+Summary:        C# extension for graphviz
+Requires:       %{name} = %{version}-%{release}
+Requires:       mono-core
 
 %description sharp
 C# extension for graphviz.
 %endif
 
 %package tcl
-Summary:		Tcl extension & tools for graphviz
-Requires:		%{name} = %{version}-%{release}, tcl >= 8.3
+Summary:        Tcl extension & tools for graphviz
+Requires:       %{name} = %{version}-%{release}
+Requires:       tcl >= 8.3
 
 %description tcl
 Various tcl packages (extensions) for the graphviz tools.
@@ -275,15 +315,15 @@ sed -i 's|_MY_JAVA_INCLUDES_|-I%{java_home}/include/ -I%{java_home}/include/linu
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
-make %{?_smp_mflags} CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}" \
-  CXXFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}"
+%make_build CFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}" \
+  CXXFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}"
 
 %install
 make DESTDIR=%{buildroot} \
 	docdir=%{buildroot}%{_docdir}/%{name} \
 	pkgconfigdir=%{_libdir}/pkgconfig \
 	install
-find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 # Move docs to the right place
 mkdir -p %{buildroot}%{_docdir}/%{name}
@@ -294,8 +334,8 @@ install -m0644 README %{buildroot}%{_docdir}/%{name}
 
 %if %{PHP}
 # PHP configuration file
-%{__mkdir_p} %{buildroot}%{_sysconfdir}/php.d
-%{__cat} << __EOF__ > %{buildroot}%{_sysconfdir}/php.d/%{ini_name}
+mkdir -p %{buildroot}%{_sysconfdir}/php.d
+cat << __EOF__ > %{buildroot}%{_sysconfdir}/php.d/%{ini_name}
 ; Enable %{name} extension module
 extension=gv.so
 __EOF__
@@ -337,9 +377,9 @@ install -p tclpkg/gv/gv.py %{buildroot}%{python3_sitearch}/gv.py
 touch %{buildroot}%{_libdir}/graphviz/config%{pluginsver}
 
 # Fix lua file placement for flatpak
-if [ "%{_prefix}" != "/usr" ]; then
-  cp -ru %{buildroot}/usr/* %{buildroot}%{_prefix}/
-  rm -rf %{buildroot}/usr/*
+if [ "%{_prefix}" != "%{_prefix}" ]; then
+  cp -ru %{buildroot}%{_prefix}/* %{buildroot}%{_prefix}/
+  rm -rf %{buildroot}%{_prefix}/*
 fi
 
 %check
@@ -361,7 +401,7 @@ php --no-php-ini \
 %{?ldconfig}
 %{_bindir}/dot -c 2>/dev/null || :
 
-%ldconfig_postun
+%{ldconfig_postun}
 
 %if %{DEVIL}
 # run "dot -c" to generate plugin config in %%{_libdir}/graphviz/config*
@@ -401,8 +441,8 @@ php --no-php-ini \
 %dir %{_libdir}/graphviz
 %{_libdir}/*.so.*
 %{_libdir}/graphviz/*.so.*
-%{_mandir}/man1/*.1*
-%{_mandir}/man7/*.7*
+%{_mandir}/man1/*.1%{?ext_man}
+%{_mandir}/man7/*.7%{?ext_man}
 %dir %{_datadir}/graphviz
 %exclude %{_docdir}/%{name}/html
 %exclude %{_docdir}/%{name}/pdf
@@ -429,7 +469,7 @@ php --no-php-ini \
 %{_libdir}/*.so
 %{_libdir}/graphviz/*.so
 %{_libdir}/pkgconfig/*.pc
-%{_mandir}/man3/*.3*
+%{_mandir}/man3/*.3%{?ext_man}
 
 %if %{DEVIL}
 %files devil
@@ -505,10 +545,15 @@ php --no-php-ini \
 %{_libdir}/graphviz/tcl/
 %{_libdir}/tcl*/*
 # hack to include gv.3tcl only if available
-#  always includes tcldot.3tcl, gdtclft.3tcl
+# always includes tcldot.3tcl, gdtclft.3tcl
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Wed Jan 26 2022 Henry Li <lihl@microsoft.com> - 2.42.4-4
+- Add perl as BR
+- License Verified
+- Fix linting
+
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.42.4-3
 - Use pkgconfig(cairo) instead of cairo-devel build requirement
 
@@ -517,7 +562,7 @@ php --no-php-ini \
 - Remove X11 dependencies and extra language bindings.
 - Use `/usr/lib` instead of `/usr/lib64`
 
-* Mon Apr  6 2020 Jaroslav Škarvada <jskarvad@redhat.com> - 2.42.4-1
+* Mon Apr  6 2020 Jaroslav �karvada <jskarvad@redhat.com> - 2.42.4-1
 - New version
   Resolves: rhbz#1821045
 - Switched to bz2 archives
@@ -544,13 +589,13 @@ php --no-php-ini \
 * Fri Dec 06 2019 Richard W.M. Jones <rjones@redhat.com> - 2.42.2-4
 - OCaml 4.09.0 (final) rebuild.
 
-* Thu Oct 31 2019 Miro Hrončok <mhroncok@redhat.com> - 2.42.2-3
+* Thu Oct 31 2019 Miro Hroncok <mhroncok@redhat.com> - 2.42.2-3
 - Remove Python 2 package on Fedora 32+
 
 * Fri Oct 04 2019 Remi Collet <remi@remirepo.net> - 2.42.2-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php74
 
-* Wed Oct  2 2019 Jaroslav Škarvada <jskarvad@redhat.com> - 2.42.2-1
+* Wed Oct  2 2019 Jaroslav �karvada <jskarvad@redhat.com> - 2.42.2-1
 - New version
   Resolves: rhbz#1753061
 - Dropped visio, python3, CVE-2018-10196, CVE-2019-11023, and
@@ -560,7 +605,7 @@ php --no-php-ini \
 * Wed Oct 02 2019 Orion Poplawski <orion@nwra.com> - 2.40.1-58
 - Rebuild for lasi 1.1.3 soname bump
 
-* Mon Aug 19 2019 Miro Hrončok <mhroncok@redhat.com> - 2.40.1-57
+* Mon Aug 19 2019 Miro Hroncok <mhroncok@redhat.com> - 2.40.1-57
 - Rebuilt for Python 3.8
 
 * Fri Aug 16 2019 Richard W.M. Jones <rjones@redhat.com> - 2.40.1-56
@@ -581,43 +626,43 @@ php --no-php-ini \
 * Tue Jun 04 2019 Jitka Plesnikova <jplesnik@redhat.com> - 2.40.1-51
 - Perl 5.30 re-rebuild updated packages
 
-* Mon Jun  3 2019 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-50
+* Mon Jun  3 2019 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-50
 - Fixed FTBFS with python-3.8
 
 * Sat Jun 01 2019 Jitka Plesnikova <jplesnik@redhat.com> - 2.40.1-49
 - Perl 5.30 rebuild
 
-* Tue May  7 2019 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-48
+* Tue May  7 2019 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-48
 - Fixed FTBFS caused by swig-4.0.0
   Resolves: rhbz#1707435
 
 * Mon Apr 29 2019 Richard W.M. Jones <rjones@redhat.com> - 2.40.1-47
 - OCaml 4.08.0 (beta 3) rebuild.
 
-* Wed Apr 24 2019 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-46
+* Wed Apr 24 2019 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-46
 - Updated CVE-2019-11023 patch
   Related: CVE-2019-11023
 
-* Wed Apr 24 2019 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-45
+* Wed Apr 24 2019 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-45
 - Fixed null pointer dereference in function agroot()
   Resolves: CVE-2019-11023
 
 * Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.40.1-44
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
-* Mon Jan 21 2019 Vít Ondruch <vondruch@redhat.com> - 2.40.1-43
+* Mon Jan 21 2019 V�t Ondruch <vondruch@redhat.com> - 2.40.1-43
 - Rebuilt for https://fedoraproject.org/wiki/Changes/Ruby_2.6
 
-* Mon Jan 14 2019 Björn Esser <besser82@fedoraproject.org> - 2.40.1-42
+* Mon Jan 14 2019 Bj�rn Esser <besser82@fedoraproject.org> - 2.40.1-42
 - Rebuilt for libcrypt.so.2 (#1666033)
 
-* Fri Dec  7 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-41
+* Fri Dec  7 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-41
 - Fixed some issues found by coverity scan
 
-* Thu Oct 18 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-40
+* Thu Oct 18 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-40
 - Clarified license tag
 
-* Mon Oct 15 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-39
+* Mon Oct 15 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-39
 - Dropped rpath
 
 * Thu Oct 11 2018 Remi Collet <remi@remirepo.net> - 2.40.1-38
@@ -626,20 +671,20 @@ php --no-php-ini \
 * Wed Sep 26 2018 Kevin Fenzi <kevin@scrye.com> - 2.40.1-37
 - Don't fail on post scriptlet failures.
 
-* Wed Jul 18 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-36
+* Wed Jul 18 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-36
 - Fixed ghostscript requirements
 
-* Wed Jul 18 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-35
+* Wed Jul 18 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-35
 - Conditionalized php support
 
-* Tue Jul 17 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-34
+* Tue Jul 17 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-34
 - Fixed menu in dotty
   Resolves: rhbz#1505230
 
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.40.1-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
-* Thu Jul 12 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-32
+* Thu Jul 12 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-32
 - Updated source URL
 
 * Wed Jul 11 2018 Richard W.M. Jones <rjones@redhat.com> - 2.40.1-31
@@ -654,44 +699,44 @@ php --no-php-ini \
 * Tue Jun 19 2018 Richard W.M. Jones <rjones@redhat.com> - 2.40.1-28
 - OCaml 4.07.0-rc1 rebuild.
 
-* Tue Jun 19 2018 Miro Hrončok <mhroncok@redhat.com> - 2.40.1-27
+* Tue Jun 19 2018 Miro Hroncok <mhroncok@redhat.com> - 2.40.1-27
 - Rebuilt for Python 3.7
 
-* Thu May 17 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-26
+* Thu May 17 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-26
 - Fixed CVE-2018-10196
 
-* Thu May  3 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-25
+* Thu May  3 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-25
 - Made python2 package optional
 
-* Wed May  2 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-24
+* Wed May  2 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-24
 - Added support for python3
 
 * Thu Apr 26 2018 Richard W.M. Jones <rjones@redhat.com> - 2.40.1-23
 - OCaml 4.07.0-beta2 rebuild.
 
-* Sat Apr 14 2018 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.40.1-22
+* Sat Apr 14 2018 Zbigniew Jedrzejewski-Szmek <zbyszek@in.waw.pl> - 2.40.1-22
 - Rename python2 subpackage to graphviz-python2, because
   there is intent to package python-graphviz, which is a separate project
   from graphviz.
 
-* Thu Mar  8 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-21
+* Thu Mar  8 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-21
 - Dropped libgnomeui-devel requirement, libgnomeui support has been
   dropped long time ago in upstream
 
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.40.1-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
-* Thu Feb  1 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-19
+* Thu Feb  1 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-19
 - Rebuilt with urw-base35-fonts
 
-* Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 2.40.1-18
+* Sat Jan 20 2018 Bj�rn Esser <besser82@fedoraproject.org> - 2.40.1-18
 - Rebuilt for switch to libxcrypt
 
 * Tue Jan 16 2018 Iryna Shcherbina <ishcherb@redhat.com> - 2.40.1-17
 - Update Python 2 dependency declarations to new packaging standards
   (See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3)
 
-* Mon Jan 15 2018 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-16
+* Mon Jan 15 2018 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-16
 - Switched to libgs-devel
   Resolves: rhbz#1534666
 - Made the build verbose (without silent rules)
@@ -705,10 +750,10 @@ php --no-php-ini \
 * Wed Oct 04 2017 Remi Collet <remi@fedoraproject.org> - 2.40.1-13
 - rebuild for https://fedoraproject.org/wiki/Changes/php72
 
-* Sun Aug 20 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.40.1-12
+* Sun Aug 20 2017 Zbigniew Jedrzejewski-Szmek <zbyszek@in.waw.pl> - 2.40.1-12
 - Add Provides for the old name without %%_isa
 
-* Sat Aug 19 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.40.1-11
+* Sat Aug 19 2017 Zbigniew Jedrzejewski-Szmek <zbyszek@in.waw.pl> - 2.40.1-11
 - Python 2 binary package renamed to python2-graphviz
   See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3
 
@@ -733,13 +778,13 @@ php --no-php-ini \
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.40.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
-* Mon Jan 16 2017 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-3
+* Mon Jan 16 2017 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-3
 - Re-enabled PHP support
 
 * Thu Jan 12 2017 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.40.1-2
 - F-26: rebuild for ruby24
 
-* Mon Jan  2 2017 Jaroslav Škarvada <jskarvad@redhat.com> - 2.40.1-1
+* Mon Jan  2 2017 Jaroslav �karvada <jskarvad@redhat.com> - 2.40.1-1
 - New version
   Resolves: rhbz#1406954
 - Dropped rtest-fix, find-fix, ocaml-fix-ints, format-string,
@@ -749,17 +794,17 @@ php --no-php-ini \
 * Sat Nov 05 2016 Richard W.M. Jones <rjones@redhat.com> - 2.38.0-40
 - Rebuild for OCaml 4.04.0.
 
-* Fri Oct 14 2016 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-39
+* Fri Oct 14 2016 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-39
 - Fixed build with ghostscript-9.18+
   Resolves: rhbz#1384016
 
 * Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.38.0-38
 - https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
 
-* Fri Jul 15 2016 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-37
+* Fri Jul 15 2016 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-37
 - Conditionalized php support and disabled it due to rhbz#1356985
 
-* Fri Jul 15 2016 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-36
+* Fri Jul 15 2016 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-36
 - Rebuilt for php
 
 * Tue May 17 2016 Jitka Plesnikova <jplesnik@redhat.com> - 2.38.0-35
@@ -771,7 +816,7 @@ php --no-php-ini \
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.38.0-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
-* Tue Jan 12 2016 Vít Ondruch <vondruch@redhat.com> - 2.38.0-32
+* Tue Jan 12 2016 V�t Ondruch <vondruch@redhat.com> - 2.38.0-32
 - Rebuilt for https://fedoraproject.org/wiki/Changes/Ruby_2.3
 
 * Tue Dec  1 2015 Tom Callaway <spot@fedoraproject.org> - 2.38.0-31
@@ -789,7 +834,7 @@ php --no-php-ini \
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.38.0-27
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
-* Mon Jun 15 2015 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-26
+* Mon Jun 15 2015 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-26
 - Fixed built with visio (by visio patch)
 - Enabled visio support
   Resolves: rhbz#1231896
@@ -816,15 +861,15 @@ php --no-php-ini \
 - Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_2.2
 - Fix obsolete Config:: usage
 
-* Fri Jan 16 2015 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-18
+* Fri Jan 16 2015 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-18
 - Make vimdot to work with vi, dropped explicit vim-ehnanced requirement
   Resolves: rhbz#1182764
 
-* Tue Nov 25 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-17
+* Tue Nov 25 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-17
 - Fixed format string vulnerability
   Resolves: rhbz#1167868
 
-* Tue Nov 11 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-16
+* Tue Nov 11 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-16
 - Added ISO8859-1 fonts as requirement
   Resolves: rhbz#1058323
 - Fixed spurious whitespaces
@@ -845,7 +890,7 @@ php --no-php-ini \
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.38.0-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
-* Mon Jul 14 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-9
+* Mon Jul 14 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-9
 - Rebuilt for new ocaml
 
 * Thu Jun 19 2014 Remi Collet <rcollet@redhat.com> - 2.38.0-8
@@ -859,21 +904,21 @@ php --no-php-ini \
 * Tue Jun  3 2014 Peter Robinson <pbrobinson@fedoraproject.org> 2.38.0-6
 - Re-enable R bindings on aarch64, we now have it
 
-* Wed May 28 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-5
+* Wed May 28 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-5
 - Fixed crash by adding additional check to findVertical/Horizontal functions
   (by find-fix patch provided by Mattias Ellert <mattias.ellert@fysast.uu.se>)
   Resolves: rhbz#1095419
 
-* Tue May 20 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-4
+* Tue May 20 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-4
 - Rebuilt for tcl/tk8.6
 
-* Thu Apr 24 2014 Vít Ondruch <vondruch@redhat.com> - 2.38.0-3
+* Thu Apr 24 2014 V�t Ondruch <vondruch@redhat.com> - 2.38.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Changes/Ruby_2.1
 
 * Tue Apr 15 2014 Richard W.M. Jones <rjones@redhat.com> - 2.38.0-2
 - Remove ocaml_arches macro (RHBZ#1087794).
 
-* Mon Apr 14 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.38.0-1
+* Mon Apr 14 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.38.0-1
 - New version
   Resolves: rhbz#1052160
 - Dropped testsuite-sigsegv-fix, rtest-errout-fix, lefty-getaddrinfo,
@@ -882,17 +927,17 @@ php --no-php-ini \
 - Added rtest-fix patch (sent upstream)
 - Disabled test suite (for now)
 
-* Wed Mar 19 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.34.0-9
+* Wed Mar 19 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.34.0-9
 - Added ppc64le support
   Resolves: rhbz#1078464
 
-* Thu Jan  9 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.34.0-8
+* Thu Jan  9 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.34.0-8
 - Prevent possible buffer overflow in yyerror()
   Resolves: CVE-2014-1235
 - Fix possible buffer overflow problem in chkNum of scanner
   Resolves: CVE-2014-1236
 
-* Tue Jan  7 2014 Jaroslav Škarvada <jskarvad@redhat.com> - 2.34.0-7
+* Tue Jan  7 2014 Jaroslav �karvada <jskarvad@redhat.com> - 2.34.0-7
 - Fixed overflow in yyerror
   Resolves: CVE-2014-0978
 
@@ -902,20 +947,20 @@ php --no-php-ini \
 * Thu Dec 19 2013 Peter Robinson <pbrobinson@fedoraproject.org> 2.34.0-5
 - No mono on aarch64
 
-* Thu Oct 31 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.34.0-4
+* Thu Oct 31 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.34.0-4
 - Removed metadata from generated PDFs
   Related: rhbz#881173
 
-* Thu Oct 31 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.34.0-3
+* Thu Oct 31 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.34.0-3
 - Fixed multilib conflicts
   Rewrote lefty IO lib to use getaddrinfo instead of gethostbyname
   (by lefty-getaddrinfo patch)
   Resolves: rhbz#881173
 
-* Mon Sep 16 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.34.0-2
+* Mon Sep 16 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.34.0-2
 - Added explicit dependency on vim (required by vimdot)
 
-* Mon Sep 16 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.34.0-1
+* Mon Sep 16 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.34.0-1
 - New version
   Resolves: rhbz#1005957
 - Dropped perl-fix patch (upstreamed)
@@ -923,17 +968,17 @@ php --no-php-ini \
 * Sat Sep 14 2013 Richard W.M. Jones <rjones@redhat.com> - 2.32.0-2
 - Rebuild for OCaml 4.01.0.
 
-* Mon Aug 19 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.32.0-1
+* Mon Aug 19 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.32.0-1
 - New version
   Resolves: rhbz#991752
 - Dropped guile2-fix, cgraph, lua-52, smyrna-doc-opt, gv2gml-options-fix,
   lefty-help, prune-help, man-fix patches (all upstreamed)
 
-* Tue Aug  6 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.30.1-14
+* Tue Aug  6 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.30.1-14
 - Used unversioned doc directory
   Resolves: rhbz#993803
 
-* Mon Aug  5 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.30.1-13
+* Mon Aug  5 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.30.1-13
 - Fixed FTBFS related to perl config
   Resolves: rhbz#991915
 
@@ -943,10 +988,10 @@ php --no-php-ini \
 * Wed Jul 17 2013 Petr Pisar <ppisar@redhat.com> - 2.30.1-11
 - Perl 5.18 rebuild
 
-* Fri Jul 12 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.30.1-10
+* Fri Jul 12 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.30.1-10
 - Various man and built-in help fixes
 
-* Tue Jun 25 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.30.1-9
+* Tue Jun 25 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.30.1-9
 - Fixed handling of the libdir/graphviz directory
 
 * Tue Jun 11 2013 Remi Collet <rcollet@redhat.com> - 2.30.1-8
@@ -961,7 +1006,7 @@ php --no-php-ini \
 * Thu Apr 11 2013 Tom Callaway <spot@fedoraproject.org> - 2.30.1-5
 - rebuild for R3 (may not be needed, but better safe than sorry)
 
-* Mon Mar 25 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.30.1-4
+* Mon Mar 25 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.30.1-4
 - Added support for aarch64
   Resolves: rhbz#925487
 
@@ -969,27 +1014,27 @@ php --no-php-ini \
 - rebuild for http://fedoraproject.org/wiki/Features/Php55
 - add explicit BuildRequires: perl-Carp (workaround)
 
-* Thu Mar 14 2013 Vít Ondruch <vondruch@redhat.com> - 2.30.1-2
+* Thu Mar 14 2013 V�t Ondruch <vondruch@redhat.com> - 2.30.1-2
 - Rebuild for https://fedoraproject.org/wiki/Features/Ruby_2.0.0
 
-* Fri Feb 15 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.30.1-1
+* Fri Feb 15 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.30.1-1
 - New version
   Resolves: rhbz#911520
   Resolves: rhbz#704529
 
-* Thu Jan 24 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.30.0-3
+* Thu Jan 24 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.30.0-3
 - Used ocaml_arches macros to enable ocaml on supported arches
 
 * Fri Jan 18 2013 Adam Tkac <atkac redhat com> - 2.30.0-2
 - rebuild due to "jpeg8-ABI" feature drop
 
-* Mon Jan 14 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.30.0-1
+* Mon Jan 14 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.30.0-1
 - New version
   Resolves: rhbz#895027
 - Dropped guile-detect, ocaml4 patches (not needed)
 - Fixed bogus date in changelog (guessing)
 
-* Wed Jan  9 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-26
+* Wed Jan  9 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-26
 - Rebuilt with -fno-strict-overflow to workaround the overflow problem
   (upstream ticket: http://www.graphviz.org/mantisbt/view.php?id=2244)
 - The dot_builtins was removed rather then excluded to fix the dangling
@@ -998,14 +1043,14 @@ php --no-php-ini \
 * Fri Dec 21 2012 Adam Tkac <atkac redhat com> - 2.28.0-25
 - rebuild against new libjpeg
 
-* Wed Oct 17 2012 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-24
+* Wed Oct 17 2012 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-24
 - Rebuilt for new ocaml
 
-* Fri Aug 17 2012 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-23
+* Fri Aug 17 2012 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-23
 - Silenced 'dot -c' errors/warnings in post/postun
 - Do not remove dot config in plugins post/postun
 
-* Fri Aug 17 2012 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-22
+* Fri Aug 17 2012 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-22
 - dot_builtins no longer installed (lowers implicit deps)
 - Fixed post/postuns for plugins
 - Removed -ffast-math, added -ffloat-store (on i386) to fix arithmetic on i386
@@ -1021,10 +1066,10 @@ php --no-php-ini \
 - Enable OCaml on arm and ppc64, since there are working native compilers
   for both.
 
-* Wed May 23 2012 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-18
+* Wed May 23 2012 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-18
 - Improved docs handling code in spec to be backward compatible with older RPM
 
-* Tue May 22 2012 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-17
+* Tue May 22 2012 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-17
 - All docs are now installed into /usr/share/doc/graphviz-%%{version}
 - Demos packaged as docs not to automatically bring in unnecessary deps
 
@@ -1034,7 +1079,7 @@ php --no-php-ini \
 * Thu Feb 16 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 2.28.0-15
 - fix CPPFLAGS export so it doesn't cause issues on ARM
 
-* Mon Feb 06 2012 Vít Ondruch <vondruch@redhat.com> - 2.28.0-14
+* Mon Feb 06 2012 V�t Ondruch <vondruch@redhat.com> - 2.28.0-14
 - Rebuilt for Ruby 1.9.3.
 
 * Wed Jan 18 2012 Remi Collet <remi@fedoraproject.org> - 2.28.0-13
@@ -1045,7 +1090,7 @@ php --no-php-ini \
 * Sun Jan 08 2012 Richard W.M. Jones <rjones@redhat.com> - 2.28.0-12
 - Rebuild for OCaml 3.12.1.
 
-* Thu Dec  8 2011 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-11
+* Thu Dec  8 2011 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-11
 - Added conditionals for ARRRR, DEVIL, QTAPPS (gvedit), GTS, LASI
 - Fixed conditionals for SHARP, OCAML
 - Built with gts, ghostscript, rsvg and lasi
@@ -1063,26 +1108,26 @@ php --no-php-ini \
 * Wed Jul 20 2011 Petr Sabata <contyk@redhat.com> - 2.28.0-8
 - Perl mass rebuild
 
-* Thu Jul 07 2011 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-7
+* Thu Jul 07 2011 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-7
 - Added gd as devel requirement
 
-* Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> - 2.28.0-6
+* Fri Jun 17 2011 Marcela Ma�l�nov� <mmaslano@redhat.com> - 2.28.0-6
 - Perl mass rebuild
 
-* Fri Jun 10 2011 Marcela Mašláňová <mmaslano@redhat.com> - 2.28.0-5
+* Fri Jun 10 2011 Marcela Ma�l�nov� <mmaslano@redhat.com> - 2.28.0-5
 - Perl 5.14 mass rebuild
 
-* Thu May 19 2011 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-4
+* Thu May 19 2011 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-4
 - Fixed detection of guile 2.x
   Resolves: rhbz#704529
 
-* Fri May 13 2011 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-3
+* Fri May 13 2011 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-3
 - Corrected license tag, the graphviz license is now EPL
 
-* Fri May 13 2011 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-2
+* Fri May 13 2011 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-2
 - Recompiled with -fno-strict-aliasing in CXXFLAGS
 
-* Tue May 10 2011 Jaroslav Škarvada <jskarvad@redhat.com> - 2.28.0-1
+* Tue May 10 2011 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-1
 - New version 2.28.0
 - Added perl-ExtUtils-Embed to BuildRequires, it is now required
 - Fixed build failure due to change in php_zend_api macro type
@@ -1092,7 +1137,7 @@ php --no-php-ini \
 * Thu Mar 03 2011 Oliver Falk <oliver@linux-kernel.at> - 2.26.3-5
 - Disable mono and ocaml on alpha
 
-* Tue Feb 22 2011 Jaroslav Škarvada <jskarvad@redhat.com> - 2.26.3-4
+* Tue Feb 22 2011 Jaroslav �karvada <jskarvad@redhat.com> - 2.26.3-4
 - Added urw-fonts to requires (#677114)
 
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.26.3-3
@@ -1101,7 +1146,7 @@ php --no-php-ini \
 * Fri Jan 21 2011 Karsten Hopp <karsten@redhat.com> 2.26.3-2
 - fix hack for powerpc-darwin8 in configure
 
-* Thu Jan 06 2011 Jaroslav Škarvada <jskarvad@redhat.com> - 2.26.3-1
+* Thu Jan 06 2011 Jaroslav �karvada <jskarvad@redhat.com> - 2.26.3-1
 - New version (#580017)
 - Fixed gtk plugin program-name (#640671, gtk-progname patch)
 - Fixed broken links in doc index (#642536, doc-index-fix patch)
