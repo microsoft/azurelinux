@@ -153,7 +153,7 @@ getent passwd oprofile >/dev/null || \
 
 %changelog
 * Fri Jan 21 2022 Thomas Crain <thcrain@microsoft.com> - 1.4.0-3
-- Fix %%java_home detection with msopenjdk
+- Pull in javapackages-local-bootstrap as a BR for %%java_home macro definition
 - Remove PPC-specific patches, BRs
 - Lint spec
 - License verified
