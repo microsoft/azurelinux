@@ -9,7 +9,7 @@ Provides:	perl(IO::AIO) = %{upstream_version}%{extraversion}
 
 Name:		perl-IO-AIO
 Version:	%{upstream_version}%{extraversion}
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Asynchronous Input/Output
 License:	GPLv2+
 URL:		https://metacpan.org/release/IO-AIO
@@ -102,6 +102,9 @@ make test
 %{_mandir}/man1/treescan.1*
 
 %changelog
+* Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.76-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Wed Jul 28 2021 Paul Howarth <paul@city-fan.org> - 4.76-1
 - Update to 4.76
   - Add autoconf test for siginfo_t, which is, of course, not available on

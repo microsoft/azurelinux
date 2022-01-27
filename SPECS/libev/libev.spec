@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:             libev
 Version:          4.33
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          High-performance event loop/event model with lots of features
 
 License:          BSD or GPLv2+
@@ -94,6 +94,9 @@ install -p -m 0644 Changes ev.pod LICENSE README %{inst_srcdir}
 %{source_dir}
 
 %changelog
+* Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.33-5
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.33-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

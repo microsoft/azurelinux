@@ -9601,8 +9601,8 @@
         "type": "other",
         "other": {
           "name": "libev",
-          "version": "4.24",
-          "downloadUrl": "http://dist.schmorp.de/libev/Attic/libev-4.24.tar.gz"
+          "version": "4.33",
+          "downloadUrl": "http://dist.schmorp.de/libev/Attic/libev-4.33.tar.gz"
         }
       }
     },
@@ -16523,6 +16523,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-BDB",
+          "version": "1.92",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-1.92.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Bit-Vector",
           "version": "7.4",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/S/ST/STBEY/Bit-Vector-7.4.tar.gz"
@@ -18296,6 +18306,16 @@
           "name": "perl-Inline-Files",
           "version": "0.71",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AM/AMBS/Inline-Files-0.71.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-IO-AIO",
+          "version": "4.76",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-4.76.tar.gz"
         }
       }
     },
