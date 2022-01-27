@@ -18,13 +18,15 @@ BuildRequires:  perl(warnings)
 # Run-Time
 BuildRequires:  perl(Color::RGB::Util) >= 0.600
 BuildRequires:  perl(Exporter) >= 5.57
-# Optional - BuildRequires:  perl(Term::Detect::Software)
-# Tests
+
+%if %{with_check}
 BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More) >= 0.98
+%endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Color::RGB::Util) >= 0.600
 Requires:       perl(Exporter) >= 5.57

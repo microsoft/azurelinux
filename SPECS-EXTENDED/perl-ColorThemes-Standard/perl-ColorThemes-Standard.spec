@@ -18,12 +18,13 @@ BuildRequires:  perl(warnings)
 # Run-time
 BuildRequires:  perl(ColorThemeBase::Static::FromStructColors) >= 0.006
 BuildRequires:  perl(parent)
-# Tests
+%if %{with_check}
 BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More)
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(ColorThemeBase::Static::FromStructColors) >= 0.006
 

@@ -18,7 +18,7 @@ BuildRequires:  perl(warnings)
 # Run-time
 BuildRequires:  perl(Exporter) >= 5.57
 BuildRequires:  perl(Regexp::Pattern::Perl::Module)
-# Tests
+%if %{with_check}
 BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(FindBin)
@@ -27,6 +27,7 @@ BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More) >= 0.98
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Exporter) >= 5.57
 

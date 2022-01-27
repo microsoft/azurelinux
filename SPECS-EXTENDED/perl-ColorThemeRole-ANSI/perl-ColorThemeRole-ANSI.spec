@@ -18,13 +18,14 @@ BuildRequires:  perl(warnings)
 # Run-time
 BuildRequires:  perl(ColorThemeUtil::ANSI)
 BuildRequires:  perl(Role::Tiny)
-# Tests
+%if %{with_check}
 BuildRequires:  perl(blib)
 BuildRequires:  perl(ColorTheme::Test::Static)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More) >= 0.98
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
