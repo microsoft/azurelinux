@@ -124,15 +124,10 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--output=$(cached_file) && \
 	touch $@
 
-graphscrubber_extra_flags :=
-ifeq ($(HYDRATED_BUILD), y)
-graphscrubber_extra_flags += --hydrated-build
-endif
-
 $(scrubbed_file): $(cached_file) $(go-graphscrubber)
 	$(go-graphscrubber) \
 		--input=$(graph_file) \
-		$(graphscrubber_extra_flags) \
+		$(if $(filter y,$(HYDRATED_BUILD)),--hydrated-build) \
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
