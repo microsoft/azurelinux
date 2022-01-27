@@ -14,7 +14,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
-Source3:        cbl-mariner-ca-20210127.pem
+Source3:        cbl-mariner-ca-20211013.pem
 Patch1:         0002-add-linux-syscall-license-info.patch
 Patch2:         0003-realtime20.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
