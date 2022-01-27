@@ -1,6 +1,6 @@
 Name:           perl-Archive-Zip
 Version:        1.67
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Perl library for accessing Zip archives
 # lib/Archive/Zip/Member.pm:    (GPL+ or Artistic) and BSD
 #                               (The _mapPermissionsToUnix() comments are
@@ -15,6 +15,7 @@ BuildArch:      noarch
 # For a Git binary patch
 BuildRequires:  git-core
 BuildRequires:  make
+BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
@@ -99,6 +100,9 @@ make pure_install DESTDIR=$RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.67-4
+- Adding 'BuildRequires: perl-generators'.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.67-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Explicitly provide perl(Archive::*).

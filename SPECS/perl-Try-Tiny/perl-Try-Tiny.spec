@@ -1,7 +1,7 @@
 Summary:        Minimal try/catch with proper preservation of $@
 Name:           perl-Try-Tiny
 Version:        0.30
-Release:        5%{?dist}
+Release:        6%{?dist}
 URL:            https://metacpan.org/release/Try-Tiny
 License:        MIT
 Group:          Development/Libraries
@@ -11,6 +11,7 @@ Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-%{versi
 
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Sub::Util)
@@ -41,6 +42,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.30-6
+-   Adding 'BuildRequires: perl-generators'.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.30-5
 -   Use new perl package names.
 -   Build with NO_PACKLIST option.

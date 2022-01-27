@@ -114,16 +114,16 @@ rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.10.78.1 API Headers
-tar xf kernel-5.10.78.1.tar.gz
-cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1/
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
+echo Linux-5.15.2.1 API Headers
+tar xf kernel-5.15.2.1.tar.gz
+cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1/
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1
 patch -p1 -i 0002-add-linux-syscall-license-info.patch
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
@@ -502,15 +502,15 @@ rm -rf perl-5.32.0
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
-echo Python-3.9.9
-tar xf Python-3.9.9.tar.xz
-pushd Python-3.9.9
+echo Python-3.9.10
+tar xf Python-3.9.10.tar.xz
+pushd Python-3.9.10
 sed -i '/def add_multiarch_paths/a \        return' setup.py
 ./configure --prefix=/tools --without-ensurepip --enable-shared
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.9.9
+rm -rf Python-3.9.10
 
 touch $LFS/logs/temptoolchain/status_python_complete
 

@@ -23,10 +23,14 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Get Python dependencies
+        run: python3 -m pip install python-rpm-spec
+
       - name: Run license map checking script
         run: |
-          python3 ./toolkit/scripts/licenses/license_map.py \
+          python3 ./toolkit/scripts/license_map.py \
           ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
           ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
           ./SPECS \
+          ./SPECS-EXTENDED \
           ./SPECS-SIGNED

@@ -1,0 +1,13 @@
+--- ounit-v2.2.4.old/src/lib/ounit2/threads/oUnitRunnerThreads.ml	2021-03-01 21:14:43.656815139 +0000
++++ ounit-v2.2.4/src/lib/ounit2/threads/oUnitRunnerThreads.ml	2020-12-19 23:59:04.000000000 +0000
+@@ -143,8 +143,8 @@
+         Mutex.lock worker_finished_mutex
+       done;
+       if not !worker_finished then begin
+-        (* This will fail... because probably not implemented. *)
+-        Thread.kill thread;
++        (* This will fail... because probably not implemented.
++         Thread.kill thread; *)
+         worker_finished := true;
+         Condition.broadcast worker_finished_cond
+       end;

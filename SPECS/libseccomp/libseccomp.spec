@@ -1,13 +1,14 @@
 Summary:        Enhanced seccomp library
 Name:           libseccomp
-Version:        2.4.1
-Release:        4%{?dist}
+Version:        2.5.3
+Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/seccomp/libseccomp/wiki
 Source0:        https://github.com/seccomp/libseccomp/releases/download/v%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  gperf
 %if %{with_check}
 BuildRequires:  which
 %endif
@@ -52,6 +53,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files devel
 %{_includedir}/seccomp.h
+%{_includedir}/seccomp-syscalls.h
 %{_libdir}/libseccomp.so
 %{_libdir}/libseccomp.a
 %{_libdir}/pkgconfig/libseccomp.pc
@@ -60,6 +62,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 2.5.3-1
+- Upgrade to version 2.5.3
+- Add gperf as BR
+- Add /usr/include/seccomp-syscalls.h to libseccomp-devel package
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.1-4
 - Remove pkgconfig provides (no longer necessary)
 - Require base package from devel subpackage

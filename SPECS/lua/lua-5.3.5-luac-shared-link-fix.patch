@@ -1,0 +1,54 @@
+diff -up lua-5.3.5/src/lopcodes.c.luac-shared lua-5.3.5/src/lopcodes.c
+--- lua-5.3.5/src/lopcodes.c.luac-shared	2019-10-23 15:36:44.487204487 -0400
++++ lua-5.3.5/src/lopcodes.c	2019-10-23 15:37:44.029960930 -0400
+@@ -17,7 +17,7 @@
+ 
+ /* ORDER OP */
+ 
+-LUAI_DDEF const char *const luaP_opnames[NUM_OPCODES+1] = {
++LUA_API const char *const luaP_opnames[NUM_OPCODES+1] = {
+   "MOVE",
+   "LOADK",
+   "LOADKX",
+@@ -71,7 +71,7 @@ LUAI_DDEF const char *const luaP_opnames
+ 
+ #define opmode(t,a,b,c,m) (((t)<<7) | ((a)<<6) | ((b)<<4) | ((c)<<2) | (m))
+ 
+-LUAI_DDEF const lu_byte luaP_opmodes[NUM_OPCODES] = {
++LUA_API const lu_byte luaP_opmodes[NUM_OPCODES] = {
+ /*       T  A    B       C     mode		   opcode	*/
+   opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_MOVE */
+  ,opmode(0, 1, OpArgK, OpArgN, iABx)		/* OP_LOADK */
+diff -up lua-5.3.5/src/lopcodes.h.luac-shared lua-5.3.5/src/lopcodes.h
+--- lua-5.3.5/src/lopcodes.h.luac-shared	2019-10-23 15:37:52.982773948 -0400
++++ lua-5.3.5/src/lopcodes.h	2019-10-23 15:38:17.861254367 -0400
+@@ -278,7 +278,7 @@ enum OpArgMask {
+   OpArgK   /* argument is a constant or register/constant */
+ };
+ 
+-LUAI_DDEC const lu_byte luaP_opmodes[NUM_OPCODES];
++LUA_API const lu_byte luaP_opmodes[NUM_OPCODES];
+ 
+ #define getOpMode(m)	(cast(enum OpMode, luaP_opmodes[m] & 3))
+ #define getBMode(m)	(cast(enum OpArgMask, (luaP_opmodes[m] >> 4) & 3))
+@@ -287,7 +287,7 @@ LUAI_DDEC const lu_byte luaP_opmodes[NUM
+ #define testTMode(m)	(luaP_opmodes[m] & (1 << 7))
+ 
+ 
+-LUAI_DDEC const char *const luaP_opnames[NUM_OPCODES+1];  /* opcode names */
++LUA_API const char *const luaP_opnames[NUM_OPCODES+1];  /* opcode names */
+ 
+ 
+ /* number of list items to accumulate before a SETLIST instruction */
+diff -up lua-5.3.5/src/lundump.h.luac-shared lua-5.3.5/src/lundump.h
+--- lua-5.3.5/src/lundump.h.luac-shared	2019-10-23 15:38:46.707651903 -0400
++++ lua-5.3.5/src/lundump.h	2019-10-23 15:39:07.044227180 -0400
+@@ -26,7 +26,7 @@
+ LUAI_FUNC LClosure* luaU_undump (lua_State* L, ZIO* Z, const char* name);
+ 
+ /* dump one chunk; from ldump.c */
+-LUAI_FUNC int luaU_dump (lua_State* L, const Proto* f, lua_Writer w,
++LUA_API int luaU_dump (lua_State* L, const Proto* f, lua_Writer w,
+                          void* data, int strip);
+ 
+ #endif

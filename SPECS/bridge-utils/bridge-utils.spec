@@ -1,7 +1,7 @@
 Summary:      Utilities for configuring and managing bridge devices
 Name:         bridge-utils
-Version:      1.6
-Release:      4%{?dist}
+Version:      1.7.1
+Release:      1%{?dist}
 License:      GPLv2+
 URL:          https://wiki.linuxfoundation.org/networking/bridge
 Group:        System Environment/Base
@@ -27,6 +27,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man8/*
 
 %changelog
+* Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.7.1-1
+- Upgrade to 1.7.1
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6-4
 - Added %%license line automatically
 

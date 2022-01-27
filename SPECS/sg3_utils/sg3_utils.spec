@@ -1,7 +1,7 @@
 Summary:        Tools and Utilities for interaction with SCSI devices.
 Name:           sg3_utils
-Version:        1.44
-Release:        3%{?dist}
+Version:        1.46
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,16 +45,20 @@ install -m 755 scripts/rescan-scsi-bus.sh %{buildroot}/%{_bindir}
 %license COPYING
 %{_bindir}/*
 %{_mandir}/*
-%{_libdir}/libsgutils2.so.*
 
 %files -n libsg3_utils-devel
 %defattr(-,root,root)
 %{_libdir}/libsgutils2.a
 %{_libdir}/libsgutils2.la
 %{_libdir}/libsgutils2.so
+%{_libdir}/libsgutils2-1.46.so.2
+%{_libdir}/libsgutils2-1.46.so.2.0.0
 %{_includedir}/scsi/*
 
 %changelog
+* Tue Jan 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.46-1
+- Update to version 1.46
+
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 1.44-3
 - Provide sg3_utils-devel and sg3_utils-libs.
 

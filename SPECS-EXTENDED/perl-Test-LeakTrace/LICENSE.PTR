@@ -1,0 +1,8 @@
+License information taken from Makefile.PL:
+
+(...)
+    NAME         => 'Test::LeakTrace',
+    VERSION_FROM => 'lib/Test/LeakTrace.pm',
+        AUTHOR       => 'FUJI Goro',
+    LICENSE      => 'perl',
+...

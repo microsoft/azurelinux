@@ -2,7 +2,7 @@
 Summary:        YAML Ain't Markup Language (tm)
 Name:           perl-YAML
 Version:        1.26
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML/
@@ -11,6 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(B::Deparse)
 Requires:       perl(Carp)
@@ -104,6 +105,10 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/YAML::Types.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-6
+- Adding 'BuildRequires: perl-generators'.
+- License verified.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.26-5
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.26-4: Adding 'local::lib' perl5 library to fix test dependencies.

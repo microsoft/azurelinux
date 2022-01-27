@@ -1,7 +1,7 @@
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
-Version:        1.16.6
-Release:        4%{?dist}
+Version:        1.22.0
+Release:        1%{?dist}
 # The custom license is inside numpy/core/src/multiarray/dragon4.c.
 License:        BSD AND ZLIB custom
 Vendor:         Microsoft Corporation
@@ -9,14 +9,14 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://numpy.org/
 Source0:        https://github.com/numpy/numpy/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         fix-setup-py-install.patch
-Patch1:         CVE-2021-41496.patch
 BuildRequires:  lapack-devel
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildRequires:  python3-libs
 BuildRequires:  unzip
+BuildRequires:  python3-Cython >= 0.29.24
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
@@ -47,10 +47,6 @@ This package includes a version of f2py that works properly with NumPy.
 %autosetup -p1
 
 %build
-# xlocale.h has been removed from glibc 2.26
-# The above include of locale.h is sufficient
-# Further details: https://sourceware.org/git/?p=glibc.git;a=commit;h=f0be25b6336db7492e47d2e8e72eb8af53b5506d */
-sed -i "/xlocale.h/d" numpy/core/src/common/numpyos.c
 %py3_build
 
 %install
@@ -74,6 +70,9 @@ rm -rf test
 %{_bindir}/f2py%{python3_version}
 
 %changelog
+* Thu Jan 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.22.0-1
+- Update version to 1.22.0 fix CVE-2021-34141.
+
 * Tue Dec 28 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.16.6-4
 - Backported upstream patch for CVE-2021-41496
 

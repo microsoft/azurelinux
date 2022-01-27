@@ -1,0 +1,5 @@
+%lua_version %{lua: print(string.sub(_VERSION, 5))}
+
+%lua_requires \
+Requires: lua(abi) = %{lua_version} \
+%{nil}
