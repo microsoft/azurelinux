@@ -10300,6 +10300,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblzf",
+          "version": "3.6",
+          "downloadUrl": "http://dist.schmorp.de/liblzf/liblzf-3.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmad",
           "version": "0.15.1b",
           "downloadUrl": "http://download.sourceforge.net/mad/libmad-0.15.1b.tar.gz"
@@ -16906,6 +16916,16 @@
           "name": "perl-Convert-Bencode",
           "version": "1.03",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Convert/Convert-Bencode-1.03.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Coro-Multicore",
+          "version": "1.07",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-1.07.tar.gz"
         }
       }
     },

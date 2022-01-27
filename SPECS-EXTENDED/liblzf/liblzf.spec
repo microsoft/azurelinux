@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           liblzf
 Version:        3.6
-Release:        22%{?dist}
+Release:        23%{?dist}
 Summary:        Small data compression library
 
 License:        BSD or GPLv2+
@@ -75,6 +75,9 @@ rm -f %{buildroot}%{_libdir}/liblzf.la
 %{_libdir}/pkgconfig/liblzf.pc
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-23
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.6-22
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

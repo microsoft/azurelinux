@@ -5,7 +5,7 @@ Distribution:   Mariner
 %global debug_package %{nil}
 Name:       libecb
 Version:    0.%{snapshot}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Compiler built-ins
 License:    BSD or GPLv2+
 URL:        http://software.schmorp.de/pkg/libecb.html
@@ -57,6 +57,9 @@ install -m 0644 -t %{buildroot}%{_mandir}/man3 *.3
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20211217-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Fri Dec 17 2021 Petr Pisar <ppisar@redhat.com> - 0.20211217-1
 - CVS snapshot taken on 20211217 (Fedora patches merged)
 

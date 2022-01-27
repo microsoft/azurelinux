@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 Name:           perl-Coro-Multicore
 Version:        1.07
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Make Coro threads on multiple cores with specially supported modules
 # COPYING:          GPL+ or Artistic
 # perlmulticore.h:  Public Domain or CC0
@@ -161,6 +161,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.07-3
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Wed Aug 04 2021 Petr Pisar <ppisar@redhat.com> - 1.07-2
 - Do not package Coro::Multicore tests in case coro feature is disabled
 
