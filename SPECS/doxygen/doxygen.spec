@@ -1,6 +1,6 @@
 Name:           doxygen
 Version:        1.8.17
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Automated C, C++, and Java Documentation Generator
 License:        GPL
 Group:          Development/Tools/Doc Generators
@@ -17,7 +17,7 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  python3
 BuildRequires:  python3-xml
-BuildRequires:  python-defusedxml
+BuildRequires:  python3-defusedxml
 Obsoletes:      doxygen-doc
 
 %description
