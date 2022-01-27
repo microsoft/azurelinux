@@ -714,7 +714,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
 - Bump release number to match kernel-signed update
 
-* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+* Tue May 18 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
 - Update CONFIG_LD_VERSION for binutils 2.36.1
 - Remove build-id match check
 
