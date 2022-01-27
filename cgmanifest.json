@@ -2027,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "colm",
-          "version": "0.13.0.7",
-          "downloadUrl": "https://www.colm.net/files/colm/colm-0.13.0.7.tar.gz"
+          "version": "0.14.7",
+          "downloadUrl": "https://github.com/adrian-thurston/colm/archive/0.14.7.tar.gz"
         }
       }
     },
@@ -23313,16 +23313,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-kubernetes",
-          "version": "11.0.0",
-          "downloadUrl": "https://github.com/kubernetes-client/python/archive/v11.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-lazy-object-proxy",
           "version": "1.4.3",
           "downloadUrl": "https://github.com/ionelmc/python-lazy-object-proxy/archive/v1.4.3/lazy-object-proxy-1.4.3.tar.gz"
@@ -25354,8 +25344,8 @@
         "type": "other",
         "other": {
           "name": "ragel",
-          "version": "7.0.0.12",
-          "downloadUrl": "https://www.colm.net/files/ragel/ragel-7.0.0.12.tar.gz"
+          "version": "7.0.4",
+          "downloadUrl": "https://github.com/adrian-thurston/ragel/archive/7.0.4.tar.gz"
         }
       }
     },
