@@ -16713,6 +16713,46 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Color-ANSI-Util",
+          "version": "0.164",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-ANSI-Util-0.164.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeBase-Static",
+          "version": "0.008",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeBase-Static-0.008.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeRole-ANSI",
+          "version": "0.001",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeRole-ANSI-0.001.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemes-Standard",
+          "version": "0.003",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemes-Standard-0.003.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-common-sense",
           "version": "3.74",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-3.74.tar.gz"
@@ -17923,6 +17963,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Graphics-ColorNamesLite-WWW",
+          "version": "1.14.000",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Graphics-ColorNamesLite-WWW-1.14.000.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-GSSAPI",
           "version": "0.28",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AG/AGROLMS/GSSAPI-0.28.tar.gz"
@@ -18286,6 +18336,16 @@
           "name": "perl-JSON-Color",
           "version": "0.133",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-0.133.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-JSON-MaybeXS",
+          "version": "1.004003",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004003.tar.gz"
         }
       }
     },
@@ -18716,6 +18776,16 @@
           "name": "perl-Module-Install-TestBase",
           "version": "0.86",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Install-TestBase-0.86.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Module-Load-Util",
+          "version": "0.006",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Module-Load-Util-0.006.tar.gz"
         }
       }
     },
