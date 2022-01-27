@@ -141,8 +141,7 @@ popd
 
 find %{buildroot} -name '*.pyc' -delete
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license COPYING
