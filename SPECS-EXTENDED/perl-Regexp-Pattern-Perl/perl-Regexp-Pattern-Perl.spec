@@ -1,13 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Regexp patterns related to Perl
 Name:           perl-Regexp-Pattern-Perl
 Version:        0.006
 Release:        2%{?dist}
-Summary:        Regexp patterns related to Perl
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Regexp-Pattern-Perl/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-%{version}.tar.gz
+
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
@@ -15,13 +17,15 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+
 %if %{with_check}
-BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(blib)
 %endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
@@ -32,11 +36,11 @@ Regexp::Pattern is a convention for organizing reusable regex patterns.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
 unset AUTHOR_TESTING RELEASE_TESTING

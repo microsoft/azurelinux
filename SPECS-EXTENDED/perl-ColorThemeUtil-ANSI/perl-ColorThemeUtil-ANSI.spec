@@ -1,37 +1,41 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
+%global __requires_exclude %{?__requires_exclude}|perl\\(Color::ANSI::Util\\)\\s*$
+
+Summary:        Utility routines related to color themes and ANSI code
 Name:           perl-ColorThemeUtil-ANSI
 Version:        0.002
 Release:        4%{?dist}
-Summary:        Utility routines related to color themes and ANSI code
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/ColorThemeUtil-ANSI/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeUtil-ANSI-%{version}.tar.gz
+
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.10.1
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
 # Run-time
 BuildRequires:  perl(Color::ANSI::Util) >= 0.164
 BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 %if %{with_check}
-BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More) >= 0.98
+BuildRequires:  perl(blib)
 %endif
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Color::ANSI::Util) >= 0.161
 Requires:       perl(Exporter) >= 5.57
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
-%global __requires_exclude %{?__requires_exclude}|perl\\(Color::ANSI::Util\\)\\s*$
 
 %description
 This module provides utility routines related to color themes and ANSI
@@ -42,11 +46,11 @@ code.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
 unset AUTHOR_TESTING

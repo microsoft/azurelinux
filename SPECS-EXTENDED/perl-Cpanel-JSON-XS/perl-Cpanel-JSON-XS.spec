@@ -1,58 +1,59 @@
+Summary:        JSON::XS for Cpanel, fast and correct serializing
+Name:           perl-Cpanel-JSON-XS
+Version:        4.27
+Release:        2%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://metacpan.org/release/Cpanel-JSON-XS
+Source0:        https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
+Patch0:         Cpanel-JSON-XS-4.20-signature.patch
 
-Name:		perl-Cpanel-JSON-XS
-Summary:	JSON::XS for Cpanel, fast and correct serializing
-Version:	4.27
-Release:	2%{?dist}
-License:	GPL+ or Artistic
-URL:		https://metacpan.org/release/Cpanel-JSON-XS
-Source0:	https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
-Patch0:		Cpanel-JSON-XS-4.20-signature.patch
 # Module Build
-BuildRequires:	coreutils
-BuildRequires:	findutils
-BuildRequires:	gcc
-BuildRequires:	make
-BuildRequires:	perl-devel
-BuildRequires:	perl-generators
-BuildRequires:	perl-interpreter
-BuildRequires:	perl(Config)
-BuildRequires:	perl(ExtUtils::MakeMaker)
-# Module Runtime
-BuildRequires:	perl(Carp)
-BuildRequires:	perl(Exporter)
-BuildRequires:	perl(overload)
-BuildRequires:	perl(Scalar::Util)
-BuildRequires:	perl(strict)
-BuildRequires:	perl(warnings)
-BuildRequires:	perl(XSLoader)
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 # Script Runtime
-BuildRequires:	perl(CBOR::XS)
-BuildRequires:	perl(Compress::LZF)
-BuildRequires:	perl(Convert::Bencode)
-BuildRequires:	perl(CPAN::Meta::YAML)
-BuildRequires:	perl(Data::Dump)
-BuildRequires:	perl(YAML)
-BuildRequires:	perl(YAML::Syck)
-BuildRequires:	perl(YAML::XS)
+BuildRequires:  perl(CBOR::XS)
+BuildRequires:  perl(CPAN::Meta::YAML)
+# Module Runtime
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Compress::LZF)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Convert::Bencode)
+BuildRequires:  perl(Data::Dump)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(XSLoader)
+BuildRequires:  perl(YAML)
+BuildRequires:  perl(YAML::Syck)
+BuildRequires:  perl(YAML::XS)
+BuildRequires:  perl(overload)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 %if %{with_check}
-BuildRequires:	perl(B)
-BuildRequires:	perl(charnames)
-BuildRequires:	perl(constant)
-BuildRequires:	perl(Data::Dumper)
-BuildRequires:	perl(Devel::Peek)
-BuildRequires:	perl(Encode) >= 1.9081
-BuildRequires:	perl(lib)
-BuildRequires:	perl(POSIX)
-BuildRequires:	perl(Test)
-BuildRequires:	perl(Test::More) >= 0.88
-BuildRequires:	perl(Test::Simple)
-BuildRequires:	perl(threads)
-BuildRequires:	perl(threads::shared) >= 1.21
-BuildRequires:	perl(Tie::Array)
-BuildRequires:	perl(Tie::Hash)
-BuildRequires:	perl(utf8)
+BuildRequires:  perl(B)
+BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(Devel::Peek)
+BuildRequires:  perl(Encode) >= 1.9081
+BuildRequires:  perl(POSIX)
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(Test::Simple)
+BuildRequires:  perl(Tie::Array)
+BuildRequires:  perl(Tie::Hash)
+BuildRequires:  perl(charnames)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(threads)
+BuildRequires:  perl(threads::shared) >= 1.21
+BuildRequires:  perl(utf8)
 # Optional Tests
 # Cycle: perl-Cpanel-JSON-XS → perl-Test-LeakTrace → perl-Module-Install
 # → perl-YAML-Tiny → perl-JSON-MaybeXS → perl-Cpanel-JSON-XS
@@ -64,51 +65,51 @@ BuildRequires:	perl(utf8)
 # Cycle: perl-Cpanel-JSON-XS → perl-Test-Kwalitee → perl-Module-CPANTS-Analyse
 # → perl-JSON-MaybeXS → perl-Cpanel-JSON-XS
 %if !%{defined perl_bootstrap}
-BuildRequires:	perl(common::sense) >= 3.5
-BuildRequires:	perl(Hash::Util)
-BuildRequires:	perl(JSON) >= 2.09
-BuildRequires:	perl(JSON::PP) >= 2.09
-BuildRequires:	perl(JSON::XS)
-BuildRequires:	perl(Math::BigFloat) >= 1.16
-BuildRequires:	perl(Math::BigInt)
-BuildRequires:	perl(Mojo::JSON) >= 6.11
-BuildRequires:	perl(Test::LeakTrace)
-BuildRequires:	perl(Tie::IxHash)
-BuildRequires:	perl(Time::Piece)
 # Maintainer Tests (Test::Spelling intentionally omitted as associated test would fail due to various technical terms)
-BuildRequires:	perl(Class::XSAccessor)
-BuildRequires:	perl(List::MoreUtils)
-BuildRequires:	perl(Perl::MinimumVersion) >= 1.20
-BuildRequires:	perl(Pod::Spell::CommonMistakes)
-BuildRequires:	perl(Test::CheckChanges)
-BuildRequires:	perl(Test::CPAN::Changes)
-BuildRequires:	perl(Test::CPAN::Meta) >= 0.12
-BuildRequires:	perl(Test::Kwalitee)
-BuildRequires:	perl(Test::MinimumVersion) >= 0.008
-BuildRequires:	perl(Test::Pod) >= 1.00
-BuildRequires:	perl(Test::Pod::Coverage) >= 1.04
-BuildRequires:	perl(Text::CSV_XS)
+BuildRequires:  perl(Class::XSAccessor)
+BuildRequires:  perl(Hash::Util)
+BuildRequires:  perl(JSON) >= 2.09
+BuildRequires:  perl(JSON::PP) >= 2.09
+BuildRequires:  perl(JSON::XS)
+BuildRequires:  perl(List::MoreUtils)
+BuildRequires:  perl(Math::BigFloat) >= 1.16
+BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Mojo::JSON) >= 6.11
+BuildRequires:  perl(Perl::MinimumVersion) >= 1.20
+BuildRequires:  perl(Pod::Spell::CommonMistakes)
+BuildRequires:  perl(Test::CPAN::Changes)
+BuildRequires:  perl(Test::CPAN::Meta) >= 0.12
+BuildRequires:  perl(Test::CheckChanges)
+BuildRequires:  perl(Test::Kwalitee)
+BuildRequires:  perl(Test::LeakTrace)
+BuildRequires:  perl(Test::MinimumVersion) >= 0.008
+BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:  perl(Test::Pod::Coverage) >= 1.04
+BuildRequires:  perl(Text::CSV_XS)
+BuildRequires:  perl(Tie::IxHash)
+BuildRequires:  perl(Time::Piece)
+BuildRequires:  perl(common::sense) >= 3.5
 %endif
 %endif
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:	perl(Carp)
-Requires:	perl(overload)
-Requires:	perl(Scalar::Util)
-Suggests:	perl(CBOR::XS)
-Recommends:	perl(Math::BigFloat) >= 1.16
-Recommends:	perl(Math::BigInt)
-Suggests:	perl(Bencode)
-Suggests:	perl(Compress::LZF)
-Suggests:	perl(CPAN::Meta::YAML)
-Suggests:	perl(Data::Dump)
-Suggests:	perl(Data::Dumper)
-Suggests:	perl(Sereal::Decoder)
-Suggests:	perl(Sereal::Encoder)
-Suggests:	perl(YAML)
-Suggests:	perl(YAML::Syck)
-Suggests:	perl(YAML::XS)
 
+# Runtime
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Carp)
+Requires:       perl(Scalar::Util)
+Requires:       perl(overload)
+Recommends:     perl(Math::BigFloat) >= 1.16
+Recommends:     perl(Math::BigInt)
+Suggests:       perl(Bencode)
+Suggests:       perl(CBOR::XS)
+Suggests:       perl(CPAN::Meta::YAML)
+Suggests:       perl(Compress::LZF)
+Suggests:       perl(Data::Dump)
+Suggests:       perl(Data::Dumper)
+Suggests:       perl(Sereal::Decoder)
+Suggests:       perl(Sereal::Encoder)
+Suggests:       perl(YAML)
+Suggests:       perl(YAML::Syck)
+Suggests:       perl(YAML::XS)
 # Avoid unwanted provides and dependencies
 %{?perl_default_filter}
 

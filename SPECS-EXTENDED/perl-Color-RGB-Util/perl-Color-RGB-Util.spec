@@ -1,39 +1,43 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
+
+Summary:        Utilities related to RGB colors
 Name:           perl-Color-RGB-Util
 Version:        0.606
 Release:        2%{?dist}
-Summary:        Utilities related to RGB colors
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Color-RGB-Util/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-RGB-Util-%{version}.tar.gz
+
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.10.1
 BuildRequires:  perl(Config)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
 # Run-time
 BuildRequires:  perl(Digest::SHA)
 BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 %if %{with_check}
-BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More) >= 0.98
 BuildRequires:  perl(Test::RandomResult)
+BuildRequires:  perl(blib)
 %endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Digest::SHA)
 Requires:       perl(Exporter) >= 5.57
-
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
 
 %description
 This module contains utilities related to RGB colors.
@@ -58,10 +62,10 @@ done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 %{_fixperms} %{buildroot}/*
 
 # Install tests
