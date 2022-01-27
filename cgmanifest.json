@@ -16723,6 +16723,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Color-RGB-Util",
+          "version": "0.606",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-RGB-Util-0.606.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-ColorThemeBase-Static",
           "version": "0.008",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeBase-Static-0.008.tar.gz"
@@ -16746,6 +16756,16 @@
           "name": "perl-ColorThemes-Standard",
           "version": "0.003",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemes-Standard-0.003.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeUtil-ANSI",
+          "version": "0.002",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeUtil-ANSI-0.002.tar.gz"
         }
       }
     },
@@ -16886,6 +16906,16 @@
           "name": "perl-CPAN-Meta-Check",
           "version": "0.014",
           "downloadUrl": "http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-0.014.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Cpanel-JSON-XS",
+          "version": "4.27",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-4.27.tar.gz"
         }
       }
     },
@@ -19656,6 +19686,16 @@
           "name": "perl-Ref-Util-XS",
           "version": "0.117",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/X/XS/XSAWYERX/Ref-Util-XS-0.117.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Regexp-Pattern-Perl",
+          "version": "0.006",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-0.006.tar.gz"
         }
       }
     },

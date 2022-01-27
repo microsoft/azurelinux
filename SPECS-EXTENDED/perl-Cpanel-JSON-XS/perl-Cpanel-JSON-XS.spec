@@ -10,7 +10,7 @@ Distribution:   Mariner
 Name:		perl-Cpanel-JSON-XS
 Summary:	JSON::XS for Cpanel, fast and correct serializing
 Version:	4.27
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL+ or Artistic
 URL:		https://metacpan.org/release/Cpanel-JSON-XS
 Source0:	https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
@@ -183,6 +183,9 @@ make test
 %{_mandir}/man3/Cpanel::JSON::XS::Type.3*
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.27-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Fri Oct 15 2021 Paul Howarth <paul@city-fan.org> - 4.27-1
 - Update to 4.27
   - Only add -Werror=declaration-after-statement for 5.035004 and earlier

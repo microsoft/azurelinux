@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Color-RGB-Util
 Version:        0.606
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Utilities related to RGB colors
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Color-RGB-Util/
@@ -88,6 +88,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.606-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Fri Aug 06 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.606-1
 - 0.606 bump
 

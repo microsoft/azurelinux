@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-ColorThemeUtil-ANSI
 Version:        0.002
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Utility routines related to color themes and ANSI code
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/ColorThemeUtil-ANSI/
@@ -58,6 +58,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.002-4
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.002-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

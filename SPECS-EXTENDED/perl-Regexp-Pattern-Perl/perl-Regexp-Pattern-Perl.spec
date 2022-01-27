@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Regexp-Pattern-Perl
 Version:        0.006
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Regexp patterns related to Perl
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Regexp-Pattern-Perl/
@@ -48,6 +48,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.006-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Mon Dec 20 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.006-1
 - 0.006 bump
 
