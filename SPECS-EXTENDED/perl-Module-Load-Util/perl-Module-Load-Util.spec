@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Module-Load-Util
 Version:        0.006
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Some utility routines related to module loading
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Module-Load-Util/
@@ -89,6 +89,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.006-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Fri Oct 01 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.006-1
 - 0.006 bump
 

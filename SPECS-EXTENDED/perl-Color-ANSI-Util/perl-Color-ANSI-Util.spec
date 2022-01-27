@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Color-ANSI-Util
 Version:        0.164
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Routines for dealing with ANSI colors
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Color-ANSI-Util/
@@ -64,6 +64,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.164-6
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.164-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

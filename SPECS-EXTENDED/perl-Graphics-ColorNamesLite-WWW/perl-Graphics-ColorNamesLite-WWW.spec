@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Graphics-ColorNamesLite-WWW
 Version:        1.14.000
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        WWW color names and equivalent RGB values
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Graphics-ColorNamesLite-WWW/
@@ -47,6 +47,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.000-6
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.000-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

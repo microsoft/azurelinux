@@ -11,7 +11,7 @@ Distribution:   Mariner
 Name:		perl-JSON-MaybeXS
 Summary:	Use Cpanel::JSON::XS with a fallback to JSON::XS and JSON::PP
 Version:	1.004003
-Release:	4%{?dist}
+Release:	5%{?dist}
 License:	GPL+ or Artistic
 URL:		https://metacpan.org/release/JSON-MaybeXS
 Source0:	https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-%{version}.tar.gz
@@ -84,6 +84,9 @@ make test
 %{_mandir}/man3/JSON::MaybeXS.3*
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.004003-5
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.004003-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
