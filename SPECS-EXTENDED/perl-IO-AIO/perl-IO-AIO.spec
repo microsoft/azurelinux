@@ -11,7 +11,7 @@ Name:		perl-IO-AIO
 Version:	%{upstream_version}%{extraversion}
 Release:	2%{?dist}
 Summary:	Asynchronous Input/Output
-License:	GPLv2+
+License:        GPL+ or Artistic
 URL:		https://metacpan.org/release/IO-AIO
 Source0:	https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-%{upstream_version}.tar.gz
 Patch0:		IO-AIO-4.4-shellbang.patch
@@ -104,6 +104,7 @@ make test
 %changelog
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.76-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Wed Jul 28 2021 Paul Howarth <paul@city-fan.org> - 4.76-1
 - Update to 4.76
