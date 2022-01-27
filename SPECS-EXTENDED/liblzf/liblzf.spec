@@ -1,36 +1,30 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Small data compression library
 Name:           liblzf
 Version:        3.6
 Release:        23%{?dist}
-Summary:        Small data compression library
-
-License:        BSD or GPLv2+
+License:        BSD OR GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://oldhome.schmorp.de/marc/liblzf.html
 Source0:        http://dist.schmorp.de/liblzf/liblzf-%{version}.tar.gz
 # Adds autoconf and in particular support for building shared libraries.
-# 7th Feb 2011 - Mail sent upstream to author. Awaiting conclusion. 
+# 7th Feb 2011 - Mail sent upstream to author. Awaiting conclusion.
 Patch0:         liblzf-%{version}-autoconf-20140314.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
-BuildRequires: make
+BuildRequires:  make
 
 %description
-LibLZF is a very small data compression library. It consists 
-of only two .c and two .h files and is very easy to 
-incorporate into your own programs.  The compression algorithm 
+LibLZF is a very small data compression library. It consists
+of only two .c and two .h files and is very easy to
+incorporate into your own programs.  The compression algorithm
 is very, very fast, yet still written in portable C.
 
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%if 0%{?el4}%{?el5}
-Requires:       pkgconfig
-%endif
-
 
 %description    devel
 The liblzf-devel package contains libraries and header files for

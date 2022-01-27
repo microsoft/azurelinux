@@ -1,14 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global         underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 # Do not create debuginfo sub-package because there is no binary executable
 %global debug_package %{nil}
-Name:       libecb
-Version:    9.30
-Release:    1%{?dist}
-Summary:    Compiler built-ins
-License:    BSD or GPLv2+
-URL:        http://software.schmorp.de/pkg/libecb.html
+
+Summary:        Compiler built-ins
+Name:           libecb
+Version:        9.30
+Release:        1%{?dist}
+License:        BSD OR GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://software.schmorp.de/pkg/libecb.html
 # Below link points to the correct revision of the sources but doesn't give tarballs with reproducible hashes.
 # How to re-build this file for CBL-Mariner in a reproducible way:
 #   1. cvs -d :pserver:anonymous@cvs.schmorp.de/schmorpforge export -r rxvt-unicode-rel-%%{underscore_version} %%{name}
@@ -24,7 +25,8 @@ URL:        http://software.schmorp.de/pkg/libecb.html
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source0:    http://cvs.schmorp.de/libecb/?view=tar&pathrev=rxvt-unicode-rel-%{underscore_version}#/%{name}-%{version}.tar.gz
+Source0:        http://cvs.schmorp.de/libecb/?view=tar&pathrev=rxvt-unicode-rel-%{underscore_version}#/%{name}-%{version}.tar.gz
+
 BuildRequires:  coreutils
 BuildRequires:  perl-podlators
 
@@ -36,16 +38,15 @@ noinline, assume, unreachable and so on.
 This is a dummy package. All the useful files are delivered by %{name}-devel
 package.
 
-
 %package devel
-Summary:    Compiler built-ins
+Summary:        Compiler built-ins
 # Packaging guidelines require header-only packages:
 # to be architecture-specific, to deliver headers in -devel package, to
 # provide -static symbol for reverse build-requires.
 # Replace libecb package:
-Provides:   libecb-static = %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:   libecb = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes:  libecb < 0.20150218
+Provides:       libecb-static = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       libecb = %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes:      libecb < 0.20150218
 
 %description devel
 This project delivers you many GCC built-ins, attributes and a number of
@@ -60,7 +61,7 @@ pod2man ecb.pod > ecb.3
 
 %install
 install -d %{buildroot}%{_includedir}
-install -m 0644 -t %{buildroot}%{_includedir} *.h 
+install -m 0644 -t %{buildroot}%{_includedir} *.h
 install -d %{buildroot}%{_mandir}/man3
 install -m 0644 -t %{buildroot}%{_mandir}/man3 *.3
 
@@ -173,4 +174,3 @@ install -m 0644 -t %{buildroot}%{_mandir}/man3 *.3
 * Mon Oct 08 2012 Petr Pisar <ppisar@redhat.com> - 0.20121008-1
 - CVS snapshot taken on 2012-10-08
 - Fix for building on big-endian systems (bug #863991)
-

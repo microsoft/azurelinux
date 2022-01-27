@@ -1,13 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+# Filter under-specified dependecies
+%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\((AnyEvent|Coro)\\)$
 
+Summary:        Make Coro threads on multiple cores with specially supported modules
 Name:           perl-Coro-Multicore
 Version:        1.07
 Release:        3%{?dist}
-Summary:        Make Coro threads on multiple cores with specially supported modules
 # COPYING:          GPL+ or Artistic
 # perlmulticore.h:  Public Domain or CC0
-License:        (GPL+ or Artistic) and (Public Domain or CC0)
+License:        (GPL+ OR Artistic) AND (Public Domain OR CC0)
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Coro-Multicore
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-%{version}.tar.gz
 # Declare POD encoding, submitted to upstream,
@@ -19,7 +21,6 @@ Patch0:         Coro-Multicore-0.02-Declare-POD-encoding.patch
 Patch1:         Coro-Multicore-1.04-Fix-passing-context.patch
 
 BuildRequires:  coreutils
-BuildRequires:  perl-podlators
 BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  make
@@ -27,13 +28,13 @@ BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-podlators
-BuildRequires:  perl(Canary::Stability)
-BuildRequires:  perl(Coro::MakeMaker)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Run-time:
 BuildRequires:  perl(AnyEvent) >= 7
+BuildRequires:  perl(Canary::Stability)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Coro) >= 6.44
+BuildRequires:  perl(Coro::MakeMaker)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(XSLoader)
 
 %if %{with_check}
@@ -44,9 +45,6 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(AnyEvent) >= 7
 Requires:       perl(Carp)
 Requires:       perl(Coro) >= 6.44
-
-# Filter under-specified dependecies
-%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\((AnyEvent|Coro)\\)$
 
 %description
 While Coro threads (unlike ithreads) provide real threads similar to
@@ -63,7 +61,7 @@ prepared to allow this.
 # points to Coro-Multicore CVS tree.
 %package -n perlmulticore-devel
 Summary:        Perl Multicore specification and implementation
-License:        Public Domain or CC0
+License:        Public Domain OR CC0
 # Packaging guidelines require header-only packages:
 # to be architecture-specific, to deliver headers in -devel package, to
 # provide -static symbol for reverse build-requires.
@@ -76,10 +74,11 @@ operation, such as cryptography, SQL queries, disk I/O and so on.
 
 %package tests
 Summary:        Tests for %{name}
-BuildArch:      noarch
+License:        (GPL+ OR Artistic) AND (Public Domain OR CC0)
 Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       perl-Test-Harness
 Requires:       perl(Coro) >= 6.44
+BuildArch:      noarch
 
 %description tests
 Tests from %{name}. Execute them
@@ -93,22 +92,22 @@ with "%{_libexecdir}/%{name}/test".
 %build
 export CORO_MULTICORE_CHECK=0 PERL_CANARY_STABILITY_NOPROMPT=1
 perl Makefile.PL INSTALLDIRS=vendor \
-    NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="$RPM_OPT_FLAGS" </dev/null
-%{make_build}
+    NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="%{optflags}" </dev/null
+%make_build
 
 # perlmulticore-devel:
 pod2man perlmulticore.h >perlmulticore.h.3
 
 %install
-%{make_install}
-find $RPM_BUILD_ROOT -type f -name '*.bs' -size 0 -delete
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+find %{buildroot} -type f -name '*.bs' -size 0 -delete
+%{_fixperms} %{buildroot}/*
 
 # perlmulticore-devel:
-install -d $RPM_BUILD_ROOT/%{_includedir}
-install -m 0644 perlmulticore.h $RPM_BUILD_ROOT/%{_includedir}
-install -d $RPM_BUILD_ROOT/%{_mandir}/man3
-install -m 0644 perlmulticore.h.3 $RPM_BUILD_ROOT/%{_mandir}/man3
+install -d %{buildroot}/%{_includedir}
+install -m 0644 perlmulticore.h %{buildroot}/%{_includedir}
+install -d %{buildroot}/%{_mandir}/man3
+install -m 0644 perlmulticore.h.3 %{buildroot}/%{_mandir}/man3
 
 # Install tests
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
