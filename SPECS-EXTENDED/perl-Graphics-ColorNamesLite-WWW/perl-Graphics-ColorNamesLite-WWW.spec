@@ -49,6 +49,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.000-6
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.000-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

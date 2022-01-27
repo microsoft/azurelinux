@@ -91,6 +91,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.006-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Fri Oct 01 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.006-1
 - 0.006 bump
