@@ -1,11 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Run extra test
-%if ! (0%{?rhel})
-%bcond_without perl_Cpanel_JSON_XS_enables_extra_test
-%else
-%bcond_with perl_Cpanel_JSON_XS_enables_extra_test
-%endif
 
 Name:		perl-Cpanel-JSON-XS
 Summary:	JSON::XS for Cpanel, fast and correct serializing
@@ -34,9 +28,7 @@ BuildRequires:	perl(strict)
 BuildRequires:	perl(warnings)
 BuildRequires:	perl(XSLoader)
 # Script Runtime
-%if 0%{?fedora} > 22 || 0%{?rhel} > 7
 BuildRequires:	perl(CBOR::XS)
-%endif
 BuildRequires:	perl(Compress::LZF)
 BuildRequires:	perl(Convert::Bencode)
 BuildRequires:	perl(CPAN::Meta::YAML)
@@ -44,7 +36,7 @@ BuildRequires:	perl(Data::Dump)
 BuildRequires:	perl(YAML)
 BuildRequires:	perl(YAML::Syck)
 BuildRequires:	perl(YAML::XS)
-# Test Suite
+%if %{with_check}
 BuildRequires:	perl(B)
 BuildRequires:	perl(charnames)
 BuildRequires:	perl(constant)
@@ -79,14 +71,11 @@ BuildRequires:	perl(JSON::PP) >= 2.09
 BuildRequires:	perl(JSON::XS)
 BuildRequires:	perl(Math::BigFloat) >= 1.16
 BuildRequires:	perl(Math::BigInt)
-%if 0%{?fedora:1}
 BuildRequires:	perl(Mojo::JSON) >= 6.11
-%endif
 BuildRequires:	perl(Test::LeakTrace)
 BuildRequires:	perl(Tie::IxHash)
 BuildRequires:	perl(Time::Piece)
 # Maintainer Tests (Test::Spelling intentionally omitted as associated test would fail due to various technical terms)
-%if %{with perl_Cpanel_JSON_XS_enables_extra_test}
 BuildRequires:	perl(Class::XSAccessor)
 BuildRequires:	perl(List::MoreUtils)
 BuildRequires:	perl(Perl::MinimumVersion) >= 1.20
@@ -106,10 +95,7 @@ Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(Carp)
 Requires:	perl(overload)
 Requires:	perl(Scalar::Util)
-%if 0%{?fedora} > 22 || 0%{?rhel} > 7
 Suggests:	perl(CBOR::XS)
-%endif
-%if 0%{?fedora} > 20 || 0%{?rhel} > 7
 Recommends:	perl(Math::BigFloat) >= 1.16
 Recommends:	perl(Math::BigInt)
 Suggests:	perl(Bencode)
@@ -122,20 +108,6 @@ Suggests:	perl(Sereal::Encoder)
 Suggests:	perl(YAML)
 Suggests:	perl(YAML::Syck)
 Suggests:	perl(YAML::XS)
-%else
-Requires:	perl(Compress::LZF)
-Requires:	perl(Convert::Bencode)
-Requires:	perl(CPAN::Meta::YAML)
-Requires:	perl(Data::Dump)
-Requires:	perl(Data::Dumper)
-Requires:	perl(Math::BigFloat) >= 1.16
-Requires:	perl(Math::BigInt)
-Requires:	perl(Sereal::Decoder)
-Requires:	perl(Sereal::Encoder)
-Requires:	perl(YAML)
-Requires:	perl(YAML::Syck)
-Requires:	perl(YAML::XS)
-%endif
 
 # Avoid unwanted provides and dependencies
 %{?perl_default_filter}
@@ -165,7 +137,7 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
 %check
-%if !%{defined perl_bootstrap} && %{with perl_Cpanel_JSON_XS_enables_extra_test}
+%if !%{defined perl_bootstrap}
 make test xtest AUTHOR_TESTING=1
 %else
 make test
@@ -185,6 +157,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.27-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Fri Oct 15 2021 Paul Howarth <paul@city-fan.org> - 4.27-1
 - Update to 4.27

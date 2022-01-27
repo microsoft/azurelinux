@@ -19,12 +19,13 @@ BuildRequires:  perl(warnings)
 # Run-time
 BuildRequires:  perl(Color::ANSI::Util) >= 0.164
 BuildRequires:  perl(Exporter) >= 5.57
-# Tests
+%if %{with_check}
 BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More) >= 0.98
+%endif
 Requires:       perl(Color::ANSI::Util) >= 0.161
 Requires:       perl(Exporter) >= 5.57
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -60,6 +61,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.002-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.002-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

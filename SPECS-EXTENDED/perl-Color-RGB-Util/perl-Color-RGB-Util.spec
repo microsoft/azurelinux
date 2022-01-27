@@ -20,7 +20,7 @@ BuildRequires:  perl(warnings)
 # Run-time
 BuildRequires:  perl(Digest::SHA)
 BuildRequires:  perl(Exporter) >= 5.57
-# Tests
+%if %{with_check}
 BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
@@ -28,6 +28,7 @@ BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More) >= 0.98
 BuildRequires:  perl(Test::RandomResult)
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Digest::SHA)
 Requires:       perl(Exporter) >= 5.57
@@ -90,6 +91,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.606-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Fri Aug 06 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.606-1
 - 0.606 bump
