@@ -134,7 +134,7 @@ find %{buildroot} -type f -name '*.bs' -size 0 -delete
 %{make_build} test
 
 %files
-%license COPYING
+%license COPYING Coro/libcoro/LICENSE
 %doc Changes README README.linux-glibc
 %doc doc/* eg
 %{perl_archlib}/auto/Coro
@@ -145,6 +145,7 @@ find %{buildroot} -type f -name '*.bs' -size 0 -delete
 %changelog
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.570-5
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.570-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
