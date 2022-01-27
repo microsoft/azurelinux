@@ -21,8 +21,9 @@ BuildRequires:  perl(Exporter)
 BuildRequires:  perl(locale)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-# Tests only
+%if %{with_check}
 BuildRequires:  perl(Test::More) >= 0.45
+%endif
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 
@@ -53,6 +54,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.03-33
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.03-32
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

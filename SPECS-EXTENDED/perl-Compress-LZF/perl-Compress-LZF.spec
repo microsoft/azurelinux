@@ -28,8 +28,9 @@ BuildRequires:  perlmulticore-static
 # Module
 BuildRequires:  perl(DynaLoader)
 BuildRequires:  perl(Exporter)
-# Test Suite
+%if %{with_check}
 BuildRequires:  perl(Storable)
+%endif
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
@@ -64,6 +65,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8-21
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.8-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

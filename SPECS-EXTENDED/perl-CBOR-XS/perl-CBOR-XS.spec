@@ -35,9 +35,10 @@ BuildRequires:  perl(Time::Piece)
 BuildRequires:  perl(Types::Serialiser)
 BuildRequires:  perl(URI)
 BuildRequires:  perl(XSLoader)
-# Tests:
+%if %{with_check}
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Math::BigInt::FastCalc)
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Math::BigFloat)
 Requires:       perl(Math::BigInt)
@@ -103,6 +104,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.86-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Fri Nov 05 2021 Petr Pisar <ppisar@redhat.com> - 1.86-1
 - 1.86 bump (bug #2020382)
