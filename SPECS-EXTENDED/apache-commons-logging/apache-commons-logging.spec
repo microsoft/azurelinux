@@ -25,7 +25,7 @@ Name:           apache-%{short_name}
 Version:        1.2
 Release:        10%{?dist}
 Summary:        Apache Commons Logging
-License:        Apache-2.0
+License:        ASL 2.0
 URL:            http://commons.apache.org/%{base_name}
 Source0:        http://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Source4:        http://central.maven.org/maven2/%{short_name}/%{short_name}-api/1.1/%{short_name}-api-1.1.pom
@@ -127,6 +127,7 @@ install -pm 644 tmp.pom %{buildroot}/%{_mavenpomdir}/%{short_name}-adapters-%{ve
 %changelog
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-10
 - Removing 'log4j12' dependency.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-9
 - Converting the 'Release' tag to the '[number].[distribution]' format.

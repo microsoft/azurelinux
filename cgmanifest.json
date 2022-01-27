@@ -29877,6 +29877,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xml-commons-apis",
+          "version": "1.4.01",
+          "downloadUrl": "https://svn.apache.org/repos/asf/xerces/xml-commons/tags/xml-commons-external-1_4_01/java/external"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xml-commons-resolver",
           "version": "1.2",
           "downloadUrl": "http://www.apache.org/dist/xerces/xml-commons/xml-commons-resolver-1.2.tar.gz"
