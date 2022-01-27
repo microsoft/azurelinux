@@ -1,16 +1,30 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global snapshot 20211217
+%global         underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 # Do not create debuginfo sub-package because there is no binary executable
 %global debug_package %{nil}
 Name:       libecb
-Version:    0.%{snapshot}
-Release:    2%{?dist}
+Version:    9.30
+Release:    1%{?dist}
 Summary:    Compiler built-ins
 License:    BSD or GPLv2+
 URL:        http://software.schmorp.de/pkg/libecb.html
-# Snapshot from CVS :pserver:anonymous@cvs.schmorp.de/schmorpforge libecb 
-Source0:    %{name}-%{snapshot}.tar.xz
+# Below link points to the correct revision of the sources but doesn't give tarballs with reproducible hashes.
+# How to re-build this file for CBL-Mariner in a reproducible way:
+#   1. cvs -d :pserver:anonymous@cvs.schmorp.de/schmorpforge export -r rxvt-unicode-rel-%%{underscore_version} %%{name}
+#   2. mv %%{name} %%{name}-%%{version}
+#   3. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}.tar.gz %%{name}-%%{version}
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+Source0:    http://cvs.schmorp.de/libecb/?view=tar&pathrev=rxvt-unicode-rel-%{underscore_version}#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  perl-podlators
 
@@ -39,7 +53,7 @@ generally useful low-level functions, such as popcount, expect, prefetch,
 noinline, assume, unreachable and so on.
 
 %prep
-%autosetup -p1 -n %{name}-%{snapshot}
+%autosetup -p1
 
 %build
 pod2man ecb.pod > ecb.3
@@ -57,8 +71,9 @@ install -m 0644 -t %{buildroot}%{_mandir}/man3 *.3
 %{_mandir}/man3/*
 
 %changelog
-* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20211217-2
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.30-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Switching to using CVS revision tag as version.
 
 * Fri Dec 17 2021 Petr Pisar <ppisar@redhat.com> - 0.20211217-1
 - CVS snapshot taken on 20211217 (Fedora patches merged)

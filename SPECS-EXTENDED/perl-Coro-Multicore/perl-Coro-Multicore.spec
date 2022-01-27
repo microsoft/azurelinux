@@ -23,6 +23,7 @@ Patch0:         Coro-Multicore-0.02-Declare-POD-encoding.patch
 # 1.05 provided a fix, but forgot to return a value from thread_proc().
 # Keep the patch until upstream resolves it.
 Patch1:         Coro-Multicore-1.04-Fix-passing-context.patch
+
 BuildRequires:  coreutils
 BuildRequires:  perl-podlators
 %if %{with perl_Coro_Multicore_enables_coro}
@@ -41,8 +42,11 @@ BuildRequires:  perl(AnyEvent) >= 7
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Coro) >= 6.44
 BuildRequires:  perl(XSLoader)
-# Tests:
+
+%if %{with_check}
 BuildRequires:  perl(Coro::AnyEvent)
+%endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(AnyEvent) >= 7
 Requires:       perl(Carp)
