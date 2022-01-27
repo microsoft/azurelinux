@@ -74,6 +74,7 @@ install -m 0644 -t %{buildroot}%{_mandir}/man3 *.3
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.30-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Switching to using CVS revision tag as version.
+- License verified.
 
 * Fri Dec 17 2021 Petr Pisar <ppisar@redhat.com> - 0.20211217-1
 - CVS snapshot taken on 20211217 (Fedora patches merged)

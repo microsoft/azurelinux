@@ -1,11 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Enable Coro support via Perl XS Coro::Multicore module
-%if 0%{?rhel}
-%bcond_with perl_Coro_Multicore_enables_coro
-%else
-%bcond_without perl_Coro_Multicore_enables_coro
-%endif
 
 Name:           perl-Coro-Multicore
 Version:        1.07
@@ -26,7 +20,6 @@ Patch1:         Coro-Multicore-1.04-Fix-passing-context.patch
 
 BuildRequires:  coreutils
 BuildRequires:  perl-podlators
-%if %{with perl_Coro_Multicore_enables_coro}
 BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  make
@@ -54,9 +47,6 @@ Requires:       perl(Coro) >= 6.44
 
 # Filter under-specified dependecies
 %global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\((AnyEvent|Coro)\\)$
-%else
-%global debug_package %{nil}
-%endif
 
 %description
 While Coro threads (unlike ithreads) provide real threads similar to
@@ -87,11 +77,9 @@ operation, such as cryptography, SQL queries, disk I/O and so on.
 %package tests
 Summary:        Tests for %{name}
 BuildArch:      noarch
-%if %{with perl_Coro_Multicore_enables_coro}
 Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       perl-Test-Harness
 Requires:       perl(Coro) >= 6.44
-%endif
 
 %description tests
 Tests from %{name}. Execute them
@@ -103,22 +91,18 @@ with "%{_libexecdir}/%{name}/test".
 %patch1 -p1
 
 %build
-%if %{with perl_Coro_Multicore_enables_coro}
 export CORO_MULTICORE_CHECK=0 PERL_CANARY_STABILITY_NOPROMPT=1
 perl Makefile.PL INSTALLDIRS=vendor \
     NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="$RPM_OPT_FLAGS" </dev/null
 %{make_build}
-%endif
 
 # perlmulticore-devel:
 pod2man perlmulticore.h >perlmulticore.h.3
 
 %install
-%if %{with perl_Coro_Multicore_enables_coro}
 %{make_install}
 find $RPM_BUILD_ROOT -type f -name '*.bs' -size 0 -delete
 %{_fixperms} $RPM_BUILD_ROOT/*
-%endif
 
 # perlmulticore-devel:
 install -d $RPM_BUILD_ROOT/%{_includedir}
@@ -128,36 +112,27 @@ install -m 0644 perlmulticore.h.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 
 # Install tests
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
-%if %{with perl_Coro_Multicore_enables_coro}
 cp -a t %{buildroot}%{_libexecdir}/%{name}
-%endif
 cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
 #!/bin/sh
-%if %{with perl_Coro_Multicore_enables_coro}
 cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
-%else
-echo 'No upstream tests for perlmulticore-devel.'
-%endif
 EOF
 chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
-%if %{with perl_Coro_Multicore_enables_coro}
 export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
-%endif
 
-%if %{with perl_Coro_Multicore_enables_coro}
 %files
 %license COPYING
 %doc Changes README
 %{perl_vendorarch}/auto/*
 %{perl_vendorarch}/Coro*
 %{_mandir}/man3/Coro::Multicore.3*
-%endif
 
 %files -n perlmulticore-devel
 # COPYING file is about Perl module. Header files have a different license.
+%license %{_includedir}/perlmulticore.h
 %{_includedir}/perlmulticore.h
 %{_mandir}/man3/perlmulticore.h.3*
 
@@ -167,6 +142,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.07-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License vefified.
 
 * Wed Aug 04 2021 Petr Pisar <ppisar@redhat.com> - 1.07-2
 - Do not package Coro::Multicore tests in case coro feature is disabled

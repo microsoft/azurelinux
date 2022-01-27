@@ -61,12 +61,13 @@ rm -f %{buildroot}%{_libdir}/liblzf.la
 %ldconfig_scriptlets
 
 %files
+%license LICENSE
 %{_bindir}/lzf
 %{_bindir}/unlzf
 %{_libdir}/liblzf.so.*
 # The cs directory contains a .net implementation of lzf.
 # Will happily add a .net sub package if given a patch.
-%doc README Changes LICENSE cs
+%doc README Changes cs
 
 %files devel
 %{_includedir}/lzf.h
@@ -77,6 +78,7 @@ rm -f %{buildroot}%{_libdir}/liblzf.la
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-23
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.6-22
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

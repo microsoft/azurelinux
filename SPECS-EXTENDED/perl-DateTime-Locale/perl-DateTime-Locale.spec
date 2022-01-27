@@ -54,7 +54,7 @@ Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(Dist::CheckConflicts) >= 0.02
 # perl-DateTime-Locale used to be bundled with perl-DateTime
 # ideally, this would be resolved with
-# Requires:     perl-DateTime >= 2:0.70-1
+# Requires:     perl-DateTime >= 0.70-1
 # but DateTime::Locale doesn't strictly require DateTime
 # and this would introduce circular build dependencies
 Conflicts:      perl-DateTime <= 1:0.7000-3.fc16
