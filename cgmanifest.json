@@ -16573,6 +16573,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-CBOR-XS",
+          "version": "1.86",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/CBOR-XS-1.86.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-CGI",
           "version": "4.40",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-4.40.tar.gz"
@@ -16793,6 +16803,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Compress-LZF",
+          "version": "3.8",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Compress/Compress-LZF-3.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Compress-Raw-Lzma",
           "version": "2.101",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Lzma-2.101.tar.gz"
@@ -16876,6 +16896,16 @@
           "name": "perl-Convert-ASN1",
           "version": "0.27",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GB/GBARR/Convert-ASN1-0.27.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Convert-Bencode",
+          "version": "1.03",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Convert/Convert-Bencode-1.03.tar.gz"
         }
       }
     },

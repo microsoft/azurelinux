@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-CBOR-XS
 Version:        1.86
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Concise Binary Object Representation (CBOR)
 # COPYING:      GPLv3+
 ## Replaced by system header-only package
@@ -101,6 +101,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.86-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Fri Nov 05 2021 Petr Pisar <ppisar@redhat.com> - 1.86-1
 - 1.86 bump (bug #2020382)
 
