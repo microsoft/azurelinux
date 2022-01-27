@@ -1,4 +1,3 @@
-%global java_home %(find %{_libdir}/jvm -name "msopenjdk*")
 Summary:        System-Wide Profiler for Linux Systems
 #
 # spec file for package oprofile
@@ -33,7 +32,7 @@ BuildRequires:  docbook-utils
 BuildRequires:  docbook-xsl-stylesheets
 BuildRequires:  fdupes
 BuildRequires:  gcc-c++
-BuildRequires:  java-devel
+BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  libICE-devel
 BuildRequires:  libtool
 BuildRequires:  libxslt
