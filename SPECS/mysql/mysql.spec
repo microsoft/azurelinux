@@ -87,10 +87,10 @@ sudo -u test %make_build CTEST_OUTPUT_ON_FAILURE=1 test
 %{_libdir}/*.a
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
-/usr/lib/private/icudt69l/brkitr/*.res
-/usr/lib/private/icudt69l/brkitr/*.brk
-/usr/lib/private/icudt69l/brkitr/*.dict
-/usr/lib/private/icudt69l/unames.icu
+%{_libdir}/private/icudt69l/brkitr/*.res
+%{_libdir}/private/icudt69l/brkitr/*.brk
+%{_libdir}/private/icudt69l/brkitr/*.dict
+%{_libdir}/private/icudt69l/unames.icu
 
 %changelog
 * Wed Jan 26 2022 Neha Agarwal <pawelwi@microsoft.com> - 8.0.28-1
