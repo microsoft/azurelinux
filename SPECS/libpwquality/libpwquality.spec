@@ -1,32 +1,27 @@
 # This spec is adapted from the spec in libpwquality-1.4.2.tar.bz2
 
-Summary:       A library for password generation and password quality checking
-Name:          libpwquality
-Version:       1.4.2
-Release:       6%{?dist}
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-URL:           https://github.com/libpwquality/libpwquality/
-License:       BSD or GPLv2+
-Source0:       https://github.com/libpwquality/libpwquality/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
-
+Summary:        A library for password generation and password quality checking
+Name:           libpwquality
+Version:        1.4.4
+Release:        1%{?dist}
+License:        BSD OR GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/libpwquality/libpwquality/
+Source0:        https://github.com/libpwquality/libpwquality/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
 %global _pwqlibdir %{_libdir}
 %global _moduledir %{_libdir}/security
 %global _secconfdir %{_sysconfdir}/security
 %global __python3 \/usr\/bin\/python3
-
 %define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-
-Recommends:    cracklib-dicts >= 2.8
-Requires:      pam
-BuildRequires: gcc
-BuildRequires: cracklib-devel
-BuildRequires: gettext
-BuildRequires: pam-devel
-BuildRequires: python3-devel
-
 # we don't want to provide private python extension libs
 %define __provides_exclude_from ^(%{python_sitearch}|%{python3_sitearch})/.*\.so$.
+BuildRequires:  cracklib-devel
+BuildRequires:  gcc
+BuildRequires:  gettext
+BuildRequires:  pam-devel
+BuildRequires:  python3-devel
+Requires:       pam
 
 %description
 This is a library for password quality checks and generation
@@ -35,9 +30,9 @@ This library uses the cracklib and cracklib dictionaries
 to perform some of the checks.
 
 %package devel
-Summary: Support for development of applications using the libpwquality library
-Requires: libpwquality%{?_isa} = %{version}-%{release}
-Requires: pkg-config
+Summary:        Support for development of applications using the libpwquality library
+Requires:       libpwquality%{?_isa} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 Files needed for development of applications using the libpwquality
@@ -45,8 +40,8 @@ library.
 See the pwquality.h header file for the API.
 
 %package -n python3-pwquality
-Summary: Python bindings for the libpwquality library
-Requires: libpwquality%{?_isa} = %{version}-%{release}
+Summary:        Python bindings for the libpwquality library
+Requires:       libpwquality%{?_isa} = %{version}-%{release}
 
 %description -n python3-pwquality
 This is pwquality Python module that provides Python bindings
@@ -58,7 +53,7 @@ pronounceable passwords from Python applications.
 %setup -q
 
 %build
-[ -f /usr/bin/python3 ] || ln -s /usr/bin/python3 /bin/python
+[ -f %{_bindir}/python3 ] || ln -s %{_bindir}/python3 /bin/python
 
 %configure \
 	--with-securedir=%{_moduledir} \
@@ -69,23 +64,22 @@ pronounceable passwords from Python applications.
 make %{?_smp_mflags}
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
+make install DESTDIR=%{buildroot} INSTALL='install -p'
 
 %if "%{_pwqlibdir}" != "%{_libdir}"
-pushd $RPM_BUILD_ROOT%{_libdir}
-mv libpwquality.so.* $RPM_BUILD_ROOT%{_pwqlibdir}
+pushd %{buildroot}%{_libdir}
+mv libpwquality.so.* %{buildroot}%{_pwqlibdir}
 ln -sf %{_pwqlibdir}/libpwquality.so.*.* libpwquality.so
 popd
 %endif
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -f $RPM_BUILD_ROOT%{_moduledir}/*.la
+rm -f %{buildroot}%{_libdir}/*.la
+rm -f %{buildroot}%{_moduledir}/*.la
 
-mkdir $RPM_BUILD_ROOT%{_secconfdir}/pwquality.conf.d
+mkdir %{buildroot}%{_secconfdir}/pwquality.conf.d
 
 %find_lang libpwquality
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
 
 %files -f libpwquality.lang
@@ -113,6 +107,9 @@ mkdir $RPM_BUILD_ROOT%{_secconfdir}/pwquality.conf.d
 %{python3_sitearch}/*.egg-info
 
 %changelog
+* Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.4.4-1
+- Upgrade to version 1.4.4
+
 * Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.4.2-6
 - Replace %%ldconfig_scriptlets with actual post/postun sections
 

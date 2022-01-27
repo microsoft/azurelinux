@@ -1,0 +1,46 @@
+From 5bdd01c3b3b1c415c71b00b2374538995f63597c Mon Sep 17 00:00:00 2001
+From: Paul Wise <pabs3@bonedaddy.net>
+Date: Sun, 29 Apr 2018 11:40:58 +0800
+Subject: [PATCH] Switch from python to python3
+
+Python 2 will be EOL in 2020 so Python 3 is preferrable.
+
+See-also: https://pythonclock.org/
+---
+ iotop.py        | 2 +-
+ sbin/iotop      | 2 +-
+ setup.py        | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/iotop.py b/iotop.py
+index 13ed873..666c6b4 100755
+--- a/iotop.py
++++ b/iotop.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ # iotop: Display I/O usage of processes in a top like UI
+ # Copyright (c) 2007, 2008 Guillaume Chazarain <guichaz@gmail.com>
+ # GPL version 2 or later
+diff --git a/sbin/iotop b/sbin/iotop
+index c5202d3..bb23a6e 100755
+--- a/sbin/iotop
++++ b/sbin/iotop
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ # iotop: Display I/O usage of processes in a top like UI
+ # Copyright (c) 2007, 2008 Guillaume Chazarain <guichaz@gmail.com>, GPLv2
+ # See iotop --help for some help
+diff --git a/setup.py b/setup.py
+index 9de6068..e87bfaa 100755
+--- a/setup.py
++++ b/setup.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ from distutils.core import setup
+ from distutils.command import install as distutils_install
+-- 
+2.11.4.GIT
