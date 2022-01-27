@@ -1,21 +1,22 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Truly asynchronous file and directrory I/O
 Name:           perl-AnyEvent-AIO
 Version:        1.1
 Release:        35%{?dist}
-Summary:        Truly asynchronous file and directrory I/O
-
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/AnyEvent-AIO
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-AIO-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRequires: make
+
+BuildRequires:  make
 BuildRequires:  perl-generators
+BuildRequires:  perl(AnyEvent)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(IO::AIO) >= 3
-BuildRequires:  perl(AnyEvent)
-Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 Truly asynchronous file and directrory I/O.
@@ -25,14 +26,13 @@ Truly asynchronous file and directrory I/O.
 
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor
+%make_build
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
+make pure_install PERL_INSTALL_ROOT=%{buildroot}
+find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 
 %check
 make test
@@ -42,7 +42,6 @@ make test
 %doc README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*.3*
-
 
 %changelog
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-35
@@ -156,4 +155,3 @@ make test
 
 * Fri Nov 29 2008 kwizart < kwizart at gmail.com > - 1.0-1
 - Initial package.
-

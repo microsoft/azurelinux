@@ -1,33 +1,36 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+# Remove under-speficied dependencies
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((AnyEvent|BDB)\\)$
+
+Summary:        Truly asynchronous Berkeley DB access
 Name:           perl-AnyEvent-BDB
 Version:        1.1
 Release:        38%{?dist}
-Summary:        Truly asynchronous Berkeley DB access
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/AnyEvent-BDB
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-BDB-%{version}.tar.gz
+
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Run-time:
 BuildRequires:  perl(AnyEvent) >= 3.81
-BuildRequires:  perl(base)
 BuildRequires:  perl(BDB) >= 1.5
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(base)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(AnyEvent) >= 3.81
 Requires:       perl(BDB) >= 1.5
 Requires:       perl(Exporter)
 Requires:       perl(warnings)
-
-# Remove under-speficied dependencies
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((AnyEvent|BDB)\\)$
 
 %description
 Loading this module will install the necessary magic to seamlessly integrate
@@ -39,10 +42,10 @@ BDB::poll_cb or any of that stuff.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 %{_fixperms} %{buildroot}
 
 %check
@@ -178,4 +181,3 @@ make test
 
 * Sat Nov 29 2008 kwizart < kwizart at gmail.com > - 1.0-1
 - Initial package.
-

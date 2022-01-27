@@ -1,34 +1,31 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Wrapper for the libev high-performance event loop library
 Name:           perl-EV
 Version:        4.33
 Release:        8%{?dist}
-Summary:        Wrapper for the libev high-performance event loop library
-
 # Note: The source archive includes a libev/ folder which contents are licensed
 #       as "BSD or GPLv2+". However, those are removed at build-time and
 #       perl-EV is instead built against the system-provided libev.
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/EV
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/EV-%{version}.tar.gz
 Patch0:         perl-EV-4.03-Don-t-ask-questions-at-build-time.patch
 Patch1:         perl-EV-4.30-Don-t-check-bundled-libev.patch
 
-BuildRequires: make
 BuildRequires:  gcc
-BuildRequires:  perl-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(common::sense)
 BuildRequires:  gdbm-devel
 BuildRequires:  libev-source >= 4.33
-BuildRequires:  perl(AnyEvent) => 2.6
+BuildRequires:  make
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl(AnyEvent) >= 2.6
 BuildRequires:  perl(Canary::Stability)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(common::sense)
 
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
-
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{_bindir}/perl -V:version`"; echo $version))
 %{?perl_default_filter}
-
 
 %description
 This module provides an interface to libev
@@ -39,34 +36,29 @@ semantics or some discussion on the available backends, or how to force a
 specific backend with "LIBEV_FLAGS", or just about in any case because it has
 much more detailed information.
 
-
 %prep
 %setup -q -n EV-%{version}
 
 %patch0 -p1
-%patch1 -p0
+%patch1
 
 # remove all traces of the bundled libev
 rm -fr ./libev
 
 # use the sources from the system libev
 mkdir -p ./libev
-cp -r /usr/share/libev-source/* ./libev/
-
+cp -r %{_datadir}/libev-source/* ./libev/
 
 %build
-PERL_CANARY_STABILITY_NOPROMPT=1 /usr/bin/perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="$RPM_OPT_FLAGS" NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
-
+PERL_CANARY_STABILITY_NOPROMPT=1 %{_bindir}/perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1 NO_PERLLOCAL=1
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
-
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
-%{make_build} test
-
+%make_build test
 
 %files
 %license COPYING
@@ -75,7 +67,6 @@ PERL_CANARY_STABILITY_NOPROMPT=1 /usr/bin/perl Makefile.PL INSTALLDIRS=vendor OP
 %{perl_vendorarch}/EV.pm
 %{perl_vendorarch}/EV
 %{_mandir}/man3/*.3*
-
 
 %changelog
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.33-8
