@@ -1,7 +1,4 @@
-%global java_home %(find %{_libdir}/jvm -name "OpenJDK*")
-
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        System-Wide Profiler for Linux Systems
 #
 # spec file for package oprofile
 #
@@ -15,25 +12,19 @@ Distribution:   Mariner
 # case the license is the MIT License). An "Open Source License" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-
 Name:           oprofile
 Version:        1.4.0
-Release:        2%{?dist}
-Summary:        System-Wide Profiler for Linux Systems
-License:        GPL-2.0-or-later AND LGPL-2.1-or-later
+Release:        3%{?dist}
+License:        GPLv2+ AND LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Development/Tools/Other
 URL:            http://oprofile.sourceforge.net/
 Source0:        http://prdownloads.sourceforge.net/oprofile/oprofile-%{version}.tar.gz
-Source2:        %{name}.rpmlintrc
-Source3:        baselibs.conf
-Source4:        jvmpi.h
-Source5:        README-BEFORE-ADDING-PATCHES
-Patch1:         %{name}-no-libjvm-version.patch
-Patch2:         %{name}-pfm-ppc.patch
+Source1:        baselibs.conf
+Source2:        jvmpi.h
+Patch0:         %{name}-no-libjvm-version.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  binutils-devel
@@ -41,18 +32,15 @@ BuildRequires:  docbook-utils
 BuildRequires:  docbook-xsl-stylesheets
 BuildRequires:  fdupes
 BuildRequires:  gcc-c++
-BuildRequires:  java-devel
+BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  libICE-devel
 BuildRequires:  libtool
 BuildRequires:  libxslt
-BuildRequires:  pkgconfig
+BuildRequires:  pkgconf
 BuildRequires:  popt-devel
 BuildRequires:  zlib-devel
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
-%ifarch ppc ppc64 ppc64le
-BuildRequires:  libpfm-devel >= 4.3.0
-%endif
 
 %description
 OProfile is a system-wide profiler for Linux systems, capable of
@@ -75,7 +63,7 @@ warranty.
 
 This is the package containing the userspace tools.
 
-%package devel
+%package        devel
 Summary:        Development files for oprofile, a system-wide profiler for Linux
 Group:          Development/Libraries/C and C++
 Requires:       binutils-devel
@@ -89,7 +77,7 @@ the GNU GPL.
 This package contains the files needed to develop JIT agents for other
 virtual machines.
 
-%package -n libopagent1
+%package -n     libopagent1
 Summary:        System-Wide Profiler for Linux Systems
 Group:          System/Libraries
 
@@ -107,7 +95,7 @@ from supported virtual machines.
 mkdir -p java/include
 # copy files necessary to build Java agent libraries
 # libjvmpi_oprofile.so and libjvmti_oprofile.so
-test -f %{java_home}/include/jvmpi.h || ln -s %{SOURCE4} %{java_home}/include
+test -f %{java_home}/include/jvmpi.h || ln -s %{SOURCE2} %{java_home}/include
 
 %build
 ./autogen.sh
@@ -130,10 +118,12 @@ getent passwd oprofile >/dev/null || \
 	-s /bin/false -c "Special user account to be used by OProfile" \
 	oprofile
 
-%post -n libopagent1 -p /sbin/ldconfig
-%postun -n libopagent1 -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
+%license COPYING
+%doc doc/oprofile.html doc/internals.html doc/opreport.xsd
+%doc README TODO ChangeLog-*
 %{_bindir}/ocount
 %{_bindir}/ophelp
 %{_bindir}/opimport
@@ -148,10 +138,7 @@ getent passwd oprofile >/dev/null || \
 %{_mandir}/man1/*
 %{_libdir}/oprofile/libjvm[tp]i_oprofile.so
 %exclude %{_libdir}/oprofile/libjvm[tp]i_oprofile.*a
-%doc doc/oprofile.html doc/internals.html doc/opreport.xsd
 %{_docdir}/%{name}/ophelp.xsd
-%doc README TODO ChangeLog-*
-%license COPYING
 
 %files devel
 %{_includedir}/*
@@ -160,10 +147,17 @@ getent passwd oprofile >/dev/null || \
 %{_libdir}/oprofile/libopagent.so
 
 %files -n libopagent1
+%license COPYING
 %dir %{_libdir}/oprofile
 %{_libdir}/oprofile/libopagent.so.1*
 
 %changelog
+* Fri Jan 21 2022 Thomas Crain <thcrain@microsoft.com> - 1.4.0-3
+- Pull in javapackages-local-bootstrap as a BR for %%java_home macro definition
+- Remove PPC-specific patches, BRs
+- Lint spec
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
@@ -184,29 +178,37 @@ getent passwd oprofile >/dev/null || \
   * ocount leaves orphan process on error
 - remove oprofile-handle-empty-event-name-spec-gracefully-for-ppc.patch,
   oprofile-handle-binutils-2_34.patch: upstream
+
 * Tue Oct 13 2020 Jan Engelhardt <jengelh@inai.de>
 - Do not suppress error text output from useradd.
+
 * Wed Apr  8 2020 Christophe Giboudeaux <christophe@krop.fr>
 - Add upstream patch:
   * oprofile-handle-binutils-2_34.patch
 - Spec cleanup
+
 * Thu Jan 23 2020 Stefan Brüns <stefan.bruens@rwth-aachen.de>
 - Use docbook-utils-minimal for manpage generation, avoids
   texlive dependency.
+
 * Mon Oct 29 2018 Tony Jones <tonyj@suse.com>
 - Handle empty event name gracefully on ppc.
   New patch: oprofile-handle-empty-event-name-spec-gracefully-for-ppc.patch
+
 * Thu Jul 26 2018 tonyj@suse.com
 - Update to version 1.3.0
   - New/updated Processor Support for Intel Goldmont Plus
   - Minor bug fixes
   Release notes: http://oprofile.sourceforge.net/release-notes/oprofile-1.3.0
+
 * Mon Oct  2 2017 jengelh@inai.de
 - Rectify RPM groups. Update summary of -devel subpackage.
   Do not ignore errors from useradd/groupadd.
   Avoid running fdupes across partitions.
+
 * Mon Sep 25 2017 fcrozat@suse.com
 - Remove qt-devel from BuildRequires, it is no needed anymore.
+
 * Mon Aug  7 2017 tonyj@suse.com
 - Update to version 1.2.0
   - New/updated Processor Support
@@ -229,17 +231,21 @@ getent passwd oprofile >/dev/null || \
   * Only start the application if the perf events setup was successful
   * Corrections in the code and i386 events so "make check" tests pass
 - Drop local patch oprofile-1.1.0-gcc6.patch (upstream)
+
 * Sat May 20 2017 tchvatal@suse.com
 - Depend on java-devel instead of deprecated provide
+
 * Sat Mar 11 2017 sfalken@opensuse.org
 - Edited %%files to clear unpackaged files builderror in
   openSUSE:Factory
+
 * Sat Jul  2 2016 i@marguerite.su
 - add patch: oprofile-1.1.0-gcc6.patch, fixed boo#985359
   * cherry picked upstream commit 39d4d4, so please
     remember to drop it next release
   * GCC 6 is pickier about some of the type conversions
     avoid the intermediate bool type to make it happy
+
 * Fri Dec 25 2015 mpluskal@suse.com
 - Update to 1.1.0
   * New/updated Processor Support
@@ -268,6 +274,7 @@ getent passwd oprofile >/dev/null || \
 - Drop desktop file since binary it is calling is no longer
   present (at least since version 1.0.0)
 - Update dependencies
+
 * Fri Sep 19 2014 tonyj@suse.com
 - Update to version 1.0.0. THIS IS A MAJOR OPROFILE RELEASE WITH SIGNIFICANT
   CHANGES FROM THE PREVIOUS 0.9.9 RELEASE.  See changelog below.
@@ -335,9 +342,11 @@ getent passwd oprofile >/dev/null || \
   - Allow all native events for IBM POWER8 in POWER7 compat mode
   - Fix spurious "backtraces skipped due to no file mapping" log entries
   - Fix the units for the reported CPU frequency
+
 * Thu Aug 14 2014 tonyj@suse.com
 - Add support for Intel Silvermont processor (bnc#891892)
   New patch: oprofile-add-support-for-intel-silvermont-processor.patch
+
 * Thu Mar  6 2014 tonyj@suse.com
 - Support ppc64le/power8e (bnc#867091)
   added patches:
@@ -347,6 +356,7 @@ getent passwd oprofile >/dev/null || \
   * oprofile-make-cpu-type-power8e-equivalent-to-power8.patch
   modified patches:
   * oprofile-pfm-ppc.patch
+
 * Wed Aug  7 2013 tonyj@suse.com
 - Update to version 0.9.9
   http://oprofile.sourceforge.net/release-notes/oprofile-0.9.9
@@ -355,9 +365,11 @@ getent passwd oprofile >/dev/null || \
 - New processor support for Haswell, zEC12, Power8
 - New support for AMD Generic Performance Events and IBM Power ISA 2.07 Architected Events
 - Numerous bug fixes.
+
 * Thu Jan  3 2013 tonyj@suse.com
 - Add dependancy on libpfm 4.3 for powerpc.
 - Add patch 'oprofile-pfm-ppc.patch' (fix configure for 32bit powerpc)
+
 * Mon Dec 10 2012 tonyj@suse.com
 - Update to version 0.9.8.
 - Support for pre-2.6 kernels has been removed
@@ -372,174 +384,244 @@ getent passwd oprofile >/dev/null || \
   Intel Ivy Bridge
   ARMv7 (Cortex-A5 Cortex-A15 Cortex-A7)
 - Numerous bugfixes
+
 * Fri Nov 25 2011 coolo@suse.com
 - add libtool as buildrequire to avoid implicit dependency
+
 * Sat Sep 24 2011 tonyj@suse.com
 - Upgrade to version 0.9.7.
 - Drop unneeded patches.
 - Remove non-utf8 characters from changelog
+
 * Tue May  3 2011 idoenmez@novell.com
 - Add oprofile-0.9.6-gcc46.patch to fix compilation with gcc 4.6
+
 * Thu Apr 28 2011 tonyj@novell.com
 - Add support for building using qt4 (no bnc)
+
 * Thu Apr 28 2011 tonyj@novell.com
 - Add README-BEFORE-ADDING-PATCHES local file documenting required patch
   header
+
 * Tue Jun 29 2010 coolo@novell.com
 - fix baselibs.conf
+
 * Thu Jun 24 2010 tonyj@novell.com
 - Fix packaging of java agent libs bnc#576533
 - Remove unnecessary verbage from %%desc for oprofile-devel and libopagent
 - Make %%files of libopagent more specific to avoid future errors
+
 * Wed Feb  3 2010 rguenther@suse.de
 - Update to 0.9.6.  Fixes
   * opcontrol cannot start daemon in timer mode
   * Improper handling of separate debuginfo files
   * XML callgraph output has no symbol-level sample counts
+
 * Mon Feb  1 2010 jengelh@medozas.de
 - Package baselibs.conf
+
 * Tue Aug  4 2009 tonyj@novell.com
 - Update to 0.9.5 - i386/nehalem/events is the only difference from RC2
+
 * Fri Jul 31 2009 jblunck@suse.de
 - Remove libopagent static libary. It is used to inject information from a VM
   into the OProfile data and is therefore not suitable for being statically
   linked into the VM itself.
+
 * Wed Jul 29 2009 jblunck@suse.de
 - Move libopagent1 to its own package.
+
 * Wed Jul 29 2009 jblunck@suse.de
 - Update to version 0.9.5-rc2.
+
 * Wed Jun 10 2009 tonyj@suse.de
 - Fix definition clash for basename
+
 * Sun Mar  1 2009 coolo@suse.de
 - fix compilation with gcc 4.4
+
 * Thu Nov 20 2008 schwab@suse.de
 - Properly handle SPE overlays.
+
 * Wed Nov 19 2008 schwab@suse.de
 - Work around broken java support.
+
 * Wed Oct 29 2008 schwab@suse.de
 - Fix uninitialized variable.
+
 * Thu Oct 23 2008 schwab@suse.de
 - Ignore section symbols.
+
 * Tue Oct 21 2008 schwab@suse.de
 - Fix jvm agent libs.
+
 * Fri Jul 18 2008 schwab@suse.de
 - Update to oprofile 0.9.4.
   http://oprofile.sourceforge.net/release-notes/oprofile-0.9.4
+
 * Fri Jul 11 2008 schwab@suse.de
 - Update binutils check.
+
 * Mon Nov 26 2007 schwab@suse.de
 - Fix open call.
+
 * Tue Oct 16 2007 schwab@suse.de
 - Fix event mapping on 970MP [#333487].
+
 * Thu Oct 11 2007 schwab@suse.de
 - Fix missing includes.
+
 * Tue Jul 17 2007 schwab@suse.de
 - Update to oprofile 0.9.3.
+
 * Wed Jul  4 2007 schwab@suse.de
 - Update to oprofile 0.9.3-rc2.
+
 * Mon Jun 18 2007 schwab@suse.de
 - Update to oprofile 0.9.3-rc1.
+
 * Thu Jan 11 2007 schwab@suse.de
 - Add binutils-devel to BuildRequires.
+
 * Mon Sep 18 2006 schwab@suse.de
 - Update to oprofile 0.9.2 (no summary available).
+
 * Fri Aug 18 2006 schwab@suse.de
 - Avoid crash in find_nearest_line [#193622].
+
 * Wed May 31 2006 schwab@suse.de
 - Fix invalid string operation.
+
 * Thu May  4 2006 schwab@suse.de
 - Fix last change.
+
 * Mon Feb 27 2006 schwab@suse.de
 - Add events for Power5+ [#152494].
+
 * Fri Jan 27 2006 mls@suse.de
 - converted neededforbuild to BuildRequires
+
 * Wed Jan 25 2006 schwab@suse.de
 - Integrate fixes for ppc64 events and groups [#130910, #137665].
+
 * Mon Dec 12 2005 schwab@suse.de
 - Update to oprofile 0.9.1.
+
 * Tue Nov  8 2005 dmueller@suse.de
 - don't build as root
+
 * Wed Sep 28 2005 schwab@suse.de
 - Fix invalid C++.
+
 * Wed Jul  6 2005 schwab@suse.de
 - Unpack compressed vmlinux [#52767].
 - Use RPM_OPT_FLAGS.
+
 * Tue Jun  7 2005 schwab@suse.de
 - Update to oprofile 0.9.
+
 * Thu Mar 24 2005 schwab@suse.de
 - Update to oprofile 0.8.2.
+
 * Thu Nov  4 2004 schwab@suse.de
 - Update to oprofile 0.8.1.
+
 * Fri Sep  3 2004 schwab@suse.de
 - Update to oprofile 0.8.
+
 * Mon Jun 28 2004 skh@suse.de
 - more fixes for #40468
   - fixed print statement in op_help.c
   - more power 4 events
   - fixed incorrect event counter settings for power 4
+
 * Tue Jun  8 2004 skh@suse.de
 - Update to fix for #40468: use correct event numbers for power5
   events.
+
 * Wed May 26 2004 skh@suse.de
 - Added default CYCLES event to the Power 4 and Power 5 event
   files. (#40468)
+
 * Tue May 25 2004 skh@suse.de
 - add user space support for ppc64 (#40468)
+
 * Sun May  9 2004 ak@suse.de
 - Increase minimum count on P4 to 5000 for all events
 - Automatically add the module path of the current kernel to oprofpp
   (#36825)
 - Fix 64bit uncleanness in symbol resolution (#36825)
+
 * Sat Apr 10 2004 aj@suse.de
 - Remove kernel-source requirement.
+
 * Wed Feb  4 2004 skh@suse.de
 - Updated to version 0.7.1
 - Removed subpackage km_oprofile (it is part of the main kernel
   distribution as of kernel 2.6)
 - Don't build as root.
+
 * Mon Oct  6 2003 ak@suse.de
 - Check if APIC is enabled instead of crashing (#31774)
   Needs updated kernel.
+
 * Sat Aug 16 2003 adrian@suse.de
 - add desktop file
+
 * Thu Jul 31 2003 skh@suse.de
 - Updated to 0.6
+
 * Fri Jun 20 2003 mmj@suse.de
 - Up to 0.5.4
+
 * Fri Jun 13 2003 mmj@suse.de
 - Package all dirs
+
 * Wed Jun  4 2003 mmj@suse.de
 - Make sure we get the right location for qt.
+
 * Wed May 28 2003 mmj@suse.de
 - Update to 0.5.3
+
 * Tue May 13 2003 mmj@suse.de
 - Use %%defattr
 - Package forgotten files
+
 * Mon Mar 31 2003 mmj@suse.de
 - Update to 0.5.2 including:
   · Docu overhaul
   · Feature additions
 - Bzip2'ed sources
 - Folded both automake patches into one patch
+
 * Tue Mar 11 2003 kukuk@suse.de
 - Don't call depmod
+
 * Mon Mar 10 2003 ro@suse.de
 - remove k_deflt from neededforbuild (cycle)
+
 * Mon Mar 10 2003 mmj@suse.de
 - Fix typo
+
 * Fri Mar  7 2003 mmj@suse.de
 - A go at fixing km_oprofile
+
 * Mon Mar  3 2003 duwe@suse.de
 - split off km_oprofile
 - tiny version update includes patches
+
 * Mon Feb 24 2003 mmj@suse.de
 - Add patch from davej to make it not crash the box
+
 * Sat Feb 15 2003 adrian@suse.de
 - minor dependency clean up
+
 * Fri Feb  7 2003 mmj@suse.de
 - Really fix build on x86_64
+
 * Tue Feb  4 2003 mmj@suse.de
 - Fix build on x86_64
+
 * Tue Feb  4 2003 mmj@suse.de
 - Update to oprofile 0.5:
   · Pentium IV support, including support for HyperThreading, is
@@ -556,9 +638,12 @@ getent passwd oprofile >/dev/null || \
     daemon startup and starting/stopping profiling.
   · Fixed upstream to compile with gcc 3.3
   · Several bugfixes
+
 * Wed Jan 29 2003 ro@suse.de
 - fix build with gcc-3.3 (sluggish c++)
+
 * Thu Nov  7 2002 mmj@suse.de
 - Update to 0.4 which now has kernel 2.5 support
+
 * Thu Sep 12 2002 mmj@suse.de
 - Initial package, version 0.3 (x86 only for now)
