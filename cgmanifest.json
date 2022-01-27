@@ -16383,6 +16383,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-AnyEvent-AIO",
+          "version": "1.1",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-AIO-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-AnyEvent-BDB",
+          "version": "1.1",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-BDB-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-App-cpanminus",
           "version": "1.7044",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7044.tar.gz"
@@ -17616,6 +17636,16 @@
           "name": "perl-Error",
           "version": "0.17029",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Error/Error-0.17029.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-EV",
+          "version": "4.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/EV-4.33.tar.gz"
         }
       }
     },

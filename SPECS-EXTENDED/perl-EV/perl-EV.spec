@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-EV
 Version:        4.33
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Wrapper for the libev high-performance event loop library
 
 # Note: The source archive includes a libev/ folder which contents are licensed
@@ -77,6 +77,9 @@ PERL_CANARY_STABILITY_NOPROMPT=1 /usr/bin/perl Makefile.PL INSTALLDIRS=vendor OP
 
 
 %changelog
+* Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.33-8
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.33-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
