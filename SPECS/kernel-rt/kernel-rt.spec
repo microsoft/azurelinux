@@ -344,7 +344,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Sun Jan 23 2022 Chris Co <chrco@microsoft.com> - 5.15.2.1-2
+* Wed Jan 26 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-2
 - Rotate Mariner cert
 
 * Tue Jan 11 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-1
