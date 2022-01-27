@@ -1,40 +1,43 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
+# Filter modules bundled for tests
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
+
+Summary:        Some utility routines related to module loading
 Name:           perl-Module-Load-Util
 Version:        0.006
 Release:        2%{?dist}
-Summary:        Some utility routines related to module loading
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Module-Load-Util/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Module-Load-Util-%{version}.tar.gz
+
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
 # Run-time
 BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(Regexp::Pattern::Perl::Module)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 %if %{with_check}
-BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
-BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More) >= 0.98
+BuildRequires:  perl(blib)
+BuildRequires:  perl(lib)
 %endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Exporter) >= 5.57
-
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(Exporter\\)\\s*$
-
-# Filter modules bundled for tests
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
 
 %description
 This module contains some utility routines related to module loading.
@@ -59,10 +62,10 @@ done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 %{_fixperms} %{buildroot}/*
 
 # Install tests

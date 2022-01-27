@@ -1,26 +1,30 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        WWW color names and equivalent RGB values
 Name:           perl-Graphics-ColorNamesLite-WWW
 Version:        1.14.000
 Release:        6%{?dist}
-Summary:        WWW color names and equivalent RGB values
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Graphics-ColorNamesLite-WWW/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Graphics-ColorNamesLite-WWW-%{version}.tar.gz
+
 BuildArch:      noarch
+
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+
 %if %{with_check}
-BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(blib)
 %endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
@@ -31,11 +35,11 @@ WWW color names and equivalent RGB values (lite version).
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+%make_install
+%{_fixperms} %{buildroot}/*
 
 %check
 unset AUTHOR_TESTING

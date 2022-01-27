@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # Note: this package takes the approach of adding a hard dependency on
 # upstream's preferred back-end, Cpanel::JSON::XS, rather than using
 # a virtual provides/requires arrangement so that any of the supported
@@ -7,48 +5,53 @@ Distribution:   Mariner
 # involve modifications to the back-end packages, but it also makes for
 # consistent results as we're always using the same, most-tested
 # back-end.
+Summary:        Use Cpanel::JSON::XS with a fallback to JSON::XS and JSON::PP
+Name:           perl-JSON-MaybeXS
+Version:        1.004003
+Release:        5%{?dist}
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://metacpan.org/release/JSON-MaybeXS
+Source0:        https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-%{version}.tar.gz
 
-Name:		perl-JSON-MaybeXS
-Summary:	Use Cpanel::JSON::XS with a fallback to JSON::XS and JSON::PP
-Version:	1.004003
-Release:	5%{?dist}
-License:	GPL+ or Artistic
-URL:		https://metacpan.org/release/JSON-MaybeXS
-Source0:	https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-%{version}.tar.gz
-BuildArch:	noarch
+BuildArch:      noarch
+
 # Module Build
-BuildRequires:	coreutils
-BuildRequires:	make
-BuildRequires:	perl-generators
-BuildRequires:	perl-interpreter
-BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:	perl(lib)
-BuildRequires:	perl(Text::ParseWords)
+BuildRequires:  coreutils
+BuildRequires:  make
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(Carp)
 # Dependencies of bundled ExtUtils::HasCompiler
-BuildRequires:	perl(Config)
-BuildRequires:	perl(DynaLoader)
-BuildRequires:	perl(ExtUtils::Mksymlists)
-BuildRequires:	perl(File::Basename)
-BuildRequires:	perl(File::Spec::Functions)
-BuildRequires:	perl(File::Temp)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Cpanel::JSON::XS) >= 2.3310
+BuildRequires:  perl(DynaLoader)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(ExtUtils::Mksymlists)
+BuildRequires:  perl(File::Basename)
+BuildRequires:  perl(File::Spec::Functions)
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(Text::ParseWords)
 # Module Runtime
-BuildRequires:	perl(base)
-BuildRequires:	perl(Carp)
-BuildRequires:	perl(Cpanel::JSON::XS) >= 2.3310
-BuildRequires:	perl(Exporter)
-BuildRequires:	perl(Scalar::Util)
-BuildRequires:	perl(strict)
-BuildRequires:	perl(warnings)
+BuildRequires:  perl(base)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 %if %{with_check}
-BuildRequires:	perl(if)
-BuildRequires:	perl(JSON::PP) >= 2.27300
-BuildRequires:	perl(JSON::XS) >= 3.0
-BuildRequires:	perl(Test::More) >= 0.88
-BuildRequires:	perl(Test::Needs) >= 0.002006
+BuildRequires:  perl(JSON::PP) >= 2.27300
+BuildRequires:  perl(JSON::XS) >= 3.0
+BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(Test::Needs) >= 0.002006
+BuildRequires:  perl(if)
 %endif
+
 # Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:	perl(Cpanel::JSON::XS) >= 2.3310
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(Cpanel::JSON::XS) >= 2.3310
 
 %description
 This module first checks to see if either Cpanel::JSON::XS or JSON::XS
@@ -69,10 +72,10 @@ mutators, so we provide our own "new" method that supports that.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 %{_fixperms} -c %{buildroot}
 
 %check
