@@ -16933,6 +16933,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Coro",
+          "version": "6.570",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-6.57.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Coro-Multicore",
           "version": "1.07",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-1.07.tar.gz"

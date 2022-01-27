@@ -3,7 +3,7 @@ Distribution:   Mariner
 %global cpan_version 6.57
 Name:           perl-Coro
 Version:        6.570
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        The only real threads in perl
 # Coro/libcoro:    GPLv2 or BSD
 # Rest of package: GPL+ or Artistic
@@ -143,6 +143,9 @@ find %{buildroot} -type f -name '*.bs' -size 0 -delete
 %{_mandir}/man3/Coro*.3pm*
 
 %changelog
+* Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.570-5
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.570-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

@@ -1251,6 +1251,7 @@
                 "perl-Const-Fast",
                 "perl-Convert-ASN1",
                 "perl-Convert-Bencode",
+                "perl-Coro",
                 "perl-Coro-Multicore",
                 "perl-CPAN-Changes",
                 "perl-CPAN-DistnameInfo",
