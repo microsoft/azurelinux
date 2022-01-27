@@ -1,27 +1,26 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global source_dir  %{_datadir}/%{name}-source
 %global inst_srcdir %{buildroot}/%{source_dir}
 
-Name:             libev
-Version:          4.33
-Release:          5%{?dist}
-Summary:          High-performance event loop/event model with lots of features
+Summary:        High-performance event loop/event model with lots of features
+Name:           libev
+Version:        4.33
+Release:        5%{?dist}
+License:        BSD OR GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://software.schmorp.de/pkg/libev.html
+Source0:        http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
 
-License:          BSD or GPLv2+
-URL:              http://software.schmorp.de/pkg/libev.html
-Source0:          http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  libtool
+BuildRequires:  make
+BuildRequires:  tar
 
-BuildRequires:    autoconf
-BuildRequires:    automake
-BuildRequires:    coreutils
-BuildRequires:    findutils
-BuildRequires:    gcc
-BuildRequires:    libtool
-BuildRequires:    make
-BuildRequires:    tar
-
-Provides:         bundled(libecb) = 1.05
+Provides:       bundled(libecb) = 1.05
 
 %description
 Libev is modeled (very loosely) after libevent and the Event Perl
@@ -29,27 +28,26 @@ module, but is faster, scales better and is more correct, and also more
 featureful. And also smaller.
 
 %package devel
-Summary:          Development headers for libev
-Requires:         %{name}%{?_isa} = %{version}-%{release}
+Summary:        Development headers for libev
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains the development headers and libraries for libev.
 
 %package libevent-devel
-Summary:          Compatibility development header with libevent for %{name}.
-Requires:         %{name}-devel%{?_isa} = %{version}-%{release}
-
+Summary:        Compatibility development header with libevent for %{name}.
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 # The event.h file actually conflicts with the one from libevent-devel
-Conflicts:        libevent-devel
+Conflicts:      libevent-devel
 
 %description libevent-devel
 This package contains a development header to make libev compatible with
 libevent.
 
 %package source
-Summary:          High-performance event loop/event model with lots of features
-BuildArch:        noarch
-Provides:         bundled(libecb) = 1.05
+Summary:        High-performance event loop/event model with lots of features
+Provides:       bundled(libecb) = 1.05
+BuildArch:      noarch
 
 %description source
 This package contains the source code for libev.
@@ -291,4 +289,3 @@ install -p -m 0644 Changes ev.pod LICENSE README %{inst_srcdir}
 
 * Mon Aug 04 2008 Michal Nowak <mnowak@redhat.com> - 3.43-1
 - initial package
-

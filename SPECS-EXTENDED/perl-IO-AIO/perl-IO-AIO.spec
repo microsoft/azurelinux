@@ -1,67 +1,67 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # work around upstream versioning being decimal rather than v-string
 %global upstream_version 4.76
 %global extraversion %{nil}
-%if "%{upstream_version}%{extraversion}" != "%{upstream_version}"
-Provides:	perl(IO::AIO) = %{upstream_version}%{extraversion}
+
+Summary:        Asynchronous Input/Output
+Name:           perl-IO-AIO
+Version:        %{upstream_version}%{extraversion}
+Release:        2%{?dist}
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://metacpan.org/release/IO-AIO
+Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-%{upstream_version}.tar.gz
+Patch0:         IO-AIO-4.4-shellbang.patch
+
+# Module Build
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(Canary::Stability) >= 2001
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+# Script Runtime
+BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(Pod::Usage)
+BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(XSLoader)
+BuildRequires:  perl(base)
+BuildRequires:  perl(common::sense)
+
+%if %{with_check}
+BuildRequires:  perl(Fcntl)
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(POSIX)
+BuildRequires:  perl(Test)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
 %endif
 
-Name:		perl-IO-AIO
-Version:	%{upstream_version}%{extraversion}
-Release:	2%{?dist}
-Summary:	Asynchronous Input/Output
-License:        GPL+ or Artistic
-URL:		https://metacpan.org/release/IO-AIO
-Source0:	https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-%{upstream_version}.tar.gz
-Patch0:		IO-AIO-4.4-shellbang.patch
-# Module Build
-BuildRequires:	coreutils
-BuildRequires:	findutils
-BuildRequires:	gcc
-BuildRequires:	make
-BuildRequires:	perl-devel
-BuildRequires:	perl-generators
-BuildRequires:	perl-interpreter
-BuildRequires:	perl(Canary::Stability) >= 2001
-BuildRequires:	perl(Config)
-BuildRequires:	perl(ExtUtils::MakeMaker)
-# Module Runtime
-BuildRequires:	perl(base)
-BuildRequires:	perl(Carp)
-BuildRequires:	perl(common::sense)
-BuildRequires:	perl(Exporter)
-BuildRequires:	perl(XSLoader)
-# Script Runtime
-BuildRequires:	perl(Getopt::Long)
-BuildRequires:	perl(Pod::Usage)
-BuildRequires:	perl(Time::HiRes)
-# Test Suite
-BuildRequires:	perl(Fcntl)
-BuildRequires:	perl(File::Temp)
-BuildRequires:	perl(FindBin)
-BuildRequires:	perl(lib)
-BuildRequires:	perl(POSIX)
-BuildRequires:	perl(strict)
-BuildRequires:	perl(Test)
-BuildRequires:	perl(vars)
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:	perl(XSLoader)
-
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(XSLoader)
 # Avoid provides for private shared objects
 %{?perl_default_filter}
+%if "%{upstream_version}%{extraversion}" != "%{upstream_version}"
+Provides:       perl(IO::AIO) = %{upstream_version}%{extraversion}
+%endif
 
 %description
 This module implements asynchronous I/O using whatever means your operating
 system supports.
 
 %package -n treescan
-Summary:	Scan directory trees, list dirs/files, stat, sync, grep
-License:	GPL+ or Artistic
-BuildArch:	noarch
-Requires:	%{name} = %{version}-%{release}
-Requires:	perl(Pod::Usage)
+Summary:        Scan directory trees, list dirs/files, stat, sync, grep
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl(Pod::Usage)
+BuildArch:      noarch
 
 %description -n treescan
 The treescan command scans directories and their contents recursively. By

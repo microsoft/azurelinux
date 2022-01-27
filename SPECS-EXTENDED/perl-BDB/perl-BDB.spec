@@ -1,13 +1,13 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global cpan_version 1.92
 
+Summary:        Asynchronous Berkeley DB access
 Name:           perl-BDB
 # Extend to 2 digits to get higher RPM package version than 1.88
 Version:        %{cpan_version}
 Release:        16%{?dist}
-Summary:        Asynchronous Berkeley DB access
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/BDB
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-%{cpan_version}.tar.gz
 
@@ -20,30 +20,28 @@ BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.8.8
 BuildRequires:  perl(Config)
+BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-# Run-time
+BuildRequires:  perl(XSLoader)
 BuildRequires:  perl(base)
 BuildRequires:  perl(common::sense)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(XSLoader)
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(XSLoader)
-
 %{?perl_default_filter}
 
 %description
 Asynchronous Berkeley DB access.
 
 %prep
-%setup -qn BDB-%{cpan_version}
+%autosetup -n BDB-%{cpan_version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 find %{buildroot} -type f -name '*.bs' -a -size 0 -delete
 %{_fixperms} %{buildroot}/*
 
