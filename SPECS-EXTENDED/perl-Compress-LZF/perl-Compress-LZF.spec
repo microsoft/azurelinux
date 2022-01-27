@@ -1,10 +1,10 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Extremely light-weight Lempel-Ziv-Free compression
 Name:           perl-Compress-LZF
 Version:        3.8
 Release:        21%{?dist}
-Summary:        Extremely light-weight Lempel-Ziv-Free compression
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 ## Not in the binary packages
 # liblzf files:     BSD or GPLv2+
 # perlmulticore.h:  Public Domain or CC0
@@ -14,6 +14,7 @@ Source0:        https://cpan.metacpan.org/modules/by-module/Compress/Compress-LZ
 Patch0:         Compress-LZF-3.8-Unbundle-liblzf.patch
 # Unbundle perlmulticore.h
 Patch1:         Compress-LZF-3.8-Unbundle-perlmulticore.patch
+
 # Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -23,14 +24,16 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perlmulticore-static
 # Module
 BuildRequires:  perl(DynaLoader)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+
 %if %{with_check}
 BuildRequires:  perl(Storable)
 %endif
+
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 

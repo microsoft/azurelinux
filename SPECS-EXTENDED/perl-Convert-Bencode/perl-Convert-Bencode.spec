@@ -1,29 +1,33 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Functions for converting to/from bencoded strings
 Name:           perl-Convert-Bencode
 Version:        1.03
 Release:        33%{?dist}
-Summary:        Functions for converting to/from bencoded strings
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Convert-Bencode
 Source0:        https://cpan.metacpan.org/modules/by-module/Convert/Convert-Bencode-%{version}.tar.gz
+
 BuildArch:      noarch
+
 # Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Runtime
 BuildRequires:  perl(bytes)
-BuildRequires:  perl(Exporter)
 BuildRequires:  perl(locale)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+
 %if %{with_check}
 BuildRequires:  perl(Test::More) >= 0.45
 %endif
+
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 
@@ -36,10 +40,10 @@ decode bencoded strings respectively.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+%make_build
 
 %install
-%{make_install}
+%make_install
 %{_fixperms} -c %{buildroot}
 
 %check

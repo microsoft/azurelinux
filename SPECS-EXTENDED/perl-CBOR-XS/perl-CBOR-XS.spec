@@ -1,33 +1,32 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Concise Binary Object Representation (CBOR)
 Name:           perl-CBOR-XS
 Version:        1.86
 Release:        2%{?dist}
-Summary:        Concise Binary Object Representation (CBOR)
 # COPYING:      GPLv3+
 ## Replaced by system header-only package
 # ecb.h:        BSD or GPLv2+
-License:        GPLv3+ and (BSD or GPLv2+)
+License:        GPLv3+ AND (BSD OR GPLv2+)
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/CBOR-XS
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/CBOR-XS-%{version}.tar.gz
 # Use system libecb
 Patch0:         CBOR-XS-1.6-Include-ecb.h-from-system.patch
 # Silent compiler warnings
 Patch1:         CBOR-XS-1.84-Cast-char-and-U8-where-needed.patch
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 # gcc for standard header files
 BuildRequires:  gcc
 BuildRequires:  libecb-static
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(Canary::Stability)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-# Run-time:
-BuildRequires:  perl(common::sense)
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(Math::BigFloat)
 BuildRequires:  perl(Math::BigInt)
 BuildRequires:  perl(Math::BigRat)
@@ -35,10 +34,14 @@ BuildRequires:  perl(Time::Piece)
 BuildRequires:  perl(Types::Serialiser)
 BuildRequires:  perl(URI)
 BuildRequires:  perl(XSLoader)
+BuildRequires:  perl(common::sense)
+
 %if %{with_check}
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Math::BigInt::FastCalc)
 %endif
+
+# Run-time:
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Math::BigFloat)
 Requires:       perl(Math::BigInt)
@@ -55,10 +58,10 @@ represent it in CBOR.
 
 %package tests
 Summary:        Tests for %{name}
-BuildArch:      noarch
 Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       perl-Test-Harness
 Requires:       perl(Math::BigInt::FastCalc)
+BuildArch:      noarch
 
 %description tests
 Tests from %{name}. Execute them
@@ -71,11 +74,11 @@ rm ecb.h
 perl -i -ne 'print $_ unless m{^ecb\.h}' MANIFEST
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="$RPM_OPT_FLAGS" </dev/null
-%{make_build}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="%{optflags}" </dev/null
+%make_build
 
 %install
-%{make_install}
+%make_install
 find %{buildroot} -type f -name '*.bs' -size 0 -delete
 %{_fixperms} %{buildroot}/*
 # Install tests
