@@ -1,34 +1,38 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global cpan_version 6.57
+# Filter underspecified dependencies
+%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(AnyEvent\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(AnyEvent\\) >= 4.800001$
+%global __requires_exclude %{__requires_exclude}|^perl\\(AnyEvent::AIO\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(AnyEvent::BDB\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(EV\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(Event\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(Guard\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(Storable\\)$
+%global __provides_exclude %{?__provides_exclude:__provides_exclude|}^perl\\(Coro\\)$
+
+Summary:        The only real threads in perl
 Name:           perl-Coro
 Version:        6.570
 Release:        5%{?dist}
-Summary:        The only real threads in perl
 # Coro/libcoro:    GPLv2 or BSD
 # Rest of package: GPL+ or Artistic
-License:        (GPL+ or Artistic) and (GPLv2 or BSD)
+License:        (GPL+ OR Artistic) AND (GPLv2 OR BSD)
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Coro
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-%{cpan_version}.tar.gz
 Patch0:         %{name}-5.25-ucontext-default.patch
 # Do not disable hardening
 Patch1:         Coro-6.512-Disable-disabling-FORTIFY_SOURCE.patch
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  libecb-static
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
-BuildRequires:  perl(Canary::Stability)
-BuildRequires:  perl(Config)
-BuildRequires:  perl(EV) >= 4
-BuildRequires:  perl(EV::MakeMaker)
-BuildRequires:  perl(Event) >= 1.08
-BuildRequires:  perl(Event::MakeMaker) >= 6.76
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.52
-BuildRequires:  perl(strict)
+BuildRequires:  perl-interpreter
 BuildRequires:  sed
 # Run-time:
 BuildRequires:  perl(AnyEvent) >= 7
@@ -37,25 +41,34 @@ BuildRequires:  perl(AnyEvent) >= 7
 # AnyEvent::DNS not used at tests
 BuildRequires:  perl(AnyEvent::Socket)
 BuildRequires:  perl(AnyEvent::Util)
-BuildRequires:  perl(base)
+BuildRequires:  perl(Canary::Stability)
 # BDB not used at tests
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(common::sense)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(EV) >= 4
+BuildRequires:  perl(EV::MakeMaker)
 BuildRequires:  perl(Errno)
+BuildRequires:  perl(Event) >= 1.08
+BuildRequires:  perl(Event::MakeMaker) >= 6.76
 BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.52
 BuildRequires:  perl(Guard) >= 0.5
 # IO::AIO >= 3.1 not used at tests
 BuildRequires:  perl(IO::Socket::INET)
+BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(Socket)
+BuildRequires:  perl(Storable) >= 2.15
+BuildRequires:  perl(XSLoader)
+BuildRequires:  perl(base)
+BuildRequires:  perl(common::sense)
 # Net::Config not used at tests
 # Net::FTP not used at tests
 # Net::HTTP not used at tests
 # Net::NNTP not used at tests
 BuildRequires:  perl(overload)
-BuildRequires:  perl(Scalar::Util)
-BuildRequires:  perl(Socket)
-BuildRequires:  perl(Storable) >= 2.15
+BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-BuildRequires:  perl(XSLoader)
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # Export correct required versions
 Requires:       perl(AnyEvent) >= 7
@@ -66,20 +79,7 @@ Requires:       perl(Event) >= 1.08
 Requires:       perl(Guard) >= 0.5
 Requires:       perl(Storable) >= 2.15
 Requires:       perl(warnings)
-
 %{?perl_default_filter}
-
-# Filter underspecified dependencies
-%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(AnyEvent\\)$
-%global __requires_exclude %__requires_exclude|^perl\\(AnyEvent\\) >= 4.800001$
-%global __requires_exclude %__requires_exclude|^perl\\(AnyEvent::AIO\\)$
-%global __requires_exclude %__requires_exclude|^perl\\(AnyEvent::BDB\\)$
-%global __requires_exclude %__requires_exclude|^perl\\(EV\\)$
-%global __requires_exclude %__requires_exclude|^perl\\(Event\\)$
-%global __requires_exclude %__requires_exclude|^perl\\(Guard\\)$
-%global __requires_exclude %__requires_exclude|^perl\\(Storable\\)$
-%global __provides_exclude %{?__provides_exclude:__provides_exclude|}^perl\\(Coro\\)$
-
 
 %description
 This module collection manages continuations in general, most often in the
@@ -90,7 +90,6 @@ thread offered by this module also guarantees you that it will not switch
 between threads unless necessary, at easily-identified points in your
 program, so locking and parallel access are rarely an issue, making thread
 programming much safer and easier than using other thread models.
-
 
 %prep
 %setup -q -n Coro-%{cpan_version}
@@ -111,27 +110,22 @@ for F in Coro/jit-*.pl; do
     perl -i -ne 'print $_ unless m{\A#!}' "$F"
     chmod -x "$F"
 done
-%fix_shbang_line eg/myhttpd
+%{fix_shbang_line} eg/myhttpd
 
 
 %build
-# Disable FORTIFY_SOURCE on ARM as it breaks setjmp - RHBZ 750805
-%ifarch %{arm}
-RPM_OPT_FLAGS="${RPM_OPT_FLAGS} -Wp,-U_FORTIFY_SOURCE -Wp,-D_FORTIFY_SOURCE=0"
-%endif
-
 # Interactive configuration. Use default values.
 perl Makefile.PL INSTALLDIRS=perl NO_PACKLIST=1 NO_PERLLOCAL=1 \
-    OPTIMIZE="$RPM_OPT_FLAGS" </dev/null
-%{make_build}
+    OPTIMIZE="%{optflags}" </dev/null
+%make_build
 
 %install
-%{make_install}
+%make_install
 find %{buildroot} -type f -name '*.bs' -size 0 -delete
 %{_fixperms} %{buildroot}/*
 
 %check
-%{make_build} test
+%make_build test
 
 %files
 %license COPYING Coro/libcoro/LICENSE
