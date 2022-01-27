@@ -86,7 +86,6 @@ BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(cairo) >= 1.1.10
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Distribution:   Mariner
 %if %{with python2}
 BuildRequires:  python2-devel
 %endif
