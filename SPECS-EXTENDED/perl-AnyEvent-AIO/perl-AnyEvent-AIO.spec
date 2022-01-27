@@ -34,14 +34,12 @@ rm -rf $RPM_BUILD_ROOT
 make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
 
-
 %check
 make test
 
-
-
 %files
-%doc COPYING README
+%license COPYING
+%doc README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*.3*
 
@@ -49,6 +47,7 @@ make test
 %changelog
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-35
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-34
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

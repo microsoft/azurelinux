@@ -69,7 +69,8 @@ PERL_CANARY_STABILITY_NOPROMPT=1 /usr/bin/perl Makefile.PL INSTALLDIRS=vendor OP
 
 
 %files
-%doc Changes COPYING README
+%license COPYING
+%doc Changes README
 %{perl_vendorarch}/auto/*
 %{perl_vendorarch}/EV.pm
 %{perl_vendorarch}/EV
@@ -79,6 +80,7 @@ PERL_CANARY_STABILITY_NOPROMPT=1 /usr/bin/perl Makefile.PL INSTALLDIRS=vendor OP
 %changelog
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.33-8
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.33-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
