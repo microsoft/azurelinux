@@ -141,7 +141,7 @@ make test
 %changelog
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.07-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License vefified.
+- License verified.
 
 * Wed Aug 04 2021 Petr Pisar <ppisar@redhat.com> - 1.07-2
 - Do not package Coro::Multicore tests in case coro feature is disabled
