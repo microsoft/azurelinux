@@ -39,7 +39,7 @@ PCI locations.
 
 
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
