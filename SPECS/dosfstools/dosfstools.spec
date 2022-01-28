@@ -7,7 +7,7 @@ URL:		http://github.com/dosfstools/dosfstools
 Group:		Filesystem Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	https://github.com/dosfstools/dosfstools/archive/v4.2.tar.gz#/%{name}-%{version}.tar.gz
+Source0:	https://github.com/dosfstools/dosfstools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: acl
 BuildRequires: autoconf
