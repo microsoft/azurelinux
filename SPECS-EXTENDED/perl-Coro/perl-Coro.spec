@@ -110,7 +110,7 @@ for F in Coro/jit-*.pl; do
     perl -i -ne 'print $_ unless m{\A#!}' "$F"
     chmod -x "$F"
 done
-%{fix_shbang_line} eg/myhttpd
+%fix_shbang_line eg/myhttpd
 
 
 %build
