@@ -13723,8 +13723,8 @@
         "type": "other",
         "other": {
           "name": "moby-buildx",
-          "version": "0.4.1+azure",
-          "downloadUrl": "https://github.com/docker/buildx/archive/v0.4.1.tar.gz"
+          "version": "0.7.1",
+          "downloadUrl": "https://github.com/docker/buildx/archive/v0.7.1.tar.gz"
         }
       }
     },
