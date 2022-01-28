@@ -20,6 +20,7 @@ ignore_list=" \
   dbus-x11 \
   grub2-efi-binary-signed-aarch64 \
   grub2-efi-binary-signed-x86_64 \
+  grubby \
   initramfs \
   installkernel \
   kde-filesystem \
