@@ -245,8 +245,8 @@
         "type": "other",
         "other": {
           "name": "ant-antlr",
-          "version": "1.10.9",
-          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.xz"
+          "version": "1.10.11",
+          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },
@@ -275,8 +275,8 @@
         "type": "other",
         "other": {
           "name": "ant-junit",
-          "version": "1.10.9",
-          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.xz"
+          "version": "1.10.11",
+          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },
@@ -2927,6 +2927,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dom4j",
+          "version": "2.0.3",
+          "downloadUrl": "https://github.com/dom4j/dom4j/archive/version-2.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dos2unix",
           "version": "7.4.1",
           "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1.tar.gz"
@@ -3588,8 +3598,8 @@
         "type": "other",
         "other": {
           "name": "fdupes",
-          "version": "2.1.1",
-          "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.1/fdupes-2.1.1.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.2/fdupes-2.1.2.tar.gz"
         }
       }
     },
@@ -11941,8 +11951,8 @@
         "type": "other",
         "other": {
           "name": "libxcrypt",
-          "version": "4.4.17",
-          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
+          "version": "4.4.27",
+          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.27/libxcrypt-4.4.27.tar.gz"
         }
       }
     },
@@ -12081,8 +12091,8 @@
         "type": "other",
         "other": {
           "name": "libxml++",
-          "version": "3.2.0",
-          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
+          "version": "5.0.1",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/5.0/libxml++-5.0.1.tar.xz"
         }
       }
     },
@@ -14143,8 +14153,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.24",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.24.tar.gz"
+          "version": "8.0.28",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.28.tar.gz"
         }
       }
     },
@@ -29228,7 +29238,7 @@
         "other": {
           "name": "velocity",
           "version": "1.7",
-          "downloadUrl": "http://www.apache.org/dist/velocity/engine/1.7/velocity-1.7.tar.gz"
+          "downloadUrl": "https://github.com/apache/velocity-engine/archive/refs/tags/1.7.tar.gz"
         }
       }
     },
@@ -29678,8 +29688,8 @@
         "type": "other",
         "other": {
           "name": "xbean",
-          "version": "4.5",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/xbean/xbean/4.5/xbean-4.5-source-release.zip"
+          "version": "4.18",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/xbean/xbean/4.18/xbean-4.18-source-release.zip"
         }
       }
     },
@@ -30100,6 +30110,16 @@
           "name": "xmessage",
           "version": "1.0.5.",
           "downloadUrl": "https://www.x.org/pub/individual/app/xmessage-1.0.5.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xml-commons-apis",
+          "version": "1.4.01",
+          "downloadUrl": "https://svn.apache.org/repos/asf/xerces/xml-commons/tags/xml-commons-external-1_4_01/java/external"
         }
       }
     },

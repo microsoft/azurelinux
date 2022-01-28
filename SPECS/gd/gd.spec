@@ -1,9 +1,7 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package gd
 #
-# Copyright (c) 2020 SUSE LLC
+# Copyright (c) 2022 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -22,9 +20,11 @@ Distribution:   Mariner
 %define lname libgd3
 Name:           gd
 Version:        2.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://libgd.github.io/
 Source:         https://github.com/libgd/libgd/releases/download/%{name}-%{version}/%{prjname}-%{version}.tar.xz
 Source1:        baselibs.conf
@@ -34,11 +34,11 @@ Patch1:         gd-fontpath.patch
 Patch2:         gd-format.patch
 # could be upstreamed
 Patch3:         gd-aliasing.patch
+BuildRequires:  fontconfig-devel
 # needed for tests
 BuildRequires:  libjpeg-devel
 BuildRequires:  libpng-devel
 BuildRequires:  pkgconfig
-BuildRequires:  fontconfig-devel
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(libtiff-4)
 BuildRequires:  pkgconfig(libwebp)
@@ -53,9 +53,9 @@ and is supported by PHP.
 
 %package -n %{lname}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
+Conflicts:      gd < 2.2.3
 # change order while installing a split library
 Obsoletes:      gd < 2.2.3
-Conflicts:      gd < 2.2.3
 
 %description -n %{lname}
 Gd allows your code to quickly draw images complete with lines, arcs,
@@ -153,6 +153,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+* Wed Jan 26 2022 Henry Li <lihl@microsoft.com> - 2.3.0-3
+- License Verified
+- Fix linting
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
@@ -180,7 +184,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
   - Fix #533: Remove cmake modules
   - Fix #539: Add RAQM support for cmake
   - Fix #499: gdImageGifAnimAddPtr: heap corruption with 2 identical images
-  - Fix #486: gdImageCropAuto(…, GD_CROP_SIDES) crops left but not right
+  - Fix #486: gdImageCropAuto(�, GD_CROP_SIDES) crops left but not right
   - Fix #485: auto cropping has insufficient precision
   - Fix #479: Provide a suitable malloc function to liq
   - Fix #474: libtiff link returns 404 HTTP code
