@@ -8,6 +8,9 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://clang.llvm.org
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/lld-%{version}.src.tar.xz
+# The `lld` build needs access to `mach-o/compact_unwind_encoding.h` which LLVM
+# packages with the `libunwind` source.  We fetch and unpack both sources then
+# pass an additional `-I` to `CMAKE` to allow the build to find the header.
 Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/libunwind-%{version}.src.tar.xz
 BuildRequires:  build-essential
 BuildRequires:  cmake
