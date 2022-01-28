@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
-Version:        2020.4
-Release:        3%{?dist}
+Version:        2022.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,7 +9,6 @@ URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         rpm-ostree-libdnf-build.patch
 Patch1:         rpm-ostree-disable-selinux.patch
-Patch2:         rpm-ostree-gcc-11-2.patch
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
@@ -137,12 +136,14 @@ make check
 %{_datadir}/dbus-1/system-services/*
 %config(noreplace) %{_sysconfdir}/rpm-ostreed.conf
 %{_libdir}/systemd/system/rpm-ostreed-automatic.timer
+%{_libdir}/systemd/system/rpm-ostree-countme.timer
 %{_datadir}/bash-completion/completions/rpm-ostree
 %{_datadir}/dbus-1/interfaces/org.projectatomic.rpmostree1.xml
 %{_datadir}/polkit-1/actions/org.projectatomic.rpmostree1.policy
 %{_mandir}/man1/rpm-ostree.1.gz
 %{_mandir}/man5/rpm-ostreed*
 %{_mandir}/man8/rpm-ostreed*
+%{_mandir}/man8/rpm-ostree-countme*
 
 %files devel
 %{_libdir}/lib*.so
@@ -152,6 +153,13 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Thu Jan 27 2022 Henry Li <lihl@microsoft.com> - 2022.1-1
+- Upgrade to version 2022.1
+- Remove patches that no longer apply
+- Fix rpm-ostree-disable-selinux.patch
+- Add new files to main package due to the version upgrade
+
+
 * Mon Nov 29 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 2020.4-3
 - Fix build issue due to gcc 11.2
 
