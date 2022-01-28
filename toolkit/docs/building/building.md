@@ -497,7 +497,7 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 
 ##### `HYDRATED_BUILD=`**`y`**]
 
-> If exists, all the dependency RUN nodes will be replaced with PreBuilt Nodes if those RPMs are hydrated already. So if any dependency package fails to build, the subsequent dependent packages will not be stuck as their dependency will be satisfied by hydrated RPM. This is even applicable to the packages mentioned in REBUILD_PACKAGES. This option is introduced mainly for running PTEST.
+> If exists, all the dependency RUN nodes will be replaced with PreBuilt Nodes if those RPMs are hydrated already. So if any dependency package fails to build, the subsequent dependent packages will not be stuck as their dependency will be satisfied by hydrated RPM. This is even applicable to the packages mentioned in REBUILD_PACKAGES.
 
 ##### `HYDRATED_BUILD=`**`n`** *(default)*
 

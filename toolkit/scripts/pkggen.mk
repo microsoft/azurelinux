@@ -126,12 +126,8 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 
 $(scrubbed_file): $(cached_file) $(go-graphPreprocessor)
 	$(go-graphPreprocessor) \
-		--input=$(graph_file) \
+		--input=$(cached_file) \
 		$(if $(filter y,$(HYDRATED_BUILD)),--hydrated-build) \
-		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
-		--packages="$(PACKAGE_BUILD_LIST)" \
-		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
-		--image-config-file="$(CONFIG_FILE)" \
 		$(logging_command) \
 		--output=$@ && \
 	touch $@
