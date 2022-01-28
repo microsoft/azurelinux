@@ -59,7 +59,6 @@ cd build
 %ninja_install
 
 %files
-%license LICENSE.TXT
 %{_bindir}/*
 
 %files devel
@@ -68,6 +67,7 @@ cd build
 %{_libdir}/*.so
 
 %files libs
+%license LICENSE.TXT
 %{_libdir}/*.so.12*
 
 %changelog
