@@ -27,6 +27,11 @@ make %{?_smp_mflags} -k test
 %{_bindir}/*
 %{_datadir}/*
 %changelog
+* Thu Jan 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.15.05-1
+- Upgrading to 2.15.05
+- License verified.
+- Removed sha1 definition. 
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.13.03-5
 - Added %%license line automatically
 
