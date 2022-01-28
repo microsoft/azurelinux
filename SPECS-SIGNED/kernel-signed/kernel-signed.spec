@@ -151,6 +151,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
 %exclude /module_info.ld
+%ifarch aarch64
+%exclude %{_libdir}/debug/.build-id
+%endif
 
 %changelog
 * Sun Jan 23 2022 Chris Co <chrco@microsoft.com> - 5.15.2.1-2
