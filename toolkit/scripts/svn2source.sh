@@ -28,7 +28,7 @@ trap clean_up EXIT SIGINT SIGTERM
 umask 000
 
 svn export "$REPO" "$EXPORT_DIR"
-find "$EXPORT_DIR" -type f |sed 's/^\.*\/*//'|sort > "$MANIFEST"
+find "$EXPORT_DIR" -type f | sed 's/^\.*\/*//'| sort > "$MANIFEST"
 tar -cf "$TARBALL_NAME" \
     --sort=name \
     --mtime="2021-04-26 00:00Z" \
