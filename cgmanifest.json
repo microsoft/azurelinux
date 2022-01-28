@@ -2027,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "colm",
-          "version": "0.13.0.7",
-          "downloadUrl": "https://www.colm.net/files/colm/colm-0.13.0.7.tar.gz"
+          "version": "0.14.7",
+          "downloadUrl": "https://github.com/adrian-thurston/colm/archive/0.14.7.tar.gz"
         }
       }
     },
@@ -2758,8 +2758,8 @@
         "type": "other",
         "other": {
           "name": "dmidecode",
-          "version": "3.2",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/dmidecode/dmidecode-3.2.tar.xz"
+          "version": "3.3",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/dmidecode/dmidecode-3.3.tar.xz"
         }
       }
     },
@@ -2938,8 +2938,8 @@
         "type": "other",
         "other": {
           "name": "dos2unix",
-          "version": "7.4.1",
-          "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1.tar.gz"
+          "version": "7.4.2",
+          "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.2.tar.gz"
         }
       }
     },
@@ -2948,8 +2948,8 @@
         "type": "other",
         "other": {
           "name": "dosfstools",
-          "version": "4.1",
-          "downloadUrl": "http://github.com/dosfstools/dosfstools/releases/download/v4.1/dosfstools-4.1.tar.gz"
+          "version": "4.2",
+          "downloadUrl": "https://github.com/dosfstools/dosfstools/archive/v4.2.tar.gz"
         }
       }
     },
@@ -4810,8 +4810,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.6.14",
-          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.14.tar.xz"
+          "version": "3.7.3",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.3.tar.xz"
         }
       }
     },
@@ -21694,8 +21694,8 @@
         "type": "other",
         "other": {
           "name": "popt",
-          "version": "1.16",
-          "downloadUrl": "ftp://anduin.linuxfromscratch.org/BLFS/svn/p/popt-1.16.tar.gz"
+          "version": "1.18",
+          "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz"
         }
       }
     },
@@ -23306,16 +23306,6 @@
           "name": "python-kombu",
           "version": "5.0.2",
           "downloadUrl": "https://github.com/celery/kombu/archive/v5.0.2/python-kombu-5.0.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-kubernetes",
-          "version": "11.0.0",
-          "downloadUrl": "https://github.com/kubernetes-client/python/archive/v11.0.0.tar.gz"
         }
       }
     },
@@ -25354,8 +25344,8 @@
         "type": "other",
         "other": {
           "name": "ragel",
-          "version": "7.0.0.12",
-          "downloadUrl": "https://www.colm.net/files/ragel/ragel-7.0.0.12.tar.gz"
+          "version": "7.0.4",
+          "downloadUrl": "https://github.com/adrian-thurston/ragel/archive/7.0.4.tar.gz"
         }
       }
     },

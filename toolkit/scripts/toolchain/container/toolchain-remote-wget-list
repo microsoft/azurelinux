@@ -27,7 +27,7 @@ https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2
 http://anduin.linuxfromscratch.org/BLFS/bdb/db-5.3.28.tar.gz
 https://github.com/libarchive/libarchive/releases/download/v3.4.2/libarchive-3.4.2.tar.gz
 http://www.lua.org/ftp/lua-5.4.3.tar.gz
-ftp://anduin.linuxfromscratch.org/BLFS/popt/popt-1.16.tar.gz
+http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz
 https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh

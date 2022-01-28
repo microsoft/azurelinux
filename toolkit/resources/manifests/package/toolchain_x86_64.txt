@@ -480,10 +480,10 @@ pkgconf-1.8.0-1.cm2.x86_64.rpm
 pkgconf-debuginfo-1.8.0-1.cm2.x86_64.rpm
 pkgconf-m4-1.8.0-1.cm2.noarch.rpm
 pkgconf-pkg-config-1.8.0-1.cm2.x86_64.rpm
-popt-1.16-7.cm2.x86_64.rpm
-popt-debuginfo-1.16-7.cm2.x86_64.rpm
-popt-devel-1.16-7.cm2.x86_64.rpm
-popt-lang-1.16-7.cm2.x86_64.rpm
+popt-1.18-1.cm2.x86_64.rpm
+popt-debuginfo-1.18-1.cm2.x86_64.rpm
+popt-devel-1.18-1.cm2.x86_64.rpm
+popt-lang-1.18-1.cm2.x86_64.rpm
 procps-ng-3.3.17-1.cm2.x86_64.rpm
 procps-ng-debuginfo-3.3.17-1.cm2.x86_64.rpm
 procps-ng-devel-3.3.17-1.cm2.x86_64.rpm
