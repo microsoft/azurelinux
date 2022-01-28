@@ -2,19 +2,19 @@ Summary:        Command line utility for i-node notifications and management.
 Name:           inotify-tools
 Version:        3.22.1.0
 Release:        1%{?dist}
-URL:            https://github.com/inotify-tools/inotify-tools/wiki
-Source0:        https://github.com/inotify-tools/inotify-tools/archive/%{version}/inotify-tools-%{version}.tar.gz
 License:        GPLv2
-Group:          Applications/Systems
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Provides:       libinotifytools0
-BuildRequires:  gcc
+Group:          Applications/Systems
+URL:            https://github.com/inotify-tools/inotify-tools/wiki
+Source0:        https://github.com/inotify-tools/inotify-tools/archive/%{version}/inotify-tools-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  doxygen
-BuildRequires:  make
+BuildRequires:  gcc
 BuildRequires:  libtool
+BuildRequires:  make
+Provides:       libinotifytools0
 
 %description
 inotify-tools is simple command line interface program for linux distributions
@@ -42,12 +42,11 @@ you will need to install %{name}-devel.
 make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 
-find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 # We'll install documentation in the proper place
-rm -rf %{buildroot}/%{_datadir}/doc/
+rm -rf %{buildroot}/%{_docdir}
 
 %check
 make %{?_smp_mflags} check
@@ -55,8 +54,8 @@ make %{?_smp_mflags} check
 %ldconfig_scriptlets
 
 %files
-%doc AUTHORS COPYING
 %license COPYING
+%doc AUTHORS
 %{_bindir}/inotifywait
 %{_bindir}/inotifywatch
 %{_libdir}/libinotifytools.so.*
