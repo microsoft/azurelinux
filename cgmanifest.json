@@ -9510,6 +9510,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libecb",
+          "version": "9.30",
+          "downloadUrl": "http://cvs.schmorp.de/libecb/?view=tar&pathrev=rxvt-unicode-rel-9_30"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libedit",
           "version": "3.1.20180525",
           "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20180525-3.1.tar.gz"
@@ -9601,8 +9611,8 @@
         "type": "other",
         "other": {
           "name": "libev",
-          "version": "4.24",
-          "downloadUrl": "http://dist.schmorp.de/libev/Attic/libev-4.24.tar.gz"
+          "version": "4.33",
+          "downloadUrl": "http://dist.schmorp.de/libev/Attic/libev-4.33.tar.gz"
         }
       }
     },
@@ -10303,6 +10313,16 @@
           "name": "liblqr-1",
           "version": "0.4.2",
           "downloadUrl": "http://liblqr.wikidot.com/local--files/en:download-page/liblqr-1-0.4.2.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "liblzf",
+          "version": "3.6",
+          "downloadUrl": "http://dist.schmorp.de/liblzf/liblzf-3.6.tar.gz"
         }
       }
     },
@@ -16373,6 +16393,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-AnyEvent-AIO",
+          "version": "1.1",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-AIO-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-AnyEvent-BDB",
+          "version": "1.1",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-BDB-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-App-cpanminus",
           "version": "1.7044",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7044.tar.gz"
@@ -16493,9 +16533,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-BDB",
+          "version": "1.92",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-1.92.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Bit-Vector",
           "version": "7.4",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/S/ST/STBEY/Bit-Vector-7.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-boolean",
+          "version": "0.46",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/boolean-0.46.tar.gz"
         }
       }
     },
@@ -16566,6 +16626,16 @@
           "name": "perl-Carp-Clan",
           "version": "6.08",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Carp-Clan-6.08.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-CBOR-XS",
+          "version": "1.86",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/CBOR-XS-1.86.tar.gz"
         }
       }
     },
@@ -16713,6 +16783,66 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Color-ANSI-Util",
+          "version": "0.164",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-ANSI-Util-0.164.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Color-RGB-Util",
+          "version": "0.606",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-RGB-Util-0.606.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeBase-Static",
+          "version": "0.008",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeBase-Static-0.008.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeRole-ANSI",
+          "version": "0.001",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeRole-ANSI-0.001.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemes-Standard",
+          "version": "0.003",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemes-Standard-0.003.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeUtil-ANSI",
+          "version": "0.002",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeUtil-ANSI-0.002.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-common-sense",
           "version": "3.74",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-3.74.tar.gz"
@@ -16726,6 +16856,16 @@
           "name": "perl-Compress-Bzip2",
           "version": "2.28",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Compress-Bzip2-2.28.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Compress-LZF",
+          "version": "3.8",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Compress/Compress-LZF-3.8.tar.gz"
         }
       }
     },
@@ -16823,6 +16963,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Convert-Bencode",
+          "version": "1.03",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Convert/Convert-Bencode-1.03.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Coro",
+          "version": "6.570",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-6.57.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Coro-Multicore",
+          "version": "1.07",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-1.07.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-CPAN-Changes",
           "version": "0.400002",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-0.400002.tar.gz"
@@ -16846,6 +17016,16 @@
           "name": "perl-CPAN-Meta-Check",
           "version": "0.014",
           "downloadUrl": "http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-0.014.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Cpanel-JSON-XS",
+          "version": "4.27",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-4.27.tar.gz"
         }
       }
     },
@@ -17483,6 +17663,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-EV",
+          "version": "4.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/EV-4.33.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Eval-Closure",
           "version": "0.14",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DO/DOY/Eval-Closure-0.14.tar.gz"
@@ -17923,6 +18113,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Graphics-ColorNamesLite-WWW",
+          "version": "1.14.000",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Graphics-ColorNamesLite-WWW-1.14.000.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-GSSAPI",
           "version": "0.28",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AG/AGROLMS/GSSAPI-0.28.tar.gz"
@@ -18123,6 +18323,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-IO-AIO",
+          "version": "4.76",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-4.76.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-IO-All",
           "version": "0.87",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/F/FR/FREW/IO-All-0.87.tar.gz"
@@ -18286,6 +18496,16 @@
           "name": "perl-JSON-Color",
           "version": "0.133",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-0.133.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-JSON-MaybeXS",
+          "version": "1.004003",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004003.tar.gz"
         }
       }
     },
@@ -18716,6 +18936,16 @@
           "name": "perl-Module-Install-TestBase",
           "version": "0.86",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Install-TestBase-0.86.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Module-Load-Util",
+          "version": "0.006",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Module-Load-Util-0.006.tar.gz"
         }
       }
     },
@@ -19586,6 +19816,16 @@
           "name": "perl-Ref-Util-XS",
           "version": "0.117",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/X/XS/XSAWYERX/Ref-Util-XS-0.117.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Regexp-Pattern-Perl",
+          "version": "0.006",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-0.006.tar.gz"
         }
       }
     },
