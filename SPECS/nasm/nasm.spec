@@ -1,7 +1,7 @@
 Summary:	Netwide Assembler.
 Name:		nasm
-Version:	2.13.03
-Release:        5%{?dist}
+Version:	2.15.05
+Release:        1%{?dist}
 License:	BSD
 URL:		http://www.nasm.us
 Group:		System Environment/Libraries
@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 ExclusiveArch:  x86_64
 Source0:	http://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.gz
-%define sha1 nasm=fa15c35b6003518d8165ab507f31af5d3938e91f
+
 %description
 NASM (Netwide Assembler) is an 80x86 assembler designed for portability and modularity. It includes a disassembler as well.
 %prep
@@ -18,7 +18,7 @@ NASM (Netwide Assembler) is an 80x86 assembler designed for portability and modu
 %configure
 make %{?_smp_mflags} CFLAGS="%{build_cflags}"
 %install
-make INSTALLROOT=%{buildroot} install
+%make_install
 %check
 make %{?_smp_mflags} -k test
 %files
