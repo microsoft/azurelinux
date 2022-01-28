@@ -10,7 +10,7 @@
 Summary:        Ruby
 Name:           ruby
 Version:        2.7.2
-Release:        5%{?dist}
+Release:        4%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -191,9 +191,6 @@ sudo -u test make test TESTS="-v"
 %{rubygems_dir}/rubygems
 
 %changelog
-* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.7.2-5
-- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
-
 * Mon Jul 12 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-4
 - Add attribution for parts of the install script taken from Fedora 34 (license: MIT)
 - Add provides for rubygem(json), and install json gem into the gemdir

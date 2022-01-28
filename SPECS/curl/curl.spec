@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        9%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -96,9 +96,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 7.76.0-9
-- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
-
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.76.0-8
 - Removing the explicit %%clean stage.
 

@@ -1,7 +1,7 @@
 Summary:        GNU Ubiquitous Intelligent Language for Extensions
 Name:           guile
 Version:        2.0.14
-Release:        5%{?dist}
+Release:        4%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,9 +78,6 @@ make  %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0.14-5
-- Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
-
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.14-4
 - Remove libtool archive files from final packaging
 
