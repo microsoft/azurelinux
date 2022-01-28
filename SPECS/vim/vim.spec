@@ -2,13 +2,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.2.4120
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: CVE-2022-0318.patch
 BuildRequires:  ncurses-devel
 
 %description
@@ -190,6 +191,8 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+*   Fri Jan 28 2022 Mariner Autopatcher <cblmargh@microsoft.com> 8.2.4120-2
+-   Added patch file(s) CVE-2022-0318.patch
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2.4120-1
 - Update version to 8.2.4120 to fix CVE-2022-0261.
 
