@@ -80,14 +80,14 @@ func main() {
 		logger.Log.Panicf("Failed to read graph to file, %s. Error: %s", *inputGraphFile, err)
 	}
 
-    if *hydratedBuild {
-        logger.Log.Debugf("Nodes before replacing prebuilt nodes: %d", len(scrubbedGraph.AllNodes()))
-	    err = replaceRunNodesWithPrebuiltNodes(scrubbedGraph)
-        logger.Log.Debugf("Nodes after replacing prebuilt nodes: %d", len(scrubbedGraph.AllNodes()))
-    	if err != nil {
-		    logger.Log.Panicf("Failed to replace run nodes with preBuilt nodes. Error: %s", err)
-    	}
-    }
+	if *hydratedBuild {
+		logger.Log.Debugf("Nodes before replacing prebuilt nodes: %d", len(scrubbedGraph.AllNodes()))
+		err = replaceRunNodesWithPrebuiltNodes(scrubbedGraph)
+		logger.Log.Debugf("Nodes after replacing prebuilt nodes: %d", len(scrubbedGraph.AllNodes()))
+		if err != nil {
+			logger.Log.Panicf("Failed to replace run nodes with preBuilt nodes. Error: %s", err)
+		}
+	}
 
 	err = pkggraph.WriteDOTGraphFile(scrubbedGraph, *outputGraphFile)
 	if err != nil {
