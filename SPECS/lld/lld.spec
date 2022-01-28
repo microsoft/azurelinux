@@ -14,10 +14,10 @@ Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%
 Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/libunwind-%{version}.src.tar.xz
 BuildRequires:  build-essential
 BuildRequires:  cmake
+BuildRequires:  file
 BuildRequires:  llvm-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3
-BuildRequires:  file
 Requires:       %{name}-libs = %{version}-%{release}
 
 %package devel
