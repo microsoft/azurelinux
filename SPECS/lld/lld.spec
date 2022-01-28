@@ -15,6 +15,7 @@ BuildRequires:  llvm-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3
 BuildRequires:  file
+Requires:       %{name}-libs = %{version}-%{release}
 
 %package devel
 Summary:        Libraries and header files for LLD
@@ -56,11 +57,11 @@ cd build
 
 %files
 %license LICENSE.TXT
-%{_bindir}
+%{_bindir}/*
 
 %files devel
-%{_includedir}/lld
-%{_libdir}/cmake
+%{_includedir}/lld/
+%{_libdir}/cmake/lld/*.cmake
 %{_libdir}/*.so
 
 %files libs
