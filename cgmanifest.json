@@ -10481,8 +10481,8 @@
         "type": "other",
         "other": {
           "name": "libmspack",
-          "version": "0.7.1alpha",
-          "downloadUrl": "http://www.cabextract.org.uk/libmspack/libmspack-0.7.1alpha.tar.gz"
+          "version": "0.10.1alpha",
+          "downloadUrl": "http://www.cabextract.org.uk/libmspack/libmspack-0.10.1alpha.tar.gz"
         }
       }
     },
@@ -14685,16 +14685,6 @@
           "name": "nmap",
           "version": "7.90",
           "downloadUrl": "https://nmap.org/dist/nmap-7.90.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "nmstate",
-          "version": "0.3.3",
-          "downloadUrl": "https://github.com/nmstate/nmstate/releases/download/v0.3.3/nmstate-0.3.3.tar.gz"
         }
       }
     },
@@ -19623,16 +19613,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "perl-Pod-Escapes",
-          "version": "1.07",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEILB/Pod-Escapes-1.07.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "perl-Pod-Eventual",
           "version": "0.094001",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-0.094001.tar.gz"
@@ -20346,16 +20326,6 @@
           "name": "perl-Test-File-ShareDir",
           "version": "1.001002",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/K/KE/KENTNL/Test-File-ShareDir-1.001002.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "perl-Test-Harness",
-          "version": "3.42",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.42.tar.gz"
         }
       }
     },
@@ -22756,6 +22726,16 @@
           "name": "python-entrypoints",
           "version": "0.3",
           "downloadUrl": "https://github.com/takluyver/entrypoints/archive/0.3/entrypoints-0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-ethtool",
+          "version": "0.14",
+          "downloadUrl": "https://github.com/fedora-python/python-ethtool/archive/refs/tags/v0.14.tar.gz"
         }
       }
     },
@@ -25496,16 +25476,6 @@
           "name": "recordproto",
           "version": "1.14.2",
           "downloadUrl": "https://www.x.org/pub/individual/proto/recordproto-1.14.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "redfish-finder",
-          "version": "0.4",
-          "downloadUrl": "https://github.com/nhorman/redfish-finder/archive/V0.4/redfish-finder-0.4.tar.gz"
         }
       }
     },
