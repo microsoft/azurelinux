@@ -14692,16 +14692,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nmstate",
-          "version": "0.3.3",
-          "downloadUrl": "https://github.com/nmstate/nmstate/releases/download/v0.3.3/nmstate-0.3.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "node-problem-detector",
           "version": "0.8.8",
           "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.8.tar.gz"
@@ -25476,16 +25466,6 @@
           "name": "recordproto",
           "version": "1.14.2",
           "downloadUrl": "https://www.x.org/pub/individual/proto/recordproto-1.14.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "redfish-finder",
-          "version": "0.4",
-          "downloadUrl": "https://github.com/nhorman/redfish-finder/archive/V0.4/redfish-finder-0.4.tar.gz"
         }
       }
     },
