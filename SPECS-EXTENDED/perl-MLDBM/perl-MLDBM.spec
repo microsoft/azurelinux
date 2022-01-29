@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/MLDBM
 Source0:        https://cpan.metacpan.org/authors/id/C/CH/CHORNY/MLDBM-%{version}.tar.gz#/perl-MLDBM-%{version}.tar.gz
+Source1:        LICENSE.PTR
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -51,10 +52,13 @@ make pure_install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} -c %{buildroot}
 
+cp %{SOURCE1} .
+
 %check
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes README
 %{perl_vendorlib}/MLDBM/
 %{perl_vendorlib}/MLDBM.pm
@@ -63,6 +67,7 @@ make test
 %changelog
 * Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.05-22
 - Removing dependency on "perl(DB_File)".
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.05-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
