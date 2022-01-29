@@ -2067,8 +2067,8 @@
         "type": "other",
         "other": {
           "name": "conda",
-          "version": "4.10.1",
-          "downloadUrl": "https://github.com/conda/conda/archive/4.10.1/conda-4.10.1.tar.gz"
+          "version": "4.11.0",
+          "downloadUrl": "https://github.com/conda/conda/archive/4.11.0/conda-4.11.0.tar.gz"
         }
       }
     },

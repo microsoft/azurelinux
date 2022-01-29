@@ -39,4 +39,3 @@ index b51f7f272d..06e0b4bc9a 100644
  def get_python_site_packages_short_path(python_version):
 -- 
 2.19.2
-
