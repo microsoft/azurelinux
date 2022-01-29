@@ -1,6 +1,6 @@
 Name:           perl-MLDBM
 Version:        2.05
-Release:        21%{?dist}
+Release:        22%{?dist}
 Summary:        Store multi-level hash structure in single level tied hash
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -27,8 +27,6 @@ BuildRequires:  perl(vars)
 # Test Suite
 BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(Test::More)
-# Optional Tests
-BuildRequires:  perl(DB_File)
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
@@ -63,6 +61,9 @@ make test
 %{_mandir}/man3/MLDBM.3*
 
 %changelog
+* Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.05-22
+- Removing dependency on "perl(DB_File)".
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.05-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

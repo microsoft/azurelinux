@@ -70,7 +70,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
-    sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libselinux-[[:alpha:]]/d' $TmpPkgGen
@@ -245,7 +244,6 @@ generate_pkggen_core () {
         grep "^popt-" $TmpPkgGen
         grep "^nspr-" $TmpPkgGen
         grep "^sqlite-" $TmpPkgGen
-        grep "^nss-" $TmpPkgGen
         grep "^elfutils-" $TmpPkgGen
         grep "^expat-" $TmpPkgGen
         grep "^libpipeline-" $TmpPkgGen
@@ -256,7 +254,6 @@ generate_pkggen_core () {
         grep "^automake-" $TmpPkgGen
         grep "^openssl-" $TmpPkgGen
         grep "^libcap-" $TmpPkgGen
-        grep "^libdb-" $TmpPkgGen
         grep "^debugedit-" $TmpPkgGen
         grep "^rpm-" $TmpPkgGen
         grep "^cpio-" $TmpPkgGen
