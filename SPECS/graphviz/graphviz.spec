@@ -441,8 +441,8 @@ php --no-php-ini \
 %dir %{_libdir}/graphviz
 %{_libdir}/*.so.*
 %{_libdir}/graphviz/*.so.*
-%{_mandir}/man1/*.1%{?ext_man}
-%{_mandir}/man7/*.7%{?ext_man}
+%{_mandir}/man1/*.1*
+%{_mandir}/man7/*.7*
 %dir %{_datadir}/graphviz
 %exclude %{_docdir}/%{name}/html
 %exclude %{_docdir}/%{name}/pdf
@@ -469,7 +469,7 @@ php --no-php-ini \
 %{_libdir}/*.so
 %{_libdir}/graphviz/*.so
 %{_libdir}/pkgconfig/*.pc
-%{_mandir}/man3/*.3%{?ext_man}
+%{_mandir}/man3/*.3*
 
 %if %{DEVIL}
 %files devil
@@ -553,6 +553,7 @@ php --no-php-ini \
 - Add perl as BR
 - License Verified
 - Fix linting
+- Remove usage of {?ext_man}, which is not supported in CBL-Mariner
 
 * Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.42.4-3
 - Use pkgconfig(cairo) instead of cairo-devel build requirement
