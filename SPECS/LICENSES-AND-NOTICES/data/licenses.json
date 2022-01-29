@@ -1574,7 +1574,6 @@
                 "perl-Test-Fatal",
                 "perl-Test-File",
                 "perl-Test-File-ShareDir",
-                "perl-Test-Harness",
                 "perl-Test-HasVersion",
                 "perl-Test-InDistDir",
                 "perl-Test-Inter",
