@@ -22733,6 +22733,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-ethtool",
+          "version": "0.14",
+          "downloadUrl": "https://github.com/fedora-python/python-ethtool/archive/refs/tags/v0.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-evdev",
           "version": "1.1.2",
           "downloadUrl": "https://github.com/gvalkov/python-evdev/archive/v1.1.2.tar.gz"
