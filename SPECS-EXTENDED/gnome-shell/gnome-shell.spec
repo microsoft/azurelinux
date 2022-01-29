@@ -215,6 +215,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/evolution-calendar.de
 %changelog
 * Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 3.36.9-3
 - Remove NetworkManger-libnm-devel BR because CBL-Mariner is not providing NetworkManager
+- License verified
 
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.9-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
