@@ -1,4 +1,3 @@
-%define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
 Version:        101.0.0
@@ -8,10 +7,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt
-#Source0:       https://github.com/microsoft/SymCrypt/archive/%{version}.tar.gz
+#Source0:       https://github.com/microsoft/SymCrypt/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 #Source1        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz
 Source1:        jitterentropy-library-3.3.1.tar.gz
+%define debug_package %{nil}
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
@@ -22,8 +22,8 @@ BuildRequires:  python3-pyelftools
 A core cryptographic library written by Microsoft
 
 %prep
-%setup
-%setup -a 1
+%setup -q
+%setup -q -a 1
 # Create a symbolic link as if jitterentropy-library has been pulled in as git submodule
 rm -rf jitterentropy-library
 ln -s jitterentropy-library-3.3.1 jitterentropy-library
@@ -62,5 +62,5 @@ install bin/module/ARM64/LinuxUserMode/generic/libsymcrypt.so %{buildroot}%{_lib
 %{_includedir}/*
 
 %changelog
-* Fri Jan 28 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
-- Initial CBL-Mariner import
+* Mon Jan 31 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
+- Original version for CBL-Mariner
