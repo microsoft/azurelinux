@@ -1,13 +1,12 @@
 Summary:        A utility for patching ELF binaries
 Name:           patchelf
-Version:        0.12
-Release:        3%{?dist}
+Version:        0.14.3
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://nixos.org/patchelf.html
 Source0:        https://github.com/NixOS/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         disable-set-interpreter-long-test.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  coreutils
@@ -52,6 +51,10 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 %{_mandir}/man1/patchelf.1*
 
 %changelog
+* Wed Jan 26 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.14.3-1
+- Upgraded to v0.14.3
+- Removed patch to disable set-interpreter-long test.
+
 * Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 0.12-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified
