@@ -1,9 +1,0 @@
---- src/java/org/apache/log/output/db/DefaultDataSource.java.sav	2012-04-18 00:41:59.000000000 +0300
-+++ src/java/org/apache/log/output/db/DefaultDataSource.java	2012-04-18 00:46:17.454272754 +0300
-@@ -117,4 +117,6 @@ public class DefaultDataSource
-     }
- 
-     public <T> T unwrap(java.lang.Class<T> iface) {return null;}
-+    
-+    public java.util.logging.Logger getParentLogger() {return null;}
- }

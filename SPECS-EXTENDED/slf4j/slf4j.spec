@@ -21,10 +21,9 @@ Distribution:   Mariner
 
 Name:           slf4j
 Version:        1.7.30
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Simple Logging Facade for Java
-# the log4j-over-slf4j and jcl-over-slf4j submodules are ASL 2.0, rest is MIT
-License:        MIT AND Apache-2.0
+License:        MIT
 Group:          Development/Libraries/Java
 URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -42,7 +41,6 @@ BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  javapackages-tools
 BuildRequires:  javassist >= 3.4
 BuildRequires:  junit >= 3.8.2
-BuildRequires:  log4j12-mini
 Requires:       cal10n
 Requires:       java
 # this is ugly hack, which creates package which requires the same,
@@ -84,14 +82,6 @@ Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 %description jdk14
 SLF4J JDK14 Binding.
 
-%package log4j12
-Summary:        SLF4J LOG4J-12 Binding
-Group:          Development/Libraries/Java
-Requires:       mvn(org.slf4j:slf4j-api) = %{version}
-
-%description log4j12
-SLF4J LOG4J-12 Binding.
-
 %package jcl
 Summary:        SLF4J JCL Binding
 Group:          Development/Libraries/Java
@@ -111,6 +101,7 @@ Extensions to the SLF4J API.
 
 %package -n jcl-over-slf4j
 Summary:        JCL 1.1.1 implemented over SLF4J
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 
@@ -119,6 +110,7 @@ JCL 1.1.1 implemented over SLF4J.
 
 %package -n log4j-over-slf4j
 Summary:        Log4j implemented over SLF4J
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 
@@ -165,9 +157,10 @@ done
 sed -i "/Import-Package/s/$/;resolution:=optional/" slf4j-api/src/main/resources/META-INF/MANIFEST.MF
 
 %pom_change_dep -r -f ::::: :::::
+%pom_disable_module slf4j-log4j12
 
 %build
-export CLASSPATH=$(build-classpath log4j12/log4j-12 \
+export CLASSPATH=$(build-classpath \
                    commons-logging \
                    commons-lang3 \
                    javassist-3.14.0 \
@@ -182,7 +175,7 @@ ant -Dmaven2.jpp.mode=true \
 %install
 # jars
 install -d -m 0755 %{buildroot}%{_javadir}/%{name}
-for i in api ext jcl jdk14 log4j12 nop simple; do
+for i in api ext jcl jdk14 nop simple; do
   install -m 644 slf4j-${i}/target/slf4j-${i}-%{version}.jar \
     %{buildroot}%{_javadir}/%{name}/${i}.jar
   ln -sf ${i}.jar %{buildroot}%{_javadir}/%{name}/%{name}-${i}.jar
@@ -193,7 +186,7 @@ done
 
 # poms
 install -d -m 755 %{buildroot}%{_mavenpomdir}/%{name}
-for i in api ext jcl jdk14 log4j12 nop simple; do
+for i in api ext jcl jdk14 nop simple; do
   %pom_remove_parent slf4j-${i}
   %pom_xpath_inject "pom:project" "
     <groupId>org.slf4j</groupId>
@@ -210,7 +203,7 @@ done
 for i in api nop simple; do
   %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar
 done
-for i in ext jcl jdk14 log4j12 jcl-over-slf4j jul-to-slf4j log4j-over-slf4j; do
+for i in ext jcl jdk14 jcl-over-slf4j jul-to-slf4j log4j-over-slf4j; do
   %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar -f ${i}
 done
 
@@ -235,9 +228,6 @@ rm -rf target/site
 %files jdk14 -f .mfiles-jdk14
 %{_javadir}/%{name}/%{name}-jdk14.jar
 
-%files log4j12 -f .mfiles-log4j12
-%{_javadir}/%{name}/%{name}-log4j12.jar
-
 %files jcl -f .mfiles-jcl
 %{_javadir}/%{name}/%{name}-jcl.jar
 
@@ -257,6 +247,10 @@ rm -rf target/site
 %{_docdir}/%{name}-%{version}/site
 
 %changelog
+* Mon Jan 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.30-4
+- Removing dependency on "log4j12".
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.30-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

@@ -779,9 +779,9 @@ popd
 rm -rf openssl-1.1.1g
 touch /logs/status_openssl_complete
 
-echo Python-3.9.9
-tar xf Python-3.9.9.tar.xz
-pushd Python-3.9.9
+echo Python-3.9.10
+tar xf Python-3.9.10.tar.xz
+pushd Python-3.9.10
 ./configure --prefix=/usr       \
             --with-platlibdir=lib \
             --enable-shared     \
@@ -794,7 +794,7 @@ chmod -v 755 /usr/lib/libpython3.9.so.1.0
 chmod -v 755 /usr/lib/libpython3.so
 ln -sfv pip3.9 /usr/bin/pip3
 popd
-rm -rf Python-3.9.9
+rm -rf Python-3.9.10
 touch /logs/status_python399_complete
 
 echo Coreutils-8.32
@@ -1031,39 +1031,17 @@ popd
 rm -rf nspr-4.21
 touch /logs/status_nspr_complete
 
-echo popt-1.16
-tar xf popt-1.16.tar.gz
-pushd popt-1.16
+echo popt-1.18
+tar xf popt-1.18.tar.gz
+pushd popt-1.18
 ./configure --prefix=/usr \
         --disable-static \
         --build=$BUILD_TARGET
 make -j$(nproc)
 make install
 popd
-rm -rf popt-1.16
+rm -rf popt-1.18
 touch /logs/status_popt_complete
-
-echo libdb - aka Berkely DB-5.3.28
-tar xf db-5.3.28.tar.gz
-pushd db-5.3.28
-sed -i 's/\(__atomic_compare_exchange\)/\1_db/' src/dbinc/atomic.h
-cd build_unix
-../dist/configure --prefix=/usr  \
-                --enable-compat185 \
-                --enable-dbm       \
-                --disable-static   \
-                --enable-cxx       \
-                --build=$BUILD_TARGET
-make -j$(nproc)
-make docdir=/usr/share/doc/db-5.3.28 install
-chown -v -R root:root                    \
-    /usr/bin/db_*                          \
-    /usr/include/db{,_185,_cxx}.h          \
-    /usr/lib/libdb*.{so,la}                \
-    /usr/share/doc/db-5.3.28
-popd
-rm -rf db-5.3.28
-touch /logs/status_libdb_complete
 
 echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2

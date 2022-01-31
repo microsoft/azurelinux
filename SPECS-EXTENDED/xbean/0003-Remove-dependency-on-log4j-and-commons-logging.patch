@@ -1,0 +1,35 @@
+From 28e37850d8343f44f82e3138c772dd65d1d0ff2f Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 12 Dec 2019 08:52:26 +0100
+Subject: [PATCH 3/3] Remove dependency on log4j and commons-logging
+
+---
+ .../xbean/propertyeditor/PropertyEditorRegistry.java | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/xbean-reflect/src/main/java/org/apache/xbean/propertyeditor/PropertyEditorRegistry.java b/xbean-reflect/src/main/java/org/apache/xbean/propertyeditor/PropertyEditorRegistry.java
+index e7e17edd..be302861 100644
+--- a/xbean-reflect/src/main/java/org/apache/xbean/propertyeditor/PropertyEditorRegistry.java
++++ b/xbean-reflect/src/main/java/org/apache/xbean/propertyeditor/PropertyEditorRegistry.java
+@@ -84,18 +84,6 @@ public class PropertyEditorRegistry implements Closeable {
+         register(new VectorEditor());
+         register(new WeakHashMapEditor());
+ 
+-        try {
+-            register(new Log4jConverter());
+-        } catch (final Throwable e) {
+-            // no-op
+-        }
+-
+-        try {
+-            register(new CommonsLoggingConverter());
+-        } catch (final Throwable e) {
+-            // no-op
+-        }
+-
+         return this;
+     }
+ 
+-- 
+2.21.0
+

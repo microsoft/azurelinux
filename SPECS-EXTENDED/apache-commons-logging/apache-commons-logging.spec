@@ -23,13 +23,11 @@ Distribution:   Mariner
 %define short_name commons-%{base_name}
 Name:           apache-%{short_name}
 Version:        1.2
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Apache Commons Logging
-License:        Apache-2.0
+License:        ASL 2.0
 URL:            http://commons.apache.org/%{base_name}
 Source0:        http://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
-Source1:        http://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz.asc
-Source2:        apache-commons-logging.keyring
 Source4:        http://central.maven.org/maven2/%{short_name}/%{short_name}-api/1.1/%{short_name}-api-1.1.pom
 Patch0:         commons-logging-1.1.3-src-junit.diff
 Patch1:         commons-logging-1.2-sourcetarget.patch
@@ -40,7 +38,6 @@ BuildRequires:  glassfish-servlet-api
 BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  junit
-BuildRequires:  log4j12-mini >= 1.2
 Requires:       java >= 1.8
 Provides:       jakarta-%{short_name} = %{version}-%{release}
 Obsoletes:      jakarta-%{short_name} < %{version}
@@ -72,6 +69,19 @@ rm ./src/test/java/org/apache/commons/logging/servlet/BasicServletTestCase.java
 
 %pom_remove_parent .
 
+# Remove log4j12 and components not provided in CBL-Mariner.
+%pom_remove_dep -r :avalon-framework
+%pom_remove_dep -r :logkit
+%pom_remove_dep -r :log4j
+rm src/main/java/org/apache/commons/logging/impl/AvalonLogger.java
+rm src/main/java/org/apache/commons/logging/impl/Log4JLogger.java
+rm src/main/java/org/apache/commons/logging/impl/LogKitLogger.java
+rm -r src/test/java/org/apache/commons/logging/{avalon,log4j,logkit}
+rm src/test/java/org/apache/commons/logging/pathable/{Parent,Child}FirstTestCase.java
+
+# Remove log4j12 tests
+rm -rf src/test/java/org/apache/commons/logging/log4j/log4j12
+
 %build
 export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
 mkdir -p $MAVEN_REPO_LOCAL
@@ -82,7 +92,7 @@ export CLASSPATH=$(build-classpath \
                   ):target/classes:target/test-classes
 ant \
   -Dmaven.mode.offline=true -lib %{_javadir} \
-  -Dlog4j12.jar=%{_javadir}/log4j12/log4j-12.jar -Dservletapi.jar=%{_javadir}/glassfish-servlet-api.jar \
+  -Dservletapi.jar=%{_javadir}/glassfish-servlet-api.jar \
   dist
 
 %install
@@ -115,6 +125,10 @@ install -pm 644 tmp.pom %{buildroot}/%{_mavenpomdir}/%{short_name}-adapters-%{ve
 %doc PROPOSAL.html RELEASE-NOTES.txt NOTICE.txt
 
 %changelog
+* Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-10
+- Removing 'log4j12' dependency.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-9
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
