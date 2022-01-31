@@ -1538,15 +1538,17 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 		files := 0
 		lastFile := ""
 		onStdout := func(args ...interface{}) {
-			files++
+			if len(args) > 0 {
+				files++
+				lastFile = fmt.Sprintf("%v", args)
+			}
 			if (files % 1000) == 0 {
 				ReportActionf("SELinux: labelled %d files", files)
 			}
-			return
 		}
 		err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", args...)
 		if err != nil {
-			return fmt.Errorf("Failed while labeling files (last file: %s) %w", lastFile, err)
+			return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
 		}
 		return err
 	})
