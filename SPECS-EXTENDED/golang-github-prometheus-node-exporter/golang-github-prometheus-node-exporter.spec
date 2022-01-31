@@ -17,7 +17,7 @@ Distribution:   Mariner
 %global goipath         github.com/prometheus/node_exporter
 Version:                1.3.1
 
-%gometa
+#%gometa
 
 %global common_description %{expand:
 Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written
@@ -28,13 +28,13 @@ in Go with pluggable metric collectors.}
                         CONTRIBUTING.md MAINTAINERS.md SECURITY.md README.md
 
 Name:           %{goname}
-Release:        %autorelease
+Release:        6%{?dist}
 Summary:        Exporter for machine metrics
 
 # Upstream license specification: Apache-2.0
 License:        ASL 2.0 and MIT
 URL:            %{gourl}
-Source0:        %{gosource}
+Source0:        https://github.com/prometheus/node_exporter/archive/refs/tags/v%{version}.tar.gz#/%{shortname}-%{version}.tar.gz
 Source1:        %{shortname}.sysusers
 Source2:        %{shortname}.service
 Source3:        %{shortname}.conf
@@ -160,6 +160,9 @@ sed -i '/^  /d; /^.SH "NAME"/,+1c.SH "NAME"\nprometheus-node-exporter \\- The Pr
 %gopkgfiles
 
 %changelog
+* Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.1-6
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> 1.3.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
