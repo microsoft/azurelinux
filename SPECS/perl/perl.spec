@@ -1,3 +1,20 @@
+# use "lib", not %%{_lib}, for privlib, sitelib, and vendorlib
+# To build production version, we would need -DDEBUGGING=-g
+
+# Perl INC path (perl -V) in search order:
+# - /usr/local/share/perl5            -- for CPAN     (site lib)
+# - /usr/local/lib[64]/perl5          -- for CPAN     (site arch)
+# - /usr/share/perl5/vendor_perl      -- 3rd party    (vendor lib)
+# - /usr/lib[64]/perl5/vendor_perl    -- 3rd party    (vendor arch)
+# - /usr/share/perl5                  -- Fedora       (priv lib)
+# - /usr/lib[64]/perl5                -- Fedora       (arch lib)
+
+%global privlib     %{_prefix}/share/perl5
+%global archlib     %{_libdir}/perl5
+
+%global perl_vendorlib  %{privlib}/vendor_perl
+%global perl_vendorarch %{archlib}/vendor_perl
+
 %define _unpackaged_files_terminate_build 0
 
 %global perl_version    5.32.0
@@ -12,7 +29,7 @@
 
 # This overrides filters from build root (/usr/lib/rpm/macros.d/macros.perl)
 # intentionally (unversioned perl(DB) is removed and versioned one is kept).
-%global __provides_exclude_from .*%{_docdir}|.*%{perl_archlib}/.*\\.pl$|.*%{perl_privlib}/.*\\.pl$
+%global __provides_exclude_from .*(%{_docdir}|%{archlib}/.*\\.pl|%{privlib}/.*\\.pl)$
 %global __requires_exclude_from %{_docdir}
 %global __provides_exclude perl\\((VMS|Win32|BSD::|DB\\)$)
 %global __requires_exclude perl\\((VMS|BSD::|Win32|Tk|Mac::|Your::Module::Here)
@@ -24,7 +41,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version} 
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        464%{?dist}
+Release:        465%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -189,7 +206,7 @@ Requires:       perl-Compress-Raw-Bzip2, perl-Compress-Raw-Zlib,
 Requires:       perl-Config-Extensions, perl-Config-Perl-V, perl-constant,
 Requires:       perl-CPAN, perl-CPAN-Meta, perl-CPAN-Meta-Requirements,
 Requires:       perl-CPAN-Meta-YAML,
-Requires:       perl-Data-Dumper, perl-DB_File, perl-DBM_Filter,
+Requires:       perl-Data-Dumper, perl-DBM_Filter,
 Requires:       perl-debugger, perl-deprecate,
 Requires:       perl-Devel-Peek, perl-Devel-PPPort, perl-Devel-SelfStubber,
 Requires:       perl-diagnostics, perl-Digest, perl-Digest-MD5, perl-Digest-SHA,
@@ -354,8 +371,6 @@ Provides:       perl(unicore::Name)
 # causes loading utf8 and unicore/Heave.pl and unicore/lib files.
 Provides:       perl(utf8_heavy.pl)
 # utf8 and utf8_heavy.pl require Carp, re, strict, warnings, XSLoader
-# For AnyDBM_File
-Suggests:       perl(DB_File)
 # File::Spec loaded by _charnames.pm that is loaded by \N{}
 Requires:       perl(File::Spec)
 # For AnyDBM_File
@@ -965,27 +980,6 @@ Given a list of scalars or reference variables, writes out their contents
 in perl syntax. The references can also be objects. The content of each
 variable is output in a single Perl statement. Handles self-referential
 structures correctly.
-%endif
-
-%if %{dual_life} || %{rebuild_from_scratch}
-%package DB_File
-Summary:        Perl5 access to Berkeley DB version 1.x
-License:        GPL+ or Artistic
-Epoch:          0
-Version:        1.853
-Requires:       %perl_compat
-Requires:       perl(Fcntl)
-Requires:       perl(XSLoader)
-%if %{defined perl_bootstrap}
-%gendep_perl_DB_File
-%endif
-
-
-%description DB_File
-DB_File is a module which allows Perl programs to make use of the facilities
-provided by Berkeley DB version 1.x (if you have a newer version of DB, you
-will be limited to functionality provided by interface of version 1.x). The
-interface defined here mirrors the Berkeley DB interface closely.
 %endif
 
 %package DBM_Filter
@@ -4115,23 +4109,6 @@ sed -i '/\(bzip2\|zlib\)-src/d' MANIFEST
 %build
 echo "RPM Build arch: %{_arch}"
 
-# use "lib", not %%{_lib}, for privlib, sitelib, and vendorlib
-# To build production version, we would need -DDEBUGGING=-g
-
-# Perl INC path (perl -V) in search order:
-# - /usr/local/share/perl5            -- for CPAN     (site lib)
-# - /usr/local/lib[64]/perl5          -- for CPAN     (site arch)
-# - /usr/share/perl5/vendor_perl      -- 3rd party    (vendor lib)
-# - /usr/lib[64]/perl5/vendor_perl    -- 3rd party    (vendor arch)
-# - /usr/share/perl5                  -- Fedora       (priv lib)
-# - /usr/lib[64]/perl5                -- Fedora       (arch lib)
-
-%global privlib     %{_prefix}/share/perl5
-%global archlib     %{_libdir}/perl5
-
-%global perl_vendorlib  %{privlib}/vendor_perl
-%global perl_vendorarch %{archlib}/vendor_perl
-
 %global perl_abi    %(echo '%{perl_version}' | sed 's/^\\([^.]*\\.[^.]*\\).*/\\1/')
 
 # ldflags is not used when linking XS modules.
@@ -4307,7 +4284,6 @@ done
 %exclude %{archlib}/auto/Compress/Raw/Bzip2/Bzip2.so
 %exclude %{archlib}/auto/Compress/Raw/Zlib/Zlib.so
 %exclude %{archlib}/auto/Cwd/Cwd.so
-%exclude %{archlib}/auto/DB_File/DB_File.so
 %exclude %{archlib}/auto/Data/Dumper/Dumper.so
 %exclude %{archlib}/auto/Digest/MD5/MD5.so
 %exclude %{archlib}/auto/Digest/SHA/SHA.so
@@ -4721,19 +4697,6 @@ done
 %exclude %dir %{archlib}/Data
 %exclude %{archlib}/Data/Dumper.pm
 %exclude %{_mandir}/man3/Data::Dumper.3*
-%endif
-
-%if %{dual_life} || %{rebuild_from_scratch}
-%files DB_File
-%{archlib}/DB_File.pm
-%dir %{archlib}/auto/DB_File
-%{archlib}/auto/DB_File/DB_File.so
-%{_mandir}/man3/DB_File*
-%else
-%exclude %{archlib}/DB_File.pm
-%exclude %dir %{archlib}/auto/DB_File
-%exclude %{archlib}/auto/DB_File/DB_File.so
-%exclude %{_mandir}/man3/DB_File*
 %endif
 
 %files DBM_Filter
@@ -6701,6 +6664,10 @@ done
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.32.0-465
+- Removed the "perl-DB_File" subpackage.
+- Fixing macro usage.
+
 * Tue Oct 26 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 4:5.32.0-464
 - Removing unused dependency on 'libdb-devel'.
 

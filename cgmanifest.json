@@ -27706,16 +27706,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "spamassassin",
-          "version": "3.4.4",
-          "downloadUrl": "https://www.apache.org/dist/spamassassin/source/Mail-SpamAssassin-3.4.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "span-lite",
           "version": "0.7.0",
           "downloadUrl": "https://github.com/martinmoene/span-lite/archive/v0.7.0.tar.gz"
