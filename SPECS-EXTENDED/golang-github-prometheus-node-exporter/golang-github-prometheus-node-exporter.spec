@@ -1,4 +1,5 @@
 %global shortname prometheus-node-exporter
+
 # https://github.com/prometheus/node_exporter
 %global goipath         github.com/prometheus/node_exporter
 
@@ -23,10 +24,24 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            %{gourl}
 Source0:        https://github.com/prometheus/node_exporter/archive/refs/tags/v%{version}.tar.gz#/%{shortname}-%{version}.tar.gz
-Source1:        %{shortname}.sysusers
-Source2:        %{shortname}.service
-Source3:        %{shortname}.conf
-Source4:        %{shortname}.logrotate
+# Below is a manually created tarball, no download link.
+# We're using vendored Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/prometheus/node_exporter/archive/refs/tags/v%{version}.tar.gz -O %%{shortname}-%%{version}.tar.gz
+#   2. tar -xf %%{shortname}-%%{version}.tar.gz
+#   3. cd %%{shortname}-%%{version}
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{shortname}-%%{version}-vendor.tar.gz vendor
+#
+Source1:        %{name}-%{version}-vendor.tar.gz
+Source2:        %{shortname}.sysusers
+Source3:        %{shortname}.service
+Source4:        %{shortname}.conf
+Source5:        %{shortname}.logrotate
 # Replace defaults paths for config files
 Patch0:         defaults-paths.patch
 # https://github.com/prometheus/node_exporter/pull/2190
@@ -64,11 +79,11 @@ pushd %{buildroot}%{_bindir}
 ln -s %{shortname} node_exporter
 popd
 
-install -Dpm0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{shortname}.conf
-install -Dpm0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{shortname}.service
-install -Dpm0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/%{shortname}
+install -Dpm0644 %{SOURCE2} %{buildroot}%{_sysusersdir}/%{shortname}.conf
+install -Dpm0644 %{SOURCE3} %{buildroot}%{_unitdir}/%{shortname}.service
+install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/default/%{shortname}
 install -Dpm0644 example-rules.yml %{buildroot}%{_datadir}/prometheus/node-exporter/example-rules.yml
-install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/%{shortname}
+install -Dpm0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/%{shortname}
 mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus/node-exporter
 
 # Build man pages.
