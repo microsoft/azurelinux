@@ -98,7 +98,7 @@ fi
 - Remove %%clean stage
 
 * Tue Mar 16 2021 Hernan Gatta <hegatta@microsoft.com> 2.1-3
-- Initial import into ECF Mariner (License: GPL+)
+- Initial import into ECF Mariner from CentOS 8 (License: GPL+)
 - Removed dependency on annobin
 - Pick up systemd unit files from /usr/lib instead of /lib (i.e., _unitdir)
 

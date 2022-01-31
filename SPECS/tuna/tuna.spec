@@ -70,6 +70,7 @@ done
 * Thu Jan 27 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.14.1-3
 - Move to SPECS
 - Remove oscilloscope subpackage
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

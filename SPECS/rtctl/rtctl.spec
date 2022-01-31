@@ -42,11 +42,11 @@ fi
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.13-4
-- Initial import into CBL Mariner (License: GPL+)
+- Initial import into CBL Mariner (License: GPL)
 - Remove %%clean stage
 
 * Tue Mar 09 2021 Hernan Gatta <hegatta@microsoft.com> - 1.13-3
-- Initial import into ECF mariner
+- Initial import into ECF Mariner from CentOS 8 (License: GPL)
 
 * Mon Dec 29 2014 Luis Claudio R. Goncalves <lgoncalv@redhat.com> - 1.13-2
 - adjusted startup script messages (1162768)

@@ -409,6 +409,7 @@ fi
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 2.15.0-4
 - Initial import into CBL Mariner (License: GPL+)
+- License verified
 
 * Fri Aug 13 2021 Hernan Gatta <hegatta@microsoft.com> - 2.15.0-3
 - Remove dependency on desktop-file-utils

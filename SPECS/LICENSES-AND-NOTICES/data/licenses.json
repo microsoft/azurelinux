@@ -12,7 +12,11 @@
                 "crash-ptdump-command",
                 "delve",
                 "nodejs-nodemon",
-                "rhnlib"
+                "rhnlib",
+                "rtctl",
+                "rt-setup",
+                "rt-tests",
+                "tuned"
             ]
         },
         "Ceph source": {

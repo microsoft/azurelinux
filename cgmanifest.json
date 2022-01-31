@@ -25764,29 +25764,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rtctl",
-          "version": "1.13",
-          "downloadUrl": "TBD"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rpmlint",
           "version": "1.11",
           "downloadUrl": "https://github.com/rpm-software-management/rpmlint/archive/rpmlint-1.11.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rt-setup",
-          "version": "2.1",
-          "downloadUrl": "TBD"
         }
       }
     },

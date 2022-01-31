@@ -1,9 +1,7 @@
-%define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
-
 Summary:       Programs that test various rt-features
 Name:          rt-tests
 Version:       1.8
-Release:       15%{?dist}
+Release:       13%{?dist}
 License:       GPLv2
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -106,13 +104,13 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 /usr/share/man/man8/get_cyclictest_snapshot.8.gz
 
 %changelog
-* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-14
-- Initial import into CBL Mariner (License: GPL+)
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-13
+- Initial import into CBL Mariner (License: GPLv2)
 - License verified
 - Remove %%clean stage
 
 * Wed Mar 17 2021 Hernan Gatta <hegatta@microsoft.com> 1.8-12
-- Initial import into ECF Mariner (License: GPLv2)
+- Initial import into ECF Mariner from CentOS 8 (License: GPLv2)
 
 * Thu Aug 20 2020 John Kacur <jkacur@redhat.com> - 1.8-11
 - Add SPDX license to oslat, and reformat source code to match suite

@@ -46,6 +46,8 @@ ignore_list=" \
   python-yamlloader \
   python-zope-interface \
   qt5-rpm-macros \
+  rt-setup
+  rtctl
   runc \
   sgabios \
   shim \
