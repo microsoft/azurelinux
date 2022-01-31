@@ -1,5 +1,4 @@
 %define _unpackaged_files_terminate_build 0
-
 %define        with_boost     1
 %define        with_crash     1
 %define        with_docs      0
@@ -7,54 +6,52 @@
 %define        with_pie       1
 %define        with_rpm       0
 %define        with_sqlite    1
-
-Name:          systemtap
-Version:       4.1
-Release:       9%{?dist}
-Summary:       Programmable system-wide instrumentation system
-Group:         Development/System
+Summary:        Programmable system-wide instrumentation system
+Name:           systemtap
+Version:        4.5
+Release:        1%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:           https://sourceware.org/systemtap/
-Source0:       https://sourceware.org/systemtap/ftp/releases/systemtap-%{version}.tar.gz
-License:       GPLv2+
-
-BuildRequires: elfutils-devel
-BuildRequires: glibc-devel
-BuildRequires: elfutils-libelf-devel
-BuildRequires: libgcc
-BuildRequires: nspr-devel
-BuildRequires: nss-devel
-BuildRequires: sqlite-devel
-BuildRequires: libstdc++-devel
-BuildRequires: libtirpc-devel
-BuildRequires: libxml2-devel
-BuildRequires: perl
-BuildRequires: python3-setuptools
-BuildRequires: nss
-BuildRequires: shadow-utils
-BuildRequires: python3-devel
+Group:          Development/System
+URL:            https://sourceware.org/systemtap/
+Source0:        https://sourceware.org/systemtap/ftp/releases/systemtap-%{version}.tar.gz
+BuildRequires:  elfutils-devel
+BuildRequires:  elfutils-libelf-devel
+BuildRequires:  glibc-devel
+BuildRequires:  libgcc
+BuildRequires:  libstdc++-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  nspr-devel
+BuildRequires:  nss
+BuildRequires:  nss-devel
+BuildRequires:  perl
+BuildRequires:  pkg-config
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  shadow-utils
+BuildRequires:  sqlite-devel
 %if %with_boost
-BuildRequires: boost-devel
+BuildRequires:  boost-devel
 %endif
-%if %with_crash
-BuildRequires: crash-devel
-BuildRequires: zlib-devel
-Requires:      crash
+%if %{with_crash}
+BuildRequires:  crash-devel
+BuildRequires:  zlib-devel
+Requires:       crash
 %endif
-BuildRequires: pkg-config
-%if %with_rpm
-BuildRequires: rpm-devel
+%if %{with_rpm}
+BuildRequires:  rpm-devel
 %endif
-Requires:      gcc
-Requires:      kernel-devel
-Requires:      make
-Requires:      elfutils
-Requires:      %{name}-runtime = %{version}-%{release}
+Requires:       elfutils
+Requires:       gcc
+Requires:       kernel-devel
+Requires:       make
+Requires:       %{name}-runtime = %{version}-%{release}
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
 
-BuildRoot:     %{_tmppath}/%{name}-%{version}-root
+BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 
 %description
 SystemTap is an instrumentation system for systems running Linux.
@@ -62,53 +59,51 @@ Developers can write instrumentation scripts to collect data on
 the operation of the system.  The base systemtap package contains/requires
 the components needed to locally develop and execute systemtap scripts.
 
-
 %package initscript
-Group:         System/Tools
-Summary:       Systemtap Initscript
-Requires:      %{name}-runtime = %{version}-%{release}
-Requires:      initscripts
+Summary:        Systemtap Initscript
+Group:          System/Tools
+Requires:       %{name}-runtime = %{version}-%{release}
+Requires:       initscripts
 
 %description initscript
 Initscript for Systemtap scripts.
 
 %package python
-Group:         System/Tools
-Summary:       Python interface for systemtap
-Requires:      python3
+Summary:        Python interface for systemtap
+Group:          System/Tools
+Requires:       python3
 
 %description python
 This packages has the python interface to systemtap
 
 %package runtime
-Group:         System/Tools
-Summary:       Instrumentation System Runtime
-Requires:      kernel-devel
+Summary:        Instrumentation System Runtime
+Group:          System/Tools
+Requires:       kernel-devel
 
 %description runtime
 SystemTap runtime is the runtime component of an instrumentation system for systems running Linux.
 
 %package sdt-devel
-Group:         System/Tools
-Summary:       Static probe support tools
-Requires:      %{name} = %{version}-%{release}
+Summary:        Static probe support tools
+Group:          System/Tools
+Requires:       %{name} = %{version}-%{release}
 
 %description sdt-devel
 Support tools to allow applications to use static probes.
 
 %package server
-Group:         System/Tools
-Summary:       Instrumentation System Server
-Requires:      %{name} = %{version}-%{release}
-Requires:      %{name}-runtime = %{version}-%{release}
-Requires:      coreutils
-Requires:      nss
-Requires:      unzip
-Requires:      gzip
+Summary:        Instrumentation System Server
+Group:          System/Tools
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-runtime = %{version}-%{release}
+Requires:       coreutils
+Requires:       gzip
+Requires:       nss
+Requires:       unzip
 
 %description server
 SystemTap server is the server component of an instrumentation system for systems running Linux.
-
 
 %prep
 %setup -q
@@ -117,23 +112,23 @@ sed -i "s#"devel"#"dev"#g" stap-prep
 
 %build
 %configure \
-%if %with_crash
+%if %{with_crash}
 	--enable-crash \
 %else
 	--disable-crash \
 %endif
 	--disable-docs \
-%if %with_sqlite
+%if %{with_sqlite}
 	--enable-sqlite \
 %else
 	--disable-sqlite \
 %endif
-%if %with_rpm
+%if %{with_rpm}
 	--with-rpm \
 %else
 	--without-rpm \
 %endif
-%if %with_pie
+%if %{with_pie}
 	--enable-pie \
 %else
 	--disable-pie \
@@ -147,7 +142,7 @@ sed -i "s#"devel"#"dev"#g" stap-prep
 make
 
 %install
-[ "%{buildroot}" != / ] && rm -rf ""
+[ %{buildroot} != / ] && rm -rf ""
 %makeinstall
 
 mv %{buildroot}%{_datadir}/systemtap/examples examples
@@ -158,7 +153,6 @@ chmod 755 %{buildroot}%{_bindir}/staprun
 
 install -c -m 755 stap-prep %{buildroot}%{_bindir}/stap-prep
 
-
 mkdir -p %{buildroot}%{_sysconfdir}//rc.d/init.d/
 install -m 755 initscript/systemtap %{buildroot}%{_sysconfdir}/rc.d/init.d/
 mkdir -p %{buildroot}%{_sysconfdir}/systemtap
@@ -168,11 +162,11 @@ install -m 644 initscript/config.systemtap %{buildroot}%{_sysconfdir}/systemtap/
 mkdir -p %{buildroot}%{_localstatedir}/cache/systemtap
 mkdir -p %{buildroot}%{_localstatedir}/run/systemtap
 
-%if %with_docs
+%if %{with_docs}
 mkdir docs.installed
 mv %{buildroot}%{_datadir}/systemtap/*.pdf docs.installed/
 mv %{buildroot}%{_datadir}/systemtap/tapsets docs.installed/
-%if %with_publican
+%if %{with_publican}
 mv %{buildroot}%{_datadir}/systemtap/SystemTap_Beginners_Guide docs.installed/
 %endif
 %endif
@@ -204,8 +198,8 @@ exit 0
 
 %pre server
 getent passwd stap-server >/dev/null || \
-/usr/sbin/useradd -c "Systemtap Compile Server" -u 155 -g stap-server -d %{_localstatedir}/lib/stap-server -m -r -s /sbin/nologin stap-server || \
-/usr/sbin/useradd -c "Systemtap Compile Server" -g stap-server -d %{_localstatedir}/lib/stap-server -m -r -s /sbin/nologin stap-server
+%{_sbindir}/useradd -c "Systemtap Compile Server" -u 155 -g stap-server -d %{_localstatedir}/lib/stap-server -m -r -s /sbin/nologin stap-server || \
+%{_sbindir}/useradd -c "Systemtap Compile Server" -g stap-server -d %{_localstatedir}/lib/stap-server -m -r -s /sbin/nologin stap-server
 test -e ~stap-server && chmod 755 ~stap-server
 exit 0
 
@@ -273,6 +267,7 @@ fi
 
 %files -f %{name}.lang
 %defattr(-,root,root)
+%doc AUTHORS
 %license COPYING
 %{_bindir}/stap
 %{_bindir}/stap-merge
@@ -293,15 +288,16 @@ fi
 %{_datadir}/systemtap/runtime/linux/uprobes/*
 %dir %{_datadir}/systemtap/runtime/linux/uprobes2
 %{_datadir}/systemtap/runtime/linux/uprobes2/*
+%{_datadir}/systemtap/runtime/softfloat/*.h
 %{_datadir}/systemtap/tapset
 %{_mandir}/man1
 %{_mandir}/man3/stap*.3stap*
+%{_mandir}/man7/warning::buildid.7stap.gz
 %{_mandir}/man7/warning::symbols.7stap*
 %{_mandir}/man7/stappaths.7*
 %{_mandir}/man8/stapsh.8*
 %{_mandir}/man8/systemtap.8*
 %{_mandir}/man8/stapbpf.8*
-%doc AUTHORS COPYING
 %{_bindir}/dtrace
 
 %files initscript
@@ -317,15 +313,13 @@ fi
 %files python
 %defattr(-,root,root)
 %{python3_sitelib}/*
-%{_libexecdir}/systemtap/python/stap-resolve-module-function.py
 
 %files runtime
 %defattr(-,root,root)
 %attr(4111,root,root) %{_bindir}/staprun
-%{_libexecdir}/systemtap/stapio
 %{_libexecdir}/systemtap/stap-env
 %{_libexecdir}/systemtap/stap-authorize-cert
-%if %with_crash
+%if %{with_crash}
 %{_libdir}/systemtap/staplog.so*
 %endif
 %{_mandir}/man8/staprun.8*
@@ -358,6 +352,9 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.5-1
+- Update to version 4.5.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-9
 - Removing the explicit %%clean stage.
 
@@ -376,52 +373,76 @@ fi
 
 * Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-4
 - Renaming linux to kernel
+
 * Fri Apr 17 2020 Emre Girgin <mrgirgin@microsoft.com> 4.1-3
 - Rename shadow to shadow-utils.
+
 * Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.1-2
 - Remove toybox and only use coreutils for requires.
+
 * Wed Mar 18 2020 Henry Beberman <henry.beberman@microsoft.com> 4.1-1
 - Update to 4.1. License verified.
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.0-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Thu Jan 10 2019 Alexey Makhalov <amakhalov@vmware.com> 4.0-2
 - Added BuildRequires python2-devel
+
 * Tue Dec 04 2018 Keerthana K <keerthanak@vmware.com> 4.0-1
 - Updated to version 4.0
+
 * Mon Sep 10 2018 Keerthana K <keerthanak@vmware.com> 3.3-1
 - Updated to version 3.3
+
 * Tue Jan 23 2018 Divya Thaluru <dthaluru@vmware.com>  3.2-1
 - Updated to version 3.2
+
 * Thu Dec 28 2017 Divya Thaluru <dthaluru@vmware.com>  3.1-5
 - Fixed the log file directory structure
+
 * Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-4
 - Remove shadow from requires and use explicit tools for post actions
+
 * Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-3
 - Requires coreutils or toybox
+
 * Thu Aug 10 2017 Alexey Makhalov <amakhalov@vmware.com> 3.1-2
 - systemtap-sdt-devel requires systemtap
+
 * Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> 3.1-1
 - Update to version 3.1
+
 * Mon Nov 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.0-4
 - add shadow to requires
+
 * Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 3.0-3
 - Use sqlite-{devel,libs}
+
 * Tue Oct 04 2016 ChangLee <changlee@vmware.com> 3.0-2
 - Modified %check
+
 * Fri Jul 22 2016 Divya Thaluru <dthaluru@vmware.com> 3.0-1
 - Updated version to 3.0
 - Removing patch to enable kernel (fix is present in upstream)
+
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9-5
 - GA - Bump release of all rpms
+
 * Mon May 23 2016 Harish Udaiya KUmar <hudaiyakumar@vmware.com> 2.9-4
 - Added the patch to enable kernel building with Kernel 4.4
+
 * Fri May 20 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.9-3
 - Fixed the stap-prep script to be compatible with Photon
+
 * Wed May 4 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9-2
 - Fix for upgrade issues
+
 * Wed Dec 16 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.9-1
 - Updated version to 2.9
+
 * Fri Dec 11 2015 Xiaolin Li <xiaolinl@vmware.com> 2.7-2
 - Move dtrace to the main package.
+
 * Wed Nov 18 2015 Anish Swaminathan <anishs@vmware.com> 2.7-1
 - Initial build. First version

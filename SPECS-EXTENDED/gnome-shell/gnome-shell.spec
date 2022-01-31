@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           gnome-shell
 Version:        3.36.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
@@ -49,7 +49,6 @@ BuildRequires:  pkgconfig(gnome-desktop-3.0)
 BuildRequires:  gobject-introspection >= %{gobject_introspection_version}
 BuildRequires:  mesa-libGL-devel
 BuildRequires:  mesa-libEGL-devel
-BuildRequires:  NetworkManager-libnm-devel
 BuildRequires:  polkit-devel >= %{polkit_version}
 BuildRequires:  startup-notification-devel
 BuildRequires:  systemd-devel
@@ -214,6 +213,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/evolution-calendar.de
 %{_mandir}/man1/gnome-shell.1*
 
 %changelog
+* Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 3.36.9-3
+- Remove NetworkManger-libnm-devel BR because CBL-Mariner is not providing NetworkManager
+- License verified
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.9-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removing run-time dependency on 'libnma' (GUI library for 'NetworkManager')

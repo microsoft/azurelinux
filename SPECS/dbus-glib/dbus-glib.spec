@@ -1,7 +1,7 @@
 Summary:        Glib interfaces to D-Bus API
 Name:           dbus-glib
-Version:        0.110
-Release:        5%{?dist}
+Version:        0.112
+Release:        1%{?dist}
 License:        AFL OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,6 +65,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Jan 20 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.112-1
+- Upgrade to 0.112
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.110-5
 - Remove libtool archive files from final packaging
 

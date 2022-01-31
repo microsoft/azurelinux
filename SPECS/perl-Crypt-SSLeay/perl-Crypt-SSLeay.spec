@@ -3,7 +3,7 @@
 Summary:        Crypt::SSLeay - OpenSSL support for LWP
 Name:           perl-Crypt-SSLeay
 Version:        0.72
-Release:        7%{?dist}
+Release:        8%{?dist}
 URL:            https://metacpan.org/release/Crypt-SSLeay
 License:        Artistic 2.0
 Group:          Development/Libraries
@@ -16,6 +16,7 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(XSLoader)
 Requires:       openssl
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 BuildRequires:  openssl-devel
 BuildRequires:  perl-Path-Class
 BuildRequires:  perl-Try-Tiny
@@ -65,6 +66,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.72-8
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.72-8
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 0.72-7: Add patch to fix test issue

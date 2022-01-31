@@ -1,16 +1,13 @@
 Summary:        cifs client utils
 Name:           cifs-utils
-Version:        6.8
-Release:        6%{?dist}
+Version:        6.14
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Nfs-utils-client
 URL:            https://wiki.samba.org/index.php/LinuxCIFS_utils
-Source0:        https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-%{version}.tar.bz2
-Patch0:         CVE-2020-14342.patch
-Patch1:         CVE-2020-14342-fix.patch
-Patch2:         CVE-2021-20208.patch
+Source0:        https://download.samba.org/pub/linux-cifs/%{name}/%{name}-%{version}.tar.bz2
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libtalloc-devel
 BuildRequires:  keyutils-devel
@@ -47,6 +44,7 @@ Provides header files needed for Cifs-Utils development.
 %build
 autoreconf -fiv
 %configure
+%configure --prefix=/usr ROOTSBINDIR=%{_sbindir}
 %make_build
 
 %install
@@ -59,7 +57,10 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 %license COPYING
 %{_bindir}/cifscreds
-/sbin/mount.cifs
+%{_bindir}/smb2-quota
+%{_bindir}/smbinfo
+%{_sbindir}/mount.cifs
+%{_sbindir}/mount.smb3
 
 %files -n pam_cifscreds
 %{_libdir}/security/pam_cifscreds.so
@@ -69,6 +70,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Fri Jan 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 6.14-1
+- Upgrade to 6.14.
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.8-6
 - Adding the 'pam_cifscreds' subpackage using Fedora 32 spec (license: MIT) as guidance.
 

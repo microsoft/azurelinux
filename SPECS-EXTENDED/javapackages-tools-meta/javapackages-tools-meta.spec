@@ -24,7 +24,7 @@ Requires:       javapackages-tools = %{version}
 Requires:       javapackages-local = %{version}-%{release}
 Requires:       xmvn-minimal
 Requires:       xmvn-mojo
-Requires:       xmvn-connector-aether
+#Requires:       xmvn-connector-aether
 # Common Maven plugins required by almost every build. It wouldn't make
 # sense to explicitly require them in every package built with Maven.
 Requires:       mvn(org.apache.maven.plugins:maven-compiler-plugin)

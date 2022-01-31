@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "fipshmac-openssl.sh": "78f6d74404fb60cc13ab36569a4077046de5a1b62271e4401801294f8eb05c3a",
-  "libkcapi-1.2.0.tar.xz": "782430512195f146e0e16e6bb689d9a7e61387afcfedc4340c433284b8b66049",
+  "libkcapi-1.3.1.tar.xz": "6b57946eb87bc9cfa544140b6c9a12ef9eefa0a16695578aebf3395f0a78bede",
   "sha512hmac-openssl.sh": "e0b44bedb58b06547e13c48c8170333bb7f131b6c1f0056ae9486fee6f3cb435"
  }
 }

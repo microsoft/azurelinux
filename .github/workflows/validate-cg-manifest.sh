@@ -20,6 +20,7 @@ ignore_list=" \
   dbus-x11 \
   grub2-efi-binary-signed-aarch64 \
   grub2-efi-binary-signed-x86_64 \
+  grubby \
   initramfs \
   installkernel \
   kde-filesystem \
@@ -27,6 +28,7 @@ ignore_list=" \
   kernel-signed-x86_64 \
   kf5 \
   lcms2 \
+  lua-rpm-macros \
   mariner-repos \
   mariner-rpm-macros \
   moby-buildx \

@@ -1,7 +1,7 @@
 Summary:        Test for warnings and the lack of them in Perl
 Name:           perl-Test-Warnings
 Version:        0.028
-Release:        4%{?dist}
+Release:        5%{?dist}
 URL:            https://metacpan.org/release/Test-Warnings
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -13,6 +13,7 @@ BuildArch:      noarch
 Requires:       perl-libs
 Requires:       perl(Carp)
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Provides:       perl(Test::Warnings) = %{version}-%{release}
 
@@ -39,6 +40,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+*   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.028-5
+-   Adding 'BuildRequires: perl-generators'.
+
 *   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 0.028-4
 -   Use new perl package names.
 -   Build with NO_PACKLIST option.

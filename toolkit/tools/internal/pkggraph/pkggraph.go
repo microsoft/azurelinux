@@ -1314,6 +1314,7 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 					err = g.AddEdge(parentNode, preBuiltNode)
 					if err != nil {
 						logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
+						return
 					}
 				}
 			}

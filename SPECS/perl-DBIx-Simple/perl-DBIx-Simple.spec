@@ -2,7 +2,7 @@
 Summary:        Easy-to-use OO interface to DBI
 Name:           perl-DBIx-Simple
 Version:        1.37
-Release:        4%{?dist}
+Release:        5%{?dist}
 # License not mentioned in any of the source files and CPAN web page explicitly says it's unknown.
 License:        Unknown
 Group:          Development/Libraries
@@ -13,6 +13,7 @@ Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl-DBI >= 1.21
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       perl-libs
 Requires:       perl-Object-Accessor
 Requires:       perl-DBI >= 1.21
@@ -52,6 +53,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+*   Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.37-5
+-   Adding 'BuildRequires: perl-generators'.
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.37-4
 -   Removing the explicit %%clean stage.
 -   License verified.

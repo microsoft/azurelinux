@@ -155,18 +155,8 @@
         "type": "other",
         "other": {
           "name": "alsa-lib",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "alsa-lib",
-          "version": "1.2.3.2",
-          "downloadUrl": "ftp://ftp.alsa-project.org/pub/lib/alsa-lib-1.2.3.2.tar.bz2"
+          "version": "1.2.6.1",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
         }
       }
     },
@@ -185,8 +175,8 @@
         "type": "other",
         "other": {
           "name": "alsa-utils",
-          "version": "1.2.2",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/utils/alsa-utils-1.2.2.tar.bz2"
+          "version": "1.2.6",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/utils/alsa-utils-1.2.6.tar.bz2"
         }
       }
     },
@@ -225,8 +215,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.9.18",
-          "downloadUrl": "https://releases.ansible.com/ansible/ansible-2.9.18.tar.gz"
+          "version": "2.12.1",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.12.1.tar.gz"
         }
       }
     },
@@ -255,8 +245,8 @@
         "type": "other",
         "other": {
           "name": "ant-antlr",
-          "version": "1.10.9",
-          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.xz"
+          "version": "1.10.11",
+          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },
@@ -285,8 +275,8 @@
         "type": "other",
         "other": {
           "name": "ant-junit",
-          "version": "1.10.9",
-          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.9-src.tar.xz"
+          "version": "1.10.11",
+          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
         }
       }
     },
@@ -615,8 +605,8 @@
         "type": "other",
         "other": {
           "name": "apr",
-          "version": "1.6.5",
-          "downloadUrl": "http://archive.apache.org/dist/apr/apr-1.6.5.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://dlcdn.apache.org/apr/apr-1.7.0.tar.gz"
         }
       }
     },
@@ -745,8 +735,8 @@
         "type": "other",
         "other": {
           "name": "at",
-          "version": "3.1.23",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.1.23.orig.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "http://ftp.debian.org/debian/pool/main/a/at/at_3.2.2.orig.tar.gz"
         }
       }
     },
@@ -775,8 +765,8 @@
         "type": "other",
         "other": {
           "name": "atf",
-          "version": "0.20",
-          "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.20/atf-0.20.tar.gz"
+          "version": "0.21",
+          "downloadUrl": "https://github.com/jmmv/atf/releases/download/atf-0.21/atf-0.21.tar.gz"
         }
       }
     },
@@ -855,8 +845,8 @@
         "type": "other",
         "other": {
           "name": "audit",
-          "version": "3.0",
-          "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.0-alpha8.tar.gz"
+          "version": "3.0.6",
+          "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.0.6.tar.gz"
         }
       }
     },
@@ -905,8 +895,8 @@
         "type": "other",
         "other": {
           "name": "autoconf-archive",
-          "version": "2018.03.13",
-          "downloadUrl": "http://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2018.03.13.tar.xz"
+          "version": "2021.02.19",
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2021.02.19.tar.xz"
         }
       }
     },
@@ -1015,8 +1005,8 @@
         "type": "other",
         "other": {
           "name": "babeltrace2",
-          "version": "2.0.1",
-          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.1.tar.bz2"
+          "version": "2.0.4",
+          "downloadUrl": "https://www.efficios.com/files/babeltrace/babeltrace2-2.0.4.tar.bz2"
         }
       }
     },
@@ -1075,8 +1065,8 @@
         "type": "other",
         "other": {
           "name": "bash-completion",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/scop/bash-completion/releases/download/2.7/bash-completion-2.7.tar.xz"
+          "version": "2.11",
+          "downloadUrl": "https://github.com/scop/bash-completion/archive/refs/tags/2.11.tar.gz"
         }
       }
     },
@@ -1198,7 +1188,7 @@
         "other": {
           "name": "biosdevname",
           "version": "0.7.3",
-          "downloadUrl": "http://linux.dell.com/files/biosdevname/biosdevname-0.7.3/biosdevname-0.7.3.tar.gz"
+          "downloadUrl": "https://github.com/dell/biosdevname/archive/refs/tags/v0.7.3.tar.gz"
         }
       }
     },
@@ -1217,8 +1207,8 @@
         "type": "other",
         "other": {
           "name": "blktrace",
-          "version": "1.2.0",
-          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/blktrace-1.2.0.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/blktrace-1.3.0.tar.gz"
         }
       }
     },
@@ -1247,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "bmake",
-          "version": "20201010",
-          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20201010.tar.gz"
+          "version": "20211221",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg/bmake-20211221.tar.gz"
         }
       }
     },
@@ -1296,16 +1286,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "bond",
-          "version": "8.0.1",
-          "downloadUrl": "https://github.com/microsoft/bond/archive/8.0.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "boom-boot",
           "version": "1.2",
           "downloadUrl": "https://github.com/snapshotmanager/boom/archive/1.2/boom-1.2.tar.gz"
@@ -1317,8 +1297,8 @@
         "type": "other",
         "other": {
           "name": "boost",
-          "version": "1.66.0",
-          "downloadUrl": "http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2"
+          "version": "1.69.0",
+          "downloadUrl": "https://sourceforge.net/projects/boost/files/boost/1.69.0/boost_1_69_0.tar.bz2"
         }
       }
     },
@@ -1327,8 +1307,8 @@
         "type": "other",
         "other": {
           "name": "boost",
-          "version": "1.69.0",
-          "downloadUrl": "https://sourceforge.net/projects/boost/files/boost/1.69.0/boost_1_69_0.tar.bz2"
+          "version": "1.76.0",
+          "downloadUrl": "https://downloads.sourceforge.net/boost/boost_1_76_0.tar.bz2"
         }
       }
     },
@@ -1397,8 +1377,8 @@
         "type": "other",
         "other": {
           "name": "bridge-utils",
-          "version": "1.6",
-          "downloadUrl": "https://kernel.org/pub/linux/utils/net/bridge-utils/bridge-utils-1.6.tar.xz"
+          "version": "1.7.1",
+          "downloadUrl": "https://kernel.org/pub/linux/utils/net/bridge-utils/bridge-utils-1.7.1.tar.xz"
         }
       }
     },
@@ -1417,8 +1397,8 @@
         "type": "other",
         "other": {
           "name": "brotli",
-          "version": "1.0.7",
-          "downloadUrl": "https://github.com/google/brotli/archive/v1.0.7/brotli-1.0.7.tar.gz"
+          "version": "1.0.9",
+          "downloadUrl": "https://github.com/google/brotli/archive/refs/tags/v1.0.9.tar.gz"
         }
       }
     },
@@ -1457,8 +1437,8 @@
         "type": "other",
         "other": {
           "name": "btrfs-progs",
-          "version": "4.19",
-          "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v4.19.tar.xz"
+          "version": "5.16",
+          "downloadUrl": "https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v5.16.tar.xz"
         }
       }
     },
@@ -1487,8 +1467,8 @@
         "type": "other",
         "other": {
           "name": "busybox",
-          "version": "1.32.0",
-          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.32.0.tar.bz2"
+          "version": "1.35.0",
+          "downloadUrl": "http://www.busybox.net/downloads/busybox-1.35.0.tar.bz2"
         }
       }
     },
@@ -1507,8 +1487,8 @@
         "type": "other",
         "other": {
           "name": "byacc",
-          "version": "1.9.20200330",
-          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20200330.tgz"
+          "version": "1.9.20220109",
+          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20220109.tgz"
         }
       }
     },
@@ -1637,8 +1617,8 @@
         "type": "other",
         "other": {
           "name": "catch",
-          "version": "2.13.7",
-          "downloadUrl": "https://github.com/catchorg/Catch2/archive/v2.13.7/catch-2.13.7.tar.gz/Catch2-2.13.7.tar.gz"
+          "version": "2.13.8",
+          "downloadUrl": "https://github.com/catchorg/Catch2/archive/refs/tags/v2.13.8.tar.gz"
         }
       }
     },
@@ -1797,8 +1777,8 @@
         "type": "other",
         "other": {
           "name": "chkconfig",
-          "version": "1.11",
-          "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/1.11.tar.gz"
+          "version": "1.20",
+          "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/refs/tags/1.20.tar.gz"
         }
       }
     },
@@ -1827,8 +1807,8 @@
         "type": "other",
         "other": {
           "name": "cifs-utils",
-          "version": "6.8",
-          "downloadUrl": "https://ftp.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-6.8.tar.bz2"
+          "version": "6.14",
+          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-6.14.tar.bz2"
         }
       }
     },
@@ -1867,8 +1847,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.103.2",
-          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.2.tar.gz"
+          "version": "0.104.2",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.104.2.tar.gz"
         }
       }
     },
@@ -2047,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "colm",
-          "version": "0.13.0.7",
-          "downloadUrl": "https://www.colm.net/files/colm/colm-0.13.0.7.tar.gz"
+          "version": "0.14.7",
+          "downloadUrl": "https://github.com/adrian-thurston/colm/archive/0.14.7.tar.gz"
         }
       }
     },
@@ -2216,6 +2196,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cpp-hocon",
+          "version": "0.3.0",
+          "downloadUrl": "https://github.com/puppetlabs/cpp-hocon/archive/0.3.0/cpp-hocon-0.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cppcheck",
           "version": "2.1",
           "downloadUrl": "http://downloads.sourceforge.net/cppcheck/cppcheck-2.1.tar.gz"
@@ -2227,8 +2217,8 @@
         "type": "other",
         "other": {
           "name": "cpprest",
-          "version": "2.10.14",
-          "downloadUrl": "https://github.com/Microsoft/cpprestsdk/archive/v2.10.14.tar.gz"
+          "version": "2.10.18",
+          "downloadUrl": "https://github.com/microsoft/cpprestsdk/archive/2.10.18.tar.gz"
         }
       }
     },
@@ -2387,8 +2377,8 @@
         "type": "other",
         "other": {
           "name": "cryptsetup",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/cryptsetup/v2.3/cryptsetup-2.3.3.tar.xz"
+          "version": "2.4.3",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/cryptsetup/v2.4/cryptsetup-2.4.3.tar.xz"
         }
       }
     },
@@ -2457,8 +2447,8 @@
         "type": "other",
         "other": {
           "name": "Cython",
-          "version": "0.28.5",
-          "downloadUrl": "https://github.com/cython/cython/archive/0.28.5.tar.gz"
+          "version": "0.29.26",
+          "downloadUrl": "https://github.com/cython/cython/archive/0.29.26.tar.gz"
         }
       }
     },
@@ -2487,8 +2477,8 @@
         "type": "other",
         "other": {
           "name": "dbus-glib",
-          "version": "0.110",
-          "downloadUrl": "http://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-0.110.tar.gz"
+          "version": "0.112",
+          "downloadUrl": "http://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-0.112.tar.gz"
         }
       }
     },
@@ -2598,8 +2588,8 @@
         "type": "other",
         "other": {
           "name": "desktop-file-utils",
-          "version": "0.24",
-          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.24.tar.xz"
+          "version": "0.26",
+          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.26.tar.xz"
         }
       }
     },
@@ -2708,8 +2698,8 @@
         "type": "other",
         "other": {
           "name": "dkms",
-          "version": "2.8.1",
-          "downloadUrl": "https://github.com/dell/dkms/archive/v2.8.1.tar.gz"
+          "version": "3.0.3",
+          "downloadUrl": "https://github.com/dell/dkms/archive/refs/tags/v3.0.3.tar.gz"
         }
       }
     },
@@ -2768,8 +2758,8 @@
         "type": "other",
         "other": {
           "name": "dmidecode",
-          "version": "3.2",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/dmidecode/dmidecode-3.2.tar.xz"
+          "version": "3.3",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/dmidecode/dmidecode-3.3.tar.xz"
         }
       }
     },
@@ -2937,9 +2927,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dom4j",
+          "version": "2.0.3",
+          "downloadUrl": "https://github.com/dom4j/dom4j/archive/version-2.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dos2unix",
-          "version": "7.4.1",
-          "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.1.tar.gz"
+          "version": "7.4.2",
+          "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.2.tar.gz"
         }
       }
     },
@@ -2948,8 +2948,8 @@
         "type": "other",
         "other": {
           "name": "dosfstools",
-          "version": "4.1",
-          "downloadUrl": "http://github.com/dosfstools/dosfstools/releases/download/v4.1/dosfstools-4.1.tar.gz"
+          "version": "4.2",
+          "downloadUrl": "https://github.com/dosfstools/dosfstools/archive/v4.2.tar.gz"
         }
       }
     },
@@ -2988,8 +2988,8 @@
         "type": "other",
         "other": {
           "name": "doxygen",
-          "version": "1.8.17",
-          "downloadUrl": "http://doxygen.nl/files/doxygen-1.8.17.src.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://doxygen.nl/files/doxygen-1.9.3.src.tar.gz"
         }
       }
     },
@@ -2998,8 +2998,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "18.11.2",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-18.11.2.tar.xz"
+          "version": "21.11",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.tar.xz"
         }
       }
     },
@@ -3128,8 +3128,8 @@
         "type": "other",
         "other": {
           "name": "dwz",
-          "version": "0.13",
-          "downloadUrl": "https://sourceware.org/ftp/dwz/releases/dwz-0.13.tar.xz"
+          "version": "0.14",
+          "downloadUrl": "https://sourceware.org/ftp/dwz/releases/dwz-0.14.tar.xz"
         }
       }
     },
@@ -3358,8 +3358,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "22.0.7",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-22.0.7/otp-OTP-22.0.7.tar.gz"
+          "version": "24.2",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-24.2/otp-OTP-24.2.tar.gz"
         }
       }
     },
@@ -3418,8 +3418,8 @@
         "type": "other",
         "other": {
           "name": "ethtool",
-          "version": "5.0",
-          "downloadUrl": "https://www.kernel.org/pub/software/network/ethtool/ethtool-5.0.tar.xz"
+          "version": "5.16",
+          "downloadUrl": "https://www.kernel.org/pub/software/network/ethtool/ethtool-5.16.tar.xz"
         }
       }
     },
@@ -3478,8 +3478,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.1",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_1/expat-2.4.1.tar.bz2"
+          "version": "2.4.3",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_3/expat-2.4.3.tar.bz2"
         }
       }
     },
@@ -3510,6 +3510,16 @@
           "name": "fabtests",
           "version": "1.12.0",
           "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.12.0rc1/fabtests-1.12.0rc1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "facter",
+          "version": "4.2.5",
+          "downloadUrl": "https://downloads.puppetlabs.com/facter/facter-4.2.5.gem"
         }
       }
     },
@@ -3588,8 +3598,8 @@
         "type": "other",
         "other": {
           "name": "fdupes",
-          "version": "2.1.1",
-          "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.1/fdupes-2.1.1.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.2/fdupes-2.1.2.tar.gz"
         }
       }
     },
@@ -3728,8 +3738,8 @@
         "type": "other",
         "other": {
           "name": "firewalld",
-          "version": "0.9.4",
-          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v0.9.4/firewalld-0.9.4.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v1.0.3/firewalld-1.0.3.tar.gz"
         }
       }
     },
@@ -4800,8 +4810,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.6.14",
-          "downloadUrl": "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.6/gnutls-3.6.14.tar.xz"
+          "version": "3.7.3",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.3.tar.xz"
         }
       }
     },
@@ -5509,6 +5519,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hiera",
+          "version": "3.7.0",
+          "downloadUrl": "http://downloads.puppetlabs.com/hiera/hiera-3.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "highlight",
           "version": "3.54",
           "downloadUrl": "http://www.andre-simon.de/zip/highlight-3.54.tar.bz2"
@@ -5600,8 +5620,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.46",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.46.tar.bz2"
+          "version": "2.4.52",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.52.tar.bz2"
         }
       }
     },
@@ -6750,8 +6770,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.78.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
         }
       }
     },
@@ -7621,8 +7641,8 @@
         "type": "other",
         "other": {
           "name": "ipvsadm",
-          "version": "1.29",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/ipvsadm/ipvsadm-1.29.tar.xz"
+          "version": "1.31",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/ipvsadm/ipvsadm-1.31.tar.xz"
         }
       }
     },
@@ -8541,8 +8561,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.78.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
         }
       }
     },
@@ -8551,8 +8571,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.78.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
         }
       }
     },
@@ -8561,8 +8581,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.78.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.78.1.tar.gz"
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
         }
       }
     },
@@ -8860,6 +8880,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "leatherman",
+          "version": "1.12.6",
+          "downloadUrl": "https://github.com/puppetlabs/leatherman/archive/1.12.6/leatherman-1.12.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ledmon",
           "version": "0.92",
           "downloadUrl": "https://github.com/intel/ledmon/archive/v0.92.tar.gz"
@@ -9031,8 +9061,8 @@
         "type": "other",
         "other": {
           "name": "libatomic_ops",
-          "version": "7.6.6",
-          "downloadUrl": "http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.6.6.tar.gz"
+          "version": "7.6.12",
+          "downloadUrl": "https://github.com/ivmai/libatomic_ops/releases/download/v7.6.12/libatomic_ops-7.6.12.tar.gz"
         }
       }
     },
@@ -9480,6 +9510,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libecb",
+          "version": "9.30",
+          "downloadUrl": "http://cvs.schmorp.de/libecb/?view=tar&pathrev=rxvt-unicode-rel-9_30"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libedit",
           "version": "3.1.20180525",
           "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20180525-3.1.tar.gz"
@@ -9571,8 +9611,8 @@
         "type": "other",
         "other": {
           "name": "libev",
-          "version": "4.24",
-          "downloadUrl": "http://dist.schmorp.de/libev/Attic/libev-4.24.tar.gz"
+          "version": "4.33",
+          "downloadUrl": "http://dist.schmorp.de/libev/Attic/libev-4.33.tar.gz"
         }
       }
     },
@@ -9761,8 +9801,8 @@
         "type": "other",
         "other": {
           "name": "libgit2",
-          "version": "1.0.1",
-          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.0.1/libgit2-1.0.1.tar.gz"
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.1.0/libgit2-1.1.0.tar.gz"
         }
       }
     },
@@ -10141,8 +10181,8 @@
         "type": "other",
         "other": {
           "name": "libjpeg-turbo",
-          "version": "2.0.0",
-          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.0.0.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "http://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.2.tar.gz"
         }
       }
     },
@@ -10151,8 +10191,8 @@
         "type": "other",
         "other": {
           "name": "libkcapi",
-          "version": "1.2.0",
-          "downloadUrl": "https://www.chronox.de/libkcapi/libkcapi-1.2.0.tar.xz"
+          "version": "1.3.1",
+          "downloadUrl": "https://www.chronox.de/libkcapi/libkcapi-1.3.1.tar.xz"
         }
       }
     },
@@ -10251,8 +10291,8 @@
         "type": "other",
         "other": {
           "name": "liblognorm",
-          "version": "2.0.3",
-          "downloadUrl": "https://www.liblognorm.com/files/download/liblognorm-2.0.3.tar.gz"
+          "version": "2.0.6",
+          "downloadUrl": "https://www.liblognorm.com/files/download/liblognorm-2.0.6.tar.gz"
         }
       }
     },
@@ -10280,6 +10320,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblzf",
+          "version": "3.6",
+          "downloadUrl": "http://dist.schmorp.de/liblzf/liblzf-3.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmad",
           "version": "0.15.1b",
           "downloadUrl": "http://download.sourceforge.net/mad/libmad-0.15.1b.tar.gz"
@@ -10291,8 +10341,8 @@
         "type": "other",
         "other": {
           "name": "libmaxminddb",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.5.0/libmaxminddb-1.5.0.tar.gz"
+          "version": "1.6.0",
+          "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.6.0/libmaxminddb-1.6.0.tar.gz"
         }
       }
     },
@@ -10313,6 +10363,16 @@
           "name": "libmediaart",
           "version": "1.9.4",
           "downloadUrl": "https://download.gnome.org/sources/libmediaart/1.9/libmediaart-1.9.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libmemcached-awesome",
+          "version": "1.1.1",
+          "downloadUrl": "https://github.com/awesomized/libmemcached/archive/refs/tags/1.1.1.tar.gz"
         }
       }
     },
@@ -10421,8 +10481,8 @@
         "type": "other",
         "other": {
           "name": "libmspack",
-          "version": "0.7.1alpha",
-          "downloadUrl": "http://www.cabextract.org.uk/libmspack/libmspack-0.7.1alpha.tar.gz"
+          "version": "0.10.1alpha",
+          "downloadUrl": "http://www.cabextract.org.uk/libmspack/libmspack-0.10.1alpha.tar.gz"
         }
       }
     },
@@ -10481,8 +10541,8 @@
         "type": "other",
         "other": {
           "name": "libndp",
-          "version": "1.7",
-          "downloadUrl": "http://www.libndp.org/files/libndp-1.7.tar.gz"
+          "version": "1.8",
+          "downloadUrl": "http://www.libndp.org/files/libndp-1.8.tar.gz"
         }
       }
     },
@@ -10501,8 +10561,8 @@
         "type": "other",
         "other": {
           "name": "libnetfilter_conntrack",
-          "version": "1.0.7",
-          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.7.tar.bz2"
+          "version": "1.0.8",
+          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.8.tar.bz2"
         }
       }
     },
@@ -10531,8 +10591,8 @@
         "type": "other",
         "other": {
           "name": "libnetfilter_queue",
-          "version": "1.0.3",
-          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_queue/files/libnetfilter_queue-1.0.3.tar.bz2"
+          "version": "1.0.5",
+          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_queue/files/libnetfilter_queue-1.0.5.tar.bz2"
         }
       }
     },
@@ -10561,8 +10621,8 @@
         "type": "other",
         "other": {
           "name": "libnftnl",
-          "version": "1.1.9",
-          "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.1.9.tar.bz2"
+          "version": "1.2.1",
+          "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.2.1.tar.bz2"
         }
       }
     },
@@ -10581,8 +10641,8 @@
         "type": "other",
         "other": {
           "name": "libnl3",
-          "version": "3.4.0",
-          "downloadUrl": "https://github.com/thom311/libnl/releases/download/libnl3_4_0/libnl-3.4.0.tar.gz"
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/thom311/libnl/releases/download/libnl3_5_0/libnl-3.5.0.tar.gz"
         }
       }
     },
@@ -10601,8 +10661,8 @@
         "type": "other",
         "other": {
           "name": "libnsl2",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/thkukuk/libnsl/archive/v1.2.0/libnsl-1.2.0.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/thkukuk/libnsl/archive/v2.0.0/libnsl-2.0.0.tar.gz"
         }
       }
     },
@@ -10791,8 +10851,8 @@
         "type": "other",
         "other": {
           "name": "libpcap",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz"
+          "version": "1.10.1",
+          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.1.tar.gz"
         }
       }
     },
@@ -10831,8 +10891,8 @@
         "type": "other",
         "other": {
           "name": "libpipeline",
-          "version": "1.5.0",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz"
+          "version": "1.5.5",
+          "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.5.tar.gz"
         }
       }
     },
@@ -10891,8 +10951,8 @@
         "type": "other",
         "other": {
           "name": "libpsl",
-          "version": "0.20.2",
-          "downloadUrl": "https://github.com/rockdaboot/libpsl/releases/download/libpsl-0.20.2/libpsl-0.20.2.tar.gz"
+          "version": "0.21.1",
+          "downloadUrl": "https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz"
         }
       }
     },
@@ -10901,8 +10961,8 @@
         "type": "other",
         "other": {
           "name": "libpwquality",
-          "version": "1.4.2",
-          "downloadUrl": "https://github.com/libpwquality/libpwquality/releases/download/libpwquality-1.4.2/libpwquality-1.4.2.tar.bz2"
+          "version": "1.4.4",
+          "downloadUrl": "https://github.com/libpwquality/libpwquality/releases/download/libpwquality-1.4.4/libpwquality-1.4.4.tar.bz2"
         }
       }
     },
@@ -10921,8 +10981,8 @@
         "type": "other",
         "other": {
           "name": "libqmi",
-          "version": "1.22.4",
-          "downloadUrl": "https://www.freedesktop.org/software/libqmi/libqmi-1.22.4.tar.xz"
+          "version": "1.30.2",
+          "downloadUrl": "https://www.freedesktop.org/software/libqmi/libqmi-1.30.2.tar.xz"
         }
       }
     },
@@ -10981,18 +11041,8 @@
         "type": "other",
         "other": {
           "name": "librdkafka",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/edenhill/librdkafka/archive/v1.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "librdkafka",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/edenhill/librdkafka/archive/v1.5.0.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://github.com/edenhill/librdkafka/archive/v1.8.2.tar.gz"
         }
       }
     },
@@ -11051,8 +11101,8 @@
         "type": "other",
         "other": {
           "name": "librsync",
-          "version": "2.0.2",
-          "downloadUrl": "https://github.com/librsync/librsync/archive/v2.0.2.tar.gz"
+          "version": "2.3.2",
+          "downloadUrl": "https://github.com/librsync/librsync/archive/v2.3.2.tar.gz"
         }
       }
     },
@@ -11081,8 +11131,8 @@
         "type": "other",
         "other": {
           "name": "libseccomp",
-          "version": "2.4.1",
-          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.4.1/libseccomp-2.4.1.tar.gz"
+          "version": "2.5.3",
+          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.3/libseccomp-2.5.3.tar.gz"
         }
       }
     },
@@ -11331,8 +11381,8 @@
         "type": "other",
         "other": {
           "name": "libstoragemgmt",
-          "version": "1.8.4",
-          "downloadUrl": "https://github.com/libstorage/libstoragemgmt/releases/download/1.8.4/libstoragemgmt-1.8.4.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://github.com/libstorage/libstoragemgmt/releases/download/1.9.3/libstoragemgmt-1.9.3.tar.gz"
         }
       }
     },
@@ -11341,8 +11391,8 @@
         "type": "other",
         "other": {
           "name": "libtalloc",
-          "version": "2.3.1",
-          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.3.1.tar.gz"
+          "version": "2.3.3",
+          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.3.3.tar.gz"
         }
       }
     },
@@ -11361,8 +11411,8 @@
         "type": "other",
         "other": {
           "name": "libtasn1",
-          "version": "4.14",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.14.tar.gz"
+          "version": "4.18.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.18.0.tar.gz"
         }
       }
     },
@@ -11541,8 +11591,8 @@
         "type": "other",
         "other": {
           "name": "libunwind",
-          "version": "1.2",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/libunwind/libunwind-1.2.tar.gz"
+          "version": "1.6.2",
+          "downloadUrl": "http://download.savannah.gnu.org/releases/libunwind/libunwind-1.6.2.tar.gz"
         }
       }
     },
@@ -11601,8 +11651,8 @@
         "type": "other",
         "other": {
           "name": "libuv",
-          "version": "1.38.0",
-          "downloadUrl": "https://dist.libuv.org/dist/v1.38.0/libuv-v1.38.0.tar.gz"
+          "version": "1.43.0",
+          "downloadUrl": "https://dist.libuv.org/dist/v1.43.0/libuv-v1.43.0.tar.gz"
         }
       }
     },
@@ -11771,8 +11821,8 @@
         "type": "other",
         "other": {
           "name": "libwebp",
-          "version": "1.0.3",
-          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.0.3.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.2.2.tar.gz"
         }
       }
     },
@@ -11901,8 +11951,8 @@
         "type": "other",
         "other": {
           "name": "libxcrypt",
-          "version": "4.4.17",
-          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.17/libxcrypt-4.4.17.tar.gz"
+          "version": "4.4.27",
+          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.27/libxcrypt-4.4.27.tar.gz"
         }
       }
     },
@@ -12041,8 +12091,8 @@
         "type": "other",
         "other": {
           "name": "libxml++",
-          "version": "3.2.0",
-          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/3.2/libxml++-3.2.0.tar.xz"
+          "version": "5.0.1",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/libxml++/5.0/libxml++-5.0.1.tar.xz"
         }
       }
     },
@@ -12511,8 +12561,8 @@
         "type": "other",
         "other": {
           "name": "lttng-tools",
-          "version": "2.11.2",
-          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.11.2.tar.bz2"
+          "version": "2.13.2",
+          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.13.2.tar.bz2"
         }
       }
     },
@@ -12521,8 +12571,8 @@
         "type": "other",
         "other": {
           "name": "lttng-ust",
-          "version": "2.11.2",
-          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.11.2.tar.bz2"
+          "version": "2.13.1",
+          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.13.1.tar.bz2"
         }
       }
     },
@@ -12531,8 +12581,8 @@
         "type": "other",
         "other": {
           "name": "lua",
-          "version": "5.3.5",
-          "downloadUrl": "https://www.lua.org/ftp/lua-5.3.5.tar.gz"
+          "version": "5.4.3",
+          "downloadUrl": "https://www.lua.org/ftp/lua-5.4.3.tar.gz"
         }
       }
     },
@@ -12642,7 +12692,7 @@
         "other": {
           "name": "lvm2",
           "version": "2.03.05",
-          "downloadUrl": "ftp://sourceware.org/pub/lvm2/releases/LVM2.2.03.05.tgz"
+          "downloadUrl": "https://sourceware.org/pub/lvm2/LVM2.2.03.05.tgz"
         }
       }
     },
@@ -13411,8 +13461,8 @@
         "type": "other",
         "other": {
           "name": "mc",
-          "version": "4.8.21",
-          "downloadUrl": "https://ftp.midnight-commander.org/mc-4.8.21.tar.xz"
+          "version": "4.8.27",
+          "downloadUrl": "http://ftp.midnight-commander.org/mc-4.8.27.tar.xz"
         }
       }
     },
@@ -13501,8 +13551,8 @@
         "type": "other",
         "other": {
           "name": "memcached",
-          "version": "1.5.22",
-          "downloadUrl": "https://www.memcached.org/files/memcached-1.5.22.tar.gz"
+          "version": "1.6.13",
+          "downloadUrl": "https://www.memcached.org/files/memcached-1.6.13.tar.gz"
         }
       }
     },
@@ -13713,8 +13763,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.3.4+azure",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.3.4.tar.gz"
+          "version": "1.5.9+azure",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.5.9.tar.gz"
         }
       }
     },
@@ -14103,8 +14153,18 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.24",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.24.tar.gz"
+          "version": "8.0.28",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.28.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mysql-connector-java",
+          "version": "8.0.21",
+          "downloadUrl": "https://github.com/mysql/mysql-connector-j/archive/8.0.21.tar.gz"
         }
       }
     },
@@ -14343,8 +14403,8 @@
         "type": "other",
         "other": {
           "name": "nano",
-          "version": "3.0",
-          "downloadUrl": "http://www.nano-editor.org/dist/v3/nano-3.0.tar.xz"
+          "version": "6.0",
+          "downloadUrl": "http://www.nano-editor.org/dist/v6/nano-6.0.tar.xz"
         }
       }
     },
@@ -14353,8 +14413,8 @@
         "type": "other",
         "other": {
           "name": "nasm",
-          "version": "2.13.03",
-          "downloadUrl": "http://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.gz"
+          "version": "2.15.05",
+          "downloadUrl": "http://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.gz"
         }
       }
     },
@@ -14482,6 +14542,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netplan",
+          "version": "0.95",
+          "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "netsniff-ng",
           "version": "0.6.7",
           "downloadUrl": "http://www.netsniff-ng.org/pub/netsniff-ng/netsniff-ng-0.6.7.tar.xz"
@@ -14493,8 +14563,8 @@
         "type": "other",
         "other": {
           "name": "nettle",
-          "version": "3.7.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.2.tar.gz"
+          "version": "3.7.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.7.3.tar.gz"
         }
       }
     },
@@ -14615,16 +14685,6 @@
           "name": "nmap",
           "version": "7.90",
           "downloadUrl": "https://nmap.org/dist/nmap-7.90.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "nmstate",
-          "version": "0.3.3",
-          "downloadUrl": "https://github.com/nmstate/nmstate/releases/download/v0.3.3/nmstate-0.3.3.tar.gz"
         }
       }
     },
@@ -14803,8 +14863,8 @@
         "type": "other",
         "other": {
           "name": "numpy",
-          "version": "1.16.6",
-          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.16.6/numpy-1.16.6.tar.gz"
+          "version": "1.22.0",
+          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.22.0/numpy-1.22.0.tar.gz"
         }
       }
     },
@@ -14903,8 +14963,8 @@
         "type": "other",
         "other": {
           "name": "ocaml",
-          "version": "4.10.0",
-          "downloadUrl": "http://caml.inria.fr/pub/distrib/ocaml-4.10/ocaml-4.10.0.tar.xz"
+          "version": "4.13.1",
+          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13/ocaml-4.13.1.tar.xz"
         }
       }
     },
@@ -14933,8 +14993,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-base",
-          "version": "0.14.1",
-          "downloadUrl": "https://github.com/janestreet/base/archive/v0.14.1/base-0.14.1.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/base/archive/v0.15.0/base-0.15.0.tar.gz"
         }
       }
     },
@@ -14973,8 +15033,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-camlp5",
-          "version": "7.12",
-          "downloadUrl": "https://github.com/camlp5/camlp5/archive/rel712.tar.gz"
+          "version": "8.00.02",
+          "downloadUrl": "https://github.com/camlp5/camlp5/archive/rel8.00.02.tar.gz"
         }
       }
     },
@@ -15132,6 +15192,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ocaml-gettext",
+          "version": "0.4.2",
+          "downloadUrl": "https://github.com/gildor478/ocaml-gettext/releases/download/v0.4.2/gettext-v0.4.2.tbz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ocaml-integers",
           "version": "0.4.0",
           "downloadUrl": "https://github.com/ocamllabs/ocaml-integers/archive/0.4.0/ocaml-integers-0.4.0.tar.gz"
@@ -15193,8 +15263,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-migrate-parsetree",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/archive/v2.1.0/ocaml-migrate-parsetree-2.1.0.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v2.3.0/ocaml-migrate-parsetree-2.3.0.tbz"
         }
       }
     },
@@ -15263,8 +15333,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-parsexp",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/parsexp/archive/v0.14.0/parsexp-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/parsexp/archive/v0.15.0/parsexp-0.15.0.tar.gz"
         }
       }
     },
@@ -15283,8 +15353,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ppxlib",
-          "version": "0.22.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/archive/0.22.0/ppxlib-0.22.0.tar.gz"
+          "version": "0.24.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ppxlib/releases/download/0.24.0/ppxlib-0.24.0.tbz"
         }
       }
     },
@@ -15333,8 +15403,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib/archive/v0.14.0/sexplib-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib/archive/v0.15.0/sexplib-0.15.0.tar.gz"
         }
       }
     },
@@ -15343,8 +15413,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib0",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.14.0/sexplib0-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.15.0/sexplib0-0.15.0.tar.gz"
         }
       }
     },
@@ -15353,8 +15423,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-stdio",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.14.0/stdio-0.14.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://github.com/janestreet/stdio/archive/v0.15.0/stdio-0.15.0.tar.gz"
         }
       }
     },
@@ -15464,8 +15534,8 @@
         "type": "other",
         "other": {
           "name": "oniguruma",
-          "version": "6.9.5",
-          "downloadUrl": "https://github.com/kkos/oniguruma/releases/download/v6.9.5/onig-6.9.5.tar.gz"
+          "version": "6.9.7.1",
+          "downloadUrl": "https://github.com/kkos/oniguruma/releases/download/v6.9.7.1/onig-6.9.7.1.tar.gz"
         }
       }
     },
@@ -16114,8 +16184,8 @@
         "type": "other",
         "other": {
           "name": "patchelf",
-          "version": "0.12",
-          "downloadUrl": "https://github.com/NixOS/patchelf/archive/0.12/patchelf-0.12.tar.gz"
+          "version": "0.14.3",
+          "downloadUrl": "https://github.com/NixOS/patchelf/archive/0.14.3/patchelf-0.14.3.tar.gz"
         }
       }
     },
@@ -16146,16 +16216,6 @@
           "name": "pcaudiolib",
           "version": "1.1",
           "downloadUrl": "https://github.com/espeak-ng/pcaudiolib/archive/1.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "pciutils",
-          "version": "3.6.2",
-          "downloadUrl": "https://www.kernel.org/pub/software/utils/pciutils/pciutils-3.6.2.tar.gz"
         }
       }
     },
@@ -16323,6 +16383,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-AnyEvent-AIO",
+          "version": "1.1",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-AIO-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-AnyEvent-BDB",
+          "version": "1.1",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-BDB-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-App-cpanminus",
           "version": "1.7044",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7044.tar.gz"
@@ -16443,9 +16523,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-BDB",
+          "version": "1.92",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-1.92.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Bit-Vector",
           "version": "7.4",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/S/ST/STBEY/Bit-Vector-7.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-boolean",
+          "version": "0.46",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/boolean-0.46.tar.gz"
         }
       }
     },
@@ -16516,6 +16616,16 @@
           "name": "perl-Carp-Clan",
           "version": "6.08",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Carp-Clan-6.08.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-CBOR-XS",
+          "version": "1.86",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/CBOR-XS-1.86.tar.gz"
         }
       }
     },
@@ -16663,6 +16773,66 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Color-ANSI-Util",
+          "version": "0.164",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-ANSI-Util-0.164.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Color-RGB-Util",
+          "version": "0.606",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-RGB-Util-0.606.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeBase-Static",
+          "version": "0.008",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeBase-Static-0.008.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeRole-ANSI",
+          "version": "0.001",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeRole-ANSI-0.001.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemes-Standard",
+          "version": "0.003",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemes-Standard-0.003.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-ColorThemeUtil-ANSI",
+          "version": "0.002",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeUtil-ANSI-0.002.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-common-sense",
           "version": "3.74",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-3.74.tar.gz"
@@ -16676,6 +16846,26 @@
           "name": "perl-Compress-Bzip2",
           "version": "2.28",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Compress-Bzip2-2.28.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Compress-LZF",
+          "version": "3.8",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Compress/Compress-LZF-3.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Compress-Raw-Lzma",
+          "version": "2.101",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Lzma-2.101.tar.gz"
         }
       }
     },
@@ -16763,6 +16953,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Convert-Bencode",
+          "version": "1.03",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Convert/Convert-Bencode-1.03.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Coro",
+          "version": "6.570",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-6.57.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Coro-Multicore",
+          "version": "1.07",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-1.07.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-CPAN-Changes",
           "version": "0.400002",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-0.400002.tar.gz"
@@ -16786,6 +17006,16 @@
           "name": "perl-CPAN-Meta-Check",
           "version": "0.014",
           "downloadUrl": "http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-0.014.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Cpanel-JSON-XS",
+          "version": "4.27",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-4.27.tar.gz"
         }
       }
     },
@@ -17383,6 +17613,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Encode-IMAPUTF7",
+          "version": "1.05",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PM/PMAKHOLM/Encode-IMAPUTF7-1.05.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Encode-Locale",
           "version": "1.05",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GA/GAAS/Encode-Locale-1.05.tar.gz"
@@ -17406,6 +17646,16 @@
           "name": "perl-Error",
           "version": "0.17029",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Error/Error-0.17029.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-EV",
+          "version": "4.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/EV-4.33.tar.gz"
         }
       }
     },
@@ -17853,6 +18103,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Graphics-ColorNamesLite-WWW",
+          "version": "1.14.000",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Graphics-ColorNamesLite-WWW-1.14.000.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-GSSAPI",
           "version": "0.28",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AG/AGROLMS/GSSAPI-0.28.tar.gz"
@@ -18053,6 +18313,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-IO-AIO",
+          "version": "4.76",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-4.76.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-IO-All",
           "version": "0.87",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/F/FR/FREW/IO-All-0.87.tar.gz"
@@ -18066,6 +18336,16 @@
           "name": "perl-IO-CaptureOutput",
           "version": "1.1105",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-CaptureOutput-1.1105.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-IO-Compress-Lzma",
+          "version": "2.101",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Compress-Lzma-2.101.tar.gz"
         }
       }
     },
@@ -18203,6 +18483,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-JSON-Color",
+          "version": "0.133",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-0.133.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-JSON-MaybeXS",
+          "version": "1.004003",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004003.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-JSON-XS",
           "version": "3.04",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-3.04.tar.gz"
@@ -18315,7 +18615,7 @@
         "other": {
           "name": "perl-Locale-Msgfmt",
           "version": "0.15",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SZ/SZABGAB/Locale-Msgfmt-0.15.tar.gz"
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-0.15.tar.gz"
         }
       }
     },
@@ -18633,6 +18933,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Module-Load-Util",
+          "version": "0.006",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Module-Load-Util-0.006.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Module-Manifest",
           "version": "1.09",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Module/Module-Manifest-1.09.tar.gz"
@@ -18745,7 +19055,7 @@
         "other": {
           "name": "perl-Mozilla-LDAP",
           "version": "1.5.3",
-          "downloadUrl": "ftp://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5.3/src/perl-mozldap-1.5.3.tar.gz"
+          "downloadUrl": "https://ftp.mozilla.org/pub/mozilla.org/directory/perldap/releases/1.5.3/src/perl-mozldap-1.5.3.tar.gz"
         }
       }
     },
@@ -19303,16 +19613,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "perl-Pod-Escapes",
-          "version": "1.07",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEILB/Pod-Escapes-1.07.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "perl-Pod-Eventual",
           "version": "0.094001",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-0.094001.tar.gz"
@@ -19496,6 +19796,16 @@
           "name": "perl-Ref-Util-XS",
           "version": "0.117",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/X/XS/XSAWYERX/Ref-Util-XS-0.117.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Regexp-Pattern-Perl",
+          "version": "0.006",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-0.006.tar.gz"
         }
       }
     },
@@ -20016,16 +20326,6 @@
           "name": "perl-Test-File-ShareDir",
           "version": "1.001002",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/K/KE/KENTNL/Test-File-ShareDir-1.001002.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "perl-Test-Harness",
-          "version": "3.42",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-3.42.tar.gz"
         }
       }
     },
@@ -20883,6 +21183,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-XXX",
+          "version": "0.38",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IN/INGY/XXX-0.38.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-YAML",
           "version": "1.26",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-1.26.tar.gz"
@@ -20896,6 +21206,16 @@
           "name": "perl-YAML-LibYAML",
           "version": "0.81",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/YAML/YAML-LibYAML-0.81.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-YAML-PP",
+          "version": "0.031",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-PP-0.031.tar.gz"
         }
       }
     },
@@ -21344,8 +21664,8 @@
         "type": "other",
         "other": {
           "name": "popt",
-          "version": "1.16",
-          "downloadUrl": "ftp://anduin.linuxfromscratch.org/BLFS/svn/p/popt-1.16.tar.gz"
+          "version": "1.18",
+          "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz"
         }
       }
     },
@@ -21616,6 +21936,16 @@
           "name": "pulseaudio",
           "version": "14.0",
           "downloadUrl": "http://freedesktop.org/software/pulseaudio/releases/pulseaudio-14.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "puppet",
+          "version": "7.12.1",
+          "downloadUrl": "https://downloads.puppetlabs.com/puppet/puppet-7.12.1.tar.gz"
         }
       }
     },
@@ -22314,8 +22644,8 @@
         "type": "other",
         "other": {
           "name": "python-distro",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/nir0s/distro/archive/v1.4.0.tar.gz"
+          "version": "1.6.0",
+          "downloadUrl": "https://github.com/python-distro/distro/releases/download/v1.6.0/distro-1.6.0.tar.gz"
         }
       }
     },
@@ -22396,6 +22726,16 @@
           "name": "python-entrypoints",
           "version": "0.3",
           "downloadUrl": "https://github.com/takluyver/entrypoints/archive/0.3/entrypoints-0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-ethtool",
+          "version": "0.14",
+          "downloadUrl": "https://github.com/fedora-python/python-ethtool/archive/refs/tags/v0.14.tar.gz"
         }
       }
     },
@@ -22953,16 +23293,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-kubernetes",
-          "version": "11.0.0",
-          "downloadUrl": "https://github.com/kubernetes-client/python/archive/v11.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-lazy-object-proxy",
           "version": "1.4.3",
           "downloadUrl": "https://github.com/ionelmc/python-lazy-object-proxy/archive/v1.4.3/lazy-object-proxy-1.4.3.tar.gz"
@@ -23224,8 +23554,8 @@
         "type": "other",
         "other": {
           "name": "python-netaddr",
-          "version": "0.7.19",
-          "downloadUrl": "https://github.com/netaddr/netaddr/archive/netaddr-0.7.19.tar.gz"
+          "version": "0.8.0",
+          "downloadUrl": "https://github.com/netaddr/netaddr/archive/refs/tags/0.8.0.tar.gz"
         }
       }
     },
@@ -23574,8 +23904,8 @@
         "type": "other",
         "other": {
           "name": "python-psutil",
-          "version": "5.6.3",
-          "downloadUrl": "https://github.com/giampaolo/psutil/archive/release-5.6.3.tar.gz"
+          "version": "5.9.0",
+          "downloadUrl": "https://github.com/giampaolo/psutil/archive/release-5.9.0.tar.gz"
         }
       }
     },
@@ -23614,8 +23944,8 @@
         "type": "other",
         "other": {
           "name": "python-pyasn1",
-          "version": "0.4.4",
-          "downloadUrl": "https://files.pythonhosted.org/packages/10/46/059775dc8e50f722d205452bced4b3cc965d27e8c3389156acd3b1123ae3/pyasn1-0.4.4.tar.gz"
+          "version": "0.4.8",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyasn1/pyasn1-0.4.8.tar.gz"
         }
       }
     },
@@ -24724,8 +25054,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.9",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tar.xz"
+          "version": "3.9.10",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tar.xz"
         }
       }
     },
@@ -24994,8 +25324,8 @@
         "type": "other",
         "other": {
           "name": "ragel",
-          "version": "7.0.0.12",
-          "downloadUrl": "https://www.colm.net/files/ragel/ragel-7.0.0.12.tar.gz"
+          "version": "7.0.4",
+          "downloadUrl": "https://github.com/adrian-thurston/ragel/archive/7.0.4.tar.gz"
         }
       }
     },
@@ -25153,19 +25483,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "redfish-finder",
-          "version": "0.4",
-          "downloadUrl": "https://github.com/nhorman/redfish-finder/archive/V0.4/redfish-finder-0.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "redis",
-          "version": "5.0.5",
-          "downloadUrl": "http://download.redis.io/releases/redis-5.0.5.tar.gz"
+          "version": "6.2.5",
+          "downloadUrl": "http://download.redis.io/releases/redis-6.2.5.tar.gz"
         }
       }
     },
@@ -25405,8 +25725,8 @@
         "type": "other",
         "other": {
           "name": "rsync",
-          "version": "3.1.3",
-          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.1.3.tar.gz"
+          "version": "3.2.3",
+          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.2.3.tar.gz"
         }
       }
     },
@@ -25415,8 +25735,8 @@
         "type": "other",
         "other": {
           "name": "rsyslog",
-          "version": "8.37.0",
-          "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.37.0.tar.gz"
+          "version": "8.2108.0",
+          "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2108.0.tar.gz"
         }
       }
     },
@@ -25437,6 +25757,16 @@
           "name": "ruby",
           "version": "2.7.2",
           "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ruby-augeas",
+          "version": "0.5.0",
+          "downloadUrl": "http://download.augeas.net/ruby/ruby-augeas-0.5.0.tgz"
         }
       }
     },
@@ -25654,6 +25984,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-deep_merge",
+          "version": "1.2.1",
+          "downloadUrl": "https://rubygems.org/downloads/deep_merge-1.2.1.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-diff-lcs",
           "version": "1.3",
           "downloadUrl": "https://rubygems.org/gems/diff-lcs-1.3.gem"
@@ -25697,6 +26037,16 @@
           "name": "rubygem-elasticsearch-transport",
           "version": "7.6.0",
           "downloadUrl": "https://rubygems.org/downloads/elasticsearch-transport-7.6.0.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-eventmachine",
+          "version": "1.2.7",
+          "downloadUrl": "https://rubygems.org/downloads/eventmachine-1.2.7.gem"
         }
       }
     },
@@ -25894,6 +26244,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-hocon",
+          "version": "1.3.1",
+          "downloadUrl": "https://rubygems.org/downloads/hocon-1.3.1.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-hpricot",
+          "version": "0.8.6",
+          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/rubygem-hpricot/hpricot-0.8.6-modified.gem/5d737234720f3847cc5def6c0047f2e4/hpricot-0.8.6-modified.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-http_parser.rb",
           "version": "0.6.0",
           "downloadUrl": "https://rubygems.org/downloads/http_parser.rb-0.6.0.gem"
@@ -25907,6 +26277,16 @@
           "name": "rubygem-httpclient",
           "version": "2.8.2.4",
           "downloadUrl": "https://rubygems.org/downloads/httpclient-2.8.2.4.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-introspection",
+          "version": "0.0.4",
+          "downloadUrl": "https://rubygems.org/downloads/introspection-0.0.4.gem"
         }
       }
     },
@@ -25954,6 +26334,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-metaclass",
+          "version": "0.0.4",
+          "downloadUrl": "https://rubygems.org/downloads/metaclass-0.0.4.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-method_source",
           "version": "1.0.0",
           "downloadUrl": "http://rubygems.org/gems/method_source-1.0.0.gem"
@@ -25977,6 +26367,16 @@
           "name": "rubygem-minitest",
           "version": "5.14.2",
           "downloadUrl": "https://rubygems.org/gems/minitest-5.14.2.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-mocha",
+          "version": "1.9.0",
+          "downloadUrl": "https://rubygems.org/gems/mocha-1.9.0.gem"
         }
       }
     },
@@ -26174,6 +26574,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-puppet-resource_api",
+          "version": "1.8.14",
+          "downloadUrl": "https://rubygems.org/gems/puppet-resource_api-1.8.14.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-quantile",
           "version": "0.2.1",
           "downloadUrl": "https://rubygems.org/downloads/quantile-0.2.1.gem"
@@ -26197,6 +26607,26 @@
           "name": "rubygem-rake",
           "version": "13.0.1",
           "downloadUrl": "https://rubygems.org/downloads/rake-13.0.1.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-rake-compiler",
+          "version": "1.1.6",
+          "downloadUrl": "https://rubygems.org/gems/rake-compiler-1.1.6.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-rdiscount",
+          "version": "2.2.0.2",
+          "downloadUrl": "https://rubygems.org/gems/rdiscount-2.2.0.2.gem"
         }
       }
     },
@@ -26324,6 +26754,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-semantic_puppet",
+          "version": "1.0.4",
+          "downloadUrl": "https://rubygems.org/downloads/semantic_puppet-1.0.4.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-serverengine",
           "version": "2.2.1",
           "downloadUrl": "https://rubygems.org/downloads/serverengine-2.2.1.gem"
@@ -26397,6 +26837,16 @@
           "name": "rubygem-test-unit",
           "version": "3.3.6",
           "downloadUrl": "http://rubygems.org/gems/test-unit-3.3.6.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-thor",
+          "version": "1.1.0",
+          "downloadUrl": "https://rubygems.org/downloads/thor-1.1.0.gem"
         }
       }
     },
@@ -26947,8 +27397,8 @@
         "type": "other",
         "other": {
           "name": "sg3_utils",
-          "version": "1.44",
-          "downloadUrl": "https://github.com/hreinecke/sg3_utils/archive/v1.44.tar.gz"
+          "version": "1.46",
+          "downloadUrl": "https://github.com/hreinecke/sg3_utils/archive/v1.46.tar.gz"
         }
       }
     },
@@ -27068,7 +27518,7 @@
         "other": {
           "name": "slang",
           "version": "2.3.2",
-          "downloadUrl": "http://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2"
+          "downloadUrl": "https://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2"
         }
       }
     },
@@ -27157,8 +27607,8 @@
         "type": "other",
         "other": {
           "name": "socat",
-          "version": "1.7.3.4",
-          "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.3.4.tar.gz"
+          "version": "1.7.4.3",
+          "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.4.3.tar.gz"
         }
       }
     },
@@ -27387,8 +27837,8 @@
         "type": "other",
         "other": {
           "name": "squashfs-tools",
-          "version": "4.3",
-          "downloadUrl": "http://downloads.sourceforge.net/squashfs/squashfs4.3.tar.gz"
+          "version": "4.5",
+          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.5.tar.gz"
         }
       }
     },
@@ -27547,8 +27997,8 @@
         "type": "other",
         "other": {
           "name": "subversion",
-          "version": "1.14.0",
-          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.0.tar.bz2"
+          "version": "1.14.1",
+          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.1.tar.bz2"
         }
       }
     },
@@ -27587,8 +28037,8 @@
         "type": "other",
         "other": {
           "name": "supermin",
-          "version": "5.2.0",
-          "downloadUrl": "http://download.libguestfs.org/supermin/5.2-stable/supermin-5.2.0.tar.gz"
+          "version": "5.2.1",
+          "downloadUrl": "http://download.libguestfs.org/supermin/5.2-stable/supermin-5.2.1.tar.gz"
         }
       }
     },
@@ -27617,8 +28067,8 @@
         "type": "other",
         "other": {
           "name": "swupdate",
-          "version": "2019.11",
-          "downloadUrl": "https://github.com/sbabic/swupdate/archive/2019.11.tar.gz"
+          "version": "2021.04",
+          "downloadUrl": "https://github.com/sbabic/swupdate/archive/2021.04.tar.gz"
         }
       }
     },
@@ -27657,8 +28107,8 @@
         "type": "other",
         "other": {
           "name": "syslog-ng",
-          "version": "3.23.1",
-          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.23.1/syslog-ng-3.23.1.tar.gz"
+          "version": "3.33.2",
+          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.33.2/syslog-ng-3.33.2.tar.gz"
         }
       }
     },
@@ -27687,8 +28137,8 @@
         "type": "other",
         "other": {
           "name": "systemd",
-          "version": "249.7",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz"
+          "version": "250.3",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v250.3.tar.gz"
         }
       }
     },
@@ -27707,8 +28157,8 @@
         "type": "other",
         "other": {
           "name": "systemd-bootstrap",
-          "version": "249.7",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz"
+          "version": "250.3",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v250.3.tar.gz"
         }
       }
     },
@@ -27717,8 +28167,8 @@
         "type": "other",
         "other": {
           "name": "systemtap",
-          "version": "4.1",
-          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.1.tar.gz"
+          "version": "4.5",
+          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.5.tar.gz"
         }
       }
     },
@@ -27977,8 +28427,8 @@
         "type": "other",
         "other": {
           "name": "tinyxml2",
-          "version": "7.1.0",
-          "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/7.1.0.tar.gz"
+          "version": "9.0.0",
+          "downloadUrl": "https://github.com/leethomason/tinyxml2/archive/9.0.0.tar.gz"
         }
       }
     },
@@ -28027,8 +28477,8 @@
         "type": "other",
         "other": {
           "name": "tmux",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/tmux/tmux/releases/download/2.7/tmux-2.7.tar.gz"
+          "version": "3.2a",
+          "downloadUrl": "https://github.com/tmux/tmux/releases/download/3.2a/tmux-3.2a.tar.gz"
         }
       }
     },
@@ -28167,8 +28617,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-abrmd",
-          "version": "2.3.3",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.3.3/tpm2-abrmd-2.3.3.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.4.0/tpm2-abrmd-2.4.0.tar.gz"
         }
       }
     },
@@ -28187,8 +28637,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tools",
-          "version": "4.2",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/4.2/tpm2-tools-4.2.tar.gz"
+          "version": "4.3.2",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/4.3.2/tpm2-tools-4.3.2.tar.gz"
         }
       }
     },
@@ -28197,8 +28647,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "2.4.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.0/tpm2-tss-2.4.0.tar.gz"
+          "version": "2.4.6",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.6/tpm2-tss-2.4.6.tar.gz"
         }
       }
     },
@@ -28207,8 +28657,8 @@
         "type": "other",
         "other": {
           "name": "tracelogging",
-          "version": "0.2",
-          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.2.tar.gz"
+          "version": "0.3",
+          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.3.tar.gz"
         }
       }
     },
@@ -28237,8 +28687,8 @@
         "type": "other",
         "other": {
           "name": "tree",
-          "version": "1.7.0",
-          "downloadUrl": "http://mama.indstate.edu/users/ice/tree/src/tree-1.7.0.tgz"
+          "version": "1.8.0",
+          "downloadUrl": "http://mama.indstate.edu/users/ice/tree/src/tree-1.8.0.tgz"
         }
       }
     },
@@ -28437,8 +28887,8 @@
         "type": "other",
         "other": {
           "name": "unbound",
-          "version": "1.10.0",
-          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.10.0.tar.gz"
+          "version": "1.13.2",
+          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.13.2.tar.gz"
         }
       }
     },
@@ -28497,8 +28947,8 @@
         "type": "other",
         "other": {
           "name": "unixODBC",
-          "version": "2.3.7",
-          "downloadUrl": "ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-2.3.7.tar.gz"
+          "version": "2.3.9",
+          "downloadUrl": "http://www.unixodbc.org/unixODBC-2.3.9.tar.gz"
         }
       }
     },
@@ -28627,8 +29077,8 @@
         "type": "other",
         "other": {
           "name": "userspace-rcu",
-          "version": "0.10.1",
-          "downloadUrl": "https://github.com/urcu/userspace-rcu/archive/v0.10.1.tar.gz"
+          "version": "0.13.0",
+          "downloadUrl": "https://github.com/urcu/userspace-rcu/archive/v0.13.0.tar.gz"
         }
       }
     },
@@ -28647,8 +29097,8 @@
         "type": "other",
         "other": {
           "name": "utf8proc",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/JuliaStrings/utf8proc/archive/v2.2.0.tar.gz"
+          "version": "2.6.1",
+          "downloadUrl": "https://github.com/JuliaStrings/utf8proc/archive/v2.6.1.tar.gz"
         }
       }
     },
@@ -28748,7 +29198,7 @@
         "other": {
           "name": "velocity",
           "version": "1.7",
-          "downloadUrl": "http://www.apache.org/dist/velocity/engine/1.7/velocity-1.7.tar.gz"
+          "downloadUrl": "https://github.com/apache/velocity-engine/archive/refs/tags/1.7.tar.gz"
         }
       }
     },
@@ -28767,8 +29217,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.3668",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.3668.tar.gz"
+          "version": "8.2.4081",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4081.tar.gz"
         }
       }
     },
@@ -28937,8 +29387,8 @@
         "type": "other",
         "other": {
           "name": "WALinuxAgent",
-          "version": "2.2.54.2",
-          "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/refs/tags/v2.2.54.2.tar.gz"
+          "version": "2.3.1.1",
+          "downloadUrl": "https://github.com/Azure/WALinuxAgent/archive/refs/tags/v2.3.1.1.tar.gz"
         }
       }
     },
@@ -28997,8 +29447,8 @@
         "type": "other",
         "other": {
           "name": "websocketpp",
-          "version": "0.8.1",
-          "downloadUrl": "https://github.com/zaphoyd/websocketpp/archive/0.8.1.tar.gz"
+          "version": "0.8.2",
+          "downloadUrl": "https://github.com/zaphoyd/websocketpp/archive/0.8.2.tar.gz"
         }
       }
     },
@@ -29198,8 +29648,8 @@
         "type": "other",
         "other": {
           "name": "xbean",
-          "version": "4.5",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/xbean/xbean/4.5/xbean-4.5-source-release.zip"
+          "version": "4.18",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/xbean/xbean/4.18/xbean-4.18-source-release.zip"
         }
       }
     },
@@ -29620,6 +30070,16 @@
           "name": "xmessage",
           "version": "1.0.5.",
           "downloadUrl": "https://www.x.org/pub/individual/app/xmessage-1.0.5.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xml-commons-apis",
+          "version": "1.4.01",
+          "downloadUrl": "https://svn.apache.org/repos/asf/xerces/xml-commons/tags/xml-commons-external-1_4_01/java/external"
         }
       }
     },
@@ -30150,8 +30610,8 @@
         "type": "other",
         "other": {
           "name": "zchunk",
-          "version": "1.1.5",
-          "downloadUrl": "https://github.com/zchunk/zchunk/archive/1.1.5.tar.gz"
+          "version": "1.1.16",
+          "downloadUrl": "https://github.com/zchunk/zchunk/archive/1.1.16.tar.gz"
         }
       }
     },
@@ -30191,7 +30651,7 @@
         "other": {
           "name": "zfs-fuse",
           "version": "0.7.2.2",
-          "downloadUrl": "http://github.com/gordan-bobic/zfs-fuse/archive/zfs-fuse-0.7.2.2.tar.gz"
+          "downloadUrl": "http://github.com/gordan-bobic/zfs-fuse/archive/refs/tags/0.7.2.2.tar.gz"
         }
       }
     },
@@ -30210,8 +30670,8 @@
         "type": "other",
         "other": {
           "name": "zipper",
-          "version": "1.0.1",
-          "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.1.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.3.tar.gz"
         }
       }
     },

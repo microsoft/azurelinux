@@ -1,0 +1,27 @@
+From 1afddd618629a97479560bedbdcfa11b2c492a0e Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Fri, 26 Jun 2020 10:02:51 +0200
+Subject: [PATCH] Fix build with rpm-4.16
+
+rpmvercmp() was moved to librpmio, so link against this library instead.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 1ab58aeb039..a54b053a30b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -59,7 +59,7 @@ grubby:: $(OBJECTS)
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(grubby_LIBS)
+ 
+ rpm-sort::rpm-sort.o
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lrpm
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -lrpmio
+ 
+ clean:
+ 	rm -f *.o grubby rpm-sort *~
+-- 
+2.26.2

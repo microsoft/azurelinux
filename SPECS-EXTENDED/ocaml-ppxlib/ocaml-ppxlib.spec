@@ -11,13 +11,13 @@ Distribution:   Mariner
 %bcond_with doc
 
 Name:           ocaml-%{srcname}
-Version:        0.22.0
-Release:        3%{?dist}
+Version:        0.24.0
+Release:        1%{?dist}
 Summary:        Base library and tools for ppx rewriters
 
 License:        MIT
-URL:            https://github.com/ocaml-ppx/%{srcname}
-Source0:        %{url}/archive/%{version}/%{srcname}-%{version}.tar.gz
+URL:            https://github.com/ocaml-ppx/ppxlib
+Source0:        https://github.com/ocaml-ppx/ppxlib/releases/download/%{version}/%{srcname}-%{version}.tbz
 # Fedora does not have, and does not need, stdlib-shims
 Patch0:         %{name}-stdlib-shims.patch
 
@@ -53,7 +53,7 @@ projects.  It features:
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = 1:%{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       ocaml-compiler-libs-janestreet-devel%{?_isa}
 Requires:       ocaml-migrate-parsetree-devel%{?_isa}
 Requires:       ocaml-ppx-derivers-devel%{?_isa}
@@ -166,7 +166,11 @@ dune runtest
 %endif
 
 %changelog
-* Thu Dec  2 2021 Muhammad Falak <mwani@microsoft.com> - 0.22.0-3
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.24.0-1
+- Upgrade to latest version
+- License verified
+
+* Thu Dec 2 2021 Muhammad Falak <mwani@microsoft.com> - 0.22.0-3
 - Remove epoch.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.22.0-2

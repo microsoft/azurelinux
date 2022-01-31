@@ -32,6 +32,10 @@ BuildRequires:  gnutls-devel
 BuildRequires:  vala
 BuildRequires:  gtk-doc
 BuildRequires:  python3-pygments
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(File::Find)
 Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
@@ -119,6 +123,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Use meson to build and install
 - Add additional files to libsoup-devel 
 - License Verified
+
+* Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.64.0-8
+- Add perl find bin and file find to build requires.
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.64.0-7
 - Remove libtool archive files from final packaging

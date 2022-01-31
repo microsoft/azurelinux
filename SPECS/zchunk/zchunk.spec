@@ -1,17 +1,16 @@
 Summary:        Compressed file format
 Name:           zchunk
-Version:        1.1.5
-Release:        2%{?dist}
+Version:        1.1.16
+Release:        1%{?dist}
 License:        BSD 2-Clause AND MIT
-URL:            https://github.com/zchunk/zchunk
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://github.com/zchunk/zchunk
 #Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz
 Source0:        https://github.com/zchunk/zchunk/archive/%{name}-%{version}.tar.gz
-
-BuildRequires:  meson
 BuildRequires:  curl-devel
+BuildRequires:  meson
 BuildRequires:  openssl-devel
 Requires:       %{name}-libs = %{version}-%{release}
 
@@ -75,10 +74,10 @@ DESTDIR=%{buildroot}/ ninja install
 %files
 %license LICENSE
 %doc README.md contrib
-%doc LICENSE
 %doc zchunk_format.txt
 %{_bindir}/zck*
 %{_bindir}/unzck
+%{_mandir}/man1/*.gz
 
 %files libs
 %{_libdir}/libzck.so.*
@@ -89,11 +88,18 @@ DESTDIR=%{buildroot}/ ninja install
 %{_includedir}/zck.h
 
 %changelog
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.1.5-2
--   Added %%license line automatically
-*   Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.1.5-1
--   Update to version 1.1.5
-*   Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> 1.1.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed May 15 2019 Ankit Jain <ankitja@vmware.com> 1.1.1-1
--   Initial build. First version
+* Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.16-1
+- Update to version 1.1.16.
+- License verified.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.1.5-2
+- Added %%license line automatically
+
+* Fri Mar 13 2020 Paul Monson <paulmon@microsoft.com> 1.1.5-1
+- Update to version 1.1.5
+
+* Wed Sep 25 2019 Saravanan Somasundaram <sarsoma@microsoft.com> 1.1.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed May 15 2019 Ankit Jain <ankitja@vmware.com> 1.1.1-1
+- Initial build. First version

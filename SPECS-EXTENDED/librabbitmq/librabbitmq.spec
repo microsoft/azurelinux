@@ -19,7 +19,7 @@ Distribution:   Mariner
 Name:      %{libname}
 Summary:   Client library for AMQP
 Version:   0.10.0
-Release:   3%{?dist}
+Release:   4%{?dist}
 License:   MIT
 URL:       https://github.com/alanxz/rabbitmq-c
 
@@ -116,8 +116,11 @@ make test
 
 
 %changelog
+* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.10.0-4
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.0-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Initial CBL-Mariner import from Fedora 32 (license: CC-BY-SA).
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

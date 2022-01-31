@@ -1335,9 +1335,16 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 	const squashErrors = false
 	const authorizedKeysTempFilePerms = 0644
 	const authorizedKeysTempFile = "/tmp/authorized_keys"
+	const sshDirectoryPermission = "0700"
+
+	// Skip user SSH directory generation when not provided with public keys
+	// Let SSH handle the creation of this folder on its first use
+	if len(user.SSHPubKeyPaths) == 0 {
+		return
+	}
 
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
-	authorizedKeysFile := filepath.Join(homeDir, ".ssh/authorized_keys")
+	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
 	if err != nil {
@@ -1402,34 +1409,30 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		return
 	}
 
-	if len(user.SSHPubKeyPaths) != 0 {
-		const sshDirectoryPermission = "0700"
-
-		// Change ownership of the folder to belong to the user and their primary group
-		err = installChroot.UnsafeRun(func() (err error) {
-			// Find the primary group of the user
-			stdout, stderr, err := shell.Execute("id", "-g", user.Name)
-			if err != nil {
-				logger.Log.Warnf(stderr)
-				return
-			}
-
-			primaryGroup := strings.TrimSpace(stdout)
-			logger.Log.Debugf("Primary group for user (%s) is (%s)", user.Name, primaryGroup)
-
-			ownership := fmt.Sprintf("%s:%s", user.Name, primaryGroup)
-			err = shell.ExecuteLive(squashErrors, "chown", "-R", ownership, userSSHKeyDir)
-			if err != nil {
-				return
-			}
-
-			err = shell.ExecuteLive(squashErrors, "chmod", "-R", sshDirectoryPermission, userSSHKeyDir)
+	// Change ownership of the folder to belong to the user and their primary group
+	err = installChroot.UnsafeRun(func() (err error) {
+		// Find the primary group of the user
+		stdout, stderr, err := shell.Execute("id", "-g", user.Name)
+		if err != nil {
+			logger.Log.Warnf(stderr)
 			return
-		})
+		}
 
+		primaryGroup := strings.TrimSpace(stdout)
+		logger.Log.Debugf("Primary group for user (%s) is (%s)", user.Name, primaryGroup)
+
+		ownership := fmt.Sprintf("%s:%s", user.Name, primaryGroup)
+		err = shell.ExecuteLive(squashErrors, "chown", "-R", ownership, userSSHKeyDir)
 		if err != nil {
 			return
 		}
+
+		err = shell.ExecuteLive(squashErrors, "chmod", "-R", sshDirectoryPermission, userSSHKeyDir)
+		return
+	})
+
+	if err != nil {
+		return
 	}
 
 	return

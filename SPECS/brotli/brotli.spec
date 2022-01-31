@@ -1,14 +1,13 @@
 Summary:        Lossless compression algorithm
 Name:           brotli
-Version:        1.0.7
-Release:        10%{?dist}
+Version:        1.0.9
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://github.com/google/brotli
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2020-8927.patch
+Source0:        https://github.com/google/brotli/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -114,8 +113,12 @@ python3 setup.py test
 %{_mandir}/man3/decode.h.3brotli*
 %{_mandir}/man3/encode.h.3brotli*
 %{_mandir}/man3/types.h.3brotli*
+%{_mandir}/man3/constants.h.3brotli*
 
 %changelog
+* Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0.9-1
+- Upgrade to 1.0.9
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.7-10
 - Remove hardcoded %%python_version macros to enable building with Python 3.9
 - License verified
