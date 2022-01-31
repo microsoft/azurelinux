@@ -1,28 +1,26 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
 %global shortname prometheus-node-exporter
-
 # https://github.com/prometheus/node_exporter
 %global goipath         github.com/prometheus/node_exporter
-Version:                1.3.1
 
-#%gometa
+%gometa
 
 %global common_description %{expand:
 Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written
 in Go with pluggable metric collectors.}
 
 %global golicenses      LICENSE NOTICE
+
 %global godocs          docs examples CHANGELOG.md CODE_OF_CONDUCT.md\\\
                         CONTRIBUTING.md MAINTAINERS.md SECURITY.md README.md
 
-Name:           %{goname}
-Release:        6%{?dist}
 Summary:        Exporter for machine metrics
-
+Name:           %{goname}
+Version:        1.3.1
+Release:        6%{?dist}
 # Upstream license specification: Apache-2.0
-License:        ASL 2.0 and MIT
+License:        ASL 2.0 AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            %{gourl}
 Source0:        https://github.com/prometheus/node_exporter/archive/refs/tags/v%{version}.tar.gz#/%{shortname}-%{version}.tar.gz
 Source1:        %{shortname}.sysusers
@@ -36,52 +34,16 @@ Patch1:         0001-Refactor-perf-collector.patch
 
 BuildRequires:  go-rpm-macros
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  golang(github.com/beevik/ntp)
-BuildRequires:  golang(github.com/coreos/go-systemd/dbus)
-BuildRequires:  golang(github.com/ema/qdisc)
-BuildRequires:  golang(github.com/go-kit/log)
-BuildRequires:  golang(github.com/go-kit/log/level)
-BuildRequires:  golang(github.com/godbus/dbus)
-BuildRequires:  golang(github.com/hashicorp/go-envparse)
-BuildRequires:  golang(github.com/hodgesds/perf-utils)
-BuildRequires:  golang(github.com/jsimonetti/rtnetlink)
-BuildRequires:  golang(github.com/mattn/go-xmlrpc)
-BuildRequires:  golang(github.com/mdlayher/wifi)
-BuildRequires:  golang(github.com/prometheus/client_golang/prometheus)
-BuildRequires:  golang(github.com/prometheus/client_golang/prometheus/collectors)
-BuildRequires:  golang(github.com/prometheus/client_golang/prometheus/promhttp)
-BuildRequires:  golang(github.com/prometheus/client_model/go)
-BuildRequires:  golang(github.com/prometheus/common/expfmt)
-BuildRequires:  golang(github.com/prometheus/common/promlog)
-BuildRequires:  golang(github.com/prometheus/common/promlog/flag)
-BuildRequires:  golang(github.com/prometheus/common/version)
-BuildRequires:  golang(github.com/prometheus/exporter-toolkit/web)
-BuildRequires:  golang(github.com/prometheus/procfs)
-BuildRequires:  golang(github.com/prometheus/procfs/bcache)
-BuildRequires:  golang(github.com/prometheus/procfs/blockdevice)
-BuildRequires:  golang(github.com/prometheus/procfs/btrfs)
-BuildRequires:  golang(github.com/prometheus/procfs/nfs)
-BuildRequires:  golang(github.com/prometheus/procfs/sysfs)
-BuildRequires:  golang(github.com/prometheus/procfs/xfs)
-BuildRequires:  golang(github.com/safchain/ethtool)
-BuildRequires:  golang(github.com/soundcloud/go-runit/runit)
-BuildRequires:  golang(golang.org/x/sys/unix)
-BuildRequires:  golang(gopkg.in/alecthomas/kingpin.v2)
 
-%if %{with_check}
-# Tests
-BuildRequires:  golang(github.com/prometheus/client_golang/prometheus/testutil)
-%endif
-
-Requires(pre): shadow-utils
+Requires(pre):  shadow-utils
 
 %description
 %{common_description}
 
-%gopkg
+%{gopkg}
 
 %prep
-%goprep
+%{goprep}
 %patch0 -p1
 %patch1 -p1
 
@@ -91,10 +53,10 @@ LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}  \
          -X github.com/prometheus/common/version.Revision=%{release} \
          -X github.com/prometheus/common/version.Branch=tarball      \
          -X github.com/prometheus/common/version.BuildDate=$(date -u -d@$SOURCE_DATE_EPOCH +%%Y%%m%%d)"
-%gobuild -o %{gobuilddir}/bin/node_exporter %{goipath}
+%{gobuild} -o %{gobuilddir}/bin/node_exporter %{goipath}
 
 %install
-%gopkginstall
+%{gopkginstall}
 install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 mv %{buildroot}%{_bindir}/node_exporter %{buildroot}%{_bindir}/%{shortname}
@@ -102,11 +64,11 @@ pushd %{buildroot}%{_bindir}
 ln -s %{shortname} node_exporter
 popd
 
-install -Dpm0644 %{S:1} %{buildroot}%{_sysusersdir}/%{shortname}.conf
-install -Dpm0644 %{S:2} %{buildroot}%{_unitdir}/%{shortname}.service
-install -Dpm0644 %{S:3} %{buildroot}%{_sysconfdir}/default/%{shortname}
+install -Dpm0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{shortname}.conf
+install -Dpm0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{shortname}.service
+install -Dpm0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/%{shortname}
 install -Dpm0644 example-rules.yml %{buildroot}%{_datadir}/prometheus/node-exporter/example-rules.yml
-install -Dpm0644 %{S:4} %{buildroot}%{_sysconfdir}/logrotate.d/%{shortname}
+install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/%{shortname}
 mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus/node-exporter
 
 # Build man pages.
@@ -117,10 +79,10 @@ sed -i '/^  /d; /^.SH "NAME"/,+1c.SH "NAME"\nprometheus-node-exporter \\- The Pr
     %{buildroot}/%{_mandir}/man1/%{shortname}.1
 
 %check
-%gocheck -d collector
+%{gocheck} -d collector
 
 %pre
-%sysusers_create_compat %{SOURCE1}
+%{sysusers_create_compat} %{SOURCE1}
 
 %post
 %systemd_post %{shortname}.service
@@ -145,7 +107,7 @@ sed -i '/^  /d; /^.SH "NAME"/,+1c.SH "NAME"\nprometheus-node-exporter \\- The Pr
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus/node-exporter
 
-%gopkgfiles
+%{gopkgfiles}
 
 %changelog
 * Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.1-6
@@ -178,4 +140,3 @@ sed -i '/^  /d; /^.SH "NAME"/,+1c.SH "NAME"\nprometheus-node-exporter \\- The Pr
 
 * Wed Feb 17 22:48:22 CET 2021 Robert-André Mauchin <zebob.m@gmail.com> - 1.1.1-1
 - Initial package
-
