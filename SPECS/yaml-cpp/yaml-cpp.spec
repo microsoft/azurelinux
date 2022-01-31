@@ -80,6 +80,7 @@ pushd build_static
 %changelog
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.0-1
 - Update to version 0.7.0.
+- License verified.
 
 * Thu Jul 9 2020 Joe Schmitt <joschmit@microsoft.com> - 0.6.2-6
 - Use the official patch for CVE-2017-5950.
