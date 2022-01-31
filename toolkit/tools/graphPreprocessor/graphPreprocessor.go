@@ -12,10 +12,6 @@ import (
 	"microsoft.com/pkggen/internal/pkggraph"
 )
 
-const (
-	allGoalNodeName = "ALL"
-)
-
 var (
 	app             = kingpin.New("graphPreprocessor", "Update the graph for the build requested")
 	inputGraphFile  = exe.InputFlag(app, "Input graph file having full build graph")
