@@ -62,9 +62,6 @@ mkdir -p %{buildroot}
 mkdir -p %{buildroot}/%{python3_sitelib}
 make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root,-)
 %license COPYING
@@ -112,6 +109,7 @@ rm -rf %{buildroot}
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-14
 - Initial import into CBL Mariner (License: GPL+)
 - License verified
+- Remove %%clean stage
 
 * Wed Mar 17 2021 Hernan Gatta <hegatta@microsoft.com> 1.8-12
 - Initial import into ECF Mariner (License: GPLv2)

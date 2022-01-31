@@ -79,9 +79,6 @@ if [ "$1" = "0" ] ; then # uninstall
 systemctl disable rt-setup
 fi
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(0644,root,root,0755)
 %config(noreplace) %{_sysconfdir}/security/limits.d/realtime.conf
@@ -98,6 +95,7 @@ rm -rf %{buildroot}
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 2.1-4
 - Initial import into CBL Mariner (License: GPL+)
+- Remove %%clean stage
 
 * Tue Mar 16 2021 Hernan Gatta <hegatta@microsoft.com> 2.1-3
 - Initial import into ECF Mariner (License: GPL+)

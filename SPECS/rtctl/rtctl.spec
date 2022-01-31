@@ -22,9 +22,6 @@ make
 rm -rf $RPM_BUILD_ROOT
 make DEST=$RPM_BUILD_ROOT install
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root,-)
 %attr(0755, root, root) /usr/sbin/rtctl
@@ -46,6 +43,7 @@ fi
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.13-4
 - Initial import into CBL Mariner (License: GPL+)
+- Remove %%clean stage
 
 * Tue Mar 09 2021 Hernan Gatta <hegatta@microsoft.com> - 1.13-3
 - Initial import into ECF mariner

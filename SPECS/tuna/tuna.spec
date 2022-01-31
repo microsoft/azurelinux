@@ -5,7 +5,7 @@ Version: 0.14.1
 Release: 3%{?dist}
 License: GPLv2
 Summary: Application tuning GUI & command line utility
-Source: https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.xz
+Source: https://git.kernel.org/pub/scm/utils/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.xz
 URL: https://rt.wiki.kernel.org/index.php/Tuna
 BuildArch: noarch
 BuildRequires: python3-devel, gettext

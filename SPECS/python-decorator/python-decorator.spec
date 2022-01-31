@@ -13,8 +13,7 @@ Version:        4.4.2
 Release:        4%{?dist}
 License:        BSD
 URL:            https://github.com/micheles/decorator
-#Source0:       https://files.pythonhosted.org/packages/source/d/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/source/d/%{pypi_name}/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/d/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-devel
