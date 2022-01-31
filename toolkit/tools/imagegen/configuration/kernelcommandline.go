@@ -36,6 +36,11 @@ func (k *KernelCommandLine) IsValid() (err error) {
 		}
 	}
 
+	err = k.SELinux.IsValid()
+	if err != nil {
+		return err
+	}
+
 	// A character needs to be set aside for use as the sed delimiter, make sure it isn't included in the provided string
 	if strings.Contains(k.ExtraCommandLine, k.GetSedDelimeter()) {
 		return fmt.Errorf("ExtraCommandLine contains character %s which is reserved for use by sed", k.GetSedDelimeter())
