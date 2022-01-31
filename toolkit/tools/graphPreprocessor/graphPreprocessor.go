@@ -51,6 +51,7 @@ func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph) (err error) {
 
 				if err != nil {
 					logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
+					return
 				}
 			}
 		}
