@@ -14,22 +14,11 @@ Distribution:   Mariner
 
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:  curl
-BuildRequires:  gawk
+BuildRequires:  git
 BuildRequires:  golang => 1.16
-BuildRequires:  iptables-devel
-BuildRequires:  pkg-config
-BuildRequires:  libaio-devel
-BuildRequires:  libcap-ng-devel
-BuildRequires:  libseccomp
-BuildRequires:  libseccomp-devel
-BuildRequires:  protobuf-devel
-BuildRequires:  protobuf-c-devel
-BuildRequires:  python2-devel
-BuildRequires:  unzip
 BuildRequires:  go-md2man
-Buildrequires:  which
-Buildrequires:  git
+BuildRequires:  libseccomp-devel
+BuildRequires:  make
 
 Requires:       glibc
 Requires:       libgcc
