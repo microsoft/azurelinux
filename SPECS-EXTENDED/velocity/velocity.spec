@@ -1,4 +1,4 @@
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 Summary:        Java-based template engine
 Name:           velocity
@@ -93,6 +93,7 @@ rm src/java/org/apache/velocity/app/event/implement/Escape{Html,JavaScript,Sql,X
 * Mon Jan 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-37
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
+- Build bootstrap path to avoid circular dependencies.
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.7-36
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
