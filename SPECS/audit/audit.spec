@@ -3,10 +3,8 @@
 
 Summary:        Kernel Audit Tool
 Name:           audit
-Version:        3.0
-Release:        11%{?dist}
-Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
-Patch0:         refuse-manual-stop.patch
+Version:        3.0.6
+Release:        2%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
 URL:            https://people.redhat.com/sgrubb/audit/
@@ -102,9 +100,6 @@ mkdir -p %{buildroot}/%{_var}/spool/audit
 ln -sfv %{_var}/opt/audit/log %{buildroot}/%{_var}/log/audit
 make install DESTDIR=%{buildroot}
 
-install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
-echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-auditd.preset
-
 %check
 make %{?_smp_mflags} check
 
@@ -125,7 +120,6 @@ make %{?_smp_mflags} check
 %{_bindir}/*
 %{_sbindir}/*
 %{_libdir}/systemd/system/auditd.service
-%{_libdir}/systemd/system-preset/50-auditd.preset
 %{_libexecdir}/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -170,59 +164,85 @@ make %{?_smp_mflags} check
 %{python3_sitelib}/*
 
 %changelog
-*   Fri Jan 21 2022 Nick Samson <nisamson@microsoft.com> - 3.0-11
--   Removed libwrap support to remove dependency on finger
-*   Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.0-10
--   Increment release for force republishing using golang 1.16.12
-*   Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-9
--   Increment release for force republishing using golang 1.16.9
-*   Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.0-8
--   Increment release to force republishing using golang 1.16.7.
-*   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 3.0-7
--   Increment release to force republishing using golang 1.15.13.
-*   Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.0-6
--   Increment release to force republishing using golang 1.15.11.
-*   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 3.0-5
--   Increment release to force republishing using golang 1.15.
-*   Thu May 14 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.0-4
--   Set "RefuseManualStop=no" in "auditd.service".
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.0-3
--   Added %%license line automatically
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0-2
--   Renaming go to golang
-*   Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0-1
--   Updated to version 3.0-alpha8. Subpackage licenses updated. 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8.4-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Sep 3 2018 Keerthana K <keerthanak@vmware.com> 2.8.4-1
--   Updated to version 2.8.4.
-*   Thu Dec 28 2017 Divya Thaluru <dthaluru@vmware.com>  2.7.5-4
--   Fixed the log file directory structure
-*   Thu Jun 29 2017 Divya Thaluru <dthaluru@vmware.com>  2.7.5-3
--   Disabled audit service by default
-*   Thu May 18 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.5-2
--   Move python2 requires to python subpackage and added python3.
-*   Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 2.7.5-1
--   Version update.
-*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 2.5-7
--   Moved man3 to devel subpackage.
-*   Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 2.5-6
--   Required krb5-devel.
-*   Fri Jul 22 2016 Xiaolin Li <xiaolinl@vmware.com> 2.5-5
--   Add gawk requirement.
-*   Thu May 26 2016 Divya Thaluru <dthaluru@vmware.com>  2.5-4
--   Fixed logic to restart the active services after upgrade
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.5-3
--   GA - Bump release of all rpms
-*   Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  2.5-2
--   Fixing spec file to handle rpm upgrade scenario correctly
-*   Tue Feb 23 2016 Anish Swaminathan <anishs@vmware.com>  2.5-1
--   Upgrade to 2.5
-*   Fri Jan 29 2016 Anish Swaminathan <anishs@vmware.com>  2.4.4-4
--   Add directories for auditd service.
-*   Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com>  2.4.4-3
--   Change config file attributes.
-*   Wed Dec 09 2015 Anish Swaminathan <anishs@vmware.com> 2.4.4-2
--   Add systemd requirement.
-*   Fri Aug 28 2015 Divya Thaluru <dthaluru@vmware.com> 2.4.4-1
--   Initial version
+* Mon Jan 31 2022 Chris PeBenito <chpebeni@microsoft.com> - 3.0.6.2
+- Remove override so auditd starts by default.
+
+* Fri Dec 10 2021 Chris Co <chrco@microsoft.com> - 3.0.6-1
+- Update to 3.0.6
+
+* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-8
+- Remove tcp_wrappers dependency due to package removal
+- License verified
+
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-7
+- Remove libtool archive files from final packaging
+
+* Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-6
+- Remove python2 subpackage
+
+* Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 3.0-5 (from dev branch)
+- Provide audit-libs-devel from the devel subpackage.
+- Provide audit-libs-python3 from the python3 subpackage.
+
+* Thu May 14 2020 Nicolas Ontiveros <niontive@microsoft.com> 3.0-4
+- Set "RefuseManualStop=no" in "auditd.service".
+
+* Sat May 09 00:21:30 PST 2020 Nick Samson <nisamson@microsoft.com> - 3.0-3
+- Added %%license line automatically
+
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0-2
+- Renaming go to golang
+
+* Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0-1
+- Updated to version 3.0-alpha8. Subpackage licenses updated.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8.4-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Sep 3 2018 Keerthana K <keerthanak@vmware.com> 2.8.4-1
+- Updated to version 2.8.4.
+
+* Thu Dec 28 2017 Divya Thaluru <dthaluru@vmware.com>  2.7.5-4
+- Fixed the log file directory structure
+
+* Thu Jun 29 2017 Divya Thaluru <dthaluru@vmware.com>  2.7.5-3
+- Disabled audit service by default
+
+* Thu May 18 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.5-2
+- Move python2 requires to python subpackage and added python3.
+
+* Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 2.7.5-1
+- Version update.
+
+* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 2.5-7
+- Moved man3 to devel subpackage.
+
+* Thu Nov 24 2016 Alexey Makhalov <amakhalov@vmware.com> 2.5-6
+- Required krb5-devel.
+
+* Fri Jul 22 2016 Xiaolin Li <xiaolinl@vmware.com> 2.5-5
+- Add gawk requirement.
+
+* Thu May 26 2016 Divya Thaluru <dthaluru@vmware.com>  2.5-4
+- Fixed logic to restart the active services after upgrade
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.5-3
+- GA - Bump release of all rpms
+
+* Tue May 3 2016 Divya Thaluru <dthaluru@vmware.com>  2.5-2
+- Fixing spec file to handle rpm upgrade scenario correctly
+
+* Tue Feb 23 2016 Anish Swaminathan <anishs@vmware.com>  2.5-1
+- Upgrade to 2.5
+
+* Fri Jan 29 2016 Anish Swaminathan <anishs@vmware.com>  2.4.4-4
+- Add directories for auditd service.
+
+* Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com>  2.4.4-3
+- Change config file attributes.
+
+* Wed Dec 09 2015 Anish Swaminathan <anishs@vmware.com> 2.4.4-2
+- Add systemd requirement.
+
+* Fri Aug 28 2015 Divya Thaluru <dthaluru@vmware.com> 2.4.4-1
+- Initial version
