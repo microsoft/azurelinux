@@ -1,0 +1,5782 @@
+From 99c3d3c96eb54789ece93c656514d48fe6f9d547 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Fri, 28 Jan 2022 18:06:36 +0000
+Subject: [PATCH 9/9] Add containers policy.
+
+MSFT_TAG: Backport
+
+This is a backport of SELinuxProject/refpolicy#434,
+SELinuxProject/refpolicy#467, and SELinuxProject/refpolicy#470
+squashed into a single patch.
+---
+ config/appconfig-mcs/lxc_contexts       |    6 +-
+ config/appconfig-mls/lxc_contexts       |    6 +-
+ config/appconfig-standard/lxc_contexts  |    6 +-
+ policy/modules/admin/logrotate.te       |    1 +
+ policy/modules/admin/usermanage.te      |    1 +
+ policy/modules/apps/gpg.if              |   37 +
+ policy/modules/apps/mozilla.te          |    1 +
+ policy/modules/apps/screen.if           |    2 +
+ policy/modules/kernel/corenetwork.te.in |    5 +
+ policy/modules/kernel/devices.if        |   47 +-
+ policy/modules/kernel/devices.te        |   28 +
+ policy/modules/kernel/filesystem.if     |  107 ++
+ policy/modules/kernel/filesystem.te     |    4 +
+ policy/modules/kernel/kernel.if         |   65 +-
+ policy/modules/kernel/kernel.te         |   14 +-
+ policy/modules/kernel/storage.te        |    4 +
+ policy/modules/kernel/terminal.te       |    4 +
+ policy/modules/roles/staff.te           |    4 +
+ policy/modules/roles/sysadm.te          |    4 +
+ policy/modules/services/abrt.te         |    1 +
+ policy/modules/services/condor.te       |    1 +
+ policy/modules/services/container.fc    |   79 ++
+ policy/modules/services/container.if    | 1396 +++++++++++++++++++++++
+ policy/modules/services/container.te    |  727 ++++++++++++
+ policy/modules/services/dbus.if         |   39 +
+ policy/modules/services/dbus.te         |    3 +
+ policy/modules/services/docker.fc       |    8 +
+ policy/modules/services/docker.if       |  237 ++++
+ policy/modules/services/docker.te       |  170 +++
+ policy/modules/services/ksmtuned.te     |    1 +
+ policy/modules/services/podman.fc       |    2 +
+ policy/modules/services/podman.if       |  258 +++++
+ policy/modules/services/podman.te       |  270 +++++
+ policy/modules/services/rootlesskit.fc  |    3 +
+ policy/modules/services/rootlesskit.if  |  106 ++
+ policy/modules/services/rootlesskit.te  |   46 +
+ policy/modules/services/rpc.te          |    2 +-
+ policy/modules/services/rtkit.te        |    1 +
+ policy/modules/services/samba.te        |    1 +
+ policy/modules/services/snmp.te         |    1 +
+ policy/modules/services/virt.if         |  232 +++-
+ policy/modules/services/virt.te         |  213 +---
+ policy/modules/system/init.if           |   37 +
+ policy/modules/system/init.te           |    8 +
+ policy/modules/system/iptables.te       |    6 +
+ policy/modules/system/logging.te        |    1 +
+ policy/modules/system/miscfiles.te      |    4 +
+ policy/modules/system/mount.te          |    6 +-
+ policy/modules/system/raid.te           |    1 +
+ policy/modules/system/sysnetwork.if     |   56 +
+ policy/modules/system/sysnetwork.te     |    5 +
+ policy/modules/system/systemd.if        |  284 ++++-
+ policy/modules/system/systemd.te        |    7 +-
+ policy/modules/system/unconfined.if     |    4 +
+ policy/modules/system/unconfined.te     |    4 +
+ policy/modules/system/userdomain.fc     |    2 +
+ policy/modules/system/userdomain.if     |  108 +-
+ policy/modules/system/userdomain.te     |    3 +
+ policy/modules/system/xdg.if            |   18 +
+ 59 files changed, 4425 insertions(+), 272 deletions(-)
+ create mode 100644 policy/modules/services/container.fc
+ create mode 100644 policy/modules/services/container.if
+ create mode 100644 policy/modules/services/container.te
+ create mode 100644 policy/modules/services/docker.fc
+ create mode 100644 policy/modules/services/docker.if
+ create mode 100644 policy/modules/services/docker.te
+ create mode 100644 policy/modules/services/podman.fc
+ create mode 100644 policy/modules/services/podman.if
+ create mode 100644 policy/modules/services/podman.te
+ create mode 100644 policy/modules/services/rootlesskit.fc
+ create mode 100644 policy/modules/services/rootlesskit.if
+ create mode 100644 policy/modules/services/rootlesskit.te
+
+diff --git a/config/appconfig-mcs/lxc_contexts b/config/appconfig-mcs/lxc_contexts
+index bf3fcc1a4..de397ed27 100644
+--- a/config/appconfig-mcs/lxc_contexts
++++ b/config/appconfig-mcs/lxc_contexts
+@@ -1,3 +1,5 @@
+-process = "system_u:system_r:svirt_lxc_net_t:s0"
++process = "system_u:system_r:container_t:s0"
+ content = "system_u:object_r:virt_var_lib_t:s0"
+-file = "system_u:object_r:svirt_lxc_file_t:s0"
++file = "system_u:object_r:container_file_t:s0"
++ro_file = "system_u:object_r:container_ro_file_t:s0"
++sandbox_lxc_process = "system_u:system_r:container_t:s0"
+diff --git a/config/appconfig-mls/lxc_contexts b/config/appconfig-mls/lxc_contexts
+index bf3fcc1a4..de397ed27 100644
+--- a/config/appconfig-mls/lxc_contexts
++++ b/config/appconfig-mls/lxc_contexts
+@@ -1,3 +1,5 @@
+-process = "system_u:system_r:svirt_lxc_net_t:s0"
++process = "system_u:system_r:container_t:s0"
+ content = "system_u:object_r:virt_var_lib_t:s0"
+-file = "system_u:object_r:svirt_lxc_file_t:s0"
++file = "system_u:object_r:container_file_t:s0"
++ro_file = "system_u:object_r:container_ro_file_t:s0"
++sandbox_lxc_process = "system_u:system_r:container_t:s0"
+diff --git a/config/appconfig-standard/lxc_contexts b/config/appconfig-standard/lxc_contexts
+index b386c6ad4..f2d6ef9b8 100644
+--- a/config/appconfig-standard/lxc_contexts
++++ b/config/appconfig-standard/lxc_contexts
+@@ -1,3 +1,5 @@
+-process = "system_u:system_r:svirt_lxc_net_t"
++process = "system_u:system_r:container_t"
+ content = "system_u:object_r:virt_var_lib_t"
+-file = "system_u:object_r:svirt_lxc_file_t"
++file = "system_u:object_r:container_file_t"
++ro_file = "system_u:object_r:container_ro_file_t:s0"
++sandbox_lxc_process = "system_u:system_r:container_t:s0"
+diff --git a/policy/modules/admin/logrotate.te b/policy/modules/admin/logrotate.te
+index 05573f917..c20887c6a 100644
+--- a/policy/modules/admin/logrotate.te
++++ b/policy/modules/admin/logrotate.te
+@@ -37,6 +37,7 @@ init_unit_file(logrotate_unit_t)
+ 
+ # sys_ptrace is for systemctl
+ allow logrotate_t self:capability { chown dac_override dac_read_search fowner fsetid kill setgid setuid sys_ptrace sys_nice sys_resource };
++dontaudit logrotate_t self:cap_userns sys_ptrace;
+ # systemctl asks for net_admin
+ dontaudit logrotate_t self:capability net_admin;
+ allow logrotate_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr setfscreate noatsecure siginh setrlimit rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index 13695b7a8..17c8f080c 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -466,6 +466,7 @@ optional_policy(`
+ 
+ allow useradd_t self:capability { chown dac_override fowner fsetid kill setuid sys_resource };
+ dontaudit useradd_t self:capability { net_admin sys_tty_config };
++dontaudit useradd_t self:cap_userns sys_ptrace;
+ allow useradd_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr setfscreate noatsecure siginh rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
+ allow useradd_t self:fd use;
+ allow useradd_t self:fifo_file rw_fifo_file_perms;
+diff --git a/policy/modules/apps/gpg.if b/policy/modules/apps/gpg.if
+index c15dce8d3..c45cf389a 100644
+--- a/policy/modules/apps/gpg.if
++++ b/policy/modules/apps/gpg.if
+@@ -158,6 +158,24 @@ interface(`gpg_exec_agent',`
+ 	can_exec($1, gpg_agent_exec_t)
+ ')
+ 
++########################################
++## <summary>
++##	Do not audit attempts to execute the gpg-agent.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`gpg_dontaudit_exec_agent',`
++	gen_require(`
++		type gpg_agent_exec_t;
++	')
++
++	dontaudit $1 gpg_agent_exec_t:file exec_file_perms;
++')
++
+ ######################################
+ ## <summary>
+ ##	Make gpg executable files an
+@@ -380,6 +398,25 @@ interface(`gpg_pinentry_dbus_chat',`
+ 	allow gpg_pinentry_t $1:dbus send_msg;
+ ')
+ 
++########################################
++## <summary>
++##	Do not audit attempts to search gpg
++##	user secrets.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`gpg_dontaudit_search_user_secrets',`
++	gen_require(`
++		type gpg_secret_t;
++	')
++
++	dontaudit $1 gpg_secret_t:dir search_dir_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	List gpg user secrets.
+diff --git a/policy/modules/apps/mozilla.te b/policy/modules/apps/mozilla.te
+index dee00ae9b..ea19bf78c 100644
+--- a/policy/modules/apps/mozilla.te
++++ b/policy/modules/apps/mozilla.te
+@@ -333,6 +333,7 @@ optional_policy(`
+ #
+ 
+ dontaudit mozilla_plugin_t self:capability { ipc_lock sys_nice sys_ptrace sys_tty_config };
++dontaudit mozilla_plugin_t self:cap_userns sys_ptrace;
+ allow mozilla_plugin_t self:process { setpgid getsched setsched signal_perms setrlimit };
+ allow mozilla_plugin_t self:fifo_file manage_fifo_file_perms;
+ allow mozilla_plugin_t self:netlink_kobject_uevent_socket create_socket_perms;
+diff --git a/policy/modules/apps/screen.if b/policy/modules/apps/screen.if
+index add60694e..1045e9f35 100644
+--- a/policy/modules/apps/screen.if
++++ b/policy/modules/apps/screen.if
+@@ -53,6 +53,8 @@ template(`screen_role_template',`
+ 
+ 	dontaudit $1_screen_t self:capability sys_tty_config;
+ 
++	dontaudit $1_screen_t self:cap_userns sys_ptrace;
++
+ 	domtrans_pattern($3, screen_exec_t, $1_screen_t)
+ 
+ 	ps_process_pattern($3, $1_screen_t)
+diff --git a/policy/modules/kernel/corenetwork.te.in b/policy/modules/kernel/corenetwork.te.in
+index e995359f5..b4099f754 100644
+--- a/policy/modules/kernel/corenetwork.te.in
++++ b/policy/modules/kernel/corenetwork.te.in
+@@ -32,6 +32,11 @@ dev_node(ppp_device_t)
+ type tun_tap_device_t;
+ dev_node(tun_tap_device_t)
+ 
++# double quotes needed here to avoid a build error
++optional_policy(``
++	container_mountpoint(tun_tap_device_t)
++'')
++
+ ########################################
+ #
+ # Ports and packets
+diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
+index aace3ccd8..7dac9142f 100644
+--- a/policy/modules/kernel/devices.if
++++ b/policy/modules/kernel/devices.if
+@@ -108,6 +108,24 @@ interface(`dev_getattr_fs',`
+ 	allow $1 device_t:filesystem getattr;
+ ')
+ 
++########################################
++## <summary>
++##	Remount device filesystems.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`dev_remount_fs',`
++	gen_require(`
++		type device_t;
++	')
++
++	allow $1 device_t:filesystem remount;
++')
++
+ ########################################
+ ## <summary>
+ ##	Watch the directories in /dev.
+@@ -4238,7 +4256,7 @@ interface(`dev_rw_sysdig',`
+ 
+ ########################################
+ ## <summary>
+-##	Mount a filesystem on sysfs.
++##	Mount a filesystem on sysfs.  (Deprecated)
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+@@ -4247,11 +4265,8 @@ interface(`dev_rw_sysdig',`
+ ## </param>
+ #
+ interface(`dev_mounton_sysfs',`
+-	gen_require(`
+-		type sysfs_t;
+-	')
+-
+-	allow $1 sysfs_t:dir mounton;
++	refpolicywarn(`$0($*) has been deprecated, please use dev_mounton_sysfs_dirs() instead.')
++	dev_mounton_sysfs_dirs($1)
+ ')
+ 
+ ########################################
+@@ -4326,6 +4341,24 @@ interface(`dev_mount_sysfs',`
+ 	allow $1 sysfs_t:filesystem mount;
+ ')
+ 
++########################################
++## <summary>
++##	Remount a sysfs filesystem.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allow access.
++##	</summary>
++## </param>
++#
++interface(`dev_remount_sysfs',`
++	gen_require(`
++		type sysfs_t;
++	')
++
++	allow $1 sysfs_t:filesystem remount;
++')
++
+ ########################################
+ ## <summary>
+ ##	Do not audit getting the attributes of sysfs filesystem
+@@ -4366,7 +4399,7 @@ interface(`dev_dontaudit_read_sysfs',`
+ 
+ ########################################
+ ## <summary>
+-##     mounton sysfs directories.
++##	Mount on sysfs directories.
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+diff --git a/policy/modules/kernel/devices.te b/policy/modules/kernel/devices.te
+index c3cf2b457..8c949fb07 100644
+--- a/policy/modules/kernel/devices.te
++++ b/policy/modules/kernel/devices.te
+@@ -44,6 +44,10 @@ dev_node(acpi_bios_t)
+ type autofs_device_t;
+ dev_node(autofs_device_t)
+ 
++optional_policy(`
++	container_mountpoint(autofs_device_t)
++')
++
+ type cardmgr_dev_t;
+ dev_node(cardmgr_dev_t)
+ files_tmp_file(cardmgr_dev_t)
+@@ -130,6 +134,10 @@ dev_node(ipmi_device_t)
+ type kmsg_device_t;
+ dev_node(kmsg_device_t)
+ 
++optional_policy(`
++	container_mountpoint(kmsg_device_t)
++')
++
+ optional_policy(`
+ 	init_mountpoint(kmsg_device_t)
+ ')
+@@ -209,6 +217,10 @@ dev_node(null_device_t)
+ mls_trusted_object(null_device_t)
+ sid devnull gen_context(system_u:object_r:null_device_t,s0)
+ 
++optional_policy(`
++	container_mountpoint(null_device_t)
++')
++
+ #
+ # Type for /dev/nvram
+ #
+@@ -244,6 +256,10 @@ dev_node(qemu_device_t)
+ type random_device_t;
+ dev_node(random_device_t)
+ 
++optional_policy(`
++	container_mountpoint(random_device_t)
++')
++
+ type scanner_device_t;
+ dev_node(scanner_device_t)
+ 
+@@ -301,6 +317,10 @@ dev_node(uhid_device_t)
+ type urandom_device_t;
+ dev_node(urandom_device_t)
+ 
++optional_policy(`
++	container_mountpoint(urandom_device_t)
++')
++
+ #
+ # usbfs_t is the type for the /proc/bus/usb pseudofs
+ #
+@@ -316,6 +336,10 @@ genfscon usbdevfs / gen_context(system_u:object_r:usbfs_t,s0)
+ type usb_device_t;
+ dev_node(usb_device_t)
+ 
++optional_policy(`
++	container_mountpoint(usb_device_t)
++')
++
+ #
+ # usb_device_t is the type for /dev/usbmon
+ #
+@@ -367,6 +391,10 @@ type zero_device_t;
+ dev_node(zero_device_t)
+ mls_trusted_object(zero_device_t)
+ 
++optional_policy(`
++	container_mountpoint(zero_device_t)
++')
++
+ ########################################
+ #
+ # Rules for all device nodes
+diff --git a/policy/modules/kernel/filesystem.if b/policy/modules/kernel/filesystem.if
+index 1fdba77f5..dd261be1f 100644
+--- a/policy/modules/kernel/filesystem.if
++++ b/policy/modules/kernel/filesystem.if
+@@ -2306,6 +2306,24 @@ interface(`fs_unmount_fusefs',`
+ 	allow $1 fusefs_t:filesystem unmount;
+ ')
+ 
++########################################
++## <summary>
++##	Remount a FUSE filesystem.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`fs_remount_fusefs',`
++	gen_require(`
++		type fusefs_t;
++	')
++
++	allow $1 fusefs_t:filesystem remount;
++')
++
+ ########################################
+ ## <summary>
+ ##	Mounton a FUSEFS filesystem.
+@@ -2324,6 +2342,58 @@ interface(`fs_mounton_fusefs',`
+ 	allow $1 fusefs_t:dir mounton;
+ ')
+ 
++########################################
++## <summary>
++##	Make FUSEFS files an entrypoint for the
++##	specified domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	The domain for which fusefs_t is an entrypoint.
++##	</summary>
++## </param>
++#
++interface(`fs_fusefs_entry_type',`
++	gen_require(`
++		type fusefs_t;
++	')
++
++	domain_entry_file($1, fusefs_t)
++')
++
++########################################
++## <summary>
++##	Execute FUSEFS files in a specified domain.
++## </summary>
++## <desc>
++##	<p>
++##	Execute FUSEFS files in a specified domain.
++##	</p>
++##	<p>
++##	No interprocess communication (signals, pipes,
++##	etc.) is provided by this interface since
++##	the domains are not owned by this module.
++##	</p>
++## </desc>
++## <param name="source_domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="target_domain">
++##	<summary>
++##	Domain to transition to.
++##	</summary>
++## </param>
++#
++interface(`fs_fusefs_domtrans',`
++	gen_require(`
++		type fusefs_t;
++	')
++
++	domain_auto_transition_pattern($1, fusefs_t, $2)
++')
++
+ ########################################
+ ## <summary>
+ ##	Search directories
+@@ -2500,6 +2570,25 @@ interface(`fs_read_fusefs_symlinks',`
+ 	read_lnk_files_pattern($1, fusefs_t, fusefs_t)
+ ')
+ 
++########################################
++## <summary>
++##	Manage symlinks on a FUSEFS filesystem.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`fs_manage_fusefs_symlinks',`
++	gen_require(`
++		type fusefs_t;
++	')
++
++	manage_lnk_files_pattern($1, fusefs_t, fusefs_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Get the attributes of an hugetlbfs
+@@ -3851,6 +3940,24 @@ interface(`fs_read_nsfs_files',`
+ 	allow $1 nsfs_t:file read_file_perms;
+ ')
+ 
++########################################
++## <summary>
++##	Get the attributes of an nsfs filesystem.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`fs_getattr_nsfs',`
++	gen_require(`
++		type nsfs_t;
++	')
++
++	allow $1 nsfs_t:filesystem getattr;
++')
++
+ ########################################
+ ## <summary>
+ ##	Unmount an nsfs filesystem.
+diff --git a/policy/modules/kernel/filesystem.te b/policy/modules/kernel/filesystem.te
+index 6fbed6ac9..0fd90fb67 100644
+--- a/policy/modules/kernel/filesystem.te
++++ b/policy/modules/kernel/filesystem.te
+@@ -273,6 +273,10 @@ genfscon fuse / gen_context(system_u:object_r:fusefs_t,s0)
+ genfscon fuseblk / gen_context(system_u:object_r:fusefs_t,s0)
+ genfscon fusectl / gen_context(system_u:object_r:fusefs_t,s0)
+ 
++optional_policy(`
++	container_mountpoint(fusefs_t)
++')
++
+ #
+ # iso9660_t is the type for CD filesystems
+ # and their files.
+diff --git a/policy/modules/kernel/kernel.if b/policy/modules/kernel/kernel.if
+index 18002e67d..4cd35959a 100644
+--- a/policy/modules/kernel/kernel.if
++++ b/policy/modules/kernel/kernel.if
+@@ -948,7 +948,7 @@ interface(`kernel_dontaudit_getattr_proc',`
+ 
+ ########################################
+ ## <summary>
+-##	Mount on proc directories.
++##	Mount on proc directories.  (Deprecated)
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+@@ -958,11 +958,8 @@ interface(`kernel_dontaudit_getattr_proc',`
+ ## <rolecap/>
+ #
+ interface(`kernel_mounton_proc',`
+-	gen_require(`
+-		type proc_t;
+-	')
+-
+-	allow $1 proc_t:dir mounton;
++	refpolicywarn(`$0($*) has been deprecated, please use kernel_mounton_proc_dirs() instead.')
++	kernel_mounton_proc_dirs($1)
+ ')
+ 
+ ########################################
+@@ -1060,7 +1057,7 @@ interface(`kernel_dontaudit_write_proc_dirs',`
+ 
+ ########################################
+ ## <summary>
+-##	Mount the directories in /proc.
++##	Mount on the directories in /proc.
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+@@ -2346,6 +2343,26 @@ interface(`kernel_read_irq_sysctls',`
+ 	list_dirs_pattern($1, proc_t, sysctl_irq_t)
+ ')
+ 
++########################################
++## <summary>
++##	Do not audit attempts to search
++##	filesystem sysctl directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`kernel_dontaudit_search_fs_sysctls',`
++	gen_require(`
++		type sysctl_fs_t;
++	')
++
++	dontaudit $1 sysctl_fs_t:dir search_dir_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Read and write IRQ sysctls.
+@@ -2894,6 +2911,40 @@ interface(`kernel_dontaudit_read_unlabeled_files',`
+ 	dontaudit $1 unlabeled_t:file { getattr read };
+ ')
+ 
++########################################
++## <summary>
++##	Create an object in unlabeled directories
++##	with a private type.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="private type">
++##	<summary>
++##	The type of the object to be created.
++##	</summary>
++## </param>
++## <param name="object">
++##	<summary>
++##	The object class of the object being created.
++##	</summary>
++## </param>
++## <param name="name" optional="true">
++##	<summary>
++##	The name of the object being created.
++##	</summary>
++## </param>
++#
++interface(`kernel_unlabeled_filetrans',`
++	gen_require(`
++		type unlabeled_t;
++	')
++
++	filetrans_pattern($1, unlabeled_t, $2, $3, $4)
++')
++
+ ########################################
+ ## <summary>
+ ##	Delete unlabeled symbolic links.
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index 9a938fa7e..30e34bec5 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -78,6 +78,10 @@ fs_type(proc_t)
+ genfscon proc / gen_context(system_u:object_r:proc_t,s0)
+ genfscon proc /sysvipc gen_context(system_u:object_r:proc_t,s0)
+ 
++optional_policy(`
++	container_mountpoint(proc_t)
++')
++
+ type proc_afs_t, proc_type;
+ genfscon proc /fs/openafs gen_context(system_u:object_r:proc_afs_t,s0)
+ 
+@@ -119,6 +123,10 @@ files_mountpoint(sysctl_t)
+ sid sysctl gen_context(system_u:object_r:sysctl_t,s0)
+ genfscon proc /sys gen_context(system_u:object_r:sysctl_t,s0)
+ 
++optional_policy(`
++	container_mountpoint(sysctl_t)
++')
++
+ # /proc/irq directory and files
+ type sysctl_irq_t, sysctl_type;
+ genfscon proc /irq gen_context(system_u:object_r:sysctl_irq_t,s0)
+@@ -127,6 +135,10 @@ optional_policy(`
+ 	init_mountpoint(sysctl_irq_t)
+ ')
+ 
++optional_policy(`
++	container_mountpoint(sysctl_irq_t)
++')
++
+ # /proc/net/rpc directory and files
+ type sysctl_rpc_t, sysctl_type;
+ genfscon proc /net/rpc gen_context(system_u:object_r:sysctl_rpc_t,s0)
+@@ -284,7 +296,7 @@ corenet_ib_access_unlabeled_pkeys(kernel_t)
+ corenet_ib_manage_subnet_all_endports(kernel_t)
+ corenet_ib_manage_subnet_unlabeled_endports(kernel_t)
+ 
+-dev_mounton_sysfs(kernel_t)
++dev_mounton_sysfs_dirs(kernel_t)
+ dev_read_sysfs(kernel_t)
+ dev_search_usbfs(kernel_t)
+ # devtmpfs handling:
+diff --git a/policy/modules/kernel/storage.te b/policy/modules/kernel/storage.te
+index 8c1c4c4e5..dfe1a1663 100644
+--- a/policy/modules/kernel/storage.te
++++ b/policy/modules/kernel/storage.te
+@@ -27,6 +27,10 @@ neverallow ~{ fixed_disk_raw_write storage_unconfined_type } fixed_disk_device_t
+ type fuse_device_t;
+ dev_node(fuse_device_t)
+ 
++optional_policy(`
++	container_mountpoint(fuse_device_t)
++')
++
+ #
+ # scsi_generic_device_t is the type of /dev/sg*
+ # it gives access to ALL SCSI devices (both fixed and removable)
+diff --git a/policy/modules/kernel/terminal.te b/policy/modules/kernel/terminal.te
+index 22147962d..4dbe80f2d 100644
+--- a/policy/modules/kernel/terminal.te
++++ b/policy/modules/kernel/terminal.te
+@@ -38,6 +38,10 @@ type devtty_t;
+ dev_node(devtty_t)
+ mls_trusted_object(devtty_t)
+ 
++optional_policy(`
++	container_mountpoint(devtty_t)
++')
++
+ #
+ # ptmx_t is the type for /dev/ptmx.
+ #
+diff --git a/policy/modules/roles/staff.te b/policy/modules/roles/staff.te
+index 2701b0446..af069f0ad 100644
+--- a/policy/modules/roles/staff.te
++++ b/policy/modules/roles/staff.te
+@@ -23,6 +23,10 @@ optional_policy(`
+ 	auditadm_role_change(staff_r)
+ ')
+ 
++optional_policy(`
++	container_user_role(staff, staff_t, staff_application_exec_domain, staff_r)
++')
++
+ optional_policy(`
+ 	dbadm_role_change(staff_r)
+ ')
+diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
+index 1ec4e6fcf..7f8ea1d08 100644
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -282,6 +282,10 @@ optional_policy(`
+ 	consoletype_run(sysadm_t, sysadm_r)
+ ')
+ 
++optional_policy(`
++	container_admin(sysadm_t, sysadm_r)
++')
++
+ optional_policy(`
+ 	corosync_admin(sysadm_t, sysadm_r)
+ ')
+diff --git a/policy/modules/services/abrt.te b/policy/modules/services/abrt.te
+index 348c5a6ba..74a3e5f9a 100644
+--- a/policy/modules/services/abrt.te
++++ b/policy/modules/services/abrt.te
+@@ -373,6 +373,7 @@ sysnet_dns_name_resolve(abrt_retrace_worker_t)
+ #
+ 
+ allow abrt_dump_oops_t self:capability dac_override;
++allow abrt_dump_oops_t self:cap_userns { kill sys_ptrace };
+ allow abrt_dump_oops_t self:fifo_file rw_fifo_file_perms;
+ allow abrt_dump_oops_t self:unix_stream_socket { accept listen };
+ 
+diff --git a/policy/modules/services/condor.te b/policy/modules/services/condor.te
+index 0e05b9277..3583cae50 100644
+--- a/policy/modules/services/condor.te
++++ b/policy/modules/services/condor.te
+@@ -179,6 +179,7 @@ allow condor_negotiator_t condor_master_t:udp_socket getattr;
+ #
+ 
+ allow condor_procd_t self:capability { chown dac_override fowner kill sys_ptrace };
++allow condor_procd_t self:cap_userns sys_ptrace;
+ 
+ allow condor_procd_t condor_domain:process sigkill;
+ 
+diff --git a/policy/modules/services/container.fc b/policy/modules/services/container.fc
+new file mode 100644
+index 000000000..ef5ad3b69
+--- /dev/null
++++ b/policy/modules/services/container.fc
+@@ -0,0 +1,79 @@
++HOME_DIR/\.cache/containers(/.*)?		gen_context(system_u:object_r:container_cache_home_t,s0)
++HOME_DIR/\.config/containers(/.*)?		gen_context(system_u:object_r:container_conf_home_t,s0)
++HOME_DIR/\.config/cni(/.*)?		gen_context(system_u:object_r:container_conf_home_t,s0)
++HOME_DIR/\.local/share/containers(/.*)?		gen_context(system_u:object_r:container_data_home_t,s0)
++HOME_DIR/\.local/share/containers/storage/overlay(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/containers/storage/overlay2(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/containers/storage/overlay-layers(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/containers/storage/overlay2-layers(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/containers/storage/overlay-images(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/containers/storage/overlay2-images(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/containers/storage/volumes/[^/]+/.*		gen_context(system_u:object_r:container_file_t,s0)
++HOME_DIR/\.local/share/docker(/.*)?		gen_context(system_u:object_r:container_data_home_t,s0)
++HOME_DIR/\.local/share/docker/.*/config\.env	--	gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/docker/containers/.*/.*\.log	--	gen_context(system_u:object_r:container_log_t,s0)
++HOME_DIR/\.local/share/docker/containers/.*/hostname	--	gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/docker/containers/.*/hosts	--	gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/docker/init(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/docker/fuse-overlayfs(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++HOME_DIR/\.local/share/docker/volumes(/.*)?		gen_context(system_u:object_r:container_file_t,s0)
++
++/usr/bin/crun	--	gen_context(system_u:object_r:container_engine_exec_t,s0)
++/usr/bin/runc	--	gen_context(system_u:object_r:container_engine_exec_t,s0)
++
++/usr/lib/systemd/system/docker.*	--	gen_context(system_u:object_r:container_unit_t,s0)
++/usr/lib/systemd/system/containerd.*	--	gen_context(system_u:object_r:container_unit_t,s0)
++
++/etc/containers(/.*)?		gen_context(system_u:object_r:container_config_t,s0)
++/etc/cni(/.*)?		gen_context(system_u:object_r:container_config_t,s0)
++/etc/docker(/.*)?		gen_context(system_u:object_r:container_config_t,s0)
++/etc/containerd(/.*)?		gen_context(system_u:object_r:container_config_t,s0)
++
++/run/containers(/.*)?		gen_context(system_u:object_r:container_runtime_t,s0)
++/run/libpod(/.*)?		gen_context(system_u:object_r:container_runtime_t,s0)
++/run/runc(/.*)?		gen_context(system_u:object_r:container_runtime_t,s0)
++
++/run/docker(/.*)?		gen_context(system_u:object_r:container_runtime_t,s0)
++/run/docker\.pid	--	gen_context(system_u:object_r:container_runtime_t,s0)
++/run/docker\.sock	-s	gen_context(system_u:object_r:container_runtime_t,s0)
++/run/containerd(/.*)?		gen_context(system_u:object_r:container_runtime_t,s0)
++/run/containerd/[^/]+/sandboxes/[^/]+/shm(/.*)?		gen_context(system_u:object_r:container_engine_tmpfs_t,s0)
++
++/run/user/%{USERID}/netns(/.*)?		gen_context(system_u:object_r:container_runtime_t,s0)
++
++/var/cache/containers(/.*)?		gen_context(system_u:object_r:container_engine_cache_t,s0)
++
++/var/lib/cni(/.*)?		gen_context(system_u:object_r:container_var_lib_t,s0)
++/var/lib/containers(/.*)?		gen_context(system_u:object_r:container_var_lib_t,s0)
++/var/lib/containers/atomic(/.*)?		<<none>>
++/var/lib/containers/volumes/[^/]+/.*		gen_context(system_u:object_r:container_file_t,s0)
++/var/lib/containers/overlay(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/overlay2(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/overlay-layers(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/overlay-images(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/overlay2-layers(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/overlay2-images(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/storage/overlay(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/storage/overlay2(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/storage/overlay-layers(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/storage/overlay-images(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/storage/overlay2-layers(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/storage/overlay2-images(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containers/storage/volumes/[^/]+/.*		gen_context(system_u:object_r:container_file_t,s0)
++
++/var/lib/docker(/.*)?		gen_context(system_u:object_r:container_var_lib_t,s0)
++/var/lib/docker/.*/config\.env	--	gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/docker/containers/.*/.*\.log	--	gen_context(system_u:object_r:container_log_t,s0)
++/var/lib/docker/containers/.*/hostname	--	gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/docker/containers/.*/hosts	--	gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/docker/init(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/docker/overlay(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/docker/overlay2(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/docker/volumes/[^/]+/.*		gen_context(system_u:object_r:container_file_t,s0)
++
++/var/lib/containerd(/.*)?		gen_context(system_u:object_r:container_var_lib_t,s0)
++/var/lib/containerd/[^/]+/sandboxes(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++/var/lib/containerd/[^/]+/snapshots(/.*)?		gen_context(system_u:object_r:container_ro_file_t,s0)
++
++/var/log/containers(/.*)?		gen_context(system_u:object_r:container_log_t,s0)
++/var/log/pods(/.*)?		gen_context(system_u:object_r:container_log_t,s0)
+diff --git a/policy/modules/services/container.if b/policy/modules/services/container.if
+new file mode 100644
+index 000000000..e9217f639
+--- /dev/null
++++ b/policy/modules/services/container.if
+@@ -0,0 +1,1396 @@
++## <summary>Policy for containers</summary>
++
++#######################################
++## <summary>
++##	The template to define a container domain.
++## </summary>
++## <param name="domain_prefix">
++##	<summary>
++##	Domain prefix to be used.
++##	</summary>
++## </param>
++#
++template(`container_domain_template',`
++	gen_require(`
++		attribute_role container_roles;
++		attribute container_domain;
++	')
++
++	type $1_t, container_domain;
++	domain_type($1_t)
++	domain_user_exemption_target($1_t)
++	mls_rangetrans_target($1_t)
++	mcs_constrained($1_t)
++	role container_roles types $1_t;
++')
++
++########################################
++## <summary>
++##	The template to define a container
++##	engine domain.
++## </summary>
++## <param name="domain_prefix">
++##	<summary>
++##	Domain prefix to be used.
++##	</summary>
++## </param>
++#
++template(`container_engine_domain_template',`
++	gen_require(`
++		attribute_role container_roles;
++		attribute container_engine_domain;
++	')
++
++	type $1_t, container_engine_domain;
++	role container_roles types $1_t;
++	domain_type($1_t)
++	domain_subj_id_change_exemption($1_t)
++	domain_obj_id_change_exemption($1_t)
++	domain_role_change_exemption($1_t)
++
++	mls_file_read_to_clearance($1_t)
++	mls_file_write_to_clearance($1_t)
++
++	auth_use_nsswitch($1_t)
++	storage_raw_rw_fixed_disk($1_t)
++
++	optional_policy(`
++		dbus_list_system_bus_runtime($1_t)
++		dbus_system_bus_client($1_t)
++	')
++')
++
++#######################################
++## <summary>
++##	Allow the specified container engine
++##	domain all the rules required to
++##	function as a system container engine.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_system_engine',`
++	gen_require(`
++		attribute container_engine_system_domain;
++	')
++
++	typeattribute $1 container_engine_system_domain;
++')
++
++#######################################
++## <summary>
++##	Allow the specified container engine
++##	domain all the rules required to
++##	function as a user container engine.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_user_engine',`
++	gen_require(`
++		attribute container_engine_user_domain;
++	')
++
++	typeattribute $1 container_engine_user_domain;
++')
++
++########################################
++## <summary>
++##	Base role access for containers. This
++##	grants all the rules necessary for
++##	common container usage.
++## </summary>
++## <param name="role_prefix">
++##	<summary>
++##	The prefix of the user role (e.g., user
++##	is the prefix for user_r).
++##	</summary>
++## </param>
++## <param name="user_domain">
++##	<summary>
++##	User domain for the role.
++##	</summary>
++## </param>
++## <param name="user_exec_domain">
++##	<summary>
++##	User exec domain for execute and transition access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++#
++template(`container_base_role',`
++	gen_require(`
++		type container_file_t, container_ro_file_t;
++		type container_config_t;
++	')
++
++	container_run_generic_engine($3, $4)
++
++	container_engine_dbus_chat($2)
++
++	allow $3 self:cap_userns { kill sys_ptrace };
++
++	files_search_etc($2)
++	read_files_pattern($2, container_config_t, container_config_t)
++
++	allow $2 container_file_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $2 container_file_t:file { manage_file_perms relabel_file_perms };
++	allow $2 container_file_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++	allow $2 container_file_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++	allow $2 container_file_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++	allow $2 container_file_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++
++	allow $2 container_ro_file_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $2 container_ro_file_t:file { manage_file_perms relabel_file_perms };
++	allow $2 container_ro_file_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++	allow $2 container_ro_file_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++	allow $2 container_ro_file_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++	allow $2 container_ro_file_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++')
++
++########################################
++## <summary>
++##	Role access for system containers.
++## </summary>
++## <param name="role_prefix">
++##	<summary>
++##	The prefix of the user role (e.g., user
++##	is the prefix for user_r).
++##	</summary>
++## </param>
++## <param name="user_domain">
++##	<summary>
++##	User domain for the role.
++##	</summary>
++## </param>
++## <param name="user_exec_domain">
++##	<summary>
++##	User exec domain for execute and transition access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++#
++template(`container_system_role',`
++	gen_require(`
++		attribute container_system_domain;
++		attribute container_engine_system_domain;
++	')
++
++	role $4 types container_engine_system_domain;
++
++	container_base_role($1, $2, $3, $4)
++
++	allow container_system_domain $3:unix_stream_socket rw_stream_socket_perms;
++
++	allow $3 container_engine_system_domain:process { ptrace signal_perms };
++	ps_process_pattern($3, container_engine_system_domain)
++')
++
++########################################
++## <summary>
++##	Role access for user containers.
++## </summary>
++## <param name="role_prefix">
++##	<summary>
++##	The prefix of the user role (e.g., user
++##	is the prefix for user_r).
++##	</summary>
++## </param>
++## <param name="user_domain">
++##	<summary>
++##	User domain for the role.
++##	</summary>
++## </param>
++## <param name="user_exec_domain">
++##	<summary>
++##	User exec domain for execute and transition access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++#
++template(`container_user_role',`
++	gen_require(`
++		attribute container_user_domain;
++		attribute container_engine_user_domain;
++		type container_file_t, container_ro_file_t;
++		type container_user_runtime_t;
++		type container_cache_home_t, container_conf_home_t;
++		type container_data_home_t;
++	')
++
++	role $4 types container_user_domain;
++
++	container_base_role($1, $2, $3, $4)
++
++	allow container_user_domain $3:unix_stream_socket rw_stream_socket_perms;
++
++	allow $3 container_user_domain:process { ptrace signal_perms };
++	ps_process_pattern($3, container_user_domain)
++
++	allow $2 container_user_runtime_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $2 container_user_runtime_t:file { manage_file_perms relabel_file_perms };
++	allow $2 container_user_runtime_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++	allow $2 container_user_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++
++	allow $2 container_cache_home_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $2 container_cache_home_t:file { manage_file_perms relabel_file_perms };
++	xdg_cache_filetrans($2, container_cache_home_t, dir, "containers")
++
++	allow $2 container_conf_home_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $2 container_conf_home_t:file { manage_file_perms relabel_file_perms };
++	xdg_config_filetrans($2, container_conf_home_t, dir, "containers")
++
++	allow $2 container_data_home_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $2 container_data_home_t:file { manage_file_perms relabel_file_perms };
++	allow $2 container_data_home_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++	allow $2 container_data_home_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++	allow $2 container_data_home_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++	allow $2 container_data_home_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++	allow $2 container_data_home_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++	xdg_data_filetrans($2, container_data_home_t, dir, "containers")
++	filetrans_pattern($2, container_data_home_t, container_ro_file_t, dir, "overlay")
++	filetrans_pattern($2, container_data_home_t, container_ro_file_t, dir, "overlay-images")
++	filetrans_pattern($2, container_data_home_t, container_ro_file_t, dir, "overlay-layers")
++	filetrans_pattern($2, container_data_home_t, container_ro_file_t, dir, "overlay2")
++	filetrans_pattern($2, container_data_home_t, container_ro_file_t, dir, "overlay2-images")
++	filetrans_pattern($2, container_data_home_t, container_ro_file_t, dir, "overlay2-layers")
++	filetrans_pattern($2, container_data_home_t, container_file_t, dir, "volumes")
++
++	optional_policy(`
++		systemd_read_user_manager_state($1, container_engine_user_domain)
++		systemd_user_manager_system_start($1, container_engine_user_domain)
++		systemd_user_manager_system_stop($1, container_engine_user_domain)
++		systemd_user_manager_system_status($1, container_engine_user_domain)
++		systemd_user_manager_dbus_chat($1, container_engine_user_domain)
++
++		systemd_user_app_status($1, container_user_domain)
++	')
++
++	optional_policy(`
++		docker_user_role($1, $2, $3, $4)
++	')
++
++	optional_policy(`
++		podman_user_role($1, $2, $3, $4)
++	')
++')
++
++########################################
++## <summary>
++##	Execute generic container engines in the
++##	container engine domain.
++## </summary>
++## <param name="domain">
++## <summary>
++##	Domain allowed to transition.
++## </summary>
++## </param>
++#
++interface(`container_domtrans_generic_engine',`
++	gen_require(`
++		type container_engine_t, container_engine_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, container_engine_exec_t, container_engine_t)
++')
++
++########################################
++## <summary>
++##	Execute generic container engines in the
++##	container engine domain, and allow the
++##	specified role the container domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the container domain.
++##	</summary>
++## </param>
++#
++interface(`container_run_generic_engine',`
++	gen_require(`
++		attribute_role container_roles;
++	')
++
++	container_domtrans_generic_engine($1)
++	roleattribute $2 container_roles;
++')
++
++########################################
++## <summary>
++##	Make the specified type usable for files
++##	that are executables for container engines.
++## </summary>
++## <param name="type">
++##	<summary>
++##	Type to be used for files.
++##	</summary>
++## </param>
++#
++interface(`container_engine_executable_file',`
++	gen_require(`
++		attribute container_engine_exec_type;
++	')
++
++	typeattribute $1 container_engine_exec_type;
++
++	application_executable_file($1)
++')
++
++########################################
++## <summary>
++##	Execute a generic container engine
++##	executable with an automatic transition
++##	to a private type.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="target_domain">
++##	<summary>
++##	The type of the new process.
++##	</summary>
++## </param>
++#
++interface(`container_generic_engine_domtrans',`
++	gen_require(`
++		type container_engine_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, container_engine_exec_t, $2)
++')
++
++########################################
++## <summary>
++##	Allow the generic container engine
++##	executables to be an entrypoint
++##	for the specified domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_engine_executable_entrypoint',`
++	gen_require(`
++		type container_engine_exec_t;
++	')
++
++	allow $1 container_engine_exec_t:file entrypoint;
++')
++
++########################################
++## <summary>
++##	Send and receive messages from
++##	container engines over dbus.
++## </summary>
++## <param name="domain">
++## <summary>
++##	Domain allowed access.
++## </summary>
++## </param>
++#
++interface(`container_engine_dbus_chat',`
++	gen_require(`
++		attribute container_engine_domain;
++		class dbus send_msg;
++	')
++
++	allow $1 container_engine_domain:dbus send_msg;
++	allow container_engine_domain $1:dbus send_msg;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to be started
++##	by systemd socket activation using a
++##	named socket labeled the container
++##	runtime type.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_runtime_named_socket_activation',`
++	gen_require(`
++		type container_runtime_t;
++	')
++
++	init_named_socket_activation($1, container_runtime_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	container engine temporary files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_engine_tmp_files',`
++	gen_require(`
++		type container_engine_tmp_t;
++	')
++
++	files_search_tmp($1)
++	allow $1 container_engine_tmp_t:file manage_file_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	container engine temporary named sockets.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_engine_tmp_sock_files',`
++	gen_require(`
++		type container_engine_tmp_t;
++	')
++
++	files_search_tmp($1)
++	allow $1 container_engine_tmp_t:sock_file manage_sock_file_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to create
++##	objects in generic temporary directories
++##	with an automatic type transition to
++##	the container engine temporary file type.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="object">
++##	<summary>
++##	The object class of the object being created.
++##	</summary>
++## </param>
++## <param name="name" optional="true">
++##	<summary>
++##	The name of the object being created.
++##	</summary>
++## </param>
++#
++interface(`container_engine_tmp_filetrans',`
++	gen_require(`
++		type container_engine_tmp_t;
++	')
++
++	files_tmp_filetrans($1, container_engine_tmp_t, $2, $3)
++')
++
++########################################
++## <summary>
++##	Read the process state (/proc/pid)
++##	of all system containers.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_read_system_container_state',`
++	gen_require(`
++		attribute container_system_domain;
++	')
++
++	ps_process_pattern($1, container_system_domain)
++')
++
++########################################
++## <summary>
++##	Read the process state (/proc/pid)
++##	of all user containers.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_read_user_container_state',`
++	gen_require(`
++		attribute container_user_domain;
++	')
++
++	ps_process_pattern($1, container_user_domain)
++')
++
++########################################
++## <summary>
++##	All of the permissions necessary
++##	for a container engine to manage
++##	container processes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_all_containers',`
++	gen_require(`
++		attribute container_domain;
++	')
++
++	allow $1 container_domain:process { getattr getsched setsched transition signal signull sigkill };
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	perform a type transition to
++##	container domains.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`container_domtrans',`
++	gen_require(`
++		attribute container_domain;
++	')
++
++	allow $1 container_domain:process transition;
++')
++
++########################################
++## <summary>
++##	Connect to a system container domain
++##	over a unix stream socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_stream_connect_system_containers',`
++	gen_require(`
++		attribute container_system_domain;
++		type container_runtime_t;
++	')
++
++	files_search_runtime($1)
++	stream_connect_pattern($1, container_runtime_t, container_runtime_t, container_system_domain)
++	allow $1 container_runtime_t:sock_file read_sock_file_perms;
++')
++
++########################################
++## <summary>
++##	Connect to a user container domain
++##	over a unix stream socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_stream_connect_user_containers',`
++	gen_require(`
++		attribute container_user_domain;
++		type container_runtime_t;
++	')
++
++	files_search_runtime($1)
++	stream_connect_pattern($1, container_runtime_t, container_runtime_t, container_user_domain)
++	allow $1 container_runtime_t:sock_file read_sock_file_perms;
++')
++
++########################################
++## <summary>
++##	Connect to a container domain
++##	over a unix stream socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_stream_connect_all_containers',`
++	gen_require(`
++		attribute container_domain;
++		type container_runtime_t;
++	')
++
++	files_search_runtime($1)
++	stream_connect_pattern($1, container_runtime_t, container_runtime_t, container_domain)
++	allow $1 container_runtime_t:sock_file read_sock_file_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	send all signals to a container
++##	domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`container_signal_all_containers',`
++	gen_require(`
++		attribute container_domain;
++	')
++
++	allow $1 container_domain:process signal_perms;
++')
++
++########################################
++## <summary>
++##	Set the attributes of container ptys.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_setattr_container_ptys',`
++	gen_require(`
++		type container_devpts_t;
++	')
++
++	allow $1 container_devpts_t:chr_file setattr;
++')
++
++########################################
++## <summary>
++##	Read and write container ptys.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_use_container_ptys',`
++	gen_require(`
++		type container_devpts_t;
++	')
++
++	allow $1 container_devpts_t:chr_file rw_term_perms;
++')
++
++########################################
++## <summary>
++##	Make the specified type usable as a mountpoint
++##	for containers.
++## </summary>
++## <param name="file_type">
++##	<summary>
++##	Type to be used as a mountpoint.
++##	</summary>
++## </param>
++#
++interface(`container_mountpoint',`
++	gen_require(`
++		attribute container_mountpoint_type;
++	')
++
++	typeattribute $1 container_mountpoint_type;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container config files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_config_files',`
++	gen_require(`
++		type container_config_t;
++	')
++
++	manage_files_pattern($1, container_config_t, container_config_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	create container files in the
++##	root directory with a type
++##	transition.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_file_root_filetrans',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	files_root_filetrans($1, container_file_t, dir_file_class_set)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container file directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_dirs',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	manage_dirs_pattern($1, container_file_t, container_file_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_files',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	manage_files_pattern($1, container_file_t, container_file_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container lnk files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_lnk_files',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	manage_lnk_files_pattern($1, container_file_t, container_file_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container fifo files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_fifo_files',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	manage_fifo_files_pattern($1, container_file_t, container_file_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container sock files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_sock_files',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	manage_sock_files_pattern($1, container_file_t, container_file_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to read
++##	and write container chr files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_rw_chr_files',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	allow $1 container_file_t:chr_file rw_chr_file_perms;
++')
++
++########################################
++## <summary>
++##	Do not audit attempts to read
++##	and write container chr files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_dontaudit_rw_chr_files',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	dontaudit $1 container_file_t:chr_file rw_chr_file_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container chr files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_chr_files',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	manage_chr_files_pattern($1, container_file_t, container_file_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container config home content.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_home_config',`
++	gen_require(`
++		type container_conf_home_t;
++	')
++
++	allow $1 container_conf_home_t:dir manage_dir_perms;
++	allow $1 container_conf_home_t:file manage_file_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to create
++##	objects in an xdg_config directory
++##	with an automatic type transition to
++##	the container config home type.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="object">
++##	<summary>
++##	The object class of the object being created.
++##	</summary>
++## </param>
++## <param name="name" optional="true">
++##	<summary>
++##	The name of the object being created.
++##	</summary>
++## </param>
++#
++interface(`container_config_home_filetrans',`
++	gen_require(`
++		type container_conf_home_t;
++	')
++
++	xdg_search_config_dirs($1)
++	xdg_config_filetrans($1, container_conf_home_t, $2, $3)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container data home files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_home_data_files',`
++	gen_require(`
++		type container_data_home_t;
++	')
++
++	manage_files_pattern($1, container_data_home_t, container_data_home_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container data home named
++##	pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_home_data_fifo_files',`
++	gen_require(`
++		type container_data_home_t;
++	')
++
++	manage_fifo_files_pattern($1, container_data_home_t, container_data_home_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	manage container data home named
++##	sockets.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_home_data_sock_files',`
++	gen_require(`
++		type container_data_home_t;
++	')
++
++	manage_sock_files_pattern($1, container_data_home_t, container_data_home_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	relabel container files and
++##	directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_relabel_all_content',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	allow $1 container_file_t:dir_file_class_set { relabelfrom relabelto };
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	relabel container filesystems.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_relabel_fs',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	allow $1 container_file_t:filesystem { relabelfrom relabelto };
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to
++##	get the attributes of container
++##	filesystems.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_getattr_fs',`
++	gen_require(`
++		type container_file_t;
++	')
++
++	allow $1 container_file_t:filesystem getattr;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to search
++##	runtime container directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_search_runtime',`
++	gen_require(`
++		type container_runtime_t;
++	')
++
++	files_search_runtime($1)
++	allow $1 container_runtime_t:dir search_dir_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	runtime container files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_runtime_files',`
++	gen_require(`
++		type container_runtime_t;
++	')
++
++	manage_files_pattern($1, container_runtime_t, container_runtime_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	runtime container named pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_runtime_fifo_files',`
++	gen_require(`
++		type container_runtime_t;
++	')
++
++	manage_fifo_files_pattern($1, container_runtime_t, container_runtime_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	runtime container named sockets.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_runtime_sock_files',`
++	gen_require(`
++		type container_runtime_t;
++	')
++
++	manage_sock_files_pattern($1, container_runtime_t, container_runtime_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	user runtime container files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_user_runtime_files',`
++	gen_require(`
++		type container_user_runtime_t;
++	')
++
++	manage_files_pattern($1, container_user_runtime_t, container_user_runtime_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to read and
++##	write user runtime container named sockets.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_rw_user_runtime_sock_files',`
++	gen_require(`
++		type container_user_runtime_t;
++	')
++
++	allow $1 container_user_runtime_t:sock_file rw_sock_file_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to search
++##	container directories in /var/lib.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_search_var_lib',`
++	gen_require(`
++		type container_var_lib_t;
++	')
++
++	files_search_var_lib($1)
++	allow $1 container_var_lib_t:dir search_dir_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	container files in /var/lib.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_var_lib_files',`
++	gen_require(`
++		type container_var_lib_t;
++	')
++
++	manage_files_pattern($1, container_var_lib_t, container_var_lib_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	container named pipes in /var/lib.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_var_lib_fifo_files',`
++	gen_require(`
++		type container_var_lib_t;
++	')
++
++	manage_fifo_files_pattern($1, container_var_lib_t, container_var_lib_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to manage
++##	container named sockets in /var/lib.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`container_manage_var_lib_sock_files',`
++	gen_require(`
++		type container_var_lib_t;
++	')
++
++	manage_sock_files_pattern($1, container_var_lib_t, container_var_lib_t)
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to create
++##	objects in unlabeled directories with
++##	an automatic type transition to the
++##	container var lib type.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="object">
++##	<summary>
++##	The object class of the object being created.
++##	</summary>
++## </param>
++## <param name="name" optional="true">
++##	<summary>
++##	The name of the object being created.
++##	</summary>
++## </param>
++#
++interface(`container_unlabeled_var_lib_filetrans',`
++	gen_require(`
++		type container_var_lib_t;
++	')
++
++	# This access is to workaround an issue in Docker
++	# See: https://github.com/moby/moby/issues/43088
++	kernel_unlabeled_filetrans($1, container_var_lib_t, $2, $3)
++')
++
++########################################
++## <summary>
++##	All of the rules required to
++##	administrate a container
++##	environment.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`container_admin',`
++	gen_require(`
++		attribute container_domain, container_engine_domain;
++		type container_file_t, container_ro_file_t;
++		type container_var_lib_t, container_runtime_t;
++		type container_config_t, container_engine_cache_t;
++		type container_engine_tmp_t, container_engine_tmpfs_t;
++	')
++
++	container_run_generic_engine($1, $2)
++
++	allow $1 container_domain:process { ptrace signal_perms };
++	ps_process_pattern($1, container_domain)
++
++	allow $1 container_engine_domain:process { ptrace signal_perms };
++	ps_process_pattern($1, container_engine_domain)
++
++	allow $1 self:cap_userns { kill sys_ptrace };
++
++	files_search_var_lib($1)
++	admin_pattern($1, container_var_lib_t)
++	admin_pattern($1, container_file_t)
++	admin_pattern($1, container_ro_file_t)
++
++	allow $1 container_var_lib_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++	allow $1 container_file_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++	allow $1 container_ro_file_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++
++	files_search_var($1)
++	admin_pattern($1, container_engine_cache_t)
++
++	files_search_runtime($1)
++	admin_pattern($1, container_runtime_t)
++
++	files_search_etc($1)
++	admin_pattern($1, container_config_t)
++
++	files_search_tmp($1)
++	admin_pattern($1, container_engine_tmp_t)
++
++	fs_search_tmpfs($1)
++	admin_pattern($1, container_engine_tmpfs_t)
++
++	optional_policy(`
++		docker_admin($1, $2)
++	')
++
++	optional_policy(`
++		podman_admin($1, $2)
++	')
++')
+diff --git a/policy/modules/services/container.te b/policy/modules/services/container.te
+new file mode 100644
+index 000000000..d5f79b158
+--- /dev/null
++++ b/policy/modules/services/container.te
+@@ -0,0 +1,727 @@
++policy_module(container)
++
++## <desc>
++##	<p>
++##	Allow containers to manage cgroups.
++##	This is required for systemd to run inside
++##	containers.
++##	</p>
++## </desc>
++gen_tunable(container_manage_cgroup, false)
++
++## <desc>
++##	<p>
++##	Allow container engines to mount on all non-security files.
++##	</p>
++## </desc>
++gen_tunable(container_mounton_non_security, false)
++
++## <desc>
++##	<p>
++##	Allow containers to use NFS filesystems.
++##	</p>
++## </desc>
++gen_tunable(container_use_nfs, false)
++
++## <desc>
++##	<p>
++##	Allow containers to use CIFS filesystems.
++##	</p>
++## </desc>
++gen_tunable(container_use_samba, false)
++
++########################################
++#
++# Declarations
++#
++
++# common attribute for all containers
++attribute container_domain;
++
++# common attribute for all container engines
++attribute container_engine_domain;
++
++# system container engines can only interact with
++# system containers, and user container engines
++# can only interact with user containers.
++attribute container_system_domain;
++attribute container_user_domain;
++attribute container_engine_system_domain;
++attribute container_engine_user_domain;
++
++# containers which require network access
++attribute container_net_domain;
++
++# containers considered privileged
++attribute privileged_container_domain;
++
++attribute container_engine_exec_type;
++
++attribute container_mountpoint_type;
++
++attribute_role container_roles;
++roleattribute system_r container_roles;
++
++container_domain_template(container)
++typealias container_t alias svirt_lxc_net_t;
++typeattribute container_t container_system_domain, container_user_domain, container_net_domain;
++
++container_engine_domain_template(container_engine)
++typeattribute container_engine_t container_engine_system_domain;
++type container_engine_exec_t, container_engine_exec_type;
++application_domain(container_engine_t, container_engine_exec_t)
++init_daemon_domain(container_engine_t, container_engine_exec_t)
++ifdef(`enable_mls',`
++	init_ranged_daemon_domain(container_engine_t, container_engine_exec_t, s0 - mls_systemhigh)
++')
++mls_trusted_object(container_engine_t)
++
++type spc_t, container_domain, container_net_domain, container_system_domain, privileged_container_domain;
++domain_type(spc_t)
++role system_r types spc_t;
++
++type spc_user_t, container_domain, container_net_domain, container_user_domain, privileged_container_domain;
++domain_type(spc_user_t)
++
++type container_unit_t;
++init_unit_file(container_unit_t)
++
++type container_config_t;
++files_config_file(container_config_t)
++
++type container_var_lib_t;
++files_type(container_var_lib_t)
++container_mountpoint(container_var_lib_t)
++
++type container_engine_tmp_t;
++files_tmp_file(container_engine_tmp_t)
++container_mountpoint(container_engine_tmp_t)
++
++type container_engine_tmpfs_t;
++files_tmpfs_file(container_engine_tmpfs_t)
++container_mountpoint(container_engine_tmpfs_t)
++
++type container_runtime_t;
++files_runtime_file(container_runtime_t)
++container_mountpoint(container_runtime_t)
++
++type container_log_t;
++logging_log_file(container_log_t)
++
++type container_devpts_t;
++term_pty(container_devpts_t)
++
++type container_file_t alias svirt_lxc_file_t;
++dev_node(container_file_t)
++files_mountpoint(container_file_t)
++files_associate_rootfs(container_file_t)
++term_pty(container_file_t)
++container_mountpoint(container_file_t)
++
++type container_ro_file_t;
++files_mountpoint(container_ro_file_t)
++container_mountpoint(container_ro_file_t)
++
++type container_engine_cache_t;
++files_type(container_engine_cache_t)
++
++type container_cache_home_t;
++xdg_cache_content(container_cache_home_t)
++
++type container_conf_home_t;
++xdg_config_content(container_conf_home_t)
++
++type container_data_home_t;
++xdg_data_content(container_data_home_t)
++container_mountpoint(container_data_home_t)
++
++type container_user_runtime_t;
++files_runtime_file(container_user_runtime_t)
++userdom_user_runtime_content(container_user_runtime_t)
++container_mountpoint(container_user_runtime_t)
++
++type container_port_t;
++corenet_port(container_port_t)
++
++########################################
++#
++# Common container domain local policy
++#
++
++allow container_domain self:capability { dac_override kill setgid setuid sys_boot sys_chroot };
++allow container_domain self:cap_userns { chown dac_override fowner setgid setuid };
++allow container_domain self:process { execstack execmem getattr getsched getsession setsched setcap setpgid signal_perms };
++allow container_domain self:fifo_file manage_fifo_file_perms;
++allow container_domain self:sem create_sem_perms;
++allow container_domain self:shm create_shm_perms;
++allow container_domain self:msgq create_msgq_perms;
++allow container_domain self:unix_stream_socket { create_stream_socket_perms connectto };
++allow container_domain self:unix_dgram_socket { sendto create_socket_perms };
++
++manage_dirs_pattern(container_domain, container_file_t, container_file_t)
++manage_files_pattern(container_domain, container_file_t, container_file_t)
++manage_lnk_files_pattern(container_domain, container_file_t, container_file_t)
++manage_sock_files_pattern(container_domain, container_file_t, container_file_t)
++manage_fifo_files_pattern(container_domain, container_file_t, container_file_t)
++rw_chr_files_pattern(container_domain, container_file_t, container_file_t)
++rw_blk_files_pattern(container_domain, container_file_t, container_file_t)
++allow container_domain container_file_t:dir_file_class_set watch;
++
++allow container_domain container_ro_file_t:blk_file read_blk_file_perms;
++allow container_domain container_ro_file_t:dir list_dir_perms;
++allow container_domain container_ro_file_t:chr_file read_chr_file_perms;
++allow container_domain container_ro_file_t:file { exec_file_perms read_file_perms };
++allow container_domain container_ro_file_t:lnk_file read_lnk_file_perms;
++allow container_domain container_ro_file_t:sock_file read_sock_file_perms;
++
++can_exec(container_domain, container_file_t)
++
++kernel_getattr_proc(container_domain)
++kernel_list_all_proc(container_domain)
++kernel_read_kernel_sysctls(container_domain)
++kernel_rw_net_sysctls(container_domain)
++kernel_read_system_state(container_domain)
++kernel_dontaudit_search_kernel_sysctl(container_domain)
++
++corecmd_exec_all_executables(container_domain)
++
++files_dontaudit_getattr_all_dirs(container_domain)
++files_dontaudit_getattr_all_files(container_domain)
++files_dontaudit_getattr_all_symlinks(container_domain)
++files_dontaudit_getattr_all_pipes(container_domain)
++files_dontaudit_getattr_all_sockets(container_domain)
++files_dontaudit_list_all_mountpoints(container_domain)
++files_dontaudit_write_etc_runtime_files(container_domain)
++files_list_var(container_domain)
++files_list_var_lib(container_domain)
++files_search_all(container_domain)
++files_read_config_files(container_domain)
++files_read_usr_files(container_domain)
++files_read_usr_symlinks(container_domain)
++
++fs_getattr_all_fs(container_domain)
++fs_list_inotifyfs(container_domain)
++# for rootless containers
++fs_manage_fusefs_dirs(container_domain)
++fs_manage_fusefs_files(container_domain)
++fs_manage_fusefs_symlinks(container_domain)
++fs_exec_fusefs_files(container_domain)
++fs_fusefs_entry_type(container_domain)
++
++auth_dontaudit_read_login_records(container_domain)
++auth_dontaudit_write_login_records(container_domain)
++auth_search_pam_console_data(container_domain)
++
++clock_read_adjtime(container_domain)
++
++init_read_utmp(container_domain)
++init_dontaudit_write_utmp(container_domain)
++
++libs_dontaudit_setattr_lib_files(container_domain)
++
++miscfiles_read_localization(container_domain)
++miscfiles_dontaudit_setattr_fonts_cache_dirs(container_domain)
++miscfiles_read_fonts(container_domain)
++
++mta_dontaudit_read_spool_symlinks(container_domain)
++
++container_use_container_ptys(container_domain)
++
++tunable_policy(`container_manage_cgroup',`
++	fs_manage_cgroup_dirs(container_domain)
++	fs_manage_cgroup_files(container_domain)
++')
++
++tunable_policy(`container_use_nfs',`
++	fs_manage_nfs_dirs(container_domain)
++	fs_manage_nfs_files(container_domain)
++	fs_manage_nfs_named_sockets(container_domain)
++	fs_read_nfs_symlinks(container_domain)
++	fs_exec_nfs_files(container_domain)
++')
++
++tunable_policy(`container_use_samba',`
++	fs_manage_cifs_dirs(container_domain)
++	fs_manage_cifs_files(container_domain)
++	fs_manage_cifs_named_sockets(container_domain)
++	fs_read_cifs_symlinks(container_domain)
++	fs_exec_cifs_files(container_domain)
++')
++
++optional_policy(`
++	udev_read_runtime_files(container_domain)
++')
++
++optional_policy(`
++	apache_exec_modules(container_domain)
++	apache_read_sys_content(container_domain)
++')
++
++optional_policy(`
++	virt_lxc_use_fds(container_domain)
++	virt_lxc_rw_pipes(container_domain)
++	virt_lxc_sigchld(container_domain)
++	virt_lxc_stream_connect(container_domain)
++	virt_lxc_list_runtime(container_domain)
++	virt_lxc_read_runtime(container_domain)
++	virt_virsh_use_fds(container_domain)
++	virt_virsh_rw_pipes(container_domain)
++	virt_virsh_sigchld(container_domain)
++')
++
++########################################
++#
++# Common container net domain local policy
++#
++
++allow container_net_domain self:capability { net_admin net_raw };
++allow container_net_domain self:cap_userns { net_admin net_raw };
++allow container_net_domain self:tcp_socket create_stream_socket_perms;
++allow container_net_domain self:udp_socket create_socket_perms;
++allow container_net_domain self:tun_socket create_socket_perms;
++allow container_net_domain self:packet_socket create_socket_perms;
++allow container_net_domain self:socket create_socket_perms;
++allow container_net_domain self:icmp_socket create_socket_perms;
++allow container_net_domain self:rawip_socket create_socket_perms;
++allow container_net_domain self:netlink_route_socket create_netlink_socket_perms;
++allow container_net_domain self:netlink_socket create_socket_perms;
++allow container_net_domain self:netlink_tcpdiag_socket create_socket_perms;
++allow container_net_domain self:netlink_kobject_uevent_socket create_socket_perms;
++
++corenet_all_recvfrom_netlabel(container_net_domain)
++corenet_tcp_sendrecv_generic_if(container_net_domain)
++corenet_udp_sendrecv_generic_if(container_net_domain)
++corenet_tcp_sendrecv_generic_node(container_net_domain)
++corenet_udp_sendrecv_generic_node(container_net_domain)
++corenet_tcp_bind_generic_node(container_net_domain)
++corenet_udp_bind_generic_node(container_net_domain)
++
++corenet_sendrecv_all_server_packets(container_net_domain)
++corenet_tcp_bind_all_ports(container_net_domain)
++corenet_udp_bind_all_ports(container_net_domain)
++
++corenet_sendrecv_all_client_packets(container_net_domain)
++corenet_tcp_connect_all_ports(container_net_domain)
++
++########################################
++#
++# Container local policy
++#
++
++allow container_t self:capability { chown dac_override dac_read_search fowner fsetid setpcap sys_admin sys_nice sys_ptrace sys_resource };
++dontaudit container_t self:capability2 block_suspend;
++allow container_t self:process setrlimit;
++
++allow container_t container_file_t:file entrypoint;
++allow container_t container_file_t:filesystem getattr;
++
++kernel_read_network_state(container_t)
++kernel_read_irq_sysctls(container_t)
++
++dev_getattr_mtrr_dev(container_t)
++dev_read_rand(container_t)
++dev_read_sysfs(container_t)
++dev_read_urand(container_t)
++
++files_read_kernel_modules(container_t)
++
++fs_mount_cgroup(container_t)
++fs_rw_cgroup_files(container_t)
++
++auth_use_nsswitch(container_t)
++
++logging_send_audit_msgs(container_t)
++
++userdom_use_user_ptys(container_t)
++
++optional_policy(`
++	rpm_read_db(container_t)
++')
++
++########################################
++#
++# Common container engine local policy
++#
++
++allow container_engine_domain self:process { getcap setcap getsched setsched getrlimit setrlimit rlimitinh noatsecure setexec setkeycreate setpgid siginh transition fork signal_perms };
++allow container_engine_domain self:capability { chown dac_override dac_read_search fowner fsetid kill mknod net_admin net_raw setfcap setpcap setgid setuid sys_admin sys_chroot sys_ptrace sys_resource };
++allow container_engine_domain self:capability2 { bpf perfmon };
++allow container_engine_domain self:bpf { map_create map_read map_write prog_load prog_run };
++allow container_engine_domain self:cap_userns { audit_write chown dac_override dac_read_search fowner fsetid ipc_lock ipc_owner kill lease linux_immutable mknod net_admin net_bind_service net_raw setfcap setgid setpcap setuid sys_admin sys_boot sys_chroot sys_nice sys_pacct sys_ptrace sys_rawio sys_resource sys_time sys_tty_config };
++allow container_engine_domain self:cap2_userns { audit_read bpf block_suspend perfmon syslog wake_alarm };
++allow container_engine_domain self:bpf { map_create map_read map_write prog_load prog_run };
++allow container_engine_domain self:fd use;
++allow container_engine_domain self:fifo_file manage_fifo_file_perms;
++allow container_engine_domain self:tcp_socket create_stream_socket_perms;
++allow container_engine_domain self:udp_socket create_socket_perms;
++allow container_engine_domain self:unix_stream_socket { create_stream_socket_perms connectto };
++allow container_engine_domain self:unix_dgram_socket { create_socket_perms sendto };
++allow container_engine_domain self:icmp_socket create_socket_perms;
++allow container_engine_domain self:netlink_route_socket create_netlink_socket_perms;
++allow container_engine_domain self:packet_socket create_socket_perms;
++
++allow container_engine_domain container_port_t:tcp_socket name_bind;
++
++dontaudit container_engine_domain container_domain:process { noatsecure rlimitinh siginh };
++allow container_engine_domain container_domain:process2 { nnp_transition nosuid_transition };
++
++allow container_engine_domain container_mountpoint_type:dir_file_class_set mounton;
++
++corecmd_bin_entry_type(container_engine_domain)
++corecmd_exec_bin(container_engine_domain)
++# needed when spawning interactive shells inside containers
++corecmd_exec_shell(container_engine_domain)
++corecmd_search_bin(container_engine_domain)
++# podman unshare causes most of this noise
++corecmd_dontaudit_exec_all_executables(container_engine_domain)
++
++corenet_tcp_bind_generic_node(container_engine_domain)
++corenet_tcp_connect_http_port(container_engine_domain)
++corenet_tcp_bind_all_ports(container_engine_domain)
++corenet_udp_bind_all_ports(container_engine_domain)
++corenet_rw_tun_tap_dev(container_engine_domain)
++
++dev_getattr_all_blk_files(container_engine_domain)
++dev_getattr_all_chr_files(container_engine_domain)
++dev_setattr_null_dev(container_engine_domain)
++dev_getattr_fs(container_engine_domain)
++dev_remount_fs(container_engine_domain)
++dev_list_sysfs(container_engine_domain)
++# required by crun
++dev_read_sysfs(container_engine_domain)
++dev_mount_sysfs(container_engine_domain)
++dev_remount_sysfs(container_engine_domain)
++dev_mounton_sysfs_dirs(container_engine_domain)
++
++domain_use_interactive_fds(container_engine_domain)
++# podman unshare causes most of this noise
++domain_dontaudit_search_all_domains_state(container_engine_domain)
++
++files_read_etc_files(container_engine_domain)
++files_read_usr_files(container_engine_domain)
++files_mounton_root(container_engine_domain)
++files_mounton_tmp(container_engine_domain)
++files_dontaudit_getattr_all_dirs(container_engine_domain)
++files_dontaudit_getattr_all_files(container_engine_domain)
++
++fs_getattr_nsfs(container_engine_domain)
++fs_read_nsfs_files(container_engine_domain)
++fs_unmount_nsfs(container_engine_domain)
++
++fs_getattr_tmpfs(container_engine_domain)
++fs_mount_tmpfs(container_engine_domain)
++fs_remount_tmpfs(container_engine_domain)
++fs_unmount_tmpfs(container_engine_domain)
++fs_relabelfrom_tmpfs(container_engine_domain)
++
++fs_getattr_xattr_fs(container_engine_domain)
++fs_mount_xattr_fs(container_engine_domain)
++fs_remount_xattr_fs(container_engine_domain)
++fs_unmount_xattr_fs(container_engine_domain)
++fs_relabelfrom_xattr_fs(container_engine_domain)
++
++fs_getattr_cgroup(container_engine_domain)
++fs_manage_cgroup_dirs(container_engine_domain)
++fs_manage_cgroup_files(container_engine_domain)
++fs_watch_cgroup_files(container_engine_domain)
++fs_mount_cgroup(container_engine_domain)
++fs_remount_cgroup(container_engine_domain)
++fs_mounton_cgroup(container_engine_domain)
++
++fs_list_hugetlbfs(container_engine_domain)
++
++kernel_getattr_proc(container_engine_domain)
++kernel_mount_proc(container_engine_domain)
++kernel_remount_proc(container_engine_domain)
++kernel_read_kernel_sysctls(container_engine_domain)
++kernel_read_network_state(container_engine_domain)
++kernel_read_system_state(container_engine_domain)
++kernel_rw_net_sysctls(container_engine_domain)
++kernel_dontaudit_search_kernel_sysctl(container_engine_domain)
++
++selinux_get_fs_mount(container_engine_domain)
++selinux_mount_fs(container_engine_domain)
++selinux_remount_fs(container_engine_domain)
++selinux_unmount_fs(container_engine_domain)
++seutil_read_config(container_engine_domain)
++seutil_read_default_contexts(container_engine_domain)
++
++term_create_pty(container_engine_domain, container_devpts_t)
++term_mount_devpts(container_engine_domain)
++term_relabel_pty_fs(container_engine_domain)
++
++init_read_state(container_engine_domain)
++
++miscfiles_read_generic_certs(container_engine_domain)
++miscfiles_read_localization(container_engine_domain)
++miscfiles_dontaudit_setattr_fonts_cache_dirs(container_engine_domain)
++
++modutils_domtrans(container_engine_domain)
++
++sysnet_exec_ifconfig(container_engine_domain)
++sysnet_create_netns_dirs(container_engine_domain)
++# nsfs mountpoints get created in /run/netns, which
++# will be labeled nsfs_t once bind-mounted
++sysnet_netns_filetrans(container_engine_domain, container_runtime_t, file)
++
++userdom_use_user_ptys(container_engine_domain)
++
++can_exec(container_engine_domain, container_engine_exec_type)
++
++list_dirs_pattern(container_engine_domain, container_config_t, container_config_t)
++read_files_pattern(container_engine_domain, container_config_t, container_config_t)
++read_lnk_files_pattern(container_engine_domain, container_config_t, container_config_t)
++
++allow container_engine_domain container_engine_tmp_t:dir manage_dir_perms;
++allow container_engine_domain container_engine_tmp_t:file manage_file_perms;
++allow container_engine_domain container_engine_tmp_t:fifo_file manage_fifo_file_perms;
++# needed when manually spawning processes inside containers
++allow container_engine_domain container_engine_tmp_t:sock_file manage_sock_file_perms;
++files_tmp_filetrans(container_engine_domain, container_engine_tmp_t, { dir file sock_file })
++
++allow container_engine_domain container_engine_tmpfs_t:dir { manage_dir_perms relabel_dir_perms };
++allow container_engine_domain container_engine_tmpfs_t:file { manage_file_perms relabel_file_perms exec_file_perms };
++allow container_engine_domain container_engine_tmpfs_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++allow container_engine_domain container_engine_tmpfs_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++allow container_engine_domain container_engine_tmpfs_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++allow container_engine_domain container_engine_tmpfs_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++fs_tmpfs_filetrans(container_engine_domain, container_engine_tmpfs_t, { dir file })
++
++allow container_engine_domain container_file_t:dir { manage_dir_perms relabel_dir_perms };
++allow container_engine_domain container_file_t:file { manage_file_perms relabel_file_perms exec_file_perms };
++allow container_engine_domain container_file_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++allow container_engine_domain container_file_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++allow container_engine_domain container_file_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++allow container_engine_domain container_file_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++allow container_engine_domain container_file_t:filesystem { getattr relabelfrom relabelto mount unmount remount };
++
++allow container_engine_domain container_ro_file_t:dir { manage_dir_perms relabel_dir_perms };
++allow container_engine_domain container_ro_file_t:file { manage_file_perms relabel_file_perms exec_file_perms };
++allow container_engine_domain container_ro_file_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++allow container_engine_domain container_ro_file_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++allow container_engine_domain container_ro_file_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++allow container_engine_domain container_ro_file_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++allow container_engine_domain container_ro_file_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++
++ifdef(`init_systemd',`
++	# needed by runc, which is also invoked by other engines
++	init_run_bpf(container_engine_domain)
++')
++
++tunable_policy(`container_mounton_non_security',`
++	files_mounton_non_security(container_engine_domain)
++')
++
++tunable_policy(`container_use_nfs',`
++	fs_manage_nfs_dirs(container_engine_domain)
++	fs_manage_nfs_files(container_engine_domain)
++	fs_manage_nfs_named_sockets(container_engine_domain)
++	fs_read_nfs_symlinks(container_engine_domain)
++	fs_mount_nfs(container_engine_domain)
++	fs_unmount_nfs(container_engine_domain)
++	fs_exec_nfs_files(container_engine_domain)
++	kernel_rw_fs_sysctls(container_engine_domain)
++',`
++	kernel_dontaudit_search_fs_sysctls(container_engine_domain)
++')
++
++tunable_policy(`container_use_samba',`
++	fs_manage_cifs_dirs(container_engine_domain)
++	fs_manage_cifs_files(container_engine_domain)
++	fs_manage_cifs_named_sockets(container_engine_domain)
++	fs_read_cifs_symlinks(container_engine_domain)
++	fs_exec_cifs_files(container_engine_domain)
++')
++
++optional_policy(`
++	# to verify container image signatures
++	gpg_exec(container_engine_domain)
++	gpg_dontaudit_exec_agent(container_engine_domain)
++	gpg_dontaudit_search_user_secrets(container_engine_domain)
++')
++
++optional_policy(`
++	iptables_domtrans(container_engine_domain)
++')
++
++########################################
++#
++# Common system container engine local policy
++#
++
++allow container_engine_system_domain container_domain:process { sigkill signal signull transition };
++allow container_engine_system_domain container_domain:key { create search setattr view };
++
++ps_process_pattern(container_engine_system_domain, container_system_domain)
++allow container_system_domain container_engine_system_domain:fd use;
++allow container_system_domain container_engine_system_domain:fifo_file rw_fifo_file_perms;
++
++create_dirs_pattern(container_engine_system_domain, container_config_t, container_config_t)
++files_etc_filetrans(container_engine_system_domain, container_config_t, dir)
++
++manage_dirs_pattern(container_engine_system_domain, container_log_t, container_log_t)
++manage_files_pattern(container_engine_system_domain, container_log_t, container_log_t)
++logging_log_filetrans(container_engine_system_domain, container_log_t, { dir file })
++
++allow container_engine_system_domain container_var_lib_t:dir { manage_dir_perms relabel_dir_perms watch };
++allow container_engine_system_domain container_var_lib_t:file { manage_file_perms relabel_file_perms exec_file_perms };
++allow container_engine_system_domain container_var_lib_t:blk_file { manage_blk_file_perms relabel_blk_file_perms };
++allow container_engine_system_domain container_var_lib_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++allow container_engine_system_domain container_var_lib_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++allow container_engine_system_domain container_var_lib_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++allow container_engine_system_domain container_var_lib_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++files_var_lib_filetrans(container_engine_system_domain, container_var_lib_t, dir)
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, file, "config.env")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, file, "hosts")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, file, "hostname")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, file, "resolv.conf")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, dir, "init")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, dir, "overlay")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, dir, "overlay-images")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, dir, "overlay-layers")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, dir, "overlay2")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, dir, "overlay2-images")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_ro_file_t, dir, "overlay2-layers")
++filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_file_t, dir, "volumes")
++
++allow container_engine_system_domain container_runtime_t:dir { manage_dir_perms relabel_dir_perms watch };
++allow container_engine_system_domain container_runtime_t:file { manage_file_perms relabel_file_perms watch };
++allow container_engine_system_domain container_runtime_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++allow container_engine_system_domain container_runtime_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++allow container_engine_system_domain container_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++files_runtime_filetrans(container_engine_system_domain, container_runtime_t, { dir file })
++
++allow container_engine_system_domain container_engine_cache_t:dir manage_dir_perms;
++allow container_engine_system_domain container_engine_cache_t:file manage_file_perms;
++files_var_filetrans(container_engine_system_domain, container_engine_cache_t, { dir file })
++
++########################################
++#
++# Common user container engine local policy
++#
++
++allow container_engine_user_domain self:tun_socket create_socket_perms;
++
++allow container_engine_user_domain container_user_domain:process { sigkill signal signull transition };
++allow container_engine_user_domain container_user_domain:key { create search setattr view };
++
++ps_process_pattern(container_engine_user_domain, container_user_domain)
++allow container_user_domain container_engine_user_domain:fd use;
++allow container_user_domain container_engine_user_domain:fifo_file rw_fifo_file_perms;
++
++userdom_list_user_home_content(container_engine_user_domain)
++
++xdg_search_config_dirs(container_engine_user_domain)
++
++allow container_engine_user_domain container_user_runtime_t:dir { manage_dir_perms relabel_dir_perms watch };
++allow container_engine_user_domain container_user_runtime_t:file { manage_file_perms relabel_file_perms watch };
++allow container_engine_user_domain container_user_runtime_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++allow container_engine_user_domain container_user_runtime_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++allow container_engine_user_domain container_user_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++# file and sock_file filetrans to support rootless docker
++userdom_user_runtime_filetrans(container_engine_user_domain, container_user_runtime_t, { dir file sock_file })
++
++allow container_engine_user_domain container_cache_home_t:dir manage_dir_perms;
++allow container_engine_user_domain container_cache_home_t:file manage_file_perms;
++xdg_cache_filetrans(container_engine_user_domain, container_cache_home_t, dir)
++
++allow container_engine_user_domain container_conf_home_t:dir manage_dir_perms;
++allow container_engine_user_domain container_conf_home_t:file manage_file_perms;
++xdg_config_filetrans(container_engine_user_domain, container_conf_home_t, dir)
++
++allow container_engine_user_domain container_data_home_t:dir { manage_dir_perms relabel_dir_perms watch };
++allow container_engine_user_domain container_data_home_t:file { manage_file_perms relabel_file_perms exec_file_perms };
++allow container_engine_user_domain container_data_home_t:chr_file { manage_chr_file_perms relabel_chr_file_perms };
++allow container_engine_user_domain container_data_home_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
++allow container_engine_user_domain container_data_home_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++allow container_engine_user_domain container_data_home_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
++xdg_data_filetrans(container_engine_user_domain, container_data_home_t, dir)
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, file, "config.env")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, file, "hosts")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, file, "resolv.conf")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, file, "hostname")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, dir, "init")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, dir, "fuse-overlayfs")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, dir, "overlay")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, dir, "overlay-images")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, dir, "overlay-layers")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, dir, "overlay2")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, dir, "overlay2-images")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_ro_file_t, dir, "overlay2-layers")
++filetrans_pattern(container_engine_user_domain, container_data_home_t, container_file_t, dir, "volumes")
++
++########################################
++#
++# Common privileged container local policy
++#
++
++allow privileged_container_domain container_file_t:file entrypoint;
++allow privileged_container_domain container_ro_file_t:file entrypoint;
++allow privileged_container_domain container_var_lib_t:file entrypoint;
++
++optional_policy(`
++	systemd_dbus_chat_machined(privileged_container_domain)
++	systemd_dbus_chat_logind(privileged_container_domain)
++')
++
++########################################
++#
++# spc local policy
++#
++# spc_t is the default type for containers created
++# with the --privileged (or similar) argument
++#
++
++# Containers run from an engine with the --privileged argument are not
++# restricted by the engine. One of these restrictions is a manual
++# transition to the default context for containers, usually container_t.
++# Instead of performing a manual transition when creating a restricted
++# container (default), we do an automatic transition to spc_t when
++# restrictions are disabled.
++domtrans_pattern(container_engine_system_domain, container_file_t, spc_t)
++domtrans_pattern(container_engine_system_domain, container_ro_file_t, spc_t)
++domtrans_pattern(container_engine_system_domain, container_var_lib_t, spc_t)
++
++allow container_engine_system_domain spc_t:process { setsched signal_perms };
++
++allow spc_t container_engine_system_domain:fifo_file rw_fifo_file_perms;
++
++init_dbus_chat(spc_t)
++
++optional_policy(`
++	dbus_system_bus_client(spc_t)
++	dbus_all_session_bus_client(spc_t)
++')
++
++optional_policy(`
++# If unconfined domains are enabled, spc is also unconfined
++	unconfined_domain_noaudit(spc_t)
++	domain_ptrace_all_domains(spc_t)
++')
++
++########################################
++#
++# spc user local policy
++#
++
++# Similar to above, automatically transition to spc_user_t when a
++# container engine runs a container with the --privileged argument
++domtrans_pattern(container_engine_user_domain, container_file_t, spc_user_t)
++domtrans_pattern(container_engine_user_domain, container_ro_file_t, spc_user_t)
++domtrans_pattern(container_engine_user_domain, container_var_lib_t, spc_user_t)
++fs_fusefs_domtrans(container_engine_user_domain, spc_user_t)
++
++allow container_engine_user_domain spc_user_t:process { setsched signal_perms };
++
++allow spc_user_t container_engine_user_domain:fifo_file rw_fifo_file_perms;
++
++optional_policy(`
++       dbus_system_bus_client(spc_user_t)
++       dbus_all_session_bus_client(spc_user_t)
++')
++
++optional_policy(`
++       # If unconfined domains are enabled, spc is also unconfined
++       unconfined_domain_noaudit(spc_user_t)
++       domain_ptrace_all_domains(spc_user_t)
++')
+diff --git a/policy/modules/services/dbus.if b/policy/modules/services/dbus.if
+index f2c0857c7..b3f01e9f6 100644
+--- a/policy/modules/services/dbus.if
++++ b/policy/modules/services/dbus.if
+@@ -88,6 +88,7 @@ template(`dbus_role_template',`
+ 	allow $3 $1_dbusd_t:fd use;
+ 
+ 	dontaudit $1_dbusd_t self:process getcap;
++	dontaudit $1_dbusd_t self:cap_userns sys_ptrace;
+ 
+ 	allow $3 system_dbusd_t:dbus { send_msg acquire_svc };
+ 
+@@ -304,6 +305,44 @@ template(`dbus_send_spec_session_bus',`
+ 	allow $2 $1_dbusd_t:dbus send_msg;
+ ')
+ 
++#######################################
++## <summary>
++##  Allow the specified domain to get the
++##  attributes of the session dbus sock file.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`dbus_getattr_session_runtime_socket',`
++	gen_require(`
++		type session_dbusd_runtime_t;
++	')
++
++	allow $1 session_dbusd_runtime_t:sock_file getattr;
++')
++
++#######################################
++## <summary>
++##  Allow the specified domain to write to
++##  the session dbus sock file.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`dbus_write_session_runtime_socket',`
++	gen_require(`
++		type session_dbusd_runtime_t;
++	')
++
++	allow $1 session_dbusd_runtime_t:sock_file write;
++')
++
+ ########################################
+ ## <summary>
+ ##	Read dbus configuration content.
+diff --git a/policy/modules/services/dbus.te b/policy/modules/services/dbus.te
+index a7c830d69..c5d0bcee2 100644
+--- a/policy/modules/services/dbus.te
++++ b/policy/modules/services/dbus.te
+@@ -281,11 +281,14 @@ files_read_usr_files(session_bus_type)
+ files_watch_usr_dirs(session_bus_type)
+ files_dontaudit_search_var(session_bus_type)
+ 
++fs_getattr_cgroup(session_bus_type)
+ fs_getattr_romfs(session_bus_type)
+ fs_getattr_xattr_fs(session_bus_type)
+ fs_list_inotifyfs(session_bus_type)
+ fs_dontaudit_list_nfs(session_bus_type)
+ 
++kernel_getattr_proc(session_bus_type)
++
+ selinux_get_fs_mount(session_bus_type)
+ selinux_validate_context(session_bus_type)
+ selinux_compute_access_vector(session_bus_type)
+diff --git a/policy/modules/services/docker.fc b/policy/modules/services/docker.fc
+new file mode 100644
+index 000000000..577d148fd
+--- /dev/null
++++ b/policy/modules/services/docker.fc
+@@ -0,0 +1,8 @@
++/usr/bin/docker	--	gen_context(system_u:object_r:dockerc_exec_t,s0)
++/usr/bin/dockerd	--	gen_context(system_u:object_r:dockerd_exec_t,s0)
++/usr/bin/docker-proxy	--	gen_context(system_u:object_r:dockerd_exec_t,s0)
++/usr/bin/containerd	--	gen_context(system_u:object_r:dockerd_exec_t,s0)
++/usr/bin/containerd-shim	--	gen_context(system_u:object_r:dockerd_exec_t,s0)
++/usr/bin/containerd-shim-runc-v1	--	gen_context(system_u:object_r:dockerd_exec_t,s0)
++/usr/bin/containerd-shim-runc-v2	--	gen_context(system_u:object_r:dockerd_exec_t,s0)
++/usr/bin/containerd-stress	--	gen_context(system_u:object_r:dockerd_exec_t,s0)
+diff --git a/policy/modules/services/docker.if b/policy/modules/services/docker.if
+new file mode 100644
+index 000000000..532fa4419
+--- /dev/null
++++ b/policy/modules/services/docker.if
+@@ -0,0 +1,237 @@
++## <summary>Policy for docker</summary>
++
++########################################
++## <summary>
++##	Execute docker CLI in the docker CLI domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`docker_domtrans_cli',`
++	gen_require(`
++		type dockerc_t, dockerc_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, dockerc_exec_t, dockerc_t)
++')
++
++########################################
++## <summary>
++##	Execute docker CLI in the docker CLI
++##	domain, and allow the specified role
++##	the docker CLI domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the docker domain.
++##	</summary>
++## </param>
++#
++interface(`docker_run_cli',`
++	gen_require(`
++		type dockerc_t;
++	')
++
++	role $2 types dockerc_t;
++
++	docker_domtrans_cli($1)
++')
++
++########################################
++## <summary>
++##	Execute docker in the docker user domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`docker_domtrans_user_daemon',`
++	gen_require(`
++		type dockerd_user_t, dockerd_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, dockerd_exec_t, dockerd_user_t)
++')
++
++########################################
++## <summary>
++##	Execute docker in the docker user
++##	domain, and allow the specified
++##	role the docker user domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the docker domain.
++##	</summary>
++## </param>
++#
++interface(`docker_run_user_daemon',`
++	gen_require(`
++		type dockerd_user_t;
++	')
++
++	role $2 types dockerd_user_t;
++
++	docker_domtrans_user_daemon($1)
++')
++
++########################################
++## <summary>
++##	Execute docker CLI in the docker CLI
++##	user domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`docker_domtrans_user_cli',`
++	gen_require(`
++		type dockerc_user_t, dockerc_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, dockerc_exec_t, dockerc_user_t)
++')
++
++########################################
++## <summary>
++##	Execute docker CLI in the docker CLI
++##	user domain, and allow the specified
++##	role the docker CLI user domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the docker
++##	user domain.
++##	</summary>
++## </param>
++#
++interface(`docker_run_user_cli',`
++	gen_require(`
++		type dockerc_user_t;
++	')
++
++	role $2 types dockerc_user_t;
++
++	docker_domtrans_user_cli($1)
++')
++
++########################################
++## <summary>
++##	Role access for rootless docker.
++## </summary>
++## <param name="role_prefix">
++##	<summary>
++##	The prefix of the user role (e.g., user
++##	is the prefix for user_r).
++##	</summary>
++## </param>
++## <param name="user_domain">
++##	<summary>
++##	User domain for the role.
++##	</summary>
++## </param>
++## <param name="user_exec_domain">
++##	<summary>
++##	User exec domain for execute and transition access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++template(`docker_user_role',`
++	gen_require(`
++		type dockerd_user_t;
++		type dockerd_exec_t;
++	')
++
++	role $4 types dockerd_user_t;
++
++	docker_run_user_daemon($3, $4)
++	docker_run_user_cli($3, $4)
++
++	ifdef(`init_systemd',`
++		systemd_user_daemon_domain($1, dockerd_exec_t, dockerd_user_t)
++		systemd_user_send_systemd_notify($1, dockerd_user_t)
++	')
++
++	optional_policy(`
++		dbus_spec_session_bus_client($1, dockerd_user_t)
++	')
++
++	optional_policy(`
++		rootlesskit_role($1, $2, $3, $4)
++	')
++')
++
++########################################
++## <summary>
++##	Send signals to the rootless docker daemon.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`docker_signal_user_daemon',`
++	gen_require(`
++		type dockerd_user_t;
++	')
++
++	allow $1 dockerd_user_t:process signal;
++')
++
++########################################
++## <summary>
++##	All of the rules required to
++##	administrate a docker
++##	environment.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`docker_admin',`
++	docker_run_cli($1, $2)
++
++	optional_policy(`
++		rootlesskit_run($1, $2)
++	')
++')
+diff --git a/policy/modules/services/docker.te b/policy/modules/services/docker.te
+new file mode 100644
+index 000000000..7a657e15d
+--- /dev/null
++++ b/policy/modules/services/docker.te
+@@ -0,0 +1,170 @@
++policy_module(docker)
++
++########################################
++#
++# Declarations
++#
++
++container_engine_domain_template(dockerd)
++container_system_engine(dockerd_t)
++type dockerd_exec_t;
++container_engine_executable_file(dockerd_exec_t)
++application_domain(dockerd_t, dockerd_exec_t)
++init_daemon_domain(dockerd_t, dockerd_exec_t)
++ifdef(`enable_mls',`
++	init_ranged_daemon_domain(dockerd_t, dockerd_exec_t, s0 - mls_systemhigh)
++')
++mls_trusted_object(dockerd_t)
++
++type dockerc_t;
++type dockerc_exec_t;
++container_engine_executable_file(dockerc_t)
++application_domain(dockerc_t, dockerc_exec_t)
++
++container_engine_domain_template(dockerd_user)
++container_user_engine(dockerd_user_t)
++application_domain(dockerd_user_t, dockerd_exec_t)
++mls_trusted_object(dockerd_user_t)
++
++type dockerc_user_t;
++application_domain(dockerc_user_t, dockerc_exec_t)
++
++########################################
++#
++# Docker daemon local policy
++#
++
++allow dockerd_t self:netlink_netfilter_socket create_socket_perms;
++allow dockerd_t self:netlink_xfrm_socket create_socket_perms;
++
++init_write_runtime_socket(dockerd_t)
++container_runtime_named_socket_activation(dockerd_t)
++
++# docker fails to start if /proc/kallsyms is unreadable,
++# but only when btrfs support is disabled
++files_read_kernel_symbol_table(dockerd_t)
++files_dontaudit_write_usr_dirs(dockerd_t)
++
++kernel_relabelfrom_unlabeled_dirs(dockerd_t)
++# docker wants to load binfmt_misc
++kernel_request_load_module(dockerd_t)
++kernel_dontaudit_search_fs_sysctls(dockerd_t)
++
++logging_send_syslog_msg(dockerd_t)
++
++container_stream_connect_system_containers(dockerd_t)
++
++# docker manages key.json in /etc/docker
++container_manage_config_files(dockerd_t)
++
++# In btrfs mode, docker creates subvolumes which are unlabeled
++# in /var/lib/docker/btrfs/subvolumes. The files inside will
++# become labeled with a file transition, but the subvolume
++# root will always be unlabeled.
++container_unlabeled_var_lib_filetrans(dockerd_t, dir)
++
++ifdef(`init_systemd',`
++	init_dbus_chat(dockerd_t)
++	init_get_generic_units_status(dockerd_t)
++	init_start_generic_units(dockerd_t)
++	init_start_system(dockerd_t)
++	init_stop_system(dockerd_t)
++')
++
++########################################
++#
++# Docker CLI local policy
++#
++
++allow dockerc_t self:process { getsched signal };
++allow dockerc_t self:fifo_file rw_fifo_file_perms;
++
++allow dockerc_t dockerd_t:unix_stream_socket connectto;
++
++corecmd_dontaudit_search_bin(dockerc_t)
++
++domain_use_interactive_fds(dockerc_t)
++
++auth_use_nsswitch(dockerc_t)
++
++miscfiles_read_localization(dockerc_t)
++
++userdom_use_user_ptys(dockerc_t)
++
++container_stream_connect_system_containers(dockerc_t)
++
++########################################
++#
++# Rootless Docker daemon local policy
++#
++
++# rootless docker is really just docker running as root, but in a user namespace
++
++allow dockerd_user_t self:netlink_netfilter_socket create_socket_perms;
++allow dockerd_user_t self:netlink_xfrm_socket create_socket_perms;
++
++fs_getattr_fusefs(dockerd_user_t)
++fs_mount_fusefs(dockerd_user_t)
++fs_unmount_fusefs(dockerd_user_t)
++fs_remount_fusefs(dockerd_user_t)
++fs_manage_fusefs_dirs(dockerd_user_t)
++fs_manage_fusefs_files(dockerd_user_t)
++fs_manage_fusefs_symlinks(dockerd_user_t)
++fs_exec_fusefs_files(dockerd_user_t)
++fs_mounton_fusefs(dockerd_user_t)
++
++kernel_dontaudit_request_load_module(dockerd_user_t)
++
++storage_rw_fuse(dockerd_user_t)
++
++init_write_runtime_socket(dockerd_user_t)
++
++logging_send_syslog_msg(dockerd_user_t)
++
++mount_exec(dockerd_user_t)
++
++container_setattr_container_ptys(dockerd_user_t)
++container_use_container_ptys(dockerd_user_t)
++
++ifdef(`init_systemd',`
++	systemd_search_user_runtime(dockerd_user_t)
++	systemd_write_user_runtime_socket(dockerd_user_t)
++	systemd_start_user_runtime_units(dockerd_user_t)
++	systemd_stop_user_runtime_units(dockerd_user_t)
++	systemd_status_user_runtime_units(dockerd_user_t)
++')
++
++optional_policy(`
++	dbus_getattr_session_runtime_socket(dockerd_user_t)
++	dbus_write_session_runtime_socket(dockerd_user_t)
++')
++
++optional_policy(`
++	rootlesskit_exec(dockerd_user_t)
++')
++
++########################################
++#
++# Rootless Docker CLI local policy
++#
++
++allow dockerc_user_t self:process { getsched signal };
++allow dockerc_user_t self:fifo_file rw_fifo_file_perms;
++
++allow dockerc_user_t dockerd_user_t:unix_stream_socket connectto;
++
++corecmd_search_bin(dockerc_user_t)
++
++domain_use_interactive_fds(dockerc_user_t)
++
++auth_use_nsswitch(dockerc_user_t)
++
++miscfiles_read_localization(dockerc_user_t)
++
++userdom_use_user_ptys(dockerc_user_t)
++userdom_search_user_home_dirs(dockerc_user_t)
++userdom_search_user_runtime(dockerc_user_t)
++
++xdg_search_data_dirs(dockerc_user_t)
++
++container_stream_connect_user_containers(dockerc_user_t)
+diff --git a/policy/modules/services/ksmtuned.te b/policy/modules/services/ksmtuned.te
+index 3997f73c4..7d7a9f4e9 100644
+--- a/policy/modules/services/ksmtuned.te
++++ b/policy/modules/services/ksmtuned.te
+@@ -24,6 +24,7 @@ files_runtime_file(ksmtuned_runtime_t)
+ #
+ 
+ allow ksmtuned_t self:capability { sys_ptrace sys_tty_config };
++allow ksmtuned_t self:cap_userns sys_ptrace;
+ allow ksmtuned_t self:fifo_file rw_fifo_file_perms;
+ 
+ manage_dirs_pattern(ksmtuned_t, ksmtuned_log_t, ksmtuned_log_t)
+diff --git a/policy/modules/services/podman.fc b/policy/modules/services/podman.fc
+new file mode 100644
+index 000000000..ece2d0dc7
+--- /dev/null
++++ b/policy/modules/services/podman.fc
+@@ -0,0 +1,2 @@
++/usr/bin/podman	--	gen_context(system_u:object_r:podman_exec_t,s0)
++/usr/bin/conmon	--	gen_context(system_u:object_r:podman_conmon_exec_t,s0)
+diff --git a/policy/modules/services/podman.if b/policy/modules/services/podman.if
+new file mode 100644
+index 000000000..3d03884e2
+--- /dev/null
++++ b/policy/modules/services/podman.if
+@@ -0,0 +1,258 @@
++## <summary>Policy for podman</summary>
++
++########################################
++## <summary>
++##	Execute podman in the podman domain.
++## </summary>
++## <param name="domain">
++## 	<summary>
++##	Domain allowed to transition.
++## 	</summary>
++## </param>
++#
++interface(`podman_domtrans',`
++	gen_require(`
++		type podman_t, podman_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, podman_exec_t, podman_t)
++')
++
++########################################
++## <summary>
++##	Execute podman in the podman domain,
++##	and allow the specified role the
++##	podman domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the podman domain.
++##	</summary>
++## </param>
++#
++interface(`podman_run',`
++	gen_require(`
++		type podman_t;
++	')
++
++	role $2 types podman_t;
++
++	podman_domtrans($1)
++')
++
++########################################
++## <summary>
++##	Execute podman in the podman user
++##	domain (rootless podman).
++## </summary>
++## <param name="domain">
++## 	<summary>
++##	Domain allowed to transition.
++## 	</summary>
++## </param>
++#
++interface(`podman_domtrans_user',`
++	gen_require(`
++		type podman_user_t, podman_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, podman_exec_t, podman_user_t)
++')
++
++########################################
++## <summary>
++##	Execute podman in the podman user
++##	domain, and allow the specified role
++##	the podman user domain (rootless
++##	podman).
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the podman domain.
++##	</summary>
++## </param>
++#
++interface(`podman_run_user',`
++	gen_require(`
++		type podman_user_t;
++	')
++
++	role $2 types podman_user_t;
++
++	podman_domtrans_user($1)
++')
++
++########################################
++## <summary>
++##	Execute conmon in the conmon domain.
++## </summary>
++## <param name="domain">
++## 	<summary>
++##	Domain allowed to transition.
++## 	</summary>
++## </param>
++#
++interface(`podman_domtrans_conmon',`
++	gen_require(`
++		type podman_conmon_t, podman_conmon_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, podman_conmon_exec_t, podman_conmon_t)
++')
++
++########################################
++## <summary>
++##	Execute conmon in the conmon domain,
++##	and allow the specified role the
++##	conmon domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the conmon domain.
++##	</summary>
++## </param>
++#
++interface(`podman_run_conmon',`
++	gen_require(`
++		type podman_conmon_t;
++	')
++
++	role $2 types podman_conmon_t;
++
++	podman_domtrans_conmon($1)
++')
++
++########################################
++## <summary>
++##	Execute conmon in the conmon user
++##	domain (rootless podman).
++## </summary>
++## <param name="domain">
++## 	<summary>
++##	Domain allowed to transition.
++## 	</summary>
++## </param>
++#
++interface(`podman_domtrans_conmon_user',`
++	gen_require(`
++		type podman_conmon_user_t, podman_conmon_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, podman_conmon_exec_t, podman_conmon_user_t)
++')
++
++########################################
++## <summary>
++##	Execute conmon in the conmon user
++##	domain, and allow the specified role
++##	the conmon user domain (rootless
++##	podman).
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the conmon domain.
++##	</summary>
++## </param>
++#
++interface(`podman_run_conmon_user',`
++	gen_require(`
++		type podman_conmon_user_t;
++	')
++
++	role $2 types podman_conmon_user_t;
++
++	podman_domtrans_conmon_user($1)
++')
++
++########################################
++## <summary>
++##	Role access for rootless podman.
++## </summary>
++## <param name="role_prefix">
++##	<summary>
++##	The prefix of the user role (e.g., user
++##	is the prefix for user_r).
++##	</summary>
++## </param>
++## <param name="user_domain">
++##	<summary>
++##	User domain for the role.
++##	</summary>
++## </param>
++## <param name="user_exec_domain">
++##	<summary>
++##	User exec domain for execute and transition access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++template(`podman_user_role',`
++	gen_require(`
++		type podman_user_t;
++		type podman_conmon_user_t;
++	')
++
++	podman_run_user($3, $4)
++	podman_run_conmon_user($3, $4)
++
++	optional_policy(`
++		dbus_spec_session_bus_client($1, podman_user_t)
++	')
++
++	optional_policy(`
++		systemd_user_app_status($1, podman_user_t)
++		systemd_user_app_status($1, podman_conmon_user_t)
++	')
++')
++
++########################################
++## <summary>
++##	All of the rules required to
++##	administrate a podman
++##	environment.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`podman_admin',`
++	podman_run($1, $2)
++	podman_run_conmon($1, $2)
++')
+diff --git a/policy/modules/services/podman.te b/policy/modules/services/podman.te
+new file mode 100644
+index 000000000..6efd2cd1f
+--- /dev/null
++++ b/policy/modules/services/podman.te
+@@ -0,0 +1,270 @@
++policy_module(podman)
++
++########################################
++#
++# Declarations
++#
++
++container_engine_domain_template(podman)
++container_system_engine(podman_t)
++type podman_exec_t;
++container_engine_executable_file(podman_exec_t)
++application_domain(podman_t, podman_exec_t)
++init_daemon_domain(podman_t, podman_exec_t)
++ifdef(`enable_mls',`
++	init_ranged_daemon_domain(podman_t, podman_exec_t, s0 - mls_systemhigh)
++')
++mls_trusted_object(podman_t)
++
++container_engine_domain_template(podman_user)
++container_user_engine(podman_user_t)
++application_domain(podman_user_t, podman_exec_t)
++mls_trusted_object(podman_user_t)
++
++type podman_conmon_t;
++type podman_conmon_exec_t;
++application_domain(podman_conmon_t, podman_conmon_exec_t)
++
++type podman_conmon_user_t;
++application_domain(podman_conmon_user_t, podman_conmon_exec_t)
++
++########################################
++#
++# Podman local policy
++#
++
++allow podman_t podman_conmon_t:process { setsched signull };
++allow podman_t podman_conmon_t:fifo_file setattr;
++allow podman_t podman_conmon_t:unix_stream_socket { connectto rw_stream_socket_perms };
++
++container_engine_executable_entrypoint(podman_t)
++
++domtrans_pattern(podman_t, podman_conmon_exec_t, podman_conmon_t)
++
++logging_send_syslog_msg(podman_t)
++
++userdom_list_user_home_content(podman_t)
++# allow podman to relabel content mounted inside containers
++# when run in rootless mode
++userdom_relabel_generic_user_home_dirs(podman_t)
++userdom_relabel_generic_user_home_files(podman_t)
++
++# when run by root, podman will fail to start if
++# /root/.config/containers is not readable
++container_config_home_filetrans(podman_t, dir)
++container_manage_home_config(podman_t)
++
++container_manage_sock_files(podman_t)
++
++ifdef(`init_systemd',`
++	init_dbus_chat(podman_t)
++	init_setsched(podman_t)
++	init_start_system(podman_t)
++	init_stop_system(podman_t)
++
++	# podman can read logs from containers which are
++	# sent to the system journal
++	logging_search_logs(podman_t)
++	systemd_list_journal_dirs(podman_t)
++	systemd_read_journal_files(podman_t)
++')
++
++########################################
++#
++# Rootless Podman local policy
++#
++
++allow podman_user_t podman_conmon_user_t:process signull;
++allow podman_user_t podman_conmon_user_t:fifo_file setattr;
++allow podman_user_t podman_conmon_user_t:unix_stream_socket { connectto rw_stream_socket_perms };
++
++container_engine_executable_entrypoint(podman_user_t)
++
++domtrans_pattern(podman_user_t, podman_conmon_exec_t, podman_conmon_user_t)
++
++# required by slirp4netns
++files_mounton_etc_dirs(podman_user_t)
++# required by slirp4netns
++files_mounton_runtime_dirs(podman_user_t)
++
++# FUSE access is required for rootless containers
++fs_getattr_fusefs(podman_user_t)
++fs_mount_fusefs(podman_user_t)
++fs_unmount_fusefs(podman_user_t)
++fs_remount_fusefs(podman_user_t)
++fs_manage_fusefs_dirs(podman_user_t)
++fs_manage_fusefs_files(podman_user_t)
++fs_manage_fusefs_symlinks(podman_user_t)
++fs_exec_fusefs_files(podman_user_t)
++fs_mounton_fusefs(podman_user_t)
++
++kernel_read_fs_sysctls(podman_user_t)
++# to read kernel.unprivileged_userns_clone, if present
++kernel_read_sysctl(podman_user_t)
++
++logging_send_syslog_msg(podman_user_t)
++
++init_write_runtime_socket(podman_user_t)
++
++mount_exec(podman_user_t)
++
++storage_rw_fuse(podman_user_t)
++
++# allow podman to relabel content mounted inside containers
++# when run in rootless mode
++userdom_relabel_generic_user_home_dirs(podman_user_t)
++userdom_relabel_generic_user_home_files(podman_user_t)
++
++ifdef(`init_systemd',`
++	# podman queries the cgroup manager (systemd) over the session bus socket
++	dbus_getattr_session_runtime_socket(podman_user_t)
++	dbus_write_session_runtime_socket(podman_user_t)
++
++	# rootless podman must be able to get login state of the user
++	systemd_dbus_chat_logind(podman_user_t)
++
++	# containers are created as transient user units
++	systemd_start_user_runtime_units(podman_user_t)
++	systemd_stop_user_runtime_units(podman_user_t)
++	systemd_status_user_runtime_units(podman_user_t)
++
++	# podman can read logs from containers which are
++	# sent to the user journal
++	logging_search_logs(podman_user_t)
++	systemd_list_journal_dirs(podman_user_t)
++	systemd_read_journal_files(podman_user_t)
++')
++
++########################################
++#
++# conmon local policy
++#
++
++allow podman_conmon_t self:process signal;
++allow podman_conmon_t self:capability { dac_override dac_read_search sys_ptrace sys_resource };
++allow podman_conmon_t self:cap_userns sys_ptrace;
++allow podman_conmon_t self:fifo_file { rw_fifo_file_perms setattr };
++allow podman_conmon_t self:unix_dgram_socket create_socket_perms;
++dontaudit podman_conmon_t self:capability net_admin;
++
++# conmon will execute crun/runc to create the container
++container_generic_engine_domtrans(podman_conmon_t, podman_t)
++podman_domtrans(podman_conmon_t)
++
++allow podman_conmon_t podman_t:tcp_socket rw_stream_socket_perms;
++allow podman_conmon_t podman_t:unix_stream_socket rw_stream_socket_perms;
++allow podman_conmon_t podman_t:unix_dgram_socket rw_socket_perms;
++ps_process_pattern(podman_conmon_t, podman_t)
++
++domain_use_interactive_fds(podman_conmon_t)
++
++fs_getattr_cgroup(podman_conmon_t)
++fs_search_cgroup_dirs(podman_conmon_t)
++fs_read_cgroup_files(podman_conmon_t)
++fs_watch_cgroup_files(podman_conmon_t)
++
++fs_getattr_tmpfs(podman_conmon_t)
++fs_getattr_xattr_fs(podman_conmon_t)
++
++logging_send_syslog_msg(podman_conmon_t)
++
++miscfiles_read_localization(podman_conmon_t)
++
++userdom_use_user_ptys(podman_conmon_t)
++
++container_read_system_container_state(podman_conmon_t)
++
++# to send/receive data from container ttys
++container_rw_chr_files(podman_conmon_t)
++
++container_manage_runtime_files(podman_conmon_t)
++container_manage_runtime_fifo_files(podman_conmon_t)
++container_manage_runtime_sock_files(podman_conmon_t)
++
++container_search_var_lib(podman_conmon_t)
++container_manage_var_lib_files(podman_conmon_t)
++container_manage_var_lib_fifo_files(podman_conmon_t)
++container_manage_var_lib_sock_files(podman_conmon_t)
++
++container_engine_tmp_filetrans(podman_conmon_t, { file sock_file })
++container_manage_engine_tmp_files(podman_conmon_t)
++container_manage_engine_tmp_sock_files(podman_conmon_t)
++
++ifdef(`init_systemd',`
++	init_get_generic_units_status(podman_conmon_t)
++	init_start_generic_units(podman_conmon_t)
++	init_start_system(podman_conmon_t)
++	init_stop_system(podman_conmon_t)
++
++	# conmon can read logs from containers which are
++	# sent to the system journal
++	logging_search_logs(podman_conmon_t)
++	systemd_list_journal_dirs(podman_conmon_t)
++	systemd_read_journal_files(podman_conmon_t)
++')
++
++optional_policy(`
++	iptables_domtrans(podman_conmon_t)
++')
++
++########################################
++#
++# Rootless conmon local policy
++#
++
++allow podman_conmon_user_t self:process signal;
++allow podman_conmon_user_t self:cap_userns sys_ptrace;
++allow podman_conmon_user_t self:fifo_file { rw_fifo_file_perms setattr };
++allow podman_conmon_user_t self:unix_dgram_socket create_socket_perms;
++
++ps_process_pattern(podman_conmon_user_t, podman_user_t)
++allow podman_conmon_user_t podman_user_t:process signal;
++allow podman_conmon_user_t podman_user_t:unix_stream_socket rw_stream_socket_perms;
++allow podman_conmon_user_t podman_user_t:unix_dgram_socket rw_socket_perms;
++
++# conmon will execute crun/runc to create the container
++container_generic_engine_domtrans(podman_conmon_user_t, podman_user_t)
++podman_domtrans_user(podman_conmon_user_t)
++
++domain_use_interactive_fds(podman_conmon_user_t)
++
++fs_getattr_cgroup(podman_conmon_user_t)
++fs_search_cgroup_dirs(podman_conmon_user_t)
++fs_read_cgroup_files(podman_conmon_user_t)
++fs_watch_cgroup_files(podman_conmon_user_t)
++
++fs_getattr_tmpfs(podman_conmon_user_t)
++fs_getattr_xattr_fs(podman_conmon_user_t)
++
++logging_send_syslog_msg(podman_conmon_user_t)
++
++miscfiles_read_localization(podman_conmon_user_t)
++
++userdom_use_user_ptys(podman_conmon_user_t)
++
++container_read_user_container_state(podman_conmon_user_t)
++
++# to send/receive data from container ttys
++container_rw_chr_files(podman_conmon_user_t)
++
++userdom_search_user_home_dirs(podman_conmon_user_t)
++xdg_search_data_dirs(podman_conmon_user_t)
++container_manage_home_data_files(podman_conmon_user_t)
++container_manage_home_data_fifo_files(podman_conmon_user_t)
++container_manage_home_data_sock_files(podman_conmon_user_t)
++
++userdom_search_user_runtime_root(podman_conmon_user_t)
++userdom_search_user_runtime(podman_conmon_user_t)
++container_manage_user_runtime_files(podman_conmon_user_t)
++
++container_engine_tmp_filetrans(podman_conmon_user_t, { file sock_file })
++container_manage_engine_tmp_files(podman_conmon_user_t)
++container_manage_engine_tmp_sock_files(podman_conmon_user_t)
++
++ifdef(`init_systemd',`
++	# conmon can read logs from containers which are
++	# sent to the system journal
++	logging_search_logs(podman_conmon_user_t)
++	systemd_list_journal_dirs(podman_conmon_user_t)
++	systemd_read_journal_files(podman_conmon_user_t)
++')
+diff --git a/policy/modules/services/rootlesskit.fc b/policy/modules/services/rootlesskit.fc
+new file mode 100644
+index 000000000..613ebd9b9
+--- /dev/null
++++ b/policy/modules/services/rootlesskit.fc
+@@ -0,0 +1,3 @@
++/usr/bin/rootlesskit	--	gen_context(system_u:object_r:rootlesskit_exec_t,s0)
++/usr/bin/rootlessctl	--	gen_context(system_u:object_r:rootlesskit_exec_t,s0)
++/usr/bin/rootlesskit-docker-proxy	--	gen_context(system_u:object_r:rootlesskit_exec_t,s0)
+diff --git a/policy/modules/services/rootlesskit.if b/policy/modules/services/rootlesskit.if
+new file mode 100644
+index 000000000..2be598d70
+--- /dev/null
++++ b/policy/modules/services/rootlesskit.if
+@@ -0,0 +1,106 @@
++## <summary>Policy for RootlessKit</summary>
++
++########################################
++## <summary>
++##	Execute rootlesskit in the caller domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`rootlesskit_exec',`
++	gen_require(`
++		type rootlesskit_exec_t;
++	')
++
++	can_exec($1, rootlesskit_exec_t)
++')
++
++########################################
++## <summary>
++##	Execute rootlesskit in the rootlesskit domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`rootlesskit_domtrans',`
++	gen_require(`
++		type rootlesskit_t, rootlesskit_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, rootlesskit_exec_t, rootlesskit_t)
++')
++
++########################################
++## <summary>
++##	Execute rootlesskit in the rootlesskit
++##	domain, and allow the specified role
++##	the rootlesskit domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the rootlesskit domain.
++##	</summary>
++## </param>
++#
++interface(`rootlesskit_run',`
++	gen_require(`
++		type rootlesskit_t;
++	')
++
++	role $2 types rootlesskit_t;
++
++	rootlesskit_domtrans($1)
++')
++
++########################################
++## <summary>
++##	Role access for rootlesskit.
++## </summary>
++## <param name="role_prefix">
++##	<summary>
++##	The prefix of the user role (e.g., user
++##	is the prefix for user_r).
++##	</summary>
++## </param>
++## <param name="user_domain">
++##	<summary>
++##	User domain for the role.
++##	</summary>
++## </param>
++## <param name="user_exec_domain">
++##	<summary>
++##	User exec domain for execute and transition access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++template(`rootlesskit_role',`
++	gen_require(`
++		type rootlesskit_t;
++		type rootlesskit_exec_t;
++	')
++
++	rootlesskit_run($3, $4)
++
++	optional_policy(`
++		systemd_user_daemon_domain($1, rootlesskit_exec_t, rootlesskit_t)
++	')
++')
++
+diff --git a/policy/modules/services/rootlesskit.te b/policy/modules/services/rootlesskit.te
+new file mode 100644
+index 000000000..208143c6f
+--- /dev/null
++++ b/policy/modules/services/rootlesskit.te
+@@ -0,0 +1,46 @@
++policy_module(rootlesskit)
++
++########################################
++#
++# Declarations
++#
++
++container_engine_domain_template(rootlesskit)
++type rootlesskit_exec_t;
++container_user_engine(rootlesskit_t)
++application_domain(rootlesskit_t, rootlesskit_exec_t)
++mls_trusted_object(rootlesskit_t)
++
++########################################
++#
++# Rootlesskit local policy
++#
++
++# rootlesskit fails without this access
++allow rootlesskit_t self:tun_socket { relabelfrom relabelto };
++
++can_exec(rootlesskit_t, rootlesskit_exec_t)
++
++domain_use_interactive_fds(rootlesskit_t)
++
++# any dir not readable or file not stat-able causes rootlesskit to hang
++# when --copy-up would access it; the below rules cover at least the
++# access needed for rootless docker (copying /etc and /run)
++files_list_all(rootlesskit_t)
++files_getattr_all_files(rootlesskit_t)
++files_getattr_all_pipes(rootlesskit_t)
++files_getattr_all_sockets(rootlesskit_t)
++
++kernel_read_sysctl(rootlesskit_t)
++
++auth_use_nsswitch(rootlesskit_t)
++
++userdom_exec_user_bin_files(rootlesskit_t)
++
++docker_domtrans_user_daemon(rootlesskit_t)
++docker_signal_user_daemon(rootlesskit_t)
++
++optional_policy(`
++	dbus_list_system_bus_runtime(rootlesskit_t)
++	dbus_system_bus_client(rootlesskit_t)
++')
+diff --git a/policy/modules/services/rpc.te b/policy/modules/services/rpc.te
+index 8d0cb7b3c..f0b69b08c 100644
+--- a/policy/modules/services/rpc.te
++++ b/policy/modules/services/rpc.te
+@@ -311,7 +311,7 @@ kernel_dontaudit_getattr_core_if(nfsd_t)
+ kernel_search_debugfs(nfsd_t)
+ kernel_setsched(nfsd_t)
+ kernel_request_load_module(nfsd_t)
+-# kernel_mounton_proc(nfsd_t)
++# kernel_mounton_proc_dirs(nfsd_t)
+ 
+ corenet_sendrecv_nfs_server_packets(nfsd_t)
+ corenet_tcp_bind_nfs_port(nfsd_t)
+diff --git a/policy/modules/services/rtkit.te b/policy/modules/services/rtkit.te
+index 152709a02..34a64003a 100644
+--- a/policy/modules/services/rtkit.te
++++ b/policy/modules/services/rtkit.te
+@@ -21,6 +21,7 @@ init_unit_file(rtkit_daemon_unit_t)
+ #
+ 
+ allow rtkit_daemon_t self:capability { dac_read_search setgid setpcap setuid sys_chroot sys_nice sys_ptrace };
++allow rtkit_daemon_t self:cap_userns { sys_nice sys_ptrace };
+ allow rtkit_daemon_t self:process { setsched getcap setcap setrlimit };
+ 
+ kernel_read_system_state(rtkit_daemon_t)
+diff --git a/policy/modules/services/samba.te b/policy/modules/services/samba.te
+index 8f942d22d..3ceaff424 100644
+--- a/policy/modules/services/samba.te
++++ b/policy/modules/services/samba.te
+@@ -847,6 +847,7 @@ optional_policy(`
+ 
+ allow winbind_t self:capability { dac_override ipc_lock setuid sys_nice };
+ dontaudit winbind_t self:capability sys_tty_config;
++dontaudit winbind_t self:cap_userns kill;
+ allow winbind_t self:process { signal_perms getsched setsched };
+ allow winbind_t self:fifo_file rw_fifo_file_perms;
+ allow winbind_t self:unix_stream_socket { accept listen };
+diff --git a/policy/modules/services/snmp.te b/policy/modules/services/snmp.te
+index bec3691fd..846ab288a 100644
+--- a/policy/modules/services/snmp.te
++++ b/policy/modules/services/snmp.te
+@@ -28,6 +28,7 @@ files_type(snmpd_var_lib_t)
+ 
+ allow snmpd_t self:capability { chown dac_override ipc_lock kill net_admin setgid setuid sys_nice sys_ptrace sys_tty_config };
+ dontaudit snmpd_t self:capability { sys_module sys_tty_config };
++allow snmpd_t self:cap_userns sys_ptrace;
+ allow snmpd_t self:process { signal_perms getsched setsched };
+ allow snmpd_t self:fifo_file rw_fifo_file_perms;
+ allow snmpd_t self:unix_stream_socket { accept connectto listen };
+diff --git a/policy/modules/services/virt.if b/policy/modules/services/virt.if
+index fe484666b..ee7fd18fc 100644
+--- a/policy/modules/services/virt.if
++++ b/policy/modules/services/virt.if
+@@ -84,30 +84,6 @@ template(`virt_domain_template',`
+ 	')
+ ')
+ 
+-#######################################
+-## <summary>
+-##	The template to define a virt lxc domain.
+-## </summary>
+-## <param name="domain_prefix">
+-##	<summary>
+-##	Domain prefix to be used.
+-##	</summary>
+-## </param>
+-#
+-template(`virt_lxc_domain_template',`
+-	gen_require(`
+-		attribute_role svirt_lxc_domain_roles;
+-		attribute svirt_lxc_domain;
+-	')
+-
+-	type $1_t, svirt_lxc_domain;
+-	domain_type($1_t)
+-	domain_user_exemption_target($1_t)
+-	mls_rangetrans_target($1_t)
+-	mcs_constrained($1_t)
+-	role svirt_lxc_domain_roles types $1_t;
+-')
+-
+ ########################################
+ ## <summary>
+ ##	Make the specified type virt image type.
+@@ -299,37 +275,6 @@ interface(`virt_kill_all_virt_domains',`
+ 	allow $1 virt_domain:process sigkill;
+ ')
+ 
+-########################################
+-## <summary>
+-##	Execute svirt lxc domains in their
+-##	domain, and allow the specified
+-##	role that svirt lxc domain.
+-## </summary>
+-## <param name="domain">
+-##	<summary>
+-##	Domain allowed to transition.
+-##	</summary>
+-## </param>
+-## <param name="role">
+-##	<summary>
+-##	Role allowed access.
+-##	</summary>
+-## </param>
+-#
+-interface(`virt_run_svirt_lxc_domain',`
+-	gen_require(`
+-		attribute svirt_lxc_domain;
+-		attribute_role svirt_lxc_domain_roles;
+-	')
+-
+-	allow $1 svirt_lxc_domain:process { signal transition };
+-	roleattribute $2 svirt_lxc_domain_roles;
+-
+-	allow svirt_lxc_domain $1:fd use;
+-	allow svirt_lxc_domain $1:fifo_file rw_fifo_file_perms;
+-	allow svirt_lxc_domain $1:process sigchld;
+-')
+-
+ #######################################
+ ## <summary>
+ ##	Get attributes of virtd executable files.
+@@ -1158,6 +1103,173 @@ interface(`virt_manage_images',`
+ 	')
+ ')
+ 
++########################################
++## <summary>
++##	Inherit and use virtd lxc
++##	file descriptors.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_lxc_use_fds',`
++	gen_require(`
++		type virtd_lxc_t;
++	')
++
++	allow $1 virtd_lxc_t:fd use;
++')
++
++########################################
++## <summary>
++##	Send a SIGCHLD to virtd lxc.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_lxc_sigchld',`
++	gen_require(`
++		type virtd_lxc_t;
++	')
++
++	allow $1 virtd_lxc_t:process sigchld;
++')
++
++########################################
++## <summary>
++##	Read and write virtd lxc unamed pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_lxc_rw_pipes',`
++	gen_require(`
++		type virtd_lxc_t;
++	')
++
++	allow $1 virtd_lxc_t:fifo_file rw_fifo_file_perms;
++')
++
++########################################
++## <summary>
++##	Connect to virtd lxc over
++##	a unix stream socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_lxc_stream_connect',`
++	gen_require(`
++		type virtd_lxc_t;
++	')
++
++	files_search_runtime($1)
++	allow $1 virtd_lxc_t:unix_stream_socket { connectto rw_socket_perms };
++')
++
++########################################
++## <summary>
++##	List the contents of virtd lxc
++##	directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_lxc_list_runtime',`
++	gen_require(`
++		type virtd_lxc_runtime_t;
++	')
++
++	allow $1 virtd_lxc_runtime_t:dir list_dir_perms;
++')
++
++########################################
++## <summary>
++##	Read virtd lxc runtime files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_lxc_read_runtime',`
++	gen_require(`
++		type virtd_lxc_runtime_t;
++	')
++
++	allow $1 virtd_lxc_runtime_t:file read_file_perms;
++')
++
++########################################
++## <summary>
++##	Inherit and use virsh file
++##	descriptors.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_virsh_use_fds',`
++	gen_require(`
++		type virsh_t;
++	')
++
++	allow $1 virsh_t:fd use;
++')
++
++########################################
++## <summary>
++##	Send a SIGCHLD to virsh.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_virsh_sigchld',`
++	gen_require(`
++		type virsh_t;
++	')
++
++	allow $1 virsh_t:process sigchld;
++')
++
++########################################
++## <summary>
++##	Read and write virsh unamed pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`virt_virsh_rw_pipes',`
++	gen_require(`
++		type virsh_t;
++	')
++
++	allow $1 virsh_t:fifo_file rw_fifo_file_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	All of the rules required to
+@@ -1178,18 +1290,18 @@ interface(`virt_manage_images',`
+ interface(`virt_admin',`
+ 	gen_require(`
+ 		attribute virt_domain, virt_image_type, virt_tmpfs_type;
+-		attribute virt_ptynode, svirt_lxc_domain, virt_tmp_type;
++		attribute virt_ptynode, virt_tmp_type;
+ 		type virtd_t, virtd_initrc_exec_t, virtd_lxc_t;
+-		type virsh_t, virtd_lxc_runtime_t, svirt_lxc_file_t;
++		type virsh_t, virtd_lxc_runtime_t;
+ 		type virt_bridgehelper_t, virt_qmf_t, virt_var_lib_t;
+ 		type virt_runtime_t, virt_tmp_t, virt_log_t;
+ 		type virt_lock_t, svirt_runtime_t, virt_etc_rw_t;
+ 		type virt_etc_t, svirt_cache_t, virtd_keytab_t;
+ 	')
+ 
+-	allow $1 { virt_domain svirt_lxc_domain virtd_t }:process { ptrace signal_perms };
++	allow $1 { virt_domain virtd_t }:process { ptrace signal_perms };
+ 	allow $1 { virtd_lxc_t virsh_t virt_bridgehelper_t virt_qmf_t }:process { ptrace signal_perms };
+-	ps_process_pattern($1, { virt_domain svirt_lxc_domain virtd_t })
++	ps_process_pattern($1, { virt_domain virtd_t })
+ 	ps_process_pattern($1, { virtd_lxc_t virsh_t virt_bridgehelper_t virt_qmf_t })
+ 
+ 	init_startstop_service($1, $2, virtd_t, virtd_initrc_exec_t)
+@@ -1213,7 +1325,7 @@ interface(`virt_admin',`
+ 	admin_pattern($1, svirt_cache_t)
+ 
+ 	files_search_var_lib($1)
+-	admin_pattern($1, { virt_image_type virt_var_lib_t svirt_lxc_file_t })
++	admin_pattern($1, { virt_image_type virt_var_lib_t })
+ 
+ 	files_search_locks($1)
+ 	admin_pattern($1, virt_lock_t)
+diff --git a/policy/modules/services/virt.te b/policy/modules/services/virt.te
+index 6c2c85040..6030ef548 100644
+--- a/policy/modules/services/virt.te
++++ b/policy/modules/services/virt.te
+@@ -92,17 +92,12 @@ attribute virt_image_type;
+ attribute virt_tmp_type;
+ attribute virt_tmpfs_type;
+ 
+-attribute svirt_lxc_domain;
+-
+ attribute_role virt_domain_roles;
+ roleattribute system_r virt_domain_roles;
+ 
+ attribute_role virt_bridgehelper_roles;
+ roleattribute system_r virt_bridgehelper_roles;
+ 
+-attribute_role svirt_lxc_domain_roles;
+-roleattribute system_r svirt_lxc_domain_roles;
+-
+ virt_domain_template(svirt)
+ virt_domain_template(svirt_prot_exec)
+ 
+@@ -198,13 +193,6 @@ init_system_domain(virtd_lxc_t, virtd_lxc_exec_t)
+ type virtd_lxc_runtime_t alias virtd_lxc_var_run_t;
+ files_runtime_file(virtd_lxc_runtime_t)
+ 
+-type svirt_lxc_file_t;
+-files_mountpoint(svirt_lxc_file_t)
+-fs_noxattr_type(svirt_lxc_file_t)
+-term_pty(svirt_lxc_file_t)
+-
+-virt_lxc_domain_template(svirt_lxc_net)
+-
+ type virsh_t;
+ type virsh_exec_t;
+ init_system_domain(virsh_t, virsh_exec_t)
+@@ -485,8 +473,7 @@ allow virtd_t self:netlink_route_socket nlmsg_write;
+ allow virtd_t virt_domain:process { getattr getsched setsched transition rlimitinh signal signull sigkill };
+ dontaudit virtd_t virt_domain:process { siginh noatsecure rlimitinh };
+ 
+-allow virtd_t { virt_domain svirt_lxc_domain }:unix_stream_socket { create_stream_socket_perms connectto };
+-allow virtd_t svirt_lxc_domain:process signal_perms;
++allow virtd_t virt_domain:unix_stream_socket { create_stream_socket_perms connectto };
+ 
+ allow virtd_t virtlogd_t:fd use;
+ allow virtd_t virtlogd_t:fifo_file rw_fifo_file_perms;
+@@ -747,6 +734,11 @@ optional_policy(`
+ 	consoletype_exec(virtd_t)
+ ')
+ 
++optional_policy(`
++	container_signal_all_containers(virtd_t)
++	container_stream_connect_all_containers(virtd_t)
++')
++
+ optional_policy(`
+ 	dbus_system_bus_client(virtd_t)
+ 
+@@ -850,21 +842,12 @@ manage_files_pattern(virsh_t, virt_image_type, virt_image_type)
+ manage_blk_files_pattern(virsh_t, virt_image_type, virt_image_type)
+ manage_lnk_files_pattern(virsh_t, virt_image_type, virt_image_type)
+ 
+-manage_dirs_pattern(virsh_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_files_pattern(virsh_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_chr_files_pattern(virsh_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_lnk_files_pattern(virsh_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_sock_files_pattern(virsh_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_fifo_files_pattern(virsh_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-
+ manage_dirs_pattern(virsh_t, virtd_lxc_runtime_t, virtd_lxc_runtime_t)
+ manage_files_pattern(virsh_t, virtd_lxc_runtime_t, virtd_lxc_runtime_t)
+ filetrans_pattern(virsh_t, virt_runtime_t, virtd_lxc_runtime_t, dir, "lxc")
+ 
+ dontaudit virsh_t virt_var_lib_t:file read_file_perms;
+ 
+-allow virsh_t svirt_lxc_domain:process transition;
+-
+ can_exec(virsh_t, virsh_exec_t)
+ 
+ virt_domtrans(virsh_t)
+@@ -937,6 +920,16 @@ tunable_policy(`virt_use_samba',`
+ 	fs_read_cifs_symlinks(virsh_t)
+ ')
+ 
++optional_policy(`
++	container_domtrans(virsh_t)
++	container_manage_dirs(virsh_t)
++	container_manage_files(virsh_t)
++	container_manage_chr_files(virsh_t)
++	container_manage_lnk_files(virsh_t)
++	container_manage_sock_files(virsh_t)
++	container_manage_fifo_files(virsh_t)
++')
++
+ optional_policy(`
+ 	cron_system_entry(virsh_t, virsh_exec_t)
+ ')
+@@ -988,8 +981,6 @@ allow virtd_lxc_t self:netlink_route_socket nlmsg_write;
+ allow virtd_lxc_t self:unix_stream_socket { accept listen };
+ allow virtd_lxc_t self:packet_socket create_socket_perms;
+ 
+-allow virtd_lxc_t svirt_lxc_domain:process { getattr getsched setsched transition signal signull sigkill };
+-
+ allow virtd_lxc_t virt_image_type:dir mounton;
+ manage_files_pattern(virtd_lxc_t, virt_image_t, virt_image_t)
+ 
+@@ -999,15 +990,6 @@ manage_files_pattern(virtd_lxc_t, virtd_lxc_runtime_t, virtd_lxc_runtime_t)
+ manage_sock_files_pattern(virtd_lxc_t, virtd_lxc_runtime_t, virtd_lxc_runtime_t)
+ files_runtime_filetrans(virtd_lxc_t, virtd_lxc_runtime_t, { file dir })
+ 
+-manage_dirs_pattern(virtd_lxc_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_files_pattern(virtd_lxc_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_chr_files_pattern(virtd_lxc_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_lnk_files_pattern(virtd_lxc_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_sock_files_pattern(virtd_lxc_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_fifo_files_pattern(virtd_lxc_t, svirt_lxc_file_t, svirt_lxc_file_t)
+-allow virtd_lxc_t svirt_lxc_file_t:dir_file_class_set { relabelto relabelfrom };
+-allow virtd_lxc_t svirt_lxc_file_t:filesystem { relabelto relabelfrom };
+-
+ storage_manage_fixed_disk(virtd_lxc_t)
+ 
+ kernel_read_all_sysctls(virtd_lxc_t)
+@@ -1025,7 +1007,6 @@ dev_read_urand(virtd_lxc_t)
+ 
+ domain_use_interactive_fds(virtd_lxc_t)
+ 
+-files_associate_rootfs(svirt_lxc_file_t)
+ files_search_all(virtd_lxc_t)
+ files_getattr_all_files(virtd_lxc_t)
+ files_read_usr_files(virtd_lxc_t)
+@@ -1033,7 +1014,6 @@ files_relabel_rootfs(virtd_lxc_t)
+ files_mounton_non_security(virtd_lxc_t)
+ files_mount_all_file_type_fs(virtd_lxc_t)
+ files_unmount_all_file_type_fs(virtd_lxc_t)
+-files_root_filetrans(virtd_lxc_t, svirt_lxc_file_t, dir_file_class_set)
+ 
+ fs_getattr_all_fs(virtd_lxc_t)
+ fs_manage_tmpfs_dirs(virtd_lxc_t)
+@@ -1072,157 +1052,18 @@ seutil_read_default_contexts(virtd_lxc_t)
+ 
+ sysnet_domtrans_ifconfig(virtd_lxc_t)
+ 
+-########################################
+-#
+-# Common virt lxc domain local policy
+-#
+-
+-allow svirt_lxc_domain self:capability { dac_override kill setgid setuid sys_boot };
+-allow svirt_lxc_domain self:process { execstack execmem getattr signal_perms getsched setsched setcap setpgid };
+-allow svirt_lxc_domain self:fifo_file manage_fifo_file_perms;
+-allow svirt_lxc_domain self:sem create_sem_perms;
+-allow svirt_lxc_domain self:shm create_shm_perms;
+-allow svirt_lxc_domain self:msgq create_msgq_perms;
+-allow svirt_lxc_domain self:unix_stream_socket { create_stream_socket_perms connectto };
+-allow svirt_lxc_domain self:unix_dgram_socket { sendto create_socket_perms };
+-
+-allow svirt_lxc_domain virtd_lxc_t:fd use;
+-allow svirt_lxc_domain virtd_lxc_t:fifo_file rw_fifo_file_perms;
+-allow svirt_lxc_domain virtd_lxc_t:process sigchld;
+-
+-allow svirt_lxc_domain virtd_lxc_t:unix_stream_socket { connectto rw_socket_perms };
+-
+-allow svirt_lxc_domain virsh_t:fd use;
+-allow svirt_lxc_domain virsh_t:fifo_file rw_fifo_file_perms;
+-allow svirt_lxc_domain virsh_t:process sigchld;
+-
+-allow svirt_lxc_domain virtd_lxc_runtime_t:dir list_dir_perms;
+-allow svirt_lxc_domain virtd_lxc_runtime_t:file read_file_perms;
+-
+-manage_dirs_pattern(svirt_lxc_domain, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_files_pattern(svirt_lxc_domain, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_lnk_files_pattern(svirt_lxc_domain, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_sock_files_pattern(svirt_lxc_domain, svirt_lxc_file_t, svirt_lxc_file_t)
+-manage_fifo_files_pattern(svirt_lxc_domain, svirt_lxc_file_t, svirt_lxc_file_t)
+-rw_chr_files_pattern(svirt_lxc_domain, svirt_lxc_file_t, svirt_lxc_file_t)
+-rw_blk_files_pattern(svirt_lxc_domain, svirt_lxc_file_t, svirt_lxc_file_t)
+-
+-allow svirt_lxc_net_t svirt_lxc_file_t:dir mounton;
+-allow svirt_lxc_net_t svirt_lxc_file_t:filesystem getattr;
+-
+-can_exec(svirt_lxc_domain, svirt_lxc_file_t)
+-
+-kernel_getattr_proc(svirt_lxc_domain)
+-kernel_list_all_proc(svirt_lxc_domain)
+-kernel_read_kernel_sysctls(svirt_lxc_domain)
+-kernel_rw_net_sysctls(svirt_lxc_domain)
+-kernel_read_system_state(svirt_lxc_domain)
+-kernel_dontaudit_search_kernel_sysctl(svirt_lxc_domain)
+-
+-corecmd_exec_all_executables(svirt_lxc_domain)
+-
+-files_dontaudit_getattr_all_dirs(svirt_lxc_domain)
+-files_dontaudit_getattr_all_files(svirt_lxc_domain)
+-files_dontaudit_getattr_all_symlinks(svirt_lxc_domain)
+-files_dontaudit_getattr_all_pipes(svirt_lxc_domain)
+-files_dontaudit_getattr_all_sockets(svirt_lxc_domain)
+-files_dontaudit_list_all_mountpoints(svirt_lxc_domain)
+-files_dontaudit_write_etc_runtime_files(svirt_lxc_domain)
+-# files_entrypoint_all_files(svirt_lxc_domain)
+-files_list_var(svirt_lxc_domain)
+-files_list_var_lib(svirt_lxc_domain)
+-files_search_all(svirt_lxc_domain)
+-files_read_config_files(svirt_lxc_domain)
+-files_read_usr_files(svirt_lxc_domain)
+-files_read_usr_symlinks(svirt_lxc_domain)
+-
+-fs_getattr_all_fs(svirt_lxc_domain)
+-fs_list_inotifyfs(svirt_lxc_domain)
+-
+-# fs_rw_inherited_tmpfs_files(svirt_lxc_domain)
+-# fs_rw_inherited_cifs_files(svirt_lxc_domain)
+-# fs_rw_inherited_noxattr_fs_files(svirt_lxc_domain)
+-
+-auth_dontaudit_read_login_records(svirt_lxc_domain)
+-auth_dontaudit_write_login_records(svirt_lxc_domain)
+-auth_search_pam_console_data(svirt_lxc_domain)
+-
+-clock_read_adjtime(svirt_lxc_domain)
+-
+-init_read_utmp(svirt_lxc_domain)
+-init_dontaudit_write_utmp(svirt_lxc_domain)
+-
+-libs_dontaudit_setattr_lib_files(svirt_lxc_domain)
+-
+-miscfiles_read_localization(svirt_lxc_domain)
+-miscfiles_dontaudit_setattr_fonts_cache_dirs(svirt_lxc_domain)
+-miscfiles_read_fonts(svirt_lxc_domain)
+-
+-mta_dontaudit_read_spool_symlinks(svirt_lxc_domain)
+-
+-optional_policy(`
+-	udev_read_runtime_files(svirt_lxc_domain)
+-')
+-
+-optional_policy(`
+-	apache_exec_modules(svirt_lxc_domain)
+-	apache_read_sys_content(svirt_lxc_domain)
+-')
+-
+-########################################
+-#
+-# Lxc net local policy
+-#
+-
+-allow svirt_lxc_net_t self:capability { chown dac_override dac_read_search fowner fsetid net_admin net_raw setpcap sys_admin sys_nice sys_ptrace sys_resource };
+-dontaudit svirt_lxc_net_t self:capability2 block_suspend;
+-allow svirt_lxc_net_t self:process setrlimit;
+-allow svirt_lxc_net_t self:tcp_socket { accept listen };
+-allow svirt_lxc_net_t self:netlink_route_socket nlmsg_write;
+-allow svirt_lxc_net_t self:packet_socket create_socket_perms;
+-allow svirt_lxc_net_t self:socket create_socket_perms;
+-allow svirt_lxc_net_t self:rawip_socket create_socket_perms;
+-allow svirt_lxc_net_t self:netlink_socket create_socket_perms;
+-allow svirt_lxc_net_t self:netlink_tcpdiag_socket create_socket_perms;
+-allow svirt_lxc_net_t self:netlink_kobject_uevent_socket create_socket_perms;
+-
+-kernel_read_network_state(svirt_lxc_net_t)
+-kernel_read_irq_sysctls(svirt_lxc_net_t)
+-
+-corenet_all_recvfrom_netlabel(svirt_lxc_net_t)
+-corenet_tcp_sendrecv_generic_if(svirt_lxc_net_t)
+-corenet_udp_sendrecv_generic_if(svirt_lxc_net_t)
+-corenet_tcp_sendrecv_generic_node(svirt_lxc_net_t)
+-corenet_udp_sendrecv_generic_node(svirt_lxc_net_t)
+-corenet_tcp_bind_generic_node(svirt_lxc_net_t)
+-corenet_udp_bind_generic_node(svirt_lxc_net_t)
+-
+-corenet_sendrecv_all_server_packets(svirt_lxc_net_t)
+-corenet_udp_bind_all_ports(svirt_lxc_net_t)
+-corenet_tcp_bind_all_ports(svirt_lxc_net_t)
+-
+-corenet_sendrecv_all_client_packets(svirt_lxc_net_t)
+-corenet_tcp_connect_all_ports(svirt_lxc_net_t)
+-
+-dev_getattr_mtrr_dev(svirt_lxc_net_t)
+-dev_read_rand(svirt_lxc_net_t)
+-dev_read_sysfs(svirt_lxc_net_t)
+-dev_read_urand(svirt_lxc_net_t)
+-
+-files_read_kernel_modules(svirt_lxc_net_t)
+-
+-fs_mount_cgroup(svirt_lxc_net_t)
+-fs_manage_cgroup_dirs(svirt_lxc_net_t)
+-fs_rw_cgroup_files(svirt_lxc_net_t)
+-
+-auth_use_nsswitch(svirt_lxc_net_t)
+-
+-logging_send_audit_msgs(svirt_lxc_net_t)
+-
+-userdom_use_user_ptys(svirt_lxc_net_t)
+-
+ optional_policy(`
+-	rpm_read_db(svirt_lxc_net_t)
++	container_manage_all_containers(virtd_lxc_t)
++	container_file_root_filetrans(virtd_lxc_t)
++
++	container_manage_dirs(virtd_lxc_t)
++	container_manage_files(virtd_lxc_t)
++	container_manage_chr_files(virtd_lxc_t)
++	container_manage_lnk_files(virtd_lxc_t)
++	container_manage_sock_files(virtd_lxc_t)
++	container_manage_fifo_files(virtd_lxc_t)
++	container_relabel_all_content(virtd_lxc_t)
++	container_relabel_fs(virtd_lxc_t)
+ ')
+ 
+ #######################################
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 04a0d01d7..fda2faca5 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -922,6 +922,24 @@ interface(`init_sigchld',`
+ 	allow $1 init_t:process sigchld;
+ ')
+ 
++########################################
++## <summary>
++##	Set the nice level of init.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_setsched',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:process setsched;
++')
++
+ ########################################
+ ## <summary>
+ ##	Connect to init with a unix socket.
+@@ -1317,6 +1335,25 @@ interface(`init_dbus_chat',`
+ 	allow init_t $1:dbus send_msg;
+ ')
+ 
++########################################
++## <summary>
++## 	Run init BPF programs.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_run_bpf',`
++	gen_require(`
++		type init_t;
++		class bpf prog_run;
++	')
++
++	allow $1 init_t:bpf prog_run;
++')
++
+ ########################################
+ ## <summary>
+ ##      read/follow symlinks under /var/lib/systemd/
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index b855e262c..01a0eb786 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -258,6 +258,10 @@ ifdef(`init_systemd',`
+ 	allow init_t self:bpf { map_create map_read map_write prog_load prog_run };
+ 	dontaudit init_t self:process { dyntransition setcurrent };
+ 
++	# manage the capabilities granted to namespace processes
++	allow init_t self:cap_userns { audit_write chown dac_override dac_read_search fowner fsetid ipc_lock ipc_owner kill lease linux_immutable mknod net_admin net_bind_service net_raw setfcap setgid setpcap setuid sys_admin sys_boot sys_chroot sys_module sys_nice sys_pacct sys_ptrace sys_rawio sys_resource sys_time sys_tty_config };
++	allow init_t self:cap2_userns { audit_read bpf block_suspend mac_admin mac_override perfmon syslog wake_alarm };
++
+ 	allow init_t init_mountpoint_type:dir_file_class_set { getattr mounton };
+ 
+ 	allow init_t init_path_unit_loc_type:{ dir file } { getattr watch };
+@@ -292,6 +296,10 @@ ifdef(`init_systemd',`
+ 
+ 	allow daemon init_t:unix_stream_socket { append write read getattr ioctl };
+ 
++	# systemd must be able to renice processes in other
++	# slices when containers are started and stopped
++	domain_setpriority_all_domains(init_t)
++
+ 	allow init_t init_runtime_t:{ dir file } watch;
+ 	manage_files_pattern(init_t, init_runtime_t, init_runtime_t)
+ 	manage_lnk_files_pattern(init_t, init_runtime_t, init_runtime_t)
+diff --git a/policy/modules/system/iptables.te b/policy/modules/system/iptables.te
+index 0f163d016..294f7bcf5 100644
+--- a/policy/modules/system/iptables.te
++++ b/policy/modules/system/iptables.te
+@@ -35,6 +35,7 @@ init_unit_file(iptables_unit_t)
+ 
+ allow iptables_t self:capability { dac_override dac_read_search net_admin net_raw };
+ dontaudit iptables_t self:capability sys_tty_config;
++allow iptables_t self:cap_userns { net_admin net_raw };
+ allow iptables_t self:fifo_file rw_fifo_file_perms;
+ allow iptables_t self:process { sigchld sigkill sigstop signull signal };
+ allow iptables_t self:netlink_socket create_socket_perms;
+@@ -103,6 +104,11 @@ ifdef(`hide_broken_symptoms',`
+ 	dev_dontaudit_write_mtrr(iptables_t)
+ ')
+ 
++optional_policy(`
++	# iptables may try to rw /ptmx in a container
++	container_dontaudit_rw_chr_files(iptables_t)
++')
++
+ optional_policy(`
+ 	fail2ban_append_log(iptables_t)
+ ')
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 094c24d6d..768aba5bd 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -381,6 +381,7 @@ optional_policy(`
+ # cjp: why net_admin!
+ allow syslogd_t self:capability { chown dac_override fsetid net_admin setgid setuid sys_admin sys_nice sys_resource sys_tty_config };
+ dontaudit syslogd_t self:capability { sys_ptrace };
++dontaudit syslogd_t self:cap_userns { kill sys_ptrace };
+ # setpgid for metalog
+ # setrlimit for syslog-ng
+ # getsched for syslog-ng
+diff --git a/policy/modules/system/miscfiles.te b/policy/modules/system/miscfiles.te
+index 31e4737e1..5226b3ab8 100644
+--- a/policy/modules/system/miscfiles.te
++++ b/policy/modules/system/miscfiles.te
+@@ -36,6 +36,10 @@ files_type(hwdata_t)
+ type locale_t;
+ files_type(locale_t)
+ 
++optional_policy(`
++	container_mountpoint(locale_t)
++')
++
+ #
+ # man_t is the type for the man directories.
+ #
+diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
+index 5ea77a37b..3e59531ff 100644
+--- a/policy/modules/system/mount.te
++++ b/policy/modules/system/mount.te
+@@ -42,7 +42,7 @@ application_domain(unconfined_mount_t, mount_exec_t)
+ #
+ 
+ # setuid/setgid needed to mount cifs
+-allow mount_t self:capability { chown dac_override ipc_lock setgid setuid sys_admin sys_rawio sys_tty_config };
++allow mount_t self:capability { chown dac_override dac_read_search ipc_lock setgid setuid sys_admin sys_rawio sys_tty_config };
+ 
+ allow mount_t mount_tmp_t:file manage_file_perms;
+ allow mount_t mount_tmp_t:dir manage_dir_perms;
+@@ -202,6 +202,10 @@ optional_policy(`
+ 	')
+ ')
+ 
++optional_policy(`
++	container_getattr_fs(mount_t)
++')
++
+ optional_policy(`
+ 	modutils_read_module_deps(mount_t)
+ ')
+diff --git a/policy/modules/system/raid.te b/policy/modules/system/raid.te
+index 14ba49084..6dd652a8c 100644
+--- a/policy/modules/system/raid.te
++++ b/policy/modules/system/raid.te
+@@ -29,6 +29,7 @@ init_unit_file(mdadm_unit_t)
+ 
+ allow mdadm_t self:capability { dac_override ipc_lock sys_admin };
+ dontaudit mdadm_t self:capability sys_tty_config;
++dontaudit mdadm_t self:cap_userns sys_ptrace;
+ allow mdadm_t self:process { getsched setsched signal_perms };
+ allow mdadm_t self:fifo_file rw_fifo_file_perms;
+ allow mdadm_t self:netlink_kobject_uevent_socket create_socket_perms;
+diff --git a/policy/modules/system/sysnetwork.if b/policy/modules/system/sysnetwork.if
+index 8664a67c8..ceee0362b 100644
+--- a/policy/modules/system/sysnetwork.if
++++ b/policy/modules/system/sysnetwork.if
+@@ -718,6 +718,62 @@ interface(`sysnet_signull_ifconfig',`
+ 	allow $1 ifconfig_t:process signull;
+ ')
+ 
++########################################
++## <summary>
++##	Create the /run/netns directory with
++##	an automatic type transition.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`sysnet_create_netns_dirs',`
++	gen_require(`
++		type ifconfig_runtime_t;
++	')
++
++	files_runtime_filetrans($1, ifconfig_runtime_t, dir, "netns")
++')
++
++########################################
++## <summary>
++##	Create an object in the /run/netns
++##	directory with a private type.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="private type">
++##	<summary>
++##	The type of the object to be created.
++##	</summary>
++## </param>
++## <param name="object">
++##	<summary>
++##	The object class of the object being created.
++##	</summary>
++## </param>
++## <param name="name" optional="true">
++##	<summary>
++##	The name of the object being created.
++##	</summary>
++## </param>
++#
++interface(`sysnet_netns_filetrans',`
++	gen_require(`
++		type ifconfig_runtime_t;
++	')
++
++	search_dirs_pattern($1, ifconfig_runtime_t, ifconfig_runtime_t)
++
++	allow $1 ifconfig_runtime_t:dir create_dir_perms;
++	filetrans_pattern($1, ifconfig_runtime_t, $2, $3, $4)
++')
++
+ ########################################
+ ## <summary>
+ ##	Read the DHCP configuration files.
+diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
+index 4b576e87c..f59b0e30c 100644
+--- a/policy/modules/system/sysnetwork.te
++++ b/policy/modules/system/sysnetwork.te
+@@ -46,6 +46,10 @@ role system_r types ifconfig_t;
+ type ifconfig_runtime_t;
+ files_runtime_file(ifconfig_runtime_t)
+ 
++optional_policy(`
++	container_mountpoint(ifconfig_runtime_t)
++')
++
+ type net_conf_t;
+ files_type(net_conf_t)
+ 
+@@ -62,6 +66,7 @@ dontaudit dhcpc_t self:capability { sys_ptrace sys_tty_config };
+ # for access("/etc/bashrc", X_OK) on Red Hat
+ dontaudit dhcpc_t self:capability { dac_read_search sys_module };
+ allow dhcpc_t self:process { getsched getcap setcap setfscreate ptrace signal_perms };
++allow dhcpc_t self:cap_userns { net_bind_service };
+ 
+ allow dhcpc_t self:fifo_file rw_fifo_file_perms;
+ allow dhcpc_t self:tcp_socket create_stream_socket_perms;
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index 3f4bd451d..e68a9b443 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -96,6 +96,14 @@ template(`systemd_role_template',`
+ 	init_linkable_keyring($1_systemd_t)
+ 	init_list_unit_dirs($1_systemd_t)
+ 	init_read_generic_units_files($1_systemd_t)
++	# container engines will move container processes to different slices
++	init_dbus_chat($1_systemd_t)
++
++	# the user@.service unit is restarted when containers are created
++	systemd_start_user_manager_units($1_systemd_t)
++	systemd_stop_user_manager_units($1_systemd_t)
++	systemd_reload_user_manager_units($1_systemd_t)
++	systemd_status_user_manager_units($1_systemd_t)
+ 
+ 	miscfiles_watch_localization($1_systemd_t)
+ 
+@@ -116,6 +124,9 @@ template(`systemd_role_template',`
+ 
+ 	dbus_system_bus_client($1_systemd_t)
+ 	dbus_spec_session_bus_client($1, $1_systemd_t)
++	dbus_connect_spec_session_bus($1, $1_systemd_t)
++
++	userdom_exec_user_bin_files($1_systemd_t)
+ 
+ 	# userdomain rules
+ 	allow $3 $1_systemd_t:process signal;
+@@ -246,6 +257,35 @@ interface(`systemd_user_unix_stream_activated_socket',`
+ 	systemd_user_activated_sock_file($2)
+ ')
+ 
++######################################
++## <summary>
++##	Allow the target domain the permissions necessary
++##	to use systemd notify when started by the specified
++##	systemd user instance.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	Prefix for the user domain.
++##	</summary>
++## </param>
++## <param name="domain">
++##	<summary>
++##	Domain to be allowed systemd notify permissions.
++##	</summary>
++## </param>
++#
++template(`systemd_user_send_systemd_notify',`
++	gen_require(`
++		type $1_systemd_t;
++		type systemd_user_runtime_notify_t;
++	')
++
++	systemd_search_user_runtime($2)
++	allow $2 systemd_user_runtime_notify_t:sock_file rw_sock_file_perms;
++
++	allow $2 $1_systemd_t:unix_dgram_socket sendto;
++')
++
+ ######################################
+ ## <summary>
+ ##   Allow the target domain to be monitored and have its output
+@@ -278,7 +318,7 @@ template(`systemd_user_app_status',`
+ 	ps_process_pattern($1_systemd_t, $2)
+ 	allow $1_systemd_t $2:process signal_perms;
+ 	allow $2 $1_systemd_t:fd use;
+-	allow $2 $1_systemd_t:unix_stream_socket rw_socket_perms;
++	allow $2 $1_systemd_t:unix_stream_socket rw_stream_socket_perms;
+ 
+ 	# apps run by systemd --user instances need to be able to read the
+ 	# state of the systemd --user instance
+@@ -286,6 +326,128 @@ template(`systemd_user_app_status',`
+ 	allow $2 $1_systemd_t:process sigchld;
+ ')
+ 
++########################################
++## <summary>
++##	Read the process state (/proc/pid) of
++##	the specified systemd user instance.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	Prefix for the user domain.
++##	</summary>
++## </param>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++template(`systemd_read_user_manager_state',`
++	gen_require(`
++		type $1_systemd_t;
++	')
++
++	ps_process_pattern($2, $1_systemd_t)
++')
++
++########################################
++## <summary>
++##	Send a start request to the specified
++##	systemd user instance system object.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	Prefix for the user domain.
++##	</summary>
++## </param>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++template(`systemd_user_manager_system_start',`
++	gen_require(`
++		type $1_systemd_t;
++	')
++
++	allow $2 $1_systemd_t:system start;
++')
++
++########################################
++## <summary>
++##	Send a stop request to the specified
++##	systemd user instance system object.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	Prefix for the user domain.
++##	</summary>
++## </param>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++template(`systemd_user_manager_system_stop',`
++	gen_require(`
++		type $1_systemd_t;
++	')
++
++	allow $2 $1_systemd_t:system stop;
++')
++
++########################################
++## <summary>
++##	Get the status of the specified
++##	systemd user instance system object.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	Prefix for the user domain.
++##	</summary>
++## </param>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++template(`systemd_user_manager_system_status',`
++	gen_require(`
++		type $1_systemd_t;
++	')
++
++	allow $2 $1_systemd_t:system status;
++')
++
++########################################
++## <summary>
++##	Send and receive messages from the
++##	specified systemd user instance over dbus.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	Prefix for the user domain.
++##	</summary>
++## </param>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++template(`systemd_user_manager_dbus_chat',`
++	gen_require(`
++		type $1_systemd_t;
++		class dbus send_msg;
++	')
++
++	allow $2 $1_systemd_t:dbus send_msg;
++	allow $1_systemd_t $2:dbus send_msg;
++')
++
+ ######################################
+ ## <summary>
+ ##   Allow the specified domain to search systemd config home
+@@ -463,6 +625,25 @@ interface(`systemd_read_user_runtime_lnk_files',`
+ 	read_lnk_files_pattern($1, systemd_user_runtime_t, systemd_user_runtime_t)
+ ')
+ 
++######################################
++## <summary>
++##	Allow the specified domain to write to
++##	the systemd user runtime named socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_write_user_runtime_socket',`
++	gen_require(`
++		type systemd_user_runtime_t;
++	')
++
++	allow $1 systemd_user_runtime_t:sock_file write;
++')
++
+ ######################################
+ ## <summary>
+ ##   Allow the specified domain to read system-wide systemd
+@@ -1110,6 +1291,27 @@ interface(`systemd_connect_machined',`
+ 	allow $1 systemd_machined_t:unix_stream_socket connectto;
+ ')
+ 
++########################################
++## <summary>
++##   Send and receive messages from
++##   systemd machined over dbus.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_dbus_chat_machined',`
++	gen_require(`
++		type systemd_machined_t;
++		class dbus send_msg;
++	')
++
++	allow $1 systemd_machined_t:dbus send_msg;
++	allow systemd_machined_t $1:dbus send_msg;
++')
++
+ ########################################
+ ## <summary>
+ ##   Send and receive messages from
+@@ -1633,6 +1835,86 @@ interface(`systemd_read_logind_state',`
+ 	allow systemd_logind_t $1:file read_file_perms;
+ ')
+ 
++########################################
++## <summary>
++##	Allow the specified domain to start systemd
++##	user manager units (systemd --user).
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_start_user_manager_units',`
++	gen_require(`
++		type systemd_user_manager_unit_t;
++		class service start;
++	')
++
++	allow $1 systemd_user_manager_unit_t:service start;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to stop systemd
++##	user manager units (systemd --user).
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_stop_user_manager_units',`
++	gen_require(`
++		type systemd_user_manager_unit_t;
++		class service stop;
++	')
++
++	allow $1 systemd_user_manager_unit_t:service stop;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to reload systemd
++##	user manager units (systemd --user).
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_reload_user_manager_units',`
++	gen_require(`
++		type systemd_user_manager_unit_t;
++		class service reload;
++	')
++
++	allow $1 systemd_user_manager_unit_t:service reload;
++')
++
++########################################
++## <summary>
++##	Get the status of systemd user manager
++##	units (systemd --user).
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_status_user_manager_units',`
++	gen_require(`
++		type systemd_user_manager_unit_t;
++		class service status;
++	')
++
++	allow $1 systemd_user_manager_unit_t:service status;
++')
++
+ ########################################
+ ## <summary>
+ ##	Allow specified domain to start power units
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 8d7a3d485..d79b7b759 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -296,6 +296,9 @@ init_system_domain(systemd_update_done_t, systemd_update_done_exec_t)
+ type systemd_update_run_t;
+ files_type(systemd_update_run_t)
+ 
++type systemd_user_manager_unit_t;
++init_unit_file(systemd_user_manager_unit_t)
++
+ type systemd_conf_home_t;
+ init_unit_file(systemd_conf_home_t)
+ xdg_config_content(systemd_conf_home_t)
+@@ -417,6 +420,7 @@ ifdef(`enable_mls',`
+ 
+ allow systemd_coredump_t self:unix_dgram_socket { create write connect getopt setopt };
+ allow systemd_coredump_t self:capability { setgid setuid setpcap };
++allow systemd_coredump_t self:cap_userns sys_ptrace;
+ allow systemd_coredump_t self:process { getcap setcap setfscreate };
+ 
+ manage_files_pattern(systemd_coredump_t, systemd_coredump_var_lib_t, systemd_coredump_var_lib_t)
+@@ -929,6 +933,7 @@ optional_policy(`
+ #
+ 
+ allow systemd_machined_t self:capability { setgid sys_chroot sys_ptrace };
++allow systemd_machined_t self:cap_userns sys_chroot;
+ allow systemd_machined_t self:process setfscreate;
+ allow systemd_machined_t self:unix_dgram_socket { connected_socket_perms connect };
+ 
+@@ -1128,7 +1133,7 @@ kernel_mount_proc(systemd_nspawn_t)
+ kernel_mounton_sysctl_dirs(systemd_nspawn_t)
+ kernel_mounton_kernel_sysctl_files(systemd_nspawn_t)
+ kernel_mounton_message_if(systemd_nspawn_t)
+-kernel_mounton_proc(systemd_nspawn_t)
++kernel_mounton_proc_dirs(systemd_nspawn_t)
+ kernel_read_kernel_sysctls(systemd_nspawn_t)
+ kernel_read_system_state(systemd_nspawn_t)
+ kernel_remount_proc(systemd_nspawn_t)
+diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
+index a139cfe78..d0e61c28a 100644
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -41,6 +41,10 @@ interface(`unconfined_domain_noaudit',`
+ 	allow $1 self:{ capability2 cap2_userns } { syslog wake_alarm };
+ 	allow $1 self:fifo_file manage_fifo_file_perms;
+ 
++	# Manage most namespace capabilities
++	allow $1 self:cap_userns { audit_write chown dac_override dac_read_search fowner fsetid ipc_lock ipc_owner kill lease linux_immutable mknod net_admin net_bind_service net_raw setfcap setgid setpcap setuid sys_admin sys_boot sys_chroot sys_module sys_nice sys_pacct sys_ptrace sys_rawio sys_resource sys_time sys_tty_config };
++	allow $1 self:cap2_userns { audit_read bpf block_suspend mac_admin mac_override perfmon syslog wake_alarm };
++
+ 	# Transition to myself, to make get_ordered_context_list happy.
+ 	allow $1 self:process transition;
+ 
+diff --git a/policy/modules/system/unconfined.te b/policy/modules/system/unconfined.te
+index ca614a92e..8ecc6f731 100644
+--- a/policy/modules/system/unconfined.te
++++ b/policy/modules/system/unconfined.te
+@@ -80,6 +80,10 @@ optional_policy(`
+ 	bootloader_run(unconfined_t, unconfined_r)
+ ')
+ 
++optional_policy(`
++	container_user_role(unconfined, unconfined_t, unconfined_application_exec_domain, unconfined_r)
++')
++
+ optional_policy(`
+ 	cron_unconfined_role(unconfined, unconfined_t, unconfined_application_exec_domain, unconfined_r)
+ ')
+diff --git a/policy/modules/system/userdomain.fc b/policy/modules/system/userdomain.fc
+index 70b830585..173e314af 100644
+--- a/policy/modules/system/userdomain.fc
++++ b/policy/modules/system/userdomain.fc
+@@ -1,5 +1,7 @@
+ HOME_DIR	-d	gen_context(system_u:object_r:user_home_dir_t,s0-mls_systemhigh)
+ HOME_DIR/.+		gen_context(system_u:object_r:user_home_t,s0)
++HOME_DIR/bin(/.*)?		gen_context(system_u:object_r:user_bin_t,s0)
++HOME_DIR/\.local/bin(/.*)?		gen_context(system_u:object_r:user_bin_t,s0)
+ HOME_DIR/\.pki(/.*)?	gen_context(system_u:object_r:user_cert_t,s0)
+ 
+ /tmp/gconfd-%{USERNAME} -d	gen_context(system_u:object_r:user_tmp_t,s0)
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index ba30ecab3..dcf510185 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -376,7 +376,8 @@ interface(`userdom_ro_home_role',`
+ #
+ interface(`userdom_manage_home_role',`
+ 	gen_require(`
+-		type user_home_t, user_home_dir_t, user_cert_t;
++		type user_home_t, user_home_dir_t;
++		type user_bin_t, user_cert_t;
+ 	')
+ 
+ 	##############################
+@@ -410,6 +411,10 @@ interface(`userdom_manage_home_role',`
+ 	allow $2 user_home_t:sock_file { watch watch_mount watch_sb watch_with_perm watch_reads };
+ 	allow $2 user_home_t:fifo_file { watch watch_mount watch_sb watch_with_perm watch_reads };
+ 
++	userdom_manage_user_bin($2)
++	userdom_exec_user_bin_files($2)
++	userdom_user_home_dir_filetrans($2, user_bin_t, dir, "bin")
++
+ 	userdom_manage_user_certs($2)
+ 	userdom_user_home_dir_filetrans($2, user_cert_t, dir, ".pki")
+ 
+@@ -434,6 +439,10 @@ interface(`userdom_manage_home_role',`
+ 		fs_dontaudit_manage_cifs_dirs($2)
+ 		fs_dontaudit_manage_cifs_files($2)
+ 	')
++
++	optional_policy(`
++		xdg_data_filetrans($2, user_bin_t, dir, "bin")
++	')
+ ')
+ 
+ #######################################
+@@ -1331,6 +1340,7 @@ template(`userdom_admin_user_template',`
+ 	#
+ 
+ 	allow $1_t self:capability { chown dac_override dac_read_search fowner fsetid kill setgid setuid setpcap linux_immutable net_bind_service net_broadcast net_admin net_raw ipc_lock ipc_owner sys_rawio sys_chroot sys_ptrace sys_pacct sys_admin sys_boot sys_nice sys_resource sys_time sys_tty_config mknod lease setfcap };
++	allow $1_t self:cap_userns sys_ptrace;
+ 	allow $1_t self:process { setexec setfscreate };
+ 	allow $1_t self:netlink_audit_socket nlmsg_readpriv;
+ 	allow $1_t self:tun_socket create;
+@@ -2348,6 +2358,42 @@ interface(`userdom_delete_user_home_content_files',`
+ 	allow $1 user_home_t:file delete_file_perms;
+ ')
+ 
++########################################
++## <summary>
++##	Relabel generic user home dirs.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_relabel_generic_user_home_dirs',`
++	gen_require(`
++		type user_home_t;
++	')
++
++	allow $1 user_home_t:dir relabel_dir_perms;
++')
++
++########################################
++## <summary>
++##	Relabel generic user home files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_relabel_generic_user_home_files',`
++	gen_require(`
++		type user_home_t;
++	')
++
++	allow $1 user_home_t:file relabel_file_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Do not audit attempts to relabel user home files.
+@@ -2706,6 +2752,47 @@ interface(`userdom_user_home_dir_filetrans_user_home_content',`
+ 	files_search_home($1)
+ ')
+ 
++########################################
++## <summary>
++##	Execute user executable files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_exec_user_bin_files',`
++	gen_require(`
++		type user_bin_t;
++	')
++
++	exec_files_pattern($1, user_bin_t, user_bin_t)
++	read_lnk_files_pattern($1, user_bin_t, user_bin_t)
++	files_search_home($1)
++')
++
++########################################
++## <summary>
++##	Manage user executable files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`userdom_manage_user_bin',`
++	gen_require(`
++		type user_bin_t;
++	')
++
++	allow $1 user_bin_t:dir { manage_dir_perms relabel_dir_perms };
++	allow $1 user_bin_t:file { manage_file_perms relabel_file_perms };
++	allow $1 user_bin_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
++	files_search_home($1)
++')
++
+ ########################################
+ ## <summary>
+ ##	Read user SSL certificates.
+@@ -3425,6 +3512,25 @@ interface(`userdom_search_user_runtime_root',`
+ 	files_search_runtime($1)
+ ')
+ 
++########################################
++## <summary>
++##	Do not audit attempts to search
++##	user runtime root directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`userdom_dontaudit_search_user_runtime_root',`
++	gen_require(`
++		type user_runtime_root_t;
++	')
++
++	dontaudit $1 user_runtime_root_t:dir search;
++')
++
+ ########################################
+ ## <summary>
+ ##	Create, read, write, and delete user
+diff --git a/policy/modules/system/userdomain.te b/policy/modules/system/userdomain.te
+index cc7be15bc..6513a7ba2 100644
+--- a/policy/modules/system/userdomain.te
++++ b/policy/modules/system/userdomain.te
+@@ -95,6 +95,9 @@ files_associate_tmp(user_home_t)
+ files_poly_parent(user_home_t)
+ files_mountpoint(user_home_t)
+ 
++type user_bin_t;
++userdom_user_home_content(user_bin_t)
++
+ type user_cert_t;
+ userdom_user_home_content(user_cert_t)
+ 
+diff --git a/policy/modules/system/xdg.if b/policy/modules/system/xdg.if
+index 823042414..a3c2759b7 100644
+--- a/policy/modules/system/xdg.if
++++ b/policy/modules/system/xdg.if
+@@ -635,6 +635,24 @@ interface(`xdg_relabel_all_config',`
+ 	userdom_search_user_home_dirs($1)
+ ')
+ 
++########################################
++## <summary>
++##	Search through the xdg data home directories
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access
++##	</summary>
++## </param>
++#
++interface(`xdg_search_data_dirs',`
++	gen_require(`
++		type xdg_data_t;
++	')
++
++	allow $1 xdg_data_t:dir search_dir_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Watch the xdg data home directories
+-- 
+2.17.1
+
