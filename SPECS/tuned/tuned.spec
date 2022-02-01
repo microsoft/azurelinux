@@ -7,7 +7,7 @@
 Summary:      A dynamic adaptive system tuning daemon
 Name:         tuned
 Version:      2.15.0
-Release:      4%{?prerel1}%{?dist}
+Release:      4%{?dist}
 License:      GPLv2+
 Vendor:       Microsoft Corporation
 Distribution: Mariner
@@ -408,7 +408,7 @@ fi
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 2.15.0-4
-- Initial import into CBL Mariner (License: GPL+)
+- Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - License verified
 
 * Fri Aug 13 2021 Hernan Gatta <hegatta@microsoft.com> - 2.15.0-3

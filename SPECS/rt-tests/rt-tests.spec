@@ -105,7 +105,7 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-13
-- Initial import into CBL Mariner (License: GPLv2)
+- Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - License verified
 - Remove %%clean stage
 

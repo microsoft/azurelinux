@@ -42,8 +42,9 @@ fi
 
 %changelog
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.13-4
-- Initial import into CBL Mariner (License: GPL)
+- Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - Remove %%clean stage
+- License verified
 
 * Tue Mar 09 2021 Hernan Gatta <hegatta@microsoft.com> - 1.13-3
 - Initial import into ECF Mariner from CentOS 8 (License: GPL)

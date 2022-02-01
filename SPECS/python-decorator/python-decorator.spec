@@ -10,7 +10,7 @@
 Summary:        Module to simplify usage of decorators
 Name:           python-%{pypi_name}
 Version:        4.4.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 URL:            https://github.com/micheles/decorator
 Source0:        https://files.pythonhosted.org/packages/source/d/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -57,6 +57,10 @@ find %{buildroot} -name SOURCES.txt~ -exec rm -f {} \;
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Mon Jan 31 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.4.2-5
+- Move to SPECS
+- License verified
+
 * Wed Dec 09 2020 Steve Laughman <steve.laughman@microsoft.com> - 4.4.2-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.4.2-3
