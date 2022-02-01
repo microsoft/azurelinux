@@ -164,7 +164,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(scrubbed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
