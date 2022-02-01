@@ -12,7 +12,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/fedora-java/javapackages/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -24,7 +24,7 @@ Requires:       javapackages-tools = %{version}
 Requires:       javapackages-local = %{version}-%{release}
 Requires:       xmvn-minimal
 Requires:       xmvn-mojo
-#Requires:       xmvn-connector-aether
+Requires:       xmvn-connector-aether
 # Common Maven plugins required by almost every build. It wouldn't make
 # sense to explicitly require them in every package built with Maven.
 Requires:       mvn(org.apache.maven.plugins:maven-compiler-plugin)
@@ -70,6 +70,7 @@ Requires:       python3
 This package provides non-essential macros and scripts to support Java packaging.
 
 %files -n javapackages-local
+%license LICENSE
 
 %files -n maven-local
 
@@ -80,6 +81,7 @@ This package provides non-essential macros and scripts to support Java packaging
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Create javapackages-local-bootstrap without xmvn requires.
 - Add requires on upstream javapackages-tools.
+- License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
