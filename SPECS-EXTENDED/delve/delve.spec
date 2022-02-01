@@ -73,7 +73,7 @@ done
 
 %changelog
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.0-3
-- Initial CBL-Mariner import from CentOS 8 (license: MIT).
+- Initial CBL-Mariner import from CentOS 8 (license: GPLv2).
 - Adding missing BR on 'go-rpm-macros'.
 - Running with empty 'LDFLAGS' to fix the build.
 

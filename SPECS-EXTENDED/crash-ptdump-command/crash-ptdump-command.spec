@@ -45,7 +45,7 @@ cp %{_builddir}/ptdump-%{version}/ptdump.so %{buildroot}%{_libdir}/crash/extensi
 - License verified.
 
 * Sun Jul 25 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0.7-2
-- Initial CBL-Mariner import from CentOS 8 (license: MIT).
+- Initial CBL-Mariner import from CentOS 8 (license: GPLv2).
 - Modified spec to provide architecture arguments to make
 
 * Wed Jul 8 2020 Bhupesh Sharma <bhsharma@redhat.com> - 1.0.7-1

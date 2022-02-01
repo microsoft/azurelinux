@@ -88,7 +88,7 @@ make -f Makefile.rhnlib
 - License verified.
 
 * Fri Mar 05 2021 Henry Li <lihl@microsoft.com> 2.8.6-9
-- Initial CBL-Mariner import from CentOS 8 (license: MIT).
+- Initial CBL-Mariner import from CentOS 8 (license: GPLv2).
 - Fix distro condition checking to enable python3 build
 
 * Fri Jun 21 2019 Michael Mraka <michael.mraka@redhat.com> 2.8.6-8
