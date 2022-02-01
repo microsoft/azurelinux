@@ -151,7 +151,7 @@ Velocity+Turbine provides a template service that will allow web
 applications to be developed according to a true MVC model.
 
 %prep
-%setup -q
+%autosetup -p1
 # Remove all binary libs used in compiling the package.
 # Note that velocity has some jar files containing macros under
 # examples and test that should not be removed.
@@ -159,7 +159,6 @@ applications to be developed according to a true MVC model.
 for j in $(find . -name "*.jar" | grep -v /test/); do
     mv $j $j.no
 done
-%patch0 -b .sav0
 
 # Removing dependency on "avalong-logkit".
 rm src/java/org/apache/velocity/runtime/log/AvalonLogChute.java
