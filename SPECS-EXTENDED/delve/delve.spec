@@ -76,6 +76,7 @@ done
 - Initial CBL-Mariner import from CentOS 8 (license: GPLv2).
 - Adding missing BR on 'go-rpm-macros'.
 - Running with empty 'LDFLAGS' to fix the build.
+- License verified
 
 * Tue Nov 24 2020 David Benoit <dbenoit@redhat.com> - 1.5.0-2
 - Add golang-1.15.4 related patch

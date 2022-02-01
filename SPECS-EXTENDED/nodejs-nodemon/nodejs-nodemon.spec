@@ -81,6 +81,7 @@ npm run test
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.3-2
 - Initial CBL-Mariner import from CentOS 8 (license: GPLv2).
+- License verified
 
 * Fri May 01 2020 Honza Horak <hhorak@redhat.com> - 2.0.3-1
 - Update to 2.0.3
