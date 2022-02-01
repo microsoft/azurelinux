@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/fmtlib/%{name}
+URL:            https://github.com/fmtlib/%{name}/archive/refs/tags/%{version}.tar.gz
 #Source0:        %%{url}/archive/%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
