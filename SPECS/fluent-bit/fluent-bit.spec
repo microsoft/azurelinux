@@ -2,7 +2,7 @@
 
 Name:           fluent-bit
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
-Version:        1.5.2
+Version:        1.8.12
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
