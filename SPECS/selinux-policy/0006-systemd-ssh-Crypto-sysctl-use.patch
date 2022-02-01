@@ -9,7 +9,7 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/systemd.te | 2 ++
  2 files changed, 3 insertions(+)
 
-MSFT_TAG: pending
+MSFT_TAG: upstreamed
 
 diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
 index 4ae482c04..93bc985b4 100644

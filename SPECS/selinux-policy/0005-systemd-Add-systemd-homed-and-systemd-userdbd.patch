@@ -1,45 +1,33 @@
-From 051c3dc81c7d8ad1b9350ce1367f9499df1c42c4 Mon Sep 17 00:00:00 2001
+From 995d99c391b9b722916cd1cc536550a969bfa109 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Mon, 3 Jan 2022 20:12:14 +0000
-Subject: [PATCH 5/8] systemd: Add systemd-homed and systemd-userdbd.
+Subject: [PATCH 5/9] systemd: Add systemd-homed and systemd-userdbd.
 
 Systemd-homed does not completely work since the code does not label
 the filesystems it creates.
 
+systemd-userdbd partially derived from the Fedora policy.
+
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---
- policy/modules/admin/aide.te        |   4 +
  policy/modules/kernel/files.if      |  18 +++
  policy/modules/services/mta.if      |   1 +
- policy/modules/services/redis.te    |   4 +
  policy/modules/services/ssh.if      |   1 +
  policy/modules/system/fstools.if    |   1 +
- policy/modules/system/init.if       |  37 ++++++
+ policy/modules/system/init.if       |  18 +++
  policy/modules/system/init.te       |   1 +
  policy/modules/system/lvm.te        |   4 +
- policy/modules/system/systemd.fc    |   7 +-
- policy/modules/system/systemd.if    |  39 ++++--
+ policy/modules/system/systemd.fc    |  10 +-
+ policy/modules/system/systemd.if    |  38 ++++--
  policy/modules/system/systemd.te    | 194 +++++++++++++++++++++++++++-
  policy/modules/system/userdomain.if |   4 +
  policy/support/misc_patterns.spt    |  28 ++++
- 14 files changed, 330 insertions(+), 13 deletions(-)
+ 12 files changed, 305 insertions(+), 13 deletions(-)
 
-MSFT_TAG: pending
+MSFT_TAG: upstreamed
 
-diff --git a/policy/modules/admin/aide.te b/policy/modules/admin/aide.te
-index 29acc50d4..2c91f79dd 100644
---- a/policy/modules/admin/aide.te
-+++ b/policy/modules/admin/aide.te
-@@ -58,3 +58,7 @@ tunable_policy(`aide_mmap_files',`
- optional_policy(`
- 	seutil_use_newrole_fds(aide_t)
- ')
-+
-+optional_policy(`
-+	systemd_stream_connect_userdb(aide_t)
-+')
 diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
-index 495cbe2f4..d4be27094 100644
+index 495cbe2f4..e3c22b94a 100644
 --- a/policy/modules/kernel/files.if
 +++ b/policy/modules/kernel/files.if
 @@ -3849,6 +3849,24 @@ interface(`files_relabelfrom_home',`
@@ -57,11 +45,11 @@ index 495cbe2f4..d4be27094 100644
 +## </param>
 +#
 +interface(`files_watch_home',`
-+		gen_require(`
-+			type home_root_t;
-+		')
++	gen_require(`
++		type home_root_t;
++	')
 +
-+		allow $1 home_root_t:dir watch;
++	allow $1 home_root_t:dir watch;
 +')
 +
  ########################################
@@ -79,18 +67,6 @@ index 924039579..779c9a971 100644
  ')
 
  #######################################
-diff --git a/policy/modules/services/redis.te b/policy/modules/services/redis.te
-index 923caac7c..8395cf1da 100644
---- a/policy/modules/services/redis.te
-+++ b/policy/modules/services/redis.te
-@@ -72,3 +72,7 @@ miscfiles_read_generic_certs(redis_t)
- miscfiles_read_localization(redis_t)
-
- sysnet_dns_name_resolve(redis_t)
-+
-+optional_policy(`
-+	systemd_stream_connect_userdb(redis_t)
-+')
 diff --git a/policy/modules/services/ssh.if b/policy/modules/services/ssh.if
 index ae23e1995..b9ed26bc8 100644
 --- a/policy/modules/services/ssh.if
@@ -116,7 +92,7 @@ index 6ebe38003..f994965af 100644
 
  ########################################
 diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
-index 0171ee299..31330c0c6 100644
+index 0171ee299..04a0d01d7 100644
 --- a/policy/modules/system/init.if
 +++ b/policy/modules/system/init.if
 @@ -1096,6 +1096,24 @@ interface(`init_rw_stream_sockets',`
@@ -144,32 +120,6 @@ index 0171ee299..31330c0c6 100644
  ########################################
  ## <summary>
  ##	start service (systemd).
-@@ -1354,6 +1372,25 @@ interface(`init_relabel_var_lib_dirs',`
- 	allow $1 init_var_lib_t:dir relabel_dir_perms;
- ')
-
-+########################################
-+## <summary>
-+##	Read files in /var/lib/systemd.
-+## </summary>
-+## <param name="domain">
-+##	<summary>
-+##	Domain allowed access.
-+##	</summary>
-+## </param>
-+#
-+interface(`init_read_var_lib_files',`
-+		gen_require(`
-+			type init_var_lib_t;
-+		')
-+
-+		read_files_pattern($1, init_var_lib_t, init_var_lib_t)
-+		files_search_var_lib($1)
-+')
-+
- ########################################
- ## <summary>
- ##	Manage files in /var/lib/systemd/.
 diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
 index 6561e3d32..b855e262c 100644
 --- a/policy/modules/system/init.te
@@ -198,7 +148,7 @@ index dcb4f410e..1cf6e1753 100644
  	udev_read_runtime_files(lvm_t)
  ')
 diff --git a/policy/modules/system/systemd.fc b/policy/modules/system/systemd.fc
-index 34db8c034..a57efb058 100644
+index 34db8c034..84bdcb224 100644
 --- a/policy/modules/system/systemd.fc
 +++ b/policy/modules/system/systemd.fc
 @@ -29,6 +29,8 @@
@@ -206,7 +156,7 @@ index 34db8c034..a57efb058 100644
  /usr/lib/systemd/systemd-cgroups-agent	--	gen_context(system_u:object_r:systemd_cgroups_exec_t,s0)
  /usr/lib/systemd/systemd-coredump	--	gen_context(system_u:object_r:systemd_coredump_exec_t,s0)
 +/usr/lib/systemd/systemd-homed  	--	gen_context(system_u:object_r:systemd_homed_exec_t,s0)
-+/usr/lib/systemd/systemd-homework   --  gen_context(system_u:object_r:systemd_homed_exec_t,s0)
++/usr/lib/systemd/systemd-homework       --      gen_context(system_u:object_r:systemd_homework_exec_t,s0)
  /usr/lib/systemd/systemd-hostnamed	--	gen_context(system_u:object_r:systemd_hostnamed_exec_t,s0)
  /usr/lib/systemd/systemd-localed	--	gen_context(system_u:object_r:systemd_locale_exec_t,s0)
  /usr/lib/systemd/systemd-logind		--	gen_context(system_u:object_r:systemd_logind_exec_t,s0)
@@ -219,15 +169,29 @@ index 34db8c034..a57efb058 100644
 
  # Systemd unit files
  HOME_DIR/\.config/systemd(/.*)?		gen_context(system_u:object_r:systemd_conf_home_t,s0)
-@@ -62,6 +66,7 @@ HOME_DIR/\.local/share/systemd(/.*)?		gen_context(system_u:object_r:systemd_data
+@@ -62,6 +66,8 @@ HOME_DIR/\.local/share/systemd(/.*)?		gen_context(system_u:object_r:systemd_data
  /usr/lib/systemd/system/systemd-networkd.*		gen_context(system_u:object_r:systemd_networkd_unit_t,s0)
  /usr/lib/systemd/system/systemd-rfkill.*	--	gen_context(system_u:object_r:systemd_rfkill_unit_t,s0)
  /usr/lib/systemd/system/systemd-socket-proxyd\.service	--	gen_context(system_u:object_r:systemd_socket_proxyd_unit_file_t,s0)
 +/usr/lib/systemd/system/systemd-userdbd\.(service|socket)		--	gen_context(system_u:object_r:systemd_userdbd_unit_t,s0)
++/usr/lib/systemd/system/user@\.service	--	gen_context(system_u:object_r:systemd_user_manager_unit_t,s0)
 
  /usr/share/factory(/.*)?	gen_context(system_u:object_r:systemd_factory_conf_t,s0)
 
-@@ -89,7 +94,7 @@ HOME_DIR/\.local/share/systemd(/.*)?		gen_context(system_u:object_r:systemd_data
+@@ -69,6 +75,7 @@ HOME_DIR/\.local/share/systemd(/.*)?		gen_context(system_u:object_r:systemd_data
+
+ /var/lib/systemd/backlight(/.*)?	gen_context(system_u:object_r:systemd_backlight_var_lib_t,s0)
+ /var/lib/systemd/coredump(/.*)?	gen_context(system_u:object_r:systemd_coredump_var_lib_t,s0)
++/var/lib/systemd/home(/.*)?     gen_context(system_u:object_r:systemd_homed_var_lib_t,s0)
+ /var/lib/systemd/linger(/.*)?	gen_context(system_u:object_r:systemd_logind_var_lib_t,s0)
+ /var/lib/systemd/pstore(/.*)?	gen_context(system_u:object_r:systemd_pstore_var_lib_t,s0)
+ /var/lib/systemd/rfkill(/.*)?	gen_context(system_u:object_r:systemd_rfkill_var_lib_t,s0)
+@@ -85,11 +92,12 @@ HOME_DIR/\.local/share/systemd(/.*)?		gen_context(system_u:object_r:systemd_data
+
+ /run/systemd/ask-password(/.*)?	gen_context(system_u:object_r:systemd_passwd_runtime_t,s0)
+ /run/systemd/ask-password-block(/.*)?	gen_context(system_u:object_r:systemd_passwd_runtime_t,s0)
++/run/systemd/home(/.*)?         gen_context(system_u:object_r:systemd_homed_runtime_t,s0)
+ /run/systemd/resolve(/.*)?  gen_context(system_u:object_r:systemd_resolved_runtime_t,s0)
  /run/systemd/seats(/.*)?	gen_context(system_u:object_r:systemd_sessions_runtime_t,s0)
  /run/systemd/sessions(/.*)?	gen_context(system_u:object_r:systemd_sessions_runtime_t,s0)
  /run/systemd/users(/.*)?	gen_context(system_u:object_r:systemd_logind_runtime_t,s0)
@@ -237,7 +201,7 @@ index 34db8c034..a57efb058 100644
  /run/systemd/nspawn(/.*)?	gen_context(system_u:object_r:systemd_nspawn_runtime_t,s0)
  /run/systemd/machines(/.*)?	gen_context(system_u:object_r:systemd_machined_runtime_t,s0)
 diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
-index 38adf050c..c38519778 100644
+index 38adf050c..3f4bd451d 100644
 --- a/policy/modules/system/systemd.if
 +++ b/policy/modules/system/systemd.if
 @@ -682,6 +682,24 @@ interface(`systemd_PrivateDevices',`
@@ -291,7 +255,7 @@ index 38adf050c..c38519778 100644
  ')
 
  ########################################
-@@ -1046,12 +1064,13 @@ interface(`systemd_manage_userdb_runtime_sock_files', `
+@@ -1046,12 +1064,12 @@ interface(`systemd_manage_userdb_runtime_sock_files', `
  #
  interface(`systemd_stream_connect_userdb', `
  	gen_require(`
@@ -303,12 +267,11 @@ index 38adf050c..c38519778 100644
 -	allow $1 systemd_userdb_runtime_t:dir list_dir_perms;
 -	allow $1 systemd_userdb_runtime_t:sock_file write_sock_file_perms;
 +	allow $1 systemd_userdbd_runtime_t:dir list_dir_perms;
-+	allow $1 systemd_userdbd_runtime_t:sock_file write_sock_file_perms;
 +	stream_connect_pattern($1, systemd_userdbd_runtime_t, systemd_userdbd_runtime_t, systemd_userdbd_t)
  	init_unix_stream_socket_connectto($1)
  ')
 
-@@ -1202,7 +1221,7 @@ interface(`systemd_filetrans_passwd_runtime_dirs',`
+@@ -1202,7 +1220,7 @@ interface(`systemd_filetrans_passwd_runtime_dirs',`
 
  ########################################
  ## <summary>
@@ -317,7 +280,7 @@ index 38adf050c..c38519778 100644
  ##  creating the userdb directory inside an init runtime
  ##  directory.
  ## </summary>
-@@ -1214,10 +1233,10 @@ interface(`systemd_filetrans_passwd_runtime_dirs',`
+@@ -1214,10 +1232,10 @@ interface(`systemd_filetrans_passwd_runtime_dirs',`
  #
  interface(`systemd_filetrans_userdb_runtime_dirs', `
  	gen_require(`
@@ -331,7 +294,7 @@ index 38adf050c..c38519778 100644
 
  ######################################
 diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
-index 09874fcf0..bd061eadf 100644
+index 09874fcf0..40d452837 100644
 --- a/policy/modules/system/systemd.te
 +++ b/policy/modules/system/systemd.te
 @@ -115,6 +115,28 @@ typealias systemd_generator_t alias { systemd_fstab_generator_t systemd_gpt_gene
@@ -461,7 +424,7 @@ index 09874fcf0..bd061eadf 100644
 +dontaudit systemd_homework_t self:capability sys_resource;
 +allow systemd_homework_t self:key { search write };
 +allow systemd_homework_t self:process getsched;
-+allow systemd_homework_t self:sem create_sem_perms;;
++allow systemd_homework_t self:sem create_sem_perms;
 +
 +allow systemd_homework_t systemd_homed_runtime_t:file manage_file_perms;
 +allow systemd_homework_t systemd_homed_runtime_t:dir manage_dir_perms;
@@ -553,7 +516,7 @@ index 09874fcf0..bd061eadf 100644
 +manage_sock_files_pattern(systemd_userdbd_t, systemd_userdbd_runtime_t, systemd_userdbd_runtime_t)
 +init_runtime_filetrans(systemd_userdbd_t, systemd_userdbd_runtime_t, dir)
 +
-+can_exec(systemd_userdbd_t systemd_userdbd_exec_t)
++can_exec(systemd_userdbd_t, systemd_userdbd_exec_t)
 +
 +auth_read_shadow(systemd_userdbd_t)
 +auth_use_nsswitch(systemd_userdbd_t)
