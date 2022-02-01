@@ -1,7 +1,7 @@
-From 87c428427dc494c7c614ba26ba8b4bd9a9398464 Mon Sep 17 00:00:00 2001
+From a99e02ed5b3c19b57cc2ffedefae8a7baf597104 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Sep 2021 20:29:04 +0000
-Subject: Temporary fix for wrong audit log directory
+Subject: [PATCH 3/8] Temporary fix for wrong audit log directory
 
 ---
  policy/modules/system/logging.fc | 4 ++++

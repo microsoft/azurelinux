@@ -27315,8 +27315,8 @@
         "type": "other",
         "other": {
           "name": "selinux-policy",
-          "version": "2.20210203",
-          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20210203/refpolicy-2.20210203.tar.bz2"
+          "version": "2.20220106",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20220106/refpolicy-2.20220106.tar.bz2"
         }
       }
     },
