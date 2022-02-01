@@ -7461,8 +7461,8 @@
         "type": "other",
         "other": {
           "name": "inotify-tools",
-          "version": "3.14",
-          "downloadUrl": "https://github.com/downloads/rvoicilas/inotify-tools/inotify-tools-3.14.tar.gz"
+          "version": "3.22.1.0",
+          "downloadUrl": "https://github.com/inotify-tools/inotify-tools/archive/3.22.1.0/inotify-tools-3.22.1.0.tar.gz"
         }
       }
     },
