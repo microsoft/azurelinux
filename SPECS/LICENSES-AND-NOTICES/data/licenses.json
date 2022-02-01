@@ -21,6 +21,12 @@
                 "ceph"
             ]
         },
+        "Debian": {
+            "license": "[MIT](https://opensource.org/licenses/MIT)",
+            "specs": [
+                "prometheus-process-exporter"
+            ]
+        },
         "Fedora": {
             "license": "[Fedora MIT License Declaration](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#License_of_Fedora_SPEC_Files)",
             "specs": [
@@ -327,7 +333,6 @@
                 "gnu-efi",
                 "gnuplot",
                 "go-rpm-macros",
-                "prometheus-node-exporter",
                 "gom",
                 "google-api-python-client",
                 "google-crosextra-caladea-fonts",
@@ -1696,6 +1701,7 @@
                 "procmail",
                 "prometheus",
                 "prometheus-jmx-exporter",
+                "prometheus-node-exporter",
                 "prometheus-simpleclient-java",
                 "protobuf-java",
                 "ps_mem",
