@@ -30540,8 +30540,8 @@
         "type": "other",
         "other": {
           "name": "yaml-cpp",
-          "version": "0.6.2",
-          "downloadUrl": "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.2.tar.gz"
+          "version": "0.7.0",
+          "downloadUrl": "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.7.0.tar.gz"
         }
       }
     },
