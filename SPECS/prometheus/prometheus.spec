@@ -25,6 +25,7 @@ Source6:        %{name}-%{version}-vendor.tar.gz
 
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
+Patch1:         0001-Fixed-TestChunkDiskMapper_WriteChunk_Chunk_IterateCh.patch
 
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  golang
@@ -141,6 +142,7 @@ fi
 %changelog
 * Mon Jan 31 2022 Muhammad Falak <mwani@microsoft.com> - 2.24.1-8
 - Fix ptest by using 'go test' instead of 'go check'
+- Backport a patch to fix test in 'tsdb/chunks'
 
 * Wed Jul 28 2021 Henry Li <lihl@microsoft.com> - 2.24.1-7
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
