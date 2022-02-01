@@ -31,7 +31,7 @@ validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 specs_file        = $(PKGBUILD_DIR)/specs.json
 graph_file        = $(PKGBUILD_DIR)/graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
-scrubbed_file     = $(PKGBUILD_DIR)/scrubbed_graph.dot
+preprocessed_file     = $(PKGBUILD_DIR)/preprocessed_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
