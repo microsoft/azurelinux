@@ -2366,6 +2366,7 @@
                 "libmaxminddb",
                 "libuv",
                 "libxml++",
+                "lld",
                 "lsb-release",
                 "lttng-consume",
                 "mariner-release",

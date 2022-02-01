@@ -11610,6 +11610,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libunwind",
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/libunwind-12.0.1.src.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "liburing",
           "version": "2.0",
           "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.0.tar.gz"
@@ -12353,6 +12363,16 @@
           "name": "lksctp-tools",
           "version": "1.0.18",
           "downloadUrl": "https://github.com/sctp/lksctp-tools/archive/lksctp-tools-1.0.18.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lld",
+          "version": "12.0.1",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lld-12.0.1.src.tar.xz"
         }
       }
     },
