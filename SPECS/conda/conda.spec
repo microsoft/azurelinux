@@ -82,7 +82,6 @@ BuildRequires:  python3
 BuildRequires:  python3-pip
 BuildRequires:  python%{python3_pkgversion}-mock
 BuildRequires:  python%{python3_pkgversion}-pytest-cov
-BuildRequires:  python%{python3_pkgversion}-pytest-timeout
 BuildRequires:  python%{python3_pkgversion}-responses
 %endif
 
@@ -158,8 +157,6 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
 
 %check
-export PATH=%{buildroot}%{_bindir}:$PATH
-PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
 # Integration tests generally require network, so skip them.
 
@@ -188,8 +185,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 # tests/gateways/disk/test_permissions.py::test_recursive_make_writable \
 # tests/gateways/disk/test_permissions.py::test_make_executable 
 
-
 mkdir /tmp
+export PATH=%{buildroot}%{_bindir}:$PATH
+PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
@@ -197,10 +195,11 @@ pip3 install atomicwrites>=1.3.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
     pytest>=5.4.0 \
-    pytest-cov>=2.7.1 
-PATH=%{buildroot}%{_bindir}:${PATH} \
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -vv -m "not integration" \
+    pytest-cov>=2.7.1 \
+    pytest-timeout \
+    pytest-rerunfailures
+
+python%{python3_version} -m pytest -vv -m "not integration" \
     --deselect=tests/test_cli.py::TestJson::test_list \
     --deselect=tests/test_cli.py::TestRun::test_run_returns_int \
     --deselect=tests/test_cli.py::TestRun::test_run_returns_nonzero_errorlevel \
@@ -216,7 +215,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
     --deselect=tests/gateways/disk/test_delete.py::test_remove_file_to_trash \
     --deselect=tests/gateways/disk/test_permissions.py::test_make_writable \
     --deselect=tests/gateways/disk/test_permissions.py::test_recursive_make_writable \
-    --deselect=tests/gateways/disk/test_permissions.py::test_make_executable 
+    --deselect=tests/gateways/disk/test_permissions.py::test_make_executable \
+    --deselect=tests/gateways/test_subprocess.py::test_subprocess_call_with_live_stream 
 
 
 %files
