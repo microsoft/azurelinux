@@ -54,7 +54,7 @@ Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(Dist::CheckConflicts) >= 0.02
 # perl-DateTime-Locale used to be bundled with perl-DateTime
 # ideally, this would be resolved with
-# Requires:     perl-DateTime >= 2:0.70-1
+# Requires:     perl-DateTime >= 0.70-1
 # but DateTime::Locale doesn't strictly require DateTime
 # and this would introduce circular build dependencies
 Conflicts:      perl-DateTime <= 1:0.7000-3.fc16
@@ -89,6 +89,7 @@ make test
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.25-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.25-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

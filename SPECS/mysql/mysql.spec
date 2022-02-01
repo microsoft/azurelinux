@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.24
+Version:        8.0.28
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -72,10 +72,17 @@ make test
 %files devel
 %{_libdir}/*.so
 %{_libdir}/*.a
+%{_libdir}/private/icudt69l/brkitr/*.res
+%{_libdir}/private/icudt69l/brkitr/*.brk
+%{_libdir}/private/icudt69l/brkitr/*.dict
+%{_libdir}/private/icudt69l/unames.icu
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Wed Jan 26 2022 Neha Agarwal <thcrain@microsoft.com> - 8.0.28-1
+- Upgrade to 8.0.28 to fix 16 CVEs
+
 * Sat Apr 24 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.24-1
 - Upgrade to 8.0.24 to fix 30 CVEs
 - Update source URL

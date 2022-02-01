@@ -1,20 +1,21 @@
 Summary:        A library that provides compression and decompression of file formats used by Microsoft
 Name:           libmspack
-Version:        0.7.1alpha
-Release:        4%{?dist}
+Version:        0.10.1alpha
+Release:        1%{?dist}
 License:        LGPLv2+
-URL:            http://www.cabextract.org.uk/libmspack/libmspack-0.5alpha.tar.gz
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://www.cabextract.org.uk/libmspack/
 Source0:        http://www.cabextract.org.uk/libmspack/%{name}-%{version}.tar.gz
-%define sha1    libmspack=073348180586d7b0f61fd7f971162ffb5c1f6621
+
 %description
 A library that provides compression and decompression of file formats used by Microsoft
 
 %package        devel
 Summary:        Header and development files for libmspack
 Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files to create applications.
 
@@ -39,20 +40,25 @@ cd test
 
 %files
 %defattr(-,root,root)
+%doc README TODO ChangeLog AUTHORS
 %license COPYING.LIB
-%{_bindir}/cabrip
-%{_bindir}/chmextract
-%{_bindir}/msexpand
-%{_bindir}/oabextract
 %{_libdir}/*.so.*
 
-%files  devel
+%files devel
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/*
 %{_libdir}/*.a
 %{_libdir}/*.so
 
 %changelog
+* Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 0.10.1alpha-1
+- Upgrade to version 0.10.1alpha
+- Remove binaries under /usr/bin
+- Add README, TODO, ChangeLog, AUTHORS to the main package
+- License Verified
+- Remove the sha1 macro
+- Fix URL field
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.1alpha-4
 - Remove libtool archive files from final packaging
 
@@ -61,13 +67,18 @@ cd test
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.7.1alpha-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Mon Sep 10 2018 Bo Gan <ganb@vmware.com> 0.7.1alpha-1
 -   Update to 0.7.1alpha
+
 *   Fri Jun 23 2017 Xiaolin Li <xiaolinl@vmware.com> 0.5alpha-3
 -   Add devel package.
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.5alpha-2
 -   GA - Bump release of all rpms
+
 *   Fri Jan 22 2016 Xiaolin Li <xiaolinl@vmware.com> 0.5-1
 -   Updated to version 0.5
+
 *   Thu Nov 06 2014 Sharath George <sharathg@vmware.com> 0.4-1
     Initial version
