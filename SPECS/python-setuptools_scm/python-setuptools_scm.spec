@@ -1,78 +1,49 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
-Summary:        the blessed package to manage your versions by scm tags.
+Summary:        The blessed package to manage your versions by scm tags.
 Name:           python-setuptools_scm
 Version:        3.1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Url:            https://pypi.python.org/pypi/setuptools_scm
+URL:            https://pypi.python.org/pypi/setuptools_scm
 Source0:        https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-%{version}.tar.gz
-
-BuildRequires:  python2
-BuildRequires:  python2-libs
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-
-Requires:       python2
-Requires:       python2-libs
-
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildArch:      noarch
 
 %description
-setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
-
-It also handles file finders for the supported scm’s.
+setuptools_scm handles managing your python package versions in scm metadata.
 
 %package -n     python3-setuptools_scm
 Summary:        python-setuptools_scm
-BuildRequires:  python3-devel
-BuildRequires:  python3-libs
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-setuptools_scm
-Python 3 version.
+setuptools_scm handles managing your python package versions in scm metadata
+instead of declaring them as the version argument or in a scm managed file.
+It also handles file finders for the supported scms.
 
 %prep
-%setup -q -n setuptools_scm-%{version}
-rm -rf ../p3dir
-cp -a . ../p3dir
+%autosetup -n setuptools_scm-%{version}
 
 %build
-python2 setup.py build
-pushd ../p3dir
-python3 setup.py build
-popd
+%py3_build
 
 %install
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-pushd ../p3dir
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-popd
+%py3_install
 
 %check
-python2 setup.py test
-pushd ../p3dir
-python3 setup.py test
-popd
-
-%files
-%defattr(-,root,root)
-%license LICENSE
-%{python2_sitelib}/*
+%python3 setup.py test
 
 %files -n python3-setuptools_scm
-%defattr(-,root,root)
+%license LICENSE
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 15 2022 Thomas Crain <thcrain@microsoft.com> - 3.1.0-5
+- Remove python2 subpackage
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.1.0-4
 - Remove unused `%%define sha1` lines
 - License verified
