@@ -1,9 +1,7 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Open vSwitch daemon/database/utilities
 Name:           openvswitch
 Version:        2.12.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,63 +9,42 @@ Group:          System Environment/Daemons
 URL:            https://www.openvswitch.org/
 Source0:        http://openvswitch.org/releases/%{name}-%{version}.tar.gz
 BuildRequires:  gcc >= 4.0.0
-BuildRequires:  libcap-ng
 BuildRequires:  libcap-ng-devel
 BuildRequires:  make
-BuildRequires:  openssl
 BuildRequires:  openssl-devel
-BuildRequires:  python-pip
-BuildRequires:  python-setuptools
-BuildRequires:  python-six
-BuildRequires:  python-xml
-BuildRequires:  python2 >= 2.7.0
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-BuildRequires:  python3 >= 3.4.0
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
+BuildRequires:	python3-setuptools
 BuildRequires:  python3-six
-BuildRequires:  systemd
+BuildRequires:  systemd-devel
 Requires:       gawk
 Requires:       libcap-ng
 Requires:       libgcc-atomic
 Requires:       openssl
-Requires:       python-six
-Requires:       python-xml
-Requires:       python2
-Requires:       python2-libs
+Requires:       python3-six
+Requires:       python3
 
 %description
 Open vSwitch provides standard network bridging functions and
 support for the OpenFlow protocol for remote per-flow control of
 traffic.
 
-%package -n     python-openvswitch
-Summary:        python-openvswitch
-Requires:       python2
-Requires:       python2-libs
-
-%description -n python-openvswitch
-Python 2 openvswith bindings.
-
 %package -n     python3-openvswitch
 Summary:        python3-openvswitch
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-openvswitch
-Python 3 version.
+Python 3 version of openvswitch module
 
 %package        devel
 Summary:        Header and development files for openvswitch
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 openvswitch-devel package contains header files and libs.
 
 %package        devel-static
 Summary:        Static libs for openvswitch
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel-static
 openvswitch-devel-static package contains static libs.
@@ -131,11 +108,9 @@ make %{_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-find %{buildroot} -type f -name "*.la" -delete -print
-mkdir -p %{buildroot}/%{python2_sitelib}
-mkdir -p %{buildroot}/%{python3_sitelib}
-cp -a %{buildroot}/%{_datadir}/openvswitch/python/ovs/* %{buildroot}/%{python2_sitelib}
+find %{buildroot} -type f -name "*.la" -delete -pristine
 
+mkdir -p %{buildroot}/%{python3_sitelib}
 cp -a %{buildroot}/%{_datadir}/openvswitch/python/ovs/* %{buildroot}/%{python3_sitelib}
 
 mkdir -p %{buildroot}/%{_libdir}/systemd/system
@@ -220,9 +195,6 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/openvswitch/scripts/ovs-*
 %config(noreplace) %{_sysconfdir}/sysconfig/openvswitch
 
-%files -n python-openvswitch
-%{python2_sitelib}/*
-
 %files -n python3-openvswitch
 %{python3_sitelib}/*
 
@@ -289,6 +261,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man8/ovn-trace.8.gz
 
 %changelog
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.12.3-3
+- Remove python2 subpackage, use python3 for main package
+- License verified
+
 * Mon Apr 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.12.3-2
 - Don't include static libraries in openvswitch package
 
