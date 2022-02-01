@@ -3,7 +3,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.47.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,21 @@ Patch3:         CVE-2021-28876.patch
 Patch4:         CVE-2021-28879.patch
 Patch5:         CVE-2021-28878.patch
 Patch6:         CVE-2020-36323.patch
+Patch7: CVE-2022-21658_b16715.patch
+Patch8: CVE-2022-21658_70a61c.patch
+Patch9: CVE-2022-21658_a14ae6.patch
+Patch10: CVE-2022-21658_408709.patch
+Patch11: CVE-2022-21658_acd647.patch
+Patch12: CVE-2022-21658_0076b1.patch
+Patch13: CVE-2022-21658_4f0ad1.patch
+Patch14: CVE-2022-21658_32ed6e.patch
+Patch15: CVE-2022-21658_406cc0.patch
+Patch16: CVE-2022-21658_42cb17.patch
+Patch17: CVE-2022-21658_1e17da.patch
+Patch18: CVE-2022-21658_cb8816.patch
+Patch19: CVE-2022-21658_2923f3.patch
+Patch20: CVE-2022-21658_68976d.patch
+Patch21: CVE-2022-21658_1c63ec.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -110,6 +125,15 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+*   Tue Feb 01 2022 Mariner Autopatcher <cblmargh@microsoft.com> 1.47.0-4
+-   Added patch file(s) CVE-2022-21658_b16715.patch,
+-   CVE-2022-21658_70a61c.patch, CVE-2022-21658_a14ae6.patch,
+-   CVE-2022-21658_408709.patch, CVE-2022-21658_acd647.patch,
+-   CVE-2022-21658_0076b1.patch, CVE-2022-21658_4f0ad1.patch,
+-   CVE-2022-21658_32ed6e.patch, CVE-2022-21658_406cc0.patch,
+-   CVE-2022-21658_42cb17.patch, CVE-2022-21658_1e17da.patch,
+-   CVE-2022-21658_cb8816.patch, CVE-2022-21658_2923f3.patch,
+-   CVE-2022-21658_68976d.patch, CVE-2022-21658_1c63ec.patch
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-3
 - Patch CVE-2020-36317, CVE-2021-28875, CVE-2021-28876, CVE-2021-28877, CVE-2021-28878
 - Redo patch for CVE-2021-28879 with regards to patches listed above
