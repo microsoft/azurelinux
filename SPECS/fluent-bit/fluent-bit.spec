@@ -11,7 +11,21 @@ URL:            https://fluentbit.io
 #Source0:       https://github.com/fluent/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
+BuildRequires:  pkgconfig
+BuildRequires:  make
 BuildRequires:  cmake
+BuildRequires:  systemd-rpm-macros
+BuildRequires:  systemd-devel
+BuildRequires:  gcc-c++
+BuildRequires:  flex
+BuildRequires:  bison
+BuildRequires:  doxygen
+BuildRequires:  graphviz
+BuildRequires:  libpq-devel
+BuildRequires:  zlib-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  openssl-devel
+BuildRequires:  cyrus-sasl-devel
 
 %description
 Fluent Bit is a fast Log Processor and Forwarder for Linux, Embedded Linux, MacOS and BSD 
@@ -28,13 +42,25 @@ Development files for %{name}
 %setup -q
 
 %build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=%{_prefix} ..
-make %{?_smp_mflags}
+	
+%cmake\
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo\
+    -DFLB_EXAMPLES=Off\
+    -DFLB_OUT_SLACK=Off\
+    -DFLB_IN_SYSTEMD=On\
+    -DFLB_OUT_TD=Off\
+    -DFLB_OUT_ES=Off\
+    -DFLB_SHARED_LIB=On\
+    -DFLB_TESTS_RUNTIME=On\
+    -DFLB_TESTS_INTERNAL=Off\
+    -DFLB_RELEASE=On\
+    -DFLB_DEBUG=Off\
+    -DFLB_TLS=On
+ 
+%cmake_build
 
 %install
-cd build
-make install DESTDIR=%{buildroot}
+%cmake_install
 
 %files
 %license LICENSE
@@ -46,9 +72,12 @@ make install DESTDIR=%{buildroot}
 
 %files devel
 %{_includedir}/*
-/usr/lib64/fluent-bit/*.so
+/usr/lib/fluent-bit/*.so
 
 %changelog
+* Tue Feb 01 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8.12-1
+- Update to version 1.8.12
+
 * Mon May 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.5.2-1
 - Update to version 1.5.2
 
