@@ -31,6 +31,7 @@ validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 specs_file        = $(PKGBUILD_DIR)/specs.json
 graph_file        = $(PKGBUILD_DIR)/graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
+preprocessed_file     = $(PKGBUILD_DIR)/preprocessed_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
@@ -123,6 +124,13 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--output=$(cached_file) && \
 	touch $@
 
+$(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
+	$(go-graphPreprocessor) \
+		--input=$(cached_file) \
+		$(if $(filter y,$(HYDRATED_BUILD)),--hydrated-build) \
+		$(logging_command) \
+		--output=$@ && \
+	touch $@
 ######## PACKAGE BUILD ########
 
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
@@ -156,9 +164,9 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(cached_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE)
 	$(go-scheduler) \
-		--input="$(cached_file)" \
+		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
 		--workers="$(CONCURRENT_PACKAGE_BUILDS)" \
 		--work-dir="$(CHROOT_DIR)" \

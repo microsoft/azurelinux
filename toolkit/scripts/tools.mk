@@ -19,6 +19,7 @@ go_tool_list = \
 	grapher \
 	graphpkgfetcher \
 	graphanalytics \
+	graphPreprocessor \
 	imageconfigvalidator \
 	imagepkgfetcher \
 	imager \
