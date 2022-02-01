@@ -1,3 +1,4 @@
+%global builddate $(date +"%%Y%%m%%d-%%T")
 # https://github.com/prometheus/node_exporter
 %global goipath         github.com/prometheus/node_exporter
 
@@ -44,8 +45,7 @@ Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written
 in Go with pluggable metric collectors.
 
 %prep
-%patch0 -p1
-%patch1 -p1
+%autosetup -n node_exporter-%{version} -p1
 
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
@@ -55,7 +55,7 @@ export BUILDTAGS="netgo osusergo static_build"
 LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}  \
          -X github.com/prometheus/common/version.Revision=%{release} \
          -X github.com/prometheus/common/version.Branch=tarball      \
-         -X github.com/prometheus/common/version.BuildDate=$(date -u -d@$SOURCE_DATE_EPOCH +%%Y%%m%%d)"
+         -X github.com/prometheus/common/version.BuildDate=%{builddate} "
 go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o %{gobuilddir}/bin/node_exporter %{goipath}
 
 %install
