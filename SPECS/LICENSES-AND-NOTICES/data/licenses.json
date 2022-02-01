@@ -327,7 +327,7 @@
                 "gnu-efi",
                 "gnuplot",
                 "go-rpm-macros",
-                "golang-github-prometheus-node-exporter",
+                "prometheus-node-exporter",
                 "gom",
                 "google-api-python-client",
                 "google-crosextra-caladea-fonts",
