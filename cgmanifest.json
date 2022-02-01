@@ -7980,6 +7980,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "javapackages-tools-meta",
+          "version": "5.3.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/refs/tags/5.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "javaparser",
           "version": "3.3.5",
           "downloadUrl": "https://github.com/javaparser/javaparser/archive/javaparser-parent-3.3.5.tar.gz"

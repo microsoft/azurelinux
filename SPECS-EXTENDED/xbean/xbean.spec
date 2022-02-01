@@ -22,7 +22,7 @@ Name:           xbean
 Version:        4.18
 Release:        1%{?dist}
 Summary:        Java plugin based web server
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            https://geronimo.apache.org/xbean/
 Source0:        http://repo2.maven.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}-source-release.zip
@@ -162,6 +162,7 @@ cp -aL build/apidoc/* %{buildroot}/%{_javadocdir}/%{name}
 * Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.18-1
 - Updating to version 4.18.
 - Removing dependency on "log4j12".
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.5-6
 - Converting the 'Release' tag to the '[number].[distribution]' format.

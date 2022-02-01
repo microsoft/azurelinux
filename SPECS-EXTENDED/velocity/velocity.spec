@@ -22,7 +22,7 @@ Name:           velocity
 Version:        1.7
 Release:        10%{?dist}
 Summary:        Java-based template engine
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            https://velocity.apache.org/
 Source0:        https://github.com/apache/%{name}-engine/archive/refs/tags/%{version}.tar.gz#/%{name}-engine-%{version}.tar.gz
@@ -257,6 +257,7 @@ cp -pr examples test %{buildroot}%{_datadir}/%{name}
 * Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-10
 - Removing dependency on "avalog-logkit" and "log4j12".
 - Ported to "commons-lang3".
+- License verified.
 - Changes done using Fedora 33 (license: MIT) spec as guidance.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-9
