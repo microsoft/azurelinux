@@ -124,7 +124,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--output=$(cached_file) && \
 	touch $@
 
-$(scrubbed_file): $(cached_file) $(go-graphPreprocessor)
+$(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 	$(go-graphPreprocessor) \
 		--input=$(cached_file) \
 		$(if $(filter y,$(HYDRATED_BUILD)),--hydrated-build) \
