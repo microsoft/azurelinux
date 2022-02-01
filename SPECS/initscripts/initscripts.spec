@@ -1,7 +1,7 @@
 Summary:        Scripts to bring up network interfaces and legacy utilities
 Name:           initscripts
 Version:        9.70
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,8 +15,7 @@ BuildRequires:  gettext
 BuildRequires:  glib-devel
 BuildRequires:  pkg-config
 BuildRequires:  popt-devel
-BuildRequires:  python2
-BuildRequires:  python2-libs
+BuildRequires:  python3
 BuildRequires:  systemd
 Requires:       iproute
 Requires:       systemd
@@ -39,9 +38,9 @@ the system in a debug mode.
 Currently, this consists of various memory checking code.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
+
+%py3_shebang_fix po/xgettext_sh{,.py}
 
 %build
 make
@@ -51,14 +50,7 @@ make ROOT=%{buildroot} SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandir} 
 
 %find_lang %{name}
 
-%ifnarch s390 s390x
-rm -f \
-  %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifup-ctc \
-%else
-rm -f \
-  %{buildroot}%{_sysconfdir}/sysconfig/init.s390
-%endif
-
+rm -f %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifup-ctc \
 rm -f %{buildroot}%{_sysconfdir}/rc.d/rc.local %{buildroot}%{_sysconfdir}/rc.local
 rm -f %{buildroot}%{_sbindir}/ifdown
 rm -f %{buildroot}%{_sbindir}/ifup
@@ -173,6 +165,9 @@ EOF
 %{_sysconfdir}/profile.d/debug*
 
 %changelog
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 9.70-9
+- Remove python2, use python3 explicitly during docs build
+
 * Mon Mar 29 2021 Henry Li <lihl@microsoft.com> - 9.70-8
 - Replace incorrect %%{_lib} usage with %%{_libdir}.
 
