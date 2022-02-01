@@ -8,7 +8,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fluentbit.io
-#Source0:       https://github.com/fluent/%{name}/archive/v%{version}.tar.gz
+#Source0:       https://github.com/fluent/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  pkgconfig
