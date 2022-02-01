@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Patch5:         0005-systemd-Add-systemd-homed-and-systemd-userdbd.patch
 Patch6:         0006-systemd-ssh-Crypto-sysctl-use.patch
 Patch7:         0007-systemd-Additional-fixes-for-fs-getattrs.patch
 Patch8:         0008-systemd-Updates-for-generators-and-kmod-static-nodes.patch
+Patch9:         0009-Add-containers-policy.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -274,6 +275,10 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Feb 01 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-2
+- Update systemd-homed and systemd-userdbd patch to upstreamed version.
+- Backport containers policy.
+
 * Mon Jan 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
 - Update to version 2.20220106.
 - Fix setup process to apply patches.
