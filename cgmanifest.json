@@ -3858,8 +3858,8 @@
         "type": "other",
         "other": {
           "name": "fmt",
-          "version": "7.0.3",
-          "downloadUrl": "https://github.com/fmtlib/fmt/archive/7.0.3.tar.gz"
+          "version": "8.1.1",
+          "downloadUrl": "https://github.com/fmtlib/fmt/archive/refs/tags/8.1.1.tar.gz"
         }
       }
     },
