@@ -1435,8 +1435,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.3",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_3/expat-2.4.3.tar.bz2"
+          "version": "2.4.4",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_4/expat-2.4.4.tar.bz2"
         }
       }
     },
