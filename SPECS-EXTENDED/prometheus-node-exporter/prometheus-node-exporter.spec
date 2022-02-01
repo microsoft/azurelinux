@@ -1,6 +1,5 @@
 %global builddate $(date +"%%Y%%m%%d-%%T")
 # https://github.com/prometheus/node_exporter
-%global goipath         github.com/prometheus/node_exporter
 
 Summary:        Exporter for machine metrics
 Name:           prometheus-node-exporter
@@ -56,7 +55,7 @@ LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}  \
          -X github.com/prometheus/common/version.Revision=%{release} \
          -X github.com/prometheus/common/version.Branch=tarball      \
          -X github.com/prometheus/common/version.BuildDate=%{builddate} "
-go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o %{gobuilddir}/bin/node_exporter %{goipath}
+go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o %{gobuilddir}/bin/node_exporter ./collector
 
 %install
 install -m 0755 -vd                     %{buildroot}%{_bindir}
