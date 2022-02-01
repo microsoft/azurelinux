@@ -1,5 +1,5 @@
+%global debug_package %{nil}
 %global builddate $(date +"%%Y%%m%%d-%%T")
-# https://github.com/prometheus/node_exporter
 
 Summary:        Exporter for machine metrics
 Name:           prometheus-node-exporter
@@ -9,7 +9,7 @@ Release:        6%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            %{gourl}
+URL:            https://github.com/prometheus/node_exporter
 Source0:        https://github.com/prometheus/node_exporter/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using vendored Go modules from this tarball, since network is disabled during build time.
@@ -17,8 +17,9 @@ Source0:        https://github.com/prometheus/node_exporter/archive/refs/tags/v%
 #   1. wget https://github.com/prometheus/node_exporter/archive/refs/tags/v%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
+#   4. Apply patches from the spec (may change go dependencies).
+#   5. go mod vendor
+#   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
@@ -34,7 +35,7 @@ Patch0:         defaults-paths.patch
 # https://github.com/prometheus/node_exporter/pull/2190
 Patch1:         0001-Refactor-perf-collector.patch
 
-BuildRequires:  go-rpm-macros
+BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 
 Requires(pre):  shadow-utils
@@ -55,11 +56,11 @@ LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}  \
          -X github.com/prometheus/common/version.Revision=%{release} \
          -X github.com/prometheus/common/version.Branch=tarball      \
          -X github.com/prometheus/common/version.BuildDate=%{builddate} "
-go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o %{gobuilddir}/bin/node_exporter ./collector
+go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o bin/node_exporter ./collector
 
 %install
-install -m 0755 -vd                     %{buildroot}%{_bindir}
-install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
+install -m 0755 -vd %{buildroot}%{_bindir}
+install -m 0755 -vp bin/* %{buildroot}%{_bindir}/
 mv %{buildroot}%{_bindir}/node_exporter %{buildroot}%{_bindir}/%{name}
 pushd %{buildroot}%{_bindir}
 ln -s %{name} node_exporter
