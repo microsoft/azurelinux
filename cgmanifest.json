@@ -14643,8 +14643,8 @@
         "type": "other",
         "other": {
           "name": "nghttp2",
-          "version": "1.41.0",
-          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.41.0/nghttp2-1.41.0.tar.xz"
+          "version": "1.46.0",
+          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.46.0/nghttp2-1.46.0.tar.xz"
         }
       }
     },
