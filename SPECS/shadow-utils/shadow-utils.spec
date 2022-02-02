@@ -167,151 +167,131 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
-* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 4.9-6
-- Add provides to resolve dynamic dependencies
-
-* Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-5
-- Make pam_loginuid use optional for systems that don't have audit.
-- License verified.
-
-* Tue Sep 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9-4
-- Adding missing BR for "libxslt".
-- Removing not built man pages.
-
-* Thu Sep 16 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-3
-- Update pam.d configuration for SELinux logins.
-- Change loginuid to be set only on logins.
-- Add missing BuildRequires for xsltproc.
-
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-2
-- Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
-- Add license to subid subpackage
-
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-1
+* Tue Feb 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 4.9-1
 - Upgrade to latest upstream version and rebase chkname patch
 - Add upstream patch to deal with libsubid build failure when linking to pam
 - Add %%{_sysconfdir}/login.defs and %{_syconfdir}/default/useradd to sources
 -   since they are not auto-generated during packaging
 - Create %%{name}-subid and %%{name}-subid-devel subpackages
+- Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
+- Add license to subid subpackage
+- Add missing BuildRequires for xsltproc.
+- Adding missing BR for "libxslt".
+- Removing not built man pages.
+- Add provides to resolve dynamic dependencies
 
-* Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 4.6-15
-- Dash Rolled for Merge from 1.0 branch
+* Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
+- License verified.
+- Update pam.d configuration for SELinux logins.
+- Change loginuid to be set only on logins.
 
-* Tue Jun 15 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-14
+* Tue Jun 15 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-13
 - Fix issue with undocumented libselinux and libsemanage requirements
 
-* Wed May 26 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-13
+* Wed May 26 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-12
 - Add SELinux support
 
-* Thu May 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-12
+* Thu May 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-11
 - Enable usergroups for useradd
-
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> 4.6-11
-- Merge the following releases from 1.0 to dev branch
-- schalam@microsoft.com, 4.6-9: Remove PASS_MAX_DAYS customized value 90 to set default value
-- lihl@microsoft.com, 4.6-10: Add sym link to adduser from useradd and create the file for adduser
 
 * Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 4.6-10
 - Add sym link to adduser from useradd and create the file for adduser
 
-* Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-10
-- Provide passwd.
-
-* Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 4.6-9
-- Provide /sbin/nologin.
+* Mon Dec 14 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.6-9
+- Remove PASS_MAX_DAYS customized value 90 to set default value
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.6-8
 - Added %%license line automatically
 
-* Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> - 4.6-7
-- Renaming Linux-PAM to pam
+*   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 4.6-7
+-   Renaming Linux-PAM to pam
 
-* Tue Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> - 4.6-6
-- Consolidate all subpackages as one and rename it to shadow-utils.
-- Update the URL.
+*   Mon Apr 14 2020 Emre Girgin <mrgirgin@microsoft.com> 4.6-6
+-   Consolidate all subpackages as one and rename it to shadow-utils.
+-   Update the URL.
 
-* Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> - 4.6-5
-- Remove toybox and only use shadow-tools for requires.
+*   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.6-5
+-   Remove toybox and only use shadow-tools for requires.
 
-* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 4.6-4
-- Initial CBL-Mariner import from Photon (license: Apache2).
+*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.6-4
+-   Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Wed Oct 24 2018 Michelle Wang <michellew@vmware.com> - 4.6-3
-- Add su and login into shadow-tool.
+*   Wed Oct 24 2018 Michelle Wang <michellew@vmware.com> 4.6-3
+-   Add su and login into shadow-tool.
 
-* Tue Oct 2 2018 Michelle Wang <michellew@vmware.com> - 4.6-2
-- Add conflict toybox for shadow-tools.
+*   Tue Oct 2 2018 Michelle Wang <michellew@vmware.com> 4.6-2
+-   Add conflict toybox for shadow-tools.
 
-* Wed Sep 19 2018 Srinidhi Rao <srinidhir@vmware.com> - 4.6-1
-- Upgrading the version to 4.6.
+*   Wed Sep 19 2018 Srinidhi Rao <srinidhir@vmware.com> 4.6-1
+-   Upgrading the version to 4.6.
 
-* Mon Jul 30 2018 Tapas Kundu <tkundu@vmware.com> - 4.2.1-16
-- Added fix for CVE-2018-7169.
+*   Mon Jul 30 2018 Tapas Kundu <tkundu@vmware.com> 4.2.1-16
+-   Added fix for CVE-2018-7169.
 
-* Fri Apr 20 2018 Alexey Makhalov <amakhalov@vmware.com> - 4.2.1-15
-- Move pam.d config file to here for better tracking.
-- Add pam_loginuid module as optional in a session.
+*   Fri Apr 20 2018 Alexey Makhalov <amakhalov@vmware.com> 4.2.1-15
+-   Move pam.d config file to here for better tracking.
+-   Add pam_loginuid module as optional in a session.
 
-* Tue Oct 10 2017 Alexey Makhalov <amakhalov@vmware.com> - 4.2.1-14
-- Added -tools subpackage.
-- Main package requires -tools or toybox.
+*   Tue Oct 10 2017 Alexey Makhalov <amakhalov@vmware.com> 4.2.1-14
+-   Added -tools subpackage.
+-   Main package requires -tools or toybox.
 
-* Tue Aug 15 2017 Anish Swaminathan <anishs@vmware.com> - 4.2.1-13
-- Added fix for CVE-2017-12424, CVE-2016-6252.
+*   Tue Aug 15 2017 Anish Swaminathan <anishs@vmware.com> 4.2.1-13
+-   Added fix for CVE-2017-12424, CVE-2016-6252.
 
-* Thu Apr 27 2017 Divya Thaluru <dthaluru@vmware.com> - 4.2.1-12
-- Allow '.' in username.
+*   Thu Apr 27 2017 Divya Thaluru <dthaluru@vmware.com> 4.2.1-12
+-   Allow '.' in username.
 
-* Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> - 4.2.1-11
-- BuildRequires Linux-PAM-devel.
+*   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 4.2.1-11
+-   BuildRequires Linux-PAM-devel.
 
-* Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> - 4.2.1-10
-- Added -lang subpackage.
+*   Wed Nov 23 2016 Alexey Makhalov <amakhalov@vmware.com> 4.2.1-10
+-   Added -lang subpackage.
 
-* Tue Oct 04 2016 ChangLee <changlee@vmware.com> - 4.2.1-9
-- Modified %check.
+*   Tue Oct 04 2016 ChangLee <changlee@vmware.com> 4.2.1-9
+-   Modified %check.
 
-* Tue Jun 21 2016 Divya Thaluru <dthaluru@vmware.com> - 4.2.1-8
-- Added logic to not replace pam.d conf files in upgrade scenario.
+*   Tue Jun 21 2016 Divya Thaluru <dthaluru@vmware.com> 4.2.1-8
+-   Added logic to not replace pam.d conf files in upgrade scenario.
 
-* Fri May 27 2016 Divya Thaluru <dthaluru@vmware.com> - 4.2.1-7
-- Adding pam_cracklib module as requisite to pam password configuration.
+*   Fri May 27 2016 Divya Thaluru <dthaluru@vmware.com> 4.2.1-7
+-   Adding pam_cracklib module as requisite to pam password configuration.
 
-* Wed May 25 2016 Divya Thaluru <dthaluru@vmware.com> - 4.2.1-6
-- Modifying pam_systemd module as optional in a session.
+*   Wed May 25 2016 Divya Thaluru <dthaluru@vmware.com> 4.2.1-6
+-   Modifying pam_systemd module as optional in a session.
 
-* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 4.2.1-5
-- GA Bump release of all rpms.
+*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 4.2.1-5
+-   GA Bump release of all rpms.
 
-* Mon May 2 2016 Xiaolin Li <xiaolinl@vmware.com> - 4.2.1-4
-- Enabling pam_systemd module in a session.
+*   Mon May 2 2016 Xiaolin Li <xiaolinl@vmware.com> 4.2.1-4
+-   Enabling pam_systemd module in a session.
 
-* Fri Apr 29 2016 Divya Thaluru <dthaluru@vmware.com> - 4.2.1-3
-- Setting password aging limits to 90 days.
+*   Fri Apr 29 2016 Divya Thaluru <dthaluru@vmware.com> 4.2.1-3
+-   Setting password aging limits to 90 days.
 
-* Wed Apr 27 2016 Divya Thaluru <dthaluru@vmware.com> - 4.2.1-3
-- Setting password aging limits to 365 days.
+*   Wed Apr 27 2016 Divya Thaluru <dthaluru@vmware.com> 4.2.1-3
+-   Setting password aging limits to 365 days.
 
-* Wed Mar 23 2016 Divya Thaluru <dthaluru@vmware.com> - 4.2.1-2
-- Enabling pam_limits module in a session.
+*   Wed Mar 23 2016 Divya Thaluru <dthaluru@vmware.com> 4.2.1-2
+-   Enabling pam_limits module in a session.
 
-* Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com> - 4.2.1-1
-- Update version.
+*   Tue Jan 12 2016 Anish Swaminathan <anishs@vmware.com> 4.2.1-1
+-   Update version.
 
-* Wed Dec 2 2015 Divya Thaluru <dthaluru@vmware.com> - 4.1.5.1-6
-- Fixed PAM Configuration file for passwd.
+*   Wed Dec 2 2015 Divya Thaluru <dthaluru@vmware.com> 4.1.5.1-6
+-   Fixed PAM Configuration file for passwd.
 
-* Mon Oct 26 2015 Sharath George <sharathg@vmware.com> - 4.1.5.1-5
-- Allow mixed case in username.
+*   Mon Oct 26 2015 Sharath George <sharathg@vmware.com> 4.1.5.1-5
+-   Allow mixed case in username.
 
-* Mon Jun 29 2015 Divya Thaluru <dthaluru@vmware.com> - 4.1.5.1-4
-- Fixed PAM Configuration file for chpasswd.
+*   Mon Jun 29 2015 Divya Thaluru <dthaluru@vmware.com> 4.1.5.1-4
+-   Fixed PAM Configuration file for chpasswd.
 
-* Tue Jun 16 2015 Alexey Makhalov <amakhalov@vmware.com> - 4.1.5.1-3
-- Use group id 100(users) by default.
+*   Tue Jun 16 2015 Alexey Makhalov <amakhalov@vmware.com> 4.1.5.1-3
+-   Use group id 100(users) by default.
 
-* Wed May 27 2015 Divya Thaluru <dthaluru@vmware.com> - 4.1.5.1-2
-- Adding PAM support.
+*   Wed May 27 2015 Divya Thaluru <dthaluru@vmware.com> 4.1.5.1-2
+-   Adding PAM support.
 
-* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 4.1.5.1-1
-- Initial build First version.
+*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 4.1.5.1-1
+-   Initial build First version.

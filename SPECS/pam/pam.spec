@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.1
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -96,18 +96,14 @@ EOF
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
-* Tue Oct 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.5.1-2
-- Remove libdb dependency
-
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.1-1
-- Upgrade to latest upstream version
-
-* Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 1.3.1-6
-- Add SELinux support (JOSLOBO 7/26/21 bumped dash version to resolve merge conflict)
-
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.3.1-5
-- Replace incorrect %%{_lib} usage with %%{_libdir}
-
+*   Tue Feb 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.5.1-1
+-   Upgrading to v1.5.1
+-   Remove libdb dependency
+-   Replace incorrect %%{_lib} usage with %%{_libdir}
+*   Tue Oct 19 2021 Andrew Phelps <anphel@microsoft.com> 1.3.1-6
+-   Increment release to republish with toolchain fix to include pam_selinux.so
+*   Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 1.3.1-5
+-   Add SELinux support
 *   Fri Jun 12 2020 Chris Co <chrco@microsoft.com> 1.3.1-4
 -   Set default PATH in /etc/environment
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.1-3

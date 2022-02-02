@@ -274,13 +274,14 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Mon Jan 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
+* Tue Feb 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.20220106-1
 - Update to version 2.20220106.
 - Fix setup process to apply patches.
 - Correct files listing to include the module store files.
 - Create a booleans.conf for the build process, to override upstream Boolean
   default values.
 - Fix build to include systemd rules.
+- Update versions on checkpolicy, policycoreutils dependencies
 
 * Tue Sep 07 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20210203-1
 - Update to newest refpolicy release.  Add policy changes to boot the system
@@ -289,9 +290,6 @@ exit 0
   guidance, but does not use the Fedora's policy. The Fedora policy is a hard
   fork Reference Policy, so the changes are not related and the version numbers
   are incomparable.
-
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 2.20200818-2
-- Update versions on checkpolicy, policycoreutils dependencies
 
 * Mon Aug 31 2020 Daniel Burgener <daburgen@microsoft.com> - 2.20200818-1
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
