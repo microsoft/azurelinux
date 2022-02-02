@@ -646,7 +646,7 @@ index d98d9c7..437d931 100644
 +    uint32_t dwError = 0;
 +    Repo* pRepo = NULL;
 +
-+    if(!pPool || !pRepo)
++    if(!pPool)
 +    {
 +        dwError = ERROR_TDNF_INVALID_PARAMETER;
 +        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
