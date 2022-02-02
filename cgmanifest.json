@@ -12331,8 +12331,8 @@
         "type": "other",
         "other": {
           "name": "linux-firmware",
-          "version": "20200316",
-          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-20200316.tar.gz"
+          "version": "20211216",
+          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-20211216.tar.gz"
         }
       }
     },
