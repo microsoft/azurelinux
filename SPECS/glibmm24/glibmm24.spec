@@ -1,8 +1,8 @@
 Summary:        C++ interface to the glib
 Name:           glibmm24
-%define BaseVersion 2.56
+%define BaseVersion 2.70
 Version:        %{BaseVersion}.0
-Release:        8%{?dist}
+Release:        1%{?dist}
 License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
