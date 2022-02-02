@@ -1,0 +1,35 @@
+From 9bb4afe61426419c8bb83a25aa9822e00611c8f3 Mon Sep 17 00:00:00 2001
+From: Cristian Klein <cristian.klein@elastisys.com>
+Date: Fri, 11 Dec 2020 22:19:25 +0100
+Subject: [PATCH 4/5] tests: Fix test t1700-probe-fs
+
+mkfs.ext3 (see version below) was complaining that the filesystem is too small
+for a journal, which made the test fail.
+
+```
+$ mkfs.ext3 -V
+mke2fs 1.45.5 (07-Jan-2020)
+	Using EXT2FS Library version 1.45.5
+```
+
+Signed-off-by: Brian C. Lane <bcl@redhat.com>
+---
+ tests/t1700-probe-fs.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/t1700-probe-fs.sh b/tests/t1700-probe-fs.sh
+index 848d3e3..5c08e97 100755
+--- a/tests/t1700-probe-fs.sh
++++ b/tests/t1700-probe-fs.sh
+@@ -57,7 +57,7 @@ done
+ # Some features should indicate ext4 by themselves.
+ for feature in uninit_bg flex_bg; do
+   # create an ext3 file system
+-  dd if=/dev/null of=$dev bs=1024 seek=4096 >/dev/null || skip_ "dd failed"
++  dd if=/dev/null of=$dev bs=1024 seek=8192 >/dev/null || skip_ "dd failed"
+   mkfs.ext3 -F $dev >/dev/null || skip_ "mkfs.ext3 failed"
+ 
+   # set the feature
+-- 
+2.26.2
+

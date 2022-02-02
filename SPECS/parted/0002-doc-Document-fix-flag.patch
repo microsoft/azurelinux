@@ -1,0 +1,47 @@
+From 8aa569aa60c37526a8c37b06e88a833745a7a6ef Mon Sep 17 00:00:00 2001
+From: Cristian Klein <cristian.klein@elastisys.com>
+Date: Fri, 11 Dec 2020 22:19:23 +0100
+Subject: [PATCH 2/5] doc: Document --fix flag
+
+Also fix copyright year, to please `make syntax-check`.
+
+Signed-off-by: Brian C. Lane <bcl@redhat.com>
+---
+ doc/C/parted.8  | 3 +++
+ doc/parted.texi | 6 ++++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/doc/C/parted.8 b/doc/C/parted.8
+index 297c39a..d8e556e 100644
+--- a/doc/C/parted.8
++++ b/doc/C/parted.8
+@@ -27,6 +27,9 @@ displays machine parseable output
+ .B -s, --script
+ never prompts for user intervention
+ .TP
++.B -f, --fix
++automatically answer "fix" to exceptions in script mode
++.TP
+ .B -v, --version
+ displays the version
+ .TP
+diff --git a/doc/parted.texi b/doc/parted.texi
+index d89d74d..33212f0 100644
+--- a/doc/parted.texi
++++ b/doc/parted.texi
+@@ -406,6 +406,12 @@ display a help message
+ @itemx --script
+ never prompt the user
+ 
++@item -f
++@itemx --fix
++automatically answer exceptions with "fix" in script mode, whcih is useful for:
++GPT header not including full disk size; moving the backup GPT table to the end of the disk;
++MAC fix missing partition map entry; etc.
++
+ @item -a alignment-type
+ @itemx --align alignment-type
+ Set alignment for newly created partitions, valid alignment types are:
+-- 
+2.26.2
+

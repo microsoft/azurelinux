@@ -1,0 +1,38 @@
+From 8e6976661409d7c87b1f0a80ebdddc450b4db2dd Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Thu, 10 Jun 2021 15:41:33 -0700
+Subject: [PATCH 07/13] libparted: Fix potential memory leak in
+ sdmmc_get_product_info
+
+---
+ libparted/arch/linux.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/libparted/arch/linux.c b/libparted/arch/linux.c
+index 9dc90b5..aacc94f 100644
+--- a/libparted/arch/linux.c
++++ b/libparted/arch/linux.c
+@@ -1399,13 +1399,19 @@ static int
+ init_sdmmc (PedDevice* dev)
+ {
+         char id[128];
+-        char *type, *name;
++        char *type = NULL;
++        char *name = NULL;
+ 
+         if (sdmmc_get_product_info (dev, &type, &name)) {
+                 snprintf (id, sizeof(id) - 1, "%s %s", type, name);
+                 free (type);
+                 free (name);
+         } else {
++                // One or the other may have been allocated, free it
++                if (type)
++                    free(type);
++                if (name)
++                    free(name);
+                 snprintf (id, sizeof(id) - 1, "%s",
+                           _("Generic SD/MMC Storage Card"));
+         }
+-- 
+2.31.1
+

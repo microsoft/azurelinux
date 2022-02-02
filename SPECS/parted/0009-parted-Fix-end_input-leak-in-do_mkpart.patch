@@ -1,0 +1,53 @@
+From 3a7f644f21703afcf7088a5994be1a6dff19f679 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Thu, 10 Jun 2021 15:51:12 -0700
+Subject: [PATCH 09/13] parted: Fix end_input leak in do_mkpart
+
+---
+ parted/parted.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/parted/parted.c b/parted/parted.c
+index 41edb7f..e9aa240 100644
+--- a/parted/parted.c
++++ b/parted/parted.c
+@@ -645,6 +645,7 @@ do_mkpart (PedDevice** dev, PedDisk** diskp)
+         char*                    part_name = NULL;
+         char                     *start_usr = NULL, *end_usr = NULL;
+         char                     *start_sol = NULL, *end_sol = NULL;
++        char                     *end_input = NULL;
+ 
+         if (*diskp)
+                 disk = *diskp;
+@@ -698,12 +699,10 @@ do_mkpart (PedDevice** dev, PedDisk** diskp)
+ 
+         if (!command_line_get_sector (_("Start?"), *dev, &start, &range_start, NULL))
+                 goto error;
+-        char *end_input;
+         if (!command_line_get_sector (_("End?"), *dev, &end, &range_end, &end_input))
+                 goto error;
+ 
+         _adjust_end_if_iec(&start, &end, range_end, end_input);
+-        free(end_input);
+ 
+         /* processing starts here */
+         part = ped_partition_new (disk, part_type, fs_type, start, end);
+@@ -839,6 +838,7 @@ do_mkpart (PedDevice** dev, PedDisk** diskp)
+         free (end_usr);
+         free (start_sol);
+         free (end_sol);
++        free(end_input);
+ 
+         if ((*dev)->type != PED_DEVICE_FILE)
+                 disk_is_modified = 1;
+@@ -860,6 +860,7 @@ error:
+         free (end_usr);
+         free (start_sol);
+         free (end_sol);
++        free(end_input);
+ 
+         return 0;
+ }
+-- 
+2.31.1
+

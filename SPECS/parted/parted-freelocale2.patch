@@ -1,0 +1,11 @@
+--- atari.c	2021-01-25 11:49:56.000000000 -0800
++++ atari2.c	2022-01-27 10:44:59.841957503 -0800
+@@ -1957,7 +1957,7 @@
+ 	PED_ASSERT (sizeof (AtariRawPartition) == 12);
+ 	PED_ASSERT (sizeof (AtariRawTable) == 512);
+ 	/* GNU Libc doesn't support NULL instead of the locale name */
+-	PED_ASSERT ((atr_c_locale = newlocale(LC_ALL_MASK, "C", NULL)) != NULL);
++	atr_c_locale = newlocale(LC_ALL_MASK, "C", NULL);
+ 
+ 	ped_disk_type_register (&atari_disk_type);
+ }

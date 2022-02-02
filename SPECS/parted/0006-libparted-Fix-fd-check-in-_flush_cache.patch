@@ -1,0 +1,26 @@
+From dacdfc20957d92eff7a3c9fd72baa849b45485e3 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Thu, 10 Jun 2021 15:39:04 -0700
+Subject: [PATCH 06/13] libparted: Fix fd check in _flush_cache
+
+In theory open() could return 0 so the correct error value is -1.
+---
+ libparted/arch/linux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libparted/arch/linux.c b/libparted/arch/linux.c
+index 94ea176..9dc90b5 100644
+--- a/libparted/arch/linux.c
++++ b/libparted/arch/linux.c
+@@ -1678,7 +1678,7 @@ _flush_cache (PedDevice* dev)
+                         break;
+                 if (!_partition_is_mounted_by_path (name)) {
+                         fd = open (name, WR_MODE, 0);
+-                        if (fd > 0) {
++                        if (fd > -1) {
+                                 ioctl (fd, BLKFLSBUF);
+ retry:
+                                 if (fsync (fd) < 0 || close (fd) < 0)
+-- 
+2.31.1
+

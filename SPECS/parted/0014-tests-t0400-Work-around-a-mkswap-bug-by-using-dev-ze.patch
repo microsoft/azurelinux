@@ -1,0 +1,34 @@
+From f801496427db11cc468065dcd77d1c610c0a1047 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Mon, 14 Jun 2021 14:23:46 -0700
+Subject: [PATCH 14/15] tests: t0400 - Work around a mkswap bug by using
+ /dev/zero
+
+mkswap gets stuck, in some situations, when operating on a file full of
+holes (see https://bugzilla.redhat.com/show_bug.cgi?id=1971877) so work
+around that by using /dev/zero instead of /dev/null
+---
+ tests/t0400-loop-clobber-infloop.sh | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/tests/t0400-loop-clobber-infloop.sh b/tests/t0400-loop-clobber-infloop.sh
+index 2d2190d..d05a8e0 100644
+--- a/tests/t0400-loop-clobber-infloop.sh
++++ b/tests/t0400-loop-clobber-infloop.sh
+@@ -22,7 +22,12 @@
+ 
+ N=1M
+ dev=loop-file
+-dd if=/dev/null of=$dev bs=1 seek=$N || fail=1
++
++cleanup_() {
++    rm -f $dev;
++}
++
++dd if=/dev/zero of=$dev bs=$N count=1 || fail=1
+ 
+ mkswap $dev || fail=1
+ 
+-- 
+2.31.1
+

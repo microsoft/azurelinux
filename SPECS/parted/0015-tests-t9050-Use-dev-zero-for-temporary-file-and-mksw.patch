@@ -1,0 +1,46 @@
+From ea1a97b57d4e84005c66bc9c05f2e7c9244b5118 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Mon, 14 Jun 2021 15:04:05 -0700
+Subject: [PATCH 15/15] tests: t9050 Use /dev/zero for temporary file and
+ mkswap
+
+and clean up the usage a little bit by giving it a proper name and
+removing the file when finished.
+---
+ tests/t9050-partition-table-types.sh | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/tests/t9050-partition-table-types.sh b/tests/t9050-partition-table-types.sh
+index 57e004a..d63fa80 100755
+--- a/tests/t9050-partition-table-types.sh
++++ b/tests/t9050-partition-table-types.sh
+@@ -35,16 +35,22 @@ pc98
+ sun
+ mkswap
+ '
++N=1M
++dev=loop-file
+ 
+-dd if=/dev/null of=f bs=1 seek=30M || framework_failure_
++cleanup_() {
++    rm -f $dev;
++}
++
++dd if=/dev/zero of=$dev bs=$N count=30 || framework_failure_
+ 
+ for i in $types; do
+   for j in $types; do
+     echo $i:$j
+-    case $i in mkswap) mkswap f || fail=1;;
+-      *) parted -s f mklabel $i || fail=1;; esac
++    case $i in mkswap) mkswap $dev || fail=1;;
++      *) parted -s $dev mklabel $i || fail=1;; esac
+     case $j in mkswap) continue;; esac
+-    parted -s f mklabel $j || fail=1
++    parted -s $dev mklabel $j || fail=1
+   done
+ done
+ 
+-- 
+2.31.1
+

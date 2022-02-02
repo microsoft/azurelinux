@@ -1,0 +1,123 @@
+From 7c9a96209af2b84e1eec98ad3527f82ddd966cdf Mon Sep 17 00:00:00 2001
+From: Cristian Klein <cristian.klein@elastisys.com>
+Date: Fri, 11 Dec 2020 22:19:22 +0100
+Subject: [PATCH 1/5] parted: add --fix to "fix" in script mode
+
+Use-case: VMs are booted from images that are smaller than their virtual
+disk. This means that -- almost by definition -- the secondary GPT
+header will be "misplaced", i.e., not at the end of the virtual disk.
+
+Without this patch, parted cannot be used for custom/exotic partitioning
+when the VM boots (e.g., in cloud-init's `bootcmd`). Specifically, it
+will fail as follows:
+
+```
+$ sudo parted --script /dev/vda "mkpart 2 10GB -1"
+Warning: Not all of the space available to /dev/vda appears to be used,
+you can fix the GPT to use all of the space (an extra 500 blocks) or continue with the current setting?
+Error: Unable to satisfy all constraints on the partition.
+```
+
+This happens because, in script mode, exceptions are usually not
+resolved.
+
+This patch adds `--fix`. This allows exceptions to be automatically
+resolved with Fix. As a result, the following command will work:
+
+```
+$ sudo parted --fix --script /dev/vda "mkpart 2 10GB -1"
+```
+
+Signed-off-by: Brian C. Lane <bcl@redhat.com>
+---
+ parted/parted.c | 8 ++++++--
+ parted/ui.c     | 7 +++++++
+ parted/ui.h     | 1 +
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/parted/parted.c b/parted/parted.c
+index e84e66d..41edb7f 100644
+--- a/parted/parted.c
++++ b/parted/parted.c
+@@ -116,6 +116,7 @@ static struct option const options[] = {
+         {"list",        0, NULL, 'l'},
+         {"machine",     0, NULL, 'm'},
+         {"script",      0, NULL, 's'},
++        {"fix",         0, NULL, 'f'},
+         {"version",     0, NULL, 'v'},
+         {"align",       required_argument, NULL, 'a'},
+         {"-pretend-input-tty", 0, NULL, PRETEND_INPUT_TTY},
+@@ -127,12 +128,14 @@ static const char *const options_help [][2] = {
+         {"list",        N_("lists partition layout on all block devices")},
+         {"machine",     N_("displays machine parseable output")},
+         {"script",      N_("never prompts for user intervention")},
++        {"fix",         N_("in script mode, fix instead of abort when asked")},
+         {"version",     N_("displays the version")},
+         {"align=[none|cyl|min|opt]", N_("alignment for new partitions")},
+         {NULL,          NULL}
+ };
+ 
+ int     opt_script_mode = 0;
++int     opt_fix_mode = 0;
+ int     pretend_input_tty = 0;
+ int     opt_machine_mode = 0;
+ int     disk_is_modified = 0;
+@@ -2191,7 +2194,7 @@ int     opt, help = 0, list = 0, version = 0, wrong = 0;
+ 
+ while (1)
+ {
+-        opt = getopt_long (*argc_ptr, *argv_ptr, "hlmsva:",
++        opt = getopt_long (*argc_ptr, *argv_ptr, "hlmsfva:",
+                            options, NULL);
+         if (opt == -1)
+                 break;
+@@ -2201,6 +2204,7 @@ while (1)
+                 case 'l': list = 1; break;
+                 case 'm': opt_machine_mode = 1; break;
+                 case 's': opt_script_mode = 1; break;
++                case 'f': opt_fix_mode = 1; break;
+                 case 'v': version = 1; break;
+                 case 'a':
+                   alignment = XARGMATCH ("--align", optarg,
+@@ -2217,7 +2221,7 @@ while (1)
+ 
+ if (wrong == 1) {
+         fprintf (stderr,
+-                 _("Usage: %s [-hlmsv] [-a<align>] [DEVICE [COMMAND [PARAMETERS]]...]\n"),
++                 _("Usage: %s [-hlmsfv] [-a<align>] [DEVICE [COMMAND [PARAMETERS]]...]\n"),
+                  program_name);
+         return 0;
+ }
+diff --git a/parted/ui.c b/parted/ui.c
+index 973bd26..b5948d3 100644
+--- a/parted/ui.c
++++ b/parted/ui.c
+@@ -644,6 +644,13 @@ exception_handler (PedException* ex)
+         if (!option_get_next (ex->options, opt))
+                 return opt;
+ 
++        /* script-mode and fix? */
++        int fix_is_an_option = (ex->options & PED_EXCEPTION_FIX);
++        if (opt_script_mode && opt_fix_mode && fix_is_an_option) {
++                printf ("Fixing, due to --fix\n");
++                return PED_EXCEPTION_FIX;
++        }
++
+         /* script-mode: don't handle the exception */
+         if (opt_script_mode || (!isatty (0) && !pretend_input_tty))
+                 return PED_EXCEPTION_UNHANDLED;
+diff --git a/parted/ui.h b/parted/ui.h
+index 3b07782..e4e88b6 100644
+--- a/parted/ui.h
++++ b/parted/ui.h
+@@ -89,6 +89,7 @@ extern void print_using_dev (PedDevice* dev);
+ 
+ /* in parted.c */
+ extern int	opt_script_mode;
++extern int	opt_fix_mode;
+ extern int	pretend_input_tty;
+ 
+ extern void print_options_help ();
+-- 
+2.26.2
+

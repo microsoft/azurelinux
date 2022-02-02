@@ -1,0 +1,43 @@
+From 6c4050af2c6c0abdbe1d553fdf2f19a6b600e9d1 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Thu, 10 Jun 2021 15:55:59 -0700
+Subject: [PATCH 11/13] parted: Fix memory leaks in do_resizepart
+
+---
+ parted/parted.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/parted/parted.c b/parted/parted.c
+index ba152c3..22b5818 100644
+--- a/parted/parted.c
++++ b/parted/parted.c
+@@ -1582,7 +1582,6 @@ do_resizepart (PedDevice** dev, PedDisk** diskp)
+         /* Push the End value back onto the command_line, if it exists */
+         if (end_size) {
+             command_line_push_word(end_size);
+-            free(end_size);
+         }
+ 
+         start = part->geom.start;
+@@ -1590,7 +1589,7 @@ do_resizepart (PedDevice** dev, PedDisk** diskp)
+         if (!command_line_get_sector (_("End?"), *dev, &end, &range_end, &end_input))
+                 goto error;
+         _adjust_end_if_iec(&start, &end, range_end, end_input);
+-        free(end_input);
++
+         /* Do not move start of the partition */
+         constraint = constraint_from_start_end_fixed_start (*dev, start, range_end);
+         if (!ped_disk_set_partition_geom (disk, part, constraint,
+@@ -1616,6 +1615,9 @@ error_destroy_constraint:
+ error:
+         if (range_end != NULL)
+                 ped_geometry_destroy (range_end);
++        free(end_input);
++        free(end_size);
++
+         return rc;
+ }
+ 
+-- 
+2.31.1
+

@@ -1,0 +1,44 @@
+From 16751493376db612abcceae5ae81fd798c0a4d18 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Fri, 11 Jun 2021 13:43:02 -0700
+Subject: [PATCH 13/13] libparted: Fix potential memory leak in gpt_write
+
+_generate_header() can return with 1 after allocating gpt so it needs to
+be freed in the error path.
+---
+ libparted/labels/gpt.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/libparted/labels/gpt.c b/libparted/labels/gpt.c
+index 93f7add..9b987c1 100644
+--- a/libparted/labels/gpt.c
++++ b/libparted/labels/gpt.c
+@@ -1292,8 +1292,10 @@ gpt_write (const PedDisk *disk)
+ 
+   /* Write PTH and PTEs */
+   /* FIXME: Caution: this code is nearly identical to what's just below. */
+-  if (_generate_header (disk, 0, ptes_crc, &gpt) != 0)
+-    goto error_free_ptes;
++  if (_generate_header (disk, 0, ptes_crc, &gpt) != 0) {
++      pth_free(gpt);
++      goto error_free_ptes;
++  }
+   pth_raw = pth_get_raw (disk->dev, gpt);
+   pth_free (gpt);
+   if (pth_raw == NULL)
+@@ -1307,8 +1309,10 @@ gpt_write (const PedDisk *disk)
+ 
+   /* Write Alternate PTH & PTEs */
+   /* FIXME: Caution: this code is nearly identical to what's just above. */
+-  if (_generate_header (disk, 1, ptes_crc, &gpt) != 0)
+-    goto error_free_ptes;
++  if (_generate_header (disk, 1, ptes_crc, &gpt) != 0) {
++      pth_free(gpt);
++      goto error_free_ptes;
++  }
+   pth_raw = pth_get_raw (disk->dev, gpt);
+   pth_free (gpt);
+   if (pth_raw == NULL)
+-- 
+2.31.1
+

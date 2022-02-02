@@ -1,0 +1,25 @@
+From fbd83d9df7bf5fd0c830935decb9bbc482bf95f4 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Thu, 10 Jun 2021 15:52:28 -0700
+Subject: [PATCH 10/13] parted: Free tmp usage inside do_print
+
+str_list_create calls gettext_to_wchar which makes a copy of it.
+---
+ parted/parted.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/parted/parted.c b/parted/parted.c
+index e9aa240..ba152c3 100644
+--- a/parted/parted.c
++++ b/parted/parted.c
+@@ -1192,6 +1192,7 @@ do_print (PedDevice** dev, PedDisk** diskp)
+                             sprintf (tmp, "%2s ", "");
+ 
+                     StrList *row = str_list_create (tmp, NULL);
++                    free(tmp);
+ 
+                     start = ped_unit_format (*dev, part->geom.start);
+                     end = ped_unit_format_byte (
+-- 
+2.31.1
+

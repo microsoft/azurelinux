@@ -1,0 +1,33 @@
+From 6ed9c9e82ea6cfbee93a47e82e92a90abdb82343 Mon Sep 17 00:00:00 2001
+From: Cristian Klein <cristian.klein@elastisys.com>
+Date: Fri, 11 Dec 2020 22:19:26 +0100
+Subject: [PATCH 5/5] tests: Fix t9041-undetected-in-use-16th-partition
+
+Sometimes fails with:
+```
++ mkfs.ext3 /dev/sda15
+mke2fs 1.45.5 (07-Jan-2020)
+/dev/sda15: Not enough space to build proposed filesystem while setting up superblock
+```
+
+Signed-off-by: Brian C. Lane <bcl@redhat.com>
+---
+ tests/t9041-undetected-in-use-16th-partition.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/t9041-undetected-in-use-16th-partition.sh b/tests/t9041-undetected-in-use-16th-partition.sh
+index a4a3020..129bf15 100644
+--- a/tests/t9041-undetected-in-use-16th-partition.sh
++++ b/tests/t9041-undetected-in-use-16th-partition.sh
+@@ -25,7 +25,7 @@ grep '^#define USE_BLKID 1' "$CONFIG_HEADER" > /dev/null ||
+   skip_ 'this system lacks a new-enough libblkid'
+ 
+ ss=$sector_size_
+-partition_sectors=256  # sectors per partition
++partition_sectors=512  # sectors per partition
+ n_partitions=17        # how many partitions to create
+ start=2048             # start sector for the first partition
+ gpt_slop=34            # sectors at end of disk reserved for GPT
+-- 
+2.26.2
+
