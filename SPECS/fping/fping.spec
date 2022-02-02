@@ -1,13 +1,13 @@
 Summary:       Utility to send ICMP echo probes to network hosts
 Name:          fping
-Version:       4.2
-Release:       3%{?dist}
+Version:       5.0
+Release:       1%{?dist}
 License:       BSD
 Group:         Productivity/Networking/Diagnostic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:           https://www.fping.org/
-Source0:       https://fping.org/dist/%{name}-%{version}.tar.gz
+Source0:       https://github.com/schweikert/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: autoconf
 BuildRequires: automake
 
@@ -36,6 +36,9 @@ rm -rf %{buildroot}%{_infodir}
 %doc %{_mandir}/man8/fping.8*
 
 %changelog
+* Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.0-1
+- Removing the explicit %%clean stage.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2-3
 - Removing the explicit %%clean stage.
 - License verified.
