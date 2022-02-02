@@ -1,6 +1,6 @@
 %global build_date $(date +"%%Y%%m%%d-%%T")
 %global debug_package %{nil}
-%global go_version %(go version | sed -E 's/go version go(\S+).*/\1/')
+%global go_version %(go version | sed -E "s/go version go(\\S+).*/\\1/")
 
 Summary:        Prometheus exporter exposing process metrics from procfs
 Name:           prometheus-process-exporter
@@ -48,7 +48,7 @@ tar -xf %{SOURCE1} --no-same-owner
 %build
 LDFLAGS="-X github.com/ncabatoff/process-exporter/version.Version=%{version}      \
          -X github.com/ncabatoff/process-exporter/version.Revision=%{release}     \
-         -X github.com/prometheus/common/version.Branch=tarball                   \
+         -X github.com/ncabatoff/process-exporter/version.Branch=tarball          \
          -X github.com/ncabatoff/process-exporter/version.BuildDate=%{build_date} \
          -X github.com/ncabatoff/process-exporter/version.GoVersion=%{go_version}"
 
@@ -56,10 +56,9 @@ LDFLAGS="-X github.com/ncabatoff/process-exporter/version.Version=%{version}    
 CGO_ENABLED=0 go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags netgo -o process-exporter ./cmd/process-exporter
 
 %install
-%make_install
-pushd %{buildroot}%{_bindir}
-ln -s %{name} process-exporter
-popd
+install -m 0755 -vd %{buildroot}%{_bindir}
+install -m 0755 -vp process-exporter %{buildroot}%{_bindir}/%{name}
+ln -s %{name} %{buildroot}%{_bindir}/process-exporter
 
 %check
 make test integ
