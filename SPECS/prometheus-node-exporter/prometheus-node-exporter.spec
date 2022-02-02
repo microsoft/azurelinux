@@ -1,6 +1,6 @@
 %global build_date $(date +"%%Y%%m%%d-%%T")
 %global debug_package %{nil}
-%global go_version %(go version | sed -E 's/go version go(\S+).*/\1/')
+%global go_version %(go version | sed -E "s/go version go(\\S+).*/\\1/")
 
 Summary:        Exporter for machine metrics
 Name:           prometheus-node-exporter
@@ -64,9 +64,7 @@ go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o bin/node_ex
 install -m 0755 -vd %{buildroot}%{_bindir}
 install -m 0755 -vp bin/* %{buildroot}%{_bindir}/
 mv %{buildroot}%{_bindir}/node_exporter %{buildroot}%{_bindir}/%{name}
-pushd %{buildroot}%{_bindir}
-ln -s %{name} node_exporter
-popd
+ln -s %{name} %{buildroot}%{_bindir}/node_exporter
 
 install -Dpm0644 %{SOURCE2} %{buildroot}%{_sysusersdir}/%{name}.conf
 install -Dpm0644 %{SOURCE3} %{buildroot}%{_unitdir}/%{name}.service
@@ -76,9 +74,7 @@ install -Dpm0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus/node-exporter
 
 %check
-pushd collector
-go test
-popd
+make test
 
 %pre
 %{sysusers_create_compat} %{SOURCE2}
