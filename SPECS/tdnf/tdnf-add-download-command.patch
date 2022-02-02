@@ -6,7 +6,7 @@ Subject: [PATCH] Merged PR 221: Add download option to TDNF
 Add a `download` command to TDNF that will download RPMs to a directory.
 
 Usage:
-- `tdnf download <package1, package2, ...> --downloaddir /path/to/download/folder>`
+- `tdnf download <package1, package2, ...> --destdir /path/to/download/folder>`
 - To download a package and all of its dependencies even if the system already has them installed, add the `--alldeps` option.
 
 Behavior:
@@ -23,10 +23,10 @@ From: Mateusz Malisz <mamalisz@microsoft.com>
 Date: Thu, 20 Jan 2022 21:54:04+0000
 Subject: [PATCH] Update download commands to work with tdnf-3.2.2.
 
-Updated code to work with tdnf 3.2.2. Removed --destdir argument in favor of reusing --downloaddir instead.
+Updated code to work with tdnf 3.2.2. 
 
 diff --git a/client/api.c b/client/api.c
-index ef25d09..0fefa1d 100644
+index ef25d09..561461b 100644
 --- a/client/api.c
 +++ b/client/api.c
 @@ -629,10 +629,10 @@ TDNFOpenHandle(
@@ -88,10 +88,11 @@ index ef25d09..0fefa1d 100644
      dwError = SolvGetQueryResult(pQuery, &pPkgList);
      BAIL_ON_TDNF_ERROR(dwError);
  
-@@ -1939,3 +1917,183 @@ TDNFGetPackageName(
+@@ -1939,3 +1917,184 @@ TDNFGetPackageName(
  {
      return PACKAGE_NAME;
  }
++
 +uint32_t
 +TDNFResetSack(
 +    PTDNF pTdnf,
@@ -168,7 +169,7 @@ index ef25d09..0fefa1d 100644
 +    TDNFRPMTS ts = {0};
 +
 +    if(!pTdnf || !pTdnf->pSack ||!pdwCount || !ppPkgInfo ||
-+       !ppszPackageNameSpecs || IsNullOrEmptyString(pTdnf->pArgs->pszDownloadDir))
++       !ppszPackageNameSpecs || IsNullOrEmptyString(pTdnf->pArgs->pszDestDir))
 +    {
 +        dwError = ERROR_TDNF_INVALID_PARAMETER;
 +        BAIL_ON_TDNF_ERROR(dwError);
@@ -334,7 +335,7 @@ index b9164e8..125d4b2 100644
          dwError = TDNFAddPackagesForInstall(
                        pSack,
 diff --git a/client/rpmtrans.c b/client/rpmtrans.c
-index 8fa055a..99098b8 100644
+index 8fa055a..2910d3d 100644
 --- a/client/rpmtrans.c
 +++ b/client/rpmtrans.c
 @@ -41,7 +41,9 @@ TDNFRpmExecTransaction(
@@ -343,7 +344,7 @@ index 8fa055a..99098b8 100644
      nKeepCachedRpms = pTdnf->pConf->nKeepCache;
 -    nDownloadOnly = pTdnf->pArgs->nDownloadOnly;
 +    nDownloadOnly = pTdnf->pArgs->nDownloadOnly ||
-+                    nAlterType != ALTER_INSTALL_ONLY_DOWNLOAD;
++                    nAlterType == ALTER_INSTALL_ONLY_DOWNLOAD;
 +
  
      dwError = TDNFAllocateMemory(
@@ -361,18 +362,57 @@ index 8fa055a..99098b8 100644
      if (pszPackageLocation[0] == '/')
      {
          dwError = TDNFAllocateString(
-@@ -519,7 +527,8 @@ TDNFTransAddInstallPkg(
+@@ -519,7 +527,9 @@ TDNFTransAddInstallPkg(
      }
      else
      {
 -        if (!pTdnf->pArgs->nDownloadOnly || pTdnf->pArgs->pszDownloadDir == NULL)
 +        if (!pTdnf->pArgs->nDownloadOnly ||
-+            IsNullOrEmptyString(pTdnf->pArgs->pszDownloadDir))
++            IsNullOrEmptyString(pTdnf->pArgs->pszDownloadDir) ||
++            IsNullOrEmptyString(pTdnf->pArgs->pszDestDir))
          {
              dwError = TDNFDownloadPackageToCache(
                            pTdnf,
+@@ -531,14 +541,29 @@ TDNFTransAddInstallPkg(
+         }
+         else
+         {
+-            dwError = TDNFDownloadPackageToDirectory(
+-                          pTdnf,
+-                          pszPackageLocation,
+-                          pszPkgName,
+-                          pszRepoName,
+-                          pTdnf->pArgs->pszDownloadDir,
+-                          &pszFilePath
+-            );
++            if(!IsNullOrEmptyString(pTdnf->pArgs->pszDestDir)) {
++                dwError = TDNFDownloadPackageToDirectory(
++                    pTdnf,
++                    pszPackageLocation,
++                    pszPkgName,
++                    pszRepoName,
++                    pTdnf->pArgs->pszDestDir,
++                    &pszFilePath
++                    );
++            }
++            else if(!IsNullOrEmptyString(pTdnf->pArgs->pszDestDir)) {
++                dwError = TDNFDownloadPackageToDirectory(
++                    pTdnf,
++                    pszPackageLocation,
++                    pszPkgName,
++                    pszRepoName,
++                    pTdnf->pArgs->pszDownloadDir,
++                    &pszFilePath
++                    );
++            }
++            else {
++                dwError = ERROR_TDNF_INVALID_PARAMETER;
++            }
+ 
+         }
+         BAIL_ON_TDNF_ERROR(dwError);
 diff --git a/include/tdnf.h b/include/tdnf.h
-index d15ea62..38be638 100644
+index d15ea62..e35a65b 100644
 --- a/include/tdnf.h
 +++ b/include/tdnf.h
 @@ -173,6 +173,13 @@ TDNFSearchCommand(
@@ -389,6 +429,22 @@ index d15ea62..38be638 100644
  //invoke solv goal dependency resolution
  //return solved pkg info which has descriptive
  //info about steps to reach current goal.
+@@ -277,6 +284,15 @@ TDNFUninit(
+     void
+     );
+ 
++//Downloads all requested packages without any of their dependencies.
++uint32_t
++TDNFDownloadNoDepsCommand(
++    PTDNF pTdnf,
++    TDNF_SCOPE nScope,
++    char** ppszPackageNameSpecs,
++    PTDNF_PKG_INFO* ppPkgInfo,
++    uint32_t* pdwCount
++    );
+ 
+ #ifdef __cplusplus
+ }
 diff --git a/include/tdnfcli.h b/include/tdnfcli.h
 index 4644cd0..f33f9d4 100644
 --- a/include/tdnfcli.h
@@ -460,7 +516,7 @@ index b7b33d1..3a6178e 100644
  
  #ifdef __cplusplus
 diff --git a/include/tdnftypes.h b/include/tdnftypes.h
-index a547b8a..db77ada 100644
+index a547b8a..a50cfec 100644
 --- a/include/tdnftypes.h
 +++ b/include/tdnftypes.h
 @@ -54,7 +54,8 @@ typedef enum
@@ -481,12 +537,11 @@ index a547b8a..db77ada 100644
      int nAllowErasing;     //allow erasures when solving
      int nAssumeNo;         //assume no for all questions
      int nAssumeYes;        //assume yes for all questions
-@@ -250,7 +252,7 @@ typedef struct _TDNF_CMD_ARGS
-     int nIPv6;             //resolve to IPv6 addresses only
+@@ -251,6 +253,7 @@ typedef struct _TDNF_CMD_ARGS
      int nDisableExcludes;  //disable excludes from tdnf.conf
      int nDownloadOnly;     //download packages only, no install
--    char* pszDownloadDir;  //directory for download, if nDownloadOnly is set
-+    char* pszDownloadDir;  //directory for download, if nDownloadOnly is set or install command is called
+     char* pszDownloadDir;  //directory for download, if nDownloadOnly is set
++    char* pszDestDir;      //directory for download, if install command is called
      char* pszInstallRoot;  //set install root
      char* pszConfFile;     //set conf file location
      char* pszReleaseVer;   //Release version
@@ -633,7 +688,7 @@ index d98d9c7..437d931 100644
  SolvCalculateCookieForFile(
      char *pszFilePath,
 diff --git a/tools/cli/lib/api.c b/tools/cli/lib/api.c
-index f277b7c..2fd99af 100644
+index f277b7c..539b908 100644
 --- a/tools/cli/lib/api.c
 +++ b/tools/cli/lib/api.c
 @@ -718,3 +718,123 @@ TDNFCliRefresh(
@@ -657,7 +712,7 @@ index f277b7c..2fd99af 100644
 +    if(!pContext ||
 +       !pContext->hTdnf ||
 +       !pCmdArgs ||
-+       IsNullOrEmptyString(pCmdArgs->pszDownloadDir))
++       IsNullOrEmptyString(pCmdArgs->pszDestDir))
 +    {
 +        dwError = ERROR_TDNF_INVALID_PARAMETER;
 +        BAIL_ON_CLI_ERROR(dwError);
@@ -732,7 +787,7 @@ index f277b7c..2fd99af 100644
 +       !pContext->hTdnf ||
 +       !pContext->pFnDownloadNoDeps ||
 +       !pCmdArgs ||
-+       IsNullOrEmptyString(pCmdArgs->pszDownloadDir))
++       IsNullOrEmptyString(pCmdArgs->pszDestDir))
 +    {
 +        dwError = ERROR_TDNF_INVALID_PARAMETER;
 +        BAIL_ON_CLI_ERROR(dwError);
@@ -782,7 +837,7 @@ index 369e4e2..8b48c3c 100644
      pr_crit("erase                     Remove a package or packages from your system\n");
      pr_crit("help                      Display a helpful usage message\n");
 diff --git a/tools/cli/lib/parseargs.c b/tools/cli/lib/parseargs.c
-index a022e13..e3093c8 100644
+index a022e13..15329ce 100644
 --- a/tools/cli/lib/parseargs.c
 +++ b/tools/cli/lib/parseargs.c
 @@ -74,6 +74,7 @@ static TDNF_CMD_ARGS _opt = {0};
@@ -793,7 +848,15 @@ index a022e13..e3093c8 100644
      {"allowerasing",  no_argument, &_opt.nAllowErasing, 1},//--allowerasing
      {"assumeno",      no_argument, &_opt.nAssumeNo, 1},    //--assumeno
      {"assumeyes",     no_argument, 0, 'y'},                //--assumeyes
-@@ -326,6 +327,7 @@ TDNFCopyOptions(
+@@ -112,6 +113,7 @@ static struct option pstOptions[] =
+     {"noplugins",     no_argument, 0, 0},                  //--noplugins
+     {"disableplugin", required_argument, 0, 0},            //--disableplugin
+     {"enableplugin",  required_argument, 0, 0},            //--enableplugin
++    {"destdir",       required_argument, 0, 0},            //--destdir
+     {"disableexcludes", no_argument, &_opt.nDisableExcludes, 1}, //--disableexcludes
+     {"downloadonly",  no_argument, &_opt.nDownloadOnly, 1}, //--downloadonly
+     {"downloaddir",   required_argument, 0, 0},            //--downloaddir
+@@ -326,6 +328,7 @@ TDNFCopyOptions(
          BAIL_ON_CLI_ERROR(dwError);
      }
  
@@ -801,6 +864,17 @@ index a022e13..e3093c8 100644
      pArgs->nAllowErasing  = pOptionArgs->nAllowErasing;
      pArgs->nAssumeNo      = pOptionArgs->nAssumeNo;
      pArgs->nAssumeYes     = pOptionArgs->nAssumeYes;
+@@ -383,6 +386,10 @@ ParseOption(
+     {
+         dwError = TDNFAllocateString(optarg, &pCmdArgs->pszInstallRoot);
+     }
++    else if (!strcasecmp(pszName, "destdir"))
++    {
++        dwError = TDNFAllocateString(optarg, &pCmdArgs->pszDestDir);
++    }
+     else if (!strcasecmp(pszName, "downloaddir"))
+     {
+         dwError = TDNFAllocateString(optarg, &pCmdArgs->pszDownloadDir);
 diff --git a/tools/cli/main.c b/tools/cli/main.c
 index 203f50a..eeeabdb 100644
 --- a/tools/cli/main.c

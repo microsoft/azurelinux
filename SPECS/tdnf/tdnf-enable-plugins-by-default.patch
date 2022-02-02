@@ -1,0 +1,9 @@
+diff --git a/etc/tdnf/tdnf.conf b/etc/tdnf/tdnf.conf
+index f8cbc96..a7897ed 100644
+--- a/etc/tdnf/tdnf.conf
++++ b/etc/tdnf/tdnf.conf
+@@ -4,3 +4,4 @@ installonly_limit=3
+ clean_requirements_on_remove=true
+ repodir=/etc/yum.repos.d
+ cachedir=/var/cache/tdnf
++plugins=1

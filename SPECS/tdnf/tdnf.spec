@@ -16,7 +16,8 @@ Source4:        tdnfrepogpgcheck.conf
 
 Patch0:         tdnf-mandatory-space-list-output.patch
 Patch1:         tdnf-default-mariner-release.patch
-Patch2:         tdnf-add-download-command.patch
+Patch2:         tdnf-enable-plugins-by-default.patch
+Patch3:         tdnf-add-download-command.patch
 
 #Cmake requires binutils
 BuildRequires:  binutils
@@ -105,9 +106,6 @@ systemd services for periodic automatic update
 %prep
 %autosetup -p1
 
-# Enable plugins in the default tdnf.conf
-echo "plugins=1" >> etc/tdnf/tdnf.conf
-
 %build
 mkdir build && cd build
 cmake \
@@ -118,7 +116,7 @@ cmake \
 make %{?_smp_mflags} && make python
 
 %check
-pip3 install pytest
+pip3 install pytest requests pyOpenSSL
 cd build && make %{?_smp_mflags} check
 
 %install
