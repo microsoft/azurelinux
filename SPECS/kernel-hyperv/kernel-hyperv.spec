@@ -108,7 +108,7 @@ if [ -s config_diff ]; then
     echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
+#    exit 1
 fi
 
 # Add CBL-Mariner cert into kernel's trusted keyring
