@@ -4200,8 +4200,8 @@
         "type": "other",
         "other": {
           "name": "gcovr",
-          "version": "4.2",
-          "downloadUrl": "https://github.com/gcovr/gcovr/archive/4.2/gcovr-4.2.tar.gz"
+          "version": "5.0",
+          "downloadUrl": "https://github.com/gcovr/gcovr/archive/5.0/gcovr-5.0.tar.gz"
         }
       }
     },
