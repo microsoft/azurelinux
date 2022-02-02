@@ -65,10 +65,7 @@ install -m 0755 -vd %{buildroot}%{_bindir}
 install -m 0755 -vp process-exporter %{buildroot}%{_bindir}/%{name}
 ln -s %{name} %{buildroot}%{_bindir}/process-exporter
 
-install -m 0755 -vd %{buildroot}%{_unitdir}
 install -Dpm0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}.service
-
-install -m 0755 -vd %{buildroot}%{_sysconfdir}
 install -Dpm0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/default/%{name}
 
