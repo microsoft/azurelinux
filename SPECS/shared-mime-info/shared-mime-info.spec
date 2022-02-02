@@ -114,7 +114,7 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 %{_datadir}/gettext/its/shared-mime-info.loc
 
 %changelog
-* Tue Feb 01 2022 Hideyuki Nagase <hideyukn@microsoft.com> - 2.0.5
+* Tue Feb 01 2022 Hideyuki Nagase <hideyukn@microsoft.com> - 2.0-5
 - Apply patch to build with meson 0.60
 
 * Wed Jul 21 2021 Vinicius Jarina <vinja@microsoft.com> - 2.0-4

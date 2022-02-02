@@ -29,6 +29,7 @@ BuildRequires:  git
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  harfbuzz-devel >= 2.0.0
 BuildRequires:  make
+BuildRequires:  pkgconfig
 BuildRequires:  vala
 BuildRequires:  vala-devel
 BuildRequires:  vala-tools
