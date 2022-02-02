@@ -1,5 +1,6 @@
+%global build_date $(date +"%%Y%%m%%d-%%T")
 %global debug_package %{nil}
-%global builddate $(date +"%%Y%%m%%d-%%T")
+%global go_version %(go version | sed -E 's/go version go(\S+).*/\1/')
 
 Summary:        Prometheus exporter exposing process metrics from procfs
 Name:           prometheus-process-exporter
@@ -45,57 +46,27 @@ rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
 
 %build
-export BUILDTAGS="netgo osusergo static_build"
-LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}  \
-         -X github.com/prometheus/common/version.Revision=%{release} \
-         -X github.com/prometheus/common/version.Branch=tarball      \
-         -X github.com/prometheus/common/version.BuildDate=%{builddate} "
-go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o bin/node_exporter ./collector
+LDFLAGS="-X github.com/ncabatoff/process-exporter/version.Version=%{version}      \
+         -X github.com/ncabatoff/process-exporter/version.Revision=%{release}     \
+         -X github.com/prometheus/common/version.Branch=tarball                   \
+         -X github.com/ncabatoff/process-exporter/version.BuildDate=%{build_date} \
+         -X github.com/ncabatoff/process-exporter/version.GoVersion=%{go_version}"
+
+# Modified "build" target from Makefile.
+CGO_ENABLED=0 go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags netgo -o process-exporter ./cmd/process-exporter
 
 %install
-install -m 0755 -vd %{buildroot}%{_bindir}
-install -m 0755 -vp bin/* %{buildroot}%{_bindir}/
-mv %{buildroot}%{_bindir}/node_exporter %{buildroot}%{_bindir}/%{name}
+%make_install
 pushd %{buildroot}%{_bindir}
-ln -s %{name} node_exporter
+ln -s %{name} process-exporter
 popd
-
-install -Dpm0644 %{SOURCE2} %{buildroot}%{_sysusersdir}/%{name}.conf
-install -Dpm0644 %{SOURCE3} %{buildroot}%{_unitdir}/%{name}.service
-install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/default/%{name}
-install -Dpm0644 example-rules.yml %{buildroot}%{_datadir}/prometheus/node-exporter/example-rules.yml
-install -Dpm0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus/node-exporter
 
 %check
-pushd collector
-go test
-popd
-
-%pre
-%{sysusers_create_compat} %{SOURCE2}
-
-%post
-%systemd_post %{name}.service
-
-%preun
-%systemd_preun %{name}.service
-
-%postun
-%systemd_postun_with_restart %{name}.service
+make test integ
 
 %files
 %license LICENSE
-%doc docs examples CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md
-%doc MAINTAINERS.md SECURITY.md README.md
-%{_bindir}/*
-%config(noreplace) %{_sysconfdir}/default/%{name}
-%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%{_sysusersdir}/%{name}.conf
-%{_unitdir}/%{name}.service
-%{_datadir}/prometheus/node-exporter/example-rules.yml
-%dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
-%dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus/node-exporter
+%{_bindir}/*process-exporter
 
 %changelog
 * Tue Feb 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.10-1

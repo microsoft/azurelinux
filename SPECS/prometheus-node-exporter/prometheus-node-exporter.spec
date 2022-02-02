@@ -1,5 +1,6 @@
+%global build_date $(date +"%%Y%%m%%d-%%T")
 %global debug_package %{nil}
-%global builddate $(date +"%%Y%%m%%d-%%T")
+%global go_version %(go version | sed -E 's/go version go(\S+).*/\1/')
 
 Summary:        Exporter for machine metrics
 Name:           prometheus-node-exporter
@@ -52,10 +53,11 @@ tar -xf %{SOURCE1} --no-same-owner
 
 %build
 export BUILDTAGS="netgo osusergo static_build"
-LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}  \
-         -X github.com/prometheus/common/version.Revision=%{release} \
-         -X github.com/prometheus/common/version.Branch=tarball      \
-         -X github.com/prometheus/common/version.BuildDate=%{builddate} "
+LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}      \
+         -X github.com/prometheus/common/version.Revision=%{release}     \
+         -X github.com/prometheus/common/version.Branch=tarball          \
+         -X github.com/prometheus/common/version.BuildDate=%{build_date} \
+         -X github.com/ncabatoff/process-exporter/version.GoVersion=%{go_version}"
 go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o bin/node_exporter ./collector
 
 %install
