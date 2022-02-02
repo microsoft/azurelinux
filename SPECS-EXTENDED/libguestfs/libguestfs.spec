@@ -147,7 +147,7 @@ BuildRequires: perl(Test::Pod) >= 1.00
 BuildRequires: perl(Test::Pod::Coverage) >= 1.00
 BuildRequires: perl(Module::Build)
 BuildRequires: perl(ExtUtils::CBuilder)
-BuildRequires: perl(Locale::TextDomain)
+BuildRequires: perl-libintl-perl
 BuildRequires: python3-devel
 BuildRequires: python3-libvirt
 BuildRequires: ruby-devel
@@ -1276,6 +1276,7 @@ rm ocaml/html/.gitignore
 - Patch ocaml support, RPM config support
 - Disable inspect-icons support by default (we don't have ghostscript)
 - Remove reiserfs, nilfs, jfs, hfsplus, ufs completely
+- Replace perl(Locale::TextDomain) BR with actual provider perl-libintl-perl
 - License verified
 
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.44.0-2
