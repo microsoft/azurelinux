@@ -69,6 +69,8 @@ install -Dpm0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}.service
 install -Dpm0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/default/%{name}
 
+mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus
+
 %check
 make test integ
 
