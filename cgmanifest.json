@@ -27757,8 +27757,8 @@
         "type": "other",
         "other": {
           "name": "span-lite",
-          "version": "0.7.0",
-          "downloadUrl": "https://github.com/martinmoene/span-lite/archive/v0.7.0.tar.gz"
+          "version": "0.10.0",
+          "downloadUrl": "https://github.com/martinmoene/span-lite/archive/v0.10.0.tar.gz"
         }
       }
     },
@@ -28357,8 +28357,8 @@
         "type": "other",
         "other": {
           "name": "tcsh",
-          "version": "6.20.00",
-          "downloadUrl": "https://astron.com/pub/tcsh/old/tcsh-6.20.00.tar.gz"
+          "version": "6.22.03",
+          "downloadUrl": "https://astron.com/pub/tcsh/old/tcsh-6.22.03.tar.gz"
         }
       }
     },
