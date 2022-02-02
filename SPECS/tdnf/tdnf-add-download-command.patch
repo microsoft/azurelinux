@@ -395,7 +395,7 @@ index 8fa055a..2910d3d 100644
 +                    &pszFilePath
 +                    );
 +            }
-+            else if(!IsNullOrEmptyString(pTdnf->pArgs->pszDestDir)) {
++            else if(!IsNullOrEmptyString(pTdnf->pArgs->pszDownloadDir)) {
 +                dwError = TDNFDownloadPackageToDirectory(
 +                    pTdnf,
 +                    pszPackageLocation,
