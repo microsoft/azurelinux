@@ -14,7 +14,7 @@ BuildRequires:  automake
 BuildRequires:  libtool
 BuildRequires:  mesa-libGL-devel
 #Requires:
-Provides:       libGLU
+Provides:       libGLU = %{version}-%{release}
 
 %description
 Mesa implementation of the standard GLU OpenGL utility API.
@@ -29,7 +29,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q -n glu-%{?gitdate:%{gitdate}}%{?!gitdate:%{version}}
+%setup -q -n glu-%{version}
 cp %{SOURCE1} .
 
 %build
@@ -40,9 +40,10 @@ make %{?_smp_mflags}
 
 %install
 %make_install
+find %{buildroot} -type f -name "*.la" -delete -print
+rm -rf %{buildroot}%{_mandir}/man3/gl[A-Z]*
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license LICENSE.PTR
@@ -52,11 +53,8 @@ make %{?_smp_mflags}
 %files devel
 %{_includedir}/GL/glu*.h
 %{_libdir}/libGLU.so
-%{_libdir}/libGLU.la
 %{_libdir}/pkgconfig/glu.pc
 
-%post devel -p /sbin/ldconfig
-%postun devel -p /sbin/ldconfig
 %changelog
 * Wed Jul 21 2021 Vinicius Jarina <vinja@microsoft.com> - 9.0.1-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).

@@ -3,11 +3,9 @@
 
 # We want verbose builds
 %global _configure_disable_silent_rules 1
-
 # Use bundled deps as we don't ship the exact right versions for all the
 # required rust libraries
 %global bundled_rust_deps 1
-
 %global cairo_version 1.16.0
 
 Summary:        An SVG library based on cairo

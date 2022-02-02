@@ -1,8 +1,3 @@
-
-# NOTE: packages that can use jasper:
-# ImageMagick
-# netpbm
-
 Summary:        Implementation of the JPEG-2000 standard, Part 1
 Name:           jasper
 Version:        2.0.32
@@ -110,8 +105,7 @@ make test -C builder
 %{_libdir}/libjasper.so
 %{_libdir}/pkgconfig/jasper.pc
 
-%post libs -p /sbin/ldconfig
-%postun libs -p /sbin/ldconfig
+%ldconfig_scriptlets libs
 
 %files libs
 %doc README
