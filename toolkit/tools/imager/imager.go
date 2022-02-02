@@ -525,6 +525,15 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap m
 			return
 		}
 
+		// Preconfigure SELinux labels now since all the changes to the filesystem should be done
+		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
+			err = installutils.SELinuxConfigure(systemConfig, installChroot, mountPointToFsTypeMap)
+			if err != nil {
+				err = fmt.Errorf("failed to configure selinux: %w", err)
+				return
+			}
+		}
+
 		// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
 		if systemConfig.ReadOnlyVerityRoot.Enable {
 			var initramfsPathList []string

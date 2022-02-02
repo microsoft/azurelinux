@@ -3,19 +3,20 @@
 Summary:        Policy analysis tools for SELinux
 Name:           setools
 Version:        4.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 # binaries are GPL and libraries are LGPL.  See COPYING.
 License:        GPLv2 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/setools
 Source0:        https://github.com/SELinuxProject/setools/releases/download/%{version}/%{name}-%{version}.tar.bz2
+Patch0:         0001-Make-NetworkX-optional.patch
 BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  glibc-devel
-BuildRequires:  libselinux-devel >=  %{libselinux_ver}
+BuildRequires:  libselinux-devel >= %{libselinux_ver}
 BuildRequires:  libsepol-devel >= %{libsepol_ver}
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
@@ -31,8 +32,8 @@ Python modules designed to facilitate SELinux policy analysis.
 %package        console
 Summary:        Policy analysis command-line tools for SELinux
 License:        GPLv2
-Requires:       libselinux >= %{libselinux_ver}
 Requires:       %{name}-python3 = %{version}-%{release}
+Requires:       libselinux >= %{libselinux_ver}
 
 %description    console
 SETools is a collection of graphical tools, command-line tools, and
@@ -57,17 +58,20 @@ SETools is a collection of graphical tools, command-line tools, and
 Python 3 modules designed to facilitate SELinux policy analysis.
 
 %prep
-%autosetup -n %{name}
+%autosetup -p1 -n %{name}
 
 %build
-%python3 setup.py build_ext
-%python3 setup.py build
+%{python3} setup.py build_ext
+%{python3} setup.py build
 
 %install
 %py3_install
 
 # Remove unpackaged files.  These are tools for which the dependencies
 # are not yet available on mariner (python3-networkx)
+# Once networkx is added, the first 4 lines below should be
+# added to setools-console-analyses and the last 3 should
+# go in setools-gui.
 rm -rf %{buildroot}%{_bindir}/sedta
 rm -rf %{buildroot}%{_bindir}/seinfoflow
 rm -rf %{buildroot}%{_mandir}/{,ru/}man1/sedta*
@@ -96,6 +100,11 @@ rm -rf %{buildroot}%{_mandir}/{,ru/}man1/apol*
 %{python3_sitearch}/setools-*
 
 %changelog
+* Tue Dec 14 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.4.0-2
+- Make NetworkX optional for setools-console tools.  It is not used
+  by them.
+- Fix lint issues.
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.4.0-1
 - Upgrade to latest upstream
 - Update version of libselinux/libsepol dependencies

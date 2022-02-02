@@ -1,0 +1,29 @@
+From 4eefe365897af2fcd91b47433140f994777ebd31 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Sun, 12 Sep 2021 21:12:27 +0200
+Subject: [PATCH] Go back to ruamel_yaml
+
+What a mess conda is!
+---
+ conda.recipe/run_test.sh | 2 +-
+ setup.py                 | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index cd9c5715b0..56bb5bbeaf 100644
+--- a/setup.py
++++ b/setup.py
+@@ -37,9 +37,9 @@ install_requires = [
+ ]
+ 
+ if os.getenv('CONDA_BUILD', None) == '1':
+-    install_requires.append("ruamel_yaml_conda >=0.11.14")
++    install_requires.append("ruamel_yaml >=0.11.14")
+ else:
+-    install_requires.append("ruamel_yaml_conda >=0.11.14")
++    install_requires.append("ruamel_yaml >=0.11.14")
+ 
+ 
+ def package_files(*root_directories):
+-- 
+2.32.0

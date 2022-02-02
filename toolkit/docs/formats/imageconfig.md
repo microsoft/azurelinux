@@ -274,12 +274,24 @@ ImaPolicy is a list of Integrity Measurement Architecture (IMA) policies to enab
 
 ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used.
 
+The Security Enhanced Linux (SELinux) feature is enabled by using the `SELinux` key, with value containing the mode to use on boot.  The `enforcing` and `permissive` values will set the mode in /etc/selinux/config.
+This will instruct init (systemd) to set the configured mode on boot.  The `force_enforcing` option will set enforcing in the config and also add `enforcing=1` in the kernel command line,
+which is a higher precedent than the config file. This ensures SELinux boots in enforcing even if the /etc/selinux/config was altered.
+
 A sample KernelCommandLine enabling a basic IMA mode and passing two additional parameters:
 
 ``` json
 "KernelCommandLine": {
     "ImaPolicy": ["tcb"],
     "ExtraCommandLine": "my_first_param=foo my_second_param=\"bar baz\""
+},
+```
+
+A sample KernelCommandLine enabling SELinux and booting in enforcing mode:
+
+``` json
+"KernelCommandLine": {
+    "SELinux": "enforcing"
 },
 ```
 

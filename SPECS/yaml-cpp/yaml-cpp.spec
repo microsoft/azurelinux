@@ -1,33 +1,21 @@
-Name:           yaml-cpp
-Version:        0.6.2
-Release:        6%{?dist}
 Summary:        A YAML parser and emitter for C++
+Name:           yaml-cpp
+Version:        0.7.0
+Release:        1%{?dist}
 License:        MIT
-URL:            https://github.com/jbeder/yaml-cpp
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
+URL:            https://github.com/jbeder/yaml-cpp
 Source0:        https://github.com/jbeder/yaml-cpp/archive/%{name}-%{version}.tar.gz
-
 Patch0:         yaml-cpp-static.patch
-Patch1:         yaml-cpp-include_dir.patch
-
-# The patch for CVE-2017-5950 also fixes CVE-2018-20573, CVE-2018-20574, CVE-2019-6285 and CVE-2019-6292.
-Patch2:         CVE-2017-5950.patch
-Patch3:         CVE-2018-20573.nopatch
-Patch4:         CVE-2018-20574.nopatch
-Patch5:         CVE-2019-6285.nopatch
-Patch6:         CVE-2019-6292.nopatch
-
-BuildRequires: cmake
-BuildRequires: gcc
+BuildRequires:  cmake
+BuildRequires:  gcc
 
 %description
 yaml-cpp is a YAML parser and emitter in C++ written around the YAML 1.2 spec.
 
 %package        devel
 Summary:        Development files for %{name}
-License:        MIT
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       pkg-config
 
@@ -37,17 +25,13 @@ developing applications that use %{name}.
 
 %package        static
 Summary:        Static library for %{name}
-License:        MIT
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 
 %description    static
 The %{name}-static package contains the static library for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%autosetup -n %{name}-%{name}-%{version}
 
 %build
 rm -rf build_shared && mkdir build_shared
@@ -68,7 +52,6 @@ pushd build_static
        ../
 %make_build
 
-
 %install
 pushd build_shared
 %make_install
@@ -82,21 +65,23 @@ pushd build_static
 %files
 %doc CONTRIBUTING.md README.md
 %license LICENSE
-%{_libdir}/*.so.0.6*
+%{_libdir}/*.so.0.7*
 
 %files devel
 %{_includedir}/yaml-cpp/
 %{_libdir}/*.so
-%{_libdir}/cmake/%{name}
-%{_libdir}/pkgconfig/%{name}.pc
+%{_datadir}/cmake/%{name}
+%{_datadir}/pkgconfig/%{name}.pc
 
 %files static
 %license LICENSE
 %{_libdir}/*.a
-%{_libdir}/cmake/%{name}-static
-%{_libdir}/pkgconfig/%{name}-static.pc
 
 %changelog
+* Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.0-1
+- Update to version 0.7.0.
+- License verified.
+
 * Thu Jul 9 2020 Joe Schmitt <joschmit@microsoft.com> - 0.6.2-6
 - Use the official patch for CVE-2017-5950.
 - Nopatch CVE-2018-20573, CVE-2018-20574, CVE-2019-6285 and CVE-2019-6292.
