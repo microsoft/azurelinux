@@ -1,7 +1,7 @@
 Summary:        administration tool for IP sets
 Name:           ipset
-Version:        7.1
-Release:        3%{?dist}
+Version:        7.15
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,14 +33,14 @@ Requires:       %{name} = %{version}-%{release}
 Libraries and header files for ipset.
 
 %package service
-Summary:        %{name} service for %{name}s
-BuildRequires:  systemd
-Requires:       %{name} = %{version}-%{release}
-Requires:       iptables-services
-Requires(post): systemd
+Summary:          %{name} service for %{name}s
+BuildRequires:    systemd
+Requires:         %{name} = %{version}-%{release}
+Requires:         iptables-services
+Requires(post):   systemd
+Requires(preun):  systemd
 Requires(postun): systemd
-Requires(preun): systemd
-BuildArch:      noarch
+BuildArch:        noarch
 
 %description service
 This package provides the service %{name}
@@ -111,6 +111,9 @@ fi
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Tue Feb 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 7.15-1
+- Update source to 7.15
+
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 7.1-3
 - Add service subpackage from Fedora 35 (license: MIT)
 - Add provides for libs subpackage from main package
