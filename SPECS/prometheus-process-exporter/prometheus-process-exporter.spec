@@ -25,6 +25,11 @@ Source0:        https://github.com/ncabatoff/process-exporter/archive/refs/tags/
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+Source2:        %{name}.service
+Source3:        %{name}.logrotate
+Source4:        %{name}.conf
+Patch0:         01-fix-RSS-test-on-non4K-pagesize-systems.patch
+Patch1:         03-disable-fakescraper.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
@@ -40,7 +45,7 @@ instrument with Prometheus. This exporter solves that issue by mining
 process metrics from procfs.
 
 %prep
-%autosetup -n process-exporter-%{version} -p1
+%autosetup -p1 -n process-exporter-%{version}
 
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
@@ -60,12 +65,37 @@ install -m 0755 -vd %{buildroot}%{_bindir}
 install -m 0755 -vp process-exporter %{buildroot}%{_bindir}/%{name}
 ln -s %{name} %{buildroot}%{_bindir}/process-exporter
 
+install -m 0755 -vd %{buildroot}%{_unitdir}
+install -Dpm0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}.service
+
+install -m 0755 -vd %{buildroot}%{_sysconfdir}
+install -Dpm0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/default/%{name}
+
 %check
 make test integ
 
+%pre
+# Same user/group creation steps as for "prometheus-node-exporter".
+getent group 'prometheus' >/dev/null || groupadd -r 'prometheus'
+getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_sharedstatedir}/prometheus' -s '%{_sbindir}/nologin' -c 'Prometheus user account' 'prometheus'
+
+%post
+%systemd_post %{name}.service
+
+%preun
+%systemd_preun %{name}.service
+
+%postun
+%systemd_postun_with_restart %{name}.service
+
 %files
 %license LICENSE
+%config(noreplace) %{_sysconfdir}/default/%{name}
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %{_bindir}/*process-exporter
+%{_unitdir}/%{name}.service
+%dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
 * Tue Feb 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.10-1

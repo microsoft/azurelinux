@@ -46,7 +46,7 @@ Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written
 in Go with pluggable metric collectors.
 
 %prep
-%autosetup -n node_exporter-%{version} -p1
+%autosetup -p1 -n node_exporter-%{version}
 
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
@@ -77,7 +77,12 @@ mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus/node-exporter
 make test
 
 %pre
-%{sysusers_create_compat} %{SOURCE2}
+# Steps extracted from Fedora's /usr/lib/rpm/sysusers.generate-pre.sh script.
+# The script and the RPM macro 'sysusers_create_compat' calling it are not available
+# in Mariner's 'systemd-rpm-macros' package.
+# Input file for the script was %%{SOURCE2}.
+getent group 'prometheus' >/dev/null || groupadd -r 'prometheus'
+getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_sharedstatedir}/prometheus' -s '%{_sbindir}/nologin' -c 'Prometheus user account' 'prometheus'
 
 %post
 %systemd_post %{name}.service
@@ -92,9 +97,9 @@ make test
 %license LICENSE NOTICE
 %doc docs examples CHANGELOG.md CODE_OF_CONDUCT.md CONTRIBUTING.md
 %doc MAINTAINERS.md SECURITY.md README.md
-%{_bindir}/*
 %config(noreplace) %{_sysconfdir}/default/%{name}
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
+%{_bindir}/*
 %{_sysusersdir}/%{name}.conf
 %{_unitdir}/%{name}.service
 %{_datadir}/prometheus/node-exporter/example-rules.yml
