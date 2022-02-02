@@ -58,4 +58,3 @@ index 3ca97be734..e866e82fd3 100644
      assert isinstance(reload_result, PrefixData)
 -- 
 2.19.2
-
