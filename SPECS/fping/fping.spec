@@ -37,7 +37,7 @@ rm -rf %{buildroot}%{_infodir}
 
 %changelog
 * Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.0-1
-- Removing the explicit %%clean stage.
+- Update to 5.0
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2-3
 - Removing the explicit %%clean stage.
