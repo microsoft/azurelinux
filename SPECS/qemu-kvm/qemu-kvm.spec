@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        37%{?dist}
+Release:        38%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,7 @@ Patch1003:      CVE-2020-27661.nopatch
 # CVE 2020-35506 affects the SCSI ESP driver (esp.c), which is only compiled when CONFIG_ESP is set.
 # Our configuration does not enable CONFIG_ESP/compile esp.c, so Mariner is not vulnerable.
 Patch1004:      CVE-2020-35506.nopatch
+Patch1005: CVE-2021-4145.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -189,6 +190,8 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+*   Wed Feb 02 2022 Mariner Autopatcher <cblmargh@microsoft.com> 4.2.0-38
+-   Added patch file(s) CVE-2021-4145.patch
 * Thu Nov 18 2021 Cameron Baird <cameronbaird@microsoft.com> - 4.2.0-37
 - Patched CVE-2021-3545
 - Marked CVE-2020-35506 as nopatch
