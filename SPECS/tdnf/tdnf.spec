@@ -121,7 +121,7 @@ cd build && make %{?_smp_mflags} check
 
 %install
 cd build && %make_install
-find %{buildroot} -name '*.a' -delete
+find %{buildroot} -name '*.a' -delete -print
 mkdir -p %{buildroot}%{_var}/cache/tdnf
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tyum
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/yum

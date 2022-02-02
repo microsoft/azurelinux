@@ -34,12 +34,14 @@ and libraries for use with %{name}.
 %install
 %make_install
 
+find %{buildroot} -name '*.a'  -delete -print
+find %{buildroot} -name '*.la' -delete -print
+
 %files
 %doc README
 %license COPYING
 %defattr(-,root,root)
 %{_libdir}/%{name}.so.3*
-%exclude %{_libdir}/%{name}.{a,la}
 
 %files devel
 %defattr(-,root,root)
@@ -47,7 +49,6 @@ and libraries for use with %{name}.
 %{_libdir}/pkgconfig/*
 %{_libdir}/%{name}.so
 %{_mandir}/man3/*
-%exclude %{_libdir}/%{name}.{a,la}
 
 %changelog
 * Fri Dec 10 2021 Mateusz Malisz <mamalisz@microsoft.com> 0.1.3-1
