@@ -9,7 +9,6 @@ Vendor:        Microsoft Corporation
 Distribution:  Mariner
 Source0:       https://www.kernel.org/pub/linux/utils/usb/usbutils/%{name}-%{version}.tar.xz
 Source1:       usb.ids
-Source2:       LICENSE.PTR
 BuildRequires: libusb-devel
 BuildRequires: pkg-config
 BuildRequires: systemd
@@ -38,7 +37,7 @@ cp %{SOURCE2} .
 
 %files
 %defattr(-,root,root,-)
-%license LICENSE.PTR
+%license LICENSES/GPL*
 %{_bindir}/usb-devices
 %{_bindir}/lsusb
 %{_bindir}/lsusb.py
@@ -49,6 +48,8 @@ cp %{SOURCE2} .
 %changelog
 * Wed Feb 02 2022 Chris Co <chrco@microsoft.com> - 014-1
 - Update to 014 release
+- License shipped upstream now.
+- License verified
 
 *   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 010-3
 -   Adding a license reference.
