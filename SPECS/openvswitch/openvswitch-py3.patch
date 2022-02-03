@@ -1,0 +1,38 @@
+From d84109f0b60096ce71cd0537b31b69a7f5ea8756 Mon Sep 17 00:00:00 2001
+From: Flavio Leitner <fbl@sysclose.org>
+Date: Sat, 14 Sep 2019 20:17:28 -0300
+Subject: [PATCH] ovsdb-idlc.in: fix dict change during iteration.
+
+Python3 complains if a dict key is changed during the
+iteration.
+
+Use list() to create a copy of it.
+
+Traceback (most recent call last):
+  File "./ovsdb/ovsdb-idlc.in", line 1581, in <module>
+    func(*args[1:])
+  File "./ovsdb/ovsdb-idlc.in", line 185, in printCIDLHeader
+    replace_cplusplus_keyword(schema)
+  File "./ovsdb/ovsdb-idlc.in", line 179, in replace_cplusplus_keyword
+    for columnName in table.columns:
+RuntimeError: dictionary keys changed during iteration
+
+Signed-off-by: Flavio Leitner <fbl@sysclose.org>
+Signed-off-by: Ben Pfaff <blp@ovn.org>
+---
+ ovsdb/ovsdb-idlc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ovsdb/ovsdb-idlc.in b/ovsdb/ovsdb-idlc.in
+index 40fef39edf..22d0a4e22e 100755
+--- a/ovsdb/ovsdb-idlc.in
++++ b/ovsdb/ovsdb-idlc.in
+@@ -176,7 +176,7 @@ def replace_cplusplus_keyword(schema):
+                 'wchar_t', 'while', 'xor', 'xor_eq'}
+ 
+     for tableName, table in schema.tables.items():
+-        for columnName in table.columns:
++        for columnName in list(table.columns):
+             if columnName in keywords:
+                 table.columns[columnName + '_'] = table.columns.pop(columnName)
+ 

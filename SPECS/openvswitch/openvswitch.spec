@@ -8,6 +8,8 @@ Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://www.openvswitch.org/
 Source0:        http://openvswitch.org/releases/%{name}-%{version}.tar.gz
+# Upstream patch to enable python3 build, removable in 2.13.0
+Patch0:         %{name}-py3.patch
 BuildRequires:  gcc >= 4.0.0
 BuildRequires:  libcap-ng-devel
 BuildRequires:  make
@@ -263,6 +265,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %changelog
 * Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.12.3-3
 - Remove python2 subpackage, use python3 for main package
+- Add upstream patch to fix python3 build
 - License verified
 
 * Mon Apr 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.12.3-2
