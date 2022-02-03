@@ -1,19 +1,20 @@
-Summary:       USB Utils
-Name:          usbutils
-Version:       014
-Release:       1%{?dist}
-License:       GPLv2+
-URL:           http://linux-usb.sourceforge.net
-Group:         Applications/System
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-Source0:       https://www.kernel.org/pub/linux/utils/usb/usbutils/%{name}-%{version}.tar.xz
-Source1:       usb.ids
-BuildRequires: libusb-devel
-BuildRequires: pkg-config
-BuildRequires: systemd
-Requires:      libusb
-BuildRequires: systemd-devel
+Summary:        USB Utils
+Name:           usbutils
+Version:        014
+Release:        1%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Applications/System
+URL:            http://linux-usb.sourceforge.net
+Source0:        https://www.kernel.org/pub/linux/utils/usb/usbutils/%{name}-%{version}.tar.xz
+Source1:        usb.ids
+BuildRequires:  libusb-devel
+BuildRequires:  pkg-config
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
+Requires:       libusb
+
 
 %description
 The USB Utils package contains an utility used to display information
@@ -23,8 +24,8 @@ about USB buses in the system and the devices connected to them.
 %setup -q -n %{name}-%{version}
 
 %build
-./configure --prefix=/usr \
-            --datadir=/usr/share/misc \
+./configure --prefix=%{_prefix} \
+            --datadir=%{_datadir}/misc \
             --disable-zlib &&
 make %{?_smp_mflags}
 
@@ -51,19 +52,25 @@ cp %{SOURCE2} .
 - License shipped upstream now.
 - License verified
 
-*   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 010-3
--   Adding a license reference.
--   License verified.
--   Removed "sha1" macro.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 010-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Sep 10 2018 Michelle Wang <michellew@vmware.com>  010-1
--   Update version to 010.
-*   Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com>  008-4
--   Change systemd dependency
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 008-3
--   GA - Bump release of all rpms
-*   Tue May 10 2016 Nick Shi <nshi@vmware.com> - 008-2
--   Update Source0 to the correct link
-*   Fri May 06 2016 Nick Shi <nshi@vmware.com> - 008-1
--   Initial version
+* Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 010-3
+- Adding a license reference.
+- License verified.
+- Removed "sha1" macro.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 010-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Sep 10 2018 Michelle Wang <michellew@vmware.com> - 010-1
+- Update version to 010.
+
+* Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com> - 008-4
+- Change systemd dependency
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 008-3
+- GA - Bump release of all rpms
+
+* Tue May 10 2016 Nick Shi <nshi@vmware.com> - 008-2
+- Update Source0 to the correct link
+
+* Fri May 06 2016 Nick Shi <nshi@vmware.com> - 008-1
+- Initial version
