@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 # Contains:
-#	- Definitions
-#	- High Level Targets
-#	- Submake Includes
+#   - Definitions
+#   - High Level Targets
+#   - Submake Includes
 
 ######## DEFINITIONS ########
 
@@ -51,6 +51,7 @@ HYDRATED_BUILD                  ?= n
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
+REPOS_DIR        ?= $(toolkit_root)/repos
 RESOURCES_DIR    ?= $(toolkit_root)/resources
 SCRIPTS_DIR      ?= $(toolkit_root)/scripts
 
@@ -106,6 +107,10 @@ SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR
 endif
 
 REPO_LIST   ?=
+ifeq ($(USE_PREVIEW_REPO),y)
+override REPO_LIST += $(REPOS_DIR)/mariner-official-preview.repo
+endif
+
 CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
@@ -121,9 +126,9 @@ RELEASE_MAJOR_ID   ?= 2.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
 ifneq ($(wildcard $(OUT_DIR)/version-minor-id.config),)
-	RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.config)
+   RELEASE_MINOR_ID ?= .$(shell cat $(OUT_DIR)/version-minor-id.config)
 else
-	RELEASE_MINOR_ID ?= .$(shell date +'%Y%m%d.%H%M')
+   RELEASE_MINOR_ID ?= .$(shell date +'%Y%m%d.%H%M')
 endif
 RELEASE_VERSION    ?= $(RELEASE_MAJOR_ID)$(RELEASE_MINOR_ID)
 
@@ -134,6 +139,7 @@ IMAGE_TAG          ?= Preview-C
 LOG_LEVEL          ?= info
 STOP_ON_WARNING    ?= n
 STOP_ON_PKG_FAIL   ?= n
+STOP_ON_FETCH_FAIL ?= n
 
 ######## HIGH LEVEL TARGETS ########
 
@@ -147,29 +153,29 @@ all: toolchain go-tools chroot-tools
 include $(SCRIPTS_DIR)/utils.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
-#	toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
+#   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 include $(SCRIPTS_DIR)/toolchain.mk
 
 # go utilities with:
-#	go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
+#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 # chroot worker with:
-#	chroot-tools clean-chroot-tools
+#   chroot-tools clean-chroot-tools
 # macro definitions with:
-#	macro-tools clean-macro-tools
+#   macro-tools clean-macro-tools
 include $(SCRIPTS_DIR)/tools.mk
 
 # Create SRPMS from local SPECS with:
-#	input-srpms, clean-input-srpms
+#   input-srpms, clean-input-srpms
 include $(SCRIPTS_DIR)/srpm_pack.mk
 
 # Expand local SRPMS into sources and SPECS with:
-#	expand-specs clean-expand-specs
+#   expand-specs clean-expand-specs
 include $(SCRIPTS_DIR)/srpm_expand.mk
 
 # Create a package build workplan with:
-#	workplan, clean-workplan clean-cache
+#   workplan, clean-workplan clean-cache
 # Build a package with:
-#	build-packages clean-build-packages
+#   build-packages clean-build-packages
 # Either create or consume compressed folders of rpms with:
 #   hydrate-rpms, compress-rpms, clean-compress-rpms, compress-srpms, clean-compress-srpms
 include $(SCRIPTS_DIR)/pkggen.mk
@@ -186,10 +192,10 @@ include $(SCRIPTS_DIR)/toolkit.mk
 # They are guaranteed to run first and will verify there are no existing mount points
 # left after a chroot.
 clean:
-	rm -rf $(OUT_DIR)
-	rm -rf $(BUILD_DIR)
-	rm -rf $(toolkit_root)/out
+   rm -rf $(OUT_DIR)
+   rm -rf $(BUILD_DIR)
+   rm -rf $(toolkit_root)/out
 
 # output version number
 get-version:
-	@echo $(RELEASE_VERSION)
+   @echo $(RELEASE_VERSION)
