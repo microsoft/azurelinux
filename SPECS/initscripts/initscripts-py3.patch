@@ -1,0 +1,218 @@
+From 1d8958cd062c9c5051d93b8d3b946a4384451374 Mon Sep 17 00:00:00 2001
+From: "David Kaspar [Dee'Kej]" <dkaspar@redhat.com>
+Date: Fri, 11 May 2018 14:51:28 +0200
+Subject: [PATCH] po/xgettext_sh*: converted to use to python3
+
+  Also, the code has been fixed to comply with PEP8 specification.
+  More info: https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3
+---
+ po/xgettext_sh    |   5 +-
+ po/xgettext_sh.py | 130 ++++++++++++++++++++++++++--------------------
+ 2 files changed, 76 insertions(+), 59 deletions(-)
+
+diff --git a/po/xgettext_sh b/po/xgettext_sh
+index a9f1f6de..d0550ce6 100644
+--- a/po/xgettext_sh
++++ b/po/xgettext_sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ # xgettext_sh -- extracts translatable strings from a shell script
+ # Copyright (C) 1999 Conectiva Consultoria e Desenvolvimento de Sistemas LTDA
+@@ -18,10 +18,11 @@
+ # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+ from sys import path
++
+ if not '/usr/lib/conectiva/xgettext_sh' in path:
+     path[:0] = ['/usr/lib/conectiva/xgettext_sh']
+ 
+ from xgettext_sh import main
+ 
+ if __name__ == '__main__':
+-	main()
++    main()
+diff --git a/po/xgettext_sh.py b/po/xgettext_sh.py
+index d442e989..0391d650 100755
+--- a/po/xgettext_sh.py
++++ b/po/xgettext_sh.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ # sh_xgettext
+ # Arnaldo Carvalho de Melo <acme@conectiva.com.br>
+ # Wed Mar 10 10:24:35 EST 1999
+@@ -24,74 +24,90 @@
+ 
+ 
+ from sys import argv
+-from string import find, split, strip
++import string
+ import re
+ 
+ s = {}
+ pattern = re.compile('[ =]\$"')
+ 
++
+ def xgettext(arq):
+-	line = 0
+-	f = open(arq, "r")
+-        while 1:
+-		l = f.readline()
+-		if not l: break
+-		line = line + 1
+-		if l[0:1] == '#':       continue
+-		elif l[0:1] == '\n':    continue
+-		else:
+-			for match in pattern.finditer(l):
+-				pos = match.start()
+-				p1 = l.find('"',pos) + 1
+-				p2 = p1+1
+-				while 1:
+-                                    p2 = l.find('"',p2)
+-                                    if p2 == -1:
+-                                        p2 = p1
+-                                        break
+-                                    if l[p2-1] == '\\':
+-                                        p2 = p2 + 1
+-                                    else:
+-                                        break
+-                                text = l[p1:p2]
+-				#text = split(l[pos:], '"')[1]
+-				if s.has_key(text):
+-				    s[text].append((arq, line))
+-				else:
+-				    s[text] = [(arq, line)]
+-	f.close()
++    line = 0
++    f = open(arq, "r")
++
++    while 1:
++        l = f.readline()
++
++        if not l:
++            break
++
++        line = line + 1
++
++        if l[0:1] == '#':
++            continue
++        elif l[0:1] == '\n':
++            continue
++        else:
++            for match in pattern.finditer(l):
++                pos = match.start()
++                p1 = l.find('"', pos) + 1
++                p2 = p1 + 1
++
++                while 1:
++                    p2 = l.find('"', p2)
++                    if p2 == -1:
++                        p2 = p1
++                        break
++                    if l[p2-1] == '\\':
++                        p2 = p2 + 1
++                    else:
++                        break
++                    text = l[p1:p2]
++
++                if text in s:
++                    s[text].append((arq, line))
++                else:
++                    s[text] = [(arq, line)]
++
++    f.close()
++
+ 
+ def print_header():
+-	print 'msgid ""' 
+-	print 'msgstr ""' 
+-	print '"Project-Id-Version: PACKAGE VERSION\\n"'
+-	print '"Report-Msgid-Bugs-To: \\n"'
+-	print '"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\\n"'
+-	print '"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"'
+-	print '"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"'
+-	print '"Language-Team: LANGUAGE <LL@li.org>\\n"'
+-	print '"Language: \\n"'
+-	print '"MIME-Version: 1.0\\n"'
+-	print '"Content-Type: text/plain; charset=UTF-8\\n"'
+-	print '"Content-Transfer-Encoding: 8bit\\n"\n'
++    print('msgid ""')
++    print('msgstr ""')
++    print('"Project-Id-Version: PACKAGE VERSION\\n"')
++    print('"Report-Msgid-Bugs-To: \\n"')
++    print('"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\\n"')
++    print('"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"')
++    print('"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"')
++    print('"Language-Team: LANGUAGE <LL@li.org>\\n"')
++    print('"Language: \\n"')
++    print('"MIME-Version: 1.0\\n"')
++    print('"Content-Type: text/plain; charset=UTF-8\\n"')
++    print('"Content-Transfer-Encoding: 8bit\\n"\n')
++
+ 
+ def print_pot():
+-	print_header()
+-
+-	for text in s.keys():
+-		print '#:',
+-		for p in s[text]:
+-			print '%s:%d' % p,
+-		if find(text, '%') != -1:
+-			print '\n#, c-format',
+-		print '\nmsgid "' + text + '"'
+-		print 'msgstr ""\n'
+-				
++    print_header()
++
++    for text in list(s.keys()):
++        print('#:', end=' ')
++
++        for p in s[text]:
++            print('%s:%d' % p, end=' ')
++
++        if text.find('%') != -1:
++            print('\n#, c-format', end=' ')
++
++        print('\nmsgid "' + text + '"')
++        print('msgstr ""\n')
++
++
+ def main():
+-	for a in argv:
+-		xgettext(a)
++    for a in argv:
++        xgettext(a)
+ 
+-	print_pot()
++    print_pot()
+ 
+ if __name__ == '__main__':
+     main()
+
+From 721c3dd4e3ad8ad0dec5bed350bc2743e97d357f Mon Sep 17 00:00:00 2001
+From: "David Kaspar [Dee'Kej]" <dkaspar@redhat.com>
+Date: Mon, 14 May 2018 13:03:18 +0200
+Subject: [PATCH] po/xgettext_sh.py: fix for indentation of previous commit
+
+  The tabs & spaces mixture caused bad script conversion and breaking
+  the script completely...
+---
+ po/xgettext_sh.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/po/xgettext_sh.py b/po/xgettext_sh.py
+index 0391d650..36ff02bb 100755
+--- a/po/xgettext_sh.py
++++ b/po/xgettext_sh.py
+@@ -62,7 +62,8 @@ def xgettext(arq):
+                         p2 = p2 + 1
+                     else:
+                         break
+-                    text = l[p1:p2]
++
++                text = l[p1:p2]
+ 
+                 if text in s:
+                     s[text].append((arq, line))

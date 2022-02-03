@@ -11,6 +11,8 @@ URL:            https://github.com/fedora-sysv/initscripts
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         service.patch
 Patch1:         fix_return_code_during_set_error.patch
+# Upsteam patches to enable python3 usage. Removable in version 9.80
+Patch2:         initscripts-py3.patch
 BuildRequires:  gettext
 BuildRequires:  glib-devel
 BuildRequires:  pkg-config
@@ -39,8 +41,6 @@ Currently, this consists of various memory checking code.
 
 %prep
 %autosetup -p1
-
-%py3_shebang_fix po/xgettext_sh{,.py}
 
 %build
 make
@@ -166,7 +166,7 @@ EOF
 
 %changelog
 * Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 9.70-9
-- Remove python2, use python3 explicitly during docs build
+- Remove python2, add patches to use python3 during docs build
 
 * Mon Mar 29 2021 Henry Li <lihl@microsoft.com> - 9.70-8
 - Replace incorrect %%{_lib} usage with %%{_libdir}.
