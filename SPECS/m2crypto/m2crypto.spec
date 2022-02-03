@@ -42,7 +42,7 @@ messenger for Zope.
 %py3_install
 
 %check
-%python3 setup.py test
+%{python3} setup.py test
 
 %files -n python3-m2crypto
 %defattr(-,root,root)
