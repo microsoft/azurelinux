@@ -3950,8 +3950,8 @@
         "type": "other",
         "other": {
           "name": "fping",
-          "version": "4.2",
-          "downloadUrl": "https://fping.org/dist/fping-4.2.tar.gz"
+          "version": "5.0",
+          "downloadUrl": "https://github.com/schweikert/fping/releases/download/v5.0/fping-5.0.tar.gz"
         }
       }
     },
