@@ -1,12 +1,13 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.4.2
-Release:        3%{?dist}
+Release:        5%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         0001-test_write_disk_secure-properly-check-if-lchmod-is-s.patch
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -25,7 +26,7 @@ Requires:       %{name} = %{version}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 export CFLAGS="%{optflags}"
@@ -59,6 +60,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Feb 03 2022 Muhammad Falak <mwani@microsoft.com> - 3.4.2-5
+- Backport patch from upstream to fix 'test_write_disk_secure'
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.2-4
 - Merge the following releases from 1.0 to dev branch
 - henry.beberman@microsoft.com, 3.4.2-3: Update Source URL to GitHub instead of libarchive.org

@@ -1,0 +1,69 @@
+From 56c095bef0a892dbaf18e45efbec2087d6878a54 Mon Sep 17 00:00:00 2001
+From: Martin Matuska <martin@matuska.org>
+Date: Fri, 22 May 2020 11:43:43 +0200
+Subject: [PATCH] test_write_disk_secure: properly check if lchmod() is
+ supported
+
+Fixes #1379
+
+Backported by mfrw from upstream.
+
+Signed-off-by: Muhammad Falak Wani <mwani@microsoft.com>
+---
+ libarchive/test/test_write_disk_secure.c | 33 +++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 4 deletions(-)
+
+diff --git a/libarchive/test/test_write_disk_secure.c b/libarchive/test/test_write_disk_secure.c
+index 7cd66c41..ff2922a3 100644
+--- a/libarchive/test/test_write_disk_secure.c
++++ b/libarchive/test/test_write_disk_secure.c
+@@ -40,6 +40,9 @@ DEFINE_TEST(test_write_disk_secure)
+ 	struct archive *a;
+ 	struct archive_entry *ae;
+ 	struct stat st;
++#if defined(HAVE_LCHMOD) && defined(HAVE_SYMLINK)
++	int working_lchmod;
++#endif
+ 
+ 	/* Start with a known umask. */
+ 	assertUmask(UMASK);
+@@ -251,10 +254,32 @@ DEFINE_TEST(test_write_disk_secure)
+ 	assert(0 == lstat("link_to_dir", &st));
+ 	failure("link_to_dir: st.st_mode=%o", st.st_mode);
+ 	assert(S_ISLNK(st.st_mode));
+-#if HAVE_LCHMOD
+-	/* Systems that lack lchmod() can't set symlink perms, so skip this. */
+-	failure("link_to_dir: st.st_mode=%o", st.st_mode);
+-	assert((st.st_mode & 07777) == 0755);
++#if defined(HAVE_SYMLINK) && defined(HAVE_LCHMOD) && \
++    defined(S_IRUSR) && defined(S_IWUSR) && defined(S_IXUSR)
++	/* Verify if we are able to lchmod() */
++	if (symlink("dir", "testlink_to_dir") == 0) {
++		if (lchmod("testlink_to_dir",
++		    S_IRUSR | S_IWUSR | S_IXUSR) != 0) {
++			switch (errno) {
++				case ENOTSUP:
++				case ENOSYS:
++#if ENOTSUP != EOPNOTSUPP
++				case EOPNOTSUPP:
++#endif
++					working_lchmod = 0;
++					break;
++				default:
++					working_lchmod = 1;
++			}
++		} else
++			working_lchmod = 1;
++	} else
++		working_lchmod = 0;
++
++	if (working_lchmod) {
++		failure("link_to_dir: st.st_mode=%o", st.st_mode);
++		assert((st.st_mode & 07777) == 0755);
++	}
+ #endif
+ 
+ 	assert(0 == lstat("dir/filea", &st));
+-- 
+2.17.1
+
