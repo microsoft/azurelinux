@@ -29097,8 +29097,8 @@
         "type": "other",
         "other": {
           "name": "usbutils",
-          "version": "010",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/usb/usbutils/usbutils-010.tar.xz"
+          "version": "014",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/usb/usbutils/usbutils-014.tar.xz"
         }
       }
     },
