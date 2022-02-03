@@ -25,7 +25,7 @@ Mercurial is written in Python and is used by projects such as Mozilla and Vim.
 %autosetup
 
 %build
-%make_build
+%make_build all
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
