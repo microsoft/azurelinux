@@ -81,7 +81,9 @@ This package contains a network IPMI listener.
     --with-tkinter=no                       \
     --docdir=%{_docdir}/%{name}-%{version}  \
     --with-perl=yes                         \
-    --with-perlinstall=%{perl_vendorarch}
+    --with-perlinstall=%{perl_vendorarch}   \
+    --with-python=%python3                  \
+    --with-pythoninstall=%{python3_sitelib}
 make
 
 %install
