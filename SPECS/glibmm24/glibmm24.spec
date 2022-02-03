@@ -1,17 +1,31 @@
+%global apiver 2.4
+
 Summary:        C++ interface to the glib
 Name:           glibmm24
 %define BaseVersion 2.70
 Version:        %{BaseVersion}.0
-Release:        1%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://ftp.gnome.org/pub/GNOME/sources/glibmm/%{BaseVersion}/glibmm-%{version}.tar.xz
-BuildRequires:  python2 >= 2.7
+BuildRequires:  gcc-c++
+BuildRequires:  glib-devel 
+BuildRequires:  glib-schemas
 BuildRequires:  libsigc++20 >= 2.10.0
-BuildRequires:  glib-devel glib-schemas
+BuildRequires:  m4
+BuildRequires:  meson
+BuildRequires:  mm-common
+BuildRequires:  git
+
+BuildRequires:  libxslt
+BuildRequires:  doxygen
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+
+%global with_check 0
 %if %{with_check}
 BuildRequires:  glib-networking
 %endif
@@ -29,44 +43,51 @@ a comprehensive set of widget classes that can be freely combined to quickly cre
 %package devel
 Summary: Header files for glibmm
 Group: Applications/System
-Requires: %{name} = %{version}
-Requires:	glib-devel libsigc++20
+Requires: 	%{name} = %{version}
+Requires:	glib-devel
+Requires:   libsigc++20
 %description devel
 These are the header files of glibmm.
 
 %prep
 %setup -q -n glibmm-%{version}
+
 %build
-./configure \
-	--prefix=%{_prefix} \
-	--bindir=%{_bindir}
-make %{?_smp_mflags}
+%meson
+meson --buildtype=plain --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/libexec --bindir=/usr/bin --sbindir=/usr/sbin --includedir=/usr/include --datadir=/usr/share --mandir=/usr/share/man --infodir=/usr/share/info --localedir=/usr/share/locale --sysconfdir=/etc --localstatedir=/var --sharedstatedir=/var/lib --auto-features=enabled . x86_64-mariner-linux
+%meson_build
+
 %install
-make DESTDIR=%{buildroot} install
-find %{buildroot} -type f -name "*.la" -delete -print
+%meson_install
+
+chmod +x %{buildroot}%{_libdir}/glibmm-%{apiver}/proc/generate_wrap_init.pl
+chmod +x %{buildroot}%{_libdir}/glibmm-%{apiver}/proc/gmmproc
 
 %check
 #need read content from /etc/fstab, which couldn't be empty
 echo '#test' > /etc/fstab
 export GIO_EXTRA_MODULES=/usr/lib/gio/modules; make check
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
 %files
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/*.so.*
-%{_libdir}/pkgconfig/*.pc
-%{_libdir}/glibmm-2.4/proc/*
+%{_libdir}/glibmm-%{apiver}/proc/*
+
 %files devel
 %defattr(-,root,root)
 %{_libdir}/*.so
-%{_libdir}/glibmm-2.4/include/*
-%{_libdir}/giomm-2.4/include/*
+%{_libdir}/glibmm-%{apiver}/include/*
+%{_libdir}/giomm-%{apiver}/include/*
 %{_includedir}/*
 %{_datadir}/*
+%{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.70.0-1
+- Update to v2.70.0
+- Refactor to support new meson build system
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.56.0-8
 - Remove libtool archive files from final packaging
 
