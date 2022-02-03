@@ -1,12 +1,9 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Enable building and running the tests
-# This is disabled by default, because ocaml-lwt requires this package to build.
-%bcond_with test
 
 Name:           ocaml-ctypes
 Version:        0.18.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Combinators for binding to C libraries without writing any C
 
 License:        MIT
@@ -19,9 +16,9 @@ BuildRequires:  ocaml-bigarray-compat-devel
 BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-integers-devel >= 0.3.0
 BuildRequires:  ocaml-ocamldoc
-BuildRequires:  pkgconfig(libffi)
+BuildRequires:  libffi-devel
 
-%if %{with test}
+%if %{with_check}
 BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  ocaml-bisect-ppx-devel
 BuildRequires:  ocaml-lwt-devel >= 3.2.0
@@ -60,7 +57,7 @@ The %{name}-doc package contains developer documentation for
 %prep
 %autosetup
 
-# Use Fedora flags
+# Use Mariner flags
 sed -e 's|-fPIC -Wall -g|-fPIC %{build_cflags}|' \
     -e 's|-link -static-libgcc|%{build_ldflags}|' \
     -i Makefile.rules
@@ -95,10 +92,8 @@ mkdir -p $DESTDIR/ctypes-foreign
 cp -p ctypes-foreign.opam $DESTDIR/ctypes-foreign/opam
 cp -p ctypes.opam $DESTDIR/ctypes/opam
 
-%if %{with test}
 %check
 make test
-%endif
 
 %files
 %license LICENSE
@@ -130,6 +125,10 @@ make test
 %doc *.html *.css
 
 %changelog
+* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.18.0-3
+- Use direct libffi-devel BR instead of pkgconfig(libffi) due to improper provides
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.0-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

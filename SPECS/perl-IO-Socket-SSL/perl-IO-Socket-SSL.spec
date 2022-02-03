@@ -1,7 +1,7 @@
 Summary:        SSL sockets with IO::Socket interface
 Name:           perl-IO-Socket-SSL
 Version:        2.066
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            https://metacpan.org/release/IO-Socket-SSL
@@ -11,6 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 BuildRequires:  perl-Net-SSLeay
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -64,6 +65,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.066-6
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.066-5
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 2.066-4: Fix check tests.

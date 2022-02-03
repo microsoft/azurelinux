@@ -1,15 +1,14 @@
 Summary:        C library that provide processing for data in the UTF-8 encoding
 Name:           utf8proc
-Version:        2.2.0
-Release:        3%{?dist}
+Version:        2.6.1
+Release:        1%{?dist}
 License:        MIT
-Group:          System Environment/Libraries
-Url:            https://github.com/JuliaStrings/utf8proc
-# Source0:  https://github.com/JuliaStrings/utf8proc/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-%define sha1 %{name}-%{version}=476efd08dbff38c63f01bb9176905edb09384e63
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Libraries
+URL:            https://github.com/JuliaStrings/utf8proc
+# Source0:  https://github.com/JuliaStrings/utf8proc/archive/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 
 %description
@@ -49,7 +48,7 @@ make check
 %files
 %defattr(-,root,root,-)
 %license LICENSE.md
-%doc lump.md LICENSE.md NEWS.md README.md
+%doc lump.md NEWS.md README.md
 %{_libdir}/libutf8proc.so.*
 
 %files devel
@@ -58,10 +57,15 @@ make check
 %{_libdir}/libutf8proc.so
 
 %changelog
+* Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.6.1-1
+- Update to version 2.6.1.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.2.0-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.2.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*       Tue Sep 18 2018 Ankit Jain <ankitja@vmware.com> 2.2.0-1
--       Initial Version.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.2.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Sep 18 2018 Ankit Jain <ankitja@vmware.com> 2.2.0-1
+- Initial Version.

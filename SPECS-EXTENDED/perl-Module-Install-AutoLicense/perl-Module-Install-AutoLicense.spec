@@ -1,6 +1,6 @@
 Name:           perl-Module-Install-AutoLicense
 Version:        0.10
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Module::Install extension to automatically generate LICENSE files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -19,8 +19,10 @@ BuildRequires:  perl(Config)
 BuildRequires:  perl(Capture::Tiny) >= 0.05
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(inc::Module::Install) >= 0.85
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install) >= 0.85
 BuildRequires:  perl(Module::Install::Base)
 BuildRequires:  perl(Module::Install::Can)
@@ -65,11 +67,15 @@ find $RPM_BUILD_ROOT -type f -name .packlist -delete
 make test
 
 %files
+%license LICENSE
 %doc Changes
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-12
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

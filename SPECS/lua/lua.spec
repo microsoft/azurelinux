@@ -1,14 +1,19 @@
-%global major_version 5.3
+%global major_version 5.4
 # Normally, this is the same as version, but... not always.
-# No tests yet for 5.3.5
-%global test_version 5.3.4
+%global test_version 5.4.3
+# If you are incrementing major_version, enable bootstrapping and adjust accordingly.
+# Version should be the latest prior build. If you don't do this, RPM will break and
+# everything will grind to a halt.
+%global bootstrap 1
+%global bootstrap_major_version 5.3
+%global bootstrap_version %{bootstrap_major_version}.5
+
 # Place rpm-macros into proper location.
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-
 Name:           lua
-Version:        %{major_version}.5
-Release:        11%{?dist}
+Version:        %{major_version}.3
+Release:        1%{?dist}
 Summary:        Powerful light-weight programming language
 License:        MIT
 URL:            https://www.lua.org/
@@ -18,34 +23,28 @@ Distribution:   Mariner
 Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
 # copied from doc/readme.html on 2014-07-18
 Source1:        mit.txt
-Source2:        http://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
+%if 0%{?bootstrap}
+Source2:        http://www.lua.org/ftp/lua-%{bootstrap_version}.tar.gz
+%endif
+Source3:        http://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
 # multilib
-Source3:        luaconf.h
-# rpm-macro
-Source1000:     macros.lua
-
-Patch0:         %{name}-5.3.0-autotoolize.patch
+Source4:        luaconf.h
+Patch0:         %{name}-5.4.0-beta-autotoolize.patch
 Patch1:         %{name}-5.3.0-idsize.patch
-Patch2:         %{name}-5.2.2-configure-linux.patch
-Patch3:         %{name}-5.3.0-configure-compat-module.patch
-# From http://lua.2524044.n2.nabble.com/CVE-2019-6706-use-after-free-in-lua-upvaluejoin-function-tt7685575.html
-Patch4:         CVE-2019-6706-use-after-free-lua_upvaluejoin.patch
-Patch5:         lua-5.3.4-shared_library-1.patch
-# CVE-2020-15888 patch taken from Open Embedded's Lua meta layer https://github.com/openembedded/meta-openembedded/blob/master/meta-oe/recipes-devtools/lua/lua/CVE-2020-15888.patch
-# NOTE: Upstream patches needed if updating to 5.4:
-#   - eb41999461b6f428186c55abd95f4ce1a76217d5
-#   - 6298903e35217ab69c279056f925fb72900ce0b7
-Patch6:         CVE-2020-15888.patch
-# CVE-2020-15889 is in the Lua generational garbage collection code, which is new to 5.4.0. 5.3.5 is not affected.
-# NOTE: Patches needed if updating to 5.4:
-#   - 127e7a6c8942b362aa3c6627f44d660a4fb75312
-Patch7:         CVE-2020-15889.nopatch
-# CVE-2020-24342 appears to not affect 5.3.5 (no repro of exploit)
-# NOTE: Patches needed if updating to 5.4:
-#   - 34affe7a63fc5d842580a9f23616d057e17dfe27
-Patch8:         CVE-2020-24342.nopatch
+#Patch2:         %%{name}-5.3.0-luac-shared-link-fix.patch
+Patch3:         %{name}-5.2.2-configure-linux.patch
+Patch4:         %{name}-5.3.0-configure-compat-module.patch
+%if 0%{?bootstrap}
+Patch5:         %{name}-5.3.0-autotoolize.patch
+Patch6:		%{name}-5.3.5-luac-shared-link-fix.patch
+%endif
+# https://www.lua.org/bugs.html
+Patch18:	%{name}-5.3.5-CVE-2020-24370.patch
+Patch19:	%{name}-5.4.3-bug3.patch
+Patch20:	CVE-2021-43519.patch
 
 BuildRequires:  automake autoconf libtool readline-devel ncurses-devel
+BuildRequires:  make
 Requires:       lua-libs = %{version}-%{release}
 
 %description
@@ -62,6 +61,7 @@ configuration, scripting, and rapid prototyping.
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       pkgconfig
+Requires:       lua-rpm-macros
 
 %description devel
 This package contains development files for %{name}.
@@ -82,20 +82,36 @@ This package contains the static version of liblua for %{name}.
 
 
 %prep
-%setup -q -a 2 -n %{name}-%{version}
+%if 0%{?bootstrap}
+%setup -q -a 2 -a 3 -n %{name}-%{version}
+%else
+%setup -q -a 3
+%endif
 cp %{SOURCE1} .
 mv src/luaconf.h src/luaconf.h.template.in
 %patch0 -p1 -E -z .autoxxx
 %patch1 -p1 -z .idsize
-%patch2 -p1 -z .configure-linux
-%patch3 -p1 -z .configure-compat-all
-%patch4 -p1 -b .CVE-2019-6706
-%patch5 -p1
-%patch6 -p1
-sed -i 's/CFLAGS= -fPIC -O2 /CFLAGS+= -fPIC -O2 -DLUA_COMPAT_MODULE /' src/Makefile
+#%% patch2 -p1 -z .luac-shared
+%patch3 -p1 -z .configure-linux
+%patch4 -p1 -z .configure-compat-all
 # Put proper version in configure.ac, patch0 hardcodes 5.3.0
 sed -i 's|5.3.0|%{version}|g' configure.ac
+%patch19 -p1 -b .bug3
+%patch20 -p1
 autoreconf -ifv
+
+%if 0%{?bootstrap}
+cd lua-%{bootstrap_version}/
+mv src/luaconf.h src/luaconf.h.template.in
+%patch5 -p1 -b .autoxxx
+%patch1 -p1 -b .idsize
+%patch3 -p1 -z .configure-linux
+%patch4 -p1 -z .configure-compat-all
+%patch6 -p1 -b .luac-shared-link-fix
+%patch18 -p1 -b .CVE-2020-24370
+autoreconf -i
+cd ..
+%endif
 
 %build
 %configure --with-readline --with-compat-module
@@ -106,8 +122,22 @@ sed -i 's|@pkgdatadir@|%{_datadir}|g' src/luaconf.h.template
 
 # hack so that only /usr/bin/lua gets linked with readline as it is the
 # only one which needs this and otherwise we get License troubles
-make %{?_smp_mflags} LIBS="-lm -ldl"
+%make_build LIBS="-lm -ldl"
 # only /usr/bin/lua links with readline now #luac_LDADD="liblua.la -lm -ldl"
+
+%if 0%{?bootstrap}
+pushd lua-%{bootstrap_version}
+%configure --with-readline --with-compat-module
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+# Autotools give me a headache sometimes.
+sed -i 's|@pkgdatadir@|%{_datadir}|g' src/luaconf.h.template
+
+# hack so that only /usr/bin/lua gets linked with readline as it is the
+# only one which needs this and otherwise we get License troubles
+%make_build LIBS="-lm -ldl" luac_LDADD="liblua.la -lm -ldl"
+popd
+%endif
 
 %check
 cd ./lua-%{test_version}-tests/
@@ -129,7 +159,7 @@ sed -i.orig -e '
 LD_LIBRARY_PATH=$RPM_BUILD_ROOT/%{_libdir} $RPM_BUILD_ROOT/%{_bindir}/lua -e"_U=true" all.lua
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/lua/%{major_version}
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/lua/%{major_version}
@@ -137,10 +167,18 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/lua/%{major_version}
 # Rename luaconf.h to luaconf-<arch>.h to avoid file conflicts on
 # multilib systems and install luaconf.h wrapper
 mv %{buildroot}%{_includedir}/luaconf.h %{buildroot}%{_includedir}/luaconf-%{_arch}.h
-install -p -m 644 %{SOURCE3} %{buildroot}%{_includedir}/luaconf.h
+install -p -m 644 %{SOURCE4} %{buildroot}%{_includedir}/luaconf.h
 
-# Install rpm-macro
-install -Dpm 0644 %{SOURCE1000} $RPM_BUILD_ROOT/%{macrosdir}/macros.lua
+%if 0%{?bootstrap}
+pushd lua-%{bootstrap_version}
+mkdir $RPM_BUILD_ROOT/installdir
+make install DESTDIR=$RPM_BUILD_ROOT/installdir
+cp -a $RPM_BUILD_ROOT/installdir/%{_libdir}/liblua-%{bootstrap_major_version}.so $RPM_BUILD_ROOT%{_libdir}/
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/lua/%{bootstrap_major_version}
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/lua/%{bootstrap_major_version}
+rm -rf $RPM_BUILD_ROOT/installdir
+popd
+%endif
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -158,18 +196,27 @@ install -Dpm 0644 %{SOURCE1000} $RPM_BUILD_ROOT/%{macrosdir}/macros.lua
 %dir %{_datadir}/lua
 %dir %{_datadir}/lua/%{major_version}
 
+%if 0%{?bootstrap}
+%dir %{_libdir}/lua/%{bootstrap_major_version}
+%{_libdir}/liblua-%{bootstrap_major_version}.so
+%dir %{_datadir}/lua/%{bootstrap_major_version}
+%endif
+
 %files devel
 %{_includedir}/l*.h
 %{_includedir}/l*.hpp
 %{_libdir}/liblua.so
 %{_libdir}/pkgconfig/*.pc
-%{macrosdir}/macros.lua
 
 %files static
 %{_libdir}/*.a
 
 
 %changelog
+* Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 5.4.3-1
+- Update lua version to 5.4.3
+- Apply patch for CVE-2021-43519.
+
 * Thu Oct 01 2020 Daniel McIlvaney <damcilva@microsoft.com> 5.3.5-11
 - Nopatch CVE-2020-24342
 - Apply patch for CVE-2019-6706 from Lua mailing list

@@ -1,8 +1,8 @@
 %define htmldir %{_docdir}/liblognorm/html
 Summary:        Fast samples-based log normalization library
 Name:           liblognorm
-Version:        2.0.3
-Release:        11%{?dist}
+Version:        2.0.6
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -87,6 +87,9 @@ rm %{buildroot}%{htmldir}/{objects.inv,.buildinfo}
 %{_bindir}/lognormalizer
 
 %changelog
+* Mon Jan 10 2022 Henry Li <lihl@microsoft.com> - 2.0.6-1
+- Upgrade to version 2.0.6
+
 * Tue Jul 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.3-11
 - License verified
 - Spec linted

@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "memcached-1.5.22.tar.gz": "c2b47e9d20575a2367087c229636ffc3fb699a6c3a7f3a22f44402f25f5f1f93",
-  "memcached-selinux-1.0.2.tar.gz": "450006d987152aa0eda11efcfbd8254a19ae29cb4ec40e6bdfc4adbfb0419dc1",
-  "memcached.sysconfig": "31f7d20fad86bdd2bc5692619928af8785dc0e9f858863aeece67cff0e4edfd2"
- }
-}

@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,10 @@ BuildRequires:  python2-devel
 BuildRequires:  python2-libs
 BuildRequires:  python2-tools
 BuildRequires:  sqlite-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(File::Find)
 Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
@@ -103,6 +107,9 @@ make  check
 %defattr(-,root,root)
 
 %changelog
+* Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.64.0-8
+- Add perl find bin and file find to build requires.
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.64.0-7
 - Remove libtool archive files from final packaging
 

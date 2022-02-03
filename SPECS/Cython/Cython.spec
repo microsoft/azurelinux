@@ -1,49 +1,48 @@
 %global upname cython
 Name:           Cython
-Version:        0.29.24
+Version:        0.29.26
 Release:        1%{?dist}
 Summary:        Language for writing Python extension modules
 Vendor:         Microsoft
 Distribution:   Mariner
 License:        ASL 2.0
 URL:            https://www.cython.org
-#Source0:       https://github.com/%{upname}/%{upname}/archive/%{version}.tar.gz
-Source0:        %{upname}-%{version}.tar.gz
-
+Source0:        https://github.com/%{upname}/%{upname}/archive/%{version}.tar.gz#/%{upname}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description \
 Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (baded on Pyrex). It makes writing C extensions for Python as easy as Python itself.}
 
 %description %{_description}
 
-%package -n python3-%{name}
-Summary:       C extensions for Python 3
+%package -n     python3-%{name}
+Summary:        C extensions for Python 3
+Requires:       python3
 %{?python_provide:%python_provide python3-%{name}}
 Provides:       %{name} = %{version}-%{release}
 Provides:       %{name}%{?_isa} = %{version}-%{release}
-BuildRequires: python3
-BuildRequires: python3-devel
-BuildRequires: python3-libs
-BuildRequires: python3-xml
-Requires:      python3
 
 %description -n python3-%{name}
-Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex). It makes writing C extensions for Python as easy as Python itself.
+%{_description}
 
 %prep
 %autosetup -p1 -n %{upname}-%{version}
 
 %build
-python3 setup.py build
+%py3_build
 
 %install
-
-python3 setup.py install --skip-build --root=%{buildroot}
+%py3_install
 rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
+
+%check
+pip3 install -r test-requirements.txt 
+%python3 runtests.py -vv
 
 %files -n python3-%{name}
 %license LICENSE.txt COPYING.txt
@@ -58,6 +57,10 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 %{python3_sitearch}/__pycache__/%{upname}.*
 
 %changelog
+* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.29.26-1
+- Update version to 0.29.26
+- Add check section
+
 * Thu Jan 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.29.24-1
 - Update version to 0.29.24
 

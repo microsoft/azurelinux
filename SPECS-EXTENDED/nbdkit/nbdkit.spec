@@ -29,9 +29,6 @@ Distribution:   Mariner
 ExclusiveArch:  x86_64
 %endif
 
-# If we should verify tarball signature with GPGv2.
-%global verify_tarball_signature 1
-
 # If there are patches which touch autotools files, set this to 1.
 %global patches_touch_autotools %{nil}
 
@@ -40,18 +37,13 @@ ExclusiveArch:  x86_64
 
 Name:           nbdkit
 Version:        1.20.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        NBD server
 
 License:        BSD
 URL:            https://github.com/libguestfs/nbdkit
 
 Source0:        http://libguestfs.org/download/nbdkit/%{source_directory}/%{name}-%{version}.tar.gz
-%if 0%{verify_tarball_signature}
-Source1:        http://libguestfs.org/download/nbdkit/%{source_directory}/%{name}-%{version}.tar.gz.sig
-# Keyring used to verify tarball signature.
-Source2:       libguestfs.keyring
-%endif
 
 %if 0%{patches_touch_autotools}
 BuildRequires: autoconf, automake, libtool
@@ -86,9 +78,6 @@ BuildRequires:  ocaml >= 4.02.2
 BuildRequires:  ruby-devel
 BuildRequires:  tcl-devel
 BuildRequires:  lua-devel
-%if 0%{verify_tarball_signature}
-BuildRequires:  gnupg2
-%endif
 
 # Only for running the test suite:
 BuildRequires:  /usr/bin/certtool
@@ -590,9 +579,6 @@ for %{name}.
 
 
 %prep
-%if 0%{verify_tarball_signature}
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%endif
 %autosetup -p1
 %if 0%{patches_touch_autotools}
 autoreconf -i
@@ -974,6 +960,10 @@ make %{?_smp_mflags} check || {
 
 
 %changelog
+* Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-3
+- Removing in-spec verification of source tarballs.
+- License verified.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
