@@ -88,9 +88,9 @@ IMAGES_DIR      ?= $(OUT_DIR)/images
 
 # If toolchain RPMs are being rebuilt locally, they belong with the other RPMs
 ifeq ($(REBUILD_TOOLCHAIN),y)
-toolchain_rpms_dir := $(RPMS_DIR)
+   toolchain_rpms_dir := $(RPMS_DIR)
 else
-toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache
+   toolchain_rpms_dir := $(CACHED_RPMS_DIR)/cache
 endif
 
 # External source server
@@ -102,10 +102,10 @@ REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
 ifeq ($(USE_PREVIEW_REPO),y)
-PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-override REPO_LIST += $(REPOS_DIR)/mariner-official-preview.repo
-SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
+   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
+   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
+   override REPO_LIST += $(REPOS_DIR)/mariner-official-preview.repo
+   SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
 endif
 
 CA_CERT     ?=
@@ -117,7 +117,7 @@ DIST_TAG           ?= .cm2
 BUILD_NUMBER       ?= $(shell git rev-parse --short HEAD)
 # an empty BUILD_NUMBER breaks the build later on
 ifeq ($(BUILD_NUMBER),)
-        BUILD_NUMBER = non-git
+   BUILD_NUMBER = non-git
 endif
 RELEASE_MAJOR_ID   ?= 2.0
 # use minor ID defined in file (if exist) otherwise define it
@@ -189,10 +189,10 @@ include $(SCRIPTS_DIR)/toolkit.mk
 # They are guaranteed to run first and will verify there are no existing mount points
 # left after a chroot.
 clean:
-   rm -rf $(OUT_DIR)
-   rm -rf $(BUILD_DIR)
-   rm -rf $(toolkit_root)/out
+	rm -rf $(OUT_DIR)
+	rm -rf $(BUILD_DIR)
+	rm -rf $(toolkit_root)/out
 
 # output version number
 get-version:
-   @echo $(RELEASE_VERSION)
+	@echo $(RELEASE_VERSION)
