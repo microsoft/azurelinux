@@ -69,7 +69,7 @@ Development files for %{name}
 
 %files devel
 %{_includedir}/*
-%{_lib}/fluent-bit/*.so
+%{_libdir}/fluent-bit/*.so
 
 %changelog
 * Tue Feb 01 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8.12-1
