@@ -1,7 +1,7 @@
 Summary:       USB Utils
 Name:          usbutils
-Version:       010
-Release:       3%{?dist}
+Version:       014
+Release:       1%{?dist}
 License:       GPLv2+
 URL:           http://linux-usb.sourceforge.net
 Group:         Applications/System
@@ -47,6 +47,9 @@ cp %{SOURCE2} .
 %{_datadir}/misc/usb.ids
 
 %changelog
+* Wed Feb 02 2022 Chris Co <chrco@microsoft.com> - 014-1
+- Update to 014 release
+
 *   Mon Jun 01 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 010-3
 -   Adding a license reference.
 -   License verified.
