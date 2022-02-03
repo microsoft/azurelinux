@@ -345,7 +345,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Thur Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-4
+* Thu Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-4
 - Bump release number to match kernel release
 
 * Wed Jan 26 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-2
