@@ -24,6 +24,7 @@ BuildRequires: git
 BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
+BuildRequires: systemd-rpm-macros
 
 Requires: moby-runc >= 1.0.0~rc10~
 
