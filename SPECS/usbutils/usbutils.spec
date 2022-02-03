@@ -33,8 +33,6 @@ make DESTDIR=%{buildroot} install
 mkdir -p %{buildroot}%{_datadir}/misc/
 install -p -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/misc/
 
-cp %{SOURCE2} .
-
 %files
 %defattr(-,root,root,-)
 %license LICENSES/GPL*
