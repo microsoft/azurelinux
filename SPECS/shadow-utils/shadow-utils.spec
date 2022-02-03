@@ -167,18 +167,35 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
-* Tue Feb 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 4.9-1
+* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 4.9-6
+- Add provides to resolve dynamic dependencies
+
+* Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-5
+- Make pam_loginuid use optional for systems that don't have audit.
+- License verified.
+
+* Tue Sep 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9-4
+- Adding missing BR for "libxslt".
+- Removing not built man pages.
+
+* Thu Sep 16 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-3
+- Update pam.d configuration for SELinux logins.
+- Change loginuid to be set only on logins.
+- Add missing BuildRequires for xsltproc.
+
+* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-2
+- Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
+- Add license to subid subpackage
+
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-1
 - Upgrade to latest upstream version and rebase chkname patch
 - Add upstream patch to deal with libsubid build failure when linking to pam
 - Add %%{_sysconfdir}/login.defs and %{_syconfdir}/default/useradd to sources
 -   since they are not auto-generated during packaging
 - Create %%{name}-subid and %%{name}-subid-devel subpackages
-- Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
-- Add license to subid subpackage
-- Add missing BuildRequires for xsltproc.
-- Adding missing BR for "libxslt".
-- Removing not built man pages.
-- Add provides to resolve dynamic dependencies
+
+* Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 4.6-15
+- Dash Rolled for Merge from 1.0 branch
 
 * Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
 - License verified.

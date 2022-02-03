@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -274,14 +274,13 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Tue Feb 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.20220106-1
+* Mon Jan 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
 - Update to version 2.20220106.
 - Fix setup process to apply patches.
 - Correct files listing to include the module store files.
 - Create a booleans.conf for the build process, to override upstream Boolean
   default values.
 - Fix build to include systemd rules.
-- Update versions on checkpolicy, policycoreutils dependencies
 
 * Tue Sep 07 2021 Chris PeBenito <chpebeni@microsoft.com> - 2.20210203-1
 - Update to newest refpolicy release.  Add policy changes to boot the system

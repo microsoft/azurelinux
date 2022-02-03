@@ -73,7 +73,8 @@ session  required       pam_deny.so
 EOF
 %make_build check
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
@@ -98,36 +99,50 @@ EOF
 %changelog
 *   Tue Feb 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.5.1-1
 -   Upgrading to v1.5.1
--   Remove libdb dependency
--   Replace incorrect %%{_lib} usage with %%{_libdir}
+-   joslobo@microsoft.com, 1.5.1: Remove libdb dependency
+-   joschmit@microsoft.com, 1.3.1: Replace incorrect %%{_lib} usage with %%{_libdir}
+
 *   Tue Oct 19 2021 Andrew Phelps <anphel@microsoft.com> 1.3.1-6
 -   Increment release to republish with toolchain fix to include pam_selinux.so
 *   Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 1.3.1-5
 -   Add SELinux support
+
 *   Fri Jun 12 2020 Chris Co <chrco@microsoft.com> 1.3.1-4
 -   Set default PATH in /etc/environment
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.1-3
 -   Added %%license line automatically
+
 *   Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 1.3.1-2
 -   Renaming Linux-PAM to pam
+
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 1.3.1-1
 -   Update to 1.3.1. Fix URL. Fix Source0 URL. License verified.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.0-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 1.3.0-1
 -   Version update.
+
 *   Fri Feb 10 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.1-5
 -   Added pam_unix_auth.so, pam_unix_acct.so, pam_unix_passwd.so,
 -   and pam_unix_session.so.
+
 *   Wed Dec 07 2016 Xiaolin Li <xiaolinl@vmware.com> 1.2.1-4
 -   Added devel subpackage.
+
 *   Thu May 26 2016 Divya Thaluru <dthaluru@vmware.com> 1.2.1-3
 -   Packaging pam cracklib module
+
 *   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.2.1-2
 -   GA - Bump release of all rpms
+
 *   Fri Jan 15 2016 Xiaolin Li <xiaolinl@vmware.com> 1.2.1-1
 -   Updated to version 1.2.1
+
 *   Mon May 18 2015 Touseef Liaqat <tliaqat@vmware.com> 1.1.8-2
 -   Update according to UsrMove.
+
 *   Thu Oct 09 2014 Divya Thaluru <dthaluru@vmware.com> 1.1.8-1
 -   Initial build.  First version

@@ -83,7 +83,6 @@ cp %{SOURCE1} %{buildroot}%{_sysconfdir}/selinux/semanage.conf
 ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
 
 %files
