@@ -1,18 +1,19 @@
 Summary:        Mesa libGLU library
 Name:           mesa-libGLU
 Version:        9.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://mesa3d.org/
-Source0:        https://ftp.freedesktop.org/pub/mesa/glu/glu-%{version}.tar.xz
-Source1:        %{name}-LICENSE.txt
+Source0:        https://mesa.freedesktop.org/archive/glu/glu-%{version}.tar.xz
+Source1:        LICENSE.PTR
+Source2:        make-git-snapshot.sh
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  mesa-libGL-devel
+#Requires:
 Provides:       libGLU = %{version}-%{release}
 
 %description
@@ -21,8 +22,7 @@ Mesa implementation of the standard GLU OpenGL utility API.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       gl-manpages
-Provides:       libGLU-devel = %{version}-%{release}
+Provides:       libGLU-devel
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
@@ -30,7 +30,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n glu-%{version}
-mv %{SOURCE1} ./LICENSE.txt
+cp %{SOURCE1} .
 
 %build
 autoreconf -v -i -f
@@ -46,7 +46,7 @@ rm -rf %{buildroot}%{_mandir}/man3/gl[A-Z]*
 %ldconfig_scriptlets
 
 %files
-%license LICENSE.txt
+%license LICENSE.PTR
 %{_libdir}/libGLU.so.1
 %{_libdir}/libGLU.so.1.3.*
 
@@ -56,12 +56,13 @@ rm -rf %{buildroot}%{_mandir}/man3/gl[A-Z]*
 %{_libdir}/pkgconfig/glu.pc
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 9.0.1-4
-- License verified
-- Lint spec
+* Wed Jul 21 2021 Vinicius Jarina <vinja@microsoft.com> - 9.0.1-4
+- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+- Added a "LICENSE.PTR" source clarifying the project's license.
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.0.1-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 9.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 9.0.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

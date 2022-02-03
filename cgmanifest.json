@@ -7921,8 +7921,8 @@
         "type": "other",
         "other": {
           "name": "jasper",
-          "version": "2.0.24",
-          "downloadUrl": "https://github.com/jasper-software/jasper/archive/version-2.0.24.tar.gz"
+          "version": "2.0.32",
+          "downloadUrl": "https://github.com/jasper-software/jasper/archive/version-2.0.32.tar.gz"
         }
       }
     },
@@ -11101,8 +11101,8 @@
         "type": "other",
         "other": {
           "name": "librsvg2",
-          "version": "2.48.9",
-          "downloadUrl": "https://download.gnome.org/sources/librsvg/2.48/librsvg-2.48.9.tar.xz"
+          "version": "2.50.3",
+          "downloadUrl": "https://download.gnome.org/sources/librsvg/2.50/librsvg-2.50.3.tar.xz"
         }
       }
     },
@@ -13622,7 +13622,7 @@
         "other": {
           "name": "mesa-libGLU",
           "version": "9.0.1",
-          "downloadUrl": "https://ftp.freedesktop.org/pub/mesa/glu/glu-9.0.1.tar.xz"
+          "downloadUrl": "https://mesa.freedesktop.org/archive/glu/glu-9.0.1.tar.xz"
         }
       }
     },
@@ -27487,8 +27487,8 @@
         "type": "other",
         "other": {
           "name": "shared-mime-info",
-          "version": "1.15",
-          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/b27eb88e4155d8fccb8bb3cd12025d5b/shared-mime-info-1.15.tar.xz"
+          "version": "2.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/0440063a2e6823a4b1a6fb2f2af8350f/shared-mime-info-2.0.tar.xz"
         }
       }
     },
