@@ -995,9 +995,9 @@ touch /logs/status_util-linux_complete
 echo Building RPM related packages
 cd /sources
 
-echo sqlite-autoconf-3320100
-tar xf sqlite-autoconf-3320100.tar.gz
-pushd sqlite-autoconf-3320100
+echo sqlite-autoconf-3360000
+tar xf sqlite-autoconf-3360000.tar.gz
+pushd sqlite-autoconf-3360000
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \
@@ -1012,7 +1012,7 @@ pushd sqlite-autoconf-3320100
 make -j$(nproc)
 make install
 popd
-rm -rf sqlite-autoconf-3320100
+rm -rf sqlite-autoconf-3360000
 touch /logs/status_sqlite-autoconf_complete
 
 echo nspr-4.21
