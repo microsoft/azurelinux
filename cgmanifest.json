@@ -3828,8 +3828,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "1.5.2",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/v1.5.2.tar.gz"
+          "version": "1.8.12",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v1.8.12.tar.gz"
         }
       }
     },
