@@ -1,7 +1,5 @@
-%define _build_id_links none
-
-Name:           fluent-bit
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
+Name:           fluent-bit
 Version:        1.8.12
 Release:        1%{?dist}
 License:        ASL 2.0
@@ -9,24 +7,24 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fluentbit.io
 Source0:        https://github.com/fluent/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildRequires:  pkgconfig
-BuildRequires:  make
-BuildRequires:  cmake
-BuildRequires:  systemd-rpm-macros
-BuildRequires:  systemd-devel
-BuildRequires:  gcc-c++
-BuildRequires:  flex
 BuildRequires:  bison
+BuildRequires:  cmake
+BuildRequires:  cyrus-sasl-devel
 BuildRequires:  doxygen
+BuildRequires:  flex
+BuildRequires:  gcc-c++
+BuildRequires:  gnutls-devel
 BuildRequires:  graphviz
 BuildRequires:  libpq-devel
-BuildRequires:  zlib-devel
-BuildRequires:  gnutls-devel
+BuildRequires:  make
 BuildRequires:  openssl-devel
-BuildRequires:  cyrus-sasl-devel
+BuildRequires:  pkgconfig
+BuildRequires:  systemd-devel
+BuildRequires:  systemd-rpm-macros
+BuildRequires:  zlib-devel
 
 %description
+
 Fluent Bit is a fast Log Processor and Forwarder for Linux, Embedded Linux, MacOS and BSD 
 family operating systems. It's part of the Fluentd Ecosystem and a CNCF sub-project.
 
@@ -64,26 +62,27 @@ Development files for %{name}
 %files
 %license LICENSE
 %doc README.md
-%exclude /usr/src/debug
+%exclude %{_prefix}/src/debug
 /lib/systemd/system/fluent-bit.service
 %{_bindir}/*
-/usr/etc/fluent-bit/*
+%{_prefix}%{_sysconfdir}/fluent-bit/*
 
 %files devel
 %{_includedir}/*
-/usr/lib/fluent-bit/*.so
+%{_lib}/fluent-bit/*.so
 
 %changelog
-* Tue Feb 01 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8.12-1
+* Tue Feb 01 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8.12-1
 - Update to version 1.8.12
 
-* Mon May 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.5.2-1
+* Mon May 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.5.2-1
 - Update to version 1.5.2
 
-* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.4.1-2
+* Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.1-2
 - License verified.
 - Fixed source URL.
 - Added 'Vendor' and 'Distribution' tags.
-* Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 1.4.1-1
+
+* Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 1.4.1-1
 - Original version for CBL-Mariner.
 
