@@ -15,13 +15,12 @@ BuildRequires:  systemd
 BuildRequires:  systemd-devel
 Requires:       libusb
 
-
 %description
 The USB Utils package contains an utility used to display information
 about USB buses in the system and the devices connected to them.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 %build
 ./configure --prefix=%{_prefix} \
