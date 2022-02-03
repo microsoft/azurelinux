@@ -171,8 +171,8 @@ openssl-static-1.1.1k-8.cm2.x86_64.rpm
 libcap-2.26-2.cm2.x86_64.rpm
 libcap-devel-2.26-2.cm2.x86_64.rpm
 debugedit-5.0-1.cm2.x86_64.rpm
-libarchive-3.4.2-3.cm2.x86_64.rpm
-libarchive-devel-3.4.2-3.cm2.x86_64.rpm
+libarchive-3.4.2-5.cm2.x86_64.rpm
+libarchive-devel-3.4.2-5.cm2.x86_64.rpm
 rpm-4.17.0-1.cm2.x86_64.rpm
 rpm-build-4.17.0-1.cm2.x86_64.rpm
 rpm-build-libs-4.17.0-1.cm2.x86_64.rpm
