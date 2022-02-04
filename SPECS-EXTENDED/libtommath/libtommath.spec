@@ -1,12 +1,11 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        A portable number theoretic multiple-precision integer library
 Name:           libtommath
 Version:        1.1.0
 Release:        4%{?dist}
-Summary:        A portable number theoretic multiple-precision integer library
 License:        Public Domain
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.libtom.net/
-
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  libtool
@@ -42,7 +41,7 @@ sed -i \
 %install
 %make_install V=1 CFLAGS="$CFLAGS -I./" PREFIX=%{_prefix} LIBPATH=%{_libdir} -f makefile.shared
 
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -name '*.a' -delete
 
 %ldconfig_scriptlets
