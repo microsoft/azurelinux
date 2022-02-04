@@ -108,9 +108,11 @@ ifeq ($(USE_PREVIEW_REPO),y)
    ifneq ($(wildcard $(PREVIEW_REPO)),)
       override REPO_LIST += $(PREVIEW_REPO)
    else
+      $(warning )
       $(warning ######################### WARNING #########################)
       $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
       $(warning ######################### WARNING #########################)
+      $(warning )
    endif
 endif
 
