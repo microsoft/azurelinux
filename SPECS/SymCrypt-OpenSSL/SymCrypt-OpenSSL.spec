@@ -18,6 +18,15 @@ BuildRequires:  make
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 
+# Only x86_64 and aarch64 are currently supported
+%ifarch x86_64
+%define symcrypt_arch AMD64
+%endif
+
+%ifarch aarch64
+%define symcrypt_arch ARM64
+%endif
+
 %prep
 %setup -q
 
@@ -28,12 +37,7 @@ cmake   .. \
         -DOPENSSL_ROOT_DIR="%{_prefix}/local/ssl" \
         -DCMAKE_INSTALL_LIBDIR=%{buildroot}%{_libdir} \
         -DCMAKE_INSTALL_INCLUDEDIR=%{buildroot}%{_includedir} \
-%ifarch x86_64
-        -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-AMD64.cmake" \
-%endif
-%ifarch aarch64
-        -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-ARM64.cmake" \
-%endif
+        -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-%{symcrypt_arch}.cmake" \
         -DCMAKE_BUILD_TYPE=Release
 
 cmake --build .
@@ -48,5 +52,5 @@ cmake --build . --target install
 %{_includedir}/scossl.h
 
 %changelog
-* Mon Jan 31 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
-- Original version for CBL-Mariner
+* Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
+- Initial CBL-Mariner import

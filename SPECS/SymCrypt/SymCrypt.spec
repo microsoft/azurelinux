@@ -21,6 +21,15 @@ BuildRequires:  python3-pyelftools
 %description
 A core cryptographic library written by Microsoft
 
+# Only x86_64 and aarch64 are currently supported
+%ifarch x86_64
+%define symcrypt_arch AMD64
+%endif
+
+%ifarch aarch64
+%define symcrypt_arch ARM64
+%endif
+
 %prep
 %setup -q
 %setup -q -a 1
@@ -32,12 +41,7 @@ ln -s jitterentropy-library-3.3.1 jitterentropy-library
 mkdir bin; cd bin
 
 cmake   .. \
-%ifarch x86_64
-        -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-AMD64.cmake" \
-%endif
-%ifarch aarch64
-        -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-ARM64.cmake" \
-%endif
+        -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-%{symcrypt_arch}.cmake" \
         -DCMAKE_BUILD_TYPE=Release
 
 cmake --build .
@@ -45,22 +49,16 @@ cmake --build .
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_includedir}
+mkdir -p %{buildroot}%{_bindir}
 install inc/* %{buildroot}%{_includedir}
-%ifarch x86_64
-install bin/module/AMD64/LinuxUserMode/generic/libsymcrypt.so %{buildroot}%{_libdir}/
-%endif
-%ifarch aarch64
-install bin/module/ARM64/LinuxUserMode/generic/libsymcrypt.so %{buildroot}%{_libdir}/
-%endif
-# Other architectures will currently break here because we are not creating the expected
-# libsymcrypt.so output. Equally, other architectures currently should not include SymCrypt in their
-# package list!
+install bin/module/%{symcrypt_arch}/LinuxUserMode/generic/libsymcrypt.so* %{buildroot}%{_libdir}
+chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 
 %files
 %license LICENSE
-%{_libdir}/libsymcrypt.so
+%{_libdir}/libsymcrypt.so*
 %{_includedir}/*
 
 %changelog
-* Mon Jan 31 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
-- Original version for CBL-Mariner
+* Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
+- Initial CBL-Mariner import
