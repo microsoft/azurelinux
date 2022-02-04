@@ -9,21 +9,7 @@ Group:          Applications/System
 URL:            https://www.gnu.org/software/parted/
 Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # Upstream patches since v3.4 release
-Patch0: 0001-parted-add-fix-to-fix-in-script-mode.patch
-Patch1: 0002-doc-Document-fix-flag.patch
-Patch2: 0003-tests-Add-tests-for-fix.patch
-Patch3: 0004-tests-Fix-test-t1700-probe-fs.patch
-Patch4: 0005-tests-Fix-t9041-undetected-in-use-16th-partition.patch
-Patch5: 0006-libparted-Fix-fd-check-in-_flush_cache.patch
-Patch6: 0007-libparted-Fix-potential-memory-leak-in-sdmmc_get_pro.patch
-Patch7: 0008-fs-Fix-copy-paste-error-in-HFS-journal-code.patch
-Patch8: 0009-parted-Fix-end_input-leak-in-do_mkpart.patch
-Patch9: 0010-parted-Free-tmp-usage-inside-do_print.patch
-Patch10: 0011-parted-Fix-memory-leaks-in-do_resizepart.patch
-Patch11: 0012-libparted-Fix-warning-about-buffer-size-in-Atari-lab.patch
-Patch12: 0013-libparted-Fix-potential-memory-leak-in-gpt_write.patch
-Patch13: 0014-tests-t0400-Work-around-a-mkswap-bug-by-using-dev-ze.patch
-Patch14: 0015-tests-t9050-Use-dev-zero-for-temporary-file-and-mksw.patch
+Patch0: 0001-freelocale-bug-fix.patch
 Conflicts:      toybox
 Provides:       %{name}-devel = %{version}-%{release}
 
