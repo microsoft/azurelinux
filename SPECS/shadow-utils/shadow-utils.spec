@@ -197,7 +197,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 4.6-15
 - Dash Rolled for Merge from 1.0 branch
 
-* Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
+* Mon Jul 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
 - License verified.
 - Update pam.d configuration for SELinux logins.
 - Change loginuid to be set only on logins.
