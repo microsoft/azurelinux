@@ -1,13 +1,13 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
-Version:        4.9
-Release:        6%{?dist}
+Version:        4.6
+Release:        14%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/shadow-maint/shadow/
-Source0:        https://github.com/shadow-maint/shadow/releases/download/v%{version}/shadow-%{version}.tar.xz
+Source0:        https://github.com/shadow-maint/shadow/releases/download/4.6/shadow-%{version}.tar.xz
 Source1:        chage
 Source2:        chpasswd
 Source3:        login
@@ -19,56 +19,24 @@ Source8:        system-account
 Source9:        system-auth
 Source10:       system-password
 Source11:       system-session
-Source12:       useradd-default
-Source13:       login-defs
-Patch0:         chkname-allowcase.patch
-Patch1:         libsubid-pam-link.patch
-BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  autoconf
-BuildRequires:  automake
+Patch1:         chkname-allowcase.patch
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
-BuildRequires:  libtool
-BuildRequires:  libxslt
 BuildRequires:  pam-devel
 Requires:       cracklib
 Requires:       libselinux
 Requires:       libsemanage
 Requires:       pam
-Provides:       /sbin/nologin
-Provides:       /usr/sbin/groupadd
-Provides:       /usr/sbin/groupdel
-Provides:       /usr/sbin/nologin
-Provides:       /usr/sbin/useradd
-Provides:       /usr/sbin/userdel
-Provides:       passwd = %{version}-%{release}
 
 %description
 The Shadow package contains programs for handling passwords
 in a secure way.
 
-%package        subid
-Summary:        A library to manage subordinate uid and gid ranges
-
-%description    subid
-Utility library that provides a way to manage subid ranges.
-
-%package        subid-devel
-Summary:        Libraries and headers for libsubid
-Requires:       %{name}-subid = %{version}-%{release}
-
-%description    subid-devel
-Libraries and headers for libsubid
-
 %prep
 %setup -q -n shadow-%{version}
-%patch0 -p1
 %patch1 -p1
-
-autoreconf -fiv
-
 sed -i 's/groups$(EXEEXT) //' src/Makefile.in
 find man -name Makefile.in -exec sed -i 's/groups\.1 / /' {} \;
 sed -i -e 's@#ENCRYPT_METHOD DES@ENCRYPT_METHOD SHA512@' \
@@ -78,23 +46,21 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     etc/login.defs
 
 %build
-%configure \
-    --sysconfdir=%{_sysconfdir} \
-    --with-libpam \
-    --with-libcrack \
-    --with-group-name-max-length=32 \
-    --with-selinux \
-    --enable-man
-%make_build
+%configure --sysconfdir=%{_sysconfdir} --with-libpam \
+           --with-libcrack --with-group-name-max-length=32 \
+           --with-selinux
+make %{?_smp_mflags}
 
 %install
-%make_install
+make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
-install -vdm755 %{buildroot}%{_sysconfdir}/default
 mv -v %{buildroot}%{_bindir}/passwd %{buildroot}/bin
-install -vm644 %{SOURCE12} %{buildroot}%{_sysconfdir}/default/useradd
-install -vm644 %{SOURCE13} %{buildroot}%{_sysconfdir}/login.defs
+sed -i 's/yes/no/' %{buildroot}%{_sysconfdir}/default/useradd
 ln -s useradd %{buildroot}%{_sbindir}/adduser
+# Use group id 100(users) by default
+sed -i 's/GROUP.*/GROUP=100/' %{buildroot}%{_sysconfdir}/default/useradd
+# Enable usergroups. Each user will get their own primary group with a name matching their login name
+sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB yes/' %{buildroot}%{_sysconfdir}/login.defs
 cp etc/{limits,login.access} %{buildroot}%{_sysconfdir}
 for FUNCTION in FAIL_DELAY               \
                 FAILLOG_ENAB             \
@@ -135,12 +101,10 @@ do
     sed -i "s/chage/$PROGRAM/" %{buildroot}%{_sysconfdir}/pam.d/${PROGRAM}
 done
 
-find %{buildroot} -type f -name "*.la" -delete -print
-
 %find_lang shadow
 
 %check
-%make_build check
+make %{?_smp_mflags} check
 
 %post
 %{_sbindir}/pwconv
@@ -156,48 +120,31 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/*
 %{_sbindir}/*
 /bin/passwd
+%{_mandir}/man1
+%{_mandir}/man5
+%{_mandir}/man8
+%exclude %{_mandir}/cs
+%exclude %{_mandir}/da
+%exclude %{_mandir}/de
+%exclude %{_mandir}/fi
+%exclude %{_mandir}/fr
+%exclude %{_mandir}/hu
+%exclude %{_mandir}/id
+%exclude %{_mandir}/it
+%exclude %{_mandir}/ja
+%exclude %{_mandir}/ko
+%exclude %{_mandir}/man3
+%exclude %{_mandir}/pl
+%exclude %{_mandir}/pt_BR
+%exclude %{_mandir}/ru
+%exclude %{_mandir}/sv
+%exclude %{_mandir}/tr
+%exclude %{_mandir}/zh_CN
+%exclude %{_mandir}/zh_TW
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
-%files subid
-%license COPYING
-%{_libdir}/libsubid.so.3*
-
-%files subid-devel
-%{_includedir}/shadow/subid.h
-%{_libdir}/libsubid.so
-
 %changelog
-* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 4.9-6
-- Add provides to resolve dynamic dependencies
-
-* Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-5
-- Make pam_loginuid use optional for systems that don't have audit.
-- License verified.
-
-* Tue Sep 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9-4
-- Adding missing BR for "libxslt".
-- Removing not built man pages.
-
-* Thu Sep 16 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.9-3
-- Update pam.d configuration for SELinux logins.
-- Change loginuid to be set only on logins.
-- Add missing BuildRequires for xsltproc.
-
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-2
-- Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
-- Add license to subid subpackage
-
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-1
-- Upgrade to latest upstream version and rebase chkname patch
-- Add upstream patch to deal with libsubid build failure when linking to pam
-- Add %%{_sysconfdir}/login.defs and %{_syconfdir}/default/useradd to sources
--   since they are not auto-generated during packaging
-- Create %%{name}-subid and %%{name}-subid-devel subpackages
-
-* Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 4.6-15
-- Dash Rolled for Merge from 1.0 branch
-
-* Mon Jul 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
+* Mon Oct 11 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.6-14
 - License verified.
 - Update pam.d configuration for SELinux logins.
 - Change loginuid to be set only on logins.
