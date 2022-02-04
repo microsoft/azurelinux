@@ -239,7 +239,7 @@ func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
 
 func tdnfInstall(packages []string) (err error) {
 	const (
-		alreadyInstalledPostfix = "is already installed."
+		alreadyInstalledPostfix = "is already installed"
 		noMatchingPackagesErr   = "Error(1011) : No matching packages"
 		packageMatchGroup       = 1
 	)
