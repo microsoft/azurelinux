@@ -20,6 +20,9 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         0002-add-linux-syscall-license-info.patch
+Patch1:         CVE-2021-45469.patch
+Patch2:         CVE-2021-45480.patch
+Patch3:         CVE-2021-45095.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -27,6 +30,14 @@ Patch0:         0002-add-linux-syscall-license-info.patch
 # To indicate a kernel CVE is fixed to our automated tooling, add nopatch files
 # but do not apply them as a real patch. Each nopatch file should contain
 # information on why the CVE nopatch was applied.
+Patch1001:      CVE-2020-25672.nopatch
+Patch1002:      CVE-2018-16880.nopatch
+Patch1003:      CVE-2018-1000026.nopatch
+Patch1004:      CVE-2019-3016.nopatch
+Patch1005:      CVE-2019-3819.nopatch
+Patch1006:      CVE-2019-3887.nopatch
+Patch1007:      CVE-2010-0309.nopatch
+Patch1008:      CVE-2021-3564.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -134,6 +145,9 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 make mrproper
