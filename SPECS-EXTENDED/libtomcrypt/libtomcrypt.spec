@@ -1,15 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
+Summary:        A comprehensive, portable cryptographic toolkit
 Name:           libtomcrypt
 Version:        1.18.2
 Release:        8%{?dist}
-Summary:        A comprehensive, portable cryptographic toolkit
-License:        Public Domain or WTFPL
+License:        Public Domain OR WTFPL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.libtom.net/
-
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-
 BuildRequires:  libtommath-devel >= 1.0
 BuildRequires:  libtool
 
@@ -22,7 +19,7 @@ cryptography and a plethora of other routines.
 Designed from the ground up to be very simple to use. It has a modular and
 standard API that allows new ciphers, hashes and PRNGs to be added or removed
 without change to the overall end application. It features easy to use functions
-and a complete user manual which has many source snippet examples. 
+and a complete user manual which has many source snippet examples.
 
 %package        devel
 Summary:        Development files for %{name}
@@ -52,7 +49,7 @@ export CFLAGS="%{build_cflags} -DLTM_DESC -DUSE_LTM"
 %make_install INSTALL_OPTS="-m 755" INCPATH="%{_includedir}" LIBPATH="%{_libdir}" -f makefile.shared
 
 # Remove unneeded files
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -name '*.a' -delete
 
 # Fix pkgconfig path
