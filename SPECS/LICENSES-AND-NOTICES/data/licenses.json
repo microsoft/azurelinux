@@ -12,7 +12,11 @@
                 "crash-ptdump-command",
                 "delve",
                 "nodejs-nodemon",
-                "rhnlib"
+                "rhnlib",
+                "rt-setup",
+                "rt-tests",
+                "rtctl",
+                "tuned"
             ]
         },
         "Ceph source": {
@@ -2835,6 +2839,7 @@
                 "kernel",
                 "kernel-headers",
                 "kernel-hyperv",
+                "kernel-rt",
                 "keyutils",
                 "kmod",
                 "krb5",

@@ -8600,6 +8600,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-rt",
+          "version": "5.15.2.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kexec-tools",
           "version": "2.0.21",
           "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.21.tar.xz"
@@ -22675,7 +22685,7 @@
         "other": {
           "name": "python-decorator",
           "version": "4.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/decorator/python-decorator-4.4.2.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/decorator/decorator-4.4.2.tar.gz"
         }
       }
     },
@@ -23385,7 +23395,7 @@
         "other": {
           "name": "python-linux-procfs",
           "version": "0.6.1",
-          "downloadUrl": "https://cdn.kernel.org/pub/software/libs/python/python-linux-procfs/python-linux-procfs-0.6.1.tar.xz"
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/python/python-linux-procfs/python-linux-procfs.git/snapshot/python-linux-procfs-0.6.1.tar.gz"
         }
       }
     },
@@ -25757,6 +25767,16 @@
           "name": "rpmlint",
           "version": "1.11",
           "downloadUrl": "https://github.com/rpm-software-management/rpmlint/archive/rpmlint-1.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rt-tests",
+          "version": "1.8",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
         }
       }
     },
@@ -28778,7 +28798,7 @@
         "other": {
           "name": "tuna",
           "version": "0.14.1",
-          "downloadUrl": "https://www.kernel.org/pub/software/utils/tuna/tuna-0.14.1.tar.xz"
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/tuna/tuna.git/snapshot/tuna-0.14.1.tar.gz"
         }
       }
     },

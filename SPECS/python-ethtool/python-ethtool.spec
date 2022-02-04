@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           python-%{pypi_name}
 Version:        0.14
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Python module to interface with %{pypi_name}
 
 License:        GPLv2
@@ -78,9 +78,11 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 %{python3_sitearch}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
-* Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 0.14-8
+* Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 0.14-9
 - Fix source name collision with ethtool package
 - Use github source tarball instead of pypi
+* Thu Jan 27 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.14-8
+- Move to SPECS
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14-7

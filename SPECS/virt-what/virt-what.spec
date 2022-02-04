@@ -1,6 +1,6 @@
 Name:           virt-what
 Version:        1.20
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Detect if we are running in a virtual machine
 License:        GPLv2+
 
@@ -106,6 +106,10 @@ fi
 
 
 %changelog
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.20-4
+- Move into SPECS
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

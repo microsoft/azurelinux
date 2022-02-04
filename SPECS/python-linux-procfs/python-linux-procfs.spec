@@ -1,16 +1,11 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-
-
-
-
 Name: python-linux-procfs
 Version: 0.6.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPLv2
 Summary: Linux /proc abstraction classes
-Source: https://cdn.kernel.org/pub/software/libs/python/%{name}/%{name}-%{version}.tar.xz
+Source: https://git.kernel.org/pub/scm/libs/python/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.xz
 URL: https://rt.wiki.kernel.org/index.php/Tuna
 BuildArch: noarch
 BuildRequires: python3-devel
@@ -48,6 +43,10 @@ rm -rf %{buildroot}
 %license COPYING
 
 %changelog
+* Mon Jan 31 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.6.1-8
+- Move to SPECS
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: Linux scheduler python bindings
 Name: python-schedutils
 Version: 0.6
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: GPLv2
 URL: https://rt.wiki.kernel.org/index.php/Tuna
 Source: https://cdn.kernel.org/pub/software/libs/python/%{name}/%{name}-%{version}.tar.xz
@@ -43,6 +43,10 @@ Summary: %summary
 %{python3_sitearch}/*.egg-info
 
 %changelog
+* Mon Jan 31 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.6-12
+- Move to SPECS
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
