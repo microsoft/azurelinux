@@ -13,7 +13,6 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 BuildRequires:  mesa-libGL-devel
-#Requires:
 Provides:       libGLU = %{version}-%{release}
 
 %description
