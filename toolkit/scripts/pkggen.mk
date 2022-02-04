@@ -105,6 +105,10 @@ ifeq ($(USE_PREVIEW_REPO),y)
 graphpkgfetcher_extra_flags += --use-preview-repo
 endif
 
+ifeq ($(STOP_ON_FETCH_FAIL),y)
+graphpkgfetcher_extra_flags += --stop-on-failure
+endif
+
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
