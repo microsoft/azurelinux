@@ -33,14 +33,14 @@ Requires:       %{name} = %{version}-%{release}
 Libraries and header files for ipset.
 
 %package service
-Summary:          %{name} service for %{name}s
-BuildRequires:    systemd
-Requires:         %{name} = %{version}-%{release}
-Requires:         iptables-services
-Requires(post):   systemd
-Requires(preun):  systemd
+Summary:        %{name} service for %{name}s
+BuildRequires:  systemd
+Requires:       %{name} = %{version}-%{release}
+Requires:       iptables-services
+Requires(post): systemd
 Requires(postun): systemd
-BuildArch:        noarch
+Requires(preun): systemd
+BuildArch:      noarch
 
 %description service
 This package provides the service %{name}
