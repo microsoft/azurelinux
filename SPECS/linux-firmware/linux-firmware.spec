@@ -4,8 +4,8 @@
 %define _binaries_in_noarch_packages_terminate_build   0
 Summary:        Linux Firmware
 Name:           linux-firmware
-Version:        20200316
-Release:        3%{?dist}
+Version:        20211216
+Release:        1%{?dist}
 License:        GPL+ AND GPLv2+ AND MIT AND Redistributable, no modification permitted
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 %{_firmwarepath}/*
 
 %changelog
+* Tue Feb 01 2022 Chris Co <chrco@microsoft.com> - 20211216-1
+- Update to 20211216.
+
 * Fri Feb 19 2021 Chris Co <chrco@microsoft.com> - 20200316-3
 - Add bnx2x and qed firmware.
 - Add WHENCE and relevant LICENSE files.

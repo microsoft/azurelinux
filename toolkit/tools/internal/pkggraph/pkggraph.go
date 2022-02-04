@@ -1203,9 +1203,9 @@ func (g *PkgGraph) MakeDAG() (err error) {
 	}
 }
 
-// cloneNode creates a clone of the input node with a new, unique ID.
+// CloneNode creates a clone of the input node with a new, unique ID.
 // The clone doesn't have any edges attached to it.
-func (g *PkgGraph) cloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
+func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
 	newNode = &PkgNode{
 		nodeID:       g.NewNode().ID(),
 		VersionedPkg: pkgNode.VersionedPkg,
@@ -1299,7 +1299,7 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 			logger.Log.Debugf("Cycle contains pre-built SRPM '%s'. Replacing edges from build nodes associated with '%s' with an edge to a new 'PreBuilt' node.",
 				currentNode.SrpmPath, previousNode.SrpmPath)
 
-			preBuiltNode := g.cloneNode(currentNode)
+			preBuiltNode := g.CloneNode(currentNode)
 			preBuiltNode.State = StateUpToDate
 			preBuiltNode.Type = TypePreBuilt
 
