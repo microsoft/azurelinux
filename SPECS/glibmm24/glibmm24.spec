@@ -4,7 +4,7 @@ Summary:        C++ interface to the glib
 Name:           glibmm24
 %define BaseVersion 2.70
 Version:        %{BaseVersion}.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
@@ -14,7 +14,7 @@ Source0:        http://ftp.gnome.org/pub/GNOME/sources/glibmm/%{BaseVersion}/gli
 BuildRequires:  gcc-c++
 BuildRequires:  glib-devel 
 BuildRequires:  glib-schemas
-BuildRequires:  libsigc++20 >= 2.10.0
+BuildRequires:  libsigc++30
 BuildRequires:  m4
 BuildRequires:  meson
 BuildRequires:  mm-common
@@ -30,8 +30,8 @@ BuildRequires:  perl-interpreter
 BuildRequires:  glib-networking
 %endif
 
-Requires:	libsigc++20 >= 2.10.0
-Requires:	glib >= 2.50.0
+Requires:	libsigc++30
+Requires:	glib >= 2.69.1
 Requires:	gobject-introspection >= 1.50.0
 Requires:	perl-XML-Parser
 
@@ -45,7 +45,7 @@ Summary: Header files for glibmm
 Group: Applications/System
 Requires: 	%{name} = %{version}
 Requires:	glib-devel
-Requires:   libsigc++20
+Requires:   libsigc++30
 %description devel
 These are the header files of glibmm.
 
@@ -87,6 +87,7 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules; make check
 * Thu Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.70.0-1
 - Update to v2.70.0
 - Refactor to support new meson build system
+- libsigc++30, instead of libsigc++20
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.56.0-8
 - Remove libtool archive files from final packaging
