@@ -13733,8 +13733,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "19.03.15+azure",
-          "downloadUrl": "https://github.com/docker/cli/archive/v19.03.15.tar.gz"
+          "version": "20.10.12",
+          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.12.tar.gz"
         }
       }
     },
