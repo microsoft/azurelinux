@@ -2,16 +2,15 @@ Summary:        Helper application and MIME type associations for file types
 Name:           mailcap
 Version:        2.1.53
 Release:        1%{?dist}
-License:        Public Domain and MIT
-URL:            https://pagure.io/mailcap
+License:        Public Domain AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://pagure.io/mailcap
 Source0:        https://pagure.io/releases/%{name}/%{name}-%{version}.tar.xz
-BuildArch:      noarch
-
 BuildRequires:  perl
 # the test script is written in python
 BuildRequires:  python3
+BuildArch:      noarch
 
 %description
 The mailcap file is used by the metamail program.  Metamail reads the
