@@ -1,31 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%if 0%{?fedora}
-%global _with_docs 1
-%endif
 
 Name:           libtomcrypt
 Version:        1.18.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A comprehensive, portable cryptographic toolkit
 License:        Public Domain or WTFPL
-URL:            http://www.libtom.net/
+URL:            https://www.libtom.net/
 
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  libtommath-devel >= 1.0
 BuildRequires:  libtool
-
-%{?_with_docs:
-BuildRequires:  ghostscript
-BuildRequires:  texlive-latex-bin-bin
-BuildRequires:  texlive-makeindex-bin
-BuildRequires:  texlive-mfware-bin
-BuildRequires:  tex(cmr10.tfm)
-BuildRequires:  tex(fancyhdr.sty)
-BuildRequires:  tex(hyphen.tex)
-BuildRequires:  tex(mf.mf)
-}
 
 %description
 A comprehensive, modular and portable cryptographic toolkit that provides
@@ -46,17 +32,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-%{?_with_docs:
-%package        doc
-Summary:        Documentation files for %{name}
-BuildArch:      noarch
-Provides:       %{name}-doc = %{version}-%{release}
-Obsoletes:      %{name}-doc < 1.17-19
-
-%description    doc
-The %{name}-doc package contains documentation for use with %{name}.
-}
-
 %prep
 %setup -q
 
@@ -69,9 +44,6 @@ export EXTRALIBS="-ltommath"
 export CFLAGS="%{build_cflags} -DLTM_DESC -DUSE_LTM"
 %make_build V=1 -f makefile.shared library
 %make_build V=1 -f makefile.shared test
-%{?_with_docs:
-%make_build V=1 -f makefile docs
-}
 
 %check
 ./test
@@ -100,12 +72,11 @@ sed -i \
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
-%{?_with_docs:
-%files doc
-%doc doc/crypt.pdf
-}
-
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.2-8
+- Removing docs to drop dependency on 'ghostscript'.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.2-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
