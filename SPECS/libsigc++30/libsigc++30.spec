@@ -1,7 +1,7 @@
 Summary:      Library that Implements a typesafe callback system for standard C++.
 Name:         libsigc++30
 Version:      3.0.7
-Release:      5%{?dist}
+Release:      1%{?dist}
 License:      LGPLv2+
 URL:          https://github.com/libsigcplusplus/libsigcplusplus
 Group:        Applications/System
@@ -46,7 +46,6 @@ depend on GTK+ or gtkmm.
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/sigc++-3.0/include/*.h
 %{_includedir}/*
-%{_datadir}/*
 
 %changelog
 * Thu Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.0.7-1
