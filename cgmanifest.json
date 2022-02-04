@@ -3929,26 +3929,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "foomatic",
-          "version": "4.0.13",
-          "downloadUrl": "http://www.openprinting.org/download/foomatic/foomatic-db-engine-4.0.13.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "foomatic-db",
-          "version": "4.0",
-          "downloadUrl": "http://www.openprinting.org/download/foomatic/foomatic-db-4.0-20201104.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "fping",
           "version": "5.0",
           "downloadUrl": "https://github.com/schweikert/fping/releases/download/v5.0/fping-5.0.tar.gz"
@@ -21626,16 +21606,6 @@
           "name": "pngnq",
           "version": "1.1",
           "downloadUrl": "http://downloads.sourceforge.net/pngnq/pngnq-1.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "pnm2ppa",
-          "version": "1.04",
-          "downloadUrl": "http://download.sourceforge.net/pnm2ppa/pnm2ppa-1.04.tar.gz"
         }
       }
     },
