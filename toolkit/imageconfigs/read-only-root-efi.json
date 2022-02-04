@@ -74,7 +74,8 @@
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/read-only-root-packages.json"
+                "packagelists/read-only-root-packages.json",
+                "packagelists/selinux.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
@@ -88,7 +89,8 @@
                 "VerityErrorBehavior": "restart"
             },
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0=9800 rd.shell=0 rd.emergency=reboot"
+                "ExtraCommandLine": "console=tty0 console=ttyS0=9800 rd.shell=0 rd.emergency=reboot",
+                "SELinux": "permissive"
             },
             "Hostname": "cbl-mariner",
             "Users": [

@@ -12,13 +12,23 @@
                 "crash-ptdump-command",
                 "delve",
                 "nodejs-nodemon",
-                "rhnlib"
+                "rhnlib",
+                "rt-setup",
+                "rt-tests",
+                "rtctl",
+                "tuned"
             ]
         },
         "Ceph source": {
             "license": "[LGPL2.1](https://github.com/ceph/ceph/blob/master/COPYING-LGPL2.1)",
             "specs": [
                 "ceph"
+            ]
+        },
+        "Debian": {
+            "license": "[MIT](https://opensource.org/licenses/MIT)",
+            "specs": [
+                "prometheus-process-exporter"
             ]
         },
         "Fedora": {
@@ -1695,6 +1705,7 @@
                 "procmail",
                 "prometheus",
                 "prometheus-jmx-exporter",
+                "prometheus-node-exporter",
                 "prometheus-simpleclient-java",
                 "protobuf-java",
                 "ps_mem",
@@ -2098,7 +2109,6 @@
                 "soundtouch",
                 "sox",
                 "soxr",
-                "spamassassin",
                 "sparsehash",
                 "spausedd",
                 "spec-version-maven-plugin",
@@ -2205,7 +2215,6 @@
                 "v4l-utils",
                 "varnish",
                 "varnish-modules",
-                "velocity",
                 "vhostmd",
                 "vino",
                 "virglrenderer",
@@ -2245,7 +2254,6 @@
                 "x3270",
                 "xapian-core",
                 "Xaw3d",
-                "xbean",
                 "xcb-proto",
                 "xcb-util",
                 "xcb-util-image",
@@ -2369,6 +2377,7 @@
                 "libmaxminddb",
                 "libuv",
                 "libxml++",
+                "lld",
                 "lsb-release",
                 "lttng-consume",
                 "mariner-release",
@@ -2657,8 +2666,10 @@
                 "snakeyaml",
                 "testng",
                 "trilead-ssh2",
+                "velocity",
                 "werken-xpath",
                 "xalan-j2",
+                "xbean",
                 "xcursor-themes",
                 "xerces-j2",
                 "xml-commons-apis",
@@ -2828,6 +2839,7 @@
                 "kernel",
                 "kernel-headers",
                 "kernel-hyperv",
+                "kernel-rt",
                 "keyutils",
                 "kmod",
                 "krb5",

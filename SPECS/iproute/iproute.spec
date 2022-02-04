@@ -1,7 +1,7 @@
 Summary:        Basic and advanced IPV4-based networking
 Name:           iproute
 Version:        5.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://www.kernel.org/pub/linux/utils/net/iproute2
 Group:          Applications/System
@@ -14,6 +14,8 @@ BuildRequires:  elfutils-libelf-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  make
 BuildRequires:  pkgconfig
+BuildRequires:  libmnl-devel
+BuildRequires:  sudo
 Requires:       elfutils-libelf
 Requires:       libselinux
 
@@ -39,7 +41,7 @@ sed -i 's/m_ipt.o//' tc/Makefile
 
 %build
 # Not an autoconf configure file
-%configure 
+%configure
 %make_build
 
 %install
@@ -69,6 +71,9 @@ sed -i 's/\"libnetlink.h\"/"..\/include\/libnetlink.h\"/g' ../lib/libnetlink.c
 %{_mandir}/man3/*
 
 %changelog
+* Wed Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 5.15.0-2
+- Add an explict BR on 'sudo' & 'libmnl-devel' to enable check section
+
 * Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 5.15.0-1
 - Upgrade to latest upstream version
 - Add relevant build/runtime requirements

@@ -51,6 +51,7 @@
 |                       | User namespaces                       | Available  | [CONFIG_USER_NS=y](https://github.com/torvalds/linux/blob/master/init/Kconfig)
 |                       | Private /tmp for systemd services     | Available  | [PrivateTmp](https://systemd.io/TEMPORARY_DIRECTORIES/)
 |                       | Polyinstantiate /tmp, /var/tmp,<br/>and user home folders | Available | [namespace.conf](http://www.linux-pam.org/Linux-PAM-html/sag-pam_namespace.html)
+|                       | Mandatory access control              | By default | [SELinux](https://github.com/SELinuxProject)
 |                       |                                       |            |
 | **Encrypted Storage** |                                       |            |
 |                       | Encrypted Volumes                     | Available  | Encrypt during OS installation

@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -192,11 +192,14 @@ install -m 755 tools/udev/scan-scsi-target \
     %{buildroot}/%{_udevrulesdir}/../scan-scsi-target
 
 %check
+check_status=0
 if ! make check
 then
-  cat test-suite.log || true
-  exit 1
+  cat test-suite.log
+  check_status=1
 fi
+
+[[ $check_status -eq 0 ]]
 
 %pre
 getent group libstoragemgmt >/dev/null || groupadd -r libstoragemgmt
@@ -453,6 +456,9 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Wed Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 1.9.3-2
+- Gracefully handle ptest failure instead of breaking the build
+
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.9.3-1
 - Upgrade to version 1.9.3
 - Remove subpackage libstoragemgmt-netapp-plugin and libstoragemgmt-nstor-plugin

@@ -1,30 +1,37 @@
+# https://github.com/rust-lang/rust/issues/47714
+%undefine _strict_symbol_defs_build
+
 # We want verbose builds
 %global _configure_disable_silent_rules 1
 # Use bundled deps as we don't ship the exact right versions for all the
 # required rust libraries
 %global bundled_rust_deps 1
 %global cairo_version 1.16.0
+
 Summary:        An SVG library based on cairo
 Name:           librsvg2
-Version:        2.48.9
-Release:        4%{?dist}
+Version:        2.50.3
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.48/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.50/librsvg-%{version}.tar.xz
 BuildRequires:  cairo-devel >= %{cairo_version}
 BuildRequires:  cairo-gobject-devel >= %{cairo_version}
-BuildRequires:  cargo
 BuildRequires:  chrpath
+BuildRequires:  fontconfig-devel
 BuildRequires:  gcc
-BuildRequires:  git-core
+BuildRequires:  gdk-pixbuf2-devel
+BuildRequires:  git
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  pkg-config
-BuildRequires:  rust
+BuildRequires:  harfbuzz-devel >= 2.0.0
+BuildRequires:  make
+BuildRequires:  pkgconfig
 BuildRequires:  vala
-BuildRequires:  pkgconfig(fontconfig)
-BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
+BuildRequires:  vala-devel
+BuildRequires:  vala-tools
+BuildRequires:  pkgconfig(cairo-png) >= %{cairo_version}
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  pkgconfig(glib-2.0)
@@ -32,33 +39,53 @@ BuildRequires:  pkgconfig(gthread-2.0)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(pangocairo)
 BuildRequires:  pkgconfig(pangoft2)
-Requires:       cairo >= %{cairo_version}
-Requires:       cairo-gobject >= %{cairo_version}
+Requires:       cairo%{?_isa} >= %{cairo_version}
+Requires:       cairo-gobject%{?_isa} >= %{cairo_version}
 # We install a gdk-pixbuf svg loader
-Requires:       gdk-pixbuf2
-# https://github.com/rust-lang/rust/issues/47714
-%undefine _strict_symbol_defs_build
+Requires:       gdk-pixbuf2%{?_isa}
+%if 0%{?bundled_rust_deps}
+BuildRequires:  rust
+%else
+BuildRequires:  rust-packaging
+%endif
 
 %description
 An SVG library based on cairo.
 
-%package        devel
+%package devel
 Summary:        Libraries and include files for developing with librsvg
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This package provides the necessary development libraries and include
 files to allow you to develop with librsvg.
 
-%package        tools
+%package tools
 Summary:        Extra tools for librsvg
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description tools
 This package provides extra utilities based on the librsvg library.
 
 %prep
 %autosetup -n librsvg-%{version} -p1 -Sgit
+%if 0%{?bundled_rust_deps}
+# Use the bundled deps
+%else
+# No bundled deps
+rm -vrf vendor .cargo Cargo.lock
+pushd rsvg_internals
+  %{cargo_prep}
+  mv .cargo ..
+popd
+%endif
+
+%if ! 0%{?bundled_rust_deps}
+%{generate_buildrequires}
+pushd rsvg_internals >/dev/null
+  %{cargo_generate_buildrequires}
+popd >/dev/null
+%endif
 
 %build
 %configure --disable-static  \
@@ -108,20 +135,27 @@ rm -vrf %{buildroot}%{_docdir}
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.48.9-4
-- License verified
-- Remove unneeded libcroco dependency
-- Lint spec
+* Thu Jul 08 2021 Vinicius Jarina <vinja@microsoft.com> - 2.50.3-2
+- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+- License verified.
 
-* Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.48.9-3
-- Bringing back the dependency on 'cairo'.
+* Thu Jan 28 2021 Kalev Lember <klember@redhat.com> - 2.50.3-1
+- Update to 2.50.3
 
-* Wed Jun 16 2021 Thomas Crain <thcrain@microsoft.com> - 2.48.9-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Use UI-cairo instead of cairo to avoid runtime conflicts
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.50.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
-* Fri Nov  6 2020 Kalev Lember <klember@redhat.com> - 2.48.9-1
-- Update to 2.48.9
+* Wed Nov 25 2020 Kalev Lember <klember@redhat.com> - 2.50.2-1
+- Update to 2.50.2
+
+* Mon Oct  5 2020 Kalev Lember <klember@redhat.com> - 2.50.1-1
+- Update to 2.50.1
+
+* Fri Sep 11 2020 Kalev Lember <klember@redhat.com> - 2.50.0-1
+- Update to 2.50.0
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.48.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Jul 20 2020 Kalev Lember <klember@redhat.com> - 2.48.8-1
 - Update to 2.48.8

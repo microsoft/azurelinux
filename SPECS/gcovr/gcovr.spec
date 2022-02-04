@@ -1,8 +1,8 @@
 %bcond_with  docs
 Summary:        A code coverage report generator using GNU gcov
 Name:           gcovr
-Version:        4.2
-Release:        6%{?dist}
+Version:        5.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -95,6 +95,9 @@ popd
 
 
 %changelog
+* Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.0-1
+- Update to v5.0
+
 * Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 4.2-6
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified

@@ -1,15 +1,13 @@
 # Disable pkgconfig autodep
 %global __requires_exclude ^%{_bindir}/pkg-config$
+
 Summary:        Shared MIME information database
 Name:           shared-mime-info
-Version:        1.15
+Version:        2.0
 Release:        5%{?dist}
 License:        GPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 URL:            https://freedesktop.org/Software/shared-mime-info
-# Sadly no way to get rid of the version-specific URL
-Source0:        https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/b27eb88e4155d8fccb8bb3cd12025d5b/%{name}-%{version}.tar.xz
+Source0:        https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/0440063a2e6823a4b1a6fb2f2af8350f/shared-mime-info-2.0.tar.xz
 Source1:        gnome-mimeapps.list
 # Generated with:
 # for i in `cat /home/hadess/Projects/jhbuild/totem/data/mime-type-list.txt | grep -v audio/flac | grep -v ^#` ; do if grep MimeType /home/hadess/Projects/jhbuild/rhythmbox/data/rhythmbox.desktop.in.in | grep -q "$i;" ; then echo "$i=org.gnome.Rhythmbox3.desktop;rhythmbox.desktop;org.gnome.Totem.desktop;" >> totem-defaults.list ; else echo "$i=org.gnome.Totem.desktop;" >> totem-defaults.list ; fi ; done ; for i in `cat /home/hadess/Projects/jhbuild/totem/data/uri-schemes-list.txt | grep -v ^#` ; do echo "x-scheme-handler/$i=org.gnome.Totem.desktop;" >> totem-defaults.list ; done
@@ -23,13 +21,25 @@ Source4:        eog-defaults.list
 # Generated with:
 # for i in `grep MimeType= /usr/share/applications/org.gnome.Evince.desktop | sed 's/MimeType=//' | sed 's/;/ /g'` ; do echo $i=org.gnome.Evince.desktop\; >> evince-defaults.list ; done
 Source5:        evince-defaults.list
+# Tarball for https://gitlab.freedesktop.org/xdg/xdgmime/-/tree/6663a2288d11b37bc07f5a01b4b85dcd377787e1
+Source6:        https://gitlab.freedesktop.org/xdg/xdgmime/-/archive/6663a2288d11b37bc07f5a01b4b85dcd377787e1/xdgmime-6663a2288d11b37bc07f5a01b4b85dcd377787e1.tar.bz2
 # Work-around for https://bugs.freedesktop.org/show_bug.cgi?id=40354
 Patch0:         0001-Remove-sub-classing-from-OO.o-mime-types.patch
+# https://gitlab.freedesktop.org/xdg/shared-mime-info/-/merge_requests/80
+Patch1:         0001-data-Fix-pkg-config-installation-path.patch
+# https://cgit.freedesktop.org/xdg/shared-mime-info/commit/?id=5a406b06792e26a83c7346b3c2443c0bd8d4cdb2
+Patch2:         0001-Patch-fixing-Meson-builds.-See-https-cgit.freedeskto.patch
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
 BuildRequires:  gcc
 BuildRequires:  gettext
-BuildRequires:  glib2-devel
+BuildRequires:  git
+BuildRequires:  glib-devel
 BuildRequires:  itstool
 BuildRequires:  libxml2-devel
+BuildRequires:  mariner-rpm-macros
+BuildRequires:  meson
+BuildRequires:  xmlto
 
 %description
 This is the freedesktop.org shared MIME info database.
@@ -40,20 +50,20 @@ a file. This is generally done by examining the file's name or contents,
 and looking up the correct MIME type in a database.
 
 %prep
-%autosetup
+%autosetup -S git
+tar xjf %{SOURCE6}
+
+mv xdgmime-*/ xdgmime/
 
 %build
-%configure \
-  --disable-silent-rules \
-  --disable-update-mimedb
-
-# not smp safe, pretty small package anyway
+cd ./xdgmime/
 make
+cd ..
+%meson -Dupdate-mimedb=false -Dxdgmime-path=./xdgmime/
+%meson_build
 
 %install
-# speed build a bit
-PKGSYSTEM_ENABLE_FSYNC=0 \
-%make_install
+%meson_install
 
 find %{buildroot}%{_datadir}/mime -type d \
 | sed -e "s|^$RPM_BUILD_ROOT|%%dir |" > %{name}.files
@@ -77,6 +87,8 @@ cp %{buildroot}%{_datadir}/applications/gnome-mimeapps.list \
 ## translations are already in the xml file installed
 rm -rf %{buildroot}%{_datadir}/locale/*
 
+%check
+%meson_test
 
 %post
 /bin/touch --no-create %{_datadir}/mime/packages &>/dev/null ||:
@@ -89,7 +101,7 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 
 %files -f %{name}.files
 %license COPYING
-%doc README NEWS HACKING shared-mime-info-spec.xml
+%doc README.md NEWS HACKING.md data/shared-mime-info-spec.xml
 %{_bindir}/*
 %{_datadir}/mime/packages/*
 %{_datadir}/applications/mimeapps.list
@@ -98,14 +110,32 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 %dir %{_datadir}/pkgconfig
 %{_datadir}/pkgconfig/shared-mime-info.pc
 %{_mandir}/man*/*
+%{_datadir}/gettext/its/shared-mime-info.its
+%{_datadir}/gettext/its/shared-mime-info.loc
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.15-5
-- License verified
-- Lint spec
+* Tue Feb 01 2022 Hideyuki Nagase <hideyukn@microsoft.com> - 2.0-5
+- Apply patch to build with meson 0.60
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jul 21 2021 Vinicius Jarina <vinja@microsoft.com> - 2.0-4
+- Rebuilt for Mariner Core UI
+- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+- License verified.
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.0-3
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed May 06 2020 Bastien Nocera <bnocera@redhat.com> - 2.0-1
++ shared-mime-info-2.0-1
+- Update to 2.0
+
+* Tue May 05 2020 Bastien Nocera <bnocera@redhat.com> - 1.15-4
++ shared-mime-info-1.15-4
+- Update mime defaults (eog, totem, evince, file-roller)
 
 * Sun Mar 08 2020 Bastien Nocera <bnocera@redhat.com> - 1.15-3
 + shared-mime-info-1.15-3
