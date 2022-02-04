@@ -23834,8 +23834,8 @@
         "type": "other",
         "other": {
           "name": "python-packaging",
-          "version": "17.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/77/32/439f47be99809c12ef2da8b60a2c47987786d2c6c9205549dd6ef95df8bd/packaging-17.1.tar.gz"
+          "version": "21.3",
+          "downloadUrl": "https://github.com/pypa/packaging/releases/download/21.3/packaging-21.3.tar.gz"
         }
       }
     },
