@@ -73,7 +73,8 @@ session  required       pam_deny.so
 EOF
 %make_build check
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
