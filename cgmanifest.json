@@ -14552,6 +14552,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netpbm",
+          "version": "10.90.00",
+          "downloadUrl": "https://svn.code.sf.net/p/netpbm/code/advanced"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "netplan",
           "version": "0.95",
           "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
@@ -25724,16 +25734,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rt-tests",
-          "version": "1.8",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rrdtool",
           "version": "1.7.0",
           "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.7.0/rrdtool-1.7.0.tar.gz"
@@ -25757,6 +25757,16 @@
           "name": "rsyslog",
           "version": "8.2108.0",
           "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2108.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rt-tests",
+          "version": "1.8",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
         }
       }
     },
