@@ -1,7 +1,7 @@
 Summary:        GNU Parted manipulates partition tables
 Name:           parted
 Version:        3.4
-Release:        99%{?dist}
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
