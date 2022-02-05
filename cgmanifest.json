@@ -28686,16 +28686,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "transfig",
-          "version": "3.2.7b",
-          "downloadUrl": "http://downloads.sourceforge.net/mcj/fig2dev-3.2.7b.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tree",
           "version": "1.8.0",
           "downloadUrl": "http://mama.indstate.edu/users/ice/tree/src/tree-1.8.0.tgz"
