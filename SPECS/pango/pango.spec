@@ -69,6 +69,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Thu Feb 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.44.7-3
 - Use 'meson test' instead of 'make check'
 - Introduce patch to skip tests that are known to fail
+- License verified
 
 * Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 1.44.7-2
 - Merge the following releases from 1.0 to dev branch
