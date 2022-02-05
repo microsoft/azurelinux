@@ -13,7 +13,6 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 BuildRequires:  mesa-libGL-devel
-#Requires:
 Provides:       libGLU = %{version}-%{release}
 
 %description
@@ -22,7 +21,7 @@ Mesa implementation of the standard GLU OpenGL utility API.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:       libGLU-devel
+Provides:       libGLU-devel = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
