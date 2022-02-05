@@ -1,9 +1,9 @@
 Summary:        rcpsvc protocol.x files and headers
 Name:           rpcsvc-proto
-Version:        1.4
-Release:        4%{?dist}
-Source0:        https://github.com/thkukuk/rpcsvc-proto/releases/download/v1.4/rpcsvc-proto-1.4.tar.gz
-License:        LGPLv2+
+Version:        1.4.3
+Release:        1%{?dist}
+Source0:        https://github.com/thkukuk/rpcsvc-proto/releases/download/v%{version}/%{name}-%{version}.tar.xz
+License:        BSD-3
 Group:          System Environment/Libraries
 URL:            https://github.com/thkukuk/rpcsvc-proto
 Vendor:         Microsoft Corporation
@@ -43,6 +43,10 @@ make install DESTDIR=%{buildroot}
 %{_includedir}/rpcsvc/*
 
 %changelog
+* Fri Feb 04 2022 Chris Co <chrco@microsoft.com> - 1.4.3-1
+- Update to 1.4.3
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.4-3
 - Added %%license line automatically
 
