@@ -38,7 +38,9 @@ BuildRequires:  fontconfig-devel
 # needed for tests
 BuildRequires:  libjpeg-devel
 BuildRequires:  libpng-devel
+%if %{with_check}
 BuildRequires:  fontawesome-fonts
+%endif
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(libtiff-4)
