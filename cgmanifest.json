@@ -14342,16 +14342,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mythes-it",
-          "version": "2.0.9l",
-          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/linguistico/thesaurus2_it_02_09_l_2008_11_29.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mythes-ne",
           "version": "1.1",
           "downloadUrl": "http://download.services.openoffice.org/contrib/dictionaries/thes_ne_NP_v2.zip"
