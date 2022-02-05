@@ -211,7 +211,6 @@ libpwquality-devel-1.4.2-6.cm1.aarch64.rpm
 libselinux-3.2-1.cm1.aarch64.rpm
 libselinux-debuginfo-3.2-1.cm1.aarch64.rpm
 libselinux-devel-3.2-1.cm1.aarch64.rpm
-libselinux-python-3.2-1.cm1.aarch64.rpm
 libselinux-python3-3.2-1.cm1.aarch64.rpm
 libselinux-utils-3.2-1.cm1.aarch64.rpm
 libsemanage-3.2-1.cm1.aarch64.rpm
