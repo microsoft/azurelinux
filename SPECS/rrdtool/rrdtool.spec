@@ -161,7 +161,7 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 %{_libdir}/ruby
 
 %changelog
-* Thu Feb 03 2021 Chris Co <chrco@microsoft.com> - 1.7.2-1
+* Thu Feb 03 2022 Chris Co <chrco@microsoft.com> - 1.7.2-1
 - Update to 1.7.2.
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.0-7
