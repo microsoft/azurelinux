@@ -1,0 +1,22 @@
+From aef4c9944d4dd8f5686823aa74fb54505a6983b4 Mon Sep 17 00:00:00 2001
+From: Rachel <rachelmenge@microsoft.com>
+Date: Tue, 9 Nov 2021 12:21:01 -0500
+Subject: [PATCH] Add license info
+
+---
+ include/uapi/misc/d3dkmthk.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/uapi/misc/d3dkmthk.h b/include/uapi/misc/d3dkmthk.h
+index e752fd5c87d0..bf4fc7228bac 100644
+--- a/include/uapi/misc/d3dkmthk.h
++++ b/include/uapi/misc/d3dkmthk.h
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ 
+ /*
+  * Copyright (c) 2019, Microsoft Corporation.
+-- 
+2.17.1
+

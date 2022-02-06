@@ -2,31 +2,23 @@
 # Filter unwanted dependencies
 %global __requires_exclude %{?__requires_exclude|%__requires_exclude|}^perl\\(RPC::\\)
 
-# According to documentation, module using Coro is just:
-# A PROOF-OF-CONCEPT IMPLEMENTATION FOR EXPERIMENTATION.
-# Omit Coro support on bootsrap bacause perl-DBI is pulled in by core
-# perl-CPANPLUS.
-%bcond_without coro
-
 Summary:        A database access API for perl
 Name:           perl-DBI
 Version:        1.641
-Release:        4%{?dist}
+Release:        6%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
 # The source tarball must be repackaged to remove the DBI/FAQ.pm, since the
 # license is not a FSF free license.
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz
-#Source0:        DBI-%{version}_repackaged.tar.gz
-%define sha1 DBI=d14c34fac2dd058905b0b8237a4ca8b86eed6f5d
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 Requires:       perl-libs
 Requires:       perl(FileHandle)
 Requires:       perl(Math::BigInt)
-Requires:       perl(DB_File)
 
 Provides:       perl(DBD::DBM) = %{version}-%{release}
 Provides:       perl(DBD::DBM::Statement) = %{version}-%{release}
@@ -163,6 +155,14 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.641-6
+- Removing dependency on "perl-DB_File".
+- Removing unused macros.
+
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.641-5
+- Adding 'BuildRequires: perl-generators'.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.641-4
 - Use new perl package names.
 - Provide perl(DB*)

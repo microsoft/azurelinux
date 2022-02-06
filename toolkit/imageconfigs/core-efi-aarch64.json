@@ -47,10 +47,14 @@
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image-aarch64.json",
-                "packagelists/cloud-init-packages.json"
+                "packagelists/cloud-init-packages.json",
+                "packagelists/selinux.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
+            },
+            "KernelCommandLine": {
+                "SELinux": "permissive"
             },
             "Hostname": "cbl-mariner"
         }

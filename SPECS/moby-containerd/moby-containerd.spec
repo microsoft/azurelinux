@@ -2,8 +2,8 @@
 
 Summary: Industry-standard container runtime
 Name: moby-containerd
-Version: 1.4.4+azure
-Release: 4%{?dist}
+Version: 1.5.9+azure
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -11,14 +11,11 @@ Group: Tools/Container
 # Please look at ./generate-sources.sh for generating source tar ball.
 
 %define vernum %(echo "%{version}" | cut -d+ -f1)
-#Source0: https://github.com/containerd/containerd/archive/v%{vernum}.tar.gz
-Source0: moby-containerd-%{version}.tar.gz
+Source0: https://github.com/containerd/containerd/archive/v%{vernum}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
 Source3: NOTICE
 Source4: LICENSE
-Patch0:  CVE-2021-32760.patch
-Patch1:  CVE-2021-41103.patch
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
@@ -70,9 +67,8 @@ used directly by developers or end-users.
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%setup -q -n %{name}-%{version} -c
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1 -c -n %{name}-%{version}
+
 mkdir -p %{OUR_GOPATH}/src/github.com/containerd
 ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/containerd/containerd
 
@@ -134,6 +130,12 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Tue Jan 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.5.9+azure-1
+- Update to version 1.5.9+azure
+* Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.4.4+azure-6
+- Increment release for force republishing using golang 1.16.12
+* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4+azure-5
+- Increment release for force republishing using golang 1.16.9
 * Mon Oct 04 2021 Henry Beberman <henry.beberman@microsoft.com> 1.4.4+azure-4
 - Patch CVE-2021-41103
 - Change config to noreplace

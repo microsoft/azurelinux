@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Syntax-Highlight-Engine-Kate
 Version:        0.14
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Port to Perl of the syntax highlight engine of the Kate text editor
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Syntax-Highlight-Engine-Kate
@@ -13,7 +13,9 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(inc::Module::Install) >= 0.91
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(Module::Install::Metadata)
 BuildRequires:  perl(Module::Install::WriteAll)
 BuildRequires:  sed
@@ -69,11 +71,15 @@ make pure_install DESTDIR=%{buildroot}
 make test
 
 %files
+%license README
 %doc Changes README REGISTERED
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14-10
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

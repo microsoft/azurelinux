@@ -1,46 +1,77 @@
 Summary:        Implementation of the JPEG-2000 standard, Part 1
 Name:           jasper
-Version:        2.0.24
-Release:        4%{?dist}
+Version:        2.0.32
+Release:        2%{?dist}
 License:        JasPer
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.ece.uvic.ca/~frodo/jasper/
-Source0:        https://github.com/jasper-software/jasper/archive/version-%{version}.tar.gz
+Source0:        https://github.com/jasper-software/jasper/archive/version-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # skip hard-coded prefix/lib rpath
 Patch2:         jasper-2.0.14-rpath.patch
-Patch3:         jasper-freeglut.patch
+# architecture related patches
+Patch100:       jasper-2.0.2-test-ppc64-disable.patch
+Patch101:       jasper-2.0.2-test-ppc64le-disable.patch
 # autoreconf
 BuildRequires:  cmake
 BuildRequires:  gcc
-BuildRequires:  libjpeg-devel
+BuildRequires:  libGLU-devel
+BuildRequires:  libXi-devel
+BuildRequires:  libXmu-devel
+BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  make
-BuildRequires:  pkg-config
-Requires:       %{name}-libs = %{version}-%{release}
+BuildRequires:  mesa-libGL-devel
+BuildRequires:  pkgconfig
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
 This package contains an implementation of the image compression
 standard JPEG-2000, Part 1. It consists of tools for conversion to and
 from the JP2 and JPC formats.
 
-%package        devel
+%package devel
 Summary:        Header files, libraries and developer documentation
-Requires:       %{name}-libs = %{version}-%{release}
-Requires:       libjpeg-devel
-Requires:       pkg-config
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       libjpeg-turbo-devel
+Requires:       pkgconfig
 Provides:       libjasper-devel = %{version}-%{release}
 
 %description devel
 %{summary}.
 
-%package        libs
+%package libs
 Summary:        Runtime libraries for %{name}
+Conflicts:      jasper < 1.900.1-4
 
 %description libs
 %{summary}.
 
+%package utils
+Summary:        Nonessential utilities for %{name}
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description utils
+%{summary}, including jiv and tmrdemo.
+
 %prep
-%autosetup -p1 -n %{name}-version-%{version}
+%setup -q -n %{name}-version-%{version}
+
+%patch2 -p1 -b .rpath
+# Need to disable one test to be able to build it on ppc64 arch
+# At ppc64 this test just stuck (nothing happend - no exception or error)
+# %patch3 -p1 -b .freeglut
+
+%if "%{_arch}" == "ppc64"
+%patch100 -p1 -b .test-ppc64-disable
+%endif
+
+# Need to disable two tests to be able to build it on ppc64le arch
+# At ppc64le this tests just stuck (nothing happend - no exception or error)
+
+%if "%{_arch}" == "ppc64le"
+%patch101 -p1 -b .test-ppc64le-disable
+%endif
 
 %build
 mkdir builder
@@ -60,8 +91,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %check
 make test -C builder
 
-%ldconfig_scriptlets libs
-
 %files
 %{_bindir}/imgcmp
 %{_bindir}/imginfo
@@ -76,23 +105,41 @@ make test -C builder
 %{_libdir}/libjasper.so
 %{_libdir}/pkgconfig/jasper.pc
 
+%ldconfig_scriptlets libs
+
 %files libs
 %doc README
 %license COPYRIGHT LICENSE
 %{_libdir}/libjasper.so.4*
 
 %changelog
-* Fri Dec 10 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.24-4
-- Removing unused BR on 'doxygen'.
+* Tue Jul 20 2021 Vinicius Jarina <vinja@microsoft.com> - 2.0.32-2
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified.
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.24-3
-- License verified
-- Lint spec
+* Wed Jun 02 2021 Josef Ridky <jridky@redhat.com> - 2.0.32-1
+- New upstream release 2.0.32 (#1950621)
 
-* Thu Feb 25 2021 Henry Li <lihl@microsoft.com> - 2.0.24-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
-- Remove UI-related dependencies
-- Remove utils subpackage
+* Tue Mar 30 2021 Josef Ridky <jridky@redhat.com> - 2.0.28-1
+- New upstream release 2.0.28 (#1944481)
+
+* Wed Mar 24 2021 Josef Ridky <jridky@redhat.com> - 2.0.27-1
+- New upstream release 2.0.27 (#1940455)
+
+* Tue Mar 16 2021 Josef Ridky <jridky@redhat.com> - 2.0.26-2
+- Fix CVE-2021-3443 (#1939233)
+
+* Wed Mar 10 2021 Josef Ridky <jridky@redhat.com> - 2.0.26-1
+- New upstream release 2.0.26 (#1935900)
+
+* Tue Feb 09 2021 Josef Ridky <jridky@redhat.com> - 2.0.25-1
+- New upstream release 2.0.25 (#1925996)
+
+* Thu Jan 28 2021 Josef Ridky <jridky@redhat.com> - 2.0.24-3
+- fix CVE-2021-3272 (#1921328)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.24-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Jan 25 2021 Josef Ridky <jridky@redhat.com> - 2.0.24-1
 - New upstream release 2.0.24 (#1905690)

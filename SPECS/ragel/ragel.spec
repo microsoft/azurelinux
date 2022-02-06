@@ -1,6 +1,6 @@
 Name:           ragel
-Version:        7.0.0.12
-Release:        6%{?dist}
+Version:        7.0.4
+Release:        1%{?dist}
 Summary:        Finite state machine compiler
 # aapl/ is the LGPLv2+
 License:        MIT AND LGPLv2+
@@ -8,15 +8,17 @@ Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.colm.net/open-source/%{name}/
-Source0:        https://www.colm.net/files/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/adrian-thurston/ragel/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         Ragel-Colm-NoStatic.patch
 
-BuildRequires:  gcc
-BuildRequires:  libstdc++
 BuildRequires:  autoconf
 BuildRequires:  automake
+# the specific version of colm needed is in EXPECTED_COLM_VER in configure.ac (Source0)
+BuildRequires:  colm-devel = 0.14.7
+BuildRequires:  gcc
+BuildRequires:  libstdc++
 BuildRequires:  libtool
 BuildRequires:  make
-BuildRequires:  colm-devel = 0.13.0.7
 
 %description
 Ragel compiles executable finite state machines from regular languages.
@@ -33,14 +35,14 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %prep
-%autosetup
+%autosetup -p1
 # Do not pollute with docs
 sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
-autoreconf -vfi
-%configure --disable-static
-%make_build
+./autogen.sh
+./configure --prefix="/usr" --with-colm="/usr" --disable-manual --disable-static
+make %{?_smp_mflags}
 
 %install
 %make_install
@@ -52,24 +54,23 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 
 %files
 %license COPYING
-%doc CREDITS ChangeLog
-%{_bindir}/%{name}
-%{_bindir}/%{name}-*
-%{_mandir}/man1/%{name}.1*
-%{_libdir}/libfsm.so.*
+%doc CREDITS
+%{_bindir}/*
+%{_mandir}/man1/*
 %{_libdir}/libragel.so.*
-%{_datarootdir}/%{name}.lm
+%{_datarootdir}/*.lm
 %dir %{_datadir}/vim
 %dir %{_datadir}/vim/vimfiles
 %dir %{_datadir}/vim/vimfiles/syntax
 %{_datadir}/vim/vimfiles/syntax/%{name}.vim
 
 %files devel
-%{_libdir}/libfsm.so
 %{_libdir}/libragel.so
-%{_includedir}/%{name}/
 
 %changelog
+* Wed Jan 26 2022 Nicolas Guibourge <nicolasg@microsft.com> - 7.0.4-1
+- Ugrade to 7.0.4
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 7.0.0.12-6
 - Remove epoch
 

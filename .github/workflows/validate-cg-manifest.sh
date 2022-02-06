@@ -28,6 +28,7 @@ ignore_list=" \
   kernel-signed-x86_64 \
   kf5 \
   lcms2 \
+  lua-rpm-macros \
   mariner-repos \
   mariner-rpm-macros \
   moby-buildx \
@@ -45,6 +46,8 @@ ignore_list=" \
   python-yamlloader \
   python-zope-interface \
   qt5-rpm-macros \
+  rt-setup
+  rtctl
   runc \
   sgabios \
   shim \

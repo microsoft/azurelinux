@@ -20,37 +20,34 @@ Distribution:   Mariner
 
 Name:           velocity
 Version:        1.7
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Java-based template engine
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
-URL:            http://velocity.apache.org/
-Source0:        http://www.apache.org/dist/velocity/engine/%{version}/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}.pom
-Patch0:         velocity-build_xml.patch
+URL:            https://velocity.apache.org/
+Source0:        https://github.com/apache/%{name}-engine/archive/refs/tags/%{version}.tar.gz#/%{name}-engine-%{version}.tar.gz
+Patch1:         0001-Port-to-apache-commons-lang3.patch
+Patch2:         0002-Force-use-of-JDK-log-chute.patch
+Patch3:         0003-CVE-2020-13936.patch
 BuildRequires:  ant >= 1.6.5
 BuildRequires:  ant-junit
 BuildRequires:  antlr
-BuildRequires:  avalon-logkit
 BuildRequires:  commons-collections
-BuildRequires:  commons-lang
+BuildRequires:  commons-lang3
 BuildRequires:  commons-logging
 BuildRequires:  fdupes
 BuildRequires:  hsqldb
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  jdom >= 1.0-1
 BuildRequires:  junit
-BuildRequires:  log4j12 >= 1.1
 BuildRequires:  oro
 BuildRequires:  plexus-classworlds
 BuildRequires:  servletapi4
 BuildRequires:  werken-xpath
-Requires:       avalon-logkit
 Requires:       commons-collections
-Requires:       commons-lang
+Requires:       commons-lang3
 Requires:       java >= 1.6.0
 Requires:       jdom >= 1.0-1
-Requires:       log4j12 >= 1.1
 Requires:       oro
 Requires:       servletapi4
 Requires:       werken-xpath
@@ -154,7 +151,7 @@ Velocity+Turbine provides a template service that will allow web
 applications to be developed according to a true MVC model.
 
 %prep
-%setup -q
+%autosetup -p1
 # Remove all binary libs used in compiling the package.
 # Note that velocity has some jar files containing macros under
 # examples and test that should not be removed.
@@ -162,11 +159,30 @@ applications to be developed according to a true MVC model.
 for j in $(find . -name "*.jar" | grep -v /test/); do
     mv $j $j.no
 done
-%patch0 -b .sav0
 
-cp %{SOURCE1} pom.xml
+# Removing dependency on "avalong-logkit".
+rm src/java/org/apache/velocity/runtime/log/AvalonLogChute.java
+rm src/java/org/apache/velocity/runtime/log/AvalonLogSystem.java
+rm src/java/org/apache/velocity/runtime/log/VelocityFormatter.java
+
+# Removing dependency on "log4j12".
+rm src/java/org/apache/velocity/runtime/log/Log4JLogChute.java
+rm src/java/org/apache/velocity/runtime/log/Log4JLogSystem.java
+rm src/java/org/apache/velocity/runtime/log/SimpleLog4JLogSystem.java
+
+# Removing dependency on "commons-logging".
+rm src/java/org/apache/velocity/runtime/log/CommonsLogLogChute.java
+
+# Need porting to new servlet API. We would just add a lot of empty functions.
+rm src/test/org/apache/velocity/test/VelocityServletTestCase.java
+
+# This test doesn't work with new hsqldb.
+rm src/test/org/apache/velocity/test/sql/DataSourceResourceLoaderTestCase.java
 
 %pom_remove_parent pom.xml
+%pom_remove_dep :commons-logging
+%pom_remove_dep :log4j
+%pom_remove_dep :logkit
 
 %build
 #export JAVA_HOME=%{_jvmdir}/java-1.5.0
@@ -180,19 +196,17 @@ mkdir -p bin/lib
 pushd bin/lib
 ln -sf $(build-classpath ant)
 ln -sf $(build-classpath antlr)
-ln -sf $(build-classpath avalon-logkit)
 ln -sf $(build-classpath commons-collections)
-ln -sf $(build-classpath commons-lang)
+ln -sf $(build-classpath commons-lang3)
 ln -sf $(build-classpath commons-logging)
 ln -sf $(build-classpath jdom)
-ln -sf $(build-classpath log4j12/log4j-12)
 ln -sf $(build-classpath oro)
 # Use servletapi4 instead of servletapi5 in CLASSPATH
 ln -sf $(build-classpath servletapi4)
 ln -sf $(build-classpath werken-xpath)
 ln -sf $(build-classpath plexus/classworlds)
 popd
-export CLASSPATH=$(build-classpath jdom commons-collections commons-lang werken-xpath antlr)
+export CLASSPATH=$(build-classpath jdom commons-collections commons-lang3 werken-xpath antlr)
 CLASSPATH=$CLASSPATH:$(pwd)/test/texen-classpath/test.jar
 export OPT_JAR_LIST="ant/ant-junit junit"
 #FIXME: tests failed on CommonsExtPropTestCase
@@ -240,6 +254,12 @@ cp -pr examples test %{buildroot}%{_datadir}/%{name}
 %{_datadir}/%{name}
 
 %changelog
+* Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-10
+- Removing dependency on "avalog-logkit" and "log4j12".
+- Ported to "commons-lang3".
+- License verified.
+- Changes done using Fedora 33 (license: MIT) spec as guidance.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-9
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

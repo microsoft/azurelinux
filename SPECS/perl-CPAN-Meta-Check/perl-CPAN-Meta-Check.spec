@@ -1,7 +1,7 @@
 Name:           perl-CPAN-Meta-Check
 Summary:        Verify requirements in a CPAN::Meta object
 Version:        0.014
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
@@ -12,6 +12,7 @@ BuildArch:      noarch
 # Build
 BuildRequires:  make
 BuildRequires:  perl
+BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Module
 BuildRequires:  perl(base)
@@ -56,6 +57,9 @@ make test
 %{_mandir}/man3/CPAN::Meta::Check.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.014-13
+- Adding BR on "perl-generators".
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.014-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified

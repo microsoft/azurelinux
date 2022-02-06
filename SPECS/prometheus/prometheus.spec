@@ -3,7 +3,7 @@
 
 Name:           prometheus
 Version:        2.24.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Prometheus monitoring system and time series database
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Source6:        %{name}-%{version}-vendor.tar.gz
 
 # Debian patch for default settings
 Patch0:         02-Default_settings.patch
+Patch1:         0001-Fixed-TestChunkDiskMapper_WriteChunk_Chunk_IterateCh.patch
 
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  golang
@@ -91,7 +92,37 @@ mkdir -p %{buildroot}%{_sharedstatedir}/prometheus
 %check
 # scrape: needs network
 # tsdb: https://github.com/prometheus/prometheus/issues/8393
-go check -t cmd -d scrape -d discovery/kubernetes -d web -d tsdb -d tsdb/chunks
+# NOTE '%gocheck' is avalible via go-rpm-tools which is currently in SPECS-EXTENDED
+# use the raw go test till we import go-rpm-macros to CBL-Mariner core
+# go check -t cmd -d scrape -d discovery/kubernetes -d web -d tsdb -d tsdb/chunks
+go_test_status=0
+go test -v ./scrape/
+check_result=$?
+if [[ $check_result -ne 0 ]]; then
+    go_test_status=1
+fi
+go test -v ./discovery/...
+check_result=$?
+if [[ $check_result -ne 0 ]]; then
+    go_test_status=1
+fi
+go test -v ./web/
+check_result=$?
+if [[ $check_result -ne 0 ]]; then
+    go_test_status=1
+fi
+go test -v ./tsdb/...
+check_result=$?
+if [[ $check_result -ne 0 ]]; then
+    go_test_status=1
+fi
+go test -v ./cmd/prometheus/
+check_result=$?
+if [[ $check_result -ne 0 ]]; then
+    go_test_status=1
+fi
+
+[[ go_test_status -eq 0 ]]
 
 %files
 %license LICENSE NOTICE
@@ -109,6 +140,10 @@ go check -t cmd -d scrape -d discovery/kubernetes -d web -d tsdb -d tsdb/chunks
 %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Mon Jan 31 2022 Muhammad Falak <mwani@microsoft.com> - 2.24.1-8
+- Fix ptest by using 'go test' instead of 'go check'
+- Backport a patch to fix test in 'tsdb/chunks'
+
 * Wed Jul 28 2021 Henry Li <lihl@microsoft.com> - 2.24.1-7
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified

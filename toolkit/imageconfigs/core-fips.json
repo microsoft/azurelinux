@@ -46,13 +46,15 @@
                 "packagelists/hyperv-packages.json",
                 "packagelists/fips-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json"
+                "packagelists/cloud-init-packages.json",
+                "packagelists/selinux.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
             },
             "KernelCommandLine": {
-                "ExtraCommandLine": "fips=1"
+                "ExtraCommandLine": "fips=1",
+                "SELinux": "permissive"
             },
             "Hostname": "cbl-mariner"
         }

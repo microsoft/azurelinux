@@ -1,16 +1,14 @@
 Summary:        Software Update for Embedded Systems
 Name:           swupdate
-Version:        2019.11
-Release:        7%{?dist}
+Version:        2021.04
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://sbabic.github.io/swupdate/
-#Source0:       https://github.com/sbabic/swupdate/archive/%%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/sbabic/swupdate/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        .config
-
 BuildRequires:  curl-devel
 BuildRequires:  json-c-devel
 BuildRequires:  libarchive-devel
@@ -53,15 +51,15 @@ cp %{SOURCE1} .
 make %{?_smp_mflags} SKIP_STRIP=y
 
 %install
-make install    DESTDIR=$RPM_BUILD_ROOT \
+make install    DESTDIR=%{buildroot} \
                 SKIP_STRIP=y            \
                 HAVE_LUA=n
 
 %pre
 # swupdate - preinst
 #!/bin/sh
-if true && [ -z "$D" -a -f "/etc/init.d/swupdate" ]; then
-    /etc/init.d/swupdate stop || :
+if true && [ -z "$D" -a -f "%{_sysconfdir}/init.d/swupdate" ]; then
+    %{_sysconfdir}/init.d/swupdate stop || :
 fi
 if true && type update-rc.d >/dev/null 2>/dev/null; then
     if [ -n "$D" ]; then
@@ -71,7 +69,6 @@ if true && type update-rc.d >/dev/null 2>/dev/null; then
     fi
     update-rc.d $OPT swupdate remove
 fi
-
 
 %post
 # swupdate - postinst
@@ -85,13 +82,12 @@ if true && type update-rc.d >/dev/null 2>/dev/null; then
     update-rc.d $OPT swupdate defaults 70
 fi
 
-
 %preun
 # swupdate - prerm
 #!/bin/sh
 if [ "$1" = "0" ] ; then
-if true && [ -z "$D" -a -x "/etc/init.d/swupdate" ]; then
-    /etc/init.d/swupdate stop || :
+if true && [ -z "$D" -a -x "%{_sysconfdir}/init.d/swupdate" ]; then
+    %{_sysconfdir}/init.d/swupdate stop || :
 fi
 fi
 
@@ -111,34 +107,36 @@ fi
 
 %files
 %defattr(-,-,-,-)
-%license Licenses
-%dir "/usr"
-%dir "/usr/bin"
-"/usr/bin/swupdate"
+%license LICENSES
+%dir "%{_prefix}"
+%dir "%{_bindir}"
+"%{_bindir}/swupdate"
 
 %files tools
 %defattr(-,-,-,-)
-%dir "/usr"
-%dir "/usr/bin"
-"/usr/bin/swupdate-client"
-"/usr/bin/swupdate-progress"
-"/usr/bin/swupdate-sendtohawkbit"
-"/usr/bin/swupdate-hawkbitcfg"
-"/usr/bin/swupdate-sysrestart"
-
+%dir "%{_prefix}"
+%dir "%{_bindir}"
+"%{_bindir}/swupdate-client"
+"%{_bindir}/swupdate-progress"
+"%{_bindir}/swupdate-sendtohawkbit"
+"%{_bindir}/swupdate-hawkbitcfg"
+"%{_bindir}/swupdate-sysrestart"
 
 %files devel
 %defattr(-,-,-,-)
-%dir "/usr"
-%dir "/usr/include"
-"/usr/include/progress_ipc.h"
-"/usr/include/network_ipc.h"
-"/usr/include/swupdate_status.h"
-%dir "/usr/lib"
-"/usr/lib/libswupdate.a"
-
+%dir "%{_prefix}"
+%dir "%{_includedir}"
+"%{_includedir}/progress_ipc.h"
+"%{_includedir}/network_ipc.h"
+"%{_includedir}/swupdate_status.h"
+%dir "%{_libdir}"
+%{_libdir}/libswupdate.so
+%{_libdir}/libswupdate.so.*
 
 %changelog
+* Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2021.04-1
+- Update to version 2021.04.
+
 * Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 2019.11-7
 - Use libconfig-devel at build-time, instead of libconfig
 
