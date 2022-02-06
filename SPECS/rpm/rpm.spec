@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -145,7 +145,13 @@ sed -i 's/@MAJORVER-PROVIDES-VERSIONS@/%{python3_version}/' %{SOURCE3}
 sed -i '1 s:.*:#!/usr/bin/python3:' %{SOURCE5}
 
 %check
-%make_build_check
+make check TESTSUITEFLAGS=-j%{_smp_build_ncpus}
+check_result=$?
+if [[ $check_result -ne 0 ]]; then
+	cat tests/rpmtests.log || true
+fi
+make clean
+[[ $check_result -eq 0 ]]
 
 %install
 %make_install
@@ -264,6 +270,8 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Sat Jan 29 2022 Muhammad Falak <mwani@microsoft.com> - 4.17.0-2
+- Fix ptest build by replacing `%make_build_check` with `make`
 
 * Wed Sep 15 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.17.0-1
 - Upgrade to version 4.17.0.  Remove libdb dependency.

@@ -1,25 +1,19 @@
 # Got the intial spec from Fedora and modified it
 Summary:        An enhanced version of csh, the C shell
 Name:           tcsh
-Version:        6.20.00
-Release:        10%{?dist}
+Version:        6.22.03
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Shells
 URL:            https://www.tcsh.org/
 Source0:        https://astron.com/pub/%{name}/old/%{name}-%{version}.tar.gz
-
-# patch origin http://pkgs.fedoraproject.org/cgit/rpms/tcsh.git/
-Patch0:         tcsh-6.20.00-009-fix-regexp-for-backlash-quoting-tests.patch
-
 BuildRequires:  ncurses-devel
-
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
-
 Requires:       ncurses
 Requires(post): /bin/grep
 Requires(postun): /bin/grep
@@ -38,8 +32,7 @@ spelling correction, a history mechanism, job control and a C language
 like syntax.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup
 
 %build
 sed -i -e 's|\$\*|#&|' -e 's|fR/g|&m|' tcsh.man2html &&
@@ -123,6 +116,9 @@ fi
 %{_mandir}/man1/*.1*
 
 %changelog
+* Tue Feb 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.22.03-1
+- Update version to 6.22.03.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.20.00-10
 - Removing the explicit %%clean stage.
 

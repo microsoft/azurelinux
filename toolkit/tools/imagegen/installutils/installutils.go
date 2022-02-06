@@ -963,6 +963,12 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 		return
 	}
 
+	err = setGrubCfgSELinux(installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
+		return
+	}
+
 	// Append any additional command line parameters
 	err = setGrubCfgAdditionalCmdLine(installGrubCfgFile, kernelCommandLine)
 	if err != nil {
@@ -1452,6 +1458,104 @@ func updateUserPassword(installRoot, username, password string) (err error) {
 	return
 }
 
+// SELinuxConfigure pre-configures SELinux file labels and configuration files
+func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string) (err error) {
+	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", systemConfig.KernelCommandLine.SELinux)
+
+	err = selinuxUpdateConfig(systemConfig, installChroot)
+	if err != nil {
+		logger.Log.Errorf("Failed to update SELinux config")
+		return
+	}
+	err = selinuxRelabelFiles(systemConfig, installChroot, mountPointToFsTypeMap)
+	if err != nil {
+		logger.Log.Errorf("Failed to label SELinux files")
+		return
+	}
+	return
+}
+
+func selinuxUpdateConfig(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot) (err error) {
+	const (
+		configFile     = "etc/selinux/config"
+		selinuxPattern = "^SELINUX=.*"
+	)
+	var mode string
+
+	switch systemConfig.KernelCommandLine.SELinux {
+	case configuration.SELinuxEnforcing, configuration.SELinuxForceEnforcing:
+		mode = configuration.SELinuxEnforcing.String()
+	case configuration.SELinuxPermissive:
+		mode = configuration.SELinuxPermissive.String()
+	}
+
+	selinuxConfigPath := filepath.Join(installChroot.RootDir(), configFile)
+	selinuxMode := fmt.Sprintf("SELINUX=%s", mode)
+	err = sed(selinuxPattern, selinuxMode, "`", selinuxConfigPath)
+	return
+}
+
+func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string) (err error) {
+	const (
+		squashErrors        = false
+		configFile          = "etc/selinux/config"
+		fileContextBasePath = "etc/selinux/%s/contexts/files/file_contexts"
+	)
+	var listOfMountsToLabel []string
+
+	// Search through all our mount points for supported filesystem types
+	// Note for the future: SELinux can support any of {btrfs, encfs, ext2-4, f2fs, jffs2, jfs, ubifs, xfs, zfs}, but the build system currently
+	//     only supports the below cases:
+	for mount, fsType := range mountPointToFsTypeMap {
+		switch fsType {
+		case "ext2", "ext3", "ext4":
+			listOfMountsToLabel = append(listOfMountsToLabel, mount)
+		case "fat32", "fat16", "vfat":
+			logger.Log.Debugf("SELinux will not label mount at (%s) of type (%s), skipping", mount, fsType)
+		default:
+			err = fmt.Errorf("Unknown fsType (%s) for mount (%s), cannot configure SELinux", fsType, mount)
+			return
+		}
+	}
+
+	// Find the type of policy we want to label with
+	selinuxConfigPath := filepath.Join(installChroot.RootDir(), configFile)
+	stdout, stderr, err := shell.Execute("sed", "-n", "s/^SELINUXTYPE=\\(.*\\)$/\\1/p", selinuxConfigPath)
+	if err != nil {
+		logger.Log.Errorf("Could not find an SELINUXTYPE in %s", selinuxConfigPath)
+		logger.Log.Error(stderr)
+		return
+	}
+	selinuxType := strings.TrimSpace(stdout)
+	fileContextPath := fmt.Sprintf(fileContextBasePath, selinuxType)
+
+	logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", listOfMountsToLabel)
+	err = installChroot.UnsafeRun(func() error {
+		args := []string{"-m", "-v", fileContextPath}
+		args = append(args, listOfMountsToLabel...)
+
+		// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
+		files := 0
+		lastFile := ""
+		onStdout := func(args ...interface{}) {
+			if len(args) > 0 {
+				files++
+				lastFile = fmt.Sprintf("%v", args)
+			}
+			if (files % 1000) == 0 {
+				ReportActionf("SELinux: labelled %d files", files)
+			}
+		}
+		err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", args...)
+		if err != nil {
+			return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
+		}
+		return err
+	})
+
+	return
+}
+
 func sed(find, replace, delimiter, file string) (err error) {
 	const squashErrors = false
 
@@ -1783,6 +1887,32 @@ func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelComman
 	err = sed(imaPattern, ima, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's IMA setting: %v", err)
+	}
+
+	return
+}
+
+func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		selinuxPattern        = "{{.SELinux}}"
+		selinuxSettings       = "security=selinux selinux=1"
+		selinuxForceEnforcing = "enforcing=1"
+	)
+	var selinux string
+
+	switch kernelCommandline.SELinux {
+	case configuration.SELinuxForceEnforcing:
+		selinux = fmt.Sprintf("%s %s", selinuxSettings, selinuxForceEnforcing)
+	case configuration.SELinuxPermissive, configuration.SELinuxEnforcing:
+		selinux = selinuxSettings
+	case configuration.SELinuxOff:
+		selinux = ""
+	}
+
+	logger.Log.Debugf("Adding SELinuxConfiguration('%s') to '%s'", selinux, grubPath)
+	err = sed(selinuxPattern, selinux, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
 	}
 
 	return

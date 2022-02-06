@@ -1,0 +1,10 @@
+{
+    "packages": [
+        "selinux-policy",
+        "selinux-policy-devel",
+        "policycoreutils-python-utils",
+        "checkpolicy",
+        "secilc",
+        "setools-console"
+    ]
+}

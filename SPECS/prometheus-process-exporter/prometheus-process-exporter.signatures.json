@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "prometheus-process-exporter-0.7.10-vendor.tar.gz": "79736beba1ac3f216763b3672ed1f769becb40dc8e0e5c3283b40d162d0601c8",
+  "prometheus-process-exporter-0.7.10.tar.gz": "197a950879f90d36e3979ab412c60ec35eec5942451a0105e070a670474d730a",
+  "prometheus-process-exporter.conf": "ef9dc718b103fee1bcb31c721478164318aba1692eaabdb3ea2df49e43caa7cd",
+  "prometheus-process-exporter.logrotate": "3a0a2225dacc04968b74b67ae9dc5c273a4d9bdaa358396b322b7093e873f612",
+  "prometheus-process-exporter.service": "12e5011db5c1b66926a66e7506bd039b6d7ca7ebc72e685cedf5783299adf6bd"
+ }
+}

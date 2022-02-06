@@ -1,0 +1,30 @@
+diff -up conda-4.11.0/conda/auxlib/decorators.py.memoize conda-4.11.0/conda/auxlib/decorators.py
+--- conda-4.11.0/conda/auxlib/decorators.py.memoize	2021-11-29 20:27:32.622204583 -0700
++++ conda-4.11.0/conda/auxlib/decorators.py	2021-11-29 20:28:42.661814653 -0700
+@@ -189,7 +189,7 @@ def memoizemethod(method):
+ 
+ def clear_memoized_methods(obj, *method_names):
+     """
+-    Clear the memoized method or @memoizeproperty results for the given
++    Clear the memoized method or @memoizedproperty results for the given
+     method names from the given object.
+ 
+     >>> v = [0]
+@@ -201,7 +201,7 @@ def clear_memoized_methods(obj, *method_
+     ...    @memoizemethod
+     ...    def foo(self):
+     ...        return inc()
+-    ...    @memoizeproperty
++    ...    @memoizedproperty
+     ...    def g(self):
+     ...       return inc()
+     ...
+@@ -343,6 +343,6 @@ class classproperty(object):  # pylint:
+ #     staticproperty?
+ # memoizefunction
+ # memoizemethod
+-# memoizeproperty
++# memoizedproperty
+ #
+ #
+ 

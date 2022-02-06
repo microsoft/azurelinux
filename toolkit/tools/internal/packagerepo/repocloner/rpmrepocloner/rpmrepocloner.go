@@ -34,8 +34,13 @@ const (
 )
 
 var (
-	// Every valid line will be of the form: <package>-<version>.<arch> : <Description>
-	packageLookupNameMatchRegex = regexp.MustCompile(`^\s*([^:]+(x86_64|aarch64|noarch))\s*:`)
+	// Every valid line pair will be of the form:
+	//		<package>-<version>.<arch> : <Description>
+	//		Repo	: [repo_name]
+	//
+	// NOTE: we ignore packages installed in the build environment denoted by "Repo	: @System".
+	packageLookupNameMatchRegex = regexp.MustCompile(`([^:\s]+(x86_64|aarch64|noarch))\s*:[^\n]*\nRepo\s+:\s+[^@]`)
+	packageNameIndex            = 1
 
 	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist> <repo_id>
 	// For:
@@ -145,10 +150,17 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 		return
 	}
 
-	logger.Log.Info("Initializing local RPM repository")
-	err = r.initializeMountedChrootRepo(chrootLocalRpmsDir)
-	if err != nil {
-		return
+	// The 'cacheRepoDir' repo is only used during Docker based builds, which don't
+	// use overlay so cache repo must be explicitly initialized.
+	// We make sure it's present during all builds to avoid noisy TDNF error messages in the logs.
+	reposToInitialize := []string{chrootLocalRpmsDir, chrootDownloadDir, cacheRepoDir}
+	for _, repoToInitialize := range reposToInitialize {
+		logger.Log.Debugf("Initializing the '%s' repository.", repoToInitialize)
+		err = r.initializeMountedChrootRepo(repoToInitialize)
+		if err != nil {
+			logger.Log.Errorf("Failed while trying to initialize the '%s' repository.", repoToInitialize)
+			return
+		}
 	}
 
 	logger.Log.Info("Initializing repository configurations")
@@ -239,6 +251,11 @@ func appendRepoFile(repoFilePath string, dstFile *os.File) (err error) {
 // initializeMountedChrootRepo will initialize a local RPM repository inside the chroot.
 func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) {
 	return r.chroot.Run(func() (err error) {
+		err = os.MkdirAll(repoDir, os.ModePerm)
+		if err != nil {
+			logger.Log.Errorf("Failed to create repo directory '%s'.", repoDir)
+			return
+		}
 		return rpmrepomanager.CreateRepo(repoDir)
 	})
 }
@@ -247,12 +264,6 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // If cloneDeps is set, package dependencies will also be cloned.
 // It will automatically resolve packages that describe a provide or file from a package.
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (err error) {
-	const (
-		strictComparisonOperator          = "="
-		lessThanOrEqualComparisonOperator = "<="
-		versionSuffixFormat               = "-%s"
-	)
-
 	for _, pkg := range packagesToClone {
 		pkgName := convertPackageVersionToTdnfArg(pkg)
 
@@ -317,19 +328,14 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 				return
 			}
 
-			splitStdout := strings.Split(stdout, "\n")
-			for _, line := range splitStdout {
-				matches := packageLookupNameMatchRegex.FindStringSubmatch(line)
-				if len(matches) == 0 {
-					continue
-				}
-
-				packageName := matches[1]
-				if !foundPackages[packageName] {
+			for _, matches := range packageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
+				packageName := matches[packageNameIndex]
+				if _, found := foundPackages[packageName]; !found {
 					foundPackages[packageName] = true
 					logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
 				}
 			}
+
 			return
 		})
 		if err != nil {
@@ -378,7 +384,7 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 
 	if !buildpipeline.IsRegularBuild() {
 		// Docker based build doesn't use overlay so cache repo
-		// must be explicitely initialized
+		// must be explicitly initialized
 		err = r.initializeMountedChrootRepo(cacheRepoDir)
 	}
 
@@ -420,7 +426,7 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 		tdnfArgs := []string{
 			"list",
 			"ALL",
-			"--disablerepo=*",
+			fmt.Sprintf("--disablerepo=%s", allRepoIDs),
 			fmt.Sprintf("--enablerepo=%s", checkedRepoID),
 		}
 		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)
@@ -465,11 +471,6 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		// e.g. packages in upstream update repo may require packages in upstream base repo.
 		enabledRepoArgs = append(enabledRepoArgs, fmt.Sprintf("--enablerepo=%s", repoID))
 		args := append(baseArgs, enabledRepoArgs...)
-
-		// Do not enable the fetcher's own repo as it is only used for listing cloned files
-		// and will not been initialized until ConvertDownloadedPackagesIntoRepo is called on it
-		// when all cloning is complete.
-		args = append(args, fmt.Sprintf("--disablerepo=%s", fetcherRepoID))
 
 		if !r.usePreviewRepo {
 			args = append(args, fmt.Sprintf("--disablerepo=%s", previewRepoID))
