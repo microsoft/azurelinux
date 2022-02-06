@@ -43,7 +43,7 @@ Distribution:   Mariner
 Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Version:       1.44.0
-Release:       4%{?dist}
+Release:       5%{?dist}
 License:       LGPLv2+
 
 # Source and patches.
@@ -69,6 +69,7 @@ Source9:       tdnf-build-cache.repo
 # Upstream patches not present in 1.44.0
 Patch0:        libguestfs-ocaml413compat.patch
 Patch1:        libguestfs-config-rpm.patch
+Patch2:        libguestfs-file-5.40.patch
 
 %if 0%{patches_touch_autotools}
 BuildRequires: autoconf, automake, libtool, gettext-devel
@@ -281,7 +282,7 @@ Requires:      libvirt-daemon-driver-qemu
 Requires:      libvirt-daemon-driver-secret
 Recommends:    libvirt-daemon-driver-storage-core
 Requires:      libvirt-daemon-kvm >= 5.3.0
-Requires:      selinux-policy >= 3.11.1-63
+Recommends:    selinux-policy
 
 %ifarch aarch64
 Requires:      edk2-aarch64
@@ -743,8 +744,7 @@ for %{name}.
 
 
 %prep
-%setup -q
-%autopatch -p1
+%autosetup -p1
 
 %if 0%{patches_touch_autotools}
 autoreconf -i
@@ -1268,6 +1268,11 @@ rm ocaml/html/.gitignore
 
 
 %changelog
+* Sat Feb 05 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-5
+- Add patch to fix UUID parsing with file >= 5.40
+- Downgrade selinux-policy requirement to a recommendation without a version constraint
+- Bump release number to 5
+
 * Thu Jan 20 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-3
 - Remove Fedora-specific comments/macros
 - Use TDNF to get build-cached RPMs
