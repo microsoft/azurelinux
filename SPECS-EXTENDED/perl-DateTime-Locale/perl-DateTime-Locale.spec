@@ -1,6 +1,6 @@
 Name:           perl-DateTime-Locale
 Version:        1.25
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Localization support for DateTime.pm
 # Although the CLDR license is listed as "MIT" on the Fedora Wiki, it's more
 # similar to recently added "Unicode" license.
@@ -52,12 +52,6 @@ BuildRequires:  perl(CPAN::Meta::Requirements)
 BuildRequires:  perl(Storable)
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(Dist::CheckConflicts) >= 0.02
-# perl-DateTime-Locale used to be bundled with perl-DateTime
-# ideally, this would be resolved with
-# Requires:     perl-DateTime >= 0.70-1
-# but DateTime::Locale doesn't strictly require DateTime
-# and this would introduce circular build dependencies
-Conflicts:      perl-DateTime <= 1:0.7000-3.fc16
 
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Dist::CheckConflicts\\)$
 
@@ -87,6 +81,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.25-4
+- Removing "Conflicts: perl-DateTime <= 1:0.7000-3.fc16". Version never present in CBL-Mariner.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.25-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.

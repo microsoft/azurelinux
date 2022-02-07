@@ -3,9 +3,6 @@
 
 # We want verbose builds
 %global _configure_disable_silent_rules 1
-# Use bundled deps as we don't ship the exact right versions for all the
-# required rust libraries
-%global bundled_rust_deps 1
 %global cairo_version 1.16.0
 
 Summary:        An SVG library based on cairo
@@ -28,6 +25,7 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  harfbuzz-devel >= 2.0.0
 BuildRequires:  make
 BuildRequires:  pkgconfig
+BuildRequires:  rust
 BuildRequires:  vala
 BuildRequires:  vala-devel
 BuildRequires:  vala-tools
@@ -43,11 +41,6 @@ Requires:       cairo%{?_isa} >= %{cairo_version}
 Requires:       cairo-gobject%{?_isa} >= %{cairo_version}
 # We install a gdk-pixbuf svg loader
 Requires:       gdk-pixbuf2%{?_isa}
-%if 0%{?bundled_rust_deps}
-BuildRequires:  rust
-%else
-BuildRequires:  rust-packaging
-%endif
 
 %description
 An SVG library based on cairo.
@@ -69,23 +62,6 @@ This package provides extra utilities based on the librsvg library.
 
 %prep
 %autosetup -n librsvg-%{version} -p1 -Sgit
-%if 0%{?bundled_rust_deps}
-# Use the bundled deps
-%else
-# No bundled deps
-rm -vrf vendor .cargo Cargo.lock
-pushd rsvg_internals
-  %{cargo_prep}
-  mv .cargo ..
-popd
-%endif
-
-%if ! 0%{?bundled_rust_deps}
-%{generate_buildrequires}
-pushd rsvg_internals >/dev/null
-  %{cargo_generate_buildrequires}
-popd >/dev/null
-%endif
 
 %build
 %configure --disable-static  \
