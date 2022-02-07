@@ -3929,26 +3929,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "foomatic",
-          "version": "4.0.13",
-          "downloadUrl": "http://www.openprinting.org/download/foomatic/foomatic-db-engine-4.0.13.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "foomatic-db",
-          "version": "4.0",
-          "downloadUrl": "http://www.openprinting.org/download/foomatic/foomatic-db-4.0-20201104.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "fping",
           "version": "5.0",
           "downloadUrl": "https://github.com/schweikert/fping/releases/download/v5.0/fping-5.0.tar.gz"
@@ -14572,6 +14552,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netpbm",
+          "version": "10.90.00",
+          "downloadUrl": "https://svn.code.sf.net/p/netpbm/code/advanced"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "netplan",
           "version": "0.95",
           "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
@@ -21633,16 +21623,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "pnm2ppa",
-          "version": "1.04",
-          "downloadUrl": "http://download.sourceforge.net/pnm2ppa/pnm2ppa-1.04.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "po4a",
           "version": "0.60",
           "downloadUrl": "https://github.com/mquinson/po4a/archive/v0.60/po4a-0.60.tar.gz"
@@ -25433,16 +25413,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rcs",
-          "version": "5.9.4",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/rcs/rcs-5.9.4.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rdist",
           "version": "6.1.5",
           "downloadUrl": "http://www.MagniComp.com/download/rdist/rdist-6.1.5.tar.gz"
@@ -25764,16 +25734,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rt-tests",
-          "version": "1.8",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rrdtool",
           "version": "1.7.2",
           "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.7.2/rrdtool-1.7.2.tar.gz"
@@ -25797,6 +25757,16 @@
           "name": "rsyslog",
           "version": "8.2108.0",
           "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2108.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rt-tests",
+          "version": "1.8",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
         }
       }
     },
@@ -28719,16 +28689,6 @@
           "name": "traceroute",
           "version": "2.1.0",
           "downloadUrl": "http://downloads.sourceforge.net/project/traceroute/traceroute/traceroute-2.1.0/traceroute-2.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "transfig",
-          "version": "3.2.7b",
-          "downloadUrl": "http://downloads.sourceforge.net/mcj/fig2dev-3.2.7b.tar.xz"
         }
       }
     },
