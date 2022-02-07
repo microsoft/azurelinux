@@ -254,7 +254,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
-* Mon Feb 07 2022 camelron <cameronbaird@microsoft.com> - 5.15.18.1-1
+* Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
 - Update source to 5.15.18.1
 
 * Fri Feb 04 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-6

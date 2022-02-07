@@ -219,7 +219,7 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
-* Mon Feb 07 2022 camelron <cameronbaird@microsoft.com> - 5.15.18.1-1
+* Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
 - Update source to 5.15.18.1
 
 * Thu Jan 06 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-1
