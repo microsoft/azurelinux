@@ -1,49 +1,47 @@
 # Don't generate requires on jpackage-utils and java-headless for
 # provided pseudo-artifacts: com.sun:tools and sun.jdk:jconsole.
 %global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}/maven-metadata/javapackages-metadata.xml$
-%global python_interpreter %{__python3}
+%global python_interpreter python3
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
 %bcond_with bootstrap
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
-
+Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        6.0.0
 Release:        7%{?dist}
-Summary:        Macros and scripts for Java packaging support
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
-BuildArch:      noarch
-
 Source0:        https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        javapackages-config.json
-
 # Upstream patch for rhbz#2025272
 Patch0:         0001-Update-ivy-local-classpath.patch
 Patch1:         remove-epoch-from-java-requires.patch
 Patch2:         remove-headless-from-java-requires.patch
 
+BuildArch:      noarch
+
 BuildRequires:  coreutils
-BuildRequires:  which
 BuildRequires:  make
 BuildRequires:  msopenjdk-11
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
 BuildRequires:  python3-setuptools
+BuildRequires:  which
+
 %if %{with_check}
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
 %endif
 
-Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       coreutils
 Requires:       findutils
-Requires:       which
+Requires:       javapackages-filesystem = %{version}-%{release}
 # default JRE
 Requires:       msopenjdk-11
+Requires:       which
 
 Provides:       jpackage-utils = %{version}-%{release}
 # These could be generated automatically, but then we would need to
@@ -68,13 +66,13 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       javapackages-local = %{version}-%{release}
 %if %{without bootstrap}
 Requires:       %{_bindir}/xmvn
-Requires:       mvn(org.fedoraproject.xmvn:xmvn-mojo)
 # Common Maven plugins required by almost every build. It wouldn't make
 # sense to explicitly require them in every package built with Maven.
 Requires:       mvn(org.apache.maven.plugins:maven-compiler-plugin)
 Requires:       mvn(org.apache.maven.plugins:maven-jar-plugin)
 Requires:       mvn(org.apache.maven.plugins:maven-resources-plugin)
 Requires:       mvn(org.apache.maven.plugins:maven-surefire-plugin)
+Requires:       mvn(org.fedoraproject.xmvn:xmvn-mojo)
 %endif
 
 %description -n maven-local
@@ -83,8 +81,8 @@ This package provides macros and scripts to support packaging Maven artifacts.
 %package -n ivy-local
 Summary:        Local mode for Apache Ivy
 Requires:       %{name} = %{version}-%{release}
-Requires:       javapackages-local = %{version}-%{release}
 Requires:       apache-ivy >= 2.3.0-8
+Requires:       javapackages-local = %{version}-%{release}
 Requires:       xmvn-connector-ivy
 
 %description -n ivy-local
@@ -101,15 +99,15 @@ packaging in Linux distributions
 
 %package -n javapackages-local
 Summary:        Non-essential macros and scripts for Java packaging support
-Requires:       javapackages-generators = %{version}-%{release}
 # Java build systems don't have hard requirement on java-devel, so it should be there
 Requires:       java-devel
+Requires:       javapackages-generators = %{version}-%{release}
 %if %{with bootstrap}
 Requires:       javapackages-bootstrap
 %else
 Requires:       %{_bindir}/xmvn-install
-Requires:       %{_bindir}/xmvn-subst
 Requires:       %{_bindir}/xmvn-resolve
+Requires:       %{_bindir}/xmvn-subst
 %endif
 
 %description -n javapackages-local
@@ -118,8 +116,8 @@ This package provides non-essential macros and scripts to support Java packaging
 %package -n javapackages-generators
 Summary:        RPM dependency generators for Java packaging support
 Requires:       %{name} = %{version}-%{release}
-Requires:       python3-javapackages = %{version}-%{release}
 Requires:       python3
+Requires:       python3-javapackages = %{version}-%{release}
 
 %description -n javapackages-generators
 RPM dependency generators to support Java packaging.
@@ -174,10 +172,10 @@ pip3 install -r test-requirements.txt
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
 - Migrating Thomas Crain's fixes from previous CBL-Mariner version:
-    - Add patch to replace generated dependency on "java-headless" with "java"
-    - Amend epoch patch to fix expected test results
-    - Remove obsoletes statements that don't apply to Mariner
-    - Install test requirements with pip during check section
+  - Add patch to replace generated dependency on "java-headless" with "java"
+  - Amend epoch patch to fix expected test results
+  - Remove obsoletes statements that don't apply to Mariner
+  - Install test requirements with pip during check section
 
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
