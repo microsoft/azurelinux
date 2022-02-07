@@ -12851,8 +12851,8 @@
         "type": "other",
         "other": {
           "name": "mailcap",
-          "version": "2.1.49",
-          "downloadUrl": "https://pagure.io/releases/mailcap/mailcap-2.1.49.tar.xz"
+          "version": "2.1.53",
+          "downloadUrl": "https://pagure.io/releases/mailcap/mailcap-2.1.53.tar.xz"
         }
       }
     },
@@ -14335,16 +14335,6 @@
           "name": "mythes-hu",
           "version": "0.20101019",
           "downloadUrl": "https://downloads.sourceforge.net/project/aoo-extensions/1283/9/dict-hu.oxt"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "mythes-it",
-          "version": "2.0.9l",
-          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/linguistico/thesaurus2_it_02_09_l_2008_11_29.zip"
         }
       }
     },
@@ -25785,8 +25775,8 @@
         "type": "other",
         "other": {
           "name": "rrdtool",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.7.0/rrdtool-1.7.0.tar.gz"
+          "version": "1.7.2",
+          "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.7.2/rrdtool-1.7.2.tar.gz"
         }
       }
     },

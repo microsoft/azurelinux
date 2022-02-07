@@ -51,7 +51,7 @@ HYDRATED_BUILD                  ?= n
 toolkit_root     := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
-REPOS_DIR        ?= $(toolkit_root)/repos
+PREVIEW_REPO     ?= $(toolkit_root)/repos/mariner-official-preview.repo
 RESOURCES_DIR    ?= $(toolkit_root)/resources
 SCRIPTS_DIR      ?= $(toolkit_root)/scripts
 
@@ -104,8 +104,16 @@ SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR
 ifeq ($(USE_PREVIEW_REPO),y)
    PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
    PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-   override REPO_LIST += $(REPOS_DIR)/mariner-official-preview.repo
    SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
+   ifneq ($(wildcard $(PREVIEW_REPO)),)
+      override REPO_LIST += $(PREVIEW_REPO)
+   else
+      $(warning )
+      $(warning ######################### WARNING #########################)
+      $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
+      $(warning ######################### WARNING #########################)
+      $(warning )
+   endif
 endif
 
 CA_CERT     ?=
@@ -130,7 +138,7 @@ endif
 RELEASE_VERSION    ?= $(RELEASE_MAJOR_ID)$(RELEASE_MINOR_ID)
 
 # Image tag - empty by default. Does not apply to the initrd.
-IMAGE_TAG          ?= Preview-C
+IMAGE_TAG          ?= Preview-D
 
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
