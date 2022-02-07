@@ -36,7 +36,7 @@ definitions for any number of text parsing applications.
 %py3_install
 
 %check
-pip3 -r tests/requirements.txt
+pip3 install -r tests/requirements.txt
 tox -e py%{python3_version_nodots}
 
 %files -n python3-pyparsing
