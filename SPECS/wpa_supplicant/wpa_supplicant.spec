@@ -97,6 +97,7 @@ EOF
 %changelog
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.10-1
 - Upgrade to v2.10 to resolve CVE-2022-23303 and CVE-2022-23304.
+- License verified.
 
 * Fri Apr 09 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9-4
 - Add patch for CVE-2021-30004
