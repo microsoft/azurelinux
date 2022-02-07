@@ -9,7 +9,7 @@ Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0: CVE-2022-0443.patch
+Patch0:         CVE-2022-0443.patch
 BuildRequires:  ncurses-devel
 
 %description
@@ -191,8 +191,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
-*   Sat Feb 05 2022 Mariner Autopatcher <cblmargh@microsoft.com> 8.2.4233-2
--   Added patch file(s) CVE-2022-0443.patch
+* Sat Feb 05 2022 Mariner Autopatcher <cblmargh@microsoft.com> 8.2.4233-2
+- Added patch file(s) CVE-2022-0443.patch
+
 * Thu Feb 03 2022 Chris Co <chrco@microsoft.com> - 8.2.4233-1
 - Update version to 8.2.4233 to fix CVE-2022-0392,CVE-2022-0393,CVE-2022-0359,CVE-2022-0361,CVE-2022-0368
 
