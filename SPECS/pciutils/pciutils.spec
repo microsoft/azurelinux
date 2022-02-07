@@ -1,7 +1,7 @@
 Summary:        System utilities to list pci devices
 Name:           pciutils
 Version:        3.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
