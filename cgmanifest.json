@@ -29607,8 +29607,8 @@
         "type": "other",
         "other": {
           "name": "wpa_supplicant",
-          "version": "2.9",
-          "downloadUrl": "https://w1.fi/releases/wpa_supplicant-2.9.tar.gz"
+          "version": "2.10",
+          "downloadUrl": "https://w1.fi/releases/wpa_supplicant-2.10.tar.gz"
         }
       }
     },
