@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.pcre.org
-Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
+Source0:        https://sourceforge.net/projects/pcre/files/%{name}/%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
 Requires:       libgcc

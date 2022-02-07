@@ -5116,7 +5116,7 @@
         "other": {
           "name": "pcre",
           "version": "8.44",
-          "downloadUrl": "https://ftp.pcre.org/pub/pcre/pcre-8.44.tar.bz2"
+          "downloadUrl": "https://sourceforge.net/projects/pcre/files/pcre/8.44/pcre-8.44.tar.bz2"
         }
       }
     },
