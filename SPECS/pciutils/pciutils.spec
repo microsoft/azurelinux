@@ -52,7 +52,7 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 
 %files libs
 %license COPYING
-%{_libdir}/libpci.so.*
+%{_libdir}/libpci.so.3*
 
 %files devel
 %defattr(-,root,root)
