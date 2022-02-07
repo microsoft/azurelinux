@@ -42,6 +42,10 @@ export CGO_ENABLED=1
 # note that "apparmor" and "selinux" feature are by default enabled since version 1.0.0-rc93
 make %{?_smp_mflags} BUILDTAGS="seccomp" COMMIT="%{commit_hash}" man runc
 
+%check
+# only run local unit tests
+make %{?_smp_mflags} COMMIT="%{commit_hash}" localunittest
+
 %install
 # must set BINDIR to force install to '/usr/bin' instead of '/usr/sbin'
 make install DESTDIR="%{buildroot}" PREFIX="%{_prefix}" BINDIR="%{_bindir}" 
