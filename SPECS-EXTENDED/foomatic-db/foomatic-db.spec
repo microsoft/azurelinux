@@ -3,17 +3,17 @@ Distribution:   Mariner
 %global dbver_rel 4.0
 # When you change dbver_snap, rebuild also foomatic against this build to pick up new IEEE 1284 Device IDs.
 # The postscriptdriver tags get put onto foomatic, because that's there the actual CUPS driver lives.
-%global dbver_snap 20210824
+%global dbver_snap 20201104
 
 Summary: Database of printers and printer drivers
 Name: foomatic-db
 Version: %{dbver_rel}
-Release: 70%{?dist}
+Release: 69%{?dist}
 License: GPLv2+
 Requires: %{name}-filesystem = %{version}-%{release}
 Requires: %{name}-ppds = %{version}-%{release}
 
-Source0: https://www.openprinting.org/download/foomatic/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
+Source0: http://www.openprinting.org/download/foomatic/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
 
 Patch1: foomatic-db-device-ids.patch
 Patch2: foomatic-db-invalid.patch
@@ -159,7 +159,6 @@ rm -f %{buildroot}%{_datadir}/cups/model/foomatic-db-ppds
 ln -sf ../../foomatic/db/source/PPD %{buildroot}%{_datadir}/cups/model/foomatic-db-ppds
 
 %files filesystem
-%license COPYING
 %dir %{_datadir}/foomatic/
 %dir %{_datadir}/foomatic/db/
 %dir %{_datadir}/foomatic/db/source/
@@ -178,14 +177,11 @@ ln -sf ../../foomatic/db/source/PPD %{buildroot}%{_datadir}/cups/model/foomatic-
 %{_datadir}/foomatic/xmlschema
 
 %files ppds
+%doc COPYING
 %{_datadir}/foomatic/db/source/PPD/*
 %{_datadir}/cups/model/foomatic-db-ppds
 
 %changelog
-* Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0-70
-- Updating DB version snapshot to 20210824.
-- License verified.
-
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0-69
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
