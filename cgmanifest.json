@@ -3889,8 +3889,8 @@
         "type": "other",
         "other": {
           "name": "fontconfig",
-          "version": "2.13.91",
-          "downloadUrl": "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.91.tar.gz"
+          "version": "2.13.95",
+          "downloadUrl": "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.95.tar.gz"
         }
       }
     },
