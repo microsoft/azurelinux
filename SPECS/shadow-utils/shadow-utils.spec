@@ -156,27 +156,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/*
 %{_sbindir}/*
 /bin/passwd
-%{_mandir}/man1
-%{_mandir}/man5
-%{_mandir}/man8
-%exclude %{_mandir}/cs
-%exclude %{_mandir}/da
-%exclude %{_mandir}/de
-%exclude %{_mandir}/fi
-%exclude %{_mandir}/fr
-%exclude %{_mandir}/hu
-%exclude %{_mandir}/id
-%exclude %{_mandir}/it
-%exclude %{_mandir}/ja
-%exclude %{_mandir}/ko
-%exclude %{_mandir}/man3
-%exclude %{_mandir}/pl
-%exclude %{_mandir}/pt_BR
-%exclude %{_mandir}/ru
-%exclude %{_mandir}/sv
-%exclude %{_mandir}/tr
-%exclude %{_mandir}/zh_CN
-%exclude %{_mandir}/zh_TW
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
 %files subid
