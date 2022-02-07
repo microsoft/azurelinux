@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/System Utilities
 URL:            https://www.kernel.org/pub/software/utils/pciutils/
 Source0:        https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description
 The pciutils package contains a set of programs for listing PCI devices, inspecting their status and setting their configuration registers.
@@ -15,7 +16,7 @@ The pciutils package contains a set of programs for listing PCI devices, inspect
 %package devel
 Summary:        Linux PCI development library
 Group:          Development/Libraries
-Requires:       pciutils = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Library files for doing development with pciutils.
@@ -36,7 +37,6 @@ make %{?_smp_mflags} PREFIX=%{_prefix} \
     SHARED=yes
 
 %install
-[ %{buildroot} != "/" ] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} \
     PREFIX=%{_prefix} \
     SHAREDIR=%{_datadir}/misc \
@@ -62,6 +62,9 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 %{_includedir}/*
 
 %changelog
+* Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 3.7.0-2
+- Require libs subpackage from main package
+
 * Wed Dec 29 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.7.0-1
 - Upgrading to 3.7.0
 - Adding libs subpackage.
