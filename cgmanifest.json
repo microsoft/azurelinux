@@ -4409,16 +4409,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ghostscript",
-          "version": "9.53.3",
-          "downloadUrl": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs9.53.3/ghostscript-9.53.3.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "giflib",
           "version": "5.2.1",
           "downloadUrl": "http://downloads.sourceforge.net/giflib/giflib-5.2.1.tar.gz"
@@ -7990,16 +7980,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "jbig2dec",
-          "version": "0.19",
-          "downloadUrl": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs952/jbig2dec-0.19.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "jbigkit",
           "version": "2.1",
           "downloadUrl": "http://www.cl.cam.ac.uk/~mgk25/download/jbigkit-2.1.tar.gz"
@@ -10060,16 +10040,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libijs",
-          "version": "0.35",
-          "downloadUrl": "https://github.com/ArtifexSoftware/ijs/archive/0.35.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libimobiledevice",
           "version": "1.2.1",
           "downloadUrl": "http://www.libimobiledevice.org/downloads/libimobiledevice-1.2.0.tar.bz2"
@@ -11303,16 +11273,6 @@
           "name": "libsoup",
           "version": "2.64.0",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/2.64/libsoup-2.64.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libspectre",
-          "version": "0.2.8",
-          "downloadUrl": "http://libspectre.freedesktop.org/releases/libspectre-0.2.8.tar.gz"
         }
       }
     },
@@ -28999,16 +28959,6 @@
           "name": "urlview",
           "version": "0.9",
           "downloadUrl": "https://github.com/sigpipe/urlview/archive/08767a/urlview-.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "urw-base35-fonts",
-          "version": "20200910",
-          "downloadUrl": "https://github.com/ArtifexSoftware/urw-base35-fonts/archive/20200910.tar.gz"
         }
       }
     },
