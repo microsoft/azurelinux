@@ -47,7 +47,6 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 %files
 %defattr(-,root,root)
 %{_sbindir}/*
-%{_libdir}/*.so.*
 %{_datadir}/misc/*
 %{_mandir}/*
 
@@ -64,6 +63,7 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 %changelog
 * Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 3.7.0-2
 - Require libs subpackage from main package
+- Remove libraries from main package
 
 * Wed Dec 29 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.7.0-1
 - Upgrading to 3.7.0
