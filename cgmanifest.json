@@ -27877,8 +27877,8 @@
         "type": "other",
         "other": {
           "name": "sqlite",
-          "version": "3.34.1",
-          "downloadUrl": "https://www.sqlite.org/2021/sqlite-autoconf-3340100.tar.gz"
+          "version": "3.36.0",
+          "downloadUrl": "https://www.sqlite.org/2021/sqlite-autoconf-3360000.tar.gz"
         }
       }
     },
@@ -29517,8 +29517,8 @@
         "type": "other",
         "other": {
           "name": "wget",
-          "version": "1.20.3",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/wget/wget-1.20.3.tar.gz"
+          "version": "1.21.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/wget/wget-1.21.2.tar.gz"
         }
       }
     },

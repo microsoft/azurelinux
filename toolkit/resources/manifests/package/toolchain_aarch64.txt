@@ -520,10 +520,10 @@ sed-debuginfo-4.8-1.cm2.aarch64.rpm
 sed-lang-4.8-1.cm2.aarch64.rpm
 slang-2.3.2-4.cm2.aarch64.rpm
 slang-devel-2.3.2-4.cm2.aarch64.rpm
-sqlite-3.34.1-2.cm2.aarch64.rpm
-sqlite-debuginfo-3.34.1-2.cm2.aarch64.rpm
-sqlite-devel-3.34.1-2.cm2.aarch64.rpm
-sqlite-libs-3.34.1-2.cm2.aarch64.rpm
+sqlite-3.36.0-1.cm2.aarch64.rpm
+sqlite-debuginfo-3.36.0-1.cm2.aarch64.rpm
+sqlite-devel-3.36.0-1.cm2.aarch64.rpm
+sqlite-libs-3.36.0-1.cm2.aarch64.rpm
 swig-4.0.2-2.cm2.aarch64.rpm
 swig-debuginfo-4.0.2-2.cm2.aarch64.rpm
 systemd-bootstrap-250.3-1.cm2.aarch64.rpm
@@ -546,8 +546,8 @@ util-linux-2.37.2-1.cm2.aarch64.rpm
 util-linux-debuginfo-2.37.2-1.cm2.aarch64.rpm
 util-linux-devel-2.37.2-1.cm2.aarch64.rpm
 util-linux-lang-2.37.2-1.cm2.aarch64.rpm
-wget-1.20.3-4.cm2.aarch64.rpm
-wget-debuginfo-1.20.3-4.cm2.aarch64.rpm
+wget-1.21.2-1.cm2.aarch64.rpm
+wget-debuginfo-1.21.2-1.cm2.aarch64.rpm
 which-2.21-7.cm2.aarch64.rpm
 which-debuginfo-2.21-7.cm2.aarch64.rpm
 xz-5.2.5-1.cm2.aarch64.rpm
