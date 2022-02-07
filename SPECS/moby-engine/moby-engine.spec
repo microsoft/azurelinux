@@ -11,9 +11,7 @@ URL: https://mobyproject.org
 Vendor: Microsoft Corporation
 Distribution: Mariner
 
-# Tini is a tiny container init, it's used as the binary for "docker-init"
-# TINI_REPO=https://github.com/krallin/tini.git
-# TINI_COMMIT=fec3683b971d9c3ef73f284f176672c44b448662
+# Note that docker-init is provided by Tini
 
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # docker-proxy binary comes from libnetwork
@@ -51,6 +49,7 @@ Requires: libcgroup
 Requires: libseccomp >= 2.3
 Requires: moby-containerd >= 1.2
 Requires: tar
+Requires: tini
 Requires: xz
 
 Conflicts: docker
@@ -75,7 +74,6 @@ tar xf %{SOURCE1} --no-same-owner
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 LIBNETWORK_FOLDER=$(find -type d -name "libnetwork-*")
 ln -sfT %{_builddir}/%{upstream_name}-%{version}/${LIBNETWORK_FOLDER} %{OUR_GOPATH}/src/github.com/docker/libnetwork
-# mkdir -p '%{OUR_GOPATH}/src/github.com/docker'
 ln -sfT %{_builddir}/%{upstream_name}-%{version} %{OUR_GOPATH}/src/github.com/docker/docker
 
 %build
@@ -96,23 +94,10 @@ go build \
     -o libnetwork/docker-proxy \
     github.com/docker/libnetwork/cmd/proxy
 
-# echo "!!!! ALWAYS FAIL !!!!"
-# exit 1
-
-# mkdir -p tini/build
-# cd tini/build
-# cmake ..
-# make tini-static
-
-# cd ../../
-
 %install
 mkdir -p %{buildroot}/%{_bindir}
 cp -aLT ./bundles/dynbinary-daemon/dockerd %{buildroot}/%{_bindir}/dockerd
 cp -aT libnetwork/docker-proxy %{buildroot}/%{_bindir}/docker-proxy
-
-# cp -aT tini/build/tini-static %{buildroot}/%{_bindir}/docker-init
-# echo %{_bindir}/docker-init >> ./files
 
 # install udev rules
 mkdir -p %{buildroot}/%{_sysconfdir}/udev/rules.d
