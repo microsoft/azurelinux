@@ -58,9 +58,9 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-mv -v %{buildroot}%{_lib}/libpcre.so.* %{buildroot}/lib &&
-ln -sfv ../../lib/$(readlink %{buildroot}%{_lib}/libpcre.so) %{buildroot}%{_lib}/libpcre.so
-ln -sfv $(readlink %{buildroot}%{_lib}/libpcre.so) %{buildroot}%{_lib}/libpcre.so.0
+mv -v %{buildroot}%{_libdir}/libpcre.so.* %{buildroot}/lib &&
+ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_lib}/libpcre.so
+ln -sfv $(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_lib}/libpcre.so.0
 
 %check
 make %{?_smp_mflags} check
