@@ -28,10 +28,10 @@ libgomp-11.2.0-2.cm2.aarch64.rpm
 libgomp-devel-11.2.0-2.cm2.aarch64.rpm
 gcc-11.2.0-2.cm2.aarch64.rpm
 gcc-c++-11.2.0-2.cm2.aarch64.rpm
-libpkgconf-1.8.0-1.cm2.aarch64.rpm
-pkgconf-1.8.0-1.cm2.aarch64.rpm
-pkgconf-m4-1.8.0-1.cm2.noarch.rpm
-pkgconf-pkg-config-1.8.0-1.cm2.aarch64.rpm
+libpkgconf-1.8.0-2.cm2.aarch64.rpm
+pkgconf-1.8.0-2.cm2.aarch64.rpm
+pkgconf-m4-1.8.0-2.cm2.noarch.rpm
+pkgconf-pkg-config-1.8.0-2.cm2.aarch64.rpm
 ncurses-6.2-4.cm2.aarch64.rpm
 ncurses-compat-6.2-4.cm2.aarch64.rpm
 ncurses-devel-6.2-4.cm2.aarch64.rpm
@@ -64,8 +64,8 @@ gzip-1.11-1.cm2.aarch64.rpm
 make-4.3-2.cm2.aarch64.rpm
 mariner-release-2.0-5.cm2.noarch.rpm
 patch-2.7.6-7.cm2.aarch64.rpm
-util-linux-2.37.2-1.cm2.aarch64.rpm
-util-linux-devel-2.37.2-1.cm2.aarch64.rpm
+util-linux-2.37.2-2.cm2.aarch64.rpm
+util-linux-devel-2.37.2-2.cm2.aarch64.rpm
 tar-1.34-1.cm2.aarch64.rpm
 xz-5.2.5-1.cm2.aarch64.rpm
 xz-devel-5.2.5-1.cm2.aarch64.rpm

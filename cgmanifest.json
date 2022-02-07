@@ -24275,7 +24275,7 @@
         "other": {
           "name": "python-rdflib",
           "version": "4.2.1",
-          "downloadUrl": "http://pypi.python.org/packages/source/r/rdflib/rdflib-4.2.1.tar.gz"
+          "downloadUrl": "https://pypi.python.org/packages/source/r/rdflib/rdflib-4.2.1.tar.gz"
         }
       }
     },
@@ -28998,7 +28998,7 @@
         "other": {
           "name": "urlview",
           "version": "0.9",
-          "downloadUrl": "https://github.com/sigpipe/urlview/archive//urlview-.tar.gz"
+          "downloadUrl": "https://github.com/sigpipe/urlview/archive/08767a/urlview-.tar.gz"
         }
       }
     },
