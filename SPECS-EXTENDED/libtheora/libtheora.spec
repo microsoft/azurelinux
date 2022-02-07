@@ -1,12 +1,9 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-# enable bootstrap mode (e.g. disables doc generation)
-%global bootstrap 1
-
 Name:           libtheora
 Version:        1.1.1
-Release:        27%{?dist}
+Release:        28%{?dist}
 Summary:        Theora Video Compression Codec
 License:        BSD
 URL:            http://www.theora.org
@@ -20,12 +17,6 @@ BuildRequires:  autoconf automake libtool
 BuildRequires:  libogg-devel >= 1.1
 BuildRequires:  libvorbis-devel
 BuildRequires:  SDL-devel libpng-devel
-%if 0%{?bootstrap}
-Obsoletes: %{name}-devel-docs < %{version}-%{release}
-%else
-BuildRequires:  doxygen
-BuildRequires:  tetex-latex transfig
-%endif
 
 %description
 Theora is Xiph.Org's first publicly released video codec, intended
@@ -50,17 +41,6 @@ Provides:       theora-exp-devel
 %description devel
 The libtheora-devel package contains the header files needed to develop
 applications with libtheora.
-
-%if ! 0%{?bootstrap}
-%package devel-docs
-Summary:        Documentation for developing Theora applications
-BuildArch:      noarch
-
-%description devel-docs
-The libtheora-devel-docs package contains the documentation needed
-to develop applications with libtheora.
-%endif
-
 
 %package -n theora-tools
 Summary:        Command line tools for Theora videos
@@ -91,11 +71,6 @@ sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
 
-%if ! 0%{?bootstrap}
-make -C doc/spec %{?_smp_mflags}
-%endif
-
-
 %install
 %make_install
 
@@ -113,7 +88,8 @@ install -m 755 examples/.libs/png2theora $RPM_BUILD_ROOT/%{_bindir}/png2theora
 
 
 %files
-%doc README COPYING
+%license COPYING LICENSE
+%doc README
 %{_libdir}/*.so.*
 
 %files devel
@@ -121,17 +97,15 @@ install -m 755 examples/.libs/png2theora $RPM_BUILD_ROOT/%{_bindir}/png2theora
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/theora*.pc
 
-%if ! 0%{?bootstrap}
-%files devel-docs
-%doc doc/libtheora/html doc/vp3-format.txt doc/spec/Theora.pdf
-%doc doc/color.html doc/draft-ietf-avt-rtp-theora-00.txt
-%endif
-
 %files -n theora-tools
 %{_bindir}/*
 
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-28
+- Removing docs to drop dependency on 'transfig' (requires 'ghostscript' not available in CBL-Mariner).
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.1.1-27
 - Remove epoch
 
