@@ -3,11 +3,11 @@ Distribution:   Mariner
 Summary: Tools for using the foomatic database of printers and printer drivers
 Name:       foomatic
 Version:    4.0.13
-Release:    16%{?dist}
+Release:    17%{?dist}
 License:    GPLv2+
 
 # The database engine.
-Source0: http://www.openprinting.org/download/foomatic/foomatic-db-engine-%{version}.tar.gz
+Source0: https://www.openprinting.org/download/foomatic/foomatic-db-engine-%{version}.tar.gz
 
 ## PATCHES FOR FOOMATIC-DB-ENGINE (PATCHES 101 TO 200)
 Patch101:  foomatic-manpages.patch
@@ -16,7 +16,7 @@ Patch102:  0001-Recognize-fractional-numbers-in-PageSize.patch
 
 ## PATCHES FOR FOOMATIC-DB-HPIJS (PATCHES 201 TO 300)
 
-Url:            http://www.linuxfoundation.org/collaborate/workgroups/openprinting/database/foomatic
+Url:            https://www.linuxfoundation.org/collaborate/workgroups/openprinting/database/foomatic
 
 # gcc is no longer in buildroot by default
 BuildRequires:  gcc
@@ -109,7 +109,7 @@ exit 0
 
 
 %files
-%doc COPYING
+%license COPYING
 %dir %{_sysconfdir}/foomatic
 %config(noreplace) %{_sysconfdir}/foomatic/defaultspooler
 %{_bindir}/foomatic-combo-xml
@@ -145,6 +145,10 @@ exit 0
 %{_var}/cache/foomatic
 
 %changelog
+* Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.13-17
+- Rebuilding for new version of "foomatic-db".
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.13-16
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

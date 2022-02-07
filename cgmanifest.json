@@ -3931,7 +3931,7 @@
         "other": {
           "name": "foomatic",
           "version": "4.0.13",
-          "downloadUrl": "http://www.openprinting.org/download/foomatic/foomatic-db-engine-4.0.13.tar.gz"
+          "downloadUrl": "https://www.openprinting.org/download/foomatic/foomatic-db-engine-4.0.13.tar.gz"
         }
       }
     },
@@ -3941,7 +3941,7 @@
         "other": {
           "name": "foomatic-db",
           "version": "4.0",
-          "downloadUrl": "http://www.openprinting.org/download/foomatic/foomatic-db-4.0-20201104.tar.gz"
+          "downloadUrl": "https://www.openprinting.org/download/foomatic/foomatic-db-4.0-20210824.tar.gz"
         }
       }
     },
@@ -14565,6 +14565,16 @@
           "name": "netlabel_tools",
           "version": "0.30.0",
           "downloadUrl": "https://github.com/netlabel/netlabel_tools/releases/download/v0.30.0/netlabel_tools-0.30.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "netpbm",
+          "version": "10.90.00",
+          "downloadUrl": "https://svn.code.sf.net/p/netpbm/code/advanced"
         }
       }
     },
@@ -25764,16 +25774,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rt-tests",
-          "version": "1.8",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rrdtool",
           "version": "1.7.2",
           "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.7.2/rrdtool-1.7.2.tar.gz"
@@ -25797,6 +25797,16 @@
           "name": "rsyslog",
           "version": "8.2108.0",
           "downloadUrl": "http://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2108.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rt-tests",
+          "version": "1.8",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
         }
       }
     },
