@@ -1,6 +1,6 @@
 Name:           libzip
-Version:        1.7.3
-Release:        5%{?dist}
+Version:        1.8.0
+Release:        1%{?dist}
 Summary:        C library for reading, creating, and modifying zip archives
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -111,6 +111,9 @@ make check
 
 
 %changelog
+* Mon Feb 07 2022 Henry Li <lihl@microsoft.com> - 1.8.0-1
+- Upgrade to version 1.8.0
+
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.7.3-5
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

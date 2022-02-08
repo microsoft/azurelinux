@@ -1,7 +1,7 @@
 Summary:        List Open Files
 Name:           lsof
-Version:        4.93.2
-Release:        3%{?dist}
+Version:        4.94.0
+Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/lsof-org/lsof
 Group:          System Environment/Tools
@@ -37,6 +37,9 @@ install -v -m 0644 Lsof.8 %{buildroot}%{_mandir}/man8/lsof.8
 %{_mandir}/man8/*
 
 %changelog
+* Mon Feb 07 2022 Henry Li <lihl@microsoft.com> - 4.94.0-1
+- Upgrade to version 4.94.0
+
 *   Wed Jul 01 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.93.2-3
 -   Fix license to point to 00README which contains the license. Removes false dependency on /bin/ksh
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.93.2-2

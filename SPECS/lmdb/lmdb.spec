@@ -1,7 +1,7 @@
 Summary:       Lightning memory-mapped database
 Name:          lmdb
-Version:       0.9.23
-Release:       3%{?dist}
+Version:       0.9.29
+Release:       1%{?dist}
 Group:         System/Libraries
 Vendor:         Microsoft Corporation
 License:       OpenLDAP
@@ -70,6 +70,9 @@ install -m0755 %{SOURCE1} %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/*.so
 
 %changelog
+* Mon Feb 07 2022 Henry Li <lihl@microsoft.com> - 0.9.29-1
+- Upgrade to version 0.9.29
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.23-3
 - Removing the explicit %%clean stage.
 

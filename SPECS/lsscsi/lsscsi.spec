@@ -1,12 +1,11 @@
-Summary:	List SCSI devices information.
-Name:		lsscsi
-Version:	0.30
-Release:        3%{?dist}
-License:	GPLv2
-URL:		http://sg.danny.cz/scsi/lsscsi.html
-Source0:	http://sg.danny.cz/scsi/%{name}-%{version}.tar.xz
-%define sha1 lsscsi=2aa4e0ea2551ed6909c531156978cb110d701f38
-Group:		Hardware/Others.
+Summary:	    List SCSI devices information.
+Name:		    lsscsi
+Version:	    0.32
+Release:        1%{?dist}
+License:	    GPLv2
+URL:		    http://sg.danny.cz/scsi/lsscsi.html
+Source0:	    http://sg.danny.cz/scsi/%{name}-%{version}.tar.xz
+Group:		    Hardware/Others.
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
@@ -14,7 +13,7 @@ Distribution:   Mariner
 This lists the information about SCSI devices.
 
 %prep
-%setup -q -n lsscsi-030r154
+%autosetup
 
 %build
 %configure
@@ -32,6 +31,11 @@ make %{?_smp_mflags} -k check
 %{_mandir}/*
 
 %changelog
+* Mon Feb 07 2022 Henry Li <lihl@microsoft.com> - 0.32-1
+- Upgrade to version 0.32
+- Use autosetup
+- Delete sha1 macro
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.30-3
 - Added %%license line automatically
 
