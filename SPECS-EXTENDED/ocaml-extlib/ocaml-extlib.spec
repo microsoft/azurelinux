@@ -1,26 +1,20 @@
 # The debuginfo package is empty, so don't generate it.
 # Could possibly be fixed by passing -g option correctly to the compiler.
 %global debug_package %{nil}
-
-Name:           ocaml-extlib
-Version:        1.7.5
-Release:        15%{?dist}
 Summary:        OCaml ExtLib additions to the standard library
-License:        LGPLv2+ with exceptions
-
+Name:           ocaml-extlib
+Version:        1.7.8
+Release:        1%{?dist}
+License:        LGPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/ygrek/ocaml-extlib
 Source0:        https://github.com/ygrek/ocaml-extlib/releases/download/%{version}/extlib-%{version}.tar.gz
-
-BuildRequires:  ocaml >= 4.00.1
-BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-cppo
 BuildRequires:  gawk
-# In order to apply patches:
-BuildRequires:  git
-
+BuildRequires:  ocaml
+BuildRequires:  ocaml-cppo
+BuildRequires:  ocaml-findlib-devel >= 1.5.1
+BuildRequires:  ocaml-ocamldoc
 
 %description
 ExtLib is a project aiming at providing a complete - yet small -
@@ -30,35 +24,27 @@ modules, to modify some functions in order to get better performances
 or more safety (tail-recursive) but also to provide new modules which
 should be useful for the average OCaml programmer.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
-
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-
 %prep
-%autosetup -S git -n extlib-%{version}
-
+%autosetup -n extlib-%{version}
 
 %build
 # Parallel builds do not work.
 unset MAKEFLAGS
-
 make build -j1
 
-
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
+export DESTDIR=%{buildroot}
+export OCAMLFIND_DESTDIR=%{buildroot}%{_libdir}/ocaml
 mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
-
 make install -j1
-
 
 %files
 %doc README.md
@@ -71,7 +57,6 @@ make install -j1
 %endif
 %exclude %{_libdir}/ocaml/extlib/*.mli
 
-
 %files devel
 %ifarch %{ocaml_native_compiler}
 %{_libdir}/ocaml/extlib/*.a
@@ -80,8 +65,12 @@ make install -j1
 %endif
 %{_libdir}/ocaml/extlib/*.mli
 
-
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.7.8-1
+- Upgrade to latest upstream version
+- Lint spec
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.5-15
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
@@ -318,4 +307,3 @@ make install -j1
 
 * Fri May 18 2007 Richard W.M. Jones <rjones@redhat.com> - 1.5-1
 - Initial RPM release.
-

@@ -3,7 +3,7 @@
 Name:      elinks
 Summary:   A text-mode Web browser
 Version:   0.12
-Release:   1%{?dist}
+Release:   2%{?dist}
 License:   GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,7 @@ Requires(post): %{_sbindir}/alternatives
 Requires(postun): coreutils
 Requires(postun): %{_sbindir}/alternatives
 Provides:  webclient
-Provides:  links = 1:0.97-1
+Provides:  links = 0.97-1
 Provides: text-www-browser
 
 # Prevent crash when HOME is unset (bug #90663).
@@ -150,7 +150,8 @@ fi
 exit 0
 
 %files -f elinks.lang
-%doc COPYING README
+%license COPYING
+%doc README
 %ghost %verify(not md5 size mtime) %{_bindir}/links
 %{_bindir}/elinks
 %ghost %verify(not md5 size mtime) %{_mandir}/man1/links.1.gz
@@ -159,6 +160,10 @@ exit 0
 %{_mandir}/man5/*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12-2
+- Removing epoch.
+- License verified.
+
 * Mon Oct 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12-1
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

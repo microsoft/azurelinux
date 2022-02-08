@@ -18,7 +18,7 @@ Distribution:   Mariner
 Name: python-%{pkgsuf}
 # See https://github.com/containers/python-podman/issues/27
 Version: 0.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Python bindings for using Varlink access to Podman Service
 
 License: ASL 2.0
@@ -44,8 +44,7 @@ BuildRequires: python3-varlink
 %{?python_provide:%python_provide python3-%{pkgsuf}}
 
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1720577
-Obsoletes: python3-podman < 2:0.12.2-28
-Provides: python3-podman = 3:%{version}-%{release}
+Provides: python3-podman = %{version}-%{release}
 
 %description -n python3-%{pkgsuf}
 %{summary}
@@ -81,6 +80,10 @@ export PBR_VERSION="0.0.0"
 %{python3_sitelib}/%{srcname}-*.egg-info/
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.0-2
+- Removing epoch.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.0-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
