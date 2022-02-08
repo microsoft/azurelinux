@@ -35,6 +35,7 @@ make %{?_smp_mflags} -k check
 - Upgrade to version 0.32
 - Use autosetup
 - Delete sha1 macro
+- License Verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.30-3
 - Added %%license line automatically
