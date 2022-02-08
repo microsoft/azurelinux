@@ -23374,8 +23374,8 @@
         "type": "other",
         "other": {
           "name": "python-m2r",
-          "version": "0.2.0",
-          "downloadUrl": "https://github.com/miyakogi/m2r/archive/v0.2.0/m2r-0.2.0.tar.gz"
+          "version": "0.2.1",
+          "downloadUrl": "https://github.com/miyakogi/m2r/archive/v0.2.1/m2r-0.2.1.tar.gz"
         }
       }
     },
