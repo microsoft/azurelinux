@@ -22094,8 +22094,8 @@
         "type": "other",
         "other": {
           "name": "pyparsing",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/pyparsing/pyparsing/archive/pyparsing_2.2.0.tar.gz"
+          "version": "3.0.7",
+          "downloadUrl": "https://github.com/pyparsing/pyparsing/releases/download/pyparsing_3.0.7/pyparsing-3.0.7.tar.gz"
         }
       }
     },
