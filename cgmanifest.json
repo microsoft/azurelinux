@@ -12291,8 +12291,8 @@
         "type": "other",
         "other": {
           "name": "libzip",
-          "version": "1.7.3",
-          "downloadUrl": "https://libzip.org/download/libzip-1.7.3.tar.xz"
+          "version": "1.8.0",
+          "downloadUrl": "https://libzip.org/download/libzip-1.8.0.tar.xz"
         }
       }
     },
@@ -12421,8 +12421,8 @@
         "type": "other",
         "other": {
           "name": "lmdb",
-          "version": "0.9.23",
-          "downloadUrl": "https://github.com/LMDB/lmdb/archive/LMDB_0.9.23.tar.gz"
+          "version": "0.9.29",
+          "downloadUrl": "https://github.com/LMDB/lmdb/archive/LMDB_0.9.29.tar.gz"
         }
       }
     },
@@ -12541,8 +12541,8 @@
         "type": "other",
         "other": {
           "name": "lsof",
-          "version": "4.93.2",
-          "downloadUrl": "https://github.com/lsof-org/lsof/archive/4.93.2.tar.gz"
+          "version": "4.94.0",
+          "downloadUrl": "https://github.com/lsof-org/lsof/archive/4.94.0.tar.gz"
         }
       }
     },
@@ -12551,8 +12551,8 @@
         "type": "other",
         "other": {
           "name": "lsscsi",
-          "version": "0.30",
-          "downloadUrl": "http://sg.danny.cz/scsi/lsscsi-0.30.tar.xz"
+          "version": "0.32",
+          "downloadUrl": "http://sg.danny.cz/scsi/lsscsi-0.32.tar.xz"
         }
       }
     },
