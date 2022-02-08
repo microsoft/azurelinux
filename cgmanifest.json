@@ -23874,8 +23874,8 @@
         "type": "other",
         "other": {
           "name": "python-process-tests",
-          "version": "2.0.2",
-          "downloadUrl": "https://pypi.python.org/packages/source/p/process-tests/process-tests-2.0.2.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "https://github.com/ionelmc/python-process-tests/archive/refs/tags/v2.1.2.tar.gz"
         }
       }
     },
