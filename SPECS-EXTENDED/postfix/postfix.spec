@@ -757,6 +757,7 @@ exit 0
 %changelog
 * Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.4-1
 - Updating to version 3.6.4.
+- License verified.
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.5.7-4
 - Remove epoch
