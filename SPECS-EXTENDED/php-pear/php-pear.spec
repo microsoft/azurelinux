@@ -1,17 +1,10 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Fedora spec file for php-pear
-#
-# License: MIT
-# http://opensource.org/licenses/MIT
-#
-# Please preserve changelog entries
-#
 %global peardir %{_datadir}/pear
 %global metadir %{_localstatedir}/lib/pear
 
 %global getoptver 1.4.3
-%global arctarver 1.4.12
+%global arctarver 1.4.14
 # https://pear.php.net/bugs/bug.php?id=19367
 # Structures_Graph 1.0.4 - incorrect FSF address
 %global structver 1.1.1
@@ -28,13 +21,13 @@ Distribution:   Mariner
 
 Summary: PHP Extension and Application Repository framework
 Name: php-pear
-Version: 1.10.12
-Release: 7%{?dist}
+Version: 1.10.13
+Release: 3%{?dist}
 # PEAR, PEAR_Manpages, Archive_Tar, XML_Util, Console_Getopt are BSD
 # Structures_Graph is LGPLv3+
 License: BSD and LGPLv3+
-URL: http://pear.php.net/package/PEAR
-Source0: http://download.pear.php.net/package/PEAR-%{version}%{?pearprever}.tgz
+URL: https://pear.php.net/package/PEAR
+Source0: http://download.pear.php.net/package/PEAR-%{version}.tgz
 # wget https://raw.githubusercontent.com/pear/pear-core/stable/install-pear.php
 Source1: install-pear.php
 Source3: cleanup.php
@@ -42,11 +35,11 @@ Source10: pear.sh
 Source11: pecl.sh
 Source12: peardev.sh
 Source13: macros.pear
-Source21: http://pear.php.net/get/Archive_Tar-%{arctarver}.tgz
-Source22: http://pear.php.net/get/Console_Getopt-%{getoptver}.tgz
-Source23: http://pear.php.net/get/Structures_Graph-%{structver}.tgz
-Source24: http://pear.php.net/get/XML_Util-%{xmlutil}.tgz
-Source25: http://pear.php.net/get/PEAR_Manpages-%{manpages}.tgz
+Source21: https://pear.php.net/get/Archive_Tar-%{arctarver}.tgz
+Source22: https://pear.php.net/get/Console_Getopt-%{getoptver}.tgz
+Source23: https://pear.php.net/get/Structures_Graph-%{structver}.tgz
+Source24: https://pear.php.net/get/XML_Util-%{xmlutil}.tgz
+Source25: https://pear.php.net/get/PEAR_Manpages-%{manpages}.tgz
 
 BuildArch: noarch
 BuildRequires: php(language) > 5.4
@@ -58,9 +51,6 @@ BuildRequires: php-devel
 %if %{with_tests}
 BuildRequires:  %{_bindir}/phpunit
 %endif
-
-BuildRequires:  php-fedora-autoloader-devel
-
 
 Provides: php-pear(Console_Getopt) = %{getoptver}
 Provides: php-pear(Archive_Tar) = %{arctarver}
@@ -74,13 +64,6 @@ Provides: php-composer(pear/archive_tar) = %{arctarver}
 Provides: php-composer(pear/pear-core-minimal) = %{version}
 Provides: php-composer(pear/structures_graph) = %{structver}
 Provides: php-composer(pear/xml_util) = %{xmlutil}
-
-Provides: php-autoloader(pear/console_getopt) = %{getoptver}
-Provides: php-autoloader(pear/archive_tar) = %{arctarver}
-Provides: php-autoloader(pear/pear-core-minimal) = %{version}
-Provides: php-autoloader(pear/structures_graph) = %{structver}
-Provides: php-autoloader(pear/xml_util) = %{xmlutil}
-
 
 # Archive_Tar requires 5.2
 # XML_Util, Structures_Graph require 5.3
@@ -105,9 +88,6 @@ Requires:  php-bz2
 # for /var/www/html ownership
 Requires: httpd-filesystem
 
-Requires: php-composer(fedora/autoloader)
-
-
 
 %description
 PEAR is a framework and distribution system for reusable PHP
@@ -124,7 +104,7 @@ do
     [ -f LICENSE ] && mv LICENSE LICENSE-${file%%-*}
     [ -f README ]  && mv README  README-${file%%-*}
 
-    tar xzf $archive 'package.xml'
+    tar xzf --wildcards $archive 'package*xml'
     [ -f package2.xml ] && mv package2.xml ${file%%-*}.xml \
                         || mv package.xml  ${file%%-*}.xml
 done
@@ -139,32 +119,6 @@ sed -e 's:@BINDIR@:%{_bindir}:' \
 
 
 %build
-
-# Create per package autoloader
-phpab --template fedora \
-      --output PEAR/autoload.php\
-      PEAR OS System.php PEAR.php
-
-phpab --template fedora \
-      --output Structures/Graph/autoload.php \
-      Structures
-
-mkdir Archive/Tar
-phpab --template fedora \
-      --output Archive/Tar/autoload.php \
-      Archive
-
-mkdir Console/Getopt
-phpab --template fedora \
-      --output Console/Getopt/autoload.php \
-      Console
-
-mkdir XML/Util
-phpab --template fedora \
-      --output XML/Util/autoload.php \
-      XML
-
-
 
 %install
 export PHP_PEAR_SYSCONF_DIR=%{_sysconfdir}
@@ -228,14 +182,6 @@ rm -rf %{buildroot}/.depdb* %{buildroot}/.lock %{buildroot}/.channels %{buildroo
 
 # Need for re-registrying XML_Util
 install -m 644 *.xml %{buildroot}%{_localstatedir}/lib/pear/pkgxml
-
-
-# install autoloaders
-for i in PEAR/autoload.php Structures/Graph/autoload.php Archive/Tar/autoload.php Console/Getopt/autoload.php XML/Util/autoload.php
-do install -Dpm 644 $i %{buildroot}%{peardir}/$i
-done
-
-
 
 %check
 # Check that no bogus paths are left in the configuration, or in
@@ -306,6 +252,9 @@ fi
 
 
 %files
+%license LICENSE*
+%doc README*
+%doc %{_docdir}/pear/*
 %{peardir}
 %dir %{metadir}
 %{metadir}/.channels
@@ -320,10 +269,7 @@ fi
 %{macrosdir}/macros.pear
 %dir %{_localstatedir}/cache/php-pear
 %dir %{_sysconfdir}/pear
-%license LICENSE*
-%doc README*
 %dir %{_docdir}/pear
-%doc %{_docdir}/pear/*
 %{_datadir}/tests/pear
 %{_datadir}/pear-data
 %{_mandir}/man1/pear.1*
@@ -333,12 +279,33 @@ fi
 
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.10.12-7
-- Remove epoch
+* Tue Feb 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.13-3
+- Removed dependency on "php-fedora-autoloader".
+- Updated URLs to HTTPS.
+- Removed epoch.
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
-* Fri Feb 12 2021 Henry Li <lihl@microsoft.com> - 1:1.10.12-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove wildcard matching of "package*xml" to "package.xml"
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.10.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Aug 11 2021 Remi Collet <remi@remirepo.net> - 1.10.13-1
+- update to 1.10.13
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.10.12-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jul 21 2021 Remi Collet <remi@remirepo.net> - 1:1.10.12-9
+- update Archive_Tar to 1.4.14
+
+* Fri Jun 18 2021 Remi Collet <remi@remirepo.net> - 1:1.10.12-8
+- fedora/autoloader is optional
+
+* Mon May 10 2021 Remi Collet <remi@remirepo.net> - 1:1.10.12-7
+- update Archive_Tar to 1.4.13
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.10.12-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Tue Jan 19 2021 Remi Collet <remi@remirepo.net> - 1:1.10.12-5
 - update Archive_Tar to 1.4.12
@@ -348,6 +315,9 @@ fi
 
 * Wed Sep 16 2020 Remi Collet <remi@remirepo.net> - 1:1.10.12-3
 - update Archive_Tar to 1.4.10
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.10.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Apr 20 2020 Remi Collet <remi@remirepo.net> - 1.10.12-1
 - update PEAR to 1.10.12
