@@ -7,8 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/etcd-io/etcd/
-#Source0:       https://github.com/etcd-io/etcd/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/etcd-io/etcd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        etcd.service
 BuildRequires:  git
 BuildRequires:  golang >= 1.13
