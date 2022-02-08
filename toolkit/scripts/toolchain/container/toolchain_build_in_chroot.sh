@@ -69,9 +69,7 @@ cd /sources
 
 echo Linux-5.15.18.1 API Headers
 tar xf kernel-5.15.18.1.tar.gz
-cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
-patch -p1 -i 0002-add-linux-syscall-license-info.patch
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
