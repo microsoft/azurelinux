@@ -8511,8 +8511,8 @@
         "type": "other",
         "other": {
           "name": "kde-settings",
-          "version": "30.0",
-          "downloadUrl": "https://github.com/FedoraKDE/kde-settings/archive/30.0.tar.gz"
+          "version": "33.0",
+          "downloadUrl": "https://github.com/FedoraKDE/kde-settings/archive/33.0.tar.gz"
         }
       }
     },
