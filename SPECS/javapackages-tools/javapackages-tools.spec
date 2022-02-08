@@ -5,6 +5,7 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
 %bcond_without bootstrap
+%bcond_with ivy
 
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
@@ -78,6 +79,7 @@ Requires:       mvn(org.fedoraproject.xmvn:xmvn-mojo)
 %description -n maven-local
 This package provides macros and scripts to support packaging Maven artifacts.
 
+%if %{with ivy}
 %package -n ivy-local
 Summary:        Local mode for Apache Ivy
 Requires:       %{name} = %{version}-%{release}
@@ -88,6 +90,7 @@ Requires:       xmvn-connector-ivy
 %description -n ivy-local
 This package implements local mode for Apache Ivy, which allows
 artifact resolution using XMvn resolver.
+%endif
 
 %package -n python3-javapackages
 Summary:        Module for handling various files for Java packaging
@@ -112,6 +115,8 @@ Requires:       %{_bindir}/xmvn-resolve
 Requires:       %{_bindir}/xmvn-subst
 %endif
 
+Provides:       javapackages-local-bootstrap = %{version}-%{release}
+
 %description -n javapackages-local
 This package provides non-essential macros and scripts to support Java packaging.
 
@@ -134,13 +139,19 @@ sed -i '/${mandir}/d' install
 %define jdk_home $(find %{_libdir}/jvm -name "msopenjdk*")
 %define jre_home %{jdk_home}/jre
 
-%configure --pyinterpreter=%{python_interpreter} \
-    --default_jdk=%{jdk_home} --default_jre=%{jre_home} \
-    --rpmmacrodir=%{rpmmacrodir}
+%configure  --pyinterpreter=%{python_interpreter} \
+            --default_jdk=%{jdk_home} \
+            --default_jre=%{jre_home} \
+            --rpmmacrodir=%{rpmmacrodir}
 ./build
 
 %install
 ./install
+
+%if %{without ivy}
+rm -rf %{buildroot}%{_sysconfdir}/ivy
+rm -rf %{buildroot}%{_sysconfdir}/ant.d
+%endif
 
 sed -e 's/.[17]$/&*/' -i files-*
 
@@ -164,7 +175,9 @@ pip3 install -r test-requirements.txt
 
 %files -n maven-local
 
+%if %{with ivy}
 %files -n ivy-local -f files-ivy
+%endif
 
 %files -n python3-javapackages -f files-python
 %license LICENSE

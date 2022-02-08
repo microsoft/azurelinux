@@ -603,7 +603,6 @@
                 "java-atk-wrapper",
                 "javacc-maven-plugin",
                 "javapackages-tools",
-                "javapackages-tools-meta",
                 "javaparser",
                 "jbig2dec",
                 "jbigkit",
