@@ -1,8 +1,5 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global peardir %{_datadir}/pear
 %global metadir %{_localstatedir}/lib/pear
-
 %global getoptver 1.4.3
 %global arctarver 1.4.14
 # https://pear.php.net/bugs/bug.php?id=19367
@@ -10,101 +7,99 @@ Distribution:   Mariner
 %global structver 1.1.1
 %global xmlutil   1.4.5
 %global manpages  1.10.0
-
-# Tests are only run with rpmbuild --with tests
-# Can't be run in mock / koji because PEAR is the first package
-%global with_tests 0%{?_with_tests:1}
-
-%global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+%global macrosdir %{_rpmconfigdir}/macros.d
 
 %{!?pecl_xmldir: %global pecl_xmldir %{_sharedstatedir}/php/peclxml}
 
-Summary: PHP Extension and Application Repository framework
-Name: php-pear
-Version: 1.10.13
-Release: 3%{?dist}
+Summary:        PHP Extension and Application Repository framework
+Name:           php-pear
+Version:        1.10.13
+Release:        3%{?dist}
 # PEAR, PEAR_Manpages, Archive_Tar, XML_Util, Console_Getopt are BSD
 # Structures_Graph is LGPLv3+
-License: BSD and LGPLv3+
-URL: https://pear.php.net/package/PEAR
-Source0: http://download.pear.php.net/package/PEAR-%{version}.tgz
+License:        BSD AND LGPLv3+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://pear.php.net/package/PEAR
+Source0:        http://download.pear.php.net/package/PEAR-%{version}.tgz
 # wget https://raw.githubusercontent.com/pear/pear-core/stable/install-pear.php
-Source1: install-pear.php
-Source3: cleanup.php
-Source10: pear.sh
-Source11: pecl.sh
-Source12: peardev.sh
-Source13: macros.pear
-Source21: https://pear.php.net/get/Archive_Tar-%{arctarver}.tgz
-Source22: https://pear.php.net/get/Console_Getopt-%{getoptver}.tgz
-Source23: https://pear.php.net/get/Structures_Graph-%{structver}.tgz
-Source24: https://pear.php.net/get/XML_Util-%{xmlutil}.tgz
-Source25: https://pear.php.net/get/PEAR_Manpages-%{manpages}.tgz
+Source1:        install-pear.php
+Source3:        cleanup.php
+Source10:       pear.sh
+Source11:       pecl.sh
+Source12:       peardev.sh
+Source13:       macros.pear
+Source21:       https://pear.php.net/get/Archive_Tar-%{arctarver}.tgz
+Source22:       https://pear.php.net/get/Console_Getopt-%{getoptver}.tgz
+Source23:       https://pear.php.net/get/Structures_Graph-%{structver}.tgz
+Source24:       https://pear.php.net/get/XML_Util-%{xmlutil}.tgz
+Source25:       https://pear.php.net/get/PEAR_Manpages-%{manpages}.tgz
 
-BuildArch: noarch
-BuildRequires: php(language) > 5.4
-BuildRequires: php-cli
-BuildRequires: php-xml
-BuildRequires: %{_bindir}/gpg
+BuildArch:      noarch
+
+BuildRequires:  %{_bindir}/gpg
+BuildRequires:  php(language) > 5.4
+BuildRequires:  php-cli
 # For pecl_xmldir macro
-BuildRequires: php-devel
-%if %{with_tests}
+BuildRequires:  php-devel
+BuildRequires:  php-xml
+
+%if %{with_check}
 BuildRequires:  %{_bindir}/phpunit
 %endif
 
-Provides: php-pear(Console_Getopt) = %{getoptver}
-Provides: php-pear(Archive_Tar) = %{arctarver}
-Provides: php-pear(PEAR) = %{version}
-Provides: php-pear(Structures_Graph) = %{structver}
-Provides: php-pear(XML_Util) = %{xmlutil}
-Provides: php-pear(PEAR_Manpages) = %{manpages}
-
-Provides: php-composer(pear/console_getopt) = %{getoptver}
-Provides: php-composer(pear/archive_tar) = %{arctarver}
-Provides: php-composer(pear/pear-core-minimal) = %{version}
-Provides: php-composer(pear/structures_graph) = %{structver}
-Provides: php-composer(pear/xml_util) = %{xmlutil}
-
-# Archive_Tar requires 5.2
-# XML_Util, Structures_Graph require 5.3
-# Console_Getopt requires 5.4
-# PEAR requires 5.4
-Requires:  php(language) > 5.4
-Requires:  php-cli
-# phpci detected extension
-# PEAR (date, spl always builtin):
-Requires:  php-ftp
-Requires:  php-pcre
-Requires:  php-posix
-Requires:  php-tokenizer
-Requires:  php-xml
-Requires:  php-zlib
-# Console_Getopt: pcre
-# Archive_Tar: pcre, posix, zlib
-Requires:  php-bz2
 # Structures_Graph: none
 # XML_Util: pcre
 # optional: overload and xdebug
 # for /var/www/html ownership
-Requires: httpd-filesystem
+Requires:       httpd-filesystem
+# Archive_Tar requires 5.2
+# XML_Util, Structures_Graph require 5.3
+# Console_Getopt requires 5.4
+# PEAR requires 5.4
+Requires:       php(language) > 5.4
+# Console_Getopt: pcre
+# Archive_Tar: pcre, posix, zlib
+Requires:       php-bz2
+Requires:       php-cli
+# phpci detected extension
+# PEAR (date, spl always builtin):
+Requires:       php-ftp
+Requires:       php-pcre
+Requires:       php-posix
+Requires:       php-tokenizer
+Requires:       php-xml
+Requires:       php-zlib
 
+Provides:       php-pear(Console_Getopt) = %{getoptver}
+Provides:       php-pear(Archive_Tar) = %{arctarver}
+Provides:       php-pear(PEAR) = %{version}
+Provides:       php-pear(Structures_Graph) = %{structver}
+Provides:       php-pear(XML_Util) = %{xmlutil}
+Provides:       php-pear(PEAR_Manpages) = %{manpages}
+
+Provides:       php-composer(pear/console_getopt) = %{getoptver}
+Provides:       php-composer(pear/archive_tar) = %{arctarver}
+Provides:       php-composer(pear/pear-core-minimal) = %{version}
+Provides:       php-composer(pear/structures_graph) = %{structver}
+Provides:       php-composer(pear/xml_util) = %{xmlutil}
 
 %description
 PEAR is a framework and distribution system for reusable PHP
 components.  This package contains the basic PEAR components.
 
 %prep
-%setup -cT
+%setup -q -cT
 
 # Create a usable PEAR directory (used by install-pear.php)
 for archive in %{SOURCE0} %{SOURCE21} %{SOURCE22} %{SOURCE23} %{SOURCE24} %{SOURCE25}
 do
-    tar xzf  $archive --strip-components 1 || tar xzf  $archive --strip-path 1
+    tar xzf $archive --strip-components 1 || tar xzf $archive --strip-path 1
     file=${archive##*/}
     [ -f LICENSE ] && mv LICENSE LICENSE-${file%%-*}
     [ -f README ]  && mv README  README-${file%%-*}
 
-    tar xzf --wildcards $archive 'package*xml'
+    tar xzf $archive --wildcards 'package*xml'
     [ -f package2.xml ] && mv package2.xml ${file%%-*}.xml \
                         || mv package.xml  ${file%%-*}.xml
 done
@@ -116,7 +111,6 @@ cp %{SOURCE1} .
 sed -e 's:@BINDIR@:%{_bindir}:' \
     -e 's:@LIBDIR@:%{_localstatedir}/lib:' \
     %{SOURCE13} > macros.pear
-
 
 %build
 
@@ -130,12 +124,12 @@ export PHP_PEAR_INSTALL_DIR=%{peardir}
 # so it's not possible to set a sane default via the environment.
 # The ${PWD} bit will be stripped via relocate.php later.
 export PHP_PEAR_CACHE_DIR=${PWD}%{_localstatedir}/cache/php-pear
-export PHP_PEAR_TEMP_DIR=/var/tmp
+export PHP_PEAR_TEMP_DIR=%{_var}/tmp
 
 install -d %{buildroot}%{peardir} \
            %{buildroot}%{_localstatedir}/cache/php-pear \
            %{buildroot}%{_localstatedir}/www/html \
-           %{buildroot}%{_localstatedir}/lib/pear/pkgxml \
+           %{buildroot}%{metadir}/pkgxml \
            %{buildroot}%{_sysconfdir}/pear
 
 export INSTALL_ROOT=%{buildroot}
@@ -181,7 +175,7 @@ popd
 rm -rf %{buildroot}/.depdb* %{buildroot}/.lock %{buildroot}/.channels %{buildroot}/.filemap
 
 # Need for re-registrying XML_Util
-install -m 644 *.xml %{buildroot}%{_localstatedir}/lib/pear/pkgxml
+install -m 644 *.xml %{buildroot}%{metadir}/pkgxml
 
 %check
 # Check that no bogus paths are left in the configuration, or in
@@ -189,13 +183,12 @@ install -m 644 *.xml %{buildroot}%{_localstatedir}/lib/pear/pkgxml
 grep %{buildroot} %{buildroot}%{_sysconfdir}/pear.conf && exit 1
 grep %{_libdir} %{buildroot}%{_sysconfdir}/pear.conf && exit 1
 grep '"/tmp"' %{buildroot}%{_sysconfdir}/pear.conf && exit 1
-grep /usr/local %{buildroot}%{_sysconfdir}/pear.conf && exit 1
+grep %{_prefix}/local %{buildroot}%{_sysconfdir}/pear.conf && exit 1
 grep -rl %{buildroot} %{buildroot} && exit 1
 
 
-%if %{with_tests}
-cp /etc/php.ini .
-echo "include_path=.:%{buildroot}%{peardir}:/usr/share/php" >>php.ini
+cp %{_sysconfdir}/php.ini .
+echo "include_path=.:%{buildroot}%{peardir}:%{_datadir}/php" >>php.ini
 export PHPRC=$PWD/php.ini
 LOG=$PWD/rpmlog
 ret=0
@@ -206,21 +199,18 @@ phpunit \
 
 cd %{buildroot}%{_datadir}/tests/pear/XML_Util/tests
 phpunit \
-   --bootstrap=/usr/share/pear/XML/Util/autoload.php \
+   --bootstrap=%{peardir}XML/Util/autoload.php \
    --test-suffix .php . || ret=1
 
 cd %{buildroot}%{_datadir}/tests/pear/Console_Getopt/tests
 %{_bindir}/php \
-   %{buildroot}/usr/share/pear/pearcmd.php \
+   %{buildroot}%{peardir}pearcmd.php \
    run-tests \
    | tee -a $LOG
 
 grep "FAILED TESTS" $LOG && ret=1
 
 exit $ret
-%else
-echo 'Test suite disabled (missing "--with tests" option)'
-%endif
 
 # Register newly installed PECL packages
 %transfiletriggerin -- %{pecl_xmldir}
@@ -244,12 +234,10 @@ while ($file=fgets(STDIN)) {
   %{_bindir}/pecl uninstall --nodeps --ignore-errors --register-only "$name" >/dev/null || :
 done
 
-
 %postun
 if [ $1 -eq 0 -a -d %{metadir}/.registry ] ; then
   rm -rf %{metadir}/.registry
 fi
-
 
 %files
 %license LICENSE*
@@ -259,9 +247,9 @@ fi
 %dir %{metadir}
 %{metadir}/.channels
 %verify(not mtime size md5) %{metadir}/.depdb
-%verify(not mtime)          %{metadir}/.depdblock
+%verify(not mtime) %{metadir}/.depdblock
 %verify(not mtime size md5) %{metadir}/.filemap
-%verify(not mtime)          %{metadir}/.lock
+%verify(not mtime) %{metadir}/.lock
 %{metadir}/.registry
 %{metadir}/pkgxml
 %{_bindir}/*
@@ -276,7 +264,6 @@ fi
 %{_mandir}/man1/pecl.1*
 %{_mandir}/man1/peardev.1*
 %{_mandir}/man5/pear.conf.5*
-
 
 %changelog
 * Tue Feb 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.13-3
