@@ -955,8 +955,8 @@
         "type": "other",
         "other": {
           "name": "azure-iot-sdk-c",
-          "version": "2020.02.04.1",
-          "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/LTS_02_2020_Ref01.tar.gz"
+          "version": "2022.01.21",
+          "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/LTS_01_2022_Ref01.tar.gz"
         }
       }
     },
@@ -975,8 +975,8 @@
         "type": "other",
         "other": {
           "name": "azure-storage-cpp",
-          "version": "7.3.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.3.0.tar.gz"
+          "version": "7.5.0",
+          "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.5.0.tar.gz"
         }
       }
     },
