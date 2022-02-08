@@ -22364,8 +22364,8 @@
         "type": "other",
         "other": {
           "name": "python-cherrypy",
-          "version": "18.6.0",
-          "downloadUrl": "https://pypi.io/packages/source/C/CherryPy/CherryPy-18.6.0.tar.gz"
+          "version": "18.6.1",
+          "downloadUrl": "https://pypi.io/packages/source/C/CherryPy/CherryPy-18.6.1.tar.gz"
         }
       }
     },
