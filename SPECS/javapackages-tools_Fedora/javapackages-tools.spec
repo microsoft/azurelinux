@@ -100,11 +100,13 @@ packaging in Linux distributions
 %package -n javapackages-local
 Summary:        Non-essential macros and scripts for Java packaging support
 # Java build systems don't have hard requirement on java-devel, so it should be there
+Requires:       %{name} = %{version}-%{release}
+Requires:       msopenjdk-11
+Requires:       python3
+Requires:       python3-javapackages = %{version}-%{release}
 Requires:       java-devel
 Requires:       javapackages-generators = %{version}-%{release}
-%if %{with bootstrap}
-Requires:       javapackages-bootstrap
-%else
+%if %{without bootstrap}
 Requires:       %{_bindir}/xmvn-install
 Requires:       %{_bindir}/xmvn-resolve
 Requires:       %{_bindir}/xmvn-subst
