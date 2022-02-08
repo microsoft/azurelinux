@@ -1,47 +1,26 @@
-%bcond_with doc
 Summary:        Small, safe and fast formatting library for C++
 Name:           fmt
-Version:        7.0.3
-Release:        4%{?dist}
+Version:        8.1.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fmtlib/%{name}
-#Source0:        %%{url}/archive/%%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-# See https://github.com/fmtlib/fmt/issues/443 and https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/message/LVKYLDLJVWAVJE4MQVKDO6PYZRD5MCP6/
-Patch1:         doc-build-removed-all-pip-internet-stuff.patch
-Patch3:         doc-build-do-not-create-virtual-environment.patch
-Patch4:         doc-_templates-layout-stripped-Google-Analytics.patch
-Patch5:         doc-_templates-layout-stripped-download-links.patch
-Patch6:         doc-index-removed-GitHub-iframe.patch
-Patch7:         doc-build-use-sphinx-build-3.patch
-Patch8:         doc-build-use-python3.patch
+Source0:        https://github.com/fmtlib/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  ninja-build
+
 # This package replaces the old name of cppformat
 Provides:       cppformat = %{version}-%{release}
 Obsoletes:      cppformat < %{version}-%{release}
+
 %undefine __cmake_in_source_build
 %if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:  cmake3
 %else
 BuildRequires:  cmake
-%endif
-%if %{with doc}
-BuildRequires:  doxygen
-BuildRequires:  nodejs-less
-%if 0%{?rhel} && 0%{?rhel} <= 7
-BuildRequires:  python%{python3_version_nodots}-breathe
-BuildRequires:  python%{python3_version_nodots}-sphinx
-%else
-BuildRequires:  python3-breathe
-BuildRequires:  python3-sphinx
-%endif
-%else
-Provides:       %{name}-doc = %{version}-%{release}
-Obsoletes:      %{name}-doc < %{version}-%{release}
 %endif
 
 %description
@@ -58,19 +37,6 @@ Obsoletes:      cppformat-devel < %{version}-%{release}
 
 %description    devel
 This package contains the header file for using %{name}.
-
-%if %{with doc}
-%package        doc
-Summary:        Documentation files for %{name}
-License:        Python
-# This package replaces the old name of cppformat
-Provides:       cppformat-doc = %{version}-%{release}
-Obsoletes:      cppformat-doc < %{version}-%{release}
-BuildArch:      noarch
-
-%description    doc
-This package contains documentation for developer documentation for %{name}.
-%endif
 
 %prep
 %autosetup -p1
@@ -94,16 +60,7 @@ sed -i "s/'--clean-css',//" doc/build.py
     -DFMT_CMAKE_DIR=%{_libdir}/cmake/%{name}  \
     -DFMT_LIB_DIR=%{_libdir}
 
-%cmake_build \
-%if %{with doc}
-    --target doc \
-%endif
-    --target all
-
-%if %{with doc}
-# Remove temporary build products
-rm -rf %{_vpath_builddir}/doc/html/{.buildinfo,.doctrees,objects.inv}
-%endif
+%cmake_build
 
 %install
 %cmake_install
@@ -114,7 +71,7 @@ rm -rf %{_vpath_builddir}/doc/html/{.buildinfo,.doctrees,objects.inv}
 %files
 %license LICENSE.rst
 %doc ChangeLog.rst README.rst
-%{_libdir}/lib%{name}.so.7*
+%{_libdir}/lib%{name}.so.8*
 
 %files devel
 %{_includedir}/%{name}
@@ -122,14 +79,12 @@ rm -rf %{_vpath_builddir}/doc/html/{.buildinfo,.doctrees,objects.inv}
 %{_libdir}/cmake/%{name}
 %{_libdir}/pkgconfig/%{name}.pc
 
-%if %{with doc}
-%files doc
-%doc %{_docdir}/%{name}
-%license doc/python-license.txt
-%endif
-
 %changelog
-* Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 7.0.3-4
+* Tue Feb 01 2022 Cameron Baird <cameronbaird@microsoft.com> - 8.1.1-1
+- Update to 8.1.1
+- Clean up docs 
+
+* Wed Oct 27 2021 Muhammad Falak <mwani@microsoft.com> - 7.0.3-4
 - Remove epoch
 
 * Mon Jun 14 2021 Henry Li <lihl@microsoft.com> - 7.0.3-3

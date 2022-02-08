@@ -12,13 +12,23 @@
                 "crash-ptdump-command",
                 "delve",
                 "nodejs-nodemon",
-                "rhnlib"
+                "rhnlib",
+                "rt-setup",
+                "rt-tests",
+                "rtctl",
+                "tuned"
             ]
         },
         "Ceph source": {
             "license": "[LGPL2.1](https://github.com/ceph/ceph/blob/master/COPYING-LGPL2.1)",
             "specs": [
                 "ceph"
+            ]
+        },
+        "Debian": {
+            "license": "[MIT](https://opensource.org/licenses/MIT)",
+            "specs": [
+                "prometheus-process-exporter"
             ]
         },
         "Fedora": {
@@ -1042,7 +1052,6 @@
                 "mythes-fr",
                 "mythes-ga",
                 "mythes-hu",
-                "mythes-it",
                 "mythes-mi",
                 "mythes-ne",
                 "mythes-nl",
@@ -1695,6 +1704,7 @@
                 "procmail",
                 "prometheus",
                 "prometheus-jmx-exporter",
+                "prometheus-node-exporter",
                 "prometheus-simpleclient-java",
                 "protobuf-java",
                 "ps_mem",
@@ -2828,6 +2838,7 @@
                 "kernel",
                 "kernel-headers",
                 "kernel-hyperv",
+                "kernel-rt",
                 "keyutils",
                 "kmod",
                 "krb5",

@@ -31,7 +31,7 @@ validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 specs_file        = $(PKGBUILD_DIR)/specs.json
 graph_file        = $(PKGBUILD_DIR)/graph.dot
 cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
-preprocessed_file     = $(PKGBUILD_DIR)/preprocessed_graph.dot
+preprocessed_file = $(PKGBUILD_DIR)/preprocessed_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
@@ -104,6 +104,10 @@ endif
 
 ifeq ($(USE_PREVIEW_REPO),y)
 graphpkgfetcher_extra_flags += --use-preview-repo
+endif
+
+ifeq ($(STOP_ON_FETCH_FAIL),y)
+graphpkgfetcher_extra_flags += --stop-on-failure
 endif
 
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms)

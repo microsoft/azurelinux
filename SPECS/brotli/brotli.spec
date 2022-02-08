@@ -1,7 +1,7 @@
 Summary:        Lossless compression algorithm
 Name:           brotli
 Version:        1.0.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,10 +81,10 @@ done
 %postun -p /sbin/ldconfig
 
 %check
-cd build
-ctest -V
-cd ..
-python3 setup.py test
+make test
+test_result=$?
+make clean
+[[ $test_result -eq 0 ]]
 
 %files
 %{_bindir}/brotli
@@ -116,6 +116,9 @@ python3 setup.py test
 %{_mandir}/man3/constants.h.3brotli*
 
 %changelog
+* Fri Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.9-2
+- Use `make test` instead of `ctest` to fix ptests
+
 * Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0.9-1
 - Upgrade to 1.0.9
 
