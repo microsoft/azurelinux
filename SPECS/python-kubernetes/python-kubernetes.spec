@@ -16,7 +16,6 @@ Summary:    Kubernetes Python Client
 BuildRequires:  git
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3-certifi
 Requires:       python3-six
 Requires:       python3-dateutil
