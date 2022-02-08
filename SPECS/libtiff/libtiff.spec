@@ -8,10 +8,10 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
-BuildRequires:  libjpeg-turbo-devel
-BuildRequires:  libtool 
+BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  autoconf 
+BuildRequires:  libjpeg-turbo-devel
+BuildRequires:  libtool
 Requires:       libjpeg-turbo
 Provides:       %{name}-tools = %{version}-%{release}
 
@@ -71,6 +71,7 @@ make %{?_smp_mflags} -k check
 - Remove patches that no longer apply
 - Add autoconf, libtool, automake as BR
 - Remove calling autogen script
+- License Verified
 
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.1.0-3
 - Merge the following releases from 1.0 to dev branch

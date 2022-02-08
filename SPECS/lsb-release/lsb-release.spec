@@ -1,19 +1,19 @@
-%define LICENSE_PATH LICENSE.PTR
-Summary:       lsb_release script
-Name:          lsb-release
-Version:       3.1
-Release:       1%{?dist}
-License:       GPLv2+
-URL:           https://wiki.linuxfoundation.org/lsb/start
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-BuildArch:     noarch
+Summary:        lsb_release script
+Name:           lsb-release
+Version:        3.1
+Release:        1%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://wiki.linuxfoundation.org/lsb/start
 #Source0:      https://github.com/thkukuk/lsb-release_os-release/archive/refs/tags/v%{version}.tar.gz
-Source0:       %{name}_os-release-%{version}.tar.gz 
-Source1:       %{LICENSE_PATH}
-BuildRequires: coreutils
-BuildRequires: gzip
-Requires:      mariner-release
+Source0:        %{name}_os-release-%{version}.tar.gz
+Source1:        %{LICENSE_PATH}
+%define LICENSE_PATH LICENSE.PTR
+BuildRequires:  coreutils
+BuildRequires:  gzip
+Requires:       mariner-release
+BuildArch:      noarch
 
 %description
 lsb_release prints certain LSB (Linux Standard Base) and Distribution information.

@@ -3,11 +3,11 @@ Name:           lshw
 Version:        B.02.19
 Release:        1%{?dist}
 License:        GPLv2
-URL:            https://github.com/lyonel/lshw/releases
-Source0:        https://github.com/lyonel/lshw/archive/%{version}/%{name}-%{version}.tar.gz
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://github.com/lyonel/lshw/releases
+Source0:        https://github.com/lyonel/lshw/archive/%{version}/%{name}-%{version}.tar.gz
 
 %description
 lshw is a small tool to provide detailed informaton on the hardware
@@ -39,7 +39,7 @@ make DESTDIR=%{buildroot} install
 
 %files docs
 %defattr(-,root,root)
-/usr/share/*
+%{_datadir}/*
 
 %changelog
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - B.02.19-1
@@ -53,5 +53,6 @@ make DESTDIR=%{buildroot} install
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> B.02.18-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *    Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> B.02.18-1
 -    Initial version of lshw package for Photon.
