@@ -339,8 +339,6 @@ rm -f %{buildroot}%{_libdir}/graphviz/libgvplugin_xlib*
 rm -rf %{buildroot}%{_datadir}/graphviz/lefty
 rm -f %{buildroot}%{_mandir}/man1/{lefty.1*}
 
-rm -rf %{buildroot}%{python2_sitearch}/*gv*
-
 # python 3
 install -pD tclpkg/gv/.libs/libgv_python3.so %{buildroot}%{python3_sitearch}/_gv.so
 install -p tclpkg/gv/gv.py %{buildroot}%{python3_sitearch}/gv.py
