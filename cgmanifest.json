@@ -15123,8 +15123,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-extlib",
-          "version": "1.7.5",
-          "downloadUrl": "https://github.com/ygrek/ocaml-extlib/releases/download/1.7.5/extlib-1.7.5.tar.gz"
+          "version": "1.7.8",
+          "downloadUrl": "https://github.com/ygrek/ocaml-extlib/releases/download/1.7.8/extlib-1.7.8.tar.gz"
         }
       }
     },
