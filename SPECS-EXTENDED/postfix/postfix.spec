@@ -89,6 +89,7 @@ BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  libdb-devel
 BuildRequires:  libicu-devel
+BuildRequires:  libnsl2-devel
 BuildRequires:  m4
 # Optional patches - set the appropriate environment variables to include
 #                    them when building the package/spec file
