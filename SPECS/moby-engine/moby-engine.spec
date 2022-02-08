@@ -1,37 +1,26 @@
+%define upstream_name moby
+%define commit_hash 459d0dfbbb51fb2423a43655e6c62368ec0f36c9
+
 Summary: The open-source application container engine
-Name:    moby-engine
-Version: 19.03.15+azure
-Release: 4%{?dist}
+Name:    %{upstream_name}-engine
+Version: 20.10.12
+Release: 1%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
-
-# Git clone is a standard practice of producing source files for moby.
-# Please look at ./generate-sources.sh for generating source tar ball.
-# ENGINE_REPO=https://github.com/moby/moby.git
-%define MOBY_GITCOMMIT 420b1d36250f9cfdc561f086f25a213ecb669b6f
-
-# docker-proxy binary comes from libnetwork
-# The proxy code rarely sees any changes
-# The default value for the commit is taken from the engine repo
-#   see "hack/dockerfile/install/proxy.installer" in that repo
-# PROXY_REPO=https://github.com/docker/libnetwork.git
-# PROXY_COMMIT=153d0769a1181bf591a9637fd487a541ec7db1e6
-
-# Tini is a tiny container init, it's used as the binary for "docker-init"
-# TINI_REPO=https://github.com/krallin/tini.git
-# TINI_COMMIT=fec3683b971d9c3ef73f284f176672c44b448662
-
-#Source0: https://github.com/moby/moby/archive/v19.03.15.tar.gz
-Source0: moby-engine-%{version}.tar.gz
-Source2: docker.service
-Source3: docker.socket
-Source4: LICENSE
-Source5: NOTICE
-Patch0:  CVE-2021-41091.patch
-Patch1:  CVE-2021-41089.patch
 URL: https://mobyproject.org
 Vendor: Microsoft Corporation
 Distribution: Mariner
+
+# Note that docker-init is provided by Tini
+
+Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# docker-proxy binary comes from libnetwork
+# - The libnetwork version (more accurately commit hash) 
+#   that moby relies on is hard coded in 
+#   "hack/dockerfile/install/proxy.installer" (in moby github repo above)
+Source1: https://github.com/moby/libnetwork/archive/master.tar.gz/#/%{upstream_name}-libnetwork-%{version}.tar.gz
+Source3: docker.service
+Source4: docker.socket
 
 %{?systemd_requires}
 
@@ -49,7 +38,7 @@ BuildRequires: make
 BuildRequires: pkg-config
 BuildRequires: systemd-devel
 BuildRequires: tar
-BuildRequires: golang
+BuildRequires: golang >= 1.16.12
 BuildRequires: git
 
 Requires: audit
@@ -60,6 +49,7 @@ Requires: libcgroup
 Requires: libseccomp >= 2.3
 Requires: moby-containerd >= 1.2
 Requires: tar
+Requires: tini
 Requires: xz
 
 Conflicts: docker
@@ -78,31 +68,28 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%autosetup -p1 -c
+%autosetup -p1 -n %{upstream_name}-%{version}
+tar xf %{SOURCE1} --no-same-owner
+
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
-ln -sfT %{_topdir}/BUILD/%{name}-%{version}/libnetwork %{OUR_GOPATH}/src/github.com/docker/libnetwork
-mkdir -p '%{OUR_GOPATH}/src/github.com/docker'
-ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/docker/docker
+LIBNETWORK_FOLDER=$(find -type d -name "libnetwork-*")
+ln -sfT %{_builddir}/%{upstream_name}-%{version}/${LIBNETWORK_FOLDER} %{OUR_GOPATH}/src/github.com/docker/libnetwork
+ln -sfT %{_builddir}/%{upstream_name}-%{version} %{OUR_GOPATH}/src/github.com/docker/docker
 
 %build
 export GOPATH=%{OUR_GOPATH}
 export GOCACHE=%{OUR_GOPATH}/.cache
 export GOPROXY=off
 export GO111MODULE=off
-#export GOFLAGS=-trimpath
 export GOGC=off
 export VERSION=%{version}
 
-GIT_COMMIT=%{MOBY_GITCOMMIT}
+# build docker daemon
+GIT_COMMIT=%{commit_hash}
 GIT_COMMIT_SHORT=${GIT_COMMIT:0:7}
 DOCKER_GITCOMMIT=${GIT_COMMIT_SHORT} DOCKER_BUILDTAGS='apparmor seccomp' hack/make.sh dynbinary
 
-mkdir -p tini/build
-cd tini/build
-cmake ..
-make tini-static
-
-cd ../../
+# build docker proxy
 go build \
     -o libnetwork/docker-proxy \
     github.com/docker/libnetwork/cmd/proxy
@@ -110,29 +97,16 @@ go build \
 %install
 mkdir -p %{buildroot}/%{_bindir}
 cp -aLT ./bundles/dynbinary-daemon/dockerd %{buildroot}/%{_bindir}/dockerd
-echo %{_bindir}/dockerd >> files
-
 cp -aT libnetwork/docker-proxy %{buildroot}/%{_bindir}/docker-proxy
-echo %{_bindir}/docker-proxy >> ./files
-
-cp -aT tini/build/tini-static %{buildroot}/%{_bindir}/docker-init
-echo %{_bindir}/docker-init >> ./files
 
 # install udev rules
 mkdir -p %{buildroot}/%{_sysconfdir}/udev/rules.d
 install -p -m 644 contrib/udev/80-docker.rules %{buildroot}/%{_sysconfdir}/udev/rules.d/80-docker.rules
-echo %config %{_sysconfdir}/udev/rules.d/80-docker.rules >> ./files
+
 # add init scripts
 mkdir -p %{buildroot}/%{_unitdir}
-install -p -m 644 %{SOURCE2} %{buildroot}/%{_unitdir}/docker.service
-install -p -m 644 %{SOURCE3} %{buildroot}/%{_unitdir}/docker.socket
-echo %config %{_unitdir}/docker.service >> ./files
-echo %config %{_unitdir}/docker.socket >> ./files
-
-# copy legal files
-mkdir -p %{buildroot}/usr/share/doc/%{name}-%{version}
-cp %{SOURCE4} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
-cp %{SOURCE5} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
+install -p -m 644 %{SOURCE3} %{buildroot}/%{_unitdir}/docker.service
+install -p -m 644 %{SOURCE4} %{buildroot}/%{_unitdir}/docker.socket
 
 %post
 if ! grep -q "^docker:" /etc/group; then
@@ -146,11 +120,17 @@ fi
 %systemd_postun_with_restart docker.service
 
 # list files owned by the package here
-%files -f ./files
-%license LICENSE
-/usr/share/doc/%{name}-%{version}/*
+%files
+%license LICENSE NOTICE
+%{_bindir}/*
+%{_sysconfdir}/*
+%{_unitdir}/*
 
 %changelog
+* Fri Feb 4 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.12-1
+- Update to version 20.10.12
+- Use code from upstream instead of Azure fork.
+
 * Mon Oct 04 2021 Henry Beberman <henry.beberman@microsoft.com> 19.03.15+azure-4
 - Patch CVE-2021-41091 and CVE-2021-41089
 - Switch to autosetup
