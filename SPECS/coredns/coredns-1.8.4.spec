@@ -2,8 +2,8 @@
 
 Summary:        Fast and flexible DNS server
 Name:           coredns
-Version:        1.7.0
-Release:        7%{?dist}
+Version:        1.8.4
+Release:        3%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,7 +45,7 @@ CoreDNS is a fast and flexible DNS server.
 tar -xf %{SOURCE1} --no-same-owner
 export BUILDOPTS="-mod=vendor -v"
 # set commit number that correspond to the github tag for that version
-export GITCOMMIT="f59c03d"
+export GITCOMMIT="053c4d5ca1772517746a854e87ffa971249df14b"
 make
 
 %install
@@ -58,19 +58,22 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
-%changelog
-* Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.7.0-7
+* Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.4-3
 - Remove clean section
 - License verified
 
-* Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.7.0-6
+* Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.8.4-2
 - Increment release for force republishing using golang 1.16.12
 
-* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.0-5
+* Tue Dec 28 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.4-1
+- Update to version  "1.8.4".
+
+* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.0-2
 - Increment release for force republishing using golang 1.16.9
 
-* Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.7.0-4
-- Increment release to force republishing using golang 1.16.7.
+* Fri Aug 20 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.8.0-1
+- Update to version  "1.8.0".
+
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.7.0-3
 - Increment release to force republishing using golang 1.15.13.
 * Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.7.0-2

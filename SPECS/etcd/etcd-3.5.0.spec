@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.4.13
-Release:        8%{?dist}
+Version:        3.5.0
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,8 +9,35 @@ Group:          System Environment/Security
 URL:            https://github.com/etcd-io/etcd/
 Source0:        https://github.com/etcd-io/etcd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        etcd.service
-BuildRequires:  git
-BuildRequires:  golang >= 1.13
+# Below is a manually created tarball, no download link.
+# We're using vendored Go modules from this tarball, since network is disabled during build time.
+#
+# How to re-build this file:
+#   1. either download etcd source tarball or git clone etcd repo from github and checkout relevant tag
+#   2. execute 'go mod vendor' in 'server', 'etcdctl' and 'etcdutl' folders 
+#      and create tarball containting 'vendor' folder for each
+#      (naming rule for tarball is 'vendor-[component].tar.gz', e.g.: 'vendor-server.tar.gz')
+#   3. create 'vendor' tarballs for dump tools
+#       a. cd 'etcd-dump-db' folder, create 'go.mod' file ('go mod init go.etcd.io/etcd/tools/etcd-dump-db/v3')
+#       b. populate 'go.mod' file ('go mod tidy')
+#       c. add replace rules in 'go.mod' making sure that each etcd dependency is taken locally, e.g.:
+#          replace (
+#               go.etcd.io/etcd/api/v3 => ../../api
+#               go.etcd.io/etcd/server/v3 => ../../server
+#          )
+#       d. create vendor folder ('go mod vendor')
+#       e. create tarball containing 'vendor' folder and 'go.mod' and 'go.sum' files
+#          (same naming rules than described above)
+#       f. repeat above operations for 'etcd-dump-logs' folder
+#   4. create 'etcd-%{version}-vendor.tar.gz' tarball containing all tarballs created above
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+Source2:        %{name}-%{version}-vendor.tar.gz
+BuildRequires:  golang >= 1.16
 
 %description
 A highly-available key value store for shared configuration and service discovery.
@@ -27,23 +54,33 @@ tools.
 
 %prep
 %setup -q
+tar --no-same-owner -xf %{SOURCE2}
 
 %build
-# Turn off auto moduling. golang 1.13 does not automatically consider the vendor folder (it does as of 1.14).
-# To successfully build, manually hydrate the go package cache (GOPATH) with the included vendor folder and
-# etcd's source code before invoking the build script.
-export GO111MODULE=off
+%define ETCD_OUT_DIR %{_builddir}/%{name}-%{version}/bin
+mkdir -p %{ETCD_OUT_DIR}
 
-%define OUR_GOPATH %{_topdir}/.gopath
-mkdir -p "%{OUR_GOPATH}/vendor" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io"
-export GOPATH=%{OUR_GOPATH}/vendor:%{OUR_GOPATH}/etcd_src
+# build etcd
+for component in server etcdctl etcdutl; do
+    pushd $component
+    tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    go build \
+        -o %{ETCD_OUT_DIR} \
+        -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
+    popd
+done
 
-ln -s "%{_builddir}/%{name}-%{version}/vendor" "%{OUR_GOPATH}/vendor/src"
-ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io/etcd"
-./build
-# Now build the etcd-dump* tools
-source ./build
-tools_build
+# build tools
+%define ETCD_TOOLS_OUT_DIR %{_builddir}/%{name}-%{version}/bin/tools
+mkdir -p %{ETCD_TOOLS_OUT_DIR}
+
+for component in etcd-dump-db etcd-dump-logs; do
+    pushd tools/$component
+    tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    go build \
+        -o %{ETCD_TOOLS_OUT_DIR}
+    popd
+done
 
 %install
 install -vdm755 %{buildroot}%{_bindir}
@@ -55,14 +92,25 @@ install -vpm 0755 -T etcd.conf.yml.sample %{buildroot}%{_sysconfdir}/etcd/etcd-d
 chown -R root:root %{buildroot}%{_bindir}
 chown -R root:root %{buildroot}/%{_docdir}/%{name}-%{version}
 
-mv %{_builddir}/%{name}-%{version}/bin/etcd %{buildroot}%{_bindir}/
+# note that 'server' should be renamed 'etcd'
+mv %{_builddir}/%{name}-%{version}/bin/server %{buildroot}%{_bindir}/etcd
 mv %{_builddir}/%{name}-%{version}/bin/etcdctl %{buildroot}%{_bindir}/
+mv %{_builddir}/%{name}-%{version}/bin/etcdutl %{buildroot}%{_bindir}/
+
 mv %{_builddir}/%{name}-%{version}/README.md %{buildroot}/%{_docdir}/%{name}-%{version}/
 mv %{_builddir}/%{name}-%{version}/etcdctl/README.md %{buildroot}/%{_docdir}/%{name}-%{version}/README-etcdctl.md
 mv %{_builddir}/%{name}-%{version}/etcdctl/READMEv2.md %{buildroot}/%{_docdir}/%{name}-%{version}/READMEv2-etcdctl.md
+mv %{_builddir}/%{name}-%{version}/etcdutl/README.md %{buildroot}/%{_docdir}/%{name}-%{version}/README-etcdutl.md
+
+# tools
+install -vdm755 %{buildroot}/%{_docdir}/%{name}-%{version}-tools
+chown -R root:root %{buildroot}/%{_docdir}/%{name}-%{version}-tools
+
 mv %{_builddir}/%{name}-%{version}/bin/tools/etcd-dump-logs %{buildroot}%{_bindir}/
 mv %{_builddir}/%{name}-%{version}/bin/tools/etcd-dump-db %{buildroot}%{_bindir}/
 
+mv %{_builddir}/%{name}-%{version}/tools/etcd-dump-db/README.md %{buildroot}/%{_docdir}/%{name}-%{version}-tools/README-etcd-dump-db.md
+mv %{_builddir}/%{name}-%{version}/tools/etcd-dump-logs/README.md %{buildroot}/%{_docdir}/%{name}-%{version}-tools/README-etcd-dump-logs.md
 
 install -vdm755 %{buildroot}/lib/systemd/system-preset
 echo "disable etcd.service" > %{buildroot}/lib/systemd/system-preset/50-etcd.preset
@@ -77,6 +125,7 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 %license LICENSE
 %{_bindir}/etcd
 %{_bindir}/etcdctl
+%{_bindir}/etcdutl
 /%{_docdir}/%{name}-%{version}/*
 /lib/systemd/system/etcd.service
 /lib/systemd/system-preset/50-etcd.preset
@@ -84,19 +133,23 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 %config(noreplace) %{_sysconfdir}/etcd/etcd-default-conf.yml
 
 %files tools
+%license LICENSE
 %{_bindir}/etcd-dump-*
+/%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
 %changelog
-* Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.4.13-8
+* Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.0-3
 - Remove clean section
 
-* Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.4.13-7
-- Increment release for force republishing using golang 1.16.12
-- Update Source0 URL
+*   Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.5.0-2
+-   Increment release for force republishing using golang 1.16.12
 
-* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.13-6
-- Increment release for force republishing using golang 1.16.9
+*   Tue Dec 28 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.0-1
+-   Upgrade to version 3.5.0
+
+*   Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.13-6
+-   Increment release for force republishing using golang 1.16.9
 
 *   Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.4.13-5
 -   Increment release to force republishing using golang 1.16.7.
