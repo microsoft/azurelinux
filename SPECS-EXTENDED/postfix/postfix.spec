@@ -48,13 +48,13 @@
 
 Name: postfix
 Summary: Postfix Mail Transport Agent
-Version: 3.5.7
-Release: 4%{?dist}
+Version: 3.6.4
+Release: 1%{?dist}
 URL: http://www.postfix.org
 License: (IBM and GPLv2+) or (EPL-2.0 and GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Requires(post): systemd hostname
+Requires(post): systemd systemd-sysv hostname
 Requires(post): %{_sbindir}/alternatives
 Requires(post): %{_bindir}/openssl
 Requires(pre): %{_sbindir}/groupadd
@@ -63,7 +63,10 @@ Requires(preun): %{_sbindir}/alternatives
 Requires(preun): systemd
 Requires(postun): systemd
 # Required by /usr/libexec/postfix/postfix-script
-Requires: diffutils, findutils
+Requires: diffutils
+Requires: findutils
+# for restorecon
+Requires: policycoreutils
 Provides: MTA smtpd smtpdaemon server(smtp)
 
 Source0: ftp://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
@@ -95,14 +98,21 @@ Patch9: pflogsumm-1.1.5-datecalc.patch
 # rhbz#1384871, sent upstream
 Patch10: pflogsumm-1.1.5-ipv6-warnings-fix.patch
 Patch11: postfix-3.4.4-chroot-example-fix.patch
+# upstream patch
+Patch12: postfix-3.6.2-glibc-234-build-fix.patch
+# sent upstream
+Patch13: postfix-3.6.2-whitespace-name-fix.patch
+# rhbz#1931403, sent upstream
+Patch14: pflogsumm-1.1.5-syslog-name-underscore-fix.patch
 
 # Optional patches - set the appropriate environment variables to include
 #                    them when building the package/spec file
 
 
 # Determine the different packages required for building postfix
+BuildRequires: make
 BuildRequires: libdb-devel, perl-generators, pkgconfig, zlib-devel
-BuildRequires: systemd-devel, icu-devel, libnsl2-devel
+BuildRequires: systemd-units, libicu-devel
 BuildRequires: gcc, m4, findutils
 
 %{?with_ldap:BuildRequires: openldap-devel}
@@ -121,12 +131,8 @@ Postfix is a Mail Transport Agent (MTA).
 %package perl-scripts
 Summary: Postfix utilities written in perl
 Requires: %{name} = %{version}-%{release}
-Requires: perl(Date::Calc)
-# perl-scripts introduced in 2:2.5.5-2
-Obsoletes: postfix < 2.5.5-2
 %if %{with pflogsumm}
 Provides: postfix-pflogsumm = %{version}-%{release}
-Obsoletes: postfix-pflogsumm < 2.5.5-2
 %endif
 %description perl-scripts
 This package contains perl scripts pflogsumm and qshape.
@@ -230,6 +236,9 @@ pushd pflogsumm-%{pflogsumm_ver}
 popd
 %endif
 %patch11 -p1 -b .chroot-example-fix
+%patch12 -p1 -b .glibc-234-build-fix
+%patch13 -p1 -b .whitespace-name-fix
+%patch14 -p1 -b .pflogsumm-1.1.5-syslog-name-underscore-fix
 
 for f in README_FILES/TLS_{LEGACY_,}README TLS_ACKNOWLEDGEMENTS; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
@@ -237,6 +246,7 @@ for f in README_FILES/TLS_{LEGACY_,}README TLS_ACKNOWLEDGEMENTS; do
 done
 
 %build
+%set_build_flags
 unset AUXLIBS AUXLIBS_LDAP AUXLIBS_LMDB AUXLIBS_PCRE AUXLIBS_MYSQL AUXLIBS_PGSQL AUXLIBS_SQLITE AUXLIBS_CDB
 CCARGS="-fPIC -fcommon"
 AUXLIBS="-lnsl"
@@ -295,7 +305,7 @@ CCARGS="${CCARGS} -fsigned-char"
 CCARGS="${CCARGS} -DDEF_CONFIG_DIR=\\\"%{postfix_config_dir}\\\""
 CCARGS="${CCARGS} $(getconf LFS_CFLAGS)"
 
-LDFLAGS="%{?__global_ldflags} %{?_hardened_build:-Wl,-z,relro,-z,now}"
+LDFLAGS="$LDFLAGS %{?_hardened_build:-Wl,-z,relro,-z,now}"
 
 # SHLIB_RPATH is needed to find private libraries
 # LDFLAGS are added to SHLIB_RPATH because the postfix build system
@@ -308,7 +318,7 @@ make -f Makefile.init makefiles shared=yes dynamicmaps=yes \
   AUXLIBS_PGSQL="${AUXLIBS_PGSQL}" AUXLIBS_SQLITE="${AUXLIBS_SQLITE}" \
   AUXLIBS_CDB="${AUXLIBS_CDB}" \
   DEBUG="" SHLIB_RPATH="-Wl,-rpath,%{postfix_shlib_dir} $LDFLAGS" \
-  OPT="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-comment" \
+  OPT="$CFLAGS -fno-strict-aliasing -Wno-comment" \
   POSTFIX_INSTALL_OPTS=-keep-build-mtime
 
 %make_build
@@ -376,7 +386,7 @@ install -m 644 %{SOURCE101} $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/smtp.postfix
 
 # prepare documentation
 mkdir -p $RPM_BUILD_ROOT%{postfix_doc_dir}
-cp -p %{SOURCE3} COMPATIBILITY TLS_ACKNOWLEDGEMENTS $RPM_BUILD_ROOT%{postfix_doc_dir}
+cp -p %{SOURCE3} COMPATIBILITY LICENSE TLS_ACKNOWLEDGEMENTS TLS_LICENSE $RPM_BUILD_ROOT%{postfix_doc_dir}
 
 mkdir -p $RPM_BUILD_ROOT%{postfix_doc_dir}/examples{,/chroot-setup}
 cp -pr examples/{qmail-local,smtpd-policy} $RPM_BUILD_ROOT%{postfix_doc_dir}/examples
@@ -482,7 +492,7 @@ fi
 # Create self-signed SSL certificate
 if [ ! -f %{sslkey} ]; then
   umask 077
-  %{_bindir}/openssl genrsa 4096 > %{sslkey} 2> /dev/null
+  %{_bindir}/openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out %{sslkey} 2>/dev/null || echo "openssl genpkey failed"
 fi
 
 if [ ! -f %{sslcert} ]; then
@@ -491,8 +501,10 @@ if [ ! -f %{sslcert} ]; then
     FQDN=localhost.localdomain
   fi
 
-  %{_bindir}/openssl req -new -key %{sslkey} -x509 -sha256 -days 365 -set_serial $RANDOM -out %{sslcert} \
-    -subj "/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=${FQDN}/emailAddress=root@${FQDN}"
+  req_cmd="%{_bindir}/openssl req -new -key %{sslkey} -x509 -sha256 -days 365 -set_serial $RANDOM -out %{sslcert} \
+    -subj /C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=${FQDN}/emailAddress=root@${FQDN}"
+# openssl-3.0 and fallback for backward compatibility with openssl < 3.0
+  $req_cmd -noenc -copy_extensions none 2>/dev/null || $req_cmd 2>/dev/null || echo "openssl req failed"
   chmod 644 %{sslcert}
 fi
 
@@ -743,6 +755,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6.4-1
+- Updating to version 3.6.4.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.5.7-4
 - Remove epoch
 
