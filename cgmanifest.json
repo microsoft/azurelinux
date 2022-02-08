@@ -21283,19 +21283,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "php-fedora-autoloader",
-          "version": "1.0.1",
-          "downloadUrl": "https://github.com/php-fedora/autoloader/archive/7cd61b5a927c8f446df8e820aa288434e18a7f0c/php-fedora-autoloader-1.0.1-7cd61b5a927c8f446df8e820aa288434e18a7f0c.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "php-pear",
-          "version": "1.10.12",
-          "downloadUrl": "http://download.pear.php.net/package/PEAR-1.10.12.tgz"
+          "version": "1.10.13",
+          "downloadUrl": "http://download.pear.php.net/package/PEAR-1.10.13.tgz"
         }
       }
     },
