@@ -9,7 +9,9 @@ Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
 BuildRequires:  libjpeg-turbo-devel
-BuildRequires:  wget
+BuildRequires:  libtool 
+BuildRequires:  automake
+BuildRequires:  autoconf 
 Requires:       libjpeg-turbo
 Provides:       %{name}-tools = %{version}-%{release}
 
@@ -27,8 +29,13 @@ It contains the libraries and header files to create applications
 %prep
 %setup -q -n libtiff-v%{version}
 
+libtoolize --force --copy
+aclocal -I ./m4
+autoheader
+automake --foreign --add-missing --copy
+autoconf
+
 %build
-sh autogen.sh
 %configure \
     --disable-static
 make %{?_smp_mflags}
@@ -59,6 +66,12 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
+* Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 4.3.0-1
+- Upgrade to 4.3.0
+- Remove patches that no longer apply
+- Add autoconf, libtool, automake as BR
+- Remove calling autogen script
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.1.0-3
 - Merge the following releases from 1.0 to dev branch
 - joslobo@microsoft.com, 4.1.0-2: Add patches for CVE-2020-35521, CVE-2020-35522, CVE-2020-35523, CVE-2020-35524

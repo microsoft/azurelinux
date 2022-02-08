@@ -1,11 +1,10 @@
 Summary:        Hardware lister
 Name:           lshw
-Version:        B.02.18
-Release:        3%{?dist}
+Version:        B.02.19
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/lyonel/lshw/releases
-Source0:        http://www.ezix.org/software/files/%{name}-%{version}.tar.gz
-%define sha1 lshw=c0240f5e53cf40769d52e316719e8010ea6bdea3
+Source0:        https://github.com/lyonel/lshw/archive/%{version}/%{name}-%{version}.tar.gz
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +19,7 @@ XML or HTML.
 %package docs
 Summary:        lshw docs
 Group:          Applications/System
+
 %description docs
 The package contains lshw doc files.
 
@@ -42,6 +42,12 @@ make DESTDIR=%{buildroot} install
 /usr/share/*
 
 %changelog
+* Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - B.02.19-1
+- Upgrade to B.02.19
+- Fix Source0
+- Delete sha1 macro
+- License Verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - B.02.18-3
 - Added %%license line automatically
 
