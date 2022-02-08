@@ -60,6 +60,7 @@ make install-man DESTDIR="%{buildroot}" PREFIX="%{_prefix}"
 * Fri Jan 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.1.0-1
 - Upgrade to 1.1.0.
 - Use code from upstream instead of Azure fork.
+- License verified.
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.0.0~rc95+azure-2
 - Increment release to force republishing using golang 1.15.13.
 * Wed May 19 2021 Andrew Phelps <anphel@microsoft.com> 1.0.0~rc95+azure-1
