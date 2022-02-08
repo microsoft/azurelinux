@@ -1,6 +1,5 @@
 %global library kubernetes
 %global basehash 06191d321491abd87caaf0d049030dc87720684a
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
 Name:       python-%{library}
 Version:    21.7.0
