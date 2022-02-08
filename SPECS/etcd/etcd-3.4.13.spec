@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.4.13
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -74,11 +74,6 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
-
-
 %files
 %license LICENSE
 %{_bindir}/etcd
@@ -93,6 +88,10 @@ rm -rf %{buildroot}/*
 %{_bindir}/etcd-dump-*
 
 %changelog
+%changelog
+* Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.4.13-8
+- Remove clean section
+
 * Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.4.13-7
 - Increment release for force republishing using golang 1.16.12
 - Update Source0 URL
