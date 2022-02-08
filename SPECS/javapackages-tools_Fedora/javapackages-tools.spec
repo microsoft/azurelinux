@@ -4,7 +4,7 @@
 %global python_interpreter python3
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
