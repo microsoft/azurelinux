@@ -8501,8 +8501,8 @@
         "type": "other",
         "other": {
           "name": "kde-settings",
-          "version": "30.0",
-          "downloadUrl": "https://github.com/FedoraKDE/kde-settings/archive/30.0.tar.gz"
+          "version": "36.0",
+          "downloadUrl": "https://pagure.io/fedora-kde/kde-settings/archive/36.0/kde-settings-36.0.tar.gz"
         }
       }
     },
