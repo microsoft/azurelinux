@@ -22214,8 +22214,8 @@
         "type": "other",
         "other": {
           "name": "python-bcrypt",
-          "version": "3.1.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/ce/3a/3d540b9f5ee8d92ce757eebacf167b9deedb8e30aedec69a2a072b2399bb/bcrypt-3.1.6.tar.gz"
+          "version": "3.2.0",
+          "downloadUrl": "https://pypi.io/packages/source/b/bcrypt/bcrypt-3.2.0.tar.gz"
         }
       }
     },
