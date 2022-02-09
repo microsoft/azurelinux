@@ -21,6 +21,9 @@ BuildRequires:  python3-xml
 BuildRequires:  swig
 Requires:       openssl >= 1.1.1g-6
 Requires:       python3
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description -n python3-m2crypto
 M2Crypto is a crypto and SSL toolkit for Python featuring the following:
@@ -42,7 +45,8 @@ messenger for Zope.
 %py3_install
 
 %check
-%{python3} setup.py test
+pip3 install parameterized
+%python3 setup.py test
 
 %files -n python3-m2crypto
 %defattr(-,root,root)
@@ -52,6 +56,7 @@ messenger for Zope.
 %changelog
 * Wed Feb 02 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.38.0-1
 - Update to version v0.38.0
+- Added parameterized as BR for check section.
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.35.2-9
 - Add license to python3 package
