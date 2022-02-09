@@ -24,15 +24,15 @@ transmitted or received over a network to which the computer is attached.
 make %{?_smp_mflags}
 
 %install
-# make install installs to /usr/bin in 4.99.1 
+# make install installs to /usr/bin in 4.99.1
 # so specify install to sbin instead
 mkdir -p %{buildroot}/%{_sbindir}
 mkdir -p %{buildroot}/%{_mandir}/man1
 
 chmod 755 %{buildroot}/%{_sbindir}
-	
+
 install -m755 tcpdump %{buildroot}%{_sbindir}
-install -m755 tcpdump %{buildroot}%{_sbindir}/tcpdump.%{version} 
+install -m755 tcpdump %{buildroot}%{_sbindir}/tcpdump.%{version}
 install -m644 tcpdump.1 %{buildroot}%{_mandir}/man1/tcpdump.1
 
 find %{buildroot} -type f -name "*.la" -delete -print
