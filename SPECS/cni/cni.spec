@@ -23,8 +23,8 @@
 %define __arch_install_post export NO_BRP_STRIP_DEBUG=true
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
-Version:        0.8.1
-Release:        2%{?dist}
+Version:        1.0.1
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

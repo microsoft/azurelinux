@@ -2,6 +2,6 @@
  "Signatures": {
   "99-loopback.conf": "82e03a3292ca327bcc86af3664a0d7b110cb1c39bca16d3cc703abd49c3c9a1b",
   "build.sh": "0626c2cc6371866f489ec1215e48a4192ece3e3019794ba7292e8d637d90eedc",
-  "cni-0.8.1.tar.gz": "6242e7905b5f8f7561a21f595209b569998727927380a8cdf5ab58e7fd5ac2d5"
+  "cni-1.0.1.tar.gz": "0e5376f70fb36c26935ddfb90b0da69736592ba8b577fbfb904750034c053d3b"
  }
 }
