@@ -1877,8 +1877,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "19.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v19.0.tar.gz"
+          "version": "21.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v21.0.tar.gz"
         }
       }
     },
@@ -2337,8 +2337,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.22.0",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.22.0.tar.gz"
+          "version": "1.23.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.23.0.tar.gz"
         }
       }
     },
