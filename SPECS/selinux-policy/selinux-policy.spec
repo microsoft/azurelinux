@@ -33,7 +33,7 @@ BuildRequires:  python3
 BuildRequires:  python3-xml
 Requires(pre):  coreutils
 Requires(pre):  policycoreutils >= %{POLICYCOREUTILSVER}
-Requires:       /bin/sh
+Requires:       bash
 Provides:       selinux-policy-targeted
 BuildArch:      noarch
 
@@ -276,7 +276,7 @@ selinuxenabled && semodule -nB
 exit 0
 %changelog
 * Mon Feb 07 2022 Max Brodeur-Urbas <maxbr@micrsofot.com> - 2.20220106-2
-- Adding /bin/sh as requirement.
+- Adding bash as requirement.
 
 * Mon Jan 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
 - Update to version 2.20220106.
