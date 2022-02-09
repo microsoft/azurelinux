@@ -1,7 +1,7 @@
 Summary:        HA monitor built upon LVS, VRRP and services poller
 Name:           keepalived
 Version:        2.2.7
-Release:        7%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,7 @@ BuildRequires:  systemd
 BuildRequires:  unzip
 
 Requires:       iptables
-Requires:       libkmod
+Requires:       kmod
 Requires:       libnl3-devel
 Requires:       net-snmp
 Requires:       openssl
@@ -68,6 +68,9 @@ rm -f doc_install/samples/*.pem
 rm -rf %{buildroot}%{_sysconfdir}/rc.d/init.d/
 rm -rf %{buildroot}%{_sysconfdir}/%{name}/samples/*
 mkdir -p %{buildroot}%{_libexecdir}/keepalived
+# After keepalived v2.2.4 we stopped installing a default keepalived.conf and instead install
+# keepalived.conf.sample.
+mv %{buildroot}/etc/keepalived/keepalived.conf.sample %{buildroot}/etc/keepalived/keepalived.conf
 
 %check
 # A build could silently have LVS support disabled if the kernel includes can't
