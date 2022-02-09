@@ -46,6 +46,7 @@ messenger for Zope.
 
 %check
 pip3 install parameterized
+#Testing: 1/370 test failing with SSLError not raised
 %python3 setup.py test
 
 %files -n python3-m2crypto
@@ -56,7 +57,7 @@ pip3 install parameterized
 %changelog
 * Wed Feb 02 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.38.0-1
 - Update to version v0.38.0
-- Added parameterized as BR for check section.
+- Added parameterized as BR and pip install in check section.
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.35.2-9
 - Add license to python3 package
