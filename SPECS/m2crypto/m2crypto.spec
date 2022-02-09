@@ -46,7 +46,7 @@ messenger for Zope.
 
 %check
 pip3 install parameterized
-#Testing: 1/370 test failing with SSLError not raised
+#Testing: MiscSSLClientTestCase failing with SSLError not raised
 %python3 setup.py test
 
 %files -n python3-m2crypto
