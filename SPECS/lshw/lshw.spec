@@ -1,11 +1,10 @@
 Summary:        Hardware lister
 Name:           lshw
 Version:        B.02.18
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 URL:            https://github.com/lyonel/lshw/releases
 Source0:        http://www.ezix.org/software/files/%{name}-%{version}.tar.gz
-%define sha1 lshw=c0240f5e53cf40769d52e316719e8010ea6bdea3
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,10 +41,15 @@ make DESTDIR=%{buildroot} install
 /usr/share/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - B.02.18-4
+- Remove unused `%%define sha1` lines
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - B.02.18-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> B.02.18-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*    Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> B.02.18-1
--    Initial version of lshw package for Photon.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - B.02.18-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> - B.02.18-1
+- Initial version of lshw package for Photon.
