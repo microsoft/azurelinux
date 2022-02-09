@@ -1,7 +1,7 @@
 Summary:        Library for manipulating pipelines
 Name:           libpipeline
 Version:        1.5.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,7 +20,6 @@ in a flexible and convenient way.
 Summary:        Library providing headers and static libraries to libpipeline
 Group:          Development/Libraries
 Requires:       libpipeline = %{version}-%{release}
-Provides:       pkgconfig(libpipeline)
 
 %description devel
 Development files for libpipeline
@@ -55,6 +54,9 @@ make -C tests check
 %{_mandir}/man3/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.5-2
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.5.5-1
 - Upgrade to version 1.5.5
 - Verified License
