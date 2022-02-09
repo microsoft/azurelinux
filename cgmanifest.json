@@ -24124,8 +24124,8 @@
         "type": "other",
         "other": {
           "name": "python-pyroute2",
-          "version": "0.5.14",
-          "downloadUrl": "https://pypi.io/packages/source/p/pyroute2/pyroute2-0.5.14.tar.gz"
+          "version": "0.6.5",
+          "downloadUrl": "https://pypi.io/packages/source/p/pyroute2/pyroute2-0.6.5.tar.gz"
         }
       }
     },

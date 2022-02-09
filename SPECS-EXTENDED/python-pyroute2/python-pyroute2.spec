@@ -8,14 +8,14 @@ License: GPLv2+
 URL: https://github.com/svinota/%{srcname}
  
 BuildArch: noarch
-Source0: %{pypi_source pyroute2}
-Source1: %{pypi_source pyroute2.core}
-Source2: %{pypi_source pyroute2.nslink}
-Source3: %{pypi_source pyroute2.nftables}
-Source4: %{pypi_source pyroute2.ethtool}
-Source5: %{pypi_source pyroute2.ipset}
-Source6: %{pypi_source pyroute2.ipdb}
-Source7: %{pypi_source pyroute2.ndb}
+Source0: %{srcname}-%{version}.tar.gz
+Source1: %{srcname}.core-%{version}.tar.gz
+Source2: %{srcname}.nslink-%{version}.tar.gz
+Source3: %{srcname}.nftables-%{version}.tar.gz
+Source4: %{srcname}.ethtool-%{version}.tar.gz
+Source5: %{srcname}.ipset-%{version}.tar.gz
+Source6: %{srcname}.ipdb-%{version}.tar.gz
+Source7: %{srcname}.nbd-%{version}.tar.gz
  
 %description
 PyRoute2 provides several levels of API to work with Netlink
@@ -91,6 +91,7 @@ cd ../pyroute2.ndb-%{version}
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com>  - 0.6.5-1
 - Initial CBL-Mariner import from Fedora rawhide (license: MIT).
 - License verified
+
 * Tue Feb 01 2022 Alfredo Moralejo <amoralej@rechat.com> - 0.6.5-1
 - Update to 0.6.5
  
