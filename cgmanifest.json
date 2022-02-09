@@ -1987,8 +1987,8 @@
         "type": "other",
         "other": {
           "name": "cni",
-          "version": "0.8.1",
-          "downloadUrl": "https://github.com/containernetworking/cni/archive/refs/tags/v0.8.1.tar.gz"
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/containernetworking/cni/archive/refs/tags/v1.0.1.tar.gz"
         }
       }
     },
