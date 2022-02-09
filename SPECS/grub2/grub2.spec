@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06~rc1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -313,6 +313,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 2.06~rc1-8
+- Bump release number to force binary signing with new secure boot key
+
 * Tue Sep 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-7
 - Disable module_info.ld script due to issue with ELF metadata note
 
