@@ -22294,8 +22294,8 @@
         "type": "other",
         "other": {
           "name": "python-cachetools",
-          "version": "4.1.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-4.1.1.tar.gz"
+          "version": "5.0.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-5.0.0.tar.gz"
         }
       }
     },
