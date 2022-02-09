@@ -33,7 +33,7 @@ chmod 755 %{buildroot}/%{_sbindir}
 chmod 755 %{buildroot}/%{_mandir}/man1
 
 install -m755 tcpdump %{buildroot}%{_sbindir}/tcpdump
-install -m755 tcpdump %{buildroot}%{_sbindir}/tcpdump.%{version}
+ln -sf tcpdump %{buildroot}%{_sbindir}/tcpdump.%{version}
 install -m755 tcpdump.1 %{buildroot}%{_mandir}/man1/tcpdump.1
 
 find %{buildroot} -type f -name "*.la" -delete -print
