@@ -15,7 +15,7 @@ Source3: %{srcname}.nftables-%{version}.tar.gz
 Source4: %{srcname}.ethtool-%{version}.tar.gz
 Source5: %{srcname}.ipset-%{version}.tar.gz
 Source6: %{srcname}.ipdb-%{version}.tar.gz
-Source7: %{srcname}.nbd-%{version}.tar.gz
+Source7: %{srcname}.ndb-%{version}.tar.gz
  
 %description
 PyRoute2 provides several levels of API to work with Netlink
