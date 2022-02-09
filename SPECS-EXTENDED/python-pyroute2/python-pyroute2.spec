@@ -89,7 +89,7 @@ cd ../pyroute2.ndb-%{version}
 
 %changelog
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com>  - 0.6.5-1
-- Initial CBL-Mariner import from Fedora rawhide (license: MIT).
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified
 
 * Tue Feb 01 2022 Alfredo Moralejo <amoralej@rechat.com> - 0.6.5-1
