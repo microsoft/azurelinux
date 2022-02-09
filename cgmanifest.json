@@ -11490,6 +11490,36 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "metal3-baremetal-operator",
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/metal3-io/baremetal-operator/archive/refs/tags/capm3-v0.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "metal3-cluster-api-provider-metal3",
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/metal3-io/cluster-api-provider-metal3/archive/refs/tags/v0.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "metal3-ip-address-manager",
+          "version": "0.0.4",
+          "downloadUrl": "https://github.com/metal3-io/ip-address-manager/archive/refs/tags/v0.0.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "metis",
           "version": "5.1.0",
           "downloadUrl": "http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz"
