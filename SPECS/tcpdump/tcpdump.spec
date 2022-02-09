@@ -1,7 +1,7 @@
 Summary:        Packet Analyzer
 Name:           tcpdump
 Version:        4.99.1
-Release:        1%{?dist}
+Release:        10000%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,10 +30,11 @@ mkdir -p %{buildroot}/%{_sbindir}
 mkdir -p %{buildroot}/%{_mandir}/man1
 
 chmod 755 %{buildroot}/%{_sbindir}
+chmod 755 %{buildroot}/%{_mandir}/man1
 
-install -m755 tcpdump %{buildroot}%{_sbindir}
+install -m755 tcpdump %{buildroot}%{_sbindir}/tcpdump
 install -m755 tcpdump %{buildroot}%{_sbindir}/tcpdump.%{version}
-install -m644 tcpdump.1 %{buildroot}%{_mandir}/man1/tcpdump.1
+install -m755 tcpdump.1 %{buildroot}%{_mandir}/man1/tcpdump.1
 
 find %{buildroot} -type f -name "*.la" -delete -print
 
