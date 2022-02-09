@@ -6,7 +6,7 @@ Distribution:   Mariner
 Summary: A high-performance CORBA Object Request Broker
 Name: ORBit2
 Version: 2.14.19
-Release: 24%{?dist}
+Release: 25%{?dist}
 #VCS: git:git://git.gnome.org/ORBit2
 Source: http://download.gnome.org/sources/ORBit2/2.14/%{name}-%{version}.tar.bz2
 License: LGPLv2+ and GPLv2+
@@ -47,7 +47,7 @@ Requires: glib2-devel >= %{glib2_version}
 Requires: pkgconfig
 # we install an automake macro
 Requires: automake
-Conflicts: ORBit-devel <= 1:0.5.8
+Conflicts: ORBit-devel <= 0.5.8
 
 %description devel
 ORBit is a high-performance CORBA (Common Object Request Broker
@@ -106,7 +106,8 @@ EOF
 %ldconfig_scriptlets
 
 %files
-%doc AUTHORS COPYING README TODO
+%license COPYING COPYING.LIB
+%doc AUTHORS README TODO
 %{_libdir}/*.so.*
 %dir %{_libdir}/orbit-2.0
 %{_libdir}/orbit-2.0/*.so*
@@ -127,6 +128,10 @@ EOF
 %{_datadir}/gtk-doc
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.14.19-25
+- Removing epoch.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.14.19-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

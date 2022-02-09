@@ -1,13 +1,13 @@
 Summary:        rcpsvc protocol.x files and headers
 Name:           rpcsvc-proto
-Version:        1.4
-Release:        4%{?dist}
-Source0:        https://github.com/thkukuk/rpcsvc-proto/releases/download/v1.4/rpcsvc-proto-1.4.tar.gz
-License:        LGPLv2+
-Group:          System Environment/Libraries
-URL:            https://github.com/thkukuk/rpcsvc-proto
+Version:        1.4.3
+Release:        1%{?dist}
+License:        BSD-3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Libraries
+URL:            https://github.com/thkukuk/rpcsvc-proto
+Source0:        https://github.com/thkukuk/rpcsvc-proto/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Provides:       rpcgen = %{version}-%{release}
 
 %description
@@ -16,9 +16,9 @@ formerly included with glibc, that are not included in replacement
 libtirpc-1.1.4, along with the rpcgen program.
 
 %package    devel
-Summary:    Development files for the rpcsvc library
-Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Summary:        Development files for the rpcsvc library
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 This package includes header files and libraries necessary for developing programs which use the rpcsvc library.
@@ -43,6 +43,10 @@ make install DESTDIR=%{buildroot}
 %{_includedir}/rpcsvc/*
 
 %changelog
+* Fri Feb 04 2022 Chris Co <chrco@microsoft.com> - 1.4.3-1
+- Update to 1.4.3
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.4-3
 - Added %%license line automatically
 

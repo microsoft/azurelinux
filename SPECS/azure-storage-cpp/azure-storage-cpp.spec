@@ -2,14 +2,13 @@
 
 Name:           azure-storage-cpp
 Summary:        Azure Storage Client Library for C++
-Version:        7.3.0
-Release:        2%{?dist}
+Version:        7.5.0
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://azure.github.io/azure-storage-cpp/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/Azure/azure-storage-cpp/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/azure-storage-cpp/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  util-linux-devel
 BuildRequires:  openssl-devel
@@ -64,6 +63,9 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} install
 %{_libdir}/libazurestorage.so
 
 %changelog
+*   Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> 7.5.0-1
+-   Upgrade to 7.5.0.
+
 *   Fri Oct 16 2020 Jonathan Slobodzian <joslobo@microsoft.com> 7.3.0-2
 -   License Verified.  Update Source0 Location.  Integrated into Mariner Core.
 

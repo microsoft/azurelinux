@@ -46,6 +46,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+ExclusiveArch:  x86_64
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
