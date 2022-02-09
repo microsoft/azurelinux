@@ -45,7 +45,7 @@ pip3 install mock wheel
 %{python3_sitelib}/*
 
 %changelog
-* Web Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 2.1.0-7
+* Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 2.1.0-7
 - Add an explicit BR on 'pip'
 - Install 'wheel' to enable ptest
 
