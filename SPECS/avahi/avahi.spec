@@ -3,7 +3,7 @@
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.7
-Release:        26%{?dist}
+Release:        27%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ BuildRequires:  libcap-devel
 BuildRequires:  libdaemon-devel >= 0.11
 BuildRequires:  libtool
 BuildRequires:  perl-XML-Parser
+BuildRequires:  perl(File::Find)
 BuildRequires:  pkg-config
 BuildRequires:  systemd
 BuildRequires:  xmltoman
@@ -400,6 +401,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 0.7-27
+- Add perl File::Find build requires to resolve build issue
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7-26
 - License verified
 - Lint spec
