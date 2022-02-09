@@ -2,7 +2,7 @@
 Summary:        Utility library for the Xfce4 desktop environment
 Name:           libxfce4util
 Version:        4.14.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ BuildRequires:  intltool
 BuildRequires:  pkg-config
 BuildRequires:  vala
 BuildRequires:  pkgconfig(glib-2.0) >= 2.24.0
+BuildRequires:  perl(File::Find)
 
 %description
 This package includes basic utility non-GUI functions for Xfce4.
@@ -67,6 +68,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_datadir}/gtk-doc/
 
 %changelog
+* Wed Feb 02 2022 Chris Co <chrco@microsoft.com> - 4.14.0-5
+- Add perl File::Find build requires to resolve build issue
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.0-4
 - License verified
 - Lint spec
