@@ -21914,8 +21914,8 @@
         "type": "other",
         "other": {
           "name": "pugixml",
-          "version": "1.10",
-          "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.10.tar.gz"
+          "version": "1.11.4",
+          "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.11.4.tar.gz"
         }
       }
     },
