@@ -3,7 +3,7 @@
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
 Version:        1.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ BuildRequires:  ipset
 BuildRequires:  iptables
 BuildRequires:  libxslt
 BuildRequires:  make
+BuildRequires:  perl(File::Find)
 BuildRequires:  python3-devel
 BuildRequires:  systemd-units
 
@@ -316,6 +317,9 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 1.0.3-2
+- Add perl File::Find build requires to resolve build issue
+
 * Fri Jan 21 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.0.3-1
 - Update to 1.0.3
 - Add firewalld-test subpackage
