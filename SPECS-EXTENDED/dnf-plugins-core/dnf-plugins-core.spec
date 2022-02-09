@@ -411,7 +411,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %endif
 
 %changelog
-* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 4.0.24-1
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com>  - 4.0.24-1
 - Upgrade to undeprecated python3-nose2
 - Update source to 4.0.24
 - License verified
