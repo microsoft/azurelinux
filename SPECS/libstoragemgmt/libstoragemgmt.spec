@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,7 +75,7 @@ Summary:        Files for SMI-S generic array support for %{name}
 BuildRequires:  python3-pywbem
 Requires:       python3-pywbem
 BuildArch:      noarch
-Provides:       %{name}-ibm-v7k-plugin = 2:%{version}-%{release}
+Provides:       %{name}-ibm-v7k-plugin = %{version}-%{release}
 Requires:       python3-%{name} = %{version}
 Requires(post): python3-%{name} = %{version}
 Requires(postun): python3-%{name} = %{version}
@@ -456,6 +456,9 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.3-3
+- Removing epoch.
+
 * Wed Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 1.9.3-2
 - Gracefully handle ptest failure instead of breaking the build
 

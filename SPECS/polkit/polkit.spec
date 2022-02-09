@@ -1,12 +1,13 @@
 Summary:           A toolkit for defining and handling authorizations.
 Name:              polkit
 Version:           0.119
-Release:           1%{?dist}
+Release:           2%{?dist}
 Group:             Applications/System
 Vendor:            Microsoft Corporation
 License:           GPLv2+
 URL:               https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html
 Source0:           https://www.freedesktop.org/software/polkit/releases/%{name}-%{version}.tar.gz
+Patch0:            CVE-2021-4034.patch
 Distribution:      Mariner
 BuildRequires:     autoconf
 BuildRequires:     expat-devel
@@ -38,7 +39,7 @@ Requires:          polkit = %{version}-%{release}
 header files and libraries for polkit
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
@@ -109,6 +110,9 @@ fi
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+*   Mon Feb 07 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.119-2
+-   Patch for CVE-2021-4034.
+
 *   Wed Nov 03 2021 Jon Slobodzian <joslobo@microsoft.com> - 0.119-1
 -   Bump to polkit 0.119.
 -   Switching a BR to CBL-Mariner's "mozjs" from "mozjs[version]".

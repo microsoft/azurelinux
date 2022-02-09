@@ -12,7 +12,7 @@
 
 Name:       quota
 Version:    4.05
-Release:    11%{?dist}
+Release:    12%{?dist}
 Summary:    System administration tools for monitoring users' disk usage
 # quota_nld.c, quotaio_xfs.h:       GPLv2
 # bylabel.c copied from util-linux: GPLv2+
@@ -167,7 +167,6 @@ Requires:   tcp_wrappers
 Requires(post):     systemd
 Requires(preun):    systemd
 Requires(postun):   systemd
-Conflicts:  quota < 1:4.02-3
 
 %description rpc
 The RPC daemon allows to query and set disk quotas over network. If you run
@@ -390,6 +389,10 @@ make check
 
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.05-12
+- Removing 'Conflicts' on an older package never present in CBL-Mariner.
+- License verified.
+
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 4.05-11
 - Remove epoch
 

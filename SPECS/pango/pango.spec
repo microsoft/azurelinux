@@ -1,13 +1,14 @@
 Summary:        library for laying out and rendering of text.
 Name:           pango
 Version:        1.44.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://pango.org
 Source0:        https://download.gnome.org/sources/pango/1.44/%{name}-%{version}.tar.xz
+Patch0:         0001-skip-tests-which-are-known-to-fail.patch
 BuildRequires:  cairo-devel
 BuildRequires:  fontconfig
 BuildRequires:  fontconfig-devel
@@ -33,7 +34,7 @@ Requires:   %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %meson
@@ -45,9 +46,7 @@ It contains the libraries and header files to create applications
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-# Skip test-layout test, which is known to fail
-sed -i 's|test-layout$(EXEEXT) test-font$(EXEEXT)|test-font$(EXEEXT)|g' tests/Makefile
-make -k check
+%meson_test
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -67,6 +66,11 @@ make -k check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Feb 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.44.7-3
+- Use 'meson test' instead of 'make check'
+- Introduce patch to skip tests that are known to fail
+- License verified
+
 * Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 1.44.7-2
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 1.40.4-5: Skip test-layout test.

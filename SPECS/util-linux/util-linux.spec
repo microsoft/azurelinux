@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,7 +20,7 @@ Requires:       %{name}-devel = %{version}-%{release}
 Conflicts:      toybox
 
 Provides:       %{name}-ng = %{version}-%{release}
-Provides:       hardlink = 1:1.3-9
+Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
 
 %description
@@ -123,6 +123,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37.2-2
+- Removing epoch
+
 * Tue Oct 12 2021 Andrew Phelps <anphel@microsoft.com> - 2.37.2-1
 - Update to version 2.37.2
 

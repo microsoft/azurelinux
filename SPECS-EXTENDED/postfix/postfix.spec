@@ -33,7 +33,7 @@
 %define postfix_shlib_dir	%{_libdir}/postfix
 %define postfix_command_dir	%{_sbindir}
 %define postfix_queue_dir	%{_var}/spool/postfix
-%define postfix_data_dir	%{_var}/lib/postfix
+%define postfix_data_dir	%{_sharedstatedir}/postfix
 %define postfix_doc_dir		%{?_pkgdocdir}%{!?_pkgdocdir:%{_docdir}/%{name}-%{version}}
 %define postfix_sample_dir	%{postfix_doc_dir}/samples
 %define postfix_readme_dir	%{postfix_doc_dir}/README_FILES
@@ -46,64 +46,61 @@
 %global __provides_exclude ^(%{_privatelibs})$
 %global __requires_exclude ^(%{_privatelibs})$
 
-Name: postfix
-Summary: Postfix Mail Transport Agent
-Version: 3.5.7
-Release: 4%{?dist}
-URL: http://www.postfix.org
-License: (IBM and GPLv2+) or (EPL-2.0 and GPLv2+)
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Requires(post): systemd hostname
-Requires(post): %{_sbindir}/alternatives
-Requires(post): %{_bindir}/openssl
-Requires(pre): %{_sbindir}/groupadd
-Requires(pre): %{_sbindir}/useradd
-Requires(preun): %{_sbindir}/alternatives
-Requires(preun): systemd
-Requires(postun): systemd
-# Required by /usr/libexec/postfix/postfix-script
-Requires: diffutils, findutils
-Provides: MTA smtpd smtpdaemon server(smtp)
-
-Source0: ftp://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
-Source1: postfix-etc-init.d-postfix
-Source2: postfix.service
-Source3: README-Postfix-SASL-RedHat.txt
-Source4: postfix.aliasesdb
-Source5: postfix-chroot-update
-
 # Sources 50-99 are upstream [patch] contributions
 
 %define pflogsumm_ver 1.1.5
 
+Summary:        Postfix Mail Transport Agent
+Name:           postfix
+Version:        3.7.0
+Release:        1%{?dist}
+License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.postfix.org
+Source0:        ftp://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
+Source1:        postfix-etc-init.d-postfix
+Source2:        postfix.service
+Source3:        README-Postfix-SASL-RedHat.txt
+Source4:        postfix.aliasesdb
+Source5:        postfix-chroot-update
 # Postfix Log Entry Summarizer: http://jimsun.linxnet.com/postfix_contrib.html
-Source53: http://jimsun.linxnet.com/downloads/pflogsumm-%{pflogsumm_ver}.tar.gz
-
+Source53:       http://jimsun.linxnet.com/downloads/pflogsumm-%{pflogsumm_ver}.tar.gz
 # Sources >= 100 are config files
-
-Source100: postfix-sasl.conf
-Source101: postfix-pam.conf
-
+Source100:      postfix-sasl.conf
+Source101:      postfix-pam.conf
 # Patches
-
-Patch1: postfix-3.5.0-config.patch
-Patch2: postfix-3.4.0-files.patch
-Patch3: postfix-3.3.3-alternatives.patch
-Patch4: postfix-3.4.0-large-fs.patch
-Patch9: pflogsumm-1.1.5-datecalc.patch
+Patch1:         postfix-3.5.0-config.patch
+Patch2:         postfix-3.4.0-files.patch
+Patch3:         postfix-3.3.3-alternatives.patch
+Patch4:         postfix-3.4.0-large-fs.patch
+Patch9:         pflogsumm-1.1.5-datecalc.patch
 # rhbz#1384871, sent upstream
-Patch10: pflogsumm-1.1.5-ipv6-warnings-fix.patch
-Patch11: postfix-3.4.4-chroot-example-fix.patch
+Patch10:        pflogsumm-1.1.5-ipv6-warnings-fix.patch
+Patch11:        postfix-3.4.4-chroot-example-fix.patch
+# upstream patch
+Patch12:        postfix-3.6.2-glibc-234-build-fix.patch
+# sent upstream
+Patch13:        postfix-3.6.2-whitespace-name-fix.patch
+# rhbz#1931403, sent upstream
+Patch14:        pflogsumm-1.1.5-syslog-name-underscore-fix.patch
 
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  libdb-devel
+BuildRequires:  libicu-devel
+BuildRequires:  libnsl2-devel
+BuildRequires:  m4
 # Optional patches - set the appropriate environment variables to include
 #                    them when building the package/spec file
 
 
 # Determine the different packages required for building postfix
-BuildRequires: libdb-devel, perl-generators, pkgconfig, zlib-devel
-BuildRequires: systemd-devel, icu-devel, libnsl2-devel
-BuildRequires: gcc, m4, findutils
+BuildRequires:  make
+BuildRequires:  perl-generators
+BuildRequires:  pkg-config
+BuildRequires:  systemd-units
+BuildRequires:  zlib-devel
 
 %{?with_ldap:BuildRequires: openldap-devel}
 %{?with_lmdb:BuildRequires: lmdb-devel}
@@ -115,19 +112,38 @@ BuildRequires: gcc, m4, findutils
 %{?with_cdb:BuildRequires: tinycdb-devel}
 %{?with_tls:BuildRequires: openssl-devel}
 
+# Required by /usr/libexec/postfix/postfix-script
+Requires:       diffutils
+Requires:       findutils
+# for restorecon
+Requires:       policycoreutils
+
+Requires(post): %{_bindir}/openssl
+Requires(post): %{_sbindir}/alternatives
+Requires(post): hostname
+Requires(post): systemd
+Requires(post): systemd-sysv
+Requires(postun): systemd
+Requires(pre):  %{_sbindir}/groupadd
+Requires(pre):  %{_sbindir}/useradd
+Requires(preun): %{_sbindir}/alternatives
+Requires(preun): systemd
+
+Provides:       MTA
+Provides:       smtpd
+Provides:       smtpdaemon
+Provides:       server(smtp)
+
 %description
 Postfix is a Mail Transport Agent (MTA).
 
 %package perl-scripts
-Summary: Postfix utilities written in perl
-Requires: %{name} = %{version}-%{release}
-Requires: perl(Date::Calc)
-# perl-scripts introduced in 2:2.5.5-2
-Obsoletes: postfix < 2.5.5-2
+Summary:        Postfix utilities written in perl
+Requires:       %{name} = %{version}-%{release}
 %if %{with pflogsumm}
-Provides: postfix-pflogsumm = %{version}-%{release}
-Obsoletes: postfix-pflogsumm < 2.5.5-2
+Provides:       postfix-pflogsumm = %{version}-%{release}
 %endif
+
 %description perl-scripts
 This package contains perl scripts pflogsumm and qshape.
 
@@ -141,8 +157,8 @@ qshape prints Postfix queue domain and age distribution.
 
 %if %{with mysql}
 %package mysql
-Summary: Postfix MySQL map support
-Requires: %{name} = %{version}-%{release}
+Summary:        Postfix MySQL map support
+Requires:       %{name} = %{version}-%{release}
 
 %description mysql
 This provides support for MySQL maps in Postfix. If you plan to use MySQL
@@ -151,8 +167,8 @@ maps with Postfix, you need this.
 
 %if %{with pgsql}
 %package pgsql
-Summary: Postfix PostgreSQL map support
-Requires: %{name} = %{version}-%{release}
+Summary:        Postfix PostgreSQL map support
+Requires:       %{name} = %{version}-%{release}
 
 %description pgsql
 This provides support for PostgreSQL  maps in Postfix. If you plan to use
@@ -161,8 +177,8 @@ PostgreSQL maps with Postfix, you need this.
 
 %if %{with sqlite}
 %package sqlite
-Summary: Postfix SQLite map support
-Requires: %{name} = %{version}-%{release}
+Summary:        Postfix SQLite map support
+Requires:       %{name} = %{version}-%{release}
 
 %description sqlite
 This provides support for SQLite maps in Postfix. If you plan to use SQLite
@@ -171,8 +187,8 @@ maps with Postfix, you need this.
 
 %if %{with cdb}
 %package cdb
-Summary: Postfix CDB map support
-Requires: %{name} = %{version}-%{release}
+Summary:        Postfix CDB map support
+Requires:       %{name} = %{version}-%{release}
 
 %description cdb
 This provides support for CDB maps in Postfix. If you plan to use CDB
@@ -181,8 +197,8 @@ maps with Postfix, you need this.
 
 %if %{with ldap}
 %package ldap
-Summary: Postfix LDAP map support
-Requires: %{name} = %{version}-%{release}
+Summary:        Postfix LDAP map support
+Requires:       %{name} = %{version}-%{release}
 
 %description ldap
 This provides support for LDAP maps in Postfix. If you plan to use LDAP
@@ -191,8 +207,8 @@ maps with Postfix, you need this.
 
 %if %{with lmdb}
 %package lmdb
-Summary: Postfix LDMB map support
-Requires: %{name} = %{version}-%{release}
+Summary:        Postfix LDMB map support
+Requires:       %{name} = %{version}-%{release}
 
 %description lmdb
 This provides support for LMDB maps in Postfix. If you plan to use LMDB
@@ -201,8 +217,8 @@ maps with Postfix, you need this.
 
 %if %{with pcre}
 %package pcre
-Summary: Postfix PCRE map support
-Requires: %{name} = %{version}-%{release}
+Summary:        Postfix PCRE map support
+Requires:       %{name} = %{version}-%{release}
 
 %description pcre
 This provides support for PCRE maps in Postfix. If you plan to use PCRE
@@ -230,6 +246,9 @@ pushd pflogsumm-%{pflogsumm_ver}
 popd
 %endif
 %patch11 -p1 -b .chroot-example-fix
+%patch12 -p1 -b .glibc-234-build-fix
+%patch13 -p1 -b .whitespace-name-fix
+%patch14 -p1 -b .pflogsumm-1.1.5-syslog-name-underscore-fix
 
 for f in README_FILES/TLS_{LEGACY_,}README TLS_ACKNOWLEDGEMENTS; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
@@ -237,6 +256,7 @@ for f in README_FILES/TLS_{LEGACY_,}README TLS_ACKNOWLEDGEMENTS; do
 done
 
 %build
+%set_build_flags
 unset AUXLIBS AUXLIBS_LDAP AUXLIBS_LMDB AUXLIBS_PCRE AUXLIBS_MYSQL AUXLIBS_PGSQL AUXLIBS_SQLITE AUXLIBS_CDB
 CCARGS="-fPIC -fcommon"
 AUXLIBS="-lnsl"
@@ -295,7 +315,7 @@ CCARGS="${CCARGS} -fsigned-char"
 CCARGS="${CCARGS} -DDEF_CONFIG_DIR=\\\"%{postfix_config_dir}\\\""
 CCARGS="${CCARGS} $(getconf LFS_CFLAGS)"
 
-LDFLAGS="%{?__global_ldflags} %{?_hardened_build:-Wl,-z,relro,-z,now}"
+LDFLAGS="$LDFLAGS %{?_hardened_build:-Wl,-z,relro,-z,now}"
 
 # SHLIB_RPATH is needed to find private libraries
 # LDFLAGS are added to SHLIB_RPATH because the postfix build system
@@ -308,7 +328,7 @@ make -f Makefile.init makefiles shared=yes dynamicmaps=yes \
   AUXLIBS_PGSQL="${AUXLIBS_PGSQL}" AUXLIBS_SQLITE="${AUXLIBS_SQLITE}" \
   AUXLIBS_CDB="${AUXLIBS_CDB}" \
   DEBUG="" SHLIB_RPATH="-Wl,-rpath,%{postfix_shlib_dir} $LDFLAGS" \
-  OPT="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-comment" \
+  OPT="$CFLAGS -fno-strict-aliasing -Wno-comment" \
   POSTFIX_INSTALL_OPTS=-keep-build-mtime
 
 %make_build
@@ -324,7 +344,7 @@ for i in man1/mailq.1 man1/newaliases.1 man1/sendmail.1 man5/aliases.5 man8/smtp
 done
 
 make non-interactive-package \
-       install_root=$RPM_BUILD_ROOT \
+       install_root=%{buildroot} \
        config_directory=%{postfix_config_dir} \
        meta_directory=%{postfix_config_dir} \
        shlib_directory=%{postfix_shlib_dir} \
@@ -347,74 +367,74 @@ install -m 644 %{SOURCE2} %{buildroot}%{_unitdir}
 install -m 755 %{SOURCE4} %{buildroot}%{postfix_daemon_dir}/aliasesdb
 install -m 755 %{SOURCE5} %{buildroot}%{postfix_daemon_dir}/chroot-update
 
-install -c auxiliary/rmail/rmail $RPM_BUILD_ROOT%{_bindir}/rmail.postfix
+install -c auxiliary/rmail/rmail %{buildroot}%{_bindir}/rmail.postfix
 
 for i in active bounce corrupt defer deferred flush incoming private saved maildrop public pid saved trace; do
-    mkdir -p $RPM_BUILD_ROOT%{postfix_queue_dir}/$i
+    mkdir -p %{buildroot}%{postfix_queue_dir}/$i
 done
 
 # install performance benchmark and test tools by hand
 for i in smtp-sink smtp-source posttls-finger ; do
-  install -c -m 755 bin/$i $RPM_BUILD_ROOT%{postfix_command_dir}/
-  install -c -m 755 man/man1/$i.1 $RPM_BUILD_ROOT%{_mandir}/man1/
+  install -c -m 755 bin/$i %{buildroot}%{postfix_command_dir}/
+  install -c -m 755 man/man1/$i.1 %{buildroot}%{_mandir}/man1/
 done
 
 ## RPM compresses man pages automatically.
 ## - Edit postfix-files to reflect this, so post-install won't get confused
 ##   when called during package installation.
-sed -i -r "s#(/man[158]/.*.[158]):f#\1.gz:f#" $RPM_BUILD_ROOT%{postfix_config_dir}/postfix-files
+sed -i -r "s#(/man[158]/.*.[158]):f#\1.gz:f#" %{buildroot}%{postfix_config_dir}/postfix-files
 
-cat $RPM_BUILD_ROOT%{postfix_config_dir}/postfix-files
+cat %{buildroot}%{postfix_config_dir}/postfix-files
 %if %{with sasl}
 # Install the smtpd.conf file for SASL support.
-mkdir -p $RPM_BUILD_ROOT%{sasl_config_dir}
-install -m 644 %{SOURCE100} $RPM_BUILD_ROOT%{sasl_config_dir}/smtpd.conf
+mkdir -p %{buildroot}%{sasl_config_dir}
+install -m 644 %{SOURCE100} %{buildroot}%{sasl_config_dir}/smtpd.conf
 %endif
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pam.d
-install -m 644 %{SOURCE101} $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/smtp.postfix
+mkdir -p %{buildroot}%{_sysconfdir}/pam.d
+install -m 644 %{SOURCE101} %{buildroot}%{_sysconfdir}/pam.d/smtp.postfix
 
 # prepare documentation
-mkdir -p $RPM_BUILD_ROOT%{postfix_doc_dir}
-cp -p %{SOURCE3} COMPATIBILITY TLS_ACKNOWLEDGEMENTS $RPM_BUILD_ROOT%{postfix_doc_dir}
+mkdir -p %{buildroot}%{postfix_doc_dir}
+cp -p %{SOURCE3} COMPATIBILITY LICENSE TLS_ACKNOWLEDGEMENTS TLS_LICENSE %{buildroot}%{postfix_doc_dir}
 
-mkdir -p $RPM_BUILD_ROOT%{postfix_doc_dir}/examples{,/chroot-setup}
-cp -pr examples/{qmail-local,smtpd-policy} $RPM_BUILD_ROOT%{postfix_doc_dir}/examples
-cp -p examples/chroot-setup/LINUX2 $RPM_BUILD_ROOT%{postfix_doc_dir}/examples/chroot-setup
+mkdir -p %{buildroot}%{postfix_doc_dir}/examples{,/chroot-setup}
+cp -pr examples/{qmail-local,smtpd-policy} %{buildroot}%{postfix_doc_dir}/examples
+cp -p examples/chroot-setup/LINUX2 %{buildroot}%{postfix_doc_dir}/examples/chroot-setup
 
-cp conf/{main,bounce}.cf.default $RPM_BUILD_ROOT%{postfix_doc_dir}
-sed -i 's#%{postfix_config_dir}\(/bounce\.cf\.default\)#%{postfix_doc_dir}\1#' $RPM_BUILD_ROOT%{_mandir}/man5/bounce.5
-rm -f $RPM_BUILD_ROOT%{postfix_config_dir}/{TLS_,}LICENSE
+cp conf/{main,bounce}.cf.default %{buildroot}%{postfix_doc_dir}
+sed -i 's#%{postfix_config_dir}\(/bounce\.cf\.default\)#%{postfix_doc_dir}\1#' %{buildroot}%{_mandir}/man5/bounce.5
+rm -f %{buildroot}%{postfix_config_dir}/{TLS_,}LICENSE
 
-find $RPM_BUILD_ROOT%{postfix_doc_dir} -type f | xargs chmod 644
-find $RPM_BUILD_ROOT%{postfix_doc_dir} -type d | xargs chmod 755
+find %{buildroot}%{postfix_doc_dir} -type f | xargs chmod 644
+find %{buildroot}%{postfix_doc_dir} -type d | xargs chmod 755
 
 %if %{with pflogsumm}
-install -c -m 644 pflogsumm-%{pflogsumm_ver}/pflogsumm-faq.txt $RPM_BUILD_ROOT%{postfix_doc_dir}/pflogsumm-faq.txt
-install -c -m 644 pflogsumm-%{pflogsumm_ver}/pflogsumm.1 $RPM_BUILD_ROOT%{_mandir}/man1/pflogsumm.1
-install -c pflogsumm-%{pflogsumm_ver}/pflogsumm.pl $RPM_BUILD_ROOT%{postfix_command_dir}/pflogsumm
+install -c -m 644 pflogsumm-%{pflogsumm_ver}/pflogsumm-faq.txt %{buildroot}%{postfix_doc_dir}/pflogsumm-faq.txt
+install -c -m 644 pflogsumm-%{pflogsumm_ver}/pflogsumm.1 %{buildroot}%{_mandir}/man1/pflogsumm.1
+install -c pflogsumm-%{pflogsumm_ver}/pflogsumm.pl %{buildroot}%{postfix_command_dir}/pflogsumm
 %endif
 
 # install qshape
 mantools/srctoman - auxiliary/qshape/qshape.pl > qshape.1
-install -c qshape.1 $RPM_BUILD_ROOT%{_mandir}/man1/qshape.1
-install -c auxiliary/qshape/qshape.pl $RPM_BUILD_ROOT%{postfix_command_dir}/qshape
+install -c qshape.1 %{buildroot}%{_mandir}/man1/qshape.1
+install -c auxiliary/qshape/qshape.pl %{buildroot}%{postfix_command_dir}/qshape
 
 # remove alias file
-rm -f $RPM_BUILD_ROOT%{postfix_config_dir}/aliases
+rm -f %{buildroot}%{postfix_config_dir}/aliases
 
 # create /usr/lib/sendmail
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib
-pushd $RPM_BUILD_ROOT%{_prefix}/lib
+mkdir -p %{buildroot}%{_libdir}
+pushd %{buildroot}%{_libdir}
 ln -sf ../sbin/sendmail.postfix .
 popd
 
-mkdir -p $RPM_BUILD_ROOT%{_var}/lib/misc
-touch $RPM_BUILD_ROOT%{_var}/lib/misc/postfix.aliasesdb-stamp
+mkdir -p %{buildroot}%{_sharedstatedir}/misc
+touch %{buildroot}%{_sharedstatedir}/misc/postfix.aliasesdb-stamp
 
 # prepare alternatives ghosts
 for i in %{postfix_command_dir}/sendmail %{_bindir}/{mailq,newaliases,rmail} \
-	%{_sysconfdir}/pam.d/smtp %{_prefix}/lib/sendmail \
+	%{_sysconfdir}/pam.d/smtp %{_libdir}/sendmail \
 	%{_mandir}/{man1/{mailq.1,newaliases.1},man5/aliases.5,man8/{sendmail.8,smtpd.8}}
 do
 	touch $RPM_BUILD_ROOT$i
@@ -429,7 +449,7 @@ function split_file
 }
 
 # split global dynamic maps configuration to individual sub-packages
-pushd $RPM_BUILD_ROOT%{postfix_config_dir}
+pushd %{buildroot}%{postfix_config_dir}
 for map in %{?with_mysql:mysql} %{?with_pgsql:pgsql} %{?with_sqlite:sqlite} \
 %{?with_cdb:cdb} %{?with_ldap:ldap} %{?with_lmdb:lmdb} %{?with_pcre:pcre}; do
   rm -f dynamicmaps.cf.d/"$map" "postfix-files.d/$map"
@@ -467,7 +487,7 @@ ALTERNATIVES_DOCS=""
 	--slave %{_bindir}/newaliases mta-newaliases %{_bindir}/newaliases.postfix \
 	--slave %{_sysconfdir}/pam.d/smtp mta-pam %{_sysconfdir}/pam.d/smtp.postfix \
 	--slave %{_bindir}/rmail mta-rmail %{_bindir}/rmail.postfix \
-	--slave %{_prefix}/lib/sendmail mta-sendmail %{_prefix}/lib/sendmail.postfix \
+	--slave %{_libdir}/sendmail mta-sendmail %{_libdir}/sendmail.postfix \
 	$ALTERNATIVES_DOCS \
 	--initscript postfix
 
@@ -482,7 +502,7 @@ fi
 # Create self-signed SSL certificate
 if [ ! -f %{sslkey} ]; then
   umask 077
-  %{_bindir}/openssl genrsa 4096 > %{sslkey} 2> /dev/null
+  %{_bindir}/openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out %{sslkey} 2>/dev/null || echo "openssl genpkey failed"
 fi
 
 if [ ! -f %{sslcert} ]; then
@@ -491,8 +511,10 @@ if [ ! -f %{sslcert} ]; then
     FQDN=localhost.localdomain
   fi
 
-  %{_bindir}/openssl req -new -key %{sslkey} -x509 -sha256 -days 365 -set_serial $RANDOM -out %{sslcert} \
-    -subj "/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=${FQDN}/emailAddress=root@${FQDN}"
+  req_cmd="%{_bindir}/openssl req -new -key %{sslkey} -x509 -sha256 -days 365 -set_serial $RANDOM -out %{sslcert} \
+    -subj /C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=${FQDN}/emailAddress=root@${FQDN}"
+# openssl-3.0 and fallback for backward compatibility with openssl < 3.0
+  $req_cmd -noenc -copy_extensions none 2>/dev/null || $req_cmd 2>/dev/null || echo "openssl req failed"
   chmod 644 %{sslcert}
 fi
 
@@ -503,7 +525,7 @@ exit 0
 %{_sbindir}/groupadd -g %{maildrop_gid} -r %{maildrop_group} 2>/dev/null
 %{_sbindir}/groupadd -g %{postfix_gid} -r %{postfix_group} 2>/dev/null
 %{_sbindir}/groupadd -g 12 -r mail 2>/dev/null
-%{_sbindir}/useradd -d %{postfix_queue_dir} -s /usr/sbin/nologin -g %{postfix_group} -G mail -M -r -u %{postfix_uid} %{postfix_user} 2>/dev/null
+%{_sbindir}/useradd -d %{postfix_queue_dir} -s %{_sbindir}/nologin -g %{postfix_group} -G mail -M -r -u %{postfix_uid} %{postfix_user} 2>/dev/null
 
 # hack, to turn man8/smtpd.8.gz into alternatives symlink (part of the rhbz#1051180 fix)
 # this could be probably dropped in f23+
@@ -529,9 +551,6 @@ exit 0
 %{_bindir}/systemd-sysv-convert --apply postfix >/dev/null 2>&1 ||:
 /sbin/chkconfig --del postfix >/dev/null 2>&1 || :
 /bin/systemctl try-restart postfix.service >/dev/null 2>&1 || :
-
-
-
 
 %files
 
@@ -652,7 +671,7 @@ exit 0
 %{_bindir}/newaliases.postfix
 %attr(0755, root, root) %{_bindir}/rmail.postfix
 %attr(0755, root, root) %{_sbindir}/sendmail.postfix
-%{_prefix}/lib/sendmail.postfix
+%{_libdir}/sendmail.postfix
 
 %ghost %{_sysconfdir}/pam.d/smtp
 
@@ -666,9 +685,9 @@ exit 0
 %ghost %attr(0755, root, root) %{_bindir}/newaliases
 %ghost %attr(0755, root, root) %{_bindir}/rmail
 %ghost %attr(0755, root, root) %{_sbindir}/sendmail
-%ghost %attr(0755, root, root) %{_prefix}/lib/sendmail
+%ghost %attr(0755, root, root) %{_libdir}/sendmail
 
-%ghost %attr(0644, root, root) %{_var}/lib/misc/postfix.aliasesdb-stamp
+%ghost %attr(0644, root, root) %{_sharedstatedir}/misc/postfix.aliasesdb-stamp
 
 %files perl-scripts
 %attr(0755, root, root) %{postfix_command_dir}/qshape
@@ -743,6 +762,10 @@ exit 0
 %endif
 
 %changelog
+* Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-1
+- Updating to version 3.7.0.
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.5.7-4
 - Remove epoch
 
@@ -1612,7 +1635,7 @@ exit 0
 
 * Sat Dec 13 2003 Jeff Johnson <jbj@jbj.org> 2:2.0.16-2
 - rebuild against db-4.2.52.
- 
+
 * Mon Nov 17 2003 John Dennis <jdennis@finch.boston.redhat.com> 2:2.0.16-1
 - sync up with current upstream release, 2.0.16, fixes bug #108960
 
@@ -1777,4 +1800,3 @@ exit 0
   - Remove some hacks to support building on all sorts of distributions at
     the cost of specfile readability
   - Remove postdrop group on deletion
-
