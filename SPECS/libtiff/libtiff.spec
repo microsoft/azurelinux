@@ -27,17 +27,13 @@ Requires:       libjpeg-turbo-devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q -n libtiff-v%{version}
-
-libtoolize --force --copy
-aclocal -I ./m4
-autoheader
-automake --foreign --add-missing --copy
-autoconf
+%autosetup -n libtiff-v%{version}
 
 %build
-%configure \
-    --disable-static
+export CFLAGS="%{optflags} -fno-strict-aliasing"
+sed -i "s/for file.*/for false/g" autogen.sh
+./autogen.sh
+%configure --disable-static
 make %{?_smp_mflags}
 
 %install
@@ -70,7 +66,7 @@ make %{?_smp_mflags} -k check
 - Upgrade to 4.3.0
 - Remove patches that no longer apply
 - Add autoconf, libtool, automake as BR
-- Remove calling autogen script
+- Use autosetup and modify build steps
 - License Verified
 
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.1.0-3
