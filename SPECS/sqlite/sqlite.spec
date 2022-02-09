@@ -1,8 +1,8 @@
-%define sourcever 3340100
+%define sourcever 3360000
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
-Version:        3.34.1
-Release:        2%{?dist}
+Version:        3.36.0
+Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -82,6 +82,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.36.0-1
+- Update to version 3.36.0.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.34.1-2
 - Removing the explicit %%clean stage.
 - License verified.

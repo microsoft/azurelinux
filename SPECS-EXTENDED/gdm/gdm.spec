@@ -11,10 +11,10 @@ Distribution:   Mariner
 
 Name: gdm
 Version: 3.36.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: The GNOME Display Manager
 
-License: GPLv2+
+License: GPLv2
 URL: https://wiki.gnome.org/Projects/GDM
 Source0: http://download.gnome.org/sources/gdm/3.36/gdm-%{version}.tar.xz
 Source1: org.gnome.login-screen.gschema.override
@@ -84,20 +84,15 @@ Requires: xorg-x11-xinit
 # use a user bus
 Requires: /usr/bin/dbus-run-session
 
-Obsoletes: gdm-libs < 1:3.12.0-3
 Provides: gdm-libs%{?_isa} = %{version}-%{release}
 
-# Swallow up old fingerprint/smartcard plugins
-Obsoletes: gdm-plugin-smartcard < 1:3.2.1
 Provides: gdm-plugin-smartcard = %{version}-%{release}
 
-Obsoletes: gdm-plugin-fingerprint < 1:3.2.1
 Provides: gdm-plugin-fingerprint = %{version}-%{release}
 
 # moved here from pulseaudio-gdm-hooks-11.1-16
 Source5:   default.pa-for-gdm
-Obsoletes: pulseaudio-gdm-hooks < 1:11.1-17
-Provides:  pulseaudio-gdm-hooks = 1:%{version}-%{release}
+Provides:  pulseaudio-gdm-hooks = %{version}-%{release}
 
 %description
 GDM, the GNOME Display Manager, handles authentication-related backend
@@ -317,6 +312,10 @@ fi
 %{_libdir}/pkgconfig/gdm-pam-extensions.pc
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.4-5
+- Remove epoch harder.
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.36.4-4
 - Remove epoch
 
