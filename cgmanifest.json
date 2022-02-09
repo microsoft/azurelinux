@@ -22284,8 +22284,8 @@
         "type": "other",
         "other": {
           "name": "python-botocore",
-          "version": "1.13.21",
-          "downloadUrl": "https://github.com/boto/botocore/archive/1.13.21.tar.gz"
+          "version": "1.23.52",
+          "downloadUrl": "https://github.com/boto/botocore/archive/refs/tags/1.23.52.tar.gz"
         }
       }
     },
