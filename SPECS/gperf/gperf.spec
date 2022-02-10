@@ -1,11 +1,10 @@
-Summary:	Gperf-3.0.4
+Summary:	Gperf
 Name:		gperf
 Version:	3.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:	GPLv3+
 URL:		http://freedesktop.org/wiki/Software/%{name}l/
 Source0:	http://ftp.gnu.org/gnu/gperf/%{name}-%{version}.tar.gz
-%define sha1 gperf=e3c0618c2d2e5586eda9498c867d5e4858a3b0e2
 Group:		Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,14 +42,21 @@ make %{?_smp_mflags} check
 %{_bindir}/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.1-4
+- Remove unused `%%define sha1` lines
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.1-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*	Thu Apr 13 2017 Danut Moraru <dmoraru@vmware.com> 3.1-1
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 3.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+*	Thu Apr 13 2017 Danut Moraru <dmoraru@vmware.com> - 3.1-1
 -	Updated to version 3.1
-*	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.0.4-2
+
+*	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 3.0.4-2
 -	GA - Bump release of all rpms
-*	Thu Oct 23 2014 Divya Thaluru <dthaluru@vmware.com> 3.0.4-1
+
+*	Thu Oct 23 2014 Divya Thaluru <dthaluru@vmware.com> - 3.0.4-1
 -	Initial build. First version

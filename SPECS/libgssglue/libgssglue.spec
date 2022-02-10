@@ -1,14 +1,13 @@
 Summary:        This library exports a gssapi interface
 Name:           libgssglue
 Version:        0.4
-Release:        5%{?dist}
-License:        BSD
+Release:        6%{?dist}
+License:        BSD and MIT
 URL:            http://www.citi.umich.edu/projects/nfsv4/linux/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.citi.umich.edu/projects/nfsv4/linux/libgssglue/%{name}-%{version}.tar.gz
-%define sha1    libgssglue=a8edc4f6a1d4dcd80ad52d18226fc65fa8850af1
 
 %description
 This library exports a gssapi interface, but doesn't implement any gssapi mechanisms itself; instead it calls gssapi routines in other libraries, depending on the mechanism.
@@ -44,14 +43,21 @@ find %{buildroot}/%{_libdir} -name '*.la' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.4-6
+- Remove unused `%%define sha1` lines
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.4-5
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.4-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Thu Oct 25 2018 Ajay Kaher <akaher@vmware.com> 0.4-3
--   Corrected spec file name
-*   Thu Jul 26 2018 Ajay Kaher <akaher@vmware.com> 0.4-2
--   Resolved compilation error for aarch64
-*   Mon Jan 22 2018 Xiaolin Li <xiaolinl@vmware.com> 0.4-1
--   Initial build. First version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 0.4-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Thu Oct 25 2018 Ajay Kaher <akaher@vmware.com> - 0.4-3
+- Corrected spec file name
+
+* Thu Jul 26 2018 Ajay Kaher <akaher@vmware.com> - 0.4-2
+- Resolved compilation error for aarch64
+
+* Mon Jan 22 2018 Xiaolin Li <xiaolinl@vmware.com> - 0.4-1
+- Initial build. First version

@@ -1,14 +1,13 @@
 Summary:        A set of I2C tools for Linux Kernel
 Name:           i2c-tools
 Version:        4.1
-Release:        3%{?dist}
-License:        LGPL-2.1+
+Release:        4%{?dist}
+License:        LGPLv2+ and GPLv2+
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            https://i2c.wiki.kernel.org/index.php/I2C_Tools
 Source0:        https://www.kernel.org/pub/software/utils/i2c-tools/%{name}-%{version}.tar.xz
-%define sha1 %{name}-%{version}=d383d1ae86bd695b505dd1251ac399e3cdc1b05f
 
 %description
 This package contains a heterogeneous set of I2C tools for Linux Kernelas well as an I2C library.
@@ -36,7 +35,7 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
 
 %files
 %defattr(-, root, root)
-%license COPYING
+%license COPYING COPYING.LGPL
 %{_bindir}/*
 %{_sbindir}/*
 %{_libdir}/libi2c.so.0*
@@ -50,10 +49,15 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
 %{_libdir}/libi2c.so
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.1-4
+- Remove unused `%%define sha1` lines
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.1-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.1-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed Feb 27 2019 Ankit Jain <ankitja@vmware.com> 4.1-1
--   Initial version
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 4.1-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed Feb 27 2019 Ankit Jain <ankitja@vmware.com> - 4.1-1
+- Initial version
