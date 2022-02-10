@@ -1,8 +1,7 @@
+Summary:    Mock core config files basic chroots
 Name:       mock-core-configs
 Version:    36.4
 Release:    1%{?dist}
-Summary:    Mock core config files basic chroots
-
 License:    GPLv2+
 URL:        https://github.com/rpm-software-management/mock/
 # Source is created by
@@ -11,19 +10,16 @@ URL:        https://github.com/rpm-software-management/mock/
 # git reset --hard %%{name}-%%{version}
 # tito build --tgz
 Source:     https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-BuildArch:  noarch
-
-# The mock.rpm requires this.  Other packages may provide this if they tend to
-# replace the mock-core-configs.rpm functionality.
-Provides: mock-configs
-
 # distribution-gpg-keys contains GPG keys used by mock configs
 Requires:   distribution-gpg-keys >= 1.59
 # specify minimal compatible version of mock
 Requires:   mock >= 2.5
 Requires:   mock-filesystem
-
 Requires(post): coreutils
+# The mock.rpm requires this.  Other packages may provide this if they tend to
+# replace the mock-core-configs.rpm functionality.
+Provides: mock-configs
+BuildArch:  noarch
 
 %description
 Config files which allow you to create chroots for:
@@ -66,12 +62,12 @@ fi
 # reference valid mock.rpm's docdir with example site-defaults.cfg
 mock_docs=%{_pkgdocdir}
 mock_docs=${mock_docs//mock-core-configs/mock}
-mock_docs=${mock_docs//-%version/-*}
+mock_docs=${mock_docs//-%{version}/-*}
 sed -i "s~@MOCK_DOCS@~$mock_docs~" %{buildroot}%{_sysconfdir}/mock/site-defaults.cfg
 
 %post
-if [ -s /etc/os-release ]; then
-    ver=$(source /etc/os-release && echo $VERSION_ID | cut -d. -f1 | grep -o '[0-9]\+')
+if [ -s %{_sysconfdir}/os-release ]; then
+    ver=$(source %{_sysconfdir}/os-release && echo $VERSION_ID | cut -d. -f1 | grep -o '[0-9]\+')
 fi
 mock_arch=$(python -c "import rpmUtils.arch; baseArch = rpmUtils.arch.getBaseArch(); print baseArch")
 cfg=%{?fedora:fedora}%{?rhel:epel}%{?mageia:mageia}-$ver-${mock_arch}.cfg
@@ -85,13 +81,12 @@ else
 fi
 :
 
-
 %files -f %{name}.cfgs
 %license COPYING
 %ghost %config(noreplace,missingok) %{_sysconfdir}/mock/default.cfg
 
 %changelog
-* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 36.4-1
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 36.4-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update to 36.4 source
 - License verified
@@ -425,5 +420,3 @@ fi
 
 * Thu Sep 07 2017 Miroslav Suchý <msuchy@redhat.com> 27.1-1
 - Split from Mock package.
-
-

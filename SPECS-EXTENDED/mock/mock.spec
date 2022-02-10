@@ -1,86 +1,85 @@
 %bcond_without tests
-
 # mock group id allocate (Must not overlap with any other gid in Mariner)
 %global mockgid 135
-
+%global __python %{__python3}
 %global python_sitelib %{python3_sitelib}
 
-Summary: Builds packages inside chroots
-Name: mock
-Version: 2.16
-Release: 1%{?dist}
-License: GPLv2+
+Summary:        Builds packages inside chroots
+Name:           mock
+Version:        2.15
+Release:        2%{?dist}
+License:        GPLv2+
 # Source is created by
 # git clone https://github.com/rpm-software-management/mock.git
 # cd mock
 # git reset --hard %%{name}-%%{version}
 # tito build --tgz
-Source: https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-URL: https://github.com/rpm-software-management/mock/
-BuildArch: noarch
-Requires: tar
-Requires: pigz
-Requires: usermode
-Requires: createrepo_c
-Requires: mock-configs
-Requires: %{name}-filesystem
-Requires: systemd
-Requires: coreutils
-BuildRequires: bash-completion
-Requires: python3-distro
-Requires: python3-jinja2
-Requires: python3-requests
-Requires: python3-rpm
-Requires: python3-pyroute2
-Requires: python3-templated-dictionary
-BuildRequires: python3-devel
-Requires: dnf
-Suggests: yum
-Requires: dnf-plugins-core
-Recommends: btrfs-progs
-Recommends: dnf-utils
-Suggests: qemu-user-static
-Suggests: procenv
-Suggests: podman
-
-%if %{with tests}
-BuildRequires: python3-distro
-BuildRequires: python3-jinja2
-BuildRequires: python3-pyroute2
-BuildRequires: python3-pytest
-BuildRequires: python3-pytest-cov
-BuildRequires: python3-requests
-BuildRequires: python3-templated-dictionary
-%endif
-
-BuildRequires: perl
+URL:            https://github.com/rpm-software-management/mock/
+Source:         https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  bash-completion
+BuildRequires:  perl
+BuildRequires:  python3-devel
+Requires:       %{name}-filesystem
+Requires:       coreutils
+Requires:       createrepo_c
+Requires:       dnf
+Requires:       dnf-plugins-core
+Requires:       mock-configs
+Requires:       pigz
+Requires:       procps-ng
+Requires:       python3-distro
+Requires:       python3-jinja2
+Requires:       python3-pyroute2
+Requires:       python3-requests
+Requires:       python3-rpm
+Requires:       python3-templated-dictionary
+Requires:       systemd
+Requires:       tar
+Requires:       usermode
 # hwinfo plugin
-Requires: util-linux
-Requires: coreutils
-Requires: procps-ng
-
+Requires:       util-linux
+BuildArch:      noarch
+%if %{with tests}
+BuildRequires:  python3-distro
+BuildRequires:  python3-jinja2
+BuildRequires:  python3-pyroute2
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-requests
+BuildRequires:  python3-templated-dictionary
+BuildRequires:  python3-distro
+BuildRequires:  python3-jinja2
+BuildRequires:  python3-pyroute2
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-requests
+BuildRequires:  python3-templated-dictionary
+%endif
 
 %description
 Mock takes an SRPM and builds it in a chroot.
 
 %package lvm
-Summary: LVM plugin for mock
-Requires: %{name} = %{version}-%{release}
-Requires: lvm2
+Summary:        LVM plugin for mock
+Requires:       %{name} = %{version}-%{release}
+Requires:       lvm2
 
 %description lvm
 Mock plugin that enables using LVM as a backend and support creating snapshots
 of the buildroot.
 
 %package filesystem
-Summary:  Mock filesystem layout
+Summary:        Mock filesystem layout
 Requires(pre):  shadow-utils
 
 %description filesystem
 Filesystem layout and group for Mock.
 
 %prep
-%setup -q -n mock-%{name}-%{version}-1/mock
+%setup -q
+for file in py/mock.py py/mock-parse-buildlog.py; do
+  sed -i 1"s|#!/usr/bin/python3 |#!%{__python} |" $file
+done
 
 %build
 for i in py/mock.py py/mock-parse-buildlog.py; do
@@ -136,12 +135,12 @@ install -d %{buildroot}/var/cache/mock
 mkdir -p %{buildroot}%{_pkgdocdir}
 install -p -m 0644 docs/site-defaults.cfg %{buildroot}%{_pkgdocdir}
 
-sed -i 's/^_MOCK_NVR = None$/_MOCK_NVR = "%name-%version-%release"/' \
+sed -i 's/^_MOCK_NVR = None$/_MOCK_NVR = "%{name}-%{version}-%{release}"/' \
     %{buildroot}%{_libexecdir}/mock/mock
 
 %pre filesystem
 # check for existence of mock group, create it if not found
-getent group mock > /dev/null || groupadd -f -g %mockgid -r mock
+getent group mock > /dev/null || groupadd -f -g %{mockgid} -r mock
 exit 0
 
 %check
@@ -203,10 +202,8 @@ exit 0
 %dir  %{_datadir}/cheat
 
 %changelog
-* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 2.16-1
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
-- Update to 2.16 source
-- License verified
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.15-2
+- Initial CBL-Mariner import from Fedora 33 (license: GPLv2)
 
 * Thu Nov 18 2021 Pavel Raiskup <praiskup@redhat.com> 2.15-1
 - argparse: handle old-style commands *before* ignoring "--" (awilliam@redhat.com)

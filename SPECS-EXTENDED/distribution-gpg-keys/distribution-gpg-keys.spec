@@ -1,8 +1,7 @@
+Summary:	GPG keys of various Linux distributions
 Name:		distribution-gpg-keys
 Version:	1.60
 Release:	2%{?dist}
-Summary:	GPG keys of various Linux distributions
-
 License:	CC0
 URL:		https://github.com/xsuchy/distribution-gpg-keys
 # Sources can be obtained by
@@ -16,8 +15,8 @@ BuildArch:	noarch
 GPG keys used by various Linux distributions to sign packages.
 
 %package copr
-Summary: GPG keys for Copr projects
-BuildArch: noarch
+Summary:    GPG keys for Copr projects
+BuildArch:  noarch
 
 %description copr
 GPG keys used by Copr projects.
@@ -46,7 +45,7 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 %{_datadir}/%{name}/copr
 
 %changelog
-* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 1.60-2
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.60-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 
@@ -335,6 +334,3 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 
 * Thu Oct 15 2015 Miroslav Suchý <msuchy@redhat.com> 1.1-1
 - initial package
-
-
-

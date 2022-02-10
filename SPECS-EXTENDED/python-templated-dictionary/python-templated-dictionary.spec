@@ -1,48 +1,40 @@
 %global srcname templated-dictionary
 %global python3_pkgversion 3
 
-Name:       python-%{srcname}
-Version:    1.1
-Release:    5%{?dist}
-Summary:    Dictionary with Jinja2 expansion
-
-License:    GPLv2+
-URL:        https://github.com/xsuchy/templated-dictionary
-
+Summary:        Dictionary with Jinja2 expansion
+Name:           python-%{srcname}
+Version:        1.1
+Release:        5%{?dist}
+License:        GPLv2+
+URL:            https://github.com/xsuchy/templated-dictionary
 # Source is created by:
 # git clone https://github.com/xsuchy/templated-dictionary && cd templated-dictionary
 # tito build --tgz --tag %%name-%%version-%%release
 # Source tar: https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz
-Source0:    %{name}-%{version}.tar.gz
-
+Source0:        %{name}-%{version}.tar.gz
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
+Requires:       python%{python3_pkgversion}-jinja2
 BuildArch: noarch
-
-BuildRequires: python%{python3_pkgversion}-devel
-BuildRequires: python%{python3_pkgversion}-setuptools
-Requires:      python%{python3_pkgversion}-jinja2
 
 %global _description\
 Dictionary where __getitem__() is run through Jinja2 template.
 
 %description %_description
 
-
 %package -n python3-%{srcname}
 Summary: %{summary}
 %{?py_provides:%py_provides python3-%{srcname}}
-%description -n python3-%{srcname} %_description
-
+%description -n python3-%{srcname} %{_description}
 
 %prep
 %setup -q -n %{srcname}-%{version}
 
-
 %build
-version="%version" python3 setup.py build '--executable=/usr/bin/python3 -s'
+version="%{version}" python3 setup.py build '--executable=%{_bindir}/python3 -s'
 
 %install
-version="%version" python3 setup.py install -O1 --skip-build --root %{buildroot}
-
+version="%{version}" python3 setup.py install -O1 --skip-build --root %{buildroot}
 
 %files -n python3-%{srcname}
 # %%license LICENSE
@@ -51,7 +43,7 @@ version="%version" python3 setup.py install -O1 --skip-build --root %{buildroot}
 %{python3_sitelib}/templated_dictionary*
 
 %changelog
-* Wed Jan 5 2022 Cameron Baird <cameronbaird@microsoft.com>  - 1.1-5
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.1-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified
 

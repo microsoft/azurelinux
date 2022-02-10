@@ -4,16 +4,16 @@ Distribution:   Mariner
 %global dnf_plugins_extra 2.0.0
 %global hawkey_version 0.46.1
 %global yum_utils_subpackage_name dnf-utils
-
 %bcond_without yumcompatibility
-
 %bcond_without yumutils
 
+Summary:        Core Plugins for DNF
 Name:           dnf-plugins-core
 Version:        4.0.24
 Release:        1%{?dist}
-Summary:        Core Plugins for DNF
 License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/dnf-plugins-core
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -74,11 +74,11 @@ BuildRequires:  python3-dnf >= %{dnf_lowest_compatible}
 %if %{with_check}
 BuildRequires:  python3-nose2
 %endif
-Requires:       python3-distro
+Requires:       python3-dateutil
 Requires:       python3-dbus
+Requires:       python3-distro
 Requires:       python3-dnf >= %{dnf_lowest_compatible}
 Requires:       python3-hawkey >= %{hawkey_version}
-Requires:       python3-dateutil
 Provides:       python3-dnf-plugins-extras-debug = %{version}-%{release}
 Provides:       python3-dnf-plugins-extras-repoclosure = %{version}-%{release}
 Provides:       python3-dnf-plugins-extras-repograph = %{version}-%{release}
@@ -87,7 +87,6 @@ Obsoletes:      python3-dnf-plugins-extras-debug < %{dnf_plugins_extra}
 Obsoletes:      python3-dnf-plugins-extras-repoclosure < %{dnf_plugins_extra}
 Obsoletes:      python3-dnf-plugins-extras-repograph < %{dnf_plugins_extra}
 Obsoletes:      python3-dnf-plugins-extras-repomanage < %{dnf_plugins_extra}
-
 Conflicts:      %{name} <= 0.1.5
 # let the both python plugin versions be updated simultaneously
 Conflicts:      python2-%{name} < %{version}-%{release}
@@ -411,7 +410,7 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 %endif
 
 %changelog
-* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com>  - 4.0.24-1
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.0.24-1
 - Upgrade to undeprecated python3-nose2
 - Update source to 4.0.24
 - License verified
