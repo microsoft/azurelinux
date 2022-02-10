@@ -7881,8 +7881,8 @@
         "type": "other",
         "other": {
           "name": "jansson",
-          "version": "2.11",
-          "downloadUrl": "http://www.digip.org/jansson/releases/jansson-2.11.tar.gz"
+          "version": "2.14",
+          "downloadUrl": "https://github.com/akheron/jansson/releases/download/v2.14/jansson-2.14.tar.gz"
         }
       }
     },
