@@ -11441,8 +11441,8 @@
         "type": "other",
         "other": {
           "name": "libtiff",
-          "version": "4.1.0",
-          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.1.0/libtiff-v4.1.0.tar.gz"
+          "version": "4.3.0",
+          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.3.0/libtiff-v4.3.0.tar.gz"
         }
       }
     },
@@ -12381,8 +12381,8 @@
         "type": "other",
         "other": {
           "name": "lm-sensors",
-          "version": "3.5.0",
-          "downloadUrl": "https://github.com/lm-sensors/lm-sensors/archive/V3-5-0.tar.gz"
+          "version": "3.6.0",
+          "downloadUrl": "https://github.com/lm-sensors/lm-sensors/archive/V3-6-0.tar.gz"
         }
       }
     },
@@ -12491,8 +12491,8 @@
         "type": "other",
         "other": {
           "name": "lsb-release",
-          "version": "1.4",
-          "downloadUrl": "https://downloads.sourceforge.net/lsb/lsb-release-1.4.tar.gz"
+          "version": "3.1",
+          "downloadUrl": "https://github.com/thkukuk/lsb-release_os-release/archive/refs/tags/v3.1.tar.gz"
         }
       }
     },
@@ -12501,8 +12501,8 @@
         "type": "other",
         "other": {
           "name": "lshw",
-          "version": "B.02.18",
-          "downloadUrl": "http://www.ezix.org/software/files/lshw-B.02.18.tar.gz"
+          "version": "B.02.19",
+          "downloadUrl": "https://github.com/lyonel/lshw/archive/B.02.19/lshw-B.02.19.tar.gz"
         }
       }
     },
