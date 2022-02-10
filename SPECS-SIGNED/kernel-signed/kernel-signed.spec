@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        5.10.93.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -147,6 +147,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Thu Jan 27 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-2
+- Bump release number to match kernel release
+
 * Mon Jan 24 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-1
 - Update source to 5.10.93.1
 
@@ -244,7 +247,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
 - Recalculate sha512hmac on signed kernel binary
 
-* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+* Tue May 18 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
 - Update to kernel release 5.10.32.1-3
 
 * Thu May 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-2
