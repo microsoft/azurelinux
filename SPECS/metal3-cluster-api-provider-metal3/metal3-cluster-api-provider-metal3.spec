@@ -36,3 +36,4 @@ install -p -m 755 -t %{buildroot} %{name}
 %changelog
 * Thu Feb 09 2022 Vince Perri <viperri@microsoft.com> - 0.4.0-1
 - Original version for CBL-Mariner.
+- License verified
