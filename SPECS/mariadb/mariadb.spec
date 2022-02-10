@@ -8,13 +8,7 @@ Distribution:   Mariner
 Group:          Applications/Databases
 
 # A buildable mariadb environment needs functioning submodules that do not work from the archive download
-# To recreate the tar.gz run the following
-#  sudo git clone --depth 1 https://github.com/MariaDB/server.git -b mariadb-%%{version}
-#  pushd server
-#  sudo git submodule update --init --recursive --depth 1
-#  popd
-#  sudo mv server mariadb-%{version}
-#  sudo tar -zcvf mariadb-%%{version}.tar.gz mariadb-%{version}/
+# To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
 
