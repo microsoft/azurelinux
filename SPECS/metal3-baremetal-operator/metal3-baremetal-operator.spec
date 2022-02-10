@@ -32,9 +32,6 @@ go build -mod=vendor -v -ldflags '-extldflags "-static" -X "github.com/metal3-io
 %install
 install -p -m 755 -t %{buildroot} %{name}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE

@@ -30,9 +30,6 @@ go build -mod=vendor -v -a -ldflags '-extldflags "-static"' -o %{name} .
 %install
 install -p -m 755 -t %{buildroot} %{name}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE
