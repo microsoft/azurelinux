@@ -1,7 +1,7 @@
 Summary:        ASN.1 library
 Name:           libtasn1
 Version:        4.18.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,7 +17,6 @@ and Distinguished Encoding Rules (DER, as per X.690) encoding and decoding funct
 %package devel
 Summary:        Development libraries and header files for libtasn1
 Requires:       libtasn1
-Provides:       pkgconfig(libtasn1) = %{version}-%{release}
 
 %description devel
 The package contains libraries and header files for
@@ -58,6 +57,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.18.0-2
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 4.18.0-1
 - Upgrade to version 4.18.0
 - Fix license files

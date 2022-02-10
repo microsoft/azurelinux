@@ -2,7 +2,7 @@
 Summary:        Distro - an OS platform information API
 Name:           python-distro
 Version:        1.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,8 +37,9 @@ Distro provides information about the OS distribution it runs on, such as a reli
 %py3_install
 
 %check
-pip3 install tox
-tox
+pip3 install pytest
+export LANG=C.UTF-8
+%pytest
 
 %files -n python3-distro
 %defattr(-,root,root,-)
@@ -48,6 +49,9 @@ tox
 %{_bindir}/*
 
 %changelog
+* Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.6.0-2
+- Use `%pytest` instead of `tox` to enable ptest
+
 * Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 1.6.0-1
 - Upgrade to latest upstream version
 

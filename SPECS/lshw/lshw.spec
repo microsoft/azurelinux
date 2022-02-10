@@ -45,14 +45,16 @@ make DESTDIR=%{buildroot} install
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - B.02.19-1
 - Upgrade to B.02.19
 - Fix Source0
-- Delete sha1 macro
-- License Verified
+
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - B.02.18-4
+- Remove unused `%%define sha1` lines
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - B.02.18-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> B.02.18-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> B.02.18-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*    Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> B.02.18-1
--    Initial version of lshw package for Photon.
+* Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> B.02.18-1
+- Initial version of lshw package for Photon.

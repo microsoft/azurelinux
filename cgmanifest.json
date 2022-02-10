@@ -1877,8 +1877,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "19.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v19.0.tar.gz"
+          "version": "21.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v21.0.tar.gz"
         }
       }
     },
@@ -1987,8 +1987,8 @@
         "type": "other",
         "other": {
           "name": "cni",
-          "version": "0.8.1",
-          "downloadUrl": "https://github.com/containernetworking/cni/archive/refs/tags/v0.8.1.tar.gz"
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/containernetworking/cni/archive/refs/tags/v1.0.1.tar.gz"
         }
       }
     },
@@ -2337,8 +2337,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.22.0",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.22.0.tar.gz"
+          "version": "1.23.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.23.0.tar.gz"
         }
       }
     },
@@ -8501,8 +8501,8 @@
         "type": "other",
         "other": {
           "name": "kde-settings",
-          "version": "30.0",
-          "downloadUrl": "https://github.com/FedoraKDE/kde-settings/archive/30.0.tar.gz"
+          "version": "36.0",
+          "downloadUrl": "https://pagure.io/fedora-kde/kde-settings/archive/36.0/kde-settings-36.0.tar.gz"
         }
       }
     },
@@ -12771,8 +12771,8 @@
         "type": "other",
         "other": {
           "name": "m2crypto",
-          "version": "0.35.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/74/18/3beedd4ac48b52d1a4d12f2a8c5cf0ae342ce974859fba838cbbc1580249/M2Crypto-0.35.2.tar.gz"
+          "version": "0.38.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-0.38.0.tar.gz"
         }
       }
     },
@@ -14593,8 +14593,8 @@
         "type": "other",
         "other": {
           "name": "nftables",
-          "version": "0.9.3",
-          "downloadUrl": "https://netfilter.org/projects/nftables//files/nftables-0.9.3.tar.bz2"
+          "version": "1.0.1",
+          "downloadUrl": "https://netfilter.org/projects/nftables/files/nftables-1.0.1.tar.bz2"
         }
       }
     },
@@ -16154,8 +16154,8 @@
         "type": "other",
         "other": {
           "name": "parted",
-          "version": "3.2",
-          "downloadUrl": "http://ftp.gnu.org/gnu/parted/parted-3.2.tar.xz"
+          "version": "3.4",
+          "downloadUrl": "https://ftp.gnu.org/gnu/parted/parted-3.4.tar.xz"
         }
       }
     },
@@ -21283,19 +21283,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "php-fedora-autoloader",
-          "version": "1.0.1",
-          "downloadUrl": "https://github.com/php-fedora/autoloader/archive/7cd61b5a927c8f446df8e820aa288434e18a7f0c/php-fedora-autoloader-1.0.1-7cd61b5a927c8f446df8e820aa288434e18a7f0c.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "php-pear",
-          "version": "1.10.12",
-          "downloadUrl": "http://download.pear.php.net/package/PEAR-1.10.12.tgz"
+          "version": "1.10.13",
+          "downloadUrl": "http://download.pear.php.net/package/PEAR-1.10.13.tgz"
         }
       }
     },
@@ -21924,8 +21914,8 @@
         "type": "other",
         "other": {
           "name": "pugixml",
-          "version": "1.10",
-          "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.10.tar.gz"
+          "version": "1.11.4",
+          "downloadUrl": "https://github.com/zeux/pugixml/archive/v1.11.4.tar.gz"
         }
       }
     },
@@ -22224,8 +22214,8 @@
         "type": "other",
         "other": {
           "name": "python-bcrypt",
-          "version": "3.1.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/ce/3a/3d540b9f5ee8d92ce757eebacf167b9deedb8e30aedec69a2a072b2399bb/bcrypt-3.1.6.tar.gz"
+          "version": "3.2.0",
+          "downloadUrl": "https://pypi.io/packages/source/b/bcrypt/bcrypt-3.2.0.tar.gz"
         }
       }
     },
@@ -22294,8 +22284,8 @@
         "type": "other",
         "other": {
           "name": "python-botocore",
-          "version": "1.13.21",
-          "downloadUrl": "https://github.com/boto/botocore/archive/1.13.21.tar.gz"
+          "version": "1.23.52",
+          "downloadUrl": "https://github.com/boto/botocore/archive/refs/tags/1.23.52.tar.gz"
         }
       }
     },
@@ -28307,8 +28297,8 @@
         "type": "other",
         "other": {
           "name": "tcpdump",
-          "version": "4.9.3",
-          "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.9.3.tar.gz"
+          "version": "4.99.1",
+          "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.99.1.tar.gz"
         }
       }
     },

@@ -1,14 +1,13 @@
 Summary:        Shared libraries, portable interface
 Name:           libtool
 Version:        2.4.6
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 URL:            http://www.gnu.org/software/libtool
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://ftp.gnu.org/gnu/libtool/%{name}-%{version}.tar.xz
-%define sha1    libtool=3e7504b832eb2dd23170c91b6af72e15b56eb94e
 %description
 It wraps the complexity of using shared libraries in a
 consistent, portable interface.
@@ -82,6 +81,10 @@ make %{?_smp_mflags} check
 %{_libdir}/libltdl.so.7.3.1
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.4.6-8
+- Remove unused `%%define sha1` lines
+- License verified
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.4.6-6
 - Provide libtool-ltdl-devel%%{?_isa}
 

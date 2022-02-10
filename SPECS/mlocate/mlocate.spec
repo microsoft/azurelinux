@@ -1,11 +1,10 @@
 Name:           mlocate
 Version:        0.26
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An utility for finding files by name.
-License:        GPL-2.0
+License:        GPLv2
 URL:            https://pagure.io/mlocate
 Source0:        http://releases.pagure.org/mlocate/%{name}-%{version}.tar.xz
-%define sha1    %{name}=c6e6d81b25359c51c545f4b8ba0f3b469227fcbc
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
@@ -48,12 +47,18 @@ mv %{buildroot}/%{_mandir}/man1/locate.1 %{buildroot}/%{_mandir}/man1/%{name}.1
 %{_localstatedir}/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.26-5
+- Remove unused `%%define sha1` lines
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.26-4
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.26-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Thu Nov 15 2018 Sujay G <gsujay@vware.com> 0.26-2
--   Added %check section
-*   Fri Jul 20 2018 Keerthana K <keerthanak@vmware.com> 0.26-1
--   Initial mlocate package for Photon.
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.26-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Thu Nov 15 2018 Sujay G <gsujay@vware.com> - 0.26-2
+- Added %%check section
+
+* Fri Jul 20 2018 Keerthana K <keerthanak@vmware.com> 0.26-1
+- Initial mlocate package for Photon.

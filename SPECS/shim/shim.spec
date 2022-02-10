@@ -1,5 +1,5 @@
 %global debug_package %{nil}
-%global release_number 1
+%global release_number 2
 Summary:        First stage UEFI bootloader
 Name:           shim
 Version:        15.4
@@ -27,7 +27,7 @@ Initial UEFI bootloader that handles chaining to a trusted full bootloader
 under secure boot environments.
 
 %prep
-%autosetup
+%autosetup -n signed-%{name}-%{version}-%{release_number}
 
 %install
 install -d %{buildroot}/boot/efi/EFI/BOOT
@@ -38,5 +38,9 @@ install -m644 shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
 /boot/efi/EFI/BOOT/bootx64.efi
 
 %changelog
+* Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 15.4-2
+- Update signed shim binary to newer one associated with 15.4-2 unsigned build.
+- License verified
+
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 15.4-1
 - Original version for CBL-Mariner.
