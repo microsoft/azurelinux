@@ -1,16 +1,14 @@
+Summary:        Bare Metal Operator implements a Kubernetes API for managing bare metal hosts
 Name:           metal3-baremetal-operator
 Version:        0.4.0
 Release:        1%{?dist}
-Summary:        Bare Metal Operator implements a Kubernetes API for managing bare metal hosts
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/metal3-io/baremetal-operator
-
 # Created using ./generate-sources.sh
 Source0:        %{name}-%{version}.tar.gz
-
 BuildRequires:  golang >= 1.14
 
 %description

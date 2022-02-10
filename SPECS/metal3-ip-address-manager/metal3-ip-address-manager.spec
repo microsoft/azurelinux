@@ -1,16 +1,14 @@
+Summary:        IP Address Manager is a Kubernetes Controller that provides IP addresses and manages the allocations of IP subnets for the Cluster API Provider for Metal3.
 Name:           metal3-ip-address-manager
 Version:        0.0.4
 Release:        1%{?dist}
-Summary:        IP Address Manager is a Kubernetes Controller that provides IP addresses and manages the allocations of IP subnets for the Cluster API Provider for Metal3.
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/metal3-io/ip-address-manager
-
 # Created using ./generate-sources.sh
 Source0:        %{name}-%{version}.tar.gz
-
 BuildRequires:  golang >= 1.13
 
 %description
