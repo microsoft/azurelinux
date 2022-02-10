@@ -1,8 +1,9 @@
-diff -urN kured-1.4.0.old/kured-ds.yaml kured-1.4.0/kured-ds.yaml
---- kured-1.4.0.old/kured-ds.yaml	2020-04-30 18:07:30.000000000 +0200
-+++ kured-1.4.0/kured-ds.yaml	2020-05-18 09:20:34.176054210 +0200
-@@ -32,7 +32,7 @@
-           image: docker.io/weaveworks/kured
+diff --git a/kured-ds.yaml b/kured-ds.yaml
+index 15869c4..b226865 100644
+--- a/kured-ds.yaml
++++ b/kured-ds.yaml
+@@ -32,7 +32,7 @@ spec:
+           image: docker.io/weaveworks/kured:1.9.1
                   # If you find yourself here wondering why there is no
                   # :latest tag on Docker Hub,see the FAQ in the README
 -          imagePullPolicy: IfNotPresent
