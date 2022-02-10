@@ -45,7 +45,7 @@ Good password hashing for your software and your servers.
 %{python3_sitelib}/*
 
 %changelog
-* Tue Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.2.0-2
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.2.0-2
 - Add an explicit BR on 'pip' to enable ptest
 
 * Fri Feb 04 2022 Nick Samson <nisamson@microsoft.com> - 3.2.0-1
