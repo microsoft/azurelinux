@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.keepalived.org/
-Source0:        https://www.keepalived.org/software/keepalived-%{version}.tar.gz
+Source0:        https://www.keepalived.org/software/%{name}-%{version}.tar.gz
 Source1:        %{name}.service
 
 BuildRequires:  autoconf
@@ -58,7 +58,6 @@ autoreconf -f -i
 make %{?_smp_mflags} STRIP=/bin/true
 
 %install
-rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 mkdir -p doc_install/samples
@@ -93,7 +92,8 @@ fi
 
 %files
 %defattr(-, root, root, -)
-%doc AUTHOR ChangeLog CONTRIBUTORS COPYING README TODO
+%license COPYING
+%doc AUTHOR ChangeLog CONTRIBUTORS README TODO
 %doc doc_install/*
 %dir %{_sysconfdir}/keepalived/
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/keepalived/keepalived.conf
@@ -111,6 +111,8 @@ fi
 %changelog
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.2.7-1
 - Update source to v2.2.7
+- Using Fedora 36 spec (license: MIT) for guidance.
+- Using spec shipped with source (license: GPLv2) for guidance.
 
 * Thu Apr 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.10-6
 - Adding an explicit run-time dependency on 'net-snmp'.
