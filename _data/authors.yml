@@ -1,0 +1,20 @@
+jperrin:
+  name: "Jim Perrin"
+  bio: "Principal Program Manager, Azure Edge and Platform"
+  avatar: "/assets/images/profile/jperrin.jpg"
+  links:
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/BitIntegrity"
+Rachel Menge and Cameron Baird:
+  name: "Rachel Menge and Cameron Baird"
+  bio: "Rachel and Cameron are software engineers with Microsoft working on the Mariner Team"
+  avatar: "/assets/images/profile/bio-photo.jpg"
+juan_manuel_rey:
+  name: "Juan Manuel Rey"
+  bio: "Unix Geek. Sysadmin by heart. Creating more problems than solving them in Microsoft Azure engineering."
+  avatar: "/assets/images/profile/juan_manuel_rey.jpg"
+  web: http://blog.jreypo.io
+  twitter: jreypo
+  github: jreypo
+  linkedin: jreypo
