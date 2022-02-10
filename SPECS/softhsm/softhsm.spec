@@ -1,29 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #global prever rc1
 #global prerelease yes
-
-Summary: Software version of a PKCS#11 Hardware Security Module
-Name: softhsm
-Version: 2.6.1
-Release: 5%{?dist}
-License: BSD
-Url: http://www.opendnssec.org/
-Source: http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz
-Source1: http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz.sig
-
-Patch1: softhsm-2.6.1-rh1831086-exit.patch
-
-BuildRequires: openssl-devel >= 1.0.1k-6, sqlite-devel >= 3.4.2, cppunit-devel
-BuildRequires: gcc-c++, pkgconfig, p11-kit-devel
-
-Requires(pre): shadow-utils
-Requires: p11-kit
-Requires: openssl-libs >= 1.0.1k-6
-
 %global _hardened_build 1
-
 %global softhsm_module "SoftHSM PKCS #11 Module"
+Summary:        Software version of a PKCS#11 Hardware Security Module
+Name:           softhsm
+Version:        2.6.1
+Release:        6%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.opendnssec.org/
+Source0:        http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz
+Source1:        http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz.sig
+Patch1:         softhsm-2.6.1-rh1831086-exit.patch
+
+BuildRequires:  cppunit-devel
+BuildRequires:  gcc-c++
+BuildRequires:  openssl-devel >= 1.0.1k-6
+BuildRequires:  p11-kit-devel
+BuildRequires:  pkgconfig
+BuildRequires:  sqlite-devel >= 3.4.2
+Requires:       openssl-libs >= 1.0.1k-6
+Requires:       p11-kit
+Requires(pre):  shadow-utils
 
 %description
 OpenDNSSEC is providing a software implementation of a generic
@@ -65,7 +64,6 @@ make %{?_smp_mflags}
 make check
 
 %install
-rm -rf %{buildroot}
 make DESTDIR=%{buildroot} install
 
 rm %{buildroot}/%{_sysconfdir}/softhsm2.conf.sample

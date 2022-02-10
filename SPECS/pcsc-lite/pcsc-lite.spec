@@ -1,8 +1,7 @@
-Name:           pcsc-lite
-Version:        1.9.0
-Release:        2%{?dist}
 Summary:        PC/SC Lite smart card framework and applications
-
+Name:           pcsc-lite
+Version:        1.9.5
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -106,10 +105,6 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/pcscd
 
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
 
-# Remove documentation installed in a wrong directory
-rm $RPM_BUILD_ROOT%{_docdir}/pcsc-lite/README.DAEMON
-
-
 %post
 %systemd_post pcscd.socket pcscd.service
 # If install, test if pcscd socket is enabled.
@@ -160,8 +155,11 @@ fi
 %files doc
 %doc doc/api/ doc/example/pcsc_demo.c
 
-
 %changelog
+* Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.9.5-1
+- Update to v1.9.5.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

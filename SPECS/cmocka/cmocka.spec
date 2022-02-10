@@ -1,20 +1,17 @@
+Summary:        An elegant unit testing framework for C with support for mock objects
 Name:           cmocka
 Version:        1.1.5
-Release:        4%{?dist}
-
+Release:        5%{?dist}
 License:        ASL 2.0
-Summary:        An elegant unit testing framework for C with support for mock objects
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://cmocka.org
-
 Source0:        https://cmocka.org/files/1.1/%{name}-%{version}.tar.xz
 Source1:        https://cmocka.org/files/1.1/%{name}-%{version}.tar.xz.asc
 Source2:        cmocka.keyring
-
-BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  doxygen
+BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnupg2
 
@@ -42,8 +39,7 @@ This is the successor of Google's Cmockery.
 
 %package -n libcmocka
 Summary:        Lightweight library to simplify and generalize unit tests for C
-
-Conflicts: cmockery2
+Conflicts:      cmockery2
 
 %description -n libcmocka
 There are a variety of C unit testing frameworks available however many of them
@@ -76,8 +72,7 @@ Static version of the cmocka library.
 %package -n libcmocka-devel
 Summary:        Development headers for the cmocka library
 Requires:       libcmocka = %{version}-%{release}
-
-Conflicts: cmockery2-devel
+Conflicts:      cmockery2-devel
 
 %description -n libcmocka-devel
 Development headers for the cmocka unit testing library.
@@ -134,6 +129,9 @@ popd
 %{_libdir}/cmake/cmocka/cmocka-config.cmake
 
 %changelog
+* Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.5-5
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.5-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

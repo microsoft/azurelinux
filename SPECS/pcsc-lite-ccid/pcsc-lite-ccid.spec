@@ -1,11 +1,9 @@
 %global dropdir %(pkg-config libpcsclite --variable usbdropdir 2>/dev/null)
 %global pcsc_lite_ver 1.8.9
-
+Summary:        Generic USB CCID smart card reader driver
 Name:           pcsc-lite-ccid
 Version:        1.4.33
-Release:        2%{?dist}
-Summary:        Generic USB CCID smart card reader driver
-
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,29 +32,24 @@ Provides:       bundled(simclist) = 1.6
 Generic USB CCID (Chip/Smart Card Interface Devices) driver for use with the
 PC/SC Lite daemon.
 
-
 %prep
 gpgv2 --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %setup -q -n ccid-%{version}
 %patch0 -p1 -b .omnikey
 
-
 %build
 %configure --enable-twinserial
 make %{?_smp_mflags}
 
-
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
 cp -p src/openct/LICENSE LICENSE.openct
-
 
 %post
 /bin/systemctl try-restart pcscd.service >/dev/null 2>&1 || :
 
 %postun
 /bin/systemctl try-restart pcscd.service >/dev/null 2>&1 || :
-
 
 %files
 %doc AUTHORS ChangeLog README.md
@@ -65,8 +58,10 @@ cp -p src/openct/LICENSE LICENSE.openct
 %{dropdir}/serial/
 %config(noreplace) %{_sysconfdir}/reader.conf.d/libccidtwin
 
-
 %changelog
+* Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.4.33-3
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.33-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
