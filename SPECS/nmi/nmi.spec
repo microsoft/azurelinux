@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        Node Managed Identity
 Name:           nmi
-Version:        1.7.0
+Version:        1.8.7
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
