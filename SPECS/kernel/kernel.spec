@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.93.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         CVE-2021-43976.patch
 Patch2:         0003-export-mmput_async.patch
+Patch3:         0001-tipc-improve-size-validations-for-received-domain-re.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -347,6 +348,7 @@ manipulation of eBPF programs and maps.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 make mrproper
@@ -587,6 +589,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Feb 09 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-3
+- Address CVE-2022-0435 with patch
+  0001-tipc-improve-size-validations-for-received-domain-re.patch
+
 * Thu Jan 27 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-2
 - Address CVE-2021-4083
 
