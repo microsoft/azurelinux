@@ -122,7 +122,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
-* Fri Jan 21 2022 Henry Li <lihl@microsoft.com> - 2.71.0-1
+* Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 2.71.0-1
 - Upgrade to version 2.71.0
 - Add python3-pygments as BR
 - Don't remove pcre sources which no longer apply for the new version

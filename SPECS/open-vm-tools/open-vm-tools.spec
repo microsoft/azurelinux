@@ -344,6 +344,7 @@ fi
 - Remove patches that no longer apply
 - Add vmware-alias-import,libgdp.so, libguestStore.so, libguestStoreClient.so
   and libguestStoreClient.so.*
+- License Verified
 
 * Wed Nov 04 2020 Ruying Chen <v-ruyche@microsoft.com> - 11.1.0-5
 - Systemd supports merged /usr. Configure to build with corresponding directory.
