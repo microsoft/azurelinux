@@ -1,13 +1,13 @@
 Summary:       Jansson json parser
 Name:          jansson
-Version:       2.11
-Release:        4%{?dist}
-Group:         System Environment/Libraries
-Vendor:         Microsoft Corporation
+Version:       2.14
+Release:       1%{?dist}
 License:       MIT
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
+# digip.org now redirects to https://github.com/akheron/jansson
 URL:           http://www.digip.org/jansson
-Source0:       http://www.digip.org/jansson/releases/%{name}-%{version}.tar.gz
-Distribution:   Mariner
+Source0:       https://github.com/akheron/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 %description
 Jansson is a C library for encoding, decoding and manipulating JSON data.
@@ -54,6 +54,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Feb 10 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.14-1
+- Update source to v2.14
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11-4
 - Removing the explicit %%clean stage.
 - License verified.
