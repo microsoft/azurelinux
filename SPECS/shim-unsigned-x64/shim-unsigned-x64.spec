@@ -52,6 +52,7 @@ make VENDOR_CERT_FILE=cert.der test
 %changelog
 * Wed Jan 05 2022 Chris Co <chrco@microsoft.com> - 15.4-2
 - Update key
+- License verified
 
 * Tue Mar 30 2021 Chris Co <chrco@microsoft.com> - 15.4-1
 - Update to 15.4

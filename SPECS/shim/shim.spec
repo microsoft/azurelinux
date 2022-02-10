@@ -40,6 +40,7 @@ install -m644 shimx64.efi %{buildroot}/boot/efi/EFI/BOOT/bootx64.efi
 %changelog
 * Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 15.4-2
 - Update signed shim binary to newer one associated with 15.4-2 unsigned build.
+- License verified
 
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 15.4-1
 - Original version for CBL-Mariner.
