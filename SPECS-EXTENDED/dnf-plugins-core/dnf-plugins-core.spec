@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %{?!dnf_lowest_compatible: %global dnf_lowest_compatible 4.2.22}
 %global dnf_plugins_extra 2.0.0
 %global hawkey_version 0.46.1
