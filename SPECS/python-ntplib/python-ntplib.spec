@@ -40,7 +40,7 @@ Python 3 version.
 %{python3_sitelib}/*
 
 %changelog
-* Wed Feb 9 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.4.0-1
+* Wed Feb 09 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.4.0-1
 - Upgrade to 0.4.0 for Mariner 2.0
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.3.3-6
