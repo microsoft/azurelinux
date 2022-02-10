@@ -25,7 +25,7 @@ Requires:       python3-jsonpointer >= %{jsonpointer_min_ver}
 Library to apply JSON Patches according to RFC 6902.
 
 %prep
-%autosetup -n jsonpatch-%{version}
+%autosetup -n python-json-patch-%{version}
 
 %build
 %py3_build
