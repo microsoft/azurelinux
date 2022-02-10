@@ -42,13 +42,6 @@ Requires:       python3-xml
 Requires:       python3
 Provides:       glib2-devel = %{version}-%{release}
 Provides:       glib2-devel%{?_isa} = %{version}-%{release}
-Provides:       pkgconfig(glib-2.0)
-Provides:       pkgconfig(gmodule-2.0)
-Provides:       pkgconfig(gmodule-no-export-2.0)
-Provides:       pkgconfig(gobject-2.0)
-Provides:       pkgconfig(gio-2.0)
-Provides:       pkgconfig(gio-unix-2.0)
-Provides:       pkgconfig(gthread-2.0)
 
 %description devel
 Static libraries and header files for the support library for the glib library
@@ -135,10 +128,15 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 - Don't remove pcre sources which no longer apply for the new version
 - Fix Source0 URL to use macro to represent major version
 
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.60.1-6
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.60.1-5
 - Removed python2 support
+
 * Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4
 - Require schemas subpackage from devel subpackage
+
 * Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
 - Remove CVE-2019-13012 patch (already in the this version)
 - Exclude doubly-packaged files from devel subpackage

@@ -4,18 +4,15 @@ Distribution:   Mariner
 %global gitrev %(c=%{gitfullrev}; echo ${c:0:6})
 Name:           urlview
 Version:        0.9
-Release:        28%{?dist}
+Release:        29%{?dist}
 Summary:        URL extractor/launcher
 
-License:        GPLv2+
+License:        GPLv2
 URL:            https://github.com/sigpipe/urlview
 Source0:        https://github.com/sigpipe/urlview/archive/%{gitrev}/urlview-%{gitrev}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  ncurses-devel
-
-# mutt packages before 5:1.5.16-2 included urlview
-Conflicts:      mutt < 5:1.5.16-2
 
 Patch1:         urlview-default.patch
 
@@ -41,7 +38,8 @@ echo '.so man1/urlview.1' > $RPM_BUILD_ROOT%{_mandir}/man5/urlview.conf.5
 echo '.so man1/urlview.1' > $RPM_BUILD_ROOT%{_mandir}/man1/url_handler.sh.1
 
 %files
-%doc AUTHORS ChangeLog COPYING README sample.urlview
+%license COPYING
+%doc AUTHORS ChangeLog README sample.urlview
 %config(noreplace) %{_sysconfdir}/urlview.conf
 %{_bindir}/urlview
 %{_bindir}/url_handler.sh
@@ -50,6 +48,10 @@ echo '.so man1/urlview.1' > $RPM_BUILD_ROOT%{_mandir}/man1/url_handler.sh.1
 %{_mandir}/man5/urlview.conf.5*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9-29
+- Removing 'Conflicts' on an older package never present in CBL-Mariner.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9-28
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

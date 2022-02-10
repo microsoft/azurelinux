@@ -1,15 +1,13 @@
 Summary:        Advanced Trivial File Transfer Protocol (ATFTP) - TFTP server
 Name:           atftp
 Version:        0.7.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            http://sourceforge.net/projects/atftp
 License:        GPLv2+
 Group:          System Environment/Daemons
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://sourceforge.net/projects/atftp/files/latest/download/%{name}-%{version}.tar.gz
-
-%define sha1 atftp=a05ff68dfcdbe5368b57a955647450b798a07adc
 
 BuildRequires:  systemd
 Requires:       systemd
@@ -128,6 +126,9 @@ fi
 
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.5-4
+- Remove unused `%%define sha1` lines
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.5-3
 - Removing the explicit %%clean stage.
 

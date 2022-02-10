@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           gnome-shell
 Version:        3.36.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
@@ -29,7 +29,7 @@ Patch3: 0002-endSessionDialog-Support-rebooting-into-the-bootload.patch
 %define polkit_version 0.100
 %define gsettings_desktop_schemas_version 3.33.1
 %define ibus_version 1.5.2
-%define gnome_bluetooth_version 1:3.9.0
+%define gnome_bluetooth_version 3.9.0
 %define gstreamer_version 1.4.5
 
 BuildRequires:  asciidoc
@@ -213,6 +213,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/evolution-calendar.de
 %{_mandir}/man1/gnome-shell.1*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.9-4
+- Removing epoch.
+
 * Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 3.36.9-3
 - Remove NetworkManger-libnm-devel BR because CBL-Mariner is not providing NetworkManager
 - License verified

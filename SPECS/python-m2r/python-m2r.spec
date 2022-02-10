@@ -1,13 +1,22 @@
 Summary:        Markdown to reStructuredText converter.
 Name:           python-m2r
-Version:        0.2.0
-Release:        7%{?dist}
+Version:        0.2.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/m2r
 Source0:        https://github.com/miyakogi/m2r/archive/v%{version}/m2r-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-docutils
+BuildRequires:  python3-mistune
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  curl-devel
+BuildRequires:  openssl-devel
+BuildRequires:  python3-pygments
+%endif
 BuildArch:      noarch
 
 %description
@@ -15,20 +24,11 @@ M2R converts a markdown file including reST markups to a valid reST format.
 
 %package -n     python3-m2r
 Summary:        Markdown to reStructuredText converter.
-BuildRequires:  python3-devel
-BuildRequires:  python3-docutils
-BuildRequires:  python3-libs
-BuildRequires:  python3-mistune
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
+
 Requires:       python3
 Requires:       python3-docutils
 Requires:       python3-mistune
-%if %{with_check}
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  python3-pygments
-%endif
+
 
 %description -n python3-m2r
 M2R converts a markdown file including reST markups to a valid reST format.
@@ -55,7 +55,10 @@ pip3 install mock
 %{python3_sitelib}/*
 
 %changelog
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com>
+* Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 0.2.1-1
+- Upgrade to latest upstream version
+
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.0-7
 - Replace easy_install usage with pip in %%check sections
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.0-6

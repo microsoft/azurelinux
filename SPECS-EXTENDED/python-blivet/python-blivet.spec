@@ -25,8 +25,8 @@ Version: 3.2.2
 
 #%%global prerelease .b2
 # prerelease, if defined, should be something like .a1, .b1, .b2.dev1, or .c2
-Release: 3%{?dist}
-License: LGPLv2+
+Release: 4%{?dist}
+License: GPLv2 and LGPLv2+
 %global realname blivet
 %global realversion %{version}%{?prerelease}
 Source0: http://github.com/storaged-project/blivet/archive/%{realname}-%{realversion}.tar.gz
@@ -51,9 +51,6 @@ storage configuration.
 Summary: Data for the %{realname} python module.
 
 BuildRequires: systemd
-
-Conflicts: python-blivet < 1:2.0.0
-Conflicts: python3-blivet < 1:2.0.0
 
 %description -n %{realname}-data
 The %{realname}-data package provides data files required by the %{realname}
@@ -179,19 +176,23 @@ configuration.
 
 %if %{with python2}
 %files -n python2-%{realname}
-%license COPYING
+%license COPYING COPYING.LESSER
 %doc README ChangeLog examples
 %{python2_sitelib}/*
 %endif
 
 %if %{with python3}
 %files -n python3-%{realname}
-%license COPYING
+%license COPYING COPYING.LESSER
 %doc README ChangeLog examples
 %{python3_sitelib}/*
 %endif
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-4
+- Removing 'Conflicts' for old packages never present in CBL-Mariner.
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.2.2-3
 - Remove epoch
 
