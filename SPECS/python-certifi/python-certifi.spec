@@ -7,8 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/certifi
-#Source0:       https://github.com/certifi/python-certifi/archive/%{version}.tar.gz
-#Source0:       https://github.com/certifi/%{package}/archive/refs/tags/%{version}.tar.gz
+#Source0:       https://github.com/certifi/python-certifi/archive/refs/tags/%{version}.tar.gz
 Source0:        certifi-%{version}.tar.gz
 BuildArch:      noarch
 
