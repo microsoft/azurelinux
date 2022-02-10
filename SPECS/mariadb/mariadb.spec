@@ -1,14 +1,22 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.3.28
-Release:        2%{?dist}
+Version:        10.3.32
+Release:        10%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
+# A buildable mariadb environment needs functioning submodules that do not work from the archive download
+# To recreate the tar.gz run the following
+#  sudo git clone --depth 1 https://github.com/MariaDB/server.git -b mariadb-%{version}
+#  pushd server
+#  sudo git submodule update --init --recursive --depth 1
+#  popd
+#  sudo mv servermariadb-%{version} mariadb-%{version}
+#  sudo tar -cvf mariadb-%{version}.tar.gz mariadb-%{version}/
+
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
-Patch0:         cmake_3.21.4_fix.patch
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
