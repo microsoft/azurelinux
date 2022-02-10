@@ -14,7 +14,7 @@ Group:          Applications/Databases
 #  sudo git submodule update --init --recursive --depth 1
 #  popd
 #  sudo mv server mariadb-%{version}
-#  sudo tar -cvf mariadb-%%{version}.tar.gz mariadb-%{version}/
+#  sudo tar -zcvf mariadb-%%{version}.tar.gz mariadb-%{version}/
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
 
