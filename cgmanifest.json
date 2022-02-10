@@ -22324,8 +22324,8 @@
         "type": "other",
         "other": {
           "name": "python-certifi",
-          "version": "2018.10.15",
-          "downloadUrl": "https://github.com/certifi/python-certifi/archive/2018.10.15.tar.gz"
+          "version": "2021.10.08",
+          "downloadUrl": "https://github.com/certifi/python-certifi/archive/refs/tags/2021.10.08.tar.gz"
         }
       }
     },
