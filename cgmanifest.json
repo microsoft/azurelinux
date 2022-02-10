@@ -4560,8 +4560,8 @@
         "type": "other",
         "other": {
           "name": "glib",
-          "version": "2.60.1",
-          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.60/glib-2.60.1.tar.xz"
+          "version": "2.71.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/gnome/sources/glib/2.71/glib-2.71.0.tar.xz"
         }
       }
     },
@@ -5190,8 +5190,8 @@
         "type": "other",
         "other": {
           "name": "gtk-doc",
-          "version": "1.29",
-          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/gtk-doc/1.29/gtk-doc-1.29.tar.xz"
+          "version": "1.33.2",
+          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/gtk-doc/1.33/gtk-doc-1.33.2.tar.xz"
         }
       }
     },
@@ -11271,8 +11271,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.19",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.19/libsolv-0.7.19.tar.gz"
+          "version": "0.7.20",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.20/libsolv-0.7.20.tar.gz"
         }
       }
     },
@@ -11281,8 +11281,8 @@
         "type": "other",
         "other": {
           "name": "libsoup",
-          "version": "2.64.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/2.64/libsoup-2.64.0.tar.xz"
+          "version": "3.0.4",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/3.0/libsoup-3.0.4.tar.xz"
         }
       }
     },
@@ -15554,8 +15554,8 @@
         "type": "other",
         "other": {
           "name": "open-vm-tools",
-          "version": "11.1.0",
-          "downloadUrl": "https://github.com/vmware/open-vm-tools/releases/download/stable-11.1.0/open-vm-tools-11.1.0-16036546.tar.gz"
+          "version": "11.3.0",
+          "downloadUrl": "https://github.com/vmware/open-vm-tools/releases/download/stable-11.3.0/open-vm-tools-11.3.0-18090558.tar.gz"
         }
       }
     },
@@ -15994,8 +15994,8 @@
         "type": "other",
         "other": {
           "name": "ostree",
-          "version": "2021.4",
-          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2021.4/libostree-2021.4.tar.xz"
+          "version": "2022.1",
+          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2022.1/libostree-2022.1.tar.xz"
         }
       }
     },
@@ -25534,8 +25534,8 @@
         "type": "other",
         "other": {
           "name": "rest",
-          "version": "0.8.1",
-          "downloadUrl": "https://download.gnome.org/sources/rest/0.8/rest-0.8.1.tar.xz"
+          "version": "0.9.0",
+          "downloadUrl": "https://download.gnome.org/sources/rest/0.9/rest-0.9.0.tar.xz"
         }
       }
     },
@@ -25685,8 +25685,8 @@
         "type": "other",
         "other": {
           "name": "rpm-ostree",
-          "version": "2020.4",
-          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2020.4/rpm-ostree-2020.4.tar.xz"
+          "version": "2022.1",
+          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2022.1/rpm-ostree-2022.1.tar.xz"
         }
       }
     },
@@ -29137,8 +29137,8 @@
         "type": "other",
         "other": {
           "name": "vala",
-          "version": "0.34.6",
-          "downloadUrl": "http://download.gnome.org/sources/vala/0.34/vala-0.34.6.tar.xz"
+          "version": "0.54.6",
+          "downloadUrl": "http://download.gnome.org/sources/vala/0.54/vala-0.54.6.tar.xz"
         }
       }
     },
@@ -29337,8 +29337,8 @@
         "type": "other",
         "other": {
           "name": "vte291",
-          "version": "0.60.3",
-          "downloadUrl": "https://download.gnome.org/sources/vte/0.60/vte-0.60.3.tar.xz"
+          "version": "0.66.2",
+          "downloadUrl": "https://download.gnome.org/sources/vte/0.66/vte-0.66.2.tar.xz"
         }
       }
     },

@@ -182,8 +182,8 @@ rpm-libs-4.17.0-3.cm2.x86_64.rpm
 cpio-2.13-3.cm2.x86_64.rpm
 cpio-lang-2.13-3.cm2.x86_64.rpm
 e2fsprogs-libs-1.46.4-1.cm2.x86_64.rpm
-libsolv-0.7.19-2.cm2.x86_64.rpm
-libsolv-devel-0.7.19-2.cm2.x86_64.rpm
+libsolv-0.7.20-1.cm2.x86_64.rpm
+libsolv-devel-0.7.20-1.cm2.x86_64.rpm
 libssh2-1.9.0-2.cm2.x86_64.rpm
 libssh2-devel-1.9.0-2.cm2.x86_64.rpm
 krb5-1.18-3.cm2.x86_64.rpm
@@ -198,7 +198,7 @@ createrepo_c-0.17.5-1.cm2.x86_64.rpm
 libxml2-2.9.12-2.cm2.x86_64.rpm
 libxml2-devel-2.9.12-2.cm2.x86_64.rpm
 libsepol-3.2-2.cm2.x86_64.rpm
-glib-2.60.1-6.cm2.x86_64.rpm
+glib-2.71.0-1.cm2.x86_64.rpm
 libltdl-2.4.6-8.cm2.x86_64.rpm
 libltdl-devel-2.4.6-8.cm2.x86_64.rpm
 pcre-8.44-3.cm2.x86_64.rpm

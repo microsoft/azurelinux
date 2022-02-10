@@ -399,8 +399,20 @@ chroot_and_install_rpms perl-XML-Parser
 chroot_and_install_rpms python3-libxml2
 build_rpm_in_chroot_no_install itstool
 
-# gtk-doc needs itstool
+# ninja-build requires gtest
+chroot_and_install_rpms gtest
+build_rpm_in_chroot_no_install ninja-build
+
+# meson requires ninja-build, gettext
+chroot_and_install_rpms ninja-build
+chroot_and_install_rpms gettext
+build_rpm_in_chroot_no_install meson
+
+# gtk-doc needs itstool, meson, python3-pygments
 chroot_and_install_rpms itstool
+chroot_and_install_rpms meson
+build_rpm_in_chroot_no_install python-pygments
+chroot_and_install_rpms python-pygments
 
 # gtk-doc and ca-certificates require libxslt
 chroot_and_install_rpms docbook-dtd-xml
@@ -413,15 +425,6 @@ build_rpm_in_chroot_no_install gtk-doc
 chroot_and_install_rpms gtk-doc
 build_rpm_in_chroot_no_install libtasn1
 
-# ninja-build requires gtest
-chroot_and_install_rpms gtest
-build_rpm_in_chroot_no_install ninja-build
-
-# meson requires ninja-build, gettext
-chroot_and_install_rpms ninja-build
-chroot_and_install_rpms gettext
-build_rpm_in_chroot_no_install meson
-
 build_rpm_in_chroot_no_install libsepol
 build_rpm_in_chroot_no_install swig
 
@@ -430,7 +433,6 @@ chroot_and_install_rpms libsepol
 chroot_and_install_rpms swig
 build_rpm_in_chroot_no_install libselinux
 
-chroot_and_install_rpms meson
 chroot_and_install_rpms libselinux
 
 build_rpm_in_chroot_no_install glib
