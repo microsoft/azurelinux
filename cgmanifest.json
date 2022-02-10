@@ -28177,8 +28177,8 @@
         "type": "SymCrypt-OpenSSL",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "101.0.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v101.0.0.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.0.0.tar.gz"
         }
       }
     },
