@@ -2,7 +2,7 @@ Name:           metal3-ip-address-manager
 Version:        0.0.4
 Release:        1%{?dist}
 Summary:        IP Address Manager is a Kubernetes Controller that provides IP addresses and manages the allocations of IP subnets for the Cluster API Provider for Metal3.
-License:        Apache License 2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries

@@ -2,7 +2,7 @@ Name:           metal3-baremetal-operator
 Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Bare Metal Operator implements a Kubernetes API for managing bare metal hosts
-License:        Apache License 2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries

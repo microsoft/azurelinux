@@ -2,7 +2,7 @@ Name:           metal3-cluster-api-provider-metal3
 Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Cluster API Provider Metal3 enables users to deploy a Cluster API based cluster on top of bare metal infrastructure using Metal3.
-License:        Apache License 2.0
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
