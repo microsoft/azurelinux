@@ -5,14 +5,14 @@
 %global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
 Summary:        GRand Unified Bootloader
 Name:           grub2
-Version:        2.06~rc1
-Release:        8%{?dist}
+Version:        2.06
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/grub
-Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.06-rc1.tar.gz
+Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
 # Incorporate relevant patches from Fedora 34
@@ -142,7 +142,7 @@ GRUB UEFI bootloader binaries
 LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
 export LDFLAGS
 
-%autosetup -p1 -n grub-2.06-rc1
+%autosetup -p1 -n grub-2.06
 cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
 tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
@@ -313,6 +313,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 2.06-1
+- Update to 2.06 release
+
 * Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 2.06~rc1-8
 - Bump release number to force binary signing with new secure boot key
 
