@@ -1,14 +1,16 @@
+%define jsonpointer_min_ver 1.9
 Summary:        Applying JSON Patches in Python
 Name:           python-jsonpatch
-Version:        1.23
-Release:        5%{?dist}
+Version:        1.32
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jsonpatch
-#Source0:       https://github.com/stefankoegl/python-json-patch/archive/v%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/9a/7d/bcf203d81939420e1aaf7478a3efce1efb8ccb4d047a33cb85d7f96d775e/jsonpatch-%{version}.tar.gz
+Source0:        https://github.com/stefankoegl/python-json-patch/archive/refs/tags/v%{version}.tar.gz#/python-json-patch-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-jsonpointer >= %{jsonpointer_min_ver}
 BuildArch:      noarch
 
 %description
@@ -16,9 +18,8 @@ Library to apply JSON Patches according to RFC 6902.
 
 %package -n     python3-jsonpatch
 Summary:        Applying JSON Patches in Python
-BuildRequires:  python3-devel
-BuildRequires:  python3-jsonpointer
-Requires:       python3-jsonpointer
+Requires:       python3
+Requires:       python3-jsonpointer >= %{jsonpointer_min_ver}
 
 %description -n python3-jsonpatch
 Library to apply JSON Patches according to RFC 6902.
@@ -47,6 +48,10 @@ ln -s jsonpatch %{buildroot}%{_bindir}/jsonpatch3
 %{_bindir}/jsonpatch3
 
 %changelog
+* Thu Feb 10 2022 Thomas Crain <thcrain@microsoft.com> - 1.32-1
+- Upgrade to latest upstream version
+- Use github source tarball
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.23-5
 - Add license to python3 package
 - Remove python2 package
