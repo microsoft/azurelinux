@@ -19,7 +19,7 @@ Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         CVE-2021-43976.patch
 Patch2:         0003-export-mmput_async.patch
-Patch3:         0001-tipc-improve-size-validations-for-received-domain-re.patch
+Patch3:         CVE-2022-0435.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -591,7 +591,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Wed Feb 09 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-3
 - Address CVE-2022-0435 with patch
-  0001-tipc-improve-size-validations-for-received-domain-re.patch
 
 * Thu Jan 27 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.93.1-2
 - Address CVE-2021-4083
