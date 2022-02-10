@@ -904,11 +904,11 @@ popd
 rm -rf patch-2.7.6
 touch /logs/status_patch_complete
 
-echo Man-DB-2.8.4
-tar xf man-db-2.8.4.tar.xz
-pushd man-db-2.8.4
+echo Man-DB-2.10.1
+tar xf man-db-2.10.1.tar.xz
+pushd man-db-2.10.1
 ./configure --prefix=/usr                        \
-            --docdir=/usr/share/doc/man-db-2.8.4 \
+            --docdir=/usr/share/doc/man-db-2.10.1 \
             --sysconfdir=/etc                    \
             --disable-setuid                     \
             --enable-cache-owner=bin             \
@@ -920,7 +920,7 @@ pushd man-db-2.8.4
 make -j$(nproc)
 make install
 popd
-rm -rf man-db-2.8.4
+rm -rf man-db-2.10.1
 touch /logs/status_man_db_complete
 
 echo Tar-1.34
