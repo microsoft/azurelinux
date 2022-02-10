@@ -23624,8 +23624,8 @@
         "type": "other",
         "other": {
           "name": "python-ntplib",
-          "version": "0.3.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/29/8b/85a86e01c510665b0790d3a9fd4532ad98aba9e185a676113a0ae3879350/ntplib-0.3.3.tar.gz"
+          "version": "0.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/b4/14/6b018fb602602d9f6cc7485cbad7c1be3a85d25cea18c233854f05284aed/ntplib-0.4.0.tar.gz"
         }
       }
     },

@@ -1,15 +1,13 @@
-%define LICENSE_PATH LICENSE.PTR
 Summary:        Python NTP library
 Name:           python-ntplib
-Version:        0.3.3
-Release:        6%{?dist}
+Version:        0.4.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-URL:            https://code.google.com/archive/p/ntplib/
-Source0:        https://files.pythonhosted.org/packages/29/8b/85a86e01c510665b0790d3a9fd4532ad98aba9e185a676113a0ae3879350/ntplib-%{version}.tar.gz
-Source1:        %{LICENSE_PATH}
+URL:            https://pypi.org/project/ntplib/
+Source0:        https://files.pythonhosted.org/packages/b4/14/6b018fb602602d9f6cc7485cbad7c1be3a85d25cea18c233854f05284aed/ntplib-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -29,7 +27,6 @@ Python 3 version.
 
 %prep
 %autosetup -n ntplib-%{version}
-cp %{SOURCE1} ./
 
 %build
 %py3_build
@@ -38,11 +35,14 @@ cp %{SOURCE1} ./
 %py3_install
 
 %files -n python3-ntplib
-%license %{LICENSE_PATH}
+%license LICENSE
 %defattr(-,root,root)
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 09 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.4.0-1
+- Upgrade to 0.4.0 for Mariner 2.0
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.3.3-6
 - Remove python2 package
 - Lint spec
