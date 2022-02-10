@@ -1,16 +1,18 @@
 Summary:        A tiny but valid init for containers
 Name:           tini
 Version:        0.19.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/krallin/tini
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/krallin/tini/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  sed
+
+Provides:       docker-init = %{version}-%{release}
 
 %description
 Tini is the simplest init you could think of.
@@ -31,14 +33,20 @@ mkdir build && cd build
 
 %install
 %make_install -C build
-rm -f %{buildroot}/%{_bindir}/tini-static
+pushd %{buildroot}%{_bindir}
+rm -f tini-static
+ln -s tini docker-init
+popd
 
 %files
 %license LICENSE
 %doc README.md
-%{_bindir}/tini
+%{_bindir}/*
 
 %changelog
+* Mon Feb 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.19.0-6
+- Makes moby-engine spec relying on tini to provide docker-init
+
 * Thu Nov 04 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.19.0-5
 - Removed static tini package
 

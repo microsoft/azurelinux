@@ -1,29 +1,29 @@
 %global srcname process-tests
 Summary:        Tools for testing processes
 Name:           python-%{srcname}
-Version:        2.0.2
-Release:        10%{?dist}
+Version:        2.1.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/ionelmc/python-process-tests
-Source0:        https://pypi.python.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/ionelmc/python-process-tests/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildArch:      noarch
 
 %description
 Tools for testing processes.
 
-%package -n python%{python3_pkgversion}-%{srcname}
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
+%package -n python3-%{srcname}
 Summary:        Tools for testing processes
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
+Requires:       python3
 
-%description -n python%{python3_pkgversion}-%{srcname}
+%description -n python3-%{srcname}
 Tools for testing processes for Python 3.
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 %py3_build
@@ -31,13 +31,18 @@ Tools for testing processes for Python 3.
 %install
 %py3_install
 
-%files -n python%{python3_pkgversion}-%{srcname}
+%files -n python-%{srcname}
 %doc README.rst
 %license LICENSE
 %{python3_sitelib}/__pycache__/*
 %{python3_sitelib}/process_tests*
 
 %changelog
+* Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 2.1.2-1
+- Upgrade to latest upstream version
+- Remove %%python3_pkgversion boilerplating
+- Use upstream github source
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.0.2-10
 - Change source to match python sources
 - License verified

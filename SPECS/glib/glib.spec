@@ -1,7 +1,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.60.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,13 +46,6 @@ Requires:       python3-xml
 Requires:       python3
 Provides:       glib2-devel = %{version}-%{release}
 Provides:       glib2-devel%{?_isa} = %{version}-%{release}
-Provides:       pkgconfig(glib-2.0)
-Provides:       pkgconfig(gmodule-2.0)
-Provides:       pkgconfig(gmodule-no-export-2.0)
-Provides:       pkgconfig(gobject-2.0)
-Provides:       pkgconfig(gio-2.0)
-Provides:       pkgconfig(gio-unix-2.0)
-Provides:       pkgconfig(gthread-2.0)
 
 %description devel
 Static libraries and header files for the support library for the glib library
@@ -136,6 +129,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.60.1-6
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.60.1-5
 - Removed python2 support
 * Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4

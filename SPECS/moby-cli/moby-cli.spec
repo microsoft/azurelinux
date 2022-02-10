@@ -1,26 +1,19 @@
+%define upstream_name cli
+%define commit_hash e91ed5707e038b02af3b5120fa0835c5bedfd42e
+
 Summary: The open-source application container engine client.
-Name: moby-cli
-Version: 19.03.15+azure
-Release: 2%{?dist}
+Name: moby-%{upstream_name}
+Version: 20.10.12
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
-
-# Git clone is a standard practice of producing source files for moby-* packages.
-# Please look at ./generate-sources.sh for generating source tar ball.
-# REPO = https://github.com/docker/cli.git
-%define CLI_COMMIT 48d30b5b32e99c932b4ea3edca74353feddd83ff
-#Source0: https://github.com/docker/cli/archive/v19.03.15.tar.gz
-Source0: moby-cli-%{version}.tar.gz
-Source1: NOTICE
-Source2: LICENSE
 URL: https://github.com/docker/cli
 Vendor: Microsoft Corporation
 Distribution: Mariner
 
-BuildRequires: golang
-BuildRequires: bash
-BuildRequires: gcc
-BuildRequires: libltdl-devel
+Source0: https://github.com/docker/cli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+BuildRequires: golang >= 1.16.12
 BuildRequires: make
 BuildRequires: git
 BuildRequires: go-md2man
@@ -35,30 +28,28 @@ Requires: xz
 %define OUR_GOPATH  %{_topdir}/.gopath
 
 %prep
-%setup -q -n %{name}-%{version} -c
+%autosetup -p1 -n %{upstream_name}-%{version}
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
-ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
-# Fix incorrect package name reference for go-md2man
-sed -i 's/md2man/go-md2man/g' ./man/md2man-all.sh
+ln -sfT %{_builddir}/%{upstream_name}-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
 
 %build
 export GOPATH=%{OUR_GOPATH}
 export GOCACHE=%{OUR_GOPATH}/.cache
 export GOPROXY=off
-export GO111MODULE=off
-#export GOFLAGS=-trimpath
 export DISABLE_WARN_OUTSIDE_CONTAINER=1
+export GO111MODULE=off
 export GOGC=off
 export CGO_ENABLED=1
 
-cd %{OUR_GOPATH}/src/github.com/docker/cli
 make \
     LDFLAGS='' \
     VERSION=%{version} \
-    GITCOMMIT=%{CLI_COMMIT} \
+    GITCOMMIT=%{commit_hash} \
     dynbinary
 
 # Generating man pages.
+mkdir -p ./github.com/docker
+ln -sfT %{_builddir}/%{upstream_name}-%{version} ./github.com/docker/cli
 make manpages
 
 %install
@@ -70,30 +61,29 @@ install -p -m 644 man/man1/*.1 %{buildroot}/%{_mandir}/man1
 install -p -m 644 man/man5/*.5 %{buildroot}/%{_mandir}/man5
 install -p -m 644 man/man8/*.8 %{buildroot}/%{_mandir}/man8
 
-install -d %{buildroot}/usr/share/bash-completion/completions
-install -d %{buildroot}/usr/share/zsh/vendor-completions
-install -d %{buildroot}/usr/share/fish/vendor_completions.d
-install -p -m 644 contrib/completion/bash/docker %{buildroot}/usr/share/bash-completion/completions/docker
-install -p -m 644 contrib/completion/zsh/_docker %{buildroot}/usr/share/zsh/vendor-completions/_docker
-install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}/usr/share/fish/vendor_completions.d/docker.fish
-
-mkdir -p %{buildroot}/usr/share/doc/%{name}-%{version}
-cp %{SOURCE1} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
-cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
+install -d %{buildroot}%{_datadir}/bash-completion/completions
+install -d %{buildroot}%{_datadir}/zsh/vendor-completions
+install -d %{buildroot}%{_datadir}/fish/vendor_completions.d
+install -p -m 644 contrib/completion/bash/docker %{buildroot}%{_datadir}/bash-completion/completions/docker
+install -p -m 644 contrib/completion/zsh/_docker %{buildroot}%{_datadir}/zsh/vendor-completions/_docker
+install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fish/vendor_completions.d/docker.fish
 
 # list files owned by the package here
 %files
-%license LICENSE
-/usr/share/doc/%{name}-%{version}/*
-/%{_bindir}/docker
-/%{_mandir}/man1/*
-/%{_mandir}/man5/*
-/%{_mandir}/man8/*
-/usr/share/bash-completion/completions/docker
-/usr/share/zsh/vendor-completions/_docker
-/usr/share/fish/vendor_completions.d/docker.fish
+%license NOTICE LICENSE
+%{_bindir}/docker
+%{_mandir}/man1/*
+%{_mandir}/man5/*
+%{_mandir}/man8/*
+%{_datadir}/bash-completion/completions/docker
+%{_datadir}/zsh/vendor-completions/_docker
+%{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Thu Feb 3 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.12-1
+- Update to version 20.10.12
+- Use code from upstream instead of Azure fork.
+
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 19.03.15+azure-2
 - Increment release to force republishing using golang 1.15.13.
 

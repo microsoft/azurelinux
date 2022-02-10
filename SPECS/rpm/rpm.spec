@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,7 +44,6 @@ RPM package manager
 %package devel
 Summary:        Libraries and header files for rpm
 Requires:       %{name} = %{version}-%{release}
-Provides:       pkgconfig(rpm)
 
 %description devel
 Static libraries and header files for the support library for rpm
@@ -270,6 +269,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.17.0-3
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Sat Jan 29 2022 Muhammad Falak <mwani@microsoft.com> - 4.17.0-2
 - Fix ptest build by replacing `%make_build_check` with `make`
 

@@ -1,7 +1,7 @@
 Summary:        Good password hashing for your software and your servers.
 Name:           python-bcrypt
-Version:        3.1.6
-Release:        6%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,9 @@ Good password hashing for your software and your servers.
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 04 2022 Nick Samson <nisamson@microsoft.com> - 3.2.0-1
+- Upgraded to 3.2.0
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.1.6-6
 - Add license to python3 package
 - Remove python2 package
