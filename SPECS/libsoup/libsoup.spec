@@ -87,6 +87,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %find_lang %{name}-%{BaseVersion}
 
+%check
+%meson_test
+
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 

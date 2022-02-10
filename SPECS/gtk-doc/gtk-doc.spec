@@ -52,7 +52,7 @@ mv doc/README doc/README.docs
 %py_byte_compile %{__python3} %{buildroot}%{_datadir}/gtk-doc/
 
 %check
-cd tests && make check-TESTS
+%meson_test
 
 %files
 %defattr(-,root,root)

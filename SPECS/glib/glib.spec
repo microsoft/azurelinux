@@ -1,3 +1,4 @@
+%define majorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.71.0
@@ -7,8 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
-#Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{version}.tar.xz
-Source0:        %{name}-%{version}.tar.xz
+Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/%{majorver}/%{name}-%{version}.tar.xz
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -133,6 +133,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 - Upgrade to version 2.71.0
 - Add python3-pygments as BR
 - Don't remove pcre sources which no longer apply for the new version
+- Fix Source0 URL to use macro to represent major version
 
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.60.1-5
 - Removed python2 support
