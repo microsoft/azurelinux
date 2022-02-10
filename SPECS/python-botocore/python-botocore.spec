@@ -1,13 +1,13 @@
 Summary:        Amazon Web Services Library.
 Name:           python-botocore
-Version:        1.13.21
-Release:        3%{?dist}
+Version:        1.23.52
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/boto/botocore
-#Source0:       https://github.com/boto/botocore/archive/%{version}.tar.gz
+#Source0:       https://github.com/boto/botocore/archive/refs/tags/%{version}.tar.gz
 Source0:        botocore-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -50,6 +50,9 @@ nosetests tests/unit
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 09 2022 Nick Samson <nisamson@microsoft.com> - 1.23.52-1
+- Upgraded to 1.23.52, updated Source0 URL
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.21-3
 - Add license to python3 package, fix license tag
 - Remove python2 package
