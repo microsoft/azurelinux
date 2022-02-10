@@ -8531,8 +8531,8 @@
         "type": "other",
         "other": {
           "name": "keepalived",
-          "version": "2.0.10",
-          "downloadUrl": "https://github.com/acassen/keepalived/archive/v2.0.10.zip"
+          "version": "2.2.7",
+          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.2.7.tar.gz"
         }
       }
     },
