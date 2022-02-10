@@ -63,5 +63,10 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 1.8.7-1
+- Upgrade to version 1.8.7
+- Update modify-go-build-option.patch
+- License Verified
+
 * Thu Jun 24 2021 Henry Li <lihl@microsoft.com> - 1.7.0-1
 - Original version for CBL-Mariner
