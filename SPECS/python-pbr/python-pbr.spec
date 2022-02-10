@@ -54,7 +54,7 @@ tox -e py39
 %{python3_sitelib}/pbr
 
 %changelog
-* Wed Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 5.8.1-1
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 5.8.1-1
 - Bump version to 5.8.1
 - Use `tox` instead of `setup.py test` to enable ptest
 
