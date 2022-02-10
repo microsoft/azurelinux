@@ -6,8 +6,8 @@
 
 Summary:        Builds packages inside chroots
 Name:           mock
-Version:        2.15
-Release:        2%{?dist}
+Version:        2.16
+Release:        1%{?dist}
 License:        GPLv2+
 # Source is created by
 # git clone https://github.com/rpm-software-management/mock.git
@@ -47,39 +47,29 @@ BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
 BuildRequires:  python3-requests
 BuildRequires:  python3-templated-dictionary
-BuildRequires:  python3-distro
-BuildRequires:  python3-jinja2
-BuildRequires:  python3-pyroute2
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-cov
-BuildRequires:  python3-requests
-BuildRequires:  python3-templated-dictionary
 %endif
 
 %description
 Mock takes an SRPM and builds it in a chroot.
 
 %package lvm
-Summary:        LVM plugin for mock
-Requires:       %{name} = %{version}-%{release}
-Requires:       lvm2
+Summary: LVM plugin for mock
+Requires: %{name} = %{version}-%{release}
+Requires: lvm2
 
 %description lvm
 Mock plugin that enables using LVM as a backend and support creating snapshots
 of the buildroot.
 
 %package filesystem
-Summary:        Mock filesystem layout
+Summary:  Mock filesystem layout
 Requires(pre):  shadow-utils
 
 %description filesystem
 Filesystem layout and group for Mock.
 
 %prep
-%setup -q
-for file in py/mock.py py/mock-parse-buildlog.py; do
-  sed -i 1"s|#!/usr/bin/python3 |#!%{__python} |" $file
-done
+%setup -q -n mock-%{name}-%{version}-1/mock
 
 %build
 for i in py/mock.py py/mock-parse-buildlog.py; do
@@ -135,12 +125,12 @@ install -d %{buildroot}/var/cache/mock
 mkdir -p %{buildroot}%{_pkgdocdir}
 install -p -m 0644 docs/site-defaults.cfg %{buildroot}%{_pkgdocdir}
 
-sed -i 's/^_MOCK_NVR = None$/_MOCK_NVR = "%{name}-%{version}-%{release}"/' \
+sed -i 's/^_MOCK_NVR = None$/_MOCK_NVR = "%name-%version-%release"/' \
     %{buildroot}%{_libexecdir}/mock/mock
 
 %pre filesystem
 # check for existence of mock group, create it if not found
-getent group mock > /dev/null || groupadd -f -g %{mockgid} -r mock
+getent group mock > /dev/null || groupadd -f -g %mockgid -r mock
 exit 0
 
 %check
@@ -202,8 +192,10 @@ exit 0
 %dir  %{_datadir}/cheat
 
 %changelog
-* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.15-2
-- Initial CBL-Mariner import from Fedora 33 (license: GPLv2)
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.16-1
+- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+- Update to 2.16 source
+- License verified
 
 * Thu Nov 18 2021 Pavel Raiskup <praiskup@redhat.com> 2.15-1
 - argparse: handle old-style commands *before* ignoring "--" (awilliam@redhat.com)
