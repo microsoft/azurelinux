@@ -913,6 +913,7 @@ pushd man-db-2.10.1
             --disable-setuid                     \
             --enable-cache-owner=bin             \
             --with-browser=/usr/bin/lynx         \
+            --with-systemdsystemunitdir=no       \
             --with-vgrind=/usr/bin/vgrind        \
             --with-grap=/usr/bin/grap            \
             --with-systemdtmpfilesdir=           \
