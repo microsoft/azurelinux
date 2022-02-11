@@ -22,7 +22,7 @@ Distribution:   Mariner
 %global verbase 2.0
 Name:           qdox
 Version:        %{verbase}.%{vertag}
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Tool to extract class/interface/method definitions from sources
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -33,7 +33,7 @@ BuildRequires:  byaccj
 BuildRequires:  fdupes
 BuildRequires:  java-cup-bootstrap
 BuildRequires:  java-devel
-BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  javapackages-local
 BuildRequires:  jflex-bootstrap
 BuildArch:      noarch
 
@@ -41,13 +41,6 @@ BuildArch:      noarch
 QDox is a parser for extracting class/interface/method definitions
 from source files complete with JavaDoc @tags. It is designed to be
 used by active code generators or documentation tools.
-
-%package javadoc
-Summary:        Javadoc for %{name}
-Group:          Development/Libraries/Java
-
-%description javadoc
-API docs for %{name}.
 
 %prep
 %setup -q -n %{name}-%{verbase}-%{vertag}
@@ -105,20 +98,15 @@ install -pm 0644 build/%{name}-%{verbase}-%{vertag}.jar %{buildroot}%{_javadir}/
 install -dm 0755 %{buildroot}%{_mavenpomdir}
 install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar -a qdox:qdox
-# javadoc
-mkdir -p %{buildroot}%{_javadocdir}/%{name}
-cp -aL build/apidoc/* %{buildroot}%{_javadocdir}/%{name}
-%fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE.txt
 %doc README.md
 
-%files javadoc
-%{_javadocdir}/%{name}
-%license LICENSE.txt
-
 %changelog
+* Thu Feb 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.M9-5
+- Removing docs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.M9-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
