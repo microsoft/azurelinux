@@ -187,6 +187,7 @@
                 "ding-libs",
                 "discount",
                 "disruptor",
+                "distribution-gpg-keys",
                 "dleyna-connector-dbus",
                 "dleyna-core",
                 "dleyna-renderer",
@@ -1003,6 +1004,8 @@
                 "minizip",
                 "mksh",
                 "mobile-broadband-provider-info",
+                "mock",
+                "mock-core-configs",
                 "mod_auth_gssapi",
                 "mod_auth_mellon",
                 "mod_auth_openidc",
@@ -1833,6 +1836,7 @@
                 "python-msrestazure",
                 "python-mutagen",
                 "python-ndg_httpsclient",
+                "python-nose2",
                 "python-novaclient",
                 "python-nss",
                 "python-ntlm-auth",
@@ -1863,6 +1867,7 @@
                 "python-pymongo",
                 "python-PyMySQL",
                 "python-pyperclip",
+                "python-pyroute2",
                 "python-pyrsistent",
                 "python-pysocks",
                 "python-pytest-benchmark",
@@ -1922,6 +1927,7 @@
                 "python-sushy",
                 "python-systemd",
                 "python-tempita",
+                "python-templated-dictionary",
                 "python-testpath",
                 "python-testrepository",
                 "python-testresources",
@@ -2437,6 +2443,12 @@
             "license": "[GPLv3](https://github.com/canonical/netplan/blob/main/COPYING)",
             "specs": [
                 "netplan"
+            ]
+        },
+        "Numad source": {
+            "license": "[LGPLv2 License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)",
+            "specs": [
+                "numad"
             ]
         },
         "NVIDIA": {
