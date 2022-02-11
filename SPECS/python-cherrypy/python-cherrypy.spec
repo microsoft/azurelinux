@@ -6,7 +6,7 @@
 
 Summary:        A pythonic, object-oriented HTTP framework
 Name:           python-%{pkgname}
-Version:        18.6.0
+Version:        18.6.1
 Release:        1%{?dist}
 License:        BSD
 Url:            https://cherrypy.org/
@@ -52,7 +52,7 @@ python3 setup.py install --root=%{buildroot}
 %if 0%{with check}
 %check
 pip3 install tox
-tox
+tox -e py39
 %endif
 
 %files -n python3-%{pkgname}
@@ -62,6 +62,10 @@ tox
 %{_bindir}/cherryd
 
 %changelog
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.4.0-1
+* Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 18.6.1-1
+- Bump version to 18.6.1
+- Use 'py39' as tox environment to enable ptest
+
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 18.6.0-1
 - Original version for CBL-Mariner
 - License verified

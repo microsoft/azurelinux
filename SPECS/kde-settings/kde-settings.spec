@@ -1,14 +1,13 @@
 
 Summary:        Config files for kde
 Name:           kde-settings
-Version:        30.0
-Release:        3%{?dist}
+Version:        36.0
+Release:        1%{?dist}
 License:        MIT
-Url:            https://github.com/FedoraKDE/kde-settings
+Url:            https://pagure.io/fedora-kde/kde-settings
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/FedoraKDE/kde-settings/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://pagure.io/fedora-kde/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Source1:        COPYING
 
 BuildArch: noarch
@@ -110,8 +109,13 @@ rm -fv %{buildroot}%{_datadir}/plasma/look-and-feel/org.fedoraproject.fedora.des
 
 
 %changelog
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> 36.0-1
+- Update source to v36.0
+- License verified
+
 * Tue Apr 28 2020 Emre Girgin <mrgirgin@microsoft.com> 30.0-3
 - Renaming Linux-PAM to pam
+
 * Fri Apr 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 30.0-2
 - Initial CBL-Mariner import from Fedora 30 (license: MIT).
 - Removed 'fedora' and 'rhel' macro references.

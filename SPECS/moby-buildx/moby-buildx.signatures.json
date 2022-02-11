@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "LICENSE": "1536899d2bd6410995ed5cc18a47222f4d6202f6778e2d4555159b322eabdbe7",
-  "NOTICE": "f826786f7fadab1750eca9db909e449d2ef59f8d0e2242ef3987fdc67edc6ea6",
-  "moby-buildx-0.4.1+azure.tar.gz": "a3cce02aedae61a05316df96803fe746038abd937c2e3a073ed5ec7692ac961d"
+  "moby-buildx-0.7.1.tar.gz": "5df4224eeac5a00d1bef2344660e93415264a64ea4742133f2c2a794c563ef50"
  }
 }
