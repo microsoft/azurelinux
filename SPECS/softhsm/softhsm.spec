@@ -111,6 +111,9 @@ if [ -f /var/softhsm/slot0.db ]; then
 fi
 
 %changelog
+* Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.6.1-6
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.1-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
