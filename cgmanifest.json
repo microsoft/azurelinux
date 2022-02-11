@@ -12862,7 +12862,7 @@
         "other": {
           "name": "man-db",
           "version": "2.10.1",
-          "downloadUrl": "http://download.savannah.nongnu.org/releases/man-db/man-db-2.10.1.tar.xz"
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.10.1.tar.xz"
         }
       }
     },
