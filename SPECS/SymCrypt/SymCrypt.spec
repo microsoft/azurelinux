@@ -49,13 +49,14 @@ cmake --build .
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_includedir}
-mkdir -p %{buildroot}%{_bindir}
-install inc/* %{buildroot}%{_includedir}
-install bin/module/%{symcrypt_arch}/LinuxUserMode/generic/libsymcrypt.so* %{buildroot}%{_libdir}
+install inc/symcrypt* %{buildroot}%{_includedir}
+# Use cp -P to preserve symbolic links
+cp -P bin/module/%{symcrypt_arch}/LinuxUserMode/generic/libsymcrypt.so* %{buildroot}%{_libdir}
 chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 
 %files
 %license LICENSE
+%license NOTICE
 %{_libdir}/libsymcrypt.so*
 %{_includedir}/*
 
