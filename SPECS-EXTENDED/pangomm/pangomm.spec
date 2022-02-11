@@ -18,12 +18,12 @@ URL:            http://www.gtkmm.org/
 Source0:        http://ftp.gnome.org/pub/GNOME/sources/pangomm/%{release_version}/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc-c++
-BuildRequires:  glibmm24-devel >= %{glibmm_version}
+BuildRequires:  glibmm-devel >= %{glibmm_version}
 BuildRequires:  cairomm-devel >= %{cairomm_version}
 BuildRequires:  pango-devel >= %{pango_version}
 BuildRequires:  doxygen graphviz
 
-Requires:       glibmm24%{?_isa} >= %{glibmm_version}
+Requires:       glibmm%{?_isa} >= %{glibmm_version}
 Requires:       cairomm%{?_isa} >= %{cairomm_version}
 Requires:       pango%{?_isa} >= %{pango_version}
 
@@ -48,7 +48,7 @@ Summary:          Developer's documentation for the pangomm library
 BuildArch:        noarch
 Requires:         %{name} = %{version}-%{release}
 Requires:         libsigc++30-doc
-Requires:         glibmm24-doc
+Requires:         glibmm-doc
 
 %description      doc
 This package contains developer's documentation for the pangomm

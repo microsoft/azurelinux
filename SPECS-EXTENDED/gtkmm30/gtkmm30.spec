@@ -7,7 +7,7 @@ Distribution:   Mariner
 %global atkmm_version 2.24.2
 %global cairomm_version 1.12.0
 %global gdk_pixbuf2_version 2.35.5
-%global glibmm24_version 2.49.1
+%global glibmm_version 2.49.1
 %global gtk3_version 3.22.0
 %global pangomm_version 2.38.2
 
@@ -24,14 +24,14 @@ BuildRequires:  gcc-c++
 BuildRequires:  atkmm-devel >= %{atkmm_version}
 BuildRequires:  cairomm-devel >= %{cairomm_version}
 BuildRequires:  gdk-pixbuf2-devel >= %{gdk_pixbuf2_version}
-BuildRequires:  glibmm24-devel >= %{glibmm24_version}
+BuildRequires:  glibmm-devel >= %{glibmm_version}
 BuildRequires:  gtk3-devel >= %{gtk3_version}
 BuildRequires:  pangomm-devel >= %{pangomm_version}
 
 Requires:       atkmm%{?_isa} >= %{atkmm_version}
 Requires:       cairomm%{?_isa} >= %{cairomm_version}
 Requires:       gdk-pixbuf2%{?_isa} >= %{gdk_pixbuf2_version}
-Requires:       glibmm24%{?_isa} >= %{glibmm24_version}
+Requires:       glibmm%{?_isa} >= %{glibmm_version}
 Requires:       gtk3%{?_isa} >= %{gtk3_version}
 Requires:       pangomm%{?_isa} >= %{pangomm_version}
 
@@ -54,7 +54,7 @@ developing applications that use %{name}.
 Summary:        API documentation for %{name}
 BuildArch:      noarch
 Requires:       %{name} = %{version}-%{release}
-Requires:       glibmm24-doc
+Requires:       glibmm-doc
 
 %description    doc
 This package contains the full API documentation for %{name}.

@@ -10,11 +10,14 @@ Distribution: Mariner
 
 #Source0:     https://github.com/libsigcplusplus/libsigcplusplus/releases/download/%{version}/libsigcplusplus-%{version}.tar.xz
 Source0:      libsigc++-%{version}.tar.xz
-
+BuildRequires:  docbook-style-xsl
+BuildRequires:  doxygen
 BuildRequires:  gcc-c++
+BuildRequires:  graphviz
 BuildRequires:  libxslt
 BuildRequires:  m4
 BuildRequires:  meson
+%global debug_package   %{nil}
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  perl-interpreter
 
@@ -27,11 +30,19 @@ whether it is static or virtual.
 libsigc++ is used by gtkmm to wrap the GTK+ signal system. It does not
 depend on GTK+ or gtkmm.
 
+%package        doc
+Summary:        Documentation for %{name}, includes full API docs
+BuildArch:      noarch
+Requires:       %{name} = %{version}-%{release}
+ 
+%description    doc
+This package contains the full API documentation for %{name}.
+
 %prep
 %setup -qn libsigc++-%{version}
 
 %build
-%meson
+%meson -Dbuild-documentation=true
 %meson_build
 
 %install
@@ -47,9 +58,14 @@ depend on GTK+ or gtkmm.
 %{_libdir}/sigc++-3.0/include/*.h
 %{_includedir}/*
 
+%files doc
+%doc %{_datadir}/doc/libsigc++-3.0/
+%doc %{_datadir}/devhelp/
+
 %changelog
 * Thu Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.0.7-1
 - Update to v3.0.7
+- Add doc package
 
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.10.0-7
 - Remove libtool archive files from final packaging

@@ -2777,7 +2777,7 @@
                 "glib",
                 "glib-networking",
                 "glibc",
-                "glibmm24",
+                "glibmm",
                 "gmp",
                 "gnome-common",
                 "gnupg2",

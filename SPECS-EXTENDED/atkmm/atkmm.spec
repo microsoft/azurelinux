@@ -4,7 +4,7 @@ Distribution:   Mariner
 # first two digits of version
 %define release_version %(echo %{version} | awk -F. '{print $1"."$2}')
 
-%global glibmm24_version 2.46.1
+%global glibmm_version 2.46.1
 
 Name:           atkmm
 Version:        2.24.3
@@ -17,9 +17,9 @@ Source0:        http://ftp.gnome.org/pub/GNOME/sources/atkmm/%{release_version}/
 
 BuildRequires:  gcc-c++
 BuildRequires:  atk-devel
-BuildRequires:  glibmm24-devel >= %{glibmm24_version}
+BuildRequires:  glibmm-devel >= %{glibmm_version}
 
-Requires:       glibmm24%{?_isa} >= %{glibmm24_version}
+Requires:       glibmm%{?_isa} >= %{glibmm_version}
 
 %description
 atkmm provides a C++ interface for the ATK library. Highlights
@@ -41,7 +41,7 @@ developing applications that use %{name}.
 Summary:        Developer's documentation for the atkmm library
 BuildArch:      noarch
 Requires:       %{name} = %{version}-%{release}
-Requires:       glibmm24-doc
+Requires:       glibmm-doc
 
 %description    doc
 This package contains developer's documentation for the atkmm

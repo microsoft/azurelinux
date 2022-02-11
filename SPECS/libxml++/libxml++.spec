@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://libxmlplusplus.sourceforge.net/
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/%{majver}/%{name}-%{version}.tar.xz
-BuildRequires:  glibmm24-devel
+BuildRequires:  glibmm-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  mm-common
 BuildRequires:  pkg-config
@@ -16,7 +16,7 @@ BuildRequires:  doxygen
 BuildRequires:  graphviz
 BuildRequires:  libxslt
 BuildRequires:  docbook-style-xsl
-Requires:       glibmm24
+Requires:       glibmm
 Requires:       libxml2
 
 %description
