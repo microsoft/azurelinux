@@ -1,7 +1,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
-Version:        2.22.0
-Release:        3%{?dist}
+Version:        2.27.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,8 +9,6 @@ Group:          Development/Languages/Python
 URL:            http://python-requests.org
 #Source0:       https://github.com/requests/requests/archive/v%{version}/requests-v%{version}.tar.gz
 Source0:        requests-%{version}.tar.gz
-Patch0:         test_requests_typeerror_testfix.patch
-Patch1:         test_requests_support_pytest_4.patch
 BuildArch:      noarch
 
 %description
@@ -62,7 +60,7 @@ perform the simplest of tasks.
 
 %check
 pip3 install tox
-LANG=en_US.UTF-8 tox -e py37
+LANG=en_US.UTF-8 tox -e py39
 
 %files -n python3-requests
 %defattr(-,root,root)
@@ -71,6 +69,10 @@ LANG=en_US.UTF-8 tox -e py37
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 2.27.1-1
+- Bump version to 2.27.1
+- Use 'py39' as tox env to enable ptest
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.22.0-3
 - Remove python2 package
 - Lint spec
