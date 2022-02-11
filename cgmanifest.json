@@ -4030,8 +4030,8 @@
         "type": "other",
         "other": {
           "name": "fribidi",
-          "version": "1.0.9",
-          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.9/fribidi-1.0.9.tar.xz"
+          "version": "1.0.10",
+          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.10/fribidi-1.0.10.tar.xz"
         }
       }
     },
