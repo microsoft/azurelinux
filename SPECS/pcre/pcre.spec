@@ -1,13 +1,14 @@
 Summary:        Grep for perl compatible regular expressions
 Name:           pcre
-Version:        8.44
-Release:        3%{?dist}
+Version:        8.45
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.pcre.org
-Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
+Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.bz2
+
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
 Requires:       libgcc
@@ -89,6 +90,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libpcre.so.*
 
 %changelog
+* Thu Feb 10 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.45-1
+- Upgrading to v8.45
+- Correcting source URL.
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 8.44-3
 - Remove *.la files from devel subpackage
 - Build static libraries, add compatibility provides for static subpackage
