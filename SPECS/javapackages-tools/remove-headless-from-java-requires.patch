@@ -4,11 +4,25 @@ Date: Wed, 5 Jan 2022 11:01:54 -0800
 Subject: [PATCH 2/2] Replace java-headless generated requirement with java
 
 ---
+ etc/javapackages-config-SCL.json              |  2 +-
  etc/javapackages-config.json                  |  2 +-
  .../config/filtered/javapackages-config.json  |  2 +-
  test/maven_req_test.py                        | 62 +++++++++----------
- 3 files changed, 33 insertions(+), 33 deletions(-)
+ 4 files changed, 34 insertions(+), 34 deletions(-)
 
+diff --git a/etc/javapackages-config-SCL.json b/etc/javapackages-config-SCL.json
+index 72dd5fb..789559d 100644
+--- a/etc/javapackages-config-SCL.json
++++ b/etc/javapackages-config-SCL.json
+@@ -4,7 +4,7 @@
+             "@{scl}-runtime"
+         ],
+         "java_requires": {
+-            "package_name": "java-headless",
++            "package_name": "java",
+             "always_generate": true,
+             "skip": false
+         },
 diff --git a/etc/javapackages-config.json b/etc/javapackages-config.json
 index 601fedc..2e94ceb 100644
 --- a/etc/javapackages-config.json

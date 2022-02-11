@@ -9,14 +9,13 @@
 
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
-Version:        6.0.0
-Release:        7%{?dist}
+Version:        5.3.0
+Release:        15%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
 Source0:        https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        javapackages-config.json
 # Upstream patch for rhbz#2025272
 Patch0:         0001-Update-ivy-local-classpath.patch
 Patch1:         remove-epoch-from-java-requires.patch
@@ -108,7 +107,6 @@ Requires:       msopenjdk-11
 Requires:       python3
 Requires:       python3-javapackages = %{version}-%{release}
 Requires:       java-devel
-Requires:       javapackages-generators = %{version}-%{release}
 %if %{without bootstrap}
 Requires:       %{_bindir}/xmvn-install
 Requires:       %{_bindir}/xmvn-resolve
@@ -119,15 +117,6 @@ Provides:       javapackages-local-bootstrap = %{version}-%{release}
 
 %description -n javapackages-local
 This package provides non-essential macros and scripts to support Java packaging.
-
-%package -n javapackages-generators
-Summary:        RPM dependency generators for Java packaging support
-Requires:       %{name} = %{version}-%{release}
-Requires:       python3
-Requires:       python3-javapackages = %{version}-%{release}
-
-%description -n javapackages-generators
-RPM dependency generators to support Java packaging.
 
 %prep
 %autosetup -p1 -n javapackages-%{version}
@@ -159,8 +148,6 @@ rm -rf %{buildroot}%{_bindir}/gradle-local
 rm -rf %{buildroot}%{_datadir}/gradle-local
 rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 
-install -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/java/javapackages-config.json
-
 %check
 pip3 install -r test-requirements.txt
 ./check
@@ -168,8 +155,6 @@ pip3 install -r test-requirements.txt
 %files -f files-tools
 
 %files -n javapackages-filesystem -f files-filesystem
-
-%files -n javapackages-generators -f files-generators
 
 %files -n javapackages-local -f files-local
 
@@ -183,99 +168,34 @@ pip3 install -r test-requirements.txt
 %license LICENSE
 
 %changelog
-* Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.0.0-7
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified.
-- Migrating Thomas Crain's fixes from previous CBL-Mariner version:
-  - Add patch to replace generated dependency on "java-headless" with "java"
-  - Amend epoch patch to fix expected test results
-  - Remove obsoletes statements that don't apply to Mariner
-  - Install test requirements with pip during check section
+* Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.3.0-15
+- Adding the "maven-local" subpackage using Fedora 36 spec (license: MIT) for guidance.
 
-* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 5.3.0-14
+- Add patch to replace generated dependency on "java-headless" with "java"
+- Amend epoch patch to fix expected test results
+- Remove obsoletes statements that don't apply to Mariner
+- Install test requirements with pip during check section
 
-* Fri Jan 14 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0-5
-- Bootstrap build for Maven 3.8.4
+* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.3.0-13
+- Update to build with JDK 11
+- License verified
 
-* Sun Nov 21 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0-4
-- Uptate ivy-local classpath
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-12
+- Replace incorrect %%{_lib} usage with %%{_libdir}
 
-* Wed Nov 17 2021 Didik Supriadi <didiksupriadi41@fedoraproject.org> - 6.0.0-3
-- Re-add ivy-local subpackage
+* Wed Dec 09 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-11
+- Add remove-epoch-from-java-requires.patch to remove epoch from java versions during dependency generation.
 
-* Tue Nov 02 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0-2
-- Implement OpenJDK 11 and 17 toolchains
-
-* Mon Jul 26 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0-1
-- Update to upstream version 6.0.0
-
-* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0~alpha-9
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Wed Jul 14 2021 Sérgio Basto <sergio@serjux.com> - 6.0.0~alpha-8
-- Drop apache-ivy is orphan now
-
-* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 6.0.0~alpha-7
-- Rebuilt for Python 3.10
-
-* Mon May 17 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0~alpha-6
-- Bootstrap build
-- Non-bootstrap build
-
-* Mon May 17 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0~alpha-5
-- Implement bootstrap mode
-
-* Thu May 13 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0~alpha-4
-- Disable skippedPlugins for now
-
-* Thu May 13 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0~alpha-3
-- Fix typos in Requires
-
-* Thu May 13 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0~alpha-2
-- Disable javapackages-bootstrap for now
-
-* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-15
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
-* Mon Nov 30 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.0-14
-- Add javapackages-generators provides
-
-* Wed Jul 29 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.0.0~alpha-1
-- Update to upstream version 6.0.0~alpha
-
-* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-13
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Fri Jul 17 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-9
-- Add separate subpackage with RPM generators
-
-* Thu Jul 16 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-8
-- Don't use networking during tests
-
-* Fri Jul 10 2020 Jiri Vanek <jvanek@redhat.com> - 5.3.0-12
-- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
-
-* Wed Jun 10 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.0-11
-- Use XMvn Javadoc MOJO for generating API docs
-
-* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 5.3.0-10
-- Rebuilt for Python 3.9
-
-* Tue Apr 28 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.0-10
-- Switch to OpenJDK 11 as default JDK
+* Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-10
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Dynamically calculate jdk and jre paths.
+- Remove meta packages.
+- Simplify spec macro and bcond usage.
+- Create bootstrap packages for ivy-local and javapackages-local with minimal runtime requirements.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
-
-* Thu Jan 23 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-7
-- Add OpenJDK 8 toolchain configuration
-
-* Tue Nov 05 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-6
-- Mass rebuild for javapackages-tools 201902
-
-* Fri Oct 25 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-5
-- Switch to OpenJDK 11 as default JDK
 
 * Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 5.3.0-8
 - Rebuilt for Python 3.8.0rc1 (#1748018)
@@ -288,27 +208,6 @@ pip3 install -r test-requirements.txt
 
 * Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
-
-* Fri Jun 28 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-4
-- Enable namespaced dependency generation
-
-* Fri Jun 28 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-3
-- Don't ignore duplicate metadata in namespaced modules
-
-* Fri Jun 28 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-2
-- Introduce javapackages-config-maven-3.6
-
-* Fri Jun 14 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.1-1
-- Update to upstream version 5.3.1
-
-* Mon Jun 10 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.0-7
-- Define maven-3.6 install repository
-
-* Fri May 24 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.0-6
-- Mass rebuild for javapackages-tools 201901
-
-* Thu Apr 25 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.3.0-5
-- Move python modules under java-utils directory
 
 * Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
