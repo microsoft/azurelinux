@@ -24544,8 +24544,8 @@
         "type": "other",
         "other": {
           "name": "python-six",
-          "version": "1.11.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/s/six/six-1.11.0.tar.gz"
+          "version": "1.16.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/s/six/six-1.16.0.tar.gz"
         }
       }
     },
