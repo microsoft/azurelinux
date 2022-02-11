@@ -11180,26 +11180,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libsigc++20",
-          "version": "2.10.0",
-          "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/2.10.0/libsigcplusplus-2.10.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libsigc++20",
-          "version": "2.10.3",
-          "downloadUrl": "http://download.gnome.org/sources/libsigc++/2.10/libsigc++-2.10.3.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libsigsegv",
           "version": "2.11",
           "downloadUrl": "http://ftp.gnu.org/gnu/libsigsegv/libsigsegv-2.11.tar.gz"

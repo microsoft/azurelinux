@@ -47,7 +47,7 @@ developing pangomm applications.
 Summary:          Developer's documentation for the pangomm library
 BuildArch:        noarch
 Requires:         %{name} = %{version}-%{release}
-Requires:         libsigc++20-doc
+Requires:         libsigc++30-doc
 Requires:         glibmm24-doc
 
 %description      doc
