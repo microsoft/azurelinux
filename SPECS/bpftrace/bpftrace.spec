@@ -1,7 +1,7 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
 Version:        0.13.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,7 @@ cd build
 
 %cmake \
     -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS:BOOL=OFF \
 %if !%{with_check}
     -DBUILD_TESTING=0 \
 %endif
@@ -76,6 +77,9 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 0.13.0-2
+- Disable building of shared libraries
+
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 0.13.0-1
 - Update to 0.13.0.
 - Fixed source URL.
