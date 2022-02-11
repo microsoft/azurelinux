@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,7 @@ cmake -G Ninja                              \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_PARALLEL_LINK_JOBS=1           \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
+      -DLLVM_LINK_LLVM_DYLIB=ON             \
       -DLLVM_INCLUDE_TESTS=ON               \
       -DLLVM_BUILD_TESTS=ON                 \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
@@ -85,6 +86,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 12.0.1-4
+- Allow tools to link to libLLVM shared library
+
 * Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 12.0.1-3
 - Use python3 during build
 
