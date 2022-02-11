@@ -1,22 +1,20 @@
 Summary:        A library for access to RESTful web services
 Name:           rest
-Version:        0.8.1
-Release:        9%{?dist}
+Version:        0.9.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.gnome.org
-Source0:        https://download.gnome.org/sources/%{name}/0.8/%{name}-%{version}.tar.xz
-# https://bugzilla.redhat.com/show_bug.cgi?id=1445700
-Patch0:         rest-0.8.0-fix-the-XML-test.patch
-BuildRequires:  autoconf
-BuildRequires:  automake
+Source0:        https://download.gnome.org/sources/%{name}/0.9/%{name}-%{version}.tar.xz
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gtk-doc
 BuildRequires:  libsoup-devel
 BuildRequires:  libtool
 BuildRequires:  libxml2-devel
+BuildRequires:  meson
+BuildRequires:  cmake
+BuildRequires:  json-glib-devel
 
 %description
 This library was designed to make it easier to access web services that
@@ -35,15 +33,14 @@ Requires:       %{name} = %{version}-%{release}
 Files for development with %{name}.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
-autoreconf -vif
-%configure --disable-static --enable-gtk-doc --enable-introspection=yes
-%make_build
+%meson -Dsoup2=false -Dgtk_doc=false
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 #Remove libtool archives.
 find %{buildroot} -type f -name "*.la" -delete -print
@@ -53,23 +50,31 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files
 %license COPYING
 %doc AUTHORS README
-%{_libdir}/librest-0.7.so.0
-%{_libdir}/librest-0.7.so.0.0.0
-%{_libdir}/librest-extras-0.7.so.0
-%{_libdir}/librest-extras-0.7.so.0.0.0
-%{_libdir}/girepository-1.0/Rest-0.7.typelib
-%{_libdir}/girepository-1.0/RestExtras-0.7.typelib
+%{_libdir}/librest-1.0.so.0
+%{_libdir}/librest-1.0.so.0.0.0
+%{_libdir}/librest-extras-1.0.so.0
+%{_libdir}/librest-extras-1.0.so.0.0.0
+%{_libdir}/girepository-1.0/Rest-1.0.typelib
+%{_libdir}/girepository-1.0/RestExtras-1.0.typelib
 
 %files devel
-%{_includedir}/rest-0.7
+%{_includedir}/rest-1.0/*
 %{_libdir}/pkgconfig/rest*
-%{_libdir}/librest-0.7.so
-%{_libdir}/librest-extras-0.7.so
-%{_datadir}/gtk-doc/html/%{name}*0.7
-%{_datadir}/gir-1.0/Rest-0.7.gir
-%{_datadir}/gir-1.0/RestExtras-0.7.gir
+%{_libdir}/librest-1.0.so
+%{_libdir}/librest-extras-1.0.so
+%{_datadir}/gir-1.0/Rest-1.0.gir
+%{_datadir}/gir-1.0/RestExtras-1.0.gir
 
 %changelog
+* Fri Jan 28 2022 Henry Li <lihl@microsoft.com> - 0.9.0-1
+- Upgrade to version 0.9.0
+- Remove patch that no longer applies
+- Remove autoconf, automake and gtk-doc as BR
+- Add meson, cmake and json-glib-devel as BR
+- Disable soup2 to use libsoup 3.0 as dependency
+- Disable gtk-doc which will involve unresolved dependencies in Mariner
+- Modify the file names due to version change
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.8.1-9
 - License verified
 - Lint spec

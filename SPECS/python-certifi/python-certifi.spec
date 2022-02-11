@@ -1,14 +1,14 @@
 Summary:        Python package for providing Mozilla's CA Bundle
 Name:           python-certifi
-Version:        2018.10.15
-Release:        6%{?dist}
+Version:        2021.10.08
+Release:        1%{?dist}
 License:        MPL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/certifi
-#Source0:       https://github.com/certifi/python-certifi/archive/%{version}.tar.gz
-Source0:        https://github.com/certifi/python-certifi/archive/certifi-%{version}.tar.gz
+#Source0:       https://github.com/certifi/python-certifi/archive/refs/tags/%{version}.tar.gz
+Source0:        certifi-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -46,6 +46,9 @@ SSL certificates while verifying the identity of TLS hosts
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 09 2022 Nick Samson <nisamson@microsoft.com> - 2021.10.08-1
+- Updated URL, updated to 2021.10.08
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2018.10.15-6
 - Add license to python3 package
 - Remove python2 package
