@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/freetype/freetype-%{version}.tar.gz
-Source1: 		https://download.savannah.gnu.org/releases/freetype/freetype-doc-%{version}.tar.gz
+Source1:        https://download.savannah.gnu.org/releases/freetype/freetype-doc-%{version}.tar.gz
 BuildRequires: 	brotli-devel
 BuildRequires: 	bzip2-devel
 BuildRequires:  gcc
@@ -40,13 +40,13 @@ FreeType.
 %setup -q -b 1
 
 %build
-./configure \
-	--prefix=%{_prefix} \
-	--with-harfbuzz=no \
-	--disable-static \
-    --with-zlib=yes \
-    --with-bzip2=yes \
-    --with-png=yes \
+./configure                  \
+	--prefix=%{_prefix}      \
+	--with-harfbuzz=no       \
+	--disable-static         \
+    --with-zlib=yes          \
+    --with-bzip2=yes         \
+    --with-png=yes           \
 	--enable-freetype-config \
 	--with-brotli=yes
 %make_build
