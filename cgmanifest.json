@@ -4570,8 +4570,8 @@
         "type": "other",
         "other": {
           "name": "glib-networking",
-          "version": "2.59.1",
-          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glib-networking/2.59/glib-networking-2.59.1.tar.xz"
+          "version": "2.70.0",
+          "downloadUrl": "https://download.gnome.org/sources/glib-networking/2.70/glib-networking-2.70.0.tar.xz"
         }
       }
     },
@@ -11173,6 +11173,16 @@
           "name": "libshout",
           "version": "2.4.3",
           "downloadUrl": "https://downloads.us.xiph.org/releases/libshout/libshout-2.4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libsigc++30",
+          "version": "3.2.0",
+          "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/3.2.0/libsigc++-3.2.0.tar.xz"
         }
       }
     },
