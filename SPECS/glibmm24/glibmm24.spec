@@ -1,10 +1,10 @@
-%global apiver 2.4
+%global apiver 2.68
 
 Summary:        C++ interface to the glib
 Name:           glibmm24
 %define BaseVersion 2.70
 Version:        %{BaseVersion}.0
-Release:        7%{?dist}
+Release:        1%{?dist}
 License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
@@ -15,13 +15,10 @@ BuildRequires:  gcc-c++
 BuildRequires:  glib-devel 
 BuildRequires:  glib-schemas
 BuildRequires:  libsigc++30
+BuildRequires:  libxslt
 BuildRequires:  m4
 BuildRequires:  meson
 BuildRequires:  mm-common
-BuildRequires:  git
-
-BuildRequires:  libxslt
-BuildRequires:  doxygen
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 
@@ -54,7 +51,6 @@ These are the header files of glibmm.
 
 %build
 %meson
-meson --buildtype=plain --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/libexec --bindir=/usr/bin --sbindir=/usr/sbin --includedir=/usr/include --datadir=/usr/share --mandir=/usr/share/man --infodir=/usr/share/info --localedir=/usr/share/locale --sysconfdir=/etc --localstatedir=/var --sharedstatedir=/var/lib --auto-features=enabled . x86_64-mariner-linux
 %meson_build
 
 %install
@@ -80,7 +76,6 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules; make check
 %{_libdir}/glibmm-%{apiver}/include/*
 %{_libdir}/giomm-%{apiver}/include/*
 %{_includedir}/*
-%{_datadir}/*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
@@ -95,37 +90,53 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules; make check
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.56.0-7
 - Added %%license line automatically
 
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.56.0-6
--   Renaming glibmm to glibmm24
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.56.0-5
--   Renaming XML-Parser to perl-XML-Parser
-*   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 2.56.0-4
--   Renaming libsigc++ to libsigc++20
-*   Tue Apr 21 2020 Eric Li <eli@microsoft.com> 2.56.0-3
--   Fix Source0: and delete sha1. Verified License. Fixed URL.  Fixed formatting.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.56.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 14 2018 Keerthana K <keerthanak@vmware.com> 2.56.0-1
--   Update to version 2.56.0
-*   Thu Aug 24 2017 Rongrong Qiu <rqiu@vmware.com> 2.50.1-2
--   add buildrequires for make check for bug 1900286
-*   Thu May 26 2017 Harish Udaiya Kumar <hudaiykumar@vmware.com> 2.50.1-1
--   Downgrade to stable version 2.50.1
-*   Mon Apr 10 2017 Danut Moraru <dmoraru@vmware.com> 2.53.1-1
--   Update to version 2.53.1
-*   Thu Oct 06 2016 ChangLee <changlee@vmware.com> 2.48.1-2
--   Modified %check
-*   Tue Sep 06 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.48.1-1
--   Updated to version 2.48.1-1
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.47.3.1-2
--   GA - Bump release of all rpms
-*   Thu Apr 14 2016	Harish Udaiya Kumar<hudaiyakumar@vmware.com> 2.47.3.1-1
-    Updated to version 2.47.3.1
-*   Mon Feb 22 2016 XIaolin Li <xiaolinl@vmware.com> 2.46.3-1
--   Updated to version 2.46.3
-*   Tue Jul 7 2015 Alexey Makhalov <amakhalov@vmware.com> 2.42.0-3
--   Created devel subpackage. Added Summary.
-*   Tue Jun 23 2015 Alexey Makhalov <amakhalov@vmware.com> 2.42.0-2
--   Added glib-schemas to build requirements.
-*   Fri Nov 12 2014 Mahmoud Bassiouny <mbassiouny@vmware.com> 2.42.0-1
--   Initial version
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.56.0-6
+- Renaming glibmm to glibmm24
+
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 2.56.0-5
+- Renaming XML-Parser to perl-XML-Parser
+
+* Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 2.56.0-4
+- Renaming libsigc++ to libsigc++20
+
+* Tue Apr 21 2020 Eric Li <eli@microsoft.com> 2.56.0-3
+- Fix Source0: and delete sha1. Verified License. Fixed URL.  Fixed formatting.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.56.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 14 2018 Keerthana K <keerthanak@vmware.com> 2.56.0-1
+- Update to version 2.56.0
+
+* Thu Aug 24 2017 Rongrong Qiu <rqiu@vmware.com> 2.50.1-2
+- add buildrequires for make check for bug 1900286
+
+* Fri May 26 2017 Harish Udaiya Kumar <hudaiykumar@vmware.com> 2.50.1-1
+- Downgrade to stable version 2.50.1
+
+* Mon Apr 10 2017 Danut Moraru <dmoraru@vmware.com> 2.53.1-1
+- Update to version 2.53.1
+
+* Thu Oct 06 2016 ChangLee <changlee@vmware.com> 2.48.1-2
+- Modified %check
+
+* Tue Sep 06 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.48.1-1
+- Updated to version 2.48.1-1
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.47.3.1-2
+- GA - Bump release of all rpms
+
+* Thu Apr 14 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 2.47.3.1-1
+- Updated to version 2.47.3.1
+
+* Mon Feb 22 2016 XIaolin Li <xiaolinl@vmware.com> 2.46.3-1
+- Updated to version 2.46.3
+
+* Tue Jul 7 2015 Alexey Makhalov <amakhalov@vmware.com> 2.42.0-3
+- Created devel subpackage. Added Summary.
+
+* Tue Jun 23 2015 Alexey Makhalov <amakhalov@vmware.com> 2.42.0-2
+- Added glib-schemas to build requirements.
+
+* Wed Nov 12 2014 Mahmoud Bassiouny <mbassiouny@vmware.com> 2.42.0-1
+- Initial version

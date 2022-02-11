@@ -31,7 +31,7 @@ depend on GTK+ or gtkmm.
 %setup -qn libsigc++-%{version}
 
 %build
-%meson 
+%meson
 %meson_build
 
 %install
