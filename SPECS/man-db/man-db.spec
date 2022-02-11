@@ -7,7 +7,7 @@ URL:            https://nongnu.org/man-db
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.xz
 Provides:       man = %{version}-%{release}
 Requires:       libpipeline
 Requires:       gdbm
