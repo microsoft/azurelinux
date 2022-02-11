@@ -4020,8 +4020,8 @@
         "type": "other",
         "other": {
           "name": "freetype",
-          "version": "2.9.1",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.11.1.tar.gz"
         }
       }
     },
