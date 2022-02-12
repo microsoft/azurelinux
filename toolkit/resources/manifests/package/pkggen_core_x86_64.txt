@@ -47,8 +47,8 @@ bash-lang-5.1.8-1.cm2.x86_64.rpm
 bzip2-1.0.8-1.cm2.x86_64.rpm
 bzip2-devel-1.0.8-1.cm2.x86_64.rpm
 bzip2-libs-1.0.8-1.cm2.x86_64.rpm
-sed-4.8-1.cm2.x86_64.rpm
-sed-lang-4.8-1.cm2.x86_64.rpm
+sed-4.8-2.cm2.x86_64.rpm
+sed-lang-4.8-2.cm2.x86_64.rpm
 procps-ng-3.3.17-1.cm2.x86_64.rpm
 procps-ng-devel-3.3.17-1.cm2.x86_64.rpm
 procps-ng-lang-3.3.17-1.cm2.x86_64.rpm
