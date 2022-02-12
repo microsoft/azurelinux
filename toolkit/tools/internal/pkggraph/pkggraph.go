@@ -1257,6 +1257,8 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 		}
 	}
 
+	// Breaking the cycle by removing all edges between in-cycle nodes.
+	// Their dependency on each other will be reflected by a new meta node.
 	logger.Log.Debugf("Breaking cycle edges.")
 	cycleLength := len(trimmedCycle)
 	for i, currentNode := range trimmedCycle {
