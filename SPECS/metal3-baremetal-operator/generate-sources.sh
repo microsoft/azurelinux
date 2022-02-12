@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 #
-# Source0 is the upstream source tarball of a golang project with the vendor dir
-# included for offline build. It also have a top-level directory normalized to
-# <package-name>-<version>. It can't simply be downloaded by URL. This script
-# will regenerate the tarball in a reproducible such that the hash will be
-# consistent with previous runs.
+# The Source0 of this package is the upstream source tarball with the vendor dir
+# included for offline builds and its top-level directory renamed to
+# <name>-<version>. This script will regenerate Source0 in a reproducible way
+# such that its cyptographic hash in *.signatures.json will not need to be
+# changed. It may be run in any directory.
 #
-# The script may be run in any directory using no arguments.
-#
-# Usage: /path/to/generate-source.sh
+# Usage: /path/to/generate-sources.sh
 #
 set -eu
 
