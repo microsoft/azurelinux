@@ -21,7 +21,7 @@ Name:           qdox
 Version:        2.0.0
 Release:        1%{?dist}
 Summary:        Tool to extract class/interface/method definitions from sources
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            https://github.com/paul-hammant/qdox
 Source0:        https://github.com/paul-hammant/qdox/archive/refs/tags/%{name}-%{version}.tar.gz
@@ -100,6 +100,7 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %changelog
 * Thu Feb 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-1
 - Removing docs.
+- License verified.
 - Updating to version 2.0.0 and GitHub sources.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.M9-4
