@@ -35,10 +35,10 @@ Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
 Requires:       systemd
-Requires(pre):  /usr/sbin/useradd
-Requires(pre):  /usr/sbin/groupadd
-Requires(postun): /usr/sbin/userdel
-Requires(postun): /usr/sbin/groupdel
+Requires(pre):  %{_sbindir}/useradd
+Requires(pre):  %{_sbindir}/groupadd
+Requires(postun): %{_sbindir}/userdel
+Requires(postun): %{_sbindir}/groupdel
 
 %description
 Telegraf is an agent written in Go for collecting, processing, aggregating, and writing metrics.

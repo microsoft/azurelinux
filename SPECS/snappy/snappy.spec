@@ -10,7 +10,7 @@ URL:            https://github.com/google/snappy
 #Source0:       https://github.com/google/%{name}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         snappy-inline.patch
-BuildRequires:  cmake>=3.3
+BuildRequires:  cmake >= 3.3
 
 # A buildable snappy environment needs functioning submodules that do not work from the archive download
 # To recreate the tar.gz run the following
@@ -31,8 +31,9 @@ inputs, but the resulting compressed files are anywhere from 20% to 100%
 bigger.
 
 %package	devel
-Summary:	Header and development files
-Requires:	%{name} = %{version}
+Summary:	 Header and development files
+Requires:	 %{name} = %{version}
+
 %description	devel
 It contains the libraries and header files to create applications
 
