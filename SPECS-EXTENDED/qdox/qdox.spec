@@ -17,17 +17,14 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
-%global vertag  M9
-%global verbase 2.0
 Name:           qdox
-Version:        %{verbase}.%{vertag}
-Release:        5%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 Summary:        Tool to extract class/interface/method definitions from sources
 License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            https://github.com/paul-hammant/qdox
-Source0:        http://repo2.maven.org/maven2/com/thoughtworks/qdox/qdox/%{verbase}-%{vertag}/%{name}-%{verbase}-%{vertag}-project.tar.gz
+Source0:        https://github.com/paul-hammant/qdox/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        qdox-MANIFEST.MF
 BuildRequires:  byaccj
 BuildRequires:  fdupes
@@ -43,7 +40,7 @@ from source files complete with JavaDoc @tags. It is designed to be
 used by active code generators or documentation tools.
 
 %prep
-%setup -q -n %{name}-%{verbase}-%{vertag}
+%setup -q -n %{name}-%{name}-%{version}
 find -name *.jar -delete
 find -name *.class -delete
 rm -rf bootstrap
@@ -82,15 +79,15 @@ GRAMMAR_PATH=$(pwd)/src/grammar/parser.y && \
 mkdir -p build/classes
 javac -d build/classes -source 6 -target 6 \
   $(find src/main/java -name \*.java)
-jar cf build/%{name}-%{verbase}-%{vertag}.jar -C build/classes .
+jar cf build/%{name}-%{version}.jar -C build/classes .
 
 # Inject OSGi manifests
-jar ufm build/%{name}-%{verbase}-%{vertag}.jar %{SOURCE1}
+jar ufm build/%{name}-%{version}.jar %{SOURCE1}
 
 %install
 # jar
 install -dm 0755 %{buildroot}%{_javadir}
-install -pm 0644 build/%{name}-%{verbase}-%{vertag}.jar %{buildroot}%{_javadir}/%{name}.jar
+install -pm 0644 build/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
 # pom
 install -dm 0755 %{buildroot}%{_mavenpomdir}
 install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
@@ -101,8 +98,9 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %doc README.md
 
 %changelog
-* Thu Feb 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.M9-5
+* Thu Feb 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-1
 - Removing docs.
+- Updating to version 2.0.0 and GitHub sources.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.M9-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
