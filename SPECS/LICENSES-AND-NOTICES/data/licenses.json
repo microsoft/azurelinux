@@ -602,6 +602,7 @@
                 "java-atk-wrapper",
                 "javacc-maven-plugin",
                 "javapackages-tools",
+                "javapackages-tools-meta",
                 "javaparser",
                 "jbigkit",
                 "jboss-annotations-1.2-api",

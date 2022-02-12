@@ -1,148 +1,87 @@
 # Don't generate requires on jpackage-utils and java-headless for
 # provided pseudo-artifacts: com.sun:tools and sun.jdk:jconsole.
 %global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}/maven-metadata/javapackages-metadata.xml$
-# Disable automatic bytecode compilation for files in java-utils
-# https://fedoraproject.org/wiki/Packaging:Python_Appendix#Manual_byte_compilation
-%global _python_bytecompile_extra 0
-%global python_interpreter %{__python3}
-%global rpmmacrodir %{_rpmconfigdir}/macros.d
-Summary:        Macros and scripts for Java packaging support
-Name:           javapackages-tools
+
+Name:           javapackages-tools-meta
 Version:        5.3.0
-Release:        14%{?dist}
+Release:        10%{?dist}
+
+Summary:        Macros and scripts for Java packaging support
+
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
-#Source0:       https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Patch0:         remove-epoch-from-java-requires.patch
-Patch1:         remove-headless-from-java-requires.patch
-BuildRequires:  asciidoc
-BuildRequires:  coreutils
-BuildRequires:  msopenjdk-11
-BuildRequires:  make
-BuildRequires:  python3-devel
-BuildRequires:  python3-lxml
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
-BuildRequires:  which
-BuildRequires:  xmlto
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
-Requires:       coreutils
-Requires:       findutils
-# default JRE
-Requires:       msopenjdk-11
-Requires:       javapackages-filesystem = %{version}-%{release}
-Requires:       which
-Provides:       jpackage-utils = %{version}-%{release}
-# These could be generated automatically, but then we would need to
-# depend on javapackages-local for dependency generator.
-Provides:       mvn(com.sun:tools) = SYSTEM
-Provides:       mvn(sun.jdk:jconsole) = SYSTEM
+Source0:        https://github.com/fedora-java/javapackages/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
-This package provides macros and scripts to support Java packaging.
+Meta package for adding requires ontop of javapackages-tools.
 
-%package -n javapackages-filesystem
-Summary:        Java packages filesystem layout
-Provides:       eclipse-filesystem = %{version}-%{release}
+%package -n maven-local
+Summary:        Macros and scripts for Maven packaging support
+Requires:       javapackages-tools = %{version}
+Requires:       javapackages-local = %{version}-%{release}
+Requires:       xmvn-minimal
+Requires:       xmvn-mojo
+Requires:       xmvn-connector-aether
+# Common Maven plugins required by almost every build. It wouldn't make
+# sense to explicitly require them in every package built with Maven.
+Requires:       mvn(org.apache.maven.plugins:maven-compiler-plugin)
+Requires:       mvn(org.apache.maven.plugins:maven-jar-plugin)
+Requires:       mvn(org.apache.maven.plugins:maven-javadoc-plugin)
+Requires:       mvn(org.apache.maven.plugins:maven-resources-plugin)
+Requires:       mvn(org.apache.maven.plugins:maven-surefire-plugin)
+# Tests based on JUnit are very common and JUnit itself is small.
+# Include JUnit and JUnit provider for Surefire just for convenience.
+Requires:       mvn(junit:junit)
+Requires:       mvn(org.apache.maven.surefire:surefire-junit4)
+# testng is quite common as well
+Requires:       mvn(org.apache.maven.surefire:surefire-testng)
 
-%description -n javapackages-filesystem
-This package provides some basic directories into which Java packages
-install their content.
+%description -n maven-local
+This package provides macros and scripts to support packaging Maven artifacts.
 
-%package -n ivy-local-bootstrap
+%package -n ivy-local
 Summary:        Local mode for Apache Ivy
-Requires:       %{name} = %{version}-%{release}
-Requires:       javapackages-local-bootstrap = %{version}-%{release}
+Requires:       javapackages-tools = %{version}
+Requires:       javapackages-local = %{version}-%{release}
+Requires:       ivy-local-bootstrap = %{version}
+Requires:       apache-ivy >= 2.3.0-8
+Requires:       xmvn-connector-ivy
 
-%description -n ivy-local-bootstrap
+%description -n ivy-local
 This package implements local mode for Apache Ivy, which allows
 artifact resolution using XMvn resolver.
 
-%package -n python3-javapackages
-Summary:        Module for handling various files for Java packaging
-Requires:       python3-lxml
-Requires:       python3-six
-
-%description -n python3-javapackages
-Module for handling, querying and manipulating of various files for Java
-packaging in Linux distributions
-
-%package -n javapackages-local-bootstrap
+%package -n javapackages-local
 Summary:        Non-essential macros and scripts for Java packaging support
-Requires:       %{name} = %{version}-%{release}
-Requires:       msopenjdk-11
+Requires:       javapackages-tools = %{version}
+Requires:       javapackages-local-bootstrap = %{version}
+Requires:       xmvn-install
+Requires:       xmvn-subst
+Requires:       xmvn-resolve
+# Java build systems don't have hard requirement on java-devel, so it should be there
+Requires:       java-1.8.0-openjdk-devel
+Requires:       python3-javapackages = %{version}
 Requires:       python3
-Requires:       python3-javapackages = %{version}-%{release}
 
-%description -n javapackages-local-bootstrap
+%description -n javapackages-local
 This package provides non-essential macros and scripts to support Java packaging.
-It is a lightweight version with minimal runtime requirements.
 
-%prep
-%autosetup -p1 -n javapackages-%{version}
-
-%build
-%define jdk_home $(find %{_libdir}/jvm -name "msopenjdk*")
-%define jre_home %{jdk_home}/jre
-
-%configure --pyinterpreter=%{python_interpreter} \
-    --default_jdk=%{jdk_home} --default_jre=%{jre_home} \
-    --rpmmacrodir=%{rpmmacrodir}
-./build
-
-%install
-./install
-
-sed -e 's/.[17]$/&*/' -i files-*
-
-rm -rf %{buildroot}%{_bindir}/gradle-local
-rm -rf %{buildroot}%{_datadir}/gradle-local
-rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
-
-%check
-pip3 install -r test-requirements.txt
-./check
-
-%files -f files-tools
-
-%files -n javapackages-filesystem -f files-filesystem
-
-%files -n javapackages-local-bootstrap -f files-local
-
-%files -n ivy-local-bootstrap -f files-ivy
-
-%files -n python3-javapackages -f files-python
+%files -n javapackages-local
 %license LICENSE
 
+%files -n maven-local
+
+%files -n ivy-local
+
 %changelog
-* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 5.3.0-14
-- Add patch to replace generated dependency on "java-headless" with "java"
-- Amend epoch patch to fix expected test results
-- Remove obsoletes statements that don't apply to Mariner
-- Install test requirements with pip during check section
-
-* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.3.0-13
-- Update to build with JDK 11
-- License verified
-
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-12
-- Replace incorrect %%{_lib} usage with %%{_libdir}
-
-* Wed Dec 09 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-11
-- Add remove-epoch-from-java-requires.patch to remove epoch from java versions during dependency generation.
-
-* Fri Nov 20 2020 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-10
+* Thu Nov 12 2020 Ruying Chen <v-ruyche@microsoft.com> - 5.3.0-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Dynamically calculate jdk and jre paths.
-- Remove meta packages.
-- Simplify spec macro and bcond usage.
-- Create bootstrap packages for ivy-local and javapackages-local with minimal runtime requirements.
+- Create javapackages-local-bootstrap without xmvn requires.
+- Add requires on upstream javapackages-tools.
+- License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

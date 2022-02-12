@@ -33,7 +33,7 @@ BuildRequires:  byaccj
 BuildRequires:  fdupes
 BuildRequires:  java-cup-bootstrap
 BuildRequires:  java-devel
-BuildRequires:  javapackages-local
+BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  jflex-bootstrap
 BuildArch:      noarch
 
@@ -86,9 +86,6 @@ jar cf build/%{name}-%{verbase}-%{vertag}.jar -C build/classes .
 
 # Inject OSGi manifests
 jar ufm build/%{name}-%{verbase}-%{vertag}.jar %{SOURCE1}
-
-mkdir -p build/apidoc
-javadoc -d build/apidoc -source 6 -notimestamp $(find src/main/java -name \*.java)
 
 %install
 # jar
