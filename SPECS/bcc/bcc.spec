@@ -10,7 +10,6 @@ Group:          Development/Languages
 URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
 Source0:        https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz#/%{name}-%{version}.tar.gz
-
 BuildRequires:  bison
 BuildRequires:  clang-devel
 BuildRequires:  cmake >= 2.8.7
@@ -23,8 +22,7 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  pkg-config
 BuildRequires:  python3-devel
-
-Requires:  elfutils-libelf
+Requires:       elfutils-libelf
 
 %description
 BCC is a toolkit for creating efficient kernel tracing and manipulation programs,
@@ -42,8 +40,8 @@ Requires:       %{name} = %{version}-%{release}
 developing application.
 
 %package -n python3-%{name}
-%{?python_provide:%python_provide python3-bcc}
 Summary:        Python3 bindings for BPF Compiler Collection (BCC)
+%{?python_provide:%python_provide python3-bcc}
 Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-%{name}

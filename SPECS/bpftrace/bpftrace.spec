@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/iovisor/bpftrace
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
@@ -22,14 +21,6 @@ BuildRequires:  llvm-devel >= 12.0.1-1
 BuildRequires:  make
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  zlib-devel
-
-%if %{with_check}
-BuildRequires:  gmock
-BuildRequires:  gmock-devel
-BuildRequires:  gtest
-BuildRequires:  gtest-devel
-%endif
-
 Requires:       bcc
 Requires:       binutils
 Requires:       clang
@@ -37,6 +28,12 @@ Requires:       glibc
 Requires:       libgcc
 Requires:       libstdc++
 Requires:       llvm >= 12.0.1-1
+%if %{with_check}
+BuildRequires:  gmock
+BuildRequires:  gmock-devel
+BuildRequires:  gtest
+BuildRequires:  gtest-devel
+%endif
 
 %description
 bpftrace is a high-level tracing language for Linux enhanced Berkeley Packet Filter (eBPF)
