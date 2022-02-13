@@ -2,7 +2,7 @@
 Summary:        Job spooling tools
 Name:           at
 Version:        3.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:        GPLv3+ AND GPLv2+ AND ISC AND MIT AND Public Domain
@@ -49,6 +49,12 @@ Conflicts:      crontabs <= 1.5
 Obsoletes:      at-sysvinit < 3.1.16-1
 %if %{with pam}
 BuildRequires:  pam-devel
+%endif
+
+%if %{with_check}
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::Harness)
+BuildRequires:  perl(Test::More)
 %endif
 
 %description
@@ -164,6 +170,9 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root) /lib/systemd/system/atd.service
 
 %changelog
+* Thu Feb 14 2022 Bala <balakumaran.kannan@microsoft.com> - 3.2.2-2
+- BR perl-Test, perl-Test-More and perl-Test-Harness for ptest
+
 * Thu Jan 06 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.2-1
 - upgrade to version 3.2.2
 - License verified
