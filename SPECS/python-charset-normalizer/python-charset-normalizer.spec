@@ -1,19 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        The Real First Universal Charset Detector
 Name:           python-charset-normalizer
 Version:        2.0.11
 Release:        2%{?dist}
-Summary:        The Real First Universal Charset Detector
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ousret/charset_normalizer
-Source0:        %{url}/archive/refs/tags/%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildArch:      noarch
 
-BuildRequires:  python3-devel
 BuildRequires:  pyproject-rpm-macros
-BuildRequires:  python3dist(pytest)
+BuildRequires:  python3-devel
 
+%if %{with_check}
+BuildRequires:  python3dist(pytest)
+%endif
 
 %description
 A library that helps you read text from an unknown charset encoding.
