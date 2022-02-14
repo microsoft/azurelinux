@@ -22374,8 +22374,8 @@
         "type": "other",
         "other": {
           "name": "python-cffi",
-          "version": "1.14.5",
-          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.14.5.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.15.0.tar.gz"
         }
       }
     },
