@@ -911,13 +911,10 @@ pushd man-db-2.10.1
             --docdir=/usr/share/doc/man-db-2.10.1 \
             --sysconfdir=/etc                    \
             --disable-setuid                     \
-            --enable-cache-owner=bin             \
             --with-browser=/usr/bin/lynx         \
             --with-systemdsystemunitdir=no       \
             --with-vgrind=/usr/bin/vgrind        \
-            --with-grap=/usr/bin/grap            \
-            --with-systemdtmpfilesdir=           \
-            --with-systemdsystemunitdir=
+            --with-grap=/usr/bin/grap
 make -j$(nproc)
 make install
 popd
