@@ -25224,8 +25224,8 @@
         "type": "other",
         "other": {
           "name": "qdox",
-          "version": "2.0.M9",
-          "downloadUrl": "http://repo2.maven.org/maven2/com/thoughtworks/qdox/qdox/2.0-M9/qdox-2.0-M9-project.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/paul-hammant/qdox/archive/refs/tags/qdox-2.0.0.tar.gz"
         }
       }
     },
