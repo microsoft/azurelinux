@@ -1,11 +1,5 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Name:           pyproject-rpm-macros
 Summary:        RPM macros for PEP 517 Python packages
-License:        MIT
-
-%bcond_without tests
-
+Name:           pyproject-rpm-macros
 # The idea is to follow the spirit of semver
 # Given version X.Y.Z:
 #   Increment X and reset Y.Z when there is a *major* incompatibility
@@ -14,6 +8,12 @@ License:        MIT
 # Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.0.0~rc1
 Release:        2%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://src.fedoraproject.org/rpms/pyproject-rpm-macros
+
+BuildArch:      noarch
 
 # Macro files
 Source001:      macros.pyproject
@@ -41,30 +41,23 @@ Source303:      test_RECORD
 Source901:      README.md
 Source902:      LICENSE
 
-URL:            https://src.fedoraproject.org/rpms/pyproject-rpm-macros
-
-BuildArch:      noarch
-
 %if %{with_check}
-BuildRequires: python3dist(pytest)
-BuildRequires: python3dist(pyyaml)
-BuildRequires: python3dist(packaging)
-BuildRequires: python3dist(pip)
-BuildRequires: python3dist(setuptools)
-BuildRequires: python3dist(tox-current-env) >= 0.0.6
+BuildRequires:  python3dist(packaging)
+BuildRequires:  python3dist(pip)
+BuildRequires:  python3dist(pytest)
+BuildRequires:  python3dist(pyyaml)
+BuildRequires:  python3dist(setuptools)
 # Available only in SPECS-EXTENDED:
-BuildRequires: python3dist(toml)
-BuildRequires: python3dist(wheel)
+BuildRequires:  python3dist(toml)
+BuildRequires:  python3dist(tox-current-env) >= 0.0.6
+BuildRequires:  python3dist(wheel)
 %endif
 
-# We build on top of those:
-Requires:      python-rpm-macros
-Requires:      python-srpm-macros
-Requires:      python3-rpm-macros
-
-# We use the following tools outside of coreutils
-Requires:      /usr/bin/find
-Requires:      /bin/sed
+Requires:       %{_bindir}/find
+Requires:       /bin/sed
+Requires:       python-rpm-macros
+Requires:       python-srpm-macros
+Requires:       python3-rpm-macros
 
 %description
 These macros allow projects that follow the Python packaging specifications
@@ -80,11 +73,10 @@ They work for:
 These macros replace %%py3_build and %%py3_install,
 which only work with setup.py.
 
-
 %prep
 # Not strictly necessary but allows working on file names instead
 # of source numbers in install section
-%setup -c -T
+%setup -q -c -T
 cp -p %{sources} .
 
 %build
