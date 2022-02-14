@@ -1940,6 +1940,7 @@
                 "python-toolz",
                 "python-tornado",
                 "python-tox",
+                "python-tox-current-env",
                 "python-tqdm",
                 "python-trio",
                 "python-uamqp",

@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           python-%{pypi_name}
 Version:        0.0.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Tox plugin to run tests in current Python environment
 
 License:        MIT
@@ -57,6 +57,9 @@ The tox-current-env plugin allows to run tests in current Python environment.
 
 
 %changelog
+* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.7-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Mon Feb 07 2022 Miro Hrončok <mhroncok@redhat.com> - 0.0.7-1
 - Update to 0.0.7 to pin tox < 4
 
