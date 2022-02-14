@@ -142,7 +142,7 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 %{_mandir}/man1/mem*
 
 %changelog
-* Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> -1.1.1-4
+* Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1-4
 - Adding python-devel to fix python-sphinx build issue
 
 * Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 1.1.1-3
