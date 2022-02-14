@@ -36,8 +36,7 @@ The Man-DB package contains programs for finding and viewing man pages.
     --with-browser=%{_bindir}/lynx \
     --with-systemdsystemunitdir=no \
     --with-vgrind=%{_bindir}/vgrind \
-    --with-grap=%{_bindir}/grap \
-    --disable-silent-rules
+    --with-grap=%{_bindir}/grap
 
 make %{?_smp_mflags}
 
