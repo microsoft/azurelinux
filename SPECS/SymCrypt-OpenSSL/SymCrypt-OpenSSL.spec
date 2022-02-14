@@ -2,7 +2,7 @@ Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenS
 Name:           SymCrypt-OpenSSL
 Version:        1.0.0
 Release:        1%{?dist}
-License:        MIT License
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Libraries
@@ -52,4 +52,5 @@ cmake --build . --target install
 
 %changelog
 * Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 1.0.0-1
-- Initial CBL-Mariner import
+- Original version for CBL-Mariner
+- Verified license
