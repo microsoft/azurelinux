@@ -10,7 +10,6 @@ URL:            https://github.com/metal3-io/cluster-api-provider-metal3
 # Created using ./generate-sources.sh
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  golang >= 1.13
-ExclusiveArch:  x86_64
 
 %description
 The Cluster API brings declarative, Kubernetes-style APIs to cluster creation,

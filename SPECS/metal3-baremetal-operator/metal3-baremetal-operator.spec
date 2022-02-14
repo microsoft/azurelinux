@@ -10,7 +10,6 @@ URL:            https://github.com/metal3-io/baremetal-operator
 # Created using ./generate-sources.sh
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  golang >= 1.14
-ExclusiveArch:  x86_64
 
 %description
 The Bare Metal Operator implements a Kubernetes API for managing bare metal

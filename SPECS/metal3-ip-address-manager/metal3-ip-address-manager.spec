@@ -10,7 +10,6 @@ URL:            https://github.com/metal3-io/ip-address-manager
 # Created using ./generate-sources.sh
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  golang >= 1.13
-ExclusiveArch:  x86_64
 
 %description
 The IP Address Manager is a Kubernetes Controller that provides IP addresses and
