@@ -13,7 +13,7 @@ License:        MIT
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.0.0~rc1
-Release:        1%{?dist}
+Release:        2%{?dist}
 
 # Macro files
 Source001:      macros.pyproject
@@ -122,6 +122,9 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 %license LICENSE
 
 %changelog
+* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Tue Jan 25 2022 Miro Hrončok <mhroncok@redhat.com> - 1.0.0~rc1-1
 - Release version 1.0.0, first release candidate
 

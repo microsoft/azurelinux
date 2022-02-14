@@ -1721,6 +1721,7 @@
                 "pykickstart",
                 "pylint",
                 "pyparted",
+                "pyproject-rpm-macros",
                 "pyserial",
                 "python-adal",
                 "python-aiodns",
