@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
-Version:        5.15.2.1
-Release:        5%{?dist}
+Version:        5.15.18.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,6 @@ Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20211013.pem
-Patch0:         0002-add-linux-syscall-license-info.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -85,7 +84,6 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
-%patch0 -p1
 
 %build
 make mrproper
@@ -256,6 +254,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
+- Update source to 5.15.18.1
+
 * Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 5.15.2.1-5
 - Enable CONFIG_X86_SGX and CONFIG_X86_SGX_KVM
 
