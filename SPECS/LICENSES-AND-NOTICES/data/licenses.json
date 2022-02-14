@@ -1739,6 +1739,7 @@
                 "python-blivet",
                 "python-case",
                 "python-celery",
+                "python-charset-normalizer",
                 "python-cheetah",
                 "python-click",
                 "python-cliff",

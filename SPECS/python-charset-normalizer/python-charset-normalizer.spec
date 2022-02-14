@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           python-charset-normalizer
 Version:        2.0.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The Real First Universal Charset Detector
 
 License:        MIT
@@ -54,6 +54,9 @@ sed -i "/addopts = --cov/d" setup.cfg
 %{_bindir}/normalizer
 
 %changelog
+* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.11-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+
 * Mon Jan 31 2022 Lumír Balhar <lbalhar@redhat.com> - 2.0.11-1
 - Update to 2.0.11
 Resolves: rhbz#2048279

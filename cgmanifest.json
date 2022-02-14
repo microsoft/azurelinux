@@ -22393,6 +22393,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-charset-normalizer",
+          "version": "2.0.11",
+          "downloadUrl": "https://github.com/ousret/charset_normalizer/archive/refs/tags/2.0.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-cheetah",
           "version": "3.2.4",
           "downloadUrl": "https://github.com/CheetahTemplate3/cheetah3/archive/3.2.4/python-cheetah-3.2.4.tar.gz"
