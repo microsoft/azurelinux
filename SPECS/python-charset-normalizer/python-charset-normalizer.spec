@@ -56,6 +56,7 @@ sed -i "/addopts = --cov/d" setup.cfg
 %changelog
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.11-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Mon Jan 31 2022 Lumír Balhar <lbalhar@redhat.com> - 2.0.11-1
 - Update to 2.0.11
