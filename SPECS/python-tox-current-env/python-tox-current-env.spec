@@ -1,24 +1,23 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name tox-current-env
 %global pypi_under tox_current_env
 
+Summary:        Tox plugin to run tests in current Python environment
 Name:           python-%{pypi_name}
 Version:        0.0.7
 Release:        2%{?dist}
-Summary:        Tox plugin to run tests in current Python environment
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/fedora-python/tox-current-env
 Source0:        https://github.com/fedora-python/tox-current-env/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildArch:      noarch
 
-BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python%{python3_pkgversion}-devel
 
 %description
 The tox-current-env plugin allows to run tests in current Python environment.
-
 
 %package -n     python%{python3_pkgversion}-%{pypi_name}
 Summary:        %{summary}
@@ -26,7 +25,6 @@ Summary:        %{summary}
 
 %description -n python%{python3_pkgversion}-%{pypi_name}
 The tox-current-env plugin allows to run tests in current Python environment.
-
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
@@ -55,7 +53,6 @@ The tox-current-env plugin allows to run tests in current Python environment.
 %files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
-
 
 %changelog
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.7-2
