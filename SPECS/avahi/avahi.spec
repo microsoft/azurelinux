@@ -3,7 +3,7 @@
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.7
-Release:        26%{?dist}
+Release:        27%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,9 @@ BuildRequires:  pkg-config
 BuildRequires:  systemd
 BuildRequires:  xmltoman
 BuildRequires:  pkgconfig(pygobject-3.0)
+BuildRequires:  perl
+BuildRequires:  perl-generators
+BuildRequires:  perl(File::Find)
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       dbus
 Requires:       expat
@@ -400,6 +403,9 @@ exit 0
 %endif
 
 %changelog
+* Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.7-27
+- Add BR for Perl and Perl-Generators
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7-26
 - License verified
 - Lint spec
