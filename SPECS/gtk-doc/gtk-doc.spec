@@ -1,12 +1,12 @@
 %global debug_package %{nil}
-
+%define majver %(echo %{version} | cut -d. -f 1-2)
 Summary:        Program to generate documenation
 Name:           gtk-doc
-Version:        1.29
-Release:        6%{?dist}
+Version:        1.33.2
+Release:        1%{?dist}
 License:        GPLv2+ and GFDL
 URL:            https://www.gtk.org/
-Source0:        https://ftp.gnome.org/pub/gnome/sources/%{name}/%{version}/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnome.org/pub/gnome/sources/%{name}/%{majver}/%{name}-%{version}.tar.xz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,15 +15,19 @@ Requires:       libxslt
 Requires:       docbook-dtd-xml
 Requires:       docbook-style-xsl
 Requires:       python3
+Requires:       python3-pygments
+Requires:       python3-lxml
 
 BuildRequires:  docbook-dtd-xml >= 4.5
 BuildRequires:  docbook-style-xsl >= 1.78.1
 BuildRequires:  itstool >= 2.0.2
 BuildRequires:  libxslt >= 1.1.28
+BuildRequires:  meson
 BuildRequires:  cmake
 BuildRequires:  check
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
+BuildRequires:  python3-pygments
 
 Provides:       perl(gtkdoc-common.pl)
 
@@ -32,16 +36,23 @@ BuildArch:      noarch
 %description
 The GTK-Doc package contains a code documenter. This is useful for extracting
 specially formatted comments from the code to create API documentation.
+
 %prep
 %setup -q
+
+# Move this doc file to avoid name collisions	
+mv doc/README doc/README.docs
+
 %build
-%configure --disable-silent-rules CFLAGS="%{build_cflags}"
-make %{?_smp_mflags}
+%meson -Dtests=false
+%meson_build
+
 %install
-make DESTDIR=%{buildroot} sysconfdir=%{_sysconfdir} datadir=%{_datadir} install
+%meson_install
+%py_byte_compile %{__python3} %{buildroot}%{_datadir}/gtk-doc/
 
 %check
-cd tests && make check-TESTS
+%meson_test
 
 %files
 %defattr(-,root,root)
@@ -51,6 +62,13 @@ cd tests && make check-TESTS
 %{_libdir}/cmake/
 
 %changelog
+* Fri Jan 21 2022 Henry Li <lihl@microsoft.com> - 1.33.2-1
+- Upgrade to version 1.33.2
+- Add meson and python3-pygments as BR
+- Use meson to build and install
+- Disable test, which will cause circular dependency with glib2
+- License Verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.29-6
 - Added %%license line automatically
 

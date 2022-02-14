@@ -1,7 +1,7 @@
 Summary:        A free package dependency solver
 Name:           libsolv
-Version:        0.7.19
-Release:        2%{?dist}
+Version:        0.7.20
+Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
 Source0:        https://github.com/openSUSE/libsolv/archive/%{version}/%{name}-%{version}.tar.gz
@@ -76,6 +76,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Fri Jan 14 2022 Henry Li <lihl@microsoft.com> - 0.7.20-1
+- Upgrade to version 0.7.20
+- License Verified
+
 * Tue Oct 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 0.7.19-2
 - RPM no longer requires libdb, so remove dependency from libsolv
 

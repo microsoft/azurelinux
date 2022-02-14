@@ -1,19 +1,14 @@
+%define majorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
-Version:        2.60.1
-Release:        6%{?dist}
+Version:        2.71.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
-Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/2.60/%{name}-%{version}.tar.xz
-Patch0:         CVE-2019-12450.patch
-Patch1:         CVE-2020-35457.patch
-# CVE-2021-27218 and CVE-2021-27219 are both solved by the patch for the first
-Patch3:         CVE-2021-27218.patch
-Patch4:         CVE-2021-27219.nopatch
-Patch5:         CVE-2021-28153.patch
+Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/%{majorver}/%{name}-%{version}.tar.xz
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -25,6 +20,7 @@ BuildRequires:  python3-xml
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  which
+BuildRequires:  python3-pygments
 Requires:       libffi
 Requires:       libselinux
 Requires:       pcre-libs
@@ -72,9 +68,6 @@ The glib2-doc package includes documentation for the GLib library.
 %autosetup -p1
 
 %build
-# Bug 1324770: Also explicitly remove PCRE sources since we use --with-pcre=system
-rm glib/pcre/*.[ch]
-
 %meson \
     -Dgtk_doc=true \
     --default-library=both
@@ -129,13 +122,21 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 2.71.0-1
+- Upgrade to version 2.71.0
+- Add python3-pygments as BR
+- Don't remove pcre sources which no longer apply for the new version
+- Fix Source0 URL to use macro to represent major version
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.60.1-6
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.60.1-5
 - Removed python2 support
+
 * Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4
 - Require schemas subpackage from devel subpackage
+
 * Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
 - Remove CVE-2019-13012 patch (already in the this version)
 - Exclude doubly-packaged files from devel subpackage
