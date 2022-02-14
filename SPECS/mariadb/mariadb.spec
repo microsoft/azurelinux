@@ -1,14 +1,13 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.3.28
-Release:        3%{?dist}
+Version:        10.6.6
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
-Patch0:         cmake_3.21.4_fix.patch
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
