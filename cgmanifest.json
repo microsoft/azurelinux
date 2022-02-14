@@ -24873,6 +24873,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-tox-current-env",
+          "version": "0.0.7",
+          "downloadUrl": "https://github.com/fedora-python/tox-current-env/archive/refs/tags/v0.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-tqdm",
           "version": "4.50.2",
           "downloadUrl": "https://github.com/tqdm/tqdm/archive/v4.50.2/tqdm-4.50.2.tar.gz"

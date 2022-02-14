@@ -10,7 +10,7 @@ Summary:        Tox plugin to run tests in current Python environment
 
 License:        MIT
 URL:            https://github.com/fedora-python/tox-current-env
-Source0:        %{pypi_source}
+Source0:        https://github.com/fedora-python/tox-current-env/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python%{python3_pkgversion}-devel
@@ -53,12 +53,14 @@ The tox-current-env plugin allows to run tests in current Python environment.
 
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
+%license LICENSE
 %doc README.rst
 
 
 %changelog
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.7-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Mon Feb 07 2022 Miro Hrončok <mhroncok@redhat.com> - 0.0.7-1
 - Update to 0.0.7 to pin tox < 4
