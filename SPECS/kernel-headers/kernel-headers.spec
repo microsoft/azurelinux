@@ -40,9 +40,6 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 * Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
 - Update source to 5.15.18.1
 
-* Fri Feb 04 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-6
-- Bump release number to match kernel release
-
 * Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 5.15.2.1-5
 - Bump release number to match kernel release
 

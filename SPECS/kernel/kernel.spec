@@ -386,8 +386,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
 - Update source to 5.15.18.1
-
-* Fri Feb 04 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-6
 - Address CVE-2010-0309, CVE-2018-1000026, CVE-2018-16880, CVE-2019-3016,
   CVE-2019-3819, CVE-2019-3887, CVE-2020-25672, CVE-2021-3564, CVE-2021-45095, 
   CVE-2021-45469, CVE-2021-45480
