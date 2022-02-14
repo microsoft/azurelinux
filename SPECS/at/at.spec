@@ -170,7 +170,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root) /lib/systemd/system/atd.service
 
 %changelog
-* Thu Feb 14 2022 Bala <balakumaran.kannan@microsoft.com> - 3.2.2-2
+* Mon Feb 14 2022 Bala <balakumaran.kannan@microsoft.com> - 3.2.2-2
 - BR perl-Test, perl-Test-More and perl-Test-Harness for ptest
 
 * Thu Jan 06 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.2-1
