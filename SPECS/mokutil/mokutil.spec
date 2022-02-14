@@ -1,26 +1,23 @@
+Summary:        Tool to manage UEFI Secure Boot MoK Keys
 Name:           mokutil
 Version:        0.5.0
 Release:        1%{?dist}
-Summary:        Tool to manage UEFI Secure Boot MoK Keys
 License:        GPLv3+
-URL:            https://github.com/lcp/mokutil
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:       https://github.com/lcp/mokutil/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-ExclusiveArch:  x86_64
-
-BuildRequires:  gcc
+URL:            https://github.com/lcp/mokutil
+Source0:        https://github.com/lcp/mokutil/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  efivar-devel >= 31-1
+BuildRequires:  gcc
 BuildRequires:  gnu-efi
 BuildRequires:  keyutils-devel
-BuildRequires:  openssl-devel
 BuildRequires:  openssl
+BuildRequires:  openssl-devel
 BuildRequires:  which
-BuildRequires:  efivar-devel >= 31-1
-
 Conflicts:      shim < 0.8-1%{?dist}
+ExclusiveArch:  x86_64
 
 %description
 mokutil provides a tool to manage keys for Secure Boot through the MoK
@@ -35,7 +32,6 @@ mokutil provides a tool to manage keys for Secure Boot through the MoK
 make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 make PREFIX=%{_prefix} LIBDIR=%{_libdir} DESTDIR=%{buildroot} install
 
 %files
@@ -49,6 +45,7 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir} DESTDIR=%{buildroot} install
 %changelog
 * Fri Feb 11 2022 Chris Co <chrco@microsoft.com> - 0.5.0-1
 - Update to 0.5.0 version
+- License verified
 
 * Tue May 12 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.0-17
 - Building only for x86_64.
