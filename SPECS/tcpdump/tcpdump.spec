@@ -1,7 +1,7 @@
 Summary:        Packet Analyzer
 Name:           tcpdump
 Version:        4.9.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          Networking
 URL:            https://www.tcpdump.org
 Source0:        https://www.tcpdump.org/release/%{name}-%{version}.tar.gz
 Patch0:         CVE-2020-8037.patch
+Patch1: CVE-2018-16301.patch
 BuildRequires:  libpcap-devel
 Requires:       libpcap
 
@@ -38,6 +39,8 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
+*   Tue Feb 15 2022 Mariner Autopatcher <cblmargh@microsoft.com> 4.9.3-4
+-   Added patch file(s) CVE-2018-16301.patch
 * Fri Nov 13 2020 Thomas Crain <thcrain@microsoft.com> - 4.9.3-3
 - Patch CVE-2020-8037
 - Lint to Mariner style
