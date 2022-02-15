@@ -8,6 +8,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://github.com/metal3-io/baremetal-operator
+#Source0:       https://github.com/metal3-io/baremetal-operator/archive/refs/tags/capm3-v%%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 # The source is the upstream tarball with the vendor dir (created using
 # "go mod vendor") include for offline builds and its top-level directory
 # renamed to %%{name}-%%{version}. It is then repackaged as a tar using the
@@ -26,8 +28,7 @@ URL:            https://github.com/metal3-io/baremetal-operator
 # This command creates a tar with the same cryptographic hash regardless of time
 # or environment. See https://reproducible-builds.org/docs/archives/. It can be
 # recreated using ./generate-sources.sh.
-#Source0:        https://github.com/metal3-io/baremetal-operator/archive/refs/tags/capm3-v%%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+
 BuildRequires:  golang >= 1.14
 
 %description
