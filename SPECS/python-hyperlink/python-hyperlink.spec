@@ -52,6 +52,7 @@ pytest
 * Mon Feb 14 2022 Nick Samson <nisamson@microsoft.com> - 21.0.0-1
 - Updated to 21.0.0
 - Updated URL and Source0 to reflect github change.
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 19.0.0-4
 - Replace easy_install usage with pip in %%check sections
 
