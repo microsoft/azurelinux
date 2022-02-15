@@ -1,9 +1,9 @@
 %global apiver 2.68
+%define BaseVersion %(echo %{version} | cut -d. -f1-2)
 
 Summary:        C++ interface to the glib
 Name:           glibmm
-%define BaseVersion 2.70
-Version:        %{BaseVersion}.0
+Version:        2.70.0
 Release:        1%{?dist}
 License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
