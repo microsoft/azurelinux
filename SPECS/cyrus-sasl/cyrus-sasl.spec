@@ -1,7 +1,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,6 +129,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man8/saslauthd.8.gz
 
 %changelog
+* Mon Feb 14 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.1.27-6
+- Bumping release number to force rebuild.
+
 * Fri Mar 05 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.27-5
 - Add nopatch for CVE-2020-8032
 - Lint spec
