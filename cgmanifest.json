@@ -1646,16 +1646,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cdparanoia",
-          "version": "10.2",
-          "downloadUrl": "http://downloads.xiph.org/releases/cdparanoia/cdparanoia-III-10.2.src.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cdrdao",
           "version": "1.2.4",
           "downloadUrl": "http://prdownloads.sourceforge.net/cdrdao/cdrdao-1.2.4.tar.bz2"
@@ -10273,16 +10263,6 @@
           "name": "liblognorm",
           "version": "2.0.6",
           "downloadUrl": "https://www.liblognorm.com/files/download/liblognorm-2.0.6.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "liblouis",
-          "version": "3.12.0",
-          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.12.0/liblouis-3.12.0.tar.gz"
         }
       }
     },
