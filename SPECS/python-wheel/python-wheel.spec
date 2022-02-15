@@ -7,7 +7,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.33.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Built-package format for Python
 
 License:        MIT
@@ -105,6 +105,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-3 -v --ignore build
 %endif
 
 %changelog
+* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.33.6-6
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.33.6-5
 - Remove epoch
 
