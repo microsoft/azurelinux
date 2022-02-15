@@ -1,6 +1,6 @@
 Summary:        Cluster API Provider Metal3 enables users to deploy a Cluster API based cluster on top of bare metal infrastructure using Metal3.
 Name:           metal3-cluster-api-provider-metal3
-Version:        0.4.0
+Version:        0.5.4
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -27,7 +27,7 @@ Source0:        https://github.com/metal3-io/cluster-api-provider-metal3/archive
 # or environment. See https://reproducible-builds.org/docs/archives/. It can be
 # recreated using ./generate-sources.sh.
 
-BuildRequires:  golang >= 1.13
+BuildRequires:  golang >= 1.17
 
 %description
 The Cluster API brings declarative, Kubernetes-style APIs to cluster creation,
@@ -58,6 +58,6 @@ install -p -m 755 -t %{buildroot} %{name}
 /%{name}
 
 %changelog
-* Thu Feb 09 2022 Vince Perri <viperri@microsoft.com> - 0.4.0-1
+* Thu Feb 09 2022 Vince Perri <viperri@microsoft.com> - 0.5.4-1
 - Original version for CBL-Mariner.
 - License verified

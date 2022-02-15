@@ -1,7 +1,6 @@
-%define git_commit c05f5f731a679fd8820bad4804ed04f17619de7c
 Summary:        Bare Metal Operator implements a Kubernetes API for managing bare metal hosts
 Name:           metal3-baremetal-operator
-Version:        0.4.0
+Version:        0.5.4
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -28,7 +27,7 @@ Source0:        https://github.com/metal3-io/baremetal-operator/archive/refs/tag
 # or environment. See https://reproducible-builds.org/docs/archives/. It can be
 # recreated using ./generate-sources.sh.
 
-BuildRequires:  golang >= 1.14
+BuildRequires:  golang >= 1.17
 
 %description
 The Bare Metal Operator implements a Kubernetes API for managing bare metal
@@ -63,6 +62,6 @@ install -p -m 755 -t %{buildroot} %{name}
 /%{name}
 
 %changelog
-* Thu Feb 09 2022 Vince Perri <viperri@microsoft.com> - 0.4.0-1
+* Thu Feb 09 2022 Vince Perri <viperri@microsoft.com> - 0.5.4-1
 - Original version for CBL-Mariner.
 - License verified
