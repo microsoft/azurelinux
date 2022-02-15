@@ -25,7 +25,7 @@ URL:            https://github.com/metal3-io/ip-address-manager
 # This command creates a tar with the same cryptographic hash regardless of time
 # or environment. See https://reproducible-builds.org/docs/archives/. It can be
 # recreated using ./generate-sources.sh.
-#Source0:        https://github.com/metal3-io/ip-address-manager/archive/refs/tags/v$version.tar.gz
+#Source0:        https://github.com/metal3-io/ip-address-manager/archive/refs/tags/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  golang >= 1.13
 
