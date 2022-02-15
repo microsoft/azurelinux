@@ -13,7 +13,9 @@ Source0:        https://github.com/fedora-python/tox-current-env/archive/refs/ta
 
 BuildArch:      noarch
 
+
 BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3dist(wheel)
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-pip
 

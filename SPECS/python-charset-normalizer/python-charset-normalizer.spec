@@ -10,6 +10,7 @@ Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.t
 
 BuildArch:      noarch
 
+BuildRequires:  python3dist(wheel)
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
