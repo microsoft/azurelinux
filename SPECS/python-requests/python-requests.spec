@@ -1,7 +1,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.27.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +21,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
 Requires:       python3-certifi
-Requires:       python3-chardet
+Requires:       python3-charset-normalizer
 Requires:       python3-idna
 Requires:       python3-libs
 Requires:       python3-pyOpenSSL
@@ -32,7 +32,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-certifi
-BuildRequires:  python3-chardet
+BuildRequires:  python3-charset-normalizer
 BuildRequires:  python3-idna
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
@@ -69,6 +69,9 @@ LANG=en_US.UTF-8 tox -e py39
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.27.1-2
+- Switching dependencies: "python3-chardet" -> "python3-charset-normalizer".
+
 * Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 2.27.1-1
 - Bump version to 2.27.1
 - Use 'py39' as tox env to enable ptest
