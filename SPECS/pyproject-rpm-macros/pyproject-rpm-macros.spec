@@ -84,14 +84,14 @@ cp -p %{sources} .
 
 %install
 mkdir -p %{buildroot}%{_rpmmacrodir}
-mkdir -p %{buildroot}%{_rpmconfigdir}/redhat
+mkdir -p %{buildroot}%{_rpmconfigdir}/mariner
 install -m 644 macros.pyproject %{buildroot}%{_rpmmacrodir}/
-install -m 644 pyproject_buildrequires.py %{buildroot}%{_rpmconfigdir}/redhat/
-install -m 644 pyproject_convert.py %{buildroot}%{_rpmconfigdir}/redhat/
-install -m 644 pyproject_save_files.py  %{buildroot}%{_rpmconfigdir}/redhat/
-install -m 644 pyproject_preprocess_record.py %{buildroot}%{_rpmconfigdir}/redhat/
-install -m 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/redhat/
-install -m 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/redhat/
+install -m 644 pyproject_buildrequires.py %{buildroot}%{_rpmconfigdir}/mariner/
+install -m 644 pyproject_convert.py %{buildroot}%{_rpmconfigdir}/mariner/
+install -m 644 pyproject_save_files.py  %{buildroot}%{_rpmconfigdir}/mariner/
+install -m 644 pyproject_preprocess_record.py %{buildroot}%{_rpmconfigdir}/mariner/
+install -m 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/mariner/
+install -m 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/mariner/
 
 %check
 export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856356
@@ -103,12 +103,12 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 
 %files
 %{_rpmmacrodir}/macros.pyproject
-%{_rpmconfigdir}/redhat/pyproject_buildrequires.py
-%{_rpmconfigdir}/redhat/pyproject_convert.py
-%{_rpmconfigdir}/redhat/pyproject_save_files.py
-%{_rpmconfigdir}/redhat/pyproject_preprocess_record.py
-%{_rpmconfigdir}/redhat/pyproject_construct_toxenv.py
-%{_rpmconfigdir}/redhat/pyproject_requirements_txt.py
+%{_rpmconfigdir}/mariner/pyproject_buildrequires.py
+%{_rpmconfigdir}/mariner/pyproject_convert.py
+%{_rpmconfigdir}/mariner/pyproject_save_files.py
+%{_rpmconfigdir}/mariner/pyproject_preprocess_record.py
+%{_rpmconfigdir}/mariner/pyproject_construct_toxenv.py
+%{_rpmconfigdir}/mariner/pyproject_requirements_txt.py
 
 %doc README.md
 %license LICENSE
