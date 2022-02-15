@@ -31,7 +31,6 @@ Patch13:        at-3.2.2-lock-locks.patch
 Patch14:        at-3.1.23-document-n.patch
 Patch15:        at-3.1.20-log-jobs.patch
 Patch16:        at-3.2.23-coverity-fix.patch
-
 BuildRequires:  autoconf
 BuildRequires:  bison
 BuildRequires:  flex
@@ -50,7 +49,6 @@ Obsoletes:      at-sysvinit < 3.1.16-1
 %if %{with pam}
 BuildRequires:  pam-devel
 %endif
-
 %if %{with_check}
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::Harness)
