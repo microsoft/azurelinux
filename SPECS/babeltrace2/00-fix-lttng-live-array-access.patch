@@ -1,0 +1,23 @@
+diff -Naur babeltrace2-2.0.4/src/plugins/ctf/common/msg-iter/msg-iter.c babeltrace2-2.0.4-copy/src/plugins/ctf/common/msg-iter/msg-iter.c
+--- babeltrace2-2.0.4/src/plugins/ctf/common/msg-iter/msg-iter.c	2022-02-09 16:04:31.452911700 -0800
++++ babeltrace2-2.0.4-copy/src/plugins/ctf/common/msg-iter/msg-iter.c	2022-02-09 16:24:36.138072700 -0800
+@@ -2001,6 +2001,9 @@
+ 	}
+ 
+ 	if (G_UNLIKELY(int_fc->storing_index >= 0)) {
++		if ((uint64_t) int_fc->storing_index >= msg_it->stored_values->len) {
++			g_array_set_size(msg_it->stored_values, (uint64_t) int_fc->storing_index + 1);
++		}
+ 		g_array_index(msg_it->stored_values, uint64_t,
+ 			(uint64_t) int_fc->storing_index) = value;
+ 	}
+@@ -2090,6 +2093,9 @@
+ 	BT_ASSERT_DBG(int_fc->meaning == CTF_FIELD_CLASS_MEANING_NONE);
+ 
+ 	if (G_UNLIKELY(int_fc->storing_index >= 0)) {
++		if ((uint64_t) int_fc->storing_index >= msg_it->stored_values->len) {
++			g_array_set_size(msg_it->stored_values, (uint64_t) int_fc->storing_index + 1);
++		}
+ 		g_array_index(msg_it->stored_values, uint64_t,
+ 			(uint64_t) int_fc->storing_index) = (uint64_t) value;
+ 	}

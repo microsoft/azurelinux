@@ -7,7 +7,7 @@
 Summary:        Python re-implementation of the Rails routes system
 Name:           python-%{pkgname}
 Version:        2.4.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://routes.readthedocs.io/en/latest/
 Vendor:         Microsoft Corporation
@@ -49,11 +49,9 @@ python3 setup.py build
 %install
 python3 setup.py install --root=%{buildroot}
 
-%if %{with check}
 %check
 pip3 install tox==3.4.0
-tox
-%endif
+tox -e py39
 
 %files -n python3-%{pkgname}
 %license LICENSE.txt
@@ -61,9 +59,12 @@ tox
 %{python3_sitelib}/*
 
 %changelog
-* Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> 2.4.1-2
+* Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 2.4.1-3
+- Use tox env `py39` to enable ptest
+
+* Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 2.4.1-2
 - Pass check section
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 2.4.1-1
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.4.1-1
 - Original version for CBL-Mariner
 - License verified
