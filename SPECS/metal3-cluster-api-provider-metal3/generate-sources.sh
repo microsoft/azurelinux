@@ -49,7 +49,8 @@ main() {
   #
   name=$(grep "^Name:" "$spec" | awk '{ print $2 }')
   version=$(grep "^Version:" "$spec" | awk '{ print $2}')
-  url="$(grep "^URL:" "$spec" | awk '{ print $2}')/archive/refs/tags/v$version.tar.gz"
+  url=$(grep "^#Source0:" "$spec" | awk '{ print $2}')
+  url=${url/\%\%\{version\}/$version}
 
   #
   # Do the rest of the work within a temp dir so the wd is clean.
