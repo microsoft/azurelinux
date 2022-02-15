@@ -1,13 +1,6 @@
 # The function of bootstrap is that it disables the wheel subpackage
 %bcond_with bootstrap
 
-# Default: when bootstrapping -> disable tests
-%if %{with bootstrap}
-%bcond_with tests
-%else
-%bcond_without tests
-%endif
-
 %global pypi_name wheel
 %global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
@@ -22,7 +15,7 @@ URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
-%if %{with tests}
+%if %{with_check}
 # several tests compile extensions
 # those tests are skipped if gcc is not found
 BuildRequires:  gcc
@@ -44,7 +37,7 @@ compatible install in a way that is very close to the on-disk format.
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with tests}
+%if %{with_check}
 BuildRequires:  python3-pytest
 %endif
 %{?python_provide:%python_provide python3-%{pypi_name}}
@@ -91,11 +84,9 @@ install -p dist/%{python_wheelname} -t %{buildroot}%{python_wheeldir}
 %endif
 
 
-%if %{with tests}
 %check
 rm setup.cfg
 PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-3 -v --ignore build
-%endif
 
 %files -n python3-%{pypi_name}
 %license LICENSE.txt
