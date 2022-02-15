@@ -34,6 +34,7 @@ index b41eb071..5e8fcf1d 100644
 +  tst-sockaddr_un_set \
 +  # tests-internal
 +
++
  aux	 := sa_len
  
  include ../Rules
