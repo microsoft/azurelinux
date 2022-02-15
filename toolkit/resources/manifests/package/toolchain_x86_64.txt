@@ -82,8 +82,8 @@ findutils-lang-4.8.0-2.cm2.x86_64.rpm
 flex-2.6.4-7.cm2.x86_64.rpm
 flex-debuginfo-2.6.4-7.cm2.x86_64.rpm
 flex-devel-2.6.4-7.cm2.x86_64.rpm
-gawk-5.1.0-1.cm2.x86_64.rpm
-gawk-debuginfo-5.1.0-1.cm2.x86_64.rpm
+gawk-5.1.0-2.cm2.x86_64.rpm
+gawk-debuginfo-5.1.0-2.cm2.x86_64.rpm
 gcc-11.2.0-2.cm2.x86_64.rpm
 gcc-c++-11.2.0-2.cm2.x86_64.rpm
 gcc-debuginfo-11.2.0-2.cm2.x86_64.rpm
