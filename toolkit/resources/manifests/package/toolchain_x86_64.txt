@@ -516,9 +516,9 @@ rpm-debuginfo-4.17.0-3.cm2.x86_64.rpm
 rpm-devel-4.17.0-3.cm2.x86_64.rpm
 rpm-lang-4.17.0-3.cm2.x86_64.rpm
 rpm-libs-4.17.0-3.cm2.x86_64.rpm
-sed-4.8-1.cm2.x86_64.rpm
-sed-debuginfo-4.8-1.cm2.x86_64.rpm
-sed-lang-4.8-1.cm2.x86_64.rpm
+sed-4.8-2.cm2.x86_64.rpm
+sed-debuginfo-4.8-2.cm2.x86_64.rpm
+sed-lang-4.8-2.cm2.x86_64.rpm
 slang-2.3.2-4.cm2.x86_64.rpm
 slang-devel-2.3.2-4.cm2.x86_64.rpm
 sqlite-3.36.0-2.cm2.x86_64.rpm
