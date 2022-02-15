@@ -23014,8 +23014,8 @@
         "type": "other",
         "other": {
           "name": "python-hypothesis",
-          "version": "3.71.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/65/57/c4e2cc37a7b9de3d57a1cd6c200f931807cfdd9f7e05ef4c67fb9c507d65/hypothesis-3.71.0.tar.gz"
+          "version": "6.36.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/24/05/d03211fc959ddf8c4a26d04957d9640a86a723f5d6a4359a4430cf5fa0b4/hypothesis-6.36.2.tar.gz"
         }
       }
     },
