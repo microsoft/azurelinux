@@ -841,7 +841,7 @@
                 "libsecret",
                 "libsemanage",
                 "libshout",
-                "libsigc++30",
+                "libsigc++20",
                 "libsigsegv",
                 "libslirp",
                 "libSM",
