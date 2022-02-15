@@ -23,6 +23,7 @@ ignore_list=" \
   grubby \
   initramfs \
   installkernel \
+  javapackages-tools-meta \
   kde-filesystem \
   kernel-signed-aarch64 \
   kernel-signed-x86_64 \
