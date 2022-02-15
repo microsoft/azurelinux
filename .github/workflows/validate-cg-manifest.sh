@@ -37,6 +37,7 @@ ignore_list=" \
   opencl-filesystem \
   openjdk8 \
   patterns-ceph-containers \
+  pyproject-rpm-macros \
   python-markupsafe \
   python-nocasedict \
   python-pywbem \

@@ -2707,6 +2707,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "distribution-gpg-keys",
+          "version": "1.60",
+          "downloadUrl": "https://github.com/xsuchy/distribution-gpg-keys/archive/refs/tags/distribution-gpg-keys-1.60-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dkms",
           "version": "3.0.3",
           "downloadUrl": "https://github.com/dell/dkms/archive/refs/tags/v3.0.3.tar.gz"
@@ -2798,8 +2808,8 @@
         "type": "other",
         "other": {
           "name": "dnf-plugins-core",
-          "version": "4.0.18",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf-plugins-core/archive/4.0.18/dnf-plugins-core-4.0.18.tar.gz"
+          "version": "4.0.24",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf-plugins-core/archive/4.0.24/dnf-plugins-core-4.0.24.tar.gz"
         }
       }
     },
@@ -3158,8 +3168,8 @@
         "type": "other",
         "other": {
           "name": "e2fsprogs",
-          "version": "1.46.4",
-          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.46.4.tar.gz"
+          "version": "1.46.5",
+          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.46.5.tar.gz"
         }
       }
     },
@@ -4020,8 +4030,8 @@
         "type": "other",
         "other": {
           "name": "freetype",
-          "version": "2.9.1",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.11.1.tar.gz"
         }
       }
     },
@@ -4030,8 +4040,8 @@
         "type": "other",
         "other": {
           "name": "fribidi",
-          "version": "1.0.9",
-          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.9/fribidi-1.0.9.tar.xz"
+          "version": "1.0.10",
+          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.10/fribidi-1.0.10.tar.xz"
         }
       }
     },
@@ -6750,8 +6760,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
+          "version": "5.15.18.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
         }
       }
     },
@@ -8381,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "json-glib",
-          "version": "1.4.4",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.4/json-glib-1.4.4.tar.xz"
+          "version": "1.6.6",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.6/json-glib-1.6.6.tar.xz"
         }
       }
     },
@@ -8541,8 +8551,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
+          "version": "5.15.18.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
         }
       }
     },
@@ -8551,8 +8561,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
+          "version": "5.15.18.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
         }
       }
     },
@@ -8561,8 +8571,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.15.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
+          "version": "5.15.18.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
         }
       }
     },
@@ -8571,8 +8581,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "5.15.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.2.1.tar.gz"
+          "version": "5.15.18.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
         }
       }
     },
@@ -12851,8 +12861,8 @@
         "type": "other",
         "other": {
           "name": "man-db",
-          "version": "2.8.4",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.8.4.tar.xz"
+          "version": "2.10.1",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.10.1.tar.xz"
         }
       }
     },
@@ -13765,6 +13775,26 @@
           "name": "moby-runc",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mock",
+          "version": "2.16",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-2.16-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mock-core-configs",
+          "version": "36.4",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-core-configs-36.4-1/mock-core-configs-36.4-1.tar.gz"
         }
       }
     },
@@ -22334,8 +22364,8 @@
         "type": "other",
         "other": {
           "name": "python-cffi",
-          "version": "1.14.5",
-          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.14.5.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.15.0.tar.gz"
         }
       }
     },
@@ -22344,8 +22374,18 @@
         "type": "other",
         "other": {
           "name": "python-chardet",
-          "version": "3.0.4",
-          "downloadUrl": "https://github.com/chardet/chardet/archive/3.0.4.tar.gz"
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/chardet/chardet/archive/refs/tags/4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-charset-normalizer",
+          "version": "2.0.11",
+          "downloadUrl": "https://github.com/ousret/charset_normalizer/archive/refs/tags/2.0.11.tar.gz"
         }
       }
     },
@@ -23583,6 +23623,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-nose2",
+          "version": "0.10.0",
+          "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-novaclient",
           "version": "15.1.0",
           "downloadUrl": "https://pypi.io/packages/source/p/python-novaclient/python-novaclient-15.1.0.tar.gz"
@@ -24073,6 +24123,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pyroute2",
+          "version": "0.6.5",
+          "downloadUrl": "https://pypi.io/packages/source/p/pyroute2/pyroute2-0.6.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pyrsistent",
           "version": "0.17.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyrsistent/pyrsistent-0.17.3.tar.gz"
@@ -24294,8 +24354,8 @@
         "type": "other",
         "other": {
           "name": "python-requests",
-          "version": "2.22.0",
-          "downloadUrl": "http://github.com/requests/requests/archive/v2.22.0/requests-v2.22.0.tar.gz"
+          "version": "2.27.1",
+          "downloadUrl": "https://github.com/requests/requests/archive/v2.27.1/requests-v2.27.1.tar.gz"
         }
       }
     },
@@ -24534,8 +24594,8 @@
         "type": "other",
         "other": {
           "name": "python-six",
-          "version": "1.11.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/s/six/six-1.11.0.tar.gz"
+          "version": "1.16.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/s/six/six-1.16.0.tar.gz"
         }
       }
     },
@@ -24723,6 +24783,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-templated-dictionary",
+          "version": "1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/22/4d/cd73de22b8b345e57677c80c26381e25abef19cab9495c91b1627af7621b/templated-dictionary-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-testpath",
           "version": "0.3.1",
           "downloadUrl": "https://github.com/jupyter/testpath/archive/0.3.1.tar.gz"
@@ -24786,6 +24856,16 @@
           "name": "python-toolz",
           "version": "0.11.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/d6/0d/fdad31347bf3d058002993a094da1ca95f0f3ef9beec08856d0fe4ad9766/toolz-0.11.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-tox-current-env",
+          "version": "0.0.7",
+          "downloadUrl": "https://github.com/fedora-python/tox-current-env/archive/refs/tags/v0.0.7.tar.gz"
         }
       }
     },
@@ -25154,8 +25234,8 @@
         "type": "other",
         "other": {
           "name": "qdox",
-          "version": "2.0.M9",
-          "downloadUrl": "http://repo2.maven.org/maven2/com/thoughtworks/qdox/qdox/2.0-M9/qdox-2.0-M9-project.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/paul-hammant/qdox/archive/refs/tags/qdox-2.0.0.tar.gz"
         }
       }
     },
@@ -25394,8 +25474,8 @@
         "type": "other",
         "other": {
           "name": "rdma-core",
-          "version": "31.0",
-          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v31.0/rdma-core-31.0.tar.gz"
+          "version": "39.0",
+          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v39.0/rdma-core-39.0.tar.gz"
         }
       }
     },

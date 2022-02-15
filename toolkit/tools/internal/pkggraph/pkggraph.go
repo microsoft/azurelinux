@@ -995,14 +995,18 @@ func (g *PkgGraph) AddMetaNode(from []*PkgNode, to []*PkgNode) (metaNode *PkgNod
 	metaNode.This = metaNode
 	g.AddNode(metaNode)
 
-	for _, n := range to {
-		toEdge := g.NewEdge(metaNode, n)
-		g.SetEdge(toEdge)
+	logger.Log.Trace("Adding edges TO the meta node:")
+	for _, n := range from {
+		logger.Log.Tracef("\t'%s' -> '%s'", n.FriendlyName(), metaNode.FriendlyName())
+		edge := g.NewEdge(n, metaNode)
+		g.SetEdge(edge)
 	}
 
-	for _, n := range from {
-		toEdge := g.NewEdge(n, metaNode)
-		g.SetEdge(toEdge)
+	logger.Log.Trace("Adding edges FROM the meta node:")
+	for _, n := range to {
+		logger.Log.Tracef("\t'%s' -> '%s'", metaNode.FriendlyName(), n.FriendlyName())
+		edge := g.NewEdge(metaNode, n)
+		g.SetEdge(edge)
 	}
 
 	return
@@ -1241,30 +1245,57 @@ func (g *PkgGraph) fixCycle(cycle []*PkgNode) (err error) {
 	return g.fixPrebuiltSRPMsCycle(trimmedCycle)
 }
 
-// fixIntraSpecCycle attempts to fix a cycle if all nodes are from the same spec file.
+// fixIntraSpecCycle attempts to fix a cycle if none of the cycle nodes are build nodes.
 // If a cycle can be fixed an additional meta node will be added to represent the interdependencies of the cycle.
 func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
-	logger.Log.Debug("Checking if cycle consists only of subpackages of one .spec file.")
+	logger.Log.Debug("Checking if cycle contains build nodes.")
 
-	// For each node, remove any edges which point to other nodes in the cycle, and move any remaining dependencies to a new
-	// meta node, then have everything in the cycle depend on the new meta node.
-	groupedDependencies := make(map[int64]bool)
 	for _, currentNode := range trimmedCycle {
-		logger.Log.Tracef("\tCycle node: %s", currentNode.FriendlyName())
 		if currentNode.Type == TypeBuild {
 			logger.Log.Debug("Cycle contains build dependencies, cannot be solved this way.")
 			return fmt.Errorf("cycle contains build dependencies, unresolvable")
 		}
-		// Remove all links to other members of the cycle
-		for _, nodeInCycle := range trimmedCycle {
-			g.RemoveEdge(currentNode.ID(), nodeInCycle.ID())
-		}
+	}
 
-		// Record any other dependencies the nodes have (ie, where can we get to from here), then remove them
-		fromNodes := graph.NodesOf(g.From(currentNode.ID()))
-		for _, from := range fromNodes {
-			groupedDependencies[from.ID()] = true
-			g.RemoveEdge(currentNode.ID(), from.ID())
+	// Breaking the cycle by removing all edges between in-cycle nodes.
+	// Their dependency on each other will be reflected by a new meta node.
+	logger.Log.Debugf("Breaking cycle edges.")
+	cycleLength := len(trimmedCycle)
+	for i, currentNode := range trimmedCycle {
+		currentNodeID := currentNode.ID()
+		for j := i + 1; j < cycleLength; j++ {
+			nextNode := trimmedCycle[j]
+			nextNodeID := nextNode.ID()
+
+			if g.Edge(currentNodeID, nextNodeID) != nil {
+				logger.Log.Tracef("\t'%s' -> '%s'", currentNode.FriendlyName(), nextNode.FriendlyName())
+				g.RemoveEdge(currentNodeID, nextNodeID)
+			}
+
+			if g.Edge(nextNodeID, currentNodeID) != nil {
+				logger.Log.Tracef("\t'%s' -> '%s'", nextNode.FriendlyName(), currentNode.FriendlyName())
+				g.RemoveEdge(nextNodeID, currentNodeID)
+			}
+		}
+	}
+
+	// For each cycle node move any dependencies from a non-cycle node to a new
+	// meta node, then have the meta node depend on all cycle nodes.
+	groupedDependencies := make(map[int64]bool)
+	for _, currentNode := range trimmedCycle {
+		logger.Log.Debugf("Breaking NON-cycle edges connected to cycle node '%s'.", currentNode.FriendlyName())
+
+		currentNodeID := currentNode.ID()
+
+		toNodes := g.To(currentNodeID)
+		for toNodes.Next() {
+			toNode := toNodes.Node().(*PkgNode)
+			toNodeID := toNode.ID()
+
+			logger.Log.Tracef("\t'%s' -> '%s'", toNode.FriendlyName(), currentNode.FriendlyName())
+
+			groupedDependencies[toNodeID] = true
+			g.RemoveEdge(toNodeID, currentNodeID)
 		}
 	}
 
@@ -1274,10 +1305,7 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 		dependencyNodes = append(dependencyNodes, g.Node(id).(*PkgNode).This)
 	}
 
-	metaNode := g.AddMetaNode(trimmedCycle, dependencyNodes)
-
-	// Enable cycle detection between meta nodes within the same srpm file
-	metaNode.SrpmPath = trimmedCycle[0].SrpmPath
+	g.AddMetaNode(dependencyNodes, trimmedCycle)
 
 	return
 }

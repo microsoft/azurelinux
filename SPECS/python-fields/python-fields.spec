@@ -2,7 +2,7 @@
 Summary:        Container class boilerplate killer
 Name:           python-%{srcname}
 Version:        5.0.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Features:
 
 %package doc
 Summary:        Documentation for '%{name}'
+BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-sphinx-theme-py3doc-enhanced
 BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
@@ -93,6 +94,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft,.com> - 5.0.0-10
+- Add missing build requires on python-devel
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.0.0-9
 - Update check section to use pytest module
 - License verified

@@ -1,7 +1,7 @@
 Summary:        This package contains programs to find files
 Name:           findutils
 Version:        4.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/findutils
 Group:          Applications/File
@@ -9,6 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/findutils/%{name}-%{version}.tar.xz
 Conflicts:      toybox
+
+# Required to unblock automatic BR resolution for some Python packages.
+Provides:       /usr/bin/find
 
 %description
 These programs are provided to recursively search through a
@@ -59,6 +62,8 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> 4.8.0-2
+- Adding "Provides: /usr/bin/find".
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 4.8.0-1
 - Update to version 4.8.0
 - License verified
