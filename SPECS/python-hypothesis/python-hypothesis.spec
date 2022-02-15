@@ -47,7 +47,7 @@ and then generates simple and comprehensible examples that make your tests fail.
 %{_bindir}/*
 
 %changelog
-* Tue Feb 15 2022 Nick Samson <nisamson@microsoft.com> - 6.36.2
+* Tue Feb 15 2022 Nick Samson <nisamson@microsoft.com> - 6.36.2-1
 - Updated source URL, updated to 6.36.2
 - Added hypothesis binary
 
