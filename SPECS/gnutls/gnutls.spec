@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.7.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ BuildRequires:  guile-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  openssl-devel
+BuildRequires:  p11-kit-devel
 %if %{with_check}
 BuildRequires:  net-tools
 BuildRequires:  which
@@ -46,7 +47,6 @@ developing applications that use gnutls.
 
 %build
 %configure \
-    --without-p11-kit \
     --disable-openssl-compatibility \
     --with-included-unistring \
     --with-system-priority-file=%{_sysconfdir}/gnutls/default-priorities \
@@ -94,7 +94,10 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
-* Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.7.3
+* Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.7.3-2
+- Build with p11-kit
+
+* Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.7.3-1
 - Upgrade to 3.7.3
 - License verified
 

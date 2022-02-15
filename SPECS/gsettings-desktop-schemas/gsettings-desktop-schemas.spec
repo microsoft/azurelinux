@@ -6,7 +6,6 @@ Name:           gsettings-desktop-schemas
 Version:        3.36.1
 Release:        2%{?dist}
 Summary:        A collection of GSettings schemas
-
 License:        LGPLv2+
 # no homepage exists for this component
 URL:            https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas

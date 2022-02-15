@@ -13,10 +13,12 @@ BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  meson
 BuildRequires:  glib2-devel
+BuildRequires:  gnutls-devel
 BuildRequires:  gnutls
-BuildRequires:  gsettings-desktop-schemas
+BuildRequires:  gsettings-desktop-schemas-devel
+BuildRequires:  p11-kit-devel
 Requires:       ca-certificates
-Requires:       glib2-devel
+Requires:       glib2
 Requires:	    gnutls
 Requires:       gsettings-desktop-schemas
 
