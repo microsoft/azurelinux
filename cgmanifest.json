@@ -25484,8 +25484,8 @@
         "type": "other",
         "other": {
           "name": "rdma-core",
-          "version": "31.0",
-          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v31.0/rdma-core-31.0.tar.gz"
+          "version": "39.0",
+          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v39.0/rdma-core-39.0.tar.gz"
         }
       }
     },
