@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Development
 URL:            https://gitlab.gnome.org/GNOME/glib-networking/
 Source0:        https://download.gnome.org/sources/%{name}/2.70/%{name}-%{version}.tar.xz
-BuildRequires:  ca-certificates
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  meson
@@ -17,9 +16,8 @@ BuildRequires:  gnutls-devel
 BuildRequires:  gnutls
 BuildRequires:  gsettings-desktop-schemas-devel
 BuildRequires:  p11-kit-devel
-Requires:       ca-certificates
 Requires:       glib2
-Requires:	    gnutls
+Requires:       gnutls
 Requires:       gsettings-desktop-schemas
 
 %description
@@ -38,9 +36,6 @@ implementation.
 %install
 %meson_install
 %find_lang %{name}
-
-%check
-ninja test
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
