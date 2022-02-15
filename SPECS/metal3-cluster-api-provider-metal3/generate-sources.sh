@@ -45,12 +45,23 @@ main() {
   spec=$(echo $spec_dir/*.spec)
 
   #
-  # Extract info from spec.
+  # Extract values of Name, Version, and Source0 directives from spec file.
   #
   name=$(grep "^Name:" "$spec" | awk '{ print $2 }')
   version=$(grep "^Version:" "$spec" | awk '{ print $2}')
-  url=$(grep "^#Source0:" "$spec" | awk '{ print $2}')
-  url=${url/\%\%\{version\}/$version}
+  source0=$(grep "^Source0:" "$spec" | awk '{ print $2}')
+
+  #
+  # Expand all instances of %{name} and %{version} macros.
+  #
+  source0=${source0//%\{name\}/$name}
+  source0=${source0//%\{version\}/$version}
+
+  #
+  # Extract url and name from Source0, formatted as <url>#/<name>.
+  #
+  source0_url=${source0%#/*}
+  source0_name=${source0#*#/}
 
   #
   # Do the rest of the work within a temp dir so the wd is clean.
@@ -59,17 +70,15 @@ main() {
   trap "rm -rf $temp_dir" EXIT
   cd $temp_dir
 
-  source0=$name-$version.tar.gz
-
-  wget -O $source0 $url
-  tar xf $source0
-  rm $source0
+  wget -O $source0_name $source0_url
+  tar xf $source0_name
+  rm $source0_name
   mv * $name-$version
   pushd *
   go mod vendor
   popd
-  reproducible-tar $source0 *
-  mv $source0 "$spec_dir"
+  reproducible-tar $source0_name *
+  mv $source0_name "$spec_dir"
 }
 
 if [[ $# != 0 ]]; then
