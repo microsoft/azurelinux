@@ -22,13 +22,14 @@ BuildRequires:  openssl-devel
 BuildRequires:  openssl >= 1.0.2
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(p11-kit-1)
-# Needed for testsuite
+%if %{with_check}
 BuildRequires:  doxygen
 BuildRequires:  procps-ng
 BuildRequires:  opensc
 BuildRequires:  softhsm
 Requires:       openssl-libs >= 1.0.2
 Requires:       p11-kit-trust
+%endif
 
 # Package renamed from libp11 to openssl-pkcs11 in release 0.4.7-4
 Provides:       libp11%{?_isa} = %{version}-%{release}

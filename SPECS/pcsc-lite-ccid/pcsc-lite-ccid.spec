@@ -9,8 +9,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ccid.apdu.fr/files
 Source0:        https://ccid.apdu.fr/files/ccid-%{version}.tar.bz2
-Source1:        https://ccid.apdu.fr/files/ccid-%{version}.tar.bz2.asc
-Source2:        gpgkey-F5E11B9FFE911146F41D953D78A1B4DFE8F9C57E.gpg
 Patch0:         ccid-1.4.26-omnikey-3121.patch
 
 BuildRequires:  perl-interpreter
@@ -33,7 +31,6 @@ Generic USB CCID (Chip/Smart Card Interface Devices) driver for use with the
 PC/SC Lite daemon.
 
 %prep
-gpgv2 --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %setup -q -n ccid-%{version}
 %patch0 -p1 -b .omnikey
 

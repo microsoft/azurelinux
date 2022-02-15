@@ -1,5 +1,3 @@
-#global prever rc1
-#global prerelease yes
 %global _hardened_build 1
 %global softhsm_module "SoftHSM PKCS #11 Module"
 Summary:        Software version of a PKCS#11 Hardware Security Module
@@ -9,11 +7,9 @@ Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.opendnssec.org/
-Source0:        http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz
-Source1:        http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz.sig
+URL:            https://www.opendnssec.org/
+Source0:        https://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz
 Patch1:         softhsm-2.6.1-rh1831086-exit.patch
-
 BuildRequires:  cppunit-devel
 BuildRequires:  gcc-c++
 BuildRequires:  openssl-devel >= 1.0.1k-6
@@ -31,10 +27,14 @@ designed to meet the requirements of OpenDNSSEC, but can also work together
 with other cryptographic products because of the PKCS#11 interface.
 
 %package devel
-Summary: Development package of softhsm that includes the header files
-Requires: %{name} = %{version}-%{release}, openssl-devel, sqlite-devel
+Summary:        Development package of softhsm that includes the header files
+Requires:       %{name} = %{version}-%{release}
+Requires:       openssl-devel
+Requires:       sqlite-devel
 %if 0%{?prever:1} || 0%{?prerelease:1}
-BuildRequires: autoconf, libtool, automake
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
 %endif
 
 %description devel
@@ -89,7 +89,8 @@ ln -s ../pkcs11/libsofthsm2.so %{buildroot}/%{_libdir}/softhsm/libsofthsm.so
 %attr(0664,root,root) %{_datadir}/p11-kit/modules/softhsm2.module
 %attr(0750,ods,ods) %dir %{_sharedstatedir}/softhsm
 %attr(1770,ods,ods) %dir %{_sharedstatedir}/softhsm/tokens
-%doc LICENSE README.md NEWS
+%license LICENSE
+%doc README.md NEWS
 %{_mandir}/*/*
 
 %files devel

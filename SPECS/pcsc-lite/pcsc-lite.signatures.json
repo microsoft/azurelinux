@@ -1,8 +1,6 @@
 {
  "Signatures": {
-  "gpgkey-F5E11B9FFE911146F41D953D78A1B4DFE8F9C57E.gpg": "204e5824015b70baa1da46a58aa3b2be53e67e03848e180006c82edca387c6da",
   "org.debian.pcsc-lite.policy": "4e39100040bd847d663748d73babe6c6c777ac2e579773ee73b9738068729c67",
-  "pcsc-lite-1.9.5.tar.bz2": "9ee3f9b333537562177893559ad4f7b8d5c23ebe828eef53056c02db14049d08",
-  "pcsc-lite-1.9.5.tar.bz2.asc": "c6079ed5e6caa3c9f8259da2040274acb4c35119ec6be39558a80a9463e6b096"
+  "pcsc-lite-1.9.5.tar.bz2": "9ee3f9b333537562177893559ad4f7b8d5c23ebe828eef53056c02db14049d08"
  }
 }
