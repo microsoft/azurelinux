@@ -2,15 +2,15 @@
 Summary:        Job spooling tools
 Name:           at
 Version:        3.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:        GPLv3+ AND GPLv2+ AND ISC AND MIT AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ftp.debian.org/debian/pool/main/a/at
-Source:         http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
-# git upstream source git://git.debian.org/git/collab-maint/at.git
+Source:         https://salsa.debian.org/debian/at/-/archive/release/%{version}/at-release-%{version}.tar.gz
+# git upstream source https://salsa.debian.org/debian/at.git/
 Source1:        pam_atd
 Source3:        atd.sysconf
 Source5:        atd.systemd
@@ -31,7 +31,6 @@ Patch13:        at-3.2.2-lock-locks.patch
 Patch14:        at-3.1.23-document-n.patch
 Patch15:        at-3.1.20-log-jobs.patch
 Patch16:        at-3.2.23-coverity-fix.patch
-
 BuildRequires:  autoconf
 BuildRequires:  bison
 BuildRequires:  flex
@@ -50,6 +49,11 @@ Obsoletes:      at-sysvinit < 3.1.16-1
 %if %{with pam}
 BuildRequires:  pam-devel
 %endif
+%if %{with_check}
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::Harness)
+BuildRequires:  perl(Test::More)
+%endif
 
 %description
 At and batch read commands from standard input or from a specified
@@ -63,7 +67,7 @@ need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
 %prep
-%setup -q
+%setup -q -n %{name}-release-%{version}
 cp %{SOURCE1} .
 %autopatch -p1
 
@@ -124,13 +128,13 @@ make test
 touch %{_localstatedir}/spool/at/.SEQ
 chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown root:root %{_localstatedir}/spool/at/.SEQ
-%systemd_post atd.service
+%{systemd_post} atd.service
 
 %preun
 %systemd_preun atd.service
 
 %postun
-%systemd_postun_with_restart atd.service
+%{systemd_postun_with_restart} atd.service
 
 %triggerun -- at < 3.1.12-6
 # Save the current service runlevel info
@@ -164,6 +168,10 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root) /lib/systemd/system/atd.service
 
 %changelog
+* Mon Feb 14 2022 Bala <balakumaran.kannan@microsoft.com> - 3.2.2-2
+- BR perl-Test, perl-Test-More and perl-Test-Harness for ptest
+- Update source0 URL
+
 * Thu Jan 06 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.2-1
 - upgrade to version 3.2.2
 - License verified
