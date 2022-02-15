@@ -48,9 +48,9 @@ BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(pyyaml)
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(tox-current-env) >= 0.0.6
+BuildRequires:  python3dist(wheel)
 # Available only in SPECS-EXTENDED:
 BuildRequires:  python3dist(toml)
-BuildRequires:  python3dist(wheel)
 %endif
 
 Requires:       %{_bindir}/find
