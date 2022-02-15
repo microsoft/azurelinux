@@ -9,8 +9,8 @@ License:        GPLv3+ AND GPLv2+ AND ISC AND MIT AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ftp.debian.org/debian/pool/main/a/at
-Source:         http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
-# git upstream source git://git.debian.org/git/collab-maint/at.git
+Source:         https://salsa.debian.org/debian/at/-/archive/release/%{version}/at-release-%{version}.tar.gz
+# git upstream source https://salsa.debian.org/debian/at.git/
 Source1:        pam_atd
 Source3:        atd.sysconf
 Source5:        atd.systemd
@@ -69,7 +69,7 @@ need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
 %prep
-%setup -q
+%setup -q -n %{name}-release-%{version}
 cp %{SOURCE1} .
 %autopatch -p1
 
@@ -172,6 +172,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %changelog
 * Mon Feb 14 2022 Bala <balakumaran.kannan@microsoft.com> - 3.2.2-2
 - BR perl-Test, perl-Test-More and perl-Test-Harness for ptest
+- Update source0 URL
 
 * Thu Jan 06 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.2-1
 - upgrade to version 3.2.2
