@@ -10,7 +10,7 @@ Distribution:   Mariner
 
 Name:           pangomm
 Version:        2.42.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        C++ interface for Pango
 
 License:        LGPLv2+
@@ -92,6 +92,9 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %{_datadir}/devhelp/
 
 %changelog
+* Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.42.1-3
+- Update Requires: to point at glibmm, rather than glibmm24 (removed)
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.42.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
