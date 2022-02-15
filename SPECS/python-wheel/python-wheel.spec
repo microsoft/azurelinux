@@ -5,24 +5,6 @@
 %global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
 
-Name:           python-%{pypi_name}
-Version:        0.33.6
-Release:        6%{?dist}
-Summary:        Built-package format for Python
-
-License:        MIT
-URL:            https://github.com/pypa/wheel
-Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
-BuildArch:      noarch
-
-%if %{with_check}
-# several tests compile extensions
-# those tests are skipped if gcc is not found
-BuildRequires:  gcc
-%endif
-
-%{?python_enable_dependency_generator}
-
 %global _description \
 A built-package format for Python.\
 \
@@ -30,23 +12,41 @@ A wheel is a ZIP-format archive with a specially formatted filename and the\
 .whl extension. It is designed to contain all the files for a PEP 376\
 compatible install in a way that is very close to the on-disk format.
 
+Summary:        Built-package format for Python
+Name:           python-%{pypi_name}
+Version:        0.33.6
+Release:        6%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/pypa/wheel
+Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
+
+BuildArch:      noarch
+
+%{?python_enable_dependency_generator}
+
+%if %{with_check}
+# several tests compile extensions
+# those tests are skipped if gcc is not found
+BuildRequires:  gcc
+%endif
+
 %description %{_description}
 
-
 %package -n     python3-%{pypi_name}
+%{?python_provide:%python_provide python3-%{pypi_name}}
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+
 %if %{with_check}
 BuildRequires:  python3-pytest
 %endif
-%{?python_provide:%python_provide python3-%{pypi_name}}
-Conflicts:      python-%{pypi_name} < %{version}-%{release}
 
 %description -n python3-%{pypi_name} %{_description}
 
 Python 3 version.
-
 
 %if %{without bootstrap}
 %package wheel
@@ -62,7 +62,6 @@ A Python wheel of wheel to use with virtualenv.
 
 # Empty files make rpmlint sad
 test -s wheel/cli/install.py || echo "# empty" > wheel/cli/install.py
-
 
 %build
 %py3_build
