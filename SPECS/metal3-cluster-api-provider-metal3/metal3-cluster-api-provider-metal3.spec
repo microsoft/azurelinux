@@ -10,7 +10,7 @@ URL:            https://github.com/metal3-io/cluster-api-provider-metal3
 #Source0:       https://github.com/metal3-io/cluster-api-provider-metal3/archive/refs/tags/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # The source is the upstream tarball with the vendor dir (created using
-# "go mod vendor") include for offline builds and its top-level directory
+# "go mod vendor") included for offline builds and its top-level directory
 # renamed to %%{name}-%%{version}. It is then repackaged as a tar using the
 # following command:
 #
