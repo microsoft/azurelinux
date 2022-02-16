@@ -1,11 +1,13 @@
 {
     "packages": [
         "cloud-init",
+        "cloud-init-azure-kvp",
         "cloud-utils-growpart",
         "dhcp-client",
         "hyperv-daemons",
         "openssh-server",
-        "python3-distro",
+        "python-xml",
+        "rsyslog",
         "WALinuxAgent"
     ]
 }

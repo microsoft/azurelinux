@@ -1,6 +1,6 @@
-diff -pruN fribidi-1.0.6.orig/bin/Makefile.am fribidi-1.0.6/bin/Makefile.am
---- fribidi-1.0.6.orig/bin/Makefile.am	2019-09-27 14:03:47.000000000 +0900
-+++ fribidi-1.0.6/bin/Makefile.am	2019-09-27 18:14:02.407881337 +0900
+diff -pruN fribidi-1.0.10.orig/bin/Makefile.am fribidi-1.0.10/bin/Makefile.am
+--- fribidi-1.0.10.orig/bin/Makefile.am	2020-07-06 04:17:23.000000000 +0900
++++ fribidi-1.0.10/bin/Makefile.am	2020-07-07 21:09:49.076237457 +0900
 @@ -2,11 +2,9 @@ bin_PROGRAMS = fribidi
  
  noinst_PROGRAMS = fribidi-benchmark fribidi-bidi-types fribidi-caprtl2utf8
@@ -14,10 +14,10 @@ diff -pruN fribidi-1.0.6.orig/bin/Makefile.am fribidi-1.0.6/bin/Makefile.am
 +fribidi_benchmark_SOURCES = fribidi-benchmark.c
  
  AM_CPPFLAGS = \
- 		-I$(top_builddir)/lib \
-diff -pruN fribidi-1.0.6.orig/bin/getopt.c fribidi-1.0.6/bin/getopt.c
---- fribidi-1.0.6.orig/bin/getopt.c	2019-09-27 14:03:47.000000000 +0900
-+++ fribidi-1.0.6/bin/getopt.c	1970-01-01 09:00:00.000000000 +0900
+ 		@FRIBIDI_CPPFLAGS@ \
+diff -pruN fribidi-1.0.10.orig/bin/getopt.c fribidi-1.0.10/bin/getopt.c
+--- fribidi-1.0.10.orig/bin/getopt.c	2015-08-05 03:49:07.000000000 +0900
++++ fribidi-1.0.10/bin/getopt.c	1970-01-01 09:00:00.000000000 +0900
 @@ -1,1268 +0,0 @@
 -/* Getopt for GNU.
 -   NOTE: getopt is now part of the C library, so if you don't know what
@@ -1287,9 +1287,9 @@ diff -pruN fribidi-1.0.6.orig/bin/getopt.c fribidi-1.0.6/bin/getopt.c
 -}
 -
 -#endif /* TEST */
-diff -pruN fribidi-1.0.6.orig/bin/getopt.h fribidi-1.0.6/bin/getopt.h
---- fribidi-1.0.6.orig/bin/getopt.h	2019-09-27 14:03:47.000000000 +0900
-+++ fribidi-1.0.6/bin/getopt.h	1970-01-01 09:00:00.000000000 +0900
+diff -pruN fribidi-1.0.10.orig/bin/getopt.h fribidi-1.0.10/bin/getopt.h
+--- fribidi-1.0.10.orig/bin/getopt.h	2015-08-05 03:49:07.000000000 +0900
++++ fribidi-1.0.10/bin/getopt.h	1970-01-01 09:00:00.000000000 +0900
 @@ -1,187 +0,0 @@
 -/* Declarations for getopt.
 -   Copyright (C) 1989-1994,1996-1999,2001,2003,2004
@@ -1478,9 +1478,9 @@ diff -pruN fribidi-1.0.6.orig/bin/getopt.h fribidi-1.0.6/bin/getopt.h
 -#undef __need_getopt
 -
 -#endif				/* getopt.h */
-diff -pruN fribidi-1.0.6.orig/bin/getopt1.c fribidi-1.0.6/bin/getopt1.c
---- fribidi-1.0.6.orig/bin/getopt1.c	2019-09-27 14:03:47.000000000 +0900
-+++ fribidi-1.0.6/bin/getopt1.c	1970-01-01 09:00:00.000000000 +0900
+diff -pruN fribidi-1.0.10.orig/bin/getopt1.c fribidi-1.0.10/bin/getopt1.c
+--- fribidi-1.0.10.orig/bin/getopt1.c	2015-08-05 03:49:07.000000000 +0900
++++ fribidi-1.0.10/bin/getopt1.c	1970-01-01 09:00:00.000000000 +0900
 @@ -1,213 +0,0 @@
 -/* getopt_long and getopt_long_only entry points for GNU getopt.
 -   Copyright (C) 1987,88,89,90,91,92,93,94,96,97,98,2004
@@ -1695,9 +1695,9 @@ diff -pruN fribidi-1.0.6.orig/bin/getopt1.c fribidi-1.0.6/bin/getopt1.c
 -}
 -
 -#endif /* TEST */
-diff -pruN fribidi-1.0.6.orig/bin/getopt_int.h fribidi-1.0.6/bin/getopt_int.h
---- fribidi-1.0.6.orig/bin/getopt_int.h	2019-09-27 14:03:47.000000000 +0900
-+++ fribidi-1.0.6/bin/getopt_int.h	1970-01-01 09:00:00.000000000 +0900
+diff -pruN fribidi-1.0.10.orig/bin/getopt_int.h fribidi-1.0.10/bin/getopt_int.h
+--- fribidi-1.0.10.orig/bin/getopt_int.h	2015-08-05 03:49:07.000000000 +0900
++++ fribidi-1.0.10/bin/getopt_int.h	1970-01-01 09:00:00.000000000 +0900
 @@ -1,145 +0,0 @@
 -/* Internal declarations for getopt.
 -   Copyright (C) 1989-1994,1996-1999,2001,2003,2004
@@ -1844,20 +1844,20 @@ diff -pruN fribidi-1.0.6.orig/bin/getopt_int.h fribidi-1.0.6/bin/getopt_int.h
 -);
 -
 -#endif /* getopt_int.h */
-diff -pruN fribidi-1.0.6.orig/bin/gettext.h fribidi-1.0.6/bin/gettext.h
---- fribidi-1.0.6.orig/bin/gettext.h	2019-09-27 14:03:47.000000000 +0900
-+++ fribidi-1.0.6/bin/gettext.h	1970-01-01 09:00:00.000000000 +0900
+diff -pruN fribidi-1.0.10.orig/bin/gettext.h fribidi-1.0.10/bin/gettext.h
+--- fribidi-1.0.10.orig/bin/gettext.h	2015-08-05 03:49:07.000000000 +0900
++++ fribidi-1.0.10/bin/gettext.h	1970-01-01 09:00:00.000000000 +0900
 @@ -1,2 +0,0 @@
 -#undef gettext
 -#define gettext
-diff -pruN fribidi-1.0.6.orig/bin/meson.build fribidi-1.0.6/bin/meson.build
---- fribidi-1.0.6.orig/bin/meson.build	2019-09-27 14:03:47.000000000 +0900
-+++ fribidi-1.0.6/bin/meson.build	2019-09-27 18:15:26.375883489 +0900
+diff -pruN fribidi-1.0.10.orig/bin/meson.build fribidi-1.0.10/bin/meson.build
+--- fribidi-1.0.10.orig/bin/meson.build	2020-07-06 04:17:23.000000000 +0900
++++ fribidi-1.0.10/bin/meson.build	2020-07-07 21:10:30.931408884 +0900
 @@ -1,12 +1,12 @@
  fribidi = executable('fribidi',
 -  'fribidi-main.c', 'getopt.c', 'getopt1.c', fribidi_unicode_version_h,
 +  'fribidi-main.c', fribidi_unicode_version_h,
-   c_args: ['-DHAVE_CONFIG_H'] + visibility_args,
+   c_args: ['-DHAVE_CONFIG_H'] + fribidi_static_cargs + visibility_args,
    include_directories: incs,
    link_with: libfribidi,
    install: true)
@@ -1865,6 +1865,6 @@ diff -pruN fribidi-1.0.6.orig/bin/meson.build fribidi-1.0.6/bin/meson.build
  executable('fribidi-benchmark',
 -  'fribidi-benchmark.c', 'getopt.c', 'getopt1.c', fribidi_unicode_version_h,
 +  'fribidi-benchmark.c', fribidi_unicode_version_h,
-   c_args: ['-DHAVE_CONFIG_H'] + visibility_args,
+   c_args: ['-DHAVE_CONFIG_H'] + fribidi_static_cargs + visibility_args,
    include_directories: incs,
    link_with: libfribidi,

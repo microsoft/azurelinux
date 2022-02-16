@@ -1,40 +1,64 @@
 Summary:        software font engine.
 Name:           freetype
-Version:        2.9.1
-Release:        5%{?dist}
-License:        BSD/GPL
+Version:        2.11.1
+Release:        1%{?dist}
+License:        BSD/GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/freetype/freetype-%{version}.tar.gz
+Source1:        https://download.savannah.gnu.org/releases/freetype/freetype-doc-%{version}.tar.gz
+BuildRequires: 	brotli-devel
+BuildRequires: 	bzip2-devel
+BuildRequires:  gcc
+BuildRequires: 	libpng-devel
 BuildRequires:  libtool
+BuildRequires:  make
 BuildRequires:  zlib-devel
 
 %description
-FreeType is a software font engine that is designed to be small, efficient, highly customizable, and portable while capable of producing high-quality output (glyph images). It can be used in graphics libraries, display servers, font conversion tools, text image generation tools, and many other products as well.
+The FreeType engine is a free and portable font rendering
+engine, developed to provide advanced font support for a variety of
+platforms and environments. FreeType is a library which can open and
+manages font files as well as efficiently load, hint and render
+individual glyphs. FreeType is not a font server or a complete
+text-rendering library.
 
 %package	devel
 Summary:        Header and development files
 Requires:       freetype = %{version}-%{release}
 
-%description	devel
-It contains the libraries and header files to create applications
+%description	devel	
+The freetype-devel package includes the static libraries and header files
+for the FreeType font rendering engine.
+ 
+Install freetype-devel if you want to develop programs which will use
+FreeType.
 
 %prep
-%setup -q
+%setup -q -b 1
 
 %build
-./configure \
-	--prefix=%{_prefix} \
-	--with-harfbuzz=no \
-	--enable-freetype-config
-make %{?_smp_mflags}
+./configure                  \
+	--prefix=%{_prefix}      \
+	--with-harfbuzz=no       \
+	--disable-static         \
+    --with-zlib=yes          \
+    --with-bzip2=yes         \
+    --with-png=yes           \
+	--enable-freetype-config \
+	--with-brotli=yes
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -name '*.a' -delete
+
+mkdir -p %{buildroot}%{_datadir}/licenses/freetype
+cp LICENSE.TXT %{buildroot}%{_datadir}/licenses/freetype
+cp -r docs/* %{buildroot}%{_datadir}/licenses/freetype
 
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
@@ -56,6 +80,12 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_bindir}/freetype-config
 
 %changelog
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.11.1-1
+- Update source to 2.11.1
+- Add freetype-docs source (2.11.1), same license
+- Manually copy over docs (make install doesn't handle it for us?)
+- License verified
+
 * Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 2.9.1-5
 - Add enable-fretype-config to configuration
 - Add /usr/bin/freetype-config to freetype-devel

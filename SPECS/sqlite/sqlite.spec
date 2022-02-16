@@ -2,7 +2,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
 Version:        3.36.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,6 @@ header files for development.
 %package libs
 Summary:        sqlite3 library
 Group:          Libraries
-Provides:       pkgconfig(sqlite3)
 
 %description libs
 The sqlite3 library.
@@ -82,6 +81,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.36.0-2
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.36.0-1
 - Update to version 3.36.0.
 

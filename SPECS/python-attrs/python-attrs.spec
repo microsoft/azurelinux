@@ -1,7 +1,7 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
 Version:        18.2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,7 +41,7 @@ Attributes without boilerplate.
 %check
 # Tests are only supported with Python3
 pip3 install pytest hypothesis==4.38.0 tox
-LANG=en_US.UTF-8 tox -e py37
+LANG=en_US.UTF-8 tox -e py39
 
 %files -n python3-attrs
 %defattr(-,root,root,-)
@@ -49,6 +49,9 @@ LANG=en_US.UTF-8 tox -e py37
 %{python3_sitelib}/*
 
 %changelog
+* Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 18.2.0-9
+- Use `py39` as tox env to enable ptest
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 18.2.0-8
 - Add license to python3 package
 - Remove python2 package
