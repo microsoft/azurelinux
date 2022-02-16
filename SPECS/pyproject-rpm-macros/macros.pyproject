@@ -69,8 +69,8 @@ for site_dir in ${site_dirs[@]}; do
   for distinfo in %{buildroot}$site_dir/*.dist-info; do
     echo "%ghost ${distinfo#%{buildroot}}" >> %{_pyproject_ghost_distinfo}
     sed -i 's/pip/rpm/' ${distinfo}/INSTALLER
-    PYTHONPATH=%{_rpmconfigdir}/redhat \\
-      %{__python3} -B %{_rpmconfigdir}/redhat/pyproject_preprocess_record.py \\
+    PYTHONPATH=%{_rpmconfigdir}/mariner \\
+      %{__python3} -B %{_rpmconfigdir}/mariner/pyproject_preprocess_record.py \\
       --buildroot %{buildroot} --record ${distinfo}/RECORD --output %{_pyproject_record}
     rm -fv ${distinfo}/RECORD
     rm -fv ${distinfo}/REQUESTED
@@ -89,7 +89,7 @@ fi
 
 
 %pyproject_save_files() %{expand:\\\
-%{__python3} %{_rpmconfigdir}/redhat/pyproject_save_files.py \\
+%{__python3} %{_rpmconfigdir}/mariner/pyproject_save_files.py \\
   --output-files "%{pyproject_files}" \\
   --output-modules "%{_pyproject_modules}" \\
   --buildroot "%{buildroot}" \\
@@ -124,7 +124,7 @@ fi
 %{-e:%{error:The -N and -e options are mutually exclusive}}
 %{-t:%{error:The -N and -t options are mutually exclusive}}
 }
-%{-e:%{expand:%global toxenv %(%{__python3} -s %{_rpmconfigdir}/redhat/pyproject_construct_toxenv.py %{?**})}}
+%{-e:%{expand:%global toxenv %(%{__python3} -s %{_rpmconfigdir}/mariner/pyproject_construct_toxenv.py %{?**})}}
 echo 'pyproject-rpm-macros'  # we already have this installed, but this way, it's repoqueryable
 echo 'python%{python3_pkgversion}-devel'
 echo 'python%{python3_pkgversion}dist(pip) >= 19'
@@ -142,7 +142,7 @@ fi}
 # setuptools assumes no pre-existing dist-info
 rm -rfv *.dist-info/ >&2
 if [ -f %{__python3} ]; then
-  RPM_TOXENV="%{toxenv}" HOSTNAME="rpmbuild" %{__python3} -s %{_rpmconfigdir}/redhat/pyproject_buildrequires.py %{?!_python_no_extras_requires:--generate-extras} --python3_pkgversion %{python3_pkgversion} %{?**}
+  RPM_TOXENV="%{toxenv}" HOSTNAME="rpmbuild" %{__python3} -s %{_rpmconfigdir}/mariner/pyproject_buildrequires.py %{?!_python_no_extras_requires:--generate-extras} --python3_pkgversion %{python3_pkgversion} %{?**}
 fi
 }
 
