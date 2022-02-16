@@ -240,6 +240,7 @@ make check -j1
 %changelog
 * Tue Feb 15 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.39-1
 - Upgrading to v10.39
+- Fixing source URL. 
 
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 10.34-2
 - Unconditionally build with readline support
