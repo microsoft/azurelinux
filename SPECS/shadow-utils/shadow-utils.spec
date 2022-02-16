@@ -168,6 +168,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %exclude %{_mandir}/hu
 %exclude %{_mandir}/id
 %exclude %{_mandir}/it
+%exclude %{_mandir}/ru
 %exclude %{_mandir}/ja
 %exclude %{_mandir}/ko
 %exclude %{_mandir}/man3
