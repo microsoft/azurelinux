@@ -87,6 +87,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %changelog
 * Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.24.3-6
 - Update Requires: to point at glibmm, rather than glibmm24 (removed)
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.24.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

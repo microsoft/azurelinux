@@ -87,6 +87,7 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %changelog
 * Fri Feb 04 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.12.0-15
 - Upgrade to to libsigc++30
+- License verified.
 
 * Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-14
 - Bringing back the dependency on 'cairo'.

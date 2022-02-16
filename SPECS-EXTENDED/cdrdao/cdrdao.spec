@@ -81,6 +81,7 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %changelog
 * Fri Feb 04 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.12.4-6
 - Upgrade to to libsigc++30
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

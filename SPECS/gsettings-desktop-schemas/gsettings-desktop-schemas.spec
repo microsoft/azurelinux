@@ -72,6 +72,10 @@ glib-compile-schemas --dry-run --strict %{buildroot}%{_datadir}/glib-2.0/schemas
 
 
 %changelog
+* Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.36.1-2
+- Promote to SPECS 
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
