@@ -6,6 +6,8 @@
         "dhcp-client",
         "hyperv-daemons",
         "openssh-server",
+        "python-xml",
+        "rsyslog",
         "WALinuxAgent"
     ]
 }
