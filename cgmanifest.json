@@ -23004,8 +23004,8 @@
         "type": "other",
         "other": {
           "name": "python-hyperlink",
-          "version": "19.0.0",
-          "downloadUrl": "https://github.com/python-hyper/hyperlink/archive/v19.0.0.tar.gz"
+          "version": "21.0.0",
+          "downloadUrl": "https://github.com/python-hyper/hyperlink/archive/refs/tags/v21.0.0.tar.gz"
         }
       }
     },
