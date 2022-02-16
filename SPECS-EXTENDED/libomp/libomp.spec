@@ -33,6 +33,7 @@ Patch1: 99b03c1c18.patch
 
 BuildRequires: cmake
 BuildRequires: perl(FindBin)
+BuildRequires: perl(lib)
 BuildRequires: elfutils-libelf-devel
 BuildRequires: perl
 BuildRequires: perl-Data-Dumper

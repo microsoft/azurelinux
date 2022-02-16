@@ -16,6 +16,7 @@ URL: http://www.orangefs.org/
 # LGPLv2+ remainder
 License: LGPLv2+ and LGPLv2 and BSD and MIT and zlib
 BuildRequires:  gcc
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Term::ReadLine)
 BuildRequires: automake
 BuildRequires: bison flex libattr-devel openssl-devel
