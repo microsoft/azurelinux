@@ -58,7 +58,7 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
-* Wed Feb 16 2022 Max Brodeur-Urbas <maxbr@microsoft.com> 7.92-1
+* Wed Feb 16 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 7.92-1
 - Upgrading to latest version.
 
 * Tue Aug 10 2021 Jon Slobodzian <joslobo@microsoft.com> 7.90-3
@@ -69,7 +69,6 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 
 * Mon May 03 2021 Thomas Crain <thcrain@microsoft.com> - 7.90-2
 - Remove zenmap/ndiff from configuration 
-
 
 * Tue Feb 02 2021 Henry Beberman <henry.beberman@microsoft.com> - 7.90-1
 - Add nmap spec
