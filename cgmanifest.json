@@ -4790,8 +4790,8 @@
         "type": "other",
         "other": {
           "name": "gnuplot",
-          "version": "5.2.4",
-          "downloadUrl": "http://downloads.sourceforge.net/gnuplot/gnuplot-5.2.4.tar.gz"
+          "version": "5.4.3",
+          "downloadUrl": "http://downloads.sourceforge.net/gnuplot/gnuplot-5.4.3.tar.gz"
         }
       }
     },
