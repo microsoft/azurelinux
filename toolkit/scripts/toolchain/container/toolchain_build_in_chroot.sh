@@ -675,9 +675,9 @@ popd
 rm -rf gettext-0.19.8.1
 touch /logs/status_gettext_complete
 
-echo Elfutils-0.185
-tar xjf elfutils-0.185.tar.bz2
-pushd elfutils-0.185
+echo Elfutils-0.186
+tar xjf elfutils-0.186.tar.bz2
+pushd elfutils-0.186
 ./configure \
     --prefix=/usr \
     --disable-debuginfod \
@@ -690,7 +690,7 @@ make -C libdw install
 # Need to install (eu-strip) as well
 make install
 popd
-rm -rf elfutils-0.185
+rm -rf elfutils-0.186
 touch /logs/status_libelf_complete
 
 echo Libffi-3.4.2
