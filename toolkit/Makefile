@@ -12,7 +12,7 @@
 ifndef CONFIG_FILE
 $(warning CONFIG_FILE is empty, defaulting to toolkit's core-efi.json unless CONFIG_FILE="" was set explicitly.)
 endif
-CONFIG_FILE            ?= $(toolkit_root)/imageconfigs/core-efi.json
+CONFIG_FILE            ?= 
 CONFIG_BASE_DIR        ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST     ?=
 PACKAGE_REBUILD_LIST   ?=
@@ -24,7 +24,7 @@ UPDATE_TOOLCHAIN_LIST           ?= n
 REBUILD_PACKAGES                ?= y
 DOWNLOAD_SRPMS                  ?= n
 ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
-REBUILD_TOOLS                   ?= n
+REBUILD_TOOLS                   ?= y
 RUN_CHECK                       ?= n
 USE_PREVIEW_REPO                ?= n
 DISABLE_UPSTREAM_REPOS          ?= n
@@ -94,10 +94,10 @@ else
 endif
 
 # External source server
-SOURCE_URL         ?=
+SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
 
-PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
-PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/debuginfo/$(build_arch)
+PACKAGE_URL_LIST   ?= https://cblmarinerdevrepo.blob.core.windows.net/main-latest/RPMS
+PACKAGE_URL_LIST   += 
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
