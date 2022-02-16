@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # Required binaries:
 # rpm and dnf on Mariner
