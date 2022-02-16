@@ -13611,8 +13611,8 @@
         "type": "other",
         "other": {
           "name": "metal3-baremetal-operator",
-          "version": "0.4.0",
-          "downloadUrl": "https://github.com/metal3-io/baremetal-operator/archive/refs/tags/capm3-v0.4.0.tar.gz"
+          "version": "0.5.4",
+          "downloadUrl": "https://github.com/metal3-io/baremetal-operator/archive/refs/tags/capm3-v0.5.4.tar.gz"
         }
       }
     },
@@ -13621,8 +13621,8 @@
         "type": "other",
         "other": {
           "name": "metal3-cluster-api-provider-metal3",
-          "version": "0.4.0",
-          "downloadUrl": "https://github.com/metal3-io/cluster-api-provider-metal3/archive/refs/tags/v0.4.0.tar.gz"
+          "version": "0.5.4",
+          "downloadUrl": "https://github.com/metal3-io/cluster-api-provider-metal3/archive/refs/tags/v0.5.4.tar.gz"
         }
       }
     },
@@ -13631,8 +13631,8 @@
         "type": "other",
         "other": {
           "name": "metal3-ip-address-manager",
-          "version": "0.0.4",
-          "downloadUrl": "https://github.com/metal3-io/ip-address-manager/archive/refs/tags/v0.0.4.tar.gz"
+          "version": "0.1.1",
+          "downloadUrl": "https://github.com/metal3-io/ip-address-manager/archive/refs/tags/v0.1.1.tar.gz"
         }
       }
     },
