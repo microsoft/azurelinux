@@ -10,7 +10,7 @@ URL:            https://github.com/metal3-io/cluster-api-provider-metal3
 Source0:        https://github.com/metal3-io/cluster-api-provider-metal3/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # The source is the upstream tarball with the vendor dir (created using
 # "go mod vendor") included for offline builds and its top-level directory
-# renamed to %%{name}-%%{version}. It is then repackaged as a tar using the
+# renamed to %{name}-%{version}. It is then repackaged as a tar using the
 # following command:
 #
 #   tar \
@@ -20,8 +20,8 @@ Source0:        https://github.com/metal3-io/cluster-api-provider-metal3/archive
 #     --group=0 \
 #     --numeric-owner \
 #     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#     -cf %%{name}-%%{version}.tar.gz \
-#     %%{name}-%%{version}
+#     -cf %{name}-%{version}.tar.gz \
+#     %{name}-%{version}
 #
 # This command creates a tar with the same cryptographic hash regardless of time
 # or environment. See https://reproducible-builds.org/docs/archives/. It can be
