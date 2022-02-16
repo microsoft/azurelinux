@@ -23024,8 +23024,8 @@
         "type": "other",
         "other": {
           "name": "python-idna",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/kjd/idna/archive/v2.7.tar.gz"
+          "version": "3.3",
+          "downloadUrl": "https://github.com/kjd/idna/archive/refs/tags/v3.3.tar.gz"
         }
       }
     },
