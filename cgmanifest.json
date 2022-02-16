@@ -3168,8 +3168,8 @@
         "type": "other",
         "other": {
           "name": "e2fsprogs",
-          "version": "1.46.4",
-          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.46.4.tar.gz"
+          "version": "1.46.5",
+          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.46.5.tar.gz"
         }
       }
     },
@@ -12871,8 +12871,8 @@
         "type": "other",
         "other": {
           "name": "man-db",
-          "version": "2.8.4",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.8.4.tar.xz"
+          "version": "2.10.1",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.10.1.tar.xz"
         }
       }
     },
@@ -22404,8 +22404,8 @@
         "type": "other",
         "other": {
           "name": "python-cffi",
-          "version": "1.14.5",
-          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.14.5.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.15.0.tar.gz"
         }
       }
     },
@@ -22414,8 +22414,18 @@
         "type": "other",
         "other": {
           "name": "python-chardet",
-          "version": "3.0.4",
-          "downloadUrl": "https://github.com/chardet/chardet/archive/3.0.4.tar.gz"
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/chardet/chardet/archive/refs/tags/4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-charset-normalizer",
+          "version": "2.0.11",
+          "downloadUrl": "https://github.com/ousret/charset_normalizer/archive/refs/tags/2.0.11.tar.gz"
         }
       }
     },
@@ -24893,6 +24903,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-tox-current-env",
+          "version": "0.0.7",
+          "downloadUrl": "https://github.com/fedora-python/tox-current-env/archive/refs/tags/v0.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-tqdm",
           "version": "4.50.2",
           "downloadUrl": "https://github.com/tqdm/tqdm/archive/v4.50.2/tqdm-4.50.2.tar.gz"
@@ -25494,8 +25514,8 @@
         "type": "other",
         "other": {
           "name": "rdma-core",
-          "version": "31.0",
-          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v31.0/rdma-core-31.0.tar.gz"
+          "version": "39.0",
+          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v39.0/rdma-core-39.0.tar.gz"
         }
       }
     },

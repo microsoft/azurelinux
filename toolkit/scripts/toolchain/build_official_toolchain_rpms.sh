@@ -532,6 +532,7 @@ chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
 build_rpm_in_chroot_no_install mariner-repos
+build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 chroot_and_print_installed_rpms
 

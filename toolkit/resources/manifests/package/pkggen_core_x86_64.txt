@@ -47,8 +47,8 @@ bash-lang-5.1.8-1.cm2.x86_64.rpm
 bzip2-1.0.8-1.cm2.x86_64.rpm
 bzip2-devel-1.0.8-1.cm2.x86_64.rpm
 bzip2-libs-1.0.8-1.cm2.x86_64.rpm
-sed-4.8-1.cm2.x86_64.rpm
-sed-lang-4.8-1.cm2.x86_64.rpm
+sed-4.8-2.cm2.x86_64.rpm
+sed-lang-4.8-2.cm2.x86_64.rpm
 procps-ng-3.3.17-1.cm2.x86_64.rpm
 procps-ng-devel-3.3.17-1.cm2.x86_64.rpm
 procps-ng-lang-3.3.17-1.cm2.x86_64.rpm
@@ -57,8 +57,8 @@ grep-3.7-1.cm2.x86_64.rpm
 grep-lang-3.7-1.cm2.x86_64.rpm
 diffutils-3.8-1.cm2.x86_64.rpm
 gawk-5.1.0-1.cm2.x86_64.rpm
-findutils-4.8.0-1.cm2.x86_64.rpm
-findutils-lang-4.8.0-1.cm2.x86_64.rpm
+findutils-4.8.0-2.cm2.x86_64.rpm
+findutils-lang-4.8.0-2.cm2.x86_64.rpm
 gettext-0.21-2.cm2.x86_64.rpm
 gzip-1.11-1.cm2.x86_64.rpm
 make-4.3-2.cm2.x86_64.rpm
@@ -181,7 +181,7 @@ rpm-lang-4.17.0-3.cm2.x86_64.rpm
 rpm-libs-4.17.0-3.cm2.x86_64.rpm
 cpio-2.13-3.cm2.x86_64.rpm
 cpio-lang-2.13-3.cm2.x86_64.rpm
-e2fsprogs-libs-1.46.4-1.cm2.x86_64.rpm
+e2fsprogs-libs-1.46.5-1.cm2.x86_64.rpm
 libsolv-0.7.20-1.cm2.x86_64.rpm
 libsolv-devel-0.7.20-1.cm2.x86_64.rpm
 libssh2-1.9.0-2.cm2.x86_64.rpm
@@ -240,3 +240,4 @@ slang-2.3.2-4.cm2.x86_64.rpm
 newt-0.52.21-3.cm2.x86_64.rpm
 chkconfig-1.20-2.cm2.x86_64.rpm
 msopenjdk-11-11.0.13+8-LTS-4.x86_64.rpm
+pyproject-rpm-macros-1.0.0~rc1-2.cm2.noarch.rpm
