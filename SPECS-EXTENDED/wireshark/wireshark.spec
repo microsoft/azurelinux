@@ -8,7 +8,7 @@ Distribution:   Mariner
 Summary:	Network traffic analyzer
 Name:		wireshark
 Version:	3.4.4
-Release:	3%{?dist}
+Release:	4%{?dist}
 License:	GPL+
 Url:		http://www.wireshark.org/
 
@@ -39,6 +39,7 @@ Requires:	libmaxminddb
 %endif
 
 BuildRequires:	bzip2-devel
+BuildRequires:	perl(English)
 BuildRequires:	c-ares-devel
 BuildRequires:	elfutils-devel
 BuildRequires:	gcc-c++
@@ -282,6 +283,9 @@ fi
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-4
+- Adding missing BRs on Perl modules.
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 3.4.4-3
 - Remove epoch
 

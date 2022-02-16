@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:       ibus-libzhuyin
 Version:    1.9.1
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    New Zhuyin engine based on libzhuyin for IBus
 License:    GPLv2+
 URL:        https://github.com/libzhuyin/ibus-libzhuyin
@@ -18,6 +18,7 @@ Patch0:     ibus-libzhuyin-1.9.x-HEAD.patch
 %endif
 
 BuildRequires:  gcc-c++
+BuildRequires:  perl(File::Find)
 BuildRequires:  gettext-devel
 BuildRequires:  intltool
 BuildRequires:  libtool
@@ -74,6 +75,9 @@ make install DESTDIR=${RPM_BUILD_ROOT} INSTALL="install -p"
 
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-5
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

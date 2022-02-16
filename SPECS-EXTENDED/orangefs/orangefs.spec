@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: orangefs
 Version: 2.9.7
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Parallel network file system client
 URL: http://www.orangefs.org/
 # BSD (2 clause) maint/config/ssl.m4
@@ -16,6 +16,7 @@ URL: http://www.orangefs.org/
 # LGPLv2+ remainder
 License: LGPLv2+ and LGPLv2 and BSD and MIT and zlib
 BuildRequires:  gcc
+BuildRequires:  perl(Term::ReadLine)
 BuildRequires: automake
 BuildRequires: bison flex libattr-devel openssl-devel
 BuildRequires: perl(Math::BigInt) perl(Getopt::Long)
@@ -248,6 +249,9 @@ This package contains the FUSE client.
 %{_bindir}/pvfs2fuse
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-8
+- Adding missing BRs on Perl modules.
+
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 2.9.7-7
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Build without docs and remove related build requirements.

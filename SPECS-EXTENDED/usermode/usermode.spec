@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: Tools for certain user account management tasks
 Name: usermode
 Version: 1.112
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: GPLv2+
 URL: https://pagure.io/usermode/
 Source: https://releases.pagure.org/usermode/usermode-%{version}.autotoolized.tar.xz
@@ -20,6 +20,7 @@ Patch2: selinux_deprecated.patch
 Requires: pam, passwd, util-linux
 # https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/IJFYI5Q2BYZKIGDFS2WLOBDUSEGWHIKV/
 BuildRequires: gcc
+BuildRequires: perl(File::Find)
 BuildRequires: desktop-file-utils, gettext, glib2-devel, gtk2-devel, intltool
 BuildRequires: libblkid-devel, libSM-devel, libselinux-devel, libuser-devel
 BuildRequires: pam-devel, perl-XML-Parser, startup-notification-devel
@@ -104,6 +105,9 @@ done
 %{_datadir}/applications/*
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.112-11
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.112-10
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

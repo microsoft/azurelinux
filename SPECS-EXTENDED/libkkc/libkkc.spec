@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:		libkkc
 Version:	0.3.5
-Release:	19%{?dist}
+Release:	20%{?dist}
 Summary:	Japanese Kana Kanji conversion library
 
 License:	GPLv3+
@@ -17,6 +17,7 @@ Patch1:         libkkc-POT.skip.patch
 Patch2:         libkkc-vala-abstract-create.patch
 
 BuildRequires:  gcc-c++
+BuildRequires:  perl(File::Find)
 BuildRequires:	marisa-devel
 BuildRequires:	vala
 BuildRequires:	pkgconfig(gee-0.8)
@@ -112,6 +113,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.5-20
+- Adding missing BRs on Perl modules.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.3.5-19
 - Remove epoch from libkkc-data
 

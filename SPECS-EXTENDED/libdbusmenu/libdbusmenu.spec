@@ -11,7 +11,7 @@ Distribution:   Mariner
 
 Name:       libdbusmenu
 Version:    %{ubuntu_release}.0
-Release:    16%{?dist}
+Release:    17%{?dist}
 Summary:    Library for passing menus over DBus
 
 # All files installed in final rpms use C sources with dual licensing headers.
@@ -25,6 +25,7 @@ Source0:    https://launchpad.net/libdbusmenu/%{ubuntu_release}/%{version}/+down
 Patch0:     00-no-werror.patch
 
 BuildRequires:  atk-devel
+BuildRequires:  perl(File::Find)
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gettext
@@ -262,6 +263,9 @@ done
 %{_datadir}/%{name}/json/test-gtk-label.json
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.04.0-17
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.04.0-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

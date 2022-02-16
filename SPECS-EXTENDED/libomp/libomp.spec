@@ -12,7 +12,7 @@ Distribution:   Mariner
 
 Name: libomp
 Version: 10.0.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: OpenMP runtime for clang
 
 License: NCSA
@@ -32,6 +32,7 @@ Patch0: 0001-CMake-Make-LIBOMP_HEADERS_INSTALL_PATH-a-cache-varia.patch
 Patch1: 99b03c1c18.patch
 
 BuildRequires: cmake
+BuildRequires: perl(FindBin)
 BuildRequires: elfutils-libelf-devel
 BuildRequires: perl
 BuildRequires: perl-Data-Dumper
@@ -135,6 +136,9 @@ rm -rf %{buildroot}%{_libdir}/libarcher_static.a
 %{_libexecdir}/tests/libomp/
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.0.1-5
+- Adding missing BRs on Perl modules.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.0.1-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

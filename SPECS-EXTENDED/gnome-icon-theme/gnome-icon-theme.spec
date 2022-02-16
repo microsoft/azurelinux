@@ -4,7 +4,7 @@ Summary:    GNOME icon theme
 Name:       gnome-icon-theme
 Version:    3.12.0
 License:    LGPLv3+
-Release:    14%{?dist}
+Release:    15%{?dist}
 URL:        http://www.gnome.org
 
 #VCS: git:git://git.gnome.org/gnome-icon-theme
@@ -12,6 +12,7 @@ Source0: http://download.gnome.org/sources/gnome-icon-theme/3.12/%{name}-%{versi
 Source1: legacy-icon-mapping.xml
 
 BuildRequires:  gcc
+BuildRequires:  perl(File::Find)
 BuildRequires: gtk2
 BuildRequires: icon-naming-utils >= 0.8.7
 BuildRequires: intltool
@@ -111,6 +112,9 @@ gtk-update-icon-cache --force %{_datadir}/icons/gnome &>/dev/null || :
 %{_datadir}/pkgconfig/gnome-icon-theme.pc
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.12.0-15
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.12.0-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
