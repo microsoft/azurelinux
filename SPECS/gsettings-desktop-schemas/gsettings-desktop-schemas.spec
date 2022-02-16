@@ -1,24 +1,20 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global debug_package %{nil}
 
+Summary:        A collection of GSettings schemas
 Name:           gsettings-desktop-schemas
 Version:        3.36.1
 Release:        2%{?dist}
-Summary:        A collection of GSettings schemas
-
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 # no homepage exists for this component
 URL:            https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas
 Source0:        https://download.gnome.org/sources/%{name}/3.36/%{name}-%{version}.tar.xz
-
 BuildRequires:  gettext
 BuildRequires:  glib2-devel >= 2.31.0
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  meson
-
 Requires: glib2 >= 2.31.0
-
 # Recommend the default fonts set in the schemas
 Recommends: font(cantarell)
 Recommends: font(sourcecodepro)
@@ -26,7 +22,6 @@ Recommends: font(sourcecodepro)
 %description
 gsettings-desktop-schemas contains a collection of GSettings schemas for
 settings shared by various components of a desktop.
-
 
 %package        devel
 Summary:        Development files for %{name}
@@ -36,26 +31,20 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries
 and header files for developing applications that use %{name}.
 
-
 %prep
 %autosetup -p1
-
 
 %build
 %meson
 %meson_build
 
-
 %install
 %meson_install
-
 %find_lang %{name} --with-gnome
-
 
 %check
 # Test that the schemas compile
 glib-compile-schemas --dry-run --strict %{buildroot}%{_datadir}/glib-2.0/schemas
-
 
 %files -f %{name}.lang
 %doc AUTHORS MAINTAINERS NEWS README
@@ -71,8 +60,11 @@ glib-compile-schemas --dry-run --strict %{buildroot}%{_datadir}/glib-2.0/schemas
 %{_datadir}/pkgconfig/*
 %{_datadir}/gir-1.0/GDesktopEnums-3.0.gir
 
-
 %changelog
+* Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.36.1-2
+- Promote to SPECS 
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

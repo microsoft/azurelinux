@@ -10,7 +10,7 @@ Distribution:   Mariner
 
 Name:           pangomm
 Version:        2.42.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        C++ interface for Pango
 
 License:        LGPLv2+
@@ -18,12 +18,12 @@ URL:            http://www.gtkmm.org/
 Source0:        http://ftp.gnome.org/pub/GNOME/sources/pangomm/%{release_version}/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc-c++
-BuildRequires:  glibmm24-devel >= %{glibmm_version}
+BuildRequires:  glibmm-devel >= %{glibmm_version}
 BuildRequires:  cairomm-devel >= %{cairomm_version}
 BuildRequires:  pango-devel >= %{pango_version}
 BuildRequires:  doxygen graphviz
 
-Requires:       glibmm24%{?_isa} >= %{glibmm_version}
+Requires:       glibmm%{?_isa} >= %{glibmm_version}
 Requires:       cairomm%{?_isa} >= %{cairomm_version}
 Requires:       pango%{?_isa} >= %{pango_version}
 
@@ -47,8 +47,8 @@ developing pangomm applications.
 Summary:          Developer's documentation for the pangomm library
 BuildArch:        noarch
 Requires:         %{name} = %{version}-%{release}
-Requires:         libsigc++20-doc
-Requires:         glibmm24-doc
+Requires:         libsigc++30-doc
+Requires:         glibmm-doc
 
 %description      doc
 This package contains developer's documentation for the pangomm
@@ -92,6 +92,10 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %{_datadir}/devhelp/
 
 %changelog
+* Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.42.1-3
+- Update Requires: to point at glibmm, rather than glibmm24 (removed)
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.42.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

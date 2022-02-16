@@ -4580,8 +4580,8 @@
         "type": "other",
         "other": {
           "name": "glib-networking",
-          "version": "2.59.1",
-          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glib-networking/2.59/glib-networking-2.59.1.tar.xz"
+          "version": "2.70.0",
+          "downloadUrl": "https://download.gnome.org/sources/glib-networking/2.70/glib-networking-2.70.0.tar.xz"
         }
       }
     },
@@ -4599,9 +4599,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "glibmm24",
-          "version": "2.56.0",
-          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.56/glibmm-2.56.0.tar.xz"
+          "name": "glibmm",
+          "version": "2.70.0",
+          "downloadUrl": "http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.70/glibmm-2.70.0.tar.xz"
         }
       }
     },
@@ -11190,19 +11190,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libsigc++20",
-          "version": "2.10.0",
-          "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/2.10.0/libsigcplusplus-2.10.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libsigc++20",
-          "version": "2.10.3",
-          "downloadUrl": "http://download.gnome.org/sources/libsigc++/2.10/libsigc++-2.10.3.tar.xz"
+          "name": "libsigc++30",
+          "version": "3.2.0",
+          "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/3.2.0/libsigc++-3.2.0.tar.xz"
         }
       }
     },

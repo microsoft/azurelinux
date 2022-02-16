@@ -2,13 +2,13 @@
 Summary:        libxml++
 Name:           libxml++
 Version:        5.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://libxmlplusplus.sourceforge.net/
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/%{majver}/%{name}-%{version}.tar.xz
-BuildRequires:  glibmm24-devel
+BuildRequires:  glibmm-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  mm-common
 BuildRequires:  pkg-config
@@ -16,7 +16,7 @@ BuildRequires:  doxygen
 BuildRequires:  graphviz
 BuildRequires:  libxslt
 BuildRequires:  docbook-style-xsl
-Requires:       glibmm24
+Requires:       glibmm
 Requires:       libxml2
 
 %description
@@ -67,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/devhelp/*
 
 %changelog
+* Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.0.1-2
+- Update Requires: to point at glibmm, rather than glibmm24 (removed)
+
 * Wed Jan 26 2022 Henry Li <lihl@microsoft.com> - 5.0.1-1
 - Upgrade to version 5.0.1
 - Add doxygen, graphviz, libxslt and docbook-style-xsl as BR
