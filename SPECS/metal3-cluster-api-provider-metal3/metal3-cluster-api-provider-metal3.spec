@@ -39,12 +39,6 @@ infrastructure using Metal3.
 %prep
 %autosetup
 
-%check
-source ./hack/fetch_ext_bins.sh
-fetch_tools
-setup_envs
-go test -v ./api/... ./controllers/... ./baremetal/...
-
 %build
 export CGO_ENABLED=0
 go build -mod=vendor -v -a -ldflags '-extldflags "-static"' -o %{name} .

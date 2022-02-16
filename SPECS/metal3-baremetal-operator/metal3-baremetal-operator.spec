@@ -40,18 +40,9 @@ contents before or after provisioning.
 %prep
 %autosetup
 
-%check
-go test -v ./cmd/... ./pkg/... ./version/...
-
 %build
-export GO111MODULE=on
-export GOFLAGS=
-go build \
-  -mod=vendor \
-  -v \
-  -ldflags "-X github.com/metal3-io/baremetal-operator/pkg/version.Raw=capm3-v%{version} -X github.com/metal3-io/baremetal-operator/pkg/version.Commit=%{git_commit}" \
-  -o %{name} \
-  cmd/manager/main.go
+export CGO_ENABLED=0
+go build -mod=vendor -v -a -ldflags '-extldflags "-static"' -o %{name} .
 
 %install
 install -p -m 755 -t %{buildroot} %{name}

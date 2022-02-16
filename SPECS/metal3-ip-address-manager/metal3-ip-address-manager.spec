@@ -36,12 +36,6 @@ manages the allocations of IP subnets for the Cluster API Provider for Metal3.
 %prep
 %autosetup
 
-%check
-source ./hack/fetch_ext_bins.sh
-fetch_tools
-setup_envs
-go test -v ./api/... ./controllers/... ./ipam/...
-
 %build
 export CGO_ENABLED=0
 go build -mod=vendor -v -a -ldflags '-extldflags "-static"' -o %{name} .
