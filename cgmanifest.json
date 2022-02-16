@@ -27677,8 +27677,8 @@
         "type": "other",
         "other": {
           "name": "snappy",
-          "version": "1.1.7",
-          "downloadUrl": "https://github.com/google/snappy/archive/1.1.7.tar.gz"
+          "version": "1.1.9",
+          "downloadUrl": "https://github.com/google/snappy/archive/1.1.9.tar.gz"
         }
       }
     },
@@ -28427,8 +28427,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.14.5",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.14.5.tar.gz"
+          "version": "1.21.2",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.21.2.tar.gz"
         }
       }
     },

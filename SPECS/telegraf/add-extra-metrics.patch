@@ -1,20 +1,18 @@
-diff --git a/plugins/inputs/procstat/process.go b/plugins/inputs/procstat/process.go
-index 042929f0..cf4f5185 100644
---- a/plugins/inputs/procstat/process.go
-+++ b/plugins/inputs/procstat/process.go
-@@ -26,6 +26,7 @@ type Process interface {
+diff -ruN telegraf-1.21.2-a/plugins/inputs/procstat/process.go telegraf-1.21.2-b/plugins/inputs/procstat/process.go
+--- telegraf-1.21.2-a/plugins/inputs/procstat/process.go	2022-01-31 16:47:42.447035252 -0800
++++ telegraf-1.21.2-b/plugins/inputs/procstat/process.go	2022-01-31 16:49:30.036424290 -0800
+@@ -26,6 +26,7 @@
  	RlimitUsage(bool) ([]process.RlimitStat, error)
  	Username() (string, error)
  	CreateTime() (int64, error)
 +	MemoryMaps(bool) (*[]process.MemoryMapsStat, error)
+ 	Ppid() (int32, error)
  }
  
- type PIDFinder interface {
-diff --git a/plugins/inputs/procstat/procstat.go b/plugins/inputs/procstat/procstat.go
-index 8e56e4bf..bf2d5503 100644
---- a/plugins/inputs/procstat/procstat.go
-+++ b/plugins/inputs/procstat/procstat.go
-@@ -250,6 +250,14 @@ func (p *Procstat) addMetric(proc Process, acc telegraf.Accumulator) {
+diff -ruN telegraf-1.21.2-a/plugins/inputs/procstat/procstat.go telegraf-1.21.2-b/plugins/inputs/procstat/procstat.go
+--- telegraf-1.21.2-a/plugins/inputs/procstat/procstat.go	2022-01-31 16:47:42.447035252 -0800
++++ telegraf-1.21.2-b/plugins/inputs/procstat/procstat.go	2022-01-31 16:54:10.684079205 -0800
+@@ -289,6 +289,14 @@
  		fields[prefix+"memory_locked"] = mem.Locked
  	}
  
@@ -26,6 +24,6 @@ index 8e56e4bf..bf2d5503 100644
 +		fields[prefix+"memory_maps_private_clean"] = (*memMaps)[0].PrivateClean
 +	}
 +
- 	mem_perc, err := proc.MemoryPercent()
+ 	memPerc, err := proc.MemoryPercent()
  	if err == nil {
- 		fields[prefix+"memory_usage"] = mem_perc
+ 		fields[prefix+"memory_usage"] = memPerc
