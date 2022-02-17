@@ -43,6 +43,7 @@
         "extra-cmake-modules",
         "fipscheck",
         "fuse-zip",
+        "gcovr",
         "gnu-efi",
         "graphviz",
         "hardening-check",
