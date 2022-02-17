@@ -118,7 +118,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Wed Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 1.16.12-2
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 1.16.12-2
 - Use _topdir instead of hard-coded value /usr/src/mariner
 
 * Tue Jan 18 2022 Henry Li <lihl@microsoft.com> - 1.16.12-1

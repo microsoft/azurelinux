@@ -1803,7 +1803,7 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
-*   Wed Feb 17 2022 Andrew Phelps <anphel@microsoft.com> 16.2.0-4
+*   Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> 16.2.0-4
 -   Use _topdir instead of hard-coded value /usr/src/mariner
 
 *   Thu Jul 22 2021 Andrew Phelps <anphel@microsoft.com> 16.2.0-3

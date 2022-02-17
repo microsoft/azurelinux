@@ -277,7 +277,7 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
-* Wed Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-7
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-7
 - Use _topdir instead of hard-coded value /usr/src/mariner
 
 * Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 2.06~rc1-6

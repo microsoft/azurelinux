@@ -56,7 +56,7 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Wed Feb 16 2022 Andrew Phelps <anphel@microsoft.com> 1.0-8
+* Wed Feb 16 2022 Andrew Phelps <anphel@microsoft.com> - 1.0-8
 - Use _topdir variable with gen-ld-script.sh
 
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.0-7
