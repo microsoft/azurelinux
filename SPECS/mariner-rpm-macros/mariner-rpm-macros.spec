@@ -1,7 +1,7 @@
 Summary:	Mariner specific rpm macro files
 Name:		mariner-rpm-macros
 Version:	1.0
-Release:	7%{?dist}
+Release:	8%{?dist}
 License:	GPL+
 Group:		Development/System
 Vendor:		Microsoft Corporation
@@ -56,6 +56,9 @@ install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Wed Feb 16 2022 Andrew Phelps <anphel@microsoft.com> 1.0-8
+- Use _topdir variable with gen-ld-script.sh
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.0-7
 - add sed step to os_install_post to remove references to module_info.ld in pkgconfigs
 
