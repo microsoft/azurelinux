@@ -28,7 +28,7 @@ BuildRequires: lmdb-devel fuse-devel
 BuildRequires: libibverbs-devel
 %endif
 
-Source0: https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-%version.tar.gz
+Source0: https://s3.amazonaws.com/download.orangefs.org/releases/2.9.7/source/orangefs-%version.tar.gz
 Source1: orangefs-server.service
 Source2: orangefs-client.service
 Source3: orangefs.conf

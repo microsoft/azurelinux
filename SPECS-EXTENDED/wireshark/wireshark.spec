@@ -12,7 +12,7 @@ Release:	5%{?dist}
 License:	GPL+
 Url:		http://www.wireshark.org/
 
-Source0:	https://wireshark.org/download/src/%{name}-%{version}.tar.xz
+Source0:	https://wireshark.org/download/src/all-versions/%{name}-%{version}.tar.xz
 Source1:        https://www.wireshark.org/download/src/all-versions/SIGNATURES-%{version}.txt
 Source2:	90-wireshark-usbmon.rules
 
