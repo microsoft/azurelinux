@@ -8,19 +8,19 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://harfbuzz.github.io/
 Source0:        https://github.com/%{name}/%{name}/releases/download/3.3.2/%{name}-%{version}.tar.xz	
-BuildRequires:  cairo-devel
-BuildRequires:  freetype-devel
-BuildRequires:  gcc
+BuildRequires:  pkgconfig(cairo)
+BuildRequires:  pkgconfig(freetype2)
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  gcc-c++
-BuildRequires:  glib2-devel
-BuildRequires:  gobject-introspection-devel
+BuildRequires:  gobject-introspection
 BuildRequires:  gtk-doc
-BuildRequires:  icu-devel
 BuildRequires:  make
 %global with_check 1
 %if %{with_check}
 BuildRequires:  python3-devel
 %endif
+Requires:       glib
 
 %description
 HarfBuzz is an implementation of the OpenType Layout engine.
