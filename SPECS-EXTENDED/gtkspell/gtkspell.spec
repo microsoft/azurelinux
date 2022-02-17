@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name: gtkspell
 Version: 2.0.16
-Release: 22%{?dist}
+Release: 23%{?dist}
 License: GPLv2+
 Summary: On-the-fly spell checking for GtkTextView widgets
 URL: http://gtkspell.sourceforge.net/
@@ -62,6 +62,9 @@ find $RPM_BUILD_ROOT -name "*.la" -exec rm {} \;
 %{_libdir}/pkgconfig/gtkspell-2.0.pc
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.16-23
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.16-22
 - Adding missing BRs on Perl modules.
 

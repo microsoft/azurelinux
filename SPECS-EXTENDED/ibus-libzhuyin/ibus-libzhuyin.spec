@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:       ibus-libzhuyin
 Version:    1.9.1
-Release:    5%{?dist}
+Release:    6%{?dist}
 Summary:    New Zhuyin engine based on libzhuyin for IBus
 License:    GPLv2+
 URL:        https://github.com/libzhuyin/ibus-libzhuyin
@@ -75,6 +75,9 @@ make install DESTDIR=${RPM_BUILD_ROOT} INSTALL="install -p"
 
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-6
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-5
 - Adding missing BRs on Perl modules.
 

@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:		libkkc
 Version:	0.3.5
-Release:	20%{?dist}
+Release:	21%{?dist}
 Summary:	Japanese Kana Kanji conversion library
 
 License:	GPLv3+
@@ -113,6 +113,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.5-21
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.5-20
 - Adding missing BRs on Perl modules.
 

@@ -6,7 +6,7 @@ Distribution:   Mariner
 Summary: Helps troubleshoot SELinux problems
 Name: setroubleshoot
 Version: 3.3.24
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2+
 URL: https://pagure.io/setroubleshoot
 Source0: https://releases.pagure.org/setroubleshoot/%{name}-%{version}.tar.gz
@@ -203,6 +203,9 @@ SELinux troubleshoot legacy applet
 %{_bindir}/seappletlegacy
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.24-5
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.24-4
 - Adding missing BRs on Perl modules.
 

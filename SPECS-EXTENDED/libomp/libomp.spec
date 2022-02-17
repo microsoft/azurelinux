@@ -12,7 +12,7 @@ Distribution:   Mariner
 
 Name: libomp
 Version: 10.0.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: OpenMP runtime for clang
 
 License: NCSA
@@ -137,6 +137,9 @@ rm -rf %{buildroot}%{_libdir}/libarcher_static.a
 %{_libexecdir}/tests/libomp/
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.0.1-6
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.0.1-5
 - Adding missing BRs on Perl modules.
 

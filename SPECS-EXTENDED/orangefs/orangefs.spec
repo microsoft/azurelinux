@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: orangefs
 Version: 2.9.7
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Parallel network file system client
 URL: http://www.orangefs.org/
 # BSD (2 clause) maint/config/ssl.m4
@@ -250,6 +250,9 @@ This package contains the FUSE client.
 %{_bindir}/pvfs2fuse
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-9
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-8
 - Adding missing BRs on Perl modules.
 

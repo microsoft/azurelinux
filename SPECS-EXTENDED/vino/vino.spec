@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:    vino
 Version: 3.22.0
-Release: 19%{?dist}
+Release: 20%{?dist}
 Summary: A remote desktop system for GNOME
 
 License: GPLv2+
@@ -96,6 +96,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/vino-server.desktop
 
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-20
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-19
 - Adding missing BRs on Perl modules.
 

@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: Tools for certain user account management tasks
 Name: usermode
 Version: 1.112
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: GPLv2+
 URL: https://pagure.io/usermode/
 Source: https://releases.pagure.org/usermode/usermode-%{version}.autotoolized.tar.xz
@@ -105,6 +105,9 @@ done
 %{_datadir}/applications/*
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.112-12
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.112-11
 - Adding missing BRs on Perl modules.
 

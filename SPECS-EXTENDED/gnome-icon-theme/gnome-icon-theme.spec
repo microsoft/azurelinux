@@ -4,7 +4,7 @@ Summary:    GNOME icon theme
 Name:       gnome-icon-theme
 Version:    3.12.0
 License:    LGPLv3+
-Release:    15%{?dist}
+Release:    16%{?dist}
 URL:        http://www.gnome.org
 
 #VCS: git:git://git.gnome.org/gnome-icon-theme
@@ -112,6 +112,9 @@ gtk-update-icon-cache --force %{_datadir}/icons/gnome &>/dev/null || :
 %{_datadir}/pkgconfig/gnome-icon-theme.pc
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.12.0-16
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.12.0-15
 - Adding missing BRs on Perl modules.
 

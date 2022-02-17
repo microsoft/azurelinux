@@ -1,6 +1,6 @@
 Name:		realmd
 Version:	0.16.3
-Release:	24%{?dist}
+Release:	25%{?dist}
 Summary:	Kerberos realm enrollment service
 License:	LGPLv2+
 Vendor:         Microsoft Corporation
@@ -101,6 +101,9 @@ make install DESTDIR=%{buildroot}
 %doc ChangeLog
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.3-25
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.3-24
 - Adding missing BRs on Perl modules.
 

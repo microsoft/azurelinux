@@ -11,7 +11,7 @@ Distribution:   Mariner
 
 Name:       libdbusmenu
 Version:    %{ubuntu_release}.0
-Release:    17%{?dist}
+Release:    18%{?dist}
 Summary:    Library for passing menus over DBus
 
 # All files installed in final rpms use C sources with dual licensing headers.
@@ -263,6 +263,9 @@ done
 %{_datadir}/%{name}/json/test-gtk-label.json
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.04.0-18
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.04.0-17
 - Adding missing BRs on Perl modules.
 

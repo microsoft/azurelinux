@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: sound-theme-freedesktop
 Version: 0.8
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary: freedesktop.org sound theme
 Source0: http://people.freedesktop.org/~mccann/dist/sound-theme-freedesktop-%{version}.tar.bz2
 # For details on the licenses used, see CREDITS
@@ -44,6 +44,9 @@ touch --no-create %{_datadir}/sounds/freedesktop %{_datadir}/sounds
 %{_datadir}/sounds/freedesktop/stereo/*.oga
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8-16
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8-15
 - Adding missing BRs on Perl modules.
 

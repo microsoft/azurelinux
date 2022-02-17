@@ -8,7 +8,7 @@ Distribution:   Mariner
 Summary: Analysis plugins for use with setroubleshoot
 Name: setroubleshoot-plugins
 Version: 3.3.12
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2+
 URL: https://github.com/fedora-selinux/setroubleshoot
 Source0: https://releases.pagure.org/setroubleshoot/%{name}-%{version}.tar.gz
@@ -51,6 +51,9 @@ make DESTDIR=%{buildroot} PYTHON=%{__python3} pkgdocdir=%{_pkgdocdir} install
 %{_datadir}/setroubleshoot/plugins
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.12-4
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.12-3
 - Adding missing BRs on Perl modules.
 

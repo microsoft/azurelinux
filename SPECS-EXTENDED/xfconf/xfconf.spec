@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           xfconf
 Version:        4.14.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Hierarchical configuration system for Xfce
 
 License:        GPLv2
@@ -135,6 +135,9 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 %endif
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.4-4
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.4-3
 - Adding missing BRs on Perl modules.
 

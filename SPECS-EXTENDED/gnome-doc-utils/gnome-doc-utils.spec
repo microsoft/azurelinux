@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: gnome-doc-utils
 Version: 0.20.10
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary: Documentation utilities for GNOME
 
 License: GPLv2+ and LGPLv2+ and GFDL
@@ -92,6 +92,9 @@ sed -i -e '/^Requires:/d' %{buildroot}%{_datadir}/pkgconfig/xml2po.pc
 %{_datadir}/xml/mallard
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.10-24
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.10-23
 - Adding missing BRs on Perl modules.
 

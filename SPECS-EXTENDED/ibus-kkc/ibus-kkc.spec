@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:		ibus-kkc
 Version:	1.5.22
-Release:	15%{?dist}
+Release:	16%{?dist}
 Summary:	Japanese Kana Kanji input method for ibus
 
 License:	GPLv2+
@@ -104,6 +104,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/ibus-setup-kkc.deskt
 
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.22-16
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.22-15
 - Adding missing BRs on Perl modules.
 

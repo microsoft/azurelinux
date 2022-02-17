@@ -8,7 +8,7 @@ Distribution:   Mariner
 Summary:	Network traffic analyzer
 Name:		wireshark
 Version:	3.4.4
-Release:	4%{?dist}
+Release:	5%{?dist}
 License:	GPL+
 Url:		http://www.wireshark.org/
 
@@ -283,6 +283,9 @@ fi
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-5
+- License verified.
+
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-4
 - Adding missing BRs on Perl modules.
 
