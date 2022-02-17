@@ -1,19 +1,23 @@
 Summary:        opentype text shaping engine
 Name:           harfbuzz
-Version:        2.6.7
+Version:        3.4.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://harfbuzz.github.io/
-Source0:        https://www.freedesktop.org/software/harfbuzz/release/%{name}-%{version}.tar.xz
-BuildRequires:  pkg-config
-BuildRequires:  pkgconfig(fontconfig)
-BuildRequires:  pkgconfig(freetype2)
-BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  pkgconfig(icu-uc)
-Requires:       glib
+Source0:        https://github.com/%{name}/%{name}/releases/download/3.3.2/%{name}-%{version}.tar.xz	
+BuildRequires:  cairo-devel
+BuildRequires:  freetype-devel
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  glib2-devel
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  gtk-doc
+BuildRequires:  icu-devel
+BuildRequires:  make
+%global with_check 1
 %if %{with_check}
 BuildRequires:  python3-devel
 %endif
@@ -31,15 +35,15 @@ Provides:       %{name}-icu = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
-%configure
-%make_build
+%configure --disable-static --with-gobject --enable-introspection
+%{make_build}
 
 %install
-%make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+%{make_install}
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %check
 # Remove all instances of "/usr/bin/env python" shabangs from test code
@@ -48,10 +52,15 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3
 
 %ldconfig_scriptlets
 
+%ldconfig_scriptlets devel
+
 %files
 %defattr(-,root,root)
 %license COPYING
+%doc NEWS AUTHORS README
 %{_libdir}/*.so*
+%dir %{_libdir}/girepository-1.0
+%{_libdir}/girepository-1.0/HarfBuzz-0.0.typelib
 %{_bindir}/*
 
 %files devel
@@ -62,10 +71,13 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/cmake/harfbuzz/harfbuzz-config.cmake
+%dir %{_datadir}/gir-1.0
+%{_datadir}/gir-1.0/HarfBuzz-0.0.gir
+%{_libdir}/libharfbuzz-icu.so.*
 
 %changelog
-* Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.6.7-1
-- Update source to v2.6.7
+* Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.4.0-1
+- Update source to v3.4.0
 - Make check section sed for /usr/bin/env/python3, rather than .../python
 
 * Thu Jun 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-3
