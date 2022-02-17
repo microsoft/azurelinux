@@ -24154,8 +24154,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-cov",
-          "version": "2.10.1",
-          "downloadUrl": "https://github.com/pytest-dev/pytest-cov/archive/v2.10.1/python-pytest-cov-2.10.1.tar.gz"
+          "version": "2.12.1",
+          "downloadUrl": "https://github.com/pytest-dev/pytest-cov/archive/v2.12.1/python-pytest-cov-2.12.1.tar.gz"
         }
       }
     },
