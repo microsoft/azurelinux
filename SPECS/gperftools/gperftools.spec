@@ -48,6 +48,7 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 %defattr(-,root,root)
 %license COPYING
 %{_bindir}/pprof
+%{_bindir}/pprof-symbolize
 %{_libdir}/libprofiler*.so.*
 %{_libdir}/libtcmalloc*.so.*
 
