@@ -48,7 +48,7 @@ pip install pytest
 %{python3_sitelib}/*
 
 %changelog
-* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 1.16.0-2
+* Mon Feb 14 2022 Thomas Crain <thcrain@microsoft.com> - 1.16.0-2
 - Remove python2 package
 - Lint spec
 
