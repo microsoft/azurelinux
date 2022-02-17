@@ -127,6 +127,7 @@ fi
 %changelog
 * Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 3.1.2-4
 - Use _topdir instead of hard-coded value /usr/src/mariner
+- License verified
 
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

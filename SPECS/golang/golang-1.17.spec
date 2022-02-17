@@ -118,6 +118,7 @@ fi
 %changelog
 * Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 1.17.1-2
 - Use _topdir instead of hard-coded value /usr/src/mariner
+- License verified
 
 * Wed Sep 15 2021 Andrew Phelps <anphel@microsoft.com> - 1.17.1-1
 - Updated to version 1.17.1
