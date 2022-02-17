@@ -238,6 +238,7 @@ Patch1197:      CVE-2022-23222.nopatch
 Patch1198:      CVE-2021-4083.nopatch
 Patch1199:      CVE-2021-4154.nopatch
 Patch1200:      CVE-2021-4001.nopatch
+Patch1201:      CVE-2022-0487.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
