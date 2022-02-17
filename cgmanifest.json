@@ -3287,16 +3287,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "elinks",
-          "version": "0.12",
-          "downloadUrl": "http://elinks.or.cz/download/elinks-0.12pre6.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "emacs",
           "version": "27.1",
           "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-27.1.tar.xz"
