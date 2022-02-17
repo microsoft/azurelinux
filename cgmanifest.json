@@ -14693,8 +14693,8 @@
         "type": "other",
         "other": {
           "name": "nmap",
-          "version": "7.90",
-          "downloadUrl": "https://nmap.org/dist/nmap-7.90.tar.bz2"
+          "version": "7.92",
+          "downloadUrl": "https://nmap.org/dist/nmap-7.92.tar.bz2"
         }
       }
     },
