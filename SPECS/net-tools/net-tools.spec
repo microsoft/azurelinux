@@ -33,6 +33,7 @@ make
 
 %install
 make BASEDIR=%{buildroot} install
+mv %{buildroot}/bin/ifconfig %{buildroot}/sbin/ifconfig
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
