@@ -1646,16 +1646,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cdparanoia",
-          "version": "10.2",
-          "downloadUrl": "http://downloads.xiph.org/releases/cdparanoia/cdparanoia-III-10.2.src.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cdrdao",
           "version": "1.2.4",
           "downloadUrl": "http://prdownloads.sourceforge.net/cdrdao/cdrdao-1.2.4.tar.bz2"
@@ -3290,16 +3280,6 @@
           "name": "elfutils",
           "version": "0.185",
           "downloadUrl": "https://sourceware.org/ftp/elfutils/0.185/elfutils-0.185.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "elinks",
-          "version": "0.12",
-          "downloadUrl": "http://elinks.or.cz/download/elinks-0.12pre6.tar.bz2"
         }
       }
     },
@@ -7970,16 +7950,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "javapackages-tools-meta",
-          "version": "5.3.0",
-          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/refs/tags/5.3.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "javaparser",
           "version": "3.3.5",
           "downloadUrl": "https://github.com/javaparser/javaparser/archive/javaparser-parent-3.3.5.tar.gz"
@@ -8900,16 +8870,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "lensfun",
-          "version": "0.3.2",
-          "downloadUrl": "http://downloads.sourceforge.net/lensfun/lensfun-0.3.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "less",
           "version": "590",
           "downloadUrl": "http://www.greenwoodsoftware.com/less/less-590.tar.gz"
@@ -9243,16 +9203,6 @@
           "name": "libcmis",
           "version": "0.5.2",
           "downloadUrl": "https://github.com/tdf/libcmis/releases/download/v0.5.2/libcmis-0.5.2.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libcmpiutil",
-          "version": "0.5.7",
-          "downloadUrl": "https://github.com/libvirt/libcmpiutil/archive/refs/tags/libcmpiutil-0.5.7.tar.gz"
         }
       }
     },
@@ -10283,16 +10233,6 @@
           "name": "liblognorm",
           "version": "2.0.6",
           "downloadUrl": "https://www.liblognorm.com/files/download/liblognorm-2.0.6.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "liblouis",
-          "version": "3.12.0",
-          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.12.0/liblouis-3.12.0.tar.gz"
         }
       }
     },
@@ -15905,7 +15845,7 @@
         "other": {
           "name": "orangefs",
           "version": "2.9.7",
-          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-2.9.7.tar.gz"
+          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/releases/2.9.7/source/orangefs-2.9.7.tar.gz"
         }
       }
     },
@@ -28576,16 +28516,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "tog-pegasus",
-          "version": "2.14.1",
-          "downloadUrl": "https://collaboration.opengroup.org/pegasus/documents/27211/pegasus-2.14.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tokyocabinet",
           "version": "1.4.48",
           "downloadUrl": "http://fallabs.com/tokyocabinet/tokyocabinet-1.4.48.tar.gz"
@@ -29558,7 +29488,7 @@
         "other": {
           "name": "wireshark",
           "version": "3.4.4",
-          "downloadUrl": "https://wireshark.org/download/src/wireshark-3.4.4.tar.xz"
+          "downloadUrl": "https://wireshark.org/download/src/all-versions/wireshark-3.4.4.tar.xz"
         }
       }
     },
