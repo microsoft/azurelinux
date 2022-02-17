@@ -57,12 +57,12 @@ curl-devel-7.76.0-8.cm1.aarch64.rpm
 curl-libs-7.76.0-8.cm1.aarch64.rpm
 cyrus-sasl-2.1.27-6.cm1.aarch64.rpm
 cyrus-sasl-debuginfo-2.1.27-6.cm1.aarch64.rpm
-device-mapper-2.03.05-5.cm1.aarch64.rpm
-device-mapper-devel-2.03.05-5.cm1.aarch64.rpm
-device-mapper-event-2.03.05-5.cm1.aarch64.rpm
-device-mapper-event-devel-2.03.05-5.cm1.aarch64.rpm
-device-mapper-event-libs-2.03.05-5.cm1.aarch64.rpm
-device-mapper-libs-2.03.05-5.cm1.aarch64.rpm
+device-mapper-2.03.05-6.cm1.aarch64.rpm
+device-mapper-devel-2.03.05-6.cm1.aarch64.rpm
+device-mapper-event-2.03.05-6.cm1.aarch64.rpm
+device-mapper-event-devel-2.03.05-6.cm1.aarch64.rpm
+device-mapper-event-libs-2.03.05-6.cm1.aarch64.rpm
+device-mapper-libs-2.03.05-6.cm1.aarch64.rpm
 diffutils-3.6-4.cm1.aarch64.rpm
 diffutils-debuginfo-3.6-4.cm1.aarch64.rpm
 docbook-dtd-xml-4.5-11.cm1.noarch.rpm
@@ -358,7 +358,7 @@ python3-cracklib-2.9.7-2.cm1.aarch64.rpm
 python3-gpg-1.13.1-6.cm1.aarch64.rpm
 python3-libcap-ng-0.7.9-3.cm1.aarch64.rpm
 python3-libxml2-2.9.12-1.cm1.aarch64.rpm
-python3-pwquality-1.4.2-6.cm1.aarch64.rpm
+python3-pwquality-1.4.2-7.cm1.aarch64.rpm
 python3-rpm-4.14.2-14.cm1.aarch64.rpm
 python-curses-2.7.18-8.cm1.aarch64.rpm
 python-gpg-1.13.1-6.cm1.aarch64.rpm
