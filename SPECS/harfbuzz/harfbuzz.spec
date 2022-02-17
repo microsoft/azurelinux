@@ -13,7 +13,7 @@ BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  gcc-c++
-BuildRequires:  gobject-introspection
+BuildRequires:  gobject-introspection-devel
 BuildRequires:  gtk-doc
 BuildRequires:  make
 %global with_check 1
