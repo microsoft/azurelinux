@@ -84,7 +84,8 @@ make install DESTDIR=%{buildroot}
 %find_lang realmd
 
 %files -f realmd.lang
-%doc AUTHORS COPYING NEWS README
+%license COPYING
+%doc AUTHORS NEWS README
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.realmd.conf
 %{_sbindir}/realm
 %dir %{_prefix}/lib/realmd

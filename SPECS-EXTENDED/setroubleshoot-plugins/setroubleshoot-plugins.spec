@@ -9,7 +9,7 @@ Summary: Analysis plugins for use with setroubleshoot
 Name: setroubleshoot-plugins
 Version: 3.3.12
 Release: 4%{?dist}
-License: GPLv2+
+License: GPLv3
 URL: https://github.com/fedora-selinux/setroubleshoot
 Source0: https://releases.pagure.org/setroubleshoot/%{name}-%{version}.tar.gz
 # git format-patch -N setroubleshoot-plugins-<version> -- plugins
@@ -47,6 +47,7 @@ make DESTDIR=%{buildroot} PYTHON=%{__python3} pkgdocdir=%{_pkgdocdir} install
 %py_byte_compile %{__python3} %{buildroot}%{_datadir}/setroubleshoot/plugins
 
 %files -f %{name}.lang 
+%license COPYING
 %doc %{_pkgdocdir}
 %{_datadir}/setroubleshoot/plugins
 

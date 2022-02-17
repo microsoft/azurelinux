@@ -93,7 +93,8 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %files -f %{name}.lang
-%doc README data/rules/README.rules COPYING
+%license COPYING
+%doc README data/rules/README.rules
 %{_libdir}/*.so.*
 %{_libdir}/girepository-1.0/*.typelib
 

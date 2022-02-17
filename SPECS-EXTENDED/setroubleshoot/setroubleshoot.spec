@@ -124,6 +124,8 @@ getent passwd %{username} >/dev/null || useradd -r -U -s /usr/sbin/nologin -d %{
 chown -R setroubleshoot:setroubleshoot %{pkgvardatadir}
 
 %files server -f %{name}.lang
+%license COPYING
+%doc AUTHORS ChangeLog DBUS.md NEWS README TODO
 %{_bindir}/sealert
 %{_sbindir}/sedispatch
 %{_sbindir}/setroubleshootd
@@ -188,7 +190,6 @@ chown -R setroubleshoot:setroubleshoot %{pkgvardatadir}
 %{_datadir}/dbus-1/system-services/org.fedoraproject.SetroubleshootFixit.service
 %attr(0644,root,root) %{_tmpfilesdir}/%{name}.conf
 %attr(0711,setroubleshoot,setroubleshoot) %dir %{_rundir}/setroubleshoot
-%doc AUTHORS COPYING ChangeLog DBUS.md NEWS README TODO
 
 %package legacy
 Summary: SELinux troubleshoot legacy applet

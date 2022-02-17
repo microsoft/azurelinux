@@ -9,7 +9,7 @@ Summary:	Network traffic analyzer
 Name:		wireshark
 Version:	3.4.4
 Release:	5%{?dist}
-License:	GPL+
+License:	BSD and GPLv2
 Url:		http://www.wireshark.org/
 
 Source0:	https://wireshark.org/download/src/all-versions/%{name}-%{version}.tar.xz

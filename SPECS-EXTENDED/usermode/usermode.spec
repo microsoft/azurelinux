@@ -80,7 +80,8 @@ done
 %find_lang %{name}
 
 %files -f %{name}.lang
-%doc COPYING ChangeLog NEWS README
+%license COPYING
+%doc ChangeLog NEWS README
 %attr(4711,root,root) /usr/sbin/userhelper
 %{_bindir}/consolehelper
 %{_mandir}/man8/userhelper.8*

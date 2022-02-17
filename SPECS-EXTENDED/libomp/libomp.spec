@@ -15,7 +15,7 @@ Version: 10.0.1
 Release: 6%{?dist}
 Summary: OpenMP runtime for clang
 
-License: NCSA
+License: ASL 2.0 and MIT and NCSA
 URL: http://openmp.llvm.org	
 %if 0%{?rc_ver:1}
 Source0: https://prereleases.llvm.org/%{version}/rc%{rc_ver}/%{libomp_srcdir}.tar.xz

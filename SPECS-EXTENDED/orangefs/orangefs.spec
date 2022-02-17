@@ -5,16 +5,20 @@ Version: 2.9.7
 Release: 9%{?dist}
 Summary: Parallel network file system client
 URL: http://www.orangefs.org/
+# ASL 2.0 src/client/jni
 # BSD (2 clause) maint/config/ssl.m4
 # BSD (3 clause) src/client/usrint/fts.c
 # BSD (3 clause) src/client/usrint/fts.h
-# MIT maint/config/install-sh
-# zlib src/common/misc/md5.c
-# zlib src/common/misc/md5.h
+# GPLv2 src/kernel
 # LGPLv2 src/apps/admin/pvfs2-config.in
 # LGPLv2 src/common/dotconf/dotconf.c
 # LGPLv2+ remainder
-License: LGPLv2+ and LGPLv2 and BSD and MIT and zlib
+# MIT maint/config/install-sh
+# OpenLDAP src/apps/devel/lmdb and src/common/lmdb
+# Public Domain src/common/hash/murmur3.c
+# zlib src/common/misc/md5.c
+# zlib src/common/misc/md5.h
+License: ASL 2.0 and BSD and GPLv2 and LGPLv2+ and LGPLv2 and MIT and OpenLDAP and Public Domain and zlib
 BuildRequires:  gcc
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Term::ReadLine)
@@ -96,7 +100,7 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/orangefs
 install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 
 %files
-
+%license COPYING
 %config(noreplace) %{_sysconfdir}/pvfs2tab
 %{_bindir}/pvfs2-check-server
 %{_bindir}/pvfs2-chmod
