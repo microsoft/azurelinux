@@ -1,3 +1,4 @@
+%define version_tag %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        Python templating language
 Name:           python-mako
 Version:        1.1.5
@@ -7,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://www.makotemplates.org/
-Source0:        https://github.com/sqlalchemy/mako/archive/refs/tags/rel_1_1_5.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/sqlalchemy/mako/archive/refs/tags/rel_%{version_tag}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %if %{with_check}
