@@ -16234,8 +16234,8 @@
         "type": "other",
         "other": {
           "name": "pcaudiolib",
-          "version": "1.1",
-          "downloadUrl": "https://github.com/espeak-ng/pcaudiolib/archive/1.1.tar.gz"
+          "version": "1.2",
+          "downloadUrl": "https://github.com/espeak-ng/pcaudiolib/archive/1.2.tar.gz"
         }
       }
     },
