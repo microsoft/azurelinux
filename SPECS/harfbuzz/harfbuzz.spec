@@ -1,7 +1,7 @@
 Summary:        opentype text shaping engine
 Name:           harfbuzz
-Version:        2.6.4
-Release:        3%{?dist}
+Version:        2.6.7
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,7 +43,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 # Remove all instances of "/usr/bin/env python" shabangs from test code
-find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python\d\?|#! %{python3}|' {} +
+find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3\d\?|#! %{python3}|' {} +
 %make_build -k check
 
 %ldconfig_scriptlets
@@ -64,6 +64,10 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python\
 %{_libdir}/cmake/harfbuzz/harfbuzz-config.cmake
 
 %changelog
+* Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.6.7-1
+- Update source to v2.6.7
+- Make check section sed for /usr/bin/env/python3, rather than .../python
+
 * Thu Jun 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-3
 - Fix pkgconfig(freetype2) dependency (incorrect pkgconfig name)
 
