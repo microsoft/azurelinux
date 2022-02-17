@@ -79,6 +79,7 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3
 * Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.4.0-1
 - Update source to v3.4.0
 - Make check section sed for /usr/bin/env/python3, rather than .../python
+- License verified
 
 * Thu Jun 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-3
 - Fix pkgconfig(freetype2) dependency (incorrect pkgconfig name)
