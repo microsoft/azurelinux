@@ -58,6 +58,7 @@ tox -e py39
 %changelog
 * Wed Feb 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.5-1
 - Bump version to 1.1.5
+- Introduce macro to generate underscored version
 - Add an explicit BR on `pip`
 - Drop BR on `python3-pytest`
 - Use `tox` instead of `pytest` to enable ptest
