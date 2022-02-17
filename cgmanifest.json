@@ -8870,16 +8870,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "lensfun",
-          "version": "0.3.2",
-          "downloadUrl": "http://downloads.sourceforge.net/lensfun/lensfun-0.3.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "less",
           "version": "590",
           "downloadUrl": "http://www.greenwoodsoftware.com/less/less-590.tar.gz"
@@ -9213,16 +9203,6 @@
           "name": "libcmis",
           "version": "0.5.2",
           "downloadUrl": "https://github.com/tdf/libcmis/releases/download/v0.5.2/libcmis-0.5.2.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libcmpiutil",
-          "version": "0.5.7",
-          "downloadUrl": "https://github.com/libvirt/libcmpiutil/archive/refs/tags/libcmpiutil-0.5.7.tar.gz"
         }
       }
     },
@@ -28539,16 +28519,6 @@
           "name": "tofrodos",
           "version": "1.7.13",
           "downloadUrl": "http://tofrodos.sourceforge.net/download/tofrodos-1.7.13.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "tog-pegasus",
-          "version": "2.14.1",
-          "downloadUrl": "https://collaboration.opengroup.org/pegasus/documents/27211/pegasus-2.14.1.tar.gz"
         }
       }
     },
