@@ -52,7 +52,8 @@ find $RPM_BUILD_ROOT -name "*.la" -exec rm {} \;
 %ldconfig_scriptlets
 
 %files -f %{name}.lang
-%doc README AUTHORS COPYING
+%license COPYING
+%doc README AUTHORS
 %{_libdir}/libgtkspell.so.0*
 
 %files devel

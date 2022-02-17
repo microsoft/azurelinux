@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary:    GNOME icon theme
 Name:       gnome-icon-theme
 Version:    3.12.0
-License:    LGPLv3+
+License:    CC-BY-SA or LGPLv3+
 Release:    16%{?dist}
 URL:        http://www.gnome.org
 
@@ -103,7 +103,8 @@ gtk-update-icon-cache --force %{_datadir}/icons/gnome &>/dev/null || :
 gtk-update-icon-cache --force %{_datadir}/icons/gnome &>/dev/null || :
 
 %files -f files.txt
-%doc COPYING AUTHORS
+%license COPYING COPYING_CCBYSA3 COPYING_LGPL
+%doc AUTHORS
 %ghost %{_datadir}/icons/gnome/icon-theme.cache
 
 %files legacy -f legacy.txt

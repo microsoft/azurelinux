@@ -60,7 +60,8 @@ make install DESTDIR=${RPM_BUILD_ROOT} INSTALL="install -p"
 %find_lang %{name}
 
 %files -f %{name}.lang
-%doc AUTHORS COPYING README ChangeLog INSTALL NEWS
+%license COPYING
+%doc AUTHORS README ChangeLog INSTALL NEWS
 %{_datadir}/appdata/*.appdata.xml
 %{_datadir}/glib-2.0/schemas/*.gschema.xml
 %{_datadir}/applications/ibus-setup-libzhuyin.desktop

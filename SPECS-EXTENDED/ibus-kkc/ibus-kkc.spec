@@ -95,7 +95,8 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/ibus-setup-kkc.deskt
 
 
 %files -f %{name}.lang
-%doc AUTHORS COPYING ChangeLog README
+%license COPYING
+%doc AUTHORS ChangeLog README
 %{_datadir}/appdata/*.appdata.xml
 %{_datadir}/ibus-kkc
 %{_libexecdir}/ibus-*-kkc

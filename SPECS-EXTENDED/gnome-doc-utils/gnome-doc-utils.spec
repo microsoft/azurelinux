@@ -5,7 +5,7 @@ Version: 0.20.10
 Release: 24%{?dist}
 Summary: Documentation utilities for GNOME
 
-License: GPLv2+ and LGPLv2+ and GFDL
+License: GPLv2+ and LGPLv2+
 URL:     https://wiki.gnome.org/Projects/GnomeDocUtils
 Source:  https://download.gnome.org/sources/%{name}/0.20/%{name}-%{version}.tar.xz
 #VCS: git:git://git.gnome.org/gnome-doc-utils
