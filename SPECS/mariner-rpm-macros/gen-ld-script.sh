@@ -6,8 +6,8 @@
 # gen-ld-script.sh
 # Generate linker script to embed ELF binaries with build metadata
 
-# /usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version}
-echo "gen-ld-script.sh name($1) version($2)"
+# /usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir}
+echo "gen-ld-script.sh name($1) version($2) _topdir($3)"
 
 OS_ID=$(sed -En 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)
 OS_VERSION=$(sed -En 's/^VERSION_ID="?([^"]+)"?/\1/p' /etc/os-release)
@@ -30,7 +30,7 @@ case ${#NUM_DOT_SEPARATORS} in
     ;;
 esac
 
-MODULE_INFO_DIR="/usr/src/mariner/BUILD/"
+MODULE_INFO_DIR="$3/BUILD/"
 
 mkdir -pv $MODULE_INFO_DIR
 
