@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.16.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,7 +32,7 @@ Go is an open source programming language that makes it easy to build simple, re
 %prep
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
-patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
+patch -Np1 --ignore-whitespace < %{_topdir}/SOURCES/go14_bootstrap_aarch64.patch
 mv -v go go-bootstrap
 
 # Setup go source and patch
@@ -41,10 +41,10 @@ mv -v go go-bootstrap
 
 %build
 # Build go 1.4 bootstrap
-pushd /usr/src/mariner/BUILD/go-bootstrap/src
+pushd %{_topdir}/BUILD/go-bootstrap/src
 CGO_ENABLED=0 ./make.bash
 popd
-mv -v /usr/src/mariner/BUILD/go-bootstrap /usr/lib/golang
+mv -v %{_topdir}/BUILD/go-bootstrap /usr/lib/golang
 export GOROOT=/usr/lib/golang
 
 # Build current go version
@@ -118,6 +118,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 1.16.12-2
+- Use _topdir instead of hard-coded value /usr/src/mariner
+
 * Tue Jan 18 2022 Henry Li <lihl@microsoft.com> - 1.16.12-1
 - Upgrade to version 1.16.12 to resolve CVE-2021-44716
 

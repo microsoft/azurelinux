@@ -127,7 +127,7 @@ gmp-debuginfo-6.1.2-6.cm1.x86_64.rpm
 gmp-devel-6.1.2-6.cm1.x86_64.rpm
 gnupg2-2.2.20-3.cm1.x86_64.rpm
 gnupg2-debuginfo-2.2.20-3.cm1.x86_64.rpm
-golang-1.16.12-1.cm1.x86_64.rpm
+golang-1.16.12-2.cm1.x86_64.rpm
 gperf-3.1-3.cm1.x86_64.rpm
 gperf-debuginfo-3.1-3.cm1.x86_64.rpm
 gpgme-1.13.1-6.cm1.x86_64.rpm
@@ -259,7 +259,7 @@ m4-1.4.18-4.cm1.x86_64.rpm
 m4-debuginfo-1.4.18-4.cm1.x86_64.rpm
 make-4.2.1-5.cm1.x86_64.rpm
 make-debuginfo-4.2.1-5.cm1.x86_64.rpm
-mariner-check-macros-1.0-7.cm1.noarch.rpm
+mariner-check-macros-1.0-8.cm1.noarch.rpm
 mariner-release-1.0-33.cm1.noarch.rpm
 mariner-repos-1.0-14.cm1.noarch.rpm
 mariner-repos-extras-1.0-14.cm1.noarch.rpm
@@ -269,7 +269,7 @@ mariner-repos-ui-1.0-14.cm1.noarch.rpm
 mariner-repos-ui-preview-1.0-14.cm1.noarch.rpm
 mariner-repos-microsoft-1.0-14.cm1.noarch.rpm
 mariner-repos-microsoft-preview-1.0-14.cm1.noarch.rpm
-mariner-rpm-macros-1.0-7.cm1.noarch.rpm
+mariner-rpm-macros-1.0-8.cm1.noarch.rpm
 meson-0.56.0-1.cm1.noarch.rpm
 mpfr-4.0.1-3.cm1.x86_64.rpm
 mpfr-debuginfo-4.0.1-3.cm1.x86_64.rpm
