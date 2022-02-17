@@ -4229,16 +4229,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "gdisk",
-          "version": "1.0.6",
-          "downloadUrl": "http://downloads.sourceforge.net/gptfdisk/gptfdisk-1.0.6.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "gdk-pixbuf2",
           "version": "2.40.0",
           "downloadUrl": "https://download.gnome.org/sources/gdk-pixbuf/2.40/gdk-pixbuf-2.40.0.tar.xz"
@@ -4970,8 +4960,8 @@
         "type": "other",
         "other": {
           "name": "gptfdisk",
-          "version": "1.0.4",
-          "downloadUrl": "http://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.4/gptfdisk-1.0.4.tar.gz"
+          "version": "1.0.8",
+          "downloadUrl": "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.8/gptfdisk-1.0.8.tar.gz"
         }
       }
     },
