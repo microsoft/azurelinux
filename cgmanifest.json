@@ -4940,8 +4940,8 @@
         "type": "other",
         "other": {
           "name": "gperftools",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/gperftools/gperftools/releases/download/gperftools-2.7/gperftools-2.7.tar.gz"
+          "version": "2.9.1",
+          "downloadUrl": "https://github.com/gperftools/gperftools/releases/download/gperftools-2.9.1/gperftools-2.9.1.tar.gz"
         }
       }
     },

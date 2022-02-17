@@ -1,7 +1,7 @@
 Summary:        A fast malloc tool for threads
 Name:           gperftools
-Version:        2.7
-Release:        4%{?dist}
+Version:        2.9.1
+Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/gperftools/gperftools
 Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -48,6 +48,7 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 %defattr(-,root,root)
 %license COPYING
 %{_bindir}/pprof
+%{_bindir}/pprof-symbolize
 %{_libdir}/libprofiler*.so.*
 %{_libdir}/libtcmalloc*.so.*
 
@@ -65,18 +66,26 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 %{_mandir}/man1/*
 
 %changelog
-*    Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.7-4
--    Added %%license line automatically
-*    Mon May 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.7-3
--    Marking CVE-2018-13420 as false positive.
--    Updated 'Source0` tag.
--    License verified.
--    Converted tabs to spaces.
-*    Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.7-2
--    Initial CBL-Mariner import from Photon (license: Apache2).
-*    Tue Sep 11 2018 Anish Swaminathan <anishs@vmware.com> 2.7-1
--    Update version to 2.7
-*    Mon Jul 31 2017 Vinay Chang Lee <changlee@vmware.com> 2.5-2
--    Fix %check
-*    Mon Feb 06 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.5-1
--    Initial version of gperftools package.
+* Wed Feb 16 2022 Cameron Baird <cameronbaird@microsoft.com> 2.9.1-1
+- Update source to v2.9.1
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.7-4
+- Added %%license line automatically
+
+* Mon May 04 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 2.7-3
+- Marking CVE-2018-13420 as false positive.
+- Updated 'Source0` tag.
+- License verified.
+- Converted tabs to spaces.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.7-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Sep 11 2018 Anish Swaminathan <anishs@vmware.com> 2.7-1
+- Update version to 2.7
+
+* Mon Jul 31 2017 Vinay Chang Lee <changlee@vmware.com> 2.5-2
+- Fix %check
+
+* Mon Feb 06 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.5-1
+- Initial version of gperftools package.
