@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           capstone
 Version:        4.0.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A lightweight multi-platform, multi-architecture disassembly framework
 
 %global         gituser         aquynh
@@ -49,6 +49,7 @@ BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  jna
 BuildRequires:  java-devel
+BuildRequires:  javapackages-filesystem
 
 %if 0%{?with_python2}
 BuildRequires:  python2
@@ -232,6 +233,9 @@ install -D -p -m 0644 bindings/java/%{name}.jar  %{buildroot}/%{_javadir}/%{name
 %{_javadir}/
 
 %changelog
+* Thu Feb 17 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.2-4
+- Adding BR on "javapackages-filesystem" to provide missing macros.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
