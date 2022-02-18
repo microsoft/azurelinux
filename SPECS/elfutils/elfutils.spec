@@ -217,13 +217,10 @@ fi
 %doc README TODO CONTRIBUTING
 %{_bindir}/eu-*
 %{_bindir}/debuginfod-find
-#%exclude %{_bindir}/eu-ld
 %{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
 %{_libdir}/libasm.so.*
 %{_libdir}/libdw.so.*
-#%%dir %%{_libdir}/elfutils
-#%%{_libdir}/elfutils/lib*.so
 %{_mandir}/man1/*
 %exclude %{_mandir}/man7/*
 
@@ -237,15 +234,11 @@ fi
 /etc/profile.d/debuginfod.sh
 %dir %{_includedir}/elfutils
 %{_includedir}/elfutils/elf-knowledge.h
-#%{_includedir}/elfutils/libasm.h
-#%%{_includedir}/elfutils/libebl.h
 %{_includedir}/elfutils/libdw.h
 %{_includedir}/elfutils/libdwfl.h
 %{_includedir}/elfutils/known-dwarf.h
 %{_includedir}/elfutils/libdwelf.h
 %{_includedir}/elfutils/debuginfod.h
-#%%{_libdir}/libebl.a
-#%{_libdir}/libasm.so
 %{_libdir}/libdw.so
 %{_libdir}/libdebuginfod*
 %{_libdir}/pkgconfig/*.pc
