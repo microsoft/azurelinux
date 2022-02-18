@@ -14983,8 +14983,8 @@
         "type": "other",
         "other": {
           "name": "oath-toolkit",
-          "version": "2.6.2",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/oath-toolkit/oath-toolkit-2.6.2.tar.gz"
+          "version": "2.6.7",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/oath-toolkit/oath-toolkit-2.6.7.tar.gz"
         }
       }
     },
