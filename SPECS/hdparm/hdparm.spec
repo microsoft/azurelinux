@@ -30,7 +30,7 @@ make DESTDIR=%{buildroot} binprefix=%{_prefix} install
 %{_mandir}/man8/hdparm.8*
 
 %changelog
-* Thur Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 9.63-1
+* Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 9.63-1
 - Update source to v9.63
 
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 9.56-5
