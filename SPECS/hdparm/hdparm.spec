@@ -1,11 +1,11 @@
-Summary:	command line utility to set and view hardware parameters
-Name:		hdparm
-Version:	9.56
-Release:        5%{?dist}
-License:	BSD
-URL:		http://sourceforge.net/projects/%{name}/
-Source0:	http://downloads.sourceforge.net/hdparm/%{name}-%{version}.tar.gz
-Group:		Applications/System
+Summary:	    command line utility to set and view hardware parameters
+Name:		    hdparm
+Version:	    9.63
+Release:        1%{?dist}
+License:	    BSD
+URL:		    http://sourceforge.net/projects/%{name}/
+Source0:	    http://downloads.sourceforge.net/hdparm/%{name}-%{version}.tar.gz
+Group:		    Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
@@ -30,6 +30,9 @@ make DESTDIR=%{buildroot} binprefix=%{_prefix} install
 %{_mandir}/man8/hdparm.8*
 
 %changelog
+* Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 9.63-1
+- Update source to v9.63
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 9.56-5
 - Remove unused `%%define sha1` lines
 - License verified

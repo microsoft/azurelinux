@@ -5400,8 +5400,8 @@
         "type": "other",
         "other": {
           "name": "hdparm",
-          "version": "9.56",
-          "downloadUrl": "http://downloads.sourceforge.net/hdparm/hdparm-9.56.tar.gz"
+          "version": "9.63",
+          "downloadUrl": "https://downloads.sourceforge.net/hdparm/hdparm-9.63.tar.gz"
         }
       }
     },
