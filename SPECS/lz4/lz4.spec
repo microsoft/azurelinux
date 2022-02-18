@@ -1,7 +1,7 @@
 Summary:        Extremely fast compression.
 Name:           lz4
-Version:        1.9.2
-Release:        2%{?dist}
+Version:        1.9.3
+Release:        1%{?dist}
 License:        BSD 2-Clause and GPLv2
 URL:            http://lz4.github.io/lz4/
 Group:          Applications
