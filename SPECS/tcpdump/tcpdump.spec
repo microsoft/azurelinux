@@ -1,7 +1,7 @@
 Summary:        Packet Analyzer
 Name:           tcpdump
 Version:        4.99.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
+* Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.99.1-2
+- Nopatch CVE-2018-16301
+
 * Tue Feb 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.99.1-1
 - Update to 4.99.1
 
