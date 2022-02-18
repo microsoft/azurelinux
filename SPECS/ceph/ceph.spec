@@ -5,13 +5,14 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
-
+# Upstream patch to fix build with snappy 1.1.9
+Patch0:         %{name}-snappy-fix
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
@@ -772,7 +773,7 @@ This package provides Ceph’s default alerts for Prometheus.
 # common
 #################################################################################
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1
 
 # Despite disabling diskprediction, some unpackaged files stick around
 # Delete directories to prevent these files from being built/installed later
@@ -1802,6 +1803,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft> - 16.2.5-3
+- Add patch to fix build with snappy >= 1.1.9
+
 * Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 16.2.5-2
 - Use _topdir instead of hard-coded value /usr/src/mariner
 
