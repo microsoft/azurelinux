@@ -1,5 +1,13 @@
 #!/bin/bash
-echo "gen-ld-script.sh generating linker script"
+
+# /usr/lib/rpm/mariner/gen-ld-script.sh %{_topdir}
+if [ -z "$1" ]; then
+    TOPDIR="/usr/src/mariner"
+else
+    TOPDIR="$1"
+fi
+
+echo "gen-ld-script.sh generating linker script with topdir($TOPDIR)"
 
 # Generate linker script that will add the following note to ELF files:
 #
@@ -46,5 +54,5 @@ LINKER_SCRIPT_DESC="BYTE(0x7b) BYTE(0x0a) BYTE(0x20) BYTE(0x22)
 
 LINKER_SCRIPT_END="KEEP (*(.note.package)) } } INSERT AFTER .note.gnu.build-id;"
 
-mkdir -pv /usr/src/mariner/BUILD
-echo $LINKER_SCRIPT_START $LINKER_SCRIPT_NAMESZ $LINKER_SCRIPT_DESCSZ $LINKER_SCRIPT_TYPE $LINKER_SCRIPT_NAME $LINKER_SCRIPT_DESC $LINKER_SCRIPT_END > /usr/src/mariner/BUILD/module_info.ld
+mkdir -pv $TOPDIR/BUILD
+echo $LINKER_SCRIPT_START $LINKER_SCRIPT_NAMESZ $LINKER_SCRIPT_DESCSZ $LINKER_SCRIPT_TYPE $LINKER_SCRIPT_NAME $LINKER_SCRIPT_DESC $LINKER_SCRIPT_END > $TOPDIR/BUILD/module_info.ld

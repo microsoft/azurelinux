@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.16.12
+Version:        1.16.14
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -22,6 +22,7 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+# Patch for CVE-2021-29923 is available upstream in v1.17
 Patch1:         CVE-2021-29923.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
@@ -32,7 +33,7 @@ Go is an open source programming language that makes it easy to build simple, re
 %prep
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
-patch -Np1 --ignore-whitespace < /usr/src/mariner/SOURCES/go14_bootstrap_aarch64.patch
+patch -Np1 --ignore-whitespace < %{_topdir}/SOURCES/go14_bootstrap_aarch64.patch
 mv -v go go-bootstrap
 
 # Setup go source and patch
@@ -41,10 +42,10 @@ mv -v go go-bootstrap
 
 %build
 # Build go 1.4 bootstrap
-pushd /usr/src/mariner/BUILD/go-bootstrap/src
+pushd %{_topdir}/BUILD/go-bootstrap/src
 CGO_ENABLED=0 ./make.bash
 popd
-mv -v /usr/src/mariner/BUILD/go-bootstrap /usr/lib/golang
+mv -v %{_topdir}/BUILD/go-bootstrap /usr/lib/golang
 export GOROOT=/usr/lib/golang
 
 # Build current go version
@@ -118,6 +119,12 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.16.14-1
+- Upgrade to version 1.16.14 to resolve CVE-2022-23806, CVE-2022-23772, CVE-2022-23773
+
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 1.16.12-2
+- Use _topdir instead of hard-coded value /usr/src/mariner
+
 * Tue Jan 18 2022 Henry Li <lihl@microsoft.com> - 1.16.12-1
 - Upgrade to version 1.16.12 to resolve CVE-2021-44716
 

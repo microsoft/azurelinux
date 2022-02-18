@@ -1654,6 +1654,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gcovr",
+          "version": "5.0",
+          "downloadUrl": "https://github.com/gcovr/gcovr/archive/5.0/gcovr-5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gd",
           "version": "2.3.3",
           "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.3.tar.xz"
@@ -1865,8 +1875,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.16.12",
-          "downloadUrl": "https://golang.org/dl/go1.16.12.src.tar.gz"
+          "version": "1.16.14",
+          "downloadUrl": "https://golang.org/dl/go1.16.14.src.tar.gz"
         }
       }
     },
