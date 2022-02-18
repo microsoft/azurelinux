@@ -83,8 +83,7 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-libpam \
     --with-libcrack \
     --with-group-name-max-length=32 \
-    --with-selinux \
-    --enable-man
+    --with-selinux
 %make_build
 
 %install
@@ -157,28 +156,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sbindir}/*
 /bin/passwd
 %config(noreplace) %{_sysconfdir}/pam.d/*
-%{_mandir}/man1
-%{_mandir}/man5
-%{_mandir}/man8
-%exclude %{_mandir}/cs
-%exclude %{_mandir}/da
-%exclude %{_mandir}/de
-%exclude %{_mandir}/fi
-%exclude %{_mandir}/fr
-%exclude %{_mandir}/hu
-%exclude %{_mandir}/id
-%exclude %{_mandir}/it
-%exclude %{_mandir}/ru
-%exclude %{_mandir}/ja
-%exclude %{_mandir}/ko
-%exclude %{_mandir}/man3
-%exclude %{_mandir}/pl
-%exclude %{_mandir}/pt_BR
-%exclude %{_mandir}/rz
-%exclude %{_mandir}/sv
-%exclude %{_mandir}/tr
-%exclude %{_mandir}/zh_CN
-%exclude %{_mandir}/zh_TW
 
 %files subid
 %license COPYING
@@ -189,6 +166,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 4.9-7
+- Removing --enable-man configuration to resolve build failure.
+
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 4.9-6
 - Add provides to resolve dynamic dependencies
 
