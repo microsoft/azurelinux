@@ -3278,8 +3278,8 @@
         "type": "other",
         "other": {
           "name": "elfutils",
-          "version": "0.185",
-          "downloadUrl": "https://sourceware.org/ftp/elfutils/0.185/elfutils-0.185.tar.bz2"
+          "version": "0.186",
+          "downloadUrl": "https://sourceware.org/ftp/elfutils/0.186/elfutils-0.186.tar.bz2"
         }
       }
     },
