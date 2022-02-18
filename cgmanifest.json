@@ -5380,8 +5380,8 @@
         "type": "other",
         "other": {
           "name": "haveged",
-          "version": "1.9.8",
-          "downloadUrl": "https://github.com/jirka-h/haveged/archive/v1.9.8/haveged-1.9.8.tar.gz"
+          "version": "1.9.17",
+          "downloadUrl": "https://github.com/jirka-h/haveged/archive/v1.9.17/haveged-1.9.17.tar.gz"
         }
       }
     },
