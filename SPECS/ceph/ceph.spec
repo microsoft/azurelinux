@@ -11,7 +11,7 @@ URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
-# Upstream patch to fix build with snappy 1.1.9
+# Upstream patch to fix build with snappy 1.1.9. Remove in v16.2.7
 Patch0:         %{name}-snappy-fix
 
 #
