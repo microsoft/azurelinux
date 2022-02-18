@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -776,7 +776,7 @@ This package provides Ceph’s default alerts for Prometheus.
 
 # Despite disabling diskprediction, some unpackaged files stick around
 # Delete directories to prevent these files from being built/installed later
-cd /usr/src/mariner/BUILD/%{name}-%{version}
+cd %{_topdir}/BUILD/%{name}-%{version}
 rm -rf ./src/pybind/mgr/diskprediction_local
 rm -rf ./src/pybind/mgr/diskprediction_cloud
 
@@ -1802,6 +1802,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 16.2.5-2
+- Use _topdir instead of hard-coded value /usr/src/mariner
+
 * Mon Jan 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 16.2.5-1
 - Updated to version 16.2.5.
 

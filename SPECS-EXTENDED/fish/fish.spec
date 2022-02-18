@@ -6,7 +6,7 @@ Distribution:   Mariner
 
 Name:           fish
 Version:        3.1.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Friendly interactive shell
 
 # GPLv2
@@ -72,7 +72,7 @@ done
 
 %build
 # Removing linker scripts to fix component existance checks.
-LDFLAGS="$(echo " $LDFLAGS " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##')"
+LDFLAGS="$(echo " $LDFLAGS " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##')"
 
 %cmake . -B%{_vpath_builddir} -GNinja \
     -DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir} \
@@ -125,6 +125,10 @@ fi
 %{_pkgdocdir}
 
 %changelog
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 3.1.2-4
+- Use _topdir instead of hard-coded value /usr/src/mariner
+- License verified
+
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removed linker scripts to fix the build.

@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -139,7 +139,7 @@ GRUB UEFI bootloader binaries
 
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
-LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
 export LDFLAGS
 
 %autosetup -p1 -n grub-2.06
@@ -149,7 +149,7 @@ mv gnulib-%{gnulibversion} gnulib
 
 %build
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
-LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
 export LDFLAGS
 
 export PYTHON=%{python3}
@@ -313,6 +313,9 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 2.06-2
+- Use _topdir instead of hard-coded value /usr/src/mariner
+
 * Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 2.06-1
 - Update to 2.06 release
 - Add efinet and tftp modules to grub efi binary
