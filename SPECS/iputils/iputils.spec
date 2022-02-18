@@ -2,14 +2,14 @@ Summary:        Programs for basic networking
 Name:           iputils
 Version:        20211215
 Release:        1%{?dist}
-License:        BSD-3 and GPLv2+ and Rdisc
-URL:            https://github.com/iputils/iputils
-Group:          Applications/Communications
+License:        BSD-3 AND GPLv2+ AND Rdisc
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/Communications
+URL:            https://github.com/iputils/iputils
 Source0:        https://github.com/iputils/iputils/archive/20211215.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  iproute
-BuildRequires:  libcap-devel 
+BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxslt
 BuildRequires:  meson
