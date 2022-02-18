@@ -43,6 +43,7 @@ Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
 Patch22:        CVE-2021-3711.patch
 Patch23:        CVE-2021-3712.patch
+Patch24:        CVE-2021-4160.nopatch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
