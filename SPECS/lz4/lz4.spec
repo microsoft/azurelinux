@@ -6,7 +6,7 @@ License:        BSD 2-Clause and GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications
-URL:            http://lz4.github.io/lz4/
+URL:            https://lz4.github.io/lz4/
 Source0:        https://github.com/lz4/lz4/archive/v%{version}/%{name}-%{version}.tar.gz
 # Version format changed from r131 to v1.7.3 on Nov 16, 2016
 # see https://github.com/lz4/lz4/tags?after=v1.7.4.2
@@ -56,7 +56,7 @@ make install DESTDIR=%{buildroot} LIBDIR=%{_libdir} PREFIX=%{_prefix}
 %{_includedir}/*
 
 %changelog
-*   Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> 1.9.3-1
+*   Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.9.3-1
 -   Update to version 1.9.3
 -   License verified.
 
