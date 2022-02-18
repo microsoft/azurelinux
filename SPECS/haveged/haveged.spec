@@ -104,6 +104,7 @@ rm -rf %{buildroot}%{_libdir}/libhavege.*a
 %changelog
 * Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.9.17-1
 - Update to v1.9.17
+- Configure build to run with additional tests
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.8-3
 - Removing the explicit %%clean stage.
@@ -169,7 +170,7 @@ rm -rf %{buildroot}%{_libdir}/libhavege.*a
 - update from the upstream (1.3 stable)
 
 * Mon Oct 03 2011 Jirka Hladky <hladky.jiri@gmail.com> - 1.3-0
--version 1.3 beta
+- version 1.3 beta
 
 * Fri Sep 30 2011 Jirka Hladky <hladky.jiri@gmail.com> - 1.2-4
 - ppc64 build
