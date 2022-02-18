@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Networking
 URL:            https://www.tcpdump.org
 Source0:        https://www.tcpdump.org/release/%{name}-%{version}.tar.gz
+Patch0:         CVE-2018-16301.nopatch
 BuildRequires:  libpcap-devel
 Requires:       libpcap
 
@@ -17,7 +18,7 @@ It allows the user to display TCP/IP and other packets being
 transmitted or received over a network to which the computer is attached.
 
 %prep
-%autosetup -p1
+%setup
 
 %build
 %configure
