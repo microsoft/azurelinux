@@ -55,6 +55,8 @@ make install DESTDIR=%{buildroot} LIBDIR=%{_libdir} PREFIX=%{_prefix}
 %{_includedir}/*
 
 %changelog
+*   Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> 1.9.3-1
+-   Update to version 1.9.3
 *   Fri Jun 12 2020 Eric Li <eli@microsoft.com> 1.9.2-2
 -   Mark CVE-2014-4715 as not applicable due to version format change
 *   Tue May 18 2020 Andrew Phelps <anphel@microsoft.com> 1.9.2-1
