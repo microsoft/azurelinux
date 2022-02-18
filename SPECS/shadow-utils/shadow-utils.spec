@@ -33,6 +33,10 @@ BuildRequires:  libsemanage-devel
 BuildRequires:  libtool
 BuildRequires:  libxslt
 BuildRequires:  pam-devel
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
+BuildRequires:  libxml2
+BuildRequires:  itstool
 Requires:       cracklib
 Requires:       libselinux
 Requires:       libsemanage
@@ -83,7 +87,8 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-libpam \
     --with-libcrack \
     --with-group-name-max-length=32 \
-    --with-selinux
+    --with-selinux \
+    --enable-man
 %make_build
 
 %install
@@ -156,6 +161,28 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sbindir}/*
 /bin/passwd
 %config(noreplace) %{_sysconfdir}/pam.d/*
+%{_mandir}/man1
+%{_mandir}/man5
+%{_mandir}/man8
+%exclude %{_mandir}/cs
+%exclude %{_mandir}/da
+%exclude %{_mandir}/de
+%exclude %{_mandir}/fi
+%exclude %{_mandir}/fr
+%exclude %{_mandir}/hu
+%exclude %{_mandir}/id
+%exclude %{_mandir}/it
+%exclude %{_mandir}/ru
+%exclude %{_mandir}/ja
+%exclude %{_mandir}/ko
+%exclude %{_mandir}/man3
+%exclude %{_mandir}/pl
+%exclude %{_mandir}/pt_BR
+%exclude %{_mandir}/rz
+%exclude %{_mandir}/sv
+%exclude %{_mandir}/tr
+%exclude %{_mandir}/zh_CN
+%exclude %{_mandir}/zh_TW
 
 %files subid
 %license COPYING
