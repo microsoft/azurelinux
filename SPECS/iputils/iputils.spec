@@ -1,25 +1,26 @@
-Summary:          Programs for basic networking
-Name:             iputils
-Version:          20211215
-Release:          1%{?dist}
-License:          BSD-3 and GPLv2+ and Rdisc
-URL:              https://github.com/iputils/iputils
-Group:            Applications/Communications
-Vendor:           Microsoft Corporation
-Distribution:     Mariner
-Source0:          https://github.com/iputils/iputils/archive/20211215.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:    iproute
-BuildRequires:    libcap-devel 
-BuildRequires:    libgcrypt-devel
-BuildRequires:    libxslt
-BuildRequires:    meson
-BuildRequires:    ninja-build
-Requires:         libcap
-Requires:         libgcrypt
-Obsoletes:        inetutils
+Summary:        Programs for basic networking
+Name:           iputils
+Version:        20211215
+Release:        1%{?dist}
+License:        BSD-3 and GPLv2+ and Rdisc
+URL:            https://github.com/iputils/iputils
+Group:          Applications/Communications
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Source0:        https://github.com/iputils/iputils/archive/20211215.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  iproute
+BuildRequires:  libcap-devel 
+BuildRequires:  libgcrypt-devel
+BuildRequires:  libxslt
+BuildRequires:  meson
+BuildRequires:  ninja-build
+Requires:       libcap
+Requires:       libgcrypt
+Obsoletes:      inetutils
 
 %description
 The Iputils package contains programs for basic networking.
+
 %prep
 %autosetup -n %{name}-%{version}
 
@@ -61,7 +62,7 @@ mv -f RELNOTES.tmp RELNOTES.old
 %exclude %{_sysconfdir}/init.d/ninfod.sh
 
 %changelog
-* Tue Feb 15 2022 Rachel Menge <rachelmenge@microsoft.com> 20211215-1
+* Tue Feb 15 2022 Rachel Menge <rachelmenge@microsoft.com> - 20211215-1
 - Update source to 20211215
 
 * Wed Jul 29 2020 Andrew Phelps 20180629-5
