@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Applications/Communications
 URL:            https://github.com/iputils/iputils
 Source0:        https://github.com/iputils/iputils/archive/20211215.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         ping_test_ipv6_localhost.patch
 BuildRequires:  iproute
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
@@ -22,7 +23,7 @@ Obsoletes:      inetutils
 The Iputils package contains programs for basic networking.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 %meson
@@ -42,6 +43,10 @@ ln -sf ../bin/ping %{buildroot}%{_bindir}/ping6
 iconv -f ISO88591 -t UTF8 Documentation/RELNOTES.old -o RELNOTES.tmp
 touch -r Documentation/RELNOTES.old RELNOTES.tmp
 mv -f RELNOTES.tmp RELNOTES.old
+
+%check
+# "ping -6 -c1 localhost" fails due to hostname mapping. See patch.
+%meson_test
 
 %files
 %defattr(-,root,root)
@@ -64,6 +69,7 @@ mv -f RELNOTES.tmp RELNOTES.old
 %changelog
 * Tue Feb 15 2022 Rachel Menge <rachelmenge@microsoft.com> - 20211215-1
 - Update source to 20211215
+- Enable meson builds and tests
 
 * Wed Jul 29 2020 Andrew Phelps 20180629-5
 - Add ping6 symlink.
