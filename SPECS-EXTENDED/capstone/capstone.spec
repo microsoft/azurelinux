@@ -5,17 +5,10 @@ Version:        4.0.2
 Release:        4%{?dist}
 Summary:        A lightweight multi-platform, multi-architecture disassembly framework
 
-%global         gituser         aquynh
-%global         gitname         capstone
-# 4.0.1 release
-%global         commit          f9c6a90489be7b3637ff1c7298e45efafe7cf1b9
-%global         shortcommit     %(c=%{commit}; echo ${c:0:7})
-
 License:        BSD
 URL:            http://www.capstone-engine.org/
 #               https://github.com/aquynh/capstone/releases
-#Source0:       https://github.com/%{gituser}/%{gitname}/archive/%{commit}/%{name}-%{version}-%{shortcommit}.tar.gz
-Source0:        https://github.com/%{gituser}/%{gitname}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/aquynh/capstone/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Test suite binary samples to be used for disassembly
 # Source1:
@@ -126,8 +119,7 @@ The %{name}-java package contains java bindings for %{name}.
 
 
 %prep
-# autosetup -n %{gitname}-%{commit} -S git
-%autosetup -n %{gitname}-%{version} -S git
+%autosetup -S git
 
 
 
