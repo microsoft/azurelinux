@@ -194,7 +194,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 4.9-7
-- Removing --enable-man configuration to resolve build failure.
+- Adding missing docbook-dtd-xml, docbook-style-xsl and libxml2 BR to build man pages.
+- Adding man file handling in files section.
 
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 4.9-6
 - Add provides to resolve dynamic dependencies
