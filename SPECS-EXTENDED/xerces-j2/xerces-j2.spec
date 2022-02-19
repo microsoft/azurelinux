@@ -27,7 +27,7 @@ Summary:        Java XML parser
 License:        Apache-2.0 AND W3C
 Group:          Development/Libraries/Java
 URL:            http://xerces.apache.org/xerces2-j/
-Source0:        http://www.eu.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz
+Source0:        https://archive.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz
 Source1:        %{name}-version.sh
 Source2:        %{name}-constants.sh
 Source3:        %{name}-version.1
@@ -38,6 +38,7 @@ Source5:        http://repo.maven.apache.org/maven2/xerces/xercesImpl/%{version}
 Patch0:         %{name}-build.patch
 Patch1:         xerces-2_11_0-jdk7.patch
 Patch2:         %{name}-manifest.patch
+Patch3:         ant-build-fix.patch
 BuildRequires:  ant
 BuildRequires:  dos2unix
 BuildRequires:  fdupes
@@ -93,6 +94,7 @@ find -type f -exec dos2unix {} \;
 %patch0 -p1
 %patch1 -p1
 %patch2
+%patch3 -p1
 
 %build
 mkdir -p tools
