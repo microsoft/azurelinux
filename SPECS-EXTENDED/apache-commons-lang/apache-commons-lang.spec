@@ -25,7 +25,7 @@ Name:           apache-commons-lang
 Version:        2.6
 Release:        17%{?dist}
 Summary:        Apache Commons Lang Package
-License:        ASL 2.0.
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            http://commons.apache.org/%{base_name}
 Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
