@@ -24,7 +24,7 @@ Name:           ecj
 Version:        4.12
 Release:        5%{?dist}
 Summary:        Eclipse Compiler for Java
-License:        EPL-2.0 AND GPL-2.0 WITH Classpath-exception-2.0
+License:        EPL-2.0
 Group:          Development/Libraries/Java
 URL:            https://www.eclipse.org
 Source0:        http://download.eclipse.org/eclipse/downloads/drops4/%{qualifier}/ecjsrc-%{version}.jar
@@ -108,6 +108,7 @@ install -m 644 -p ecj.1 %{buildroot}%{_mandir}/man1/ecj.1
 %changelog
 * Fri Feb 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.12-5
 - Removing Java < 9 parts.
+- License verified.
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 4.12-4
 - Remove epoch

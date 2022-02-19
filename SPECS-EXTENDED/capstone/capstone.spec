@@ -227,6 +227,7 @@ install -D -p -m 0644 bindings/java/%{name}.jar  %{buildroot}/%{_javadir}/%{name
 %changelog
 * Thu Feb 17 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.2-4
 - Adding BR on "javapackages-filesystem" to provide missing macros.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

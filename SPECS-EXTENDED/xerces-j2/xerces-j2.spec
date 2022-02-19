@@ -24,7 +24,7 @@ Name:           xerces-j2
 Version:        2.12.0
 Release:        5%{?dist}
 Summary:        Java XML parser
-License:        Apache-2.0 AND W3C
+License:        ASL 2.0 and Public Domain and W3C
 Group:          Development/Libraries/Java
 URL:            http://xerces.apache.org/xerces2-j/
 Source0:        https://archive.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz
@@ -154,7 +154,7 @@ update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar >/dev/null
 ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 
 %files
-%license LICENSE
+%license LICENSE LICENSE.DOM-documentation.html LICENSE.DOM-software.html LICENSE.resolver.txt LICENSE-SAX.html LICENSE.DOM-documentation.html LICENSE.serializer.txt
 %doc NOTICE README
 %{_bindir}/*
 %{_javadir}/*
@@ -175,6 +175,7 @@ ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 %changelog
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.12.0-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
+- License verified.
 
 * Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 2.12.0-4.9
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).

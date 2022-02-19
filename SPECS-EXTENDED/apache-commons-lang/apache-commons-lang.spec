@@ -25,7 +25,7 @@ Name:           apache-commons-lang
 Version:        2.6
 Release:        17%{?dist}
 Summary:        Apache Commons Lang Package
-License:        Apache-2.0
+License:        ASL 2.0.
 Group:          Development/Libraries/Java
 URL:            http://commons.apache.org/%{base_name}
 Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
@@ -116,6 +116,7 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %changelog
 * Fri Feb 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6-17
 - Using newer Java version to fix build.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6-16
 - Converting the 'Release' tag to the '[number].[distribution]' format.
