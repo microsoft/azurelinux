@@ -1,7 +1,7 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-runc
 Version:        1.1.0+azure
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,6 +108,9 @@ cp %{SOURCE7} %{buildroot}%{_docdir}/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
+* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.1.0+azure-3
+- Bump release to force rebuild with golang 1.16.14
+
 * Wed Jan 19 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.1.0+azure-2
 - Fix BuildRequires pkgconfig to pkg-config
 

@@ -1,14 +1,16 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.3.28
-Release:        3%{?dist}
+Version:        10.3.32
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
+
+# A buildable mariadb environment needs functioning submodules that do not work from the archive download
+# To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
-Patch0:         cmake_3.21.4_fix.patch
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -318,7 +320,6 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/mysql_system_tables.sql
 %{_datadir}/mysql/mysql_system_tables_data.sql
 %{_datadir}/mysql/mysql_test_data_timezone.sql
-%{_datadir}/mysql/mysql_to_mariadb.sql
 %{_datadir}/mysql/mysql_test_db.sql
 %license %{_datadir}/mysql/mroonga/AUTHORS
 %license %{_datadir}/mysql/mroonga/COPYING
@@ -370,8 +371,11 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
-* Mon Feb 14 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.3.28-3
-- Bumping release number to force rebuild.
+* Wed Feb 09 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.3.32-1
+- Upgrading to version 10.3.32 resolving CVE-2021-46657, CVE-2021-46658, 
+  CVE-2021-46667
+- Removing mysql_to_mariadb.sql from files.
+- Adding submodule instructions to generate tarball.
 
 * Fri Nov 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.3.28-2
 - Adding a fix to work with newer version of cmake.

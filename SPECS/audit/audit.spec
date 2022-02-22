@@ -168,6 +168,7 @@ make %{?_smp_mflags} check
 %changelog
 *   Tue Feb 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.0-12
 -   chpebeni@microsoft.com, 3.0.6.2: Remove override so auditd starts by default.
+-   thcrain@microsoft.com, 3.0-12: Bump release to force rebuild with golang 1.16.14
 *   Fri Jan 21 2022 Nick Samson <nisamson@microsoft.com> - 3.0-11
 -   Removed libwrap support to remove dependency on finger
 *   Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.0-10
