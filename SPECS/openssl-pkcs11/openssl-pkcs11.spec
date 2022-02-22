@@ -27,9 +27,9 @@ BuildRequires:  doxygen
 BuildRequires:  procps-ng
 BuildRequires:  opensc
 BuildRequires:  softhsm
+%endif
 Requires:       openssl-libs >= 1.0.2
 Requires:       p11-kit-trust
-%endif
 
 # Package renamed from libp11 to openssl-pkcs11 in release 0.4.7-4
 Provides:       libp11%{?_isa} = %{version}-%{release}

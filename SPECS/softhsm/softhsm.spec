@@ -8,7 +8,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.opendnssec.org/
-Source0:        https://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz
+Source0:        https://dist.opendnssec.org/source/%{name}-%{version}.tar.gz
 Patch1:         softhsm-2.6.1-rh1831086-exit.patch
 BuildRequires:  cppunit-devel
 BuildRequires:  gcc-c++
@@ -28,31 +28,26 @@ with other cryptographic products because of the PKCS#11 interface.
 
 %package devel
 Summary:        Development package of softhsm that includes the header files
-Requires:       %{name} = %{version}-%{release}
-Requires:       openssl-devel
-Requires:       sqlite-devel
-%if 0%{?prever:1} || 0%{?prerelease:1}
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
-%endif
+Requires:       %{name} = %{version}-%{release}
+Requires:       openssl-devel
+Requires:       sqlite-devel
 
 %description devel
 The devel package contains the libsofthsm include files
 
 %prep
-%setup -q -n %{name}-%{version}%{?prever}
+%setup -q -n %{name}-%{version}
 %patch1 -p1
 
-%if 0%{?prever:1} || 0%{?prerelease:1}
-   # pre-release or post-release snapshots fixup
-   sed -i 's:^full_libdir=":#full_libdir=":g' configure.ac
-   sed -i "s:libdir)/@PACKAGE@:libdir):" Makefile.in
+# pre-release or post-release snapshots fixup
+sed -i 's:^full_libdir=":#full_libdir=":g' configure.ac
+sed -i "s:libdir)/@PACKAGE@:libdir):" Makefile.in
 autoreconf -fiv
-%else
-   # remove softhsm/ subdir auto-added to --libdir
-   sed -i 's:full_libdir/softhsm:full_libdir:g' configure
-%endif
+# remove softhsm/ subdir auto-added to --libdir
+sed -i 's:full_libdir/softhsm:full_libdir:g' configure
 
 %build
 %configure --libdir=%{_libdir}/pkcs11 --with-openssl=%{_prefix} --enable-ecc --enable-eddsa --disable-gost \

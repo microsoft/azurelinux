@@ -7,8 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pcsclite.apdu.fr/
 Source0:        https://pcsclite.apdu.fr/files/%{name}-%{version}.tar.bz2
-Source1:	      org.debian.pcsc-lite.policy
-
+Source1:        org.debian.pcsc-lite.policy
 BuildRequires:  doxygen
 BuildRequires:  graphviz
 BuildRequires:  systemd-devel
