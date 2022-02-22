@@ -14443,8 +14443,8 @@
         "type": "other",
         "other": {
           "name": "net-tools",
-          "version": "1.60",
-          "downloadUrl": "https://downloads.sourceforge.net/project/net-tools/net-tools-1.60.tar.bz2"
+          "version": "2.10",
+          "downloadUrl": "https://downloads.sourceforge.net/project/net-tools/net-tools-2.10.tar.xz"
         }
       }
     },
