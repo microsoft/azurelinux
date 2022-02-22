@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Networking
 URL:            https://www.tcpdump.org
 Source0:        https://www.tcpdump.org/release/%{name}-%{version}.tar.gz
-Patch0:         CVE-2018-16301.nopatch
 BuildRequires:  libpcap-devel
 Requires:       libpcap
 
@@ -49,11 +48,8 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
-* Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.99.1-2
-- Nopatch CVE-2018-16301
-
-* Tue Feb 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.99.1-1
-- Update to 4.99.1
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.99.1-1
+- cherry-pick update to 4.99.1
 
 * Fri Nov 13 2020 Thomas Crain <thcrain@microsoft.com> - 4.9.3-3
 - Patch CVE-2020-8037
