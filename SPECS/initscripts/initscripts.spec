@@ -109,6 +109,7 @@ touch %{buildroot}%{_sbindir}/ifdown
 %changelog
 * Tue Feb 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 10.15-1
 - Update source to v10.15
+- Use python3 to build
 
 * Mon Mar 29 2021 Henry Li <lihl@microsoft.com> - 9.70-8
 - Replace incorrect %%{_lib} usage with %%{_libdir}.
