@@ -1,36 +1,35 @@
-Name:          jdom2
-Version:       2.0.6
-Release:       28%{?dist}
-Summary:       Java manipulation of XML made easy
+Summary:        Java manipulation of XML made easy
+Name:           jdom2
+Version:        2.0.6
+Release:        28%{?dist}
 # Sam as the "Saxpath" license but restricts the use of the name "JDOM" instead of "SAXPath".
-License:       JDOM
+License:        JDOM
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:           http://www.jdom.org/
+URL:            http://www.jdom.org/
 # ./generate-tarball.sh
-Source0:       %{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 # Remove bundled jars that might not have clear licensing
-Source4:       generate-tarball.sh
+Source4:        generate-tarball.sh
 # Use system libraries
 # Disable gpg signatures
 # Process contrib and junit pom files
-Patch0:        0001-Adapt-build.patch
-
+Patch0:         0001-Adapt-build.patch
 #
 # Security patches
 # P100 -> ...
 #
 # CVE-2021-33813
-Patch100:      bd3ab78370098491911d7fe9d7a43b97144a234e.patch
-Patch101:      dd4f3c2fc7893edd914954c73eb577f925a7d361.patch
-Patch102:      07f316957b59d305f04c7bdb26292852bcbc2eb5.patch
+Patch100:       bd3ab78370098491911d7fe9d7a43b97144a234e.patch
+Patch101:       dd4f3c2fc7893edd914954c73eb577f925a7d361.patch
+Patch102:       07f316957b59d305f04c7bdb26292852bcbc2eb5.patch
 
-BuildRequires: javapackages-local-bootstrap
-BuildRequires: ant
-BuildRequires: ant-junit
-BuildRequires: fdupes
+BuildArch:      noarch
 
-BuildArch:     noarch
+BuildRequires:  ant
+BuildRequires:  ant-junit
+BuildRequires:  fdupes
+BuildRequires:  javapackages-local-bootstrap
 
 %description
 JDOM is a Java-oriented object model which models XML documents.
@@ -44,7 +43,7 @@ complex and memory-consumptive options that current API
 offerings provide.
 
 %package javadoc
-Summary:       Javadoc for %{name}
+Summary:        Javadoc for %{name}
 
 %description javadoc
 This package contains javadoc for %{name}.
