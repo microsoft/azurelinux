@@ -14,7 +14,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.44
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,7 +28,6 @@ Patch1:         CVE-2020-12403.patch
 BuildRequires:  nspr-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  libdb-devel
-Provides:       %{name}-tools = %{version}-%{release}
 Provides:       %{name}-softokn = %{version}-%{release}
 Requires:       nspr
 Requires:       libdb
@@ -67,10 +66,22 @@ Requires:       nspr
 %description libs
 This package contains minimal set of shared nss libraries.
 
+%package tools
+Summary:          Tools for the Network Security Services
+Requires:         %{name}%{?_isa} = %{version}-%{release}
+
+%description tools
+Network Security Services (NSS) is a set of libraries designed to
+support cross-platform development of security-enabled client and
+server applications. Applications built with NSS can support SSL v2
+and v3, TLS, PKCS #5, PKCS #7, PKCS #11, PKCS #12, S/MIME, X.509
+v3 certificates, and other security standards.
+
+Install the nss-tools package if you need command-line tools to
+manipulate the NSS certificate and key database.
+
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 export NSS_FORCE_FIPS=1
@@ -128,6 +139,12 @@ install -vm 644 Linux*/lib/pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
 install -p -m 644 pkgconfig/nss-util.pc %{buildroot}%{_libdir}/pkgconfig/nss-util.pc
 install -p -m 755 pkgconfig/nss-util-config %{buildroot}%{_bindir}/nss-util-config
 
+# Copy the binaries we want
+for file in certutil cmsutil crlutil modutil nss-policy-check pk12util signver ssltap
+do
+  install -p -m 755 ./*.OBJ/bin/$file $RPM_BUILD_ROOT/%{_bindir}
+done
+
 # The shilibsign script ran after packaging is looking for those files in the lib directory (hardcoded)
 cp -r %{buildroot}%{_libdir}/* /lib
 
@@ -142,7 +159,9 @@ popd
 %files
 %defattr(-,root,root)
 %license nss/COPYING
-%{_bindir}/*
+%{_bindir}/nss-config
+%{_bindir}/pk12util
+%{_bindir}/nss-util-config
 %{_libdir}/*.chk
 %{_libdir}/*.so
 %exclude %{_libdir}/libfreeblpriv3.so
@@ -163,7 +182,22 @@ popd
 %{_libdir}/libsoftokn3.so
 %{unsupported_tools_directory}/shlibsign
 
+%files tools
+%{_bindir}/certutil
+%{_bindir}/cmsutil
+%{_bindir}/crlutil
+%{_bindir}/modutil
+%{_bindir}/nss-policy-check
+%{_bindir}/pk12util
+%{_bindir}/signver
+%{_bindir}/ssltap
+
 %changelog
+* Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 3.44-11
+- Add explicit binaries in the main package instead of `*`
+- Switch to `%autosetup` instead of `%setup`
+- Drop `Provides: nss-tools`
+- Add subpackage `nss-tools`
 
 * Tue Nov 16 2021 Mateusz Malisz <mamalisz@microsoft.com> - 3.44-10
 - Remove libdb from toolchain. Add workaround for the shlibsign script to work.
