@@ -94,6 +94,8 @@ rm -rf %{buildroot}
 %{_mandir}/*/ntsysv.8*
 
 %changelog
+* Mon Feb 14 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.11-2
+- Bumping release number to force rebuild.
 * Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 1.11-1
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - Upgrade to 1.11. License verified.

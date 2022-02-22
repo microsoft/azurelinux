@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,7 +33,6 @@ BuildRequires:  python3
 BuildRequires:  python3-xml
 Requires(pre):  coreutils
 Requires(pre):  policycoreutils >= %{POLICYCOREUTILSVER}
-Requires:       bash
 Provides:       selinux-policy-targeted
 BuildArch:      noarch
 
@@ -275,9 +274,6 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Mon Feb 07 2022 Max Brodeur-Urbas <maxbr@micrsofot.com> - 2.20220106-2
-- Adding bash as requirement.
-
 * Mon Jan 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
 - Update to version 2.20220106.
 - Fix setup process to apply patches.
