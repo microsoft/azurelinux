@@ -17,7 +17,7 @@ It allows the user to display TCP/IP and other packets being
 transmitted or received over a network to which the computer is attached.
 
 %prep
-%setup
+%autosetup -p1
 
 %build
 %configure
