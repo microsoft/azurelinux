@@ -1,8 +1,8 @@
 Summary:        Mobile broadband modem manager
 Name:           ModemManager
-Version:        1.10.4
-Release:        4%{?dist}
-License:        GPLv2
+Version:        1.18.6
+Release:        1%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -66,8 +66,8 @@ make  %{?_smp_mflags} check
 %{_datadir}/locale/*
 %{_datadir}/bash-completion/*
 %{_datadir}/gir-1.0/ModemManager-1.0.gir
+%{_datadir}/ModemManager/*
 %exclude %{_datadir}/icons
-%exclude %{_datadir}/ModemManager/mm-dell-dw5821e-carrier-mapping.conf
 /lib/udev/rules.d/*
 
 %files devel
@@ -78,6 +78,10 @@ make  %{?_smp_mflags} check
 %{_libdir}/libmm-glib.la
 
 %changelog
+* Fri Feb 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.18.6-1
+- Upgrading to v1.18.6
+- License verified.
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.4-4
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 1.10.4-3: Add dbus BuildRequires to fix check tests.
