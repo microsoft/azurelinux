@@ -45,15 +45,11 @@
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json",
-                "packagelists/selinux.json"
+                "packagelists/cloud-init-packages.json"
             ],
             "Hostname": "mariner",
             "KernelOptions": {
                 "default": "kernel"
-            },
-            "KernelCommandLine": {
-                "SELinux": "permissive"
             },
             "Users": [
                 {
