@@ -53,6 +53,7 @@ cd ..
 make destdir=%{buildroot} prefix=%{_prefix} libdir=/lib usrlibdir=%{_libdir} includedir=%{_includedir} install
 
 %check
+# The check generates a lot of load on CPU & is flaky when run parallely. Avoid using `-j $(nproc)
 make -k check
 
 %post -p /sbin/ldconfig
