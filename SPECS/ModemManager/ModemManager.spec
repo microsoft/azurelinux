@@ -2,7 +2,7 @@ Summary:        Mobile broadband modem manager
 Name:           ModemManager
 Version:        1.18.6
 Release:        1%{?dist}
-License:        GPLv2
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -80,6 +80,7 @@ make  %{?_smp_mflags} check
 %changelog
 * Fri Feb 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.18.6-1
 - Upgrading to v1.18.6
+- License verified.
 
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.4-4
 - Merge the following releases from 1.0 to dev branch
