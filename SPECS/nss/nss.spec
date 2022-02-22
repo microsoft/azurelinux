@@ -159,7 +159,9 @@ popd
 %files
 %defattr(-,root,root)
 %license nss/COPYING
-%{_bindir}/*
+%{_bindir}/nss-config
+%{_bindir}/pk12util
+%{_bindir}/nss-util-config
 %{_libdir}/*.chk
 %{_libdir}/*.so
 %exclude %{_libdir}/libfreeblpriv3.so
@@ -192,6 +194,7 @@ popd
 
 %changelog
 * Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 3.44-11
+- Add explicit binaries in the main package instead of `*`
 - Switch to `%autosetup` instead of `%setup`
 - Drop `Provides: nss-tools`
 - Add subpackage `nss-tools`
