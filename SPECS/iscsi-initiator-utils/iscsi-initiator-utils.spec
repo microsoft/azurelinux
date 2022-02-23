@@ -61,6 +61,7 @@ BuildRequires:  systemd-devel
 BuildRequires:  systemd-units
 
 Requires:       %{name}-iscsiuio >= %{version}-%{release}
+Requires:       isns-utils
 Requires(post): systemd
 Requires(postun): systemd
 Requires(preun): systemd
