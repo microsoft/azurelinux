@@ -21,7 +21,7 @@ Distribution:   Mariner
 %define section free
 Name:           jarjar
 Version:        1.4
-Release:        7%{?dist}
+Release:        6%{?dist}
 Summary:        Tool to repackage Java libraries
 License:        ASL 2.0
 Group:          Development/Libraries/Java
@@ -122,23 +122,18 @@ cp -pr dist/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed Feb 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-7
+* Wed Feb 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-6
 - Removing dependency on "maven2".
 
-* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-6
+* Wed Jan 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-5
 - License verified.
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-5
+* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
-* Mon Nov 16 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.4-4.6
+* Mon Nov 16 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.4-3.9
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Use javapackages-local-bootstrap to avoid build cycle.
-
-
-* Sat May 22 2021 Fridrich Strba <fstrba@suse.com>
-- Filter out the distributionManagement section from pom files,
-  since we use aliases and not relocations
 
 * Tue Dec 11 2018 Fridrich Strba <fstrba@suse.com>
 - Build against objectweb-asm >= 5 in order to avoid getting stuck
