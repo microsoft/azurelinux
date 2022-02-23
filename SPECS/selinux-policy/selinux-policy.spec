@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -274,6 +274,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.20220106-2
+- Bumping release to force rebuild.
+
 * Mon Jan 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 2.20220106-1
 - Update to version 2.20220106.
 - Fix setup process to apply patches.

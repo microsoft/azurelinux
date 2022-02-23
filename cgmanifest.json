@@ -8026,7 +8026,7 @@
         "other": {
           "name": "shadow-utils",
           "version": "4.9",
-          "downloadUrl": "https://github.com/shadow-maint/shadow/releases/download/4.9/shadow-4.9.tar.xz"
+          "downloadUrl": "https://github.com/shadow-maint/shadow/releases/download/v4.9/shadow-4.9.tar.xz"
         }
       }
     },
