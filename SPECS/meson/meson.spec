@@ -11,7 +11,6 @@ BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
@@ -60,6 +59,7 @@ python3 ./run_tests.py
 %changelog
 * Tue Feb 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.60.2-2
 - Drop BR on `gmock-devel` & `gtest-devel`
+- Drop BR on `python3-libs` which is satisfied by `python3-devel`
 - Add an explict BR on `libgcrypt, glib, gtest, gmock, cmake, git` to enable ptest
 
 * Wed Dec 08 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.60.2-1
