@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -34,6 +34,9 @@ Patch12:        CVE-2020-27619.patch
 # CVE-2021-23336 patch backported from 3.6 courtesy of Gentoo
 # https://gitweb.gentoo.org/repo/gentoo.git/commit/?id=f2a53a94f3b6b6395ef4541051a02d80c61442d0
 Patch13:        CVE-2021-23336.patch
+# CVE-2022-0391 patch backported from 3.7 courtesy of openSUSE
+# https://build.opensuse.org/package/view_file/openSUSE:Factory/python/CVE-2022-0391-urllib_parse-newline-parsing.patch?expand=1 
+Patch14:        CVE-2022-0391.patch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -246,6 +249,9 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.7.18-9
+- Patch CVE-2022-0391
+
 * Mon Oct 25 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 2.7.18-8
 - Specify version and release number for "Provides: python(abi)" to avoid mixing with Python 3.
 - Removing "Provides: /bin/python" as this is satisfied by Python 3.
