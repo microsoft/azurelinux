@@ -3,7 +3,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        21.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,8 @@ Patch2:         ds-vmware-mariner.patch
 Patch3:         cloud-cfg.patch
 Patch4:         networkd.patch
 Patch5:         mariner.patch
+Patch6:         update-metadata-on-BOOT_NEW_INSTANCE.patch
+Patch7:         apply-netconfig-every-boot.patch
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
@@ -158,6 +160,9 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue Feb 22 2022 Henry Beberman <henry.beberman@microsoft.com> - 21.3-4
+- Add patches from upstream to resolve a hang when reinitializing preprovisioned VMs.
+
 * Mon Oct 18 2021 Henry Beberman <henry.beberman@microsoft.com> - 21.3-3
 - Add azure-kvp subpackage.
 
