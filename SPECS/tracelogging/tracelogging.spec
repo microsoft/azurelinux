@@ -1,6 +1,6 @@
 Summary:        tracelogging one-line structure logging API on top of LTTNG
 Name:           tracelogging
-Version:        0.3
+Version:        0.3.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -65,6 +65,9 @@ mkdir build && cd build
 %{_libdir}/cmake/tracelogging
 
 %changelog
+* Wed Feb 09 2022 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 0.3.1-1
+- Upgrade to 0.3.1 for lttng-ust 2.13 compatibility & fixes.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.3-1
 - Upgrade to latest upstream version for lttng-ust 2.13 compatibility
 - Use CMake options to avoid pulling in catch-devel in non-test builds

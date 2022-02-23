@@ -1,7 +1,7 @@
 Summary:        Python development support library
 Name:           python-py
 Version:        1.10.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,17 +43,15 @@ py.code: dynamic code generation and introspection
 #python-py and python-pytest have circular dependency. Hence not adding tests
 %make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
-%files
-%defattr(-,root,root,-)
-
-%{python2_sitelib}/*
-
 %files -n python3-py
 %defattr(-,root,root,-)
 %license LICENSE
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 16 2022 Thomas Crain <thcrian@microsoft.com> - 1.10.0-3
+- Fix accidental double-packaging of python3 subpackage in main package
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.0-2
 - Add license to python3 package
 - Remove python2 package

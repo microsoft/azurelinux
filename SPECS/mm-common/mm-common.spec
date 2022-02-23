@@ -1,7 +1,7 @@
 Summary:        mm-common module
 Name:           mm-common
-Version:        1.0.0
-Release:        3%{?dist}
+Version:        1.0.4
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,9 @@ make install DESTDIR=%{buildroot}
 %{_mandir}/*
 
 %changelog
+* Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0.4-1
+- Upgrading to v1.0.4
+
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.0-3
 - Update Source0 (removes need for libstdc++.tag file)
 - Lint for Mariner style

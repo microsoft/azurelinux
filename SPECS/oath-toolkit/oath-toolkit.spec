@@ -1,22 +1,14 @@
 Summary:        One-time password components
 Name:           oath-toolkit
-Version:        2.6.2
-Release:        7%{?dist}
+Version:        2.6.7
+Release:        1%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.nongnu.org/oath-toolkit/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 
-# Escape leading single quotes in man pages which are misinterpreted as macros,
-# patch sent upstream, upstream ticket #108312
-Patch0:        oath-toolkit-2.0.2-man-fix.patch
-# Fix invalid reads due to references to old (freed) xmlDoc,
-# upstream ticket #108736
-Patch1:        oath-toolkit-2.4.1-retain-original-xmldoc.patch
-# rhbz#1605276
-Patch2:        oath-toolkit-2.6.2-build-fix.patch
-Patch3:        oath-toolkit-2.6.2-lockfile.patch
+Patch0:        oath-toolkit-2.6.2-lockfile.patch
 
 BuildRequires: pam-devel
 BuildRequires: gtk-doc
@@ -119,10 +111,7 @@ A PAM module for pluggable login authentication for OATH.
 
 %prep
 %setup -q
-%patch0 -p1 -b .man-fix
-%patch1 -p1 -b .retain-original-xmldoc
-%patch2 -p1 -b .build-fix
-%patch3 -p1 -b .lockfile
+%patch0 -p1 -b .lockfile
 
 %build
 autoreconf -fi
@@ -197,6 +186,9 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 %{_libdir}/security/pam_oath.so
 
 %changelog
+* Fri Feb 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.6.7-1
+- Upgrading to v2.6.7
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.6.2-7
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified

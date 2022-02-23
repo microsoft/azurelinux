@@ -8,8 +8,8 @@ Distribution:   Mariner
 Summary: Analysis plugins for use with setroubleshoot
 Name: setroubleshoot-plugins
 Version: 3.3.12
-Release: 2%{?dist}
-License: GPLv2+
+Release: 4%{?dist}
+License: GPLv3
 URL: https://github.com/fedora-selinux/setroubleshoot
 Source0: https://releases.pagure.org/setroubleshoot/%{name}-%{version}.tar.gz
 # git format-patch -N setroubleshoot-plugins-<version> -- plugins
@@ -19,6 +19,7 @@ BuildArch: noarch
 # gcc is needed only for ./configure
 # Remove it when the build process is fixed
 BuildRequires: gcc
+BuildRequires: perl(File::Find)
 BuildRequires: perl-XML-Parser
 BuildRequires: intltool gettext python3-devel
 # Introduction of get_package_nvr functions
@@ -46,10 +47,17 @@ make DESTDIR=%{buildroot} PYTHON=%{__python3} pkgdocdir=%{_pkgdocdir} install
 %py_byte_compile %{__python3} %{buildroot}%{_datadir}/setroubleshoot/plugins
 
 %files -f %{name}.lang 
+%license COPYING
 %doc %{_pkgdocdir}
 %{_datadir}/setroubleshoot/plugins
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.12-4
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.12-3
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.12-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

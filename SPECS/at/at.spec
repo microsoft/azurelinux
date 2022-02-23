@@ -128,13 +128,13 @@ make test
 touch %{_localstatedir}/spool/at/.SEQ
 chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown root:root %{_localstatedir}/spool/at/.SEQ
-%{systemd_post} atd.service
+%systemd_post atd.service
 
 %preun
 %systemd_preun atd.service
 
 %postun
-%{systemd_postun_with_restart} atd.service
+%systemd_postun_with_restart atd.service
 
 %triggerun -- at < 3.1.12-6
 # Save the current service runlevel info

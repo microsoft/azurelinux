@@ -675,9 +675,9 @@ popd
 rm -rf gettext-0.19.8.1
 touch /logs/status_gettext_complete
 
-echo Elfutils-0.185
-tar xjf elfutils-0.185.tar.bz2
-pushd elfutils-0.185
+echo Elfutils-0.186
+tar xjf elfutils-0.186.tar.bz2
+pushd elfutils-0.186
 ./configure \
     --prefix=/usr \
     --disable-debuginfod \
@@ -690,7 +690,7 @@ make -C libdw install
 # Need to install (eu-strip) as well
 make install
 popd
-rm -rf elfutils-0.185
+rm -rf elfutils-0.186
 touch /logs/status_libelf_complete
 
 echo Libffi-3.4.2
@@ -902,23 +902,21 @@ popd
 rm -rf patch-2.7.6
 touch /logs/status_patch_complete
 
-echo Man-DB-2.8.4
-tar xf man-db-2.8.4.tar.xz
-pushd man-db-2.8.4
+echo Man-DB-2.10.1
+tar xf man-db-2.10.1.tar.xz
+pushd man-db-2.10.1
 ./configure --prefix=/usr                        \
-            --docdir=/usr/share/doc/man-db-2.8.4 \
+            --docdir=/usr/share/doc/man-db-2.10.1 \
             --sysconfdir=/etc                    \
             --disable-setuid                     \
-            --enable-cache-owner=bin             \
             --with-browser=/usr/bin/lynx         \
+            --with-systemdsystemunitdir=no       \
             --with-vgrind=/usr/bin/vgrind        \
-            --with-grap=/usr/bin/grap            \
-            --with-systemdtmpfilesdir=           \
-            --with-systemdsystemunitdir=
+            --with-grap=/usr/bin/grap
 make -j$(nproc)
 make install
 popd
-rm -rf man-db-2.8.4
+rm -rf man-db-2.10.1
 touch /logs/status_man_db_complete
 
 echo Tar-1.34

@@ -2,20 +2,26 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: orangefs
 Version: 2.9.7
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary: Parallel network file system client
 URL: http://www.orangefs.org/
+# ASL 2.0 src/client/jni
 # BSD (2 clause) maint/config/ssl.m4
 # BSD (3 clause) src/client/usrint/fts.c
 # BSD (3 clause) src/client/usrint/fts.h
-# MIT maint/config/install-sh
-# zlib src/common/misc/md5.c
-# zlib src/common/misc/md5.h
+# GPLv2 src/kernel
 # LGPLv2 src/apps/admin/pvfs2-config.in
 # LGPLv2 src/common/dotconf/dotconf.c
 # LGPLv2+ remainder
-License: LGPLv2+ and LGPLv2 and BSD and MIT and zlib
+# MIT maint/config/install-sh
+# OpenLDAP src/apps/devel/lmdb and src/common/lmdb
+# Public Domain src/common/hash/murmur3.c
+# zlib src/common/misc/md5.c
+# zlib src/common/misc/md5.h
+License: ASL 2.0 and BSD and GPLv2 and LGPLv2+ and LGPLv2 and MIT and OpenLDAP and Public Domain and zlib
 BuildRequires:  gcc
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Term::ReadLine)
 BuildRequires: automake
 BuildRequires: bison flex libattr-devel openssl-devel
 BuildRequires: perl(Math::BigInt) perl(Getopt::Long)
@@ -26,7 +32,7 @@ BuildRequires: lmdb-devel fuse-devel
 BuildRequires: libibverbs-devel
 %endif
 
-Source0: https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-%version.tar.gz
+Source0: https://s3.amazonaws.com/download.orangefs.org/releases/2.9.7/source/orangefs-%version.tar.gz
 Source1: orangefs-server.service
 Source2: orangefs-client.service
 Source3: orangefs.conf
@@ -94,7 +100,7 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/orangefs
 install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 
 %files
-
+%license COPYING
 %config(noreplace) %{_sysconfdir}/pvfs2tab
 %{_bindir}/pvfs2-check-server
 %{_bindir}/pvfs2-chmod
@@ -248,6 +254,12 @@ This package contains the FUSE client.
 %{_bindir}/pvfs2fuse
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-9
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-8
+- Adding missing BRs on Perl modules.
+
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 2.9.7-7
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Build without docs and remove related build requirements.
