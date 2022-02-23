@@ -15,11 +15,9 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
-
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  which
-
 Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       %{name}-mimetypes
 
@@ -27,9 +25,9 @@ Requires:       %{name}-mimetypes
 NGINX is a free, open-source, high-performance HTTP server and reverse proxy, as well as an IMAP/POP3 proxy server.
 
 %package filesystem
-Summary:           The basic directory layout for the Nginx server
-BuildArch:         noarch
-Requires(pre):     shadow-utils
+Summary:        The basic directory layout for the Nginx server
+BuildArch:      noarch
+Requires(pre):  shadow-utils
 
 %description filesystem
 The nginx-filesystem package contains the basic directory layout
