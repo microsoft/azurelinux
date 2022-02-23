@@ -1,4 +1,4 @@
-From 2e660a78632545e98f7c9e2ffb8518512c0db5ff Mon Sep 17 00:00:00 2001
+From c53c576c09c5a3a1654b7a1f08fcc222a102499d Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Tue, 28 Feb 2017 09:00:41 -0800
 Subject: [PATCH] libiscsi: fix discovery request timeout regression
@@ -28,5 +28,5 @@ index 755c18c..bb17dfc 100644
  	rc = idbm_bind_ifaces_to_nodes(discovery_fw, &drec, &ifaces, &rec_list);
  	if (rc) {
 -- 
-2.21.0
+2.26.2
 
