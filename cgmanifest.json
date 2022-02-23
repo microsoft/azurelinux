@@ -15585,7 +15585,7 @@
         "other": {
           "name": "OpenIPMI",
           "version": "2.0.32",
-          "downloadUrl": "http://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz"
+          "downloadUrl": "https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz"
         }
       }
     },

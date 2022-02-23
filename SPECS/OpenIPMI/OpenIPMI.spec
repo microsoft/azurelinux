@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://sourceforge.net/projects/openipmi/
-Source0:        http://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz
+Source0:        https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz
 Source1:        openipmi-helper
 Source2:        ipmi.service
 BuildRequires:  ncurses-devel
@@ -188,6 +188,9 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Tue Feb 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.0.32-1
+- Upgrading to version 2.0.32.
+
 * Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.0.25-7
 - Use python3 instead of python2 in python subpackage
 - Add Fedora patch to enable build with python >= 3.9
