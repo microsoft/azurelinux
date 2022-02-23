@@ -7621,8 +7621,8 @@
         "type": "other",
         "other": {
           "name": "irqbalance",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.6.0.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.8.0.tar.gz"
         }
       }
     },
