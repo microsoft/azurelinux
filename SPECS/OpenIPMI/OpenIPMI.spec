@@ -1,17 +1,15 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
-Version:        2.0.25
-Release:        7%{?dist}
+Version:        2.0.32
+Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://sourceforge.net/projects/openipmi/
-Source0:        https://sourceforge.net/projects/openipmi/files/latest/download/openipmi-%{version}.tar.gz
+Source0:        http://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz
 Source1:        openipmi-helper
 Source2:        ipmi.service
-# Enable detection of python versions with deprecated distutils modules (Source: Fedora 28, MIT license)
-Patch0:         %{name}-py39.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  perl
