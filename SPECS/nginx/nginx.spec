@@ -3,8 +3,10 @@
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
-Version:        1.20.1
-Release:        2%{?dist}
+# Currently on "stable" version of nginx from https://nginx.org/en/download.html.
+# Note: Stable versions are even (1.20), mainline versions are odd (1.21)
+Version:        1.20.2
+Release:        1%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +15,6 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
-Patch0:         CVE-2009-4487.nopatch
 
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
@@ -109,6 +110,9 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.20.2-1
+- Upgrading to latest version 1.20.2 from "stable" branch.
+
 * Wed Oct 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.1-2
 - Split out "nginx-filesystem" using Fedora 34 spec (license: MIT) as guidance.
 - Removing conflicts with "nginx-mimetypes" over "mime.types".
