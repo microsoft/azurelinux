@@ -13,7 +13,7 @@ URL:            https://twistedmatrix.com
 Source0:        https://pypi.python.org/packages/source/T/Twisted/Twisted-%{version}.tar.bz2
 Patch0:         extra_dependency.patch
 Patch1:         no_packet.patch
-Patch2: CVE-2022-21712.patch
+Patch2:         CVE-2022-21712.patch
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
