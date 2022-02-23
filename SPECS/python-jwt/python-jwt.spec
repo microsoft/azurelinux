@@ -69,7 +69,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %endif
 
 %changelog
-* Tue Feb 22 2022 Nick Samson <nisamson@microsoft.com> - 2.3.0
+* Tue Feb 22 2022 Nick Samson <nisamson@microsoft.com> - 2.3.0-1
 - Updated to 2.3.0.
 - Removed pyjwt binary as it no longer exists.
 - Updated Python dependency to at least 3.6.
