@@ -111,8 +111,8 @@ gmock-devel-1.11.0-1.cm2.aarch64.rpm
 gmp-6.2.1-2.cm2.aarch64.rpm
 gmp-debuginfo-6.2.1-2.cm2.aarch64.rpm
 gmp-devel-6.2.1-2.cm2.aarch64.rpm
-gnupg2-2.3.3-1.cm2.aarch64.rpm
-gnupg2-debuginfo-2.3.3-1.cm2.aarch64.rpm
+gnupg2-2.3.3-2.cm2.aarch64.rpm
+gnupg2-debuginfo-2.3.3-2.cm2.aarch64.rpm
 gperf-3.1-4.cm2.aarch64.rpm
 gperf-debuginfo-3.1-4.cm2.aarch64.rpm
 gpgme-1.16.0-1.cm2.aarch64.rpm

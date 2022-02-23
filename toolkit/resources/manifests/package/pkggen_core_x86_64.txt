@@ -215,7 +215,7 @@ libksba-1.6.0-1.cm2.x86_64.rpm
 libksba-devel-1.6.0-1.cm2.x86_64.rpm
 npth-1.6-4.cm2.x86_64.rpm
 pinentry-1.2.0-1.cm2.x86_64.rpm
-gnupg2-2.3.3-1.cm2.x86_64.rpm
+gnupg2-2.3.3-2.cm2.x86_64.rpm
 gpgme-1.16.0-1.cm2.x86_64.rpm
 mariner-repos-shared-2.0-4.cm2.noarch.rpm
 mariner-repos-preview-2.0-4.cm2.noarch.rpm
