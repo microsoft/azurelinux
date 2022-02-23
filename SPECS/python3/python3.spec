@@ -37,7 +37,6 @@ Provides:       /bin/python
 Provides:       /bin/python3
 Provides:       %{name}-docs = %{version}-%{release}
 Provides:       %{_bindir}/pathfix.py
-%global with_check 1
 %if %{with_check}
 BuildRequires:  iana-etc
 BuildRequires:  tzdata
