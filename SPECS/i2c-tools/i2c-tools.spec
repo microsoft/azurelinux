@@ -1,7 +1,7 @@
 Summary:        A set of I2C tools for Linux Kernel
 Name:           i2c-tools
-Version:        4.1
-Release:        4%{?dist}
+Version:        4.3
+Release:        1%{?dist}
 License:        LGPLv2+ and GPLv2+
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -40,6 +40,7 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
 %{_sbindir}/*
 %{_libdir}/libi2c.so.0*
 %{_mandir}/man1/*.1.gz
+%{_mandir}/man3/*.3.gz
 %{_mandir}/man8/*.8.gz
 
 %files devel
@@ -49,6 +50,10 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
 %{_libdir}/libi2c.so
 
 %changelog
+* Tue Feb 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.3-1
+- Update source to v4.3
+- Include man3 directory
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.1-4
 - Remove unused `%%define sha1` lines
 - License verified
