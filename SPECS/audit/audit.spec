@@ -4,7 +4,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
 Patch0:         refuse-manual-stop.patch
 License:        GPLv2+
@@ -166,9 +166,10 @@ make %{?_smp_mflags} check
 %{python3_sitelib}/*
 
 %changelog
+*   Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 3.0-13
+-   Bump release to force rebuild with golang 1.16.14
 *   Tue Feb 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.0-12
 -   chpebeni@microsoft.com, 3.0.6.2: Remove override so auditd starts by default.
--   thcrain@microsoft.com, 3.0-12: Bump release to force rebuild with golang 1.16.14
 *   Fri Jan 21 2022 Nick Samson <nisamson@microsoft.com> - 3.0-11
 -   Removed libwrap support to remove dependency on finger
 *   Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.0-10
