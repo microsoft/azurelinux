@@ -28,9 +28,6 @@ with other cryptographic products because of the PKCS#11 interface.
 
 %package devel
 Summary:        Development package of softhsm that includes the header files
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
 Requires:       %{name} = %{version}-%{release}
 Requires:       openssl-devel
 Requires:       sqlite-devel
@@ -39,13 +36,8 @@ Requires:       sqlite-devel
 The devel package contains the libsofthsm include files
 
 %prep
-%setup -q -n %{name}-%{version}
-%patch1 -p1
+%autosetup -p1 -n %{name}-%{version}
 
-# pre-release or post-release snapshots fixup
-sed -i 's:^full_libdir=":#full_libdir=":g' configure.ac
-sed -i "s:libdir)/@PACKAGE@:libdir):" Makefile.in
-autoreconf -fiv
 # remove softhsm/ subdir auto-added to --libdir
 sed -i 's:full_libdir/softhsm:full_libdir:g' configure
 
