@@ -313,24 +313,10 @@ func PackageNamesFromSingleSystemConfig(systemConfig configuration.SystemConfig)
 func SelectKernelPackage(systemConfig configuration.SystemConfig, isLiveInstall bool) (kernelPkg string, err error) {
 	const (
 		defaultOption = "default"
-		hypervOption  = "hyperv"
 	)
 
 	optionToUse := defaultOption
 
-	// Only consider Hyper-V for an ISO
-	if isLiveInstall {
-		// Only check if running on Hyper V if there's a kernel option for it
-		_, found := systemConfig.KernelOptions[hypervOption]
-		if found {
-			isHyperV, err := isRunningInHyperV()
-			if err != nil {
-				logger.Log.Warnf("Unable to detect if the current system is Hyper-V, using the default kernel")
-			} else if isHyperV {
-				optionToUse = hypervOption
-			}
-		}
-	}
 
 	kernelPkg = systemConfig.KernelOptions[optionToUse]
 	if kernelPkg == "" {
