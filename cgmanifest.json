@@ -22414,8 +22414,8 @@
         "type": "other",
         "other": {
           "name": "python-coverage",
-          "version": "4.5.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-4.5.1.tar.gz"
+          "version": "6.3.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-6.3.2.tar.gz"
         }
       }
     },
