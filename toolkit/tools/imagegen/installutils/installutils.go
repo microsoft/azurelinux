@@ -317,7 +317,6 @@ func SelectKernelPackage(systemConfig configuration.SystemConfig, isLiveInstall 
 
 	optionToUse := defaultOption
 
-
 	kernelPkg = systemConfig.KernelOptions[optionToUse]
 	if kernelPkg == "" {
 		err = fmt.Errorf("no kernel for option (%s) set", optionToUse)
