@@ -88,7 +88,7 @@ index ef25d09..561461b 100644
      dwError = SolvGetQueryResult(pQuery, &pPkgList);
      BAIL_ON_TDNF_ERROR(dwError);
  
-@@ -1939,3 +1917,184 @@ TDNFGetPackageName(
+@@ -1939,3 +1917,183 @@ TDNFGetPackageName(
  {
      return PACKAGE_NAME;
  }
@@ -107,12 +107,11 @@ index ef25d09..561461b 100644
 +        dwError = ERROR_TDNF_INVALID_PARAMETER;
 +        BAIL_ON_TDNF_ERROR(dwError);
 +    }
-+
-+    dwError = SolvInitSack(
-+        &pSack,
-+        pTdnf->pConf->pszCacheDir,
-+        pTdnf->pArgs->pszInstallRoot,
-+        nSkipInstalledRpms);
++           dwError = SolvInitSack(
++            &pSack,
++            pTdnf->pConf->pszCacheDir,
++            pTdnf->pArgs->pszInstallRoot,
++            nSkipInstalledRpms);
 +    BAIL_ON_TDNF_ERROR(dwError);
 +
 +    dwError = TDNFLoadRepoData(
@@ -286,7 +285,7 @@ index 916388c..3700df5 100644
              dwError = SolvAddPkgInstallJob(pQueueJobs, dwId);
              BAIL_ON_TDNF_ERROR(dwError);
 diff --git a/client/init.c b/client/init.c
-index 871dae7..1bee9f5 100644
+index 871dae7..a8ccb6a 100644
 --- a/client/init.c
 +++ b/client/init.c
 @@ -37,6 +37,7 @@ TDNFCloneCmdArgs(
@@ -297,6 +296,22 @@ index 871dae7..1bee9f5 100644
      pCmdArgs->nAllowErasing  = pCmdArgsIn->nAllowErasing;
      pCmdArgs->nAssumeNo      = pCmdArgsIn->nAssumeNo;
      pCmdArgs->nAssumeYes     = pCmdArgsIn->nAssumeYes;
+@@ -116,6 +117,15 @@ TDNFCloneCmdArgs(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
++    if(!IsNullOrEmptyString(pCmdArgsIn->pszDestDir))
++    {
++       dwError = TDNFAllocateString(
++                     pCmdArgsIn->pszDestDir,
++                     &pCmdArgs->pszDestDir);
++       pCmdArgs->nDownloadOnly=1;
++       BAIL_ON_TDNF_ERROR(dwError);
++    }
++
+     pCmdArgs->nCmdCount = pCmdArgsIn->nCmdCount;
+     dwError = TDNFAllocateMemory(
+                   pCmdArgs->nCmdCount,
 diff --git a/client/packageutils.c b/client/packageutils.c
 index e130d66..510c337 100644
 --- a/client/packageutils.c
@@ -335,7 +350,7 @@ index b9164e8..125d4b2 100644
          dwError = TDNFAddPackagesForInstall(
                        pSack,
 diff --git a/client/rpmtrans.c b/client/rpmtrans.c
-index 8fa055a..2910d3d 100644
+index 8fa055a..46a6f3d 100644
 --- a/client/rpmtrans.c
 +++ b/client/rpmtrans.c
 @@ -41,7 +41,9 @@ TDNFRpmExecTransaction(
@@ -367,9 +382,9 @@ index 8fa055a..2910d3d 100644
      else
      {
 -        if (!pTdnf->pArgs->nDownloadOnly || pTdnf->pArgs->pszDownloadDir == NULL)
-+        if (!pTdnf->pArgs->nDownloadOnly ||
-+            IsNullOrEmptyString(pTdnf->pArgs->pszDownloadDir) ||
-+            IsNullOrEmptyString(pTdnf->pArgs->pszDestDir))
++        if ((!pTdnf->pArgs->nDownloadOnly ||
++             IsNullOrEmptyString(pTdnf->pArgs->pszDownloadDir)) && 
++             IsNullOrEmptyString(pTdnf->pArgs->pszDestDir))
          {
              dwError = TDNFDownloadPackageToCache(
                            pTdnf,
@@ -546,7 +561,7 @@ index a547b8a..a50cfec 100644
      char* pszConfFile;     //set conf file location
      char* pszReleaseVer;   //Release version
 diff --git a/solv/prototypes.h b/solv/prototypes.h
-index 04e877e..b04411d 100644
+index 04e877e..c71b19f 100644
 --- a/solv/prototypes.h
 +++ b/solv/prototypes.h
 @@ -315,7 +315,8 @@ uint32_t
@@ -559,22 +574,26 @@ index 04e877e..b04411d 100644
      );
  
  
-@@ -502,10 +503,11 @@ SolvCountPackages(
-     );
- 
+@@ -504,8 +505,16 @@ SolvCountPackages(
  uint32_t
--SolvReadInstalledRpms(
-+SolvInitializeSystemRepo(
+ SolvReadInstalledRpms(
      Pool* pPool,
-     Repo** ppRepo,
--    const char* pszCacheFileName
+-    Repo** ppRepo,
++    Repo** pRepo,
+     const char* pszCacheFileName
++);
++
++uint32_t
++SolvInitializeSystemRepo(
++    Pool* pPool,
++    Repo** ppRepo,
 +    const char* pszCacheFileName,
 +    int nSkipInstalledRpms
      );
  
  uint32_t
 diff --git a/solv/tdnfpool.c b/solv/tdnfpool.c
-index b22de1d..6a64f43 100644
+index b22de1d..6cc7731 100644
 --- a/solv/tdnfpool.c
 +++ b/solv/tdnfpool.c
 @@ -61,7 +61,8 @@ uint32_t
@@ -587,17 +606,28 @@ index b22de1d..6a64f43 100644
      )
  {
      uint32_t dwError = 0;
-@@ -109,7 +110,7 @@ SolvInitSack(
+@@ -109,9 +110,16 @@ SolvInitSack(
      pool_setarch(pPool, systemInfo.machine);
      pool_set_flag(pPool, POOL_FLAG_ADDFILEPROVIDESFILTERED, 1);
  
 -    dwError = SolvReadInstalledRpms(pPool, &pRepo, pszCacheDir);
-+    dwError = SolvInitializeSystemRepo(pPool, &pRepo, pszCacheDir, nSkipInstalledRpms);
-     BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
- 
+-    BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
+-
++    if(nSkipInstalledRpms){
++        pRepo = repo_create(pPool, SYSTEM_REPO_NAME);
++        if(pRepo == NULL) {
++           dwError = ERROR_TDNF_INVALID_PARAMETER;
++           BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
++        }
++    } else {
++        dwError = SolvReadInstalledRpms(pPool, &pRepo, pszCacheDir);
++        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
++    }
      pool_set_installed(pPool, pRepo);
+     pool_createwhatprovides(pPool);
+ 
 diff --git a/solv/tdnfrepo.c b/solv/tdnfrepo.c
-index d98d9c7..437d931 100644
+index d98d9c7..bcab90b 100644
 --- a/solv/tdnfrepo.c
 +++ b/solv/tdnfrepo.c
 @@ -1,4 +1,3 @@
@@ -605,33 +635,16 @@ index d98d9c7..437d931 100644
  /*
   * Copyright (C) 2015-2021 VMware, Inc. All Rights Reserved.
   *
-@@ -270,15 +269,14 @@ error:
- uint32_t
- SolvReadInstalledRpms(
-     Pool* pPool,
--    Repo** ppRepo,
-+    Repo* pRepo,
-     const char*  pszCacheFileName
+@@ -275,7 +274,7 @@ SolvReadInstalledRpms(
      )
  {
      uint32_t dwError = 0;
 -    Repo *pRepo = NULL;
++    Repo* pRepo = NULL;
      FILE *pCacheFile = NULL;
      int  dwFlags = 0;
--    if(!pPool || !ppRepo)
-+    if(!pPool || !pRepo)
-     {
-         dwError = ERROR_TDNF_INVALID_PARAMETER;
-         BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
-@@ -310,7 +308,6 @@ SolvReadInstalledRpms(
-         dwError = ERROR_TDNF_SOLV_IO;
-         BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
-     }
--    *ppRepo = pRepo;
- 
- cleanup:
-     if (pCacheFile)
-@@ -325,6 +322,55 @@ error:
+     if(!pPool || !ppRepo)
+@@ -325,6 +324,49 @@ error:
      goto cleanup;
  }
  
@@ -652,18 +665,11 @@ index d98d9c7..437d931 100644
 +        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
 +    }
 +
-+    pRepo = repo_create(pPool, SYSTEM_REPO_NAME);
-+    if(pRepo == NULL)
-+    {
-+        dwError = ERROR_TDNF_INVALID_PARAMETER;
-+        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
-+    }
-+
 +    if(!nSkipInstalledRpms)
 +    {
 +        dwError = SolvReadInstalledRpms(pPool, pRepo, pszCacheFileName);
 +        BAIL_ON_TDNF_SYSTEM_ERROR(dwError);
-+    }
++   
 +
 +    if (dwError)
 +    {
@@ -671,6 +677,7 @@ index d98d9c7..437d931 100644
 +        BAIL_ON_TDNF_LIBSOLV_ERROR(dwError);
 +    }
 +    *ppRepo = pRepo;
++    }
 +
 +cleanup:
 +    return dwError;
