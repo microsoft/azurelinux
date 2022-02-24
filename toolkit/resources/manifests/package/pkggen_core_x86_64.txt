@@ -53,8 +53,8 @@ procps-ng-3.3.17-1.cm2.x86_64.rpm
 procps-ng-devel-3.3.17-1.cm2.x86_64.rpm
 procps-ng-lang-3.3.17-1.cm2.x86_64.rpm
 m4-1.4.19-1.cm2.x86_64.rpm
-grep-3.7-1.cm2.x86_64.rpm
-grep-lang-3.7-1.cm2.x86_64.rpm
+grep-3.7-2.cm2.x86_64.rpm
+grep-lang-3.7-2.cm2.x86_64.rpm
 diffutils-3.8-1.cm2.x86_64.rpm
 gawk-5.1.0-1.cm2.x86_64.rpm
 findutils-4.8.0-2.cm2.x86_64.rpm
@@ -215,7 +215,7 @@ libksba-1.6.0-1.cm2.x86_64.rpm
 libksba-devel-1.6.0-1.cm2.x86_64.rpm
 npth-1.6-4.cm2.x86_64.rpm
 pinentry-1.2.0-1.cm2.x86_64.rpm
-gnupg2-2.3.3-1.cm2.x86_64.rpm
+gnupg2-2.3.3-2.cm2.x86_64.rpm
 gpgme-1.16.0-1.cm2.x86_64.rpm
 mariner-repos-shared-2.0-4.cm2.noarch.rpm
 mariner-repos-preview-2.0-4.cm2.noarch.rpm
