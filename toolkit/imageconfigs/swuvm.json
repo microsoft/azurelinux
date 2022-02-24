@@ -47,6 +47,7 @@
             ],
             "PackageLists": [
                 "packagelists/core-packages-image.json",
+                "packagelists/core-tools-packages.json",
                 "packagelists/hyperv-packages.json"
             ],
             "KernelOptions": {
