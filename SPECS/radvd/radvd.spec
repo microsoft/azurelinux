@@ -1,31 +1,31 @@
-Vendor:         Microsoft Corporation
-Distribution:    Mariner
-Summary: A Router Advertisement daemon
-Name: radvd
-Version: 2.18
-Release: 5%{?dist}
-
+Summary:        A Router Advertisement daemon
+Name:           radvd
+Version:        2.18
+Release:        5%{?dist}
 # The code includes the advertising clause, so it's GPL-incompatible
-License: BSD with advertising
-URL: http://www.litech.org/radvd/
-Source0: %{url}dist/%{name}-%{version}.tar.xz
-Source1: radvd-tmpfs.conf
+License:        BSD WITH advertising
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.litech.org/radvd/
+Source0:        %{url}dist/%{name}-%{version}.tar.xz
+Source1:        radvd-tmpfs.conf
 ## https://github.com/reubenhwk/radvd/commit/6e45acbf3d64b9bd945adcb3de622fd7d059ceb9.patch
-Patch0: radvd-werror.patch
-Patch1: radvd-endianess.patch
-Patch2: radvd-stderr_logging.patch
-Patch3: radvd-nodaemon_manpage,patch
-Patch4: radvd-double_free_ifacelist.patch
+Patch0:         radvd-werror.patch
+Patch1:         radvd-endianess.patch
+Patch2:         radvd-stderr_logging.patch
+Patch3:         radvd-nodaemon_manpage,patch
+Patch4:         radvd-double_free_ifacelist.patch
 
-BuildRequires: gcc
-BuildRequires: bison
-BuildRequires: flex
-BuildRequires: flex-static
-BuildRequires: pkgconfig
-BuildRequires: check-devel
-BuildRequires: systemd
+BuildRequires:  bison
+BuildRequires:  check-devel
+BuildRequires:  flex
+BuildRequires:  flex-static
+BuildRequires:  gcc
+BuildRequires:  pkg-config
+BuildRequires:  systemd
+
+Requires(pre):  shadow-utils
 %{?systemd_requires}
-Requires(pre): shadow-utils
 
 %description
 radvd is the router advertisement daemon for IPv6.  It listens to router
@@ -48,13 +48,13 @@ for F in CHANGES; do
 done
 
 %build
-export CFLAGS="$RPM_OPT_FLAGS -fPIE " 
+export CFLAGS="%{optflags} -fPIE "
 export LDFLAGS='-pie -Wl,-z,relro,-z,now,-z,noexecstack,-z,nodlopen'
 %configure \
     --with-check \
     --disable-silent-rules \
     --with-pidfile=/run/radvd/radvd.pid
-make %{?_smp_mflags} 
+make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
@@ -86,7 +86,7 @@ make check
 %pre
 getent group radvd >/dev/null || groupadd -r -g 75 radvd
 getent passwd radvd >/dev/null || \
-  useradd -r -u 75 -g radvd -d / -s /usr/sbin/nologin -c "radvd user" radvd
+  useradd -r -u 75 -g radvd -d / -s %{_sbindir}/nologin -c "radvd user" radvd
 exit 0
 
 %files

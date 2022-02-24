@@ -1,14 +1,15 @@
+Summary:        Real-time file compressor
+Name:           lzop
+Version:        1.04
+Release:        5%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:    Mariner
-Summary:	Real-time file compressor
-Name:		lzop
-Version:	1.04
-Release:	5%{?dist}
-License:	GPLv2+
-URL:		https://www.lzop.org/
-Source:		https://www.lzop.org/download/%{name}-%{version}.tar.gz
-BuildRequires:	gcc
-BuildRequires:	lzo-devel
+Distribution:   Mariner
+URL:            https://www.lzop.org/
+Source:         https://www.lzop.org/download/%{name}-%{version}.tar.gz
+
+BuildRequires:  gcc
+BuildRequires:  lzo-devel
 
 %description
 lzop is a compression utility which is designed to be a companion to gzip.
@@ -27,7 +28,7 @@ make %{?_smp_mflags}
 
 %install
 %make_install INSTALL='install -p' install
-rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}
+rm -rf %{buildroot}%{_docdir}/%{name}
 
 %files
 %{!?_licensedir:%global license %%doc}
