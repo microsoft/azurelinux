@@ -1,29 +1,24 @@
+%global _hardened_build 1
+%global softhsm_module "SoftHSM PKCS #11 Module"
+Summary:        Software version of a PKCS#11 Hardware Security Module
+Name:           softhsm
+Version:        2.6.1
+Release:        6%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#global prever rc1
-#global prerelease yes
-
-Summary: Software version of a PKCS#11 Hardware Security Module
-Name: softhsm
-Version: 2.6.1
-Release: 5%{?dist}
-License: BSD
-Url: http://www.opendnssec.org/
-Source: http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz
-Source1: http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz.sig
-
-Patch1: softhsm-2.6.1-rh1831086-exit.patch
-
-BuildRequires: openssl-devel >= 1.0.1k-6, sqlite-devel >= 3.4.2, cppunit-devel
-BuildRequires: gcc-c++, pkgconfig, p11-kit-devel
-
-Requires(pre): shadow-utils
-Requires: p11-kit
-Requires: openssl-libs >= 1.0.1k-6
-
-%global _hardened_build 1
-
-%global softhsm_module "SoftHSM PKCS #11 Module"
+URL:            https://www.opendnssec.org/
+Source0:        https://dist.opendnssec.org/source/%{name}-%{version}.tar.gz
+Patch1:         softhsm-2.6.1-rh1831086-exit.patch
+BuildRequires:  cppunit-devel
+BuildRequires:  gcc-c++
+BuildRequires:  openssl-devel >= 1.0.1k-6
+BuildRequires:  p11-kit-devel
+BuildRequires:  pkgconfig
+BuildRequires:  sqlite-devel >= 3.4.2
+Requires:       openssl-libs >= 1.0.1k-6
+Requires:       p11-kit
+Requires(pre):  shadow-utils
 
 %description
 OpenDNSSEC is providing a software implementation of a generic
@@ -32,28 +27,19 @@ designed to meet the requirements of OpenDNSSEC, but can also work together
 with other cryptographic products because of the PKCS#11 interface.
 
 %package devel
-Summary: Development package of softhsm that includes the header files
-Requires: %{name} = %{version}-%{release}, openssl-devel, sqlite-devel
-%if 0%{?prever:1} || 0%{?prerelease:1}
-BuildRequires: autoconf, libtool, automake
-%endif
+Summary:        Development package of softhsm that includes the header files
+Requires:       %{name} = %{version}-%{release}
+Requires:       openssl-devel
+Requires:       sqlite-devel
 
 %description devel
 The devel package contains the libsofthsm include files
 
 %prep
-%setup -q -n %{name}-%{version}%{?prever}
-%patch1 -p1
+%autosetup -p1 -n %{name}-%{version}
 
-%if 0%{?prever:1} || 0%{?prerelease:1}
-   # pre-release or post-release snapshots fixup
-   sed -i 's:^full_libdir=":#full_libdir=":g' configure.ac
-   sed -i "s:libdir)/@PACKAGE@:libdir):" Makefile.in
-autoreconf -fiv
-%else
-   # remove softhsm/ subdir auto-added to --libdir
-   sed -i 's:full_libdir/softhsm:full_libdir:g' configure
-%endif
+# remove softhsm/ subdir auto-added to --libdir
+sed -i 's:full_libdir/softhsm:full_libdir:g' configure
 
 %build
 %configure --libdir=%{_libdir}/pkcs11 --with-openssl=%{_prefix} --enable-ecc --enable-eddsa --disable-gost \
@@ -65,7 +51,6 @@ make %{?_smp_mflags}
 make check
 
 %install
-rm -rf %{buildroot}
 make DESTDIR=%{buildroot} install
 
 rm %{buildroot}/%{_sysconfdir}/softhsm2.conf.sample
@@ -91,7 +76,8 @@ ln -s ../pkcs11/libsofthsm2.so %{buildroot}/%{_libdir}/softhsm/libsofthsm.so
 %attr(0664,root,root) %{_datadir}/p11-kit/modules/softhsm2.module
 %attr(0750,ods,ods) %dir %{_sharedstatedir}/softhsm
 %attr(1770,ods,ods) %dir %{_sharedstatedir}/softhsm/tokens
-%doc LICENSE README.md NEWS
+%license LICENSE
+%doc README.md NEWS
 %{_mandir}/*/*
 
 %files devel
@@ -113,6 +99,9 @@ if [ -f /var/softhsm/slot0.db ]; then
 fi
 
 %changelog
+* Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.6.1-6
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.1-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

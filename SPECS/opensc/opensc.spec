@@ -1,11 +1,9 @@
 %define opensc_module "OpenSC PKCS #11 Module"
 %define nssdb %{_sysconfdir}/pki/nssdb
-
+Summary:        Smart card library and applications
 Name:           opensc
 Version:        0.20.0
-Release:        8%{?dist}
-Summary:        Smart card library and applications
-
+Release:        9%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +17,6 @@ Patch1:         opensc-0.19.0-pinpad.patch
 Patch2:         opensc-0.20.0-no-common.patch
 # https://github.com/OpenSC/OpenSC/pull/1987
 Patch3:         opensc-0.20.0-cardos.patch
-
 BuildRequires:  pcsc-lite-devel
 BuildRequires:  readline-devel
 BuildRequires:  openssl-devel
@@ -68,7 +65,6 @@ cp -p src/scconf/README.scconf .
 # No {_libdir} here to avoid multilib conflicts; it's just an example
 sed -i -e 's|/usr/local/towitoko/lib/|/usr/lib/ctapi/|' etc/opensc.conf.example.in
 
-
 %build
 autoreconf -fvi
 %ifarch %{ix86}
@@ -86,10 +82,8 @@ sed -i -e 's|"/lib /usr/lib\b|"/%{_lib} %{_libdir}|' configure # lib64 rpaths
   --with-completiondir="%{_sysconfdir}/bash_completion.d/"
 make %{?_smp_mflags} V=1
 
-
 %check
 make check
-
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
@@ -133,12 +127,12 @@ rm %{buildroot}%{_bindir}/opensc-notify
 rm %{buildroot}%{_datadir}/applications/org.opensc.notify.desktop
 rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
-%doc COPYING NEWS README*
+%license COPYING
+%doc NEWS README*
 
 %{_sysconfdir}/bash_completion.d/
 
@@ -205,8 +199,10 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_mandir}/man1/egk-tool.1*
 %{_mandir}/man5/pkcs15-profile.5*
 
-
 %changelog
+* Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.20.0-9
+- License verified.
+
 * Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.20.0-8
 - Explicitly specify bash-completion when configuring
 

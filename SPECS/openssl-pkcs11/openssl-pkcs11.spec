@@ -1,51 +1,46 @@
-Version: 0.4.10
-Release: 7%{?dist}
-
 # Define the directory where the OpenSSL engines are installed
 %global enginesdir %{_libdir}/engines-1.1
-
-Name:           openssl-pkcs11
 Summary:        A PKCS#11 engine for use with OpenSSL
+Name:           openssl-pkcs11
+Version:        0.4.10
+Release:        8%{?dist}
 # The source code is LGPLv2+ except eng_back.c and eng_parse.c which are BSD
-License:        LGPLv2+ and BSD
+License:        LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/OpenSC/libp11
 Source0:        https://github.com/OpenSC/libp11/releases/download/libp11-%{version}/libp11-%{version}.tar.gz
-
 Patch0:         openssl-pkcs11-0.4.10-various-bug-fixes.patch
 Patch1:         openssl-pkcs11-0.4.10-search-objects-in-all-matching-tokens.patch
 Patch2:         openssl-pkcs11-0.4.10-add-support-pin-source.patch
 Patch3:         openssl-pkcs11-0.4.10-set-rsa-flag-ext-pkey.patch
 Patch4:         openssl-pkcs11-0.4.10-set-rsa-fips-method-flag.patch
-
-BuildRequires:  autoconf automake libtool
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
 BuildRequires:  openssl-devel
 BuildRequires:  openssl >= 1.0.2
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(p11-kit-1)
-# Needed for testsuite
-BuildRequires:  softhsm opensc procps-ng
-
-
+%if %{with_check}
 BuildRequires:  doxygen
-
-
-Requires:       p11-kit-trust
+BuildRequires:  procps-ng
+BuildRequires:  opensc
+BuildRequires:  softhsm
+%endif
 Requires:       openssl-libs >= 1.0.2
+Requires:       p11-kit-trust
 
 # Package renamed from libp11 to openssl-pkcs11 in release 0.4.7-4
 Provides:       libp11%{?_isa} = %{version}-%{release}
 Obsoletes:      libp11 < 0.4.7-4
-# The engine_pkcs11 subpackage is also provided 
+# The engine_pkcs11 subpackage is also provided
 Provides:       engine_pkcs11%{?_isa} = %{version}-%{release}
 Obsoletes:      engine_pkcs11 < 0.4.7-4
-
 
 # The libp11-devel subpackage was removed in libp11-0.4.7-1, but not obsoleted
 # This Obsoletes prevents the conflict in updates by removing old libp11-devel
 Obsoletes:      libp11-devel < 0.4.7-4
-
 
 %description -n openssl-pkcs11
 openssl-pkcs11 enables hardware security module (HSM), and smart card support in
@@ -64,8 +59,6 @@ Requires:       %{name} = %{version}-%{release}
 The libp11-devel package contains libraries and header files for
 developing applications that use libp11.
 
-
-
 %prep
 %autosetup -p 1 -n libp11-%{version}
 
@@ -74,8 +67,6 @@ autoreconf -fvi
 export CFLAGS="%{optflags}"
 
 %configure --disable-static --enable-api-doc --with-enginesdir=%{enginesdir}
-
-
 
 make V=1 %{?_smp_mflags}
 
@@ -86,9 +77,6 @@ make install DESTDIR=%{buildroot}
 # Remove libtool .la files
 rm -f %{buildroot}%{_libdir}/*.la
 rm -f %{buildroot}%{enginesdir}/*.la
-
-
-
 
 # Remove documentation automatically installed by make install
 rm -rf %{buildroot}%{_docdir}/libp11/
@@ -104,15 +92,16 @@ make check %{?_smp_mflags} || if [ $? -ne 0 ]; then cat tests/*.log; exit 1; fi;
 %{_libdir}/libp11.so.*
 %{enginesdir}/*.so
 
-
 %files -n libp11-devel
 %doc examples/ doc/api.out/html/
 %{_libdir}/libp11.so
 %{_libdir}/pkgconfig/libp11.pc
 %{_includedir}/*.h
 
-
 %changelog
+* Tue Feb 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.4.10-8
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.10-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

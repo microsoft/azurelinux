@@ -1,17 +1,13 @@
-Name:           pcsc-lite
-Version:        1.9.0
-Release:        2%{?dist}
 Summary:        PC/SC Lite smart card framework and applications
-
+Name:           pcsc-lite
+Version:        1.9.5
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pcsclite.apdu.fr/
 Source0:        https://pcsclite.apdu.fr/files/%{name}-%{version}.tar.bz2
-Source1:        https://pcsclite.apdu.fr/files/%{name}-%{version}.tar.bz2.asc
-Source2:	gpgkey-F5E11B9FFE911146F41D953D78A1B4DFE8F9C57E.gpg
-Source3:	org.debian.pcsc-lite.policy
-
+Source1:        org.debian.pcsc-lite.policy
 BuildRequires:  doxygen
 BuildRequires:  graphviz
 BuildRequires:  systemd-devel
@@ -68,9 +64,7 @@ Requires:       %{name}-libs = %{version}-%{release}
 %description    doc
 %{summary}.
 
-
 %prep
-gpgv2 --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 
 %setup -q
 
@@ -80,7 +74,6 @@ for file in ChangeLog; do
     touch -r $file $file.new && \
     mv $file.new $file
 done
-
 
 %build
 %configure \
@@ -97,7 +90,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{_datadir}/polkit-1/actions/org.debian.pcsc-lite.policy
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/polkit-1/actions/
-install -p -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/polkit-1/actions/
+install -p -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/polkit-1/actions/
 
 # Create empty directories
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/reader.conf.d
@@ -105,10 +98,6 @@ mkdir -p $RPM_BUILD_ROOT%{_libdir}/pcsc/drivers
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/pcscd
 
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
-
-# Remove documentation installed in a wrong directory
-rm $RPM_BUILD_ROOT%{_docdir}/pcsc-lite/README.DAEMON
-
 
 %post
 %systemd_post pcscd.socket pcscd.service
@@ -129,7 +118,6 @@ fi
 %systemd_postun_with_restart pcscd.socket pcscd.service
 
 %ldconfig_scriptlets libs
-
 
 %files
 %doc AUTHORS ChangeLog HELP README SECURITY TODO
@@ -160,8 +148,11 @@ fi
 %files doc
 %doc doc/api/ doc/example/pcsc_demo.c
 
-
 %changelog
+* Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.9.5-1
+- Update to v1.9.5.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

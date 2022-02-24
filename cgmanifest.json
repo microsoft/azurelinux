@@ -16194,8 +16194,8 @@
         "type": "other",
         "other": {
           "name": "pcsc-lite",
-          "version": "1.9.0",
-          "downloadUrl": "https://pcsclite.apdu.fr/files/pcsc-lite-1.9.0.tar.bz2"
+          "version": "1.9.5",
+          "downloadUrl": "https://pcsclite.apdu.fr/files/pcsc-lite-1.9.5.tar.bz2"
         }
       }
     },
@@ -25575,8 +25575,8 @@
         "type": "other",
         "other": {
           "name": "rng-tools",
-          "version": "5",
-          "downloadUrl": "https://github.com/nhorman/rng-tools/archive/rng-tools-5.tar.gz"
+          "version": "6.14",
+          "downloadUrl": "https://github.com/nhorman/rng-tools/archive/v6.14/rng-tools-6.14.tar.gz"
         }
       }
     },
@@ -25717,6 +25717,16 @@
           "name": "rtkit",
           "version": "0.11",
           "downloadUrl": "http://0pointer.de/public/rtkit-0.11.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rtl-sdr",
+          "version": "0.6.0",
+          "downloadUrl": "https://github.com/steve-m/librtlsdr/archive/0.6.0/librtlsdr-0.6.0.tar.gz"
         }
       }
     },
