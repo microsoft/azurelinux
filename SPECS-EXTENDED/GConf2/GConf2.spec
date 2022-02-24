@@ -13,7 +13,7 @@ Summary: A process-transparent configuration system
 Name: GConf2
 Version: 3.2.6
 Release: 30%{?dist}
-License: LGPLv2+ and GPLv2+
+License: GPLv2+
 #VCS: git:git://git.gnome.org/gconf
 Source0: http://download.gnome.org/sources/GConf/3.2/GConf-%{version}.tar.xz
 Source1: macros.gconf2
@@ -184,6 +184,7 @@ fi
 %changelog
 * Wed Feb 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.6-30
 - Using the "%%python3_version" macro to use the proper "2to3-%%{python3_version}" tool.
+- License verified.
 
 * Wed Mar 10 2021 Henry Li <lihl@microsoft.com> - 3.2.6-29
 - Add python3-tools as BuildRequire to provide 2to3-3.7
