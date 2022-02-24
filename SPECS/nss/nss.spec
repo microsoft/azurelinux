@@ -14,7 +14,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.75
-Release:        6%{?dist}
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
