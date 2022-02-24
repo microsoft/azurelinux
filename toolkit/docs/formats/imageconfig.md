@@ -205,7 +205,7 @@ A sample KernelOptions specifying a default kernel:
 
 ``` json
 "KernelOptions": {
-    "default": "kernel-rt"
+    "default": "kernel"
 },
 ```
 

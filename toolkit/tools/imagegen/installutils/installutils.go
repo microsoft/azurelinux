@@ -2185,30 +2185,6 @@ func createRDiffArtifact(workDirPath, devPath, rDiffBaseImage, name string) (err
 	return shell.ExecuteLive(squashErrors, "rdiff", rdiffArgs...)
 }
 
-// isRunningInHyperV checks if the program is running in a Hyper-V Virtual Machine.
-func isRunningInHyperV() (isHyperV bool, err error) {
-	const (
-		dmesgHypervTag = "Hyper-V"
-	)
-
-	stdout, stderr, err := shell.Execute("dmesg")
-	if err != nil {
-		logger.Log.Warnf("stderr: %v", stderr)
-		return
-	}
-	logger.Log.Debugf("dmesg system: %s", stdout)
-
-	// dmesg will print information about Hyper-V if it detects that Hyper-V is the hypervisor.
-	// There will be multiple mentions of Hyper-V in the output (entry for BIOS as well as hypervisor)
-	// and diagnostic information about hypervisor version.
-	// Outside of Hyper-V, this name will not be reported.
-	if strings.Contains(stdout, dmesgHypervTag) {
-		logger.Log.Infof("Detected Hyper-V Host")
-		isHyperV = true
-	}
-	return
-}
-
 //KernelPackages returns a list of kernel packages obtained from KernelOptions in the config's SystemConfigs
 func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 	var packageList []*pkgjson.PackageVer
