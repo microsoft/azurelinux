@@ -22974,8 +22974,8 @@
         "type": "other",
         "other": {
           "name": "python-incremental",
-          "version": "23.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-23.1.0.tar.gz"
+          "version": "21.3.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-21.3.0.tar.gz"
         }
       }
     },
