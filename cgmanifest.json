@@ -22614,8 +22614,8 @@
         "type": "other",
         "other": {
           "name": "python-docutils",
-          "version": "0.14",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.14.tar.gz"
+          "version": "0.18.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.18.1.tar.gz"
         }
       }
     },
