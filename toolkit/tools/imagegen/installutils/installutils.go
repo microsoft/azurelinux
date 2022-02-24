@@ -311,9 +311,7 @@ func PackageNamesFromSingleSystemConfig(systemConfig configuration.SystemConfig)
 // SelectKernelPackage selects the kernel to use for the current installation
 // based on the KernelOptions field of the system configuration.
 func SelectKernelPackage(systemConfig configuration.SystemConfig, isLiveInstall bool) (kernelPkg string, err error) {
-	const (
-		defaultOption = "default"
-	)
+	const defaultOption = "default"
 
 	optionToUse := defaultOption
 
