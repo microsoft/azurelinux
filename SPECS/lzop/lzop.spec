@@ -3,7 +3,7 @@ Distribution:    Mariner
 Summary:	Real-time file compressor
 Name:		lzop
 Version:	1.04
-Release:	4%{?dist}
+Release:	5%{?dist}
 License:	GPLv2+
 URL:		https://www.lzop.org/
 Source:		https://www.lzop.org/download/%{name}-%{version}.tar.gz
@@ -37,6 +37,9 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}
 %{_mandir}/man?/%{name}.*
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.04-5
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.04-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

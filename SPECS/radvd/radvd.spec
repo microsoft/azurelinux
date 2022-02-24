@@ -3,7 +3,7 @@ Distribution:    Mariner
 Summary: A Router Advertisement daemon
 Name: radvd
 Version: 2.18
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # The code includes the advertising clause, so it's GPL-incompatible
 License: BSD with advertising
@@ -90,7 +90,8 @@ getent passwd radvd >/dev/null || \
 exit 0
 
 %files
-%doc CHANGES COPYRIGHT INTRO.html README TODO
+%license COPYRIGHT
+%doc CHANGES INTRO.html README TODO
 %{_unitdir}/radvd.service
 %config(noreplace) %{_sysconfdir}/radvd.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/radvd
@@ -102,6 +103,9 @@ exit 0
 %{_sbindir}/radvdump
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.18-5
+- License verified.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.18-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
