@@ -12,7 +12,7 @@ Distribution:   Mariner
 Summary: A process-transparent configuration system
 Name: GConf2
 Version: 3.2.6
-Release: 29%{?dist}
+Release: 30%{?dist}
 License: LGPLv2+ and GPLv2+
 #VCS: git:git://git.gnome.org/gconf
 Source0: http://download.gnome.org/sources/GConf/3.2/GConf-%{version}.tar.xz
@@ -90,7 +90,7 @@ development using GConf.
 
 autoreconf -i -f
 
-2to3-3.7 --write --nobackup gsettings/gsettings-schema-convert
+2to3-%{python3_version} --write --nobackup gsettings/gsettings-schema-convert
 pathfix.py -pni "%{__python3} %{py3_shbang_opts}" . gsettings/gsettings-schema-convert
 
 %build
@@ -182,6 +182,9 @@ fi
 %{_mandir}/man1/gsettings-schema-convert.1*
 
 %changelog
+* Wed Feb 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.6-30
+- Using the "%%python3_version" macro to use the proper "2to3-%%{python3_version}" tool.
+
 * Wed Mar 10 2021 Henry Li <lihl@microsoft.com> - 3.2.6-29
 - Add python3-tools as BuildRequire to provide 2to3-3.7
 - Change 2to3 to 2to3-3.7
