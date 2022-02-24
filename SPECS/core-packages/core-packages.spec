@@ -95,6 +95,7 @@ Requires:       zlib
 %changelog
 * Wed Feb 23 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0-2
 - Update Mariner Core base and container images to remove dnf vim wget by default.
+- License verified
 
 * Mon Dec 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
 - Update core-package to include new repositories for default Mariner 2.0 Preview Images
