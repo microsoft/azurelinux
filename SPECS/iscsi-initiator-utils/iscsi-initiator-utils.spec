@@ -1,5 +1,4 @@
 %global __provides_exclude_from ^(%{python2_sitearch}/.*\\.so|%{python3_sitearch}/.*\\.so)$
-%global debug_package %{nil}
 
 # Use only 7-10 first characters of the git commit hash!
 %global git_commit            2a8f9d81d0d6b5094c3fe9c686e2afb2ec27058a
@@ -45,7 +44,7 @@ Patch0022:      0022-iscsi_if.h-replace-zero-length-array-with-flexible-a.patch
 Patch0023:      0023-stop-using-Werror-for-now.patch
 Patch0024:      0024-minor-service-file-updates.patch
 Patch0025:      0025-Remove-dependences-from-iscsi-init.service.patch
-Patch0026:      fix-libpath.patch
+Patch0026:      0026-fix-libpath.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
