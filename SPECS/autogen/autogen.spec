@@ -1,21 +1,22 @@
-Summary:	The Automated Text and Program Generation Tool
-Name:		autogen
-Version:    5.18.16
-Release:    7%{?dist}
+Summary:        The Automated Text and Program Generation Tool
+Name:           autogen
+Version:        5.18.16
+Release:        8%{?dist}
 License:        GPLv3+
-URL:            http://www.gnu.org/software/autogen/
-Source0:        ftp://ftp.gnu.org/gnu/autogen/rel%{version}/%{name}-%{version}.tar.xz
-Group:		System Environment/Tools
+URL:            https://www.gnu.org/software/autogen/
+Source0:        https://ftp.gnu.org/gnu/autogen/rel%{version}/%{name}-%{version}.tar.xz
+Group:          System Environment/Tools
 Vendor:         Microsoft Corporation
-BuildRequires:	guile-devel
-BuildRequires:	gc-devel
-BuildRequires:	which
+BuildRequires:  guile-devel
+BuildRequires:  gc-devel
+BuildRequires:  which
 BuildRequires:  perl
+BuildRequires:  perl(lib)
 
-Requires:	guile
-Requires:	gc
-Requires:	gmp
-Requires:   %{name}-libopts
+Requires:       guile
+Requires:       gc
+Requires:       gmp
+Requires:       %{name}-libopts
 Distribution:   Mariner
 %description
 AutoGen is a tool designed to simplify the creation and maintenance of programs that contain large amounts of repetitious text. It is especially valuable in programs that have several blocks of text that must be kept synchronized.
@@ -48,7 +49,8 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-make %{?_smp_mflags} check
+# Running the test parallely is flaky and hangs the pipeline sometimes. Avoid using `-j` flags
+make -k check
 
 %post	libopts -p /sbin/ldconfig
 %postun	libopts -p /sbin/ldconfig
@@ -80,6 +82,11 @@ make %{?_smp_mflags} check
 %exclude /usr/share/info/
 
 %changelog
+* Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 5.18.16-8
+- Add an explicit BR on `perl(lib)` to enable build
+- Drop parallel `%{?_smp_mflags}` make flags to enable ptest
+- Switch Source urls to `https`
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.18.16-7
 - Remove libtool archive files from final packaging
 

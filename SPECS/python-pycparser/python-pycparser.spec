@@ -1,7 +1,7 @@
 Summary:        Python C parser
 Name:           python-pycparser
 Version:        2.18
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,9 +31,7 @@ pycparser is a complete parser of the C language, written in pure Python using t
 %py3_install
 
 %check
-pushd
-%python3 all_tests.py
-popd
+%python3 tests/all_tests.py
 
 %files -n python3-pycparser
 %defattr(-,root,root,-)
@@ -41,6 +39,10 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 2.18-5
+- Fix test path `tests/all_tests.py` instead of `all_tests.py` to enable ptest
+- Drop unnecessary `pushd/popd`
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.18-4
 - Add license to python3 package
 - Remove python2 package

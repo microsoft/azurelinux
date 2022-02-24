@@ -1,7 +1,7 @@
 Summary:        CAC (Common Access Card) library
 Name:           libcacard
 Version:        2.7.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,10 @@ BuildRequires:  gnutls-utils
 BuildRequires:  nss-devel
 BuildRequires:  nss-tools
 BuildRequires:  openssl
+%if %{with_check}
+BuildRequires:  softhsm
+BuildRequires:  opensc
+%endif
 
 %description
 This library provides emulation of smart cards to a virtual card
@@ -63,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/libcacard.pc
 
 %changelog
+* Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 2.7.0-9
+- Add an explicit BR on `softhsm` & `opensc` to enable ptest
+
 * Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.0-8
 - Using CBL-Mariner RPM macros for "make".
 - Removing unnecessary in-spec signature check.

@@ -1,7 +1,7 @@
 Summary:        A library that provides compression and decompression of file formats used by Microsoft
 Name:           libmspack
 Version:        0.10.1alpha
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,8 +32,7 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-cd test
-./cabd_test
+make -k check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -51,6 +50,9 @@ cd test
 %{_libdir}/*.so
 
 %changelog
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsfot.com> - 0.10.1alpha-2
+- Use `make -k check` to enable ptest
+
 * Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 0.10.1alpha-1
 - Upgrade to version 0.10.1alpha
 - Remove binaries under /usr/bin

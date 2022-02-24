@@ -20,7 +20,7 @@
 %define lname libgd3
 Name:           gd
 Version:        2.3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -38,6 +38,9 @@ BuildRequires:  fontconfig-devel
 # needed for tests
 BuildRequires:  libjpeg-devel
 BuildRequires:  libpng-devel
+%if %{with_check}
+BuildRequires:  fontawesome-fonts
+%endif
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(libtiff-4)
@@ -153,6 +156,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+* Fri Feb 04 2022 Muhammad Falak <mwani@microsoft.com> - 2.3.0-4
+- Add an explicit BR on 'fontawesome-fonts' to enable ptest
+
 * Wed Jan 26 2022 Henry Li <lihl@microsoft.com> - 2.3.0-3
 - License Verified
 - Fix linting

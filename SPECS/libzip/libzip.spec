@@ -1,19 +1,18 @@
-Name:           libzip
-Version:        1.7.3
-Release:        5%{?dist}
 Summary:        C library for reading, creating, and modifying zip archives
+Name:           libzip
+Version:        1.8.0
+Release:        1%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-License:        BSD
 URL:            https://libzip.org/
 Source0:        https://libzip.org/download/libzip-%{version}.tar.xz
-
-BuildRequires:  gcc
-BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
+BuildRequires:  cmake >= 3.0.2
+BuildRequires:  gcc
 BuildRequires:  openssl-devel
 BuildRequires:  xz-devel
-BuildRequires:  cmake >= 3.0.2
+BuildRequires:  zlib-devel
 # Needed to run the test suite
 # find regress/ -type f | /usr/lib/rpm/perl.req
 # find regress/ -type f | /usr/lib/rpm/perl.prov
@@ -33,30 +32,27 @@ BuildRequires:  perl(warnings)
 
 %description
 libzip is a C library for reading, creating, and modifying zip archives. Files
-can be added from data buffers, files, or compressed data copied directly from 
-other zip archives. Changes made without closing the archive can be reverted. 
+can be added from data buffers, files, or compressed data copied directly from
+other zip archives. Changes made without closing the archive can be reverted.
 The API is documented by man pages.
 
-
 %package devel
-Summary:  Development files for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %package tools
-Summary:  Command line tools from %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Command line tools from %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description tools
 The %{name}-tools package provides command line tools split off %{name}:
 - zipcmp
 - zipmerge
 - ziptool
-
 
 %prep
 %autosetup -p1
@@ -109,8 +105,10 @@ make check
 %{_libdir}/libzip.so
 %{_libdir}/pkgconfig/libzip.pc
 
-
 %changelog
+* Mon Feb 07 2022 Henry Li <lihl@microsoft.com> - 1.8.0-1
+- Upgrade to version 1.8.0
+
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.7.3-5
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

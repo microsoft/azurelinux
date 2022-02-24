@@ -1,7 +1,7 @@
 Summary:        WebSocket client for python
 Name:           python-websocket-client
 Version:        0.56.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ Requires:       python3
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
+BuildRequires:  python3-pip
 %endif
 
 %description -n python3-websocket-client
@@ -37,6 +38,8 @@ WebSocket client for python3
 %py3_install
 
 %check
+pip3 install six
+pip3 install unittest2==0.8.0
 %python3 setup.py test
 
 %files -n python3-websocket-client
@@ -46,6 +49,9 @@ WebSocket client for python3
 %{_bindir}/wsdump.py
 
 %changelog
+* Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 0.56.0-4
+- Install `six` & `unittest2` to enable ptest.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.56.0-3
 - Add license, wsdump.py binary to python3 package
 - Remove python2 package

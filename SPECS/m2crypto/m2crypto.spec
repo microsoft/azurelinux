@@ -1,13 +1,14 @@
 Summary:        Crypto and SSL toolkit for Python
 Name:           m2crypto
-Version:        0.35.2
-Release:        9%{?dist}
+Version:        0.38.0
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/M2Crypto
-Source0:        https://files.pythonhosted.org/packages/74/18/3beedd4ac48b52d1a4d12f2a8c5cf0ae342ce974859fba838cbbc1580249/M2Crypto-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-%{version}.tar.gz
+Patch0:         0001-skip-test_tls1_nok-which-cant-be-run-in-FIPS.patch
 
 %description
 M2Crypto is a crypto and SSL toolkit for Python
@@ -21,6 +22,9 @@ BuildRequires:  python3-xml
 BuildRequires:  swig
 Requires:       openssl >= 1.1.1g-6
 Requires:       python3
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description -n python3-m2crypto
 M2Crypto is a crypto and SSL toolkit for Python featuring the following:
@@ -33,7 +37,7 @@ server. S/MIME. ZServerSSL: A HTTPS server for Zope. ZSmime: An S/MIME
 messenger for Zope.
 
 %prep
-%autosetup -n M2Crypto-%{version}
+%autosetup -n M2Crypto-%{version} -p1
 
 %build
 %py3_build
@@ -42,6 +46,8 @@ messenger for Zope.
 %py3_install
 
 %check
+pip3 install parameterized
+#Testing: MiscSSLClientTestCase failing with SSLError not raised
 %python3 setup.py test
 
 %files -n python3-m2crypto
@@ -50,6 +56,13 @@ messenger for Zope.
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 11 2022 Muhammad Falak <mwani@microsoft.com> - 0.38.0-2
+- Introduce patch to skip tests which can not run on FIPS mode & TLS1
+
+* Wed Feb 02 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.38.0-1
+- Update to version v0.38.0
+- Added parameterized as BR and pip install in check section.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.35.2-9
 - Add license to python3 package
 - Remove python3-typing requirement

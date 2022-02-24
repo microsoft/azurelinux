@@ -1,7 +1,7 @@
 Summary:        Netfilter Tables userspace utillites
 Name:           nftables
-Version:        0.9.3
-Release:        5%{?dist}
+Version:        1.0.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,22 +9,14 @@ URL:            https://netfilter.org/projects/nftables/
 Source0:        %{url}/files/%{name}-%{version}.tar.bz2
 Source1:        nftables.service
 Source2:        nftables.conf
-# https://bugzilla.redhat.com/show_bug.cgi?id=1834853
-Patch0:         nftables-fix_json_events.patch
-Patch1:         0001-tests-json_echo-Fix-for-Python3.patch
-Patch2:         0002-tests-json_echo-Support-testing-host-binaries.patch
-Patch3:         0003-tests-monitor-Support-running-individual-test-cases.patch
-Patch4:         0004-tests-monitor-Support-testing-host-s-nft-binary.patch
-Patch5:         0005-tests-py-Support-testing-host-binaries.patch
-Patch6:         0006-tests-monitor-use-correct-nft-value-in-EXIT-trap.patch
-Patch7:         0007-scanner-incorrect-error-reporting-after-file-inclusi.patch
-Patch8:         0008-scanner-move-the-file-descriptor-to-be-in-the-input_.patch
-Patch9:         0009-scanner-move-indesc-list-append-in-scanner_push_inde.patch
-Patch10:        0010-scanner-remove-parser_state-indescs-static-array.patch
-Patch11:        0011-Inclusion-depth-was-computed-incorrectly-for-glob-in.patch
-Patch12:        0012-scanner-fix-indesc_list-stack-to-be-in-the-correct-o.patch
-Patch13:        0013-scanner-remove-parser_state-indesc_idx.patch
-Patch14:        0014-scanner-use-list_is_first-from-scanner_pop_indesc.patch
+Source3:        main.nft
+Source4:        router.nft
+Source5:        nat.nft
+
+# already upstream at https://git.netfilter.org/nftables/commit/?id=8492878961248b4b53fa97383c7c1b15d7062947
+Patch1:         nftables-1.0.1-drop-historyh.patch
+# already upstream at https://git.netfilter.org/nftables/commit/?id=3847fccf004525ceb97db6fbc681835b0ac9a61a
+Patch2:         nftables-1.0.1-fix-terse.patch
 
 BuildRequires:  asciidoc
 BuildRequires:  bison
@@ -33,8 +25,10 @@ BuildRequires:  gcc
 BuildRequires:  gmp-devel
 BuildRequires:  iptables-devel
 BuildRequires:  jansson-devel
+BuildRequires:  libedit-devel
 BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
+BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  readline-devel
 BuildRequires:  systemd
@@ -66,7 +60,7 @@ The nftables python module provides an interface to libnftables via ctypes.
 %build
 #./autogen.sh
 %configure --disable-silent-rules --with-xtables --with-json \
-	--enable-python --with-python-bin=python3
+	--enable-python --with-python-bin=%{__python3}
 %make_build
 
 %install
@@ -76,6 +70,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 # Don't ship static lib (for now at least)
 rm -f %{buildroot}/%{_libdir}/libnftables.a
 
+# drop vendor-provided configs, they are not really useful
+rm -f %{buildroot}/%{_datadir}/nftables/*.nft
+
 chmod 644 %{buildroot}/%{_mandir}/man8/nft*
 
 mkdir -p %{buildroot}/%{_unitdir}
@@ -83,11 +80,14 @@ cp -a %{SOURCE1} %{buildroot}/%{_unitdir}/
 
 mkdir -p %{buildroot}/%{_sysconfdir}/sysconfig
 cp -a %{SOURCE2} %{buildroot}/%{_sysconfdir}/sysconfig/
-chmod 600 %{buildroot}/%{_sysconfdir}/sysconfig/nftables.conf
 
-mkdir -m 700 -p %{buildroot}/%{_sysconfdir}/nftables
-chmod 600 %{buildroot}/%{_sysconfdir}/nftables/*.nft
-chmod 700 %{buildroot}/%{_sysconfdir}/nftables
+
+cp %{SOURCE3} %{SOURCE4} %{SOURCE5} \
+	%{buildroot}/%{_sysconfdir}/nftables/
+
+find %{buildroot}/%{_sysconfdir} \
+	\( -type d -exec chmod 0700 {} \; \) , \
+	\( -type f -exec chmod 0600 {} \; \)
 
 # make nftables.py use the real library file name
 # to avoid nftables-devel package dependency
@@ -128,6 +128,10 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 %{python3_sitelib}/nftables/
 
 %changelog
+* Tue Feb 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.0.1-1
+- CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+
 * Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Dropped the epoch number.

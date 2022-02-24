@@ -1,7 +1,7 @@
 Summary:        World timezone definitions, modern and historical
 Name:           pytz
-Version:        2018.5
-Release:        6%{?dist}
+Version:        2021.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,8 +19,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
 BuildRequires:  unzip
 %if %{with_check}
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
+BuildRequires:  python3-pip
 %endif
 Requires:       python3
 Requires:       tzdata
@@ -42,9 +41,19 @@ Library Reference (``datetime.tzinfo``).
 %py3_install
 
 %check
-PATH=%{buildroot}%{_bindir}:${PATH} \
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    py.test%{python3_version} -v
+pip3 install --upgrade pip wheel flake8
+pushd pytz/tests
+check_status=0
+%python3 test_lazy.py -vv
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+%python3 test_tzinfo.py -vv
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+popd
+[[ $check_status -eq 0 ]]
 
 %files -n python3-pytz
 %defattr(-,root,root,-)
@@ -52,6 +61,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
+* Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 2021.3-1
+- Bump version to 2021.3
+- Add an explicit BR on `pip` & remove un-needed deps
+- Use correct test files to enable ptest
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2018.5-6
 - Add license to python3 package
 - Remove python2 package

@@ -1,7 +1,7 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,8 +20,7 @@ BuildRequires:  sqlite-devel
 BuildRequires:  swig
 BuildRequires:  utf8proc-devel
 %if %{with_check}
-BuildRequires:  python-xml
-BuildRequires:  python2
+BuildRequires:  python3
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
@@ -103,6 +102,9 @@ sudo -u test make check && userdel test -r -f
 %{_mandir}/man3/SVN*
 
 %changelog
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 1.14.1-2
+- Use python3 during %%check section instead of python2
+
 * Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.14.1-1
 - Update to version 1.14.1.
 

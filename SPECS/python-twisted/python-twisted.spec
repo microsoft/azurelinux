@@ -1,7 +1,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        19.2.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,11 @@ BuildRequires:  python3-pyOpenSSL
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-zope-interface
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  sudo
+%endif
+
 AutoReqProv:    no
 
 %description
@@ -62,7 +67,7 @@ chmod g+w . -R
 useradd test -G root -m
 pip3 install --upgrade tox
 chmod g+w . -R
-LANG=en_US.UTF-8 sudo -u test tox -e py36-tests
+LANG=en_US.UTF-8 sudo -u test tox -e py39
 
 %files -n python3-twisted
 %defattr(-,root,root)
@@ -87,6 +92,10 @@ LANG=en_US.UTF-8 sudo -u test tox -e py36-tests
 %{_bindir}/cftp3
 
 %changelog
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 19.2.1-9
+- Add an explicit BR on 'pip' & 'sudo'
+- Use `py39` as tox environment to enable ptest
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 19.2.1-8
 - Replace easy_install usage with pip in %%check sections
 

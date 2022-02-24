@@ -43,7 +43,7 @@ Distribution:   Mariner
 Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Version:       1.44.0
-Release:       4%{?dist}
+Release:       5%{?dist}
 License:       LGPLv2+
 
 # Source and patches.
@@ -62,9 +62,14 @@ Source6:       yum.conf.in
 # Maintainer script which helps with handling patches.
 Source8:       copy-patches.sh
 
+# Build cache RPMS configuration for tdnf downloading
+# This is a copy of toolkit/resources/manifests/package/local.repo
+Source9:       tdnf-build-cache.repo
+
 # Upstream patches not present in 1.44.0
 Patch0:        libguestfs-ocaml413compat.patch
 Patch1:        libguestfs-config-rpm.patch
+Patch2:        libguestfs-file-5.40.patch
 
 %if 0%{patches_touch_autotools}
 BuildRequires: autoconf, automake, libtool, gettext-devel
@@ -124,6 +129,7 @@ BuildRequires: xz
 BuildRequires: /usr/bin/qemu-img
 BuildRequires: perl(Win::Hivex)
 BuildRequires: perl(Win::Hivex::Regedit)
+BuildRequires: tdnf
 
 # For language bindings.
 BuildRequires: ocaml
@@ -142,7 +148,7 @@ BuildRequires: perl(Test::Pod) >= 1.00
 BuildRequires: perl(Test::Pod::Coverage) >= 1.00
 BuildRequires: perl(Module::Build)
 BuildRequires: perl(ExtUtils::CBuilder)
-BuildRequires: perl(Locale::TextDomain)
+BuildRequires: perl-libintl-perl
 BuildRequires: python3-devel
 BuildRequires: python3-libvirt
 BuildRequires: ruby-devel
@@ -174,17 +180,12 @@ BuildRequires: attr
 BuildRequires: augeas-libs
 BuildRequires: bash
 BuildRequires: binutils
-%if !0%{?rhel}
 BuildRequires: btrfs-progs
-%endif
 BuildRequires: bzip2
 BuildRequires: coreutils
 BuildRequires: cpio
 BuildRequires: cryptsetup
 BuildRequires: curl
-%if !0%{?rhel}
-#BuildRequires: debootstrap
-%endif
 BuildRequires: dhclient
 BuildRequires: diffutils
 BuildRequires: dosfstools
@@ -229,20 +230,20 @@ BuildRequires: sleuthkit
 BuildRequires: squashfs-tools
 BuildRequires: strace
 %ifarch x86_64
-BuildRequires: syslinux syslinux-devel
+BuildRequires: syslinux
+BuildRequires: syslinux-devel
 %endif
 BuildRequires: systemd
 BuildRequires: tar
 BuildRequires: udev
 BuildRequires: util-linux
-BuildRequires: vim-minimal
+BuildRequires: vim
 BuildRequires: which
 BuildRequires: xfsprogs
 BuildRequires: xz
 BuildRequires: yajl
 BuildRequires: zerofree
 %ifnarch aarch64
-# http://zfs-fuse.net/issues/94
 BuildRequires: zfs-fuse
 %endif
 
@@ -281,7 +282,7 @@ Requires:      libvirt-daemon-driver-qemu
 Requires:      libvirt-daemon-driver-secret
 Recommends:    libvirt-daemon-driver-storage-core
 Requires:      libvirt-daemon-kvm >= 5.3.0
-Requires:      selinux-policy >= 3.11.1-63
+Recommends:    selinux-policy
 
 %ifarch aarch64
 Requires:      edk2-aarch64
@@ -332,7 +333,6 @@ For enhanced features, install:
  libguestfs-inspect-icons  adds support for inspecting guest icons
         libguestfs-rescue  enhances virt-rescue shell with more tools
          libguestfs-rsync  rsync to/from guest filesystems
-           libguestfs-ufs  adds UFS (BSD) support
            libguestfs-xfs  adds XFS support
            libguestfs-zfs  adds ZFS support
 
@@ -410,16 +410,6 @@ Requires:      %{name}%{?_isa} = %{version}-%{release}
 %description rsync
 This adds rsync support to %{name}.  Install it if you want to use
 rsync to upload or download files into disk images.
-
-
-%package ufs
-Summary:       UFS (BSD) support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
-%description ufs
-This adds UFS support to %{name}.  Install it if you want to process
-disk images containing UFS (BSD filesystems).
 
 
 %package xfs
@@ -754,8 +744,7 @@ for %{name}.
 
 
 %prep
-%setup -q
-%autopatch -p1
+%autosetup -p1
 
 %if 0%{patches_touch_autotools}
 autoreconf -i
@@ -775,8 +764,93 @@ fi
 mv README README.orig
 sed 's/@VERSION@/%{version}/g' < %{SOURCE4} > README
 
+# Re-enable upstream cache and local repos
+mkdir -pv /etc/yum.repos.d
+cp %{SOURCE9} /etc/yum.repos.d/allrepos.repo
+
+# Download appliance, since our chroot TDNF config does not have `keepcache=1`
+# Must keep in sync with BRs under "Build requirements for the appliance"
+# Download to
+mkdir -pv /var/cache/tdnf
+tdnf download -y --disablerepo=* \
+  --enablerepo=local-repo --enablerepo=upstream-cache-repo \
+  --alldeps --destdir /var/cache/tdnf \
+    acl \
+    attr \
+    augeas-libs \
+    bash \
+    binutils \
+    btrfs-progs \
+    bzip2 \
+    coreutils \
+    cpio \
+    cryptsetup \
+    curl \
+    dhclient \
+    diffutils \
+    dosfstools \
+    e2fsprogs \
+    file \
+    findutils \
+    gawk \
+    gdisk \
+    genisoimage \
+    gfs2-utils \
+    grep \
+    gzip \
+    hivex \
+    iproute \
+    iputils \
+    kernel \
+    kmod \
+    kpartx \
+    less \
+    libcap \
+    libldm \
+    libselinux \
+    libxml2 \
+    lsof \
+    lsscsi \
+    lvm2 \
+    lzop \
+    mdadm \
+    ntfs-3g ntfsprogs \
+    ntfs-3g-system-compression \
+    openssh-clients \
+    parted \
+    pciutils \
+    pcre \
+    policycoreutils \
+    procps \
+    psmisc \
+    qemu-img \
+    rsync \
+    scrub \
+    sed \
+    sleuthkit \
+    squashfs-tools \
+    strace \
+%ifarch x86_64
+    syslinux \
+    syslinux-devel \
+%endif
+    systemd \
+    tar \
+    udev \
+    util-linux \
+    vim \
+    which \
+    xfsprogs \
+    xz \
+    yajl \
+    zerofree \
+%ifnarch aarch64
+    zfs-fuse \
+%endif
+
+
 mkdir cachedir repo
-find /var/cache/{dnf,tdnf} -type f -name '*.rpm' -print0 | \
+find /var/cache/tdnf -type f -name '*.rpm' -print0 | \
   xargs -0 -n 1 cp -t repo
 createrepo_c repo
 sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
@@ -832,6 +906,15 @@ fi
 # included in the -devel subpackage, compress it to reduce
 # installation size.
 gzip -9 ChangeLog
+
+# supermin prepare does not detect configuration files for Mariner, so create
+# our own base tarball out of the root filesystem RPM
+mkdir -pv mariner-filesystem
+pushd mariner-filesystem
+rpm2cpio /var/cache/tdnf/filesystem*.rpm | cpio -id
+popd
+tar -czvf base.tar.gz mariner-filesystem
+mv base.tar.gz appliance/supermin.d/
 
 # 'INSTALLDIRS' ensures that Perl and Ruby libs are installed in the
 # vendor dir not the site dir.
@@ -899,7 +982,7 @@ move_to lsof            zz-packages-rescue
 move_to openssh-clients zz-packages-rescue
 move_to pciutils        zz-packages-rescue
 move_to strace          zz-packages-rescue
-move_to vim-minimal     zz-packages-rescue
+move_to vim             zz-packages-rescue
 move_to rsync           zz-packages-rsync
 move_to xfsprogs        zz-packages-xfs
 %ifnarch aarch64
@@ -981,9 +1064,6 @@ rm ocaml/html/.gitignore
 
 %files rescue
 %{_libdir}/guestfs/supermin.d/zz-packages-rescue
-
-%files ufs
-%{_libdir}/guestfs/supermin.d/zz-packages-ufs
 
 %files xfs
 %{_libdir}/guestfs/supermin.d/zz-packages-xfs
@@ -1188,13 +1268,20 @@ rm ocaml/html/.gitignore
 
 
 %changelog
+* Sat Feb 05 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-5
+- Add patch to fix UUID parsing with file >= 5.40
+- Downgrade selinux-policy requirement to a recommendation without a version constraint
+- Bump release number to 5
+
 * Thu Jan 20 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-3
 - Remove Fedora-specific comments/macros
+- Use TDNF to get build-cached RPMs
 - Remove link to highjacked upstream bug tracker
 - Conditionally include PHP deps (off by default)
 - Patch ocaml support, RPM config support
 - Disable inspect-icons support by default (we don't have ghostscript)
-- Remove reiserfs, nilfs, jfs, hfsplus completely
+- Remove reiserfs, nilfs, jfs, hfsplus, ufs completely
+- Replace perl(Locale::TextDomain) BR with actual provider perl-libintl-perl
 - License verified
 
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.44.0-2

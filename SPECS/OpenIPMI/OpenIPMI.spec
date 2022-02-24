@@ -1,7 +1,7 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
 Version:        2.0.25
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,11 +10,13 @@ URL:            https://sourceforge.net/projects/openipmi/
 Source0:        https://sourceforge.net/projects/openipmi/files/latest/download/openipmi-%{version}.tar.gz
 Source1:        openipmi-helper
 Source2:        ipmi.service
+# Enable detection of python versions with deprecated distutils modules (Source: Fedora 28, MIT license)
+Patch0:         %{name}-py39.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  perl
 BuildRequires:  popt-devel
-BuildRequires:  python2-devel
+BuildRequires:  python3-devel
 BuildRequires:  swig
 BuildRequires:  systemd
 Requires:       systemd
@@ -46,7 +48,7 @@ A Perl interface for OpenIPMI.
 Summary:        Python interface for OpenIPMI
 Group:          Utilities
 Requires:       OpenIPMI = %{version}-%{release}
-Requires:       python2
+Requires:       python3
 Provides:       python3-openipmi = %{version}-%{release}
 
 %description    python
@@ -69,7 +71,8 @@ Requires:       OpenIPMI = %{version}-%{release}
 This package contains a network IPMI listener.
 
 %prep
-%setup -q
+%autosetup -p1
+autoreconf -fiv
 
 %build
 # USERFIX: Things you might have to add to configure:
@@ -81,7 +84,9 @@ This package contains a network IPMI listener.
     --with-tkinter=no                       \
     --docdir=%{_docdir}/%{name}-%{version}  \
     --with-perl=yes                         \
-    --with-perlinstall=%{perl_vendorarch}
+    --with-perlinstall=%{perl_vendorarch}   \
+    --with-python=%python3                  \
+    --with-pythoninstall=%{python3_sitearch}
 make
 
 %install
@@ -100,7 +105,7 @@ install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ipmi.preset
 
 #The build VM does not support ipmi.
-#%check
+#%%check
 #make %{?_smp_mflags} check
 
 %preun
@@ -139,7 +144,8 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 
 %files python
 %defattr(-,root,root)
-%{_libdir}/python*/site-packages/*OpenIPMI.*
+%{python3_sitelib}/*OpenIPMI.*
+%{python3_sitelib}/__pycache__/*
 %doc swig/OpenIPMI.i
 
 %files devel
@@ -184,6 +190,11 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.0.25-7
+- Use python3 instead of python2 in python subpackage
+- Add Fedora patch to enable build with python >= 3.9
+- License verified
+
 * Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 2.0.25-6
 - Provides python3-openipmi from OpenIPMI-python
 

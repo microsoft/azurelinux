@@ -67,16 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.2.1 API Headers
-tar xf kernel-5.15.2.1.tar.gz
-cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1/
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1
-patch -p1 -i 0002-add-linux-syscall-license-info.patch
+echo Linux-5.15.18.1 API Headers
+tar xf kernel-5.15.18.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -677,9 +675,9 @@ popd
 rm -rf gettext-0.19.8.1
 touch /logs/status_gettext_complete
 
-echo Elfutils-0.185
-tar xjf elfutils-0.185.tar.bz2
-pushd elfutils-0.185
+echo Elfutils-0.186
+tar xjf elfutils-0.186.tar.bz2
+pushd elfutils-0.186
 ./configure \
     --prefix=/usr \
     --disable-debuginfod \
@@ -692,7 +690,7 @@ make -C libdw install
 # Need to install (eu-strip) as well
 make install
 popd
-rm -rf elfutils-0.185
+rm -rf elfutils-0.186
 touch /logs/status_libelf_complete
 
 echo Libffi-3.4.2
@@ -904,23 +902,21 @@ popd
 rm -rf patch-2.7.6
 touch /logs/status_patch_complete
 
-echo Man-DB-2.8.4
-tar xf man-db-2.8.4.tar.xz
-pushd man-db-2.8.4
+echo Man-DB-2.10.1
+tar xf man-db-2.10.1.tar.xz
+pushd man-db-2.10.1
 ./configure --prefix=/usr                        \
-            --docdir=/usr/share/doc/man-db-2.8.4 \
+            --docdir=/usr/share/doc/man-db-2.10.1 \
             --sysconfdir=/etc                    \
             --disable-setuid                     \
-            --enable-cache-owner=bin             \
             --with-browser=/usr/bin/lynx         \
+            --with-systemdsystemunitdir=no       \
             --with-vgrind=/usr/bin/vgrind        \
-            --with-grap=/usr/bin/grap            \
-            --with-systemdtmpfilesdir=           \
-            --with-systemdsystemunitdir=
+            --with-grap=/usr/bin/grap
 make -j$(nproc)
 make install
 popd
-rm -rf man-db-2.8.4
+rm -rf man-db-2.10.1
 touch /logs/status_man_db_complete
 
 echo Tar-1.34
@@ -995,9 +991,9 @@ touch /logs/status_util-linux_complete
 echo Building RPM related packages
 cd /sources
 
-echo sqlite-autoconf-3320100
-tar xf sqlite-autoconf-3320100.tar.gz
-pushd sqlite-autoconf-3320100
+echo sqlite-autoconf-3360000
+tar xf sqlite-autoconf-3360000.tar.gz
+pushd sqlite-autoconf-3360000
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \
@@ -1012,7 +1008,7 @@ pushd sqlite-autoconf-3320100
 make -j$(nproc)
 make install
 popd
-rm -rf sqlite-autoconf-3320100
+rm -rf sqlite-autoconf-3360000
 touch /logs/status_sqlite-autoconf_complete
 
 echo nspr-4.21

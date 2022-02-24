@@ -110,7 +110,7 @@ popd
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}-%{version}
 
 %files
-%license LICENSE
+%license LICENSE.txt
 %defattr(0644,root,root,0755)
 %doc README.SUSE
 %dir %{_javadir}/%{name}
@@ -123,13 +123,14 @@ popd
 %endif
 
 %files javadoc
-%license LICENSE
+%license LICENSE.txt
 %defattr(-,root,root,-)
 %{_javadocdir}/%{name}-%{version}
 
 %changelog
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.7-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
+- License verified.
 
 * Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 0.7.7-4.9
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).

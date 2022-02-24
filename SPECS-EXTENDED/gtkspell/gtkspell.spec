@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name: gtkspell
 Version: 2.0.16
-Release: 21%{?dist}
+Release: 23%{?dist}
 License: GPLv2+
 Summary: On-the-fly spell checking for GtkTextView widgets
 URL: http://gtkspell.sourceforge.net/
@@ -13,6 +13,7 @@ Source: http://gtkspell.sourceforge.net/download/%{name}-%{version}.tar.gz
 ### Build Dependencies ###
 
 BuildRequires: gcc
+BuildRequires: perl(File::Find)
 BuildRequires: make
 BuildRequires: enchant-devel
 BuildRequires: gtk2-devel
@@ -51,7 +52,8 @@ find $RPM_BUILD_ROOT -name "*.la" -exec rm {} \;
 %ldconfig_scriptlets
 
 %files -f %{name}.lang
-%doc README AUTHORS COPYING
+%license COPYING
+%doc README AUTHORS
 %{_libdir}/libgtkspell.so.0*
 
 %files devel
@@ -61,6 +63,12 @@ find $RPM_BUILD_ROOT -name "*.la" -exec rm {} \;
 %{_libdir}/pkgconfig/gtkspell-2.0.pc
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.16-23
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.16-22
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.16-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
