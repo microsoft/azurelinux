@@ -42,7 +42,7 @@ executable, and which have been executed.
 
 %check
 pip3 install tox PyContracts
-LANG=en_US.UTF-8 tox -e py37
+LANG=en_US.UTF-8 tox -e py39
 
 %files -n python3-coverage
 %defattr(-,root,root)
