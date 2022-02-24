@@ -4770,8 +4770,8 @@
         "type": "other",
         "other": {
           "name": "gobject-introspection",
-          "version": "1.58.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.58/gobject-introspection-1.58.0.tar.xz"
+          "version": "1.71.0",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.71/gobject-introspection-1.71.0.tar.xz"
         }
       }
     },
