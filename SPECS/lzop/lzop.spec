@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:    Mariner
 Summary:	Real-time file compressor
 Name:		lzop
 Version:	1.04

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:    Mariner
 Summary: A Router Advertisement daemon
 Name: radvd
 Version: 2.18
