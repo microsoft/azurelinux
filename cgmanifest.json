@@ -4319,16 +4319,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "geronimo-jaxrpc",
-          "version": "2.1",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/geronimo/specs/geronimo-jaxrpc_1.1_spec/2.1/geronimo-jaxrpc_1.1_spec-2.1-source-release.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "geronimo-osgi-support",
           "version": "1.0",
           "downloadUrl": "http://repo2.maven.org/maven2/org/apache/geronimo/specs/geronimo-osgi-support/1.0/geronimo-osgi-support-1.0-source-release.tar.gz"
@@ -4342,16 +4332,6 @@
           "name": "geronimo-parent-poms",
           "version": "1.6",
           "downloadUrl": "http://svn.apache.org/repos/asf/geronimo/specs/tags/specs-parent-1.6/pom.xml"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "geronimo-saaj",
-          "version": "1.1",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/geronimo/specs/geronimo-saaj_1.3_spec/1.1/geronimo-saaj_1.3_spec-1.1-source-release.tar.gz"
         }
       }
     },
@@ -22183,16 +22163,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-beautifulsoup4",
-          "version": "4.9.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.9.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-betamax",
           "version": "0.8.1",
           "downloadUrl": "https://github.com/sigmavirus24/betamax/archive/0.8.1/betamax-0.8.1.tar.gz"
@@ -24936,16 +24906,6 @@
           "name": "python-websocket-client",
           "version": "0.56.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/c5/01/8c9c7de6c46f88e70b5a3276c791a2be82ae83d8e0d0cc030525ee2866fd/websocket_client-0.56.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-webtest",
-          "version": "2.0.35",
-          "downloadUrl": "https://github.com/Pylons/webtest/archive/2.0.35.tar.gz"
         }
       }
     },
