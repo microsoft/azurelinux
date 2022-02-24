@@ -1,4 +1,4 @@
-From 1ddee25396962a6bd966b98311881ed6d4cba87c Mon Sep 17 00:00:00 2001
+From 8312003a6a9e41d8d20eb8225ec8c4b2860351ec Mon Sep 17 00:00:00 2001
 From: Chris Leech <cleech@redhat.com>
 Date: Mon, 19 Nov 2012 16:40:04 -0800
 Subject: [PATCH] use red hat for name
@@ -22,10 +22,10 @@ index 6a413f6..dd77ed9 100644
  .SH AUTHORS
  Open-iSCSI project <http://www.open-iscsi.com/>
 diff --git a/utils/iscsi-iname.c b/utils/iscsi-iname.c
-index da850dc..29aa4ad 100644
+index 0f587e1..0e15650 100644
 --- a/utils/iscsi-iname.c
 +++ b/utils/iscsi-iname.c
-@@ -80,7 +80,7 @@ main(int argc, char *argv[])
+@@ -89,7 +89,7 @@ main(int argc, char *argv[])
  			exit(0);
  		}
  	} else {
@@ -35,5 +35,5 @@ index da850dc..29aa4ad 100644
  
  	/* try to feed some entropy from the pool to MD5 in order to get
 -- 
-2.21.0
+2.26.2
 
