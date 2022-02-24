@@ -1,4 +1,4 @@
-%global nspr_version 4.21
+%global nspr_version 4.30
 %global unsupported_tools_directory %{_libdir}/nss/unsupported-tools
 # Produce .chk files for the final stripped binaries
 %define __spec_install_post \
@@ -13,19 +13,17 @@
 
 Summary:        Security client
 Name:           nss
-Version:        3.44
-Release:        11%{?dist}
+Version:        3.75
+Release:        6%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
-Source0:        https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/%{name}-%{version}.tar.gz
+Source0:        https://ftp.mozilla.org/pub/security/%{nss}/releases/NSS_3_75_RTM/src/%{name}-%{version}.tar.gz
 Source1:        nss-util.pc.in
 Source2:        nss-util-config.in
-Patch0:         nss-3.44-standalone-1.patch
-Patch1:         CVE-2020-12403.patch
-BuildRequires:  nspr-devel
+BuildRequires:  nspr-devel >= %{nspr_version}
 BuildRequires:  sqlite-devel
 BuildRequires:  libdb-devel
 Provides:       %{name}-softokn = %{version}-%{release}
@@ -132,10 +130,9 @@ install -v -m755 Linux*/lib/*.so %{buildroot}%{_libdir}
 install -v -m644 Linux*/lib/libcrmf.a %{buildroot}%{_libdir}
 cp -v -RL {public,private}/nss/* %{buildroot}%{_includedir}/nss
 chmod 644 %{buildroot}%{_includedir}/nss/*
-install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} %{buildroot}%{_bindir}
+install -v -m755 Linux*/bin/{certutil,pk12util} %{buildroot}%{_bindir}
 install -v -m755 Linux*/bin/shlibsign %{buildroot}%{unsupported_tools_directory}
 install -vdm 755 %{buildroot}%{_libdir}/pkgconfig
-install -vm 644 Linux*/lib/pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
 install -p -m 644 pkgconfig/nss-util.pc %{buildroot}%{_libdir}/pkgconfig/nss-util.pc
 install -p -m 755 pkgconfig/nss-util-config %{buildroot}%{_bindir}/nss-util-config
 
@@ -159,7 +156,6 @@ popd
 %files
 %defattr(-,root,root)
 %license nss/COPYING
-%{_bindir}/nss-config
 %{_bindir}/pk12util
 %{_bindir}/nss-util-config
 %{_libdir}/*.chk
@@ -193,6 +189,9 @@ popd
 %{_bindir}/ssltap
 
 %changelog
+* Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.75-1
+- Upgrading to newest version 3.75
+
 * Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 3.44-11
 - Add explicit binaries in the main package instead of `*`
 - Switch to `%autosetup` instead of `%setup`
