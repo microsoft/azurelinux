@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,7 +34,7 @@ cat > %{buildroot}/%{_libdir}/os-release << EOF
 NAME="Common Base Linux Mariner"
 VERSION="%{mariner_release_version}"
 ID=mariner
-VERSION_ID=$version_id
+VERSION_ID="$version_id"
 PRETTY_NAME="CBL-Mariner/Linux"
 ANSI_COLOR="1;34"
 HOME_URL="%{url}"
@@ -62,6 +62,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-6
+- Surrounding 'VERSION_ID' inside 'os-release' with double quotes.
+
 * Sun Feb 06 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-5
 - Updating version for Preview D-Release
 
