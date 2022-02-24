@@ -14,8 +14,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
-#Source0:       https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch
 Patch1:         remove-headless-from-java-requires.patch
 # Bringing back deprecated macro because the newer alternatives
@@ -88,6 +87,15 @@ Requires:       python3-javapackages = %{version}-%{release}
 This package provides non-essential macros and scripts to support Java packaging.
 It is a lightweight version with minimal runtime requirements.
 
+%package -n javapackages-generators
+Summary:        RPM dependency generators for Java packaging support
+Requires:       %{name} = %{version}-%{release}
+Requires:       python3-javapackages = %{version}-%{release}
+Requires:       %{python_interpreter}
+ 
+%description -n javapackages-generators
+RPM dependency generators to support Java packaging.
+
 %prep
 %autosetup -p1 -n javapackages-%{version}
 
@@ -116,6 +124,8 @@ pip3 install -r test-requirements.txt
 %files -f files-tools
 
 %files -n javapackages-filesystem -f files-filesystem
+
+%files -n javapackages-generators -f files-generators
 
 %files -n javapackages-local-bootstrap -f files-local
 
