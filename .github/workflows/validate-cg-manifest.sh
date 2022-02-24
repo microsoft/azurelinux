@@ -16,6 +16,7 @@ ignore_list=" \
   appstream-data \
   byacc \
   ca-certificates \
+  core-packages \
   Cython \
   dbus-x11 \
   grub2-efi-binary-signed-aarch64 \
