@@ -13,12 +13,10 @@ Source1:        cache-updateinfo
 Source2:        cache-updateinfo.service
 Source3:        cache-updateinfo.timer
 Source4:        tdnfrepogpgcheck.conf
-
 Patch0:         tdnf-mandatory-space-list-output.patch
 Patch1:         tdnf-default-mariner-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
 Patch3:         tdnf-add-download-command.patch
-
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -28,33 +26,30 @@ BuildRequires:  gcc
 BuildRequires:  glibc-devel
 #plugin repogpgcheck
 BuildRequires:  gpgme-devel
-BuildRequires:  libsolv-devel
 BuildRequires:  libmetalink-devel
+BuildRequires:  libsolv-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  rpm-devel
-
+Requires:       curl
+Requires:       libmetalink
+Requires:       libsolv
+Requires:       openssl-libs
+Requires:       rpm-libs
+Requires:       tdnf-cli-libs = %{version}-%{release}
+Obsoletes:      yum
+Provides:       yum
 %if %{with_check}
 BuildRequires:  createrepo_c
 BuildRequires:  glib
 BuildRequires:  libxml2
-BuildRequires:  python3-requests
 BuildRequires:  python3-pip
+BuildRequires:  python3-requests
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %endif
-
-Requires:       curl
-Requires:       libsolv
-Requires:       libmetalink
-Requires:       openssl-libs
-Requires:       rpm-libs
-Requires:       tdnf-cli-libs = %{version}-%{release}
-
-Obsoletes:      yum
-Provides:       yum
 
 %description
 tdnf is a yum/dnf equivalent which uses libsolv and libcurl
@@ -64,7 +59,6 @@ tdnf is a yum/dnf equivalent which uses libsolv and libcurl
 %package    devel
 Summary:        A Library providing C API for tdnf
 Group:          Development/Libraries
-
 Requires:       libsolv-devel
 Requires:       tdnf = %{version}-%{release}
 
@@ -81,7 +75,6 @@ Library providing cli libs for tdnf like clients.
 %package        plugin-repogpgcheck
 Summary:        tdnf plugin providing gpg verification for repository metadata
 Group:          Development/Libraries
-
 Requires:       gpgme
 
 %description plugin-repogpgcheck
@@ -90,7 +83,6 @@ tdnf plugin providing gpg verification for repository metadata
 %package        python
 Summary:        python bindings for tdnf
 Group:          Development/Libraries
-
 Requires:       python3
 
 %description python

@@ -3,14 +3,13 @@ Name:           libmetalink
 Version:        0.1.3
 Release:        1%{?dist}
 License:        MIT
-URL:            https://launchpad.net/libmetalink
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://launchpad.net/libmetalink
 Source0:        https://launchpad.net/%{name}/trunk/%{name}-%{version}/+download/%{name}-%{version}.tar.gz
 Patch0:         libmetalink-0.1.3-ns_uri.patch
-
-BuildRequires:  glibc-devel
 BuildRequires:  gcc
+BuildRequires:  glibc-devel
 Requires:       glibc
 
 %description
@@ -35,7 +34,7 @@ and libraries for use with %{name}.
 %make_install
 
 find %{buildroot} -name '*.a'  -delete -print
-find %{buildroot} -name '*.la' -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %doc README
