@@ -25,7 +25,7 @@ Version: 3.2.2
 
 #%%global prerelease .b2
 # prerelease, if defined, should be something like .a1, .b1, .b2.dev1, or .c2
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and LGPLv2+
 %global realname blivet
 %global realversion %{version}%{?prerelease}
@@ -155,8 +155,8 @@ configuration.
 %endif
 
 %prep
-%autosetup -n %{realname}-%{realversion} -N
-%autosetup -n %{realname}-%{realversion} -b1 -p1
+%autosetup -n %{realname}-%{realname}-%{realversion} -N
+%autosetup -n %{realname}-%{realname}-%{realversion} -b1 -p1
 
 %build
 %{?with_python2:make PYTHON=%{__python2}}
@@ -166,9 +166,7 @@ configuration.
 %{?with_python2:make PYTHON=%{__python2} DESTDIR=%{buildroot} install}
 %{?with_python3:make PYTHON=%{__python3} DESTDIR=%{buildroot} install}
 
-%find_lang %{realname}
-
-%files -n %{realname}-data -f %{realname}.lang
+%files -n %{realname}-data
 %{_sysconfdir}/dbus-1/system.d/*
 %{_datadir}/dbus-1/system-services/*
 %{_libexecdir}/*
@@ -177,18 +175,21 @@ configuration.
 %if %{with python2}
 %files -n python2-%{realname}
 %license COPYING COPYING.LESSER
-%doc README ChangeLog examples
+%doc README examples
 %{python2_sitelib}/*
 %endif
 
 %if %{with python3}
 %files -n python3-%{realname}
 %license COPYING COPYING.LESSER
-%doc README ChangeLog examples
+%doc README examples
 %{python3_sitelib}/*
 %endif
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-5
+- Making sure license files are accessible.
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-4
 - Removing 'Conflicts' for old packages never present in CBL-Mariner.
 - License verified.

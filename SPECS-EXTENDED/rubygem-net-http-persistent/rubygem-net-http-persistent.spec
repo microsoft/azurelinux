@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary:	Persistent connections using Net::HTTP plus a speed fix
 Name:		rubygem-%{gem_name}
 Version:	2.9.4
-Release:	15%{?dist}
+Release:	16%{?dist}
 License:	MIT
 
 URL:		https://github.com/drbrain/net-http-persistent
@@ -56,6 +56,7 @@ sed -i test/test_net_http_persistent_ssl_reuse.rb \
 gem specification -l --ruby %{SOURCE0} > %{gem_name}.gemspec
 gem build %{gem_name}.gemspec
 mv %{gem_name}-%{version}.gem $TOPDIR
+mv README.rdoc $TOPDIR
 
 popd
 rm -rf tmpunpackdir
@@ -96,6 +97,9 @@ popd
 %{gem_docdir}/
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.4-16
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.4-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

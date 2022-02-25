@@ -13,7 +13,7 @@ Distribution:   Mariner
 Summary:	A pkg-config implementation by Ruby
 Name:		rubygem-%{gem_name}
 Version:	1.4.5
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	LGPLv2+
 URL:		http://github.com/rcairo/pkg-config
 
@@ -91,7 +91,7 @@ EOF
 ruby -Ilib:test:. ./test.rb
 
 %files
-%license LGPL-2.1
+%license %{gem_instdir}/LGPL-2.1
 %dir	%{gem_instdir}
 %doc	%{gem_instdir}/[A-Z]*
 %exclude	%{gem_instdir}/Rakefile
@@ -106,6 +106,9 @@ ruby -Ilib:test:. ./test.rb
 %{gem_docdir}
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.5-3
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.5-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 
