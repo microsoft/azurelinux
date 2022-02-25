@@ -311,26 +311,9 @@ func PackageNamesFromSingleSystemConfig(systemConfig configuration.SystemConfig)
 // SelectKernelPackage selects the kernel to use for the current installation
 // based on the KernelOptions field of the system configuration.
 func SelectKernelPackage(systemConfig configuration.SystemConfig, isLiveInstall bool) (kernelPkg string, err error) {
-	const (
-		defaultOption = "default"
-		hypervOption  = "hyperv"
-	)
+	const defaultOption = "default"
 
 	optionToUse := defaultOption
-
-	// Only consider Hyper-V for an ISO
-	if isLiveInstall {
-		// Only check if running on Hyper V if there's a kernel option for it
-		_, found := systemConfig.KernelOptions[hypervOption]
-		if found {
-			isHyperV, err := isRunningInHyperV()
-			if err != nil {
-				logger.Log.Warnf("Unable to detect if the current system is Hyper-V, using the default kernel")
-			} else if isHyperV {
-				optionToUse = hypervOption
-			}
-		}
-	}
 
 	kernelPkg = systemConfig.KernelOptions[optionToUse]
 	if kernelPkg == "" {
@@ -2200,30 +2183,6 @@ func createRDiffArtifact(workDirPath, devPath, rDiffBaseImage, name string) (err
 	}
 
 	return shell.ExecuteLive(squashErrors, "rdiff", rdiffArgs...)
-}
-
-// isRunningInHyperV checks if the program is running in a Hyper-V Virtual Machine.
-func isRunningInHyperV() (isHyperV bool, err error) {
-	const (
-		dmesgHypervTag = "Hyper-V"
-	)
-
-	stdout, stderr, err := shell.Execute("dmesg")
-	if err != nil {
-		logger.Log.Warnf("stderr: %v", stderr)
-		return
-	}
-	logger.Log.Debugf("dmesg system: %s", stdout)
-
-	// dmesg will print information about Hyper-V if it detects that Hyper-V is the hypervisor.
-	// There will be multiple mentions of Hyper-V in the output (entry for BIOS as well as hypervisor)
-	// and diagnostic information about hypervisor version.
-	// Outside of Hyper-V, this name will not be reported.
-	if strings.Contains(stdout, dmesgHypervTag) {
-		logger.Log.Infof("Detected Hyper-V Host")
-		isHyperV = true
-	}
-	return
 }
 
 //KernelPackages returns a list of kernel packages obtained from KernelOptions in the config's SystemConfigs

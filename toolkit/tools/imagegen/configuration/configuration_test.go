@@ -400,7 +400,6 @@ var expectedConfiguration Config = Config{
 			},
 			KernelOptions: map[string]string{
 				"default": "kernel",
-				"hyperv":  "kernel-hyperv",
 			},
 			AdditionalFiles: map[string]string{
 				"local/path/file1": "/final/system/path",
@@ -495,7 +494,6 @@ var expectedConfiguration Config = Config{
 			},
 			KernelOptions: map[string]string{
 				"default": "kernel",
-				"hyperv":  "kernel-hyperv",
 			},
 			Hostname: "Mariner-TestA",
 			Users: []User{
@@ -531,7 +529,6 @@ var expectedConfiguration Config = Config{
 			},
 			KernelOptions: map[string]string{
 				"default": "kernel",
-				"hyperv":  "kernel-hyperv",
 			},
 			Hostname: "Mariner-TestB",
 			Users: []User{

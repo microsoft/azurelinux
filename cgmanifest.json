@@ -8500,16 +8500,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kernel-hyperv",
-          "version": "5.15.18.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "kernel-rt",
           "version": "5.15.18.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
@@ -14383,8 +14373,8 @@
         "type": "other",
         "other": {
           "name": "nDPI",
-          "version": "3.4",
-          "downloadUrl": "https://github.com/ntop/nDPI/archive/3.4.tar.gz"
+          "version": "4.2",
+          "downloadUrl": "https://github.com/ntop/nDPI/archive/4.2.tar.gz"
         }
       }
     },
@@ -14733,8 +14723,8 @@
         "type": "other",
         "other": {
           "name": "ntopng",
-          "version": "4.2",
-          "downloadUrl": "https://github.com/ntop/ntopng/archive/4.2.tar.gz"
+          "version": "5.2.1",
+          "downloadUrl": "https://github.com/ntop/ntopng/archive/5.2.1.tar.gz"
         }
       }
     },
