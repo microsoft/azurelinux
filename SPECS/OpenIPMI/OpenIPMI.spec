@@ -1,17 +1,15 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
-Version:        2.0.25
-Release:        7%{?dist}
+Version:        2.0.32
+Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://sourceforge.net/projects/openipmi/
-Source0:        https://sourceforge.net/projects/openipmi/files/latest/download/openipmi-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz
 Source1:        openipmi-helper
 Source2:        ipmi.service
-# Enable detection of python versions with deprecated distutils modules (Source: Fedora 28, MIT license)
-Patch0:         %{name}-py39.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  perl
@@ -190,6 +188,9 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Tue Feb 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.0.32-1
+- Upgrading to version 2.0.32.
+
 * Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.0.25-7
 - Use python3 instead of python2 in python subpackage
 - Add Fedora patch to enable build with python >= 3.9
