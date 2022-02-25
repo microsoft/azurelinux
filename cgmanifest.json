@@ -24614,8 +24614,8 @@
         "type": "other",
         "other": {
           "name": "python-suds",
-          "version": "0.7",
-          "downloadUrl": "https://bitbucket.org/jurko/suds/get/.tar.bz2"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/suds-community/suds/archive/v1.0.0.tar.gz"
         }
       }
     },
@@ -24644,8 +24644,8 @@
         "type": "other",
         "other": {
           "name": "python-tempita",
-          "version": "0.5.1",
-          "downloadUrl": "http://pypi.python.org/packages/source/T/Tempita/Tempita-0.5.1.tar.gz"
+          "version": "0.5.2",
+          "downloadUrl": "https://pypi.python.org/packages/source/T/Tempita/Tempita-0.5.2.tar.gz"
         }
       }
     },
