@@ -1,4 +1,4 @@
-From 039700890e11dff3323241349d3858f258c09cc0 Mon Sep 17 00:00:00 2001
+From 55af753f593243bcd1ab4c7e82620bdee432915b Mon Sep 17 00:00:00 2001
 From: Chris Leech <cleech@redhat.com>
 Date: Thu, 7 Nov 2019 09:16:17 -0800
 Subject: [PATCH] libiscsi: fix build against latest upstream, again
@@ -62,5 +62,5 @@ index 7003388..c598aee 100644
  		strcpy(context->error_str, "No such node");
  		rc = ENODEV;
 -- 
-2.21.0
+2.26.2
 

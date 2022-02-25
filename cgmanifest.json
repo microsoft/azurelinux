@@ -926,7 +926,7 @@
         "other": {
           "name": "autogen",
           "version": "5.18.16",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/autogen/rel5.18.16/autogen-5.18.16.tar.xz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/autogen/rel5.18.16/autogen-5.18.16.tar.xz"
         }
       }
     },
@@ -1115,8 +1115,8 @@
         "type": "other",
         "other": {
           "name": "bcc",
-          "version": "0.22.0",
-          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.22.0/bcc-src-with-submodule.tar.gz"
+          "version": "0.24.0",
+          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.24.0/bcc-src-with-submodule.tar.gz"
         }
       }
     },
@@ -1877,8 +1877,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "21.3",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/21.3/+download/cloud-init-21.3.tar.gz"
+          "version": "22.1",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.1/+download/cloud-init-22.1.tar.gz"
         }
       }
     },
@@ -4319,16 +4319,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "geronimo-jaxrpc",
-          "version": "2.1",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/geronimo/specs/geronimo-jaxrpc_1.1_spec/2.1/geronimo-jaxrpc_1.1_spec-2.1-source-release.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "geronimo-osgi-support",
           "version": "1.0",
           "downloadUrl": "http://repo2.maven.org/maven2/org/apache/geronimo/specs/geronimo-osgi-support/1.0/geronimo-osgi-support-1.0-source-release.tar.gz"
@@ -4342,16 +4332,6 @@
           "name": "geronimo-parent-poms",
           "version": "1.6",
           "downloadUrl": "http://svn.apache.org/repos/asf/geronimo/specs/tags/specs-parent-1.6/pom.xml"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "geronimo-saaj",
-          "version": "1.1",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/geronimo/specs/geronimo-saaj_1.3_spec/1.1/geronimo-saaj_1.3_spec-1.1-source-release.tar.gz"
         }
       }
     },
@@ -4790,8 +4770,8 @@
         "type": "other",
         "other": {
           "name": "gobject-introspection",
-          "version": "1.58.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.58/gobject-introspection-1.58.0.tar.xz"
+          "version": "1.71.0",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.71/gobject-introspection-1.71.0.tar.xz"
         }
       }
     },
@@ -5370,8 +5350,8 @@
         "type": "other",
         "other": {
           "name": "harfbuzz",
-          "version": "2.6.4",
-          "downloadUrl": "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-2.6.4.tar.xz"
+          "version": "3.4.0",
+          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/3.4.0/harfbuzz-3.4.0.tar.xz"
         }
       }
     },
@@ -5540,8 +5520,8 @@
         "type": "other",
         "other": {
           "name": "http-parser",
-          "version": "2.8.1",
-          "downloadUrl": "https://github.com/nodejs/http-parser/archive/v2.8.1.tar.gz"
+          "version": "2.9.4",
+          "downloadUrl": "https://github.com/nodejs/http-parser/archive/v2.9.4.tar.gz"
         }
       }
     },
@@ -6700,8 +6680,8 @@
         "type": "other",
         "other": {
           "name": "hwdata",
-          "version": "0.341",
-          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.341.tar.gz"
+          "version": "0.356",
+          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.356.tar.gz"
         }
       }
     },
@@ -7130,8 +7110,8 @@
         "type": "other",
         "other": {
           "name": "i2c-tools",
-          "version": "4.1",
-          "downloadUrl": "https://www.kernel.org/pub/software/utils/i2c-tools/i2c-tools-4.1.tar.xz"
+          "version": "4.3",
+          "downloadUrl": "https://www.kernel.org/pub/software/utils/i2c-tools/i2c-tools-4.3.tar.xz"
         }
       }
     },
@@ -7581,8 +7561,8 @@
         "type": "other",
         "other": {
           "name": "iputils",
-          "version": "20180629",
-          "downloadUrl": "https://github.com/iputils/iputils/archive/s20180629.tar.gz"
+          "version": "20211215",
+          "downloadUrl": "https://github.com/iputils/iputils/archive/20211215.tar.gz"
         }
       }
     },
@@ -7621,8 +7601,8 @@
         "type": "other",
         "other": {
           "name": "irqbalance",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.6.0.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.8.0.tar.gz"
         }
       }
     },
@@ -7641,8 +7621,8 @@
         "type": "other",
         "other": {
           "name": "iscsi-initiator-utils",
-          "version": "6.2.1.0+20191114.4440e57a59",
-          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/4440e57a59c7f1c23bbfdcb10844017f478918b6.tar.gz"
+          "version": "6.2.1.4+20210729.2a8f9d8",
+          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/refs/tags/2.1.4.tar.gz"
         }
       }
     },
@@ -7651,8 +7631,8 @@
         "type": "other",
         "other": {
           "name": "isns-utils",
-          "version": "0.97",
-          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.97.tar.gz"
+          "version": "0.101",
+          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.101.tar.gz"
         }
       }
     },
@@ -7931,8 +7911,8 @@
         "type": "other",
         "other": {
           "name": "javapackages-tools",
-          "version": "5.3.0",
-          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/5.3.0.tar.gz"
+          "version": "6.0.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/6.0.0.tar.gz"
         }
       }
     },
@@ -12611,8 +12591,8 @@
         "type": "other",
         "other": {
           "name": "lvm2",
-          "version": "2.03.05",
-          "downloadUrl": "https://sourceware.org/pub/lvm2/LVM2.2.03.05.tgz"
+          "version": "2.03.15",
+          "downloadUrl": "https://sourceware.org/pub/lvm2/LVM2.2.03.15.tgz"
         }
       }
     },
@@ -12641,8 +12621,8 @@
         "type": "other",
         "other": {
           "name": "lz4",
-          "version": "1.9.2",
-          "downloadUrl": "https://github.com/lz4/lz4/archive/v1.9.2/lz4-1.9.2.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://github.com/lz4/lz4/archive/v1.9.3/lz4-1.9.3.tar.gz"
         }
       }
     },
@@ -13491,8 +13471,8 @@
         "type": "other",
         "other": {
           "name": "mercurial",
-          "version": "5.4",
-          "downloadUrl": "https://www.mercurial-scm.org/release/mercurial-5.4.tar.gz"
+          "version": "6.0.3",
+          "downloadUrl": "https://www.mercurial-scm.org/release/mercurial-6.0.3.tar.gz"
         }
       }
     },
@@ -13883,8 +13863,8 @@
         "type": "other",
         "other": {
           "name": "ModemManager",
-          "version": "1.10.4",
-          "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.10.4.tar.xz"
+          "version": "1.18.6",
+          "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.6.tar.xz"
         }
       }
     },
@@ -14443,8 +14423,8 @@
         "type": "other",
         "other": {
           "name": "net-tools",
-          "version": "1.60",
-          "downloadUrl": "https://downloads.sourceforge.net/project/net-tools/net-tools-1.60.tar.bz2"
+          "version": "2.10",
+          "downloadUrl": "https://downloads.sourceforge.net/project/net-tools/net-tools-2.10.tar.xz"
         }
       }
     },
@@ -14563,8 +14543,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.20.1",
-          "downloadUrl": "https://nginx.org/download/nginx-1.20.1.tar.gz"
+          "version": "1.20.2",
+          "downloadUrl": "https://nginx.org/download/nginx-1.20.2.tar.gz"
         }
       }
     },
@@ -14893,8 +14873,8 @@
         "type": "other",
         "other": {
           "name": "oath-toolkit",
-          "version": "2.6.2",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/oath-toolkit/oath-toolkit-2.6.2.tar.gz"
+          "version": "2.6.7",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/oath-toolkit/oath-toolkit-2.6.7.tar.gz"
         }
       }
     },
@@ -16214,8 +16194,8 @@
         "type": "other",
         "other": {
           "name": "pcsc-lite",
-          "version": "1.9.0",
-          "downloadUrl": "https://pcsclite.apdu.fr/files/pcsc-lite-1.9.0.tar.bz2"
+          "version": "1.9.5",
+          "downloadUrl": "https://pcsclite.apdu.fr/files/pcsc-lite-1.9.5.tar.bz2"
         }
       }
     },
@@ -22183,16 +22163,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-beautifulsoup4",
-          "version": "4.9.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.9.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-betamax",
           "version": "0.8.1",
           "downloadUrl": "https://github.com/sigmavirus24/betamax/archive/0.8.1/betamax-0.8.1.tar.gz"
@@ -22444,8 +22414,8 @@
         "type": "other",
         "other": {
           "name": "python-coverage",
-          "version": "4.5.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-4.5.1.tar.gz"
+          "version": "6.3.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-6.3.2.tar.gz"
         }
       }
     },
@@ -22644,8 +22614,8 @@
         "type": "other",
         "other": {
           "name": "python-docutils",
-          "version": "0.14",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.14.tar.gz"
+          "version": "0.18.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.18.1.tar.gz"
         }
       }
     },
@@ -23154,8 +23124,8 @@
         "type": "other",
         "other": {
           "name": "python-jwt",
-          "version": "1.7.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/PyJWT-1.7.1.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/1d/8e/01bdcfdbb352daaba8ea406d9df149c5bba7dbf70f908d4fa4c269fe6a08/PyJWT-2.3.0.tar.gz"
         }
       }
     },
@@ -24943,16 +24913,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-webtest",
-          "version": "2.0.35",
-          "downloadUrl": "https://github.com/Pylons/webtest/archive/2.0.35.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-werkzeug",
           "version": "1.0.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/10/27/a33329150147594eff0ea4c33c2036c0eadd933141055be0ff911f7f8d04/Werkzeug-1.0.1.tar.gz"
@@ -25615,8 +25575,8 @@
         "type": "other",
         "other": {
           "name": "rng-tools",
-          "version": "5",
-          "downloadUrl": "https://github.com/nhorman/rng-tools/archive/rng-tools-5.tar.gz"
+          "version": "6.14",
+          "downloadUrl": "https://github.com/nhorman/rng-tools/archive/v6.14/rng-tools-6.14.tar.gz"
         }
       }
     },
@@ -25757,6 +25717,16 @@
           "name": "rtkit",
           "version": "0.11",
           "downloadUrl": "http://0pointer.de/public/rtkit-0.11.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rtl-sdr",
+          "version": "0.6.0",
+          "downloadUrl": "https://github.com/steve-m/librtlsdr/archive/0.6.0/librtlsdr-0.6.0.tar.gz"
         }
       }
     },
@@ -28647,8 +28617,8 @@
         "type": "other",
         "other": {
           "name": "tracelogging",
-          "version": "0.3",
-          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.3.tar.gz"
+          "version": "0.3.1",
+          "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.3.1.tar.gz"
         }
       }
     },
@@ -29803,7 +29773,7 @@
         "other": {
           "name": "xerces-j2",
           "version": "2.12.0",
-          "downloadUrl": "http://www.eu.apache.org/dist/xerces/j/source/Xerces-J-src.2.12.0.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/xerces/j/source/Xerces-J-src.2.12.0.tar.gz"
         }
       }
     },

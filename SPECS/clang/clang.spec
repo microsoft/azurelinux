@@ -38,7 +38,7 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -136,6 +136,7 @@ cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
       -DCMAKE_BUILD_TYPE=Release    \
       -DLLVM_ENABLE_EH=ON \
       -DLLVM_ENABLE_RTTI=ON \
+      -DCLANG_LINK_CLANG_DYLIB=ON \
       -Wno-dev ..
 
 %make_build
@@ -214,6 +215,9 @@ make clang-check
 %{_datadir}/clang/clang-rename.py*
 
 %changelog
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 12.0.1-3
+- Enable clang tools to link against libclang_shared.so
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0.1-2
 - Introduced following subpackages using Fedora 32 (license: MIT) spec as guidance:
   - clang-analyzer,

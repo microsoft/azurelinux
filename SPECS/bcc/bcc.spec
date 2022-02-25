@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
-Version:        0.22.0
+Version:        0.24.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -9,8 +9,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
-Source0:        https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-%{version}-src-with-submodule.tar.gz
-
+Source0:        https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  bison
 BuildRequires:  clang-devel
 BuildRequires:  cmake >= 2.8.7
@@ -23,8 +22,7 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  pkg-config
 BuildRequires:  python3-devel
-
-Requires:  elfutils-libelf
+Requires:       elfutils-libelf
 
 %description
 BCC is a toolkit for creating efficient kernel tracing and manipulation programs,
@@ -42,8 +40,8 @@ Requires:       %{name} = %{version}-%{release}
 developing application.
 
 %package -n python3-%{name}
-%{?python_provide:%python_provide python3-bcc}
 Summary:        Python3 bindings for BPF Compiler Collection (BCC)
+%{?python_provide:%python_provide python3-bcc}
 Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-%{name}
@@ -123,6 +121,9 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_datadir}/%{name}/man/*
 
 %changelog
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 0.24.0-1
+- Update to 0.24.0
+
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 0.22.0-1
 - Update to 0.22.0
 - Using shared `elfutils-libelf` libraries instead of static ones.
