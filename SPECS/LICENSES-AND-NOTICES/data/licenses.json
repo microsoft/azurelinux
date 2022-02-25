@@ -2193,6 +2193,7 @@
                 "usb_modeswitch",
                 "usb_modeswitch-data",
                 "usbguard",
+                "usbip",
                 "usbmuxd",
                 "usbredir",
                 "usermode",
