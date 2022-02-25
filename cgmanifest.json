@@ -1867,8 +1867,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "21.3",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/21.3/+download/cloud-init-21.3.tar.gz"
+          "version": "22.1",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.1/+download/cloud-init-22.1.tar.gz"
         }
       }
     },
@@ -4750,8 +4750,8 @@
         "type": "other",
         "other": {
           "name": "gobject-introspection",
-          "version": "1.58.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.58/gobject-introspection-1.58.0.tar.xz"
+          "version": "1.71.0",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.71/gobject-introspection-1.71.0.tar.xz"
         }
       }
     },
@@ -5020,8 +5020,8 @@
         "type": "other",
         "other": {
           "name": "GSL",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/microsoft/GSL/archive/v2.0.0.tar.gz"
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/microsoft/GSL/archive/v4.0.0.tar.gz"
         }
       }
     },
@@ -7891,8 +7891,8 @@
         "type": "other",
         "other": {
           "name": "javapackages-tools",
-          "version": "5.3.0",
-          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/5.3.0.tar.gz"
+          "version": "6.0.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/6.0.0.tar.gz"
         }
       }
     },
@@ -8261,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "jq",
-          "version": "1.5",
-          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-1.5.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-1.6.tar.gz"
         }
       }
     },
@@ -8301,8 +8301,8 @@
         "type": "other",
         "other": {
           "name": "json-c",
-          "version": "0.14",
-          "downloadUrl": "https://github.com/json-c/json-c/archive/json-c-0.14-20200419.tar.gz"
+          "version": "0.15",
+          "downloadUrl": "https://github.com/json-c/json-c/archive/json-c-0.15-20200726.tar.gz"
         }
       }
     },
@@ -8481,16 +8481,6 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.18.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kernel-hyperv",
           "version": "5.15.18.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz"
         }
@@ -14363,8 +14353,8 @@
         "type": "other",
         "other": {
           "name": "nDPI",
-          "version": "3.4",
-          "downloadUrl": "https://github.com/ntop/nDPI/archive/3.4.tar.gz"
+          "version": "4.2",
+          "downloadUrl": "https://github.com/ntop/nDPI/archive/4.2.tar.gz"
         }
       }
     },
@@ -14713,8 +14703,8 @@
         "type": "other",
         "other": {
           "name": "ntopng",
-          "version": "4.2",
-          "downloadUrl": "https://github.com/ntop/ntopng/archive/4.2.tar.gz"
+          "version": "5.2.1",
+          "downloadUrl": "https://github.com/ntop/ntopng/archive/5.2.1.tar.gz"
         }
       }
     },
@@ -15534,18 +15524,8 @@
         "type": "other",
         "other": {
           "name": "OpenIPMI",
-          "version": "2.0.25",
-          "downloadUrl": "https://sourceforge.net/projects/openipmi/files/latest/download/openipmi-2.0.25.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "OpenIPMI",
-          "version": "2.0.31",
-          "downloadUrl": "http://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.31.tar.gz"
+          "version": "2.0.32",
+          "downloadUrl": "https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz"
         }
       }
     },
@@ -22384,8 +22364,8 @@
         "type": "other",
         "other": {
           "name": "python-coverage",
-          "version": "4.5.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-4.5.1.tar.gz"
+          "version": "6.3.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-6.3.2.tar.gz"
         }
       }
     },
@@ -22584,8 +22564,8 @@
         "type": "other",
         "other": {
           "name": "python-docutils",
-          "version": "0.14",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.14.tar.gz"
+          "version": "0.18.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.18.1.tar.gz"
         }
       }
     },
@@ -22914,8 +22894,8 @@
         "type": "other",
         "other": {
           "name": "python-incremental",
-          "version": "17.5.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-17.5.0.tar.gz"
+          "version": "21.3.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-21.3.0.tar.gz"
         }
       }
     },

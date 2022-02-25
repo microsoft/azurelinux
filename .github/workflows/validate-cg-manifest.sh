@@ -16,6 +16,7 @@ ignore_list=" \
   appstream-data \
   byacc \
   ca-certificates \
+  core-packages \
   Cython \
   dbus-x11 \
   geronimo-specs \
@@ -55,6 +56,7 @@ ignore_list=" \
   sgabios \
   shim \
   verity-read-only-root \
+  usbip \
   web-assets \
   xmvn \
   xorg-x11-apps \
