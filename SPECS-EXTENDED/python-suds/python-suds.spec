@@ -1,41 +1,39 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global commit 94664ddd46a61d06862fa8fb6ba7b9e054214f57
-%global shortcommit %(c=%{commit}; echo ${c:0:12})
 %global srcname suds
-%global sum A python SOAP client
-%global desc \
-The suds project is a python soap web services client lib.  Suds leverages\
-python meta programming to provide an intuitive API for consuming web\
-services.  Objectification of types defined in the WSDL is provided\
-without class generation.  Programmers rarely need to read the WSDL since\
-services and WSDL based objects can be easily inspected.
 
-Summary: %{sum}
+Summary: A python SOAP client
 Name:  python-suds
-Version: 0.7
+Version: 1.0.0
 Release: 1%{?dist}
-Source0: https://bitbucket.org/jurko/suds/get/%{shortcommit}.tar.bz2#/%{name}-%{shortcommit}.tar.bz2
-Patch0: fix_http_test.patch
-Patch1: pytest4.patch
-Patch2: python3.8.patch
+Source0: https://github.com/suds-community/suds/archive/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 License: LGPLv3+
 BuildArch: noarch
-URL: https://bitbucket.org/jurko/suds
+URL: https://github.com/suds-community/suds
 
-%description %{desc}
+BuildRequires: python3-devel
+BuildRequires: python3-six
+
+%if %{with_check}
+BuildRequires: python3-pytest
+%endif
+
+%global _description %{expand:
+The suds project is a python soap web services client lib.  Suds leverages
+python meta programming to provide an intuitive API for consuming web
+services.  Objectification of types defined in the WSDL is provided
+without class generation.  Programmers rarely need to read the WSDL since
+services and WSDL based objects can be easily inspected.}
+
+%description %_description
 
 %package -n python3-%{srcname}
-BuildRequires: python3-devel python3-pytest python3-six
-Summary:        %{sum}
+Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
-%description -n python3-%{srcname} %{desc}
+%description -n python3-%{srcname} %_description
 
 %prep
-%setup -q -n jurko-suds-%{shortcommit}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%autosetup -p1 -n %{srcname}-%{version}
 
 %build
 %py3_build
@@ -44,14 +42,18 @@ Summary:        %{sum}
 %py3_install
 
 %check
-%{__python3} setup.py test
+%pytest
 
 %files -n python3-%{srcname}
 %{python3_sitelib}/%{srcname}*/
-%doc README.rst
+%doc README.md
 %license LICENSE.txt
 
 %changelog
+* Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
+- Updating to version 1.0.0 using Fedora 36 specs (license: MIT) for guidance.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
