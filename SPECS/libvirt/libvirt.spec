@@ -3,14 +3,13 @@
 %define qemu_group  qemu
 
 # Its dependencies cannot run their post-install scripts due to systemd not working in the build container.
-%bcond_with glusterfs
 %bcond_with missing_dependencies
 %bcond_with netcf
 
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        7.10.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,10 +27,8 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  dnsmasq >= 2.41
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  fuse-devel >= 2.8.6
-%if 0%{with glusterfs}
 BuildRequires:  glusterfs-api-devel >= 3.4.1
 BuildRequires:  glusterfs-devel >= 3.4.1
-%endif
 BuildRequires:  gnutls-devel
 BuildRequires:  iscsi-initiator-utils
 BuildRequires:  libacl-devel
@@ -189,10 +186,7 @@ Requires:       %{name}-daemon = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       dnsmasq >= 2.41
 Requires:       iptables
-
-%if 0%{with missing_dependencies}
 Requires:       radvd
-%endif
 
 %description daemon-driver-network
 The network driver plugin for the libvirtd daemon, providing
@@ -233,10 +227,10 @@ Requires:       %{name}-libs = %{version}-%{release}
 Requires:       bzip2
 # For image compression
 Requires:       gzip
+Requires:       lzop
 Requires:       xz
 
 %if 0%{with missing_dependencies}
-Requires:       lzop
 Requires:       systemd-container
 %endif
 
@@ -265,9 +259,7 @@ Requires:       %{name}-daemon-driver-storage-logical = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-mpath = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-rbd = %{version}-%{release}
 Requires:       %{name}-daemon-driver-storage-scsi = %{version}-%{release}
-%if 0%{with glusterfs}
 Requires:       %{name}-daemon-driver-storage-gluster = %{version}-%{release}
-%endif
 
 %description daemon-driver-storage
 The storage driver plugin for the libvirtd daemon, providing
@@ -301,7 +293,6 @@ Requires:       parted
 The storage driver backend adding implementation of the storage APIs for block
 volumes using the host disks.
 
-%if 0%{with glusterfs}
 %package daemon-driver-storage-gluster
 Summary:        Storage driver plugin for gluster
 
@@ -313,7 +304,6 @@ Requires:       glusterfs-client >= 2.0.1
 %description daemon-driver-storage-gluster
 The storage driver backend adding implementation of the storage APIs for gluster
 volumes using libgfapi.
-%endif
 
 %package daemon-driver-storage-iscsi
 Summary:        Storage driver plugin for iscsi
@@ -476,10 +466,7 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
     -Ddriver_network=enabled \
     -Ddriver_qemu=enabled \
     -Dfuse=enabled \
-%if 0%{with glusterfs}
     -Dglusterfs=enabled \
-    -Dstorage_gluster=enabled \
-%endif
     -Dlibssh2=enabled \
 %if 0%{with netcf}
     -Dnetcf=enabled \
@@ -496,6 +483,7 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
     -Dselinux=enabled \
     -Dselinux_mount="/sys/fs/selinux" \
     -Dstorage_disk=enabled \
+    -Dstorage_gluster=enabled \
     -Dstorage_iscsi=enabled \
     -Dstorage_lvm=enabled \
     -Dstorage_mpath=enabled \
@@ -513,10 +501,6 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
     -Ddriver_lxc=disabled \
     -Ddriver_vz=disabled \
     -Dfirewalld_zone=disabled \
-%if ! 0%{with glusterfs}
-    -Dglusterfs=disabled \
-    -Dstorage_gluster=disabled \
-%endif
     -Dlibssh=disabled \
     -Dlogin_shell=disabled \
 %if ! 0%{with netcf}
@@ -984,11 +968,9 @@ exit 0
 %files daemon-driver-storage-disk
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_disk.so
 
-%if 0%{with glusterfs}
 %files daemon-driver-storage-gluster
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_gluster.so
 %{_libdir}/%{name}/storage-file/libvirt_storage_file_gluster.so
-%endif
 
 %files daemon-driver-storage-iscsi
 %{_libdir}/%{name}/storage-backend/libvirt_storage_backend_iscsi.so
@@ -1071,6 +1053,10 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.10.0-3
+- Re-enabling '*-glusterfs' subpackage.
+- Bringing back dependency on 'lzop' and 'radvd'.
+
 * Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 7.10.0-2
 - Remove requirement on python2 (python in general is not needed at runtime)
 
