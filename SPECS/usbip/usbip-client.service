@@ -1,0 +1,10 @@
+[Unit]
+Description=USB/IP client modules
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/sbin/modprobe -qab vhci-hcd
+
+[Install]
+WantedBy=multi-user.target

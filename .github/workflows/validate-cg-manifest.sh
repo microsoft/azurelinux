@@ -56,6 +56,7 @@ ignore_list=" \
   sgabios \
   shim \
   verity-read-only-root \
+  usbip \
   web-assets \
   xmvn \
   xorg-x11-apps \
