@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.4.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
@@ -9,6 +9,10 @@ Distribution:   Mariner
 Group:          System Environment/Development
 URL:            https://www.libarchive.org/
 Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Patch0: CVE-2021-36976_17f4e8.patch
+Patch1: CVE-2021-36976_05ebb5.patch
+Patch2: CVE-2021-36976_7d3c18.patch
+Patch3: CVE-2021-36976_b96758.patch
 BuildRequires:  xz-devel
 BuildRequires:  xz-libs
 Requires:       xz-libs
@@ -24,7 +28,7 @@ Requires:       %{name} = %{version}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 export CFLAGS="%{optflags}"
@@ -58,6 +62,10 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+*   Fri Feb 25 2022 Mariner Autopatcher <cblmargh@microsoft.com> 3.4.2-4
+-   Added patch file(s) CVE-2021-36976_17f4e8.patch,
+-   CVE-2021-36976_05ebb5.patch, CVE-2021-36976_7d3c18.patch,
+-   CVE-2021-36976_b96758.patch
 * Tue Nov 24 2020 Henry Beberman <henry.beberman@microsoft.com> - 3.4.2-3
 - Update Source URL to GitHub instead of libarchive.org
 

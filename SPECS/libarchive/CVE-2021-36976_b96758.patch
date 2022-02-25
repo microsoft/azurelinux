@@ -1,0 +1,325 @@
+From 05ebb55896d10a9737dad9ae0303f7f45489ba6f Mon Sep 17 00:00:00 2001
+From: Grzegorz Antoniak <ga@anadoxin.org>
+Date: Sat, 13 Feb 2021 09:08:13 +0100
+Subject: [PATCH] RAR5 reader: fixed out of bounds read in some files
+
+Added more range checks in the bit stream reading functions
+(read_bits_16 and read_bits_32) in order to better guard against out of
+memory reads.
+
+This commit contains a test with OSSFuzz sample #30448.
+---
+ Makefile.am                                   |   1 +
+ libarchive/archive_read_support_format_rar5.c | 108 ++++++++++--------
+ libarchive/test/test_read_format_rar5.c       |  16 +++
+ ...r5_decode_number_out_of_bounds_read.rar.uu |  10 ++
+ 4 files changed, 89 insertions(+), 46 deletions(-)
+ create mode 100644 libarchive/test/test_read_format_rar5_decode_number_out_of_bounds_read.rar.uu
+
+diff --git a/Makefile.am b/Makefile.am
+index c5796f29f..963c94212 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -893,6 +893,7 @@ libarchive_test_EXTRA_DIST=\
+ 	libarchive/test/test_read_format_rar5_arm_filter_on_window_boundary.rar.uu \
+ 	libarchive/test/test_read_format_rar5_different_winsize_on_merge.rar.uu \
+ 	libarchive/test/test_read_format_rar5_block_size_is_too_small.rar.uu \
++	libarchive/test/test_read_format_rar5_decode_number_out_of_bounds_read.rar.uu \
+ 	libarchive/test/test_read_format_raw.bufr.uu \
+ 	libarchive/test/test_read_format_raw.data.gz.uu \
+ 	libarchive/test/test_read_format_raw.data.Z.uu \
+diff --git a/libarchive/archive_read_support_format_rar5.c b/libarchive/archive_read_support_format_rar5.c
+index e89e988ac..a91c73f8b 100644
+--- a/libarchive/archive_read_support_format_rar5.c
++++ b/libarchive/archive_read_support_format_rar5.c
+@@ -1012,7 +1012,16 @@ static int read_var_sized(struct archive_read* a, size_t* pvalue,
+ 	return ret;
+ }
+ 
+-static int read_bits_32(struct rar5* rar, const uint8_t* p, uint32_t* value) {
++static int read_bits_32(struct archive_read* a, struct rar5* rar,
++	const uint8_t* p, uint32_t* value)
++{
++	if(rar->bits.in_addr >= rar->cstate.cur_block_size) {
++		archive_set_error(&a->archive,
++			ARCHIVE_ERRNO_PROGRAMMER,
++			"Premature end of stream during extraction of data (#1)");
++		return ARCHIVE_FATAL;
++	}
++
+ 	uint32_t bits = ((uint32_t) p[rar->bits.in_addr]) << 24;
+ 	bits |= p[rar->bits.in_addr + 1] << 16;
+ 	bits |= p[rar->bits.in_addr + 2] << 8;
+@@ -1023,7 +1032,16 @@ static int read_bits_32(struct rar5* rar, const uint8_t* p, uint32_t* value) {
+ 	return ARCHIVE_OK;
+ }
+ 
+-static int read_bits_16(struct rar5* rar, const uint8_t* p, uint16_t* value) {
++static int read_bits_16(struct archive_read* a, struct rar5* rar,
++	const uint8_t* p, uint16_t* value)
++{
++	if(rar->bits.in_addr >= rar->cstate.cur_block_size) {
++		archive_set_error(&a->archive,
++			ARCHIVE_ERRNO_PROGRAMMER,
++			"Premature end of stream during extraction of data (#2)");
++		return ARCHIVE_FATAL;
++	}
++
+ 	int bits = (int) ((uint32_t) p[rar->bits.in_addr]) << 16;
+ 	bits |= (int) p[rar->bits.in_addr + 1] << 8;
+ 	bits |= (int) p[rar->bits.in_addr + 2];
+@@ -1039,8 +1057,8 @@ static void skip_bits(struct rar5* rar, int bits) {
+ }
+ 
+ /* n = up to 16 */
+-static int read_consume_bits(struct rar5* rar, const uint8_t* p, int n,
+-    int* value)
++static int read_consume_bits(struct archive_read* a, struct rar5* rar,
++	const uint8_t* p, int n, int* value)
+ {
+ 	uint16_t v;
+ 	int ret, num;
+@@ -1051,7 +1069,7 @@ static int read_consume_bits(struct rar5* rar, const uint8_t* p, int n,
+ 		return ARCHIVE_FATAL;
+ 	}
+ 
+-	ret = read_bits_16(rar, p, &v);
++	ret = read_bits_16(a, rar, p, &v);
+ 	if(ret != ARCHIVE_OK)
+ 		return ret;
+ 
+@@ -2525,13 +2543,13 @@ static int create_decode_tables(uint8_t* bit_length,
+ static int decode_number(struct archive_read* a, struct decode_table* table,
+     const uint8_t* p, uint16_t* num)
+ {
+-	int i, bits, dist;
++	int i, bits, dist, ret;
+ 	uint16_t bitfield;
+ 	uint32_t pos;
+ 	struct rar5* rar = get_context(a);
+ 
+-	if(ARCHIVE_OK != read_bits_16(rar, p, &bitfield)) {
+-		return ARCHIVE_EOF;
++	if(ARCHIVE_OK != (ret = read_bits_16(a, rar, p, &bitfield))) {
++		return ret;
+ 	}
+ 
+ 	bitfield &= 0xfffe;
+@@ -2637,14 +2655,6 @@ static int parse_tables(struct archive_read* a, struct rar5* rar,
+ 	for(i = 0; i < HUFF_TABLE_SIZE;) {
+ 		uint16_t num;
+ 
+-		if((rar->bits.in_addr + 6) >= rar->cstate.cur_block_size) {
+-			/* Truncated data, can't continue. */
+-			archive_set_error(&a->archive,
+-			    ARCHIVE_ERRNO_FILE_FORMAT,
+-			    "Truncated data in huffman tables (#2)");
+-			return ARCHIVE_FATAL;
+-		}
+-
+ 		ret = decode_number(a, &rar->cstate.bd, p, &num);
+ 		if(ret != ARCHIVE_OK) {
+ 			archive_set_error(&a->archive,
+@@ -2661,8 +2671,8 @@ static int parse_tables(struct archive_read* a, struct rar5* rar,
+ 			/* 16..17: repeat previous code */
+ 			uint16_t n;
+ 
+-			if(ARCHIVE_OK != read_bits_16(rar, p, &n))
+-				return ARCHIVE_EOF;
++			if(ARCHIVE_OK != (ret = read_bits_16(a, rar, p, &n)))
++				return ret;
+ 
+ 			if(num == 16) {
+ 				n >>= 13;
+@@ -2690,8 +2700,8 @@ static int parse_tables(struct archive_read* a, struct rar5* rar,
+ 			/* other codes: fill with zeroes `n` times */
+ 			uint16_t n;
+ 
+-			if(ARCHIVE_OK != read_bits_16(rar, p, &n))
+-				return ARCHIVE_EOF;
++			if(ARCHIVE_OK != (ret = read_bits_16(a, rar, p, &n)))
++				return ret;
+ 
+ 			if(num == 18) {
+ 				n >>= 13;
+@@ -2807,22 +2817,22 @@ static int parse_block_header(struct archive_read* a, const uint8_t* p,
+ }
+ 
+ /* Convenience function used during filter processing. */
+-static int parse_filter_data(struct rar5* rar, const uint8_t* p,
+-    uint32_t* filter_data)
++static int parse_filter_data(struct archive_read* a, struct rar5* rar,
++	const uint8_t* p, uint32_t* filter_data)
+ {
+-	int i, bytes;
++	int i, bytes, ret;
+ 	uint32_t data = 0;
+ 
+-	if(ARCHIVE_OK != read_consume_bits(rar, p, 2, &bytes))
+-		return ARCHIVE_EOF;
++	if(ARCHIVE_OK != (ret = read_consume_bits(a, rar, p, 2, &bytes)))
++		return ret;
+ 
+ 	bytes++;
+ 
+ 	for(i = 0; i < bytes; i++) {
+ 		uint16_t byte;
+ 
+-		if(ARCHIVE_OK != read_bits_16(rar, p, &byte)) {
+-			return ARCHIVE_EOF;
++		if(ARCHIVE_OK != (ret = read_bits_16(a, rar, p, &byte))) {
++			return ret;
+ 		}
+ 
+ 		/* Cast to uint32_t will ensure the shift operation will not
+@@ -2865,16 +2875,17 @@ static int parse_filter(struct archive_read* ar, const uint8_t* p) {
+ 	uint16_t filter_type;
+ 	struct filter_info* filt = NULL;
+ 	struct rar5* rar = get_context(ar);
++	int ret;
+ 
+ 	/* Read the parameters from the input stream. */
+-	if(ARCHIVE_OK != parse_filter_data(rar, p, &block_start))
+-		return ARCHIVE_EOF;
++	if(ARCHIVE_OK != (ret = parse_filter_data(ar, rar, p, &block_start)))
++		return ret;
+ 
+-	if(ARCHIVE_OK != parse_filter_data(rar, p, &block_length))
+-		return ARCHIVE_EOF;
++	if(ARCHIVE_OK != (ret = parse_filter_data(ar, rar, p, &block_length)))
++		return ret;
+ 
+-	if(ARCHIVE_OK != read_bits_16(rar, p, &filter_type))
+-		return ARCHIVE_EOF;
++	if(ARCHIVE_OK != (ret = read_bits_16(ar, rar, p, &filter_type)))
++		return ret;
+ 
+ 	filter_type >>= 13;
+ 	skip_bits(rar, 3);
+@@ -2914,8 +2925,8 @@ static int parse_filter(struct archive_read* ar, const uint8_t* p) {
+ 	if(filter_type == FILTER_DELTA) {
+ 		int channels;
+ 
+-		if(ARCHIVE_OK != read_consume_bits(rar, p, 5, &channels))
+-			return ARCHIVE_EOF;
++		if(ARCHIVE_OK != (ret = read_consume_bits(ar, rar, p, 5, &channels)))
++			return ret;
+ 
+ 		filt->channels = channels + 1;
+ 	}
+@@ -2923,10 +2934,11 @@ static int parse_filter(struct archive_read* ar, const uint8_t* p) {
+ 	return ARCHIVE_OK;
+ }
+ 
+-static int decode_code_length(struct rar5* rar, const uint8_t* p,
+-    uint16_t code)
++static int decode_code_length(struct archive_read* a, struct rar5* rar,
++	const uint8_t* p, uint16_t code)
+ {
+ 	int lbits, length = 2;
++
+ 	if(code < 8) {
+ 		lbits = 0;
+ 		length += code;
+@@ -2938,7 +2950,7 @@ static int decode_code_length(struct rar5* rar, const uint8_t* p,
+ 	if(lbits > 0) {
+ 		int add;
+ 
+-		if(ARCHIVE_OK != read_consume_bits(rar, p, lbits, &add))
++		if(ARCHIVE_OK != read_consume_bits(a, rar, p, lbits, &add))
+ 			return -1;
+ 
+ 		length += add;
+@@ -3033,7 +3045,7 @@ static int do_uncompress_block(struct archive_read* a, const uint8_t* p) {
+ 			continue;
+ 		} else if(num >= 262) {
+ 			uint16_t dist_slot;
+-			int len = decode_code_length(rar, p, num - 262),
++			int len = decode_code_length(a, rar, p, num - 262),
+ 				dbits,
+ 				dist = 1;
+ 
+@@ -3075,12 +3087,12 @@ static int do_uncompress_block(struct archive_read* a, const uint8_t* p) {
+ 					uint16_t low_dist;
+ 
+ 					if(dbits > 4) {
+-						if(ARCHIVE_OK != read_bits_32(
+-						    rar, p, &add)) {
++						if(ARCHIVE_OK != (ret = read_bits_32(
++						    a, rar, p, &add))) {
+ 							/* Return EOF if we
+ 							 * can't read more
+ 							 * data. */
+-							return ARCHIVE_EOF;
++							return ret;
+ 						}
+ 
+ 						skip_bits(rar, dbits - 4);
+@@ -3115,11 +3127,11 @@ static int do_uncompress_block(struct archive_read* a, const uint8_t* p) {
+ 					/* dbits is one of [0,1,2,3] */
+ 					int add;
+ 
+-					if(ARCHIVE_OK != read_consume_bits(rar,
+-					     p, dbits, &add)) {
++					if(ARCHIVE_OK != (ret = read_consume_bits(a, rar,
++					     p, dbits, &add))) {
+ 						/* Return EOF if we can't read
+ 						 * more data. */
+-						return ARCHIVE_EOF;
++						return ret;
+ 					}
+ 
+ 					dist += add;
+@@ -3176,7 +3188,11 @@ static int do_uncompress_block(struct archive_read* a, const uint8_t* p) {
+ 				return ARCHIVE_FATAL;
+ 			}
+ 
+-			len = decode_code_length(rar, p, len_slot);
++			len = decode_code_length(a, rar, p, len_slot);
++			if (len == -1) {
++				return ARCHIVE_FATAL;
++			}
++
+ 			rar->cstate.last_len = len;
+ 
+ 			if(ARCHIVE_OK != copy_string(a, len, dist))
+diff --git a/libarchive/test/test_read_format_rar5.c b/libarchive/test/test_read_format_rar5.c
+index 9ac63f910..d8b9ff21d 100644
+--- a/libarchive/test/test_read_format_rar5.c
++++ b/libarchive/test/test_read_format_rar5.c
+@@ -1295,3 +1295,19 @@ DEFINE_TEST(test_read_format_rar5_sfx)
+ 	assertEqualMem(buff, test_txt, size);
+ }
+ 
++DEFINE_TEST(test_read_format_rar5_decode_number_out_of_bounds_read)
++{
++	/* oss fuzz 30448 */
++
++	char buf[4096];
++	PROLOGUE("test_read_format_rar5_decode_number_out_of_bounds_read.rar");
++
++	/* Return codes of those calls are ignored, because this sample file
++	 * is invalid. However, the unpacker shouldn't produce any SIGSEGV
++	 * errors during processing. */
++
++	(void) archive_read_next_header(a, &ae);
++	while(0 < archive_read_data(a, buf, sizeof(buf))) {}
++
++	EPILOGUE();
++}
+diff --git a/libarchive/test/test_read_format_rar5_decode_number_out_of_bounds_read.rar.uu b/libarchive/test/test_read_format_rar5_decode_number_out_of_bounds_read.rar.uu
+new file mode 100644
+index 000000000..34d8ce3f7
+--- /dev/null
++++ b/libarchive/test/test_read_format_rar5_decode_number_out_of_bounds_read.rar.uu
+@@ -0,0 +1,10 @@
++begin 644 test_read_format_rar5_decode_number_out_of_bounds_read.rar
++M4F%R(1H'`0!3@"KT`P+G(@(0("`@@`L!!"`@("`@(($D_[BJ2"!::7!)210V
++M+0#ZF#)Q!`+>YPW_("`@("``_R````````````````````````````!__P``
++M``````!T72`@/EW_(/\@("`@("`@("`@("`@("`@("`@("`@("`@(/\@("`@
++M("`@("#_("`@("`@("`@("`@("`@("`@("`@("`@("#_("`@("`@("`@_R`@
++M("`@("`@("`@("`@("`@("`@("`@("`@_R`@("`@("`@(/\@("`@("`@("`@
++M("`@("`@("`@("`@("`@(/\@("`@("`@("#_("`@("`@("`@("`@("`@("`@
++E("`@("`@("#_("`@("`@("`@_R`@("`@("`@("`@("`@("`@(```
++`
++end
