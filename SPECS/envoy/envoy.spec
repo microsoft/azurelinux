@@ -188,6 +188,7 @@ fdupes %{buildroot}%{src_install_dir}
 - Remove patches that are no longer needed
 - Remove -c dbg and --color=no from bazel build option which will deplete memory
   space and cause gcc compiling error
+- Add bazel build option to stop treating vla-parameter warning as error
 - Add --override_repository option to let bazel fetch dependencies from prebuilt 
   vendor source instead of downloading from the network 
 - Disable rpm stripping
