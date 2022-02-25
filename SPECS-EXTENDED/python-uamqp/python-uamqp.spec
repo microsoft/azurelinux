@@ -68,7 +68,6 @@ rm $RPM_BUILD_ROOT%{python3_sitearch}/%{srcname}/*.c
 
 %changelog
 * Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.1-1
-- Added a patch to fix the build with new CMake.
 - Updating to version 1.5.1 using Fedora 36 spec (license: MIT) for guidance.
 - License verified.
 
