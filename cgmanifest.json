@@ -15593,16 +15593,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "OpenIPMI",
-          "version": "2.0.31",
-          "downloadUrl": "http://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.31.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "openjade",
           "version": "1.3.2",
           "downloadUrl": "http://download.sourceforge.net/openjade/openjade-1.3.2.tar.gz"
