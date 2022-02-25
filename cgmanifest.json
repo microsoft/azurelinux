@@ -1276,16 +1276,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "bolt",
-          "version": "0.9.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/bolt/bolt/-/archive/0.9.1/bolt-0.9.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "boom-boot",
           "version": "1.2",
           "downloadUrl": "https://github.com/snapshotmanager/boom/archive/1.2/boom-1.2.tar.gz"
@@ -3932,16 +3922,6 @@
           "name": "fping",
           "version": "5.0",
           "downloadUrl": "https://github.com/schweikert/fping/releases/download/v5.0/fping-5.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "fprintd",
-          "version": "1.90.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/libfprint/fprintd/uploads/a47c31c844e23e070665a8a85dae0144/fprintd-1.90.1.tar.xz"
         }
       }
     },
@@ -9623,16 +9603,6 @@
           "name": "libfontenc",
           "version": "1.1.3",
           "downloadUrl": "ftp://ftp.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libfprint",
-          "version": "1.90.3",
-          "downloadUrl": "https://gitlab.freedesktop.org/libfprint/libfprint/-/archive/v1.90.3/libfprint-v1.90.3.tar.gz"
         }
       }
     },
@@ -28819,16 +28789,6 @@
           "name": "uid_wrapper",
           "version": "1.2.7",
           "downloadUrl": "https://ftp.samba.org/pub/cwrap/uid_wrapper-1.2.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "umockdev",
-          "version": "0.14",
-          "downloadUrl": "https://github.com/martinpitt/umockdev/archive/0.14.tar.gz"
         }
       }
     },
