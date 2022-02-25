@@ -1,15 +1,26 @@
 Summary:        Fast compression and decompression library
 Name:           snappy
-Version:        1.1.7
-Release:        6%{?dist}
+Version:        1.1.9
+Release:        1%{?dist}
 License:        BSD
-URL:            https://google.github.io/snappy/
-#Source0:       https://github.com/google/%{name}/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Group:          System/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  cmake
+Group:          System/Libraries
+URL:            https://github.com/google/snappy
+#Source0:       https://github.com/google/%{name}/archive/%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+Patch0:         snappy-inline.patch
+BuildRequires:  cmake >= 3.3
+
+# A buildable snappy environment needs functioning submodules that do not work from the archive download
+# To recreate the tar.gz run the following
+#  sudo git clone https://github.com/google/snappy
+#  git checkout <commitid-for-version>
+#  pushd snappy
+#  sudo git submodule update --init --recursive
+#  popd
+#  sudo mv %{name} %{name}-%{version}
+#  sudo tar -cvf %{name}-%{version}.tar.gz %{name}-%{version}/
 
 %description
 Snappy is a compression/decompression library. It does not aim for maximum
@@ -20,25 +31,22 @@ inputs, but the resulting compressed files are anywhere from 20% to 100%
 bigger.
 
 %package	devel
-Summary:	Header and development files
-Requires:	%{name} = %{version}
+Summary:	 Header and development files
+Requires:	 %{name} = %{version}
+
 %description	devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-mkdir -p build/
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=%{_prefix} -DBUILD_SHARED_LIBS=ON ..
-make %{?_smp_mflags}
+mkdir build && cd build
+%cmake ..
+%make_build
 
 %install
-cd build
-make DESTDIR=%{buildroot} install
-rm -rf %{buildroot}%{_datadir}/doc/snappy/
-find %{buildroot} -name '*.la' -delete
+%make_install -C build
 
 %check
 cd testdata
@@ -53,16 +61,22 @@ make test
 %defattr(-,root,root)
 %license COPYING
 %doc AUTHORS
-%{_lib64dir}/*.so.*
-%exclude %{_lib64dir}/cmake
+%{_libdir}/*.so.*
+%exclude %{_libdir}/cmake
 
 %files devel
 %defattr(-,root,root)
 %doc format_description.txt framing_format.txt
 %{_includedir}/*
-%{_lib64dir}/libsnappy.so
+%{_libdir}/lib*.so
+%{_libdir}/cmake/Snappy/
+%{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Feb 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.9-1
+- Update to version 1.1.9.
+- Add patch for fixing compiler error due to missing 'inline'.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.7-6
 - Removing the explicit %%clean stage.
 - License verified.
@@ -70,13 +84,17 @@ make test
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.7-5
 - Added %%license line automatically
 
-*   Fri Apr 10 2020 Nick Samson <nisamson@microsoft.com> 1.1.7-4
--   Updated Source0, URL, license info. Removed licenses not mentioned in source. Removed sha1.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.7-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Fri Apr 10 2020 Nick Samson <nisamson@microsoft.com> 1.1.7-4
+- Updated Source0, URL, license info. Removed licenses not mentioned in source. Removed sha1.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.1.7-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
 *  Wed Jan 09 2019 Michelle Wang <michellew@vmware.com> 1.1.7-2
 -  Fix make check for snappy.
+
 *  Wed Sep 19 2018 Srinidhi Rao <srinidhir@vmware.com> 1.1.7-1
 -  Updating the version to 1.1.7.
+
 *  Fri Dec 16 2016 Dheeraj Shetty <Dheerajs@vmware.com> 1.1.3-1
 -  Initial build. First version.

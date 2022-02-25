@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "haveged-1.9.8.tar.gz": "99aa1996c6e39ea2459cfc37addfb8b1eecc63f3a2b6da9db17b22e76b6851ae",
+  "haveged-1.9.17.tar.gz": "02d9b7c801fbcf16bed43c27bf6ece570b79f4d94561f3eb30883fb5f89c526d",
   "haveged.service": "bdc275f31092ac37b9d455f633861b6ae74b9ef3e737609755ff207a4df084e7"
  }
 }

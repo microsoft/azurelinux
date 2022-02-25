@@ -10,7 +10,7 @@
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        7.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -90,7 +90,6 @@ Requires:       libssh2
 Requires:       libtirpc
 Requires:       libxml2
 Requires:       parted
-Requires:       python2
 Requires:       readline
 Requires:       systemd
 
@@ -1072,6 +1071,9 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
+* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 7.10.0-2
+- Remove requirement on python2 (python in general is not needed at runtime)
+
 * Tue Jan 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.10.0-1
 - Updating to version 7.10.0.
 - Switched to building with "meson".

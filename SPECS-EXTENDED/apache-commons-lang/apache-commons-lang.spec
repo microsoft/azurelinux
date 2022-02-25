@@ -23,15 +23,17 @@ Distribution:   Mariner
 %define short_name commons-%{base_name}
 Name:           apache-commons-lang
 Version:        2.6
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        Apache Commons Lang Package
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            http://commons.apache.org/%{base_name}
 Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Patch0:         fix_StopWatchTest_for_slow_systems.patch
 Patch1:         0002-Fix-FastDateFormat-for-Java-7-behaviour.patch
 Patch2:         commons-lang-bundle-manifest.patch
+Patch3:         encoding-fix.patch
+Patch4:         removing-enum-package.patch
 BuildRequires:  ant
 BuildRequires:  java-devel
 BuildRequires:  javapackages-local-bootstrap
@@ -72,6 +74,8 @@ Javadoc for %{name}.
 %patch0
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
 sed -i 's/\r//' *.txt *.html
 
 %pom_remove_parent .
@@ -80,7 +84,7 @@ sed -i 's/\r//' *.txt *.html
 export OPT_JAR_LIST=`cat %{_sysconfdir}/ant.d/junit`
 export CLASSPATH=
 %{ant} \
-    -Dcompile.source=1.4 -Dcompile.target=1.4 \
+    -Dcompile.source=1.6 -Dcompile.target=1.6 \
     -Djunit.jar=$(build-classpath junit4) \
     -Dfinal.name=%{short_name} \
     -Djdk.javadoc=%{_javadocdir}/java \
@@ -110,6 +114,10 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Feb 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6-17
+- Using newer Java version to fix build.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6-16
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

@@ -1,7 +1,7 @@
 Summary:        Incremental is a small library that versions your Python projects.
 Name:           python-incremental
-Version:        17.5.0
-Release:        5%{?dist}
+Version:        21.3.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,9 @@ Incremental is a small library that versions your Python projects.
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 24 2022 Nick Samson <nisamson@microsoft.com> - 21.3.0-1
+- Update to 21.3.0.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 17.5.0-5
 - Add license to python3 package
 - Remove python2 package

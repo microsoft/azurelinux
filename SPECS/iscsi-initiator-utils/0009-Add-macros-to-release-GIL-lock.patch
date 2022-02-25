@@ -1,4 +1,4 @@
-From 3df19ccba0af40da8cdb15c41e1bcd08ce25fbd9 Mon Sep 17 00:00:00 2001
+From 676f48d6e70f8406b36a004669d923825db51e2f Mon Sep 17 00:00:00 2001
 From: Jiri Konecny <jkonecny@redhat.com>
 Date: Mon, 11 May 2015 13:16:26 +0200
 Subject: [PATCH] Add macros to release GIL lock
@@ -52,5 +52,5 @@ index 8800853..40b5955 100644
  				libiscsi_get_error_string(context));
  		return NULL;
 -- 
-2.21.0
+2.26.2
 

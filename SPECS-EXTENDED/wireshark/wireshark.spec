@@ -8,11 +8,11 @@ Distribution:   Mariner
 Summary:	Network traffic analyzer
 Name:		wireshark
 Version:	3.4.4
-Release:	3%{?dist}
-License:	GPL+
+Release:	5%{?dist}
+License:	BSD and GPLv2
 Url:		http://www.wireshark.org/
 
-Source0:	https://wireshark.org/download/src/%{name}-%{version}.tar.xz
+Source0:	https://wireshark.org/download/src/all-versions/%{name}-%{version}.tar.xz
 Source1:        https://www.wireshark.org/download/src/all-versions/SIGNATURES-%{version}.txt
 Source2:	90-wireshark-usbmon.rules
 
@@ -39,6 +39,7 @@ Requires:	libmaxminddb
 %endif
 
 BuildRequires:	bzip2-devel
+BuildRequires:	perl(English)
 BuildRequires:	c-ares-devel
 BuildRequires:	elfutils-devel
 BuildRequires:	gcc-c++
@@ -282,6 +283,12 @@ fi
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-5
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-4
+- Adding missing BRs on Perl modules.
+
 * Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 3.4.4-3
 - Remove epoch
 
