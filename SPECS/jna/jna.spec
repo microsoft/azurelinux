@@ -21,8 +21,11 @@
 
 Summary:        Java Native Access
 Name:           jna
-Version:        5.5.0
-Release:        4%{?dist}
+Version:        5.10.0
+Release:        1%{?dist}
+# Most of code is dual-licensed under either LGPL 2.1+ only or Apache
+# License 2.0.  WeakIdentityHashMap.java was taken from Apache CXF,
+# which is pure Apache License 2.0.
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,11 +35,18 @@ Source0:        https://github.com/java-native-access/jna/archive/%{version}/%{n
 Patch0:         jna_remove_clover_and_win32_native_jar.patch
 BuildRequires:  ant
 BuildRequires:  dos2unix
+BuildRequires:  gcc
+BuildRequires:  hamcrest
 BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  javapackages-tools
+BuildRequires:  junit
 BuildRequires:  libffi
 BuildRequires:  libffi-devel
+BuildRequires:  libX11-devel
+BuildRequires:  libXt-devel
+BuildRequires:  make
 BuildRequires:  msopenjdk-11
-BuildRequires:  javapackages-tools
+BuildRequires:  objectweb-asm
 Requires:       msopenjdk-11
 
 %description
@@ -135,6 +145,10 @@ ant
 %license LICENSE
 
 %changelog
+* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.0-1
+- Update source to v5.10.0
+- Update jna_remove_clover_and_win32_native_jar.patch
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.0-4
 - Removing the explicit %%clean stage.
 

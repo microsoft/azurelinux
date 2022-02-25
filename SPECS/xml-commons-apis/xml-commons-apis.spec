@@ -37,7 +37,10 @@ Source4:        https://repo1.maven.org/maven2/xml-apis/xml-apis-ext/1.3.04/xml-
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel
+BuildRequires:  javapackages-filesystem
 BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  javapackages-tools
+BuildRequires:  python3-javapackages
 BuildRequires:  xz
 #!BuildIgnore:  xerces-j2 xml-apis xml-resolver
 Provides:       xml-commons-apis-bootstrap = %{version}-%{release}
