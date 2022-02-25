@@ -3,7 +3,7 @@
 Summary:        A PKCS#11 engine for use with OpenSSL
 Name:           openssl-pkcs11
 Version:        0.4.10
-Release:        8%{?dist}
+Release:        9%{?dist}
 # The source code is LGPLv2+ except eng_back.c and eng_parse.c which are BSD
 License:        LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
@@ -99,6 +99,9 @@ make check %{?_smp_mflags} || if [ $? -ne 0 ]; then cat tests/*.log; exit 1; fi;
 %{_includedir}/*.h
 
 %changelog
+* Fri Feb 25 2022 Muhammad Falak <mwani@microsoft.caom> - 04.10-9
+- Move BR on doxygen out the `%{with_check}` gate to fix build break
+
 * Tue Feb 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.4.10-8
 - License verified.
 
