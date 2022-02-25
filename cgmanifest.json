@@ -5019,9 +5019,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "GSL",
-          "version": "4.0.0",
-          "downloadUrl": "https://github.com/microsoft/GSL/archive/v4.0.0.tar.gz"
+          "name": "gsl",
+          "version": "2.6",
+          "downloadUrl": "http://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz"
         }
       }
     },
@@ -5029,9 +5029,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "gsl",
-          "version": "2.6",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz"
+          "name": "GSL",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/microsoft/GSL/archive/v4.0.0.tar.gz"
         }
       }
     },
@@ -24744,8 +24744,8 @@
         "type": "other",
         "other": {
           "name": "python-uamqp",
-          "version": "1.2.12",
-          "downloadUrl": "https://github.com/Azure/azure-uamqp-python//archive/v1.2.12/uamqp-1.2.12.tar.gz"
+          "version": "1.5.1",
+          "downloadUrl": "https://github.com/Azure/azure-uamqp-python/archive/v1.5.1/uamqp-1.5.1.tar.gz"
         }
       }
     },
