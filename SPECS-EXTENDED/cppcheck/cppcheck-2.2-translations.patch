@@ -1,7 +1,7 @@
-diff -urp cppcheck-1.89.orig/gui/CMakeLists.txt cppcheck-1.89/gui/CMakeLists.txt
---- cppcheck-1.89.orig/gui/CMakeLists.txt	2019-12-07 13:41:32.651559443 -0500
-+++ cppcheck-1.89/gui/CMakeLists.txt	2019-12-07 13:45:16.037535529 -0500
-@@ -30,7 +30,7 @@ if (BUILD_GUI)
+diff -urp cppcheck-2.2.orig/gui/CMakeLists.txt cppcheck-2.2/gui/CMakeLists.txt
+--- cppcheck-2.2.orig/gui/CMakeLists.txt	2020-10-03 11:05:53.000000000 +0200
++++ cppcheck-2.2/gui/CMakeLists.txt	2020-10-04 07:18:23.309796000 +0200
+@@ -40,7 +40,7 @@ if (BUILD_GUI)
      endif()
  
      install(TARGETS cppcheck-gui RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR} COMPONENT applications)
@@ -10,12 +10,12 @@ diff -urp cppcheck-1.89.orig/gui/CMakeLists.txt cppcheck-1.89/gui/CMakeLists.txt
  
      install(FILES cppcheck-gui.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
  
-diff -urp cppcheck-1.89.orig/gui/translationhandler.cpp cppcheck-1.89/gui/translationhandler.cpp
---- cppcheck-1.89.orig/gui/translationhandler.cpp	2019-09-01 09:01:12.000000000 -0400
-+++ cppcheck-1.89/gui/translationhandler.cpp	2019-12-07 13:46:47.085525782 -0500
-@@ -116,15 +116,7 @@ bool TranslationHandler::setLanguage(con
-         if (datadir.isEmpty())
-             datadir = appPath;
+diff -urp cppcheck-2.2.orig/gui/translationhandler.cpp cppcheck-2.2/gui/translationhandler.cpp
+--- cppcheck-2.2.orig/gui/translationhandler.cpp	2020-10-03 11:05:53.000000000 +0200
++++ cppcheck-2.2/gui/translationhandler.cpp	2020-10-04 07:19:44.765892500 +0200
+@@ -113,15 +113,7 @@ bool TranslationHandler::setLanguage(con
+ 
+         QString datadir = getDataDir();
  
 -        QString translationFile;
 -        if (QFile::exists(datadir + "/lang/" + mTranslations[index].mFilename + ".qm"))
@@ -26,7 +26,7 @@ diff -urp cppcheck-1.89.orig/gui/translationhandler.cpp cppcheck-1.89/gui/transl
 -
 -        else
 -            translationFile = appPath + "/" + mTranslations[index].mFilename + ".qm";
-+	QString translationFile("/usr/share/Cppcheck/lang/" + mTranslations[index].mFilename + ".qm");
++        QString translationFile("/usr/share/Cppcheck/lang/" + mTranslations[index].mFilename + ".qm");
  
          if (!mTranslator->load(translationFile) && !failure) {
              //If it failed, lets check if the default file exists

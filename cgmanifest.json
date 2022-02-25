@@ -2197,8 +2197,8 @@
         "type": "other",
         "other": {
           "name": "cppcheck",
-          "version": "2.1",
-          "downloadUrl": "http://downloads.sourceforge.net/cppcheck/cppcheck-2.1.tar.gz"
+          "version": "2.7",
+          "downloadUrl": "https://github.com/danmar/cppcheck/archive/2.7.tar.gz"
         }
       }
     },
