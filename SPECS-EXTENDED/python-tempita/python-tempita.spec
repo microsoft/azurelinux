@@ -2,14 +2,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 Name:           python-tempita
-Version:        0.5.1
-Release:        27%{?dist}
+Version:        0.5.2
+Release:        1%{?dist}
 Summary:        A very small text templating language
 
 License:        MIT
 URL:            http://pythonpaste.org/tempita/
-Source0:        http://pypi.python.org/packages/source/T/Tempita/Tempita-%{version}.tar.gz
+Source0:        https://pypi.python.org/packages/source/T/Tempita/Tempita-%{version}.tar.gz
 Source1:        %{name}-LICENSE.txt
+Patch0001:      0001-Fix-SyntaxError-multiple-exception-types-must-be-par.patch
 
 BuildArch:      noarch
 
@@ -40,11 +41,13 @@ Tempita is a small templating language for text substitution.
 
 
 %prep
-%setup -q -n Tempita-%{version}
+%autosetup -n Tempita-%{version} -p1
 cp %{SOURCE1} ./LICENSE.txt
 
 
 %build
+# Mariner's version of 'python3-setuptools' removed support for the "use_2to3" option.
+sed -i '/use_2to3/d' setup.py
 %py3_build
 
 
@@ -58,6 +61,10 @@ cp %{SOURCE1} ./LICENSE.txt
 %{python3_sitelib}/*.egg-info/
 
 %changelog
+* Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.2-1
+- Fixing build for updated version of "python3-setuptools".
+- Updating to version 0.5.2 and applying a build patch from Fedora 36 (license: MIT).
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.1-28
 - License verified
 

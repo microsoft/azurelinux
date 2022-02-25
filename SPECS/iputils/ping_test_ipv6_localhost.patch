@@ -1,0 +1,26 @@
+From 503d6e54847974d0b0d63f2354919c64cbda611d Mon Sep 17 00:00:00 2001
+From: Rachel Menge <rachelmenge@microsoft.com>
+Date: Fri, 18 Feb 2022 12:13:21 -0800
+Subject: [PATCH] Mark ping6 for localhost as expected failure
+
+Mariner does not map 'localhost' for ipv6 addresses
+---
+ test/ping/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/ping/meson.build b/test/ping/meson.build
+index 11f15f5..7198369 100644
+--- a/test/ping/meson.build
++++ b/test/ping/meson.build
+@@ -37,7 +37,7 @@ foreach dst : [ 'localhost', '127.0.0.1' ] + ipv6_dst
+ 
+ 	if switch != ''
+ 	  args = [switch] + args
+-	  if (switch == '-4' and dst == '::1') or (switch == '-6' and dst == '127.0.0.1')
++	  if (switch == '-4' and dst == '::1') or (switch == '-6' and dst == '127.0.0.1') or (switch == '-6' and dst == 'localhost')
+ 		 should_fail = true
+ 	  endif
+ 	endif
+-- 
+2.17.1
+

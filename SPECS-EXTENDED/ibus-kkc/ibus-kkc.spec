@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:		ibus-kkc
 Version:	1.5.22
-Release:	14%{?dist}
+Release:	16%{?dist}
 Summary:	Japanese Kana Kanji input method for ibus
 
 License:	GPLv2+
@@ -12,6 +12,7 @@ Patch0:		ibus-kkc-content-type.patch
 Patch1:         ibus-HEAD.patch
 
 BuildRequires:	vala
+BuildRequires:	perl(File::Find)
 BuildRequires:	intltool
 BuildRequires:	libkkc-devel >= 0.3.4
 BuildRequires:	ibus-devel
@@ -94,7 +95,8 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/ibus-setup-kkc.deskt
 
 
 %files -f %{name}.lang
-%doc AUTHORS COPYING ChangeLog README
+%license COPYING
+%doc AUTHORS ChangeLog README
 %{_datadir}/appdata/*.appdata.xml
 %{_datadir}/ibus-kkc
 %{_libexecdir}/ibus-*-kkc
@@ -103,6 +105,12 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/ibus-setup-kkc.deskt
 
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.22-16
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.22-15
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.22-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

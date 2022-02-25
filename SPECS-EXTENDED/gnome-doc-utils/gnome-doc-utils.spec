@@ -2,10 +2,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: gnome-doc-utils
 Version: 0.20.10
-Release: 22%{?dist}
+Release: 24%{?dist}
 Summary: Documentation utilities for GNOME
 
-License: GPLv2+ and LGPLv2+ and GFDL
+License: GPLv2+ and LGPLv2+
 URL:     https://wiki.gnome.org/Projects/GnomeDocUtils
 Source:  https://download.gnome.org/sources/%{name}/0.20/%{name}-%{version}.tar.xz
 #VCS: git:git://git.gnome.org/gnome-doc-utils
@@ -16,6 +16,7 @@ Patch2:  gnome-doc-utils-0.20.10-python3.patch
 BuildArch: noarch
 
 BuildRequires: gcc
+BuildRequires: perl(File::Find)
 BuildRequires: libxml2-devel >= 2.6.12
 BuildRequires: libxslt-devel >= 1.1.8
 BuildRequires: python3-libxml2
@@ -91,6 +92,12 @@ sed -i -e '/^Requires:/d' %{buildroot}%{_datadir}/pkgconfig/xml2po.pc
 %{_datadir}/xml/mallard
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.10-24
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.10-23
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.10-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:    vino
 Version: 3.22.0
-Release: 18%{?dist}
+Release: 20%{?dist}
 Summary: A remote desktop system for GNOME
 
 License: GPLv2+
@@ -17,6 +17,7 @@ Patch3: Prevent-monitoring-all-interfaces-after-change-of-ot.patch
 Patch4: Properly-remove-watches-when-changing-server-props.patch
 
 BuildRequires: pkgconfig(avahi-client)
+BuildRequires: perl(File::Find)
 BuildRequires: pkgconfig(avahi-glib)
 BuildRequires: pkgconfig(gnutls)
 BuildRequires: pkgconfig(gtk+-x11-3.0)
@@ -95,6 +96,12 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/vino-server.desktop
 
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-20
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-19
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

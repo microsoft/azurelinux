@@ -1,30 +1,44 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
-Version:        1.14.5
-Release:        8%{?dist}
+Version:        1.21.2
+Release:        1%{?dist}
 License:        MIT
-Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
-
 #Source0:       %{url}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-vendor-%{version}.tar.gz
-
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget %{url}/archive/v%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Patch0:         add-extra-metrics.patch
-
 BuildRequires:  golang
 BuildRequires:  systemd-devel
-
-Requires:           systemd
-Requires:           logrotate
-Requires:           procps-ng
-Requires:           shadow-utils
-Requires(pre):      /usr/sbin/useradd
-Requires(pre):      /usr/sbin/groupadd
-Requires(postun):   /usr/sbin/userdel
-Requires(postun):   /usr/sbin/groupdel
+Requires:       logrotate
+Requires:       procps-ng
+Requires:       shadow-utils
+Requires:       systemd
+Requires(pre):  %{_sbindir}/useradd
+Requires(pre):  %{_sbindir}/groupadd
+Requires(postun): %{_sbindir}/userdel
+Requires(postun): %{_sbindir}/groupdel
 
 %description
 Telegraf is an agent written in Go for collecting, processing, aggregating, and writing metrics.
@@ -53,9 +67,8 @@ getent passwd telegraf >/dev/null || useradd -c "Telegraf" -d %{_localstatedir}/
         -s /sbin/nologin -M -r %{name}
 
 %post
-chown -R telegraf:telegraf /etc/telegraf
+chown -R telegraf:telegraf %{_sysconfdir}/telegraf
 %systemd_post %{name}.service
-systemctl daemon-reload
 
 %preun
 %systemd_preun %{name}.service
@@ -77,29 +90,42 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-*   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.5-8
--   Removing the explicit %%clean stage.
+* Tue Jan 18 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.21.2-1
+- Update to version 1.21.2.
+- Modified patch to apply to new version.
 
-*   Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.14.5-7
--   Increment release to force republishing using golang 1.15.13.
-*   Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.14.5-6
--   Increment release to force republishing using golang 1.15.11.
-*   Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.14.5-5
--   Increment release to force republishing using golang 1.15.
-*   Thu Oct 15 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.14.5-4
--   License verified.
--   Added %%license macro.
--   Fixed source URL.
--   Switched to %%autosetup.
-*   Fri Aug 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.14.5-3
--   Add runtime required procps-ng and shadow-utils
-*   Tue Jul 14 2020 Jonathan Chiu <jochi@microsoft.com> 1.14.5-1
--   Update to version 1.14.5
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.7.4-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Fri Sep 07 2018 Michelle Wang <michellew@vmware.com> 1.7.4-1
--   Update version to 1.7.4 and its plugin version to 1.4.0.
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.3.4-2
--   Remove shadow from requires and use explicit tools for post actions
-*   Tue Jul 18 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.3.4-1
--   first version
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.5-8
+- Removing the explicit %%clean stage.
+
+* Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 1.14.5-7
+- Increment release to force republishing using golang 1.15.13.
+
+* Mon Apr 26 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.14.5-6
+- Increment release to force republishing using golang 1.15.11.
+
+* Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 1.14.5-5
+- Increment release to force republishing using golang 1.15.
+
+* Thu Oct 15 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.14.5-4
+- License verified.
+- Added %%license macro.
+- Fixed source URL.
+- Switched to %%autosetup.
+
+* Fri Aug 21 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.14.5-3
+- Add runtime required procps-ng and shadow-utils
+
+* Tue Jul 14 2020 Jonathan Chiu <jochi@microsoft.com> 1.14.5-1
+- Update to version 1.14.5
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.7.4-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Fri Sep 07 2018 Michelle Wang <michellew@vmware.com> 1.7.4-1
+- Update version to 1.7.4 and its plugin version to 1.4.0.
+
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 1.3.4-2
+- Remove shadow from requires and use explicit tools for post actions
+
+* Tue Jul 18 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.3.4-1
+- first version

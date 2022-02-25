@@ -196,10 +196,8 @@ KernelOptions is mandatory for all non-`rootfs` image types.
 
 KernelOptions may be included in `rootfs` images which expect a kernel, such as the initrd for an ISO, if desired.
 
-Currently there are only two keys with an assigned meaning:
+Currently there is only one key with an assigned meaning:
 - `default` key needs to be always provided. It designates a kernel that is used when no other scenario is applicable (i.e. by default).
-- `hyperv` key is an optional key that is only meaningful in ISO context. It provides a kernel that will be chosen by the installer instead of the default one if the installer detects that the installation is conducted in the Hyper-V environment.
-
 
 Keys starting with an underscore are ignored - they can be used for providing comments.
 
@@ -207,16 +205,7 @@ A sample KernelOptions specifying a default kernel:
 
 ``` json
 "KernelOptions": {
-    "default": "kernel-hyperv"
-},
-```
-
-A sample KernelOptions specifying a default kernel and a specialized kernel for Hyper-V scenario:
-
-``` json
-"KernelOptions": {
-    "default": "kernel",
-    "hyperv": "kernel-hyperv"
+    "default": "kernel"
 },
 ```
 

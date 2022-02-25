@@ -30,6 +30,8 @@ Patch1:         0001-Remove-unused-import.patch
 # Fix dependency on xbean-asm4-shaded to original objectweb-asm
 Patch2:         0002-Unbundle-ASM.patch
 Patch3:         0003-Remove-dependency-on-log4j-and-commons-logging.patch
+Patch4:         downgrading-asm-version.patch
+Patch5:         jdk-11-fix.patch
 
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
@@ -70,13 +72,13 @@ rm src/site/site.xml
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %pom_remove_parent
 %pom_remove_dep mx4j:mx4j
 
-%pom_remove_dep -r :xbean-asm5-shaded
 %pom_remove_dep -r :xbean-finder-shaded
-%pom_disable_module xbean-asm5-shaded
 %pom_disable_module xbean-finder-shaded
 
 %pom_xpath_remove pom:scope xbean-asm-util
@@ -111,7 +113,6 @@ sed -i "s|</Private-Package>|</Private-Package-->|" xbean-blueprint/pom.xml
 
 # Removing dependency on Apache commons logging
 %pom_remove_dep :commons-logging-api xbean-reflect
-%pom_remove_dep :xbean-asm7-shaded xbean-reflect
 find -name CommonsLoggingConverter.java -delete
 
 # Removing dependency on log4j.

@@ -1,13 +1,13 @@
 Summary:        Python library for creating unit tests which are simpler to write and more powerful
 Name:           python-hypothesis
-Version:        3.71.0
-Release:        5%{?dist}
+Version:        6.36.2
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/HypothesisWorks/hypothesis-python
-Source0:        https://files.pythonhosted.org/packages/65/57/c4e2cc37a7b9de3d57a1cd6c200f931807cfdd9f7e05ef4c67fb9c507d65/hypothesis-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/24/05/d03211fc959ddf8c4a26d04957d9640a86a723f5d6a4359a4430cf5fa0b4/hypothesis-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -44,8 +44,13 @@ and then generates simple and comprehensible examples that make your tests fail.
 %defattr(-,root,root,-)
 %license LICENSE.txt
 %{python3_sitelib}/*
+%{_bindir}/*
 
 %changelog
+* Tue Feb 15 2022 Nick Samson <nisamson@microsoft.com> - 6.36.2-1
+- Updated source URL, updated to 6.36.2
+- Added hypothesis binary
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.71.0-5
 - Add license to python3 package
 - Remove python2 package

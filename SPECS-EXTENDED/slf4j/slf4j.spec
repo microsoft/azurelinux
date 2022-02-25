@@ -91,14 +91,6 @@ Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 %description jcl
 SLF4J JCL Binding.
 
-%package ext
-Summary:        SLF4J Extensions Module
-Group:          Development/Libraries/Java
-Requires:       mvn(org.slf4j:slf4j-api) = %{version}
-
-%description ext
-Extensions to the SLF4J API.
-
 %package -n jcl-over-slf4j
 Summary:        JCL 1.1.1 implemented over SLF4J
 License:        ASL 2.0
@@ -116,14 +108,6 @@ Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 
 %description -n log4j-over-slf4j
 Log4j implemented over SLF4J.
-
-%package -n jul-to-slf4j
-Summary:        JUL to SLF4J bridge
-Group:          Development/Libraries/Java
-Requires:       mvn(org.slf4j:slf4j-api) = %{version}
-
-%description -n jul-to-slf4j
-JUL to SLF4J bridge.
 
 %prep
 %setup -q -n %{name}-v_%{version} -a2
@@ -157,7 +141,12 @@ done
 sed -i "/Import-Package/s/$/;resolution:=optional/" slf4j-api/src/main/resources/META-INF/MANIFEST.MF
 
 %pom_change_dep -r -f ::::: :::::
+
+# Disabling log4j12 and modules depending on it.
+sed -i "/log4j12/d" maven-build.xml
 %pom_disable_module slf4j-log4j12
+%pom_disable_module jul-to-slf4j
+%pom_disable_module slf4j-ext
 
 %build
 export CLASSPATH=$(build-classpath \
@@ -175,25 +164,25 @@ ant -Dmaven2.jpp.mode=true \
 %install
 # jars
 install -d -m 0755 %{buildroot}%{_javadir}/%{name}
-for i in api ext jcl jdk14 nop simple; do
+for i in api jcl jdk14 nop simple; do
   install -m 644 slf4j-${i}/target/slf4j-${i}-%{version}.jar \
     %{buildroot}%{_javadir}/%{name}/${i}.jar
   ln -sf ${i}.jar %{buildroot}%{_javadir}/%{name}/%{name}-${i}.jar
 done
-for i in jcl-over-slf4j jul-to-slf4j log4j-over-slf4j; do
+for i in jcl-over-slf4j log4j-over-slf4j; do
   install -m 644 ${i}/target/${i}-%{version}.jar %{buildroot}%{_javadir}/%{name}/${i}.jar
 done
 
 # poms
 install -d -m 755 %{buildroot}%{_mavenpomdir}/%{name}
-for i in api ext jcl jdk14 nop simple; do
+for i in api jcl jdk14 nop simple; do
   %pom_remove_parent slf4j-${i}
   %pom_xpath_inject "pom:project" "
     <groupId>org.slf4j</groupId>
     <version>%{version}</version>" slf4j-${i}
   install -pm 644 slf4j-${i}/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/${i}.pom
 done
-for i in jcl-over-slf4j jul-to-slf4j log4j-over-slf4j; do
+for i in jcl-over-slf4j log4j-over-slf4j; do
   %pom_remove_parent ${i}
   %pom_xpath_inject "pom:project" "
     <groupId>org.slf4j</groupId>
@@ -203,7 +192,7 @@ done
 for i in api nop simple; do
   %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar
 done
-for i in ext jcl jdk14 jcl-over-slf4j jul-to-slf4j log4j-over-slf4j; do
+for i in jcl jdk14 jcl-over-slf4j log4j-over-slf4j; do
   %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar -f ${i}
 done
 
@@ -231,14 +220,9 @@ rm -rf target/site
 %files jcl -f .mfiles-jcl
 %{_javadir}/%{name}/%{name}-jcl.jar
 
-%files ext -f .mfiles-ext
-%{_javadir}/%{name}/%{name}-ext.jar
-
 %files -n jcl-over-slf4j -f .mfiles-jcl-over-slf4j
 
 %files -n log4j-over-slf4j -f .mfiles-log4j-over-slf4j
-
-%files -n jul-to-slf4j -f .mfiles-jul-to-slf4j
 
 %files javadoc
 %{_javadocdir}/%{name}

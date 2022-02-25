@@ -1,9 +1,7 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
 Summary:        A free, distributed source control management tool.
 Name:           mercurial
-Version:        5.4
-Release:        3%{?dist}
+Version:        6.0.3
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://www.mercurial-scm.org
 Group:          System Environment/Security
@@ -11,9 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.mercurial-scm.org/release/%{name}-%{version}.tar.gz
 
-BuildRequires:  python2
-BuildRequires:  python2-libs
-BuildRequires:  python2-devel
+BuildRequires:  python3
+BuildRequires:  python3-libs
+BuildRequires:  python3-devel
 %if %{with_check}
 BuildRequires:  check
 BuildRequires:  python-setuptools
@@ -21,7 +19,7 @@ BuildRequires:  unzip
 BuildRequires:  which
 %endif
 
-Requires:       python2
+Requires:       python3
 
 %description
 Mercurial is a distributed source control management tool similar to Git and Bazaar.
@@ -36,7 +34,7 @@ make %{?_smp_mflags} build
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 mkdir -p %{buildroot}/%{_bindir}
-python2 setup.py install --skip-build --root %{buildroot}
+python3 setup.py install --skip-build --root %{buildroot}
 
 cat >> %{buildroot}/.hgrc << "EOF"
 [ui]
@@ -48,7 +46,7 @@ sed -i '1087,1088d' tests/test-obsolete.t
 sed -i '54,56d' tests/test-clonebundles.t
 sed -i '54i\ \ abort:\ stream:\ not\ a\ Mercurial\ bundle' tests/test-clonebundles.t
 pushd tests
-python2 run-tests.py -t 360
+python3 run-tests.py -t 360
 popd
 
 %post -p /sbin/ldconfig
@@ -61,9 +59,13 @@ popd
 %license COPYING
 /.hgrc
 %{_bindir}/hg
-%{python2_sitelib}/*
+%{python3_sitelib}/*
 
 %changelog
+*   Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 6.0.3-1
+-   Upgrading to latest version 6.0.3
+-   Switching from python2 to python3.
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4-3
 -   Removing the explicit %%clean stage.
 
