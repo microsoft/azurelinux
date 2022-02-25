@@ -50,8 +50,7 @@
                 "packagelists/hyperv-packages.json"
             ],
             "KernelOptions": {
-                "default": "kernel",
-                "hyperv": "kernel-hyperv"
+                "default": "kernel"
             },
             "Hostname": "swuvm"
         }
