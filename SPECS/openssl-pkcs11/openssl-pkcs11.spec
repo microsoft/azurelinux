@@ -22,8 +22,8 @@ BuildRequires:  openssl-devel
 BuildRequires:  openssl >= 1.0.2
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(p11-kit-1)
-%if %{with_check}
 BuildRequires:  doxygen
+%if %{with_check}
 BuildRequires:  procps-ng
 BuildRequires:  opensc
 BuildRequires:  softhsm
