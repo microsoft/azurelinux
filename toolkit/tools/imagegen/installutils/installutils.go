@@ -559,7 +559,9 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 		}
 	}
 
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName, "--installroot", installRoot, "--nogpgcheck", "--assumeyes")
+	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation
+	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName,
+		"--installroot", installRoot, "--nogpgcheck", "--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/")
 	if err != nil {
 		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
 	}
