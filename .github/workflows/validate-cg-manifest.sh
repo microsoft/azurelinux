@@ -16,8 +16,10 @@ ignore_list=" \
   appstream-data \
   byacc \
   ca-certificates \
+  core-packages \
   Cython \
   dbus-x11 \
+  geronimo-specs \
   grub2-efi-binary-signed-aarch64 \
   grub2-efi-binary-signed-x86_64 \
   grubby \

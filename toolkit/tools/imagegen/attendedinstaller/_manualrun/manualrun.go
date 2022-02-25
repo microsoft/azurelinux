@@ -56,9 +56,9 @@ func main() {
 			configuration.SystemConfig{
 				Name: "Developer",
 				PackageLists: []string{
-					"core-packages-image.json",
-					"developer-packages.json",
-					"hyperv.json",
+					"packagelists/developer-packages.json",
+					"packagelists/core-packages-image.json",
+					"packagelists/hyperv-packages.json",
 				},
 				KernelOptions: map[string]string{
 					"default": "kernel",

@@ -1,30 +1,5 @@
-From 604a4ce5426099bc6459911c7773ffe39055febf Mon Sep 17 00:00:00 2001
-From: Thomas Crain <thcrain@microsoft.com>
-Date: Wed, 5 Jan 2022 11:01:54 -0800
-Subject: [PATCH 2/2] Replace java-headless generated requirement with java
-
----
- etc/javapackages-config-SCL.json              |  2 +-
- etc/javapackages-config.json                  |  2 +-
- .../config/filtered/javapackages-config.json  |  2 +-
- test/maven_req_test.py                        | 62 +++++++++----------
- 4 files changed, 34 insertions(+), 34 deletions(-)
-
-diff --git a/etc/javapackages-config-SCL.json b/etc/javapackages-config-SCL.json
-index 72dd5fb..789559d 100644
---- a/etc/javapackages-config-SCL.json
-+++ b/etc/javapackages-config-SCL.json
-@@ -4,7 +4,7 @@
-             "@{scl}-runtime"
-         ],
-         "java_requires": {
--            "package_name": "java-headless",
-+            "package_name": "java",
-             "always_generate": true,
-             "skip": false
-         },
 diff --git a/etc/javapackages-config.json b/etc/javapackages-config.json
-index 601fedc..2e94ceb 100644
+index 601fedcb..2e94ceb2 100644
 --- a/etc/javapackages-config.json
 +++ b/etc/javapackages-config.json
 @@ -4,7 +4,7 @@
@@ -37,7 +12,7 @@ index 601fedc..2e94ceb 100644
              "skip": false
          },
 diff --git a/test/data/config/filtered/javapackages-config.json b/test/data/config/filtered/javapackages-config.json
-index 7951d91..3feb345 100644
+index 7951d913..3feb345a 100644
 --- a/test/data/config/filtered/javapackages-config.json
 +++ b/test/data/config/filtered/javapackages-config.json
 @@ -4,7 +4,7 @@
@@ -50,7 +25,7 @@ index 7951d91..3feb345 100644
              "skip": false
          },
 diff --git a/test/maven_req_test.py b/test/maven_req_test.py
-index d7cb969..5650482 100644
+index b5ea4456..377b6143 100644
 --- a/test/maven_req_test.py
 +++ b/test/maven_req_test.py
 @@ -21,7 +21,7 @@ class TestMavenReq(unittest.TestCase):
@@ -327,6 +302,3 @@ index d7cb969..5650482 100644
          self.assertEqual(set(want), set(sout))
  
  if __name__ == '__main__':
--- 
-2.25.1
-

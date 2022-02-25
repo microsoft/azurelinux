@@ -1,16 +1,16 @@
-From 6602f08bfcc2b2e75d1a58671cb160c96cf2d99b Mon Sep 17 00:00:00 2001
+From 97b1242450df25648d203acf7cc297cd46d10e8c Mon Sep 17 00:00:00 2001
 From: Chris Leech <cleech@redhat.com>
 Date: Mon, 19 Nov 2012 16:37:13 -0800
 Subject: [PATCH] update initscripts and docs
 
 ---
- README          | 10 ++++------
- etc/iscsid.conf | 21 ++++++++++-----------
+ README          | 12 +++++-------
+ etc/iscsid.conf | 23 +++++++++++------------
  usr/idbm.c      |  4 ++++
- 3 files changed, 18 insertions(+), 17 deletions(-)
+ 3 files changed, 20 insertions(+), 19 deletions(-)
 
 diff --git a/README b/README
-index 2499d9a..c05814a 100644
+index 508c9d7..b62a14e 100644
 --- a/README
 +++ b/README
 @@ -77,11 +77,6 @@ the cache sync command will fail.
@@ -25,16 +25,21 @@ index 2499d9a..c05814a 100644
  The userspace components iscsid, iscsiadm and iscsistart require the
  open-isns library, which can be found here:
  	https://github.com/gonzoleeman/open-isns/releases
-@@ -1151,7 +1146,7 @@ Red Hat or Fedora:
+@@ -1163,11 +1158,11 @@ Red Hat or Fedora:
  -----------------
  To start open-iscsi in Red Hat/Fedora you can do:
  
--	service open-iscsi start
-+	service iscsi start
+-	systemctl start open-iscsi
++	systemctl start iscsi
  
  To get open-iscsi to automatically start at run time you may have to
  run:
-@@ -1353,6 +1348,9 @@ iscsid will only perform rediscovery when it gets a SCN from the server.
+-	systemctl enable open-iscsi
++	systemctl enable iscsi
+ 
+ And, to automatically mount a file system during startup
+ you must have the partition entry in /etc/fstab marked with the "_netdev"
+@@ -1370,6 +1365,9 @@ iscsid will only perform rediscovery when it gets a SCN from the server.
  #   linux-isns (SLES's iSNS server) where it sometimes does not send SCN
  #   events in the proper format, so they may not get handled.
  
@@ -45,18 +50,20 @@ index 2499d9a..c05814a 100644
  --------
  
 diff --git a/etc/iscsid.conf b/etc/iscsid.conf
-index 70985af..2f3a28c 100644
+index f21ed3d..420145b 100644
 --- a/etc/iscsid.conf
 +++ b/etc/iscsid.conf
-@@ -19,7 +19,7 @@
+@@ -19,8 +19,8 @@
  # the time then leave this attribute commented out.
  #
  # Default for Fedora and RHEL. (uncomment to activate).
--# iscsid.startup = /bin/systemctl start iscsid.socket iscsiuio.soccket
+-# iscsid.startup = /bin/systemctl start iscsid.socket iscsiuio.socket
+-#
 +iscsid.startup = /bin/systemctl start iscsid.socket iscsiuio.socket
- # 
++# 
  # Default if you are not using systemd (uncomment to activate)
  # iscsid.startup = /usr/bin/service start iscsid
+ 
 @@ -41,8 +41,8 @@
  # To request that the iscsi initd scripts startup a session set to "automatic".
  # node.startup = automatic
@@ -68,7 +75,7 @@ index 70985af..2f3a28c 100644
  
  # For "automatic" startup nodes, setting this to "Yes" will try logins on each
  # available iface until one succeeds, and then stop.  The default "No" will try
-@@ -264,28 +264,27 @@ node.conn[0].iscsi.MaxXmitDataSegmentLength = 0
+@@ -271,28 +271,27 @@ node.conn[0].iscsi.MaxXmitDataSegmentLength = 0
  discovery.sendtargets.iscsi.MaxRecvDataSegmentLength = 32768
  
  # To allow the targets to control the setting of the digest checking,
@@ -105,10 +112,10 @@ index 70985af..2f3a28c 100644
  # For multipath configurations, you may want more than one session to be
  # created on each iface record.  If node.session.nr_sessions is greater
 diff --git a/usr/idbm.c b/usr/idbm.c
-index a2332cc..aed08f2 100644
+index f1e5c88..0f0f17a 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
-@@ -521,9 +521,13 @@ idbm_recinfo_node(node_rec_t *r, recinfo_t *ri)
+@@ -566,9 +566,13 @@ idbm_recinfo_node(node_rec_t *r, recinfo_t *ri)
  				 IDBM_SHOW, "None", "CRC32C", "CRC32C,None",
  				 "None,CRC32C", num, 1);
  		sprintf(key, CONN_DATA_DIGEST, i);
@@ -123,5 +130,5 @@ index a2332cc..aed08f2 100644
  		__recinfo_int_o2(key, ri, r, conn[i].iscsi.IFMarker, IDBM_SHOW,
  				"No", "Yes", num, 1);
 -- 
-2.21.0
+2.26.2
 

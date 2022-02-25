@@ -1,7 +1,7 @@
-From 9cae86dd15bf78ee9d221f722f723062eb6ad3d8 Mon Sep 17 00:00:00 2001
+From f7c6a7381a38ca59fd7a9a64e5f54cf5c16995ad Mon Sep 17 00:00:00 2001
 From: Chris Leech <cleech@redhat.com>
 Date: Mon, 19 Nov 2012 16:38:45 -0800
-Subject: [PATCH] use var for config
+Subject: [PATCH 1/1] use var for config
 
 ---
  README         | 33 ++++++++++++++++-----------------
@@ -13,7 +13,7 @@ Subject: [PATCH] use var for config
  6 files changed, 33 insertions(+), 32 deletions(-)
 
 diff --git a/README b/README
-index c05814a..326c3b0 100644
+index b62a14e..1875e3d 100644
 --- a/README
 +++ b/README
 @@ -172,8 +172,7 @@ Usage: iscsid [OPTION]
@@ -26,7 +26,7 @@ index c05814a..326c3b0 100644
  
  Configuration is contained in directories for:
  
-@@ -561,7 +560,7 @@ a scsi_host per HBA port).
+@@ -573,7 +572,7 @@ a scsi_host per HBA port).
  To manage both types of initiator stacks, iscsiadm uses the interface (iface)
  structure. For each HBA port or for software iscsi for each network
  device (ethX) or NIC, that you wish to bind sessions to you must create
@@ -35,7 +35,7 @@ index c05814a..326c3b0 100644
  
  Prep
  ----
-@@ -594,7 +593,7 @@ Running
+@@ -606,7 +605,7 @@ Running
  The command
  	iscsiadm -m iface
  
@@ -44,7 +44,7 @@ index c05814a..326c3b0 100644
  
  	iface0 qla4xxx,00:c0:dd:08:63:e8,20.15.0.7,default,iqn.2005-06.com.redhat:madmax
  	iface1 qla4xxx,00:c0:dd:08:63:ea,20.15.0.9,default,iqn.2005-06.com.redhat:madmax
-@@ -604,10 +603,10 @@ The format is:
+@@ -616,10 +615,10 @@ The format is:
  
  For software iscsi, you can create the iface configs by hand, but it is
  recommended that you use iscsiadm's iface mode. There is an iface.example in
@@ -57,7 +57,7 @@ index c05814a..326c3b0 100644
  must have a unique name which is less than or equal to 64 characters.
  
  Example
-@@ -615,12 +614,12 @@ Example
+@@ -627,12 +626,12 @@ Example
  
  If you have NIC1 with MAC address 00:0F:1F:92:6B:BF and NIC2 with
  MAC address 00:C0:DD:08:63:E7, and you wanted to do software iscsi over
@@ -72,7 +72,7 @@ index c05814a..326c3b0 100644
  
  	iface.transport_name = tcp
  	iface.hwaddress = 00:C0:DD:08:63:E7
-@@ -662,7 +661,7 @@ port. The iface name will be of the form:
+@@ -674,7 +673,7 @@ port. The iface name will be of the form:
  Running the following command:
  	iscsiadm -m iface
  
@@ -81,7 +81,7 @@ index c05814a..326c3b0 100644
  
  	default tcp,<empty>,<empty>,<empty>,<empty>
  	iser iser,<empty>,<empty>,<empty>,<empty>
-@@ -742,7 +741,7 @@ need a separate network connection to the target for discovery purposes.
+@@ -754,7 +753,7 @@ need a separate network connection to the target for discovery purposes.
  *This will be fixed in the next version of open-iscsi*
  
  For compatibility reasons, when you run iscsiadm to do discovery, it
@@ -90,7 +90,7 @@ index c05814a..326c3b0 100644
  tcp for the iface.transport, and it will bind the portals that are discovered
  so that they will be logged in through those ifaces. This behavior can also
  be overridden by passing in the interfaces you want to use. For the case
-@@ -757,7 +756,7 @@ If you had defined interfaces but wanted the old behavior, where we do not
+@@ -769,7 +768,7 @@ If you had defined interfaces but wanted the old behavior, where we do not
  bind a session to an iface, then you can use the special iface "default":
  	iscsiadm -m discoverydb -t st -p ip:port -I default --discover -P 1
  
@@ -99,7 +99,7 @@ index c05814a..326c3b0 100644
  not pass anything into iscsiadm, running iscsiadm will do the default
  behavior, allowing the network subsystem to decide which device to use.
  
-@@ -793,7 +792,7 @@ Discovery mode
+@@ -805,7 +804,7 @@ Discovery mode
  		ID [192.168.1.1:3260]:
  	iscsiadm -m discoverydb -t st -p 192.168.1.1:3260 --discover
  
@@ -108,7 +108,7 @@ index c05814a..326c3b0 100644
  	ID [portal = 192.168.1.1:3260 and type = sendtargets. If found it
  	will perform discovery using the settings stored in the record.
  	If a record does not exist, it will be created using the iscsid.conf
-@@ -802,7 +801,7 @@ Discovery mode
+@@ -814,7 +813,7 @@ Discovery mode
  	The argument to -p may also be a hostname instead of an address:
  		iscsiadm -m discoverydb -t st -p somehost --discover
  
@@ -117,7 +117,7 @@ index c05814a..326c3b0 100644
  	interfaces using software iscsi. If any are found then nodes found
  	during discovery will be setup so that they can logged in through
  	those interfaces. To specify a specific iface, pass the
-@@ -853,7 +852,7 @@ Discovery mode
+@@ -865,7 +864,7 @@ Discovery mode
  
  - SendTargets iSCSI Discovery with a specific interface.
  		If you wish to only use a subset of the interfaces in
@@ -126,7 +126,7 @@ index c05814a..326c3b0 100644
  	iscsiadm -m discoverydb -t sendtargets -p 192.168.1.1:3260 \
  		--interface=iface0 --interface=iface1 --discover
  
-@@ -1223,8 +1222,8 @@ where targetname is the name of the target and ip_address:port is the address
+@@ -1232,8 +1231,8 @@ where targetname is the name of the target and ip_address:port is the address
  and port of the portal. tpgt is the Target Portal Group Tag of
  the portal, and is not used in iscsiadm commands except for static
  record creation. ifacename is the name of the iscsi interface
@@ -137,7 +137,7 @@ index c05814a..326c3b0 100644
  Default here is iscsi_tcp/tcp to be used over whichever NIC the
  network layer decides is best.
  
-@@ -1336,7 +1335,7 @@ If set, iscsid will perform discovery to the address every
+@@ -1353,7 +1352,7 @@ If set, iscsid will perform discovery to the address every
  discovery.isns.discoveryd_poll_inval or
  discovery.sendtargets.discoveryd_poll_inval seconds,
  and it will log into any portals found from the discovery source using
@@ -147,7 +147,7 @@ index c05814a..326c3b0 100644
  Note that for iSNS the poll_interval does not have to be set. If not set,
  iscsid will only perform rediscovery when it gets a SCN from the server.
 diff --git a/doc/iscsiadm.8 b/doc/iscsiadm.8
-index bf23dd2..9cfce16 100644
+index 3729a72..9f84a81 100644
 --- a/doc/iscsiadm.8
 +++ b/doc/iscsiadm.8
 @@ -228,7 +228,7 @@ This option is only valid for ping submode.
@@ -159,7 +159,7 @@ index bf23dd2..9cfce16 100644
  iSCSI (qla4xxx) the iface config must have the hardware address
  (iface.hwaddress = port's MAC address)
  and the driver/transport_name (iface.transport_name). The iface's name is
-@@ -301,7 +301,7 @@ If no other options are specified: for \fIdiscovery\fR, \fIdiscoverydb\fR and
+@@ -318,7 +318,7 @@ If no other options are specified: for \fIdiscovery\fR, \fIdiscoverydb\fR and
  \fInode\fR, all of their respective records are displayed; for \fIsession\fR,
  all active sessions and connections are displayed; for \fIfw\fR, all boot
  firmware values are displayed; for \fIhost\fR, all iSCSI hosts are displayed;
@@ -168,7 +168,7 @@ index bf23dd2..9cfce16 100644
  .TP
  \fB\-n\fR, \fB\-\-name=\fIname\fR
  In node mode, specify a field \fIname\fR in a record. In flashnode submode
-@@ -640,10 +640,10 @@ The configuration file read by \fBiscsid\fR and \fBiscsiadm\fR on startup.
+@@ -681,10 +681,10 @@ The configuration file read by \fBiscsid\fR and \fBiscsiadm\fR on startup.
  The file containing the iSCSI InitiatorName and InitiatorAlias read by
  \fBiscsid\fR and \fBiscsiadm\fR on startup.
  .TP
@@ -182,10 +182,10 @@ index bf23dd2..9cfce16 100644
  .SH "SEE ALSO"
  .BR iscsid (8)
 diff --git a/doc/iscsid.8 b/doc/iscsid.8
-index 6f9218f..0da0551 100644
+index db996b4..eaa9c3b 100644
 --- a/doc/iscsid.8
 +++ b/doc/iscsid.8
-@@ -65,7 +65,7 @@ and
+@@ -70,7 +70,7 @@ and
  .B iscsiadm
  on startup.
  .TP
@@ -195,24 +195,24 @@ index 6f9218f..0da0551 100644
  
  .SH "SEE ALSO"
 diff --git a/usr/idbm.c b/usr/idbm.c
-index aed08f2..15802c3 100644
+index 7c63c04..779d052 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
-@@ -2968,9 +2968,9 @@ free_info:
+@@ -3104,9 +3104,9 @@ free_info:
  int idbm_init(idbm_get_config_file_fn *fn)
  {
  	/* make sure root db dir is there */
 -	if (access(ISCSI_CONFIG_ROOT, F_OK) != 0) {
--		if (mkdir(ISCSI_CONFIG_ROOT, 0660) != 0) {
+-		if (mkdir(ISCSI_CONFIG_ROOT, 0770) != 0) {
 -			log_error("Could not make %s %d", ISCSI_CONFIG_ROOT,
 +	if (access(ISCSIVAR, F_OK) != 0) {
-+		if (mkdir(ISCSIVAR, 0660) != 0) {
++		if (mkdir(ISCSIVAR, 0770) != 0) {
 +			log_error("Could not make %s %d", ISCSIVAR,
  				   errno);
  			return errno;
  		}
 diff --git a/usr/idbm.h b/usr/idbm.h
-index 18c5025..6bdfd60 100644
+index 7496f1d..db3048b 100644
 --- a/usr/idbm.h
 +++ b/usr/idbm.h
 @@ -30,12 +30,13 @@
@@ -251,5 +251,5 @@ index 6c06f7f..c8b9de9 100644
  struct iface_rec;
  struct list_head;
 -- 
-2.21.0
+2.26.3
 
