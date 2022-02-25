@@ -1326,16 +1326,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "boringssl",
-          "version": "20200921",
-          "downloadUrl": "https://boringssl.googlesource.com/boringssl/+archive/3743aafdacff2f7b083615a043a37101f740fa53.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "botan2",
           "version": "2.14.0",
           "downloadUrl": "https://botan.randombit.net/releases/Botan-2.14.0.tar.xz"
@@ -3358,8 +3348,8 @@
         "type": "other",
         "other": {
           "name": "envoy",
-          "version": "1.14.4",
-          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.14.4.tar.gz"
+          "version": "1.21.0",
+          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.21.0.tar.gz"
         }
       }
     },
