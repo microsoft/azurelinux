@@ -2,13 +2,18 @@
 Summary:        An XML parser library
 Name:           expat
 Version:        2.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
+Patch0: CVE-2022-25235_ee2a5b.patch
+Patch1: CVE-2022-25235_3f0a0c.patch
+Patch2: CVE-2022-25235_c85a30.patch
+Patch3: CVE-2022-25235_6a5510.patch
+Patch4: CVE-2022-25235_c16300.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -65,6 +70,10 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+*   Fri Feb 25 2022 Mariner Autopatcher <cblmargh@microsoft.com> 2.4.4-2
+-   Added patch file(s) CVE-2022-25235_ee2a5b.patch,
+-   CVE-2022-25235_3f0a0c.patch, CVE-2022-25235_c85a30.patch,
+-   CVE-2022-25235_6a5510.patch, CVE-2022-25235_c16300.patch
 * Mon Jan 31 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.4.4-1
 - Update version to 2.4.4 to address CVE-2022-23852
 
