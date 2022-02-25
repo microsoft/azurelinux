@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.10
-Release:        6%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,7 +12,6 @@ Patch0:         remove_windows_build.patch
 Patch1:         add_mariner_OSVersion.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
-BuildRequires:  python-dev
 ExclusiveArch:  x86_64
 
 %description
