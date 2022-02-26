@@ -1,13 +1,14 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.10
-Release:        9%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://github.com/kubernetes/node-problem-detector
-Source0:        https://github.com/kubernetes/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
+#Source0:        https://github.com/kubernetes/%{name}/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Patch0:         remove_windows_build.patch
 Patch1:         add_mariner_OSVersion.patch
 BuildRequires:  golang
@@ -61,6 +62,10 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Fri Feb 25 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.8.10-1
+- Upgrading to v0.8.10
+- Disable arm64 builds in Makefile with remove_windows_build.patch.
+
 * Tue Jun 15 2021 Henry Beberman <henry.beberman@microsoft.com> - 0.8.8-1
 - Add node-problem-detector spec.
 - Add Mariner to OSVersion detection and disable exe builds in makefile.
