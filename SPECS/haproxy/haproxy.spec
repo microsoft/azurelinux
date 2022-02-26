@@ -2,7 +2,7 @@ Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
 Version:        2.4.13
 Release:        1%{?dist}
-License:        GPL
+License:        GPLv2+
 URL:            http://www.haproxy.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
