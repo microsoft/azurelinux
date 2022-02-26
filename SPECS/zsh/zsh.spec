@@ -2,8 +2,8 @@
 
 Summary:        Z shell
 Name:           zsh
-Version:        5.8
-Release:        4%{?dist}
+Version:        5.8.1
+Release:        1%{?dist}
 License:        MIT AND GPLv2.0 AND GPLv3.0 AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -136,6 +136,9 @@ fi
 %doc Doc/*.html
 
 %changelog
+* Wed Feb 23 2022 Thomas Crain <thcrain@microsoft.com> - 5.8.1-1
+- Upgrade to latest upstream version to fix CVE-2021-45444
+
 * Tue Nov 10 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.8-4
 - Adding a patch to skip globbing test if ran as root.
 - Removing redundant 'sed' and 'chmod' commands in %%install.

@@ -41,9 +41,8 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 		RootCAs:      caCerts,
 		Certificates: tlsCerts,
 	}
-	transport := &http.Transport{
-		TLSClientConfig: tlsConfig,
-	}
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.TLSClientConfig = tlsConfig
 	client := &http.Client{
 		Transport: transport,
 	}

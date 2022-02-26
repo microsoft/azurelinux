@@ -1435,8 +1435,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.4.4",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_4/expat-2.4.4.tar.bz2"
+          "version": "2.4.6",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_6/expat-2.4.6.tar.bz2"
         }
       }
     },
@@ -8315,8 +8315,8 @@
         "type": "other",
         "other": {
           "name": "tcpdump",
-          "version": "4.9.3",
-          "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.9.3.tar.gz"
+          "version": "4.99.1",
+          "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.99.1.tar.gz"
         }
       }
     },
@@ -8635,8 +8635,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4281",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4281.tar.gz"
+          "version": "8.2.4432",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4432.tar.gz"
         }
       }
     },
@@ -8975,8 +8975,8 @@
         "type": "other",
         "other": {
           "name": "zsh",
-          "version": "5.8",
-          "downloadUrl": "https://sourceforge.net/projects/zsh/files/zsh/5.8/zsh-5.8.tar.xz"
+          "version": "5.8.1",
+          "downloadUrl": "https://sourceforge.net/projects/zsh/files/zsh/5.8.1/zsh-5.8.1.tar.xz"
         }
       }
     },

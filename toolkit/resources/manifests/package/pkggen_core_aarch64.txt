@@ -58,7 +58,7 @@ findutils-lang-4.6.0-7.cm1.aarch64.rpm
 gettext-0.19.8.1-5.cm1.aarch64.rpm
 gzip-1.9-5.cm1.aarch64.rpm
 make-4.2.1-5.cm1.aarch64.rpm
-mariner-release-1.0-33.cm1.noarch.rpm
+mariner-release-1.0-35.cm1.noarch.rpm
 patch-2.7.6-7.cm1.aarch64.rpm
 util-linux-2.32.1-5.cm1.aarch64.rpm
 util-linux-devel-2.32.1-5.cm1.aarch64.rpm
@@ -93,9 +93,9 @@ elfutils-libelf-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-devel-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-devel-static-0.176-4.cm1.aarch64.rpm
 elfutils-libelf-lang-0.176-4.cm1.aarch64.rpm
-expat-2.4.4-1.cm1.aarch64.rpm
-expat-devel-2.4.4-1.cm1.aarch64.rpm
-expat-libs-2.4.4-1.cm1.aarch64.rpm
+expat-2.4.6-1.cm1.aarch64.rpm
+expat-devel-2.4.6-1.cm1.aarch64.rpm
+expat-libs-2.4.6-1.cm1.aarch64.rpm
 libpipeline-1.5.0-4.cm1.aarch64.rpm
 libpipeline-devel-1.5.0-4.cm1.aarch64.rpm
 gdbm-1.18-3.cm1.aarch64.rpm

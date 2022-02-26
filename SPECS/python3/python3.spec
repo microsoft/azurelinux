@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.7.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Patch0:         cgi3.patch
 Patch1:         python3-support-mariner-platform.patch
 Patch2:         Replace-unsupported-TLS-methods.patch
 Patch3:         fix_broken_mariner_ssl_tests.patch
+Patch4:         CVE-2022-0391.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
@@ -274,6 +275,9 @@ make  %{?_smp_mflags} test
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.7.10-6
+- Patch CVE-2022-0391
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 3.7.10-5
 - Add explicit provides for pathfix.py
 - Add version for provides
