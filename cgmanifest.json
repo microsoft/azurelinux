@@ -8261,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "jq",
-          "version": "1.6",
-          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-1.6.tar.gz"
+          "version": "1.5",
+          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-1.5.tar.gz"
         }
       }
     },
