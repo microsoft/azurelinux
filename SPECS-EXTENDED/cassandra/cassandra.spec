@@ -10,7 +10,7 @@ License:        Apache License, Version 2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://archive.apache.org/dist/cassandra/%{version}/apache-%{name}-%{version}-src.tar.gz
+Source0:        https://archive.apache.org/dist/cassandra/%{version}/apache-%{name}-%{version}-src.tar.gz
 Source1:        cassandra.service
 Source2:        cassandra-build-cache-4.0.3.tar.gz
 ExclusiveArch:  x86_64
@@ -49,17 +49,17 @@ Cassandra is a highly scalable, eventually consistent, distributed, structured k
 Cassandra brings together the distributed systems technologies from Dynamo and the log-structured storage engine from Google's BigTable.
 
 %prep
+# refer to Readme file for detailed
+# instructions to rebuild cassandra-build-cache
 %autosetup -p1 -n apache-%{name}-%{version}-src
 
 %build
-# refer to Readme file for 
-# cassandra-build-cache
 cp %{SOURCE2} .
 tar -xvf  %{SOURCE2}
 mkdir -p ~/.m2
 mv repository ~/.m2/
 
-export JAVA_HOME=$(echo /usr/lib/jvm/msopenjdk-11)
+export JAVA_HOME="%{java_home}"
 export ANT_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
 ant -v clean jar javadoc -Drelease=true -Duse.jdk11=true
 
@@ -122,7 +122,8 @@ fi
 
 %files
 %defattr(-,root,root)
-%doc README.asc CHANGES.txt NEWS.txt conf/cqlshrc.sample LICENSE.txt NOTICE.txt
+%license LICENSE.txt
+%doc README.asc CHANGES.txt NEWS.txt conf/cqlshrc.sample NOTICE.txt
 %dir %{_var}/opt/cassandra
 %{_bindir}/*
 %{_datadir}/cassandra
