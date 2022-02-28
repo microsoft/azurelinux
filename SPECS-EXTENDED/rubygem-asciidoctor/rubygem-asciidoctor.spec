@@ -10,8 +10,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:	Mariner
 URL:            https://asciidoctor.org/
-#Source0:        https://github.com/%{gem_name}/%{gem_name}/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/%{gem_name}/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 
 %description
