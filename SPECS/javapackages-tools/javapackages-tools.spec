@@ -8,8 +8,8 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
-Version:        5.3.0
-Release:        14%{?dist}
+Version:        6.0.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,9 @@ URL:            https://github.com/fedora-java/javapackages
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch
 Patch1:         remove-headless-from-java-requires.patch
+# Bringing back deprecated macro because the newer alternatives
+#  %mvn_artifact and %mvn_install require packages that are not yet supported
+Patch2:         undeprecate_add_maven_depmap.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
 BuildRequires:  msopenjdk-11
@@ -28,6 +31,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  which
 BuildRequires:  xmlto
+%global with_check 1
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
@@ -121,6 +125,11 @@ pip3 install -r test-requirements.txt
 %license LICENSE
 
 %changelog
+* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.0.0-1
+- Update source to v6.0.0
+- Update remove-headless-from-java-requires.patch
+- Add javapackages-generators 
+
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 5.3.0-14
 - Add patch to replace generated dependency on "java-headless" with "java"
 - Amend epoch patch to fix expected test results
