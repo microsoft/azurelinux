@@ -11,7 +11,7 @@ Version:	3.9.1
 Release:	2%{?dist}
 
 License:	MIT
-URL:		http://github.com/rspec/rspec-mocks
+URL:		https://github.com/rspec/rspec-mocks
 #Source0:  https://github.com/rspec/rspec-mocks/archive/refs/tags/v%{version}.tar.gz
 Source0:  %{gem_name}-%{version}.tar.gz
 
@@ -71,6 +71,7 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.1-2
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.1-1.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

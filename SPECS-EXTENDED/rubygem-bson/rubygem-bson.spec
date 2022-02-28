@@ -9,7 +9,7 @@ License: ASL 2.0
 # Keep the URL, while different URL is used in the upstream gemspec file.
 # Because there is a basic explanation about the bson
 # that is a beneficial for Fedora user.
-URL: http://bsonspec.org
+URL: https://bsonspec.org
 #Source0: https://github.com/mongodb/bson-ruby/archive/refs/tags/v%{version}.tar.gz
 Source0: %{gem_name}-ruby-%{version}.tar.gz
 Requires: rubygem(bigdecimal)
@@ -83,6 +83,7 @@ popd
 %changelog
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.14.1-1
 - Update to v4.14.1.
+- License verified.
 
 * Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 4.7.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

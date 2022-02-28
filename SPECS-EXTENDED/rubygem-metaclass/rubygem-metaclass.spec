@@ -6,7 +6,7 @@ Release:        14%{?dist}
 License:        MIT
 Vendor:	        Microsoft Corporation
 Distribution:	Mariner
-URL:            http://github.com/floehopper/
+URL:            https://github.com/floehopper/metaclass/
 #Source0:        https://github.com/floehopper/metaclass/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{gem_name}-%{version}.tar.gz
 # Make the test suite support MiniTest 5.x.

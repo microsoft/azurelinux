@@ -8,7 +8,7 @@ Release: 10%{?dist}
 Summary: Maruku is a Markdown-superset interpreter written in Ruby
 # lib/maruku/ext/fenced_code.rb - BSD
 License: MIT and BSD
-URL: http://github.com/bhollis/maruku
+URL: https://github.com/bhollis/maruku
 #Source0: https://github.com/bhollis/%{gem_name}/archive/refs/tags/v%{version}.tar.gz
 Source0: %{gem_name}-%{version}.tar.gz
 Patch0: remove-pem.patch
@@ -63,6 +63,7 @@ popd
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

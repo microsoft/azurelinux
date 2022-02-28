@@ -9,10 +9,7 @@ Summary:	Improved version of Test::Unit bundled in Ruby 1.8.x
 Name:		rubygem-%{gem_name}
 Version:	3.5.3
 Release:	1%{?dist}
-# lib/test/unit/diff.rb is under GPLv2 or Ruby or Python
-# lib/test-unit.rb is under LGPLv2+ or Ruby
-# Other file: GPLv2 or Ruby
-License:    (GPLv2 or Ruby) and (GPLv2 or Ruby or Python) and (LGPLv2+ or Ruby)
+License:    (BSD or Ruby) and (BSD or Ruby or Python)
 URL:        http://test-unit.github.io/
 #Source0:    https://github.com/test-unit/test-unit/archive/refs/tags/%{version}.tar.gz
 Source0:  %{gem_name}-%{version}.tar.gz
@@ -75,6 +72,7 @@ popd
 %changelog
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-1
 - Update to v3.5.3.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.6-202
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

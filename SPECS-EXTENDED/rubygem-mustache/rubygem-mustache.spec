@@ -103,6 +103,7 @@ popd
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Mon Apr 27 2020 Vít Ondruch <vondruch@redhat.com> - 1.1.1-1
 - Update to Mustache 1.1.1.

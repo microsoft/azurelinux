@@ -69,6 +69,7 @@ help2man -N -s1 -o %{buildroot}%{_mandir}/man1/rougify.1 \
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.26.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Fri Dec 11 2020 Fabio Valentini <decathorpe@gmail.com> - 3.26.0-1
 - Update to version 3.26.0.

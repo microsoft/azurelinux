@@ -4,7 +4,7 @@ Name:          rubygem-%{gem_name}
 Version:       0.4.0
 Release:       2%{?dist}
 License:       MIT
-URL:           http://github.com/voxik/abrt-ruby
+URL:           https://github.com/voxik/abrt-ruby
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 #Source0:      https://github.com/voxik/abrt-ruby/archive/refs/tags/v%{version}.tar.gz
@@ -69,6 +69,7 @@ popd
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Mon Jun 22 2020 Vít Ondruch <vondruch@redhat.com> - 0.4.0-1
 - Update to abrt 0.4.0.

@@ -6,9 +6,8 @@ Summary:	Behaviour driven development (BDD) framework for Ruby
 Name:		rubygem-%{gem_name}
 Version:	3.9.0
 Release:	3%{?dist}
-
 License:	MIT
-URL:		http://rspec.info
+URL:      https://rspec.info
 #Source0:	https://github.com/rspec/rspec-metagem/archive/refs/tags/v%{version}.tar.gz
 Source0:	%{gem_name}-metagem-%{version}.tar.gz
 
@@ -44,6 +43,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 * Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 3.9.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disable autoprovides and add provides for rubygem(rspec)
+- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
