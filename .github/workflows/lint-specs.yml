@@ -58,7 +58,7 @@ jobs:
 
       # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
       - name: Setup Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.7
         
