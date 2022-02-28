@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           gnome-shell
 Version:        3.36.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
@@ -110,8 +110,6 @@ Requires:       switcheroo-control
 # needed for clocks/weather integration
 Requires:       geoclue2-libs%{?_isa}
 Requires:       libgweather%{?_isa}
-# needed for thunderbolt support
-Requires:       bolt%{?_isa}
 # Needed for launching flatpak apps etc
 Requires:       xdg-desktop-portal-gtk
 
@@ -213,6 +211,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/evolution-calendar.de
 %{_mandir}/man1/gnome-shell.1*
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.9-5
+- Removing dependency on 'bolt'.
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.9-4
 - Removing epoch.
 

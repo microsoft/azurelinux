@@ -4,13 +4,15 @@ Distribution:   Mariner
 %global _description %{expand:An AMQP 1.0 client library for Python.}
 
 Name:           python-%{srcname}
-Version:        1.2.12
-Release:        2%{?dist}
+Version:        1.5.1
+Release:        1%{?dist}
 Summary:        AMQP 1.0 client library for Python
 
 License:        MIT
-URL:            https://github.com/Azure/azure-uamqp-python/
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+URL:            https://github.com/Azure/azure-uamqp-python
+Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz#/azure-%{srcname}-python-%{version}.tar.gz
+# Fix build with GCC 11
+Patch1:         %{name}-treat-warnings-as-warnings.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -18,10 +20,13 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-devel
 BuildRequires:  %{py3_dist cython}
 BuildRequires:  %{py3_dist setuptools}
-# Required for tests
+
+%if %{with_check}
 BuildRequires:  %{py3_dist certifi}
 BuildRequires:  %{py3_dist pytest}
+BuildRequires:  %(py3_dist pytest-asyncio)
 BuildRequires:  %{py3_dist six}
+%endif
 
 %description
 %{_description}
@@ -36,27 +41,23 @@ Summary:        %{summary}
 
 
 %prep
-%autosetup -n azure-uamqp-python-%{version}
+%autosetup -p1 -n azure-uamqp-python-%{version}
 
 # Remove bundled egg-info
 rm -rf *.egg-info
-
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS -Wno-error=strict-aliasing"
 export CXXFLAGS=$CFLAGS
 VERBOSE=1 %py3_build
 
-
 %install
 %py3_install
 
 rm $RPM_BUILD_ROOT%{python3_sitearch}/%{srcname}/*.c
 
-
 %check
-%pytest tests/
-
+%pytest --disable-warnings -k "not test_error_loop_arg_async"
 
 %files -n python3-%{srcname}
 %doc HISTORY.rst README.rst
@@ -66,6 +67,10 @@ rm $RPM_BUILD_ROOT%{python3_sitearch}/%{srcname}/*.c
 
 
 %changelog
+* Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.1-1
+- Updating to version 1.5.1 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.12-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
