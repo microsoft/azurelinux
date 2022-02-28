@@ -11,7 +11,11 @@
 7. Run "sudo ant clean ant -v clean jar -Drelease=true -Duse.jdk11=true"
 8. Once build completed successfully take build cache as below.
 9. cd ~/.m2
-9. tar -czvf cassandra-build-cache-<version>.tar.gz repository
+9. sudo tar --sort=name \
+            --mtime="2021-04-26 00:00Z" \
+            --owner=0 --group=0 --numeric-owner \
+            --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+            -cf cassandra-build-cache-<version>.tar.gz repository
 10. Update latest build cache in cassandra spec and update to sources server.
 
 
