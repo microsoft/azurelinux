@@ -3,14 +3,14 @@ Distribution:   Mariner
 Summary:   Writes audio CD-Rs in disk-at-once (DAO) mode
 Name:      cdrdao
 Version:   1.2.4
-Release:   5%{?dist}
+Release:   6%{?dist}
 License:   GPLv2+
 URL:       http://cdrdao.sourceforge.net/
 Source0:   http://prdownloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
 
 BuildRequires:  gcc-c++
 BuildRequires:  gcc
-BuildRequires:  libsigc++20-devel
+BuildRequires:  libsigc++30
 BuildRequires:  libvorbis-devel >= 1.0
 BuildRequires:  libao-devel
 BuildRequires:  libmad-devel
@@ -79,6 +79,10 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 
 
 %changelog
+* Fri Feb 04 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.12.4-6
+- Upgrade to to libsigc++30
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

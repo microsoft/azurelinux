@@ -298,6 +298,7 @@ generate_pkggen_core () {
         grep "^newt-[0-9]" $TmpPkgGen
         grep "^chkconfig-[0-9]" $TmpPkgGen
         grep "^msopenjdk-" $TmpPkgGen
+        grep "^pyproject-" $TmpPkgGen
     } > "$1"
 }
 

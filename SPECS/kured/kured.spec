@@ -20,12 +20,12 @@
 # Remove stripping of Go binaries.
 %define __arch_install_post export NO_BRP_STRIP_DEBUG=true
 # Project upstream commit.
-%define commit 685f328
+%define commit 2b36eab
 %global debug_package %{nil}
 Summary:        Kubernetes daemonset to perform safe automatic node reboots
 Name:           kured
-Version:        1.6.1
-Release:        2%{?dist}
+Version:        1.9.1
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,8 +47,7 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         systemctl-path.patch
-Patch1:         kured-imagePullPolicy.patch
+Patch0:         kured-imagePullPolicy.patch
 BuildRequires:  fdupes
 BuildRequires:  go-go-md2man
 BuildRequires:  golang
@@ -79,7 +78,6 @@ kured container in a kubernetes cluster.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 
 %build
 # create vendor folder from the vendor tarball and set vendor mode
@@ -124,6 +122,11 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
 %{_datarootdir}/k8s-yaml/kured/kured.yaml
 
 %changelog
+* Wed Feb 09 2022 Henry Li <lihl@microsoft.com> - 1.9.1-1
+- Upgrade to version 1.9.1
+- Remove systemctl-path.patch
+- Update kured-imagePullPolicy.patch
+
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-2
 - Switching to using a single digit for the 'Release' tag.
 

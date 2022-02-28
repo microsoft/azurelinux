@@ -1,13 +1,13 @@
 Summary:        Programs for finding and viewing man pages
 Name:           man-db
-Version:        2.8.4
-Release:        8%{?dist}
+Version:        2.10.1
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://nongnu.org/man-db
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://download.savannah.nongnu.org/releases/man-db/%{name}-%{version}.tar.xz
+Source0:        https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.xz
 Provides:       man = %{version}-%{release}
 Requires:       libpipeline
 Requires:       gdbm
@@ -34,9 +34,9 @@ The Man-DB package contains programs for finding and viewing man pages.
     --docdir=%{_defaultdocdir}/%{name}-%{version} \
     --disable-setuid \
     --with-browser=%{_bindir}/lynx \
+    --with-systemdsystemunitdir=no \
     --with-vgrind=%{_bindir}/vgrind \
-    --with-grap=%{_bindir}/grap \
-    --disable-silent-rules
+    --with-grap=%{_bindir}/grap
 
 make %{?_smp_mflags}
 
@@ -70,7 +70,7 @@ fi
 
 %files -f %{name}.lang
 %defattr(-,root,root)
-%license docs/COPYING
+%license COPYING
 %{_sysconfdir}/man_db.conf
 %{_bindir}/*
 %{_sbindir}/*
@@ -81,6 +81,12 @@ fi
 %{_libdir}/tmpfiles.d/man-db.conf
 
 %changelog
+* Thu Feb 10 2022 Max Brodeur-Urbas <maxbr@microsoft.com> 2.10.1-1
+- Upgrading to v2.10.1
+- Correcting COPYING path in file section.
+- Adding systemdsystemunitdir=no flag in build configure.
+- Correcting source0 URL.
+
 * Wed Jun 09 2021 Muhammad Falak Wani <mwani@microsoft.com> 2.8.4-8
 - Add an explict provides for "man-pages-reader"
 

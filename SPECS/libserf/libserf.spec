@@ -1,13 +1,15 @@
 Summary:        A high performance C-based HTTP client library built upon the Apache Portable Runtime (APR) library
 Name:           libserf
 Version:        1.3.9
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 URL:            https://serf.apache.org/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.apache.org/dist/serf/serf-%{version}.tar.bz2
+# Enable building with python3 version of scons (patch courtesy of Fedora 35, license: MIT)
+Patch0:         %{name}-python3.patch
 Requires:       openldap
 BuildRequires:  apr-devel
 BuildRequires:  apr-util-devel
@@ -30,7 +32,7 @@ Requires:       %{name} = %{version}
 It contains the libraries and header files to create serf applications.
 
 %prep
-%setup -q -n serf-%{version}
+%autosetup -p1 -n serf-%{version}
 
 %build
 scons PREFIX=%{_prefix}
@@ -72,19 +74,27 @@ scons check
 
 
 %changelog
-*   Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> 1.3.9-7
--   Add libdb as an explicit requires.
+* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 1.3.9-8
+- Add Fedora patch to enable build with python3
 
-*   Tue May 04 2021 Nicolas Ontiveros <niontive@microsoft.com> 1.3.9-6
--   Disable test_ssl_handshake
-*   Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> 1.3.9-5
--   Fix check tests.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.3.9-4
--   Added %%license line automatically
-*   Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com? 1.3.9-3
--   Rename the package to libserf.
--   Update license. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.3.9-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Jan 22 2018 Xiaolin Li <xiaolinl@vmware.com> 1.3.9-1
--   Initial build. First version
+* Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.9-7
+- Add libdb as an explicit requires.
+
+* Tue May 04 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.3.9-6
+- Disable test_ssl_handshake
+
+* Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> - 1.3.9-5
+- Fix check tests.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.9-4
+- Added %%license line automatically
+
+* Mon Apr 13 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.3.9-3
+- Rename the package to libserf.
+- Update license. License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.9-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Jan 22 2018 Xiaolin Li <xiaolinl@vmware.com> - 1.3.9-1
+- Initial build. First version

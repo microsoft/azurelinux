@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,10 +12,7 @@ BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
-BuildRequires:  python2
-%if %{with_check}
-BuildRequires:  python-xml
-%endif
+BuildRequires:  python3-devel
 Requires:       libxml2
 
 %description
@@ -88,6 +85,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 12.0.1-3
+- Use python3 during build
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0.1-2
 - Removing the explicit %%clean stage.
 

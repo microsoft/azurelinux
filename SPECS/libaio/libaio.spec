@@ -1,7 +1,7 @@
 Summary:        Linux-native asynchronous I/O access library
 Name:           libaio
 Version:        0.3.112
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ Distribution:   Mariner
 URL:            https://pagure.io/libaio
 Source0:        https://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
 Patch0:         libaio-install-to-destdir-slash-usr.patch
+Patch1:         fix-gcc11-bug-and-parity-with-upstream.patch
 
 %if %{with_check}
 BuildRequires:  e2fsprogs-devel
@@ -32,9 +33,7 @@ This package provides header files to include and libraries to link with
 for the Linux-native asynchronous I/O facility ("async I/O", or "aio").
 
 %prep
-%setup -q -a 0
-%patch0 -p0 -b .install-to-destdir-slash-usr
-%patch0 -p1 -b .install-to-destdir-slash-usr
+%autosetup -p1 -a 0
 
 
 %build
@@ -54,7 +53,8 @@ cd ..
 make destdir=%{buildroot} prefix=%{_prefix} libdir=/lib usrlibdir=%{_libdir} includedir=%{_includedir} install
 
 %check
-make %{?_smp_mflags} -k check
+# The check generates a lot of load on CPU & is flaky when run parallely. Avoid using `-j $(nproc)
+make -k check
 
 %post -p /sbin/ldconfig
 
@@ -71,15 +71,24 @@ make %{?_smp_mflags} -k check
 %attr(0755,root,root) %{_libdir}/libaio.a
 
 %changelog
-*   Thu Dec 17 2020 Andrew Phelps <anphel@microsoft.com> 0.3-112-3
--   Add e2fsprogs-devel to fix check test.
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.3.112-2
--   Added %%license line automatically
-*   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 0.3.112-1
--   Update to 0.3.112. Fix Source0 URL. Fix URL. Update Patch0. License verified.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.3.110-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.3.110-2
--   GA - Bump release of all rpms
-*   Tue Mar 3 2015 Divya Thaluru <dthaluru@vmware.com> 0.3.110-1
--   Initial version
+* Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> 0.3-112-4
+- Switch to `%autosetup` instead of `%setup`
+- Introduce patch to fix gcc-11 ptest bug & parity with upstream
+
+* Thu Dec 17 2020 Andrew Phelps <anphel@microsoft.com> 0.3-112-3
+- Add e2fsprogs-devel to fix check test.
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 0.3.112-2
+- Added %%license line automatically
+
+* Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 0.3.112-1
+- Update to 0.3.112. Fix Source0 URL. Fix URL. Update Patch0. License verified.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 0.3.110-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.3.110-2
+- GA - Bump release of all rpms
+
+* Tue Mar 3 2015 Divya Thaluru <dthaluru@vmware.com> 0.3.110-1
+- Initial version

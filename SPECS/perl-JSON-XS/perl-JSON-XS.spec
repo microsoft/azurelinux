@@ -1,9 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        JSON serializing/deserializing, done correctly and fast
 Name:           perl-JSON-XS
-Epoch:          1
 Version:        3.04
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/JSON-XS/
@@ -55,6 +54,9 @@ make test
 %{_mandir}/man[13]/*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.04-6
+- Removing epoch.
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:3.04-5
 - Adding 'BuildRequires: perl-generators'.
 - License verified.

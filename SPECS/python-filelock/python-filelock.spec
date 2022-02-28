@@ -2,7 +2,7 @@
 Summary:        A platform independent file lock
 Name:           python-%{srcname}
 Version:        3.0.12
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ the same lock object twice, it will not block.
 
 %package doc
 Summary:        Documentation for %{srcname}, %{summary}
+BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 
@@ -31,6 +32,8 @@ BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-sphinx
+BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 
 %description -n python%{python3_pkgversion}-%{srcname}
 This package contains a single module, which implements a platform independent
@@ -69,6 +72,9 @@ python%{python3_version} test.py
 %{_mandir}/man1/py-%{srcname}.1.gz
 
 %changelog
+* Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.0.12-12
+- Add python-devel
+
 * Wed Nov 17 2021 Andrew Phelps <anphel@microsoft.com> - 3.0.12-11
 - Use make with single processor to mitigate intermittent build failures
 

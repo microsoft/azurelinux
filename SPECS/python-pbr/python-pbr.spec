@@ -1,7 +1,7 @@
 Summary:        Python Build Reasonableness
 Name:           python-pbr
-Version:        5.1.2
-Release:        4%{?dist}
+Version:        5.8.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,8 +41,8 @@ export SKIP_PIP_INSTALL=1
 ln -s pbr %{buildroot}/%{_bindir}/pbr3
 
 %check
-pip3 install coverage hacking mock testrepository testresources testscenarios virtualenv wheel
-%python3 setup.py test
+pip3 install coverage hacking mock testrepository testresources testscenarios virtualenv wheel tox
+tox -e py39
 
 %files -n python3-pbr
 %defattr(-,root,root)
@@ -54,6 +54,10 @@ pip3 install coverage hacking mock testrepository testresources testscenarios vi
 %{python3_sitelib}/pbr
 
 %changelog
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 5.8.1-1
+- Bump version to 5.8.1
+- Use `tox` instead of `setup.py test` to enable ptest
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 5.1.2-4
 - Replace easy_install usage with pip in %%check sections
 

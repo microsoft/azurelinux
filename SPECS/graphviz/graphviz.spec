@@ -36,7 +36,6 @@
 %ifarch i386 i686
 %global FFSTORE -ffloat-store
 %endif
-%bcond_with python2
 %bcond_with php
 %if %{with php}
 %global PHP 1
@@ -45,7 +44,7 @@
 %endif
 Name:           graphviz
 Version:        2.42.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Graph Visualization Tools
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
@@ -86,9 +85,6 @@ BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(cairo) >= 1.1.10
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-%if %{with python2}
-BuildRequires:  python2-devel
-%endif
 %if %{PHP}
 BuildRequires:  php-devel
 %endif
@@ -209,23 +205,6 @@ Requires:       php(zend-abi) = %{?php_zend_api}%{?!php_zend_api:UNDEFINED}
 
 %description php
 PHP extension for graphviz.
-%endif
-
-%if %{with python2}
-%package python2
-Summary:        Python extension for graphviz
-Requires:       %{name} = %{version}-%{release}
-# Manually add provides that would be generated automatically if .egg-info was present
-Provides:       python2dist(gv) = %{version}
-Provides:       python%{python2_version}dist(gv) = %{version}
-# Remove before F30
-Provides:       %{name}-python = %{version}-%{release}
-Provides:       %{name}-python%{?_isa} = %{version}-%{release}
-Obsoletes:      %{name}-python < 2.40.1-25
-Obsoletes:      python2-%{name} < 2.40.1-25
-
-%description python2
-Python extension for graphviz.
 %endif
 
 %package python3
@@ -359,15 +338,6 @@ rm -f %{buildroot}%{_libdir}/graphviz/libgvplugin_xlib*
 # This is part of the x11 subpkg only
 rm -rf %{buildroot}%{_datadir}/graphviz/lefty
 rm -f %{buildroot}%{_mandir}/man1/{lefty.1*}
-
-%if %{without python2}
-rm -rf %{buildroot}%{python2_sitearch}/*gv*
-%endif
-
-%if %{with python2}
-install -pD tclpkg/gv/.libs/libgv_python2.so %{buildroot}%{python2_sitearch}/_gv.so
-install -p tclpkg/gv/gv.py %{buildroot}%{python2_sitearch}/gv.py
-%endif
 
 # python 3
 install -pD tclpkg/gv/.libs/libgv_python3.so %{buildroot}%{python3_sitearch}/_gv.so
@@ -519,12 +489,6 @@ php --no-php-ini \
 %{_mandir}/man3/gv.3php*
 %endif
 
-%if %{with python2}
-%files python2
-%{python2_sitearch}/*
-%{_mandir}/man3/gv.3python*
-%endif
-
 %files python3
 %{python3_sitearch}/*
 %{_mandir}/man3/gv.3python*
@@ -549,6 +513,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.42.4-5
+- Remove option to build with python2
+
 * Wed Jan 26 2022 Henry Li <lihl@microsoft.com> - 2.42.4-4
 - Add perl as BR
 - License Verified

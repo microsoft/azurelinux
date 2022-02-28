@@ -1,0 +1,12 @@
+diff -ruN a/snappy.cc b/snappy.cc
+--- a/snappy.cc	2022-01-21 13:54:18.000000000 -0800
++++ b/snappy.cc	2022-02-08 12:22:57.560576542 -0800
+@@ -1014,7 +1014,7 @@
+ }
+ 
+ SNAPPY_ATTRIBUTE_ALWAYS_INLINE
+-size_t AdvanceToNextTag(const uint8_t** ip_p, size_t* tag) {
++inline size_t AdvanceToNextTag(const uint8_t** ip_p, size_t* tag) {
+   const uint8_t*& ip = *ip_p;
+   // This section is crucial for the throughput of the decompression loop.
+   // The latency of an iteration is fundamentally constrained by the

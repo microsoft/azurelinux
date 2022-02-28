@@ -6,16 +6,16 @@ Distribution:   Mariner
 
 Name:           python-%{pypi_name}
 Version:        4.2.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        Python library for working with RDF
 
 License:        BSD
 URL:            https://github.com/RDFLib/rdflib
-Source0:        http://pypi.python.org/packages/source/r/rdflib/rdflib-%{version}.tar.gz
+Source0:        https://pypi.python.org/packages/source/r/rdflib/rdflib-%{version}.tar.gz
 Patch1:         %{name}-SPARQLWrapper-optional.patch
 BuildArch:      noarch
 
-BuildRequires:  python3-html5lib >= 1:
+BuildRequires:  python3-html5lib
 BuildRequires:  python3-isodate
 BuildRequires:  python3-pyparsing
 BuildRequires:  python3-devel
@@ -40,7 +40,7 @@ of the Berkeley DB, and a wrapper for remote SPARQL endpoints.
 %package -n python3-%{pypi_name}
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
-Requires:       python3-html5lib >= 1:
+Requires:       python3-html5lib
 Requires:       python3-isodate
 Requires:       python3-pyparsing
 Requires:       python3-six
@@ -153,6 +153,10 @@ sed -i -e "s|with-doctest = 1|#with-doctest = 1|" setup.cfg
 %{_bindir}/rdfs2dot-3*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.1-16
+- Removing epoch.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.1-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

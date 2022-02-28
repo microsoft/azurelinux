@@ -2,8 +2,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global         majorminor      1.0
 
-%bcond_with tex_docs
-
 #global gitrel     140
 #global gitcommit  a70055b58568f7304ba46bd8742232337013487b
 #global shortcommit %(c=%{gitcommit}; echo ${c:0:5})
@@ -15,10 +13,10 @@ Distribution:   Mariner
 
 Name:           gstreamer1
 Version:        1.16.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        GStreamer streaming media framework runtime
 
-License:        LGPLv2+
+License:        GPLv2+
 URL:            http://gstreamer.freedesktop.org/
 %if 0%{?gitrel}
 # git clone git://anongit.freedesktop.org/gstreamer/gstreamer
@@ -51,17 +49,6 @@ BuildRequires:  chrpath
 ### documentation requirements
 BuildRequires:  gtk-doc >= 1.3
 BuildRequires:  libxslt
-%if %{with tex_docs}
-BuildRequires:  openjade
-BuildRequires:  texlive-jadetex
-BuildRequires:  docbook-style-dsssl
-BuildRequires:  docbook-style-xsl
-BuildRequires:  docbook-utils
-BuildRequires:  transfig
-BuildRequires:  netpbm-progs
-BuildRequires:  texlive-dvips
-BuildRequires:  ghostscript
-%endif
 
 %description
 GStreamer is a streaming media framework, based on graphs of filters which
@@ -214,6 +201,10 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.2-5
+- Removing docs to drop dependency on 'ghostscript'.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.2-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
