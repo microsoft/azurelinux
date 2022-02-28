@@ -9,7 +9,8 @@ Release:	3%{?dist}
 
 License:	MIT
 URL:		http://rspec.info
-Source0:	http://rubygems.org/gems/%{gem_name}-%{version}.gem
+#Source0:	https://github.com/rspec/rspec-metagem/archive/refs/tags/v%{version}.tar.gz
+Source0:	%{gem_name}-metagem-%{version}.tar.gz
 
 BuildRequires:	rubygems-devel
 #BuildRequires:	ruby(release)
@@ -19,43 +20,25 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 BuildArch:	noarch
 
 %description
-RSpec is a behaviour driven development (BDD) framework for Ruby.  
-
-%package	doc
-Summary:	Documentation for %{name}
-Requires:	%{name} = %{version}-%{release}
-
-%description	doc
-This package contains documentation for %{name}.
-
+RSpec is a behaviour driven development (BDD) framework for Ruby.
 
 %prep
-gem unpack %{SOURCE0}
-
-%setup -q -D -T -n  %{gem_name}-%{version}
-
-gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n %{gem_name}-metagem-%{version}
 
 %build
-gem build %{gem_name}.gemspec
+gem build %{gem_name}
 %gem_install
 
 %install
-mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-	%{buildroot}%{gem_dir}/
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
-%dir	%{gem_instdir}
-%{gem_instdir}/lib
-%license	%{gem_instdir}/LICENSE.md
-%doc	%{gem_instdir}/README.md
-%exclude %{gem_cache}
-%{gem_spec}
-
-%files	doc
-%doc	%{gem_docdir}
-
+/%{gemdir}/cache/%{gem_name}-%{version}.gem
+/%{gemdir}/doc/%{gem_name}-%{version}/ri/cache.ri
+/%{gemdir}/doc/%{gem_name}-%{version}/ri/page-README_md.ri
+/%{gemdir}/gems/%{gem_name}-%{version}/LICENSE.md
+/%{gemdir}/gems/%{gem_name}-%{version}/README.md
+/%{gemdir}/specifications/%{gem_name}-%{version}.gemspec
 
 %changelog
 * Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 3.9.0-3

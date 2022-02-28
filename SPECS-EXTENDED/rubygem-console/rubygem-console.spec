@@ -9,8 +9,9 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
-URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
-Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
+URL:            https://socketry.github.io/console/
+#Source0:        https://github.com/socketry/console/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Requires:       rubygem-fiber-local
 
@@ -19,12 +20,13 @@ Provides console logging for Ruby applications.
 Implements fast, buffered log output.
 
 %prep
-%setup -q -c -T
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)

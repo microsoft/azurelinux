@@ -7,22 +7,18 @@ Distribution:   Mariner
 
 Summary:	Improved version of Test::Unit bundled in Ruby 1.8.x
 Name:		rubygem-%{gem_name}
-Version:	3.3.6
-Release:	202%{?dist}
+Version:	3.5.3
+Release:	1%{?dist}
 # lib/test/unit/diff.rb is under GPLv2 or Ruby or Python
 # lib/test-unit.rb is under LGPLv2+ or Ruby
 # Other file: GPLv2 or Ruby
-License:	(GPLv2 or Ruby) and (GPLv2 or Ruby or Python) and (LGPLv2+ or Ruby)
-URL:		http://test-unit.github.io/
-
-Source0:	http://rubygems.org/gems/%{gem_name}-%{version}.gem
-
+License:    (GPLv2 or Ruby) and (GPLv2 or Ruby or Python) and (LGPLv2+ or Ruby)
+URL:        http://test-unit.github.io/
+#Source0:    https://github.com/test-unit/test-unit/archive/refs/tags/%{version}.tar.gz
+Source0:  %{gem_name}-%{version}.tar.gz
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems
 BuildRequires:	rubygems-devel
-# For %%check
-#BuildRequires:	rubygem(rake)
-#BuildRequires:	rubygem(hoe)
 Requires:	ruby(release)
 Requires:	rubygems
 AutoReqProv: 0
@@ -45,32 +41,15 @@ Requires:	%{name} = %{version}-%{release}
 This package contains documentation for %{name}.
 
 %prep
-%setup -q -c -T
-# Gem repack
-TOPDIR=$(pwd)
-mkdir tmpunpackdir
-pushd tmpunpackdir
-
-gem unpack %{SOURCE0}
-cd %{gem_name}-%{version}
-
-gem specification -l --ruby %{SOURCE0} > %{gem_name}.gemspec
-gem build %{gem_name}.gemspec
-mv %{gem_name}-%{version}.gem $TOPDIR
-
-popd
-rm -rf tmpunpackdir
+%setup -q -n %{gem_name}-%{version}
 
 %build
-%gem_install
-
-#find . -name \*.gem | xargs chmod 0644
+gem build %{gem_name}
 find . -type f | xargs chmod ugo+r
 
 %install
-mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-	%{buildroot}%{gem_dir}/
+%gem_install
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %check
 pushd .%{gem_instdir}
@@ -79,25 +58,24 @@ ruby -Ilib ./test/run-test.rb
 popd
 
 %files
-%dir	%{gem_instdir}
-%doc	%{gem_instdir}/[A-Z]*
-%exclude	%{gem_instdir}/Rakefile
+/%{gemdir}/gems/%{gem_name}-%{version}/BSDL
+/%{gemdir}/gems/%{gem_name}-%{version}/COPYING
+/%{gemdir}/gems/%{gem_name}-%{version}/PSFL
+/%{gemdir}/gems/%{gem_name}-%{version}/README.md
+/%{gemdir}/gems/%{gem_name}-%{version}/Rakefile
+/%{gemdir}/gems/%{gem_name}-%{version}/lib
+/%{gemdir}/gems/%{gem_name}-%{version}/sample
+/%{gemdir}/specifications/%{gem_name}-%{version}.gemspec
+%exclude /%{gemdir}/cache
 
-%{gem_instdir}/lib/
-
-%exclude	%{gem_cache}
-%{gem_spec}
-
-%files	doc
-%{gem_instdir}/doc/
-# Keep below for this package
-%{gem_instdir}/Rakefile
-%{gem_instdir}/sample/
-%{gem_instdir}/test/
-
-%{gem_docdir}/
+%files doc
+/%{gemdir}/doc
+/%{gemdir}/gems/%{gem_name}-%{version}/doc
 
 %changelog
+* Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-1
+- Update to v3.5.3.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.6-202
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

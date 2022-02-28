@@ -1,13 +1,13 @@
-# Generated from method_source-0.7.1.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name method_source
-
 Summary: Retrieve the source code for a method
 Name: rubygem-%{gem_name}
 Version: 1.0.0
 Release: 3%{?dist}
 License: MIT
 URL: http://banisterfiend.wordpress.com
-Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
+#Source0: https://github.com/banister/method_source/archive/refs/tags/v%{version}.tar.gz
+Source0:  %{gem_name}-%{version}.tar.gz
+Patch0: fix_gemspec.patch
 
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
@@ -18,7 +18,6 @@ BuildArch: noarch
 %description
 Retrieve the source code for a method
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -28,40 +27,36 @@ BuildArch: noarch
 Documentation for %{name}
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
-gem build ../%{gem_name}-%{version}.gemspec
+gem build %{gem_name}
 %gem_install
 
-
 %install
-mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %check
 pushd .%{gem_instdir}
 rspec spec
 popd
 
-
 %files
-%dir %{gem_instdir}
-%exclude %{gem_instdir}/.*
-%license %{gem_instdir}/LICENSE
-%{gem_libdir}
-%exclude %{gem_cache}
-%{gem_spec}
+%license /%{gemdir}/gems/%{gem_name}-%{version}/LICENSE
+/%{gemdir}/gems/%{gem_name}-%{version}/lib
+%exclude /%{gemdir}/cache/
+%exclude /%{gemdir}/gems/%{gem_name}-%{version}/.gemtest
+%exclude /%{gemdir}/gems/%{gem_name}-%{version}/.yardopts
 
 %files doc
-%doc %{gem_docdir}
-%{gem_instdir}/Gemfile
-%doc %{gem_instdir}/README.markdown
-%doc %{gem_instdir}/CHANGELOG.md
-%{gem_instdir}/Rakefile
-%{gem_instdir}/method_source.gemspec
-%{gem_instdir}/spec
+/%{gemdir}/doc
+%doc /%{gemdir}/gems/%{gem_name}-%{version}/CHANGELOG.md
+%doc /%{gemdir}/gems/%{gem_name}-%{version}/README.markdown
+/%{gemdir}/gems/%{gem_name}-%{version}/Rakefile
+/%{gemdir}/gems/%{gem_name}-%{version}/Gemfile
+/%{gemdir}/gems/%{gem_name}-%{version}/method_source.gemspec
+/%{gemdir}/gems/%{gem_name}-%{version}/spec/
+/%{gemdir}/specifications
 
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3

@@ -9,20 +9,22 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
-URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
-Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
+URL:            https://github.com/socketry/fiber-local
+#Source0:        https://github.com/socketry/fiber-local/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 
 %description
 Provides a class-level mixin to make fiber local state easy.
 
 %prep
-%setup -q -c -T
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)

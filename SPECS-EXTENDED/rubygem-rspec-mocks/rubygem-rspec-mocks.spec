@@ -2,9 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 %global	gem_name	rspec-mocks
-
 %global	need_bootstrap_set	0
-
 %undefine __brp_mangle_shebangs
 
 Summary:	RSpec's 'test double' framework (mocks and stubs)
@@ -14,19 +12,17 @@ Release:	2%{?dist}
 
 License:	MIT
 URL:		http://github.com/rspec/rspec-mocks
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# %%{SOURCE2} %%{name} %%{version}
-Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
-Source2:	rspec-related-create-full-tarball.sh
+#Source0:  https://github.com/rspec/rspec-mocks/archive/refs/tags/v%{version}.tar.gz
+Source0:  %{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 %if 0%{?need_bootstrap_set} < 1
-BuildRequires:	rubygem(rspec)
-BuildRequires:	rubygem(thread_order)
-BuildRequires:	git
+BuildRequires:  rubygem(rspec)
+BuildRequires:  rubygem(thread_order)
+BuildRequires:  git
 %endif
-BuildArch:	noarch
+BuildArch:  noarch
 
 %description
 rspec-mocks provides a test-double framework for rspec including support
@@ -39,25 +35,17 @@ Requires:	%{name} = %{version}-%{release}
 %description	doc
 This package contains documentation for %{name}.
 
-
 %prep
-gem unpack %{SOURCE0}
-
-%setup -q -D -T -n  %{gem_name}-%{version} -b 1
-
-gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n  %{gem_name}-%{version}
 
 %build
-gem build %{gem_name}.gemspec
+gem build %{gem_name}
 %gem_install
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
 	%{buildroot}%{gem_dir}/
-
-# cleanups
-rm -f %{buildroot}%{gem_instdir}/{.document,.yardopts}
 
 %if 0%{?need_bootstrap_set} < 1
 %check
@@ -67,18 +55,16 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 %endif
 
 %files
-%dir	%{gem_instdir}
-
-%license	%{gem_instdir}/LICENSE.md
-%doc	%{gem_instdir}/Changelog.md
-%doc	%{gem_instdir}/README.md
-
-%{gem_instdir}/lib/
-
-%exclude	%{gem_cache}
+%dir %{gem_instdir}
+%license /usr/lib/ruby/gems/gems/%{gem_name}-%{version}/LICENSE.md
+%doc %{gem_instdir}/Changelog.md
+%doc %{gem_instdir}/README.md
 %{gem_spec}
+%exclude %{gem_cache}
+%exclude /usr/lib/ruby/gems/gems/%{gem_name}-%{version}/.document
+%exclude /usr/lib/ruby/gems/gems/%{gem_name}-%{version}/.yardopts
 
-%files	doc
+%files doc
 %{gem_docdir}
 
 %changelog

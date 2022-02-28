@@ -12,7 +12,8 @@ Release: 9%{?dist}
 Summary: Provide a list of changes between two sequenced collections
 License: GPLv2+ or Artistic or MIT
 URL: https://github.com/halostatue/diff-lcs
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+#Source0: https://github.com/halostatue/diff-lcs/archive/refs/tags/v%{version}.tar.gz
+Source0: %{gem_name}-%{version}.tar.gz
 BuildRequires: rubygems-devel
 %if ! 0%{?bootstrap}
 BuildRequires: rubygem(rspec)
@@ -25,7 +26,6 @@ Diff::LCS computes the difference between two Enumerable sequences using the
 McIlroy-Hunt longest common subsequence (LCS) algorithm. It includes utilities
 to create a simple HTML diff output format and a standard diff-like tool.
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -35,27 +35,13 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -c  -T
-%gem_install -n %{SOURCE0}
-
+%setup -q -n %{gem_name}-%{version}
 
 %build
-
+gem build %{gem_name}
 
 %install
-mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
-
-
-mkdir -p %{buildroot}%{_bindir}
-cp -pa .%{_bindir}/* \
-        %{buildroot}%{_bindir}/
-
-find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
-
-# Fix shebangs.
-sed -i 's|^#!.*|#!/usr/bin/ruby|' %{buildroot}%{gem_instdir}/bin/{htmldiff,ldiff}
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %if ! 0%{?bootstrap}
 %check
@@ -65,27 +51,16 @@ popd
 %endif
 
 %files
-%dir %{gem_instdir}
-%{_bindir}/htmldiff
-%{_bindir}/ldiff
-%exclude %{gem_instdir}/.*
-%license %{gem_instdir}/License.md
-%license %{gem_instdir}/docs
-%{gem_instdir}/bin
-%{gem_libdir}
-%exclude %{gem_cache}
-%{gem_spec}
+/%{gemdir}/gems/%{gem_name}-%{version}/bin
+/%{gemdir}/gems/%{gem_name}-%{version}/lib
+/%{gemdir}/gems/%{gem_name}-%{version}/spec
+/%{gemdir}/specifications
+/%{gemdir}/bin/
+/%{gemdir}/gems/%{gem_name}-%{version}/
+%exclude /%{gemdir}/cache
 
 %files doc
-%doc %{gem_docdir}
-%doc %{gem_instdir}/Code-of-Conduct.md
-%doc %{gem_instdir}/Contributing.md
-%doc %{gem_instdir}/History.md
-%doc %{gem_instdir}/Manifest.txt
-%{gem_instdir}/autotest
-%doc %{gem_instdir}/README.rdoc
-%{gem_instdir}/Rakefile
-%{gem_instdir}/spec
+/%{gemdir}/doc
 
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-9
