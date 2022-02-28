@@ -1,0 +1,15 @@
+diff -ruN bcache-tools-1.1.orig/bcache.8 bcache-tools-1.1/bcache.8
+--- bcache-tools-1.1.orig/bcache.8	1970-01-01 01:00:00.000000000 +0100
++++ bcache-tools-1.1/bcache.8	2021-01-30 12:49:17.199440242 +0100
+@@ -0,0 +1,11 @@
++.TH bcache 8
++.SH NAME
++bcache \- usefull bcache utility
++.SH SYNOPSIS
++.B bcache
++[\fB \-o\ \fIudev\fR ]
++.I device
++.SH USAGE
++Command explains itself when no arguments are passed, don't use in case of doubt.
++
++This man page needs further work

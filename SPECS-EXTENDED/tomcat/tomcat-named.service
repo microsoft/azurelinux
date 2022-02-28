@@ -1,0 +1,24 @@
+# Systemd unit file for tomcat instances.
+# 
+# To create clones of this service:
+# 0. systemctl enable tomcat@name.service
+# 1. create catalina.base directory structure in
+#    /var/lib/tomcats/name
+# 2. profit.
+
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=syslog.target network.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/tomcat/tomcat.conf
+Environment="NAME=%i"
+EnvironmentFile=-/etc/sysconfig/tomcat@%i
+ExecStart=/usr/libexec/tomcat/server start
+ExecStop=/usr/libexec/tomcat/server stop
+SuccessExitStatus=143
+User=tomcat
+
+[Install]
+WantedBy=multi-user.target

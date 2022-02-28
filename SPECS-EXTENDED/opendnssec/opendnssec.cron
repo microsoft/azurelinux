@@ -1,0 +1,4 @@
+# Ensure multiple ods-enforcerd's on different system roll at the same time
+# independant of when the daemon was started. Since TLDs often update their
+# zone "on the hour" we do the key rollover checks just before the hour.
+50,20 * * * * root test -f /var/lock/subsys/ods-enforcerd && kill -s SIGHUP `cat /var/run/opendnssec/enforcerd.pid` > /dev/null 2> /dev/null

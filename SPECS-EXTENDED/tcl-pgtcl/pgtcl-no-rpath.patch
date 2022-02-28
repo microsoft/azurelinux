@@ -1,0 +1,33 @@
+This patch prevents use of rpath, which isn't wanted on Fedora.
+
+Also, tweak Makefile.in to ensure that the -L switch for libpq appears
+before any -L for the Tcl libraries during the link.  This prevents the
+generated library from being bound to the wrong version of libpq when
+building on a machine that has an older version of libpq already installed
+(bug #166665).
+
+
+diff -Naur pgtcl1.5.3.orig/Makefile.in pgtcl1.5.3/Makefile.in
+--- pgtcl1.5.3.orig/Makefile.in	2006-09-09 21:59:59.000000000 -0400
++++ pgtcl1.5.3/Makefile.in	2007-01-10 18:58:19.000000000 -0500
+@@ -101,7 +101,7 @@
+ RANLIB_STUB	= @RANLIB_STUB@
+ SHLIB_CFLAGS	= @SHLIB_CFLAGS@
+ SHLIB_LD	= @SHLIB_LD@
+-SHLIB_LD_LIBS   = @SHLIB_LD_LIBS@ $(PG_LIBS) $(TCL_LIBS)
++SHLIB_LD_LIBS   = $(PG_LIBS) @SHLIB_LD_LIBS@ $(TCL_LIBS)
+ STLIB_LD	= @STLIB_LD@
+ #TCL_DEFS	= @TCL_DEFS@
+ TCL_BIN_DIR	= @TCL_BIN_DIR@
+diff -Naur pgtcl1.5.3.orig/aclocal.m4 pgtcl1.5.3/aclocal.m4
+--- pgtcl1.5.3.orig/aclocal.m4	2006-09-09 20:27:09.000000000 -0400
++++ pgtcl1.5.3/aclocal.m4	2007-01-10 18:56:46.000000000 -0500
+@@ -844,7 +844,7 @@
+ 	    DL_OBJS="tclLoadDl.o"
+ 	    DL_LIBS="-ldl"
+ 	    LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
+-	    CC_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR},-rpath,${LIB_PGTCL_RUNTIME_DIR}'
++	    CC_SEARCH_FLAGS=""
+ 	    LD_SEARCH_FLAGS=${CC_SEARCH_FLAGS}
+ 	    if test "`uname -m`" = "alpha" ; then
+ 		CFLAGS="$CFLAGS -mieee"

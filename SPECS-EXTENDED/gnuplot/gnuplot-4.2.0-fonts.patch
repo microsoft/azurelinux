@@ -1,0 +1,12 @@
+diff -up gnuplot-4.4.0/term/gd.trm.pom gnuplot-4.4.0/term/gd.trm
+--- gnuplot-4.4.0/term/gd.trm.pom	2010-02-25 03:29:20.000000000 +0100
++++ gnuplot-4.4.0/term/gd.trm	2010-08-17 09:51:22.000000000 +0200
+@@ -978,7 +978,7 @@ PNG_options()
+ 	if (external_default)
+ 		png_state.ttffont = gp_strdup(external_default);
+ 	else	/* Might as well try some plausible font; it's no worse than failing immediately */
+-		png_state.ttffont = gp_strdup("arial");
++		png_state.ttffont = gp_strdup("/usr/share/fonts/dejavu/DejaVuSans.ttf");
+ 
+ 	free(png_state.default_ttffont);
+ 	png_state.default_ttffont = gp_strdup(png_state.ttffont);

@@ -1,0 +1,34 @@
+From 662e9e93babc9be39bb2d6267ffe428703ca137e Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Thu, 12 Sep 2019 10:18:01 +0200
+Subject: [PATCH] warnquota: Clarify that CC_TO gets resolved through LDAP
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Clarify that CC_TO field from warnquota.conf gets resolved through LDAP
+lookup similarly to normal message recifient.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+Petr Písař: Ported to Fedora 32.
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ warnquota.conf | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/warnquota.conf b/warnquota.conf
+index 7e00947..34bfe53 100644
+--- a/warnquota.conf
++++ b/warnquota.conf
+@@ -8,6 +8,8 @@ MAIL_CMD 	= "/usr/sbin/sendmail -t"
+ FROM 		= "root@example.com"
+ # but they don't have to be:
+ SUBJECT 	= NOTE: You are exceeding your allocated disk space limits
++# Note that if LDAP is configured, the name in CC_TO gets looked up in LDAP
++# to obtain email address similarly to email recipient address.
+ CC_TO 		= "root@example.com"
+ # If you set this variable CC will be used only when user has less than
+ # specified grace time left (examples of possible times: 5 seconds, 1 minute,
+-- 
+2.21.0
+

@@ -1,0 +1,98 @@
+# $Id: hsqldb-1.8.0-standard-sqltool.rc,v 1.1 2007/08/31 13:37:06 fnasser Exp $
+
+# This is a sample SqlTool configuration file, a.k.a. rc file.
+
+# You can run SqlTool right now by copying this file to your home directory
+# and running
+#    java -jar /path/to/hsqldb.jar mem
+# This will access the first urlid definition below in order to use a 
+# personal Memory-Only database.
+
+# If you have the least concerns about security, then secure access to
+# your sqltool.rc file.
+# See the documentation for SqlTool for various ways to use this file.
+
+# A personal Memory-Only database.
+urlid mem
+url jdbc:hsqldb:mem:memdbid
+username sa
+password
+
+# This is for a hsqldb Server running with default settings on your local
+# computer (and for which you have not changed the password for "sa").
+urlid db0-url
+url jdbc:hsqldb:hsql://localhost/firstdb
+username sa
+password
+
+
+###########################################################################
+# Template for a urlid for an Oracle database.
+# You will need to put the oracle.jdbc.OracleDriver class into your 
+# classpath.
+# In the great majority of cases, you want to use the file classes12.zip
+# (which you can get from the directory $ORACLE_HOME/jdbc/lib of any
+# Oracle installation compatible with your server).
+# Since you need to add to the classpath, you can't invoke SqlTool with
+# the jar switch, like "java -jar .../hsqldb.jar..." or 
+# "java -jar .../hsqlsqltool.jar...".
+# Put both the HSQLDB jar and classes12.zip in your classpath (and export!)
+# and run something like "java org.hsqldb.util.SqlTool...".
+
+#urlid cardiff2
+#url jdbc:oracle:thin:@aegir.admc.com:1522:TRAFFIC_SID
+#username blaine
+#password secretpassword
+#driver oracle.jdbc.OracleDriver
+###########################################################################
+
+
+###########################################################################
+# Template for a urlid for a Postgresql database.
+# You will need to put the org.postgresql.Driver class into your 
+# classpath.
+# The postgresql jar will be named postgresql.jar (if you built Postgresql 
+# from source), or something like pg73b1jdbc3.jar or jdbc7.2x-1.2.jar.
+# You can obtain it from a client or server Postgresql installation, or 
+# download it from http://jdbc.postgresql.org/download.html.
+# Notice that the jar file names (other than "postgresql.jar") contain both
+# the target Postgresql server version and the client-side JDBC level (which
+# is determined by your client-side Java version, as explained at
+# http://jdbc.postgresql.org/download.html).
+# I recommend the latest production version for your JDBC version.  The 
+# later JDBC drivers work better even with older Postgresql servers.
+# (E.g. \dt won't list owners with an older driver).
+# N.b.: Suse Linux 9.1 users should download a new driver from the PG site,
+# since Suse distributes the 7.3 drivers with Postgresql 7.4 (why???).
+# Since you need to add to the classpath, you can't invoke SqlTool with
+# the jar switch, like "java -jar .../hsqldb.jar..." or 
+# "java -jar .../hsqlsqltool.jar...".
+# Put both the HSQLDB jar and the Postgresql jar in your classpath (and
+# export!) and run something like "java org.hsqldb.util.SqlTool...".
+# N.b.:  I notice that Postgresql is unusual in that it does not do an
+# implicit commit before DDL commands.  If you get an error message 
+# "... cannot run inside a transaction block", just run "commit;" and retry.
+
+#urlid commerce
+#url jdbc:postgresql://dbsvr2/commercedb
+#username blaine
+#password obscured
+#driver org.postgresql.Driver
+###########################################################################
+
+
+###########################################################################
+# Template for a TLS-encrypted HSQLDB Server.
+# Remember that the hostname in hsqls (and https) JDBC URLs must match the
+# CN of the server certificate (the port and instance alias that follows 
+# are not part of the certificate at all).
+# You only need to set "truststore" if the server cert is not approved by
+# your system default truststore (which a commercial certificate probably
+# would be).
+
+#urlid tls
+#url jdbc:hsqldb:hsqls://db.admc.com:9001/lm2
+#username blaine
+#password asecret
+#truststore /home/blaine/ca/db/db-trust.store
+###########################################################################

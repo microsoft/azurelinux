@@ -1,0 +1,99 @@
+===============================================
+                                 Mar 9th, 2007
+                      Written by Mamoru Tasaka
+                 <mtasaka@ioa.s.u-tokyo.ac.jp>  
+   
+  Clarification of the license of mecab-ipadic
+  on Fedora
+===============================================
+
+The English version of the license of mecab-ipadic 
+(which is included as "LICENSE.en" in this rpm )
+contains the part which came from ICOT Free software 
+license, which contains the following paragraph.
+-----------------------------------------------
+Each User may also freely distribute the Program, whether in its
+original form or modified, to any third party or parties, PROVIDED
+that the provisions of Section 3 ("NO WARRANTY") will ALWAYS appear
+on, or be attached to, the Program, which is distributed substantially
+in the same form as set out herein and that such intended
+distribution, if actually made, will neither violate or otherwise
+contravene any of the laws and regulations of the countries having
+jurisdiction over the User or the intended distribution itself.
+-----------------------------------------------
+At the time I was writing this document, debian regarded
+mecab-ipadic as NON-free as they judged this paragraph problematic.
+
+So I asked Mr. Tom "spot" Callaway if this software can be 
+legally accepted, and he asked FSF (The Free Software 
+Foundation) if they can accept this license as free.
+The opinion of FSF on this passage was as below.
+-----------------------------------------------
+Debian's beef is with the following paragraph of the license:
+
+<This part is the same as the above paragraph>
+
+They have two complaints.  I've given my thoughts on both, but I can't
+make a final determination on either; that would be for RMS and Eben.
+
+* They believe that when the license talks about something being
+  "distributed substantially in the same form as set out herein," it's
+  referring to the program -- implying that you can't radically alter 
+  the software (i.e., take a piece of it and incorporate it in some   
+  totally different software).  I understand why they think that.  On 
+  the other hand, I'm skeptical that this is the licensor's intent; I 
+  think they just want to keep you from messing up the warranty 
+  disclaimer too much. Unusually for Debian, apparently nobody tried to 
+  clear this up with the original authors.  It might be worthwhile to 
+  try that.  As it stands, I think we'd want to steer clear as well, as 
+  we did with the original Artistic license.
+
+* They object to the requirement that you follow the law.  I'm not sure 
+  if we have a general policy on this, but I know we've accepted similar
+  restrictions as being free before (the Intel Open Source License has
+  similar, though narrower, language), so I think we would still 
+  consider the license free as well even with this text.
+
+If you can get some kind of clarification on the first point, I'd be
+happy to escalate this for further discussion.
+-----------------------------------------------
+So Mr Callaway asked me to clarify the intend of the original author
+with respect to the word "substantially".
+
+However, according to the original Japanese version of
+this license (which is included as "LICENSE.jp.html" in this rpm), 
+the part of the license which corresponds to the ICOT license
+paragraph, which contains the words "substantially", reads 
+as below (in English):
+-----------------------------------------------
+Each user of this program may freely use, modify and make a copy of
+this program. "To modify this program" used herein includes
+* to improve or to extend this program to make it better its
+  function, performance, and the quality
+* to add programs and documents you created by yourself,
+however, it ("to modify this program") is not limited to the above.
+
+Each user of this program may distribute to others
+this program itself, or the modified version of this program,
+provided
+* the section three ("no warranty") of this license is
+  included in it,
+freely as long as the distribution won't violate the laws
+which may relate to the distribution.
+-----------------------------------------------
+So as mecab developers mention, who maintain mecab-ipadic 
+software currently, and also in my opinion, it does not seem 
+to appear in the Japanese license the part which corresponds to 
+the words "substantially in the same form".  And in the Japanese 
+license it is mentioned what to call "the modified version", which
+declares that the original developer imposes no limitation
+for modifying this software.
+
+Mr Callaway finally declared this license OK for Fedora
+on Mar 8th, 2007.
+-----------------------------------------------
+This is good. Add a text file which says exactly what you just said as
+LICENSE.Fedora, include it in %doc, and it is ok for Fedora.
+
+~spot
+-----------------------------------------------

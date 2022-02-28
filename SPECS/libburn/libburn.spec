@@ -5,7 +5,7 @@
 Summary:         Library for reading, mastering and writing optical discs
 Name:            libburn
 Version:         1.4.8
-Release:         2%{?dist}
+Release:         3%{?dist}
 License:         GPLv2+
 Group:           System Environment/Libraries
 URL:             http://libburnia-project.org/
@@ -59,9 +59,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}.la
 # Clean up for later usage in documentation
 rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
@@ -82,6 +79,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{cdrskin}.1*
 
 %changelog
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.8-3
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.4.8-2
 - Initial CBL-Mariner import from Fedora 27 (license: MIT).
 

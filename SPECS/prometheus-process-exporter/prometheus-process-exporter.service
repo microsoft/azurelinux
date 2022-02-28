@@ -1,0 +1,13 @@
+[Unit]
+Description=Prometheus exporter that mines /proc to report on selected processes
+Documentation=https://github.com/ncabatoff/process-exporter man:prometheus-process-exporter(1)
+After=network.target
+
+[Service]
+Restart=on-failure
+User=prometheus
+EnvironmentFile=/etc/default/prometheus-process-exporter
+ExecStart=/usr/bin/prometheus-process-exporter $ARGS
+
+[Install]
+WantedBy=multi-user.target

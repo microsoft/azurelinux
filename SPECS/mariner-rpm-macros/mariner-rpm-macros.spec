@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        8%{?dist}
+Release:        12%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -123,6 +123,18 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Wed Feb 16 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-12
+- Use _topdir variable with gen-ld-script.sh
+
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0-11
+- add sed step to os_install_post to remove references to module_info.ld in pkgconfigs
+
+* Wed Dec 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-10
+- Add Fedora's macros for passing flags to extension builders (license: MIT)
+
+* Wed Dec 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-9
+- Update unversioned python and python3 macros to reflect removal of easy_install binary
+
 * Tue Nov 02 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.0-8
 - Remove too verbose logs from the linker script
 - Update default mariner macros with invalid_encoding_terminates_build

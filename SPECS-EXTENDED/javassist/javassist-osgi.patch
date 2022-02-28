@@ -1,0 +1,53 @@
+--- javassist-rel_3_23_1_ga/src/main/META-INF/MANIFEST.MF	2018-07-01 19:27:13.000000000 +0200
++++ javassist-rel_3_23_1_ga/src/main/META-INF/MANIFEST.MF	2020-03-25 14:51:53.954402117 +0100
+@@ -2,3 +2,50 @@
+ Specification-Vendor: Shigeru Chiba, www.javassist.org
+ Specification-Version: 3.23.1-GA
+ Main-Class: javassist.CtClass
++Bundle-Description: Javassist (JAVA programming ASSISTant)
++ makes Java bytecode manipulation simple. It is a class
++ library for editing bytecodes in Java.
++Bundle-License: http://www.mozilla.org/MPL/MPL-1.1.html,
++ http://www.gnu.org/licenses/lgpl-2.1.html,
++ http://www.apache.org/licenses/
++Bundle-ManifestVersion: 2                                       
++Bundle-Name: Javassist                               
++Bundle-SymbolicName: javassist                               
++Bundle-Vendor: Shigeru Chiba, www.javassist.org        
++Bundle-Version: 3.23.1.GA                               
++Export-Package: javassist;version="3.23.1.GA";
++ uses:="javassist.bytecode,javassist.compiler,
++ javassist.compiler.ast,javassist.convert,javassist.expr",
++ javassist.bytecode;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode.annotation",
++ javassist.bytecode.analysis;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode,javassist.bytecode.stackmap",
++ javassist.bytecode.annotation;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode",
++ javassist.bytecode.stackmap;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode",
++ javassist.compiler;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode,javassist.compiler.ast",
++ javassist.compiler.ast;version="3.23.1.GA";
++ uses:="javassist,javassist.compiler",
++ javassist.convert;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode",
++ javassist.expr;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode",
++ javassist.runtime;version="3.23.1.GA",
++ javassist.scopedpool;version="3.23.1.GA";
++ uses:=javassist,
++ javassist.tools;version="3.23.1.GA";
++ uses:=javassist,
++ javassist.tools.reflect;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode",
++ javassist.tools.rmi;version="3.23.1.GA";
++ uses:="javassist,javassist.tools.web",
++ javassist.tools.web;version="3.23.1.GA";
++ uses:=javassist,
++ javassist.util;version="3.23.1.GA";
++ uses:=javassist,
++ javassist.util.proxy;version="3.23.1.GA";
++ uses:="javassist,javassist.bytecode"
++Require-Capability: osgi.ee;
++ filter:="(&(osgi.ee=JavaSE)(version=1.6))"

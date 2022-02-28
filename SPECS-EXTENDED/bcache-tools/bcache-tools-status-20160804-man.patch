@@ -1,0 +1,49 @@
+diff -ruN bcache-tools-20160804.orig/bcache-status.8 bcache-tools-20160804/bcache-status.8
+--- bcache-tools-20160804.orig/bcache-status.8	1970-01-01 01:00:00.000000000 +0100
++++ bcache-tools-20160804/bcache-status.8	2016-08-04 15:12:15.378683562 +0200
+@@ -0,0 +1,45 @@
++.TH bcache-status 8
++.SH NAME
++bcache-status \- Display useful bcache statistics
++.SH SYNOPSIS
++.B bcache-status
++[\fB \--help\fR ]
++[\fB \-f\fR ]
++[\fB \-h\fR ]
++[\fB \-d\fR ]
++[\fB \-t\fR ]
++[\fB \-a\fR ]
++[\fB \-r\fR ]
++[\fB \-s\fR ]
++[\fB \-g\fR ]
++.SH DESCRIPTION
++This command displays useful bcache statistics in a convenient way.
++.SH OPTIONS
++.TP
++.BR \---help
++Print help message and exit.
++.TP
++.BR \-f,\ --five-minute
++Print the last five minutes of stats.
++.TP
++.BR \-h,\ --hour
++Print the last hour of stats.
++.TP
++.BR \-d,\ --day
++Print the last day of stats.
++.TP
++.BR \-t,\ --total
++Print total stats.
++.TP
++.BR \-a,\ --all
++Print all stats.
++.TP
++.BR \-r,\ --reset-stats
++Reset stats after printing them.
++.TP
++.BR \-s,\ --sub-status
++Print subdevice status.
++.TP
++.BR \-g,\ --gc
++Invoke GC before printing status (root only).
++

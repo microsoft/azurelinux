@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="jansi" default="package" basedir="jansi">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="build.properties"/>
+  
+  <property name="project.groupId" value="org.fusesource.jansi"/>
+  <property name="project.artifactId" value="jansi"/>
+  <property name="project.version" value="1.17.1"/>
+  <property name="project.name" value="${project.artifactId}"/>
+  <property name="project.description" value="Jansi is a java library for generating and interpreting ANSI escape sequences."/>
+  
+  <property name="compiler.source" value="1.6"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir.0" value="src/main/java"/>
+  <property name="build.resourceDir.0" value="src/main/resources"/>
+  <property name="build.testOutputDir" value="${build.dir}/test-classes"/>
+  <property name="build.testDir.0" value="src/test/java"/>
+  <property name="build.testResourceDir.0" value="src/test/resources"/>
+  <property name="test.reports" value="${build.dir}/test-reports"/>
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+  
+  <property name="spec.version" value="1.17"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath">
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           encoding="UTF-8" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir.0}"/>
+      </src>
+      <classpath refid="build.classpath"/>
+    </javac>
+    <copy todir="${build.outputDir}">
+      <fileset dir="${build.resourceDir.0}"/>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Test-compilation target                                                -->
+  <!-- ====================================================================== -->
+
+  <target name="compile-tests" 
+          depends="compile" 
+          description="Compile the test code" 
+          unless="test.skip">
+    <mkdir dir="${build.testOutputDir}"/>
+    <javac destdir="${build.testOutputDir}" 
+           encoding="UTF-8" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.testDir.0}"/>
+      </src>
+      <classpath>
+        <path refid="build.classpath"/>
+        <pathelement location="${build.outputDir}"/>
+      </classpath>
+    </javac>
+    <copy todir="${build.testOutputDir}">
+      <fileset dir="${build.testResourceDir.0}"/>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Run all tests                                                          -->
+  <!-- ====================================================================== -->
+
+  <target name="test" 
+          depends="compile-tests, junit-missing" 
+          unless="junit.skipped" 
+          description="Run the test cases">
+    <mkdir dir="${test.reports}"/>
+    <junit printSummary="yes" haltonerror="true" haltonfailure="true" fork="true" dir=".">
+      <sysproperty key="basedir" value="."/>
+      <formatter type="xml"/>
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+        <path refid="build.classpath"/>
+        <pathelement location="${build.outputDir}"/>
+        <pathelement location="${build.testOutputDir}"/>
+      </classpath>
+      <batchtest todir="${test.reports}" unless="test">
+        <fileset dir="${build.testDir.0}">
+          <include name="**/*Test.java"/>
+          <exclude name="**/Abstract*.java"/>
+          <exclude name="**/Test*.java"/>
+        </fileset>
+      </batchtest>
+      <batchtest todir="${test.reports}" if="test">
+        <fileset dir="${build.testDir.0}">
+          <include name="**/${test}.java"/>
+          <exclude name="**/Abstract*.java"/>
+          <exclude name="**/Test*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+  <target name="test-junit-present">
+    <available classname="junit.framework.Test" property="junit.present" classpathref="build.classpath"/>
+  </target>
+
+  <target name="test-junit-status" 
+          depends="test-junit-present">
+    <condition property="junit.missing">
+      <and>
+        <isfalse value="${junit.present}"/>
+        <isfalse value="${test.skip}"/>
+      </and>
+    </condition>
+    <condition property="junit.skipped">
+      <or>
+        <isfalse value="${junit.present}"/>
+        <istrue value="${test.skip}"/>
+      </or>
+    </condition>
+  </target>
+
+  <target name="junit-missing" 
+          depends="test-junit-status" 
+          if="junit.missing">
+    <echo>=================================== WARNING ===================================</echo>
+    <echo> JUnit is not present in the test classpath or your $ANT_HOME/lib directory. Tests not executed.</echo>
+    <echo>===============================================================================</echo>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir.0}" 
+             packagenames="*" 
+             destdir="${reporting.outputDirectory}/apidocs" 
+             access="protected" 
+             source="${compiler.source}" 
+             verbose="false" 
+             locale="en_US" 
+             version="false" 
+             use="true" 
+             author="true" 
+             splitindex="false" 
+             windowtitle="jansi API Reference (${project.version})" 
+             nodeprecated="false" 
+             nodeprecatedlist="false" 
+             notree="false" 
+             noindex="false" 
+             nohelp="false" 
+             nonavbar="false" 
+             serialwarn="false" 
+             encoding="UTF-8" 
+             docencoding="UTF-8" 
+             linksource="true" 
+             breakiterator="false">
+      <doctitle>&lt;![CDATA[jansi API Reference (${project.version})]]&gt;</doctitle>
+      <classpath refid="build.classpath"/>
+    </javadoc>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile,test" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html">
+      <manifest>
+		<attribute name="Bundle-Description" value="${project.description}"/>
+		<attribute name="Bundle-DocURL" value="http://fusesource.com/"/>
+		<attribute name="Bundle-License" value="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+		<attribute name="Bundle-ManifestVersion" value="2"/>
+		<attribute name="Bundle-Name" value="${project.name}"/>
+		<attribute name="Bundle-SymbolicName" value="org.fusesource.jansi"/>
+		<attribute name="Bundle-Vendor" value="FuseSource, Corp."/>
+		<attribute name="Bundle-Version" value="${project.version}"/>
+		<attribute name="Export-Package" value="org.fusesource.jansi;version=&quot;${project.version}&quot;,org.fusesource.jansi.internal;version=&quot;${project.version}&quot;"/>
+		<attribute name="Implementation-Title" value="${project.name}"/>
+		<attribute name="Implementation-URL" value="http://fusesource.github.io/jansi/jansi"/>
+		<attribute name="Implementation-Vendor" value="FuseSource, Corp."/>
+		<attribute name="Implementation-Vendor-Id" value="${project.groupId}"/>
+		<attribute name="Implementation-Version" value="${project.version}"/>
+		<attribute name="JavaPackages-ArtifactId" value="${project.artifactId}"/>
+		<attribute name="JavaPackages-GroupId" value="${project.groupId}"/>
+		<attribute name="JavaPackages-Version" value="${project.version}"/>
+		<attribute name="Main-Class" value="org.fusesource.jansi.AnsiMain"/>
+		<attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+		<attribute name="Specification-Title" value="${project.name}"/>
+		<attribute name="Specification-Vendor" value="FuseSource, Corp."/>
+		<attribute name="Specification-Version" value="${spec.version}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

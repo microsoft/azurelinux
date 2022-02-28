@@ -1,0 +1,3839 @@
+#
+# Device Reference (UTF-8 encoding used)
+#
+# Last modified: 2014-05-29
+#
+# Collection of configurations for usb_modeswitch, a mode switching
+# tool for controlling flip flop (multiple mode) USB devices
+#
+# Detailed instructions and a friendly forum on the homepage:
+# http://www.draisberghof.de/usb_modeswitch
+#
+# You may want to check for a newer version of this file at:
+# http://www.draisberghof.de/usb_modeswitch/device_reference.txt
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Don't use this file directly; for your own experiments, create a
+# config file, copy data from here, and use it with the -c parameter!
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# For a parameter reference see file REFERENCE in the data package
+#
+# If you find working codes and configurations, please contribute
+# them!
+
+
+
+
+#######################################################
+# Option GlobeSurfer Icon (aka "Vodafone EasyBox")
+#
+# The MessageContent is identical for all Option devices
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x0af0
+TargetProduct=  0x6600
+
+MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+
+
+#######################################################
+# Option GlobeSurfer Icon 7.2
+#
+# Contributor: The Pharscape Forum
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x0af0
+TargetProduct=  0x6901
+
+MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+
+
+########################################################
+# Option GlobeTrotter GT MAX 3.6 (aka "T-Mobile Web'n'walk Card Compact II")
+#
+# Contributor: Bernd HolzmÃ¼ller
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x0af0
+TargetProduct=  0x6600
+
+MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+
+# ResponseEndpoint=0x84
+
+NeedResponse=1
+
+
+########################################################
+# Option GlobeTrotter GT MAX "7.2 Ready"
+#
+# Contributors: Lucas Benedicic, Morgwai Kotarbinski
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x0af0
+TargetProduct=  0x6701
+
+MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+
+
+########################################################
+# Option GlobeTrotter EXPRESS 7.2 (aka "T-Mobile wnw Express II")
+#
+# Contributor: Fridtjof Busse
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x0af0
+TargetProduct=  0x6701
+
+MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+
+# Response reading needed according to one (1) report
+NeedResponse=1
+
+
+#######################################################
+# Option GlobeSurfer Icon 7.2, new firmware (HSO driver)
+#
+# Vendor/ProductID don't change when switching, only the device
+# class does. Most new Option devices work with this. Just adapt the IDs.
+#
+# Option's HSO driver is part of the mainstream kernel; support is
+# available at Pharscape (www.pharscape.org)
+#
+# Contributors: Paul Hardwick, Philip Aben
+
+DefaultVendor=  0x0af0
+DefaultProduct= 0x6911
+
+TargetClass=    0xff
+
+MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+
+# Here is a list with all currently supported Option default IDs:
+#
+# 0af0:6711
+# 0af0:6731
+# 0af0:6751
+# 0af0:6771
+# 0af0:6791
+# 0af0:6811
+# 0af0:6911
+# 0af0:6951
+# 0af0:6971
+# 0af0:7011
+# 0af0:7031
+# 0af0:7051
+# 0af0:7071
+# 0af0:7111
+# 0af0:7211
+# 0af0:7251
+# 0af0:7271
+# 0af0:7301
+# 0af0:7311
+# 0af0:7361
+# 0af0:7381
+# 0af0:7401
+# 0af0:7501
+# 0af0:7601
+# 0af0:7701
+# 0af0:7801
+# 0af0:7901
+# 0af0:7a01
+# 0af0:7a05
+# 0af0:8200
+# 0af0:8201
+# 0af0:8300
+# 0af0:8302
+# 0af0:8304
+# 0af0:8400
+# 0af0:8600
+# 0af0:8800
+# 0af0:8900
+# 0af0:9000
+# 0af0:c031
+# 0af0:c100
+# 0af0:d013
+# 0af0:d031
+# 0af0:d033
+# 0af0:d035
+# 0af0:d055
+# 0af0:d057
+# 0af0:d058
+# 0af0:d155
+# 0af0:d157
+# 0af0:d255
+# 0af0:d257
+# 0af0:d357
+
+
+
+########################################################
+# Option iCON 210
+# PROLiNK PHS100 (various looks)
+# Hyundai Mobile MB-810
+#
+# One report of switching with DetachStorageOnly. Needs at least
+# a second to settle before binding to usbserial
+#
+# Contributor: wahlm, Peter Kraker, Pakdhetimin Sekum
+
+DefaultVendor=  0x1e0e
+DefaultProduct= 0xf000
+
+TargetVendor=   0x1e0e
+TargetProduct=  0x9000
+
+MessageContent="555342431234567800000000000006bd000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# AT&T USBConnect Quicksilver (made by Option, HSO driver)
+#
+# Contributor: sissie from Bullteam
+
+DefaultVendor=  0x0af0
+DefaultProduct= 0xd033
+
+TargetClass=    0xff
+
+MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+
+
+########################################################
+# Huawei devices
+#
+# Contributor: Hans Kurent, Denis Sutter, Vincent Teoh
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1003
+
+TargetClass=    0xff
+
+HuaweiMode=1
+
+
+########################################################
+# Huawei E169 and others
+#
+# Contributor: Dale Lane
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1001
+
+TargetClass=    0xff
+
+# choose one of these:
+DetachStorageOnly=1
+HuaweiMode=1
+
+
+########################################################
+# Huawei E180
+#
+# Contributor: Tom Dawahare
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1414
+
+TargetClass=    0xff
+
+HuaweiMode=1
+
+
+########################################################
+# Huawei E630
+#
+# There seem to be modem-only variants around - no storage,
+# no switching
+#
+# Contributor: Joakim Wenrgren
+
+DefaultVendor=  0x1033
+DefaultProduct= 0x0035
+
+TargetVendor=   0x12d1
+TargetProduct=  0x1003
+
+HuaweiMode=1
+
+
+########################################################
+# ZTE MF620 (aka "Onda MH600HS")
+#
+# Probably works with DetachStorageOnly too
+#
+# Contributor: FlÃƒÂ¡vio Moringa and others
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProductList="0001"
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE MF622 (aka "Onda MDC502HS"), MF100 and others
+#
+# Contributor: andylog
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0002
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE MF628
+#
+# Captured with "usbmon". Has a micro SD slot which can be
+# activated alternatively
+#
+# Contributor: Alvaro Lopes <alvieboy at alvie dot com>
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+
+# To modem mode:
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0015
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+# To SD slot mode:
+
+TargetVendor=   0x05c6
+TargetProduct=  0x2001
+
+MessageContent="55534243123456782000000080000a86010101180101010101000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE MF622 (aka "Onda MDC502HS")
+# ZTE MF626
+# ZTE MF628+ (tested version from Telia / Sweden)
+# ZTE MF633
+# ZTE MF636 (aka "Telstra / BigPond 7.2 Mobile Card")
+# ZTE MF637
+# and probably others not listed here
+#
+# Contributor: Joakim Wennergren and others
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0031
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE MF638 (aka "Onda MDC525UP")
+#
+# Contributor: andylog
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0037
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE AC8710
+# ZTE AC2726
+# and others
+#
+# Many new ZTE devices use this sequence. There are
+# several ID combinations; check your default
+#
+# Contributor: Michael Khurtsiya, Amit Pundir and others
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0xfff5
+
+TargetVendor=   0x19d2
+TargetProduct=  0xffff
+
+# No. 2
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0xfff6
+
+TargetVendor=   0x19d2
+TargetProduct=  0xfff1
+
+# No. 3
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0xfff5
+
+TargetVendor=   0x19d2
+TargetProduct=  0xfff1
+
+MessageContent="5553424312345678c00000008000069f030000000000000000000000000000"
+
+
+########################################################
+# ZTE AC2710 (EVDO) 
+#
+# Contributor: Wasim Baig
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0xfff5
+
+TargetVendor=   0x19d2
+TargetProduct=  0xffff
+
+MessageContent="5553424312345678c00000008000069f010000000000000000000000000000"
+
+# Just for information: try it with the message from the AC8710 ...
+
+
+########################################################
+# ZTE 6535-Z
+#
+# Contributor: David Taillandier
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0052
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ONDA MT503HS
+#
+# Contributor: Lucio Asnaghi a.k.a. kRAkEn/gORe
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0002
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ONDA MT505UP (most likely a ZTE model)
+#
+# Contributor: Alex Scortegagna
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0002
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Novatel Wireless Ovation MC950D HSUPA
+# Novatel Wireless Merlin XU950D
+# Novatel Wireless Ovation 930D
+#
+# Contributor: Razvan Dragomirescu, Mike Kirk
+
+DefaultVendor=  0x1410
+DefaultProduct= 0x5010
+
+TargetVendor=   0x1410
+TargetProduct=  0x4400
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# Novatel U727 USB modem
+#
+# Modem only versions (no switching required) are around.
+#
+# Contributor: Chris Thielen
+
+DefaultVendor=  0x1410
+DefaultProduct= 0x5010
+
+TargetVendor=   0x1410
+TargetProduct=  0x4100
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# Novatel MC990D
+#
+# Contributor: Joakim Wennergren
+
+DefaultVendor= 0x1410
+DefaultProduct=0x5020
+
+DefaultVendor= 0x1410
+TargetProductList="6000,7001"
+
+# Don't use this, original report must be wrong,
+# https://bugzilla.redhat.com/show_bug.cgi?id=728318
+#
+# Interface=5
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# Novatel U760 USB modem
+#
+# Contributor: Richard Laager
+
+DefaultVendor=  0x1410
+DefaultProduct= 0x5030
+
+TargetVendor=   0x1410
+TargetProduct=  0x6000
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# Alcatel One Touch X020 (aka OT-X020, aka MBD-100HU, aka Nuton 3.5G), works with Emobile D11LC
+# Alcatel One Touch X030 (aka OT-X030, aka Nuton NT36HD)
+#
+# Contributor: Aleksandar Samardzic, Marcelo Fernandez
+
+DefaultVendor=  0x1c9e
+DefaultProduct= 0x1001
+
+TargetVendor=   0x1c9e
+TargetProduct=  0x6061
+
+MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
+
+
+########################################################
+# Alcatel X200/X060S
+
+DefaultVendor=  0x1bbb
+DefaultProduct= 0xf000
+
+TargetVendor=   0x1bbb
+TargetProduct=  0x0000
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# AnyDATA ADU-500A, ADU-510A, ADU-510L, ADU-520A
+#
+# This ID gets an "Option" treatment by newer kernels.
+# Use module option "option_zero_cd=2" with usb-storage.
+# A kernel patch to fix the problem is pending
+#
+# Contributor: Vladimir Poluektov, Gabriel Smolar
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x16d5
+TargetProduct=  0x6502
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# BandLuxe C120
+#
+# Reportedly needs several switch calls in a certain order. See
+# http://www.draisberghof.de/usb_modeswitch/bb/viewtopic.php?t=71
+# This might be a case to try the new ResetUSB function
+#
+# Contributor: Alexander Czigler
+
+DefaultVendor=  0x1a8d
+DefaultProduct= 0x1000
+
+TargetVendor=   0x1a8d
+TargetProduct=  0x1002
+
+MessageContent="55534243123456781200000080000603000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Solomon S3Gm-660
+#
+# Same notes apply as with the BandLuxe C120 above
+#
+# Contributor: Alexander Czigler
+
+DefaultVendor=  0x1dd6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x1dd6
+TargetProduct=  0x1002
+
+MessageContent="55534243123456781200000080000603000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# C-motech D-50 (aka "CDU-680")
+#
+# Interesting notes about the device in the forum post at
+# http://www.draisberghof.de/usb_modeswitch/bb/viewtopic.php?t=69
+#
+# Contributor: Alexander Czigler
+
+DefaultVendor=  0x16d8
+DefaultProduct= 0x6803
+
+TargetVendor=   0x16d8
+TargetProduct=  0x680a
+
+MessageContent="555342431234567824000000800008ff524445564348470000000000000000"
+
+
+########################################################
+# C-motech CGU-628 (aka "Franklin Wireless CGU-628A" aka "4G Systems XS Stick W12")
+#
+# Contributor: Mathias Picker
+
+DefaultVendor=  0x16d8
+DefaultProduct= 0xf000
+
+TargetVendor=   0x16d8
+TargetProduct=  0x6006
+
+MessageContent="55534243d85dd88524000000800008ff524445564348470000000000000000"
+
+
+########################################################
+# Toshiba G450
+#
+# Contributor: Mijail Anton
+
+DefaultVendor=  0x0930
+DefaultProduct= 0x0d46
+
+TargetVendor=   0x0930
+TargetProduct=  0x0d45
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# UTStarcom UM175 (distributor "Alltel")
+#
+# Contributor: Mark A. Ziesemer
+
+DefaultVendor=  0x106c
+DefaultProduct= 0x3b03
+
+TargetVendor=   0x106c
+TargetProduct=  0x3715
+
+MessageContent="555342431234567824000000800008ff024445564348470000000000000000"
+
+
+########################################################
+# Hummer DTM5731
+#
+# Contributor: "paul"
+
+DefaultVendor=  0x1ab7
+DefaultProduct= 0x5700
+
+TargetVendor=   0x1ab7
+TargetProduct=  0x5731
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# A-Link 3GU
+#
+# Contributor: A-Link Europe Ltd.
+
+DefaultVendor=  0x1e0e
+DefaultProduct= 0xf000
+
+TargetVendor=   0x1e0e
+TargetProduct=  0x9200
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Sierra Wireless Compass 597
+#
+# Contributor: Vincent Teoh
+
+DefaultVendor=  0x1199
+DefaultProduct= 0x0fff
+
+TargetVendor=   0x1199
+TargetProduct=  0x0023
+
+SierraMode=1
+
+
+########################################################
+# Sierra Wireless AirCard 881U (most likely 880U too)
+#
+# Contributor: Vincent Teoh
+
+DefaultVendor=  0x1199
+DefaultProduct= 0x0fff
+
+TargetVendor=   0x1199
+TargetProduct=  0x6856
+
+SierraMode=1
+
+
+########################################################
+# Sony Ericsson MD400
+#
+# Special procedure, takes around 25 secs. on the whole
+
+DefaultVendor=  0x0fce
+DefaultProduct= 0xd0e1
+
+TargetClass=    0x02
+
+SonyMode=1
+Configuration=2
+
+
+########################################################
+# LG LDU-1900D EV-DO (Rev. A)
+#
+# Recommended init command: ATE0V1&D2&C1S0=0
+#
+# Contributor: JÃƒÂ©rÃƒÂ´me Oufella
+
+DefaultVendor=  0x1004
+DefaultProduct= 0x1000
+
+MessageContent="55534243123456780000000000000aff554d53434847000000000000000000"
+
+
+########################################################
+# Samsung SGH-Z810 USB (with microSD card)
+#
+# This ID gets a wrong "Option" treatment by newer kernels
+# from 2.6.29 to 2.6.31
+# Use module option "option_zero_cd=2" with usb-storage.
+# Problem fixed in 2.6.32
+#
+# Contributor: A Friend
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x04e8
+TargetProduct=  0x6601
+
+MessageContent="55534243123456780000000000000616000000000000000000000000000000"
+
+
+######################################################## 
+# MobiData MBD-200HU
+#
+# Contributor: Stefan Olejnik
+
+DefaultVendor=  0x1c9e
+DefaultProduct= 0xf000
+
+TargetVendor=   0x1c9e
+TargetProduct=  0x9000
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# ST Mobile Connect HSUPA USB Modem
+#
+# Use /dev/ttyUSB2 for connecting
+#
+# Contributor: Vincent Teoh
+
+DefaultVendor=  0x1c9e
+DefaultProduct= 0xf000
+
+TargetVendor=   0x1c9e
+TargetProduct=  0x9063
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# MyWave SW006 Sport Phone/Modem Combination
+#
+# Has a card reader too, working fine
+# 
+# Contributor: Aaron Guidazzi
+
+DefaultVendor=  0x1c9e
+DefaultProduct= 0x9200
+
+TargetVendor=   0x1c9e
+TargetProduct=  0x9202
+
+MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
+
+
+########################################################
+# Cricket A600
+#
+# Switches to ACM device. Might need a ResetUSB after switching - or not
+#
+# Contributor: Jeffrey Hoogland
+
+DefaultVendor=  0x1f28
+DefaultProduct= 0x0021
+
+TargetVendor=   0x1f28
+TargetProduct=  0x0020
+
+MessageContent="555342431234567824000000800108df200000000000000000000000000000"
+
+# Afterwards (optional): "usb_modeswitch -v 0x1f28 -p 0x0020 -R"
+
+
+########################################################
+# EpiValley SEC-7089 (featured by Alegro and Starcomms / iZAP)
+#
+# Contributor: Chris Wright
+
+DefaultVendor=  0x1b7d
+DefaultProduct= 0x0700
+
+TargetVendor=   0x1b7d
+TargetProduct=  0x0001
+
+MessageContent="555342431234567824000000800008FF05B112AEE102000000000000000000"
+
+
+########################################################
+# Samsung U209
+#
+# Has a modem and a storage device after switching
+#
+# Contributor: Arif Ahmed
+
+DefaultVendor=  0x04e8
+DefaultProduct= 0xf000
+
+TargetVendor=   0x04e8
+TargetProduct=  0x6601
+
+MessageContent="55534243123456780000000000000616000000000000000000000000000000"
+
+
+########################################################
+# Huawei E270+  (HSPA+ modem)
+# Huawei E1762
+# Huawei E1820
+#
+# Contributor: Paranoid Paranoia
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1446
+
+TargetVendor=   0x12d1
+TargetProduct=  0x14ac
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+########################################################
+# Huawei E1550
+# Huawei E1750
+#
+# Contributor: Anders Blomdell, Ahmed Soliman
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1446
+
+TargetVendor=   0x12d1
+TargetProduct=  0x1001
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+########################################################
+# ZTE K3520-Z
+#
+# Contributor: Paul McDermott
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0055
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+######################################################## 
+# MobiData MBD-200HU (aka 4G XS Stick W10/W14, aka Micromax MMX 300G,
+# aka ChinaBird CBCPL68)
+#
+# Contributor: Chris
+
+DefaultVendor=  0x1c9e
+DefaultProduct= 0xf000
+
+TargetVendor=   0x1c9e
+TargetProduct=  0x9603
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+######################################################## 
+# D-Link DWM-162-U5, Micromax MMX 300c
+#
+# Contributor: Zhang Le
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x2001
+
+TargetVendor=   0x1e0e
+TargetProductList="ce16,cefe"
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+######################################################## 
+# Novatel MC760 3G
+#
+# Contributor: Matt Roberds
+
+DefaultVendor=  0x1410
+DefaultProduct= 0x5031
+
+TargetVendor=   0x1410
+TargetProduct=  0x6002
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE MF110 (Variant)
+#
+# Contributor: Moritz Grosse-Wentrup
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x0053
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0031
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+MessageContent2="55534243876543212000000080000c85010101180101010101000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Philips TalkTalk (NXP Semiconductors "Dragonfly")
+#
+
+DefaultVendor=  0x0471
+DefaultProduct= 0x1237
+
+TargetVendor=   0x0471
+TargetProduct=  0x1234
+
+MessageContent="5553424312345678000000000000061b000000030000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# HuaXing E600 (NXP Semiconductors "Dragonfly")
+#
+# Contributor: Emfox Zhou
+
+DefaultVendor=  0x0471
+DefaultProduct= 0x1237
+
+TargetVendor=   0x0471
+TargetProduct=  0x1206
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+Configuration=2
+
+
+########################################################
+# ZTE K3565
+#
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0063
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Motorola 802.11 bg WLAN (TER/GUSB3-E)
+#
+# Contributor: Prashad Prashant
+
+DefaultVendor=  0x148f
+DefaultProduct= 0x2578
+
+TargetVendor=   0x148f
+TargetProduct=  0x9021
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Huawei E1612
+#
+# Contributor: Genar Codina
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1446
+
+TargetVendor=   0x12d1
+TargetProduct=  0x1406
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+########################################################
+# Huawei E1690
+# Huawei E1692
+# Huawei E1762
+#
+# Contributor: Carolin Latze and others
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1446
+
+TargetVendor=   0x12d1
+TargetProduct=  0x140c
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+########################################################
+# C-motech CHU-629S
+#
+
+DefaultVendor=  0x16d8
+DefaultProduct= 0x700a
+
+TargetClass=0xff
+
+MessageContent="55534243123456782400000080000dfe524445564348473d4e444953000000"
+
+
+########################################################
+# Sagem F@ST 9520-35-GLR
+#
+# Contributor: Yaroslav Levandovskiy
+
+DefaultVendor=  0x1076
+DefaultProduct= 0x7f40
+
+TargetVendor=   0x1076
+TargetProduct=  0x7f00
+
+GCTMode=1
+
+
+########################################################
+# Nokia CS-15
+#
+# Contributor: Antti Turunen
+
+DefaultVendor=  0x0421
+DefaultProduct= 0x0610
+
+TargetVendor=   0x0421
+TargetProduct=  0x0612
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Huawei K3765
+#
+# Contributor: Felix Schwarz
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1520
+
+TargetVendor=   0x12d1
+TargetProduct=  0x1465
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+########################################################
+# Huawei K4505
+#
+# Contributor: Nikolaos Koutsianas
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x1521
+
+TargetVendor=   0x12d1
+TargetProduct=  0x1464
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+#########################################
+# Vodafone MD950 (Wisue Technology)
+#
+# Contributor: Bob Williams
+
+DefaultVendor=  0x0471
+DefaultProduct= 0x1210
+
+# The report said that giving the target IDs prevented
+# the device from switching. Got to try it out ...
+
+#TargetVendor=   0x1dbc
+#TargetProduct=  0x0005
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Siptune LM-75 ("LinuxModem")
+#
+# Contributor: Antti Turunen
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0xf000
+
+TargetVendor=   0x05c6
+TargetProduct=  0x9000
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Zydas ZD1211RW WLAN USB, Sphairon HomeLink 1202 (Variant 1)
+#
+# WLAN devices from Linux kernel
+
+DefaultVendor=  0x0ace
+DefaultProduct= 0x2011
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Zydas ZD1211RW WLAN USB, Sphairon HomeLink 1202 (Variant 2)
+#
+# WLAN devices from Linux kernel
+
+DefaultVendor=  0x0ace
+DefaultProduct= 0x20ff
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Vertex Wireless 100 Series
+#
+# Contributor: Reinis Danne
+
+DefaultVendor=  0x05c6
+DefaultProduct= 0x1000
+
+TargetVendor=   0x1fe7
+TargetProduct=  0x0100
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# AVM Fritz!Wlan USB Stick N
+#
+
+DefaultVendor=  0x057c
+DefaultProduct= 0x84ff
+
+TargetVendor=   0x057c
+TargetProduct=  0x8401
+
+MessageContent="5553424312345678000000000000061b000000ff0000000000000000000000"
+
+
+########################################################
+# InfoCert Business Key (SmartCard/Reader emulation)
+#
+# Contributor: Bicio
+
+DefaultVendor=  0x072f
+DefaultProduct= 0x100d
+
+TargetVendor=   0x072f
+TargetProduct=  0x90cc
+
+MessageContent="01b0000000000000000000000000000000000000000000000000000000000000"
+
+
+########################################################
+# UTStarcom UM185E (distributor "Alltel")
+#
+# Contributor: Jason Smith
+
+DefaultVendor=  0x106c
+DefaultProduct= 0x3b06
+
+TargetVendor=   0x106c
+TargetProduct=  0x3717
+
+MessageContent="555342431234567824000000800008ff020000000000000000000000000000
+
+
+########################################################
+# ZTE AC581
+#
+# Contributor: Alberto Maurizi
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x0026
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0094
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Huawei U7510 / U7517
+#
+# Contributor: Isaac Salgado
+
+DefaultVendor=  0x12d1
+DefaultProduct= 0x101e
+
+TargetClass=0xff
+
+MessageContent="55534243123456780600000080000601000000000000000000000000000000"
+
+
+########################################################
+# Beceem BCSM250
+#
+# Contributor: Alexander Gordeev
+
+DefaultVendor= 0x198f
+DefaultProduct=0xbccd
+
+TargetVendor=  0x198f
+TargetProduct= 0x0220
+
+MessageContent="555342431234567824000000800006bc626563240000000000000000000000"
+
+
+########################################################
+# LG HDM-2100 (EVDO Rev.A USB modem)
+#
+# Contributor: JÃƒÂ©rÃƒÂ´me Oufella
+
+DefaultVendor= 0x1004
+DefaultProduct=0x607f
+
+TargetVendor=  0x1004
+TargetProduct= 0x6114
+
+MessageContent="1201100102000040041014610000010200018006000100001200"
+
+
+########################################################
+# Kyocera W06K CDMA modem
+#
+# Contributor: Ying-Hung Lo
+
+DefaultVendor= 0x0482
+DefaultProduct=0x024d
+
+Configuration=2
+
+
+########################################################
+# Digicom 8E4455
+#
+# Contributor: Alberto Ciampini
+
+DefaultVendor= 0x1266
+DefaultProduct=0x1000
+
+TargetVendor=  0x1266
+TargetProduct= 0x1009
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424387654321000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Sony Ericsson MD300
+#
+# Contributor: Betavine Project
+
+DefaultVendor= 0x0fce
+DefaultProduct=0xd0cf
+
+TargetClass=0x02
+
+DetachStorageOnly=1
+Configuration=3
+
+
+########################################################
+# Vodafone (ZTE) K3805-Z
+#
+# Contributor: Betavine Project
+#
+# Note:
+#   This device has multiple USB profiles. Depending upon how it is flipped
+#   from storage mode to modem mode determines its final PID and the packages
+#   shown on its ISO CD image.
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1001
+
+TargetVendor=  0x19d2
+TargetProduct= 0x1003
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Franklin Wireless U210
+#
+# Contributor: Adam J. Porter
+
+DefaultVendor= 0x1fac
+DefaultProduct=0x0130
+
+TargetVendor=  0x1fac
+TargetProduct= 0x0131
+
+MessageContent="555342431234567824000000800108df200000000000000000000000000000"
+
+
+########################################################
+# Alcatel X220L, X215S
+#
+# Contributor: John Watt
+
+DefaultVendor=  0x1bbb
+DefaultProduct= 0xf000
+
+TargetVendor=   0x1bbb
+TargetProduct=  0x0017
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# ZTE MF112
+#
+# Contributors: Akos Ladanyi, John Talbut
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x0103
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0031
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+MessageContent2="55534243876543212000000080000c85010101180101010101000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Olivetti Olicard 100 and others
+#
+# Contributor: Nils Radtke
+
+DefaultVendor=  0x0b3c
+DefaultProduct= 0xc700
+
+TargetVendor=   0x0b3c
+TargetProductList="c000,c001,c002"
+
+MessageContent="5553424312345678000000000000061b000000030000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE MF110 (Variant)
+#
+# Contributor: uusrlnx
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x0083
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0124
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE MU351
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x0003
+
+TargetClass=0xff
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# LG L-05A
+
+DefaultVendor=  0x1004
+DefaultProduct= 0x613a
+
+TargetVendor=   0x1004
+TargetProduct=  0x6124
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# LG LUU-2100TI (aka AT&T USBConnect Turbo)
+#
+# Contributor: Chris Jager
+
+DefaultVendor=  0x1004
+DefaultProduct= 0x613f
+
+TargetVendor=   0x1004
+TargetProduct=  0x6141
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+######################################################## 
+# LG KP500 Cookie Phone  - UNTESTED! Please report!
+#
+# Contributor: Oliver Mattos
+
+DefaultVendor= 0x1004
+DefaultProduct=0x607f
+
+TargetVendor=  0x1004
+TargetProduct= 0x6000
+
+MessageContent="555342431234567803000000800006f1022000000000000000000000000000"
+MessageContent2="555342438765432103000000800006f1010100000000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Royaltek Q110 - UNCONFIRMED!
+
+DefaultVendor= 0x1266
+DefaultProduct=0x1000
+
+TargetVendor=  0x1266
+TargetProduct= 0x1009
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424387654321000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# BandRich BandLuxe C170, BandLuxe C270
+
+DefaultVendor= 0x1a8d
+DefaultProduct=0x1000
+
+TargetVendor=  0x1a8d
+TargetProduct= 0x1009
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+ReleaseDelay=4000
+
+NeedResponse=1
+
+
+########################################################
+# Vodafone (Huawei) K4605
+#
+# Contributor: Betavine Project
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x14c1
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14c6
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+########################################################
+# Huawei R201
+#
+# Contributor: Betavine Project
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1523
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1491
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+########################################################
+# Atheros Wireless / Netgear WNDA3200
+#
+# Contributor: Sujith Manoharan (Atheros)
+
+DefaultVendor= 0x0cf3
+DefaultProduct=0x20ff
+
+TargetVendor=  0x0cf3
+TargetProduct= 0x7010
+
+NoDriverLoading=1
+
+MessageContent="5553424329000000000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# Onda MW833UP
+#
+# Contributor: Riccardo Sepe aka zeroidle
+
+DefaultVendor= 0x1ee8
+DefaultProduct=0x0013
+
+TargetVendor=  0x1ee8
+TargetProduct= 0x0012
+
+MessageContent="555342431234567800000000000010ff000000000000000000000000000000"
+ResponseNeeded=1
+
+
+########################################################
+# Huawei U8110 / U8300 / Joy, Vodafone 845 (Android smartphone)
+#
+# Contributor: David Erosa GarcÃƒÂ­a
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1031
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1035
+
+MessageContent="55534243123456780600000080010a11060000000000000000000000000000"
+
+# for Android SDK
+NoDriverLoading=1
+
+
+########################################################
+# Nokia CS-10
+#
+# Contributor: WacÃ…â€šaw Sierek
+
+DefaultVendor= 0x0421
+DefaultProduct=0x060c
+
+TargetVendor=  0x0421
+TargetProduct= 0x060e
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# ZTE WCDMA Stick from BNSL
+#
+# Contributor: Anoop John
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x2000
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0108
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# BSNL Capitel
+
+DefaultVendor=  0x1c9e
+DefaultProduct= 0x9e00
+
+TargetClass=0xff
+
+MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
+
+
+#######################################################
+# Samsung GT-B3730
+#
+# Contributor: Per ÃƒËœyvind Karlsen
+
+DefaultVendor= 0x04e8
+DefaultProduct=0x689a
+
+TargetVendor=  0x04e8
+TargetProduct= 0x6889
+
+MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+
+#######################################################
+# Kobil mIdentity 3G (1)
+#
+# Contributor: Filip Aben
+
+DefaultVendor= 0x0d46
+DefaultProduct=0x45a1
+
+TargetVendor=  0x0d46
+TargetProduct= 0x45a9
+
+KobilMode=1
+
+
+#######################################################
+# Kobil mIdentity 3G (2)
+#
+# Contributor: Filip Aben
+
+DefaultVendor= 0x0d46
+DefaultProduct=0x45a5
+
+TargetVendor=  0x0d46
+TargetProduct= 0x45ad
+
+KobilMode=1
+
+
+########################################################
+# Onda MW833UP
+#
+# Contributor: Enrico Mioso
+
+DefaultVendor= 0x1ee8
+DefaultProduct=0x0009
+
+TargetVendor=  0x1ee8
+TargetProduct= 0x000b
+
+MessageContent="555342431234567800000000000010ff000000000000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# Olivetti Olicard 145
+#
+# Contributor: Pierre-Andre Cornillon
+
+DefaultVendor= 0x0b3c
+DefaultProduct=0xf000
+
+TargetVendor=  0x0b3c
+TargetProduct= 0xc003
+
+MessageContent="5553424312345678c000000080010606f50402527000000000000000000000"
+NeedResponse=1
+
+
+#######################################################
+# Huawei EC168C (from Zantel)
+#
+# Contributor: Ãƒâ€¦smund Hjulstad
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1446
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1412
+
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+
+#######################################################
+# Nokia CS-17
+#
+# Contributor: Juho Frits
+
+DefaultVendor= 0x0421
+DefaultProduct=0x0622
+
+TargetVendor=  0x0421
+TargetProduct= 0x0623
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Nokia CS-18
+#
+# Contributor: Thomas Behan
+
+DefaultVendor= 0x0421
+DefaultProduct=0x0627
+
+TargetVendor=  0x0421
+TargetProduct= 0x0612
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Qtronix EVDO 3G Modem (for TianYi)
+#
+# Contributor: Alexey Charkov
+
+DefaultVendor= 0x05c7
+DefaultProduct=0x1000
+
+TargetVendor=  0x05c7
+TargetProduct=	0x6000
+
+MessageContent="5553424312345678c00000008000069f140000000000000000000000000000"
+
+
+#######################################################
+# GW D301 (Advinne AMC)
+#
+
+DefaultVendor= 0x0fd1
+DefaultProduct=0x1000
+
+TargetClass=0xff
+
+Configuration=3
+
+
+#######################################################
+# LG AD600
+#
+# Contributor: Shawn J. Goff
+
+DefaultVendor= 0x1004
+DefaultProduct=0x6190
+
+TargetVendor=  0x1004
+TargetProduct= 0x61a7
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Pantech / UTStarcom UMW190 (Verizon)
+#
+# Contributor: Noel J. Bergman, Gus Esquivel
+
+DefaultVendor= 0x106c
+DefaultProduct=0x3b05
+
+TargetVendor=  0x106c
+TargetProduct= 0x3716
+
+MessageContent="555342431234567824000000800008ff020000000000000000000000000000"
+
+
+#######################################################
+# AirPlus MCD-800
+#
+
+DefaultVendor= 0x1edf
+DefaultProduct=0x6003
+
+TargetClass=0xff
+
+Configuration=3
+
+
+#######################################################
+# Linktop LW272/LW273 (BSNL Teracom)
+#
+# Contributor: Amit Mendapara
+
+DefaultVendor= 0x230d
+DefaultProduct=0x0001
+
+TargetClass=0xff
+
+Configuration=3
+
+
+########################################################
+# MediaTek Wimax USB Card
+#
+
+DefaultVendor= 0x0e8d
+DefaultProduct=0x7109
+
+TargetVendor=  0x0e8d
+TargetProduct= 0x7118
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NoDriverLoading=1
+
+
+########################################################
+# C-motech CHU-628S
+#
+# Contributor: Jungwon Seo
+
+DefaultVendor= 0x16d8
+DefaultProduct=0x6281
+
+TargetClass=0xff
+
+MessageContent="555342431234567824000000800008ff524445564348470000000000000000"
+
+
+######################################################## 
+# HSDPA USB modem from dealextreme 
+#
+# Contributor: Andrew 'Necromant' Andrianov 
+
+DefaultVendor= 0x05c6
+DefaultProduct=0x2000
+
+TargetVendor=  0x05c6
+TargetProduct= 0x0015
+
+MessageContent="5553424368032c882400000080000612000000240000000000000000000000" 
+
+NeedResponse=1
+
+# This modem doesn't react fast - it pauses for some 30-40 seconds 
+CheckSuccess=40 
+
+
+######################################################## 
+# Exiss Mobile E-190 series (made by C-motech)
+#
+# Contributor: Tri Mulya Saputra 
+
+DefaultVendor=  0x8888
+DefaultProduct= 0x6500
+
+TargetVendor=   0x16d8
+TargetProduct=  0x6533
+
+MessageContent="5553424398e2c4812400000080000bff524445564348473d43440000000000"
+
+
+########################################################
+# D-Link DWM-156 HSUPA 3.75G USB Modem 
+#
+# Contributor: Fuego
+
+DefaultVendor= 0x07d1
+DefaultProduct=0xa800
+
+TargetVendor=  0x07d1
+TargetProduct= 0x3e02
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Franklin Wireless U210 (Variant)
+
+DefaultVendor= 0x1fac
+DefaultProduct=0x0032
+
+Configuration=2
+
+
+########################################################
+# Haier CE 100
+
+DefaultVendor= 0x201e
+DefaultProduct=0x2009
+
+TargetClass=0xff
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+#######################################################
+# Huawei BM358 WiMAX
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x380b
+
+TargetClass=0x02
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000" 
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000" 
+
+NeedResponse=1 
+
+
+######################################################## 
+# Huawei E352
+#
+# Contributor: Antonio Talarico
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1449
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1444
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+######################################################## 
+# Huawei ET8282 
+#
+# Contributor: Emfox Zhou
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1da1
+
+DefaultVendor= 0x12d1
+TargetProduct= 0x1d09
+
+HuaweiMode=1
+
+
+######################################################## 
+# Huawei V725 Phone (aka Vodafone 725)
+
+DefaultVendor= 0x12d1 
+DefaultProduct=0x1009 
+
+TargetClass=0xff 
+
+HuaweiMode=1
+
+
+########################################################
+# Onda MW836UP-K
+
+DefaultVendor= 0x1ee8
+DefaultProduct=0x0040
+
+TargetVendor=  0x1ee8
+TargetProduct= 0x003e
+
+MessageContent="555342431234567800000000000010ff000000000000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# ZTE MF637 (Variant for Orange France)
+#
+# Contributor: David Vigier
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0110
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0121
+
+MessageContent="5553424302000000000000000000061b000000020000000000000000000000" 
+
+NeedResponse=1
+
+
+########################################################
+# Prolink P2000 CDMA
+#
+# Test string: uMa=SSE
+
+DefaultVendor= 0x05c6
+DefaultProduct=0x1000
+
+TargetVendor=  0x05c6
+TargetProduct= 0x6000
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+######################################################## 
+# Vibe 3G Modem 
+#
+# Contributor: Steven James Drinnan
+
+DefaultVendor= 0x1c9e
+DefaultProduct=0x6061
+
+TargetClass=0xff
+
+MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
+
+
+######################################################## 
+# T-Mobile NL (Huawei E352)
+#
+# Contributor: Alex Hermann
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x14fe
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1506
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+########################################################
+# Huawei U8220, T-Mobile Pulse (Android smartphone)
+#
+# Contributor: Mobile Stream Team
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1030
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1034
+
+MessageContent="55534243123456780600000080010a11060000000000000000000000000000"
+
+# for Android SDK
+NoDriverLoading=1
+
+
+########################################################
+# D-Link DWM-156 HSUPA 3.75G USB Modem
+#
+# Contributor: Ari Suutari
+
+DefaultVendor= 0x07d1
+DefaultProduct=0xa804
+
+TargetVendor=  0x07d1
+TargetProduct= 0x7e11
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Sony Ericsson MD400G (Rogers)
+#
+# Contributor: Kjartan Adolfsson
+
+DefaultVendor=  0x0fce
+DefaultProduct= 0xd103
+
+TargetClass=    0x02
+
+SonyMode=1
+
+
+########################################################
+# ZTE "ffe" devices 1 (e.g. Cricket A605)
+#
+# Contributor: Matt Eaton
+
+DefaultVendor= 0x19d2
+DefaultProduct=0xffe6
+
+TargetVendor=  0x19d2
+TargetProduct= 0xffe5
+
+MessageContent="5553424330f4cf8124000000800108df200000000000000000000000000000"
+
+
+########################################################
+# ZTE MF190
+#
+# Contributor: Eshwar Andhavarapu
+
+DefaultVendor=  0x19d2
+DefaultProduct= 0x1224
+
+TargetVendor=   0x19d2
+TargetProduct=  0x0082
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# JOA Telecom LM-700r
+
+DefaultVendor= 0x198a
+DefaultProduct=0x0003
+
+TargetVendor=  0x198a
+TargetProduct= 0x0002
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Huawei E173 (Viettel 3G)
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14a8
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x14b5
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+########################################################
+# C-motech CHU-629S (Variant)
+#
+# Contributor: "wlsloi"
+
+DefaultVendor= 0x16d8
+DefaultProduct=0x700b
+
+TargetClass=0xff
+
+MessageContent="55534243123456782400000080000dfe524445564348473d4e444953000000"
+
+
+########################################################
+# ZTE MF691 (T-Mobile Rocket 2.0)
+#
+# Contributor: Michael Fogel
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1201
+
+TargetVendor=  0x19d2
+TargetProduct= 0x1203
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# ZTE MF192
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1216
+
+TargetVendor=  0x19d2
+TargetProduct= 0x1218
+
+#MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+# Different MessageContent enables cdc_ether interface which is preferable.
+# Thanks to Alex Orlov!
+
+MessageContent="555342431234567800000000000010ff000000000000000000000000000000"
+
+
+########################################################
+# ZTE MF190 (Variant)
+#
+# Contributor: Jean-Baptiste Dubois
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0149
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0124
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+MessageContent3="55534243123456702000000080000c85010101180101010101000000000000"
+
+NeedResponse=1
+
+
+#######################################################
+# Visiontek 82GH 3G
+
+DefaultVendor= 0x230d
+DefaultProduct=0x0007
+
+TargetClass=0xff
+
+Configuration=3
+
+
+#######################################################
+# HP LaserJet Professional P1102
+
+DefaultVendor= 0x03f0
+DefaultProduct=0x002a
+
+TargetClass=0x07
+
+MessageContent="555342431234567800000000000006d0000000000000000000000000000000"
+
+NeedResponse=1
+
+
+#######################################################
+# Mobile Action ("Smart Cable")
+#
+# No success check, device will vanish completely
+
+DefaultVendor= 0x0df7
+DefaultProduct=0x0800
+
+TargetClass=0xff
+
+MobileActionMode=1
+
+NoDriverLoading=1
+
+
+########################################################
+# Vodafone/Huawei K3770
+#
+# Contributor: Alex Chiang
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x14d1
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14c9
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+########################################################
+# Vodafone/Huawei K3771
+#
+# Contributor: Ben Knight
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x14c4
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14ca
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+########################################################
+# Option iCon 461
+#
+# Contributor: Samit Basu
+
+DefaultVendor=  0x0af0
+DefaultProduct= 0x7a05
+
+TargetClass=    0xff
+
+MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+
+########################################################
+# ZTE AX226 WiMax
+#
+# may be supported by the Beceem driver
+
+DefaultVendor= 0x19d2
+DefaultProduct=0xbccd
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0172
+
+MessageContent="555342431234567824000000800006bc626563240000000000000000000000"
+
+NoDriverLoading=1
+
+
+########################################################
+# Huawei EC156
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1505
+
+TargetVendor=  0x12d1
+TargetProduct= 0x140b
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+########################################################
+# Longcheer SU9800
+
+DefaultVendor= 0x1c9e
+DefaultProduct=0x9800
+
+TargetClass=0xff
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# SpeedUp SU-8000U
+
+DefaultVendor= 0x2020
+DefaultProduct=0xf00e
+
+TargetVendor=  0x2020
+TargetProduct= 0x1005
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Cisco AM10 "Valet Connector"
+#
+# Contributor: David S.
+
+DefaultVendor= 0x1307
+DefaultProduct=0x1169
+
+TargetVendor=  0x13b1
+TargetProduct= 0x0031
+
+CiscoMode=1
+
+
+########################################################
+# Alcatel OT X220L
+#
+# Contributor: Sylvain Gros-Desormeaux
+
+DefaultVendor= 0x1bbb
+DefaultProduct=0xf052
+
+TargetVendor=  0x1bbb
+TargetProduct= 0x0052
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# Nokia CS-19
+#
+# Contributor: ThatGuy
+
+DefaultVendor= 0x0421
+DefaultProduct=0x062c
+
+TargetVendor=  0x0421
+TargetProduct= 0x062d
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Huawei ET302
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1d50
+
+Configuration=2
+
+
+########################################################
+# 3GO 3GO11 HSUPA
+
+DefaultVendor= 0x1e89
+DefaultProduct=0xf000
+
+TargetVendor=  0x1e89
+TargetProduct= 0x1a20
+
+MessageContent="5553424312345678800000008000060619181a207000000000000000000000"
+
+
+########################################################
+# Novatel Wireless MC545 HSPA
+
+DefaultVendor= 0x1410
+DefaultProduct=0x5059
+
+TargetVendor=  0x1410
+TargetProduct= 0x7042
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# ZTE AC682 (a.k.a. SmartFren Connex)
+
+DefaultVendor= 0x19d2
+DefaultProduct=0xffde
+
+TargetVendor=  0x19d2
+TargetProduct= 0xffdd
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# ZTE MF820 4G LTE
+#
+# Contributor: Kenny Lam
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0166
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0167
+
+MessageContent="55534243123456782400000080000685000000240000000000000000000000"
+
+
+########################################################
+# Philips PicoPix 1020 Projector
+#
+# No known driver or application yet
+
+DefaultVendor= 0x1de1
+DefaultProduct=0x1101
+
+TargetVendor=  0x21e7
+TargetProduct= 0x000e
+
+MessageContent="55534243123456780000000000000cff020000000000000000000000000000"
+
+
+########################################################
+# AnyDATA APE-540H
+#
+# Contributor: Robert Gabriel
+
+DefaultVendor= 0x05c6
+DefaultProduct=0x6503
+
+TargetVendor=  0x16d5
+TargetProduct= 0x6502
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# ZTE MF192 (Variant)
+#
+# Contributor: C!chy
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1517
+
+TargetVendor=  0x19d2
+TargetProduct= 0x1519
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Qisda H21 Flying Beetle
+#
+# Contributor: Chi-Hang Long
+
+DefaultVendor= 0x1da5
+DefaultProduct=0xf000
+
+TargetVendor=  0x1da5
+TargetProduct= 0x4512
+
+QisdaMode=1
+
+
+########################################################
+# C-motech CDU-685a
+#
+# Contributor: Tom Cumming
+
+DefaultVendor= 0x16d8
+DefaultProduct=0x6804
+
+TargetClass=0xff
+
+MessageContent="555342431234567824000000800008ff524445564348470000000000000000"
+
+
+########################################################
+# StrongRising (China Telcom), Air FlexiNet
+
+DefaultVendor= 0x21f5
+DefaultProduct=0x1000
+
+TargetVendor=  0x21f5
+TargetProduct= 0x2008
+
+MessageContent="5553424312345678c000000080000671010000000000000000000000000000
+
+
+########################################################
+# BandRich BandLuxe C339
+
+DefaultVendor= 0x1a8d
+DefaultProduct=0x2000
+
+TargetVendor=  0x1a8d
+TargetProduct= 0x2006
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+########################################################
+# Celot CT-680
+
+DefaultVendor= 0x05c6
+DefaultProduct=0x1000
+
+TargetVendor=  0x211f
+TargetProduct= 0x6802
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Huawei E353 (3.se)
+#
+# Contributor: Ulf Eklund
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1f01
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14db
+
+MessageContent="55534243123456780000000000000a11062000000000000100000000000000"
+
+# Driver is cdc_ether
+NoDriverLoading=1
+
+
+########################################################
+# Haier CE682 (EVDO)
+#
+# Contributor: Ebedsat
+
+DefaultVendor= 0x201e
+DefaultProduct=0x1023
+
+TargetVendor=  0x201e
+TargetProduct= 0x1022
+
+MessageContent="55534243123456780000000000000600000000000000000000000000000000"
+MessageContent2="5553424312345679c000000080000671030000000000000000000000000000"
+NeedResponse=1
+
+
+#######################################################
+# LG L-02C LTE
+#
+# Contributor: Yoshiaki Katsumata
+
+DefaultVendor= 0x1004
+DefaultProduct=0x61dd
+
+TargetVendor=  0x1004
+TargetProduct= 0x618f
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+#######################################################
+# LG SD711
+#
+# Contributor: Ryan Jenkins
+
+DefaultVendor= 0x1004
+DefaultProduct=0x61e7
+
+TargetVendor=  0x1004
+TargetProduct= 0x61e6
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# LG L-08C (NTT docomo)
+#
+# Contributor: Shlomi Cohen
+
+DefaultVendor= 0x1004
+DefaultProduct=0x61eb
+
+TargetVendor=  0x1004
+TargetProduct= 0x61ea
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# I-O Data WMX2-U Wimax
+#
+# Contributor: Shlomi Cohen
+
+DefaultVendor= 0x04bb
+DefaultProduct=0xbccd
+
+TargetVendor=  0x04bb
+TargetProduct= 0x0949
+
+MessageContent="55534243f0298d8124000000800006bc626563240000000000000000000000"
+
+
+########################################################
+# Option GlobeTrotter GI1515
+
+DefaultVendor= 0x0af0
+DefaultProduct=0xd001
+
+TargetVendor=  0x0af0
+TargetProduct= 0xd157
+
+MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+
+
+#######################################################
+# LG L-07A
+#
+# Contributor: Shin Sterneck
+
+DefaultVendor= 0x1004
+DefaultProduct=0x614e
+
+TargetVendor=  0x1004
+TargetProduct= 0x6135
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+######################################################## 
+# ZTE A371B
+#
+# Contributor: Wang Lei
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0169
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0170
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+######################################################## 
+# ZTE MF652
+#
+# Contributor: BjÃ¶rn Andreas HÃ¶fer
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1520
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0142
+
+MessageContent="5553424312345679000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+######################################################## 
+# ZTE MF652 (Variant)
+#
+# Contributor: Jackzy
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0146
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0143
+
+MessageContent="5553424312345679000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# Telenet 3G dongle (T&W WU160)
+#
+# Contributor: Ben Van Mechelen
+
+DefaultVendor= 0x2077
+DefaultProduct=0xf000
+
+TargetVendor=  0x2077
+TargetProduct= 0x9000
+
+MessageContent="5553424308902082000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Nokia CS-21M-02
+#
+# Contributor: Wojciech Wiercho.a, Tore Anderson
+
+DefaultVendor= 0x0421
+DefaultProduct=0x0637
+
+TargetVendor=  0x0421
+TargetProduct= 0x0638
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Telewell TW-3G HSPA+
+#
+# Contributor: Teemu Merikumpu
+
+DefaultVendor= 0x1c9e
+DefaultProduct=0x98ff
+
+TargetVendor=  0x1c9e
+TargetProduct= 0x9801
+
+MessageContent="55534243123456780000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# ZTE MF637
+#
+# Contributor: Johannes Hubertz
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0031
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0094
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+########################################################
+# Samsung GT-B1110
+#
+# Contributor: Spelroth
+
+DefaultVendor= 0x04e8
+DefaultProduct=0x680c
+
+TargetVendor=  0x04e8
+TargetProduct= 0x6792
+
+MessageContent="0902200001010080fa0904000002080650000705010200020007058102000200"
+
+
+########################################################
+# ZTE MF192 (yet annother variant)
+#
+# Contributor: Paul Hedderly
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1514
+
+TargetVendor=  0x19d2
+TargetProduct= 0x1515
+
+MessageContent="5553424348c4758600000000000010ff000000000000000000000000000000"
+
+
+########################################################
+# MediaTek MT6276M
+#
+# Contributor: Meng Zhang
+
+DefaultVendor= 0x0e8d
+DefaultProduct=0x0002
+
+TargetVendor=  0x0e8d
+TargetProductList="00a1,00a2"
+
+MessageContent="555342431234567800000000000006f0010300000000000000000000000000"
+
+
+########################################################
+# Tata Photon+
+#
+# Contributor: Nirbheek Chauhan
+
+DefaultVendor= 0x22f4
+DefaultProduct=0x0021
+
+TargetClass=0xff
+
+MessageContent="555342439f000000000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Option Globetrotter (Variant)
+#
+# Contributor: Roman Samarev
+
+DefaultVendor=  0x0af0
+DefaultProduct= 0x8006
+
+TargetVendor=   0x0af0
+TargetProduct=  0x9100
+
+MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+
+
+####################################################### 
+# Option iCon 711
+#
+# Contributor: Rene Falcon
+
+DefaultVendor= 0x0af0
+DefaultProduct=0x4007
+
+TargetVendor=  0x0af0
+TargetProduct= 0x4005
+
+SierraMode=1
+
+
+####################################################### 
+# Celot K-300
+#
+# Contributor: Jan Vecek
+
+DefaultVendor= 0x05c6
+DefaultProduct=0x1000
+
+TargetVendor=  0x211f
+TargetProduct= 0x6801
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+####################################################### 
+# Hisense E910 EVDO Phone
+#
+# Contributor: Zang MingJie
+
+DefaultVendor= 0x109b 
+DefaultProduct=0xf009
+
+TargetVendor=  0x109b
+TargetProduct= 0x9114
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+############################################################################# 
+# Yota Router (Quanta 1QDLZZZ0ST2)
+#
+# Contributor: Ilya Voronin
+
+DefaultVendor= 0x0408
+DefaultProduct=0xf000
+
+TargetVendor=  0x0408
+TargetProduct= 0xd009
+
+MessageContent="5553424312345678000000000000061b004600000000000000000000000000"
+
+
+############################################################################# 
+# K5005 Vodafone/Huawei
+#
+# Contributor: Thomas Schaefer
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x14c3
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14c8
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+
+############################################################################# 
+# D-Link DWM-156 (Variant)
+#
+# Contributor: ZML
+
+DefaultVendor= 0x2001 
+DefaultProduct=0xa80b 
+
+TargetVendor=  0x2001 
+TargetProduct= 0x7d00
+
+MessageContent="555342431234567800000000000003f0010100000000000000000000000000"
+
+
+########################################################
+# Huawei E173 (Moviestar)
+#
+# Contributor: Molipha
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1c24
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1c12
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+########################################################
+# Onda MSA 14.4 (TIM Brasil)
+#
+# Contributor: Rafael Pagliuca
+
+DefaultVendor= 0x1ee8
+DefaultProduct=0x0060
+
+TargetVendor=  0x1ee8
+TargetProduct= 0x005f
+
+MessageContent="555342431234567800000000000008ff000000000000030000000000000000"
+
+
+########################################################
+# Alcatel OT-X220D
+#
+# Contributor: Javier Llorente
+
+DefaultVendor= 0x1bbb
+DefaultProduct=0xf017
+
+TargetVendor=  0x1bbb
+TargetProduct= 0x0017
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# Alcatel OT-X080C
+#
+# Contributor: Hicham Haouari
+
+DefaultVendor= 0x1bbb
+DefaultProduct=0x00ca
+
+TargetClass=0xff
+
+MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+
+
+########################################################
+# TP-Link MA180
+#
+# Contributor: complexgeek
+
+DefaultVendor= 0x2357
+DefaultProduct=0x0200
+
+TargetVendor=  0x2357
+TargetProduct= 0x0201
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# ZTE MF821D
+#
+# Contributor: Thomas Schäfer
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0325
+
+TargetVendor=  0x12d1
+TargetProduct= 0x0326
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# Dymo LabelManager PnP 
+#
+# Contributor: Kjell M. Myksvoll
+
+DefaultVendor= 0x0922
+DefaultProduct=0x1001
+
+TargetVendor=  0x0922
+TargetProduct= 0x1002
+
+MessageEndpoint= 0x01 
+ResponseEndpoint=0x01 
+
+MessageContent="1b5a01"
+NoDriverLoading=1
+
+
+########################################################
+# Onda MDC655 HSDPA 900/2100 MHz 14.4 Mbps 
+#
+# Contributor: lmctv
+
+DefaultVendor = 0x1ee8
+DefaultProduct =0x004a
+
+TargetVendor =  0x1ee8
+TargetProduct = 0x0049
+
+MessageContent="555342431234567800000000000010ff000000000000000000000000000000"
+
+
+########################################################
+# Vodafone K5006Z (MF821)
+#
+# Contributor: Thomas Schäfer
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1017
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1018
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Option GI0643 (aka XYFI)
+#
+# Contributor: Amish Chana
+
+DefaultVendor= 0x0af0
+DefaultProduct=0x8700
+
+TargetClass=0xff
+
+MessageContent="55534243785634120100000080000601000000000000000000000000000000" 
+NoDriverLoading=1
+
+
+#######################################################
+# WeTelecom WM-D300
+#
+# Contributor: Viktor Remennik
+
+DefaultVendor= 0x22de
+DefaultProduct=0x6803
+
+TargetVendor=  0x22de
+TargetProduct= 0x6801
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# China TeleCom CBP7.0
+#
+# Contributor: tricky
+
+DefaultVendor= 0x15eb
+DefaultProduct=0x7153
+
+TargetVendor=  0x15eb
+TargetProduct= 0x7152
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Linktop LW272/LW273 (BSNL Teracom)
+#
+# Contributor: Jigish Gohil
+
+DefaultVendor= 0x230d
+DefaultProduct=0x0101
+
+TargetClass=0xff
+
+Configuration=2
+
+
+#######################################################
+# Nokia CS-11
+#
+# Contributor: Alessandro Martins
+
+DefaultVendor= 0x0421
+DefaultProduct=0x061d
+ 
+TargetVendor=  0x0421
+TargetProduct= 0x061e
+ 
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# ZTE MF190 (Variant)
+#
+# Contributor: Radu C
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0154
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0117
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+#######################################################
+# Huawei E535
+#
+# Contributor: Andres Septer
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x14fe
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1506
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+#######################################################
+# ZTE MF190J
+#
+# Contributor: moma
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1542
+
+TargetVendor=  0x19d2
+TargetProduct= 0x1544
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+NeedResponse=1
+
+
+#######################################################
+# Huawei E171
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x155b
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1506
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+#######################################################
+# Vodafone / Huawei K3772
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1526
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14cf
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+#######################################################
+# Vodafone / Huawei K3773
+#
+# Contributor: Allwyn Fernandes
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1f11
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14bc
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+#######################################################
+# Huawei E173u-2, E177
+#
+# Contributor: Rob Spanton
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x14ba
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14d2
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+#######################################################
+# Option Beemo / Pantech P4200 LTE
+#
+# Contributor: Thomas Schäfer
+
+DefaultVendor= 0x106c
+DefaultProduct=0x3b14
+
+TargetVendor=  0x106c
+TargetProduct= 0x3721
+
+MessageContent="555342431234567824000000800008ff024445564348470000000000000000"
+
+# QMI device
+NoDriverLoading=1
+
+
+#######################################################
+# Huawei E355s-1
+#
+# Contributor: Mihail Zenkov
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1f01
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14db
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+#######################################################
+# Nokia CS-7M-01
+#
+# Contributor: Krzysztof Luczak
+
+DefaultVendor= 0x0421
+DefaultProduct=0x0632
+
+TargetVendor=  0x0421
+TargetProduct= 0x0632
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#########################################################
+# LG L-03D LTE/3G
+#
+# Contributor: Kentaro Kazuhama
+
+DefaultVendor= 0x1004
+DefaultProduct=0x6327
+
+TargetVendor=  0x1004
+TargetProduct= 0x6326
+
+MessageContent=555342431234567800000000000005f1010100000000000000000000000000
+
+########################################################
+# Franklin Wireless U600
+
+DefaultVendor= 0x1fac
+DefaultProduct=0x0150
+
+TargetVendor=  0x1fac
+TargetProduct= 0x0151
+
+MessageContent="555342431234567824000000800108df200000000000000000000000000000"
+
+
+#######################################################
+# Huawei E353
+#
+# Contributor: koisoke
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x151a
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14ac
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+#######################################################
+# Changhong CH690
+
+DefaultVendor= 0x2077
+DefaultProduct=0x1000
+
+TargetVendor=  0x2077
+TargetProduct= 0x7001
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Alcatel-Lucent T930S
+#
+# Contributor: areslee
+
+DefaultVendor= 0x04cc
+DefaultProduct=0x225c
+
+Configuration=2
+
+
+#######################################################
+# Axesstel MU130
+#
+# Contributor: Jazb
+
+DefaultVendor= 0x1726
+DefaultProduct=0xf00e
+
+TargetVendor=  0x1726
+TargetProduct= 0xa000
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Explay Slim
+#
+# Contributor: vdsdmitry
+
+DefaultVendor= 0x1c9e
+DefaultProduct=0x9e08
+
+TargetVendor=  0x1c9e
+TargetProduct= 0x9e18
+
+SierraMode=1
+NoDriverLoading=1
+
+
+#######################################################
+# Huawei GP02 (E587 Variant)
+#
+# Contributor: Genmei Mori
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1c1b
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1506
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+NoDriverLoading=1
+
+
+#######################################################
+# Huawei U2800 Phone
+#
+# Contributor: Peter Fedorow
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1805
+
+TargetClass=0xff
+
+MessageContent="55534243123456780600000080000601000000000000000000000000000000"
+
+
+###################################################
+# KDDI (Huawei) HWD12 LTE
+#
+# Contributor: nhe
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1f03
+
+TargetVendor=  0x12d1
+TargetProduct= 0x14db
+
+#MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+MessageContent="55534243123456780000000000000a11062000000000000100000000000000"
+NoDriverLoading=1
+
+
+########################################################
+# D-Link DWM-156 (Variant)
+#
+# Contributor: Bjørn Mork
+
+DefaultVendor= 0x2001
+DefaultProduct=0xa706
+
+TargetVendor=  0x2001
+TargetProduct= 0x7d01
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# D-Link DWM-156 (Variant)
+#
+# Contributor: Bjørn Mork
+
+DefaultVendor= 0x2001
+DefaultProduct=0xa707
+
+TargetVendor=  0x2001
+TargetProduct= 0x7d02
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# D-Link DWM-156 (Variant)
+#
+# Contributor: Bjørn Mork
+
+DefaultVendor= 0x2001
+DefaultProduct=0xa708
+
+TargetVendor=  0x2001
+TargetProduct= 0x7d03
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Onda TM201 14.4 (TIM Italy)
+#
+# Contributor: Cristian Astorino
+
+DefaultVendor= 0x1ee8
+DefaultProduct=0x0063
+
+TargetVendor=  0x1ee8
+TargetProduct= 0x0064
+
+MessageContent="555342431234567800000000000008FF000000000000030000000000000000"
+
+
+#######################################################
+# Onda WM301
+#
+# Contributor: Nicolas Carrier
+
+DefaultVendor= 0x1ee8
+DefaultProduct=0x0068
+
+TargetVendor=  0x1ee8
+TargetProduct= 0x0069
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Nokia CS-12
+#
+# Contributor: John Zouck
+
+DefaultVendor= 0x0421
+DefaultProduct=0x0618
+
+TargetVendor=  0x0421
+TargetProduct= 0x0619
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Axesstel Modems (w/ initial idProduct 0x0010)
+#
+# Contributor: LOM
+
+DefaultVendor= 0x05c6
+DefaultProduct=0x0010
+
+TargetVendor=  0x05c6
+TargetProduct= 0x00a0
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Onda MT8205 LTE
+#
+# Contributor: Vincenzo Ingrosso
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0266
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0265
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Pantech UML290
+#
+# Contributor: Davis Ford
+
+DefaultVendor= 0x106c
+DefaultProduct=0x3b11
+
+TargetVendor=  0x106c
+TargetProduct= 0x3718
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Novatel MC996D
+#
+# Contributor: David Caste
+
+DefaultVendor= 0x1410
+DefaultProduct=0x5023
+
+TargetVendor=  0x1410
+TargetProduct= 0x7030
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# D-Link DWR-510
+#
+# Contributor: Nicolas Carrier
+
+DefaultVendor= 0x2001
+DefaultProduct=0xa805
+
+TargetVendor=  0x2001
+TargetProduct= 0x7e12
+
+MessageContent="5553424308407086000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Mediatek MT6229
+#
+# Contributor: Daniel Dongo
+
+DefaultVendor= 0x2020
+DefaultProduct=0x0002
+
+TargetVendor=  0x2020
+TargetProduct= 0x2000
+
+MessageContent="555342430820298900000000000003f0010100000000000000000000000000"
+
+
+#######################################################
+# ZTE MF196
+#
+# Contributor: David Caste
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1528
+
+TargetVendor=  0x19d2
+TargetProduct= 0x1527
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+#######################################################
+# ZTE MF656A, MF668A, MF669
+#
+# Contributor: David Caste
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x0150
+
+TargetVendor=  0x19d2
+TargetProduct= 0x0124
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+#######################################################
+# ZTE MF680
+#
+# Contributor: David Caste
+
+DefaultVendor= 0x19d2
+DefaultProduct=0x1227
+
+TargetVendor=  0x19d2
+TargetProduct= 0x1252
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+NeedResponse=1
+
+
+#######################################################
+# WeTelecom WM-D200
+#
+# Contributor: Kirill Roskoliy
+
+DefaultVendor= 0x22de
+DefaultProduct=0x6801
+
+TargetClass=0xff
+
+MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Quanta 1K3 LTE
+#
+# Contributor: Andrey Tikhomirov
+
+DefaultVendor= 0x0408
+DefaultProduct=0xea25
+
+TargetVendor=  0x0408
+TargetProduct= 0xea26
+
+QuantaMode=1
+
+
+#######################################################
+# TP-Link MA260
+#
+# Contributor: Bjørn Mork
+
+DefaultVendor= 0x2357
+DefaultProduct=0xf000
+
+TargetVendor=  0x2357
+TargetProduct= 0x9000
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################
+# Teracom LW272
+#
+# Contributor: Dheeraj Khanna
+
+DefaultVendor= 0x230d
+DefaultProduct=0x0103
+
+Configuration=2
+
+
+#######################################################
+# Huawei E3276s-151 and E3251
+#
+# Contributor: Nicholas Carrier
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x156a
+
+TargetVendor=  0x12d1
+TargetProductList="156b,156c"
+
+MessageContent="55534243123456780000000000000011062000000100000000000000000000"
+
+
+########################################################
+# Huawei K4305
+#
+# Contributor: Dario
+
+DefaultVendor= 0x12d1
+DefaultProduct=0x1f15
+
+TargetVendor=  0x12d1
+TargetProduct= 0x1400
+
+MessageContent="55534243123456780000000000000011062000000000000100000000000000"
+
+
+########################################################
+# BlackBerry Q10 and Z10
+#
+# Contributor: Daniel Mende
+
+DefaultVendor= 0x0fca
+DefaultProduct=0x8020
+
+TargetVendor=  0x0fca
+TargetProduct= 0x8012
+
+BlackberryMode=1
+
+
+########################################################
+# Pantech LTE Modem
+#
+# Contributor: Adam Goode
+
+DefaultVendor= 0x10a9
+DefaultProduct=0x6080
+
+TargetVendor=  0x10a9
+TargetProduct= 0x6085
+
+PantechMode=1
+
+
+#######################################################
+# Quanta MobileGenie 4G lte
+#
+# Contributor: Richard Wood
+
+DefaultVendor= 0x0408
+DefaultProduct=0xea43
+
+TargetVendor=  0x0408
+TargetProduct= 0xea47
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+########################################################
+# AVM Fritz!Wlan USB Stick N v2
+#
+# Contributor: merla
+
+DefaultVendor= 0x057c
+DefaultProduct=0x62ff
+
+TargetVendor=  0x057c
+TargetProduct= 0x8501
+
+MessageContent="5553424312345678000000000000061b000000ff0000000000000000000000"
+
+
+########################################################
+# Alcatel-sbell ASB TL131 TD-LTE
+#
+# Contributor: scateu
+
+DefaultVendor= 0x05c6
+DefaultProduct=0x9024
+
+TargetVendor=  0x05c6
+TargetProduct= 0x9025
+
+MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+
+
+#######################################################

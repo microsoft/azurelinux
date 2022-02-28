@@ -1,0 +1,118 @@
+From a33b23b9ec5c0733a0ff85dafc46b3df2a6d2249 Mon Sep 17 00:00:00 2001
+From: Mark Salter <msalter@redhat.com>
+Date: Fri, 21 Aug 2015 12:03:30 -0400
+Subject: [PATCH] Add PL_ARCH for AArch64
+
+Add a skeleton PL_ARCH for AArch64. Just enough to support
+execstack.
+
+Signed-off-by: Mark Salter <msalter@redhat.com>
+---
+ src/Makefile.am    |  3 ++-
+ src/Makefile.in    |  9 ++++++---
+ src/arch-aarch64.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+), 4 deletions(-)
+ create mode 100644 src/arch-aarch64.c
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index d2265aa9c0..a4c65f2e65 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -12,7 +12,8 @@ bin_PROGRAMS = execstack
+ 
+ arch_SOURCES = arch-i386.c arch-alpha.c arch-ppc.c arch-ppc64.c \
+ 	       arch-sparc.c arch-sparc64.c arch-x86_64.c arch-mips.c \
+-	       arch-s390.c arch-s390x.c arch-arm.c arch-sh.c arch-ia64.c
++	       arch-s390.c arch-s390x.c arch-arm.c arch-sh.c arch-ia64.c \
++	       arch-aarch64.c
+ common_SOURCES = checksum.c data.c dso.c dwarf2.c dwarf2.h fptr.c fptr.h     \
+ 		 hashtab.c hashtab.h mdebug.c prelink.h stabs.c crc32.c
+ prelink_SOURCES = cache.c conflict.c cxx.c doit.c exec.c execle_open.c get.c \
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 85cf84577f..863dc835a0 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -107,7 +107,8 @@ bin_PROGRAMS = execstack
+ 
+ arch_SOURCES = arch-i386.c arch-alpha.c arch-ppc.c arch-ppc64.c \
+ 	       arch-sparc.c arch-sparc64.c arch-x86_64.c arch-mips.c \
+-	       arch-s390.c arch-s390x.c arch-arm.c arch-sh.c arch-ia64.c
++	       arch-s390.c arch-s390x.c arch-arm.c arch-sh.c arch-ia64.c \
++	       arch-aarch64.c
+ 
+ common_SOURCES = checksum.c data.c dso.c dwarf2.c dwarf2.h fptr.c fptr.h     \
+ 		 hashtab.c hashtab.h mdebug.c prelink.h stabs.c crc32.c
+@@ -139,7 +140,8 @@ am__objects_2 = arch-i386.$(OBJEXT) arch-alpha.$(OBJEXT) \
+ 	arch-ppc.$(OBJEXT) arch-ppc64.$(OBJEXT) arch-sparc.$(OBJEXT) \
+ 	arch-sparc64.$(OBJEXT) arch-x86_64.$(OBJEXT) \
+ 	arch-mips.$(OBJEXT) arch-s390.$(OBJEXT) arch-s390x.$(OBJEXT) \
+-	arch-arm.$(OBJEXT) arch-sh.$(OBJEXT) arch-ia64.$(OBJEXT)
++	arch-arm.$(OBJEXT) arch-sh.$(OBJEXT) arch-ia64.$(OBJEXT) \
++	arch-aarch64.$(OBJEXT)
+ am_execstack_OBJECTS = execstack.$(OBJEXT) $(am__objects_1) \
+ 	$(am__objects_2)
+ execstack_OBJECTS = $(am_execstack_OBJECTS)
+@@ -162,7 +164,7 @@ LIBS = @LIBS@
+ depcomp = $(SHELL) $(top_srcdir)/depcomp
+ am__depfiles_maybe = depfiles
+ @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/arch-alpha.Po \
+-@AMDEP_TRUE@	./$(DEPDIR)/arch-arm.Po ./$(DEPDIR)/arch-i386.Po \
++@AMDEP_TRUE@	./$(DEPDIR)/arch-arm.Po ./$(DEPDIR)/arch-aarch64.Po ./$(DEPDIR)/arch-i386.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/arch-ia64.Po ./$(DEPDIR)/arch-mips.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/arch-ppc.Po ./$(DEPDIR)/arch-ppc64.Po \
+ @AMDEP_TRUE@	./$(DEPDIR)/arch-s390.Po ./$(DEPDIR)/arch-s390x.Po \
+@@ -277,6 +279,7 @@ distclean-compile:
+ 
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-alpha.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-arm.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-arch64.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-i386.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-ia64.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arch-mips.Po@am__quote@
+diff --git a/src/arch-aarch64.c b/src/arch-aarch64.c
+new file mode 100644
+index 0000000000..42eb2ececb
+--- /dev/null
++++ b/src/arch-aarch64.c
+@@ -0,0 +1,38 @@
++/* Copyright (C) 2015 Red Hat, Inc.
++   Written by Mark Salter <msalter@redhat.com>, 2015.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2, or (at your option)
++   any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software Foundation,
++   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
++
++#include <config.h>
++#include <assert.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <string.h>
++#include <locale.h>
++#include <error.h>
++#include <argp.h>
++#include <stdlib.h>
++
++#include "prelink.h"
++
++PL_ARCH = {
++  .name = "AArch64",
++  .class = ELFCLASS64,
++  .machine = EM_AARCH64,
++  .alternate_machine = { EM_NONE },
++  .max_page_size = 0x10000,
++  .page_size = 0x1000
++};
+-- 
+2.1.0
+

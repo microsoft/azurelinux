@@ -1,0 +1,15 @@
+diff -up libvncserver-LibVNCServer-0.9.13/libvncclient/tls_gnutls.c.crypto_policy libvncserver-LibVNCServer-0.9.13/libvncclient/tls_gnutls.c
+--- libvncserver-LibVNCServer-0.9.13/libvncclient/tls_gnutls.c.crypto_policy	2020-06-13 13:49:53.000000000 -0500
++++ libvncserver-LibVNCServer-0.9.13/libvncclient/tls_gnutls.c	2020-07-02 08:00:54.304902893 -0500
+@@ -29,8 +29,8 @@
+ #include "tls.h"
+ 
+ 
+-static const char *rfbTLSPriority = "NORMAL:+DHE-DSS:+RSA:+DHE-RSA:+SRP";
+-static const char *rfbAnonTLSPriority= "NORMAL:+ANON-DH";
++static const char *rfbTLSPriority = "@SYSTEM";
++static const char *rfbAnonTLSPriority= "@SYSTEM:+ANON-DH";
+ 
+ #define DH_BITS 1024
+ static gnutls_dh_params_t rfbDHParams;
+diff -up libvncserver-LibVNCServer-0.9.13/libvncserver/rfbssl_gnutls.c.crypto_policy libvncserver-LibVNCServer-0.9.13/libvncserver/rfbssl_gnutls.c

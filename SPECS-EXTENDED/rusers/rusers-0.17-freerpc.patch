@@ -1,0 +1,12 @@
+diff -up netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.freerpc netkit-rusers-0.17/rpc.rstatd/rstat_proc.c
+--- netkit-rusers-0.17/rpc.rstatd/rstat_proc.c.freerpc	2013-07-29 17:32:29.501179053 +0200
++++ netkit-rusers-0.17/rpc.rstatd/rstat_proc.c	2013-07-29 17:33:56.882155180 +0200
+@@ -1133,6 +1133,8 @@ rstat_service(struct svc_req *rqstp, SVC
+ 	}
+ 	memset(&argument, 0, sizeof(argument));
+ 	if (!svc_getargs(transp, xdr_argument, (caddr_t)&argument)) {
++		/* try to free already allocated memory during decoding */
++		svc_freeargs(transp, xdr_argument, (caddr_t)&argument);
+ 		svcerr_decode(transp);
+ 		return;
+ 	}

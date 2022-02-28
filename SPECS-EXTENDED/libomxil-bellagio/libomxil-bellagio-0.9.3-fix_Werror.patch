@@ -1,0 +1,79 @@
+@@ -, +, @@ 
+ OMX_INDEXTYPE/OMX_INDEXVENDORTYPE in one switch
+ src/base/omx_base_component.c |   54 ++++++++++++++++++++++-------------------
+ 1 files changed, 29 insertions(+), 25 deletions(-)
+--- a/src/base/omx_base_component.c	
++++ a/src/base/omx_base_component.c	
+@@ -915,14 +915,6 @@ OSCL_EXPORT_REF OSCL_EXPORT_REF OMX_ERRORTYPE omx_base_component_GetParameter(
+     return OMX_ErrorBadParameter;
+   }
+   switch(nParamIndex) {
+-  case OMX_IndexParameterThreadsID:
+-	    if ((err = checkHeader(ComponentParameterStructure, sizeof(OMX_PARAM_BELLAGIOTHREADS_ID))) != OMX_ErrorNone) {
+-	      break;
+-	    }
+-	  threadID = (OMX_PARAM_BELLAGIOTHREADS_ID *)ComponentParameterStructure;
+-	  threadID->nThreadBufferMngtID = omx_base_component_Private->bellagioThreads->nThreadBufferMngtID;
+-	  threadID->nThreadMessageID = omx_base_component_Private->bellagioThreads->nThreadMessageID;
+-	  break;
+   case OMX_IndexParamAudioInit:
+   case OMX_IndexParamVideoInit:
+   case OMX_IndexParamImageInit:
+@@ -988,28 +980,40 @@ OSCL_EXPORT_REF OSCL_EXPORT_REF OMX_ERRORTYPE omx_base_component_GetParameter(
+       }
+     }
+     break;
+-  case OMX_IndexVendorCompPropTunnelFlags:
+-    pPropTunnelSetup = (OMX_VENDOR_PROP_TUNNELSETUPTYPE*)ComponentParameterStructure;
++  default:
++    /* additional switch statement for extended OMX_INDEXTYPE */
++    switch((OMX_INDEXVENDORTYPE) nParamIndex) {
++    case OMX_IndexParameterThreadsID:
++        if ((err = checkHeader(ComponentParameterStructure, sizeof(OMX_PARAM_BELLAGIOTHREADS_ID))) != OMX_ErrorNone) {
++          break;
++        }
++      threadID = (OMX_PARAM_BELLAGIOTHREADS_ID *)ComponentParameterStructure;
++      threadID->nThreadBufferMngtID = omx_base_component_Private->bellagioThreads->nThreadBufferMngtID;
++      threadID->nThreadMessageID = omx_base_component_Private->bellagioThreads->nThreadMessageID;
++      break;
++    case OMX_IndexVendorCompPropTunnelFlags:
++      pPropTunnelSetup = (OMX_VENDOR_PROP_TUNNELSETUPTYPE*)ComponentParameterStructure;
+ 
+-    if (pPropTunnelSetup->nPortIndex >= (omx_base_component_Private->sPortTypesParam[OMX_PortDomainAudio].nPorts +
+-                                         omx_base_component_Private->sPortTypesParam[OMX_PortDomainVideo].nPorts +
+-                                         omx_base_component_Private->sPortTypesParam[OMX_PortDomainImage].nPorts +
+-                                         omx_base_component_Private->sPortTypesParam[OMX_PortDomainOther].nPorts)) {
++      if (pPropTunnelSetup->nPortIndex >= (omx_base_component_Private->sPortTypesParam[OMX_PortDomainAudio].nPorts +
++                                           omx_base_component_Private->sPortTypesParam[OMX_PortDomainVideo].nPorts +
++                                           omx_base_component_Private->sPortTypesParam[OMX_PortDomainImage].nPorts +
++                                           omx_base_component_Private->sPortTypesParam[OMX_PortDomainOther].nPorts)) {
+ 
+-      DEBUG(DEB_LEV_ERR,"In %s OMX_IndexVendorCompPropTunnelFlags nPortIndex=%d Line=%d \n",
+-          __func__,(int)pPropTunnelSetup->nPortIndex,__LINE__);
++        DEBUG(DEB_LEV_ERR,"In %s OMX_IndexVendorCompPropTunnelFlags nPortIndex=%d Line=%d \n",
++            __func__,(int)pPropTunnelSetup->nPortIndex,__LINE__);
+ 
+-      return OMX_ErrorBadPortIndex;
+-    }
++        return OMX_ErrorBadPortIndex;
++      }
+ 
+-    pPort = omx_base_component_Private->ports[pPropTunnelSetup->nPortIndex];
++      pPort = omx_base_component_Private->ports[pPropTunnelSetup->nPortIndex];
+ 
+-    pPropTunnelSetup->nTunnelSetup.nTunnelFlags  = pPort->nTunnelFlags;
+-    pPropTunnelSetup->nTunnelSetup.eSupplier     = pPort->eBufferSupplier;
+-    break;
+-  default:
+-    err = OMX_ErrorUnsupportedIndex;
+-    break;
++      pPropTunnelSetup->nTunnelSetup.nTunnelFlags  = pPort->nTunnelFlags;
++      pPropTunnelSetup->nTunnelSetup.eSupplier     = pPort->eBufferSupplier;
++      break;
++    default:
++      err = OMX_ErrorUnsupportedIndex;
++      break;
++    }
+   }
+   DEBUG(DEB_LEV_FUNCTION_NAME, "Out of %s for component %p\n", __func__, hComponent);
+   return err;

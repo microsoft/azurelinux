@@ -1,0 +1,12 @@
+diff --git a/commons-vfs2/src/main/java/org/apache/commons/vfs2/provider/zip/ZipFileProvider.java b/commons-vfs2/src/main/java/org/apache/commons/vfs2/provider/zip/ZipFileProvider.java
+index 30ada1a..35acab2 100644
+--- a/commons-vfs2/src/main/java/org/apache/commons/vfs2/provider/zip/ZipFileProvider.java
++++ b/commons-vfs2/src/main/java/org/apache/commons/vfs2/provider/zip/ZipFileProvider.java
+@@ -31,7 +31,6 @@ import org.apache.commons.vfs2.FileType;
+ import org.apache.commons.vfs2.provider.AbstractFileName;
+ import org.apache.commons.vfs2.provider.AbstractLayeredFileProvider;
+ import org.apache.commons.vfs2.provider.LayeredFileName;
+-import org.apache.commons.vfs2.provider.hdfs.HdfsFileSystemConfigBuilder;
+ 
+ /**
+  * A file system provider for ZIP files. Provides read-only file systems.

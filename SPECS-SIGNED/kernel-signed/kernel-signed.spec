@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        5.10.78.1
+Version:        5.15.18.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -89,13 +89,22 @@ The kernel package contains the signed Linux kernel.
 %prep
 
 %build
+mkdir rpm_contents
+pushd rpm_contents
+
 # This spec's whole purpose is to inject the signed kernel binary
 rpm2cpio %{SOURCE0} | cpio -idmv
 cp %{SOURCE1} ./boot/vmlinuz-%{uname_r}
 
+popd
+
 %install
+pushd rpm_contents
+
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
 cp -rp ./. %{buildroot}/
+
+popd
 
 # Recalculate sha512hmac for FIPS
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
@@ -141,11 +150,36 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
-%ifarch x86_64
-%exclude /lib/modules/%{uname_r}/kernel/arch/x86/oprofile/
-%endif
+%exclude /module_info.ld
 
 %changelog
+* Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 5.15.18.1-2
+- Bump release number to match kernel release
+
+* Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
+- Update source to 5.15.18.1
+
+* Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 5.15.2.1-5
+- Bump release number to match kernel release
+
+* Wed Feb 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-4
+- Bump release number to match kernel release
+
+* Thu Jan 27 2022 Daniel Mihai <dmihai@microsoft.com> - 5.15.2.1-3
+- Bump release number to match kernel release
+
+* Sun Jan 23 2022 Chris Co <chrco@microsoft.com> - 5.15.2.1-2
+- Bump release number to match kernel release
+
+* Thu Jan 06 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-1
+- Update source to 5.15.2.1
+
+* Tue Jan 04 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-3
+- Bump release number to match kernel release
+
+* Tue Dec 28 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.78.1-2
+- Bump release number to match kernel release
+
 * Tue Nov 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.78.1-1
 - Update source to 5.10.78.1
 

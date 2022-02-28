@@ -4,14 +4,15 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        16.2.0
-Release:        5%{?dist}
+Version:        16.2.5
+Release:        3%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
-
+# Upstream patch to fix build with snappy 1.1.9. Remove in v16.2.7
+Patch0:         %{name}-snappy-fix
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
@@ -772,11 +773,11 @@ This package provides Ceph’s default alerts for Prometheus.
 # common
 #################################################################################
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1
 
 # Despite disabling diskprediction, some unpackaged files stick around
 # Delete directories to prevent these files from being built/installed later
-cd /usr/src/mariner/BUILD/%{name}-%{version}
+cd %{_topdir}/BUILD/%{name}-%{version}
 rm -rf ./src/pybind/mgr/diskprediction_local
 rm -rf ./src/pybind/mgr/diskprediction_cloud
 
@@ -971,9 +972,6 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/ceph/bootstrap-rbd-mirror
 
 # prometheus alerts
 install -m 644 -D monitoring/prometheus/alerts/ceph_default_alerts.yml %{buildroot}/etc/prometheus/ceph/ceph_default_alerts.yml
-
-%clean
-rm -rf %{buildroot}
 
 #################################################################################
 # files and systemd scriptlets
@@ -1250,6 +1248,7 @@ fi
 %{_datadir}/ceph/mgr/localpool
 %{_datadir}/ceph/mgr/mds_autoscaler
 %{_datadir}/ceph/mgr/mirroring
+%{_datadir}/ceph/mgr/nfs
 %{_datadir}/ceph/mgr/orchestrator
 %{_datadir}/ceph/mgr/osd_perf_query
 %{_datadir}/ceph/mgr/osd_support
@@ -1804,6 +1803,18 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft> - 16.2.5-3
+- Add patch to fix build with snappy >= 1.1.9
+
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 16.2.5-2
+- Use _topdir instead of hard-coded value /usr/src/mariner
+
+* Mon Jan 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 16.2.5-1
+- Updated to version 16.2.5.
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.0-6
+- Removing the explicit %%clean stage.
+
 * Tue Sep 21 2021 Henry Li <lihl@microsoft.com> - 16.2.0-5
 - Use util-linux-devel as BR instead of util-linux-libs
 

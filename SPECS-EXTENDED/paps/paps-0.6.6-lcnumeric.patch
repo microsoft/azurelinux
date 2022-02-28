@@ -1,0 +1,82 @@
+diff -ruN paps-0.6.6.orig/src/libpaps.c paps-0.6.6/src/libpaps.c
+--- paps-0.6.6.orig/src/libpaps.c	2007-03-27 20:25:00.000000000 +0900
++++ paps-0.6.6/src/libpaps.c	2007-03-27 20:31:15.000000000 +0900
+@@ -28,6 +28,7 @@
+ #include <freetype/ftglyph.h>
+ #include <freetype/ftoutln.h>
+ #include <errno.h>
++#include <locale.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -263,7 +264,7 @@
+ 			 );
+   
+   /* Outline support */
+-  g_string_append_printf(paps->header,
++  paps_string_append_printf(paps->header,
+ 			 "/conicto {\n"
+ 			 "    /to_y exch def\n"
+ 			 "    /to_x exch def\n"
+@@ -691,3 +692,28 @@
+   return points * 1.0 / 72 * PAPS_DPI * PANGO_SCALE;
+ }
+ 
++void
++paps_string_append_printf(GString *string,
++			  const gchar *fmt,
++			  ...)
++{
++	gchar *buffer, *lc_numeric;
++	gint length;
++	va_list args;
++
++	va_start(args, fmt);
++
++	lc_numeric = g_strdup(setlocale(LC_NUMERIC, NULL));
++	setlocale(LC_NUMERIC, "C");
++
++	length = g_vasprintf(&buffer, fmt, args);
++	g_string_append_len(string, buffer, length);
++
++	setlocale(LC_NUMERIC, lc_numeric);
++
++	g_free(buffer);
++	g_free(lc_numeric);
++
++	va_end(args);
++}
++
+diff -ruN paps-0.6.6.orig/src/libpaps.h paps-0.6.6/src/libpaps.h
+--- paps-0.6.6.orig/src/libpaps.h	2007-03-27 20:25:00.000000000 +0900
++++ paps-0.6.6/src/libpaps.h	2007-03-27 20:31:02.000000000 +0900
+@@ -124,4 +124,8 @@
+  */
+ double paps_postscript_points_to_pango(double points);
+ 
++void paps_string_append_printf(GString *string,
++			       const gchar *fmt,
++			       ...) G_GNUC_PRINTF (2, 3);
++
+ #endif /* LIBPAPS */
+diff -ruN paps-0.6.6.orig/src/paps.c paps-0.6.6/src/paps.c
+--- paps-0.6.6.orig/src/paps.c	2007-03-27 20:25:00.000000000 +0900
++++ paps-0.6.6/src/paps.c	2007-03-27 20:31:33.000000000 +0900
+@@ -992,7 +992,7 @@
+   y_top = page_layout->page_height - page_layout->top_margin - page_layout->header_height - page_layout->header_sep / 2;
+   y_bot = page_layout->bottom_margin - page_layout->footer_height;
+ 
+-  g_string_append_printf(ps_pages_string,
++  paps_string_append_printf(ps_pages_string,
+                          "%f %f moveto %f %f lineto 0 setlinewidth stroke\n",
+                          x_pos, y_top,
+                          x_pos, y_bot);
+@@ -1154,7 +1154,7 @@
+ 
+   /* header separator */
+   line_pos = page_layout->page_height - page_layout->top_margin - page_layout->header_height - page_layout->header_sep / 2;
+-  g_string_append_printf(ps_pages_string,
++  paps_string_append_printf(ps_pages_string,
+                          "%d %f moveto %d %f lineto 0 setlinewidth stroke\n",
+                          page_layout->left_margin, line_pos,
+                          page_layout->page_width - page_layout->right_margin, line_pos);

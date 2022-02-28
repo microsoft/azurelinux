@@ -1,0 +1,24 @@
+From a0060c5d48ef742bff4fe9ba9c276a5c21795ce8 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Wed, 9 Apr 2014 09:58:38 +0200
+Subject: [PATCH 22/27] build-sys: compile pppol2tp with multilink support
+
+Resolves: #817013
+---
+ pppd/plugins/pppol2tp/Makefile.linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pppd/plugins/pppol2tp/Makefile.linux b/pppd/plugins/pppol2tp/Makefile.linux
+index 9a635b8..9cb316d 100644
+--- a/pppd/plugins/pppol2tp/Makefile.linux
++++ b/pppd/plugins/pppol2tp/Makefile.linux
+@@ -1,5 +1,5 @@
+ #CC	= gcc
+-COPTS	= $(RPM_OPT_FLAGS)
++COPTS	= $(RPM_OPT_FLAGS) -DHAVE_MULTILINK
+ CFLAGS	= $(COPTS) -I. -I../.. -I../../../include -fPIC
+ LDFLAGS	= -shared
+ INSTALL	= install
+-- 
+1.8.3.1
+

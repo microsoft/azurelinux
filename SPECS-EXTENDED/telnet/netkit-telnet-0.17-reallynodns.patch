@@ -1,0 +1,88 @@
+--- netkit-telnet-0.17.orig/telnetd/telnetd.c.reallynodns	2009-03-12 14:32:29.000000000 -0700
++++ netkit-telnet-0.17.orig/telnetd/telnetd.c	2009-03-12 14:51:59.000000000 -0700
+@@ -85,6 +85,7 @@
+ int keepalive = 1;
+ char *loginprg = _PATH_LOGIN;
+ char *progname;
++int lookupself = 1;
+ 
+ extern void usage(void);
+ 
+@@ -111,7 +112,7 @@
+ 
+ 	progname = *argv;
+ 
+-	while ((ch = getopt(argc, argv, "d:a:e:lhnr:I:D:B:sS:a:X:L:")) != EOF) {
++	while ((ch = getopt(argc, argv, "d:a:e:lhnr:I:D:B:sS:a:X:L:N")) != EOF) {
+ 		switch(ch) {
+ 
+ #ifdef	AUTHENTICATE
+@@ -210,6 +211,10 @@
+ 			keepalive = 0;
+ 			break;
+ 
++                case 'N':
++                        lookupself = 0;
++                        break;
++
+ #ifdef	SecurID
+ 		case 's':
+ 			/* SecurID required */
+@@ -393,6 +398,7 @@
+ #endif
+ 	fprintf(stderr, " [-L login_program]");
+ 	fprintf(stderr, " [-n]");
++	fprintf(stderr, " [-N]");
+ #ifdef	SecurID
+ 	fprintf(stderr, " [-s]");
+ #endif
+@@ -691,15 +697,20 @@
+ 
+ 		memset(&hints, '\0', sizeof(hints));
+ 		hints.ai_socktype = SOCK_STREAM;
+-		hints.ai_flags = AI_ADDRCONFIG;
++		hints.ai_flags = AI_CANONNAME;
+ 
+ 		gethostname(host_name, sizeof(host_name));
+-		if ((e = getaddrinfo(host_name, NULL, &hints, &res)) != 0) {
+-			if(e != EAI_AGAIN) {
+-				fprintf(stderr, "getaddrinfo: localhost %s\n", 
+-				        gai_strerror(e));
+-				exit(1);
+-			}
++                /*
++                 * Optionally canonicalize the local host name, in case
++                 * gethostname() returns foo, we want foo.example.com
++                 */
++		if (lookupself &&
++                    (e = getaddrinfo(host_name, NULL, &hints, &res)) == 0) {
++                        if (res->ai_canonname) {
++                                strncpy(host_name, res->ai_canonname,
++                                                        sizeof(host_name)-1);
++                                host_name[sizeof(host_name)-1] = 0;
++                        }
+ 		}
+ 		if(res)
+ 			freeaddrinfo(res);
+--- netkit-telnet-0.17.orig/telnetd/telnetd.8.reallynodns	2009-03-12 14:54:54.000000000 -0700
++++ netkit-telnet-0.17.orig/telnetd/telnetd.8	2009-03-12 14:56:58.000000000 -0700
+@@ -42,7 +42,7 @@
+ protocol server
+ .Sh SYNOPSIS
+ .Nm /usr/sbin/in.telnetd
+-.Op Fl hns
++.Op Fl hnNs
+ .Op Fl a Ar authmode
+ .Op Fl D Ar debugmode
+ .Op Fl L Ar loginprg
+@@ -175,6 +175,10 @@
+ if the client is still there, so that idle connections
+ from machines that have crashed or can no longer
+ be reached may be cleaned up.
++.It Fl N
++Do not use DNS to canonicalize the local hostname;
++.Fn gethostname 2
++returns a fully qualified name.
+ .It Fl s
+ This option is only enabled if
+ .Nm telnetd

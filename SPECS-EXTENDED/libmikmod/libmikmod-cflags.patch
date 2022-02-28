@@ -1,0 +1,90 @@
+diff -up libmikmod-3.3.8/configure~ libmikmod-3.3.8/configure
+--- libmikmod-3.3.8/configure~	2015-11-11 11:02:00.000000000 +0100
++++ libmikmod-3.3.8/configure	2015-11-16 14:04:21.559228528 +0100
+@@ -16783,86 +16783,6 @@ $as_echo "#define HAVE_RTLD_GLOBAL 1" >>
+ 	fi
+ fi
+ 
+-# If compiling with gcc, use adequate optimization flags
+-if test $ac_cv_c_compiler_gnu = yes
+-then
+-	# On at least x86 platforms, gcc 2.7.2.1 and earlier won't work if -O3 (or
+-	# -finline-functions) are used. Versions 2.7.2.3, 2.8.x and egcs are ok
+-	# (didn't test 2.7.2.2).
+-	# Until there's an easy way to catch broken inlining, we choose flags known
+-	# to work correctly depending of the compiler version.
+-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if inlining functions is safe" >&5
+-$as_echo_n "checking if inlining functions is safe... " >&6; }
+-if ${libmikmod_cv_gcc_inline_safe+:} false
+-then :
+-  $as_echo_n "(cached) " >&6
+-else
+-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-int
+-main (void)
+-{
+-
+-#if !(defined __GNUC__ && (__GNUC__ > 2 || __GNUC__ == 2 && __GNUC_MINOR__ > 7))
+-#error inlining functions is not safe
+-#endif
+-
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_c_try_compile "$LINENO"
+-then :
+-  libmikmod_cv_gcc_inline_safe=yes
+-else
+-  libmikmod_cv_gcc_inline_safe=no
+-fi
+-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+-fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libmikmod_cv_gcc_inline_safe" >&5
+-$as_echo "$libmikmod_cv_gcc_inline_safe" >&6; }
+-	if test $libmikmod_cv_gcc_inline_safe = no
+-	then
+-		CFLAGS="$CFLAGS -fno-strength-reduce"
+-	fi
+-	CFLAGS="$CFLAGS -ffast-math"
+-	if test $libmikmod_darwin = yes
+-	then
+-		CFLAGS="$CFLAGS -fno-common"
+-	fi
+-	if test $libmikmod_debug = yes
+-	then
+-		CFLAGS="$CFLAGS -Wall -Werror"
+-	else
+-		CFLAGS="$CFLAGS -Wall"
+-	fi
+-
+-	# pgcc 2.95.2 appears not to be able to compile libmikmod, although regular
+-	# gcc works fine. Issue a warning if the compiler is pgcc, until a reliable
+-	# way to detect flawed version (or, better, a reliable workaround) is
+-	# found.
+-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler is pgcc" >&5
+-$as_echo_n "checking if compiler is pgcc... " >&6; }
+-	if ($CC -v 2>&1 | grep ^pgcc > /dev/null) 2>/dev/null
+-	then
+-		libmikmod_gcc_is_pgcc=yes
+-	else
+-		libmikmod_gcc_is_pgcc=no
+-	fi
+-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libmikmod_gcc_is_pgcc" >&5
+-$as_echo "$libmikmod_gcc_is_pgcc" >&6; }
+-	if test $libmikmod_gcc_is_pgcc = yes
+-	then
+-		echo "
+-*** Version 2.95.2 of this compiler, and perhaps others, are unable to
+-*** compile libmikmod. If compilation fails for playercode/virtch.c
+-*** around line 650, with the error ``internal error--insn does not
+-*** satisfy its constraints'', then you'll have to use another compiler.
+-" >&2
+-	fi
+-fi
+-
+ if test x$libmikmod_threads != xno
+ then
+ 

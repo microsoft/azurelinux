@@ -1,0 +1,40 @@
+From c929f200484f5a2355edf769aaaee1e036129fd8 Mon Sep 17 00:00:00 2001
+From: Daniele Varrazzo <daniele.varrazzo@gmail.com>
+Date: Mon, 4 Mar 2019 17:25:56 +0000
+Subject: [PATCH] Fixed building with Python 3.8
+
+Not released yet, and using an internal API, so for the moment better
+not declare it supported.
+
+Close #854
+
+Ported to 2.7.5 by Thomas Crain <thcrain@microsoft.com>
+---
+ psycopg/psycopgmodule.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/psycopg/psycopgmodule.c b/psycopg/psycopgmodule.c
+index 5deaa16..f35d574 100644
+--- a/psycopg/psycopgmodule.c
++++ b/psycopg/psycopgmodule.c
+@@ -677,6 +677,10 @@ psyco_set_error(PyObject *exc, cursorObject *curs, const char *msg)
+ static int
+ psyco_is_main_interp(void)
+ {
++#if PY_VERSION_HEX >= 0x03080000
++    /* tested with Python 3.8.0a2 */
++    return _PyInterpreterState_Get() == PyInterpreterState_Main();
++#else
+     static PyInterpreterState *main_interp = NULL;  /* Cached reference */
+     PyInterpreterState *interp;
+ 
+@@ -692,6 +696,7 @@ psyco_is_main_interp(void)
+     main_interp = interp;
+     assert (main_interp);
+     return psyco_is_main_interp();
++#endif
+ }
+ 
+ 
+-- 
+2.25.1

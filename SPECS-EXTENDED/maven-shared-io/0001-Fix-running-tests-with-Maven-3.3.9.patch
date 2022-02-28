@@ -1,0 +1,38 @@
+From 7ce11eec214f2a87a63cbb22525f3fdc8f5759ce Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 5 Jan 2016 08:28:31 +0100
+Subject: [PATCH] Fix running tests with Maven 3.3.9
+
+---
+ .../maven/shared/io/download/DefaultDownloadManagerTest.java      | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/test/java/org/apache/maven/shared/io/download/DefaultDownloadManagerTest.java b/src/test/java/org/apache/maven/shared/io/download/DefaultDownloadManagerTest.java
+index f67cb5c..c99631a 100644
+--- a/src/test/java/org/apache/maven/shared/io/download/DefaultDownloadManagerTest.java
++++ b/src/test/java/org/apache/maven/shared/io/download/DefaultDownloadManagerTest.java
+@@ -38,6 +38,8 @@ import org.apache.maven.wagon.authorization.AuthorizationException;
+ import org.apache.maven.wagon.events.TransferListener;
+ import org.apache.maven.wagon.proxy.ProxyInfo;
+ import org.apache.maven.wagon.repository.Repository;
++import org.codehaus.plexus.ContainerConfiguration;
++import org.codehaus.plexus.PlexusConstants;
+ import org.codehaus.plexus.PlexusTestCase;
+ 
+ import static org.easymock.EasyMock.*;
+@@ -59,6 +61,12 @@ public class DefaultDownloadManagerTest
+         wagon = createMock( Wagon.class );
+     }
+ 
++    protected void customizeContainerConfiguration( ContainerConfiguration conf )
++    {
++        conf.setAutoWiring( true );
++        conf.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
++    }
++
+     public void testShouldConstructWithNoParamsAndHaveNonNullMessageHolder()
+     {
+         new DefaultDownloadManager();
+-- 
+2.5.0
+

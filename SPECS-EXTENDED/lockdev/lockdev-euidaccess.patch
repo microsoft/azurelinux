@@ -1,0 +1,91 @@
+diff -up lockdev-scm-2011-10-07/src/lockdev.c.access lockdev-scm-2011-10-07/src/lockdev.c
+--- lockdev-scm-2011-10-07/src/lockdev.c.access	2011-07-22 09:37:10.000000000 +0200
++++ lockdev-scm-2011-10-07/src/lockdev.c	2013-12-05 11:56:57.836961642 +0100
+@@ -95,6 +95,10 @@
+  *
+  */
+ 
++#ifndef _GNU_SOURCE
++   #define _GNU_SOURCE
++#endif
++
+ #include <errno.h>
+ #include <signal.h>
+ #include <stdio.h>
+@@ -125,6 +125,10 @@
+ #include "lockdev.h"
+ #include "ttylock.h"
+ 
++#ifndef LOCKDEV_ACCESS
++#define LOCKDEV_ACCESS  euidaccess
++#endif
++
+ #define	LOCKDEV_PATH	SBINDIR "/lockdev"
+ 
+ /*
+@@ -616,7 +620,10 @@ dev_lock (const char *devname)
+ 	if ( stat( device, &statbuf) == -1 ) {
+ 		close_n_return(-errno);
+ 	}
+-	if ( access( device, W_OK ) == -1 ) {
++	/* check that the caller has write permission to the device
++	 * to prevent denial-of-service attack by unauthorized users
++	 */
++	if ( LOCKDEV_ACCESS( device, W_OK ) == -1 ) {
+ 		close_n_return(-errno);
+ 	}
+ 
+@@ -780,7 +787,10 @@ dev_relock (const char  *devname,
+ 	if ( stat( device, &statbuf) == -1 ) {
+ 		close_n_return(-errno);
+ 	}
+-	if ( access( device, W_OK ) == -1 ) {
++	/* check that the caller has write permission to the device
++	 * to prevent denial-of-service attack by unauthorized users
++	 */
++	if ( LOCKDEV_ACCESS( device, W_OK ) == -1 ) {
+ 		close_n_return(-errno);
+ 	}
+ 
+@@ -870,7 +880,10 @@ dev_unlock (const char *devname,
+ 	if ( stat( device, &statbuf) == -1 ) {
+ 		close_n_return(-errno);
+ 	}
+-	if ( access( device, W_OK ) == -1 ) {
++	/* check that the caller has write permission to the device
++	 * to prevent denial-of-service attack by unauthorized users
++	 */
++	if ( LOCKDEV_ACCESS( device, W_OK ) == -1 ) {
+ 		close_n_return(-errno);
+ 	}
+ 
+diff -ru lockdev-save/src/Makefile.am lockdev-scm-2011-10-07/src/Makefile.am
+--- lockdev-save/src/Makefile.am	2014-09-18 13:42:00.363741658 +0200
++++ lockdev-scm-2011-10-07/src/Makefile.am	2014-09-18 13:52:10.307868154 +0200
+@@ -6,7 +6,6 @@
+ AM_CPPFLAGS = -include $(top_builddir)/config.h -DSBINDIR=\"$(sbindir)\"
+ 
+ lockdev_SOURCES = sample.c
+-lockdev_LDADD = liblockdev.la
+ 
+ baudboy_SOURCES = baudboy_test.c
+ baudboy_LDADD = liblockdev.la
+Solo in lockdev-scm-2011-10-07/src: Makefile.in
+diff -ru lockdev-save/src/sample.c lockdev-scm-2011-10-07/src/sample.c
+--- lockdev-save/src/sample.c	2014-09-18 13:42:00.363741658 +0200
++++ lockdev-scm-2011-10-07/src/sample.c	2014-09-18 14:06:03.769023380 +0200
+@@ -6,6 +6,13 @@
+ #include <fcntl.h>
+ #include "lockdev.h"
+ 
++/* ttylock functions swap the real/effective uid/gid for us, so
++ * use access instead of euidaccess.
++ */
++#define LOCKDEV_ACCESS access
++#undef TTYLOCK_USE_HELPER
++#include "lockdev.c"
++
+ void
+ usage (void)
+ {
+Solo in lockdev-scm-2011-10-07: VERSION

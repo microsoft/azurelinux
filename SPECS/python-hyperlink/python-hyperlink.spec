@@ -1,14 +1,14 @@
 Summary:        provides a pure-Python implementation of immutable URLs
 Name:           python-hyperlink
-Version:        19.0.0
-Release:        3%{?dist}
+Version:        21.0.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/python-hyper/hyperlink
-#Source0:       https://github.com/python-hyper/hyperlink/archive/v%{version}.tar.gz
-Source0:        https://github.com/python-hyper/hyperlink/archive/%{name}-%{version}.tar.gz
+#Source0:       https://github.com/python-hyper/hyperlink/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -24,6 +24,7 @@ Requires:       python3
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-idna
+BuildRequires:  python3-pip
 %endif
 
 %description -n python3-hyperlink
@@ -39,8 +40,7 @@ Hyperlink provides a pure-Python implementation of immutable URLs. Based on RFC 
 %py3_install
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pytest
+pip3 install pytest
 pytest
 
 %files -n python3-hyperlink
@@ -49,6 +49,13 @@ pytest
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 14 2022 Nick Samson <nisamson@microsoft.com> - 21.0.0-1
+- Updated to 21.0.0
+- Updated URL and Source0 to reflect github change.
+
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 19.0.0-4
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 19.0.0-3
 - Add license to python3 package
 - Remove python2 package

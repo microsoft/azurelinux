@@ -1,0 +1,28 @@
+From 06bf27978f1366f459383c6f00548492e7658134 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 11 Apr 2018 16:26:58 +0200
+Subject: [PATCH] Do no regenerate README
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 0c89aeb..f82abe9 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -15,7 +15,6 @@ build_requires 'Test::Builder::Tester' =
+ perl_version '5.007003';
+ 
+ license 'perl';
+-readme_from 'lib/Test/utf8.pm';
+ 
+ repository 'https://github.com/2shortplanks/Test-utf8';
+ 
+-- 
+2.14.3
+

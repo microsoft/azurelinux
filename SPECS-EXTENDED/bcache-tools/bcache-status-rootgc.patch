@@ -1,0 +1,17 @@
+--- bcache-tools-1.0.8.bcache-status.orig	2016-08-04 15:03:50.095602401 +0200
++++ bcache-tools-1.0.8/bcache-status	2016-08-04 14:31:24.507542579 +0200
+@@ -337,8 +337,12 @@
+ 			continue
+ 
+ 		if run_gc:
+-			with open('%s%s/internal/trigger_gc' % (SYSFS_BCACHE_PATH, cache), 'w') as fd:
+-				fd.write('1\n')
++			try:
++				with open('%s%s/internal/trigger_gc' % (SYSFS_BCACHE_PATH, cache), 'w') as fd:
++					fd.write('1\n')
++			except PermissionError as e:
++				print ('You need root permissions for the --gc option')
++				sys.exit(1)
+ 
+ 		dump_bcache('%s%s' % (SYSFS_BCACHE_PATH, cache), stats, print_subdevices, uuid_map.get(cache, '?'))
+ 

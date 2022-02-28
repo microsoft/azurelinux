@@ -1,0 +1,396 @@
+diff --git a/consolehelper-gtk.8 b/consolehelper-gtk.8
+index d964ffa..a0937cf 100644
+--- a/consolehelper-gtk.8
++++ b/consolehelper-gtk.8
+@@ -12,7 +12,8 @@
+ .\"
+ .\" You should have received a copy of the GNU General Public License
+ .\" along with this program; if not, write to the Free Software
+-.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++.\" Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++.\" MA  02110-1301, USA.
+ .\"
+ .TH CONSOLEHELPER-GTK 8 "2009-10-05" "Red Hat"
+ .SH NAME
+diff --git a/consolehelper.8.in b/consolehelper.8.in
+index d771da7..e6ad431 100644
+--- a/consolehelper.8.in
++++ b/consolehelper.8.in
+@@ -12,7 +12,8 @@
+ .\"
+ .\" You should have received a copy of the GNU General Public License
+ .\" along with this program; if not, write to the Free Software
+-.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++.\" Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++.\" MA  02110-1301, USA.
+ .\"
+ .TH CONSOLEHELPER 8 "18 March 1999" "Red Hat Software"
+ .SH NAME
+diff --git a/consolehelper.c b/consolehelper.c
+index d4ee6f9..064ccb3 100644
+--- a/consolehelper.c
++++ b/consolehelper.c
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #include "config.h"
+diff --git a/dummy.h b/dummy.h
+index 24f8277..b6d38d3 100644
+--- a/dummy.h
++++ b/dummy.h
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ /* Just a dummy file for gettext, containing messages emmitted by various
+diff --git a/gsmclient.c b/gsmclient.c
+index 85a3dea..6d67e91 100644
+--- a/gsmclient.c
++++ b/gsmclient.c
+@@ -17,8 +17,8 @@
+  *
+  * You should have received a copy of the GNU Library General Public
+  * License along with this library; if not, write to the
+- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+- * Boston, MA 02111-1307, USA.
++ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
++ * Boston, MA  02110-1301, USA.
+  */
+ 
+ #include <config.h>
+diff --git a/gsmclient.h b/gsmclient.h
+index a4e94b0..66d97c7 100644
+--- a/gsmclient.h
++++ b/gsmclient.h
+@@ -17,8 +17,8 @@
+  *
+  * You should have received a copy of the GNU Library General Public
+  * License along with this library; if not, write to the
+- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+- * Boston, MA 02111-1307, USA.
++ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
++ * Boston, MA  02110-1301, USA.
+  */
+ 
+ #ifndef GSM_CLIENT_H
+diff --git a/pam-panel-icon.1 b/pam-panel-icon.1
+index f92f57a..5f891dc 100644
+--- a/pam-panel-icon.1
++++ b/pam-panel-icon.1
+@@ -12,7 +12,8 @@
+ .\"
+ .\" You should have received a copy of the GNU General Public License
+ .\" along with this program; if not, write to the Free Software
+-.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++.\" Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++.\" MA  02110-1301, USA.
+ .\"
+ .\" Red Hat author: Miloslav Trmač <mitr@redhat.com>
+ .TH PAM-PANEL-ICON 1 "2009-10-05" "Red Hat"
+diff --git a/pam-panel-icon.c b/pam-panel-icon.c
+index d2e93fa..c4e038c 100644
+--- a/pam-panel-icon.c
++++ b/pam-panel-icon.c
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #include "config.h"
+diff --git a/props.c b/props.c
+index 04eaeb6..3f37fd5 100644
+--- a/props.c
++++ b/props.c
+@@ -15,8 +15,8 @@
+  * 
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+- * 02111-1307, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #include "props.h"
+diff --git a/props.h b/props.h
+index c309450..aaa491c 100644
+--- a/props.h
++++ b/props.h
+@@ -15,8 +15,8 @@
+  * 
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+- * 02111-1307, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #ifndef MSM_PROPS_H
+diff --git a/shvar.c b/shvar.c
+index 114b7fc..7dd3651 100644
+--- a/shvar.c
++++ b/shvar.c
+@@ -24,7 +24,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  *
+  */
+ 
+diff --git a/shvar.h b/shvar.h
+index debc1ee..81cff6f 100644
+--- a/shvar.h
++++ b/shvar.h
+@@ -24,7 +24,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  *
+  */
+ #ifndef _SHVAR_H
+diff --git a/test-userdialog.c b/test-userdialog.c
+index 4ace42e..d3dd34f 100644
+--- a/test-userdialog.c
++++ b/test-userdialog.c
+@@ -14,7 +14,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #include "config.h"
+diff --git a/userdialogs.c b/userdialogs.c
+index af44607..04f450a 100644
+--- a/userdialogs.c
++++ b/userdialogs.c
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  *
+  */
+ 
+diff --git a/userdialogs.h b/userdialogs.h
+index 44b464a..3ea2f01 100644
+--- a/userdialogs.h
++++ b/userdialogs.h
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #ifndef __USERDIALOGS_H__
+diff --git a/userhelper-messages.c b/userhelper-messages.c
+index 5c73cc0..7b8e37c 100644
+--- a/userhelper-messages.c
++++ b/userhelper-messages.c
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #include "config.h"
+diff --git a/userhelper-messages.h b/userhelper-messages.h
+index 69825f5..ec507d3 100644
+--- a/userhelper-messages.h
++++ b/userhelper-messages.h
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #ifndef USERHELPER_MESSAGES_H__
+diff --git a/userhelper-wrap.c b/userhelper-wrap.c
+index cd35cd6..1e631f7 100644
+--- a/userhelper-wrap.c
++++ b/userhelper-wrap.c
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #include "config.h"
+diff --git a/userhelper-wrap.h b/userhelper-wrap.h
+index 2fb77c0..e4fea41 100644
+--- a/userhelper-wrap.h
++++ b/userhelper-wrap.h
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #ifndef __USERHELPER_WRAP_H__
+diff --git a/userhelper.8.in b/userhelper.8.in
+index 4e7aff1..ce90528 100644
+--- a/userhelper.8.in
++++ b/userhelper.8.in
+@@ -12,7 +12,8 @@
+ .\"
+ .\" You should have received a copy of the GNU General Public License
+ .\" along with this program; if not, write to the Free Software
+-.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++.\" Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++.\" MA  02110-1301, USA.
+ .\"
+ .TH USERHELPER 8 "January 8 2008" "Red Hat, Inc."
+ .SH NAME
+diff --git a/userhelper.c b/userhelper.c
+index 287aa4d..fa5395d 100644
+--- a/userhelper.c
++++ b/userhelper.c
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #include "config.h"
+diff --git a/userhelper.h b/userhelper.h
+index 50e6ed9..32c29d6 100644
+--- a/userhelper.h
++++ b/userhelper.h
+@@ -13,7 +13,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #ifndef __USERHELPER_H__
+diff --git a/userinfo.1 b/userinfo.1
+index 8701bda..292aa4b 100644
+--- a/userinfo.1
++++ b/userinfo.1
+@@ -12,7 +12,8 @@
+ .\"
+ .\" You should have received a copy of the GNU General Public License
+ .\" along with this program; if not, write to the Free Software
+-.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++.\" Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++.\" MA  02110-1301, USA.
+ .\"
+ .TH USERINFO 1 "6 October 1997" "Red Hat Software"
+ .SH NAME
+diff --git a/userinfo.c b/userinfo.c
+index 5139b13..4c0ea9b 100644
+--- a/userinfo.c
++++ b/userinfo.c
+@@ -14,7 +14,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ /* Things to remember...
+diff --git a/usermount.1 b/usermount.1
+index eb864c8..1af6122 100644
+--- a/usermount.1
++++ b/usermount.1
+@@ -12,7 +12,8 @@
+ .\"
+ .\" You should have received a copy of the GNU General Public License
+ .\" along with this program; if not, write to the Free Software
+-.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++.\" Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++.\" MA  02110-1301, USA.
+ .\"
+ .TH USERMOUNT 1 "March 13 2007" "Red Hat"
+ .SH NAME
+diff --git a/usermount.c b/usermount.c
+index 5875c09..1fc627b 100644
+--- a/usermount.c
++++ b/usermount.c
+@@ -14,7 +14,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ /* TODO notes.
+diff --git a/userpasswd.1 b/userpasswd.1
+index 3f11f7a..6e2ab14 100644
+--- a/userpasswd.1
++++ b/userpasswd.1
+@@ -12,7 +12,8 @@
+ .\"
+ .\" You should have received a copy of the GNU General Public License
+ .\" along with this program; if not, write to the Free Software
+-.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++.\" Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++.\" MA  02110-1301, USA.
+ .\"
+ .TH USERPASSWD 1 "17 October 1997" "Red Hat Software"
+ .SH NAME
+diff --git a/userpasswd.c b/userpasswd.c
+index 42c6705..fad128f 100644
+--- a/userpasswd.c
++++ b/userpasswd.c
+@@ -14,7 +14,8 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ * MA  02110-1301, USA.
+  */
+ 
+ #include "config.h"

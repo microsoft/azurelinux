@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2016, 2018 GK Software SE and others.
+
+  This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License 2.0
+  which accompanies this distribution, and is available at
+  https://www.eclipse.org/legal/epl-2.0/
+
+  SPDX-License-Identifier: EPL-2.0
+
+  Contributors:
+      Stephan Herrmann - initial implementation
+-->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xsi:noNamespaceSchemaLocation="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.eclipse.jdt</groupId>
+  <artifactId>ecj</artifactId>
+  <version>3.18.0</version>
+  <description>Eclipse Compiler for Java(TM)</description>
+  <name>Eclipse Compiler for Java(TM)</name>
+  <url>http://www.eclipse.org/jdt</url>
+  <licenses>
+    <license>
+      <name>Eclipse Public License - v 2.0</name>
+      <url>https://www.eclipse.org/legal/epl-2.0/</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <organization>
+    <name>Eclipse Foundation</name>
+    <url>http://www.eclipse.org/</url>
+  </organization>
+  <issueManagement>
+    <system>Bugzilla</system>
+    <url>https://bugs.eclipse.org/</url>
+  </issueManagement>
+  <scm>
+    <connection>scm:git:git://git.eclipse.org/gitroot/jdt/eclipse.jdt.core.git</connection>
+    <url>https://git.eclipse.org/c/jdt/eclipse.jdt.core.git</url>
+  </scm>
+  <developers>
+    <developer>
+      <url>https://projects.eclipse.org/projects/eclipse.jdt/who</url>
+    </developer>
+  </developers>
+</project>

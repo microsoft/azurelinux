@@ -1,0 +1,21 @@
+diff -up netpbm-10.61.01/converter/pbm/cmuwmtopbm.c.cmuwtopbmfix netpbm-10.61.01/converter/pbm/cmuwmtopbm.c
+--- netpbm-10.61.01/converter/pbm/cmuwmtopbm.c.cmuwtopbmfix	2013-01-02 18:39:57.000000000 +0100
++++ netpbm-10.61.01/converter/pbm/cmuwmtopbm.c	2013-01-03 05:41:36.024984241 +0100
+@@ -18,7 +18,7 @@
+    This program does not check the pad bits at the end of each row.
+ */
+ 
+-
++#include <stdint.h>
+ #include "pbm.h"
+ 
+ /*--------------------------
+@@ -42,7 +42,7 @@ readCmuwmHeader(FILE *         const ifP
+         "CMU window manager header EOF / read error";
+     uint32_t const cmuwmMagic = 0xf10040bb;
+ 
+-    long l;
++    uint32_t l;
+     short s;
+     int rc;
+ 

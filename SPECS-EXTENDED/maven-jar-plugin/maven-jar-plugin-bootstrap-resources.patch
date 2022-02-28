@@ -1,0 +1,772 @@
+--- maven-jar-plugin-3.2.0/src/main/filtered-resources/META-INF/maven/org.apache.maven.plugins/maven-jar-plugin/plugin-help.xml	1970-01-01 01:00:00.000000000 +0100
++++ maven-jar-plugin-3.2.0/src/main/filtered-resources/META-INF/maven/org.apache.maven.plugins/maven-jar-plugin/plugin-help.xml	2019-11-25 18:27:09.361408438 +0100
+@@ -0,0 +1,218 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<plugin>
++  <name>${project.name}</name>
++  <description>${project.description}</description>
++  <groupId>${project.groupId}</groupId>
++  <artifactId>${project.artifactId}</artifactId>
++  <version>${project.version}</version>
++  <goalPrefix>jar</goalPrefix>
++  <mojos>
++    <mojo>
++      <goal>jar</goal>
++      <description>Build a JAR from the current project.</description>
++      <requiresDependencyResolution>runtime</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>package</phase>
++      <implementation>org.apache.maven.plugins.jar.JarMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>archive</name>
++          <type>org.apache.maven.archiver.MavenArchiveConfiguration</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>classesDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Build a JAR from the current project.</description>
++        </parameter>
++        <parameter>
++          <name>classifier</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Build a JAR from the current project.</description>
++        </parameter>
++        <parameter>
++          <name>excludes</name>
++          <type>java.lang.String[]</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>forceCreation</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>includes</name>
++          <type>java.lang.String[]</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>outputTimestamp</name>
++          <type>java.lang.String</type>
++          <since>3.2.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>skipIfEmpty</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultManifestFile</name>
++          <type>boolean</type>
++          <deprecated>For version 3.0.0 this parameter is only defined here to break the build if you use it!</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <classesDirectory implementation="java.io.File" default-value="${project.build.outputDirectory}"/>
++        <forceCreation implementation="boolean" default-value="false">${maven.jar.forceCreation}</forceCreation>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.directory}"/>
++        <outputTimestamp implementation="java.lang.String" default-value="${project.build.outputTimestamp}"/>
++        <skipIfEmpty implementation="boolean" default-value="false"/>
++        <useDefaultManifestFile implementation="boolean" default-value="false">${jar.useDefaultManifestFile}</useDefaultManifestFile>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>test-jar</goal>
++      <description>Build a JAR of the test classes for the current project.</description>
++      <requiresDependencyResolution>test</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>package</phase>
++      <implementation>org.apache.maven.plugins.jar.TestJarMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>archive</name>
++          <type>org.apache.maven.archiver.MavenArchiveConfiguration</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>classifier</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Build a JAR of the test classes for the current project.</description>
++        </parameter>
++        <parameter>
++          <name>excludes</name>
++          <type>java.lang.String[]</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>forceCreation</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>includes</name>
++          <type>java.lang.String[]</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>outputTimestamp</name>
++          <type>java.lang.String</type>
++          <since>3.2.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Build a JAR of the test classes for the current project.</description>
++        </parameter>
++        <parameter>
++          <name>skipIfEmpty</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>testClassesDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Build a JAR of the test classes for the current project.</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultManifestFile</name>
++          <type>boolean</type>
++          <deprecated>For version 3.0.0 this parameter is only defined here to break the build if you use it!</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <classifier implementation="java.lang.String" default-value="tests"/>
++        <forceCreation implementation="boolean" default-value="false">${maven.jar.forceCreation}</forceCreation>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.directory}"/>
++        <outputTimestamp implementation="java.lang.String" default-value="${project.build.outputTimestamp}"/>
++        <skip implementation="boolean">${maven.test.skip}</skip>
++        <skipIfEmpty implementation="boolean" default-value="false"/>
++        <testClassesDirectory implementation="java.io.File" default-value="${project.build.testOutputDirectory}"/>
++        <useDefaultManifestFile implementation="boolean" default-value="false">${jar.useDefaultManifestFile}</useDefaultManifestFile>
++      </configuration>
++    </mojo>
++  </mojos>
++</plugin>
+--- maven-jar-plugin-3.2.0/src/main/filtered-resources/META-INF/maven/plugin.xml	1970-01-01 01:00:00.000000000 +0100
++++ maven-jar-plugin-3.2.0/src/main/filtered-resources/META-INF/maven/plugin.xml	2019-11-25 18:26:17.657117466 +0100
+@@ -0,0 +1,548 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<plugin>
++  <name>${project.name}</name>
++  <description>${project.description}</description>
++  <groupId>${project.groupId}</groupId>
++  <artifactId>${project.artifactId}</artifactId>
++  <version>${project.version}</version>
++  <goalPrefix>jar</goalPrefix>
++  <isolatedRealm>false</isolatedRealm>
++  <inheritedByDefault>true</inheritedByDefault>
++  <mojos>
++    <mojo>
++      <goal>jar</goal>
++      <description>Build a JAR from the current project.</description>
++      <requiresDependencyResolution>runtime</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>package</phase>
++      <implementation>org.apache.maven.plugins.jar.JarMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>archive</name>
++          <type>org.apache.maven.archiver.MavenArchiveConfiguration</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>classesDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Build a JAR from the current project.</description>
++        </parameter>
++        <parameter>
++          <name>classifier</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Build a JAR from the current project.</description>
++        </parameter>
++        <parameter>
++          <name>excludes</name>
++          <type>java.lang.String[]</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>finalName</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>forceCreation</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>includes</name>
++          <type>java.lang.String[]</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>outputTimestamp</name>
++          <type>java.lang.String</type>
++          <since>3.2.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>session</name>
++          <type>org.apache.maven.execution.MavenSession</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>skipIfEmpty</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultManifestFile</name>
++          <type>boolean</type>
++          <deprecated>For version 3.0.0 this parameter is only defined here to break the build if you use it!</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <classesDirectory implementation="java.io.File" default-value="${project.build.outputDirectory}"/>
++        <finalName implementation="java.lang.String" default-value="${project.build.finalName}"/>
++        <forceCreation implementation="boolean" default-value="false">${maven.jar.forceCreation}</forceCreation>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.directory}"/>
++        <outputTimestamp implementation="java.lang.String" default-value="${project.build.outputTimestamp}"/>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
++        <skipIfEmpty implementation="boolean" default-value="false"/>
++        <useDefaultManifestFile implementation="boolean" default-value="false">${jar.useDefaultManifestFile}</useDefaultManifestFile>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>java.util.Map</role>
++          <field-name>archivers</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.project.MavenProjectHelper</role>
++          <field-name>projectHelper</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++    <mojo>
++      <goal>test-jar</goal>
++      <description>Build a JAR of the test classes for the current project.</description>
++      <requiresDependencyResolution>test</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>package</phase>
++      <implementation>org.apache.maven.plugins.jar.TestJarMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>archive</name>
++          <type>org.apache.maven.archiver.MavenArchiveConfiguration</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>classifier</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Build a JAR of the test classes for the current project.</description>
++        </parameter>
++        <parameter>
++          <name>excludes</name>
++          <type>java.lang.String[]</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>finalName</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>forceCreation</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>includes</name>
++          <type>java.lang.String[]</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>outputTimestamp</name>
++          <type>java.lang.String</type>
++          <since>3.2.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>session</name>
++          <type>org.apache.maven.execution.MavenSession</type>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Build a JAR of the test classes for the current project.</description>
++        </parameter>
++        <parameter>
++          <name>skipIfEmpty</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++        <parameter>
++          <name>testClassesDirectory</name>
++          <type>java.io.File</type>
++          <required>true</required>
++          <editable>true</editable>
++          <description>Build a JAR of the test classes for the current project.</description>
++        </parameter>
++        <parameter>
++          <name>useDefaultManifestFile</name>
++          <type>boolean</type>
++          <deprecated>For version 3.0.0 this parameter is only defined here to break the build if you use it!</deprecated>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Base class for creating a jar from project classes.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <classifier implementation="java.lang.String" default-value="tests"/>
++        <finalName implementation="java.lang.String" default-value="${project.build.finalName}"/>
++        <forceCreation implementation="boolean" default-value="false">${maven.jar.forceCreation}</forceCreation>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.directory}"/>
++        <outputTimestamp implementation="java.lang.String" default-value="${project.build.outputTimestamp}"/>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <session implementation="org.apache.maven.execution.MavenSession" default-value="${session}"/>
++        <skip implementation="boolean">${maven.test.skip}</skip>
++        <skipIfEmpty implementation="boolean" default-value="false"/>
++        <testClassesDirectory implementation="java.io.File" default-value="${project.build.testOutputDirectory}"/>
++        <useDefaultManifestFile implementation="boolean" default-value="false">${jar.useDefaultManifestFile}</useDefaultManifestFile>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>java.util.Map</role>
++          <field-name>archivers</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.project.MavenProjectHelper</role>
++          <field-name>projectHelper</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++  </mojos>
++  <dependencies>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-plugin-api</artifactId>
++      <type>jar</type>
++      <version>3.1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-classworlds</artifactId>
++      <type>jar</type>
++      <version>2.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.sisu</groupId>
++      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <type>jar</type>
++      <version>0.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-core</artifactId>
++      <type>jar</type>
++      <version>3.1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-settings</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-util</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.commons</groupId>
++      <artifactId>commons-lang3</artifactId>
++      <type>jar</type>
++      <version>3.8.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.sisu</groupId>
++      <artifactId>org.eclipse.sisu.inject</artifactId>
++      <type>jar</type>
++      <version>0.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.enterprise</groupId>
++      <artifactId>cdi-api</artifactId>
++      <type>jar</type>
++      <version>1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.el</groupId>
++      <artifactId>javax.el-api</artifactId>
++      <type>jar</type>
++      <version>3.0.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.jboss.spec.javax.interceptor</groupId>
++      <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
++      <type>jar</type>
++      <version>any</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.inject</groupId>
++      <artifactId>guice</artifactId>
++      <type>jar</type>
++      <version>4.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>aopalliance</groupId>
++      <artifactId>aopalliance</artifactId>
++      <type>jar</type>
++      <version>1.0</version>
++    </dependency>
++    <dependency>
++      <groupId>cglib</groupId>
++      <artifactId>cglib</artifactId>
++      <type>jar</type>
++      <version>3.2.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.ow2.asm</groupId>
++      <artifactId>asm</artifactId>
++      <type>jar</type>
++      <version>5.0.3</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.guava</groupId>
++      <artifactId>guava</artifactId>
++      <type>jar</type>
++      <version>19.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-resolver-provider</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.slf4j</groupId>
++      <artifactId>slf4j-api</artifactId>
++      <type>jar</type>
++      <version>1.7.25</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-api</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.inject</groupId>
++      <artifactId>javax.inject</artifactId>
++      <type>jar</type>
++      <version>1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-impl</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-repository-metadata</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-spi</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-component-annotations</artifactId>
++      <type>jar</type>
++      <version>1.5.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model-builder</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-builder-support</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-settings-builder</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-sec-dispatcher</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-cipher</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-artifact</artifactId>
++      <type>jar</type>
++      <version>3.1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>file-management</artifactId>
++      <type>jar</type>
++      <version>3.0.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-shared-io</artifactId>
++      <type>jar</type>
++      <version>3.0.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-archiver</artifactId>
++      <type>jar</type>
++      <version>3.5.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-interpolation</artifactId>
++      <type>jar</type>
++      <version>1.25</version>
++    </dependency>
++    <dependency>
++      <groupId>commons-io</groupId>
++      <artifactId>commons-io</artifactId>
++      <type>jar</type>
++      <version>2.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-shared-utils</artifactId>
++      <type>jar</type>
++      <version>3.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-archiver</artifactId>
++      <type>jar</type>
++      <version>4.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-io</artifactId>
++      <type>jar</type>
++      <version>3.2.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.commons</groupId>
++      <artifactId>commons-compress</artifactId>
++      <type>jar</type>
++      <version>1.19</version>
++    </dependency>
++    <dependency>
++      <groupId>org.tukaani</groupId>
++      <artifactId>xz</artifactId>
++      <type>jar</type>
++      <version>1.8</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-utils</artifactId>
++      <type>jar</type>
++      <version>3.3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.wagon</groupId>
++      <artifactId>wagon-provider-api</artifactId>
++      <type>jar</type>
++      <version>3.3.3</version>
++    </dependency>
++  </dependencies>
++</plugin>

@@ -1,0 +1,43 @@
+From 2da6ad1c0a941423490a74119966ea403f3ca246 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Fri, 29 Jun 2018 12:35:54 +0200
+Subject: [PATCH] Port to current plexus-utils
+
+---
+ .../maven/plugins/javadoc/JavadocUtil.java    | 20 +++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/src/main/java/org/apache/maven/plugins/javadoc/JavadocUtil.java b/src/main/java/org/apache/maven/plugins/javadoc/JavadocUtil.java
+index a740c6e..0fbf00c 100644
+--- a/src/main/java/org/apache/maven/plugins/javadoc/JavadocUtil.java
++++ b/src/main/java/org/apache/maven/plugins/javadoc/JavadocUtil.java
+@@ -1178,14 +1178,18 @@ public class JavadocUtil
+         InvocationOutputHandler outputHandler = new PrintStreamHandler( ps, false );
+         request.setOutputHandler( outputHandler );
+ 
+-        outputHandler.consumeLine( "Invoking Maven for the goals: " + goals + " with "
+-            + ( properties == null ? "no properties" : "properties=" + properties ) );
+-        outputHandler.consumeLine( "" );
+-        outputHandler.consumeLine( "M2_HOME=" + getMavenHome( log ) );
+-        outputHandler.consumeLine( "MAVEN_OPTS=" + getMavenOpts( log ) );
+-        outputHandler.consumeLine( "JAVA_HOME=" + getJavaHome( log ) );
+-        outputHandler.consumeLine( "JAVA_OPTS=" + getJavaOpts( log ) );
+-        outputHandler.consumeLine( "" );
++        try {
++            outputHandler.consumeLine( "Invoking Maven for the goals: " + goals + " with "
++                + ( properties == null ? "no properties" : "properties=" + properties ) );
++            outputHandler.consumeLine( "" );
++            outputHandler.consumeLine( "M2_HOME=" + getMavenHome( log ) );
++            outputHandler.consumeLine( "MAVEN_OPTS=" + getMavenOpts( log ) );
++            outputHandler.consumeLine( "JAVA_HOME=" + getJavaHome( log ) );
++            outputHandler.consumeLine( "JAVA_OPTS=" + getJavaOpts( log ) );
++            outputHandler.consumeLine( "" );
++        } catch (IOException e) {
++            throw new MavenInvocationException("Failed to output lines", e);
++        }
+ 
+         try
+         {
+-- 
+2.17.1
+

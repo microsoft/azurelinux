@@ -1,0 +1,5 @@
+/var/log/munge/munged.log {
+    missingok
+    notifempty
+    copytruncate
+}

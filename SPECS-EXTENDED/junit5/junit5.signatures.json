@@ -1,0 +1,19 @@
+{
+ "Signatures": {
+  "aggregator.pom": "d05dfb38ac1c1f31f3b642b1b5a93f1dbe9929f0a8c9661ae176fadec24dbf89",
+  "junit-jupiter-api-5.5.2.pom": "76a15d80d8587a1a5a3a5b142d2ceb37304fbd91198ba425486e57f76d088860",
+  "junit-jupiter-engine-5.5.2.pom": "032fef4e2563084d397eae481a388010f443401af6252bfd377d76307f6f8bfe",
+  "junit-jupiter-migrationsupport-5.5.2.pom": "805e794430d2e24704f3b066f2d84252d636fd59b8bf18a28917f7dbff9b7546",
+  "junit-jupiter-params-5.5.2.pom": "d498a431ef473bdb26549351efc3833284c858ab1a73cf79b25648623aae73fe",
+  "junit-platform-commons-1.5.2.pom": "3bd0d4ded632a8af8ca587fb6764019de771b1d6bcb89acd562435a1009faada",
+  "junit-platform-console-1.5.2.pom": "fca71862d65e5d7de50b9558559151d4419780fbb10577c5074c63893de08a53",
+  "junit-platform-console-standalone-1.5.2.pom": "eeba2241a79c76d89d38ae8b18a5aa10d81c5fe0857b4e5b661663d2d834b5ee",
+  "junit-platform-engine-1.5.2.pom": "2d4b95555c21e085ebc1ddbdf42d79eb1d55640dc193b1b7e6100240fd2f189f",
+  "junit-platform-launcher-1.5.2.pom": "25a42980af3a24685376633e511a928f8e83de736fbc6fd46eac2238d10a3631",
+  "junit-platform-reporting-1.5.2.pom": "7df5e9a04a7b3480f39dc9fa1fe4c62ecbad346a75800ebb40032f939e86cbae",
+  "junit-platform-runner-1.5.2.pom": "30e3176af9285c27ac96caf26e6db31982996f18af7ffb0ff4a4768fd6ae7bce",
+  "junit-platform-suite-api-1.5.2.pom": "0f85a55ea8bea35cad93d4b1f417af9ec6dfec4a8a9d7d92efe53a95cd80e4d6",
+  "junit-vintage-engine-5.5.2.pom": "7aac894933943af601fcde32e34a9825732e204d09d48b2b3b5cb086dc736b8d",
+  "junit5-5.5.2.tar.gz": "fbc1f99c297d1d44e10a074019574855d53c6565b1345f93d0fa3276f2102e42"
+ }
+}

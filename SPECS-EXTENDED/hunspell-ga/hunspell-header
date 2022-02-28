@@ -1,0 +1,87 @@
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#                Start hunspell affix file extensions                       #
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+WORDCHARS -'
+
+# see gramadoir morph-ga; not bothering with any replacements
+# from that file that are anchored at ^ or $, nor with any that
+# simply add a fada (hopefully handled by MAP rules below),
+# nor with derivational morphology, since these are undesirable for
+# spelling replacement
+REP 64
+REP a á
+REP e é
+REP i í
+REP o ó
+REP u ú
+REP uigh aigh
+REP uith aith
+REP idhth ith
+REP ighth ith
+REP sg sc
+REP sb sp
+REP sd st
+REP dn nn
+REP eu éa
+REP tch t
+REP idhea ío
+REP ighea ío
+REP idhe í
+REP ighe í
+REP uím aím
+REP uít aít
+REP uío aío
+REP aghadh ú
+REP adha ú
+REP ádh á
+REP mhth f
+REP bhth f
+REP thmh f
+REP thbh f
+REP thch ch
+REP tht t
+REP ghaí aí
+REP llr lr
+REP lls ls
+REP llt lt
+REP nnc nc
+REP nnd nd
+REP nnl nl
+REP nnr nr
+REP nns ns
+REP nnt nt
+REP aingc aing
+REP éagc éag
+REP éigc éig
+REP iargc iarg
+REP éadt éad
+REP éidt éid
+REP domb dom
+REP díomb díom
+REP dhomb dhom
+REP dhíomb dhíom
+REP anbhf anbh
+REP ainbhf ainbh
+REP ighim ím
+REP ighidh í
+REP ighinn ínn
+REP éá éa
+REP áí ái
+REP éí éi
+REP óí ói
+REP úí úi
+REP íó ío
+REP íá iá
+REP íú iú
+
+MAP 5
+MAP aáAÁ
+MAP eéEÉ
+MAP iíIÍ
+MAP oóOÓ
+MAP uúUÚ
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#     End hunspell extensions; remainder are PFX and SFX specifications     #
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+

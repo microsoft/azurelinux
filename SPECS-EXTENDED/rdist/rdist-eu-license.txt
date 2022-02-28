@@ -1,0 +1,118 @@
+                   MagniComp - End User License Agreement
+
+                              www.MagniComp.com
+
+                             RDist Version 6.1
+
+                     Version of This Document: 19990724
+
+GRANT.
+
+MagniComp grants you a non-exclusive license to use RDist version 6.1 and
+all subsequent versions called 6.1.X software (the "Software") free of
+charge.
+
+This license does not entitle you to hard-copy documentation, support or
+telephone assistance. MagniComp reserves the right at any time to alter
+prices, features, specifications, capabilities, functions, licensing terms,
+general availability of the Software.
+
+SCOPE OF GRANT.
+
+You may:
+
+   * use the Software in any way you wish on any computer regardless of
+     ownership of said computer;
+   * redistribute the Software in any form, including source and binary, to
+     any party with or without charging a fee;
+   * copy the Software for any purpose.
+
+You may not:
+
+   * remove or alter this notice;
+   * remove or alter any proprietary notices or labels on the Software.
+
+REQUIREMENTS.
+
+   * All advertising materials mentioning features or use of this software
+     must display the following acknowledgement:
+
+          This product includes software developed by MagniComp
+          (www.MagniComp.com) and its contributors.
+
+   * Redistributions in binary form must reproduce this copyright notice,
+     this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+   * Neither name of MagniComp nor the names of its contributors may be used
+     to endorse or promote products derived from this software without
+     specific prior written permission.
+
+TITLE.
+
+Title, ownership rights, and intellectual property rights in the Software
+shall remain in MagniComp and/or its suppliers. The Software is protected by
+copyright and other intellectual property laws and by international
+treaties. Title and related rights in the content accessed through the
+Software is the property of the applicable content owner and may be
+protected by applicable law. This license gives you no rights to such
+content.
+
+TERMINATION.
+
+The license will terminate automatically if you fail to comply with the
+limitations described herein. Upon termination of this license, you agree to
+destroy all copies of the Software.
+
+DISCLAIMER OF WARRANTY.
+
+The Software is provided on an "AS IS" basis, without warranty of any kind,
+including without limitation the warranties of merchantability, fitness for
+a particular purpose and non-infringement. The entire risk as to the quality
+and performance of the Software is borne by you. Should the Software prove
+defective, you and not MagniComp or its suppliers assume the entire cost of
+any service and repair. In addition, the security mechanisms implemented by
+MagniComp software have inherent limitations, and you must determine that
+the Software sufficiently meets your requirements. This disclaimer of
+warranty constitutes an essential part of the agreement. SOME JURISDICTIONS
+DO NOT ALLOW EXCLUSIONS OF AN IMPLIED WARRANTY, SO THIS DISCLAIMER MAY NOT
+APPLY TO YOU AND YOU MAY HAVE OTHER LEGAL RIGHTS THAT VARY BY JURISDICTION.
+
+LIMITATION OF LIABILITY.
+
+UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY, TORT, CONTRACT, OR
+OTHERWISE, SHALL MAGNICOMP OR ITS SUPPLIERS OR RESELLERS BE LIABLE TO YOU OR
+ANY OTHER PERSON FOR ANY INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES OF ANY CHARACTER INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF
+GOODWILL, WORK STOPPAGE, COMPUTER FAILURE OR MALFUNCTION, OR ANY AND ALL
+OTHER COMMERCIAL DAMAGES OR LOSSES. IN NO EVENT WILL MAGNICOMP BE LIABLE FOR
+ANY DAMAGES, EVEN IF MAGNICOMP SHALL HAVE BEEN INFORMED OF THE POSSIBILITY
+OF SUCH DAMAGES, OR FOR ANY CLAIM BY ANY OTHER PARTY. THIS LIMITATION OF
+LIABILITY SHALL NOT APPLY TO LIABILITY FOR DEATH OR PERSONAL INJURY TO THE
+EXTENT APPLICABLE LAW PROHIBITS SUCH LIMITATION. FURTHERMORE, SOME
+JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR
+CONSEQUENTIAL DAMAGES, SO THIS LIMITATION AND EXCLUSION MAY NOT APPLY TO
+YOU.
+
+HIGH RISK ACTIVITIES.
+
+The Software is not fault-tolerant and is not designed, manufactured or
+intended for use or resale as on-line control equipment in hazardous
+environments requiring fail-safe performance, such as in the operation of
+nuclear facilities, aircraft navigation or communication systems, air
+traffic control, direct life support machines, or weapons systems, in which
+the failure of the Software could lead directly to death, personal injury,
+or severe physical or environmental damage ("High Risk Activities").
+MagniComp and its suppliers specifically disclaim any express or implied
+warranty of fitness for High Risk Activities.
+
+MISCELLANEOUS.
+
+This Agreement represents the complete agreement concerning this license and
+may amended only by a writing executed by both parties. If any provision of
+this Agreement is held to be unenforceable, such provision shall be reformed
+only to the extent necessary to make it enforceable. This Agreement shall be
+governed by California law (except for conflict of law provisions). The
+application the United Nations Convention of Contracts for the International
+Sale of Goods is expressly excluded.
+
+                                    END

@@ -1,0 +1,28 @@
+--- a/opam
++++ b/opam
+@@ -12,7 +12,6 @@ depends: [
+   "ocamlfind" {build}
+   "ocamlbuild" {build}
+   "topkg" {build}
+-  "uchar"
+ ]
+ depopts: ["cmdliner"]
+ conflicts: ["cmdliner" { < "0.9.6"} ]
+--- a/pkg/META
++++ b/pkg/META
+@@ -1,6 +1,6 @@
+ version = "%%VERSION_NUM%%"
+ description = "Non-blocking streaming Unicode codec for OCaml"
+-requires = "bytes uchar"
++requires = "bytes"
+ archive(byte) = "uutf.cma"
+ archive(native) = "uutf.cmxa"
+ plugin(byte) = "uutf.cma"
+--- a/_tags
++++ b/_tags
+@@ -1,4 +1,4 @@
+-true : bin_annot, safe_string, package(bytes), package(uchar)
++true : bin_annot, safe_string, package(bytes)
+ 
+ <src> : include
+ 

@@ -2,7 +2,7 @@ echo "1. Create hash for tboot module and store it in the mle_hash file"
 sudo lcp2_mlehash --create --alg sha256 --cmdline "logging=serial,memory" /boot/tboot.gz > mle_hash
 
 echo "2. Create the policy element for tboot"
-sudo lcp2_crtpolelt --create --type mle --alg sha256 --ctrl 0x00 --minver 0 --out mle.elt mle_hash
+sudo lcp2_crtpolelt --create --type mle2 --alg sha256 --ctrl 0x00 --minver 0 --out mle.elt mle_hash
 
 echo "3. Create the policy element for the platform configuration (pconf)"
 pcr0=$(sudo tpm2_pcrread | grep '0 :' | sed -n '2 p' | cut -c 9-)
@@ -17,7 +17,7 @@ sudo lcp2_crtpolelt --create --type pconf2 --ctrl 0x00 --alg sha256 \
     --out pconf2.elt
 
 echo "4. Create the unsigned policy list file list_unsig.lst, using mle_elt and pconf_elt"
-sudo lcp2_crtpollist --create --out lists_unsig.lst pconf2.elt mle.elt
+sudo lcp2_crtpollist --create --listver 0x100 --out lists_unsig.lst pconf2.elt mle.elt
 sudo lcp2_crtpol --create --type list --pol lists.pol --alg sha256 --sign 0x0A --ctrl 0x00 --data lists.data lists_unsig.lst
 
 echo "5. Create an RSA key pair, and sign the policy list, list_sig.lst"
@@ -25,7 +25,7 @@ sudo openssl genrsa -out privkey.pem 2048
 sudo openssl rsa -pubout -in privkey.pem -out pubkey.pem
 
 sudo cp lists_unsig.lst lists_sig.lst
-sudo lcp2_crtpollist --sign --pub pubkey.pem --priv privkey.pem --out lists_sig.lst
+sudo lcp2_crtpollist --sign --sigalg rsa --pub pubkey.pem --priv privkey.pem --out lists_sig.lst
 
 echo "6. Create the final LCP policy blobs from list_sig.lst, and generate the list_pol and list_data files"
 sudo lcp2_crtpol --create --type list --alg sha256 --sign 0x0A --ctrl 0x00 --pol lists_sig.pol --data lists_sig.data lists_sig.lst

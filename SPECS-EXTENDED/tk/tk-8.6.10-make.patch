@@ -1,0 +1,13 @@
+diff --git a/unix/Makefile.in b/unix/Makefile.in
+index c6f8c25..a3cc8cb 100644
+--- a/unix/Makefile.in
++++ b/unix/Makefile.in
+@@ -744,7 +744,7 @@ install-binaries: $(TK_STUB_LIB_FILE) $(TK_LIB_FILE) ${WISH_EXE}
+ 	    fi
+ 	@echo "Installing $(LIB_FILE) to $(DLL_INSTALL_DIR)/"
+ 	@@INSTALL_LIB@
+-	@chmod 555 "$(DLL_INSTALL_DIR)/$(LIB_FILE)"
++	@chmod 755 "$(DLL_INSTALL_DIR)/$(LIB_FILE)"
+ 	@if test -f "tk${MAJOR_VERSION}${MINOR_VERSION}.dll"; then \
+ 	    $(INSTALL_LIBRARY) "tk${MAJOR_VERSION}${MINOR_VERSION}.dll" "$(DLL_INSTALL_DIR)";\
+ 	    chmod 555 "$(DLL_INSTALL_DIR)/tk${MAJOR_VERSION}${MINOR_VERSION}.dll";\

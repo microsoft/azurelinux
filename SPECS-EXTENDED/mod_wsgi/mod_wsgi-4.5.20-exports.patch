@@ -1,0 +1,11 @@
+--- mod_wsgi-4.5.20/Makefile.in.exports
++++ mod_wsgi-4.5.20/Makefile.in
+@@ -28,7 +28,7 @@
+ all : src/server/mod_wsgi.la
+ 
+ src/server/mod_wsgi.la : $(SRCFILES)
+-	$(APXS) -c $(CPPFLAGS) $(CFLAGS) $(SRCFILES) $(LDFLAGS) $(LDLIBS)
++	$(APXS) -Wl,-export-symbols-regex -Wl,wsgi_module -c $(CPPFLAGS) $(CFLAGS) $(SRCFILES) $(LDFLAGS) $(LDLIBS)
+ 
+ $(DESTDIR)$(LIBEXECDIR) :
+ 	mkdir -p $@

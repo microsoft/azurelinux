@@ -1,13 +1,12 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
-%bcond_without check
 %define pkgname repoze-lru
 %define pypiname repoze.lru
 
 Summary:        A tiny LRU cache implementation and decorator
 Name:           python-%{pkgname}
 Version:        0.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 URL:            https://github.com/repoze/repoze.lru
 Vendor:         Microsoft Corporation
@@ -45,11 +44,9 @@ python3 setup.py build
 %install
 python3 setup.py install --root=%{buildroot}
 
-%if %{with check}
 %check
 pip3 install tox
-LANG=en_US.UTF-8 tox -e py37
-%endif
+LANG=en_US.UTF-8 tox -e py39
 
 %files -n python3-%{pkgname}
 %license LICENSE.txt
@@ -57,9 +54,13 @@ LANG=en_US.UTF-8 tox -e py37
 %{python3_sitelib}/*
 
 %changelog
-* Tue Jun 08 2021 Andrew Phelps <anphel@microsoft.com> 0.7-2
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 0.7-3
+- Remove `%bcond_without check`
+- Use `py39` as tox environment to enable ptest
+
+* Tue Jun 08 2021 Andrew Phelps <anphel@microsoft.com> - 0.7-2
 - Fix check tests
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 0.7-1
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.7-1
 - Original version for CBL-Mariner
 - License verified

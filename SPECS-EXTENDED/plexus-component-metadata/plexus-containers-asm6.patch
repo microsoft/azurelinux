@@ -1,0 +1,48 @@
+diff -urEbwB plexus-containers-plexus-containers-2.1.0/plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnReader.java plexus-containers-plexus-containers-2.1.0.new/plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnReader.java
+--- plexus-containers-plexus-containers-2.1.0/plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnReader.java	2019-10-23 12:28:46.000000000 +0200
++++ plexus-containers-plexus-containers-2.1.0.new/plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnReader.java	2019-11-22 03:26:41.546581926 +0100
+@@ -35,7 +35,7 @@
+   private final AnnClass annClass;
+ 
+   private AnnReader(AnnClass annClass) {
+-    super(Opcodes.ASM7);
++    super(Opcodes.ASM6);
+     this.annClass = annClass;
+   }
+ 
+@@ -64,7 +64,7 @@
+   public FieldVisitor visitField(int access, final String name, final String desc, String signature, Object value) {
+     final AnnField field = new AnnField(annClass, access, name, desc);
+     annClass.addField(field);
+-    return new FieldVisitor(Opcodes.ASM7) {
++    return new FieldVisitor(Opcodes.ASM6) {
+ 
+       public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+         Ann ann = new Ann(desc);
+@@ -79,7 +79,7 @@
+     final AnnMethod method = new AnnMethod(annClass, access, mname, mdesc);
+     annClass.addMethod(method);
+     
+-    return new MethodVisitor(Opcodes.ASM7) {
++    return new MethodVisitor(Opcodes.ASM6) {
+ 
+       public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+         Ann ann = new Ann(desc);
+@@ -99,7 +99,7 @@
+     private Ann ann;
+ 
+     public AnnAnnReader(Ann ann) {
+-      super(Opcodes.ASM7);
++      super(Opcodes.ASM6);
+       this.ann = ann;
+     }
+ 
+@@ -132,7 +132,7 @@
+     private ArrayList<String> array = new ArrayList<String>();
+ 
+     public AnnAnnArrayReader(Ann ann, String name) {
+-      super(Opcodes.ASM7);
++      super(Opcodes.ASM6);
+       this.ann = ann;
+       this.name = name;
+     }

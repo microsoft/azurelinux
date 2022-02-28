@@ -1,0 +1,28 @@
+From c8391790c96d4c8a2c10f9ab1460fda83b509fc2 Mon Sep 17 00:00:00 2001
+From: Willem Toorop <willem@nlnetlabs.nl>
+Date: Thu, 27 Apr 2017 00:14:58 +0200
+Subject: [PATCH] Check parse limit before t increment
+
+Thanks Stephan Zeisberg
+---
+ parse.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/parse.c b/parse.c
+index e68627c..947dbb8 100644
+--- a/parse.c
++++ b/parse.c
+@@ -118,6 +118,10 @@ ldns_fget_token_l(FILE *f, char *token, const char *delim, size_t limit, int *li
+ 			if (line_nr) {
+ 				*line_nr = *line_nr + 1;
+ 			}
++			if (limit > 0 && (i >= limit || (size_t)(t-token) >= limit)) {
++				*t = '\0';
++				return -1;
++			}
+ 			*t++ = ' ';
+ 			prev_c = c;
+ 			continue;
+-- 
+2.9.5
+

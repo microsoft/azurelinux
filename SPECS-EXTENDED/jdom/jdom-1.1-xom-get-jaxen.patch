@@ -1,0 +1,13 @@
+--- XOM/build.xml
++++ XOM/build.xml
+@@ -729,7 +729,9 @@
+   </target>
+   
+   <target name="get-jaxen" description="Download Jaxen source code" depends="prepare">
+-      <unzip src="jaxen-1.1-src.zip" dest="${build.dir}" />
++      <copy todir="${build.dir}/jaxen">
++          <fileset dir="../jaxen-1.1.1/" />
++      </copy>
+   </target>
+ 
+   <target name="debug" depends="init" description="Print various Ant properties">

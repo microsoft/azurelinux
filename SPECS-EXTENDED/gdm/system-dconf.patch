@@ -1,0 +1,22 @@
+From 29d374ce6781df6f3b168a8c57163ddb582c998a Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Wed, 31 Jul 2013 17:32:55 -0400
+Subject: [PATCH] data: add system dconf databases to gdm profile
+
+This way system settings can affect the login screen.
+---
+ data/dconf/gdm.in | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/data/dconf/gdm.in b/data/dconf/gdm.in
+index 4d8bf174..9694078f 100644
+--- a/data/dconf/gdm.in
++++ b/data/dconf/gdm.in
+@@ -1,2 +1,5 @@
+ user-db:user
++system-db:local
++system-db:site
++system-db:distro
+ file-db:@DATADIR@/@PACKAGE@/greeter-dconf-defaults
+--
+2.11.1

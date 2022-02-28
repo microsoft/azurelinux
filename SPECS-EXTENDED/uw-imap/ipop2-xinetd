@@ -1,0 +1,15 @@
+# default: off
+# description: The POP2 service allows remote users to access their mail \
+#              using an POP2 client such as fetchmail.  In most cases, clients \
+#              support POP3 instead of POP2, so enabling this service is rarely \
+#              necessary.
+service pop2
+{
+	socket_type		= stream
+	wait			= no
+	user			= root
+	server			= /usr/sbin/ipop2d
+	log_on_success  += HOST DURATION 
+	log_on_failure  += HOST
+	disable			= yes
+}

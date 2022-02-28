@@ -1,15 +1,14 @@
 Summary:        Rsync libraries
 Name:           librsync
-Version:        2.0.2
-Release:        4%{?dist}
-URL:            https://librsync.github.io/
-License:        LGPLv2+ and CC0
-Group:          System Environment/Libraries
+Version:        2.3.2
+Release:        1%{?dist}
+License:        LGPLv2+ AND CC0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Libraries
+URL:            https://librsync.github.io/
 #Source0:       https://github.com/librsync/librsync/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-
 BuildRequires:  cmake
 %if %{with_check}
 BuildRequires:  which
@@ -28,9 +27,9 @@ network protocol and uses a delta format slightly more efficient than
 and incompatible with rsync 2.4.6.
 
 %package devel
-Summary: Headers and development libraries for librsync
-Group: Development/Libraries
-Requires: %{name} = %{version}
+Summary:        Headers and development libraries for librsync
+Group:          Development/Libraries
+Requires:       %{name} = %{version}
 
 %description devel
 librsync implements the "rsync" algorithm, which allows remote
@@ -53,7 +52,7 @@ based on librsync.
 %build
 mkdir -p build
 cd build
-%{cmake} -DCMAKE_SKIP_RPATH:BOOL=YES \
+%cmake -DCMAKE_SKIP_RPATH:BOOL=YES \
          -DCMAKE_SKIP_INSTALL_RPATH:BOOL=YES \
          -DENABLE_STATIC:BOOL=NO ..
 make %{?_smp_mflags}
@@ -78,7 +77,7 @@ make test
 %files
 %defattr(-,root,root)
 %license COPYING
-%doc AUTHORS COPYING
+%doc AUTHORS
 %{_bindir}/rdiff
 %{_libdir}/*.so.*
 %{_mandir}/man1/*
@@ -90,17 +89,26 @@ make test
 %{_libdir}/*.so
 
 %changelog
+* Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 2.3.2-1
+- Upgrade to version 2.3.2
+
 *   Wed Dec 09 2020 Andrew Phelps <anphel@microsoft.com> 2.0.2-4
 -   Fix check tests
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.0.2-3
 -   Added %%license line automatically
+
 *   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 2.0.2-3
 -   Verified license. Removed sha1. Fixed Source0 URL comment.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.0.2-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Sun Sep 30 2018 Bo Gan <ganb@vmware.com> 2.0.2-1
 -   Update to 2.0.2
+
 *   Wed Jun 28 2017 Chang Lee <changlee@vmware.com>  2.0.0-2
 -   Updated %check
+
 *   Wed Apr 12 2017 Xiaolin Li <xiaolinl@vmware.com>  2.0.0-1
 -   Initial build. First version

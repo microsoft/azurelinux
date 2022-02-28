@@ -1,8 +1,8 @@
-%define sourcever 3340100
+%define sourcever 3360000
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
-Version:        3.34.1
-Release:        1%{?dist}
+Version:        3.36.0
+Release:        2%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,6 @@ header files for development.
 %package libs
 Summary:        sqlite3 library
 Group:          Libraries
-Provides:       pkgconfig(sqlite3)
 
 %description libs
 The sqlite3 library.
@@ -64,10 +63,6 @@ make %{?_smp_mflags} check
 %post libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}/*
-
-
 %files
 %defattr(-,root,root)
 %license tea/license.terms
@@ -86,6 +81,16 @@ rm -rf %{buildroot}/*
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.36.0-2
+- Remove manual pkgconfig(*) provides in toolchain specs
+
+* Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.36.0-1
+- Update to version 3.36.0.
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.34.1-2
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.34.1-1
 - Update to 3.34.1 to fix CVE-2021-20227
 - Remove Obsoletes tags

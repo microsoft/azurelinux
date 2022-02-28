@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "apache-maven-3.6.3-build.tar.xz": "3f126061e5e8166700c6b63a367ac7e78a3b6b296334665c35a4e1e9706f31e4",
+  "apache-maven-3.6.3-src.tar.gz": "7c1c990ba64dd4f88688120cc2ec93bf33dd500d2a62ae5cd57bd4b7f6335c07",
+  "maven-bash-completion": "f9259d2b2399ee9c040af02a89c9e0bbd9ea0fe51c37af6ce35a4f4559ca6beb",
+  "mvn.1": "9681bbbae284bdfdc7ba5c2144fd9892da38f310977b7c2b44c73ddb863b987d"
+ }
+}

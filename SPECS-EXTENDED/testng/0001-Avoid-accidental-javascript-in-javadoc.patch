@@ -1,0 +1,25 @@
+From bce3019741aeb785658b23095ae408a6c2d8ca35 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Wed, 31 May 2017 13:44:36 +0200
+Subject: [PATCH 1/2] Avoid accidental javascript in javadoc
+
+---
+ src/main/java/org/testng/xml/TestNGContentHandler.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main/java/org/testng/xml/TestNGContentHandler.java b/src/main/java/org/testng/xml/TestNGContentHandler.java
+index 450678f..11543e3 100644
+--- a/src/main/java/org/testng/xml/TestNGContentHandler.java
++++ b/src/main/java/org/testng/xml/TestNGContentHandler.java
+@@ -245,7 +245,7 @@ public class TestNGContentHandler extends DefaultHandler {
+   }
+ 
+   /**
+-   * Parse <script>
++   * Parse &lt;script&gt;
+    */
+   private void xmlScript(boolean start, Attributes attributes) {
+     if (start) {
+-- 
+2.17.1
+

@@ -1,0 +1,11 @@
+--- a/src/p11_rsa.c	2019-04-03 21:58:18.000000000 +0200
++++ b/src/p11_rsa.c	2019-11-28 15:46:18.898258545 +0100
+@@ -478,7 +478,7 @@
+ 		if (ops == NULL)
+ 			return NULL;
+ 		RSA_meth_set1_name(ops, "libp11 RSA method");
+-		RSA_meth_set_flags(ops, 0);
++		RSA_meth_set_flags(ops, RSA_FLAG_FIPS_METHOD);
+ 		RSA_meth_set_priv_enc(ops, pkcs11_rsa_priv_enc_method);
+ 		RSA_meth_set_priv_dec(ops, pkcs11_rsa_priv_dec_method);
+ 		RSA_meth_set_finish(ops, pkcs11_rsa_free_method);

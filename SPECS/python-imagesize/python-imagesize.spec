@@ -1,7 +1,7 @@
 Summary:        python module to analyze jpeg/jpeg2000/png/gif image header and return image size.
 Name:           python-imagesize
 Version:        1.1.0
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,9 @@ URL:            https://github.com/shibukawa/imagesize_py
 #Source0:       https://github.com/shibukawa/imagesize_py/archive/%{version}.tar.gz
 Source0:        https://files.pythonhosted.org/packages/41/f5/3cf63735d54aa9974e544aa25858d8f9670ac5b4da51020bbfc6aaade741/imagesize-%{version}.tar.gz
 BuildArch:      noarch
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 python module to analyze jpeg/jpeg2000/png/gif image header and return image size.
@@ -37,10 +40,8 @@ Python 3 module to analyze jpeg/jpeg2000/png/gif image header and return image s
 %py3_install
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pytest pathlib2 pluggy
+pip3 install pytest pathlib2 pluggy
 %{python3} setup.py test
-popd
 
 %files -n python3-imagesize
 %license LICENSE.rst
@@ -48,6 +49,13 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.0-9
+- Add an explict BR on 'pip' to enable ptest
+- Remove stray `popd` in the `%check` section
+
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-8
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-7
 - Add license to python3 package
 - Remove python2 package

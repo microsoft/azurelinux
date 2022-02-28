@@ -1,0 +1,15 @@
+diff --git pflogsumm-1.1.5/pflogsumm.pl pflogsumm-1.1.5/pflogsumm.pl
+index 31de5bd..36384dd 100755
+--- pflogsumm-1.1.5/pflogsumm.pl
++++ pflogsumm-1.1.5/pflogsumm.pl
+@@ -398,8 +398,8 @@ Copyright (C) 1998-2010 by James S. Seymour, Release 1.1.5
+ use strict;
+ use locale;
+ use Getopt::Long;
+-eval { require Date::Calc };
+-my $hasDateCalc = $@ ? 0 : 1;
++require Date::Calc;
++my $hasDateCalc = 1;
+ 
+ my $mailqCmd = "mailq";
+ my $release = "1.1.5";

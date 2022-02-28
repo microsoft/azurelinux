@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "flatpak-1.8.5.tar.xz": "338dc47398ef0b9bd95d14b6a321f6ee4d9ae53fdb06dc0f8901d6440319d47c",
+  "flatpak-add-fedora-repos.service": "654860205493d1a6fa7c2aec813a52f07f6c2c3e64a799519654416d916a4a8c"
+ }
+}

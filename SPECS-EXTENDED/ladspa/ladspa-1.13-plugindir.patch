@@ -1,0 +1,25 @@
+--- src/search.c		2001-07-21 09:04:23.000000000 -0700
++++ src/search.c.plugindir	2007-10-09 04:43:30.000000000 -0700
+@@ -99,10 +99,7 @@
+ 
+   pcLADSPAPath = getenv("LADSPA_PATH");
+   if (!pcLADSPAPath) {
+-    fprintf(stderr,
+-	    "Warning: You do not have a LADSPA_PATH "
+-	    "environment variable set.\n");
+-    return;
++    pcLADSPAPath = PLUGINDIR;
+   }
+   
+   pcStart = pcLADSPAPath;
+--- src/load.c			2001-07-21 09:04:23.000000000 -0700
++++ src/load.c.plugindir	2007-10-09 04:42:47.000000000 -0700
+@@ -54,6 +54,8 @@
+        to search. */
+ 
+     pcLADSPAPath = getenv("LADSPA_PATH");
++    if (! pcLADSPAPath)
++      pcLADSPAPath = PLUGINDIR;
+     
+     if (pcLADSPAPath) {
+ 

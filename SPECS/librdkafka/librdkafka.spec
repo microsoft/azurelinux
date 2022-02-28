@@ -4,8 +4,8 @@
 %define _binary_payload w9.gzdio
 Summary:        The Apache Kafka C library
 Name:           librdkafka
-Version:        1.4.0
-Release:        2%{?dist}
+Version:        1.8.2
+Release:        1%{?dist}
 # files like src/crc32c.c are under zlib license
 # files like win32/wingetopt.c are under ISC
 # files like src/rdfnv1a.c are under Public Domain
@@ -21,7 +21,7 @@ BuildRequires:  cyrus-sasl-devel
 BuildRequires:  gcc >= 4.1
 BuildRequires:  libstdc++-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python2
+BuildRequires:  python3
 BuildRequires:  zlib-devel
 
 %description
@@ -63,9 +63,6 @@ examples/rdkafka_example -X builtin.features
 %install
 DESTDIR=%{buildroot} make install
 
-%clean
-rm -rf %{buildroot}
-
 %post   -n %{name}%{soname} -p /sbin/ldconfig
 %postun -n %{name}%{soname} -p /sbin/ldconfig
 
@@ -78,6 +75,7 @@ rm -rf %{buildroot}
 %doc %{_docdir}/librdkafka/CONFIGURATION.md
 %doc %{_docdir}/librdkafka/INTRODUCTION.md
 %doc %{_docdir}/librdkafka/STATISTICS.md
+%doc %{_docdir}/librdkafka/CHANGELOG.md
 %license %{_docdir}/librdkafka/LICENSE
 %doc %{_docdir}/librdkafka/LICENSES.txt
 
@@ -95,6 +93,14 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/rdkafka++-static.pc
 
 %changelog
+* Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 1.8.2-1
+- Upgrade to version 1.8.2
+- Use python3 as BR instead of python2
+- Add CHANGELOG.md to librdkafka1 package
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.0-3
+- Removing the explicit %%clean stage.
+
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-2
 - Updating BRs to pull in "cyrus-sasl-devel".
 

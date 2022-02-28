@@ -1,0 +1,24 @@
+DEBUGGING AND TRACING
+
+The VDPAU wrapper library supports tracing VDPAU function calls, and their
+parameters. This tracing is controlled by the following environment variables:
+
+VDPAU_TRACE
+
+    Enables tracing. Set to 1 to trace function calls. Set to 2 to trace all
+    arguments passed to the function.
+
+VDPAU_TRACE_FILE
+
+    Filename to write traces to. By default, traces are sent to stderr. This
+    variable may either contain a plain filename, or a reference to an
+    existing open file-descriptor in the format "&N" where N is the file
+    descriptor number.
+
+
+The VDPAU wrapper library is responsible for determining which vendor-specific
+driver to load for a given X11 display/screen. At present, it hard-codes
+"nvidia" as the driver. The environment variable VDPAU_DRIVER may be set to
+override this default. The actual library loaded will be
+libvdpau_${VDPAU_DRIVER}.so. Setting VDPAU_DRIVER to "trace" is not advised.
+

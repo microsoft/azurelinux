@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "README-replacement.in": "520f7e61d6af1594fcc1e23f12dbc614aed302b34a2b948e33bdda7164d8ef26",
+  "copy-patches.sh": "9e0112d9b85f80f48697ffefbb6cc3a1eda527ea5ff065f48e08440dfba573e8",
+  "guestfish.sh": "5efae0e6b38c7a137265bc1f3988dc9734a99a08a87ffbcfa1715aefe3982d29",
+  "libguestfs-1.44.0.tar.gz": "0ec7b44a4c50e928583c56099da31ceb9680766043bd7d468f3ca7b741c55d21",
+  "tdnf-build-cache.repo": "646e3ff6dddf3b088edf141796b6b081fe6f82dba6f1f7f32b426581a065c7c6",
+  "yum.conf.in": "2ca1e0ea6814436211715f14975e211263db10f09fca1fdef51c5aa3fe52a357"
+ }
+}

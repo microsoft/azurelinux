@@ -1,0 +1,112 @@
+From 6f0aa79c3e8dd93e723f29bf46e1b8b14403254f Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Mon, 5 Dec 2016 18:25:44 +0100
+Subject: [PATCH] Kerberos: fall back to tcp SRV lookup
+
+---
+ service/realm-kerberos-provider.c | 48 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 39 insertions(+), 9 deletions(-)
+
+diff --git a/service/realm-kerberos-provider.c b/service/realm-kerberos-provider.c
+index 2b3a0f8..1477ae8 100644
+--- a/service/realm-kerberos-provider.c
++++ b/service/realm-kerberos-provider.c
+@@ -19,6 +19,7 @@
+ #include "realm-kerberos-provider.h"
+ 
+ #include <errno.h>
++#include <string.h>
+ 
+ struct _RealmKerberosProvider {
+ 	RealmProvider parent;
+@@ -38,28 +39,54 @@ realm_kerberos_provider_init (RealmKerberosProvider *self)
+ 
+ }
+ 
++typedef struct {
++	gchar *name;
++	const char *prot;
++} NameProtPair;
++
++static void
++name_prot_pair_free (gpointer data)
++{
++	NameProtPair *name_prot_pair = data;
++	g_free (name_prot_pair->name);
++	g_free (name_prot_pair);
++}
++
+ static void
+ on_kerberos_discover (GObject *source,
+                       GAsyncResult *result,
+                       gpointer user_data)
+ {
+ 	GTask *task = G_TASK (user_data);
+-	const gchar *domain = g_task_get_task_data (task);
++	NameProtPair *name_prot_pair = g_task_get_task_data (task);
+ 	GError *error = NULL;
+ 	RealmDisco *disco;
+ 	GList *targets;
++	GResolver *resolver;
+ 
+ 	targets = g_resolver_lookup_service_finish (G_RESOLVER (source), result, &error);
+ 	if (targets) {
+ 		g_list_free_full (targets, (GDestroyNotify)g_srv_target_free);
+-		disco = realm_disco_new (domain);
+-		disco->kerberos_realm = g_ascii_strup (domain, -1);
++		disco = realm_disco_new (name_prot_pair->name);
++		disco->kerberos_realm = g_ascii_strup (name_prot_pair->name, -1);
+ 		g_task_return_pointer (task, disco, realm_disco_unref);
+ 
+ 	} else if (error) {
+-		g_debug ("Resolving %s failed: %s", domain, error->message);
++		g_debug ("Resolving %s failed: %s", name_prot_pair->name, error->message);
+ 		g_error_free (error);
+-		g_task_return_pointer (task, NULL, NULL);
++
++		if (strcmp (name_prot_pair->prot, "tcp") == 0) {
++			g_task_return_pointer (task, NULL, NULL);
++		} else {
++			/* Try tcp */
++			name_prot_pair->prot = "tcp";
++			resolver = g_resolver_get_default ();
++			g_resolver_lookup_service_async (resolver, "kerberos", name_prot_pair->prot,
++			                                 name_prot_pair->name,
++			                                 g_task_get_cancellable (task),
++			                                 on_kerberos_discover, g_object_ref (task));
++			g_object_unref (resolver);
++		}
+ 	}
+ 
+ 	g_object_unref (task);
+@@ -76,7 +103,7 @@ realm_kerberos_provider_discover_async (RealmProvider *provider,
+ 	GTask *task;
+ 	const gchar *software;
+ 	GResolver *resolver;
+-	gchar *name;
++	NameProtPair *name_prot_pair;
+ 
+ 	task = g_task_new (provider, NULL, callback, user_data);
+ 
+@@ -86,12 +113,15 @@ realm_kerberos_provider_discover_async (RealmProvider *provider,
+ 		g_task_return_pointer (task, NULL, NULL);
+ 
+ 	} else {
+-		name = g_hostname_to_ascii (string);
++		name_prot_pair = g_new0 (NameProtPair, 1);
++		name_prot_pair->name = g_hostname_to_ascii (string);
++		name_prot_pair->prot = "udp";
+ 		resolver = g_resolver_get_default ();
+-		g_resolver_lookup_service_async (resolver, "kerberos", "udp", name,
++		g_resolver_lookup_service_async (resolver, "kerberos", name_prot_pair->prot,
++		                                 name_prot_pair->name,
+ 		                                 realm_invocation_get_cancellable (invocation),
+ 		                                 on_kerberos_discover, g_object_ref (task));
+-		g_task_set_task_data (task, name, g_free);
++		g_task_set_task_data (task, name_prot_pair, name_prot_pair_free);
+ 		g_object_unref (resolver);
+ 	}
+ 
+-- 
+2.9.3
+

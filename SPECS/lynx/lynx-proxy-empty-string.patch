@@ -1,0 +1,26 @@
+From af24900d0964ed6c1cc8688ba8d2f8ccc75b239b Mon Sep 17 00:00:00 2001
+From: Thomas Crain <thcrain@microsoft.com>
+Date: Tue, 14 Dec 2021 11:52:12 -0800
+Subject: [PATCH 3/3] empty proxy patch
+
+---
+ WWW/Library/Implementation/HTAccess.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/WWW/Library/Implementation/HTAccess.c b/WWW/Library/Implementation/HTAccess.c
+index a79a8a2..b8b0df3 100644
+--- a/WWW/Library/Implementation/HTAccess.c
++++ b/WWW/Library/Implementation/HTAccess.c
+@@ -513,6 +513,9 @@ static int get_physical(const char *addr,
+ 	else
+ 	    sprintf(gateway_parameter, "%s_proxy", acc_method);
+ 	proxy = LYGetEnv(gateway_parameter);
++	if (proxy)
++		if (*proxy == '\0')
++			proxy = NULL;
+ 	FREE(gateway_parameter);
+ 
+ 	if (gateway)
+-- 
+2.25.1
+

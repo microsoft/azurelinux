@@ -1,0 +1,13 @@
+Index: commons-beanutils-1.9.4-src/build.xml
+===================================================================
+--- commons-beanutils-1.9.4-src.orig/build.xml
++++ commons-beanutils-1.9.4-src/build.xml
+@@ -43,7 +43,7 @@
+   <property name="component.title"         value="Bean Introspection Utilities"/>
+ 
+   <!-- The current version number of this component -->
+-  <property name="component.version"       value="1.9.3-SNAPSHOT"/>
++  <property name="component.version"       value="1.9.4"/>
+ 
+   <!-- The base directory for compilation targets -->
+   <property name="build.home"              value="target"/>

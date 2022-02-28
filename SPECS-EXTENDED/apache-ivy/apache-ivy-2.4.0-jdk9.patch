@@ -1,0 +1,22 @@
+--- apache-ivy-2.3.0/build.properties	2012-04-02 23:11:30.000000000 +0200
++++ apache-ivy-2.3.0/build.properties	2017-09-07 14:13:28.647597540 +0200
+@@ -42,7 +42,7 @@
+ checkstyle.src.dir=${basedir}/src/etc/checkstyle
+ rat.report.dir=${reports.dir}/rat
+ 
+-ivy.minimum.javaversion=1.5
++ivy.minimum.javaversion=1.8
+ debug.mode=on
+ ivy.install.version=1.4.1
+ 
+--- apache-ivy-2.3.0/build.xml	2012-04-09 08:58:36.000000000 +0200
++++ apache-ivy-2.3.0/build.xml	2017-09-07 14:46:13.128164218 +0200
+@@ -517,7 +517,7 @@
+ 	</target>
+ 
+     <target name="javadoc" unless="skip.javadoc">
+-        <javadoc destdir="${javadoc.build.dir}" useexternalfile="true">
++        <javadoc destdir="${javadoc.build.dir}" useexternalfile="false" source="${ivy.minimum.javaversion}">
+             <fileset dir="${src.dir}" includes="**/*.java" />
+         </javadoc>
+     </target>

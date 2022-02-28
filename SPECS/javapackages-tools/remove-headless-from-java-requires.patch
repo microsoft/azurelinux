@@ -1,0 +1,304 @@
+diff --git a/etc/javapackages-config.json b/etc/javapackages-config.json
+index 601fedcb..2e94ceb2 100644
+--- a/etc/javapackages-config.json
++++ b/etc/javapackages-config.json
+@@ -4,7 +4,7 @@
+             "javapackages-filesystem"
+         ],
+         "java_requires": {
+-            "package_name": "java-headless",
++            "package_name": "java",
+             "always_generate": true,
+             "skip": false
+         },
+diff --git a/test/data/config/filtered/javapackages-config.json b/test/data/config/filtered/javapackages-config.json
+index 7951d913..3feb345a 100644
+--- a/test/data/config/filtered/javapackages-config.json
++++ b/test/data/config/filtered/javapackages-config.json
+@@ -4,7 +4,7 @@
+             "javapackages-tools"
+         ],
+         "java_requires": {
+-            "package_name": "java-headless",
++            "package_name": "java",
+             "always_generate": true,
+             "skip": false
+         },
+diff --git a/test/maven_req_test.py b/test/maven_req_test.py
+index b5ea4456..377b6143 100644
+--- a/test/maven_req_test.py
++++ b/test/maven_req_test.py
+@@ -21,7 +21,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_require1(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                 "mvn(org.apache.maven:maven-project)")
+         self.assertEqual(set(want), set(sout))
+ 
+@@ -30,7 +30,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1.6")
++                "java >= 1.6")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java2/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -38,7 +38,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1.8")
++                "java >= 1.8")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java3/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -46,7 +46,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 1.8")
++                "java >= 1.8")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java9/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -54,7 +54,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 9")
++                "java >= 9")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java10/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -62,7 +62,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 10")
++                "java >= 10")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java9and10/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -70,7 +70,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "mvn(org.apache.maven:maven-project)",
+-                "java-headless >= 10")
++                "java >= 10")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-java-fail/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -83,7 +83,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_require_parent(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                 "ns-mvn(org.codehaus.plexus:plexus-ant-factory)")
+         self.assertEqual(set(want), set(sout))
+ 
+@@ -92,7 +92,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("javapackages-filesystem", "ns-mvn(org.codehaus.plexus:plexus-ant-factory)",
+-                "ns-mvn(codehaus:plexus-utils) = 1.2", "java-headless",
++                "ns-mvn(codehaus:plexus-utils) = 1.2", "java",
+                 "mvn(org.apache.maven.wagon:wagon-provider-api::test-jar:)")
+         self.assertEqual(set(want), set(sout))
+ 
+@@ -100,7 +100,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_require_multi_namespace(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                 "ns2-mvn(codehaus:plexus-cipher)", "ns-mvn(codehaus:plexus-utils)",
+                 "mvn(org.apache.maven.wagon:wagon-provider-api::test-jar:)")
+         self.assertEqual(set(want), set(sout))
+@@ -109,7 +109,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_require_multi_versioned(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("java-headless", "javapackages-filesystem",
++        want = ("java", "javapackages-filesystem",
+                 "ns-mvn(org.codehaus.plexus:plexus-ant-factory:1.0) = 1.0",
+                 "ns-mvn(codehaus:plexus-utils:1.2)",
+                 "ns-mvn(codehaus:plexus-cipher:1.0) = 1.1",
+@@ -121,7 +121,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_mixed(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                 "ns-mvn(org.codehaus.plexus:plexus-ant-factory)",
+                 "ns-mvn(codehaus:plexus-utils) = 1.2",
+                 "mvn(org.apache.maven.wagon:wagon-provider-api::test-jar:)",
+@@ -132,7 +132,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_simple_subpackage(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                 "mvn(org.apache.maven:maven-plugin-api) = 3.2.1")
+         self.assertEqual(set(want), set(sout))
+ 
+@@ -140,7 +140,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_simple_subpackage2(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                 "mvn(org.apache.maven:maven-plugin-api) = 3.2.1",
+                 "mvn(org.codehaus.plexus:plexus-utils)")
+         self.assertEqual(set(want), set(sout))
+@@ -149,7 +149,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_simple_subpackage3(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                  "mvn(org.apache.maven:maven-plugin-api:3.2.0) = 3.2.1")
+         self.assertEqual(set(want), set(sout))
+ 
+@@ -157,7 +157,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_simple_subpackage4(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                 "mvn(org.apache.maven:maven-plugin-api)")
+         self.assertEqual(set(want), set(sout))
+ 
+@@ -165,7 +165,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_simple_artifact_in_same_package(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless")
++        want = ("javapackages-filesystem", "java")
+         self.assertEqual(set(want), set(sout))
+ 
+     #test for rhbz#1012980
+@@ -183,7 +183,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_rhbz1017701_c2(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless",
++        want = ("javapackages-filesystem", "java",
+                 "maven31-mvn(org.eclipse.aether:aether-api) = 0.9.0.M3")
+         self.assertEqual(set(want), set(sout))
+ 
+@@ -200,7 +200,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_dep_filtering(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("ns-mvn(org.codehaus.plexus:plexus-ant-factory)", "java-headless",
++        want = ("ns-mvn(org.codehaus.plexus:plexus-ant-factory)", "java",
+                 "mvn(org.apache.maven.wagon:wagon-provider-api::test-jar:)",
+                 "javapackages-tools")
+         self.assertEqual(set(want), set(sout))
+@@ -209,7 +209,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_config_env1(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("ns-mvn(org.codehaus.plexus:plexus-ant-factory)", "java-headless",
++        want = ("ns-mvn(org.codehaus.plexus:plexus-ant-factory)", "java",
+                 "mvn(org.apache.maven.wagon:wagon-provider-api::test-jar:)",
+                 "javapackages-tools")
+         self.assertEqual(set(want), set(sout))
+@@ -219,7 +219,7 @@ class TestMavenReq(unittest.TestCase):
+     def test_config_env2(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("ns-mvn(org.codehaus.plexus:plexus-ant-factory)", "java-headless",
++        want = ("ns-mvn(org.codehaus.plexus:plexus-ant-factory)", "java",
+                 "mvn(org.apache.maven.wagon:wagon-provider-api::test-jar:)",
+                 "javapackages-tools")
+         self.assertEqual(set(want), set(sout))
+@@ -230,7 +230,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("mvn(org.fedoraproject.xmvn:xmvn-core)",
+-                "java-headless", "javapackages-filesystem",
++                "java", "javapackages-filesystem",
+                 "mvn(org.fedoraproject.xmvn:xmvn-api)")
+         self.assertEqual(set(want), set(sout))
+ 
+@@ -240,7 +240,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("mvn(plugin:external)", "javapackages-filesystem",
+-                "mvn(ppom:parent-pom:pom:)", "java-headless")
++                "mvn(ppom:parent-pom:pom:)", "java")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require4/buildroot/usr/share/maven-metadata/require.xml"],
+@@ -249,7 +249,7 @@ class TestMavenReq(unittest.TestCase):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("mvn(extension:from-subpackage) = 1.1", "javapackages-filesystem",
+-                "mvn(ppom:parent-pom:pom:)", "java-headless")
++                "mvn(ppom:parent-pom:pom:)", "java")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require5/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -270,28 +270,28 @@ class TestMavenReq(unittest.TestCase):
+     def test_osgi_basic(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("osgi(osgi.req1)", "javapackages-filesystem", "java-headless")
++        want = ("osgi(osgi.req1)", "javapackages-filesystem", "java")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["osgi_self/buildroot/usr/share/maven-metadata/require.xml"])
+     def test_osgi_self(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("javapackages-filesystem", "java-headless")
++        want = ("javapackages-filesystem", "java")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["osgi_versioned/buildroot/usr/share/maven-metadata/require.xml"])
+     def test_osgi_versioned(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("osgi(osgi.req1) = 1.0", "javapackages-filesystem", "java-headless")
++        want = ("osgi(osgi.req1) = 1.0", "javapackages-filesystem", "java")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["osgi_versioned_ns/buildroot/usr/share/maven-metadata/require.xml"])
+     def test_osgi_versioned_ns(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("devtoolset-3-osgi(osgi.req1) = 1.0", "javapackages-filesystem", "java-headless")
++        want = ("devtoolset-3-osgi(osgi.req1) = 1.0", "javapackages-filesystem", "java")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["dashes/buildroot/usr/share/maven-metadata/require.xml"])
+@@ -300,21 +300,21 @@ class TestMavenReq(unittest.TestCase):
+         sout = [x for x in stdout.split('\n') if x]
+         want = ("mvn(org.apache.maven:maven-plugin-api) = 1.alpha.2",
+                 "osgi(osgi2) = 1.5.1.SNAPSHOT",
+-                "java-headless", "javapackages-filesystem")
++                "java", "javapackages-filesystem")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require_optional/buildroot/usr/share/maven-metadata/require.xml"])
+     def test_optional(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("mvn(dg:da)", "java-headless", "javapackages-filesystem")
++        want = ("mvn(dg:da)", "java", "javapackages-filesystem")
+         self.assertEqual(set(want), set(sout))
+ 
+     @mavenreq(["require-no-artifacts/buildroot/usr/share/maven-metadata/require.xml"])
+     def test_no_artifacts(self, stdout, stderr, return_value):
+         self.assertEqual(return_value, 0, stderr)
+         sout = [x for x in stdout.split('\n') if x]
+-        want = ("java-headless", "javapackages-filesystem")
++        want = ("java", "javapackages-filesystem")
+         self.assertEqual(set(want), set(sout))
+ 
+ if __name__ == '__main__':

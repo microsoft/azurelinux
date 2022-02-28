@@ -2,16 +2,16 @@
 Summary:	An exporter with the features of Sub::Exporter but only core dependencies
 Name:		perl-Exporter-Tiny
 Version:	1.002001
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:	(GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Exporter-Tiny/
 Source0:	https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-%{version}.tar.gz
-%define sha1 Exporter-Tiny=9ecca5df5613f948a0d50335ba9fd7854238464b
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Carp)
@@ -50,9 +50,6 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %license LICENSE
 %{perl_vendorlib}/Exporter/
@@ -61,6 +58,13 @@ rm -rf %{buildroot}
 %{_mandir}/man3/Exporter::Tiny::Manual*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.002001-6
+- Adding 'BuildRequires: perl-generators'.
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.002001-5
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 1.002001-4
 - Use new perl package names.
 - Provide perl(Exporter::*).

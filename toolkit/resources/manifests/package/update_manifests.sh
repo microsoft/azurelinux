@@ -57,7 +57,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/e2fsprogs-[0-9]/d' $TmpPkgGen
     sed -i '/e2fsprogs-devel/d' $TmpPkgGen
     sed -i '/e2fsprogs-lang/d' $TmpPkgGen
-    sed -i '/openj/d' $TmpPkgGen
     sed -i '/freetype2/d' $TmpPkgGen
     sed -i '/gfortran/d' $TmpPkgGen
     sed -i '/glib-devel/d' $TmpPkgGen
@@ -71,7 +70,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
-    sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libselinux-[[:alpha:]]/d' $TmpPkgGen
@@ -80,7 +78,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
     sed -i '/lua-devel/d' $TmpPkgGen
-    sed -ri '/mariner-repos-(extras|ui|microsoft)/d' $TmpPkgGen
+    sed -ri '/mariner-repos-(debuginfo|extended|extras|microsoft)/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
     sed -i '/perl-5/d' $TmpPkgGen
@@ -246,7 +244,6 @@ generate_pkggen_core () {
         grep "^popt-" $TmpPkgGen
         grep "^nspr-" $TmpPkgGen
         grep "^sqlite-" $TmpPkgGen
-        grep "^nss-" $TmpPkgGen
         grep "^elfutils-" $TmpPkgGen
         grep "^expat-" $TmpPkgGen
         grep "^libpipeline-" $TmpPkgGen
@@ -257,7 +254,6 @@ generate_pkggen_core () {
         grep "^automake-" $TmpPkgGen
         grep "^openssl-" $TmpPkgGen
         grep "^libcap-" $TmpPkgGen
-        grep "^libdb-" $TmpPkgGen
         grep "^debugedit-" $TmpPkgGen
         grep "^rpm-" $TmpPkgGen
         grep "^cpio-" $TmpPkgGen
@@ -284,7 +280,8 @@ generate_pkggen_core () {
         grep "^pinentry-" $TmpPkgGen
         grep "^gnupg2-" $TmpPkgGen
         grep "^gpgme-" $TmpPkgGen
-        grep "^mariner-repos-" $TmpPkgGen
+        grep "^mariner-repos-shared" $TmpPkgGen
+        grep "^mariner-repos-preview" $TmpPkgGen
         grep "^libffi-" $TmpPkgGen
         grep "^libtasn1-" $TmpPkgGen
         grep "^p11-kit-" $TmpPkgGen
@@ -297,6 +294,11 @@ generate_pkggen_core () {
         grep "^python3-" $TmpPkgGen
         grep "^which-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
+        grep "^slang-[0-9]" $TmpPkgGen
+        grep "^newt-[0-9]" $TmpPkgGen
+        grep "^chkconfig-[0-9]" $TmpPkgGen
+        grep "^msopenjdk-" $TmpPkgGen
+        grep "^pyproject-" $TmpPkgGen
     } > "$1"
 }
 

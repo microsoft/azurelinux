@@ -1,0 +1,12 @@
+diff -up libvpx-1.7.0/build/make/configure.sh.leave-fs-on libvpx-1.7.0/build/make/configure.sh
+--- libvpx-1.7.0/build/make/configure.sh.leave-fs-on	2018-01-26 15:02:18.767645332 -0500
++++ libvpx-1.7.0/build/make/configure.sh	2018-01-26 15:02:28.594420775 -0500
+@@ -1440,7 +1440,7 @@ EOF
+ 
+   # Work around longjmp interception on glibc >= 2.11, to improve binary
+   # compatibility. See http://code.google.com/p/webm/issues/detail?id=166
+-  enabled linux && check_add_cflags -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0
++  # enabled linux && check_add_cflags -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0
+ 
+   # Check for strip utility variant
+   ${STRIP} -V 2>/dev/null | grep GNU >/dev/null && enable_feature gnu_strip

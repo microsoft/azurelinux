@@ -1,0 +1,47 @@
+From 215a01f1513f918e7295a8a477d4674f7b8085f0 Mon Sep 17 00:00:00 2001
+From: Giuseppe Bilotta <giuseppe.bilotta@gmail.com>
+Date: Wed, 18 Jan 2017 08:52:23 +0100
+Subject: [PATCH app/xrandr] xrandr: suppress misleading indentation warning
+
+When printing out rotations, we print a space before any item other than
+the first, and set `first = False` in each block where we print.
+However, this is done in the same line as the conditional that checks if
+first is set, which may give the impression that the assignment is also
+under the conditional. This is not the case, and recent GCC warns about
+this.
+
+Move the assignment to after we print the value we want to print, which
+(1) doesn't mislead about the indentation, and
+(2) makes logical sense as the _next_ entry is what won't be the first.
+
+Signed-off-by: Giuseppe Bilotta <giuseppe.bilotta@gmail.com>
+---
+ xrandr.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/xrandr.c b/xrandr.c
+index dcfdde0..2aad946 100644
+--- a/xrandr.c
++++ b/xrandr.c
+@@ -3703,14 +3703,16 @@ main (int argc, char **argv)
+ 		printf (" (");
+ 		for (i = 0; i < 4; i ++) {
+ 		    if ((rotations >> i) & 1) {
+-			if (!first) printf (" "); first = False;
++			if (!first) printf (" ");
+ 			printf("%s", direction[i]);
++			first = False;
+ 		    }
+ 		}
+ 		if (rotations & RR_Reflect_X)
+ 		{
+-		    if (!first) printf (" "); first = False;
++		    if (!first) printf (" ");
+ 		    printf ("x axis");
++		    first = False;
+ 		}
+ 		if (rotations & RR_Reflect_Y)
+ 		{
+-- 
+2.17.1
+

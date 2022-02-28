@@ -1,0 +1,41 @@
+From 895e5b37d14090541480cebcb297846cbd3662ce Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Fri, 25 Nov 2016 17:35:11 +0100
+Subject: [PATCH] LDAP: don't close LDAP socket twice
+
+ldap_destroy() will call close() on the LDAP socket so with an explicit
+close() before the file descriptor will be closed twice. Even worse,
+since the file descriptor can be reused after the explicit call of
+close() by any other thread the close() called from ldap_destroy() might
+close a file descriptor used by a different thread as seen e.g. in
+https://bugzilla.redhat.com/show_bug.cgi?id=1398522.
+
+Additionally the patch makes sure that the closed connection cannot be
+used again.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1398522
+---
+ service/realm-ldap.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/service/realm-ldap.c b/service/realm-ldap.c
+index 061ed61..59817fb 100644
+--- a/service/realm-ldap.c
++++ b/service/realm-ldap.c
+@@ -159,10 +159,11 @@ ldap_source_finalize (GSource *source)
+ {
+ 	LdapSource *ls = (LdapSource *)source;
+ 
+-	/* Yeah, this is pretty rough, but we don't want blocking here */
+-	close (ls->sock);
+ 	ldap_destroy (ls->ldap);
+ 
++	ls->sock = -1;
++	ls->ldap = NULL;
++
+ 	if (ls->cancellable) {
+ 		g_cancellable_release_fd (ls->cancellable);
+ 		g_object_unref (ls->cancellable);
+-- 
+2.9.3
+

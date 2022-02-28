@@ -1,13 +1,13 @@
 Summary:        Boost
 Name:           boost
-Version:        1.66.0
-Release:        4%{?dist}
+Version:        1.76.0
+Release:        1%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.boost.org/
-Source0:        https://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2
+Source0:        https://downloads.sourceforge.net/boost/boost_1_76_0.tar.bz2
 BuildRequires:  bzip2-devel
 
 %description
@@ -33,7 +33,7 @@ Requires:       %{name} = %{version}-%{release}
 The boost-static package contains boost static libraries.
 
 %prep
-%autosetup -n %{name}_1_66_0
+%autosetup -n %{name}_1_76_0
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
@@ -41,6 +41,7 @@ The boost-static package contains boost static libraries.
 
 %install
 ./b2 install threading=multi
+rm -rf %{buildroot}%{_libdir}/cmake
 
 %ldconfig_scriptlets
 
@@ -59,6 +60,9 @@ The boost-static package contains boost static libraries.
 %{_libdir}/libboost_*.a
 
 %changelog
+* Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.76.0-1
+- Update version to 1.76.0
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.66.0-4
 - Add signals subpackage provide from the devel subpackage
 - License verified, changed to use short name

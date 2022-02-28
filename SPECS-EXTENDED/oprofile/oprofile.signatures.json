@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "baselibs.conf": "4683bf4781539ede9cc3c4638bf94409da0c2de217ee2e428fe6a73540779e97",
+  "jvmpi.h": "99585453b86fae8550f4840bc1dd39a3b45b635ef382a7a60667312351f9dd0a",
+  "oprofile-1.4.0.tar.gz": "7ba06f99d7c188389d20d1d5e53ee690c7733f87aa9af62bd664fa0ca235a412"
+ }
+}

@@ -1,4 +1,4 @@
-From ccb9d70a0dad7c42f926f1680ae708a5ae3d3696 Mon Sep 17 00:00:00 2001
+From 49dc2a687175f9671a159df38971a15287dae18c Mon Sep 17 00:00:00 2001
 From: Chris Leech <cleech@redhat.com>
 Date: Mon, 24 Feb 2014 09:33:33 -0800
 Subject: [PATCH] Revert "iscsiadm: return error when login fails"
@@ -30,5 +30,5 @@ index 0500f15..1e1f2bc 100644
  	}
  
 -- 
-2.21.0
+2.26.2
 

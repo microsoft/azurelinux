@@ -1,0 +1,128 @@
+.\"  -*- nroff -*-
+.\"
+.Dd January 2, 2013
+.Dt IVY 1
+.Os
+.Sh NAME
+.Nm ivy
+.Nd Ivy depedency manager
+.Sh SYNOPSIS
+.Nm ivy
+.Bk -words
+.Op options ...
+.Ek
+.Sh DESCRIPTION
+.Nm
+invokes the Ivy dependency manager from the command line.
+.Sh OPTIONS
+.Ss Settings Options
+.Bl -tag -width Ds
+.It Fl settings Ar settingsfile
+Use given file for settings.
+.It Fl cache Ar cachedir
+Use given directory for cache.
+.It Fl novalidate
+Do not validate ivy files against xsd.
+.It Fl m2compatible
+Use maven2 compatibility.
+.El
+.Ss Resolve Options
+.Bl -tag -width Ds
+.It Fl ivy Ar ivyfile
+Use given file as ivy file.
+.It Fl refresh
+Refresh dynamic resolved revisions.
+.It Fl dependency Ar organisation Ar module Ar revision 
+Use this instead of ivy file to do the rest of the
+work with this as a dependency.
+.It Fl confs Ar configurations
+Resolve given configurations.
+.It Fl types Ar types
+Comma separated list of accepted artifact types.
+.It Fl mode Ar resolvemode
+The resolve mode to use.
+.It Fl notransitive
+Do not resolve dependencies transitively.
+.El
+.Ss Retrieve Options
+.Bl -tag -width Ds
+.It Fl retrieve Ar retrievepattern
+Use given pattern as retrieve pattern.
+.It Fl ivypattern Ar pattern
+Use given pattern to copy the ivy files.
+.It Fl sync
+Use sync mode for retrieve.
+.It Fl symlink
+Create symbolic links.
+.El
+.Ss Cache Path Options
+.Bl -tag -width Ds
+.It Fl cachepath Ar cachepathfile
+Outputs a classpath consisting of all dependencies
+in cache (including transitive ones) of the given
+ivy file to the given
+.Ar cachepathfile .
+.El
+.Ss Deliver Options
+.Bl -tag -width Ds
+.It Fl deliverto Ar ivypattern
+Use given pattern as resolved ivy file pattern.
+.El
+.Ss Publish Options
+.Bl -tag -width Ds
+.It Fl publish Ar resolvername
+Use given resolver to publish to.
+.It Fl publishpattern Ar artpattern
+Use given pattern to find artifacts to publish.
+.It Fl revision Ar revision
+Use given revision to publish the module.
+.It Fl status Ar status
+Use given status to publish the module.
+.It Fl overwrite
+Overwrite files in the repository if they exist.
+.El
+.Ss HTTP Auth Options
+.Bl -tag -width Ds
+.It Fl realm Ar realm
+Use given realm for HTTP AUTH.
+.It Fl host Ar host
+Use given host for HTTP AUTH.
+.It Fl username Ar username
+Use given username for HTTP AUTH.
+.It Fl passwd Ar passwd
+Use given password for HTTP AUTH.
+.El
+.Ss Launcher Options
+.Bl -tag -width Ds
+.It Fl main Ar main
+The FQCN of the main class to launch.
+.It Fl args Ar args
+The arguments to give to the launched process.
+.It Fl cp Ar cp
+Extra classpath to use when launching process.
+.El
+.Ss Message Options
+.Bl -tag -width Ds
+.It Fl debug
+Set message level to debug.
+.It Fl verbose
+Set message level to verbose.
+.It Fl warn
+Set message level to warn.
+.It Fl error
+Set message level to error.
+.El
+.Ss Help Options
+.Bl -tag -width Ds
+.It Fl ?
+Display this help.
+.It Fl deprecated
+Show deprecated options.
+.It Fl version
+Displays version information.
+.El
+.Sh SEE ALSO
+.Rs
+.%T "Ivy: The agile dependency manager"
+.%O http://ant.apache.org/ivy/
+.Re

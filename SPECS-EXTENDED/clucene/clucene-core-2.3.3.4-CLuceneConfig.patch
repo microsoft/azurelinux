@@ -1,0 +1,14 @@
+diff -up clucene-core-2.3.3.4/src/core/CMakeLists.txt.CLuceneConfig.cmake clucene-core-2.3.3.4/src/core/CMakeLists.txt
+--- clucene-core-2.3.3.4/src/core/CMakeLists.txt.CLuceneConfig.cmake	2011-03-16 19:21:07.000000000 -0500
++++ clucene-core-2.3.3.4/src/core/CMakeLists.txt	2014-10-07 19:32:17.042894690 -0500
+@@ -251,8 +251,8 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/
+     set(CLUCENE_VERSION ${CLUCENE_VERSION})
+     set(CLUCENE_SOVERSION ${CLUCENE_SOVERSION})
+ ")
+-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CLuceneConfig.cmake"
+-        DESTINATION ${LIB_DESTINATION}/CLuceneConfig.cmake)
++#install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CLuceneConfig.cmake"
++#        DESTINATION ${LIB_DESTINATION}/CLuceneConfig.cmake)
+ 
+ # install pkg-config file
+ IF(NOT WIN32)

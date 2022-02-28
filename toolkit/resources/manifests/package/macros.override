@@ -20,6 +20,7 @@
 %skip_check_gtk_doc 1
 %skip_check_tdnf 1
 %skip_check_vim 1
+%skip_check_gnutls 1
 
 # Chmods /dev/null to 600 breaking many non-root applications.
 %skip_check_zstd 1

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>jaxen</groupId>
+  <artifactId>jaxen</artifactId>
+  <name>jaxen</name>
+  <version>1.1.1</version>
+  <description>Jaxen is a universal Java XPath engine.</description>
+  <url>http://jaxen.codehaus.org/</url>
+  <issueManagement>
+    <url>http://jira.codehaus.org/BrowseProject.jspa?id=10022</url>
+  </issueManagement>
+  <ciManagement>
+    <notifiers>
+      <notifier>
+        <configuration>
+          <address>dev@jaxen.codehaus.org</address>
+        </configuration>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+  <inceptionYear>2001</inceptionYear>
+  <mailingLists>
+    <mailingList>
+      <name>Jaxen Users List</name>
+      <subscribe>user-subscribe@jaxen.codehaus.org</subscribe>
+      <unsubscribe>user-unsubscribe@jaxen.codehaus.org</unsubscribe>
+      <archive>http://archive.jaxen.codehaus.org/user/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Jaxen Developers List</name>
+      <subscribe>dev-subscribe@jaxen.codehaus.org</subscribe>
+      <unsubscribe>dev-unsubscribe@jaxen.codehaus.org</unsubscribe>
+      <archive>http://archive.jaxen.codehaus.org/dev/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Jaxen CVS Commits List</name>
+      <subscribe>scm-subscribe@jaxen.codehaus.org</subscribe>
+      <unsubscribe>scm-unsubscribe@jaxen.codehaus.org</unsubscribe>
+      <archive>http://archive.jaxen.codehaus.org/scm/</archive>
+    </mailingList>
+  </mailingLists>
+  <developers>
+    <developer>
+      <id>bob</id>
+      <name>Bob McWhirter</name>
+      <email>bob@eng.werken.com</email>
+      <organization>The Werken Company</organization>
+    </developer>
+    <developer>
+      <id>jstrachan</id>
+      <name>James Strachan</name>
+      <email>james_strachan@yahoo.co.uk</email>
+      <organization>Spiritsoft</organization>
+    </developer>
+    <developer>
+      <id>dmegginson</id>
+      <name>David Megginson</name>
+      <email>contact@megginson.com</email>
+      <organization>Megginson Technologies</organization>
+    </developer>
+    <developer>
+      <id>eboldwidt</id>
+      <name>Erwin Bolwidt</name>
+      <email>erwin@klomp.org</email>
+    </developer>
+    <developer>
+      <id>mbelonga</id>
+      <name>Mark A. Belonga</name>
+      <email>mbelonga@users.sourceforge.net</email>
+    </developer>
+    <developer>
+      <id>cnentwich</id>
+      <name>Christian Nentwich</name>
+      <email>xcut@users.sourceforge.net</email>
+    </developer>
+    <developer>
+      <id>purpletech</id>
+      <name>Alexander Day Chaffee</name>
+      <email>purpletech@users.sourceforge.net</email>
+      <organization>Purple Technologies</organization>
+    </developer>
+    <developer>
+      <id>jdvorak</id>
+      <name>Jan Dvorak</name>
+      <email>jdvorak@users.sourceforge.net</email>
+    </developer>
+    <developer>
+      <id>szegedia</id>
+      <name>Attila Szegedi</name>
+      <email>szegedia@users.sourceforge.net</email>
+    </developer>
+    <developer>
+      <id>proyal</id>
+      <name>Peter Royal</name>
+      <email>peter.royal@pobox.com</email>
+      <url>http://fotap.org/~osi</url>
+    </developer>
+    <developer>
+      <id>ssanders</id>
+      <name>Scott Sanders</name>
+      <email>scott@dotnot.org</email>
+      <url>http://dotnot.org/blog</url>
+      <organization>dotnot</organization>
+    </developer>
+    <developer>
+      <id>bewins</id>
+      <name>Brian Ewins</name>
+      <email>brian.ewins@gmail.com</email>
+    </developer>
+    <developer>
+      <id>elharo</id>
+      <name>Elliotte Rusty Harold</name>
+      <email>elharo@metalab.unc.edu</email>
+      <url>http://www.elharo.com/</url>
+      <organization>Cafe au Lait</organization>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Ryan Gustafson</name>
+      <email>rgustav@users.sourceforge.net</email>
+    </contributor>
+    <contributor>
+      <name>David Peterson</name>
+      <email>david@randombits.org</email>
+    </contributor>
+    <contributor>
+      <name>Mark Wilson</name>
+      <email>mark.wilson@wilsoncom.de</email>
+    </contributor>
+    <contributor>
+      <name>Jacob Kjome</name>
+      <email>hoju@visi.com</email>
+    </contributor>
+    <contributor>
+      <name>Michael Brennan</name>
+      <email>mpbrennan@earthlink.net</email>
+    </contributor>
+    <contributor>
+      <name>Jason Hunter</name>
+      <email>jhunter@xquery.com</email>
+    </contributor>
+    <contributor>
+      <name>Brett Mclaughlin</name>
+      <email>brett.mclaughlin@lutris.com</email>
+    </contributor>
+    <contributor>
+      <name>Bradley S. Huffman</name>
+      <email>hip@cs.okstate.edu</email>
+    </contributor>
+    <contributor>
+      <name>K. Ari Krupnikov</name>
+      <email>ari@lib.aero</email>
+    </contributor>
+    <contributor>
+      <name>Paul R. Brown</name>
+      <email>prb@fivesight.com</email>
+    </contributor>
+    <contributor>
+      <name>Guoliang Cao</name>
+      <email>cao@ispsoft.com</email>
+    </contributor>
+    <contributor>
+      <name>J??r??me N??gre</name>
+      <email>jerome.negre@e-xmlmedia.fr</email>
+    </contributor>
+    <contributor>
+      <name>Eddie McGreal</name>
+      <email>emcgreal@BlackPearl.com</email>
+    </contributor>
+    <contributor>
+      <name>Steen Lehmann</name>
+      <email>slehmann@users.sourceforge.net</email>
+    </contributor>
+  </contributors>
+  <scm>
+    <connection>scm:cvs:pserver:anonymous@cvs.jaxen.codehaus.org:/cvs/jaxen:jaxen</connection>
+    <url>http://cvs.jaxen.codehaus.org</url>
+  </scm>
+  <organization>
+    <name>Codehaus</name>
+    <url>http://codehaus.org</url>
+  </organization>
+  <build>
+    <sourceDirectory>src/java/main</sourceDirectory>
+    <testSourceDirectory>src/java/test</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>maven-plugins</groupId>
+        <artifactId>maven-cobertura-plugin</artifactId>
+        <version>1.3</version>
+        <configuration />
+      </plugin>
+      <plugin>
+        <groupId>maven-plugins</groupId>
+        <artifactId>maven-findbugs-plugin</artifactId>
+        <version>1.3.1</version>
+        <configuration />
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.3.02</version>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.6.2</version>
+    </dependency>
+    <dependency>
+      <groupId>xom</groupId>
+      <artifactId>xom</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>default</id>
+      <name>Default Repository</name>
+      <url>file:///dist</url>
+    </repository>
+    <site>
+      <id>default</id>
+      <name>Default Site</name>
+      <url>scp://jaxen.codehaus.org//home/projects/jaxen/public_html</url>
+    </site>
+    <status>converted</status>
+  </distributionManagement>
+</project>

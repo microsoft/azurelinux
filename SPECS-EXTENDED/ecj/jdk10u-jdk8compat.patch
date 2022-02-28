@@ -1,0 +1,149 @@
+--- java10api-src/javax/lang/model/util/AbstractAnnotationValueVisitor6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/AbstractAnnotationValueVisitor6.java	2019-09-25 10:43:47.764821845 +0200
+@@ -75,7 +75,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected AbstractAnnotationValueVisitor6() {}
+ 
+     /**
+--- java10api-src/javax/lang/model/util/AbstractElementVisitor6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/AbstractElementVisitor6.java	2019-09-25 10:44:11.829001049 +0200
+@@ -75,7 +75,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected AbstractElementVisitor6(){}
+ 
+     /**
+--- java10api-src/javax/lang/model/util/AbstractTypeVisitor6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/AbstractTypeVisitor6.java	2019-09-25 10:43:54.596872718 +0200
+@@ -74,7 +74,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected AbstractTypeVisitor6() {}
+ 
+     /**
+--- java10api-src/javax/lang/model/util/ElementKindVisitor6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/ElementKindVisitor6.java	2019-09-25 10:45:46.301704594 +0200
+@@ -91,7 +91,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected ElementKindVisitor6() {
+         super(null);
+     }
+@@ -104,7 +103,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected ElementKindVisitor6(R defaultValue) {
+         super(defaultValue);
+     }
+--- java10api-src/javax/lang/model/util/ElementScanner6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/ElementScanner6.java	2019-09-25 10:45:07.805417912 +0200
+@@ -106,7 +106,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected ElementScanner6(){
+         DEFAULT_VALUE = null;
+     }
+@@ -119,7 +118,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected ElementScanner6(R defaultValue){
+         DEFAULT_VALUE = defaultValue;
+     }
+--- java10api-src/javax/lang/model/util/SimpleAnnotationValueVisitor6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/SimpleAnnotationValueVisitor6.java	2019-09-25 10:44:58.053345287 +0200
+@@ -92,7 +92,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected SimpleAnnotationValueVisitor6() {
+         super();
+         DEFAULT_VALUE = null;
+@@ -106,7 +105,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected SimpleAnnotationValueVisitor6(R defaultValue) {
+         super();
+         DEFAULT_VALUE = defaultValue;
+--- java10api-src/javax/lang/model/util/SimpleElementVisitor6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/SimpleElementVisitor6.java	2019-09-25 10:45:31.181591992 +0200
+@@ -94,7 +94,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected SimpleElementVisitor6(){
+         DEFAULT_VALUE = null;
+     }
+@@ -107,7 +106,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected SimpleElementVisitor6(R defaultValue){
+         DEFAULT_VALUE = defaultValue;
+     }
+--- java10api-src/javax/lang/model/util/SimpleTypeVisitor6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/SimpleTypeVisitor6.java	2019-09-25 10:45:17.877492913 +0200
+@@ -94,7 +94,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected SimpleTypeVisitor6(){
+         DEFAULT_VALUE = null;
+     }
+@@ -107,7 +106,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected SimpleTypeVisitor6(R defaultValue){
+         DEFAULT_VALUE = defaultValue;
+     }
+--- java10api-src/javax/lang/model/util/TypeKindVisitor6.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/lang/model/util/TypeKindVisitor6.java	2019-09-25 10:44:26.801112546 +0200
+@@ -85,7 +85,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected TypeKindVisitor6() {
+         super(null);
+     }
+@@ -99,7 +98,6 @@
+      * @deprecated Release 6 is obsolete; update to a visitor for a newer
+      * release level.
+      */
+-    @Deprecated(since="9")
+     protected TypeKindVisitor6(R defaultValue) {
+         super(defaultValue);
+     }
+--- java10api-src/javax/tools/ToolProvider.java	2018-06-24 16:07:06.000000000 +0200
++++ java10api-src/javax/tools/ToolProvider.java	2019-09-25 10:58:25.566820650 +0200
+@@ -94,7 +94,6 @@
+      * locate system tools as well as user-installed tools.
+      * @return a class loader, or {@code null}
+      */
+-    @Deprecated(since="9")
+     public static ClassLoader getSystemToolClassLoader() {
+         return null;
+     }
+Only in java10api-src/javax/tools: ToolProvider.java.bak

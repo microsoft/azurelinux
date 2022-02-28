@@ -1,0 +1,12 @@
+diff -up netkit-rusers-0.17/rup/rup.c.manhelp netkit-rusers-0.17/rup/rup.c
+--- netkit-rusers-0.17/rup/rup.c.manhelp	2013-05-19 11:59:04.451701391 +0200
++++ netkit-rusers-0.17/rup/rup.c	2013-05-19 11:59:43.033905751 +0200
+@@ -335,7 +335,7 @@ allhosts(void)
+ 
+ static void usage(void)
+ {
+-	fprintf(stderr, "Usage: rup [-dhlt] [hosts ...]\n");
++	fprintf(stderr, "Usage: rup [-dshlt] [hosts ...]\n");
+ 	exit(1);
+ }
+ 

@@ -1,0 +1,28 @@
+--- labltk-8.06.0.old/support/Makefile.common	2014-09-18 05:08:33.000000000 +0100
++++ labltk-8.06.0/support/Makefile.common	2015-02-16 15:11:30.157186457 +0000
+@@ -21,17 +21,17 @@
+ ## Tools from the OCaml distribution
+ 
+ CAMLRUN=$(BINDIR)/ocamlrun
+-CAMLC=$(BINDIR)/ocamlc$(OPT)
+-CAMLOPT=$(BINDIR)/ocamlopt$(OPT)
+-CAMLCB=$(BINDIR)/ocamlc
+-CAMLOPTB=$(BINDIR)/ocamlopt
+-CAMLCOMP=$(CAMLC) -c -warn-error A-3
++CAMLC=$(BINDIR)/ocamlc$(OPT) -g
++CAMLOPT=$(BINDIR)/ocamlopt$(OPT) -g
++CAMLCB=$(BINDIR)/ocamlc -g
++CAMLOPTB=$(BINDIR)/ocamlopt -g
++CAMLCOMP=$(CAMLC) -c -warn-error A-3 -g
+ CAMLYACC=$(BINDIR)/ocamlyacc -v
+ CAMLLEX=$(BINDIR)/ocamllex
+-CAMLLIBR=$(CAMLC) -a
++CAMLLIBR=$(CAMLC) -a -g
+ CAMLDEP=$(BINDIR)/ocamldep
+ COMPFLAGS=-g
+ LINKFLAGS=
+-CAMLOPTLIBR=$(CAMLOPT) -a
+-MKLIB=$(BINDIR)/ocamlmklib
++CAMLOPTLIBR=$(CAMLOPT) -a -g
++MKLIB=$(BINDIR)/ocamlmklib -g
+ CAMLRUNGEN=$(BINDIR)/ocamlrun

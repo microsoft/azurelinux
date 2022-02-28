@@ -1,0 +1,101 @@
+From a1524608b05e6c89e2b99f64923f064d888465ce Mon Sep 17 00:00:00 2001
+From: Hui Zhou <hzhou321@anl.gov>
+Date: Mon, 18 Nov 2019 14:52:55 -0600
+Subject: [PATCH 1/2] ch3: fix improper error handling from MPL_get_sockaddr
+
+MPL layer does not directly return mpi_errno. Use MPIR_ERR_CHKANDJUMP
+macro to create the appropriate return code. See pmodels/mpich#4318.
+
+Cherry-picked from [8d923937ec5d].
+---
+ .../channels/nemesis/netmod/tcp/tcp_init.c    | 23 +++++++++++--------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
+
+diff --git a/src/mpid/ch3/channels/nemesis/netmod/tcp/tcp_init.c b/src/mpid/ch3/channels/nemesis/netmod/tcp/tcp_init.c
+index 4c2383ed8f..bc58211eb6 100644
+--- a/src/mpid/ch3/channels/nemesis/netmod/tcp/tcp_init.c
++++ b/src/mpid/ch3/channels/nemesis/netmod/tcp/tcp_init.c
+@@ -307,8 +307,9 @@ static int GetSockInterfaceAddr(int myRank, char *ifname, int maxIfname,
+     if (MPIR_CVAR_NEMESIS_TCP_NETWORK_IFACE) {
+         char s[100];
+ 	int len;
+-        mpi_errno = MPL_get_sockaddr_iface(MPIR_CVAR_NEMESIS_TCP_NETWORK_IFACE, p_addr);
+-        MPIR_ERR_CHKANDJUMP1(mpi_errno, mpi_errno, MPI_ERR_OTHER, "**iface_notfound", "**iface_notfound %s", MPIR_CVAR_NEMESIS_TCP_NETWORK_IFACE);
++        int ret = MPL_get_sockaddr_iface(MPIR_CVAR_NEMESIS_TCP_NETWORK_IFACE, p_addr);
++        MPIR_ERR_CHKANDJUMP1(ret != 0, mpi_errno, MPI_ERR_OTHER, "**iface_notfound",
++                             "**iface_notfound %s", MPIR_CVAR_NEMESIS_TCP_NETWORK_IFACE);
+ 
+         MPL_sockaddr_to_str(p_addr, s, 100);
+         MPL_DBG_MSG_FMT(MPIDI_CH3_DBG_CONNECT, VERBOSE, (MPL_DBG_FDEST,
+@@ -354,12 +355,13 @@ static int GetSockInterfaceAddr(int myRank, char *ifname, int maxIfname,
+ 
+ 	ifname_string = ifname;
+ 
+-	/* If we didn't find a specific name, then try to get an IP address
+-	   directly from the available interfaces, if that is supported on
+-	   this platform.  Otherwise, we'll drop into the next step that uses 
+-	   the ifname */
+-	mpi_errno = MPL_get_sockaddr_iface( NULL, p_addr);
+-        if (mpi_errno) MPIR_ERR_POP(mpi_errno);
++        /* If we didn't find a specific name, then try to get an IP address
++         * directly from the available interfaces, if that is supported on
++         * this platform.  Otherwise, we'll drop into the next step that uses
++         * the ifname */
++        int ret = MPL_get_sockaddr_iface(NULL, p_addr);
++        MPIR_ERR_CHKANDJUMP1(ret != 0, mpi_errno, MPI_ERR_OTHER, "**iface_notfound",
++                             "**iface_notfound %s", NULL);
+         ifaddrFound = 1;
+     }
+     else {
+@@ -369,8 +371,9 @@ static int GetSockInterfaceAddr(int myRank, char *ifname, int maxIfname,
+ 
+     /* If we don't have an IP address, try to get it from the name */
+     if (!ifaddrFound) {
+-        mpi_errno = MPL_get_sockaddr(ifname_string, p_addr);
+-        MPIR_ERR_CHKANDJUMP2(mpi_errno, mpi_errno, MPI_ERR_OTHER, "**gethostbyname", "**gethostbyname %s %d", ifname_string, h_errno);
++        int ret = MPL_get_sockaddr(ifname_string, p_addr);
++        MPIR_ERR_CHKANDJUMP2(ret != 0, mpi_errno, MPI_ERR_OTHER, "**gethostbyname",
++                             "**gethostbyname %s %d", ifname_string, h_errno);
+     }
+ 
+ fn_exit:
+
+From 89157ad35c0885b4758d250d019f0f7cf0f59095 Mon Sep 17 00:00:00 2001
+From: Hui Zhou <hzhou321@anl.gov>
+Date: Wed, 15 Jan 2020 13:29:56 -0600
+Subject: [PATCH 2/2] pmi: fix a wrong condition checking return of
+ MPL_get_sockaddr
+
+Cherry-picked from [3e6af3c2fbaf]. See pmodels/mpich#4318.
+---
+ src/mpl/include/mpl_sockaddr.h | 3 +++
+ src/pmi/simple/simple_pmi.c    | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/mpl/include/mpl_sockaddr.h b/src/mpl/include/mpl_sockaddr.h
+index c0eb749419..a9860c1353 100644
+--- a/src/mpl/include/mpl_sockaddr.h
++++ b/src/mpl/include/mpl_sockaddr.h
+@@ -21,6 +21,9 @@
+ 
+ typedef struct sockaddr_storage MPL_sockaddr_t;
+ 
++/* The following functions when return an int, it returns 0 on success,
++ * non-zero indicates error. It is consistent with posix socket functions.
++ */
+ void MPL_sockaddr_set_aftype(int type);
+ int MPL_get_sockaddr(const char *s_hostname, MPL_sockaddr_t * p_addr);
+ int MPL_get_sockaddr_direct(int type, MPL_sockaddr_t * p_addr);
+diff --git a/src/pmi/simple/simple_pmi.c b/src/pmi/simple/simple_pmi.c
+index df37a8689f..7f660bdac9 100644
+--- a/src/pmi/simple/simple_pmi.c
++++ b/src/pmi/simple/simple_pmi.c
+@@ -881,7 +881,7 @@ static int PMII_Connect_to_pm(char *hostname, int portnum)
+     int q_wait = 1;
+ 
+     ret = MPL_get_sockaddr(hostname, &addr);
+-    if (!ret) {
++    if (ret) {
+         PMIU_printf(1, "Unable to get host entry for %s\n", hostname);
+         return PMI_FAIL;
+     }

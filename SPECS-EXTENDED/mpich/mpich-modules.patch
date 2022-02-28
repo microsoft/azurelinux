@@ -1,0 +1,33 @@
+--- mpich-3.2.1/src/packaging/envmods/mpich.module.in.orig	2017-11-11 03:19:44.000000000 +0100
++++ mpich-3.2.1/src/packaging/envmods/mpich.module.in	2018-04-04 14:14:16.553160669 +0200
+@@ -3,12 +3,23 @@
+ #  MPICH module for use with 'environment-modules' package:
+ # 
+ 
++# Only allow one mpi module to be loaded at a time
++conflict mpi
++
+ # Define prefix so PATH and MANPATH can be updated.
+-setenv        prefix        @prefix@
+-setenv        exec_prefix   @exec_prefix@
++setenv        MPI_BIN       @LIBDIR@/bin
++setenv        MPI_SYSCONFIG @sysconfdir@/@MPINAME@-@ARCH@
++setenv        MPI_FORTRAN_MOD_DIR @fortranmoddir@/@MPINAME@
++setenv        MPI_INCLUDE   @includedir@
++setenv        MPI_LIB       @libdir@
++setenv        MPI_MAN       @mandir@
++setenv        MPI_PYTHON_SITEARCH	@py2sitearch@/@MPINAME@
++setenv        MPI_PYTHON2_SITEARCH	@py2sitearch@/@MPINAME@
++setenv        MPI_PYTHON3_SITEARCH	@py3sitearch@/@MPINAME@
++setenv        MPI_COMPILER  @MPINAME@-@ARCH@
++setenv        MPI_SUFFIX    _@MPINAME@
++setenv        MPI_HOME      @LIBDIR@
+ prepend-path  PATH          @bindir@
+-prepend-path  MANPATH       @mandir@
+-
+-# Undefine prefix and exec_prefix which are too generic environment variables.
+-unsetenv      prefix
+-unsetenv      exec_prefix
++prepend-path  LD_LIBRARY_PATH @libdir@
++prepend-path  MANPATH       :@mandir@
++prepend-path  PKG_CONFIG_PATH @LIBDIR@/lib/pkgconfig

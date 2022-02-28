@@ -6,8 +6,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"gonum.org/v1/gonum/graph"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -102,7 +100,7 @@ func searchForPkg(graph *pkggraph.PkgGraph, packages []string) (list []*pkggraph
 
 func searchForSpec(graph *pkggraph.PkgGraph, specs []string) (list []*pkggraph.PkgNode) {
 	for _, n := range graph.AllRunNodes() {
-		nodeSpec := strings.TrimSuffix(filepath.Base(n.SpecPath), ".spec")
+		nodeSpec := n.SpecName()
 		for _, searchSpec := range specs {
 			if nodeSpec == searchSpec {
 				list = append(list, n)
@@ -172,7 +170,7 @@ func printSpecs(graph *pkggraph.PkgGraph) {
 	specs := make(map[string]bool)
 	for _, n := range graph.AllNodes() {
 		if n.Type == pkggraph.TypeRun {
-			nodeSpec := strings.TrimSuffix(filepath.Base(n.SpecPath), ".spec")
+			nodeSpec := n.SpecName()
 			specs[nodeSpec] = true
 		}
 	}

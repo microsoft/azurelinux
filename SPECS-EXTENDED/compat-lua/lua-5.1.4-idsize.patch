@@ -1,0 +1,12 @@
+diff -urN lua-5.1.4/src/luaconf.h.template.in lua-5.1.4.idsize/src/luaconf.h.template.in
+--- lua-5.1.4/src/luaconf.h.template.in	2011-01-28 19:18:03.176584291 +0100
++++ lua-5.1.4.idsize/src/luaconf.h.template.in	2011-01-28 19:19:26.581213131 +0100
+@@ -216,7 +216,7 @@
+ @* of a function in debug information.
+ ** CHANGE it if you want a different size.
+ */
+-#define LUA_IDSIZE	60
++#define LUA_IDSIZE	512
+ 
+ 
+ /*

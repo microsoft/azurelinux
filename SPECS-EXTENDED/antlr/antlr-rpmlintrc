@@ -1,0 +1,3 @@
+addFilter("zero-length /usr/share/doc/packages/antlr-manual/examples/csharp/csharp_v1/testfiles/Empty.cs")
+addFilter("wrong-file-end-of-line-encoding /usr/share/doc/packages/antlr-manual/examples/")
+addFilter("no-binary")

@@ -1,0 +1,68 @@
+From e35ddf55d3b731452ac33fabd811b3a830f0e626 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 29 Sep 2015 10:31:58 +0200
+Subject: [PATCH] Cast char* and U8* where needed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Building with GCC 5.1.1 and perl-5.22.0 produces various warnings about
+mismatching signess. This patch corrects it.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ XS.xs | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/XS.xs b/XS.xs
+index 91ca74b..28e298f 100644
+--- a/XS.xs
++++ b/XS.xs
+@@ -1112,7 +1112,7 @@ decode_str (dec_t *dec, int utf8)
+           STRLEN len = decode_uint (dec);
+ 
+           WANT (len);
+-          sv_catpvn (sv, dec->cur, len);
++          sv_catpvn (sv, (char *)dec->cur, len);
+           dec->cur += len;
+         }
+     }
+@@ -1121,7 +1121,7 @@ decode_str (dec_t *dec, int utf8)
+       STRLEN len = decode_uint (dec);
+ 
+       WANT (len);
+-      sv = newSVpvn (dec->cur, len);
++      sv = newSVpvn ((char*)dec->cur, len);
+       dec->cur += len;
+ 
+       if (ecb_expect_false (dec->stringref)
+@@ -1132,7 +1132,7 @@ decode_str (dec_t *dec, int utf8)
+   if (utf8)
+     {
+       if (ecb_expect_false (dec->cbor.flags & F_VALIDATE_UTF8))
+-        if (!cbor_is_utf8_string (SvPVX (sv), SvCUR (sv)))
++        if (!cbor_is_utf8_string ((U8*)SvPVX (sv), SvCUR (sv)))
+           ERR ("corrupted CBOR data (invalid UTF-8 in text string)");
+ 
+       SvUTF8_on (sv);
+@@ -1452,7 +1452,7 @@ decode_cbor (SV *string, CBOR *cbor, char **offset_return)
+   sv = decode_sv (&dec);
+ 
+   if (offset_return)
+-    *offset_return = dec.cur;
++    *offset_return = (char *)dec.cur;
+ 
+   if (!(offset_return || !sv))
+     if (dec.cur != dec.end && !dec.err)
+@@ -1506,7 +1506,7 @@ incr_parse (CBOR *self, SV *cborstr)
+         1, 2, 4, 8,-1,-1,-1,-2
+       };
+ 
+-      const U8 *p = SvPVX (cborstr) + self->incr_pos;
++      const U8 *p = (U8*)SvPVX (cborstr) + self->incr_pos;
+       U8 m = *p & MINOR_MASK;
+       IV count = SvIVX (AvARRAY (self->incr_count)[AvFILLp (self->incr_count)]);
+       I8 ilen = incr_len[m];
+-- 
+2.31.1
+

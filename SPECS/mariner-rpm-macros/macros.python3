@@ -35,7 +35,7 @@
 
 %py3_install_egg() %{expand:\\\
   mkdir -p %{buildroot}%{python3_sitelib}
-  easy_install-%{python3_version} -m --prefix %{buildroot}%{_prefix} -Z dist/*-py%{python3_version}.egg %{?*}
+  %{__python3} -m easy_install -m --prefix %{buildroot}%{_prefix} -Z dist/*-py%{python3_version}.egg %{?*}
   rm -rfv %{buildroot}%{_bindir}/__pycache__
 }
 

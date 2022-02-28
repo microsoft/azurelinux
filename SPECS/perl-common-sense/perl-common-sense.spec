@@ -5,15 +5,15 @@
 Summary:	"Common sense" Perl defaults
 Name:		perl-common-sense
 Version:	3.74
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/common-sense
 Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{version}.tar.gz
-%define sha1 common-sense=b32990086501a68bdb10bfa85160866d270aa8ae
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(common::sense) = %{version}-%{release}
@@ -61,9 +61,6 @@ pod2man sense.pod > %{buildroot}%{_mandir}/man3/common::sense.3pm
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %license LICENSE
 %dir %{perl_vendorarch}/common/
@@ -72,6 +69,13 @@ rm -rf %{buildroot}
 %{_mandir}/man3/common::sense.3*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.74-8
+- Adding 'BuildRequires: perl-generators'.
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.74-7
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 3.74-6
 - Use new perl package names.
 - Provide perl(common::sense).

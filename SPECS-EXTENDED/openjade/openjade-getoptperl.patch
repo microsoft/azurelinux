@@ -1,0 +1,21 @@
+diff -urNp openjade-1.3.2-orig/msggen.pl openjade-1.3.2/msggen.pl
+--- openjade-1.3.2-orig/msggen.pl	2002-10-20 23:47:23.000000000 +0200
++++ openjade-1.3.2/msggen.pl	2012-08-10 10:38:28.019081661 +0200
+@@ -4,6 +4,7 @@
+ # See the file COPYING for copying permission.
+ 
+ use POSIX;
++use Getopt::Std;
+ 
+ # Package and version.
+ $package = 'openjade';
+@@ -18,8 +19,7 @@ $gen_c = 0;
+ undef $opt_l;
+ undef $opt_p;
+ undef $opt_t;
+-do 'getopts.pl';
+-&Getopts('l:p:t:');
++getopts('l:p:t:');
+ $module = $opt_l;
+ $pot_file = $opt_p;
+ 

@@ -1,0 +1,11 @@
+--- src/SConstruct~	2015-11-24 10:32:31.000000000 -0600
++++ src/SConstruct	2017-01-23 10:53:53.228548687 -0600
+@@ -32,7 +32,7 @@
+ env['CC'] = os.environ.setdefault("CC","gcc")
+ env['CCFLAGS'] = os.environ.setdefault("CFLAGS","")
+ env['LINKFLAGS'] = Split('-pipe -Wall')
+-env.Append(CCFLAGS = Split('-pipe -Wall -std=c99 -Wno-switch -Wno-unused -Wno-missing-braces -Wno-parentheses -Wno-uninitialized -Wcast-align -fno-strict-aliasing -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -DTEXT_DOMAIN=\\"zfs-fuse\\" -O2 -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector -fstrict-volatile-bitfields --param=ssp-buffer-size=4 '))
++env.Append(CCFLAGS = Split('-pipe -Wall -std=c99 -Wno-switch -Wno-unused -Wno-missing-braces -Wno-parentheses -Wno-uninitialized -Wcast-align -fno-strict-aliasing -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -DTEXT_DOMAIN=\\"zfs-fuse\\" '))
+ 
+ if osname == "Linux":
+   env.Append(CPPFLAGS = " -DLINUX_AIO")

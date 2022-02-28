@@ -1,14 +1,13 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
-Version:        2.2.54.2
-Release:        3%{?dist}
+Version:        2.3.1.1
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Daemons
 URL:            https://github.com/Azure/WALinuxAgent
-#Source0:       https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -23,6 +22,7 @@ Requires:       openssl
 Requires:       python3-pyasn1
 Requires:       python3-xml
 Requires:       python3
+Requires:       python3-distro
 Requires:       python3-libs
 Requires:       sudo
 Requires:       systemd
@@ -50,6 +50,7 @@ mkdir -p %{buildroot}/%{_localstatedir}/log
 touch %{buildroot}/%{_localstatedir}/log/waagent.log
 install -vdm 755 %{buildroot}/%{_sysconfdir}/udev/rules.d
 install -m 644 config/99-azure-product-uuid.rules %{buildroot}/%{_sysconfdir}/udev/rules.d
+install -m 644 config/66-azure-storage.rules %{buildroot}/%{_sysconfdir}/udev/rules.d
 # python refers to python2 version on CBL-Mariner hence update to use python3
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
@@ -80,6 +81,16 @@ python3 setup.py check && python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 25 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.3.1.1-2
+- Add python3-distro as a Requires
+- Update Source0 to use source tar renaming
+
+* Wed Jan 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.1.1-1
+- Update to version 2.3.1.1.
+
+* Tue Dec 14 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2.54.2-4
+- Include the 66-azure-storage udev rule.
+
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.2.54.2-3
 - Include the 99-azure-product-uuid udev rule.
 

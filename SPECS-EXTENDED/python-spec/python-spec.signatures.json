@@ -1,0 +1,8 @@
+{
+    "Signatures": {
+        "gpgkey-0C8AFED2B8FDD7AF40F809BA9C29BC560041E930.gpg": "59d2dbb69ab9544fed720ab9194961b40a3a82206e88b1ecae6ccf3f28880755",
+        "LICENSE": "1954daf7fa6d31e7759d733045337aff93be47349d58828cf521e7eb1c4b45fd",
+        "python-spec-1.4.1.tar.gz": "d50e3f6e8c9771c68c9b56151533ec46f1e0bfcc94a121a835175cb034bf6b31",
+        "python-spec-1.4.1.tar.gz.asc": "010b252f651c248d4dd4106be3508e3c330c08c332a131dce4b20aee0cff87af"
+    }
+}

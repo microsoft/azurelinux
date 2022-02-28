@@ -1,0 +1,26 @@
+diff --git a/Programs/midi_alsa.c b/Programs/midi_alsa.c
+index 10a6afc..c52ee30 100644
+--- a/Programs/midi_alsa.c
++++ b/Programs/midi_alsa.c
+@@ -18,7 +18,7 @@
+ 
+ #include "prologue.h"
+ 
+-#include <asoundlib.h>
++#include <alsa/asoundlib.h>
+ 
+ #include "log.h"
+ #include "parse.h"
+diff --git a/Programs/pcm_alsa.c b/Programs/pcm_alsa.c
+index e04b1ea..82e12f1 100644
+--- a/Programs/pcm_alsa.c
++++ b/Programs/pcm_alsa.c
+@@ -19,7 +19,7 @@
+ #include "prologue.h"
+ 
+ #define ALSA_PCM_NEW_HW_PARAMS_API
+-#include <asoundlib.h>
++#include <alsa/asoundlib.h>
+ 
+ #include "log.h"
+ #include "timing.h"

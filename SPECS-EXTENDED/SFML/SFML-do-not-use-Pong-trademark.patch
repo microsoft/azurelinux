@@ -1,0 +1,20 @@
+--- examples/pong/Pong.cpp~	2017-02-05 16:20:55.162895169 +0530
++++ examples/pong/Pong.cpp	2017-02-05 16:21:17.150992547 +0530
+@@ -27,7 +27,7 @@ int main()
+     float ballRadius = 10.f;
+ 
+     // Create the window of the application
+-    sf::RenderWindow window(sf::VideoMode(gameWidth, gameHeight, 32), "SFML Pong",
++    sf::RenderWindow window(sf::VideoMode(gameWidth, gameHeight, 32), "SFML Virtual Tennis",
+                             sf::Style::Titlebar | sf::Style::Close);
+     window.setVerticalSyncEnabled(true);
+ 
+@@ -72,7 +72,7 @@ int main()
+     pauseMessage.setCharacterSize(40);
+     pauseMessage.setPosition(170.f, 150.f);
+     pauseMessage.setFillColor(sf::Color::White);
+-    pauseMessage.setString("Welcome to SFML pong!\nPress space to start the game");
++    pauseMessage.setString("Welcome to SFML virtual tennis\nPress space to start the game");
+ 
+     // Define the paddles properties
+     sf::Clock AITimer;

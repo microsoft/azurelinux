@@ -1,0 +1,91 @@
+From cc4ecbe236914f9b391ecf3815008547472632f8 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 2 Mar 2021 10:39:15 +0000
+Subject: [PATCH] mlstdutils/std_utils.ml: Fix for OCaml 4.12.
+
+We were using a default function from somewhere called "compare"
+instead of the actual function (Pervasives.compare / Stdlib.compare).
+Since the wrong default function was used it had a different type from
+what we expected:
+
+File "std_utils.ml", line 312, characters 36-37:
+312 |       | (y, y') :: _ when cmp x y = 0 -> y'
+                                          ^
+Error: This expression has type int but an expression was expected of type
+         'weak1 list -> int
+---
+ common/mlstdutils/std_utils.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/mlstdutils/std_utils.ml b/common/mlstdutils/std_utils.ml
+index 4237ea5..8847717 100644
+--- a/common/mlstdutils/std_utils.ml
++++ b/common/mlstdutils/std_utils.ml
+@@ -307,7 +307,7 @@ module List = struct
+       | x::xs, y::ys, z::zs -> (x, y, z) :: combine3 xs ys zs
+       | _ -> invalid_arg "combine3"
+ 
+-    let rec assoc_lbl ?(cmp = compare) ~default x = function
++    let rec assoc_lbl ?(cmp = Pervasives.compare) ~default x = function
+       | [] -> default
+       | (y, y') :: _ when cmp x y = 0 -> y'
+       | _ :: ys -> assoc_lbl ~cmp ~default x ys
+
+From 5f499208cf53ebd3f05525918c213a36c3ca13b5 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 2 Mar 2021 10:42:49 +0000
+Subject: [PATCH] builder: Don't redefine Val_none (OCaml 4.12).
+ 
+  CC       virt_builder-setlocale-c.o
+setlocale-c.c:38: error: "Val_none" redefined [-Werror]
+   38 | #define Val_none (Val_int (0))
+      |
+In file included from /usr/lib64/ocaml/caml/alloc.h:24,
+                 from setlocale-c.c:23:
+/usr/lib64/ocaml/caml/mlvalues.h:395: note: this is the location of the previous definition
+  395 | #define Val_none Val_int(0)
+      |
+---
+ builder/setlocale-c.c | 2 ++
+ 1 file changed, 2 insertions(+)
+ 
+diff --git a/builder/setlocale-c.c b/builder/setlocale-c.c
+index 6d877e7ac..1834c11df 100644
+--- a/builder/setlocale-c.c
++++ b/builder/setlocale-c.c
+@@ -35,7 +35,9 @@ static const int lc_string_table[7] = {
+   LC_MESSAGES
+ };
+ 
++#ifndef Val_none
+ #define Val_none (Val_int (0))
++#endif
+ 
+ extern value virt_builder_setlocale (value val_category, value val_name);
+ 
+-- 
+2.29.0.rc2
+
+From 80abb37b53fc1297de7644ed5a3506c4c1f9375e Mon Sep 17 00:00:00 2001
+From: Stephane Glondu <st...@glondu.net>
+Date: Sun, 26 Dec 2021 10:03:35 +0100
+Subject: [PATCH] Do not error on warning 6 [labels-omitted]
+
+---
+ m4/guestfs-ocaml.m4 | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+diff --git a/m4/guestfs-ocaml.m4 b/m4/guestfs-ocaml.m4
+index bf07799..c40a173 100644
+--- a/m4/guestfs-ocaml.m4
++++ b/m4/guestfs-ocaml.m4
+@@ -231,7 +231,7 @@ EOF
+ ])
+ 
+ dnl Flags we want to pass to every OCaml compiler call.
+-OCAML_WARN_ERROR="-warn-error CDEFLMPSUVYZX+52-3"
++OCAML_WARN_ERROR="-warn-error +C+D+E+F+L+M+P+S+U+V+Y+Z+X+52-3-6"
+ AC_SUBST([OCAML_WARN_ERROR])
+ OCAML_FLAGS="-g -annot $safe_string_option"
+ AC_SUBST([OCAML_FLAGS])
+-- 
+2.34.1

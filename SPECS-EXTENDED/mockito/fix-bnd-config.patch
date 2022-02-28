@@ -1,0 +1,29 @@
+--- conf/mockito-core.bnd.orig	2014-12-31 16:43:56.000000000 +0000
++++ conf/mockito-core.bnd	2015-09-01 19:36:18.534549995 +0100
+@@ -1,21 +1,19 @@
+--versionpolicy=[${version;==;${@}},${version;+;${@}})
+-
+-Bundle-Name= Mockito Mock Library for Java. Core bundle requires Hamcrest-core and Objenesis. 
++Bundle-Name= Mockito Mock Library for Java.
+ Bundle-SymbolicName= org.mockito.mockito-core
+ Bundle-Version= ${version}
+ 
+ Export-Package= !org.mockito.asm.*, \
+                 !org.mockito.cglib.*, \
+                 !org.mockito.internal.*, \
+-                org.mockito.*;version=${version}
++                org.mockito.*
+ 
+ Import-Package= junit.*;resolution:=optional, \
+                 org.junit.*;resolution:=optional, \
+                 org.apache.tools.ant.*;resolution:=optional, \
+-                org.hamcrest;version="[1.0,3.0)", \
+-                org.objenesis;version="[2.1,3.0)", \
++                org.objenesis;version="[2.1,4.0)", \
+                 org.mockito.asm.signature;resolution:=optional, \
+-                org.mockito.*
++                org.mockito.*, \
++                net.sf.cglib.core,net.sf.cglib.proxy,net.sf.cglib.reflect
+ 
+ Private-Package: org.mockito.*
+ 

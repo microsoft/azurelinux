@@ -1,7 +1,7 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.88
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
@@ -12,6 +12,7 @@ Source100:      openssl-fips-2.0.9-lin64.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  perl >= 5.28.0
+BuildRequires:  perl-generators
 BuildRequires:  openssl-devel
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -64,6 +65,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.88-5
+- Adding 'BuildRequires: perl-generators'.
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.88-4
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.88-3: Adding 'local::lib' perl5 library to fix test dependencies.

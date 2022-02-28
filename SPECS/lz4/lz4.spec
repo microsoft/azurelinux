@@ -1,12 +1,12 @@
 Summary:        Extremely fast compression.
 Name:           lz4
-Version:        1.9.2
-Release:        2%{?dist}
+Version:        1.9.3
+Release:        1%{?dist}
 License:        BSD 2-Clause and GPLv2
-URL:            http://lz4.github.io/lz4/
-Group:          Applications
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications
+URL:            https://lz4.github.io/lz4/
 Source0:        https://github.com/lz4/lz4/archive/v%{version}/%{name}-%{version}.tar.gz
 # Version format changed from r131 to v1.7.3 on Nov 16, 2016
 # see https://github.com/lz4/lz4/tags?after=v1.7.4.2
@@ -23,6 +23,7 @@ It features an extremely fast decoder, with speed in multiple GB/s per core, typ
 %package devel
 Summary:    Libraries and header files for lz4
 Requires:   %{name} = %{version}-%{release}
+
 %description devel
 Static libraries and header files for the support library for lz4.
 
@@ -55,17 +56,27 @@ make install DESTDIR=%{buildroot} LIBDIR=%{_libdir} PREFIX=%{_prefix}
 %{_includedir}/*
 
 %changelog
+*   Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.9.3-1
+-   Update to version 1.9.3
+-   License verified.
+
 *   Fri Jun 12 2020 Eric Li <eli@microsoft.com> 1.9.2-2
 -   Mark CVE-2014-4715 as not applicable due to version format change
+
 *   Tue May 18 2020 Andrew Phelps <anphel@microsoft.com> 1.9.2-1
 -   Update to version 1.9.2
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.2-3
 -   Added %%license line automatically
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.2-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Wed Sep 05 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 1.8.2-1
 -   Update to version 1.8.2
+
 *   Wed Mar 29 2017 Michelle Wang <michellew@vmware.com> 1.7.5-1
 -   Update lz4 package to 1.7.5.
+
 *   Thu Dec 01 2016 Xiaolin Li <xiaolinl@vmware.com> 1.7.4-1
 -   Add lz4 package.

@@ -1,0 +1,14 @@
+diff -up wrk/growisofs_mmc.cpp.wrk wrk/growisofs_mmc.cpp
+--- wrk/growisofs_mmc.cpp.wrk	2014-11-14 13:22:49.579552118 +0100
++++ wrk/growisofs_mmc.cpp	2014-11-14 13:35:36.779730963 +0100
+@@ -410,7 +410,9 @@ static unsigned int get_2k_capacity (Scs
+ 	    }
+ 
+ 	    nwa = 0;
+-	    if (buf[7]&1 && !bdr_plus_pow)	// NWA_V
++	    //if (buf[7]&1 && !bdr_plus_pow)	// NWA_V
++	    //!bdr_plus_pow patched out for Fedora
++	    if (buf[7]&1)	// NWA_V
+ 	    {	nwa  = buf[12]<<24;
+ 		nwa |= buf[13]<<16;
+ 		nwa |= buf[14]<<8;

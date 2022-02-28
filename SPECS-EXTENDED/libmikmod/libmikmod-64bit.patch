@@ -1,0 +1,27 @@
+diff -up libmikmod-3.3.7/include/mikmod.h~ libmikmod-3.3.7/include/mikmod.h
+--- libmikmod-3.3.7/include/mikmod.h~	2014-07-15 09:50:00.000000000 +0200
++++ libmikmod-3.3.7/include/mikmod.h	2014-09-10 16:42:59.104289246 +0200
+@@ -142,7 +142,8 @@ typedef unsigned short int UWORD;
+ #endif
+ 
+ /* 4 bytes, signed and unsigned: */
+-#if defined(_LP64) || defined(__LP64__) || defined(__arch64__) || defined(__alpha) || defined(__x86_64) || defined(__powerpc64__)
++#include <stdint.h>
++#if __WORDSIZE == 64
+         /* 64 bit architectures: */
+ typedef signed int         SLONG;
+ #if !(defined(_WIN32) || defined(_MIKMOD_AMIGA))
+diff -up libmikmod-3.3.7/include/mikmod_internals.h~ libmikmod-3.3.7/include/mikmod_internals.h
+--- libmikmod-3.3.7/include/mikmod_internals.h~	2014-07-15 09:50:00.000000000 +0200
++++ libmikmod-3.3.7/include/mikmod_internals.h	2014-09-10 16:42:55.969362911 +0200
+@@ -50,8 +50,8 @@ extern "C" {
+ /*========== More type definitions */
+ 
+ /* SLONGLONG: 64bit, signed */
+-#if !defined(_WIN32) && \
+-   (defined(_LP64) || defined(__LP64__) || defined(__arch64__) || defined(__alpha) || defined(__x64_64) || defined(__powerpc64__))
++#include <stdint.h>
++#if __WORDSIZE == 64
+ typedef long            SLONGLONG;
+ #define NATIVE_64BIT_INT
+ #elif defined(_WIN64) /* win64 is LLP64, not LP64  */

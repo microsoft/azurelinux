@@ -1,0 +1,96 @@
+From 56ff427e14145772485cf04f174e436298d55836 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 16 Nov 2016 18:09:48 +0100
+Subject: [PATCH] Perform network tests only if EXTENDED_TESTING=1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Many tests require configured NNTP server. This is not true for many
+cases. This patch skips them if EXTENDED_TESTING environment variable
+is not true. The variable name is defined by
+<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md#environment-variables-for-testing-contexts>.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ test.pl | 46 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/test.pl b/test.pl
+index 26a100c..d8e5e12 100644
+--- a/test.pl
++++ b/test.pl
+@@ -6,7 +6,11 @@
+ # Change 1..1 below to 1..last_test_to_print .
+ # (It may become useful if the test is moved to ./t subdirectory.)
+ 
+-BEGIN {print "1..37\n";}
++BEGIN {
++    my $test_plan = 7;
++    $test_plan += 30 if $ENV{EXTENDED_TESTING};
++    print "1..$test_plan\n";
++}
+ END {print "not ok 1\n" unless $loaded;}
+ use News::NNTPClient;
+ $loaded = 1;
+@@ -18,19 +22,6 @@ print "ok 1\n";
+ # (correspondingly "not ok 13") depending on the success of chunk 13
+ # of the test code):
+ 
+-print <<EOF;
+-
+-    These tests are as much a test of your news server as they are a
+-    test of News::NNTPClient.  Not all of these tests will pass.
+-
+-    The following tests rely on the existence of an available news
+-    server.  If the environment variable NNTPSERVER is not set, then
+-    "news" will be used.  If you don't have access to a news server,
+-    ok(), okprint(), code(), and postok() will fail.  postok() will
+-    also fail if you don't have permission to post.
+-
+-EOF
+-
+ $i = 2;
+ 
+ sub skip_500_ok {
+@@ -50,12 +41,35 @@ $c = new News::NNTPClient;
+ $c->gmt(1);
+ $c->fourdigityear(1);
+ 
+-for $f (qw(version debug eol gmt fourdigityear message code
+-	   ok okprint postok mode_reader list help)) {
++for $f (qw(version debug eol gmt fourdigityear message)) {
++  print "not " unless $c->$f();
++  print "ok ", $i++, " ($f)\n";
++}
++
++# All test since here require an existing NNTP server
++if (!$ENV{EXTENDED_TESTING}) {
++    exit 0;
++}
++
++print <<EOF;
++
++    These tests are as much a test of your news server as they are a
++    test of News::NNTPClient.  Not all of these tests will pass.
++
++    The following tests rely on the existence of an available news
++    server.  If the environment variable NNTPSERVER is not set, then
++    "news" will be used.  If you don't have access to a news server,
++    ok(), okprint(), code(), and postok() will fail.  postok() will
++    also fail if you don't have permission to post.
++
++EOF
++
++for $f (qw(code ok okprint postok mode_reader list help)) {
+   print "not " unless $c->$f();
+   print "ok ", $i++, " ($f)\n";
+ }
+ 
++
+ # slave not supported by inn
+ skip_500_ok(\$i, $c, 'slave');
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,27 @@
+diff --git a/tests/pwhash_test b/tests/pwhash_test
+index ff89d60..525885e 100755
+--- a/tests/pwhash_test
++++ b/tests/pwhash_test
+@@ -77,6 +77,22 @@ if [ "x${pw#\$6\$}" = "x$pw" ]; then
+     exit 1
+ fi
+ 
++cp "${LIBUSER_CONF}_" "$LIBUSER_CONF"
++echo 'crypt_style = blowfish' >> "$LIBUSER_CONF"
++pw=$(workdir="$workdir" $VALGRIND $PYTHON "$srcdir"/pwhash.py)
++if [ "x${pw#\$2b\$}" = "x$pw" ]; then
++    echo "Invalid BLOWFISH hash" >&2
++    exit 1
++fi
++
++cp "${LIBUSER_CONF}_" "$LIBUSER_CONF"
++echo 'crypt_style = yescrypt' >> "$LIBUSER_CONF"
++pw=$(workdir="$workdir" $VALGRIND $PYTHON "$srcdir"/pwhash.py)
++if [ "x${pw#\$y\$}" = "x$pw" ]; then
++    echo "Invalid YESCRYPT hash" >&2
++    exit 1
++fi
++
+ cp "${LIBUSER_CONF}_" "$LIBUSER_CONF"
+ cat >> "$LIBUSER_CONF" <<\EOF
+ crypt_style = sha256

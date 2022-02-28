@@ -1,0 +1,44 @@
+From f2c855462ff56be4121409c7e048cd2503fe0ccf Mon Sep 17 00:00:00 2001
+From: Jiri Skala <jskala@fedoraproject.org>
+Date: Mon, 7 Apr 2014 14:26:20 +0200
+Subject: [PATCH 15/27] pppd: move pppd database to /var/run/ppp
+
+Resolves: #560014
+---
+ pppd/pathnames.h | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/pppd/pathnames.h b/pppd/pathnames.h
+index bef3160..24e010c 100644
+--- a/pppd/pathnames.h
++++ b/pppd/pathnames.h
+@@ -6,8 +6,9 @@
+ 
+ #ifdef HAVE_PATHS_H
+ #include <paths.h>
+-
++#define _PPP_SUBDIR	"ppp/"
+ #else /* HAVE_PATHS_H */
++#define _PPP_SUBDIR
+ #ifndef _PATH_VARRUN
+ #define _PATH_VARRUN 	"/etc/ppp/"
+ #endif
+@@ -46,13 +47,9 @@
+ #endif /* IPX_CHANGE */
+ 
+ #ifdef __STDC__
+-#define _PATH_PPPDB	_ROOT_PATH _PATH_VARRUN "pppd2.tdb"
++#define _PATH_PPPDB	_ROOT_PATH _PATH_VARRUN _PPP_SUBDIR "pppd2.tdb"
+ #else /* __STDC__ */
+-#ifdef HAVE_PATHS_H
+-#define _PATH_PPPDB	"/var/run/pppd2.tdb"
+-#else
+-#define _PATH_PPPDB	"/etc/ppp/pppd2.tdb"
+-#endif
++#define _PATH_PPPDB	_PATH_VARRUN _PPP_SUBDIR "pppd2.tdb"
+ #endif /* __STDC__ */
+ 
+ #ifdef PLUGIN
+-- 
+1.8.3.1
+

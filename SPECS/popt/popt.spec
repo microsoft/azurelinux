@@ -1,14 +1,13 @@
 Summary:	Programs to parse command-line options
 Name:		popt
-Version:	1.16
-Release:        7%{?dist}
+Version:	1.18
+Release:    1%{?dist}
 License:	MIT
-URL:		http://rpm5.org/files/popt
+URL:		https://github.com/rpm-software-management/popt
 Group:		Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:	ftp://anduin.linuxfromscratch.org/BLFS/svn/p/%{name}-%{version}.tar.gz
-%define sha1 popt=cfe94a15a2404db85858a81ff8de27c8ff3e235e
+Source0:	http://ftp.rpm.org/popt/releases/popt-1.x/%{name}-%{version}.tar.gz
 %description
 The popt package contains the popt libraries which are used by
 some programs to parse command-line options.
@@ -60,6 +59,10 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18-1
+- Upgrade to 1.18
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.16-7
 - Added %%license line automatically
 

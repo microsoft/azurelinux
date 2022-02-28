@@ -1,0 +1,11 @@
+--- src/loadlib.c.orig	2010-02-09 16:58:47.000000000 -0600
++++ src/loadlib.c	2010-02-09 16:59:12.000000000 -0600
+@@ -66,7 +66,7 @@
+ 
+ 
+ static void *ll_load (lua_State *L, const char *path) {
+-  void *lib = dlopen(path, RTLD_NOW);
++  void *lib = dlopen(path, RTLD_NOW|RTLD_GLOBAL);
+   if (lib == NULL) lua_pushstring(L, dlerror());
+   return lib;
+ }

@@ -1,0 +1,15 @@
+diff -up lapack-3.9.0/INSTALL/make.inc.gfortran.fedora lapack-3.9.0/INSTALL/make.inc.gfortran
+--- lapack-3.9.0/INSTALL/make.inc.gfortran.fedora	2019-11-26 09:18:42.671256080 -0500
++++ lapack-3.9.0/INSTALL/make.inc.gfortran	2019-11-26 09:19:09.296715591 -0500
+@@ -20,9 +20,9 @@ CFLAGS = -O3
+ #  should not compile LAPACK with flags such as -ffpe-trap=overflow.
+ #
+ FC = gfortran
+-FFLAGS = -O2 -frecursive
++FFLAGS = 
+ FFLAGS_DRV = $(FFLAGS)
+-FFLAGS_NOOPT = -O0 -frecursive
++FFLAGS_NOOPT = 
+ 
+ #  Define LDFLAGS to the desired linker options for your machine.
+ #

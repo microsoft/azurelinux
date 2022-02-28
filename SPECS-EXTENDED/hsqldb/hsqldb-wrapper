@@ -1,0 +1,104 @@
+#!/bin/sh
+
+# This file was created with portions of the original SysV init script shipped 
+# with hsqldb
+
+# Copyright (c) 2001-2004, The HSQL Development Group
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# Neither the name of the HSQL Development Group nor the names of its
+# contributors may be used to endorse or promote products derived from this
+# software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG,
+# OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+# Class in the org.hsqldb package to start.
+# At this time, only the values "Server" or "WebServer" will work.
+TARGET_CLASS=Server
+
+. /etc/hsqldb.conf
+
+. /usr/share/java-utils/java-functions
+
+[ -z "$JAVA_EXECUTABLE" ] && {
+    set_javacmd
+    JAVA_EXECUTABLE=${JAVACMD}
+}
+
+# Suffix delimiter to $SERVER_ADDL_CLASSPATH, if it is set.
+[ -n "$SERVER_ADDL_CLASSPATH" ] &&
+SERVER_ADDL_CLASSPATH="${SERVER_ADDL_CLASSPATH}:"
+# Validate that config file sets all required variables.
+[ -n "$JAVA_EXECUTABLE" ] && [ -n "$HSQLDB_JAR_PATH" ] &&
+[ -n "$SERVER_HOME" ] || {
+    echo "Config file '$CFGFILE' does not set one or more of following variables
+    JAVA_EXECUTABLE, HSQLDB_JAR_PATH, SERVER_HOME" 1>&2
+    exit 2
+}
+[ -d "$SERVER_HOME" ] || {
+    echo "SERVER_HOME variable in '$CFGFILE' is set to a non-directory." 1>&2
+    exit 2
+}
+[ -f "$JAVA_EXECUTABLE" ] && [ -f "$HSQLDB_JAR_PATH" ] || {
+    echo "JAVA_EXECUTABLE or HSQLDB_JAR_PATH in '$CFGFILE' is set to a non-file." 1>&2
+    exit 2
+}
+[ -r "$HSQLDB_JAR_PATH" ] || {
+    echo "'$HSQLDB_JAR_PATH' isn't readable" 1>&2
+    exit 2
+}
+[ -x "$JAVA_EXECUTABLE" ] || {
+    echo "No Java executable found at '$JAVA_EXECUTABLE'" 1>&2
+    exit 2
+}
+
+# Make a good effort (but not bullet-proof) check on permissions of the
+# auth file.  Unfortunately, if auth-file is not specified, this depends
+# upon both (a) $HOME being set; and (b) SqlToolSprayer and SqlTool defaults.
+# On the other hand, it works great if AUTH_FILE is set explicitly by user.
+if [ -z "$AUTH_FILE" ] && [ -z "$HOME" ]; then
+    : # Lousy init environment didn't set $HOME, so can't find dflt cfg file.
+else
+    _AUTH_TEST_PATH="$AUTH_FILE"
+    [ -n "${_AUTH_TEST_PATH}" ] || _AUTH_TEST_PATH="$HOME/sqltool.rc"
+    [ -f "$_AUTH_TEST_PATH" ] || {
+        echo "No auth file found at '$_AUTH_TEST_PATH'" 1>&2
+        exit 2
+    }
+    [ -r "$_AUTH_TEST_PATH" ] || {
+        echo "Auth file '$_AUTH_TEST_PATH' not readable" 1>&2
+        exit 2
+    }
+    ls -ld "$_AUTH_TEST_PATH" | grep '^-..------' > /dev/null 2>&1 || {
+        echo "Fix permissions on '$_AUTH_TEST_PATH' like 'chmod 600 $_AUTH_TEST_PATH'" 1>&2
+        exit 2
+    }
+fi
+
+TLS_SWITCHES=
+[ -n "$TLS_KEYSTORE" ] &&
+TLS_SWITCHES="-Djavax.net.ssl.keyStore=$TLS_KEYSTORE -Djavax.net.ssl.keyStorePassword=$TLS_PASSWORD"
+
+cd "$SERVER_HOME" &&
+exec "$JAVA_EXECUTABLE" $SERVER_JVMARGS $TLS_SWITCHES -classpath "${SERVER_ADDL_CLASSPATH}${HSQLDB_JAR_PATH}" org.hsqldb.util.MainInvoker org.hsqldb.$TARGET_CLASS $INVOC_ADDL_ARGS

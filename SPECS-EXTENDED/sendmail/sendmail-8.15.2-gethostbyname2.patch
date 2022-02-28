@@ -1,0 +1,39 @@
+diff --git a/libmilter/sm_gethost.c b/libmilter/sm_gethost.c
+index a025c8f..cd0ef31 100644
+--- a/libmilter/sm_gethost.c
++++ b/libmilter/sm_gethost.c
+@@ -49,8 +49,16 @@ sm_getipnodebyname(name, family, flags, err)
+ 	int flags;
+ 	int *err;
+ {
+-	bool resv6 = true;
+ 	struct hostent *h;
++# if HAS_GETHOSTBYNAME2
++
++	h = gethostbyname2(name, family);
++	if (h == NULL)
++		*err = h_errno;
++	return h;
++
++# else /* HAS_GETHOSTBYNAME2 */
++	bool resv6 = true;
+ 
+ 	if (family == AF_INET6)
+ 	{
+@@ -60,7 +68,7 @@ sm_getipnodebyname(name, family, flags, err)
+ 	}
+ 	SM_SET_H_ERRNO(0);
+ 	h = gethostbyname(name);
+-	if (family == AF_INET6 && !resv6)
++	if (!resv6)
+ 		_res.options &= ~RES_USE_INET6;
+ 
+ 	/* the function is supposed to return only the requested family */
+@@ -75,6 +83,7 @@ sm_getipnodebyname(name, family, flags, err)
+ 	else
+ 		*err = h_errno;
+ 	return h;
++# endif /* HAS_GETHOSTBYNAME2 */
+ }
+ 
+ void

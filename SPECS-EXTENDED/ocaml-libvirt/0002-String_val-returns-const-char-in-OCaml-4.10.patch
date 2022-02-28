@@ -1,0 +1,113 @@
+From 3705b9bdcd04dc86474c62e1c8dd8759669842bc Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Sun, 19 Jan 2020 12:59:09 +0000
+Subject: [PATCH 2/3] String_val returns const char * in OCaml 4.10.
+
+This should be compatible with earlier versions of OCaml
+too since we are just assigning a char * to a const char *.
+---
+ libvirt/generator.pl        | 14 +++++++-------
+ libvirt/libvirt_c_oneoffs.c |  6 +++---
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/libvirt/generator.pl b/libvirt/generator.pl
+index ac3dd65..aff371b 100755
+--- a/libvirt/generator.pl
++++ b/libvirt/generator.pl
+@@ -593,7 +593,7 @@ sub gen_c_code
+     } elsif ($sig =~ /^(\w+), string : unit$/) {
+ 	"\
+   " . gen_unpack_args ($1) . "
+-  char *str = String_val (strv);
++  const char *str = String_val (strv);
+   int r;
+ 
+   NONBLOCKING (r = $c_name ($1, str));
+@@ -605,7 +605,7 @@ sub gen_c_code
+ 	"\
+   CAMLlocal1 (rv);
+   " . gen_unpack_args ($1) . "
+-  char *str = String_val (strv);
++  const char *str = String_val (strv);
+   int r;
+ 
+   NONBLOCKING (r = $c_name ($1, str, 0));
+@@ -618,7 +618,7 @@ sub gen_c_code
+ 	"\
+   CAMLlocal1 (rv);
+   " . gen_unpack_args ($1) . "
+-  char *str = String_val (strv);
++  const char *str = String_val (strv);
+   $c_ret_type r;
+ 
+   NONBLOCKING (r = $c_name ($1, str));
+@@ -633,7 +633,7 @@ sub gen_c_code
+ 	"\
+   CAMLlocal1 (rv);
+   " . gen_unpack_args ($1) . "
+-  char *str = String_val (strv);
++  const char *str = String_val (strv);
+   $c_ret_type r;
+ 
+   NONBLOCKING (r = $c_name ($1, str, 0));
+@@ -648,7 +648,7 @@ sub gen_c_code
+ 	"\
+   CAMLlocal1 (rv);
+   " . gen_unpack_args ($1) . "
+-  char *str = String_val (strv);
++  const char *str = String_val (strv);
+   unsigned int u = Int_val (uv);
+   $c_ret_type r;
+ 
+@@ -735,7 +735,7 @@ sub gen_c_code
+ 	"\
+   CAMLlocal2 (rv, connv);
+   " . gen_unpack_args ($1) . "
+-  char *str = String_val (strv);
++  const char *str = String_val (strv);
+   $c_ret_type r;
+ 
+   NONBLOCKING (r = $c_name ($1, str));
+@@ -751,7 +751,7 @@ sub gen_c_code
+ 	"\
+   CAMLlocal2 (rv, connv);
+   " . gen_unpack_args ($1) . "
+-  char *str = String_val (strv);
++  const char *str = String_val (strv);
+   $c_ret_type r;
+ 
+   NONBLOCKING (r = $c_name ($1, str, 0));
+diff --git a/libvirt/libvirt_c_oneoffs.c b/libvirt/libvirt_c_oneoffs.c
+index 8468c73..fc2ac13 100644
+--- a/libvirt/libvirt_c_oneoffs.c
++++ b/libvirt/libvirt_c_oneoffs.c
+@@ -601,7 +601,7 @@ ocaml_libvirt_domain_set_scheduler_parameters (value domv, value paramsv)
+   int nparams = Wosize_val (paramsv);
+   virSchedParameterPtr params;
+   int r, i;
+-  char *name;
++  const char *name;
+ 
+   params = malloc (sizeof (*params) * nparams);
+   if (params == NULL)
+@@ -1005,7 +1005,7 @@ ocaml_libvirt_domain_block_stats (value domv, value pathv)
+   CAMLparam2 (domv, pathv);
+   CAMLlocal2 (rv,v);
+   virDomainPtr dom = Domain_val (domv);
+-  char *path = String_val (pathv);
++  const char *path = String_val (pathv);
+   struct _virDomainBlockStats stats;
+   int r;
+ 
+@@ -1028,7 +1028,7 @@ ocaml_libvirt_domain_interface_stats (value domv, value pathv)
+   CAMLparam2 (domv, pathv);
+   CAMLlocal2 (rv,v);
+   virDomainPtr dom = Domain_val (domv);
+-  char *path = String_val (pathv);
++  const char *path = String_val (pathv);
+   struct _virDomainInterfaceStats stats;
+   int r;
+ 
+-- 
+2.24.1
+

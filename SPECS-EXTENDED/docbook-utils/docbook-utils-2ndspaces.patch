@@ -1,0 +1,260 @@
+--- Original/backends/dvi	2003-01-13 18:14:10.000000000 +0100
++++ Changes/backends/dvi	2007-05-21 14:10:42.000000000 +0200
+@@ -6,31 +6,31 @@
+ export TEXINPUTS
+ 
+ # Convert to TeX
+-$SGML_JADE -t tex -o ${SGML_FILE_NAME}.tex $SGML_ARGUMENTS
++$SGML_JADE -t tex -o "${SGML_FILE_NAME}.tex" $SGML_ARGUMENTS "$SGML_FILE"
+ if [ $? -ne 0 ]
+ then exit 1
+ fi
+ 
+ # Convert from TeX to DVI
+-jadetex ${SGML_FILE_NAME}.tex >${SGML_FILE_NAME}.tmp
++jadetex "${SGML_FILE_NAME}.tex" > "${SGML_FILE_NAME}.tmp"
+ if [ $? -ne 0 ]
+ then
+-  cat ${SGML_FILE_NAME}.tmp
+-  rm ${SGML_FILE_NAME}.tmp
+-  rm ${SGML_FILE_NAME}.tex
++  cat "${SGML_FILE_NAME}.tmp"
++  rm "${SGML_FILE_NAME}.tmp"
++  rm "${SGML_FILE_NAME}.tex"
+   exit 2
+ fi
+-rm ${SGML_FILE_NAME}.tmp
++rm "${SGML_FILE_NAME}.tmp"
+ 
+ # If there are unresolved references, re-run jadetex, twice 
+-if egrep '^LaTeX Warning: There were undefined references.$' ${SGML_FILE_NAME}.log >/dev/null 2>&1
++if egrep '^LaTeX Warning: There were undefined references.$' "${SGML_FILE_NAME}.log" >/dev/null 2>&1
+ then
+-    jadetex ${SGML_FILE_NAME}.tex >/dev/null
+-    jadetex ${SGML_FILE_NAME}.tex >/dev/null
++    jadetex "${SGML_FILE_NAME}.tex" >/dev/null
++    jadetex "${SGML_FILE_NAME}.tex" >/dev/null
+ fi
+-rm ${SGML_FILE_NAME}.log
+-rm ${SGML_FILE_NAME}.aux
+-rm ${SGML_FILE_NAME}.tex
+-rm ${SGML_FILE_NAME}.out
++rm "${SGML_FILE_NAME}.log"
++rm "${SGML_FILE_NAME}.aux"
++rm "${SGML_FILE_NAME}.tex"
++rm "${SGML_FILE_NAME}.out"
+ 
+ exit 0
+--- Original/backends/html	2000-07-21 20:15:22.000000000 +0200
++++ Changes/backends/html	2007-05-21 14:11:32.000000000 +0200
+@@ -3,7 +3,7 @@
+ # This program is under GPL license. See LICENSE file for details.
+ 
+ # Convert to HTML
+-$SGML_JADE -t sgml $SGML_ARGUMENTS
++$SGML_JADE -t sgml $SGML_ARGUMENTS "$SGML_FILE"
+ if [ $? -ne 0 ]
+ then exit 1
+ fi
+--- Original/backends/pdf	2003-03-17 18:47:11.000000000 +0100
++++ Changes/backends/pdf	2007-05-21 14:13:58.000000000 +0200
+@@ -6,26 +6,26 @@
+ export TEXINPUTS
+ 
+ # Convert to TeX
+-$SGML_JADE -t tex -o ${SGML_FILE_NAME}.tex $SGML_ARGUMENTS
++$SGML_JADE -t tex -o "${SGML_FILE_NAME}.tex" $SGML_ARGUMENTS "$SGML_FILE"
+ if [ $? -ne 0 ]
+ then exit 1
+ fi
+ 
+ # Convert from TeX to PDF
+-pdfjadetex ${SGML_FILE_NAME}.tex >${SGML_FILE_NAME}.tmp
++pdfjadetex "${SGML_FILE_NAME}.tex" > "${SGML_FILE_NAME}.tmp"
+ if [ $? -ne 0 ]
+ then
+-  cat ${SGML_FILE_NAME}.tmp
+-  rm ${SGML_FILE_NAME}.tmp
+-  rm ${SGML_FILE_NAME}.tex
++  cat "${SGML_FILE_NAME}.tmp"
++  rm "${SGML_FILE_NAME}.tmp"
++  rm "${SGML_FILE_NAME}.tex"
+   exit 2
+ fi
+-rm ${SGML_FILE_NAME}.tmp
++rm "${SGML_FILE_NAME}.tmp"
+ 
+ # Unconditionally re-run pdfjadetex, twice 
+-pdfjadetex ${SGML_FILE_NAME}.tex >/dev/null
+-pdfjadetex ${SGML_FILE_NAME}.tex >/dev/null
+-rm -f ${SGML_FILE_NAME}.log ${SGML_FILE_NAME}.aux \
+-      ${SGML_FILE_NAME}.tex ${SGML_FILE_NAME}.out
++pdfjadetex "${SGML_FILE_NAME}.tex" >/dev/null
++pdfjadetex "${SGML_FILE_NAME}.tex" >/dev/null
++rm -f "${SGML_FILE_NAME}.log" "${SGML_FILE_NAME}.aux" \
++      "${SGML_FILE_NAME}.tex" "${SGML_FILE_NAME}.out"
+ 
+ exit 0
+--- Original/backends/ps	2003-03-17 18:51:48.000000000 +0100
++++ Changes/backends/ps	2007-05-21 14:16:51.000000000 +0200
+@@ -6,30 +6,30 @@
+ export TEXINPUTS
+ 
+ # Convert to TeX
+-$SGML_JADE -t tex -o ${SGML_FILE_NAME}.tex $SGML_ARGUMENTS
++$SGML_JADE -t tex -o "${SGML_FILE_NAME}.tex" $SGML_ARGUMENTS "$SGML_FILE"
+ if [ $? -ne 0 ]
+ then exit 1
+ fi
+ 
+ # Convert from TeX to DVI
+-jadetex ${SGML_FILE_NAME}.tex >${SGML_FILE_NAME}.tmp
++jadetex "${SGML_FILE_NAME}.tex" > "${SGML_FILE_NAME}.tmp"
+ if [ $? -ne 0 ]
+ then
+-  cat ${SGML_FILE_NAME}.tmp
+-  rm ${SGML_FILE_NAME}.tmp
+-  rm ${SGML_FILE_NAME}.tex
++  cat "${SGML_FILE_NAME}.tmp"
++  rm "${SGML_FILE_NAME}.tmp"
++  rm "${SGML_FILE_NAME}.tex"
+   exit 2
+ fi
+-rm ${SGML_FILE_NAME}.tmp
++rm "${SGML_FILE_NAME}.tmp"
+ 
+ # If there are unresolved references, re-run jadetex, twice 
+-if egrep '^LaTeX Warning: There were undefined references.$' ${SGML_FILE_NAME}.log >/dev/null 2>&1
++if egrep '^LaTeX Warning: There were undefined references.$' "${SGML_FILE_NAME}.log" >/dev/null 2>&1
+ then
+-    jadetex ${SGML_FILE_NAME}.tex >/dev/null
+-    jadetex ${SGML_FILE_NAME}.tex >/dev/null
++    jadetex "${SGML_FILE_NAME}.tex" >/dev/null
++    jadetex "${SGML_FILE_NAME}.tex" >/dev/null
+ fi
+-rm -f ${SGML_FILE_NAME}.log ${SGML_FILE_NAME}.aux \
+-	${SGML_FILE_NAME}.tex ${SGML_FILE_NAME}.out
++rm -f "${SGML_FILE_NAME}.log" "${SGML_FILE_NAME}.aux" \
++	"${SGML_FILE_NAME}.tex" "${SGML_FILE_NAME}.out"
+ 
+ # Convert from DVI to PostScript
+ PAPERSIZE="-t letter"
+@@ -38,12 +38,12 @@
+   PAPERSIZE="-t a4"
+ fi
+ 
+-dvips -R -q $PAPERSIZE ${SGML_FILE_NAME}.dvi -o ${SGML_FILE_NAME}.ps
++dvips -R -q $PAPERSIZE "${SGML_FILE_NAME}.dvi" -o "${SGML_FILE_NAME}.ps"
+ if [ $? -ne 0 ]
+ then
+-  rm ${SGML_FILE_NAME}.dvi
++  rm "${SGML_FILE_NAME}.dvi"
+   exit 3
+ fi
+-rm ${SGML_FILE_NAME}.dvi
++rm "${SGML_FILE_NAME}.dvi"
+ 
+ exit 0
+--- Original/backends/rtf	2000-07-21 20:15:22.000000000 +0200
++++ Changes/backends/rtf	2007-05-21 14:18:37.000000000 +0200
+@@ -3,7 +3,7 @@
+ # This program is under GPL license. See LICENSE file for details.
+ 
+ # Convert to RTF
+-$SGML_JADE -t rtf -o ${SGML_FILE_NAME}.rtf $SGML_ARGUMENTS
++$SGML_JADE -t rtf -o "${SGML_FILE_NAME}.rtf" $SGML_ARGUMENTS "$SGML_FILE"
+ if [ $? -ne 0 ]
+ then exit 1
+ fi
+--- Original/backends/tex	2000-07-21 20:15:22.000000000 +0200
++++ Changes/backends/tex	2007-05-21 14:21:12.000000000 +0200
+@@ -3,7 +3,7 @@
+ # This program is under GPL license. See LICENSE file for details.
+ 
+ # Convert to TeX
+-$SGML_JADE -t tex -o ${SGML_FILE_NAME}.tex $SGML_ARGUMENTS
++$SGML_JADE -t tex -o "${SGML_FILE_NAME}.tex" $SGML_ARGUMENTS "$SGML_FILE"
+ if [ $? -ne 0 ]
+ then exit 1
+ fi
+--- Original/backends/txt	2004-02-11 14:58:03.000000000 +0100
++++ Changes/backends/txt	2007-05-21 14:22:33.000000000 +0200
+@@ -23,7 +23,7 @@
+ trap 'rm -f "$HTML"; exit' 0 1 2 3 7 13 15
+ 
+ # Convert to HTML
+-$SGML_JADE -V nochunks -t sgml ${SGML_ARGUMENTS} >${HTML}
++$SGML_JADE -V nochunks -t sgml ${SGML_ARGUMENTS} "$SGML_FILE" >${HTML}
+ if [ $? -ne 0 ]
+ then exit 1
+ fi
+--- Original/bin/jw.in	2003-04-30 18:21:49.000000000 +0200
++++ Changes/bin/jw.in	2007-05-21 14:28:58.000000000 +0200
+@@ -246,7 +246,7 @@ then
+   echo -e $SGML_HELP_MESSAGE >&2
+   exit 1
+ fi
+-if [ ! -s $SGML_FRONTEND ]
++if [ ! -s "$SGML_FRONTEND" ]
+ then
+   echo "`basename $0`: There is no frontend called \"$SGML_FRONTEND\"." >&2
+   exit 2
+@@ -270,14 +270,14 @@
+   echo -e $SGML_HELP_MESSAGE >&2
+   exit 1
+ fi
+-if [ ! -s $SGML_FILE ]
++if [ ! -s "$SGML_FILE" ]
+ then
+   echo "`basename $0`: Cannot open \"$SGML_FILE\"." >&2
+   exit 3
+ fi
+ 
+ # Separate the file name and the extension (if any)
+-SGML_FILE_NAME=`basename $SGML_FILE`
++SGML_FILE_NAME=`basename "$SGML_FILE"`
+ SGML_FILE_NAME=${SGML_FILE_NAME%.*}
+ 
+ # Determine if we are in an XML file
+@@ -416,7 +416,7 @@
+ fi
+ 
+ # Prepare the parser's arguments
+-SGML_ARGUMENTS="$SGML_INCLUDE -i $SGML_TYPE -d $SGML_STYLESHEET $SGML_OPTIONS $SGML_WARNINGS $SGML_DECL $SGML_FILE"
++SGML_ARGUMENTS="$SGML_INCLUDE -i $SGML_TYPE -d $SGML_STYLESHEET $SGML_OPTIONS $SGML_WARNINGS $SGML_DECL"
+ 
+ # Call the backend
+ echo "Using catalogs: `echo $SGML_CATALOG_FILES | sed 's/:/, /g'`"
+@@ -430,7 +430,7 @@
+ then
+ 	sh $SGML_BACKEND
+ else
+-	sh $SGML_BACKEND >$SGML_FILE_NAME.html
++	sh $SGML_BACKEND >"$SGML_FILE_NAME.html"
+ fi
+ SGML_RETURN=$?
+ cd "$SGML_CURRENT_DIRECTORY"
+diff -urNp docbook-utils-0.6.14-orig/backends/man.in docbook-utils-0.6.14/backends/man.in
+--- docbook-utils-0.6.14-orig/backends/man.in	2003-02-11 13:56:23.000000000 +0100
++++ docbook-utils-0.6.14/backends/man.in	2009-07-24 15:07:04.000000000 +0200
+@@ -7,7 +7,7 @@ HELPER=$SGML_BASE_DIR/docbook/utils-@VER
+ TMPDIR=`mktemp -d /tmp/man.XXXXXX` || \
+  { echo >&2 "man backend: could not create secure temporary directory"; exit 1;}
+ trap 'rm -rf "${TMPDIR}"' EXIT
+-nsgmls $SGML_FILE > "${TMPDIR}/nsgmls.tmp"
++nsgmls "$SGML_FILE" > "${TMPDIR}/nsgmls.tmp"
+ sgmlspl $HELPER <"${TMPDIR}/nsgmls.tmp" 2>"${TMPDIR}/errs"
+ if [ $? -ne 0 ]
+ then
+diff -urNp docbook-utils-0.6.14-orig/backends/texi.in docbook-utils-0.6.14/backends/texi.in
+--- docbook-utils-0.6.14-orig/backends/texi.in	2002-08-05 23:20:56.000000000 +0200
++++ docbook-utils-0.6.14/backends/texi.in	2009-07-24 15:08:02.000000000 +0200
+@@ -3,7 +3,7 @@
+ # This program is under GPL license. See LICENSE file for details.
+ 
+ # Convert to texinfo
+-nsgmls $SGML_FILE | sgmlspl $SGML_BASE_DIR/docbook/utils-@VERSION@/helpers/docbook2texi-spec.pl >$SGML_FILE_NAME.texi
++nsgmls "$SGML_FILE" | sgmlspl $SGML_BASE_DIR/docbook/utils-@VERSION@/helpers/docbook2texi-spec.pl >$SGML_FILE_NAME.texi
+ if [ $? -ne 0 ]
+ then exit 1
+ fi

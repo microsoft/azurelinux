@@ -1,0 +1,12 @@
+This fedora package installs java-atk-wrapper in a JRE-independent way. It is
+up to each JRE to make use of it correctly. In general, you want to symlink the
+shared object and the jar into somehwere where the JRE can find it and
+configure the accessiblity configuration of the JRE to load this.
+
+For OpenJDK, the process looks like this:
+ln -s %{_libdir}/java-atk-wrapper/libatk-wrapper.so.0 \
+    /usr/lib/jvm/jre/lib/%{arch}/libatk-wrapper.so
+ln -s %{_libdir}/java-atk-wrapper/java-atk-wrapper.jar \
+    /usr/lib/jvm/jre/lib/ext/
+echo "assistive_technologies=org.GNOME.Accessibility.AtkWrapper" \
+    >>  /usr/lib/java/jre/lib/accessibility.properties

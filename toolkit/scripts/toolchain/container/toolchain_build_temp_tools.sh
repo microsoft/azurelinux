@@ -114,16 +114,14 @@ rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-echo Linux-5.10.78.1 API Headers
-tar xf kernel-5.10.78.1.tar.gz
-cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1/
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
-patch -p1 -i 0002-add-linux-syscall-license-info.patch
+echo Linux-5.15.18.1 API Headers
+tar xf kernel-5.15.18.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
 make mrproper
 make headers
 cp -rv usr/include/* /tools/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
@@ -302,17 +300,14 @@ rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
-echo M4-1.4.18
-tar xf m4-1.4.18.tar.xz
-pushd m4-1.4.18
-# Fix issues building with glibc 2.34
-patch -Np1 -i /tools/04-fix-sigstksz.patch
-patch -Np1 -i /tools/m4-1.4.18-glibc-change-work-around.patch
+echo M4-1.4.19
+tar xf m4-1.4.19.tar.gz
+pushd m4-1.4.19
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf m4-1.4.18
+rm -rf m4-1.4.19
 
 touch $LFS/logs/temptoolchain/status_m4_complete
 
@@ -505,15 +500,15 @@ rm -rf perl-5.32.0
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
-echo Python-3.7.4
-tar xf Python-3.7.4.tar.xz
-pushd Python-3.7.4
+echo Python-3.9.10
+tar xf Python-3.9.10.tar.xz
+pushd Python-3.9.10
 sed -i '/def add_multiarch_paths/a \        return' setup.py
-./configure --prefix=/tools --without-ensurepip
+./configure --prefix=/tools --without-ensurepip --enable-shared
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.7.4
+rm -rf Python-3.9.10
 
 touch $LFS/logs/temptoolchain/status_python_complete
 

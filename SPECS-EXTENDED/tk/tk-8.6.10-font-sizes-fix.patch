@@ -1,0 +1,22 @@
+Author: Sergei Golovan
+Description: Patch sets the default font sizes for X11 in points instead of
+ pixels. This helps to get reasonable font sizes for high DPI displays.
+Last-Modified: Sat, 24 Mar 2018 16:14:33 +0300
+
+--- a/library/ttk/fonts.tcl
++++ b/library/ttk/fonts.tcl
+@@ -131,10 +131,10 @@
+ 	    set F(family) "Helvetica"
+ 	    set F(fixed)  "courier"
+ 	}
+-	set F(size) -12
+-	set F(ttsize) -10
+-	set F(capsize) -14
+-	set F(fixedsize) -12
++	set F(size) 10
++	set F(ttsize) 9
++	set F(capsize) 12
++	set F(fixedsize) 10
+ 
+ 	font configure TkDefaultFont -family $F(family) -size $F(size)
+ 	font configure TkTextFont    -family $F(family) -size $F(size)

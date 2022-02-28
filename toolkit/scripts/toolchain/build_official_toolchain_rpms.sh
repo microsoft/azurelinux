@@ -239,7 +239,6 @@ build_rpm_in_chroot_no_install xz
 build_rpm_in_chroot_no_install zstd
 build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
-build_rpm_in_chroot_no_install libdb
 build_rpm_in_chroot_no_install libcap
 build_rpm_in_chroot_no_install popt
 build_rpm_in_chroot_no_install findutils
@@ -295,7 +294,6 @@ chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
 
 build_rpm_in_chroot_no_install wget
-build_rpm_in_chroot_no_install freetype
 
 # build and install additional openjdk build dependencies
 build_rpm_in_chroot_no_install pcre
@@ -316,35 +314,21 @@ build_rpm_in_chroot_no_install python3
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3
 
-
-# openjdk needs fontconfig to build, which needs libxml
+# libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 copy_rpm_subpackage python3-libxml2
 chroot_and_install_rpms libxml2
-chroot_and_install_rpms expat
-chroot_and_install_rpms freetype
-build_rpm_in_chroot_no_install fontconfig
-chroot_and_install_rpms fontconfig
 
-
-# Build OpenJDK and OpenJRE
-echo Java bootstrap version:
+# Download JDK rpms
+echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        echo $($LFS/usr/lib/jvm/OpenJDK-212-b04-bootstrap/bin/java -version)
-        build_rpm_in_chroot_no_install openjdk8
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13%2B8-LTS-4.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        echo $($LFS/usr/lib/jvm/OpenJDK-1.8.0.181-bootstrap/bin/java -version)
-        build_rpm_in_chroot_no_install openjdk8_aarch64
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13%2B8-LTS-4.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
-
-# Install OpenJDK and OpenJRE
-chroot_and_install_rpms openjdk8
-# Copy OpenJRE
-cp -v $CHROOT_RPMS_DIR_ARCH/openjre8* $FINISHED_RPM_DIR
-chroot_and_install_rpms openjre8
 
 # PCRE needs to be installed (above) for grep to build with perl regexp support
 build_rpm_in_chroot_no_install grep
@@ -415,8 +399,20 @@ chroot_and_install_rpms perl-XML-Parser
 chroot_and_install_rpms python3-libxml2
 build_rpm_in_chroot_no_install itstool
 
-# gtk-doc needs itstool
+# ninja-build requires gtest
+chroot_and_install_rpms gtest
+build_rpm_in_chroot_no_install ninja-build
+
+# meson requires ninja-build, gettext
+chroot_and_install_rpms ninja-build
+chroot_and_install_rpms gettext
+build_rpm_in_chroot_no_install meson
+
+# gtk-doc needs itstool, meson, python3-pygments
 chroot_and_install_rpms itstool
+chroot_and_install_rpms meson
+build_rpm_in_chroot_no_install python-pygments
+chroot_and_install_rpms python-pygments
 
 # gtk-doc and ca-certificates require libxslt
 chroot_and_install_rpms docbook-dtd-xml
@@ -429,15 +425,6 @@ build_rpm_in_chroot_no_install gtk-doc
 chroot_and_install_rpms gtk-doc
 build_rpm_in_chroot_no_install libtasn1
 
-# ninja-build requires gtest
-chroot_and_install_rpms gtest
-build_rpm_in_chroot_no_install ninja-build
-
-# meson requires ninja-build, gettext
-chroot_and_install_rpms ninja-build
-chroot_and_install_rpms gettext
-build_rpm_in_chroot_no_install meson
-
 build_rpm_in_chroot_no_install libsepol
 build_rpm_in_chroot_no_install swig
 
@@ -446,7 +433,6 @@ chroot_and_install_rpms libsepol
 chroot_and_install_rpms swig
 build_rpm_in_chroot_no_install libselinux
 
-chroot_and_install_rpms meson
 chroot_and_install_rpms libselinux
 
 build_rpm_in_chroot_no_install glib
@@ -520,9 +506,6 @@ build_rpm_in_chroot_no_install systemd-bootstrap
 # Removed 'lvm2', might not need: ncurses
 chroot_and_install_rpms ncurses
 
-# Removed 'cryptsetup', might not need: popt
-chroot_and_install_rpms popt
-
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
 chroot_and_install_rpms systemd-bootstrap
@@ -536,7 +519,20 @@ chroot_and_install_rpms p11-kit
 chroot_and_install_rpms asciidoc
 build_rpm_in_chroot_no_install ca-certificates
 
+# slang needs readline
+build_rpm_in_chroot_no_install slang
+
+# newt needs popt and slang
+chroot_and_install_rpms popt
+chroot_and_install_rpms slang
+build_rpm_in_chroot_no_install newt
+
+# chkconfig needs newt, popt and slang
+chroot_and_install_rpms newt
+build_rpm_in_chroot_no_install chkconfig
+
 build_rpm_in_chroot_no_install mariner-repos
+build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 chroot_and_print_installed_rpms
 

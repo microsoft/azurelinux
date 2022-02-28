@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        1%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,7 @@ cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="Mariner"
 DISTRIB_RELEASE="%{mariner_release_version}"
 DISTRIB_CODENAME=Mariner
-DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version}"
+DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version} Preview-D"
 EOF
 
 version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
@@ -34,7 +34,7 @@ cat > %{buildroot}/%{_libdir}/os-release << EOF
 NAME="Common Base Linux Mariner"
 VERSION="%{mariner_release_version}"
 ID=mariner
-VERSION_ID=$version_id
+VERSION_ID="$version_id"
 PRETTY_NAME="CBL-Mariner/Linux"
 ANSI_COLOR="1;34"
 HOME_URL="%{url}"
@@ -45,11 +45,11 @@ EOF
 ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
 
 cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel \r (\l)
+Welcome to CBL-Mariner %{mariner_release_version} Preview-D (%{_arch}) - Kernel \r (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel %r (%t)
+Welcome to CBL-Mariner %{mariner_release_version} Preview-D (%{_arch}) - Kernel %r (%t)
 EOF
 
 %files
@@ -62,6 +62,22 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-6
+- Surrounding 'VERSION_ID' inside 'os-release' with double quotes.
+
+* Sun Feb 06 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-5
+- Updating version for Preview D-Release
+
+* Wed Jan 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-4
+- CBL-Mariner 2.0 Public Preview C Release.
+- License verified
+
+* Thu Dec 16 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-3
+- CBL-Mariner 2.0 Public Preview B Release version with fixed repo configuration files.
+
+* Mon Dec 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-2
+- CBL-Mariner 2.0 Public Preview A Release version.
+
 * Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
 - Updating version and distrotag for future looking 2.0 branch.  Formatting fixes.
 - Remove %%clean section, buildroot cleaning step (both automatically done by RPM)

@@ -1,0 +1,71 @@
+<!-- simple generic build file -->
+
+<project name="antlr" default="all" basedir=".">
+
+  <!-- Properties -->
+
+  <property name="name" value="antlr"/>
+  <property name="src" value="src"/>
+  <property name="build" value="work"/>
+  <property name="build.classes" value="${build}/classes"/>
+  <property name="build.doc" value="${build}/api"/>
+  <property name="build.lib" value="${build}/lib"/>
+  <property name="packagenames" value="antlr.*"/>
+  <property name="j2se.apidoc" value="http://java.sun.com/j2se/1.4/docs/api/"/>
+
+  <!-- Targets -->
+
+  <!-- Prepare build directories -->
+  <target name="prepare">
+    <mkdir dir="${src}"/>
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build.classes}"/>
+    <mkdir dir="${build.lib}"/>
+    <mkdir dir="${build.doc}"/>
+    <copy todir="${src}/antlr">
+      <fileset dir="antlr"/>
+    </copy>
+  </target>
+
+  <!-- Kill all the created directories -->
+  <target name="clean">
+    <delete dir="${build}"/>
+    <delete dir="${src}"/>
+  </target>
+
+  <!-- Build classes -->
+  <target name="classes" depends="prepare">
+    <javac srcdir="${src}" destdir="${build.classes}"
+      debug="off" optimize="on" deprecation="on"/>
+  </target>
+
+  <!-- Build jar archives -->
+  <target name="jar" depends="classes">
+    <jar jarfile="${build.lib}/${name}.jar" basedir="${build.classes}"
+      index="true">
+      <manifest>
+        <attribute name="Main-Class" value="antlr.Tool"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- Build the full JavaDocs -->
+  <target name="javadoc" depends="prepare">
+    <javadoc sourcepath="${src}"
+      destdir="${build.doc}"
+      doctitle="${name} Javadoc"
+      windowtitle="${name} Javadoc"
+      package="true"
+      author="true"
+      version="true"
+      packagenames="${packagenames}"
+      splitindex="true"
+      use="true">
+      <link href="${j2se.apidoc}"/>
+    </javadoc>
+  </target>
+
+  <!-- Build everything -->
+  <target name="all" depends="jar,javadoc"/>
+
+</project>

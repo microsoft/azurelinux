@@ -1,0 +1,15 @@
+diff -urN jabberpy-0.5-0-orig/jabber/__init__.py jabberpy-0.5-0/jabber/__init__.py
+--- jabberpy-0.5-0-orig/jabber/__init__.py	1969-12-31 19:00:00.000000000 -0500
++++ jabberpy-0.5-0/jabber/__init__.py	2004-06-14 18:53:10.000000000 -0400
+@@ -0,0 +1,10 @@
++__all__ = []
++
++import jabber
++
++for __s in dir(jabber):
++    __val = getattr(jabber, __s)
++    globals()[__s] = __val
++    __all__.append(__val)
++    
++del __s, __val
+Binary files jabberpy-0.5-0-orig/jabber/.__init__.py.swp and jabberpy-0.5-0/jabber/.__init__.py.swp differ

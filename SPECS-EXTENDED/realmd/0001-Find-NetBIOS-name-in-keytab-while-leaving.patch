@@ -1,0 +1,168 @@
+From b11d891a50c2f70e3c02b880e0199583b8df186c Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Thu, 31 May 2018 16:16:08 +0200
+Subject: [PATCH] Find NetBIOS name in keytab while leaving
+
+If realmd is used with Samba as membership software, i.e. Samba's net
+utility, the NetBIOS name must be known when leaving a domain. The most
+reliable way to find it is by searching the keytab for NAME$@REALM type
+entries and use the NAME as the NetBIOS name.
+
+Related to https://bugzilla.redhat.com/show_bug.cgi?id=1370457
+---
+ service/realm-kerberos.c     | 64 ++++++++++++++++++++++++++++++++++++
+ service/realm-kerberos.h     |  2 ++
+ service/realm-samba-enroll.c | 17 ++++++++--
+ 3 files changed, 80 insertions(+), 3 deletions(-)
+
+diff --git a/service/realm-kerberos.c b/service/realm-kerberos.c
+index 54d1ed7..d6d109f 100644
+--- a/service/realm-kerberos.c
++++ b/service/realm-kerberos.c
+@@ -1130,3 +1130,67 @@ realm_kerberos_flush_keytab (const gchar *realm_name,
+ 	return ret;
+ 
+ }
++
++gchar *
++realm_kerberos_get_netbios_name_from_keytab (const gchar *realm_name)
++{
++	krb5_error_code code;
++	krb5_keytab keytab = NULL;
++	krb5_context ctx;
++	krb5_kt_cursor cursor = NULL;
++	krb5_keytab_entry entry;
++	krb5_principal realm_princ = NULL;
++	gchar *princ_name = NULL;
++	gchar *netbios_name = NULL;
++	krb5_data *name_data;
++
++	code = krb5_init_context (&ctx);
++	if (code != 0) {
++		return NULL;
++	}
++
++	princ_name = g_strdup_printf ("user@%s", realm_name);
++	code = krb5_parse_name (ctx, princ_name, &realm_princ);
++	g_free (princ_name);
++
++	if (code == 0) {
++		code = krb5_kt_default (ctx, &keytab);
++	}
++
++	if (code == 0) {
++		code = krb5_kt_start_seq_get (ctx, keytab, &cursor);
++	}
++
++	if (code == 0) {
++		while (!krb5_kt_next_entry (ctx, keytab, &entry, &cursor) && netbios_name == NULL) {
++			if (krb5_realm_compare (ctx, realm_princ, entry.principal)) {
++				name_data = krb5_princ_component (ctx, entry.principal, 0);
++				if (name_data != NULL
++				                && name_data->length > 0
++				                && name_data->data[name_data->length - 1] == '$') {
++					netbios_name = g_strndup (name_data->data, name_data->length - 1);
++					if (netbios_name == NULL) {
++						code = krb5_kt_free_entry (ctx, &entry);
++						warn_if_krb5_failed (ctx, code);
++						break;
++					}
++				}
++			}
++			code = krb5_kt_free_entry (ctx, &entry);
++			warn_if_krb5_failed (ctx, code);
++		}
++	}
++
++	code = krb5_kt_end_seq_get (ctx, keytab, &cursor);
++	warn_if_krb5_failed (ctx, code);
++
++	code = krb5_kt_close (ctx, keytab);
++	warn_if_krb5_failed (ctx, code);
++
++	krb5_free_principal (ctx, realm_princ);
++
++	krb5_free_context (ctx);
++
++	return netbios_name;
++
++}
+diff --git a/service/realm-kerberos.h b/service/realm-kerberos.h
+index 0447e4d..58cfe07 100644
+--- a/service/realm-kerberos.h
++++ b/service/realm-kerberos.h
+@@ -88,6 +88,8 @@ gchar *             realm_kerberos_format_login          (RealmKerberos *self,
+ gboolean            realm_kerberos_flush_keytab                (const gchar *realm_name,
+                                                                 GError **error);
+ 
++gchar *             realm_kerberos_get_netbios_name_from_keytab (const gchar *realm_name);
++
+ const gchar *       realm_kerberos_get_name                    (RealmKerberos *self);
+ 
+ const gchar *       realm_kerberos_get_realm_name              (RealmKerberos *self);
+diff --git a/service/realm-samba-enroll.c b/service/realm-samba-enroll.c
+index 76e7b79..f5edca3 100644
+--- a/service/realm-samba-enroll.c
++++ b/service/realm-samba-enroll.c
+@@ -85,7 +85,8 @@ static JoinClosure *
+ join_closure_init (GTask *task,
+                    RealmDisco *disco,
+                    GVariant *options,
+-                   GDBusMethodInvocation *invocation)
++                   GDBusMethodInvocation *invocation,
++                   gboolean do_join)
+ {
+ 	JoinClosure *join;
+ 	gchar *workgroup;
+@@ -93,6 +94,7 @@ join_closure_init (GTask *task,
+ 	int temp_fd;
+ 	const gchar *explicit_computer_name = NULL;
+ 	const gchar *authid = NULL;
++	gchar *name_from_keytab = NULL;
+ 
+ 	join = g_new0 (JoinClosure, 1);
+ 	join->disco = realm_disco_ref (disco);
+@@ -106,6 +108,14 @@ join_closure_init (GTask *task,
+ 	else if (disco->explicit_netbios)
+ 		authid = disco->explicit_netbios;
+ 
++	/* try to get the NetBIOS name from the keytab while leaving the domain */
++	if (explicit_computer_name == NULL && !do_join) {
++		name_from_keytab = realm_kerberos_get_netbios_name_from_keytab(disco->kerberos_realm);
++		if (name_from_keytab != NULL) {
++			authid = name_from_keytab;
++		}
++	}
++
+ 	join->config = realm_ini_config_new (REALM_INI_NO_WATCH | REALM_INI_PRIVATE);
+ 	realm_ini_config_set (join->config, REALM_SAMBA_CONFIG_GLOBAL,
+ 	                      "security", "ads",
+@@ -151,6 +161,7 @@ join_closure_init (GTask *task,
+ 		g_warning ("Couldn't create temp file in: %s", g_get_tmp_dir ());
+ 	}
+ 
++	g_free (name_from_keytab);
+ 	return join;
+ }
+ 
+@@ -393,7 +404,7 @@ realm_samba_enroll_join_async (RealmDisco *disco,
+ 	g_return_if_fail (cred != NULL);
+ 
+ 	task = g_task_new (NULL, NULL, callback, user_data);
+-	join = join_closure_init (task, disco, options, invocation);
++	join = join_closure_init (task, disco, options, invocation, TRUE);
+ 	explicit_computer_name = realm_options_computer_name (options, disco->domain_name);
+ 	if (explicit_computer_name != NULL) {
+ 		realm_diagnostics_info (invocation, "Joining using a manual netbios name: %s",
+@@ -462,7 +473,7 @@ realm_samba_enroll_leave_async (RealmDisco *disco,
+ 	JoinClosure *join;
+ 
+ 	task = g_task_new (NULL, NULL, callback, user_data);
+-	join = join_closure_init (task, disco, options, invocation);
++	join = join_closure_init (task, disco, options, invocation, FALSE);
+ 
+ 	switch (cred->type) {
+ 	case REALM_CREDENTIAL_PASSWORD:
+-- 
+2.17.1
+

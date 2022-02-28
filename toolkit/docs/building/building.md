@@ -52,6 +52,9 @@
       - [`REFRESH_WORKER_CHROOT=...`](#refresh_worker_chroot)
         - [`REFRESH_WORKER_CHROOT=`**`n`**](#refresh_worker_chrootn)
         - [`REFRESH_WORKER_CHROOT=`**`y`** *(default)*](#refresh_worker_chrooty-default)
+      - [`HYDRATED_BUILD=...`](#hydrated_build)
+        - [`HYDRATED_BUILD=`**`y`**](#hydraded_buildy)
+        - [`HYDRATED_BUILD=`**`n`** *(default)*](#hydrated_build-default)
   - [All Build Targets](#all-build-targets)
   - [Reproducing a Build](#reproducing-a-build)
     - [Build Summaries](#build-summaries)
@@ -381,7 +384,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 > List of RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. CBL-Mariner provides a set of pre-populated RPM repositories accessible inside the toolkit folder under `toolkit/repos`:
 >
 > - `mariner-official-base.repo` and `mariner-official-update.repo` - default, always-on CBL-Mariner repositories.
-> - `mariner-preview.repo` - CBL-Mariner repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivallent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
+> - `mariner-preview.repo` - CBL-Mariner repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
 > - `mariner-ui.repo` and `mariner-ui-preview.repo` - CBL-Mariner repository containing packages related to any UI components. The preview version serves the same purpose as the official preview repo.
 > - `mariner-extras.repo` and `mariner-extras-preview.repo` - CBL-Mariner repository containing proprietory RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
 >
@@ -489,6 +492,16 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 > - worker chroot's manifest file,
 > - at least one of the RPM packages mentioned in the manifest file, or
 > - the script responsible for building the chroot.
+
+#### `HYDRATED_BUILD=...`]
+
+##### `HYDRATED_BUILD=`**`y`**]
+
+> If exists, all the dependency RUN nodes will be replaced with PreBuilt Nodes if those RPMs are hydrated already. So if any dependency package fails to build, the subsequent dependent packages will not be stuck as their dependency will be satisfied by hydrated RPM. This is even applicable to the packages mentioned in REBUILD_PACKAGES.
+
+##### `HYDRATED_BUILD=`**`n`** *(default)*
+
+> Normal build. No hydrated RPMs will be used.
 
 ## All Build Targets
 

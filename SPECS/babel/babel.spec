@@ -1,7 +1,7 @@
 Summary:        An integrated collection of utilities that assist in internationalizing and localizing Python applications
 Name:           babel
 Version:        2.6.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ BuildRequires:  python3-xml
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
 BuildRequires:  python3-six
 %endif
 Requires:       python3
@@ -43,8 +44,7 @@ The functionality Babel provides for internationalization (I18n) and localizatio
 ln -sfv pybabel %{buildroot}/%{_bindir}/pybabel3
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 pytest freezegun funcsigs pathlib2 pluggy utils
+pip3 install pytest freezegun funcsigs pathlib2 pluggy utils
 %{python3} setup.py test
 
 %files
@@ -55,6 +55,9 @@ $easy_install_3 pytest freezegun funcsigs pathlib2 pluggy utils
 %{python3_sitelib}/*
 
 %changelog
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-10
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-9
 - Remove python2 package, have main package contain python3 version
 - Add license to python3 package

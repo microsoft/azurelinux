@@ -1,0 +1,215 @@
+diff --git a/include/dmraid/lib_context.h b/include/dmraid/lib_context.h
+index c2e16e6..c2b3c4d 100644
+--- a/include/dmraid/lib_context.h
++++ b/include/dmraid/lib_context.h
+@@ -46,7 +46,8 @@ enum lc_options {
+ 	LC_CREATE,
+ 	LC_REBUILD_SET,
+ 	LC_REBUILD_DISK,
+-	LC_HOT_SPARE_SET,	/* Add new options below this one ! */
++	LC_HOT_SPARE_SET,	
++	LC_DEFER_UPDATE,	/* Add new options below this one ! */
+ 	LC_OPTIONS_SIZE,	/* Must be the last enumerator. */
+ };
+ 
+@@ -67,6 +68,7 @@ enum lc_options {
+ #define	OPT_CREATE(lc)		(lc_opt(lc, LC_CREATE))
+ #define OPT_HOT_SPARE_SET(lc)	(lc_opt(lc, LC_HOT_SPARE_SET))
+ #define OPT_REBUILD_DISK(lc)	(lc_opt(lc, LC_REBUILD_DISK))
++#define OPT_DEFER_UPDATE(lc)	(lc_opt(lc, LC_DEFER_UPDATE))
+ 
+ /* Return option value. */
+ #define	OPT_STR(lc, o)		(lc->options[o].arg.str)
+@@ -76,6 +78,7 @@ enum lc_options {
+ #define	OPT_STR_PARTCHAR(lc)	OPT_STR(lc, LC_PARTCHAR)
+ #define OPT_STR_HOT_SPARE_SET(lc)	OPT_STR(lc, LC_HOT_SPARE_SET)
+ #define OPT_STR_REBUILD_DISK(lc)	OPT_STR(lc, LC_REBUILD_DISK)
++#define OPT_STR_DEFER_UPDATE(lc)	OPT_STR(lc, LC_DEFER_UPDATE)
+ 
+ struct lib_version {
+ 	const char *text;
+diff --git a/lib/metadata/reconfig.c b/lib/metadata/reconfig.c
+index 73f7604..19768a9 100644
+--- a/lib/metadata/reconfig.c
++++ b/lib/metadata/reconfig.c
+@@ -249,9 +249,9 @@ add_dev_to_raid(struct lib_context *lc, struct raid_set *rs,
+ 			strncat(lib_name, ".so", 3);
+ 		} else
+ 			goto err;
+-
++		
+ 		/* Check registration */
+-		if (!dm_monitored_events(&pending, sub_rs->name, lib_name)) {
++		if (!dm_monitored_events(&pending, sub_rs->name, lib_name) && !OPT_DEFER_UPDATE(lc)) {
+ 			/* If NOT registered update metadata to OK state. */
+ 			if (check_rd->fmt->metadata_handler)
+ 				check_rd->fmt->metadata_handler(lc, UPDATE_REBUILD_STATE, NULL, (void *) rs);
+diff --git a/man/dmraid.8 b/man/dmraid.8
+index b4de737..62a6091 100644
+--- a/man/dmraid.8
++++ b/man/dmraid.8
+@@ -11,6 +11,7 @@ dmraid \- discover, configure and activate software (ATA)RAID
+  [-Z|--rm_partitions]
+  [--separator SEPARATOR]
+  [-t|--test]
++ [-u|--update_defer]
+  [RAID-set...]
+ 
+ .B dmraid
+@@ -38,6 +39,7 @@ dmraid \- discover, configure and activate software (ATA)RAID
+  {-R| --rebuild}
+  RAID-set
+  [device-path]
++ [-u|--update_defer]
+ 
+ .B dmraid
+  {-x| --remove}
+@@ -118,7 +120,14 @@ underlying the set, ie if sda is part of the set, remove sda1, sda2, etc.
+ This prevents applications from directly accessiong the disks bypassing dmraid.
+ RAID set names given on command line don't need to be fully specified
+ (eg, "dmraid -ay sil" would activate all discovered Silicon Image Medley
+-RAID sets).
++RAID sets). Option 
++.B -u
++defers metadata update in case of rebuild is triggered parallelly with activation.
++Awoids metadata update to "OK" state if volume is not registered to the event
++monitoring. 
++Useful if volume is activating at early stage of booting process when registration
++to the event monitoring is impossible.
++
+ 
+ .TP
+ .I {-b|--block_devices} [device-path...]
+@@ -208,7 +217,11 @@ Use CHAR as the separator between the device name and the partition number.
+ .I {-R| --rebuild} RAID-set [device-path]
+ Rebuild raid array after a drive has failed and a new drive is added. 
+ For Intel chipset based systems, there are two methods in which a new drive 
+-is added to the system.
++is added to the system. Option
++.B -u
++defers metadata update in case of rebuild is triggered. 
++Awoids metadata update to "OK" state if volume is not registered to the event
++monitoring. 
+ 
+ 1. Using OROM to identify a new drive
+     During system reboot, enter OROM and mark the new drive as the rebuild drive.  
+diff --git a/tools/commands.c b/tools/commands.c
+index 4c71ae1..a3c77d2 100644
+--- a/tools/commands.c
++++ b/tools/commands.c
+@@ -30,7 +30,7 @@ int add_dev_to_array(struct lib_context *lc, struct raid_set *rs,
+ /*
+  * Command line options.
+  */
+-static char const *short_opts = "a:hipP:"
++static char const *short_opts = "a:hipP:u"
+ #ifndef	DMRAID_MINI
+ 	"bc::dDEf:glxM:"
+ #ifdef	DMRAID_NATIVE_LOG
+@@ -46,6 +46,7 @@ static struct option long_opts[] = {
+ 	{"format", required_argument, NULL, 'f'},
+ 	{"partchar", required_argument, NULL, 'P'},
+ 	{"no_partitions", no_argument, NULL, 'p'},
++	{"update_defer", no_argument, NULL, 'u'},
+ # ifndef DMRAID_MINI
+ 	{"block_devices", no_argument, NULL, 'b'},
+ 	{"display_columns", optional_argument, NULL, 'c'},
+@@ -197,6 +198,15 @@ check_part_separator(struct lib_context *lc, int arg)
+ 	return lc_stralloc_opt(lc, LC_PARTCHAR, optarg) ? 1 : 0;
+ }
+ 
++/* Defer any mtadata updates in case of volume activation 
++ * at early stage of OS boot */
++static int
++defer_update(struct lib_context *lc, int arg)
++{
++    	lc_inc_opt(lc, arg);
++	return 1;
++}
++
+ /* Display help information */
+ static int
+ help(struct lib_context *lc, int arg)
+@@ -211,6 +221,7 @@ help(struct lib_context *lc, int arg)
+ 		  "\t[-P|--partchar CHAR]\n"
+ 		  "\t[-p|--no_partitions]\n"
+ 		  "\t[-Z|--rm_partitions]\n"
++		  "\t[-d|--update_defer]\n"
+ 		  "\t[--separator SEPARATOR]\n" "\t[RAID-set...]\n", c);
+ 	log_print(lc, "%s\t{-h|--help}\n", c);
+ 	log_print(lc, "%s\t{-V/--version}\n", c);
+@@ -219,11 +230,12 @@ help(struct lib_context *lc, int arg)
+ 	log_print(lc,
+ 		  "* = [-d|--debug]... [-v|--verbose]... [-i|--ignorelocking]\n");
+ 	log_print(lc,
+-		  "%s\t{-a|--activate} {y|n|yes|no} *\n"
++		  "%s\t{-a|--activate} {y|n|yes|no} \n"
+ 		  "\t[-f|--format FORMAT[,FORMAT...]]\n"
+ 		  "\t[-P|--partchar CHAR]\n" "\t[-p|--no_partitions]\n"
+ 		  "\t[--separator SEPARATOR]\n" "\t[-t|--test]\n"
+-		  "\t[-Z|--rm_partitions] [RAID-set...]\n", c);
++		  "\t[-Z|--rm_partitions] [RAID-set...]\n"
++		  "\t[-u|--update_defer]", c);
+ 	log_print(lc,
+ 		  "%s\t{-b|--block_devices} *\n"
+ 		  "\t[-c|--display_columns][FIELD[,FIELD...]]...\n"
+@@ -255,7 +267,8 @@ help(struct lib_context *lc, int arg)
+ 		  "\t[--str[i[de]] [0-9]...[kK][bB]]\n"
+ 		  "\t{--disk[s] \"device-path[, device-path...\"}\n", c);
+ 	log_print(lc, "%s\t{-x|--remove RAID-set} \n");
+-	log_print(lc, "%s\t{-R|--rebuild} RAID-set [drive_name]\n", c);
++	log_print(lc, "%s\t{-R|--rebuild} RAID-set [drive_name]\n"
++		  "\t[-u|--update_defer]", c);
+ 	log_print(lc, "%s\t[{-f|--format FORMAT}]\n"
+ 		  "\t{-S|--spare [RAID-set]} \n"
+ 		  "\t{-M|--media \"device-path\"}\n", c);
+@@ -285,6 +298,19 @@ static struct actions actions[] = {
+ 	 0,
+ 	 },
+ 
++	/* Defer metadata update */
++	{'u',
++	 UNDEF,
++	 UNDEF,
++	 ACTIVATE | REBUILD
++#ifndef DMRAID_MINI
++	 | DBG | TEST | VERBOSE
++#endif
++	 , NO_ARGS,
++	 defer_update,
++	 LC_DEFER_UPDATE,
++	 },
++
+ 	/* Format option. */
+ 	{'f',
+ 	 FORMAT,
+@@ -726,7 +752,7 @@ handle_args(struct lib_context *lc, int argc, char ***argv)
+ 		if (o == 'C') {
+ 			*argv += optind - 1;
+ 			return 1;
+-		} else if (o == 'R' && argc == 4) {
++		} else if (o == 'R' && (argc == 4 || argc == 5)) {
+ 			if (*(*argv + optind))
+ 				save_drive_name(lc, *(*argv + optind));
+ 		}
+@@ -744,7 +770,7 @@ handle_args(struct lib_context *lc, int argc, char ***argv)
+ 		ret = check_actions_arguments(lc);
+ 
+ 	*argv += optind;
+-	if (argc == 4 && lc->options[LC_REBUILD_SET].opt)
++	if ((argc == 4 || argc == 5) && lc->options[LC_REBUILD_SET].opt)
+ 		*argv += 1;
+ 
+ 	return ret;
+@@ -871,7 +897,7 @@ struct prepost prepost[] = {
+ 	 0,
+ 	 activate_or_deactivate_sets,
+ 	 },
+-
++	
+ #ifndef DMRAID_MINI
+ 	/* Display block devices. */
+ 	{BLOCK_DEVICES,
+-- 
+1.7.0.4
+

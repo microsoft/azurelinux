@@ -1,0 +1,21 @@
+--- tclx8.4/Makefile.in.old	2005-11-20 22:29:13.000000000 +0100
++++ tclx8.4/Makefile.in	2007-03-20 15:42:48.000000000 +0100
+@@ -221,12 +221,18 @@
+ 
+ install-doc: doc install-help
+ 	@mkdir -p $(DESTDIR)$(mandir)/mann
++	@mkdir -p $(DESTDIR)$(mandir)/man3
+ 	@echo "Installing documentation in $(DESTDIR)$(mandir)"
+ 	@list='$(srcdir)/doc/*.n'; for i in $$list; do \
+ 	    echo "Installing $$i"; \
+ 	    rm -f $(DESTDIR)$(mandir)/mann/`basename $$i`; \
+ 	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/mann ; \
+ 	done
++	@list='$(srcdir)/doc/*.3'; for i in $$list; do \
++		echo "Installing $$i"; \
++		rm -f $(DESTDIR)$(mandir)/man3/`basename $$i`; \
++		$(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man3 ; \
++	done
+ 
+ test: binaries libraries
+ 	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS)

@@ -1,0 +1,12 @@
+diff -urNp docbook-utils-0.6.14-orig/bin/jw.in docbook-utils-0.6.14/bin/jw.in
+--- docbook-utils-0.6.14-orig/bin/jw.in	2009-10-07 14:41:19.000000000 +0200
++++ docbook-utils-0.6.14/bin/jw.in	2009-10-07 14:45:22.000000000 +0200
+@@ -368,7 +368,7 @@ case "$SGML_OPTIONS" in
+ 	fi
+ 	if [ -n "$papersize" ]
+ 	then
+-	  SGML_OPTIONS="-V paper-type=$papersize $SGML_OPTIONS"
++	  SGML_OPTIONS="-V %paper-type%=$papersize $SGML_OPTIONS"
+ 	fi
+ 	;;
+ esac

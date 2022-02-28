@@ -1,0 +1,26 @@
+From c5a5f795b1defcb6d168e79c4d1fc371dfc556ca Mon Sep 17 00:00:00 2001
+From: Jiri Skala <jskala@redhat.com>
+Date: Wed, 9 Apr 2014 09:29:50 +0200
+Subject: [PATCH 20/27] pppd: put lock files in /var/lock/ppp
+
+Resolves: #708260
+---
+ pppd/utils.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pppd/utils.c b/pppd/utils.c
+index 6051b9a..8407492 100644
+--- a/pppd/utils.c
++++ b/pppd/utils.c
+@@ -846,7 +846,7 @@ complete_read(int fd, void *buf, size_t count)
+ /* Procedures for locking the serial device using a lock file. */
+ #ifndef LOCK_DIR
+ #ifdef __linux__
+-#define LOCK_DIR	"/var/lock"
++#define LOCK_DIR	"/var/lock/ppp"
+ #else
+ #ifdef SVR4
+ #define LOCK_DIR	"/var/spool/locks"
+-- 
+1.8.3.1
+

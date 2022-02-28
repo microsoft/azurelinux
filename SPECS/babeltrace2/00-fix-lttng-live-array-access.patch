@@ -1,6 +1,6 @@
-diff -Naur babeltrace2-2.0.1/src/plugins/ctf/common/msg-iter/msg-iter.c babeltrace2-2.0.1-copy/src/plugins/ctf/common/msg-iter/msg-iter.c
---- babeltrace2-2.0.1/src/plugins/ctf/common/msg-iter/msg-iter.c	2020-02-28 22:26:47.194726018 -0800
-+++ babeltrace2-2.0.1-copy/src/plugins/ctf/common/msg-iter/msg-iter.c	2020-02-28 22:29:36.318373106 -0800
+diff -Naur babeltrace2-2.0.4/src/plugins/ctf/common/msg-iter/msg-iter.c babeltrace2-2.0.4-copy/src/plugins/ctf/common/msg-iter/msg-iter.c
+--- babeltrace2-2.0.4/src/plugins/ctf/common/msg-iter/msg-iter.c	2022-02-09 16:04:31.452911700 -0800
++++ babeltrace2-2.0.4-copy/src/plugins/ctf/common/msg-iter/msg-iter.c	2022-02-09 16:24:36.138072700 -0800
 @@ -2001,6 +2001,9 @@
  	}
  

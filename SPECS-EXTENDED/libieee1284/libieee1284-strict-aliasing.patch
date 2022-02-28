@@ -1,0 +1,60 @@
+diff -up libieee1284-0.2.11/src/ieee1284module.c.strict-aliasing libieee1284-0.2.11/src/ieee1284module.c
+--- libieee1284-0.2.11/src/ieee1284module.c.strict-aliasing	2004-02-03 11:50:57.000000000 +0000
++++ libieee1284-0.2.11/src/ieee1284module.c	2010-06-23 12:36:05.093026807 +0100
+@@ -28,6 +28,17 @@ typedef struct {
+ 	struct parport *port;
+ } ParportObject;
+ 
++static PyObject *
++Parport_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
++{
++  ParportObject *self;
++  self = (ParportObject *) type->tp_alloc (type, 0);
++  if (self != NULL)
++    self->port = NULL;
++
++  return (PyObject *) self;
++}
++
+ static int
+ Parport_init (ParportObject *self, PyObject *args, PyObject *kwds)
+ {
+@@ -562,6 +573,23 @@ static PyTypeObject ParportType = {
+ 	0,					/* tp_as_buffer */
+ 	Py_TPFLAGS_DEFAULT,			/* tp_flags */
+ 	"parallel port object",			/* tp_doc */
++	0,					/* tp_traverse */
++	0,					/* tp_clear */
++	0,					/* tp_richcompare */
++	0,					/* tp_weaklistoffset */
++	0,					/* tp_iter */
++	0,					/* tp_iternext */
++	Parport_methods,			/* tp_methods */
++	0,					/* tp_members */
++	Parport_getseters,			/* tp_getset */
++	0,					/* tp_base */
++	0,					/* tp_dict */
++	0,					/* tp_descr_get */
++	0,					/* tp_descr_set */
++	0,					/* tp_dictoffset */
++	(initproc)Parport_init,			/* tp_init */
++	0,					/* tp_alloc */
++	Parport_new,		                /* tp_new */
+ };
+ 
+ static PyObject *
+@@ -625,14 +653,9 @@ initieee1284 (void)
+ 	PyObject *d = PyModule_GetDict (m);
+ 	PyObject *c;
+ 
+-	ParportType.tp_new = PyType_GenericNew;
+-	ParportType.tp_init = (initproc) Parport_init;
+-	ParportType.tp_getset = Parport_getseters;
+-	ParportType.tp_methods = Parport_methods;
+ 	if (PyType_Ready (&ParportType) < 0)
+ 		return;
+ 
+-	Py_INCREF (&ParportType);
+ 	PyModule_AddObject (m, "Parport", (PyObject *) &ParportType);
+ 
+ 	pyieee1284_error = PyErr_NewException("ieee1284.error", NULL, NULL);

@@ -1,0 +1,18 @@
+commit 1f998f5d6d77674dad01b181811638578ad68242
+Author: Tristan Matthews <tmatth@videolan.org>
+Date:   Sun Jan 15 12:15:07 2017 -0500
+
+    pulse: fix missing include warning for nanosleep
+
+diff --git a/src/plugins/pulse/ao_pulse.c b/src/plugins/pulse/ao_pulse.c
+index 9835273b53c35bf9..2d10d57f17f6bdd6 100644
+--- a/src/plugins/pulse/ao_pulse.c
++++ b/src/plugins/pulse/ao_pulse.c
+@@ -30,6 +30,7 @@
+ #include <assert.h>
+ #include <string.h>
+ #include <signal.h>
++#include <time.h>
+ #include <limits.h>
+ 
+ #include <pulse/pulseaudio.h>

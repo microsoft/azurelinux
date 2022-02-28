@@ -1,0 +1,18 @@
+diff -uNr json-simple-1.1.1.ORIG/src/test/java/org/json/simple/Test.java json-simple-1.1.1/src/test/java/org/json/simple/Test.java
+--- json-simple-1.1.1.ORIG/src/test/java/org/json/simple/Test.java	2014-07-22 09:55:47.058000000 +0000
++++ json-simple-1.1.1/src/test/java/org/json/simple/Test.java	2014-07-22 14:17:16.942000000 +0000
+@@ -294,7 +294,7 @@
+             pe.printStackTrace();
+         }
+ 	}
+-	
++	/*
+ 	public void testEncode() throws Exception{
+ 		System.out.println("=======encode=======");
+ 		
+@@ -388,4 +388,5 @@
+         System.out.println(jsonString);
+         assertEquals("[{\"k11\":\"v11\",\"k12\":\"v12\",\"k13\":\"v13\",\"k14\":{\"k31\":\"v3\",\"k32\":123.45,\"k33\":false,\"k34\":null,\"k35\":[\"vvv\",\"1.23456789123456789\",true,null]}},{\"k22\":\"v22\",\"k21\":\"v21\",\"k23\":\"v23\"}]",jsonString);
+     }
++    */
+ }

@@ -1,0 +1,73 @@
+From e501d0ee85bb661173c4c5c3fd1c74fabe78c2e3 Mon Sep 17 00:00:00 2001
+From: Michal Srb <msrb@redhat.com>
+Date: Wed, 10 Apr 2013 11:30:35 +0200
+Subject: [PATCH] Migrate to plexus-containers-container-default
+
+---
+ .../component/factory/bsh/BshComponentFactory.java | 26 +++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 6 deletions(-)
+
+diff --git a/src/main/java/org/codehaus/plexus/component/factory/bsh/BshComponentFactory.java b/src/main/java/org/codehaus/plexus/component/factory/bsh/BshComponentFactory.java
+index f2f3437..5e39fcf 100644
+--- a/src/main/java/org/codehaus/plexus/component/factory/bsh/BshComponentFactory.java
++++ b/src/main/java/org/codehaus/plexus/component/factory/bsh/BshComponentFactory.java
+@@ -8,6 +8,8 @@ import org.codehaus.plexus.PlexusContainer;
+ import org.codehaus.plexus.component.factory.AbstractComponentFactory;
+ import org.codehaus.plexus.component.factory.ComponentInstantiationException;
+ import org.codehaus.plexus.component.repository.ComponentDescriptor;
++import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
++import org.codehaus.plexus.logging.Logger;
+ import org.codehaus.plexus.util.IOUtil;
+ 
+ import java.io.FileNotFoundException;
+@@ -68,24 +70,31 @@ public class BshComponentFactory
+         catch ( EvalError evalError )
+         {
+             containerRealm.display();
+-            
+-            container.getLogger().info( "Error text: " + evalError.getErrorText() );
+-            
++
++            try
++            {
++                container.lookup( Logger.class ).info( "Error text: " + evalError.getErrorText() );
++            }
++            catch ( ComponentLookupException e )
++            {
++                throw new ComponentInstantiationException( e );
++            }
++
+             throw new ComponentInstantiationException( "Cannot build component for: " +
+-                                                       componentDescriptor.getComponentKey() +
++                                                       componentDescriptor.toString() +
+                                                        "; unable to read BeanShell script", evalError );
+         }
+         catch ( FileNotFoundException e )
+         {
+             containerRealm.display();
+             throw new ComponentInstantiationException( "Cannot build component for: " +
+-                                                       componentDescriptor.getComponentKey() +
++                                                       componentDescriptor.toString() +
+                                                        "; unable to read BeanShell script", e );
+         }
+         catch ( IOException e )
+         {
+             throw new ComponentInstantiationException( "Cannot build component for: " +
+-                                                       componentDescriptor.getComponentKey() +
++                                                       componentDescriptor.toString() +
+                                                        "; unable to read BeanShell script", e );
+         }
+         finally
+@@ -96,4 +105,9 @@ public class BshComponentFactory
+         return result;
+     }
+ 
++    public String getId()
++    {
++        return getClass().toString();
++    }
++
+ }
+-- 
+1.8.1.4
+

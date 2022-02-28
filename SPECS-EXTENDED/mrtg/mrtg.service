@@ -1,0 +1,36 @@
+# To customize, copy this file to /etc/systemd/system and edit there
+#
+# This unit facilitates starting of MRTG.  There are 2 options of
+# how to run MRTG:
+# - as a daemon (preferred); in this case please put
+#   RunAsDaemon: yes in mrtg.conf (or use --daemon switch)
+# - periodically - please see and enable mrtg.timer
+#   Periodic settings need Type=oneshot set here
+#
+# Other recommended settings in mrtg.cfg for daemon mode:
+# NoDetach: yes 
+# If you set this, change below Type=simple
+#
+# Please disable /etc/crond.d/mrtg job when using this unit!
+#
+# do not enable both mrtg-as-a-daemon and timer at the same time
+
+[Unit]
+Description=Multi-router Traffic Grapher
+After=syslog.target
+
+[Service]
+Environment=LANG=C
+ExecStart=/usr/bin/mrtg /etc/mrtg/mrtg.cfg --lock-file /var/lock/mrtg/mrtg_l --confcache-file /var/lib/mrtg/mrtg.ok
+# Type= settings cheatsheet:
+# - RunAsDaemon: yes; NoDetach: yes :
+#Type=simple
+# - RunAsDaemon: yes; NoDetach: no :
+#Type=forking
+# - RunAsDaemon: no; (periodic invocation) :
+#Type=oneshot
+Type=simple
+StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target

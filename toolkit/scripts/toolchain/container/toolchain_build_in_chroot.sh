@@ -67,16 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.10.78.1 API Headers
-tar xf kernel-5.10.78.1.tar.gz
-cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1/
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
-patch -p1 -i 0002-add-linux-syscall-license-info.patch
+echo Linux-5.15.18.1 API Headers
+tar xf kernel-5.15.18.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.10.78.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -219,31 +217,29 @@ popd
 rm -rf file-5.40
 touch /logs/status_file_complete
 
-echo Readline-7.0
-tar xf readline-7.0.tar.gz
-pushd readline-7.0
+echo Readline-8.1
+tar xf readline-8.1.tar.gz
+pushd readline-8.1
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/readline-7.0
+            --with-curses    \
+            --docdir=/usr/share/doc/readline-8.1
 make SHLIB_LIBS="-L/tools/lib -lncursesw"
-make SHLIB_LIBS="-L/tools/lib -lncurses" install
+make SHLIB_LIBS="-L/tools/lib -lncursesw" install
 popd
-rm -rf readline-7.0
+rm -rf readline-8.1
 touch /logs/status_readline_complete
 
-echo M4-1.4.18
-tar xf m4-1.4.18.tar.xz
-pushd m4-1.4.18
-# patch issues building with glibc 2.34
-patch -Np1 -i /tools/04-fix-sigstksz.patch
-patch -Np1 -i /tools/m4-1.4.18-glibc-change-work-around.patch
+echo M4-1.4.19
+tar xf m4-1.4.19.tar.gz
+pushd m4-1.4.19
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf m4-1.4.18
+rm -rf m4-1.4.19
 touch /logs/status_m4_complete
 
 echo Binutils-2.37
@@ -679,9 +675,9 @@ popd
 rm -rf gettext-0.19.8.1
 touch /logs/status_gettext_complete
 
-echo Elfutils-0.185
-tar xjf elfutils-0.185.tar.bz2
-pushd elfutils-0.185
+echo Elfutils-0.186
+tar xjf elfutils-0.186.tar.bz2
+pushd elfutils-0.186
 ./configure \
     --prefix=/usr \
     --disable-debuginfod \
@@ -694,12 +690,12 @@ make -C libdw install
 # Need to install (eu-strip) as well
 make install
 popd
-rm -rf elfutils-0.185
+rm -rf elfutils-0.186
 touch /logs/status_libelf_complete
 
-echo Libffi-3.2.1
-tar xf libffi-3.2.1.tar.gz
-pushd libffi-3.2.1
+echo Libffi-3.4.2
+tar xf libffi-3.4.2.tar.gz
+pushd libffi-3.4.2
 # TODO: set generic build to avoid optimizations causing illegal operation errors on other processors
 # options: https://gcc.gnu.org/onlinedocs/gcc-9.2.0/gcc/x86-Options.html
 #          https://gcc.gnu.org/onlinedocs/gcc-9.2.0/gcc/AArch64-Options.html#AArch64-Options
@@ -729,11 +725,11 @@ esac
 unset GCC_ARCH
 #	CFLAGS="-O2 -g" \
 #	CXXFLAGS="-O2 -g" \
-# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.2.1-7.cm1.x86_64//usr/lib64': No such file or directory
+# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.4.2-1.cm1.x86_64//usr/lib64': No such file or directory
 make -j$(nproc)
 make install
 popd
-rm -rf libffi-3.2.1
+rm -rf libffi-3.4.2
 touch /logs/status_libffi_complete
 
 echo "Perl Test::Warnings"
@@ -781,22 +777,23 @@ popd
 rm -rf openssl-1.1.1g
 touch /logs/status_openssl_complete
 
-echo Python-3.7.4
-tar xf Python-3.7.4.tar.xz
-pushd Python-3.7.4
+echo Python-3.9.10
+tar xf Python-3.9.10.tar.xz
+pushd Python-3.9.10
 ./configure --prefix=/usr       \
+            --with-platlibdir=lib \
             --enable-shared     \
             --with-system-expat \
             --with-system-ffi   \
             --with-ensurepip=yes
 make -j$(nproc)
 make install
-chmod -v 755 /usr/lib/libpython3.7m.so
+chmod -v 755 /usr/lib/libpython3.9.so.1.0
 chmod -v 755 /usr/lib/libpython3.so
-ln -sfv pip3.7 /usr/bin/pip3
+ln -sfv pip3.9 /usr/bin/pip3
 popd
-rm -rf Python-3.7.4
-touch /logs/status_python374_complete
+rm -rf Python-3.9.10
+touch /logs/status_python399_complete
 
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
@@ -905,23 +902,21 @@ popd
 rm -rf patch-2.7.6
 touch /logs/status_patch_complete
 
-echo Man-DB-2.8.4
-tar xf man-db-2.8.4.tar.xz
-pushd man-db-2.8.4
+echo Man-DB-2.10.1
+tar xf man-db-2.10.1.tar.xz
+pushd man-db-2.10.1
 ./configure --prefix=/usr                        \
-            --docdir=/usr/share/doc/man-db-2.8.4 \
+            --docdir=/usr/share/doc/man-db-2.10.1 \
             --sysconfdir=/etc                    \
             --disable-setuid                     \
-            --enable-cache-owner=bin             \
             --with-browser=/usr/bin/lynx         \
+            --with-systemdsystemunitdir=no       \
             --with-vgrind=/usr/bin/vgrind        \
-            --with-grap=/usr/bin/grap            \
-            --with-systemdtmpfilesdir=           \
-            --with-systemdsystemunitdir=
+            --with-grap=/usr/bin/grap
 make -j$(nproc)
 make install
 popd
-rm -rf man-db-2.8.4
+rm -rf man-db-2.10.1
 touch /logs/status_man_db_complete
 
 echo Tar-1.34
@@ -950,13 +945,13 @@ popd
 rm -rf texinfo-6.8
 touch /logs/status_texinfo_complete
 
-echo Procps-ng-3.3.15
-tar xf procps-ng-3.3.15.tar.xz
-pushd procps-ng-3.3.15
+echo Procps-ng-3.3.17
+tar xf procps-ng-3.3.17.tar.xz
+pushd procps-3.3.17
 ./configure --prefix=/usr                            \
             --exec-prefix=                           \
             --libdir=/usr/lib                        \
-            --docdir=/usr/share/doc/procps-ng-3.3.15 \
+            --docdir=/usr/share/doc/procps-ng-3.3.17 \
             --disable-static                         \
             --disable-kill
 make -j$(nproc)
@@ -964,7 +959,7 @@ make install
 #mv -v /usr/lib/libprocps.so.* /lib
 #ln -sfv ../../lib/$(readlink /usr/lib/libprocps.so) /usr/lib/libprocps.so
 popd
-rm -rf procps-ng-3.3.15
+rm -rf procps-ng-3.3.17
 touch /logs/status_procpsng_complete
 
 echo util-linux-2.37.2
@@ -996,9 +991,9 @@ touch /logs/status_util-linux_complete
 echo Building RPM related packages
 cd /sources
 
-echo sqlite-autoconf-3320100
-tar xf sqlite-autoconf-3320100.tar.gz
-pushd sqlite-autoconf-3320100
+echo sqlite-autoconf-3360000
+tar xf sqlite-autoconf-3360000.tar.gz
+pushd sqlite-autoconf-3360000
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \
@@ -1013,7 +1008,7 @@ pushd sqlite-autoconf-3320100
 make -j$(nproc)
 make install
 popd
-rm -rf sqlite-autoconf-3320100
+rm -rf sqlite-autoconf-3360000
 touch /logs/status_sqlite-autoconf_complete
 
 echo nspr-4.21
@@ -1032,39 +1027,17 @@ popd
 rm -rf nspr-4.21
 touch /logs/status_nspr_complete
 
-echo popt-1.16
-tar xf popt-1.16.tar.gz
-pushd popt-1.16
+echo popt-1.18
+tar xf popt-1.18.tar.gz
+pushd popt-1.18
 ./configure --prefix=/usr \
         --disable-static \
         --build=$BUILD_TARGET
 make -j$(nproc)
 make install
 popd
-rm -rf popt-1.16
+rm -rf popt-1.18
 touch /logs/status_popt_complete
-
-echo libdb - aka Berkely DB-5.3.28
-tar xf db-5.3.28.tar.gz
-pushd db-5.3.28
-sed -i 's/\(__atomic_compare_exchange\)/\1_db/' src/dbinc/atomic.h
-cd build_unix
-../dist/configure --prefix=/usr  \
-                --enable-compat185 \
-                --enable-dbm       \
-                --disable-static   \
-                --enable-cxx       \
-                --build=$BUILD_TARGET
-make -j$(nproc)
-make docdir=/usr/share/doc/db-5.3.28 install
-chown -v -R root:root                    \
-    /usr/bin/db_*                          \
-    /usr/include/db{,_185,_cxx}.h          \
-    /usr/lib/libdb*.{so,la}                \
-    /usr/share/doc/db-5.3.28
-popd
-rm -rf db-5.3.28
-touch /logs/status_libdb_complete
 
 echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2
@@ -1099,12 +1072,12 @@ popd
 rm -rf libarchive-3.4.2
 touch /logs/status_libarchive_complete
 
-echo lua-5.3.5
-tar xf lua-5.3.5.tar.gz
-pushd lua-5.3.5
+echo lua-5.4.3
+tar xf lua-5.4.3.tar.gz
+pushd lua-5.4.3
 cat > lua.pc << "EOF"
-V=5.3
-R=5.3.5
+V=5.4
+R=5.4.3
 prefix=/usr
 INSTALL_BIN=${prefix}/bin
 INSTALL_INC=${prefix}/include
@@ -1122,19 +1095,19 @@ Requires:
 Libs: -L${libdir} -llua -lm -ldl
 Cflags: -I${includedir}
 EOF
-patch -Np1 -i ../lua-5.3.5-shared_library-1.patch
+patch -Np1 -i ../lua-5.4.3-shared_library-1.patch
 sed -i '/#define LUA_ROOT/s:/usr/local/:/usr/:' src/luaconf.h
 make MYCFLAGS="-DLUA_COMPAT_5_2 -DLUA_COMPAT_5_1" linux
 make INSTALL_TOP=/usr                \
      INSTALL_DATA="cp -d"            \
      INSTALL_MAN=/usr/share/man/man1 \
-     TO_LIB="liblua.so liblua.so.5.3 liblua.so.5.3.4" \
+     TO_LIB="liblua.so liblua.so.5.4 liblua.so.5.4.3" \
      install
-mkdir -pv                      /usr/share/doc/lua-5.3.5
-cp -v doc/*.{html,css,gif,png} /usr/share/doc/lua-5.3.5
+mkdir -pv                      /usr/share/doc/lua-5.4.3
+cp -v doc/*.{html,css,gif,png} /usr/share/doc/lua-5.4.3
 install -v -m644 -D lua.pc /usr/lib/pkgconfig/lua.pc
 popd
-rm -rf lua-5.3.5
+rm -rf lua-5.4.3
 touch /logs/status_lua_complete
 
 DEBUGEDIT_WITH_VERSION=debugedit-5.0
@@ -1191,8 +1164,5 @@ rm -rf /tmp/*
 
 echo sanity check - raw toolchain - after build complete - gcc -v
 gcc -v
-
-echo Building OpenJDK raw dependencies
-sh /tools/jdk8-build-raw.sh 2>&1 | tee /logs/openjdk8_dependency_build.log
 
 touch /logs/status_building_in_chroot_complete

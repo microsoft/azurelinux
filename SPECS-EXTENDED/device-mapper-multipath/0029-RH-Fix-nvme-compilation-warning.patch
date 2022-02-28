@@ -1,0 +1,26 @@
+From 938d211bf5e8d96849bfbf4d2707507adc7f718e Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Fri, 25 Jan 2019 14:54:56 -0600
+Subject: [PATCH] RH: Fix nvme compilation warning
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/nvme/argconfig.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libmultipath/nvme/argconfig.h b/libmultipath/nvme/argconfig.h
+index adb192b6..bfd10ef8 100644
+--- a/libmultipath/nvme/argconfig.h
++++ b/libmultipath/nvme/argconfig.h
+@@ -76,7 +76,7 @@ struct argconfig_commandline_options {
+ extern "C" {
+ #endif
+ 
+-typedef void argconfig_help_func();
++typedef void argconfig_help_func(void);
+ void argconfig_append_usage(const char *str);
+ void argconfig_print_help(const char *program_desc,
+ 			  const struct argconfig_commandline_options *options);
+-- 
+2.17.2
+

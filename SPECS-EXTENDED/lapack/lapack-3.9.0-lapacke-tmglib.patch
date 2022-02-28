@@ -1,0 +1,24 @@
+diff -up lapack-3.9.0/LAPACKE/Makefile.tmglib lapack-3.9.0/LAPACKE/Makefile
+--- lapack-3.9.0/LAPACKE/Makefile.tmglib	2019-11-26 09:22:35.406554632 -0500
++++ lapack-3.9.0/LAPACKE/Makefile	2019-11-26 09:24:06.927711490 -0500
+@@ -55,7 +55,7 @@ include/lapacke_mangling.h: include/lapa
+ 	cp include/lapacke_mangling_with_flags.h.in $@
+ 
+ shlib: lapacke
+-	$(CC) $(CFLAGS) -shared -Wl,-soname,liblapacke.so.@SHORTVER@ -o $(SHLIB_LAPACKE).@LONGVER@ src/*.o utils/*.o $(LDFLAGS) $(LIBS) -lgfortran -lc -L.. -llapack
++	$(CC) $(CFLAGS) -shared -Wl,-soname,liblapacke.so.@SHORTVER@ -o $(SHLIB_LAPACKE).@LONGVER@ src/*.o utils/*.o $(LDFLAGS) $(LIBS) -lgfortran -lc -L.. -llapack ../TESTING/MATGEN/*.o
+ 
+ .PHONY: lapacke_example
+ lapacke_example: lapacke
+diff -up lapack-3.9.0/Makefile.tmglib lapack-3.9.0/Makefile
+--- lapack-3.9.0/Makefile.tmglib	2019-11-26 09:22:35.408554591 -0500
++++ lapack-3.9.0/Makefile	2019-11-26 09:48:23.173944899 -0500
+@@ -27,7 +27,7 @@ lapacklib:
+ 	$(MAKE) -C SRC
+ 
+ .PHONY: lapackelib
+-lapackelib:
++lapackelib: tmglib
+ 	$(MAKE) -C LAPACKE
+ 
+ .PHONY: blaspplib

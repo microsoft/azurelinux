@@ -1,14 +1,13 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
-Version:        249.7
-Release:        2%{?dist}
+Version:        250.3
+Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.freedesktop.org/wiki/Software/systemd/
-#Source0:       https://github.com/systemd/systemd-stable/archive/v249.7.tar.gz
-Source0:        systemd-%{version}.tar.gz
+Source0:        https://github.com/systemd/systemd-stable/archive/v%{version}.tar.gz#/systemd-%{version}.tar.gz
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
@@ -90,6 +89,7 @@ meson  --prefix %{_prefix}                                            \
        -Dsplit-usr=false                                              \
        -Dsysusers=true                                                \
        -Dpam=true                                                     \
+       -Dhomed=false                                                  \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
        -Dlz4=true                                                     \
@@ -138,9 +138,6 @@ install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 systemctl preset-all
 
 %postun -p /sbin/ldconfig
-
-%clean
-rm -rf %{buildroot}/*
 
 %files
 %defattr(-,root,root)
@@ -229,6 +226,13 @@ rm -rf %{buildroot}/*
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Mon Jan 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 250.3-1
+- Update to systemd-stable version 250.3
+- Explicitly disable systemd-homed
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 249.7-3
+- Removing the explicit %%clean stage.
+
 * Wed Dec 08 2021 Henry Beberman <henry.beberman@microsoft.com> 249.7-2
 - Update systemd boot args to force cgroups V1 with systemd.unified_cgroup_hierarchy=0
 - Update 99-dhcp-en.network with SendRelease=false so DHCP leases arent released on reboot

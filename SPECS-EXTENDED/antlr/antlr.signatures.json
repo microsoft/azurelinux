@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "antlr-2.7.7.pom": "100f793ba27f8b4e4204edb46171ebf36e54e0f94cfc02527fea07a0bb1fceb7",
+  "antlr-2.7.7.tar.bz2": "93c0f0cb64c5c3558d97cc5c30b4dbe11074fb1689c4defa8f7d7fcd35473099",
+  "antlr-build.xml": "22e0a05f013e1468fdea14dd4af5887efbbfd322cfadd632f83a100a2bfdd793",
+  "antlr-rpmlintrc": "9a4a345b7fe0683d501037457b01cc0538c5c8df1f0cc6dd5aa62988af3e6ed6",
+  "antlr-script": "dd46ee00eb5517dc689c1ea062fb367bccd6ff9603d71a64d986e1c8a584b476"
+ }
+}

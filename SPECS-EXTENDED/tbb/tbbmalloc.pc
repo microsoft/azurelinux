@@ -1,0 +1,5 @@
+Name: Threading Building Blocks Scalable Allocator
+Description: Implementation of Scalable Memory Allocator of Threading Building Blocks
+URL: http://www.threadingbuildingblocks.org/
+Version: _FEDORA_VERSION
+Libs: -ltbbmalloc

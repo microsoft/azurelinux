@@ -1,13 +1,13 @@
 Summary:        Kernel Audit Tool
 Name:           audit
-Version:        3.0
-Release:        8%{?dist}
+Version:        3.0.6
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://people.redhat.com/sgrubb/audit/
-Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}-alpha8.tar.gz
+Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}.tar.gz
 Patch0:         refuse-manual-stop.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  golang
@@ -89,9 +89,6 @@ ln -sfv %{_var}/opt/audit/log %{buildroot}/%{_var}/log/audit
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 
-install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
-echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-auditd.preset
-
 %check
 %make_build check
 
@@ -111,7 +108,6 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %{_bindir}/*
 %{_sbindir}/*
 %{_libdir}/systemd/system/auditd.service
-%{_libdir}/systemd/system-preset/50-auditd.preset
 %{_libexecdir}/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -133,6 +129,7 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/audisp-remote.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/plugins.d/au-remote.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/libaudit.conf
+%{_datadir}/%{name}/sample-rules/*
 
 %files libs
 %license COPYING
@@ -152,6 +149,12 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %{python3_sitelib}/*
 
 %changelog
+* Mon Jan 31 2022 Chris PeBenito <chpebeni@microsoft.com> - 3.0.6.2
+- Remove override so auditd starts by default.
+
+* Fri Dec 10 2021 Chris Co <chrco@microsoft.com> - 3.0.6-1
+- Update to 3.0.6
+
 * Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-8
 - Remove tcp_wrappers dependency due to package removal
 - License verified
@@ -176,7 +179,7 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 - Renaming go to golang
 
 * Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0-1
-- Updated to version 3.0-alpha8. Subpackage licenses updated. 
+- Updated to version 3.0-alpha8. Subpackage licenses updated.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8.4-2
 - Initial CBL-Mariner import from Photon (license: Apache2).

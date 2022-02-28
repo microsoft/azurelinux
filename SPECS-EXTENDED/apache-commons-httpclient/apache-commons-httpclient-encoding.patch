@@ -1,0 +1,34 @@
+--- build.xml	2007-08-18 05:02:14.000000000 -0400
++++ build.xml	2012-01-23 09:52:50.405796336 -0500
+@@ -179,6 +179,7 @@
+           description="Compile shareable components">
+     <javac srcdir      ="${source.home}/java"
+            destdir     ="${build.home}/classes"
++           encoding    ="ISO-8859-1"
+            debug       ="${compile.debug}"
+            deprecation ="${compile.deprecation}"
+            optimize    ="${compile.optimize}">
+@@ -186,6 +187,7 @@
+     </javac>
+     <javac srcdir      ="${source.home}/examples"
+            destdir     ="${build.home}/examples"
++           encoding    ="ISO-8859-1"
+            debug       ="${compile.debug}"
+            deprecation ="${compile.deprecation}"
+            optimize    ="${compile.optimize}">
+@@ -197,6 +199,7 @@
+           description="Compile unit test cases">
+     <javac srcdir      ="${test.home}"
+            destdir     ="${build.home}/tests"
++           encoding    ="ISO-8859-1"
+            debug       ="${compile.debug}"
+            deprecation ="${compile.deprecation}"
+            optimize    ="${compile.optimize}">
+@@ -244,6 +244,7 @@
+     <mkdir dir="${dist.home}/docs/api"/>
+     <javadoc sourcepath   ="${source.home}/java"
+              destdir      ="${dist.home}/docs/api"
++             encoding     ="ISO-8859-1"
+              packagenames ="org.apache.commons.*"
+              author       ="true"
+              protected    ="true"

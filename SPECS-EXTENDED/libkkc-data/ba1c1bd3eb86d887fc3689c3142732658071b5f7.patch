@@ -1,0 +1,138 @@
+From ba1c1bd3eb86d887fc3689c3142732658071b5f7 Mon Sep 17 00:00:00 2001
+From: Takao Fujiwara <tfujiwar@redhat.com>
+Date: Mon, 30 Jul 2018 15:26:37 +0900
+Subject: [PATCH] build: Enable python3
+
+---
+ data/templates/libkkc-data/tools/genfilter.py | 18 +++++++--------
+ data/templates/libkkc-data/tools/sortlm.py    | 23 ++++++++-----------
+ 2 files changed, 19 insertions(+), 22 deletions(-)
+
+diff --git a/data/templates/libkkc-data/tools/genfilter.py b/data/templates/libkkc-data/tools/genfilter.py
+index 5ffab32..0c5f75a 100644
+--- a/data/templates/libkkc-data/tools/genfilter.py
++++ b/data/templates/libkkc-data/tools/genfilter.py
+@@ -84,24 +84,24 @@ def __init__(self, infile, outfile, record_size):
+ 
+     def generate(self):
+         size = os.fstat(self.infile.fileno()).st_size
+-        n = size / self.record_size
++        n = size // self.record_size
+         m = int(math.ceil(-n*math.log10(ERROR_RATE) /
+                           math.pow(math.log10(2), 2)))
+-        m = (m/8 + 1)*8
++        m = (m//8 + 1)*8
+         inmem = mmap.mmap(self.infile.fileno(),
+                           size,
+                           access=mmap.ACCESS_READ)
+-        outmem = bytearray(m/8)
+-        for i in xrange(0, n):
++        outmem = bytearray(m//8)
++        for i in range(0, n):
+             offset = i*self.record_size
+             b0, b1 = struct.unpack("=LL", inmem[offset:offset+8])
+-            for k in xrange(0, 4):
++            for k in range(0, 4):
+                 h = murmur_hash3_32(b0, b1, k)
+                 h = int(h * (m / float(0xFFFFFFFF)))
+-                outmem[h/8] |= (1 << (h%8))
++                outmem[h//8] |= (1 << (h%8))
+         inmem.close()
+-        # Convert bytearray to str, for Python 2.6 compatibility.
+-        self.outfile.write(str(outmem))
++        # Convert bytearray to bytes, for Python 3 compatibility.
++        self.outfile.write(bytes(outmem))
+ 
+ if __name__ == '__main__':
+     import sys
+@@ -110,7 +110,7 @@ def generate(self):
+     parser = argparse.ArgumentParser(description='filter')
+     parser.add_argument('infile', type=argparse.FileType('r'),
+                         help='input file')
+-    parser.add_argument('outfile', type=argparse.FileType('w'),
++    parser.add_argument('outfile', type=argparse.FileType('wb'),
+                         help='output file')
+     parser.add_argument('record_size', type=int,
+                         help='record size')
+diff --git a/data/templates/libkkc-data/tools/sortlm.py b/data/templates/libkkc-data/tools/sortlm.py
+index a0dd8fe..40f0837 100644
+--- a/data/templates/libkkc-data/tools/sortlm.py
++++ b/data/templates/libkkc-data/tools/sortlm.py
+@@ -40,10 +40,10 @@ def __init__(self, infile, output_prefix):
+         self.__min_cost = 0.0
+ 
+     def read(self):
+-        print "reading N-grams"
++        print("reading N-grams")
+         self.__read_tries()
+         self.__read_ngrams()
+-        print "min cost = %lf" % self.__min_cost
++        print("min cost = %lf" % self.__min_cost)
+ 
+     def __read_tries(self):
+         while True:
+@@ -58,7 +58,7 @@ def __read_tries(self):
+             line = self.__infile.readline()
+             if line == "":
+                 break
+-            line = line.strip()
++            line = line.strip('\n')
+             if line == "":
+                 break
+             match = self.__ngram_line_regex.match(line)
+@@ -89,7 +89,7 @@ def __read_ngrams(self):
+                 line = self.__infile.readline()
+                 if line == "":
+                     break
+-                line = line.strip()
++                line = line.strip('\n')
+                 if line == "":
+                     break
+                 match = self.__ngram_line_regex.match(line)
+@@ -125,14 +125,11 @@ def __write_ngrams(self):
+         def quantize(cost, min_cost):
+             return max(0, min(65535, int(cost * 65535 / min_cost)))
+ 
+-        def cmp_header(a, b):
+-            return cmp(a[0], b[0])
+-
+-        print "writing 1-gram file"
++        print("writing 1-gram file")
+         unigram_offsets = {}
+         unigram_file = open("%s.1gram" % self.__output_prefix, "wb")
+         offset = 0
+-        for ids, value in sorted(self.__ngram_entries[0].iteritems()):
++        for ids, value in sorted(self.__ngram_entries[0].items()):
+             unigram_offsets[ids[0]] = offset
+             s = struct.pack("=HHH",
+                             quantize(value[0], self.__min_cost),
+@@ -143,13 +140,13 @@ def cmp_header(a, b):
+             offset += 1
+         unigram_file.close()
+ 
+-        print "writing 2-gram file"
++        print("writing 2-gram file")
+         bigram_offsets = {}
+         bigram_file = open("%s.2gram" % self.__output_prefix, "wb")
+         keys = self.__ngram_entries[1].keys()
+         items = [(struct.pack("=LL", ids[1], unigram_offsets[ids[0]]), ids) for ids in keys]
+         offset = 0
+-        for header, ids in sorted(items, cmp=cmp_header):
++        for header, ids in sorted(items, key=lambda x: x[0]):
+             value = self.__ngram_entries[1][ids]
+             bigram_offsets[ids] = offset
+             s = struct.pack("=HH",
+@@ -160,11 +157,11 @@ def cmp_header(a, b):
+         bigram_file.close()
+ 
+         if len(self.__ngram_entries[2]) > 0:
+-            print "writing 3-gram file"
++            print("writing 3-gram file")
+             trigram_file = open("%s.3gram" % self.__output_prefix, "wb")
+             keys = self.__ngram_entries[2].keys()
+             items = [(struct.pack("=LL", ids[2], bigram_offsets[(ids[0], ids[1])]), ids) for ids in keys]
+-            for header, ids in sorted(items, cmp=cmp_header):
++            for header, ids in sorted(items, key=lambda x: x[0]):
+                 value = self.__ngram_entries[2][ids]
+                 s = struct.pack("=H",
+                                 quantize(value[0], self.__min_cost))

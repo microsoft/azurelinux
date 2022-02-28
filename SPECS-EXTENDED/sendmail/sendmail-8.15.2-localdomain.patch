@@ -1,0 +1,13 @@
+diff --git a/cf/m4/proto.m4 b/cf/m4/proto.m4
+index 696bf36..5a5963b 100644
+--- a/cf/m4/proto.m4
++++ b/cf/m4/proto.m4
+@@ -1898,6 +1898,8 @@ R<@> < $* @ [IPv6:::1] >
+ 			$: < ? $&{client_name} > < $1 @ [IPv6:::1] >
+ R<@> < $* @ localhost.$m >
+ 			$: < ? $&{client_name} > < $1 @ localhost.$m >
++R<@> < $* @ localhost.localdomain >
++			$: < ? $&{client_name} > < $1 @ localhost.localdomain >
+ ifdef(`_NO_UUCP_', `dnl',
+ `R<@> < $* @ localhost.UUCP >
+ 			$: < ? $&{client_name} > < $1 @ localhost.UUCP >')

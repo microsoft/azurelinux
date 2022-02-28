@@ -1,0 +1,11 @@
+--- Map8.xs
++++ Map8.xs
+@@ -348,7 +348,7 @@
+ 	Map8* m2
+ 	PREINIT:
+ 	    STRLEN len;
+-	    STRLEN rlen;
++	    int rlen;
+ 	    char*  res;
+ 	INPUT:
+ 	    char* str = SvPV(ST(2), len);

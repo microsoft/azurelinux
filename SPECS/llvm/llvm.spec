@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,10 +12,7 @@ BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
-BuildRequires:  python2
-%if %{with_check}
-BuildRequires:  python-xml
-%endif
+BuildRequires:  python3-devel
 Requires:       libxml2
 
 %description
@@ -46,6 +43,7 @@ cmake -G Ninja                              \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_PARALLEL_LINK_JOBS=1           \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
+      -DLLVM_LINK_LLVM_DYLIB=ON             \
       -DLLVM_INCLUDE_TESTS=ON               \
       -DLLVM_BUILD_TESTS=ON                 \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
@@ -68,9 +66,6 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 cd build
 ninja check-all
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
@@ -91,6 +86,15 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 12.0.1-4
+- Allow tools to link to libLLVM shared library
+
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 12.0.1-3
+- Use python3 during build
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0.1-2
+- Removing the explicit %%clean stage.
+
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
 - Update to 12.0.1
 

@@ -8,18 +8,18 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
-Version:        5.3.0
-Release:        12%{?dist}
+Version:        6.0.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
-#Source0:       https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch
+Patch1:         remove-headless-from-java-requires.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
-BuildRequires:  java-devel
+BuildRequires:  msopenjdk-11
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
@@ -27,10 +27,13 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  which
 BuildRequires:  xmlto
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 Requires:       coreutils
 Requires:       findutils
 # default JRE
-Requires:       java-1.8.0-openjdk-headless
+Requires:       msopenjdk-11
 Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}
@@ -45,7 +48,6 @@ This package provides macros and scripts to support Java packaging.
 
 %package -n javapackages-filesystem
 Summary:        Java packages filesystem layout
-Obsoletes:      eclipse-filesystem < 2
 Provides:       eclipse-filesystem = %{version}-%{release}
 
 %description -n javapackages-filesystem
@@ -65,7 +67,6 @@ artifact resolution using XMvn resolver.
 Summary:        Module for handling various files for Java packaging
 Requires:       python3-lxml
 Requires:       python3-six
-Obsoletes:      python-javapackages < %{version}-%{release}
 
 %description -n python3-javapackages
 Module for handling, querying and manipulating of various files for Java
@@ -74,7 +75,7 @@ packaging in Linux distributions
 %package -n javapackages-local-bootstrap
 Summary:        Non-essential macros and scripts for Java packaging support
 Requires:       %{name} = %{version}-%{release}
-Requires:       java-1.8.0-openjdk-devel
+Requires:       msopenjdk-11
 Requires:       python3
 Requires:       python3-javapackages = %{version}-%{release}
 
@@ -82,12 +83,20 @@ Requires:       python3-javapackages = %{version}-%{release}
 This package provides non-essential macros and scripts to support Java packaging.
 It is a lightweight version with minimal runtime requirements.
 
+%package -n javapackages-generators
+Summary:        RPM dependency generators for Java packaging support
+Requires:       %{name} = %{version}-%{release}
+Requires:       python3-javapackages = %{version}-%{release}
+Requires:       %{python_interpreter}
+ 
+%description -n javapackages-generators
+RPM dependency generators to support Java packaging.
+
 %prep
-%setup -q -n javapackages-%{version}
-%patch0 -p1
+%autosetup -p1 -n javapackages-%{version}
 
 %build
-%define jdk_home $(find %{_libdir}/jvm -name "OpenJDK*")
+%define jdk_home $(find %{_libdir}/jvm -name "msopenjdk*")
 %define jre_home %{jdk_home}/jre
 
 %configure --pyinterpreter=%{python_interpreter} \
@@ -105,11 +114,14 @@ rm -rf %{buildroot}%{_datadir}/gradle-local
 rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 
 %check
+pip3 install -r test-requirements.txt
 ./check
 
 %files -f files-tools
 
 %files -n javapackages-filesystem -f files-filesystem
+
+%files -n javapackages-generators -f files-generators
 
 %files -n javapackages-local-bootstrap -f files-local
 
@@ -119,6 +131,21 @@ rm -rf %{buildroot}%{_mandir}/man7/gradle_build.7
 %license LICENSE
 
 %changelog
+* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.0.0-1
+- Update source to v6.0.0
+- Update remove-headless-from-java-requires.patch
+- Add javapackages-generators 
+
+* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 5.3.0-14
+- Add patch to replace generated dependency on "java-headless" with "java"
+- Amend epoch patch to fix expected test results
+- Remove obsoletes statements that don't apply to Mariner
+- Install test requirements with pip during check section
+
+* Thu Dec 02 2021 Andrew Phelps <anphel@microsoft.com> - 5.3.0-13
+- Update to build with JDK 11
+- License verified
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 5.3.0-12
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

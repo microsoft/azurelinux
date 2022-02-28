@@ -1,0 +1,45 @@
+diff -urNp PackageKit-0.8.14.old/etc/Vendor.conf PackageKit-0.8.14/etc/Vendor.conf
+--- PackageKit-0.8.14.old/etc/Vendor.conf	2013-12-02 15:14:19.644838900 +0000
++++ PackageKit-0.8.14/etc/Vendor.conf	2013-12-02 15:15:26.956925038 +0000
+@@ -12,7 +12,7 @@
+ # If the value is set to 'none' then no link is shown.
+ #
+ # default=http://www.packagekit.org/pk-package-not-found.html
+-DefaultUrl=http://www.packagekit.org/pk-package-not-found.html
++DefaultUrl=https://fedoraproject.org/wiki/PackageKit_Items_Not_Found#Missing_Package
+ 
+ # The URL which is shown to the user when a codec could not be found.
+ # It should explain why certain codecs cannot be used, and perhaps show
+@@ -21,7 +21,7 @@ DefaultUrl=http://www.packagekit.org/pk-
+ # If the value is set to 'none' then the value of DefaultUrl is used.
+ #
+ # default=none
+-CodecUrl=none
++CodecUrl=https://fedoraproject.org/wiki/PackageKit_Items_Not_Found#Missing_Codec
+ 
+ # The URL which is shown to the user when hardware drivers could not be found.
+ # It should explain why some hardware is not supported, and links to futher
+@@ -30,7 +30,7 @@ CodecUrl=none
+ # If the value is set to 'none' then the value of DefaultUrl is used.
+ #
+ # default=none
+-HardwareUrl=none
++HardwareUrl=https://fedoraproject.org/wiki/PackageKit_Items_Not_Found#Missing_Driver
+ 
+ # The URL which is shown to the user when fonts could not be found.
+ # Alternatives should probably be suggested where possible.
+@@ -38,7 +38,7 @@ HardwareUrl=none
+ # If the value is set to 'none' then the value of DefaultUrl is used.
+ #
+ # default=none
+-FontUrl=none
++FontUrl=https://fedoraproject.org/wiki/PackageKit_Items_Not_Found#Missing_Font
+ 
+ # The URL which is shown to the user when programs handing a mime tpye could not
+ # be found. It should probably explain how to use wine if the program is a
+@@ -47,4 +47,4 @@ FontUrl=none
+ # If the value is set to 'none' then the value of DefaultUrl is used.
+ #
+ # default=none
+-MimeUrl=none
++MimeUrl=https://fedoraproject.org/wiki/PackageKit_Items_Not_Found#Missing_MIME_Support

@@ -1,0 +1,23 @@
+.TH PROXY "1" "September 2013" "libproxy" "User Commands"
+.SH NAME
+proxy \- Display the proxy server that should be used to reach a given a network resource
+.SH SYNOPSIS
+proxy
+.SH DESCRIPTION
+Display the proxy server that should be used to reach a given a network resource.
+.PP
+libproxy is a library that provides automatic proxy configuration management
+using different backends.
+.SH EXAMPLE
+.B echo http://www.example.com/ | proxy
+  http://webcache:3128 direct://
+.SH AUTHOR
+This manual page was written by
+.MT bigon@debian.org
+Laurent Bigonville
+.ME ,
+for the Debian GNU/Linux system (but may be used by others).
+.SH SEE ALSO
+.UR http://code.google.com/p/libproxy/
+libproxy
+.UE .

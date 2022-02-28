@@ -1,0 +1,150 @@
+From 01eeca78566d3a867d9e7142e4ef84f0a4f4c6ff Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Fri, 8 Mar 2019 15:53:38 +0000
+Subject: [PATCH 1/2] OSGi metadata fixes:
+
+ * unbundles tiger-types from hk2-utils
+ * fixes invalid whitespace in hk2-core
+---
+ class-model/osgi.bundle | 30 +++++++++++++++---------------
+ hk2-api/osgi.bundle     | 30 +++++++++++++++---------------
+ hk2-core/osgi.bundle    |  3 ++-
+ hk2-utils/osgi.bundle   | 31 +++++++++++++++----------------
+ 4 files changed, 47 insertions(+), 47 deletions(-)
+
+diff --git a/class-model/osgi.bundle b/class-model/osgi.bundle
+index 3e8ba69..72905ec 100755
+--- a/class-model/osgi.bundle
++++ b/class-model/osgi.bundle
+@@ -1,18 +1,18 @@
+-/*
+- * Copyright (c) 2010, 2018 Oracle and/or its affiliates. All rights reserved.
+- *
+- * This program and the accompanying materials are made available under the
+- * terms of the Eclipse Public License v. 2.0, which is available at
+- * http://www.eclipse.org/legal/epl-2.0.
+- *
+- * This Source Code may also be made available under the following Secondary
+- * Licenses when the conditions for such availability set forth in the
+- * Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
+- * version 2 with the GNU Classpath Exception, which is available at
+- * https://www.gnu.org/software/classpath/license.html.
+- *
+- * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+- */
++#
++# Copyright (c) 2010, 2018 Oracle and/or its affiliates. All rights reserved.
++#
++# This program and the accompanying materials are made available under the
++# terms of the Eclipse Public License v. 2.0, which is available at
++# http://www.eclipse.org/legal/epl-2.0.
++#
++# This Source Code may also be made available under the following Secondary
++# Licenses when the conditions for such availability set forth in the
++# Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
++# version 2 with the GNU Classpath Exception, which is available at
++# https://www.gnu.org/software/classpath/license.html.
++#
++# SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
++#
+ 
+ Bundle-Activator: org.glassfish.hk2.classmodel.reflect.util.ClassModelActivator
+ 
+diff --git a/hk2-api/osgi.bundle b/hk2-api/osgi.bundle
+index be5033d..e08de48 100755
+--- a/hk2-api/osgi.bundle
++++ b/hk2-api/osgi.bundle
+@@ -1,18 +1,18 @@
+-/*
+- * Copyright (c) 2010, 2018 Oracle and/or its affiliates. All rights reserved.
+- *
+- * This program and the accompanying materials are made available under the
+- * terms of the Eclipse Public License v. 2.0, which is available at
+- * http://www.eclipse.org/legal/epl-2.0.
+- *
+- * This Source Code may also be made available under the following Secondary
+- * Licenses when the conditions for such availability set forth in the
+- * Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
+- * version 2 with the GNU Classpath Exception, which is available at
+- * https://www.gnu.org/software/classpath/license.html.
+- *
+- * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+- */
++#
++# Copyright (c) 2010, 2018 Oracle and/or its affiliates. All rights reserved.
++#
++# This program and the accompanying materials are made available under the
++# terms of the Eclipse Public License v. 2.0, which is available at
++# http://www.eclipse.org/legal/epl-2.0.
++#
++# This Source Code may also be made available under the following Secondary
++# Licenses when the conditions for such availability set forth in the
++# Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
++# version 2 with the GNU Classpath Exception, which is available at
++# https://www.gnu.org/software/classpath/license.html.
++#
++# SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
++#
+ 
+ -exportcontents: \
+                com.sun.hk2.component; \
+diff --git a/hk2-core/osgi.bundle b/hk2-core/osgi.bundle
+index f9db7c6..1e4fd15 100755
+--- a/hk2-core/osgi.bundle
++++ b/hk2-core/osgi.bundle
+@@ -24,4 +24,5 @@
+                             com.sun.enterprise.module.single; \
+                             com.sun.enterprise.module.impl; version=${project.osgi.version}
+ 
+-Import-Package: \           * 
++Import-Package: \
++                            * 
+diff --git a/hk2-utils/osgi.bundle b/hk2-utils/osgi.bundle
+index 4f3779a..fad6317 100755
+--- a/hk2-utils/osgi.bundle
++++ b/hk2-utils/osgi.bundle
+@@ -1,18 +1,18 @@
+-/*
+- * Copyright (c) 2010, 2018 Oracle and/or its affiliates. All rights reserved.
+- *
+- * This program and the accompanying materials are made available under the
+- * terms of the Eclipse Public License v. 2.0, which is available at
+- * http://www.eclipse.org/legal/epl-2.0.
+- *
+- * This Source Code may also be made available under the following Secondary
+- * Licenses when the conditions for such availability set forth in the
+- * Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
+- * version 2 with the GNU Classpath Exception, which is available at
+- * https://www.gnu.org/software/classpath/license.html.
+- *
+- * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+- */
++#
++# Copyright (c) 2010, 2018 Oracle and/or its affiliates. All rights reserved.
++#
++# This program and the accompanying materials are made available under the
++# terms of the Eclipse Public License v. 2.0, which is available at
++# http://www.eclipse.org/legal/epl-2.0.
++#
++# This Source Code may also be made available under the following Secondary
++# Licenses when the conditions for such availability set forth in the
++# Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
++# version 2 with the GNU Classpath Exception, which is available at
++# https://www.gnu.org/software/classpath/license.html.
++#
++# SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
++#
+ 
+ -exportcontents: \
+                org.glassfish.hk2.utilities.cache; \
+@@ -20,7 +20,6 @@
+                org.glassfish.hk2.utilities.reflection; \
+                org.glassfish.hk2.utilities.reflection.internal; \
+                org.jvnet.hk2.component; \
+-               org.jvnet.tiger_types; \
+                version=${project.osgi.version}
+ 
+ DynamicImport-Package: *
+-- 
+2.20.1
+

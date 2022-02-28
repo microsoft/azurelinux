@@ -1,22 +1,21 @@
-Summary:       Jansson json parser
-Name:          jansson
-Version:       2.11
-Release:        3%{?dist}
-Group:         System Environment/Libraries
+Summary:        Jansson json parser
+Name:           jansson
+Version:        2.14
+Release:        1%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
-License:       MIT
-URL:           http://www.digip.org/jansson
-Source0:       http://www.digip.org/jansson/releases/%{name}-%{version}.tar.gz
-%define sha1 %{name}-%{version}=0c99636416499960214ce6c095d26af541d3c244
 Distribution:   Mariner
+# digip.org now redirects to https://github.com/akheron/jansson
+URL:            http://www.digip.org/jansson
+Source0:        https://github.com/akheron/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 %description
 Jansson is a C library for encoding, decoding and manipulating JSON data.
 
 %package devel
-Summary:    Development files for jansson
-Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Summary:        Development files for jansson
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Development files for jansson
@@ -32,7 +31,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name '*.la' -delete -print
 
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
@@ -44,12 +43,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
     # First argument is 1 => New Installation
     # First argument is 2 => Upgrade
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %license LICENSE
-%doc LICENSE CHANGES
+%doc CHANGES
 %{_libdir}/*.so.*
 
 %files devel
@@ -58,14 +54,24 @@ rm -rf %{buildroot}/*
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Feb 10 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.14-1
+- Update source to v2.14
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11-4
+- Removing the explicit %%clean stage.
+- License verified.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.11-3
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.11-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*  Mon Sep 10 2018 Ankit Jain <ankitja@vmware.com> 2.11-1
--  Updated to version 2.11
-*  Thu Mar 30 2017 Divya Thaluru <dthaluru@vmware.com> 2.10-1
--  Updated to version 2.10
-*  Thu Jan 05 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9-1
--  Initial
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.11-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Sep 10 2018 Ankit Jain <ankitja@vmware.com> 2.11-1
+- Updated to version 2.11
+
+* Thu Mar 30 2017 Divya Thaluru <dthaluru@vmware.com> 2.10-1
+- Updated to version 2.10
+
+* Thu Jan 05 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.9-1
+- Initial

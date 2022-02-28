@@ -1,0 +1,11 @@
+--- bcel-5.2/build.xml	2017-09-27 18:59:57.110434113 +0200
++++ bcel-5.2/build.xml	2017-09-27 19:00:39.286692143 +0200
+@@ -39,7 +39,7 @@
+   <target name="compile" description="o Compile the code" depends="get-deps">
+     <mkdir dir="${classesdir}">
+     </mkdir>
+-    <javac destdir="${classesdir}" deprecation="true" debug="true" optimize="false" excludes="**/package.html">
++    <javac destdir="${classesdir}" deprecation="true" debug="true" optimize="false" encoding="ISO-8859-1" excludes="**/package.html">
+       <src>
+         <pathelement location="src/java">
+         </pathelement>

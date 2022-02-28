@@ -1,15 +1,19 @@
 %define debug_package %{nil}
 Summary:        Distro - an OS platform information API
 Name:           python-distro
-Version:        1.4.0
-Release:        5%{?dist}
+Version:        1.6.0
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-URL:            https://pypi.python.org/pypi/distro
-#Source0:       https://github.com/nir0s/distro/archive/v%{version}.tar.gz
-Source0:        distro-%{version}-github.tar.gz
+URL:            https://distro.readthedocs.io/en/latest/
+Source0:        https://github.com/python-distro/distro/releases/download/v%{version}/distro-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
 %description
@@ -17,15 +21,8 @@ Distro provides information about the OS distribution it runs on, such as a reli
 
 %package -n     python3-distro
 Summary:        Distro - an OS platform information API
-BuildRequires:  python3
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       mariner-release
 Requires:       python3
-Requires:       python3-libs
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
 
 %description -n python3-distro
 Distro provides information about the OS distribution it runs on, such as a reliable machine-readable ID, or version information.
@@ -40,8 +37,9 @@ Distro provides information about the OS distribution it runs on, such as a reli
 %py3_install
 
 %check
-pip3 install tox
-tox
+pip3 install pytest
+export LANG=C.UTF-8
+%pytest
 
 %files -n python3-distro
 %defattr(-,root,root,-)
@@ -51,6 +49,12 @@ tox
 %{_bindir}/*
 
 %changelog
+* Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.6.0-2
+- Use `%pytest` instead of `tox` to enable ptest
+
+* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 1.6.0-1
+- Upgrade to latest upstream version
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-5
 - Add license to python3 package
 - Remove python2 package

@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "LICENSE.PTR": "b01434e9a89f0cdf3806bb8dfad60baf1bced6cf64c4819b7ba1fda296ae59dc",
   "Module-Build-0.4224.tar.gz": "a6ca15d78244a7b50fdbf27f85c85f4035aa799ce7dd018a0d98b358ef7bc782"
  }
 }

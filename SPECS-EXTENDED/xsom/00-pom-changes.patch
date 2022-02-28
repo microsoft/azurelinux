@@ -1,0 +1,27 @@
+diff --git a/pom.xml b/pom.xml
+index f972462..a542ee5 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -231,12 +231,6 @@
+                             <phase>generate-sources</phase>
+                             <configuration>
+                                 <tasks>
+-                                    <taskdef name="licence" classname="com.sun.tools.LicenceTask">
+-                                        <classpath>
+-                                            <pathelement path="lib/lic.jar" />
+-                                        </classpath>
+-                                    </taskdef>
+-
+                                     <!--<mkdir dir="build/automata" />-->
+ 
+                                     <!-- delete old files to avoid corruption -->
+@@ -249,9 +243,6 @@
+                                         <arg path="src/com/sun/xml/xsom/impl/parser/state" />
+                                         <arg path="src/xmlschema.rng" />
+                                     </java>
+-                                    <licence licence="licenceheader.txt">
+-                                        <fileset dir="src/" includes="com/sun/xml/xsom/impl/parser/state/*.java" />
+-                                    </licence>
+                                 </tasks>
+                             </configuration>
+                             <goals>

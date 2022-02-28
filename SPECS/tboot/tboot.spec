@@ -9,6 +9,7 @@ Group:          System Environment/Security
 URL:            https://sourceforge.net/projects/tboot/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:        create-drtm-policy.sh
+Source2:        README.md
 Patch0:         remove-sm3.patch
 BuildRequires:  make
 BuildRequires:  gcc
@@ -33,13 +34,15 @@ make debug=y %{?_smp_mflags}
 make debug=y DISTDIR=$RPM_BUILD_ROOT install
 mkdir -p %{buildroot}%{_bindir}
 install -m 755 %{SOURCE1} %{buildroot}%{_bindir}/create-drtm-policy.sh
-
+mkdir -p %{buildroot}%{_docdir}
+install -m 755 %{SOURCE2} %{buildroot}%{_docdir}/README.md
 
 %files
 %doc COPYING docs/*
 %config %{_sysconfdir}/grub.d/20_linux_tboot
 %config %{_sysconfdir}/grub.d/20_linux_xen_tboot
 %{_bindir}/create-drtm-policy.sh
+%{_docdir}/README.md
 %{_sbindir}/lcp2_crtpol
 %{_sbindir}/lcp2_crtpolelt
 %{_sbindir}/lcp2_crtpollist
@@ -54,9 +57,11 @@ install -m 755 %{SOURCE1} %{buildroot}%{_bindir}/create-drtm-policy.sh
 
 
 %changelog
-* Thu Nov 04 2021 Henry Li <lihl@microsoft.com> 1.9.12-2
+* Fri Feb 25 2022 Henry Li <lihl@microsoft.com> 1.10.2-1
+- Upgrade to version 1.10.2
 - Add mandatory grub configuration files/tooling that are missing
 - Add script to create DRTM launch policy
+- Add patch to disable supporting sm3 encryption policy
 
 *   Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> 1.9.12-1
 -   Update to version 1.9.12 for binutils 2.36.1 compatibility

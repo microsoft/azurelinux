@@ -1,0 +1,11 @@
+--- ./data/ostable.orig	2021-02-15 19:38:42.839725962 +0000
++++ ./data/ostable	2021-02-15 19:43:00.942473302 +0000
+@@ -19,7 +19,7 @@ base-uclibc-linux	linux-uclibc		linux[^-
+ eabihf-musl-linux	linux-musleabihf	linux[^-]*-musleabihf
+ base-musl-linux		linux-musl		linux[^-]*-musl
+ eabihf-gnu-linux	linux-gnueabihf		linux[^-]*-gnueabihf
+-eabi-gnu-linux		linux-gnueabi		linux[^-]*-gnueabi
++eabi-gnu-linux		linux-gnu		linux[^-]*-gnueabi
+ abin32-gnu-linux	linux-gnuabin32		linux[^-]*-gnuabin32
+ abi64-gnu-linux		linux-gnuabi64		linux[^-]*-gnuabi64
+ spe-gnu-linux		linux-gnuspe		linux[^-]*-gnuspe

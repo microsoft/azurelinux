@@ -1,0 +1,18 @@
+--- netkit-rusers-0.15/rpc.rusersd/rusers_proc.c.numusers	Mon Sep 20 10:03:12 1999
++++ netkit-rusers-0.15/rpc.rusersd/rusers_proc.c	Mon Sep 20 10:03:54 1999
+@@ -204,13 +204,14 @@
+ char *
+ rusers_num(void *ign1, struct svc_req *ign2)
+ {
+-        static int num_users = 0;
++        static int num_users;
+ 	struct utmp *uptr;
+ 	(void)ign1;
+ 	(void)ign2;
+ 
+         /* only use entries with both name and line fields */
+ 
++	num_users = 0;
+ 	setutent();
+         while ((uptr = getutent())!=NULL) {
+                 if (*uptr->ut_name && *uptr->ut_line &&

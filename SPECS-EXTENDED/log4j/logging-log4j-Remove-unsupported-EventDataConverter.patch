@@ -1,0 +1,268 @@
+diff --git a/log4j-slf4j-impl/src/main/java/org/apache/logging/slf4j/EventDataConverter.java b/log4j-slf4j-impl/src/main/java/org/apache/logging/slf4j/EventDataConverter.java
+deleted file mode 100644
+index 620232a..0000000
+--- a/log4j-slf4j-impl/src/main/java/org/apache/logging/slf4j/EventDataConverter.java
++++ /dev/null
+@@ -1,50 +0,0 @@
+-/*
+- * Licensed to the Apache Software Foundation (ASF) under one or more
+- * contributor license agreements. See the NOTICE file distributed with
+- * this work for additional information regarding copyright ownership.
+- * The ASF licenses this file to You under the Apache license, Version 2.0
+- * (the "License"); you may not use this file except in compliance with
+- * the License. You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the license for the specific language governing permissions and
+- * limitations under the license.
+- */
+-package org.apache.logging.slf4j;
+-
+-import java.util.Map;
+-
+-import org.apache.logging.log4j.message.Message;
+-import org.apache.logging.log4j.message.ParameterizedMessage;
+-import org.apache.logging.log4j.message.StructuredDataMessage;
+-import org.slf4j.ext.EventData;
+-
+-/**
+- *
+- */
+-public class EventDataConverter {
+-
+-    public Message convertEvent(final String message, final Object[] objects, final Throwable throwable) {
+-        try {
+-            final EventData data = objects != null && objects[0] instanceof EventData ?
+-                    (EventData) objects[0] : new EventData(message);
+-            final StructuredDataMessage msg =
+-                    new StructuredDataMessage(data.getEventId(), data.getMessage(), data.getEventType());
+-            for (final Map.Entry<String, Object> entry : data.getEventMap().entrySet()) {
+-                final String key = entry.getKey();
+-                if (EventData.EVENT_TYPE.equals(key) || EventData.EVENT_ID.equals(key)
+-                        || EventData.EVENT_MESSAGE.equals(key)) {
+-                    continue;
+-                }
+-                msg.put(key, String.valueOf(entry.getValue()));
+-            }
+-            return msg;
+-        } catch (final Exception ex) {
+-            return new ParameterizedMessage(message, objects, throwable);
+-        }
+-    }
+-}
+diff --git a/log4j-slf4j-impl/src/main/java/org/apache/logging/slf4j/Log4jLogger.java b/log4j-slf4j-impl/src/main/java/org/apache/logging/slf4j/Log4jLogger.java
+index 1fa8080..90cfe4e 100644
+--- a/log4j-slf4j-impl/src/main/java/org/apache/logging/slf4j/Log4jLogger.java
++++ b/log4j-slf4j-impl/src/main/java/org/apache/logging/slf4j/Log4jLogger.java
+@@ -27,9 +27,7 @@ import org.apache.logging.log4j.message.Message;
+ import org.apache.logging.log4j.message.ParameterizedMessage;
+ import org.apache.logging.log4j.message.SimpleMessage;
+ import org.apache.logging.log4j.spi.ExtendedLogger;
+-import org.apache.logging.log4j.util.LoaderUtil;
+ import org.slf4j.Marker;
+-import org.slf4j.MarkerFactory;
+ import org.slf4j.impl.StaticMarkerBinder;
+ import org.slf4j.spi.LocationAwareLogger;
+ 
+@@ -39,18 +37,13 @@ import org.slf4j.spi.LocationAwareLogger;
+ public class Log4jLogger implements LocationAwareLogger, Serializable {
+ 
+     public static final String FQCN = Log4jLogger.class.getName();
+-
+     private static final long serialVersionUID = 7869000638091304316L;
+-    private static final Marker EVENT_MARKER = MarkerFactory.getMarker("EVENT");
+-    private static final EventDataConverter CONVERTER = createConverter();
+ 
+-    private final boolean eventLogger;
+     private transient ExtendedLogger logger;
+     private final String name;
+ 
+     public Log4jLogger(final ExtendedLogger logger, final String name) {
+         this.logger = logger;
+-        this.eventLogger = "EventLogger".equals(name);
+         this.name = name;
+     }
+ 
+@@ -363,9 +356,7 @@ public class Log4jLogger implements LocationAwareLogger, Serializable {
+             return;
+         }
+         final Message msg;
+-        if (CONVERTER != null && eventLogger && marker != null && marker.contains(EVENT_MARKER)) {
+-            msg = CONVERTER.convertEvent(message, params, throwable);
+-        } else if (params == null) {
++        if (params == null) {
+             msg = new SimpleMessage(message);
+         } else {
+             msg = new ParameterizedMessage(message, params, throwable);
+@@ -410,15 +401,6 @@ public class Log4jLogger implements LocationAwareLogger, Serializable {
+         aOutputStream.defaultWriteObject();
+     }
+ 
+-    private static EventDataConverter createConverter() {
+-        try {
+-            LoaderUtil.loadClass("org.slf4j.ext.EventData");
+-            return new EventDataConverter();
+-        } catch (final ClassNotFoundException cnfe) {
+-            return null;
+-        }
+-    }
+-
+     private static Level getLevel(final int i) {
+         switch (i) {
+         case TRACE_INT:
+diff --git a/log4j-slf4j-impl/src/test/java/org/apache/logging/slf4j/LoggerTest.java b/log4j-slf4j-impl/src/test/java/org/apache/logging/slf4j/LoggerTest.java
+index 0524074..c60f1ad 100644
+--- a/log4j-slf4j-impl/src/test/java/org/apache/logging/slf4j/LoggerTest.java
++++ b/log4j-slf4j-impl/src/test/java/org/apache/logging/slf4j/LoggerTest.java
+@@ -21,7 +21,6 @@ import static org.junit.Assert.assertNotNull;
+ import static org.junit.Assert.assertTrue;
+ 
+ import java.util.List;
+-import java.util.Locale;
+ 
+ import org.apache.logging.log4j.junit.LoggerContextRule;
+ import org.apache.logging.log4j.test.appender.ListAppender;
+@@ -34,8 +33,6 @@ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import org.slf4j.MDC;
+ import org.slf4j.Marker;
+-import org.slf4j.ext.EventData;
+-import org.slf4j.ext.EventLogger;
+ import org.slf4j.ext.XLogger;
+ import org.slf4j.ext.XLoggerFactory;
+ import org.slf4j.spi.LocationAwareLogger;
+@@ -145,23 +142,6 @@ public class LoggerTest {
+         verify("List", "o.a.l.s.LoggerTest Hello, Log4j Log4j {} MDC{}" + Strings.LINE_SEPARATOR);
+     }
+ 
+-    @Test
+-    public void testEventLogger() {
+-        MDC.put("loginId", "JohnDoe");
+-        MDC.put("ipAddress", "192.168.0.120");
+-        MDC.put("locale", Locale.US.getDisplayName());
+-        final EventData data = new EventData();
+-        data.setEventType("Transfer");
+-        data.setEventId("Audit@18060");
+-        data.setMessage("Transfer Complete");
+-        data.put("ToAccount", "123456");
+-        data.put("FromAccount", "123457");
+-        data.put("Amount", "200.00");
+-        EventLogger.logEvent(data);
+-        MDC.clear();
+-        verify("EventLogger", "o.a.l.s.LoggerTest Transfer [Audit@18060 Amount=\"200.00\" FromAccount=\"123457\" ToAccount=\"123456\"] Transfer Complete" + Strings.LINE_SEPARATOR);
+-    }
+-
+     private void verify(final String name, final String expected) {
+         final ListAppender listApp = ctx.getListAppender(name);
+         assertNotNull("Missing Appender", listApp);
+@@ -177,6 +157,5 @@ public class LoggerTest {
+     public void cleanup() {
+         MDC.clear();
+         ctx.getListAppender("List").clear();
+-        ctx.getListAppender("EventLogger").clear();
+     }
+ }
+diff --git a/log4j-slf4j-impl/src/test/java/org/apache/logging/slf4j/OptionalTest.java b/log4j-slf4j-impl/src/test/java/org/apache/logging/slf4j/OptionalTest.java
+deleted file mode 100644
+index a6e9fd5..0000000
+--- a/log4j-slf4j-impl/src/test/java/org/apache/logging/slf4j/OptionalTest.java
++++ /dev/null
+@@ -1,69 +0,0 @@
+-/*
+- * Licensed to the Apache Software Foundation (ASF) under one or more
+- * contributor license agreements. See the NOTICE file distributed with
+- * this work for additional information regarding copyright ownership.
+- * The ASF licenses this file to You under the Apache license, Version 2.0
+- * (the "License"); you may not use this file except in compliance with
+- * the License. You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the license for the specific language governing permissions and
+- * limitations under the license.
+- */
+-package org.apache.logging.slf4j;
+-
+-import java.util.List;
+-
+-import org.apache.logging.log4j.junit.LoggerContextRule;
+-import org.apache.logging.log4j.test.appender.ListAppender;
+-import org.apache.logging.log4j.util.Strings;
+-import org.junit.Before;
+-import org.junit.ClassRule;
+-import org.junit.Test;
+-import org.slf4j.Logger;
+-import org.slf4j.LoggerFactory;
+-import org.slf4j.MDC;
+-import org.slf4j.Marker;
+-import org.slf4j.MarkerFactory;
+-
+-import static org.junit.Assert.*;
+-
+-/**
+- *
+- */
+-public class OptionalTest {
+-
+-    private static final String CONFIG = "log4j-test1.xml";
+-
+-    @ClassRule
+-    public static final LoggerContextRule CTX = new LoggerContextRule(CONFIG);
+-
+-    Logger logger = LoggerFactory.getLogger("EventLogger");
+-    Marker marker = MarkerFactory.getMarker("EVENT");
+-
+-    @Test
+-    public void testEventLogger() {
+-        logger.info(marker, "This is a test");
+-        MDC.clear();
+-        verify("EventLogger", "o.a.l.s.OptionalTest This is a test" + Strings.LINE_SEPARATOR);
+-    }
+-
+-    private void verify(final String name, final String expected) {
+-        final ListAppender listApp = CTX.getListAppender(name);
+-        final List<String> events = listApp.getMessages();
+-        assertTrue("Incorrect number of messages. Expected 1 Actual " + events.size(), events.size()== 1);
+-        final String actual = events.get(0);
+-        assertEquals("Incorrect message. Expected " + expected + ". Actual " + actual, expected, actual);
+-        listApp.clear();
+-    }
+-
+-    @Before
+-    public void cleanup() {
+-        CTX.getListAppender("List").clear();
+-        CTX.getListAppender("EventLogger").clear();
+-    }
+-}
+diff --git a/log4j-slf4j-impl/src/test/resources/log4j-test1.xml b/log4j-slf4j-impl/src/test/resources/log4j-test1.xml
+index a64bdfa..07a2be6 100644
+--- a/log4j-slf4j-impl/src/test/resources/log4j-test1.xml
++++ b/log4j-slf4j-impl/src/test/resources/log4j-test1.xml
+@@ -6,9 +6,6 @@
+   <ThresholdFilter level="trace"/>
+ 
+   <Appenders>
+-    <List name="EventLogger">
+-      <PatternLayout pattern="%C{1.} %m%n"/>
+-    </List>
+     <Console name="STDOUT">
+       <PatternLayout pattern="%C{1.} %m MDC%X%n"/>
+     </Console>
+@@ -24,10 +21,6 @@
+   </Appenders>
+ 
+   <Loggers>
+-    <Logger name="EventLogger" level="info" additivity="false">
+-      <AppenderRef ref="EventLogger"/>
+-    </Logger>>
+-
+     <Logger name="org.apache.logging.log4j.test2" level="debug" additivity="false">
+       <AppenderRef ref="File"/>
+     </Logger>

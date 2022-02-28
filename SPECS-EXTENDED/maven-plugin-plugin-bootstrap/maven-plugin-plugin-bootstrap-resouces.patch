@@ -1,0 +1,1914 @@
+--- maven-plugin-tools-3.6.0/maven-plugin-plugin/src/main/filtered-resources/META-INF/maven/org.apache.maven.plugins/maven-plugin-plugin/plugin-help.xml	1970-01-01 01:00:00.000000000 +0100
++++ maven-plugin-tools-3.6.0/maven-plugin-plugin/src/main/filtered-resources/META-INF/maven/org.apache.maven.plugins/maven-plugin-plugin/plugin-help.xml	2019-11-25 11:03:12.945643770 +0100
+@@ -0,0 +1,385 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<plugin>
++  <name>${project.name}</name>
++  <description>${project.description}</description>
++  <groupId>${project.groupId}</groupId>
++  <artifactId>${project.artifactId}</artifactId>
++  <version>${project.version}</version>
++  <goalPrefix>plugin</goalPrefix>
++  <mojos>
++    <mojo>
++      <goal>addPluginArtifactMetadata</goal>
++      <description>Inject any plugin-specific artifact metadata to the project&apos;s artifact, for subsequent installation and deployment. It is used:
++1.	to add the latest metadata (which is plugin-specific) for shipping alongside the plugin&apos;s artifact
++2.	to define plugin mapping in the group
++</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>package</phase>
++      <implementation>org.apache.maven.plugin.plugin.metadata.AddPluginArtifactMetadataMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>goalPrefix</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Inject any plugin-specific artifact metadata to the project&apos;s artifact, for subsequent installation and deployment. It is used:
++1.	to add the latest metadata (which is plugin-specific) for shipping alongside the plugin&apos;s artifact
++2.	to define plugin mapping in the group
++</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Inject any plugin-specific artifact metadata to the project&apos;s artifact, for subsequent installation and deployment. It is used:
++1.	to add the latest metadata (which is plugin-specific) for shipping alongside the plugin&apos;s artifact
++2.	to define plugin mapping in the group
++</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <skip implementation="boolean" default-value="false">${maven.plugin.skip}</skip>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>descriptor</goal>
++      <description>Generate a plugin descriptor.
++
++Note: Since 3.0, for Java plugin annotations support, default phase defined by this goal is after the &apos;compilation&apos; of any scripts. This doesn&apos;t override the default binding coded at generate-resources phase in Maven core.
++</description>
++      <requiresDependencyResolution>runtime</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>process-classes</phase>
++      <implementation>org.apache.maven.plugin.plugin.DescriptorGeneratorMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>extractors</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>goalPrefix</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>mojoDependencies</name>
++          <type>java.util.List</type>
++          <since>3.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generate a plugin descriptor.
++
++Note: Since 3.0, for Java plugin annotations support, default phase defined by this goal is after the &apos;compilation&apos; of any scripts. This doesn&apos;t override the default binding coded at generate-resources phase in Maven core.
++</description>
++        </parameter>
++        <parameter>
++          <name>packagingTypes</name>
++          <type>java.util.List</type>
++          <since>3.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>skipDescriptor</name>
++          <type>boolean</type>
++          <since>2.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generate a plugin descriptor.
++
++Note: Since 3.0, for Java plugin annotations support, default phase defined by this goal is after the &apos;compilation&apos; of any scripts. This doesn&apos;t override the default binding coded at generate-resources phase in Maven core.
++</description>
++        </parameter>
++        <parameter>
++          <name>skipErrorNoDescriptorsFound</name>
++          <type>boolean</type>
++          <since>3.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.outputDirectory}/META-INF/maven"/>
++        <skip implementation="boolean" default-value="false">${maven.plugin.skip}</skip>
++        <skipDescriptor implementation="boolean" default-value="false"/>
++        <skipErrorNoDescriptorsFound implementation="boolean" default-value="false">${maven.plugin.skipErrorNoDescriptorsFound}</skipErrorNoDescriptorsFound>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>help</goal>
++      <description>Display help information on maven-plugin-plugin.
++Call mvn plugin:help -Ddetail=true -Dgoal=&lt;goal-name&gt; to display parameter details.</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>false</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <implementation>org.apache.maven.plugin.plugin.HelpMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>detail</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Display help information on maven-plugin-plugin.
++Call mvn plugin:help -Ddetail=true -Dgoal=&lt;goal-name&gt; to display parameter details.</description>
++        </parameter>
++        <parameter>
++          <name>goal</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Display help information on maven-plugin-plugin.
++Call mvn plugin:help -Ddetail=true -Dgoal=&lt;goal-name&gt; to display parameter details.</description>
++        </parameter>
++        <parameter>
++          <name>indentSize</name>
++          <type>int</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Display help information on maven-plugin-plugin.
++Call mvn plugin:help -Ddetail=true -Dgoal=&lt;goal-name&gt; to display parameter details.</description>
++        </parameter>
++        <parameter>
++          <name>lineLength</name>
++          <type>int</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Display help information on maven-plugin-plugin.
++Call mvn plugin:help -Ddetail=true -Dgoal=&lt;goal-name&gt; to display parameter details.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <detail implementation="boolean" default-value="false">${detail}</detail>
++        <goal implementation="java.lang.String">${goal}</goal>
++        <indentSize implementation="int" default-value="2">${indentSize}</indentSize>
++        <lineLength implementation="int" default-value="80">${lineLength}</lineLength>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>helpmojo</goal>
++      <description>Generates a HelpMojo class.</description>
++      <requiresDependencyResolution>compile</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>generate-sources</phase>
++      <implementation>org.apache.maven.plugin.plugin.HelpGeneratorMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.4</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>extractors</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>goalPrefix</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>helpPackageName</name>
++          <type>java.lang.String</type>
++          <since>2.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates a HelpMojo class.</description>
++        </parameter>
++        <parameter>
++          <name>mojoDependencies</name>
++          <type>java.util.List</type>
++          <since>3.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates a HelpMojo class.</description>
++        </parameter>
++        <parameter>
++          <name>packagingTypes</name>
++          <type>java.util.List</type>
++          <since>3.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>skipErrorNoDescriptorsFound</name>
++          <type>boolean</type>
++          <since>3.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.directory}/generated-sources/plugin"/>
++        <skip implementation="boolean" default-value="false">${maven.plugin.skip}</skip>
++        <skipErrorNoDescriptorsFound implementation="boolean" default-value="false">${maven.plugin.skipErrorNoDescriptorsFound}</skipErrorNoDescriptorsFound>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>report</goal>
++      <description>Generates the Plugin&apos;s documentation report: plugin-info.html plugin overview page, and one goal-mojo.html per goal.</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <executePhase>process-classes</executePhase>
++      <implementation>org.apache.maven.plugin.plugin.PluginReport</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.7</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: plugin-info.html plugin overview page, and one goal-mojo.html per goal.</description>
++        </parameter>
++        <parameter>
++          <name>goalPrefix</name>
++          <type>java.lang.String</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: plugin-info.html plugin overview page, and one goal-mojo.html per goal.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: plugin-info.html plugin overview page, and one goal-mojo.html per goal.</description>
++        </parameter>
++        <parameter>
++          <name>requirements</name>
++          <type>org.apache.maven.plugin.plugin.Requirements</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: plugin-info.html plugin overview page, and one goal-mojo.html per goal.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: plugin-info.html plugin overview page, and one goal-mojo.html per goal.</description>
++        </parameter>
++        <parameter>
++          <name>skipReport</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: plugin-info.html plugin overview page, and one goal-mojo.html per goal.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <goalPrefix implementation="java.lang.String">${goalPrefix}</goalPrefix>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.directory}/generated-site/xdoc"/>
++        <skip implementation="boolean" default-value="false">${maven.plugin.skip}</skip>
++        <skipReport implementation="boolean" default-value="false">${maven.plugin.report.skip}</skipReport>
++      </configuration>
++    </mojo>
++  </mojos>
++</plugin>
+--- maven-plugin-tools-3.6.0/maven-plugin-plugin/src/main/filtered-resources/META-INF/maven/plugin.xml	1970-01-01 01:00:00.000000000 +0100
++++ maven-plugin-tools-3.6.0/maven-plugin-plugin/src/main/filtered-resources/META-INF/maven/plugin.xml	2019-11-25 11:05:03.978261704 +0100
+@@ -0,0 +1,1062 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<plugin>
++  <name>${project.name}</name>
++  <description>${project.description}</description>
++  <groupId>${project.groupId}</groupId>
++  <artifactId>${project.artifactId}</artifactId>
++  <version>${project.version}</version>
++  <goalPrefix>plugin</goalPrefix>
++  <isolatedRealm>false</isolatedRealm>
++  <inheritedByDefault>true</inheritedByDefault>
++  <mojos>
++    <mojo>
++      <goal>addPluginArtifactMetadata</goal>
++      <description>Inject any plugin-specific
++&lt;a href=&quot;/ref/current/maven-repository-metadata/repository-metadata.html&quot;&gt;artifact metadata&lt;/a&gt; to the project&apos;s
++artifact, for subsequent installation and deployment.
++It is used:
++&lt;ol&gt;
++&lt;li&gt;to add the &lt;code&gt;latest&lt;/code&gt; metadata (which is plugin-specific) for shipping alongside the plugin&apos;s
++    artifact&lt;/li&gt;
++&lt;li&gt;to define plugin mapping in the group&lt;/li&gt;
++&lt;/ol&gt;</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>package</phase>
++      <implementation>org.apache.maven.plugin.plugin.metadata.AddPluginArtifactMetadataMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>goalPrefix</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Inject any plugin-specific
++&lt;a href=&quot;/ref/current/maven-repository-metadata/repository-metadata.html&quot;&gt;artifact metadata&lt;/a&gt; to the project&apos;s
++artifact, for subsequent installation and deployment.
++It is used:
++&lt;ol&gt;
++&lt;li&gt;to add the &lt;code&gt;latest&lt;/code&gt; metadata (which is plugin-specific) for shipping alongside the plugin&apos;s
++    artifact&lt;/li&gt;
++&lt;li&gt;to define plugin mapping in the group&lt;/li&gt;
++&lt;/ol&gt;</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Inject any plugin-specific
++&lt;a href=&quot;/ref/current/maven-repository-metadata/repository-metadata.html&quot;&gt;artifact metadata&lt;/a&gt; to the project&apos;s
++artifact, for subsequent installation and deployment.
++It is used:
++&lt;ol&gt;
++&lt;li&gt;to add the &lt;code&gt;latest&lt;/code&gt; metadata (which is plugin-specific) for shipping alongside the plugin&apos;s
++    artifact&lt;/li&gt;
++&lt;li&gt;to define plugin mapping in the group&lt;/li&gt;
++&lt;/ol&gt;</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Inject any plugin-specific
++&lt;a href=&quot;/ref/current/maven-repository-metadata/repository-metadata.html&quot;&gt;artifact metadata&lt;/a&gt; to the project&apos;s
++artifact, for subsequent installation and deployment.
++It is used:
++&lt;ol&gt;
++&lt;li&gt;to add the &lt;code&gt;latest&lt;/code&gt; metadata (which is plugin-specific) for shipping alongside the plugin&apos;s
++    artifact&lt;/li&gt;
++&lt;li&gt;to define plugin mapping in the group&lt;/li&gt;
++&lt;/ol&gt;</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <skip implementation="boolean" default-value="false">${maven.plugin.skip}</skip>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>descriptor</goal>
++      <description>&lt;p&gt;
++Generate a plugin descriptor.
++&lt;/p&gt;
++&lt;p&gt;
++&lt;b&gt;Note:&lt;/b&gt; Since 3.0, for Java plugin annotations support,
++default &lt;a href=&quot;http://maven.apache.org/ref/current/maven-core/lifecycles.html&quot;&gt;phase&lt;/a&gt;
++defined by this goal is after the &quot;compilation&quot; of any scripts. This doesn&apos;t override
++&lt;a href=&quot;/ref/current/maven-core/default-bindings.html#Bindings_for_maven-plugin_packaging&quot;&gt;the default binding coded
++at generate-resources phase&lt;/a&gt; in Maven core.
++&lt;/p&gt;</description>
++      <requiresDependencyResolution>runtime</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>process-classes</phase>
++      <implementation>org.apache.maven.plugin.plugin.DescriptorGeneratorMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>dependencies</name>
++          <type>java.util.Set</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>extractors</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>goalPrefix</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>local</name>
++          <type>org.apache.maven.artifact.repository.ArtifactRepository</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>mojoDependencies</name>
++          <type>java.util.List</type>
++          <since>3.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>&lt;p&gt;
++Generate a plugin descriptor.
++&lt;/p&gt;
++&lt;p&gt;
++&lt;b&gt;Note:&lt;/b&gt; Since 3.0, for Java plugin annotations support,
++default &lt;a href=&quot;http://maven.apache.org/ref/current/maven-core/lifecycles.html&quot;&gt;phase&lt;/a&gt;
++defined by this goal is after the &quot;compilation&quot; of any scripts. This doesn&apos;t override
++&lt;a href=&quot;/ref/current/maven-core/default-bindings.html#Bindings_for_maven-plugin_packaging&quot;&gt;the default binding coded
++at generate-resources phase&lt;/a&gt; in Maven core.
++&lt;/p&gt;</description>
++        </parameter>
++        <parameter>
++          <name>packagingTypes</name>
++          <type>java.util.List</type>
++          <since>3.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>remoteRepos</name>
++          <type>java.util.List</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>skipDescriptor</name>
++          <type>boolean</type>
++          <since>2.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>&lt;p&gt;
++Generate a plugin descriptor.
++&lt;/p&gt;
++&lt;p&gt;
++&lt;b&gt;Note:&lt;/b&gt; Since 3.0, for Java plugin annotations support,
++default &lt;a href=&quot;http://maven.apache.org/ref/current/maven-core/lifecycles.html&quot;&gt;phase&lt;/a&gt;
++defined by this goal is after the &quot;compilation&quot; of any scripts. This doesn&apos;t override
++&lt;a href=&quot;/ref/current/maven-core/default-bindings.html#Bindings_for_maven-plugin_packaging&quot;&gt;the default binding coded
++at generate-resources phase&lt;/a&gt; in Maven core.
++&lt;/p&gt;</description>
++        </parameter>
++        <parameter>
++          <name>skipErrorNoDescriptorsFound</name>
++          <type>boolean</type>
++          <since>3.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <dependencies implementation="java.util.Set" default-value="${project.artifacts}"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <local implementation="org.apache.maven.artifact.repository.ArtifactRepository" default-value="${localRepository}"/>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.outputDirectory}/META-INF/maven"/>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <remoteRepos implementation="java.util.List" default-value="${project.remoteArtifactRepositories}"/>
++        <skip implementation="boolean" default-value="false">${maven.plugin.skip}</skip>
++        <skipDescriptor implementation="boolean" default-value="false"/>
++        <skipErrorNoDescriptorsFound implementation="boolean" default-value="false">${maven.plugin.skipErrorNoDescriptorsFound}</skipErrorNoDescriptorsFound>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>org.apache.maven.tools.plugin.scanner.MojoScanner</role>
++          <field-name>mojoScanner</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++    <mojo>
++      <goal>help</goal>
++      <description>Display help information on maven-plugin-plugin.&lt;br&gt;
++Call &lt;code&gt;mvn plugin:help -Ddetail=true -Dgoal=&amp;lt;goal-name&amp;gt;&lt;/code&gt; to display parameter details.</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>false</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <implementation>org.apache.maven.plugin.plugin.HelpMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>detail</name>
++          <type>boolean</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Display help information on maven-plugin-plugin.&lt;br&gt;
++Call &lt;code&gt;mvn plugin:help -Ddetail=true -Dgoal=&amp;lt;goal-name&amp;gt;&lt;/code&gt; to display parameter details.</description>
++        </parameter>
++        <parameter>
++          <name>goal</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Display help information on maven-plugin-plugin.&lt;br&gt;
++Call &lt;code&gt;mvn plugin:help -Ddetail=true -Dgoal=&amp;lt;goal-name&amp;gt;&lt;/code&gt; to display parameter details.</description>
++        </parameter>
++        <parameter>
++          <name>indentSize</name>
++          <type>int</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Display help information on maven-plugin-plugin.&lt;br&gt;
++Call &lt;code&gt;mvn plugin:help -Ddetail=true -Dgoal=&amp;lt;goal-name&amp;gt;&lt;/code&gt; to display parameter details.</description>
++        </parameter>
++        <parameter>
++          <name>lineLength</name>
++          <type>int</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Display help information on maven-plugin-plugin.&lt;br&gt;
++Call &lt;code&gt;mvn plugin:help -Ddetail=true -Dgoal=&amp;lt;goal-name&amp;gt;&lt;/code&gt; to display parameter details.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <detail implementation="boolean" default-value="false">${detail}</detail>
++        <goal implementation="java.lang.String">${goal}</goal>
++        <indentSize implementation="int" default-value="2">${indentSize}</indentSize>
++        <lineLength implementation="int" default-value="80">${lineLength}</lineLength>
++      </configuration>
++    </mojo>
++    <mojo>
++      <goal>helpmojo</goal>
++      <description>Generates a &lt;code&gt;HelpMojo&lt;/code&gt; class.</description>
++      <requiresDependencyResolution>compile</requiresDependencyResolution>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <phase>generate-sources</phase>
++      <implementation>org.apache.maven.plugin.plugin.HelpGeneratorMojo</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.4</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>dependencies</name>
++          <type>java.util.Set</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>extractors</name>
++          <type>java.util.Set</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>goalPrefix</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>helpPackageName</name>
++          <type>java.lang.String</type>
++          <since>2.6</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates a &lt;code&gt;HelpMojo&lt;/code&gt; class.</description>
++        </parameter>
++        <parameter>
++          <name>local</name>
++          <type>org.apache.maven.artifact.repository.ArtifactRepository</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>mojoDependencies</name>
++          <type>java.util.List</type>
++          <since>3.5</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates a &lt;code&gt;HelpMojo&lt;/code&gt; class.</description>
++        </parameter>
++        <parameter>
++          <name>packagingTypes</name>
++          <type>java.util.List</type>
++          <since>3.3</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>remoteRepos</name>
++          <type>java.util.List</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++        <parameter>
++          <name>skipErrorNoDescriptorsFound</name>
++          <type>boolean</type>
++          <since>3.0</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Abstract class for this Plugin.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <dependencies implementation="java.util.Set" default-value="${project.artifacts}"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <local implementation="org.apache.maven.artifact.repository.ArtifactRepository" default-value="${localRepository}"/>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.directory}/generated-sources/plugin"/>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <remoteRepos implementation="java.util.List" default-value="${project.remoteArtifactRepositories}"/>
++        <skip implementation="boolean" default-value="false">${maven.plugin.skip}</skip>
++        <skipErrorNoDescriptorsFound implementation="boolean" default-value="false">${maven.plugin.skipErrorNoDescriptorsFound}</skipErrorNoDescriptorsFound>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>org.apache.maven.tools.plugin.scanner.MojoScanner</role>
++          <field-name>mojoScanner</field-name>
++        </requirement>
++        <requirement>
++          <role>org.codehaus.plexus.velocity.VelocityComponent</role>
++          <field-name>velocity</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++    <mojo>
++      <goal>report</goal>
++      <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++      <requiresDirectInvocation>false</requiresDirectInvocation>
++      <requiresProject>true</requiresProject>
++      <requiresReports>false</requiresReports>
++      <aggregator>false</aggregator>
++      <requiresOnline>false</requiresOnline>
++      <inheritedByDefault>true</inheritedByDefault>
++      <executePhase>process-classes</executePhase>
++      <implementation>org.apache.maven.plugin.plugin.PluginReport</implementation>
++      <language>java</language>
++      <instantiationStrategy>per-lookup</instantiationStrategy>
++      <executionStrategy>once-per-session</executionStrategy>
++      <since>2.0</since>
++      <threadSafe>true</threadSafe>
++      <parameters>
++        <parameter>
++          <name>dependencies</name>
++          <type>java.util.Set</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>encoding</name>
++          <type>java.lang.String</type>
++          <since>2.7</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>goalPrefix</name>
++          <type>java.lang.String</type>
++          <since>2.4</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>inputEncoding</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>local</name>
++          <type>org.apache.maven.artifact.repository.ArtifactRepository</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>outputDirectory</name>
++          <type>java.io.File</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>outputEncoding</name>
++          <type>java.lang.String</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>pluginXmlFile</name>
++          <type>java.io.File</type>
++          <since>3.5.1</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>project</name>
++          <type>org.apache.maven.project.MavenProject</type>
++          <required>false</required>
++          <editable>false</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>remoteRepos</name>
++          <type>java.util.List</type>
++          <since>3.0</since>
++          <required>true</required>
++          <editable>false</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>requirements</name>
++          <type>org.apache.maven.plugin.plugin.Requirements</type>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>skip</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++        <parameter>
++          <name>skipReport</name>
++          <type>boolean</type>
++          <since>2.8</since>
++          <required>false</required>
++          <editable>true</editable>
++          <description>Generates the Plugin&apos;s documentation report: &lt;code&gt;plugin-info.html&lt;/code&gt; plugin overview page,
++and one &lt;code&gt;&lt;i&gt;goal&lt;/i&gt;-mojo.html&lt;/code&gt; per goal.</description>
++        </parameter>
++      </parameters>
++      <configuration>
++        <dependencies implementation="java.util.Set" default-value="${project.artifacts}"/>
++        <encoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</encoding>
++        <goalPrefix implementation="java.lang.String">${goalPrefix}</goalPrefix>
++        <inputEncoding implementation="java.lang.String" default-value="${project.build.sourceEncoding}">${encoding}</inputEncoding>
++        <local implementation="org.apache.maven.artifact.repository.ArtifactRepository" default-value="${localRepository}"/>
++        <outputDirectory implementation="java.io.File" default-value="${project.build.directory}/generated-site/xdoc"/>
++        <outputEncoding implementation="java.lang.String" default-value="${project.reporting.outputEncoding}">${outputEncoding}</outputEncoding>
++        <pluginXmlFile implementation="java.io.File" default-value="${project.build.outputDirectory}/META-INF/maven/plugin.xml"/>
++        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
++        <remoteRepos implementation="java.util.List" default-value="${project.remoteArtifactRepositories}"/>
++        <skip implementation="boolean" default-value="false">${maven.plugin.skip}</skip>
++        <skipReport implementation="boolean" default-value="false">${maven.plugin.report.skip}</skipReport>
++      </configuration>
++      <requirements>
++        <requirement>
++          <role>org.apache.maven.tools.plugin.scanner.MojoScanner</role>
++          <field-name>mojoScanner</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.execution.RuntimeInformation</role>
++          <field-name>rtInfo</field-name>
++        </requirement>
++        <requirement>
++          <role>org.apache.maven.doxia.siterenderer.Renderer</role>
++          <field-name>siteRenderer</field-name>
++        </requirement>
++      </requirements>
++    </mojo>
++  </mojos>
++  <dependencies>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-compat</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-settings</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model-builder</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-builder-support</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.inject</groupId>
++      <artifactId>javax.inject</artifactId>
++      <type>jar</type>
++      <version>1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.sisu</groupId>
++      <artifactId>org.eclipse.sisu.inject</artifactId>
++      <type>jar</type>
++      <version>0.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.enterprise</groupId>
++      <artifactId>cdi-api</artifactId>
++      <type>jar</type>
++      <version>1.1</version>
++    </dependency>
++    <dependency>
++      <groupId>javax.el</groupId>
++      <artifactId>javax.el-api</artifactId>
++      <type>jar</type>
++      <version>3.0.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.jboss.spec.javax.interceptor</groupId>
++      <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
++      <type>jar</type>
++      <version>any</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-interpolation</artifactId>
++      <type>jar</type>
++      <version>1.25</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.wagon</groupId>
++      <artifactId>wagon-provider-api</artifactId>
++      <type>jar</type>
++      <version>3.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-resolver-provider</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-spi</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.slf4j</groupId>
++      <artifactId>slf4j-api</artifactId>
++      <type>jar</type>
++      <version>1.7.25</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-core</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.inject</groupId>
++      <artifactId>guice</artifactId>
++      <type>jar</type>
++      <version>4.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>aopalliance</groupId>
++      <artifactId>aopalliance</artifactId>
++      <type>jar</type>
++      <version>1.0</version>
++    </dependency>
++    <dependency>
++      <groupId>cglib</groupId>
++      <artifactId>cglib</artifactId>
++      <type>jar</type>
++      <version>3.2.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-api</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-util</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.resolver</groupId>
++      <artifactId>maven-resolver-impl</artifactId>
++      <type>jar</type>
++      <version>1.4.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-component-annotations</artifactId>
++      <type>jar</type>
++      <version>1.5.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-settings-builder</artifactId>
++      <type>jar</type>
++      <version>3.6.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-sec-dispatcher</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.sonatype.plexus</groupId>
++      <artifactId>plexus-cipher</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.sisu</groupId>
++      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <type>jar</type>
++      <version>0.3.3</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.plugin-tools</groupId>
++      <artifactId>maven-plugin-tools-api</artifactId>
++      <type>jar</type>
++      <version>3.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.plugin-tools</groupId>
++      <artifactId>maven-plugin-tools-generators</artifactId>
++      <type>jar</type>
++      <version>3.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>net.sf.jtidy</groupId>
++      <artifactId>jtidy</artifactId>
++      <type>jar</type>
++      <version>r938</version>
++    </dependency>
++    <dependency>
++      <groupId>xerces</groupId>
++      <artifactId>dom3-xml-apis</artifactId>
++      <type>jar</type>
++      <version>1.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.ow2.asm</groupId>
++      <artifactId>asm-commons</artifactId>
++      <type>jar</type>
++      <version>7.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.ow2.asm</groupId>
++      <artifactId>asm-tree</artifactId>
++      <type>jar</type>
++      <version>7.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.ow2.asm</groupId>
++      <artifactId>asm-analysis</artifactId>
++      <type>jar</type>
++      <version>7.2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.ow2.asm</groupId>
++      <artifactId>asm</artifactId>
++      <type>jar</type>
++      <version>7.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.plugin-tools</groupId>
++      <artifactId>maven-plugin-tools-java</artifactId>
++      <type>jar</type>
++      <version>3.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>com.thoughtworks.qdox</groupId>
++      <artifactId>qdox</artifactId>
++      <type>jar</type>
++      <version>2.0-M5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.plugin-tools</groupId>
++      <artifactId>maven-plugin-tools-annotations</artifactId>
++      <type>jar</type>
++      <version>3.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-archiver</artifactId>
++      <type>jar</type>
++      <version>3.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-io</artifactId>
++      <type>jar</type>
++      <version>3.2.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.commons</groupId>
++      <artifactId>commons-compress</artifactId>
++      <type>jar</type>
++      <version>1.19</version>
++    </dependency>
++    <dependency>
++      <groupId>org.tukaani</groupId>
++      <artifactId>xz</artifactId>
++      <type>jar</type>
++      <version>1.8</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.plugin-tools</groupId>
++      <artifactId>maven-plugin-annotations</artifactId>
++      <type>jar</type>
++      <version>3.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.doxia</groupId>
++      <artifactId>doxia-sink-api</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.doxia</groupId>
++      <artifactId>doxia-logging-api</artifactId>
++      <type>jar</type>
++      <version>1.7</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.doxia</groupId>
++      <artifactId>doxia-site-renderer</artifactId>
++      <type>jar</type>
++      <version>1.4</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.doxia</groupId>
++      <artifactId>doxia-decoration-model</artifactId>
++      <type>jar</type>
++      <version>1.7.5</version>
++    </dependency>
++    <dependency>
++      <groupId>commons-collections</groupId>
++      <artifactId>commons-collections</artifactId>
++      <type>jar</type>
++      <version>3.2.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.doxia</groupId>
++      <artifactId>doxia-core</artifactId>
++      <type>jar</type>
++      <version>1.7</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.httpcomponents</groupId>
++      <artifactId>httpcore</artifactId>
++      <type>jar</type>
++      <version>4.0.1</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.httpcomponents</groupId>
++      <artifactId>httpclient</artifactId>
++      <type>jar</type>
++      <version>4.0.2</version>
++    </dependency>
++    <dependency>
++      <groupId>commons-logging</groupId>
++      <artifactId>commons-logging</artifactId>
++      <type>jar</type>
++      <version>any</version>
++    </dependency>
++    <dependency>
++      <groupId>commons-codec</groupId>
++      <artifactId>commons-codec</artifactId>
++      <type>jar</type>
++      <version>any</version>
++    </dependency>
++    <dependency>
++      <groupId>xmlunit</groupId>
++      <artifactId>xmlunit</artifactId>
++      <type>jar</type>
++      <version>1.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.doxia</groupId>
++      <artifactId>doxia-module-xhtml</artifactId>
++      <type>jar</type>
++      <version>1.7</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-i18n</artifactId>
++      <type>jar</type>
++      <version>1.0-beta-7</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.commons</groupId>
++      <artifactId>commons-lang3</artifactId>
++      <type>jar</type>
++      <version>3.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.doxia</groupId>
++      <artifactId>doxia-skin-model</artifactId>
++      <type>jar</type>
++      <version>1.7.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-plugin-api</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-classworlds</artifactId>
++      <type>jar</type>
++      <version>2.6.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-repository-metadata</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
++      <artifactId>maven-artifact</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.reporting</groupId>
++      <artifactId>maven-reporting-impl</artifactId>
++      <type>jar</type>
++      <version>2.3</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.shared</groupId>
++      <artifactId>maven-shared-utils</artifactId>
++      <type>jar</type>
++      <version>3.2.0</version>
++    </dependency>
++    <dependency>
++      <groupId>commons-io</groupId>
++      <artifactId>commons-io</artifactId>
++      <type>jar</type>
++      <version>2.5</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven.reporting</groupId>
++      <artifactId>maven-reporting-api</artifactId>
++      <type>jar</type>
++      <version>3.0</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-utils</artifactId>
++      <type>jar</type>
++      <version>3.0.20</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-velocity</artifactId>
++      <type>jar</type>
++      <version>1.1.8</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-container-default</artifactId>
++      <type>jar</type>
++      <version>SYSTEM</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.xbean</groupId>
++      <artifactId>xbean-reflect</artifactId>
++      <type>jar</type>
++      <version>SYSTEM</version>
++    </dependency>
++    <dependency>
++      <groupId>com.google.guava</groupId>
++      <artifactId>guava</artifactId>
++      <type>jar</type>
++      <version>20.0</version>
++    </dependency>
++    <dependency>
++      <groupId>junit</groupId>
++      <artifactId>junit</artifactId>
++      <type>jar</type>
++      <version>SYSTEM</version>
++    </dependency>
++    <dependency>
++      <groupId>org.hamcrest</groupId>
++      <artifactId>hamcrest-core</artifactId>
++      <type>jar</type>
++      <version>1.3</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.velocity</groupId>
++      <artifactId>velocity</artifactId>
++      <type>jar</type>
++      <version>1.7</version>
++    </dependency>
++    <dependency>
++      <groupId>commons-lang</groupId>
++      <artifactId>commons-lang</artifactId>
++      <type>jar</type>
++      <version>2.4</version>
++    </dependency>
++  </dependencies>
++</plugin>
+--- maven-plugin-tools-3.6.0/maven-plugin-plugin/src/main/java/org/apache/maven/plugin/plugin/HelpMojo.java	1970-01-01 01:00:00.000000000 +0100
++++ maven-plugin-tools-3.6.0/maven-plugin-plugin/src/main/java/org/apache/maven/plugin/plugin/HelpMojo.java	2019-11-25 11:01:29.241066576 +0100
+@@ -0,0 +1,458 @@
++
++package org.apache.maven.plugin.plugin;
++
++import org.apache.maven.plugin.AbstractMojo;
++import org.apache.maven.plugin.MojoExecutionException;
++import org.apache.maven.plugins.annotations.Mojo;
++import org.apache.maven.plugins.annotations.Parameter;
++
++import org.w3c.dom.Document;
++import org.w3c.dom.Element;
++import org.w3c.dom.Node;
++import org.w3c.dom.NodeList;
++import org.xml.sax.SAXException;
++
++import javax.xml.parsers.DocumentBuilder;
++import javax.xml.parsers.DocumentBuilderFactory;
++import javax.xml.parsers.ParserConfigurationException;
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.ArrayList;
++import java.util.List;
++
++/**
++ * Display help information on maven-plugin-plugin.<br>
++ * Call <code>mvn plugin:help -Ddetail=true -Dgoal=&lt;goal-name&gt;</code> to display parameter details.
++ * @author maven-plugin-tools
++ */
++@Mojo( name = "help", requiresProject = false, threadSafe = true )
++public class HelpMojo
++    extends AbstractMojo
++{
++    /**
++     * If <code>true</code>, display all settable properties for each goal.
++     *
++     */
++    @Parameter( property = "detail", defaultValue = "false" )
++    private boolean detail;
++
++    /**
++     * The name of the goal for which to show help. If unspecified, all goals will be displayed.
++     *
++     */
++    @Parameter( property = "goal" )
++    private java.lang.String goal;
++
++    /**
++     * The maximum length of a display line, should be positive.
++     *
++     */
++    @Parameter( property = "lineLength", defaultValue = "80" )
++    private int lineLength;
++
++    /**
++     * The number of spaces per indentation level, should be positive.
++     *
++     */
++    @Parameter( property = "indentSize", defaultValue = "2" )
++    private int indentSize;
++
++    // groupId/artifactId/plugin-help.xml
++    private static final String PLUGIN_HELP_PATH =
++                    "/META-INF/maven/org.apache.maven.plugins/maven-plugin-plugin/plugin-help.xml";
++
++    private static final int DEFAULT_LINE_LENGTH = 80;
++
++    private Document build()
++        throws MojoExecutionException
++    {
++        getLog().debug( "load plugin-help.xml: " + PLUGIN_HELP_PATH );
++        InputStream is = null;
++        try
++        {
++            is = getClass().getResourceAsStream( PLUGIN_HELP_PATH );
++            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
++            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
++            return dBuilder.parse( is );
++        }
++        catch ( IOException e )
++        {
++            throw new MojoExecutionException( e.getMessage(), e );
++        }
++        catch ( ParserConfigurationException e )
++        {
++            throw new MojoExecutionException( e.getMessage(), e );
++        }
++        catch ( SAXException e )
++        {
++            throw new MojoExecutionException( e.getMessage(), e );
++        }
++        finally
++        {
++            if ( is != null )
++            {
++                try
++                {
++                    is.close();
++                }
++                catch ( IOException e )
++                {
++                    throw new MojoExecutionException( e.getMessage(), e );
++                }
++            }
++        }
++    }
++
++    /**
++     * {@inheritDoc}
++     */
++    public void execute()
++        throws MojoExecutionException
++    {
++        if ( lineLength <= 0 )
++        {
++            getLog().warn( "The parameter 'lineLength' should be positive, using '80' as default." );
++            lineLength = DEFAULT_LINE_LENGTH;
++        }
++        if ( indentSize <= 0 )
++        {
++            getLog().warn( "The parameter 'indentSize' should be positive, using '2' as default." );
++            indentSize = 2;
++        }
++
++        Document doc = build();
++
++        StringBuilder sb = new StringBuilder();
++        Node plugin = getSingleChild( doc, "plugin" );
++
++
++        String name = getValue( plugin, "name" );
++        String version = getValue( plugin, "version" );
++        String id = getValue( plugin, "groupId" ) + ":" + getValue( plugin, "artifactId" ) + ":" + version;
++        if ( isNotEmpty( name ) && !name.contains( id ) )
++        {
++            append( sb, name + " " + version, 0 );
++        }
++        else
++        {
++            if ( isNotEmpty( name ) )
++            {
++                append( sb, name, 0 );
++            }
++            else
++            {
++                append( sb, id, 0 );
++            }
++        }
++        append( sb, getValue( plugin, "description" ), 1 );
++        append( sb, "", 0 );
++
++        //<goalPrefix>plugin</goalPrefix>
++        String goalPrefix = getValue( plugin, "goalPrefix" );
++
++        Node mojos1 = getSingleChild( plugin, "mojos" );
++
++        List<Node> mojos = findNamedChild( mojos1, "mojo" );
++
++        if ( goal == null || goal.length() <= 0 )
++        {
++            append( sb, "This plugin has " + mojos.size() + ( mojos.size() > 1 ? " goals:" : " goal:" ), 0 );
++            append( sb, "", 0 );
++        }
++
++        for ( Node mojo : mojos )
++        {
++            writeGoal( sb, goalPrefix, (Element) mojo );
++        }
++
++        if ( getLog().isInfoEnabled() )
++        {
++            getLog().info( sb.toString() );
++        }
++    }
++
++
++    private static boolean isNotEmpty( String string )
++    {
++        return string != null && string.length() > 0;
++    }
++
++    private String getValue( Node node, String elementName )
++        throws MojoExecutionException
++    {
++        return getSingleChild( node, elementName ).getTextContent();
++    }
++
++    private Node getSingleChild( Node node, String elementName )
++        throws MojoExecutionException
++    {
++        List<Node> namedChild = findNamedChild( node, elementName );
++        if ( namedChild.isEmpty() )
++        {
++            throw new MojoExecutionException( "Could not find " + elementName + " in plugin-help.xml" );
++        }
++        if ( namedChild.size() > 1 )
++        {
++            throw new MojoExecutionException( "Multiple " + elementName + " in plugin-help.xml" );
++        }
++        return namedChild.get( 0 );
++    }
++
++    private List<Node> findNamedChild( Node node, String elementName )
++    {
++        List<Node> result = new ArrayList<Node>();
++        NodeList childNodes = node.getChildNodes();
++        for ( int i = 0; i < childNodes.getLength(); i++ )
++        {
++            Node item = childNodes.item( i );
++            if ( elementName.equals( item.getNodeName() ) )
++            {
++                result.add( item );
++            }
++        }
++        return result;
++    }
++
++    private Node findSingleChild( Node node, String elementName )
++        throws MojoExecutionException
++    {
++        List<Node> elementsByTagName = findNamedChild( node, elementName );
++        if ( elementsByTagName.isEmpty() )
++        {
++            return null;
++        }
++        if ( elementsByTagName.size() > 1 )
++        {
++            throw new MojoExecutionException( "Multiple " + elementName + "in plugin-help.xml" );
++        }
++        return elementsByTagName.get( 0 );
++    }
++
++    private void writeGoal( StringBuilder sb, String goalPrefix, Element mojo )
++        throws MojoExecutionException
++    {
++        String mojoGoal = getValue( mojo, "goal" );
++        Node configurationElement = findSingleChild( mojo, "configuration" );
++        Node description = findSingleChild( mojo, "description" );
++        if ( goal == null || goal.length() <= 0 || mojoGoal.equals( goal ) )
++        {
++            append( sb, goalPrefix + ":" + mojoGoal, 0 );
++            Node deprecated = findSingleChild( mojo, "deprecated" );
++            if ( ( deprecated != null ) && isNotEmpty( deprecated.getTextContent() ) )
++            {
++                append( sb, "Deprecated. " + deprecated.getTextContent(), 1 );
++                if ( detail && description != null )
++                {
++                    append( sb, "", 0 );
++                    append( sb, description.getTextContent(), 1 );
++                }
++            }
++            else if ( description != null )
++            {
++                append( sb, description.getTextContent(), 1 );
++            }
++            append( sb, "", 0 );
++
++            if ( detail )
++            {
++                Node parametersNode = getSingleChild( mojo, "parameters" );
++                List<Node> parameters = findNamedChild( parametersNode, "parameter" );
++                append( sb, "Available parameters:", 1 );
++                append( sb, "", 0 );
++
++                for ( Node parameter : parameters )
++                {
++                    writeParameter( sb, parameter, configurationElement );
++                }
++            }
++        }
++    }
++
++    private void writeParameter( StringBuilder sb, Node parameter, Node configurationElement )
++        throws MojoExecutionException
++    {
++        String parameterName = getValue( parameter, "name" );
++        String parameterDescription = getValue( parameter, "description" );
++
++        Element fieldConfigurationElement = null;
++        if ( configurationElement != null )
++        {
++          fieldConfigurationElement =  (Element) findSingleChild( configurationElement, parameterName );
++        }
++
++        String parameterDefaultValue = "";
++        if ( fieldConfigurationElement != null && fieldConfigurationElement.hasAttribute( "default-value" ) )
++        {
++            parameterDefaultValue = " (Default: " + fieldConfigurationElement.getAttribute( "default-value" ) + ")";
++        }
++        append( sb, parameterName + parameterDefaultValue, 2 );
++        Node deprecated = findSingleChild( parameter, "deprecated" );
++        if ( ( deprecated != null ) && isNotEmpty( deprecated.getTextContent() ) )
++        {
++            append( sb, "Deprecated. " + deprecated.getTextContent(), 3 );
++            append( sb, "", 0 );
++        }
++        append( sb, parameterDescription, 3 );
++        if ( "true".equals( getValue( parameter, "required" ) ) )
++        {
++            append( sb, "Required: Yes", 3 );
++        }
++        if ( ( fieldConfigurationElement != null ) && isNotEmpty( fieldConfigurationElement.getTextContent() ) )
++        {
++            String property = getPropertyFromExpression( fieldConfigurationElement.getTextContent() );
++            append( sb, "User property: " + property, 3 );
++        }
++
++        append( sb, "", 0 );
++    }
++
++    /**
++     * <p>Repeat a String <code>n</code> times to form a new string.</p>
++     *
++     * @param str    String to repeat
++     * @param repeat number of times to repeat str
++     * @return String with repeated String
++     * @throws NegativeArraySizeException if <code>repeat &lt; 0</code>
++     * @throws NullPointerException       if str is <code>null</code>
++     */
++    private static String repeat( String str, int repeat )
++    {
++        StringBuilder buffer = new StringBuilder( repeat * str.length() );
++
++        for ( int i = 0; i < repeat; i++ )
++        {
++            buffer.append( str );
++        }
++
++        return buffer.toString();
++    }
++
++    /**
++     * Append a description to the buffer by respecting the indentSize and lineLength parameters.
++     * <b>Note</b>: The last character is always a new line.
++     *
++     * @param sb          The buffer to append the description, not <code>null</code>.
++     * @param description The description, not <code>null</code>.
++     * @param indent      The base indentation level of each line, must not be negative.
++     */
++    private void append( StringBuilder sb, String description, int indent )
++    {
++        for ( String line : toLines( description, indent, indentSize, lineLength ) )
++        {
++            sb.append( line ).append( '\n' );
++        }
++    }
++
++    /**
++     * Splits the specified text into lines of convenient display length.
++     *
++     * @param text       The text to split into lines, must not be <code>null</code>.
++     * @param indent     The base indentation level of each line, must not be negative.
++     * @param indentSize The size of each indentation, must not be negative.
++     * @param lineLength The length of the line, must not be negative.
++     * @return The sequence of display lines, never <code>null</code>.
++     * @throws NegativeArraySizeException if <code>indent &lt; 0</code>
++     */
++    private static List<String> toLines( String text, int indent, int indentSize, int lineLength )
++    {
++        List<String> lines = new ArrayList<String>();
++
++        String ind = repeat( "\t", indent );
++
++        String[] plainLines = text.split( "(\r\n)|(\r)|(\n)" );
++
++        for ( String plainLine : plainLines )
++        {
++            toLines( lines, ind + plainLine, indentSize, lineLength );
++        }
++
++        return lines;
++    }
++
++    /**
++     * Adds the specified line to the output sequence, performing line wrapping if necessary.
++     *
++     * @param lines      The sequence of display lines, must not be <code>null</code>.
++     * @param line       The line to add, must not be <code>null</code>.
++     * @param indentSize The size of each indentation, must not be negative.
++     * @param lineLength The length of the line, must not be negative.
++     */
++    private static void toLines( List<String> lines, String line, int indentSize, int lineLength )
++    {
++        int lineIndent = getIndentLevel( line );
++        StringBuilder buf = new StringBuilder( 256 );
++
++        String[] tokens = line.split( " +" );
++
++        for ( String token : tokens )
++        {
++            if ( buf.length() > 0 )
++            {
++                if ( buf.length() + token.length() >= lineLength )
++                {
++                    lines.add( buf.toString() );
++                    buf.setLength( 0 );
++                    buf.append( repeat( " ", lineIndent * indentSize ) );
++                }
++                else
++                {
++                    buf.append( ' ' );
++                }
++            }
++
++            for ( int j = 0; j < token.length(); j++ )
++            {
++                char c = token.charAt( j );
++                if ( c == '\t' )
++                {
++                    buf.append( repeat( " ", indentSize - buf.length() % indentSize ) );
++                }
++                else if ( c == '\u00A0' )
++                {
++                    buf.append( ' ' );
++                }
++                else
++                {
++                    buf.append( c );
++                }
++            }
++        }
++        lines.add( buf.toString() );
++    }
++
++    /**
++     * Gets the indentation level of the specified line.
++     *
++     * @param line The line whose indentation level should be retrieved, must not be <code>null</code>.
++     * @return The indentation level of the line.
++     */
++    private static int getIndentLevel( String line )
++    {
++        int level = 0;
++        for ( int i = 0; i < line.length() && line.charAt( i ) == '\t'; i++ )
++        {
++            level++;
++        }
++        for ( int i = level + 1; i <= level + 4 && i < line.length(); i++ )
++        {
++            if ( line.charAt( i ) == '\t' )
++            {
++                level++;
++                break;
++            }
++        }
++        return level;
++    }
++    
++    private String getPropertyFromExpression( String expression )
++    {
++        if ( expression != null && expression.startsWith( "${" ) && expression.endsWith( "}" )
++            && !expression.substring( 2 ).contains( "${" ) )
++        {
++            // expression="${xxx}" -> property="xxx"
++            return expression.substring( 2, expression.length() - 1 );
++        }
++        // no property can be extracted
++        return null;
++    }
++}

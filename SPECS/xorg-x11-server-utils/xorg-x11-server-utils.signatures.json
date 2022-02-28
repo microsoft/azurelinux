@@ -1,0 +1,20 @@
+{
+ "Signatures": {
+  "iceauth-1.0.8.tar.bz2": "e6ee213a217265cc76050e4293ea70b98c32dce6505c6421227efbda62ab60c6",
+  "rgb-1.0.6.tar.bz2": "bbca7c6aa59939b9f6a0fb9fff15dfd62176420ffd4ae30c8d92a6a125fbe6b0",
+  "sessreg-1.1.0.tar.bz2": "551177657835e0902b5eee7b19713035beaa1581bbd3c6506baa553e751e017c",
+  "xgamma-1.0.6.tar.bz2": "0ef1c35b5c18b1b22317f455c8df13c0a471a8efad63c89c98ae3ce8c2b222d3",
+  "xhost-1.0.7.tar.bz2": "93e619ee15471f576cfb30c663e18f5bc70aca577a63d2c2c03f006a7837c29a",
+  "xinput-1.6.3.tar.bz2": "35a281dd3b9b22ea85e39869bb7670ba78955d5fec17c6ef7165d61e5aeb66ed",
+  "xisxwayland-1.tar.xz": "39eff8ab32e7fa3d94fad61eaba9c970f51221f2b76897a66f16ff0b34f02a29",
+  "xkill-1.0.5.tar.bz2": "c5f0bb6a95e1ac7c4def8a657496d5d2f21ccd41eb47ef2c9ccb03fb6d6aff6b",
+  "xmodmap-1.0.9.tar.bz2": "b7b0e5cc5f10d0fb6d2d6ea4f00c77e8ac0e847cc5a73be94cd86139ac4ac478",
+  "xrandr-1.5.0.tar.bz2": "c1cfd4e1d4d708c031d60801e527abc9b6d34b85f2ffa2cadd21f75ff38151cd",
+  "xrdb-1.1.1.tar.bz2": "2d23ade7cdbb487996bf77cbb32cbe9bdb34d004748a53de7a4a97660d2217b7",
+  "xrefresh-1.0.6.tar.bz2": "287dfb9bb7e8d780d07e672e3252150850869cb550958ed5f8401f0835cd6353",
+  "xset-1.2.4.tar.bz2": "e4fd95280df52a88e9b0abc1fee11dcf0f34fc24041b9f45a247e52df941c957",
+  "xsetpointer-1.0.1.tar.bz2": "495d88871eb5081e98bbae55f813f73cb3ce4145d6ca3e8f2826800166c04571",
+  "xsetroot-1.1.2.tar.bz2": "10c442ba23591fb5470cea477a0aa5f679371f4f879c8387a1d9d05637ae417c",
+  "xstdcmap-1.0.3.tar.bz2": "f648e2b0cf16aa29856de998e2c7204be39dc1f8daeda9464d32288e0b580fc1"
+ }
+}

@@ -1,7 +1,7 @@
 Summary:        Python Build Reasonableness
 Name:           python-pbr
-Version:        5.1.2
-Release:        3%{?dist}
+Version:        5.8.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,7 @@ Requires:       python3
 %if %{with_check}
 BuildRequires:  git
 BuildRequires:  gnupg2
+BuildRequires:  python3-pip
 %endif
 
 %description -n python3-pbr
@@ -40,16 +41,8 @@ export SKIP_PIP_INSTALL=1
 ln -s pbr %{buildroot}/%{_bindir}/pbr3
 
 %check
-easy_install_3=$(ls %{_bindir} |grep easy_install |grep 3)
-$easy_install_3 coverage
-$easy_install_3 hacking
-$easy_install_3 mock
-$easy_install_3 testrepository
-$easy_install_3 testresources
-$easy_install_3 testscenarios
-$easy_install_3 virtualenv
-$easy_install_3 wheel
-%python3 setup.py test
+pip3 install coverage hacking mock testrepository testresources testscenarios virtualenv wheel tox
+tox -e py39
 
 %files -n python3-pbr
 %defattr(-,root,root)
@@ -61,6 +54,13 @@ $easy_install_3 wheel
 %{python3_sitelib}/pbr
 
 %changelog
+* Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 5.8.1-1
+- Bump version to 5.8.1
+- Use `tox` instead of `setup.py test` to enable ptest
+
+* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 5.1.2-4
+- Replace easy_install usage with pip in %%check sections
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 5.1.2-3
 - Remove python2 package
 - Lint spec

@@ -1,0 +1,766 @@
+--- tests/runners.py
++++ tests/runners.py
+@@ -18,6 +18,10 @@ from pytest import raises, skip
+ from pytest_relaxed import trap
+ from mock import patch, Mock, call
+ 
++from pytest import __version__ as pytest_version
++from pytest import mark as pytest_mark
++max_pytest_version = pytest_mark.skipif(pytest_version >= '3.3', reason='Test fails with more recent versions of pytest (GH#530)')
++
+ from invoke import (
+     CommandTimedOut,
+     Config,
+@@ -168,16 +172,19 @@ class Runner_:
+                 assert False, "Invalid run() kwarg didn't raise TypeError"
+ 
+     class warn:
++        @max_pytest_version
+         def honors_config(self):
+             runner = self._runner(run={"warn": True}, exits=1)
+             # Doesn't raise Failure -> all good
+             runner.run(_)
+ 
++        @max_pytest_version
+         def kwarg_beats_config(self):
+             runner = self._runner(run={"warn": False}, exits=1)
+             # Doesn't raise Failure -> all good
+             runner.run(_, warn=True)
+ 
++        @max_pytest_version
+         def does_not_apply_to_watcher_errors(self):
+             runner = self._runner(out="stuff")
+             try:
+@@ -188,6 +195,7 @@ class Runner_:
+             else:
+                 assert False, "Did not raise Failure for WatcherError!"
+ 
++        @max_pytest_version
+         def does_not_apply_to_timeout_errors(self):
+             with raises(CommandTimedOut):
+                 self._runner(klass=_TimingOutRunner).run(
+@@ -196,6 +204,7 @@ class Runner_:
+ 
+     class hide:
+         @trap
++        @max_pytest_version
+         def honors_config(self):
+             runner = self._runner(out="stuff", run={"hide": True})
+             r = runner.run(_)
+@@ -203,6 +212,7 @@ class Runner_:
+             assert sys.stdout.getvalue() == ""
+ 
+         @trap
++        @max_pytest_version
+         def kwarg_beats_config(self):
+             runner = self._runner(out="stuff")
+             r = runner.run(_, hide=True)
+@@ -210,51 +220,64 @@ class Runner_:
+             assert sys.stdout.getvalue() == ""
+ 
+     class pty:
++        @max_pytest_version
+         def pty_defaults_to_off(self):
+             assert self._run(_).pty is False
+ 
++        @max_pytest_version
+         def honors_config(self):
+             runner = self._runner(run={"pty": True})
+             assert runner.run(_).pty is True
+ 
++        @max_pytest_version
+         def kwarg_beats_config(self):
+             runner = self._runner(run={"pty": False})
+             assert runner.run(_, pty=True).pty is True
+ 
+     class shell:
++        @max_pytest_version
+         def defaults_to_bash_or_cmdexe_when_pty_True(self):
+             _expect_platform_shell(self._run(_, pty=True).shell)
+ 
++        @max_pytest_version
+         def defaults_to_bash_or_cmdexe_when_pty_False(self):
+             _expect_platform_shell(self._run(_, pty=False).shell)
+ 
++        @max_pytest_version
+         def may_be_overridden(self):
+             assert self._run(_, shell="/bin/zsh").shell == "/bin/zsh"
+ 
++        @max_pytest_version
+         def may_be_configured(self):
+             runner = self._runner(run={"shell": "/bin/tcsh"})
+             assert runner.run(_).shell == "/bin/tcsh"
+ 
++        @max_pytest_version
+         def kwarg_beats_config(self):
+             runner = self._runner(run={"shell": "/bin/tcsh"})
+             assert runner.run(_, shell="/bin/zsh").shell == "/bin/zsh"
+ 
+     class env:
++        @max_pytest_version
+         def defaults_to_os_environ(self):
+             assert self._run(_).env == os.environ
+ 
++        @max_pytest_version
+         def updates_when_dict_given(self):
+             expected = dict(os.environ, FOO="BAR")
+             assert self._run(_, env={"FOO": "BAR"}).env == expected
+ 
++        @max_pytest_version
+         def replaces_when_replace_env_True(self):
+             env = self._run(_, env={"JUST": "ME"}, replace_env=True).env
+             assert env == {"JUST": "ME"}
+ 
++        @max_pytest_version
+         def config_can_be_used(self):
+             env = self._run(_, settings={"run": {"env": {"FOO": "BAR"}}}).env
+             assert env == dict(os.environ, FOO="BAR")
+ 
++        @max_pytest_version
+         def kwarg_wins_over_config(self):
+             settings = {"run": {"env": {"FOO": "BAR"}}}
+             kwarg = {"FOO": "NOTBAR"}
+@@ -262,6 +285,7 @@ class Runner_:
+             assert foo == "NOTBAR"
+ 
+     class return_value:
++        @max_pytest_version
+         def return_code(self):
+             """
+             Result has .return_code (and .exited) containing exit code int
+@@ -271,44 +295,54 @@ class Runner_:
+             assert r.return_code == 17
+             assert r.exited == 17
+ 
++        @max_pytest_version
+         def ok_attr_indicates_success(self):
+             runner = self._runner()
+             assert runner.run(_).ok is True  # default dummy retval is 0
+ 
++        @max_pytest_version
+         def ok_attr_indicates_failure(self):
+             runner = self._runner(exits=1)
+             assert runner.run(_, warn=True).ok is False
+ 
++        @max_pytest_version
+         def failed_attr_indicates_success(self):
+             runner = self._runner()
+             assert runner.run(_).failed is False  # default dummy retval is 0
+ 
++        @max_pytest_version
+         def failed_attr_indicates_failure(self):
+             runner = self._runner(exits=1)
+             assert runner.run(_, warn=True).failed is True
+ 
+         @trap
++        @max_pytest_version
+         def stdout_attribute_contains_stdout(self):
+             runner = self._runner(out="foo")
+             assert runner.run(_).stdout == "foo"
+             assert sys.stdout.getvalue() == "foo"
+ 
+         @trap
++        @max_pytest_version
+         def stderr_attribute_contains_stderr(self):
+             runner = self._runner(err="foo")
+             assert runner.run(_).stderr == "foo"
+             assert sys.stderr.getvalue() == "foo"
+ 
++        @max_pytest_version
+         def whether_pty_was_used(self):
+             assert self._run(_).pty is False
+             assert self._run(_, pty=True).pty is True
+ 
++        @max_pytest_version
+         def command_executed(self):
+             assert self._run(_).command == _
+ 
++        @max_pytest_version
+         def shell_used(self):
+             _expect_platform_shell(self._run(_).shell)
+ 
++        @max_pytest_version
+         def hide_param_exposed_and_normalized(self):
+             assert self._run(_, hide=True).hide, "stdout" == "stderr"
+             assert self._run(_, hide=False).hide == tuple()
+@@ -316,26 +350,31 @@ class Runner_:
+ 
+     class command_echoing:
+         @trap
++        @max_pytest_version
+         def off_by_default(self):
+             self._run("my command")
+             assert sys.stdout.getvalue() == ""
+ 
+         @trap
++        @max_pytest_version
+         def enabled_via_kwarg(self):
+             self._run("my command", echo=True)
+             assert "my command" in sys.stdout.getvalue()
+ 
+         @trap
++        @max_pytest_version
+         def enabled_via_config(self):
+             self._run("yup", settings={"run": {"echo": True}})
+             assert "yup" in sys.stdout.getvalue()
+ 
+         @trap
++        @max_pytest_version
+         def kwarg_beats_config(self):
+             self._run("yup", echo=True, settings={"run": {"echo": False}})
+             assert "yup" in sys.stdout.getvalue()
+ 
+         @trap
++        @max_pytest_version
+         def uses_ansi_bold(self):
+             self._run("my command", echo=True)
+             # TODO: vendor & use a color module
+@@ -374,6 +413,7 @@ class Runner_:
+         #
+         # Use UTF-7 as a valid encoding unlikely to be a real default derived
+         # from test-runner's locale.getpreferredencoding()
++        @max_pytest_version
+         def defaults_to_encoding_method_result(self):
+             # Setup
+             runner = self._runner()
+@@ -384,6 +424,7 @@ class Runner_:
+             runner.default_encoding.assert_called_with()
+             assert runner.encoding == "UTF-7"
+ 
++        @max_pytest_version
+         def honors_config(self):
+             c = Context(Config(overrides={"run": {"encoding": "UTF-7"}}))
+             runner = _Dummy(c)
+@@ -419,27 +460,35 @@ class Runner_:
+             assert sys.stdout.getvalue() == expect_out
+             assert sys.stderr.getvalue() == expect_err
+ 
++        @max_pytest_version
+         def both_hides_everything(self):
+             self._expect_hidden("both")
+ 
++        @max_pytest_version
+         def True_hides_everything(self):
+             self._expect_hidden(True)
+ 
++        @max_pytest_version
+         def out_only_hides_stdout(self):
+             self._expect_hidden("out", expect_out="", expect_err="bar")
+ 
++        @max_pytest_version
+         def err_only_hides_stderr(self):
+             self._expect_hidden("err", expect_out="foo", expect_err="")
+ 
++        @max_pytest_version
+         def accepts_stdout_alias_for_out(self):
+             self._expect_hidden("stdout", expect_out="", expect_err="bar")
+ 
++        @max_pytest_version
+         def accepts_stderr_alias_for_err(self):
+             self._expect_hidden("stderr", expect_out="foo", expect_err="")
+ 
++        @max_pytest_version
+         def None_hides_nothing(self):
+             self._expect_hidden(None, expect_out="foo", expect_err="bar")
+ 
++        @max_pytest_version
+         def False_hides_nothing(self):
+             self._expect_hidden(False, expect_out="foo", expect_err="bar")
+ 
+@@ -460,28 +509,33 @@ class Runner_:
+                     False
+                 ), "run() did not raise ValueError for bad hide= value"  # noqa
+ 
++        @max_pytest_version
+         def does_not_affect_capturing(self):
+             assert self._runner(out="foo").run(_, hide=True).stdout == "foo"
+ 
+         @trap
++        @max_pytest_version
+         def overrides_echoing(self):
+             self._runner().run("invisible", hide=True, echo=True)
+             assert "invisible" not in sys.stdout.getvalue()
+ 
+     class output_stream_overrides:
+         @trap
++        @max_pytest_version
+         def out_defaults_to_sys_stdout(self):
+             "out_stream defaults to sys.stdout"
+             self._runner(out="sup").run(_)
+             assert sys.stdout.getvalue() == "sup"
+ 
+         @trap
++        @max_pytest_version
+         def err_defaults_to_sys_stderr(self):
+             "err_stream defaults to sys.stderr"
+             self._runner(err="sup").run(_)
+             assert sys.stderr.getvalue() == "sup"
+ 
+         @trap
++        @max_pytest_version
+         def out_can_be_overridden(self):
+             "out_stream can be overridden"
+             out = StringIO()
+@@ -490,6 +544,7 @@ class Runner_:
+             assert sys.stdout.getvalue() == ""
+ 
+         @trap
++        @max_pytest_version
+         def overridden_out_is_never_hidden(self):
+             out = StringIO()
+             self._runner(out="sup").run(_, out_stream=out, hide=True)
+@@ -497,6 +552,7 @@ class Runner_:
+             assert sys.stdout.getvalue() == ""
+ 
+         @trap
++        @max_pytest_version
+         def err_can_be_overridden(self):
+             "err_stream can be overridden"
+             err = StringIO()
+@@ -505,6 +561,7 @@ class Runner_:
+             assert sys.stderr.getvalue() == ""
+ 
+         @trap
++        @max_pytest_version
+         def overridden_err_is_never_hidden(self):
+             err = StringIO()
+             self._runner(err="sup").run(_, err_stream=err, hide=True)
+@@ -512,11 +569,13 @@ class Runner_:
+             assert sys.stderr.getvalue() == ""
+ 
+         @trap
++        @max_pytest_version
+         def pty_defaults_to_sys(self):
+             self._runner(out="sup").run(_, pty=True)
+             assert sys.stdout.getvalue() == "sup"
+ 
+         @trap
++        @max_pytest_version
+         def pty_out_can_be_overridden(self):
+             out = StringIO()
+             self._runner(out="yo").run(_, pty=True, out_stream=out)
+@@ -525,12 +584,14 @@ class Runner_:
+ 
+     class output_stream_handling:
+         # Mostly corner cases, generic behavior's covered above
++        @max_pytest_version
+         def writes_and_flushes_to_stdout(self):
+             out = Mock(spec=StringIO)
+             self._runner(out="meh").run(_, out_stream=out)
+             out.write.assert_called_once_with("meh")
+             out.flush.assert_called_once_with()
+ 
++        @max_pytest_version
+         def writes_and_flushes_to_stderr(self):
+             err = Mock(spec=StringIO)
+             self._runner(err="whatever").run(_, err_stream=err)
+@@ -617,15 +678,18 @@ class Runner_:
+             assert not Fake.close_proc_stdin.called
+ 
+     class failure_handling:
++        @max_pytest_version
+         def fast_failures(self):
+             with raises(UnexpectedExit):
+                 self._runner(exits=1).run(_)
+ 
++        @max_pytest_version
+         def non_1_return_codes_still_act_as_failure(self):
+             r = self._runner(exits=17).run(_, warn=True)
+             assert r.failed is True
+ 
+         class UnexpectedExit_repr:
++            @max_pytest_version
+             def similar_to_just_the_result_repr(self):
+                 try:
+                     self._runner(exits=23).run(_)
+@@ -645,6 +709,7 @@ class Runner_:
+                 self._stderr = lines("stderr")
+ 
+             @trap
++            @max_pytest_version
+             def displays_command_and_exit_code_by_default(self):
+                 try:
+                     self._runner(
+@@ -667,6 +732,7 @@ Stderr: already printed
+                     assert False, "Failed to raise UnexpectedExit!"
+ 
+             @trap
++            @max_pytest_version
+             def does_not_display_stderr_when_pty_True(self):
+                 try:
+                     self._runner(
+@@ -687,6 +753,7 @@ Stderr: n/a (PTYs have no stderr)
+                     assert str(e) == expected.format(_)
+ 
+             @trap
++            @max_pytest_version
+             def pty_stderr_message_wins_over_hidden_stderr(self):
+                 try:
+                     self._runner(
+@@ -698,6 +765,7 @@ Stderr: n/a (PTYs have no stderr)
+                     assert "Stderr: already printed" not in r
+ 
+             @trap
++            @max_pytest_version
+             def explicit_hidden_stream_tail_display(self):
+                 # All the permutations of what's displayed when, are in
+                 # subsequent test, which does 'x in y' assertions; this one
+@@ -744,6 +812,7 @@ stderr 25
+                     assert str(e) == expected.format(_)
+ 
+             @trap
++            @max_pytest_version
+             def displays_tails_of_streams_only_when_hidden(self):
+                 def oops(msg, r, hide):
+                     return "{}! hide={}; str output:\n\n{}".format(
+@@ -792,6 +861,7 @@ stderr 25
+         # TODO: may eventually turn into having Runner raise distinct Failure
+         # subclasses itself, at which point `reason` would probably go away.
+         class reason:
++            @max_pytest_version
+             def is_None_for_regular_nonzero_exits(self):
+                 try:
+                     self._regular_error()
+@@ -804,6 +874,7 @@ stderr 25
+                 # TODO: when we implement 'exitcodes 1 and 2 are actually OK'
+                 skip()
+ 
++            @max_pytest_version
+             def is_exception_when_WatcherError_raised_internally(self):
+                 try:
+                     self._watcher_error()
+@@ -818,6 +889,7 @@ stderr 25
+         # no problem" and "raised as/attached to an exception when problem",
+         # possibly not - complicates how the APIs need to be adhered to.
+         class wrapped_result:
++            @max_pytest_version
+             def most_attrs_are_always_present(self):
+                 attrs = ("command", "shell", "env", "stdout", "stderr", "pty")
+                 for method in (self._regular_error, self._watcher_error):
+@@ -830,6 +902,7 @@ stderr 25
+                         assert False, "Did not raise Failure!"
+ 
+             class shell_exit_failure:
++                @max_pytest_version
+                 def exited_is_integer(self):
+                     try:
+                         self._regular_error()
+@@ -838,6 +911,7 @@ stderr 25
+                     else:
+                         assert False, "Did not raise Failure!"
+ 
++                @max_pytest_version
+                 def ok_bool_etc_are_falsey(self):
+                     try:
+                         self._regular_error()
+@@ -849,6 +923,7 @@ stderr 25
+                     else:
+                         assert False, "Did not raise Failure!"
+ 
++                @max_pytest_version
+                 def stringrep_notes_exit_status(self):
+                     try:
+                         self._regular_error()
+@@ -858,6 +933,7 @@ stderr 25
+                         assert False, "Did not raise Failure!"
+ 
+             class watcher_failure:
++                @max_pytest_version
+                 def exited_is_None(self):
+                     try:
+                         self._watcher_error()
+@@ -866,6 +942,7 @@ stderr 25
+                         err = "Expected None, got {!r}".format(exited)
+                         assert exited is None, err
+ 
++                @max_pytest_version
+                 def ok_and_bool_still_are_falsey(self):
+                     try:
+                         self._watcher_error()
+@@ -877,6 +954,7 @@ stderr 25
+                     else:
+                         assert False, "Did not raise Failure!"
+ 
++                @max_pytest_version
+                 def stringrep_lacks_exit_status(self):
+                     try:
+                         self._watcher_error()
+@@ -889,6 +967,7 @@ stderr 25
+ 
+     class threading:
+         # NOTE: see also the more generic tests in concurrency.py
++        @max_pytest_version
+         def errors_within_io_thread_body_bubble_up(self):
+             class Oops(_Dummy):
+                 def handle_stdout(self, **kwargs):
+@@ -912,6 +991,7 @@ stderr 25
+             else:
+                 assert False, "Did not raise ThreadException as expected!"
+ 
++        @max_pytest_version
+         def io_thread_errors_str_has_details(self):
+             class Oops(_Dummy):
+                 def handle_stdout(self, **kwargs):
+@@ -939,6 +1019,7 @@ stderr 25
+         # StreamWatcher/Responder and their host Runner; Responder-only tests
+         # are in tests/watchers.py.
+ 
++        @max_pytest_version
+         def nothing_is_written_to_stdin_by_default(self):
+             # NOTE: technically if some goofus ran the tests by hand and mashed
+             # keys while doing so...this would fail. LOL?
+@@ -966,17 +1047,20 @@ stderr 25
+             runner.run(_, watchers=watchers, hide=True)
+             return klass.write_proc_stdin
+ 
++        @max_pytest_version
+         def watchers_responses_get_written_to_proc_stdin(self):
+             self._expect_response(
+                 out="the house was empty", responses={"empty": "handed"}
+             ).assert_called_once_with("handed")
+ 
++        @max_pytest_version
+         def multiple_hits_yields_multiple_responses(self):
+             holla = call("how high?")
+             self._expect_response(
+                 out="jump, wait, jump, wait", responses={"jump": "how high?"}
+             ).assert_has_calls([holla, holla])
+ 
++        @max_pytest_version
+         def chunk_sizes_smaller_than_patterns_still_work_ok(self):
+             klass = self._mock_stdin_writer()
+             klass.read_chunk_size = 1  # < len('jump')
+@@ -989,6 +1073,7 @@ stderr 25
+             # And there weren't duplicates!
+             assert len(klass.write_proc_stdin.call_args_list) == 2
+ 
++        @max_pytest_version
+         def both_out_and_err_are_scanned(self):
+             bye = call("goodbye")
+             # Would only be one 'bye' if only scanning stdout
+@@ -998,6 +1083,7 @@ stderr 25
+                 responses={"hello": "goodbye"},
+             ).assert_has_calls([bye, bye])
+ 
++        @max_pytest_version
+         def multiple_patterns_works_as_expected(self):
+             calls = [call("betty"), call("carnival")]
+             # Technically, I'd expect 'betty' to get called before 'carnival',
+@@ -1010,6 +1096,7 @@ stderr 25
+                 responses={"boop": "betty", "robot": "carnival"},
+             ).assert_has_calls(calls, any_order=True)
+ 
++        @max_pytest_version
+         def multiple_patterns_across_both_streams(self):
+             responses = {
+                 "boop": "betty",
+@@ -1026,6 +1113,7 @@ stderr 25
+                 responses=responses,
+             ).assert_has_calls(calls, any_order=True)
+ 
++        @max_pytest_version
+         def honors_watchers_config_option(self):
+             klass = self._mock_stdin_writer()
+             responder = Responder("my stdout", "and my axe")
+@@ -1037,6 +1125,7 @@ stderr 25
+             runner.run(_, hide=True)
+             klass.write_proc_stdin.assert_called_once_with("and my axe")
+ 
++        @max_pytest_version
+         def kwarg_overrides_config(self):
+             # TODO: how to handle use cases where merging, not overriding, is
+             # the expected/unsurprising default? probably another config-only
+@@ -1211,6 +1300,7 @@ stderr 25
+     class character_buffered_stdin:
+         @skip_if_windows
+         @patch("invoke.terminals.tty")
++        @max_pytest_version
+         def setcbreak_called_on_tty_stdins(self, mock_tty, mock_termios):
+             mock_termios.tcgetattr.return_value = make_tcattrs(echo=True)
+             self._run(_)
+@@ -1225,6 +1315,7 @@ stderr 25
+         @skip_if_windows
+         @patch("invoke.terminals.tty")
+         @patch("invoke.terminals.os")
++        @max_pytest_version
+         def setcbreak_not_called_if_process_not_foregrounded(
+             self, mock_os, mock_tty
+         ):
+@@ -1238,6 +1329,7 @@ stderr 25
+ 
+         @skip_if_windows
+         @patch("invoke.terminals.tty")
++        @max_pytest_version
+         def tty_stdins_have_settings_restored_by_default(
+             self, mock_tty, mock_termios
+         ):
+@@ -1253,6 +1345,7 @@ stderr 25
+ 
+         @skip_if_windows
+         @patch("invoke.terminals.tty")  # stub
++        @max_pytest_version
+         def tty_stdins_have_settings_restored_on_KeyboardInterrupt(
+             self, mock_tty, mock_termios
+         ):
+@@ -1271,6 +1364,7 @@ stderr 25
+ 
+         @skip_if_windows
+         @patch("invoke.terminals.tty")
++        @max_pytest_version
+         def setcbreak_not_called_if_terminal_seems_already_cbroken(
+             self, mock_tty, mock_termios
+         ):
+@@ -1299,6 +1393,7 @@ stderr 25
+                 pass
+             return runner
+ 
++        @max_pytest_version
+         def called_on_KeyboardInterrupt(self):
+             runner = self._run_with_mocked_interrupt(
+                 _KeyboardInterruptingRunner
+@@ -1309,6 +1404,7 @@ stderr 25
+             runner = self._run_with_mocked_interrupt(_GenericExceptingRunner)
+             assert not runner.send_interrupt.called
+ 
++        @max_pytest_version
+         def sends_escape_byte_sequence(self):
+             for pty in (True, False):
+                 runner = _KeyboardInterruptingRunner(Context())
+@@ -1318,6 +1414,7 @@ stderr 25
+                 mock_stdin.assert_called_once_with(u"\x03")
+ 
+     class timeout:
++        @max_pytest_version
+         def start_timer_called_with_config_value(self):
+             runner = self._runner(timeouts={"command": 7})
+             runner.start_timer = Mock()
+@@ -1325,6 +1422,7 @@ stderr 25
+             runner.run(_)
+             runner.start_timer.assert_called_once_with(7)
+ 
++        @max_pytest_version
+         def run_kwarg_honored(self):
+             runner = self._runner()
+             runner.start_timer = Mock()
+@@ -1332,6 +1430,7 @@ stderr 25
+             runner.run(_, timeout=3)
+             runner.start_timer.assert_called_once_with(3)
+ 
++        @max_pytest_version
+         def kwarg_wins_over_config(self):
+             runner = self._runner(timeouts={"command": 7})
+             runner.start_timer = Mock()
+@@ -1339,6 +1438,7 @@ stderr 25
+             runner.run(_, timeout=3)
+             runner.start_timer.assert_called_once_with(3)
+ 
++        @max_pytest_version
+         def raises_CommandTimedOut_with_timeout_info(self):
+             runner = self._runner(
+                 klass=_TimingOutRunner, timeouts={"command": 7}
+@@ -1512,6 +1612,7 @@ class Local_:
+ 
+     class pty:
+         @mock_pty()
++        @max_pytest_version
+         def when_pty_True_we_use_pty_fork_and_os_exec(self):
+             "when pty=True, we use pty.fork and os.exec*"
+             self._run(_, pty=True)
+@@ -1536,13 +1637,16 @@ class Local_:
+             expected_get.assert_called_once_with(exitstatus)
+             assert not unexpected_get.called
+ 
++        @max_pytest_version
+         def pty_uses_WEXITSTATUS_if_WIFEXITED(self):
+             self._expect_exit_check(True)
+ 
++        @max_pytest_version
+         def pty_uses_WTERMSIG_if_WIFSIGNALED(self):
+             self._expect_exit_check(False)
+ 
+         @mock_pty(insert_os=True)
++        @max_pytest_version
+         def WTERMSIG_result_turned_negative_to_match_subprocess(self, mock_os):
+             mock_os.WIFEXITED.return_value = False
+             mock_os.WIFSIGNALED.return_value = True
+@@ -1550,6 +1654,7 @@ class Local_:
+             assert self._run(_, pty=True, warn=True).exited == -2
+ 
+         @mock_pty()
++        @max_pytest_version
+         def pty_is_set_to_controlling_terminal_size(self):
+             self._run(_, pty=True)
+             # @mock_pty's asserts check the TIOC[GS]WINSZ calls for us
+@@ -1569,16 +1674,19 @@ class Local_:
+             assert runner.should_use_pty(pty=True, fallback=True) is False
+ 
+         @mock_pty(trailing_error=OSError("Input/output error"))
++        @max_pytest_version
+         def spurious_OSErrors_handled_gracefully(self):
+             # Doesn't-blow-up test.
+             self._run(_, pty=True)
+ 
+         @mock_pty(trailing_error=OSError("I/O error"))
++        @max_pytest_version
+         def other_spurious_OSErrors_handled_gracefully(self):
+             # Doesn't-blow-up test.
+             self._run(_, pty=True)
+ 
+         @mock_pty(trailing_error=OSError("wat"))
++        @max_pytest_version
+         def non_spurious_OSErrors_bubble_up(self):
+             try:
+                 self._run(_, pty=True)
+@@ -1588,6 +1696,7 @@ class Local_:
+                 assert str(e.value) == "wat"
+ 
+         @mock_pty(os_close_error=True)
++        @max_pytest_version
+         def stop_mutes_errors_on_pty_close(self):
+             # Another doesn't-blow-up test, this time around os.close() of the
+             # pty itself (due to os_close_error=True)
+@@ -1595,12 +1704,14 @@ class Local_:
+ 
+         class fallback:
+             @mock_pty(isatty=False)
++            @max_pytest_version
+             def can_be_overridden_by_kwarg(self):
+                 self._run(_, pty=True, fallback=False)
+                 # @mock_pty's asserts will be mad if pty-related os/pty calls
+                 # didn't fire, so we're done.
+ 
+             @mock_pty(isatty=False)
++            @max_pytest_version
+             def can_be_overridden_by_config(self):
+                 self._runner(run={"fallback": False}).run(_, pty=True)
+                 # @mock_pty's asserts will be mad if pty-related os/pty calls
+@@ -1612,11 +1723,13 @@ class Local_:
+                 assert self._run(_, pty=True).pty is False
+ 
+             @mock_pty(isatty=False)
++            @max_pytest_version
+             def overridden_fallback_affects_result_pty_value(self):
+                 assert self._run(_, pty=True, fallback=False).pty is True
+ 
+     class shell:
+         @mock_pty(insert_os=True)
++        @max_pytest_version
+         def defaults_to_bash_or_cmdexe_when_pty_True(self, mock_os):
+             # NOTE: yea, windows can't run pty is true, but this is really
+             # testing config behavior, so...meh
+@@ -1631,6 +1744,7 @@ class Local_:
+             )
+ 
+         @mock_pty(insert_os=True)
++        @max_pytest_version
+         def may_be_overridden_when_pty_True(self, mock_os):
+             self._run(_, pty=True, shell="/bin/zsh")
+             assert mock_os.execve.call_args_list[0][0][0] == "/bin/zsh"
+@@ -1652,6 +1766,7 @@ class Local_:
+             assert env == expected
+ 
+         @mock_pty(insert_os=True)
++        @max_pytest_version
+         def uses_execve_for_pty_True(self, mock_os):
+             type(mock_os).environ = {"OTHERVAR": "OTHERVAL"}
+             self._run(_, pty=True, env={"FOO": "BAR"})

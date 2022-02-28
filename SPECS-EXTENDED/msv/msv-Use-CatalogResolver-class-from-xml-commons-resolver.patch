@@ -1,0 +1,67 @@
+From 4b691adecd92c09689b0d23b7b17cc50f4b5bee9 Mon Sep 17 00:00:00 2001
+From: Michal Srb <msrb@redhat.com>
+Date: Thu, 11 Apr 2013 16:26:09 +0200
+Subject: [PATCH] Use CatalogResolver class from xml-commons-resolver
+
+---
+ msv/examples/schemaLookup/Main.java                | 2 +-
+ msv/src/com/sun/msv/driver/textui/Driver.java      | 2 +-
+ msv/test/batch/BatchTester.java                    | 2 +-
+ msv/test/batch/driver/AbstractValidatorExImpl.java | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/msv/examples/schemaLookup/Main.java b/msv/examples/schemaLookup/Main.java
+index 426051d..5bcbaa3 100644
+--- a/msv/examples/schemaLookup/Main.java
++++ b/msv/examples/schemaLookup/Main.java
+@@ -36,7 +36,7 @@ import java.io.IOException;
+ 
+ import javax.xml.parsers.DocumentBuilderFactory;
+ 
+-import com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver;
++import org.apache.xml.resolver.tools.CatalogResolver;
+ import org.iso_relax.verifier.Schema;
+ import org.iso_relax.verifier.Verifier;
+ import org.w3c.dom.Document;
+diff --git a/msv/src/com/sun/msv/driver/textui/Driver.java b/msv/src/com/sun/msv/driver/textui/Driver.java
+index f659b5f..63a5794 100644
+--- a/msv/src/com/sun/msv/driver/textui/Driver.java
++++ b/msv/src/com/sun/msv/driver/textui/Driver.java
+@@ -39,7 +39,7 @@ import java.util.Locale;
+ 
+ import javax.xml.parsers.SAXParserFactory;
+ 
+-import com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver;
++import org.apache.xml.resolver.tools.CatalogResolver;
+ import org.iso_relax.dispatcher.Dispatcher;
+ import org.iso_relax.dispatcher.SchemaProvider;
+ import org.iso_relax.dispatcher.impl.DispatcherImpl;
+diff --git a/msv/test/batch/BatchTester.java b/msv/test/batch/BatchTester.java
+index 7fd8b88..b7bba01 100644
+--- a/msv/test/batch/BatchTester.java
++++ b/msv/test/batch/BatchTester.java
+@@ -40,7 +40,7 @@ import javax.xml.parsers.SAXParserFactory;
+ import junit.framework.Test;
+ import junit.framework.TestSuite;
+ 
+-import com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver;
++import org.apache.xml.resolver.tools.CatalogResolver;
+ 
+ import batch.driver.DTDValidator;
+ import batch.driver.GenericValidator;
+diff --git a/msv/test/batch/driver/AbstractValidatorExImpl.java b/msv/test/batch/driver/AbstractValidatorExImpl.java
+index dd85d93..33121f0 100644
+--- a/msv/test/batch/driver/AbstractValidatorExImpl.java
++++ b/msv/test/batch/driver/AbstractValidatorExImpl.java
+@@ -36,7 +36,7 @@ import java.io.InputStream;
+ 
+ import javax.xml.parsers.SAXParserFactory;
+ 
+-import com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver;
++import org.apache.xml.resolver.tools.CatalogResolver;
+ import org.xml.sax.InputSource;
+ import org.xml.sax.XMLReader;
+ 
+-- 
+1.8.1.4
+

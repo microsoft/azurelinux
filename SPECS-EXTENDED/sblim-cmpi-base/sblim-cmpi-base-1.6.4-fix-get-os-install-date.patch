@@ -1,0 +1,67 @@
+diff -up sblim-cmpi-base-1.6.4/OSBase_OperatingSystem.c.orig sblim-cmpi-base-1.6.4/OSBase_OperatingSystem.c
+--- sblim-cmpi-base-1.6.4/OSBase_OperatingSystem.c.orig	2014-10-23 16:54:13.000000000 +0200
++++ sblim-cmpi-base-1.6.4/OSBase_OperatingSystem.c	2020-01-21 15:11:49.420942584 +0100
+@@ -143,11 +143,11 @@ void _init_os_distro() {
+     
+     _OSBASE_TRACE(4,("--- _init_os_distro() called : init"));
+ 
+-    rc = runcommand( "find /etc/ -maxdepth 1 -type f -name *release 2>/dev/null" , NULL , &hdout , NULL );
++    rc = runcommand( "find /etc/ /usr/lib/ -maxdepth 1 -type f -name *release 2>/dev/null" , NULL , &hdout , NULL );
+     if( rc == 0 && *hdout != NULL) {
+       while (hdout[j] && hdout[j][0]) {
+-	if (strstr(hdout[j],"lsb-release") && hdout[j+1] && hdout[j+1][0]) {
+-	  /* found lsb-release but there are other (preferred) release files */
++	if ((strstr(hdout[j],"lsb-release") || strstr(hdout[j],"os-release")) && hdout[j+1] && hdout[j+1][0]) {
++	  /* found lsb-release/os-release but there are other (preferred) release files */
+ 	  j++;
+ 	  continue;
+ 	}
+@@ -242,35 +242,28 @@ unsigned long long get_os_totalSwapSize(
+ 
+ 
+ char * get_os_installdate() {
+-  struct tm    date;
++  struct tm  * datep;
+   char      ** hdout = NULL;
+-  char      *  dstr  = NULL;
+   char      *  str   = NULL;
+-  char      *  ptr   = NULL;
+-  int          rc    = 0;
++  int          rc    = -1;
+ 
+   _OSBASE_TRACE(4,("--- get_os_installdate() called"));
+ 
+-  if( CIM_OS_DISTRO && strstr( CIM_OS_DISTRO, "Red Hat" ) ) {
+-    /* we guess it is Red Hat */
+-    rc = runcommand( "rpm -qi redhat-release | grep Install" , NULL , &hdout , NULL );
+-    if(rc!=0) { 
+-    /* we guess it is Fedora */
+-      rc = runcommand( "rpm -qi fedora-release | grep Install" , NULL , &hdout , NULL );
++  if( CIM_OS_DISTRO ) {
++    if( strstr( CIM_OS_DISTRO, "Red Hat" ) ) {
++      /* we guess it is Red Hat */
++      rc = runcommand( "rpm -q --qf '%{INSTALLTIME}' redhat-release" , NULL , &hdout , NULL );
++    }
++    else if( strstr( CIM_OS_DISTRO, "Fedora" ) ) {
++      /* we guess it is Fedora */
++      rc = runcommand( "rpm -q --qf '%{INSTALLTIME}' fedora-release-common" , NULL , &hdout , NULL );
+     }
+     if( rc == 0 ) {
+-      str = strstr( hdout[0], ": ");
+-      str+=2;
+-      for( ptr = str ; (*ptr)!=' ' ; ptr++ ) {
+-	if( *(ptr+1)==' ' ) { ptr ++; }
+-      }
+-      dstr = (char *) malloc( (strlen(str)-strlen(ptr)+1));
+-      strncpy( dstr , str, strlen(str)-strlen(ptr)-1);
+-      strptime(dstr, "%A %d %B %Y %H:%M:%S %p %Z", &date);
++      time_t t = (time_t) atoi(*hdout);
++      datep = gmtime(&t);
+       str = (char*)malloc(26);
+-      strftime(str,26,"%Y%m%d%H%M%S.000000",&date);
++      strftime(str,26,"%Y%m%d%H%M%S.000000",datep);
+       _cat_timezone(str, get_os_timezone());
+-      if(dstr) free(dstr);
+     }
+     freeresultbuf(hdout);
+   }

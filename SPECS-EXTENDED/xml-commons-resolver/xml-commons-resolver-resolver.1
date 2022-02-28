@@ -1,0 +1,66 @@
+.TH XML-RESOLVER 1 "11 April 2013" "xml-commons-resolver" "User commands"
+
+.SH NAME
+xml-resolver - A simple command-line resolver
+
+.SH SYNOPSIS
+
+.B xml-resolver
+[options] keyword
+
+.SH DESCRIPTION
+
+\fBxml-resolver\fP is a simple command-line resolver. It takes some parameters 
+and passes them through the resolver, printing the result.
+
+The process ends with error-level 1, if there were errors.
+
+.SH OPTIONS
+
+Command-line options are described below.
+
+.PP
+.B -c
+catalogfile
+.RS 4
+Load a particular catalog file
+.RE
+.PP
+.B -n
+name
+.RS 4
+Sets the name
+.RE
+.PP
+.B -p
+publicId
+.RS 4
+Sets the public identifier
+.RE
+.PP
+.B -s
+systemId
+.RS 4
+Sets the system identifier
+.RE
+.PP
+.B -a
+.RS 4
+Absolute system URI
+.RE
+.PP
+.B -u
+uri
+.RS 4
+Sets the URI
+.RE
+.PP
+.B -d
+integer
+.RS 4
+Set the debug level
+.RE
+
+And keyword is one of: doctype, document, entity, notation, public,
+system, or uri.
+

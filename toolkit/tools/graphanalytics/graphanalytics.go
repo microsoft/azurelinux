@@ -143,7 +143,7 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 			continue
 		}
 
-		pkgSRPM := filepath.Base(node.SrpmPath)
+		pkgSRPM := node.SRPMFileName()
 
 		dependencies := pkgGraph.From(node.ID())
 		for dependencies.Next() {
@@ -157,7 +157,7 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 			}
 
 			// Skip requirements that come from the same srpm.
-			dependencySRPM := filepath.Base(dependency.SrpmPath)
+			dependencySRPM := dependency.SRPMFileName()
 			if pkgSRPM == dependencySRPM {
 				continue
 			}
@@ -184,7 +184,7 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 			continue
 		}
 
-		pkgSRPM := filepath.Base(node.SrpmPath)
+		pkgSRPM := node.SRPMFileName()
 
 		search := traverse.BreadthFirst{}
 		search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
@@ -196,7 +196,7 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 			}
 
 			// Skip requirements that come from the same srpm.
-			dependencySRPM := filepath.Base(dependency.SrpmPath)
+			dependencySRPM := dependency.SRPMFileName()
 			if pkgSRPM == dependencySRPM {
 				return
 			}
@@ -229,7 +229,7 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 // nodeDependencyName returns a common dependency name for a node that will be shared across similair Meta/Run/Build nodes for the same package.
 func nodeDependencyName(node *pkggraph.PkgNode) (name string) {
 	// Prefer the SRPM name if possible, otherwise use the unversioned package name
-	name = filepath.Base(node.SrpmPath)
+	name = node.SRPMFileName()
 	if name == "" || name == "<NO_SRPM_PATH>" {
 		name = node.VersionedPkg.Name
 	}
@@ -287,7 +287,7 @@ func sortMap(mapToSort map[string][]string, inverse bool) (pairList []mapPair) {
 //
 // Will alter data.
 func insertIfMissing(data map[string][]string, key string, value string) {
-	if sliceutils.Find(data[key], value, sliceutils.StringMatch) == sliceutils.NotFound {
+	if !sliceutils.Contains(data[key], value, sliceutils.StringMatch) {
 		data[key] = append(data[key], value)
 	}
 }
@@ -298,7 +298,7 @@ func insertIfMissing(data map[string][]string, key string, value string) {
 //
 // Will alter data.
 func insertIfMissingLastPathNode(data map[string][][]graph.Node, key string, value []graph.Node) {
-	if sliceutils.Find(data[key], value, finalPathNodeSRPMMatch) == sliceutils.NotFound {
+	if !sliceutils.Contains(data[key], value, finalPathNodeSRPMMatch) {
 		data[key] = append(data[key], value)
 	}
 }

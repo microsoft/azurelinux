@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        5%{?dist}
+Release:        8%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,11 @@ Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(lib)
+%if %{with_check}
+BuildRequires:  perl
+%endif
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       glibc
 Requires:       libgcc
@@ -318,11 +323,16 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %post   libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
 
-%clean
-rm -rf %{buildroot}
-
-
 %changelog
+* Sun Jan 23 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1k-8
+- Add build requires for perl dependencies
+
+* Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.1k-7
+- Add build requires perl for tests.
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1k-6
+- Removing the explicit %%clean stage.
+
 * Thu Jul 22 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-5
 - In FIPS mode, perform Linux RNG concatenation even if adin/pers functions
 - aren't defined in given DRBG

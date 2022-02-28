@@ -1,0 +1,117 @@
+From f91a2109fb139131a5f4ba5d00fca043df82ba10 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Wed, 15 Aug 2018 15:03:56 +0200
+Subject: [PATCH 2/2] endSessionDialog: Support rebooting into the bootloader
+ menu aka ("Boot Options")
+
+This implements the "Alt" behavior for the "Reboot" button as outlined in
+the design here: https://wiki.gnome.org/Design/OS/BootOptions
+
+This causes the endSessionDialog to send a ConfirmedRebootToBootOptions signal
+to gnome-session instead of the normal ConfirmedReboot signal, actually
+telling the boot-loader that it should show its menu the next boot is left
+up to gnome-session.
+
+Note I've tried implemeting this with the AltSwitcher class from
+js/ui/status/system.js first, but that puts the button in a St.Bin()
+which causes the button to think it is the only button on the dialog
+and makes it have rounded corners on both of its bottom corners.
+---
+ js/ui/endSessionDialog.js | 52 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
+
+diff --git a/js/ui/endSessionDialog.js b/js/ui/endSessionDialog.js
+index 27ddf6804..6cebf2a81 100644
+--- a/js/ui/endSessionDialog.js
++++ b/js/ui/endSessionDialog.js
+@@ -239,6 +239,9 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+         this._totalSecondsToStayOpen = 0;
+         this._applications = [];
+         this._sessions = [];
++        this._capturedEventId = 0;
++        this._rebootButton = null;
++        this._rebootButtonAlt = null;
+ 
+         this.connect('destroy',
+                      this._onDestroy.bind(this));
+@@ -368,6 +371,26 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+         this._sessionSection.visible = hasSessions;
+     }
+ 
++    _onCapturedEvent(actor, event) {
++        let altEnabled = false;
++
++        let type = event.type();
++        if (type != Clutter.EventType.KEY_PRESS && type != Clutter.EventType.KEY_RELEASE)
++            return Clutter.EVENT_PROPAGATE;
++
++        let key = event.get_key_symbol();
++        if (key != Clutter.KEY_Alt_L && key != Clutter.KEY_Alt_R)
++            return Clutter.EVENT_PROPAGATE;
++
++        if (type == Clutter.EventType.KEY_PRESS)
++            altEnabled = true;
++
++        this._rebootButton.visible = !altEnabled;
++        this._rebootButtonAlt.visible = altEnabled;
++
++        return Clutter.EVENT_PROPAGATE;
++    }
++
+     _updateButtons() {
+         this.clearButtons();
+ 
+@@ -389,7 +412,34 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+                 },
+                 label,
+             });
++
++            // Add Alt "Boot Options" option to the Reboot button
++            if (signal == 'ConfirmedReboot') {
++                this._rebootButton = button;
++                this._rebootButtonAlt = this.addButton({
++                    action: () => {
++                        this.close(true);
++                        let signalId = this.connect('closed', () => {
++                            this.disconnect(signalId);
++                            this._confirm('ConfirmedRebootToBootOptions');
++                        });
++                    },
++                    label: C_("button", "Boot Options")
++                });
++                this._rebootButtonAlt.visible = false;
++                this._capturedEventId = global.stage.connect('captured-event',
++                    this._onCapturedEvent.bind(this));
++            }
++        }
++    }
++
++    _stopAltCapture() {
++        if (this._capturedEventId > 0) {
++            global.stage.disconnect(this._capturedEventId);
++            this._capturedEventId = 0;
+         }
++        this._rebootButton = null;
++        this._rebootButtonAlt = null;
+     }
+ 
+     close(skipSignal) {
+@@ -401,6 +451,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+ 
+     cancel() {
+         this._stopTimer();
++        this._stopAltCapture();
+         this._dbusImpl.emit_signal('Canceled', null);
+         this.close();
+     }
+@@ -409,6 +460,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
+         let callback = () => {
+             this._fadeOutDialog();
+             this._stopTimer();
++            this._stopAltCapture();
+             this._dbusImpl.emit_signal(signal, null);
+         };
+ 
+-- 
+2.24.1
+

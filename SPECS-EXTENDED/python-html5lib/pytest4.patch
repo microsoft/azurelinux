@@ -1,0 +1,140 @@
+From dd117cc62d961573e9867d79ae1c3461a42e6167 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Thu, 28 Mar 2019 01:45:43 +0100
+Subject: [PATCH] Support pytest 4
+
+Fixes https://github.com/html5lib/html5lib-python/issues/411
+---
+ html5lib/tests/test_encoding.py    |  4 ++--
+ html5lib/tests/test_sanitizer.py   | 14 +++++++-------
+ html5lib/tests/test_serializer.py  |  2 +-
+ html5lib/tests/test_stream.py      |  7 ++++---
+ html5lib/tests/test_treewalkers.py |  2 +-
+ requirements-test.txt              |  2 +-
+ tox.ini                            |  2 +-
+ 7 files changed, 17 insertions(+), 16 deletions(-)
+
+diff --git a/html5lib/tests/test_encoding.py b/html5lib/tests/test_encoding.py
+index 9a411c77..97b6ca2a 100644
+--- a/html5lib/tests/test_encoding.py
++++ b/html5lib/tests/test_encoding.py
+@@ -99,8 +99,8 @@ def test_encoding():
+     for filename in get_data_files("encoding"):
+         tests = _TestData(filename, b"data", encoding=None)
+         for test in tests:
+-            yield (runParserEncodingTest, test[b'data'], test[b'encoding'])
+-            yield (runPreScanEncodingTest, test[b'data'], test[b'encoding'])
++            runParserEncodingTest(test[b'data'], test[b'encoding'])
++            runPreScanEncodingTest(test[b'data'], test[b'encoding'])
+ 
+ 
+ # pylint:disable=wrong-import-position
+diff --git a/html5lib/tests/test_sanitizer.py b/html5lib/tests/test_sanitizer.py
+index 45046d57..1b7285fc 100644
+--- a/html5lib/tests/test_sanitizer.py
++++ b/html5lib/tests/test_sanitizer.py
+@@ -67,19 +67,19 @@ def test_sanitizer():
+                         'tfoot', 'th', 'thead', 'tr', 'select']:
+             continue  # TODO
+         if tag_name == 'image':
+-            yield (runSanitizerTest, "test_should_allow_%s_tag" % tag_name,
++            runSanitizerTest("test_should_allow_%s_tag" % tag_name,
+                    "<img title=\"1\"/>foo &lt;bad&gt;bar&lt;/bad&gt; baz",
+                    "<%s title='1'>foo <bad>bar</bad> baz</%s>" % (tag_name, tag_name))
+         elif tag_name == 'br':
+-            yield (runSanitizerTest, "test_should_allow_%s_tag" % tag_name,
++            runSanitizerTest("test_should_allow_%s_tag" % tag_name,
+                    "<br title=\"1\"/>foo &lt;bad&gt;bar&lt;/bad&gt; baz<br/>",
+                    "<%s title='1'>foo <bad>bar</bad> baz</%s>" % (tag_name, tag_name))
+         elif tag_name in constants.voidElements:
+-            yield (runSanitizerTest, "test_should_allow_%s_tag" % tag_name,
++            runSanitizerTest("test_should_allow_%s_tag" % tag_name,
+                    "<%s title=\"1\"/>foo &lt;bad&gt;bar&lt;/bad&gt; baz" % tag_name,
+                    "<%s title='1'>foo <bad>bar</bad> baz</%s>" % (tag_name, tag_name))
+         else:
+-            yield (runSanitizerTest, "test_should_allow_%s_tag" % tag_name,
++            runSanitizerTest("test_should_allow_%s_tag" % tag_name,
+                    "<%s title=\"1\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</%s>" % (tag_name, tag_name),
+                    "<%s title='1'>foo <bad>bar</bad> baz</%s>" % (tag_name, tag_name))
+ 
+@@ -93,7 +93,7 @@ def test_sanitizer():
+         attribute_value = 'foo'
+         if attribute_name in sanitizer.attr_val_is_uri:
+             attribute_value = '%s://sub.domain.tld/path/object.ext' % sanitizer.allowed_protocols[0]
+-        yield (runSanitizerTest, "test_should_allow_%s_attribute" % attribute_name,
++        runSanitizerTest("test_should_allow_%s_attribute" % attribute_name,
+                "<p %s=\"%s\">foo &lt;bad&gt;bar&lt;/bad&gt; baz</p>" % (attribute_name, attribute_value),
+                "<p %s='%s'>foo <bad>bar</bad> baz</p>" % (attribute_name, attribute_value))
+ 
+@@ -101,7 +101,7 @@ def test_sanitizer():
+         rest_of_uri = '//sub.domain.tld/path/object.ext'
+         if protocol == 'data':
+             rest_of_uri = 'image/png;base64,aGVsbG8gd29ybGQ='
+-        yield (runSanitizerTest, "test_should_allow_uppercase_%s_uris" % protocol,
++        runSanitizerTest("test_should_allow_uppercase_%s_uris" % protocol,
+                "<img src=\"%s:%s\">foo</a>" % (protocol, rest_of_uri),
+                """<img src="%s:%s">foo</a>""" % (protocol, rest_of_uri))
+ 
+@@ -110,7 +110,7 @@ def test_sanitizer():
+         if protocol == 'data':
+             rest_of_uri = 'image/png;base64,aGVsbG8gd29ybGQ='
+         protocol = protocol.upper()
+-        yield (runSanitizerTest, "test_should_allow_uppercase_%s_uris" % protocol,
++        runSanitizerTest("test_should_allow_uppercase_%s_uris" % protocol,
+                "<img src=\"%s:%s\">foo</a>" % (protocol, rest_of_uri),
+                """<img src="%s:%s">foo</a>""" % (protocol, rest_of_uri))
+ 
+diff --git a/html5lib/tests/test_serializer.py b/html5lib/tests/test_serializer.py
+index 9333286e..29bbb492 100644
+--- a/html5lib/tests/test_serializer.py
++++ b/html5lib/tests/test_serializer.py
+@@ -222,4 +222,4 @@ def test_serializer():
+         with open(filename) as fp:
+             tests = json.load(fp)
+             for test in tests['tests']:
+-                yield runSerializerTest, test["input"], test["expected"], test.get("options", {})
++                runSerializerTest(test["input"], test["expected"], test.get("options", {}))
+diff --git a/html5lib/tests/test_stream.py b/html5lib/tests/test_stream.py
+index 27c39538..a9b3ebbe 100644
+--- a/html5lib/tests/test_stream.py
++++ b/html5lib/tests/test_stream.py
+@@ -308,9 +308,10 @@ def test_invalid_codepoints(inp, num):
+                           ("'\\uD800\\uD800\\uD800'", 3),
+                           ("'a\\uD800a\\uD800a\\uD800a'", 3),
+                           ("'\\uDFFF\\uDBFF'", 2),
+-                          pytest.mark.skipif(sys.maxunicode == 0xFFFF,
+-                                             ("'\\uDBFF\\uDFFF'", 2),
+-                                             reason="narrow Python")])
++                          pytest.param(
++                              "'\\uDBFF\\uDFFF'", 2,
++                              mark=pytest.mark.skipif(sys.maxunicode == 0xFFFF,
++                                                      reason="narrow Python"))])
+ def test_invalid_codepoints_surrogates(inp, num):
+     inp = eval(inp)  # pylint:disable=eval-used
+     fp = StringIO(inp)
+diff --git a/html5lib/tests/test_treewalkers.py b/html5lib/tests/test_treewalkers.py
+index 67fc89e5..c2323b7e 100644
+--- a/html5lib/tests/test_treewalkers.py
++++ b/html5lib/tests/test_treewalkers.py
+@@ -99,7 +99,7 @@ def test_treewalker_six_mix():
+ 
+     for tree in sorted(treeTypes.items()):
+         for intext, attrs, expected in sm_tests:
+-            yield runTreewalkerEditTest, intext, expected, attrs, tree
++            runTreewalkerEditTest(intext, expected, attrs, tree)
+ 
+ 
+ @pytest.mark.parametrize("tree,char", itertools.product(sorted(treeTypes.items()), ["x", "\u1234"]))
+diff --git a/requirements-test.txt b/requirements-test.txt
+index 4e223a3f..b936e0fa 100644
+--- a/requirements-test.txt
++++ b/requirements-test.txt
+@@ -4,7 +4,7 @@ tox
+ 
+ flake8<3.0
+ 
+-pytest==3.2.5
++pytest>=4.3,<4.4
+ coverage
+ pytest-expect>=1.1,<2.0
+ mock

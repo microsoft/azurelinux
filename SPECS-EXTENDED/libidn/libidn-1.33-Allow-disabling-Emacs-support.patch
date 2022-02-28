@@ -1,0 +1,61 @@
+From d011a6ae00ce9abd445d6d01ce9131a7b97ef5bc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 3 Oct 2017 10:04:18 +0200
+Subject: [PATCH] Allow disabling Emacs support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch adds --disable-emacs configure option to disable installing
+LISP scripts for Emacs.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ configure.ac    | 9 ++++++++-
+ src/Makefile.am | 2 ++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 649ddcd..a6dc9ff 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -50,7 +50,6 @@ AM_MISSING_PROG(HELP2MAN, help2man, $missing_dir)
+ AM_GNU_GETTEXT(external)
+ AM_GNU_GETTEXT_VERSION(0.19.3)
+ AM_ICONV
+-AM_PATH_LISPDIR
+ 
+ if test "$am_cv_func_iconv" != "yes"; then
+   AC_MSG_NOTICE([
+@@ -100,6 +99,14 @@ AM_CONDITIONAL(JAVA, test "$enable_java" != "no")
+ AC_MSG_CHECKING([if implementation in Java should be built])
+ AC_MSG_RESULT($enable_java)
+ 
++# Check for Emacs
++AC_ARG_ENABLE(emacs, AC_HELP_STRING([--disable-emacs], [disable Emacs support]),
++		enable_emacs=$enableval, enable_emacs=yes)
++AM_CONDITIONAL(EMACS, test "$enable_emacs" != "no")
++if test "$enable_emacs" != "no"; then
++    AM_PATH_LISPDIR
++fi
++
+ # Check for C#
+ if test -n "$HAVE_CSHARPCOMP"; then
+   gt_CSHARPEXEC
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 6832c20..ec99560 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -20,7 +20,9 @@ AM_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS)
+ AM_CPPFLAGS = -I$(top_srcdir)/lib -I../lib -I$(top_srcdir)/gl -I../gl
+ AM_CPPFLAGS += -DLOCALEDIR=\"$(localedir)\"
+ 
++if EMACS
+ dist_lisp_DATA = punycode.el idna.el
++endif
+ 
+ bin_PROGRAMS = idn
+ idn_SOURCES = idn.c
+-- 
+2.13.6
+

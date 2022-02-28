@@ -1,0 +1,11 @@
+--- commons-collections-3.2.2-src/src/test/org/apache/commons/collections/collection/AbstractTestCollection.java	2015-11-12 23:25:16.000000000 +0100
++++ commons-collections-3.2.2-src/src/test/org/apache/commons/collections/collection/AbstractTestCollection.java	2018-07-10 14:58:06.116528850 +0200
+@@ -1116,7 +1116,7 @@
+         verify();
+ 
+         try {
+-            array = collection.toArray(null);
++            array = collection.toArray((Object[])null);
+             fail("toArray(null) should raise NPE");
+         } catch (NullPointerException e) {
+             // expected

@@ -1,0 +1,64 @@
+--- HTTPretty/tests/unit/test_core.py	2017-01-06 15:04:06.030520764 -0800
++++ HTTPretty/tests/unit/test_core.py.new	2017-01-06 15:37:17.932752818 -0800
+@@ -192,31 +192,37 @@
+ @patch('httpretty.core.datetime')
+ def test_fakesock_socket_getpeercert(dt):
+     ("fakesock.socket#getpeercert should return a hardcoded fake certificate")
+-    # Background:
+-    dt.now.return_value = datetime(2013, 10, 4, 4, 20, 0)
++    # Don't bother with an actual remote roundtrip
++    httpretty.allow_net_connect = False
+ 
+-    # Given a fake socket instance
+-    socket = fakesock.socket()
+-
+-    # And that it's bound to some host
+-    socket._host = 'somewhere.com'
+-
+-    # When I retrieve the peer certificate
+-    certificate = socket.getpeercert()
+-
+-    # Then it should return a hardcoded value
+-    certificate.should.equal({
+-        u'notAfter': 'Sep 29 04:20:00 GMT',
+-        u'subject': (
+-            ((u'organizationName', u'*.somewhere.com'),),
+-            ((u'organizationalUnitName', u'Domain Control Validated'),),
+-            ((u'commonName', u'*.somewhere.com'),)),
+-        u'subjectAltName': (
+-            (u'DNS', u'*.somewhere.com'),
+-            (u'DNS', u'somewhere.com'),
+-            (u'DNS', u'*')
+-        )
+-    })
++    try:
++        # Background:
++        dt.now.return_value = datetime(2013, 10, 4, 4, 20, 0)
++
++        # Given a fake socket instance
++        socket = fakesock.socket()
++
++        # And that it's bound to some host
++        socket._host = 'somewhere.com'
++
++        # When I retrieve the peer certificate
++        certificate = socket.getpeercert()
++
++        # Then it should return a hardcoded value
++        certificate.should.equal({
++            u'notAfter': 'Sep 29 04:20:00 GMT',
++            u'subject': (
++                ((u'organizationName', u'*.somewhere.com'),),
++                ((u'organizationalUnitName', u'Domain Control Validated'),),
++                ((u'commonName', u'*.somewhere.com'),)),
++            u'subjectAltName': (
++                (u'DNS', u'*.somewhere.com'),
++                (u'DNS', u'somewhere.com'),
++                (u'DNS', u'*')
++            )
++        })
++    finally:
++        httpretty.allow_net_connect = True
+ 
+ 
+ def test_fakesock_socket_ssl():
