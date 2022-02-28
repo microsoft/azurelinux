@@ -7,10 +7,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
 URL:            https://github.com/kubernetes/node-problem-detector
-#Source0:        https://github.com/kubernetes/%{name}/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Patch0:         remove_windows_build.patch
-Patch1:         add_mariner_OSVersion.patch
+Source0:        https://github.com/kubernetes/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         001-remove_arm64_build.patch
+Patch1:         002-remove_windows_build.patch
+Patch2:         003-add_mariner_OSVersion.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 ExclusiveArch:  x86_64
@@ -64,7 +64,7 @@ make test
 %changelog
 * Fri Feb 25 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.8.10-1
 - Upgrading to v0.8.10
-- Disable arm64 builds in Makefile with remove_windows_build.patch.
+- Disable arm64 builds in Makefile with remove_arm64_build.patch.
 
 * Tue Jun 15 2021 Henry Beberman <henry.beberman@microsoft.com> - 0.8.8-1
 - Add node-problem-detector spec.
