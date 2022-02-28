@@ -1,7 +1,7 @@
 # By default all files require a review by at lest one member of the CBL-Mariner developers team.
 *   @cbl-mariner-devs
 
-# Modification to this file require adming approval.
+# Modification to this file require admin approval.
 /.github/CODEOWNERS @cbl-mariner-admins
 
 # Modification to what is considered "core packages" require admin approval.
