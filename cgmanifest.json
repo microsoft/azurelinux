@@ -8190,6 +8190,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jitterentropy-library",
+          "version": "3.3.1",
+          "downloadUrl": "https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jlex",
           "version": "1.2.6",
           "downloadUrl": "http://www.cs.princeton.edu/~appel/modern/java/JLex/Archive/1.2.5/Main.java"
@@ -28009,6 +28019,26 @@
           "name": "sysfsutils",
           "version": "2.1.0",
           "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "SymCrypt",
+          "version": "101.0.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v101.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "SymCrypt-OpenSSL",
+        "other": {
+          "name": "SymCrypt-OpenSSL",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.0.0.tar.gz"
         }
       }
     },

@@ -2420,6 +2420,8 @@
                 "shim-unsigned-x64",
                 "span-lite",
                 "swupdate",
+                "SymCrypt",
+                "SymCrypt-OpenSSL",
                 "tinyxml2",
                 "toml11",
                 "tracelogging",
