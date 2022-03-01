@@ -15,6 +15,8 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
+# Some external dependencies of envoy have no build-ids and thus will cause 
+# errors when performing rpm stripping, and thus disable it
 %global __strip /bin/true
 %define _dwz_low_mem_die_limit  20000000
 %define _dwz_max_die_limit     100000000
@@ -43,15 +45,19 @@ Source0:        %{name}-%{version}.tar.gz
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz BAZEL_CACHE
 Source1:        %{name}-%{version}-vendor.tar.gz
+# Bazel fetch is not capable of prefetching and caching all external dependencies, thus
+# introduce this second source to satisfy the dependency requirements. See this link for more
+# detailed explanation: https://github.com/bazelbuild/bazel/issues/5175
 # Below is a manually created tarball, no download link.
 # We're using pre-populated external dependencies from this tarball, since network is disabled during build time.
 #   1. wget https://github.com/envoyproxy/envoy/archive/refs/tags/v%{version}.tar.gz -o %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. patch -p1 < 0001-build-Use-Go-from-host.patch
-#   5. bazel fetch --repository_cache=BAZEL_CACHE //source/exe:envoy
-#   6. cd $(bazel info output_base)
-#   7. tar  --sort=name \
+#   5. mkdir -p BAZEL_CACHE
+#   6. bazel fetch --repository_cache=BAZEL_CACHE //source/exe:envoy
+#   7. cd $(bazel info output_base)
+#   8. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
@@ -146,10 +152,10 @@ CC=gcc CXX=g++ bazel --batch build \
     --override_repository="com_github_curl=%{_datadir}/bazel-workspaces/curl" \
     --override_repository="com_github_nghttp2_nghttp2=%{_datadir}/bazel-workspaces/nghttp2" \
     --override_repository="zlib=%{_datadir}/bazel-workspaces/zlib" \
-    --override_repository="org_golang_x_text=/usr/src/mariner/BUILD/%{name}-%{version}/external/org_golang_x_text" \
-    --override_repository="com_github_spf13_afero=/usr/src/mariner/BUILD/%{name}-%{version}/external/com_github_spf13_afero" \
-    --override_repository="com_github_lyft_protoc_gen_star=/usr/src/mariner/BUILD/%{name}-%{version}/external/com_github_lyft_protoc_gen_star" \
-    --override_repository="com_github_iancoleman_strcase=/usr/src/mariner/BUILD/%{name}-%{version}/external/com_github_iancoleman_strcase" \
+    --override_repository="org_golang_x_text=%{_builddir}/%{name}-%{version}/external/org_golang_x_text" \
+    --override_repository="com_github_spf13_afero=%{_builddir}/%{name}-%{version}/external/com_github_spf13_afero" \
+    --override_repository="com_github_lyft_protoc_gen_star=%{_builddir}/%{name}-%{version}/external/com_github_lyft_protoc_gen_star" \
+    --override_repository="com_github_iancoleman_strcase=%{_builddir}/%{name}-%{version}/external/com_github_iancoleman_strcase" \
     --verbose_failures \
 %ifarch ppc64le
     --local_cpu_resources=HOST_CPUS*.5 \
