@@ -1596,6 +1596,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cassandra",
+          "version": "4.0.3",
+          "downloadUrl": "https://archive.apache.org/dist/cassandra/4.0.3/apache-cassandra-4.0.3-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "catatonit",
           "version": "0.1.5",
           "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.5.tar.gz"

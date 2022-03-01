@@ -2710,6 +2710,7 @@
                 "bzip2",
                 "c-ares",
                 "cairo",
+                "cassandra",
                 "cdrkit",
                 "check",
                 "chkconfig",
