@@ -6,19 +6,11 @@
 %if "%{?_without_ip2location:0}%{?!_without_ip2location:1}" == "1"
 %define enable_ip2location 1
 %endif
-%if "%{?_without_geoip:0}%{?!_without_geoip:1}" == "1"
-%define enable_geoip 1
-%endif
-%if "%{?_without_dbip:0}%{?!_without_dbip:1}" == "1"
-%define enable_dbip 1
-%endif
 %if "%{?_without_external:0}%{?!_without_external:1}" == "1"
 %define enable_external 1
 %endif
 # database locations
 %define ip2location_db	%{_datadir}/IP2Location
-%define geoip_db	%{_datadir}/GeoIP
-%define dbip_db		%{_datadir}/DBIP
 %define external_db	%{_datadir}/%{name}/db
 # Berkeley DB selector
 %define require_db4 %(echo "%{dist}" | grep -E -q '^\.el(5|6)$' && echo 1 || echo 0)
@@ -28,14 +20,13 @@
 %endif
 Summary:        IPv6 address format change and calculation utility
 Name:           ipv6calc
-Version:        2.2.0
-Release:        42%{?dist}
+Version:        4.0.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.deepspace6.net/projects/%{name}.html
-Source0:        ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/%{name}-%{version}.tar.gz
-Patch0:         ipv6calc-2.2.0-patch-8c7eea58.diff
+Source0:        https://github.com/pbiering/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  openssl-devel
 BuildRequires:  perl
@@ -54,6 +45,11 @@ Conflicts:      ipv6calc-libs
 BuildRequires:  db4-devel
 %else
 BuildRequires:  libdb-devel
+%endif
+
+%if %{enable_ip2location}
+BuildRequires: IP2Location-devel >= 8.2.0
+Recommends:    IP2Location       >= 8.2.0
 %endif
 
 %description
@@ -80,17 +76,9 @@ Support for following databases
 		default directory for downloaded db files: %{ip2location_db}
 		(requires also external library on system)
 
- - GeoIP	%{?enable_geoip:ENABLED}%{?!enable_geoip:DISABLED}
-		default directory for downloaded db files: %{geoip_db}
-		(requires also external library on system)
-
  - GeoIP v2	%{?enable_mmdb:ENABLED}%{?!enable_mmdb:DISABLED}
 		default directory for downloaded db files: %{geoip_db}
 		(requires also external library on system)
-
- - db-ip.com	%{?enable_dbip:ENABLED}%{?!enable_dbip:DISABLED}
-		(once generated database files are found on system)
-		default directory for generated db files: %{dbip_db}
 
  - db-ip.com v2	%{?enable_mmdb:ENABLED}%{?!enable_mmdb:DISABLED}
 		(once generated database files are found on system)
@@ -103,8 +91,6 @@ Built %{?enable_shared:WITH}%{?!enable_shared:WITHOUT} shared-library
 
 Available rpmbuild rebuild options:
   --without ip2location
-  --without geoip
-  --without dbip
   --without mmdb (which disables GeoIP v2 and db-ip.com v2)
   --without external
   --without shared
@@ -125,27 +111,18 @@ Check/adjust %{_sysconfdir}/httpd/conf.d/ipv6calcweb.conf
 Default restricts access to localhost
 
 %prep
-%setup -q
+%autosetup -p1
 
-%patch0 -p1
-
+%build
 %configure \
 	%{?enable_ip2location:--enable-ip2location} \
 	%{?enable_ip2location:--with-ip2location-dynamic --with-ip2location-headers-fallback} \
 	--with-ip2location-db=%{ip2location_db} \
-	%{?enable_geoip:--enable-geoip} \
-	%{?enable_geoip:--with-geoip-dynamic --with-geoip-headers-fallback} \
-	--with-geoip-db=%{geoip_db} \
-	%{?enable_dbip:--enable-dbip} \
-	--with-dbip-db=%{dbip_db} \
 	%{?enable_mmdb:--enable-mmdb --with-mmdb-dynamic} \
 	%{?enable_external:--enable-external} \
 	--with-external-db=%{external_db} \
-	%{?enable_shared:--enable-shared} \
-	%{?enable_mod_ipv6calc:--enable-mod_ipv6calc}
+	%{?enable_shared:--enable-shared} 
 
-
-%build
 make clean
 make %{?_smp_mflags} COPTS="%{optflags}"
 
@@ -246,6 +223,9 @@ install -m 644 ipv6calcweb/ipv6calcweb-databases-in-var.te  %{buildroot}%{_datad
 %{_sbindir}/ldconfig
 
 %changelog
+* Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.0.1-1
+- Update source to 4.0.1
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.0-42
 - Removing the explicit %%clean stage.
 
