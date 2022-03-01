@@ -12,6 +12,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/cassandra/%{version}/apache-%{name}-%{version}-src.tar.gz
 Source1:        cassandra.service
+# Refer to Readme file for detailed
+# instructions to regenerate cassandra-build-cache
+# whenever updating to newer version.
 Source2:        cassandra-build-cache-4.0.3.tar.gz
 ExclusiveArch:  x86_64
 
@@ -49,8 +52,6 @@ Cassandra is a highly scalable, eventually consistent, distributed, structured k
 Cassandra brings together the distributed systems technologies from Dynamo and the log-structured storage engine from Google's BigTable.
 
 %prep
-# refer to Readme file for detailed
-# instructions to rebuild cassandra-build-cache
 %autosetup -p1 -n apache-%{name}-%{version}-src
 
 %build
