@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.33.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
 Requires:       expat
+Requires:       openssh
 Requires:       openssl
 Requires:       perl-CGI
 Requires:       perl-DBI
@@ -160,6 +161,9 @@ fi
 %endif
 
 %changelog
+* Tue Mar 1 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.33.0-5
+- Add openssh dependency for git
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.33.0-4
 - Replace python2 depdendency with python3
 - Lint spec
