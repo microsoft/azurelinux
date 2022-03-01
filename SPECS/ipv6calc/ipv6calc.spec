@@ -40,16 +40,14 @@ Provides:       ipv6calc-libs = %{version}-%{release}
 %else
 Conflicts:      ipv6calc-libs
 %endif
-
 %if %{require_db4}
 BuildRequires:  db4-devel
 %else
 BuildRequires:  libdb-devel
 %endif
-
 %if %{enable_ip2location}
-BuildRequires: IP2Location-devel >= 8.2.0
-Recommends:    IP2Location       >= 8.2.0
+BuildRequires:  IP2Location-devel >= 8.2.0
+Recommends:     IP2Location       >= 8.2.0
 %endif
 
 %description
@@ -121,7 +119,7 @@ Default restricts access to localhost
 	%{?enable_mmdb:--enable-mmdb --with-mmdb-dynamic} \
 	%{?enable_external:--enable-external} \
 	--with-external-db=%{external_db} \
-	%{?enable_shared:--enable-shared} 
+	%{?enable_shared:--enable-shared}
 
 make clean
 make %{?_smp_mflags} COPTS="%{optflags}"

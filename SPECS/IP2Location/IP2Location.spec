@@ -1,25 +1,23 @@
 %define soname 3
-
-Summary:	    Tools for mapping IP address to geolocation information
-Name:		    IP2Location
-Version:	    8.4.1
-Release:	    1%{?dist}
-License:	    MIT
+Summary:        Tools for mapping IP address to geolocation information
+Name:           IP2Location
+Version:        8.4.1
+Release:        1%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		    http://www.ip2location.com/
-Source0:	    https://github.com/chrislim2888/IP2Location-C-Library/archive/%{version}/%{name}-%{version}.tar.gz
-BuildRequires:	libtool
-BuildRequires:  perl-generators
-BuildRequires:	perl(Math::BigInt)
-BuildRequires:  gcc
+URL:            https://www.ip2location.com/
+Source0:        https://github.com/chrislim2888/IP2Location-C-Library/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  gcc
+BuildRequires:  libtool
 BuildRequires:  make
-
-Obsoletes:	libip2location < %{version}
-Provides:	libip2location = %{version}
-Requires:	%{name}-libs%{_isa} = %{version}-%{release}
+BuildRequires:  perl-generators
+BuildRequires:	perl(Math::BigInt)
+Obsoletes:      libip2location < %{version}
+Provides:       libip2location = %{version}
+Requires:       %{name}-libs%{_isa} = %{version}-%{release}
 
 
 %description
@@ -33,11 +31,8 @@ commercial binary databases.
 Users can download the latest LITE database from IP2Location web site using e.g.
 the included downloader.
 
-
-%package 	libs
-Summary:	C library for mapping IP address to geolocation information
-Recommends:	%{name}%{_isa} = %{version}-%{release}
-
+%package        libs
+Summary:        C library for mapping IP address to geolocation information
 
 %description libs
 IP2Location C library enables the user to get the country, region, city,
@@ -47,14 +42,11 @@ type and category from any IP address or hostname.
 This library has been optimized for speed and memory utilization. The library
 contains API to query all IP2Location LITE and commercial binary databases.
 
-
 %package 	devel
-Summary:	Development files for the IP2Location library
-Requires:	%{name}%{_isa} = %{version}-%{release}
-
-Obsoletes:	libip2location-devel < %{version}
-Provides:	libip2location-devel = %{version}
-
+Summary:        Development files for the IP2Location library
+Requires:       %{name}%{_isa} = %{version}-%{release}
+Obsoletes:      libip2location-devel < %{version}
+Provides:       libip2location-devel = %{version}
 
 %description 	devel
 IP2Location C library enables the user to get the country, region, city,
@@ -66,14 +58,11 @@ contains API to query all IP2Location LITE and commercial binary databases.
 
 This package contains the development files for the IP2Location library.
 
-
-%package 	data-sample
-Summary:	Sample data files for the IP2Location library
-Requires:	%{name} = %{version}-%{release}
-
-Obsoletes:	ip2location-country < %{version}
-Provides:	ip2location-country = %{version}
-
+%package        data-sample
+Summary:        Sample data files for the IP2Location library
+Requires:       %{name} = %{version}-%{release}
+Obsoletes:      ip2location-country < %{version}
+Provides:       ip2location-country = %{version}
 
 %description 	data-sample
 IP2Location C library enables the user to get the country, region, city,
@@ -90,7 +79,6 @@ Latest lite databases can be downloaded from
 
 Further sample databases can be downloaded from
 	https://www.ip2location.com/development-libraries/ip2location/c
-
 
 %prep
 %autosetup -p1 -n IP2Location-C-Library-%{version}
@@ -128,13 +116,11 @@ install -d %{buildroot}%{_datadir}/%{name}/
 install -p data/IP-COUNTRY.BIN %{buildroot}%{_datadir}/%{name}/IP-COUNTRY-SAMPLE.BIN
 install -p data/IPV6-COUNTRY.BIN %{buildroot}%{_datadir}/%{name}/IPV6-COUNTRY.SAMPLE.BIN
 
-
 %files
 %doc AUTHORS ChangeLog README.md NEWS
 %{_datadir}/%{name}/tools/
 %{_bindir}/ip2location
 %{_mandir}/man1/ip2location.1*
-
 
 %files libs
 %license COPYING LICENSE.TXT
@@ -142,16 +128,13 @@ install -p data/IPV6-COUNTRY.BIN %{buildroot}%{_datadir}/%{name}/IPV6-COUNTRY.SA
 %{_libdir}/libIP2Location.so.%{soname}.0.0
 %dir %{_datadir}/%{name}/
 
-
 %files devel
 %doc Developers_Guide.txt
 %{_includedir}/IP2Loc*.h
 %{_libdir}/libIP2Location.so
 
-
 %files data-sample
 %attr(644,-,-) %{_datadir}/%{name}/*.BIN
-
 
 %changelog
 * Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 8.4.1-3
