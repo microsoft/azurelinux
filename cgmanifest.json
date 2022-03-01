@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "jq",
-          "version": "1.5",
-          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-1.5.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-1.6.tar.gz"
         }
       }
     },
@@ -8311,8 +8311,8 @@
         "type": "other",
         "other": {
           "name": "json-c",
-          "version": "0.14",
-          "downloadUrl": "https://github.com/json-c/json-c/archive/json-c-0.14-20200419.tar.gz"
+          "version": "0.15",
+          "downloadUrl": "https://github.com/json-c/json-c/archive/json-c-0.15-20200726.tar.gz"
         }
       }
     },
@@ -15544,18 +15544,8 @@
         "type": "other",
         "other": {
           "name": "OpenIPMI",
-          "version": "2.0.25",
-          "downloadUrl": "https://sourceforge.net/projects/openipmi/files/latest/download/openipmi-2.0.25.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "OpenIPMI",
-          "version": "2.0.31",
-          "downloadUrl": "http://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.31.tar.gz"
+          "version": "2.0.32",
+          "downloadUrl": "https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz"
         }
       }
     },
