@@ -16,7 +16,6 @@ BuildRequires:  glibc-devel
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed
-Provides:       docker-init = %{version}-%{release}
 
 %description
 Tini is the simplest init you could think of.
@@ -27,6 +26,11 @@ forwarding.
 
 %package static
 Summary:        Standalone static build of tini
+# `docker-init` used to be provided by `tini` it's now provided by `tini-static`
+# `tini` and `tini-static` are co-installable so long as both are newer than
+# that change.
+Conflicts:      %{name} <= 0.19.0-6
+Provides:       docker-init = %{version}-%{release}
 
 %description static
 This package contains a standalone static build of tini, meant to be used
@@ -49,19 +53,19 @@ mkdir build && cd build
 
 %install
 %make_install -C build
-# Ensure we're providing docker-init
-ln -s %{_bindir}/tini %{buildroot}%{_bindir}/docker-init
+# Ensure we're providing a static `docker-init`
+ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 
 %files
 %license LICENSE
 %doc README.md
 %{_bindir}/tini
-%{_bindir}/docker-init
 
 %files static
 %license LICENSE
 %doc README.md
 %{_bindir}/tini-static
+%{_bindir}/docker-init
 
 %changelog
 * Mon Feb 21 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.19.0-7

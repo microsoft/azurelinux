@@ -11,8 +11,6 @@ URL: https://mobyproject.org
 Vendor: Microsoft Corporation
 Distribution: Mariner
 
-# Note that docker-init is provided by Tini
-
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # docker-proxy binary comes from libnetwork
 # - The libnetwork version (more accurately commit hash) 
@@ -49,7 +47,7 @@ Requires: libcgroup
 Requires: libseccomp >= 2.3
 Requires: moby-containerd >= 1.2
 Requires: tar
-Requires: tini
+Requires: docker-init
 Requires: xz
 
 Conflicts: docker
