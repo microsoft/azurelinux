@@ -9,8 +9,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        5.10.93.1
-Release:        4%{?dist}
+Version:        5.10.102.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -147,6 +147,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %endif
 
 %changelog
+* Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-1
+- Update source to 5.10.102.1
+
 * Fri Feb 11 2022 Vince Perri <viperri@microsoft.com> - 5.10.93.1-4
 - Bump release number to match kernel release
 

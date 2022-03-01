@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.93.1
-Release:        4%{?dist}
+Version:        5.10.102.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,9 +17,8 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         CVE-2021-43976.patch
-Patch2:         0003-export-mmput_async.patch
-Patch3:         CVE-2022-0435.patch
+Patch1:         0003-export-mmput_async.patch
+Patch2:         CVE-2022-24958.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -351,7 +350,6 @@ manipulation of eBPF programs and maps.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 %build
 make mrproper
@@ -592,6 +590,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-1
+- Update source to 5.10.102.1
+- Apply CVE-2022-24958.patch
+- Remove CVE-2021-43976.patch and CVE-2022-0435.patch
+
 * Fri Feb 11 2022 Vince Perri <viperri@microsoft.com> - 5.10.93.1-4
 - Add compressed firmware support
 
