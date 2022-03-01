@@ -21,12 +21,8 @@
             "Name": "CBL-Mariner Core",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/selinux.json"
+                "packagelists/core-packages-image.json"
             ],
-            "KernelCommandLine": {
-                "SELinux": "permissive"
-            },
             "KernelOptions": {
                 "default": "kernel"
             }
