@@ -25,9 +25,6 @@ Distribution:   Mariner
 %global debug_package %{nil}
 %endif
 
-%if ! 0%{?gobuild:1}
-%define gobuild(o:) GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '-Wl,-z,relro -Wl,-z,now -specs=/usr/lib/rpm/mariner/default-hardened-ld '" -a -v -x %{?**};
-%endif
 %define gogenerate go generate
 
 %define provider github
@@ -57,15 +54,11 @@ Version: 2.2.1
 # N.foo if released, 0.N.foo if unreleased
 # Rawhide almost always ships unreleased builds,
 # so release tag should be of the form 0.N.foo
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: ASL 2.0
 URL: https://%{name}.io/
 Source0: %{download_url}#/%{name}-%{version}.tar.gz
-# To build a random user's fork/commit, comment out above line,
-# uncomment below Source0, and replace the placeholders with the right info
-# Also, adjust %%prep section as necessary.
-#Source0: https://github.com/$GITHUB_USER/$GITHUB_USER_REPO/archive/$BRANCH.tar.gz
 Source1: https://github.com/containers/dnsname/archive/c654c95366ac5f309ca3e5727c9b858864247328/dnsname-c654c95.tar.gz
 Provides: %{name}-manpages = %{version}-%{release}
 Obsoletes: %{name}-manpages < %{version}-%{release}
@@ -76,6 +69,7 @@ BuildRequires: glibc-devel
 BuildRequires: glibc-static
 BuildRequires: git
 BuildRequires: go-md2man
+BuildRequires: go-rpm-macros
 BuildRequires: gpgme-devel
 BuildRequires: libassuan-devel
 BuildRequires: libgpg-error-devel
@@ -602,6 +596,9 @@ done
 sort -u -o devel.file-list devel.file-list
 %endif
 
+install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
+cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
+
 %check
 %if 0%{?with_check} && 0%{?with_unit_test} && 0%{?with_devel}
 %if ! 0%{?with_bundled}
@@ -625,9 +622,6 @@ export GOPATH=%{buildroot}/%{gopath}:$(pwd)/vendor:%{gopath}
 %gotest %{import_path}/libpod
 %gotest %{import_path}/pkg/registrar
 %endif
-
-install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
-cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 %triggerpostun -- %{name} < 1.1
 %{_bindir}/%{name} system renumber
@@ -709,6 +703,10 @@ exit 0
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.1-5
+- Fixing installation steps for non-test builds.
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.2.1-4
 - Remove epoch
 

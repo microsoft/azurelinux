@@ -18,10 +18,6 @@ Distribution:   Mariner
 %global debug_package   %{nil}
 %endif
 
-%if ! 0%{?gobuild:1}
-%define gobuild(o:) GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '-Wl,-z,relro -Wl,-z,now -specs=/usr/lib/rpm/mariner/default-hardened-ld '" -a -v -x %{?**};
-%endif
-
 %global provider github
 %global provider_tld com
 %global project containernetworking
@@ -40,7 +36,7 @@ Distribution:   Mariner
 
 Name: %{project}-%{repo}
 Version: 0.9.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Libraries for writing CNI plugin
 License: ASL 2.0
 URL: %{git0}
@@ -49,6 +45,7 @@ Source0: %{download_url}#/%{name}-%{version}.tar.gz
 BuildRequires: golang
 BuildRequires: git
 BuildRequires: go-md2man
+BuildRequires: go-rpm-macros
 
 %if ! 0%{?with_bundled}
 BuildRequires: go-bindata
@@ -285,6 +282,10 @@ export GOPATH=%{buildroot}/%{gopath}:$(pwd)/vendor:%{gopath}
 %endif
 
 %changelog
+* Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-3
+- Fixing usage of the '%%gobuild' macro.
+- License verified.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.

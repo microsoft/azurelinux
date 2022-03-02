@@ -4749,6 +4749,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "go-rpm-macros",
+          "version": "3.0.9",
+          "downloadUrl": "https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gobject-introspection",
           "version": "1.71.0",
           "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.71/gobject-introspection-1.71.0.tar.xz"
@@ -10823,6 +10833,16 @@
           "name": "libpsl",
           "version": "0.21.1",
           "downloadUrl": "https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpsm2",
+          "version": "11.2.206",
+          "downloadUrl": "https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/PSM2_11.2.206.tar.gz"
         }
       }
     },
@@ -28006,26 +28026,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "symlinks",
-          "version": "1.7",
-          "downloadUrl": "http://ibiblio.org/pub/Linux/utils/file/symlinks-1.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "sysfsutils",
-          "version": "2.1.0",
-          "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "SymCrypt",
           "version": "101.0.0",
           "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v101.0.0.tar.gz"
@@ -28039,6 +28039,26 @@
           "name": "SymCrypt-OpenSSL",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "symlinks",
+          "version": "1.7",
+          "downloadUrl": "http://ibiblio.org/pub/Linux/utils/file/symlinks-1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sysfsutils",
+          "version": "2.1.0",
+          "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
         }
       }
     },
