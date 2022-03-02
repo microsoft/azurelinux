@@ -5429,16 +5429,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "hfsplus-tools",
-          "version": "540.1.linux3",
-          "downloadUrl": "http://cavan.codon.org.uk/~mjg59/diskdev_cmds/diskdev_cmds-540.1.linux3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "hicolor-icon-theme",
           "version": "0.17",
           "downloadUrl": "https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz"
