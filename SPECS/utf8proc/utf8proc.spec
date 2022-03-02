@@ -60,7 +60,7 @@ LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make check
 %{_libdir}/libutf8proc.so
 
 %changelog
-* Tue Mar 01 2022 Bala <balakumaran.kannan@microsoft.com> - 2.6.1-1
+* Tue Mar 01 2022 Bala <balakumaran.kannan@microsoft.com> - 2.6.1-2
 - BR ruby for ptest
 - Set Locale before running ptest
 
