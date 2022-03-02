@@ -1,12 +1,13 @@
 diff -Naur a/Makefile b/Makefile
 --- a/Makefile	2021-05-14 17:05:59.000000000 -0700
-+++ b/Makefile	2021-06-15 12:31:28.612040696 -0700
-@@ -123,25 +123,9 @@
- 	BINARIES_LINUX_ONLY += bin/log-counter
++++ b/Makefile	2022-02-24 11:53:35.220842944 -0800
+@@ -125,26 +125,9 @@
  endif
  
--ALL_BINARIES = $(foreach binary, $(BINARIES) $(BINARIES_LINUX_ONLY), ./$(binary)) $(foreach binary, $(BINARIES) $(BINARIES_LINUX_ONLY), output/linux_amd64/$(binary)) $(foreach binary, $(BINARIES), output/windows_amd64/$(binary).exe)
-+ALL_BINARIES = $(foreach binary, $(BINARIES) $(BINARIES_LINUX_ONLY), ./$(binary)) $(foreach binary, $(BINARIES) $(BINARIES_LINUX_ONLY), output/linux_amd64/$(binary))
+ ALL_BINARIES = $(foreach binary, $(BINARIES) $(BINARIES_LINUX_ONLY), ./$(binary)) \
+-  $(foreach platform, $(LINUX_PLATFORMS), $(foreach binary, $(BINARIES) $(BINARIES_LINUX_ONLY), output/$(platform)/$(binary))) \
+-  $(foreach binary, $(BINARIES), output/windows_amd64/$(binary).exe)
++  $(foreach platform, $(LINUX_PLATFORMS), $(foreach binary, $(BINARIES) $(BINARIES_LINUX_ONLY), output/$(platform)/$(binary)))
  ALL_TARBALLS = $(foreach platform, $(PLATFORMS), $(NPD_NAME_VERSION)-$(platform).tar.gz)
  
 -output/windows_amd64/bin/%.exe: $(PKG_SOURCES)
@@ -26,5 +27,7 @@ diff -Naur a/Makefile b/Makefile
 -		./test/e2e/$(subst -,,$*)
 -
  output/linux_amd64/bin/%: $(PKG_SOURCES)
- 	GOOS=linux GOARCH=amd64 CGO_ENABLED=$(CGO_ENABLED) GO111MODULE=on go build \
- 		-mod vendor \
+ 	GOOS=linux GOARCH=amd64 CGO_ENABLED=$(CGO_ENABLED) GO111MODULE=on \
+ 	  go build \
+
+
