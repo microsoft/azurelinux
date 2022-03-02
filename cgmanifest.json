@@ -13582,16 +13582,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mksh",
-          "version": "59c",
-          "downloadUrl": "https://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mlocate",
           "version": "0.26",
           "downloadUrl": "http://releases.pagure.org/mlocate/mlocate-0.26.tar.xz"
