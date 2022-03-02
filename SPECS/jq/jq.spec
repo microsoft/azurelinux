@@ -1,20 +1,20 @@
-Summary:       jq is a lightweight and flexible command-line JSON processor.
-Name:          jq
-Version:       1.6
-Release:       1%{?dist}
-Group:         Applications/System
-Vendor:        Microsoft Corporation
-License:       MIT
-URL:           https://github.com/stedolan/jq
-Source0:       https://github.com/stedolan/jq/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+Summary:        jq is a lightweight and flexible command-line JSON processor.
+Name:           jq
+Version:        1.6
+Release:        1%{?dist}
+Group:          Applications/System
+Vendor:         Microsoft Corporation
+License:        MIT
+URL:            https://github.com/stedolan/jq
+Source0:        https://github.com/stedolan/jq/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Distribution:   Mariner
 BuildRequires:  bison
 BuildRequires:  chrpath
 BuildRequires:  flex
 BuildRequires:  gcc
-BuildRequires: oniguruma-devel
+BuildRequires:  oniguruma-devel
 %if %{with_check}
-BuildRequires: which
+BuildRequires:  which
 %endif
 
 %description
@@ -70,17 +70,17 @@ make check
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com>
 - Added %%license line automatically
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.5-5
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.5-5
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*  Mon Nov 19 2018 Ashwin H<ashwinh@vmware.com> 1.5-4
--  Add which for %check
+* Mon Nov 19 2018 Ashwin H<ashwinh@vmware.com> 1.5-4
+- Add which for %check
 
-*  Tue Aug 22 2017 Chang Lee <changlee@vmware.com> 1.5-3
--  Add oniguruma for %check
+* Tue Aug 22 2017 Chang Lee <changlee@vmware.com> 1.5-3
+- Add oniguruma for %check
 
-*  Wed Jun 07 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.5-2
--  Fix for CVE-2015-8863 and CVE-2016-4074
+* Wed Jun 07 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.5-2
+- Fix for CVE-2015-8863 and CVE-2016-4074
 
-*  Mon May 15 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.5-1
--  Initial version
+* Mon May 15 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.5-1
+- Initial version
