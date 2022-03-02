@@ -1,7 +1,7 @@
 Summary:        CAC (Common Access Card) library
 Name:           libcacard
 Version:        2.7.0
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,8 +14,7 @@ BuildRequires:  gcc
 BuildRequires:  glib2-devel
 BuildRequires:  gnupg2
 BuildRequires:  gnutls-utils
-BuildRequires:  nss-devel
-BuildRequires:  nss-tools
+BuildRequires:  pkgconfig(nss)
 BuildRequires:  openssl
 %if %{with_check}
 BuildRequires:  softhsm

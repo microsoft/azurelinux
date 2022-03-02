@@ -14,7 +14,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.75
-Release:        1%{?dist}
+Release:        10%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,8 @@ URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Source0:        https://ftp.mozilla.org/pub/security/%{nss}/releases/NSS_3_75_RTM/src/%{name}-%{version}.tar.gz
 Source1:        nss-util.pc.in
 Source2:        nss-util-config.in
+Source3:        nss.pc.in
+Source4:        nss-config.in
 BuildRequires:  nspr-devel >= %{nspr_version}
 BuildRequires:  sqlite-devel
 BuildRequires:  libdb-devel
@@ -120,6 +122,29 @@ cat %{SOURCE2} | sed -e "s,@libdir@,%{_libdir},g" \
                      -e "s,@MOD_PATCH_VERSION@,$NSSUTIL_VPATCH,g" \
                           > dist/pkgconfig/nss-util-config
 
+cat %{SOURCE3} | sed -e "s,%%libdir%%,%{_libdir},g" \
+                          -e "s,%%prefix%%,%{_prefix},g" \
+                          -e "s,%%exec_prefix%%,%{_prefix},g" \
+                          -e "s,%%includedir%%,%{_includedir}/nss,g" \
+                          -e "s,%%NSS_VERSION%%,%{version},g" \
+                          -e "s,%%NSPR_VERSION%%,%{nspr_version},g" \
+                          -e "s,%%NSSUTIL_VERSION%%,%{version},g" \
+                          -e "s,%%SOFTOKEN_VERSION%%,%{version},g" \
+                            > ./dist/pkgconfig/nss.pc
+
+NSS_VMAJOR=`cat nss/lib/nss/nss.h | grep "#define.*NSS_VMAJOR" | awk '{print $3}'`
+NSS_VMINOR=`cat nss/lib/nss/nss.h | grep "#define.*NSS_VMINOR" | awk '{print $3}'`
+NSS_VPATCH=`cat nss/lib/nss/nss.h | grep "#define.*NSS_VPATCH" | awk '{print $3}'`
+
+cat %{SOURCE4} | sed -e "s,@libdir@,%{_libdir},g" \
+                          -e "s,@prefix@,%{_prefix},g" \
+                          -e "s,@exec_prefix@,%{_prefix},g" \
+                          -e "s,@includedir@,%{_includedir}/nss,g" \
+                          -e "s,@MOD_MAJOR_VERSION@,$NSS_VMAJOR,g" \
+                          -e "s,@MOD_MINOR_VERSION@,$NSS_VMINOR,g" \
+                          -e "s,@MOD_PATCH_VERSION@,$NSS_VPATCH,g" \
+                          > ./dist/pkgconfig/nss-config
+
 %install
 cd dist
 mkdir -p %{buildroot}%{unsupported_tools_directory}
@@ -131,8 +156,10 @@ install -v -m644 Linux*/lib/libcrmf.a %{buildroot}%{_libdir}
 cp -v -RL {public,private}/nss/* %{buildroot}%{_includedir}/nss
 chmod 644 %{buildroot}%{_includedir}/nss/*
 install -v -m755 Linux*/bin/{certutil,pk12util} %{buildroot}%{_bindir}
+install -v -m755 pkgconfig/nss-config %{buildroot}%{_bindir}
 install -v -m755 Linux*/bin/shlibsign %{buildroot}%{unsupported_tools_directory}
 install -vdm 755 %{buildroot}%{_libdir}/pkgconfig
+install -vm 644 pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
 install -p -m 644 pkgconfig/nss-util.pc %{buildroot}%{_libdir}/pkgconfig/nss-util.pc
 install -p -m 755 pkgconfig/nss-util-config %{buildroot}%{_bindir}/nss-util-config
 
@@ -156,6 +183,7 @@ popd
 %files
 %defattr(-,root,root)
 %license nss/COPYING
+%{_bindir}/nss-config
 %{_bindir}/pk12util
 %{_bindir}/nss-util-config
 %{_libdir}/*.chk
