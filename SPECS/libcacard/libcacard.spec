@@ -1,7 +1,7 @@
 Summary:        CAC (Common Access Card) library
 Name:           libcacard
 Version:        2.7.0
-Release:        11%{?dist}
+Release:        10%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,6 +66,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/libcacard.pc
 
 %changelog
+* Tue Mar 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.7.0-10
+- Switching to pkgconfig(nss) BR.
+
 * Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 2.7.0-9
 - Add an explicit BR on `softhsm` & `opensc` to enable ptest
 
