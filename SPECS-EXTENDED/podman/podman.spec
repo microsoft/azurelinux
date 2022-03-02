@@ -59,9 +59,6 @@ Summary: Manage Pods, Containers and Container Images
 License: ASL 2.0
 URL: https://%{name}.io/
 Source0: %{download_url}#/%{name}-%{version}.tar.gz
-# To build a random user's fork/commit, comment out above line,
-# uncomment below Source0, and replace the placeholders with the right info
-# Also, adjust %%prep section as necessary.
 Source1: https://github.com/containers/dnsname/archive/c654c95366ac5f309ca3e5727c9b858864247328/dnsname-c654c95.tar.gz
 Provides: %{name}-manpages = %{version}-%{release}
 Obsoletes: %{name}-manpages < %{version}-%{release}
