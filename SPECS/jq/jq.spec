@@ -12,9 +12,9 @@ BuildRequires:  bison
 BuildRequires:  chrpath
 BuildRequires:  flex
 BuildRequires:  gcc
+BuildRequires: oniguruma-devel
 %if %{with_check}
 BuildRequires: which
-BuildRequires: oniguruma-devel
 %endif
 
 %description
@@ -61,6 +61,7 @@ make check
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.6-1
 - Update source to v1.6
 - Remove CVE-2015-8863.patch, CVE-2016-4074.patch (changes found in this release)
+- Move oniguruma BuildRequires outside of check block 
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-7
 - Removing the explicit %%clean stage.
