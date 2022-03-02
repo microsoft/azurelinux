@@ -147,6 +147,7 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 
 %changelog
 * Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.0-3
+- Fixing usage of the '%%gobuild' macro.
 - License verified.
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.0-2

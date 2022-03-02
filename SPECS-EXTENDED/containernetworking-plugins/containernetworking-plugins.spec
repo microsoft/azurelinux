@@ -283,6 +283,7 @@ export GOPATH=%{buildroot}/%{gopath}:$(pwd)/vendor:%{gopath}
 
 %changelog
 * Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-3
+- Fixing usage of the '%%gobuild' macro.
 - License verified.
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-2
