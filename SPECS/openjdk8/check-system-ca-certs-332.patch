@@ -1,7 +1,7 @@
-diff --git openjdk.orig/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java openjdk/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java
---- openjdk.orig/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java
-+++ openjdk/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java
-@@ -72,7 +72,7 @@
+diff -ru jdk8u-jdk8u332-b02-orig/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java jdk8u-jdk8u332-b02/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java
+--- jdk8u-jdk8u332-b02-orig/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java	2022-02-05 08:34:22.000000000 -0800
++++ jdk8u-jdk8u332-b02/jdk/src/share/classes/sun/security/ssl/TrustStoreManager.java	2022-03-01 10:57:41.837189086 -0800
+@@ -68,7 +68,7 @@
       * The preference of the default trusted KeyStore is:
       *    javax.net.ssl.trustStore
       *    jssecacerts
@@ -10,7 +10,7 @@ diff --git openjdk.orig/jdk/src/share/classes/sun/security/ssl/TrustStoreManager
       */
      private static final class TrustStoreDescriptor {
          private static final String fileSep = File.separator;
-@@ -83,6 +83,10 @@
+@@ -79,6 +79,10 @@
                  defaultStorePath + fileSep + "cacerts";
          private static final String jsseDefaultStore =
                  defaultStorePath + fileSep + "jssecacerts";
@@ -21,33 +21,31 @@ diff --git openjdk.orig/jdk/src/share/classes/sun/security/ssl/TrustStoreManager
  
          // the trust store name
          private final String storeName;
-@@ -146,7 +150,8 @@
+@@ -144,7 +148,8 @@
                      long temporaryTime = 0L;
                      if (!"NONE".equals(storePropName)) {
                          String[] fileNames =
 -                                new String[] {storePropName, defaultStore};
-+                                new String[] {storePropName,
++                                new String[] {storePropName, 
 +                                              systemStore, defaultStore};
                          for (String fileName : fileNames) {
                              File f = new File(fileName);
                              if (f.isFile() && f.canRead()) {
-diff --git openjdk.orig/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java openjdk/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java
---- openjdk.orig/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java
-+++ openjdk/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java
-@@ -108,9 +108,14 @@
+diff -ru jdk8u-jdk8u332-b02-orig/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java jdk8u-jdk8u332-b02/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java
+--- jdk8u-jdk8u332-b02-orig/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java	2022-02-05 08:34:22.000000000 -0800
++++ jdk8u-jdk8u332-b02/jdk/src/share/classes/sun/security/tools/KeyStoreUtil.java	2022-03-01 11:01:37.427001700 -0800
+@@ -103,9 +103,14 @@
          throws Exception
      {
          String sep = File.separator;
 -        File file = new File(System.getProperty("java.home") + sep
--                             + "lib" + sep + "security" + sep
--                             + "cacerts");
 +        /* Check system cacerts DB first; /etc/pki/java/cacerts */
 +        File file = new File(sep + "etc" + sep + "pki" + sep
 +                             + "java" + sep + "cacerts");
 +        if (!file.exists()) {
 +            file = new File(System.getProperty("java.home") + sep
-+                            + "lib" + sep + "security" + sep
-+                            + "cacerts");
+                              + "lib" + sep + "security" + sep
+                              + "cacerts");
 +        }
          if (!file.exists()) {
              return null;
