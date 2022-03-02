@@ -12,7 +12,7 @@ BuildRequires:  cmake
 BuildRequires:  diffutils
 BuildRequires:  file
 BuildRequires:  gcc
-BuildRequires:  glibc-devel
+BuildRequires:  glibc-devel >= 2.34-3
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed
@@ -41,8 +41,7 @@ inside a container.
 # Do not strip binaries
 sed -i CMakeLists.txt -e 's/ -Wl,-s//'
 # Enable static-pie (ASLR) support for tini-static
-# TODO:  glibc-devel does not contain rcrt1.o so -static-pie linkage fails
-# sed -i CMakeLists.txt -e 's/ -static/ -static-pie/'
+sed -i CMakeLists.txt -e 's/ -static/ -static-pie/'
 # Enable RELRO NOW for all binaries
 sed -i CMakeLists.txt -e 's/ -Wl,-z,relro/ -Wl,-z,relro,-z,now/'
 
@@ -70,7 +69,7 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %changelog
 * Mon Feb 21 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.19.0-7
 - Re-enable `tini-static` package
-- Enable binary hardening flags (`-z relro -z now`)
+- Enable binary hardening flags (`-z relro -z now` and `-static-pie`)
 
 * Mon Feb 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.19.0-6
 - Makes moby-engine spec relying on tini to provide docker-init

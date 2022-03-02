@@ -41,7 +41,6 @@ Patch11:        CVE-2018-20796.nopatch
 #Patch16:        CVE-2020-27618.patch
 Patch17:        glibc-2.34_pthread_cond_wait.patch
 
-BuildRequires:  perl(File::Find)
 BuildRequires:  bison
 BuildRequires:  kernel-headers
 BuildRequires:  gettext
