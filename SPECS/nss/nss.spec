@@ -14,7 +14,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.75
-Release:        10%{?dist}
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -219,6 +219,7 @@ popd
 %changelog
 * Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.75-1
 - Upgrading to newest version 3.75
+- Adding nss.pc.in and nss-config.in as sources.
 
 * Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 3.44-11
 - Add explicit binaries in the main package instead of `*`
