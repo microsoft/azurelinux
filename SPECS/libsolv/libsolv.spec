@@ -1,13 +1,14 @@
 Summary:        A free package dependency solver
 Name:           libsolv
 Version:        0.7.20
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/openSUSE/libsolv
 Source0:        https://github.com/openSUSE/libsolv/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0: CVE-2021-44571.patch
 BuildRequires:  cmake
 BuildRequires:  rpm-devel
 Requires:       expat-libs
@@ -41,7 +42,7 @@ Requires:       xz
 %{summary}
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %cmake \
@@ -80,6 +81,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+*   Wed Mar 02 2022 Mariner Autopatcher <cblmargh@microsoft.com> 0.7.20-2
+-   Added patch file(s) CVE-2021-44571.patch
 * Mon Dec 06 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.7.20-1
 - Update version to 0.7.20.
 
