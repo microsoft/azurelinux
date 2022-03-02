@@ -30,7 +30,9 @@ interpreted programming environments, systems integration, and as a
 tool for building user interfaces
 
 %prep
+%if %{with_check}
 pip3 install 2to3
+%endif
 %autosetup
 
 %build
