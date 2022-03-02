@@ -42,8 +42,6 @@ inside a container.
 sed -i CMakeLists.txt -e 's/ -Wl,-s//'
 # Enable static-pie (ASLR) support for tini-static
 sed -i CMakeLists.txt -e 's/ -static/ -static-pie/'
-# Enable RELRO NOW for all binaries
-sed -i CMakeLists.txt -e 's/ -Wl,-z,relro/ -Wl,-z,relro,-z,now/'
 
 %build
 mkdir build && cd build
@@ -69,7 +67,7 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %changelog
 * Mon Feb 21 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.19.0-7
 - Re-enable `tini-static` package
-- Enable binary hardening flags (`-z relro -z now` and `-static-pie`)
+- Enable binary hardening flag (`-static-pie`)
 
 * Mon Feb 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.19.0-6
 - Makes moby-engine spec relying on tini to provide docker-init
