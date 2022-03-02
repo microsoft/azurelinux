@@ -7381,8 +7381,8 @@
         "type": "other",
         "other": {
           "name": "initscripts",
-          "version": "9.70",
-          "downloadUrl": "https://github.com/fedora-sysv/initscripts/archive/9.70.tar.gz"
+          "version": "10.15",
+          "downloadUrl": "https://github.com/fedora-sysv/initscripts/archive/10.15.tar.gz"
         }
       }
     },
