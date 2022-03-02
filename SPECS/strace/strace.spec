@@ -1,14 +1,13 @@
 Summary:        Tracks system calls that are made by a running process
 Name:           strace
-Version:        5.1
-Release:        4%{?dist}
+Version:        5.16
+Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 URL:            https://strace.io/
 Group:          Development/Debuggers
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://strace.io/files/%{version}/%{name}-%{version}.tar.xz
-Patch1:         gen_tests_fixes.patch
 
 BuildRequires:  libacl-devel
 BuildRequires:  libaio-devel
@@ -21,7 +20,6 @@ all the arugments and return values from the system calls. This is useful in deb
 
 %prep
 %setup -q
-%patch1 -p1
 
 %build
 %ifarch aarch64
@@ -33,9 +31,6 @@ all the arugments and return values from the system calls. This is useful in deb
     --prefix=%{_prefix}
 %endif
 
-# to resolve build issue with glibc-2.26
-sed -i 's/struct ucontext/ucontext_t/g' linux/x86_64/arch_sigreturn.c
-sed -i 's/struct ucontext/ucontext_t/g' linux/arm/arch_sigreturn.c
 
 make %{?_smp_mflags}
 
@@ -53,6 +48,10 @@ make %{?_smp_mflags} -k check TIMEOUT_DURATION=1200
 %{_mandir}/man1/*
 
 %changelog
+*   Wed Mar 02 2022 Bala <balakumaran.kannan@microsoft.com> - 5.16-1
+-   Upgrade to latest version
+-   Remove patches and fixes not necessary for newer version
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.1-4
 -   Removing the explicit %%clean stage.
 -   License verified.
