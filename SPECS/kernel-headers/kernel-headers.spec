@@ -42,7 +42,7 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 * Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-1
 - Update source to 5.10.102.1
 - Apply CVE-2022-24958.patch
-- Remove CVE-2022-0435.patch and CVE-2022-0435.patch
+- Remove CVE-2021-43976.patch and CVE-2022-0435.patch
 
 * Fri Feb 11 2022 Vince Perri <viperri@microsoft.com> - 5.10.93.1-4
 - Bump release number to match kernel release

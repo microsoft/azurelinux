@@ -93,6 +93,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 make mrproper
@@ -273,7 +274,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-1
 - Update source to 5.10.102.1
 - Apply CVE-2022-24958.patch
-- Remove CVE-2022-0435.patch
+- Remove CVE-2021-43976.patch and CVE-2022-0435.patch
 
 * Fri Feb 11 2022 Vince Perri <viperri@microsoft.com> - 5.10.93.1-4
 - Add compressed firmware support
