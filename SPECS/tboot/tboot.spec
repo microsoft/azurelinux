@@ -62,6 +62,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_docdir}/README.md
 - Add mandatory grub configuration files/tooling that are missing
 - Add script to create DRTM launch policy
 - Add patch to disable supporting sm3 encryption policy
+- Add README file to provide instructions of enabling tboot in Mariner
 
 *   Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> 1.9.12-1
 -   Update to version 1.9.12 for binutils 2.36.1 compatibility
