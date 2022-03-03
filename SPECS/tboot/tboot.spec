@@ -38,7 +38,8 @@ mkdir -p %{buildroot}%{_docdir}
 install -m 755 %{SOURCE2} %{buildroot}%{_docdir}/README.md
 
 %files
-%doc COPYING docs/*
+%license COPYING
+%doc docs/*
 %config %{_sysconfdir}/grub.d/20_linux_tboot
 %config %{_sysconfdir}/grub.d/20_linux_xen_tboot
 %{_bindir}/create-drtm-policy.sh
