@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ $# -eq 0 ]] ; then
     echo 'Usage: generate_source_tarball.sh <MariaDB version>'
-    echo 'Example: generate_source_tarball.sh 10.3.32'
+    echo 'Example: generate_source_tarball.sh 10.3.34'
     exit 0
 fi
 

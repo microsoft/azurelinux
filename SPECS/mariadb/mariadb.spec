@@ -1,6 +1,6 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.3.32
+Version:        10.3.34
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -10,7 +10,7 @@ Group:          Applications/Databases
 # A buildable mariadb environment needs functioning submodules that do not work from the archive download
 # To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
-Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
+Source0:        https://github.com/MariaDB/server/archive/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -371,6 +371,10 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Mon Feb 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 10.3.34-1
+- Upgrading to version 10.3.34
+- patch CVE-2021-46661, CVE-2021-46662, CVE-2021-46663, CVE-2021-46664, CVE-2021-46665, CVE-2021-46668
+
 * Wed Feb 09 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.3.32-1
 - Upgrading to version 10.3.32 resolving CVE-2021-46657, CVE-2021-46658, 
   CVE-2021-46667

@@ -4,7 +4,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        20.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -13,6 +13,7 @@ URL:            https://twistedmatrix.com
 Source0:        https://pypi.python.org/packages/source/T/Twisted/Twisted-%{version}.tar.bz2
 Patch0:         extra_dependency.patch
 Patch1:         no_packet.patch
+Patch2:         CVE-2022-21712.patch
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -127,6 +128,8 @@ popd
 %{_bindir}/cftp3
 
 %changelog
+*   Sun Feb 20 2022 Mariner Autopatcher <cblmargh@microsoft.com> 20.3.0-2
+-   Added patch file(s) CVE-2022-21712.patch
 * Fri Jul 30 2021 Thomas Crain <thcrain@microsoft.com> - 20.3.0-1
 - Upgrade to version 20.3.0 to fix CVE-2020-10108, CVE-2020-10109
 - Use %%autosetup instead of %%setup and %%patch
