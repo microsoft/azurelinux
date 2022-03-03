@@ -28206,6 +28206,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tboot",
+          "version": "1.10.2",
+          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.10.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tcl",
           "version": "8.6.10",
           "downloadUrl": "http://downloads.sourceforge.net/sourceforge/tcl/tcl-core8.6.10-src.tar.gz"

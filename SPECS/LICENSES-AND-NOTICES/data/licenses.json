@@ -3126,6 +3126,7 @@
                 "systemd-bootstrap",
                 "systemtap",
                 "tar",
+                "tboot",
                 "tcl",
                 "tcpdump",
                 "tcsh",
