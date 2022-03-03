@@ -51,6 +51,11 @@ mv %{buildroot}%{_docdir}/iniparse-%{version} %{buildroot}%{_docdir}/%{name}-%{v
 %{python3_sitelib}/*
 
 %changelog
+* Thu Mar 03 2022 Nick Samson <nisamson@microsoft.com> - 0.5-1
+- Updated to 0.5
+- Removed unnecessary compatibility patch
+- Updated URL
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.4-10
 - Add license, docs to python3 package
 - Remove python2 package
