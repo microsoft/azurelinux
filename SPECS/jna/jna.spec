@@ -40,13 +40,13 @@ BuildRequires:  hamcrest
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  javapackages-tools
 BuildRequires:  junit
-BuildRequires:  libffi
 BuildRequires:  libffi-devel
 BuildRequires:  libX11-devel
 BuildRequires:  libXt-devel
 BuildRequires:  make
 BuildRequires:  msopenjdk-11
 BuildRequires:  objectweb-asm
+Requires:       libffi
 Requires:       msopenjdk-11
 
 %description
@@ -81,11 +81,24 @@ dos2unix OTHERS
 
 %patch0 -p1
 
+chmod -Rf a+rX,u+w,g-w,o-w .
 sed -i 's|@LIBDIR@|%{_libdir}/%{name}|' src/com/sun/jna/Native.java
+
+build-jar-repository -s -p lib junit ant
+rm test/com/sun/jna/StructureFieldOrderInspector.java
+rm test/com/sun/jna/StructureFieldOrderInspectorTest.java
+
+ln -s $(xmvn-resolve ant:ant:1.10.5) lib/ant.jar
+ln -s $(xmvn-resolve org.ow2.asm:asm) lib/asm-8.0.1.jar
+ln -s $(xmvn-resolve org.hamcrest:hamcrest-all) lib/hamcrest-core-1.3.jar
+ln -s $(xmvn-resolve org.reflections:reflections) lib/test/reflections.jar
+ 
+cp lib/native/aix-ppc64.jar lib/clover.jar
+ 
+%pom_remove_plugin -r :maven-javadoc-plugin parent
 
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
-build-jar-repository -s -p lib ant
 ant \
     jar \
     native \
@@ -107,22 +120,15 @@ ant \
 install -d -m 755 %{buildroot}%{_libdir}/%{name}
 install -m 755 build/native*/libjnidispatch*.so %{buildroot}%{_libdir}/%{name}/
 
-install -d -m 755 %{buildroot}%{_jnidir}/%{name}
-install -d -m 755 %{buildroot}%{_javadir}/%{name}
-install -p -m 644 build/jna-min.jar %{buildroot}%{_jnidir}/%{name}.jar
-ln -sf ../%{name}.jar %{buildroot}%{_jnidir}/%{name}/%{name}.jar
-ln -sf %{_jnidir}/%{name}.jar %{buildroot}%{_javadir}/%{name}.jar
-install -p -m 644 ./contrib/platform/dist/jna-platform.jar %{buildroot}%{_javadir}/%{name}-platform.jar
-ln -sf ../%{name}-platform.jar %{buildroot}%{_javadir}/%{name}/%{name}-platform.jar
+%mvn_file :jna jna jna/jna %{_javadir}/jna
 
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -p -m 644 pom-jna.xml %{buildroot}/%{_mavenpomdir}/%{name}.pom
-install -p -m 644 pom-jna-platform.xml %{buildroot}/%{_mavenpomdir}/%{name}-platform.pom
-%add_maven_depmap %{name}.pom %{name}.jar
-%add_maven_depmap %{name}-platform.pom %{name}-platform.jar -a net.java.dev.jna:platform -f contrib
-
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr doc/javadoc/* %{buildroot}%{_javadocdir}/%{name}
+%mvn_package :jna-platform contrib
+%mvn_alias :jna-platform :platform
+ 
+%mvn_artifact pom-jna.xml build/jna-min.jar
+%mvn_artifact pom-jna-platform.xml contrib/platform/dist/jna-platform.jar
+ 
+%mvn_install -J doc/javadoc
 
 %check
 #ignore a unicode name test which fails in chroot checks
@@ -130,19 +136,14 @@ sed -i 's/testLoadLibraryWithUnicodeName/ignore_testLoadLibraryWithUnicodeName/'
 ant
 
 %files -f .mfiles
-%dir %{_libdir}/%{name}
-%{_libdir}/%{name}/libjnidispatch.so
-%{_jnidir}/%{name}
-%{_javadir}/%{name}.jar
-%license LICENSE
-%doc CHANGES.md OTHERS README.md TODO
+%doc OTHERS README.md CHANGES.md TODO
+%license LICENSE LGPL2.1 AL2.0
+%{_libdir}/%{name}
 
 %files contrib -f .mfiles-contrib
-%{_javadir}/%{name}
 
-%files javadoc
-%{_javadocdir}/jna
-%license LICENSE
+%files javadoc -f .mfiles-javadoc
+%license LICENSE LGPL2.1 AL2.0
 
 %changelog
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.0-1
