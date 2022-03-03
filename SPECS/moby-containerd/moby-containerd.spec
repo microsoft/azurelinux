@@ -3,7 +3,7 @@
 Summary: Industry-standard container runtime
 Name: moby-containerd
 Version: 1.5.9+azure
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -134,6 +134,8 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Thu Mar 03 2022 Anirudh Gopal <angop@microsoft.com> - 1.5.9+azure-4
+- Enable containerd service restart
 * Wed Mar 02 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.5.9+azure-3
 - Fix CVE-2022-23648
 * Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.9+azure-2
