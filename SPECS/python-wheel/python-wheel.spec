@@ -15,7 +15,7 @@ compatible install in a way that is very close to the on-disk format.
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
 Version:        0.33.6
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,10 @@ BuildRequires:  python3-setuptools
 
 %if %{with_check}
 BuildRequires:  python3-pytest
+BuildRequires:  python3-six
+BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
+BuildRequires:  python3-atomicwrites
 %endif
 
 %description -n python3-%{pypi_name} %{_description}
@@ -85,7 +89,8 @@ install -p dist/%{python_wheelname} -t %{buildroot}%{python_wheeldir}
 
 %check
 rm setup.cfg
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-3 -v --ignore build
+%{python3} -m pip install pluggy more-itertools
+PYTHONPATH=%{buildroot}%{python3_sitelib} py.test3 -v --ignore build
 
 %files -n python3-%{pypi_name}
 %license LICENSE.txt
@@ -104,6 +109,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-3 -v --ignore build
 %endif
 
 %changelog
+* Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 0.33.6-7
+- BR multiple python3 modules for PTest
+- pip3 install additional modules which not available as RPM
+
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.33.6-6
 - License verified.
 
