@@ -104,16 +104,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "advancecomp",
-          "version": "2.1",
-          "downloadUrl": "https://github.com/amadvance/advancecomp/releases/download/v2.1/advancecomp-2.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "adwaita-icon-theme",
           "version": "3.36.1",
           "downloadUrl": "https://download.gnome.org/sources/adwaita-icon-theme/3.36/adwaita-icon-theme-3.36.1.tar.xz"
@@ -2209,16 +2199,6 @@
           "name": "cpprest",
           "version": "2.10.18",
           "downloadUrl": "https://github.com/microsoft/cpprestsdk/archive/2.10.18.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "cpptest",
-          "version": "1.1.2",
-          "downloadUrl": "http://downloads.sourceforge.net/cpptest/cpptest-1.1.2.tar.gz"
         }
       }
     },
@@ -4542,16 +4522,6 @@
           "name": "glm",
           "version": "0.9.9.6",
           "downloadUrl": "https://github.com/g-truc/glm/releases/download/0.9.9.6/glm-0.9.9.6.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "glog",
-          "version": "0.3.5",
-          "downloadUrl": "https://github.com/google/glog/archive/v0.3.5/glog-0.3.5.tar.gz"
         }
       }
     },
