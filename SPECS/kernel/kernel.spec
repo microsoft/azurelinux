@@ -250,6 +250,7 @@ Patch1208:      CVE-2022-0264.nopatch
 Patch1209:      CVE-2021-45402.nopatch
 Patch1210:      CVE-2021-3752.nopatch
 Patch1211:      CVE-2021-20322.nopatch
+Patch1212:      CVE-2021-43976.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
