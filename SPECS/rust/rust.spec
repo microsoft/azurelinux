@@ -7,7 +7,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.56.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,12 +73,13 @@ mv %{SOURCE7} "$BUILD_CACHE_DIR"
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
-sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo"
+sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
 USER=root SUDO_USER=root %make_build
 
 %check
+ln -s /usr/src/mariner/BUILD/rustc-1.56.1-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt /usr/src/mariner/BUILD/rustc-1.56.1-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 %make_build check
 
 %install
@@ -109,11 +110,17 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %doc src/tools/rustfmt/{README,CHANGELOG,Configurations}.md
 %doc src/tools/clippy/{README.md,CHANGELOG.md}
 %{_bindir}/cargo
+%{_bindir}/cargo-fmt
+%{_bindir}/rustfmt
 %{_datadir}/zsh/*
 %doc %{_docdir}/%{name}/LICENSE-THIRD-PARTY
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Wed Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 1.56.1-2
+- Build rustfmt tool as it is required to run PTest
+- Create softlink for rustfmt in stage0
+
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.56.1-1
 - Updating to version 1.56.1.
 - Switching to building with Python 3.
