@@ -1217,8 +1217,8 @@
         "type": "other",
         "other": {
           "name": "bluez",
-          "version": "5.55",
-          "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.55.tar.xz"
+          "version": "5.63",
+          "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz"
         }
       }
     },
@@ -9351,8 +9351,8 @@
         "type": "other",
         "other": {
           "name": "libell",
-          "version": "0.32",
-          "downloadUrl": "https://www.kernel.org/pub/linux/libs/ell/ell-0.32.tar.xz"
+          "version": "0.48",
+          "downloadUrl": "https://www.kernel.org/pub/linux/libs/ell/ell-0.48.tar.xz"
         }
       }
     },
