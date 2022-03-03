@@ -1,22 +1,22 @@
 %define _use_internal_dependency_generator 0
 %global security_hardening none
-%define _jdk_update 332
-%define _jdk_build 02
+%define _jdk_update 292
+%define _jdk_build 10
+%define _repo_ver aarch64-shenandoah-jdk8u%{_jdk_update}-b%{_jdk_build}
+%define _url_src https://github.com/AdoptOpenJDK/openjdk-aarch64-jdk8u/
+%define bootstrapjdk %{_libdir}/jvm/OpenJDK-1.8.0.181-bootstrap
 Summary:        OpenJDK
 Name:           openjdk8
-Version:        1.8.0.%{_jdk_update}
+Version:        1.8.0.292
 Release:        1%{?dist}
 License:        ASL 1.1 AND ASL 2.0 AND BSD AND BSD WITH advertising AND GPL+ AND GPLv2 AND GPLv2 WITH exceptions AND IJG AND LGPLv2+ AND MIT AND MPLv2.0 AND Public Domain AND W3C AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-URL:            https://openjdk.java.net
-Source0:        https://github.com/adoptium/jdk8u/archive/jdk8u%{_jdk_update}-b%{_jdk_build}.tar.gz#/openjdk-%{version}.tar.gz
+URL:            https://hg.openjdk.java.net/aarch64-port/jdk8u-shenandoah/
+Source0:        %{_url_src}/archive/%{_repo_ver}.tar.gz
 Patch0:         Awt_build_headless_only.patch
-Patch1:         check-system-ca-certs-332.patch
-BuildRequires:  alsa-lib
-BuildRequires:  alsa-lib-devel
-BuildRequires:  chkconfig
+Patch1:         check-system-ca-certs-292.patch
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  glib-devel
@@ -30,9 +30,10 @@ Requires:       openjre8 = %{version}-%{release}
 AutoReqProv:    no
 Obsoletes:      openjdk <= %{version}
 Provides:       java-devel = %{version}-%{release}
-# openjdk8 git repo have reconciled sources for x86_64 and aarch64
-# however we maintain 2 different specs to preserve RPM name and backward compatibility
-ExclusiveArch:  x86_64
+Provides:       java-1.8.0-openjdk = %{version}-%{release}
+Provides:       java-1.8.0-openjdk-headless = %{version}-%{release}
+Provides:       java-1.8.0-openjdk-devel = %{version}-%{release}
+ExclusiveArch:  aarch64
 
 %description
 The OpenJDK package installs java class library and javac java compiler.
@@ -43,6 +44,8 @@ Requires:       chkconfig
 Requires:       libstdc++
 AutoReqProv:    no
 Obsoletes:      openjre <= %{version}
+Provides:       java = %{version}-%{release}
+Provides:       java-headless = %{version}-%{release}
 
 %description	-n openjre8
 It contains the libraries files for Java runtime environment
@@ -75,7 +78,7 @@ Obsoletes:      openjdk-src <= %{version}
 This package provides the runtime library class sources.
 
 %prep -p exit
-%setup -qn jdk8u-jdk8u%{_jdk_update}-b%{_jdk_build}
+%setup -n openjdk-aarch64-jdk8u-%{_repo_ver}
 %patch0 -p1
 %patch1 -p1
 rm jdk/src/solaris/native/sun/awt/CUPSfuncs.c
@@ -83,24 +86,24 @@ sed -i "s#\"ft2build.h\"#<ft2build.h>#g" jdk/src/share/native/sun/font/freetypeS
 sed -i '0,/BUILD_LIBMLIB_SRC/s/BUILD_LIBMLIB_SRC/BUILD_HEADLESS_ONLY := 1\nOPENJDK_TARGET_OS := linux\n&/' jdk/make/lib/Awt2dLibraries.gmk
 
 %build
-chmod a+x ./configur*
 export CFLAGS="%{build_cflags} -Wno-error=format-overflow= -Wno-error=stringop-overflow="
-export CXXFLAGS="%{build_cxxflags}-Wno-error=format-overflow= -Wno-error=stringop-overflow="
+export CXXFLAGS="%{build_cxxflags} -Wno-error=format-overflow= -Wno-error=stringop-overflow="
 export CFLAGS=$(echo $CFLAGS | sed "s/-Wall//" | sed "s/-Wformat//" | sed "s/-Werror=format-security//")
 export CXXFLAGS=$(echo $CXXFLAGS | sed "s/-Wall//" | sed "s/-Wformat// | sed "s/-Werror=format-security//"")
 unset JAVA_HOME &&
-./configur* \
+sh configure \
+	CUPS_NOT_NEEDED=yes \
 	--with-target-bits=64 \
-	--with-boot-jdk=%{_libdir}/jvm/OpenJDK-212-b04-bootstrap \
+	--with-boot-jdk=%{bootstrapjdk} \
 	--disable-headful \
-	--with-cacerts-file=%{_libdir}/jvm/OpenJDK-212-b04-bootstrap/jre/lib/security/cacerts \
+	--with-cacerts-file=%{bootstrapjdk}/jre/lib/security/cacerts \
 	--with-extra-cxxflags="-Wno-error -std=gnu++98 -fno-delete-null-pointer-checks -fno-lifetime-dse" \
 	--with-extra-cflags="-std=gnu++98 -fno-delete-null-pointer-checks -Wno-error -fno-lifetime-dse" \
 	--with-freetype-include=%{_includedir}/freetype2 \
 	--with-freetype-lib=%{_libdir} \
-	--with-stdc++lib=dynamic \
 	--with-native-debug-symbols=none \
-	--disable-zip-debug-info
+	--disable-zip-debug-info \
+	--with-stdc++lib=dynamic
 
 make \
     DEBUG_BINARIES=true \
@@ -109,7 +112,7 @@ make \
     JAVAC_FLAGS=-g \
     STRIP_POLICY=no_strip \
     DISABLE_HOTSPOT_OS_VERSION_CHECK=ok \
-    CLASSPATH=%{_libdir}/jvm/OpenJDK-212-b04-bootstrap/jre \
+    CLASSPATH=%{bootstrapjdk}/jre \
     POST_STRIP_CMD="" \
     LOG=trace \
     SCTP_WERROR=
@@ -119,12 +122,12 @@ make DESTDIR=%{buildroot} install \
 	BUILD_HEADLESS_ONLY=yes \
 	OPENJDK_TARGET_OS=linux \
 	DISABLE_HOTSPOT_OS_VERSION_CHECK=ok \
-	CLASSPATH=%{_libdir}/jvm/OpenJDK-212-b04-bootstrap/jre
+	CLASSPATH=%{bootstrapjdk}/jre
 
 install -vdm755 %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
 chown -R root:root %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}
 install -vdm755 %{buildroot}%{_bindir}
-find %{_prefix}/local/jvm/openjdk-1.8.0-internal/jre/lib/amd64 -iname \*.diz -delete
+find %{_prefix}/local/jvm/openjdk-1.8.0-internal/jre/lib/aarch64 -iname \*.diz -delete
 mv %{_prefix}/local/jvm/openjdk-1.8.0-internal/* %{buildroot}%{_libdir}/jvm/OpenJDK-%{version}/
 
 %post
@@ -145,7 +148,6 @@ alternatives --install %{_bindir}/javac javac %{_libdir}/jvm/OpenJDK-%{version}/
   --slave %{_bindir}/jinfo jinfo %{_libdir}/jvm/OpenJDK-%{version}/bin/jinfo \
   --slave %{_bindir}/jmap jmap %{_libdir}/jvm/OpenJDK-%{version}/bin/jmap \
   --slave %{_bindir}/jps jps %{_libdir}/jvm/OpenJDK-%{version}/bin/jps \
-  --slave %{_bindir}/jfr jfr %{_libdir}/jvm/OpenJDK-%{version}/bin/jfr \
   --slave %{_bindir}/jrunscript jrunscript %{_libdir}/jvm/OpenJDK-%{version}/bin/jrunscript \
   --slave %{_bindir}/jsadebugd jsadebugd %{_libdir}/jvm/OpenJDK-%{version}/bin/jsadebugd \
   --slave %{_bindir}/jstack jstack %{_libdir}/jvm/OpenJDK-%{version}/bin/jstack \
@@ -181,7 +183,6 @@ alternatives --remove javac %{_libdir}/jvm/OpenJDK-%{version}/bin/javac
 %postun -n openjre8
 alternatives --remove java %{_libdir}/jvm/OpenJDK-%{version}/jre/bin/java
 /sbin/ldconfig
-rm -rf %{_libdir}/jvm/OpenJDK-%{version}
 
 %clean
 rm -rf %{buildroot}/*
@@ -190,15 +191,19 @@ rm -rf %{buildroot}/*
 
 %files
 %defattr(-,root,root)
-%license %{_libdir}/jvm/OpenJDK-%{version}/LICENSE
+%license LICENSE
 %{_libdir}/jvm/OpenJDK-%{version}/ASSEMBLY_EXCEPTION
+%{_libdir}/jvm/OpenJDK-%{version}/LICENSE
 %{_libdir}/jvm/OpenJDK-%{version}/release
 %{_libdir}/jvm/OpenJDK-%{version}/THIRD_PARTY_README
 %{_libdir}/jvm/OpenJDK-%{version}/lib
 %{_libdir}/jvm/OpenJDK-%{version}/include/
+%{_libdir}/jvm/OpenJDK-%{version}/bin/clhsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/extcheck
+%{_libdir}/jvm/OpenJDK-%{version}/bin/hsdb
 %{_libdir}/jvm/OpenJDK-%{version}/bin/idlj
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jar
+%{_libdir}/jvm/OpenJDK-%{version}/bin/jfr
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jarsigner
 %{_libdir}/jvm/OpenJDK-%{version}/bin/java-rmi.cgi
 %{_libdir}/jvm/OpenJDK-%{version}/bin/javac
@@ -212,7 +217,6 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jhat
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jinfo
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jjs
-%{_libdir}/jvm/OpenJDK-%{version}/bin/jfr
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jmap
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jps
 %{_libdir}/jvm/OpenJDK-%{version}/bin/jrunscript
@@ -227,9 +231,7 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/wsgen
 %{_libdir}/jvm/OpenJDK-%{version}/bin/wsimport
 %{_libdir}/jvm/OpenJDK-%{version}/bin/xjc
-%{_libdir}/jvm/OpenJDK-%{version}/bin/clhsdb
-%{_libdir}/jvm/OpenJDK-%{version}/bin/hsdb
-%exclude %{_libdir}/jvm/OpenJDK-%(version)/bin/*.debuginfo
+%exclude %{_libdir}/jvm/OpenJDK-%{version}/bin/*.debuginfo
 
 %files -n openjre8
 %defattr(-,root,root)
@@ -244,8 +246,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/bin/servertool
 %{_libdir}/jvm/OpenJDK-%{version}/bin/tnameserv
 %{_libdir}/jvm/OpenJDK-%{version}/bin/unpack200
-%{_libdir}/jvm/OpenJDK-%{version}/lib/amd64/jli/
-%exclude %{_libdir}/jvm/OpenJDK-%{version}/lib/amd64/*.diz
+%{_libdir}/jvm/OpenJDK-%{version}/lib/aarch64/jli/
+%exclude %{_libdir}/jvm/OpenJDK-%{version}/lib/aarch64/*.diz
 
 %files sample
 %defattr(-,root,root)
@@ -261,138 +263,59 @@ rm -rf %{buildroot}/*
 %{_libdir}/jvm/OpenJDK-%{version}/src.zip
 
 %changelog
-*   Mon Feb 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.0.332-1
--   Update to 1.8.0.332 to address the below CVEs:
--   CVE-2022-21248 CVE-2022-21282 CVE-2022-21283 CVE-2022-21293
--   CVE-2022-21294 CVE-2022-21296 CVE-2022-21299 CVE-2022-21305
--   CVE-2022-21340 CVE-2022-21341 CVE-2022-21349 CVE-2022-21360
--   CVE-2022-21365
+* Sun Apr 18 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.292-1
+- Update to 8u292 to address CVEs.
+- Switch to Shenandoah version of the aarch64 port
 
-*   Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 1.8.0.292-2
--   Provide java-devel
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-13
+- Replace incorrect %%{_lib} usage with %%{_libdir}
 
-*   Fri Apr 16 2021 Nick Samson <nick.samson@microsoft.com> - 1.8.0.292-1
--   Update to 8u292 to address CVEs
--   Switch to AdoptOpenJDK-generated source tarball
+* Tue Nov 17 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-12
+- Provide java and java-headless.
 
-*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.8.0.212-10
+* Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8.0.181-11
+- Provide java-1.8.0-openjdk and java-devel.
+
+*   Thu Oct 15 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.181-10
+-   Provide java-1.8.0-openjdk-devel.
+
+*   Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.8.0.181-9
+-   Remove unused buildrequires.
+-   Provide java-1.8.0-openjdk-headless.
+
+*   Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 1.8.0.181-8
 -   Disable -Werrors that break the build in cflags and cxxflags.
 
-*   Tue May 26 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.0.212-9
--   Adding the "%%license" macro.
+*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.0.181-7
+-   Added %%license line automatically
 
-*   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.0.212-8
+*   Wed May 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 1.8.0.181-6
 -   Removing *Requires for "ca-certificates".
--   Fixing changelog version markings.
 
-*   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.0.212-7
+*   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 1.8.0.181-5
 -   Replace BuildArch with ExclusiveArch
 
-*   Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.8.0.212-6
+*   Thu Apr 30 2020 Nicolas Ontiveros <niontive@microsoft.com> 8.0.181-4
 -   Rename freetype2-devel to freetype-devel.
 
-*   Thu Apr 16 2020 Paul Monson <paulmon@microsoft.com> 1.8.0.212-5
--   Remove harfbuzz-devel.  License verified. Fix Source0.
+*   Thu Apr 16 2020 Paul Monson <paulmon@microsoft.com> 8.0.181-3
+-   Remove harfbuzz-devel.  License verified.
 
-*   Wed Feb 12 2020 Andrew Phelps <anphel@microsoft.com> 1.8.0.212-4
+*   Wed Feb 12 2020 Andrew Phelps <anphel@microsoft.com> 8.0.181-2
 -   Remove ExtraBuildRequires
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.8.0.212-3
+*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 8.0.181-1
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue May 20 2019 Tapas Kundu <tkundu@vmware.com> 1.8.0.212-2
--   Upgrade to version 1.8.0.212 b04
--   Included fix for performance regression.
+*   Thu Mar 21 2019 Ajay Kaher <akaher@vmware.com> 1.8.0.181-1
+-   Update to version 1.8.0.181
 
-*   Thu May 02 2019 Tapas Kundu <tkundu@vmware.com> 1.8.0.212-1
--   Upgrade to version 1.8.0.212
--   Add new clhsdb and hsdb binaries.
--   Fix CVE-2019-2602, CVE-2019-2697, CVE-2019-2698.
-
-*   Wed Jan 23 2019 Srinidhi Rao <srinidhir@vmware.com> 1.8.0.202-1
--   Upgrade to version 1.8.0.202
-
-*   Mon Oct 29 2018 Ajay Kaher <akaher@vmware.com> 1.8.0.192-3
+*   Mon Oct 29 2018 Ajay Kaher <akaher@vmware.com> 1.8.0.151-3
 -   Adding BuildArch
 
-*   Mon Oct 29 2018 Alexey Makhalov <amakhalov@vmware.com> 1.8.0.192-2
+*   Mon Oct 29 2018 Alexey Makhalov <amakhalov@vmware.com> 1.8.0.151-2
 -   Use ExtraBuildRequires
 
-*   Thu Oct 18 2018 Tapas Kundu <tkundu@vmware.com> 1.8.0.192-1
--   Upgraded to version 1.8.0.192
-
-*   Fri Sep 21 2018 Srinidhi Rao <srinidhir@vmware.com> 1.8.0.181-1
--   Upgraded to 1.8.0.181 version.
-
-*   Mon Apr 23 2018 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.172-1
--   Upgraded to version 1.8.0.172
-
-*   Fri Jan 19 2018 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.162-1
--   Upgraded to version 1.8.0.162
-
-*   Thu Dec 21 2017 Alexey Makhalov <amakhalov@vmware.com> 1.8.0.152-2
--   Reduce list of published rpms dependencies
-
-*   Thu Oct 19 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.152-1
--   Upgraded to version 1.8.0.152
-
-*   Thu Sep 14 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.141-2
--   added ldconfig in post actions.
-
-*   Fri Jul 21 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.141-1
--   Upgraded to version 1.8.0.141-1
-
-*   Thu Jul 6 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.131-4
--   Build AWT libraries as well.
-
-*   Thu Jun 29 2017 Divya Thaluru <dthaluru@vmware.com> 1.8.0.131-3
--   Added obseletes for deprecated openjdk package
-
-*   Tue Jun 06 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.131-2
--   Add requires for libstdc++
-
-*   Mon Apr 10 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.131-1
--   Upgraded to version 1.8.0.131 and building Java from sources
-
-*   Tue Mar 28 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.0.112-2
--   add java rpm macros
-
-*   Wed Dec 21 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.0.112-1
--   Update to 1.8.0.112. addresses CVE-2016-5582 CVE-2016-5573
-
-*   Tue Oct 04 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.0.102-1
--   Update to 1.8.0.102, minor fixes in url, spelling.
--   addresses CVE-2016-3598, CVE-2016-3606, CVE-2016-3610
-
-*   Thu May 26 2016 Divya Thaluru <dthaluru@vmware.com> 1.8.0.92-3
--   Added version constraint to runtime dependencies
-
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.0.92-2
--   GA - Bump release of all rpms
-
-*   Fri May 20 2016 Divya Thaluru <dthaluru@vmware.com> 1.8.0.92-1
--   Updated to version 1.8.0.92
-
-*   Mon May 2 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.8.0.72-3
--   Move tools like javac to openjdk
-
-*   Thu Apr 28 2016 Divya Thaluru <dthaluru@vmware.com> 1.8.0.72-2
--   Adding openjre as run time dependency for openjdk package
-
-*   Fri Feb 26 2016 Kumar Kaushik <kaushikk@vmware.com> 1.8.0.72-1
--   Updating Version.
-
-*   Mon Nov 16 2015 Sharath George <sharathg@vmware.com> 1.8.0.51-3
--   Change to use /var/opt path
-
-*   Fri Sep 11 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.8.0.51-2
--   Split the openjdk into multiple sub-packages to reduce size.
-
-*   Mon Aug 17 2015 Sharath George <sarahc@vmware.com> 1.8.0.51-1
--   Moved to the next version
-
-*   Tue Jun 30 2015 Sarah Choi <sarahc@vmware.com> 1.8.0.45-2
--   Add JRE path
-
-*   Mon May 18 2015 Sharath George <sharathg@vmware.com> 1.8.0.45-1
--   Initial build. First version
+*   Thu Dec 21 2017 Alexey Makhalov <amakhalov@vmware.com> 1.8.0.151-1
+-   Initial version of OpenJDK for aarch64. SPEC file was forked from
+    openjdk8-1.8.0.152-1 of x86_64
