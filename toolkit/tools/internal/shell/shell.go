@@ -189,19 +189,19 @@ func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutpu
 	return
 }
 
-// ExecuteAndLogToFile runs a command in the shell and redirects stdout to the give file
+// ExecuteAndLogToFile runs a command in the shell and redirects stdout to the given file
 func ExecuteAndLogToFile(filepath string, command string, args ...string) {
 	cmd := exec.Command(command, args...)
 	outfile, err := os.Create(filepath)
 	if err != nil {
-		logger.Log.Errorf("Unable to create: %v", err)
+		logger.Log.Errorf("Unable to create file '%s'. Error: %s", filepath, err)
 		return
 	}
 	defer outfile.Close()
 	cmd.Stdout = outfile
 	err = cmd.Start()
 	if err != nil {
-		logger.Log.Errorf("Unable to start: %v", err)
+		logger.Log.Errorf("Unable to start command '%s %s'. Error: %s", command, strings.Join(args, " "), err)
 		return
 	}
 	cmd.Wait()

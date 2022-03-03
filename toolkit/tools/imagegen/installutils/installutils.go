@@ -491,19 +491,19 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	}
 
 	// Generate list of installed packages
-	GenerateContainerManifests(installChroot)
+	generateContainerManifests(installChroot)
 
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
 	return
 }
 
-func GenerateContainerManifests(installChroot *safechroot.Chroot) {
+func generateContainerManifests(installChroot *safechroot.Chroot) {
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
 	rpmDir := filepath.Join(installRoot, rpmDependenciesDirectory)
 	rpmManifestDir := filepath.Join(installRoot, rpmManifestDirectory)
-	manifest1Path := filepath.Join(rpmManifestDir, "container-manifest-1")
-	manifest2Path := filepath.Join(rpmManifestDir, "container-manifest-2")
+	manifest1Path := filepath.Join(rpmManifestDir, "container-manifest")
+	manifest2Path := filepath.Join(rpmManifestDir, "container-manifest-detailed")
 
 	os.MkdirAll(rpmManifestDir, os.ModePerm)
 
