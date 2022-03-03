@@ -1896,36 +1896,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "clutter",
-          "version": "1.26.4",
-          "downloadUrl": "https://download.gnome.org/sources/clutter/1.26/clutter-1.26.4.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "clutter-gst3",
-          "version": "3.0.27",
-          "downloadUrl": "https://download.gnome.org/sources/clutter-gst/3.0/clutter-gst-3.0.27.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "clutter-gtk",
-          "version": "1.8.4",
-          "downloadUrl": "http://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-1.8.4.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cmake",
           "version": "3.21.4",
           "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
@@ -1969,16 +1939,6 @@
           "name": "cni-plugins",
           "version": "0.9.1",
           "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "cogl",
-          "version": "1.22.8",
-          "downloadUrl": "http://download.gnome.org/sources/cogl/1.22/cogl-1.22.8.tar.xz"
         }
       }
     },
@@ -9083,16 +9043,6 @@
           "name": "libcgroup",
           "version": "0.41",
           "downloadUrl": "https://downloads.sourceforge.net/libcg/libcgroup-0.41.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libchamplain",
-          "version": "0.12.20",
-          "downloadUrl": "https://download.gnome.org/sources/libchamplain/0.12/libchamplain-0.12.20.tar.xz"
         }
       }
     },
