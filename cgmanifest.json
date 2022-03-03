@@ -7440,6 +7440,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "IP2Location",
+          "version": "8.4.1",
+          "downloadUrl": "https://github.com/chrislim2888/IP2Location-C-Library/archive/8.4.1/IP2Location-8.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ipa-gothic-fonts",
           "version": "003.03",
           "downloadUrl": "http://info.openlab.ipa.go.jp/ipafont/fontdata/ipag00303.zip"
@@ -7561,8 +7571,8 @@
         "type": "other",
         "other": {
           "name": "ipv6calc",
-          "version": "2.2.0",
-          "downloadUrl": "ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/ipv6calc-2.2.0.tar.gz"
+          "version": "4.0.1",
+          "downloadUrl": "https://github.com/pbiering/ipv6calc/archive/4.0.1/ipv6calc-4.0.1.tar.gz"
         }
       }
     },
