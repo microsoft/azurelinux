@@ -5429,16 +5429,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "hfsplus-tools",
-          "version": "540.1.linux3",
-          "downloadUrl": "http://cavan.codon.org.uk/~mjg59/diskdev_cmds/diskdev_cmds-540.1.linux3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "hicolor-icon-theme",
           "version": "0.17",
           "downloadUrl": "https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz"
@@ -8653,16 +8643,6 @@
           "name": "kronosnet",
           "version": "1.20",
           "downloadUrl": "https://kronosnet.org/releases/kronosnet-1.20.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ksh",
-          "version": "2020.0.0",
-          "downloadUrl": "https://github.com/att/ast/releases/download/2020.0.0/ksh-2020.0.0.tar.gz"
         }
       }
     },
@@ -13602,16 +13582,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mksh",
-          "version": "59c",
-          "downloadUrl": "https://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mlocate",
           "version": "0.26",
           "downloadUrl": "http://releases.pagure.org/mlocate/mlocate-0.26.tar.xz"
@@ -15626,16 +15596,6 @@
           "name": "openoffice-lv",
           "version": "1.0.0",
           "downloadUrl": "http://dict.dv.lv/download/lv_LV-1.0.0.oxt"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "openrdate",
-          "version": "1.2",
-          "downloadUrl": "http://downloads.sourceforge.net/openrdate/openrdate-1.2.tar.gz"
         }
       }
     },
