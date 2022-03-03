@@ -1316,16 +1316,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "boringssl",
-          "version": "20200921",
-          "downloadUrl": "https://boringssl.googlesource.com/boringssl/+archive/3743aafdacff2f7b083615a043a37101f740fa53.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "botan2",
           "version": "2.14.0",
           "downloadUrl": "https://botan.randombit.net/releases/Botan-2.14.0.tar.xz"
@@ -1589,6 +1579,16 @@
           "name": "capstone",
           "version": "4.0.2",
           "downloadUrl": "https://github.com/aquynh/capstone/archive/4.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cassandra",
+          "version": "4.0.3",
+          "downloadUrl": "https://archive.apache.org/dist/cassandra/4.0.3/apache-cassandra-4.0.3-src.tar.gz"
         }
       }
     },
@@ -3328,8 +3328,8 @@
         "type": "other",
         "other": {
           "name": "envoy",
-          "version": "1.14.4",
-          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.14.4.tar.gz"
+          "version": "1.21.0",
+          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.21.0.tar.gz"
         }
       }
     },
@@ -4742,6 +4742,16 @@
           "name": "go-md2man",
           "version": "2.0.0",
           "downloadUrl": "https://github.com/cpuguy83/go-md2man/archive/v2.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "go-rpm-macros",
+          "version": "3.0.9",
+          "downloadUrl": "https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz"
         }
       }
     },
@@ -8271,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "jq",
-          "version": "1.5",
-          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-1.5.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-1.6.tar.gz"
         }
       }
     },
@@ -10823,6 +10833,16 @@
           "name": "libpsl",
           "version": "0.21.1",
           "downloadUrl": "https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libpsm2",
+          "version": "11.2.206",
+          "downloadUrl": "https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/PSM2_11.2.206.tar.gz"
         }
       }
     },
@@ -14593,8 +14613,8 @@
         "type": "other",
         "other": {
           "name": "node-problem-detector",
-          "version": "0.8.8",
-          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.8.tar.gz"
+          "version": "0.8.10",
+          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.10.tar.gz"
         }
       }
     },
@@ -28006,26 +28026,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "symlinks",
-          "version": "1.7",
-          "downloadUrl": "http://ibiblio.org/pub/Linux/utils/file/symlinks-1.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "sysfsutils",
-          "version": "2.1.0",
-          "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "SymCrypt",
           "version": "101.0.0",
           "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v101.0.0.tar.gz"
@@ -28039,6 +28039,26 @@
           "name": "SymCrypt-OpenSSL",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "symlinks",
+          "version": "1.7",
+          "downloadUrl": "http://ibiblio.org/pub/Linux/utils/file/symlinks-1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sysfsutils",
+          "version": "2.1.0",
+          "downloadUrl": "http://prdownloads.sourceforge.net/linux-diag/sysfsutils-2.1.0.tar.gz"
         }
       }
     },
