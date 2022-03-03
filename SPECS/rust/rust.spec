@@ -79,7 +79,7 @@ sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
 USER=root SUDO_USER=root %make_build
 
 %check
-ln -s /usr/src/mariner/BUILD/rustc-1.56.1-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt /usr/src/mariner/BUILD/rustc-1.56.1-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+ln -s %{_prefix}/src/mariner/BUILD/rustc-1.56.1-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-1.56.1-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 %make_build check
 
 %install
@@ -117,7 +117,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
-* Wed Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 1.56.1-2
+* Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 1.56.1-2
 - Build rustfmt tool as it is required to run PTest
 - Create softlink for rustfmt in stage0
 
