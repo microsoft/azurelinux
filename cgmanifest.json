@@ -5429,16 +5429,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "hfsplus-tools",
-          "version": "540.1.linux3",
-          "downloadUrl": "http://cavan.codon.org.uk/~mjg59/diskdev_cmds/diskdev_cmds-540.1.linux3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "hicolor-icon-theme",
           "version": "0.17",
           "downloadUrl": "https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz"
@@ -7381,8 +7371,8 @@
         "type": "other",
         "other": {
           "name": "initscripts",
-          "version": "9.70",
-          "downloadUrl": "https://github.com/fedora-sysv/initscripts/archive/9.70.tar.gz"
+          "version": "10.15",
+          "downloadUrl": "https://github.com/fedora-sysv/initscripts/archive/10.15.tar.gz"
         }
       }
     },
@@ -7433,6 +7423,16 @@
           "name": "iotop",
           "version": "0.6",
           "downloadUrl": "http://guichaz.free.fr/iotop/files/iotop-0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "IP2Location",
+          "version": "8.4.1",
+          "downloadUrl": "https://github.com/chrislim2888/IP2Location-C-Library/archive/8.4.1/IP2Location-8.4.1.tar.gz"
         }
       }
     },
@@ -7561,8 +7561,8 @@
         "type": "other",
         "other": {
           "name": "ipv6calc",
-          "version": "2.2.0",
-          "downloadUrl": "ftp://ftp.bieringer.de/pub/linux/IPv6/ipv6calc/ipv6calc-2.2.0.tar.gz"
+          "version": "4.0.1",
+          "downloadUrl": "https://github.com/pbiering/ipv6calc/archive/4.0.1/ipv6calc-4.0.1.tar.gz"
         }
       }
     },
@@ -8643,16 +8643,6 @@
           "name": "kronosnet",
           "version": "1.20",
           "downloadUrl": "https://kronosnet.org/releases/kronosnet-1.20.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ksh",
-          "version": "2020.0.0",
-          "downloadUrl": "https://github.com/att/ast/releases/download/2020.0.0/ksh-2020.0.0.tar.gz"
         }
       }
     },
@@ -13592,16 +13582,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mksh",
-          "version": "59c",
-          "downloadUrl": "https://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mlocate",
           "version": "0.26",
           "downloadUrl": "http://releases.pagure.org/mlocate/mlocate-0.26.tar.xz"
@@ -14653,8 +14633,8 @@
         "type": "other",
         "other": {
           "name": "nspr",
-          "version": "4.21",
-          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.21/src/nspr-4.21.tar.gz"
+          "version": "4.30",
+          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.30/src/nspr-4.30.tar.gz"
         }
       }
     },
@@ -14663,8 +14643,8 @@
         "type": "other",
         "other": {
           "name": "nss",
-          "version": "3.44",
-          "downloadUrl": "https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/nss-3.44.tar.gz"
+          "version": "3.75",
+          "downloadUrl": "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_75_RTM/src/nss-3.75.tar.gz"
         }
       }
     },
@@ -15616,16 +15596,6 @@
           "name": "openoffice-lv",
           "version": "1.0.0",
           "downloadUrl": "http://dict.dv.lv/download/lv_LV-1.0.0.oxt"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "openrdate",
-          "version": "1.2",
-          "downloadUrl": "http://downloads.sourceforge.net/openrdate/openrdate-1.2.tar.gz"
         }
       }
     },
