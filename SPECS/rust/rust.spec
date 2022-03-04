@@ -79,7 +79,7 @@ sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
 USER=root SUDO_USER=root %make_build
 
 %check
-ln -s %{_prefix}/src/mariner/BUILD/rustc-1.56.1-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-1.56.1-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 %make_build check
 
 %install
