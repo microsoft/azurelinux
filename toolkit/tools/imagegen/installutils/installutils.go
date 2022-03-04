@@ -37,6 +37,9 @@ const (
 	// rpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
 	rpmDependenciesDirectory = "/var/lib/rpm"
 
+	// rpmManifestDirectory is the directory containing manifests of installed packages to support distroless vulnerability scanning tools.
+	rpmManifestDirectory = "/var/lib/rpmmanifest"
+
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0600
 	bootDirectoryDirMode  = 0700
@@ -470,8 +473,29 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		}
 	}
 
+	if config.RemoveRpmDb {
+		// When the RemoveRpmDb flag is true, generate a list of installed packages since they cannot be queiried at runtime
+		logger.Log.Info("Generating manifest with package information since RemoveRpmDb is enabled.")
+		generateContainerManifests(installChroot)
+	}
+
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
+	return
+}
+
+func generateContainerManifests(installChroot *safechroot.Chroot) {
+	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
+	rpmDir := filepath.Join(installRoot, rpmDependenciesDirectory)
+	rpmManifestDir := filepath.Join(installRoot, rpmManifestDirectory)
+	manifest1Path := filepath.Join(rpmManifestDir, "container-manifest-1")
+	manifest2Path := filepath.Join(rpmManifestDir, "container-manifest-2")
+
+	os.MkdirAll(rpmManifestDir, os.ModePerm)
+
+	shell.ExecuteAndLogToFile(manifest1Path, "rpm", "--dbpath", rpmDir, "-qa")
+	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\n")
+
 	return
 }
 
@@ -2212,7 +2236,7 @@ func stopGPGAgent(installChroot *safechroot.Chroot) {
 	installChroot.UnsafeRun(func() error {
 		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
 		if err != nil {
-			// This is non-fatal, as there is no guarentee the image has gpg agent started.
+			// This is non-fatal, as there is no guarantee the image has gpg agent started.
 			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
 		}
 
