@@ -22804,8 +22804,8 @@
         "type": "other",
         "other": {
           "name": "python-iniparse",
-          "version": "0.4",
-          "downloadUrl": "https://files.pythonhosted.org/packages/0f/d1/3090ef9be165da5ddb1b0cf2b332d3282588bdd2dd0967e94b547f10055f/iniparse-0.4.tar.gz"
+          "version": "0.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/4c/9a/02beaf11fc9ea7829d3a9041536934cd03990e09c359724f99ee6bd2b41b/iniparse-0.5.tar.gz"
         }
       }
     },
