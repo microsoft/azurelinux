@@ -45,7 +45,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
 %check
-# Disable fuzz testing as it has compile error for the realeased version.
+# Disable fuzz testing as it has compile error for the released version.
 sed -i 's/ fuzz//g' tests/Makefile
 make %{?_smp_mflags} check
 
