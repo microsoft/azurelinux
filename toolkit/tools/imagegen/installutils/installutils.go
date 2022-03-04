@@ -37,7 +37,7 @@ const (
 	// rpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
 	rpmDependenciesDirectory = "/var/lib/rpm"
 
-	// rpmManifestDirectory is the directory containing manifests of installed packages
+	// rpmManifestDirectory is the directory containing manifests of installed packages to support distroless vulnerability scanning tools.
 	rpmManifestDirectory = "/var/lib/rpmmanifest"
 
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
