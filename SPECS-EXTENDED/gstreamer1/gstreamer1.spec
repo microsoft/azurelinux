@@ -61,9 +61,10 @@ developing applications that use %{name}.
 
 %build
 %meson	\
-  -D package-name='Fedora GStreamer package' \
-  -D package-origin='http://download.fedoraproject.org' \
-  -D tests=disabled -D examples=disabled \
+  -D package-name='CBL-Mariner GStreamer package' \
+  -D package-origin='https://packages.microsoft.com/cbl-mariner/2.0' \
+  -D tests=disabled \
+  -D examples=disabled \
   -D ptp-helper-permissions=capabilities \
   -D dbghelp=disabled \
   -D doc=disabled \
