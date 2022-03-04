@@ -1,17 +1,14 @@
 # The function of bootstrap is that it disables the wheel subpackage
-%bcond_with bootstrap
-
 %global pypi_name wheel
 %global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
-
 %global _description \
 A built-package format for Python.\
 \
 A wheel is a ZIP-format archive with a specially formatted filename and the\
 .whl extension. It is designed to contain all the files for a PEP 376\
 compatible install in a way that is very close to the on-disk format.
-
+%bcond_with bootstrap
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
 Version:        0.33.6
@@ -21,11 +18,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
-
 BuildArch:      noarch
-
 %{?python_enable_dependency_generator}
-
 %if %{with_check}
 # several tests compile extensions
 # those tests are skipped if gcc is not found
@@ -39,13 +33,12 @@ BuildRequires:  gcc
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-
 %if %{with_check}
-BuildRequires:  python3-pytest
-BuildRequires:  python3-six
+BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-pip
-BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-pytest
+BuildRequires:  python3-six
 %endif
 
 %description -n python3-%{pypi_name} %{_description}
@@ -71,7 +64,7 @@ test -s wheel/cli/install.py || echo "# empty" > wheel/cli/install.py
 %py3_build
 
 %if %{without bootstrap}
-%py3_build_wheel
+%{py3_build_wheel}
 %endif
 
 
