@@ -16043,16 +16043,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "perftest",
-          "version": "4.4",
-          "downloadUrl": "https://github.com/linux-rdma/perftest/releases/download/4.4-0.29/perftest-4.4-0.29.g817ec38.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "perl",
           "version": "5.32.0",
           "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz"
