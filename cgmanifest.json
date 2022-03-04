@@ -7079,16 +7079,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ibus-libpinyin",
-          "version": "1.11.92",
-          "downloadUrl": "http://downloads.sourceforge.net/libpinyin/ibus-libpinyin/ibus-libpinyin-1.11.92.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ibus-libzhuyin",
           "version": "1.9.1",
           "downloadUrl": "http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/ibus-libzhuyin-1.9.1.tar.gz"
