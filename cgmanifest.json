@@ -104,16 +104,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "advancecomp",
-          "version": "2.1",
-          "downloadUrl": "https://github.com/amadvance/advancecomp/releases/download/v2.1/advancecomp-2.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "adwaita-icon-theme",
           "version": "3.36.1",
           "downloadUrl": "https://download.gnome.org/sources/adwaita-icon-theme/3.36/adwaita-icon-theme-3.36.1.tar.xz"
@@ -1227,8 +1217,8 @@
         "type": "other",
         "other": {
           "name": "bluez",
-          "version": "5.55",
-          "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.55.tar.xz"
+          "version": "5.63",
+          "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz"
         }
       }
     },
@@ -1906,36 +1896,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "clutter",
-          "version": "1.26.4",
-          "downloadUrl": "https://download.gnome.org/sources/clutter/1.26/clutter-1.26.4.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "clutter-gst3",
-          "version": "3.0.27",
-          "downloadUrl": "https://download.gnome.org/sources/clutter-gst/3.0/clutter-gst-3.0.27.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "clutter-gtk",
-          "version": "1.8.4",
-          "downloadUrl": "http://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-1.8.4.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cmake",
           "version": "3.21.4",
           "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
@@ -1979,16 +1939,6 @@
           "name": "cni-plugins",
           "version": "0.9.1",
           "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "cogl",
-          "version": "1.22.8",
-          "downloadUrl": "http://download.gnome.org/sources/cogl/1.22/cogl-1.22.8.tar.xz"
         }
       }
     },
@@ -2209,16 +2159,6 @@
           "name": "cpprest",
           "version": "2.10.18",
           "downloadUrl": "https://github.com/microsoft/cpprestsdk/archive/2.10.18.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "cpptest",
-          "version": "1.1.2",
-          "downloadUrl": "http://downloads.sourceforge.net/cpptest/cpptest-1.1.2.tar.gz"
         }
       }
     },
@@ -3448,8 +3388,8 @@
         "type": "other",
         "other": {
           "name": "exempi",
-          "version": "2.5.1",
-          "downloadUrl": "http://libopenraw.freedesktop.org/download/exempi-2.5.1.tar.bz2"
+          "version": "2.6.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/libopenraw/exempi/-/archive/2.6.1/exempi-2.6.1.tar.bz2"
         }
       }
     },
@@ -4549,16 +4489,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "glog",
-          "version": "0.3.5",
-          "downloadUrl": "https://github.com/google/glog/archive/v0.3.5/glog-0.3.5.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "glusterfs",
           "version": "7.9",
           "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
@@ -5100,8 +5030,8 @@
         "type": "other",
         "other": {
           "name": "gstreamer1",
-          "version": "1.16.2",
-          "downloadUrl": "http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.16.2.tar.xz"
+          "version": "1.20.0",
+          "downloadUrl": "http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.0.tar.xz"
         }
       }
     },
@@ -7149,16 +7079,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ibus-libpinyin",
-          "version": "1.11.92",
-          "downloadUrl": "http://downloads.sourceforge.net/libpinyin/ibus-libpinyin/ibus-libpinyin-1.11.92.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ibus-libzhuyin",
           "version": "1.9.1",
           "downloadUrl": "http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/ibus-libzhuyin-1.9.1.tar.gz"
@@ -7313,16 +7233,6 @@
           "name": "im-chooser",
           "version": "1.7.3",
           "downloadUrl": "https://releases.pagure.org/im-chooser/im-chooser-1.7.3.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "imake",
-          "version": "1.0.8",
-          "downloadUrl": "https://www.x.org/pub/individual/util/imake-1.0.8.tar.bz2"
         }
       }
     },
@@ -9120,16 +9030,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libchamplain",
-          "version": "0.12.20",
-          "downloadUrl": "https://download.gnome.org/sources/libchamplain/0.12/libchamplain-0.12.20.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libchewing",
           "version": "0.5.1",
           "downloadUrl": "https://github.com/chewing/libchewing/archive/v0.5.1.tar.gz"
@@ -9431,8 +9331,8 @@
         "type": "other",
         "other": {
           "name": "libell",
-          "version": "0.32",
-          "downloadUrl": "https://www.kernel.org/pub/linux/libs/ell/ell-0.32.tar.xz"
+          "version": "0.48",
+          "downloadUrl": "https://www.kernel.org/pub/linux/libs/ell/ell-0.48.tar.xz"
         }
       }
     },
@@ -10811,8 +10711,8 @@
         "type": "other",
         "other": {
           "name": "libproxy",
-          "version": "0.4.15",
-          "downloadUrl": "https://github.com/libproxy/libproxy/archive/0.4.15.tar.gz"
+          "version": "0.4.17",
+          "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.4.17.tar.gz"
         }
       }
     },

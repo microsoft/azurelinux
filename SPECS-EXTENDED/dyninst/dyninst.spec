@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 6%{?dist}
+Release: 7%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: http://www.dyninst.org
@@ -15,6 +15,7 @@ Patch1: dyninst-10.1.0-result.patch
 Patch2: testsuite-10.1.0-gettid.patch
 Patch3: testsuite-10.1.0-386.patch
 Patch4: dyninst-10.1.0-aarch-regs.patch
+Patch5: gcc-11-fix.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{version}
@@ -89,6 +90,7 @@ making sure that dyninst works properly.
 %patch2 -p1 -b.gettid
 %patch3 -p1 -b.386
 %patch4 -p1 -b.aarch
+%patch5 -p1
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -191,6 +193,10 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.1.0-7
+- Adding a patch to enable compilation for GCC 11.
+- License verified.
+
 * Thu Sep 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.1.0-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removing unsued BR on 'nasm'.

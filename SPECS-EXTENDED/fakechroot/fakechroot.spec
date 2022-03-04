@@ -7,15 +7,21 @@ Summary:        Gives a fake chroot environment
 License:        LGPLv2+
 URL:            https://github.com/dex4er/fakechroot
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch1:         https://github.com/dex4er/fakechroot/commit/b42d1fb9538f680af2f31e864c555414ccba842a.patch
+Patch2:         https://github.com/dex4er/fakechroot/pull/85/commits/534e6d555736b97211523970d378dfb0db2608e9.patch
+Patch3:         https://github.com/dex4er/fakechroot/pull/85/commits/75d7e6fa191c11a791faff06a0de86eaa7801d05.patch
+Patch4:         https://github.com/dex4er/fakechroot/pull/85/commits/693a3597ea7fccfb62f357503ff177bd3e3d5a89.patch
+Patch5:         https://github.com/dex4er/fakechroot/pull/86.patch
 
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires:  make
 BuildRequires:  gcc
 # Required for manpage
 BuildRequires:  /usr/bin/pod2man
-BuildRequires:  perl-generators
+BuildRequires:  gdbm-devel
 # ldd.fakechroot
 Requires:       /usr/bin/objdump
 
@@ -40,15 +46,7 @@ chmod -x scripts/{relocatesymlinks,restoremode,savemode}.sh
 %build
 autoreconf -vfi
 
-%ifnarch noarch
-%if 0%{__isa_bits} == 64
-%configure --disable-static --disable-silent-rules --with-libpath="%{_libdir}/fakechroot:/usr/lib/fakechroot"
-%else
 %configure --disable-static --disable-silent-rules --with-libpath="%{_libdir}/fakechroot"
-%endif
-%else
-%configure --disable-static --disable-silent-rules --with-libpath="%{_libdir}/fakechroot"
-%endif
 
 %make_build
 
@@ -78,6 +76,10 @@ find %{buildroot}%{_libdir} -name '*.la' -delete -print
 %{_libdir}/%{name}/
 
 %changelog
+* Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20.1-4
+- Apply Fedora 36 patches (license: MIT) to fix compilation with GCC 11.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.20.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
