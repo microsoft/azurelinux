@@ -8820,16 +8820,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libappindicator",
-          "version": "12.10.0",
-          "downloadUrl": "https://launchpad.net/libappindicator/12.10/12.10.0/+download/libappindicator-12.10.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libappstream-glib",
           "version": "0.7.17",
           "downloadUrl": "http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.7.17.tar.xz"
@@ -9863,16 +9853,6 @@
           "name": "libimobiledevice",
           "version": "1.2.1",
           "downloadUrl": "http://www.libimobiledevice.org/downloads/libimobiledevice-1.2.0.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libindicator",
-          "version": "12.10.1",
-          "downloadUrl": "https://launchpad.net/libindicator/12.10/12.10.1/+download/libindicator-12.10.1.tar.gz"
         }
       }
     },
