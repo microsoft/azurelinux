@@ -1,0 +1,102 @@
+From b42d1fb9538f680af2f31e864c555414ccba842a Mon Sep 17 00:00:00 2001
+From: Piotr Roszatycki <piotr.roszatycki@gmail.com>
+Date: Mon, 10 Feb 2020 13:59:10 -0800
+Subject: [PATCH] New `statx` function
+
+---
+ NEWS.md         |  1 +
+ configure.ac    |  1 +
+ src/Makefile.am |  1 +
+ src/statx.c     | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 47 insertions(+)
+ create mode 100644 src/statx.c
+
+diff --git a/NEWS.md b/NEWS.md
+index 9de12fe..f1210bf 100644
+--- a/NEWS.md
++++ b/NEWS.md
+@@ -1,5 +1,10 @@
+ # NEWS
+ 
++XX Xxx XXXX
++
++* UNRELEASED
++* New `statx(2)` function was added: glibc supports it since 2.28.
++
+ ## Version 2.20.1
+ 
+ 22 Mar 2019
+diff --git a/configure.ac b/configure.ac
+index a654edd..f8cdb32 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -277,6 +277,7 @@ AC_CHECK_FUNCS(m4_normalize([
+     statfs64
+     statvfs
+     statvfs64
++    statx
+     stpcpy
+     strchrnul
+     strlcpy
+diff --git a/src/Makefile.am b/src/Makefile.am
+index d729b0e..6066345 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -152,6 +152,7 @@ libfakechroot_la_SOURCES = \
+     statfs64.c \
+     statvfs.c \
+     statvfs64.c \
++    statx.c \
+     stpcpy.c \
+     strchrnul.c \
+     strchrnul.h \
+diff --git a/src/statx.c b/src/statx.c
+new file mode 100644
+index 0000000..524f73e
+--- /dev/null
++++ b/src/statx.c
+@@ -0,0 +1,44 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010-2020 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE_STATX
++
++#define _GNU_SOURCE
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++
++#include "libfakechroot.h"
++
++
++wrapper(statx, int, (int dirfd, const char * pathname, int flags, unsigned int mask, struct statx * statxbuf))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("statx(%d, \"%s\", %d, %u, &statxbuf)", dirfd, pathname, flags, mask);
++    expand_chroot_path_at(dirfd, pathname);
++    return nextcall(statx)(dirfd, pathname, flags, mask, statxbuf);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
