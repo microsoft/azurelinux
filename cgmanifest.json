@@ -27757,8 +27757,8 @@
         "type": "other",
         "other": {
           "name": "strace",
-          "version": "5.1",
-          "downloadUrl": "https://strace.io/files/5.1/strace-5.1.tar.xz"
+          "version": "5.16",
+          "downloadUrl": "https://strace.io/files/5.16/strace-5.16.tar.xz"
         }
       }
     },
