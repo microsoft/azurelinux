@@ -9891,8 +9891,8 @@
         "type": "other",
         "other": {
           "name": "libipt",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/01org/processor-trace/archive/v2.0.1.tar.gz"
+          "version": "2.0.5",
+          "downloadUrl": "https://github.com/intel/libipt/archive/v2.0.5.tar.gz"
         }
       }
     },
