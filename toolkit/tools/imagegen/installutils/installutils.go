@@ -490,8 +490,11 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		}
 	}
 
-	// Generate list of installed packages
-	generateContainerManifests(installChroot)
+	if config.RemoveRpmDb {
+		// When the RemoveRpmDb flag is true, generate a list of installed packages since they cannot be queiried at runtime
+		logger.Log.Info("Generating manifest with package information since RemoveRpmDb is enabled.")
+		generateContainerManifests(installChroot)
+	}
 
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
@@ -502,8 +505,8 @@ func generateContainerManifests(installChroot *safechroot.Chroot) {
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
 	rpmDir := filepath.Join(installRoot, rpmDependenciesDirectory)
 	rpmManifestDir := filepath.Join(installRoot, rpmManifestDirectory)
-	manifest1Path := filepath.Join(rpmManifestDir, "container-manifest")
-	manifest2Path := filepath.Join(rpmManifestDir, "container-manifest-detailed")
+	manifest1Path := filepath.Join(rpmManifestDir, "container-manifest-1")
+	manifest2Path := filepath.Join(rpmManifestDir, "container-manifest-2")
 
 	os.MkdirAll(rpmManifestDir, os.ModePerm)
 
