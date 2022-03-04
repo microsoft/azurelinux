@@ -1,4 +1,3 @@
-%global __requires_exclude ^%{_bindir}/perl$
 Summary:        Tracks system calls that are made by a running process
 Name:           strace
 Version:        5.16
@@ -9,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Debuggers
 URL:            https://strace.io/
 Source0:        https://strace.io/files/%{version}/%{name}-%{version}.tar.xz
+%global __requires_exclude ^%{_bindir}/perl$
 BuildRequires:  libacl-devel
 BuildRequires:  libaio-devel
 
