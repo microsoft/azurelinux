@@ -8901,8 +8901,8 @@
         "type": "other",
         "other": {
           "name": "libblockdev",
-          "version": "2.24",
-          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.24-3.cm2/libblockdev-2.24.tar.gz"
+          "version": "2.26",
+          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.26-1/libblockdev-2.26.tar.gz"
         }
       }
     },
