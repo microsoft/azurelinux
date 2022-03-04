@@ -16,6 +16,7 @@ BuildRequires: python3-pytest
 BuildRequires: python3-setuptools
 %if %{with_check}
 BuildRequires: python3-pip
+BuildRequires: python3-six
 %endif
 
 
@@ -48,7 +49,7 @@ libraries so that they interoperate with py3cairo.
 %py3_install
 
 %check
-pip3 install six attrs>=17.4.0 atomicwrites>=1.0 more-itertools>=4.0.0 pluggy>=0.7
+pip3 install attrs>=17.4.0 atomicwrites>=1.0 more-itertools>=4.0.0 pluggy>=0.7
 %{__python3} setup.py test
 
 %files -n python3-cairo
