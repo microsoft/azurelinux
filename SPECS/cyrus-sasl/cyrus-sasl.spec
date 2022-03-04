@@ -1,7 +1,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.27
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch0:         CVE-2019-19906.patch
 # CVE-2020-8032 only applies to the packaging of openSUSE's version of cyrus-sasl
 # https://bugzilla.suse.com/show_bug.cgi?id=1180669
 Patch1:         CVE-2020-8032.nopatch
+Patch2: CVE-2022-24407.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  openssl-devel
@@ -129,6 +130,8 @@ make %{?_smp_mflags} check
 %{_mandir}/man8/saslauthd.8.gz
 
 %changelog
+*   Fri Mar 04 2022 Mariner Autopatcher <cblmargh@microsoft.com> 2.1.27-5
+-   Added patch file(s) CVE-2022-24407.patch
 * Fri Mar 05 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.27-5
 - Add nopatch for CVE-2020-8032
 - Lint spec
