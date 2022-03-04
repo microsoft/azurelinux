@@ -15,7 +15,7 @@ license_regex = re.compile(
     r"\b(license verified|verified license)\b", re.IGNORECASE)
 
 valid_release_tag_regex = re.compile(
-    r'^([1-9]\d*|%\{release_number\})%\{\?dist\}$')
+    r'^[1-9]\d*%\{\?dist\}$')
 
 valid_source_attributions_one_per_line = "\n".join(f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items())
 
@@ -28,21 +28,11 @@ def check_release_tag(spec_path: str):
         print(f"""
 ERROR: invalid 'Release' tag.
 
-    Accepted formats are:
-    - '[number]%{{?dist}}' (example: 10%{{?dist}}),
-    - '%{{release_number}}%{{?dist}}', where the value of 'release_number' must be a single number.
+    Accepted format is:
+
+        '[number]%{{?dist}}' (example: 10%{{?dist}})
 """)
         return False
-
-    if "release_number" in spec.release:
-        if not spec.macros["release_number"].isdigit():
-            print(f"""
-ERROR: invalid 'Release' tag.
-
-    The 'release_number' macro must be a plain number (no nested macros).
-    Found '{spec.macros["release_number"]}' instead.
-""")
-            return False
 
     return True
 
