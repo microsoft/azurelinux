@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.10.93.1
-Release:        4%{?dist}
+Version:        5.10.102.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,8 +10,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         CVE-2021-43976.patch
-Patch2:         CVE-2022-0435.patch
+Patch1:         CVE-2022-24958.patch
 BuildArch:      noarch
 
 %description
@@ -21,7 +20,6 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 make mrproper
@@ -41,6 +39,11 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-1
+- Update source to 5.10.102.1
+- Apply CVE-2022-24958.patch
+- Remove CVE-2021-43976.patch and CVE-2022-0435.patch
+
 * Fri Feb 11 2022 Vince Perri <viperri@microsoft.com> - 5.10.93.1-4
 - Bump release number to match kernel release
 
