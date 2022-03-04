@@ -1,13 +1,4 @@
 # The function of bootstrap is that it disables the wheel subpackage
-%global pypi_name wheel
-%global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
-%global python_wheeldir %{_datadir}/python-wheels
-%global _description \
-A built-package format for Python.\
-\
-A wheel is a ZIP-format archive with a specially formatted filename and the\
-.whl extension. It is designed to contain all the files for a PEP 376\
-compatible install in a way that is very close to the on-disk format.
 %bcond_with bootstrap
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
@@ -18,6 +9,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
+%global pypi_name wheel
+%global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
+%global python_wheeldir %{_datadir}/python-wheels
+%global _description \
+A built-package format for Python.\
+\
+A wheel is a ZIP-format archive with a specially formatted filename and the\
+.whl extension. It is designed to contain all the files for a PEP 376\
+compatible install in a way that is very close to the on-disk format.
 BuildArch:      noarch
 %{?python_enable_dependency_generator}
 %if %{with_check}
@@ -29,8 +29,8 @@ BuildRequires:  gcc
 %description %{_description}
 
 %package -n     python3-%{pypi_name}
-%{?python_provide:%python_provide python3-%{pypi_name}}
 Summary:        %{summary}
+%{?python_provide:%python_provide python3-%{pypi_name}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if %{with_check}
