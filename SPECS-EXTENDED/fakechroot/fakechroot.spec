@@ -21,7 +21,7 @@ BuildRequires:  make
 BuildRequires:  gcc
 # Required for manpage
 BuildRequires:  /usr/bin/pod2man
-BuildRequires:  gdbm-libs
+BuildRequires:  gdbm-devel
 # ldd.fakechroot
 Requires:       /usr/bin/objdump
 

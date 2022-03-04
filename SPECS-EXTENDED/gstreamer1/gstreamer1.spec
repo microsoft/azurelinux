@@ -30,7 +30,6 @@ BuildRequires:  check-devel
 BuildRequires:  gettext
 BuildRequires:  pkgconfig
 BuildRequires:  libcap-devel
-BuildRequires:  libunwind-devel
 BuildRequires:  elfutils-devel
 BuildRequires:  bash-completion
 
@@ -67,7 +66,8 @@ developing applications that use %{name}.
   -D tests=disabled -D examples=disabled \
   -D ptp-helper-permissions=capabilities \
   -D dbghelp=disabled \
-  -D doc=disabled
+  -D doc=disabled \
+  -D libunwind=disabled
 %meson_build
 
 %install
