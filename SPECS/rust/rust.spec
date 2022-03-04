@@ -24,7 +24,6 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-
 BuildRequires:  binutils
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -32,11 +31,10 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
+Provides:       cargo = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  python3-xml
 %endif
-
-Provides:       cargo = %{version}-%{release}
 
 %description
 Rust Programming Language
