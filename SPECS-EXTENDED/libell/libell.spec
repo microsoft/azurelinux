@@ -1,14 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libell
-Version:        0.32
-Release:        2%{?dist}
+Version:        0.48
+Release:        1%{?dist}
 Summary:        Embedded Linux library
 License:        LGPLv2+
 URL:            https://01.org/ell
 Source0:        https://www.kernel.org/pub/linux/libs/ell/ell-%{version}.tar.xz
 
 BuildRequires:  gcc
+BuildRequires:  make
 
 %description
 The Embedded Linux* Library (ELL) provides core, low-level functionality for
@@ -41,9 +42,11 @@ Headers for developing against libell.
 find %{buildroot} -type f -name "*.la" -delete
 
 
+%ldconfig_scriptlets
+
 %files
 %license COPYING
-%doc AUTHORS README TODO ChangeLog
+%doc AUTHORS ChangeLog
 %{_libdir}/libell.so.*
 
 
@@ -54,6 +57,10 @@ find %{buildroot} -type f -name "*.la" -delete
 
 
 %changelog
+* Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-1
+- Update to version 0.48.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.32-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

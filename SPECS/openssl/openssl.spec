@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Patch18:        openssl-1.1.1-fips-curves.patch
 Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
+Patch22:        openssl-1.1.1-fips-SymCrypt.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -133,6 +134,7 @@ cp %{SOURCE4} test/
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+# %patch22 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -324,6 +326,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 1.1.1k-9
+- Add optional patch to use SymCrypt as default engine
+
 * Sun Jan 23 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1k-8
 - Add build requires for perl dependencies
 
@@ -340,7 +345,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 * Tue Jun 15 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-4
 - In FIPS mode, use jitterentropy for DRBG nonce.
 - In FIPS mode, concatenate Linux RNG with personalization string during DRBG instantiation
-- In FIPS mode, concatenate Linux RNG with additional input string during DRBG reseed 
+- In FIPS mode, concatenate Linux RNG with additional input string during DRBG reseed
 
 * Tue May 18 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-3
 - In FIPS mode, use only jitterentropy for entropy pool

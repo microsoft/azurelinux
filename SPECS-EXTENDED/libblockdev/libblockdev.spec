@@ -1,6 +1,8 @@
+%define release_number %(echo "%{release}" | cut -d. -f1)
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%define with_python2 1
+%define with_python2 0
 %define with_python3 1
 %define with_gtk_doc 1
 %define with_bcache 1
@@ -17,14 +19,12 @@ Distribution:   Mariner
 %define with_part 1
 %define with_fs 1
 %define with_nvdimm 1
-%define with_vdo 1
+%define with_vdo 0
 %define with_gi 1
 %define with_escrow 1
 %define with_dmraid 1
 %define with_tools 1
 
-# python2 is not available on RHEL > 7 and not needed on Fedora > 29
-%define with_python2 0
 %define python2_copts --without-python2
 
 # bcache is not available on RHEL
@@ -117,23 +117,18 @@ Distribution:   Mariner
 %define configure_opts %{?python2_copts} %{?python3_copts} %{?bcache_copts} %{?lvm_dbus_copts} %{?btrfs_copts} %{?crypto_copts} %{?dm_copts} %{?loop_copts} %{?lvm_copts} %{?lvm_dbus_copts} %{?mdraid_copts} %{?mpath_copts} %{?swap_copts} %{?kbd_copts} %{?part_copts} %{?fs_copts} %{?nvdimm_copts} %{?vdo_copts} %{?tools_copts} %{?gi_copts}
 
 Name:        libblockdev
-Version:     2.24
-Release:     3%{?dist}
+Version:     2.26
+Release:     1%{?dist}
 Summary:     A library for low-level manipulation with block devices
 License:     LGPLv2+
 URL:         https://github.com/storaged-project/libblockdev
-Source0:     https://github.com/storaged-project/libblockdev/releases/download/%{version}-%{release}/%{name}-%{version}.tar.gz
-Patch0:      0001-Fix-setting-locale-for-util-calls.patch
+Source0:     https://github.com/storaged-project/libblockdev/releases/download/%{version}-%{release_number}/%{name}-%{version}.tar.gz
+Patch0:      0001-s390-Remove-double-fclose-in-bd_s390_dasd_online-204.patch
 
+BuildRequires: make
 BuildRequires: glib2-devel
 %if %{with_gi}
 BuildRequires: gobject-introspection-devel
-%endif
-%if %{with_python2}
-BuildRequires: python2-devel
-%else
-# Obsolete the python2 subpackage to avoid errors on upgrade
-Obsoletes:     python2-blockdev < %{version}-%{release}
 %endif
 %if %{with_python3}
 BuildRequires: python3-devel
@@ -169,20 +164,6 @@ Requires: glib2-devel
 %description devel
 This package contains header files and pkg-config files needed for development
 with the libblockdev library.
-
-%if %{with_python2}
-%package -n python2-blockdev
-Summary:     Python2 gobject-introspection bindings for libblockdev
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-
-Requires: python2-gobject-base
-%{?python_provide:%python_provide python2-blockdev}
-
-%description -n python2-blockdev
-This package contains enhancements to the gobject-introspection bindings for
-libblockdev in Python2.
-%endif
 
 %if %{with_python3}
 %package -n python3-blockdev
@@ -378,8 +359,6 @@ BuildRequires: device-mapper-devel
 Summary:     The LVM plugin for the libblockdev library
 Requires: %{name}-utils%{?_isa} >= 0.11
 Requires: lvm2
-# for thin_metadata_size
-Requires: device-mapper-persistent-data
 
 %description lvm
 The libblockdev library plugin (and in the same time a standalone library)
@@ -402,8 +381,6 @@ BuildRequires: device-mapper-devel
 Summary:     The LVM plugin for the libblockdev library
 Requires: %{name}-utils%{?_isa} >= 1.4
 Requires: lvm2-dbusd >= 2.02.156
-# for thin_metadata_size
-Requires: device-mapper-persistent-data
 
 %description lvm-dbus
 The libblockdev library plugin (and in the same time a standalone library)
@@ -449,7 +426,7 @@ with the libblockdev-mdraid plugin/library.
 BuildRequires: device-mapper-devel
 Summary:     The multipath plugin for the libblockdev library
 Requires: %{name}-utils%{?_isa} >= 0.11
-Requires: device-mapper-multipath
+Recommends: device-mapper-multipath
 
 %description mpath
 The libblockdev library plugin (and in the same time a standalone library)
@@ -748,7 +725,6 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license LICENSE
 %{_libdir}/libblockdev.so.*
 %if %{with_gi}
@@ -770,11 +746,6 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 %endif
 %if %{with_gi}
 %{_datadir}/gir*/BlockDev*.gir
-%endif
-
-%if %{with_python2}
-%files -n python2-blockdev
-%{python2_sitearch}/gi/overrides/*
 %endif
 
 %if %{with_python3}
@@ -975,6 +946,10 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 %files plugins-all
 
 %changelog
+* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.26-1
+- Updating to version 2.26 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Mon Mar 16 2021 Henry Li <lihl@microsoft.com> - 2.24-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disable python2 build and enable python3 build

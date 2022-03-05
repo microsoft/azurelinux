@@ -1,7 +1,7 @@
 Summary:        Mobile broadband modem manager
 Name:           ModemManager
 Version:        1.18.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,8 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  libqmi-devel
 %if %{with_check}
 BuildRequires:  dbus-glib
+BuildRequires:  python3-gobject
+BuildRequires:  python3-dbus
 %endif
 Requires:       glib
 Requires:       gobject-introspection
@@ -78,6 +80,9 @@ make  %{?_smp_mflags} check
 %{_libdir}/libmm-glib.la
 
 %changelog
+* Mon Feb 28 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.18.6-2
+- Adding python3-gobject, python3-dbus check BRs to satisfy regressed ptest.
+
 * Fri Feb 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.18.6-1
 - Upgrading to v1.18.6
 - License verified.
