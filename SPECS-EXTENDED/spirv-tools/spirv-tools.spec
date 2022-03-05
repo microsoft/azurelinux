@@ -1,5 +1,3 @@
-%undefine __cmake_in_source_build
-
 Name:           spirv-tools
 Version:        2022.1
 Release:        1%{?dist}
@@ -43,13 +41,16 @@ Development files for %{name}
 %autosetup -p1 -n SPIRV-Tools-%{version}
 
 %build
+%__mkdir_p %_target_platform
+pushd %_target_platform
 %cmake3 -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBDIR=%{_lib} \
         -DSPIRV-Headers_SOURCE_DIR=%{_prefix} \
         -DPYTHON_EXECUTABLE=%{__python3} \
         -DSPIRV_TOOLS_BUILD_STATIC=OFF \
-        -GNinja
+        -GNinja ..
 %cmake3_build
+popd
 
 %install
 %cmake3_install
