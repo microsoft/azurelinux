@@ -3,7 +3,7 @@
 #
 # Dockerfile to Mariner toolchain from scratch
 #
-FROM ubuntu:18.04
+FROM cblmariner.azurecr.io/base/core:1.0
 
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
@@ -14,15 +14,13 @@ COPY [ "./version-check-container.sh", \
        "$LFS/tools/" ]
 
 # Install toolchain build dependencies
-RUN apt-get update -y -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get -yq install \
+RUN tdnf install -y \
+    build-essential \
     bison \
     gawk \
     gcc \
-    g++ \
     make \
     patch \
-    python-aptdaemon \
     rpm \
     texinfo \
     sudo \
@@ -33,8 +31,10 @@ RUN apt-get update -y -qq && \
     unzip \
     zip \
     ccache \
-    flex && \
-    apt-get clean && \
+    flex \
+    byacc \
+    ca-certificates \
+    perl && \
     ln    -sf bash /bin/sh && \
     mkdir -pv $LFS/sources && \
     chmod -v a+wt $LFS/sources && \
@@ -56,14 +56,14 @@ COPY [ "./toolchain-sha256sums", \
 # the naming convention of the source cache (convention used to prevent naming collisions).
 WORKDIR $LFS/sources
 RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz -O kernel-5.15.18.1.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz -O kernel-5.15.18.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
     useradd -s /bin/bash -g lfs -m -k /dev/null lfs && \
-    echo "lfs:lfs" | chpasswd && \
-    adduser lfs sudo && \
+    echo "lfs:lf2asfasf" | chpasswd && \
+    usermod -a -G sudo lfs && \
     chown -v lfs $LFS/tools && \
     chown -v lfs $LFS/sources && \
     chown -Rv lfs $LFS/logs && \
