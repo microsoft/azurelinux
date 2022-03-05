@@ -1,14 +1,14 @@
 Summary:        Converts markdown into roff (man pages)
 Name:           go-md2man
-Version:        2.0.0
+Version:        2.0.1
 Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Tools/Container
 URL:            https://github.com/cpuguy83/go-md2man
-#Source0:       https://github.com/cpuguy83/go-md2man/archive/v2.0.0.tar.gz
-Source0:        go-md2man-2.0.0.tar.gz
+#Source0:       https://github.com/cpuguy83/go-md2man/archive/v2.0.1.tar.gz
+Source0:        go-md2man-%{version}.tar.gz
 BuildRequires:  golang
 BuildRequires:  which
 # required packages on install
@@ -32,16 +32,16 @@ export GOCACHE=%{OUR_GOPATH}/.cache
 export CGO_ENABLED=0
 export GO111MODULE=on
 
-cd %{_topdir}/BUILD/%{name}-%{version}/go-md2man-2.0.0
+cd %{_topdir}/BUILD/%{name}-%{version}/go-md2man-%{version}
 go build -mod vendor -o go-md2man
 
 %install
 mkdir -p "%{buildroot}%{_bindir}"
-cp -aT go-md2man-2.0.0/go-md2man %{buildroot}%{_bindir}/go-md2man
+cp -aT go-md2man-%{version}/go-md2man %{buildroot}%{_bindir}/go-md2man
 
 # copy legal files
 mkdir -p %{buildroot}%{_docdir}/%{name}-%{version}
-cp go-md2man-2.0.0/LICENSE.md %{buildroot}%{_docdir}/%{name}-%{version}/LICENSE.md
+cp go-md2man-%{version}/LICENSE.md %{buildroot}%{_docdir}/%{name}-%{version}/LICENSE.md
 
 %files
 %license %{_docdir}/%{name}-%{version}/LICENSE.md
