@@ -169,13 +169,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/qv4l2.desktop
 %files -n qv4l2
 %doc README
 %{_bindir}/qv4l2
-%{_bindir}/qvidcap
 %{_datadir}/applications/qv4l2.desktop
-%{_datadir}/applications/qvidcap.desktop
 %{_datadir}/icons/hicolor/*/apps/qv4l2.*
-%{_datadir}/icons/hicolor/*/apps/qvidcap.*
 %{_mandir}/man1/qv4l2.1*
-%{_mandir}/man1/qvidcap.1*
 
 %files -n libv4l
 %doc ChangeLog README.libv4l TODO
