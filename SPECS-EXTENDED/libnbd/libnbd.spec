@@ -2,19 +2,19 @@
 %global patches_touch_autotools %{nil}
 
 # The source directory.
-%global source_directory 1.3-development
+%global source_directory 1.12-stable
 
 Name:           libnbd
-Version:        1.3.6
-Release:        3%{?dist}
+Version:        1.12.1
+Release:        1%{?dist}
 Summary:        NBD client library in userspace
 
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/libguestfs/libnbd
+URL:            https://gitlab.com/nbdkit/libnbd
 
-Source0:        http://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
+Source0:        https://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
 
 %if 0%{patches_touch_autotools}
 BuildRequires: autoconf, automake, libtool
@@ -22,12 +22,13 @@ BuildRequires: autoconf, automake, libtool
 
 # For the core library.
 BuildRequires:  gcc
+BuildRequires:  make
 BuildRequires:  /usr/bin/pod2man
 BuildRequires:  gnutls-devel
 BuildRequires:  libxml2-devel
 
 # For nbdfuse.
-BuildRequires:  fuse, fuse-devel
+BuildRequires:  fuse3, fuse3-devel
 
 # For the Python 3 bindings.
 BuildRequires:  python3-devel
@@ -35,6 +36,7 @@ BuildRequires:  python3-devel
 # For the OCaml bindings.
 BuildRequires:  ocaml
 BuildRequires:  ocaml-findlib-devel
+BuildRequires:  ocaml-ocamldoc
 
 # Only for building the examples.
 BuildRequires:  glib2-devel
@@ -43,17 +45,14 @@ BuildRequires:  glib2-devel
 BuildRequires:  bash-completion
 
 # Only for running the test suite.
+BuildRequires:  coreutils
+BuildRequires:  gcc-c++
 BuildRequires:  gnutls-utils
-%if 0%{?fedora} >= 31
-BuildRequires:  nbdkit
-BuildRequires:  nbdkit-memory-plugin
-BuildRequires:  nbdkit-null-plugin
-BuildRequires:  nbdkit-pattern-plugin
-BuildRequires:  nbdkit-sh-plugin
-%endif
+BuildRequires:  iproute
+BuildRequires:  jq
 BuildRequires:  nbd
 BuildRequires:  qemu-img
-BuildRequires:  gcc-c++
+BuildRequires:  util-linux
 
 
 %description
@@ -79,7 +78,7 @@ The key features are:
 
 %package devel
 Summary:        Development headers for %{name}
-License:        BSD and LGPLv2+
+License:        LGPLv2+ and BSD
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 
@@ -98,7 +97,7 @@ This package contains OCaml language bindings for %{name}.
 
 %package -n ocaml-%{name}-devel
 Summary:        OCaml language development package for %{name}
-License:        BSD and LGPLv2+
+License:        LGPLv2+ and BSD
 Requires:       ocaml-%{name}%{?_isa} = %{version}-%{release}
 
 
@@ -124,8 +123,9 @@ python3-%{name} contains Python 3 bindings for %{name}.
 
 %package -n nbdfuse
 Summary:        FUSE support for %{name}
-License:        BSD and LGPLv2+
+License:        LGPLv2+ and BSD
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Recommends:     fuse3
 
 
 %description -n nbdfuse
@@ -177,15 +177,23 @@ rm $RPM_BUILD_ROOT%{_mandir}/man3/libnbd-golang.3*
 
 
 %check
+function skip_test ()
+{
+    for f in "$@"; do
+        rm -f "$f"
+        echo 'exit 77' > "$f"
+        chmod +x "$f"
+    done
+}
 
 # All fuse tests fail in Koji with:
 # fusermount: entry for fuse/test-*.d not found in /etc/mtab
 # for unknown reasons but probably related to the Koji environment.
-for f in fuse/test-*.sh; do
-    rm $f
-    touch $f
-    chmod +x $f
-done
+skip_test fuse/test-*.sh
+
+# IPv6 loopback connections fail in Koji.
+make -C tests connect-tcp6 ||:
+skip_test tests/connect-tcp6
 
 make %{?_smp_mflags} check || {
     for f in $(find -name test-suite.log); do
@@ -200,7 +208,11 @@ make %{?_smp_mflags} check || {
 %files
 %doc README
 %license COPYING.LIB
+%{_bindir}/nbdcopy
+%{_bindir}/nbdinfo
 %{_libdir}/libnbd.so.*
+%{_mandir}/man1/nbdcopy.1*
+%{_mandir}/man1/nbdinfo.1*
 
 
 %files devel
@@ -233,6 +245,8 @@ make %{?_smp_mflags} check || {
 %{_libdir}/ocaml/nbd/*.cmx
 %{_libdir}/ocaml/nbd/*.mli
 %{_mandir}/man3/libnbd-ocaml.3*
+%{_mandir}/man3/NBD.3*
+%{_mandir}/man3/NBD.*.3*
 
 
 %files -n python3-%{name}
@@ -251,11 +265,16 @@ make %{?_smp_mflags} check || {
 
 %files bash-completion
 %dir %{_datadir}/bash-completion/completions
+%{_datadir}/bash-completion/completions/nbdcopy
 %{_datadir}/bash-completion/completions/nbdfuse
+%{_datadir}/bash-completion/completions/nbdinfo
 %{_datadir}/bash-completion/completions/nbdsh
 
 
 %changelog
+* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.1-1
+- Updating to version 1.12.1 using Fedora 36 spec (license: MIT) for guidance.
+
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.6-3
 - Removing in-spec verification of source tarballs.
 - License verified.

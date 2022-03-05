@@ -7270,6 +7270,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "infinipath-psm",
+          "version": "3.3",
+          "downloadUrl": "https://github.com/intel/psm/archive/refs/tags/v3.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "iniparser",
           "version": "4.1",
           "downloadUrl": "https://github.com/ndevilla/iniparser/archive/v4.1.tar.gz"
@@ -8810,16 +8820,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libappindicator",
-          "version": "12.10.0",
-          "downloadUrl": "https://launchpad.net/libappindicator/12.10/12.10.0/+download/libappindicator-12.10.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libappstream-glib",
           "version": "0.7.17",
           "downloadUrl": "http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.7.17.tar.xz"
@@ -8901,8 +8901,8 @@
         "type": "other",
         "other": {
           "name": "libblockdev",
-          "version": "2.24",
-          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.24-3.cm2/libblockdev-2.24.tar.gz"
+          "version": "2.26",
+          "downloadUrl": "https://github.com/storaged-project/libblockdev/releases/download/2.26-1/libblockdev-2.26.tar.gz"
         }
       }
     },
@@ -9860,16 +9860,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libindicator",
-          "version": "12.10.1",
-          "downloadUrl": "https://launchpad.net/libindicator/12.10/12.10.1/+download/libindicator-12.10.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libinput",
           "version": "1.16.4",
           "downloadUrl": "https://www.freedesktop.org/software/libinput/libinput-1.16.4.tar.xz"
@@ -9901,8 +9891,8 @@
         "type": "other",
         "other": {
           "name": "libipt",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/01org/processor-trace/archive/v2.0.1.tar.gz"
+          "version": "2.0.5",
+          "downloadUrl": "https://github.com/intel/libipt/archive/v2.0.5.tar.gz"
         }
       }
     },
@@ -10301,8 +10291,8 @@
         "type": "other",
         "other": {
           "name": "libnbd",
-          "version": "1.3.6",
-          "downloadUrl": "http://libguestfs.org/download/libnbd/1.3-development/libnbd-1.3.6.tar.gz"
+          "version": "1.12.1",
+          "downloadUrl": "https://libguestfs.org/download/libnbd/1.12-stable/libnbd-1.12.1.tar.gz"
         }
       }
     },
@@ -10533,16 +10523,6 @@
           "name": "libomp",
           "version": "10.0.1",
           "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1/openmp-10.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libomxil-bellagio",
-          "version": "0.9.3",
-          "downloadUrl": "http://downloads.sourceforge.net/omxil/libomxil-bellagio-0.9.3.tar.gz"
         }
       }
     },
@@ -11262,7 +11242,7 @@
         "other": {
           "name": "libtnc",
           "version": "1.25",
-          "downloadUrl": "http://dl.sourceforge.net/sourceforge/libtnc/libtnc-1.25.tar.gz"
+          "downloadUrl": "https://sourceforge.net/projects/libtnc/files/libtnc/1.25/libtnc-1.25.tar.gz"
         }
       }
     },
@@ -11620,29 +11600,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libwpd",
-          "version": "0.10.3",
-          "downloadUrl": "http://downloads.sourceforge.net/libwpd/libwpd-0.10.3.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libwpe",
           "version": "1.6.0",
           "downloadUrl": "https://github.com/WebPlatformForEmbedded/libwpe/releases/download/1.6.0/libwpe-1.6.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libwpg",
-          "version": "0.3.3",
-          "downloadUrl": "http://download.sourceforge.net/libwpg/libwpg-0.3.3.tar.xz"
         }
       }
     },
@@ -13683,8 +13643,8 @@
         "type": "other",
         "other": {
           "name": "mod_security",
-          "version": "2.9.3",
-          "downloadUrl": "https://github.com/SpiderLabs/ModSecurity/releases/download/v2.9.3/modsecurity-2.9.3.tar.gz"
+          "version": "2.9.4",
+          "downloadUrl": "https://github.com/SpiderLabs/ModSecurity/releases/download/v2.9.4/modsecurity-2.9.4.tar.gz"
         }
       }
     },
@@ -16076,16 +16036,6 @@
           "name": "PEGTL",
           "version": "2.8.3",
           "downloadUrl": "https://github.com/taocpp/PEGTL/archive/2.8.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "perftest",
-          "version": "4.4",
-          "downloadUrl": "https://github.com/linux-rdma/perftest/releases/download/4.4-0.29/perftest-4.4-0.29.g817ec38.tar.gz"
         }
       }
     },
@@ -25343,6 +25293,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "resource-agents",
+          "version": "4.10.0",
+          "downloadUrl": "https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rest",
           "version": "0.9.0",
           "downloadUrl": "https://download.gnome.org/sources/rest/0.9/rest-0.9.0.tar.xz"
@@ -28957,8 +28917,8 @@
         "type": "other",
         "other": {
           "name": "v4l-utils",
-          "version": "1.18.0",
-          "downloadUrl": "http://linuxtv.org/downloads/v4l-utils/v4l-utils-1.18.0.tar.bz2"
+          "version": "1.22.1",
+          "downloadUrl": "https://www.linuxtv.org/downloads/v4l-utils/v4l-utils-1.22.1.tar.bz2"
         }
       }
     },

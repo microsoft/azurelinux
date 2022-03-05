@@ -10,21 +10,24 @@ Distribution:   Mariner
 %bcond_without mlogc
 
 Summary: Security module for the Apache HTTP Server
-Name: mod_security 
-Version: 2.9.3
-Release: 5%{?dist}
+Name: mod_security
+Version: 2.9.4
+Release: 1%{?dist}
 License: ASL 2.0
 URL: http://www.modsecurity.org/
 Source: https://github.com/SpiderLabs/ModSecurity/releases/download/v%{version}/modsecurity-%{version}.tar.gz
 Source1: mod_security.conf
 Source2: 10-mod_security.conf
 Source3: modsecurity_localrules.conf
-Requires: httpd httpd-mmn
+Patch0: modsecurity-2.9.3-lua-54.patch
+Patch1: modsecurity-2.9.3-apulibs.patch
+Patch2: mod_security-2.9.3-remote-rules-timeout.patch
+
+Requires: httpd httpd-mmn = %{_httpd_mmn}
 Requires(pre): httpd-filesystem
 
-BuildRequires: gcc
+BuildRequires: gcc, make, autoconf, automake, libtool
 BuildRequires: httpd-devel
-BuildRequires: make
 BuildRequires: perl-generators
 BuildRequires: pkgconfig(libcurl)
 BuildRequires: pkgconfig(libpcre)
@@ -35,7 +38,7 @@ BuildRequires: pkgconfig(lua)
 %if 0%{?el6}
 BuildRequires: yajl-devel
 %else
-BuildRequires: pkgconfig(yajl)  
+BuildRequires: pkgconfig(yajl)
 %endif
 
 
@@ -45,23 +48,26 @@ for web applications. It operates embedded into the web server, acting
 as a powerful umbrella - shielding web applications from attacks.
 
 %if %{with mlogc}
-%package -n     mlogc
+%package        mlogc
 Summary:        ModSecurity Audit Log Collector
 Requires:       mod_security
 Requires(pre):  httpd-filesystem
 
-%description -n mlogc
+%description mlogc
 This package contains the ModSecurity Audit Log Collector.
 %endif
 
 %prep
-%setup -q -n modsecurity-%{version}
+%autosetup -p1 -n modsecurity-%{version}
 
 %build
+./autogen.sh
 %configure --enable-pcre-match-limit=1000000 \
            --enable-pcre-match-limit-recursion=1000000 \
            --with-apxs=%{_httpd_apxs} \
-           --with-yajl
+           --with-yajl \
+           --disable-static
+
 # remove rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -110,7 +116,8 @@ install -m0644 mlogc/mlogc-default.conf %{buildroot}%{_sysconfdir}/mlogc.conf
 
 
 %files
-%doc CHANGES LICENSE README.* NOTICE
+%license LICENSE
+%doc CHANGES README.* NOTICE
 %{_httpd_moddir}/mod_security2.so
 %config(noreplace) %{_httpd_confdir}/*.conf
 %if "%{_httpd_modconfdir}" != "%{_httpd_confdir}"
@@ -123,7 +130,7 @@ install -m0644 mlogc/mlogc-default.conf %{buildroot}%{_sysconfdir}/mlogc.conf
 %attr(770,apache,root) %dir %{_localstatedir}/lib/%{name}
 
 %if %{with mlogc}
-%files -n mlogc
+%files mlogc
 %doc mlogc/INSTALL
 %attr(0640,root,apache) %config(noreplace) %{_sysconfdir}/mlogc.conf
 %attr(0755,root,root) %dir %{_localstatedir}/log/mlogc
@@ -133,6 +140,10 @@ install -m0644 mlogc/mlogc-default.conf %{buildroot}%{_sysconfdir}/mlogc.conf
 %endif
 
 %changelog
+* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.4-1
+- Updating to version 2.9.4 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

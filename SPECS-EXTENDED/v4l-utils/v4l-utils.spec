@@ -1,15 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           v4l-utils
-Version:        1.18.0
-Release:        5%{?dist}
+Version:        1.22.1
+Release:        1%{?dist}
 Summary:        Utilities for video4linux and DVB devices
 # libdvbv5, dvbv5 utils, ir-keytable and v4l2-sysfs-path are GPLv2 only
 License:        GPLv2+ and GPLv2
-URL:            http://www.linuxtv.org/downloads/v4l-utils/
+URL:            https://www.linuxtv.org/downloads/v4l-utils/
 
-Source0:        http://linuxtv.org/downloads/v4l-utils/v4l-utils-%{version}.tar.bz2
-Patch0:         v4l-utils-1.18.0-gcc10.patch
+Source0:        https://www.linuxtv.org/downloads/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         0001-utils-v4l2-TPG-Update-use-of-typeof.patch
 
 BuildRequires:  alsa-lib-devel
 BuildRequires:  desktop-file-utils
@@ -17,11 +17,11 @@ BuildRequires:  doxygen
 BuildRequires:  gettext
 BuildRequires:  kernel-headers
 BuildRequires:  libjpeg-devel
+BuildRequires:  make
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  systemd-devel
 
 # BPF decoder dependencies
-
 %define with_bpf 1
 
 %if %{with_bpf}
@@ -29,7 +29,7 @@ BuildRequires:  elfutils-libelf-devel clang
 %endif
 
 # For /lib/udev/rules.d ownership
-Requires:       udev
+Requires:       systemd-udev
 Requires:       libv4l%{?_isa} = %{version}-%{release}
 
 %description
@@ -114,18 +114,18 @@ files for developing applications that use libdvbv5.
 %autosetup -p1
 
 %build
+export CXXFLAGS="$CXXFLAGS -std=c++14"
 %configure --disable-static --enable-libdvbv5 --enable-doxygen-man
 # Don't use rpath!
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
+%make_build
 make doxygen-run
 
 
 %install
-%{!?_udevrulesdir: %global _udevrulesdir /lib/udev/rules.d}
 %make_install
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -name '*.la' -delete
 rm -f $RPM_BUILD_ROOT%{_libdir}/{v4l1compat.so,v4l2convert.so}
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man3/
 cp -arv %{_builddir}/%{name}-%{version}/doxygen-doc/man/man3 $RPM_BUILD_ROOT%{_mandir}/
@@ -198,6 +198,10 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/qv4l2.desktop
 
 
 %changelog
+* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.1-1
+- Fixing building with GCC 11 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 1.18.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove qvidap binaries which depend on graphics related components
