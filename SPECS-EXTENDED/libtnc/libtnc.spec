@@ -7,7 +7,7 @@ Version:	1.25
 Release:	26%{?dist}
 Summary:	Library implementation of the Trusted Network Connect (TNC) specification
 License:	GPLv2
-Source0:	https://dl.sourceforge.net/sourceforge/%{name}/%{name}-%{version}.tar.gz
+Source0:	https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 Patch0:		libtnc-1.25-bootstrap.patch
 Patch1:		libtnc-1.25-syserror.patch
 URL:		http://libtnc.sourceforge.net/
