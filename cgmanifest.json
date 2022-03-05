@@ -25293,6 +25293,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "resource-agents",
+          "version": "4.10.0",
+          "downloadUrl": "https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rest",
           "version": "0.9.0",
           "downloadUrl": "https://download.gnome.org/sources/rest/0.9/rest-0.9.0.tar.xz"
