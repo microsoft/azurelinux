@@ -126,6 +126,7 @@ export LDFLAGS="$LDFLAGS -pie -z relro -z now"
     --with-pam \
     --with-pie=no \
     --with-selinux \
+    --with-audit=linux \
     --with-maintype=man \
     --without-hardening `# The hardening flags are configured by system` \
     --enable-strip=no \

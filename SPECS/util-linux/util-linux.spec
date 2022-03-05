@@ -68,7 +68,8 @@ autoreconf -fi
     --disable-static \
     --disable-use-tty-group \
     --without-python \
-    --with-selinux
+    --with-selinux \
+    --with-audit
 make %{?_smp_mflags}
 
 %install

@@ -86,6 +86,7 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-libcrack \
     --with-group-name-max-length=32 \
     --with-selinux \
+    --with-audit \
     --enable-man
 %make_build
 
