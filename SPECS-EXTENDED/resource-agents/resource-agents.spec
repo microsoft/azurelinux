@@ -53,13 +53,6 @@ BuildRequires: libxslt glib2-devel
 BuildRequires: systemd-devel
 BuildRequires: which
 
-
-%ifarch x86_64
-%if 0%{?fedora} || 0%{?centos} > 7 || 0%{?rhel} > 7
-BuildRequires: python3-google-api-client python3-pyroute2
-%endif
-%endif
-
 BuildRequires: docbook-style-xsl docbook-dtds
 BuildRequires: libnet-devel
 
