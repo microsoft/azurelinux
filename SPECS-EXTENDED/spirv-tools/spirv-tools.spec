@@ -1,20 +1,27 @@
+%global commit 67f4838659f475d618c120e13d1a196d7e00ba4b
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global commit_date 20200421
+%global gitrel .%{commit_date}.git%{shortcommit}
+
 Name:           spirv-tools
-Version:        2022.1
-Release:        1%{?dist}
+Version:        2019.5
+Release:        3%{?dist}
 Summary:        API and commands for processing SPIR-V modules
 
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/KhronosGroup/SPIRV-Tools
-Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/SPIRV-Tools-%{version}.tar.gz
-
-Patch0: fix-gcc12-build.patch
+Source0:        %url/archive/%{commit}.tar.gz#/%{name}-%{commit}.tar.gz
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
 BuildRequires:  ninja-build
+%if 0%{?rhel} == 7
+BuildRequires:  python36-devel
+%else
 BuildRequires:  python3-devel
+%endif
 BuildRequires:  python3-rpm-macros
 BuildRequires:  spirv-headers-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -38,7 +45,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Development files for %{name}
 
 %prep
-%autosetup -p1 -n SPIRV-Tools-%{version}
+%autosetup -p1 -n SPIRV-Tools-%{commit}
 
 %build
 %__mkdir_p %_target_platform
@@ -47,13 +54,12 @@ pushd %_target_platform
         -DCMAKE_INSTALL_LIBDIR=%{_lib} \
         -DSPIRV-Headers_SOURCE_DIR=%{_prefix} \
         -DPYTHON_EXECUTABLE=%{__python3} \
-        -DSPIRV_TOOLS_BUILD_STATIC=OFF \
         -GNinja ..
-%cmake3_build
+%ninja_build
 popd
 
 %install
-%cmake3_install
+%ninja_install -C %_target_platform
 
 %ldconfig_scriptlets libs
 
@@ -65,18 +71,16 @@ popd
 %{_bindir}/spirv-dis
 %{_bindir}/spirv-lesspipe.sh
 %{_bindir}/spirv-link
-%{_bindir}/spirv-lint
 %{_bindir}/spirv-opt
 %{_bindir}/spirv-reduce
 %{_bindir}/spirv-val
 
 %files libs
 %{_libdir}/libSPIRV-Tools-link.so
-%{_libdir}/libSPIRV-Tools-lint.so
 %{_libdir}/libSPIRV-Tools-opt.so
-%{_libdir}/libSPIRV-Tools.so
-%{_libdir}/libSPIRV-Tools-reduce.so
 %{_libdir}/libSPIRV-Tools-shared.so
+%{_libdir}/libSPIRV-Tools-reduce.so
+%{_libdir}/libSPIRV-Tools.so
 
 %files devel
 %{_includedir}/spirv-tools/
@@ -85,10 +89,6 @@ popd
 %{_libdir}/pkgconfig/SPIRV-Tools.pc
 
 %changelog
-* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2022.1-1
-- Updating to version 2022.1 using Fedora 36 spec (license: MIT) for guidance.
-- License verified.
-
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2019.5-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
