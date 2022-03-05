@@ -511,6 +511,9 @@ chroot_and_install_rpms libtasn1
 chroot_and_install_rpms systemd-bootstrap
 build_rpm_in_chroot_no_install p11-kit
 
+# audit needs: systemd-bootstrap, python3, krb5, swig, e2fsprogs
+build_rpm_in_chroot_no_install audit
+
 # asciidoc needs python3-xml
 build_rpm_in_chroot_no_install asciidoc
 
