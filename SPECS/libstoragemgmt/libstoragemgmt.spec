@@ -9,26 +9,26 @@ URL:            https://github.com/libstorage/libstoragemgmt
 Source0:        https://github.com/libstorage/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch1:         0001-change-run-dir.patch
 
-BuildRequires:  gcc
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  bash-completion
+BuildRequires:  check
+BuildRequires:  chrpath
+BuildRequires:  gcc
+BuildRequires:  glib-devel
+BuildRequires:  libconfig-devel
 BuildRequires:  libtool
 BuildRequires:  libxml2-devel
-BuildRequires:  check
-BuildRequires:  perl
 BuildRequires:  openssl-devel
-BuildRequires:  glib-devel
-BuildRequires:  bash-completion
-BuildRequires:  libconfig-devel
+BuildRequires:  perl
 BuildRequires:  procps-ng
-BuildRequires:  sqlite-devel
-BuildRequires:  python3-six
 BuildRequires:  python3-devel
 BuildRequires:  python3-pywbem
+BuildRequires:  python3-six
+BuildRequires:  sqlite-devel
 %{?systemd_requires}
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
-BuildRequires:  chrpath
 BuildRequires:  valgrind
 %if %{with_check}
 BuildRequires:  git
