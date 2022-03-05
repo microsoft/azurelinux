@@ -3,7 +3,7 @@
 Summary: Industry-standard container runtime
 Name: moby-containerd
 Version: 1.5.9+azure
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -17,6 +17,9 @@ Source1: containerd.service
 Source2: containerd.toml
 Source3: NOTICE
 Source4: LICENSE
+
+Patch0:  CVE-2022-23648.patch
+
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
@@ -131,9 +134,10 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Wed Mar 02 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.5.9+azure-3
+- Fix CVE-2022-23648
 * Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.9+azure-2
 - Bump release to force rebuild with golang 1.16.14
-
 * Wed Jan 19 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.5.9+azure-1
 - Update to version 1.5.9+azure
 * Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.4.4+azure-6
