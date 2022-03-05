@@ -6,9 +6,9 @@ Release:        1%{?dist}
 Summary:        Utilities for video4linux and DVB devices
 # libdvbv5, dvbv5 utils, ir-keytable and v4l2-sysfs-path are GPLv2 only
 License:        GPLv2+ and GPLv2
-URL:            http://www.linuxtv.org/downloads/v4l-utils/
+URL:            https://www.linuxtv.org/downloads/v4l-utils/
 
-Source0:        http://linuxtv.org/downloads/v4l-utils/v4l-utils-%{version}.tar.bz2
+Source0:        https://www.linuxtv.org/downloads/%{name}/%{name}-%{version}.tar.bz2
 Patch0:         0001-utils-v4l2-TPG-Update-use-of-typeof.patch
 
 BuildRequires:  alsa-lib-devel

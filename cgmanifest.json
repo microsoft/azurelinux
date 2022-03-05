@@ -28918,7 +28918,7 @@
         "other": {
           "name": "v4l-utils",
           "version": "1.22.1",
-          "downloadUrl": "http://linuxtv.org/downloads/v4l-utils/v4l-utils-1.22.1.tar.bz2"
+          "downloadUrl": "https://www.linuxtv.org/downloads/v4l-utils/v4l-utils-1.22.1.tar.bz2"
         }
       }
     },
