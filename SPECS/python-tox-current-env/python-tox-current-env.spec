@@ -57,7 +57,7 @@ tox -e py39
 %doc README.rst
 
 %changelog
-* Fri Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 0.0.7-3
+* Fri Mar 04 2022 Bala <balakumaran.kannan@microsoft.com> - 0.0.7-3
 - Use tox to run Ptest
 
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.7-2
