@@ -1,31 +1,25 @@
 # The function of bootstrap is that it disables the wheel subpackage
 %bcond_with bootstrap
-
+Summary:        Built-package format for Python
+Name:           python-%{pypi_name}
+Version:        0.33.6
+Release:        7%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/pypa/wheel
+Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
 %global pypi_name wheel
 %global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
-
 %global _description \
 A built-package format for Python.\
 \
 A wheel is a ZIP-format archive with a specially formatted filename and the\
 .whl extension. It is designed to contain all the files for a PEP 376\
 compatible install in a way that is very close to the on-disk format.
-
-Summary:        Built-package format for Python
-Name:           python-%{pypi_name}
-Version:        0.33.6
-Release:        6%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            https://github.com/pypa/wheel
-Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
-
 BuildArch:      noarch
-
 %{?python_enable_dependency_generator}
-
 %if %{with_check}
 # several tests compile extensions
 # those tests are skipped if gcc is not found
@@ -35,13 +29,16 @@ BuildRequires:  gcc
 %description %{_description}
 
 %package -n     python3-%{pypi_name}
-%{?python_provide:%python_provide python3-%{pypi_name}}
 Summary:        %{summary}
+%{?python_provide:%python_provide python3-%{pypi_name}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
+BuildRequires:  python3-six
 %endif
 
 %description -n python3-%{pypi_name} %{_description}
@@ -67,7 +64,7 @@ test -s wheel/cli/install.py || echo "# empty" > wheel/cli/install.py
 %py3_build
 
 %if %{without bootstrap}
-%py3_build_wheel
+%{py3_build_wheel}
 %endif
 
 
@@ -85,7 +82,8 @@ install -p dist/%{python_wheelname} -t %{buildroot}%{python_wheeldir}
 
 %check
 rm setup.cfg
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-3 -v --ignore build
+%{python3} -m pip install pluggy more-itertools
+PYTHONPATH=%{buildroot}%{python3_sitelib} py.test3 -v --ignore build
 
 %files -n python3-%{pypi_name}
 %license LICENSE.txt
@@ -104,6 +102,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-3 -v --ignore build
 %endif
 
 %changelog
+* Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 0.33.6-7
+- BR multiple python3 modules for PTest
+- pip3 install additional modules which not available as RPM
+
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.33.6-6
 - License verified.
 
