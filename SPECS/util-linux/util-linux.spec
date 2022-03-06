@@ -107,8 +107,6 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man8/*
 %{_datadir}/bash-completion/completions/*
 %{_docdir}/util-linux/getopt*
-/usr/lib/systemd/system/uuidd.*
-/usr/lib/systemd/system/fstrim.*
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
