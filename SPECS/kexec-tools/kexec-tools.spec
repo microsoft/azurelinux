@@ -326,6 +326,7 @@ done
 %changelog
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.23-1
 - Update version to 2.0.23
+- License verified
 * Mon Jun 07 2021 Chris Co <chrco@microsoft.com> - 2.0.21-3
 - Always use -s option in kdumpctl to use kexec file load by default
 * Tue May 11 2021 Andrew Phelps <anphel@microsoft.com> 2.0.21-2

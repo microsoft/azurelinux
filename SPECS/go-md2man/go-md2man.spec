@@ -50,6 +50,7 @@ cp go-md2man-%{version}/LICENSE.md %{buildroot}%{_docdir}/%{name}-%{version}/LIC
 %changelog
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> 2.0.1-1
 - Update to version 2.0.1
+- License verified
 
 * Fri Jun 18 2021 Henry Li <lihl@microsoft.com> 2.0.0-7
 - Provides go-go-md2man.
