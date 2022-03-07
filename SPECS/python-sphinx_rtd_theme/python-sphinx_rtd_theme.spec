@@ -15,19 +15,16 @@ Source1:        https://docs.readthedocs.io/en/latest/objects.inv#/%{name}-objec
 # - https://github.com/readthedocs/sphinx_rtd_theme/pull/728
 # - https://github.com/readthedocs/sphinx_rtd_theme/commit/a49a812c8821123091166fae1897d702cdc2d627
 Patch0:         %{name}-script.patch
-
-BuildArch:      noarch
-
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(docutils)
 BuildRequires:  python3dist(setuptools)
+BuildArch:      noarch
 %if %{with_check}
-BuildRequires:  python3dist(pytest)
-BuildRequires:  python3dist(pytest)
-BuildRequires:  python3-six
+BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-pip
-BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-six
+BuildRequires:  python3dist(pytest)
 %endif
 
 %description
@@ -37,12 +34,12 @@ can be ignored if you're just trying to use it on your project outside
 of that site.
 
 %package -n python3-%{srcname}
+%{?python_provide:%python_provide python3-%{srcname}}
 Summary:        Sphinx theme for readthedocs.org
 Requires:       font(fontawesome)
 Requires:       font(lato)
 Requires:       font(robotoslab)
 Requires:       fontawesome-fonts-web
-%{?python_provide:%python_provide python3-%{srcname}}
 
 %description -n python3-%{srcname}
 This is a prototype mobile-friendly sphinx theme for readthedocs.org.
@@ -97,6 +94,10 @@ py.test3
 %{python3_sitelib}/%{srcname}*
 
 %changelog
+* Mon Mar 07 2022 Bala <balakumaran.kannan@microsoft.com> - 0.4.3-13
+- BR multiple python packages for when check enabled
+- Pip install dependent packages during check
+
 * Mon Dec 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.3-12
 - Removed documentation build steps.
 - License verified.
