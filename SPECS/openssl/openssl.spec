@@ -1,6 +1,3 @@
-# Don't depend on bash by default
-%define __requires_exclude ^/(bin|usr/bin).*$
-%define soversion 1.1
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
@@ -42,19 +39,22 @@ Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
 Patch22:        openssl-1.1.1-fips-SymCrypt.patch
+# Don't depend on bash by default
+%define __requires_exclude ^/(bin|usr/bin).*$
+%define soversion 1.1
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
+Requires:       %{name}-libs = %{version}-%{release}
+Requires:       glibc
+Requires:       libgcc
+Conflicts:      httpd <= 2.4.37
 %if %{with_check}
 BuildRequires:  perl
 BuildRequires:  perl(Math::BigInt)
 BuildRequires:  perl(Test::Harness)
 %endif
-Requires:       %{name}-libs = %{version}-%{release}
-Requires:       glibc
-Requires:       libgcc
-Conflicts:      httpd <= 2.4.37
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -326,7 +326,6 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
 %post   libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
-
 %changelog
 * Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.1k-10
 - Add an explicit BR on `perl{(Test::Harness), (Math::BigInt)}` to enable ptest
