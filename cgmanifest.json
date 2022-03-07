@@ -2207,8 +2207,8 @@
         "type": "other",
         "other": {
           "name": "crash-gcore-command",
-          "version": "1.5.1",
-          "downloadUrl": "https://github.com/crash-utility/crash-extensions/raw/master/crash-gcore-command-1.5.1.tar.gz"
+          "version": "1.6.1",
+          "downloadUrl": "https://github.com/crash-utility/crash-extensions/raw/master/crash-gcore-command-1.6.1.tar.gz"
         }
       }
     },
@@ -4670,8 +4670,8 @@
         "type": "other",
         "other": {
           "name": "go-md2man",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/cpuguy83/go-md2man/archive/v2.0.0.tar.gz"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/cpuguy83/go-md2man/archive/v2.0.1.tar.gz"
         }
       }
     },
@@ -8441,8 +8441,8 @@
         "type": "other",
         "other": {
           "name": "kexec-tools",
-          "version": "2.0.21",
-          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.21.tar.xz"
+          "version": "2.0.23",
+          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.23.tar.xz"
         }
       }
     },
