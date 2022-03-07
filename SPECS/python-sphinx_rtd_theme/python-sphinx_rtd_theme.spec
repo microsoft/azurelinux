@@ -2,7 +2,7 @@
 Summary:        Sphinx theme for readthedocs.org
 Name:           python-%{srcname}
 Version:        0.4.3
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        MIT AND OFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,11 @@ BuildRequires:  python3dist(docutils)
 BuildRequires:  python3dist(setuptools)
 %if %{with_check}
 BuildRequires:  python3dist(pytest)
+BuildRequires:  python3dist(pytest)
+BuildRequires:  python3-six
+BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
+BuildRequires:  python3-atomicwrites
 %endif
 
 %description
@@ -83,7 +88,8 @@ cp -p fonts/Lato/*.{eot,woff,woff2} \
    %{buildroot}%{python3_sitelib}/%{srcname}/static/fonts/Lato
 
 %check
-pytest
+pip3 install pluggy more-itertools Sphinx==1.8 readthedocs-sphinx-ext
+py.test3
 
 %files -n python3-%{srcname}
 %license LICENSE OFL-License.txt
