@@ -62,42 +62,42 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
-* Tue Feb 15 2022 Muhammad Falak <mwani@microsoft.com> 5.1.0-2
+* Tue Feb 15 2022 Muhammad Falak <mwani@microsoft.com> - 5.1.0-2
 - Generate locale `en_US.iso88591` in `%check` section to enable ptest
 
-* Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 5.1.0-1
+* Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> - 5.1.0-1
 - Update to version 5.1.0
 - License verified
 
-* Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> 4.2.1-4
+* Tue Jan 05 2021 Andrew Phelps <anphel@microsoft.com> - 4.2.1-4
 - Skip timeout test
 
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.2.1-3
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.2.1-3
 - Added %%license line automatically
 
-* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.2.1-2
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 4.2.1-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Mon Sep 17 2018 Sujay G <gsujay@vmware.com> 4.2.1-1
+* Mon Sep 17 2018 Sujay G <gsujay@vmware.com> - 4.2.1-1
 - Bump version to 4.2.1
 
-* Wed Apr 05 2017 Danut Moraru <dmoraru@vmware.com> 4.1.4-1
+* Wed Apr 05 2017 Danut Moraru <dmoraru@vmware.com> - 4.1.4-1
 - Upgrade to version 4.1.4
 
-* Wed Jan 18 2017 Dheeraj Shetty <dheerajs@vmware.com> 4.1.3-4
+* Wed Jan 18 2017 Dheeraj Shetty <dheerajs@vmware.com> - 4.1.3-4
 - Bump up for depending on readline 7.0
 
-* Sun Dec 18 2016 Alexey Makhalov <amakhalov@vmware.com> 4.1.3-3
+* Sun Dec 18 2016 Alexey Makhalov <amakhalov@vmware.com> - 4.1.3-3
 - Provides /bin/awk
 
-* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 4.1.3-2
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 4.1.3-2
 - GA - Bump release of all rpms
 
-* Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> 4.1.3-1
+* Tue Jan 12 2016 Xiaolin Li <xiaolinl@vmware.com> - 4.1.3-1
 - Updated to version 4.1.3
 
-* Fri Jun 19 2015 Alexey Makhalov <amakhalov@vmware.com> 4.1.0-2
+* Fri Jun 19 2015 Alexey Makhalov <amakhalov@vmware.com> - 4.1.0-2
 - Provide /bin/gawk.
 
-* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 4.1.0-1
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 4.1.0-1
 - Initial build. First version
