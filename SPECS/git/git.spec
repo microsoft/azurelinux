@@ -10,11 +10,6 @@ URL:            https://git-scm.com/
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
-%if %{with_check}
-BuildRequires:  perl(lib)
-BuildRequires:  perl(IO::File)
-BuildRequires:  perl(Getopt::Long)
-%endif
 Requires:       curl
 Requires:       expat
 Requires:       openssh
@@ -26,6 +21,11 @@ Requires:       perl-interpreter
 Requires:       python3
 Requires:       subversion-perl
 Provides:       git-core = %{version}-%{release}
+%if %{with_check}
+BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(lib)
+%endif
 
 %description
 Git is a free and open source, distributed version control system
@@ -102,7 +102,7 @@ BuildArch:      noarch
 
 %prep
 %setup -q
-%py3_shebang_fix git-p4.py
+%{py3_shebang_fix} git-p4.py
 
 %build
 %configure \
