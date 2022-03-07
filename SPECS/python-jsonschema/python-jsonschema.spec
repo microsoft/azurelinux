@@ -19,12 +19,12 @@ Summary:        An implementation of JSON Schema validation for Python
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-vcversioner
-BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
+BuildRequires:  python3-xml
+Requires:       python3
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
-Requires:       python3
 
 %description -n python3-jsonschema
 jsonschema is JSON Schema validator currently based on
