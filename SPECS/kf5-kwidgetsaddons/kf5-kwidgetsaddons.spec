@@ -2,8 +2,8 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
 Name:           kf5-%{framework}
-Version:        5.61.0
-Release:        3%{?dist}
+Version:        5.86.0
+Release:        1%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon with various classes on top of QtWidgets
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://cgit.kde.org/%{framework}.git
@@ -68,6 +68,9 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 
 %changelog
+* Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 5.86.0-1
+- Update to version 5.86.0
+
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3
 - License verified.
 - Fixed Source0 tag.

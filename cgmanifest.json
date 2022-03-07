@@ -8481,8 +8481,8 @@
         "type": "other",
         "other": {
           "name": "kf5-kconfig",
-          "version": "5.61.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kconfig-5.61.0.tar.xz"
+          "version": "5.86.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.86/kconfig-5.86.0.tar.xz"
         }
       }
     },
@@ -8491,8 +8491,8 @@
         "type": "other",
         "other": {
           "name": "kf5-kcoreaddons",
-          "version": "5.61.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kcoreaddons-5.61.0.tar.xz"
+          "version": "5.86.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.86/kcoreaddons-5.86.0.tar.xz"
         }
       }
     },
@@ -8501,8 +8501,8 @@
         "type": "other",
         "other": {
           "name": "kf5-ki18n",
-          "version": "5.61.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/ki18n-5.61.0.tar.xz"
+          "version": "5.86.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.86/ki18n-5.86.0.tar.xz"
         }
       }
     },
@@ -8511,8 +8511,8 @@
         "type": "other",
         "other": {
           "name": "kf5-kwidgetsaddons",
-          "version": "5.61.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kwidgetsaddons-5.61.0.tar.xz"
+          "version": "5.86.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.86/kwidgetsaddons-5.86.0.tar.xz"
         }
       }
     },
