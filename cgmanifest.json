@@ -27587,8 +27587,8 @@
         "type": "other",
         "other": {
           "name": "spirv-headers",
-          "version": "1.5.1",
-          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Headers/archive/2ad0492fb00919d99500f1da74abf5ad3c870e4e/spirv-headers-2ad0492fb00919d99500f1da74abf5ad3c870e4e.tar.gz"
+          "version": "1.5.5",
+          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Headers/archive/b42ba6d92faf6b4938e6f22ddd186dbdacc98d78/spirv-headers-b42ba6d92faf6b4938e6f22ddd186dbdacc98d78.tar.gz"
         }
       }
     },
