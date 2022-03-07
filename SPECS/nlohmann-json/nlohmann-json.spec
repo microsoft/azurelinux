@@ -1,7 +1,7 @@
 Summary:        Modern C++11 JSON library
 Name:           nlohmann-json
 Version:        3.10.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Source0:        %{name}-%{version}.tar.gz
 %global debug_package %{nil}
 BuildRequires:  cmake
 BuildRequires:  gcc
+BuildRequires:  git
 
 %description
 A modern C++ JSON library.
@@ -23,7 +24,7 @@ Summary:        Development files for %{name}
 Development files for %{name}
 
 %prep
-%setup -q -n json-%{version}
+%autosetup -S git -n json-%{version}
 
 %build
 mkdir build && cd build
@@ -48,6 +49,10 @@ make test -C build
 %{_libdir}/pkgconfig/nlohmann_json.pc
 
 %changelog
+* Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 3.10.4-2
+- Switch to `autosetup -S git`
+- Add an explicit BR on `git` to enable ptest
+
 * Wed Nov 10 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 3.10.4-1
 - Updating to version 3.10.4 to get code fixes for GCC 10 and 11.
 

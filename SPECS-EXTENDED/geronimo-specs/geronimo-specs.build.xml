@@ -24,20 +24,6 @@
   <property name="annotation.dir" value="${annotation.id}-${annotation}" />
   <property name="annotation.jar" value="${annotation.id}-${annotation.ver}.jar" />
   
-  <property name="corba10"        value="null" />
-  <property name="corba10.dir"    value="geronimo-spec-corba/" />
-  <property name="corba10.jar"    value="geronimo-spec-corba-${corba10}.jar" />
-
-  <property name="corba23"        value="null" />
-  <property name="corba23.ver"    value="${geronimoSpecsCorba23Version}" />
-  <property name="corba23.id"     value="geronimo-corba_2.3_spec" />
-  <property name="corba23.dir"    value="geronimo-spec-corba-2.3" />
-  <property name="corba23.jar"    value="${corba23.id}-${corba23}.jar" />
-
-  <property name="corba30"        value="1.1" />
-  <property name="corba30.dir"    value="geronimo-spec-corba-3.0" />
-  <property name="corba30.jar"    value="${corba30.dir}_spec-${corba30}.jar" />
-  
   <property name="ejb21"          value="1.1" />
   <property name="ejb21.id"       value="geronimo-ejb_2.1_spec" />
   <property name="ejb21.dir"      value="${ejb21.id}-${ejb21}" />
@@ -87,31 +73,6 @@
   <property name="j2eemanagment11.dir" value="geronimo-j2ee-management_1.1_spec-${j2eemanagment11}" />
   <property name="j2eemanagment11.jar" value="${j2eemanagment11.dir}.jar" />
   
-  <property name="javamail13"     value="1.3" />
-  <property name="javamail13.ver" value="1.3" />
-  <property name="javamail13.id"  value="geronimo-javamail_1.3.1_spec" />
-  <property name="javamail13.dir" value="${javamail13.id}-${javamail13}" />
-  <property name="javamail13.jar" value="${javamail13.dir}.jar" />
-
-  <property name="javamail14"     value="1.1" />
-  <property name="javamail14.dir" value="geronimo-javamail_1.4_spec-${javamail14}" />
-  <property name="javamail14.jar" value="${javamail14.dir}.jar" />
-  
-  <property name="jaxr"           value="1.1" />
-  <property name="jaxr.id"        value="geronimo-jaxr_1.0_spec" />
-  <property name="jaxr.dir"       value="${jaxr.id}-${jaxr}" />
-  <property name="jaxr.jar"       value="${jaxr.dir}.jar" />
-  
-  <property name="jaxrpc"         value="1.1" />
-  <property name="jaxrpc.id"      value="geronimo-jaxrpc_1.1_spec" />
-  <property name="jaxrpc.dir"     value="${jaxrpc.id}-${jaxrpc}" />
-  <property name="jaxrpc.jar"     value="${jaxrpc.dir}.jar" />
-  
-  <property name="jms"            value="1.1" />
-  <property name="jms.id"         value="geronimo-jms_1.1_spec" />
-  <property name="jms.dir"        value="${jms.id}-${jms}" />
-  <property name="jms.jar"        value="${jms.dir}.jar" />
-
   <property name="jpa"            value="1.1.0" />
   <property name="jpa.dir"        value="geronimo-jpa_3.0_spec-${jpa}" />
   <property name="jpa.jar"        value="geronimo-jpa_3.0_spec-1.1.jar" />
@@ -139,11 +100,6 @@
   <property name="qname.dir"      value="${qname.id}-${qname}" />
   <property name="qname.jar"      value="${qname.dir}.jar" />
   
-  <property name="saaj"           value="1.1" />
-  <property name="saaj.id"        value="geronimo-saaj_1.1_spec" />
-  <property name="saaj.dir"       value="${saaj.id}-${saaj}" />
-  <property name="saaj.jar"       value="${saaj.dir}.jar" />
-  
   <property name="servlet24"      value="1.1.1" />
   <property name="servlet24.id"   value="geronimo-servlet_2.4_spec" />
   <property name="servlet24.dir"  value="${servlet24.id}-${servlet24}" />
@@ -161,16 +117,10 @@
   <property name="wsmetadata.dir" value="geronimo-ws-metadata_2.0_spec-${wsmetadata}" />
   <property name="wsmetadata.jar" value="${wsmetadata.dir}.jar" />
 
-  <property name="commonj"        value="null" />
-  <property name="commonj.ver"    value="${geronimoSpecsCommonjVersion}" />
-  <property name="commonj.id"     value="geronimo-commonj_1.1_spec" />
-  <property name="commonj.dir"    value="geronimo-spec-commonj/" />
-  <property name="commonj.jar"    value="${commonj.id}-${commonj}.jar" />
-
   <target name="dist" depends="build">
   </target>
   
-  <target name="build" depends="activation102, activation110, annotation, corba10, corba23, corba30, ejb21, ejb30, el10, interceptor, connector, j2eedeployment, javaeedeployment, jacc, j2eejacc, j2eemanagment10, j2eemanagment11, javamail13, javamail14, jaxr, jaxrpc, jms, jpa, jsp20, jsp21, jta10, jta11, qname, saaj, servlet24, servlet25, stax, wsmetadata, commonj, geronimo-spec-j2ee">
+  <target name="build" depends="activation102, activation110, annotation, ejb21, ejb30, el10, interceptor, connector, j2eedeployment, javaeedeployment, jacc, j2eejacc, j2eemanagment10, j2eemanagment11, jpa, jsp20, jsp21, jta10, jta11, qname, servlet24, servlet25, stax, wsmetadata, geronimo-spec-j2ee">
   </target>
 
   <target name="geronimo-spec-j2ee">
@@ -179,11 +129,6 @@
           <fileset dir="${activation102.dir}/${build}"/>
           <fileset dir="${activation110.dir}/${build}"/>
           <fileset dir="${annotation.dir}/${build}"/>
-          <fileset dir="${corba10.dir}/${build}"/>
-          <fileset dir="${corba23.dir}/${build}"/>
-<!--
-          <fileset dir="${corba30.dir}/${build}"/>
--->
           <fileset dir="${ejb21.dir}/${build}"/>
           <fileset dir="${ejb30.dir}/${build}"/>
           <fileset dir="${el10.dir}/${build}"/>
@@ -195,23 +140,16 @@
           <fileset dir="${j2eejacc.dir}/${build}"/>
           <fileset dir="${j2eemanagment10.dir}/${build}"/>
           <fileset dir="${j2eemanagment11.dir}/${build}"/>
-          <fileset dir="${javamail13.dir}/${build}"/>
-          <fileset dir="${javamail14.dir}/${build}"/>
-          <fileset dir="${jaxr.dir}/${build}"/>
-          <fileset dir="${jaxrpc.dir}/${build}"/>
-          <fileset dir="${jms.dir}/${build}"/>
           <fileset dir="${jpa.dir}/${build}"/>
           <fileset dir="${jsp20.dir}/${build}"/>
           <fileset dir="${jsp21.dir}/${build}"/>
           <fileset dir="${jta10.dir}/${build}"/>
           <fileset dir="${jta11.dir}/${build}"/>
           <fileset dir="${qname.dir}/${build}"/>
-          <fileset dir="${saaj.dir}/${build}"/>
           <fileset dir="${servlet24.dir}/${build}"/>
           <fileset dir="${servlet25.dir}/${build}"/>
           <fileset dir="${stax.dir}/${build}"/>
           <fileset dir="${wsmetadata.dir}/${build}"/>
-          <fileset dir="${commonj.dir}/${build}"/>
       </jar>
   </target>
 
@@ -280,45 +218,6 @@ artifactId=${gbuild.id}
           <param name="gbuild.id"  value="${annotation.id}" />
           <param name="gbuild.ver" value="${annotation.ver}" />
       </antcall>
-  </target>
-  
-  <target name="corba10" depends="jta10">
-      <copy file="${corba10.dir}/${idl}/geronimo-orb.idl" tofile="${corba10.dir}/${idl}/CORBA.idl"/>
-      <antcall target="corba_idlj">
-          <param name="corba_dir" value="${corba10.dir}"/>
-      </antcall>
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${corba10.dir}" />
-          <param name="gbuild.jar" value="${corba10.jar}" />
-          <param name="gbuild.classpath"  value="${jta10.dir}/${dist}/${jta10.jar}" />
-      </antcall>
-  </target>
-  
-  <target name="corba23" depends="jta10">
-      <copy file="${corba23.dir}/${idl}/geronimo-orb.idl" tofile="${corba23.dir}/${idl}/CORBA.idl"/>
-      <antcall target="corba_idlj">
-          <param name="corba_dir" value="${corba23.dir}"/>
-      </antcall>
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${corba23.dir}" />
-          <param name="gbuild.jar" value="${corba23.jar}" />
-          <param name="gbuild.classpath"  value="${jta10.dir}/${dist}/${jta10.jar}" />
-          <param name="gbuild.id"  value="${corba23.id}" />
-          <param name="gbuild.ver" value="${corba23.ver}" />
-      </antcall>
-  </target>
-  
-  <target name="corba30" depends="jta10">
-      <!--
-      <antcall target="corba_idlj">
-          <param name="corba_dir" value="${corba30.dir}"/>
-      </antcall>
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${corba30.dir}" />
-          <param name="gbuild.jar" value="${corba30.jar}" />
-          <param name="gbuild.classpath"  value="${jta10.dir}/${dist}/${jta10.jar}" />
-      </antcall>
-      -->
   </target>
   
   <target name="ejb21" depends="jta10">
@@ -414,50 +313,6 @@ artifactId=${gbuild.id}
       </antcall>
   </target>
   
-  <target name="javamail13">
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${javamail13.dir}" />
-          <param name="gbuild.jar" value="${javamail13.jar}" />
-          <param name="gbuild.id"  value="${javamail13.id}" />
-          <param name="gbuild.ver" value="${javamail13}" />
-      </antcall>
-  </target>
-  
-  <target name="javamail14">
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${javamail14.dir}" />
-          <param name="gbuild.jar" value="${javamail14.jar}" />
-      </antcall>
-  </target>
-
-  <target name="jaxr">
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${jaxr.dir}" />
-          <param name="gbuild.jar" value="${jaxr.jar}" />
-          <param name="gbuild.id"  value="${jaxr.id}" />
-          <param name="gbuild.ver" value="${jaxr}" />
-      </antcall>
-  </target>
-  
-  <target name="jaxrpc" depends="servlet24">
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${jaxrpc.dir}" />
-          <param name="gbuild.jar" value="${jaxrpc.jar}" />
-          <param name="gbuild.classpath" value="${servlet24.dir}/${dist}/${servlet24.jar}"/>
-          <param name="gbuild.id"  value="${jaxrpc.id}" />
-          <param name="gbuild.ver" value="${jaxprc}" />
-      </antcall>
-  </target>
-  
-  <target name="jms">
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${jms.dir}" />
-          <param name="gbuild.jar" value="${jms.jar}" />
-          <param name="gbuild.id"  value="${jms.id}" />
-          <param name="gbuild.ver" value="${jms}" />
-      </antcall>
-  </target>
-  
   <target name="jpa">
       <antcall target="gbuild">
           <param name="gbuild.dir" value="${jpa.dir}" />
@@ -508,15 +363,6 @@ artifactId=${gbuild.id}
       </antcall>
   </target>
   
-  <target name="saaj">
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${saaj.dir}" />
-          <param name="gbuild.jar" value="${saaj.jar}" />
-          <param name="gbuild.id"  value="${saaj.id}" />
-          <param name="gbuild.ver" value="${saaj}" />
-      </antcall>
-  </target>
-
   <target name="servlet24">
       <antcall target="gbuild">
           <param name="gbuild.dir" value="${servlet24.dir}" />
@@ -547,15 +393,6 @@ artifactId=${gbuild.id}
       </antcall>
   </target>
   
-  <target name="commonj">
-      <antcall target="gbuild">
-          <param name="gbuild.dir" value="${commonj.dir}" />
-          <param name="gbuild.jar" value="${commonj.jar}" />
-          <param name="gbuild.id"  value="${commonj.id}" />
-          <param name="gbuild.ver" value="${commonj.ver}" />
-      </antcall>
-  </target>
-  
   <target name="idlj_prefix">
       <exec executable="${idlj}">
           <arg value="-pkgPrefix"/>
@@ -576,117 +413,6 @@ artifactId=${gbuild.id}
       </exec>
   </target>
 
-  <target name="corba_idlj">
-      <antcall target="idlj_prefix">
-          <!-- idl_compile org.omg CORBA -->
-          <param name="module_name" value="CORBA" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/CORBA.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!-- idl_compile org.omg CosNaming -->
-          <param name="module_name" value="CosNaming"/>
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/CosNaming.idl" />
-      </antcall>
-      <antcall target="idlj">
-          <!-- idl_compile CosTransactions -->
-          <param name="idl_file"    value="${corba_dir}/${idl}/CosTransactions.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg CosTransactions-->
-          <param name="module_name" value="CosTransactions" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/CosTransactions.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg CosTSInteroperation-->
-          <param name="module_name" value="CosTSInteroperation" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/CosTSInteroperation.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg CosTSPortability-->
-          <param name="module_name" value="CosTSPortability" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/CosTSPortability.idl" />
-      </antcall>
-      <antcall target="idlj">
-          <!--idl_compile CSI-->
-          <param name="idl_file"    value="${corba_dir}/${idl}/CSI.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg CSI-->
-          <param name="module_name" value="CSI" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/CSI.idl" />
-      </antcall>
-      <antcall target="idlj">
-          <!--idl_compile CSIIOP-->
-          <param name="idl_file"    value="${corba_dir}/${idl}/CSIIOP.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg CSIIOP-->
-          <param name="module_name" value="CSIIOP" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/CSIIOP.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg GIOP-->
-          <param name="module_name" value="GIOP" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/GIOP.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg GSSUP-->
-          <param name="module_name" value="GSSUP" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/GSSUP.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg IIOP-->
-          <param name="module_name" value="IIOP" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/IIOP.idl" />
-      </antcall>
-      <antcall target="idlj">
-          <!--idl_compile IOP-->
-          <param name="idl_file"    value="${corba_dir}/${idl}/IOP.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg IOP-->
-          <param name="module_name" value="IOP" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/IOP.idl" />
-      </antcall>
-      <antcall target="idlj">
-          <!--idl_compile Security-->
-          <param name="idl_file"    value="${corba_dir}/${idl}/Security.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg Security-->
-          <param name="module_name" value="Security" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/Security.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg SSLIOP-->
-          <param name="module_name" value="SSLIOP" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/SSLIOP.idl" />
-      </antcall>
-      <antcall target="idlj">
-          <!--idl_compile TimeBase-->
-          <param name="idl_file"    value="${corba_dir}/${idl}/TimeBase.idl" />
-      </antcall>
-      <antcall target="idlj_prefix">
-          <!--idl_compile org.omg TimeBase-->
-          <param name="module_name" value="TimeBase" />
-          <param name="prefix"      value="org.omg" />
-          <param name="idl_file"    value="${corba_dir}/${idl}/TimeBase.idl" />
-      </antcall>
-  </target>
-  
   <target name="clean" description="clean up" >
     <delete dir="geronimo-spec-j2ee/${dist}" />
   </target>

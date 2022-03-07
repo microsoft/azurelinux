@@ -1,23 +1,25 @@
-%define BaseVersion 1.58
+%define BaseVersion 1.71
 Summary:        Introspection system for GObject-based libraries
 Name:           gobject-introspection
 Version:        %{BaseVersion}.0
-Release:        12%{?dist}
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://github.com/GNOME/gobject-introspection
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/%{BaseVersion}/%{name}-%{version}.tar.xz
-Patch0:         disableFaultyTest.patch
 BuildRequires:  autoconf-archive
 BuildRequires:  bison
+BuildRequires:  cairo-gobject-devel
 BuildRequires:  flex
+BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  glib-devel >= 2.58.0
 BuildRequires:  golang
 BuildRequires:  intltool
 BuildRequires:  libffi-devel
+BuildRequires:  meson
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 BuildRequires:  which
@@ -54,18 +56,13 @@ Libraries and headers for gobject-introspection.
 
 %prep
 %autosetup -p 1
-# Python 3.9 compatibility fix
-# Fixed upstream in v1.63.2
-# https://gitlab.gnome.org/GNOME/gobject-introspection/issues/325
-sed -i 's/.getchildren()//' giscanner/girparser.py
-autoreconf -fiv
 
 %build
-%configure --with-python=%{python3}
-make -j1
+%meson -Ddoctool=disabled -Dpython=%{python3}
+%meson_build
 
 %install
-%make_install
+%meson_install
 # Move the python3 modules to the correct location
 mkdir -p %{buildroot}/%{python3_sitelib}
 mv %{buildroot}/%{_libdir}/gobject-introspection/giscanner %{buildroot}/%{python3_sitelib}
@@ -74,7 +71,7 @@ rm -rf %{buildroot}/%{_datarootdir}/gtk-doc/html
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-%make_build check
+%meson_test
 
 %ldconfig_scriptlets
 
@@ -92,7 +89,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files devel
 %defattr(-,root,root,-)
 %{_libdir}/lib*.so
-%{_libdir}/lib*.a
 %{_libdir}/pkgconfig/*
 %{_includedir}/*
 %{_bindir}/g-ir-*
@@ -102,6 +98,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*.gz
 
 %changelog
+* Wed Feb 16 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.71.0-1
+- Update source to v1.71.0
+- Switch to meson build
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.58.0-12
 - Fix Python 3.9 compatibility issue
 

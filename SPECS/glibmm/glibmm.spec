@@ -4,7 +4,7 @@
 Summary:        C++ interface to the glib
 Name:           glibmm
 Version:        2.70.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
@@ -72,7 +72,8 @@ chmod +x %{buildroot}%{_libdir}/glibmm-%{apiver}/proc/gmmproc
 %check
 #need read content from /etc/fstab, which couldn't be empty
 echo '#test' > /etc/fstab
-export GIO_EXTRA_MODULES=/usr/lib/gio/modules; make check
+export GIO_EXTRA_MODULES=/usr/lib/gio/modules
+%meson_test
 
 %files
 %defattr(-,root,root)
@@ -93,6 +94,9 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules; make check
 %doc %{_docdir}/glibmm-%{apiver}/
 
 %changelog
+* Mon Feb 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.70.0-2
+- Fix %check section
+
 * Thu Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.70.0-1
 - Update to v2.70.0
 - Refactor to support new meson build system

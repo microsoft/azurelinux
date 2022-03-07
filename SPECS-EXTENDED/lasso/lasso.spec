@@ -1,11 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global with_java 1
+%global with_java 0
 %global with_php 0
 %global with_perl 1
-%global with_python 1
-%global with_python2 0
-%global with_python3 0
 %global with_wsf 0
 %global obsolete_old_lang_subpackages 0
 
@@ -15,13 +12,6 @@ Distribution:   Mariner
 %else
 %global ini_name     40-%{name}.ini
 %endif
-%endif
-
-
-
-
-%if %{with_python}
-  %global with_python3 1
 %endif
 
 %global configure_args %{nil}
@@ -45,15 +35,11 @@ Distribution:   Mariner
   %global configure_args %{configure_args} --enable-wsf --with-sasl2=%{_prefix}/sasl2
 %endif
 
-%if !%{with_python}
-  %global configure_args %{configure_args} --disable-python
-%endif
-
 
 Summary: Liberty Alliance Single Sign On
 Name: lasso
 Version: 2.6.0
-Release: 24%{?dist}
+Release: 25%{?dist}
 License: GPLv2+
 URL: http://lasso.entrouvert.org/
 Source: http://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
@@ -75,6 +61,7 @@ BuildRequires: gtk-doc
 BuildRequires: libtool
 BuildRequires: libtool-ltdl-devel
 BuildRequires: libxml2-devel
+BuildRequires: libxslt-devel
 BuildRequires: openssl-devel
 BuildRequires: swig
 BuildRequires: xmlsec1-devel >= 1.2.25-4
@@ -99,18 +86,10 @@ BuildRequires: expat-devel
 BuildRequires: php-devel
 %endif
 # The Lasso build system requires python, especially the binding generators
-%if %{with_python2}
-BuildRequires: python2
-BuildRequires: python2-devel
-BuildRequires: python2-lxml
-BuildRequires: python2-six
-%endif
-%if %{with_python3}
 BuildRequires: python3
 BuildRequires: python3-devel
 BuildRequires: python3-lxml
 BuildRequires: python3-six
-%endif
 %if %{with_wsf}
 BuildRequires: cyrus-sasl-devel
 %endif
@@ -169,24 +148,6 @@ PHP language bindings for the lasso (Liberty Alliance Single Sign On) library.
 
 %endif
 
-%if %{with_python2}
-%package -n python2-%{name}
-%{?python_provide:%python_provide python2-%{name}}
-Summary: Liberty Alliance Single Sign On (lasso) Python bindings
-Requires: python2
-Requires: %{name}%{?_isa} = %{version}-%{release}
-%if %{obsolete_old_lang_subpackages}
-Provides: %{name}-python = %{version}-%{release}
-Provides: %{name}-python%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-python < %{version}-%{release}
-%endif
-
-%description -n python2-%{name}
-Python language bindings for the lasso (Liberty Alliance Single Sign On)
-library.
-%endif
-
-%if %{with_python3}
 %package -n python3-%{name}
 %{?python_provide:%python_provide python3-%{name}}
 Summary: Liberty Alliance Single Sign On (lasso) Python bindings
@@ -197,7 +158,6 @@ Provides: lasso-python = %{version}-%{release}
 %description -n python3-%{name}
 Python language bindings for the lasso (Liberty Alliance Single Sign On)
 library.
-%endif
 
 %prep
 %autosetup -p1
@@ -207,26 +167,10 @@ sed -i -E -e '/^#![[:blank:]]*(\/usr\/bin\/env[[:blank:]]+python[^3]?\>)|(\/usr\
   `grep -r -l -E '^#![[:blank:]]*(/usr/bin/python[^3]?)|(/usr/bin/env[[:blank:]]+python[^3]?)' *`
 
 %build
+export JAVA_HOME=%{java_home}
 ./autogen.sh
-%if 0%{?with_python2}
-  %configure %{configure_args} --with-python=%{__python2}
-  pushd lasso
-  make %{?_smp_mflags} CFLAGS="%{optflags}"
-  popd
-  pushd bindings/python
-  make %{?_smp_mflags} CFLAGS="%{optflags}"
-  make check CK_TIMEOUT_MULTIPLIER=5
-  mkdir py2
-  mv lasso.py .libs/_lasso.so py2
-  popd
-  make clean
-%endif
 
-%if 0%{?with_python3}
-  %configure %{configure_args} --with-python=%{__python3}
-%else
-  %configure %{configure_args}
-%endif
+%configure %{configure_args} --with-python=%{__python3}
 %make_build CFLAGS="%{optflags}"
 
 %check
@@ -238,13 +182,6 @@ make check CK_TIMEOUT_MULTIPLIER=5
 make install exec_prefix=%{_prefix} DESTDIR=%{buildroot}
 find %{buildroot} -type f -name '*.la' -exec rm -f {} \;
 find %{buildroot} -type f -name '*.a' -exec rm -f {} \;
-
-%if 0%{?with_python2}
-  # Install Python 2 files saved from first build
-  install -d -m 0755 %{buildroot}/%{python2_sitearch}
-  install -m 0644 bindings/python/py2/lasso.py %{buildroot}/%{python2_sitearch}
-  install -m 0755 bindings/python/py2/_lasso.so %{buildroot}/%{python2_sitearch}
-%endif
 
 # Perl subpackage
 %if %{with_perl}
@@ -303,20 +240,17 @@ rm -fr %{buildroot}%{_defaultdocdir}/%{name}
 %{_datadir}/php/%{name}/lasso.php
 %endif
 
-%if %{with_python2}
-%files -n python2-%{name}
-%{python2_sitearch}/lasso.py*
-%{python2_sitearch}/_lasso.so
-%endif
-
-%if %{with_python3}
 %files -n python3-%{name}
 %{python3_sitearch}/lasso.py*
 %{python3_sitearch}/_lasso.so
 %{python3_sitearch}/__pycache__/*
-%endif
 
 %changelog
+* Wed Mar 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.0-25
+- Removed Python 2 bits.
+- Disabling Java subpackage as it's no needed.
+- Adding a missing BR on 'libsxlt-devel'.
+
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.6.0-24
 - Rename java-headless dependency to java
 - License verified

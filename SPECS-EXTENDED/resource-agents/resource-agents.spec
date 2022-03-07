@@ -11,19 +11,6 @@ Distribution:   Mariner
 # published by the Open Source Initiative.
 #
 
-# Below is the script used to generate a new source file
-# from the resource-agent upstream git repo.
-#
-# TAG=$(git log --pretty="format:%h" -n 1)
-# distdir="ClusterLabs-resource-agents-${TAG}"
-# TARFILE="${distdir}.tar.gz"
-# rm -rf $TARFILE $distdir
-# git archive --prefix=$distdir/ HEAD | gzip > $TARFILE
-#
-
-%global upstream_prefix ClusterLabs-resource-agents
-%global upstream_version 8ec8f341
-
 # Whether this platform defaults to using systemd as an init system
 # (needs to be evaluated prior to BuildRequires being enumerated and
 # installed as it's intended to conditionally select some of these, and
@@ -41,11 +28,7 @@ Distribution:   Mariner
   } || %(test -f /usr/lib/os-release; test $? -ne 0; echo $?))
 
 # SSLeay (required by ldirectord)
-%if 0%{?suse_version}
-%global SSLeay perl-Net_SSLeay
-%else
 %global SSLeay perl-Net-SSLeay
-%endif
 
 # determine the ras-set to process based on configure invokation
 %bcond_with rgmanager
@@ -53,51 +36,37 @@ Distribution:   Mariner
 
 Name:		resource-agents
 Summary:	Open Source HA Reusable Cluster Resource Scripts
-Version:	4.6.1
-Release:	5%{?dist}
+Version:	4.10.0
+Release:	1%{?dist}
 License:	GPLv2+ and LGPLv2+
 URL:		https://github.com/ClusterLabs/resource-agents
-%if 0%{?fedora} || 0%{?centos_version} || 0%{?rhel}
-%else
-%endif
-Source0:	%{upstream_prefix}-%{upstream_version}.tar.gz
+Source0:	https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.10.0.tar.gz#/%{name}-%{version}.tar.gz
 Obsoletes:	heartbeat-resources <= %{version}
 Provides:	heartbeat-resources = %{version}
 
 # Build dependencies
+BuildRequires: make
 BuildRequires: automake autoconf pkgconfig gcc
-BuildRequires: perl-interpreter python3-devel
+BuildRequires: perl
+BuildRequires: python3-devel
 BuildRequires: libxslt glib2-devel
-BuildRequires: systemd
+BuildRequires: systemd-devel
 BuildRequires: which
 
 BuildRequires: docbook-style-xsl docbook-dtds
 BuildRequires: libnet-devel
 
-%if 0%{?suse_version}
-%if 0%{?suse_version} >= 1140
-BuildRequires:  libnet1
-%else
-BuildRequires:  libnet
-%endif
-BuildRequires:  libglue-devel
-BuildRequires:  libxslt docbook_4 docbook-xsl-stylesheets
-%endif
-
 ## Runtime deps
 # system tools shared by several agents
-Requires: bash grep sed gawk
-Requires: /bin/ps /bin/pkill /bin/hostname /bin/netstat
-Requires: /usr/sbin/fuser /bin/mount
+Requires: /bin/bash /bin/grep /bin/sed /bin/gawk
+Requires: /bin/ps /bin/netstat /bin/hostname /usr/sbin/rpc.statd
+Requires: /usr/sbin/rpc.statd /bin/mount
 
 # Filesystem / fs.sh / netfs.sh
-Requires: util-linux
+Requires: /sbin/fsck
 Requires: /usr/sbin/fsck.ext2 /usr/sbin/fsck.ext3 /usr/sbin/fsck.ext4
-Requires: xfsprogs
+Requires: /sbin/fsck.xfs
 Requires: /sbin/mount.nfs /sbin/mount.nfs4
-%if 0%{?fedora} < 33 || (0%{?rhel} && 0%{?rhel} < 9) || (0%{?centos_version} && 0%{?centos_version} < 9) || 0%{?suse_version}
-Recommends: /usr/sbin/mount.cifs
-%endif
 
 # IPaddr2
 Requires: /sbin/ip
@@ -106,7 +75,10 @@ Requires: /sbin/ip
 Requires: /usr/sbin/lvm
 
 # nfsserver / netfs.sh
-Requires: nfs-utils
+Requires: /usr/sbin/rpc.nfsd /usr/sbin/rpc.statd /usr/sbin/rpc.mountd
+
+# ocf-distro
+Requires: /usr/bin/lsb_release
 
 # rgmanager
 %if %{with rgmanager}
@@ -128,21 +100,12 @@ service managers.
 %package -n ldirectord
 License:	GPLv2+
 Summary:	A Monitoring Daemon for Maintaining High Availability Resources
-%if 0%{?fedora} || 0%{?centos_version} || 0%{?rhel}
-%else
-%endif
 Obsoletes:	heartbeat-ldirectord <= %{version}
 Provides:	heartbeat-ldirectord = %{version}
-%if 0%{?fedora} > 18 || 0%{?centos_version} > 6 || 0%{?rhel} > 6
 BuildRequires: perl-podlators
-%endif
 Requires:       %{SSLeay} perl-libwww-perl perl-MailTools
 Requires:       ipvsadm logrotate
-%if 0%{?fedora}
 Requires:	perl-Net-IMAP-Simple-SSL perl-IO-Socket-INET6
-Requires(post):	/sbin/chkconfig
-Requires(preun):/sbin/chkconfig
-%endif
 %if %{systemd_native}
 BuildRequires:  systemd
 %endif
@@ -161,21 +124,15 @@ See 'ldirectord -h' and linux-ha/doc/ldirectord for more information.
 %endif
 
 %prep
-%setup -q -n %{upstream_prefix}-%{upstream_version}
-%autopatch -p1
+%autosetup -p1
 
 %build
 if [ ! -f configure ]; then
 	./autogen.sh
 fi
 
-%if 0%{?fedora} >= 11 || 0%{?centos_version} > 5 || 0%{?rhel} > 5
 CFLAGS="$(echo '%{optflags}')"
 %global conf_opt_fatal "--enable-fatal-warnings=no"
-%else
-CFLAGS="${CFLAGS} ${RPM_OPT_FLAGS}"
-%global conf_opt_fatal "--enable-fatal-warnings=yes"
-%endif
 
 %if %{with rgmanager}
 %global rasset rgmanager
@@ -192,19 +149,18 @@ export CFLAGS
 %configure PYTHON="%{__python3}" \
 	%{conf_opt_fatal} \
 %if %{defined _unitdir}
-    --with-systemdsystemunitdir=%{_unitdir} \
+    SYSTEMD_UNIT_DIR=%{_unitdir} \
 %endif
 %if %{defined _tmpfilesdir}
-    --with-systemdtmpfilesdir=%{_tmpfilesdir} \
+    SYSTEMD_TMPFILES_DIR=%{_tmpfilesdir} \
     --with-rsctmpdir=/run/resource-agents \
 %endif
 	--with-pkg-name=%{name} \
 	--with-ras-set=%{rasset}
 
-make
+make %{_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 
 ## tree fixup
@@ -222,7 +178,8 @@ test -d %{buildroot}/sbin || mkdir %{buildroot}/sbin
 %endif
 
 %files
-%doc AUTHORS COPYING COPYING.GPLv3 COPYING.LGPL ChangeLog
+%license COPYING COPYING.GPLv3 COPYING.LGPL
+%doc AUTHORS ChangeLog
 %if %{with linuxha}
 %doc heartbeat/README.galera
 %doc doc/README.webapps
@@ -247,6 +204,8 @@ test -d %{buildroot}/sbin || mkdir %{buildroot}/sbin
 %{_usr}/lib/ocf/resource.d/redhat
 %endif
 
+%{_datadir}/pkgconfig/%{name}.pc
+
 %if %{defined _unitdir}
 %{_unitdir}/resource-agents-deps.target
 %endif
@@ -266,8 +225,6 @@ test -d %{buildroot}/sbin || mkdir %{buildroot}/sbin
 
 %{_sbindir}/ocf-tester
 %{_sbindir}/ocft
-#%%{_sbindir}/sfex_init
-#%%{_sbindir}/sfex_stat
 
 %{_includedir}/heartbeat
 
@@ -279,7 +236,6 @@ test -d %{buildroot}/sbin || mkdir %{buildroot}/sbin
 
 %{_mandir}/man7/*.7*
 %{_mandir}/man8/ocf-tester.8*
-#%%{_mandir}/man8/sfex_init.8*
 
 # For compatability with pre-existing agents
 %dir %{_sysconfdir}/ha.d
@@ -345,6 +301,10 @@ ccs_update_schema > /dev/null 2>&1 ||:
 %endif
 
 %changelog
+* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.10.0-1
+- Updating to version 4.10.0 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.6.1-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

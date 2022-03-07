@@ -1,54 +1,37 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global         majorminor      1.0
-
-#global gitrel     140
-#global gitcommit  a70055b58568f7304ba46bd8742232337013487b
-#global shortcommit %(c=%{gitcommit}; echo ${c:0:5})
 
 %global         _glib2                  2.32.0
 %global         _libxml2                2.4.0
 %global         _gobject_introspection  1.31.1
 %global 	__python %{__python3}
 
-Name:           gstreamer1
-Version:        1.16.2
-Release:        5%{?dist}
 Summary:        GStreamer streaming media framework runtime
-
-License:        GPLv2+
+Name:           gstreamer1
+Version:        1.20.0
+Release:        1%{?dist}
+License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://gstreamer.freedesktop.org/
-%if 0%{?gitrel}
-# git clone git://anongit.freedesktop.org/gstreamer/gstreamer
-# cd gstreamer; git reset --hard %{gitcommit}; ./autogen.sh; make; make distcheck
-Source0:        gstreamer-%{version}.tar.xz
-%else
 Source0:        http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-%{version}.tar.xz
-%endif
 ## For GStreamer RPM provides
 Patch0:         gstreamer-inspect-rpm-format.patch
 Source1:        gstreamer1.prov
 Source2:        gstreamer1.attr
 
+BuildRequires:  meson >= 0.48.0
+BuildRequires:  gcc
 BuildRequires:  glib2-devel >= %{_glib2}
 BuildRequires:  libxml2-devel >= %{_libxml2}
 BuildRequires:  gobject-introspection-devel >= %{_gobject_introspection}
 BuildRequires:  bison
 BuildRequires:  flex
-BuildRequires:  m4
 BuildRequires:  check-devel
-BuildRequires:  python3
 BuildRequires:  gettext
 BuildRequires:  pkgconfig
 BuildRequires:  libcap-devel
-
-# ./autogen.sh deps
-BuildRequires:  automake gettext-devel libtool
-BuildRequires:  chrpath
-
-### documentation requirements
-BuildRequires:  gtk-doc >= 1.3
-BuildRequires:  libxslt
+BuildRequires:  elfutils-devel
+BuildRequires:  bash-completion
 
 %description
 GStreamer is a streaming media framework, based on graphs of filters which
@@ -72,50 +55,30 @@ Conflicts:      gstreamer1-plugins-bad-free-devel < 1.13
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
-%package devel-docs
-Summary:         Developer documentation for GStreamer streaming media framework
-Requires:        %{name} = %{version}-%{release}
-BuildArch:       noarch
-
-%description devel-docs
-This %{name}-devel-docs contains developer documentation for the
-GStreamer streaming media framework.
-
 %prep
 %setup -q -n gstreamer-%{version}
 %patch0 -p1 -b .rpm-provides
 
 %build
-NOCONFIGURE=1 \
-./autogen.sh
-
-%configure \
-  --with-package-name='Fedora GStreamer package' \
-  --with-package-origin='http://download.fedoraproject.org' \
-  --enable-gtk-doc \
-  --enable-debug \
-  --disable-fatal-warnings \
-  --disable-silent-rules \
-  --disable-tests --disable-examples \
-  --with-ptp-helper-permissions=capabilities
-
-
-%make_build V=1
-
+%meson	\
+  -D package-name='CBL-Mariner GStreamer package' \
+  -D package-origin='https://packages.microsoft.com/cbl-mariner/2.0' \
+  -D tests=disabled \
+  -D examples=disabled \
+  -D ptp-helper-permissions=capabilities \
+  -D dbghelp=disabled \
+  -D doc=disabled \
+  -D libunwind=disabled
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 %find_lang gstreamer-%{majorminor}
-# Clean out files that should not be part of the rpm.
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -fv {} ';'
-find $RPM_BUILD_ROOT -name '*.a' -exec rm -fv {} ';'
 # Add the provides script
 install -m0755 -D %{SOURCE1} $RPM_BUILD_ROOT%{_rpmconfigdir}/gstreamer1.prov
 # Add the gstreamer plugin file attribute entry (rpm >= 4.9.0)
 install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer1.attr
-
 
 %ldconfig_scriptlets
 
@@ -194,13 +157,10 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 %{_libdir}/pkgconfig/gstreamer-check-%{majorminor}.pc
 %{_libdir}/pkgconfig/gstreamer-net-%{majorminor}.pc
 
-%files devel-docs
-%doc %{_datadir}/gtk-doc/html/gstreamer-%{majorminor}
-%doc %{_datadir}/gtk-doc/html/gstreamer-libs-%{majorminor}
-%doc %{_datadir}/gtk-doc/html/gstreamer-plugins-%{majorminor}
-
-
 %changelog
+* Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.0-1
+- Updating to version 1.20.0 using Fedora 36 spec (license: MIT) for guidance.
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.2-5
 - Removing docs to drop dependency on 'ghostscript'.
 - License verified.

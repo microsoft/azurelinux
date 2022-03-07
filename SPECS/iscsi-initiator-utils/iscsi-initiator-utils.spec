@@ -1,25 +1,25 @@
 %global __provides_exclude_from ^(%{python2_sitearch}/.*\\.so|%{python3_sitearch}/.*\\.so)$
 
 # Use only 7-10 first characters of the git commit hash!
-%global git_commit            4440e57a59c7f1c23bbfdcb10844017f478918b6
-%global git_short_commit      4440e57a59
-%global git_short_commit_date 20191114
-%global open_iscsi_build      0
+%global git_commit            2a8f9d81d0d6b5094c3fe9c686e2afb2ec27058a
+%global git_short_commit      2a8f9d8
+%global git_short_commit_date 20210729
+%global open_iscsi_build      4
 %global open_iscsi_version    2.1
 
 Summary:        iSCSI daemon and utility programs
 Name:           iscsi-initiator-utils
 Version:        6.%{open_iscsi_version}.%{open_iscsi_build}+%{git_short_commit_date}.%{git_short_commit}
-Release:        4%{?dist}
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://www.open-iscsi.org
+URL:            https://www.open-iscsi.com/
 Source0:        https://github.com/open-iscsi/open-iscsi/archive/%{git_commit}.tar.gz#/open-iscsi-%{version}.tar.gz
 Source4:        04-iscsi
 Source5:        iscsi-tmpfiles.conf
 
-Patch0001:      0001-service-file-tweaks.patch
+Patch0001:      0001-unit-file-tweaks.patch
 Patch0002:      0002-idmb_rec_write-check-for-tpgt-first.patch
 Patch0003:      0003-idbm_rec_write-seperate-old-and-new-style-writes.patch
 Patch0004:      0004-idbw_rec_write-pick-tpgt-from-existing-record.patch
@@ -39,18 +39,17 @@ Patch0017:      0017-dont-install-scripts.patch
 Patch0018:      0018-use-var-lib-iscsi-in-libopeniscsiusr.patch
 Patch0019:      0019-Coverity-scan-fixes.patch
 Patch0020:      0020-fix-upstream-build-breakage-of-iscsiuio-LDFLAGS.patch
-Patch0021:      0021-improve-systemd-service-files-for-boot-session-handl.patch
-Patch0022:      0022-use-Red-Hat-version-string-to-match-RPM-package-vers.patch
-Patch0023:      0023-support-gcc-fno-common-option.patch
-Patch0024:      fix-libpath.patch
-# Rebased backport of https://github.com/open-iscsi/open-iscsi/commit/d3daa7a2
-# Intended to fix error using iSCSI during install:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1774746
-Patch1000:      0001-configuration-support-for-CHAP-algorithms-rebased.patch
+Patch0021:      0021-use-Red-Hat-version-string-to-match-RPM-package-vers.patch
+Patch0022:      0022-iscsi_if.h-replace-zero-length-array-with-flexible-a.patch
+Patch0023:      0023-stop-using-Werror-for-now.patch
+Patch0024:      0024-minor-service-file-updates.patch
+Patch0025:      0025-Remove-dependences-from-iscsi-init.service.patch
+Patch0026:      0026-fix-libpath.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
+BuildRequires:  doxygen
 BuildRequires:  flex
 BuildRequires:  isns-utils-devel
 BuildRequires:  kmod-devel
@@ -61,6 +60,7 @@ BuildRequires:  systemd-devel
 BuildRequires:  systemd-units
 
 Requires:       %{name}-iscsiuio >= %{version}-%{release}
+Requires:       isns-utils
 Requires(post): systemd
 Requires(postun): systemd
 Requires(preun): systemd
@@ -77,7 +77,6 @@ Protocol networks.
 %package iscsiuio
 Summary:        Userspace configuration daemon required for some iSCSI hardware
 License:        BSD
-
 Requires:       %{name} = %{version}-%{release}
 
 %description iscsiuio
@@ -87,7 +86,6 @@ for some iSCSI offload hardware.
 %package devel
 Summary:        Development files for %{name}
 License:        GPLv2+
-
 Requires:       %{name} = %{version}-%{release}
 
 %description devel
@@ -98,10 +96,9 @@ developing applications that use %{name}.
 %{?python_provide:%python_provide python3-%{name}}
 Summary:        Python %{python3_version} bindings to %{name}
 License:        GPLv2+
-
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-
+BuildRequires:  make
 Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-%{name}
@@ -109,7 +106,7 @@ The %{name}-python3 package contains Python %{python3_version} bindings to the
 libiscsi interface for interacting with %{name}
 
 %prep
-%autosetup -p1 -n open-iscsi-%{git_commit}
+%autosetup -p1 -n open-iscsi-%{open_iscsi_version}.%{open_iscsi_build}
 
 # change exec_prefix, there's no easy way to override
 sed -i -e 's|^exec_prefix = /$|exec_prefix = %{_exec_prefix}|' Makefile
@@ -124,15 +121,6 @@ cd iscsiuio
 autoreconf --install
 %configure
 cd ..
-
-# Faking Doxygen's existence. No config option to disable its usage.
-cat << EOF >> %{_bindir}/doxygen
-#!/bin/bash
-if [[ -n "$1" ]]; then
-  echo "Pretending to be 'doxygen' for '$1'."
-fi
-EOF
-chmod +x %{_bindir}/doxygen
 
 make OPTFLAGS="%{optflags} %{?__global_ldflags}"
 pushd libiscsi
@@ -159,8 +147,8 @@ install -d %{buildroot}%{_sharedstatedir}/iscsi/slp
 install -d %{buildroot}%{_sharedstatedir}/iscsi/ifaces
 
 # for %%ghost
-install -d %{buildroot}%{_var}/lock/iscsi
-touch %{buildroot}%{_var}/lock/iscsi/lock
+%{__install} -d %{buildroot}%{_rundir}/lock/iscsi
+touch %{buildroot}%{_rundir}/lock/iscsi/lock
 
 
 install -d %{buildroot}%{_unitdir}
@@ -258,8 +246,8 @@ fi
 %dir %{_sharedstatedir}/iscsi/slp
 %dir %{_sharedstatedir}/iscsi/ifaces
 %dir %{_sharedstatedir}/iscsi/send_targets
-%ghost %{_var}/lock/iscsi
-%ghost %{_var}/lock/iscsi/lock
+%ghost %attr(0700, root, root) %{_rundir}/lock/iscsi
+%ghost %attr(0600, root, root) %{_rundir}/lock/iscsi/lock
 %{_unitdir}/iscsi.service
 %{_unitdir}/iscsi-shutdown.service
 %{_unitdir}/iscsid.service
@@ -280,12 +268,6 @@ fi
 %{_mandir}/man8/iscsistart.8.gz
 # until we decide to setup libopeniscsiusr as a subpkg for real
 %{_libdir}/libopeniscsiusr.so.*
-%exclude %{_libdir}/libopeniscsiusr.so
-%exclude %{_includedir}/libopeniscsiusr.h
-%exclude %{_includedir}/libopeniscsiusr_common.h
-%exclude %{_includedir}/libopeniscsiusr_iface.h
-%exclude %{_includedir}/libopeniscsiusr_session.h
-%exclude %{_libdir}/pkgconfig/libopeniscsiusr.pc
 
 %files iscsiuio
 %{_sbindir}/iscsiuio
@@ -297,11 +279,24 @@ fi
 %files devel
 %{_libdir}/libiscsi.so
 %{_includedir}/libiscsi.h
+%{_includedir}/libopeniscsiusr_node.h
+%{_libdir}/libopeniscsiusr.so
+%{_includedir}/libopeniscsiusr.h
+%{_includedir}/libopeniscsiusr_common.h
+%{_includedir}/libopeniscsiusr_iface.h
+%{_includedir}/libopeniscsiusr_session.h
+%{_libdir}/pkgconfig/libopeniscsiusr.pc
 
 %files -n python3-%{name}
 %{python3_sitearch}/*
 
 %changelog
+* Tue Feb 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.2.1.4+20210729.2a8f9d8-1
+- Update source to v2.1.4
+- Readd BR doxygen
+- Move libopeniscsiusr*.h files into devel package
+- Remove debuginfo
+
 * Thu Jul 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.2.1.0+20191114.4440e57a59-4
 - Changed release to a simple integer.
 - Switched versioning to closer follow Fedora's guidelines for snapshots.

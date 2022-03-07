@@ -4,13 +4,15 @@ Distribution:   Mariner
 
 Name:		libtnc
 Version:	1.25
-Release:	25%{?dist}
+Release:	26%{?dist}
 Summary:	Library implementation of the Trusted Network Connect (TNC) specification
 License:	GPLv2
-Source0:	http://dl.sourceforge.net/sourceforge/%{name}/%{name}-%{version}.tar.gz
+Source0:	https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 Patch0:		libtnc-1.25-bootstrap.patch
+Patch1:		libtnc-1.25-syserror.patch
 URL:		http://libtnc.sourceforge.net/
 BuildRequires:  gcc
+BuildRequires:  make
 BuildRequires:	perl-devel
 BuildRequires:	perl-generators
 BuildRequires:	libxml2-devel, zlib-devel, perl(ExtUtils::MakeMaker)
@@ -44,6 +46,7 @@ tar xf Interface-TNC-1.0.tar.gz
 popd
 
 %patch0 -p1 -b .bootstrap
+%patch1 -p1 -b .syserror
 
 %build
 CFLAGS="%{optflags} -fPIC -DPIC"
@@ -77,7 +80,8 @@ popd
 %ldconfig_scriptlets
 
 %files
-%doc COPYING README
+%license COPYING
+%doc README
 %{_libdir}/libosc_im*.so.*
 %{_libdir}/libsample_im*.so.*
 %{_libdir}/libtnc.so.*
@@ -97,6 +101,10 @@ popd
 %{_mandir}/man3/Interface::TNC*
 
 %changelog
+* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.25-26
+- Fixing building with GCC 11 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.25-25
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           python-%{srcname}
 Version:        0.18.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Comprehensive HTTP client library
 License:        MIT
 URL:            https://pypi.python.org/pypi/httplib2
@@ -53,6 +53,7 @@ popd
 
 mv %{srcname}-%{version} python3
 rm -r python3/python2
+mv python3/LICENSE .
 
 
 %build
@@ -79,6 +80,9 @@ popd
 %{python3_sitelib}/%{srcname}/
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.1-5
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

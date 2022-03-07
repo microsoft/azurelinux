@@ -7,7 +7,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.56.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,7 +24,6 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-
 BuildRequires:  binutils
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -32,11 +31,10 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
+Provides:       cargo = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  python3-xml
 %endif
-
-Provides:       cargo = %{version}-%{release}
 
 %description
 Rust Programming Language
@@ -73,12 +71,13 @@ mv %{SOURCE7} "$BUILD_CACHE_DIR"
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
-sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo"
+sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
 USER=root SUDO_USER=root %make_build
 
 %check
+ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 %make_build check
 
 %install
@@ -109,11 +108,17 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %doc src/tools/rustfmt/{README,CHANGELOG,Configurations}.md
 %doc src/tools/clippy/{README.md,CHANGELOG.md}
 %{_bindir}/cargo
+%{_bindir}/cargo-fmt
+%{_bindir}/rustfmt
 %{_datadir}/zsh/*
 %doc %{_docdir}/%{name}/LICENSE-THIRD-PARTY
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 1.56.1-2
+- Build rustfmt tool as it is required to run PTest
+- Create softlink for rustfmt in stage0
+
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.56.1-1
 - Updating to version 1.56.1.
 - Switching to building with Python 3.
