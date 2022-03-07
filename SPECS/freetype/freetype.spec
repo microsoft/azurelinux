@@ -44,7 +44,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %files
 %defattr(-,root,root)
-%license LICENSE.TXT docs/FTL.txt docs/GPLv2.txt
+%license LICENSE.TXT docs/FTL.TXT docs/GPLv2.TXT
 %{_libdir}/*.so*
 %{_datadir}/*
 
