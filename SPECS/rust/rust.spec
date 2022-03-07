@@ -16,6 +16,9 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
+# Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
 Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
