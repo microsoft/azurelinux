@@ -1,8 +1,8 @@
 Summary:	software font engine.
 Name:		freetype
-Version:	2.9.1
-Release:    4%{?dist}
-License:	BSD/GPL
+Version:	2.11.1
+Release:    1%{?dist}
+License:	BSD with advertising or GPLv2
 URL:		https://www.freetype.org/
 Group:		System Environment/Libraries
 Vendor:         Microsoft Corporation
@@ -45,7 +45,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %files
 %defattr(-,root,root)
-%license docs/LICENSE.TXT
+%license LICENSE.TXT docs/FTL.txt docs/GPLv2.txt
 %{_libdir}/*.so*
 %{_datadir}/*
 
@@ -56,6 +56,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11.1-1
+- Updating to version 2.11.1 to address CVE-2020-15999.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.9.1-4
 - Added %%license line automatically
 
