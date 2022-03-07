@@ -49,7 +49,7 @@ popd
 %autosetup -p1 -n rustc-%{version}-src
 
 # Setup build/cache directory
-%define BUILD_CACHE_DIR build/cache/2020-08-27/
+%define BUILD_CACHE_DIR build/cache/%{release_date}/
 mkdir -pv %{BUILD_CACHE_DIR}
 %ifarch x86_64
 mv %{SOURCE2} %{BUILD_CACHE_DIR}
