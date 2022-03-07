@@ -3,17 +3,17 @@ Name:           gawk
 Version:        5.1.0
 Release:        2%{?dist}
 License:        GPLv3
-URL:            https://www.gnu.org/software/gawk
-Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/File
+URL:            https://www.gnu.org/software/gawk
 Source0:        https://ftp.gnu.org/gnu/gawk/%{name}-%{version}.tar.xz
+Requires:       gmp
+Requires:       mpfr
+Requires:       readline >= 7.0
 Provides:       /bin/awk
 Provides:       /bin/gawk
 Provides:       awk
-Requires:       mpfr
-Requires:       gmp
-Requires:       readline >= 7.0
 
 %description
 The Gawk package contains programs for manipulating text files.
@@ -33,7 +33,7 @@ make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}%{_defaultdocdir}/%{name}-%{version}
 cp -v doc/{awkforai.txt,*.{eps,pdf,jpg}} %{buildroot}%{_defaultdocdir}/%{name}-%{version}
 rm -rf %{buildroot}%{_infodir}
-find %{buildroot}%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}
 
 %check
@@ -41,8 +41,8 @@ find %{buildroot}%{_libdir} -name '*.la' -delete
 sed -i 's/ timeout / /' test/Makefile
 sed -i 's/ pty1 / /' test/Makefile
 # Generate locale for `en_US.iso88591` which is required for ptest
-echo "en_US ISO-8859-1" >> /etc/locale-gen.conf
-/usr/sbin/locale-gen.sh
+echo "en_US ISO-8859-1" >> %{_sysconfdir}/locale-gen.conf
+%{_sbindir}/locale-gen.sh
 make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
@@ -64,6 +64,7 @@ make %{?_smp_mflags} check
 %changelog
 * Tue Feb 15 2022 Muhammad Falak <mwani@microsoft.com> - 5.1.0-2
 - Generate locale `en_US.iso88591` in `%check` section to enable ptest
+- Lint spec
 
 * Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> - 5.1.0-1
 - Update to version 5.1.0
