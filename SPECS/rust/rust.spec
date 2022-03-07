@@ -32,9 +32,12 @@ BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  git
 BuildRequires:  glibc
-BuildRequires:  python2
+BuildRequires:  ninja-build
+BuildRequires:  python3
+Provides:       cargo = %{version}-%{release}
+
 %if %{with_check}
-BuildRequires:  python-xml
+BuildRequires:  python3-xml
 %endif
 
 %description
@@ -44,22 +47,27 @@ Rust Programming Language
 # Setup .cargo directory
 mkdir -p $HOME
 pushd $HOME
-tar xf %{SOURCE1} --no-same-owner
+tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
 
+# Rust doesn't recognize our .tar.gz bootstrap files when XZ support is enabled
+# This causes stage 0 bootstrap to look online for sources
+# So, we remove XZ support detection in the bootstrap program
+sed -i "s/tarball_suffix = '.tar.xz' if support_xz() else '.tar.gz'/tarball_suffix = '.tar.gz'/g" src/bootstrap/bootstrap.py
+
 # Setup build/cache directory
-%define BUILD_CACHE_DIR build/cache/%{release_date}/
-mkdir -pv %{BUILD_CACHE_DIR}
+BUILD_CACHE_DIR="build/cache/%{release_date}"
+mkdir -pv "$BUILD_CACHE_DIR"
 %ifarch x86_64
-mv %{SOURCE2} %{BUILD_CACHE_DIR}
-mv %{SOURCE3} %{BUILD_CACHE_DIR}
-mv %{SOURCE4} %{BUILD_CACHE_DIR}
+mv %{SOURCE2} "$BUILD_CACHE_DIR"
+mv %{SOURCE3} "$BUILD_CACHE_DIR"
+mv %{SOURCE4} "$BUILD_CACHE_DIR"
 %endif
 %ifarch aarch64
-mv %{SOURCE5} %{BUILD_CACHE_DIR}
-mv %{SOURCE6} %{BUILD_CACHE_DIR}
-mv %{SOURCE7} %{BUILD_CACHE_DIR}
+mv %{SOURCE5} "$BUILD_CACHE_DIR"
+mv %{SOURCE6} "$BUILD_CACHE_DIR"
+mv %{SOURCE7} "$BUILD_CACHE_DIR"
 %endif
 
 %build
@@ -67,20 +75,17 @@ mv %{SOURCE7} %{BUILD_CACHE_DIR}
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
-sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo"
-# Exporting SUDO_USER=root bypasses a check in the python bootstrap that
+sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
+# SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
-export USER=root
-export SUDO_USER=root
-make %{?_smp_mflags}
+USER=root SUDO_USER=root %make_build
 
 %check
-make check
+ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+%make_build check
 
 %install
-export USER=root
-export SUDO_USER=root
-make DESTDIR=%{buildroot} install
+USER=root SUDO_USER=root %make_install
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
 
@@ -96,6 +101,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
+%{_libexecdir}/cargo-credential-1password
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
 %doc %{_docdir}/%{name}/html/*
@@ -107,6 +113,8 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %doc src/tools/rustfmt/{README,CHANGELOG,Configurations}.md
 %doc src/tools/clippy/{README.md,CHANGELOG.md}
 %{_bindir}/cargo
+%{_bindir}/cargo-fmt
+%{_bindir}/rustfmt
 %{_datadir}/zsh/*
 %doc %{_docdir}/%{name}/LICENSE-THIRD-PARTY
 %{_sysconfdir}/bash_completion.d/cargo
@@ -114,6 +122,7 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %changelog
 * Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.59.0-1
 - Updating to version 1.59.0 to fix CVE-2022-21658.
+- Updating build instructions to fix tests.
 
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-3
 - Patch CVE-2020-36317, CVE-2021-28875, CVE-2021-28876, CVE-2021-28877, CVE-2021-28878
