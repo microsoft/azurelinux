@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.33.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,11 @@ URL:            https://git-scm.com/
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
+%if %{with_check}
+BuildRequires:  perl(lib)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(Getopt::Long)
+%endif
 Requires:       curl
 Requires:       expat
 Requires:       openssh
@@ -116,7 +121,8 @@ install -m 0644 contrib/completion/git-completion.bash %{buildroot}%{_datadir}/b
 %{_fixperms} %{buildroot}/*
 
 %check
-%make_build test
+# Skip git-send-email tests as mariner does not ship it
+GIT_SKIP_TESTS='t9001' %make_build test
 
 %post
 if [ $1 -eq 1 ];then
@@ -161,6 +167,10 @@ fi
 %endif
 
 %changelog
+* Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 2.33.0-6
+- Add an explicit BR on `perl{(lib), (IO::File), (Getopt::Long)}`
+- Skip `git-send-email` (t9001) tests to enable ptest
+
 * Tue Mar 1 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.33.0-5
 - Add openssh dependency for git
 
