@@ -22874,8 +22874,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonschema",
-          "version": "2.6.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
+          "version": "3.2.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-3.2.0.tar.gz"
         }
       }
     },
