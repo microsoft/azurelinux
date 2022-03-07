@@ -11,7 +11,6 @@ Distribution:   Mariner
 BuildRequires:  cracklib-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  audit-devel
-Requires:       audit-libs
 Requires:       cracklib
 
 %description
