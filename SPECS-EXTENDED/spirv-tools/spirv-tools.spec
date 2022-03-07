@@ -43,6 +43,7 @@ Development files for %{name}
 %build
 %__mkdir_p %_target_platform
 pushd %_target_platform
+
 %cmake3 -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBDIR=%{_lib} \
         -DSPIRV-Headers_SOURCE_DIR=%{_prefix} \
@@ -50,10 +51,16 @@ pushd %_target_platform
         -DSPIRV_TOOLS_BUILD_STATIC=OFF \
         -GNinja ..
 %cmake3_build
+
 popd
 
 %install
+%__mkdir_p %_target_platform
+pushd %_target_platform
+
 %cmake3_install
+
+popd
 
 %ldconfig_scriptlets libs
 
