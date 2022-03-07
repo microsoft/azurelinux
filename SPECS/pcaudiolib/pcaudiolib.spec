@@ -2,7 +2,7 @@ Summary:        Portable C Audio Library
 Name:           pcaudiolib
 Version:        1.2
 Release:        1%{?dist}
-License:        GPLv3
+License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/espeak-ng/pcaudiolib

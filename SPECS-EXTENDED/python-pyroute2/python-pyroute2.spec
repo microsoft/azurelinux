@@ -34,13 +34,13 @@ IPQ.
 %prep
 %setup -q -n %{srcname}-%{version}
 cd ..
-tar xzvf %{Source1}
-tar xzvf %{Source2}
-tar xzvf %{Source3}
-tar xzvf %{Source4}
-tar xzvf %{Source5}
-tar xzvf %{Source6}
-tar xzvf %{Source7}
+tar xzvf %{SOURCE1}
+tar xzvf %{SOURCE2}
+tar xzvf %{SOURCE3}
+tar xzvf %{SOURCE4}
+tar xzvf %{SOURCE5}
+tar xzvf %{SOURCE6}
+tar xzvf %{SOURCE7}
 
 %build
 %py3_build

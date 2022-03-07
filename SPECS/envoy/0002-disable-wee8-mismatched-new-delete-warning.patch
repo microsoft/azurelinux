@@ -1,0 +1,25 @@
+diff --git a/bazel/external/wee8.BUILD b/bazel/external/wee8.BUILD
+index ee56998..79f5e62 100644
+--- a/bazel/external/wee8.BUILD
++++ b/bazel/external/wee8.BUILD
+@@ -17,6 +17,7 @@ cc_library(
+         ]),
+     copts = [
+         "-Wno-range-loop-analysis",
++        "-Wno-mismatched-new-delete",
+     ],
+     defines = [
+         "V8_ENABLE_WEBASSEMBLY",
+diff --git a/bazel/external/wee8.genrule_cmd b/bazel/external/wee8.genrule_cmd
+index c01a8c5..1453d91 100644
+--- a/bazel/external/wee8.genrule_cmd
++++ b/bazel/external/wee8.genrule_cmd
+@@ -29,7 +29,7 @@ rm -rf out/wee8
+ 
+ # Export compiler configuration.
+ export CFLAGS="$${CFLAGS-} -Wno-unknown-warning-option"
+-export CXXFLAGS="$${CXXFLAGS-} -Wno-sign-compare -Wno-deprecated-copy -Wno-unknown-warning-option -Wno-range-loop-analysis -Wno-shorten-64-to-32 -Wno-invalid-offsetof"
++export CXXFLAGS="$${CXXFLAGS-} -Wno-sign-compare -Wno-deprecated-copy -Wno-unknown-warning-option -Wno-range-loop-analysis -Wno-shorten-64-to-32 -Wno-invalid-offsetof -Wno-mismatched-new-delete"
+ if [[ ( $${SYSTEM} == "Darwin" && $${CXX-} == "" ) || $${CXX-} == *clang* ]]; then
+   export CC=$${CC:-clang}
+   export CXX=$${CXX:-clang++}

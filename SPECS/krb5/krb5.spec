@@ -1,7 +1,9 @@
+%define __requires_exclude ^/(usr/)?bin/(ba)?sh$
+
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.18
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -117,6 +119,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18-4
+- Removing dependcy on Bash.
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.18-3
 - Remove manual pkgconfig(*) provides in toolchain specs
 
