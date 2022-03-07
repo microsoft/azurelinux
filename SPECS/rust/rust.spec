@@ -1,9 +1,15 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
+
+# Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
+# Look for "date:" and "rustc:".
+%define release_date 2022-01-13
+%define stage0_version 1.58.0
+
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.47.0
-Release:        3%{?dist}
+Version:        1.59.0
+Release:        1%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,19 +17,12 @@ Group:          Applications/System
 URL:            https://www.rust-lang.org/
 Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Source2:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-x86_64-unknown-linux-gnu.tar.gz
-Source3:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-x86_64-unknown-linux-gnu.tar.gz
-Source4:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-x86_64-unknown-linux-gnu.tar.gz
-Source5:        https://static.rust-lang.org/dist/2020-08-27/cargo-0.47.0-aarch64-unknown-linux-gnu.tar.gz
-Source6:        https://static.rust-lang.org/dist/2020-08-27/rustc-1.46.0-aarch64-unknown-linux-gnu.tar.gz
-Source7:        https://static.rust-lang.org/dist/2020-08-27/rust-std-1.46.0-aarch64-unknown-linux-gnu.tar.gz
-Patch0:         CVE-2020-36317.patch
-Patch1:         CVE-2021-28875.patch
-Patch2:         CVE-2021-28877.patch
-Patch3:         CVE-2021-28876.patch
-Patch4:         CVE-2021-28879.patch
-Patch5:         CVE-2021-28878.patch
-Patch6:         CVE-2020-36323.patch
+Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
+Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
+Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
+Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -110,6 +109,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.59.0-1
+- Updating to version 1.59.0 to fix CVE-2022-21658.
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-3
 - Patch CVE-2020-36317, CVE-2021-28875, CVE-2021-28876, CVE-2021-28877, CVE-2021-28878
 - Redo patch for CVE-2021-28879 with regards to patches listed above
