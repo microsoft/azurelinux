@@ -1,12 +1,13 @@
-diff -urN a/examples/chronyd.service b/examples/chronyd.service
---- a/examples/chronyd.service  2022-03-08 05:41:13.287141475 +0000
-+++ b/examples/chronyd.service  2022-03-08 06:09:47.065622213 +0000
-@@ -11,6 +11,8 @@
+diff -urN c/examples/chronyd.service d/examples/chronyd.service
+--- c/examples/chronyd.service  2022-03-08 08:58:48.624885692 +0000
++++ d/examples/chronyd.service  2022-03-08 08:59:29.500744600 +0000
+@@ -10,6 +10,8 @@
+ PIDFile=/run/chrony/chronyd.pid
  EnvironmentFile=-/etc/sysconfig/chronyd
  ExecStart=/usr/sbin/chronyd $OPTIONS
-
 +ExecStartPost=/usr/libexec/chrony-helper update-daemon
 +ExecStopPost=/usr/libexec/chrony-helper remove-daemon-state
- CapabilityBoundingSet=~CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_AUDIT_WRITE
- CapabilityBoundingSet=~CAP_BLOCK_SUSPEND CAP_KILL CAP_LEASE CAP_LINUX_IMMUTABLE
- CapabilityBoundingSet=~CAP_MAC_ADMIN CAP_MAC_OVERRIDE CAP_MKNOD CAP_SYS_ADMIN
+ PrivateTmp=yes
+ ProtectHome=yes
+ ProtectSystem=full
+ 

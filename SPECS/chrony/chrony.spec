@@ -1,9 +1,9 @@
 %global _hardened_build 1
-%global clknetsim_ver 79ffe4
+%global clknetsim_ver f89702
 %bcond_without debug
 
 Name:           chrony
-Version:        4.2
+Version:        4.1
 Release:        1%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
@@ -21,6 +21,7 @@ Source10:       https://github.com/mlichvar/clknetsim/archive/%{clknetsim_ver}/c
 
 # add NTP servers from DHCP when starting service
 Patch2:         chrony-service-helper.patch
+Patch3:         sys-linux-testfix.patch
 
 BuildRequires:  bison
 BuildRequires:  gcc
@@ -60,16 +61,17 @@ service to other computers in the network.
 
 %setup -q -n %{name}-%{version} -a 10
 %patch2 -p1 -b .service-helper
+%patch3 -p1
 
 # review changes in packaged configuration files and scripts
 md5sum -c <<-EOF | (! grep -v 'OK$')
-        b40117b4aac846d31e4ad196dc44cda3  examples/chrony-wait.service
+        bc563c1bcf67b2da774bd8c2aef55a06  examples/chrony-wait.service
         2d01b94bc1a7b7fb70cbee831488d121  examples/chrony.conf.example2
         96999221eeef476bd49fe97b97503126  examples/chrony.keys.example
         6a3178c4670de7de393d9365e2793740  examples/chrony.logrotate
         d0984e98fe3ac9c4dc8d94d9b037f6ef  examples/chrony.nm-dispatcher.dhcp
         8f5a98fcb400a482d355b929d04b5518  examples/chrony.nm-dispatcher.onoffline
-        d4857678ec4c250010d81cdc9a4eded8  examples/chronyd.service
+        56d221eba8ce8a2e03d3e0dd87999a81  examples/chronyd.service
 EOF
 
 # use example chrony.conf as the default config with some modifications:
@@ -203,7 +205,7 @@ systemctl start chronyd.service
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
-* Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 4.2-1
+* Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 4.1-1
 - Upgrade to version 4.2
 
 * Wed Jun 23 2021 Mateusz Malisz <mamalisz@microsoft.com> - 3.5.1-5
