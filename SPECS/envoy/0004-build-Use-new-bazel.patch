@@ -1,0 +1,27 @@
+diff --git a/.bazelversion b/.bazelversion
+index ccbccc3..ee74734 100644
+--- a/.bazelversion
++++ b/.bazelversion
+@@ -1 +1 @@
+-2.2.0
++4.1.0
+diff --git a/bazel/repository_locations.bzl b/bazel/repository_locations.bzl
+index 3f24f41..76dd1df 100644
+--- a/bazel/repository_locations.bzl
++++ b/bazel/repository_locations.bzl
+@@ -9,11 +9,11 @@ REPOSITORY_LOCATIONS = dict(
+         urls = ["https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.1/bazel-gazelle-v0.19.1.tar.gz"],
+     ),
+     bazel_toolchains = dict(
+-        sha256 = "1342f84d4324987f63307eb6a5aac2dff6d27967860a129f5cd40f8f9b6fd7dd",
+-        strip_prefix = "bazel-toolchains-2.2.0",
++        sha256 = "179ec02f809e86abf56356d8898c8bd74069f1bd7c56044050c2cd3d79d0e024",
++        strip_prefix = "bazel-toolchains-4.1.0",
+         urls = [
+-            "https://github.com/bazelbuild/bazel-toolchains/releases/download/2.2.0/bazel-toolchains-2.2.0.tar.gz",
+-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/archive/2.2.0.tar.gz",
++            "https://github.com/bazelbuild/bazel-toolchains/releases/download/4.1.0/bazel-toolchains-4.1.0.tar.gz",
++            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/archive/4.1.0.tar.gz",
+         ],
+     ),
+     build_bazel_rules_apple = dict(
