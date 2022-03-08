@@ -40,8 +40,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 # Skip the timeout test, which is unreliable on our (vm) build machines
 sed -i 's/ timeout / /' test/Makefile
 sed -i 's/ pty1 / /' test/Makefile
+
 # Generate locale for `en_US.iso88591` which is required for ptest
-echo "en_US ISO-8859-1" >> %{_sysconfdir}/locale-gen.conf
+# Ideally it should have been present. Investigate if its a `chroot` only issue
 %{_sbindir}/locale-gen.sh
 make %{?_smp_mflags} check
 
