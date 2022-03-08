@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,13 +46,15 @@ BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
-%if %{with_check}
-BuildRequires:  perl
-%endif
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       glibc
 Requires:       libgcc
 Conflicts:      httpd <= 2.4.37
+%if %{with_check}
+BuildRequires:  perl
+BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Test::Harness)
+%endif
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -324,8 +326,10 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
 %post   libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
-
 %changelog
+* Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.1k-10
+- Add an explicit BR on `perl{(Test::Harness), (Math::BigInt)}` to enable ptest
+
 * Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 1.1.1k-9
 - Add optional patch to use SymCrypt as default engine
 
