@@ -84,6 +84,7 @@ make %{?_smp_mflags} check
 %changelog
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 1.14.0-1
 - Upgrade to version 1.14.0
+- License verified
 
 * Thu Sep 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13.6-9
 - Breaking circular dependency on 'systemd' by using 'Recommends' instead of 'Requires'.
