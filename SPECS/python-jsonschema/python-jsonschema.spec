@@ -1,7 +1,7 @@
 Summary:        An implementation of JSON Schema validation for Python
 Name:           python-jsonschema
-Version:        2.6.0
-Release:        6%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,8 +19,12 @@ Summary:        An implementation of JSON Schema validation for Python
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-vcversioner
+BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
 Requires:       python3
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description -n python3-jsonschema
 jsonschema is JSON Schema validator currently based on
@@ -37,7 +41,8 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 
 %check
-%python3 setup test
+pip3 install tox
+tox -e py39
 
 %files -n python3-jsonschema
 %defattr(-,root,root)
@@ -47,6 +52,11 @@ ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 %{_bindir}/jsonschema3
 
 %changelog
+* Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 3.2.0-1
+- Bump version to 3.2.0
+- Add an explicit BR on `python3-pip` & `python3-wheel`
+- Switch to `tox` to enable ptest
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
 - Remove python2 package
 - Lint spec
