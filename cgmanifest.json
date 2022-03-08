@@ -22854,8 +22854,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonpointer",
-          "version": "2.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonpointer/jsonpointer-2.0.tar.gz"
+          "version": "2.2",
+          "downloadUrl": "https://github.com/stefankoegl/python-json-pointer/archive/refs/tags/v2.2.tar.gz"
         }
       }
     },
