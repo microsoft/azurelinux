@@ -56,7 +56,7 @@ m4-1.4.19-1.cm2.aarch64.rpm
 grep-3.7-2.cm2.aarch64.rpm
 grep-lang-3.7-2.cm2.aarch64.rpm
 diffutils-3.8-1.cm2.aarch64.rpm
-gawk-5.1.0-1.cm2.aarch64.rpm
+gawk-5.1.0-2.cm2.aarch64.rpm
 findutils-4.8.0-2.cm2.aarch64.rpm
 findutils-lang-4.8.0-2.cm2.aarch64.rpm
 gettext-0.21-2.cm2.aarch64.rpm
