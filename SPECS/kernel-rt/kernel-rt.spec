@@ -3,7 +3,7 @@
 %define uname_r %{version}-rt28-%{release}
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        5.15.25.1
+Version:        5.15.26.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -346,8 +346,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Mon Mar 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.25.1-1
-- Update source to 5.15.25.1
+* Tue Mar 08 2022 cameronbaird <cameronbaird@microsoft.com> - 5.15.26.1-1
+- Update source to 5.15.26.1
 
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-4
 - CONFIG_BPF_UNPRIV_DEFAULT_OFF=y
