@@ -55,8 +55,8 @@ curl-7.76.0-8.cm1.aarch64.rpm
 curl-debuginfo-7.76.0-8.cm1.aarch64.rpm
 curl-devel-7.76.0-8.cm1.aarch64.rpm
 curl-libs-7.76.0-8.cm1.aarch64.rpm
-cyrus-sasl-2.1.27-4.cm1.aarch64.rpm
-cyrus-sasl-debuginfo-2.1.27-4.cm1.aarch64.rpm
+cyrus-sasl-2.1.28-1.cm1.aarch64.rpm
+cyrus-sasl-debuginfo-2.1.28-1.cm1.aarch64.rpm
 device-mapper-2.03.05-5.cm1.aarch64.rpm
 device-mapper-devel-2.03.05-5.cm1.aarch64.rpm
 device-mapper-event-2.03.05-5.cm1.aarch64.rpm
@@ -95,9 +95,9 @@ findutils-lang-4.6.0-7.cm1.aarch64.rpm
 flex-2.6.4-6.cm1.aarch64.rpm
 flex-debuginfo-2.6.4-6.cm1.aarch64.rpm
 flex-devel-2.6.4-6.cm1.aarch64.rpm
-freetype-2.9.1-4.cm1.aarch64.rpm
-freetype-debuginfo-2.9.1-4.cm1.aarch64.rpm
-freetype-devel-2.9.1-4.cm1.aarch64.rpm
+freetype-2.11.1-1.cm1.aarch64.rpm
+freetype-debuginfo-2.11.1-1.cm1.aarch64.rpm
+freetype-devel-2.11.1-1.cm1.aarch64.rpm
 gawk-4.2.1-4.cm1.aarch64.rpm
 gawk-debuginfo-4.2.1-4.cm1.aarch64.rpm
 gcc-9.1.0-7.cm1.aarch64.rpm
