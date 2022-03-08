@@ -28,7 +28,7 @@
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
 Version:        %{toolsversion}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -176,10 +176,6 @@ install -p -m 644 -D %{SOURCE2} %{buildroot}%{_unitdir}/%{vgauthdaemon}.service
 install -p -m 644 -D '%{SOURCE3}' %{buildroot}%{_unitdir}/run-vmblock\\x2dfuse.mount
 install -p -m 644 -D %{SOURCE4} %{buildroot}%{_modulesloaddir}/open-vm-tools.conf
 install -p -m 644 -D %{SOURCE5} %{buildroot}%{_sysconfdir}/pam.d/vmtoolsd
-
-# Remove requirement of vmware virtualization from service files
-sed -i 's/ConditionVirtualization=vmware//g' %{buildroot}%{_unitdir}/%{toolsdaemon}.service
-sed -i 's/ConditionVirtualization=vmware//g' %{buildroot}%{_unitdir}/%{vgauthdaemon}.service
 
 # 'make check' in open-vm-tools rebuilds docs and ends up regenerating
 # the font file. We can add %%check secion once 'make check' is fixed
@@ -339,6 +335,10 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Tue Mar 08 2022 Matthew Torr <matthewtorr@microsoft.com> - 11.3.0-2
+- Reinstate ConditionVirtualization service option so that the services
+  only run on VMware.
+
 * Thu Jan 27 2022 Henry Li <lihl@microsoft.com> - 11.3.0-1
 - Upgrade to version 11.3.0
 - Remove patches that no longer apply
