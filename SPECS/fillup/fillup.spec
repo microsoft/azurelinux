@@ -18,7 +18,7 @@
 Summary:        Tool for Merging Config Files
 Name:           fillup
 Version:        1.42
-Release:        277%{?dist}
+Release:        278%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,7 +33,9 @@ Patch3:         %{name}-retval.dif
 Patch4:         %{name}-nodate.patch
 Patch5:         %{name}-1.42-cloexec.patch
 Patch6:         %{name}-fno-common.patch
+Patch7:         %{name}-test-create-DIFFERENCE-dir-before-testing.patch
 Provides:       /bin/%{name}
+BuildRequires:  diffutils
 
 %description
 fillup merges files that hold variables.  A variable is defined by an
@@ -50,6 +52,7 @@ its variable name.
 %patch4
 %patch5
 %patch6 -p1
+%patch7 -p1
 
 %build
 mkdir -p OBJ
@@ -72,6 +75,9 @@ make %{?_smp_mflags} test    OPTISPLUS="%{optflags}"
 %{_mandir}/man8/fillup*
 
 %changelog
+* Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 1.42.278
+- Introduce patch to fix ptest
+
 * Tue Aug 17 2021 Henry Li <lihl@microsoft.com> - 1.42-277
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified

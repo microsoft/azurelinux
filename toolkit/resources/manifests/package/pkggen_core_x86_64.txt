@@ -1,5 +1,5 @@
 filesystem-1.1-8.cm2.x86_64.rpm
-kernel-headers-5.15.18.1-4.cm2.noarch.rpm
+kernel-headers-5.15.18.1-5.cm2.noarch.rpm
 glibc-2.34-3.cm2.x86_64.rpm
 glibc-devel-2.34-3.cm2.x86_64.rpm
 glibc-i18n-2.34-3.cm2.x86_64.rpm
@@ -56,7 +56,7 @@ m4-1.4.19-1.cm2.x86_64.rpm
 grep-3.7-2.cm2.x86_64.rpm
 grep-lang-3.7-2.cm2.x86_64.rpm
 diffutils-3.8-1.cm2.x86_64.rpm
-gawk-5.1.0-1.cm2.x86_64.rpm
+gawk-5.1.0-2.cm2.x86_64.rpm
 findutils-4.8.0-2.cm2.x86_64.rpm
 findutils-lang-4.8.0-2.cm2.x86_64.rpm
 gettext-0.21-2.cm2.x86_64.rpm
@@ -163,11 +163,11 @@ perl-5.32.0-465.cm2.x86_64.rpm
 texinfo-6.8-1.cm2.x86_64.rpm
 autoconf-2.69-11.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
-openssl-1.1.1k-9.cm2.x86_64.rpm
-openssl-devel-1.1.1k-9.cm2.x86_64.rpm
-openssl-libs-1.1.1k-9.cm2.x86_64.rpm
-openssl-perl-1.1.1k-9.cm2.x86_64.rpm
-openssl-static-1.1.1k-9.cm2.x86_64.rpm
+openssl-1.1.1k-10.cm2.x86_64.rpm
+openssl-devel-1.1.1k-10.cm2.x86_64.rpm
+openssl-libs-1.1.1k-10.cm2.x86_64.rpm
+openssl-perl-1.1.1k-10.cm2.x86_64.rpm
+openssl-static-1.1.1k-10.cm2.x86_64.rpm
 libcap-2.26-2.cm2.x86_64.rpm
 libcap-devel-2.26-2.cm2.x86_64.rpm
 debugedit-5.0-1.cm2.x86_64.rpm
