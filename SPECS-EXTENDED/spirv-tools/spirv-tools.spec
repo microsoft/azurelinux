@@ -9,7 +9,7 @@ Distribution:   Mariner
 URL:            https://github.com/KhronosGroup/SPIRV-Tools
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/SPIRV-Tools-%{version}.tar.gz
 
-Patch0: fix-gcc12-build.patch
+Patch0:         fix-gcc12-build.patch
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
