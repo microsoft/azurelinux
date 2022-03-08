@@ -95,7 +95,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libpcre.so.*
 
 %changelog
-* Tue Feb 08 2022 Matt DeVuyst <mattdev@microsoft.com> - 8.45-2
+* Tue Mar 08 2022 Matt DeVuyst <mattdev@microsoft.com> - 8.45-2
 - Enable JIT feature on supported architectures (as Fedora does).
 
 * Thu Feb 10 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.45-1
