@@ -184,11 +184,14 @@ func CleanupDockerChroot(chroot string) (err error) {
 	var folderToKeep = []string{
 		"dev",
 		"proc",
-		"run",
 		"localrpms",
 		"upstream-cached-rpms",
 		"sys",
 		chrootUse,
+	}
+
+	var folderToCreate = []string{
+		"run",
 	}
 
 	logger.Log.Debugf("cleanup Chroot -> %s", chroot)
@@ -219,6 +222,14 @@ func CleanupDockerChroot(chroot string) (err error) {
 			if err != nil {
 				logger.Log.Warnf("Removing files in chroot %s failed: %v", chroot, err)
 			}
+		}
+	}
+
+	// create some folder(s) once chroot has been cleaned up
+	for _, folder := range folderToCreate {
+		err = os.Mkdir(filepath.Join(chroot, folder), os.ModePerm)
+		if err != nil {
+			logger.Log.Warnf("Creation of %s folder in chroot %s failed: %v", folder, chroot, err)
 		}
 	}
 
