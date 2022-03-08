@@ -24,7 +24,7 @@
 Summary:        L7 proxy and communication bus
 Name:           envoy
 Version:        1.21.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,7 +70,6 @@ BuildRequires:  bazel
 BuildRequires:  bazel-workspaces
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
-BuildRequires:  fdupes
 BuildRequires:  fmt-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcovr
@@ -93,15 +92,6 @@ ExcludeArch:    %{ix86}
 %description
 Envoy is an L7 proxy and communication bus designed for large modern service
 oriented architectures.
-
-%package source
-Summary:        Source code of bazel-rules-cc
-
-%description source
-Envoy is an L7 proxy and communication bus designed for large modern service
-oriented architectures.
-
-This package contains source code of Envoy.
 
 %prep
 %autosetup -p1
@@ -166,21 +156,15 @@ bazel shutdown
 %install
 install -D -m0755 bazel-bin/source/exe/envoy-static %{buildroot}%{_bindir}/envoy-proxy
 
-# Install sources
-rm -rf .git bazel-*
-mkdir -p %{buildroot}%{src_install_dir}
-cp -r * %{buildroot}%{src_install_dir}
-fdupes %{buildroot}%{src_install_dir}
-
 %files
 %license LICENSE
 %doc README.md
 %{_bindir}/envoy-proxy
 
-%files source
-%{src_install_dir}
-
 %changelog
+* Mon Mar 07 2022 Henry Li <lihl@microsoft.com> - 1.21.0-2
+- Remove envoy-soource subpackage
+
 * Thu Feb 24 2022 Henry Li <lihl@microsoft.com> - 1.21.0-1
 - Upgrade to version 1.21.0
 - Update envoy vendor source
