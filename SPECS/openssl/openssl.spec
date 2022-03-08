@@ -1,3 +1,6 @@
+# Don't depend on bash by default
+%define __requires_exclude ^/(bin|usr/bin).*$
+%define soversion 1.1
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
@@ -39,9 +42,6 @@ Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
 Patch22:        openssl-1.1.1-fips-SymCrypt.patch
-# Don't depend on bash by default
-%define __requires_exclude ^/(bin|usr/bin).*$
-%define soversion 1.1
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
