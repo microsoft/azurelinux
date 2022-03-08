@@ -19,6 +19,8 @@ BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
+BuildRequires:  pcre2-devel
+BuildRequires:  pkgconf
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
 
