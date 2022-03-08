@@ -29,7 +29,7 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pkg-config
-BuildRequires:  ruby
+BuildRequires:  ruby = 2.6.9
 BuildRequires:  rubygem-async-http
 BuildRequires:  rubygem-aws-partitions
 BuildRequires:  rubygem-aws-sdk-core
@@ -77,7 +77,7 @@ BuildRequires:  zlib-devel
 Requires:       jemalloc
 Requires:       jemalloc-devel
 Requires:       libxcrypt
-Requires:       ruby
+Requires:       ruby = 2.6.9
 Requires:       rubygem-async-http
 Requires:       rubygem-aws-partitions
 Requires:       rubygem-aws-sdk-core
@@ -207,6 +207,7 @@ sudo systemctl start td-agent
 %changelog
 * Tue Mar 08 2022 Henry Li <lihl@microsoft.com> - 4.0.1-5
 - Update td-agent.patch due to the upgrade in ruby
+- Add versioning for ruby in BR and runtime requirement
 
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.0.1-4
 - Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
