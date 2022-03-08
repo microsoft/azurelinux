@@ -1,11 +1,12 @@
-diff -up chrony-3.5/examples/chronyd.service.service-helper chrony-3.5/examples/chronyd.service
---- chrony-3.5/examples/chronyd.service.service-helper	2019-05-10 12:22:57.000000000 +0200
-+++ chrony-3.5/examples/chronyd.service	2019-05-14 13:42:38.069516800 +0200
-@@ -10,6 +10,7 @@ Type=forking
- PIDFile=/run/chrony/chronyd.pid
+diff -urN a/examples/chronyd.service b/examples/chronyd.service
+--- a/examples/chronyd.service  2022-03-08 05:41:13.287141475 +0000
++++ b/examples/chronyd.service  2022-03-08 06:09:47.065622213 +0000
+@@ -11,6 +11,8 @@
  EnvironmentFile=-/etc/sysconfig/chronyd
  ExecStart=/usr/sbin/chronyd $OPTIONS
+
 +ExecStartPost=/usr/libexec/chrony-helper update-daemon
- PrivateTmp=yes
- ProtectHome=yes
- ProtectSystem=full
++ExecStopPost=/usr/libexec/chrony-helper remove-daemon-state
+ CapabilityBoundingSet=~CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_AUDIT_WRITE
+ CapabilityBoundingSet=~CAP_BLOCK_SUSPEND CAP_KILL CAP_LEASE CAP_LINUX_IMMUTABLE
+ CapabilityBoundingSet=~CAP_MAC_ADMIN CAP_MAC_OVERRIDE CAP_MKNOD CAP_SYS_ADMIN
