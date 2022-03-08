@@ -21,6 +21,7 @@ Source10:       https://github.com/mlichvar/clknetsim/archive/%{clknetsim_ver}/c
 
 # add NTP servers from DHCP when starting service
 Patch2:         chrony-service-helper.patch
+# fix test 099-scfilter with glibc 2.34
 Patch3:         sys-linux-testfix.patch
 
 BuildRequires:  bison
@@ -206,7 +207,7 @@ systemctl start chronyd.service
 
 %changelog
 * Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 4.1-1
-- Upgrade to version 4.2
+- Upgrade to version 4.1
 
 * Wed Jun 23 2021 Mateusz Malisz <mamalisz@microsoft.com> - 3.5.1-5
 - Make chronyd not listen on UDP port by default.
