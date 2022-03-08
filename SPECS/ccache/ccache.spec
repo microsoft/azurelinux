@@ -26,7 +26,7 @@ popd
 
 %install
 pushd build
-make DESTDIR=%{buildroot} install
+%make_install
 popd
 
 %check
