@@ -118,7 +118,7 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
-* Wed Nov 24 2021 Andrew Phelps <anphel@microsoft.com> - 1.19.2-1
+* Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.19.2-1
 - Update to version 1.19.2
 
 * Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18-4
