@@ -1,16 +1,18 @@
 Summary:        Sudo
 Name:           sudo
 Version:        1.9.5p2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
+BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  pam-devel
 BuildRequires:  sed
+Requires:       audit-libs
 Requires:       pam
 Requires:       shadow-utils
 
@@ -30,6 +32,7 @@ the ability to run some (or all) commands as root or another user while logging 
     --with-all-insults \
     --with-env-editor \
     --with-pam \
+    --with-linux-audit \
     --with-passprompt="[sudo] password for %p: "
 
 make %{?_smp_mflags}
@@ -89,6 +92,9 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+*   Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> - 1.9.5p2-4
+-   Build with audit support
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.5p2-3
 -   Removing the explicit %%clean stage.
 
