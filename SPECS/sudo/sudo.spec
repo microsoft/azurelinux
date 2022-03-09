@@ -8,12 +8,14 @@ Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
+BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  openssl-devel
 BuildRequires:  openssl-libs
 BuildRequires:  pam-devel
 BuildRequires:  sed
 BuildRequires:  zlib-devel
+Requires:       audit-libs
 Requires:       openssl-libs
 Requires:       pam
 Requires:       shadow-utils
@@ -32,9 +34,9 @@ the ability to run some (or all) commands as root or another user while logging 
     --bindir=%{_bindir} \
     --libexecdir=%{_libdir} \
     --docdir=%{_docdir}/%{name}-%{version} \
-    --with-all-insults \
     --with-env-editor \
     --with-pam \
+    --with-linux-audit \
     --enable-zlib=system \
     --with-passprompt="[sudo] password for %p: "
 
