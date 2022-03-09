@@ -184,7 +184,7 @@ func GetRpmsDir(chrootDir string, proposedDir string) string {
 //    these folders are the ones mounted in docker run command (-v option)
 // 2) create empty folders
 //    these folders are required by chroot (e.g.: /run) and needs to be created empty
-//    do not inherit anything from previous build
+//    to not inherit anything from previous build
 func CleanupDockerChroot(chroot string) (err error) {
 	var folderToKeep = []string{
 		"dev",
