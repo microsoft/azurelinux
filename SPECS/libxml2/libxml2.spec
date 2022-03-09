@@ -3,13 +3,14 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/General Libraries
 URL:            http://www.xmlsoft.org/
 Source0:        ftp://xmlsoft.org/libxml2/%{name}-%{version}.tar.gz
+Patch0: CVE-2022-23308.patch
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
 BuildRequires:  python3-devel
@@ -102,6 +103,8 @@ rm -rf %{buildroot}/*
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+*   Wed Mar 09 2022 Mariner Autopatcher <cblmargh@microsoft.com> 2.9.12-2
+-   Added patch file(s) CVE-2022-23308.patch
 * Thu May 27 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.9.12-1
 - Update to version 2.9.12 to fix CVE-2021-3517, CVE-2021-3518 and CVE-2021-3537
 
