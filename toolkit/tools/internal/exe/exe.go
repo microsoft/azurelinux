@@ -13,7 +13,7 @@ import (
 )
 
 // ToolkitVersion specifies the version of the toolkit and the reported version of all tools in it.
-const ToolkitVersion = "1.0"
+var ToolkitVersion = ""
 
 // InputFlag registers an input flag for k with documentation doc and returns the passed value
 func InputFlag(k *kingpin.Application, doc string) *string {

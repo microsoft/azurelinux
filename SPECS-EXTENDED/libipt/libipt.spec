@@ -1,20 +1,22 @@
-%bcond_with docs
-
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+%global __cmake_in_source_build 1
+
 Name: libipt
-Version: 2.0.1
-Release: 3%{?dist}
+Version: 2.0.5
+Release: 1%{?dist}
 Summary: Intel Processor Trace Decoder Library
 License: BSD
-URL: https://github.com/01org/processor-trace
-Source0: https://github.com/01org/processor-trace/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL: https://github.com/intel/libipt
+Source0: https://github.com/intel/libipt/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: libipt-gcc11.patch
 # c++ is required only for -DPTUNIT test "ptunit-cpp".
-# pandoc is for -DMAN.
 BuildRequires: gcc-c++ cmake
-%if %{with docs}
+%if 0%{?_with_docs:1}
+# pandoc is for -DMAN.
 BuildRequires: pandoc
 %endif
+BuildRequires: make
 ExclusiveArch: %{ix86} x86_64
 
 %description
@@ -35,21 +37,20 @@ develop programs that use the Intel Processor Trace (Intel PT) Decoder Library.
 
 %prep
 %setup -q -n libipt-%{version}
+%patch0 -p1
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DPTUNIT:BOOL=ON \
-       %if %{with docs}
+%if 0%{?_with_docs:1}
        -DMAN:BOOL=ON \
-       %else
-       -DMAN:BOOL=OFF \
-       %endif
+%endif
        -DDEVBUILD:BOOL=ON \
        .
-make VERBOSE=1 %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 %global develdocs howto_libipt.md
 (cd doc;cp -p %{develdocs} ..)
 
@@ -65,11 +66,15 @@ ctest -V %{?_smp_mflags}
 %doc %{develdocs}
 %{_includedir}/*
 %{_libdir}/%{name}.so
-%if %{with docs}
+%if 0%{?_with_docs:1}
 %{_mandir}/*/*.gz
 %endif
 
 %changelog
+* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.5-1
+- Updating to version 2.0.5 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionalize building of documentation

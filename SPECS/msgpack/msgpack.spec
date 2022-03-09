@@ -1,7 +1,7 @@
 Summary:        MessagePack implementation for C and C++
 Name:           msgpack
-Version:        3.2.1
-Release:        2%{?dist}
+Version:        3.3.0
+Release:        1%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ make install DESTDIR=%{buildroot}
 %{_libdir}/*.a
 
 %changelog
+* Thu Mar 03 2022 Minghe Ren <mingheren@microsoft.com> - 3.3.0-1
+- Upgrade to version 3.3.0
+
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 3.2.1-2
 - License verified and %%license added
 - Update Source0

@@ -1,9 +1,9 @@
 %global debug_package %{nil}
-%global release_number 2
+%define release_number %(echo "%{release}" | cut -d. -f1)
 Summary:        First stage UEFI bootloader
 Name:           shim
 Version:        15.4
-Release:        %{release_number}%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
