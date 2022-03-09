@@ -1,6 +1,7 @@
 # The RubyGems library has to stay out of Ruby directory tree, since the
 # RubyGems should be share by all Ruby implementations.
 %global rubygems_dir %{_datadir}/rubygems
+%global bigdecimal_version 2.0.0
 %global io_console_version 0.5.6
 %global psych_version      3.1.0
 %global irb_version        1.2.6
