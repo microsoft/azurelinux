@@ -16,19 +16,10 @@ Summary:        Azure IoT Edge Security Daemon
 Name:           azure-iotedge
 Version:        1.2.8
 Release:        1%{?dist}
-
-# A buildable azure-iotedge environments needs functioning submodules that do not work from the archive download
-# To recreate the tar.gz run the following
-#  sudo git clone https://github.com/Azure/iotedge.git -b %%{version}
-#  pushd iotedge
-#  sudo git submodule update --init --recursive
-#  popd
-#  sudo mv iotedge azure-iotedge-%%{version}
-#  sudo tar --sort=name --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime
-#           -cvf azure-iotedge-%%{version}.tar.gz azure-iotedge-%%{version}
 Source0:        https://github.com/Azure/iotedge/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz iotedge-%%{version}/edgelet
 Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         rust-1.59.0-fix.patch
 License:        MIT
@@ -66,7 +57,7 @@ mkdir -p $HOME
 pushd $HOME
 tar xf %{SOURCE1} --no-same-owner
 popd
-%setup -q -n %{name}-%{version}/edgelet
+%setup -q -n iotedge-%{version}/edgelet
 %patch0 -p1
 
 %build
@@ -221,6 +212,7 @@ fi
 * Tue Mar 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.8-1
 - Updating to version 1.2.8.
 - Using 'rust' version 1.59.0
+- Switching to using pure GitHub source tarball.
 
 * Fri Nov 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.2-2
 - Adding a fix to work with newer version of cmake.
