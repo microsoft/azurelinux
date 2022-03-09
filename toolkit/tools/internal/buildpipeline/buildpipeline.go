@@ -179,7 +179,12 @@ func GetRpmsDir(chrootDir string, proposedDir string) string {
 	return filepath.Join(chrootDir, "localrpms")
 }
 
-// CleanupDockerChroot: Docker based only, clean chroot => delete everything but the folders listed
+// CleanupDockerChroot: Docker based only, clean chroot =>
+// 1) delete everything but the folders listed
+//    these folders are the ones mounted in docker run command (-v option)
+// 2) create empty folders
+//    these folders are required by chroot (e.g.: /run) and needs to be created empty
+//    do not inherit anything from previous build
 func CleanupDockerChroot(chroot string) (err error) {
 	var folderToKeep = []string{
 		"dev",
