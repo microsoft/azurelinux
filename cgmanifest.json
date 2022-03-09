@@ -975,8 +975,8 @@
         "type": "other",
         "other": {
           "name": "babel",
-          "version": "2.6.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-2.6.0.tar.gz"
+          "version": "2.9.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/17/e6/ec9aa6ac3d00c383a5731cc97ed7c619d3996232c977bb8326bcbb6c687e/Babel-2.9.1.tar.gz"
         }
       }
     },
@@ -1417,8 +1417,8 @@
         "type": "other",
         "other": {
           "name": "bubblewrap",
-          "version": "0.4.1",
-          "downloadUrl": "https://github.com/containers/bubblewrap/releases/download/v0.4.1/bubblewrap-0.4.1.tar.xz"
+          "version": "0.6.1",
+          "downloadUrl": "https://github.com/containers/bubblewrap/releases/download/v0.6.1/bubblewrap-0.6.1.tar.xz"
         }
       }
     },
@@ -2387,8 +2387,8 @@
         "type": "other",
         "other": {
           "name": "dbus",
-          "version": "1.13.6",
-          "downloadUrl": "http://dbus.freedesktop.org/releases/dbus/dbus-1.13.6.tar.gz"
+          "version": "1.14.0",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.14.0.tar.xz"
         }
       }
     },
@@ -2738,8 +2738,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.85",
-          "downloadUrl": "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.85.tar.xz"
+          "version": "2.86",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.86.tar.xz"
         }
       }
     },
