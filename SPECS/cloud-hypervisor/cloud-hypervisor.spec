@@ -1,14 +1,16 @@
 Summary:        A Rust-VMM based cloud hypervisor from Intel
 Name:           cloud-hypervisor
-Version:        0.6.0
-Release:        7%{?dist}
+Version:        22.0
+Release:        1%{?dist}
 License:        ASL 2.0 or BSD
 URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       %{url}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:       %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache run:
+#   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 ExclusiveArch:  x86_64
 
@@ -38,9 +40,15 @@ install -D -m755 target/release/ch-remote %{buildroot}%{_bindir}
 install -D -m755 target/release/cloud-hypervisor %{buildroot}%{_bindir}
 install -d %{buildroot}%{_libdir}
 install -d %{buildroot}%{_libdir}/cloud-hypervisor
-install -D -m755 target/release/vhost_user_blk %{buildroot}%{_libdir}/cloud-hypervisor
-install -D -m755 target/release/vhost_user_fs %{buildroot}%{_libdir}/cloud-hypervisor
-install -D -m755 target/release/vhost_user_net %{buildroot}%{_libdir}/cloud-hypervisor
+
+ls -la target/release
+for f in vhost_user_fs vhost_user_net
+do
+    if [[ -f target/release/$f ]]
+    then
+        install -D -m755 target/release/$f %{buildroot}%{_libdir}/cloud-hypervisor
+    fi
+done
 
 %files
 %defattr(-,root,root)
