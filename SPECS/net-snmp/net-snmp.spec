@@ -1,8 +1,8 @@
 %global __requires_exclude perl\\(.*\\)
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
-Version:        5.9
-Release:        6%{?dist}
+Version:        5.9.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,17 +69,9 @@ popd
 
 %post
 /sbin/ldconfig
-%systemd_post snmpd.service
-%systemd_post snmptrapd.service
-
-%preun
-%systemd_preun snmpd.service
-%systemd_preun snmptrapd.service
 
 %postun
 /sbin/ldconfig
-%systemd_postun_with_restart snmpd.service
-%systemd_postun_with_restart snmptrapd.service
 
 %files
 %license COPYING
@@ -101,6 +93,10 @@ popd
 %exclude %{_libdir}/perl5/perllocal.pod
 
 %changelog
+* Fri Mar 4 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-1
+- Upgrade to version 5.9.1
+- Removing the lines that enables snmpd and snmptrapd services by default
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-6
 - Remove libtool archive files from final packaging
 
