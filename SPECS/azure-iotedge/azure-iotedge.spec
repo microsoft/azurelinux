@@ -1,9 +1,10 @@
 
+%global debug_package %{nil}
+
 %define iotedge_user iotedge
 %define iotedge_group %{iotedge_user}
-%define iotedge_home %{_localstatedir}/lib/iotedge
+%define iotedge_home %{_localstatedir}/lib/aziot/edged
 %define iotedge_logdir %{_localstatedir}/log/aziot/edged
-%define iotedge_datadir %{_datadir}/iotedge
 %define iotedge_socketdir %{_localstatedir}/lib/iotedge
 %define aziot_confdir %{_sysconfdir}/aziot
 %define iotedge_confdir %{aziot_confdir}/edged
@@ -51,15 +52,13 @@ Requires:       moby-engine
 Requires:       moby-cli
 
 %description
-Azure IoT Edge Security Daemon
+Azure IoT Edge Module Runtime
 Azure IoT Edge is a fully managed service that delivers cloud intelligence
 locally by deploying and running artificial intelligence (AI), Azure services,
 and custom logic directly on cross-platform IoT devices. Run your IoT solution
-securely and at scale whether in the cloud or offline.
+securely and at scale—whether in the cloud or offline.
 
-This package contains the IoT Edge daemon and CLI tool
-
-%global debug_package %{nil}
+This package contains the IoT Edge daemon and CLI tool.
 
 %prep
 # Setup .cargo directory
@@ -67,7 +66,7 @@ mkdir -p $HOME
 pushd $HOME
 tar xf %{SOURCE1} --no-same-owner
 popd
-%setup -q -n %{_topdir}/BUILD/azure-iotedge-%{version}/edgelet
+%setup -q -n %{name}-%{version}/edgelet
 %patch0 -p1
 
 %build
@@ -125,14 +124,14 @@ if ! /usr/bin/getent passwd iotedge >/dev/null; then
     %{_sbindir}/useradd -r -g %{iotedge_group} -c "iotedge user" -s /bin/nologin -d %{iotedge_home} %{iotedge_user}
 fi
 
-# Add iotedge user to moby-engine group
-if /usr/bin/getent group docker >/dev/null; then
-    %{_sbindir}/usermod -aG docker %{iotedge_user}
-fi
-
 # Add iotedge user to systemd-journal group so it can get system logs
 if /usr/bin/getent group systemd-journal >/dev/null; then
     %{_sbindir}/usermod -aG systemd-journal %{iotedge_user}
+fi
+
+# Add iotedge user to moby-engine group
+if /usr/bin/getent group docker >/dev/null; then
+    %{_sbindir}/usermod -a -G docker %{iotedge_user}
 fi
 
 # Add iotedge user to aziot-identity-service groups
@@ -203,7 +202,7 @@ fi
 
 # systemd
 %{_unitdir}/aziot-edged.service
-/usr/lib/systemd/system-preset/00-aziot-edged.preset
+%{_presetdir}/00-aziot-edged.preset
 
 # sockets
 %attr(660, %{iotedge_user}, %{iotedge_group}) %{iotedge_socketdir}/mgmt.sock
