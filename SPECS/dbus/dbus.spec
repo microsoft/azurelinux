@@ -1,15 +1,14 @@
 %{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
 Summary:        DBus for systemd
 Name:           dbus
-Version:        1.13.6
-Release:        9%{?dist}
+Version:        1.14.0
+Release:        1%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.freedesktop.org/wiki/Software/dbus
-Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2019-12749.patch
+Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  expat-devel
 BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  xz-devel
@@ -83,6 +82,10 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 1.14.0-1
+- Upgrade to version 1.14.0
+- License verified
+
 * Thu Sep 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13.6-9
 - Breaking circular dependency on 'systemd' by using 'Recommends' instead of 'Requires'.
 

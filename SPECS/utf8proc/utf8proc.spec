@@ -1,7 +1,7 @@
 Summary:        C library that provide processing for data in the UTF-8 encoding
 Name:           utf8proc
 Version:        2.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,9 @@ URL:            https://github.com/JuliaStrings/utf8proc
 # Source0:  https://github.com/JuliaStrings/utf8proc/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
+%if %{with_check}
+BuildRequires:  ruby
+%endif
 
 %description
 utf8proc is a small, clean C library that provides Unicode normalization, case-folding, and other operations for data in the UTF-8 encoding.
@@ -40,7 +43,7 @@ cd build
 make DESTDIR=%{buildroot} install
 
 %check
-make check
+LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -57,6 +60,10 @@ make check
 %{_libdir}/libutf8proc.so
 
 %changelog
+* Tue Mar 01 2022 Bala <balakumaran.kannan@microsoft.com> - 2.6.1-2
+- BR ruby for ptest
+- Set Locale before running ptest
+
 * Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.6.1-1
 - Update to version 2.6.1.
 - License verified.
