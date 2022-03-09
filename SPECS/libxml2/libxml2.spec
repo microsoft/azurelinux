@@ -10,9 +10,11 @@ Distribution:   Mariner
 Group:          System Environment/General Libraries
 URL:            https://www.xmlsoft.org/
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
+BuildRequires:  python-xml
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
 BuildRequires:  python3-devel
+BuildRequires:  python3-xml
 Provides:       pkgconfig(libxml-2.0)
 
 %description
@@ -48,6 +50,8 @@ Static libraries and header files for the support library for libxml
 %autosetup -n %{name}-v%{version}
 
 %build
+./autogen.sh
+
 %configure \
     --disable-static \
     --with-history
