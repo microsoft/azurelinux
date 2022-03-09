@@ -41,15 +41,6 @@ install -D -m755 target/release/cloud-hypervisor %{buildroot}%{_bindir}
 install -d %{buildroot}%{_libdir}
 install -d %{buildroot}%{_libdir}/cloud-hypervisor
 
-ls -la target/release
-for f in vhost_user_fs vhost_user_net
-do
-    if [[ -f target/release/$f ]]
-    then
-        install -D -m755 target/release/$f %{buildroot}%{_libdir}/cloud-hypervisor
-    fi
-done
-
 %files
 %defattr(-,root,root)
 %license LICENSE-APACHE
@@ -58,6 +49,9 @@ done
 %exclude %{_libdir}/debug
 
 %changelog
+* Wed Mar 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 22.0-1
+- Updating to version 22.0 to build with 'rust' 1.59.0.
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-7
 - Bump release to rebuild with rust 1.47.0-3 (security update)
 
