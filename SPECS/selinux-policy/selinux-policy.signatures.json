@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "refpolicy-2.20210203.tar.bz2": "48cbf2c63ff9003bef05e03c8d3cdddb4e8f63fef2a072ae51c987301f0b874d",
-  "Makefile.devel": "cd065e896d7eb11e238a05b9102359ea370ec75b27785a81935c985899ed2df6"
+  "Makefile.devel": "5884fbbdb4d11058cfcb5d711d3c321151b15e0f439227ab2206a438c17a6a47",
+  "booleans_targeted.conf": "caa51aa41292a73092cca7687b33cadba0a32483e0bea4d1660579212d93c18f",
+  "refpolicy-2.20220106.tar.bz2": "965f98f0b68a24fd0b8e8d973d319332aea88973e1d6c455ef9c2a31aefaeaa6"
  }
 }
