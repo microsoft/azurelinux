@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -73,6 +73,8 @@ Requires:       ceph-mon = %{version}-%{release}
 Requires(post): binutils
 Requires:       systemd
 
+BuildRequires:  libevent
+BuildRequires:  libevent-devel
 BuildRequires:  cryptsetup
 BuildRequires:  cryptsetup-devel
 BuildRequires:  expat-devel
@@ -98,7 +100,7 @@ BuildRequires:  lz4-devel >= 1.7
 BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  nss-devel
-BuildRequires:  parted      
+BuildRequires:  parted
 BuildRequires:  patch
 BuildRequires:  perl
 BuildRequires:  pkg-config
@@ -257,7 +259,7 @@ Summary:        Utility to bootstrap Ceph clusters
 Requires:       lvm2
 Requires:       python%{python3_pkgversion}
 %description -n cephadm
-Utility to bootstrap a Ceph cluster and manage Ceph daemons deployed 
+Utility to bootstrap a Ceph cluster and manage Ceph daemons deployed
 with systemd and podman.
 
 %package -n ceph-common
@@ -1803,6 +1805,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Wed Mar 9 2022 Mateusz Malisz <mamalisz@microsoft> - 16.2.5-4
+- Add libevent as a build requires to fix build error/warning for some hostnames
+
 * Fri Feb 18 2022 Thomas Crain <thcrain@microsoft> - 16.2.5-3
 - Add patch to fix build with snappy >= 1.1.9
 
