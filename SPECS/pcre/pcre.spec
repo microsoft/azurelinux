@@ -1,13 +1,13 @@
 Summary:        Grep for perl compatible regular expressions
 Name:           pcre
 Version:        8.44
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.pcre.org
-Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
+Source0:        https://sourceforge.net/projects/pcre/files/%{name}/%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
 Requires:       libgcc
@@ -40,6 +40,11 @@ This package contains minimal set of shared pcre libraries.
 
 %build
 ./configure --prefix=%{_prefix}                     \
+%ifarch s390 s390x sparc64 sparcv9 riscv64
+            --disable-jit                     \
+%else
+            --enable-jit                      \
+%endif
             --docdir=%{_docdir}/pcre-%{version} \
             --enable-unicode-properties       \
             --enable-pcre16                   \
@@ -53,9 +58,9 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-mv -v %{buildroot}/usr/lib/libpcre.so.* %{buildroot}/lib &&
-ln -sfv ../../lib/$(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_lib}/libpcre.so
-ln -sfv $(readlink %{buildroot}/usr/lib/libpcre.so) %{buildroot}%{_lib}/libpcre.so.0
+mv -v %{buildroot}%{_libdir}/libpcre.so.* %{buildroot}/lib &&
+ln -sfv ../../lib/$(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_libdir}/libpcre.so
+ln -sfv $(readlink %{buildroot}%{_libdir}/libpcre.so) %{buildroot}%{_libdir}/libpcre.so.0
 
 %check
 make %{?_smp_mflags} check
@@ -90,6 +95,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libpcre.so.*
 
 %changelog
+* Mon Feb 07 2022 Matt DeVuyst <mattdev@microsoft.com> - 8.44-2
+- Enable JIT feature on supported architectures (as Fedora does).
+
 * Thu Oct 29 2020 Joe Schmitt <joschmit@microsoft.com> - 8.44-1
 - Update to version 8.44 to fix CVE-2020-14155.
 

@@ -685,8 +685,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.103.2",
-          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.2.tar.gz"
+          "version": "0.103.5",
+          "downloadUrl": "https://www.clamav.net/downloads/production/clamav-0.103.5.tar.gz"
         }
       }
     },
@@ -1005,8 +1005,8 @@
         "type": "other",
         "other": {
           "name": "cyrus-sasl",
-          "version": "2.1.27",
-          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.27/cyrus-sasl-2.1.27.tar.gz"
+          "version": "2.1.28",
+          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.28/cyrus-sasl-2.1.28.tar.gz"
         }
       }
     },
@@ -1595,8 +1595,8 @@
         "type": "other",
         "other": {
           "name": "freetype",
-          "version": "2.9.1",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://bigsearcher.com/mirrors/nongnu/freetype/freetype-2.11.1.tar.gz"
         }
       }
     },
@@ -2135,8 +2135,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.93.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.93.1.tar.gz"
+          "version": "5.10.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.102.1.tar.gz"
         }
       }
     },
@@ -2465,8 +2465,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.93.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.93.1.tar.gz"
+          "version": "5.10.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.102.1.tar.gz"
         }
       }
     },
@@ -2475,8 +2475,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.93.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.93.1.tar.gz"
+          "version": "5.10.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.102.1.tar.gz"
         }
       }
     },
@@ -2485,8 +2485,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.93.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.93.1.tar.gz"
+          "version": "5.10.102.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.102.1.tar.gz"
         }
       }
     },
@@ -5126,7 +5126,7 @@
         "other": {
           "name": "pcre",
           "version": "8.44",
-          "downloadUrl": "https://ftp.pcre.org/pub/pcre/pcre-8.44.tar.bz2"
+          "downloadUrl": "https://sourceforge.net/projects/pcre/files/pcre/8.44/pcre-8.44.tar.bz2"
         }
       }
     },
@@ -7155,8 +7155,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "2.6.7",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.7.tar.xz"
+          "version": "2.6.9",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.9.tar.xz"
         }
       }
     },
@@ -8635,8 +8635,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4432",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4432.tar.gz"
+          "version": "8.2.4495",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4495.tar.gz"
         }
       }
     },
