@@ -2367,8 +2367,8 @@
         "type": "other",
         "other": {
           "name": "cyrus-sasl",
-          "version": "2.1.27",
-          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.27/cyrus-sasl-2.1.27.tar.gz"
+          "version": "2.1.28",
+          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.28/cyrus-sasl-2.1.28.tar.gz"
         }
       }
     },
