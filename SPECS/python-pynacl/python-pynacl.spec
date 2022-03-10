@@ -11,7 +11,7 @@ URL:            https://github.com/pyca/pynacl
 # Source to be fixed as part of https://microsoft.visualstudio.com/OS/_workitems/edit/25936171.
 Source0:        https://files.pythonhosted.org/packages/61/ab/2ac6dea8489fa713e2b4c6c5b549cc962dd4a842b5998d9e80cf8440b7cd/PyNaCl-%{version}.tar.gz
 Patch1:         fix_import_unlimited_error.patch
-Patch2:			fix_average_value_hypothesis_error.patch
+Patch2:         fix_average_value_hypothesis_error.patch
 
 %description
 Good password hashing for your software and your servers.
