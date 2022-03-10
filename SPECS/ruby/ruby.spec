@@ -82,8 +82,8 @@ autoconf
         --with-vendorarchdir=%{_libdir}/ruby/vendor_ruby \
         --with-rubyhdrdir=%{_includedir} \
         --with-rubyarchhdrdir=%{_includedir} \
-        --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(_arch) \
-        --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(_arch) \
+        --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(uname -m) \
+        --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(uname -m) \
         --with-rubygemsdir=%{rubygems_dir} \
         --enable-shared \
         --with-compress-debug-sections=no \
