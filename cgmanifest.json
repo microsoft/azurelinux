@@ -14244,7 +14244,7 @@
         "other": {
           "name": "net-snmp",
           "version": "5.9.1",
-          "downloadUrl": "http://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.1/net-snmp-5.9.1.tar.gz"
+          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.1/net-snmp-5.9.1.tar.gz"
         }
       }
     },
