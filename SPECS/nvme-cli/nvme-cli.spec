@@ -44,6 +44,7 @@ make test
 %changelog
 * Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> - 1.16-1
 - Upgrade to version 1.16
+- Enable check tests
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.8.1-3
 - Added %%license line automatically

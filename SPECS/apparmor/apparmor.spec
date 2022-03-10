@@ -9,7 +9,6 @@ Group:          Productivity/Security
 URL:            https://launchpad.net/apparmor
 Source0:        https://launchpad.net/apparmor/3.0/3.0.4/+download/%{name}-%{version}.tar.gz
 Patch1:         apparmor-service-start-fix.patch
-
 # CVE-2016-1585 has no upstream fix as of 2020/09/28
 Patch100:       CVE-2016-1585.nopatch
 BuildRequires:  apr
