@@ -1,23 +1,28 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 6.14.13
-
+%define npm_version 6.14.15
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        14.17.2
-Release:        2%{?dist}
-License:        BSD and MIT and Public Domain and naist-2003
-Group:          Applications/System
+Version:        14.18.3
+Release:        1%{?dist}
+License:        BSD AND MIT AND Public Domain AND naist-2003
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
 URL:            https://github.com/nodejs/node
-Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
+# Source0 has a vendored OpenSSL source tree with patented algorithms.
+# Use Source1 to create a clean and reproducible source tarball.
+Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz#/node-v%{version}-clean.tar.xz
+Source1:        clean-source-tarball.sh
 Patch0:         patch_tls_nodejs14.patch
+Patch1:         remove_unsupported_tlsv13_ciphers.patch
 
-BuildRequires:  coreutils >= 8.22, openssl-devel >= 1.0.1
+BuildRequires:  coreutils >= 8.22
+BuildRequires:  openssl-devel >= 1.0.1
 BuildRequires:  python3
 BuildRequires:  which
+
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.0.1
 Requires:       python3
@@ -37,19 +42,19 @@ The nodejs-devel package contains libraries, header files and documentation
 for developing applications that use nodejs.
 
 %prep
-%setup -q -n node-v%{version}
-%patch0 -p1
+%autosetup -p1 -n node-v%{version}
 
 %build
-sh configure --prefix=%{_prefix} \
-           --shared-openssl \
-           --shared-zlib
-
-make %{?_smp_mflags}
+python3 configure.py \
+  --prefix=%{_prefix} \
+  --shared-openssl \
+  --shared-zlib \
+  --openssl-use-def-ca-store
+%make_build
 
 %install
 
-make %{?_smp_mflags} install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 rm -fr %{buildroot}%{_libdir}/dtrace/  # No systemtap support.
 install -m 755 -d %{buildroot}%{_libdir}/node_modules/
 install -m 755 -d %{buildroot}%{_datadir}/%{name}
@@ -63,15 +68,15 @@ done
 %check
 make cctest
 
-%post -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
 %license LICENSE
+%doc CHANGELOG.md README.md
 %{_bindir}/*
 %{_libdir}/node_modules/*
 %{_mandir}/man*/*
-%doc CHANGELOG.md LICENSE README.md
 
 %files devel
 %defattr(-,root,root)
@@ -80,36 +85,55 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-*   Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 14.17.2-2
--   Adding 'Provides' for 'npm'.
-*   Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 14.17.2-1
--   Update to version 14.17.2 to fix CVE-2021-22918
-*   Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 14.17.0-1
--   Update to nodejs version 14.17.0
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.11.2-7
--   Added %%license line automatically
-*   Mon May 04 2020 Paul Monson <paulmon@microsoft.com> 9.11.2-6
--   Add patch that enables building openssl without TLS versions less 1.2
-*   Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> 9.11.2-5
--   Remove toybox and only use coreutils for requires.
-*   Wed Apr 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 9.11.2-4
--   License verified.
--   Removed "%%define sha1".
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 9.11.2-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 9.11.2-2
--   Added BuildRequires python2, which
-*   Thu Sep 20 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 9.11.2-1
--   Updated to version 9.11.2
-*   Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> 9.9.0-1
--   Updated to version 9.9.0
-*   Wed Feb 14 2018 Xiaolin Li <xiaolinl@vmware.com> 8.3.0-1
--   Updated to version 8.3.0
-*   Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 7.7.4-4
--   Remove BuildArch
-*   Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> 7.7.4-3
--   Requires coreutils or toybox
-*   Fri Jul 14 2017 Chang Lee <changlee@vmware.com> 7.7.4-2
--   Updated %check
-*   Mon Mar 20 2017 Xiaolin Li <xiaolinl@vmware.com> 7.7.4-1
--   Initial packaging for Photon
+* Thu Mar 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 14.18.3-1
+- Update to version 14.18.3 to fix CVE-2021-44531.
+- Migrating patches and source tarball scripts from Mariner's 1.0 version.
+
+* Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 14.17.2-2
+- Adding 'Provides' for 'npm'.
+
+* Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 14.17.2-1
+- Update to version 14.17.2 to fix CVE-2021-22918
+
+* Mon Jun 07 2021 Henry Beberman <henry.beberman@microsoft.com> - 14.17.0-1
+- Update to nodejs version 14.17.0
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 9.11.2-7
+- Added %%license line automatically
+
+* Mon May 04 2020 Paul Monson <paulmon@microsoft.com> - 9.11.2-6
+- Add patch that enables building openssl without TLS versions less 1.2
+
+* Thu Apr 09 2020 Nicolas Ontiveros <niontive@microsoft.com> - 9.11.2-5
+- Remove toybox and only use coreutils for requires.
+
+* Wed Apr 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.11.2-4
+- License verified.
+- Removed "%%define sha1".
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 9.11.2-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> - 9.11.2-2
+- Added BuildRequires python2, which
+
+* Thu Sep 20 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> - 9.11.2-1
+- Updated to version 9.11.2
+
+* Mon Sep 10 2018 Him Kalyan Bordoloi <bordoloih@vmware.com> - 9.9.0-1
+- Updated to version 9.9.0
+
+* Wed Feb 14 2018 Xiaolin Li <xiaolinl@vmware.com> - 8.3.0-1
+- Updated to version 8.3.0
+
+* Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> - 7.7.4-4
+- Remove BuildArch
+
+* Mon Sep 18 2017 Alexey Makhalov <amakhalov@vmware.com> - 7.7.4-3
+- Requires coreutils or toybox
+
+* Fri Jul 14 2017 Chang Lee <changlee@vmware.com> - 7.7.4-2
+- Updated %check
+
+* Mon Mar 20 2017 Xiaolin Li <xiaolinl@vmware.com> - 7.7.4-1
+- Initial packaging for Photon

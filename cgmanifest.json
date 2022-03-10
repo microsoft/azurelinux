@@ -14463,8 +14463,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.17.2",
-          "downloadUrl": "https://nodejs.org/download/release/v14.17.2/node-v14.17.2.tar.xz"
+          "version": "14.18.3",
+          "downloadUrl": "https://nodejs.org/download/release/v14.18.3/node-v14.18.3.tar.xz"
         }
       }
     },
