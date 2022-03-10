@@ -9,8 +9,8 @@
 %global gem_dir %{_libdir}/ruby/gems
 Summary:        Ruby
 Name:           ruby
-Version:        2.7.2
-Release:        4%{?dist}
+Version:        2.7.4
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -82,8 +82,8 @@ autoconf
         --with-vendorarchdir=%{_libdir}/ruby/vendor_ruby \
         --with-rubyhdrdir=%{_includedir} \
         --with-rubyarchhdrdir=%{_includedir} \
-        --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(_arch) \
-        --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(_arch) \
+        --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(uname -m) \
+        --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(uname -m) \
         --with-rubygemsdir=%{rubygems_dir} \
         --enable-shared \
         --with-compress-debug-sections=no \
@@ -191,6 +191,9 @@ sudo -u test make test TESTS="-v"
 %{rubygems_dir}/rubygems
 
 %changelog
+* Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> - 2.7.4-1
+- Update to version 2.7.4 to build with new autoconf
+
 * Mon Jul 12 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-4
 - Add attribution for parts of the install script taken from Fedora 34 (license: MIT)
 - Add provides for rubygem(json), and install json gem into the gemdir
