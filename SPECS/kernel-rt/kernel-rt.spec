@@ -17,7 +17,7 @@ Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20211013.pem
 # When updating, make sure to grab the matching patch from 
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
-Patch0:         patch-5.15.25-rt32.patch
+Patch0:         patch-5.15.26-rt34.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not

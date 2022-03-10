@@ -2058,6 +2058,41 @@ index 44bd0b6ff505..e51e488e5c2f 100644
  }
  
  static irqreturn_t vmbus_percpu_isr(int irq, void *dev_id)
+diff --git a/drivers/i2c/busses/i2c-cht-wc.c b/drivers/i2c/busses/i2c-cht-wc.c
+index 1cf68f85b2e1..8ccf0c928bb4 100644
+--- a/drivers/i2c/busses/i2c-cht-wc.c
++++ b/drivers/i2c/busses/i2c-cht-wc.c
+@@ -99,15 +99,8 @@ static irqreturn_t cht_wc_i2c_adap_thread_handler(int id, void *data)
+ 	 * interrupt handler as well, so running the client irq handler from
+ 	 * this thread will cause things to lock up.
+ 	 */
+-	if (reg & CHT_WC_EXTCHGRIRQ_CLIENT_IRQ) {
+-		/*
+-		 * generic_handle_irq expects local IRQs to be disabled
+-		 * as normally it is called from interrupt context.
+-		 */
+-		local_irq_disable();
+-		generic_handle_irq(adap->client_irq);
+-		local_irq_enable();
+-	}
++	if (reg & CHT_WC_EXTCHGRIRQ_CLIENT_IRQ)
++		generic_handle_irq_safe(adap->client_irq);
+ 
+ 	return IRQ_HANDLED;
+ }
+diff --git a/drivers/i2c/i2c-core-base.c b/drivers/i2c/i2c-core-base.c
+index cfbef70e8ba7..cded25be1f55 100644
+--- a/drivers/i2c/i2c-core-base.c
++++ b/drivers/i2c/i2c-core-base.c
+@@ -1422,7 +1422,7 @@ int i2c_handle_smbus_host_notify(struct i2c_adapter *adap, unsigned short addr)
+ 	if (irq <= 0)
+ 		return -ENXIO;
+ 
+-	generic_handle_irq(irq);
++	generic_handle_irq_safe(irq);
+ 
+ 	return 0;
+ }
 diff --git a/drivers/leds/trigger/Kconfig b/drivers/leds/trigger/Kconfig
 index 1f1d57288085..dc6816d36d06 100644
 --- a/drivers/leds/trigger/Kconfig
@@ -2115,6 +2150,49 @@ index 5c05acf20e1f..665fe138ab4f 100644
  		struct page	*spare_page; /* Used when checking P/Q in raid6 */
  		void		*scribble;  /* space for constructing buffer
  					     * lists and performing address
+diff --git a/drivers/mfd/ezx-pcap.c b/drivers/mfd/ezx-pcap.c
+index 70fa18b04ad2..b14d3f98e1eb 100644
+--- a/drivers/mfd/ezx-pcap.c
++++ b/drivers/mfd/ezx-pcap.c
+@@ -193,13 +193,11 @@ static void pcap_isr_work(struct work_struct *work)
+ 		ezx_pcap_write(pcap, PCAP_REG_MSR, isr | msr);
+ 		ezx_pcap_write(pcap, PCAP_REG_ISR, isr);
+ 
+-		local_irq_disable();
+ 		service = isr & ~msr;
+ 		for (irq = pcap->irq_base; service; service >>= 1, irq++) {
+ 			if (service & 1)
+-				generic_handle_irq(irq);
++				generic_handle_irq_safe(irq);
+ 		}
+-		local_irq_enable();
+ 		ezx_pcap_write(pcap, PCAP_REG_MSR, pcap->msr);
+ 	} while (gpio_get_value(pdata->gpio));
+ }
+diff --git a/drivers/misc/hi6421v600-irq.c b/drivers/misc/hi6421v600-irq.c
+index 08535e97ff43..0585a5821d05 100644
+--- a/drivers/misc/hi6421v600-irq.c
++++ b/drivers/misc/hi6421v600-irq.c
+@@ -118,8 +118,8 @@ static irqreturn_t hi6421v600_irq_handler(int irq, void *__priv)
+ 			 * If both powerkey down and up IRQs are received,
+ 			 * handle them at the right order
+ 			 */
+-			generic_handle_irq(priv->irqs[POWERKEY_DOWN]);
+-			generic_handle_irq(priv->irqs[POWERKEY_UP]);
++			generic_handle_irq_safe(priv->irqs[POWERKEY_DOWN]);
++			generic_handle_irq_safe(priv->irqs[POWERKEY_UP]);
+ 			pending &= ~HISI_IRQ_POWERKEY_UP_DOWN;
+ 		}
+ 
+@@ -127,7 +127,7 @@ static irqreturn_t hi6421v600_irq_handler(int irq, void *__priv)
+ 			continue;
+ 
+ 		for_each_set_bit(offset, &pending, BITS_PER_BYTE) {
+-			generic_handle_irq(priv->irqs[offset + i * BITS_PER_BYTE]);
++			generic_handle_irq_safe(priv->irqs[offset + i * BITS_PER_BYTE]);
+ 		}
+ 	}
+ 
 diff --git a/drivers/net/ethernet/netronome/nfp/abm/qdisc.c b/drivers/net/ethernet/netronome/nfp/abm/qdisc.c
 index 2473fb5f75e5..2a5cc64227e9 100644
 --- a/drivers/net/ethernet/netronome/nfp/abm/qdisc.c
@@ -2128,6 +2206,24 @@ index 2473fb5f75e5..2a5cc64227e9 100644
  			struct gnet_stats_queue *qstats)
  {
  	_bstats_update(bstats, new->tx_bytes - old->tx_bytes,
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index 3e1a83a22fdd..bce0a6bd46a7 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -1367,11 +1367,8 @@ static void lan78xx_status(struct lan78xx_net *dev, struct urb *urb)
+ 		netif_dbg(dev, link, dev->net, "PHY INTR: 0x%08x\n", intdata);
+ 		lan78xx_defer_kevent(dev, EVENT_LINK_RESET);
+ 
+-		if (dev->domain_data.phyirq > 0) {
+-			local_irq_disable();
+-			generic_handle_irq(dev->domain_data.phyirq);
+-			local_irq_enable();
+-		}
++		if (dev->domain_data.phyirq > 0)
++			generic_handle_irq_safe(dev->domain_data.phyirq);
+ 	} else {
+ 		netdev_warn(dev->net,
+ 			    "unexpected interrupt: 0x%08x\n", intdata);
 diff --git a/drivers/scsi/fcoe/fcoe.c b/drivers/scsi/fcoe/fcoe.c
 index 5ae6c207d3ac..660908027dc5 100644
 --- a/drivers/scsi/fcoe/fcoe.c
@@ -2225,6 +2321,22 @@ index 841000445b9a..26d661ddc950 100644
  
  	/* peek cache of free slot */
  	if (pool->left != FC_XID_UNKNOWN) {
+diff --git a/drivers/staging/greybus/gpio.c b/drivers/staging/greybus/gpio.c
+index 7e6347fe93f9..8a7cf1d0e968 100644
+--- a/drivers/staging/greybus/gpio.c
++++ b/drivers/staging/greybus/gpio.c
+@@ -391,10 +391,7 @@ static int gb_gpio_request_handler(struct gb_operation *op)
+ 		return -EINVAL;
+ 	}
+ 
+-	local_irq_disable();
+-	ret = generic_handle_irq(irq);
+-	local_irq_enable();
+-
++	ret = generic_handle_irq_safe(irq);
+ 	if (ret)
+ 		dev_err(dev, "failed to invoke irq handler\n");
+ 
 diff --git a/drivers/tty/serial/8250/8250.h b/drivers/tty/serial/8250/8250.h
 index 6473361525d1..2321d02e9b7a 100644
 --- a/drivers/tty/serial/8250/8250.h
@@ -3226,7 +3338,7 @@ index ec2a47a81e42..8cd11a223260 100644
  bool irq_work_queue_on(struct irq_work *work, int cpu);
  
 diff --git a/include/linux/irqdesc.h b/include/linux/irqdesc.h
-index 59aea39785bf..ab70314af3d5 100644
+index 59aea39785bf..522d7bed9938 100644
 --- a/include/linux/irqdesc.h
 +++ b/include/linux/irqdesc.h
 @@ -68,6 +68,7 @@ struct irq_desc {
@@ -3237,6 +3349,14 @@ index 59aea39785bf..ab70314af3d5 100644
  	raw_spinlock_t		lock;
  	struct cpumask		*percpu_enabled;
  	const struct cpumask	*percpu_affinity;
+@@ -160,6 +161,7 @@ static inline void generic_handle_irq_desc(struct irq_desc *desc)
+ 
+ int handle_irq_desc(struct irq_desc *desc);
+ int generic_handle_irq(unsigned int irq);
++int generic_handle_irq_safe(unsigned int irq);
+ 
+ #ifdef CONFIG_IRQ_DOMAIN
+ /*
 diff --git a/include/linux/irqflags.h b/include/linux/irqflags.h
 index 600c10da321a..4b140938b03e 100644
 --- a/include/linux/irqflags.h
@@ -5005,6 +5125,40 @@ index 221d80c31e94..1543934f26d2 100644
  
  	if (!irq_settings_no_debug(desc))
  		note_interrupt(desc, retval);
+diff --git a/kernel/irq/irqdesc.c b/kernel/irq/irqdesc.c
+index 4e3c29bb603c..5c745c6b4416 100644
+--- a/kernel/irq/irqdesc.c
++++ b/kernel/irq/irqdesc.c
+@@ -659,6 +659,29 @@ int generic_handle_irq(unsigned int irq)
+ }
+ EXPORT_SYMBOL_GPL(generic_handle_irq);
+ 
++/**
++ * generic_handle_irq_safe - Invoke the handler for a particular irq from any
++ *			     context.
++ * @irq:	The irq number to handle
++ *
++ * Returns:	0 on success, a negative value on error.
++ *
++ * This function can be called from any context (IRQ or process context). It
++ * will report an error if not invoked from IRQ context and the irq has been
++ * marked to enforce IRQ-context only.
++ */
++int generic_handle_irq_safe(unsigned int irq)
++{
++	unsigned long flags;
++	int ret;
++
++	local_irq_save(flags);
++	ret = handle_irq_desc(irq_to_desc(irq));
++	local_irq_restore(flags);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(generic_handle_irq_safe);
++
+ #ifdef CONFIG_IRQ_DOMAIN
+ /**
+  * generic_handle_domain_irq - Invoke the handler for a HW irq belonging
 diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
 index 27667e82ecc9..894e4db1fffc 100644
 --- a/kernel/irq/manage.c
@@ -9059,11 +9213,11 @@ index abb3432ed744..d5e82e4a57ad 100644
  			kunmap(miter->page);
 diff --git a/localversion-rt b/localversion-rt
 new file mode 100644
-index 000000000000..ce6a482618d5
+index 000000000000..21988f9ad53f
 --- /dev/null
 +++ b/localversion-rt
 @@ -0,0 +1 @@
-+-rt32
++-rt34
 diff --git a/mm/Kconfig b/mm/Kconfig
 index c048dea7e342..88778414465b 100644
 --- a/mm/Kconfig
