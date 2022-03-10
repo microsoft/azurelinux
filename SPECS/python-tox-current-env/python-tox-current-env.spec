@@ -4,7 +4,7 @@
 Summary:        Tox plugin to run tests in current Python environment
 Name:           python-%{pypi_name}
 Version:        0.0.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,9 +48,8 @@ The tox-current-env plugin allows to run tests in current Python environment.
 
 
 %check
-# the tests currently only work within actual tox and with various Python
-# versions installed, so we skip them and do an import check only instead:
-%pyproject_check_import
+pip3 install tox
+tox -e py39
 
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
@@ -58,6 +57,9 @@ The tox-current-env plugin allows to run tests in current Python environment.
 %doc README.rst
 
 %changelog
+* Fri Mar 04 2022 Bala <balakumaran.kannan@microsoft.com> - 0.0.7-3
+- Use tox to run Ptest
+
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0.7-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

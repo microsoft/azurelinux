@@ -875,8 +875,8 @@
         "type": "other",
         "other": {
           "name": "autoconf",
-          "version": "2.69",
-          "downloadUrl": "http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz"
+          "version": "2.71",
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz"
         }
       }
     },
@@ -2367,8 +2367,8 @@
         "type": "other",
         "other": {
           "name": "cyrus-sasl",
-          "version": "2.1.27",
-          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.27/cyrus-sasl-2.1.27.tar.gz"
+          "version": "2.1.28",
+          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.28/cyrus-sasl-2.1.28.tar.gz"
         }
       }
     },
@@ -8551,8 +8551,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.18",
-          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.18/krb5-1.18.tar.gz"
+          "version": "1.19.2",
+          "downloadUrl": "https://web.mit.edu/kerberos/dist/krb5/1.19/krb5-1.19.2.tar.gz"
         }
       }
     },
@@ -22874,8 +22874,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonschema",
-          "version": "3.2.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-3.2.0.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
         }
       }
     },
@@ -24394,8 +24394,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinxcontrib-websupport",
-          "version": "1.2.4",
-          "downloadUrl": " https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/refs/tags/1.2.4.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": " https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.1.2.tar.gz"
         }
       }
     },
@@ -25545,8 +25545,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "2.7.2",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.2.tar.xz"
+          "version": "2.7.4",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.4.tar.xz"
         }
       }
     },
