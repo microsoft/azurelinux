@@ -1,7 +1,7 @@
 %{!?_udevdir: %define _udevdir /lib/udev/}
 Summary:        Manage "libnvdimm" subsystem devices (Non-volatile Memory)
 Name:           ndctl
-Version:        65
+Version:        71.1
 Release:        1%{?dist}
 License:        LGPLv2
 Group:          System Environment/Base
@@ -84,7 +84,7 @@ make check
 
 %files
 %defattr(-,root,root)
-%license util/COPYING licenses/BSD-MIT licenses/CC0
+%license COPYING
 %{_bindir}/ndctl
 %{_libdir}/libndctl.so.*
 %{_datadir}/bash-completion/
@@ -101,7 +101,7 @@ make check
 
 %files -n daxctl
 %defattr(-,root,root)
-%license util/COPYING licenses/BSD-MIT licenses/CC0
+%license COPYING
 %{_bindir}/daxctl
 %{_libdir}/libdaxctl.so.*
 %{_datadir}/daxctl/daxctl.conf
@@ -114,6 +114,8 @@ make check
 %{_libdir}/pkgconfig/libdaxctl.pc
 
 %changelog
+*   Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> 71.1-1
+-   Upgrade to version 71.1
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 65-1
 -   Update to 65. Remove udev rules reverted in release 63. License fixed.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 62-2
