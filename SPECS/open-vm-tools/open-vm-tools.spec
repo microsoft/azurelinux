@@ -20,7 +20,7 @@
 
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
-Version:        %{toolsversion}
+Version:        11.3.0
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -33,10 +33,7 @@ Source3:        vmblock.mount
 Source4:        open-vm-tools.conf
 Source5:        vmtoolsd.pam
 %global _hardened_build 1
-%global majorversion    11.3
-%global minorversion    0
 %global toolsbuild      18090558
-%global toolsversion    %{majorversion}.%{minorversion}
 %global toolsdaemon     vmtoolsd
 %global vgauthdaemon    vgauthd
 BuildRequires:  autoconf
