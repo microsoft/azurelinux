@@ -1,6 +1,6 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.6
+Version:        10.6.7
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -23,6 +23,9 @@ BuildRequires:  pcre2-devel
 BuildRequires:  pkgconf
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+%endif
 
 Conflicts:      mysql
 
@@ -444,10 +447,11 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
-* Tue Feb 15 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.6.6-1
-- Upgrading to v10.6.6.
+* Tue Feb 15 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.6.7-1
+- Upgrading to v10.6.7.
 - Adding reference to new unpackaged man files.
 - Adding comment and script to help with submodule tarball creation.
+- Adding with_check perl(Test::More) BR for "dbug" ptest failure.
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.3.28-3
 - Removing the explicit %%clean stage.
