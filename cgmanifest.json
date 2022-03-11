@@ -565,8 +565,8 @@
         "type": "other",
         "other": {
           "name": "apparmor",
-          "version": "2.13",
-          "downloadUrl": "https://launchpad.net/apparmor/2.13/2.13.0/+download/apparmor-2.13.tar.gz"
+          "version": "3.0.4",
+          "downloadUrl": "https://launchpad.net/apparmor/3.0/3.0.4/+download/apparmor-3.0.4.tar.gz"
         }
       }
     },
@@ -14203,16 +14203,6 @@
         "type": "other",
         "other": {
           "name": "ndctl",
-          "version": "65",
-          "downloadUrl": "https://github.com/pmem/ndctl/archive/v65.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ndctl",
           "version": "71.1",
           "downloadUrl": "https://github.com/pmem/ndctl/archive/v71.1.tar.gz"
         }
@@ -14673,8 +14663,8 @@
         "type": "other",
         "other": {
           "name": "nvme-cli",
-          "version": "1.8.1",
-          "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.8.1.tar.gz"
+          "version": "1.16",
+          "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.16.tar.gz"
         }
       }
     },
@@ -15424,8 +15414,8 @@
         "type": "other",
         "other": {
           "name": "openldap",
-          "version": "2.4.57",
-          "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.4.57.tgz"
+          "version": "2.6.1",
+          "downloadUrl": "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.1.tgz"
         }
       }
     },
