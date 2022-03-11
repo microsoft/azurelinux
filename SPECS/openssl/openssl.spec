@@ -328,7 +328,6 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
 %post   libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
-
 %changelog
 * Thu Mar 10 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.1.1k-11
 - dmihai@microsoft.com, 1.1.1k-6: Enable support for TLS 1 and TLS 1.1
