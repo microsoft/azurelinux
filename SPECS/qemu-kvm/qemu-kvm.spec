@@ -64,6 +64,8 @@ Patch1003:      CVE-2020-27661.nopatch
 # CVE 2020-35506 affects the SCSI ESP driver (esp.c), which is only compiled when CONFIG_ESP is set.
 # Our configuration does not enable CONFIG_ESP/compile esp.c, so Mariner is not vulnerable.
 Patch1004:      CVE-2020-35506.nopatch
+# CVE 2021-4145 does not apply to qemu v4.2.0 as the 'self' pointer is not dereferenced in mirror_wait_on_conflicts()
+Patch1005:      CVE-2021-4145.nopatch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -189,6 +191,9 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Fri Mar 11 2022 Minghe Ren <mingheren@microsoft.com> - 4.2.0-38
+- Marked CVE-2021-4145 as nopatch
+
 * Thu Nov 18 2021 Cameron Baird <cameronbaird@microsoft.com> - 4.2.0-37
 - Patched CVE-2021-3545
 - Marked CVE-2020-35506 as nopatch
