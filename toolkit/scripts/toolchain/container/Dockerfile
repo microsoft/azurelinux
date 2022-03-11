@@ -55,9 +55,9 @@ COPY [ "./toolchain-sha256sums", \
 # Note: Fetch the kernel sources differently to ensure we rename the source tarball appropriately. The rename is needed to comply with
 # the naming convention of the source cache (convention used to prevent naming collisions).
 WORKDIR $LFS/sources
-RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz -O kernel-5.15.18.1.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz -O kernel-5.15.18.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
