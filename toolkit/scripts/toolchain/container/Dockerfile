@@ -3,7 +3,7 @@
 #
 # Dockerfile to Mariner toolchain from scratch
 #
-FROM cblmariner.azurecr.io/base/core:1.0
+FROM cblmariner.azurecr.io/base/core:1.0.20220226
 
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
@@ -15,26 +15,26 @@ COPY [ "./version-check-container.sh", \
 
 # Install toolchain build dependencies
 RUN tdnf install -y \
-    build-essential \
     bison \
+    build-essential \
+    byacc \
+    ca-certificates \
+    ccache \
+    cpio \
+    file \
+    flex \
     gawk \
     gcc \
     make \
     patch \
+    perl \
     rpm \
-    texinfo \
     sudo \
+    texinfo \
+    unzip \
     vim \
     wget \
-    cpio \
-    file \
-    unzip \
-    zip \
-    ccache \
-    flex \
-    byacc \
-    ca-certificates \
-    perl && \
+    zip && \
     ln    -sf bash /bin/sh && \
     mkdir -pv $LFS/sources && \
     chmod -v a+wt $LFS/sources && \
@@ -62,7 +62,7 @@ USER root
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
     useradd -s /bin/bash -g lfs -m -k /dev/null lfs && \
-    echo "lfs:lf2asfasf" | chpasswd && \
+    echo "lfs:lfscblmariner" | chpasswd && \
     usermod -a -G sudo lfs && \
     chown -v lfs $LFS/tools && \
     chown -v lfs $LFS/sources && \

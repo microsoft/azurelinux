@@ -4,9 +4,9 @@
             "Component": {
                 "Type": "DockerImage",
                 "DockerImage": {
-                    "Name": "Ubuntu",
-                    "Digest": "sha256:bec5a2727be7fff3d308193cfde3491f8fba1a2ba392b7546b43a051853a341d",
-                    "Tag": "18.04"
+                    "Name": "cblmariner.azurecr.io/base/core",
+                    "Digest": "sha256:665cd7cf847ac0bd7321398a13397d35a23a784569c14ca52cef64379e2328bf",
+                    "Tag": "1.0.20220226"
                 }
             }
         }
