@@ -1,11 +1,11 @@
 Summary:        DNS proxy with integrated DHCP server
 Name:           dnsmasq
-Version:        2.85
-Release:        2%{?dist}
+Version:        2.86
+Release:        1%{?dist}
 License:        GPLv2 or GPLv3
 Group:          System Environment/Daemons
-URL:            http://www.thekelleys.org.uk/dnsmasq/
-Source0:        http://www.thekelleys.org.uk/%{name}/%{name}-%{version}.tar.xz
+URL:            https://www.thekelleys.org.uk/dnsmasq/
+Source0:        https://www.thekelleys.org.uk/%{name}/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Patch0:         fix-missing-ioctl-SIOCGSTAMP-add-sockios-header-linux-5.2.patch
@@ -66,6 +66,9 @@ EOF
 %config  /usr/share/dnsmasq/trust-anchors.conf
 
 %changelog
+* Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 2.86-1
+- Upgrade to version 2.86
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.85-2
 - Removing the explicit %%clean stage.
 

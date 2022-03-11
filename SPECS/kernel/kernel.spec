@@ -7,7 +7,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.18.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -384,6 +384,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Mar 07 2022 George Mileka <gmileka@microsoft.com> - 5.15.18.1-5
+- Enabled vfio noiommu.
+
 * Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 5.15.18.1-4
 - Enable CONFIG_DEVMEM, CONFIG_STRICT_DEVMEM and CONFIG_IO_STRICT_DEVMEM
 
