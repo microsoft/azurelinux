@@ -3,7 +3,7 @@
 #
 # Dockerfile to Mariner toolchain from scratch
 #
-FROM cblmariner.azurecr.io/base/core:1.0.20220226
+FROM mcr.microsoft.com/cbl-mariner/base/core:1.0.20220226
 
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
