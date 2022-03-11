@@ -1,0 +1,13 @@
+https://github.com/heimdal/heimdal/pull/771/files
+diff -urN a/cf/check-var.m4 b/cf/check-var.m4
+--- a/cf/check-var.m4	2022-03-09 03:30:30.806436848 +0000
++++ b/cf/check-var.m4	2022-03-09 03:31:11.806288586 +0000
+@@ -20,7 +20,7 @@
+ if test "$ac_foo" = yes; then
+ 	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_[]$1), 1, 
+ 		[Define if you have the `]$1[' variable.])
+-	m4_ifval([$2], AC_CHECK_DECLS([$1],[],[],[$2]))
++	m4_ifval([$2], [AC_CHECK_DECLS([$1],[],[],[$2])])
+ fi
+ ])
+ 

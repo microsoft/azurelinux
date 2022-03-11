@@ -1,0 +1,24 @@
+From c06dd957335053595e50f705c6a4d4e1caf15a9c Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Wed, 26 Jan 2022 08:33:19 +0100
+Subject: [PATCH] s390: Remove double fclose in bd_s390_dasd_online (#2045784)
+
+---
+ src/plugins/s390.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/plugins/s390.c b/src/plugins/s390.c
+index ac12b049..fb0dc982 100644
+--- a/src/plugins/s390.c
++++ b/src/plugins/s390.c
+@@ -290,7 +290,6 @@ gboolean bd_s390_dasd_online (const gchar *dasd, GError **error) {
+     if (wrc == EOF) {
+         g_set_error (error, BD_S390_ERROR, BD_S390_ERROR_DEVICE,
+                      "Could not set DASD device %s online", dasd);
+-        fclose(fd);
+         bd_utils_report_finished (progress_id, (*error)->message);
+         return FALSE;
+     }
+-- 
+2.33.1
+

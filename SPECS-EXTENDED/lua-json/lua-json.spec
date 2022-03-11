@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%define luaver 5.3
+%define luaver 5.4
 %define luapkgdir %{_datadir}/lua/%{luaver}
 %global commit 7a86bc22066858afeb23845a191a6ab680b46233
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           lua-json
 Version:        1.3.2
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        JSON Parser/Constructor for Lua
 License:        MIT
 URL:            https://github.com/harningt/luajson
@@ -39,10 +39,15 @@ make check-regression
 # grep -q "0 failed, 0 errors" testlog.txt
 
 %files
-%doc LICENSE docs/LuaJSON.txt docs/ReleaseNotes-1.0.txt
+%license LICENSE
+%doc docs/LuaJSON.txt docs/ReleaseNotes-1.0.txt
 %{luapkgdir}/*
 
 %changelog
+* Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-16
+- Fixing run-time dependencies.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

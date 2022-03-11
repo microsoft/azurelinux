@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.34
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,7 +41,10 @@ Patch11:        CVE-2018-20796.nopatch
 #Patch16:        CVE-2020-27618.patch
 Patch17:        glibc-2.34_pthread_cond_wait.patch
 
-BuildRequires:  perl(File::Find)
+BuildRequires:  bison
+BuildRequires:  kernel-headers
+BuildRequires:  gettext
+BuildRequires:  texinfo
 
 Requires:       filesystem
 
@@ -153,6 +156,7 @@ cd %{_builddir}/%{name}-build
         --disable-werror \
         --enable-kernel=3.2 \
         --enable-bind-now \
+        --enable-static-pie \
         --disable-experimental-malloc \
 %ifarch x86_64
         --enable-cet \
@@ -308,6 +312,10 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Wed Mar 02 2022 Andy Caldwell <andycaldwell@microsoft.com> - 2.34-3
+- Add support for building `-static-pie` binaries against `glibc`
+- Add additional BuildRequires
+
 * Thu Nov 04 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 2.34-2
 - Adding missing BR on "perl(File::Find)".
 - Fixing licensing information.

@@ -1,52 +1,33 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# When we are bootstrapping, we drop some dependencies.
-# Set this to 0 after bootstrapping.
-%{!?_with_bootstrap: %global bootstrap 1}
+%global bootstrap 1
 
 Name:           libproxy
-Version:        0.4.15
-Release:        20%{?dist}
+Version:        0.4.17
+Release:        5%{?dist}
 Summary:        A library handling all the details of proxy configuration
 
 License:        LGPLv2+
 URL:            https://libproxy.github.io/libproxy/
-Source0:        https://github.com/libproxy/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/libproxy/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Taken from the Debian package.
 Source1:        proxy.1
-# http://code.google.com/p/libproxy/issues/detail?id=152
-Patch0:         0001-Add-config-module-for-querying-PacRunner-d-mon.patch
-Patch1:         libproxy-0.4.11-crash.patch
-Patch2:         libproxy-0.4.15-python3738.patch
-# https://github.com/libproxy/libproxy/pull/86
-# https://github.com/libproxy/libproxy/pull/87
-Patch3:         libproxy-0.4.15-mozjs52.patch
-# https://github.com/libproxy/libproxy/pull/95
-Patch4:         libproxy-0.4.15-mozjs60.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1880350
-Patch5:         libproxy-0.4.15-fix-CVE-2020-25219.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1883584
-Patch6:         libproxy-0.4.15-fix-pac-buffer-overflow.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1898060
+Patch0:         libproxy-0.4.17-fix-python-version-check.patch
 
 BuildRequires:  cmake >= 2.6.0
 BuildRequires:  gcc-c++
-BuildRequires:  libmodman-devel >= 2.0.1
+BuildRequires:  pkgconfig(gio-2.0) >= 2.26
+BuildRequires:  python3-devel
 
 %if ! 0%{?bootstrap}
-# gnome
-BuildRequires:  pkgconfig(gio-2.0) >= 2.26
-# mozjs
-BuildRequires:  pkgconfig(mozjs-60)
 # NetworkManager
 BuildRequires:  pkgconfig(libnm)
 # pacrunner (and NetworkManager)
 BuildRequires:  pkgconfig(dbus-1)
 # webkit (gtk3)
 BuildRequires:  pkgconfig(javascriptcoregtk-4.0)
-# kde
-BuildRequires:  /usr/bin/kreadconfig5
 # Python
-BuildRequires:  python3-devel
 %else
 # Obsoletes of disabled subpackages.
 Provides: %{name}-mozjs = %{version}-%{release}
@@ -54,8 +35,6 @@ Obsoletes: %{name}-mozjs < %{version}-%{release}
 Provides: %{name}-webkitgtk4 = %{version}-%{release}
 Obsoletes: %{name}-webkitgtk4 < %{version}-%{release}
 %endif
-# The Python 2 subpackage was removed. Remove in F32.
-Obsoletes: python2-libproxy < %{version}-%{release}
 
 
 %description
@@ -67,7 +46,7 @@ libproxy offers the following features:
     * only 3 functions in the stable external API
     * dynamic adjustment to changing network topology
     * a standard way of dealing with proxy settings across all scenarios
-    * a sublime sense of joy and accomplishment 
+    * a sublime sense of joy and accomplishment
 
 
 %package        bin
@@ -76,7 +55,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    bin
 The %{name}-bin package contains the proxy binary for %{name}
-
 
 %package -n     python3-%{name}
 Summary:        Binding for %{name} and python3
@@ -87,7 +65,6 @@ BuildArch:      noarch
 %description -n python3-%{name}
 The python3 binding for %{name}
 
-%if ! 0%{?bootstrap}
 %package        gnome
 Summary:        Plugin for %{name} and gnome
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -103,14 +80,7 @@ Requires:       /usr/bin/kreadconfig5
 %description    kde
 The %{name}-kde package contains the %{name} plugin for kde.
 
-%package        mozjs
-Summary:        Plugin for %{name} and mozjs
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:       %{name}-pac = %{version}-%{release}
-
-%description    mozjs
-The %{name}-mozjs package contains the %{name} plugin for mozjs.
-
+%if ! 0%{?bootstrap}
 %package        networkmanager
 Summary:        Plugin for %{name} and networkmanager
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -123,6 +93,7 @@ for networkmanager.
 Summary:        Plugin for %{name} and webkitgtk3
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:       %{name}-pac = %{version}-%{release}
+Obsoletes:      %{name}-mozjs <= %{version}-%{release}
 
 %description    webkitgtk4
 The %{name}-webkitgtk4 package contains the %{name} plugin for
@@ -139,7 +110,6 @@ The %{name}-pacrunner package contains the %{name} plugin for
 PacRunner.
 %endif
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -153,25 +123,25 @@ developing applications that use %{name}.
 
 
 %build
+export CXXFLAGS="$CXXFLAGS -std=c++14"
 %{cmake} \
   -DMODULE_INSTALL_DIR=%{_libdir}/%{name}/%{version}/modules \
+  -DBIPR=OFF \
+  -DWITH_KDE=ON \
+  -DWITH_MOZJS=OFF \
   -DWITH_PERL=OFF \
+  -DWITH_PYTHON2=OFF \
+  -DWITH_PYTHON3=ON \
 %if ! 0%{?bootstrap}
   -DWITH_GNOME3=ON \
-  -DWITH_PYTHON2=OFF \
-  -DWITH_PYTHON3=ON \
   -DWITH_WEBKIT3=ON \
-  -DWITH_MOZJS=ON \
-%else
-  -DWITH_PYTHON2=OFF \
-  -DWITH_PYTHON3=ON \
 %endif
    .
-%make_build
+%cmake_build
 
 
 %install
-%make_install INSTALL="install -p"
+%cmake_install
 
 #In case all modules are disabled
 mkdir -p %{buildroot}%{_libdir}/%{name}/%{version}/modules
@@ -179,17 +149,14 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/%{version}/modules
 # Man page.
 install -Dpm 0644 %{SOURCE1} %{buildroot}/%{_mandir}/man1/proxy.1
 
-%if 0%{?bootstrap}
-rm %{buildroot}%{_libdir}/%{name}/%{version}/modules/config_kde.so
-%endif
 
 %check
-make test
+%ctest
 
 %ldconfig_scriptlets
 
 
-%files 
+%files
 %doc AUTHORS README
 %license COPYING
 %{_libdir}/*.so.*
@@ -201,12 +168,10 @@ make test
 %{_bindir}/proxy
 %{_mandir}/man1/proxy.1*
 
-
 %files -n python3-%{name}
 %{python3_sitelib}/__pycache__/*
 %{python3_sitelib}/%{name}.*
 
-%if ! 0%{?bootstrap}
 %files gnome
 %{_libdir}/%{name}/%{version}/modules/config_gnome3.so
 %{_libexecdir}/pxgsettings
@@ -214,9 +179,7 @@ make test
 %files kde
 %{_libdir}/%{name}/%{version}/modules/config_kde.so
 
-%files mozjs
-%{_libdir}/%{name}/%{version}/modules/pacrunner_mozjs.so
-
+%if ! 0%{?bootstrap}
 %files networkmanager
 %{_libdir}/%{name}/%{version}/modules/network_networkmanager.so
 
@@ -235,15 +198,63 @@ make test
 
 
 %changelog
-* Tue Jan 12 2021 Joe Schmitt <joschmit@microsoft.com> - 0.4.15-20
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Turn on bootstrap mode
+* Wed Mar 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.17-5
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Enabling 'gnome' and 'kde' subpackages.
+- License verified.
 
-* Tue Sep 29 2020 David King <amigadave@amigadave.com> - 0.4.15-19
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.17-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.17-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 21 2021 David King <amigadave@amigadave.com> - 0.4.17-2
+- Rebuilt for Python 3.10 (#1898060)
+
+* Fri May 28 2021 David King <amigadave@amigadave.com> - 0.4.17-1
+- Update to 0.4.17
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.15-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Nov 30 2020 David King <amigadave@amigadave.com> - 0.4.15-29
+- Tweak KDE conditionals to only apply at runtime
+
+* Mon Nov 30 2020 David King <amigadave@amigadave.com> - 0.4.15-28
+- Depend on KDE only on Fedora (#1902608)
+
+* Tue Oct 06 2020 Frantisek Zatloukal <fzatlouk@redhat.com> - 0.4.15-27
+- Disable mozjs backend by default, obsolete it by webkit subpackage
+
+* Tue Sep 29 2020 David King <amigadave@amigadave.com> - 0.4.15-26
 - Fix PAC buffer overflow (#1883584)
 
-* Fri Sep 18 2020 David King <amigadave@amigadave.com> - 0.4.15-18
+* Fri Sep 18 2020 David King <amigadave@amigadave.com> - 0.4.15-25
 - Fix CVE-2020-25219 (#1880350)
+
+* Tue Aug 18 2020 Jeff Law <law@redhat.com> - 0.4.15-24
+- Force C++14 as this code is not C++17 ready
+
+* Tue Aug 04 2020 Frantisek Zatloukal <fzatlouk@redhat.com> - 0.4.15-23
+- build with mozjs68
+- backport use after free fix for mozjs backend
+
+* Tue Aug 04 2020 Frantisek Zatloukal <fzatlouk@redhat.com> - 0.4.15-22
+- Fix build by switching to cmake macros instead of make
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.15-21
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.15-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.4.15-19
+- Rebuilt for Python 3.9
+
+* Thu Feb 13 2020 David King <amigadave@amigadave.com> - 0.4.15-18
+- Fix build against Python 3.9 (#1791942)
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.15-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -464,7 +475,7 @@ make test
 - Update to 0.3.0
 
 * Thu Sep 17 2009 kwizart < kwizart at gmail.com > - 0.2.3-12
-- Remove Requirement of %%{name}-pac virtual provides 
+- Remove Requirement of %%{name}-pac virtual provides
   from the main package - #524043
 
 * Sat Jul 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.2.3-11
@@ -479,7 +490,7 @@ make test
 
 * Thu Jan 22 2009 kwizart < kwizart at gmail.com > - 0.2.3-8
 - Merge NetworkManager module into the main libproxy package
-- Main Requires the -python and -bin subpackage 
+- Main Requires the -python and -bin subpackage
  (splitted for multilibs compliance).
 
 * Fri Oct 24 2008 kwizart < kwizart at gmail.com > - 0.2.3-7
@@ -506,7 +517,7 @@ make test
 - Add Requires: gecko-libs >= %%{gecko_version}
 - Fix some descriptions
 - Add plugin-webkit package
- 
+
 * Fri Jul 11 2008 kwizart < kwizart at gmail.com > - 0.2.3-1
 - Convert to Fedora spec
 

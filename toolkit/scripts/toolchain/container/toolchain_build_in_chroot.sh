@@ -619,15 +619,14 @@ popd
 rm -rf perl-5.32.0
 touch /logs/status_perl_complete
 
-echo Autoconf-2.69
-tar xf autoconf-2.69.tar.xz
-pushd autoconf-2.69
-sed '361 s/{/\\{/' -i bin/autoscan.in
+echo Autoconf-2.71
+tar xf autoconf-2.71.tar.xz
+pushd autoconf-2.71
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf autoconf-2.69
+rm -rf autoconf-2.71
 touch /logs/status_autoconf_complete
 
 echo Automake-1.16.5

@@ -1,8 +1,8 @@
 %define _userunitdir %{_libdir}/systemd/user
 Summary:        Library for loading and sharing PKCS#11 modules
 Name:           p11-kit
-Version:        0.23.22
-Release:        3%{?dist}
+Version:        0.24.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -134,6 +134,9 @@ fi
 %{_userunitdir}/p11-kit-server.socket
 
 %changelog
+* Thu Feb 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.24.1-1
+- Upgrading to v0.24.1
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.23.22-3
 - Replacing 'systemd-devel' BR with 'systemd-bootstrap-devel'
   to remove cyclic dependencies in other packages.
