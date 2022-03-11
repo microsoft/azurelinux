@@ -151,6 +151,7 @@ make check
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 71.1-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
+- License verified.
 
 * Tue Dec 22 2020 Vishal Verma <vishal.l.verma@intel.com> - 71.1-1
 - release v71.1
