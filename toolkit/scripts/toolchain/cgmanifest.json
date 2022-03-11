@@ -4,9 +4,9 @@
             "Component": {
                 "Type": "DockerImage",
                 "DockerImage": {
-                    "Name": "Ubuntu",
-                    "Digest": "sha256:bec5a2727be7fff3d308193cfde3491f8fba1a2ba392b7546b43a051853a341d",
-                    "Tag": "18.04"
+                    "Name": "mcr.microsoft.com/cbl-mariner/base/core",
+                    "Digest": "sha256:0a92146c52c59d25475e93d2acb0d7011af9411a57e237750eee7dd7c4fbbe59",
+                    "Tag": "1.0.20220226"
                 }
             }
         }
