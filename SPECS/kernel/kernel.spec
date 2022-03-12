@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.102.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -264,6 +264,7 @@ Patch1217:      CVE-2021-20321.nopatch
 Patch1218:      CVE-2022-0382.nopatch
 Patch1219:      CVE-2022-0617.nopatch
 Patch1220:      CVE-2022-0847.nopatch
+Patch1221: CVE-2021-3744.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -616,6 +617,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+*   Sat Mar 12 2022 Mariner Autopatcher <cblmargh@microsoft.com> 5.10.102.1-2
+-   Added patch file(s) CVE-2021-3744.patch
 * Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-1
 - Update source to 5.10.102.1
 - Apply CVE-2022-24958.patch
@@ -640,7 +643,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Address CVE-2021-46283, CVE-2021-45095, CVE-2022-0185, CVE-2022-23222
 
 * Thu Jan 20 2022 Chris Co <chrco@microsoft.com> - 5.10.89.1-2
-- Rotate Mariner cert 
+- Rotate Mariner cert
 
 * Sun Jan 16 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.89.1-1
 - Update source to 5.10.89.1
