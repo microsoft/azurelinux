@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://libestr.adiscon.com/
-Source0:        http://%{name}.adiscon.com/files/download/%{name}-%{version}.tar.gz
+Source0:        https://%{name}.adiscon.com/files/download/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 
 %description
