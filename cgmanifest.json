@@ -9321,8 +9321,8 @@
         "type": "other",
         "other": {
           "name": "libedit",
-          "version": "3.1.20180525",
-          "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20180525-3.1.tar.gz"
+          "version": "3.1.20210910",
+          "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20210910-3.1.tar.gz"
         }
       }
     },
