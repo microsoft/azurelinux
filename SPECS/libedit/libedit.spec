@@ -1,10 +1,10 @@
 %define libedit_version 3.1
-%define libedit_release 20180525
+%define libedit_release 20210910
 
 Summary:        The NetBSD Editline library
 Name:           libedit
-Version:        3.1.20180525
-Release:        6%{?dist}
+Version:        3.1.20210910
+Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.thrysoee.dk/editline/libedit-%{libedit_release}-%{libedit_version}.tar.gz
@@ -84,16 +84,23 @@ rm -rf %{buildroot}/%{_mandir}/man3/history.3*
     %{_includedir}/*
 
 %changelog
+*   Fri Mar 11 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.1.20210910-1
+-   Upgrade to 3.1.20210910-1
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.20180525-6
 -   Removing the explicit %%clean stage.
 
 *   Wed Aug 05 2020 Andrew Phelps <anphel@microsoft.com> 3.1.20180525-5
 -   Remove conflicting file _mandir/man3/history.3*
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.1.20180525-4
 -   Added %%license line automatically
+
 *   Mon Apr 13 2020 Jon Slobodzian <joslobo@microsoft.com> 3.1.20180525-3
 -   Verified license. Removed sha1. Fixed Source0 URL.
+
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.1.20180525-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
+
 *   Tue Aug 14 2018 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.1.20180525-1
 -   Initial
