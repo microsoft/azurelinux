@@ -44,6 +44,9 @@ The Node.js package ecosystem, npm, is the largest ecosystem of open source libr
 Summary:        Development files node
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
+Requires:       brotli-devel
+Requires:       openssl-devel >= 1.1.1
+Requires:       zlib-devel
 
 %description    devel
 The nodejs-devel package contains libraries, header files and documentation
