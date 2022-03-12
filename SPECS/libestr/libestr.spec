@@ -1,7 +1,7 @@
 Summary:        String handling essentials library
 Name:           libestr
-Version:        0.1.10
-Release:        5%{?dist}
+Version:        0.1.11
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Mar 11 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.1.11-1
+- Upgrade to 0.1.11
+
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 0.1.10-5
 - Remove %%sha1 line
 - Lint to Mariner style

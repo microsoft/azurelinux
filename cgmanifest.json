@@ -9391,8 +9391,8 @@
         "type": "other",
         "other": {
           "name": "libestr",
-          "version": "0.1.10",
-          "downloadUrl": "http://libestr.adiscon.com/files/download/libestr-0.1.10.tar.gz"
+          "version": "0.1.11",
+          "downloadUrl": "http://libestr.adiscon.com/files/download/libestr-0.1.11.tar.gz"
         }
       }
     },
