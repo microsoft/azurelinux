@@ -9431,8 +9431,8 @@
         "type": "other",
         "other": {
           "name": "libevent",
-          "version": "2.1.8",
-          "downloadUrl": "https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz"
+          "version": "2.1.12",
+          "downloadUrl": "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"
         }
       }
     },
