@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.32
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,14 +21,19 @@ Patch3:         CVE-2013-0221.nopatch
 Patch4:         CVE-2013-0222.nopatch
 # CVE-2013-0223 is fixed in coreutils-8.32-i18n-1.patch
 Patch5:         CVE-2013-0223.nopatch
-%ifarch aarch64
-Patch6:         coreutils-fix-get-sys_getdents-aarch64.patch
-%endif
+Patch6:         skip_test_if_run_as_root.patch
+BuildRequires:  libselinux-devel
 Requires:       gmp
 Requires:       libselinux
-BuildRequires:  libselinux-devel
 Conflicts:      toybox
 Provides:       sh-utils
+%ifarch aarch64
+Patch7:         coreutils-fix-get-sys_getdents-aarch64.patch
+%endif
+%if %{with_check}
+BuildRequires:  perl
+BuildRequires:  perl(File::Find)
+%endif
 
 %description
 The Coreutils package contains utilities for showing and setting
@@ -98,6 +103,10 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Mon Mar 14 2022 Bala <balakumaran.kannan@microsoft.com> - 8.32-2
+- BR perl related packages for PTest
+- Add patch to skip some tests when run as root user
+
 * Fri Oct 08 2021 Andrew Phelps <anphel@microsoft.com> 8.32-1
 - Update to version 8.32
 - Add patch to fix aarch64 build issue
