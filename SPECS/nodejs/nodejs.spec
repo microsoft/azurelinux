@@ -81,7 +81,7 @@ python3 configure.py \
   --without-dtrace \
   --openssl-use-def-ca-store
 
-JOBS=4 make %{?_smp_mflags} -j10 V=0
+JOBS=4 make %{?_smp_mflags} V=0
 
 %install
 
