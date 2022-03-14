@@ -351,13 +351,9 @@ build_rpm_in_chroot_no_install krb5
 chroot_and_install_rpms libssh2
 build_rpm_in_chroot_no_install curl
 
-# libxml2 needs python-xml and python3-xml
+# libxml2 needs python-xml
 # python-xml is built by building python2
-# python3-xml is built by building python3
 chroot_and_install_rpms python-xml
-chroot_and_install_rpms python3-libs
-chroot_and_install_rpms python3
-chroot_and_install_rpms python3-xml
 build_rpm_in_chroot_no_install libxml2
 
 # python-setuptools needs python-xml
@@ -411,6 +407,7 @@ build_rpm_in_chroot_no_install swig
 # gpgme needs swig, gnupg2 and python3
 chroot_and_install_rpms swig
 chroot_and_install_rpms gnupg2
+chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gpgme
 
 # tdnf needs python3, gpgme, curl and libsolv

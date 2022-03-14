@@ -14,7 +14,6 @@ BuildRequires:  python-xml
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
 BuildRequires:  python3-devel
-BuildRequires:  python3-xml
 Provides:       pkgconfig(libxml-2.0)
 
 %description
