@@ -32,8 +32,15 @@ Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/java-native-access/jna
 Source0:        https://github.com/java-native-access/jna/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         jna_remove_clover_and_win32_native_jar.patch
+# build-ant-tools.xml explicitly asks for ow2 asm-8.0.1.jar
+# this patch makes it instead look for the version we have.
+# the package seems to build fine with our 7.2 version, but
+# we can keep an eye on it and add a minimum version to objectweb-asm 
+# in the specfile if need be (better way to document requirements than in the .xml)
+Patch0:         ant_tools_arbitrary_ow2.patch
+Patch1:         jna_remove_clover_and_win32_native_jar.patch
 BuildRequires:  ant
+BuildRequires:  ant-junit
 BuildRequires:  dos2unix
 BuildRequires:  gcc
 BuildRequires:  hamcrest
@@ -80,22 +87,14 @@ rm -rf dist
 dos2unix OTHERS
 
 %patch0 -p1
+%patch1 -p1
 
 chmod -Rf a+rX,u+w,g-w,o-w .
 sed -i 's|@LIBDIR@|%{_libdir}/%{name}|' src/com/sun/jna/Native.java
 
-build-jar-repository -s -p lib junit ant
+build-jar-repository -s -p lib junit ant objectweb-asm/asm hamcrest/core
 rm test/com/sun/jna/StructureFieldOrderInspector.java
 rm test/com/sun/jna/StructureFieldOrderInspectorTest.java
-
-ln -s $(xmvn-resolve ant:ant:1.10.5) lib/ant.jar
-ln -s $(xmvn-resolve org.ow2.asm:asm) lib/asm-8.0.1.jar
-ln -s $(xmvn-resolve org.hamcrest:hamcrest-all) lib/hamcrest-core-1.3.jar
-ln -s $(xmvn-resolve org.reflections:reflections) lib/test/reflections.jar
- 
-cp lib/native/aix-ppc64.jar lib/clover.jar
- 
-%pom_remove_plugin -r :maven-javadoc-plugin parent
 
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
@@ -120,15 +119,24 @@ ant \
 install -d -m 755 %{buildroot}%{_libdir}/%{name}
 install -m 755 build/native*/libjnidispatch*.so %{buildroot}%{_libdir}/%{name}/
 
-%mvn_file :jna jna jna/jna %{_javadir}/jna
+install -d -m 755 %{buildroot}%{_jnidir}/%{name}
+install -d -m 755 %{buildroot}%{_javadir}/%{name}
+install -p -m 644 build/jna-min.jar %{buildroot}%{_jnidir}/%{name}.jar
 
-%mvn_package :jna-platform contrib
-%mvn_alias :jna-platform :platform
- 
-%mvn_artifact pom-jna.xml build/jna-min.jar
-%mvn_artifact pom-jna-platform.xml contrib/platform/dist/jna-platform.jar
- 
-%mvn_install -J doc/javadoc
+ln -sf ../%{name}.jar %{buildroot}%{_jnidir}/%{name}/%{name}.jar
+ln -sf %{_jnidir}/%{name}.jar %{buildroot}%{_javadir}/%{name}.jar
+install -p -m 644 ./contrib/platform/dist/jna-platform.jar %{buildroot}%{_javadir}/%{name}-platform.jar
+ln -sf ../%{name}-platform.jar %{buildroot}%{_javadir}/%{name}/%{name}-platform.jar
+
+install -d -m 755 %{buildroot}%{_mavenpomdir}
+install -p -m 644 pom-jna.xml %{buildroot}/%{_mavenpomdir}/%{name}.pom
+install -p -m 644 pom-jna-platform.xml %{buildroot}/%{_mavenpomdir}/%{name}-platform.pom
+
+%add_maven_depmap %{name}.pom %{name}.jar
+%add_maven_depmap %{name}-platform.pom %{name}-platform.jar -a net.java.dev.jna:platform -f contrib
+
+install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
+cp -pr doc/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 
 %check
 #ignore a unicode name test which fails in chroot checks
@@ -136,19 +144,26 @@ sed -i 's/testLoadLibraryWithUnicodeName/ignore_testLoadLibraryWithUnicodeName/'
 ant
 
 %files -f .mfiles
-%doc OTHERS README.md CHANGES.md TODO
-%license LICENSE LGPL2.1 AL2.0
-%{_libdir}/%{name}
+%dir %{_libdir}/%{name}
+%{_libdir}/%{name}/libjnidispatch.so
+%{_jnidir}/%{name}
+%{_javadir}/%{name}.jar
+%license LICENSE
+%doc CHANGES.md OTHERS README.md TODO
 
 %files contrib -f .mfiles-contrib
+%{_javadir}/%{name}
 
-%files javadoc -f .mfiles-javadoc
-%license LICENSE LGPL2.1 AL2.0
+%files javadoc
+%{_javadocdir}/jna
+%license LICENSE
 
 %changelog
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.0-1
 - Update source to v5.10.0
 - Update jna_remove_clover_and_win32_native_jar.patch
+- Patch build .xml files to build with objectweb-asm 7.2
+- Add ant-junit as BR to build check section
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.0-4
 - Removing the explicit %%clean stage.
