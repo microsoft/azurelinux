@@ -1,7 +1,7 @@
 Summary:        The package automatically configure source code
 Name:           autoconf
 Version:        2.71
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,9 @@ BuildRequires:  perl
 # Still an open issue as of 15th of March 2022: https://savannah.gnu.org/support/?110503.
 Requires:       gtk-doc
 
+%if %{with_check}
+BuildRequires:  perl(File::Find)
+%endif
 Requires:       m4
 Requires:       perl-libs
 BuildArch:      noarch
@@ -36,8 +39,7 @@ make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}%{_infodir}
 
 %check
-# Skip test 38 due to expected regex issue using perl 5.30 and autoconf
-make -k check %{?_smp_mflags} TESTSUITEFLAGS="1-37 39-500"
+make -k check %{?_smp_mflags}
 
 %files
 %defattr(-,root,root)
@@ -47,6 +49,10 @@ make -k check %{?_smp_mflags} TESTSUITEFLAGS="1-37 39-500"
 %{_datarootdir}/autoconf/*
 
 %changelog
+* Thu Mar 17 2022 Muhammad Falak <mwani@microsoft.com> - 2.71-3
+- Drop TESTSUITEFLAGS and run all tests cases
+- Add an explicit BR on `perl(File::Find)` to enable ptest
+
 * Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.71-2
 - Adding run-time dependency on "gtk-doc".
 
