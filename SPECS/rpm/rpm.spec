@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,7 +33,6 @@ Requires:       libarchive
 Requires:       libselinux
 Requires:       lua
 Requires:       rpm-libs = %{version}-%{release}
-Requires:       rpm-build = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
 Patch1: define-RPM_LD_FLAGS.patch
@@ -269,6 +268,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.17.0-4
+- Remove runtime requries for rpm-build
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.17.0-3
 - Remove manual pkgconfig(*) provides in toolchain specs
 
