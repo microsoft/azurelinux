@@ -1,14 +1,19 @@
-%define debug_package %{nil}
+%global _default_patch_fuzz 2
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
-Version:        2.6.1
-Release:        1%{?dist}
+Version:        2.4.57
+Release:        6%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openldap.org/
-Source0:        https://www.openldap.org/software/download/OpenLDAP/openldap-release/%{name}-%{version}.tgz
+# Using Canadian mirror. Original source link didn't work: ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/%{name}-%{version}.tgz
+Source0:        https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/%{name}-%{version}.tgz
+Patch0:         openldap-2.4.40-gssapi-1.patch
+Patch1:         openldap-2.4.44-consolidated-2.patch
+Patch2:         CVE-2015-3276.patch
+Patch3:         CVE-2021-27212.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  openssl-devel >= 1.0.1
@@ -32,8 +37,7 @@ libraries, and documentation for OpenLDAP.
 %build
 autoconf
 sed -i '/6.0.20/ a\\t__db_version_compat' configure
-# Disable experimental feature LDAP_CONNECTIONLESS to prevent error "/usr/bin/ld: ./.libs/libldap.so: undefined reference to `ber_sockbuf_io_udp'"
-export CPPFLAGS="${CPPFLAGS} -D_REENTRANT -D_GNU_SOURCE -D_AVL_H"
+export CPPFLAGS="${CPPFLAGS} -D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D_AVL_H"
 %configure \
         --disable-static    \
         --enable-dynamic    \
@@ -65,13 +69,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_sysconfdir}/openldap/*
-%{_libdir}/pkgconfig/lber.pc
-%{_libdir}/pkgconfig/ldap.pc
 
 %changelog
-* Thu Mar 10 2022 Andrew Phelps <anphel@microsoft.com> - 2.6.1-1
-- Upgrade to version 2.6.1
-
 * Wed Jan 05 2022 Henry Beberman <henry.beberman@microsoft.com> - 2.4.57-6
 - Set --enable-dynamic to disable rpath in ldap tools
 - Ensure that default CPPFLAGS are preserved
@@ -116,7 +115,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - License verified.
 - Fixed 'Source0' tag.
 
-* Tue Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> 2.4.46-4
+* Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> 2.4.46-4
 - Replaced incorrect URL link. Verified license. Removed incorrect version from Summary.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.46-3
