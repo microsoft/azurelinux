@@ -22824,8 +22824,8 @@
         "type": "other",
         "other": {
           "name": "python-jinja2",
-          "version": "2.10.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/93/ea/d884a06f8c7f9b7afbc8138b762e80479fb17aedbbe2b06515a12de9378d/Jinja2-2.10.1.tar.gz"
+          "version": "3.0.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/91/a5/429efc6246119e1e3fbf562c00187d04e83e54619249eb732bb423efa6c6/Jinja2-3.0.3.tar.gz"
         }
       }
     },
@@ -23144,8 +23144,8 @@
         "type": "other",
         "other": {
           "name": "python-markupsafe",
-          "version": "1.1.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-1.1.1.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-2.1.0.tar.gz"
         }
       }
     },
