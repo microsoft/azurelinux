@@ -30,7 +30,6 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  which
 BuildRequires:  xmlto
-%global with_check 1
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
