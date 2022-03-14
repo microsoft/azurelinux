@@ -1,7 +1,7 @@
 Summary:        POSIX capability Library
 Name:           libcap-ng
-Version:        0.7.9
-Release:        4%{?dist}
+Version:        0.8.2
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so.*
 %{_bindir}/*
 %{_mandir}/man8/*
+%{_mandir}/man7/*
 
 %files -n python3-libcap-ng
 %{python3_sitelib}/*
@@ -66,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.8.2-1
+- Upgrade to 0.8.2
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.9-4
 - Add compatibility provides for utils subpackage
 - Remove python2 subpackage

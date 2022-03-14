@@ -8981,8 +8981,8 @@
         "type": "other",
         "other": {
           "name": "libcap-ng",
-          "version": "0.7.9",
-          "downloadUrl": "http://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.7.9.tar.gz"
+          "version": "0.8.2",
+          "downloadUrl": "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.8.2.tar.gz"
         }
       }
     },
@@ -9081,8 +9081,8 @@
         "type": "other",
         "other": {
           "name": "libconfini",
-          "version": "1.16.0",
-          "downloadUrl": "https://github.com/madmurphy/libconfini/archive/1.16.0.tar.gz"
+          "version": "1.16.3",
+          "downloadUrl": "https://github.com/madmurphy/libconfini/archive/1.16.3.tar.gz"
         }
       }
     },

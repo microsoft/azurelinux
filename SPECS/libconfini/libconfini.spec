@@ -1,14 +1,13 @@
 Summary:        libconfini
 Name:           libconfini
-Version:        1.16.0
-Release:        2%{?dist}
+Version:        1.16.3
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-URL:            https://madmurphy.github.io/libconfini/html/index.html
-#Source0:       https://github.com/madmurphy/libconfini/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+URL:            https://github.com/madmurphy/libconfini
+Source0:        https://github.com/madmurphy/libconfini/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 %description
 libconfini is the ultimate and most consistent INI file parser library written in C.
@@ -51,6 +50,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.16.3-1
+- Upgrade to 1.16.3
+
+* Mon Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.0-2
+- Remove libtool archive files from final packaging
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.0-2
 - Remove libtool archive files from final packaging
 
