@@ -8931,8 +8931,8 @@
         "type": "other",
         "other": {
           "name": "libburn",
-          "version": "1.4.8",
-          "downloadUrl": "http://files.libburnia-project.org/releases/libburn-1.4.8.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://dev.lovelyhq.com/libburnia/libburn/archive/release-1.5.4.tar.gz"
         }
       }
     },
@@ -9481,8 +9481,8 @@
         "type": "other",
         "other": {
           "name": "libfastjson",
-          "version": "0.99.8",
-          "downloadUrl": "https://github.com/rsyslog/libfastjson/archive/v0.99.8.tar.gz"
+          "version": "0.99.9",
+          "downloadUrl": "https://github.com/rsyslog/libfastjson/archive/v0.99.9.tar.gz"
         }
       }
     },
@@ -9691,8 +9691,8 @@
         "type": "other",
         "other": {
           "name": "libgudev",
-          "version": "232",
-          "downloadUrl": "https://download.gnome.org/sources/libgudev/232/libgudev-232.tar.xz"
+          "version": "237",
+          "downloadUrl": "https://download.gnome.org/sources/libgudev/237/libgudev-237.tar.xz"
         }
       }
     },
@@ -9921,8 +9921,8 @@
         "type": "other",
         "other": {
           "name": "libisoburn",
-          "version": "1.4.8",
-          "downloadUrl": "http://files.libburnia-project.org/releases/libisoburn-1.4.8.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://dev.lovelyhq.com/libburnia/libisoburn/archive/release-1.5.4.tar.gz"
         }
       }
     },
@@ -9931,8 +9931,8 @@
         "type": "other",
         "other": {
           "name": "libisofs",
-          "version": "1.4.8",
-          "downloadUrl": "http://files.libburnia-project.org/releases/libisofs-1.4.8.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://dev.lovelyhq.com/libburnia/libisofs/archive/release-1.5.4.tar.gz"
         }
       }
     },

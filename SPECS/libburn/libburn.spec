@@ -4,14 +4,21 @@
 
 Summary:         Library for reading, mastering and writing optical discs
 Name:            libburn
-Version:         1.4.8
-Release:         3%{?dist}
+Version:         1.5.4
+Release:         1%{?dist}
 License:         GPLv2+
 Group:           System Environment/Libraries
-URL:             http://libburnia-project.org/
-Source0:         http://files.libburnia-project.org/releases/%{pkgname}-%{version}.tar.gz
+URL:             https://dev.lovelyhq.com/libburnia/libburn
+Source0:         https://dev.lovelyhq.com/libburnia/libburn/archive/release-%{version}.tar.gz#//%{pkgname}-%{version}.tar.gz
 Patch0:          libburn-0.6.16-multilib.patch
-BuildRequires:   intltool, gettext
+
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gcc
+BuildRequires:  libtool
+BuildRequires:  make
+BuildRequires:  intltool
+BuildRequires:  gettext
 
 %description
 Libburn is a library by which preformatted data get onto optical media:
@@ -42,8 +49,11 @@ A limited cdrecord compatibility wrapper which allows to use some %{name}
 features from the command line.
 
 %prep
-%setup -q -n %{pkgname}-%{version}
+%setup -q -n %{pkgname}
 %patch0 -p1 -b .multilib
+
+libtoolize --force
+autoreconf --force --install
 
 %build
 %configure --disable-static
@@ -79,6 +89,9 @@ rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 %{_mandir}/man1/%{cdrskin}.1*
 
 %changelog
+* Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.5.4-1
+- Upgrade to 1.5.4.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.8-3
 - Removing the explicit %%clean stage.
 - License verified.
