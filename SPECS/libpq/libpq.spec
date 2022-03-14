@@ -63,9 +63,7 @@ export SYMBOL_VERSION_PREFIX=RHPG_
 # we can disable some configure options.
 %configure \
     --disable-rpath \
-%if %{with_check}
     --with-ldap \
-%endif
     --with-openssl \
     --with-gssapi \
     --enable-nls \
@@ -123,9 +121,6 @@ find_lang_bins %{name}-devel.lst  pg_config
 %{_libdir}/pkgconfig/libpq.pc
 
 %changelog
-* Mon Mar 14 2022 Muhammad Falak <mwani@microsoft.com> - 12.2-4
-- Gate `--with-ldap` with `%{with_check}` temporarily
-
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 12.2-3
 - License verified
 - Lint spec

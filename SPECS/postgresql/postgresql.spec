@@ -63,9 +63,7 @@ sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_man
 ./configure \
     --enable-thread-safety \
     --prefix=%{_prefix} \
-%if %{with_check}
     --with-ldap \
-%endif
     --with-libxml \
     --with-openssl \
     --with-gssapi \
@@ -167,9 +165,6 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
-* Mon Mar 14 2022 Muhammad Falak <mwani@microsoft.com> - 12.7-3
-- Gate `--with-ldap` with `%{with_check}` temporarily
-
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.7-2
 - Removing the explicit %%clean stage.
 
