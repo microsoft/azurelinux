@@ -1,0 +1,56 @@
+From 62b56cdd5af44f05d8d622a9f21f3b00ef0a9f28 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 9 Mar 2022 16:40:19 +0000
+Subject: [PATCH 11/17] systemd: Drop systemd_detect_virt_t.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/corecommands.te | 1 +
+ policy/modules/system/systemd.fc      | 1 -
+ policy/modules/system/systemd.te      | 4 ----
+ 3 files changed, 1 insertion(+), 5 deletions(-)
+
+MSFT_TAG: Backport
+
+diff --git a/policy/modules/kernel/corecommands.te b/policy/modules/kernel/corecommands.te
+index fffdc5988..447cf17eb 100644
+--- a/policy/modules/kernel/corecommands.te
++++ b/policy/modules/kernel/corecommands.te
+@@ -14,6 +14,7 @@ attribute exec_type;
+ # bin_t is the type of files in the system bin/sbin directories.
+ #
+ type bin_t alias { ls_exec_t sbin_t };
++typealias bin_t alias systemd_detect_virt_t;
+ corecmd_executable_file(bin_t)
+ dev_associate(bin_t)	#For /dev/MAKEDEV
+ 
+diff --git a/policy/modules/system/systemd.fc b/policy/modules/system/systemd.fc
+index 84bdcb224..756224dca 100644
+--- a/policy/modules/system/systemd.fc
++++ b/policy/modules/system/systemd.fc
+@@ -8,7 +8,6 @@
+ /usr/bin/systemd-analyze		--	gen_context(system_u:object_r:systemd_analyze_exec_t,s0)
+ /usr/bin/systemd-cgtop			--	gen_context(system_u:object_r:systemd_cgtop_exec_t,s0)
+ /usr/bin/systemd-coredump		--	gen_context(system_u:object_r:systemd_coredump_exec_t,s0)
+-/usr/bin/systemd-detect-virt		--	gen_context(system_u:object_r:systemd_detect_virt_exec_t,s0)
+ /usr/bin/systemd-hwdb			--	gen_context(system_u:object_r:systemd_hw_exec_t,s0)
+ /usr/bin/systemd-nspawn			--	gen_context(system_u:object_r:systemd_nspawn_exec_t,s0)
+ /usr/bin/systemd-run			--	gen_context(system_u:object_r:systemd_run_exec_t,s0)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index d79b7b759..f7b8e2a00 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -102,10 +102,6 @@ init_system_domain(systemd_coredump_t, systemd_coredump_exec_t)
+ type systemd_coredump_var_lib_t;
+ files_type(systemd_coredump_var_lib_t)
+ 
+-type systemd_detect_virt_t;
+-type systemd_detect_virt_exec_t;
+-init_daemon_domain(systemd_detect_virt_t, systemd_detect_virt_exec_t)
+-
+ type systemd_factory_conf_t;
+ systemd_tmpfiles_conf_file(systemd_factory_conf_t)
+ 
+-- 
+2.17.1
+
