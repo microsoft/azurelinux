@@ -17,9 +17,10 @@ var (
 			ImaPolicyTcb,
 		},
 		ExtraCommandLine: "param1=value param2=\"value2 value3\"",
+		SELinux:          "permissive",
 	}
 	invalidExtraCommandLine     = "invalid=`delim`"
-	validExtraComandLineJSON    = `{"ImaPolicy": ["tcb"], "ExtraCommandLine": "param1=value param2=\"value2 value3\""}`
+	validExtraComandLineJSON    = `{"ImaPolicy": ["tcb"], "ExtraCommandLine": "param1=value param2=\"value2 value3\"", "SELinux": "permissive"}`
 	invalidExtraComandLineJSON1 = `{"ImaPolicy": [ "not-an-ima-policy" ]}`
 	invalidExtraComandLineJSON2 = `{"ExtraCommandLine": "` + invalidExtraCommandLine + `"}`
 )
@@ -60,6 +61,20 @@ func TestShouldSucceedParsesNoIma_KernelCommandLine(t *testing.T) {
 	err := remarshalJSON(nilImaCommandLine, &checkedCommandline)
 	assert.NoError(t, err)
 	assert.Equal(t, nilImaCommandLine, checkedCommandline)
+}
+
+func TestShouldFailParsingInvalidSELinux_KernelCommandLine(t *testing.T) {
+	var checkedCommandline KernelCommandLine
+	badSELinux := validCommandLine
+	badSELinux.SELinux = "Not a valid SELINUX"
+
+	err := badSELinux.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid value for SELinux (Not a valid SELINUX)", err.Error())
+
+	err = remarshalJSON(badSELinux, &checkedCommandline)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [KernelCommandLine]: failed to parse [SELinux]: invalid value for SELinux (Not a valid SELINUX)", err.Error())
 }
 
 func TestShouldFailParsingMixedValidInvalidIma_KernelCommandLine(t *testing.T) {

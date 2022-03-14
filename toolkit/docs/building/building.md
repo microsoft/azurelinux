@@ -157,7 +157,7 @@ sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PACKAGE_IGNORE_
 
 # Build ALL packages FOR ARM64
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 ```
 
 ### **Rebuild Minimal Required Packages**
@@ -170,7 +170,7 @@ sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json 
 
 # Build ALL packages FOR ARM64
 # (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8_aarch64" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
+sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y PACKAGE_IGNORE_LIST="openjdk8" SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core
 ```
 
 Note that the image build commands in [Build Images](#build-images) will **automatically** build _only_ the packages required by a selected image configuration and then builds the image.

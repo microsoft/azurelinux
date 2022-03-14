@@ -5,7 +5,7 @@
 Summary:        The stable distribution of Fluentd
 Name:           td-agent
 Version:        4.0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,11 @@ Group:          Applications/System
 URL:            https://github.com/fluent-plugins-nursery/td-agent-builder
 #Source0:      https://github.com/fluent-plugins-nursery/td-agent-builder/archive/testing-uploading-artifacts3.tar.gz
 Source0:        td-agent-builder-testing-uploading-artifacts3.tar.gz
+# td-agent enforces the ruby version used for building in td-agent/config.rb file. 
+# Therefore, everytime there's an upgrade in td-agent or ruby, please update this
+# patch file to update BUNDLED_RUBY_VERSION and RUBYGEM_VERSION to use the correct ruby
+# and rubygem installed in the system. Also update the shared library files of ruby, which contain
+# ruby versions in their file names
 Patch0:         td-agent.patch
 BuildRequires:  build-essential
 BuildRequires:  git
@@ -24,7 +29,7 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pkg-config
-BuildRequires:  ruby
+BuildRequires:  ruby = 2.6.9
 BuildRequires:  rubygem-async-http
 BuildRequires:  rubygem-aws-partitions
 BuildRequires:  rubygem-aws-sdk-core
@@ -72,7 +77,7 @@ BuildRequires:  zlib-devel
 Requires:       jemalloc
 Requires:       jemalloc-devel
 Requires:       libxcrypt
-Requires:       ruby
+Requires:       ruby = 2.6.9
 Requires:       rubygem-async-http
 Requires:       rubygem-aws-partitions
 Requires:       rubygem-aws-sdk-core
@@ -200,6 +205,10 @@ sudo systemctl start td-agent
 %attr(0755,td-agent,td-agent) %dir /tmp/td-agent
 
 %changelog
+* Tue Mar 08 2022 Henry Li <lihl@microsoft.com> - 4.0.1-5
+- Update td-agent.patch due to the upgrade in ruby
+- Add versioning for ruby in BR and runtime requirement
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.0.1-4
 - Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 

@@ -300,7 +300,7 @@ case $(uname -m) in
     ;;
     aarch64)
         echo $($LFS/usr/lib/jvm/OpenJDK-1.8.0.181-bootstrap/bin/java -version)
-        build_rpm_in_chroot_no_install openjdk8_aarch64
+        build_rpm_in_chroot_no_install openjdk8
     ;;
 esac
 

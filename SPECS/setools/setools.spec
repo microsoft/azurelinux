@@ -1,23 +1,25 @@
-%global selinux_ver 2.9-1
-%global __python3	%{_bindir}/python3
+%global libselinux_ver 3.2-1
+%global libsepol_ver 3.2-1
 %define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib(1))")
 Summary:        Policy analysis tools for SELinux
 Name:           setools
-Version:        4.2.2
-Release:        2%{?setools_pre_ver:.%{setools_pre_ver}}%{?dist}
+Version:        4.4.0
+Release:        2%{?dist}
 # binaries are GPL and libraries are LGPL.  See COPYING.
 License:        GPLv2 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/setools
 Source0:        https://github.com/SELinuxProject/setools/releases/download/%{version}/%{name}-%{version}.tar.bz2
+Patch0:         0001-Make-NetworkX-optional.patch
 BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  glibc-devel
-BuildRequires:  libselinux-devel
-BuildRequires:  libsepol-devel >= 2.9-1
+BuildRequires:  libselinux-devel >= %{libselinux_ver}
+BuildRequires:  libsepol-devel >= %{libsepol_ver}
+BuildRequires:  python3
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -29,13 +31,13 @@ BuildRequires:  swig
 SETools is a collection of graphical tools, command-line tools, and
 Python modules designed to facilitate SELinux policy analysis.
 
-%package     console
+%package        console
 Summary:        Policy analysis command-line tools for SELinux
 License:        GPLv2
-Requires:       libselinux >= %{selinux_ver}
-Requires:       setools-python3 = %{version}-%{release}
+Requires:       %{name}-python3 = %{version}-%{release}
+Requires:       libselinux >= %{libselinux_ver}
 
-%description console
+%description    console
 SETools is a collection of graphical tools, command-line tools, and
 libraries designed to facilitate SELinux policy analysis.
 
@@ -45,46 +47,54 @@ This package includes the following console tools:
   seinfo       List policy components.
   sesearch     Search rules (allow, type_transition, etc.)
 
-%package     python3
+%package        python3
 Summary:        Policy analysis tools for SELinux
 License:        GPLv2 AND LGPLv2+
 Requires:       python3-setuptools
 Recommends:     libselinux-python3
-Obsoletes:      setools-libs < 4.0.0
+Provides:       python3-%{name} = %{version}-%{release}
+Obsoletes:      %{name}-libs < 4.0.0
 
 %description python3
 SETools is a collection of graphical tools, command-line tools, and
 Python 3 modules designed to facilitate SELinux policy analysis.
 
 %prep
-%setup -q -n %{name}
+%autosetup -p1 -n %{name}
 
 %build
 python3 setup.py build_ext
 python3 setup.py build
-
 
 %install
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 
 # Remove unpackaged files.  These are tools for which the dependencies
 # are not yet available on mariner (python3-networkx)
-rm -rf %{buildroot}/%{_bindir}/sedta
-rm -rf %{buildroot}/%{_bindir}/seinfoflow
-rm -rf %{buildroot}/%{_mandir}/man1/sedta*
-rm -rf %{buildroot}/%{_mandir}/man1/seinfoflow*
-rm -rf %{buildroot}/%{_bindir}/apol
-rm -rf %{buildroot}/%{python3_sitearch}/setoolsgui
-rm -rf %{buildroot}/%{_mandir}/man1/apol*
+# Once networkx is added, the first 4 lines below should be
+# added to setools-console-analyses and the last 3 should
+# go in setools-gui.
+rm -rf %{buildroot}%{_bindir}/sedta
+rm -rf %{buildroot}%{_bindir}/seinfoflow
+rm -rf %{buildroot}%{_mandir}/{,ru/}man1/sedta*
+rm -rf %{buildroot}%{_mandir}/{,ru/}man1/seinfoflow*
+rm -rf %{buildroot}%{_bindir}/apol
+rm -rf %{buildroot}%{python3_sitearch}/setoolsgui
+rm -rf %{buildroot}%{_mandir}/{,ru/}man1/apol*
 
 %files console
 %license COPYING COPYING.GPL COPYING.LGPL
+%{_bindir}/sechecker
 %{_bindir}/sediff
 %{_bindir}/seinfo
 %{_bindir}/sesearch
+%{_mandir}/man1/sechecker*
 %{_mandir}/man1/sediff*
+%{_mandir}/ru/man1/sediff*
 %{_mandir}/man1/seinfo*
+%{_mandir}/ru/man1/seinfo*
 %{_mandir}/man1/sesearch*
+%{_mandir}/ru/man1/sesearch*
 
 %files python3
 %license COPYING COPYING.GPL COPYING.LGPL
@@ -92,6 +102,18 @@ rm -rf %{buildroot}/%{_mandir}/man1/apol*
 %{python3_sitearch}/setools-*
 
 %changelog
+* Tue Dec 14 2021 Chris PeBenito <chpebeni@microsoft.com> - 4.4.0-2
+- Make NetworkX optional for setools-console tools.  It is not used
+  by them.
+- Fix lint issues.
+
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.4.0-1
+- Upgrade to latest upstream
+- Update version of libselinux/libsepol dependencies
+- Add python3-setools provides to python3 subpackage
+- Lint spec
+- License verified
+
 * Tue Sep 01 2020 Daniel Burgener <daburgen@microsoft.com> - 4.2.2-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - License verified

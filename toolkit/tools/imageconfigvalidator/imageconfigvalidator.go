@@ -69,6 +69,7 @@ func ValidateConfiguration(config configuration.Config) (err error) {
 
 func validatePackages(config configuration.Config) (err error) {
 	const (
+		selinuxPkgName     = "selinux-policy"
 		validateError      = "failed to validate package lists in config"
 		verityPkgName      = "verity-read-only-root"
 		verityDebugPkgName = "verity-read-only-root-debug-tools"
@@ -80,6 +81,7 @@ func validatePackages(config configuration.Config) (err error) {
 		if err != nil {
 			return fmt.Errorf("%s: %w", validateError, err)
 		}
+		foundSELinuxPackage := false
 		foundVerityInitramfsPackage := false
 		foundVerityInitramfsDebugPackage := false
 		foundDracutFipsPackage := false
@@ -97,6 +99,9 @@ func validatePackages(config configuration.Config) (err error) {
 			if pkg == dracutFipsPkgName {
 				foundDracutFipsPackage = true
 			}
+			if pkg == selinuxPkgName {
+				foundSELinuxPackage = true
+			}
 		}
 		if systemConfig.ReadOnlyVerityRoot.Enable {
 			if !foundVerityInitramfsPackage {
@@ -109,6 +114,11 @@ func validatePackages(config configuration.Config) (err error) {
 		if strings.Contains(kernelCmdLineString, fipsKernelCmdLine) {
 			if !foundDracutFipsPackage {
 				return fmt.Errorf("%s: 'fips=1' provided on kernel cmdline, but '%s' package is not included in the package lists", validateError, dracutFipsPkgName)
+			}
+		}
+		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
+			if !foundSELinuxPackage {
+				return fmt.Errorf("%s: [SELinux] selected, but '%s' package is not included in the package lists", validateError, selinuxPkgName)
 			}
 		}
 	}
