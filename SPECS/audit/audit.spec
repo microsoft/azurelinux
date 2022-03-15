@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,13 +12,14 @@ Patch0:         refuse-manual-stop.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel
 BuildRequires:  swig
-BuildRequires:  systemd-bootstrap
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       gawk
 Requires:       krb5
 Requires:       libcap-ng
 Requires:       openldap
-Requires:       systemd
+# Break circular dependency with systemd by using weak dependency tag 'Recommends'
+# Systemd should always be installed in a running system
+Recommends:     systemd
 
 %description
 The audit package contains the user space utilities for
@@ -141,6 +142,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Andrew Phelps <anphel@microsoft.com> - 3.0.6-4
+- Break circular dependency with systemd by using Recommends
+
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 3.0.6-3
 - Reduce build requirements to build in toolchain environment
 
