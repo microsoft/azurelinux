@@ -6,7 +6,7 @@
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
 Version:        1.7.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
@@ -56,7 +56,7 @@ python3 setup.py install --root=%{buildroot}
 %if %{with check}
 %check
 pip3 install tox
-LANG=en_US.UTF-8 tox -e py39
+LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %endif
 
 %files -n python3-%{pkgname}
@@ -65,6 +65,9 @@ LANG=en_US.UTF-8 tox -e py39
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.7.1-4
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.7.1-3
 - Use `py39` instead of `py37` as tox environment to enable ptest
 
