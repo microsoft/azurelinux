@@ -1,7 +1,7 @@
 Summary:        Libxslt is the XSLT C library developed for the GNOME project. XSLT is a an XML language to define transformation for XML.
 Name:           libxslt
 Version:        1.1.34
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_fixperms} %{buildroot}/*
 
 %check
+# Disable fuzz testing as it has compile error for the released version.
+sed -i 's/ fuzz//g' tests/Makefile
 make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
@@ -69,6 +71,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.34-6
+- Drop fuzz testing to enable ptest
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.34-5
 - Removing the explicit %%clean stage.
 

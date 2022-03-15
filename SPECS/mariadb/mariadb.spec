@@ -1,14 +1,16 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.3.28
-Release:        3%{?dist}
+Version:        10.6.7
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
+
+# A buildable mariadb environment needs functioning submodules that do not work from the archive download
+# To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
-Patch0:         cmake_3.21.4_fix.patch
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -17,8 +19,13 @@ BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
+BuildRequires:  pcre2-devel
+BuildRequires:  pkgconf
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+%endif
 
 Conflicts:      mysql
 
@@ -101,6 +108,10 @@ mkdir -p %{buildroot}/%{_libdir}/systemd/system
 
 mv  %{buildroot}%{_datadir}/systemd/mariadb.service %{buildroot}/%{_libdir}/systemd/system/mariadb.service
 mv  %{buildroot}%{_datadir}/systemd/mariadb@.service %{buildroot}/%{_libdir}/systemd/system/mariadb@.service
+mv  %{buildroot}%{_datadir}/systemd/mariadb-extra@.socket %{buildroot}/%{_libdir}/systemd/system/mariadb-extra@.socket
+mv  %{buildroot}%{_datadir}/systemd/mariadb@.socket %{buildroot}/%{_libdir}/systemd/system/mariadb@.socket
+mv  %{buildroot}%{_datadir}/systemd/mysql.service %{buildroot}/%{_libdir}/systemd/system/mysql.service
+mv  %{buildroot}%{_datadir}/systemd/mysqld.service %{buildroot}/%{_libdir}/systemd/system/mysqld.service
 rm %{buildroot}/%{_sbindir}/rcmysql
 rm %{buildroot}/%{_libdir}/*.a
 mkdir -p %{buildroot}/%{_sharedstatedir}/mysql
@@ -146,6 +157,40 @@ fi
 %{_libdir}/libmysqlclient_r.so
 %{_libdir}/libmariadb.so.*
 %{_libdir}/libmariadbd.so.*
+%{_bindir}/aria_s3_copy
+%{_bindir}/mariadb
+%{_bindir}/mariadb-config
+%{_bindir}/mariadb-access
+%{_bindir}/mariadb-admin
+%{_bindir}/mariadb-backup
+%{_bindir}/mariadb-binlog
+%{_bindir}/mariadb-check
+%{_bindir}/mariadb-client-test
+%{_bindir}/mariadb-client-test-embedded
+%{_bindir}/mariadb-conv
+%{_bindir}/mariadb-convert-table-format
+%{_bindir}/mariadb-dump
+%{_bindir}/mariadb-dumpslow
+%{_bindir}/mariadb-embedded
+%{_bindir}/mariadb-find-rows
+%{_bindir}/mariadb-fix-extensions
+%{_bindir}/mariadb-hotcopy
+%{_bindir}/mariadb-import
+%{_bindir}/mariadb-install-db
+%{_bindir}/mariadb-ldb
+%{_bindir}/mariadb-plugin
+%{_bindir}/mariadb-secure-installation
+%{_bindir}/mariadb-setpermission
+%{_bindir}/mariadb-show
+%{_bindir}/mariadb-slap
+%{_bindir}/mariadb-test
+%{_bindir}/mariadb-test-embedded
+%{_bindir}/mariadb-tzinfo-to-sql
+%{_bindir}/mariadb-upgrade
+%{_bindir}/mariadb-waitpid
+%{_bindir}/mariadbd-multi
+%{_bindir}/mariadbd-safe
+%{_bindir}/mariadbd-safe-helper
 %{_bindir}/msql2mysql
 %{_bindir}/mysql
 %{_bindir}/mysql_find_rows
@@ -206,14 +251,14 @@ fi
 %{_datadir}/magic
 %{_datadir}/pam_user_map.so
 %{_datadir}/user_map.conf
+%config(noreplace) /etc/my.cnf.d/s3.cnf
+%config(noreplace) /etc/my.cnf.d/spider.cnf
 %license COPYING
 %doc CREDITS
 
 %exclude %{_datadir}/mysql/bench
 %exclude %{_datadir}/mysql/test
-%exclude %{_prefix}/data/test/db.opt
 %exclude %{_docdir}/mariadb-10.2.8/*
-%exclude %{_sysconfdir}/init.d/mysql
 
 %files server
 %config(noreplace) %{_sysconfdir}/logrotate.d/mysql
@@ -255,8 +300,8 @@ fi
 %{_bindir}/wsrep_sst_rsync
 %{_bindir}/wsrep_sst_rsync_wan
 %{_sbindir}/*
-%{_libdir}/systemd/system/mariadb.service
-%{_libdir}/systemd/system/mariadb@.service
+%{_unitdir}/*.service
+%{_unitdir}/*.socket
 %{_libdir}/systemd/system-preset/50-mariadb.preset
 %{_datadir}/binary-configure
 %{_datadir}/mysql-log-rotate
@@ -276,6 +321,7 @@ fi
 %{_mandir}/man1/aria_ftdump.1.gz
 %{_mandir}/man1/aria_pack.1.gz
 %{_mandir}/man1/aria_read_log.1.gz
+%{_mandir}/man1/aria_s3_copy.1.gz
 %{_mandir}/man1/innochecksum.1.gz
 %{_mandir}/man1/mariadb-service-convert.1.gz
 %{_mandir}/man1/myisamchk.1.gz
@@ -303,9 +349,43 @@ fi
 %{_mandir}/man1/mysql_ldb.1.gz
 %{_mandir}/man1/wsrep_sst_mariabackup.1.gz
 %{_mandir}/man1/wsrep_sst_rsync_wan.1.gz
+%{_mandir}/man1/mariadb-access.1.gz
+%{_mandir}/man1/mariadb-admin.1.gz
+%{_mandir}/man1/mariadb-backup.1.gz
+%{_mandir}/man1/mariadb-binlog.1.gz
+%{_mandir}/man1/mariadb-check.1.gz
+%{_mandir}/man1/mariadb-client-test-embedded.1.gz
+%{_mandir}/man1/mariadb-client-test.1.gz
+%{_mandir}/man1/mariadb-conv.1.gz
+%{_mandir}/man1/mariadb-convert-table-format.1.gz
+%{_mandir}/man1/mariadb-dump.1.gz
+%{_mandir}/man1/mariadb-dumpslow.1.gz
+%{_mandir}/man1/mariadb-embedded.1.gz
+%{_mandir}/man1/mariadb-find-rows.1.gz
+%{_mandir}/man1/mariadb-fix-extensions.1.gz
+%{_mandir}/man1/mariadb-hotcopy.1.gz
+%{_mandir}/man1/mariadb-import.1.gz
+%{_mandir}/man1/mariadb-install-db.1.gz
+%{_mandir}/man1/mariadb-ldb.1.gz
+%{_mandir}/man1/mariadb-plugin.1.gz
+%{_mandir}/man1/mariadb-secure-installation.1.gz
+%{_mandir}/man1/mariadb-setpermission.1.gz
+%{_mandir}/man1/mariadb-show.1.gz
+%{_mandir}/man1/mariadb-slap.1.gz
+%{_mandir}/man1/mariadb-test-embedded.1.gz
+%{_mandir}/man1/mariadb-test.1.gz
+%{_mandir}/man1/mariadb-tzinfo-to-sql.1.gz
+%{_mandir}/man1/mariadb-upgrade.1.gz
+%{_mandir}/man1/mariadb-waitpid.1.gz
+%{_mandir}/man1/mariadb.1.gz
+%{_mandir}/man1/mariadb_config.1.gz
+%{_mandir}/man1/mariadbd-multi.1.gz
+%{_mandir}/man1/mariadbd-safe-helper.1.gz
+%{_mandir}/man1/mariadbd-safe.1.gz
+%{_mandir}/man1/myrocks_hotbackup.1.gz
+%{_mandir}/man1/mytop.1.gz
 %{_mandir}/man8/*
 %{_datadir}/mysql/fill_help_tables.sql
-%{_datadir}/mysql/install_spider.sql
 %{_datadir}/mysql/maria_add_gis_sp.sql
 %{_datadir}/mysql/maria_add_gis_sp_bootstrap.sql
 %{_datadir}/mysql/mroonga/install.sql
@@ -314,8 +394,8 @@ fi
 %{_datadir}/mysql/mysql_system_tables.sql
 %{_datadir}/mysql/mysql_system_tables_data.sql
 %{_datadir}/mysql/mysql_test_data_timezone.sql
-%{_datadir}/mysql/mysql_to_mariadb.sql
 %{_datadir}/mysql/mysql_test_db.sql
+%{_datadir}/mysql/mysql_sys_schema.sql
 %license %{_datadir}/mysql/mroonga/AUTHORS
 %license %{_datadir}/mysql/mroonga/COPYING
 %license %{_datadir}/groonga-normalizer-mysql/lgpl-2.0.txt
@@ -337,6 +417,7 @@ fi
 %{_libdir}/libmariadbd.so
 %{_libdir}/libmysqld.so
 %{_libdir}/pkgconfig/*mariadb.pc
+%{_mandir}/man3/*.3.gz
 
 %files errmsg
 %{_datadir}/mysql/czech/errmsg.sys
@@ -366,6 +447,12 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Tue Feb 15 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.6.7-1
+- Upgrading to v10.6.7.
+- Adding reference to new unpackaged man files.
+- Adding comment and script to help with submodule tarball creation.
+- Adding with_check perl(Test::More) BR for "dbug" ptest failure.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.3.28-3
 - Removing the explicit %%clean stage.
 

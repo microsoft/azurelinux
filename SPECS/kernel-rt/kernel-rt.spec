@@ -1,9 +1,10 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-rt28-%{release}
+%global rt_version rt34
+%define uname_r %{version}-%{rt_version}-%{release}
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        5.15.18.1
+Version:        5.15.26.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -15,7 +16,10 @@ Source0:        kernel-%{version}.tar.gz
 Source1:        config
 Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20211013.pem
-Patch0:         patch-5.15.18-rt28.patch
+# When updating, make sure to grab the matching patch from 
+# https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
+# Also, remember to bump the global rt_version macro above ^
+Patch0:         patch-5.15.26-%{rt_version}.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -344,6 +348,14 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Mar 08 2022 cameronbaird <cameronbaird@microsoft.com> - 5.15.26.1-1
+- Update source to 5.15.26.1
+- Add some documentation about update process for rt patch
+
+* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-4
+- CONFIG_BPF_UNPRIV_DEFAULT_OFF=y
+- Bump release number to match kernel release
+
 * Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
 - Update source to 5.15.18.1
 

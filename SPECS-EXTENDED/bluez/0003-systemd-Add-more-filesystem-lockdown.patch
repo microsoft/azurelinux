@@ -14,7 +14,7 @@ diff --git a/Makefile.am b/Makefile.am
 index ac88c12e0..0a6d09847 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -562,6 +562,9 @@ MAINTAINERCLEANFILES = Makefile.in \
+@@ -617,6 +617,9 @@
  
  SED_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
  		$(SED) -e 's,@pkglibexecdir\@,$(pkglibexecdir),g' \
@@ -23,7 +23,7 @@ index ac88c12e0..0a6d09847 100644
 +		       -e 's,@confdir\@,$(confdir),g' \
  		< $< > $@
  
- %.service: %.service.in Makefile
+ if RUN_RST2MAN
 diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
 index 7c2f60bb4..4daedef2a 100644
 --- a/src/bluetooth.service.in

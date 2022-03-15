@@ -1,7 +1,7 @@
 Summary:        Grep for perl compatible regular expressions
 Name:           pcre
 Version:        8.45
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,11 @@ This package contains minimal set of shared pcre libraries.
 
 %build
 %configure \
+%ifarch s390 s390x sparc64 sparcv9 riscv64
+    --disable-jit                     \
+%else
+    --enable-jit                      \
+%endif
     --docdir=%{_docdir}/pcre-%{version} \
     --enable-unicode-properties       \
     --enable-pcre16                   \
@@ -90,6 +95,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libpcre.so.*
 
 %changelog
+* Tue Mar 08 2022 Matt DeVuyst <mattdev@microsoft.com> - 8.45-2
+- Enable JIT feature on supported architectures (as Fedora does).
+
 * Thu Feb 10 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.45-1
 - Upgrading to v8.45
 - Correcting source URL.

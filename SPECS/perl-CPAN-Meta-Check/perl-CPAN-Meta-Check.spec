@@ -1,7 +1,7 @@
 Name:           perl-CPAN-Meta-Check
 Summary:        Verify requirements in a CPAN::Meta object
 Version:        0.014
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
@@ -27,6 +27,7 @@ BuildRequires:  perl(warnings)
 BuildRequires:  perl(CPAN::Meta) >= 2.120920
 BuildRequires:  perl(Env)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(Test::Deep)
 BuildRequires:  perl(Test::More) >= 0.88
 %endif
 
@@ -57,6 +58,9 @@ make test
 %{_mandir}/man3/CPAN::Meta::Check.3*
 
 %changelog
+* Wed Mar 02 2022 Muhammad Falak <mwani@microsoft.com> - 0.014.13
+- Add an explicit BR on `perl(Test::Deep)` to enable ptest
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.014-13
 - Adding BR on "perl-generators".
 

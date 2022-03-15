@@ -42,6 +42,7 @@ generate_toolchain () {
 # Remove specific packages that are not needed in pkggen_core
 remove_packages_for_pkggen_core () {
     sed -i '/alsa-lib-/d' $TmpPkgGen
+    sed -i '/audit-devel/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
     sed -i '/libpkgconf-devel/d' $TmpPkgGen
@@ -299,6 +300,7 @@ generate_pkggen_core () {
         grep "^chkconfig-[0-9]" $TmpPkgGen
         grep "^msopenjdk-" $TmpPkgGen
         grep "^pyproject-" $TmpPkgGen
+        grep "^audit-" $TmpPkgGen
     } > "$1"
 }
 

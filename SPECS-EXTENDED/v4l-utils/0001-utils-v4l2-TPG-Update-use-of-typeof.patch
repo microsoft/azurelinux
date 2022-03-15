@@ -1,0 +1,51 @@
+From 9f799271e5e92cb84cbce002896ce7c25dad4fd8 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Mon, 27 Dec 2021 15:25:21 +0000
+Subject: [PATCH] utils: v4l2 TPG: Update use of typeof
+
+It seems the way to use typeof with newer gcc's is by using
+__typeof__
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ utils/common/v4l2-tpg.h     | 6 +++---
+ utils/common/v4l2-tpg.patch | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/utils/common/v4l2-tpg.h b/utils/common/v4l2-tpg.h
+index ecdb6eba..ba351c28 100644
+--- a/utils/common/v4l2-tpg.h
++++ b/utils/common/v4l2-tpg.h
+@@ -46,9 +46,9 @@ static inline void *vzalloc(unsigned long size)
+ }
+ 
+ #define clamp(val, min, max) ({			\
+-	typeof(val) __val = (val);		\
+-	typeof(min) __min = (min);		\
+-	typeof(max) __max = (max);		\
++	__typeof__(val) __val = (val);		\
++	__typeof__(min) __min = (min);		\
++	__typeof__(max) __max = (max);		\
+ 	(void) (&__val == &__min);		\
+ 	(void) (&__val == &__max);		\
+ 	__val = __val < __min ? __min: __val;	\
+diff --git a/utils/common/v4l2-tpg.patch b/utils/common/v4l2-tpg.patch
+index 2381ebd9..d7edc1f3 100644
+--- a/utils/common/v4l2-tpg.patch
++++ b/utils/common/v4l2-tpg.patch
+@@ -214,9 +214,9 @@ index 0b0ddb87..91da74ec 100644
+ +}
+ +
+ +#define clamp(val, min, max) ({			\
+-+	typeof(val) __val = (val);		\
+-+	typeof(min) __min = (min);		\
+-+	typeof(max) __max = (max);		\
+++	__typeof__(val) __val = (val);		\
+++	__typeof__(min) __min = (min);		\
+++	__typeof__(max) __max = (max);		\
+ +	(void) (&__val == &__min);		\
+ +	(void) (&__val == &__max);		\
+ +	__val = __val < __min ? __min: __val;	\
+-- 
+2.33.1
+
