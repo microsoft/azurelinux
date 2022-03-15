@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,7 @@ Patch21:        openssl-1.1.1-drbg-seed.patch
 Patch22:        CVE-2021-3711.patch
 Patch23:        CVE-2021-3712.patch
 Patch24:        CVE-2021-4160.nopatch
+Patch25:        CVE-2022-0778.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -133,6 +134,7 @@ cp %{SOURCE4} test/
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
+%patch25 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -312,6 +314,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Thu Mar 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1k-9
+- Adding patch for CVE-2022-0778.
+
 * Mon Aug 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1k-8
 - Fix dangling symlinks in man page packaging
 - Fix duplicate ssl suffixes in man pages
