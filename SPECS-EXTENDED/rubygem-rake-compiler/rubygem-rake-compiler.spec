@@ -1,16 +1,15 @@
-%global	gem_name	rake-compiler
-
-%undefine       _changelog_trimtime
-
+%global	gem_name rake-compiler
+%undefine        _changelog_trimtime
 Summary:	Rake-based Ruby C Extension task generator
 Name:		rubygem-%{gem_name}
-Version:	1.1.6
-Release:	2%{?dist}
+Version:	1.1.9
+Release:	1%{?dist}
 License:	MIT
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
-URL:		http://rake-compiler.rubyforge.org/
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
+URL:		https://rubydoc.info/gems/rake-compiler
+#Source0:    https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v%{version}.tar.gz
+Source0:	%{gem_name}-%{version}.tar.gz
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
@@ -47,7 +46,6 @@ This package contains documentation for %{name}.
 
 %prep
 %setup -q -n %{gem_name}-%{version}
-mv ../%{gem_name}-%{version}.gemspec .
 
 # rpmlint cosmetic
 find ./lib/rake -name \*.rb | xargs sed -i -e '\@/usr/bin/env@d'
@@ -64,11 +62,10 @@ sed -i tasks/bin/cross-ruby.rake \
 	-e '\@LDFLAGS=@d'
 
 %build
-gem build %{gem_name}-%{version}.gemspec
+gem build %{gem_name}
 %gem_install
 
 %install
-rm -rf %{buildroot}
 
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{_prefix}/* %{buildroot}%{_prefix}/
@@ -94,23 +91,21 @@ popd
 
 %files
 %{_bindir}/rake-compiler
-
 %license %{gem_instdir}/LICENSE.txt
-
 %dir %{gem_instdir}
 %doc %{gem_instdir}/README.md
 %doc %{gem_instdir}/History.md
-
 %{gem_instdir}/bin/
 %{gem_libdir}
-
 %{gem_spec}
 
 %files doc
 %{gem_docdir}
 
-
 %changelog
+* Tue Mar 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.9-1
+- Update to v1.1.9.
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.6-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

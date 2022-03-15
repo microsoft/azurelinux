@@ -1,6 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %define gem_name maruku
+%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 
 Name: rubygem-%{gem_name}
 Version: 0.7.2
@@ -8,8 +9,10 @@ Release: 10%{?dist}
 Summary: Maruku is a Markdown-superset interpreter written in Ruby
 # lib/maruku/ext/fenced_code.rb - BSD
 License: MIT and BSD
-URL: http://github.com/bhollis/maruku
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+URL: https://github.com/bhollis/maruku
+#Source0: https://github.com/bhollis/%{gem_name}/archive/refs/tags/v%{version}.tar.gz
+Source0: %{gem_name}-%{version}.tar.gz
+Patch0: remove-pem.patch
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -20,7 +23,6 @@ BuildArch: noarch
 Maruku is a Markdown interpreter in Ruby. It features native export to HTML
 and PDF (via Latex). The output is really beautiful!
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -30,22 +32,16 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -c -T
-%gem_install -n %{SOURCE0}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
-
-
-mkdir -p %{buildroot}%{_bindir}
-cp -a .%{_bindir}/* \
-        %{buildroot}%{_bindir}/
-
-find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
+cp -a /%{gem_dir}/build_info %{buildroot}%{gem_dir}/gems/
+cp -a /%{gem_dir}/extensions %{buildroot}%{gem_dir}/gems/
 
 # Run the test suite
 %check
@@ -61,8 +57,8 @@ popd
 
 %files
 %dir %{gem_instdir}
-%{_bindir}/maruku
-%{_bindir}/marutex
+/usr/lib/ruby/gems/bin/maruku
+/usr/lib/ruby/gems/bin/marutex
 %license %{gem_instdir}/MIT-LICENSE.txt
 %{gem_instdir}/bin
 %{gem_instdir}/data
@@ -78,6 +74,7 @@ popd
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

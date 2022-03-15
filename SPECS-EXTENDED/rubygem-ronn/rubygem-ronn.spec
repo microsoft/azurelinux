@@ -1,7 +1,8 @@
+%global debug_package %{nil}
+%global gem_name ronn
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # Missing BR rubygem(contest), necessary for running the test suite in %%check.
-%global gem_name ronn
 
 Name:           rubygem-%{gem_name}
 Version:        0.7.3
@@ -10,16 +11,16 @@ Summary:        Manual authoring tool
 
 License:        MIT
 URL:            https://github.com/rtomayko/ronn
-Source0:        http://rubygems.org/gems/%{gem_name}-%{version}.gem
+#Source0:        https://github.com/rtomayko/ronn/archive/refs/tags/%{version}.tar.gz
+Source0:        %{gem_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  rubygems-devel
-Requires:       rubygem(hpricot) rubygem(rdiscount) rubygem(mustache) rubygems groff-base
-
-%if 0%{?fedora} >= 19 || 0%{?rhel} > 7
-Requires: ruby(release)
-%else
-Requires: ruby(abi) >= 1.9.1
-%endif
+Requires:       rubygem(hpricot)
+Requires:       rubygem(rdiscount)
+Requires:       rubygem(mustache)
+Requires:       rubygems
+Requires:       groff-base
+Requires:       ruby(release)
 
 %description
 Ronn builds manuals. It converts simple, human readable text files to
@@ -38,13 +39,10 @@ BuildArch:      noarch
 Documentation for %{name}
 
 %prep
-gem unpack %{SOURCE0}
-%setup -q -D -T -n  %{gem_name}-%{version}
-gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n  %{gem_name}-%{version}
 
 %build
-mkdir -p .%{gem_dir}
-gem build %{gem_name}.gemspec
+gem build %{gem_name}
 %gem_install
 
 %install
@@ -78,6 +76,7 @@ rm -rf %{buildroot}%{gem_instdir}/{INSTALLING,Rakefile,test,man,ronn.gemspec,con
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.3-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.3-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

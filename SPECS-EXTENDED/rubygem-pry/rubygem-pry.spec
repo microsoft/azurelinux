@@ -8,16 +8,15 @@ Release: 2%{?dist}
 Summary: An IRB alternative and runtime developer console
 License: MIT
 URL: https://pry.github.io/
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# git clone https://github.com/pry/pry.git && cd pry
-# git archive -v -o pry-0.13.1-spec.tar.gz v0.13.1 spec/
-Source1: %{gem_name}-%{version}-spec.tar.gz
+#Source0: https://github.com/pry/pry/archive/refs/tags/v%{version}.tar.gz
+Source0: %{gem_name}-%{version}.tar.gz
+BuildRequires: git
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildRequires: rubygem(bundler)
-BuildRequires: rubygem(coderay) >= 1.1.0
-BuildRequires: rubygem(method_source) >= 0.8.1
+BuildRequires: rubygem-coderay >= 1.1.0
+BuildRequires: rubygem-method_source >= 0.8.1
 BuildRequires: rubygem(rspec)
 # editor specs fail if no editor is available (soft requirement)
 BuildRequires: vi
@@ -30,7 +29,6 @@ Pry is a runtime developer console and IRB alternative with powerful
 introspection capabilities. Pry aims to be more than an IRB replacement. It is
 an attempt to bring REPL driven programming to the Ruby language.
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -40,17 +38,10 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version} -b 1
-
-# Relax method_source. It seems that the higher version is enforced just
-# due to JRuby.
-%gemspec_remove_dep -g method_source "~> 1.0"
-%gemspec_add_dep -g method_source "< 2"
-
+%setup -q -n %{gem_name}-%{version}
 
 %build
-# Create the gem as gem install only works on a gem file
-gem build ../%{gem_name}-%{version}.gemspec
+gem build %{gem_name}
 
 # %%gem_install compiles any C extensions and installs the gem into ./%%gem_dir
 # by default, so that we can move it into the buildroot in %%install
@@ -60,7 +51,12 @@ gem build ../%{gem_name}-%{version}.gemspec
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
-
+#add lib files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
+#add CHANGELOG, README and License files to buildroot from Source0
+cp CHANGELOG.md %{buildroot}%{gem_instdir}/
+cp README.md %{buildroot}%{gem_instdir}/
+cp LICENSE %{buildroot}%{gem_instdir}/
 
 mkdir -p %{buildroot}%{_bindir}
 cp -a .%{_bindir}/* \
@@ -100,6 +96,7 @@ popd
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.13.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Mon Apr 20 2020 Vít Ondruch <vondruch@redhat.com> - 0.13.1-1
 - Update to Pry 0.13.1.

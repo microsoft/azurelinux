@@ -10,19 +10,21 @@ License:       MIT
 Vendor:	       Microsoft Corporation
 Distribution:  Mariner
 URL:           http://github.com/rtomayko/rdiscount
-Source0:       http://rubygems.org/gems/%{gem_name}-%{version}.gem
+#Source0:       https://github.com/davidfstr/rdiscount/archive/refs/tags/%{version}.tar.gz
+Source0:       %{gem_name}-%{version}.tar.gz
 BuildRequires: ruby
 
 %description
 RDiscount converts documents in Markdown syntax to HTML.
 
 %prep
-%setup -q -c -T
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)

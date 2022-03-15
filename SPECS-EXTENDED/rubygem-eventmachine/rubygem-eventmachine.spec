@@ -10,9 +10,11 @@ License:       MIT
 Vendor:	       Microsoft Corporation
 Distribution:  Mariner
 URL:           http://rubyeventmachine.com
-Source0:       https://rubygems.org/downloads/%{gem_name}-%{version}.gem
+#Source0:       https://github.com/eventmachine/eventmachine/archive/refs/tags/v%{version}.tar.gz
+Source0:       %{gem_name}-%{version}.tar.gz
 BuildRequires: ruby
 BuildRequires: gcc-c++
+BuildRequires: git
 BuildRequires: openssl-devel
 BuildRequires: rubygem(test-unit)
 
@@ -23,16 +25,16 @@ interactions with IP sockets, allowing programs to concentrate on the
 implementation of network protocols. 
 
 %prep
-%setup -q -c -T
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)
-%license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE
 %{gemdir}
 
 %changelog

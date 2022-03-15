@@ -8,12 +8,14 @@ License:       MIT
 Vendor:	       Microsoft Corporation
 Distribution:  Mariner
 URL:           https://jamesmead.org
-Source0:       https://rubygems.org/gems/%{gem_name}-%{version}.gem
+#Source0:       https://github.com/floehopper/introspection/archive/refs/tags/v%{version}.tar.gz
+Source0:       %{gem_name}-%{version}.tar.gz
+BuildRequires: git
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
-BuildRequires: rubygem(metaclass) => 0.0.1
-BuildRequires: rubygem(metaclass) < 0.1
+BuildRequires: rubygem-metaclass => 0.0.1
+BuildRequires: rubygem-metaclass < 0.1
 # There is no #assert_nothing_raised in minitest 5.x
 BuildRequires: rubygem(minitest)
 BuildArch:     noarch
@@ -21,7 +23,6 @@ Provides:      rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Dynamic inspection of the hierarchy of method definitions on a Ruby object.
-
 
 %package doc
 Summary: Documentation for %{name}
@@ -32,15 +33,23 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -c -T
-%gem_install -n %{SOURCE0}
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
-mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
+gem install -V --local --force --install-dir %{buildroot}/%{gem_dir} %{gem_name}-%{version}.gem
+mkdir -p %{buildroot}%{gem_instdir}
+#add lib, test and samples files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
+cp -a test/ %{buildroot}%{gem_instdir}/
+cp -a samples/ %{buildroot}%{gem_instdir}/
+#add COPYING, README, Rakefile and Gemfile files to buildroot from Source0
+cp COPYING.txt %{buildroot}%{gem_instdir}/
+cp README.md %{buildroot}%{gem_instdir}/
+cp Rakefile %{buildroot}%{gem_instdir}/
+cp Gemfile %{buildroot}%{gem_instdir}/
 
 %check
 pushd .%{gem_instdir}
@@ -50,13 +59,9 @@ sed -i '/bundler\/setup/ d' test/test_helper.rb
 ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 popd
 
-
 %files
 %license %{gem_instdir}/COPYING.txt
 %dir %{gem_instdir}
-%exclude %{gem_instdir}/.gitignore
-%exclude %{gem_instdir}/.travis.yml
-%exclude %{gem_instdir}/introspection.gemspec
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}

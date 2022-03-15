@@ -1,9 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global	majorver	3.9.2
-#%%global	preminorver	.rc6
-%global	fullver	%{majorver}%{?preminorver}
-
 %global	gem_name	rspec-expectations
 
 %global	need_bootstrap_set	0
@@ -12,15 +8,13 @@ Distribution:   Mariner
 
 Summary:	RSpec expectations (should and matchers)
 Name:		rubygem-%{gem_name}
-Version:	%{majorver}
-Release:	2%{?dist}
+Version:	3.11.0
+Release:	1%{?dist}
 
 License:	MIT
 URL:		http://github.com/rspec/rspec-expectations
-Source0:	https://rubygems.org/gems/%{gem_name}-%{fullver}.gem
-# %%{SOURCE2} %%{name} %%{version}
-Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
-Source2:	rspec-related-create-full-tarball.sh
+#Source0: https://github.com/rspec/rspec-expectations/archive/refs/tags/v%{version}.tar.gz
+Source0:  %{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
@@ -44,20 +38,19 @@ Requires:	%{name} = %{version}-%{release}
 %description	doc
 This package contains documentation for %{name}.
 
-
 %prep
-%setup -q -T -n %{gem_name}-%{version} -b 1
-
-gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n %{gem_name}-%{version}
 
 %build
-gem build %{gem_name}.gemspec
-%gem_install
+gem build %{gem_name}
 
 %install
+%gem_install -n %{gem_name}-%{version}.gem
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
 	%{buildroot}%{gem_dir}/
+#add lib files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
 
 # cleanups
 rm -f %{buildroot}%{gem_instdir}/{.document,.yardopts}
@@ -69,21 +62,22 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 %endif
 
 %files
-%dir	%{gem_instdir}
-
-%license	%{gem_instdir}/LICENSE.md
-%doc	%{gem_instdir}/Changelog.md
-%doc	%{gem_instdir}/README.md
-
+%dir %{gem_instdir}
+%license %{gem_instdir}/LICENSE.md
+%doc %{gem_instdir}/Changelog.md
+%doc %{gem_instdir}/README.md
 %{gem_instdir}/lib/
-
-%exclude	%{gem_cache}
+%exclude %{gem_cache}
 %{gem_spec}
 
-%files	doc
+%files doc
 %{gem_docdir}
 
 %changelog
+* Fri Mar 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.11.0-1
+- Update to v3.11.0.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

@@ -8,10 +8,12 @@ Version:        1.0.4
 Release:        1%{?dist}
 Group:          Development/Languages
 License:        MIT
-Vendor:		Microsoft Corporation
+Vendor:         Microsoft Corporation
 Distribution:	Mariner
-URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
-Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
+URL:            https://github.com/puppetlabs/semantic_puppet
+#Source0:        https://github.com/puppetlabs/semantic_puppet/archive/refs/tags/%{version}.tar.gz
+Source0:        %{gem_name}-%{version}.tar.gz
+BuildRequires:  git
 BuildRequires:  ruby
 
 %description
@@ -19,18 +21,17 @@ Tools used by Puppet to parse, validate, and compare Semantic Versions and
 Version Ranges and to query and resolve module dependencies.
 
 %prep
-%setup -q -c -T
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)
-%license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE
 %{gemdir}
-
 
 %changelog
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.0.4-1

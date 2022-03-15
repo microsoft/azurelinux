@@ -2,7 +2,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global	gem_name	rspec-support
 
-%global	mainver	3.9.3
 %undefine	prever
 
 %global	need_bootstrap_set	0
@@ -10,16 +9,13 @@ Distribution:   Mariner
 %undefine __brp_mangle_shebangs
 
 Name:		rubygem-%{gem_name}
-Version:	%{mainver}
-Release:	2%{?dist}
-
+Version:	3.11.0
+Release:	1%{?dist}
 Summary:	Common functionality to Rspec series
 License:	MIT
 URL:		https://github.com/rspec/rspec-support
-Source0:	https://rubygems.org/gems/%{gem_name}-%{mainver}%{?prever}.gem
-# %%{SOURCE2} %%{name} %%{version}
-Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
-Source2:	rspec-related-create-full-tarball.sh
+#Source0:	 https://github.com/rspec/rspec-support/archive/refs/tags/v%{version}.tar.gz
+Source0:	%{gem_name}-%{version}.tar.gz
 # tweak regex for search path
 Patch100:	rubygem-rspec-support-3.2.1-callerfilter-searchpath-regex.patch
 
@@ -31,7 +27,6 @@ BuildRequires:	rubygem(thread_order)
 BuildRequires:	rubygem(bigdecimal)
 BuildRequires:	git
 %endif
-
 BuildArch:		noarch
 
 %description
@@ -47,23 +42,20 @@ BuildArch:	noarch
 %description	doc
 Documentation for %{name}
 
-%global	version_orig	%{version}
-%global	version	%{version_orig}%{?prever}
-
 %prep
-%setup -q -T -n %{gem_name}-%{version} -b 1
-gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
-
+%setup -q -n %{gem_name}-%{version}
 %patch100 -p1
 
 %build
-gem build %{gem_name}.gemspec
-%gem_install
+gem build %{gem_name}
 
 %install
+%gem_install -n %{gem_name}-%{version}.gem
 mkdir -p %{buildroot}%{gem_dir}
 cp -pa .%{gem_dir}/* \
 	%{buildroot}%{gem_dir}/
+#add lib files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
 
 %if 0%{?need_bootstrap_set} < 1
 %check
@@ -88,26 +80,28 @@ ruby -rrubygems -Ilib/ -S rspec spec/ || \
 %endif
 
 %files
-%dir	%{gem_instdir}
-%license	%{gem_instdir}/LICENSE.md
-%doc	%{gem_instdir}/Changelog.md
-%doc	%{gem_instdir}/README.md
-
+%dir %{gem_instdir}
+%license %{gem_instdir}/LICENSE.md
+%doc %{gem_instdir}/Changelog.md
+%doc %{gem_instdir}/README.md
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}
 
 %files doc
-%doc	%{gem_docdir}
+%doc %{gem_docdir}
 
 %changelog
+* Fri Mar 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.11.0-1
+- Update to v3.11.0.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.3-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
 * Sun May  3 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.9.3-1
 - 3.9.3
-
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.2-1.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

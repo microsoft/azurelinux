@@ -8,44 +8,46 @@ Version:	2.3.6
 Release:	8%{?dist}
 License:	MIT
 URL:		https://github.com/doudou/flexmock
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
-Source1:	%{gem_name}-v%{version}-test-missing-files.tar.gz
-# Source1 is created fron Source2
-Source2:	flexmock-create-missing-test-files.sh
+#Source0:	https://github.com/doudou/flexmock/archive/refs/tags/v%{version}.tar.gz
+Source0:    %{gem_name}-%{version}.tar.gz
 
 Requires:	ruby(release)
+BuildRequires:	git
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 BuildRequires:	rubygem(minitest) >= 5
 BuildRequires:	rubygem(rspec) >= 3
-Requires:	ruby(rubygems)
-Provides:	rubygem(%{gem_name}) = %{version}-%{release}
-BuildArch:	noarch
+Requires:   ruby(rubygems)
+Provides:   rubygem(%{gem_name}) = %{version}-%{release}
+BuildArch:  noarch
 
 %description
 FlexMock is a simple, but flexible, mock object library for Ruby unit
 testing.
 
-%package	doc
+%package doc
 Summary:	Documentation for %{name}
 Requires:	%{name} = %{version}-%{release}
 
-%description	doc
+%description doc
 This package contains documentation for %{name}.
 
 %prep
-%setup -q -c -T
+%setup -q -n %{gem_name}-%{version}
 
-%gem_install -n %{SOURCE0}
-
+%build
+gem build %{gem_name}
 find . -name \*.rb | xargs sed -i -e '\@/usr/bin/env@d'
 find . -name \*.gem -or -name \*.rb -or -name \*.rdoc | xargs chmod 0644
 
-%build
-
 %install
+%gem_install -n %{gem_name}-%{version}.gem
+
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* %{buildroot}%{gem_dir}/
+#add lib and rake files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
+cp -a rakelib/ %{buildroot}%{gem_instdir}/
 
 pushd %{buildroot}%{gem_instdir}
 rm -rf \
@@ -60,36 +62,26 @@ popd
 %check
 pushd .%{gem_instdir}
 
-tar xf %{SOURCE1}
-mv flexmock/test .
-
 ruby -Ilib:.:test \
 	-e 'Dir.glob("test/*_test.rb").each {|f| require f}'
 rspec test/rspec_integration/
 popd
 
-
 %files
-%license %{gem_instdir}/LICENSE.txt
-%dir	%{gem_instdir}
-%doc	%{gem_instdir}/[A-Z]*
-
+%license LICENSE.txt
+%dir %{gem_instdir}
 %{gem_libdir}
 %{gem_instdir}/rakelib/
-%exclude	%{gem_cache}
+%exclude %{gem_cache}
 %{gem_spec}
 
-%files	doc
-%{gem_instdir}/todo.txt
-%{gem_instdir}/doc/
+%files doc
 %{gem_docdir}/
 
 %changelog
-* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.6-8
-- License verified.
-
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.6-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

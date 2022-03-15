@@ -6,10 +6,10 @@ Summary:	Behaviour driven development (BDD) framework for Ruby
 Name:		rubygem-%{gem_name}
 Version:	3.9.0
 Release:	3%{?dist}
-
 License:	MIT
-URL:		http://rspec.info
-Source0:	http://rubygems.org/gems/%{gem_name}-%{version}.gem
+URL:      https://rspec.info
+#Source0:	https://github.com/rspec/rspec-metagem/archive/refs/tags/v%{version}.tar.gz
+Source0:	%{gem_name}-metagem-%{version}.tar.gz
 
 BuildRequires:	rubygems-devel
 #BuildRequires:	ruby(release)
@@ -19,7 +19,7 @@ Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 BuildArch:	noarch
 
 %description
-RSpec is a behaviour driven development (BDD) framework for Ruby.  
+RSpec is a behaviour driven development (BDD) framework for Ruby.
 
 %package	doc
 Summary:	Documentation for %{name}
@@ -28,22 +28,17 @@ Requires:	%{name} = %{version}-%{release}
 %description	doc
 This package contains documentation for %{name}.
 
-
 %prep
-gem unpack %{SOURCE0}
-
-%setup -q -D -T -n  %{gem_name}-%{version}
-
-gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n %{gem_name}-metagem-%{version}
 
 %build
-gem build %{gem_name}.gemspec
+gem build %{gem_name}
 %gem_install
 
 %install
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-	%{buildroot}%{gem_dir}/
+cp -a .%{gem_dir}/* %{buildroot}%{gem_dir}/
 
 %files
 %dir	%{gem_instdir}
@@ -56,11 +51,11 @@ cp -a .%{gem_dir}/* \
 %files	doc
 %doc	%{gem_docdir}
 
-
 %changelog
 * Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 3.9.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disable autoprovides and add provides for rubygem(rspec)
+- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
