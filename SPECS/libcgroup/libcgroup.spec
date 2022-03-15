@@ -1,43 +1,39 @@
 Summary:        Library to control and monitor control groups
 Name:           libcgroup
-Version:        0.41
-Release:        23%{?dist}
+Version:        2.0.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://libcg.sourceforge.net/
-Source0:        https://downloads.sourceforge.net/libcg/%{name}-%{version}.tar.bz2
+URL:            https://github.com/libcgroup/libcgroup
+
+# libcgroup git repo contains submodules that must be part of source tarball
+# 1) clone git repo                           => 'git clone https://github.com/libcgroup/libcgroup.git'
+# 2) checkout tag corresponding to version    => 'git checkout v2.0.1'
+# 3) get submodule                            => 'git submodule init' then 'git submodule update'
+# 4) create source tarball                    => 'tar -czf libcgroup-2.0.1.tar.gz libcgroup'
+Source0:        https://github.com/libcgroup/libcgroup/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        cgconfig.service
 
 Patch0: fedora-config.patch
-Patch1: libcgroup-0.37-chmod.patch
-Patch2: libcgroup-0.40.rc1-coverity.patch
-Patch3: libcgroup-0.40.rc1-fread.patch
-Patch4: libcgroup-0.40.rc1-templates-fix.patch
-Patch5: libcgroup-0.41-lex.patch
-Patch6: libcgroup-0.41-api.c-support-for-setting-multiline-values-in-contro.patch
-# resolves #1348874
-Patch7: libcgroup-0.41-api.c-fix-order-of-memory-subsystem-parameters.patch
-# resolves #1384504
-Patch8: libcgroup-0.41-api.c-preserve-dirty-flag.patch
-Patch9: libcgroup-0.41-change-cgroup-of-threads.patch
-Patch10: libcgroup-0.41-fix-infinite-loop.patch
-Patch11: libcgroup-0.41-prevent-buffer-overflow.patch
-Patch12: libcgroup-0.41-tasks-file-warning.patch
-Patch13: libcgroup-0.41-fix-log-level.patch
-Patch14: libcgroup-0.41-size-of-controller-values.patch
-Patch15: libcgroup-0.41-CVE-2018-14348.patch
+Patch1: libcgroup-0.40.rc1.patch
+Patch2: no-googletests.patch
 
+%{?systemd_requires}
+
+BuildRequires: autoconf
+BuildRequires: automake
 BuildRequires: gcc
 BuildRequires: coreutils
 BuildRequires: flex
+BuildRequires: make
 BuildRequires: pam-devel
 BuildRequires: systemd-devel
 
+# required for testing
+BuildRequires: gtest-devel
+
 Requires(pre): shadow-utils
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
 
 %description
 Control groups infrastructure. The library helps manipulate, control,
@@ -71,25 +67,11 @@ future allow creation of persistent configuration for control groups and
 provide scripts to manage that configuration.
 
 %prep
-%setup  -q  -n %{name}-%{version}
-%patch0 -p1 -b .config-patch
-%patch1 -p1 -b .chmod
-%patch2 -p1 -b .coverity
-%patch3 -p1 -b .fread
-%patch4 -p1 -b .templates-fix
-%patch5 -p2 -b .lex
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
+%autosetup -p1 -n %{name}
 
 %build
+
+autoreconf -vif
 %configure --enable-pam-module-dir=%{_libdir}/security \
            --enable-opaque-hierarchy="name=systemd" \
            --disable-daemon
@@ -103,20 +85,19 @@ install -d ${RPM_BUILD_ROOT}%{_sysconfdir}
 install -m 644 samples/cgconfig.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgconfig.conf
 install -m 644 samples/cgsnapshot_blacklist.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgsnapshot_blacklist.conf
 
-# sanitize pam module, we need only pam_cgroup.so
-mv -f $RPM_BUILD_ROOT%{_libdir}/security/pam_cgroup.so.*.*.* $RPM_BUILD_ROOT%{_libdir}/security/pam_cgroup.so
-rm -f $RPM_BUILD_ROOT%{_libdir}/security/pam_cgroup.la $RPM_BUILD_ROOT/%{_libdir}/security/pam_cgroup.so.*
-
-rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
-
-rm -f $RPM_BUILD_ROOT/%{_mandir}/man5/cgred.conf.5*
-rm -f $RPM_BUILD_ROOT/%{_mandir}/man5/cgrules.conf.5*
-rm -f $RPM_BUILD_ROOT/%{_mandir}/man8/cgrulesengd.8*
-
 # install unit and sysconfig files
 install -d ${RPM_BUILD_ROOT}%{_unitdir}
 install -m 644 %SOURCE1 ${RPM_BUILD_ROOT}%{_unitdir}/
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}/sysconfig
+
+pushd $RPM_BUILD_ROOT
+find -name "*.la" -delete
+find -name "*.a" -delete
+rm -f %{_libdir}/libcgroupfortesting.*
+rm -f %{_mandir}/man5/cgred.conf.5*
+rm -f %{_mandir}/man5/cgrules.conf.5*
+rm -f %{_mandir}/man8/cgrulesengd.8*
+popd
 
 %pre
 getent group cgred >/dev/null || groupadd -r cgred
@@ -129,6 +110,16 @@ getent group cgred >/dev/null || groupadd -r cgred
 
 %postun tools
 %systemd_postun_with_restart cgconfig.service
+
+%check
+make -C tests/gunit check
+TESTLOGS=$(find -name "test-suite.log")
+if [[ -n $TESTLOGS ]]; then
+  echo "================================="
+  echo "==== show detailed test logs ===="
+  echo "================================="
+  cat $TESTLOGS
+fi
 
 %files
 %license COPYING
@@ -170,6 +161,9 @@ getent group cgred >/dev/null || groupadd -r cgred
 %{_libdir}/pkgconfig/libcgroup.pc
 
 %changelog
+* Tue Mar 15 2022 Nicolas Guibourge <nicolasg@microsoft.com> 2.0.1-23
+- Ugrade to 2.0.1.
+
 * Thu May 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.41-23
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - License verified.

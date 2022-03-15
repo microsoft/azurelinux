@@ -1,7 +1,7 @@
 Summary:        Google's C++ gtest framework
 Name:           gtest
 Version:        1.11.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ Google's C++ test framework that combines the GoogleTest and GoogleMock projects
 %package devel
 Summary:        libgtest headers
 Group:          Development/Tools
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This contains libgtest header files.
@@ -35,6 +36,7 @@ Google's C++ test framework that combines the GoogleTest and GoogleMock projects
 %package -n gmock-devel
 Summary:        libgmock headers
 Group:          Development/Tools
+Requires:       gmock%{?_isa} = %{version}-%{release}
 
 %description -n gmock-devel
 This contains libgmock header files.
@@ -82,6 +84,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_prefix}/src/gmock/
 
 %changelog
+* Tue Mar 15 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.0-2
+- Add missing Requires in devel packages.
+
 * Tue Nov 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.0-1
 - Update to version 1.11.0.
 - Removing "*-static" subpackages.

@@ -9021,8 +9021,8 @@
         "type": "other",
         "other": {
           "name": "libcgroup",
-          "version": "0.41",
-          "downloadUrl": "https://downloads.sourceforge.net/libcg/libcgroup-0.41.tar.bz2"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/libcgroup/libcgroup/archive/v2.0.1.tar.gz"
         }
       }
     },
