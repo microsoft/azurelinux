@@ -72,12 +72,12 @@ The Ruby package contains the Ruby development environment.
 This is useful for object-oriented scripting.
 
 %package -n rubygem-bigdecimal
-Summary:    BigDecimal provides arbitrary-precision floating point decimal arithmetic
-Version:    %{bigdecimal_version}
-License:    Ruby or BSD
-Requires:   ruby(release)
-Requires:   ruby(rubygems) >= %{rubygems_version}
-Provides:   rubygem(bigdecimal) = %{version}-%{release}
+Summary:        BigDecimal provides arbitrary-precision floating point decimal arithmetic
+Version:        %{bigdecimal_version}
+License:        Ruby OR BSD
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Provides:       rubygem(bigdecimal) = %{version}-%{release}
 
 %description -n rubygem-bigdecimal
 Ruby provides built-in support for arbitrary precision integer arithmetic.
@@ -92,13 +92,13 @@ floating point arithmetic often introduces subtle errors because of the
 conversion between base 10 and base 2.
 
 %package -n rubygem-minitest
-Summary:    Minitest provides a complete suite of testing facilities
-Version:    %{minitest_version}
-License:    MIT
-Requires:   ruby(release)
-Requires:   ruby(rubygems) >= %{rubygems_version}
-Provides:   rubygem(minitest) = %{version}-%{release}
-BuildArch:  noarch
+Summary:        Minitest provides a complete suite of testing facilities
+Version:        %{minitest_version}
+License:        MIT
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Provides:       rubygem(minitest) = %{version}-%{release}
+BuildArch:      noarch
 
 %description -n rubygem-minitest
 minitest/unit is a small and incredibly fast unit testing framework.
@@ -111,13 +111,13 @@ minitest/pride shows pride in testing and adds coloring to your test
 output.
 
 %package -n rubygem-power_assert
-Summary:    Power Assert for Ruby
-Version:    %{power_assert_version}
-License:    Ruby or BSD
-Requires:   ruby(release)
-Requires:   ruby(rubygems) >= %{rubygems_version}
-Provides:   rubygem(power_assert) = %{version}-%{release}
-BuildArch:  noarch
+Summary:        Power Assert for Ruby
+Version:        %{power_assert_version}
+License:        Ruby OR BSD
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Provides:       rubygem(power_assert) = %{version}-%{release}
+BuildArch:      noarch
 
 %description -n rubygem-power_assert
 Power Assert shows each value of variables and method calls in the expression.
@@ -125,19 +125,19 @@ It is useful for testing, providing which value wasn't correct when the
 condition is not satisfied.
 
 %package -n rubygem-rdoc
-Summary:    A tool to generate HTML and command-line documentation for Ruby projects
-Version:    %{rdoc_version}
+Summary:        A tool to generate HTML and command-line documentation for Ruby projects
+Version:        %{rdoc_version}
 # SIL: lib/rdoc/generator/template/darkfish/css/fonts.css
-License:    GPLv2 and Ruby and MIT and OFL
-Requires:   ruby(release)
-Requires:   ruby(rubygems) >= %{rubygems_version}
-Requires:   rubygem(io-console) >= %{io_console_version}
-Requires:   rubygem(json) >= %{json_version}
-Requires:   rubygem(psych) >= %{psych_version}
-Provides:   rdoc = %{version}-%{release}
-Provides:   ri = %{version}-%{release}
-Provides:   rubygem(rdoc) = %{version}-%{release}
-BuildArch:  noarch
+License:        GPLv2 AND Ruby AND MIT AND OFL
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Requires:       rubygem(io-console) >= %{io_console_version}
+Requires:       rubygem(json) >= %{json_version}
+Requires:       rubygem(psych) >= %{psych_version}
+Provides:       rdoc = %{version}-%{release}
+Provides:       ri = %{version}-%{release}
+Provides:       rubygem(rdoc) = %{version}-%{release}
+BuildArch:      noarch
 
 %description -n rubygem-rdoc
 RDoc produces HTML and command-line documentation for Ruby projects.  RDoc
@@ -145,16 +145,16 @@ includes the 'rdoc' and 'ri' tools for generating and displaying online
 documentation.
 
 %package -n rubygem-test-unit
-Summary:    An xUnit family unit testing framework for Ruby
-Version:    %{test_unit_version}
+Summary:        An xUnit family unit testing framework for Ruby
+Version:        %{test_unit_version}
 # lib/test/unit/diff.rb is a double license of the Ruby license and PSF license.
 # lib/test-unit.rb is a dual license of the Ruby license and LGPLv2.1 or later.
-License:    (Ruby or BSD) and (Ruby or BSD or Python) and (Ruby or BSD or LGPLv2+)
-Requires:   ruby(release)
-Requires:   ruby(rubygems) >= %{rubygems_version}
-Requires:   rubygem(power_assert)
-Provides:   rubygem(test-unit) = %{version}-%{release}
-BuildArch:  noarch
+License:        (Ruby OR BSD) AND (Ruby OR BSD OR Python) AND (Ruby OR BSD OR LGPLv2+)
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Requires:       rubygem(power_assert)
+Provides:       rubygem(test-unit) = %{version}-%{release}
+BuildArch:      noarch
 
 %description -n rubygem-test-unit
 Test::Unit (test-unit) is unit testing framework for Ruby, based on xUnit
@@ -327,6 +327,7 @@ sudo -u test make test TESTS="-v"
 %license %{gem_dir}/gems/test-unit-%{test_unit_version}/PSFL
 %{gem_dir}/gems/test-unit-%{test_unit_version}/lib
 %{gem_dir}/gems/test-unit-%{test_unit_version}/sample
+%{gem_dir}/gems/test-unit-%{test_unit_version}/test
 %{gem_dir}/specifications/test-unit-%{test_unit_version}.gemspec
 %doc %{gem_dir}/gems/test-unit-%{test_unit_version}/README.md
 %{gem_dir}/gems/test-unit-%{test_unit_version}/Rakefile
@@ -334,7 +335,7 @@ sudo -u test make test TESTS="-v"
 
 %changelog
 * Tue Mar 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.7.4-2
-- Build bigdecimal, minitest, test-unit, rdoc rubygems
+- Build bigdecimal, minitest, test-unit, rdoc and power_assert rubygems
 
 * Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> - 2.7.4-1
 - Update to version 2.7.4 to build with new autoconf
@@ -348,7 +349,7 @@ sudo -u test make test TESTS="-v"
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 2.6.6-3: Adding 'BuildRequires' on 'shadow-utils' and 'sudo' to run the package tests.
 - anphel@microsoft.com, 2.6.6-4: Run "make test" instead of "make check" to avoid unstable tests.
- 
+
 * Fri Mar 19 2021 Henry Li <lihl@microsoft.com> - 2.7.2-2
 - Add bindir path to gem installation to install executable at
   system bin directory instead of bin directory under gem home directory

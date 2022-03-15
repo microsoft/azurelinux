@@ -69,6 +69,7 @@ popd
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
+- License verified.
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

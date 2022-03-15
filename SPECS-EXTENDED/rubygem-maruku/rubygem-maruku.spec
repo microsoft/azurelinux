@@ -10,8 +10,7 @@ Summary: Maruku is a Markdown-superset interpreter written in Ruby
 # lib/maruku/ext/fenced_code.rb - BSD
 License: MIT and BSD
 URL: https://github.com/bhollis/maruku
-#Source0: https://github.com/bhollis/%{gem_name}/archive/refs/tags/v%{version}.tar.gz
-Source0: %{gem_name}-%{version}.tar.gz
+Source0: https://github.com/bhollis/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#%{gem_name}-%{version}.tar.gz
 Patch0: remove-pem.patch
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel

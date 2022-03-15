@@ -3,14 +3,14 @@
 
 Summary:	Rake is a Make-like program implemented in Ruby
 Name:		rubygem-%{gem_name}
-Version:        13.0.6
-Release:        1%{?dist}
+Version:    13.0.6
+Release:    1%{?dist}
 License:	MIT
 URL:		https://ruby.github.io/rake/
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Vendor:     Microsoft Corporation
+Distribution: Mariner
 #Source0:	https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:    %{gem_name}-%{version}.tar.gz
 
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
@@ -87,6 +87,7 @@ popd
 %changelog
 * Fri Mar 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-1
 - Update to v13.0.6.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 13.0.1-202
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
