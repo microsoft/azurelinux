@@ -11032,7 +11032,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.18",
-          "downloadUrl": "http://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
+          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
         }
       }
     },
