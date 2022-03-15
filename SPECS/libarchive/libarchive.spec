@@ -6,7 +6,7 @@ Release:        1%{?dist}
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/libarchive/libarchive
+URL:            https://www.libarchive.org/
 Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Provides:       bsdtar = %{version}-%{release}
 
