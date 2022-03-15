@@ -251,6 +251,7 @@ generate_pkggen_core () {
         grep "^gdbm-" $TmpPkgGen
         grep "^perl-" $TmpPkgGen
         grep "^texinfo-" $TmpPkgGen
+        grep "^gtk-doc-" $TmpPkgGen
         grep "^autoconf-" $TmpPkgGen
         grep "^automake-" $TmpPkgGen
         grep "^openssl-" $TmpPkgGen
