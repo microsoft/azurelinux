@@ -67,14 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.18.1 API Headers
-tar xf kernel-5.15.18.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
+echo Linux-5.15.26.1 API Headers
+tar xf kernel-5.15.26.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -619,15 +619,14 @@ popd
 rm -rf perl-5.32.0
 touch /logs/status_perl_complete
 
-echo Autoconf-2.69
-tar xf autoconf-2.69.tar.xz
-pushd autoconf-2.69
-sed '361 s/{/\\{/' -i bin/autoscan.in
+echo Autoconf-2.71
+tar xf autoconf-2.71.tar.xz
+pushd autoconf-2.71
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf autoconf-2.69
+rm -rf autoconf-2.71
 touch /logs/status_autoconf_complete
 
 echo Automake-1.16.5
