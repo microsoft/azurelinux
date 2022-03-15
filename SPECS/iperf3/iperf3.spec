@@ -3,10 +3,10 @@ Name:           iperf3
 Version:        3.11
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain
-URL:            https://github.com/esnet/iperf
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          Applications/System
+URL:            https://github.com/esnet/iperf
 Source0:        https://github.com/esnet/iperf/archive/%{version}.tar.gz#/iperf-%{version}.tar.gz
 Patch1:         disablepg.patch
 BuildRequires:  autoconf >= 2.71
@@ -20,6 +20,7 @@ reports the bandwidth, loss, and other parameters.
 
 %package        doc
 Summary:        Documentation for iperf
+
 %description    doc
 It contains the documentation and manpages for iperf package.
 Requires:       %{name} = %{version}-%{release}
@@ -42,7 +43,7 @@ echo "VDBG optflags: " %{optflags}
         --mandir=%{_mandir} \
         --infodir=%{_infodir} \
         --datadir=%{_datarootdir} \
-        --sysconfdir=/etc
+        --sysconfdir=%{_sysconfdir}
 make %{?_smp_mflags}
 
 %install
