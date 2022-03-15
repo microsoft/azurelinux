@@ -39,8 +39,8 @@ ncurses-libs-6.2-5.cm2.x86_64.rpm
 ncurses-term-6.2-5.cm2.x86_64.rpm
 readline-8.1-1.cm2.x86_64.rpm
 readline-devel-8.1-1.cm2.x86_64.rpm
-coreutils-8.32-1.cm2.x86_64.rpm
-coreutils-lang-8.32-1.cm2.x86_64.rpm
+coreutils-8.32-2.cm2.x86_64.rpm
+coreutils-lang-8.32-2.cm2.x86_64.rpm
 bash-5.1.8-1.cm2.x86_64.rpm
 bash-devel-5.1.8-1.cm2.x86_64.rpm
 bash-lang-5.1.8-1.cm2.x86_64.rpm
