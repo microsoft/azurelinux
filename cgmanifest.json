@@ -1847,8 +1847,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "21.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v21.0.tar.gz"
+          "version": "22.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v22.0.tar.gz"
         }
       }
     },
@@ -26725,8 +26725,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.56.1",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.56.1-src.tar.gz"
+          "version": "1.59.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.59.0-src.tar.xz"
         }
       }
     },
