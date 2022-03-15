@@ -146,7 +146,6 @@
       "specs": [
         "auoms",
         "azure-iot-sdk-c",
-        "azure-iotedge",
         "azure-storage-cpp",
         "bazel",
         "blobfuse",
@@ -189,7 +188,6 @@
         "libconfini",
         "libconfuse",
         "libdivsufsort",
-        "libiothsm-std",
         "libmaxminddb",
         "libuv",
         "libxml++",
