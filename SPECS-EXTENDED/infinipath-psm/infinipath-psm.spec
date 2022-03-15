@@ -6,15 +6,11 @@ Distribution:   Mariner
 Name:           infinipath-psm
 Summary:        Intel Performance Scaled Messaging (PSM) Libraries
 Version:        3.3
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        GPLv2 or BSD
 ExclusiveArch:  x86_64
 URL:            https://github.com/01org/psm
-# Source0 tar ball had been created by run:
-# 1) git clone https://github.com/01org/psm.git
-# 2) cd psm
-# 3) make dist
-Source0:        %{name}-%{version}-%{git_version}.tar.gz
+Source0:        https://github.com/intel/psm/archive/refs/tags/v%{version}.tar.gz#/psm-%{version}.tar.gz
 Source1:        ipath.rules
 Patch1:         0001-fix-a-compilation-issue.patch
 Patch2:         adjust-base-cflags.patch
@@ -23,10 +19,16 @@ Patch4:         0001-Include-sysmacros.h.patch
 Patch5:         0001-Extend-buffer-for-uvalue-and-pvalue.patch
 Patch6:         extend-fdesc-array.patch
 Patch7:         psm-multiple-definition.patch
+Patch8:         infinipath-psm-gcc11.patch
+# Upstream commits past the 3.3 version required for GCC 6+:
+# - https://github.com/intel/psm/commit/28489fd4ca1672fe84fa4c471bf6fb9d2a30a853
+# - https://github.com/intel/psm/commit/3b6306adaa9acf9ce7297129eb2215823de5b70a
+Patch9:         3.3_upstream_fixes_for_gcc6.patch
 
 Requires:       udev
 BuildRequires:  gcc
 BuildRequires:  libuuid-devel
+BuildRequires:  make
 BuildRequires:  systemd-rpm-macros
 Obsoletes:      infinipath-libs <= %{version}-%{release}
 
@@ -46,7 +48,7 @@ Obsoletes:      infinipath-devel <= %{version}-%{release}
 Development files for the %{name} library.
 
 %prep
-%setup -q -n %{name}-%{version}-%{git_version}
+%setup -q -n psm-%{version}
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -54,9 +56,16 @@ Development files for the %{name} library.
 %patch5 -p1
 %patch6 -p0
 %patch7 -p1
+%patch8 -p1
+%patch9 -p1
 find libuuid -type f -not -name 'psm_uuid.[c|h]' -not -name Makefile -delete
 
 %build
+# LTO seems to trigger a post-build failure as some symbols with external scope
+# are "leaking".  SuSE has already disabled LTO for this package, but no real
+# details about why those symbols are "leaking".
+%define _lto_cflags %{nil}
+
 %{set_build_flags}
 %make_build PSM_USE_SYS_UUID=1 %{MAKEARG} CC=gcc
 
@@ -81,6 +90,10 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_udevrulesdir}/60-ipath.rules
 %{_includedir}/psm_mq.h
 
 %changelog
+* Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3-28
+- Adding GCC 11 patch from Fedora 36 (license: MIT).
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3-27
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

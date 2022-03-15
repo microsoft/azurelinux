@@ -3,7 +3,7 @@
 Summary:        Parse and convert to JSON (JavaScript Object Notation)
 Name:           perl-JSON
 Version:        4.02
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,9 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  perl(base)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(lib)
+%if %{with_check}
+BuildRequires:  perl(Tie::Array)
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(JSON)
 BuildArch:      noarch
@@ -95,6 +98,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Mar 02 2022 Muhammad Falak <mwani@microsoft.com> - 4.02-8
+- Add an explicit BR on `perl(Tie::Array)` to enable ptest
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.02-7
 - Adding 'BuildRequires: perl-generators'.
 

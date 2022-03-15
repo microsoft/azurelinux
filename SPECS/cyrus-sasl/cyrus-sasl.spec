@@ -3,18 +3,14 @@
 
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
-Version:        2.1.27
-Release:        10%{?dist}
+Version:        2.1.28
+Release:        1%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.cyrusimap.org/sasl/
 Source0:        https://github.com/cyrusimap/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2019-19906.patch
-# CVE-2020-8032 only applies to the packaging of openSUSE's version of cyrus-sasl
-# https://bugzilla.suse.com/show_bug.cgi?id=1180669
-Patch1:         CVE-2020-8032.nopatch
 
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
@@ -310,6 +306,9 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Wed Mar 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.28-1
+- Updating to version 2.1.28 to address CVE-2022-24407.
+
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.1.27-10
 - Add libdb as an explicit dependency.
 

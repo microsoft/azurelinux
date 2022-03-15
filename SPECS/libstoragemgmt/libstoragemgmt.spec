@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,31 +9,30 @@ URL:            https://github.com/libstorage/libstoragemgmt
 Source0:        https://github.com/libstorage/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch1:         0001-change-run-dir.patch
 
-BuildRequires:  gcc
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  bash-completion
+BuildRequires:  check
+BuildRequires:  chrpath
+BuildRequires:  gcc
+BuildRequires:  glib-devel
+BuildRequires:  libconfig-devel
 BuildRequires:  libtool
 BuildRequires:  libxml2-devel
-#Provided by check
-#BuildRequires: check-devel 
-BuildRequires:  check
-BuildRequires:  perl
 BuildRequires:  openssl-devel
-BuildRequires:  glib-devel
-BuildRequires:  systemd
-BuildRequires:  bash-completion
-BuildRequires:  libconfig-devel
-BuildRequires:  systemd-devel
+BuildRequires:  perl
 BuildRequires:  procps-ng
-BuildRequires:  sqlite-devel
-BuildRequires:  python3-six
 BuildRequires:  python3-devel
 BuildRequires:  python3-pywbem
+BuildRequires:  python3-six
+BuildRequires:  sqlite-devel
 %{?systemd_requires}
-BuildRequires:  systemd 
+BuildRequires:  systemd
 BuildRequires:  systemd-devel
-BuildRequires:  chrpath
 BuildRequires:  valgrind
+%if %{with_check}
+BuildRequires:  git
+%endif
 Requires:       python3-%{name}
 
 %description
@@ -456,6 +455,10 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.9.3-4
+- Cleanup duplicate BRs
+- Add an explicit BR on `git` to enable ptest
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.3-3
 - Removing epoch.
 

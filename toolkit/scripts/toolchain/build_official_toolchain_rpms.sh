@@ -468,6 +468,13 @@ build_rpm_in_chroot_no_install createrepo_c
 
 build_rpm_in_chroot_no_install libsepol
 
+audit needs: systemd-bootstrap?, python3, krb5, swig, e2fsprogs
+build_rpm_in_chroot_no_install audit
+
+# rebuild pam with selinux and audit support
+chroot_and_install_rpms audit
+build_rpm_in_chroot_no_install pam
+
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol
 build_rpm_in_chroot_no_install libselinux
@@ -478,9 +485,6 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
-
-# rebuild pam with selinux support
-build_rpm_in_chroot_no_install pam
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-xml are also needed but already installed

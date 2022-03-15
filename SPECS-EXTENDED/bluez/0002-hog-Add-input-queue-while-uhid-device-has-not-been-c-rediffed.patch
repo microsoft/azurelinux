@@ -1,0 +1,90 @@
+From 33d13bbc5703185ab3f15e4429df324987f3f225 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 12 Jan 2022 14:07:36 -0800
+Subject: [PATCH 2/2] hog: Add input queue while uhid device has not been
+ created
+
+Since report map is only read after all reports it is possible to start
+receiving notifications before uhid has been created, so this adds a
+queue to store the events while the report map is pending and once uhid
+has been created dequeue the events.
+---
+ profiles/input/hog-lib.c | 32 +++++++++++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 3 deletions(-)
+
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index beb19af70..0b375feb8 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -98,6 +98,7 @@ struct bt_hog {
+ 	struct queue		*gatt_op;
+ 	struct gatt_db		*gatt_db;
+ 	struct gatt_db_attribute	*report_map_attr;
++	struct queue		*input;
+ };
+ 
+ struct report_map {
+@@ -355,11 +356,18 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ 		ev.u.input.size = len;
+ 	}
+ 
+-	err = bt_uhid_send(hog->uhid, &ev);
+-	if (err < 0) {
+-		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
++	/* If uhid had not been created yet queue up the input */
++	if (!hog->uhid_created) {
++		if (!hog->input)
++			hog->input = queue_new();
++
++		queue_push_tail(hog->input, g_memdup(&ev, sizeof(ev)));
+ 		return;
+ 	}
++
++	err = bt_uhid_send(hog->uhid, &ev);
++	if (err < 0)
++		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
+ }
+ 
+ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+@@ -993,6 +1001,21 @@ static char *item2string(char *str, uint8_t *buf, uint8_t len)
+ 	return str;
+ }
+ 
++static bool input_dequeue(const void *data, const void *match_data)
++{
++	const struct uhid_event *ev = data;
++	const struct bt_hog *hog = match_data;
++	int err;
++
++	err = bt_uhid_send(hog->uhid, ev);
++	if (err < 0) {
++		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
++		return false;
++	}
++
++	return true;
++}
++
+ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+ 							ssize_t report_map_len)
+ {
+@@ -1072,6 +1095,8 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+ 	hog->uhid_created = true;
+ 
+ 	DBG("HoG created uHID device");
++
++	queue_remove_all(hog->input, input_dequeue, hog, free);
+ }
+ 
+ static void db_report_map_write_value_cb(struct gatt_db_attribute *attr,
+@@ -1284,6 +1309,7 @@ static void hog_free(void *data)
+ 
+ 	bt_hog_detach(hog);
+ 
++	queue_destroy(hog->input, free);
+ 	queue_destroy(hog->bas, (void *) bt_bas_unref);
+ 	g_slist_free_full(hog->instances, hog_free);
+ 
+-- 
+2.34.1
+

@@ -1,16 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 Summary:	Library for easy parsing of XMP metadata
 Name:		exempi
-Version:	2.5.1
-Release:	3%{?dist}
+Version:	2.6.1
+Release:	1%{?dist}
 License:	BSD
 URL:		http://libopenraw.freedesktop.org/wiki/Exempi
-Source0:	http://libopenraw.freedesktop.org/download/%{name}-%{version}.tar.bz2
+Source0:	https://gitlab.freedesktop.org/libopenraw/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
+Patch0:		exempi-e23c213-typeinfos.patch
 BuildRequires:	gcc-c++
 BuildRequires:	boost-devel expat-devel zlib-devel pkgconfig
 # Work around for aarch64 support (https://bugzilla.redhat.com/show_bug.cgi?id=925327)
 BuildRequires:	autoconf automake libtool
+BuildRequires: make
 Provides:	bundled(md5-polstra)
 
 %description
@@ -28,7 +28,7 @@ This package contains the libraries and header files needed for
 developing with exempi.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 libtoolize -vi
@@ -40,19 +40,20 @@ NOCONFIGURE=1 ./autogen.sh
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
-make %{?_smp_mflags} V=1
+%make_build
 
 %check
 make check
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 rm -rf %{buildroot}%{_libdir}/*.la
 rm -rf %{buildroot}%{_libdir}/*.a
 
 %files
-%doc AUTHORS ChangeLog COPYING README
+%license COPYING LICENSE
+%doc AUTHORS ChangeLog README.md
 %{_bindir}/exempi
 %{_libdir}/libexempi.so.8*
 %{_mandir}/man1/exempi.1*
@@ -63,6 +64,10 @@ rm -rf %{buildroot}%{_libdir}/*.a
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.1-1
+- Updating to version 2.6.1.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -7,7 +7,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Patch306: pam_ssh_agent_auth-0.10.2-compat.patch
 # https://sourceforge.net/p/pamsshagentauth/bugs/22/
 Patch307: pam_ssh_agent_auth-0.10.2-dereference.patch
 
+BuildRequires:  audit-devel
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -51,6 +52,7 @@ BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
 BuildRequires:  libselinux-devel
+Requires:       audit-libs
 Requires:       openssh-clients = %{openssh_ver}-%{release}
 Requires:       openssh-server = %{openssh_ver}-%{release}
 
@@ -124,6 +126,7 @@ export LDFLAGS="$LDFLAGS -pie -z relro -z now"
     --with-pam \
     --with-pie=no \
     --with-selinux \
+    --with-audit=linux \
     --with-maintype=man \
     --without-hardening `# The hardening flags are configured by system` \
     --enable-strip=no \
@@ -256,6 +259,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 8.8p1-4
+- Build with audit support
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.8p1-3
 - Removing the explicit %%clean stage.
 

@@ -4,14 +4,12 @@
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
 Version: 20.10.12
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
 Vendor: Microsoft Corporation
 Distribution: Mariner
-
-# Note that docker-init is provided by Tini
 
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # docker-proxy binary comes from libnetwork
@@ -44,12 +42,12 @@ BuildRequires: git
 Requires: audit
 Requires: /bin/sh
 Requires: device-mapper-libs >= 1.02.90-1
+Requires: docker-init
 Requires: iptables
 Requires: libcgroup
 Requires: libseccomp >= 2.3
 Requires: moby-containerd >= 1.2
 Requires: tar
-Requires: tini
 Requires: xz
 
 Conflicts: docker
@@ -127,7 +125,10 @@ fi
 %{_unitdir}/*
 
 %changelog
-* Fri Feb 4 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.12-1
+* Wed Mar 02 2022 Andy Caldwell <andycaldwell@microsoft.com> - 20.10.12-2
+- Relax dependency from `tini` to `docker-init`
+
+* Fri Feb 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.12-1
 - Update to version 20.10.12
 - Use code from upstream instead of Azure fork.
 
