@@ -12,14 +12,14 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.16.14
+Version:        1.16.15
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
-URL:            https://golang.org
-Source0:        https://golang.org/dl/go%{version}.src.tar.gz
+URL:            https://github.com/microsoft/go
+Source0:        https://github.com/microsoft/go/releases/download/v%{version}-1-fips/go.20220307.4.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 # Patch for CVE-2021-29923 is available upstream in v1.17
@@ -57,6 +57,7 @@ export GOROOT="`pwd`"
 export GOPATH=%{gopath}
 export GOROOT_FINAL=%{_bindir}/go
 rm -f  %{gopath}/src/runtime/*.c
+echo 'go%{version}' > VERSION
 pushd src
 ./make.bash --no-clean
 popd
@@ -119,6 +120,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.16.15-1
+- Switch to `microsoft/go` instead of `golang/go`
+- Bump version to 1.16.15 to address CVE-2022-24921
+
 * Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.16.14-1
 - Upgrade to version 1.16.14 to resolve CVE-2022-23806, CVE-2022-23772, CVE-2022-23773
 

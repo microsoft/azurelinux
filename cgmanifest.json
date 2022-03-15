@@ -1875,8 +1875,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.16.14",
-          "downloadUrl": "https://golang.org/dl/go1.16.14.src.tar.gz"
+          "version": "1.16.15",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.16.15-1-fips/go.20220307.4.src.tar.gz"
         }
       }
     },
