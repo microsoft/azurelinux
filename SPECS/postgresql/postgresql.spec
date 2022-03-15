@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
-Patch0: CVE-2021-23222.patch
+Patch0:         CVE-2021-23222.patch
 
 # Common libraries needed
 BuildRequires:  krb5-devel
@@ -170,8 +170,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libpgtypes.a
 
 %changelog
-*   Fri Mar 11 2022 Mariner Autopatcher <cblmargh@microsoft.com> 12.7-2
--   Added patch file(s) CVE-2021-23222.patch
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 12.7-2
+- Patch CVE-2021-23222
+
 * Fri Jun 11 2021 Henry Beberman <henry.beberman@microsoft.com> - 12.7-1
 - Update to version 12.7 to resolve CVE-2021-32027.
 
