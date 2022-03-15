@@ -65,7 +65,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
-* Tue March 15 2022 Rachel Menge <rachelmenge@microsoft.com> - 3.11-1
+* Tue Mar 15 2022 Rachel Menge <rachelmenge@microsoft.com> - 3.11-1
 - Update to 3.11
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.6-5
