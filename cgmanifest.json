@@ -23304,8 +23304,8 @@
         "type": "other",
         "other": {
           "name": "python-nocasedict",
-          "version": "0.5.0",
-          "downloadUrl": "https://github.com/pywbem/nocasedict/archive/0.5.0.tar.gz"
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/pywbem/nocasedict/archive/refs/tags/1.0.2.tar.gz"
         }
       }
     },
