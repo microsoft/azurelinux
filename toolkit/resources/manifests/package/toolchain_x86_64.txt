@@ -75,10 +75,10 @@ expat-2.4.3-1.cm2.x86_64.rpm
 expat-debuginfo-2.4.3-1.cm2.x86_64.rpm
 expat-devel-2.4.3-1.cm2.x86_64.rpm
 expat-libs-2.4.3-1.cm2.x86_64.rpm
-file-5.40-1.cm2.x86_64.rpm
-file-debuginfo-5.40-1.cm2.x86_64.rpm
-file-devel-5.40-1.cm2.x86_64.rpm
-file-libs-5.40-1.cm2.x86_64.rpm
+file-5.40-2.cm2.x86_64.rpm
+file-debuginfo-5.40-2.cm2.x86_64.rpm
+file-devel-5.40-2.cm2.x86_64.rpm
+file-libs-5.40-2.cm2.x86_64.rpm
 filesystem-1.1-8.cm2.x86_64.rpm
 findutils-4.8.0-2.cm2.x86_64.rpm
 findutils-debuginfo-4.8.0-2.cm2.x86_64.rpm
