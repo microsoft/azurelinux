@@ -18,6 +18,10 @@
 ### Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ################################################################################
 
+%global _hardened_build 1
+%global toolsbuild      18090558
+%global toolsdaemon     vmtoolsd
+%global vgauthdaemon    vgauthd
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
 Version:        11.3.0
@@ -32,10 +36,6 @@ Source2:        %{vgauthdaemon}.service
 Source3:        vmblock.mount
 Source4:        open-vm-tools.conf
 Source5:        vmtoolsd.pam
-%global _hardened_build 1
-%global toolsbuild      18090558
-%global toolsdaemon     vmtoolsd
-%global vgauthdaemon    vgauthd
 BuildRequires:  autoconf
 BuildRequires:  automake
 #BuildRequires:    doxygen
@@ -205,11 +205,11 @@ if [ "$1" = "2" ]; then
    # Cleanup vmtoolsd-init.service in case of upgrades
    %{_bindir}/systemctl disable %{toolsdaemon}-init.service &> /dev/null || /bin/true
 fi
-%{systemd_post} %{vgauthdaemon}.service
-%{systemd_post} %{toolsdaemon}.service
+%{systemd_post %{vgauthdaemon}.service}
+%{systemd_post %{toolsdaemon}.service}
 
 
-%{systemd_post} run-vmblock\x2dfuse.mount
+%{systemd_post run-vmblock\x2dfuse.mount}
 
 %post sdmp
 # Load the newly installed or upgraded SDMP plugin
@@ -244,10 +244,10 @@ fi
 %postun
 %{?ldconfig}
 
-%{systemd_postun_with_restart} %{toolsdaemon}.service
-%{systemd_postun_with_restart} %{vgauthdaemon}.service
+%{systemd_postun_with_restart %{toolsdaemon}.service}
+%{systemd_postun_with_restart %{vgauthdaemon}.service}
 
-%{systemd_postun} run-vmblock\x2dfuse.mount
+%{systemd_postun run-vmblock\x2dfuse.mount}
 
 %postun sdmp
 # In case of uninstall, unload the uninstalled SDMP plugin
