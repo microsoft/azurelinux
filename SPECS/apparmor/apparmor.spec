@@ -1,18 +1,14 @@
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 Name:           apparmor
-Version:        2.13
-Release:        17%{?dist}
+Version:        3.0.4
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Security
 URL:            https://launchpad.net/apparmor
-Source0:        https://launchpad.net/apparmor/2.13/2.13.0/+download/%{name}-%{version}.tar.gz
-Patch0:         apparmor-set-profiles-complain-mode.patch
+Source0:        https://launchpad.net/apparmor/3.0/3.0.4/+download/%{name}-%{version}.tar.gz
 Patch1:         apparmor-service-start-fix.patch
-Patch2:         apparmor-fix-make-check.patch
-Patch3:         apparmor-update-severity-db.patch
-Patch4:         apparmor-fix-python-autoconf-check.patch
 # CVE-2016-1585 has no upstream fix as of 2020/09/28
 Patch100:       CVE-2016-1585.nopatch
 BuildRequires:  apr
@@ -53,6 +49,8 @@ BuildRequires:  systemd-rpm-macros
 BuildRequires:  which
 %if %{with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-psutil
+BuildRequires:  python3-dbus
 %endif
 
 %description
@@ -200,6 +198,7 @@ make %{?_smp_mflags}
 
 %check
 pip3 install pyflakes
+pip3 install notify2
 export PYTHONPATH=%{python3_sitelib}
 export PYTHON=%{python3}
 export PYTHON_VERSION=%{python3_version}
@@ -210,7 +209,7 @@ make check
 cd ../../binutils/
 make check
 cd ../utils
-make check
+make check PYFLAKES=/usr/bin/pyflakes
 
 %install
 export PYTHONPATH=%{python3_sitelib}
@@ -288,11 +287,9 @@ make DESTDIR=%{buildroot} install
 %dir %{_sysconfdir}/apparmor
 %dir %{_sysconfdir}/apparmor.d
 %config(noreplace) %{_sysconfdir}/apparmor/parser.conf
-%config(noreplace) %{_sysconfdir}/apparmor/subdomain.conf
 %{_localstatedir}/lib/apparmor
 %{_mandir}/man5/apparmor.d.5.gz
 %{_mandir}/man5/apparmor.vim.5.gz
-%{_mandir}/man5/subdomain.conf.5.gz
 %{_mandir}/man7/apparmor.7.gz
 %{_mandir}/man8/apparmor_parser.8.gz
 %{_mandir}/man1/aa-enabled.1.gz
@@ -312,6 +309,9 @@ make DESTDIR=%{buildroot} install
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/apparmor.d/abstractions
 %config(noreplace) %{_sysconfdir}/apparmor.d/abstractions/*
+%dir %{_sysconfdir}/apparmor.d/abi
+%config(noreplace) %{_sysconfdir}/apparmor.d/abi/*
+%config(noreplace) %{_sysconfdir}/apparmor.d/*
 %dir %{_sysconfdir}/apparmor.d/disable
 %dir %{_sysconfdir}/apparmor.d/local
 %dir %{_sysconfdir}/apparmor.d/tunables
@@ -324,15 +324,17 @@ make DESTDIR=%{buildroot} install
 %config(noreplace) %{_sysconfdir}/apparmor/logprof.conf
 %config(noreplace) %{_sysconfdir}/apparmor/notify.conf
 %config(noreplace) %{_sysconfdir}/apparmor/severity.db
-/sbin/aa-teardown
 %{_sbindir}/aa-*
 %{_sbindir}/apparmor_status
 %{_bindir}/aa-easyprof
+%{_bindir}/aa-features-abi
 %{_datadir}/apparmor/easyprof/
 %dir %{_datadir}/apparmor
 %{_datadir}/apparmor/apparmor.vim
+%{_mandir}/man1/aa-features-abi.1.gz
 %{_mandir}/man2/aa_change_profile.2.gz
 %{_mandir}/man5/logprof.conf.5.gz
+%{_mandir}/man7/apparmor_xattrs.7.gz
 %{_mandir}/man8/aa-*.gz
 %{_mandir}/man8/apparmor_status.8.gz
 
@@ -351,6 +353,9 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+* Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> - 3.04-1
+- Upgrade to version 3.04
+
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.13-17
 - Add perl Pod-Checker Pod-Html and ExtUtils-MakeMaker to build requires.
 

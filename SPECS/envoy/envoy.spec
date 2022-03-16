@@ -21,8 +21,8 @@
 %define src_install_dir %{_prefix}/src/%{name}
 Summary:        L7 proxy and communication bus
 Name:           envoy
-Version:        1.14.4
-Release:        4%{?dist}
+Version:        1.21.0
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,7 +103,6 @@ BuildRequires:  bazel-workspaces
 BuildRequires:  boringssl-source
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
-BuildRequires:  fdupes
 BuildRequires:  fmt-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcovr
@@ -185,15 +184,6 @@ ExclusiveArch:  mips
 Envoy is an L7 proxy and communication bus designed for large modern service
 oriented architectures.
 
-%package source
-Summary:        Source code of bazel-rules-cc
-
-%description source
-Envoy is an L7 proxy and communication bus designed for large modern service
-oriented architectures.
-
-This package contains source code of Envoy.
-
 %prep
 %autosetup -p1
 
@@ -253,21 +243,33 @@ bazel shutdown
 %install
 install -D -m0755 bazel-bin/source/exe/envoy-static %{buildroot}%{_bindir}/envoy-proxy
 
-# Install sources
-rm -rf .git bazel-*
-mkdir -p %{buildroot}%{src_install_dir}
-cp -r * %{buildroot}%{src_install_dir}
-fdupes %{buildroot}%{src_install_dir}
-
 %files
 %license LICENSE
 %doc README.md
 %{_bindir}/envoy-proxy
 
-%files source
-%{src_install_dir}
-
 %changelog
+* Mon Mar 07 2022 Henry Li <lihl@microsoft.com> - 1.21.0-2
+- Remove envoy-soource subpackage
+
+* Thu Feb 24 2022 Henry Li <lihl@microsoft.com> - 1.21.0-1
+- Upgrade to version 1.21.0
+- Update envoy vendor source
+- Add additional pre-built vendor source that includes external go
+  dependencies
+- Remove unnecessary provides/comments that are imported from OpenSUSE
+- Remove boringssl-source as BR
+- Update 0001-build-Use-Go-from-host.patch
+- Add 0002-disable-wee8-mismatched-new-delete-warning.patch to stop treating
+  mismated new delete warning as error
+- Remove patches that are no longer needed
+- Remove -c dbg and --color=no from bazel build option which will deplete memory
+  space and cause gcc compiling error
+- Add bazel build option to stop treating vla-parameter warning as error
+- Add --override_repository option to let bazel fetch dependencies from prebuilt 
+  vendor source instead of downloading from the network 
+- Disable rpm stripping
+
 * Tue Sep 14 2021 Henry Li <lihl@microsoft.com> - 1.14.4-4
 - Add patch to use newer version of bazel
 - Update patch to use new version of external dependencies
