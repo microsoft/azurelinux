@@ -332,7 +332,7 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
-* Tue Mar 08 2022 Matthew Torr <matthewtorr@microsoft.com> - 11.3.0-2
+* Tue Mar 16 2022 Matthew Torr <matthewtorr@microsoft.com> - 11.3.0-2
 - Reinstate ConditionVirtualization service option so that the services only run on VMware.
 
 * Thu Jan 27 2022 Henry Li <lihl@microsoft.com> - 11.3.0-1
