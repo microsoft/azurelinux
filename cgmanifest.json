@@ -2247,8 +2247,8 @@
         "type": "other",
         "other": {
           "name": "cppunit",
-          "version": "1.12.1",
-          "downloadUrl": "https://sourceforge.net/projects/cppunit/files/cppunit/1.12.1/cppunit-1.12.1.tar.gz"
+          "version": "1.15.1",
+          "downloadUrl": "https://dev-www.libreoffice.org/src/cppunit-1.15.1.tar.gz"
         }
       }
     },

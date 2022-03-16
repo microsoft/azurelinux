@@ -1,14 +1,14 @@
 %define sha1 cppunit=f1ab8986af7a1ffa6760f4bacf5622924639bf4a
 Summary:        C++ port of Junit test framework
 Name:           cppunit
-Version:        1.12.1
-Release:        6%{?dist}
+Version:        1.15.1
+Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://sourceforge.net/projects/cppunit/
-Source0:        https://sourceforge.net/projects/cppunit/files/%{name}/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://dev-www.libreoffice.org/src/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -57,6 +57,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/*
 
 %changelog
+* Wed Mar 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.15.1-1
+- Update to v1.15.1.
+- License verified.
+
 * Mon Feb 08 2021 Henry Li <lihl@microsoft.com> - 1.12.1-6
 - Add cppunit as Requires for cppunit-devel
 
