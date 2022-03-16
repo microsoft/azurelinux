@@ -468,7 +468,7 @@ build_rpm_in_chroot_no_install createrepo_c
 
 build_rpm_in_chroot_no_install libsepol
 
-audit needs: systemd-bootstrap?, python3, krb5, swig, e2fsprogs
+audit needs: python3, krb5, swig, e2fsprogs
 build_rpm_in_chroot_no_install audit
 
 # rebuild pam with selinux and audit support

@@ -1,0 +1,82 @@
+From d6d7130f0a2e3b81880fca29966e42c1b2be40a7 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyfox@gentoo.org>
+Date: Fri, 8 Jan 2021 22:22:52 +0000
+Subject: [PATCH] m4/sctp.m4: make conpatible to autoconf-2.70
+
+On recently released `autoconf-2.70` generated `./configure`
+fails as:
+
+```
+$ ./configure
+...
+checking for struct sctp_event_subscribe.sctp_stream_reset_event... yes
+checking for gcc options needed to detect all undeclared functions... none needed
+./configure: line 16464: syntax error: unexpected end of file
+```
+
+This happens becuase new autoconf generates less whitespace:
+
+```
+{
+if ...
+...
+fi}
+```
+
+It requires at least whitespace between `fi` and `}`.
+
+As input already has newlines the change just drops extra `{}`.
+
+Tested on `autoconf-2.69` and `autoconf-2.70`.
+
+Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+Signed-off-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+---
+ m4/sctp.m4 | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/m4/sctp.m4 b/m4/sctp.m4
+index 6593517..94527a6 100644
+--- a/m4/sctp.m4
++++ b/m4/sctp.m4
+@@ -6,7 +6,7 @@
+ 
+ # Macros to assist on probing kernel features
+ #   Probes if a type is defined
+-AC_DEFUN([LKSCTP_CHECK_TYPE], [{
++AC_DEFUN([LKSCTP_CHECK_TYPE], [
+ AC_CHECK_TYPE([$1],
+ 	AC_DEFINE([$2], 1,
+ 		  [Define if $1 is present.])
+@@ -22,10 +22,10 @@ AC_CHECK_TYPE([$1],
+ #ifdef HAVE_LINUX_SCTP_H
+ # include <linux/sctp.h>
+ #endif
+-])}])
++])])
+ 
+ #   Probes if a struct has a given member
+-AC_DEFUN([LKSCTP_CHECK_MEMBER], [{
++AC_DEFUN([LKSCTP_CHECK_MEMBER], [
+ AC_CHECK_MEMBER([$1],
+ 	AC_DEFINE([$2], 1,
+ 		  [Define if $1 is present.])
+@@ -41,10 +41,10 @@ AC_CHECK_MEMBER([$1],
+ #ifdef HAVE_LINUX_SCTP_H
+ # include <linux/sctp.h>
+ #endif
+-])}])
++])])
+ 
+ #   Probes if a declaration is present
+-AC_DEFUN([LKSCTP_CHECK_DECL], [{
++AC_DEFUN([LKSCTP_CHECK_DECL], [
+ AC_CHECK_DECL([$1],
+ 	AC_DEFINE([$2], 1,
+ 		  [Define if $1 is present.])
+@@ -60,4 +60,4 @@ AC_CHECK_DECL([$1],
+ #ifdef HAVE_LINUX_SCTP_H
+ # include <linux/sctp.h>
+ #endif
+-])}])
++])])

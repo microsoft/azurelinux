@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary: A SAML 2.0 authentication module for the Apache Httpd Server
 Name: mod_auth_mellon
 Version: 0.16.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Source0: https://github.com/latchset/mod_auth_mellon/releases/download/v0_16_0/mod_auth_mellon-0.16.0.tar.gz
 Source1: auth_mellon.conf
 Source2: 10-auth_mellon.conf
@@ -20,6 +20,7 @@ BuildRequires: httpd-devel
 BuildRequires: lasso-devel >= 2.5.1-13
 BuildRequires: openssl-devel
 BuildRequires: xmlsec1-devel
+BuildRequires: systemd-rpm-macros
 
 %if %{with user_guide}
 BuildRequires: rubygem-asciidoctor
@@ -98,11 +99,7 @@ in the doc directory for instructions on using the diagnostics build.
 %{_httpd_moddir}/%{name}-diagnostics.so
 
 %files
-%if 0%{?rhel} && 0%{?rhel} < 7
-%doc COPYING
-%else
 %license COPYING
-%endif
 %doc README.md NEWS ECP.rst
 %doc %{_pkgdocdir}/README.redhat.rst
 %if %{with user_guide}
@@ -116,6 +113,10 @@ in the doc directory for instructions on using the diagnostics build.
 %dir /run/%{name}/
 
 %changelog
+* Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.0-3
+- Adding missing BR on 'systemd-rpm-macros'.
+- License verified.
+
 * Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making user guide build conditional.
