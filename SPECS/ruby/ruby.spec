@@ -1,14 +1,14 @@
 Summary:        Ruby
 Name:           ruby
-Version:        2.6.7
-Release:        3%{?dist}
+Version:        2.6.9
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
 Source0:        https://cache.ruby-lang.org/pub/ruby/2.6/%{name}-%{version}.tar.xz
-Patch0:         CVE-2021-32066.patch
+
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -62,6 +62,9 @@ sudo -u test make test TESTS="-v"
 %{_mandir}/man5/*
 
 %changelog
+* Tue Mar 01 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.6.9-1
+- Upgrade to 2.6.9 to fix CVE-2021-41817, CVE-2021-41819
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.6.7-3
 - Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 
