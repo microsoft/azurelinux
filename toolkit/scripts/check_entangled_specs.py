@@ -32,6 +32,10 @@ version_matching_groups = [
     frozenset([
         "SPECS/hyperv-daemons/hyperv-daemons.spec",
         "SPECS/kernel/kernel.spec"
+    ]),
+    frozenset([
+        "SPECS/dbus/dbus.spec",
+        "SPECS/dbus-x11/dbus-x11.spec"
     ])
 ]
 
