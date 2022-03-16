@@ -1,0 +1,44 @@
+From 6c3d1e987d26d747b34540cc61c504bae3a4736e Mon Sep 17 00:00:00 2001
+From: Lizan Zhou <lizan@tetrate.io>
+Date: Sat, 13 Jun 2020 19:02:14 -0700
+Subject: [PATCH 2/3] build: update several go dependencies (#11581)
+
+Signed-off-by: Lizan Zhou <lizan@tetrate.io>
+---
+ bazel/dependency_imports.bzl   | 4 ++--
+ bazel/repository_locations.bzl | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/bazel/dependency_imports.bzl b/bazel/dependency_imports.bzl
+index 2e4c187b6..7c74d2b34 100644
+--- a/bazel/dependency_imports.bzl
++++ b/bazel/dependency_imports.bzl
+@@ -21,8 +21,8 @@ def envoy_dependency_imports(go_version = GO_VERSION):
+         name = "org_golang_google_grpc",
+         build_file_proto_mode = "disable",
+         importpath = "google.golang.org/grpc",
+-        sum = "h1:AzbTB6ux+okLTzP8Ru1Xs41C303zdcfEht7MQnYJt5A=",
+-        version = "v1.23.0",
++        sum = "h1:EC2SB8S04d2r73uptxphDSUG+kTKVgjRPF+N3xpxRB4=",
++        version = "v1.29.1",
+     )
+ 
+     go_repository(
+diff --git a/bazel/repository_locations.bzl b/bazel/repository_locations.bzl
+index 3f24f410b..5591fbb78 100644
+--- a/bazel/repository_locations.bzl
++++ b/bazel/repository_locations.bzl
+@@ -241,8 +241,8 @@ REPOSITORY_LOCATIONS = dict(
+         urls = ["https://github.com/grpc-ecosystem/grpc-httpjson-transcoding/archive/faf8af1e9788cd4385b94c8f85edab5ea5d4b2d6.tar.gz"],
+     ),
+     io_bazel_rules_go = dict(
+-        sha256 = "e88471aea3a3a4f19ec1310a55ba94772d087e9ce46e41ae38ecebe17935de7b",
+-        urls = ["https://github.com/bazelbuild/rules_go/releases/download/v0.20.3/rules_go-v0.20.3.tar.gz"],
++        sha256 = "a8d6b1b354d371a646d2f7927319974e0f9e52f73a2452d2b3877118169eb6bb",
++        urls = ["https://github.com/bazelbuild/rules_go/releases/download/v0.23.3/rules_go-v0.23.3.tar.gz"],
+     ),
+     rules_foreign_cc = dict(
+         sha256 = "3184c244b32e65637a74213fc448964b687390eeeca42a36286f874c046bba15",
+-- 
+2.28.0
+

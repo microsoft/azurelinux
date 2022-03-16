@@ -1,8 +1,7 @@
 {
  "Signatures": {
-  "envoy-1.21.0-gocache.tar.gz": "46a2ff81e05ea58efdd4bf6de2712672eadeb1657e6114e549dda54d3c786538",
-  "envoy-1.21.0-vendor.tar.gz": "b678250424661445dc12e8d9599093284b3d77632d461057ec78abab7bcaa561",
-  "envoy-1.21.0.tar.gz": "5fc280c5dd60b817bbc801f0c29ed5efea9d74b3d7d381bc940c61171b40963b",
+  "envoy-1.14.4-vendor.tar.gz": "edfcb177e60978c840061094526c5346cb6abb078a57b1783a9ec740a0c768f4",
+  "envoy-1.14.4.tar.gz": "d7f9ed0dc3aac91f1050502bb0d7ea1e457e31afc609438f967d68172727e1a9",
   "envoy-rpmlintrc": "8b9331ceac885edc8b87416a9651496a88b03b6c6ff3bc836f8fcc3ad26eaa09"
  }
 }
