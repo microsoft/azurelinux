@@ -39,7 +39,7 @@ support multiple logins on one terminal.
 %autosetup -p1
 
 %build
-./autogen.sh
+autoreconf -i
 
 %configure \
 	--enable-pam \
