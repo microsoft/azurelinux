@@ -13,6 +13,7 @@
 
 # Ignore some specs, mostly those with Source0 files that are not from an external source, or have very odd URLs
 ignore_list=" \
+  antlr \
   appstream-data \
   byacc \
   ca-certificates \
@@ -25,6 +26,7 @@ ignore_list=" \
   grubby \
   initramfs \
   installkernel \
+  java-cup \ 
   javapackages-tools-meta \
   kde-filesystem \
   kernel-signed-aarch64 \
@@ -37,6 +39,7 @@ ignore_list=" \
   moby-buildx \
   moby-containerd \
   multilib-rpm-config \
+  objectweb-asm \ 
   opencl-filesystem \
   openjdk8 \
   patterns-ceph-containers \
