@@ -35,7 +35,7 @@ version_matching_groups = [
     ]),
     frozenset([
         "SPECS/dbus/dbus.spec",
-        "SPECS/dbus-x11/dbus-x11.spec"
+        "SPECS-EXTENDED/dbus-x11/dbus-x11.spec"
     ])
 ]
 
