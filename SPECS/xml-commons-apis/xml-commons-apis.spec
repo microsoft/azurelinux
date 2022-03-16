@@ -22,7 +22,7 @@ Distribution:   Mariner
 
 Name:           xml-commons-apis
 Version:        1.4.01
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        APIs for DOM, SAX, and JAXP
 License:        ASL 2.0 AND W3C AND SUSE-Public-Domain
 Group:          Development/Libraries/Java
@@ -118,6 +118,9 @@ rm -rf build/docs/javadoc
 %{_javadir}/*
 
 %changelog
+* Tue Mar 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.4.01-6
+- Add BR javapackages-filesystem
+
 * Thu Jan 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.01-5
 - Updated spec to enabled build with new tooling.
 - Removed 'javadoc' and 'manual' subpackages.
