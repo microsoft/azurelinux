@@ -2292,7 +2292,6 @@
             "specs": [
                 "application-gateway-kubernetes-ingress",
                 "azure-iot-sdk-c",
-                "azure-iotedge",
                 "azure-storage-cpp",
                 "bazel",
                 "blobfuse",
@@ -2339,7 +2338,6 @@
                 "libacvp",
                 "libconfini",
                 "libconfuse",
-                "libiothsm-std",
                 "libmaxminddb",
                 "libuv",
                 "libxml++",

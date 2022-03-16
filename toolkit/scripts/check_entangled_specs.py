@@ -32,10 +32,6 @@ version_matching_groups = [
     frozenset([
         "SPECS/hyperv-daemons/hyperv-daemons.spec",
         "SPECS/kernel/kernel.spec"
-    ]),
-    frozenset([
-        "SPECS/azure-iotedge/azure-iotedge.spec",
-        "SPECS/libiothsm-std/libiothsm-std.spec"
     ])
 ]
 
