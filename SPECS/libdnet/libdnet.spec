@@ -1,7 +1,7 @@
 Summary:        A simplified, portable interface to several low-level networking routines
 Name:           libdnet
-Version:        1.12
-Release:        2%{?dist}
+Version:        1.14
+Release:        1%{?dist}
 License:        BSD
 URL:            https://code.google.com/p/libdnet
 Source0:        https://github.com/dugsong/%{name}/archive/%{name}-%{version}.tar.gz
@@ -39,9 +39,7 @@ make  %{?_smp_mflags} check
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/*
-%{_libdir}/libdnet
-%{_libdir}/libdnet.1
-%{_libdir}/libdnet.1.0.1
+%{_libdir}/*.so*
 %{_sbindir}/*
 %{_mandir}/man8/*
 
@@ -51,6 +49,9 @@ make  %{?_smp_mflags} check
 %{_libdir}/libdnet.a
 
 %changelog
+* Wed Mar 16 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.14-1
+- Upgrading to v1.14
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.12-2
 - Added %%license line automatically
 
