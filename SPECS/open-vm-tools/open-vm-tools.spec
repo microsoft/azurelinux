@@ -205,11 +205,11 @@ if [ "$1" = "2" ]; then
    # Cleanup vmtoolsd-init.service in case of upgrades
    %{_bindir}/systemctl disable %{toolsdaemon}-init.service &> /dev/null || /bin/true
 fi
-%{systemd_post %{vgauthdaemon}.service}
-%{systemd_post %{toolsdaemon}.service}
+%systemd_post %{vgauthdaemon}.service
+%systemd_post %{toolsdaemon}.service
 
 
-%{systemd_post run-vmblock\x2dfuse.mount}
+%systemd_post run-vmblock\x2dfuse.mount
 
 %post sdmp
 # Load the newly installed or upgraded SDMP plugin
@@ -244,10 +244,10 @@ fi
 %postun
 %{?ldconfig}
 
-%{systemd_postun_with_restart %{toolsdaemon}.service}
-%{systemd_postun_with_restart %{vgauthdaemon}.service}
+%systemd_postun_with_restart %{toolsdaemon}.service
+%systemd_postun_with_restart %{vgauthdaemon}.service
 
-%{systemd_postun run-vmblock\x2dfuse.mount}
+%systemd_postun run-vmblock\x2dfuse.mount
 
 %postun sdmp
 # In case of uninstall, unload the uninstalled SDMP plugin
