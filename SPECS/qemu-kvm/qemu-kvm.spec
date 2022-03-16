@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        37%{?dist}
+Release:        38%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,10 @@ Patch1003:      CVE-2020-27661.nopatch
 # CVE 2020-35506 affects the SCSI ESP driver (esp.c), which is only compiled when CONFIG_ESP is set.
 # Our configuration does not enable CONFIG_ESP/compile esp.c, so Mariner is not vulnerable.
 Patch1004:      CVE-2020-35506.nopatch
+# CVE-2021-4145 is a NULL-pointer dereference of the `self` pointer in `mirror_wait_on_conflicts()`.
+# This function in v4.2.0 only checks the `self` pointer with another op, which will not cause a NULL-pointer dereference.
+# The Code path for CVE-2021-4145 does not occur in the current version (v4.2.0) shipped with `Mariner-1.0`.
+Patch1005:      CVE-2021-4145.nopatch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -189,6 +193,9 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Wed Mar 16 2022 Muhammad Falak <mwani@microsoft.com> - 4.2.0-38
+- Mark CVE-2021-4145 as nopatch
+
 * Thu Nov 18 2021 Cameron Baird <cameronbaird@microsoft.com> - 4.2.0-37
 - Patched CVE-2021-3545
 - Marked CVE-2020-35506 as nopatch
