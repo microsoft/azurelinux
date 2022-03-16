@@ -1,7 +1,7 @@
 Summary:        The package automatically configure source code
 Name:           autoconf
 Version:        2.71
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,11 @@ URL:            https://www.gnu.org/software/autoconf/
 Source0:        https://ftp.gnu.org/gnu/autoconf/%{name}-%{version}.tar.xz
 BuildRequires:  m4
 BuildRequires:  perl
+
+# Dependency on "gtk-doc" regardless of the project's need to build documentation introduced in 2.70.
+# Still an open issue as of 15th of March 2022: https://savannah.gnu.org/support/?110503.
+Requires:       gtk-doc
+
 Requires:       m4
 Requires:       perl-libs
 BuildArch:      noarch
@@ -42,41 +47,44 @@ make -k check %{?_smp_mflags} TESTSUITEFLAGS="1-37 39-500"
 %{_datarootdir}/autoconf/*
 
 %changelog
-*   Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> 2.71-1
--   Update to version 2.71
--   License verified
--   Remove unneeded autoconf-make-check.patch
+* Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.71-2
+- Adding run-time dependency on "gtk-doc".
 
-*   Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> 2.69-11
--   Merge the following releases from 1.0 to dev branch
--   anphel@microsoft.com, 2.69-10: Fix check tests
+* Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> - 2.71-1
+- Update to version 2.71
+- License verified
+- Remove unneeded autoconf-make-check.patch
 
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.69-10
--   Use new perl package names.
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.69-11
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 2.69-10: Fix check tests
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.69-9
--   Added %%license line automatically
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 2.69-10
+- Use new perl package names.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.69-8
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.69-9
+- Added %%license line automatically
 
-*   Wed Oct 17 2018 Dweep Advani <dadvani@vmware.com> 2.69-7
--   Build section is changed to used %configure
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.69-8
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.69-6
--   Fix arch
+* Wed Oct 17 2018 Dweep Advani <dadvani@vmware.com> - 2.69-7
+- Build section is changed to used %configure
 
-*   Tue Dec 6 2016 Dheeraj Shetty <dheerajs@vmware.com> 2.69-5
--   Fixed Bug 1718089 make check failure
+* Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.69-6
+- Fix arch
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.69-4
--   GA - Bump release of all rpms
+* Tue Dec 6 2016 Dheeraj Shetty <dheerajs@vmware.com> - 2.69-5
+- Fixed Bug 1718089 make check failure
 
-*   Fri Jun 5 2015 Divya Thaluru <dthaluru@vmware.com> 2.69-3
--   Adding m4 package to build and run time required package
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.69-4
+- GA - Bump release of all rpms
 
-*   Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> 2.69-2
--   Adding perl packages to required packages
+* Fri Jun 5 2015 Divya Thaluru <dthaluru@vmware.com> - 2.69-3
+- Adding m4 package to build and run time required package
 
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.69-1
--   Initial build. First version
+* Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> - 2.69-2
+- Adding perl packages to required packages
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 2.69-1
+- Initial build. First version
