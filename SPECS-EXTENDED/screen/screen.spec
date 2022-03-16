@@ -6,7 +6,7 @@ Distribution:   Mariner
 Summary:        A screen manager that supports multiple logins on one terminal
 Name:           screen
 Version:        4.8.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/screen
 Requires(pre):  /usr/sbin/groupadd
@@ -117,6 +117,10 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %endif
 
 %changelog
+* Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.0-4
+- Using "autoreconf -i" to fix build issues.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
