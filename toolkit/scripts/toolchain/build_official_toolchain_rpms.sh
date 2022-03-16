@@ -350,12 +350,13 @@ build_rpm_in_chroot_no_install krb5
 # curl needs libssh2
 chroot_and_install_rpms libssh2
 build_rpm_in_chroot_no_install curl
+
+# libxml2 needs python-xml
+# python-xml is built by building python2
+chroot_and_install_rpms python-xml
 build_rpm_in_chroot_no_install libxml2
 
 # python-setuptools needs python-xml
-# python-xml is built by building python2
-chroot_and_install_rpms python-xml
-
 # cracklib needs python-setuptools
 chroot_and_install_rpms python-setuptools
 build_rpm_in_chroot_no_install cracklib

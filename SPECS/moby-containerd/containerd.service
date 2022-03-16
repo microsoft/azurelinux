@@ -8,6 +8,7 @@ ExecStartPre=/sbin/modprobe overlay
 ExecStart=/usr/bin/containerd
 Delegate=yes
 KillMode=process
+Restart=always
 
 [Install]
 WantedBy=multi-user.target

@@ -254,16 +254,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "azure-iotedge",
-          "version": "1.1.2",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "azure-storage-cpp",
           "version": "7.3.0",
           "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.3.0.tar.gz"
@@ -625,8 +615,8 @@
         "type": "other",
         "other": {
           "name": "checkpolicy",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/checkpolicy-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/checkpolicy-3.2.tar.gz"
         }
       }
     },
@@ -705,8 +695,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "0.6.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/v0.6.0.tar.gz"
+          "version": "22.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v22.0.tar.gz"
         }
       }
     },
@@ -1005,8 +995,8 @@
         "type": "other",
         "other": {
           "name": "cyrus-sasl",
-          "version": "2.1.27",
-          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.27/cyrus-sasl-2.1.27.tar.gz"
+          "version": "2.1.28",
+          "downloadUrl": "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-2.1.28/cyrus-sasl-2.1.28.tar.gz"
         }
       }
     },
@@ -1595,8 +1585,8 @@
         "type": "other",
         "other": {
           "name": "freetype",
-          "version": "2.9.1",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://bigsearcher.com/mirrors/nongnu/freetype/freetype-2.11.1.tar.gz"
         }
       }
     },
@@ -3004,16 +2994,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libiothsm-std",
-          "version": "1.1.2",
-          "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libisoburn",
           "version": "1.4.8",
           "downloadUrl": "http://files.libburnia-project.org/releases/libisoburn-1.4.8.tar.gz"
@@ -3355,8 +3335,8 @@
         "type": "other",
         "other": {
           "name": "libselinux",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libselinux-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/libselinux-3.2.tar.gz"
         }
       }
     },
@@ -3365,8 +3345,8 @@
         "type": "other",
         "other": {
           "name": "libsemanage",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libsemanage-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/libsemanage-3.2.tar.gz"
         }
       }
     },
@@ -3375,8 +3355,8 @@
         "type": "other",
         "other": {
           "name": "libsepol",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/libsepol-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://codeload.github.com/SELinuxProject/selinux/tar.gz/refs/tags/3.2"
         }
       }
     },
@@ -3865,8 +3845,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.9.12",
-          "downloadUrl": "ftp://xmlsoft.org/libxml2/libxml2-2.9.12.tar.gz"
+          "version": "2.9.13",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.9.13/libxml2-v2.9.13.tar.gz"
         }
       }
     },
@@ -4585,8 +4565,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.18.1",
-          "downloadUrl": "https://nodejs.org/download/release/v14.18.1/node-v14.18.1.tar.xz"
+          "version": "14.18.3",
+          "downloadUrl": "https://nodejs.org/download/release/v14.18.3/node-v14.18.3.tar.xz"
         }
       }
     },
@@ -5045,8 +5025,8 @@
         "type": "other",
         "other": {
           "name": "pam",
-          "version": "1.3.1",
-          "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.3.1/Linux-PAM-1.3.1.tar.xz"
+          "version": "1.5.1",
+          "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.5.1/Linux-PAM-1.5.1.tar.xz"
         }
       }
     },
@@ -5625,8 +5605,8 @@
         "type": "other",
         "other": {
           "name": "policycoreutils",
-          "version": "2.9",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/20190315/policycoreutils-2.9.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/selinux-3.2.tar.gz"
         }
       }
     },
@@ -7925,8 +7905,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.47.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.47.0-src.tar.xz"
+          "version": "1.59.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.59.0-src.tar.xz"
         }
       }
     },
@@ -7975,8 +7955,8 @@
         "type": "other",
         "other": {
           "name": "selinux-policy",
-          "version": "2.20210203",
-          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20210203/refpolicy-2.20210203.tar.bz2"
+          "version": "2.20220106",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20220106/refpolicy-2.20220106.tar.bz2"
         }
       }
     },
@@ -7985,8 +7965,8 @@
         "type": "other",
         "other": {
           "name": "setools",
-          "version": "4.2.2",
-          "downloadUrl": "https://github.com/SELinuxProject/setools/releases/download/4.2.2/setools-4.2.2.tar.bz2"
+          "version": "4.4.0",
+          "downloadUrl": "https://github.com/SELinuxProject/setools/releases/download/4.4.0/setools-4.4.0.tar.bz2"
         }
       }
     },
@@ -8015,8 +7995,8 @@
         "type": "other",
         "other": {
           "name": "shadow-utils",
-          "version": "4.6",
-          "downloadUrl": "https://github.com/shadow-maint/shadow/releases/download/4.6/shadow-4.6.tar.xz"
+          "version": "4.9",
+          "downloadUrl": "https://github.com/shadow-maint/shadow/releases/download/v4.9/shadow-4.9.tar.xz"
         }
       }
     },

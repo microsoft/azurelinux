@@ -1,29 +1,27 @@
+%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+
 %global libauditver     3.0
 %global libsepolver     %{version}-1
 %global libsemanagever  %{version}-1
 %global libselinuxver   %{version}-1
 %global __python3	%{_bindir}/python3
-%global generatorsdir %{_lib}/systemd/system-generators
+%global generatorsdir   %{_libdir}/systemd/system-generators
 # Disable automatic compilation of Python files in extra directories
 %global _python_bytecompile_extra 0
-%{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        SELinux policy core utilities
 Name:           policycoreutils
-Version:        2.9
-Release:        6%{?dist}
+Version:        3.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/SELinuxProject/selinux
-Source0:        https://github.com/SELinuxProject/selinux/releases/download/20190315/%{name}-%{version}.tar.gz
-Source1:        https://github.com/SELinuxProject/selinux/releases/download/20190315/selinux-python-%{version}.tar.gz
-Source2:        https://github.com/SELinuxProject/selinux/releases/download/20190315/semodule-utils-%{version}.tar.gz
-Source3:        https://github.com/SELinuxProject/selinux/releases/download/20190315/restorecond-%{version}.tar.gz
-Source5:        selinux-autorelabel
-Source6:        selinux-autorelabel.service
-Source7:        selinux-autorelabel-mark.service
-Source8:        selinux-autorelabel.target
-Source9:        selinux-autorelabel-generator.sh
+URL:            https://github.com/SELinuxProject/selinux/wiki
+Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/selinux-%{version}.tar.gz
+Source1:        selinux-autorelabel
+Source2:        selinux-autorelabel.service
+Source3:        selinux-autorelabel-mark.service
+Source4:        selinux-autorelabel.target
+Source5:        selinux-autorelabel-generator.sh
 BuildRequires:  audit-devel
 BuildRequires:  audit-libs >= %{libauditver}
 BuildRequires:  dbus-devel
@@ -37,7 +35,8 @@ BuildRequires:  libsemanage-devel >= %{libsemanagever}
 BuildRequires:  libsepol-devel >= %{libsepolver}
 BuildRequires:  pam-devel
 BuildRequires:  python3-devel
-BuildRequires:  systemd
+BuildRequires:  pkg-config
+BuildRequires:  systemd-devel
 Requires:       coreutils
 Requires:       diffutils
 Requires:       gawk
@@ -68,36 +67,17 @@ for basic operation of a SELinux system.  These utilities include
 load_policy to load policies, setfiles to label filesystems, newrole
 to switch roles.
 
-%prep -p %{_bindir}/bash
-# create selinux/ directory and extract sources
-%autosetup -S git -N -c -n selinux
-%autosetup -S git -N -T -D -a 1 -n selinux
-%autosetup -S git -N -T -D -a 2 -n selinux
-%autosetup -S git -N -T -D -a 3 -n selinux
-#autosetup -S git -N -T -D -a 4 -n selinux
-#autosetup -S git -N -T -D -a 5 -n selinux
-#autosetup -S git -N -T -D -a 6 -n selinux
-
-for i in *; do
-    git mv $i ${i/-%{version}/}
-    git commit -q --allow-empty -a --author 'rpm-build <rpm-build>' -m "$i -> ${i/-%{version}/}"
-done
-
-for i in selinux-*; do
-    git mv $i ${i#selinux-}
-    git commit -q --allow-empty -a --author 'rpm-build <rpm-build>' -m "$i -> ${i#selinux-}"
-done
-
-echo "G"
+%prep
+%autosetup -n selinux-%{version}
 
 %build
 %{set_build_flags}
 export PYTHON=python3
 
-make -C policycoreutils LSPP_PRIV=y SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" SEMODULE_PATH="%{_sbindir}" LIBSEPOLA="%{_libdir}/libsepol.a" all
-make -C python SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" all
-make -C semodule-utils SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" all
-make -C restorecond SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" all
+%make_build -C policycoreutils LSPP_PRIV=y SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" SEMODULE_PATH="%{_sbindir}" LIBSEPOLA="%{_libdir}/libsepol.a"
+%make_build -C python SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a"
+%make_build -C semodule-utils SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a"
+%make_build -C restorecond SBINDIR="%{_sbindir}" LSPP_PRIV=y LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a"
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -107,13 +87,10 @@ mkdir -p %{buildroot}%{_mandir}/man5
 mkdir -p %{buildroot}%{_mandir}/man8
 mkdir -p %{buildroot}/%{_usr}/share/doc/%{name}/
 
-make -C policycoreutils LSPP_PRIV=y  DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" SEMODULE_PATH="%{_sbindir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
-
-make -C python PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
-
-make -C semodule-utils PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" install
-
-make -C restorecond PYTHON=python3 DESTDIR=%{buildroot} SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" SYSTEMDDIR="/lib/systemd" install
+%make_install -C policycoreutils LSPP_PRIV=y   SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" SEMODULE_PATH="%{_sbindir}" LIBSEPOLA="%{_libdir}/libsepol.a" CFLAGS="%{build_cflags} -fno-semantic-interposition"
+%make_install -C python PYTHON=python3 SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" CFLAGS="%{build_cflags} -fno-semantic-interposition"
+%make_install -C semodule-utils PYTHON=python3 SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" CFLAGS="%{build_cflags} -fno-semantic-interposition"
+%make_install -C restorecond PYTHON=python3 SBINDIR="%{_sbindir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" SYSTEMDDIR="/usr/lib/systemd" CFLAGS="%{build_cflags} -fno-semantic-interposition"
 
 # Fix perms on newrole so that objcopy can process it
 chmod 0755 %{buildroot}%{_bindir}/newrole
@@ -133,11 +110,12 @@ rm -f %{buildroot}%{_sysconfdir}/pam.d/run_init*
 
 mkdir   -m 755 -p %{buildroot}/%{generatorsdir}
 mkdir   -m 755 -p %{buildroot}/%{_unitdir}
-install -m 644 -p %{SOURCE6} %{buildroot}/%{_unitdir}/
-install -m 644 -p %{SOURCE7} %{buildroot}/%{_unitdir}/
-install -m 644 -p %{SOURCE8} %{buildroot}/%{_unitdir}/
-install -m 755 -p %{SOURCE9} %{buildroot}/%{generatorsdir}/
-install -m 755 -p %{SOURCE5} %{buildroot}/%{_libexecdir}/selinux/
+install -m 755 -p %{SOURCE1} %{buildroot}%{_libexecdir}/selinux/
+install -m 644 -p %{SOURCE2} %{buildroot}%{_unitdir}/
+install -m 644 -p %{SOURCE3} %{buildroot}%{_unitdir}/
+install -m 644 -p %{SOURCE4} %{buildroot}%{_unitdir}/
+install -m 755 -p %{SOURCE5} %{buildroot}%{generatorsdir}/
+
 
 %package python-utils
 Summary:        SELinux policy core python utilities
@@ -153,9 +131,10 @@ Summary:        SELinux policy core python3 interfaces
 Requires:       checkpolicy
 Requires:       libselinux-python3
 Requires:       libsemanage-python3 >= %{libsemanagever}
-Requires:       policycoreutils = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       python3-audit
-Requires:       setools-python3 >= 4.1.1
+Requires:       setools-python3 >= 4.4.0
+Provides:       python3-%{name} = %{version}-%{release}
 BuildArch:      noarch
 
 %description python3
@@ -257,6 +236,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %license restorecond/COPYING
 %{_sbindir}/restorecond
 %{_unitdir}/restorecond.service
+%{_libdir}/systemd/user/restorecond_user.service
 %config(noreplace) %{_sysconfdir}/selinux/restorecond.conf
 %config(noreplace) %{_sysconfdir}/selinux/restorecond_user.conf
 %{_sysconfdir}/xdg/autostart/restorecond.desktop
@@ -311,6 +291,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %{_bindir}/semodule_link
 %{_bindir}/semodule_package
 %{_bindir}/semodule_unpackage
+%{_bindir}/sestatus
 %{_libexecdir}/selinux/hll
 %{_libexecdir}/selinux/selinux-autorelabel
 %{_unitdir}/selinux-autorelabel-mark.service
@@ -369,7 +350,15 @@ The policycoreutils-restorecond package contains the restorecond service.
 
 %postun restorecond
 %systemd_postun_with_restart restorecond.service
+
 %changelog
+* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+- Upgrade to latest upstream version
+- Switch source to use upstream's combined tarball
+- Add -fno-semantic-interposition to CFLAGS as recommended by upstream
+- Lint spec
+- License verified
+
 * Fri Aug 21 2020 Daniel Burgener <daburgen@microsoft.com> - 2.9-6
 - Initial CBL-Mariner import from Fedora 31 (license: MIT)
 - License verified

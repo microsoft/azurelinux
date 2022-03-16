@@ -1,22 +1,25 @@
-Summary:      Qt5 - Support for rendering and displaying SVG
-Name:         qt5-qtsvg
-Version:      5.12.11
-Release:      2%{?dist}
-Vendor:       Microsoft Corporation
-Distribution: Mariner
-
-# See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
-License: LGPLv2 with exceptions or GPLv3 with exceptions
-Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-src-%{version}.tar.xz
-# No gui add no patch
-Patch100:  CVE-2021-38593.nopatch
-Patch101:  CVE-2018-21035.nopatch
 
-BuildRequires: qt5-qtbase-devel >= %{version}
-BuildRequires: zlib-devel
-BuildRequires: qt5-qtbase-private-devel
+Summary:        Qt5 - Support for rendering and displaying SVG
+Name:           qt5-qtsvg
+Version:        5.12.11
+Release:        3%{?dist}
+# See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
+License:        LGPLv2 WITH exceptions OR GPLv3 WITH exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.qt.io
+Source0:        https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-src-%{version}.tar.xz
+# No gui add no patch
+Patch100:       CVE-2021-38593.nopatch
+Patch101:       CVE-2018-21035.nopatch
+# Vulnerability is limited to the Windows OS.
+Patch102:       CVE-2022-25634.nopatch
+
+BuildRequires:  qt5-qtbase-devel >= %{version}
+BuildRequires:  qt5-qtbase-private-devel
+BuildRequires:  zlib-devel
+
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
 %description
@@ -25,29 +28,27 @@ two-dimensional vector graphics. Qt provides classes for rendering and
 displaying SVG drawings in widgets and on other paint devices.
 
 %package devel
-Summary: Development files for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: qt5-qtbase-devel%{?_isa}
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       qt5-qtbase-devel%{?_isa}
+
 %description devel
 %{summary}.
 
 %package examples
-Summary: Programming examples for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Programming examples for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 %description examples
 %{summary}.
 
-
 %prep
 %autosetup -p1 -n qtsvg-everywhere-src-%{version}
-
-
 
 %build
 qmake-qt5 .
 
 %make_build
-
 
 %install
 make install INSTALL_ROOT=%{buildroot}
@@ -83,8 +84,10 @@ popd
 %files examples
 %{_qt5_examplesdir}/
 
-
 %changelog
+* Fri Mar 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
+- Adding a nopatch for CVE-2022-25634 - vulnerability limited to the Windows OS.
+
 * Thu Sep 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-2
 - Add nopatches for CVE-2021-38593 and CVE-2018-21035.
 
