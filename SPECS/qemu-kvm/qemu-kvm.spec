@@ -54,6 +54,9 @@ Patch36:        CVE-2021-3546.patch
 Patch37:        CVE-2021-3682.patch
 Patch38:        CVE-2021-3713.patch
 Patch39:        CVE-2021-3545.patch
+Patch40:        CVE-2021-3930.patch
+Patch41:        CVE-2021-3607.patch
+Patch42:        CVE-2021-3608.patch
 # Range 1001+ reserved for nopatch files
 Patch1001:      CVE-2020-7039.nopatch
 # CVE-2020-12829 affects the sm501 video driver, which is only used for powerpc and SuperH emulation
@@ -68,6 +71,8 @@ Patch1004:      CVE-2020-35506.nopatch
 # This function in v4.2.0 only checks the `self` pointer with another op, which will not cause a NULL-pointer dereference.
 # The Code path for CVE-2021-4145 does not occur in the current version (v4.2.0) shipped with `Mariner-1.0`.
 Patch1005:      CVE-2021-4145.nopatch
+# CVE-2021-3947 is a stack-buffer-overflow in the NVME component. The current version (v4.2.0) does not ship it.
+Patch1006:      CVE-2021-3947.nopatch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
 BuildRequires:  pixman-devel
@@ -194,7 +199,9 @@ fi
 
 %changelog
 * Wed Mar 16 2022 Muhammad Falak <mwani@microsoft.com> - 4.2.0-38
-- Mark CVE-2021-4145 as nopatch
+- Patch CVE-2021-3607 & CVE-2021-3930
+- Backport patch to address CVE-2021-3608
+- Mark CVE-2021-3947 & CVE-2021-4145 as nopatch
 
 * Thu Nov 18 2021 Cameron Baird <cameronbaird@microsoft.com> - 4.2.0-37
 - Patched CVE-2021-3545
