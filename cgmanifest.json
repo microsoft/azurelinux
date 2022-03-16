@@ -26635,8 +26635,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.56.1",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.56.1-src.tar.gz"
+          "version": "1.59.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.59.0-src.tar.xz"
         }
       }
     },
@@ -27706,26 +27706,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "SymCrypt",
-          "version": "101.0.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v101.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "SymCrypt-OpenSSL",
-        "other": {
-          "name": "SymCrypt-OpenSSL",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "SuperLU",
           "version": "5.2.1",
           "downloadUrl": "http://crd-legacy.lbl.gov/~xiaoye/SuperLU/superlu_5.2.1.tar.gz"
@@ -27769,6 +27749,26 @@
           "name": "swupdate",
           "version": "2021.04",
           "downloadUrl": "https://github.com/sbabic/swupdate/archive/2021.04.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "SymCrypt",
+          "version": "101.0.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v101.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "SymCrypt-OpenSSL",
+        "other": {
+          "name": "SymCrypt-OpenSSL",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.0.0.tar.gz"
         }
       }
     },
@@ -28516,6 +28516,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "udica",
+          "version": "0.2.1",
+          "downloadUrl": "https://github.com/containers/udica/archive/v0.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "udisks2",
           "version": "2.8.4",
           "downloadUrl": "https://github.com/storaged-project/udisks/releases/download/udisks-2.8.4/udisks-2.8.4.tar.bz2"
@@ -28549,16 +28559,6 @@
           "name": "uid_wrapper",
           "version": "1.2.7",
           "downloadUrl": "https://ftp.samba.org/pub/cwrap/uid_wrapper-1.2.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "umockdev",
-          "version": "0.14",
-          "downloadUrl": "https://github.com/martinpitt/umockdev/archive/0.14.tar.gz"
         }
       }
     },
@@ -30338,6 +30338,7 @@
     {
       "component": {
         "type": "other",
+        "other": {
           "name": "zipper",
           "version": "1.0.3",
           "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.3.tar.gz"
