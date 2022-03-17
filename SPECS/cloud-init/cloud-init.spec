@@ -2,8 +2,8 @@
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        21.3
-Release:        4%{?dist}
+Version:        21.4
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,10 +16,7 @@ Patch0:         cloud-init-azureds.patch
 Patch1:         ds-identify.patch
 Patch2:         ds-vmware-mariner.patch
 Patch3:         cloud-cfg.patch
-Patch4:         networkd.patch
-Patch5:         mariner.patch
-Patch6:         update-metadata-on-BOOT_NEW_INSTANCE.patch
-Patch7:         apply-netconfig-every-boot.patch
+Patch4:         mariner-21.4.patch
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
@@ -153,13 +150,18 @@ rm -rf %{buildroot}
 %{_unitdir}/*
 %{_systemdgeneratordir}/cloud-init-generator
 %{_udevrulesdir}/66-azure-ephemeral.rules
-%{_udevrulesdir}/10-cloud-init-hook-hotplug.rules
+%{_sysconfdir}/systemd/system/sshd-keygen@.service.d/disable-sshd-keygen-if-cloud-init-active.conf
 %{_datadir}/bash-completion/completions/cloud-init
 
 %files azure-kvp
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Mar 16 2022 Henry Beberman <henry.beberman@microsoft.com> - 21.4-1
+- Update to version 21.4
+- Remove several upstreamed patches already present in source
+- Add netplan support into the Mariner distro config
+
 * Tue Feb 22 2022 Henry Beberman <henry.beberman@microsoft.com> - 21.3-4
 - Add patches from upstream to resolve a hang when reinitializing preprovisioned VMs.
 
