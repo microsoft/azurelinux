@@ -1,19 +1,18 @@
-Summary:    The  purpose  of  xmlto is to convert an XML file to the desired format
-Name:       xmlto
-Version:    0.0.28
+Summary:        The  purpose  of  xmlto is to convert an XML file to the desired format
+Name:           xmlto
+Version:        0.0.28
 Release:        6%{?dist}
-License:    GPLv2+
-URL:        https://pagure.io/xmlto
-Group:      Applications/System
+License:        GPLv2+
+URL:            https://pagure.io/xmlto
+Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:     http://releases.pagure.org/xmlto/%{name}-%{version}.tar.gz
-BuildRequires:    docbook-style-xsl
-BuildRequires:    docbook-dtd-xml
-BuildRequires:    libxslt-devel
-Requires:         systemd
-Requires:	  docbook-style-xsl
-Requires:	  libxslt
+Source0:        http://releases.pagure.org/xmlto/%{name}-%{version}.tar.gz
+BuildRequires:  docbook-style-xsl
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  libxslt-devel
+Requires:       docbook-style-xsl
+Requires:       libxslt
 
 %description
 The  purpose  of  xmlto is to convert an XML file to the desired format
@@ -47,6 +46,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/xmlto/*
 
 %changelog
+* Wed Mar 16 2022 Andrew Phelps <anphel@microsoft.com> - 0.0.28-7
+- Remove unneeded systemd requires
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.0.28-6
 - Remove unused `%%define sha1` lines
 - License verified
