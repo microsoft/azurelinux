@@ -85,6 +85,9 @@ func main() {
 	defines[rpm.DistTagDefine] = *distTag
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
+	if !*runCheck {
+		defines[rpm.WithCheckDefine] = "0"
+	}
 
 	err = retry.Run(func() error {
 		err = buildSRPMInChroot(chrootDir, rpmsDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, defines, *noCleanup, *runCheck)
