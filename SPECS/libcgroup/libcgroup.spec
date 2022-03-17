@@ -7,11 +7,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/libcgroup/libcgroup
 
-# libcgroup git repo contains submodules that must be part of source tarball
+# libcgroup git repo contains submodules that must be part of source tarball (adapt version number)
 # 1) clone git repo                           => 'git clone https://github.com/libcgroup/libcgroup.git'
 # 2) checkout tag corresponding to version    => 'git checkout v2.0.1'
 # 3) get submodule                            => 'git submodule init' then 'git submodule update'
-# 4) create source tarball                    => 'tar -czf libcgroup-2.0.1.tar.gz libcgroup'
+# 4) create source tarball                    => 'tar --sort=name \
+#                                                     --mtime="2021-04-26 00:00Z" \
+#                                                     --owner=0 --group=0 --numeric-owner \
+#                                                     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#                                                     -czf libcgroup-2.0.1.tar.gz libcgroup'
 Source0:        https://github.com/libcgroup/libcgroup/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        cgconfig.service
 
