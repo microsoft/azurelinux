@@ -24,7 +24,7 @@ autoreconf --install
 touch config.{guess,sub}
 
 %configure \
-	CC=gcc \
+    CC=gcc \
     CFLAGS="%{build_cflags} -D_FILE_OFFSET_BITS=64" \
     LDFLAGS="%{build_ldflags}"
 
