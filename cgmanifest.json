@@ -14203,8 +14203,8 @@
         "type": "other",
         "other": {
           "name": "ndctl",
-          "version": "71.1",
-          "downloadUrl": "https://github.com/pmem/ndctl/archive/v71.1.tar.gz"
+          "version": "65",
+          "downloadUrl": "https://github.com/pmem/ndctl/archive/v65.tar.gz"
         }
       }
     },
