@@ -29,6 +29,7 @@ BuildRequires:  audit-devel
 BuildRequires:  automake
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
+BuildRequires:  itstool
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
 BuildRequires:  libtool
@@ -172,6 +173,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-7
 - Build with audit-libs
+- Add BR for itstool
 
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 4.9-6
 - Add provides to resolve dynamic dependencies
