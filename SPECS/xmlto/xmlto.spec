@@ -1,7 +1,7 @@
 Summary:        The  purpose  of  xmlto is to convert an XML file to the desired format
 Name:           xmlto
 Version:        0.0.28
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 URL:            https://pagure.io/xmlto
 Group:          Applications/System
