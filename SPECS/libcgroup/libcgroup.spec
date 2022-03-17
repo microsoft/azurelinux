@@ -30,7 +30,7 @@ BuildRequires: make
 BuildRequires: pam-devel
 BuildRequires: systemd-devel
 
-# required for testing
+# required to build tests
 BuildRequires: gtest-devel
 
 Requires(pre): shadow-utils
@@ -66,19 +66,44 @@ It provides API to create/delete and modify cgroup nodes. It will also in the
 future allow creation of persistent configuration for control groups and
 provide scripts to manage that configuration.
 
+# libcgroup unit test (tests/gunit - make check) must be performed from a CBL-Mariner container
+# to avoid jeopardizing cgroup of the host (/proc/mounts)
+%package tests
+Summary: libcgroup's tests
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: gcc
+Requires: gtest
+
+%description tests
+Provides tests (tests/gunit) that can be used to validate libcgroup.
+
 %prep
 %autosetup -p1 -n %{name}
 
 %build
+# build test binaries but do not execute tests
+sed -i '/TESTS = gtest/d' ./tests/gunit/Makefile.am
 
 autoreconf -vif
 %configure --enable-pam-module-dir=%{_libdir}/security \
            --enable-opaque-hierarchy="name=systemd" \
            --disable-daemon
+
+# build libcgroup
 make %{?_smp_mflags}
+
+# build test
+cd tests/gunit
+make check
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install
+
+# install tests
+install -d ${RPM_BUILD_ROOT}/tests/gunit
+install -d ${RPM_BUILD_ROOT}/tests/gunit/.libs
+install tests/gunit/gtest ${RPM_BUILD_ROOT}/tests/gunit
+install tests/gunit/.libs/gtest ${RPM_BUILD_ROOT}/tests/gunit/.libs/lt-gtest
 
 # install config files
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}
@@ -110,16 +135,6 @@ getent group cgred >/dev/null || groupadd -r cgred
 
 %postun tools
 %systemd_postun_with_restart cgconfig.service
-
-%check
-make -C tests/gunit check
-TESTLOGS=$(find -name "test-suite.log")
-if [[ -n $TESTLOGS ]]; then
-  echo "================================="
-  echo "==== show detailed test logs ===="
-  echo "================================="
-  cat $TESTLOGS
-fi
 
 %files
 %license COPYING
@@ -159,6 +174,12 @@ fi
 %{_includedir}/libcgroup/*.h
 %{_libdir}/libcgroup.so
 %{_libdir}/pkgconfig/libcgroup.pc
+
+%files tests
+%license COPYING
+%doc README
+/tests/gunit/gtest
+/tests/gunit/.libs/lt-gtest
 
 %changelog
 * Tue Mar 15 2022 Nicolas Guibourge <nicolasg@microsoft.com> 2.0.1-23
