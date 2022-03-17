@@ -1,12 +1,12 @@
 Name:           nfs4-acl-tools
-Version:        0.3.5
-Release:        4%{?dist}
+Version:        0.3.7
+Release:        1%{?dist}
 Summary:        The nfs4 ACL tools
-License:        BSD
+License:        BSD and GPLv2 and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://git.linux-nfs.org/?p=bfields/nfs4-acl-tools.git;a=summary
-Source0:        http://linux-nfs.org/~bfields/nfs4-acl-tools/%{name}-%{version}.tar.gz
+URL:            https://git.linux-nfs.org/?p=bfields/nfs4-acl-tools.git;a=summary
+Source0:        https://linux-nfs.org/~bfields/nfs4-acl-tools/%{name}-%{version}.tar.gz
 
 BuildRequires: libtool
 BuildRequires: libattr-devel
@@ -19,18 +19,23 @@ NFSv4 client.
 %setup -q
 
 %build
+# Fix for autoconf 2.7.0+ build issues with missing config.guess and config.sub.
+autoreconf --install
+touch config.{guess,sub}
+
 %configure \
-	CFLAGS="%{build_cflags} -D_FILE_OFFSET_BITS=64" \
-	LDFLAGS="%{build_ldflags}"
+	CC=gcc \
+    CFLAGS="%{build_cflags} -D_FILE_OFFSET_BITS=64" \
+    LDFLAGS="%{build_ldflags}"
 
 %make_build
 
 %install
-rm -rf %{buildroot}
-make DESTDIR=%{buildroot} install
+%make_install
 
 %files
-%doc COPYING INSTALL README TODO VERSION
+%license COPYING
+%doc INSTALL README TODO VERSION
 %{_bindir}/nfs4_editfacl
 %{_bindir}/nfs4_getfacl
 %{_bindir}/nfs4_setfacl
@@ -38,6 +43,11 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man5/*
 
 %changelog
+* Wed Mar 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.7-1
+- Updating to 0.3.7.
+- Fixing build issues with 'autoconf' 2.7.0+ by adding "CC=gcc" and running "autoreconf --install".
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.5-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
