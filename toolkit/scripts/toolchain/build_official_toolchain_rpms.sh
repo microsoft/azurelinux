@@ -304,8 +304,6 @@ build_rpm_in_chroot_no_install zip
 chroot_and_install_rpms zip
 build_rpm_in_chroot_no_install unzip
 chroot_and_install_rpms unzip
-build_rpm_in_chroot_no_install alsa-lib
-chroot_and_install_rpms alsa-lib
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
@@ -468,7 +466,7 @@ build_rpm_in_chroot_no_install createrepo_c
 
 build_rpm_in_chroot_no_install libsepol
 
-audit needs: python3, krb5, swig, e2fsprogs
+# audit needs: python3, krb5, swig, e2fsprogs
 build_rpm_in_chroot_no_install audit
 
 # rebuild pam with selinux and audit support

@@ -1,6 +1,3 @@
-alsa-lib-1.2.6.1-1.cm2.aarch64.rpm
-alsa-lib-debuginfo-1.2.6.1-1.cm2.aarch64.rpm
-alsa-lib-devel-1.2.6.1-1.cm2.aarch64.rpm
 asciidoc-9.1.0-1.cm2.noarch.rpm
 audit-3.0.6-4.cm2.aarch64.rpm
 audit-debuginfo-3.0.6-4.cm2.aarch64.rpm
