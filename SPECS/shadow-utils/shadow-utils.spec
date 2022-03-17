@@ -159,6 +159,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %config(noreplace) %{_sysconfdir}/limits
 %{_bindir}/*
 %{_sbindir}/*
+%{_mandir}/*
 /bin/passwd
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
