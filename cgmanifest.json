@@ -1577,8 +1577,8 @@
         "type": "other",
         "other": {
           "name": "catatonit",
-          "version": "0.1.5",
-          "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.5.tar.gz"
+          "version": "0.1.7",
+          "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.7.tar.gz"
         }
       }
     },
