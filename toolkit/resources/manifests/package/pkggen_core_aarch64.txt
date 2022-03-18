@@ -162,7 +162,7 @@ perl-vars-1.05-465.cm2.noarch.rpm
 perl-5.32.0-465.cm2.aarch64.rpm
 texinfo-6.8-1.cm2.aarch64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
-autoconf-2.71-2.cm2.noarch.rpm
+autoconf-2.71-3.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
 openssl-1.1.1k-11.cm2.aarch64.rpm
 openssl-debuginfo-1.1.1k-11.cm2.aarch64.rpm
