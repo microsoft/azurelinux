@@ -1,7 +1,7 @@
 Summary:           A toolkit for defining and handling authorizations.
 Name:              polkit
 Version:           0.119
-Release:           2%{?dist}
+Release:           3%{?dist}
 Group:             Applications/System
 Vendor:            Microsoft Corporation
 License:           GPLv2+
@@ -45,7 +45,8 @@ header files and libraries for polkit
 %configure \
     --datadir=%{_datarootdir} \
     --enable-libsystemd-login=yes \
-    --with-systemdsystemunitdir=%{_libdir}/systemd/system
+    --with-systemdsystemunitdir=%{_libdir}/systemd/system \
+    --enable-man-pages=no
 make %{?_smp_mflags}
 
 %install
@@ -110,6 +111,9 @@ fi
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+*   Thu Mar 17 2022 Andrew Phelps <anphel@microsoft.com> - 0.119-3
+-   Disable documentation
+
 *   Mon Feb 07 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.119-2
 -   Patch for CVE-2021-4034.
 
