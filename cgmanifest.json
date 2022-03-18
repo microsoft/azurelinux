@@ -23734,8 +23734,8 @@
         "type": "other",
         "other": {
           "name": "python-pycparser",
-          "version": "2.18",
-          "downloadUrl": "https://pypi.python.org/packages/source/p/pycparser/pycparser-2.18.tar.gz"
+          "version": "2.21",
+          "downloadUrl": "https://github.com/eliben/pycparser/archive/refs/tags/release_v2.21.tar.gz"
         }
       }
     },
