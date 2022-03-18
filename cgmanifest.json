@@ -23294,8 +23294,8 @@
         "type": "other",
         "other": {
           "name": "python-netifaces",
-          "version": "0.10.9",
-          "downloadUrl": "https://pypi.python.org/packages/source/n/netifaces/netifaces-0.10.9.tar.gz"
+          "version": "0.11.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/n/netifaces/netifaces-0.11.0.tar.gz"
         }
       }
     },
