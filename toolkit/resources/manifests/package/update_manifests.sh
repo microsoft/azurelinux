@@ -41,7 +41,6 @@ generate_toolchain () {
 
 # Remove specific packages that are not needed in pkggen_core
 remove_packages_for_pkggen_core () {
-    sed -i '/alsa-lib-/d' $TmpPkgGen
     sed -i '/audit-devel/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
