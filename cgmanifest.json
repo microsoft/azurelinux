@@ -11042,7 +11042,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.18",
-          "downloadUrl": "http://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
+          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
         }
       }
     },
@@ -13803,8 +13803,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.13+8-LTS-4.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13+8-LTS-4.aarch64.rpm"
+          "version": "11.0.14.1+1-LTS-31207.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm"
         }
       }
     },
@@ -13813,8 +13813,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.13+8-LTS-4.x86_64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13+8-LTS-4.x86_64.rpm"
+          "version": "11.0.14.1+1-LTS-31207.x86_64.rpm",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm"
         }
       }
     },
@@ -14213,8 +14213,8 @@
         "type": "other",
         "other": {
           "name": "ndctl",
-          "version": "71.1",
-          "downloadUrl": "https://github.com/pmem/ndctl/archive/v71.1.tar.gz"
+          "version": "65",
+          "downloadUrl": "https://github.com/pmem/ndctl/archive/v65.tar.gz"
         }
       }
     },
@@ -14343,8 +14343,8 @@
         "type": "other",
         "other": {
           "name": "nfs4-acl-tools",
-          "version": "0.3.5",
-          "downloadUrl": "http://linux-nfs.org/~bfields/nfs4-acl-tools/nfs4-acl-tools-0.3.5.tar.gz"
+          "version": "0.3.7",
+          "downloadUrl": "https://linux-nfs.org/~bfields/nfs4-acl-tools/nfs4-acl-tools-0.3.7.tar.gz"
         }
       }
     },
@@ -15624,18 +15624,8 @@
         "type": "other",
         "other": {
           "name": "orangefs",
-          "version": "2.9.7",
-          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/releases/2.9.7/source/orangefs-2.9.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ORBit2",
-          "version": "2.14.19",
-          "downloadUrl": "http://download.gnome.org/sources/ORBit2/2.14/ORBit2-2.14.19.tar.bz2"
+          "version": "2.9.8",
+          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-2.9.8.tar.gz"
         }
       }
     },
@@ -22364,8 +22354,8 @@
         "type": "other",
         "other": {
           "name": "python-defusedxml",
-          "version": "0.6.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/a4/5f/f8aa58ca0cf01cbcee728abc9d88bfeb74e95e6cb4334cfd5bed5673ea77/defusedxml-0.6.0.tar.gz"
+          "version": "0.7.1",
+          "downloadUrl": "https://github.com/tiran/defusedxml/archive/refs/tags/v0.7.1.tar.gz"
         }
       }
     },
@@ -22434,8 +22424,8 @@
         "type": "other",
         "other": {
           "name": "python-ecdsa",
-          "version": "0.13.3",
-          "downloadUrl": "https://pypi.python.org/packages/source/e/ecdsa/ecdsa-0.13.3.tar.gz"
+          "version": "0.17.0",
+          "downloadUrl": "https://github.com/tlsfuzzer/python-ecdsa/archive/refs/tags/python-ecdsa-0.17.0.tar.gz"
         }
       }
     },
@@ -22594,8 +22584,8 @@
         "type": "other",
         "other": {
           "name": "python-frozendict",
-          "version": "1.2",
-          "downloadUrl": "https://pypi.python.org/packages/source/f/frozendict/frozendict-1.2.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/Marco-Sulla/python-frozendict/releases/download/v2.3.0/frozendict-2.3.0.tar.gz"
         }
       }
     },
@@ -22864,8 +22854,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonpointer",
-          "version": "2.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonpointer/jsonpointer-2.0.tar.gz"
+          "version": "2.2",
+          "downloadUrl": "https://github.com/stefankoegl/python-json-pointer/archive/refs/tags/v2.2.tar.gz"
         }
       }
     },
@@ -23304,8 +23294,8 @@
         "type": "other",
         "other": {
           "name": "python-netifaces",
-          "version": "0.10.9",
-          "downloadUrl": "https://pypi.python.org/packages/source/n/netifaces/netifaces-0.10.9.tar.gz"
+          "version": "0.11.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/n/netifaces/netifaces-0.11.0.tar.gz"
         }
       }
     },
@@ -23314,8 +23304,8 @@
         "type": "other",
         "other": {
           "name": "python-nocasedict",
-          "version": "0.5.0",
-          "downloadUrl": "https://github.com/pywbem/nocasedict/archive/0.5.0.tar.gz"
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/pywbem/nocasedict/archive/refs/tags/1.0.2.tar.gz"
         }
       }
     },
@@ -23724,8 +23714,8 @@
         "type": "other",
         "other": {
           "name": "python-pycodestyle",
-          "version": "2.5.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz"
+          "version": "2.8.0",
+          "downloadUrl": "https://github.com/PyCQA/pycodestyle/archive/refs/tags/2.8.0.tar.gz"
         }
       }
     },
@@ -23744,8 +23734,8 @@
         "type": "other",
         "other": {
           "name": "python-pycparser",
-          "version": "2.18",
-          "downloadUrl": "https://pypi.python.org/packages/source/p/pycparser/pycparser-2.18.tar.gz"
+          "version": "2.21",
+          "downloadUrl": "https://github.com/eliben/pycparser/archive/refs/tags/release_v2.21.tar.gz"
         }
       }
     },
@@ -23804,8 +23794,8 @@
         "type": "other",
         "other": {
           "name": "python-pynacl",
-          "version": "1.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/61/ab/2ac6dea8489fa713e2b4c6c5b549cc962dd4a842b5998d9e80cf8440b7cd/PyNaCl-1.3.0.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/pyca/pynacl/archive/refs/tags/1.5.0.tar.gz"
         }
       }
     },

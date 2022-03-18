@@ -1,7 +1,7 @@
 Summary:        The package automatically configure source code
 Name:           autoconf
 Version:        2.71
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,14 @@ URL:            https://www.gnu.org/software/autoconf/
 Source0:        https://ftp.gnu.org/gnu/autoconf/%{name}-%{version}.tar.xz
 BuildRequires:  m4
 BuildRequires:  perl
+
+# Dependency on "gtk-doc" regardless of the project's need to build documentation introduced in 2.70.
+# Still an open issue as of 15th of March 2022: https://savannah.gnu.org/support/?110503.
+Requires:       gtk-doc
+
+%if %{with_check}
+BuildRequires:  perl(File::Find)
+%endif
 Requires:       m4
 Requires:       perl-libs
 BuildArch:      noarch
@@ -31,8 +39,7 @@ make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}%{_infodir}
 
 %check
-# Skip test 38 due to expected regex issue using perl 5.30 and autoconf
-make -k check %{?_smp_mflags} TESTSUITEFLAGS="1-37 39-500"
+make -k check %{?_smp_mflags}
 
 %files
 %defattr(-,root,root)
@@ -42,41 +49,48 @@ make -k check %{?_smp_mflags} TESTSUITEFLAGS="1-37 39-500"
 %{_datarootdir}/autoconf/*
 
 %changelog
-*   Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> 2.71-1
--   Update to version 2.71
--   License verified
--   Remove unneeded autoconf-make-check.patch
+* Thu Mar 17 2022 Muhammad Falak <mwani@microsoft.com> - 2.71-3
+- Drop TESTSUITEFLAGS and run all tests cases
+- Add an explicit BR on `perl(File::Find)` to enable ptest
 
-*   Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> 2.69-11
--   Merge the following releases from 1.0 to dev branch
--   anphel@microsoft.com, 2.69-10: Fix check tests
+* Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.71-2
+- Adding run-time dependency on "gtk-doc".
 
-*   Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 2.69-10
--   Use new perl package names.
+* Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> - 2.71-1
+- Update to version 2.71
+- License verified
+- Remove unneeded autoconf-make-check.patch
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.69-9
--   Added %%license line automatically
+* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.69-11
+- Merge the following releases from 1.0 to dev branch
+- anphel@microsoft.com, 2.69-10: Fix check tests
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.69-8
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> - 2.69-10
+- Use new perl package names.
 
-*   Wed Oct 17 2018 Dweep Advani <dadvani@vmware.com> 2.69-7
--   Build section is changed to used %configure
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.69-9
+- Added %%license line automatically
 
-*   Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.69-6
--   Fix arch
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.69-8
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Dec 6 2016 Dheeraj Shetty <dheerajs@vmware.com> 2.69-5
--   Fixed Bug 1718089 make check failure
+* Wed Oct 17 2018 Dweep Advani <dadvani@vmware.com> - 2.69-7
+- Build section is changed to used %configure
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.69-4
--   GA - Bump release of all rpms
+* Tue Apr 25 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.69-6
+- Fix arch
 
-*   Fri Jun 5 2015 Divya Thaluru <dthaluru@vmware.com> 2.69-3
--   Adding m4 package to build and run time required package
+* Tue Dec 6 2016 Dheeraj Shetty <dheerajs@vmware.com> - 2.69-5
+- Fixed Bug 1718089 make check failure
 
-*   Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> 2.69-2
--   Adding perl packages to required packages
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 2.69-4
+- GA - Bump release of all rpms
 
-*   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.69-1
--   Initial build. First version
+* Fri Jun 5 2015 Divya Thaluru <dthaluru@vmware.com> - 2.69-3
+- Adding m4 package to build and run time required package
+
+* Wed Jun 3 2015 Divya Thaluru <dthaluru@vmware.com> - 2.69-2
+- Adding perl packages to required packages
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 2.69-1
+- Initial build. First version

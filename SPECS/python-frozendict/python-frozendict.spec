@@ -5,31 +5,31 @@ the complete mapping interface. It can be used as a drop-in
 replacement for dictionaries where immutability is desired.}
 Summary:        An immutable dictionary
 Name:           python-%{srcname}
-Version:        1.2
-Release:        19%{?dist}
-License:        MIT
+Version:        2.3.0
+Release:        1%{?dist}
+License:        LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pypi.python.org/pypi/frozendict
-Source0:        https://pypi.python.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz
-# https://github.com/slezica/python-frozendict/pull/30/commits/6ad44b54139e9b298a9281d85abf4f940f5d852a.patch
-Patch0:         fix_imports_for_python3_9.patch
-# https://github.com/slezica/python-frozendict/pull/30/commits/24e65b1f197a8c0dcca82a6ada53a8a29445c21c.patch
-Patch1:         import_from_abc_first.patch
-BuildArch:      noarch
+Source0:        https://github.com/Marco-Sulla/%{name}/releases/download/v%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description %{_description}
 
 %package -n python3-%{srcname}
 %{?python_provide:%python_provide python3-%{srcname}}
 Summary:        %{summary}
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+Requires:       python3
 
 %description -n python3-%{srcname} %{_description}
 
 %prep
-%autosetup -n %{srcname}-%{version} -p1
+%autosetup -n %{srcname}-%{version}
 
 %build
 %py3_build
@@ -37,13 +37,25 @@ BuildRequires:  python3-setuptools
 %install
 %py3_install
 
+%check
+pip3 install pytest
+cd test
+PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest
+
 %files -n python3-%{srcname}
 %license LICENSE.txt
-%doc README.rst
+%doc README.md
 %{python3_sitelib}/%{srcname}-*.egg-info/
 %{python3_sitelib}/%{srcname}/
 
 %changelog
+* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 2.3.0-1
+- Upgrade to latest version in forked repo
+- Remove noarch specification (package now comes with a C extension)
+- Add package test
+- Remove upstreamed py39 compatibility patches
+- Switch source from PyPI to GitHub
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.2-19
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

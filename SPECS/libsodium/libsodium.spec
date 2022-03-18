@@ -1,65 +1,40 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Fedora spec file for libsodium
-#
-# License: MIT
-# http://opensource.org/licenses/MIT
-#
-# Please preserve changelog entries
-#
 %global libname libsodium
 %global soname  23
-
+Summary:        The Sodium crypto library
 Name:           libsodium
 Version:        1.0.18
-Release:        4%{?dist}
-Summary:        The Sodium crypto library
+Release:        5%{?dist}
 License:        ISC
-URL:            http://libsodium.org/
-Source0:        http://download.libsodium.org/libsodium/releases/%{name}-%{version}.tar.gz
-
-BuildRequires: gcc
-
-# manage update from 3rd party repository
-Obsoletes:      %{libname}%{soname} <= %{version}
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://libsodium.org/
+Source0:        https://download.libsodium.org/%{name}/releases/%{name}-%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  make
 
 %description
-Sodium is a new, easy-to-use software library for encryption, decryption, 
-signatures, password hashing and more. It is a portable, cross-compilable, 
-installable, packageable fork of NaCl, with a compatible API, and an extended 
-API to improve usability even further. Its goal is to provide all of the core 
-operations needed to build higher-level cryptographic tools. The design 
+Sodium is a new, easy-to-use software library for encryption, decryption,
+signatures, password hashing and more. It is a portable, cross-compilable,
+installable, packageable fork of NaCl, with a compatible API, and an extended
+API to improve usability even further. Its goal is to provide all of the core
+operations needed to build higher-level cryptographic tools. The design
 choices emphasize security, and "magic constants" have clear rationales.
 
-The same cannot be said of NIST curves, where the specific origins of certain 
-constants are not described by the standards. And despite the emphasis on 
-higher security, primitives are faster across-the-board than most 
+The same cannot be said of NIST curves, where the specific origins of certain
+constants are not described by the standards. And despite the emphasis on
+higher security, primitives are faster across-the-board than most
 implementations of the NIST standards.
-
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Obsoletes:      %{libname}%{soname}-devel <= %{version}
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 This package contains libraries and header files for
 developing applications that use %{name} libraries.
 
-%package        static
-Summary:        Static library for %{name}
-Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
-Obsoletes:      %{libname}%{soname}-static <= %{version}
-
-%description    static
-This package contains the static library for statically
-linking applications to use %{name}.
-
-
 %prep
-%setup -q
-
+%autosetup
 
 %build
 %configure \
@@ -72,12 +47,11 @@ linking applications to use %{name}.
 %install
 %make_install
 
-rm -f %{buildroot}%{_libdir}/%{libname}.la
-
+find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -type f -name "*.a" -delete -print
 
 %check
-make check
-
+%make_build check
 
 %files
 %license LICENSE
@@ -92,11 +66,15 @@ make check
 %{_libdir}/%{libname}.so
 %{_libdir}/pkgconfig/%{libname}.pc
 
-%files static
-%{_libdir}/libsodium.a
-
 
 %changelog
+* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.18-5
+- Move package from Mariner Extended to Mariner Core repo
+- Use HTTPS source URL instead of HTTP
+- Remove static subpackage and static library
+- Lint spec
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.18-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

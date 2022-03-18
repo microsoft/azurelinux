@@ -25,7 +25,8 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 %build
 %configure \
     --disable-silent-rules \
-    --with-priv-mode=none
+    --with-priv-mode=none \
+    --disable-man
 %make_build
 
 %install
@@ -44,6 +45,7 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 %changelog
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 0.6.1-1
 - Upgrade to version 0.6.1
+- Disable documentation explicitly
 
 * Mon Jul 19 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.1-1
 - Update to latest upstream version
