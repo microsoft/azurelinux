@@ -1,17 +1,15 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
-Version:        3.6
-Release:        5%{?dist}
+Version:        3.11
+Release:        1%{?dist}
 License:        BSD and MIT and Public Domain
-URL:            https://github.com/esnet/iperf
-Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/esnet/iperf/archive/%{version}.tar.gz
-Source0:        iperf-%{version}.tar.gz
+Group:          Applications/System
+URL:            https://github.com/esnet/iperf
+Source0:        https://github.com/esnet/iperf/archive/%{version}.tar.gz#/iperf-%{version}.tar.gz
 Patch1:         disablepg.patch
-
-BuildRequires:  autoconf
+BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
 
 %description
@@ -22,13 +20,13 @@ reports the bandwidth, loss, and other parameters.
 
 %package        doc
 Summary:        Documentation for iperf
+
 %description    doc
 It contains the documentation and manpages for iperf package.
 Requires:       %{name} = %{version}-%{release}
 
 %prep
-%setup -q -n iperf-%{version}
-%patch1 -p1
+%autosetup -p1 -n iperf-%{version}
 
 %build
 echo "VDBG optflags: " %{optflags}
@@ -45,7 +43,7 @@ echo "VDBG optflags: " %{optflags}
         --mandir=%{_mandir} \
         --infodir=%{_infodir} \
         --datadir=%{_datarootdir} \
-        --sysconfdir=/etc
+        --sysconfdir=%{_sysconfdir}
 make %{?_smp_mflags}
 
 %install
@@ -68,27 +66,38 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Tue Mar 15 2022 Rachel Menge <rachelmenge@microsoft.com> - 3.11-1
+- Update to 3.11
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.6-5
 - Added %%license line automatically
 
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 3.6-4
--   Renaming iperf to iperf3
-*   Thu Apr 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.6-3
--   Fixed "Source0" tag.
--   License verified and "License" tag updated.
--   Fixed changelog spacing.
--   Removed "%%define sha1".
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 3.6-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed Sep 05 2018 Ankit Jain <ankitja@vmware.com> 3.6-1
--   Upgraded to version 3.6
-*   Tue Mar 28 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.1.7-1
--   Upgraded to version 3.1.7
-*   Thu Oct 6 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.1.3-1
--   Upgraded to version 3.1.3
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.1.2-2
--   GA - Bump release of all rpms
-*   Tue Feb 23 2016 Anish Swaminathan <anishs@vmware.com>  3.1.2-1
--   Upgrade to 3.1.2
-*   Wed Oct 28 2015 Vinay Kulkarni <kulkarniv@vmware.com> 2.7.0-1
--   Add iperf v3.1 package.
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 3.6-4
+- Renaming iperf to iperf3
+
+* Thu Apr 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-3
+- Fixed "Source0" tag.
+- License verified and "License" tag updated.
+- Fixed changelog spacing.
+- Removed "%%define sha1".
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 3.6-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed Sep 05 2018 Ankit Jain <ankitja@vmware.com> 3.6-1
+- Upgraded to version 3.6
+
+* Tue Mar 28 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.1.7-1
+- Upgraded to version 3.1.7
+
+* Thu Oct 6 2016 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.1.3-1
+- Upgraded to version 3.1.3
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 3.1.2-2
+- GA - Bump release of all rpms
+
+* Tue Feb 23 2016 Anish Swaminathan <anishs@vmware.com>  3.1.2-1
+- Upgrade to 3.1.2
+
+* Wed Oct 28 2015 Vinay Kulkarni <kulkarniv@vmware.com> 2.7.0-1
+- Add iperf v3.1 package.
