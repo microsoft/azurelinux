@@ -1,32 +1,30 @@
-Summary:        Wayland protocols that add functionality not available in the core protocol
+Summary:        Wayland protocols that adds functionality not available in the core protocol
 Name:           wayland-protocols
-Version:        1.20
-Release:        3%{?dist}
+Version:        1.25
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://wayland.freedesktop.org/
 Source0:        https://wayland.freedesktop.org/releases/%{name}-%{version}.tar.xz
-
-BuildRequires:  make
+BuildRequires:  libffi-devel
+BuildRequires:  meson
 BuildRequires:  wayland-devel
-
 BuildArch:      noarch
 
 %description
-wayland-protocols contains Wayland protocols that add functionality not
+wayland-protocols contains Wayland protocols that adds functionality not
 available in the Wayland core protocol. Such protocols either adds
 completely new functionality, or extends the functionality of some other
 protocol either in Wayland core, or some other protocol in
 wayland-protocols.
 
 %package devel
-Summary:        Wayland protocols that add functionality not available in the core protocol
-
+Summary:        Wayland protocols that adds functionality not available in the core protocol
 Provides:       pkgconfig(wayland-protocols) = %{version}-%{release}
 
 %description devel
-wayland-protocols contains Wayland protocols that add functionality not
+wayland-protocols contains Wayland protocols that adds functionality not
 available in the Wayland core protocol. Such protocols either adds
 completely new functionality, or extends the functionality of some other
 protocol either in Wayland core, or some other protocol in
@@ -36,10 +34,11 @@ wayland-protocols.
 %autosetup
 
 %build
-%configure
+%meson
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 %files devel
 %license COPYING
@@ -48,15 +47,40 @@ wayland-protocols.
 %{_datadir}/%{name}/
 
 %changelog
-* Thu Dec 10 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20-3
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Tue Mar 15 2022 Hideyuki Nagase <hideyukn@microsoft.com> - 1.25-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
 - Added explicit "Provides" for "pkgconfig(*)".
+
+* Sat Feb 19 2022 Neal Gompa <ngompa@fedoraproject.org> - 1.25-1
+- Update to 1.25
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.24-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Nov 27 2021 Neal Gompa <ngompa@fedoraproject.org> - 1.24-1
+- Update to 1.24
+
+* Mon Sep 20 2021 Neal Gompa <ngompa@fedoraproject.org> - 1.23-1
+- Update to 1.23
+
+* Mon Sep 20 2021 Neal Gompa <ngompa@fedoraproject.org> - 1.22-1
+- Update to 1.22
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.21-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue May 04 2021 Kalev Lember <klember@redhat.com> - 1.21-1
+- Update to 1.21
+- Switch to meson build system
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.20-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.20-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Sat Feb 29 2020 Jonas Ådahl <jadahl@redhat.com> - 1.20-1
+* Sat Feb 29 2020 Jonas Ã…dahl <jadahl@redhat.com> - 1.20-1
 - Update to 1.20
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.18-2

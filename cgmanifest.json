@@ -29177,8 +29177,8 @@
         "type": "other",
         "other": {
           "name": "wayland",
-          "version": "1.18.0",
-          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-1.18.0.tar.xz"
+          "version": "1.20.0",
+          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-1.20.0.tar.xz"
         }
       }
     },
@@ -29187,8 +29187,8 @@
         "type": "other",
         "other": {
           "name": "wayland-protocols",
-          "version": "1.20",
-          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-protocols-1.20.tar.xz"
+          "version": "1.25",
+          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-protocols-1.25.tar.xz"
         }
       }
     },
