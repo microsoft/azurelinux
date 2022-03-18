@@ -22584,8 +22584,8 @@
         "type": "other",
         "other": {
           "name": "python-frozendict",
-          "version": "1.2",
-          "downloadUrl": "https://pypi.python.org/packages/source/f/frozendict/frozendict-1.2.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/Marco-Sulla/python-frozendict/releases/download/v2.3.0/frozendict-2.3.0.tar.gz"
         }
       }
     },
