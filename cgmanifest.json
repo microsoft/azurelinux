@@ -14333,8 +14333,8 @@
         "type": "other",
         "other": {
           "name": "nfs4-acl-tools",
-          "version": "0.3.5",
-          "downloadUrl": "http://linux-nfs.org/~bfields/nfs4-acl-tools/nfs4-acl-tools-0.3.5.tar.gz"
+          "version": "0.3.7",
+          "downloadUrl": "https://linux-nfs.org/~bfields/nfs4-acl-tools/nfs4-acl-tools-0.3.7.tar.gz"
         }
       }
     },
@@ -15614,18 +15614,8 @@
         "type": "other",
         "other": {
           "name": "orangefs",
-          "version": "2.9.7",
-          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/releases/2.9.7/source/orangefs-2.9.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ORBit2",
-          "version": "2.14.19",
-          "downloadUrl": "http://download.gnome.org/sources/ORBit2/2.14/ORBit2-2.14.19.tar.bz2"
+          "version": "2.9.8",
+          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-2.9.8.tar.gz"
         }
       }
     },

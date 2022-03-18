@@ -1,10 +1,10 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: orangefs
-Version: 2.9.7
-Release: 9%{?dist}
+Version: 2.9.8
+Release: 1%{?dist}
 Summary: Parallel network file system client
-URL: http://www.orangefs.org/
+URL: https://www.orangefs.org/
 # ASL 2.0 src/client/jni
 # BSD (2 clause) maint/config/ssl.m4
 # BSD (3 clause) src/client/usrint/fts.c
@@ -19,20 +19,20 @@ URL: http://www.orangefs.org/
 # zlib src/common/misc/md5.c
 # zlib src/common/misc/md5.h
 License: ASL 2.0 and BSD and GPLv2 and LGPLv2+ and LGPLv2 and MIT and OpenLDAP and Public Domain and zlib
+BuildRequires: make
 BuildRequires:  gcc
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(Term::ReadLine)
 BuildRequires: automake
 BuildRequires: bison flex libattr-devel openssl-devel
-BuildRequires: perl(Math::BigInt) perl(Getopt::Long)
+BuildRequires: perl(Math::BigInt) perl(Getopt::Long) perl(Term::ReadLine) perl(FindBin)
 BuildRequires: systemd
 BuildRequires: libselinux-devel
-BuildRequires: lmdb-devel fuse-devel
+BuildRequires: lmdb-devel
+BuildRequires: fuse-devel
 %ifnarch armv7hl
 BuildRequires: libibverbs-devel
 %endif
 
-Source0: https://s3.amazonaws.com/download.orangefs.org/releases/2.9.7/source/orangefs-%version.tar.gz
+Source0: https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-%version.tar.gz
 Source1: orangefs-server.service
 Source2: orangefs-client.service
 Source3: orangefs.conf
@@ -47,6 +47,8 @@ Patch1: orangefs-lmdb.patch
 # the server.  They would require editing and don't work with systemd,
 # so this removes them.
 Patch2: orangefs-no-start-stop.patch
+# Autoconf 2.71 fix, https://github.com/waltligon/orangefs/pull/87
+Patch3: orangefs-autotools-2.71.patch
 
 %global _hardened_build 1
 
@@ -60,14 +62,15 @@ and MPI-IO. \
 This package provides the pvfs2-client-core which is required to use \
 the kernel module.
 
+# Workaround for -fcommon issue
+# https://github.com/waltligon/orangefs/issues/80
+%define _legacy_common_support 1
+
 %description
 %desc
 
 %prep
-%autosetup -N -n orangefs-%version
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%autosetup -p1 -n orangefs-v.%version
 
 rm -r src/apps/devel/lmdb
 rm -r src/common/lmdb
@@ -76,7 +79,8 @@ rm src/client/webpack/ltmain.sh
 
 mv doc/man/pvfs2.conf.5 doc/man/orangefs.conf.5
 
-./prepare
+autoupdate -I maint/config
+autoreconf -vif -I maint/config
 
 %build
 export LDFLAGS="%{optflags} -Wl,--as-needed"
@@ -139,7 +143,7 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 %{_sbindir}/pvfs2-client-core
 %{_unitdir}/orangefs-client.service
 %{_libdir}/libpvfs2.so.2
-%{_libdir}/libpvfs2.so.%version
+%{_libdir}/libpvfs2.so.2.9.7
 %{_mandir}/man1/getmattr.1.gz
 %{_mandir}/man1/pvfs2-client-core.1.gz
 %{_mandir}/man1/pvfs2-client.1.gz
@@ -254,6 +258,9 @@ This package contains the FUSE client.
 %{_bindir}/pvfs2fuse
 
 %changelog
+* Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.8-1
+- Updating to version 2.9.8 using Fedora 36 spec (license:MIT) for guidance.
+
 * Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.7-9
 - License verified.
 
