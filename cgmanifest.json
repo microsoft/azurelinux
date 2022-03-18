@@ -3268,8 +3268,8 @@
         "type": "other",
         "other": {
           "name": "envoy",
-          "version": "1.21.0",
-          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.21.0.tar.gz"
+          "version": "1.14.4",
+          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.14.4.tar.gz"
         }
       }
     },
