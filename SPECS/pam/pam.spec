@@ -11,8 +11,8 @@ Distribution:   Mariner
 BuildRequires:  cracklib-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  audit-devel
-Requires:       cracklib
-Requires:       audit-libs
+Recommends:     audit-libs
+Recommends:     cracklib-dicts
 
 %description
 The Linux PAM package contains Pluggable Authentication Modules used to
@@ -99,7 +99,7 @@ EOF
 
 %changelog
 * Mon Mar 14 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.1-4
-- Add runtime requires for audit-libs to resolve boot issue
+- Add Recommends for audit-libs and cracklib-dicts to resolve circular dependency and boot issue
 
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.1-3
 - Build with audit support
