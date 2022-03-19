@@ -1,0 +1,42 @@
+diff -ru node-v16.14.0-orig/src/crypto/crypto_context.cc node-v16.14.0/src/crypto/crypto_context.cc
+--- node-v16.14.0-orig/src/crypto/crypto_context.cc	2022-02-08 04:37:50.000000000 -0800
++++ node-v16.14.0/src/crypto/crypto_context.cc	2022-02-25 09:17:21.964960342 -0800
+@@ -467,28 +467,16 @@
+       min_version = 0;
+       max_version = kMaxSupportedVersion;
+       method = TLS_client_method();
+-    } else if (sslmethod == "TLSv1_method") {
+-      min_version = TLS1_VERSION;
+-      max_version = TLS1_VERSION;
+-    } else if (sslmethod == "TLSv1_server_method") {
+-      min_version = TLS1_VERSION;
+-      max_version = TLS1_VERSION;
+-      method = TLS_server_method();
+-    } else if (sslmethod == "TLSv1_client_method") {
+-      min_version = TLS1_VERSION;
+-      max_version = TLS1_VERSION;
+-      method = TLS_client_method();
+-    } else if (sslmethod == "TLSv1_1_method") {
+-      min_version = TLS1_1_VERSION;
+-      max_version = TLS1_1_VERSION;
+-    } else if (sslmethod == "TLSv1_1_server_method") {
+-      min_version = TLS1_1_VERSION;
+-      max_version = TLS1_1_VERSION;
+-      method = TLS_server_method();
+-    } else if (sslmethod == "TLSv1_1_client_method") {
+-      min_version = TLS1_1_VERSION;
+-      max_version = TLS1_1_VERSION;
+-      method = TLS_client_method();
++    } else if (sslmethod == "TLSv1_method" ||
++               sslmethod == "TLSv1_server_method" ||
++               sslmethod == "TLSv1_client_method") {
++      THROW_ERR_TLS_INVALID_PROTOCOL_METHOD(env, "TLSv1 methods disabled");
++      return;
++    } else if (sslmethod == "TLSv1_1_method" ||
++               sslmethod == "TLSv1_1_server_method" ||
++               sslmethod == "TLSv1_1_client_method") {
++      THROW_ERR_TLS_INVALID_PROTOCOL_METHOD(env, "TLSv1_1 methods disabled");
++      return;
+     } else if (sslmethod == "TLSv1_2_method") {
+       min_version = TLS1_2_VERSION;
+       max_version = TLS1_2_VERSION;
