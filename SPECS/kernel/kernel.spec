@@ -4,7 +4,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.10.102.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -619,6 +619,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Mar 18 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-2
+- Disable CONFIG_FW_LOADER_USER_HELPER_FALLBACK
+
 * Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-1
 - Update source to 5.10.102.1
 - Apply CVE-2022-24958.patch
