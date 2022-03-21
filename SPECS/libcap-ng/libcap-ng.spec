@@ -69,6 +69,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.8.2-1
 - Upgrade to 0.8.2
+- License verified
 
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.9-4
 - Add compatibility provides for utils subpackage
