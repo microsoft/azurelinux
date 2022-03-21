@@ -1,7 +1,7 @@
 Summary:        Python Build Reasonableness
 Name:           python-pbr
 Version:        5.8.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,7 +42,7 @@ ln -s pbr %{buildroot}/%{_bindir}/pbr3
 
 %check
 pip3 install coverage hacking mock testrepository testresources testscenarios virtualenv wheel tox
-tox -e py39
+tox -e py%{python3_version_nodots}
 
 %files -n python3-pbr
 %defattr(-,root,root)
@@ -54,6 +54,9 @@ tox -e py39
 %{python3_sitelib}/pbr
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 5.8.1-2
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 5.8.1-1
 - Bump version to 5.8.1
 - Use `tox` instead of `setup.py test` to enable ptest

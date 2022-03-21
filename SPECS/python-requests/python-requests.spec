@@ -1,7 +1,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.27.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,7 +60,7 @@ perform the simplest of tasks.
 
 %check
 pip3 install tox
-LANG=en_US.UTF-8 tox -e py39
+LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 %files -n python3-requests
 %defattr(-,root,root)
@@ -69,6 +69,9 @@ LANG=en_US.UTF-8 tox -e py39
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 2.27.1-3
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.27.1-2
 - Switching dependencies: "python3-chardet" -> "python3-charset-normalizer".
 
