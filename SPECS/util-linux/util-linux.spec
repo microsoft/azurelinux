@@ -10,22 +10,18 @@ URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/a
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{name}-%{version}.tar.xz
 Source1:        runuser
 Source2:        runuser-l
-
 BuildRequires:  audit-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
-%if %{with_check}
-BuildRequires:  ncurses-term
-%endif
-
 Requires:       %{name}-devel = %{version}-%{release}
 Requires:       audit-libs
-
 Conflicts:      toybox
-
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
+%if %{with_check}
+BuildRequires:  ncurses-term
+%endif
 
 %description
 Utilities for handling file systems, consoles, partitions,
