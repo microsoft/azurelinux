@@ -21654,8 +21654,8 @@
         "type": "other",
         "other": {
           "name": "pyasn1-modules",
-          "version": "0.2.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/pyasn1-modules-0.2.2.tar.gz"
+          "version": "0.2.8",
+          "downloadUrl": "https://github.com/etingof/pyasn1-modules/archive/refs/tags/v0.2.8.tar.gz"
         }
       }
     },
