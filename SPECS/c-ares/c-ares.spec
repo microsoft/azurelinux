@@ -1,7 +1,7 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
 Version:        1.18.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,7 +50,7 @@ rm -f %{buildroot}/%{_libdir}/libcares.la
 # Reference: https://github.com/c-ares/c-ares/blob/main/ci/test.sh
 check_status=0
 PWD=$(pwd)
-export TEST_FILTER="--gtest_filter=-*LiveSearchANY*:*FamilyV4ServiceName*"
+export TEST_FILTER="--gtest_filter=-*LiveSearch*:*FamilyV4ServiceName*"
 TOOLSBIN=${PWD}/src/tools
 TESTDIR=${PWD}/test
 
@@ -113,6 +113,9 @@ fi
 %{_mandir}/man3/ares_*
 
 %changelog
+* Mon Mar 21 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.1-4
+- Drop all live DNS lookup from the check section to enable ptest in pipeline
+
 * Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.1-3
 - Add configure option `--enable-tests`
 - Use explicit testing as per official CI to enable ptest
