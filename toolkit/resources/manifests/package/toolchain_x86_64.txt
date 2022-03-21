@@ -107,8 +107,8 @@ glibc-iconv-2.34-3.cm2.x86_64.rpm
 glibc-lang-2.34-3.cm2.x86_64.rpm
 glibc-nscd-2.34-3.cm2.x86_64.rpm
 glibc-tools-2.34-3.cm2.x86_64.rpm
-gmock-1.11.0-1.cm2.x86_64.rpm
-gmock-devel-1.11.0-1.cm2.x86_64.rpm
+gmock-1.11.0-2.cm2.x86_64.rpm
+gmock-devel-1.11.0-2.cm2.x86_64.rpm
 gmp-6.2.1-2.cm2.x86_64.rpm
 gmp-debuginfo-6.2.1-2.cm2.x86_64.rpm
 gmp-devel-6.2.1-2.cm2.x86_64.rpm
@@ -122,9 +122,9 @@ gpgme-devel-1.16.0-1.cm2.x86_64.rpm
 grep-3.7-2.cm2.x86_64.rpm
 grep-debuginfo-3.7-2.cm2.x86_64.rpm
 grep-lang-3.7-2.cm2.x86_64.rpm
-gtest-1.11.0-1.cm2.x86_64.rpm
-gtest-debuginfo-1.11.0-1.cm2.x86_64.rpm
-gtest-devel-1.11.0-1.cm2.x86_64.rpm
+gtest-1.11.0-2.cm2.x86_64.rpm
+gtest-debuginfo-1.11.0-2.cm2.x86_64.rpm
+gtest-devel-1.11.0-2.cm2.x86_64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 gzip-1.11-1.cm2.x86_64.rpm
 gzip-debuginfo-1.11-1.cm2.x86_64.rpm
