@@ -1,8 +1,8 @@
 %define majver %(echo %{version} | cut -d. -f 1-2)
 Summary:        Compiler for the Vala programming language
 Name:           vala
-Version:        0.34.6
-Release:        4%{?dist}
+Version:        0.54.6
+Release:        1%{?dist}
 License:        LGPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,11 @@ URL:            https://wiki.gnome.org/Projects/Vala
 Source0:        http://download.gnome.org/sources/vala/%{majver}/vala-%{version}.tar.xz
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
+BuildRequires:  bison
+BuildRequires:  flex
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  libxslt
+BuildRequires:  graphviz-devel
 
 %description
 Vala is a programming language using modern high level abstractions without imposing additional
@@ -33,6 +38,40 @@ Requires:       %{name} = %{version}-%{release}
 %description tools
 %{summary}
 
+%package        doc
+Summary:        Documentation for %{name}
+License:        LGPLv2+
+BuildArch:      noarch
+Requires:       %{name} = %{version}-%{release}
+	
+%description    doc
+Vala is a new programming language that aims to bring modern programming
+language features to GNOME developers without imposing any additional
+runtime requirements and without using a different ABI compared to
+applications and libraries written in C.
+	
+This package contains documentation in a devhelp HTML book.
+
+%package -n valadoc
+Summary:        Vala documentation generator
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+	
+%description -n valadoc
+Valadoc is a documentation generator for generating API documentation from Vala
+source code.
+
+	
+%package -n     valadoc-devel
+Summary:        Development files for valadoc
+Requires:       valadoc%{?_isa} = %{version}-%{release}
+	
+%description -n valadoc-devel
+Valadoc is a documentation generator for generating API documentation from Vala
+source code.
+	
+The valadoc-devel package contains libraries and header files for
+developing applications that use valadoc.
+
 %prep
 %setup -q
 
@@ -51,7 +90,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 %license COPYING
 %dir %{_datadir}/vala-%{majver}
-%license COPYING
 %doc AUTHORS THANKS
 %{_datadir}/vala-%{majver}/*
 %{_libdir}/libvala-*.so.*
@@ -95,13 +133,37 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/valac
 %{_bindir}/valac-%{majver}
 %{_bindir}/vapigen*
-%{_bindir}/vapicheck*
 %{_libdir}/vala-*
 %{_mandir}/man1/vala-gen-introspect*
 %{_mandir}/man1/valac*
 %{_mandir}/man1/vapigen*
 
+%files doc
+%doc %{_datadir}/devhelp/books/vala-%{majver}
+
+%files -n valadoc
+%{_bindir}/valadoc
+%{_bindir}/valadoc-%{majver}
+%{_libdir}/libvaladoc-%{majver}.so.0*
+%{_libdir}/valadoc-%{majver}/
+%{_datadir}/valadoc-%{majver}/
+%{_mandir}/man1/valadoc-%{majver}.1*
+%{_mandir}/man1/valadoc.1*
+
+%files -n valadoc-devel	
+%{_includedir}/valadoc-%{majver}/
+%{_libdir}/libvaladoc-%{majver}.so
+%{_libdir}/pkgconfig/valadoc-%{majver}.pc
+
 %changelog
+* Mon Jan 24 2022 Henry Li <lihl@microsoft.com> - 0.54.6-1
+- Upgrade to version 0.54.6
+- Add bison, flex, gobject-introspection-devel, libxslt and graphviz-devel as BR
+- Add subpackages vala-doc, valadoc and valadoc-devel
+- Remove /usr/bin/vapicheck* since the files no longer exist
+- Remove duplicate %license COPYING from main package  
+- License Verified
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.34.6-4
 - Remove libtool archive files from final packaging
 

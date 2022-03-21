@@ -1,8 +1,7 @@
-%define sha1 cppunit=f1ab8986af7a1ffa6760f4bacf5622924639bf4a
 Summary:        C++ port of Junit test framework
 Name:           cppunit
 Version:        1.12.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +56,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.12.1-7
+- Remove unused `%%define sha1` lines
+- License verified
+
 * Mon Feb 08 2021 Henry Li <lihl@microsoft.com> - 1.12.1-6
 - Add cppunit as Requires for cppunit-devel
 
@@ -66,11 +69,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.12.1-4
 - Added %%license line automatically
 
-* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.12.1-3
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.12.1-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> 1.12.1-2
+* Fri Oct 13 2017 Alexey Makhalov <amakhalov@vmware.com> - 1.12.1-2
 - Use standard configure macros
 
-* Sun Mar 26 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.12.1-1
+* Sun Mar 26 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 1.12.1-1
 - Initial version of cppunit for Photon.

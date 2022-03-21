@@ -1,18 +1,15 @@
 Summary:        Irqbalance daemon
 Name:           irqbalance
-Version:        1.6.0
-Release:        3%{?dist}
+Version:        1.8.0
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/Irqbalance/irqbalance
 Group:          System Environment/Services
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/Irqbalance/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-
+Source0:        https://github.com/Irqbalance/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz   
 BuildRequires:  systemd-devel
 BuildRequires:  glib-devel
-
 Requires:       systemd
 Requires:       glib
 
@@ -59,26 +56,38 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/*
 
 %changelog
+* Tue Feb 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8.0-1
+- Update source to v1.8.0
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.6.0-3
 - Added %%license line automatically
 
-*   Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 1.6.0-2
--   Fix Source0 comment.
-*   Mon Mar 30 2020 Jon Slobodzian <joslobo@microsoft.com> 1.6.0-1
--   Updated to latest version to support NUMA. Verified license file.
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.4.0-3
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Mon Oct 22 2018 Ajay Kaher <akaher@vmware.com> 1.4.0-2
--   Adding BuildArch
-*   Fri Sep 07 2018 Ankit Jain <ankitja@vmware.com>  1.4.0-1
--   Updated the package to version 1.4.0
-*   Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com>  1.2.0-1
--   Updated the package to version 1.2.0
-*   Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com>  1.1.0-4
--   Change systemd dependency
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.1.0-3
--   GA - Bump release of all rpms
-*   Thu May 05 2016 Kumar Kaushik <kaushikk@vmware.com> 1.1.0-2
--   Adding package upgrade support.
-*   Fri Jan 15 2016 Alexey Makhalov <amakhalov@vmware.com> 1.1.0-1
--   Initial version
+* Thu Apr 09 2020 Joe Schmitt <joschmit@microsoft.com> 1.6.0-2
+- Fix Source0 comment.
+
+* Mon Mar 30 2020 Jon Slobodzian <joslobo@microsoft.com> 1.6.0-1
+- Updated to latest version to support NUMA. Verified license file.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.4.0-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Mon Oct 22 2018 Ajay Kaher <akaher@vmware.com> 1.4.0-2
+- Adding BuildArch
+
+* Fri Sep 07 2018 Ankit Jain <ankitja@vmware.com>  1.4.0-1
+- Updated the package to version 1.4.0
+
+* Mon Apr 03 2017 Divya Thaluru <dthaluru@vmware.com>  1.2.0-1
+- Updated the package to version 1.2.0
+
+* Fri Nov 18 2016 Anish Swaminathan <anishs@vmware.com>  1.1.0-4
+- Change systemd dependency
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.1.0-3
+- GA - Bump release of all rpms
+
+* Thu May 05 2016 Kumar Kaushik <kaushikk@vmware.com> 1.1.0-2
+- Adding package upgrade support.
+
+* Fri Jan 15 2016 Alexey Makhalov <amakhalov@vmware.com> 1.1.0-1
+- Initial version

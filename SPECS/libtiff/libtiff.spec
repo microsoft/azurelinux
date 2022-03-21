@@ -1,19 +1,17 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
-Version:        4.1.0
-Release:        3%{?dist}
+Version:        4.3.0
+Release:        1%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
-# CVE-2020-35522 also covers 35521.
-Patch0: CVE-2020-35521.nopatch
-Patch1: CVE-2020-35522.patch
-Patch2: CVE-2020-35523.patch
-Patch3: CVE-2020-35524.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
+BuildRequires:  libtool
 Requires:       libjpeg-turbo
 Provides:       %{name}-tools = %{version}-%{release}
 
@@ -29,16 +27,13 @@ Requires:       libjpeg-turbo-devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q -n libtiff-v%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -n libtiff-v%{version}
 
 %build
-sh autogen.sh
-%configure \
-    --disable-static
+export CFLAGS="%{optflags} -fno-strict-aliasing"
+sed -i "s/for file.*/for false/g" autogen.sh
+./autogen.sh
+%configure --disable-static
 make %{?_smp_mflags}
 
 %install
@@ -67,6 +62,13 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
+* Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 4.3.0-1
+- Upgrade to 4.3.0
+- Remove patches that no longer apply
+- Add autoconf, libtool, automake as BR
+- Use autosetup and modify build steps
+- License Verified
+
 * Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.1.0-3
 - Merge the following releases from 1.0 to dev branch
 - joslobo@microsoft.com, 4.1.0-2: Add patches for CVE-2020-35521, CVE-2020-35522, CVE-2020-35523, CVE-2020-35524

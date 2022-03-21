@@ -1,0 +1,743 @@
+No pyproject.toml, nothing installed:
+  installed:
+    # empty
+  except: FileNotFoundError
+
+Nothing installed yet:
+  installed:
+    # empty
+  pyproject.toml: |
+    # empty
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+  except: FileNotFoundError
+
+Insufficient version of setuptools:
+  installed:
+    setuptools: 5
+    wheel: 1
+    toml: 1
+  pyproject.toml: |
+    # empty
+  setup.py: |
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+  result: 0
+
+No pyproject.toml, empty setup.py:
+  installed:
+    setuptools: 50
+    wheel: 1
+  include_runtime: false
+  setup.py: |
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+  result: 0
+
+Default build system, empty setup.py:
+  installed:
+    setuptools: 50
+    wheel: 1
+    toml: 1
+  include_runtime: false
+  pyproject.toml: |
+    # empty
+  setup.py: |
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+  result: 0
+
+pyproject.toml with build-backend and setup.py:
+  generate_extras: true
+  installed:
+    setuptools: 50
+    wheel: 1
+    toml: 1
+  setup.py: |
+    # empty
+  pyproject.toml: |
+    [build-system]
+    requires = [
+        "foo",
+    ]
+    build-backend = "foo.build"
+  expected: |
+    python3dist(foo)
+  result: 0
+
+Erroring setup.py:
+  installed:
+    setuptools: 50
+    wheel: 1
+  setup.py: |
+    exit(77)
+  result: 77
+
+Bad character in version:
+  installed:
+    toml: 1
+  pyproject.toml: |
+    [build-system]
+    requires = ["pkg == 0.$.^.*"]
+  except: ValueError
+
+Single value version with unsupported compatible operator:
+  installed:
+    toml: 1
+  pyproject.toml: |
+    [build-system]
+    requires = ["pkg ~= 42", "foo"]
+    build-backend = "foo.build"
+  except: ValueError
+
+Asterisk in version with unsupported compatible operator:
+  installed:
+    toml: 1
+  pyproject.toml: |
+    [build-system]
+    requires = ["pkg ~= 0.1.*", "foo"]
+    build-backend = "foo.build"
+  except: ValueError
+
+Local path as requirement:
+  installed:
+    toml: 1
+  pyproject.toml: |
+    [build-system]
+    requires = ["./pkg-1.2.3.tar.gz", "foo"]
+    build-backend = "foo.build"
+  except: ValueError
+
+Pip's egg=pkgName requirement not in requirements file:
+  installed:
+    toml: 1
+  pyproject.toml: |
+    [build-system]
+    requires = ["git+https://github.com/monty/spam.git@master#egg=spam", "foo"]
+    build-backend = "foo.build"
+  except: ValueError
+
+URL without egg fragment as requirement:
+  installed:
+    toml: 1
+  pyproject.toml: |
+    [build-system]
+    requires = ["git+https://github.com/pkg-dev/pkg.git@96dbe5e3", "foo"]
+    build-backend = "foo.build"
+  except: ValueError
+
+Build system dependencies in pyproject.toml with extras:
+  generate_extras: true
+  installed:
+    setuptools: 50
+    wheel: 1
+    toml: 1
+  pyproject.toml: |
+    [build-system]
+    requires = [
+        "foo",
+        "bar[bAz] > 5",
+        "ne!=1",
+        "ge>=1.2.0",
+        "le <= 1.2.3",
+        "lt < 1.2.3.4      ",
+        "    gt > 1.2.3.4.5",
+        "compatible ~= 0.4.0",
+        "equal == 0.5.0",
+        "arbitrary_equal === 0.6.0",
+        "asterisk_equal == 0.6.*",
+        "appdirs@https://github.com/ActiveState/appdirs/archive/8eacfa312d77aba28d483fbfb6f6fc54099622be.zip",
+        "multi[Extras1,Extras2] == 6.0",
+        "combo >2, <5, != 3.0.0",
+        "py2 ; python_version < '2.7'",
+        "py3 ; python_version > '3.0'",
+    ]
+    build-backend = "foo.build"
+  expected: |
+    python3dist(foo)
+    python3dist(bar) > 5.0
+    python3dist(bar[baz]) > 5.0
+    (python3dist(ne) < 1 or python3dist(ne) > 1)
+    python3dist(ge) >= 1.2
+    python3dist(le) <= 1.2.3
+    python3dist(lt) < 1.2.3.4~~
+    python3dist(gt) > 1.2.3.4.5.0
+    (python3dist(compatible) >= 0.4 with python3dist(compatible) < 0.5)
+    python3dist(equal) = 0.5
+    python3dist(arbitrary-equal) = 0.6
+    (python3dist(asterisk-equal) >= 0.6 with python3dist(asterisk-equal) < 0.7)
+    python3dist(appdirs)
+    python3dist(multi) = 6
+    python3dist(multi[extras1]) = 6
+    python3dist(multi[extras2]) = 6
+    ((python3dist(combo) < 3 or python3dist(combo) > 3) with python3dist(combo) < 5~~ with python3dist(combo) > 2.0)
+    python3dist(py3)
+  stderr_contains: "WARNING: Simplifying 'appdirs@https://github.com/ActiveState/appdirs/archive/8eacfa312d77aba28d483fbfb6f6fc54099622be.zip' to 'appdirs'."
+  result: 0
+
+Build system dependencies in pyproject.toml without extras:
+  generate_extras: false
+  installed:
+    setuptools: 50
+    wheel: 1
+    toml: 1
+  pyproject.toml: |
+    [build-system]
+    requires = [
+        "bar[Baz] > 5",
+        "multi[extras1,extras2] == 6.0",
+    ]
+    build-backend = "foo.build"
+  expected: |
+    python3dist(bar) > 5.0
+    python3dist(multi) = 6
+  result: 0
+
+Default build system, build dependencies in setup.py:
+  installed:
+    setuptools: 50
+    wheel: 1
+  include_runtime: false
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+        setup_requires=['foo', 'bar!=2', 'baz~=1.1.1'],
+        install_requires=['inst'],
+    )
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(foo)
+    (python3dist(bar) < 2 or python3dist(bar) > 2)
+    (python3dist(baz) >= 1.1.1 with python3dist(baz) < 1.2)
+  result: 0
+
+Default build system, run dependencies in setup.py:
+  installed:
+    setuptools: 50
+    wheel: 1
+    pyyaml: 1
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+        setup_requires=['pyyaml'],  # nb. setuptools will try to install this
+        install_requires=['inst > 1', 'inst2 < 3'],
+    )
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(pyyaml)
+    python3dist(inst) > 1.0
+    python3dist(inst2) < 3~~
+  result: 0
+
+Run dependencies with extras (not selected):
+  installed:
+    setuptools: 50
+    wheel: 1
+    pyyaml: 1
+  setup.py: &pytest_setup_py |
+        # slightly abriged copy of pytest's setup.py
+        from setuptools import setup
+
+        INSTALL_REQUIRES = [
+            "py>=1.5.0",
+            "six>=1.10.0",
+            "setuptools",
+            "attrs>=17.4.0",
+            'more-itertools>=4.0.0,<6.0.0;python_version<="2.7"',
+            'more-itertools>=4.0.0;python_version>"2.7"',
+            "atomicwrites>=1.0",
+            'funcsigs>=1.0;python_version<"3.0"',
+            'pathlib2>=2.2.0;python_version<"3.6"',
+            'colorama;sys_platform=="win32"',
+            "pluggy>=0.11",
+        ]
+
+        def main():
+            setup(
+                setup_requires=["setuptools>=40.0"],
+                # fmt: off
+                extras_require={
+                    "testing": [
+                        "argcomplete",
+                        "hypothesis>=3.56",
+                        "nose",
+                        "requests",
+                        "mock;python_version=='2.7'",
+                    ],
+                },
+                # fmt: on
+                install_requires=INSTALL_REQUIRES,
+            )
+
+        if __name__ == "__main__":
+            main()
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(setuptools) >= 40
+    python3dist(py) >= 1.5
+    python3dist(six) >= 1.10
+    python3dist(setuptools)
+    python3dist(attrs) >= 17.4
+    python3dist(atomicwrites) >= 1
+    python3dist(pluggy) >= 0.11
+    python3dist(more-itertools) >= 4
+  result: 0
+
+Run dependencies with extras (selected):
+  installed:
+    setuptools: 50
+    wheel: 1
+    pyyaml: 1
+  include_runtime: true
+  extras:
+    - testing
+  setup.py: *pytest_setup_py
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(setuptools) >= 40
+    python3dist(py) >= 1.5
+    python3dist(six) >= 1.10
+    python3dist(setuptools)
+    python3dist(attrs) >= 17.4
+    python3dist(atomicwrites) >= 1
+    python3dist(pluggy) >= 0.11
+    python3dist(more-itertools) >= 4
+    python3dist(argcomplete)
+    python3dist(hypothesis) >= 3.56
+    python3dist(nose)
+    python3dist(requests)
+  result: 0
+
+Run dependencies with multiple extras:
+  installed:
+    setuptools: 50
+    wheel: 1
+    pyyaml: 1
+  include_runtime: true
+  generate_extras: true
+  extras:
+    - testing,more-testing
+    - even-more-testing , cool-feature
+  setup.py: |
+    from setuptools import setup
+    setup(
+        extras_require={
+            'testing': ['dep1'],
+            'more-testing': ['dep2'],
+            'even-more-testing': ['dep3'],
+            'cool-feature': ['dep4[FOO,BAR]'],
+        },
+    )
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(dep4)
+    python3dist(dep4[bar])
+    python3dist(dep4[foo])
+    python3dist(dep3)
+    python3dist(dep2)
+    python3dist(dep1)
+  result: 0
+
+Tox dependencies:
+  installed:
+    setuptools: 50
+    wheel: 1
+    tox: 3.5.3
+    tox-current-env: 0.0.6
+  toxenv:
+    - py3
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+        install_requires=['inst'],
+    )
+  tox.ini: |
+    [tox]
+    envlist = py36,py37,py38
+    [testenv]
+    deps =
+        toxdep1
+        toxdep2
+    commands =
+        true
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(tox-current-env) >= 0.0.6
+    python3dist(toxdep1)
+    python3dist(toxdep2)
+    python3dist(inst)
+  result: 0
+
+Tox extras:
+  installed:
+    setuptools: 50
+    wheel: 1
+    tox: 3.5.3
+    tox-current-env: 0.0.6
+  generate_extras: true
+  toxenv:
+    - py3
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+        install_requires=['inst'],
+        extras_require={
+            'extra1':  ['dep11 > 11', 'dep12'],
+            'extra2': ['dep21', 'dep22', 'dep23', 'extra_dep[EXTRA_DEP]'],
+            'nope': ['nopedep'],
+        }
+    )
+  tox.ini: |
+    [tox]
+    envlist = py36,py37,py38
+    [testenv]
+    deps =
+        toxdep
+    extras =
+        extra2
+        extra1
+    commands =
+        true
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(tox-current-env) >= 0.0.6
+    python3dist(toxdep)
+    python3dist(inst)
+    python3dist(dep11) > 11.0
+    python3dist(dep12)
+    python3dist(dep21)
+    python3dist(dep22)
+    python3dist(dep23)
+    python3dist(extra-dep)
+    python3dist(extra-dep[extra_dep])
+  result: 0
+
+Tox provision unsatisfied:
+  installed:
+    setuptools: 50
+    wheel: 1
+    tox: 3.5.3
+    tox-current-env: 0.0.6
+  toxenv:
+    - py3
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+        install_requires=['inst'],
+    )
+  tox.ini: |
+    [tox]
+    minversion = 3.999
+    requires =
+        setuptools > 40
+        wheel > 2
+    [testenv]
+    deps =
+        toxdep1
+        toxdep2
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(tox-current-env) >= 0.0.6
+    python3dist(tox) >= 3.999
+    python3dist(setuptools) > 40.0
+    python3dist(wheel) > 2.0
+  result: 0
+
+Tox provision satisfied:
+  installed:
+    setuptools: 50
+    wheel: 1
+    tox: 3.5.3
+    tox-current-env: 0.0.6
+  toxenv:
+    - py3
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+        install_requires=['inst'],
+    )
+  tox.ini: |
+    [tox]
+    minversion = 3.5
+    requires =
+        setuptools > 40
+    [testenv]
+    deps =
+        toxdep1
+        toxdep2
+  expected: |
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+    python3dist(tox-current-env) >= 0.0.6
+    python3dist(tox) >= 3.5
+    python3dist(setuptools) > 40.0
+    python3dist(toxdep1)
+    python3dist(toxdep2)
+    python3dist(inst)
+  result: 0
+
+Default build system, unmet deps in requirements file:
+  installed:
+    setuptools: 50
+    wheel: 1
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+    )
+  requirements.txt: |
+    lxml
+    ncclient
+    cryptography
+    paramiko
+    SQLAlchemy
+  requirement_files:
+    - requirements.txt
+  expected: |
+    python3dist(lxml)
+    python3dist(ncclient)
+    python3dist(cryptography)
+    python3dist(paramiko)
+    python3dist(sqlalchemy)
+  result: 0
+
+Default build system, met deps in requirements file:
+  installed:
+    setuptools: 50
+    wheel: 1
+    lxml: 3.9
+    ncclient: 1
+    cryptography: 2
+    paramiko: 1
+    SQLAlchemy: 1.0.90
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+    )
+  requirements.txt: |
+    lxml!=3.7.0,>=2.3    # OF-Config
+    ncclient  # OF-Config
+    cryptography!=1.5.2  # Required by paramiko
+    paramiko  # NETCONF, BGP speaker (SSH console)
+    SQLAlchemy>=1.0.10,<1.1.0  # Zebra protocol service
+  requirement_files:
+    - requirements.txt
+  expected: |
+    ((python3dist(lxml) < 3.7 or python3dist(lxml) > 3.7) with python3dist(lxml) >= 2.3)
+    python3dist(ncclient)
+    (python3dist(cryptography) < 1.5.2 or python3dist(cryptography) > 1.5.2)
+    python3dist(paramiko)
+    (python3dist(sqlalchemy) < 1.1~~ with python3dist(sqlalchemy) >= 1.0.10)
+    python3dist(setuptools) >= 40.8
+    python3dist(wheel)
+    python3dist(wheel)
+  result: 0
+
+With pyproject.toml, requirements file and with -N option:
+  use_build_system: false
+  installed:
+    setuptools: 50
+    wheel: 1
+    toml: 1
+    lxml: 3.9
+    ncclient: 1
+    cryptography: 2
+    paramiko: 1
+    SQLAlchemy: 1.0.90
+  pyproject.toml: |
+    [build-system]
+    requires = [
+        "foo",
+    ]
+    build-backend = "foo.build"
+  requirements.txt: |
+    lxml
+    ncclient
+    cryptography
+    paramiko
+    SQLAlchemy
+    git+https://github.com/monty/spam.git@master#egg=spam
+  requirement_files:
+    - requirements.txt
+  expected: |
+    python3dist(lxml)
+    python3dist(ncclient)
+    python3dist(cryptography)
+    python3dist(paramiko)
+    python3dist(sqlalchemy)
+    python3dist(spam)
+  stderr_contains: "WARNING: Simplifying 'spam@git+https://github.com/monty/spam.git@master#egg=spam' to 'spam'."
+  result: 0
+
+With pyproject.toml, requirements file and without -N option:
+  use_build_system: true
+  installed:
+    setuptools: 50
+    wheel: 1
+    toml: 1
+    lxml: 3.9
+    ncclient: 1
+    cryptography: 2
+    paramiko: 1
+    SQLAlchemy: 1.0.90
+    argcomplete: 1
+    hypothesis: 1
+  pyproject.toml: |
+    [build-system]
+    requires = [
+        "foo",
+    ]
+    build-backend = "foo.build"
+  requirements.txt: |
+    lxml
+    ncclient
+    cryptography
+    paramiko
+    SQLAlchemy
+  requirements1.in: |
+    argcomplete
+    hypothesis
+  requirement_files:
+    - requirements.txt
+    - requirements1.in
+  expected: |
+    python3dist(lxml)
+    python3dist(ncclient)
+    python3dist(cryptography)
+    python3dist(paramiko)
+    python3dist(sqlalchemy)
+    python3dist(argcomplete)
+    python3dist(hypothesis)
+    python3dist(foo)
+  result: 0
+
+Value error if -N and -r arguments are present:
+  installed:
+    # empty
+  include_runtime: true
+  use_build_system: false
+  except: ValueError
+
+Value error if -N and -e arguments are present:
+  installed:
+    # empty
+  toxenv:
+    - py3
+  use_build_system: false
+  except: ValueError
+
+
+Weird and complex requirements file:
+  installed:
+    setuptools: 50
+    wheel: 1
+  setup.py: |
+    from setuptools import setup
+    setup(
+        name='test',
+        version='0.1',
+    )
+  requirements.txt: |
+    Normal_Req ~= 1.2.0
+
+    good@git+https://github.com/monty/spam.git@master#egg=bad
+    git+https://github.com/monty/spam.git@master#egg=ugly
+
+    this-name-is-too-\
+    long-for-this-file<\
+    =30  # even names and operators can be split
+
+    # this is not a multi-line comment \
+    some-dep
+    other-dep  # but this *is* a multi-line coment \
+    so any garbage can be here
+    dep-a # and this comment ends with the blank line below \
+
+    dep-b
+    -r requirements2.txt
+    ${PACKAGE}${WANTED_VERSION}
+  requirements2.txt: |
+    dep-from-included-file
+  requirement_files:
+    - requirements.txt
+  environ:
+    PACKAGE: package
+    WANTED_VERSION: -from-environ >= 1.2.3
+  expected: |
+    (python3dist(normal-req) >= 1.2 with python3dist(normal-req) < 1.3)
+    python3dist(good)
+    python3dist(ugly)
+    python3dist(this-name-is-too-long-for-this-file) <= 30
+    python3dist(some-dep)
+    python3dist(other-dep)
+    python3dist(dep-a)
+    python3dist(dep-b)
+    python3dist(dep-from-included-file)
+    python3dist(package-from-environ) >= 1.2.3
+  stderr_contains:
+  - "WARNING: Simplifying 'good@git+https://github.com/monty/spam.git@master#egg=bad' to 'good'."
+  # XXX: pyproject_requirements_txt adds a prefix that's not actually in the source;
+  # but that's good enough:
+  - "WARNING: Simplifying 'ugly@git+https://github.com/monty/spam.git@master#egg=ugly' to 'ugly'."
+  result: 0
+
+
+Pre-releases are accepted:
+  installed:
+    setuptools: 50
+    wheel: 1
+    toml: 1
+    cffi: 1.15.0rc2
+  pyproject.toml: |
+    [build-system]
+    requires = [
+        "setuptools",
+        "wheel",
+        "cffi",
+    ]
+    build-backend = "setuptools.build_meta"
+  expected: |
+    python3dist(setuptools)
+    python3dist(wheel)
+    python3dist(cffi)
+    python3dist(wheel)
+  stderr_contains: "Requirement satisfied: cffi"
+  result: 0

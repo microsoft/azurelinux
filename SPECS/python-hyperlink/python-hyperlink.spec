@@ -1,14 +1,14 @@
 Summary:        provides a pure-Python implementation of immutable URLs
 Name:           python-hyperlink
-Version:        19.0.0
-Release:        4%{?dist}
+Version:        21.0.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/python-hyper/hyperlink
-#Source0:       https://github.com/python-hyper/hyperlink/archive/v%{version}.tar.gz
-Source0:        https://github.com/python-hyper/hyperlink/archive/%{name}-%{version}.tar.gz
+#Source0:       https://github.com/python-hyper/hyperlink/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -49,6 +49,10 @@ pytest
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 14 2022 Nick Samson <nisamson@microsoft.com> - 21.0.0-1
+- Updated to 21.0.0
+- Updated URL and Source0 to reflect github change.
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 19.0.0-4
 - Replace easy_install usage with pip in %%check sections
 

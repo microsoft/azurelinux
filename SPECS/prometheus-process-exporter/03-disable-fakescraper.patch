@@ -1,0 +1,48 @@
+Description: Disable once-to-stdout-delay command flag
+ This flag would require vendoring / patching in another insignificant package,
+ so instead we simply disable it for now.
+Author: Daniel Swarbrick <daniel.swarbrick@cloud.ionos.com>
+Forwarded: not-needed
+---
+ cmd/process-exporter/main.go |   15 ---------------
+ 1 file changed, 15 deletions(-)
+
+--- a/cmd/process-exporter/main.go
++++ b/cmd/process-exporter/main.go
+@@ -9,9 +9,7 @@ import (
+ 	"os"
+ 	"regexp"
+ 	"strings"
+-	"time"
+ 
+-	"github.com/ncabatoff/fakescraper"
+ 	common "github.com/ncabatoff/process-exporter"
+ 	"github.com/ncabatoff/process-exporter/collector"
+ 	"github.com/ncabatoff/process-exporter/config"
+@@ -150,8 +148,6 @@ func main() {
+ 			"Address on which to expose metrics and web interface.")
+ 		metricsPath = flag.String("web.telemetry-path", "/metrics",
+ 			"Path under which to expose metrics.")
+-		onceToStdoutDelay = flag.Duration("once-to-stdout-delay", 0,
+-			"Don't bind, just wait this much time, print the metrics once to stdout, and exit")
+ 		procNames = flag.String("procnames", "",
+ 			"comma-separated list of process names to monitor")
+ 		procfsPath = flag.String("procfs", "/proc",
+@@ -248,17 +244,6 @@ func main() {
+ 
+ 	prometheus.MustRegister(pc)
+ 
+-	if *onceToStdoutDelay != 0 {
+-		// We throw away the first result because that first collection primes the pump, and
+-		// otherwise we won't see our counter metrics.  This is specific to the implementation
+-		// of NamedProcessCollector.Collect().
+-		fscraper := fakescraper.NewFakeScraper()
+-		fscraper.Scrape()
+-		time.Sleep(*onceToStdoutDelay)
+-		fmt.Print(fscraper.Scrape())
+-		return
+-	}
+-
+ 	http.Handle(*metricsPath, promhttp.Handler())
+ 
+ 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

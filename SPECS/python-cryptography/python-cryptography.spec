@@ -1,13 +1,16 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        3.3.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/cryptography
 Source0:        https://pypi.io/packages/source/c/cryptography/cryptography-%{version}.tar.gz
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 Cryptography is a Python library which exposes cryptographic recipes and primitives.
@@ -51,7 +54,8 @@ openssl req \
     -out mariner.cert
 openssl rsa -in mariner.key -out mariner.pem
 mv mariner.pem %{_sysconfdir}/ssl/certs
-%python3 setup.py test
+pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
+%{__python3} setup.py test
 
 %files -n python3-cryptography
 %defattr(-,root,root,-)
@@ -59,6 +63,10 @@ mv mariner.pem %{_sysconfdir}/ssl/certs
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 3.3.2-3
+- Add and explict BR on 'pip'
+- Install ptest dependecies
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.3.2-2
 - Add license to python3 package
 - Remove python2 package

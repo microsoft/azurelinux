@@ -126,8 +126,7 @@
                 "path/to/extraPackages.json"
             ],
             "KernelOptions": {
-                "default": "kernel",
-                "hyperv":  "kernel-hyperv"
+                "default": "kernel"
             },
             "AdditionalFiles": {
                 "local/path/file1": "/final/system/path",
@@ -213,8 +212,7 @@
                 "path/to/packages.json"
             ],
             "KernelOptions": {
-                "default": "kernel",
-                "hyperv":  "kernel-hyperv"
+                "default": "kernel"
             },
             "Hostname": "Mariner-TestA",
             "Users": [
@@ -246,8 +244,7 @@
                 "path/to/packages.json"
             ],
             "KernelOptions": {
-                "default": "kernel",
-                "hyperv":  "kernel-hyperv"
+                "default": "kernel"
             },
             "Hostname": "Mariner-TestB",
             "Users": [

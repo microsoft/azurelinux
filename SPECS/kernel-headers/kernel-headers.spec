@@ -1,7 +1,7 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.2.1
-Release:        2%{?dist}
+Version:        5.15.26.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,7 +9,6 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
-Patch0:         0002-add-linux-syscall-license-info.patch
 # Historical name shipped by other distros
 Provides:       glibc-kernheaders = %{version}-%{release}
 BuildArch:      noarch
@@ -19,7 +18,6 @@ The Linux API Headers expose the kernel's API for use by Glibc.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
-%patch0 -p1
 
 %build
 make mrproper
@@ -39,6 +37,33 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Tue Mar 08 2022 cameronbaird <cameronbaird@microsoft.com> - 5.15.26.1-1
+- Update source to 5.15.26.1
+
+* Mon Mar 07 2022 George Mileka <gmileka@microsoft.com> - 5.15.18.1-5
+- Bump release number to match kernel release
+
+* Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 5.15.18.1-4
+- Bump release number to match kernel release
+
+* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-3
+- Bump release number to match kernel release
+
+* Thu Feb 24 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.15.18.1-2
+- Bump release number to match kernel release
+
+* Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
+- Update source to 5.15.18.1
+
+* Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 5.15.2.1-5
+- Bump release number to match kernel release
+
+* Wed Feb 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-4
+- Bump release number to match kernel release
+
+* Thu Jan 27 2022 Daniel Mihai <dmihai@microsoft.com> - 5.15.2.1-3
+- Bump release number to match kernel release
+
 * Sun Jan 23 2022 Chris Co <chrco@microsoft.com> - 5.15.2.1-2
 - Bump release number to match kernel release
 

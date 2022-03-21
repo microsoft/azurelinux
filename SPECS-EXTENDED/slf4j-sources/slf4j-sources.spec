@@ -22,10 +22,10 @@ Distribution:   Mariner
 %global base_name slf4j
 Name:           %{base_name}-sources
 Version:        1.7.30
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        SLF4J Source JARs
 # the log4j-over-slf4j and jcl-over-slf4j submodules are ASL 2.0, rest is MIT
-License:        MIT AND Apache-2.0
+License:        ASL 2.0 and MIT
 Group:          Development/Libraries/Java
 URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{base_name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -46,10 +46,11 @@ cp -p %{SOURCE1} APACHE-LICENSE
 # Compat symlinks
 %{mvn_file} ':{*}' %{base_name}/@1
 %{mvn_package} :::sources:
+%pom_disable_module slf4j-log4j12
 
 %build
 rm -f */src/main/resources/META-INF/MANIFEST.MF
-for i in api ext jcl jdk14 log4j12 nop simple; do
+for i in api ext jcl jdk14 nop simple; do
   mkdir -p %{base_name}-${i}/target
   jar cf %{base_name}-${i}/target/%{base_name}-${i}-%{version}-sources.jar -C %{base_name}-${i}/src/main/java .
   jar uf %{base_name}-${i}/target/%{base_name}-${i}-%{version}-sources.jar -C %{base_name}-${i}/src/main/resources .
@@ -64,7 +65,7 @@ done
 
 %install
 install -dm 0755 %{buildroot}%{_javadir}/%{base_name}
-for i in api ext jcl jdk14 log4j12 nop simple; do
+for i in api ext jcl jdk14 nop simple; do
   install -pm 0644 %{base_name}-${i}/target/%{base_name}-${i}-%{version}-sources.jar \
     %{buildroot}%{_javadir}/%{base_name}/%{base_name}-${i}-sources.jar
   %add_maven_depmap org.slf4j:%{base_name}-${i}:jar:sources:%{version} %{base_name}/%{base_name}-${i}-sources.jar
@@ -79,6 +80,10 @@ done
 %license LICENSE.txt APACHE-LICENSE
 
 %changelog
+* Tue Jan 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.30-4
+- Removing dependency on "log4j12".
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.30-3
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

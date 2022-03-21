@@ -1,22 +1,19 @@
+Summary:        C implementation of the Git core methods as a library with a solid API
+Name:           libgit2
+Version:        1.1.0
+Release:        5%{?dist}
+License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:           libgit2
-Version:        1.0.1
-Release:        4%{?dist}
-Summary:        C implementation of the Git core methods as a library with a solid API
-License:        GPLv2 with exceptions
 URL:            https://libgit2.org/
 Source0:        https://github.com/libgit2/libgit2/archive/v%{version}/%{name}-%{version}.tar.gz
-# https://github.com/extrawurst/gitui/issues/128
-# https://github.com/libgit2/libgit2/commit/d62e44cb8218840a0291fb5fbb7c5106e1e35a12
-Patch0001:      0001-checkout-Fix-removing-untracked-files-by-path-in-sub.patch
 
-BuildRequires:  gcc
 BuildRequires:  cmake >= 3.5.1
-BuildRequires:  ninja-build
+BuildRequires:  gcc
 BuildRequires:  http-parser-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libssh2-devel
+BuildRequires:  ninja-build
 BuildRequires:  openssl-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  python3
@@ -79,6 +76,10 @@ rm -vr deps
 %{_includedir}/git2/
 
 %changelog
+* Tue Jan 25 2022 Kate Goldenring <kagold@microsoft.com> - 1.1.0-1
+- Update to 1.1.0
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.0.1-4
 - Remove epoch
 

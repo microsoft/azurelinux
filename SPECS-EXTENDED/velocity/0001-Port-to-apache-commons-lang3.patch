@@ -1,0 +1,464 @@
+From bf0462e3c293863947dde1c22a62c3d4a187a70c Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 31 Oct 2019 14:35:40 +0100
+Subject: [PATCH 1/2] Port to apache-commons-lang3
+
+---
+ pom.xml                                                     | 6 +++---
+ .../velocity/app/event/implement/EscapeHtmlReference.java   | 4 ++--
+ .../app/event/implement/EscapeJavaScriptReference.java      | 4 ++--
+ .../velocity/app/event/implement/EscapeSqlReference.java    | 5 +++--
+ .../velocity/app/event/implement/EscapeXmlReference.java    | 2 +-
+ src/java/org/apache/velocity/runtime/RuntimeInstance.java   | 2 +-
+ .../org/apache/velocity/runtime/VelocimacroFactory.java     | 2 +-
+ src/java/org/apache/velocity/runtime/directive/Block.java   | 2 +-
+ .../org/apache/velocity/runtime/directive/RuntimeMacro.java | 2 +-
+ src/java/org/apache/velocity/runtime/parser/Parser.java     | 2 +-
+ .../apache/velocity/runtime/parser/ParserTokenManager.java  | 2 +-
+ .../apache/velocity/runtime/parser/node/ASTDirective.java   | 2 +-
+ .../org/apache/velocity/runtime/parser/node/ASTMethod.java  | 4 ++--
+ .../velocity/runtime/parser/node/ASTStringLiteral.java      | 2 +-
+ .../org/apache/velocity/runtime/parser/node/NodeUtils.java  | 2 +-
+ .../velocity/runtime/parser/node/PropertyExecutor.java      | 2 +-
+ .../velocity/runtime/parser/node/SetPropertyExecutor.java   | 4 ++--
+ .../org/apache/velocity/runtime/parser/node/SimpleNode.java | 4 ++--
+ .../velocity/runtime/resource/ResourceManagerImpl.java      | 4 ++--
+ .../runtime/resource/loader/ClasspathResourceLoader.java    | 2 +-
+ .../runtime/resource/loader/DataSourceResourceLoader.java   | 2 +-
+ .../runtime/resource/loader/FileResourceLoader.java         | 2 +-
+ .../velocity/runtime/resource/loader/JarResourceLoader.java | 2 +-
+ .../runtime/resource/loader/StringResourceLoader.java       | 2 +-
+ .../velocity/runtime/resource/loader/URLResourceLoader.java | 2 +-
+ .../org/apache/velocity/util/introspection/ClassMap.java    | 2 +-
+ .../org/apache/velocity/io/UnicodeInputStreamTestCase.java  | 2 +-
+ src/test/org/apache/velocity/test/BaseTestCase.java         | 2 +-
+ .../org/apache/velocity/test/MethodCacheKeyTestCase.java    | 2 +-
+ 29 files changed, 39 insertions(+), 38 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 77a8e383..eee15b34 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -148,9 +148,9 @@
+       <version>3.2.1</version>
+     </dependency>
+     <dependency>
+-      <groupId>commons-lang</groupId>
+-      <artifactId>commons-lang</artifactId>
+-      <version>2.4</version>
++      <groupId>org.apache.commons</groupId>
++      <artifactId>commons-lang3</artifactId>
++      <version>3.9</version>
+     </dependency>
+     <dependency>
+       <groupId>oro</groupId>
+diff --git a/src/java/org/apache/velocity/app/event/implement/EscapeHtmlReference.java b/src/java/org/apache/velocity/app/event/implement/EscapeHtmlReference.java
+index 6d98b45c..e1469957 100644
+--- a/src/java/org/apache/velocity/app/event/implement/EscapeHtmlReference.java
++++ b/src/java/org/apache/velocity/app/event/implement/EscapeHtmlReference.java
+@@ -19,7 +19,7 @@ package org.apache.velocity.app.event.implement;
+  * under the License.    
+  */
+ 
+-import org.apache.commons.lang.StringEscapeUtils;
++import org.apache.commons.lang3.StringEscapeUtils;
+ 
+ /**
+  * Escape all HTML entities.
+@@ -39,7 +39,7 @@ public class EscapeHtmlReference extends EscapeReference
+      */
+     protected String escape(Object text)
+     {
+-        return StringEscapeUtils.escapeHtml(text.toString());
++        return StringEscapeUtils.escapeHtml4(text.toString());
+     }
+ 
+     /**
+diff --git a/src/java/org/apache/velocity/app/event/implement/EscapeJavaScriptReference.java b/src/java/org/apache/velocity/app/event/implement/EscapeJavaScriptReference.java
+index ea49ddbf..12f38f47 100644
+--- a/src/java/org/apache/velocity/app/event/implement/EscapeJavaScriptReference.java
++++ b/src/java/org/apache/velocity/app/event/implement/EscapeJavaScriptReference.java
+@@ -19,7 +19,7 @@ package org.apache.velocity.app.event.implement;
+  * under the License.    
+  */
+ 
+-import org.apache.commons.lang.StringEscapeUtils;
++import org.apache.commons.lang3.StringEscapeUtils;
+ 
+ /**
+  * Escapes the characters in a String to be suitable for use in JavaScript.
+@@ -39,7 +39,7 @@ public class EscapeJavaScriptReference extends EscapeReference
+      */
+     protected String escape(Object text)
+     {
+-        return StringEscapeUtils.escapeJavaScript(text.toString());
++        return StringEscapeUtils.escapeEcmaScript(text.toString());
+     }
+ 
+     /**
+diff --git a/src/java/org/apache/velocity/app/event/implement/EscapeSqlReference.java b/src/java/org/apache/velocity/app/event/implement/EscapeSqlReference.java
+index 585cb6c6..39e04f43 100644
+--- a/src/java/org/apache/velocity/app/event/implement/EscapeSqlReference.java
++++ b/src/java/org/apache/velocity/app/event/implement/EscapeSqlReference.java
+@@ -19,7 +19,7 @@ package org.apache.velocity.app.event.implement;
+  * under the License.    
+  */
+ 
+-import org.apache.commons.lang.StringEscapeUtils;
++import org.apache.commons.lang3.StringUtils;
+ 
+ /**
+  * Escapes the characters in a String to be suitable to pass to an SQL query.
+@@ -39,7 +39,8 @@ public class EscapeSqlReference extends EscapeReference
+      */
+     protected String escape(Object text)
+     {
+-        return StringEscapeUtils.escapeSql(text.toString());
++        // See https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/StringEscapeUtils.html#escapeSql(java.lang.String)
++        return StringUtils.replace(text.toString(), "'", "''");
+     }
+ 
+     /**
+diff --git a/src/java/org/apache/velocity/app/event/implement/EscapeXmlReference.java b/src/java/org/apache/velocity/app/event/implement/EscapeXmlReference.java
+index 3d5b40f0..fbb525cb 100644
+--- a/src/java/org/apache/velocity/app/event/implement/EscapeXmlReference.java
++++ b/src/java/org/apache/velocity/app/event/implement/EscapeXmlReference.java
+@@ -19,7 +19,7 @@ package org.apache.velocity.app.event.implement;
+  * under the License.    
+  */
+ 
+-import org.apache.commons.lang.StringEscapeUtils;
++import org.apache.commons.lang3.StringEscapeUtils;
+ 
+ /**
+  * Escape all XML entities.
+diff --git a/src/java/org/apache/velocity/runtime/RuntimeInstance.java b/src/java/org/apache/velocity/runtime/RuntimeInstance.java
+index 670c083d..f877114d 100644
+--- a/src/java/org/apache/velocity/runtime/RuntimeInstance.java
++++ b/src/java/org/apache/velocity/runtime/RuntimeInstance.java
+@@ -32,7 +32,7 @@ import java.util.Map;
+ import java.util.Properties;
+ 
+ import org.apache.commons.collections.ExtendedProperties;
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.Template;
+ import org.apache.velocity.app.event.EventCartridge;
+ import org.apache.velocity.app.event.EventHandler;
+diff --git a/src/java/org/apache/velocity/runtime/VelocimacroFactory.java b/src/java/org/apache/velocity/runtime/VelocimacroFactory.java
+index 8756b66f..70e3d489 100644
+--- a/src/java/org/apache/velocity/runtime/VelocimacroFactory.java
++++ b/src/java/org/apache/velocity/runtime/VelocimacroFactory.java
+@@ -26,7 +26,7 @@ import java.util.Map;
+ import java.util.Vector;
+ import java.util.ArrayList;
+ 
+-import org.apache.commons.lang.StringUtils;
++import org.apache.commons.lang3.StringUtils;
+ import org.apache.velocity.Template;
+ import org.apache.velocity.exception.VelocityException;
+ import org.apache.velocity.runtime.directive.Directive;
+diff --git a/src/java/org/apache/velocity/runtime/directive/Block.java b/src/java/org/apache/velocity/runtime/directive/Block.java
+index f5fdfa85..b136543d 100755
+--- a/src/java/org/apache/velocity/runtime/directive/Block.java
++++ b/src/java/org/apache/velocity/runtime/directive/Block.java
+@@ -23,7 +23,7 @@ import java.io.IOException;
+ import java.io.StringWriter;
+ import java.io.Writer;
+ 
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.context.InternalContextAdapter;
+ import org.apache.velocity.exception.TemplateInitException;
+ import org.apache.velocity.runtime.Renderable;
+diff --git a/src/java/org/apache/velocity/runtime/directive/RuntimeMacro.java b/src/java/org/apache/velocity/runtime/directive/RuntimeMacro.java
+index 090b5522..d22ac4ed 100644
+--- a/src/java/org/apache/velocity/runtime/directive/RuntimeMacro.java
++++ b/src/java/org/apache/velocity/runtime/directive/RuntimeMacro.java
+@@ -23,7 +23,7 @@ import java.io.IOException;
+ import java.io.Writer;
+ import java.util.List;
+ 
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.context.InternalContextAdapter;
+ import org.apache.velocity.exception.MethodInvocationException;
+ import org.apache.velocity.exception.ParseErrorException;
+diff --git a/src/java/org/apache/velocity/runtime/parser/Parser.java b/src/java/org/apache/velocity/runtime/parser/Parser.java
+index 1253381f..b8e7112e 100644
+--- a/src/java/org/apache/velocity/runtime/parser/Parser.java
++++ b/src/java/org/apache/velocity/runtime/parser/Parser.java
+@@ -10,7 +10,7 @@ import org.apache.velocity.runtime.directive.Directive;
+ import org.apache.velocity.runtime.directive.Macro;
+ import org.apache.velocity.runtime.directive.MacroParseException;
+ import org.apache.velocity.util.StringUtils;
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.runtime.RuntimeConstants;
+ 
+ /**
+diff --git a/src/java/org/apache/velocity/runtime/parser/ParserTokenManager.java b/src/java/org/apache/velocity/runtime/parser/ParserTokenManager.java
+index ce00d99d..9563a1fb 100644
+--- a/src/java/org/apache/velocity/runtime/parser/ParserTokenManager.java
++++ b/src/java/org/apache/velocity/runtime/parser/ParserTokenManager.java
+@@ -9,7 +9,7 @@ import org.apache.velocity.runtime.directive.Directive;
+ import org.apache.velocity.runtime.directive.Macro;
+ import org.apache.velocity.runtime.directive.MacroParseException;
+ import org.apache.velocity.util.StringUtils;
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.runtime.RuntimeConstants;
+ 
+ /** Token Manager. */
+diff --git a/src/java/org/apache/velocity/runtime/parser/node/ASTDirective.java b/src/java/org/apache/velocity/runtime/parser/node/ASTDirective.java
+index 74727729..8fc59737 100644
+--- a/src/java/org/apache/velocity/runtime/parser/node/ASTDirective.java
++++ b/src/java/org/apache/velocity/runtime/parser/node/ASTDirective.java
+@@ -22,7 +22,7 @@ package org.apache.velocity.runtime.parser.node;
+ import java.io.IOException;
+ import java.io.Writer;
+ 
+-import org.apache.commons.lang.builder.ToStringBuilder;
++import org.apache.commons.lang3.builder.ToStringBuilder;
+ import org.apache.velocity.context.InternalContextAdapter;
+ import org.apache.velocity.exception.MethodInvocationException;
+ import org.apache.velocity.exception.ParseErrorException;
+diff --git a/src/java/org/apache/velocity/runtime/parser/node/ASTMethod.java b/src/java/org/apache/velocity/runtime/parser/node/ASTMethod.java
+index 489429bb..df54dd93 100644
+--- a/src/java/org/apache/velocity/runtime/parser/node/ASTMethod.java
++++ b/src/java/org/apache/velocity/runtime/parser/node/ASTMethod.java
+@@ -21,8 +21,8 @@ package org.apache.velocity.runtime.parser.node;
+ 
+ import java.lang.reflect.InvocationTargetException;
+ 
+-import org.apache.commons.lang.ArrayUtils;
+-import org.apache.commons.lang.StringUtils;
++import org.apache.commons.lang3.ArrayUtils;
++import org.apache.commons.lang3.StringUtils;
+ import org.apache.velocity.app.event.EventHandlerUtil;
+ import org.apache.velocity.context.InternalContextAdapter;
+ import org.apache.velocity.exception.MethodInvocationException;
+diff --git a/src/java/org/apache/velocity/runtime/parser/node/ASTStringLiteral.java b/src/java/org/apache/velocity/runtime/parser/node/ASTStringLiteral.java
+index 2267993c..82cca27a 100644
+--- a/src/java/org/apache/velocity/runtime/parser/node/ASTStringLiteral.java
++++ b/src/java/org/apache/velocity/runtime/parser/node/ASTStringLiteral.java
+@@ -21,7 +21,7 @@ import java.io.IOException;
+ import java.io.StringReader;
+ import java.io.StringWriter;
+ 
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.context.InternalContextAdapter;
+ import org.apache.velocity.exception.TemplateInitException;
+ import org.apache.velocity.exception.VelocityException;
+diff --git a/src/java/org/apache/velocity/runtime/parser/node/NodeUtils.java b/src/java/org/apache/velocity/runtime/parser/node/NodeUtils.java
+index 713a86ae..0ac03fbc 100644
+--- a/src/java/org/apache/velocity/runtime/parser/node/NodeUtils.java
++++ b/src/java/org/apache/velocity/runtime/parser/node/NodeUtils.java
+@@ -19,7 +19,7 @@ package org.apache.velocity.runtime.parser.node;
+  * under the License.    
+  */
+ 
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.context.Context;
+ import org.apache.velocity.exception.MethodInvocationException;
+ import org.apache.velocity.runtime.parser.ParserConstants;
+diff --git a/src/java/org/apache/velocity/runtime/parser/node/PropertyExecutor.java b/src/java/org/apache/velocity/runtime/parser/node/PropertyExecutor.java
+index 8c78228e..20d6c185 100644
+--- a/src/java/org/apache/velocity/runtime/parser/node/PropertyExecutor.java
++++ b/src/java/org/apache/velocity/runtime/parser/node/PropertyExecutor.java
+@@ -21,7 +21,7 @@ package org.apache.velocity.runtime.parser.node;
+ 
+ import java.lang.reflect.InvocationTargetException;
+ 
+-import org.apache.commons.lang.StringUtils;
++import org.apache.commons.lang3.StringUtils;
+ import org.apache.velocity.exception.VelocityException;
+ import org.apache.velocity.runtime.RuntimeLogger;
+ import org.apache.velocity.runtime.log.Log;
+diff --git a/src/java/org/apache/velocity/runtime/parser/node/SetPropertyExecutor.java b/src/java/org/apache/velocity/runtime/parser/node/SetPropertyExecutor.java
+index 0078d023..80887fad 100644
+--- a/src/java/org/apache/velocity/runtime/parser/node/SetPropertyExecutor.java
++++ b/src/java/org/apache/velocity/runtime/parser/node/SetPropertyExecutor.java
+@@ -21,8 +21,8 @@ package org.apache.velocity.runtime.parser.node;
+ 
+ import java.lang.reflect.InvocationTargetException;
+ 
+-import org.apache.commons.lang.StringUtils;
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.StringUtils;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.exception.VelocityException;
+ import org.apache.velocity.runtime.log.Log;
+ import org.apache.velocity.util.introspection.Introspector;
+diff --git a/src/java/org/apache/velocity/runtime/parser/node/SimpleNode.java b/src/java/org/apache/velocity/runtime/parser/node/SimpleNode.java
+index 108846f8..6372830f 100644
+--- a/src/java/org/apache/velocity/runtime/parser/node/SimpleNode.java
++++ b/src/java/org/apache/velocity/runtime/parser/node/SimpleNode.java
+@@ -22,8 +22,8 @@ package org.apache.velocity.runtime.parser.node;
+ import java.io.IOException;
+ import java.io.Writer;
+ 
+-import org.apache.commons.lang.builder.ToStringBuilder;
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.builder.ToStringBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.context.InternalContextAdapter;
+ import org.apache.velocity.exception.MethodInvocationException;
+ import org.apache.velocity.exception.ParseErrorException;
+diff --git a/src/java/org/apache/velocity/runtime/resource/ResourceManagerImpl.java b/src/java/org/apache/velocity/runtime/resource/ResourceManagerImpl.java
+index 778b42a9..a396e42f 100644
+--- a/src/java/org/apache/velocity/runtime/resource/ResourceManagerImpl.java
++++ b/src/java/org/apache/velocity/runtime/resource/ResourceManagerImpl.java
+@@ -158,7 +158,7 @@ public class ResourceManagerImpl
+ 
+         Object cacheObject = null;
+ 
+-        if (org.apache.commons.lang.StringUtils.isNotEmpty(cacheClassName))
++        if (org.apache.commons.lang3.StringUtils.isNotEmpty(cacheClassName))
+         {
+             try
+             {
+@@ -534,7 +534,7 @@ public class ResourceManagerImpl
+              *  this strikes me as bad...
+              */
+ 
+-            if (!org.apache.commons.lang.StringUtils.equals(resource.getEncoding(), encoding))
++            if (!org.apache.commons.lang3.StringUtils.equals(resource.getEncoding(), encoding))
+             {
+                 log.warn("Declared encoding for template '" +
+                              resource.getName() +
+diff --git a/src/java/org/apache/velocity/runtime/resource/loader/ClasspathResourceLoader.java b/src/java/org/apache/velocity/runtime/resource/loader/ClasspathResourceLoader.java
+index 52d09a98..bf48aa45 100644
+--- a/src/java/org/apache/velocity/runtime/resource/loader/ClasspathResourceLoader.java
++++ b/src/java/org/apache/velocity/runtime/resource/loader/ClasspathResourceLoader.java
+@@ -22,7 +22,7 @@ package org.apache.velocity.runtime.resource.loader;
+ import java.io.InputStream;
+ 
+ import org.apache.commons.collections.ExtendedProperties;
+-import org.apache.commons.lang.StringUtils;
++import org.apache.commons.lang3.StringUtils;
+ import org.apache.velocity.exception.ResourceNotFoundException;
+ import org.apache.velocity.runtime.resource.Resource;
+ import org.apache.velocity.util.ClassUtils;
+diff --git a/src/java/org/apache/velocity/runtime/resource/loader/DataSourceResourceLoader.java b/src/java/org/apache/velocity/runtime/resource/loader/DataSourceResourceLoader.java
+index f85b6d62..38ec30dc 100644
+--- a/src/java/org/apache/velocity/runtime/resource/loader/DataSourceResourceLoader.java
++++ b/src/java/org/apache/velocity/runtime/resource/loader/DataSourceResourceLoader.java
+@@ -218,7 +218,7 @@ public class DataSourceResourceLoader extends ResourceLoader
+     public synchronized InputStream getResourceStream(final String name)
+         throws ResourceNotFoundException
+     {
+-        if (org.apache.commons.lang.StringUtils.isEmpty(name))
++        if (org.apache.commons.lang3.StringUtils.isEmpty(name))
+         {
+             throw new ResourceNotFoundException("DataSourceResourceLoader: Template name was empty or null");
+         }
+diff --git a/src/java/org/apache/velocity/runtime/resource/loader/FileResourceLoader.java b/src/java/org/apache/velocity/runtime/resource/loader/FileResourceLoader.java
+index 923274a7..8580caeb 100644
+--- a/src/java/org/apache/velocity/runtime/resource/loader/FileResourceLoader.java
++++ b/src/java/org/apache/velocity/runtime/resource/loader/FileResourceLoader.java
+@@ -118,7 +118,7 @@ public class FileResourceLoader extends ResourceLoader
+         /*
+          * Make sure we have a valid templateName.
+          */
+-        if (org.apache.commons.lang.StringUtils.isEmpty(templateName))
++        if (org.apache.commons.lang3.StringUtils.isEmpty(templateName))
+         {
+             /*
+              * If we don't get a properly formed templateName then
+diff --git a/src/java/org/apache/velocity/runtime/resource/loader/JarResourceLoader.java b/src/java/org/apache/velocity/runtime/resource/loader/JarResourceLoader.java
+index 054d890e..71d6c083 100644
+--- a/src/java/org/apache/velocity/runtime/resource/loader/JarResourceLoader.java
++++ b/src/java/org/apache/velocity/runtime/resource/loader/JarResourceLoader.java
+@@ -195,7 +195,7 @@ public class JarResourceLoader extends ResourceLoader
+     {
+         InputStream results = null;
+ 
+-        if (org.apache.commons.lang.StringUtils.isEmpty(source))
++        if (org.apache.commons.lang3.StringUtils.isEmpty(source))
+         {
+             throw new ResourceNotFoundException("Need to have a resource!");
+         }
+diff --git a/src/java/org/apache/velocity/runtime/resource/loader/StringResourceLoader.java b/src/java/org/apache/velocity/runtime/resource/loader/StringResourceLoader.java
+index 245c10b8..86a08b9d 100644
+--- a/src/java/org/apache/velocity/runtime/resource/loader/StringResourceLoader.java
++++ b/src/java/org/apache/velocity/runtime/resource/loader/StringResourceLoader.java
+@@ -26,7 +26,7 @@ import java.io.ByteArrayInputStream;
+ import java.io.InputStream;
+ import java.io.UnsupportedEncodingException;
+ import org.apache.commons.collections.ExtendedProperties;
+-import org.apache.commons.lang.StringUtils;
++import org.apache.commons.lang3.StringUtils;
+ import org.apache.velocity.exception.ResourceNotFoundException;
+ import org.apache.velocity.exception.VelocityException;
+ import org.apache.velocity.runtime.resource.Resource;
+diff --git a/src/java/org/apache/velocity/runtime/resource/loader/URLResourceLoader.java b/src/java/org/apache/velocity/runtime/resource/loader/URLResourceLoader.java
+index de066367..74ab86a6 100644
+--- a/src/java/org/apache/velocity/runtime/resource/loader/URLResourceLoader.java
++++ b/src/java/org/apache/velocity/runtime/resource/loader/URLResourceLoader.java
+@@ -26,7 +26,7 @@ import java.net.URL;
+ import java.net.URLConnection;
+ import java.util.HashMap;
+ import org.apache.commons.collections.ExtendedProperties;
+-import org.apache.commons.lang.StringUtils;
++import org.apache.commons.lang3.StringUtils;
+ import org.apache.velocity.exception.VelocityException;
+ import org.apache.velocity.exception.ResourceNotFoundException;
+ import org.apache.velocity.runtime.resource.Resource;
+diff --git a/src/java/org/apache/velocity/util/introspection/ClassMap.java b/src/java/org/apache/velocity/util/introspection/ClassMap.java
+index 00512892..2e128b7e 100644
+--- a/src/java/org/apache/velocity/util/introspection/ClassMap.java
++++ b/src/java/org/apache/velocity/util/introspection/ClassMap.java
+@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
+ import java.lang.reflect.Modifier;
+ import java.util.HashMap;
+ import java.util.Map;
+-import org.apache.commons.lang.text.StrBuilder;
++import org.apache.commons.lang3.text.StrBuilder;
+ import org.apache.velocity.runtime.log.Log;
+ import org.apache.velocity.util.MapFactory;
+ 
+diff --git a/src/test/org/apache/velocity/io/UnicodeInputStreamTestCase.java b/src/test/org/apache/velocity/io/UnicodeInputStreamTestCase.java
+index 02499985..4b0b254f 100644
+--- a/src/test/org/apache/velocity/io/UnicodeInputStreamTestCase.java
++++ b/src/test/org/apache/velocity/io/UnicodeInputStreamTestCase.java
+@@ -27,7 +27,7 @@ import junit.framework.Test;
+ import junit.framework.TestCase;
+ import junit.framework.TestSuite;
+ 
+-import org.apache.commons.lang.ArrayUtils;
++import org.apache.commons.lang3.ArrayUtils;
+ 
+ 
+ /**
+diff --git a/src/test/org/apache/velocity/test/BaseTestCase.java b/src/test/org/apache/velocity/test/BaseTestCase.java
+index 0ea00cbd..798a322b 100644
+--- a/src/test/org/apache/velocity/test/BaseTestCase.java
++++ b/src/test/org/apache/velocity/test/BaseTestCase.java
+@@ -353,7 +353,7 @@ public abstract class BaseTestCase extends TestCase implements TemplateTestBase
+                 buf.append(baseFile.getPath());
+             }
+ 
+-            if (org.apache.commons.lang.StringUtils.isNotEmpty(ext))
++            if (org.apache.commons.lang3.StringUtils.isNotEmpty(ext))
+             {
+                 buf.append('.').append(ext);
+             }
+diff --git a/src/test/org/apache/velocity/test/MethodCacheKeyTestCase.java b/src/test/org/apache/velocity/test/MethodCacheKeyTestCase.java
+index 77dfc54e..4befc6ef 100644
+--- a/src/test/org/apache/velocity/test/MethodCacheKeyTestCase.java
++++ b/src/test/org/apache/velocity/test/MethodCacheKeyTestCase.java
+@@ -21,7 +21,7 @@ package org.apache.velocity.test;
+ 
+ import junit.framework.TestCase;
+ 
+-import org.apache.commons.lang.ArrayUtils;
++import org.apache.commons.lang3.ArrayUtils;
+ import org.apache.velocity.runtime.parser.node.ASTMethod;
+ 
+ /**
+-- 
+2.25.4
+

@@ -1,7 +1,7 @@
 Summary:         A library for handling different graphics file formats
 Name:            netpbm
 Version:         10.90.00
-Release:         2%{?dist}
+Release:         3%{?dist}
 # See copyright_summary for details
 License:         BSD and GPLv2 and IJG and MIT and Public Domain
 Vendor:         Microsoft Corporation
@@ -12,7 +12,7 @@ URL: http://netpbm.sourceforge.net/
 # svn checkout https://svn.code.sf.net/p/netpbm/code/userguide netpbm-%%{version}/userguide
 # svn checkout https://svn.code.sf.net/p/netpbm/code/trunk/test netpbm-%%{version}/test
 # and removing the .svn directories ( find -name "\.svn" -type d -print0 | xargs -0 rm -rf )
-Source0:         netpbm-%{version}.tar.xz
+Source0:         https://svn.code.sf.net/p/netpbm/code/advanced#/%{name}-%{version}.tar.xz
 Patch0:          netpbm-security-scripts.patch
 Patch1:          netpbm-security-code.patch
 Patch2:          netpbm-ppmfadeusage.patch
@@ -40,7 +40,6 @@ BuildRequires:   libjpeg-devel, libpng-devel, libtiff-devel, flex, gcc, jbigkit-
 BuildRequires:   perl-generators, python3, jasper-devel, libxml2-devel
 BuildRequires:   perl(Config), perl(Cwd), perl(English), perl(Fcntl), perl(File::Basename)
 BuildRequires:   perl(strict)
-BuildRequires:   ghostscript
 
 %description
 The netpbm package contains a library of functions which support
@@ -63,7 +62,6 @@ to have the netpbm package installed.
 
 %package progs
 Summary:         Tools for manipulating graphics files in netpbm supported formats
-Requires:        ghostscript
 Requires:        netpbm = %{version}-%{release}
 
 %description progs
@@ -156,8 +154,6 @@ if [ "%{_libdir}" != "/usr/lib" ]; then
   mv %{buildroot}/usr/lib/lib* %{buildroot}%{_libdir}
 fi
 
-cp -af lib/libnetpbm.a %{buildroot}%{_libdir}/libnetpbm.a
-
 mkdir -p %{buildroot}%{_datadir}
 mv userguide/man %{buildroot}%{_mandir}
 
@@ -208,8 +204,8 @@ export PBM_BINPREFIX=%{buildroot}%{_bindir}
 popd
 
 %files
-%doc doc/copyright_summary doc/COPYRIGHT.PATENT doc/HISTORY README
-%license doc/GPL_LICENSE.txt
+%doc doc/HISTORY README
+%license doc/copyright_summary doc/COPYRIGHT.PATENT doc/GPL_LICENSE.txt
 %{_libdir}/lib*.so.*
 
 %files devel
@@ -228,6 +224,10 @@ popd
 %doc userguide/*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-3
+- Removing dependency on 'ghostscript'.
+- License verified.
+
 * Wed Mar 31 2021 Henry Li <lihl@microsoft.com> - 10.90.00-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove libX11-devel from build requirement

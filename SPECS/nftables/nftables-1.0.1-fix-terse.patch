@@ -1,0 +1,100 @@
+From 8492878961248b4b53fa97383c7c1b15d7062947 Mon Sep 17 00:00:00 2001
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+Date: Thu, 18 Nov 2021 17:25:36 +0100
+Subject: cache: do not skip populating anonymous set with -t
+
+--terse does not apply to anonymous set, add a NFT_CACHE_TERSE bit
+to skip named sets only.
+
+Moreover, prioritize specific listing filter over --terse to avoid a
+bogus:
+
+  netlink: Error: Unknown set '__set0' in lookup expression
+
+when invoking:
+
+  # nft -ta list set inet filter example
+
+Extend existing test to improve coverage.
+
+Fixes: 9628d52e46ac ("cache: disable NFT_CACHE_SETELEM_BIT on --terse listing only")
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+ include/cache.h                           |  1 +
+ src/cache.c                               | 11 +++++++----
+ tests/shell/testcases/listing/0022terse_0 |  4 ++--
+ 3 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/include/cache.h b/include/cache.h
+index e5c509e8..3a9a5e81 100644
+--- a/include/cache.h
++++ b/include/cache.h
+@@ -32,6 +32,7 @@ enum cache_level_flags {
+ 				  NFT_CACHE_CHAIN_BIT |
+ 				  NFT_CACHE_RULE_BIT,
+ 	NFT_CACHE_FULL		= __NFT_CACHE_MAX_BIT - 1,
++	NFT_CACHE_TERSE		= (1 << 27),
+ 	NFT_CACHE_SETELEM_MAYBE	= (1 << 28),
+ 	NFT_CACHE_REFRESH	= (1 << 29),
+ 	NFT_CACHE_UPDATE	= (1 << 30),
+diff --git a/src/cache.c b/src/cache.c
+index fe31e3f0..6d20716d 100644
+--- a/src/cache.c
++++ b/src/cache.c
+@@ -215,10 +215,10 @@ static unsigned int evaluate_cache_list(struct nft_ctx *nft, struct cmd *cmd,
+ 			filter->list.table = cmd->handle.table.name;
+ 			filter->list.set = cmd->handle.set.name;
+ 		}
+-		if (nft_output_terse(&nft->output))
+-			flags |= (NFT_CACHE_FULL & ~NFT_CACHE_SETELEM_BIT);
+-		else if (filter->list.table && filter->list.set)
++		if (filter->list.table && filter->list.set)
+ 			flags |= NFT_CACHE_TABLE | NFT_CACHE_SET | NFT_CACHE_SETELEM;
++		else if (nft_output_terse(&nft->output))
++			flags |= NFT_CACHE_FULL | NFT_CACHE_TERSE;
+ 		else
+ 			flags |= NFT_CACHE_FULL;
+ 		break;
+@@ -234,7 +234,7 @@ static unsigned int evaluate_cache_list(struct nft_ctx *nft, struct cmd *cmd,
+ 		break;
+ 	case CMD_OBJ_RULESET:
+ 		if (nft_output_terse(&nft->output))
+-			flags |= (NFT_CACHE_FULL & ~NFT_CACHE_SETELEM_BIT);
++			flags |= NFT_CACHE_FULL | NFT_CACHE_TERSE;
+ 		else
+ 			flags |= NFT_CACHE_FULL;
+ 		break;
+@@ -830,6 +830,9 @@ static int cache_init_objects(struct netlink_ctx *ctx, unsigned int flags,
+ 			list_for_each_entry(set, &table->set_cache.list, cache.list) {
+ 				if (cache_filter_find(filter, &set->handle))
+ 					continue;
++				if (!set_is_anonymous(set->flags) &&
++				    flags & NFT_CACHE_TERSE)
++					continue;
+ 
+ 				ret = netlink_list_setelems(ctx, &set->handle,
+ 							    set);
+diff --git a/tests/shell/testcases/listing/0022terse_0 b/tests/shell/testcases/listing/0022terse_0
+index 14d31875..4841771c 100755
+--- a/tests/shell/testcases/listing/0022terse_0
++++ b/tests/shell/testcases/listing/0022terse_0
+@@ -9,7 +9,7 @@ RULESET="table inet filter {
+ 
+ 	chain input {
+ 		type filter hook prerouting priority filter; policy accept;
+-		ip saddr @example drop
++		ip saddr != { 10.10.10.100, 10.10.10.111 } ip saddr @example drop
+ 	}
+ }"
+ 
+@@ -31,7 +31,7 @@ EXPECTED="table inet filter {
+ 
+ 	chain input {
+ 		type filter hook prerouting priority filter; policy accept;
+-		ip saddr @example drop
++		ip saddr != { 10.10.10.100, 10.10.10.111 } ip saddr @example drop
+ 	}
+ }"
+ 
+-- 
+cgit v1.2.3

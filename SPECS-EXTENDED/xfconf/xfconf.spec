@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           xfconf
 Version:        4.14.4
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        Hierarchical configuration system for Xfce
 
 License:        GPLv2
@@ -14,6 +14,7 @@ URL:            http://www.xfce.org/
 Source0:        http://archive.xfce.org/src/xfce/%{name}/%{xfceversion}/%{name}-%{version}.tar.bz2
 
 BuildRequires:  glib2-devel
+BuildRequires:  perl(File::Find)
 BuildRequires:  pkgconfig(libxfce4util-1.0) >= %{xfceversion}
 BuildRequires:  pkgconfig(dbus-1) >= 1.1.0
 BuildRequires:  pkgconfig(dbus-glib-1) >= 0.84
@@ -134,6 +135,12 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 %endif
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.4-4
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.4-3
+- Adding missing BRs on Perl modules.
+
 * Thu May 27 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.4-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Unconditionally use "%%bcond_with perl"

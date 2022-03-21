@@ -1,7 +1,7 @@
 Summary:        Interface for Python to call C code
 Name:           python-cffi
-Version:        1.14.5
-Release:        3%{?dist}
+Version:        1.15.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ pip3 install pytest
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 10 2022 Nick Samson <nisamson@microsoft.com> - 1.15.0-1
+- Upgraded to 1.15.0
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.5-3
 - Replace easy_install usage with pip in %%check sections
 

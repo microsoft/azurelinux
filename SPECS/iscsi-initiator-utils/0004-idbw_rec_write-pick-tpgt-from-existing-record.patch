@@ -1,4 +1,4 @@
-From 6051b9ef3cdf206630969940aba980f4088e2e14 Mon Sep 17 00:00:00 2001
+From 2b1c0c5f1f2dbc516a9b51950a82eac091dbce2c Mon Sep 17 00:00:00 2001
 From: Chris Leech <cleech@redhat.com>
 Date: Tue, 13 Aug 2013 12:39:07 -0700
 Subject: [PATCH] idbw_rec_write, pick tpgt from existing record
@@ -12,7 +12,7 @@ updated new style record instead.
  1 file changed, 40 insertions(+)
 
 diff --git a/usr/idbm.c b/usr/idbm.c
-index 2f5e309..a2332cc 100644
+index bc51388..f1e5c88 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
 @@ -28,6 +28,7 @@
@@ -23,21 +23,21 @@ index 2f5e309..a2332cc 100644
  #include <sys/stat.h>
  #include <sys/file.h>
  #include <inttypes.h>
-@@ -164,6 +165,8 @@ static struct idbm *db;
- 	_n++; \
- } while(0)
+@@ -203,6 +204,8 @@ static struct int_list_tbl {
+ 	{ "SHA3-256", AUTH_CHAP_ALG_SHA3_256 },
+ };
  
 +static int idbm_remove_disc_to_node_link(node_rec_t *rec, char *portal);
 +
  static void
  idbm_recinfo_discovery(discovery_rec_t *r, recinfo_t *ri)
  {
-@@ -2107,12 +2110,49 @@ static int idbm_rec_write_old(node_rec_t *rec)
+@@ -2207,12 +2210,49 @@ static int idbm_rec_write_old(node_rec_t *rec)
  	FILE *f;
  	char *portal;
  	int rc = 0;
 +	glob_t globbuf;
-+	int i;
++	size_t i;
 +	int tpgt = PORTAL_GROUP_TAG_UNKNOWN;
  
  	portal = malloc(PATH_MAX);
@@ -83,5 +83,5 @@ index 2f5e309..a2332cc 100644
  		 rec->name, rec->conn[0].address, rec->conn[0].port);
  
 -- 
-2.21.0
+2.26.2
 

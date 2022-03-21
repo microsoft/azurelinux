@@ -12,7 +12,7 @@
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
 Version:        7.7.0
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,10 +39,11 @@ Source31:       %{name}-ipropd-slave-wrapper
 # klist, kswitch, and kvno are symlinks to "heimtools", and this utility needs
 # to know how to interpret the "heimdal-" prefixes.
 Patch1:         heimdal-1.6.0-c25f45a-rename-commands.patch
-# Use Python2 explicity.
-Patch3:         heimdal-7.5.0-explicit-python2.patch
+# Upstream patch to properly detect python when configuring
+Patch3:         %{name}-python3.patch
 Patch4:         heimdal-7.7.0-configure.patch
 Patch5:         fix_test_rand_build_failure.patch
+Patch6:         autoconf-2.70-fix.patch
 BuildRequires:  bison
 #libcom_err-devel is in
 #BuildRequires:  libcom_err-devel
@@ -63,7 +64,7 @@ BuildRequires:  pam-devel
 BuildRequires:  perl-JSON
 #BuildRequires:  doxygen
 #BuildRequires:  graphviz
-BuildRequires:  python2
+BuildRequires:  python3-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel
 BuildRequires:  texinfo
@@ -145,11 +146,8 @@ This package prepends the Heimdal binary directory to the beginning of
 PATH.
 
 %prep
-%setup -q
-%patch1 -p1 -b .cmds
-%patch3 -p1 -b .python2
-%patch4 -p1 -b .config
-%patch5 -p1
+%autosetup -p1
+%py3_shebang_fix .
 
 ./autogen.sh
 
@@ -488,6 +486,14 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 7.7.0-8
+- Add patch to compile with newer autoconf
+
+* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 7.7.0-7
+- Remove python2 patch and build requirement
+- Add patch to fix python detection during configuration
+- Fix python script shebang lines
+
 * Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 7.7.0-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

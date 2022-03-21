@@ -1,54 +1,30 @@
-Name:           mokutil
-Version:        0.3.0
-Release:        17%{?dist}
 Summary:        Tool to manage UEFI Secure Boot MoK Keys
+Name:           mokutil
+Version:        0.5.0
+Release:        1%{?dist}
 License:        GPLv3+
-URL:            https://github.com/lcp/mokutil
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:       https://github.com/lcp/mokutil/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-
-ExclusiveArch:  x86_64
-
-BuildRequires:  gcc
+URL:            https://github.com/lcp/mokutil
+Source0:        https://github.com/lcp/mokutil/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  gnu-efi
-BuildRequires:  openssl-devel
-BuildRequires:  openssl
-BuildRequires:  which
 BuildRequires:  efivar-devel >= 31-1
-
+BuildRequires:  gcc
+BuildRequires:  gnu-efi
+BuildRequires:  keyutils-devel
+BuildRequires:  openssl
+BuildRequires:  openssl-devel
+BuildRequires:  which
 Conflicts:      shim < 0.8-1%{?dist}
-
-Patch0001: 0001-Fix-the-potential-buffer-overflow.patch
-Patch0002: 0002-Fix-the-32bit-signedness-comparison.patch
-Patch0003: 0003-Build-with-fshort-wchar-so-toggle-passwords-work-rig.patch
-Patch0004: 0004-Don-t-allow-sha1-on-the-mokutil-command-line.patch
-Patch0005: 0005-Make-all-efi_guid_t-const.patch
-Patch0006: 0006-mokutil-be-explicit-about-file-modes-in-all-cases.patch
-Patch0007: 0007-Add-bash-completion-file.patch
-Patch0008: 0008-generate_hash-generate_pw_hash-don-t-use-strlen-for-.patch
-Patch0009: 0009-Avoid-taking-pointer-to-packed-struct.patch
-Patch0010: 0010-Fix-a-integer-comparison-sign-issue.patch
+ExclusiveArch:  x86_64
 
 %description
 mokutil provides a tool to manage keys for Secure Boot through the MoK
 ("Machine's Own Keys") mechanism.
 
 %prep
-%setup -q -n %{name}-%{version}
-%patch0001 -p1
-%patch0002 -p1
-%patch0003 -p1
-%patch0004 -p1
-%patch0005 -p1
-%patch0006 -p1
-%patch0007 -p1
-%patch0008 -p1
-%patch0009 -p1
-%patch0010 -p1
+%autosetup -n %{name}-%{version}
 
 %build
 ./autogen.sh
@@ -56,7 +32,6 @@ mokutil provides a tool to manage keys for Secure Boot through the MoK
 make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 make PREFIX=%{_prefix} LIBDIR=%{_libdir} DESTDIR=%{buildroot} install
 
 %files
@@ -68,6 +43,10 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir} DESTDIR=%{buildroot} install
 %{_datadir}/bash-completion/completions/mokutil
 
 %changelog
+* Fri Feb 11 2022 Chris Co <chrco@microsoft.com> - 0.5.0-1
+- Update to 0.5.0 version
+- License verified
+
 * Tue May 12 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.0-17
 - Building only for x86_64.
 

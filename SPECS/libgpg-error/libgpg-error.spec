@@ -1,7 +1,7 @@
 Summary:        libgpg-error
 Name:           libgpg-error
 Version:        1.43
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 URL:            https://gnupg.org/
 Group:          Development/Libraries
@@ -17,7 +17,7 @@ pinentry, SmartCard Daemon and possibly more in the future.
 %package devel
 Summary:	Libraries and header files for libgpg-error
 Requires:	%{name} = %{version}-%{release}
-Provides:   pkgconfig(gpg-error) = %{version}-%{release}
+
 %description devel
 Static libraries and header files for the support library for libgpg-error
 
@@ -73,6 +73,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.43-2
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 1.43-1
 - Update to version 1.43
 

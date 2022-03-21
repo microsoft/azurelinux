@@ -19,6 +19,7 @@ go_tool_list = \
 	grapher \
 	graphpkgfetcher \
 	graphanalytics \
+	graphPreprocessor \
 	imageconfigvalidator \
 	imagepkgfetcher \
 	imager \
@@ -81,7 +82,9 @@ else
 $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
-		go build -o $(TOOL_BINS_DIR)
+		go build \
+			-ldflags="-X microsoft.com/pkggen/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" \
+			-o $(TOOL_BINS_DIR)
 endif
 
 # Runs tests for common components

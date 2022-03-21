@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
-Version:        1.5.2
-Release:        7%{?dist}
+Version:        1.5.7
+Release:        1%{?dist}
 License:        GPLv2+ AND MIT AND BSD AND ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -166,6 +166,9 @@ make %{?_smp_mflags} check
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cron.d/dailyjobs
 
 %changelog
+* Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.7-1
+- Upgrade to version 1.5.7
+
 * Tue Aug 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.2-7
 - Splitting package into "cronie-anacron" and "cronie-noanacron".
 - Package changes are an import from Fedora 32 (license: MIT).

@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.3
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,31 +9,30 @@ URL:            https://github.com/libstorage/libstoragemgmt
 Source0:        https://github.com/libstorage/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch1:         0001-change-run-dir.patch
 
-BuildRequires:  gcc
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  bash-completion
+BuildRequires:  check
+BuildRequires:  chrpath
+BuildRequires:  gcc
+BuildRequires:  glib-devel
+BuildRequires:  libconfig-devel
 BuildRequires:  libtool
 BuildRequires:  libxml2-devel
-#Provided by check
-#BuildRequires: check-devel 
-BuildRequires:  check
-BuildRequires:  perl
 BuildRequires:  openssl-devel
-BuildRequires:  glib-devel
-BuildRequires:  systemd
-BuildRequires:  bash-completion
-BuildRequires:  libconfig-devel
-BuildRequires:  systemd-devel
+BuildRequires:  perl
 BuildRequires:  procps-ng
-BuildRequires:  sqlite-devel
-BuildRequires:  python3-six
 BuildRequires:  python3-devel
 BuildRequires:  python3-pywbem
+BuildRequires:  python3-six
+BuildRequires:  sqlite-devel
 %{?systemd_requires}
-BuildRequires:  systemd 
+BuildRequires:  systemd
 BuildRequires:  systemd-devel
-BuildRequires:  chrpath
 BuildRequires:  valgrind
+%if %{with_check}
+BuildRequires:  git
+%endif
 Requires:       python3-%{name}
 
 %description
@@ -75,7 +74,7 @@ Summary:        Files for SMI-S generic array support for %{name}
 BuildRequires:  python3-pywbem
 Requires:       python3-pywbem
 BuildArch:      noarch
-Provides:       %{name}-ibm-v7k-plugin = 2:%{version}-%{release}
+Provides:       %{name}-ibm-v7k-plugin = %{version}-%{release}
 Requires:       python3-%{name} = %{version}
 Requires(post): python3-%{name} = %{version}
 Requires(postun): python3-%{name} = %{version}
@@ -192,11 +191,14 @@ install -m 755 tools/udev/scan-scsi-target \
     %{buildroot}/%{_udevrulesdir}/../scan-scsi-target
 
 %check
+check_status=0
 if ! make check
 then
-  cat test-suite.log || true
-  exit 1
+  cat test-suite.log
+  check_status=1
 fi
+
+[[ $check_status -eq 0 ]]
 
 %pre
 getent group libstoragemgmt >/dev/null || groupadd -r libstoragemgmt
@@ -453,6 +455,16 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.9.3-4
+- Cleanup duplicate BRs
+- Add an explicit BR on `git` to enable ptest
+
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.3-3
+- Removing epoch.
+
+* Wed Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 1.9.3-2
+- Gracefully handle ptest failure instead of breaking the build
+
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.9.3-1
 - Upgrade to version 1.9.3
 - Remove subpackage libstoragemgmt-netapp-plugin and libstoragemgmt-nstor-plugin

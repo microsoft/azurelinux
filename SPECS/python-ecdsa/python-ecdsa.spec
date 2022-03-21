@@ -1,14 +1,19 @@
 Summary:        ECDSA cryptographic signature library (pure python)
 Name:           python-ecdsa
-Version:        0.13.3
-Release:        5%{?dist}
+Version:        0.17.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://pypi.python.org/pypi/ecdsa
-Source0:        https://pypi.python.org/packages/source/e/ecdsa/ecdsa-%{version}.tar.gz
-Patch0:         disable_nist192_test.patch
+Source0:        https://github.com/tlsfuzzer/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
+BuildRequires:  openssl
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
 %description
@@ -16,11 +21,8 @@ ECDSA cryptographic signature library (pure python)
 
 %package -n     python3-ecdsa
 Summary:        ECDSA cryptographic signature library (pure python)
-BuildRequires:  openssl
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
+Requires:       python3-six
 
 %description -n python3-ecdsa
 This is an easy-to-use implementation of ECDSA cryptography (Elliptic Curve
@@ -31,7 +33,7 @@ and signatures are very short, making them easy to handle and incorporate
 into other protocols.
 
 %prep
-%autosetup -p 1 -n ecdsa-%{version}
+%autosetup -n %{name}-%{name}-%{version}
 
 %build
 %py3_build
@@ -40,7 +42,8 @@ into other protocols.
 %{py3_install "--single-version-externally-managed"}
 
 %check
-python3 setup.py test
+pip3 install tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-ecdsa
 %defattr(-, root, root)
@@ -48,6 +51,12 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.17.0-1
+- Update to latest upstream version
+- Use tox to run tests
+- Remove test patch- test suite now detects cipher availability properly
+- Switch from PyPI to GitHub source
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.13.3-5
 - Add license to python3 package
 - Remove python2 package

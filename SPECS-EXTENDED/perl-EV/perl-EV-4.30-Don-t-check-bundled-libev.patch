@@ -1,0 +1,23 @@
+diff -up ./Makefile.PL.orig ./Makefile.PL
+--- ./Makefile.PL.orig	2019-11-24 10:26:02.793736366 +0100
++++ ./Makefile.PL	2019-11-24 10:27:49.699547974 +0100
+@@ -9,19 +9,6 @@ sub have_inc($) {
+ 
+ my $DEFINE;
+ 
+-unless (-e "libev/ev_iouring.c") {
+-   print <<EOF;
+-
+-***
+-*** ERROR: libev is missing or damaged. If you used a CVS check-out of EV,
+-*** you also have to check-out the "libev" module from the same CVS
+-*** repository into the EV dir (i.e. EV/libev from outside).
+-***
+-
+-EOF
+-   exit 1;
+-}
+-
+ print <<EOF;
+ 
+ *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***

@@ -1,7 +1,9 @@
+%define __requires_exclude ^/(usr/)?bin/(ba)?sh$
+
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
-Version:        1.18
-Release:        2%{?dist}
+Version:        1.19.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,8 +14,6 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
 Requires:       openssl
-Provides:       pkgconfig(mit-krb5)
-Provides:       pkgconfig(mit-krb5-gssapi)
 Provides:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -41,9 +41,8 @@ These are the additional language files of krb5.
 %setup -q
 
 %build
-cd src &&
-sed -e 's@\^u}@^u cols 300}@' \
-    -i tests/dejagnu/config/default.exp &&
+cd src
+sed -e 's@\^u}@^u cols 300}@' -i tests/dejagnu/config/default.exp
 CPPFLAGS="-D_GNU_SOURCE %{getenv:CPPFLAGS}" \
 autoconf &&
 ./configure \
@@ -119,6 +118,15 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Mon Mar 07 2022 Andrew Phelps <anphel@microsoft.com> - 1.19.2-1
+- Update to version 1.19.2
+
+* Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18-4
+- Removing dependcy on Bash.
+
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.18-3
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18-2
 - Removing the explicit %%clean stage.
 

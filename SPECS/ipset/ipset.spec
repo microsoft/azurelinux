@@ -1,7 +1,7 @@
 Summary:        administration tool for IP sets
 Name:           ipset
-Version:        7.1
-Release:        3%{?dist}
+Version:        7.15
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,13 +69,6 @@ install -c -m 755 %{SOURCE2} %{buildroot}%{_libexecdir}/%{name}
 # Create directory for configuration
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 
-%check
-sed -i 's/tests=\"$tests nethash/#tests=\"$tests nethash/g' tests/runtest.sh
-sed -i 's/tests=\"$tests hash:net,port/#tests=\"$tests hash:net,port/g' tests/runtest.sh
-sed -i 's/tests=\"$tests hash:ip/#tests=\"$tests hash:ip/g' tests/runtest.sh
-sed -i 's/tests=\"$tests hash:net,iface/#tests=\"$tests hash:net,iface/g' tests/runtest.sh
-make tests |& tee %{_specdir}/%{name}-check-log || %{nocheck}
-
 %ldconfig_scriptlets
 
 %post service
@@ -111,6 +104,11 @@ fi
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Tue Feb 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 7.15-1
+- Update source to 7.15
+- Remove check section since testsuite depends on kernel module
+  which we do not build
+
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 7.1-3
 - Add service subpackage from Fedora 35 (license: MIT)
 - Add provides for libs subpackage from main package

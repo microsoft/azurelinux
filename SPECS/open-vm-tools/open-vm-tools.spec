@@ -19,16 +19,13 @@
 ################################################################################
 
 %global _hardened_build 1
-%global majorversion    11.1
-%global minorversion    0
-%global toolsbuild      16036546
-%global toolsversion    %{majorversion}.%{minorversion}
+%global toolsbuild      18090558
 %global toolsdaemon     vmtoolsd
 %global vgauthdaemon    vgauthd
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
-Version:        %{toolsversion}
-Release:        5%{?dist}
+Version:        11.3.0
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,9 +36,6 @@ Source2:        %{vgauthdaemon}.service
 Source3:        vmblock.mount
 Source4:        open-vm-tools.conf
 Source5:        vmtoolsd.pam
-Patch1:         gcc10-warning.patch
-# Cumulative patch for fixes from https://github.com/vmware/open-vm-tools/tree/stable-11.1.0-SDMP-fixes
-Patch2:         sdmp-fixes.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 #BuildRequires:    doxygen
@@ -128,7 +122,7 @@ useful for verifying the functioning of %{name} in VMware virtual
 machines.
 
 %prep
-%autosetup -p2 -n %{name}-%{version}-%{toolsbuild}
+%autosetup -n %{name}-%{version}-%{toolsbuild}
 
 %build
 # Required for regenerating configure script when
@@ -179,10 +173,6 @@ install -p -m 644 -D %{SOURCE2} %{buildroot}%{_unitdir}/%{vgauthdaemon}.service
 install -p -m 644 -D '%{SOURCE3}' %{buildroot}%{_unitdir}/run-vmblock\\x2dfuse.mount
 install -p -m 644 -D %{SOURCE4} %{buildroot}%{_modulesloaddir}/open-vm-tools.conf
 install -p -m 644 -D %{SOURCE5} %{buildroot}%{_sysconfdir}/pam.d/vmtoolsd
-
-# Remove requirement of vmware virtualization from service files
-sed -i 's/ConditionVirtualization=vmware//g' %{buildroot}%{_unitdir}/%{toolsdaemon}.service
-sed -i 's/ConditionVirtualization=vmware//g' %{buildroot}%{_unitdir}/%{vgauthdaemon}.service
 
 # 'make check' in open-vm-tools rebuilds docs and ends up regenerating
 # the font file. We can add %%check secion once 'make check' is fixed
@@ -285,6 +275,7 @@ fi
 %{_bindir}/vm-support
 %{_bindir}/vmhgfs-fuse
 %{_bindir}/vmtoolsd
+%{_bindir}/vmware-alias-import
 %{_bindir}/vmware-checkvm
 %{_bindir}/vmware-hgfsclient
 %{_bindir}/vmware-namespace-cmd
@@ -294,6 +285,7 @@ fi
 %{_bindir}/vmware-xferlogs
 %{_libdir}/libDeployPkg.so.*
 %{_libdir}/libguestlib.so.*
+%{_libdir}/libguestStoreClient.so.*
 %{_libdir}/libhgfs.so.*
 %{_libdir}/libvgauth.so.*
 %{_libdir}/libvmtools.so.*
@@ -309,6 +301,8 @@ fi
 %{_libdir}/%{name}/plugins/vmsvc/libresolutionKMS.so
 %{_libdir}/%{name}/plugins/vmsvc/libtimeSync.so
 %{_libdir}/%{name}/plugins/vmsvc/libvmbackup.so
+%{_libdir}/%{name}/plugins/vmsvc/libgdp.so
+%{_libdir}/%{name}/plugins/vmsvc/libguestStore.so
 #Usually in desktop package
 %{_bindir}/vmware-vmblock-fuse
 
@@ -332,11 +326,22 @@ fi
 %{_libdir}/libhgfs.so
 %{_libdir}/libvgauth.so
 %{_libdir}/libvmtools.so
+%{_libdir}/libguestStoreClient.so
 
 %files test
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Wed Mar 16 2022 Matthew Torr <matthewtorr@microsoft.com> - 11.3.0-2
+- Reinstate ConditionVirtualization service option so that the services only run on VMware.
+
+* Thu Jan 27 2022 Henry Li <lihl@microsoft.com> - 11.3.0-1
+- Upgrade to version 11.3.0
+- Remove patches that no longer apply
+- Add vmware-alias-import,libgdp.so, libguestStore.so, libguestStoreClient.so
+  and libguestStoreClient.so.*
+- License Verified
+
 * Wed Nov 04 2020 Ruying Chen <v-ruyche@microsoft.com> - 11.1.0-5
 - Systemd supports merged /usr. Configure to build with corresponding directory.
 

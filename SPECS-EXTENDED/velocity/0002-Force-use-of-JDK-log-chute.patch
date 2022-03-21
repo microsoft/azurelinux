@@ -1,0 +1,25 @@
+From b2eee6ccc6ef24e084567a0a38d21fa3765df6ad Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 15 May 2020 09:56:26 +0200
+Subject: [PATCH 2/2] Force use of JDK log chute
+
+---
+ .../org/apache/velocity/runtime/defaults/velocity.properties    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/java/org/apache/velocity/runtime/defaults/velocity.properties b/src/java/org/apache/velocity/runtime/defaults/velocity.properties
+index 750a59af..855118b9 100644
+--- a/src/java/org/apache/velocity/runtime/defaults/velocity.properties
++++ b/src/java/org/apache/velocity/runtime/defaults/velocity.properties
+@@ -23,7 +23,7 @@
+ #  default LogChute to use: default: AvalonLogChute, Log4JLogChute, CommonsLogLogChute, ServletLogChute, JdkLogChute
+ # ----------------------------------------------------------------------------
+ 
+-runtime.log.logsystem.class = org.apache.velocity.runtime.log.AvalonLogChute,org.apache.velocity.runtime.log.Log4JLogChute,org.apache.velocity.runtime.log.CommonsLogLogChute,org.apache.velocity.runtime.log.ServletLogChute,org.apache.velocity.runtime.log.JdkLogChute
++runtime.log.logsystem.class = org.apache.velocity.runtime.log.JdkLogChute
+ 
+ # ---------------------------------------------------------------------------
+ # This is the location of the Velocity Runtime log.
+-- 
+2.25.4
+

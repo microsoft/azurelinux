@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary:	Mock object library for ruby
 Name:		rubygem-%{gem_name}
 Version:	2.3.6
-Release:	7%{?dist}
+Release:	8%{?dist}
 License:	MIT
 URL:		https://github.com/doudou/flexmock
 Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
@@ -70,7 +70,7 @@ popd
 
 
 %files
-%license LICENSE.txt
+%license %{gem_instdir}/LICENSE.txt
 %dir	%{gem_instdir}
 %doc	%{gem_instdir}/[A-Z]*
 
@@ -85,6 +85,9 @@ popd
 %{gem_docdir}/
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.6-8
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.6-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

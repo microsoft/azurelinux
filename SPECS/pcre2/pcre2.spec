@@ -1,13 +1,13 @@
 Summary:        A library for Perl-compatible regular expressions
 Name:           pcre2
-Version:        10.34
-Release:        2%{?dist}
-License:        BSD-3-Clause
+Version:        10.39
+Release:        1%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries/C and C++
 URL:            https://www.pcre.org/
-Source0:        https://ftp.pcre.org/pub/pcre/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/PhilipHazel/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bzip2-devel
@@ -238,6 +238,11 @@ make check -j1
 %{_libdir}/*.a
 
 %changelog
+* Tue Feb 15 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 10.39-1
+- Upgrading to v10.39
+- Fixing source URL. 
+- License verified.
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 10.34-2
 - Unconditionally build with readline support
 - Add compatibility provides for pcre2-utf{16,32}

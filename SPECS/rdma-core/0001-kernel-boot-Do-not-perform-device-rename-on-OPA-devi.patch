@@ -1,33 +1,17 @@
-From d9a376151c8a0d30ea814704e844f3aa3359d984 Mon Sep 17 00:00:00 2001
-From: "Goldman, Adam" <adam.goldman@intel.com>
-Date: Tue, 4 Feb 2020 08:55:20 -0500
-Subject: [PATCH] kernel-boot: Do not perform device rename on OPA devices
-
-PSM2 will not run with recent rdma-core releases. Several tools and
-libraries like PSM2, require the hfi1 name to be present.
-
-Recent rdma-core releases added a new feature to rename kernel devices,
-but the default configuration will not work with hfi1 fabrics.
-
-Related opa-psm2 github issue:
-  https://github.com/intel/opa-psm2/issues/43
-
-Fixes: 5b4099d47be3 ("kernel-boot: Perform device rename to make stable names")
-Reviewed-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
-Signed-off-by: Goldman, Adam <adam.goldman@intel.com>
----
- kernel-boot/rdma-persistent-naming.rules | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/kernel-boot/rdma-persistent-naming.rules b/kernel-boot/rdma-persistent-naming.rules
-index 9b61e1630d56..95d6851fb97a 100644
---- a/kernel-boot/rdma-persistent-naming.rules
-+++ b/kernel-boot/rdma-persistent-naming.rules
-@@ -25,4 +25,4 @@
+diff -Naur rdma-core-36.3-a/kernel-boot/rdma-persistent-naming.rules rdma-core-36.3-b/kernel-boot/rdma-persistent-naming.rules
+--- rdma-core-36.3-a/kernel-boot/rdma-persistent-naming.rules	2022-01-07 00:54:18.000000000 -0800
++++ rdma-core-36.3-b/kernel-boot/rdma-persistent-naming.rules	2022-02-03 15:10:26.763415015 -0800
+@@ -26,10 +26,10 @@
  #   Device type = RoCE
  #   mlx5_0 -> rocex525400c0fe123455
  #
 -ACTION=="add", SUBSYSTEM=="infiniband", PROGRAM="rdma_rename %k NAME_FALLBACK"
 +ACTION=="add", SUBSYSTEM=="infiniband", KERNEL!="hfi1*", PROGRAM="rdma_rename %k NAME_FALLBACK"
--- 
-2.24.1
+ 
+ # Example:
+ # * NAME_FIXED 
+ #   fixed name for specific board_id
+ #
+-#ACTION=="add", ATTR{board_id}=="MSF0010110035", SUBSYSTEM=="infiniband", PROGRAM="rdma_rename %k NAME_FIXED myib"
+\ No newline at end of file
++#ACTION=="add", ATTR{board_id}=="MSF0010110035", SUBSYSTEM=="infiniband", PROGRAM="rdma_rename %k NAME_FIXED myib"

@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "LICENSE": "dba39ca0c42bd0aa0909b21925c4a2d5e80da82725139ce866c8b2f76ea56202",
-  "NOTICE": "d8a1fbf076711ce24d0db29be6dbc7a87234f9c1293716377591e03f017a3c88",
-  "moby-cli-19.03.15+azure.tar.gz": "d20d6d9435409f99852d72958dbb5ebf683f79cb29989512ff44f4257d3ac675"
+  "moby-cli-20.10.12.tar.gz": "d86e3e6e10669634ee02b5e071e5ee504457a9d03941bbc5b7f2bd3683ebdb19"
  }
 }

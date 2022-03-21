@@ -6,9 +6,15 @@
                 "packagelists/developer-packages.json",
                 "packagelists/virtualization-host-packages.json",
                 "packagelists/core-packages-image.json",
+                "packagelists/core-tools-packages.json",
                 "packagelists/hyperv-packages.json",
-                "packagelists/ssh-server.json"
+                "packagelists/ssh-server.json",
+                "packagelists/selinux-full.json",
+                "packagelists/drtm.json"
             ],
+            "KernelCommandLine": {
+                "SELinux": "permissive"
+            },
             "KernelOptions": {
                 "default": "kernel"
             }

@@ -1,7 +1,7 @@
 Summary:        Platform-neutral API
 Name:           nspr
-Version:        4.21
-Release:        2%{?dist}
+Version:        4.30
+Release:        1%{?dist}
 License:        MPLv2.0
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSPR
 Group:          Applications/System
@@ -58,6 +58,9 @@ make DESTDIR=%{buildroot} install
 %{_datarootdir}/aclocal/*
 
 %changelog
+* Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 4.30-1
+- Upgrading to v4.30 for nss
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.21-2
 - Added %%license line automatically
 

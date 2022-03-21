@@ -1,15 +1,13 @@
 Summary:        Portable C Audio Library
 Name:           pcaudiolib
-Version:        1.1
+Version:        1.2
 Release:        1%{?dist}
-License:        GPLv3
+License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/espeak-ng/pcaudiolib
 #Source0:       https://github.com/espeak-ng/%{name}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-Patch0:         sample-size-calc.patch
-Patch1:         cancellation-snappiness.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -48,7 +46,7 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
 
 # %check
-# This library does not have a testing suite as of version 1.1
+# This library does not have a testing suite as of version 1.2
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
@@ -66,6 +64,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libpcaudio.so
 
 %changelog
+* Mon Feb 14 2022 Minghe Ren <mingheren@microsoft.com> - 1.2-1
+- Update to version 1.2
+
 * Fri Feb 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.1-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified

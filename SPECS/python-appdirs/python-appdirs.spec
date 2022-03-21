@@ -1,13 +1,13 @@
 Summary:        Python 3 compatibility utilities
 Name:           python-appdirs
-Version:        1.4.3
-Release:        5%{?dist}
+Version:        1.4.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/appdirs
-Source0:        https://pypi.python.org/packages/48/69/d87c60746b393309ca30761f8e2b49473d43450b150cb08f3c6df5c11be5/appdirs-%{version}.tar.gz
+Source0:        https://github.com/ActiveState/appdirs/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -42,6 +42,10 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 04 2022 Thomas Crain <thcrain@microsoft.com> - 1.4.4-1
+- Upgrade to latest upstream release version
+- Use github release tarball
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.3-5
 - Add license to python3 package
 - Remove python2 package

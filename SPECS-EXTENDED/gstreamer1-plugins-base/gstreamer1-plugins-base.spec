@@ -8,10 +8,10 @@ Distribution:   Mariner
 
 Name:           gstreamer1-plugins-base
 Version:        1.16.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
-License:        LGPLv2+
+License:        GPLv2+
 URL:            http://gstreamer.freedesktop.org/
 %if 0%{?gitrel}
 # git clone git://anongit.freedesktop.org/gstreamer/gst-plugins-base
@@ -28,7 +28,6 @@ BuildRequires:  gobject-introspection-devel >= 1.31.1
 BuildRequires:  iso-codes-devel
 
 BuildRequires:  alsa-lib-devel
-BuildRequires:  cdparanoia-devel
 BuildRequires:  libogg-devel >= 1.0
 BuildRequires:  libtheora-devel >= 1.1
 BuildRequires:  libvisual-devel
@@ -129,6 +128,7 @@ NOCONFIGURE=1 \
   --with-package-name='Fedora GStreamer-plugins-base package' \
   --with-package-origin='http://download.fedoraproject.org' \
   --enable-experimental \
+  --disable-cdparanoia \
   --disable-fatal-warnings \
   --disable-silent-rules \
   --disable-gtk-doc \
@@ -483,6 +483,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.2-6
+- Removing BR on 'cdparanoia'.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.2-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

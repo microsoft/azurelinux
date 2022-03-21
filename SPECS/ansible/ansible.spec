@@ -1,18 +1,16 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
 Version:        2.12.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://www.ansible.com
 Source0:        https://github.com/ansible/ansible/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  python-setuptools
 BuildRequires:  python3
 BuildRequires:  python3-libs
+BuildRequires:  python3-setuptools
 %if %{with_check}
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
@@ -48,6 +46,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.12.1-2
+- Remove python-setuptools in favor of python3-setuptools
+
 * Tue Jan 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.12.1-1
 - Upgrade to version 2.12.1
 

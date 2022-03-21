@@ -4,9 +4,9 @@ Distribution:   Mariner
 
 Name:           linuxconsoletools
 Version:        1.7.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Tools for connecting joysticks & legacy devices to the kernel's input subsystem
-License:        GPLv2+
+License:        GPLv2
 URL:            http://sourceforge.net/projects/linuxconsole/
 Source:         http://downloads.sourceforge.net/linuxconsole/%{name}-%{version}.tar.bz2
 
@@ -16,7 +16,7 @@ BuildRequires:  systemd-udev
 BuildRequires:  libudev-devel
 
 Provides:       joystick = %{version}-%{release}
-Provides:       ff-utils = 1:%{version}-%{release}
+Provides:       ff-utils = %{version}-%{release}
 Obsoletes:      joystick < 1.2.16-1
 Obsoletes:      ff-utils < 2.4.22-1
 Conflicts:      gpm < 1.20.6-26
@@ -77,6 +77,10 @@ chmod -x %{buildroot}%{_mandir}/man1/*
 
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-4
+- Removing epoch.
+- License verified.
+
 * Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Require libudev-devel at build-time for the udev pkgconfig file

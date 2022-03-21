@@ -2,21 +2,24 @@
 %global gui 0
 
 Name:           cppcheck
-Version:        2.1
-Release:        4%{?dist}
+Version:        2.7
+Release:        1%{?dist}
 Summary:        Tool for static C/C++ code analysis
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://cppcheck.wiki.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/danmar/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-# Use system tinyxml2
-Patch0:         cppcheck-2.1-tinyxml.patch
 # Fix location of translations
-Patch1:         cppcheck-1.89-translations.patch
+Patch0:         cppcheck-2.2-translations.patch
 # Select python3 explicitly
-Patch2:         cppcheck-1.88-htmlreport-python3.patch
+Patch1:         cppcheck-1.88-htmlreport-python3.patch
+# Disable one test, which fails under ppc64le
+# test/testmathlib.cpp:1246(TestMathLib::toString): Assertion failed.
+Patch2:         cppcheck-2.7-disable-test-testmathlib-tostring.patch
+# https://github.com/danmar/cppcheck/commit/974dd5d
+Patch3:         cppcheck-2.7-tinyxml2.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  pcre-devel
@@ -63,27 +66,24 @@ from xml files first generated using cppcheck.
 
 %prep
 %setup -q
-%patch0 -p1 -b .tinyxml
-%patch1 -p1 -b .translations
-%patch2 -p1 -b .python3
-# Make sure bundled tinyxml is not used
-rm -r externals/tinyxml
+%patch0 -p1 -b .translations
+%patch1 -p1 -b .python3
+%patch2 -p1 -b .array7
+%patch3 -p1 -b .tinyxml2
+# Make sure bundled tinyxml2 is not used
+rm -r externals/tinyxml2
 
 %build
 # Manuals
 make DB2MAN=%{_datadir}/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl man
 
 # Binaries
-mkdir objdir-%{_target_platform}
-cd objdir-%{_target_platform}
 # Upstream doesn't support shared libraries (unversioned solib)
-%cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=yes -DUSE_Z3=yes -DHAVE_RULES=yes -DBUILD_GUI=%{gui} -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck
-# SMP make doesn't seem to work
-make cppcheck
+%cmake -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=yes -DUSE_Z3=yes -DHAVE_RULES=yes -DBUILD_GUI=%{gui} -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck -DUSE_BUNDLED_TINYXML2=OFF -DENABLE_OSS_FUZZ=OFF
+%cmake_build
 
 %install
-rm -rf %{buildroot}
-make -C objdir-%{_target_platform} DESTDIR=%{buildroot} install
+%cmake_install
 install -D -p -m 644 cppcheck.1 %{buildroot}%{_mandir}/man1/cppcheck.1
 
 %if %{gui}
@@ -121,6 +121,10 @@ cd objdir-%{_target_platform}/bin
 %{_bindir}/cppcheck-htmlreport
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-1
+- Updating to version 2.7 using Fedora 36 (license: MIT) specs for guidance.
+- License verified.
+
 * Thu Dec 17 2020 Joe Schmitt <joschmit@microsoft.com> - 2.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Turn off GUI support.

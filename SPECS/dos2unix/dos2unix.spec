@@ -1,7 +1,7 @@
 Summary:       Text file format converters
 Name:          dos2unix
-Version:       7.4.1
-Release:       4%{?dist}
+Version:       7.4.2
+Release:       1%{?dist}
 License:       BSD
 URL:           https://waterlan.home.xs4all.nl/dos2unix.html
 Source:        https://waterlan.home.xs4all.nl/dos2unix/%{name}-%{version}.tar.gz
@@ -42,6 +42,9 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}
 %{_mandir}/man1/*.1*
 
 %changelog
+* Fri Jan 21 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 7.4.2-1
+- Upgrade to 7.4.2
+
 * Tue Aug 25 2020 Nicolas Ontiveros <niontive@microsoft.com> - 7.4.1-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified.

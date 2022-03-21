@@ -52,6 +52,9 @@
       - [`REFRESH_WORKER_CHROOT=...`](#refresh_worker_chroot)
         - [`REFRESH_WORKER_CHROOT=`**`n`**](#refresh_worker_chrootn)
         - [`REFRESH_WORKER_CHROOT=`**`y`** *(default)*](#refresh_worker_chrooty-default)
+      - [`HYDRATED_BUILD=...`](#hydrated_build)
+        - [`HYDRATED_BUILD=`**`y`**](#hydraded_buildy)
+        - [`HYDRATED_BUILD=`**`n`** *(default)*](#hydrated_build-default)
   - [All Build Targets](#all-build-targets)
   - [Reproducing a Build](#reproducing-a-build)
     - [Build Summaries](#build-summaries)
@@ -489,6 +492,16 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 > - worker chroot's manifest file,
 > - at least one of the RPM packages mentioned in the manifest file, or
 > - the script responsible for building the chroot.
+
+#### `HYDRATED_BUILD=...`]
+
+##### `HYDRATED_BUILD=`**`y`**]
+
+> If exists, all the dependency RUN nodes will be replaced with PreBuilt Nodes if those RPMs are hydrated already. So if any dependency package fails to build, the subsequent dependent packages will not be stuck as their dependency will be satisfied by hydrated RPM. This is even applicable to the packages mentioned in REBUILD_PACKAGES.
+
+##### `HYDRATED_BUILD=`**`n`** *(default)*
+
+> Normal build. No hydrated RPMs will be used.
 
 ## All Build Targets
 

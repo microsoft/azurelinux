@@ -1,7 +1,7 @@
 Summary:        Hardware identification and configuration data
 Name:           hwdata
-Version:        0.341
-Release:        4%{?dist}
+Version:        0.356
+Release:        1%{?dist}
 License:        GPLv2+ OR XFree86 1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,9 @@ make install DESTDIR=%{buildroot} libdir=%{_libdir}
 %{_datadir}/%{name}/*
 
 %changelog
+* Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.356-1
+- Update source to v0.356
+
 * Fri May 28 2021 Thomas Crain <thcrain@microsoft.com> - 0.341-4
 - Replace improper %%{_lib} macro usage with %%{_libdir}
 

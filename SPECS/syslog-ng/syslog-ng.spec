@@ -1,9 +1,7 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.33.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,12 +13,7 @@ Source2:        syslog-ng.service
 BuildRequires:  glib-devel
 BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
-BuildRequires:  python2
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-BuildRequires:  python3
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 BuildRequires:  systemd-devel
 %if %{with_check}
 BuildRequires:  curl-devel
@@ -39,14 +32,6 @@ Provides: syslog
  system logging tool. It is often used to manage log messages and implement
  centralized logging, where the aim is to collect the log messages of several
  devices to a single, central log server.
-
-%package -n     python2-syslog-ng
-Summary:        python2-syslog-ng
-Requires:       python2
-Requires:       python2-libs
-
-%description -n python2-syslog-ng
-Python 2 version.
 
 %package -n     python3-syslog-ng
 Summary:        python3-syslog-ng
@@ -70,23 +55,6 @@ rm -rf ../p3dir
 cp -a . ../p3dir
 
 %build
-
-%configure \
-    CFLAGS="%{optflags}" \
-    CXXFLAGS="%{optflags}" \
-    --disable-silent-rules \
-    --sysconfdir=%{_sysconfdir}/syslog-ng \
-    --enable-systemd \
-    --with-systemdsystemunitdir=%{_libdir}/systemd/system \
-    --enable-json=yes \
-    --with-jsonc=system \
-    --disable-java \
-    --disable-redis \
-    --with-python=2 \
-    PKG_CONFIG_PATH=%{_prefix}/local/lib/pkgconfig/
-make %{?_smp_mflags}
-
-pushd ../p3dir
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -103,10 +71,7 @@ pushd ../p3dir
     PKG_CONFIG_PATH=%{_prefix}/local/lib/pkgconfig/
 make %{?_smp_mflags}
 
-popd
-
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
 find %{buildroot} -name "*.la" -exec rm -f {} \;
 rm %{buildroot}/%{_libdir}/systemd/system/syslog-ng@.service
@@ -115,29 +80,14 @@ install -vd %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/
 %{_fixperms} %{buildroot}/*
-
-pushd ../p3dir
-make DESTDIR=%{buildroot} install
-rm %{buildroot}/%{_libdir}/systemd/system/syslog-ng@.service
-rm -rf %{buildroot}/%{_infodir}
 sed -i 's/eventlog//g'  %{buildroot}%{_libdir}/pkgconfig/syslog-ng.pc
-find %{buildroot} -name "*.la" -exec rm -f {} \;
-popd
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable syslog-ng.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-syslog-ng.preset
 
 %check
-easy_install_2=$(ls %{_bindir} |grep easy_install |grep 2)
-$easy_install_2 unittest2
-$easy_install_2 nose
-$easy_install_2 ply
-$easy_install_2 pep8
-make %{?_smp_mflags} check
-pushd ../p3dir
 pip3 install unittest2 nose ply pep8
 make %{?_smp_mflags} check
-popd
 
 %post
 if [ $1 -eq 1 ] ; then
@@ -184,10 +134,6 @@ fi
 %{_mandir}/man8/syslog-ng.8.gz
 %{_datadir}/syslog-ng/*
 
-%files -n python2-syslog-ng
-%defattr(-,root,root)
-%{_libdir}/syslog-ng/python/*
-
 %files -n python3-syslog-ng
 %defattr(-,root,root,-)
 %{_libdir}/syslog-ng/python/*
@@ -201,6 +147,9 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 3.33.2-3
+- Remove python2 subpackage
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.33.2-2
 - Added "Provides: syslog".
 

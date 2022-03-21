@@ -8,19 +8,19 @@ Distribution:   Mariner
 Summary:        C++ API for the cairo graphics library
 Name:           cairomm
 Version:        1.12.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 URL:            http://www.cairographics.org
 License:        LGPLv2+
 Source:         http://www.cairographics.org/releases/%{name}-%{version}.tar.gz
 BuildRequires:  gcc-c++
 BuildRequires:  cairo-devel >= %{cairo_version}
-BuildRequires:  libsigc++20-devel >= %{libsigc_version}
+BuildRequires:  libsigc++30 >= %{libsigc_version}
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  pkgconfig
 
 Requires:       cairo%{?_isa} >= %{cairo_version}
-Requires:       libsigc++20%{?_isa} >= %{libsigc_version}
+Requires:       libsigc++30%{?_isa} >= %{libsigc_version}
 
 %description
 Cairomm is the C++ API for the cairo graphics library. It offers all the power
@@ -43,7 +43,7 @@ developing %{name} applications.
 Summary:        Developer's documentation for the cairomm library
 BuildArch:      noarch
 Requires:       %{name} = %{version}-%{release}
-Requires:       libsigc++20-doc
+Requires:       libsigc++30
 
 %description      doc
 This package contains developer's documentation for the cairomm
@@ -85,6 +85,10 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %doc %{_datadir}/devhelp/
 
 %changelog
+* Fri Feb 04 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.12.0-15
+- Upgrade to to libsigc++30
+- License verified.
+
 * Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-14
 - Bringing back the dependency on 'cairo'.
 

@@ -1,8 +1,0 @@
---- runtests.sh.sav	2006-05-05 20:46:37.000000000 +0200
-+++ runtests.sh	2006-05-05 20:46:54.000000000 +0200
-@@ -11,4 +11,4 @@
- 
- CP=$ANTLR_CP:$JDOM_CP:$XPATH_CP:$TEST_CP:$XERCES_CP
- 
--java -classpath $CP $TEST_DRIVER $TESTS_XML
-+java -classpath $CLASSPATH $TEST_DRIVER $TESTS_XML

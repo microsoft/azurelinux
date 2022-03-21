@@ -1,0 +1,13 @@
+diff --git a/src/cleanup/cleanup_message.c b/src/cleanup/cleanup_message.c
+index 391c711..be5ce42 100644
+--- a/src/cleanup/cleanup_message.c
++++ b/src/cleanup/cleanup_message.c
+@@ -773,6 +773,8 @@ static void cleanup_header_done_callback(void *context)
+ 		    /* Normalize whitespace. */
+ 		    token = tok822_scan_limit(state->fullname, &dummy_token,
+ 					      var_token_limit);
++		    if (!token)
++				token = tok822_alloc(TOK822_QSTRING, state->fullname);
+ 		} else {
+ 		    token = tok822_alloc(TOK822_QSTRING, state->fullname);
+ 		}

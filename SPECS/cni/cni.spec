@@ -23,8 +23,8 @@
 %define __arch_install_post export NO_BRP_STRIP_DEBUG=true
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
-Version:        0.8.1
-Release:        2%{?dist}
+Version:        1.0.1
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,20 @@ URL:            https://github.com/containernetworking/cni
 Source0:        %{name}-%{version}.tar.gz
 Source1:        99-loopback.conf
 Source2:        build.sh
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/containernetworking/cni/archive/refs/tags/v1.0.1.tar.gz -o %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+Source3:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
@@ -55,6 +69,9 @@ range of support and the specification is simple to implement.
 cp %{SOURCE2} build.sh
 
 %build
+# create vendor folder from the vendor tarball and set vendor mode
+tar -xf %{SOURCE3} --no-same-owner
+
 # go1.16+ default is GO111MODULE=on set to auto temporarily
 # until using upstream release with go.mod
 export GO111MODULE=auto
@@ -96,6 +113,11 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
+* Wed Feb 09 2022 Henry Li <lihl@microsoft.com> - 1.0.1-1
+- Upgrade to version 1.0.1
+- Add vendor source, which is required to build
+- Modify build.sh to build using vendor source
+
 * Tue Aug 17 2021 Henry Li <lihl@microsoft.com> - 0.8.1-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified

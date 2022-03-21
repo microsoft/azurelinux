@@ -1,4 +1,4 @@
-From bca0b3a085b7a169aa40d81ed7997c73fde8b4d3 Mon Sep 17 00:00:00 2001
+From 2c28c620727e522f022689312d76f107eb8ef18f Mon Sep 17 00:00:00 2001
 From: Peter Hatina <phatina@redhat.com>
 Date: Mon, 5 Oct 2015 16:50:36 -0700
 Subject: [PATCH] libiscsi introduce sessions API
@@ -242,7 +242,7 @@ index 756590e..a9891f4 100644
   *
   * Set the given nodes iSCSI parameter named by \e parameter to value \e value.
 diff --git a/usr/iscsi_sysfs.c b/usr/iscsi_sysfs.c
-index 418f51b..6febba2 100644
+index 435c576..e549afe 100644
 --- a/usr/iscsi_sysfs.c
 +++ b/usr/iscsi_sysfs.c
 @@ -3,6 +3,7 @@
@@ -286,5 +286,5 @@ index 1d0377f..909db34 100644
  					      int *nr_found,
  					      iscsi_sysfs_iface_op_fn *fn);
 -- 
-2.21.0
+2.26.2
 

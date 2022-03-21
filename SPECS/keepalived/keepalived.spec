@@ -1,29 +1,35 @@
 Summary:        HA monitor built upon LVS, VRRP and services poller
 Name:           keepalived
-Version:        2.0.10
-Release:        6%{?dist}
+Version:        2.2.7
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.keepalived.org/
-#Note.          We currently use alternate source location.  Preferred original is here:  https://www.keepalived.org/software/keepalived-%{version}.tar.gz
-#Source0:       https://github.com/acassen/keepalived/archive/v%{version}.zip
-Source0:        %{name}-%{version}.zip
+Source0:        https://www.keepalived.org/software/%{name}-%{version}.tar.gz
 Source1:        %{name}.service
 
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gcc
 BuildRequires:  ipset-devel
 BuildRequires:  iptables-devel
+BuildRequires:  kernel-headers
 BuildRequires:  libmnl-devel
 BuildRequires:  libnfnetlink-devel
 BuildRequires:  libnl3-devel
 BuildRequires:  net-snmp-devel
 BuildRequires:  openssl-devel
+BuildRequires:  pkgconfig
 BuildRequires:  systemd
 BuildRequires:  unzip
 
+Requires:       iptables
+Requires:       kmod
 Requires:       libnl3-devel
 Requires:       net-snmp
+Requires:       openssl
 Requires:       systemd
 
 %description
@@ -45,14 +51,25 @@ healthchecks and LVS directors failover.
 autoreconf -f -i
 %configure \
     --with-systemdsystemunitdir=%{_unitdir} \
+    --disable-nftables  \
     --enable-snmp       \
-    --enable-snmp-rfc
+    --enable-snmp-rfc   \
+    --with-init=systemd
 make %{?_smp_mflags} STRIP=/bin/true
 
 %install
 make install DESTDIR=%{buildroot}
 install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
+mkdir -p doc_install/samples
+cp doc/keepalived.conf.SYNOPSIS doc_install
+cp doc/samples/* doc_install/samples
+rm -f doc_install/samples/*.pem
+rm -rf %{buildroot}%{_sysconfdir}/rc.d/init.d/
 rm -rf %{buildroot}%{_sysconfdir}/%{name}/samples/*
+mkdir -p %{buildroot}%{_libexecdir}/keepalived
+# After keepalived v2.2.4 we stopped installing a default keepalived.conf and instead install
+# keepalived.conf.sample.
+mv %{buildroot}/etc/keepalived/keepalived.conf.sample %{buildroot}/etc/keepalived/keepalived.conf
 
 %check
 # A build could silently have LVS support disabled if the kernel includes can't
@@ -74,22 +91,29 @@ fi
 %systemd_postun_with_restart keepalived.service
 
 %files
-%defattr(-,root,root)
+%defattr(-, root, root, -)
 %license COPYING
-%doc %{_docdir}/%{name}/README
-%{_sbindir}/%{name}
-%{_bindir}/genhash
-%{_unitdir}/%{name}.service
-%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
+%doc AUTHOR ChangeLog CONTRIBUTORS README TODO
+%doc doc_install/*
+%dir %{_sysconfdir}/keepalived/
+%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/keepalived/keepalived.conf
+%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/keepalived
+%{_unitdir}/keepalived.service
 %{_datadir}/snmp/mibs/KEEPALIVED-MIB.txt
 %{_datadir}/snmp/mibs/VRRP-MIB.txt
 %{_datadir}/snmp/mibs/VRRPv3-MIB.txt
+%{_bindir}/genhash
+%attr(0755,root,root) %{_sbindir}/keepalived
 %{_mandir}/man1/genhash.1*
-%{_mandir}/man5/%{name}.conf.5*
-%{_mandir}/man8/%{name}.8*
+%{_mandir}/man5/keepalived.conf.5*
+%{_mandir}/man8/keepalived.8*
 
 %changelog
+* Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.2.7-1
+- Update source to v2.2.7
+- Using Fedora 36 spec (license: MIT) for guidance.
+- Using spec shipped with source (license: GPLv2) for guidance.
+
 * Thu Apr 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.10-6
 - Adding an explicit run-time dependency on 'net-snmp'.
 - Bumping up release number to link against newer version of 'net-snmp' libraries.

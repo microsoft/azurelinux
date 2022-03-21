@@ -22,12 +22,14 @@ Version:   3.0.9
 ExclusiveArch: %{golang_arches} %{gccgo_arches}
 
 Name:      go-rpm-macros
-Release:   2%{?dist}
+Release:   3%{?dist}
 Summary:   Build-stage rpm automation for Go packages
 
 License:   GPLv3+
 URL:       %{forgeurl}
+# Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
 Source:    %{forgesource}
+Patch0:    fixing_ldflags_for_mariner.patch
 
 Requires:  go-srpm-macros = %{version}-%{release}
 Requires:  go-filesystem  = %{version}-%{release}
@@ -89,6 +91,8 @@ macros provided by go-rpm-macros to create Go packages.
 
 %prep
 %forgesetup
+%patch0 -p1
+
 %writevars -f rpm/macros.d/macros.go-srpm golang_arches gccgo_arches gopath
 for template in templates/rpm/*\.spec ; do
   target=$(echo "${template}" | sed "s|^\(.*\)\.spec$|\1-bare.spec|g")
@@ -166,6 +170,10 @@ install -m 0644 -vp   rpm/macros.d/macros.go-compilers-gcc \
 %{_spectemplatedir}/*.spec
 
 %changelog
+* Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-3
+- Fixing Go's linker flags.
+- License verified.
+
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Adjusting directories to CBL-Mariner.

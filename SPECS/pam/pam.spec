@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -10,7 +10,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  cracklib-devel
 BuildRequires:  libselinux-devel
-Requires:       cracklib
+BuildRequires:  audit-devel
+Recommends:     audit-libs
+Recommends:     cracklib-dicts
 
 %description
 The Linux PAM package contains Pluggable Authentication Modules used to
@@ -96,6 +98,12 @@ EOF
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Mon Mar 14 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.1-4
+- Add Recommends for audit-libs and cracklib-dicts to resolve circular dependency and boot issue
+
+* Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.1-3
+- Build with audit support
+
 * Tue Oct 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.5.1-2
 - Remove libdb dependency
 

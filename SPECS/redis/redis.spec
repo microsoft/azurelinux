@@ -1,6 +1,6 @@
 Summary:        advanced key-value store
 Name:           redis
-Version:        6.2.5
+Version:        6.2.6
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -83,6 +83,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Mon Feb 07 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.6-1
+- Bump version to 6.2.6 to fix ptest
+
 * Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.2.5-1
 - Update to version 6.2.5.
 - Modified patch to apply to new version.

@@ -1,7 +1,7 @@
 Summary:	Tool to analyze BIOS DMI data
 Name:		dmidecode
-Version:	3.2
-Release:        2%{?dist}
+Version:	3.3
+Release:    1%{?dist}
 License:	GPLv2+
 URL:		http://www.nongnu.org/dmidecode/
 Group:		System Environment/Base
@@ -25,6 +25,10 @@ make DESTDIR=%{buildroot} prefix=%{_prefix} install
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jan 21 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.3-1
+- Upgrade to 3.3
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.2-2
 - Added %%license line automatically
 

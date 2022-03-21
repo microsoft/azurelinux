@@ -1,14 +1,13 @@
 Summary:        Packet Analyzer
 Name:           tcpdump
-Version:        4.9.3
-Release:        3%{?dist}
+Version:        4.99.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Networking
 URL:            https://www.tcpdump.org
 Source0:        https://www.tcpdump.org/release/%{name}-%{version}.tar.gz
-Patch0:         CVE-2020-8037.patch
 BuildRequires:  libpcap-devel
 Requires:       libpcap
 
@@ -25,7 +24,18 @@ transmitted or received over a network to which the computer is attached.
 make %{?_smp_mflags}
 
 %install
-make DESTDIR=%{buildroot} install
+# make install installs to /usr/bin in 4.99.1
+# so specify install to sbin instead
+mkdir -p %{buildroot}/%{_sbindir}
+mkdir -p %{buildroot}/%{_mandir}/man1
+
+chmod 755 %{buildroot}/%{_sbindir}
+chmod 755 %{buildroot}/%{_mandir}/man1
+
+install -m755 tcpdump %{buildroot}%{_sbindir}/tcpdump
+ln -sf tcpdump %{buildroot}%{_sbindir}/tcpdump.%{version}
+install -m755 tcpdump.1 %{buildroot}%{_mandir}/man1/tcpdump.1
+
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
@@ -38,6 +48,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
+* Tue Feb 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.99.1-1
+- Update to 4.99.1
+
 * Fri Nov 13 2020 Thomas Crain <thcrain@microsoft.com> - 4.9.3-3
 - Patch CVE-2020-8037
 - Lint to Mariner style

@@ -1,0 +1,9 @@
+[Unit]
+Description=USB/IP server daemon
+
+[Service]
+ExecStartPre=/sbin/modprobe -qab usbip_host
+ExecStart=/usr/sbin/usbipd
+
+[Install]
+WantedBy=multi-user.target

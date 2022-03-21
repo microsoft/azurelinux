@@ -1,0 +1,158 @@
+# This is a directory where wheels are stored and installed from, relative to PWD
+%_pyproject_wheeldir %{_builddir}%{?buildsubdir:/%{buildsubdir}}/pyproject-wheeldir
+
+# This is a directory used as TMPDIR, where pip copies sources to and builds from, relative to PWD
+# For proper debugsource packages, we create TMPDIR within PWD
+# See https://github.com/pypa/pip/issues/7555#issuecomment-595180864
+#
+# This will be used in debugsource package paths (applies to extension modules only)
+# NB: pytest collects tests from here if not hidden
+#     https://docs.pytest.org/en/latest/reference.html#confval-norecursedirs
+%_pyproject_builddir %{_builddir}%{?buildsubdir:/%{buildsubdir}}/.pyproject-builddir
+
+%pyproject_files %{_builddir}/pyproject-files
+%_pyproject_modules %{_builddir}/pyproject-modules
+%_pyproject_ghost_distinfo %{_builddir}/pyproject-ghost-distinfo
+%_pyproject_record %{_builddir}/pyproject-record
+
+# Avoid leaking %%{_pyproject_builddir} to pytest collection
+# https://bugzilla.redhat.com/show_bug.cgi?id=1935212
+# The value is read and used by the %%pytest and %%tox macros:
+%_set_pytest_addopts %global __pytest_addopts --ignore=%{_pyproject_builddir}
+
+%pyproject_wheel() %{expand:\\\
+%_set_pytest_addopts
+mkdir -p "%{_pyproject_builddir}"
+CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}" TMPDIR="%{_pyproject_builddir}" \\\
+%{__python3} -m pip wheel --wheel-dir %{_pyproject_wheeldir} --no-deps --use-pep517 --no-build-isolation --disable-pip-version-check --no-clean --progress-bar off --verbose .
+}
+
+
+%pyproject_build_lib %{expand:\\\
+$(
+pyproject_build_lib=()
+if [ -d build/lib.%{python3_platform}-%{python3_version} ]; then
+  pyproject_build_lib+=( "${PWD}/build/lib.%{python3_platform}-%{python3_version}" )
+fi
+if [ -d build/lib ]; then
+  pyproject_build_lib+=( "${PWD}/build/lib" )
+fi
+for directory in $(find "%{_pyproject_builddir}" -type d -wholename "%{_pyproject_builddir}/pip-req-build-*/build/lib.%{python3_platform}-%{python3_version}" 2>/dev/null); do
+  pyproject_build_lib+=( "${directory}" )
+done
+for directory in $(find "%{_pyproject_builddir}" -type d -wholename "%{_pyproject_builddir}/pip-req-build-*/build/lib" 2>/dev/null); do
+  pyproject_build_lib+=( "${directory}" )
+done
+echo $(IFS=:; echo "${pyproject_build_lib[*]}")
+)}
+
+
+%pyproject_install() %{expand:\\\
+specifier=$(ls %{_pyproject_wheeldir}/*.whl | xargs basename --multiple | sed -E 's/([^-]+)-([^-]+)-.+\\\.whl/\\\1==\\\2/')
+TMPDIR="%{_pyproject_builddir}" %{__python3} -m pip install --root %{buildroot} --no-deps --disable-pip-version-check --progress-bar off --verbose --ignore-installed --no-warn-script-location --no-index --no-cache-dir --find-links %{_pyproject_wheeldir} $specifier
+if [ -d %{buildroot}%{_bindir} ]; then
+  %py3_shebang_fix %{buildroot}%{_bindir}/*
+  rm -rfv %{buildroot}%{_bindir}/__pycache__
+fi
+rm -f %{_pyproject_ghost_distinfo}
+site_dirs=()
+# Process %%{python3_sitelib} if exists
+if [ -d %{buildroot}%{python3_sitelib} ]; then
+  site_dirs+=( "%{python3_sitelib}" )
+fi
+# Process %%{python3_sitearch} if exists and does not equal to %%{python3_sitelib}
+if [ %{buildroot}%{python3_sitearch} != %{buildroot}%{python3_sitelib} ] && [ -d %{buildroot}%{python3_sitearch} ]; then
+  site_dirs+=( "%{python3_sitearch}" )
+fi
+# Process all *.dist-info dirs in sitelib/sitearch
+for site_dir in ${site_dirs[@]}; do
+  for distinfo in %{buildroot}$site_dir/*.dist-info; do
+    echo "%ghost ${distinfo#%{buildroot}}" >> %{_pyproject_ghost_distinfo}
+    sed -i 's/pip/rpm/' ${distinfo}/INSTALLER
+    PYTHONPATH=%{_rpmconfigdir}/mariner \\
+      %{__python3} -B %{_rpmconfigdir}/mariner/pyproject_preprocess_record.py \\
+      --buildroot %{buildroot} --record ${distinfo}/RECORD --output %{_pyproject_record}
+    rm -fv ${distinfo}/RECORD
+    rm -fv ${distinfo}/REQUESTED
+  done
+done
+lines=$(wc -l %{_pyproject_ghost_distinfo} | cut -f1 -d" ")
+if [ $lines -ne 1 ]; then
+  echo -e "\\n\\nWARNING: %%%%pyproject_extras_subpkg won't work without explicit -i or -F, found $lines dist-info directories.\\n\\n" >&2
+  rm %{_pyproject_ghost_distinfo}  # any attempt to use this will fail
+fi
+}
+
+
+# Note: the three times nested questionmarked -i -f -F pattern means: If none of those options was used -- in that case, we inject our own -f
+%pyproject_extras_subpkg(n:i:f:F) %{expand:%{?python_extras_subpkg:%{python_extras_subpkg%{?!-i:%{?!-f:%{?!-F: -f %{_pyproject_ghost_distinfo}}}} %**}}}
+
+
+%pyproject_save_files() %{expand:\\\
+%{__python3} %{_rpmconfigdir}/mariner/pyproject_save_files.py \\
+  --output-files "%{pyproject_files}" \\
+  --output-modules "%{_pyproject_modules}" \\
+  --buildroot "%{buildroot}" \\
+  --sitelib "%{python3_sitelib}" \\
+  --sitearch "%{python3_sitearch}" \\
+  --python-version "%{python3_version}" \\
+  --pyproject-record "%{_pyproject_record}" \\
+  --prefix "%{_prefix}" \\
+  %{*}
+}
+
+# -t - Process only top-level modules
+# -e - Exclude the module names matching given glob, may be used repeatedly
+%pyproject_check_import(e:t) %{expand:\\\
+if [ ! -f "%{_pyproject_modules}" ]; then
+  echo 'ERROR: %%%%pyproject_check_import only works when %%%%pyproject_save_files is used' >&2
+  exit 1
+fi
+%py3_check_import -f "%{_pyproject_modules}" %{?**}
+}
+
+
+%default_toxenv py%{python3_version_nodots}
+%toxenv %{default_toxenv}
+
+
+%pyproject_buildrequires(rRxtNe:) %{expand:\\\
+%{-R:%{-r:%{error:The -R and -r options are mutually exclusive}}}
+%{-N:
+%{-r:%{error:The -N and -r options are mutually exclusive}}
+%{-x:%{error:The -N and -x options are mutually exclusive}}
+%{-e:%{error:The -N and -e options are mutually exclusive}}
+%{-t:%{error:The -N and -t options are mutually exclusive}}
+}
+%{-e:%{expand:%global toxenv %(%{__python3} -s %{_rpmconfigdir}/mariner/pyproject_construct_toxenv.py %{?**})}}
+echo 'pyproject-rpm-macros'  # we already have this installed, but this way, it's repoqueryable
+echo 'python%{python3_pkgversion}-devel'
+echo 'python%{python3_pkgversion}dist(pip) >= 19'
+echo 'python%{python3_pkgversion}dist(packaging)'
+%{!-N:if [ -f pyproject.toml ]; then
+  echo 'python%{python3_pkgversion}dist(toml)'
+elif [ -f setup.py ]; then
+  # Note: If the default requirements change, also change them in the script!
+  echo 'python%{python3_pkgversion}dist(setuptools) >= 40.8'
+  echo 'python%{python3_pkgversion}dist(wheel)'
+else
+  echo 'ERROR: Neither pyproject.toml nor setup.py found, consider using %%%%pyproject_buildrequires -N <requirements-file> if this is not a Python package.' >&2
+  exit 1
+fi}
+# setuptools assumes no pre-existing dist-info
+rm -rfv *.dist-info/ >&2
+if [ -f %{__python3} ]; then
+  RPM_TOXENV="%{toxenv}" HOSTNAME="rpmbuild" %{__python3} -s %{_rpmconfigdir}/mariner/pyproject_buildrequires.py %{?!_python_no_extras_requires:--generate-extras} --python3_pkgversion %{python3_pkgversion} %{?**}
+fi
+}
+
+
+%tox(e:) %{expand:\\\
+TOX_TESTENV_PASSENV="${TOX_TESTENV_PASSENV:-*}" \\
+PYTHONDONTWRITEBYTECODE=1 \\
+PATH="%{buildroot}%{_bindir}:$PATH" \\
+PYTHONPATH="${PYTHONPATH:-%{buildroot}%{python3_sitearch}:%{buildroot}%{python3_sitelib}}" \\
+%{?__pytest_addopts:PYTEST_ADDOPTS="${PYTEST_ADDOPTS:-} %{__pytest_addopts}"} \\
+HOSTNAME="rpmbuild" \\
+%{__python3} -m tox --current-env -q --recreate -e "%{-e:%{-e*}}%{!-e:%{toxenv}}" %{?*}
+}

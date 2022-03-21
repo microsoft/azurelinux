@@ -2,7 +2,7 @@
 Summary:        Fast samples-based log normalization library
 Name:           liblognorm
 Version:        2.0.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ BuildRequires:  gcc
 BuildRequires:  libestr-devel
 BuildRequires:  libfastjson-devel
 BuildRequires:  pcre-devel
+BuildRequires:  python3-devel
 BuildRequires:  python3-sphinx
 
 %description
@@ -87,6 +88,9 @@ rm %{buildroot}%{htmldir}/{objects.inv,.buildinfo}
 %{_bindir}/lognormalizer
 
 %changelog
+* Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0.6-2
+- Add missing dependency on python-devel
+
 * Mon Jan 10 2022 Henry Li <lihl@microsoft.com> - 2.0.6-1
 - Upgrade to version 2.0.6
 

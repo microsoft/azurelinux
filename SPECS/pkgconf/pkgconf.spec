@@ -4,14 +4,14 @@
 %global pkgconfig_ver 0.29.1
 # For obsoleting pkgconfig
 %global pkgconfig_verrel %{pkgconfig_ver}-3
-%global pkgconfig_evr 1:%{pkgconfig_verrel}
+%global pkgconfig_evr %{pkgconfig_verrel}
 %endif
 # Search path for pc files for pkgconf
 %global pkgconf_libdirs %{_libdir}/pkgconfig:%{_datadir}/pkgconfig
 Summary:        Package compiler and linker metadata toolkit
 Name:           pkgconf
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -178,6 +178,9 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %endif
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.0-2
+- Removing epoch.
+
 * Tue Dec 07 2021 Chris Co <chrco@microsoft.com> - 1.8.0-1
 - Update to 1.8.0
 

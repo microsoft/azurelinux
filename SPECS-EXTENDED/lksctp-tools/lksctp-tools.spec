@@ -3,9 +3,9 @@ Distribution:   Mariner
 Name:    lksctp-tools
 Summary: User-space access to Linux Kernel SCTP
 Version: 1.0.18
-Release: 5%{?dist}
+Release: 6%{?dist}
 # src/apps/bindx_test.C is GPLv2, I've asked upstream for clarification
-License: GPLv2 and GPLv2+ and LGPLv2 and MIT
+License: GPLv2 and LGPLv2+
 Group:   System Environment/Libraries
 URL:     http://lksctp.sourceforge.net
 
@@ -17,7 +17,9 @@ Patch3: lksctp-tools-1.0.18-build-fix-netinet-sctp.h-not-to-be-installed.patch
 Patch4: lksctp-tools-1.0.18-build-remove-v4.12-secondary-defines-in-favor-of-HAV.patch
 Patch5: lksctp-tools-1.0.18-build-fix-probing-for-HAVE_SCTP_SENDV.patch
 Patch6: lksctp-tools-1.0.18-build-0b0dce7a36fb-actually-belongs-to-v4.19.patch
-BuildRequires: libtool, automake, autoconf
+Patch7: lksctp-tools-symver.patch
+Patch8: lksctp-tools-1.0.18-autoconf_2_70.patch
+BuildRequires: libtool, automake, autoconf, make
 
 %description
 This is the lksctp-tools package for Linux Kernel SCTP (Stream Control
@@ -58,6 +60,8 @@ Drafts).
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
+%patch8 -p1
 
 %build
 [ ! -x ./configure ] && sh bootstrap
@@ -66,20 +70,19 @@ Drafts).
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
-make %{?_smp_mflags}
+%make_build
 
 %install
 rm -f doc/rfc2960.txt doc/states.txt
-make install DESTDIR="$RPM_BUILD_ROOT" INSTALL="install -p"
+%make_install
 
 find $RPM_BUILD_ROOT -type f -name "*.la" -delete
 
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
-%doc AUTHORS ChangeLog COPYING* README
+%license COPYING*
+%doc AUTHORS ChangeLog README
 %{_bindir}/*
 %{_libdir}/libsctp.so.1*
 %dir %{_libdir}/lksctp-tools/
@@ -98,6 +101,10 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -delete
 %doc doc/*.txt
 
 %changelog
+* Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.18-6
+- License verified.
+- Applying patch for "autoconf" version 2.70+. Using Fedora 36 spec (license: MIT) for guidance.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.18-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

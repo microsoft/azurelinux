@@ -1,7 +1,7 @@
 Summary:        Extremely fast and user friendly build system
 Name:           meson
 Version:        0.60.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,13 +9,19 @@ URL:            https://mesonbuild.com/
 Source0:        https://github.com/mesonbuild/meson/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  gettext
-BuildRequires:  gmock-devel
-BuildRequires:  gtest-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  libgcrypt-devel
+BuildRequires:  glib-devel
+BuildRequires:  cmake
+BuildRequires:  gtest
+BuildRequires:  gmock
+BuildRequires:  git
+%endif
+
 Requires:       ninja-build
 Requires:       python3-setuptools
 Requires:       python3-xml
@@ -51,6 +57,11 @@ python3 ./run_tests.py
 %{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
 
 %changelog
+* Tue Feb 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.60.2-2
+- Drop BR on `gmock-devel` & `gtest-devel`
+- Drop BR on `python3-libs` which is satisfied by `python3-devel`
+- Add an explict BR on `libgcrypt, glib, gtest, gmock, cmake, git` to enable ptest
+
 * Wed Dec 08 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.60.2-1
 - Updating to 0.60.2.
 - License Verified

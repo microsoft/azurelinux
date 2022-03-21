@@ -1,0 +1,123 @@
+From 278d0d3226f4bdb7c6586986ca46d0a25c976fe4 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Wed, 31 Mar 2021 13:40:11 +0100
+Subject: [PATCH] lib/appliance-kcmdline.c: Read UUID directly from appliance.
+
+Instead of using the external file utility, read the UUID directly
+from the extfs filesystem.  file 5.40 broke parsing of UUIDs
+(https://bugs.astron.com/view.php?id=253).
+
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1945122
+---
+ lib/appliance-kcmdline.c | 75 +++++++++++++++++++++++++---------------
+ 1 file changed, 48 insertions(+), 27 deletions(-)
+
+diff --git a/lib/appliance-kcmdline.c b/lib/appliance-kcmdline.c
+index 6d0deef867..8b78655eb2 100644
+--- a/lib/appliance-kcmdline.c
++++ b/lib/appliance-kcmdline.c
+@@ -27,6 +27,9 @@
+ #include <stdbool.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <fcntl.h>
++#include <libintl.h>
++#include <sys/types.h>
+ 
+ #include "c-ctype.h"
+ #include "ignore-value.h"
+@@ -56,49 +59,67 @@
+ #define EARLYPRINTK "earlyprintk=pl011,0x9000000"
+ #endif
+ 
+-COMPILE_REGEXP (re_uuid, "UUID=([-0-9a-f]+)", 0)
+-
+-static void
+-read_uuid (guestfs_h *g, void *retv, const char *line, size_t len)
+-{
+-  char **ret = retv;
+-
+-  *ret = match1 (g, line, re_uuid);
+-}
+-
+ /**
+  * Given a disk image containing an extX filesystem, return the UUID.
+- * The L<file(1)> command does the hard work.
+  */
+ static char *
+ get_root_uuid_with_file (guestfs_h *g, const char *appliance)
+ {
+-  CLEANUP_CMD_CLOSE struct command *cmd = guestfs_int_new_command (g);
+-  char *ret = NULL;
+-  int r;
++  unsigned char magic[2], uuid[16];
++  char *ret;
++  int fd;
+ 
+-  guestfs_int_cmd_add_arg (cmd, "file");
+-  guestfs_int_cmd_add_arg (cmd, "--");
+-  guestfs_int_cmd_add_arg (cmd, appliance);
+-  guestfs_int_cmd_set_stdout_callback (cmd, read_uuid, &ret, 0);
+-  r = guestfs_int_cmd_run (cmd);
+-  if (r == -1) {
+-    if (ret) free (ret);
++  fd = open (appliance, O_RDONLY|O_CLOEXEC);
++  if (fd == -1) {
++    perrorf (g, _("open: %s"), appliance);
+     return NULL;
+   }
+-  if (!WIFEXITED (r) || WEXITSTATUS (r) != 0) {
+-    guestfs_int_external_command_failed (g, r, "file", NULL);
+-    if (ret) free (ret);
++  if (lseek (fd, 0x438, SEEK_SET) != 0x438) {
++  magic_error:
++    error (g, _("%s: cannot read extfs magic in superblock"), appliance);
++    close (fd);
++    return NULL;
++  }
++  if (read (fd, magic, 2) != 2)
++    goto magic_error;
++  if (magic[0] != 0x53 || magic[1] != 0xEF) {
++    error (g, _("%s: appliance is not an extfs filesystem"), appliance);
++    close (fd);
+     return NULL;
+   }
++  if (lseek (fd, 0x468, SEEK_SET) != 0x468) {
++  super_error:
++    error (g, _("%s: cannot read UUID in superblock"), appliance);
++    close (fd);
++    return NULL;
++  }
++  if (read (fd, uuid, 16) != 16)
++    goto super_error;
++  close (fd);
+ 
++  /* The UUID is a binary blob, but we must return it as a printable
++   * string.  The caller frees this.
++   */
++  ret = safe_asprintf (g,
++                       "%02x%02x%02x%02x" "-"
++                       "%02x%02x" "-"
++                       "%02x%02x" "-"
++                       "%02x%02x" "-"
++                       "%02x%02x%02x%02x%02x%02x",
++                       uuid[0], uuid[1], uuid[2], uuid[3],
++                       uuid[4], uuid[5],
++                       uuid[6], uuid[7],
++                       uuid[8], uuid[9],
++                       uuid[10], uuid[11], uuid[12], uuid[13],
++                         uuid[14], uuid[15]);
+   return ret;
+ }
+ 
+ /**
+- * Read the first 256k bytes of the in_file with L<qemu-img(1)> command
+- * and write them into the out_file. That may be useful to get UUID of
+- * the QCOW2 disk image with further L<file(1)> command.
++ * Read the first 256k bytes of the in_file with L<qemu-img(1)>
++ * command and write them into the out_file. That may be useful to get
++ * UUID of the QCOW2 disk image with C<get_root_uuid_with_file>.
++ *
+  * The function returns zero if successful, otherwise -1.
+  */
+ static int

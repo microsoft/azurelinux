@@ -31,15 +31,8 @@ install_one_toolchain_rpm () {
         exit 1
     fi
 
-    if [[ "$1" == *"msopenjdk"* ]]; then
-        echo "Will install msopenjdk with --noscripts option: $1"
-        SCRIPTS_OPTION="--noscripts"
-    else
-        SCRIPTS_OPTION=""
-    fi
-
     echo "Found full path for package $1 in $rpm_path: ($full_rpm_path)" >> "$chroot_log"
-    rpm -i -v --nodeps --noorder --force $SCRIPTS_OPTION --root "$chroot_builder_folder" --define '_dbpath /var/lib/rpm' "$full_rpm_path" &>> "$chroot_log"
+    rpm -i -v --nodeps --noorder --force --root "$chroot_builder_folder" --define '_dbpath /var/lib/rpm' "$full_rpm_path" &>> "$chroot_log"
 
     if [ ! $? -eq 0 ]
     then

@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           gnome-shell
 Version:        3.36.9
-Release:        2%{?dist}
+Release:        5%{?dist}
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
@@ -29,7 +29,7 @@ Patch3: 0002-endSessionDialog-Support-rebooting-into-the-bootload.patch
 %define polkit_version 0.100
 %define gsettings_desktop_schemas_version 3.33.1
 %define ibus_version 1.5.2
-%define gnome_bluetooth_version 1:3.9.0
+%define gnome_bluetooth_version 3.9.0
 %define gstreamer_version 1.4.5
 
 BuildRequires:  asciidoc
@@ -49,7 +49,6 @@ BuildRequires:  pkgconfig(gnome-desktop-3.0)
 BuildRequires:  gobject-introspection >= %{gobject_introspection_version}
 BuildRequires:  mesa-libGL-devel
 BuildRequires:  mesa-libEGL-devel
-BuildRequires:  NetworkManager-libnm-devel
 BuildRequires:  polkit-devel >= %{polkit_version}
 BuildRequires:  startup-notification-devel
 BuildRequires:  systemd-devel
@@ -111,8 +110,6 @@ Requires:       switcheroo-control
 # needed for clocks/weather integration
 Requires:       geoclue2-libs%{?_isa}
 Requires:       libgweather%{?_isa}
-# needed for thunderbolt support
-Requires:       bolt%{?_isa}
 # Needed for launching flatpak apps etc
 Requires:       xdg-desktop-portal-gtk
 
@@ -214,6 +211,16 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/evolution-calendar.de
 %{_mandir}/man1/gnome-shell.1*
 
 %changelog
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.9-5
+- Removing dependency on 'bolt'.
+
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.9-4
+- Removing epoch.
+
+* Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 3.36.9-3
+- Remove NetworkManger-libnm-devel BR because CBL-Mariner is not providing NetworkManager
+- License verified
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.9-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removing run-time dependency on 'libnma' (GUI library for 'NetworkManager')

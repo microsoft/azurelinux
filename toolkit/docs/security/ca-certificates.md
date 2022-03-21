@@ -22,12 +22,17 @@ trust settings in the PEM file format. The trust settings found here will be
 interpreted with a high priority - higher than the ones found in
 /usr/share/pki/ca-trust-source/.
 
-QUICK HELP: To add a certificate in the simple PEM or DER file formats to the list of CAs trusted on the system:
-Copy it to the `/etc/pki/ca-trust/source/anchors/` subdirectory, and run the `update-ca-trust` command.
+**QUICK HELP 1**: to add a certificate in the simple PEM or DER file format to the list of CAs trusted on the system:
 
-If your certificate is in the extended BEGIN TRUSTED file format, then place it into the main source/ directory instead.
+1. Copy the certificate into `/etc/pki/ca-trust/source/anchors/`.
+2. Run `update-ca-trust`.
 
-Please refer to the [update-ca-trust(8)](https://www.systutorials.com/docs/linux/man/8-update-ca-certificates/) manual page for additional information.
+**QUICK HELP 2**: if your certificate is in the extended BEGIN TRUSTED file format (which may contain distrust/blacklist trust flags, or trust flags for usages other than TLS) then:
+
+1. Copy the certificate into `/etc/pki/ca-trust/source/`.
+2. Run `update-ca-trust`.
+
+Please refer to the [update-ca-trust manual](../../../SPECS/ca-certificates/update-ca-trust.8.txt) for more details.
 
 ## Legacy certificates support
 

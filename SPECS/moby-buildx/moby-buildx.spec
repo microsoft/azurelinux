@@ -1,31 +1,20 @@
-Summary: A Docker CLI plugin for extended build capabilities with BuildKit
-Name: moby-buildx
-Version: 0.4.1+azure
-Release: 3%{?dist}
-License: ASL 2.0
-Group: Tools/Container
+%define         upstream_name buildx
+%define         commit_hash 05846896d149da05f3d6fd1e7770da187b52a247
 
-# Git clone is a standard practice of producing source files for moby.
-# Please look at ./generate-sources.sh for generating source tar ball.
-# buildx sources are git cloned to tag 0.4.1
-# BUILDX_REPO=https://github.com/docker/buildx.git
-%define BUILDX_GITCOMMIT bda4882a65349ca359216b135896bddc1d92461c
-%define vernum %(echo "%{version}" | cut -d+ -f1)
-#Source0: https://github.com/docker/buildx/archive/v%{vernum}.tar.gz
-Source0: moby-buildx-%{version}.tar.gz
-Source1: LICENSE
-Source2: NOTICE
-URL: https://www.github.com/docker/buildx
-Vendor: Microsoft Corporation
-Distribution: Mariner
+Summary:        A Docker CLI plugin for extended build capabilities with BuildKit
+Name:           moby-%{upstream_name}
+# update "commit_hash" above when upgrading version
+Version:        0.7.1
+Release:        1%{?dist}
+License:        ASL 2.0
+Group:          Tools/Container
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.github.com/docker/buildx
+Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: bash
-BuildRequires: golang
-# Removed requirement for go-md2man since this is not available in non-adm64 repos
-# Maybe we can just build our own packages... for now this gets built/installed  before running rpmbuild
-
-# required packages on install
-Requires: /bin/sh
+BuildRequires: golang >= 1.17
 
 # conflicting packages
 Conflicts: docker-ce
@@ -34,51 +23,28 @@ Conflicts: docker-ee
 %description
 A Docker CLI plugin for extended build capabilities with BuildKit
 
-%define OUR_GOPATH %{_topdir}/.gopath
-
 %prep
-%setup -q -n %{name}-%{version} -c
-mkdir -p %{OUR_GOPATH}/src/github.com/docker
-ln -sfT %{_topdir}/BUILD/%{name}-%{version} %{OUR_GOPATH}/src/github.com/docker/buildx
+%setup -q -n %{upstream_name}-%{version}
 
 %build
-export GOPATH=%{OUR_GOPATH}
-export GOCACHE=%{OUR_GOPATH}/.cache
-export GOPROXY=direct
-export GO111MODULE=on
 export CGO_ENABLED=0
-# GOFLAGS for go1.13 only
-#export GOFLAGS='-trimpath -gcflags=all="-trimpath=%{OUR_GOPATH}/src" -asmflags=all="-trimpath=%{OUR_GOPATH}/src"'
-export GOGC=off
-
-cd %{OUR_GOPATH}/src/github.com/docker/buildx
 go build -mod=vendor \
-    -ldflags "-X github.com/docker/buildx/version.Version=%{version} -X github.com/docker/buildx/version.Revision=%{BUILDX_GITCOMMIT} -X github.com/docker/buildx/version.Package=github.com/docker/buildx" \
+    -ldflags "-X version.Version=%{version} -X version.Revision=%{commit_hash} -X version.Package=github.com/docker/buildx" \
     -o buildx \
     ./cmd/buildx
 
 %install
-# install binary
 mkdir -p "%{buildroot}/%{_libexecdir}/docker/cli-plugins"
 cp -aT buildx "%{buildroot}/%{_libexecdir}/docker/cli-plugins/docker-buildx"
 
-# copy legal files
-mkdir -p %{buildroot}/usr/share/doc/%{name}-%{version}
-cp %{SOURCE1} %{buildroot}/usr/share/doc/%{name}-%{version}/LICENSE
-cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
-
-%post
-
-%preun
-
-%postun
-
 %files
 %license LICENSE
-/usr/share/doc/%{name}-%{version}/*
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Fri Jan 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> 0.7.1-1
+- Upgrade to 0.7.1.
+- Use code from upstream instead of Azure fork.
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 0.4.1+azure-3
 - Increment release to force republishing using golang 1.15.13.
 * Thu Dec 10 2020 Andrew Phelps <anphel@microsoft.com> 0.4.1+azure-2

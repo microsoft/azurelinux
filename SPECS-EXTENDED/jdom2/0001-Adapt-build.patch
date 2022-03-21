@@ -1,14 +1,14 @@
-From 05a8a2fa49e92ad36a86d5d73588a2e46bf9ff95 Mon Sep 17 00:00:00 2001
-From: Michael Simacek <msimacek@redhat.com>
-Date: Mon, 23 Jul 2018 14:30:14 +0200
+From cf7e676edc7ab9d4b8b130ca4d8ecbd291995dea Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 20 Apr 2020 09:29:12 +0200
 Subject: [PATCH] Adapt build
 
 ---
- build.xml | 40 +++++++++++++++++++++++++---------------
- 1 file changed, 25 insertions(+), 15 deletions(-)
+ build.xml | 54 +++---------------------------------------------------
+ 1 file changed, 3 insertions(+), 51 deletions(-)
 
 diff --git a/build.xml b/build.xml
-index cd7c2ed..10d8df6 100644
+index cd7c2ed..16368e2 100644
 --- a/build.xml
 +++ b/build.xml
 @@ -112,17 +112,7 @@ For instructions on how to build JDOM, please view the README.txt file.
@@ -30,72 +30,83 @@ index cd7c2ed..10d8df6 100644
  	</path>
  
  	<path id="core.class.path">
-@@ -289,6 +279,7 @@ For instructions on how to build JDOM, please view the README.txt file.
-              header="&lt;b&gt;${Name}&lt;br&gt;&lt;font size='-1'&gt;${version}&lt;/font&gt;&lt;/b&gt;"
-              bottom="Copyright &#169; ${year} Jason Hunter, Brett McLaughlin. All Rights Reserved.">
- 			<classpath refid="base.class.path"/>
-+			<link href="${j2se.apidoc}"/>
- 		</javadoc>
+@@ -296,7 +286,7 @@ For instructions on how to build JDOM, please view the README.txt file.
+ 	<!-- =================================================================== -->
+ 	<!-- Creates the jars                                           -->
+ 	<!-- =================================================================== -->
+-	<target name="jars" depends="compile, javadoc"
++	<target name="jars" depends="compile.core, javadoc"
+ 	    description="Builds the Jars">
+ 		<fixcrlf srcdir="." includes="**/*.bat" excludes="build*.*" eol="crlf"/>
+ 		<fixcrlf srcdir="." includes="**/*.sh" excludes="build*.*" eol="lf"/>
+@@ -316,21 +306,6 @@ For instructions on how to build JDOM, please view the README.txt file.
+ 			<fileset dir="${core.build}" includes="**/*.class" />
+ 			<fileset dir="${metainf.build}" excludes="**/MANIFEST.MF" />
+ 		</jar>
+-		<jar jarfile="${package}/${jarbase}-contrib.jar" >
+-			<fileset dir="${contrib.build}" includes="**/*" />
+-			<fileset dir="${metainf.build}" excludes="**/MANIFEST.MF" />
+-		</jar>
+-		<jar jarfile="${package}/${jarbase}-junit.jar" >
+-			<fileset dir="${junit.build}" includes="**/*" />
+-			<fileset dir="${metainf.build}" excludes="**/MANIFEST.MF" />
+-		</jar>
+-		<jar destfile="${package}/${jarbase}-javadoc.jar" 
+-			basedir="${build.javadocs}" includes="**/*" />
+-		<jar jarfile="${package}/${jarbase}-sources.jar" >
+-			<fileset dir="${core.src}" includes="**/*" />
+-			<fileset dir="${junit.src}" includes="**/*" />
+-			<fileset dir="${contrib.src}" includes="**/*" />
+-		</jar>
+ 	    	    
  	</target>
  	
-@@ -373,11 +364,11 @@ For instructions on how to build JDOM, please view the README.txt file.
- 	<!-- =================================================================== -->
- 	<target name="package" depends="coverage, jars"
-           description="Creates the class package">
--		<zip destfile="${package}/${jarbase}.zip">
-+		<!--<zip destfile="${package}/${jarbase}.zip">
- 			<fileset dir="${package}" includes="${jarbase}*.jar" />
- 			<fileset dir="${basedir}" includes="lib/xerces* lib/jaxen* lib/xml* lib/xalan/**" />
- 			<fileset dir="${basedir}" includes="LICENSE.txt README.txt" />
--		</zip>
-+		</zip>-->
+@@ -500,7 +475,7 @@ For instructions on how to build JDOM, please view the README.txt file.
+ 		<delete dir="${mavendir}" includes="**/*" failonerror="false"/>
  	</target>
- 
- 	<!-- =================================================================== -->
-@@ -401,6 +392,7 @@ For instructions on how to build JDOM, please view the README.txt file.
- 		        <include name="**/*.class"/>
- 		        <!-- exclude name="**/**/jaxen/**/*.class"/ -->
- 		    </fileset>
-+		    <classpath refid="junit.class.path" />
- 		</cobertura-instrument>
+ 	
+-	<target name="maven" depends="maven.clean, package"
++	<target name="maven" depends="maven.clean, jars"
+ 		description="Prepares Maven bundle to load on to Sonatype Nexus for Maven-Central">
+ 		<mkdir dir="${mavendir}" />
+ 		<mkdir dir="${mavendir}/core" />
+@@ -512,8 +487,6 @@ For instructions on how to build JDOM, please view the README.txt file.
  		
- 		<property name="forkjunit" value="true" />
-@@ -528,7 +520,25 @@ For instructions on how to build JDOM, please view the README.txt file.
+ 		<!-- copy the build jar -->
+ 		<copy tofile="${mavendir}/core/${mavenbase}.jar" file="${package}/${jarbase}.jar"/>
+-		<copy tofile="${mavendir}/core/${mavenbase}-javadoc.jar" file="${package}/${jarbase}-javadoc.jar"/>
+-		<copy tofile="${mavendir}/core/${mavenbase}-sources.jar" file="${package}/${jarbase}-sources.jar"/>
+ 		
+ 		<!-- load the license in to the ${license} property -->
+ 		<loadfile property="license" srcfile="LICENSE.txt" />
+@@ -528,27 +501,6 @@ For instructions on how to build JDOM, please view the README.txt file.
  			</filterset>
  		</copy>
  		
 -		<exec dir="${mavendir}/core" executable="${gpg}">
-+		<copy filtering="true" file="maven/contrib.pom" tofile="${mavendir}/core/${mavenbase}-contrib.pom">
-+			<filterset>
-+				<filter token="artifactID" value="${mavenartifact}"/>
-+				<filter token="version" value="${version}" />
-+				<filter token="jdk" value="${compile.target}" />
-+				<filter token="license" value="${license}" />
-+			</filterset>
-+		</copy>
-+		
-+		<copy filtering="true" file="maven/junit.pom" tofile="${mavendir}/core/${mavenbase}-junit.pom">
-+			<filterset>
-+				<filter token="artifactID" value="${mavenartifact}"/>
-+				<filter token="version" value="${version}" />
-+				<filter token="jdk" value="${compile.target}" />
-+				<filter token="license" value="${license}" />
-+			</filterset>
-+		</copy>
-+		
-+		<!--exec dir="${mavendir}/core" executable="${gpg}">
- 			<arg value="-abv"/>
- 			<arg value="${mavenbase}.pom"/>
- 		</exec>
-@@ -543,7 +553,7 @@ For instructions on how to build JDOM, please view the README.txt file.
- 		<exec dir="${mavendir}/core" executable="${gpg}">
- 			<arg value="-abv"/>
- 			<arg value="${mavenbase}-javadoc.jar"/>
+-			<arg value="-abv"/>
+-			<arg value="${mavenbase}.pom"/>
 -		</exec>
-+		</exec-->
- 		
- 		<jar destfile="${mavendir}/${mavenbase}-maven-bundle.jar"
- 			basedir="${mavendir}/core"
+-		<exec dir="${mavendir}/core" executable="${gpg}">
+-			<arg value="-abv"/>
+-			<arg value="${mavenbase}.jar"/>
+-		</exec>
+-		<exec dir="${mavendir}/core" executable="${gpg}">
+-			<arg value="-abv"/>
+-			<arg value="${mavenbase}-sources.jar"/>
+-		</exec>
+-		<exec dir="${mavendir}/core" executable="${gpg}">
+-			<arg value="-abv"/>
+-			<arg value="${mavenbase}-javadoc.jar"/>
+-		</exec>
+-		
+-		<jar destfile="${mavendir}/${mavenbase}-maven-bundle.jar"
+-			basedir="${mavendir}/core"
+-			includes="${mavenbase}*" excludes="*maven-bundle*" />
+-		
+ 	</target>
+ 	
+ </project>
 -- 
-2.17.1
+2.25.2
 

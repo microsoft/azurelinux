@@ -1,14 +1,13 @@
 Summary:        Terminal multiplexer
 Name:           tmux
 Version:        3.2a
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC and BSD
 URL:            https://tmux.github.io/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/tmux/tmux/releases/download/%{version}/%{name}-%{version}.tar.gz
-%define sha1    tmux=a12bb094bf0baf0275b6d5cc718c938639712e97
 Requires:       libevent ncurses
 BuildRequires:  libevent-devel ncurses-devel
 
@@ -38,6 +37,9 @@ make  %{?_smp_mflags} check
 %exclude /usr/src
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.2a-2
+- Remove unused `%%define sha1` lines
+
 * Mon Jan 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2a-1
 - Update to version 3.2a.
 - License verified.

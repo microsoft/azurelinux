@@ -1,10 +1,10 @@
 diff --git a/.bazelversion b/.bazelversion
-index ccbccc3..ee74734 100644
+index ccbccc3..fae6e3d 100644
 --- a/.bazelversion
 +++ b/.bazelversion
 @@ -1 +1 @@
 -2.2.0
-+4.1.0
++4.2.1
 diff --git a/bazel/repository_locations.bzl b/bazel/repository_locations.bzl
 index 3f24f41..76dd1df 100644
 --- a/bazel/repository_locations.bzl

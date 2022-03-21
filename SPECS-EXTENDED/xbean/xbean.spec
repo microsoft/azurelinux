@@ -19,21 +19,23 @@ Distribution:   Mariner
 
 
 Name:           xbean
-Version:        4.5
-Release:        6%{?dist}
+Version:        4.18
+Release:        1%{?dist}
 Summary:        Java plugin based web server
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            https://geronimo.apache.org/xbean/
 Source0:        http://repo2.maven.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}-source-release.zip
+Patch1:         0001-Remove-unused-import.patch
 # Fix dependency on xbean-asm4-shaded to original objectweb-asm
-Patch0:         0001-Unshade-ASM.patch
-Patch2:         0003-Port-to-QDox-2.0.patch
-BuildRequires:  apache-commons-logging
+Patch2:         0002-Unbundle-ASM.patch
+Patch3:         0003-Remove-dependency-on-log4j-and-commons-logging.patch
+Patch4:         downgrading-asm-version.patch
+Patch5:         jdk-11-fix.patch
+
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  log4j12
 BuildRequires:  objectweb-asm >= 5
 BuildRequires:  slf4j
 BuildRequires:  unzip
@@ -67,15 +69,16 @@ This package provides API documentation for xbean.
 # build failing on this due to doxia-sitetools problems
 rm src/site/site.xml
 
-%patch0 -p1
+%patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %pom_remove_parent
 %pom_remove_dep mx4j:mx4j
 
-%pom_remove_dep -r :xbean-asm5-shaded
 %pom_remove_dep -r :xbean-finder-shaded
-%pom_disable_module xbean-asm5-shaded
 %pom_disable_module xbean-finder-shaded
 
 %pom_xpath_remove pom:scope xbean-asm-util
@@ -108,12 +111,20 @@ sed -i "s|</Private-Package>|</Private-Package-->|" xbean-blueprint/pom.xml
 
 %pom_change_dep -r -f ::::: :::::
 
+# Removing dependency on Apache commons logging
+%pom_remove_dep :commons-logging-api xbean-reflect
+find -name CommonsLoggingConverter.java -delete
+
+# Removing dependency on log4j.
+%pom_remove_dep :log4j xbean-reflect
+find -name Log4jConverter.java -delete
+
 %build
 for i in xbean-asm-util xbean-classpath xbean-finder xbean-naming xbean-reflect; do
   pushd $i
     mkdir -p build/classes
     javac -d build/classes  -encoding utf-8 -source 6 -target 6 \
-      -cp $(build-classpath log4j12/log4j-12 commons-logging-api slf4j/api objectweb-asm/asm objectweb-asm/asm-commons):../xbean-asm-util/xbean-asm-util.jar \
+      -cp $(build-classpath commons-logging-api slf4j/api objectweb-asm/asm objectweb-asm/asm-commons):../xbean-asm-util/xbean-asm-util.jar \
       $(find src/main/java -name *.java)
     jar cf $i.jar -C build/classes .
   popd
@@ -121,7 +132,7 @@ done
 mkdir -p build/apidoc
 javadoc -d build/apidoc -source 6 -encoding utf-8 \
   -Xdoclint:none \
-  -classpath $(build-classpath log4j12/log4j-12 commons-logging-api slf4j/api objectweb-asm/asm objectweb-asm/asm-commons) \
+  -classpath $(build-classpath commons-logging-api slf4j/api objectweb-asm/asm objectweb-asm/asm-commons) \
   $(for i in xbean-asm-util xbean-classpath xbean-finder xbean-naming xbean-reflect; do find $i/src/main/java -name *.java; done | xargs)
 
 %install
@@ -149,6 +160,11 @@ cp -aL build/apidoc/* %{buildroot}/%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.18-1
+- Updating to version 4.18.
+- Removing dependency on "log4j12".
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.5-6
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

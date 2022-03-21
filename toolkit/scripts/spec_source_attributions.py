@@ -7,17 +7,18 @@ from pyrpm.spec import Spec
 import re
 
 VALID_SOURCE_ATTRIBUTIONS = {
-    "Microsoft":                    r'\n-\s+(Original version for CBL-Mariner|Initial CBL-Mariner import from Azure)( \(license: MIT\))?(\.|\n|$)',
-    "CentOS":                       r'\n-\s+Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)(\.|\n|$)',
-    "Ceph source":                  r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
-    "Netplan source":               r'\n-\s+Initial CBL-Mariner import from Netplan source \(license: GPLv3\)(\.|\n|$)',
-    "Fedora":                       r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
+    "Microsoft":                      r'\n-\s+(Original version for CBL-Mariner|Initial CBL-Mariner import from Azure)( \(license: MIT\))?(\.|\n|$)',
+    "CentOS":                         r'\n-\s+Initial CBL-Mariner import from CentOS \d+ \(license: MIT\)(\.|\n|$)',
+    "Ceph source":                    r'\n-\s+Initial CBL-Mariner import from Ceph source \(license: LGPLv2.1\)(\.|\n|$)',
+    "Debian":                         r'\n-\s+Initial CBL-Mariner import from Debian source package \(license: MIT\)(\.|\n|$)',
+    "Netplan source":                 r'\n-\s+Initial CBL-Mariner import from Netplan source \(license: GPLv3\)(\.|\n|$)',
+    "Fedora":                         r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
     "Fedora (Copyright Remi Collet)": r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: CC-BY-SA\)(\.|\n|$)',
-    "Magnus Edenhill Open Source":  r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
-    "NVIDIA":                       r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',
-    "OpenMamba":                    r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',
-    "OpenSUSE":                     r'\n-\s+Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
-    "Photon":                       r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
+    "Magnus Edenhill Open Source":    r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
+    "NVIDIA":                         r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: ASL 2\.0\)(\.|\n|$)',
+    "OpenMamba":                      r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',
+    "OpenSUSE":                       r'\n-\s+Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
+    "Photon":                         r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)'
 }
 
 KNOWN_SOURCE_ORIGINS = VALID_SOURCE_ATTRIBUTIONS.keys()

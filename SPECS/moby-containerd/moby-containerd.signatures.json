@@ -1,9 +1,7 @@
 {
  "Signatures": {
-  "LICENSE": "97da22fc71337ba63ba57561016d98a8b5a73f65b46f89acf7ad37265190fb78",
-  "NOTICE": "2fdaf93393511be4091774d401986e318fc3f335352f8276758832e605f8758e",
   "containerd.service": "2449216ee019ebfcb5756a5ab701558425c7d444bab05e82d6ddabe3e0b097ef",
   "containerd.toml": "167fb1035c983638e56f4a20bb8e6bfe1fd280c8ca9ee00a7c7358a5ca3be9f5",
-  "moby-containerd-1.5.9+azure.tar.gz": "93b4a8cdc5835cbf31ba6897aa7704b79ce765c99ffd2f1ab06987b56b027b1c"
+  "moby-containerd-1.6.0.rc.3.tar.gz": "d5f215fcdaf5902bc621d18e0971b3101fc43e095574fda69ab519a6e1d9abf4"
  }
 }

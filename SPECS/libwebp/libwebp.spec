@@ -1,6 +1,6 @@
 Summary:        Library to encode and decode webP format images
 Name:           libwebp
-Version:        1.0.3
+Version:        1.2.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -9,7 +9,6 @@ Group:          System Environment/Libraries
 URL:            https://webmproject.org/
 #Source0:       https://github.com/webmproject/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  libpng-devel
 BuildRequires:  libtiff-devel
@@ -23,6 +22,7 @@ The libwebp package contains a library and support programs to encode and decode
 %package        devel
 Summary:        Header and development files
 Requires:       %{name} = %{version}-%{release}
+
 %description    devel
 It contains the libraries and header files to create applications
 
@@ -44,7 +44,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-find %{buildroot} -type f -name '*.la' -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -63,6 +63,9 @@ find %{buildroot} -type f -name '*.la' -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.2.2-1
+- Upgrade to version 1.2.2
+
 * Tue May 25 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.0.3-1
 - Update to version 1.0.3
 

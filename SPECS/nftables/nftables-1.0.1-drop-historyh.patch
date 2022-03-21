@@ -1,0 +1,28 @@
+From 3847fccf004525ceb97db6fbc681835b0ac9a61a Mon Sep 17 00:00:00 2001
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+Date: Mon, 22 Nov 2021 18:01:52 +0100
+Subject: cli: remove #include <editline/history.h>
+
+This header is not required to compile nftables with editline, remove
+it, this unbreak compilation in several distros which have no symlink
+from history.h to editline.h
+
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+ src/cli.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/cli.c b/src/cli.c
+index 4845e5cf..87291766 100644
+--- a/src/cli.c
++++ b/src/cli.c
+@@ -26,7 +26,6 @@
+ #include <readline/history.h>
+ #elif defined(HAVE_LIBEDIT)
+ #include <editline/readline.h>
+-#include <editline/history.h>
+ #else
+ #include <linenoise.h>
+ #endif
+-- 
+cgit v1.2.3

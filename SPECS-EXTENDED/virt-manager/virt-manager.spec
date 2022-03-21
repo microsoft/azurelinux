@@ -20,7 +20,7 @@ Distribution:   Mariner
 
 Name: virt-manager
 Version: 2.2.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 %global verrel %{version}-%{release}
 
 Summary: Desktop tool for managing virtual machines via libvirt
@@ -64,6 +64,7 @@ Suggests: python3-libguestfs
 BuildRequires: intltool
 BuildRequires: /usr/bin/pod2man
 BuildRequires: python3-devel
+BuildRequires: perl(Find::File)
 
 
 %description
@@ -145,7 +146,8 @@ done
 
 
 %files
-%doc README.md COPYING NEWS.md
+%license COPYING
+%doc README.md NEWS.md
 %{_bindir}/%{name}
 
 %{_mandir}/man1/%{name}.1*
@@ -197,6 +199,10 @@ done
 
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.1-5
+- Adding BR on "perl(Find::File)".
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

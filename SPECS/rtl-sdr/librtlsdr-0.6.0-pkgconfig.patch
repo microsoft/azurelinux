@@ -1,0 +1,26 @@
+commit 222517b506278178ab93182d79ccf7eb04d107ce
+Author: A. Maitland Bottoms <bottoms@debian.org>
+Date:   Sun May 8 18:57:29 2016 -0400
+
+    Improve librtlsdr.pc file
+    
+    librtlsdr.pc should declare -lusb-1.0 in Libs.private section
+    to exclude usb library from dynamic linking.
+    References to libusb headers are not needed in Cflags, since these
+    headers are not used by external rtlsdr API, but this is optional.
+    https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=784912
+
+diff --git a/librtlsdr.pc.in b/librtlsdr.pc.in
+index 5e55049..e46519a 100644
+--- a/librtlsdr.pc.in
++++ b/librtlsdr.pc.in
+@@ -6,6 +6,6 @@ includedir=@includedir@
+ Name: RTL-SDR Library
+ Description: C Utility Library
+ Version: @VERSION@
+-Cflags: -I${includedir}/ @RTLSDR_PC_CFLAGS@
+-Libs: -L${libdir} -lrtlsdr -lusb-1.0
+-Libs.private: @RTLSDR_PC_LIBS@
++Cflags: -I${includedir}/
++Libs: -L${libdir} -lrtlsdr
++Libs.private:  -lusb-1.0 @RTLSDR_PC_LIBS@

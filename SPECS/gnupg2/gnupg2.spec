@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.3.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,9 @@ ln -s gpgv2 gpgv
 popd
 
 %check
+# The package is built with option `gpg-is-gpg2` & few tests explicity expect `gpg2`
+# softlink `gpg2 -> gpg` to enable check section
+ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %make_build check
 
 %files
@@ -74,6 +77,9 @@ popd
 %exclude /usr/share/doc/*
 
 %changelog
+* Wed Feb 23 2022 Muhammad Falak <mwani@microsoft.com> - 2.3.3-2
+- Add an explict softlink `gpg2 -> gpg` in check section to enable ptest
+
 * Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.3-1
 - Upgrade to latest upstream version
 

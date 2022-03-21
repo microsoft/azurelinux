@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "org.debian.pcsc-lite.policy": "4e39100040bd847d663748d73babe6c6c777ac2e579773ee73b9738068729c67",
+  "pcsc-lite-1.9.5.tar.bz2": "9ee3f9b333537562177893559ad4f7b8d5c23ebe828eef53056c02db14049d08"
+ }
+}

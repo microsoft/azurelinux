@@ -1,7 +1,7 @@
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.2.4
-Release:        9%{?dist}
+Release:        10%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
 URL:            https://lxml.de
@@ -44,15 +44,15 @@ export LC_ALL=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 make test
 
-%files
-%defattr(-,root,root,-)
-
 %files -n python3-lxml
 %defattr(-,root,root,-)
 %license LICENSES.txt
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 16 2022 Thomas Crain <thcrain@microsoft.com> - 4.2.4-10
+- Remove %%files section for main package to avoid outputting an empty RPM
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.4-9
 - Removing the explicit %%clean stage.
 

@@ -2,13 +2,16 @@
 Summary:        Interfaces for Python
 Name:           python-zope-interface
 Version:        4.7.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ZPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/zopefoundation/zope.interface
 Source0:        https://pypi.python.org/packages/source/z/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 Interfaces for Python
@@ -45,6 +48,9 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 %{python3_sitelib}/*
 
 %changelog
+* Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 4.7.2-3
+- Add an explicit BR on `pip` to enable ptest
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.7.2-2
 - Add license to python3 package
 - Remove python2 package

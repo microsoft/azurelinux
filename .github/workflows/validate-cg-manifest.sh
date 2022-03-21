@@ -16,12 +16,16 @@ ignore_list=" \
   appstream-data \
   byacc \
   ca-certificates \
+  core-packages \
   Cython \
   dbus-x11 \
+  geronimo-specs \
   grub2-efi-binary-signed-aarch64 \
   grub2-efi-binary-signed-x86_64 \
+  grubby \
   initramfs \
   installkernel \
+  javapackages-tools-meta \
   kde-filesystem \
   kernel-signed-aarch64 \
   kernel-signed-x86_64 \
@@ -36,6 +40,7 @@ ignore_list=" \
   opencl-filesystem \
   openjdk8 \
   patterns-ceph-containers \
+  pyproject-rpm-macros \
   python-markupsafe \
   python-nocasedict \
   python-pywbem \
@@ -45,10 +50,13 @@ ignore_list=" \
   python-yamlloader \
   python-zope-interface \
   qt5-rpm-macros \
+  rt-setup
+  rtctl
   runc \
   sgabios \
   shim \
   verity-read-only-root \
+  usbip \
   web-assets \
   xmvn \
   xorg-x11-apps \

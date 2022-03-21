@@ -16,14 +16,14 @@ claims to be transferred between two parties encoded as digitally signed and
 encrypted JSON objects.}
 
 Name:           python-%{pkgname}
-Version:        1.7.1
-Release:        10%{?dist}
+Version:        2.3.0
+Release:        1%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/jpadilla/pyjwt
-Source0:        https://files.pythonhosted.org/packages/2f/38/ff37a24c0243c5f45f5798bd120c0f873eeed073994133c084e1cf13b95c/%{srcname}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/1d/8e/01bdcfdbb352daaba8ea406d9df149c5bba7dbf70f908d4fa4c269fe6a08/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
@@ -31,10 +31,10 @@ BuildArch:      noarch
 %if %{with python3}
 %package -n python3-%{pkgname}
 Summary:        %{summary}
-BuildRequires:  python3-devel
+BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-cryptography >= 1.4.0
-Requires:       python3-cryptography >= 1.4.0
+BuildRequires:  python3-cryptography >= 3
+Requires:       python3-cryptography >= 3
 %if %{with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-atomicwrites
@@ -47,31 +47,36 @@ BuildRequires:  python3-atomicwrites
 %prep
 %autosetup -n %{srcname}-%{version}
 rm -rf %{eggname}.egg-info
-# prevent pullng in `addopts` for pytest run later
-rm setup.cfg
 
 %build
-%{?with_python3:python3 setup.py build}
+%py3_build
 
 %install
-%{?with_python3:python3 setup.py install --skip-build --root=%{buildroot}}
+%py3_install
 
 %check
-pip3 install pluggy>=0.7 more-itertools>=4.0.0 attrs==19.1.0 pytest==4.0.1
+pip3 install coverage[toml]==5.0.4 pytest==6
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v
 
 %if %{with python3}
 %files -n python3-%{pkgname}
-%doc README.rst AUTHORS
+%doc README.rst AUTHORS.rst
 %license LICENSE
 %{python3_sitelib}/%{libname}
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
-%{_bindir}/pyjwt
 %endif
 
 %changelog
+* Tue Feb 22 2022 Nick Samson <nisamson@microsoft.com> - 2.3.0-1
+- Updated to 2.3.0.
+- Removed pyjwt binary as it no longer exists.
+- Updated Python dependency to at least 3.6.
+- Updated cryptography dependency to at least 3.0
+- Updated build and install sequence to use CBL-Mariner macros.
+- Removed removal of setup.cfg as it no longer installs additional dependencies.
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.1-10
 - Remove hardcoded %%python3_version macro to enable use of Python 3.9
 

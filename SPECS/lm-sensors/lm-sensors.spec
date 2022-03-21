@@ -1,13 +1,13 @@
 Summary:        The lm_sensors package provides user-space support for the hardware monitoring drivers in the Linux kernel.
 Name:           lm-sensors
-Version:        3.5.0
-Release:        9%{?dist}
+Version:        3.6.0
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Drivers
 URL:            https://github.com/lm-sensors/lm-sensors
-#Source0:       https://github.com/lm-sensors/lm-sensors/archive/V3-5-0.tar.gz
+#Source0:       https://github.com/lm-sensors/lm-sensors/archive/V3-6-0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  bison
 BuildRequires:  flex
@@ -45,7 +45,7 @@ Requires:       %{name} = %{version}-%{release}
 Documentation for lm-sensors.
 
 %prep
-%setup -q -n %{name}-3-5-0
+%setup -q -n %{name}-3-6-0
 
 %build
 %make_build all
@@ -88,6 +88,9 @@ cp -rv README INSTALL doc/* \
 %{_mandir}/*
 
 %changelog
+* Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 3.6.0-1
+- Upgrade to 3.6.0
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.5.0-9
 - Add provides for libs subpackages from base package
 

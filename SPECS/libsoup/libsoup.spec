@@ -1,15 +1,15 @@
-%define BaseVersion 2.64
+%define BaseVersion 3.0
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
-Version:        %{BaseVersion}.0
-Release:        8%{?dist}
+Version:        %{BaseVersion}.4
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Development
 URL:            https://wiki.gnome.org/LibSoup
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{BaseVersion}/%{name}-%{version}.tar.xz
-Patch0:         libsoup-fix-make-check.patch
+BuildRequires:  meson
 BuildRequires:  autogen
 BuildRequires:  glib-devel
 BuildRequires:  glib-networking
@@ -20,11 +20,18 @@ BuildRequires:  intltool
 BuildRequires:  krb5-devel
 BuildRequires:  libpsl-devel
 BuildRequires:  libxml2-devel
-BuildRequires:  python2
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-BuildRequires:  python2-tools
+BuildRequires:  python3
+BuildRequires:  python3-devel
+BuildRequires:  python3-libs
+BuildRequires:  python3-tools
 BuildRequires:  sqlite-devel
+BuildRequires:  cmake
+BuildRequires:  libnghttp2-devel
+BuildRequires:  brotli-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  vala
+BuildRequires:  gtk-doc
+BuildRequires:  python3-pygments
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(FindBin)
@@ -32,9 +39,6 @@ BuildRequires:  perl(File::Find)
 Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
-%if %{with_check}
-BuildRequires:  krb5-devel
-%endif
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -65,22 +69,26 @@ Requires:       %{name} = %{version}-%{release}
 These are the additional language files of libsoup.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup
 
 %build
-%configure --disable-vala --enable-introspection=yes
-make %{?_smp_mflags}
+%meson \
+    -Dgtk_doc=true \
+    -Dsysprof=disabled \
+    -Dautobahn=disabled \
+    -Dhttp2_tests=disabled \
+    -Dntlm=disabled \
+    -Dtests=false
+%meson_build
 
 %install
-rm -rf %{buildroot}%{_infodir}
-make DESTDIR=%{buildroot} install
+%meson_install
 find %{buildroot} -type f -name "*.la" -delete -print
 
-%find_lang %{name}
+%find_lang %{name}-%{BaseVersion}
 
 %check
-make  check
+%meson_test
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -98,15 +106,27 @@ make  check
 %exclude %{_libdir}/*.a
 %{_libdir}/pkgconfig/*
 %{_datadir}/gir-1.0/*
+%dir %{_datadir}/vala
+%dir %{_datadir}/vala/vapi
+%{_datadir}/vala/vapi/%{name}-%{BaseVersion}.deps
+%{_datadir}/vala/vapi/%{name}-%{BaseVersion}.vapi
 
 %files doc
 %defattr(-,root,root)
 %{_datadir}/gtk-doc/html/*
 
-%files lang -f %{name}.lang
+%files lang -f %{name}-%{BaseVersion}.lang
 %defattr(-,root,root)
 
 %changelog
+* Mon Jan 24 2022 Henry Li <lihl@microsoft.com> - 3.0.4-1
+- Upgrade to version 3.0.4
+- Add cmake, libnghttp2-devel, brotli-devel, gnutls-devel, 
+  gtk-doc, vala and python3-pygments as BR
+- Use meson to build and install
+- Add additional files to libsoup-devel 
+- License Verified
+
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.64.0-8
 - Add perl find bin and file find to build requires.
 

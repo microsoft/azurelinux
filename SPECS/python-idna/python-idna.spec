@@ -1,13 +1,13 @@
 Summary:        Internationalized Domain Names in Applications (IDNA).
 Name:           python-idna
-Version:        2.7
-Release:        5%{?dist}
+Version:        3.3
+Release:        1%{?dist}
 License:        BSD-like
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/kjd/idna
-#Source0:       https://github.com/kjd/idna/archive/v%{version}.tar.gz
+#Source0:       https://github.com/kjd/idna/archive/refs/tags/v%{version}.tar.gz
 Source0:        idna-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -42,10 +42,14 @@ This acts as a suitable replacement for the “encodings.idna” module that com
 
 %files -n python3-idna
 %defattr(-,root,root,-)
-%license LICENSE.rst
+%license LICENSE.md
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 15 2022 Nick Samson <nisamson@microsoft.com> - 3.3-1
+- Updated Source0 and license file.
+- Updated to 3.3.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.7-5
 - Add license to python3 package
 - Remove python2 package

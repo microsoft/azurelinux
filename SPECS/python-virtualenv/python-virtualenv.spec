@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        16.0.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 Requires:       python3
 Provides:       %{name}-doc = %{version}-%{release}
 
@@ -44,6 +47,9 @@ virtualenv is a tool to create isolated Python environment.
 %{_bindir}/virtualenv
 
 %changelog
+* Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 16.0.0-8
+- Add an explicit BR on `python3-pip` to enable ptest
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 16.0.0-7
 - Add license, virtualenv binary to python3 package
 - Remove python2 package

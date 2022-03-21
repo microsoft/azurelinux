@@ -2,20 +2,21 @@
 %global fribidi_version 1.0.0
 %global glib2_version 2.52.0
 %global gnutls_version 3.2.7
-%global gtk3_version 3.20.0
+%global gtk3_version 3.24.22
 %global icu_uc_version 4.8
 %global libsystemd_version 220
 %global pango_version 1.22.0
 %global pcre2_version 10.21
+%define majorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Terminal emulator library
 Name:           vte291
-Version:        0.60.3
-Release:        3%{?dist}
+Version:        0.66.2
+Release:        1%{?dist}
 License:        CC-BY AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.gnome.org/
-Source0:        https://download.gnome.org/sources/vte/0.60/vte-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/vte/%{majorver}/vte-%{version}.tar.xz
 # https://bugzilla.gnome.org/show_bug.cgi?id=711059
 # https://bugzilla.redhat.com/show_bug.cgi?id=1103380
 # https://gitlab.gnome.org/GNOME/vte/-/issues/226
@@ -95,8 +96,9 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %find_lang vte-%{apiver}
 
 %files -f vte-%{apiver}.lang
-%license COPYING.GPL3
-%doc NEWS
+%license COPYING.LGPL3
+%license COPYING.XTERM
+%doc README.md
 %{_libdir}/libvte-%{apiver}.so.0*
 %{_libdir}/girepository-1.0/
 %{_userunitdir}/vte-spawn-.scope.d
@@ -109,6 +111,7 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %{_datadir}/gir-1.0/
 %doc %{_datadir}/gtk-doc/
 %{_datadir}/vala/
+%{_datadir}/glade/
 
 %files -n vte-profile
 %{_libexecdir}/vte-urlencode-cwd
@@ -116,6 +119,14 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %{_sysconfdir}/profile.d/vte.sh
 
 %changelog
+* Tue Dec 08 2022 Henry Li <lihl@microsoft.com> - 0.66.2-1
+- Upgrade to version 0.66.2
+- Update vte291-cntnr-precmd-preexec-scroll.patch
+- Update gtk3_version macro
+- Update Source0 URL to use macros
+- Add %{_datadir}/glade/ to vte291-devel package
+- Update license and doc files
+
 * Tue Dec 07 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.60.3-3
 - Switched to HTTPS URLs.
 - License verified.

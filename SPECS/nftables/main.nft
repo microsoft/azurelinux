@@ -1,0 +1,64 @@
+# Sample configuration for nftables service.
+# Load this by calling 'nft -f /etc/nftables/main.nft'.
+
+# Note about base chain priorities:
+# The priority values used in these sample configs are
+# offset by 20 in order to avoid ambiguity when firewalld
+# is also running which uses an offset of 10. This means
+# that packets will traverse firewalld first and if not
+# dropped/rejected there will hit the chains defined here.
+# Chains created by iptables, ebtables and arptables tools
+# do not use an offset, so those chains are traversed first
+# in any case.
+
+# drop any existing nftables ruleset
+flush ruleset
+
+# a common table for both IPv4 and IPv6
+table inet nftables_svc {
+
+	# protocols to allow
+	set allowed_protocols {
+		type inet_proto
+		elements = { icmp, icmpv6 }
+	}
+
+	# interfaces to accept any traffic on
+	set allowed_interfaces {
+		type ifname
+		elements = { "lo" }
+	}
+
+	# services to allow
+	set allowed_tcp_dports {
+		type inet_service
+		elements = { ssh, 9090 }
+	}
+
+	# this chain gathers all accept conditions
+	chain allow {
+		ct state established,related accept
+
+		meta l4proto @allowed_protocols accept
+		iifname @allowed_interfaces accept
+		tcp dport @allowed_tcp_dports accept
+	}
+
+	# base-chain for traffic to this host
+	chain INPUT {
+		type filter hook input priority filter + 20
+		policy accept
+
+		jump allow
+		reject with icmpx type port-unreachable
+	}
+}
+
+# By default, any forwarding traffic is allowed.
+# Uncomment the following line to filter it based
+# on the same criteria as input traffic.
+#include "/etc/nftables/router.nft"
+
+# Uncomment the following line to enable masquerading of
+# forwarded traffic. May be used with or without router.nft.
+#include "/etc/nftables/nat.nft"

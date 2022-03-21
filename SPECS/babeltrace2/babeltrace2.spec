@@ -1,13 +1,14 @@
 Summary:        A trace manipulation toolkit
 Name:           babeltrace2
 Version:        2.0.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment
 URL:            https://babeltrace.org/
 Source0:        https://www.efficios.com/files/babeltrace/%{name}-%{version}.tar.bz2
+Patch0:         00-fix-lttng-live-array-access.patch
 BuildRequires:  elfutils-devel >= 0.154
 BuildRequires:  gcc
 BuildRequires:  glib-devel >= 2.28.0
@@ -83,6 +84,9 @@ rm -fv %{buildroot}%{_docdir}/babeltrace2/*
 %{_libdir}/pkgconfig/babeltrace2-ctf-writer.pc
 
 %changelog
+* Thu Feb 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.0.4-2
+- Re-add 00-fix-lttng-live-array-access.patch
+
 * Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.0.4-1
 - Upgrate to 2.0.4
 

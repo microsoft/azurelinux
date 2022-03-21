@@ -1,4 +1,4 @@
-From af721a438031fa9f79db5de3b018c4b532ac2e0c Mon Sep 17 00:00:00 2001
+From 8b4da8007ef59bbc833fed882ddae57bbcd51f1c Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Mon, 26 Jan 2015 12:57:11 -0800
 Subject: [PATCH] libiscsi
@@ -3914,12 +3914,12 @@ index 0000000..a21f888
 +	return rc;
 +}
 diff --git a/usr/Makefile b/usr/Makefile
-index 3bb0cb4..8ae6e07 100644
+index 21bb154..885243a 100644
 --- a/usr/Makefile
 +++ b/usr/Makefile
 @@ -37,7 +37,7 @@ PKG_CONFIG = /usr/bin/pkg-config
  CFLAGS ?= -O2 -g
- WARNFLAGS ?= -Wall -Wstrict-prototypes
+ WARNFLAGS ?= -Wall -Wextra -Werror -Wstrict-prototypes -fno-common
  CFLAGS += $(WARNFLAGS) -I../include -I. -D_GNU_SOURCE \
 -	  -I$(TOPDIR)/libopeniscsiusr
 +	  -I$(TOPDIR)/libopeniscsiusr -DISNS_ENABLE
@@ -3927,7 +3927,7 @@ index 3bb0cb4..8ae6e07 100644
  ISCSI_LIB = -L$(TOPDIR)/libopeniscsiusr -lopeniscsiusr
  LDFLAGS += $(shell $(PKG_CONFIG) --libs libkmod)
 diff --git a/usr/discovery.c b/usr/discovery.c
-index 199c160..d17a250 100644
+index 7dec696..2cf1838 100644
 --- a/usr/discovery.c
 +++ b/usr/discovery.c
 @@ -36,6 +36,7 @@
@@ -3965,13 +3965,13 @@ index 199c160..d17a250 100644
  }
 +#endif
  
- int discovery_fw(void *data, struct iface_rec *iface,
- 		 struct list_head *rec_list)
+ int discovery_fw(void *data,
+ 		 __attribute__((unused))struct iface_rec *iface,
 diff --git a/usr/idbm.c b/usr/idbm.c
-index 15802c3..3184c77 100644
+index 27cad0a..2498a03 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
-@@ -1725,9 +1725,9 @@ int idbm_print_all_discovery(int info_level)
+@@ -1825,9 +1825,9 @@ int idbm_print_all_discovery(int info_level)
   * fn should return -1 if it skipped the rec, an ISCSI_ERR error code if
   * the operation failed or 0 if fn was run successfully.
   */
@@ -3985,10 +3985,10 @@ index 15802c3..3184c77 100644
  	DIR *iface_dirfd;
  	struct dirent *iface_dent;
 diff --git a/usr/idbm.h b/usr/idbm.h
-index 6bdfd60..c6982e4 100644
+index ce098b7..d1a7f63 100644
 --- a/usr/idbm.h
 +++ b/usr/idbm.h
-@@ -103,6 +103,9 @@ struct rec_op_data {
+@@ -105,6 +105,9 @@ struct rec_op_data {
  	node_rec_t *match_rec;
  	idbm_iface_op_fn *fn;
  };
@@ -3999,16 +3999,16 @@ index 6bdfd60..c6982e4 100644
  				char *targetname, bool ruw_lock);
  extern int idbm_for_each_node(int *found, void *data,
 diff --git a/usr/iscsi_ipc.h b/usr/iscsi_ipc.h
-index 47857dd..fb8e965 100644
+index 47857dd..596543b 100644
 --- a/usr/iscsi_ipc.h
 +++ b/usr/iscsi_ipc.h
 @@ -162,4 +162,6 @@ struct iscsi_ipc {
  			 char *host_stats);
  };
  
-+struct iscsi_ipc *ipc;
++extern struct iscsi_ipc *ipc;
 +
  #endif /* ISCSI_IPC_H */
 -- 
-2.21.0
+2.26.2
 

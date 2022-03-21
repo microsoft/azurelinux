@@ -1,4 +1,4 @@
-From 97071360caa6868c21a161047ed471790c405efb Mon Sep 17 00:00:00 2001
+From 45878c9461298c9da68a626d990dc4ef99e01baa Mon Sep 17 00:00:00 2001
 From: Chris Leech <cleech@redhat.com>
 Date: Tue, 13 Aug 2013 10:59:44 -0700
 Subject: [PATCH] idmb_rec_write, check for tpgt first
@@ -11,10 +11,10 @@ for splitting it up.
  1 file changed, 5 insertions(+), 13 deletions(-)
 
 diff --git a/usr/idbm.c b/usr/idbm.c
-index be4d4e3..a7da540 100644
+index 42c2699..e6ede85 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
-@@ -2078,6 +2078,10 @@ static int idbm_rec_write(node_rec_t *rec, bool disable_lock)
+@@ -2178,6 +2178,10 @@ static int idbm_rec_write(node_rec_t *rec, bool disable_lock)
  			goto free_portal;
  	}
  
@@ -25,7 +25,7 @@ index be4d4e3..a7da540 100644
  	rc = stat(portal, &statb);
  	if (rc) {
  		rc = 0;
-@@ -2086,22 +2090,10 @@ static int idbm_rec_write(node_rec_t *rec, bool disable_lock)
+@@ -2186,22 +2190,10 @@ static int idbm_rec_write(node_rec_t *rec, bool disable_lock)
  		 * set the tgpt. In new versions you must pass all the info in
  		 * from the start
  		 */
@@ -50,5 +50,5 @@ index be4d4e3..a7da540 100644
  		 * Old style portal as a file, but with tpgt. Let's update it.
  		 */
 -- 
-2.21.0
+2.26.2
 

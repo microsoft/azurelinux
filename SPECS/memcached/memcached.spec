@@ -7,7 +7,7 @@
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
 Version:        1.6.13
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,8 +23,9 @@ BuildRequires:  perl-generators
 BuildRequires:  perl(IO::Socket::SSL)
 BuildRequires:  perl(Test::Harness)
 BuildRequires:  perl(Test::More)
-BuildRequires:  shadow-utils
-BuildRequires:  sudo
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(fields)
 %endif
 %if %{with sasl}
 BuildRequires:  cyrus-sasl-devel
@@ -86,9 +87,7 @@ install -Dp -m0644 scripts/memcached.service \
 install -Dp -m0644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/sysconfig/%{name}
 
 %check
-# Some tests fail when run as root, so we utilize a test user here
-useradd test -G root -m
-sudo -u test %make_build test
+%make_build test
 
 %pre
 getent group %{groupname} >/dev/null || groupadd -r %{groupname}
@@ -120,6 +119,10 @@ exit 0
 %{_includedir}/memcached/*
 
 %changelog
+* Thu Feb 03 2022 Muhammad Falak <mwani@microsfot.com> - 1.6.13-2
+- Add explict BR on perl-{FindBin,lib,fields} to fix ptest
+- Drop dependency on 'sudo' & 'shadow-utils'
+
 * Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 1.6.13-1
 - Upgrade to latest upstream version
 - Remove Fedora's selinux policy and associated subpackage

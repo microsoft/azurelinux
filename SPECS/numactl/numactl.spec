@@ -1,7 +1,7 @@
 Summary:        NUMA support for Linux
 Name:           numactl
-Version:        2.0.13
-Release:        6%{?dist}
+Version:        2.0.14
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,6 +72,9 @@ mv %{buildroot}%{_mandir}/man2/move_pages.2 %{buildroot}%{_mandir}/man2/numa-mov
 %{_mandir}/man3/*
 
 %changelog
+* Tue Feb 1 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.0.14-1
+- Upgrading to 2.0.14
+
 * Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.13-6
 - Rename conflicting move_pages.2 man pages
 - Require libnuma from libnuma-devel

@@ -1,4 +1,4 @@
-%global nspr_version 4.21
+%global nspr_version 4.30
 %global unsupported_tools_directory %{_libdir}/nss/unsupported-tools
 # Produce .chk files for the final stripped binaries
 %define __spec_install_post \
@@ -13,22 +13,21 @@
 
 Summary:        Security client
 Name:           nss
-Version:        3.44
-Release:        10%{?dist}
+Version:        3.75
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
-Source0:        https://archive.mozilla.org/pub/security/nss/releases/NSS_3_44_RTM/src/%{name}-%{version}.tar.gz
+Source0:        https://ftp.mozilla.org/pub/security/%{nss}/releases/NSS_3_75_RTM/src/%{name}-%{version}.tar.gz
 Source1:        nss-util.pc.in
 Source2:        nss-util-config.in
-Patch0:         nss-3.44-standalone-1.patch
-Patch1:         CVE-2020-12403.patch
-BuildRequires:  nspr-devel
+Source3:        nss.pc.in
+Source4:        nss-config.in
+BuildRequires:  nspr-devel >= %{nspr_version}
 BuildRequires:  sqlite-devel
 BuildRequires:  libdb-devel
-Provides:       %{name}-tools = %{version}-%{release}
 Provides:       %{name}-softokn = %{version}-%{release}
 Requires:       nspr
 Requires:       libdb
@@ -67,10 +66,22 @@ Requires:       nspr
 %description libs
 This package contains minimal set of shared nss libraries.
 
+%package tools
+Summary:          Tools for the Network Security Services
+Requires:         %{name}%{?_isa} = %{version}-%{release}
+
+%description tools
+Network Security Services (NSS) is a set of libraries designed to
+support cross-platform development of security-enabled client and
+server applications. Applications built with NSS can support SSL v2
+and v3, TLS, PKCS #5, PKCS #7, PKCS #11, PKCS #12, S/MIME, X.509
+v3 certificates, and other security standards.
+
+Install the nss-tools package if you need command-line tools to
+manipulate the NSS certificate and key database.
+
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 %build
 export NSS_FORCE_FIPS=1
@@ -111,6 +122,29 @@ cat %{SOURCE2} | sed -e "s,@libdir@,%{_libdir},g" \
                      -e "s,@MOD_PATCH_VERSION@,$NSSUTIL_VPATCH,g" \
                           > dist/pkgconfig/nss-util-config
 
+cat %{SOURCE3} | sed -e "s,%%libdir%%,%{_libdir},g" \
+                          -e "s,%%prefix%%,%{_prefix},g" \
+                          -e "s,%%exec_prefix%%,%{_prefix},g" \
+                          -e "s,%%includedir%%,%{_includedir}/nss,g" \
+                          -e "s,%%NSS_VERSION%%,%{version},g" \
+                          -e "s,%%NSPR_VERSION%%,%{nspr_version},g" \
+                          -e "s,%%NSSUTIL_VERSION%%,%{version},g" \
+                          -e "s,%%SOFTOKEN_VERSION%%,%{version},g" \
+                            > ./dist/pkgconfig/nss.pc
+
+NSS_VMAJOR=`cat nss/lib/nss/nss.h | grep "#define.*NSS_VMAJOR" | awk '{print $3}'`
+NSS_VMINOR=`cat nss/lib/nss/nss.h | grep "#define.*NSS_VMINOR" | awk '{print $3}'`
+NSS_VPATCH=`cat nss/lib/nss/nss.h | grep "#define.*NSS_VPATCH" | awk '{print $3}'`
+
+cat %{SOURCE4} | sed -e "s,@libdir@,%{_libdir},g" \
+                          -e "s,@prefix@,%{_prefix},g" \
+                          -e "s,@exec_prefix@,%{_prefix},g" \
+                          -e "s,@includedir@,%{_includedir}/nss,g" \
+                          -e "s,@MOD_MAJOR_VERSION@,$NSS_VMAJOR,g" \
+                          -e "s,@MOD_MINOR_VERSION@,$NSS_VMINOR,g" \
+                          -e "s,@MOD_PATCH_VERSION@,$NSS_VPATCH,g" \
+                          > ./dist/pkgconfig/nss-config
+
 %install
 cd dist
 mkdir -p %{buildroot}%{unsupported_tools_directory}
@@ -121,12 +155,19 @@ install -v -m755 Linux*/lib/*.so %{buildroot}%{_libdir}
 install -v -m644 Linux*/lib/libcrmf.a %{buildroot}%{_libdir}
 cp -v -RL {public,private}/nss/* %{buildroot}%{_includedir}/nss
 chmod 644 %{buildroot}%{_includedir}/nss/*
-install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} %{buildroot}%{_bindir}
+install -v -m755 Linux*/bin/{certutil,pk12util} %{buildroot}%{_bindir}
+install -v -m755 pkgconfig/nss-config %{buildroot}%{_bindir}
 install -v -m755 Linux*/bin/shlibsign %{buildroot}%{unsupported_tools_directory}
 install -vdm 755 %{buildroot}%{_libdir}/pkgconfig
-install -vm 644 Linux*/lib/pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
+install -vm 644 pkgconfig/nss.pc %{buildroot}%{_libdir}/pkgconfig
 install -p -m 644 pkgconfig/nss-util.pc %{buildroot}%{_libdir}/pkgconfig/nss-util.pc
 install -p -m 755 pkgconfig/nss-util-config %{buildroot}%{_bindir}/nss-util-config
+
+# Copy the binaries we want
+for file in certutil cmsutil crlutil modutil nss-policy-check pk12util signver ssltap
+do
+  install -p -m 755 ./*.OBJ/bin/$file $RPM_BUILD_ROOT/%{_bindir}
+done
 
 # The shilibsign script ran after packaging is looking for those files in the lib directory (hardcoded)
 cp -r %{buildroot}%{_libdir}/* /lib
@@ -142,7 +183,9 @@ popd
 %files
 %defattr(-,root,root)
 %license nss/COPYING
-%{_bindir}/*
+%{_bindir}/nss-config
+%{_bindir}/pk12util
+%{_bindir}/nss-util-config
 %{_libdir}/*.chk
 %{_libdir}/*.so
 %exclude %{_libdir}/libfreeblpriv3.so
@@ -163,7 +206,26 @@ popd
 %{_libdir}/libsoftokn3.so
 %{unsupported_tools_directory}/shlibsign
 
+%files tools
+%{_bindir}/certutil
+%{_bindir}/cmsutil
+%{_bindir}/crlutil
+%{_bindir}/modutil
+%{_bindir}/nss-policy-check
+%{_bindir}/pk12util
+%{_bindir}/signver
+%{_bindir}/ssltap
+
 %changelog
+* Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.75-1
+- Upgrading to newest version 3.75
+- Adding nss.pc.in and nss-config.in as sources.
+
+* Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 3.44-11
+- Add explicit binaries in the main package instead of `*`
+- Switch to `%autosetup` instead of `%setup`
+- Drop `Provides: nss-tools`
+- Add subpackage `nss-tools`
 
 * Tue Nov 16 2021 Mateusz Malisz <mamalisz@microsoft.com> - 3.44-10
 - Remove libdb from toolchain. Add workaround for the shlibsign script to work.

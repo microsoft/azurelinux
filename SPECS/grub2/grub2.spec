@@ -5,14 +5,14 @@
 %global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
 Summary:        GRand Unified Bootloader
 Name:           grub2
-Version:        2.06~rc1
-Release:        7%{?dist}
+Version:        2.06
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/grub
-Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.06-rc1.tar.gz
+Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
 # Incorporate relevant patches from Fedora 34
@@ -139,17 +139,17 @@ GRUB UEFI bootloader binaries
 
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
-LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
 export LDFLAGS
 
-%autosetup -p1 -n grub-2.06-rc1
+%autosetup -p1 -n grub-2.06
 cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
 tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
 
 %build
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
-LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,/usr/src/mariner/BUILD/module_info.ld##'`"
+LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
 export LDFLAGS
 
 export PYTHON=%{python3}
@@ -239,10 +239,10 @@ cat ./sbat.csv
 # Generate grub efi image
 install -d %{buildroot}%{_datadir}/grub2-efi
 %ifarch x86_64
-./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64.efi -p /boot/grub2 -O x86_64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/x86_64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubx64.efi -p /boot/grub2 -O x86_64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop efi_uga ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp multiboot2
 %endif
 %ifarch aarch64
-./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64.efi -p /boot/grub2 -O arm64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm
+./install-for-efi/usr/bin/grub2-mkimage -d ./install-for-efi/usr/lib/grub/arm64-efi/ --sbat ./sbat.csv -o %{buildroot}%{_datadir}/grub2-efi/grubaa64.efi -p /boot/grub2 -O arm64-efi fat iso9660 part_gpt part_msdos normal boot linux configfile loopback chain efifwsetup efi_gop ls search search_label search_fs_uuid search_fs_file gfxterm gfxterm_background gfxterm_menu test all_video loadenv exfat ext2 udf halt gfxmenu png tga lsefi help probe echo lvm cryptodisk luks gcry_rijndael gcry_sha512 tpm efinet tftp
 %endif
 
 # Install to efi directory
@@ -313,6 +313,19 @@ cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
 %endif
 
 %changelog
+* Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 2.06-3
+- Enable multiboot2 support for x86_64
+
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 2.06-2
+- Use _topdir instead of hard-coded value /usr/src/mariner
+
+* Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 2.06-1
+- Update to 2.06 release
+- Add efinet and tftp modules to grub efi binary
+
+* Tue Feb 08 2022 Chris Co <chrco@microsoft.com> - 2.06~rc1-8
+- Bump release number to force binary signing with new secure boot key
+
 * Tue Sep 14 2021 Andrew Phelps <anphel@microsoft.com> - 2.06~rc1-7
 - Disable module_info.ld script due to issue with ELF metadata note
 

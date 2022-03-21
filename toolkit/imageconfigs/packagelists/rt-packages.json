@@ -1,0 +1,9 @@
+{
+    "packages": [
+        "rtctl",
+        "rt-setup",
+        "rt-tests",
+        "tuna",
+        "tuned"
+    ]
+}

@@ -10,7 +10,7 @@ industry standard OAuth2 and OpenID Connect protocols.}
 
 Name:           python-%{srcname}
 Version:        1.4.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Microsoft Authentication Library (MSAL) for Python
 
 License:        MIT
@@ -71,18 +71,18 @@ rm docs/_build/html/{.buildinfo,.nojekyll}
 
 # Drop bundled web fonts in HTML documentation
 pushd docs/_build/html/_static/fonts/
-rm fontawesome-webfont.*
+rm -f fontawesome-webfont.*
 ln -s %{_fontbasedir}/fontawesome/fontawesome-webfont.* .
 
 pushd Lato/
-rm *.ttf
+rm -f *.ttf
 for i in Bold BoldItalic Italic Regular; do
     ln -s %{_fontbasedir}/lato/Lato-$i.ttf lato-${i,,}.ttf
 done
 popd
 
 pushd RobotoSlab/
-rm *.ttf
+rm -f *.ttf
 for i in Bold Regular; do
     ln -s %{_fontbasedir}/google-roboto-slab/RobotoSlab-$i.ttf roboto-slab-v7-${i,,}.ttf
 done
@@ -116,6 +116,10 @@ pytest-%{python3_version} \
 
 
 %changelog
+* Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.3-3
+- Updating installation steps.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.3-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

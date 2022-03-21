@@ -1,26 +1,15 @@
 Summary:        Core utilities for Python packages
 Name:           python-packaging
-Version:        17.1
-Release:        8%{?dist}
+Version:        21.3
+Release:        1%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/packaging
-# This link seems very sensitive to the precise package version.
-# Source0:      https://files.pythonhosted.org/packages/77/32/439f47be99809c12ef2da8b60a2c47987786d2c6c9205549dd6ef95df8bd/packaging-%{version}.tar.gz
-Source0:        packaging-%{version}.tar.gz
+Source0:        https://github.com/pypa/packaging/releases/download/%{version}/packaging-%{version}.tar.gz
 BuildArch:      noarch
-
-%description
-Core utilities for Python packages
-
-%package -n     python3-packaging
-Summary:        Core utilities for Python packages
 BuildRequires:  python3-devel
-Requires:       python3
-Requires:       python3-pyparsing
-Requires:       python3-six
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
@@ -30,6 +19,16 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  python3-xml
 %endif
+
+%description
+Core utilities for Python packages
+
+%package -n     python3-packaging
+Summary:        Core utilities for Python packages
+Requires:       python3
+Requires:       python3-pyparsing
+Requires:       python3-six
+
 
 %description -n python3-packaging
 Core utilities for Python packages
@@ -53,6 +52,10 @@ PYTHONPATH=./ pytest
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 01 2022 Thomas Crain <thcrain@microsoft.com> - 21.3-1
+- Upgrade to latest upstream version
+- Use github release source instead of pypi source
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 17.1-8
 - Replace easy_install usage with pip in %%check sections
 

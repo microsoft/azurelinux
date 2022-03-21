@@ -3,7 +3,7 @@
 
 Name:           kf5-%{framework}
 Version:        5.61.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon for localization
 License:        BSD and LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
@@ -19,8 +19,7 @@ Distribution:   Mariner
 BuildRequires:  extra-cmake-modules >= %{majmin}
 BuildRequires:  gettext
 BuildRequires:  kf5-rpm-macros >= %{majmin}
-# FindPythonInterp.cmake , can find/use multiple versions, rely on the default for now
-BuildRequires:  python2
+BuildRequires:  python3
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qtdeclarative-devel
 
@@ -33,7 +32,8 @@ KDE Frameworks 5 Tier 1 addon for localization.
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       gettext
-Requires:       python2
+Requires:       python3
+
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
@@ -46,7 +46,7 @@ developing applications that use %{name}.
 %build
 mkdir %{_target_platform}
 pushd %{_target_platform}
-%{cmake_kf5} ..
+%{cmake_kf5} .. -DPYTHON_EXECUTABLE=%{python3}
 popd
 
 %make_build -C %{_target_platform}
@@ -90,6 +90,9 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 
 %changelog
+* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 5.61.0-4
+- Remove python2, replace with python3
+
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3
 - License verified.
 - Fixed Source0 tag.

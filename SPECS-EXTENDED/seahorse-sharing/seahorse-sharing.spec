@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           seahorse-sharing
 Version:        3.8.0
-Release:        19%{?dist}
+Release:        21%{?dist}
 Summary:        Sharing of PGP public keys via DNS-SD and HKP
 # daemon is GPLv2+
 # libegg is LGPLv2+
@@ -13,6 +13,7 @@ Source0:        http://ftp.gnome.org/pub/gnome/sources/seahorse-sharing/3.8/%{na
 Provides:       bundled(egglib)
 
 BuildRequires:  gcc
+BuildRequires:  perl(File::Find)
 BuildRequires:  gtk3-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  gnupg2
@@ -58,6 +59,12 @@ desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/%{name}.deskto
 
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.0-21
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.0-20
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.0-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

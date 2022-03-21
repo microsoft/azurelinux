@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "keepalived-2.0.10.zip": "be5bbfe3a19fe26faee9577300d449dc55334d81f98b8f3589a84bdd6294514e",
+  "keepalived-2.2.7.tar.gz": "c61940d874154a560a54627ecf7ef47adebdf832164368d10bf242a4d9b7d49d",
   "keepalived.service": "533fac0ed629192f87b42f5fa2ba4443bccc3ac383e9495be97369616b95d6bd"
  }
 }

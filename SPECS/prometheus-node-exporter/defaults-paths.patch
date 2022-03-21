@@ -1,0 +1,22 @@
+Description: Change default paths to match Debian packaging
+Forwarded: not-needed
+Author: Martina Ferrari <tina@debian.org>
+Last-Update: 2019-10-29
+
+---
+ collector/textfile.go    |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/collector/textfile.go b/collector/textfile.go
+index 469235dc..12353ffd 100644
+--- a/collector/textfile.go
++++ b/collector/textfile.go
+@@ -34,7 +34,7 @@ import (
+ )
+ 
+ var (
+-	textFileDirectory = kingpin.Flag("collector.textfile.directory", "Directory to read text files with metrics from.").Default("").String()
++	textFileDirectory = kingpin.Flag("collector.textfile.directory", "Directory to read text files with metrics from.").Default("/var/lib/prometheus/node-exporter").String()
+ 	mtimeDesc         = prometheus.NewDesc(
+ 		"node_textfile_mtime_seconds",
+ 		"Unixtime mtime of textfiles successfully read.",

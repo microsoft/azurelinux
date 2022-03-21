@@ -1,14 +1,13 @@
 Summary:        Recursive directory listing command.
 Name:           tree
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 URL:            http://mama.indstate.edu/users/ice/tree/
 Group:          Applications
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://mama.indstate.edu/users/ice/tree/src/tree-%{version}.tgz
-%define sha1    tree=35bd212606e6c5d60f4d5062f4a59bb7b7b25949
 
 %description
 Tree is a recursive directory listing command that produces a depth indented listing of files, which is colorized ala dircolors if the LS_COLORS environment variable is set and output is to tty. Tree has been ported and reported to work under the following operating systems: Linux, FreeBSD, OS X, Solaris, HP/UX, Cygwin, HP Nonstop and OS/2.
@@ -31,6 +30,9 @@ make install BINDIR=%{buildroot}%{_bindir} \
 %{_mandir}/man1/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.0-2
+- Remove unused `%%define sha1` lines
+
 * Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.0-1
 - Update to version 1.8.0.
 - License verified.

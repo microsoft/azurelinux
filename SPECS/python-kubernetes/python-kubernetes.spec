@@ -1,17 +1,14 @@
 %global library kubernetes
-%global basehash d30f1e6fd4e2725aae04fa2f4982a4cfec7c682b
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%global basehash 06191d321491abd87caaf0d049030dc87720684a
 
 Name:       python-%{library}
-Version:    11.0.0
-Release:    5%{?dist}
+Version:    21.7.0
+Release:    1%{?dist}
 Summary:    Python client for the kubernetes API.
 License:    ASL 2.0
-URL:        https://pypi.python.org/pypi/kubernetes
-#Source0:   https://github.com/kubernetes-client/python/archive/v%{version}.tar.gz
-Source0:    %{name}-%{version}.tar.gz
-#Source1:   https://github.com/kubernetes-client/python-base/archive/%{basehash}.tar.gz
-Source1:    %{name}-base-%{version}.tar.gz
+URL:        https://github.com/kubernetes-client/python
+Source0:    https://github.com/kubernetes-client/python/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:    https://github.com/kubernetes-client/python-base/archive/%{basehash}.tar.gz#/%{name}-base-%{version}.tar.gz
 BuildArch:  noarch
 
 %package -n python3-%{library}
@@ -19,7 +16,6 @@ Summary:    Kubernetes Python Client
 BuildRequires:  git
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3-certifi
 Requires:       python3-six
 Requires:       python3-dateutil
@@ -79,6 +75,9 @@ cp -pr kubernetes/e2e_test %{buildroot}%{python3_sitelib}/%{library}/
 %{python3_sitelib}/%{library}/e2e_test
 
 %changelog
+* Mon Feb 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 21.7.0-1
+- Upgrade to 21.7.0
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 11.0.0-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified

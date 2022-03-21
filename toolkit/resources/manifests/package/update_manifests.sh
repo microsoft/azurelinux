@@ -41,7 +41,7 @@ generate_toolchain () {
 
 # Remove specific packages that are not needed in pkggen_core
 remove_packages_for_pkggen_core () {
-    sed -i '/alsa-lib-/d' $TmpPkgGen
+    sed -i '/audit-devel/d' $TmpPkgGen
     sed -i '/ca-certificates-legacy/d' $TmpPkgGen
     sed -i '/libtasn1-d/d' $TmpPkgGen
     sed -i '/libpkgconf-devel/d' $TmpPkgGen
@@ -70,7 +70,6 @@ remove_packages_for_pkggen_core () {
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libarchive/d' $TmpPkgGen
-    sed -i '/libdb-utils/d' $TmpPkgGen
     sed -i '/libgpg-error-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libgcrypt-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/libselinux-[[:alpha:]]/d' $TmpPkgGen
@@ -245,18 +244,17 @@ generate_pkggen_core () {
         grep "^popt-" $TmpPkgGen
         grep "^nspr-" $TmpPkgGen
         grep "^sqlite-" $TmpPkgGen
-        grep "^nss-" $TmpPkgGen
         grep "^elfutils-" $TmpPkgGen
         grep "^expat-" $TmpPkgGen
         grep "^libpipeline-" $TmpPkgGen
         grep "^gdbm-" $TmpPkgGen
         grep "^perl-" $TmpPkgGen
         grep "^texinfo-" $TmpPkgGen
+        grep "^gtk-doc-" $TmpPkgGen
         grep "^autoconf-" $TmpPkgGen
         grep "^automake-" $TmpPkgGen
         grep "^openssl-" $TmpPkgGen
         grep "^libcap-" $TmpPkgGen
-        grep "^libdb-" $TmpPkgGen
         grep "^debugedit-" $TmpPkgGen
         grep "^rpm-" $TmpPkgGen
         grep "^cpio-" $TmpPkgGen
@@ -301,6 +299,8 @@ generate_pkggen_core () {
         grep "^newt-[0-9]" $TmpPkgGen
         grep "^chkconfig-[0-9]" $TmpPkgGen
         grep "^msopenjdk-" $TmpPkgGen
+        grep "^pyproject-" $TmpPkgGen
+        grep "^audit-" $TmpPkgGen
     } > "$1"
 }
 

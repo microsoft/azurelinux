@@ -1,13 +1,13 @@
 Summary:        Git for operating system binaries
 Name:           ostree
-Version:        2021.4
-Release:        2%{?dist}
+Version:        2022.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://ostree.readthedocs.io/en/latest
-Source0:        https://github.com/ostreedev/ostree/releases/download/v2021.4/lib%{name}-%{version}.tar.xz
+Source0:        https://github.com/ostreedev/ostree/releases/download/v%{version}/lib%{name}-%{version}.tar.xz
 Source1:        91-ostree.preset
 Patch0:         dualboot-support.patch
 Patch1:         0001-ostree-Copying-photon-config-to-boot-directory.patch
@@ -156,6 +156,10 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+* Thu Jan 27 2022 Henry Li <lihl@microsoft.com> - 2022.1-1
+- Upgrade to version 2022.1
+- Fix Source0 field to use macro to represent package version
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-2
 - Remove unused gobject-introspection-python requirement
 - Explicity specify python3-gobject-introspection requirement

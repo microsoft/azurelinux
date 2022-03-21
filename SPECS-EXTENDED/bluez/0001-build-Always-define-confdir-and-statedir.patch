@@ -12,8 +12,8 @@ diff --git a/Makefile.am b/Makefile.am
 index 9d25a815b..ac88c12e0 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -31,14 +31,14 @@ pkginclude_HEADERS =
- AM_CFLAGS = $(WARNING_CFLAGS) $(MISC_CFLAGS) $(UDEV_CFLAGS) $(ell_cflags)
+@@ -28,14 +28,14 @@
+ 				$(LIBEDATASERVER_CFLAGS) $(ell_cflags)
  AM_LDFLAGS = $(MISC_LDFLAGS)
  
 +confdir = $(sysconfdir)/bluetooth

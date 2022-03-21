@@ -1,0 +1,62 @@
+From 670c740f965bde6df333b1c8666fdfeb4c2fb647 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Sat, 10 Apr 2021 16:05:23 -0400
+Subject: [PATCH 1/4] Don't call QueryVariableInfo() on EFI 1.10 machines
+
+The EFI 1.10 spec (and presumably earlier revisions as well) didn't have
+RT->QueryVariableInfo(), and on Chris Murphy's MacBookPro8,2 , that
+memory appears to be initialized randomly.
+
+This patch changes it to not call RT->QueryVariableInfo() if the
+EFI_RUNTIME_SERVICES table's major revision is less than two, and
+assumes our maximum variable size is 1024 in that case.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ mok.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/mok.c b/mok.c
+index 5ad9072..b612290 100644
+--- a/mok.c
++++ b/mok.c
+@@ -261,6 +261,9 @@ static const uint8_t null_sha256[32] = { 0, };
+ 
+ typedef UINTN SIZE_T;
+ 
++#define EFI_MAJOR_VERSION(tablep) ((UINT16)((((tablep)->Hdr.Revision) >> 16) & 0xfffful))
++#define EFI_MINOR_VERSION(tablep) ((UINT16)(((tablep)->Hdr.Revision) & 0xfffful))
++
+ static EFI_STATUS
+ get_max_var_sz(UINT32 attrs, SIZE_T *max_var_szp)
+ {
+@@ -270,11 +273,21 @@ get_max_var_sz(UINT32 attrs, SIZE_T *max_var_szp)
+ 	uint64_t max_var_sz = 0;
+ 
+ 	*max_var_szp = 0;
+-	efi_status = gRT->QueryVariableInfo(attrs, &max_storage_sz,
+-					    &remaining_sz, &max_var_sz);
+-	if (EFI_ERROR(efi_status)) {
+-		perror(L"Could not get variable storage info: %r\n", efi_status);
+-		return efi_status;
++	if (EFI_MAJOR_VERSION(gRT) < 2) {
++		dprint(L"EFI %d.%d; no RT->QueryVariableInfo().  Using 1024!\n",
++		       EFI_MAJOR_VERSION(gRT), EFI_MINOR_VERSION(gRT));
++		max_var_sz = remaining_sz = max_storage_sz = 1024;
++		efi_status = EFI_SUCCESS;
++	} else {
++		dprint(L"calling RT->QueryVariableInfo() at 0x%lx\n",
++		       gRT->QueryVariableInfo);
++		efi_status = gRT->QueryVariableInfo(attrs, &max_storage_sz,
++						    &remaining_sz, &max_var_sz);
++		if (EFI_ERROR(efi_status)) {
++			perror(L"Could not get variable storage info: %r\n",
++			       efi_status);
++			return efi_status;
++		}
+ 	}
+ 
+ 	/*
+-- 
+2.17.1
+

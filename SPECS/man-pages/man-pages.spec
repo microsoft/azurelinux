@@ -1,7 +1,7 @@
 Summary:        Man pages
 Name:           man-pages
-Version:        4.16
-Release:        4%{?dist}
+Version:        5.13
+Release:        1%{?dist}
 License:        GPLv2+ and GPLv2 and BSD and Latex2e and Verbatim and GPL+ and BSD with advertising and MIT and LDPL and Public Domain
 URL:            https://www.kernel.org/doc/man-pages
 Group:          System Environment/Base
@@ -18,7 +18,7 @@ The Man-pages package contains over 1,900 man pages.
 %build
 
 %install
-make DESTDIR=%{buildroot} install
+make DESTDIR=%{buildroot} prefix=/usr install
 #	The following man pages conflict with other packages
 rm -vf %{buildroot}%{_mandir}/man3/getspnam.3
 rm -vf %{buildroot}%{_mandir}/man5/passwd.5
@@ -37,6 +37,9 @@ rm -vf %{buildroot}%{_mandir}/man5/passwd.5
 %{_mandir}/man8/*
 
 %changelog
+* Wed Feb 16 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.13-1
+- Upgrading to v5.13
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.16-4
 - Added %%license line automatically and updated licenses.
 

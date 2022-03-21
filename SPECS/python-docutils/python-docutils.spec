@@ -1,7 +1,7 @@
 Summary:        Docutils -- Python Documentation Utilities.
 Name:           python-docutils
-Version:        0.14
-Release:        5%{?dist}
+Version:        0.18.1
+Release:        2%{?dist}
 License:        Public Domain, PSF-2.0, BSD, GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,15 +33,15 @@ For input Docutils supports reStructuredText, an easy-to-read, what-you-see-is-w
 %py3_install
 for BINARY in rstpep2html rst2xml rst2xetex rst2s5 rst2pseudoxml rst2odt_prepstyles rst2odt rst2man rst2latex rst2html5 rst2html rst2html4
 do
-  ln -sfv $(echo $BINARY).py %{buildroot}%{_bindir}/$(echo $BINARY)
-  ln -sfv $(echo $BINARY).py %{buildroot}%{_bindir}/$(echo $BINARY)3
-  ln -sfv $(echo $BINARY).py %{buildroot}%{_bindir}/$(echo $BINARY)3.py
+  ln -sfv ${BINARY}.py %{buildroot}%{_bindir}/${BINARY}
+  ln -sfv ${BINARY}.py %{buildroot}%{_bindir}/${BINARY}3
+  ln -sfv ${BINARY}.py %{buildroot}%{_bindir}/${BINARY}3.py
 done
 
 %check
 PATH=%{buildroot}%{_bindir}:${PATH} \
   PYTHONPATH=%{buildroot}%{python3_sitelib} \
- python3 test3/alltests.py
+ python3 test/alltests.py
 
 %files -n python3-docutils
 %defattr(-,root,root)
@@ -97,6 +97,13 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 %{_bindir}/rst2html43.py
 
 %changelog
+* Fri Feb 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.18.1-2
+- Fix test path `s/test3/test/` to enable ptest
+
+* Thu Feb 24 2022 Nick Samson <nisamson@microsoft.com> - 0.18.1-1
+- Updated to 0.18.1
+- Removed unnecessary echo calls in build script.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.14-5
 - Add license to python3 package
 - Remove python2 package, move old binary names to python3 package

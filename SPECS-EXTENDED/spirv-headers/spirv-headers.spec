@@ -1,11 +1,11 @@
-%global commit 2ad0492fb00919d99500f1da74abf5ad3c870e4e
+%global commit b42ba6d92faf6b4938e6f22ddd186dbdacc98d78
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20200414
+%global commit_date 20220117
 %global gitrel .%{commit_date}.git%{shortcommit}
 
 Name:           spirv-headers
-Version:        1.5.1
-Release:        4%{?dist}
+Version:        1.5.5
+Release:        1%{?dist}
 Summary:        Header files from the SPIR-V registry
 
 License:        MIT
@@ -57,6 +57,10 @@ mv include/* %buildroot%{_includedir}/
 %{_includedir}/spirv/
 
 %changelog
+* Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.5-1
+- Updating to version 1.5.5 + 1.6.1 pre-release commits using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.1-4
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

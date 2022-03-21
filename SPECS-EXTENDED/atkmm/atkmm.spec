@@ -4,11 +4,11 @@ Distribution:   Mariner
 # first two digits of version
 %define release_version %(echo %{version} | awk -F. '{print $1"."$2}')
 
-%global glibmm24_version 2.46.1
+%global glibmm_version 2.46.1
 
 Name:           atkmm
 Version:        2.24.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        C++ interface for the ATK library
 
 License:        LGPLv2+
@@ -17,9 +17,9 @@ Source0:        http://ftp.gnome.org/pub/GNOME/sources/atkmm/%{release_version}/
 
 BuildRequires:  gcc-c++
 BuildRequires:  atk-devel
-BuildRequires:  glibmm24-devel >= %{glibmm24_version}
+BuildRequires:  glibmm-devel >= %{glibmm_version}
 
-Requires:       glibmm24%{?_isa} >= %{glibmm24_version}
+Requires:       glibmm%{?_isa} >= %{glibmm_version}
 
 %description
 atkmm provides a C++ interface for the ATK library. Highlights
@@ -41,7 +41,7 @@ developing applications that use %{name}.
 Summary:        Developer's documentation for the atkmm library
 BuildArch:      noarch
 Requires:       %{name} = %{version}-%{release}
-Requires:       glibmm24-doc
+Requires:       glibmm-doc
 
 %description    doc
 This package contains developer's documentation for the atkmm
@@ -85,6 +85,10 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.24.3-6
+- Update Requires: to point at glibmm, rather than glibmm24 (removed)
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.24.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

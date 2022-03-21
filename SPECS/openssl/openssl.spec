@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        8%{?dist}
+Release:        12%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,17 +41,23 @@ Patch18:        openssl-1.1.1-fips-curves.patch
 Patch19:        openssl-1.1.1-sp80056arev3.patch
 Patch20:        openssl-1.1.1-jitterentropy.patch
 Patch21:        openssl-1.1.1-drbg-seed.patch
+Patch22:        openssl-1.1.1-fips-SymCrypt.patch
+Patch23:        CVE-2021-3711.patch
+Patch24:        CVE-2021-3712.patch
+Patch25:        CVE-2022-0778.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
-%if %{with_check}
-BuildRequires:  perl
-%endif
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       glibc
 Requires:       libgcc
 Conflicts:      httpd <= 2.4.37
+%if %{with_check}
+BuildRequires:  perl
+BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Test::Harness)
+%endif
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -133,6 +139,10 @@ cp %{SOURCE4} test/
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+# %patch22 -p1
+%patch23 -p1
+%patch24 -p1
+%patch25 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -195,8 +205,6 @@ export HASHBANGPERL=%{_bindir}/perl
     no-sm4 \
     no-ssl \
     no-ssl3 \
-    no-tls1 \
-    no-tls1_1 \
     no-weak-ssl-ciphers \
     no-whirlpool \
     no-zlib \
@@ -324,6 +332,19 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Thu Mar 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1k-12
+- Adding a patch for CVE-2022-0778.
+
+* Thu Mar 10 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.1.1k-11
+- dmihai@microsoft.com, 1.1.1k-6: Enable support for TLS 1 and TLS 1.1
+- niontive@microsoft.com, 1.1.1k-7: Patch CVE-2021-3711 and CVE-2021-3712.
+
+* Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.1k-10
+- Add an explicit BR on `perl{(Test::Harness), (Math::BigInt)}` to enable ptest
+
+* Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 1.1.1k-9
+- Add optional patch to use SymCrypt as default engine
+
 * Sun Jan 23 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1k-8
 - Add build requires for perl dependencies
 
@@ -340,7 +361,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 * Tue Jun 15 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-4
 - In FIPS mode, use jitterentropy for DRBG nonce.
 - In FIPS mode, concatenate Linux RNG with personalization string during DRBG instantiation
-- In FIPS mode, concatenate Linux RNG with additional input string during DRBG reseed 
+- In FIPS mode, concatenate Linux RNG with additional input string during DRBG reseed
 
 * Tue May 18 2021 Nicolas Ontiveros <niontive@microsoft.com> - 1.1.1k-3
 - In FIPS mode, use only jitterentropy for entropy pool

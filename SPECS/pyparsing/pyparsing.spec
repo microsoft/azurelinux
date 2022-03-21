@@ -1,14 +1,17 @@
 Summary:        Python package with an object-oriented approach to text processing
 Name:           pyparsing
-Version:        2.2.0
-Release:        8%{?dist}
+Version:        3.0.7
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pyparsing/pyparsing
-#Source0:       https://github.com/pyparsing/pyparsing/archive/pyparsing_%{version}.tar.gz
-Source0:        pyparsing-%{version}.tar.gz
+Source0:        https://github.com/pyparsing/pyparsing/releases/download/%{name}_%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  python3-devel
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
 %description
@@ -17,7 +20,6 @@ definitions for any number of text parsing applications.
 
 %package -n     python3-pyparsing
 Summary:        Python package with an object-oriented approach to text processing
-BuildRequires:  python3-devel
 Requires:       python3
 
 %description -n python3-pyparsing
@@ -33,8 +35,9 @@ definitions for any number of text parsing applications.
 %install
 %py3_install
 
-#%check
-#Tests are not available
+%check
+pip3 install -r tests/requirements.txt
+tox -e py%{python3_version_nodots}
 
 %files -n python3-pyparsing
 %defattr(-,root,root,-)
@@ -42,6 +45,10 @@ definitions for any number of text parsing applications.
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 04 2022 Thomas Crain <thcrain@microsoft.com> - 3.0.7-1
+- Upgrade to latest upstream version
+- Add tests
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-8
 - Add license to python3 package
 - Remove python2 package

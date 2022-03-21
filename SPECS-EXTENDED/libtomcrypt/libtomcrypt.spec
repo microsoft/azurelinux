@@ -1,31 +1,14 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%if 0%{?fedora}
-%global _with_docs 1
-%endif
-
+Summary:        A comprehensive, portable cryptographic toolkit
 Name:           libtomcrypt
 Version:        1.18.2
-Release:        7%{?dist}
-Summary:        A comprehensive, portable cryptographic toolkit
-License:        Public Domain or WTFPL
-URL:            http://www.libtom.net/
-
+Release:        8%{?dist}
+License:        Public Domain OR WTFPL
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.libtom.net/
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-
 BuildRequires:  libtommath-devel >= 1.0
 BuildRequires:  libtool
-
-%{?_with_docs:
-BuildRequires:  ghostscript
-BuildRequires:  texlive-latex-bin-bin
-BuildRequires:  texlive-makeindex-bin
-BuildRequires:  texlive-mfware-bin
-BuildRequires:  tex(cmr10.tfm)
-BuildRequires:  tex(fancyhdr.sty)
-BuildRequires:  tex(hyphen.tex)
-BuildRequires:  tex(mf.mf)
-}
 
 %description
 A comprehensive, modular and portable cryptographic toolkit that provides
@@ -36,7 +19,7 @@ cryptography and a plethora of other routines.
 Designed from the ground up to be very simple to use. It has a modular and
 standard API that allows new ciphers, hashes and PRNGs to be added or removed
 without change to the overall end application. It features easy to use functions
-and a complete user manual which has many source snippet examples. 
+and a complete user manual which has many source snippet examples.
 
 %package        devel
 Summary:        Development files for %{name}
@@ -45,17 +28,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
-%{?_with_docs:
-%package        doc
-Summary:        Documentation files for %{name}
-BuildArch:      noarch
-Provides:       %{name}-doc = %{version}-%{release}
-Obsoletes:      %{name}-doc < 1.17-19
-
-%description    doc
-The %{name}-doc package contains documentation for use with %{name}.
-}
 
 %prep
 %setup -q
@@ -69,9 +41,6 @@ export EXTRALIBS="-ltommath"
 export CFLAGS="%{build_cflags} -DLTM_DESC -DUSE_LTM"
 %make_build V=1 -f makefile.shared library
 %make_build V=1 -f makefile.shared test
-%{?_with_docs:
-%make_build V=1 -f makefile docs
-}
 
 %check
 ./test
@@ -80,7 +49,7 @@ export CFLAGS="%{build_cflags} -DLTM_DESC -DUSE_LTM"
 %make_install INSTALL_OPTS="-m 755" INCPATH="%{_includedir}" LIBPATH="%{_libdir}" -f makefile.shared
 
 # Remove unneeded files
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -name '*.a' -delete
 
 # Fix pkgconfig path
@@ -100,12 +69,11 @@ sed -i \
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
-%{?_with_docs:
-%files doc
-%doc doc/crypt.pdf
-}
-
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.2-8
+- Removing docs to drop dependency on 'ghostscript'.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.2-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -4,7 +4,7 @@
 Summary:        OCaml compiler and programming environment
 Name:           ocaml
 Version:        4.13.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        QPL and (LGPLv2+ with exceptions)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source0:        https://caml.inria.fr/pub/distrib/%{name}-%{majmin}/%{name}-%{ve
 Patch0001:      0001-Don-t-add-rpaths-to-libraries.patch
 Patch0002:      0002-configure-Allow-user-defined-C-compiler-flags.patch
 Patch0003:      0003-configure-Remove-incorrect-assumption-about-cross-co.patch
+Patch0004:      0004-remove-unused-var-in-alloc_aync_stubs.patch
 BuildRequires:  autoconf
 BuildRequires:  binutils-devel
 BuildRequires:  chrpath
@@ -257,6 +258,9 @@ make -j1 all
 %{_libdir}/ocaml/compiler-libs/*.o
 
 %changelog
+* Mon Feb 28 2022 Muhammad Falak <mwani@microsoft.com> - 4.13.1-2
+- Introduce a patch to remove unused vars in test to enable ptest
+
 * Mon Jan 10 2022 Thomas Crain <thcrain@microsoft.com> - 4.13.1-1
 - Upgrade to latest upstream release and rebase relevant patches
 - Remove arch-specific gating- only applies to arches Mariner does not support

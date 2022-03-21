@@ -2,7 +2,7 @@
 Summary:        Python version extractor
 Name:           python-vcversioner
 Version:        2.16.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,7 +38,7 @@ cp %{SOURCE1} .
 %py3_install
 
 %check
-%python3 setup test
+%python3 setup.py test
 
 %files -n python3-vcversioner
 %license %{LICENSE_PATH}
@@ -46,6 +46,9 @@ cp %{SOURCE1} .
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 2.16.0.0-6
+- Fix typo `s/setup/setup.py/` in `%check` section to enable ptest
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.16.0.0-5
 - Add license to python3 package
 - Remove python2 package

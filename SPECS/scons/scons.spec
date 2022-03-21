@@ -1,7 +1,6 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Name:           scons
 Version:        3.0.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        An Open Source software construction tool
 Group:          Development/Tools
 License:        MIT
@@ -9,8 +8,8 @@ URL:            http://scons.org
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  python2
-Requires:       python2
+BuildRequires:  python3-devel
+Requires:       python3
 BuildArch:      noarch
 
 %description
@@ -20,27 +19,26 @@ with integrated functionality similar to autoconf/automake and compiler caches s
 In short, SCons is an easier, more reliable and faster way to build software.
 
 %prep
-%setup -q
+%autosetup
 
 %build
-python setup.py build
+%py3_build
 
 %install
-python setup.py install \
-    --root=%{buildroot} \
-    --prefix=%{_prefix} \
-    --standard-lib \
-    --optimize=1 \
-    --install-data=%{_datadir}
+%{py3_install "--prefix=%{_prefix}" "--standard-lib" "--install-data=%{_datadir}"}
+%py3_shebang_fix %{buildroot}%{_bindir}/*
 
 %files
 %defattr(-,root,root,-)
 %license LICENSE.txt
-%{python2_sitelib}/*
+%{python3_sitelib}/*
 %{_bindir}/*
 %{_datadir}/*
 
 %changelog
+* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 3.0.1-6
+- Build with python3 instead of python2
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.1-5
 - Removing the explicit %%clean stage.
 - License verified.

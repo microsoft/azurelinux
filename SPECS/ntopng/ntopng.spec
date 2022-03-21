@@ -1,8 +1,8 @@
-%global nDPIver 3.4
+%global nDPIver 4.2
 Summary:        Web-based Network Traffic Monitoring Application
 Name:           ntopng
-Version:        4.2
-Release:        2%{?dist}
+Version:        5.2.1
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,10 @@ mv nDPI-%{nDPIver} nDPI
 %{_datadir}/ntopng/*
 
 %changelog
+* Thu Feb 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.2.1-1
+- Upgrading to v5.2.1
+- Upgrading nDPI to v4.2
+
 * Fri Feb 26 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2-2
 - Updating source URLs.
 

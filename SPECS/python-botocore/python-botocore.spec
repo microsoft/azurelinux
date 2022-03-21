@@ -1,13 +1,13 @@
 Summary:        Amazon Web Services Library.
 Name:           python-botocore
-Version:        1.13.21
+Version:        1.23.52
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/boto/botocore
-#Source0:       https://github.com/boto/botocore/archive/%{version}.tar.gz
+#Source0:       https://github.com/boto/botocore/archive/refs/tags/%{version}.tar.gz
 Source0:        botocore-%{version}.tar.gz
 BuildArch:      noarch
 
@@ -21,9 +21,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
 %if %{with_check}
-BuildRequires:  python3-dateutil
 BuildRequires:  python3-pip
-BuildRequires:  python3-urllib3
 %endif
 
 %description -n python3-botocore
@@ -39,10 +37,8 @@ A low-level interface to a growing number of Amazon Web Services. The botocore p
 %py3_install
 
 %check
-pip3 install nose
-pip3 install mock
-pip3 install jmespath
-nosetests tests/unit
+pip3 install tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-botocore
 %defattr(-,root,root)
@@ -50,6 +46,16 @@ nosetests tests/unit
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.23.52-3
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
+* Thu Mar 03 2022 Muhammad Falak <mwani@microsfot.com> - 1.23.52-2
+- Drop un-needed BRs for `%check` section.
+- Switch to tox for testing.
+
+* Wed Feb 09 2022 Nick Samson <nisamson@microsoft.com> - 1.23.52-1
+- Upgraded to 1.23.52, updated Source0 URL
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.21-3
 - Add license to python3 package, fix license tag
 - Remove python2 package

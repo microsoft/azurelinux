@@ -1,6 +1,6 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
-Version:        1.46.4
+Version:        1.46.5
 Release:        1%{?dist}
 License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
@@ -128,6 +128,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Feb 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.46.5-1
+- Bump version to 1.46.5 to enable ptest
+
 * Sat Nov 20 2021 Chris Co <chrco@microsoft.com> - 1.46.4-1
 - Update to version 1.46.4
 

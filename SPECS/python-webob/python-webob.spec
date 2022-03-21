@@ -1,13 +1,18 @@
 Summary:        WebOb provides objects for HTTP requests and responses.
 Name:           python-webob
-Version:        1.8.5
-Release:        4%{?dist}
+Version:        1.8.7
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/WebOb
-Source0:        https://files.pythonhosted.org/packages/9d/1a/0c89c070ee2829c934cb6c7082287c822e28236a4fcf90063e6be7c35532/WebOb-%{version}.tar.gz
+Source0:        https://github.com/Pylons/webob/archive/refs/tags/%{version}.tar.gz#/webob-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pytest
+%endif
 BuildArch:      noarch
 
 %description
@@ -15,20 +20,15 @@ WebOb provides objects for HTTP requests and responses.
 
 %package -n     python3-webob
 Summary:        WebOb provides objects for HTTP requests and responses.
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
-%if %{with_check}
-BuildRequires:  python3-pytest
-%endif
+
 
 %description -n python3-webob
 WebOb provides objects for HTTP requests and responses. Specifically it does this by wrapping the WSGI request environment and response status/headers/app_iter(body).
 The request and response objects provide many conveniences for parsing HTTP request and forming HTTP responses. Both objects are read/write: as a result, WebOb is also a nice way to create HTTP requests and parse HTTP responses.
 
 %prep
-%autosetup -n WebOb-%{version}
+%autosetup -n webob-%{version}
 rm -f tests/performance_test.py
 
 %build
@@ -46,6 +46,10 @@ rm -f tests/performance_test.py
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.7-1
+- Upgrade to latest upstream version
+- Use github source tarball
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.5-4
 - Add license to python3 package
 - Remove python2 package

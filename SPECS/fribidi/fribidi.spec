@@ -1,7 +1,7 @@
 Summary:        Library implementing the Unicode Bidirectional Algorithm
 Name:           fribidi
-Version:        1.0.9
-Release:        2%{?dist}
+Version:        1.0.10
+Release:        1%{?dist}
 License:        LGPLv2+ AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Feb 08 2022 Minghe Ren <mingheren@microsoft.com> - 1.0.10-1
+- Update to Version 1.0.10
+
 * Thu Apr 15 2021 Henry Li <lihl@microsoft.com> - 1.0.9-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove distro check that does not apply to CBL-Mariner.

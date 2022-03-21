@@ -2,14 +2,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: sound-theme-freedesktop
 Version: 0.8
-Release: 14%{?dist}
+Release: 16%{?dist}
 Summary: freedesktop.org sound theme
 Source0: http://people.freedesktop.org/~mccann/dist/sound-theme-freedesktop-%{version}.tar.bz2
 # For details on the licenses used, see CREDITS
-License: GPLv2+ and LGPLv2+ and CC-BY-SA and CC-BY
+License:  CC-BY-SA and CC-BY and GPLv2+
 Url: http://www.freedesktop.org/wiki/Specifications/sound-theme-spec
 BuildArch: noarch
 BuildRequires:  gcc
+BuildRequires:  perl(File::Find)
 BuildRequires: gettext
 BuildRequires: intltool >= 0.40
 Requires(post): coreutils
@@ -43,6 +44,12 @@ touch --no-create %{_datadir}/sounds/freedesktop %{_datadir}/sounds
 %{_datadir}/sounds/freedesktop/stereo/*.oga
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8-16
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8-15
+- Adding missing BRs on Perl modules.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

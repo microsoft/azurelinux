@@ -52,27 +52,22 @@
 #
 Summary: Intel PSM Libraries
 Name: libpsm2
-Version: 11.2.86
-Release: 5%{?dist}
+Version: 11.2.206
+Release: 1%{?dist}
 License: BSD or GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: https://github.com/01org/opa-psm2/
+URL: https://github.com/cornelisnetworks/opa-psm2/
 
-# The tarball can be created by:
-# git clone https://github.com/01org/opa-psm2
-# cd opa-psm2
-# git checkout 4f0ad8cf4d6b44fcce5f745e946a056659ba54c0
-# make dist
-Source0: %{name}-%{version}.tar.gz
-Patch0: 0001-Fix-multiple-definition-issues.patch
+Source0: https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/PSM2_11.2.206.tar.gz#/opa-psm2-PSM2_%{version}.tar.gz
 
-# The OPA product is supported on x86 64 only:
+# The OPA product is supported on x86_64 only:
 ExclusiveArch: x86_64
 BuildRequires: libuuid-devel
 BuildRequires: numactl-devel
 BuildRequires: systemd
 BuildRequires: gcc
+BuildRequires: make
 Obsoletes: hfi1-psm < 1.0.0
 
 %package devel
@@ -103,14 +98,14 @@ Development files for the Intel PSM library
 Support for MPIs linked with PSM versions < 2
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -n opa-psm2-PSM2_%{version}
 
 %build
 %{set_build_flags}
 %{make_build}
 
 %install
+export DISTRO=mariner
 %make_install
 rm -f %{buildroot}%{_lib64dir}/*.a
 
@@ -118,10 +113,9 @@ rm -f %{buildroot}%{_lib64dir}/*.a
 
 %files
 %license COPYING
-%{_lib64dir}/libpsm2.so.2.1
+%{_lib64dir}/libpsm2.so.2.*
 %{_lib64dir}/libpsm2.so.2
 /lib/udev/rules.d/40-psm.rules
-
 
 %files devel
 %{_lib64dir}/libpsm2.so
@@ -137,6 +131,10 @@ rm -f %{buildroot}%{_lib64dir}/*.a
 %{_sysconfdir}/modprobe.d/libpsm2-compat.conf
 
 %changelog
+* Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.206-1
+- Upgrading to version 11.2.206 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Wed Jan 06 2021 Ruying Chen <v-ruyche@microsoft.com> - 11.2.86-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Update file packaging directories.

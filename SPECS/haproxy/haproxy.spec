@@ -1,13 +1,13 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
-Version:        2.1.5
+Version:        2.4.13
 Release:        1%{?dist}
-License:        GPL
+License:        GPLv2+
 URL:            http://www.haproxy.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://www.haproxy.org/download/2.1/src/%{name}-%{version}.tar.gz
+Source0:        http://www.haproxy.org/download/2.4/src/%{name}-%{version}.tar.gz
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  lua-devel
@@ -33,15 +33,15 @@ Requires:       %{name} = %{version}-%{release}
 %build
 make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE=1 USE_OPENSSL=1 \
         USE_GETADDRINFO=1 USE_ZLIB=1 USE_SYSTEMD=1
-make %{?_smp_mflags} -C contrib/systemd
-sed -i s/"local\/"/""/g contrib/systemd/haproxy.service
-sed -i "s/\/run/\/var\/run/g" contrib/systemd/haproxy.service
+make %{?_smp_mflags} -C admin/systemd
+sed -i s/"local\/"/""/g admin/systemd/haproxy.service
+sed -i "s/\/run/\/var\/run/g" admin/systemd/haproxy.service
 sed -i "s/192.168.1.22/127.0.0.0/g" examples/transparent_proxy.cfg
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} PREFIX=%{_prefix} DOCDIR=%{_docdir}/haproxy TARGET=linux2628 install
-install -vDm755 contrib/systemd/haproxy.service \
+install -vDm755 admin/systemd/haproxy.service \
        %{buildroot}/usr/lib/systemd/system/haproxy.service
 install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/haproxy/haproxy.cfg
 
@@ -58,6 +58,9 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+*   Thu Feb 24 2022 Minghe Ren <mingheren@microsoft.com> 2.4.13-1
+-   Update to 2.4.13
+-   License verified
 *   Thu Jun 04 2020 Ruying Chen <v-ruyche@microsoft.com> 2.1.5-1
 -   Update to 2.1.5
 *   Tue May 19 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.9.6-5

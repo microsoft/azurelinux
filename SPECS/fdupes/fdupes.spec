@@ -2,8 +2,8 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; /bin/echo $d)
 Summary:        Finds duplicate files in a given set of directories
 Name:           fdupes
-Version:        2.1.1
-Release:        3%{?dist}
+Version:        2.1.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +77,9 @@ install -Dpm 0644 %{SOURCE1} %{buildroot}%{macrosdir}/macros.%{name}
 %{macrosdir}/macros.fdupes
 
 %changelog
+* Tue Jan 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.1.2-1
+- Update source to 2.1.2
+
 * Thu Jun 10 2021 Henry Li <lihl@microsoft.com> - 2.1.1-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License Verified

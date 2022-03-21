@@ -15,7 +15,7 @@
 Summary:        GTK+ graphical user interface library
 Name:           gtk3
 Version:        3.24.28
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,7 +42,7 @@ BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(json-glib-1.0)
 BuildRequires:  pkgconfig(pango) >= %{pango_version}
-BuildRequires:  pkgconfig(rest-0.7)
+BuildRequires:  pkgconfig(rest-1.0)
 BuildRequires:  pkgconfig(wayland-client) >= %{wayland_version}
 BuildRequires:  pkgconfig(wayland-cursor) >= %{wayland_version}
 BuildRequires:  pkgconfig(wayland-egl) >= %{wayland_version}
@@ -289,6 +289,9 @@ gtk-query-immodules-3.0-%{__isa_bits} --update-cache &>/dev/null || :
 %{_datadir}/installed-tests/
 
 %changelog
+* Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 3.24.28-8
+- Use pkgconfig(rest-1.0) as BR 
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 3.24.28-7
 - License verified
 - Lint spec

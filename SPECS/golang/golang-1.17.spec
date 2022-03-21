@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.17.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,10 +39,10 @@ mv -v go go-bootstrap
 
 %build
 # Build go 1.4 bootstrap
-pushd /usr/src/mariner/BUILD/go-bootstrap/src
+pushd %{_topdir}/BUILD/go-bootstrap/src
 CGO_ENABLED=0 ./make.bash
 popd
-mv -v /usr/src/mariner/BUILD/go-bootstrap %{_libdir}/golang
+mv -v %{_topdir}/BUILD/go-bootstrap %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
 # Build current go version
@@ -116,6 +116,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 1.17.1-2
+- Use _topdir instead of hard-coded value /usr/src/mariner
+- License verified
+
 * Wed Sep 15 2021 Andrew Phelps <anphel@microsoft.com> - 1.17.1-1
 - Updated to version 1.17.1
 

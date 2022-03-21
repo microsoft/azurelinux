@@ -1,14 +1,15 @@
 %global srcname pytest-cov
 Summary:        Pytest plugin for coverage reporting
 Name:           python-%{srcname}
-Version:        2.10.1
-Release:        3%{?dist}
+Version:        2.12.1
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pypi.python.org/pypi/pytest-cov
 #Source0:       https://github.com/pytest-dev/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         0001-skip-tests-that-are-expected-to-fail.patch
 BuildArch:      noarch
 
 %description
@@ -41,24 +42,8 @@ rm -rf *.egg-info
 %py3_install
 
 %check
-echo "import site;site.addsitedir(\"$(pwd)/src\")" > tests/sitecustomize.py
-#export PYTHONPATH="$(pwd)"/build/lib
-pip3 install atomicwrites>=1.3.0 \
-    attrs>=19.1.0 \
-    more-itertools>=7.0.0 \
-    pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    execnet \
-    six \
-    fields \
-    virtualenv \
-    process-tests \
-    pytest-xdist
-PATH=%{buildroot}%{_bindir}:${PATH} \
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -v \
-    -k "not test_dist_missing_data and not test_subprocess_with_path_aliasing and not test_dist_combine_racecondition and not central_subprocess and not dist_subprocess and not test_cover_looponfail "
-
+pip3 install tox
+tox -e py%{python3_version_nodots} -v
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE
@@ -66,6 +51,14 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 2.12.1-2
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
+* Wed Feb 16 2022 Muhammad Falak <mwani@microsoft.com> - 2.12.1-1
+- Bump version to 2.12.1
+- Introduce patch to skip known test failures
+- Use tox instead of pytest to enable ptest
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.10.1-3
 - Update check section to use pytest module
 - License verified

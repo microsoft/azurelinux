@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-inc-latest
 Version:        0.500
-Release:        17%{?dist}
+Release:        18%{?dist}
 Summary:        Use modules bundled in inc/ if they are newer than installed ones
 License:        ASL 2.0
 URL:            https://metacpan.org/release/inc-latest
@@ -19,7 +19,6 @@ BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(Test::More)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(ExtUtils::Installed)
-Conflicts:      perl-Module-Build < 2:0.42.10-4
 
 %description
 The inc::latest module helps bootstrap configure-time dependencies for CPAN
@@ -47,6 +46,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.500-18
+- Removing 'Conflicts' on an old package never present in CBL-Mariner.
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.500-17
 - Remove epoch
 

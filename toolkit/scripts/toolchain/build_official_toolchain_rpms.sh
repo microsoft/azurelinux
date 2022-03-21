@@ -239,7 +239,6 @@ build_rpm_in_chroot_no_install xz
 build_rpm_in_chroot_no_install zstd
 build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
-build_rpm_in_chroot_no_install libdb
 build_rpm_in_chroot_no_install libcap
 build_rpm_in_chroot_no_install popt
 build_rpm_in_chroot_no_install findutils
@@ -305,8 +304,6 @@ build_rpm_in_chroot_no_install zip
 chroot_and_install_rpms zip
 build_rpm_in_chroot_no_install unzip
 chroot_and_install_rpms unzip
-build_rpm_in_chroot_no_install alsa-lib
-chroot_and_install_rpms alsa-lib
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
@@ -324,10 +321,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13%2B8-LTS-4.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13%2B8-LTS-4.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
@@ -400,8 +397,20 @@ chroot_and_install_rpms perl-XML-Parser
 chroot_and_install_rpms python3-libxml2
 build_rpm_in_chroot_no_install itstool
 
-# gtk-doc needs itstool
+# ninja-build requires gtest
+chroot_and_install_rpms gtest
+build_rpm_in_chroot_no_install ninja-build
+
+# meson requires ninja-build, gettext
+chroot_and_install_rpms ninja-build
+chroot_and_install_rpms gettext
+build_rpm_in_chroot_no_install meson
+
+# gtk-doc needs itstool, meson, python3-pygments
 chroot_and_install_rpms itstool
+chroot_and_install_rpms meson
+build_rpm_in_chroot_no_install python-pygments
+chroot_and_install_rpms python-pygments
 
 # gtk-doc and ca-certificates require libxslt
 chroot_and_install_rpms docbook-dtd-xml
@@ -414,15 +423,6 @@ build_rpm_in_chroot_no_install gtk-doc
 chroot_and_install_rpms gtk-doc
 build_rpm_in_chroot_no_install libtasn1
 
-# ninja-build requires gtest
-chroot_and_install_rpms gtest
-build_rpm_in_chroot_no_install ninja-build
-
-# meson requires ninja-build, gettext
-chroot_and_install_rpms ninja-build
-chroot_and_install_rpms gettext
-build_rpm_in_chroot_no_install meson
-
 build_rpm_in_chroot_no_install libsepol
 build_rpm_in_chroot_no_install swig
 
@@ -431,7 +431,6 @@ chroot_and_install_rpms libsepol
 chroot_and_install_rpms swig
 build_rpm_in_chroot_no_install libselinux
 
-chroot_and_install_rpms meson
 chroot_and_install_rpms libselinux
 
 build_rpm_in_chroot_no_install glib
@@ -467,6 +466,13 @@ build_rpm_in_chroot_no_install createrepo_c
 
 build_rpm_in_chroot_no_install libsepol
 
+# audit needs: python3, krb5, swig, e2fsprogs
+build_rpm_in_chroot_no_install audit
+
+# rebuild pam with selinux and audit support
+chroot_and_install_rpms audit
+build_rpm_in_chroot_no_install pam
+
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol
 build_rpm_in_chroot_no_install libselinux
@@ -477,9 +483,6 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
-
-# rebuild pam with selinux support
-build_rpm_in_chroot_no_install pam
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-xml are also needed but already installed
@@ -531,6 +534,7 @@ chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
 build_rpm_in_chroot_no_install mariner-repos
+build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 chroot_and_print_installed_rpms
 

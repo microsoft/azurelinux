@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,20 +27,20 @@ BuildArch:      noarch
 %description
 CBL-Mariner repo files and gpg keys
 
-%package debuginfo
+%package debug
 Summary:        CBL-Mariner Debuginfo repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
-%description debuginfo
+%description debug
 %{summary}
 
-%package debuginfo-preview
+%package debug-preview
 Summary:        CBL-Mariner Debuginfo preview repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
-%description debuginfo-preview
+%description debug-preview
 %{summary}
 
 %package extended
@@ -146,11 +146,11 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-base.repo
 
-%files debuginfo
+%files debug
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-debuginfo.repo
 
-%files debuginfo-preview
+%files debug-preview
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-debuginfo-preview.repo
 
@@ -188,6 +188,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-5
+- Moving away from using 'debuginfo' in a custom package to avoid confusion.
+
 * Mon Jan 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-4
 - Creating a separate "mariner-repos-shared" subpackage to make repo configurations
   independent of each other.

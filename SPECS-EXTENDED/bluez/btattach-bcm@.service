@@ -1,6 +1,0 @@
-[Unit]
-Description=btattach for Broadcom devices
-
-[Service]
-Type=simple
-ExecStart=/usr/libexec/bluetooth/btattach-bcm-service.sh %I

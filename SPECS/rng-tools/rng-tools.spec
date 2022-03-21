@@ -1,20 +1,21 @@
 Summary:        RNG deamon and tools
 Name:           rng-tools
-Version:        5
-Release:        5%{?dist}
+Version:        6.14
+Release:        1%{?dist}
 License:        GPLv2
-URL:            https://github.com/nhorman/rng-tools
-Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# For some reason, this file downloads as rng-tools-rng-tools-5.tar.gz on Chrome, but wget is fine
-Source0:        https://github.com/nhorman/%{name}/archive/%{name}-%{version}.tar.gz
+Group:          System Environment/Base
+URL:            https://github.com/nhorman/rng-tools
+Source0:        https://github.com/nhorman/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        rngd.service
-Source2:        LICENSE.PTR
-BuildRequires:  systemd
 BuildRequires:  gcc
+BuildRequires:  jansson-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  libp11-devel
 BuildRequires:  make
-
+BuildRequires:  rtl-sdr-devel
+BuildRequires:  systemd
 Requires:       systemd
 
 %description
@@ -22,11 +23,10 @@ The rng-tools is a set of utilities related to random number generation in kerne
 
 %prep
 %setup -q
-cp %{SOURCE2} ./
 
 %build
-%configure \
-        --prefix=%{_prefix}
+./autogen.sh
+%configure
 make %{?_smp_mflags}
 
 %install
@@ -49,23 +49,33 @@ make  %{?_smp_mflags} check
 %systemd_postun_with_restart rngd.service
 
 %files
-%license LICENSE.PTR
+%license COPYING
 %defattr(-,root,root)
 %{_libdir}/systemd/*
 %{_bindir}/rngtest
+%{_bindir}/randstat
 %{_sbindir}/rngd
 %{_mandir}/*
 
 %changelog
-*  Fri May 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 5-5
--  Update BuildRequires
--  Add %%license macro
--  Replace ./configure with %%configure
-*  Fri Apr 10 2020 Nick Samson <nisamson@microsoft.com> 5-4
--  Updated Source0, removed %%define sha1, confirmed license.
-*  Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5-3
--  Initial CBL-Mariner import from Photon (license: Apache2).
-*  Thu May 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 5-2
--  Start rngd before cloud-init-local.service to speed up booting.
-*  Wed Oct 26 2016 Alexey Makhalov <amakhalov@vmware.com> 5-1
--  Initial version.
+* Tue Feb 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.14-1
+- Update to version 6.14.
+- Remove LICENSE.PTR file
+- License verified
+
+* Fri May 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 5-5
+- Update BuildRequires
+- Add %%license macro
+- Replace ./configure with %%configure
+
+* Fri Apr 10 2020 Nick Samson <nisamson@microsoft.com> 5-4
+- Updated Source0, removed %%define sha1, confirmed license.
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 5-3
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Thu May 10 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 5-2
+- Start rngd before cloud-init-local.service to speed up booting.
+
+* Wed Oct 26 2016 Alexey Makhalov <amakhalov@vmware.com> 5-1
+- Initial version.

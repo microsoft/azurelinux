@@ -1,31 +1,14 @@
-%bcond_with docs
-
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        A portable number theoretic multiple-precision integer library
 Name:           libtommath
 Version:        1.1.0
-Release:        3%{?dist}
-Summary:        A portable number theoretic multiple-precision integer library
+Release:        4%{?dist}
 License:        Public Domain
-URL:            http://www.libtom.net/
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.libtom.net/
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  libtool
-
-%if %{with docs}
-BuildRequires:  ghostscript
-BuildRequires:  libtiff-tools
-BuildRequires:  texlive-dvips-bin
-BuildRequires:  ghostscript-tools-dvipdf
-BuildRequires:  texlive-latex-bin-bin
-BuildRequires:  texlive-makeindex-bin
-BuildRequires:  texlive-mfware-bin
-BuildRequires:  texlive-updmap-map
-BuildRequires:  tex(cmr10.tfm)
-BuildRequires:  tex(fancyhdr.sty)
-BuildRequires:  tex(hyphen.tex)
-%endif
 
 %description
 A free open source portable number theoretic multiple-precision integer library
@@ -41,17 +24,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for developing
 applications that use %{name}.
 
-%if %{with docs}
-%package        doc
-Summary:        Documentation files for %{name}
-BuildArch:      noarch
-Provides:       %{name}-doc = %{version}-%{release}
-Obsoletes:      %{name}-doc < 0.42-1
-
-%description    doc
-The %{name}-doc package contains PDF documentation for using %{name}.
-%endif
-
 %prep
 %setup -q
 # Fix permissions on installed library
@@ -65,14 +37,11 @@ sed -i \
 %build
 %set_build_flags
 %make_build V=1 CFLAGS="$CFLAGS -I./" -f makefile.shared
-%if %{with docs}
-make V=1 -f makefile poster manual docs
-%endif
 
 %install
 %make_install V=1 CFLAGS="$CFLAGS -I./" PREFIX=%{_prefix} LIBPATH=%{_libdir} -f makefile.shared
 
-find %{buildroot} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -name '*.a' -delete
 
 %ldconfig_scriptlets
@@ -86,12 +55,11 @@ find %{buildroot} -name '*.a' -delete
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
-%if %{with docs}
-%files doc
-%doc doc/bn.pdf doc/poster.pdf doc/tommath.pdf
-%endif
-
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-4
+- Removing docs to drop dependency on 'ghostscript'.
+- License verified.
+
 * Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionally build documentation, and turn off documentation building by default

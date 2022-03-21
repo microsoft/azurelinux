@@ -1,14 +1,19 @@
+%define version_tag %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        Python templating language
 Name:           python-mako
-Version:        1.0.7
-Release:        5%{?dist}
+Version:        1.1.5
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://www.makotemplates.org/
-Source0:        https://files.pythonhosted.org/packages/eb/f3/67579bb486517c0d49547f9697e36582cd19dafb5df9e687ed8e22de57fa/Mako-1.0.7.tar.gz
+Source0:        https://github.com/sqlalchemy/mako/archive/refs/tags/rel_%{version_tag}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 A super-fast templating language that borrows the best ideas from the existing templating languages. Mako is a template library written in Python. It provides a familiar, non-XML syntax which compiles into Python modules for maximum performance. Mako’s syntax and API borrows from the best ideas of many others, including Django templates, Cheetah, Myghty, and Genshi.
@@ -18,7 +23,6 @@ Summary:        python-mako
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
-BuildRequires:  python3-pytest
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
@@ -31,7 +35,7 @@ into Python modules for maximum performance. Mako’s syntax and API borrows fro
 many others, including Django templates, Cheetah, Myghty, and Genshi.
 
 %prep
-%autosetup -n Mako-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 %py3_build
@@ -41,7 +45,8 @@ many others, including Django templates, Cheetah, Myghty, and Genshi.
 ln -s mako-render %{buildroot}/%{_bindir}/mako-render3
 
 %check
-%python3 setup.py test
+pip3 install tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-mako
 %defattr(-,root,root,-)
@@ -51,6 +56,16 @@ ln -s mako-render %{buildroot}/%{_bindir}/mako-render3
 %{_bindir}/mako-render3
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.5-2
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
+* Wed Feb 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.5-1
+- Bump version to 1.1.5
+- Introduce macro to generate underscored version
+- Add an explicit BR on `pip`
+- Drop BR on `python3-pytest`
+- Use `tox` instead of `pytest` to enable ptest
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.7-5
 - Add license to python3 package
 - Remove python2 package

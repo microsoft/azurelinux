@@ -1,0 +1,39 @@
+From 16054d5e1b90a49c8e860bd4628c806660c10180 Mon Sep 17 00:00:00 2001
+From: Gary Lin <glin@suse.com>
+Date: Thu, 8 Apr 2021 16:23:03 +0800
+Subject: [PATCH 4/4] mok: allocate MOK config table as BootServicesData
+
+Linux kernel is picky when reserving the memory for x86 and it only
+expects BootServicesData:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/platform/efi/quirks.c?h=v5.11#n254
+
+Otherwise, the following error would show during system boot:
+
+Apr 07 12:31:56.743925 localhost kernel: efi: Failed to lookup EFI memory descriptor for 0x000000003dcf8000
+
+Although BootServicesData would be reclaimed after ExitBootService(),
+linux kernel reserves MOK config table when it detects the existence of
+the table, so it's fine to allocate the table as BootServicesData.
+
+Signed-off-by: Gary Lin <glin@suse.com>
+---
+ mok.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mok.c b/mok.c
+index 77e7681..beac0ff 100644
+--- a/mok.c
++++ b/mok.c
+@@ -1012,7 +1012,7 @@ EFI_STATUS import_mok_state(EFI_HANDLE image_handle)
+ 		npages = ALIGN_VALUE(config_sz, PAGE_SIZE) >> EFI_PAGE_SHIFT;
+ 		config_table = NULL;
+ 		efi_status = gBS->AllocatePages(AllocateAnyPages,
+-						EfiRuntimeServicesData,
++						EfiBootServicesData,
+ 						npages,
+ 						(EFI_PHYSICAL_ADDRESS *)&config_table);
+ 		if (EFI_ERROR(efi_status) || !config_table) {
+-- 
+2.17.1
+

@@ -6,8 +6,13 @@
                 "packagelists/hyperv-packages.json",
                 "packagelists/developer-packages.json",
                 "packagelists/virtualization-host-packages.json",
-                "packagelists/core-packages-image-aarch64.json"
+                "packagelists/core-packages-image-aarch64.json",
+                "packagelists/core-tools-packages.json",
+                "packagelists/selinux-full.json"
             ],
+            "KernelCommandLine": {
+                "SELinux": "permissive"
+            },
             "KernelOptions": {
                 "default": "kernel"
             }

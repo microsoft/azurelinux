@@ -101,8 +101,8 @@
 %endif
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
-Version:        4.4.17
-Release:        4%{?dist}
+Version:        4.4.27
+Release:        1%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -110,16 +110,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/besser82/%{name}
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-# Patch 0000 - 2999: Backported patches from upstream.
-# Patch 3000 - 5999: Backported patches from pull requests.
-Patch3000:      libxcrypt-4.4.17-enable_LTO_build.patch
-# Patch 6000 - 9999: Downstream patches.
 BuildRequires:  autoconf
 BuildRequires:  automake
 #BuildRequires:  fipscheck
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  libtool
+BuildRequires:  perl-core
 # We do not need to keep this forever.
 %if !(0%{?fedora} > 31 || 0%{?rhel} > 10)
 # Inherited from former libcrypt package.
@@ -216,7 +213,7 @@ discouraged.
 
 
 %prep
-%autosetup -p 1
+%autosetup
 
 $(realpath ./autogen.sh)
 
@@ -452,6 +449,11 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
+* Wed Jan 27 2022 Henry Li <lihl@microsoft.com> - 4.4.27-1
+- Upgrade to version 4.4.27
+- Remove patches that no longer apply
+- Add perl-core as BR
+
 * Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> - 4.4.17-4
 - Update required glibc version to 2.34
 

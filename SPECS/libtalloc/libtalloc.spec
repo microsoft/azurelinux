@@ -1,8 +1,8 @@
 %define LICENSE_PATH LICENSE.PTR
 Summary:        Talloc is a hierarchical, reference counted memory pool system
 Name:           libtalloc
-Version:        2.3.1
-Release:        2%{?dist}
+Version:        2.3.3
+Release:        1%{?dist}
 # Some files are GPL, others LGPL. Info in source.
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
@@ -58,7 +58,7 @@ make %{?_smp_mflags} V=1
 
 %install
 %make_install
-rm -f %{buildroot}/usr/share/swig/*/talloc.i
+rm -f %{buildroot}%{_datadir}/swig/*/talloc.i
 
 %check
 make check
@@ -86,6 +86,9 @@ make check
 %{_libdir}/libpytalloc-util.cpython*.so
 
 %changelog
+* Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 2.3.3-1
+- Upgrade to version 2.3.3
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.1-2
 - Use %%{python3_sitelib} macro to enable building with Python 3.9
 

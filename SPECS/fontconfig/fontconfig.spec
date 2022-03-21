@@ -1,8 +1,8 @@
 Summary:        library for configuring and customizing font access.
 Name:           fontconfig
-Version:        2.13.91
+Version:        2.13.95
 Release:        1%{?dist}
-License:        BSD/GPL
+License:        MIT or Unicode or Public Domain
 URL:            https://www.freedesktop.org/wiki/Software/fontconfig/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
@@ -12,7 +12,6 @@ BuildRequires:  freetype-devel
 BuildRequires:  libxml2
 BuildRequires:  expat-devel
 BuildRequires:  gperf
-Provides:       pkgconfig(fontconfig)
 
 %description
 Fontconfig can discover new fonts when installed automatically, removing a common source of configuration problems, perform font name substitution, so that appropriate alternative fonts can be selected if fonts are missing, identify the set of fonts required to completely cover a set of languages.
@@ -68,20 +67,31 @@ make -k check
 %{_mandir}/man3/*
 
 %changelog
+* Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.13.95-1
+- Update to 2.13.91
+- License verified
+
 * Mon Oct 5 2020 Mateusz Malisz <mamalisz@microsoft.com> - 2.13.91-1
 - Update to 2.13.91
+
 * Sat May 9 2020 Nick Samson <nisamson@microsoft.com> - 2.13.1-4
 - Added %%license line automatically
+
 * Fri Apr 17 2020 Nicolas Ontiveros <niontive@microsoft.com> 2.13.1-3
 - Rename freetype2-devel to freetype-devel.
 - Remove sha1 hash.
+
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.13.1-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
+
 * Wed Sep 12 2018 Sujay G <gsujay@vmware.com> 2.13.1-1
 - Bump version to 2.13.1
+
 * Thu Aug 03 2017 Chang Lee <changlee@vmware.com> 2.12.1-3
 - Add a patch for run-test. This issue was introduced by freetype 2.7.1
+
 * Fri Apr 14 2017 Alexey Makhalov <amakhalov@vmware.com> 2.12.1-2
 - Requires expat-devel
+
 * Fri Nov 11 2016 Dheeraj Shetty <dheerajs@vmware.com> 2.12.1-1
 - Initial version

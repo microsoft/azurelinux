@@ -1,0 +1,41 @@
+From b65292c04b96d6aa69720d9a1cb858739865f044 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 8 Apr 2021 22:39:02 -0700
+Subject: [PATCH 2/4] Fix handling of ignore_db and user_insecure_mode
+
+In 65be350308783a8ef537246c8ad0545b4e6ad069, import_mok_state() is split
+up into a function that manages the whole mok state, and one that
+handles the state machine for an individual state variable.
+Unfortunately, the code that initializes the global ignore_db and
+user_insecure_mode was copied from import_mok_state() into the new
+import_one_mok_state() function, and thus re-initializes that state each
+time it processes a MoK state variable, before even assessing if that
+variable is set.  As a result, we never honor either flag, and the
+machine owner cannot disable trusting the system firmware's db/dbx
+databases or disable validation altogether.
+
+This patch removes the extra re-initialization, allowing those variables
+to be set properly.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ mok.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/mok.c b/mok.c
+index b612290..77e7681 100644
+--- a/mok.c
++++ b/mok.c
+@@ -901,9 +901,6 @@ EFI_STATUS import_one_mok_state(struct mok_state_variable *v,
+ 	EFI_STATUS ret = EFI_SUCCESS;
+ 	EFI_STATUS efi_status;
+ 
+-	user_insecure_mode = 0;
+-	ignore_db = 0;
+-
+ 	UINT32 attrs = 0;
+ 	BOOLEAN delete = FALSE;
+ 
+-- 
+2.17.1
+

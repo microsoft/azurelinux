@@ -1,21 +1,30 @@
-From 22e55e9f8eba1f483588d18b0b7d83fe7d40b590 Mon Sep 17 00:00:00 2001
+From 642d0d6fef226fb89eaecf0016f8e5e333b9023e Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
-Date: Mon, 4 Jan 2016 11:39:33 +0100
-Subject: [PATCH] inspect: Add RPM output format
+Date: Tue, 23 Jun 2015 10:28:29 +0200
+Subject: [PATCH] gst-inspect: add mode to output RPM requires format
 
 ---
- tools/gst-inspect.c | 277 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 262 insertions(+), 15 deletions(-)
+ tools/gst-inspect.c | 279 +++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 263 insertions(+), 16 deletions(-)
 
 diff --git a/tools/gst-inspect.c b/tools/gst-inspect.c
-index 823e82b61..96f5bc786 100644
+index 8da042946..a057cba09 100644
 --- a/tools/gst-inspect.c
 +++ b/tools/gst-inspect.c
-@@ -1728,7 +1728,224 @@ print_tracer_info (GstPluginFeature * feature, gboolean print_names)
-  * is meant for machines, not humans.
-  */
- static void
--print_plugin_automatic_install_info_codecs (GstElementFactory * factory)
+@@ -394,7 +394,7 @@ print_object_properties_info (GObject * obj, GObjectClass * obj_class,
+ 
+     first_flag = TRUE;
+     n_print ("%sflags%s: ", PROP_ATTR_NAME_COLOR, RESET_COLOR);
+-    readable = ! !(param->flags & G_PARAM_READABLE);
++    readable = !!(param->flags & G_PARAM_READABLE);
+     if (readable && obj != NULL) {
+       g_object_get_property (obj, param->name, &value);
+     } else {
+@@ -1739,11 +1739,228 @@ print_tracer_info (GstPluginFeature * feature, gboolean print_names)
+   return 0;
+ }
+ 
++static void
 +print_gst_structure_append_field (GList * strings, const char *field)
 +{
 +  GList *s;
@@ -231,13 +240,17 @@ index 823e82b61..96f5bc786 100644
 +  g_list_free (strings);
 +}
 +
-+static void
+ /* NOTE: Not coloring output from automatic install functions, as their output
+  * is meant for machines, not humans.
+  */
+ static void
+-print_plugin_automatic_install_info_codecs (GstElementFactory * factory)
 +print_plugin_automatic_install_info_codecs (GstElementFactory * factory,
 +    gboolean rpm_format)
  {
    GstPadDirection direction;
    const gchar *type_name;
-@@ -1754,6 +1971,13 @@ print_plugin_automatic_install_info_codecs (GstElementFactory * factory)
+@@ -1769,6 +1986,13 @@ print_plugin_automatic_install_info_codecs (GstElementFactory * factory)
      return;
    }
  
@@ -251,7 +264,7 @@ index 823e82b61..96f5bc786 100644
    /* decoder/demuxer sink pads should always be static and there should only
     * be one, the same applies to encoders/muxers and source pads */
    static_templates = gst_element_factory_get_static_pad_templates (factory);
-@@ -1790,15 +2014,20 @@ print_plugin_automatic_install_info_codecs (GstElementFactory * factory)
+@@ -1805,15 +2029,20 @@ print_plugin_automatic_install_info_codecs (GstElementFactory * factory)
      gst_structure_remove_field (s, "rate");
      gst_structure_remove_field (s, "depth");
      gst_structure_remove_field (s, "clock-rate");
@@ -276,7 +289,7 @@ index 823e82b61..96f5bc786 100644
  {
    const gchar *const *protocols;
  
-@@ -1807,13 +2036,19 @@ print_plugin_automatic_install_info_protocols (GstElementFactory * factory)
+@@ -1822,13 +2051,19 @@ print_plugin_automatic_install_info_protocols (GstElementFactory * factory)
      switch (gst_element_factory_get_uri_type (factory)) {
        case GST_URI_SINK:
          while (*protocols != NULL) {
@@ -298,7 +311,7 @@ index 823e82b61..96f5bc786 100644
            ++protocols;
          }
          break;
-@@ -1824,7 +2059,7 @@ print_plugin_automatic_install_info_protocols (GstElementFactory * factory)
+@@ -1839,7 +2074,7 @@ print_plugin_automatic_install_info_protocols (GstElementFactory * factory)
  }
  
  static void
@@ -307,7 +320,7 @@ index 823e82b61..96f5bc786 100644
  {
    GList *features, *l;
  
-@@ -1843,11 +2078,15 @@ print_plugin_automatic_install_info (GstPlugin * plugin)
+@@ -1858,11 +2093,15 @@ print_plugin_automatic_install_info (GstPlugin * plugin)
      if (feature_plugin == plugin) {
        GstElementFactory *factory;
  
@@ -326,7 +339,7 @@ index 823e82b61..96f5bc786 100644
      }
      if (feature_plugin)
        gst_object_unref (feature_plugin);
-@@ -1869,7 +2108,7 @@ print_all_plugin_automatic_install_info (void)
+@@ -1884,7 +2123,7 @@ print_all_plugin_automatic_install_info (void)
      plugin = (GstPlugin *) (plugins->data);
      plugins = g_list_next (plugins);
  
@@ -335,15 +348,15 @@ index 823e82b61..96f5bc786 100644
    }
    gst_plugin_list_free (orig_plugins);
  }
-@@ -1934,6 +2173,7 @@ main (int argc, char *argv[])
+@@ -1951,6 +2190,7 @@ main (int argc, char *argv[])
    gboolean do_print_blacklist = FALSE;
    gboolean plugin_name = FALSE;
    gboolean print_aii = FALSE;
 +  gboolean print_aii_rpm = FALSE;
    gboolean uri_handlers = FALSE;
    gboolean check_exists = FALSE;
-   gchar *min_version = NULL;
-@@ -1954,6 +2194,9 @@ main (int argc, char *argv[])
+   gboolean color_always = FALSE;
+@@ -1972,6 +2212,9 @@ main (int argc, char *argv[])
                "or all plugins provide.\n                                       "
                "Useful in connection with external automatic plugin "
                "installation mechanisms"), NULL},
@@ -353,7 +366,7 @@ index 823e82b61..96f5bc786 100644
      {"plugin", '\0', 0, G_OPTION_ARG_NONE, &plugin_name,
          N_("List the plugin contents"), NULL},
      {"types", 't', 0, G_OPTION_ARG_STRING, &types,
-@@ -2109,7 +2352,7 @@ main (int argc, char *argv[])
+@@ -2135,7 +2378,7 @@ main (int argc, char *argv[])
        /* if there is such a plugin, print out info */
        if (plugin) {
          if (print_aii) {
@@ -362,7 +375,7 @@ index 823e82b61..96f5bc786 100644
          } else {
            print_plugin_info (plugin);
            print_plugin_features (plugin);
-@@ -2122,13 +2365,17 @@ main (int argc, char *argv[])
+@@ -2148,13 +2391,17 @@ main (int argc, char *argv[])
  
            if (plugin) {
              if (print_aii) {
@@ -383,5 +396,5 @@ index 823e82b61..96f5bc786 100644
              exit_code = -1;
              goto done;
 -- 
-2.20.1
+2.26.2
 

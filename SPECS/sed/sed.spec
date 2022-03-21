@@ -1,7 +1,7 @@
 Summary:        Stream editor
 Name:           sed
 Version:        4.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/sed
 Group:          Applications/Editors
@@ -9,6 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/sed/%{name}-%{version}.tar.xz
 Conflicts:      toybox
+%if %{with_check}
+BuildRequires:  perl(File::Find)
+%endif
 
 %description
 The Sed package contains a stream editor.
@@ -51,24 +54,36 @@ make check
 %defattr(-,root,root)
 
 %changelog
-* Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 4.8-1
+* Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 4.8-2
+- Add an explicit BR on `perl(File::Find)` to enable ptest
+
+* Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> - 4.8-1
 - Update to version 4.8
 - License verified
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 4.5-3
+
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.5-3
 - Added %%license line automatically
-* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 4.5-2
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 4.5-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
-* Tue Sep 18 2018 Srinidhi Rao <srinidhir@vmware.com> 4.5-1
+
+* Tue Sep 18 2018 Srinidhi Rao <srinidhir@vmware.com> - 4.5-1
 - Updating to version 4.5
-* Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> 4.4-3
+
+* Mon Oct 02 2017 Alexey Makhalov <amakhalov@vmware.com> - 4.4-3
 - Added conflicts toybox
-* Tue Aug 01 2017 Chang Lee <changlee@vmware.com> 4.4-2
+
+* Tue Aug 01 2017 Chang Lee <changlee@vmware.com> - 4.4-2
 - Skip panic-tests and subst-mb-incomplete from %check
-* Thu Apr 13 2017 Vinay Kulkarni <kulkarniv@vmware.com> 4.4-1
+
+* Thu Apr 13 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 4.4-1
 - Update to version 4.4
-* Wed Oct 05 2016 ChangLee <changlee@vmware.com> 4.2.2-3
+
+* Wed Oct 05 2016 ChangLee <changlee@vmware.com> - 4.2.2-3
 - Modified %check
-* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 4.2.2-2
+
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 4.2.2-2
 - GA - Bump release of all rpms
-* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 4.2.2-1
+
+* Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 4.2.2-1
 - Initial build. First version

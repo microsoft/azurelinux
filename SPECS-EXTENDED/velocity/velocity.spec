@@ -20,41 +20,31 @@ Distribution:   Mariner
 
 Name:           velocity
 Version:        1.7
-Release:        9%{?dist}
+Release:        11%{?dist}
 Summary:        Java-based template engine
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
-URL:            http://velocity.apache.org/
-Source0:        http://www.apache.org/dist/velocity/engine/%{version}/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}.pom
+URL:            https://velocity.apache.org/
+Source0:        https://github.com/apache/%{name}-engine/archive/refs/tags/%{version}.tar.gz#/%{name}-engine-%{version}.tar.gz
 Patch0:         velocity-build_xml.patch
+Patch1:         0001-Port-to-apache-commons-lang3.patch
+Patch2:         0002-Force-use-of-JDK-log-chute.patch
+Patch3:         0003-CVE-2020-13936.patch
+
+BuildArch:      noarch
+
 BuildRequires:  ant >= 1.6.5
 BuildRequires:  ant-junit
 BuildRequires:  antlr
-BuildRequires:  avalon-logkit
-BuildRequires:  commons-collections
-BuildRequires:  commons-lang
-BuildRequires:  commons-logging
-BuildRequires:  fdupes
-BuildRequires:  hsqldb
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  jdom >= 1.0-1
-BuildRequires:  junit
-BuildRequires:  log4j12 >= 1.1
-BuildRequires:  oro
-BuildRequires:  plexus-classworlds
+BuildRequires:  mvn(commons-collections:commons-collections)
+BuildRequires:  mvn(org.apache.commons:commons-lang3)
+BuildRequires:  mvn(org.apache:apache:pom:)
 BuildRequires:  servletapi4
-BuildRequires:  werken-xpath
-Requires:       avalon-logkit
+
 Requires:       commons-collections
-Requires:       commons-lang
+Requires:       commons-lang3
 Requires:       java >= 1.6.0
-Requires:       jdom >= 1.0-1
-Requires:       log4j12 >= 1.1
-Requires:       oro
-Requires:       servletapi4
-Requires:       werken-xpath
-BuildArch:      noarch
 
 %description
 Velocity is a Java-based template engine. It permits anyone to use the
@@ -77,169 +67,78 @@ template services for the Turbine web application framework.
 Velocity+Turbine provides a template service that will allow web
 applications to be developed according to a true MVC model.
 
-%package        manual
-Summary:        Manual for %{name}
-Group:          Development/Libraries/Java
-
-%description    manual
-Velocity is a Java-based template engine. It permits anyone to use the
-simple yet powerful template language to reference objects defined in
-Java code.
-When Velocity is used for web development, Web designers can work in
-parallel with Java programmers to develop web sites according to the
-Model-View-Controller (MVC) model, meaning that web page designers can
-focus solely on creating a site that looks good, and programmers can
-focus solely on writing top-notch code. Velocity separates Java code
-from the web pages, making the web site more maintainable over the long
-run and providing a viable alternative to Java Server Pages (JSPs) or
-PHP.
-Velocity's capabilities reach well beyond the realm of web sites; for
-example, it can generate SQL and PostScript and XML (see Anakia for more
-information on XML transformations) from templates. It can be used
-either as a standalone utility for generating source code and reports,
-or as an integrated component of other systems. Velocity also provides
-template services for the Turbine web application framework.
-Velocity+Turbine provides a template service that will allow web
-applications to be developed according to a true MVC model.
-
-%package        javadoc
-Summary:        Javadoc for %{name}
-Group:          Documentation/HTML
-
-%description    javadoc
-Velocity is a Java-based template engine. It permits anyone to use the
-simple yet powerful template language to reference objects defined in
-Java code.
-When Velocity is used for web development, Web designers can work in
-parallel with Java programmers to develop web sites according to the
-Model-View-Controller (MVC) model, meaning that web page designers can
-focus solely on creating a site that looks good, and programmers can
-focus solely on writing top-notch code. Velocity separates Java code
-from the web pages, making the web site more maintainable over the long
-run and providing a viable alternative to Java Server Pages (JSPs) or
-PHP.
-Velocity's capabilities reach well beyond the realm of web sites; for
-example, it can generate SQL and PostScript and XML (see Anakia for more
-information on XML transformations) from templates. It can be used
-either as a standalone utility for generating source code and reports,
-or as an integrated component of other systems. Velocity also provides
-template services for the Turbine web application framework.
-Velocity+Turbine provides a template service that will allow web
-applications to be developed according to a true MVC model.
-
-%package        demo
-Summary:        Demo for %{name}
-Group:          Development/Libraries/Java
-Requires:       %{name} = %{version}-%{release}
-
-%description    demo
-Velocity is a Java-based template engine. It permits anyone to use the
-simple yet powerful template language to reference objects defined in
-Java code.
-When Velocity is used for web development, Web designers can work in
-parallel with Java programmers to develop web sites according to the
-Model-View-Controller (MVC) model, meaning that web page designers can
-focus solely on creating a site that looks good, and programmers can
-focus solely on writing top-notch code. Velocity separates Java code
-from the web pages, making the web site more maintainable over the long
-run and providing a viable alternative to Java Server Pages (JSPs) or
-PHP.
-Velocity's capabilities reach well beyond the realm of web sites; for
-example, it can generate SQL and PostScript and XML (see Anakia for more
-information on XML transformations) from templates. It can be used
-either as a standalone utility for generating source code and reports,
-or as an integrated component of other systems. Velocity also provides
-template services for the Turbine web application framework.
-Velocity+Turbine provides a template service that will allow web
-applications to be developed according to a true MVC model.
-
 %prep
-%setup -q
-# Remove all binary libs used in compiling the package.
-# Note that velocity has some jar files containing macros under
-# examples and test that should not be removed.
-#find build -name '*.jar' -exec rm -f \{\} \;
-for j in $(find . -name "*.jar" | grep -v /test/); do
-    mv $j $j.no
-done
-%patch0 -b .sav0
+%autosetup -p1 -n %{name}-engine-%{version}
+find . -name '*.jar' ! -name 'test*.jar' -print -delete
+find . -name '*.class' ! -name 'Foo.class' -print -delete
 
-cp %{SOURCE1} pom.xml
+# Disable unneeded features
+rm -r src/java/org/apache/velocity/{anakia,texen,servlet,convert}
+rm src/java/org/apache/velocity/runtime/log/{Avalon,Log4J}Log{Chute,System}.java
+rm src/java/org/apache/velocity/runtime/log/{CommonsLog,Servlet}LogChute.java
+rm src/java/org/apache/velocity/runtime/log/SimpleLog4JLogSystem.java
+rm src/java/org/apache/velocity/runtime/log/VelocityFormatter.java
+rm src/java/org/apache/velocity/app/event/implement/Escape{Html,JavaScript,Sql,Xml,}Reference.java
 
 %pom_remove_parent pom.xml
+%pom_remove_dep :commons-logging
+%pom_remove_dep :jdom
+%pom_remove_dep :log4j
+%pom_remove_dep :logkit
+%pom_remove_dep :oro
+%pom_remove_dep :servlet-api
+%pom_remove_dep :werken-xpath
 
 %build
-#export JAVA_HOME=%{_jvmdir}/java-1.5.0
-# Use servletapi4 instead of servletapi5 in CLASSPATH
-mkdir -p bin/test-lib
-pushd bin/test-lib
-ln -sf $(build-classpath hsqldb)
-ln -sf $(build-classpath junit)
-popd
 mkdir -p bin/lib
 pushd bin/lib
 ln -sf $(build-classpath ant)
 ln -sf $(build-classpath antlr)
-ln -sf $(build-classpath avalon-logkit)
 ln -sf $(build-classpath commons-collections)
-ln -sf $(build-classpath commons-lang)
-ln -sf $(build-classpath commons-logging)
-ln -sf $(build-classpath jdom)
-ln -sf $(build-classpath log4j12/log4j-12)
-ln -sf $(build-classpath oro)
+ln -sf $(build-classpath commons-lang3)
 # Use servletapi4 instead of servletapi5 in CLASSPATH
 ln -sf $(build-classpath servletapi4)
-ln -sf $(build-classpath werken-xpath)
-ln -sf $(build-classpath plexus/classworlds)
 popd
-export CLASSPATH=$(build-classpath jdom commons-collections commons-lang werken-xpath antlr)
-CLASSPATH=$CLASSPATH:$(pwd)/test/texen-classpath/test.jar
+
+export CLASSPATH=$(build-classpath commons-collections commons-lang3 antlr)
 export OPT_JAR_LIST="ant/ant-junit junit"
-#FIXME: tests failed on CommonsExtPropTestCase
-#but resulting files seems to be same
 ant \
   -Djavac.source=1.6 -Djavac.target=1.6 \
   -buildfile build/build.xml \
-  jar javadocs
+  jar
 
 %install
 # jars
 install -d -m 755 %{buildroot}%{_javadir}
 install -p -m 644 bin/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+
 # pom
 install -d -m 755 %{buildroot}%{_mavenpomdir}
 install -pm 644 pom.xml \
     %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 %add_maven_depmap -a velocity:velocity
 
-# javadoc
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr docs/api/* %{buildroot}%{_javadocdir}/%{name}
-%fdupes -s %{buildroot}%{_javadocdir}
-
-rm -rf docs/api
+# Remove docs.
+rm -rf docs/*
 
 # zero-length file
 rm -r test/issues/velocity-537/compare/velocity537.vm.cmp
-# data
-install -d -m 755 %{buildroot}%{_datadir}/%{name}
-cp -pr examples test %{buildroot}%{_datadir}/%{name}
-%fdupes -s %{buildroot}%{_datadir}/%{name}
 
 %files -f .mfiles
 %license LICENSE NOTICE
 %doc README.txt
 
-%files manual
-%doc docs/*
-
-%files javadoc
-%{_javadocdir}/%{name}
-
-%files demo
-%{_datadir}/%{name}
-
 %changelog
+* Tue Feb 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-11
+- Removing dependency on 'jdom', 'oro', 'servlet-api', and 'werken-xpath'.
+- Removing 'manual' and 'javadoc' subpackages.
+
+* Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-10
+- Removing dependency on "avalog-logkit" and "log4j12".
+- Ported to "commons-lang3".
+- License verified.
+- Changes done using Fedora 33 (license: MIT) spec as guidance.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-9
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

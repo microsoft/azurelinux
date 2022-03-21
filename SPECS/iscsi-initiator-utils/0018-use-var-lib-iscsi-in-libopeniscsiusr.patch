@@ -1,4 +1,4 @@
-From e2b8215b80cc037ecbcb9eef50e432c31d5e56eb Mon Sep 17 00:00:00 2001
+From e186e959ddc2a47e7cfe1f5a8ea4d3fa8248a478 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 30 May 2018 16:08:30 -0700
 Subject: [PATCH] use /var/lib/iscsi in libopeniscsiusr
@@ -12,7 +12,7 @@ Subject: [PATCH] use /var/lib/iscsi in libopeniscsiusr
  5 files changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/libopeniscsiusr/idbm.h b/libopeniscsiusr/idbm.h
-index 3fd0864..c84d332 100644
+index cc90388..5a4d2fa 100644
 --- a/libopeniscsiusr/idbm.h
 +++ b/libopeniscsiusr/idbm.h
 @@ -31,7 +31,8 @@
@@ -105,5 +105,5 @@ index 39e07b3..9eba7fa 100644
  /* Might be public in the future */
  __DLL_LOCAL void iscsi_node_free(struct iscsi_node *node);
 -- 
-2.21.0
+2.26.2
 

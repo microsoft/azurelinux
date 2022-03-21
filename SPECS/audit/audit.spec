@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0.6
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,18 +10,13 @@ URL:            https://people.redhat.com/sgrubb/audit/
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}.tar.gz
 Patch0:         refuse-manual-stop.patch
 BuildRequires:  e2fsprogs-devel
-BuildRequires:  golang
 BuildRequires:  krb5-devel
-BuildRequires:  libcap-ng-devel
-BuildRequires:  openldap
 BuildRequires:  swig
-BuildRequires:  systemd
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       gawk
-Requires:       krb5
-Requires:       libcap-ng
-Requires:       openldap
-Requires:       systemd
+# Break circular dependency with systemd by using weak dependency tag 'Recommends'
+# Systemd should always be installed in a running system
+Recommends:     systemd
 
 %description
 The audit package contains the user space utilities for
@@ -71,10 +66,8 @@ and libauparse.
     --sysconfdir=%{_sysconfdir} \
     --with-python3=yes \
     --enable-gssapi-krb5=yes \
-    --with-libcap-ng=yes \
     --with-aarch64 \
-    --enable-zos-remote \
-    --with-golang \
+    --disable-zos-remote \
     --enable-systemd \
     --disable-static
 
@@ -88,9 +81,6 @@ mkdir -p %{buildroot}/%{_var}/spool/audit
 ln -sfv %{_var}/opt/audit/log %{buildroot}/%{_var}/log/audit
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
-
-install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
-echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-auditd.preset
 
 %check
 %make_build check
@@ -111,7 +101,6 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %{_bindir}/*
 %{_sbindir}/*
 %{_libdir}/systemd/system/auditd.service
-%{_libdir}/systemd/system-preset/50-auditd.preset
 %{_libexecdir}/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -128,8 +117,6 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %ghost %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/audit-stop.rules
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/plugins.d/af_unix.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/plugins.d/syslog.conf
-%config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/plugins.d/audispd-zos-remote.conf
-%config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/zos-remote.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/audisp-remote.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/audit/plugins.d/au-remote.conf
 %config(noreplace) %attr(640,root,root) %{_sysconfdir}/libaudit.conf
@@ -143,7 +130,6 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %defattr(-,root,root)
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
-%{_libdir}/golang/*
 %{_includedir}/*.h
 %{_mandir}/man3/*
 %{_datadir}/aclocal/audit.m4
@@ -153,6 +139,15 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Andrew Phelps <anphel@microsoft.com> - 3.0.6-4
+- Break circular dependency with systemd by using Recommends
+
+* Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 3.0.6-3
+- Reduce build requirements to build in toolchain environment
+
+* Mon Jan 31 2022 Chris PeBenito <chpebeni@microsoft.com> - 3.0.6-2
+- Remove override so auditd starts by default.
+
 * Fri Dec 10 2021 Chris Co <chrco@microsoft.com> - 3.0.6-1
 - Update to 3.0.6
 
@@ -180,7 +175,7 @@ echo "disable auditd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 - Renaming go to golang
 
 * Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0-1
-- Updated to version 3.0-alpha8. Subpackage licenses updated. 
+- Updated to version 3.0-alpha8. Subpackage licenses updated.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8.4-2
 - Initial CBL-Mariner import from Photon (license: Apache2).

@@ -1,7 +1,7 @@
 Summary:        Provides IPC between GnuPG Components
 Name:           libassuan
 Version:        2.5.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 URL:            https://gnupg.org/software/libassuan/index.html
 Group:          Development/Libraries
@@ -23,7 +23,6 @@ of many transaction based environments with non-persistent servers.
 Summary:        Development files for libassuan
 Requires:       %{name} = %{version}-%{release}
 Requires:       libgpg-error-devel >= 1.21
-Provides:       pkgconfig(libassuan) = %{version}-%{release}
 
 %description    devel
 This package contains development files for libassuan
@@ -58,6 +57,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_datadir}/aclocal/*
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.5.5-2
+- Remove manual pkgconfig(*) provides in toolchain specs
+
 * Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.5-1
 - Upgrade to latest upstream version
 - Split out development files into devel subpackage

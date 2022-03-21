@@ -1,26 +1,31 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.33.0
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
-URL:            https://git-scm.com/
-Group:          System Environment/Programming
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Programming
+URL:            https://git-scm.com/
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
 BuildRequires:  curl-devel
-BuildRequires:  python2
-Requires:       openssl
+BuildRequires:  python3-devel
 Requires:       curl
 Requires:       expat
-Requires:       perl-interpreter
-Requires:       perl-YAML
-Requires:       perl-DBI
+Requires:       openssh
+Requires:       openssl
 Requires:       perl-CGI
+Requires:       perl-DBI
+Requires:       perl-YAML
+Requires:       perl-interpreter
+Requires:       python3
 Requires:       subversion-perl
-Requires:       python2
-
 Provides:       git-core = %{version}-%{release}
+%if %{with_check}
+BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(lib)
+%endif
 
 %description
 Git is a free and open source, distributed version control system
@@ -32,27 +37,26 @@ merging are fast and easy to do. Git is used for version control of
 files, much like tools such as Mercurial, Bazaar,
 Subversion-1.7.8, CVS-1.11.23, Perforce, and Team Foundation Server.
 
-%package lang
-Summary: Additional language files for git
-Group: System Environment/Programming
-Requires: git >= 2.1.2
+%package        lang
+Summary:        Additional language files for git
+Group:          System Environment/Programming
+Requires:       git >= 2.1.2
+
 %description lang
 These are the additional language files of git.
-
 
 %global with_daemon 1
 %global with_subtree 1
 %global with_svn 1
 %global with_email 0
-
 %if %{with_daemon}
-%package daemon
+%package        daemon
 Summary:        Git protocol daemon
 Requires:       git-core = %{version}-%{release}
 Requires:       systemd
 Requires(post): systemd
-Requires(preun):  systemd
 Requires(postun): systemd
+Requires(preun): systemd
 
 %description daemon
 The git daemon for supporting git:// access to git repositories
@@ -60,21 +64,23 @@ The git daemon for supporting git:// access to git repositories
 
 
 %if %{with_email}
-%package email
+%package        email
 Summary:        Git tools for sending patches via email
-BuildArch:      noarch
 Requires:       git = %{version}-%{release}
 Requires:       perl(Authen::SASL)
 Requires:       perl(Net::SMTP::SSL)
+BuildArch:      noarch
+
 %description email
 %{summary}.
 %endif
 
 
 %if %{with_subtree}
-%package subtree
+%package        subtree
 Summary:        Git tools to merge and split repositories
 Requires:       git-core = %{version}-%{release}
+
 %description subtree
 Git subtrees allow subprojects to be included within a subdirectory
 of the main project, optionally including the subproject's entire
@@ -83,40 +89,45 @@ history.
 
 
 %if %{with_svn}
-%package svn
+%package        svn
 Summary:        Git tools for interacting with Subversion repositories
-BuildArch:      noarch
 Requires:       git = %{version}-%{release}
-Requires:       perl(Digest::MD5)
 Requires:       subversion
+Requires:       perl(Digest::MD5)
+BuildArch:      noarch
+
 %description svn
 %{summary}.
 %endif
 
 %prep
 %setup -q
+%{py3_shebang_fix} git-p4.py
+
 %build
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
+    PYTHON_PATH=%{python3} \
     --libexec=%{_libexecdir} \
-    --with-gitconfig=/etc/gitconfig
+    --with-gitconfig=%{_sysconfdir}/gitconfig
 make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}"
+
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
-install -vdm 755 %{buildroot}/usr/share/bash-completion/completions
-install -m 0644 contrib/completion/git-completion.bash %{buildroot}/usr/share/bash-completion/completions/git
+%make_install
+install -vdm 755 %{buildroot}%{_datadir}/bash-completion/completions
+install -m 0644 contrib/completion/git-completion.bash %{buildroot}%{_datadir}/bash-completion/completions/git
 %find_lang %{name}
 %{_fixperms} %{buildroot}/*
 
 %check
-make %{?_smp_mflags} test
+# Skip git-send-email tests as mariner does not ship it
+GIT_SKIP_TESTS='t9001' %make_build test
 
 %post
 if [ $1 -eq 1 ];then
     # This is first installation.
-    git config --system http.sslCAPath /etc/ssl/certs
+    git config --system http.sslCAPath %{_sysconfdir}/ssl/certs
     exit 0
 fi
 
@@ -156,6 +167,17 @@ fi
 %endif
 
 %changelog
+* Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 2.33.0-6
+- Add an explicit BR on `perl{(lib), (IO::File), (Getopt::Long)}`
+- Skip `git-send-email` (t9001) tests to enable ptest
+
+* Tue Mar 1 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.33.0-5
+- Add openssh dependency for git
+
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.33.0-4
+- Replace python2 depdendency with python3
+- Lint spec
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.33.0-3
 - Removing the explicit %%clean stage.
 - License verified.

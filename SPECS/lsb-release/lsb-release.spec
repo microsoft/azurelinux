@@ -1,24 +1,25 @@
+Summary:        lsb_release script
+Name:           lsb-release
+Version:        3.1
+Release:        1%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://wiki.linuxfoundation.org/lsb/start
+#Source0:      https://github.com/thkukuk/lsb-release_os-release/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}_os-release-%{version}.tar.gz
+Source1:        %{LICENSE_PATH}
 %define LICENSE_PATH LICENSE.PTR
-Summary:       lsb_release script
-Name:          lsb-release
-Version:       1.4
-Release:       1%{?dist}
-License:       GPLv2+
-URL:           https://wiki.linuxfoundation.org/lsb/start
-Vendor:        Microsoft Corporation
-Distribution:  Mariner
-BuildArch:     noarch
-Source0:       https://downloads.sourceforge.net/lsb/%{name}-%{version}.tar.gz
-Source1:       %{LICENSE_PATH}
-BuildRequires: coreutils
-BuildRequires: gzip
-Requires:      mariner-release
+BuildRequires:  coreutils
+BuildRequires:  gzip
+Requires:       mariner-release
+BuildArch:      noarch
 
 %description
 lsb_release prints certain LSB (Linux Standard Base) and Distribution information.
 
 %prep
-%setup -q
+%setup -q -n %{name}_os-release-%{version}
 cp %{SOURCE1} .
 
 %install
@@ -33,6 +34,10 @@ install -D -m 755 lsb_release %{buildroot}%{_bindir}/lsb_release
 %{_mandir}/man1/lsb_release.1.gz
 
 %changelog
+* Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 3.1-1
+- Upgrade to 3.1
+- Fix Source0
+
 *   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> - 1.4-1
 -   Original version for CBL-Mariner.
 -   License verified.

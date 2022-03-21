@@ -4,7 +4,7 @@ Name: hyphen-ia
 Summary: Interlingua hyphenation rules
 %global upstreamid 20050628
 Version: 0.%{upstreamid}
-Release: 19%{?dist}
+Release: 20%{?dist}
 Source0: http://www.ctan.org/get/language/hyphenation/iahyphen.tex
 Source1: %{name}-LICENSE.txt
 URL: http://www.ctan.org/tex-archive/help/Catalogue/entries/iahyphen.html
@@ -22,7 +22,7 @@ Interlingua hyphenation rules.
 %setup -T -q -c -n hyphen-ia
 cp -p %{SOURCE0} .
 %patch0 -p0 -b .clean
-%cp %{SOURCE1} ./LICENSE.txt
+cp %{SOURCE1} ./LICENSE.txt
 
 %build
 substrings.pl iahyphen.tex hyph_ia.dic ISO8859-1
@@ -41,6 +41,9 @@ cp -p hyph_ia.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 %{_datadir}/hyphen/*
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20050628-20
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20050628-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

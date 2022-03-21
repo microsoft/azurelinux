@@ -8,5 +8,4 @@ diff -up conda-4.7.11/conda/base/context.py.cpuinfo conda-4.7.11/conda/base/cont
 -    from .._vendor.cpuinfo import get_cpu_info
 +    from cpuinfo import get_cpu_info
      return frozendict(get_cpu_info())
- 
- 
+

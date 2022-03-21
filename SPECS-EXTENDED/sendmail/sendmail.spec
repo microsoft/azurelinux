@@ -21,7 +21,7 @@ Distribution:   Mariner
 Summary: A widely used Mail Transport Agent (MTA)
 Name: sendmail
 Version: 8.15.2
-Release: 45%{?dist}
+Release: 46%{?dist}
 License: Sendmail
 URL: http://www.sendmail.org/
 
@@ -104,7 +104,6 @@ Patch33: sendmail-8.15.2-gcc-10-fix.patch
 BuildRequires: libdb-devel
 BuildRequires: libnsl2-devel
 BuildRequires: groff
-BuildRequires: ghostscript
 BuildRequires: m4
 BuildRequires: systemd
 BuildRequires: gcc
@@ -301,8 +300,6 @@ for i in $DIRS; do
 	popd
 done
 
-make -C doc/op op.pdf
-
 %install
 # create directories
 for d in %{_bindir} %{_sbindir} %{_includedir}/libmilter \
@@ -369,7 +366,6 @@ install -p -m 644 RELEASE_NOTES %{buildroot}%{_docdir}/sendmail
 gzip -9 %{buildroot}%{_docdir}/sendmail/RELEASE_NOTES
 
 # install docs for sendmail-doc
-install -m 644 doc/op/op.pdf %{buildroot}%{_docdir}/sendmail
 install -p -m 644 sendmail/README %{buildroot}%{_docdir}/sendmail/README.sendmail
 install -p -m 644 sendmail/SECURITY %{buildroot}%{_docdir}/sendmail
 install -p -m 644 smrsh/README %{buildroot}%{_docdir}/sendmail/README.smrsh
@@ -707,12 +703,15 @@ exit 0
 %{_docdir}/sendmail/README.sendmail
 %{_docdir}/sendmail/README.smrsh
 %{_docdir}/sendmail/SECURITY
-%{_docdir}/sendmail/op.pdf
 %dir %{_docdir}/sendmail/contrib
 %attr(0644,root,root) %{_docdir}/sendmail/contrib/*
 
 
 %changelog
+* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.15.2-46
+- Removing dependency on 'ghostscript'.
+- License verified.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.15.2-45
 - Making binaries paths compatible with CBL-Mariner's paths.
 

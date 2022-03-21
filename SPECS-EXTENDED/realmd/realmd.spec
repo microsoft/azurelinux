@@ -1,6 +1,6 @@
 Name:		realmd
 Version:	0.16.3
-Release:	23%{?dist}
+Release:	25%{?dist}
 Summary:	Kerberos realm enrollment service
 License:	LGPLv2+
 Vendor:         Microsoft Corporation
@@ -33,6 +33,7 @@ Patch15:	0001-tests-ignore-order-in-test_update_domain.patch
 Patch16:	0001-Remove-support-for-deprecated-gtester-format.patch
 
 BuildRequires:	gcc
+BuildRequires:	perl(File::Find)
 BuildRequires:	automake
 BuildRequires:	autoconf
 BuildRequires:	intltool pkgconfig
@@ -83,7 +84,8 @@ make install DESTDIR=%{buildroot}
 %find_lang realmd
 
 %files -f realmd.lang
-%doc AUTHORS COPYING NEWS README
+%license COPYING
+%doc AUTHORS NEWS README
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.realmd.conf
 %{_sbindir}/realm
 %dir %{_prefix}/lib/realmd
@@ -100,6 +102,12 @@ make install DESTDIR=%{buildroot}
 %doc ChangeLog
 
 %changelog
+* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.3-25
+- License verified.
+
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.3-24
+- Adding missing BRs on Perl modules.
+
 * Fri Dec 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 0.16.3-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add e2fsprogs-devel buildrequirement for missing header file.

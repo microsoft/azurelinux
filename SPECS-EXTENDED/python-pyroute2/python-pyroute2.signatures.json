@@ -1,0 +1,12 @@
+{
+ "Signatures": {
+  "pyroute2-0.6.5.tar.gz": "d0995c8aeb96c0e4eed4d62e97c9d795000a1a33b747d6dc54326665857cf11c",
+  "pyroute2.core-0.6.5.tar.gz": "266d740eae40fa64dd04541f007d34db696cecf3154cba5be30fa75a67d43852",
+  "pyroute2.nslink-0.6.5.tar.gz": "292e6c2832a73544c1c6d5ba727f7117aa847e55f88d78e94b7d4607b299999e",
+  "pyroute2.nftables-0.6.5.tar.gz": "b1455a63a3efc050d108d550d1cafd011edded6e894d99e7bdfa02d592bf6f16",
+  "pyroute2.ndb-0.6.5.tar.gz": "a4d309584e9ef6c7842af4f832b48fc5344ab225e70e384baed1b7fe2b94d9f8",
+  "pyroute2.ethtool-0.6.5.tar.gz": "caf8014b676521135c4760d72cf5aeef6abbc7fa275210f7e95333073cc7715a",
+  "pyroute2.ipset-0.6.5.tar.gz": "ae527c0f999748230a1f688d9a2b7c257b2df6d74369f44eca530d007793b79d",
+  "pyroute2.ipdb-0.6.5.tar.gz": "f2028fd1013d8af888150d033eecf7537657a4be37e0cccea9800809961eb577"
+ }
+}

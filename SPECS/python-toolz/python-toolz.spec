@@ -28,7 +28,7 @@ suitable for most developers.
 Summary:        A functional standard library for Python
 Name:           python-%{srcname}
 Version:        0.11.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,7 +62,7 @@ BuildRequires:  python%{python3_pkgversion}-pip
 
 %check
 pip3 install nose
-nosetests-%{python3_version}
+nosetests
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
@@ -70,6 +70,9 @@ nosetests-%{python3_version}
 %{python3_sitelib}/tlz/
 
 %changelog
+* Mon Feb 07 2022 Muhammad Falak <mwani@microsoft.com> 0.11.1-5
+- Test with `nosetests` instead of `nosetests-3.9`
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.11.1-4
 - Replace easy_install usage with pip in %%check sections
 

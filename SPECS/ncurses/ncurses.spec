@@ -1,7 +1,7 @@
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 URL:            https://invisible-island.net/ncurses/
 Group:          Applications/System
@@ -35,7 +35,7 @@ compatibility.
 %package        devel
 Summary:        Header and development files for ncurses
 Requires:       %{name} = %{version}-%{release}
-Provides:       pkgconfig(ncurses)
+
 %description    devel
 It contains the libraries and header files to create applications
 
@@ -208,6 +208,9 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+*   Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 6.2-5
+-   Remove manual pkgconfig(*) provides in toolchain specs
+
 *   Thu Aug 06 2020 Mateusz Malisz <mamalisz@microsoft.com> 6.2-4
 -   Sync build process with Fedora 32.
 -   Add libtinfo

@@ -2,8 +2,8 @@
 
 Summary:        Userland logical volume management tools
 Name:           lvm2
-Version:        2.03.05
-Release:        9%{?dist}
+Version:        2.03.15
+Release:        1%{?dist}
 License:        GPLv2 AND BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -308,7 +308,7 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %dir %{_sysconfdir}/lvm/cache
 %dir %{_sysconfdir}/lvm/archive
 %{_udevdir}/11-dm-lvm.rules
-%{_udevdir}/69-dm-lvm-metad.rules
+%{_udevdir}/69-dm-lvm.rules
 %{_sbindir}/blkdeactivate
 %{_sbindir}/fsadm
 %{_sbindir}/lv*
@@ -321,7 +321,6 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %{_mandir}/man8/lv*
 %{_mandir}/man8/pv*
 %{_mandir}/man8/vg*
-%{_unitdir}/../system-generators/lvm2-activation-generator
 %{_unitdir}/blk-availability.service
 %{_unitdir}/lvm2-*
 %{_libdir}/systemd/system-preset/50-lvm2.preset
@@ -334,6 +333,9 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.03.15-1
+- Upgrading to newest version 2.03.15
+
 * Fri Jan 07 2022 Thomas Crain <thcrain@microsoft.com> - 2.03.05-9
 - Remove references to lvmetad (removed from upstream in 2.03.0)
 - Bump required systemd version to 249

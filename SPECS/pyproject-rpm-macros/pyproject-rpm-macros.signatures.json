@@ -1,0 +1,20 @@
+{
+ "Signatures": {
+  "LICENSE": "7a89da3454e97113c7c1f7037933e8cac6882a84ae1981e3dc28c0d51654fd1d",
+  "README.md": "c50d8418c07aafa8bfc702eb50643a13cc799dea047d840a1ae487b646bcfb57",
+  "compare_mandata.py": "bf804a8112f76ce7eb565c26fcfca062046c51915b587aa149989dea4777327e",
+  "macros.pyproject": "d831d06ac0dd28b2f8bab5b08e3842c0e4f607d0a0465998b07e080cbb954031",
+  "pyproject_buildrequires.py": "187076a29a99cee25e62eb6b4f8ecb3a45f7a7b97767859a2dfea85163c26b40",
+  "pyproject_buildrequires_testcases.yaml": "21185aee6cabde48fe513d822a95a067efc113fc31f0be4cbe9380b3c38ff467",
+  "pyproject_construct_toxenv.py": "73d77ba134e925680de7eeb60f9aaac6bb3b826d92f1b7a80603c596d6d8b241",
+  "pyproject_convert.py": "191745b96edbddd1fb09a4e4a6efaea71e5b6bcb1a0236c1b14a17caee8cf6b5",
+  "pyproject_preprocess_record.py": "fef4b3a43c4f710892278a7c4e92e10498552573b8a65b1d4eb7508f0a60788d",
+  "pyproject_requirements_txt.py": "26d9dbebdd371269a935abbd8777e3c551327bfd3c2a1e8bbc9eec1d89767611",
+  "pyproject_save_files.py": "9cf544d74491cae0be986d4fccf1b3b0ef349d86e747d8443611d1eab077a68e",
+  "pyproject_save_files_test_data.yaml": "e3eca727843abd3dfafac3e8752fc5b8b624d1572ef2d95fae91e19683980d59",
+  "test_RECORD": "58e67e9dcfec8ce90e29bdc33547ce4edebf280cada052f7185125313447ba42",
+  "test_pyproject_buildrequires.py": "0e113e036d831183cbbbacb121555d41dc8684f27e20fcb1c4b59bda28f3188a",
+  "test_pyproject_requirements_txt.py": "aeb95d224be96fa7087adc6266b30fd2d60ffe0795b584ba5b2e165502d43f9f",
+  "test_pyproject_save_files.py": "48e9bff0eb819b5ca5118c24aba50947f1a16e9bff14e7487dd86001d587f4a1"
+ }
+}

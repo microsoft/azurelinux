@@ -1,6 +1,8 @@
 Name:           colm
-Version:        0.13.0.7
-Release:        4%{?dist}
+# note that ragel (ragel.spec) depends on a very specific version of colm
+# => ragel version must be upgraded when upgrading colm
+Version:        0.14.7
+Release:        1%{?dist}
 Summary:        Programming language designed for the analysis of computer languages
 # aapl/ and some headers from src/ are the LGPLv2+
 License:        MIT AND LGPLv2+
@@ -8,15 +10,16 @@ Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.colm.net/open-source/colm/
-Source0:        https://www.colm.net/files/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/adrian-thurston/colm/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         Colm-NoStatic.patch
 
-BuildRequires:  gcc
-BuildRequires:  libstdc++
+BuildRequires:  asciidoc
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  make
-BuildRequires:  asciidoc
 
 # Unfortunately, upstream doesn't exist and not possible to find version
 Provides:       bundled(aapl)
@@ -34,28 +37,32 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %prep
-%autosetup
+%autosetup -p1
 # Do not pollute with docs
 sed -i -e "/dist_doc_DATA/d" Makefile.am
 
 %build
-autoreconf -vfi
-%configure --disable-static
-%make_build
+./autogen.sh
+./configure --prefix=%{buildroot}/usr --disable-static
+make %{?_smp_mflags}
 
 %install
-%make_install
+make install
+# do not install/remove .la files and doc files
+rm -rf %{buildroot}%{_datadir}
 find %{buildroot}%{_libdir} -type f -name '*.la' -print -delete
 install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{name}.vim
+install -p -m 0644 -D ./src/cgil/*.lm %{buildroot}%{_datadir}
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %license COPYING
-%doc ChangeLog README
-%{_bindir}/%{name}
+%doc README
+%{_bindir}/*
 %{_libdir}/lib%{name}-%{version}.so
+%{_libdir}/libfsm-%{version}.so
 %dir %{_datadir}/vim
 %dir %{_datadir}/vim/vimfiles
 %dir %{_datadir}/vim/vimfiles/syntax
@@ -63,9 +70,14 @@ install -p -m 0644 -D %{name}.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax/%{
 
 %files devel
 %{_libdir}/lib%{name}.so
-%{_includedir}/%{name}/
+%{_libdir}/libfsm.so
+%{_includedir}/
+%{_datadir}/*.lm
 
 %changelog
+* Wed Jan 19 2022 Nicolas Guibourge <nicolasg@microsft.com> - 0.14.7-1
+- Ugradte to 0.14.7
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 0.13.0.7-4
 - Remove epoch
 

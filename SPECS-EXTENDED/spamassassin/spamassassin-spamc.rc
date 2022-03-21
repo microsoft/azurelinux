@@ -1,3 +1,0 @@
-# send mail through spamassassin
-:0fw
-| /usr/bin/spamc

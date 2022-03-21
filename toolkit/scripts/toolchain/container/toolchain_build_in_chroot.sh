@@ -67,16 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.2.1 API Headers
-tar xf kernel-5.15.2.1.tar.gz
-cp /tools/0002-add-linux-syscall-license-info.patch CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1/
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1
-patch -p1 -i 0002-add-linux-syscall-license-info.patch
+echo Linux-5.15.26.1 API Headers
+tar xf kernel-5.15.26.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.2.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -621,15 +619,14 @@ popd
 rm -rf perl-5.32.0
 touch /logs/status_perl_complete
 
-echo Autoconf-2.69
-tar xf autoconf-2.69.tar.xz
-pushd autoconf-2.69
-sed '361 s/{/\\{/' -i bin/autoscan.in
+echo Autoconf-2.71
+tar xf autoconf-2.71.tar.xz
+pushd autoconf-2.71
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf autoconf-2.69
+rm -rf autoconf-2.71
 touch /logs/status_autoconf_complete
 
 echo Automake-1.16.5
@@ -677,9 +674,9 @@ popd
 rm -rf gettext-0.19.8.1
 touch /logs/status_gettext_complete
 
-echo Elfutils-0.185
-tar xjf elfutils-0.185.tar.bz2
-pushd elfutils-0.185
+echo Elfutils-0.186
+tar xjf elfutils-0.186.tar.bz2
+pushd elfutils-0.186
 ./configure \
     --prefix=/usr \
     --disable-debuginfod \
@@ -692,7 +689,7 @@ make -C libdw install
 # Need to install (eu-strip) as well
 make install
 popd
-rm -rf elfutils-0.185
+rm -rf elfutils-0.186
 touch /logs/status_libelf_complete
 
 echo Libffi-3.4.2
@@ -904,23 +901,21 @@ popd
 rm -rf patch-2.7.6
 touch /logs/status_patch_complete
 
-echo Man-DB-2.8.4
-tar xf man-db-2.8.4.tar.xz
-pushd man-db-2.8.4
+echo Man-DB-2.10.1
+tar xf man-db-2.10.1.tar.xz
+pushd man-db-2.10.1
 ./configure --prefix=/usr                        \
-            --docdir=/usr/share/doc/man-db-2.8.4 \
+            --docdir=/usr/share/doc/man-db-2.10.1 \
             --sysconfdir=/etc                    \
             --disable-setuid                     \
-            --enable-cache-owner=bin             \
             --with-browser=/usr/bin/lynx         \
+            --with-systemdsystemunitdir=no       \
             --with-vgrind=/usr/bin/vgrind        \
-            --with-grap=/usr/bin/grap            \
-            --with-systemdtmpfilesdir=           \
-            --with-systemdsystemunitdir=
+            --with-grap=/usr/bin/grap
 make -j$(nproc)
 make install
 popd
-rm -rf man-db-2.8.4
+rm -rf man-db-2.10.1
 touch /logs/status_man_db_complete
 
 echo Tar-1.34
@@ -995,9 +990,9 @@ touch /logs/status_util-linux_complete
 echo Building RPM related packages
 cd /sources
 
-echo sqlite-autoconf-3320100
-tar xf sqlite-autoconf-3320100.tar.gz
-pushd sqlite-autoconf-3320100
+echo sqlite-autoconf-3360000
+tar xf sqlite-autoconf-3360000.tar.gz
+pushd sqlite-autoconf-3360000
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \
@@ -1012,7 +1007,7 @@ pushd sqlite-autoconf-3320100
 make -j$(nproc)
 make install
 popd
-rm -rf sqlite-autoconf-3320100
+rm -rf sqlite-autoconf-3360000
 touch /logs/status_sqlite-autoconf_complete
 
 echo nspr-4.21
@@ -1031,39 +1026,17 @@ popd
 rm -rf nspr-4.21
 touch /logs/status_nspr_complete
 
-echo popt-1.16
-tar xf popt-1.16.tar.gz
-pushd popt-1.16
+echo popt-1.18
+tar xf popt-1.18.tar.gz
+pushd popt-1.18
 ./configure --prefix=/usr \
         --disable-static \
         --build=$BUILD_TARGET
 make -j$(nproc)
 make install
 popd
-rm -rf popt-1.16
+rm -rf popt-1.18
 touch /logs/status_popt_complete
-
-echo libdb - aka Berkely DB-5.3.28
-tar xf db-5.3.28.tar.gz
-pushd db-5.3.28
-sed -i 's/\(__atomic_compare_exchange\)/\1_db/' src/dbinc/atomic.h
-cd build_unix
-../dist/configure --prefix=/usr  \
-                --enable-compat185 \
-                --enable-dbm       \
-                --disable-static   \
-                --enable-cxx       \
-                --build=$BUILD_TARGET
-make -j$(nproc)
-make docdir=/usr/share/doc/db-5.3.28 install
-chown -v -R root:root                    \
-    /usr/bin/db_*                          \
-    /usr/include/db{,_185,_cxx}.h          \
-    /usr/lib/libdb*.{so,la}                \
-    /usr/share/doc/db-5.3.28
-popd
-rm -rf db-5.3.28
-touch /logs/status_libdb_complete
 
 echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2
@@ -1088,14 +1061,14 @@ popd
 rm -rf cpio-2.13
 touch /logs/status_cpio_complete
 
-echo libarchive-3.4.2
-tar xf libarchive-3.4.2.tar.gz
-pushd libarchive-3.4.2
+echo libarchive-3.6.0
+tar xf libarchive-3.6.0.tar.gz
+pushd libarchive-3.6.0
 ./configure --prefix=/usr --disable-static
 make -j$(nproc)
 make install
 popd
-rm -rf libarchive-3.4.2
+rm -rf libarchive-3.6.0
 touch /logs/status_libarchive_complete
 
 echo lua-5.4.3

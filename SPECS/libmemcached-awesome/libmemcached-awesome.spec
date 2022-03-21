@@ -12,7 +12,7 @@
 Summary:        Client library and command line tools for memcached server
 Name:           %{libname}-awesome
 Version:        1.1.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,8 @@ BuildRequires:  gcc-c++
 BuildRequires:  libevent-devel > 2
 BuildRequires:  memcached
 BuildRequires:  openssl-devel
-BuildRequires:  python3-sphinx
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  systemtap-sdt-devel
 Provides:       bundled(bobjenkins-hash)
 # package rename
@@ -141,6 +142,9 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 %{_mandir}/man1/mem*
 
 %changelog
+* Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1-4
+- Adding python-devel to fix python-sphinx build issue
+
 * Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 1.1.1-3
 - Initial CBL-Mariner import from Fedora 36 (license: CC-BY-SA)
 - Lint spec

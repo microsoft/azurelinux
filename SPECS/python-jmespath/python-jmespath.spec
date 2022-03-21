@@ -1,13 +1,18 @@
 Summary:        Query Language for JSON
 Name:           python-jmespath
-Version:        0.9.3
-Release:        6%{?dist}
+Version:        0.10.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jmespath
-Source0:        https://pypi.python.org/packages/e5/21/795b7549397735e911b032f255cff5fb0de58f96da794274660bca4f58ef/jmespath-%{version}.tar.gz
+Source0:        https://github.com/jmespath/jmespath.py/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
 %description
@@ -15,22 +20,13 @@ JMESPath (pronounced “james path”) allows you to declaratively specify how t
 
 %package -n     python3-jmespath
 Summary:        Query Language for JSON
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-%if %{with_check}
-BuildRequires:  python3-pip
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-%endif
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-jmespath
 JMESPath (pronounced “james path”) allows you to declaratively specify how to extract elements from a JSON document.
 
 %prep
-%autosetup -n jmespath-%{version}
+%autosetup -n jmespath.py-%{version}
 
 %build
 %py3_build
@@ -40,7 +36,7 @@ JMESPath (pronounced “james path”) allows you to declaratively specify how t
 ln -sfv jp.py %{buildroot}%{_bindir}/jp.py-%{python3_version}
 
 %check
-pip3 install nose
+pip3 install nose mock
 %python3 setup.py test
 
 %files -n python3-jmespath
@@ -51,12 +47,16 @@ pip3 install nose
 %{_bindir}/jp.py-%{python3_version}
 
 %changelog
+* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 0.10.0-1
+- Upgrade to latest upstream version
+- Switch source from PyPI to GitHub
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.3-6
 - Replace easy_install usage with pip in %%check sections
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.3-5
 - Add license to python3 package
-- Remove python2 package,
+- Remove python2 package
 - Lint spec
 - License verified
 

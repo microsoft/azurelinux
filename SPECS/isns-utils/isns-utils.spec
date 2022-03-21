@@ -1,7 +1,7 @@
 Summary:        The iSNS daemon and utility programs
 Name:           isns-utils
-Version:        0.97
-Release:        10%{?dist}
+Version:        0.101
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -100,6 +100,9 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 %{_libdir}/libisns.so
 
 %changelog
+* Wed Feb 23 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.101-1
+- Update source to v0.101
+
 * Thu Jul 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.97-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Added the '%%license' macro.

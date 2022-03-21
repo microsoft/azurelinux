@@ -11,6 +11,7 @@ PrivateTmp=true
 CapabilityBoundingSet=~ CAP_NET_ADMIN CAP_SYS_ADMIN CAP_SYS_BOOT CAP_SYS_MODULE
 ProtectSystem=true
 PrivateDevices=true
+ExecStartPre=-/usr/sbin/restorecon -R /var/spool/postfix/pid/master.pid
 ExecStartPre=-/usr/libexec/postfix/aliasesdb
 ExecStartPre=-/usr/libexec/postfix/chroot-update
 ExecStart=/usr/sbin/postfix start

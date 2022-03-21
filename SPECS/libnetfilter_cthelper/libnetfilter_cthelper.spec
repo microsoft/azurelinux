@@ -1,15 +1,13 @@
 Summary:    User-space infrastructure for connection tracking helpers
 Name:       libnetfilter_cthelper
 Version:    1.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:    GPLv2
 URL:        http://www.netfilter.org/projects/libnetfilter_cthelper/index.html
 Group:      System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:    http://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
-%define sha1 libnetfilter_cthelper=5d0a82794bd46aafde20c16800edca23d563de66
-
 BuildRequires:  libmnl-devel
 BuildRequires:  kernel-headers
 
@@ -54,12 +52,18 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 
 %changelog
+* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.0-5
+- Remove unused `%%define sha1` lines
+- License verified
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.0-4
 - Added %%license line automatically
 
-*   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.0-3
--   Renaming linux-api-headers to kernel-headers
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0.0-2
--   Initial CBL-Mariner import from Photon (license: Apache2).
-*   Wed Apr 05 2017 Anish Swaminathan <anishs@vmware.com> 1.0.0-1
--   Initial packaging
+* Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.0.0-3
+- Renaming linux-api-headers to kernel-headers
+
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.0.0-2
+- Initial CBL-Mariner import from Photon (license: Apache2).
+
+* Wed Apr 05 2017 Anish Swaminathan <anishs@vmware.com> - 1.0.0-1
+- Initial packaging

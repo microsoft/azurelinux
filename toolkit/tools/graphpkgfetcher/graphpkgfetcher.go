@@ -38,6 +38,8 @@ var (
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
 
+	stopOnFailure = app.Flag("stop-on-failure", "Stop if failed to cache all unresolved nodes.").Bool()
+
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
@@ -58,7 +60,7 @@ func main() {
 	}
 
 	if hasUnresolvedNodes(dependencyGraph) {
-		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile, *disableUpstreamRepos)
+		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile, *disableUpstreamRepos, *stopOnFailure)
 		if err != nil {
 			logger.Log.Panicf("Failed to resolve graph. Error: %s", err)
 		}
@@ -84,7 +86,7 @@ func hasUnresolvedNodes(graph *pkggraph.PkgGraph) bool {
 
 // resolveGraphNodes scans a graph and for each unresolved node in the graph clones the RPMs needed
 // to satisfy it.
-func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, disableUpstreamRepos bool) (err error) {
+func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, disableUpstreamRepos, stopOnFailure bool) (err error) {
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
 	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *usePreviewRepo, *repoFiles)
@@ -102,6 +104,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 		}
 	}
 
+	cachingSucceeded := true
 	if strings.TrimSpace(inputSummaryFile) == "" {
 		// Cache an RPM for each unresolved node in the graph.
 		fetchedPackages := make(map[string]bool)
@@ -111,6 +114,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 				// Failing to clone a dependency should not halt a build.
 				// The build should continue and attempt best effort to build as many packages as possible.
 				if resolveErr != nil {
+					cachingSucceeded = false
 					errorMessage := strings.Builder{}
 					errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
 					errorMessage.WriteString("Nodes which have this as a dependency:\n")
@@ -124,9 +128,10 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	} else {
 		// If an input summary file was provided, simply restore the cache using the file.
 		err = repoutils.RestoreClonedRepoContents(cloner, inputSummaryFile)
-		if err != nil {
-			return
-		}
+		cachingSucceeded = err == nil
+	}
+	if stopOnFailure && !cachingSucceeded {
+		return fmt.Errorf("failed to cache unresolved nodes")
 	}
 
 	logger.Log.Info("Configuring downloaded RPMs as a local repository")
@@ -238,7 +243,5 @@ func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []str
 func rpmPackageToRPMPath(rpmPackage, outDir string) string {
 	// Construct the rpm path of the cloned package.
 	rpmName := fmt.Sprintf("%s.rpm", rpmPackage)
-	// To calculate the architecture grab the last segment of the resolved name since it will be in the NVRA format.
-	rpmArch := rpmPackage[strings.LastIndex(rpmPackage, ".")+1:]
-	return filepath.Join(outDir, rpmArch, rpmName)
+	return filepath.Join(outDir, rpmName)
 }

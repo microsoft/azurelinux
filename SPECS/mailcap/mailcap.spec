@@ -1,18 +1,16 @@
 Summary:        Helper application and MIME type associations for file types
 Name:           mailcap
-Version:        2.1.49
-Release:        4%{?dist}
-License:        Public Domain and MIT
-URL:            https://pagure.io/mailcap
+Version:        2.1.53
+Release:        1%{?dist}
+License:        Public Domain AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://pagure.io/mailcap
 Source0:        https://pagure.io/releases/%{name}/%{name}-%{version}.tar.xz
-BuildArch:      noarch
-
 BuildRequires:  perl
 # the test script is written in python
 BuildRequires:  python3
-
+BuildArch:      noarch
 
 %description
 The mailcap file is used by the metamail program.  Metamail reads the
@@ -34,23 +32,18 @@ Requires:       nginx-filesystem
 %description -n nginx-mimetypes
 MIME type mappings for nginx.
 
-
 %prep
 %setup -q
 
-
 %build
 %make_build
-
 
 %install
 rm -rf ${buildroot}
 %make_install sysconfdir=%{_sysconfdir} mandir=%{_mandir}
 
-
 %check
 make check
-
 
 %files
 %license COPYING
@@ -63,8 +56,10 @@ make check
 %doc NEWS
 %config(noreplace) %{_sysconfdir}/nginx/mime.types
 
-
 %changelog
+* Wed Feb 02 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.1.53-1
+- Upgrading to v2.1.53
+
 * Wed Oct 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.49-4
 - Changing BR to be more accurate: "nginx" -> "nginx-filesystem".
 

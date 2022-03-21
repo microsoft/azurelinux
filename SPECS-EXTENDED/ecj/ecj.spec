@@ -22,9 +22,9 @@ Distribution:   Mariner
 %global jdk10_revision 45b1d041a4ef
 Name:           ecj
 Version:        4.12
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Eclipse Compiler for Java
-License:        EPL-2.0 AND GPL-2.0 WITH Classpath-exception-2.0
+License:        EPL-2.0
 Group:          Development/Libraries/Java
 URL:            https://www.eclipse.org
 Source0:        http://download.eclipse.org/eclipse/downloads/drops4/%{qualifier}/ecjsrc-%{version}.jar
@@ -41,8 +41,6 @@ Source3:        java10api.pom
 Source4:        MANIFEST.MF
 # Always generate debug info when building RPMs
 Patch0:         %{name}-rpmdebuginfo.patch
-# Include java API stubs in build with java < 9
-Patch1:         javaAPI.patch
 # Fix build with java >= 9
 Patch2:         ecj-encoding.patch
 # Patch out deprecation annotation not understood by java 8
@@ -60,11 +58,7 @@ the JDT Core batch compiler.
 %prep
 %setup -q -c -a 1
 %patch0 -p1
-%if %{?pkg_vcmp:%pkg_vcmp java-devel < 9}%{!?pkg_vcmp:1}
-%patch1
-%else
 %patch2 -p1
-%endif
 %patch3
 
 sed -i -e 's|debuglevel=\"lines,source\"|debug=\"yes\"|g' build.xml
@@ -75,11 +69,6 @@ cp %{SOURCE4} scripts/binary/META-INF/MANIFEST.MF
 # JDTCompilerAdapter isn't used by the batch compiler
 rm -f org/eclipse/jdt/core/JDTCompilerAdapter.java
 
-# Not compatible with non-modular Java
-%if %{?pkg_vcmp:%pkg_vcmp java-devel < 9}%{!?pkg_vcmp:1}
-rm -f java10api-src/javax/tools/ToolProvider.java
-%endif
-
 %build
 
 mkdir -p build/classes
@@ -89,11 +78,7 @@ jar -cf java10api.jar -C build/classes .
 # Remove everything except the jar, since ant looks for java files in "."
 rm -rf java10api-src build/classes
 
-ant \
-%if %{?pkg_vcmp:%pkg_vcmp java-devel < 9}%{!?pkg_vcmp:1}
-	-Djavaapi=java10api.jar -Drtjar=%{_jvmdir}/jre/lib/rt.jar \
-%endif
-	build
+ant build
 
 %install
 # jar
@@ -121,6 +106,10 @@ install -m 644 -p ecj.1 %{buildroot}%{_mandir}/man1/ecj.1
 %{_mandir}/man1/ecj*
 
 %changelog
+* Fri Feb 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.12-5
+- Removing Java < 9 parts.
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 4.12-4
 - Remove epoch
 

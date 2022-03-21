@@ -1,4 +1,4 @@
-From 3040b7530eda1ab5625d76783dc7b8cf595a0ef0 Mon Sep 17 00:00:00 2001
+From cf4db608004f7c1f137ed556e3ba6b6f4d65da96 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Tue, 28 Feb 2017 10:06:42 -0800
 Subject: [PATCH] libiscsi format-security build errors
@@ -31,5 +31,5 @@ index bb17dfc..7003388 100644
  	}
  
 -- 
-2.21.0
+2.26.2
 

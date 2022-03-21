@@ -6,12 +6,13 @@ Distribution:   Mariner
 
 Name:           sblim-cim-client2
 Version:        2.2.5
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        Java CIM Client library
 
 License:        EPL
 URL:            http://sourceforge.net/projects/sblim/
 Source0:        http://downloads.sourceforge.net/project/sblim/%{name}/%{version}/%{name}-%{version}-src.zip
+Patch0:         sblim-cim-client2-2.2.5-fix-for-java-11-openjdk.patch
 
 BuildArch:      noarch
 
@@ -48,6 +49,7 @@ Manual and sample code for %{name}.
 
 %prep
 %setup -q -n %{project_folder}
+%patch0 -p1 -b .fix-for-java-11-openjdk
 
 dos2unixConversion() {
         fileName=$1
@@ -69,6 +71,8 @@ dosFiles2unix 'smpl/org/sblim/cimclient/samples/*'
 export ANT_OPTS="-Xmx256m"
 ant \
         -Dbuild.compiler=modern \
+        -Dcompile.source=1.6 \
+        -Dcompile.target=1.6 \
         -DManifest.version=%{version}\
         package java-doc
 
@@ -110,6 +114,9 @@ cp -pr %{archive_folder}/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 %doc %{_pkgdocdir}/org
 
 %changelog
+* Thu Feb 17 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.5-16
+- Updating used version of Java.
+
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.2.5-15
 - Rename java-headless dependency to java
 - License verified

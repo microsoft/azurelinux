@@ -4,7 +4,7 @@
 
 Name:           javapackages-tools-meta
 Version:        5.3.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 
 Summary:        Macros and scripts for Java packaging support
 
@@ -12,7 +12,6 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fedora-java/javapackages
-Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -76,10 +75,14 @@ This package provides non-essential macros and scripts to support Java packaging
 %files -n ivy-local
 
 %changelog
+* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.3.0-11
+- Removing source tarball. This package doesn't provide or build anything, it's just a grouping of dependencies.
+
 * Thu Nov 12 2020 Ruying Chen <v-ruyche@microsoft.com> - 5.3.0-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Create javapackages-local-bootstrap without xmvn requires.
 - Add requires on upstream javapackages-tools.
+- License verified.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

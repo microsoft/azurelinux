@@ -1,9 +1,7 @@
-%{!?_with_bootstrap: %global bootstrap 0}
-
 Summary:        Cross-platform, Python-agnostic binary package manager
 Name:           conda
-Version:        4.10.1
-Release:        2%{?dist}
+Version:        4.11.0
+Release:        1%{?dist}
 License:        BSD and ASL 2.0 and LGPLv2+ and MIT
 # The conda code is BSD
 # progressbar is LGPLv2+
@@ -17,7 +15,8 @@ Source0:        https://github.com/conda/conda/archive/%{version}/%{name}-%{vers
 Source1:        https://raw.githubusercontent.com/tartansandal/conda-bash-completion/1.5/conda
 Patch0:         conda_sys_prefix.patch
 Patch1:         conda_gateways_disk_create.patch
-Patch2:         setup.patch
+# Fix typo
+Patch2:         conda-memoize.patch
 # Use system cpuinfo
 Patch3:         conda-cpuinfo.patch
 
@@ -26,11 +25,10 @@ Patch10003:     0003-Drop-fs-path-encoding-manipulation-under-python2.patch
 Patch10004:     0004-Do-not-try-to-run-usr-bin-python.patch
 Patch10005:     0005-Fix-failing-tests-in-test_api.py.patch
 Patch10006:     0006-shell-assume-shell-plugins-are-in-etc.patch
+Patch10007:     0001-Add-back-conda-and-conda_env-entry-point.patch
+Patch10008:     0002-Go-back-to-ruamel_yaml.patch
 
 BuildArch:      noarch
-
-# Temp: Do not build with x86_64 due to docker build issue
-ExclusiveArch:  aarch64
 
 BuildRequires:  bash-completion-devel
 %global bash_completionsdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null || echo '/etc/bash_completion.d')
@@ -58,10 +56,12 @@ can only use conda to create and manage new environments.}
 %global _py3_reqs \
         python%{python3_pkgversion}-cpuinfo \
         python%{python3_pkgversion}-conda-package-handling >= 1.3.0 \
+        python%{python3_pkgversion}-cytoolz >= 0.8.2 \
         python%{python3_pkgversion}-distro >= 1.0.4 \
         python%{python3_pkgversion}-frozendict >= 1.2 \
         python%{python3_pkgversion}-pycosat >= 0.6.3 \
         python%{python3_pkgversion}-pyOpenSSL >= 16.2.0 \
+        python%{python3_pkgversion}-PyYAML \
         python%{python3_pkgversion}-requests >= 2.18.4 \
         python%{python3_pkgversion}-ruamel-yaml >= 0.11.14 \
         python%{python3_pkgversion}-tqdm >= 4.22.0 \
@@ -75,16 +75,17 @@ Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  %py3_reqs
+
 # For tests
 BuildRequires:  python3
 %if %{with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python%{python3_pkgversion}-mock
+BuildRequires:  python%{python3_pkgversion}-pytest-cov
 BuildRequires:  python%{python3_pkgversion}-responses
 %endif
 
 Requires:       %py3_reqs
-Requires:       python%{python3_pkgversion}-cytoolz >= 0.8.2
 Provides:       bundled(python%{python3_pkgversion}-appdirs) = 1.2.0
 Provides:       bundled(python%{python3_pkgversion}-auxlib)
 Provides:       bundled(python%{python3_pkgversion}-boltons) = 18.0.0
@@ -99,14 +100,16 @@ Provides:       bundled(python%{python3_pkgversion}-toolz) = 0.8.2
 %autosetup -p1
 
 sed -r -i 's/^(__version__ = ).*/\1"%{version}"/' conda/__init__.py
+# xdoctest not packaged
+sed -i -e '/xdoctest/d' setup.cfg
 
 # delete interpreter line, the user can always call the file
 # explicitly as python3 /usr/lib/python3.6/site-packages/conda/_vendor/appdirs.py
 # or so.
 sed -r -i '1 {/#![/]usr[/]bin[/]env/d}' conda/_vendor/appdirs.py
 
-# Use Fedora's cpuinfo since it supports more arches
 rm conda/_vendor/cpuinfo.py
+rm conda/_vendor/toolz/[a-zA-Z]*
 
 # Use system versions
 # TODO - urllib3 - results in test failures: https://github.com/conda/conda/issues/9512
@@ -124,12 +127,12 @@ sed -i -e s/linux-64/%{python3_platform}/ tests/data/conda_format_repo/%{python3
 
 %build
 # build conda executable
-%define py_setup utils/setup-testing.py
+%define py_setup setup.py
 %py3_build
 
 %install
 # install conda executable
-%define py_setup utils/setup-testing.py
+%define py_setup setup.py
 %py3_install
 
 mkdir -p %{buildroot}%{_datadir}/conda/condarc.d
@@ -154,8 +157,6 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
 
 %check
-export PATH=%{buildroot}%{_bindir}:$PATH
-PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
 # Integration tests generally require network, so skip them.
 
@@ -184,8 +185,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 # tests/gateways/disk/test_permissions.py::test_recursive_make_writable \
 # tests/gateways/disk/test_permissions.py::test_make_executable 
 
-
 mkdir /tmp
+export PATH=%{buildroot}%{_bindir}:$PATH
+PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
@@ -193,10 +195,11 @@ pip3 install atomicwrites>=1.3.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
     pytest>=5.4.0 \
-    pytest-cov>=2.7.1 
-PATH=%{buildroot}%{_bindir}:${PATH} \
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -vv -m "not integration" \
+    pytest-cov>=2.7.1 \
+    pytest-timeout \
+    pytest-rerunfailures
+
+python%{python3_version} -m pytest -vv -m "not integration" \
     --deselect=tests/test_cli.py::TestJson::test_list \
     --deselect=tests/test_cli.py::TestRun::test_run_returns_int \
     --deselect=tests/test_cli.py::TestRun::test_run_returns_nonzero_errorlevel \
@@ -212,7 +215,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
     --deselect=tests/gateways/disk/test_delete.py::test_remove_file_to_trash \
     --deselect=tests/gateways/disk/test_permissions.py::test_make_writable \
     --deselect=tests/gateways/disk/test_permissions.py::test_recursive_make_writable \
-    --deselect=tests/gateways/disk/test_permissions.py::test_make_executable 
+    --deselect=tests/gateways/disk/test_permissions.py::test_make_executable \
+    --deselect=tests/gateways/test_subprocess.py::test_subprocess_call_with_live_stream 
 
 
 %files
@@ -238,6 +242,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 
 %changelog
+* Fri Jan 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.11.0-1
+- Update source to 4.11.0
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.10.1-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
