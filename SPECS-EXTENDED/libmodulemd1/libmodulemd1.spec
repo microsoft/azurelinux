@@ -2,13 +2,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libmodulemd1
 Version:        1.8.16
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Module metadata manipulation library
 
 License:        MIT
 URL:            https://github.com/fedora-modularity/libmodulemd
 Source0:        %{url}/releases/download/libmodulemd-%{version}/modulemd-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  meson >= 0.47
 BuildRequires:  pkgconfig
 BuildRequires:  gcc
@@ -62,7 +63,7 @@ Development files for libmodulemd.
 
 
 %build
-%meson -Ddeveloper_build=false
+%meson -Ddeveloper_build=false -Denable-gtk-doc=false
 %meson_build
 
 
@@ -105,15 +106,17 @@ export MMD_SKIP_VALGRIND=1
 %{_includedir}/modulemd/
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/Modulemd-1.0.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/modulemd-1.0/
 
 
 %files -n python%{python3_pkgversion}-%{name}
 
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.16-4
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.16-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

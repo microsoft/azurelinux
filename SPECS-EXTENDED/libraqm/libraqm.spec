@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:				libraqm
 Version:			0.7.0
-Release:			6%{?dist}
+Release:			7%{?dist}
 License:			MIT
 Summary:			Complex Textlayout Library
 Summary(ar):		مكتبة رقم للنّصوص المركّبة
@@ -14,8 +14,8 @@ BuildRequires:      python2
 %else
 BuildRequires:      python3
 %endif
-
-BuildRequires:      gcc
+BuildRequires:    %{_bindir}/xsltproc
+BuildRequires:    gcc
 BuildRequires:		freetype-devel
 BuildRequires:		harfbuzz-devel
 BuildRequires:		fribidi-devel
@@ -59,7 +59,7 @@ This package contains documentation files for raqm.
 %if ! 0%{?el7}
 sed s:python:%{__python3}:g -i tests/Makefile.in #Fixed in next release on upstream
 %endif
-%configure --enable-gtk-doc
+%configure --disable-gtk-doc
 
 %build
 make %{?_smp_mflags}
@@ -95,6 +95,11 @@ rm -f %{buildroot}%{_libdir}/*.{la,a}
 %{_datadir}/gtk-doc/html/raqm
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.0-7
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.0-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

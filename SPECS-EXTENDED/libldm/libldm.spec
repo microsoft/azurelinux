@@ -2,19 +2,19 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libldm
 Version:        0.2.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A tool to manage Windows dynamic disks
 
 License:        LGPLv3+ and GPLv3+
 URL:            https://github.com/mdbooth/libldm 
 Source0:        https://github.com/mdbooth/libldm/archive/%{name}-%{version}.tar.gz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  autoconf, automake, libtool
 BuildRequires:  glib2-devel >= 2.26.0
 BuildRequires:  json-glib-devel >= 0.14.0
 BuildRequires:  device-mapper-devel >= 1.0
 BuildRequires:  zlib-devel libuuid-devel readline-devel
-BuildRequires:  gtk-doc
 
 
 %description
@@ -43,7 +43,7 @@ autoreconf -i
 
 
 %build
-%configure --disable-static --enable-gtk-doc
+%configure --disable-static --disable-gtk-doc
 make %{?_smp_mflags} V=1
 
 
@@ -66,10 +66,14 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/ldm-1.0.pc
-%{_datadir}/gtk-doc
 
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.4-8
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.4-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

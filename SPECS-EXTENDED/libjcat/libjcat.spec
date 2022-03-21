@@ -6,12 +6,12 @@ Distribution:   Mariner
 Summary:   Library for reading Jcat files
 Name:      libjcat
 Version:   0.1.6
-Release:   2%{?dist}
+Release:   3%{?dist}
 License:   LGPLv2+
 URL:       https://github.com/hughsie/libjcat
 Source0:   https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
 
-BuildRequires: gtk-doc
+BuildRequires: %{_bindir}/xsltproc
 BuildRequires: meson
 BuildRequires: gobject-introspection-devel
 BuildRequires: glib2-devel >= %{glib2_version}
@@ -50,7 +50,7 @@ Executable and data files for installed tests.
 %build
 
 %meson \
-    -Dgtkdoc=true \
+    -Dgtkdoc=false \
     -Dtests=true
 
 %meson_build
@@ -73,9 +73,6 @@ Executable and data files for installed tests.
 %files devel
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/*.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/libjcat
 %{_includedir}/libjcat-1
 %{_libdir}/libjcat.so
 %{_libdir}/pkgconfig/jcat.pc
@@ -91,6 +88,11 @@ Executable and data files for installed tests.
 %dir %{_datadir}/installed-tests/libjcat
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.6-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.6-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

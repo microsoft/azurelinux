@@ -4,15 +4,15 @@ Distribution:   Mariner
 Summary:	Reference implementation of the iCalendar data type and serialization format
 Name:		libical
 Version:	3.0.9
-Release:	3%{?dist}
+Release:	4%{?dist}
 License:	LGPLv2 or MPLv2.0
 URL:		https://libical.github.io/libical/
 Source:		https://github.com/%{name}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
 BuildRequires:	cmake
-BuildRequires:	gtk-doc
 BuildRequires:	pkgconfig
 BuildRequires:	pkgconfig(gobject-2.0)
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
@@ -48,13 +48,6 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 This package provides a GObject wrapper for libical library with support
 of GObject Introspection.
 
-%package glib-doc
-Summary:	Documentation files for %{name}-glib
-BuildArch:	noarch
-
-%description glib-doc
-This package contains developer documentation for %{name}-glib.
-
 %package glib-devel
 Summary:	Development files for building against %{name}-glib
 Requires:	%{name}-devel%{?_isa} = %{version}-%{release}
@@ -71,6 +64,7 @@ Development files needed for building things which link against %{name}-glib.
   -DUSE_INTEROPERABLE_VTIMEZONES:BOOL=true \
   -DICAL_ALLOW_EMPTY_PROPERTIES:BOOL=true \
   -DGOBJECT_INTROSPECTION:BOOL=true \
+  -DICAL_BUILD_DOCS:BOOL=false \
   -DICAL_GLIB:BOOL=true \
   -DICAL_GLIB_VAPI:BOOL=true \
   -DSHARED_ONLY:BOOL=true
@@ -130,10 +124,12 @@ make test ARGS="-V" -C %{_target_platform}
 %{_includedir}/libical-glib/
 %{_datadir}/vala/vapi/libical-glib.vapi
 
-%files glib-doc
-%{_datadir}/gtk-doc/html/%{name}-glib
-
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-4
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Mon Mar 22 2021 Henry Li <lihl@microsoft.com> - 3.0.9-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Remove %undefine __cmake_in_source_build to perform cmake build in the right location

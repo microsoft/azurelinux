@@ -4,11 +4,12 @@ Distribution:   Mariner
 Summary:        Power Management Service
 Name:           upower
 Version:        0.99.11
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 URL:            http://upower.freedesktop.org/
 Source0:        https://gitlab.freedesktop.org/upower/upower/uploads/%{commit}/%{name}-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  sqlite-devel
 BuildRequires:  libtool
 BuildRequires:  gettext
@@ -19,7 +20,6 @@ BuildRequires:  libimobiledevice-devel
 %endif
 BuildRequires:  glib2-devel >= 2.6.0
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gtk-doc
 BuildRequires:  systemd
 Requires:       udev
 Requires:       gobject-introspection
@@ -36,20 +36,12 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %description devel
 Headers and libraries for UPower.
 
-%package devel-docs
-Summary: Developer documentation for for libupower-glib
-Requires: %{name} = %{version}-%{release}
-BuildArch: noarch
-
-%description devel-docs
-Developer documentation for for libupower-glib.
-
 %prep
 %autosetup -p1
 
 %build
 %configure \
-        --enable-gtk-doc \
+        --disable-gtk-doc \
         --disable-static \
         --enable-introspection \
         --with-udevrulesdir=%{_udevrulesdir} \
@@ -108,12 +100,12 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_includedir}/libupower-glib/up-*.h
 %{_includedir}/libupower-glib/upower.h
 
-%files devel-docs
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html/UPower
-%{_datadir}/gtk-doc/html/UPower/*
-
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.11-5
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Tue Jun 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.99.11-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Specify udev rules directory and systemd system unit dir

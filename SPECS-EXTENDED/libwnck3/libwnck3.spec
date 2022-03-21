@@ -5,18 +5,18 @@ Distribution:   Mariner
 Summary: Window Navigator Construction Kit
 Name: libwnck3
 Version: 3.36.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://download.gnome.org/sources/%{source_name}/
 Source0: http://download.gnome.org/sources/%{source_name}/3.36/%{source_name}-%{version}.tar.xz
 License: LGPLv2+
 
+BuildRequires: %{_bindir}/xsltproc
 BuildRequires: gcc
 BuildRequires: meson
 BuildRequires: gettext
 BuildRequires: glib2-devel
 BuildRequires: gobject-introspection-devel
 BuildRequires: gtk3-devel
-BuildRequires: gtk-doc
 BuildRequires: libXres-devel
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
@@ -42,7 +42,7 @@ developing applications that use %{name}.
 
 
 %build
-%meson -Dgtk_doc=true
+%meson -Dgtk_doc=false
 %meson_build
 
 
@@ -68,10 +68,14 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/*
 %{_includedir}/%{source_name}-3.0/
 %{_datadir}/gir-1.0/Wnck-3.0.gir
-%doc %{_datadir}/gtk-doc
 
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
