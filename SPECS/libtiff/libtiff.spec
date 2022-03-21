@@ -15,6 +15,7 @@ Patch2: CVE-2020-35523.patch
 Patch3: CVE-2020-35524.patch
 Patch4: CVE-2022-0561.patch
 Patch5: CVE-2022-0562.patch
+Patch6: CVE-2022-0891.patch
 BuildRequires:  libjpeg-turbo-devel
 Requires:       libjpeg-turbo
 
@@ -36,6 +37,7 @@ It contains the libraries and header files to create applications
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
 sh autogen.sh
@@ -73,7 +75,7 @@ make %{?_smp_mflags} -k check
 
 %changelog
 * Thu Mar 17 2022 Muhammad Falak <mwani@microsoft.com> - 4.1.0-3
-- Backport patches from upstream to fix CVE-2022-0561 & CVE-2022-0562
+- Backport patches from upstream to fix CVE-2022-0561, CVE-2022-0562 & CVE-2022-0891
 
 * Fri Mar 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 4.1.0-2
 - Add patches for CVE-2020-35521, CVE-2020-35522, CVE-2020-35523, CVE-2020-35524
