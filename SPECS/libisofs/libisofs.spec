@@ -1,21 +1,21 @@
-Summary:	Library to create ISO 9660 disk images
-Name:		libisofs
-Version:	1.5.4
-Release:	1%{?dist}
+Summary:  Library to create ISO 9660 disk images
+Name:     libisofs
+Version:  1.5.4
+Release:  1%{?dist}
 # make_isohybrid_mbr.c is under LGPLv2+, the rest under GPLv2+
-License:	GPLv2+ and LGPLv2+
-Group:		System Environment/Libraries
-URL:		  https://dev.lovelyhq.com/libburnia/libisofs
-Source0:	https://dev.lovelyhq.com/libburnia/libisofs/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:		libisofs-0.6.16-multilib.patch
+License:  GPLv2+ and LGPLv2+
+Group:    System Environment/Libraries
+URL:      https://dev.lovelyhq.com/libburnia/libisofs
+Source0:  https://dev.lovelyhq.com/libburnia/libisofs/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:   libisofs-0.6.16-multilib.patch
 
-BuildRequires:	autoconf
-BuildRequires:	automake
-BuildRequires:	libtool
-BuildRequires:	gcc
-BuildRequires:	libacl-devel
-BuildRequires:	make
-BuildRequires:	zlib-devel
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+BuildRequires:  gcc
+BuildRequires:  libacl-devel
+BuildRequires:  make
+BuildRequires:  zlib-devel
 
 %description
 Libisofs is a library to create an ISO-9660 filesystem and supports
@@ -27,9 +27,9 @@ ACLs and xattr in ISO-9660 filesystems as well. As it is linked with
 zlib, it supports zisofs compression, too.
 
 %package devel
-Summary:	Development files for %{name}
-Group:		Development/Libraries
-Requires:	%{name}%{?_isa} = %{version}-%{release}, pkg-config
+Summary:  Development files for %{name}
+Group:    Development/Libraries
+Requires: %{name}%{?_isa} = %{version}-%{release}, pkg-config
 
 %description devel
 The %{name}-devel package contains libraries and header files for
