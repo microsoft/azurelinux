@@ -15,4 +15,3 @@ index 2df417d..1af5635 100644
    const char* data_;
    size_t size_;
  };
- 
