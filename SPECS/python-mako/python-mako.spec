@@ -2,7 +2,7 @@
 Summary:        Python templating language
 Name:           python-mako
 Version:        1.1.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,7 +46,7 @@ ln -s mako-render %{buildroot}/%{_bindir}/mako-render3
 
 %check
 pip3 install tox
-tox -e py39
+tox -e py%{python3_version_nodots}
 
 %files -n python3-mako
 %defattr(-,root,root,-)
@@ -56,6 +56,9 @@ tox -e py39
 %{_bindir}/mako-render3
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.5-2
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Wed Feb 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.5-1
 - Bump version to 1.1.5
 - Introduce macro to generate underscored version

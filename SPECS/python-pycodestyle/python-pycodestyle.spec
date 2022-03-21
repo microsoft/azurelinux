@@ -1,29 +1,29 @@
-Summary:        A tool to check your Python code
+Summary:        Simple Python style checker in one Python file
 Name:           python-pycodestyle
-Version:        2.5.0
-Release:        5%{?dist}
+Version:        2.8.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/pycodestyle/
-#Source0:       https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/PyCQA/pycodestyle/archive/refs/tags/%{version}.tar.gz#/pycodestyle-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 pycodestyle is a tool to check your Python code against some of the style conventions in PEP 8.
 
 %package -n     python3-pycodestyle
-Summary:        python-pycodestyle
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
+Summary:        Simple Python style checker in one Python file
 Requires:       python3
 
 %description -n python3-pycodestyle
-
-Python 3 version.
+pycodestyle is a tool to check your Python code against some of the style conventions in PEP 8.
 
 %prep
 %autosetup -n pycodestyle-%{version}
@@ -35,7 +35,8 @@ Python 3 version.
 %py3_install
 
 %check
-%{python3} setup.py test
+pip3 install tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-pycodestyle
 %defattr(-,root,root,-)
@@ -44,6 +45,12 @@ Python 3 version.
 %{_bindir}/pycodestyle
 
 %changelog
+* Tue Mar 15 2022 Thomas Crain <thcrain@microsoft.com> - 2.8.0-1
+- Upgrade to latest upstream release
+- Switch source from PyPI to GitHub
+- Switch package test to use tox as a test runner
+- License verified
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.0-5
 - Add license to python3 package
 - Remove python2 package

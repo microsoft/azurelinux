@@ -2,7 +2,7 @@
 Summary:        Pytest plugin for coverage reporting
 Name:           python-%{srcname}
 Version:        2.12.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,7 +43,7 @@ rm -rf *.egg-info
 
 %check
 pip3 install tox
-tox -e py39 -v
+tox -e py%{python3_version_nodots} -v
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE
@@ -51,6 +51,9 @@ tox -e py39 -v
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 2.12.1-2
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Wed Feb 16 2022 Muhammad Falak <mwani@microsoft.com> - 2.12.1-1
 - Bump version to 2.12.1
 - Introduce patch to skip known test failures

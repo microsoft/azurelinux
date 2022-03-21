@@ -1,13 +1,15 @@
 Summary:        Python library to retrieve information about network interfaces
 Name:           python-netifaces
-Version:        0.10.9
-Release:        4%{?dist}
+Version:        0.11.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://alastairs-place.net/netifaces/
 Source0:        https://pypi.python.org/packages/source/n/netifaces/netifaces-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 
 %description
 This package provides a cross platform API for getting address information
@@ -15,11 +17,7 @@ from network interfaces.
 
 %package -n python3-netifaces
 Summary:        Python library to retrieve information about network interfaces
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-netifaces
 This package provides a cross platform API for getting address information
@@ -34,6 +32,9 @@ from network interfaces.
 %install
 %py3_install
 
+%check
+PYTHONPATH=%{buildroot}%{python3_sitelib} %python3 test.py
+
 %files -n python3-netifaces
 %defattr(-,root,root)
 %license LICENSE
@@ -41,6 +42,10 @@ from network interfaces.
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 0.11.0-1
+- Upgrade to latest upstream version
+- Add package test
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.10.9-4
 - Add build instructions
 - Add license to python3 package

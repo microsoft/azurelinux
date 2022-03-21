@@ -34,8 +34,8 @@ version_matching_groups = [
         "SPECS/kernel/kernel.spec"
     ]),
     frozenset([
-        "SPECS/azure-iotedge/azure-iotedge.spec",
-        "SPECS/libiothsm-std/libiothsm-std.spec"
+        "SPECS/dbus/dbus.spec",
+        "SPECS-EXTENDED/dbus-x11/dbus-x11.spec"
     ])
 ]
 

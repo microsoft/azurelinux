@@ -3,7 +3,7 @@
 Summary:        Gives a fake root environment
 Name:           fakeroot
 Version:        1.25.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 # setenv.c: LGPLv2+
 # the rest: GPLv3+
 License:        GPLv3+ AND LGPLv2+
@@ -182,6 +182,9 @@ fi
 %ghost %{_libdir}/libfakeroot/libfakeroot-0.so
 
 %changelog
+* Mon Mar 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.25.3-2
+- Update `relax_tartest.patch` to enable ptest
+
 * Thu Dec 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.25.3-1
 - Update to version 1.25.3.
 - Apply fix to build with 'glibc' 2.33+.

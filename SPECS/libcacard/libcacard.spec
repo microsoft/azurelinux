@@ -1,7 +1,7 @@
 Summary:        CAC (Common Access Card) library
 Name:           libcacard
 Version:        2.7.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ BuildRequires:  gnutls-utils
 BuildRequires:  pkgconfig(nss)
 BuildRequires:  openssl
 %if %{with_check}
+BuildRequires:  nss-tools
 BuildRequires:  softhsm
 BuildRequires:  opensc
 %endif
@@ -66,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/libcacard.pc
 
 %changelog
+* Mon Mar 07 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.7.0-11
+- Reverting removal of nss-tools BR for ptests.
+
 * Tue Mar 01 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.7.0-10
 - Switching to pkgconfig(nss) BR.
 

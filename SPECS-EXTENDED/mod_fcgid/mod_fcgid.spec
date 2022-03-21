@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:		mod_fcgid
 Version:	2.3.9
-Release:	20%{?dist}
+Release:	21%{?dist}
 Summary:	FastCGI interface module for Apache 2
 License:	ASL 2.0
 URL:		http://httpd.apache.org/mod_fcgid/
@@ -25,6 +25,7 @@ BuildRequires:	httpd-devel >= 2.0
 BuildRequires:	make
 BuildRequires:	pkgconfig
 BuildRequires:	sed
+BuildRequires:	systemd-rpm-macros
 Requires:	httpd-mmn
 # %%systemd_units needed for ownership of %%{_tmpfilesdir}
 %if %{rundir_tmpfs}
@@ -75,11 +76,7 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/mod_fcgid.conf
 %endif
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE-FCGID
-%else
-%doc LICENSE-FCGID
-%endif
 %doc README.RPM README.SELinux
 # mod_fcgid.html.en is explicitly encoded as ISO-8859-1
 %doc CHANGES-FCGID NOTICE-FCGID README-FCGID STATUS-FCGID
@@ -96,6 +93,10 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/mod_fcgid.conf
 %dir %attr(0775,root,apache) %{rundir}/mod_fcgid/
 
 %changelog
+* Tue Mar 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.9-21
+- Adding missing BR on 'systemd-rpm-macros'.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.9-20
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

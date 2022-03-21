@@ -1,7 +1,7 @@
 Summary:        Amazon Web Services Library.
 Name:           python-botocore
 Version:        1.23.52
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,7 +38,7 @@ A low-level interface to a growing number of Amazon Web Services. The botocore p
 
 %check
 pip3 install tox
-tox -e py39
+tox -e py%{python3_version_nodots}
 
 %files -n python3-botocore
 %defattr(-,root,root)
@@ -46,6 +46,9 @@ tox -e py39
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.23.52-3
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Thu Mar 03 2022 Muhammad Falak <mwani@microsfot.com> - 1.23.52-2
 - Drop un-needed BRs for `%check` section.
 - Switch to tox for testing.
