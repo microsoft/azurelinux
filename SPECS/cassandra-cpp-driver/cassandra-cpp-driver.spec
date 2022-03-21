@@ -54,6 +54,6 @@ cd build
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Wed Sep 1 2021 Andy Caldwell <andycaldwell@microsoft.com> - 2.16.0-1
+* Wed Sep 01 2021 Andy Caldwell <andycaldwell@microsoft.com> - 2.16.0-1
 - Original version for CBL-Mariner
 - License verified
