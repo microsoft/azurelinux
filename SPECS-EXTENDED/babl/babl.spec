@@ -17,7 +17,7 @@ Distribution:   Mariner
 Summary:	A dynamic, any to any, pixel format conversion library
 Name:		babl
 Version:	0.1.82
-Release:	2%{?dist}
+Release:	3%{?dist}
 
 # Compute some version related macros
 # Ugly hack, you need to get your quoting backslashes/percent signs straight
@@ -36,6 +36,7 @@ BuildRequires:	gobject-introspection-devel
 BuildRequires:	librsvg2-tools
 BuildRequires:	meson, vala
 BuildRequires:	pkgconfig(lcms2)
+BuildRequires:	openssh-clients
 
 %description
 Babl is a dynamic, any to any, pixel format conversion library. It
@@ -117,6 +118,10 @@ popd
 %doc %{develdocdir}
 
 %changelog
+* Fri Mar 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.82-3
+- Adding BR on "openssh-clients" to provide "scp".
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.82-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

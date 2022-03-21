@@ -134,16 +134,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "alsa-firmware",
-          "version": "1.2.1",
-          "downloadUrl": "ftp://ftp.alsa-project.org/pub/firmware/alsa-firmware-1.2.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "alsa-lib",
           "version": "1.2.6.1",
           "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
@@ -1587,8 +1577,8 @@
         "type": "other",
         "other": {
           "name": "catatonit",
-          "version": "0.1.5",
-          "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.5.tar.gz"
+          "version": "0.1.7",
+          "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.7.tar.gz"
         }
       }
     },
@@ -27557,8 +27547,8 @@
         "type": "other",
         "other": {
           "name": "spice-vdagent",
-          "version": "0.20.0",
-          "downloadUrl": "https://spice-space.org/download/releases/spice-vdagent-0.20.0.tar.bz2"
+          "version": "0.22.1",
+          "downloadUrl": "https://spice-space.org/download/releases/spice-vdagent-0.22.1.tar.bz2"
         }
       }
     },

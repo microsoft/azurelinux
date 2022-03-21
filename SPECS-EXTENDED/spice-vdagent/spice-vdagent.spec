@@ -1,17 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           spice-vdagent
-Version:        0.20.0
-Release:        3%{?dist}
+Version:        0.22.1
+Release:        1%{?dist}
 Summary:        Agent for Spice guests
 License:        GPLv3+
 URL:            https://spice-space.org/
 Source0:        https://spice-space.org/download/releases/%{name}-%{version}.tar.bz2
-Source1:        https://spice-space.org/download/releases/%{name}-%{version}.tar.bz2.sig
-Source2:        victortoso-E37A484F.keyring
+BuildRequires:  make
 BuildRequires:  systemd-devel
 BuildRequires:  glib2-devel >= 2.50
-BuildRequires:  spice-protocol >= 0.14.1
+BuildRequires:  spice-protocol >= 0.14.3
 BuildRequires:  libpciaccess-devel libXrandr-devel libXinerama-devel
 BuildRequires:  libXfixes-devel systemd desktop-file-utils libtool
 BuildRequires:  alsa-lib-devel dbus-devel libdrm-devel
@@ -19,9 +18,6 @@ BuildRequires:  alsa-lib-devel dbus-devel libdrm-devel
 BuildRequires:  automake autoconf
 BuildRequires:  gnupg2
 %{?systemd_requires}
-
-Patch0001: 0001-vdagentd-work-around-GLib-s-fork-issues.patch
-Patch0002: 0002-vdagentd-init-static-uinput-before-fork.patch
 
 %description
 Spice agent for Linux guests offering the following features:
@@ -37,18 +33,17 @@ Features:
 
 
 %prep
-gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %autosetup -p1
 autoreconf -fi
 
 
 %build
 %configure --with-session-info=systemd --with-init-script=systemd
-make %{?_smp_mflags} V=2
+%make_build V=2
 
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT V=2
+%make_install V=2
 
 
 %post
@@ -62,11 +57,13 @@ make install DESTDIR=$RPM_BUILD_ROOT V=2
 
 
 %files
-%doc COPYING CHANGELOG.md README.md
+%license COPYING
+%doc CHANGELOG.md README.md
 /usr/lib/udev/rules.d/70-spice-vdagentd.rules
 %{_unitdir}/spice-vdagentd.service
 %{_unitdir}/spice-vdagentd.socket
 %{_prefix}/lib/tmpfiles.d/spice-vdagentd.conf
+%{_userunitdir}/spice-vdagent.service
 %{_bindir}/spice-vdagent
 %{_sbindir}/spice-vdagentd
 %{_var}/run/spice-vdagentd
@@ -78,6 +75,10 @@ make install DESTDIR=$RPM_BUILD_ROOT V=2
 
 
 %changelog
+* Fri Mar 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.22.1-1
+- Updating to version 0.22.1 using Fedora 36 spec (license: MIT) for guidance.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
