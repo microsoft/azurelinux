@@ -4,14 +4,13 @@
 %global mod_name mock
 Summary:        A Python Mocking and Patching Library for Testing
 Name:           python-mock
-Version:        3.0.5
-Release:        9%{?dist}
+Version:        4.0.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.voidspace.org.uk/python/mock/
-#Source0:        https://github.com/testing-cabal/mock/archive/refs/tags/%{version}.tar.gz
-Source0:        %{mod_name}-%{version}.tar.gz
+Source0:        https://pypi.python.org/packages/source/m/%{mod_name}/%{mod_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildArch:      noarch
@@ -66,6 +65,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{mod_name}
 
 %changelog
+* Mon Mar 21 2022 Nick Samson <nicksamson@microsoft.com> - 4.0.3-1
+- Upgraded to 4.0.3
+- Updated source URL to use PyPI source for URL stability
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.0.5-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT)
 - License verified
