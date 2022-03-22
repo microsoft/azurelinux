@@ -58,6 +58,7 @@ Patch1032:      CVE-2010-4563.nopatch
 Patch1033:      CVE-2011-0640.nopatch
 Patch1034:      CVE-2022-0492.nopatch
 Patch1035:      CVE-2021-3743.nopatch
+Patch1036:      CVE-2022-26966.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -410,7 +411,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Address CVES: 2022-0617, 2022-25375, 2022-25258, 2021-4090, 2022-25265,
   2021-45402, 2022-0382, 2022-0185, 2021-44879, 2022-24959, 2022-0264, 
   2022-24448, 2022-24122, 2021-20194, 2022-0847, 1999-0524, 2008-4609,
-  2010-0298, 2010-4563, 2011-0640, 2022-0492, 2021-3743
+  2010-0298, 2010-4563, 2011-0640, 2022-0492, 2021-3743, 2022-26966
 
 * Mon Mar 07 2022 George Mileka <gmileka@microsoft.com> - 5.15.18.1-5
 - Enabled vfio noiommu.
