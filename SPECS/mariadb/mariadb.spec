@@ -20,6 +20,7 @@ BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
 
@@ -73,11 +74,11 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 mkdir build && cd build
 
 cmake -DCMAKE_BUILD_TYPE=Release                        \
-      -DCMAKE_INSTALL_PREFIX=%{_prefix}                       \
-      -DINSTALL_DOCDIR=share/doc/mariadb-10.2.8         \
-      -DINSTALL_DOCREADMEDIR=share/doc/mariadb-10.2.8   \
+      -DCMAKE_INSTALL_PREFIX=%{_prefix}                 \
+      -DINSTALL_DOCDIR=share/doc/mariadb-%{version}     \
+      -DINSTALL_DOCREADMEDIR=share/doc/mariadb-%{version} \
       -DINSTALL_MANDIR=share/man                        \
-      -DINSTALL_MYSQLSHAREDIR="share/mysql"           \
+      -DINSTALL_MYSQLSHAREDIR="share/mysql"             \
       -DINSTALL_SYSCONFDIR="%{_sysconfdir}"             \
       -DINSTALL_SYSCONF2DIR="%{_sysconfdir}/my.cnf.d"   \
       -DINSTALL_MYSQLTESTDIR=share/mysql/test           \
@@ -86,7 +87,7 @@ cmake -DCMAKE_BUILD_TYPE=Release                        \
       -DINSTALL_SCRIPTDIR=bin                           \
       -DINSTALL_SQLBENCHDIR=share/mysql/bench           \
       -DINSTALL_SUPPORTFILESDIR=share                   \
-      -DMYSQL_DATADIR="%{_sharedstatedir}/mysql"               \
+      -DMYSQL_DATADIR="%{_sharedstatedir}/mysql"        \
       -DMYSQL_UNIX_ADDR="%{_sharedstatedir}/mysql/mysqld.sock" \
       -DWITH_EXTRA_CHARSETS=complex                     \
       -DWITH_EMBEDDED_SERVER=ON                         \
@@ -166,7 +167,10 @@ rm -rf %{buildroot}
 %{_bindir}/mysqlimport
 %{_bindir}/mysqlshow
 %{_bindir}/mysqlslap
+%{_bindir}/mariadb
+%{_bindir}/mariadb-*
 %{_bindir}/mariadb_config
+%{_bindir}/mariadbd-*
 %{_bindir}/mysql_client_test
 %{_bindir}/mysql_client_test_embedded
 %{_bindir}/mysql_config
@@ -218,9 +222,7 @@ rm -rf %{buildroot}
 
 %exclude %{_datadir}/mysql/bench
 %exclude %{_datadir}/mysql/test
-%exclude %{_prefix}/data/test/db.opt
-%exclude %{_docdir}/mariadb-10.2.8/*
-%exclude %{_sysconfdir}/init.d/mysql
+%exclude %{_docdir}/mariadb-%{version}/*
 
 %files server
 %config(noreplace) %{_sysconfdir}/logrotate.d/mysql
@@ -229,6 +231,8 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/my.cnf.d/enable_encryption.preset
 %config(noreplace) %{_sysconfdir}/my.cnf.d/mysql-clients.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/server.cnf
+%config(noreplace) %{_sysconfdir}/my.cnf.d/spider.cnf
+%config(noreplace) %{_sysconfdir}/my.cnf.d/s3.cnf
 %dir %attr(0750,mysql,mysql) %{_sharedstatedir}/mysql
 %{_libdir}/mysql/plugin*
 %{_bindir}/aria_chk
@@ -236,6 +240,7 @@ rm -rf %{buildroot}
 %{_bindir}/aria_ftdump
 %{_bindir}/aria_pack
 %{_bindir}/aria_read_log
+%{_bindir}/aria_s3_copy
 %{_bindir}/innochecksum
 %{_bindir}/mariabackup
 %{_bindir}/mariadb-service-convert
@@ -278,41 +283,9 @@ rm -rf %{buildroot}
 %{_datadir}/policy/selinux/mariadb.te
 %{_datadir}/wsrep.cnf
 %{_datadir}/wsrep_notify
-%{_mandir}/man1/aria_chk.1.gz
-%{_mandir}/man1/aria_dump_log.1.gz
-%{_mandir}/man1/aria_ftdump.1.gz
-%{_mandir}/man1/aria_pack.1.gz
-%{_mandir}/man1/aria_read_log.1.gz
-%{_mandir}/man1/innochecksum.1.gz
-%{_mandir}/man1/mariadb-service-convert.1.gz
-%{_mandir}/man1/myisamchk.1.gz
-%{_mandir}/man1/myisam_ftdump.1.gz
-%{_mandir}/man1/myisamlog.1.gz
-%{_mandir}/man1/myisampack.1.gz
-%{_mandir}/man1/my_print_defaults.1.gz
-%{_mandir}/man1/my_safe_process.1.gz
-%{_mandir}/man1/mysqld_multi.1.gz
-%{_mandir}/man1/mysqld_safe.1.gz
-%{_mandir}/man1/mysqld_safe_helper.1.gz
-%{_mandir}/man1/mysqlhotcopy.1.gz
-%{_mandir}/man1/mysqlimport.1.gz
-%{_mandir}/man1/mysql_install_db.1.gz
-%{_mandir}/man1/mysql.server.1.gz
-%{_mandir}/man1/replace.1.gz
-%{_mandir}/man1/resolveip.1.gz
-%{_mandir}/man1/resolve_stack_dump.1.gz
-%{_mandir}/man1/wsrep_sst_common.1.gz
-%{_mandir}/man1/wsrep_sst_mysqldump.1.gz
-%{_mandir}/man1/wsrep_sst_rsync.1.gz
-%{_mandir}/man1/mariabackup.1.gz
-%{_mandir}/man1/mbstream.1.gz
-%{_mandir}/man1/mysql_embedded.1.gz
-%{_mandir}/man1/mysql_ldb.1.gz
-%{_mandir}/man1/wsrep_sst_mariabackup.1.gz
-%{_mandir}/man1/wsrep_sst_rsync_wan.1.gz
+%{_mandir}/man1/*
 %{_mandir}/man8/*
 %{_datadir}/mysql/fill_help_tables.sql
-%{_datadir}/mysql/install_spider.sql
 %{_datadir}/mysql/maria_add_gis_sp.sql
 %{_datadir}/mysql/maria_add_gis_sp_bootstrap.sql
 %{_datadir}/mysql/mroonga/install.sql
@@ -322,6 +295,9 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/mysql_system_tables_data.sql
 %{_datadir}/mysql/mysql_test_data_timezone.sql
 %{_datadir}/mysql/mysql_test_db.sql
+%{_datadir}/mysql/mysql_to_mariadb.sql
+%{_datadir}/systemd/mysql.service
+%{_datadir}/systemd/mysqld.service
 %license %{_datadir}/mysql/mroonga/AUTHORS
 %license %{_datadir}/mysql/mroonga/COPYING
 %license %{_datadir}/groonga-normalizer-mysql/lgpl-2.0.txt
@@ -374,6 +350,7 @@ rm -rf %{buildroot}
 %changelog
 * Mon Mar 21 2022 Andrew Phelps <anphel@microsoft.com> - 10.5.9-1
 - Upgrade to version 10.5.9 for CVE-2021-46669
+- Use %%{version} macro for documentation
 
 * Mon Feb 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 10.3.34-1
 - Upgrading to version 10.3.34
