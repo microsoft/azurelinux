@@ -1,7 +1,7 @@
 Summary:        Mobile broadband modem manager
 Name:           ModemManager
 Version:        1.18.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,7 @@ make  %{?_smp_mflags} check
 %{_libdir}/libmm-glib.so*
 %{_libdir}/girepository-1.0/ModemManager-1.0.typelib
 %{_libdir}/ModemManager/*
+%{_libdir}/systemd/system/*
 %exclude %{_libdir}/debug
 %{_mandir}/man1/mmcli.1.gz
 %{_mandir}/man8/ModemManager.8.gz
@@ -80,6 +81,9 @@ make  %{?_smp_mflags} check
 %{_libdir}/libmm-glib.la
 
 %changelog
+* Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.6-3
+- Adding missing systemd service file to the default package.
+
 * Mon Feb 28 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.18.6-2
 - Adding python3-gobject, python3-dbus check BRs to satisfy regressed ptest.
 
