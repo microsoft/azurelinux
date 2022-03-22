@@ -16,6 +16,7 @@ Patch0:         cloud-init-azureds.patch
 Patch1:         ds-identify.patch
 Patch2:         ds-vmware-mariner.patch
 Patch3:         cloud-cfg.patch
+# Add Mariner distro support to cloud-init
 Patch4:         mariner-21.4.patch
 BuildRequires:  automake
 BuildRequires:  dbus
