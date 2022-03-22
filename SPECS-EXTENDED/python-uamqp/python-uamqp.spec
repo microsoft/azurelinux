@@ -24,7 +24,7 @@ BuildRequires:  %{py3_dist setuptools}
 %if %{with_check}
 BuildRequires:  %{py3_dist certifi}
 BuildRequires:  %{py3_dist pytest}
-BuildRequires:  %(py3_dist pytest-asyncio)
+BuildRequires:  %{py3_dist pytest-asyncio}
 BuildRequires:  %{py3_dist six}
 %endif
 
