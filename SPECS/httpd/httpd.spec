@@ -1,6 +1,6 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.52
+Version:        2.4.53
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://httpd.apache.org/
@@ -10,8 +10,8 @@ Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 
 # Patch0 is taken from:
-# https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.52-blfs_layout-1.patch
-Patch0:         httpd-2.4.52-blfs_layout-1.patch
+# https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.53-blfs_layout-3.patch
+Patch0:         httpd-2.4.53-blfs_layout-3.patch
 Patch1:         httpd-uncomment-ServerName.patch
 
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
@@ -207,6 +207,8 @@ fi
 %{_bindir}/dbmmanage
 
 %changelog
+*   Mon Mar 21 2022 Andrew Phelps <anphel@microsoft.com> 2.4.53-1
+-   Upgrade to version 2.4.53 to fix CVE-2022-22719, CVE-2022-22720, CVE-2022-22721, CVE-2022-23943
 *   Mon Dec 27 2021 Nicolas Guibourge <nicolasg@microsoft.com> 2.4.52-1
 -   Upgraded to 2.4.52 to fix CVE-2021-44224, CVE-2021-44790
 *   Wed Oct 13 2021 Nick Samson <nisamson@microsoft.com> 2.4.51-1
