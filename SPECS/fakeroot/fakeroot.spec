@@ -2,40 +2,39 @@
 
 Summary:        Gives a fake root environment
 Name:           fakeroot
-Version: 1.28
-Release: 1%{?dist}
+Version:        1.28
+Release:        1%{?dist}
 # setenv.c: LGPLv2+
 # contrib/Fakeroot-Stat-1.8.8: Perl (GPL+ or Artistic)
 # the rest: GPLv3+
-License: GPLv3+ and LGPLv2+ and (GPL+ or Artistic)
+License:        GPLv3+ AND LGPLv2+ AND (GPL+ OR Artistic)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: https://tracker.debian.org/pkg/fakeroot
-Source0: https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/%{name}_%{version}.orig.tar.gz
-
+URL:            https://tracker.debian.org/pkg/fakeroot
+Source0:        https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/%{name}_%{version}.orig.tar.gz
 # Debian package patches, from debian.tar.xz
-Patch2: debian_fix-shell-in-fakeroot.patch
+Patch2:         debian_fix-shell-in-fakeroot.patch
 # Address some POSIX-types related problems.
-Patch4: fakeroot-inttypes.patch
+Patch4:         fakeroot-inttypes.patch
 # Fix LD_LIBRARY_PATH for multilib: https://bugzilla.redhat.com/show_bug.cgi?id=1241527
-Patch5: fakeroot-multilib.patch
-Patch7: relax_tartest.patch
-Patch8: also-wrap-stat-library-call.patch
-Patch10: po4a.patch
+Patch5:         fakeroot-multilib.patch
+Patch7:         relax_tartest.patch
+Patch8:         also-wrap-stat-library-call.patch
+Patch10:        po4a.patch
 
-BuildRequires: make
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
-
 # https://bugzilla.redhat.com/show_bug.cgi?id=887001
 BuildRequires:  libacl-devel
 BuildRequires:  libcap-devel
-
 BuildRequires:  libtool
+BuildRequires:  make
+
 %if %{with po4a}
 BuildRequires:  po4a
 %endif
+
 %if %{with_check}
 # uudecode used by tests/tartest
 BuildRequires:  sharutils
@@ -55,7 +54,7 @@ that simulate the effect the real library functions would have had,
 had the user really been root.
 
 %package libs
-Summary: Gives a fake root environment (libraries)
+Summary:        Gives a fake root environment (libraries)
 
 %description libs
 This package contains the libraries required by %{name}.
