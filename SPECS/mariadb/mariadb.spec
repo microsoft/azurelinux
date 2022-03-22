@@ -11,6 +11,7 @@ Group:          Applications/Databases
 # To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/%{name}-%{version}.tar.gz
+Patch0:         cmake_connectorname.patch
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
