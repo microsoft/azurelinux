@@ -542,15 +542,15 @@ rm -rf perl-5.30.3
 
 touch $LFS/logs/temptoolchain/status_perl_complete
 
-echo Python-3.7.10
-tar xf Python-3.7.10.tar.xz
-pushd Python-3.7.10
+echo Python-3.7.11
+tar xf Python-3.7.11.tar.xz
+pushd Python-3.7.11
 sed -i '/def add_multiarch_paths/a \        return' setup.py
 ./configure --prefix=/tools --without-ensurepip
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.7.10
+rm -rf Python-3.7.11
 
 touch $LFS/logs/temptoolchain/status_python_complete
 

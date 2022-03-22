@@ -2,8 +2,8 @@
 %global __brp_python_bytecompile %{nil}
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.7.10
-Release:        7%{?dist}
+Version:        3.7.11
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -277,6 +277,9 @@ make  %{?_smp_mflags} test
 %{_libdir}/python3.7/test/*
 
 %changelog
+* Mon Mar 21 2022 Andrew Phelps <anphel@microsoft.com> - 3.7.11-1
+- Upgrade to 3.7.11 to fix CVE-2021-3737
+
 * Tue Mar 01 2022 Thomas Crain <thcrain@microsoft.com> - 3.7.10-7
 - Add patch to fix tests with expat >= 2.4.5
 
