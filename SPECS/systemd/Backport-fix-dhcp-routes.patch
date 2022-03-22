@@ -1,0 +1,41 @@
+From ac2dce5f36bb8b1a877ff765e6a4dfde6bfb2d49 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@canonical.com>
+Date: Fri, 5 Jul 2019 16:42:38 -0400
+Subject: [PATCH 1/2] src/network/networkd-dhcp4.c: set prefsrc for classless
+ or static routes
+
+When a DHCP server provides only a gateway, the networkd-dhcp4 code adds a
+default route using that gateway, and sets the just-provided address as
+the route's prefsrc; this was added in commit
+46b0c76e2c355c0d0cc4792abb98cde07b28bc53
+
+However, if the DHCP server has also provided classless route(s), these
+are used instead of a default route using the provided gateway; the
+networkd-dhcp4 code sets up the classless routes, but does not use the
+just-provided dhcp address as the prefsrc of the route(s).  Note that
+it also doesn't set the prefsrc for static routes, though it should.
+
+If the interface has only the dhcp-provided address, this is not usually
+a problem, but if it has another address (e.g. a static address), then
+traffic sent through the dhcp-provided gateway might not use the
+dhcp-provided source address.  If the gateway router only will route
+traffic from the dhcp-provided address, then the dhcp client system's
+networking through the router will not work.
+
+Fixes: #12969
+
+Backported into Systemd v239.
+Signed-off-by: Henry Beberman <henry.beberman@microsoft.com>
+
+diff -Naur a/src/network/networkd-dhcp4.c b/src/network/networkd-dhcp4.c
+--- a/src/network/networkd-dhcp4.c	2018-06-22 11:11:49.000000000 +0000
++++ b/src/network/networkd-dhcp4.c	2022-03-16 18:23:49.158670037 +0000
+@@ -112,6 +112,8 @@
+                 route->priority = link->network->dhcp_route_metric;
+                 route->table = table;
+                 route->scope = route_scope_from_address(route, &address);
++                if (IN_SET(route->scope, RT_SCOPE_LINK, RT_SCOPE_UNIVERSE))
++                        route->prefsrc.in = address;
+ 
+                 r = route_configure(route, link, dhcp4_route_handler);
+                 if (r < 0)
