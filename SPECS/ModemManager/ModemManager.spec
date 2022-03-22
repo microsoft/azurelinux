@@ -10,6 +10,7 @@ URL:            https://www.freedesktop.org/wiki/Software/ModemManager/
 Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  libqmi-devel
+BuildRequires:  systemd-devel
 %if %{with_check}
 BuildRequires:  dbus-glib
 BuildRequires:  python3-gobject
@@ -61,7 +62,6 @@ make  %{?_smp_mflags} check
 %{_libdir}/libmm-glib.so*
 %{_libdir}/girepository-1.0/ModemManager-1.0.typelib
 %{_libdir}/ModemManager/*
-%{_libdir}/systemd/system/*
 %exclude %{_libdir}/debug
 %{_mandir}/man1/mmcli.1.gz
 %{_mandir}/man8/ModemManager.8.gz
@@ -70,6 +70,7 @@ make  %{?_smp_mflags} check
 %{_datadir}/bash-completion/*
 %{_datadir}/gir-1.0/ModemManager-1.0.gir
 %{_datadir}/ModemManager/*
+%{_unitdir}/*
 %exclude %{_datadir}/icons
 /lib/udev/rules.d/*
 
