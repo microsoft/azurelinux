@@ -3052,7 +3052,6 @@
                 "python-websocket-client",
                 "python-werkzeug",
                 "python-zope-interface",
-                "python2",
                 "python3",
                 "pytz",
                 "PyYAML",

@@ -24753,16 +24753,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python2",
-          "version": "2.7.18",
-          "downloadUrl": "http://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python3",
           "version": "3.9.10",
           "downloadUrl": "https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tar.xz"
