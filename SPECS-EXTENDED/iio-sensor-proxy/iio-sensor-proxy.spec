@@ -2,16 +2,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           iio-sensor-proxy
 Version:        3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        IIO accelerometer sensor to input device proxy
 
 License:        GPLv3+
 URL:            https://github.com/hadess/iio-sensor-proxy
-Source0:        %{url}/releases/download/%{version}/%{name}-%{version}.tar.xz
+Source0:        https://gitlab.freedesktop.org/hadess/%{name}/uploads/de965bcb444552d328255639b241ce73/%{name}-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  make
 BuildRequires:  gcc
-BuildRequires:  gtk-doc
 BuildRequires:  pkgconfig(udev)
 BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(gio-2.0)
@@ -35,7 +35,7 @@ This package contains the documentation for %{name}.
 %build
 %configure \
   --disable-silent-rules \
-  --enable-gtk-doc       \
+  --disable-gtk-doc       \
   --disable-gtk-tests    \ # not really interested in sample progs
   %{nil}
 %make_build
@@ -67,6 +67,11 @@ This package contains the documentation for %{name}.
 %{_datadir}/gtk-doc/html/%{name}/
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -2,23 +2,24 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %define realname bytesize
 %define with_python3 1
-%define with_gtk_doc 1
+%define with_gtk_doc 0
 %define with_tools 1
 
 %if %{with_tools} != 1
 %define tools_opts --without-tools
 %endif
 
-%define configure_opts %{?python3_opts} %{?tools_opts}
+%define configure_opts %{?python3_opts} %{?tools_opts} --without-gtk-doc
 
 Name:        libbytesize
 Version:     2.5
-Release:     2%{?dist}
+Release:     3%{?dist}
 Summary:     A library for working with sizes in bytes
 License:     LGPLv2+
 URL:         https://github.com/storaged-project/libbytesize
-Source0:     https://github.com/storaged-project/libbytesize/releases/download/%{version}-%{release}/%{name}-%{version}.tar.gz
+Source0:     https://github.com/storaged-project/libbytesize/releases/download/%{version}/%{name}-%{version}.tar.gz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires: gcc
 BuildRequires: gmp-devel
 BuildRequires: mpfr-devel
@@ -110,6 +111,11 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 %endif
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Thu Mar 04 2021 Henry Li <lihl@microsoft.com> - 2.5-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove condition checking that does not apply to CBL-Mariner

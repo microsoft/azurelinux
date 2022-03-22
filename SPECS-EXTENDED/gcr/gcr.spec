@@ -6,10 +6,10 @@ Distribution:   Mariner
 
 Name:           gcr
 Version:        3.36.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A library for bits of crypto UI and parsing
 
-License:        LGPLv2+
+License:        GPLv2
 URL:            https://wiki.gnome.org/Projects/CryptoGlue
 Source0:        https://download.gnome.org/sources/%{name}/3.36/%{name}-%{version}.tar.xz
 
@@ -20,6 +20,7 @@ BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(gtk+-3.0)
 BuildRequires:  pkgconfig(p11-kit-1)
+BuildRequires:  python3-pygments
 BuildRequires:  docbook-style-xsl
 BuildRequires:  libgcrypt-devel
 BuildRequires:  desktop-file-utils
@@ -112,6 +113,10 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/gcr-viewer.desktop
 %{_libdir}/libgcr-base-3.so.*
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-3
+- Adding BR on "python3-pygments".
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

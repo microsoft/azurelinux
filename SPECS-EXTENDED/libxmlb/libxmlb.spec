@@ -5,13 +5,13 @@ Distribution:   Mariner
 Summary:   Library for querying compressed XML metadata
 Name:      libxmlb
 Version:   0.1.14
-Release:   3%{?dist}
+Release:   4%{?dist}
 License:   LGPLv2+
 URL:       https://github.com/hughsie/libxmlb
 Source0:   http://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
 
+BuildRequires: %{_bindir}/xsltproc
 BuildRequires: glib2-devel >= %{glib2_version}
-BuildRequires: gtk-doc
 BuildRequires: libstemmer-devel
 BuildRequires: meson
 BuildRequires: gobject-introspection-devel
@@ -52,7 +52,7 @@ Executable and data files for installed tests.
 %build
 
 %meson \
-    -Dgtkdoc=true \
+    -Dgtkdoc=false \
     -Dtests=true
 
 %meson_build
@@ -74,9 +74,6 @@ Executable and data files for installed tests.
 %files devel
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/*.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/libxmlb
 %{_includedir}/libxmlb-1
 %{_libdir}/libxmlb.so
 %{_libdir}/pkgconfig/xmlb.pc
@@ -88,6 +85,11 @@ Executable and data files for installed tests.
 %dir %{_datadir}/installed-tests/libxmlb
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.14-4
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.14-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
