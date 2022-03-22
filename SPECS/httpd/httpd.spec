@@ -11,7 +11,7 @@ Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.b
 
 # Patch0 is taken from:
 # https://www.linuxfromscratch.org/patches/blfs/svn/httpd-2.4.53-blfs_layout-3.patch
-Patch0:         httpd-2.4.52-blfs_layout-1.patch
+Patch0:         httpd-2.4.53-blfs_layout-3.patch
 Patch1:         httpd-uncomment-ServerName.patch
 
 # CVE-1999-0236 must be mitigated by the user. See "Server Side Includes" at https://httpd.apache.org/docs/2.4/misc/security_tips.html
