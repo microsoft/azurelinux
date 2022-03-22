@@ -1,7 +1,7 @@
 Summary:        Mobile broadband modem manager
 Name:           ModemManager
 Version:        1.18.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.freedesktop.org/wiki/Software/ModemManager/
 Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  libqmi-devel
+BuildRequires:  systemd-devel
 %if %{with_check}
 BuildRequires:  dbus-glib
 BuildRequires:  python3-gobject
@@ -69,6 +70,7 @@ make  %{?_smp_mflags} check
 %{_datadir}/bash-completion/*
 %{_datadir}/gir-1.0/ModemManager-1.0.gir
 %{_datadir}/ModemManager/*
+%{_unitdir}/*
 %exclude %{_datadir}/icons
 /lib/udev/rules.d/*
 
@@ -80,6 +82,9 @@ make  %{?_smp_mflags} check
 %{_libdir}/libmm-glib.la
 
 %changelog
+* Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.6-3
+- Adding missing systemd service file to the default package.
+
 * Mon Feb 28 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.18.6-2
 - Adding python3-gobject, python3-dbus check BRs to satisfy regressed ptest.
 
