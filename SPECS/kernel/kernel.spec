@@ -267,6 +267,15 @@ Patch1220:      CVE-2022-0847.nopatch
 Patch1221:      CVE-2021-3656.nopatch
 Patch1222:      CVE-2021-3609.nopatch
 Patch1223:      CVE-2021-3744.nopatch
+Patch1224:      CVE-2021-3640.nopatch
+Patch1225:      CVE-2021-3739.nopatch
+Patch1226:      CVE-2022-0492.nopatch
+Patch1227:      CVE-2022-0516.nopatch
+Patch1228:      CVE-2021-3732.nopatch
+# CVE-2022-0433 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1229:      CVE-2022-0433.nopatch
+# CVE-2021-4095 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1230:      CVE-2021-4095.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -628,7 +637,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
   CVE-2021-3752, CVE-2021-20322, CVE-2021-4090, CVE-2021-4093,
   CVE-2022-25265, CVE-2021-20320, CVE-2021-20321, CVE-2022-0382,
   CVE-2022-0617, CVE-2022-0847, CVE-2021-3656, CVE-2021-3609,
-  CVE-2021-3744
+  CVE-2021-3744, CVE-2021-3640, CVE-2021-3739, CVE-2022-0492,
+  CVE-2022-0516, CVE-2021-3732, CVE-2022-0433, CVE-2021-4095
 
 * Fri Feb 11 2022 Vince Perri <viperri@microsoft.com> - 5.10.93.1-4
 - Add compressed firmware support
