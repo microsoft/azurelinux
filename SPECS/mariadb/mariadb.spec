@@ -1,6 +1,6 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.5.9
+Version:        10.5.15
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -11,7 +11,6 @@ Group:          Applications/Databases
 # To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/%{name}-%{version}.tar.gz
-Patch0:         cmake_connectorname.patch
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -295,7 +294,6 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/mysql_system_tables_data.sql
 %{_datadir}/mysql/mysql_test_data_timezone.sql
 %{_datadir}/mysql/mysql_test_db.sql
-%{_datadir}/mysql/mysql_to_mariadb.sql
 %{_datadir}/systemd/mysql.service
 %{_datadir}/systemd/mysqld.service
 %license %{_datadir}/mysql/mroonga/AUTHORS
@@ -348,8 +346,8 @@ rm -rf %{buildroot}
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
-* Mon Mar 21 2022 Andrew Phelps <anphel@microsoft.com> - 10.5.9-1
-- Upgrade to version 10.5.9 for CVE-2021-46669
+* Mon Mar 21 2022 Andrew Phelps <anphel@microsoft.com> - 10.5.15-1
+- Upgrade to version 10.5.15 for CVE-2021-46669
 - Use %%{version} macro for documentation
 
 * Mon Feb 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 10.3.34-1
