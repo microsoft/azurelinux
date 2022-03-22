@@ -9,7 +9,7 @@ Distribution:   Mariner
 %define tools_opts --without-tools
 %endif
 
-%define configure_opts %{?python3_opts} %{?tools_opts}
+%define configure_opts %{?python3_opts} %{?tools_opts} --without-gtk-doc
 
 Name:        libbytesize
 Version:     2.5
@@ -17,7 +17,7 @@ Release:     3%{?dist}
 Summary:     A library for working with sizes in bytes
 License:     LGPLv2+
 URL:         https://github.com/storaged-project/libbytesize
-Source0:     https://github.com/storaged-project/libbytesize/releases/download/%{version}-%{release}/%{name}-%{version}.tar.gz
+Source0:     https://github.com/storaged-project/libbytesize/releases/download/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires: gcc

@@ -7202,7 +7202,7 @@
         "other": {
           "name": "iio-sensor-proxy",
           "version": "3.0",
-          "downloadUrl": "https://github.com/hadess/iio-sensor-proxy/releases/download/3.0/iio-sensor-proxy-3.0.tar.xz"
+          "downloadUrl": "https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/uploads/de965bcb444552d328255639b241ce73/iio-sensor-proxy-3.0.tar.xz"
         }
       }
     },
@@ -8932,7 +8932,7 @@
         "other": {
           "name": "libbytesize",
           "version": "2.5",
-          "downloadUrl": "https://github.com/storaged-project/libbytesize/releases/download/2.5-2.cm2/libbytesize-2.5.tar.gz"
+          "downloadUrl": "https://github.com/storaged-project/libbytesize/releases/download/2.5/libbytesize-2.5.tar.gz"
         }
       }
     },
@@ -9892,7 +9892,7 @@
         "other": {
           "name": "libiptcdata",
           "version": "1.0.5",
-          "downloadUrl": "https://github.com/ianw/libiptcdata/releases/download/libiptcdata-1.0.5.tar.gz"
+          "downloadUrl": "https://github.com/ianw/libiptcdata/archive/refs/tags/release_1_0_5.tar.gz"
         }
       }
     },

@@ -85,7 +85,7 @@ make test ARGS="-V" -C %{_target_platform}
 
 %files
 %doc ReadMe.txt THANKS
-%license LICENSE
+%license COPYING LICENSE LICENSE.LGPL21.txt LICENSE.MPL2.txt
 %{_libdir}/libical.so.3
 %{_libdir}/libical.so.%{version}
 %{_libdir}/libical_cxx.so.3

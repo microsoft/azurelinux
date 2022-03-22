@@ -1,3 +1,4 @@
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: libiptcdata
@@ -5,9 +6,9 @@ Version: 1.0.5
 Release: 6%{?dist}
 Summary: IPTC tag library
 
-License: LGPLv2+
+License: GPLv2
 URL: https://github.com/ianw/%{name}
-Source0: https://github.com/ianw/%{name}/releases/download/%{name}-%{version}.tar.gz
+Source0: https://github.com/ianw/%{name}/archive/refs/tags/release_1_0_5.tar.gz#/%{name}-release_1_0_5.tar.gz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  autoconf
@@ -47,7 +48,7 @@ that you can use to develop libiptcdata applications.
 
 
 %prep
-%autosetup
+%autosetup -n "%{name}-release_1_0_5"
 autoreconf -fiv
 
 
@@ -78,7 +79,6 @@ find %{buildroot} -name "*.la" -exec rm -f {} \;
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/libiptcdata
-%{_datadir}/gtk-doc/html/libiptcdata
 
 
 %changelog

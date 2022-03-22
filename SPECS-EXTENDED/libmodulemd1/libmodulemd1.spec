@@ -63,7 +63,7 @@ Development files for libmodulemd.
 
 
 %build
-%meson -Ddeveloper_build=false -Denable-gtk-doc=false
+%meson -Ddeveloper_build=false -Dwith_docs=false
 %meson_build
 
 

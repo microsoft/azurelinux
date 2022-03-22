@@ -43,7 +43,7 @@ The Orc compiler, to produce optimized code.
 %setup -q
 
 %build
-%meson -D default_library=shared -Denable-gtk-doc=false
+%meson -D default_library=shared -Dgtk_doc=disabled
 %meson_build
 
 %install
@@ -62,7 +62,8 @@ rm -rf %{buildroot}/%{_libdir}/orc
 
 
 %files
-%doc COPYING README
+%license COPYING
+%doc README
 %{_libdir}/liborc-*.so.*
 %{_bindir}/orc-bugreport
 

@@ -38,9 +38,11 @@ developing applications that use %{name}.
 %prep
 %setup -q -n %{name}-%{name}-%{version}
 sed -i -e 's/-Werror //' src/Makefile.*
-gtkdocize
-autoreconf -i
 
+# Disable doc generation.
+sed -i -E 's@ docs/reference/\S+@@g' Makefile.am
+
+autoreconf -i
 
 %build
 %configure --disable-static --disable-gtk-doc
@@ -56,10 +58,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %files
-%doc COPYING.lgpl COPYING.gpl
+%license COPYING.lgpl COPYING.gpl
 %{_libdir}/*.so.*
 %{_bindir}/ldmtool
-%{_mandir}/man1/ldmtool.1.gz
 
 
 %files devel

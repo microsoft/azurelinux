@@ -7,7 +7,7 @@ Summary:        IIO accelerometer sensor to input device proxy
 
 License:        GPLv3+
 URL:            https://github.com/hadess/iio-sensor-proxy
-Source0:        %{url}/releases/download/%{version}/%{name}-%{version}.tar.xz
+Source0:        https://gitlab.freedesktop.org/hadess/%{name}/uploads/de965bcb444552d328255639b241ce73/%{name}-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  make

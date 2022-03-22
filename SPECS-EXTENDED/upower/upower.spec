@@ -39,6 +39,9 @@ Headers and libraries for UPower.
 %prep
 %autosetup -p1
 
+# Disable docs generation.
+sed -i -E 's/^(SUBDIRS.*) doc(.*)/\1\2/g' Makefile.in
+
 %build
 %configure \
         --disable-gtk-doc \
@@ -85,9 +88,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_bindir}/*
 %{_libexecdir}/*
 %{_libdir}/girepository-1.0/*.typelib
-%{_mandir}/man1/*
-%{_mandir}/man7/*
-%{_mandir}/man8/*
 %{_datadir}/dbus-1/system-services/*.service
 %{_unitdir}/*.service
 
