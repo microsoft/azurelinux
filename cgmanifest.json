@@ -28648,7 +28648,7 @@
         "other": {
           "name": "unique3",
           "version": "3.0.2",
-          "downloadUrl": "https://github.com/Distrotech/libunique/archive/refs/tags/libunique-3.0.2.tar.xz"
+          "downloadUrl": "https://github.com/Distrotech/libunique/archive/refs/tags/3.0.2.tar.gz"
         }
       }
     },
