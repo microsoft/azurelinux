@@ -14,7 +14,6 @@ Patch0:         cgi3.patch
 Patch1:         python3-support-mariner-platform.patch
 Patch2:         Replace-unsupported-TLS-methods.patch
 Patch3:         fix_broken_mariner_ssl_tests.patch
-Patch4:         CVE-2022-0391.patch
 # Upstream patch to fix XML tests with expat >= 2.4.5
 Patch5:         fix-xml-tests-expat.patch
 BuildRequires:  bzip2-devel
