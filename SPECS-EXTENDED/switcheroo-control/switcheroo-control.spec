@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           switcheroo-control
 Version:        2.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        D-Bus service to check the availability of dual-GPU
 
 License:        GPLv3
@@ -13,7 +13,6 @@ Source0:        https://gitlab.freedesktop.org/hadess/switcheroo-control/uploads
 BuildRequires:  gcc
 BuildRequires:  pkgconfig(gudev-1.0)
 BuildRequires:  pkgconfig(gio-2.0)
-BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  systemd
 BuildRequires:	systemd-devel
@@ -23,20 +22,12 @@ BuildRequires:	systemd-devel
 %description
 D-Bus service to check the availability of dual-GPU.
 
-%package docs
-Summary:        Documentation for %{name}
-BuildArch:      noarch
-
-%description docs
-
-This package contains the documentation for %{name}.
-
 %prep
 %autosetup
 
 
 %build
-%meson -Dgtk_doc=true
+%meson -Dgtk_doc=false
 %meson_build
 
 
@@ -65,14 +56,12 @@ fi
 %{_unitdir}/switcheroo-control.service
 %{_libexecdir}/switcheroo-control
 %{_udevhwdbdir}/30-pci-intel-gpu.hwdb
-%{_mandir}/man1/switcherooctl.1*
-
-%files docs
-%dir %{_datadir}/gtk-doc/
-%dir %{_datadir}/gtk-doc/html/
-%{_datadir}/gtk-doc/html/%{name}/
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4-3
+- Removing gtk-docs since they require a network connection.
+- License verified.
+
 * Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.4-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add BR:systemd-devel for pkgconfig files
