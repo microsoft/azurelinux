@@ -1,12 +1,13 @@
 Summary:       The NetBSD make(1) tool
 Name:          bmake
 Version:       20211221
-Release:       1%{?dist}
+Release:       2%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://ftp.netbsd.org/pub/NetBSD/misc/sjg/
 Source0:       %{url}/bmake-%{version}.tar.gz
+Patch0:        disable-time-tests.patch
 Requires:      mk-files
 
 BuildRequires: gcc
@@ -34,7 +35,7 @@ build all kinds of targets, including, for example, C/C++ programs and/or
 shared libraries.
 
 %prep
-%autosetup -n %{name}
+%autosetup -p1 -n %{name}
 sed -i.timestamp -e 's|cp_f=-f|cp_f=-pf|' mk/install-mk
 sed -i.python -e '1 s|^#!/usr/bin/env python|#!/usr/bin/python3|' mk/meta2deps.py
 
@@ -60,6 +61,11 @@ chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 %{_datadir}/mk
 
 %changelog
+* Tue Mar 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 20211221-2
+- Add patch disable-time-tests.patch, which disables unreliably failing
+- tests in varmod-gmtime.mk and varmod-localtime.mk
+- see https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=251465
+
 * Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20211221-1
 - Upgrade to 20211221
 
