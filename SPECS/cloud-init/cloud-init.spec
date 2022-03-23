@@ -1,3 +1,5 @@
+%define python3_sitelib %{_libdir}/python3.7/site-packages
+%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        21.4
@@ -18,8 +20,7 @@ Patch3:         cloud-cfg.patch
 Patch4:         mariner-21.4.patch
 # backport patch https://github.com/canonical/cloud-init/commit/0988fb89be06aeb08083ce609f755509d08fa459.patch to 21.4
 Patch5:         azureds-set-ovf_is_accesible.patch
-%define python3_sitelib %{_libdir}/python3.7/site-packages
-%define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
+
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
@@ -124,18 +125,18 @@ rm tests/unittests/test_net_freebsd.py
 
 make check %{?_smp_mflags}
 
-%{clean}
+%clean
 rm -rf %{buildroot}
 
 
 %post
-%{systemd_post} %{cl_services}
+%systemd_post %{cl_services}
 
 %preun
 %systemd_preun %{cl_services}
 
 %postun
-%{systemd_postun} %{cl_services}
+%systemd_postun %{cl_services}
 
 %files
 %{_bindir}/*
