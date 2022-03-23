@@ -9,7 +9,7 @@ URL:           https://ftp.netbsd.org/pub/NetBSD/misc/sjg/
 Source0:       %{url}/bmake-%{version}.tar.gz
 # Certain tests in varmod-localtime.mk will inconsistently fail
 # on pipeline machines. Disabling with this patch for now, and
-# tracking this bug in 
+# tracking this bug in workitem 38644519
 Patch0:        remove-inconsistent-time-tests.patch
 Requires:      mk-files
 
