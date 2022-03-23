@@ -1,12 +1,15 @@
 Summary:       The NetBSD make(1) tool
 Name:          bmake
 Version:       20211221
-Release:       103%{?dist}
+Release:       2%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://ftp.netbsd.org/pub/NetBSD/misc/sjg/
 Source0:       %{url}/bmake-%{version}.tar.gz
+# Certain tests in varmod-localtime.mk will inconsistently fail
+# on pipeline machines. Disabling with this patch for now, and
+# tracking this bug in 
 Patch0:        remove-inconsistent-time-tests.patch
 Requires:      mk-files
 
