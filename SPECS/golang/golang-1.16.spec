@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.16.14
+Version:        1.16.15
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -119,6 +119,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Mar 17 2022 Muhammad Falak <mwani@microsoft.com> - 1.16.15-1
+- Bump version to 1.16.15 to address CVE-2022-24921
+
 * Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.16.14-1
 - Upgrade to version 1.16.14 to resolve CVE-2022-23806, CVE-2022-23772, CVE-2022-23773
 
