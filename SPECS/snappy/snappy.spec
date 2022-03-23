@@ -1,16 +1,12 @@
 Summary:        Fast compression and decompression library
 Name:           snappy
 Version:        1.1.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Libraries
 URL:            https://github.com/google/snappy
-#Source0:       https://github.com/google/%{name}/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Patch0:         snappy-inline.patch
-BuildRequires:  cmake >= 3.3
 
 # A buildable snappy environment needs functioning submodules that do not work from the archive download
 # To recreate the tar.gz run the following
@@ -21,6 +17,13 @@ BuildRequires:  cmake >= 3.3
 #  popd
 #  sudo mv %{name} %{name}-%{version}
 #  sudo tar -cvf %{name}-%{version}.tar.gz %{name}-%{version}/
+Source0:        https://github.com/google/snappy/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+Patch0:         snappy-inline.patch
+Patch1:         detect_system_gtest.patch
+BuildRequires:  cmake >= 3.3
+BuildRequires:  gmock-devel
+BuildRequires:  gtest-devel
 
 %description
 Snappy is a compression/decompression library. It does not aim for maximum
@@ -42,15 +45,14 @@ It contains the libraries and header files to create applications
 
 %build
 mkdir build && cd build
-%cmake ..
+%cmake -DSNAPPY_BUILD_BENCHMARKS:BOOL=OFF ..
 %make_build
 
 %install
 %make_install -C build
 
 %check
-cd testdata
-cmake ../ && make
+cd build
 make test
 
 %post -p /sbin/ldconfig
@@ -61,18 +63,19 @@ make test
 %defattr(-,root,root)
 %license COPYING
 %doc AUTHORS
-%{_libdir}/*.so.*
-%exclude %{_libdir}/cmake
+%{_libdir}/libsnappy.so.*
 
 %files devel
 %defattr(-,root,root)
 %doc format_description.txt framing_format.txt
-%{_includedir}/*
-%{_libdir}/lib*.so
+%{_includedir}/snappy*.h
+%{_libdir}/libsnappy.so
 %{_libdir}/cmake/Snappy/
-%{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Mar 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.1.9-2
+- Do not provide gtest/gmock headers and binaries.
+
 * Wed Feb 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.9-1
 - Update to version 1.1.9.
 - Add patch for fixing compiler error due to missing 'inline'.

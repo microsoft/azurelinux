@@ -3,7 +3,7 @@
 Summary:        A fast and lightweight key/value database library by Google
 Name:           leveldb
 Version:        1.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://github.com/google/leveldb
 Vendor:         Microsoft Corporation
@@ -37,8 +37,6 @@ Patch0007:      0007-detect-system-gtest.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
-BuildRequires:  gmock
-BuildRequires:  gtest
 BuildRequires:  gmock-devel
 BuildRequires:  gtest-devel
 BuildRequires:  make
@@ -106,6 +104,9 @@ ctest -V %{?_smp_mflags}
 %{_libdir}/cmake/%{name}/
 
 %changelog
+* Wed Mar 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.23-2
+- Address gmock-devel/snappy-devel incompatibility
+
 * Mon Mar 21 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.23-1
 - Upgrade to 1.23
 
