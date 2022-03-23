@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
 Version: 1.6.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -85,6 +85,8 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Wed Mar 23 2022 Anirudh Gopal <angop@microsoft.com> - 1.6.1-2
+- Always restart containerd service 
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.1-1
 - Update to version 1.6.1
 * Fri Jan 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.0.rc.3-1
