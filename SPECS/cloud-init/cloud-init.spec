@@ -132,7 +132,7 @@ rm -rf %{buildroot}
 %{systemd_post} %{cl_services}
 
 %preun
-%{systemd_preun} %{cl_services}
+%systemd_preun %{cl_services}
 
 %postun
 %{systemd_postun} %{cl_services}
