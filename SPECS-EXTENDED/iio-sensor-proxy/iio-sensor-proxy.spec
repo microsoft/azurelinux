@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           iio-sensor-proxy
 Version:        3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        IIO accelerometer sensor to input device proxy
 
 License:        GPLv3+
@@ -35,9 +35,8 @@ This package contains the documentation for %{name}.
 %build
 %configure \
   --disable-silent-rules \
-  --disable-gtk-doc       \
-  --disable-gtk-tests    \ # not really interested in sample progs
-  %{nil}
+  --disable-gtk-doc \
+  --disable-gtk-tests
 %make_build
 
 %install
@@ -67,6 +66,9 @@ This package contains the documentation for %{name}.
 %{_datadir}/gtk-doc/html/%{name}/
 
 %changelog
+* Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-4
+- Fixing configuration step in %%build.
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-3
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
