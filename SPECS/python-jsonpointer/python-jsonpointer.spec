@@ -1,13 +1,15 @@
 Summary:        Applying JSON Patches in Python
 Name:           python-jsonpointer
-Version:        2.0
-Release:        4%{?dist}
+Version:        2.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/jsonpointer/
-Source0:        https://pypi.python.org/packages/source/j/jsonpointer/jsonpointer-%{version}.tar.gz
+Source0:        https://github.com/stefankoegl/python-json-pointer/archive/refs/tags/v%{version}.tar.gz#/python-json-pointer-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildArch:      noarch
 
 %description
@@ -15,16 +17,13 @@ Library to apply JSON Patches according to RFC 6902.
 
 %package -n     python3-jsonpointer
 Summary:        Applying JSON Patches in Python
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
 
 %description -n python3-jsonpointer
 Library to apply JSON Patches according to RFC 6902.
 
 %prep
-%autosetup -n jsonpointer-%{version}
+%autosetup -n python-json-pointer-%{version}
 
 %build
 %py3_build
@@ -44,6 +43,10 @@ ln -s jsonpointer %{buildroot}%{_bindir}/jsonpointer3
 %{_bindir}/jsonpointer3
 
 %changelog
+* Tue Mar 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.2-1
+- Upgrade to latest upstream
+- Switch source from PyPI to GitHub
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-4
 - Add license to python3 package
 - Remove python2 package

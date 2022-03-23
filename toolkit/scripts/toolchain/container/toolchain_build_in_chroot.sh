@@ -67,14 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.18.1 API Headers
-tar xf kernel-5.15.18.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
+echo Linux-5.15.26.1 API Headers
+tar xf kernel-5.15.26.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.18.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -619,15 +619,14 @@ popd
 rm -rf perl-5.32.0
 touch /logs/status_perl_complete
 
-echo Autoconf-2.69
-tar xf autoconf-2.69.tar.xz
-pushd autoconf-2.69
-sed '361 s/{/\\{/' -i bin/autoscan.in
+echo Autoconf-2.71
+tar xf autoconf-2.71.tar.xz
+pushd autoconf-2.71
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf autoconf-2.69
+rm -rf autoconf-2.71
 touch /logs/status_autoconf_complete
 
 echo Automake-1.16.5
@@ -754,9 +753,9 @@ popd
 rm -rf Text-Template-1.51
 touch /logs/status_text_template_complete
 
-echo OpenSSL-1.1.1g
-tar xf openssl-1.1.1g.tar.gz
-pushd openssl-1.1.1g
+echo OpenSSL-1.1.1k
+tar xf openssl-1.1.1k.tar.gz
+pushd openssl-1.1.1k
 sslarch=
 ./config --prefix=/usr \
          --openssldir=/etc/pki/tls \
@@ -774,7 +773,7 @@ make all -j$(nproc)
 sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
 make MANSUFFIX=ssl install
 popd
-rm -rf openssl-1.1.1g
+rm -rf openssl-1.1.1k
 touch /logs/status_openssl_complete
 
 echo Python-3.9.10
@@ -1062,14 +1061,14 @@ popd
 rm -rf cpio-2.13
 touch /logs/status_cpio_complete
 
-echo libarchive-3.4.2
-tar xf libarchive-3.4.2.tar.gz
-pushd libarchive-3.4.2
+echo libarchive-3.6.0
+tar xf libarchive-3.6.0.tar.gz
+pushd libarchive-3.6.0
 ./configure --prefix=/usr --disable-static
 make -j$(nproc)
 make install
 popd
-rm -rf libarchive-3.4.2
+rm -rf libarchive-3.6.0
 touch /logs/status_libarchive_complete
 
 echo lua-5.4.3

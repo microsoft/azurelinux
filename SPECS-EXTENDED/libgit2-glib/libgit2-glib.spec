@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           libgit2-glib
 Version:        0.99.0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Git library for GLib
 
 License:        LGPLv2+
@@ -16,8 +16,8 @@ Source0:        https://download.gnome.org/sources/libgit2-glib/0.99/libgit2-gli
 Patch0:         20.patch
 Patch1:         22.patch
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gcc
-BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gobject-2.0) >= %{glib2_version}
@@ -43,7 +43,7 @@ developing applications that use %{name}.
 %autosetup -p1
 
 %build
-%meson -Dgtk_doc=true \
+%meson -Dgtk_doc=false \
        -Dpython=true
 
 %meson_build
@@ -68,9 +68,13 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/libgit2-glib-1.0.pc
 %{_datadir}/gir-1.0/Ggit-1.0.gir
 %{_datadir}/vala/
-%doc %{_datadir}/gtk-doc/
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.0.1-5
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.0.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

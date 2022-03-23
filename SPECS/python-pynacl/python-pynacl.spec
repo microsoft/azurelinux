@@ -1,44 +1,45 @@
 Summary:        PyNaCl is a Python binding to libsodium
 Name:           python-pynacl
-Version:        1.3.0
-Release:        7%{?dist}
+Version:        1.5.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/pynacl
-# The official source is under https://github.com/pyca/pynacl/archive/1.3.0.tar.gz.
-# Source to be fixed as part of https://microsoft.visualstudio.com/OS/_workitems/edit/25936171.
-Source0:        https://files.pythonhosted.org/packages/61/ab/2ac6dea8489fa713e2b4c6c5b549cc962dd4a842b5998d9e80cf8440b7cd/PyNaCl-%{version}.tar.gz
+Source0:        https://github.com/pyca/pynacl/archive/refs/tags/%{version}.tar.gz#/pynacl-%{version}.tar.gz
+BuildRequires:  libsodium-devel
+BuildRequires:  python3-cffi
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 Good password hashing for your software and your servers.
 
 %package -n     python3-pynacl
 Summary:        PyNaCl is a Python binding to libsodium
-BuildRequires:  python3-cffi
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
-BuildRequires:  python3-xml
 Requires:       python3
-Requires:       python3-libs
+Requires:       python3-cffi
 
 %description -n python3-pynacl
 Good password hashing for your software and your servers.
 
 %prep
-%autosetup -n PyNaCl-%{version}
+%autosetup -n pynacl-%{version}
 
 %build
+export SODIUM_INSTALL=system
 %py3_build
 
 %install
 %py3_install
 
 %check
-# libsodium tests are ran as part of the build phase
-%python3 setup.py test
+pip3 install tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-pynacl
 %defattr(-,root,root)
@@ -46,6 +47,17 @@ Good password hashing for your software and your servers.
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.0-1
+- Upgrade to latest upstream version
+- Use system libsodium instead of bundled version
+- Switch source from PyPI to GitHub
+- Use tox to run package tests
+- Remove test patches meant for previous releases
+
+ Thu Mar 10 2022 Bala <balakumaran.kannan@microsoft.com> - 1.3.0-8
+- BR necessary packages for PTest
+- Patch test cases written with older verion libraries
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.0-7
 - Add license to python3 package
 - Remove python2 package
@@ -67,5 +79,5 @@ Good password hashing for your software and your servers.
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.0-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Wed Mar 06 2019 Tapas Kundu <tkundu@vmware.com> 1.3.0-1
--   Initial packaging for Photon
+* Wed Mar 06 2019 Tapas Kundu <tkundu@vmware.com> 1.3.0-1
+- Initial packaging for Photon

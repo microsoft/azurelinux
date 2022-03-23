@@ -1,13 +1,13 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
-Version:        2.10.1
-Release:        4%{?dist}
+Version:        3.0.3
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://jinja.pocoo.org/
-Source0:        https://files.pythonhosted.org/packages/93/ea/d884a06f8c7f9b7afbc8138b762e80479fb17aedbbe2b06515a12de9378d/Jinja2-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/91/a5/429efc6246119e1e3fbf562c00187d04e83e54619249eb732bb423efa6c6/Jinja2-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -16,9 +16,12 @@ Jinja2 is a template engine written in pure Python.
 %package -n     python3-jinja2
 Summary:        A fast and easy to use template engine written in pure Python
 BuildRequires:  python3-devel
-BuildRequires:  python3-markupsafe
+BuildRequires:  python3-markupsafe >= 2.0
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 Requires:       python3
 Requires:       python3-markupsafe
 Provides:       python3dist(jinja2) = %{version}-%{release}
@@ -31,7 +34,7 @@ sandboxed environment.
 
 %prep
 %autosetup -n Jinja2-%{version}
-sed -i 's/\r$//' LICENSE # Fix wrong EOL encoding
+sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
 
 %build
 %py3_build
@@ -40,16 +43,25 @@ sed -i 's/\r$//' LICENSE # Fix wrong EOL encoding
 %py3_install
 
 %check
-%make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
+pip3 install tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-jinja2
 %defattr(-,root,root)
-%doc AUTHORS
-%license LICENSE
+%license LICENSE.rst
 %{python3_sitelib}/jinja2
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 3.0.3-2
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
+* Thu Mar 03 2022 Nick Samson <nisamson@microsoft.com> - 3.0.3-1
+- Updated to 3.0.3
+- Updated source URL
+- Updated check section to use tox for testing
+- Specified update for MarkupSafe
+
 * Sat Dec 04 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.10.1-4
 - Explicitly provide python3dist(jinja2) because built in toolchain.
 

@@ -12,7 +12,7 @@ Distribution:   Mariner
 Summary: A process-transparent configuration system
 Name: GConf2
 Version: 3.2.6
-Release: 30%{?dist}
+Release: 31%{?dist}
 License: GPLv2+
 #VCS: git:git://git.gnome.org/gconf
 Source0: http://download.gnome.org/sources/GConf/3.2/GConf-%{version}.tar.xz
@@ -39,6 +39,7 @@ BuildRequires: gtk-doc >= 0.9
 BuildRequires: pkgconfig >= 0.14
 BuildRequires: gettext
 BuildRequires: intltool
+BuildRequires: perl(File::Find)
 %if 0%{?defaults_service}
 BuildRequires: polkit-devel >= 0.92
 %endif
@@ -182,6 +183,9 @@ fi
 %{_mandir}/man1/gsettings-schema-convert.1*
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.6-31
+- Adding missing "BuildRequires:  perl(File::Find)".
+
 * Wed Feb 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.6-30
 - Using the "%%python3_version" macro to use the proper "2to3-%%{python3_version}" tool.
 - License verified.

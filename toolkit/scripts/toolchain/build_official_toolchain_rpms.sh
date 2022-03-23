@@ -304,8 +304,6 @@ build_rpm_in_chroot_no_install zip
 chroot_and_install_rpms zip
 build_rpm_in_chroot_no_install unzip
 chroot_and_install_rpms unzip
-build_rpm_in_chroot_no_install alsa-lib
-chroot_and_install_rpms alsa-lib
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
@@ -323,10 +321,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13%2B8-LTS-4.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13%2B8-LTS-4.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
@@ -469,6 +467,13 @@ build_rpm_in_chroot_no_install createrepo_c
 
 build_rpm_in_chroot_no_install libsepol
 
+# audit needs: python3, krb5, swig, e2fsprogs
+build_rpm_in_chroot_no_install audit
+
+# rebuild pam with selinux and audit support
+chroot_and_install_rpms audit
+build_rpm_in_chroot_no_install pam
+
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol
 build_rpm_in_chroot_no_install libselinux
@@ -479,9 +484,6 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
-
-# rebuild pam with selinux support
-build_rpm_in_chroot_no_install pam
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-xml are also needed but already installed

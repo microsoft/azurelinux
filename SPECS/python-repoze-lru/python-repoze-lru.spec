@@ -6,7 +6,7 @@
 Summary:        A tiny LRU cache implementation and decorator
 Name:           python-%{pkgname}
 Version:        0.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 URL:            https://github.com/repoze/repoze.lru
 Vendor:         Microsoft Corporation
@@ -46,7 +46,7 @@ python3 setup.py install --root=%{buildroot}
 
 %check
 pip3 install tox
-LANG=en_US.UTF-8 tox -e py39
+LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 %files -n python3-%{pkgname}
 %license LICENSE.txt
@@ -54,6 +54,9 @@ LANG=en_US.UTF-8 tox -e py39
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 0.7-4
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 0.7-3
 - Remove `%bcond_without check`
 - Use `py39` as tox environment to enable ptest

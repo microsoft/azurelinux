@@ -1,19 +1,21 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
+
 # Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2021-09-09
-%define stage0_version 1.55.0
+%define release_date 2022-01-13
+%define stage0_version 1.58.0
+
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.56.1
-Release:        2%{?dist}
+Version:        1.59.0
+Release:        1%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
-Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.gz
+Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
@@ -24,6 +26,7 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
+
 BuildRequires:  binutils
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -31,10 +34,12 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
-Provides:       cargo = %{version}-%{release}
+
 %if %{with_check}
 BuildRequires:  python3-xml
 %endif
+
+Provides:       cargo = %{version}-%{release}
 
 %description
 Rust Programming Language
@@ -115,6 +120,10 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.59.0-1
+- Updating to version 1.59.0 to fix CVE-2022-21658.
+- Updating build instructions to fix tests.
+
 * Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 1.56.1-2
 - Build rustfmt tool as it is required to run PTest
 - Create softlink for rustfmt in stage0
