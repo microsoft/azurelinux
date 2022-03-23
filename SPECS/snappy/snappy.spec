@@ -74,7 +74,7 @@ make test
 
 %changelog
 * Wed Mar 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.1.9-2
-- Do no provide gtest/gmock headers and binaries.
+- Do not provide gtest/gmock headers and binaries.
 
 * Wed Feb 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.9-1
 - Update to version 1.1.9.
