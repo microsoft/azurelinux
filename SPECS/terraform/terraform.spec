@@ -1,6 +1,3 @@
-%global debug_package %{nil}
-%define our_gopath %{_topdir}/.gopath
-
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.1.7
@@ -31,7 +28,8 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-
+%global debug_package %{nil}
+%define our_gopath %{_topdir}/.gopath
 BuildRequires:  golang >= 1.17.2
 
 %description
@@ -49,8 +47,6 @@ go build -mod=vendor -v -a -o terraform
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 
-%clean
-rm -rf %{buildroot}/*
 
 %files
 %defattr(-,root,root)
@@ -60,4 +56,4 @@ rm -rf %{buildroot}/*
 
 %changelog
 * Wed Mar 23 2022 Matthew Torr <matthewtorr@microsoft.com> - 1.1.7-1
-- Initial release of terraform RPM for Mariner 2.
+- Original version for CBL-Mariner.
