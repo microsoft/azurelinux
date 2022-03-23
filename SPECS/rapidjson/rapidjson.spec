@@ -1,13 +1,13 @@
 Summary:        A fast JSON parser/generator for C++ with both SAX/DOM style API
 Name:           rapidjson
 Version:        1.1.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD and JSON and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/Tencent/rapidjson
-Source0:        https://github.com/Tencent/%{name}/archive/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         0000-Supress-implicit-fallthrough-in-GCC.patch
 Patch1:         0001-Onley-apply-to-GCC-7.patch
 Patch2:         0002-Correct-object-copying-in-document_h.patch
@@ -52,6 +52,9 @@ make test
 %{_datadir}
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-7
+- Fixing invalid source URL.
+
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.1.0-6
 - Update Source0
 - Licenses verified, added %%license macro
