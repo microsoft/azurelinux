@@ -1,0 +1,43 @@
+diff -ru snappy-1.1.9-orig/CMakeLists.txt snappy-1.1.9/CMakeLists.txt
+--- snappy-1.1.9-orig/CMakeLists.txt	2022-01-21 13:54:18.000000000 -0800
++++ snappy-1.1.9/CMakeLists.txt	2022-03-23 11:43:01.016610086 -0700
+@@ -284,22 +284,25 @@
+ if(SNAPPY_BUILD_TESTS)
+   enable_testing()
+ 
+-  # Prevent overriding the parent project's compiler/linker settings on Windows.
+-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+-  set(install_gtest OFF)
+-  set(install_gmock OFF)
+-  set(build_gmock ON)
++  find_package(GTest)
++  if(NOT GTest_FOUND)
++    # Prevent overriding the parent project's compiler/linker settings on Windows.
++    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
++    set(install_gtest OFF)
++    set(install_gmock OFF)
++    set(build_gmock ON)
+ 
+-  # This project is tested using GoogleTest.
+-  add_subdirectory("third_party/googletest")
++    # This project is tested using GoogleTest.
++    add_subdirectory("third_party/googletest")
+ 
+-  # GoogleTest triggers a missing field initializers warning.
+-  if(SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS)
+-    set_property(TARGET gtest
+-        APPEND PROPERTY COMPILE_OPTIONS -Wno-missing-field-initializers)
+-    set_property(TARGET gmock
+-        APPEND PROPERTY COMPILE_OPTIONS -Wno-missing-field-initializers)
+-  endif(SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS)
++    # GoogleTest triggers a missing field initializers warning.
++    if(SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS)
++      set_property(TARGET gtest
++          APPEND PROPERTY COMPILE_OPTIONS -Wno-missing-field-initializers)
++      set_property(TARGET gmock
++          APPEND PROPERTY COMPILE_OPTIONS -Wno-missing-field-initializers)
++    endif(SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS)
++  endif()
+ 
+   add_executable(snappy_unittest "")
+   target_sources(snappy_unittest
