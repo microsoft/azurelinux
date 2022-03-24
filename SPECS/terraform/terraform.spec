@@ -2,7 +2,7 @@ Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.1.7
 Release:        1%{?dist}
-License:        MPL-2.0
+License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Tools
@@ -57,3 +57,4 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %changelog
 * Wed Mar 23 2022 Matthew Torr <matthewtorr@microsoft.com> - 1.1.7-1
 - Original version for CBL-Mariner.
+- License verified.
