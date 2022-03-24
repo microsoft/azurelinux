@@ -1,6 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
 %global srcname SQLAlchemy
 
 %global python_pkg_extras \
@@ -15,23 +12,25 @@ Distribution:   Mariner
     aiomysql \
     aiosqlite
 
-Name:           python-sqlalchemy
-Version:        1.4.32
 # cope with pre-release versions containing tildes
 %global srcversion %{lua: srcversion, num = rpm.expand("%{version}"):gsub("~", ""); print(srcversion);}
-Release:        2%{?dist}
-Summary:        Modular and flexible ORM library for python
 
+Summary:        Modular and flexible ORM library for python
+Name:           python-sqlalchemy
+Version:        1.4.32
+Release:        2%{?dist}
 License:        MIT
-URL:            http://www.sqlalchemy.org/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.sqlalchemy.org/
 Source0:        https://files.pythonhosted.org/packages/source/S/%{srcname}/%{srcname}-%{srcversion}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-greenlet >= 1.0
-BuildRequires:  python3-setuptools
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-xdist
+BuildRequires:  python3-setuptools
 
 %description
 SQLAlchemy is an Object Relational Mapper (ORM) that provides a flexible,
@@ -52,9 +51,8 @@ BuildArch:      noarch
 Documentation for SQLAlchemy
 
 %package -n python3-sqlalchemy
-Summary:        Modular and flexible ORM library for python
 %{?python_provide:%python_provide python%{python3_pkgversion}-sqlalchemy}
-Obsoletes:      python2-sqlalchemy < 1.3.10-2
+Summary:        Modular and flexible ORM library for python
 
 %description -n python3-sqlalchemy
 SQLAlchemy is an Object Relational Mapper (ORM) that provides a flexible,
@@ -68,8 +66,7 @@ domain.
 This package includes the python 3 version of the module.
 
 # Subpackages to ensure dependencies enabling extra functionality
-%{?python_extras_subpkg:%python_extras_subpkg -n python3-sqlalchemy -i %{python3_sitearch}/*.egg-info %python_pkg_extras}
-
+%{?python_extras_subpkg:%python_extras_subpkg -n python3-sqlalchemy -i %{python3_sitearch}/*.egg-info %{python_pkg_extras}}
 
 %prep
 %setup -q -n %{srcname}-%{srcversion}
@@ -84,8 +81,7 @@ This package includes the python 3 version of the module.
 rm -rf doc/build
 
 %check
-PYTHONPATH=. %{__python3} -m pytest test --numprocesses=auto
-
+PYTHONPATH=. python3 -m pytest test --numprocesses=auto
 
 %files doc
 %doc doc examples
