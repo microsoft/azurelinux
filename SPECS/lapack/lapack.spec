@@ -1,31 +1,13 @@
 # Something in the debuginfo process is stripping the custom 64_ symbols out of lapack64_ and blas64_
 %global debug_package %{nil}
-%undefine __cmake_in_source_build
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%undefine __cmake_in_source_build
 
 %if %{?__isa_bits:%{__isa_bits}}%{!?__isa_bits:32} == 64
 %global arch64 1
 %else
 %global arch64 0
 %endif
-
-Summary: Numerical linear algebra package libraries
-Name: lapack
-Version: 3.10.0
-Release: 6%{?dist}
-License: BSD
-URL: http://www.netlib.org/lapack/
-Source0: https://github.com/Reference-LAPACK/lapack/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source4: http://www.netlib.org/lapack/lapackqref.ps
-Source5: http://www.netlib.org/blas/blasqr.ps
-# Fix from https://github.com/Reference-LAPACK/lapack/pull/625/
-Patch0: CVE-2021-4048.patch
-
-BuildRequires: gcc-gfortran, gawk
-BuildRequires: make, cmake
-Requires: blas%{?_isa} = %{version}-%{release}
 
 %global _description_lapack %{expand:
 LAPACK (Linear Algebra PACKage) is a standard library for numerical
@@ -46,54 +28,75 @@ BLAS (Basic Linear Algebra Subprograms) is a standard library which
 provides a number of basic algorithms for numerical algebra.
 }
 
-%description %_description_lapack
+Summary:        Numerical linear algebra package libraries
+Name:           lapack
+Version:        3.10.0
+Release:        6%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.netlib.org/lapack/
+Source0:        https://github.com/Reference-LAPACK/lapack/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source4:        http://www.netlib.org/lapack/lapackqref.ps
+Source5:        http://www.netlib.org/blas/blasqr.ps
+# Fix from https://github.com/Reference-LAPACK/lapack/pull/625/
+Patch0:         CVE-2021-4048.patch
+
+BuildRequires:  cmake
+BuildRequires:  gawk
+BuildRequires:  gcc-gfortran
+BuildRequires:  make
+
+Requires:       blas%{?_isa} = %{version}-%{release}
+
+%description %{_description_lapack}
 
 %package devel
-Summary: LAPACK development libraries
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: blas-devel%{?_isa} = %{version}-%{release}
+Summary:        LAPACK development libraries
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       blas-devel%{?_isa} = %{version}-%{release}
 
 %description devel
 LAPACK development libraries (shared).
 
 %package -n blas
-Summary: The Basic Linear Algebra Subprograms library
+Summary:        The Basic Linear Algebra Subprograms library
 
-%description -n blas %_description_blas
+%description -n blas %{_description_blas}
 
 %package -n blas-devel
-Summary: BLAS development libraries
-Requires: blas%{?_isa} = %{version}-%{release}
-Requires: gcc-gfortran
+Summary:        BLAS development libraries
+Requires:       blas%{?_isa} = %{version}-%{release}
+Requires:       gcc-gfortran
 
 %description -n blas-devel
 BLAS development libraries (shared).
 
 %if 0%{?arch64}
 %package -n lapack64
-Summary: Numerical linear algebra package libraries
-Requires: blas64%{?_isa} = %{version}-%{release}
+Summary:        Numerical linear algebra package libraries
+Requires:       blas64%{?_isa} = %{version}-%{release}
 
-%description -n lapack64 %_description_lapack
+%description -n lapack64 %{_description_lapack}
 This build has 64bit INTEGER support.
 
 %package -n blas64
-Summary: The Basic Linear Algebra Subprograms library (64bit INTEGER)
+Summary:        The Basic Linear Algebra Subprograms library (64bit INTEGER)
 
-%description -n blas64 %_description_blas
+%description -n blas64 %{_description_blas}
 This build has 64bit INTEGER support.
 
 %package -n lapack64_
-Summary: Numerical linear algebra package libraries
-Requires: blas64_%{?_isa} = %{version}-%{release}
+Summary:        Numerical linear algebra package libraries
+Requires:       blas64_%{?_isa} = %{version}-%{release}
 
-%description -n lapack64_ %_description_lapack
+%description -n lapack64_ %{_description_lapack}
 This build has 64bit INTEGER support and a symbol name suffix.
 
 %package -n blas64_
-Summary: The Basic Linear Algebra Subprograms library (64bit INTEGER)
+Summary:        The Basic Linear Algebra Subprograms library (64bit INTEGER)
 
-%description -n blas64_ %_description_blas
+%description -n blas64_ %{_description_blas}
 This build has 64bit INTEGER support and a symbol name suffix.
 %endif
 
@@ -107,19 +110,19 @@ This build has 64bit INTEGER support and a symbol name suffix.
 # shared normal
 %cmake -B%{_vpath_builddir} -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DLAPACKE=ON -DLAPACKE_WITH_TMG=ON -DCBLAS=ON
 %cmake_build
-mv %_vpath_builddir %_vpath_builddir-SHARED
+mv %{_vpath_builddir} %{_vpath_builddir}-SHARED
 
 %if 0%{?arch64}
 # shared 64
 %cmake -B%{_vpath_builddir} -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DBUILD_INDEX64=ON -DLAPACKE=OFF -DCBLAS=ON
 %cmake_build
-mv %_vpath_builddir %_vpath_builddir-SHARED64
+mv %{_vpath_builddir} %{_vpath_builddir}-SHARED64
 
 # shared 64 SUFFIX
 sed -i 's|64"|64_"|g' CMakeLists.txt
 %cmake -B%{_vpath_builddir} -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DBUILD_INDEX64=ON -DLAPACKE=OFF -DCBLAS=ON
 %cmake_build
-mv %_vpath_builddir %_vpath_builddir-SHARED64SUFFIX
+mv %{_vpath_builddir} %{_vpath_builddir}-SHARED64SUFFIX
 
 # Undo the 64_ suffix
 sed -i 's|64_"|64"|g' CMakeLists.txt
@@ -134,18 +137,18 @@ for t in SHARED SHARED64; do
 %else
 for t in SHARED; do
 %endif
-	mv %_vpath_builddir-$t %_vpath_builddir
+	mv %{_vpath_builddir}-$t %{_vpath_builddir}
 	%cmake_install
-	mv %_vpath_builddir %_vpath_builddir-$t
+	mv %{_vpath_builddir} %{_vpath_builddir}-$t
 done
 
 %if 0%{?arch64}
 # Set the suffix
 sed -i 's|64"|64_"|g' CMakeLists.txt
 for t in SHARED64SUFFIX; do
-	mv %_vpath_builddir-$t %_vpath_builddir
+	mv %{_vpath_builddir}-$t %{_vpath_builddir}
 	%cmake_install
-	mv %_vpath_builddir %_vpath_builddir-$t
+	mv %{_vpath_builddir} %{_vpath_builddir}-$t
 done
 %endif
 
