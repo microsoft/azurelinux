@@ -7,7 +7,7 @@ License:       MIT
 URL:           https://github.com/voxik/abrt-ruby
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
-Source0:      https://github.com/voxik/abrt-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
+Source0:       https://github.com/voxik/abrt-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby

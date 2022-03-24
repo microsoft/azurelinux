@@ -1,19 +1,19 @@
-%define	gem_name		hpricot
+%define	gem_name  hpricot
 # See bug 1402582
 # Currently colm (dependency for ragel) has difficulty on
 # armv7hl
-%global	force_regenerate_from_rl	0
+%global	force_regenerate_from_rl  0
 
-Summary:	A Fast, Enjoyable HTML Parser for Ruby
-Name:		rubygem-%{gem_name}
-Version:	0.8.6
-Release:	35%{?dist}
+Summary:       A Fast, Enjoyable HTML Parser for Ruby
+Name:          rubygem-%{gem_name}
+Version:       0.8.6
+Release:       35%{?dist}
 # ext/fast_xs/FastXsService.java is licensed under ASL 2.0
-License:	MIT AND ASL 2.0
-Vendor:	        Microsoft Corporation
-Distribution:	Mariner
-URL:		http://github.com/hpricot/hpricot
-Source0:    https://github.com/hpricot/hpricot/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+License:       MIT AND ASL 2.0
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
+URL:           http://github.com/hpricot/hpricot
+Source0:       https://github.com/hpricot/hpricot/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)

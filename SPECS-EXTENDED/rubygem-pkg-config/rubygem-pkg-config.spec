@@ -5,16 +5,16 @@ Distribution:   Mariner
 %undefine        _changelog_trimtime
 %undefine __brp_mangle_shebangs
 
-Summary:	A pkg-config implementation by Ruby
-Name:		rubygem-%{gem_name}
-Version:	1.4.5
-Release:	4%{?dist}
-License:	LGPLv2+
-URL:	    http://github.com/rcairo/pkg-config
-Source0:	https://github.com/ruby-gnome/pkg-config/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Summary:  A pkg-config implementation by Ruby
+Name:     rubygem-%{gem_name}
+Version:  1.4.5
+Release:  4%{?dist}
+License:  LGPLv2+
+URL:      https://github.com/rcairo/pkg-config
+Source0:  https://github.com/ruby-gnome/pkg-config/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Observe test failure on test_cflags test_cflags_only_I
 # with pkgconf 1.4.2
-Patch0:	rubygem-pkg-config-1.4.4-cflags-result-sort.patch
+Patch0:   rubygem-pkg-config-1.4.4-cflags-result-sort.patch
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)

@@ -56,8 +56,8 @@ popd
 
 %files
 %dir %{gem_instdir}
-/usr/lib/ruby/gems/bin/maruku
-/usr/lib/ruby/gems/bin/marutex
+%{_libdir}/ruby/gems/bin/maruku
+%{_libdir}/ruby/gems/bin/marutex
 %license %{gem_instdir}/MIT-LICENSE.txt
 %{gem_instdir}/bin
 %{gem_instdir}/data

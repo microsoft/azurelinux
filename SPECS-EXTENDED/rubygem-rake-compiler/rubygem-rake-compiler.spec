@@ -1,13 +1,13 @@
 %global	gem_name rake-compiler
 %undefine        _changelog_trimtime
-Summary:	Rake-based Ruby C Extension task generator
-Name:		rubygem-%{gem_name}
-Version:	1.1.9
-Release:	1%{?dist}
-License:	MIT
-Vendor:		Microsoft Corporation
-Distribution:	Mariner
-URL:		https://rubydoc.info/gems/rake-compiler
+Summary:    Rake-based Ruby C Extension task generator
+Name:       rubygem-%{gem_name}
+Version:    1.1.9
+Release:    1%{?dist}
+License:    MIT
+Vendor:     Microsoft Corporation
+Distribution:  Mariner
+URL:        https://rubydoc.info/gems/rake-compiler
 Source0:    https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:	ruby(release)
 BuildRequires:	ruby(rubygems) >= 1.3.5

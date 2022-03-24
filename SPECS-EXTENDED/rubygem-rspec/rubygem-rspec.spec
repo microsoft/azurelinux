@@ -2,13 +2,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global	gem_name	rspec
 
-Summary:	Behaviour driven development (BDD) framework for Ruby
-Name:		rubygem-%{gem_name}
-Version:	3.9.0
-Release:	4%{?dist}
-License:	MIT
+Summary:  Behaviour driven development (BDD) framework for Ruby
+Name:     rubygem-%{gem_name}
+Version:  3.9.0
+Release:  4%{?dist}
+License:  MIT
 URL:      https://rspec.info
-Source0:	https://github.com/rspec/rspec-metagem/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-metagem-%{version}.tar.gz
+Source0:  https://github.com/rspec/rspec-metagem/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-metagem-%{version}.tar.gz
 
 BuildRequires:	rubygems-devel
 #BuildRequires:	ruby(release)
