@@ -1,18 +1,4 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global         modname greenlet
-
-Name:           python-%{modname}
-Version:        1.1.2
-Release:        3%{?dist}
-Summary:        Lightweight in-process concurrent programming
-# Most is MIT except for these, which are under the Python Software License:
-# - src/greenlet/slp_platformselect.h
-# - src/greenlet/platform/ directory
-License:        MIT AND Python
-URL:            https://github.com/python-greenlet/greenlet
-Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
-BuildRequires:  gcc-c++
 
 %global _description \
 The greenlet package is a spin-off of Stackless, a version of CPython\
@@ -20,11 +6,27 @@ that supports micro-threads called "tasklets". Tasklets run\
 pseudo-concurrently (typically in a single or a few OS-level threads)\
 and are synchronized with data exchanges on "channels".
 
+Summary:        Lightweight in-process concurrent programming
+Name:           python-%{modname}
+Version:        1.1.2
+Release:        3%{?dist}
+# Most is MIT except for these, which are under the Python Software License:
+# - src/greenlet/slp_platformselect.h
+# - src/greenlet/platform/ directory
+License:        MIT AND Python
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/python-greenlet/greenlet
+Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
+
+BuildRequires:  gcc-c++
+
 %description %{_description}
 
 %package -n     python3-%{modname}
-Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{modname}}
+Summary:        %{summary}
+
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 
@@ -33,8 +35,9 @@ BuildRequires:  python3-setuptools
 Python 3 version.
 
 %package -n     python3-%{modname}-devel
-Summary:        C development headers for python3-%{modname}
 %{?python_provide:%python_provide python3-%{modname}-devel}
+Summary:        C development headers for python3-%{modname}
+
 Requires:       python3-%{modname}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description -n python3-%{modname}-devel
@@ -50,7 +53,7 @@ Python 3 version.
 
 %install
 %py3_install
- 
+
 %check
 PYTHONPATH="%{buildroot}%{python3_sitearch}" %{python3} -m unittest discover greenlet.tests
 
