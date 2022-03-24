@@ -2801,7 +2801,6 @@
                 "keyutils",
                 "kmod",
                 "krb5",
-                "lapack",
                 "less",
                 "libaio",
                 "libarchive",
