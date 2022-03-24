@@ -210,6 +210,7 @@ generate_pkggen_core () {
         grep "^binutils-" $TmpPkgGen
         grep "^gmp-" $TmpPkgGen
         grep "^mpfr-" $TmpPkgGen
+        grep "^libmetalink-[0-9]" $TmpPkgGen
         grep "^libmpc-" $TmpPkgGen
         grep "^libgcc-" $TmpPkgGen
         grep "^libstdc++-" $TmpPkgGen
