@@ -181,6 +181,7 @@ fi
 %changelog
 * Fri Mar 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.28-1
 - Updating to version 1.28 using Fedora 36 spec (license: MIT) for guidance.
+- Switching to using upstream fix for tartest.
 
 * Mon Mar 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.25.3-2
 - Update `relax_tartest.patch` to enable ptest
