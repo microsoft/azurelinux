@@ -3,7 +3,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        21.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,9 @@ Patch2:         ds-vmware-mariner.patch
 Patch3:         cloud-cfg.patch
 # Add Mariner distro support to cloud-init
 Patch4:         mariner-21.4.patch
+# backport patch https://github.com/canonical/cloud-init/commit/0988fb89be06aeb08083ce609f755509d08fa459.patch to 21.4
+Patch5:         azureds-set-ovf_is_accesible.patch
+
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
@@ -72,6 +75,7 @@ ssh keys and to let the user run various scripts.
 %package azure-kvp
 Summary:        Cloud-init configuration for Hyper-V telemetry
 Requires:       %{name} = %{version}-%{release}
+
 %description    azure-kvp
 Cloud-init configuration for Hyper-V telemetry
 
@@ -158,6 +162,9 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Tue Mar 22 2022 Anirudh Gopal <angop@microsoft.com> - 21.4-2
+- Backport cloud-init ovf_is_accessible DataSourceAzure.py fix to 21.4
+
 * Wed Mar 16 2022 Henry Beberman <henry.beberman@microsoft.com> - 21.4-1
 - Update to version 21.4
 - Remove several upstreamed patches already present in source
