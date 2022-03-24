@@ -7,14 +7,13 @@
 Summary:	A Fast, Enjoyable HTML Parser for Ruby
 Name:		rubygem-%{gem_name}
 Version:	0.8.6
-Release:	34%{?dist}
+Release:	35%{?dist}
 # ext/fast_xs/FastXsService.java is licensed under ASL 2.0
 License:	MIT AND ASL 2.0
 Vendor:	        Microsoft Corporation
 Distribution:	Mariner
 URL:		http://github.com/hpricot/hpricot
-# Source0:	https://github.com/hpricot/hpricot/archive/refs/tags/%{version}.tar.gz
-Source0:	%{gem_name}-%{version}.tar.gz
+Source0:    https://github.com/hpricot/hpricot/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
@@ -129,6 +128,9 @@ popd
 %{gem_docdir}/
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.8.6-35
+- Build from .tar.gz source.
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.8.6-34
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

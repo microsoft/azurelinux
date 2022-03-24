@@ -8,8 +8,7 @@ Release: 1%{?dist}
 Summary: Fast syntax highlighting for selected languages
 License: MIT
 URL: http://coderay.rubychan.de
-#Source0: https://github.com/rubychan/coderay/archive/refs/tags/v%{version}.tar.gz
-Source0:  %{gem_name}-%{version}.tar.gz
+Source0: https://github.com/rubychan/coderay/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby >= 1.8.6
@@ -43,7 +42,6 @@ cp -a lib/ %{buildroot}%{gem_instdir}/
 cp -a bin/ %{buildroot}%{gem_instdir}/
 #add MIT-LICENSE file to buildroot from Source0
 cp MIT-LICENSE %{buildroot}%{gem_instdir}/
-cp README_INDEX.rdoc %{buildroot}%{gem_instdir}/
 
 %check
 LANG=C.UTF-8
@@ -61,13 +59,16 @@ ruby ./test/unit/suite.rb
 
 %files doc
 %doc /%{gemdir}/doc/
-%doc %{gem_instdir}/README_INDEX.rdoc
-/%{gemdir}/gems/%{gem_name}-%{version}.rc1/README_INDEX.rdoc
+%doc /%{gemdir}/gems/%{gem_name}-%{version}.rc1/README_INDEX.rdoc
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.3-1
+- Update to v1.1.3.
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.2-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

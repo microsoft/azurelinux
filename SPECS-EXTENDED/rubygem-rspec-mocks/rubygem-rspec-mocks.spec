@@ -5,15 +5,13 @@ Distribution:   Mariner
 %global	need_bootstrap_set	0
 %undefine __brp_mangle_shebangs
 
-Summary:	RSpec's 'test double' framework (mocks and stubs)
-Name:		rubygem-%{gem_name}
-Version:	3.9.1
-Release:	2%{?dist}
-
-License:	MIT
-URL:		https://github.com/rspec/rspec-mocks
-#Source0:  https://github.com/rspec/rspec-mocks/archive/refs/tags/v%{version}.tar.gz
-Source0:  %{gem_name}-%{version}.tar.gz
+Summary:  RSpec's 'test double' framework (mocks and stubs)
+Name:     rubygem-%{gem_name}
+Version:  3.9.1
+Release:  3%{?dist}
+License:  MIT
+URL:      https://github.com/rspec/rspec-mocks
+Source0:  https://github.com/rspec/rspec-mocks/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 BuildRequires:	rubygems-devel
 %if 0%{?need_bootstrap_set} < 1
@@ -71,10 +69,13 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 %{gem_docdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.9.1-3
+- License verified.
+- Build from .tar.gz source.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.1-2
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.1-1.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

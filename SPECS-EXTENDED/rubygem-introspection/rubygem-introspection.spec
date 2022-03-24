@@ -2,14 +2,13 @@
 
 Name:          rubygem-%{gem_name}
 Version:       0.0.4
-Release:       12%{?dist}
+Release:       13%{?dist}
 Summary:       Dynamic inspection of the hierarchy of method definitions on a Ruby object
 License:       MIT
 Vendor:	       Microsoft Corporation
 Distribution:  Mariner
 URL:           https://jamesmead.org
-#Source0:       https://github.com/floehopper/introspection/archive/refs/tags/v%{version}.tar.gz
-Source0:       %{gem_name}-%{version}.tar.gz
+Source0:       https://github.com/floehopper/introspection/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: git
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
@@ -75,6 +74,9 @@ popd
 %doc %{gem_docdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.0.4-13
+- Build from .tar.gz source.
+
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.0.4-12
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

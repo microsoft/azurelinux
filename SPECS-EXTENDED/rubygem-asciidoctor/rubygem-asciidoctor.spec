@@ -10,7 +10,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:	Mariner
 URL:            https://asciidoctor.org/
-Source0:        https://github.com/%{gem_name}/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#%{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/%{gem_name}/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 
 %description
@@ -57,6 +57,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %changelog
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.17-1
 - Update to v2.0.17.
+- Build from .tar.gz source.
 
 * Tue Dec 28 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0.15-1
 - Original version for CBL-Mariner

@@ -4,12 +4,11 @@ Distribution:   Mariner
 
 Name:           rubygem-%{gem_name}
 Version:        3.26.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Pure-ruby colorizer based on pygments
 License:        MIT and BSD
 URL:            http://rouge.jneen.net/
-#Source0:        https://github.com/rouge-ruby/rouge/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/rouge-ruby/rouge/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
 BuildRequires:  ruby >= 2.0
@@ -67,9 +66,12 @@ help2man -N -s1 -o %{buildroot}%{_mandir}/man1/rougify.1 \
 %{gem_instdir}/Gemfile
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.26.0-3
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.26.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Fri Dec 11 2020 Fabio Valentini <decathorpe@gmail.com> - 3.26.0-1
 - Update to version 3.26.0.

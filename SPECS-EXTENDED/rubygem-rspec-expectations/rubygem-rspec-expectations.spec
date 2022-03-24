@@ -1,20 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global	gem_name	rspec-expectations
-
 %global	need_bootstrap_set	0
-
 %undefine __brp_mangle_shebangs
 
-Summary:	RSpec expectations (should and matchers)
-Name:		rubygem-%{gem_name}
-Version:	3.11.0
-Release:	1%{?dist}
-
-License:	MIT
-URL:		http://github.com/rspec/rspec-expectations
-#Source0: https://github.com/rspec/rspec-expectations/archive/refs/tags/v%{version}.tar.gz
-Source0:  %{gem_name}-%{version}.tar.gz
+Summary:  RSpec expectations (should and matchers)
+Name:     rubygem-%{gem_name}
+Version:  3.11.0
+Release:  1%{?dist}
+License:  MIT
+URL:      http://github.com/rspec/rspec-expectations
+Source0:  https://github.com/rspec/rspec-expectations/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
@@ -77,6 +73,7 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 * Fri Mar 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.11.0-1
 - Update to v3.11.0.
 - License verified.
+- Build from .tar.gz source.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

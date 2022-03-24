@@ -3,13 +3,12 @@
 Summary:        Adds a metaclass method to all Ruby objects
 Name:           rubygem-%{gem_name}
 Version:        0.0.4
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:	        Microsoft Corporation
 Distribution:	Mariner
 URL:            https://github.com/floehopper/metaclass/
-#Source0:        https://github.com/floehopper/metaclass/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/floehopper/metaclass/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Make the test suite support MiniTest 5.x.
 # https://github.com/floehopper/metaclass/commit/cff40cbace639d3b66d7913d99e74e56f91905b8
 Patch0:         rubygem-metaclass-0.0.4-Move-to-Minitest-5.patch
@@ -69,6 +68,9 @@ ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 %{gem_instdir}/test
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.0.4-15
+- Build from .tar.gz source.
+
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.0.4-14
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

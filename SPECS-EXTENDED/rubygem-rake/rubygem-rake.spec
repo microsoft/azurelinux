@@ -9,9 +9,7 @@ License:	MIT
 URL:		https://ruby.github.io/rake/
 Vendor:     Microsoft Corporation
 Distribution: Mariner
-#Source0:	https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz
-Source0:    %{gem_name}-%{version}.tar.gz
-
+Source0:	https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 BuildRequires:	ruby
@@ -88,6 +86,7 @@ popd
 * Fri Mar 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-1
 - Update to v13.0.6.
 - License verified.
+- Build from .tar.gz source.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 13.0.1-202
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

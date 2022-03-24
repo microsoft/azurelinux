@@ -2,13 +2,12 @@
 Summary:       ABRT support for Ruby
 Name:          rubygem-%{gem_name}
 Version:       0.4.0
-Release:       2%{?dist}
+Release:       3%{?dist}
 License:       MIT
 URL:           https://github.com/voxik/abrt-ruby
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
-#Source0:      https://github.com/voxik/abrt-ruby/archive/refs/tags/v%{version}.tar.gz
-Source0:       %{gem_name}-ruby-%{version}.tar.gz
+Source0:      https://github.com/voxik/abrt-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -67,9 +66,12 @@ popd
 %{gem_instdir}/Rakefile
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.4.0-3
+- Build from .tar.gz source.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Mon Jun 22 2020 Vít Ondruch <vondruch@redhat.com> - 0.4.0-1
 - Update to abrt 0.4.0.

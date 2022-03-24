@@ -5,14 +5,13 @@
 Summary:        Provides a simple way to write new native resources for puppet
 Name:           rubygem-%{gem_name}
 Version:        1.8.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
-#Source0:        https://github.com/puppetlabs/puppet-resource_api/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/puppetlabs/puppet-resource_api/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 
 %description
@@ -33,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.14-2
+- Build from .tar.gz source.
+
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.14-1
 - Original version for CBL-Mariner
 - License verified

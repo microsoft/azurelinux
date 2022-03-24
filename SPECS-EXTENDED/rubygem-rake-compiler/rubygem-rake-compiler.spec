@@ -8,10 +8,7 @@ License:	MIT
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
 URL:		https://rubydoc.info/gems/rake-compiler
-#Source0:    https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v%{version}.tar.gz
-Source0:	%{gem_name}-%{version}.tar.gz
-
-Requires:	ruby(release)
+Source0:    https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:	ruby(release)
 BuildRequires:	ruby(rubygems) >= 1.3.5
 BuildRequires:	rubygems-devel
@@ -21,6 +18,7 @@ BuildRequires:	rubygem(rspec) >= 3
 # cucumber test needs ruby.h header and compiler
 BuildRequires:	gcc
 BuildRequires:	ruby-devel
+Requires:	ruby(release)
 Requires:	ruby(rubygems) >= 1.3.5
 BuildArch:	noarch
 Provides:	rubygem(%{gem_name}) = %{version}-%{release}
@@ -105,6 +103,7 @@ popd
 %changelog
 * Tue Mar 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.9-1
 - Update to v1.1.9.
+- Build from .tar.gz source.
 
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.6-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)

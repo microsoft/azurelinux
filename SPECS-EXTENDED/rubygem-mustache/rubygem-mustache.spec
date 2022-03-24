@@ -3,12 +3,11 @@ Distribution:   Mariner
 %global gem_name mustache
 Name: rubygem-%{gem_name}
 Version: 1.1.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Mustache is a framework-agnostic way to render logic-free views
 License: MIT
 URL: https://github.com/mustache/mustache
-#Source0: https://github.com/mustache/mustache/archive/refs/tags/v%{version}.tar.gz
-Source0: %{gem_name}-%{version}.tar.gz
+Source0: https://github.com/mustache/mustache/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Fix test race condition.
 # https://github.com/mustache/mustache/pull/258
 Patch0: rubygem-mustache-1.1.1-Fix-test-race-condition.patch
@@ -30,7 +29,6 @@ Think of Mustache as a replacement for your views. Instead of views
 consisting of ERB or HAML with random helpers and arbitrary logic,
 your views are broken into two parts: a Ruby class and an HTML
 template.
-
 
 %package doc
 Summary: Documentation for %{name}
@@ -101,9 +99,12 @@ popd
 %{gem_instdir}/test
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.1-3
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Mon Apr 27 2020 Vít Ondruch <vondruch@redhat.com> - 1.1.1-1
 - Update to Mustache 1.1.1.

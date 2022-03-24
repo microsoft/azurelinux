@@ -8,11 +8,9 @@ Version:        5.1.0
 Release:        1%{?dist}
 License:        MIT
 URL:            https://www.liquidmarkup.org
-#Source0:        https://github.com/Shopify/liquid/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/Shopify/liquid/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 BuildArch:      noarch
-
 BuildRequires:  ruby(release)
 BuildRequires:  ruby >= 2.1.0
 BuildRequires:  rubygems-devel >= 1.3.7
@@ -72,6 +70,7 @@ popd
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.1.0-1
 - Update to v5.1.0.
 - License verified.
+- Build from .tar.gz source.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

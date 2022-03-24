@@ -6,13 +6,11 @@ Distribution:   Mariner
 
 Name:           rubygem-%{gem_name}
 Version:        0.7.3
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        Manual authoring tool
-
 License:        MIT
 URL:            https://github.com/rtomayko/ronn
-#Source0:        https://github.com/rtomayko/ronn/archive/refs/tags/%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/rtomayko/ronn/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  rubygems-devel
 Requires:       rubygem(hpricot)
@@ -74,9 +72,12 @@ rm -rf %{buildroot}%{gem_instdir}/{INSTALLING,Rakefile,test,man,ronn.gemspec,con
 %{gem_docdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.3-17
+- License verified
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.3-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.3-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

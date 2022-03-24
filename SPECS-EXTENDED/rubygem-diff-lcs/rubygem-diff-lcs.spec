@@ -8,12 +8,11 @@ Distribution:   Mariner
 
 Name: rubygem-%{gem_name}
 Version: 1.3
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: Provide a list of changes between two sequenced collections
 License: GPLv2+ or Artistic or MIT
 URL: https://github.com/halostatue/diff-lcs
-#Source0: https://github.com/halostatue/diff-lcs/archive/refs/tags/v%{version}.tar.gz
-Source0: %{gem_name}-%{version}.tar.gz
+Source0: https://github.com/halostatue/diff-lcs/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: rubygems-devel
 %if ! 0%{?bootstrap}
 BuildRequires: rubygem(rspec)
@@ -80,9 +79,12 @@ popd
 %{gem_instdir}/spec
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.3-10
+- Build from .tar.gz source.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.3-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

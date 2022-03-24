@@ -4,12 +4,11 @@ Distribution:   Mariner
 
 Name: rubygem-%{gem_name}
 Version: 0.13.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: An IRB alternative and runtime developer console
 License: MIT
 URL: https://pry.github.io/
-#Source0: https://github.com/pry/pry/archive/refs/tags/v%{version}.tar.gz
-Source0: %{gem_name}-%{version}.tar.gz
+Source0: https://github.com/pry/pry/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: git
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
@@ -94,9 +93,12 @@ popd
 %doc %{gem_instdir}/README.md
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.13.1-3
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.13.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Mon Apr 20 2020 Vít Ondruch <vondruch@redhat.com> - 0.13.1-1
 - Update to Pry 0.13.1.

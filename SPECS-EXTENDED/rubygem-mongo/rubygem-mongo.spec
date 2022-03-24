@@ -11,8 +11,7 @@ Release: 1%{?dist}
 Summary: Ruby driver for MongoDB
 License: ASL 2.0
 URL: https://docs.mongodb.com/ruby-driver/
-#Source0: https://github.com/mongodb/mongo-ruby-driver/archive/refs/tags/v%{version}.tar.gz
-Source0: %{gem_name}-ruby-driver-%{version}.tar.gz
+Source0: https://github.com/mongodb/mongo-ruby-driver/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-driver-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -115,6 +114,7 @@ popd
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.17.0-1
 - Update to v2.17.0.
 - License verified.
+- Build from .tar.gz source.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

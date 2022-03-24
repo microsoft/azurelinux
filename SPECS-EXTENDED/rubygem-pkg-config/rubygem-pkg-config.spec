@@ -8,11 +8,10 @@ Distribution:   Mariner
 Summary:	A pkg-config implementation by Ruby
 Name:		rubygem-%{gem_name}
 Version:	1.4.5
-Release:	3%{?dist}
+Release:	4%{?dist}
 License:	LGPLv2+
 URL:	    http://github.com/rcairo/pkg-config
-#Source0:	https://github.com/ruby-gnome/pkg-config/archive/refs/tags/%{version}.tar.gz
-Source0:  %{gem_name}-%{version}.tar.gz
+Source0:	https://github.com/ruby-gnome/pkg-config/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Observe test failure on test_cflags test_cflags_only_I
 # with pkgconf 1.4.2
 Patch0:	rubygem-pkg-config-1.4.4-cflags-result-sort.patch
@@ -87,9 +86,14 @@ ruby -Ilib:test:. ./test.rb
 %{gem_docdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.4.5-4
+- Build from .tar.gz source.
+
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.5-3
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.5-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
-- License verified.
 
 * Fri Feb  5 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.4.5-1
 - 1.4.5

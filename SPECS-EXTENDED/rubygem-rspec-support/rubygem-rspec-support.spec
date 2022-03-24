@@ -14,8 +14,7 @@ Release:	1%{?dist}
 Summary:	Common functionality to Rspec series
 License:	MIT
 URL:		https://github.com/rspec/rspec-support
-#Source0:	 https://github.com/rspec/rspec-support/archive/refs/tags/v%{version}.tar.gz
-Source0:	%{gem_name}-%{version}.tar.gz
+Source0:	https://github.com/rspec/rspec-support/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # tweak regex for search path
 Patch100:	rubygem-rspec-support-3.2.1-callerfilter-searchpath-regex.patch
 
@@ -95,6 +94,7 @@ ruby -rrubygems -Ilib/ -S rspec spec/ || \
 * Fri Mar 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.11.0-1
 - Update to v3.11.0.
 - License verified.
+- Build from .tar.gz source.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.3-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

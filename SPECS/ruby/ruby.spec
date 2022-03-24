@@ -335,7 +335,7 @@ sudo -u test make test TESTS="-v"
 
 %changelog
 * Tue Mar 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.7.4-2
-- Build bigdecimal, minitest, test-unit, rdoc and power_assert rubygems (taken from Fedora)
+- Build bigdecimal, minitest, test-unit, rdoc and power_assert rubygems (taken from Fedora 37, license: MIT)
 
 * Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> - 2.7.4-1
 - Update to version 2.7.4 to build with new autoconf

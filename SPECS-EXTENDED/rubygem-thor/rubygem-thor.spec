@@ -11,8 +11,7 @@ License:        MIT
 Vendor:		    Microsoft Corporation
 Distribution:	Mariner
 URL:            http://whatisthor.com/
-#Source0:        https://github.com/rails/thor/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/rails/thor/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 
 %description
@@ -35,6 +34,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %changelog
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.1-1
 - Update to v1.2.1.
+- Build from .tar.gz source.
 
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.0-1
 - Original version for CBL-Mariner

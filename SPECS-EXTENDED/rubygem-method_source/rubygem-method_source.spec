@@ -3,11 +3,10 @@
 Summary: Retrieve the source code for a method
 Name: rubygem-%{gem_name}
 Version: 1.0.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT
 URL: http://banisterfiend.wordpress.com
-#Source0: https://github.com/banister/method_source/archive/refs/tags/v%{version}.tar.gz
-Source0:  %{gem_name}-%{version}.tar.gz
+Source0: https://github.com/banister/method_source/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Patch0: fix-gemspec.patch
 
 BuildRequires: ruby(release)
@@ -67,9 +66,12 @@ popd
 %{gem_instdir}/spec
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-4
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
-- License verified.
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

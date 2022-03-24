@@ -4,13 +4,11 @@ Distribution:   Mariner
 
 Name:		rubygem-%{gem_name}
 Version:	1.1.1
-Release:	4%{?dist}
-
+Release:	5%{?dist}
 Summary:	Test helper for ordering threaded code
 License:	MIT
 URL:		https://github.com/JoshCheek/thread_order
-#Source0:	 https://github.com/JoshCheek/thread_order/archive/refs/tags/v%{version}.tar.gz
-Source0:    %{gem_name}-%{version}.tar.gz
+Source0:	https://github.com/JoshCheek/thread_order/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
@@ -89,9 +87,12 @@ popd
 %doc %{gem_docdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.1-5
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

@@ -10,8 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/rubygems/rubygems
-#Source0:        https://github.com/rubygems/rubygems/archive/refs/tags/bundler-v%{version}.tar.gz
-Source0:        rubygems-%{gem_name}-v%{version}.tar.gz
+Source0:        https://github.com/rubygems/rubygems/archive/refs/tags/bundler-v%{version}.tar.gz#/rubygems-%{gem_name}-v%{version}.tar.gz
 BuildRequires:  ruby > 2.1.0
 Provides:       rubygem(bundler) = %{version}-%{release}
 Provides:       %{name}-doc = %{version}-%{release}
@@ -39,6 +38,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %changelog
 * Tue Mar 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.8-1
 - Update to v2.3.8.
+- Build from .tar.gz source.
 
 * Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 1.16.4-5
 - Add provides for rubygem(bundler) and rubygem-bundler-doc

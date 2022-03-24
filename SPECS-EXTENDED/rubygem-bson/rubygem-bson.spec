@@ -10,8 +10,7 @@ License: ASL 2.0
 # Because there is a basic explanation about the bson
 # that is a beneficial for Fedora user.
 URL: https://bsonspec.org
-#Source0: https://github.com/mongodb/bson-ruby/archive/refs/tags/v%{version}.tar.gz
-Source0: %{gem_name}-ruby-%{version}.tar.gz
+Source0: https://github.com/mongodb/bson-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
 Requires: rubygem(bigdecimal)
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel >= 1.3.6
@@ -84,6 +83,7 @@ popd
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.14.1-1
 - Update to v4.14.1.
 - License verified.
+- Build from .tar.gz source.
 
 * Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 4.7.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

@@ -5,14 +5,13 @@
 Summary:        Merge Deeply Nested Hashes
 Name:           rubygem-%{gem_name}
 Version:        1.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:	Mariner
 URL:            https://github.com/danielsdeleo/deep_merge
-#Source0:        https://github.com/danielsdeleo/deep_merge/archive/refs/tags/%{version}.tar.gz
-Source0:        %{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/danielsdeleo/deep_merge/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 
 %description
@@ -33,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.1-2
+- Build from .tar.gz source.
+
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.2.1-1
 - Original version for CBL-Mariner
 - License verified

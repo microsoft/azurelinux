@@ -5,18 +5,16 @@ Distribution:   Mariner
 Summary:	Mock object library for ruby
 Name:		rubygem-%{gem_name}
 Version:	2.3.6
-Release:	8%{?dist}
+Release:	9%{?dist}
 License:	MIT
 URL:		https://github.com/doudou/flexmock
-#Source0:	https://github.com/doudou/flexmock/archive/refs/tags/v%{version}.tar.gz
-Source0:    %{gem_name}-%{version}.tar.gz
-
-Requires:	ruby(release)
+Source0:	https://github.com/doudou/flexmock/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:	git
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 BuildRequires:	rubygem(minitest) >= 5
 BuildRequires:	rubygem(rspec) >= 3
+Requires:   ruby(release)
 Requires:   ruby(rubygems)
 Provides:   rubygem(%{gem_name}) = %{version}-%{release}
 BuildArch:  noarch
@@ -79,9 +77,14 @@ popd
 %{gem_docdir}/
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.6-9
+- Build from .tar.gz source.
+
+* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.6-8
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.6-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.6-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
