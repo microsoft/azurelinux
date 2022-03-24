@@ -7,8 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Tools
 URL:            https://www.terraform.io/
-#Source0:       https://github.com/hashicorp/terraform/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/hashicorp/terraform/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
