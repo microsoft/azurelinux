@@ -1,18 +1,18 @@
+%global debug_package %{nil}
+%global gem_name diff-lcs
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global gem_name diff-lcs
-
 # %%check section needs rspec-expectations, however rspec-expectations depends
 # on diff-lcs.
 %{!?_with_bootstrap: %global bootstrap 0}
 
 Name: rubygem-%{gem_name}
 Version: 1.3
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: Provide a list of changes between two sequenced collections
 License: GPLv2+ or Artistic or MIT
 URL: https://github.com/halostatue/diff-lcs
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source0: https://github.com/halostatue/diff-lcs/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: rubygems-devel
 %if ! 0%{?bootstrap}
 BuildRequires: rubygem(rspec)
@@ -25,7 +25,6 @@ Diff::LCS computes the difference between two Enumerable sequences using the
 McIlroy-Hunt longest common subsequence (LCS) algorithm. It includes utilities
 to create a simple HTML diff output format and a standard diff-like tool.
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -35,49 +34,41 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -c  -T
-%gem_install -n %{SOURCE0}
-
+%setup -q -n %{gem_name}-%{version}
 
 %build
-
+gem build %{gem_name}
 
 %install
+gem install %{gem_name}-%{version}.gem
 mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
+cp -a /%{gem_dir}/bin %{buildroot}%{gem_dir}/
+cp -a /%{gem_dir}/build_info %{buildroot}%{gem_dir}/gems/
+cp -a /%{gem_dir}/cache/%{gem_name}-%{version}.gem %{buildroot}%{gem_dir}/
+cp -a /%{gem_dir}/doc/%{gem_name}-%{version} %{buildroot}%{gem_dir}/
+cp -a /%{gem_dir}/extensions %{buildroot}%{gem_dir}/gems/
+cp -a /%{gem_dir}/specifications/%{gem_name}-%{version}.gemspec %{buildroot}%{gem_dir}/
+cp -a /%{gem_dir}/gems/%{gem_name}-%{version} %{buildroot}%{gem_dir}/gems/
 
-
-mkdir -p %{buildroot}%{_bindir}
-cp -pa .%{_bindir}/* \
-        %{buildroot}%{_bindir}/
-
-find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
-
-# Fix shebangs.
-sed -i 's|^#!.*|#!/usr/bin/ruby|' %{buildroot}%{gem_instdir}/bin/{htmldiff,ldiff}
-
-%if ! 0%{?bootstrap}
 %check
 pushd .%{gem_instdir}
 rspec spec
 popd
-%endif
 
 %files
 %dir %{gem_instdir}
-%{_bindir}/htmldiff
-%{_bindir}/ldiff
+/usr/lib/ruby/gems/bin/htmldiff
+/usr/lib/ruby/gems/bin/ldiff
 %exclude %{gem_instdir}/.*
 %license %{gem_instdir}/License.md
-%license %{gem_instdir}/docs
 %{gem_instdir}/bin
+%license %{gem_instdir}/docs
 %{gem_libdir}
-%exclude %{gem_cache}
-%{gem_spec}
+%{gem_dir}/%{gem_name}-%{version}
+%{gem_dir}/%{gem_name}-%{version}.gem
+%{gem_dir}/%{gem_name}-%{version}.gemspec
 
 %files doc
-%doc %{gem_docdir}
 %doc %{gem_instdir}/Code-of-Conduct.md
 %doc %{gem_instdir}/Contributing.md
 %doc %{gem_instdir}/History.md
@@ -88,6 +79,10 @@ popd
 %{gem_instdir}/spec
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.3-10
+- Build from .tar.gz source.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

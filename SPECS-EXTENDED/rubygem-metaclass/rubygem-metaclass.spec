@@ -1,17 +1,18 @@
+%global debug_package %{nil}
 %global gem_name metaclass
-
 Summary:        Adds a metaclass method to all Ruby objects
 Name:           rubygem-%{gem_name}
 Version:        0.0.4
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:	        Microsoft Corporation
 Distribution:	Mariner
-URL:            http://github.com/floehopper/metaclass
-Source0:        http://rubygems.org/gems/%{gem_name}-%{version}.gem
+URL:            https://github.com/floehopper/metaclass/
+Source0:        https://github.com/floehopper/metaclass/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Make the test suite support MiniTest 5.x.
 # https://github.com/floehopper/metaclass/commit/cff40cbace639d3b66d7913d99e74e56f91905b8
 Patch0:         rubygem-metaclass-0.0.4-Move-to-Minitest-5.patch
+BuildRequires:  git
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
 BuildRequires:  ruby
@@ -21,7 +22,6 @@ BuildArch:      noarch
 %description
 Adds a metaclass method to all Ruby objects
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -30,50 +30,47 @@ BuildArch: noarch
 %description doc
 Documentation for %{name}
 
-
 %prep
-%setup -q -c -T
-%gem_install -n %{SOURCE0}
-
-pushd .%{gem_instdir}
-%patch0 -p1
-popd
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
-mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
+gem install %{gem_name}-%{version}.gem
+mkdir -p %{buildroot}%{gem_instdir}
+cp -a /%{gem_dir}/specifications/%{gem_name}-%{version}.gemspec %{buildroot}%{gem_dir}/
+#add lib and test files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
+cp -a test/ %{buildroot}%{gem_instdir}/
+#add COPYING, README, Rakefile and Gemfile files to buildroot from Source0
+cp COPYING.txt %{buildroot}%{gem_instdir}/
+cp README.md %{buildroot}%{gem_instdir}/
+cp Rakefile %{buildroot}%{gem_instdir}/
+cp Gemfile %{buildroot}%{gem_instdir}/
 
 %check
-pushd .%{gem_instdir}
 # test_helper.rb currently references bundler, so it is easier to avoid
 # its usage at all.
 sed -i '/require "bundler\/setup"/ d' test/test_helper.rb
-
 ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
-popd
-
 
 %files
 %dir %{gem_instdir}
 %license %{gem_instdir}/COPYING.txt
-%exclude %{gem_instdir}/.gitignore
-%exclude %{gem_instdir}/metaclass.gemspec
 %{gem_libdir}
-%exclude %{gem_cache}
-%{gem_spec}
+%{gem_dir}/%{gem_name}-%{version}.gemspec
 
 %files doc
-%doc %{gem_docdir}
 %doc %{gem_instdir}/README.md
 %{gem_instdir}/Gemfile
 %{gem_instdir}/Rakefile
 %{gem_instdir}/test
 
-
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.0.4-15
+- Build from .tar.gz source.
+
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.0.4-14
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

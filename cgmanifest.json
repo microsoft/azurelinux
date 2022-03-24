@@ -25516,7 +25516,7 @@
         "other": {
           "name": "rubygem-abrt",
           "version": "0.4.0",
-          "downloadUrl": "https://rubygems.org/gems/abrt-0.4.0.gem"
+          "downloadUrl": "https://github.com/voxik/abrt-ruby/archive/refs/tags/v0.4.0.tar.gz"
         }
       }
     },
@@ -25535,8 +25535,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-asciidoctor",
-          "version": "2.0.15",
-          "downloadUrl": "https://rubygems.org/downloads/asciidoctor-2.0.15.gem"
+          "version": "2.0.17",
+          "downloadUrl": "https://github.com/asciidoctor/asciidoctor/archive/refs/tags/v2.0.17.tar.gz"
         }
       }
     },
@@ -25655,18 +25655,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-bson",
-          "version": "4.7.0",
-          "downloadUrl": "https://rubygems.org/gems/bson-4.7.0.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-builder",
-          "version": "3.2.4",
-          "downloadUrl": "https://rubygems.org/gems/builder-3.2.4.gem"
+          "version": "4.14.1",
+          "downloadUrl": "https://github.com/mongodb/bson-ruby/archive/refs/tags/v4.14.1.tar.gz"
         }
       }
     },
@@ -25675,8 +25665,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-bundler",
-          "version": "2.1.4",
-          "downloadUrl": "https://rubygems.org/downloads/bundler-2.1.4.gem"
+          "version": "2.3.8",
+          "downloadUrl": "https://github.com/rubygems/rubygems/archive/refs/tags/bundler-v2.3.8.tar.gz"
         }
       }
     },
@@ -25685,18 +25675,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-coderay",
-          "version": "1.1.2",
-          "downloadUrl": "https://rubygems.org/gems/coderay-1.1.2.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-concurrent-ruby",
-          "version": "1.1.7",
-          "downloadUrl": "https://rubygems.org/downloads/concurrent-ruby-1.1.7.gem"
+          "version": "1.1.3",
+          "downloadUrl": "https://github.com/rubychan/coderay/archive/refs/tags/v1.1.3.tar.gz"
         }
       }
     },
@@ -25706,7 +25686,7 @@
         "other": {
           "name": "rubygem-console",
           "version": "1.10.1",
-          "downloadUrl": "https://rubygems.org/downloads/console-1.10.1.gem"
+          "downloadUrl": "https://github.com/socketry/console/archive/refs/tags/v1.10.1.tar.gz"
         }
       }
     },
@@ -25726,7 +25706,7 @@
         "other": {
           "name": "rubygem-deep_merge",
           "version": "1.2.1",
-          "downloadUrl": "https://rubygems.org/downloads/deep_merge-1.2.1.gem"
+          "downloadUrl": "https://github.com/danielsdeleo/deep_merge/archive/refs/tags/1.2.1.tar.gz"
         }
       }
     },
@@ -25736,7 +25716,7 @@
         "other": {
           "name": "rubygem-diff-lcs",
           "version": "1.3",
-          "downloadUrl": "https://rubygems.org/gems/diff-lcs-1.3.gem"
+          "downloadUrl": "https://github.com/halostatue/diff-lcs/archive/refs/tags/v1.3.tar.gz"
         }
       }
     },
@@ -25786,7 +25766,7 @@
         "other": {
           "name": "rubygem-eventmachine",
           "version": "1.2.7",
-          "downloadUrl": "https://rubygems.org/downloads/eventmachine-1.2.7.gem"
+          "downloadUrl": "https://github.com/eventmachine/eventmachine/archive/refs/tags/v1.2.7.tar.gz"
         }
       }
     },
@@ -25826,7 +25806,7 @@
         "other": {
           "name": "rubygem-fiber-local",
           "version": "1.0.0",
-          "downloadUrl": "https://rubygems.org/downloads/fiber-local-1.0.0.gem"
+          "downloadUrl": "https://github.com/socketry/fiber-local/archive/refs/tags/v1.0.0.tar.gz"
         }
       }
     },
@@ -25836,7 +25816,7 @@
         "other": {
           "name": "rubygem-flexmock",
           "version": "2.3.6",
-          "downloadUrl": "https://rubygems.org/gems/flexmock-2.3.6.gem"
+          "downloadUrl": "https://github.com/doudou/flexmock/archive/refs/tags/v2.3.6.tar.gz"
         }
       }
     },
@@ -25986,7 +25966,7 @@
         "other": {
           "name": "rubygem-hocon",
           "version": "1.3.1",
-          "downloadUrl": "https://rubygems.org/downloads/hocon-1.3.1.gem"
+          "downloadUrl": "https://github.com/puppetlabs/ruby-hocon/archive/refs/tags/1.3.1.tar.gz"
         }
       }
     },
@@ -25996,7 +25976,7 @@
         "other": {
           "name": "rubygem-hpricot",
           "version": "0.8.6",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/rubygem-hpricot/hpricot-0.8.6-modified.gem/5d737234720f3847cc5def6c0047f2e4/hpricot-0.8.6-modified.gem"
+          "downloadUrl": "https://github.com/hpricot/hpricot/archive/refs/tags/0.8.6.tar.gz"
         }
       }
     },
@@ -26026,7 +26006,7 @@
         "other": {
           "name": "rubygem-introspection",
           "version": "0.0.4",
-          "downloadUrl": "https://rubygems.org/downloads/introspection-0.0.4.gem"
+          "downloadUrl": "https://github.com/floehopper/introspection/archive/refs/tags/v0.0.4.tar.gz"
         }
       }
     },
@@ -26045,8 +26025,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-liquid",
-          "version": "4.0.3",
-          "downloadUrl": "https://rubygems.org/gems/liquid-4.0.3.gem"
+          "version": "5.1.0",
+          "downloadUrl": "https://github.com/Shopify/liquid/archive/refs/tags/v5.1.0.tar.gz"
         }
       }
     },
@@ -26066,7 +26046,7 @@
         "other": {
           "name": "rubygem-maruku",
           "version": "0.7.2",
-          "downloadUrl": "https://rubygems.org/gems/maruku-0.7.2.gem"
+          "downloadUrl": "https://github.com/bhollis/maruku/archive/refs/tags/v0.7.2.tar.gz"
         }
       }
     },
@@ -26076,7 +26056,7 @@
         "other": {
           "name": "rubygem-metaclass",
           "version": "0.0.4",
-          "downloadUrl": "https://rubygems.org/downloads/metaclass-0.0.4.gem"
+          "downloadUrl": "https://github.com/floehopper/metaclass/archive/refs/tags/v0.0.4.tar.gz"
         }
       }
     },
@@ -26086,7 +26066,7 @@
         "other": {
           "name": "rubygem-method_source",
           "version": "1.0.0",
-          "downloadUrl": "http://rubygems.org/gems/method_source-1.0.0.gem"
+          "downloadUrl": "https://github.com/banister/method_source/archive/refs/tags/v1.0.0.tar.gz"
         }
       }
     },
@@ -26104,29 +26084,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-minitest",
-          "version": "5.14.2",
-          "downloadUrl": "https://rubygems.org/gems/minitest-5.14.2.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-mocha",
-          "version": "1.9.0",
-          "downloadUrl": "https://rubygems.org/gems/mocha-1.9.0.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-mongo",
-          "version": "2.11.2",
-          "downloadUrl": "https://rubygems.org/gems/mongo-2.11.2.gem"
+          "version": "2.17.0",
+          "downloadUrl": "https://github.com/mongodb/mongo-ruby-driver/archive/refs/tags/v2.17.0.tar.gz"
         }
       }
     },
@@ -26146,7 +26106,7 @@
         "other": {
           "name": "rubygem-multi_json",
           "version": "1.15.0",
-          "downloadUrl": "https://rubygems.org/downloads/multi_json-1.15.0.gem"
+          "downloadUrl": "https://github.com/intridea/multi_json/archive/refs/tags/v1.15.0.tar.gz"
         }
       }
     },
@@ -26166,27 +26126,7 @@
         "other": {
           "name": "rubygem-mustache",
           "version": "1.1.1",
-          "downloadUrl": "https://rubygems.org/gems/mustache-1.1.1.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-mysql2",
-          "version": "0.5.3",
-          "downloadUrl": "https://rubygems.org/gems/mysql2-0.5.3.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-net-http-persistent",
-          "version": "2.9.4",
-          "downloadUrl": "https://rubygems.org/downloads/net-http-persistent-2.9.4.gem"
+          "downloadUrl": "https://github.com/mustache/mustache/archive/refs/tags/v1.1.1.tar.gz"
         }
       }
     },
@@ -26236,7 +26176,7 @@
         "other": {
           "name": "rubygem-pkg-config",
           "version": "1.4.5",
-          "downloadUrl": "http://rubygems.org/gems/pkg-config-1.4.5.gem"
+          "downloadUrl": "https://github.com/ruby-gnome/pkg-config/archive/refs/tags/1.4.5.tar.gz"
         }
       }
     },
@@ -26296,7 +26236,7 @@
         "other": {
           "name": "rubygem-pry",
           "version": "0.13.1",
-          "downloadUrl": "https://rubygems.org/gems/pry-0.13.1.gem"
+          "downloadUrl": "https://github.com/pry/pry/archive/refs/tags/v0.13.1.tar.gz"
         }
       }
     },
@@ -26316,7 +26256,7 @@
         "other": {
           "name": "rubygem-puppet-resource_api",
           "version": "1.8.14",
-          "downloadUrl": "https://rubygems.org/gems/puppet-resource_api-1.8.14.gem"
+          "downloadUrl": "https://github.com/puppetlabs/puppet-resource_api/archive/refs/tags/v1.8.14.tar.gz"
         }
       }
     },
@@ -26335,18 +26275,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rake",
-          "version": "13.0.1",
-          "downloadUrl": "https://rubygems.org/gems/rake-13.0.1.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-rake",
-          "version": "13.0.1",
-          "downloadUrl": "https://rubygems.org/downloads/rake-13.0.1.gem"
+          "version": "13.0.6",
+          "downloadUrl": "https://github.com/ruby/rake/archive/refs/tags/v13.0.6.tar.gz"
         }
       }
     },
@@ -26355,8 +26285,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rake-compiler",
-          "version": "1.1.6",
-          "downloadUrl": "https://rubygems.org/gems/rake-compiler-1.1.6.gem"
+          "version": "1.1.9",
+          "downloadUrl": "https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v1.1.9.tar.gz"
         }
       }
     },
@@ -26366,7 +26296,7 @@
         "other": {
           "name": "rubygem-rdiscount",
           "version": "2.2.0.2",
-          "downloadUrl": "https://rubygems.org/gems/rdiscount-2.2.0.2.gem"
+          "downloadUrl": "https://github.com/davidfstr/rdiscount/archive/refs/tags/2.2.0.2.tar.gz"
         }
       }
     },
@@ -26384,19 +26314,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-rdoc",
-          "version": "6.1.1",
-          "downloadUrl": "https://rubygems.org/gems/rdoc-6.1.1.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-ronn",
           "version": "0.7.3",
-          "downloadUrl": "http://rubygems.org/gems/ronn-0.7.3.gem"
+          "downloadUrl": "https://github.com/rtomayko/ronn/archive/refs/tags/0.7.3.tar.gz"
         }
       }
     },
@@ -26406,7 +26326,7 @@
         "other": {
           "name": "rubygem-rouge",
           "version": "3.26.0",
-          "downloadUrl": "https://rubygems.org/gems/rouge-3.26.0.gem"
+          "downloadUrl": "https://github.com/rouge-ruby/rouge/archive/refs/tags/v3.26.0.tar.gz"
         }
       }
     },
@@ -26416,7 +26336,7 @@
         "other": {
           "name": "rubygem-rspec",
           "version": "3.9.0",
-          "downloadUrl": "http://rubygems.org/gems/rspec-3.9.0.gem"
+          "downloadUrl": "https://github.com/rspec/rspec-metagem/archive/refs/tags/v3.9.0.tar.gz"
         }
       }
     },
@@ -26425,8 +26345,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rspec-expectations",
-          "version": "3.9.2",
-          "downloadUrl": "https://rubygems.org/gems/rspec-expectations-3.9.2.gem"
+          "version": "3.11.0",
+          "downloadUrl": "https://github.com/rspec/rspec-expectations/archive/refs/tags/v3.11.0.tar.gz"
         }
       }
     },
@@ -26436,7 +26356,7 @@
         "other": {
           "name": "rubygem-rspec-mocks",
           "version": "3.9.1",
-          "downloadUrl": "https://rubygems.org/gems/rspec-mocks-3.9.1.gem"
+          "downloadUrl": "https://github.com/rspec/rspec-mocks/archive/refs/tags/v3.9.1.tar.gz"
         }
       }
     },
@@ -26445,8 +26365,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rspec-support",
-          "version": "3.9.3",
-          "downloadUrl": "https://rubygems.org/gems/rspec-support-3.9.3.gem"
+          "version": "3.11.0",
+          "downloadUrl": "https://github.com/rspec/rspec-support/archive/refs/tags/v3.11.0.tar.gz"
         }
       }
     },
@@ -26496,7 +26416,7 @@
         "other": {
           "name": "rubygem-semantic_puppet",
           "version": "1.0.4",
-          "downloadUrl": "https://rubygems.org/downloads/semantic_puppet-1.0.4.gem"
+          "downloadUrl": "https://github.com/puppetlabs/semantic_puppet/archive/refs/tags/1.0.4.tar.gz"
         }
       }
     },
@@ -26574,19 +26494,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-test-unit",
-          "version": "3.3.6",
-          "downloadUrl": "http://rubygems.org/gems/test-unit-3.3.6.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-thor",
-          "version": "1.1.0",
-          "downloadUrl": "https://rubygems.org/downloads/thor-1.1.0.gem"
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/rails/thor/archive/refs/tags/v1.2.1.tar.gz"
         }
       }
     },
@@ -26596,7 +26506,7 @@
         "other": {
           "name": "rubygem-thread_order",
           "version": "1.1.1",
-          "downloadUrl": "https://rubygems.org/gems/thread_order-1.1.1.gem"
+          "downloadUrl": "https://github.com/JoshCheek/thread_order/archive/refs/tags/v1.1.1.tar.gz"
         }
       }
     },

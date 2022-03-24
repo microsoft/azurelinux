@@ -1,26 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Generated from rake-0.7.3.gem by gem2rpm -*- rpm-spec -*-
-%global	gem_name	rake
+%global	gem_name      rake
+%global debug_package %{nil}
 
 Summary:	Rake is a Make-like program implemented in Ruby
 Name:		rubygem-%{gem_name}
-
-Version: 13.0.1
-Release: 202%{?dist}
+Version:    13.0.6
+Release:    1%{?dist}
 License:	MIT
-URL:		https://github.com/ruby/rake
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
-
-# git clone --no-checkout https://github.com/ruby/rake
-# cd rake && git archive -v -o rake-13.0.1-tests.txz v13.0.1 test
-Source1: %{gem_name}-%{version}-tests.txz
-
+URL:		https://ruby.github.io/rake/
+Vendor:     Microsoft Corporation
+Distribution: Mariner
+Source0:	https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 BuildRequires:	ruby
-# %%check
+%if %{with_check}
 BuildRequires:	rubygem(minitest) >= 5
+%endif
 BuildArch:	noarch
 
 %description
@@ -37,35 +32,29 @@ BuildArch:	noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -c -T -b 1
-
-%gem_install -n %{SOURCE0}
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
+gem install %{gem_name}-%{version}.gem
 mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
-
-
-mkdir -p %{buildroot}%{_bindir}
-cp -pa .%{_bindir}/* \
-        %{buildroot}%{_bindir}/
-
-find %{buildroot}%{gem_instdir}/exe -type f | xargs chmod a+x
-
-# cleanup
-pushd %{buildroot}%{gem_instdir}
-rm -rf \
-popd
+cp -a /%{gem_dir}/bin %{buildroot}%{gem_dir}/
+mkdir -p %{buildroot}%{gem_dir}/cache
+cp -a /%{gem_dir}/cache/%{gem_name}-%{version}.gem %{buildroot}%{gem_dir}/cache
+cp -a /%{gem_dir}/doc/%{gem_name}-%{version} %{buildroot}%{gem_dir}/doc/
+cp -a /%{gem_dir}/extensions %{buildroot}%{gem_dir}/gems/
+mkdir -p %{buildroot}%{gem_dir}/specifications
+cp -a /%{gem_dir}/specifications/%{gem_name}-%{version}.gemspec %{buildroot}%{gem_dir}/specifications
+cp -a /%{gem_dir}/gems/%{gem_name}-%{version} %{buildroot}%{gem_dir}/gems/
 
 # Install man pages into appropriate place.
 mkdir -p %{buildroot}%{_mandir}/man1
 mv %{buildroot}%{gem_instdir}/doc/rake.1 %{buildroot}%{_mandir}/man1
 
 %check
-pushd .%{gem_instdir}
+pushd /%{gem_instdir}
 # symlink tests here
 ln -s %{_builddir}/test .
 
@@ -77,7 +66,6 @@ popd
 
 %files
 %dir %{gem_instdir}
-%{_bindir}/rake
 %license %{gem_instdir}/MIT-LICENSE
 %{gem_instdir}/exe
 %{gem_libdir}
@@ -85,19 +73,21 @@ popd
 %{gem_spec}
 %doc %{_mandir}/man1/*
 %exclude %{gem_instdir}/.*
-%exclude %{gem_instdir}/appveyor.yml
-%exclude %{gem_instdir}/azure-pipelines.yml
 %exclude %{gem_instdir}/rake.gemspec
 %exclude %{gem_instdir}/bin
+%{gem_dir}/bin/rake
 
 %files doc
-%doc %{gem_docdir}
+%doc %{gem_dir}/doc/
 %doc %{gem_instdir}/doc
 %doc %{gem_instdir}/*.rdoc
-%{gem_instdir}/Gemfile
-%{gem_instdir}/Rakefile
 
 %changelog
+* Fri Mar 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-1
+- Update to v13.0.6.
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 13.0.1-202
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
