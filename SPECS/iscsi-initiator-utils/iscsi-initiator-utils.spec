@@ -10,7 +10,7 @@
 Summary:        iSCSI daemon and utility programs
 Name:           iscsi-initiator-utils
 Version:        6.%{open_iscsi_version}.%{open_iscsi_build}+%{git_short_commit_date}.%{git_short_commit}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -154,6 +154,7 @@ touch %{buildroot}%{_rundir}/lock/iscsi/lock
 install -d %{buildroot}%{_unitdir}
 install -pm 644 etc/systemd/iscsi.service %{buildroot}%{_unitdir}
 install -pm 644 etc/systemd/iscsi-shutdown.service %{buildroot}%{_unitdir}
+install -pm 644 etc/systemd/iscsi-init.service %{buildroot}%{_unitdir}
 install -pm 644 etc/systemd/iscsid.service %{buildroot}%{_unitdir}
 install -pm 644 etc/systemd/iscsid.socket %{buildroot}%{_unitdir}
 install -pm 644 etc/systemd/iscsiuio.service %{buildroot}%{_unitdir}
@@ -181,7 +182,7 @@ popd
 
 
 %post
-%systemd_post iscsi.service iscsi-shutdown.service iscsid.service iscsid.socket
+%systemd_post iscsi.service iscsi-init.service iscsi-shutdown.service iscsid.service iscsid.socket
 
 if [ $1 -eq 1 ]; then
   if [ ! -f %{_sysconfdir}/iscsi/initiatorname.iscsi ]; then
@@ -249,6 +250,7 @@ fi
 %ghost %attr(0700, root, root) %{_rundir}/lock/iscsi
 %ghost %attr(0600, root, root) %{_rundir}/lock/iscsi/lock
 %{_unitdir}/iscsi.service
+%{_unitdir}/iscsi-init.service
 %{_unitdir}/iscsi-shutdown.service
 %{_unitdir}/iscsid.service
 %{_unitdir}/iscsid.socket
@@ -291,6 +293,9 @@ fi
 %{python3_sitearch}/*
 
 %changelog
+* Mon Mar 14 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.2.1.4+20210729.2a8f9d8-2
+- Package iscsi-init.service 
+
 * Tue Feb 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.2.1.4+20210729.2a8f9d8-1
 - Update source to v2.1.4
 - Readd BR doxygen

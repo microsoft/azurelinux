@@ -2,16 +2,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           graphene
 Version:        1.10.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Thin layer of types for graphic libraries
 
 License:        MIT
 URL:            https://github.com/ebassi/graphene
 Source:         %{url}/releases/download/%{version}/%{name}-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gcc
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gtk-doc
 BuildRequires:  meson >= 0.50.1
 BuildRequires:  pkgconfig(gobject-2.0) >= 2.30.0
 
@@ -39,7 +39,7 @@ the functionality of the installed %{name} package.
 %autosetup -p1
 
 %build
-%meson -Dgtk_doc=true
+%meson -Dgtk_doc=false
 %meson_build
 
 %install
@@ -59,13 +59,17 @@ the functionality of the installed %{name} package.
 %{_libdir}/pkgconfig/graphene-1.0.pc
 %{_libdir}/pkgconfig/graphene-gobject-1.0.pc
 %{_datadir}/gir-1.0/
-%{_datadir}/gtk-doc/
 
 %files tests
 %{_libexecdir}/installed-tests/
 %{_datadir}/installed-tests/
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.4-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.4-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,16 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%define built_tag v0.1.5
-%define built_tag_strip %(b=%{built_tag}; echo ${b:1})
-%define download_url %{url}/archive/%{built_tag}.tar.gz
 
 Name: catatonit
-Version: 0.1.5
-Release: 4%{?dist}
+Version: 0.1.7
+Release: 5%{?dist}
 Summary: A signal-forwarding process manager for containers
 License: GPLv3+
 URL: https://github.com/openSUSE/catatonit
-Source0: %{download_url}#/%{name}-%{version}.tar.gz
+Source0: %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: file
@@ -18,6 +15,9 @@ BuildRequires: gcc
 BuildRequires: git
 BuildRequires: glibc-static
 BuildRequires: libtool
+BuildRequires: make
+
+Provides: podman-%{name} = %{version}-%{release}
 
 %description
 Catatonit is a /sbin/init program for use within containers. It
@@ -30,7 +30,8 @@ This is a reimplementation of other container init programs (such as
 signalfd(2)) and has no additional features.
 
 %prep
-%autosetup -Sgit -n %{name}-%{built_tag_strip}
+%autosetup -Sgit
+sed -i '$d' configure.ac
 
 %build
 autoreconf -fi
@@ -59,8 +60,11 @@ ln -s %{_libexecdir}/%{name}/%{name} %{buildroot}%{_libexecdir}/podman/%{name}
 %dir %{_libexecdir}/podman
 %{_libexecdir}/podman/%{name}
 
-# rhcontainerbot account currently managed by @lsm5
 %changelog
+* Fri Mar 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.7-1
+- Updating to 0.1.7 using Fedora 35 spec (license: MIT) for guidance.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.5-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

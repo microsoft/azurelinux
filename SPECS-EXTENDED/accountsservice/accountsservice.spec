@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           accountsservice
 Version:        0.6.55
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        D-Bus interfaces for querying and manipulating user account information
 License:        GPLv3+
 URL:            https://www.freedesktop.org/wiki/Software/AccountsService/
@@ -12,6 +12,7 @@ URL:            https://www.freedesktop.org/wiki/Software/AccountsService/
 #VCS: git:git://git.freedesktop.org/accountsservice
 Source0:        http://www.freedesktop.org/software/accountsservice/accountsservice-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gettext-devel
 BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  glib2-devel
@@ -19,7 +20,6 @@ BuildRequires:  polkit-devel
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gtk-doc
 BuildRequires:  git
 BuildRequires:  meson
 
@@ -54,7 +54,7 @@ files needed to build applications that use accountsservice-libs.
 %autosetup -S git
 
 %build
-%meson -Dgtk_doc=true -Dsystemd=true -Duser_heuristics=true
+%meson -Dgtk_doc=false -Dsystemd=true -Duser_heuristics=true
 %meson_build
 
 %install
@@ -96,10 +96,13 @@ files needed to build applications that use accountsservice-libs.
 %{_libdir}/libaccountsservice.so
 %{_libdir}/pkgconfig/accountsservice.pc
 %{_datadir}/gir-1.0/AccountsService-1.0.gir
-%dir %{_datadir}/gtk-doc/html/libaccountsservice
-%{_datadir}/gtk-doc/html/libaccountsservice/*
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.55-4
+- Adding BR on '%%{_bindir}/xsltproc'.
+- License verified.
+- Removed doc building.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.55-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

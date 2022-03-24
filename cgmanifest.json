@@ -134,16 +134,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "alsa-firmware",
-          "version": "1.2.1",
-          "downloadUrl": "ftp://ftp.alsa-project.org/pub/firmware/alsa-firmware-1.2.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "alsa-lib",
           "version": "1.2.6.1",
           "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
@@ -1587,8 +1577,8 @@
         "type": "other",
         "other": {
           "name": "catatonit",
-          "version": "0.1.5",
-          "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.5.tar.gz"
+          "version": "0.1.7",
+          "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.7.tar.gz"
         }
       }
     },
@@ -3468,8 +3458,8 @@
         "type": "other",
         "other": {
           "name": "fakeroot",
-          "version": "1.25.3",
-          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.25.3.orig.tar.gz"
+          "version": "1.28",
+          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.28.orig.tar.gz"
         }
       }
     },
@@ -3648,8 +3638,8 @@
         "type": "other",
         "other": {
           "name": "fio",
-          "version": "3.21",
-          "downloadUrl": "http://brick.kernel.dk/snaps/fio-3.21.tar.bz2"
+          "version": "3.29",
+          "downloadUrl": "http://brick.kernel.dk/snaps/fio-3.29.tar.bz2"
         }
       }
     },
@@ -7212,7 +7202,7 @@
         "other": {
           "name": "iio-sensor-proxy",
           "version": "3.0",
-          "downloadUrl": "https://github.com/hadess/iio-sensor-proxy/releases/download/3.0/iio-sensor-proxy-3.0.tar.xz"
+          "downloadUrl": "https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/uploads/de965bcb444552d328255639b241ce73/iio-sensor-proxy-3.0.tar.xz"
         }
       }
     },
@@ -8751,8 +8741,8 @@
         "type": "other",
         "other": {
           "name": "leveldb",
-          "version": "1.22",
-          "downloadUrl": "https://github.com/google/leveldb/archive/1.22/leveldb-1.22.tar.gz"
+          "version": "1.23",
+          "downloadUrl": "https://github.com/google/leveldb/archive/1.23.tar.gz"
         }
       }
     },
@@ -8942,7 +8932,7 @@
         "other": {
           "name": "libbytesize",
           "version": "2.5",
-          "downloadUrl": "https://github.com/storaged-project/libbytesize/releases/download/2.5-2.cm2/libbytesize-2.5.tar.gz"
+          "downloadUrl": "https://github.com/storaged-project/libbytesize/releases/download/2.5/libbytesize-2.5.tar.gz"
         }
       }
     },
@@ -9902,7 +9892,7 @@
         "other": {
           "name": "libiptcdata",
           "version": "1.0.5",
-          "downloadUrl": "https://github.com/ianw/libiptcdata/releases/download/libiptcdata-1.0.5.tar.gz"
+          "downloadUrl": "https://github.com/ianw/libiptcdata/archive/refs/tags/release_1_0_5.tar.gz"
         }
       }
     },
@@ -11283,26 +11273,6 @@
           "name": "libtranslit",
           "version": "0.0.3",
           "downloadUrl": "http://du-a.org/files/libtranslit/libtranslit-0.0.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libucil",
-          "version": "0.9.10",
-          "downloadUrl": "https://www.unicap-imaging.org/downloads/libucil-0.9.10.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libunicap",
-          "version": "0.9.12",
-          "downloadUrl": "http://www.unicap-imaging.org/downloads/libunicap-0.9.12.tar.gz"
         }
       }
     },
@@ -21664,8 +21634,8 @@
         "type": "other",
         "other": {
           "name": "pyasn1-modules",
-          "version": "0.2.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/pyasn1-modules-0.2.2.tar.gz"
+          "version": "0.2.8",
+          "downloadUrl": "https://github.com/etingof/pyasn1-modules/archive/refs/tags/v0.2.8.tar.gz"
         }
       }
     },
@@ -23194,8 +23164,8 @@
         "type": "other",
         "other": {
           "name": "python-mock",
-          "version": "3.0.5",
-          "downloadUrl": "https://github.com/testing-cabal/mock/archive/refs/tags/3.0.5.tar.gz"
+          "version": "4.0.3",
+          "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-4.0.3.tar.gz"
         }
       }
     },
@@ -27557,8 +27527,8 @@
         "type": "other",
         "other": {
           "name": "spice-vdagent",
-          "version": "0.20.0",
-          "downloadUrl": "https://spice-space.org/download/releases/spice-vdagent-0.20.0.tar.bz2"
+          "version": "0.22.1",
+          "downloadUrl": "https://spice-space.org/download/releases/spice-vdagent-0.22.1.tar.bz2"
         }
       }
     },
@@ -28127,8 +28097,8 @@
         "type": "other",
         "other": {
           "name": "tdnf",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/vmware/tdnf/archive/v2.1.0.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.2.2.tar.gz"
         }
       }
     },
@@ -28678,7 +28648,7 @@
         "other": {
           "name": "unique3",
           "version": "3.0.2",
-          "downloadUrl": "https://github.com/Distrotech/libunique/archive/refs/tags/libunique-3.0.2.tar.xz"
+          "downloadUrl": "https://github.com/Distrotech/libunique/archive/refs/tags/3.0.2.tar.gz"
         }
       }
     },
