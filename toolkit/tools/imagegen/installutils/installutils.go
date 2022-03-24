@@ -559,7 +559,9 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 		}
 	}
 
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName, "--installroot", installRoot, "--nogpgcheck", "--assumeyes")
+	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation
+	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName,
+		"--installroot", installRoot, "--nogpgcheck", "--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/")
 	if err != nil {
 		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
 	}
@@ -1842,7 +1844,7 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 		ReportActionf("Running post-install script: %s", path.Base(script.Path))
 		logger.Log.Infof("Running post-install script: %s", script.Path)
 		err = installChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", scriptPath, script.Args)
+			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", scriptPath, script.Args))
 
 			if err != nil {
 				return err

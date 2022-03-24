@@ -14,9 +14,6 @@ BuildRequires:  krb5-devel
 BuildRequires:  swig
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       gawk
-Requires:       krb5
-Requires:       libcap-ng
-Requires:       openldap
 # Break circular dependency with systemd by using weak dependency tag 'Recommends'
 # Systemd should always be installed in a running system
 Recommends:     systemd

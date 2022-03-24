@@ -2,16 +2,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:		orc
 Version:	0.4.31
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	The Oil Run-time Compiler
 
 License:	BSD
 URL:		http://cgit.freedesktop.org/gstreamer/orc/
 Source0:	http://gstreamer.freedesktop.org/src/orc/%{name}-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:	meson >= 0.47.0
 BuildRequires:  gcc
-BuildRequires:	gtk-doc
 
 %description
 Orc is a library and set of tools for compiling and executing
@@ -19,14 +19,6 @@ very simple programs that operate on arrays of data.  The "language"
 is a generic assembly language that represents many of the features
 available in SIMD architectures, including saturated addition and
 subtraction, and many arithmetic operations.
-
-%package doc
-Summary:	Documentation for Orc
-Requires:	%{name} = %{version}-%{release}
-BuildArch:	noarch
-
-%description doc
-Documentation for Orc.
 
 %package devel
 Summary:	Development files and libraries for Orc
@@ -51,7 +43,7 @@ The Orc compiler, to produce optimized code.
 %setup -q
 
 %build
-%meson -D default_library=shared
+%meson -D default_library=shared -Dgtk_doc=disabled
 %meson_build
 
 %install
@@ -70,12 +62,10 @@ rm -rf %{buildroot}/%{_libdir}/orc
 
 
 %files
-%doc COPYING README
+%license COPYING
+%doc README
 %{_libdir}/liborc-*.so.*
 %{_bindir}/orc-bugreport
-
-%files doc
-%doc %{_datadir}/gtk-doc/html/orc/
 
 %files devel
 %doc examples/*.c
@@ -90,6 +80,11 @@ rm -rf %{buildroot}/%{_libdir}/orc
 
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.31-4
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.31-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

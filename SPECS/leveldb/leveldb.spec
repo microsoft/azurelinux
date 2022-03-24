@@ -2,13 +2,23 @@
 
 Summary:        A fast and lightweight key/value database library by Google
 Name:           leveldb
-Version:        1.22
-Release:        3%{?dist}
+Version:        1.23
+Release:        2%{?dist}
 License:        BSD
 URL:            https://github.com/google/leveldb
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+
+# leveldb git repo contains submodules that must be part of source tarball (adapt version number)
+# 1) clone git repo                           => 'git clone https://github.com/google/leveldb.git'
+# 2) checkout tag corresponding to version    => 'git checkout 1.23'
+# 3) get submodule                            => 'git submodule init' then 'git submodule update'
+# 4) create source tarball                    => 'tar --sort=name \
+#                                                     --mtime="2021-04-26 00:00Z" \
+#                                                     --owner=0 --group=0 --numeric-owner \
+#                                                     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#                                                     -czf leveldb-1.23.tar.gz leveldb'
+Source0:        https://github.com/google/leveldb/archive/%{version}.tar.gz#//%{name}-%{version}.tar.gz
 
 # available in https://github.com/fusesource/leveldbjni/blob/leveldb.patch
 Patch0001:      0001-Allow-leveldbjni-build.patch
@@ -20,11 +30,15 @@ Patch0002:      0002-Added-a-DB-SuspendCompations-and-DB-ResumeCompaction.patch
 Patch0003:      0003-allow-Get-calls-to-avoid-copies-into-std-string.patch
 # https://groups.google.com/d/topic/leveldb/SbVPvl4j4vU/discussion
 Patch0004:      0004-bloom_test-failure-on-big-endian-archs.patch
+# -fno-rtti breaks ABI compatibility
+Patch0006:      0006-revert-no-rtti.patch
+# use installed gtest/gmock (if any)
+Patch0007:      0007-detect-system-gtest.patch
 
 BuildRequires:  cmake
-#Provided by gcc package
-#BuildRequires:  gcc-c++
 BuildRequires:  gcc
+BuildRequires:  gmock-devel
+BuildRequires:  gtest-devel
 BuildRequires:  make
 BuildRequires:  snappy-devel
 BuildRequires:  sqlite-devel
@@ -35,8 +49,6 @@ ordered mapping from string keys to string values.
 
 %package devel
 Summary:        Development files for %{name}
-# Provided by cmake
-#Requires:      cmake-filesystem
 Requires:       cmake
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
@@ -44,7 +56,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}
 
 cat > %{name}.pc << EOF
 prefix=%{_prefix}
@@ -64,6 +76,11 @@ EOF
 
 %install
 %make_install
+# remove 'benchmark' related files/folders
+rm -f  %{buildroot}%{_libdir}/libbenchmark*.*
+rm -f  %{buildroot}%{_libdir}/pkgconfig/benchmark.pc
+rm -rf %{buildroot}%{_libdir}/cmake/benchmark
+rm -rf %{buildroot}%{_includedir}/benchmark
 
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 cp -a %{name}.pc %{buildroot}%{_libdir}/pkgconfig/
@@ -73,7 +90,6 @@ ctest -V %{?_smp_mflags}
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
-
 
 %files
 %license LICENSE
@@ -87,8 +103,13 @@ ctest -V %{?_smp_mflags}
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/cmake/%{name}/
 
-
 %changelog
+* Wed Mar 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.23-2
+- Address gmock-devel/snappy-devel incompatibility
+
+* Mon Mar 21 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.23-1
+- Upgrade to 1.23
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.22-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified

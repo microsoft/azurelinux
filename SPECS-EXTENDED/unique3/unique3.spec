@@ -2,19 +2,17 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           unique3
 Version:        3.0.2
-Release:        21%{?dist}
+Release:        22%{?dist}
 Summary:        Single instance support for applications
 
 License:        LGPLv2+
 URL:            https://github.com/Distrotech/libunique/tags
-# Source0: https://github.com/Distrotech/libunique/archive/refs/tags/3.0.2.tar.gz
-Source0:        https://github.com/Distrotech/libunique/archive/refs/tags/libunique-%{version}.tar.xz
+Source0:        https://github.com/Distrotech/libunique/archive/refs/tags/3.0.2.tar.gz#/libunique-%{version}.tar.xz
 
 BuildRequires:  gnome-doc-utils >= 0.3.2
 BuildRequires:  libtool
 BuildRequires:  glib2-devel >= 2.25.0
 BuildRequires:  gtk3-devel >= 2.99.3
-BuildRequires:  gtk-doc >= 1.11
 
 BuildRequires: automake autoconf libtool
 
@@ -49,7 +47,7 @@ gtkdocize
 autoreconf -i -f -v
 
 %build
-%configure --enable-gtk-doc --disable-static --enable-introspection=no
+%configure --disable-gtk-doc --disable-static --enable-introspection=no
 %make_build
 
 %install
@@ -59,7 +57,8 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %ldconfig_scriptlets
 
 %files
-%doc AUTHORS ChangeLog COPYING README
+%license COPYING
+%doc AUTHORS ChangeLog README
 %{_libdir}/lib*.so.*
 
 %files devel
@@ -71,6 +70,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %doc %{_datadir}/gtk-doc
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.2-22
+- Removing gtk-docs since they require a network connection.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.2-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

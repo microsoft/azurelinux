@@ -2,39 +2,39 @@
 
 Summary:        Gives a fake root environment
 Name:           fakeroot
-Version:        1.25.3
+Version:        1.28
 Release:        1%{?dist}
 # setenv.c: LGPLv2+
+# contrib/Fakeroot-Stat-1.8.8: Perl (GPL+ or Artistic)
 # the rest: GPLv3+
-License:        GPLv3+ AND LGPLv2+
+License:        GPLv3+ AND LGPLv2+ AND (GPL+ OR Artistic)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://tracker.debian.org/pkg/fakeroot
 Source0:        https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/%{name}_%{version}.orig.tar.gz
 # Debian package patches, from debian.tar.xz
-Patch0:         debian_eglibc-fts-without-LFS.patch
 Patch2:         debian_fix-shell-in-fakeroot.patch
 # Address some POSIX-types related problems.
 Patch4:         fakeroot-inttypes.patch
 # Fix LD_LIBRARY_PATH for multilib: https://bugzilla.redhat.com/show_bug.cgi?id=1241527
 Patch5:         fakeroot-multilib.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1889862
-Patch6:         glibc_2.33_fix.patch
 Patch7:         relax_tartest.patch
+Patch8:         also-wrap-stat-library-call.patch
+Patch10:        po4a.patch
 
-BuildRequires:  %{_bindir}/getopt
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
-
 # https://bugzilla.redhat.com/show_bug.cgi?id=887001
 BuildRequires:  libacl-devel
 BuildRequires:  libcap-devel
-
 BuildRequires:  libtool
+BuildRequires:  make
+
 %if %{with po4a}
 BuildRequires:  po4a
 %endif
+
 %if %{with_check}
 # uudecode used by tests/tartest
 BuildRequires:  sharutils
@@ -85,7 +85,7 @@ This package contains the libraries required by %{name}.
 for type in sysv tcp; do
   mkdir obj-$type
   cd obj-$type
-  cat >> configure << EOF
+  cat >> configure << 'EOF'
 #!/bin/sh
 exec ../configure "$@"
 EOF
@@ -102,15 +102,11 @@ done
 
 %install
 for type in sysv tcp; do
-  make -C obj-$type install bindir=%{_bindir} libdir=%{_libdir}/libfakeroot DESTDIR=%{buildroot}
+  make -C obj-$type install libdir=%{_libdir}/libfakeroot DESTDIR=%{buildroot}
   mv %{buildroot}%{_libdir}/libfakeroot/libfakeroot-0.so \
      %{buildroot}%{_libdir}/libfakeroot/libfakeroot-$type.so
-  mv %{buildroot}%{_bindir}/faked \
-     %{buildroot}%{_bindir}/faked-$type
-  mv %{buildroot}%{_bindir}/fakeroot \
-     %{buildroot}%{_bindir}/fakeroot-$type
-  rm -f %{buildroot}%{_libdir}/libfakeroot/libfakeroot.so
   rm -f %{buildroot}%{_libdir}/libfakeroot/libfakeroot.a
+  rm -f %{buildroot}%{_libdir}/libfakeroot/libfakeroot.so
   rm -f %{buildroot}%{_libdir}/libfakeroot/libfakeroot.*la
 %if %{with po4a}
   %find_lang faked-$type --without-mo --with-man
@@ -119,9 +115,9 @@ for type in sysv tcp; do
 done
 
 %if %{with po4a}
-rm %{buildroot}%{_mandir}{,/*}/man1/fake{d,root}-sysv.1
-rename -- -tcp '' %{buildroot}%{_mandir}{,/*}/man1/fake{d,root}-tcp.1
-sed -e 's/-tcp//g' fake{d,root}-tcp.lang > fakeroot.lang
+  rm %{buildroot}%{_mandir}{,/*}/man1/fake{d,root}-sysv.1
+  rename -- -tcp '' %{buildroot}%{_mandir}{,/*}/man1/fake{d,root}-tcp.1
+  sed -e 's/-tcp//g' fake{d,root}-tcp.lang > fakeroot.lang
 %endif
 
 %check
@@ -152,6 +148,7 @@ fi
   "%{_bindir}/fakeroot-sysv" 40 \
   --slave %{_bindir}/faked faked %{_bindir}/faked-sysv \
   --slave %{_libdir}/libfakeroot/libfakeroot-0.so libfakeroot.so %{_libdir}/libfakeroot/libfakeroot-sysv.so \
+
 %preun
 if [ $1 = 0 ]; then
   %{_sbindir}/alternatives --remove fakeroot "%{_bindir}/fakeroot-tcp"
@@ -182,6 +179,13 @@ fi
 %ghost %{_libdir}/libfakeroot/libfakeroot-0.so
 
 %changelog
+* Fri Mar 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.28-1
+- Updating to version 1.28 using Fedora 36 spec (license: MIT) for guidance.
+- Switching to using upstream fix for tartest.
+
+* Mon Mar 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.25.3-2
+- Update `relax_tartest.patch` to enable ptest
+
 * Thu Dec 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.25.3-1
 - Update to version 1.25.3.
 - Apply fix to build with 'glibc' 2.33+.

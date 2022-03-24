@@ -1,6 +1,6 @@
 Name:		keybinder3
 Version:	0.3.2
-Release:	10%{?dist}
+Release:	11%{?dist}
 Summary:	A library for registering global keyboard shortcuts
 License:	MIT
 Vendor:         Microsoft Corporation
@@ -9,7 +9,8 @@ URL:		https://github.com/kupferlauncher/keybinder
 Source0:	%{url}/releases/download/keybinder-3.0-v%{version}/keybinder-3.0-%{version}.tar.gz
 Patch0:     %{url}/pull/18.patch#/fix_gtkdoc.patch
 
-BuildRequires:	pkgconfig(gtk+-3.0), gnome-common, gtk-doc, gobject-introspection-devel
+BuildRequires:  %{_bindir}/xsltproc
+BuildRequires:	pkgconfig(gtk+-3.0), gnome-common, gobject-introspection-devel
 
 %description
 Keybinder is a library for registering global keyboard shortcuts. 
@@ -36,7 +37,7 @@ This package contains documentation for %{name}.
 %autosetup -p1 -n keybinder-3.0-%{version}
 
 %build
-%configure --enable-gtk-doc
+%configure --disable-gtk-doc
 %make_build
 
 %install
@@ -64,6 +65,11 @@ rm -rf %{buildroot}/%{_libdir}/libkeybinder-3.0.la
 %{_datadir}/gtk-doc/html/keybinder-3.0/*
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.2-11
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Wed Aug 25 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.2-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removing 'Requires' on 'devhelp' from the 'doc'.

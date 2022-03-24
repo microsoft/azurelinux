@@ -1,13 +1,15 @@
 Summary:        XML bomb protection for Python stdlib modules
 Name:           python-defusedxml
-Version:        0.6.0
-Release:        3%{?dist}
+Version:        0.7.1
+Release:        1%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/defusedxml
-Source0:        https://files.pythonhosted.org/packages/a4/5f/f8aa58ca0cf01cbcee728abc9d88bfeb74e95e6cb4334cfd5bed5673ea77/defusedxml-%{version}.tar.gz
+Source0:        https://github.com/tiran/defusedxml/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildArch:      noarch
 
 %description
@@ -15,11 +17,7 @@ XML bomb protection for Python stdlib modules
 
 %package -n     python3-defusedxml
 Summary:        XML bomb protection for Python stdlib modules
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
-Requires:       python3-xml
 
 %description -n python3-defusedxml
 XML bomb protection for Python stdlib modules
@@ -42,6 +40,10 @@ XML bomb protection for Python stdlib modules
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.1-1
+- Upgrade to latest upstream version
+- Switch source from PyPI to GitHub
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-3
 - Add license to python3 package
 - Remove python2 package

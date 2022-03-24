@@ -134,16 +134,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "alsa-firmware",
-          "version": "1.2.1",
-          "downloadUrl": "ftp://ftp.alsa-project.org/pub/firmware/alsa-firmware-1.2.1.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "alsa-lib",
           "version": "1.2.6.1",
           "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
@@ -1587,8 +1577,8 @@
         "type": "other",
         "other": {
           "name": "catatonit",
-          "version": "0.1.5",
-          "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.5.tar.gz"
+          "version": "0.1.7",
+          "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.7.tar.gz"
         }
       }
     },
@@ -2167,8 +2157,8 @@
         "type": "other",
         "other": {
           "name": "cppunit",
-          "version": "1.12.1",
-          "downloadUrl": "https://sourceforge.net/projects/cppunit/files/cppunit/1.12.1/cppunit-1.12.1.tar.gz"
+          "version": "1.15.1",
+          "downloadUrl": "https://dev-www.libreoffice.org/src/cppunit-1.15.1.tar.gz"
         }
       }
     },
@@ -3268,8 +3258,8 @@
         "type": "other",
         "other": {
           "name": "envoy",
-          "version": "1.21.0",
-          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.21.0.tar.gz"
+          "version": "1.14.4",
+          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.14.4.tar.gz"
         }
       }
     },
@@ -3468,8 +3458,8 @@
         "type": "other",
         "other": {
           "name": "fakeroot",
-          "version": "1.25.3",
-          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.25.3.orig.tar.gz"
+          "version": "1.28",
+          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.28.orig.tar.gz"
         }
       }
     },
@@ -3648,8 +3638,8 @@
         "type": "other",
         "other": {
           "name": "fio",
-          "version": "3.21",
-          "downloadUrl": "http://brick.kernel.dk/snaps/fio-3.21.tar.bz2"
+          "version": "3.29",
+          "downloadUrl": "http://brick.kernel.dk/snaps/fio-3.29.tar.bz2"
         }
       }
     },
@@ -7212,7 +7202,7 @@
         "other": {
           "name": "iio-sensor-proxy",
           "version": "3.0",
-          "downloadUrl": "https://github.com/hadess/iio-sensor-proxy/releases/download/3.0/iio-sensor-proxy-3.0.tar.xz"
+          "downloadUrl": "https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/uploads/de965bcb444552d328255639b241ce73/iio-sensor-proxy-3.0.tar.xz"
         }
       }
     },
@@ -7391,8 +7381,8 @@
         "type": "other",
         "other": {
           "name": "iperf3",
-          "version": "3.6",
-          "downloadUrl": "https://github.com/esnet/iperf/archive/3.6.tar.gz"
+          "version": "3.11",
+          "downloadUrl": "https://github.com/esnet/iperf/archive/3.11.tar.gz"
         }
       }
     },
@@ -8751,8 +8741,8 @@
         "type": "other",
         "other": {
           "name": "leveldb",
-          "version": "1.22",
-          "downloadUrl": "https://github.com/google/leveldb/archive/1.22/leveldb-1.22.tar.gz"
+          "version": "1.23",
+          "downloadUrl": "https://github.com/google/leveldb/archive/1.23.tar.gz"
         }
       }
     },
@@ -8831,8 +8821,8 @@
         "type": "other",
         "other": {
           "name": "libarchive",
-          "version": "3.4.2",
-          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.4.2/libarchive-3.4.2.tar.gz"
+          "version": "3.6.0",
+          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.6.0/libarchive-3.6.0.tar.gz"
         }
       }
     },
@@ -8931,8 +8921,8 @@
         "type": "other",
         "other": {
           "name": "libburn",
-          "version": "1.4.8",
-          "downloadUrl": "http://files.libburnia-project.org/releases/libburn-1.4.8.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://dev.lovelyhq.com/libburnia/libburn/archive/release-1.5.4.tar.gz"
         }
       }
     },
@@ -8942,7 +8932,7 @@
         "other": {
           "name": "libbytesize",
           "version": "2.5",
-          "downloadUrl": "https://github.com/storaged-project/libbytesize/releases/download/2.5-2.cm2/libbytesize-2.5.tar.gz"
+          "downloadUrl": "https://github.com/storaged-project/libbytesize/releases/download/2.5/libbytesize-2.5.tar.gz"
         }
       }
     },
@@ -8981,8 +8971,8 @@
         "type": "other",
         "other": {
           "name": "libcap-ng",
-          "version": "0.7.9",
-          "downloadUrl": "http://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.7.9.tar.gz"
+          "version": "0.8.2",
+          "downloadUrl": "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.8.2.tar.gz"
         }
       }
     },
@@ -9021,8 +9011,8 @@
         "type": "other",
         "other": {
           "name": "libcgroup",
-          "version": "0.41",
-          "downloadUrl": "https://downloads.sourceforge.net/libcg/libcgroup-0.41.tar.bz2"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/libcgroup/libcgroup/archive/v2.0.1.tar.gz"
         }
       }
     },
@@ -9081,8 +9071,8 @@
         "type": "other",
         "other": {
           "name": "libconfini",
-          "version": "1.16.0",
-          "downloadUrl": "https://github.com/madmurphy/libconfini/archive/1.16.0.tar.gz"
+          "version": "1.16.3",
+          "downloadUrl": "https://github.com/madmurphy/libconfini/archive/1.16.3.tar.gz"
         }
       }
     },
@@ -9481,8 +9471,8 @@
         "type": "other",
         "other": {
           "name": "libfastjson",
-          "version": "0.99.8",
-          "downloadUrl": "https://github.com/rsyslog/libfastjson/archive/v0.99.8.tar.gz"
+          "version": "0.99.9",
+          "downloadUrl": "https://github.com/rsyslog/libfastjson/archive/v0.99.9.tar.gz"
         }
       }
     },
@@ -9691,8 +9681,8 @@
         "type": "other",
         "other": {
           "name": "libgudev",
-          "version": "232",
-          "downloadUrl": "https://download.gnome.org/sources/libgudev/232/libgudev-232.tar.xz"
+          "version": "237",
+          "downloadUrl": "https://download.gnome.org/sources/libgudev/237/libgudev-237.tar.xz"
         }
       }
     },
@@ -9902,7 +9892,7 @@
         "other": {
           "name": "libiptcdata",
           "version": "1.0.5",
-          "downloadUrl": "https://github.com/ianw/libiptcdata/releases/download/libiptcdata-1.0.5.tar.gz"
+          "downloadUrl": "https://github.com/ianw/libiptcdata/archive/refs/tags/release_1_0_5.tar.gz"
         }
       }
     },
@@ -9921,8 +9911,8 @@
         "type": "other",
         "other": {
           "name": "libisoburn",
-          "version": "1.4.8",
-          "downloadUrl": "http://files.libburnia-project.org/releases/libisoburn-1.4.8.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://dev.lovelyhq.com/libburnia/libisoburn/archive/release-1.5.4.tar.gz"
         }
       }
     },
@@ -9931,8 +9921,8 @@
         "type": "other",
         "other": {
           "name": "libisofs",
-          "version": "1.4.8",
-          "downloadUrl": "http://files.libburnia-project.org/releases/libisofs-1.4.8.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://dev.lovelyhq.com/libburnia/libisofs/archive/release-1.5.4.tar.gz"
         }
       }
     },
@@ -11032,7 +11022,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.18",
-          "downloadUrl": "http://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
+          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
         }
       }
     },
@@ -11283,26 +11273,6 @@
           "name": "libtranslit",
           "version": "0.0.3",
           "downloadUrl": "http://du-a.org/files/libtranslit/libtranslit-0.0.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libucil",
-          "version": "0.9.10",
-          "downloadUrl": "https://www.unicap-imaging.org/downloads/libucil-0.9.10.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libunicap",
-          "version": "0.9.12",
-          "downloadUrl": "http://www.unicap-imaging.org/downloads/libunicap-0.9.12.tar.gz"
         }
       }
     },
@@ -13493,8 +13463,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.0.rc.3",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.0-rc.3.tar.gz"
+          "version": "1.6.1",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.1.tar.gz"
         }
       }
     },
@@ -13793,8 +13763,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.13+8-LTS-4.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13+8-LTS-4.aarch64.rpm"
+          "version": "11.0.14.1+1-LTS-31207.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm"
         }
       }
     },
@@ -13803,8 +13773,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-11",
-          "version": "11.0.13+8-LTS-4.x86_64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13+8-LTS-4.x86_64.rpm"
+          "version": "11.0.14.1+1-LTS-31207.x86_64.rpm",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm"
         }
       }
     },
@@ -14203,8 +14173,8 @@
         "type": "other",
         "other": {
           "name": "ndctl",
-          "version": "71.1",
-          "downloadUrl": "https://github.com/pmem/ndctl/archive/v71.1.tar.gz"
+          "version": "65",
+          "downloadUrl": "https://github.com/pmem/ndctl/archive/v65.tar.gz"
         }
       }
     },
@@ -14333,8 +14303,8 @@
         "type": "other",
         "other": {
           "name": "nfs4-acl-tools",
-          "version": "0.3.5",
-          "downloadUrl": "http://linux-nfs.org/~bfields/nfs4-acl-tools/nfs4-acl-tools-0.3.5.tar.gz"
+          "version": "0.3.7",
+          "downloadUrl": "https://linux-nfs.org/~bfields/nfs4-acl-tools/nfs4-acl-tools-0.3.7.tar.gz"
         }
       }
     },
@@ -14453,8 +14423,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "14.17.2",
-          "downloadUrl": "https://nodejs.org/download/release/v14.17.2/node-v14.17.2.tar.xz"
+          "version": "16.14.0",
+          "downloadUrl": "https://nodejs.org/download/release/v16.14.0/node-v16.14.0.tar.xz"
         }
       }
     },
@@ -15614,18 +15584,8 @@
         "type": "other",
         "other": {
           "name": "orangefs",
-          "version": "2.9.7",
-          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/releases/2.9.7/source/orangefs-2.9.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ORBit2",
-          "version": "2.14.19",
-          "downloadUrl": "http://download.gnome.org/sources/ORBit2/2.14/ORBit2-2.14.19.tar.bz2"
+          "version": "2.9.8",
+          "downloadUrl": "https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-2.9.8.tar.gz"
         }
       }
     },
@@ -21674,8 +21634,8 @@
         "type": "other",
         "other": {
           "name": "pyasn1-modules",
-          "version": "0.2.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/pyasn1-modules-0.2.2.tar.gz"
+          "version": "0.2.8",
+          "downloadUrl": "https://github.com/etingof/pyasn1-modules/archive/refs/tags/v0.2.8.tar.gz"
         }
       }
     },
@@ -22354,8 +22314,8 @@
         "type": "other",
         "other": {
           "name": "python-defusedxml",
-          "version": "0.6.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/a4/5f/f8aa58ca0cf01cbcee728abc9d88bfeb74e95e6cb4334cfd5bed5673ea77/defusedxml-0.6.0.tar.gz"
+          "version": "0.7.1",
+          "downloadUrl": "https://github.com/tiran/defusedxml/archive/refs/tags/v0.7.1.tar.gz"
         }
       }
     },
@@ -22424,8 +22384,8 @@
         "type": "other",
         "other": {
           "name": "python-ecdsa",
-          "version": "0.13.3",
-          "downloadUrl": "https://pypi.python.org/packages/source/e/ecdsa/ecdsa-0.13.3.tar.gz"
+          "version": "0.17.0",
+          "downloadUrl": "https://github.com/tlsfuzzer/python-ecdsa/archive/refs/tags/python-ecdsa-0.17.0.tar.gz"
         }
       }
     },
@@ -22584,8 +22544,8 @@
         "type": "other",
         "other": {
           "name": "python-frozendict",
-          "version": "1.2",
-          "downloadUrl": "https://pypi.python.org/packages/source/f/frozendict/frozendict-1.2.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/Marco-Sulla/python-frozendict/releases/download/v2.3.0/frozendict-2.3.0.tar.gz"
         }
       }
     },
@@ -22854,8 +22814,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonpointer",
-          "version": "2.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonpointer/jsonpointer-2.0.tar.gz"
+          "version": "2.2",
+          "downloadUrl": "https://github.com/stefankoegl/python-json-pointer/archive/refs/tags/v2.2.tar.gz"
         }
       }
     },
@@ -23204,8 +23164,8 @@
         "type": "other",
         "other": {
           "name": "python-mock",
-          "version": "3.0.5",
-          "downloadUrl": "https://github.com/testing-cabal/mock/archive/refs/tags/3.0.5.tar.gz"
+          "version": "4.0.3",
+          "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-4.0.3.tar.gz"
         }
       }
     },
@@ -23294,8 +23254,8 @@
         "type": "other",
         "other": {
           "name": "python-netifaces",
-          "version": "0.10.9",
-          "downloadUrl": "https://pypi.python.org/packages/source/n/netifaces/netifaces-0.10.9.tar.gz"
+          "version": "0.11.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/n/netifaces/netifaces-0.11.0.tar.gz"
         }
       }
     },
@@ -23304,8 +23264,8 @@
         "type": "other",
         "other": {
           "name": "python-nocasedict",
-          "version": "0.5.0",
-          "downloadUrl": "https://github.com/pywbem/nocasedict/archive/0.5.0.tar.gz"
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/pywbem/nocasedict/archive/refs/tags/1.0.2.tar.gz"
         }
       }
     },
@@ -23714,8 +23674,8 @@
         "type": "other",
         "other": {
           "name": "python-pycodestyle",
-          "version": "2.5.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz"
+          "version": "2.8.0",
+          "downloadUrl": "https://github.com/PyCQA/pycodestyle/archive/refs/tags/2.8.0.tar.gz"
         }
       }
     },
@@ -23734,8 +23694,8 @@
         "type": "other",
         "other": {
           "name": "python-pycparser",
-          "version": "2.18",
-          "downloadUrl": "https://pypi.python.org/packages/source/p/pycparser/pycparser-2.18.tar.gz"
+          "version": "2.21",
+          "downloadUrl": "https://github.com/eliben/pycparser/archive/refs/tags/release_v2.21.tar.gz"
         }
       }
     },
@@ -23794,8 +23754,8 @@
         "type": "other",
         "other": {
           "name": "python-pynacl",
-          "version": "1.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/61/ab/2ac6dea8489fa713e2b4c6c5b549cc962dd4a842b5998d9e80cf8440b7cd/PyNaCl-1.3.0.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/pyca/pynacl/archive/refs/tags/1.5.0.tar.gz"
         }
       }
     },
@@ -27477,8 +27437,8 @@
         "type": "other",
         "other": {
           "name": "spice-vdagent",
-          "version": "0.20.0",
-          "downloadUrl": "https://spice-space.org/download/releases/spice-vdagent-0.20.0.tar.bz2"
+          "version": "0.22.1",
+          "downloadUrl": "https://spice-space.org/download/releases/spice-vdagent-0.22.1.tar.bz2"
         }
       }
     },
@@ -28047,8 +28007,8 @@
         "type": "other",
         "other": {
           "name": "tdnf",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/vmware/tdnf/archive/v2.1.0.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.2.2.tar.gz"
         }
       }
     },
@@ -28598,7 +28558,7 @@
         "other": {
           "name": "unique3",
           "version": "3.0.2",
-          "downloadUrl": "https://github.com/Distrotech/libunique/archive/refs/tags/libunique-3.0.2.tar.xz"
+          "downloadUrl": "https://github.com/Distrotech/libunique/archive/refs/tags/3.0.2.tar.gz"
         }
       }
     },

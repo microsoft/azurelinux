@@ -1,11 +1,10 @@
 Summary:        A fast json library for C
 Name:           libfastjson
-Version:        0.99.8
-Release:        4%{?dist}
+Version:        0.99.9
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/rsyslog/libfastjson
-#Source0:       https://github.com/rsyslog/libfastjson/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/rsyslog/libfastjson/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +53,8 @@ make check
 
 
 %changelog
+* Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.99.9-1
+- Upgrade to 0.99.9
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.99.8-4
 - Added %%license line automatically
 

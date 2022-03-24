@@ -1,0 +1,37 @@
+From 9b0459afab309a82aa4e46f73a4e50dd641f3d39 Mon Sep 17 00:00:00 2001
+From: Christos Zoulas <christos@zoulas.com>
+Date: Mon, 19 Apr 2021 17:01:45 +0000
+Subject: [PATCH] PR/257: cuihao: put attributes inside the xz magic.
+
+---
+ magic/Magdir/compress | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/magic/Magdir/compress b/magic/Magdir/compress
+index 64d11a736..41a65738f 100644
+--- a/magic/Magdir/compress
++++ b/magic/Magdir/compress
+@@ -1,5 +1,5 @@
+ #------------------------------------------------------------------------------
+-# $File: compress,v 1.80 2021/03/15 17:49:24 christos Exp $
++# $File: compress,v 1.81 2021/04/19 17:01:45 christos Exp $
+ # compress:  file(1) magic for pure-compression formats (no archives)
+ #
+ # compress, gzip, pack, compact, huf, squeeze, crunch, freeze, yabba, etc.
+@@ -265,14 +265,13 @@
+ 
+ # http://tukaani.org/xz/xz-file-format.txt
+ 0	ustring		\xFD7zXZ\x00		XZ compressed data, checksum
++!:strength * 2
++!:mime	application/x-xz
+ >7	byte&0xf	0x0			NONE
+ >7	byte&0xf	0x1			CRC32
+ >7	byte&0xf	0x4			CRC64
+ >7	byte&0xf	0xa			SHA-256
+ 
+-!:strength * 2
+-!:mime	application/x-xz
+-
+ # https://github.com/ckolivas/lrzip/blob/master/doc/magic.header.txt
+ 0	string		LRZI			LRZIP compressed data
+ >4	byte		x			- version %d

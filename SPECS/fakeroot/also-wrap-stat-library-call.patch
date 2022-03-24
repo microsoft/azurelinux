@@ -1,0 +1,63 @@
+Subject: Also wrap the "stat" library call
+Author: Christoph Biedl <debian.axhn@manchmal.in-ulm.de>
+Date: 2021-12-20
+Bug-Debian: https://bugs.debian.org/1001961
+Forwarded: Yes
+
+    Seems changes in glibc 2.33 caused the stat() function to be mapped
+    into a stat() library call instead of __xstat() as it used to be.
+
+    However, fakeroot does not wrap this, causing files to be reported
+    with the real owner, not 0 as expected.
+
+    The fix for this got a bit ugly as the abstraction in configure.ac
+    would not allow wrapping both "stat" and "__xstat". So enhance the
+    search list capabilities with an optional symbol how the wrapped
+    function is named internally. Also hack the parser so "stat" gets
+    actually probed and not mistaken for __xstat.
+
+    Using "realstat" as a symbol is not the best choice as it might be
+    confusing, but "statstat" seemed even worse.
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -353,9 +353,13 @@
+ 
+ :>fakerootconfig.h.tmp
+ 
+-for SEARCH in %stat f%stat l%stat f%statat %stat64 f%stat64 l%stat64 f%statat64 %mknod %mknodat; do
+-  FUNC=`echo $SEARCH|sed -e 's/.*%//'`
++for SEARCH in %stat s%tat@realstat f%stat l%stat f%statat %stat64 f%stat64 l%stat64 f%statat64 %mknod %mknodat; do
++  FUNC=`echo $SEARCH|sed -e 's/.*%// ; s/@.*//'`
+   PRE=`echo $SEARCH|sed -e 's/%.*//'`
++  SYMBOL=`echo $SEARCH|sed -e 's/.*@//'`
++  if test "$SYMBOL" = "$SEARCH" ; then
++    SYMBOL="${PRE}${FUNC}"
++  fi
+   FOUND=
+   for WRAPPED in __${PRE}x${FUNC} _${PRE}x${FUNC} __${PRE}${FUNC}13 ${PRE}${FUNC}; do
+     AC_CHECK_FUNCS($WRAPPED,FOUND=$WRAPPED)
+@@ -366,8 +370,8 @@
+ dnl  for WRAPPED in _${PRE}${FUNC}; do
+ dnl    FOUND=$WRAPPED
+     if test -n "$FOUND"; then
+-      PF=[`echo ${PRE}${FUNC}| tr '[a-z]' '[A-Z]'`]
+-      DEFINE_WRAP=[`echo wrap_${PRE}${FUNC}| tr '[a-z]' '[A-Z]'`]
++      PF=[`echo $SYMBOL | tr '[a-z]' '[A-Z]'`]
++      DEFINE_WRAP=[`echo wrap_${SYMBOL}| tr '[a-z]' '[A-Z]'`]
+       DEFINE_NEXT=[`echo wrap_${FOUND}| tr '[a-z]' '[A-Z]'`]
+       DEFINE_ARG=[`echo wrap_${FOUND}| tr '[a-z]' '[A-Z]'`]
+       AC_DEFINE_UNQUOTED(WRAP_${PF}, $FOUND)
+@@ -509,6 +513,12 @@
+ #define TMP_STAT  __astat
+ #define NEXT_STAT_NOARG  next___astat
+ 
++#define WRAP_REALSTAT  __astat
++#define WRAP_REALSTAT_QUOTE  __astat
++#define WRAP_REALSTAT_RAW  __astat
++#define TMP_REALSTAT  __astat
++#define NEXT_REALSTAT_NOARG  next___astat
++
+ #define WRAP_LSTAT_QUOTE  __astat
+ #define WRAP_LSTAT  __astat
+ #define WRAP_LSTAT_RAW  __astat

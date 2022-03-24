@@ -1,21 +1,22 @@
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: libiptcdata
 Version: 1.0.5
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: IPTC tag library
 
-License: LGPLv2+
+License: GPLv2
 URL: https://github.com/ianw/%{name}
-Source0: https://github.com/ianw/%{name}/releases/download/%{name}-%{version}.tar.gz
+Source0: https://github.com/ianw/%{name}/archive/refs/tags/release_1_0_5.tar.gz#/%{name}-release_1_0_5.tar.gz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  gettext-devel
 BuildRequires:  libtool
-BuildRequires:  gtk-doc
 BuildRequires:  python3-devel
 
 
@@ -47,16 +48,13 @@ that you can use to develop libiptcdata applications.
 
 
 %prep
-%autosetup
-# fix compatibility with gtk-doc 1.26
-gtkdocize
+%autosetup -n "%{name}-release_1_0_5"
 autoreconf -fiv
 
 
 %build
-#configure --enable-gtk-doc --disable-python --disable-static
 export PYTHON_VERSION=%python3_version
-%configure --enable-gtk-doc --enable-python --disable-static
+%configure --disable-gtk-doc --enable-python --disable-static
 %make_build
 
 
@@ -81,10 +79,14 @@ find %{buildroot} -name "*.la" -exec rm -f {} \;
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/libiptcdata
-%{_datadir}/gtk-doc/html/libiptcdata
 
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.5-6
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.5-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

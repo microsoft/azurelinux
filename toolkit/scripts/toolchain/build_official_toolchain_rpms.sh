@@ -304,8 +304,6 @@ build_rpm_in_chroot_no_install zip
 chroot_and_install_rpms zip
 build_rpm_in_chroot_no_install unzip
 chroot_and_install_rpms unzip
-build_rpm_in_chroot_no_install alsa-lib
-chroot_and_install_rpms alsa-lib
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
@@ -323,10 +321,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13%2B8-LTS-4.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13%2B8-LTS-4.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
@@ -337,7 +335,7 @@ build_rpm_in_chroot_no_install grep
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
 
-# Build tdnf-2.1.0
+# Build tdnf-3.2.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
@@ -451,11 +449,12 @@ build_rpm_in_chroot_no_install gnupg2
 chroot_and_install_rpms gnupg2
 build_rpm_in_chroot_no_install gpgme
 
-# tdnf needs python3, gpgme, curl and libsolv
+# tdnf needs python3, gpgme, curl, libmetalink and libsolv
+build_rpm_in_chroot_no_install libmetalink
 chroot_and_install_rpms libsolv
 chroot_and_install_rpms curl
-
 chroot_and_install_rpms gpgme
+chroot_and_install_rpms libmetalink
 build_rpm_in_chroot_no_install pinentry
 
 build_rpm_in_chroot_no_install tdnf
@@ -468,7 +467,7 @@ build_rpm_in_chroot_no_install createrepo_c
 
 build_rpm_in_chroot_no_install libsepol
 
-audit needs: python3, krb5, swig, e2fsprogs
+# audit needs: python3, krb5, swig, e2fsprogs
 build_rpm_in_chroot_no_install audit
 
 # rebuild pam with selinux and audit support

@@ -2,19 +2,19 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libgxps
 Version:        0.3.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        GObject based library for handling and rendering XPS documents
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/libgxps
 Source0:        https://ftp.gnome.org/pub/gnome/sources/%{name}/0.3/%{name}-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  meson
 BuildRequires:  gcc
 BuildRequires:  gtk3-devel
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gtk-doc
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  libarchive-devel
 BuildRequires:  freetype-devel
@@ -48,7 +48,7 @@ documents using the %{name} library.
 
 
 %build
-%meson -Denable-gtk-doc=true -Denable-man=true
+%meson -Denable-gtk-doc=false -Denable-man=false
 %meson_build
 
 
@@ -70,17 +70,18 @@ documents using the %{name} library.
 %{_libdir}/pkgconfig/*.pc
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/*.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/libgxps
 
 
 %files tools
 %{_bindir}/xpsto*
-%{_mandir}/man1/xpsto*.1*
 
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.1-7
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 0.3.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Use pkgconfig(cairo) build requirement instead of cairo-devel
