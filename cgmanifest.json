@@ -8605,8 +8605,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4495",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4495.tar.gz"
+          "version": "8.2.4563",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4563.tar.gz"
         }
       }
     },
