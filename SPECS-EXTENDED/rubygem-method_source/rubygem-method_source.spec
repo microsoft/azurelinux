@@ -1,13 +1,13 @@
-# Generated from method_source-0.7.1.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name method_source
-
+%global debug_package %{nil}
 Summary: Retrieve the source code for a method
 Name: rubygem-%{gem_name}
 Version: 1.0.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT
 URL: http://banisterfiend.wordpress.com
-Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source0: https://github.com/banister/method_source/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0: fix-gemspec.patch
 
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
@@ -18,7 +18,6 @@ BuildArch: noarch
 %description
 Retrieve the source code for a method
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -28,23 +27,26 @@ BuildArch: noarch
 Documentation for %{name}
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
-gem build ../%{gem_name}-%{version}.gemspec
-%gem_install
-
+gem build %{gem_name}
 
 %install
+gem install %{gem_name}-%{version}.gem
 mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
+mkdir -p %{buildroot}%{gem_dir}/cache
+cp -a /%{gem_dir}/cache/%{gem_name}-%{version}.gem %{buildroot}%{gem_dir}/cache/
+cp -a /%{gem_dir}/doc/%{gem_name}-%{version} %{buildroot}%{gem_dir}/
+cp -a /%{gem_dir}/extensions %{buildroot}%{gem_dir}/gems/
+mkdir -p %{buildroot}%{gem_dir}/specifications
+cp -a /%{gem_dir}/specifications/%{gem_name}-%{version}.gemspec %{buildroot}%{gem_dir}/specifications/
+cp -a /%{gem_dir}/gems/%{gem_name}-%{version} %{buildroot}%{gem_dir}/gems/
 
 %check
 pushd .%{gem_instdir}
 rspec spec
 popd
-
 
 %files
 %dir %{gem_instdir}
@@ -53,9 +55,9 @@ popd
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}
+%{gem_dir}/%{gem_name}-%{version}
 
 %files doc
-%doc %{gem_docdir}
 %{gem_instdir}/Gemfile
 %doc %{gem_instdir}/README.markdown
 %doc %{gem_instdir}/CHANGELOG.md
@@ -64,6 +66,10 @@ popd
 %{gem_instdir}/spec
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-4
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 
