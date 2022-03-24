@@ -12,7 +12,7 @@ Release:       35%{?dist}
 License:       MIT AND ASL 2.0
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
-URL:           http://github.com/hpricot/hpricot
+URL:           https://github.com/hpricot/hpricot
 Source0:       https://github.com/hpricot/hpricot/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 Requires:	ruby(release)
