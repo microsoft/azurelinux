@@ -22594,8 +22594,8 @@
         "type": "other",
         "other": {
           "name": "python-greenlet",
-          "version": "0.4.16",
-          "downloadUrl": "https://github.com/python-greenlet/greenlet/archive/0.4.16/greenlet-0.4.16.tar.gz"
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/python-greenlet/greenlet/archive/1.1.2/greenlet-1.1.2.tar.gz"
         }
       }
     },

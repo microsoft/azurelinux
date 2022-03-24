@@ -3000,7 +3000,6 @@
                 "python-docutils",
                 "python-ecdsa",
                 "python-gevent",
-                "python-greenlet",
                 "python-hyperlink",
                 "python-hypothesis",
                 "python-idna",
