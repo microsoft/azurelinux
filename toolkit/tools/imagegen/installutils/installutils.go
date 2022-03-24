@@ -372,6 +372,8 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
 	const (
 		filesystemPkg = "filesystem"
+		auditlibsPkg = "audit-libs"
+		systemdPkg = "systemd"
 	)
 
 	defer stopGPGAgent(installChroot)
@@ -413,6 +415,17 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
 	if err != nil {
 		return
+	}
+
+	// If systemd package is in the list, install audit-libs first to ensure it is available
+	for _, pkg := range packagesToInstall {
+		if strings.HasPrefix(pkg, systemdPkg) {
+			logger.Log.Infof("Installing audit-libs package before systemd")
+			packagesInstalled, err = TdnfInstallWithProgress(auditlibsPkg, installRoot, packagesInstalled, totalPackages, true)
+			if err != nil {
+				return
+			}
+		}
 	}
 
 	hostname := config.Hostname
