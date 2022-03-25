@@ -16,16 +16,15 @@ The Swiss Army knife of Python web development
 %package -n     python3-werkzeug
 Summary:        The Swiss Army knife of Python web development
 BuildRequires:  python3-devel
+BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-BuildRequires:  python3-libs
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python3-requests
 BuildRequires:  python3-pip
+BuildRequires:  python3-requests
 %endif
-
 Requires:       python3
 
 %description -n python3-werkzeug
