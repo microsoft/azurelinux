@@ -1,0 +1,41 @@
+From 9673898509ba046f596245268f7109e921f7a1c6 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Fri, 25 Mar 2022 09:47:59 +0530
+Subject: [PATCH] etcd: build: switch CGO_ENABLED=1 to enable fips compliance
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ build | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/build b/build
+index 2d2ee5c..7b26cd5 100755
+--- a/build
++++ b/build
+@@ -53,12 +53,12 @@ etcd_build() {
+ 
+ 	# Static compilation is useful when etcd is run in a container. $GO_BUILD_FLAGS is OK
+ 	# shellcheck disable=SC2086
+-	CGO_ENABLED=0 go build $GO_BUILD_FLAGS \
++	CGO_ENABLED=1 go build $GO_BUILD_FLAGS \
+ 		-installsuffix cgo \
+ 		-ldflags "$GO_LDFLAGS" \
+ 		-o "${out}/etcd" ${REPO_PATH} || return
+ 	# shellcheck disable=SC2086
+-	CGO_ENABLED=0 go build $GO_BUILD_FLAGS \
++	CGO_ENABLED=1 go build $GO_BUILD_FLAGS \
+ 		-installsuffix cgo \
+ 		-ldflags "$GO_LDFLAGS" \
+ 		-o "${out}/etcdctl" ${REPO_PATH}/etcdctl || return
+@@ -79,7 +79,7 @@ tools_build() {
+ 	do
+ 		echo "Building" "'${tool}'"...
+ 		# shellcheck disable=SC2086
+-		CGO_ENABLED=0 go build ${GO_BUILD_FLAGS} \
++		CGO_ENABLED=1 go build ${GO_BUILD_FLAGS} \
+ 		  -installsuffix cgo \
+ 		  -ldflags "${GO_LDFLAGS}" \
+ 		  -o "${out}/${tool}" "${REPO_PATH}/${tool}" || return
+-- 
+2.17.1
+

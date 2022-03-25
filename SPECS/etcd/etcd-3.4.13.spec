@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.4.13
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          System Environment/Security
 URL:            https://github.com/etcd-io/etcd/
 Source0:        https://github.com/etcd-io/etcd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        etcd.service
+Patch0:         0001-etcd-build-switch-CGO_ENABLED-1-to-enable-fips-compl.patch
 BuildRequires:  git
 BuildRequires:  golang >= 1.13
 
@@ -26,7 +27,7 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 # Turn off auto moduling. golang 1.13 does not automatically consider the vendor folder (it does as of 1.14).
@@ -87,7 +88,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 %{_bindir}/etcd-dump-*
 
 %changelog
-%changelog
+* Fri Mar 25 2022 Muhammad Falak <mwani@microsoft.com> - 3.4.13-9
+- Switch CGO_ENABLED=1 to enable fips compliance
+
 * Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.4.13-8
 - Remove clean section
 
