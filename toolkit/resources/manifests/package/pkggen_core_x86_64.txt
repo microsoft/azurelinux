@@ -65,8 +65,8 @@ gzip-1.11-1.cm2.x86_64.rpm
 make-4.3-2.cm2.x86_64.rpm
 mariner-release-2.0-7.cm2.noarch.rpm
 patch-2.7.6-7.cm2.x86_64.rpm
-util-linux-2.37.2-3.cm2.x86_64.rpm
-util-linux-devel-2.37.2-3.cm2.x86_64.rpm
+util-linux-2.37.2-4.cm2.x86_64.rpm
+util-linux-devel-2.37.2-4.cm2.x86_64.rpm
 tar-1.34-1.cm2.x86_64.rpm
 xz-5.2.5-1.cm2.x86_64.rpm
 xz-devel-5.2.5-1.cm2.x86_64.rpm
