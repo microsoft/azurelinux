@@ -1,13 +1,13 @@
 Summary:        Measures number of Terminal column cells of wide-character codes.
 Name:           python-wcwidth
-Version:        0.1.7
-Release:        5%{?dist}
+Version:        0.2.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/wcwidth
-Source0:        https://files.pythonhosted.org/packages/source/w/wcwidth/wcwidth-%{version}.tar.gz
+Source0:        https://github.com/jquast/wcwidth/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -19,6 +19,17 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+
+%if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-coverage
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-six
+%endif
+
 Requires:       python3
 
 %description -n python3-wcwidth
@@ -34,14 +45,21 @@ This Library is mainly for those implementing a Terminal Emulator, or programs t
 %py3_install
 
 %check
-%python3 setup.py test
+pip3 install \
+    more-itertools \
+    pluggy
+
+pytest3 -vv tests
 
 %files -n python3-wcwidth
 %defattr(-,root,root)
-%license LICENSE.txt
+%license LICENSE
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.2.5-1
+- Upgrade to  0.2.5
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.1.7-5
 - Add license to python3 package
 - Remove python2 package

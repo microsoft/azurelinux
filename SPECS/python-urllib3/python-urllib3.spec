@@ -1,14 +1,13 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
-Version:        1.25.9
-Release:        3%{?dist}
+Version:        1.26.9
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/urllib3
-Source0:        https://github.com/shazow/urllib3/archive/%{version}/urllib3-%{version}.tar.gz
-Patch0:         CVE-2021-33503.patch
+Source0:        https://github.com/urllib3/urllib3/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -63,6 +62,9 @@ ulimit -n $nofiles
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.26.9-1
+- Upgrade to 1.26.9
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.25.9-3
 - Add license to python3 package
 - Move python3-pip to check-time build requirements
