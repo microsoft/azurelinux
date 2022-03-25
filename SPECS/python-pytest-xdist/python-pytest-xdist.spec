@@ -14,13 +14,13 @@ The pytest-xdist plugin extends py.test with some unique test execution modes:
   different platforms and run tests in parallel on all of them.}
 Summary:        py.test plugin for distributed testing and loop-on-failing modes
 Name:           python-%{pypi_name}
-Version:        2.1.0
-Release:        3%{?dist}
+Version:        2.5.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytest-dev/pytest-xdist
-Source0:        https://files.pythonhosted.org/packages/17/18/bb102b7131f1c08e5d9f0a6a5904e0b4cf02160bdde1645fc386461b5423/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/5d/43/9dbc32d297d6eae85d6c05dc8e8d3371061bd6cbe56a2f645d9ea4b53d9b/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-execnet >= 1.1
 BuildRequires:  python3-filelock
@@ -68,12 +68,15 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v  -k "not test_warning_captured_deprecated_in_pytest_6"
 
 %files -n python3-%{pypi_name}
-%doc OVERVIEW.md README.rst
+%doc README.rst
 %license LICENSE
 %{python3_sitelib}/pytest_xdist*
 %{python3_sitelib}/xdist/
 
 %changelog
+* Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.0-1
+- Updating to version 2.5.0.
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.1.0-3
 - Update check section to use pytest module
 - License verified
