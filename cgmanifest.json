@@ -24264,8 +24264,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinx-theme-py3doc-enhanced",
-          "version": "2.3.2",
-          "downloadUrl": "https://pypi.io/packages/source/s/sphinx_py3doc_enhanced_theme/sphinx-py3doc-enhanced-theme-2.3.2.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://pypi.io/packages/source/s/sphinx_py3doc_enhanced_theme/sphinx-py3doc-enhanced-theme-2.4.0.tar.gz"
         }
       }
     },
