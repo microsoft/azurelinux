@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,7 @@ BuildRequires:  perl-XML-Parser
 BuildRequires:  python3-jinja2
 BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
+Requires(pre):  audit-libs
 Requires:       %{name}-rpm-macros = %{version}-%{release}
 Requires:       glib
 Requires:       kmod
@@ -258,6 +259,9 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Mar 24 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-3
+- Add Requires(pre) on audit-libs
+
 * Thu Mar 17 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-2
 - Disable zstd configuration to ensure lz4 compression is used for journal files and coredumps
 
