@@ -5,46 +5,52 @@
 # notice and this notice are preserved.  This file is offered as-is,
 # without warranty of any kind.
 
-Summary:        Open vSwitch daemon/database/utilities
-Name:           openvswitch
-Version:        2.17.0
-Release:        1%{?dist}
-License:        ASL 2.0 AND LGPLv2+ AND SISSL
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Group:          System Environment/Daemons
-URL:            https://www.openvswitch.org/
-Source0:        http://openvswitch.org/releases/%{name}-%{version}.tar.gz
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  checkpolicy
-BuildRequires:  dpdk-devel
-BuildRequires:  gcc >= 4.0.0
-BuildRequires:  graphviz
-BuildRequires:  groff
-BuildRequires:  libcap-ng
-BuildRequires:  libcap-ng-devel
-BuildRequires:  libpcap-devel
-BuildRequires:  libtool
-BuildRequires:  make
-BuildRequires:  numactl-devel
-BuildRequires:  openssl
-BuildRequires:  openssl-devel
-BuildRequires:  procps-ng
-BuildRequires:  python3
-BuildRequires:  python3-devel
-BuildRequires:  python3-libs
-BuildRequires:  python3-six
-BuildRequires:  python3-sphinx
-BuildRequires:  selinux-policy-devel
-BuildRequires:  systemd
-BuildRequires:  unbound
-BuildRequires:  unbound-devel
-Requires:       hostname
-Requires:       iproute
-Requires:       module-init-tools
-Requires:       openssl
-Requires:       unbound
+Summary:           Open vSwitch daemon/database/utilities
+Name:              openvswitch
+Version:           2.17.0
+Release:           1%{?dist}
+License:           ASL 2.0 AND LGPLv2+ AND SISSL
+Vendor:            Microsoft Corporation
+Distribution:      Mariner
+Group:             System Environment/Daemons
+URL:               https://www.openvswitch.org/
+Source0:           http://openvswitch.org/releases/%{name}-%{version}.tar.gz
+BuildRequires:     autoconf
+BuildRequires:     automake
+BuildRequires:     checkpolicy
+BuildRequires:     dpdk-devel
+BuildRequires:     gcc >= 4.0.0
+BuildRequires:     graphviz
+BuildRequires:     groff
+BuildRequires:     libcap-ng
+BuildRequires:     libcap-ng-devel
+BuildRequires:     libpcap-devel
+BuildRequires:     libtool
+BuildRequires:     make
+BuildRequires:     numactl-devel
+BuildRequires:     openssl
+BuildRequires:     openssl-devel
+BuildRequires:     procps-ng
+BuildRequires:     python3
+BuildRequires:     python3-devel
+BuildRequires:     python3-libs
+BuildRequires:     python3-six
+BuildRequires:     python3-sphinx
+BuildRequires:     selinux-policy-devel
+BuildRequires:     systemd
+BuildRequires:     unbound
+BuildRequires:     unbound-devel
+Requires:          hostname
+Requires:          iproute
+Requires:          module-init-tools
+Requires:          openssl
+Requires:          unbound
+Requires(pre):     shadow-utils
+Requires(post):    /bin/sed
+Requires(post):    systemd-units
+Requires(preun):   systemd-units
+Requires(postun):  systemd-units
+
 
 %description
 Open vSwitch provides standard network bridging functions and
@@ -53,7 +59,7 @@ traffic.
 
 %package        selinux-policy
 Summary:        Open vSwitch SELinux policy
-License:        ASL 2.0 AND LGPLv2+ AND SISSL
+License:        ASL 2.0
 Requires:       selinux-policy
 BuildArch:      noarch
 
@@ -62,7 +68,7 @@ Open vSwitch SELinux policy
 
 %package -n     python3-openvswitch
 Summary:        Python3 bindings for Open vSwitch
-License:        ASL 2.0 AND LGPLv2+ AND SISSL
+License:        ASL 2.0
 Requires:       python3
 Requires:       python3-libs
 BuildArch:      noarch
@@ -72,7 +78,7 @@ Python binding for Open vSwitch database
 
 %package        devel
 Summary:        Header and development files for openvswitch
-License:        ASL 2.0 AND LGPLv2+ AND SISSL
+License:        ASL 2.0
 Requires:       %{name} = %{version}
 
 %description    devel
@@ -80,7 +86,7 @@ openvswitch-devel package contains header files and libs.
 
 %package        test
 Summary: Open vSwitch testing utilities
-License:        ASL 2.0 AND LGPLv2+ AND SISSL
+License:        ASL 2.0
 BuildArch: noarch
 
 %description    test
@@ -89,7 +95,7 @@ issues in Open vSwitch setup.
 
 %package        doc
 Summary:        Documentation for openvswitch
-License:        ASL 2.0 AND LGPLv2+ AND SISSL
+License:        ASL 2.0
 Requires:       %{name} = %{version}-%{release}
 
 %description    doc
@@ -279,6 +285,33 @@ fi
 %exclude %{_libdir}/*.la
 %exclude %{_libdir}/*.a
 
+%files doc
+%{_mandir}/man1/ovsdb-client.1*
+%{_mandir}/man1/ovsdb-server.1*
+%{_mandir}/man1/ovsdb-tool.1*
+%{_mandir}/man5/ovsdb-server.5*
+%{_mandir}/man5/ovs-vswitchd.conf.db.5*
+%{_mandir}/man5/ovsdb.5*
+%{_mandir}/man5/vtep.5*
+%{_mandir}/man7/ovs-actions.7*
+%{_mandir}/man7/ovs-fields.7*
+%{_mandir}/man7/ovsdb.7*
+%{_mandir}/man7/ovsdb-server.7*
+%{_mandir}/man8/vtep-ctl.8*
+%{_mandir}/man8/ovs-appctl.8*
+%{_mandir}/man8/ovs-bugtool.8*
+%{_mandir}/man8/ovs-ctl.8*
+%{_mandir}/man8/ovs-dpctl.8*
+%{_mandir}/man8/ovs-dpctl-top.8*
+%{_mandir}/man8/ovs-kmod-ctl.8*
+%{_mandir}/man8/ovs-ofctl.8*
+%{_mandir}/man8/ovs-pki.8*
+%{_mandir}/man8/ovs-vsctl.8*
+%{_mandir}/man8/ovs-vswitchd.8*
+%{_mandir}/man8/ovs-parse-backtrace.8*
+%{_mandir}/man8/ovs-testcontroller.8*
+
+
 %files
 %defattr(-,openvswitch,openvswitch)
 %dir %{_sysconfdir}/openvswitch
@@ -323,36 +356,15 @@ fi
 %{_sbindir}/ovs-bugtool
 %{_sbindir}/ovs-vswitchd
 %{_sbindir}/ovsdb-server
-%{_mandir}/man1/ovsdb-client.1*
-%{_mandir}/man1/ovsdb-server.1*
-%{_mandir}/man1/ovsdb-tool.1*
-%{_mandir}/man5/ovsdb-server.5*
-%{_mandir}/man5/ovs-vswitchd.conf.db.5*
-%{_mandir}/man5/ovsdb.5*
-%{_mandir}/man5/vtep.5*
-%{_mandir}/man7/ovs-actions.7*
-%{_mandir}/man7/ovs-fields.7*
-%{_mandir}/man7/ovsdb.7*
-%{_mandir}/man7/ovsdb-server.7*
-%{_mandir}/man8/vtep-ctl.8*
-%{_mandir}/man8/ovs-appctl.8*
-%{_mandir}/man8/ovs-bugtool.8*
-%{_mandir}/man8/ovs-ctl.8*
-%{_mandir}/man8/ovs-dpctl.8*
-%{_mandir}/man8/ovs-dpctl-top.8*
-%{_mandir}/man8/ovs-kmod-ctl.8*
-%{_mandir}/man8/ovs-ofctl.8*
-%{_mandir}/man8/ovs-pki.8*
-%{_mandir}/man8/ovs-vsctl.8*
-%{_mandir}/man8/ovs-vswitchd.8*
-%{_mandir}/man8/ovs-parse-backtrace.8*
-%{_mandir}/man8/ovs-testcontroller.8*
 %{_prefix}/lib/udev/rules.d/91-vfio.rules
 %doc NOTICE README.rst NEWS rhel/README.RHEL.rst
 /var/lib/openvswitch
 %attr(750,root,root) /var/log/openvswitch
 %ghost %attr(755,root,root) %{_rundir}/openvswitch
 %ghost %attr(644,root,root) %{_rundir}/openvswitch.useropts
+
+
+
 
 %files ipsec
 %{_datadir}/openvswitch/scripts/ovs-monitor-ipsec
