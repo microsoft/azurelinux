@@ -20,7 +20,6 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with check}
 BuildRequires:  python3-pip
-BuildRequires:  python3-six
 %endif
 Requires:       python3
 
