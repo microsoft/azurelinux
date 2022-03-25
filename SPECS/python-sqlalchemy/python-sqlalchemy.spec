@@ -26,11 +26,15 @@ URL:            https://www.sqlalchemy.org/
 Source0:        https://files.pythonhosted.org/packages/source/S/%{srcname}/%{srcname}-%{srcversion}.tar.gz
 
 BuildRequires:  gcc
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
 BuildRequires:  python3-devel >= 3.6
+BuildRequires:  python3-execnet
 BuildRequires:  python3-greenlet >= 1.0
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-xdist
+BuildRequires:  python3-pip
+BuildRequires:  python3-pluggy
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-six
 
 %description
 SQLAlchemy is an Object Relational Mapper (ORM) that provides a flexible,
@@ -81,6 +85,11 @@ This package includes the python 3 version of the module.
 rm -rf doc/build
 
 %check
+# Using pip for 'more-itertools' because Mariner doesn't build it.
+# Mariner's 'pytest' module is below the required version 6.0.0, so we need to use pip as well.
+# The 'apipkg' module should be provided by 'python3-py' pulled in by 'python3-execnet' but the build
+# couldn't find 'apipkg' just by using the BRs.
+pip3 install more-itertools pytest pytest-xdist apipkg
 PYTHONPATH=. python3 -m pytest test --numprocesses=auto
 
 %files doc
