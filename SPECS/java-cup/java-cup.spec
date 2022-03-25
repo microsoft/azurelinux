@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package java-cup
 #
@@ -17,49 +15,53 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
 %define with_bootstrap 1
-%define cvs_version        11a
-%define real_name   java-cup
-%bcond_without                bootstrap
+%define cvs_version    11b
+%define real_name      java-cup
+%define pub_date       20160615
+%bcond_without         bootstrap
+
+Summary:        LALR Parser Generator in Java
 Name:           java-cup
 Version:        0.11
-Release:        30%{?dist}
-Summary:        LALR Parser Generator in Java
+Release:        31%{?dist}
 License:        HPND
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Url:            http://www2.cs.tum.edu/projects/cup/
-# https://www2.in.tum.de/WebSVN/dl.php?repname=CUP&path=/develop/&rev=0&isdir=1
-Source0:        develop.tar.bz2
+Source0:        http://www2.cs.tum.edu/projects/cup/releases/%{name}-src-%{cvs_version}-%{pub_date}.tar.gz#/%{name}-%{version}b.tar.gz
 Source1:        java-cup.script
 Source2:        java-cup-generated-files.tar.bz2
 # From          http://www2.cs.tum.edu/projects/cup/
 Source3:        java-cup.license
 Patch1:         java-cup-no-classpath-in-manifest.patch
-Patch2:         java-cup-no-cup-no-jflex.patch
-Patch3:         java-cup-classpath.patch
-# Missing symbolFactory initialization in lr_parser, causes sinjdoc to crash
-Patch4:         java-cup-lr_parser-constructor.patch
 BuildRequires:  ant
+BuildRequires:  git
 BuildRequires:  java-devel
 BuildRequires:  xml-commons-apis-bootstrap
 BuildRequires:  xml-commons-resolver-bootstrap
+BuildRequires:  javapackages-local-bootstrap
+%if %without bootstrap
+BuildRequires:  jflex
+BuildRequires:  java_cup
+%endif
 #!BuildIgnore:  xml-commons-apis xml-commons-resolver xalan-j2 xerces-j2
+# Explicit javapackages-tools requires since scripts use
+# /usr/share/java-utils/java-functions
+Requires:       javapackages-tools
 Obsoletes:      java_cup < %{version}-%{release}
 Provides:       java_cup = %{version}-%{release}
 Provides:       java-cup-bootstrap = %{version}-%{release}
 BuildArch:      noarch
 
 %description
-java-cup is a LALR Parser Generator in Java. With v0.11, you can: *
-   use CUP in an Ant-Target
-
+java-cup is a LALR Parser Generator in Java. With v0.11, you can: 
+* use CUP in an Ant-Target
 * start CUP by a simple command like java -jar java-cup-11a.jar
    myGrammar.cup
-
 * use generic parametrized classes (since Java 1.5) as datatypes for
    non terminals and terminals
-
 * have Your own symbol classes
 
 %if %without bootstrap
@@ -68,53 +70,54 @@ Summary:        LALR Parser Generator in Java
 Group:          Development/Libraries/Java
 
 %description manual
-java-cup is a LALR Parser Generator in Java. With v0.11, you can: *
-   use CUP in an Ant-Target
-
+java-cup is a LALR Parser Generator in Java. With v0.11, you can: 
+* use CUP in an Ant-Target
 * start CUP by a simple command like java -jar java-cup-11a.jar
    myGrammar.cup
-
 * use generic parametrized classes (since Java 1.5) as datatypes for
    non
-
 * terminals and terminals
-
 * have Your own symbol classes
-
 %endif
 
 %prep
-%setup -q -n develop
+%setup -q -c
+
 %patch1 -p1
-%if %with bootstrap
-%setup -q -T -D -a 2 -n develop
-%patch2 -p1
-%else
-%{_bindir}/find . -name '*.jar' | %{_bindir}/xargs rm
-%patch3 -p1
-%endif
-%patch4 -p1
-perl -pi -e 's/1\.2/1.6/g' build.xml
+%setup -q -T -D -a 2 -c
+
+# remove all binary files
+find -name "*.class" -delete
+
+# remove prebuilt JFlex
+rm -rf java_cup-%{version}/bin/JFlex.jar
+ 
+# remove prebuilt java_cup
+rm -rf java_cup-%{version}/bin/java-cup-11.jar
+
 mkdir -p classes dist
 cp %{SOURCE3} license.txt
 
 %build
-%if %with bootstrap
-export CLASSPATH=
-%else
-export CLASSPATH=$(build-classpath java-cup jflex)
-%endif
-export OPT_JAR_LIST=:
-ant
+export CLASSPATH=$(build-classpath java_cup java_cup-runtime jflex)
+
+ant -Dcupversion=%{pub_date}
 
 %install
 # jar
 mkdir -p %{buildroot}%{_javadir}
 cp -a dist/%{real_name}-%{cvs_version}.jar %{buildroot}%{_javadir}/%{real_name}-%{version}.jar
 cp -a dist/%{real_name}-%{cvs_version}-runtime.jar %{buildroot}%{_javadir}/%{real_name}-runtime-%{version}.jar
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}*; do ln -s ${jar} ${jar/-%{version}/}; done)
+
+pushd %{buildroot}%{_javadir}
+for jar in *-%{version}*; do
+  ln -s ${jar} ${jar/-%{version}/};
+done
 # compatibility symlinks
-(cd %{buildroot}%{_javadir} && ln -s %{real_name}.jar java_cup.jar && ln -s %{real_name}-runtime.jar java_cup-runtime.jar)
+ln -s %{real_name}.jar java_cup.jar
+ln -s %{real_name}-runtime.jar java_cup-runtime.jar
+popd
+
 mkdir -p %{buildroot}%{_bindir}
 install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 
@@ -129,6 +132,10 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 %endif
 
 %changelog
+* Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.11-31
+- Update to version 0.11b, published 20160615
+- Clean up old/deprecated patches 
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-30
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

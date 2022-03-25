@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package junit
 #
@@ -17,13 +15,14 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
+Summary:        Java regression test package
 Name:           junit
 Version:        4.13
 Release:        2%{?dist}
-Summary:        Java regression test package
 License:        EPL-1.0
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.junit.org/
 Source0:        https://github.com/junit-team/junit/archive/r%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        build.xml
@@ -32,6 +31,7 @@ BuildRequires:  fdupes
 BuildRequires:  hamcrest >= 1.3
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  javapackages-local-bootstrap
+Requires:       mvn(org.hamcrest:hamcrest-core)
 Provides:       %{name}-demo = %{version}-%{release}
 Obsoletes:      %{name}-demo < %{version}-%{release}
 Provides:       %{name}4-demo = %{version}-%{release}
@@ -92,7 +92,6 @@ cp -pr %{name}%{version}/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %check
-
 cat > test.java <<EOF
 import org.junit.Assert;
 class test {

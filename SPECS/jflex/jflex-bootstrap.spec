@@ -1,4 +1,3 @@
-
 #
 # spec file for package jflex
 #
@@ -16,25 +15,16 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
-
-%define with()          %{expand:%%{?with_%{1}:1}%%{!?with_%{1}:0}}
-%define without()       %{expand:%%{?with_%{1}:0}%%{!?with_%{1}:1}}
-%define bcond_with()    %{expand:%%{?_with_%{1}:%%global with_%{1} 1}}
-%define bcond_without() %{expand:%%{!?_without_%{1}:%%global with_%{1} 1}}
-##### WARNING: please do not edit this auto generated spec file. Use the jflex.spec! #####
-%define with_bootstrap 1
-%define section            free
-Name:           jflex-bootstrap
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# This line is not a comment, please do not remove it!
-Version:        1.4.3
-Release:        30%{?dist}
 Summary:        Lexical Analyzer Generator for Java
+Name:           jflex-bootstrap
+Version:        1.4.3
+Release:        31%{?dist}
 License:        GPL-2.0+
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Url:            http://www.jflex.de/
-Source0:        http://www.jflex.de/jflex-%{version}.tar.bz2
+Source0:        https://github.com/jflex-de/jflex/archive/refs/tags/release_1_4_3.tar.gz#/jflex-%{version}.tar.gz
 Source1:        jflex.script
 Source100:      jpackage-bootstrap-prepare.sh
 Patch0:         jflex-javac-no-target.patch
@@ -50,13 +40,7 @@ BuildRequires:  javapackages-local-bootstrap
 Requires:       java_cup
 Requires:       javapackages-tools
 BuildArch:      noarch
-%if %without bootstrap
-BuildRequires:  jflex-bootstrap
-BuildRequires:  junit
-Conflicts:      jflex-bootstrap
-%else
 Conflicts:      jflex
-%endif
 
 %description
 JFlex is a lexical analyzer generator for Java written in Java. It is
@@ -73,70 +57,27 @@ Design goals The main design goals of JFlex are:
     * Platform independence
     * JLex compatibility
 
-%if %without bootstrap
-%package doc
-Summary:        Documentation and examples for %{name}
-Group:          Development/Libraries/Java
-
-%description doc
-JFlex is a lexical analyzer generator for Java written in Java. It is
-also a rewrite of the very useful tool JLex which was developed by
-Elliot Berk at Princeton University. As Vern Paxson states for his C/C++
-tool flex: they do not share any code though.
-
-Design goals The main design goals of JFlex are:
-
-    * Full unicode support
-    * Fast generated scanners
-    * Fast scanner generation
-    * Convenient specification syntax
-    * Platform independence
-    * JLex compatibility
-
-This package contains documentation and examples for %{name}
-%endif
-
 %prep
-%setup -q -n jflex-%{version}
+%setup -q -n jflex-release_1_4_3
+cd jflex
 perl -pi -e 's/
 $//g' examples/standalone/sample.inp
 rm -rf src/java_cup
-find . -name '*.jar' | xargs -t rm
-%if %without bootstrap
-export CLASSPATH=$(build-classpath java-cup java-cup-runtime junit jflex)
-export OPT_JAR_LIST=:
-pushd src
-%{ant} realclean
-%{ant} -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 jflex
-popd
-%endif
 %patch0 -p1
-
-%if %with bootstrap
 %patch1 -p1
 
-echo `pwd`
 rm -rf src/JFlex/tests
-%else # with bootstrap
-# You must use Re jflex.spec and have a java-cup and jflex installed
-%patch2 -p1
-%patch4 -p1
-%patch5 -p1
-%endif
 
 %build
+cd jflex
 pushd src
-%if %without bootstrap
-export CLASSPATH=$(build-classpath java-cup java-cup-runtime junit jflex antlr-bootstrap)
-%else
 export CLASSPATH=$(build-classpath java-cup java-cup-runtime junit antlr-bootstrap)
-%endif
 export OPT_JAR_LIST=:
-echo `pwd`
 %{ant} -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 jar
 popd
 
 %install
+cd jflex
 # jar
 mkdir -p %{buildroot}%{_javadir}
 cp -a lib/JFlex.jar %{buildroot}%{_javadir}/jflex-%{version}.jar
@@ -149,18 +90,17 @@ mkdir -p %{buildroot}%{_bindir}
 install -p -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/jflex
 
 %files
-%doc COPYRIGHT src/README src/changelog
+%doc jflex/COPYRIGHT jflex/src/README jflex/src/changelog
 %attr(0755,root,root) %{_bindir}/jflex
 %{_javadir}/jflex.jar
 %{_javadir}/jflex-%{version}.jar
 %{_javadir}/JFlex.jar
 
-%if %without bootstrap
-%files doc
-%doc examples doc
-%endif
-
 %changelog
+* Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.4.3-31
+- Remove condition macros for with/without, bootstrap; redundant with separate spec
+- Switch source to one that is actively published on github
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.3-30
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

@@ -1,9 +1,8 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package antlr
 #
 # Copyright (c) 2020 SUSE LLC
+Camelron marked this conversation as resolved.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -19,12 +18,15 @@ Distribution:   Mariner
 
 %global debug_package %{nil}
 %bcond_with python2
+
+Summary:        Another Tool for Language Recognition
 Name:           antlr
 Version:        2.7.7
 Release:        122%{?dist}
-Summary:        Another Tool for Language Recognition
 License:        GPL-2.0-or-later AND SUSE-Public-Domain AND MIT
 Group:          Development/Tools/Other
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.antlr.org/
 Source0:        antlr-%{version}.tar.bz2
 Source1:        %{name}-build.xml

@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package objectweb-asm
 #
@@ -17,13 +15,14 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
 Name:           objectweb-asm
 Version:        7.2
 Release:        2%{?dist}
 Summary:        Java bytecode manipulation framework
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://asm.objectweb.org/
 # ./generate-tarball.sh
 Source0:        %{name}-%{version}.tar.xz

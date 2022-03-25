@@ -1,10 +1,12 @@
---- develop/build.xml.orig	2006-09-09 06:43:37.000000000 +0200
-+++ develop/build.xml	2006-09-09 06:45:08.000000000 +0200
-@@ -62,7 +62,6 @@
-    <jar jarfile="${dist}/java-cup-11a.jar" basedir="${classes}">
+diff --git a/build.xml b/build.xml
+index 91bd60cb..48fa8812 100644
+--- a/build.xml
++++ b/build.xml
+@@ -90,7 +90,6 @@
+    <jar jarfile="${dist}/java-cup-11b.jar" basedir="${classes}">
        <manifest>
          <attribute name="Main-Class" value="java_cup/Main" />
--	<attribute name="Class-Path" value="java-cup-11a-runtime.jar" />
+-	<attribute name="Class-Path" value="java-cup-11b-runtime.jar" />
        </manifest>
      </jar>
-     <jar jarfile="${dist}/java-cup-11a-runtime.jar" basedir="${classes}" includes="java_cup/runtime/*">
+     <jar jarfile="${dist}/java-cup-11b-runtime.jar" basedir="${classes}" includes="java_cup/runtime/*">

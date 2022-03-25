@@ -1,7 +1,3 @@
-%global         underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
-
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package xml-commons-apis
 #
@@ -19,13 +15,16 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
+%global         underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 
+Summary:        APIs for DOM, SAX, and JAXP
 Name:           xml-commons-apis
 Version:        1.4.01
-Release:        6%{?dist}
-Summary:        APIs for DOM, SAX, and JAXP
+Release:        5%{?dist}
 License:        ASL 2.0 AND W3C AND SUSE-Public-Domain
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://xml.apache.org/commons/
 # From source control because the published tarball doesn't include some docs:
 #   toolkit/scripts/svn2source.sh https://svn.apache.org/repos/asf/xerces/xml-commons/tags/xml-commons-external-%%{underscore_version}/java/external %%{name}-%%{version}
@@ -37,10 +36,7 @@ Source4:        https://repo1.maven.org/maven2/xml-apis/xml-apis-ext/1.3.04/xml-
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel
-BuildRequires:  javapackages-filesystem
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  javapackages-tools
-BuildRequires:  python3-javapackages
 BuildRequires:  xz
 #!BuildIgnore:  xerces-j2 xml-apis xml-resolver
 Provides:       xml-commons-apis-bootstrap = %{version}-%{release}
@@ -118,9 +114,6 @@ rm -rf build/docs/javadoc
 %{_javadir}/*
 
 %changelog
-* Tue Mar 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.4.01-6
-- Add BR javapackages-filesystem
-
 * Thu Jan 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.01-5
 - Updated spec to enabled build with new tooling.
 - Removed 'javadoc' and 'manual' subpackages.

@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package qdox
 #
@@ -17,12 +15,14 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
+Summary:        Tool to extract class/interface/method definitions from sources
 Name:           qdox
 Version:        2.0.0
 Release:        1%{?dist}
-Summary:        Tool to extract class/interface/method definitions from sources
 License:        ASL 2.0
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/paul-hammant/qdox
 Source0:        https://github.com/paul-hammant/qdox/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        qdox-MANIFEST.MF

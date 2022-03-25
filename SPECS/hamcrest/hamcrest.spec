@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package hamcrest
 #
@@ -17,21 +15,23 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
 %bcond_with jmock
 %bcond_with easymock
+
+Summary:        Library of matchers for building test expressions
 Name:           hamcrest
 Version:        1.3
 Release:        14%{?dist}
-Summary:        Library of matchers for building test expressions
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/hamcrest/JavaHamcrest
 Source0:        https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-%{version}.tar.gz
-Source8:        hamcrest-core-MANIFEST.MF
-Source9:        hamcrest-library-MANIFEST.MF
-Source11:       hamcrest-integration-MANIFEST.MF
-Source12:       hamcrest-generator-MANIFEST.MF
+Source1:        hamcrest-core-MANIFEST.MF
+Source2:        hamcrest-library-MANIFEST.MF
+Source3:        hamcrest-integration-MANIFEST.MF
+Source4:        hamcrest-generator-MANIFEST.MF
 Patch0:         %{name}-%{version}-build.patch
 Patch1:         %{name}-%{version}-no-jarjar.patch
 Patch3:         %{name}-%{version}-javadoc.patch
@@ -121,10 +121,10 @@ export CLASSPATH=$(build-classpath qdox)
 ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 -Dversion=%{version} -Dbuild.sysclasspath=last clean core generator library bigjar javadoc
 
 # inject OSGi manifests
-jar ufm build/%{name}-core-%{version}.jar %{SOURCE8}
-jar ufm build/%{name}-library-%{version}.jar %{SOURCE9}
-jar ufm build/%{name}-integration-%{version}.jar %{SOURCE11}
-jar ufm build/%{name}-generator-%{version}.jar %{SOURCE12}
+jar ufm build/%{name}-core-%{version}.jar %{SOURCE1}
+jar ufm build/%{name}-library-%{version}.jar %{SOURCE2}
+jar ufm build/%{name}-integration-%{version}.jar %{SOURCE3}
+jar ufm build/%{name}-generator-%{version}.jar %{SOURCE4}
 
 %install
 sed -i 's/@VERSION@/%{version}/g' pom/*.pom

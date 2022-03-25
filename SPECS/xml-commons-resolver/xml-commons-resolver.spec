@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package xml-commons-resolver
 #
@@ -17,21 +15,23 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
+%global resolverdir %{_sysconfdir}/java/resolver
 
-%define resolverdir %{_sysconfdir}/java/resolver
 Name:           xml-commons-resolver
 Version:        1.2
 Release:        4%{?dist}
 Summary:        Resolver subproject of xml-commons
 License:        Apache-2.0
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://xerces.apache.org/xml-commons/components/resolver/
 Source0:        http://www.apache.org/dist/xerces/xml-commons/%{name}-%{version}.tar.gz
-Source5:        %{name}-pom.xml
-Source6:        %{name}-resolver.1
-Source7:        %{name}-xparse.1
-Source8:        %{name}-xread.1
-Source10:       %{name}-CatalogManager.properties
+Source1:        %{name}-pom.xml
+Source2:        %{name}-resolver.1
+Source3:        %{name}-xparse.1
+Source4:        %{name}-xread.1
+Source5:       %{name}-CatalogManager.properties
 Patch0:         %{name}-1.2-crosslink.patch
 Patch1:         %{name}-1.2-osgi.patch
 BuildRequires:  ant
@@ -42,18 +42,18 @@ BuildRequires:  javapackages-local-bootstrap
 # Explicit javapackages-tools requires since scripts use
 # /usr/share/java-utils/java-functions
 Requires:       javapackages-tools
+Provides:       xml-commons
 Provides:       xml-commons-resolver-bootstrap = %{version}-%{release}
+Provides:       xml-resolver = %{version}-%{release}
 Provides:       %{name}10
 Provides:       %{name}11
 Provides:       %{name}12
 Provides:       xerces-j2-xml-resolver
-Provides:       xml-commons
 Obsoletes:      %{name}10
 Obsoletes:      %{name}11
 Obsoletes:      %{name}12
 Obsoletes:      xerces-j2-xml-resolver
 Obsoletes:      xml-commons
-Provides:       xml-resolver = %{version}-%{release}
 BuildArch:      noarch
 
 %description
@@ -71,7 +71,7 @@ Javadoc for %{name}.
 %patch0 -p1
 %patch1 -p1
 
-cp %{SOURCE5} pom.xml
+cp %{SOURCE1} pom.xml
 
 # remove all binary libs and prebuilt javadocs
 find . -name "*.jar" -delete
@@ -111,13 +111,13 @@ mkdir -p %{buildroot}%{_bindir}
 
 # Man pages
 install -d -m 755 %{buildroot}%{_mandir}/man1
-install -p -m 644 %{SOURCE6} %{buildroot}%{_mandir}/man1/xml-resolver.1
-install -p -m 644 %{SOURCE7} %{buildroot}%{_mandir}/man1/xml-xparse.1
-install -p -m 644 %{SOURCE8} %{buildroot}%{_mandir}/man1/xml-xread.1
+install -p -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/xml-resolver.1
+install -p -m 644 %{SOURCE3} %{buildroot}%{_mandir}/man1/xml-xparse.1
+install -p -m 644 %{SOURCE4} %{buildroot}%{_mandir}/man1/xml-xread.1
 
 # Central CatalogManager.properties
 install -d -m 755 %{buildroot}%{resolverdir}
-install -m 0644 %{SOURCE10} %{buildroot}%{resolverdir}/CatalogManager.properties
+install -m 0644 %{SOURCE5} %{buildroot}%{resolverdir}/CatalogManager.properties
 
 %files -f .mfiles
 %license LICENSE.resolver.txt
