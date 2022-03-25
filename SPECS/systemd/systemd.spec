@@ -39,7 +39,9 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
-Requires(pre):  audit-libs
+Requires(post): audit-libs
+Requires(post): pam
+Requires(post): util-linux-devel
 Obsoletes:      systemd-bootstrap
 Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
