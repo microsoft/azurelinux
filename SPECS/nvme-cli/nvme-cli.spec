@@ -1,18 +1,17 @@
 Name:           nvme-cli
 Summary:        NVM-Express user space tooling for Linux
 Version:        1.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 License:        GPLv2
 URL:            https://github.com/linux-nvme/nvme-cli
-Source0:        https://github.com/linux-nvme/%{name}/archive/%{name}-%{version}.tar.gz
-#Source0:       https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz
+Source0:        https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
+BuildRequires:  gcc
+BuildRequires:  make
+Requires(post): util-linux systemd systemd-udev
 
 %description
 NVM-Express user space tooling for Linux
@@ -26,22 +25,44 @@ make CFLAGS="%{build_cflags} -std=gnu99 -I."
 %install
 make install PREFIX=%{_prefix} DESTDIR=%{buildroot}
 
-%check
-pip3 install nose nose2 pep8 flake8 pylint epydoc
-make test
-
 %files
 %defattr(-,root,root)
 %license LICENSE
 %{_sbindir}/nvme
-%{_datadir}/*
-%{_mandir}/man1/*
-%{_sysconfdir}/nvme/*
-%{_sysconfdir}/udev/rules.d/*
+%{_datadir}/bash-completion/completions/nvme
+%{_datadir}/zsh/site-functions/_nvme
+%{_mandir}/man1/nvme*.1*
+%dir %{_sysconfdir}/nvme
+%{_sysconfdir}/nvme/hostnqn
+%{_sysconfdir}/nvme/hostid
+%{_sysconfdir}/nvme/discovery.conf
+%{_sysconfdir}/udev/rules.d/70-nvmf-autoconnect.rules
+%{_sysconfdir}/udev/rules.d/71-nvmf-iopolicy-netapp.rules
 %{_libdir}/dracut/dracut.conf.d/*
-%{_libdir}/systemd/system/*
+%{_libdir}/systemd/system/nvmf-connect@.service
+%{_libdir}/systemd/system/nvmefc-boot-connections.service
+%{_libdir}/systemd/system/nvmf-connect.target
+%{_libdir}/systemd/system/nvmf-autoconnect.service
+
+%post
+if [ $1 -eq 1 ]; then # 1 : This package is being installed for the first time
+	if [ ! -s %{_sysconfdir}/nvme/hostnqn ]; then
+		echo $(%{_sbindir}/nvme gen-hostnqn) > %{_sysconfdir}/nvme/hostnqn
+        fi
+        if [ ! -s %{_sysconfdir}/nvme/hostid ]; then
+                uuidgen > %{_sysconfdir}/nvme/hostid
+        fi
+
+	# apply udev and systemd changes that we did
+	systemctl daemon-reload
+	udevadm control --reload-rules && udevadm trigger
+fi
 
 %changelog
+* Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 1.16-2
+- Remove check tests which fail to run properly on daily build machines
+- Update spec with changes based on upstream github project's nvme.spec.in
+
 * Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> - 1.16-1
 - Upgrade to version 1.16
 - Enable check tests
