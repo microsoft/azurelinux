@@ -23894,8 +23894,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-xdist",
-          "version": "2.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/17/18/bb102b7131f1c08e5d9f0a6a5904e0b4cf02160bdde1645fc386461b5423/pytest-xdist-2.1.0.tar.gz"
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/pytest-dev/pytest-xdist/archive/refs/tags/v2.5.0.tar.gz"
         }
       }
     },
