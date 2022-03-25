@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package xz-java
 #
@@ -18,13 +16,14 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
+Summary:        Pure Java implementation of XZ compression
 Name:           xz-java
 Version:        1.8
 Release:        4%{?dist}
-Summary:        Pure Java implementation of XZ compression
 License:        Public Domain
 Group:          Development/Libraries/Java
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://tukaani.org/xz/java.html
 Source:         http://tukaani.org/xz/xz-java-%{version}.zip
 Patch0:         xz-java-source-version.patch

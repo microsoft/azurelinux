@@ -29,10 +29,6 @@ Source1:        jflex.script
 Source100:      jpackage-bootstrap-prepare.sh
 Patch0:         jflex-javac-no-target.patch
 Patch1:         jflex-no-cup-no-jflex.patch
-Patch2:         jflex-classpath.patch
-Patch4:         jflex-byaccj-utl.patch
-#PATCH-FIX-OPENSUSE: make AllTests.main empty, code was not compatible with junit 4
-Patch5:         jflex-junit4.patch
 BuildRequires:  ant
 BuildRequires:  java-cup-bootstrap
 BuildRequires:  java-devel
@@ -91,6 +87,7 @@ install -p -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/jflex
 
 %files
 %doc jflex/COPYRIGHT jflex/src/README jflex/src/changelog
+%license jflex/COPYRIGHT
 %attr(0755,root,root) %{_bindir}/jflex
 %{_javadir}/jflex.jar
 %{_javadir}/jflex-%{version}.jar
