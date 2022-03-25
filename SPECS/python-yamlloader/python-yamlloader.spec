@@ -4,7 +4,7 @@
 
 Summary:        Loaders and dumpers for PyYAML
 Name:           python-%{pkgname}
-Version:        0.5.4
+Version:        1.1.0
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/Phynix/yamlloader
@@ -53,6 +53,9 @@ python3 setup.py install --skip-build --root=%{buildroot}
 
 
 %changelog
+* Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 1.1.0-1
+- Updated to version 1.1.0
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.5.4-1
 - Original version for CBL-Mariner
 - License verified
