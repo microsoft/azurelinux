@@ -5,7 +5,7 @@
 Summary:        Prometheus exporter exposing process metrics from procfs
 Name:           prometheus-process-exporter
 Version:        0.7.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,7 +58,7 @@ LDFLAGS="-X github.com/ncabatoff/process-exporter/version.Version=%{version}    
          -X github.com/ncabatoff/process-exporter/version.GoVersion=%{go_version}"
 
 # Modified "build" target from Makefile.
-CGO_ENABLED=0 go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags netgo -o process-exporter ./cmd/process-exporter
+CGO_ENABLED=1 go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags netgo -o process-exporter ./cmd/process-exporter
 
 %install
 install -m 0755 -vd %{buildroot}%{_bindir}
@@ -97,6 +97,9 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Fri Mar 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.7.10-2
+- Switch CGO_ENABLED=1 to enable fips compliance
+
 * Tue Feb 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.10-1
 - Initial CBL-Mariner import from Debian source package (license: MIT).
 - License verified.
