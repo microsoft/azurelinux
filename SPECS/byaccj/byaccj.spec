@@ -2,7 +2,6 @@
 # spec file for package byaccj
 #
 # Copyright (c) 2014 SUSE LINUX Products GmbH, Nuernberg, Germany.
-Camelron marked this conversation as resolved.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed

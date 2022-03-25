@@ -2,7 +2,6 @@
 # spec file for package antlr
 #
 # Copyright (c) 2020 SUSE LLC
-Camelron marked this conversation as resolved.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
