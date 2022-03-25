@@ -31,7 +31,6 @@ BuildRequires:  perl-XML-Parser
 BuildRequires:  python3-jinja2
 BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
-Requires(pre):  audit-libs
 Requires:       %{name}-rpm-macros = %{version}-%{release}
 Requires:       glib
 Requires:       kmod
@@ -40,9 +39,8 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
-
+Requires(pre):  audit-libs
 Obsoletes:      systemd-bootstrap
-
 Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
 Provides:       systemd-udev = %{version}-%{release}
@@ -65,9 +63,7 @@ Just the definitions of rpm macros.
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
-
 Obsoletes:      systemd-bootstrap-devel
-
 Provides:       systemd-libs = %{version}-%{release}
 Provides:       libudev-devel = %{version}-%{release}
 Provides:       libudev-devel%{?_isa} = %{version}-%{release}
