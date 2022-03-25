@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.8.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,7 +46,7 @@ tar -xf %{SOURCE1} --no-same-owner
 export BUILDOPTS="-mod=vendor -v"
 # set commit number that correspond to the github tag for that version
 export GITCOMMIT="053c4d5ca1772517746a854e87ffa971249df14b"
-make
+make CGO_ENABLED=1
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -58,6 +58,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Fri Mar 25 2022 Muhammad Falak <mwani@microsoft.com> - 1.8.4-4
+- Switch CGO_ENABLED=1 to enable fips compliance
+
 * Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.4-3
 - Remove clean section
 - License verified
