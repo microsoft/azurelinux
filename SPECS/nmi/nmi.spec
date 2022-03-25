@@ -2,7 +2,7 @@
 Summary:        Node Managed Identity
 Name:           nmi
 Version:        1.8.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Source0:        %{name}-%{version}.tar.gz
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         modify-go-build-option.patch
+Patch1:         0001-nmi-switch-CGO_ENABLED-1-to-enable-fips-compliance.patch
 BuildRequires:  golang >= 1.15
 
 %description
@@ -34,6 +35,7 @@ NMI is the resource that is used when your pods look to use their identity.
 %autosetup -c -N -n %{name}-%{version}
 pushd aad-pod-identity-%{version}
 %patch0 -p1
+%patch1 -p1
 popd
 
 %build
@@ -63,6 +65,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Fri Mar 25 2022 Muhammad Falak <mwani@microsoft.com> - 1.8.7-2
+- Switch CGO_ENABLED=1 to enable fips compliance
+
 * Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 1.8.7-1
 - Upgrade to version 1.8.7
 - Update modify-go-build-option.patch

@@ -1,0 +1,36 @@
+From 9cf3071c48c897d40267940e5103852804456489 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Fri, 25 Mar 2022 08:18:08 +0530
+Subject: [PATCH] nmi: switch CGO_ENABLED=1 to enable fips compliance
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 699994c..68a0461 100644
+--- a/Makefile
++++ b/Makefile
+@@ -109,15 +109,15 @@ clean:
+ 
+ .PHONY: build-nmi
+ build-nmi: clean-nmi
+-	CGO_ENABLED=0 PKG_NAME=github.com/Azure/$(PROJECT_NAME)/cmd/$(NMI_BINARY_NAME) $(MAKE) bin/$(PROJECT_NAME)/$(NMI_BINARY_NAME)
++	CGO_ENABLED=1 PKG_NAME=github.com/Azure/$(PROJECT_NAME)/cmd/$(NMI_BINARY_NAME) $(MAKE) bin/$(PROJECT_NAME)/$(NMI_BINARY_NAME)
+ 
+ .PHONY: build-mic
+ build-mic: clean-mic
+-	CGO_ENABLED=0 PKG_NAME=github.com/Azure/$(PROJECT_NAME)/cmd/$(MIC_BINARY_NAME) $(MAKE) bin/$(PROJECT_NAME)/$(MIC_BINARY_NAME)
++	CGO_ENABLED=1 PKG_NAME=github.com/Azure/$(PROJECT_NAME)/cmd/$(MIC_BINARY_NAME) $(MAKE) bin/$(PROJECT_NAME)/$(MIC_BINARY_NAME)
+ 
+ .PHONY: build-simple
+ build-simple:
+-	CGO_ENABLED=0 PKG_NAME=github.com/Azure/$(PROJECT_NAME)/cmd/$(SIMPLE_CMD_BINARY_NAME) $(MAKE) bin/$(PROJECT_NAME)/$(SIMPLE_CMD_BINARY_NAME)
++	CGO_ENABLED=1 PKG_NAME=github.com/Azure/$(PROJECT_NAME)/cmd/$(SIMPLE_CMD_BINARY_NAME) $(MAKE) bin/$(PROJECT_NAME)/$(SIMPLE_CMD_BINARY_NAME)
+ 
+ .PHONY: build-demo
+ build-demo: build_tags := netgo osusergo
+-- 
+2.17.1
+
