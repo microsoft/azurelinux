@@ -7,7 +7,7 @@ Name:           pyproject-rpm-macros
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.0.0~rc1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,7 +49,6 @@ BuildRequires:  python3dist(pyyaml)
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3dist(tox-current-env) >= 0.0.6
 BuildRequires:  python3dist(wheel)
-# Available only in SPECS-EXTENDED:
 BuildRequires:  python3dist(toml)
 %endif
 
@@ -114,6 +113,9 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 %license LICENSE
 
 %changelog
+* Thu Mar 24 2022 Henry Li <lihl@microsoft.com> - 1.0.0~rc1-3
+- Remove comments for python3dist(toml)
+
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
