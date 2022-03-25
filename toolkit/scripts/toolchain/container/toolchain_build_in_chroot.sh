@@ -753,9 +753,9 @@ popd
 rm -rf Text-Template-1.51
 touch /logs/status_text_template_complete
 
-echo OpenSSL-1.1.1g
-tar xf openssl-1.1.1g.tar.gz
-pushd openssl-1.1.1g
+echo OpenSSL-1.1.1k
+tar xf openssl-1.1.1k.tar.gz
+pushd openssl-1.1.1k
 sslarch=
 ./config --prefix=/usr \
          --openssldir=/etc/pki/tls \
@@ -773,7 +773,7 @@ make all -j$(nproc)
 sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
 make MANSUFFIX=ssl install
 popd
-rm -rf openssl-1.1.1g
+rm -rf openssl-1.1.1k
 touch /logs/status_openssl_complete
 
 echo Python-3.9.10

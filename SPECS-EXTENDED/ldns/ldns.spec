@@ -4,25 +4,18 @@ Distribution:   Mariner
 
 %bcond_without python3
 
-%bcond_with    python2
-
-
-
 %bcond_without  perl
 %bcond_without  ecdsa
 
 %bcond_without  eddsa
 %bcond_without  dane_ta
 
-
-
-
 # GOST is not allowed in Fedora/RHEL due to legal reasons (not NIST ECC)
 %bcond_with     gost
 
 %{?!snapshot:         %global snapshot        0}
 
-%if %{with python2} || %{with python3}
+%if %{with python3}
 %{?filter_setup:
 %global _ldns_internal_filter /^_ldns[.]so.*/d;
 %filter_from_requires %{_ldns_internal_filter}
@@ -41,7 +34,7 @@ Distribution:   Mariner
 Summary: Low-level DNS(SEC) library with API
 Name: ldns
 Version: 1.7.0
-Release: 30%{?dist}
+Release: 31%{?dist}
 
 License: BSD
 Url: http://www.nlnetlabs.nl/%{name}/
@@ -70,9 +63,6 @@ BuildRequires: doxygen
 
 # for snapshots only
 # BuildRequires: libtool, autoconf, automake
-%if %{with python2}
-BuildRequires: python2-devel, swig
-%endif
 %if %{with python3}
 BuildRequires: python3-devel, swig
 %endif
@@ -104,17 +94,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description utils
 Collection of tools to get, check or alter DNS(SEC) data.
-
-
-%if %{with python2}
-%package -n python2-ldns
-Summary: Python2 extensions for ldns
-Requires: %{name}%{?_isa} = %{version}-%{release}
-%{?python_provide:%python_provide python2-ldns}
-
-%description -n python2-ldns
-Python2 extensions for ldns
-%endif
 
 
 %if %{with python3}
@@ -176,10 +155,6 @@ popd
 mv %{pkgname} %{pkgname}_python3
 %endif
 
-%if %{with python2}
-cp -a %{pkgname}_python3 %{pkgname}_python2
-%endif # with python2
-
 
 %build
 CFLAGS="%{optflags} -fPIC"
@@ -209,15 +184,6 @@ export CFLAGS CXXFLAGS LDFLAGS
   %global disable_dane_ta --disable-dane-ta-usage
 %endif
 
-%global common_args \\\
-  --disable-rpath \\\
-  %{enable_gost} %{enable_ecdsa} %{enable_eddsa} %{?disable_dane_ta} \\\
-  --with-ca-file=/etc/pki/tls/certs/ca-bundle.trust.crt \\\
-  --with-ca-path=/etc/pki/tls/certs/ \\\
-  --with-trust-anchor=%{_sharedstatedir}/unbound/root.key \\\
-  --disable-static \\\
-
-
 %if 0%{with python3}
 pushd %{pkgname}_python3
 %else
@@ -225,7 +191,11 @@ pushd %{pkgname}
 %endif # with python3
 
 %configure \
-  %{common_args} \
+  --disable-rpath \
+  %{enable_gost} %{enable_ecdsa} %{enable_eddsa} %{?disable_dane_ta} \
+  --with-ca-file=/etc/pki/tls/certs/ca-bundle.trust.crt \
+  --with-ca-path=/etc/pki/tls/certs/ \
+  --disable-static \
   --with-examples \
   --with-drill \
 %if %{with python3}
@@ -247,18 +217,6 @@ make %{?_smp_mflags} doc
 # specfic hardening options should not end up in ldns-config
 sed -i "s~$RPM_LD_FLAGS~~" packaging/ldns-config
 popd
-
-%if %{with python2}
-  pushd %{pkgname}_python2
-  %configure \
-    %{common_args} \
-    --with-pyldns PYTHON=%{__python2}
-
-  make %{?_smp_mflags}
-  popd
-%endif
-
-
 
 %install
 rm -rf %{buildroot}
@@ -286,13 +244,6 @@ install -D -m644  packaging/libldns.pc %{buildroot}%{_libdir}/pkgconfig/ldns.pc
   rm -f %{buildroot}%{perl_vendorarch}/auto/DNS/LDNS/{.packlist,LDNS.bs}
 %endif
 popd
-
-%if %{with python2}
-  pushd %{pkgname}_python2
-  make DESTDIR=%{buildroot} INSTALL="%{__install} -p" install-pyldns install-pyldnsx
-  rm -rf %{buildroot}%{_libdir}/*.la %{buildroot}%{python2_sitearch}/*.la
-  popd
-%endif
 
 # don't package xml files
 rm doc/*.xml
@@ -325,13 +276,6 @@ rm -rf doc/man
 %{_includedir}/ldns/*.h
 %{_mandir}/man3/*.3.gz
 
-%if %{with python2}
-%files -n python2-ldns
-%doc %{pkgname}_python2/contrib/python/Changelog README.ldnsx
-%license LICENSE.ldnsx
-%{python2_sitearch}/*
-%endif
-
 %if %{with python3}
 %files -n python3-ldns
 %doc %{pkgname}_python3/contrib/python/Changelog README.ldnsx
@@ -350,6 +294,12 @@ rm -rf doc/man
 %doc doc
 
 %changelog
+* Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-31
+- Fixing configuration step in %%build.
+- Removing content related to Python 2 builds.
+- Removed config option to trust "*unbound/root.key".
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.0-30
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

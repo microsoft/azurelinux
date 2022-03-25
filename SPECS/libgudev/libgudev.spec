@@ -1,23 +1,28 @@
 Summary:        A library providing GObject bindings for libudev
 Name:           libgudev
-Version:        232
-Release:        6%{?dist}
+Version:        237
+Release:        1%{?dist}
 License:        LGPL2.1
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://git.gnome.org/browse/libgudev/
 Source0:        https://download.gnome.org/sources/%{name}/%{version}/%{name}-%{version}.tar.xz
+
+%{?systemd_requires}
+
 BuildRequires:  glib >= 2.22.0
 BuildRequires:  glib-devel
-BuildRequires:  gnome-common
-BuildRequires:  gobject-introspection
+BuildRequires:  gobject-introspection-devel
 BuildRequires:  gtk-doc
+BuildRequires:  libudev-devel
+BuildRequires:  meson
 BuildRequires:  pkg-config
 BuildRequires:  systemd-devel
 BuildRequires:  which
+
 Requires:       systemd
-Provides:       %{name}1
+Provides:       %{name}1 = %{version}-%{release}
 
 %description
 This is libgudev, a library providing GObject bindings for libudev. It
@@ -27,7 +32,7 @@ used to be part of udev, and now is a project on its own.
 Summary:        Header and development files for libgudev
 Requires:       %{name} = %{version}
 Requires:       glib-devel
-Provides:       %{name}1-devel
+Provides:       %{name}1-devel = %{version}-%{release}
 
 %description devel
 libgudev-devel package contains header files for building gudev applications.
@@ -36,15 +41,16 @@ libgudev-devel package contains header files for building gudev applications.
 %setup -q
 
 %build
-%configure  --disable-umockdev
-make %{?_smp_mflags}
+%meson -Dgtk_doc=false -Dtests=disabled -Dvapi=disabled
+%meson_build
 
 %install
-make DESTDIR=%{buildroot} install
+%meson_install
 find %{buildroot} -type f -name "*.la" -delete -print
 
-%check
-make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
+# tests require umockdev-devel package which does not exist in CBL-Mariner yet
+# %check
+# %meson_test
 
 %post	-p /sbin/ldconfig
 
@@ -59,8 +65,13 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/gudev-1.0.pc
+%{_libdir}/girepository-1.0/GUdev-1.0.typelib
+%{_datadir}/gir-1.0/GUdev-1.0.gir
 
 %changelog
+* Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 237-1
+- Upgrade to version 237
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 232-6
 - Remove libtool archive files from final packaging
 

@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,9 +39,10 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
-
+Requires(post): audit-libs
+Requires(post): pam
+Requires(post): util-linux-devel
 Obsoletes:      systemd-bootstrap
-
 Provides:       systemd-units = %{version}-%{release}
 Provides:       systemd-sysv = %{version}-%{release}
 Provides:       systemd-udev = %{version}-%{release}
@@ -64,9 +65,7 @@ Just the definitions of rpm macros.
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
-
 Obsoletes:      systemd-bootstrap-devel
-
 Provides:       systemd-libs = %{version}-%{release}
 Provides:       libudev-devel = %{version}-%{release}
 Provides:       libudev-devel%{?_isa} = %{version}-%{release}
@@ -117,6 +116,7 @@ meson  --prefix %{_prefix}                                            \
        -Dlibcryptsetup=true                                           \
        -Dgcrypt=true                                                  \
        -Dlz4=true                                                     \
+       -Dzstd=false                                                   \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
@@ -257,6 +257,12 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Mar 24 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-3
+- Add Requires(post) on audit-libs, pam and util-linux-devel
+
+* Thu Mar 17 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-2
+- Disable zstd configuration to ensure lz4 compression is used for journal files and coredumps
+
 * Mon Jan 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 250.3-1
 - Update to systemd-stable version 250.3
 - Explicitly disable systemd-homed

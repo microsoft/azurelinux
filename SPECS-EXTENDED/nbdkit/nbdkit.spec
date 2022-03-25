@@ -1,3 +1,5 @@
+%bcond_with ruby
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global _hardened_build 1
@@ -37,7 +39,7 @@ ExclusiveArch:  x86_64
 
 Name:           nbdkit
 Version:        1.20.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        NBD server
 
 License:        BSD
@@ -75,7 +77,9 @@ BuildRequires:  python3-devel
 # http://caml.inria.fr/mantis/view.php?id=6693
 BuildRequires:  ocaml >= 4.02.2
 %endif
+%if %{with ruby}
 BuildRequires:  ruby-devel
+%endif
 BuildRequires:  tcl-devel
 BuildRequires:  lua-devel
 
@@ -359,7 +363,7 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 %description python-plugin
 This package lets you write Python 3 plugins for %{name}.
 
-
+%if %{with ruby}
 %package ruby-plugin
 Summary:        Ruby plugin for %{name}
 License:        BSD
@@ -369,6 +373,7 @@ Requires:       %{name}-server%{?_isa} = %{version}-%{release}
 
 %description ruby-plugin
 This package lets you write Ruby plugins for %{name}.
+%endif
 
 
 %package ssh-plugin
@@ -600,6 +605,9 @@ autoreconf -i
     PYTHON=%{_bindir}/python3 \
     --disable-static \
     --disable-golang \
+%if !%{with ruby}
+    --disable-ruby \
+%endif
 %if 0%{?have_ocaml}
     --enable-ocaml \
 %else
@@ -815,12 +823,13 @@ make %{?_smp_mflags} check || {
 %{_libdir}/%{name}/plugins/nbdkit-python-plugin.so
 %{_mandir}/man3/nbdkit-python-plugin.3*
 
-
+%if %{with ruby}
 %files ruby-plugin
 %doc README
 %license LICENSE
 %{_libdir}/%{name}/plugins/nbdkit-ruby-plugin.so
 %{_mandir}/man3/nbdkit-ruby-plugin.3*
+%endif
 
 
 %files ssh-plugin
@@ -960,6 +969,9 @@ make %{?_smp_mflags} check || {
 
 
 %changelog
+* Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-4
+- Disabling plug-in for Ruby due to building issues.
+
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-3
 - Removing in-spec verification of source tarballs.
 - License verified.

@@ -7,7 +7,7 @@
 Summary:        A pythonic, object-oriented HTTP framework
 Name:           python-%{pkgname}
 Version:        18.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Url:            https://cherrypy.org/
 Vendor:         Microsoft Corporation
@@ -52,7 +52,7 @@ python3 setup.py install --root=%{buildroot}
 %if 0%{with check}
 %check
 pip3 install tox
-tox -e py39
+tox -e py%{python3_version_nodots}
 %endif
 
 %files -n python3-%{pkgname}
@@ -62,6 +62,9 @@ tox -e py39
 %{_bindir}/cherryd
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 18.6.1-2
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 18.6.1-1
 - Bump version to 18.6.1
 - Use 'py39' as tox environment to enable ptest

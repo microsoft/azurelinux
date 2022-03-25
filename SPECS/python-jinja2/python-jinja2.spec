@@ -1,7 +1,7 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
 Version:        3.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,7 +44,7 @@ sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
 
 %check
 pip3 install tox
-tox -e py39
+tox -e py%{python3_version_nodots}
 
 %files -n python3-jinja2
 %defattr(-,root,root)
@@ -53,6 +53,9 @@ tox -e py39
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 3.0.3-2
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Thu Mar 03 2022 Nick Samson <nisamson@microsoft.com> - 3.0.3-1
 - Updated to 3.0.3
 - Updated source URL

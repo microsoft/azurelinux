@@ -4,7 +4,7 @@
 Summary:        Tox plugin to run tests in current Python environment
 Name:           python-%{pypi_name}
 Version:        0.0.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,7 +49,7 @@ The tox-current-env plugin allows to run tests in current Python environment.
 
 %check
 pip3 install tox
-tox -e py39
+tox -e py%{python3_version_nodots}
 
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
@@ -57,6 +57,9 @@ tox -e py39
 %doc README.rst
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 0.0.7-4
+- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+
 * Fri Mar 04 2022 Bala <balakumaran.kannan@microsoft.com> - 0.0.7-3
 - Use tox to run Ptest
 

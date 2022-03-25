@@ -1,13 +1,14 @@
 Summary:        Contains a utility for determining file types
 Name:           file
 Version:        5.40
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.darwinsys.com/file
 Source0:        http://ftp.astron.com/pub/file/%{name}-%{version}.tar.gz
+Patch1:         fix_xz_mime_type_reporting.patch
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -40,7 +41,7 @@ libmagic API. The libmagic library is also used by the familiar
 file(1) command.
 
 %prep
-%autosetup
+%autosetup -p1
 
 rm -rf %{py3dir}
 cp -a python %{py3dir}
@@ -90,6 +91,9 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Tue Mar 15 2022 Bala <balakumaran.kannan@microsoft.com> - 5.40-2
+- Add patch to fix xz mime type reporting
+
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 5.40-1
 - Update to latest upstream version
 - Move license to libs subpackage
