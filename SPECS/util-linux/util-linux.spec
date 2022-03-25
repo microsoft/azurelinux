@@ -13,6 +13,7 @@ Source2:        runuser-l
 BuildRequires:  audit-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
+BuildRequires:  pam-devel
 Requires:       %{name}-devel = %{version}-%{release}
 Requires:       audit-libs
 Conflicts:      toybox
@@ -132,6 +133,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %changelog
 * Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.36.2-4
 - Add Debian's PAM configs for runuser tool
+- Add build require on pam-devel so we have the pam headers
 
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 2.37.2-3
 - Build with audit support
