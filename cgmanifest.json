@@ -23824,8 +23824,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-forked",
-          "version": "1.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/62/92/2d418d7b0c9d68a2e885b66d7f6805f9678ce56ad2b3a77669437b2d139a/pytest-forked-1.3.0.tar.gz"
+          "version": "1.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/f1/bc/0121a2e386b261b69f4f5aa48e5304c947451dce70d68628cb28d5cd0d28/pytest-forked-1.4.0.tar.gz"
         }
       }
     },
@@ -23835,7 +23835,7 @@
         "other": {
           "name": "python-pytest-mock",
           "version": "3.7.0",
-          "downloadUrl": "https://github.com/pytest-dev/pytest-mock/archive/refs/tags/v3.7.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/96/e1/fb53b62056e6840a36d9a4beb4e42726155594c567b574103435a7131c60/pytest-mock-3.7.0.tar.gz"
         }
       }
     },
@@ -23895,7 +23895,7 @@
         "other": {
           "name": "python-pytest-xdist",
           "version": "2.5.0",
-          "downloadUrl": "https://github.com/pytest-dev/pytest-xdist/archive/refs/tags/v2.5.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/5d/43/9dbc32d297d6eae85d6c05dc8e8d3371061bd6cbe56a2f645d9ea4b53d9b/pytest-xdist-2.5.0.tar.gz"
         }
       }
     },
