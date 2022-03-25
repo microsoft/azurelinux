@@ -307,6 +307,10 @@ func PackageNamesFromSingleSystemConfig(systemConfig configuration.SystemConfig)
 		logger.Log.Tracef("packages %v", packages)
 		finalPkgList = append(finalPkgList, packages.Packages...)
 	}
+
+	logger.Log.Tracef("Processing inline packages")
+	finalPkgList = append(finalPkgList, systemConfig.Packages...)
+
 	logger.Log.Tracef("finalPkgList = %v", finalPkgList)
 	return
 }

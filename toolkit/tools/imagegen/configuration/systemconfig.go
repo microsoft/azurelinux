@@ -20,6 +20,7 @@ type SystemConfig struct {
 	Hostname           string              `json:"Hostname"`
 	Name               string              `json:"Name"`
 	PackageLists       []string            `json:"PackageLists"`
+	Packages		   []string			   `json:"Packages"`
 	KernelOptions      map[string]string   `json:"KernelOptions"`
 	KernelCommandLine  KernelCommandLine   `json:"KernelCommandLine"`
 	AdditionalFiles    map[string]string   `json:"AdditionalFiles"`
@@ -69,8 +70,8 @@ func (s *SystemConfig) IsValid() (err error) {
 		return fmt.Errorf("missing [Name] field")
 	}
 
-	if len(s.PackageLists) == 0 {
-		return fmt.Errorf("system configuration must provide at least one package list inside the [PackageLists] field")
+	if len(s.PackageLists) == 0 && len(s.Packages) == 0 {
+		return fmt.Errorf("system configuration must provide at least one package list inside the [PackageLists] or one package in the [Packages] field")
 	}
 	// Additional package list validation must be done via the imageconfigvalidator tool since there is no guranatee that
 	// the paths are valid at this point.
@@ -79,7 +80,7 @@ func (s *SystemConfig) IsValid() (err error) {
 	if len(s.PartitionSettings) != 0 {
 		// Ensure that default option is always present
 		if _, ok := s.KernelOptions["default"]; !ok {
-			return fmt.Errorf("system configuration must always provide default kernel inside the [KernelOptions] field; remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]")
+			return fmt.Errorf("system configuration must always provide default kernel inside the [KernelOptions] field; remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]")
 		}
 	}
 	// A rootfs MAY include a kernel (ISO), so run the full checks even if this is a rootfs
@@ -91,7 +92,7 @@ func (s *SystemConfig) IsValid() (err error) {
 				continue
 			}
 			if strings.TrimSpace(kernelName) == "" {
-				return fmt.Errorf("empty kernel entry found in the [KernelOptions] field (%s); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", name)
+				return fmt.Errorf("empty kernel entry found in the [KernelOptions] field (%s); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", name)
 			}
 		}
 	}
