@@ -2,13 +2,13 @@
 %global file_name pytest_mock
 Summary:        Thin-wrapper around the mock package for easier use with py.test
 Name:           python-%{pypi_name}
-Version:        3.5.1
-Release:        3%{?dist}
+Version:        3.7.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytest-dev/pytest-mock/
-Source0:        https://files.pythonhosted.org/packages/24/1b/ddad49c762bddfe3cb61c8ba61349701afd584b84ff4189721bcba624598/%{pypi_name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -64,6 +64,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{file_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-1
+- Updating to version 3.7.0.
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.5.1-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

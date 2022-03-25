@@ -23834,8 +23834,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-mock",
-          "version": "3.5.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/24/1b/ddad49c762bddfe3cb61c8ba61349701afd584b84ff4189721bcba624598/pytest-mock-3.5.1.tar.gz"
+          "version": "3.7.0",
+          "downloadUrl": "https://github.com/pytest-dev/pytest-mock/archive/refs/tags/v3.7.0.tar.gz"
         }
       }
     },
