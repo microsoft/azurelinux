@@ -9,6 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytest-dev/pytest-mock/
 Source0:        https://files.pythonhosted.org/packages/96/e1/fb53b62056e6840a36d9a4beb4e42726155594c567b574103435a7131c60/pytest-mock-3.7.0.tar.gz
+# Can be removed once this bug is resolved: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006736
+Patch0:         skip_broken_tests_since_3.6.1.patch
+
 BuildArch:      noarch
 
 %description
@@ -66,6 +69,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-1
 - Updating to version 3.7.0.
+- Added a patch skipping broken tests.
 
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.5.1-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)

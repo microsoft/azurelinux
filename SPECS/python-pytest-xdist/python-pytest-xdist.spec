@@ -68,7 +68,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v  -k "not test_warning_captured_deprecated_in_pytest_6"
 
 %files -n python3-%{pypi_name}
-%doc OVERVIEW.md README.rst
+%doc README.rst
 %license LICENSE
 %{python3_sitelib}/pytest_xdist*
 %{python3_sitelib}/xdist/
