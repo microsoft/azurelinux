@@ -34,9 +34,6 @@ Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx d
 %install
 %py3_install
 
-%check
-%make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
-
 %files -n python3-sphinx-theme-alabaster
 %defattr(-,root,root,-)
 %{python3_sitelib}/*
@@ -44,6 +41,7 @@ Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx d
 %changelog
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.12-1
 - Updating to version 0.7.12.
+- Removed ivalid '%%check' section.
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.11-6
 - Add license to python3 package
