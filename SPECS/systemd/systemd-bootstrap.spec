@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,7 +37,6 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
-Requires(pre):  audit-libs
 AutoReq:        no
 
 %description
@@ -228,9 +227,6 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
-* Thu Mar 24 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-3
-- Add Requires(pre) on audit-libs
-
 * Thu Mar 17 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-2
 - Disable zstd configuration to ensure lz4 compression is used for journal files and coredumps
 
