@@ -1,28 +1,22 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Generated from abrt-0.0.2.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name abrt
-
-Name: rubygem-%{gem_name}
-Version: 0.4.0
-Release: 2%{?dist}
-Summary: ABRT support for Ruby
-License: MIT
-URL: http://github.com/voxik/abrt-ruby
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# git clone https://github.com/voxik/abrt-ruby.git && cd abrt-ruby
-# git archive -v -o abrt-0.4.0-spec.tar.gz v0.4.0 spec/
-Source1: %{gem_name}-%{version}-spec.tar.gz
-Requires: libreport-filesystem
+Summary:       ABRT support for Ruby
+Name:          rubygem-%{gem_name}
+Version:       0.4.0
+Release:       3%{?dist}
+License:       MIT
+URL:           https://github.com/voxik/abrt-ruby
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
+Source0:       https://github.com/voxik/abrt-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildRequires: rubygem(rspec)
-BuildArch: noarch
+BuildArch:     noarch
+Requires:      libreport-filesystem
 
 %description
 Provides ABRT reporting support for libraries/applications written using Ruby.
-
 
 %package doc
 Summary: Documentation for %{name}
@@ -33,11 +27,10 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version} -b 1
+%setup -q -n %{gem_name}-ruby-%{version}
 
 %build
-# Create the gem as gem install only works on a gem file
-gem build ../%{gem_name}-%{version}.gemspec
+gem build %{gem_name}
 
 # %%gem_install compiles any C extensions and installs the gem into ./%%gem_dir
 # by default, so that we can move it into the buildroot in %%install
@@ -51,11 +44,9 @@ cp -a .%{gem_dir}/* \
 mkdir -p %{buildroot}%{_sysconfdir}/libreport/events.d/
 cp -a .%{gem_instdir}/config/ruby_event.conf %{buildroot}%{_sysconfdir}/libreport/events.d/
 
-
 %check
 pushd .%{gem_instdir}
 cp -a %{_builddir}/spec spec
-
 rspec spec
 popd
 
@@ -75,6 +66,10 @@ popd
 %{gem_instdir}/Rakefile
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.4.0-3
+- Build from .tar.gz source.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

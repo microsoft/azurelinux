@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -139,7 +139,7 @@ cp %{SOURCE4} test/
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-# %patch22 -p1
+%patch22 -p1
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
@@ -332,6 +332,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Wed Mar 23 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1k-13
+- Enable symcrypt detection patch.
+
 * Thu Mar 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1k-12
 - Adding a patch for CVE-2022-0778.
 

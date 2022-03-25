@@ -4,31 +4,18 @@ Distribution:   Mariner
 
 Name:           rubygem-%{gem_name}
 Summary:        Secure, non-evaling end user template engine
-Version:        4.0.3
-Release:        5%{?dist}
+Version:        5.1.0
+Release:        1%{?dist}
 License:        MIT
-
-URL:            http://www.liquidmarkup.org
-Source0:        https://rubygems.org/gems/%{gem_name}-%{version}.gem
-
-# Disable running stack profiler in the test suite
-Patch0:         00-test-unit-context-disable-stack-profiler.patch
-
-# Remove shebang and executable bit from the test_helper.rb
-Patch1:         01-test-helper-remove-shebang-and-executable-bit.patch
-
-# Disable two tests that are broken with ruby 2.7
-Patch2:         02-tests-integration-drop_test-disable-tests-broken-wit.patch
+URL:            https://www.liquidmarkup.org
+Source0:        https://github.com/Shopify/liquid/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 BuildArch:      noarch
-
 BuildRequires:  ruby(release)
 BuildRequires:  ruby >= 2.1.0
 BuildRequires:  rubygems-devel >= 1.3.7
-
 BuildRequires:  rubygem(bigdecimal)
 BuildRequires:  rubygem(minitest)
-
 Requires:       rubygem(bigdecimal)
 
 %description
@@ -42,7 +29,6 @@ Liquid is a template engine which was written with very specific requirements:
   the expensive parsing and compiling can be done once and later on you can
   just render it passing in a hash with local variables and objects.
 
-
 %package        doc
 Summary:        Documentation for %{name}
 Requires:       %{name} = %{version}-%{release}
@@ -51,52 +37,41 @@ BuildArch:      noarch
 %description    doc
 Documentation for %{name}.
 
-
 %prep
-%setup -q -n %{gem_name}-%{version}
-
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
-gem build ../%{gem_name}-%{version}.gemspec
-
+gem build %{gem_name}
 %gem_install
-
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
 cp -a ./%{gem_dir}/* %{buildroot}%{gem_dir}/
-
 
 %check
 pushd .%{gem_instdir}
 ruby -I"lib:test" -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 popd
 
-
 %files
 %license %{gem_instdir}/LICENSE
-
 %dir %{gem_instdir}
 %{gem_libdir}
 %{gem_spec}
-
 %exclude %{gem_cache}
-
 
 %files doc
 %doc %{gem_instdir}/History.md
 %doc %{gem_instdir}/README.md
-
 %doc %{gem_docdir}
-
 %{gem_instdir}/test
 
-
 %changelog
+* Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.1.0-1
+- Update to v5.1.0.
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

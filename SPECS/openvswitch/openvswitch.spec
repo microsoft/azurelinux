@@ -1,294 +1,380 @@
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-Summary:        Open vSwitch daemon/database/utilities
-Name:           openvswitch
-Version:        2.12.3
-Release:        2%{?dist}
-License:        ASL 2.0 AND LGPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Group:          System Environment/Daemons
-URL:            https://www.openvswitch.org/
-Source0:        http://openvswitch.org/releases/%{name}-%{version}.tar.gz
-BuildRequires:  gcc >= 4.0.0
-BuildRequires:  libcap-ng
-BuildRequires:  libcap-ng-devel
-BuildRequires:  make
-BuildRequires:  openssl
-BuildRequires:  openssl-devel
-BuildRequires:  python-pip
-BuildRequires:  python-setuptools
-BuildRequires:  python-six
-BuildRequires:  python-xml
-BuildRequires:  python2 >= 2.7.0
-BuildRequires:  python2-devel
-BuildRequires:  python2-libs
-BuildRequires:  python3 >= 3.4.0
-BuildRequires:  python3-devel
-BuildRequires:  python3-libs
-BuildRequires:  python3-six
-BuildRequires:  systemd
-Requires:       gawk
-Requires:       libcap-ng
-Requires:       libgcc-atomic
-Requires:       openssl
-Requires:       python-six
-Requires:       python-xml
-Requires:       python2
-Requires:       python2-libs
+# Copyright (C) 2009, 2010, 2013, 2014, 2015, 2016 Nicira Networks, Inc.
+#
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without warranty of any kind.
+
+Summary:           Open vSwitch daemon/database/utilities
+Name:              openvswitch
+Version:           2.17.0
+Release:           1%{?dist}
+License:           ASL 2.0 AND LGPLv2+ AND SISSL
+Vendor:            Microsoft Corporation
+Distribution:      Mariner
+Group:             System Environment/Daemons
+URL:               https://www.openvswitch.org/
+Source0:           http://openvswitch.org/releases/%{name}-%{version}.tar.gz
+BuildRequires:     autoconf
+BuildRequires:     automake
+BuildRequires:     checkpolicy
+BuildRequires:     dpdk-devel
+BuildRequires:     gcc >= 4.0.0
+BuildRequires:     graphviz
+BuildRequires:     groff
+BuildRequires:     libcap-ng
+BuildRequires:     libcap-ng-devel
+BuildRequires:     libpcap-devel
+BuildRequires:     libtool
+BuildRequires:     make
+BuildRequires:     numactl-devel
+BuildRequires:     openssl
+BuildRequires:     openssl-devel
+BuildRequires:     procps-ng
+BuildRequires:     python3
+BuildRequires:     python3-devel
+BuildRequires:     python3-libs
+BuildRequires:     python3-six
+BuildRequires:     python3-sphinx
+BuildRequires:     selinux-policy-devel
+BuildRequires:     systemd
+BuildRequires:     unbound
+BuildRequires:     unbound-devel
+Requires:          hostname
+Requires:          iproute
+Requires:          module-init-tools
+Requires:          openssl
+Requires:          unbound
+Requires(pre):     shadow-utils
+Requires(post):    /bin/sed
+Requires(post):    systemd-units
+Requires(preun):   systemd-units
+Requires(postun):  systemd-units
+
 
 %description
 Open vSwitch provides standard network bridging functions and
 support for the OpenFlow protocol for remote per-flow control of
 traffic.
 
-%package -n     python-openvswitch
-Summary:        python-openvswitch
-Requires:       python2
-Requires:       python2-libs
+%package        selinux-policy
+Summary:        Open vSwitch SELinux policy
+License:        ASL 2.0
+Requires:       selinux-policy
+BuildArch:      noarch
 
-%description -n python-openvswitch
-Python 2 openvswith bindings.
+%description    selinux-policy
+Open vSwitch SELinux policy
 
 %package -n     python3-openvswitch
-Summary:        python3-openvswitch
+Summary:        Python3 bindings for Open vSwitch
+License:        ASL 2.0
 Requires:       python3
 Requires:       python3-libs
+BuildArch:      noarch
 
 %description -n python3-openvswitch
-Python 3 version.
+Python binding for Open vSwitch database 
 
 %package        devel
 Summary:        Header and development files for openvswitch
+License:        ASL 2.0
 Requires:       %{name} = %{version}
 
 %description    devel
 openvswitch-devel package contains header files and libs.
 
-%package        devel-static
-Summary:        Static libs for openvswitch
-Requires:       %{name} = %{version}
+%package        test
+Summary: Open vSwitch testing utilities
+License:        ASL 2.0
+BuildArch: noarch
 
-%description    devel-static
-openvswitch-devel-static package contains static libs.
+%description    test
+Utilities that are useful to diagnose performance and connectivity
+issues in Open vSwitch setup.
 
 %package        doc
 Summary:        Documentation for openvswitch
+License:        ASL 2.0
 Requires:       %{name} = %{version}-%{release}
 
 %description    doc
 It contains the documentation and manpages for openvswitch.
 
-%package -n	ovn-common
-Summary:        Common files for OVN
-Requires:       %{name} = %{version}-%{release}
+%package        ipsec
+Summary:        Open vSwitch IPsec tunneling support
+License:        ASL 2.0
+Requires:       openvswitch 
+Requires:       python3-openvswitch 
+Requires:       strongswan
 
-%description -n ovn-common
-It contains the common userspace components for OVN.
-
-%package -n	ovn-host
-Summary:        Host components of OVN
-Requires:       ovn-common = %{version}-%{release}
-
-%description -n ovn-host
-It contains the userspace components for OVN to be run on each hypervisor.
-
-%package -n	ovn-central
-Summary:        Central components of OVN
-Requires:       ovn-common = %{version}-%{release}
-
-%description -n ovn-central
-It contains the user space components for OVN to be run on central host.
-
-%package -n	ovn-controller-vtep
-Summary:        OVN VTEP controller binaries
-Requires:       ovn-common = %{version}-%{release}
-
-%description -n ovn-controller-vtep
-It contains the user space components for OVN Controller VTEP.
-
-%package -n	ovn-docker
-Summary:        OVN drivers for docker
-Requires:       ovn-common = %{version}-%{release}
-
-%description -n ovn-docker
-It contains the OVN drivers for docker networking.
-
-%package -n	ovn-doc
-Summary:        Documentation for OVN
-Requires:       ovn-common = %{version}-%{release}
-
-%description -n ovn-doc
-It contains the documentation and manpages for OVN.
+%description    ipsec
+This package provides IPsec tunneling support for OVS tunnels.
 
 %prep
 %autosetup -p1
 
 %build
-%configure --enable-ssl --enable-shared
+%configure \
+           --enable-ssl         \
+           --enable-shared      \
+           --disable-static     \
+           --with-dpdk=shared   \
+           --enable-libcapng    \
+           --with-pkidir=%{_sharedstatedir}/openvswitch/pki \
+           PYTHON3=%{__python3}
+
+build-aux/dpdkstrip.py \
+           --dpdk      \
+           < rhel/usr_lib_systemd_system_ovs-vswitchd.service.in \
+           > rhel/usr_lib_systemd_system_ovs-vswitchd.service
 
 make %{_smp_mflags}
+make selinux-policy
 
 %install
-make DESTDIR=%{buildroot} install
-find %{buildroot} -type f -name "*.la" -delete -print
-mkdir -p %{buildroot}/%{python2_sitelib}
-mkdir -p %{buildroot}/%{python3_sitelib}
-cp -a %{buildroot}/%{_datadir}/openvswitch/python/ovs/* %{buildroot}/%{python2_sitelib}
+make install DESTDIR=$RPM_BUILD_ROOT
 
-cp -a %{buildroot}/%{_datadir}/openvswitch/python/ovs/* %{buildroot}/%{python3_sitelib}
+install -d -m 0755 $RPM_BUILD_ROOT%{_rundir}/openvswitch
+install -d -m 0750 $RPM_BUILD_ROOT%{_localstatedir}/log/openvswitch
+install -d -m 0755 $RPM_BUILD_ROOT%{_sysconfdir}/openvswitch
+copy_headers() {
+    src=$1
+    dst=$RPM_BUILD_ROOT/$2
+    install -d -m 0755 $dst
+    install -m 0644 $src/*.h $dst
+}
+copy_headers include %{_includedir}/openvswitch
+copy_headers include/openflow %{_includedir}/openvswitch/openflow
+copy_headers include/openvswitch %{_includedir}/openvswitch/openvswitch
+copy_headers include/sparse %{_includedir}/openvswitch/sparse
+copy_headers include/sparse/arpa %{_includedir}/openvswitch/sparse/arpa
+copy_headers include/sparse/netinet %{_includedir}/openvswitch/sparse/netinet
+copy_headers include/sparse/sys %{_includedir}/openvswitch/sparse/sys
+copy_headers lib %{_includedir}/openvswitch/lib
 
-mkdir -p %{buildroot}/%{_libdir}/systemd/system
-install -p -D -m 0644 rhel/usr_share_openvswitch_scripts_systemd_sysconfig.template %{buildroot}/%{_sysconfdir}/sysconfig/openvswitch
 
-%{_bindir}/python build-aux/dpdkstrip.py --nodpdk < rhel/usr_lib_systemd_system_ovs-vswitchd.service.in > rhel/usr_lib_systemd_system_ovs-vswitchd.service
-for service in openvswitch ovsdb-server ovs-vswitchd ovn-controller ovn-controller-vtep ovn-northd; do
-	install -p -D -m 0644 rhel/usr_lib_systemd_system_${service}.service %{buildroot}/%{_unitdir}/${service}.service
+install -p -D -m 0644 rhel/usr_lib_udev_rules.d_91-vfio.rules \
+        $RPM_BUILD_ROOT%{_prefix}/lib/udev/rules.d/91-vfio.rules
+
+install -p -D -m 0644 \
+        rhel/usr_share_openvswitch_scripts_systemd_sysconfig.template \
+        $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/openvswitch
+
+
+for service in openvswitch ovsdb-server ovs-vswitchd ovs-delete-transient-ports openvswitch-ipsec; do
+        install -p -D -m 0644 \
+                        rhel/usr_lib_systemd_system_${service}.service \
+                        $RPM_BUILD_ROOT%{_unitdir}/${service}.service
 done
+install -m 0755 rhel/etc_init.d_openvswitch \
+        $RPM_BUILD_ROOT%{_datadir}/openvswitch/scripts/openvswitch.init
 
-mkdir -p %{buildroot}/%{_sysconfdir}/openvswitch
-install -p -D -m 0644 rhel/etc_openvswitch_default.conf %{buildroot}/%{_sysconfdir}/openvswitch/default.conf
-sed -i '/OVS_USER_ID=.*/c\OVS_USER_ID=' %{buildroot}/%{_sysconfdir}/openvswitch/default.conf
+install -p -D -m 0644 rhel/etc_openvswitch_default.conf \
+        $RPM_BUILD_ROOT/%{_sysconfdir}/openvswitch/default.conf
+
+install -p -D -m 0644 rhel/etc_logrotate.d_openvswitch \
+        $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d/openvswitch
+
+install -m 0644 vswitchd/vswitch.ovsschema \
+        $RPM_BUILD_ROOT/%{_datadir}/openvswitch/vswitch.ovsschema
+
+install -d -m 0755 $RPM_BUILD_ROOT%{python3_sitelib}
+cp -a $RPM_BUILD_ROOT/%{_datadir}/openvswitch/python/* \
+   $RPM_BUILD_ROOT%{python3_sitelib}
+
+rm -rf $RPM_BUILD_ROOT/%{_datadir}/openvswitch/python/
+
+install -d -m 0755 $RPM_BUILD_ROOT/%{_sharedstatedir}/openvswitch
+
+touch $RPM_BUILD_ROOT%{_sysconfdir}/openvswitch/conf.db
+touch $RPM_BUILD_ROOT%{_sysconfdir}/openvswitch/.conf.db.~lock~
+touch $RPM_BUILD_ROOT%{_sysconfdir}/openvswitch/system-id.conf
+
+install -p -m 644 -D selinux/openvswitch-custom.pp \
+        $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/openvswitch-custom.pp
+
+install -d $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/
+
+install -p -D -m 0755 \
+        rhel/usr_share_openvswitch_scripts_ovs-systemd-reload \
+        $RPM_BUILD_ROOT%{_datadir}/openvswitch/scripts/ovs-systemd-reload
+
+# remove unpackaged files
+rm -f $RPM_BUILD_ROOT%{_bindir}/ovs-parse-backtrace
 
 %check
-make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
+touch resolv.conf
+export OVS_RESOLV_CONF=$(pwd)/resolv.conf
+make -k check TESTSUITEFLAGS='%{_smp_mflags}' RECHECK=yes |& tee %{_specdir}/%{name}-check-log || %{nocheck}
+
+%pre selinux-policy
+%selinux_relabel_pre -s targeted
 
 %preun
 %systemd_preun %{name}.service
 
-%preun -n ovn-central
-%systemd_preun ovn-northd.service
+%pre
+getent group openvswitch >/dev/null || groupadd -r openvswitch
+getent passwd openvswitch >/dev/null || \
+    useradd -r -g openvswitch -d / -s /sbin/nologin \
+    -c "Open vSwitch Daemons" openvswitch
 
-%preun -n ovn-host
-%systemd_preun ovn-controller.service
+getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
+usermod -a -G hugetlbfs openvswitch
 
-%preun -n ovn-controller-vtep
-%systemd_preun ovn-controller-vtep.service
+exit 0
 
 %post
+if [ $1 -eq 1 ]; then
+    %define gname hugetlbfs
+    sed -i \
+        's@^#OVS_USER_ID="openvswitch:openvswitch"@OVS_USER_ID="openvswitch:%{gname}"@'\
+        %{_sysconfdir}/sysconfig/openvswitch
+    sed -i 's:\(.*su\).*:\1 openvswitch %{gname}:' %{_sysconfdir}/logrotate.d/openvswitch
+
+    # In the case of upgrade, this is not needed
+    chown -R openvswitch:openvswitch %{_sysconfdir}/openvswitch
+    chown -R openvswitch:%{gname} %{_localstatedir}/log/openvswitch
+fi
+
+# This may not enable openvswitch service or do daemon-reload.
 %systemd_post %{name}.service
 
-%post -n ovn-central
-%systemd_post ovn-northd.service
-
-%post -n ovn-host
-%systemd_post ovn-controller.service
-
-%post -n ovn-controller-vtep
-%systemd_post ovn-controller-vtep.service
+%post selinux-policy
+%selinux_modules_install -s targeted %{_datadir}/selinux/packages/%{name}/openvswitch-custom.pp
 
 %postun
 %systemd_postun %{name}.service
 
-%postun -n ovn-central
-%systemd_postun ovn-northd.service
+%postun selinux-policy
+if [ $1 -eq 0 ] ; then
+  %selinux_modules_uninstall -s targeted openvswitch-custom
+fi
 
-%postun -n ovn-host
-%systemd_postun ovn-controller.service
+%posttrans selinux-policy
+%selinux_relabel_post -s targeted
 
-%postun -n ovn-controller-vtep
-%systemd_postun ovn-controller-vtep.service
-
-%files
+%files selinux-policy
 %defattr(-,root,root)
-%license LICENSE
-%{_bindir}/ovs-*
-%{_bindir}/ovsdb-*
-%{_bindir}/vtep-ctl
-%{_sbindir}/ovs-*
-%{_sbindir}/ovsdb-server
-%{_unitdir}/openvswitch.service
-%{_unitdir}/ovs-vswitchd.service
-%{_unitdir}/ovsdb-server.service
-%{_libdir}/libovn.so
-%{_libdir}/libovn-2.12.so.0*
-%{_libdir}/libopenvswitch.so
-%{_libdir}/libopenvswitch-2.12.so.0*
-%{_libdir}/libofproto.so
-%{_libdir}/libofproto-2.12.so.0*
-%{_libdir}/libvtep.so
-%{_libdir}/libvtep-2.12.so.0*
-%{_libdir}/libovsdb.so
-%{_libdir}/libovsdb-2.12.so.0*
-%{_libdir}/libsflow.so
-%{_libdir}/libsflow-2.12.so.0*
-%{_sysconfdir}/openvswitch/default.conf
-%{_sysconfdir}/bash_completion.d/ovs-*-bashcomp.bash
-%{_datadir}/openvswitch/*.ovsschema
-%{_datadir}/openvswitch/bugtool-plugins/*
-%{_datadir}/openvswitch/python/*
-%{_datadir}/openvswitch/scripts/ovs-*
-%config(noreplace) %{_sysconfdir}/sysconfig/openvswitch
-
-%files -n python-openvswitch
-%{python2_sitelib}/*
+%{_datadir}/selinux/packages/%{name}/openvswitch-custom.pp
 
 %files -n python3-openvswitch
-%{python3_sitelib}/*
+%{python3_sitelib}/ovs
+
+%files test
+%{_bindir}/ovs-test
+%{_bindir}/ovs-vlan-test
+%{_bindir}/ovs-l3ping
+%{_bindir}/ovs-pcap
+%{_bindir}/ovs-tcpdump
+%{_bindir}/ovs-tcpundump
+%{_mandir}/man8/ovs-test.8*
+%{_mandir}/man8/ovs-vlan-test.8*
+%{_mandir}/man8/ovs-l3ping.8*
+%{_mandir}/man1/ovs-pcap.1*
+%{_mandir}/man8/ovs-tcpdump.8*
+%{_mandir}/man1/ovs-tcpundump.1*
+%{python3_sitelib}/ovstest
 
 %files devel
-%{_includedir}/ovn/*.h
-%{_includedir}/openflow/*.h
-%{_includedir}/openvswitch/*.h
+%{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
-
-%files devel-static
-%{_libdir}/*.a
+%{_includedir}/openvswitch/*
+%{_includedir}/openflow/*
+%exclude %{_libdir}/*.la
+%exclude %{_libdir}/*.a
 
 %files doc
-%{_mandir}/man1/ovs-*.1.gz
-%{_mandir}/man1/ovsdb-*.1.gz
-%{_mandir}/man5/ovs-vswitchd.conf.db.5.gz
-%{_mandir}/man5/ovsdb-server.5.gz
-%{_mandir}/man5/vtep.5.gz
-%{_mandir}/man7/ovs-actions.7.gz
-%{_mandir}/man7/ovs-fields.7.gz
-%{_mandir}/man8/ovs-*.8.gz
-%{_mandir}/man8/vtep-ctl.8.gz
+%{_mandir}/man1/ovsdb-client.1*
+%{_mandir}/man1/ovsdb-server.1*
+%{_mandir}/man1/ovsdb-tool.1*
+%{_mandir}/man5/ovsdb-server.5*
+%{_mandir}/man5/ovs-vswitchd.conf.db.5*
+%{_mandir}/man5/ovsdb.5*
+%{_mandir}/man5/vtep.5*
+%{_mandir}/man7/ovs-actions.7*
+%{_mandir}/man7/ovs-fields.7*
+%{_mandir}/man7/ovsdb.7*
+%{_mandir}/man7/ovsdb-server.7*
+%{_mandir}/man8/vtep-ctl.8*
+%{_mandir}/man8/ovs-appctl.8*
+%{_mandir}/man8/ovs-bugtool.8*
+%{_mandir}/man8/ovs-ctl.8*
+%{_mandir}/man8/ovs-dpctl.8*
+%{_mandir}/man8/ovs-dpctl-top.8*
+%{_mandir}/man8/ovs-kmod-ctl.8*
+%{_mandir}/man8/ovs-ofctl.8*
+%{_mandir}/man8/ovs-pki.8*
+%{_mandir}/man8/ovs-vsctl.8*
+%{_mandir}/man8/ovs-vswitchd.8*
+%{_mandir}/man8/ovs-parse-backtrace.8*
+%{_mandir}/man8/ovs-testcontroller.8*
 
-%files -n ovn-common
-%{_bindir}/ovn-nbctl
-%{_bindir}/ovn-sbctl
-%{_bindir}/ovn-trace
-%{_bindir}/ovn-detrace
-%{_datadir}/openvswitch/scripts/ovn-ctl
-%{_datadir}/openvswitch/scripts/ovndb-servers.ocf
-%{_datadir}/openvswitch/scripts/ovn-bugtool-nbctl-show
-%{_datadir}/openvswitch/scripts/ovn-bugtool-sbctl-lflow-list
-%{_datadir}/openvswitch/scripts/ovn-bugtool-sbctl-show
 
-%files -n ovn-host
-%{_unitdir}/ovn-controller.service
-%{_bindir}/ovn-controller
+%files
+%defattr(-,openvswitch,openvswitch)
+%dir %{_sysconfdir}/openvswitch
+%{_sysconfdir}/openvswitch/default.conf
+%config %ghost %{_sysconfdir}/openvswitch/conf.db
+%ghost %{_sysconfdir}/openvswitch/.conf.db.~lock~
+%config %ghost %{_sysconfdir}/openvswitch/system-id.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/openvswitch
+%defattr(-,root,root)
+%license LICENSE
+%{_sysconfdir}/bash_completion.d/ovs-appctl-bashcomp.bash
+%{_sysconfdir}/bash_completion.d/ovs-vsctl-bashcomp.bash
+%config(noreplace) %{_sysconfdir}/logrotate.d/openvswitch
+%{_unitdir}/openvswitch.service
+%{_unitdir}/ovsdb-server.service
+%{_unitdir}/ovs-vswitchd.service
+%{_unitdir}/ovs-delete-transient-ports.service
+%{_datadir}/openvswitch/scripts/openvswitch.init
+%{_datadir}/openvswitch/bugtool-plugins/
+%{_datadir}/openvswitch/scripts/ovs-bugtool-*
+%{_datadir}/openvswitch/scripts/ovs-check-dead-ifs
+%{_datadir}/openvswitch/scripts/ovs-lib
+%{_datadir}/openvswitch/scripts/ovs-save
+%{_datadir}/openvswitch/scripts/ovs-vtep
+%{_datadir}/openvswitch/scripts/ovs-ctl
+%{_datadir}/openvswitch/scripts/ovs-kmod-ctl
+%{_datadir}/openvswitch/scripts/ovs-systemd-reload
+%config %{_datadir}/openvswitch/vswitch.ovsschema
+%config %{_datadir}/openvswitch/vtep.ovsschema
+%{_bindir}/ovs-appctl
+%{_bindir}/ovs-docker
+%{_bindir}/ovs-dpctl
+%{_bindir}/ovs-dpctl-top
+%{_bindir}/ovs-ofctl
+%{_bindir}/ovs-vsctl
+%{_bindir}/ovsdb-client
+%{_bindir}/ovsdb-tool
+%{_bindir}/ovs-testcontroller
+%{_bindir}/ovs-pki
+%{_bindir}/vtep-ctl
+%{_libdir}/lib*.so.*
+%{_sbindir}/ovs-bugtool
+%{_sbindir}/ovs-vswitchd
+%{_sbindir}/ovsdb-server
+%{_prefix}/lib/udev/rules.d/91-vfio.rules
+%doc NOTICE README.rst NEWS rhel/README.RHEL.rst
+/var/lib/openvswitch
+%attr(750,root,root) /var/log/openvswitch
+%ghost %attr(755,root,root) %{_rundir}/openvswitch
+%ghost %attr(644,root,root) %{_rundir}/openvswitch.useropts
 
-%files -n ovn-central
-%{_unitdir}/ovn-northd.service
-%{_bindir}/ovn-northd
-%{_datadir}/openvswitch/ovn-nb.ovsschema
-%{_datadir}/openvswitch/ovn-sb.ovsschema
 
-%files -n ovn-controller-vtep
-%{_unitdir}/ovn-controller-vtep.service
-%{_bindir}/ovn-controller-vtep
 
-%files -n ovn-docker
-%{_bindir}/ovn-docker-overlay-driver
-%{_bindir}/ovn-docker-underlay-driver
 
-%files -n ovn-doc
-%{_mandir}/man1/ovn-detrace.1.gz
-%{_mandir}/man7/ovn-architecture.7.gz
-%{_mandir}/man8/ovn-ctl.8.gz
-%{_mandir}/man8/ovn-nbctl.8.gz
-%{_mandir}/man8/ovn-sbctl.8.gz
-%{_mandir}/man8/ovn-controller-vtep.8.gz
-%{_mandir}/man8/ovn-controller.8.gz
-%{_mandir}/man5/ovn-nb.5.gz
-%{_mandir}/man5/ovn-sb.5.gz
-%{_mandir}/man8/ovn-northd.8.gz
-%{_mandir}/man8/ovn-trace.8.gz
+%files ipsec
+%{_datadir}/openvswitch/scripts/ovs-monitor-ipsec
+%{_unitdir}/openvswitch-ipsec.service
 
 %changelog
+* Wed Mar 23 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.17.0-1
+- Upgrade to latest version of openvswitch.  Remove python2 support
+- Portions of this SPEC file were imported from OpenVswitch.org's autogenerated openvswitch-fedora spec.
+
 * Mon Apr 19 2021 Nicolas Ontiveros <niontive@microsoft.com> - 2.12.3-2
 - Don't include static libraries in openvswitch package
 
@@ -298,71 +384,71 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 * Mon Feb 22 2021 Emre Girgin <mrgirgin@microsoft.com> - 2.12.0-3
 - Fix CVE-2020-35498.
 
-*   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.12.0-2
--   Added %%license line automatically
+* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.12.0-2
+- Added %%license line automatically
 
-*   Tue Mar 31 2020 Henry Beberman <henry.beberman@microsoft.com> 2.12.0-1
--   Update to 2.12.0. License verified.
+* Tue Mar 31 2020 Henry Beberman <henry.beberman@microsoft.com> 2.12.0-1
+- Update to 2.12.0. License verified.
 
-*   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8.2-4
--   Initial CBL-Mariner import from Photon (license: Apache2).
+* Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.8.2-4
+- Initial CBL-Mariner import from Photon (license: Apache2).
 
-*   Tue Nov 13 2018 Anish Swaminathan <anishs@vmware.com> 2.8.2-3
--   Replace with configure macro
+* Tue Nov 13 2018 Anish Swaminathan <anishs@vmware.com> 2.8.2-3
+- Replace with configure macro
 
-*   Wed Feb 28 2018 Vinay Kulkarni <kulkarniv@vmware.com> 2.8.2-2
--   Setup the default conf file for local ovsdb server.
+* Wed Feb 28 2018 Vinay Kulkarni <kulkarniv@vmware.com> 2.8.2-2
+- Setup the default conf file for local ovsdb server.
 
-*   Tue Feb 27 2018 Vinay Kulkarni <kulkarniv@vmware.com> 2.8.2-1
--   Update to OVS 2.8.2
+* Tue Feb 27 2018 Vinay Kulkarni <kulkarniv@vmware.com> 2.8.2-1
+- Update to OVS 2.8.2
 
-*   Tue Oct 10 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.7.0-9
--   Fix CVE-2017-14970
+* Tue Oct 10 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.7.0-9
+- Fix CVE-2017-14970
 
-*   Wed Oct 04 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.7.0-8
--   Fix CVE-2017-9263
+* Wed Oct 04 2017 Dheeraj Shetty <dheerajs@vmware.com> 2.7.0-8
+- Fix CVE-2017-9263
 
-*   Tue Sep 19 2017 Anish Swaminathan <anishs@vmware.com> 2.7.0-7
--   Add gawk to Requires
+* Tue Sep 19 2017 Anish Swaminathan <anishs@vmware.com> 2.7.0-7
+- Add gawk to Requires
 
-*   Tue Aug 29 2017 Sarah Choi <sarahc@vmware.com> 2.7.0-6
--   Add python2/python-six/python-xml to Requires
+* Tue Aug 29 2017 Sarah Choi <sarahc@vmware.com> 2.7.0-6
+- Add python2/python-six/python-xml to Requires
 
-*   Thu Jul 13 2017 Nishant Nelogal <nnelogal@vmware.com> 2.7.0-5
--   Created OVN packages and systemd service scripts
+* Thu Jul 13 2017 Nishant Nelogal <nnelogal@vmware.com> 2.7.0-5
+- Created OVN packages and systemd service scripts
 
-*   Fri Jun 16 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.7.0-4
--   Fix CVE-2017-9214, CVE-2017-9265
+* Fri Jun 16 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.7.0-4
+- Fix CVE-2017-9214, CVE-2017-9265
 
-*   Mon Jun 12 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.7.0-3
--   Fix CVE-2017-9264
+* Mon Jun 12 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.7.0-3
+- Fix CVE-2017-9264
 
-*   Tue May 23 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.0-2
--   Added python and python3 subpackage.
+* Tue May 23 2017 Xiaolin Li <xiaolinl@vmware.com> 2.7.0-2
+- Added python and python3 subpackage.
 
-*   Sat Apr 15 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.7.0-1
--   Update to 2.7.0
+* Sat Apr 15 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.7.0-1
+- Update to 2.7.0
 
-*   Fri Feb 10 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.6.1-2
--   Build ovs shared library
+* Fri Feb 10 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.6.1-2
+- Build ovs shared library
 
-*   Wed Nov 16 2016 Vinay Kulkarni <kulkarniv@vmware.com> 2.6.1-1
--   Update to openvswitch 2.6.1
+* Wed Nov 16 2016 Vinay Kulkarni <kulkarniv@vmware.com> 2.6.1-1
+- Update to openvswitch 2.6.1
 
-*   Sat Sep 24 2016 Vinay Kulkarni <kulkarniv@vmware.com> 2.5.0-1
--   Update to openvswitch 2.5.0
+* Sat Sep 24 2016 Vinay Kulkarni <kulkarniv@vmware.com> 2.5.0-1
+- Update to openvswitch 2.5.0
 
-*   Fri Sep 09 2016 Vinay Kulkarni <kulkarniv@vmware.com> 2.4.1-1
--   Update to openvswitch 2.4.1
+* Fri Sep 09 2016 Vinay Kulkarni <kulkarniv@vmware.com> 2.4.1-1
+- Update to openvswitch 2.4.1
 
-*   Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.4.0-3
--   GA - Bump release of all rpms
+* Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.4.0-3
+- GA - Bump release of all rpms
 
-*   Sat Oct 31 2015 Vinay Kulkarni <kulkarniv@vmware.com> 2.4.0-2
--   OVS requires libatomic.so.1 provided by gcc.
+* Sat Oct 31 2015 Vinay Kulkarni <kulkarniv@vmware.com> 2.4.0-2
+- OVS requires libatomic.so.1 provided by gcc.
 
-*   Mon Oct 12 2015 Vinay Kulkarni <kulkarniv@vmware.com> 2.4.0-1
--   Update to OVS v2.4.0
+* Mon Oct 12 2015 Vinay Kulkarni <kulkarniv@vmware.com> 2.4.0-1
+- Update to OVS v2.4.0
 
-*   Fri May 29 2015 Kumar Kaushik <kaushikk@vmware.com> 2.3.1-1
--   Initial build. First version
+* Fri May 29 2015 Kumar Kaushik <kaushikk@vmware.com> 2.3.1-1
+- Initial build. First version

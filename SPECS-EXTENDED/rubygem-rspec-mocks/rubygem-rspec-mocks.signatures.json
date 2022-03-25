@@ -1,7 +1,5 @@
 {
  "Signatures": {
-  "rspec-mocks-3.9.1.gem": "b9820ed35afbc552b4448ccb98984ffe20e92bff6760dbd60f4fec503d6e75a7",
-  "rspec-related-create-full-tarball.sh": "af6dd6d70935e1f7d897b3671d98df339185810668016aa55a36d03fdad52a01",
-  "rubygem-rspec-mocks-3.9.1-full.tar.gz": "7f3297f5e742d8a0b697fff831ecb995781ddfa0c983810a0e600be203f866d2"
+  "rspec-mocks-3.9.1.tar.gz": "1619a33d4b20c0d6dc47e8b2314caf9ab622a5cde968025971ca9dc07f3906f3"
  }
 }
