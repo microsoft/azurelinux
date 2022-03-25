@@ -24665,7 +24665,7 @@
         "other": {
           "name": "python-werkzeug",
           "version": "2.0.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/6c/a8/60514fade2318e277453c9588545d0c335ea3ea6440ce5cdabfca7f73117/Werkzeug-2.0.3.tar.gz"
+          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.0.3.tar.gz"
         }
       }
     },
