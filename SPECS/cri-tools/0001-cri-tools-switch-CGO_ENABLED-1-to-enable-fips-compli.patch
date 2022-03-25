@@ -1,0 +1,35 @@
+From 6d064fa1b82962b038c496b4a268a2de38500e1d Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Fri, 25 Mar 2022 09:09:10 +0530
+Subject: [PATCH] cri-tools: switch CGO_ENABLED=1 to enable fips compliance
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 39c3cf4..374c25d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -64,7 +64,7 @@ critest:
+ 	@$(MAKE) -B $(CRITEST)
+ 
+ $(CRITEST):
+-	CGO_ENABLED=0 $(GO_TEST) -c -o $@ \
++	CGO_ENABLED=1 $(GO_TEST) -c -o $@ \
+ 		-ldflags '$(GO_LDFLAGS)' \
+ 		-trimpath \
+ 		-tags '$(BUILDTAGS)' \
+@@ -74,7 +74,7 @@ crictl:
+ 	@$(MAKE) -B $(CRICTL)
+ 
+ $(CRICTL):
+-	CGO_ENABLED=0 $(GO_BUILD) -o $@ \
++	CGO_ENABLED=1 $(GO_BUILD) -o $@ \
+ 		-ldflags '$(GO_LDFLAGS)' \
+ 		-trimpath \
+ 		-tags '$(BUILDTAGS)' \
+-- 
+2.17.1
+

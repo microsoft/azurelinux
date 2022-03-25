@@ -1,7 +1,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.23.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://github.com/kubernetes-sigs/cri-tools
 #Source0:       https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         no-git-in-build.patch
+Patch1:         0001-cri-tools-switch-CGO_ENABLED-1-to-enable-fips-compli.patch
 %define debug_package %{nil}
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
@@ -50,6 +51,9 @@ install -p -m 644 -t %{buildroot}%{_docdir}/%{name} ./docs/crictl.md
 %{_docdir}/%{name}
 
 %changelog
+* Fri Mar 25 2022 Muhammad Falak <mwani@microsoft.com> - 1.23.0-2
+- Switch CGO_ENABLED=1 to enable fips compliance
+
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 1.23.0-1
 - Update to version 1.23.0
 
