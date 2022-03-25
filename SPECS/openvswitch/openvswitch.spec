@@ -9,7 +9,7 @@ Summary:        Open vSwitch daemon/database/utilities
 Name:           openvswitch
 Version:        2.17.0
 Release:        1%{?dist}
-License:        ASL 2.0 and LGPLv2+ and SISSL
+License:        ASL 2.0 AND LGPLv2+ AND SISSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Daemons
@@ -44,7 +44,7 @@ Requires:       hostname
 Requires:       iproute
 Requires:       module-init-tools
 Requires:       openssl
-Requires:		unbound
+Requires:       unbound
 
 %description
 Open vSwitch provides standard network bridging functions and
@@ -53,38 +53,43 @@ traffic.
 
 %package        selinux-policy
 Summary:        Open vSwitch SELinux policy
-BuildArch:      noarch
+License:        ASL 2.0 AND LGPLv2+ AND SISSL
 Requires:       selinux-policy
+BuildArch:      noarch
 
 %description    selinux-policy
 Open vSwitch SELinux policy
 
 %package -n     python3-openvswitch
 Summary:        Python3 bindings for Open vSwitch
-BuildArch:      noarch
+License:        ASL 2.0 AND LGPLv2+ AND SISSL
 Requires:       python3
 Requires:       python3-libs
+BuildArch:      noarch
 
 %description -n python3-openvswitch
 Python binding for Open vSwitch database 
 
 %package        devel
 Summary:        Header and development files for openvswitch
+License:        ASL 2.0 AND LGPLv2+ AND SISSL
 Requires:       %{name} = %{version}
 
 %description    devel
 openvswitch-devel package contains header files and libs.
 
-%package test
+%package        test
 Summary: Open vSwitch testing utilities
+License:        ASL 2.0 AND LGPLv2+ AND SISSL
 BuildArch: noarch
 
-%description test
+%description    test
 Utilities that are useful to diagnose performance and connectivity
 issues in Open vSwitch setup.
 
 %package        doc
 Summary:        Documentation for openvswitch
+License:        ASL 2.0 AND LGPLv2+ AND SISSL
 Requires:       %{name} = %{version}-%{release}
 
 %description    doc
@@ -107,23 +112,21 @@ This package provides IPsec tunneling support for OVS tunnels.
 %configure \
            --enable-ssl         \
            --enable-shared      \
-		   --disable-static     \
-		   --with-dpdk=shared   \
-		   --enable-libcapng    \
-	       --with-pkidir=%{_sharedstatedir}/openvswitch/pki \
+           --disable-static     \
+           --with-dpdk=shared   \
+           --enable-libcapng    \
+           --with-pkidir=%{_sharedstatedir}/openvswitch/pki \
            PYTHON3=%{__python3}
 
 build-aux/dpdkstrip.py \
-           --dpdk               \
+           --dpdk      \
            < rhel/usr_lib_systemd_system_ovs-vswitchd.service.in \
            > rhel/usr_lib_systemd_system_ovs-vswitchd.service
-		   
 
 make %{_smp_mflags}
 make selinux-policy
 
 %install
-rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
 install -d -m 0755 $RPM_BUILD_ROOT%{_rundir}/openvswitch
@@ -285,6 +288,7 @@ fi
 %config %ghost %{_sysconfdir}/openvswitch/system-id.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/openvswitch
 %defattr(-,root,root)
+%license LICENSE
 %{_sysconfdir}/bash_completion.d/ovs-appctl-bashcomp.bash
 %{_sysconfdir}/bash_completion.d/ovs-vsctl-bashcomp.bash
 %config(noreplace) %{_sysconfdir}/logrotate.d/openvswitch
