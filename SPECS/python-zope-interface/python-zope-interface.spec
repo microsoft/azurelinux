@@ -1,8 +1,8 @@
 %define pypi_name zope.interface
 Summary:        Interfaces for Python
 Name:           python-zope-interface
-Version:        4.7.2
-Release:        3%{?dist}
+Version:        5.4.0
+Release:        1%{?dist}
 License:        ZPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,9 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 5.4.0-1
+- Updated to version 5.4.0
+
 * Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 4.7.2-3
 - Add an explicit BR on `pip` to enable ptest
 

@@ -24704,8 +24704,8 @@
         "type": "other",
         "other": {
           "name": "python-zope-interface",
-          "version": "4.7.2",
-          "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-4.7.2.tar.gz"
+          "version": "5.4.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-5.4.0.tar.gz"
         }
       }
     },
