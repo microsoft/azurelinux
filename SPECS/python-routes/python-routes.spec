@@ -1,20 +1,18 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
 %bcond_without check
 %define pkgname routes
 %define upname Routes
 
 Summary:        Python re-implementation of the Rails routes system
 Name:           python-%{pkgname}
-Version:        2.4.1
+Version:        2.5.1
 Release:        4%{?dist}
 License:        MIT
 URL:            https://routes.readthedocs.io/en/latest/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.io/packages/source/R/%{upname}/%{upname}-%{version}.tar.gz
-
 BuildArch:      noarch
+
 
 %global _description %{expand:
 Routes is a Python re-implementation of the Rails routes system for mapping URL's to Controllers/Actions and generating URL's. Routes makes it easy to create pretty and concise URL's that are RESTful with little effort.
@@ -59,6 +57,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Sat Mar 26 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.5.1-1
+- Upgrade to version 2.5.1
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 2.4.1-4
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 
