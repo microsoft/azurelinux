@@ -15,12 +15,11 @@ Release:        2%{?dist}
 # Unless otherwise noted, the license for code is BSD
 # sphinx/util/inspect.py has bits licensed with PSF license v2 (Python)
 # sphinx/themes/haiku/static/haiku.css_t has bits licensed with MIT
-# JS: JQuery, Underscore, css3-mediaqueries are available under MIT
 License:        BSD AND Python AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.sphinx-doc.org/
-Source0:        https://github.com/sphinx-doc/sphinx/archive/refs/tags/v%{version}.tar.gz#/sphinx-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/c9/08/c2932e66460cfbc8973928d276dc82ccde2d24b365055eeda9f0afc1951e/Sphinx-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -28,14 +27,18 @@ BuildArch:      noarch
 BuildRequires:  dos2unix
 BuildRequires:  make
 BuildRequires:  pyproject-rpm-macros
-BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3dist(wheel)
 
 %if %{with_check}
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  graphviz
 # tests import _testcapi
-BuildRequires:  python%{python3_pkgversion}-test
+BuildRequires:  python3-six
+BuildRequires:  python3-test
+BuildRequires:  python3-pytest
 BuildRequires:  texinfo
 %if %{with imagemagick_tests}
 BuildRequires:  ImageMagick
@@ -106,9 +109,6 @@ Summary:        Python documentation generator
 License:        BSD AND Python AND MIT
 Recommends:     ImageMagick
 Recommends:     graphviz
-# Bundled JavaScript
-Provides:       bundled(jquery) = 3.5.1
-Provides:       bundled(underscore) = 1.3.1
 Provides:       bundled(css3-mediaqueries) = 1.0
 
 %description -n python%{python3_pkgversion}-sphinx
@@ -139,26 +139,12 @@ the Python docs:
     * Various extensions are available, e.g. for automatic testing of
       snippets and inclusion of appropriately formatted docstrings.
 
-%package doc
-Summary:        Documentation for %{name}
-License:        BSD
-Recommends:     python%{python3_pkgversion}-sphinx = %{version}-%{release}
-
-%description doc
-Sphinx is a tool that makes it easy to create intelligent and
-beautiful documentation for Python projects (or other documents
-consisting of multiple reStructuredText sources), written by Georg
-Brandl. It was originally created to translate the new Python
-documentation, but has now been cleaned up in the hope that it will be
-useful to many other projects.
-
-This package contains documentation in reST and HTML formats.
-
 %prep
-%autosetup -n sphinx-%{version} -p1
+%autosetup -n Sphinx-%{version} -p1
 
-# fix line encoding of bundled jquery.js
-dos2unix -k ./sphinx/themes/basic/static/jquery.js
+# Remove bundled JS components.
+rm ./sphinx/themes/basic/static/{jquery,underscore}*.js
+rm ./sphinx/themes/bizstyle/static/css3-mediaqueries*.js
 
 %if %{without imagemagick_tests}
 rm tests/test_ext_imgconverter.py
@@ -171,24 +157,10 @@ sed -i '/typed_ast/d' setup.py
 
 
 %generate_buildrequires
-%pyproject_buildrequires -r \
-%if %{with_check}
-    -x test
-%else
-    %{nil}
-%endif
+%pyproject_buildrequires -r %{?with_check:-x test}
 
 %build
 %pyproject_wheel
-
-export PYTHONPATH=$PWD
-pushd doc
-export SPHINXBUILD="%{python3} ../sphinx/cmd/build.py"
-make html SPHINXBUILD="$SPHINXBUILD"
-make man SPHINXBUILD="$SPHINXBUILD"
-rm -rf _build/html/.buildinfo
-mv _build/html ..
-popd
 
 %install
 %pyproject_install
@@ -202,21 +174,6 @@ done
 # Clean up non-python files
 rm -f %{buildroot}%{python3_sitelib}/sphinx/locale/.DS_Store
 rm -rf %{buildroot}%{python3_sitelib}/sphinx/locale/.tx
-
-pushd doc
-# Deliver man pages
-install -d %{buildroot}%{_mandir}/man1
-for f in _build/man/sphinx-*.1;
-do
-    cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f)
-done
-popd
-
-# Deliver rst files
-rm -rf doc/_build
-sed -i 's|python ../sphinx-build.py|%{_bindir}/sphinx-build|' doc/Makefile
-mv doc reST
-rm reST/make.bat
 
 # Move language files to /usr/share;
 # patch to support this incorporated in 0.6.6
@@ -262,11 +219,6 @@ mkdir %{buildroot}%{python3_sitelib}/sphinxcontrib
 %dir %{_datadir}/sphinx/
 %dir %{_datadir}/sphinx/locale
 %dir %{_datadir}/sphinx/locale/*
-%{_mandir}/man1/sphinx-*
-
-%files doc
-%license LICENSE
-%doc html reST
 
 %changelog
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
@@ -274,6 +226,8 @@ mkdir %{buildroot}%{python3_sitelib}/sphinxcontrib
 - Removing epoch.
 - License verified.
 - Removed the "*-sphinx-latex" subpackage and thus support for LaTeX due to missing dependencies.
+- Removed bundled JS components.
+- Removed docs subpackage due to missing BRs.
 
 * Tue Feb 01 2022 Karolina Surma <ksurma@redhat.com> - 1:4.4.0-1
 - Update to 4.4.0
