@@ -1,14 +1,13 @@
 %define pkgname sphinxcontrib-websupport
 Summary:        Python API to integrate Sphinx into a web application
 Name:           python-%{pkgname}
-Version:        1.1.2
-Release:        2%{?dist}
+Version:        1.2.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/sphinx-doc/sphinxcontrib-websupport
-#Source0:       https://github.com/sphinx-doc/%{pkgname}/archive/%{version}.tar.gz
-Source0:        %{pkgname}-%{version}.tar.gz
+Source0:        https://github.com/sphinx-doc/%{pkgname}/archive/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -49,6 +48,9 @@ tox
 %{python3_sitelib}/*.pth
 
 %changelog
+* Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-1
+- Updating to version 1.2.4.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.0-2
 - Remove python2 package
 - Lint spec

@@ -24254,8 +24254,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinx-theme-alabaster",
-          "version": "0.7.11",
-          "downloadUrl": "https://files.pythonhosted.org/packages/3f/46/9346ea429931d80244ab7f11c4fce83671df0b7ae5a60247a2b588592c46/alabaster-0.7.11.tar.gz"
+          "version": "0.7.12",
+          "downloadUrl": "https://files.pythonhosted.org/packages/cc/b4/ed8dcb0d67d5cfb7f83c4d5463a7614cb1d078ad7ae890c9143edebbf072/alabaster-0.7.12.tar.gz"
         }
       }
     },
@@ -24264,8 +24264,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinx-theme-py3doc-enhanced",
-          "version": "2.3.2",
-          "downloadUrl": "https://pypi.io/packages/source/s/sphinx_py3doc_enhanced_theme/sphinx-py3doc-enhanced-theme-2.3.2.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://pypi.io/packages/source/s/sphinx_py3doc_enhanced_theme/sphinx-py3doc-enhanced-theme-2.4.0.tar.gz"
         }
       }
     },
@@ -24274,8 +24274,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinx_rtd_theme",
-          "version": "0.4.3",
-          "downloadUrl": "https://github.com/rtfd/sphinx_rtd_theme/archive/0.4.3/sphinx_rtd_theme-0.4.3.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/rtfd/sphinx_rtd_theme/archive/1.0.0/sphinx_rtd_theme-1.0.0.tar.gz"
         }
       }
     },
@@ -24304,8 +24304,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinxcontrib-websupport",
-          "version": "1.1.2",
-          "downloadUrl": " https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.1.2.tar.gz"
+          "version": "1.2.4",
+          "downloadUrl": "https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.2.4.tar.gz"
         }
       }
     },
