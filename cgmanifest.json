@@ -24054,8 +24054,8 @@
         "type": "other",
         "other": {
           "name": "python-routes",
-          "version": "2.4.1",
-          "downloadUrl": "https://pypi.io/packages/source/R/Routes/Routes-2.4.1.tar.gz"
+          "version": "2.5.1",
+          "downloadUrl": "https://pypi.io/packages/source/R/Routes/Routes-2.5.1.tar.gz"
         }
       }
     },
