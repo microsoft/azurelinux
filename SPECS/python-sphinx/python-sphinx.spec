@@ -35,10 +35,13 @@ BuildRequires:  python3dist(wheel)
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  graphviz
-# tests import _testcapi
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 BuildRequires:  python3-test
-BuildRequires:  python3-pytest
 BuildRequires:  texinfo
 %if %{with imagemagick_tests}
 BuildRequires:  ImageMagick
@@ -206,7 +209,7 @@ mkdir %{buildroot}%{python3_sitelib}/sphinxcontrib
   >> sphinx.lang
 
 %check
-# Currently, all linkcheck tests and test_latex_images need Internet
+pip3 install more-itertools
 %pytest
 
 %files -n python%{python3_pkgversion}-sphinx -f sphinx.lang
