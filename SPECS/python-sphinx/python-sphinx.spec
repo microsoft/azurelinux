@@ -1,11 +1,6 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # Unset -s on python shebang to allow RPM-installed sphinx to be used
 # with user-installed modules (#1903763)
-%global py3_shebang_flags %nil
-
-# No internet in Koji
-%bcond_with internet
+%global py3_shebang_flags %{nil}
 
 # Disabled until we bring "ImageMagick" to Mariner.
 %bcond_with imagemagick_tests
@@ -13,77 +8,70 @@ Distribution:   Mariner
 # Disabled until we have the required LaTeX dependencies in Mariner.
 %bcond_with latex_tests
 
-%global upstream_name Sphinx
-
-Name:       python-sphinx
-Version:    4.4.0
-Release:    2%{?dist}
-Summary:    Python documentation generator
-
+Summary:        Python documentation generator
+Name:           python-sphinx
+Version:        4.4.0
+Release:        2%{?dist}
 # Unless otherwise noted, the license for code is BSD
 # sphinx/util/inspect.py has bits licensed with PSF license v2 (Python)
 # sphinx/themes/haiku/static/haiku.css_t has bits licensed with MIT
 # JS: JQuery, Underscore, css3-mediaqueries are available under MIT
-License:    BSD and Python and MIT
+License:        BSD AND Python AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.sphinx-doc.org/
+Source0:        https://github.com/sphinx-doc/sphinx/archive/refs/tags/v%{version}.tar.gz#/sphinx-%{version}.tar.gz
 
-URL:        https://www.sphinx-doc.org/
-Source0:    https://github.com/sphinx-doc/sphinx/archive/refs/tags/v%{version}.tar.gz#/sphinx-%{version}.tar.gz
-
-BuildArch:     noarch
-
-BuildRequires: make
-BuildRequires: python%{python3_pkgversion}-devel
-BuildRequires: pyproject-rpm-macros
+BuildArch:      noarch
 
 # for fixes
-BuildRequires: dos2unix
+BuildRequires:  dos2unix
+BuildRequires:  make
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python%{python3_pkgversion}-devel
 
 %if %{with_check}
+BuildRequires:  gcc
+BuildRequires:  gettext
+BuildRequires:  graphviz
 # tests import _testcapi
-BuildRequires: python%{python3_pkgversion}-test
-
-BuildRequires: gcc
-BuildRequires: gettext
-BuildRequires: graphviz
-BuildRequires: texinfo
-
+BuildRequires:  python%{python3_pkgversion}-test
+BuildRequires:  texinfo
 %if %{with imagemagick_tests}
-BuildRequires: ImageMagick
+BuildRequires:  ImageMagick
 %endif
-
 %if %{with latex_tests}
-BuildRequires: texlive-collection-fontsrecommended
-BuildRequires: texlive-collection-latex
-BuildRequires: texlive-dvipng
-BuildRequires: texlive-dvisvgm
-BuildRequires: tex(amsmath.sty)
-BuildRequires: tex(amsthm.sty)
-BuildRequires: tex(anyfontsize.sty)
-BuildRequires: tex(article.cls)
-BuildRequires: tex(capt-of.sty)
-BuildRequires: tex(cmap.sty)
-BuildRequires: tex(color.sty)
-BuildRequires: tex(ctablestack.sty)
-BuildRequires: tex(fancyhdr.sty)
-BuildRequires: tex(fancyvrb.sty)
-BuildRequires: tex(fncychap.sty)
-BuildRequires: tex(framed.sty)
-BuildRequires: tex(FreeSerif.otf)
-BuildRequires: tex(geometry.sty)
-BuildRequires: tex(hyperref.sty)
-BuildRequires: tex(kvoptions.sty)
-BuildRequires: tex(luatex85.sty)
-BuildRequires: tex(needspace.sty)
-BuildRequires: tex(parskip.sty)
-BuildRequires: tex(polyglossia.sty)
-BuildRequires: tex(tabulary.sty)
-BuildRequires: tex(titlesec.sty)
-BuildRequires: tex(upquote.sty)
-BuildRequires: tex(utf8x.def)
-BuildRequires: tex(wrapfig.sty)
+BuildRequires:  texlive-collection-fontsrecommended
+BuildRequires:  texlive-collection-latex
+BuildRequires:  texlive-dvipng
+BuildRequires:  texlive-dvisvgm
+BuildRequires:  tex(FreeSerif.otf)
+BuildRequires:  tex(amsmath.sty)
+BuildRequires:  tex(amsthm.sty)
+BuildRequires:  tex(anyfontsize.sty)
+BuildRequires:  tex(article.cls)
+BuildRequires:  tex(capt-of.sty)
+BuildRequires:  tex(cmap.sty)
+BuildRequires:  tex(color.sty)
+BuildRequires:  tex(ctablestack.sty)
+BuildRequires:  tex(fancyhdr.sty)
+BuildRequires:  tex(fancyvrb.sty)
+BuildRequires:  tex(fncychap.sty)
+BuildRequires:  tex(framed.sty)
+BuildRequires:  tex(geometry.sty)
+BuildRequires:  tex(hyperref.sty)
+BuildRequires:  tex(kvoptions.sty)
+BuildRequires:  tex(luatex85.sty)
+BuildRequires:  tex(needspace.sty)
+BuildRequires:  tex(parskip.sty)
+BuildRequires:  tex(polyglossia.sty)
+BuildRequires:  tex(tabulary.sty)
+BuildRequires:  tex(titlesec.sty)
+BuildRequires:  tex(upquote.sty)
+BuildRequires:  tex(utf8x.def)
+BuildRequires:  tex(wrapfig.sty)
 %endif
 %endif
-
 
 %description
 Sphinx is a tool that makes it easy to create intelligent and
@@ -113,17 +101,15 @@ the Python docs:
     * Various extensions are available, e.g. for automatic testing of
       snippets and inclusion of appropriately formatted docstrings.
 
-
 %package -n python%{python3_pkgversion}-sphinx
-Summary:       Python documentation generator
-
-Recommends:    graphviz
-Recommends:    ImageMagick
-
+Summary:        Python documentation generator
+License:        BSD AND Python AND MIT
+Recommends:     ImageMagick
+Recommends:     graphviz
 # Bundled JavaScript
-Provides:      bundled(jquery) = 3.5.1
-Provides:      bundled(underscore) = 1.3.1
-Provides:      bundled(css3-mediaqueries) = 1.0
+Provides:       bundled(jquery) = 3.5.1
+Provides:       bundled(underscore) = 1.3.1
+Provides:       bundled(css3-mediaqueries) = 1.0
 
 %description -n python%{python3_pkgversion}-sphinx
 Sphinx is a tool that makes it easy to create intelligent and
@@ -154,9 +140,9 @@ the Python docs:
       snippets and inclusion of appropriately formatted docstrings.
 
 %package doc
-Summary:       Documentation for %{name}
-License:       BSD
-Recommends:    python%{python3_pkgversion}-sphinx = %{version}-%{release}
+Summary:        Documentation for %{name}
+License:        BSD
+Recommends:     python%{python3_pkgversion}-sphinx = %{version}-%{release}
 
 %description doc
 Sphinx is a tool that makes it easy to create intelligent and
@@ -228,7 +214,7 @@ popd
 
 # Deliver rst files
 rm -rf doc/_build
-sed -i 's|python ../sphinx-build.py|/usr/bin/sphinx-build|' doc/Makefile
+sed -i 's|python ../sphinx-build.py|%{_bindir}/sphinx-build|' doc/Makefile
 mv doc reST
 rm reST/make.bat
 
