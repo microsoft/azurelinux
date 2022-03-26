@@ -24224,8 +24224,8 @@
         "type": "other",
         "other": {
           "name": "python-snowballstemmer",
-          "version": "1.2.1",
-          "downloadUrl": "https://pypi.python.org/packages/20/6b/d2a7cb176d4d664d94a6debf52cd8dbae1f7203c8e42426daa077051d59c/snowballstemmer-1.2.1.tar.gz"
+          "version": "2.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/44/7b/af302bebf22c749c56c9c3e8ae13190b5b5db37a33d9068652e8f73b7089/snowballstemmer-2.2.0.tar.gz"
         }
       }
     },
