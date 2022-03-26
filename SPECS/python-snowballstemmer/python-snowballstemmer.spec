@@ -1,3 +1,8 @@
+# Note that python-snowballstemmer currently has a package repository on github here: https://github.com/snowballstem/snowball
+# The source on github provides "snowball".  The Snowball source generates snowballstemmer for several languages.  
+# If you clone and run "make dist" one of the output folders, "python_out", contains the python-snowballstemmer source.   
+# This SPEC provides the source from pypi.
+
 Summary:        Python stemming library
 Name:           python-snowballstemmer
 Version:        2.2.0
@@ -6,7 +11,7 @@ License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-URL:            https://github.com/shibukawa/snowball_py
+URL:            https://snowballstem.org/
 Source0:        https://files.pythonhosted.org/packages/44/7b/af302bebf22c749c56c9c3e8ae13190b5b5db37a33d9068652e8f73b7089/snowballstemmer-%{version}.tar.gz#/snowballstemmer-%{version}.tar.gz
 BuildArch:      noarch
 
