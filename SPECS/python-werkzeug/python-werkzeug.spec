@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
-Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz##werkzeug-%{version}.tar.gz
+Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
