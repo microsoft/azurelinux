@@ -1,6 +1,6 @@
 Summary:        PowerShell is an automation and configuration management platform.
 Name:           powershell
-Version:        7.2.1
+Version:        7.2.2
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
