@@ -7,7 +7,7 @@ Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://sphinx-doc.org/
+URL:            https://www.sphinx-doc.org/en/master/
 Source0:        https://files.pythonhosted.org/packages/b5/72/835d6fadb9e5d02304cf39b18f93d227cd93abd3c41ebf58e6853eeb1455/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
