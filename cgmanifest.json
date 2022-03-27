@@ -24164,8 +24164,8 @@
         "type": "other",
         "other": {
           "name": "python-setuptools_scm",
-          "version": "3.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-3.1.0.tar.gz"
+          "version": "6.4.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-6.4.2.tar.gz"
         }
       }
     },

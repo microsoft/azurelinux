@@ -21,18 +21,18 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytest-dev/pytest-xdist
 Source0:        https://files.pythonhosted.org/packages/5d/43/9dbc32d297d6eae85d6c05dc8e8d3371061bd6cbe56a2f645d9ea4b53d9b/%{pypi_name}-%{version}.tar.gz
+
+BuildArch:      noarch
+
 BuildRequires:  python3-devel
 BuildRequires:  python3-execnet >= 1.1
 BuildRequires:  python3-filelock
+BuildRequires:  python3-pip
 BuildRequires:  python3-psutil >= 3.0.0
 BuildRequires:  python3-py
 BuildRequires:  python3-pytest-forked
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
-BuildArch:      noarch
-%if %{with_check}
-BuildRequires:  python3-pip
-%endif
 
 %description %{_description}
 
