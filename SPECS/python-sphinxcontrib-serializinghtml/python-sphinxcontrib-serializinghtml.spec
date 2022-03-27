@@ -1,15 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name sphinxcontrib-serializinghtml
 
-# when bootstrapping sphinx, we cannot run tests yet
-%bcond_without check
-
+Summary:        Sphinx extension for serialized HTML
 Name:           python-%{pypi_name}
 Version:        1.1.5
 Release:        4%{?dist}
-Summary:        Sphinx extension for serialized HTML
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://sphinx-doc.org/
 Source0:        https://files.pythonhosted.org/packages/b5/72/835d6fadb9e5d02304cf39b18f93d227cd93abd3c41ebf58e6853eeb1455/%{pypi_name}-%{version}.tar.gz
 
@@ -28,15 +25,13 @@ BuildRequires:  python3-sphinx
 sphinxcontrib-serializinghtml is a sphinx extension which outputs "serialized"
 HTML files (json and pickle).
 
-
 %package -n     python3-%{pypi_name}
-Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
+Summary:        %{summary}
 
 %description -n python3-%{pypi_name}
 sphinxcontrib-serializinghtml is a sphinx extension which outputs "serialized"
 HTML files (json and pickle).
-
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
@@ -78,7 +73,6 @@ popd
 %{python3_sitelib}/sphinxcontrib/
 %{python3_sitelib}/sphinxcontrib_serializinghtml-%{version}-py%{python3_version}-*.pth
 %{python3_sitelib}/sphinxcontrib_serializinghtml-%{version}-py%{python3_version}.egg-info/
-
 
 %changelog
 * Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.5-4
