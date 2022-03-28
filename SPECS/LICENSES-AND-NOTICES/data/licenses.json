@@ -1881,6 +1881,7 @@
                 "python-sphinx_rtd_theme",
                 "python-sphinxcontrib-apidoc",
                 "python-sphinxcontrib-httpdomain",
+                "python-sphinxcontrib-serializinghtml",
                 "python-sqlalchemy",
                 "python-stestr",
                 "python-stevedore",

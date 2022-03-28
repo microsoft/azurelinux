@@ -23854,8 +23854,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-xdist",
-          "version": "2.5.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/5d/43/9dbc32d297d6eae85d6c05dc8e8d3371061bd6cbe56a2f645d9ea4b53d9b/pytest-xdist-2.5.0.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/17/18/bb102b7131f1c08e5d9f0a6a5904e0b4cf02160bdde1645fc386461b5423/pytest-xdist-2.1.0.tar.gz"
         }
       }
     },
@@ -24296,6 +24296,16 @@
           "name": "python-sphinxcontrib-httpdomain",
           "version": "1.7.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-httpdomain/sphinxcontrib-httpdomain-1.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinxcontrib-serializinghtml",
+          "version": "1.1.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/b5/72/835d6fadb9e5d02304cf39b18f93d227cd93abd3c41ebf58e6853eeb1455/sphinxcontrib-serializinghtml-1.1.5.tar.gz"
         }
       }
     },
