@@ -21,6 +21,7 @@ BuildRequires:  python3-xml
 
 Requires:       python3
 Requires:       python3-libs
+Requires:       python3-tomli
 
 %description
 setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
@@ -56,6 +57,7 @@ python3 setup.py test
 %changelog
 * Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.2-1
 - Updating to version 6.4.2.
+- Adding a dependency on 'python3-tomli'.
 - Removing Python 2 version.
 
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.1.0-4
