@@ -67,7 +67,6 @@ cp -p src/yacc.linux \
 %attr(755, root, root) %{_bindir}/%{name}
 
 %changelog
-cl
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.14-26
 - Move to SPECS
 - License verified
