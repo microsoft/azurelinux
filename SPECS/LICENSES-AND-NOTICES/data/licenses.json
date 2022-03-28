@@ -1741,6 +1741,7 @@
                 "python-flake8",
                 "python-flask",
                 "python-flit",
+                "python-flit-core",
                 "python-fluidity-sm",
                 "python-frozendict",
                 "python-funcsigs",

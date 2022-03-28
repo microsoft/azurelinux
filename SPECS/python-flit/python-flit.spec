@@ -1,46 +1,45 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# circular build dependency on requests-download and testpath
-%bcond_with tests
-
 %global srcname flit
 
 Name:		python-%{srcname}
-Version:	2.2.0
-Release:	4%{?dist}
+Version:	3.7.1
+Release:	2%{?dist}
 Summary:	Simplified packaging of Python modules
 
-# ./flit/logo.py  under ASL 2.0 license
+# ./flit/log.py under ASL 2.0 license
 # ./flit/upload.py under PSF license
 License:	BSD and ASL 2.0 and Python
 
 URL:		https://flit.readthedocs.io/en/latest/
-Source0:	https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
+Source0:	https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
 
 # For the tests
 Source1:	https://pypi.org/pypi?%3Aaction=list_classifiers#/classifiers.lst
 
 BuildArch:	noarch
 BuildRequires:	python3-devel
+BuildRequires:	pyproject-rpm-macros >= 0-40
 BuildRequires:	python3-pip
+BuildRequires:	python3-flit-core
+BuildRequires:	python3-tomli
+
+%if %{with_check}
+# Runtime deps, others
 BuildRequires:	python3-requests
 BuildRequires:	python3-docutils
 BuildRequires:	python3-pygments
-BuildRequires:	python3-pytoml
+BuildRequires:	python3-tomli-w
 
-%if %{with tests}
+# Test deps
 BuildRequires:	/usr/bin/python
 BuildRequires:	python3-pytest
 BuildRequires:	python3-responses
 
-# Requires flit to build:
+# Test deps that require flit to build:
 BuildRequires:	python3-testpath
 BuildRequires:	python3-requests-download
 %endif
-
-# https://pypi.python.org/pypi/tornado
-# ./flit/logo.py unkown version
-Provides:    bundled(python-tornado)
 
 %global _description %{expand:
 Flit is a simple way to put Python packages and modules on PyPI.
@@ -63,50 +62,27 @@ Summary:	%{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 Requires:	python3-%{srcname}-core = %{version}-%{release}
 
+# https://pypi.python.org/pypi/tornado
+# ./flit/log.py unknown version
+Provides:	bundled(python3dist(tornado))
 
 # soft dependency: (WARNING) Cannot analyze code. Pygments package not found.
 Recommends:	python3-pygments
 
 %description -n python3-%{srcname} %_description
 
-
-%package -n python3-%{srcname}-core
-Summary:	PEP 517 build backend for packages using Flit
-%{?python_provide:%python_provide python3-%{srcname}-core}
-Conflicts:	python3-%{srcname} < 2.1.0-2
-Requires:	python3-pytoml
-
-%description -n python3-%{srcname}-core
-This provides a PEP 517 build backend for packages using Flit.
-The only public interface is the API specified by PEP 517,
-at flit_core.buildapi.
-
-
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 
 %build
 export FLIT_NO_NETWORK=1
 
-# first, build flit_core with self
-# TODO do it in a less hacky way, this is reconstructed from pyoroject.toml
-cd flit_core
-PYTHONPATH=$PWD %{python3} -c 'from flit_core.build_thyself import build_wheel; build_wheel(".")'
-
-# %%py3_install_wheel unfortunately hardcodes installing from dist/
-mkdir ../dist
-mv flit_core-%{version}-py2.py3-none-any.whl ../dist
-cd -
-
-PYTHONPATH=$PWD:$PWD/flit_core %{python3} -m flit build --format wheel
-
+export PYTHONPATH=$PWD:$PWD/flit_core
+%pyproject_wheel
 
 %install
-%py3_install_wheel flit_core-%{version}-py2.py3-none-any.whl
-%py3_install_wheel flit-%{version}-py3-none-any.whl
+%pyproject_install
 
-
-%if %{with tests}
 %check
 # flit attempts to download list of classifiers from PyPI, but not if it's cached
 # test_invalid_classifier fails without the list
@@ -114,10 +90,7 @@ mkdir -p fake_cache/flit
 cp %{SOURCE1} fake_cache/flit
 export XDG_CACHE_HOME=$PWD/fake_cache
 
-export PYTHONPATH=%{buildroot}%{python3_sitelib}
-pytest-3
-%endif
-
+%pytest
 
 %files -n python3-%{srcname}
 %license LICENSE
@@ -126,22 +99,66 @@ pytest-3
 %{python3_sitelib}/flit/
 %{_bindir}/flit
 
-
-%files -n python3-%{srcname}-core
-%license LICENSE
-%doc flit_core/README.rst
-%{python3_sitelib}/flit_core-*.dist-info/
-%{python3_sitelib}/flit_core/
-
-
 %changelog
-* Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.0-4
+* Mon Mar 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.1-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
 
-* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.2.0-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Add missing dependency on pytoml
-- Turn off tests to avoid circular dependency.
+* Wed Mar 16 2022 Charalampos Stratakis <cstratak@redhat.com> - 3.7.1-1
+- Update to 3.7.1
+- Fixes: rhbz#2057214
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Nov 29 2021 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.5.1-1
+- Update to 3.5.1
+
+* Tue Oct 26 2021 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.4.0-1
+- Update to 3.4.0
+
+* Wed Aug 04 2021 Tomas Hrnciar <thrnciar@redhat.com> - 3.3.0-1
+- Update to 3.3.0
+- Fixes: rhbz#1988744
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.2.0-4
+- Rebuilt for Python 3.10
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.2.0-3
+- Bootstrap for Python 3.10
+
+* Sat May 29 2021 Miro Hrončok <mhroncok@redhat.com> - 3.2.0-2
+- Adapt to pyproject-rpm-macros 0-40+
+
+* Tue Mar 30 2021 Karolina Surma <ksurma@redhat.com> - 3.2.0-1
+- Update to 3.2.0
+Resolves: rhbz#1940399
+- Remove tests from the flip_core package
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Nov 19 2020 Miro Hrončok <mhroncok@redhat.com> - 3.0.0-2
+- Replace deprecated pytoml with toml
+
+* Mon Sep 21 2020 Tomas Hrnciar <thrnciar@redhat.com> - 3.0.0-1
+- Update to 3.0.0
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 2.3.0-3
+- Rebuilt for Python 3.9
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 2.3.0-2
+- Bootstrap for Python 3.9
+
+* Mon May 11 2020 Tomas Hrnciar <thrnciar@redhat.com> - 2.3.0-1
+- Update to 2.3.0
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

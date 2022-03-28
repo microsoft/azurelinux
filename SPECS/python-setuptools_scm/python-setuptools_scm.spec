@@ -19,10 +19,6 @@ BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 
-Requires:       python3
-Requires:       python3-libs
-Requires:       python3-tomli
-
 %description
 setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
 
@@ -30,6 +26,10 @@ It also handles file finders for the supported scm’s.
 
 %package -n     python3-setuptools_scm
 Summary:        python-setuptools_scm
+
+Requires:       python3
+Requires:       python3-libs
+Requires:       python3-tomli
 
 Provides:       %{name} = %{version}-%{release}
 

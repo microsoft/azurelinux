@@ -27,6 +27,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-execnet >= 1.1
 BuildRequires:  python3-filelock
+BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-psutil >= 3.0.0
 BuildRequires:  python3-py

@@ -22494,8 +22494,8 @@
         "type": "other",
         "other": {
           "name": "python-flit",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/takluyver/flit/archive/2.2.0/flit-2.2.0.tar.gz"
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/takluyver/flit/archive/3.7.1/flit-3.7.1.tar.gz"
         }
       }
     },

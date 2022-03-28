@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "classifiers.lst": "35b7b3ec78bf9ea45e4c0fbaba38f85a5714de28c993a55cd8dee499f55245dc",
-  "python-flit-2.2.0.tar.gz": "26c53b63199f19086ec76de0058e3865a31602cab9882de26fb5e70bb2c27d88"
+    "classifiers.lst": "c1ba7f56d9886590f20f25078d8ccd6b50333cdc6c9a7125243df72767f79da5",
+    "flit-3.7.1.tar.gz": "59d8a4dea4c9d6678853f2643abac028f5efeb9db42e14dd846524b061cb9446"
  }
 }
