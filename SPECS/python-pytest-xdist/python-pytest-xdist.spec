@@ -33,6 +33,8 @@ BuildRequires:  python3-py
 BuildRequires:  python3-pytest-forked
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-tomli
+BuildRequires:  python3-wheel
 
 %description %{_description}
 
