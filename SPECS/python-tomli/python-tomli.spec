@@ -22,9 +22,9 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-dateutil
-BuildRequires:  python3-pluggy
 # Upstream test requirements are in tests/requirements.txt,
 # but they're mixed together with coverage ones. Tests only need:
 BuildRequires:  python3-pytest
@@ -51,6 +51,7 @@ Summary:        %{summary}
 %pyproject_save_files tomli
 
 %check
+pip3 install more_itertools pluggy
 %py3_check_import tomli
 # assert the properly built package has no runtime requires
 # if it does, we need to change the bootstrap metadata
