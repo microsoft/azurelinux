@@ -19,7 +19,7 @@
 Summary:        Pure Java implementation of XZ compression
 Name:           xz-java
 Version:        1.8
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Public Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -79,6 +79,10 @@ cp -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8-5
+- Move to SPECS
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

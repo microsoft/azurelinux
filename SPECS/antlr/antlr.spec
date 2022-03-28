@@ -21,8 +21,8 @@
 Summary:        Another Tool for Language Recognition
 Name:           antlr
 Version:        2.7.7
-Release:        122%{?dist}
-License:        GPL-2.0-or-later AND SUSE-Public-Domain AND MIT
+Release:        123%{?dist}
+License:        Public Domain
 Group:          Development/Tools/Other
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -208,6 +208,11 @@ find doc -type f | xargs chmod 0644
 %endif
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.7.7-123
+- Move to SPECS
+- License verified
+- Note, antlr2 is actually public domain https://www.antlr2.org/license.html
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.7-122
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
