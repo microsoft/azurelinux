@@ -42,10 +42,13 @@ tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 go build -mod=vendor -v -a -o terraform
 
+%check
+go test -mod=vendor
+./terraform -help
+
 %install
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
-
 
 %files
 %defattr(-,root,root)
