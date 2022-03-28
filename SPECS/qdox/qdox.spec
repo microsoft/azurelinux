@@ -18,7 +18,7 @@
 Summary:        Tool to extract class/interface/method definitions from sources
 Name:           qdox
 Version:        2.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -98,6 +98,9 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %doc README.md
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0.0-2
+- Move to SPECS
+
 * Thu Feb 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-1
 - Removing docs.
 - License verified.

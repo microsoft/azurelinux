@@ -18,7 +18,7 @@
 Summary:        Java regression test package
 Name:           junit
 Version:        4.13
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        EPL-1.0
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -120,6 +120,10 @@ java -cp %{buildroot}/%{_javadir}/%{name}.jar: test 2>&1 | \
 %doc doc/*
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.13-3
+- Move to SPECS
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.13-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

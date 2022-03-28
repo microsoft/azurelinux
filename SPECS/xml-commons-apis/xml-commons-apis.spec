@@ -20,7 +20,7 @@
 Summary:        APIs for DOM, SAX, and JAXP
 Name:           xml-commons-apis
 Version:        1.4.01
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0 AND W3C AND SUSE-Public-Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -114,6 +114,9 @@ rm -rf build/docs/javadoc
 %{_javadir}/*
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.4.01-6
+- Move to SPECS
+
 * Thu Jan 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.01-5
 - Updated spec to enabled build with new tooling.
 - Removed 'javadoc' and 'manual' subpackages.

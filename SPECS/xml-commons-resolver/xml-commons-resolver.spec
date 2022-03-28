@@ -19,7 +19,7 @@
 
 Name:           xml-commons-resolver
 Version:        1.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Resolver subproject of xml-commons
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -134,6 +134,10 @@ install -m 0644 %{SOURCE5} %{buildroot}%{resolverdir}/CatalogManager.properties
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.2-5
+- Move to SPECS
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

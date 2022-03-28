@@ -137,6 +137,8 @@ pip3 install -r test-requirements.txt
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.0.0-1
 - Update source to v6.0.0
 - Update remove-headless-from-java-requires.patch
+- Add undeprecate_add_maven_depmap.patch to support legacy macros
+    while we wait for maven to be fixed (so that the new macros can be used)
 - Add javapackages-generators 
 
 * Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 5.3.0-14

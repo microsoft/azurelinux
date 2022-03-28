@@ -135,6 +135,7 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 * Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.11-31
 - Update to version 0.11b, published 20160615
 - Clean up old/deprecated patches 
+- License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-30
 - Converting the 'Release' tag to the '[number].[distribution]' format.

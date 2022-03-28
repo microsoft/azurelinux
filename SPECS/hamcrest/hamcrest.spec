@@ -21,7 +21,7 @@
 Summary:        Library of matchers for building test expressions
 Name:           hamcrest
 Version:        1.3
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -187,6 +187,10 @@ cp -pr %{name}-examples %{buildroot}%{_datadir}/%{name}/
 %{_datadir}/%{name}
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.3-15
+- Move to SPECS
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-14
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

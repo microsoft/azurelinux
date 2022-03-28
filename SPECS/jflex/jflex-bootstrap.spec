@@ -97,6 +97,7 @@ install -p -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/jflex
 * Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.4.3-31
 - Remove condition macros for with/without, bootstrap; redundant with separate spec
 - Switch source to one that is actively published on github
+- License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.3-30
 - Converting the 'Release' tag to the '[number].[distribution]' format.

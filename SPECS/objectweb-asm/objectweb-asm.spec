@@ -17,13 +17,13 @@
 
 Name:           objectweb-asm
 Version:        7.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Java bytecode manipulation framework
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://asm.objectweb.org/
+URL:            https://asm.ow2.io/
 # ./generate-tarball.sh
 Source0:        %{name}-%{version}.tar.xz
 Source1:        %{name}-%{version}-build.tar.xz
@@ -144,6 +144,10 @@ done
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 7.2-3
+- Move to SPECS
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.2-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

@@ -20,7 +20,7 @@
 Summary:        Parser Generator with Java Extension
 Name:           byaccj
 Version:        1.14
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        Public Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -67,6 +67,11 @@ cp -p src/yacc.linux \
 %attr(755, root, root) %{_bindir}/%{name}
 
 %changelog
+cl
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.14-26
+- Move to SPECS
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14-25
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
