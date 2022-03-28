@@ -1,20 +1,16 @@
 %global pypi_name tomli
 %global distinfo %{pypi_name}-%{version}+rpmbootstrap.dist-info
+%global _description %{expand:
+Tomli is a Python library for parsing TOML.
+Tomli is fully compatible with TOML v1.0.0.}
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# This package buildrequires flit_core to build the wheel, but flit_core requires tomli.
-# To bootstrap, we copy the files to appropriate locations manually and create a minimal dist-info metadata.
-# Note that as a pure Python package, the wheel contains no pre-built binary stuff.
-# When bootstrap is enabled, we don't run tests either, just an import check.
-%bcond_without     bootstrap
-
+Summary:        A little TOML parser for Python
 Name:           python-%{pypi_name}
 Version:        2.0.1
 Release:        2%{?dist}
-Summary:        A little TOML parser for Python
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://pypi.org/project/%{pypi_name}/
 Source0:        https://github.com/hukkin/%{pypi_name}/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
@@ -26,23 +22,18 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
 %if %{with_check}
+BuildRequires:  python3-dateutil
 # Upstream test requirements are in tests/requirements.txt,
 # but they're mixed together with coverage ones. Tests only need:
 BuildRequires:  python3-pytest
-BuildRequires:  python3-dateutil
 %endif
 
-%global _description %{expand:
-Tomli is a Python library for parsing TOML.
-Tomli is fully compatible with TOML v1.0.0.}
-
-
-%description %_description
+%description %{_description}
 
 %package -n python3-%{pypi_name}
 Summary:        %{summary}
 
-%description -n python3-%{pypi_name} %_description
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
 %autosetup -p1 -n %{pypi_name}-%{version}
@@ -59,13 +50,11 @@ Summary:        %{summary}
 
 %check
 %py3_check_import tomli
-%if %{without bootstrap}
 # assert the properly built package has no runtime requires
 # if it does, we need to change the bootstrap metadata
 test -f %{buildroot}%{python3_sitelib}/tomli-%{version}.dist-info/METADATA
 ! grep '^Requires-Dist:' %{buildroot}%{python3_sitelib}/tomli-%{version}.dist-info/METADATA
 %pytest
-%endif
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
 %doc README.md
