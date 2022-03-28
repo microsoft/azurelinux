@@ -12,6 +12,7 @@ The pytest-xdist plugin extends py.test with some unique test execution modes:
   again a full run is performed.
 * Multi-Platform coverage: you can specify different Python interpreters or
   different platforms and run tests in parallel on all of them.}
+
 Summary:        py.test plugin for distributed testing and loop-on-failing modes
 Name:           python-%{pypi_name}
 Version:        2.5.0

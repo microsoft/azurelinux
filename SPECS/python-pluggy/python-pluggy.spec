@@ -21,6 +21,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-pytest
 %endif
@@ -43,6 +44,8 @@ The plugin manager stripped of pytest specific details.
 %py3_install
 
 %check
+pip3 install more-itertools
+
 # TODO investigate test_load_setuptools_instantiation failure
 PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest testing -k "not test_load_setuptools_instantiation"
 
