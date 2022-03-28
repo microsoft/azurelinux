@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "docker.service": "1a748c285a3cb5c8fb01db35d5b1f9029d170fd4b4e8428fec745b9bf0424bbc",
+  "docker.service": "b150b3ce0947a65c655ed09dfe4e48b7464c60542f9f9902330288bbf87af38e",
   "docker.socket": "51a06786cae46bc63b7314c25d0bd5bb2e676120d80874b99e35bf60d0b0ffa8",
   "moby-engine-20.10.12.tar.gz": "a8ee80d31c7b74f687a837cd2a8570578f118179fba0844c5ee88f90fe180155",
   "moby-libnetwork-20.10.12.tar.gz": "96799687896a565a43a8287b4bc1b4e191f457f9cc9276b5a52ba6a614188e10"
