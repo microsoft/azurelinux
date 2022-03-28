@@ -2384,6 +2384,7 @@
                 "swupdate",
                 "SymCrypt",
                 "SymCrypt-OpenSSL",
+                "terraform",
                 "tinyxml2",
                 "toml11",
                 "tracelogging",

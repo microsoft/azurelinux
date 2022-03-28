@@ -27996,6 +27996,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "terraform",
+          "version": "1.1.7",
+          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "texinfo",
           "version": "6.8",
           "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz"
