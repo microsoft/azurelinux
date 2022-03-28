@@ -25,20 +25,20 @@ BuildRequires:	python3-flit-core
 BuildRequires:	python3-tomli
 
 %if %{with_check}
+BuildRequires:	python3-attrs
+BuildRequires:	python3-pytest
+BuildRequires:  python3-pluggy
+BuildRequires:	python3-responses
+
 # Runtime deps, others
 BuildRequires:	python3-requests
 BuildRequires:	python3-docutils
 BuildRequires:	python3-pygments
-BuildRequires:	python3-tomli-w
-
-# Test deps
-BuildRequires:	/usr/bin/python
-BuildRequires:	python3-pytest
-BuildRequires:	python3-responses
+#BuildRequires:	python3-tomli-w
 
 # Test deps that require flit to build:
 BuildRequires:	python3-testpath
-BuildRequires:	python3-requests-download
+#BuildRequires:	python3-requests-download
 %endif
 
 %global _description %{expand:

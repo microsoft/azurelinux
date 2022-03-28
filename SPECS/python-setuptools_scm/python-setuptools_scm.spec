@@ -19,6 +19,11 @@ BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+%endif
+
 %description
 setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
 

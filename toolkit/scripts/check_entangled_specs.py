@@ -36,6 +36,10 @@ version_matching_groups = [
     frozenset([
         "SPECS/dbus/dbus.spec",
         "SPECS-EXTENDED/dbus-x11/dbus-x11.spec"
+    ]),
+    frozenset([
+        "SPECS/python-flit/python-flit.spec",
+        "SPECS/python-flit-core/python-flit-core.spec"
     ])
 ]
 

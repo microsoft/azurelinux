@@ -22,7 +22,9 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
 %if %{with_check}
+BuildRequires:  python3-attrs
 BuildRequires:  python3-dateutil
+BuildRequires:  python3-pluggy
 # Upstream test requirements are in tests/requirements.txt,
 # but they're mixed together with coverage ones. Tests only need:
 BuildRequires:  python3-pytest

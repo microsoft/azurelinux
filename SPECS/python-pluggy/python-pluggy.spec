@@ -1,59 +1,49 @@
+%global pypi_name pluggy
+%global _description\
+The plugin manager stripped of pytest specific details.
+
+Summary:        The plugin manager stripped of pytest specific details
+Name:           python-pluggy
+Version:        1.0.0
+Release:        3%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global pypi_name pluggy
-
-# Turn the tests off when bootstrapping Python, because pytest requires pluggy
-%bcond_without tests
-
-Name:           python-pluggy
-Version:        0.13.1
-Release:        2%{?dist}
-Summary:        The plugin manager stripped of pytest specific details
-
-License:        MIT
 URL:            https://github.com/pytest-dev/pluggy
-Source0:        %{pypi_source}
-
+Source0:        https://files.pythonhosted.org/packages/a1/16/db2d7de3474b6e37cbb9c008965ee63835bba517e22cdb8c35b5116b5ce1/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
+BuildRequires:  python3-packaging
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
-%if %{with tests}
+
+%if %{with_check}
 BuildRequires:  python3-pytest
-# workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1756902
 %endif
 
-%global _description\
-The plugin manager stripped of pytest specific details.
-
-%description %_description
+%description %{_description}
 
 %package -n python3-%{pypi_name}
-Summary:  %summary
+Summary:        %{summary}
 
 %description -n python3-%{pypi_name}
 The plugin manager stripped of pytest specific details.
 
-
 %prep
 %autosetup -p1 -n %{pypi_name}-%{version}
-
 
 %build
 %py3_build
 
-
 %install
 %py3_install
 
-%if %{with tests}
 %check
 # TODO investigate test_load_setuptools_instantiation failure
-PYTHONPATH=%{buildroot}%{python3_sitelib} %{__python3} -m pytest testing -k "not test_load_setuptools_instantiation"
-%endif
-
+PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest testing -k "not test_load_setuptools_instantiation"
 
 %files -n python3-%{pypi_name}
 %{python3_sitelib}/%{pypi_name}/
@@ -61,11 +51,31 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %{__python3} -m pytest testing -k "not
 %doc README.rst
 %license LICENSE
 
-
 %changelog
-* Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 0.13.1-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove conditions that do not apply to CBL-Mariner
+* Mon Mar 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Aug 27 2021 Matthias Runge <mrunge@redhat.com> - 1.0.0-1
+- update to 1.0.0 (rhbz#1997706)
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 02 2021 Python Maint <python-maint@redhat.com> - 0.13.1-5
+- Rebuilt for Python 3.10
+
+* Wed Jun 02 2021 Python Maint <python-maint@redhat.com> - 0.13.1-4
+- Bootstrap for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jun 05 2020 Matthias Runge <mrunge@redhat.com> - 0.13.1-1
 - update to 0.13.1
