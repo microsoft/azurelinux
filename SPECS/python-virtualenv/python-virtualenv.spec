@@ -21,14 +21,7 @@ BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
 
 %if %{with_check}
-BuildRequires:  python3-atomicwrites
-BuildRequires:  python3-attrs
-BuildRequires:  python3-appdirs
-BuildRequires:  python3-coverage
 BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-cov
-BuildRequires:  python3-six
 %endif
 
 Requires:       python3
@@ -47,11 +40,8 @@ virtualenv is a tool to create isolated Python environment.
 %py3_install
 
 %check
-pip3 install \
-    more-itertools \
-    pluggy
-
-pytest3 -vv tests/unit
+pip3 install tox
+tox -e py
 
 %files -n python3-virtualenv
 %defattr(-,root,root,-)

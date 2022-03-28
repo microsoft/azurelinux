@@ -30,8 +30,9 @@ urllib3 is a powerful, sanity-friendly HTTP client for Python. Much of the Pytho
 
 %prep
 %autosetup -p 1 -n urllib3-%{version}
-# Dummyserver tests are failing when running in chroot. So disabling the tests.
+# remove tests that are failing when running in chroot.
 rm -rf test/with_dummyserver/
+rm -rf test/contrib/
 
 %build
 %py3_build
@@ -40,21 +41,9 @@ rm -rf test/with_dummyserver/
 %py3_install
 
 %check
-nofiles=$(ulimit -n)
-ulimit -n 5000
-pip3 install -r dev-requirements.txt
-
-ignoretestslist='not test_select_interrupt_exception and not test_selector_error and not timeout and not test_request_host_header_ignores_fqdn_dot and not test_dotted_fqdn'
-
-PYTHONPATH="%{buildroot}%{$python3_sitelib}" pytest \
-                --ignore=test/appengine \
-                --ignore=test/with_dummyserver/test_proxy_poolmanager.py \
-                --ignore=test/with_dummyserver/test_poolmanager.py \
-                --ignore=test/contrib/test_pyopenssl.py \
-                --ignore=test/contrib/test_securetransport.py \
-                -k "${ignoretestslist}" \
-                urllib3 test
-ulimit -n $nofiles
+pip3 install --user --upgrade nox
+PATH="$PATH:/root/.local/bin/"
+nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
 
 %files -n python3-urllib3
 %defattr(-,root,root,-)

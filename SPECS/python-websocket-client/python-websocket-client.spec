@@ -22,7 +22,13 @@ Requires:       python3
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-coverage
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-six
 %endif
 
 %description -n python3-websocket-client
@@ -38,9 +44,12 @@ WebSocket client for python3
 %py3_install
 
 %check
-pip3 install six
-pip3 install unittest2==0.8.0
-%python3 setup.py test
+pip3 install \
+    more-itertools \
+    pluggy
+# do not execute 'echo-server' test since it requires python websockets
+# which do not work well from a chroot
+pytest3 -vv websocket/tests -k "not echo-server"
 
 %files -n python3-websocket-client
 %defattr(-,root,root,-)
