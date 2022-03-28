@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ URL:            https://github.com/SELinuxProject/refpolicy
 Source0:        %{url}/releases/download/RELEASE_${refpolicy_major}_${refpolicy_minor}/refpolicy-%{version}.tar.bz2
 Source1:        Makefile.devel
 Source2:        booleans_targeted.conf
+Source3:        modules_targeted.conf
 Patch1:         0001-Makefile-Revise-relabel-targets-to-relabel-all-secla.patch
 Patch2:         0002-cronyd-Add-dac_read_search.patch
 Patch3:         0003-Temporary-fix-for-wrong-audit-log-directory.patch
@@ -25,6 +26,7 @@ Patch5:         0005-systemd-Add-systemd-homed-and-systemd-userdbd.patch
 Patch6:         0006-systemd-ssh-Crypto-sysctl-use.patch
 Patch7:         0007-systemd-Additional-fixes-for-fs-getattrs.patch
 Patch8:         0008-systemd-Updates-for-generators-and-kmod-static-nodes.patch
+Patch9:         0009-Add-containers-policy.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -96,12 +98,25 @@ enforced by the kernel when running with SELinux enabled.
 %{_sharedstatedir}/selinux/%{policy_name}/active/homedir_template
 %{_sharedstatedir}/selinux/%{policy_name}/active/seusers
 %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts
-%{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
-%ghost %{_sharedstatedir}/selinux/%{policy_name}/active/policy.linked
-%ghost %{_sharedstatedir}/selinux/%{policy_name}/active/seusers.linked
-%ghost %{_sharedstatedir}/selinux/%{policy_name}/active/users_extra.linked
+%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
+%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.linked
+%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/seusers.linked
+%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/users_extra.linked
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
+%{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/base
+
+%package modules
+Summary:        SELinux policy modules
+Requires:       selinux-policy = %{version}-%{release}
+Requires(pre):  selinux-policy = %{version}-%{release}
+
+%description modules
+Additional SELinux policy modules
+
+%files modules
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
+%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/base
+%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/modules/disabled
 
 %package devel
 Summary:        SELinux policy devel
@@ -143,14 +158,22 @@ SELinux policy documentation package
 
 %define makeCmds() \
 %make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} bare \
+install -m0644 %{_sourcedir}/modules_%{1}.conf policy/modules.conf \
 %make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} conf \
 install -m0644 %{_sourcedir}/booleans_%{1}.conf policy/booleans.conf
+
+# After all the modules are inserted into the module store, the non-base
+# modules are disabled so the selinux-policy package only has the base module.
+# The selinux-policy-modules RPM then drops the disable flags using %exclude
+# in the %files section so the entire policy is enabled when the
+# selinux-policy-modules RPM is installed.
 %define installCmds() \
 %make_build UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} base.pp \
 %make_build validate UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} modules \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} install \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} %{common_makeopts} install-appconfig \
 make UNK_PERMS=%{4} NAME=%{1} TYPE=%{2} UBAC=%{3} SEMODULE="semodule -p %{buildroot} -X 100 " load \
+semodule -p %{buildroot} -l | grep -v base | xargs semodule -p %{buildroot} -d \
 mkdir -p %{buildroot}/%{_sysconfdir}/selinux/%{1}/logins \
 touch %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts.subs \
 install -m0644 config/appconfig-%{2}/securetty_types %{buildroot}%{_sysconfdir}/selinux/%{1}/contexts/securetty_types \
@@ -256,6 +279,11 @@ fi
 %postInstall $1 %{policy_name}
 exit 0
 
+%post modules
+%{_sbindir}/semodule -B -n -s %{policy_name}
+[ "${SELINUXTYPE}" == "%{policy_name}" ] && selinuxenabled && load_policy
+exit 0
+
 %postun
 if [ $1 = 0 ]; then
      setenforce 0 2> /dev/null
@@ -274,6 +302,12 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Thu Mar 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.20220106-3
+- chpebeni@microsoft.com, 2.20220106-2: Split policy modules to a subpackage. 
+  Keep core images supported by base module.
+  Update systemd-homed and systemd-userdbd patch to upstreamed version.
+  Backport containers policy..
+
 * Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.20220106-2
 - Bumping release number to force rebuild against new .so files
   generated by selinux upgrade.

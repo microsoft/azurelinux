@@ -11,7 +11,7 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/systemd.te  | 5 ++++-
  3 files changed, 6 insertions(+), 1 deletion(-)
 
-MSFT_TAG: pending
+MSFT_TAG: upstreamed
 
 diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
 index 61ae572e2..094c24d6d 100644
