@@ -22503,6 +22503,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-flit-core",
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/takluyver/flit/archive/3.7.1/flit-3.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-fluidity-sm",
           "version": "0.2.0",
           "downloadUrl": "https://github.com/nsi-iff/fluidity/archive/0.2.0/python-fluidity-sm-0.2.0.tar.gz"
