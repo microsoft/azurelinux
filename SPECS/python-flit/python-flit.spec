@@ -67,11 +67,6 @@ Provides:       bundled(python3dist(tornado))
 %autosetup -p1 -n %{srcname}-%{version}
 
 %build
-if [[ ! -f "%{_bindir}/python" ]]
-then
-  ln -s "$(which python3)" "%{_bindir}/python"
-fi
-
 export FLIT_NO_NETWORK=1
 
 export PYTHONPATH=$PWD:$PWD/flit_core
@@ -81,6 +76,11 @@ export PYTHONPATH=$PWD:$PWD/flit_core
 %pyproject_install
 
 %check
+if [[ ! -f "%{_bindir}/python" ]]
+then
+  ln -s "$(which python3)" "%{_bindir}/python"
+fi
+
 pip3 install more-itertools pluggy pytest tomli_w
 
 # flit attempts to download list of classifiers from PyPI, but not if it's cached
