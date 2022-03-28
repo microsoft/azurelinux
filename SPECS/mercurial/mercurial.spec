@@ -59,7 +59,7 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Tue Mar 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.0.3-2
+* Tue Mar 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.0.3-2
 - Remove unwanted check-time dependency on python-setuptools (replace with py3 version)
 
 *   Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 6.0.3-1
