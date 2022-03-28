@@ -24463,6 +24463,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-tomli",
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/hukkin/tomli/archive/refs/tags/2.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-toolz",
           "version": "0.11.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/d6/0d/fdad31347bf3d058002993a094da1ca95f0f3ef9beec08856d0fe4ad9766/toolz-0.11.1.tar.gz"

@@ -1898,6 +1898,7 @@
                 "python-testtools",
                 "python-tidy",
                 "python-toml",
+                "python-tomli",
                 "python-toolz",
                 "python-tornado",
                 "python-tox",
