@@ -2,60 +2,49 @@
 # Below "python3-flit-core" package can be built without "python3-tomli" and it can then by used during build time by "python3-tomli".
 # In the end "python3-tomli" is used to build the full "python3-flit".
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# circular build dependency on requests-download and testpath
-%bcond_without tests
-
 %global srcname flit
-
-Name:		python-%{srcname}-core
-Version:	3.7.1
-Release:	2%{?dist}
-Summary:	PEP 517 build backend for packages using Flit.
-License:	BSD
-
-URL:		https://flit.readthedocs.io/en/latest/
-Source0:	https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
-
-# For the tests
-Source1:	https://pypi.org/pypi?%3Aaction=list_classifiers#/classifiers.lst
-
-BuildArch:	noarch
-
-BuildRequires:	python3-devel
-BuildRequires:	pyproject-rpm-macros >= 0-40
-BuildRequires:	python3-pip
 
 %global _description %{expand:
 This provides a PEP 517 build backend for packages using Flit.
 The only public interface is the API specified by PEP 517,
 at flit_core.buildapi.}
 
-%description %_description
+Summary:        PEP 517 build backend for packages using Flit.
+Name:           python-%{srcname}-core
+Version:        3.7.1
+Release:        2%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://flit.readthedocs.io/en/latest/
+Source0:        https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
+
+BuildArch:      noarch
+
+BuildRequires:  pyproject-rpm-macros >= 0-40
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+
+%description %{_description}
 
 %package -n python3-%{srcname}-core
-Summary:	PEP 517 build backend for packages using Flit.
 %{?python_provide:%python_provide python3-%{srcname}-core}
-Conflicts:	python3-%{srcname} < 2.1.0-2
+Summary:        PEP 517 build backend for packages using Flit.
 
-%description -n python3-%{srcname}-core %_description
+%description -n python3-%{srcname}-core %{_description}
 
 %prep
-%autosetup -p1 -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}/flit_core
 
 %build
 export FLIT_NO_NETWORK=1
-
-# Build flit_core with self
-cd flit_core
 %pyproject_wheel
 
 %install
 %pyproject_install
 
-# don't ship tests in flit_core package
-# if upstream decides to change the installation, it can be removed:
+# Don't ship tests in 'flit_core' package.
+# If upstream decides to change the installation, it can be removed:
 # https://github.com/takluyver/flit/issues/403
 rm -r %{buildroot}%{python3_sitelib}/flit_core/tests/
 
