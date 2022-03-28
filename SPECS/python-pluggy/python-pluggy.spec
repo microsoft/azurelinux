@@ -21,6 +21,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 
 %if %{with_check}
+BuildRequires:  python3-attrs
 BuildRequires:  python3-pytest
 %endif
 

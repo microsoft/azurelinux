@@ -1,75 +1,69 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global srcname flit
-
-Name:		python-%{srcname}
-Version:	3.7.1
-Release:	2%{?dist}
-Summary:	Simplified packaging of Python modules
-
-# ./flit/log.py under ASL 2.0 license
-# ./flit/upload.py under PSF license
-License:	BSD and ASL 2.0 and Python
-
-URL:		https://flit.readthedocs.io/en/latest/
-Source0:	https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
-
-# For the tests
-Source1:	https://pypi.org/pypi?%3Aaction=list_classifiers#/classifiers.lst
-
-BuildArch:	noarch
-BuildRequires:	python3-devel
-BuildRequires:	pyproject-rpm-macros >= 0-40
-BuildRequires:	python3-pip
-BuildRequires:	python3-flit-core
-BuildRequires:	python3-tomli
-
-%if %{with_check}
-BuildRequires:	python3-attrs
-BuildRequires:	python3-pytest
-BuildRequires:  python3-pluggy
-BuildRequires:	python3-responses
-
-# Runtime deps, others
-BuildRequires:	python3-requests
-BuildRequires:	python3-docutils
-BuildRequires:	python3-pygments
-#BuildRequires:	python3-tomli-w
-
-# Test deps that require flit to build:
-BuildRequires:	python3-testpath
-#BuildRequires:	python3-requests-download
-%endif
 
 %global _description %{expand:
 Flit is a simple way to put Python packages and modules on PyPI.
-
 Flit only creates packages in the new 'wheel' format. People using older
 versions of pip (<1.5) or easy_install will not be able to install them.
-
 Flit packages a single importable module or package at a time, using the import
 name as the name on PyPI. All sub-packages and data files within a package are
 included automatically.
-
 Flit requires Python 3, but you can use it to distribute modules for Python 2,
 so long as they can be imported on Python 3.}
 
-%description %_description
+Summary:        Simplified packaging of Python modules
+Name:           python-%{srcname}
+Version:        3.7.1
+Release:        2%{?dist}
+# ./flit/log.py under ASL 2.0 license
+# ./flit/upload.py under PSF license
+License:        BSD AND ASL 2.0 AND Python
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://flit.readthedocs.io/en/latest/
+Source0:        https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
+# For the tests
+Source1:        https://pypi.org/pypi?%{3}Aaction=list_classifiers#/classifiers.lst
 
+BuildArch:      noarch
+
+BuildRequires:  pyproject-rpm-macros >= 0-40
+BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
+BuildRequires:  python3-pip
+BuildRequires:  python3-tomli
+
+%if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
+BuildRequires:  python3-pytest
+
+# Runtime deps, others
+BuildRequires:  python3-requests
+BuildRequires:  python3-responses
+#BuildRequires:	python3-tomli-w
+
+# Test deps that require flit to build:
+BuildRequires:  python3-testpath
+#BuildRequires:	python3-requests-download
+%endif
+
+%description %{_description}
 
 %package -n python3-%{srcname}
-Summary:	%{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
-Requires:	python3-%{srcname}-core = %{version}-%{release}
+Summary:        %{summary}
+Requires:       python3-%{srcname}-core = %{version}-%{release}
+# soft dependency: (WARNING) Cannot analyze code. Pygments package not found.
+Recommends:     python3-pygments
 
 # https://pypi.python.org/pypi/tornado
 # ./flit/log.py unknown version
-Provides:	bundled(python3dist(tornado))
+Provides:       bundled(python3dist(tornado))
 
-# soft dependency: (WARNING) Cannot analyze code. Pygments package not found.
-Recommends:	python3-pygments
-
-%description -n python3-%{srcname} %_description
+%description -n python3-%{srcname} %{_description}
 
 %prep
 %autosetup -p1 -n %{srcname}-%{version}
