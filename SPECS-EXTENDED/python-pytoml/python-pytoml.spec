@@ -5,6 +5,8 @@ Distribution:   Mariner
 %global sum Parser for TOML
 %global desc A parser for TOML-0.4.0
 
+%bcond_with python2
+
 # The support for TOML 4 in python-toml is not complete. I (Julien Enselme)
 # tried to improve it (I contributed for inline object # support) but the
 # upstream maintainer is slow to respond and still hasn't published a
@@ -30,12 +32,32 @@ BuildArch:      noarch
 %description
 %{desc}
 
+
+%if %{with python2}
+%package -n     python2-%{github_name}
+BuildArch:      noarch
+BuildRequires:  python2-devel
+BuildRequires:  python2-setuptools
+Summary:        %{sum}
+%{?python_provide:%python_provide python2-%{github_name}}
+
+%description -n python2-%{github_name}
+%{desc}
+%endif # with python2
+
+
 %package -n     python%{python3_pkgversion}-%{github_name}
 Summary:        %{sum}
 BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{github_name}}
+
+%if %{without python2}
+Obsoletes:      python-%{github_name} < %{version}-%{release}
+Obsoletes:      python2-%{github_name} < %{version}-%{release}
+%endif # without python2
+
 
 %description -n python%{python3_pkgversion}-%{github_name}
 %{desc}
@@ -46,11 +68,20 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 
 
 %build
+%if %{with python2}
+%py2_build
+%endif # with python2
+
 %py3_build
 
 
 %install
 %py3_install
+
+%if %{with python2}
+%py2_install
+%endif # with python2
+
 
 # We cannot run check for now: the README ask to use git submodules, but we
 # can't just use git submodules because it requires network access and pull code
@@ -61,6 +92,16 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 # golang-github-BurntSushi-toml-test which has no release. So until improvement
 # on that side, it's better not to run check within %%check and trust the
 # upstream maintainer won't release broken stuff.
+
+
+%if %{with python2}
+%files -n python2-%{github_name}
+%doc README.md
+%license LICENSE
+%{python2_sitelib}/%{github_name}-%{version}*-py%{python2_version}.egg-info/
+%{python2_sitelib}/%{github_name}/
+%endif # with python2
+
 
 %files -n python%{python3_pkgversion}-%{github_name}
 %doc README.md
