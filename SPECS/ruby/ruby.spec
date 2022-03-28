@@ -79,7 +79,6 @@ Summary:        The Ruby standard for packaging ruby libraries
 Version:        %{rubygems_version}
 License:        Ruby OR MIT
 Requires:       ruby(release)
-Recommends:     rubygem(bundler) >= %{bundler_version}
 Recommends:     rubygem(io-console) >= %{io_console_version}
 Recommends:     rubygem(rdoc) >= %{rdoc_version}
 Provides:       gem = %{version}-%{release}
