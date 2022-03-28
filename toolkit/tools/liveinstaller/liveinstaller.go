@@ -35,6 +35,7 @@ var (
 	imagerTool         = app.Flag("imager", "Path to the imager tool.").Required().ExistingFile()
 	buildDir           = app.Flag("build-dir", "Directory to store temporary files while building.").Required().ExistingDir()
 	baseDirPath        = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
+	partitionFile	   = app.Flag("partition-file", "Path to the partition scheme file.").String()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -52,6 +53,7 @@ type imagerArguments struct {
 	emitProgress bool
 	logFile      string
 	logLevel     string
+	partitionFile string
 }
 
 func handleCtrlC(signals chan os.Signal) {
@@ -384,6 +386,7 @@ func formatImagerCommand(args imagerArguments) (program string, commandArgs []st
 		fmt.Sprintf("--base-dir=%s", args.baseDirPath),
 		fmt.Sprintf("--log-file=%s", args.logFile),
 		fmt.Sprintf("--log-level=%s", args.logLevel),
+		fmt.Sprintf("--log-level=%s", args.partitionFile),
 	}
 
 	if args.emitProgress {

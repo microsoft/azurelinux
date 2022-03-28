@@ -76,7 +76,13 @@ cd /installer
 # Turn off echoing while the installer runs to stop sensitive data from rendering in the TTY session.
 stty -echo
 
-./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $UNATTENDED_CONFIG_FILE --template-config $CONFIG_ROOT/attended_config.json \
+PREINSTALLFILE=$ISO_ROOT/config/preinstall.sh
+if [[ -f "$PREINSTALLFILE" ]]; then
+    chmod a+x "$PREINSTALLFILE"
+    source "$PREINSTALLFILE"
+fi
+
+./liveinstaller --base-dir $CONFIG_ROOT --imager /installer/imager --input $UNATTENDED_CONFIG_FILE --partition-file /tmp/part-include --template-config $CONFIG_ROOT/attended_config.json \
                 --build-dir $PWD --log-file=/installer/log.txt
 installerExitCode=$?
 
