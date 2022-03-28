@@ -19,9 +19,13 @@ URL:            https://pypi.org/project/%{pypi_name}/
 Source0:        https://github.com/hukkin/%{pypi_name}/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRequires:  python3-devel
 
-%if %{without bootstrap}
+BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+
+%if %{with_check}
 # Upstream test requirements are in tests/requirements.txt,
 # but they're mixed together with coverage ones. Tests only need:
 BuildRequires:  python3-pytest
@@ -43,19 +47,15 @@ Summary:        %{summary}
 %prep
 %autosetup -p1 -n %{pypi_name}-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires -r
+
 %build
-mkdir %{distinfo}
-cat > %{distinfo}/METADATA << EOF
-Metadata-Version: 2.2
-Name: tomli
-Version: %{version}+rpmbootstrap
-EOF
+%pyproject_wheel
 
 %install
-mkdir -p %{buildroot}%{python3_sitelib}
-cp -a tomli %{distinfo} %{buildroot}%{python3_sitelib}
-echo '%{python3_sitelib}/tomli/' > %{pyproject_files}
-echo '%{python3_sitelib}/%{distinfo}/' >> %{pyproject_files}
+%pyproject_install
+%pyproject_save_files tomli
 
 %check
 %py3_check_import tomli

@@ -7,20 +7,24 @@ Distribution:   Mariner
 
 Name:           python-pluggy
 Version:        0.13.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        The plugin manager stripped of pytest specific details
 
 License:        MIT
 URL:            https://github.com/pytest-dev/pluggy
-Source0:        %{pypi_source}
+Source0:        https://files.pythonhosted.org/packages/f8/04/7a8542bed4b16a65c2714bf76cf5a0b026157da7f75e87cc88774aa10b14/%{pypi_name}-%{version}.tar.gz
 
 
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
-%if %{with tests}
+BuildRequires:  python3-tomli
+BuildRequires:  python3-wheel
+
+%if %{with_check}
 BuildRequires:  python3-pytest
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1756902
 %endif
@@ -44,16 +48,12 @@ The plugin manager stripped of pytest specific details.
 %build
 %py3_build
 
-
 %install
 %py3_install
 
-%if %{with tests}
 %check
 # TODO investigate test_load_setuptools_instantiation failure
 PYTHONPATH=%{buildroot}%{python3_sitelib} %{__python3} -m pytest testing -k "not test_load_setuptools_instantiation"
-%endif
-
 
 %files -n python3-%{pypi_name}
 %{python3_sitelib}/%{pypi_name}/
@@ -63,6 +63,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %{__python3} -m pytest testing -k "not
 
 
 %changelog
+* Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.13.1-3
+- License verified.
+
 * Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 0.13.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove conditions that do not apply to CBL-Mariner

@@ -7,7 +7,7 @@ Distribution:   Mariner
 
 Name:		python-%{srcname}
 Version:	2.2.0
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Simplified packaging of Python modules
 
 # ./flit/logo.py  under ASL 2.0 license
@@ -135,6 +135,9 @@ pytest-3
 
 
 %changelog
+* Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.0-4
+- License verified.
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2.2.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add missing dependency on pytoml
