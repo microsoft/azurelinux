@@ -4,18 +4,21 @@
 %global ruby_libdir %{_datadir}/%{name}
 %global bigdecimal_version 3.1.1
 %global io_console_version 0.5.6
-%global psych_version      3.1.0
 %global irb_version        1.2.6
 %global json_version       2.3.0
 %global minitest_version   5.13.0
+%global rubygems_molinillo_version  0.5.7
+%global openssl_version    2.1.2
 %global power_assert_version  1.1.7
+%global psych_version      3.1.0
 %global rdoc_version       6.2.1.1
+%global rubygems_version   3.1.6
 %global test_unit_version  3.3.4
 %global gem_dir %{_libdir}/ruby/gems
 Summary:        Ruby
 Name:           ruby
 Version:        2.7.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +74,37 @@ Provides:       rubygem-json = %{version}-%{release}
 The Ruby package contains the Ruby development environment.
 This is useful for object-oriented scripting.
 
+%package -n rubygems
+Summary:        The Ruby standard for packaging ruby libraries
+Version:        %{rubygems_version}
+License:        Ruby OR MIT
+Requires:       ruby(release)
+Recommends:     rubygem(bundler) >= %{bundler_version}
+Recommends:     rubygem(io-console) >= %{io_console_version}
+Recommends:     rubygem(rdoc) >= %{rdoc_version}
+Provides:       gem = %{version}-%{release}
+Provides:       ruby(rubygems) = %{version}-%{release}
+# https://github.com/rubygems/rubygems/pull/1189#issuecomment-121600910
+Provides:       bundled(rubygem-molinillo) = %{rubygems_molinillo_version}
+BuildArch:      noarch
+
+%description -n rubygems
+RubyGems is the Ruby standard for publishing and managing third party
+libraries.
+
+%package -n rubygems-devel
+Summary:        Macros and development tools for packaging RubyGems
+Version:        %{rubygems_version}
+License:        Ruby OR MIT
+Requires:       ruby(rubygems) >= %{version}-%{release}
+# Needed for RDoc documentation format generation.
+Requires:       rubygem(json) >= %{json_version}
+Requires:       rubygem(rdoc) >= %{rdoc_version}
+BuildArch:      noarch
+
+%description -n rubygems-devel
+Macros and development tools for packaging RubyGems.
+
 %package -n rubygem-bigdecimal
 Summary:        BigDecimal provides arbitrary-precision floating point decimal arithmetic
 Version:        %{bigdecimal_version}
@@ -109,6 +143,59 @@ minitest/mock by Steven Baker, is a beautifully tiny mock object
 framework.
 minitest/pride shows pride in testing and adds coloring to your test
 output.
+
+%package -n rubygem-io-console
+Summary:        IO/Console is a simple console utilizing library
+Version:        %{io_console_version}
+License:        BSD-2-Clause OR Ruby
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Provides:       rubygem(io-console) = %{version}-%{release}
+
+%description -n rubygem-io-console
+IO/Console provides very simple and portable access to console. It doesn't
+provide higher layer features, such like curses and readline.
+
+%package -n rubygem-json
+Summary:        This is a JSON implementation as a Ruby extension in C
+Version:        %{json_version}
+# UCD: ext/json/generator/generator.c
+License:        (Ruby OR GPLv2) AND UCD
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Provides:       rubygem(json) = %{version}-%{release}
+
+%description -n rubygem-json
+This is a implementation of the JSON specification according to RFC 4627.
+You can think of it as a low fat alternative to XML, if you want to store
+data to disk or transmit it over a network rather than use a verbose
+markup language.
+
+%package -n rubygem-openssl
+Summary:        OpenSSL provides SSL, TLS and general purpose cryptography
+Version:        %{openssl_version}
+License:        Ruby OR BSD
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Provides:       rubygem(openssl) = %{version}-%{release}
+
+%description -n rubygem-openssl
+OpenSSL provides SSL, TLS and general purpose cryptography. It wraps the
+OpenSSL library.
+
+%package -n rubygem-psych
+Summary:        A libyaml wrapper for Ruby
+Version:        %{psych_version}
+License:        MIT
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Provides:       rubygem(psych) = %{version}-%{release}
+
+%description -n rubygem-psych
+Psych is a YAML parser and emitter. Psych leverages
+libyaml[http://pyyaml.org/wiki/LibYAML] for its YAML parsing and emitting
+capabilities. In addition to wrapping libyaml, Psych also knows how to
+serialize and de-serialize most Ruby objects to and from the YAML format.
 
 %package -n rubygem-power_assert
 Summary:        Power Assert for Ruby
@@ -223,17 +310,12 @@ ln -s %{gem_dir}/gems/bigdecimal-%{bigdecimal_version}/lib/bigdecimal %{buildroo
 # Install io-console
 mkdir -p %{buildroot}%{gem_dir}/io-console-%{io_console_version}/lib
 mkdir -p %{buildroot}%{_libdir}/gems/%{name}/io-console-%{io_console_version}/io
-mv %{buildroot}%{_libdir}/ruby/io %{buildroot}%{gem_dir}/io-console-%{io_console_version}/lib
 mv %{buildroot}%{gem_dir}/specifications/default/io-console-%{io_console_version}.gemspec %{buildroot}%{gem_dir}/specifications
-ln -s %{gem_dir}/io-console-%{io_console_version}/lib/io %{buildroot}%{_libdir}/ruby/io
 
 # install psych
 mkdir -p %{buildroot}%{gem_dir}/psych-%{psych_version}/lib
 mkdir -p %{buildroot}%{_libdir}/gems/%{name}/psych-%{psych_version}
-mv %{buildroot}%{_libdir}/ruby/psych* %{buildroot}%{gem_dir}/psych-%{psych_version}/lib
 mv %{buildroot}%{gem_dir}/specifications/default/psych-%{psych_version}.gemspec %{buildroot}%{gem_dir}/specifications
-ln -s %{gem_dir}/psych-%{psych_version}/lib/psych %{buildroot}%{_libdir}/ruby/psych
-ln -s %{gem_dir}/psych-%{psych_version}/lib/psych.rb %{buildroot}%{_libdir}/ruby/psych.rb
 
 # Install irb
 mkdir -p %{buildroot}%{gem_dir}/irb-%{irb_version}/lib
@@ -286,6 +368,32 @@ sudo -u test make test TESTS="-v"
 %dir %{rubygems_dir}
 %{rubygems_dir}/rubygems
 
+%files -n rubygems
+%{_bindir}/gem
+%dir %{rubygems_dir}
+%{rubygems_dir}/rubygems
+
+# Explicitly include only RubyGems directory strucure to avoid accidentally
+# packaged content.
+%dir %{gem_dir}
+%dir %{gem_dir}/build_info
+%dir %{gem_dir}/cache
+%dir %{gem_dir}/doc
+%dir %{gem_dir}/extensions
+%dir %{gem_dir}/gems
+%dir %{gem_dir}/specifications
+%dir %{gem_dir}/specifications/default
+%dir %{_prefix}/lib*/gems
+%dir %{_prefix}/lib*/gems/ruby
+%exclude %{gem_dir}/cache/*
+
+%files -n rubygems-devel
+%{_rpmconfigdir}/macros.d/macros.rubygems
+%{_rpmconfigdir}/fileattrs/rubygems.attr
+%{_rpmconfigdir}/rubygems.req
+%{_rpmconfigdir}/rubygems.prov
+%{_rpmconfigdir}/rubygems.con
+
 %files -n rubygem-bigdecimal
 %{_libdir}/gems/%{name}/bigdecimal-%{bigdecimal_version}
 %{gem_dir}/gems/bigdecimal-%{bigdecimal_version}
@@ -301,6 +409,24 @@ sudo -u test make test TESTS="-v"
 %doc %{gem_dir}/gems/minitest-%{minitest_version}/README.rdoc
 %{gem_dir}/gems/minitest-%{minitest_version}/Rakefile
 %{gem_dir}/gems/minitest-%{minitest_version}/test
+
+%files -n rubygem-io-console
+%{_libdir}/gems/%{name}/io-console-%{io_console_version}
+%{gem_dir}/gems/io-console-%{io_console_version}
+%{gem_dir}/specifications/io-console-%{io_console_version}.gemspec
+
+%files -n rubygem-json
+%{_libdir}/gems/%{name}/json-%{json_version}
+%{gem_dir}/gems/json-%{json_version}
+%{gem_dir}/specifications/json-%{json_version}.gemspec
+
+%files -n rubygem-openssl
+%{gem_dir}/gems/openssl-%{openssl_version}
+
+%files -n rubygem-psych
+%{_libdir}/gems/%{name}/psych-%{psych_version}
+%{gem_dir}/gems/psych-%{psych_version}
+%{gem_dir}/specifications/psych-%{psych_version}.gemspec
 
 %files -n rubygem-power_assert
 %dir %{gem_dir}/gems/power_assert-%{power_assert_version}
@@ -334,6 +460,9 @@ sudo -u test make test TESTS="-v"
 %doc %{gem_dir}/gems/test-unit-%{test_unit_version}/doc
 
 %changelog
+* Fri Mar 25 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.7.4-3
+- Build rubygem, openssl, io-console, json, psych rubygems (taken from Fedora 33, license: MIT)
+
 * Tue Mar 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.7.4-2
 - Build bigdecimal, minitest, test-unit, rdoc and power_assert rubygems (taken from Fedora 37, license: MIT)
 
