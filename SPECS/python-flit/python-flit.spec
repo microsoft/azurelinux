@@ -36,18 +36,16 @@ BuildRequires:  python3-tomli
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
-BuildRequires:  python3-pluggy
 BuildRequires:  python3-pygments
-BuildRequires:  python3-pytest
+BuildRequires:  sudo
+BuildRequires:  which
 
 # Runtime deps, others
 BuildRequires:  python3-requests
 BuildRequires:  python3-responses
-#BuildRequires:	python3-tomli-w
 
 # Test deps that require flit to build:
 BuildRequires:  python3-testpath
-#BuildRequires:	python3-requests-download
 %endif
 
 %description %{_description}
@@ -69,6 +67,11 @@ Provides:       bundled(python3dist(tornado))
 %autosetup -p1 -n %{srcname}-%{version}
 
 %build
+if [[ ! -f "%{_bindir}/python" ]]
+then
+  ln -s "$(which python3)" "%{_bindir}/python"
+fi
+
 export FLIT_NO_NETWORK=1
 
 export PYTHONPATH=$PWD:$PWD/flit_core
@@ -78,13 +81,17 @@ export PYTHONPATH=$PWD:$PWD/flit_core
 %pyproject_install
 
 %check
+pip3 install more-itertools pluggy pytest tomli_w
+
 # flit attempts to download list of classifiers from PyPI, but not if it's cached
 # test_invalid_classifier fails without the list
 mkdir -p fake_cache/flit
 cp %{SOURCE1} fake_cache/flit
 export XDG_CACHE_HOME=$PWD/fake_cache
 
-%pytest
+useradd test -G root -m
+# Skipping "test_test_writable_dir_win" - Windows-only.
+sudo -u test %pytest -k "not test_test_writable_dir_win"
 
 %files -n python3-%{srcname}
 %license LICENSE
