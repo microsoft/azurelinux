@@ -23,10 +23,9 @@ Patch4:         CVE-2013-0222.nopatch
 Patch5:         CVE-2013-0223.nopatch
 Patch6:         skip_test_if_run_as_root.patch
 BuildRequires:  libselinux-devel
+BuildRequires:  libselinux-utils
 Requires:       gmp
 Requires:       libselinux
-BuildRequires:  libselinux-devel
-BuildRequires:  libselinux-utils
 Conflicts:      toybox
 Provides:       sh-utils
 %ifarch aarch64
