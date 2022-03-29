@@ -24,7 +24,6 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
-BuildRequires:  python3-pip
 
 %description -n python3-%{srcname} %{_description}
 
@@ -57,8 +56,7 @@ tox -e setup.py
 
 %changelog
 * Mon Mar 28 2022 Jon Slobodzian <joslobo@microsoft.com> - 4.63.1-1
-- Initial CBL-Mariner import from Fedora 33 (license: MIT)
-- License verified
+- Updating to version 4.63.1.
 
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.50.2-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
