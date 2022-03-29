@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 #
 # spec file for package ant-junit
 #
@@ -25,12 +23,15 @@ Distribution:   Mariner
 %bcond_without junit
 %bcond_with junit5
 %bcond_with antlr
+
+Summary:        Optional junit tasks for ant
 Name:           ant-junit
 Version:        1.10.11
 Release:        1%{?dist}
-Summary:        Optional junit tasks for ant
 License:        ASL 2.0 AND W3C
 Group:          Development/Tools/Building
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://ant.apache.org/
 Source0:        https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz
 Source1:        apache-ant-1.8.ant.conf
@@ -67,9 +68,6 @@ BuildRequires:  xz-java
 %if %{with junit5}
 BuildRequires:  apiguardian
 BuildRequires:  junit5
-%endif
-%if 0%{?suse_version} > 1320
-BuildRequires:  strip-nondeterminism
 %endif
 %if %{with bootstrap}
 Requires:       java-devel >= 1.8
@@ -732,6 +730,10 @@ popd
 %endif
 
 %changelog
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.10.11-2
+- Move to SPECS 
+- Minor refactor of specfile
+
 * Thu Jan 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.11-1
 - Removing dependency on 'log4j' using Fedora 36 spec for guidance (license: MIT).
 - Updated version to 1.10.11.
@@ -750,6 +752,7 @@ popd
 
 * Thu Oct  1 2020 Pedro Monreal <pmonreal@suse.com>
 - Update to 1.10.9
+
   * Security fix: [bsc#1177180, CVE-2020-11979]
   - Insecure temporary file vulnerability
   * Fixed bugs:
@@ -780,6 +783,7 @@ popd
     control the permissions of directories it creates it will create an
     owner-owned temporary directory unaccessible to others as default
     tempdir as soon as a temporary file is created for the first time.
+
 * Thu May 14 2020 Pedro Monreal Gonzalez <pmonrealgonzalez@suse.com>
 - Update to 1.10.8
   * Security fix: [CVE-2020-1945, bsc#1171696]
@@ -802,15 +806,19 @@ popd
   * rmic has been removed from Java 15. The task will now throw an
   exception if you try to use it while running Java 15 or newer.
 - Remove ant-python3.patch fixed upstream
+
 * Wed May  6 2020 Pedro Monreal Gonzalez <pmonrealgonzalez@suse.com>
 - Add rhino to the ant-apache-bsf optional tasks [bsc#1134001]
+
 * Wed May  6 2020 Pedro Monreal Gonzalez <pmonrealgonzalez@suse.com>
 - Remove jakarta-commons-* dependencies [bsc#1133997]
   * Use apache-commons-logging and apache-commons-net in optional tasks
+
 * Tue Jan 14 2020 Fridrich Strba <fstrba@suse.com>
 - Use xml-commons-apis-bootstrap as jar in classpath instead of
   the common xml-apis jar, since we are forcing build against
   the bootstrap package
+
 * Fri Nov  8 2019 Fridrich Strba <fstrba@suse.com>
 - Upgrade to upstream version 1.10.7
 - Modified patches:
@@ -821,28 +829,37 @@ popd
     + rediff
 - Fix ant-xz.jar to be non-empty and split it from the ant-antlr
   package
+
 * Tue Oct  1 2019 Fridrich Strba <fstrba@suse.com>
 - Build against the new compatibility packages log4j12/log4j12-mini
+
 * Mon Sep 30 2019 Fridrich Strba <fstrba@suse.com>
 - Remove references to parent poms from all artifacts and do not
   distribute the ant-parent, since we don't need it
+
 * Tue Apr  9 2019 Fridrich Strba <fstrba@suse.com>
 - Require directly xerces-j2 and not its virtual provide
   jaxp_parser_impl
+
 * Mon Mar 18 2019 Jan Engelhardt <jengelh@inai.de>
 - Make "if" statements in build recipe POSIX sh compatible.
+
 * Fri Feb  8 2019 Fridrich Strba <fstrba@suse.com>
 - Create an ant-junit5 package to build junit5 optional tasks
   when they become resolved
 - Add a simple pom file for ant-bootstrap.jar
+
 * Fri Feb  8 2019 Fridrich Strba <fstrba@suse.com>
 - Add compatibility links ant/ant*.jar for bootstrap build
+
 * Tue Feb  5 2019 Fridrich Strba <fstrba@suse.com>
 - BuildRequire hamcrest for ant-junit and ant-antlr, since junit4
   depends strictly on hamcrest-core only.
+
 * Fri Feb  1 2019 Fridrich Strba <fstrba@suse.com>
 - Build ant against xml-commons-apis-bootstrap and
   xml-commons-resolver-bootstrap in order to break build cycle
+
 * Mon Dec 10 2018 Fridrich Strba <fstrba@suse.com>
 - Don't build against a particular xml-apis/xml-resolver provider,
   but against the generic virtual provider. This allows easier
@@ -851,12 +868,15 @@ popd
   * apache-ant-xml-apis.patch
     + look for the xml-apis.jar and xml-resolver.jar when composing
     classpath; they are symlinks provided by several packages.
+
 * Mon Nov 26 2018 Fridrich Strba <fstrba@suse.com>
 - Let ant-antlr provide ant-xz too, since it contains the
   corresponding jar.
+
 * Wed Oct 31 2018 Fridrich Strba <fstrba@suse.com>
 - Add aliases to some maven artifacts so that packages out there
   resolve then correctly
+
 * Fri Oct 26 2018 Pedro Monreal Gonzalez <pmonrealgonzalez@suse.com>
 - Update to 1.10.5 [bsc#1113136]
   * Same version as in 1.9.13 but with additional features and
@@ -865,13 +885,16 @@ popd
   - apache-ant-1.9.9-sourcetarget.patch
   * Refreshed patch:
   - apache-ant-class-path-in-manifest.patch
+
 * Sun Oct 21 2018 antoine.belvire@opensuse.org
 - Add reproducible-build-manifest.patch: Use less detailed version
   string for manifest's "Created-by" field (boo#1110024).
+
 * Wed Oct 17 2018 Fridrich Strba <fstrba@suse.com>
 - Require javapackages-local in order to generate correctly the
   maven requires and provides
 - Install maven artifacts
+
 * Fri Aug 24 2018 Jason Sikes <jsikes@suse.de>
 - Update to 1.9.13
   * Fixes a regression in the "get" task where redirects
@@ -883,34 +906,43 @@ popd
     segnments that the resulting path would go beyond the file system
     root.
     Bugzilla Report 62502, bsc#1100053, CVE-2018-10886
+
 * Tue May 15 2018 fstrba@suse.com
 - Build with source and target 8 to prepare for a possible removal
   of 1.6 compatibility
 - Modified patch:
   * apache-ant-1.9.9-sourcetarget.patch
   - Build with source/target 8
+
 * Fri Feb 23 2018 ecsos@opensuse.org
 - fix build error for Leap 42.3
+
 * Thu Feb 22 2018 tchvatal@suse.com
 - Add patch to run scripts with python3 if applicable bsc#1082202:
   * ant-python3.patch
+
 * Thu Feb 22 2018 tchvatal@suse.com
 - Update to 1.9.10:
   * Various fixes for java10
   * Small fixes all around
 - Remove merged patch reproducible.patch
+
 * Sat Oct 28 2017 jengelh@inai.de
 - Simply use find -delete over xargs.
 - Make description neutral.
+
 * Tue Oct 24 2017 bwiedemann@suse.com
 - Add reproducible-build-date.patch to allow to have fixed build dates
   to make other packages build more reproducibly
+
 * Wed Oct  4 2017 fstrba@suse.com
 - Remove dependency on java-1_5_0-gcj-compat-devel and build even
   the bootstrap package with java source and target 1.6
+
 * Fri Sep 29 2017 fstrba@suse.com
 - Don't condition the maven defines on release version, but on
   _maven_repository being defined
+
 * Thu Sep 14 2017 fstrba@suse.com
 - Allow bootstrapping with something else then
   java-1_5_0-gcj-compat, but still require
@@ -919,53 +951,69 @@ popd
   * apache-ant-bootstrap.patch
   - Add -sourcepath option to fix build breakages with Eclipse
     Compiler for Java(tm)
+
 * Wed Sep  6 2017 fstrba@suse.com
 - Added patch:
   * apache-ant-1.9.9-sourcetarget.patch
     + Change java source and target versions to 1.6 to allow build
     with jdk9
 - For non-boostrap builds require java-devel >= 1.6
+
 * Fri Jun  9 2017 tchvatal@suse.com
 - Do not generate poms on ant core packages to reduce deps and
   allow bootstrap
+
 * Wed May 31 2017 tchvatal@suse.com
 - Fix bootstrap to avoid new cycle bsc#1041966
+
 * Fri May 19 2017 tchvatal@suse.com
 - Disable javadoc completely it is on the web in much better form
 - Remove if0 conditions
 - Remove patch apache-ant-old-gcj-build.patch for sle11 and unused
 - Fix build with split javapackages-tools
+
 * Mon May  8 2017 bwiedemann@suse.com
 - Version bump to 1.9.9:
   * Read WHATSNEW file for full changelist
+
 * Mon May  8 2017 bwiedemann@suse.de
 - Add reproducible.patch to allow reproducible builds of ant itself
   and packages built with ant like jcodings
+
 * Mon Feb 20 2017 tchvatal@suse.com
 - Revert the previous change as it broke the build of most java
   software stack
+
 * Mon Feb 13 2017 guoyunhebrave@gmail.com
 - Add profile.d scripts to set ANT_HOME
+
 * Fri Jan 15 2016 opensuse@dstoecker.de
 - junit4 test did not work (bnc#915686)
+
 * Wed Jul 29 2015 tchvatal@suse.com
 - Add xalan-j2-serializer to ant-antlr requirements
+
 * Tue Jul 28 2015 tchvatal@suse.com
 - Sync the changes files among the subpkgs
 - Version bump to 1.9.6:
   * Read WHATSNEW file for full changelist
+
 * Sun Jun 21 2015 jengelh@inai.de
 - Do better quoting to get better error messages when it fails
+
 * Wed Mar 18 2015 tchvatal@suse.com
 - Fix build with new javapackages-tools
+
 * Thu Aug 28 2014 coolo@suse.com
 - to bootstrap 13.2 we need another split because bsf depends on things
   that depend on junit and as antlr requires bsf, we need a 3rd step ->
   split ant-junit to build in between ant and ant-antlr
+  
 * Fri Jul  4 2014 tchvatal@suse.com
 - Fix building on SLE.
 - Added patch:
   * apache-ant-old-gcj-build.patch
+
 * Fri Jul  4 2014 tchvatal@suse.com
 - Update to 1.9.4:
   * Read WHATSNEW file for full changelist
@@ -975,21 +1023,27 @@ popd
   * TarInputStream will now read archives created by tar
     implementations that encode big numbers by not adding a trailing
     NUL.
+
 * Thu May 15 2014 peter.trommler@ohm-hochschule.de
 - fix summary (was antlr summary)
+
 * Mon May 12 2014 darin@darins.net
 - SLE_11 specific spec files for ant/ant-antlr. These build with
   openjdk, which introduced bootstrap breakage in Factory.
 - Update pre_checkin.sh for SLE_11 specific spec's
+
 * Fri May  2 2014 tchvatal@suse.com
 - Revert the bootstrap breakage.
+
 * Thu Apr 24 2014 dmueller@suse.com
 - remove dependency on gpg-offline (blocks rebuilds and
   tarball integrity is checked by source-validator anyway, plus
   it was commented out)
 - remove apache-ant-bz163689.patch (was not applied anywhere)
+
 * Wed Apr 23 2014 darin@darins.net
 - Update packaging to build the openjdk and not gcj
+
 * Thu Jan  2 2014 mvyskocil@suse.com
 - Update to 1.9.3
 - BugFixes:
@@ -1005,12 +1059,16 @@ popd
   * Apt is not available under JDK 1.8, apache#55922
 - drop unused macros
 - add gpg verification
+
 * Wed Dec  4 2013 mvyskocil@suse.com
 - use requires_eq instead of manual call of rpm -q
+
 * Wed Oct  2 2013 mvyskocil@suse.com
 - install compat symlink to /usr/share/ant/bin/antRun to make scala build
+
 * Mon Sep  9 2013 tchvatal@suse.com
 - Move from jpackage-utils to javapackage-tools
+
 * Thu Aug 22 2013 mvyskocil@suse.com
 - Update to 1.9.2
 - Incompatible changes:
@@ -1039,30 +1097,40 @@ popd
   process, apache#55112.
   * Corrected XSLTC error in <junitreport>, apache#54641.
   * and many more, see WHATSNEW for details
+
 * Mon Jan  7 2013 mvyskocil@suse.com
 - remove xerces-j2-bootstrap depenency (bnc#789163)
+
 * Wed May 30 2012 cfarrell@suse.com
 - license update: CDDL-1.0
   SPDX format (note that it should CDDL-1.1 if the (c) owner and license
   steward is Oracle)
+
 * Tue May 15 2012 mvyskocil@suse.cz
 - build ignore java-1_7_0-openjdk as well
+
 * Wed Feb  1 2012 mvyskocil@suse.cz
 - revert the Recommends to fix a lot of build fails
+
 * Wed Jan 25 2012 mvyskocil@suse.cz
 - use new _mavendepmapfragdir macro instead of hardocded path
 - change java-devel Requires to Recommends
+
 * Tue Jan  3 2012 dmueller@suse.de
 - use dist-lite and dist_javadocs to make javadoc build really
   optional
 - fix arm check (ifarch does not work in a noarch spec file)
+
 * Thu Dec 15 2011 mvyskocil@suse.cz
 - use dist and javadocs targets to make javadoc build really configurable
 - disable javadoc build on arm to speedup the build of java platform
+
 * Sat Sep 17 2011 jengelh@medozas.de
 - Remove redundant tags/sections from specfile
+
 * Mon Mar 14 2011 mvyskocil@suse.cz
 - ignore openjdk for build of core ant
+
 * Wed Mar  9 2011 mvyskocil@suse.cz
 - Update to ant 1.8.2
   * performance improvements in directory scanning
@@ -1107,18 +1175,24 @@ popd
 - build ant-antlr.spec using openjdk
 - add ant-apache-xalan2 and ant-testutil
 - remove all pom files, as they are included and build from source tarball
+
 * Fri Apr  9 2010 mvyskocil@suse.cz
 - fix bnc#595144 - Compiled binary in ant
   remove test.exe from source tarball
+
 * Thu Mar 18 2010 mvyskocil@suse.cz
 - fix the compat symlinks
+
 * Wed Mar 17 2010 mvyskocil@suse.cz
 - return back the /usr/share/ant/lib compat symlinks
   http://lists.opensuse.org/opensuse-java/2010-03/msg00007.html
+
 * Wed Jun 17 2009 mvyskocil@suse.cz
 - do not use Release number in Requires of subpackages
+
 * Sun May  3 2009 ro@suse.de
 - do not assume release number for ant and ant-antlr are identical
+
 * Tue Apr 28 2009 mvyskocil@suse.cz
 - update to 1.7.1. Upstream changes (full list is in WHATSNEW):
   * String resources only have properties single expanded. If you relied on
@@ -1143,20 +1217,26 @@ popd
   keep them synchronized. Build is branched using value of %%%%bootstrap macro:
   * bootstrap == 1 means build ant, ant-{jmf,nodeps,scripts,swing,trax}
   * bootstrap == 0 means build rest of ant modules + ant-javadoc
+
 * Mon Nov  3 2008 mvyskocil@suse.cz
 - [bnc#440645] - ant fails without installed jdk:
   - added a java-devel to Recommends:
+  
 * Mon Jul 21 2008 ro@suse.de
 - use xerces-j2-bootstrap to build (as early as possible)
 - add java doc dir to filelist of javadoc subpackage to fix build
+
 * Wed Jul 16 2008 coolo@suse.de
 - avoid another build cycle
+
 * Wed May  7 2008 mvyskocil@suse.cz
 - build using gcj, to allow a openjdk6 bootstrap
 - change a source and a target level to 1.5 in build.xml
+
 * Tue Aug 14 2007 skh@suse.de
 - disable junit tests and remove junit from BuildRequires to break
   circular build dependency
+
 * Fri Jul  6 2007 dbornkessel@suse.de
 - update to version 1.7.0
   major changes are (for a complete list, consult /usr/share/doc/packages/ant/WHATSNEW):
@@ -1244,36 +1324,48 @@ popd
   receive an error if Ant itself would not start
   * All .NET tasks are now deprecated in favor of the new .NET Antlib:
   http://ant.apache.org/antlibs/dotnet/index.html
+
 * Fri Sep 22 2006 dbornkessel@suse.de
 - read in properties in /etc/ant.conf
 - added source=1.4
+
 * Mon May  8 2006 dbornkessel@suse.de
 - only ant-antlr updates
+
 * Thu Feb  2 2006 dbornkessel@suse.de
 - fixed rpmlint errors and warnings
+
 * Tue Jan 31 2006 dbornkessel@suse.de
 - only ant-antlr updates
+
 * Fri Jan 27 2006 dbornkessel@suse.de
 - added four missing xsl files
 - removed JAVA_HOME magic
+
 * Tue Jan 24 2006 dbornkessel@suse.de
 - Not dependend on xml-commons-apis, which are provided by xerces-j2, which does not
   depend on ant package (in contrast to old dependency on
   xml-commons-apis <-> ant)
 - optional task are now again in extra spec file ant-antlr
+
 * Thu Jan 19 2006 dbornkessel@suse.de
 - Integrated ant and ant-antlr again in one spec file as there is no
   dependency loop ... jpackage BuildRequires were wrong.
 - updated to version 1.6.5
+
 * Mon Dec 19 2005 dbornkessel@suse.de
 - added if statement that hinders unwanted creation of a file within a for loop
+
 * Wed Sep 28 2005 dmueller@suse.de
 - add norootforbuild
+
 * Fri Mar  4 2005 skh@suse.de
 - rely on jpackage-utils' java-functions to set JAVA_HOME correctly
+
 * Sun Sep  5 2004 skh@suse.de
 - create and add /usr/share/java/ant to file list for optional
   tasks to put their jars into
+
 * Thu Sep  2 2004 skh@suse.de
 - renamed from apache-ant to ant
 - switched to JPackage 1.5 version
