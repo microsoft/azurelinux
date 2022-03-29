@@ -4,7 +4,7 @@
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
 Version: 20.10.12
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -125,6 +125,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Tue Mar 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.12-3
+- Set 'systemd' as default cgroup driver
+
 * Wed Mar 02 2022 Andy Caldwell <andycaldwell@microsoft.com> - 20.10.12-2
 - Relax dependency from `tini` to `docker-init`
 
