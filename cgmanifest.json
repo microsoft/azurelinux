@@ -22494,8 +22494,18 @@
         "type": "other",
         "other": {
           "name": "python-flit",
-          "version": "2.2.0",
-          "downloadUrl": "https://github.com/takluyver/flit/archive/2.2.0/flit-2.2.0.tar.gz"
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/takluyver/flit/archive/3.7.1/flit-3.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-flit-core",
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/takluyver/flit/archive/3.7.1/flit-3.7.1.tar.gz"
         }
       }
     },
@@ -23513,6 +23523,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pluggy",
+          "version": "1.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/a1/16/db2d7de3474b6e37cbb9c008965ee63835bba517e22cdb8c35b5116b5ce1/pluggy-1.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-ply",
           "version": "3.11",
           "downloadUrl": "http://www.dabeaz.com/ply/ply-3.11.tar.gz"
@@ -23854,8 +23874,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-xdist",
-          "version": "2.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/17/18/bb102b7131f1c08e5d9f0a6a5904e0b4cf02160bdde1645fc386461b5423/pytest-xdist-2.1.0.tar.gz"
+          "version": "2.5.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/5d/43/9dbc32d297d6eae85d6c05dc8e8d3371061bd6cbe56a2f645d9ea4b53d9b/pytest-xdist-2.5.0.tar.gz"
         }
       }
     },
@@ -24164,8 +24184,8 @@
         "type": "other",
         "other": {
           "name": "python-setuptools_scm",
-          "version": "3.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-3.1.0.tar.gz"
+          "version": "6.4.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-6.4.2.tar.gz"
         }
       }
     },
@@ -24456,6 +24476,16 @@
           "name": "python-tidy",
           "version": "0.6",
           "downloadUrl": "http://dl.cihar.com/utidylib/uTidylib-0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-tomli",
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/hukkin/tomli/archive/refs/tags/2.0.1.tar.gz"
         }
       }
     },

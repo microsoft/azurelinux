@@ -10,6 +10,35 @@ Environment :: Console :: Curses
 Environment :: Console :: Framebuffer
 Environment :: Console :: Newt
 Environment :: Console :: svgalib
+Environment :: GPU
+Environment :: GPU :: NVIDIA CUDA
+Environment :: GPU :: NVIDIA CUDA :: 1.0
+Environment :: GPU :: NVIDIA CUDA :: 1.1
+Environment :: GPU :: NVIDIA CUDA :: 2.0
+Environment :: GPU :: NVIDIA CUDA :: 2.1
+Environment :: GPU :: NVIDIA CUDA :: 2.2
+Environment :: GPU :: NVIDIA CUDA :: 2.3
+Environment :: GPU :: NVIDIA CUDA :: 3.0
+Environment :: GPU :: NVIDIA CUDA :: 3.1
+Environment :: GPU :: NVIDIA CUDA :: 3.2
+Environment :: GPU :: NVIDIA CUDA :: 4.0
+Environment :: GPU :: NVIDIA CUDA :: 4.1
+Environment :: GPU :: NVIDIA CUDA :: 4.2
+Environment :: GPU :: NVIDIA CUDA :: 5.0
+Environment :: GPU :: NVIDIA CUDA :: 5.5
+Environment :: GPU :: NVIDIA CUDA :: 6.0
+Environment :: GPU :: NVIDIA CUDA :: 6.5
+Environment :: GPU :: NVIDIA CUDA :: 7.0
+Environment :: GPU :: NVIDIA CUDA :: 7.5
+Environment :: GPU :: NVIDIA CUDA :: 8.0
+Environment :: GPU :: NVIDIA CUDA :: 9.0
+Environment :: GPU :: NVIDIA CUDA :: 9.1
+Environment :: GPU :: NVIDIA CUDA :: 9.2
+Environment :: GPU :: NVIDIA CUDA :: 10.0
+Environment :: GPU :: NVIDIA CUDA :: 10.1
+Environment :: GPU :: NVIDIA CUDA :: 10.2
+Environment :: GPU :: NVIDIA CUDA :: 11.0
+Environment :: GPU :: NVIDIA CUDA :: 11.1
 Environment :: Handhelds/PDA's
 Environment :: MacOS X
 Environment :: MacOS X :: Aqua
@@ -25,11 +54,14 @@ Environment :: Web Environment :: Mozilla
 Environment :: Web Environment :: ToscaWidgets
 Environment :: Win32 (MS Windows)
 Environment :: X11 Applications
-Environment :: X11 Applications :: Gnome
 Environment :: X11 Applications :: GTK
+Environment :: X11 Applications :: Gnome
 Environment :: X11 Applications :: KDE
 Environment :: X11 Applications :: Qt
+Framework :: AWS CDK
+Framework :: AWS CDK :: 1
 Framework :: AiiDA
+Framework :: Ansible
 Framework :: AsyncIO
 Framework :: BEAT
 Framework :: BFG
@@ -45,31 +77,36 @@ Framework :: CherryPy
 Framework :: CubicWeb
 Framework :: Dash
 Framework :: Django
-Framework :: Django :: 1.10
-Framework :: Django :: 1.11
 Framework :: Django :: 1.4
 Framework :: Django :: 1.5
 Framework :: Django :: 1.6
 Framework :: Django :: 1.7
 Framework :: Django :: 1.8
 Framework :: Django :: 1.9
+Framework :: Django :: 1.10
+Framework :: Django :: 1.11
 Framework :: Django :: 2.0
 Framework :: Django :: 2.1
 Framework :: Django :: 2.2
 Framework :: Django :: 3.0
+Framework :: Django :: 3.1
+Framework :: Django :: 3.2
 Framework :: Django CMS
 Framework :: Django CMS :: 3.4
 Framework :: Django CMS :: 3.5
 Framework :: Django CMS :: 3.6
 Framework :: Django CMS :: 3.7
+Framework :: Django CMS :: 3.8
 Framework :: Flake8
 Framework :: Flask
 Framework :: Hypothesis
 Framework :: IDLE
 Framework :: IPython
 Framework :: Jupyter
+Framework :: Kedro
 Framework :: Lektor
 Framework :: Masonite
+Framework :: Matplotlib
 Framework :: Nengo
 Framework :: Odoo
 Framework :: Opps
@@ -88,6 +125,7 @@ Framework :: Plone :: 5.0
 Framework :: Plone :: 5.1
 Framework :: Plone :: 5.2
 Framework :: Plone :: 5.3
+Framework :: Plone :: 6.0
 Framework :: Plone :: Addon
 Framework :: Plone :: Core
 Framework :: Plone :: Theme
@@ -103,7 +141,6 @@ Framework :: Setuptools Plugin
 Framework :: Sphinx
 Framework :: Sphinx :: Extension
 Framework :: Sphinx :: Theme
-Framework :: tox
 Framework :: Trac
 Framework :: Trio
 Framework :: Tryton
@@ -117,11 +154,13 @@ Framework :: Wagtail :: 2
 Framework :: ZODB
 Framework :: Zope
 Framework :: Zope2
-Framework :: Zope :: 2
 Framework :: Zope3
+Framework :: Zope :: 2
 Framework :: Zope :: 3
 Framework :: Zope :: 4
 Framework :: Zope :: 5
+Framework :: napari
+Framework :: tox
 Intended Audience :: Customer Service
 Intended Audience :: Developers
 Intended Audience :: Education
@@ -144,9 +183,9 @@ License :: DFSG approved
 License :: Eiffel Forum License (EFL)
 License :: Free For Educational Use
 License :: Free For Home Use
+License :: Free To Use But Restricted
 License :: Free for non-commercial use
 License :: Freely Distributable
-License :: Free To Use But Restricted
 License :: Freeware
 License :: GUST Font License 1.0
 License :: GUST Font License 2006-09-30
@@ -158,8 +197,8 @@ License :: OSI Approved :: Apache Software License
 License :: OSI Approved :: Apple Public Source License
 License :: OSI Approved :: Artistic License
 License :: OSI Approved :: Attribution Assurance License
-License :: OSI Approved :: Boost Software License 1.0 (BSL-1.0)
 License :: OSI Approved :: BSD License
+License :: OSI Approved :: Boost Software License 1.0 (BSL-1.0)
 License :: OSI Approved :: CEA CNRS Inria Logiciel Libre License, version 2.1 (CeCILL-2.1)
 License :: OSI Approved :: Common Development and Distribution License 1.0 (CDDL-1.0)
 License :: OSI Approved :: Common Public License
@@ -184,12 +223,13 @@ License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3
 License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)
 License :: OSI Approved :: Historical Permission Notice and Disclaimer (HPND)
 License :: OSI Approved :: IBM Public License
-License :: OSI Approved :: Intel Open Source License
 License :: OSI Approved :: ISC License (ISCL)
+License :: OSI Approved :: Intel Open Source License
 License :: OSI Approved :: Jabber Open Source License
-License :: OSI Approved :: MirOS License (MirOS)
 License :: OSI Approved :: MIT License
+License :: OSI Approved :: MIT No Attribution License (MIT-0)
 License :: OSI Approved :: MITRE Collaborative Virtual Workspace License (CVW)
+License :: OSI Approved :: MirOS License (MirOS)
 License :: OSI Approved :: Motosoto License
 License :: OSI Approved :: Mozilla Public License 1.0 (MPL)
 License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)
@@ -207,18 +247,20 @@ License :: OSI Approved :: SIL Open Font License 1.1 (OFL-1.1)
 License :: OSI Approved :: Sleepycat License
 License :: OSI Approved :: Sun Industry Standards Source License (SISSL)
 License :: OSI Approved :: Sun Public License
+License :: OSI Approved :: The Unlicense (Unlicense)
 License :: OSI Approved :: Universal Permissive License (UPL)
 License :: OSI Approved :: University of Illinois/NCSA Open Source License
 License :: OSI Approved :: Vovida Software License 1.0
 License :: OSI Approved :: W3C License
 License :: OSI Approved :: X.Net License
-License :: OSI Approved :: zlib/libpng License
 License :: OSI Approved :: Zope Public License
+License :: OSI Approved :: zlib/libpng License
 License :: Other/Proprietary License
 License :: Public Domain
 License :: Repoze Public License
 Natural Language :: Afrikaans
 Natural Language :: Arabic
+Natural Language :: Basque
 Natural Language :: Bengali
 Natural Language :: Bosnian
 Natural Language :: Bulgarian
@@ -242,6 +284,7 @@ Natural Language :: Hindi
 Natural Language :: Hungarian
 Natural Language :: Icelandic
 Natural Language :: Indonesian
+Natural Language :: Irish
 Natural Language :: Italian
 Natural Language :: Japanese
 Natural Language :: Javanese
@@ -252,6 +295,7 @@ Natural Language :: Lithuanian
 Natural Language :: Macedonian
 Natural Language :: Malay
 Natural Language :: Marathi
+Natural Language :: Nepali
 Natural Language :: Norwegian
 Natural Language :: Panjabi
 Natural Language :: Persian
@@ -275,18 +319,17 @@ Natural Language :: Urdu
 Natural Language :: Vietnamese
 Operating System :: Android
 Operating System :: BeOS
-Operating System :: iOS
 Operating System :: MacOS
 Operating System :: MacOS :: MacOS 9
 Operating System :: MacOS :: MacOS X
 Operating System :: Microsoft
 Operating System :: Microsoft :: MS-DOS
 Operating System :: Microsoft :: Windows
-Operating System :: Microsoft :: Windows :: Windows 10
 Operating System :: Microsoft :: Windows :: Windows 3.1 or Earlier
 Operating System :: Microsoft :: Windows :: Windows 7
 Operating System :: Microsoft :: Windows :: Windows 8
 Operating System :: Microsoft :: Windows :: Windows 8.1
+Operating System :: Microsoft :: Windows :: Windows 10
 Operating System :: Microsoft :: Windows :: Windows 95/98/2000
 Operating System :: Microsoft :: Windows :: Windows CE
 Operating System :: Microsoft :: Windows :: Windows NT/2000
@@ -294,10 +337,9 @@ Operating System :: Microsoft :: Windows :: Windows Server 2003
 Operating System :: Microsoft :: Windows :: Windows Server 2008
 Operating System :: Microsoft :: Windows :: Windows Vista
 Operating System :: Microsoft :: Windows :: Windows XP
-Operating System :: OS/2
 Operating System :: OS Independent
+Operating System :: OS/2
 Operating System :: Other OS
-Operating System :: PalmOS
 Operating System :: PDA Systems
 Operating System :: POSIX
 Operating System :: POSIX :: AIX
@@ -313,10 +355,13 @@ Operating System :: POSIX :: Linux
 Operating System :: POSIX :: Other
 Operating System :: POSIX :: SCO
 Operating System :: POSIX :: SunOS/Solaris
+Operating System :: PalmOS
+Operating System :: RISC OS
 Operating System :: Unix
-Programming Language :: Ada
+Operating System :: iOS
 Programming Language :: APL
 Programming Language :: ASP
+Programming Language :: Ada
 Programming Language :: Assembly
 Programming Language :: Awk
 Programming Language :: Basic
@@ -338,32 +383,34 @@ Programming Language :: Fortran
 Programming Language :: Haskell
 Programming Language :: Java
 Programming Language :: JavaScript
+Programming Language :: Kotlin
 Programming Language :: Lisp
 Programming Language :: Logo
 Programming Language :: ML
 Programming Language :: Modula
-Programming Language :: Objective C
-Programming Language :: Object Pascal
 Programming Language :: OCaml
+Programming Language :: Object Pascal
+Programming Language :: Objective C
 Programming Language :: Other
 Programming Language :: Other Scripting Engines
-Programming Language :: Pascal
-Programming Language :: Perl
 Programming Language :: PHP
-Programming Language :: Pike
-Programming Language :: Pliant
 Programming Language :: PL/SQL
 Programming Language :: PROGRESS
+Programming Language :: Pascal
+Programming Language :: Perl
+Programming Language :: Pike
+Programming Language :: Pliant
 Programming Language :: Prolog
 Programming Language :: Python
 Programming Language :: Python :: 2
+Programming Language :: Python :: 2 :: Only
 Programming Language :: Python :: 2.3
 Programming Language :: Python :: 2.4
 Programming Language :: Python :: 2.5
 Programming Language :: Python :: 2.6
 Programming Language :: Python :: 2.7
-Programming Language :: Python :: 2 :: Only
 Programming Language :: Python :: 3
+Programming Language :: Python :: 3 :: Only
 Programming Language :: Python :: 3.0
 Programming Language :: Python :: 3.1
 Programming Language :: Python :: 3.2
@@ -374,7 +421,7 @@ Programming Language :: Python :: 3.6
 Programming Language :: Python :: 3.7
 Programming Language :: Python :: 3.8
 Programming Language :: Python :: 3.9
-Programming Language :: Python :: 3 :: Only
+Programming Language :: Python :: 3.10
 Programming Language :: Python :: Implementation
 Programming Language :: Python :: Implementation :: CPython
 Programming Language :: Python :: Implementation :: IronPython
@@ -387,10 +434,10 @@ Programming Language :: REBOL
 Programming Language :: Rexx
 Programming Language :: Ruby
 Programming Language :: Rust
+Programming Language :: SQL
 Programming Language :: Scheme
 Programming Language :: Simula
 Programming Language :: Smalltalk
-Programming Language :: SQL
 Programming Language :: Tcl
 Programming Language :: Unix Shell
 Programming Language :: Visual Basic
@@ -410,13 +457,13 @@ Topic :: Communications :: Email
 Topic :: Communications :: Email :: Address Book
 Topic :: Communications :: Email :: Email Clients (MUA)
 Topic :: Communications :: Email :: Filters
-Topic :: Communications :: Email :: Mailing List Servers
 Topic :: Communications :: Email :: Mail Transport Agents
+Topic :: Communications :: Email :: Mailing List Servers
 Topic :: Communications :: Email :: Post-Office
 Topic :: Communications :: Email :: Post-Office :: IMAP
 Topic :: Communications :: Email :: Post-Office :: POP3
-Topic :: Communications :: Fax
 Topic :: Communications :: FIDO
+Topic :: Communications :: Fax
 Topic :: Communications :: File Sharing
 Topic :: Communications :: File Sharing :: Gnutella
 Topic :: Communications :: File Sharing :: Napster
@@ -429,8 +476,8 @@ Topic :: Database :: Database Engines/Servers
 Topic :: Database :: Front-Ends
 Topic :: Desktop Environment
 Topic :: Desktop Environment :: File Managers
-Topic :: Desktop Environment :: Gnome
 Topic :: Desktop Environment :: GNUstep
+Topic :: Desktop Environment :: Gnome
 Topic :: Desktop Environment :: K Desktop Environment (KDE)
 Topic :: Desktop Environment :: K Desktop Environment (KDE) :: Themes
 Topic :: Desktop Environment :: PicoGUI
@@ -450,10 +497,10 @@ Topic :: Desktop Environment :: Window Managers :: Enlightenment :: Epplets
 Topic :: Desktop Environment :: Window Managers :: Enlightenment :: Themes DR15
 Topic :: Desktop Environment :: Window Managers :: Enlightenment :: Themes DR16
 Topic :: Desktop Environment :: Window Managers :: Enlightenment :: Themes DR17
-Topic :: Desktop Environment :: Window Managers :: Fluxbox
-Topic :: Desktop Environment :: Window Managers :: Fluxbox :: Themes
 Topic :: Desktop Environment :: Window Managers :: FVWM
 Topic :: Desktop Environment :: Window Managers :: FVWM :: Themes
+Topic :: Desktop Environment :: Window Managers :: Fluxbox
+Topic :: Desktop Environment :: Window Managers :: Fluxbox :: Themes
 Topic :: Desktop Environment :: Window Managers :: IceWM
 Topic :: Desktop Environment :: Window Managers :: IceWM :: Themes
 Topic :: Desktop Environment :: Window Managers :: MetaCity
@@ -531,11 +578,11 @@ Topic :: Multimedia :: Graphics :: Presentation
 Topic :: Multimedia :: Graphics :: Viewers
 Topic :: Multimedia :: Sound/Audio
 Topic :: Multimedia :: Sound/Audio :: Analysis
-Topic :: Multimedia :: Sound/Audio :: Capture/Recording
 Topic :: Multimedia :: Sound/Audio :: CD Audio
 Topic :: Multimedia :: Sound/Audio :: CD Audio :: CD Playing
 Topic :: Multimedia :: Sound/Audio :: CD Audio :: CD Ripping
 Topic :: Multimedia :: Sound/Audio :: CD Audio :: CD Writing
+Topic :: Multimedia :: Sound/Audio :: Capture/Recording
 Topic :: Multimedia :: Sound/Audio :: Conversion
 Topic :: Multimedia :: Sound/Audio :: Editors
 Topic :: Multimedia :: Sound/Audio :: MIDI
@@ -573,6 +620,7 @@ Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)
 Topic :: Scientific/Engineering :: GIS
 Topic :: Scientific/Engineering :: Human Machine Interfaces
 Topic :: Scientific/Engineering :: Hydrology
+Topic :: Scientific/Engineering :: Image Processing
 Topic :: Scientific/Engineering :: Image Recognition
 Topic :: Scientific/Engineering :: Information Analysis
 Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator
@@ -600,13 +648,13 @@ Topic :: Software Development :: Interpreters
 Topic :: Software Development :: Libraries
 Topic :: Software Development :: Libraries :: Application Frameworks
 Topic :: Software Development :: Libraries :: Java Libraries
-Topic :: Software Development :: Libraries :: Perl Modules
 Topic :: Software Development :: Libraries :: PHP Classes
+Topic :: Software Development :: Libraries :: Perl Modules
 Topic :: Software Development :: Libraries :: Pike Modules
-Topic :: Software Development :: Libraries :: pygame
 Topic :: Software Development :: Libraries :: Python Modules
 Topic :: Software Development :: Libraries :: Ruby Modules
 Topic :: Software Development :: Libraries :: Tcl Extensions
+Topic :: Software Development :: Libraries :: pygame
 Topic :: Software Development :: Localization
 Topic :: Software Development :: Object Brokering
 Topic :: Software Development :: Object Brokering :: CORBA
@@ -645,6 +693,20 @@ Topic :: System :: Hardware
 Topic :: System :: Hardware :: Hardware Drivers
 Topic :: System :: Hardware :: Mainframes
 Topic :: System :: Hardware :: Symmetric Multi-processing
+Topic :: System :: Hardware :: Universal Serial Bus (USB)
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Audio
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Audio/Video (AV)
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Communications Device Class (CDC)
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Diagnostic Device
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Hub
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Human Interface Device (HID)
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Mass Storage
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Miscellaneous
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Printer
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Smart Card
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Vendor
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Video (UVC)
+Topic :: System :: Hardware :: Universal Serial Bus (USB) :: Wireless Controller
 Topic :: System :: Installation/Setup
 Topic :: System :: Logging
 Topic :: System :: Monitoring
@@ -662,11 +724,11 @@ Topic :: System :: Power (UPS)
 Topic :: System :: Recovery Tools
 Topic :: System :: Shells
 Topic :: System :: Software Distribution
+Topic :: System :: System Shells
 Topic :: System :: Systems Administration
 Topic :: System :: Systems Administration :: Authentication/Directory
 Topic :: System :: Systems Administration :: Authentication/Directory :: LDAP
 Topic :: System :: Systems Administration :: Authentication/Directory :: NIS
-Topic :: System :: System Shells
 Topic :: Terminals
 Topic :: Terminals :: Serial
 Topic :: Terminals :: Telnet
@@ -686,8 +748,10 @@ Topic :: Text Processing :: Linguistic
 Topic :: Text Processing :: Markup
 Topic :: Text Processing :: Markup :: HTML
 Topic :: Text Processing :: Markup :: LaTeX
+Topic :: Text Processing :: Markup :: Markdown
 Topic :: Text Processing :: Markup :: SGML
 Topic :: Text Processing :: Markup :: VRML
 Topic :: Text Processing :: Markup :: XML
+Topic :: Text Processing :: Markup :: reStructuredText
 Topic :: Utilities
 Typing :: Typed
