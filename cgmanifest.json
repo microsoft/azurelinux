@@ -24534,8 +24534,8 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.25.9",
-          "downloadUrl": "https://github.com/shazow/urllib3/archive/1.25.9/urllib3-1.25.9.tar.gz"
+          "version": "1.26.9",
+          "downloadUrl": "https://github.com/urllib3/urllib3/archive/1.26.9.tar.gz"
         }
       }
     },
@@ -24574,8 +24574,8 @@
         "type": "other",
         "other": {
           "name": "python-virtualenv",
-          "version": "16.0.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/33/bc/fa0b5347139cd9564f0d44ebd2b147ac97c36b2403943dbee8a25fd74012/virtualenv-16.0.0.tar.gz"
+          "version": "20.14.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
         }
       }
     },
@@ -24584,8 +24584,8 @@
         "type": "other",
         "other": {
           "name": "python-wcwidth",
-          "version": "0.1.7",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/w/wcwidth/wcwidth-0.1.7.tar.gz"
+          "version": "0.2.5",
+          "downloadUrl": "https://github.com/jquast/wcwidth/archive/0.2.5.tar.gz"
         }
       }
     },
@@ -24614,8 +24614,8 @@
         "type": "other",
         "other": {
           "name": "python-websocket-client",
-          "version": "0.56.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/c5/01/8c9c7de6c46f88e70b5a3276c791a2be82ae83d8e0d0cc030525ee2866fd/websocket_client-0.56.0.tar.gz"
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/websocket-client/websocket-client/archive/v1.3.1.tar.gz"
         }
       }
     },
