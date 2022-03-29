@@ -24524,8 +24524,8 @@
         "type": "other",
         "other": {
           "name": "python-twisted",
-          "version": "19.2.1",
-          "downloadUrl": "https://pypi.python.org/packages/source/T/Twisted/Twisted-19.2.1.tar.bz2"
+          "version": "22.2.0",
+          "downloadUrl": "https://github.com/twisted/twisted/archive/refs/tags/twisted-22.2.0.tar.gz"
         }
       }
     },
