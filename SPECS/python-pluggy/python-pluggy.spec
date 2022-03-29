@@ -15,8 +15,6 @@ Source0:        https://files.pythonhosted.org/packages/a1/16/db2d7de3474b6e37cb
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
-BuildRequires:  python3-packaging
-BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 

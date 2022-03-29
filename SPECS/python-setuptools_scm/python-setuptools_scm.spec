@@ -34,6 +34,8 @@ Summary:        python-setuptools_scm
 
 Requires:       python3
 Requires:       python3-libs
+Requires:       python3-packaging
+Requires:       python3-pip
 Requires:       python3-tomli
 
 Provides:       %{name} = %{version}-%{release}
