@@ -1,14 +1,14 @@
+%global debug_package %{nil}
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
-Version:        19.2.1
-Release:        10%{?dist}
+Version:        22.2.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://twistedmatrix.com
-Source0:        https://pypi.python.org/packages/source/T/Twisted/Twisted-%{version}.tar.bz2
-Patch0:         extra_dependency.patch
+Source0:        https://github.com/twisted/twisted/archive/refs/tags/twisted-%{version}.tar.gz
 Patch1:         no_packet.patch
 
 BuildRequires:  python3-devel
@@ -19,7 +19,10 @@ BuildRequires:  python3-xml
 BuildRequires:  python3-zope-interface
 %if %{with_check}
 BuildRequires:  python3-pip
+BuildRequires:  net-tools
 BuildRequires:  sudo
+BuildRequires:  tzdata
+BuildRequires:  git
 %endif
 
 AutoReqProv:    no
@@ -45,7 +48,7 @@ Twisted is an event-driven networking engine written in Python and licensed unde
 Twisted also supports many common network protocols, including SMTP, POP3, IMAP, SSHv2, and DNS.
 
 %prep
-%autosetup -p 1 -n Twisted-%{version}
+%autosetup -p 1 -n twisted-twisted-%{version}
 
 %build
 %py3_build
@@ -66,8 +69,9 @@ route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 chmod g+w . -R
 useradd test -G root -m
 pip3 install --upgrade tox
+pip3 install PyHamcrest
 chmod g+w . -R
-LANG=en_US.UTF-8 sudo -u test tox -e py%{python3_version_nodots}
+LANG=en_US.UTF-8 sudo -u test tox -e nocov
 
 %files -n python3-twisted
 %defattr(-,root,root)
@@ -92,6 +96,9 @@ LANG=en_US.UTF-8 sudo -u test tox -e py%{python3_version_nodots}
 %{_bindir}/cftp3
 
 %changelog
+* Mon Mar 28 2022 Jon Slobodzian <joslobo@microsoft.com> - 22.2.0-1
+- Upgrade to version 22.2.0-1
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 19.2.1-10
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 

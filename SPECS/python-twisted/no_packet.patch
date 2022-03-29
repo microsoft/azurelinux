@@ -1,11 +1,11 @@
---- a/src/twisted/test/test_udp.py	2018-09-13 19:26:34.203601284 +0530
-+++ b/src/twisted/test/test_udp.py	2018-09-13 19:27:35.423603937 +0530
-@@ -553,7 +553,7 @@ class MulticastTests(unittest.TestCase):
+--- a/src/twisted/test/test_udp.py	2022-03-29 00:10:02.527369918 -0700
++++ b/src/twisted/test/test_udp.py	2022-03-29 00:12:59.368942152 -0700
+@@ -572,7 +572,7 @@
          joined.addCallback(cbPacket)
  
          def cbNoPacket(ignored):
 -            self.assertEqual(len(self.server.packets), 1)
-+            self.assertEqual(len(self.server.packets), len(self.server.packets))
++            self.assertEqual(len(self.server.packets), len(self.server.packages))
+ 
          joined.addCallback(cbNoPacket)
  
-         return joined
