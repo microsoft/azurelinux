@@ -8,8 +8,8 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.10.102.1
-Release:        2%{?dist}
+Version:        5.10.109.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,8 +28,6 @@ Source102:      hypervvss.rules
 Source201:      hypervfcopyd.service
 Source202:      hypervfcopy.rules
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
-Patch1:         CVE-2022-24958.patch
-Patch2:         CVE-2022-1016.patch
 BuildRequires:  gcc
 Requires:       hypervfcopyd = %{version}-%{release}
 Requires:       hypervkvpd = %{version}-%{release}
@@ -108,8 +106,6 @@ Contains tools and scripts useful for Hyper-V guests.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
 pushd tools/hv
@@ -225,6 +221,10 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Tue Mar 29 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.10.109.1-1
+- Update source to 5.10.109.1
+- Remove CVE-2022-24958.patch and CVE-2022-1016.patch
+
 * Fri Mar 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-2
 - Apply CVE-2022-1016.patch
 
