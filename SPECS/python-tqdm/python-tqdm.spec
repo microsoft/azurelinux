@@ -6,13 +6,13 @@ Instantly make your loops show a smart progress meter - just wrap any iterable\
 with "tqdm(iterable)", and you are done!
 Summary:        Fast, Extensible Progress Meter
 Name:           python-%{srcname}
-Version:        4.50.2
-Release:        2%{?dist}
+Version:        4.63.1
+Release:        1%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/tqdm/tqdm
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{_description}
@@ -22,6 +22,9 @@ BuildArch:      noarch
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-wheel
+BuildRequires:  python3-pip
 
 %description -n python3-%{srcname} %{_description}
 
@@ -39,6 +42,10 @@ Python 3 version.
 mkdir -p %{buildroot}%{_mandir}/man1/
 mv -v %{buildroot}%{python3_sitelib}/%{srcname}/%{srcname}.1 %{buildroot}%{_mandir}/man1/
 
+%check
+pip3 install tox
+tox -e setup.py
+
 %files -n python3-%{srcname}
 %license LICENCE
 %doc README.rst examples
@@ -47,7 +54,12 @@ mv -v %{buildroot}%{python3_sitelib}/%{srcname}/%{srcname}.1 %{buildroot}%{_mand
 %{python3_sitelib}/%{srcname}-*.egg-info/
 %{python3_sitelib}/%{srcname}/
 
+
 %changelog
+* Mon Mar 28 2022 Jon Slobodzian <joslobo@microsoft.com> - 4.63.1-1
+- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+- License verified
+
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 4.50.2-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
