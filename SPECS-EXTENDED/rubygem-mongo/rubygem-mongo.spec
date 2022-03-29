@@ -6,12 +6,12 @@ Distribution:   Mariner
 %bcond_with tests
 
 Name: rubygem-%{gem_name}
-Version: 2.11.2
-Release: 3%{?dist}
+Version: 2.17.0
+Release: 1%{?dist}
 Summary: Ruby driver for MongoDB
 License: ASL 2.0
 URL: https://docs.mongodb.com/ruby-driver/
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source0: https://github.com/mongodb/mongo-ruby-driver/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-driver-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -26,7 +26,6 @@ BuildArch: noarch
 %description
 A Ruby driver for MongoDB.
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -36,11 +35,10 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%setup -q -n %{gem_name}-ruby-driver-%{version}
 
 %build
-# Create the gem as gem install only works on a gem file
-gem build ../%{gem_name}-%{version}.gemspec
+gem build %{gem_name}
 
 %gem_install
 
@@ -113,6 +111,11 @@ popd
 %{gem_instdir}/spec
 
 %changelog
+* Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.17.0-1
+- Update to v2.17.0.
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
