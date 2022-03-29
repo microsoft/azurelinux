@@ -10,7 +10,7 @@ Group:          Development Tools
 URL:            https://github.com/NVIDIA/nvidia-docker
 #Source0:       https://github.com/NVIDIA/nvidia-docker/archive/v%%{version}.tar.gz
 Source0:        nvidia-docker-%{version}.tar.gz
-Requires:       nvidia-container-runtime >= 3.9.0
+Requires:       nvidia-container-toolkit >= 1.9.0
 Conflicts:      nvidia-docker < 2.0.0
 BuildArch:      noarch
 
@@ -35,7 +35,8 @@ install -m 644 -t %{buildroot}%{_sysconfdir}/docker daemon.json
 %changelog
 * Tue Mar 28 2022 Adithya Jayachandran <adjayach@microsoft.com> - 2.10.0-1
 - Updating package to v2.10.0
-- Bump dependency on nvidia-container-runtime to current toolkit v3.9.0
+- Replace nvidia-container-runtime dependence with nvidia-container-toolkit
+- Bump the nvidia-container-toolkit dependency to v1.9.0
 
 * Wed May 19 2021 Joseph Knierman <joknierm@microsoft.com> - 2.6.0-2
 - License verified
