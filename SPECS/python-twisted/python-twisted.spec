@@ -9,7 +9,6 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://twistedmatrix.com
 Source0:        https://github.com/twisted/twisted/archive/refs/tags/twisted-%{version}.tar.gz
-Patch1:         no_packet.patch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-incremental
@@ -68,8 +67,7 @@ ln -s cftp %{buildroot}/%{_bindir}/cftp3
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test pip3 install --upgrade pip
-sudo -u test pip3 install tox PyHamcrest cython-test-exception-raiser
+sudo -u test pip3 install --upgrade pip tox
 chmod g+w . -R
 LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 
