@@ -5,6 +5,7 @@
         "cloud-utils-growpart",
         "dhcp-client",
         "hyperv-daemons",
+        "netplan",
         "openssh-server",
         "python-xml",
         "rsyslog",
