@@ -1,7 +1,7 @@
 Summary:	This package contains programs to find files
 Name:		findutils
 Version:	4.6.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:	GPLv3+
 URL:		http://www.gnu.org/software/findutils
 Group:		Applications/File
@@ -10,6 +10,8 @@ Distribution:   Mariner
 Source0:	http://ftp.gnu.org/gnu/findutils/%{name}-%{version}.tar.gz
 %define sha1 findutils=f18e8aaee3f3d4173a1f598001003be8706d28b0
 Conflicts:      toybox
+Requires:       libselinux
+BuildRequires:  libselinux-devel
 %description
 These programs are provided to recursively search through a
 directory tree and to create, maintain, and search a database
@@ -62,6 +64,10 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Mar 28 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 4.6.0-8
+- chpebeni@microsoft.com, 4.8.0-3: Add missing (Build)Requires 
+  needed to enable SELinux support.
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 4.6.0-7
 - Added %%license line automatically
 
