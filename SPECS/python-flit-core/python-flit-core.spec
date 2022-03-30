@@ -34,13 +34,17 @@ Summary:        PEP 517 build backend for packages using Flit.
 %description -n python3-%{srcname}-core %{_description}
 
 %prep
-%autosetup -p1 -n %{srcname}-%{version}/flit_core
+%autosetup -p1 -n %{srcname}-%{version}
 
 %build
 export FLIT_NO_NETWORK=1
+
+cd flit_core
 %pyproject_wheel
 
 %install
+
+cd flit_core
 %pyproject_install
 
 # Don't ship tests in 'flit_core' package.
