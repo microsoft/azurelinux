@@ -7,7 +7,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.26.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -181,6 +181,10 @@ arch="arm64"
 archdir="arm64"
 %endif
 
+# Add CBL-Mariner cert into kernel's trusted keyring
+cp %{SOURCE4} certs/mariner.pem
+sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
+
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=${arch} oldconfig
@@ -199,9 +203,6 @@ if [ -s config_diff ]; then
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
     exit 1
 fi
-
-# Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
 
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
 
@@ -406,6 +407,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Mar 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.26.1-3
+- Remove hardcoded mariner.pem from configs and instead insert during
+  the build phase
+
 * Mon Mar 14 2022 Vince Perri <viperri@microsoft.com> - 5.15.26.1-2
 - Add support for compressed firmware
 
