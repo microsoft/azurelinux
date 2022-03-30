@@ -61,8 +61,7 @@ LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}      \
 go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o bin/node_exporter
 
 %check
-make test
-bin/node_exporter --help
+bin/node_exporter --help && make test
 
 %install
 install -m 0755 -vd %{buildroot}%{_bindir}
