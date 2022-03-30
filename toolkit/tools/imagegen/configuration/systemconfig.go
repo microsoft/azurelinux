@@ -20,7 +20,7 @@ type SystemConfig struct {
 	Hostname           string              `json:"Hostname"`
 	Name               string              `json:"Name"`
 	PackageLists       []string            `json:"PackageLists"`
-	Packages		   []string			   `json:"Packages"`
+	Packages           []string            `json:"Packages"`
 	KernelOptions      map[string]string   `json:"KernelOptions"`
 	KernelCommandLine  KernelCommandLine   `json:"KernelCommandLine"`
 	AdditionalFiles    map[string]string   `json:"AdditionalFiles"`
