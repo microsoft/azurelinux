@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,7 @@ BuildRequires:  libxslt
 BuildRequires:  pam-devel
 Requires:       audit-libs
 Requires:       cracklib
+Requires:       libpwquality
 Requires:       libselinux
 Requires:       libsemanage
 Requires:       pam
@@ -172,6 +173,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Mar 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.9-8
+- Add requires libpwquality
+
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-7
 - Build with audit-libs
 - Add BR for itstool

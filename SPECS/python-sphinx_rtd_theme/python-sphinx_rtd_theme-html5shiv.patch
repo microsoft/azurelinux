@@ -1,0 +1,58 @@
+--- a/package.json
++++ b/package.json
+@@ -25,7 +25,6 @@
+     "css-loader": "^3.6.0",
+     "file-loader": "^3.0.1",
+     "font-awesome": "^4.7.0",
+-    "html5shiv": "^3.7.3",
+     "imports-loader": "^0.8.0",
+     "jquery": "^3.6.0",
+     "lato-font": "^3.0.0",
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -3246,12 +3246,6 @@
+       "integrity": "sha512-8nxjcBcd8wovbeKx7h3wTji4e6+rhaVuPNpMqwWgnHh+N9ToqsCs6XztWRBPQ+UtzsoMAdKZtUENoVzU/EMtZA==",
+       "dev": true
+     },
+-    "html5shiv": {
+-      "version": "3.7.3",
+-      "resolved": "https://registry.npmjs.org/html5shiv/-/html5shiv-3.7.3.tgz",
+-      "integrity": "sha1-14qEo2e8uacQEA1XgCw4ewhGMdI=",
+-      "dev": true
+-    },
+     "http-deceiver": {
+       "version": "1.2.7",
+       "resolved": "https://registry.npmjs.org/http-deceiver/-/http-deceiver-1.2.7.tgz",
+--- a/sphinx_rtd_theme/layout.html
++++ b/sphinx_rtd_theme/layout.html
+@@ -61,9 +61,6 @@
+ 
+   {#- JAVASCRIPTS #}
+   {%- block scripts %}
+-  <!--[if lt IE 9]>
+-    <script src="{{ pathto('_static/js/html5shiv.min.js', 1) }}"></script>
+-  <![endif]-->
+   {%- if not embedded %}
+   {# XXX Sphinx 1.8.0 made this an external js-file, quick fix until we refactor the template to inherert more blocks directly from sphinx #}
+     {%- if sphinx_version_info >= (1, 8) -%}
+--- a/webpack.common.js
++++ b/webpack.common.js
+@@ -1,6 +1,5 @@
+ const path = require("path");
+ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+-const CopyPlugin = require('copy-webpack-plugin');
+ 
+ module.exports = {
+   entry: {
+@@ -66,11 +65,5 @@ module.exports = {
+       filename: "css/[name].css?[hash]",
+       chunkFilename: "css/[name].css?[hash]"
+     }),
+-    new CopyPlugin([
+-      {
+-        from: 'node_modules/html5shiv/dist/*.min.js',
+-        flatten: true,
+-        to: path.resolve(__dirname,'sphinx_rtd_theme/static/js') },
+-    ]),
+   ]
+ };

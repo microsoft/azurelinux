@@ -1,29 +1,28 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{name}-%{version}.tar.xz
-
+Source1:        runuser
+Source2:        runuser-l
 BuildRequires:  audit-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  ncurses-devel
-%if %{with_check}
-BuildRequires:  ncurses-term
-%endif
-
+BuildRequires:  pam-devel
 Requires:       %{name}-devel = %{version}-%{release}
 Requires:       audit-libs
-
 Conflicts:      toybox
-
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
+%if %{with_check}
+BuildRequires:  ncurses-term
+%endif
 
 %description
 Utilities for handling file systems, consoles, partitions,
@@ -84,6 +83,10 @@ install -d %{buildroot}%{_sharedstatedir}/libuuid
 
 %find_lang %{name}
 
+install -vdm755 %{buildroot}%{_sysconfdir}/pam.d
+install -vm644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/
+install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
+
 %check
 chown -Rv nobody .
 sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
@@ -107,6 +110,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man8/*
 %{_datadir}/bash-completion/completions/*
 %{_docdir}/util-linux/getopt*
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser-l
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -126,6 +131,10 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Mon Mar 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.36.2-4
+- Add Debian's PAM configs for runuser tool
+- Add build require on pam-devel so we have the pam headers
+
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 2.37.2-3
 - Build with audit support
 

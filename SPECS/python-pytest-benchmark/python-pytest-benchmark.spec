@@ -12,13 +12,13 @@ Notable features and goals:\
 %global srcname pytest-benchmark
 Summary:        A py.test fixture for benchmarking code
 Name:           python-%{srcname}
-Version:        3.2.3
-Release:        6%{?dist}
+Version:        3.4.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://pytest-benchmark.readthedocs.io
-Source:         https://github.com/ionelmc/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+URL:            https://github.com/ionelmc/pytest-benchmark
+Source:         %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildRequires:  python3-cpuinfo
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -79,6 +79,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/pytest_benchmark-%{version}-py*.egg-info
 
 %changelog
+* Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.1-1
+- Updating to 3.4.1.
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 3.2.3-6
 - Update cgmanifest and license info
 - License verified
