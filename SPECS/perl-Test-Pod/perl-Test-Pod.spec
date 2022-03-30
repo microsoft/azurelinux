@@ -1,35 +1,40 @@
+# Remove under-specified dependcies
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Simple\\)$
+
+Summary:        Test POD files for correctness
 Name:           perl-Test-Pod
 Version:        1.52
 Release:        9%{?dist}
-Summary:        Test POD files for correctness
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Pod
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Pod-%{version}.tar.gz#/perl-Test-Pod-%{version}.tar.gz
+
 BuildArch:      noarch
+
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(warnings)
-BuildRequires:  perl(strict)
+
 # Run-time
 BuildRequires:  perl(File::Find)
-BuildRequires:  perl(Pod::Simple) >= 3.05
-BuildRequires:  perl(Test::Builder)
+
 # Tests
 BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(Pod::Simple) >= 3.05
+BuildRequires:  perl(Test::Builder)
 BuildRequires:  perl(Test::Builder::Tester) >= 1.02
 BuildRequires:  perl(Test::More) >= 0.62
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl(File::Find)
 Requires:       perl(Pod::Simple) >= 3.05
 Requires:       perl(Test::More) >= 0.62
-
-# Remove under-specified dependcies
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Simple\\)$
 
 %description
 Check POD files for errors or warnings in a test file, using Pod::Simple to do

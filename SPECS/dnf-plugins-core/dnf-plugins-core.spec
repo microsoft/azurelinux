@@ -1,7 +1,8 @@
-%{?!dnf_lowest_compatible: %global dnf_lowest_compatible 4.2.22}
+%global dnf_lowest_compatible 4.2.22
 %global dnf_plugins_extra 2.0.0
 %global hawkey_version 0.46.1
 %global yum_utils_subpackage_name dnf-utils
+
 %bcond_without yumcompatibility
 %bcond_without yumutils
 
@@ -14,12 +15,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/dnf-plugins-core
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildArch:      noarch
-BuildRequires:  cmake
-BuildRequires:  gettext
+
 # Documentation
 BuildRequires:  %{_bindir}/sphinx-build-3
+BuildRequires:  cmake
+BuildRequires:  gettext
+
 Requires:       python3-%{name} = %{version}-%{release}
+
 Provides:       dnf-command(builddep)
 Provides:       dnf-command(changelog)
 Provides:       dnf-command(config-manager)
@@ -50,12 +55,12 @@ Provides:       dnf-plugin-repodiff = %{version}-%{release}
 Provides:       dnf-plugin-repograph = %{version}-%{release}
 Provides:       dnf-plugin-repomanage = %{version}-%{release}
 Provides:       dnf-plugin-reposync = %{version}-%{release}
+
 %if %{with yumcompatibility}
 Provides:       yum-plugin-copr = %{version}-%{release}
 Provides:       yum-plugin-changelog = %{version}-%{release}
 Provides:       yum-plugin-auto-update-debug-info = %{version}-%{release}
 %endif
-Conflicts:      dnf-plugins-extras-common-data < %{dnf_plugins_extra}
 
 %description
 Core Plugins for DNF. This package enhances DNF with builddep, config-manager,
@@ -64,31 +69,34 @@ repograph, repomanage, reposync, changelog and repodiff commands. Additionally
 provides generate_completion_cache passive plugin.
 
 %package -n python3-%{name}
-Summary:    Core Plugins for DNF
 %{?python_provide:%python_provide python3-%{name}}
+Summary:        Core Plugins for DNF
+
 BuildRequires:  python3-dbus
 BuildRequires:  python3-devel
 BuildRequires:  python3-dnf >= %{dnf_lowest_compatible}
+
 %if %{with_check}
 BuildRequires:  python3-nose2
 %endif
+
 Requires:       python3-dateutil
 Requires:       python3-dbus
 Requires:       python3-distro
 Requires:       python3-dnf >= %{dnf_lowest_compatible}
 Requires:       python3-hawkey >= %{hawkey_version}
+
+# let the both python plugin versions be updated simultaneously
 Provides:       python3-dnf-plugins-extras-debug = %{version}-%{release}
 Provides:       python3-dnf-plugins-extras-repoclosure = %{version}-%{release}
 Provides:       python3-dnf-plugins-extras-repograph = %{version}-%{release}
 Provides:       python3-dnf-plugins-extras-repomanage = %{version}-%{release}
+
 Obsoletes:      python3-dnf-plugins-extras-debug < %{dnf_plugins_extra}
 Obsoletes:      python3-dnf-plugins-extras-repoclosure < %{dnf_plugins_extra}
 Obsoletes:      python3-dnf-plugins-extras-repograph < %{dnf_plugins_extra}
 Obsoletes:      python3-dnf-plugins-extras-repomanage < %{dnf_plugins_extra}
-Conflicts:      %{name} <= 0.1.5
-# let the both python plugin versions be updated simultaneously
-Conflicts:      python2-%{name} < %{version}-%{release}
-Conflicts:      python-%{name} < %{version}-%{release}
+
 
 %description -n python3-%{name}
 Core Plugins for DNF, Python 3 interface. This package enhances DNF with builddep,
@@ -99,19 +107,13 @@ Additionally provides generate_completion_cache passive plugin.
 
 %if %{with yumutils}
 %package -n %{yum_utils_subpackage_name}
-%if "%{yum_utils_subpackage_name}" == "dnf-utils"
-Conflicts:      yum-utils < 1.1.31-520
-%if 0%{?rhel} != 7
-Provides:       yum-utils = %{version}-%{release}
-%endif
-%else
-Provides:       dnf-utils = %{version}-%{release}
-Obsoletes:      dnf-utils < %{version}-%{release}
-%endif
-Requires:       dnf >= %{dnf_lowest_compatible}
-Requires:       %{name} = %{version}-%{release}
-Requires:       python3-dnf >= %{dnf_lowest_compatible}
 Summary:        Yum-utils CLI compatibility layer
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       dnf >= %{dnf_lowest_compatible}
+Requires:       python3-dnf >= %{dnf_lowest_compatible}
+
+Provides:       yum-utils = %{version}-%{release}
 
 %description -n %{yum_utils_subpackage_name}
 As a Yum-utils CLI compatibility layer, supplies in CLI shims for
@@ -122,13 +124,14 @@ download and yum-groups-manager that use new implementations using DNF.
 
 %package -n python3-dnf-plugin-leaves
 Summary:        Leaves Plugin for DNF
+
 Requires:       python3-%{name} = %{version}-%{release}
+
 Provides:       python3-dnf-plugins-extras-leaves = %{version}-%{release}
 Provides:       dnf-command(leaves)
 Provides:       dnf-plugin-leaves = %{version}-%{release}
 Provides:       dnf-plugins-extras-leaves = %{version}-%{release}
-Conflicts:      dnf-plugins-extras-common-data < %{dnf_plugins_extra}
-Conflicts:      python2-dnf-plugin-leaves < %{version}-%{release}
+
 Obsoletes:      python3-dnf-plugins-extras-leaves < %{dnf_plugins_extra}
 
 %description -n python3-dnf-plugin-leaves
@@ -137,13 +140,14 @@ not required by any other installed package.
 
 %package -n python3-dnf-plugin-local
 Summary:        Local Plugin for DNF
+
 Requires:       %{_bindir}/createrepo_c
 Requires:       python3-%{name} = %{version}-%{release}
-Provides:       dnf-plugin-local =  %{version}-%{release}
+
+Provides:       dnf-plugin-local = %{version}-%{release}
 Provides:       python3-dnf-plugins-extras-local = %{version}-%{release}
 Provides:       dnf-plugins-extras-local = %{version}-%{release}
-Conflicts:      dnf-plugins-extras-common-data < %{dnf_plugins_extra}
-Conflicts:      python2-dnf-plugin-local < %{version}-%{release}
+
 Obsoletes:      python3-dnf-plugins-extras-local < %{dnf_plugins_extra}
 
 %description -n python3-dnf-plugin-local
@@ -152,9 +156,10 @@ packages to a repository on the local filesystem and generating repo metadata.
 
 %package -n python3-dnf-plugin-post-transaction-actions
 Summary:        Post transaction actions Plugin for DNF
+
 Requires:       python3-%{name} = %{version}-%{release}
-Provides:       dnf-plugin-post-transaction-actions =  %{version}-%{release}
-Conflicts:      python2-dnf-plugin-post-transaction-actions < %{version}-%{release}
+
+Provides:       dnf-plugin-post-transaction-actions = %{version}-%{release}
 
 %description -n python3-dnf-plugin-post-transaction-actions
 Post transaction actions Plugin for DNF, Python 3 version. Plugin runs actions
@@ -163,14 +168,15 @@ files.
 
 %package -n python3-dnf-plugin-show-leaves
 Summary:        Show-leaves Plugin for DNF
+
 Requires:       python3-%{name} = %{version}-%{release}
 Requires:       python3-dnf-plugin-leaves = %{version}-%{release}
-Provides:       dnf-plugin-show-leaves =  %{version}-%{release}
+
+Provides:       dnf-plugin-show-leaves = %{version}-%{release}
 Provides:       python3-dnf-plugins-extras-show-leaves = %{version}-%{release}
 Provides:       dnf-command(show-leaves)
 Provides:       dnf-plugins-extras-show-leaves = %{version}-%{release}
-Conflicts:      dnf-plugins-extras-common-data < %{dnf_plugins_extra}
-Conflicts:      python2-dnf-plugin-show-leaves < %{version}-%{release}
+
 Obsoletes:      python3-dnf-plugins-extras-show-leaves < %{dnf_plugins_extra}
 
 %description -n python3-dnf-plugin-show-leaves
@@ -180,17 +186,18 @@ after a transaction.
 
 %package -n python3-dnf-plugin-versionlock
 Summary:        Version Lock Plugin for DNF
+
 Requires:       python3-%{name} = %{version}-%{release}
-Provides:       dnf-plugin-versionlock =  %{version}-%{release}
+
+Provides:       dnf-plugin-versionlock = %{version}-%{release}
 Provides:       python3-dnf-plugins-extras-versionlock = %{version}-%{release}
 Provides:       dnf-command(versionlock)
+Provides:       dnf-plugins-extras-versionlock = %{version}-%{release}
+Obsoletes:      python3-dnf-plugins-extras-versionlock < %{dnf_plugins_extra}
+
 %if %{with yumcompatibility}
 Provides:       yum-plugin-versionlock = %{version}-%{release}
 %endif
-Provides:       dnf-plugins-extras-versionlock = %{version}-%{release}
-Conflicts:      dnf-plugins-extras-common-data < %{dnf_plugins_extra}
-Conflicts:      python2-dnf-plugin-versionlock < %{version}-%{release}
-Obsoletes:      python3-dnf-plugins-extras-versionlock < %{dnf_plugins_extra}
 
 %description -n python3-dnf-plugin-versionlock
 Version lock plugin takes a set of name/versions for packages and excludes all other
@@ -203,7 +210,7 @@ mkdir build-py3
 
 %build
 pushd build-py3
-  %cmake ../ -DPYTHON_DESIRED:FILEPATH=%{__python3} -DWITHOUT_LOCAL:str=0%{?rhel}
+  %cmake ../ -DPYTHON_DESIRED:FILEPATH=python3 -DWITHOUT_LOCAL:str=0
   %make_build
   make doc-man
 popd
@@ -921,7 +928,6 @@ PYTHONPATH=./plugins nosetests-%{python3_version} -s tests/
 - url for copr repos changed (RhBug:1227190) (Miroslav Suchý)
 - repoquery: fixed conflicts package format (Adam Salih)
 - document that globs can be used in dnf config-manager (Michael Mraka)
-
 
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.1.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild

@@ -1,40 +1,38 @@
+%global __ocaml_requires_opts -i Asttypes -i Parsetree
+
+Summary:        Objective CAML package manager and build helper
 Name:           ocaml-findlib
 Version:        1.8.1
 Release:        15%{?dist}
-Summary:        Objective CAML package manager and build helper
 License:        BSD
-
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://projects.camlcity.org/projects/findlib.html
 Source0:        http://download.camlcity.org/download/findlib-%{version}.tar.gz
 Patch0:         bytes-lib-detection.patch
+
+BuildRequires:  gawk
+BuildRequires:  m4
+BuildRequires:  ncurses-devel
 BuildRequires:  ocaml >= 4.02.0
-# BuildRequires:  ocaml-labltk-devel
-BuildRequires:  ocaml-ocamlbuild-devel
 #BuildRequires:  ocaml-num-devel
 BuildRequires:  ocaml-compiler-libs
+# BuildRequires:  ocaml-labltk-devel
+BuildRequires:  ocaml-ocamlbuild-devel
 BuildRequires:  ocaml-ocamldoc
-BuildRequires:  m4, ncurses-devel
-BuildRequires:  gawk
+
 Requires:       ocaml
-
-%global __ocaml_requires_opts -i Asttypes -i Parsetree
-
 
 %description
 Objective CAML package manager and build helper.
-
 
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 
-
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
 
 %prep
 %autosetup -p1 -n findlib-%{version}
@@ -60,10 +58,10 @@ rm doc/guide-html/TIMESTAMP
 
 %install
 # Grrr destdir grrrr
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man{1,5}
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_mandir}/man{1,5}
 make install \
-     prefix=$RPM_BUILD_ROOT \
+     prefix=%{buildroot} \
      OCAMLFIND_BIN=%{_bindir} \
      OCAMLFIND_MAN=%{_mandir}
 
@@ -89,7 +87,6 @@ make install \
 # Had to disable this in OCaml 4.06, unclear why.
 #%%{_libdir}/ocaml/num-top
 
-
 %files devel
 %doc doc/README doc/guide-html
 %ifarch %{ocaml_native_compiler}
@@ -98,7 +95,6 @@ make install \
 %endif
 %{_libdir}/ocaml/findlib/*.mli
 %{_libdir}/ocaml/findlib/Makefile.config
-
 
 %changelog
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.1-15
@@ -446,4 +442,3 @@ make install \
 
 * Fri May 18 2007 Richard W.M. Jones <rjones@redhat.com> - 1.1.2pl1-1
 - Initial RPM release.
-

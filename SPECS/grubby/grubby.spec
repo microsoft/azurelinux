@@ -29,6 +29,7 @@ Patch0010:      0010-Fix-GCC-warnings-about-possible-string-truncations-a.patch
 Patch0011:      0011-Fix-stringop-overflow-warning.patch
 Patch0012:      0012-Fix-maybe-uninitialized-warning.patch
 Patch0013:      0013-Fix-build-RPM-416.patch
+
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
 BuildRequires:  grub2-tools-minimal
@@ -38,9 +39,11 @@ BuildRequires:  pkg-config
 BuildRequires:  popt-devel
 BuildRequires:  rpm-devel
 BuildRequires:  sed
+
 %if %{with_check}
 BuildRequires:  util-linux-ng
 %endif
+
 Requires:       findutils
 Requires:       grub2-tools
 Requires:       grub2-tools-minimal

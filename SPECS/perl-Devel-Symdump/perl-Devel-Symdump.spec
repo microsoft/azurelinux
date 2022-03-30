@@ -1,34 +1,39 @@
+Summary:        A Perl module for inspecting Perl's symbol table
 Name:           perl-Devel-Symdump
 Version:        2.18
 Release:        16%{?dist}
-Summary:        A Perl module for inspecting Perl's symbol table
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Devel-Symdump
 Source0:        https://cpan.metacpan.org/authors/id/A/AN/ANDK/Devel-Symdump-%{version}.tar.gz#/perl-Devel-Symdump-%{version}.tar.gz
+
 BuildArch:      noarch
+
 # Module Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl-interpreter
+
 # Module Runtime
 BuildRequires:  perl(B)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
-BuildRequires:  perl(constant)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
+
 # Test Suite
 BuildRequires:  perl(English)
-BuildRequires:  perl(lib)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::Harness) >= 3.04
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
+
 # Author Tests
 %if 0%{!?perl_bootstrap:1}
 # Compress::Zlib (IO-Compress) ⇒ Test::NoWarnings ⇒ Devel::StackTrace ⇒
@@ -38,6 +43,7 @@ BuildRequires:  perl(Test::Pod) >= 1.00
 # Test::Pod::Coverage ⇒ Pod::Coverage ⇒ Devel::Symdump
 BuildRequires:  perl(Test::Pod::Coverage)
 %endif
+
 # Runtime
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(B)

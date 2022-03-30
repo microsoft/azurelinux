@@ -1,29 +1,35 @@
+Summary:        Check for pod coverage in your distribution
 Name:           perl-Test-Pod-Coverage
 Version:        1.10
 Release:        17%{?dist}
-Summary:        Check for pod coverage in your distribution
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Pod-Coverage
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Test-Pod-Coverage-%{version}.tar.gz#/perl-Test-Pod-Coverage-%{version}.tar.gz
+
 BuildArch:      noarch
-BuildRequires:  perl-interpreter
+
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
+
 # Run-time:
 BuildRequires:  perl(Pod::Coverage)
+BuildRequires:  perl(Pod::Coverage::CountParents)
 BuildRequires:  perl(Test::Builder)
+BuildRequires:  perl(Test::Builder::Tester)
+BuildRequires:  perl(Test::More)
+
+# Optional tests:
+BuildRequires:  perl(Test::Pod) >= 1.14
+
 # Tests:
 BuildRequires:  perl(base)
 BuildRequires:  perl(lib)
-BuildRequires:  perl(Pod::Coverage::CountParents)
-BuildRequires:  perl(Test::Builder::Tester)
-BuildRequires:  perl(Test::More)
-# Optional tests:
-BuildRequires:  perl(Test::Pod) >= 1.14
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
@@ -39,9 +45,9 @@ perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
+%{_fixperms} %{buildroot}/*
 
 %check
 make test

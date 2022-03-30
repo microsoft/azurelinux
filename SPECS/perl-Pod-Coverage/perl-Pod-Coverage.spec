@@ -1,8 +1,12 @@
+%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Devel::Symdump\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Find\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Parser\\)$
+
+Summary:        Checks if the documentation of a module is comprehensive
 Name:           perl-Pod-Coverage
 Version:        0.23
 Release:        21%{?dist}
-Summary:        Checks if the documentation of a module is comprehensive
-License:        GPL+ or Artistic
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Pod-Coverage
@@ -10,34 +14,35 @@ Source0:        https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Pod-Coverage-%{
 Source1:        LICENSE.PTR
 # Make pod_cover more secure, CPAN RT#85540
 Patch0:         Pod-Coverage-0.23-Do-not-search-.-lib-by-pod_cover.patch
+
 BuildArch:      noarch
-BuildRequires:  perl-interpreter
+
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(B)
-BuildRequires:  perl(base)
-BuildRequires:  perl(constant)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Devel::Symdump) >= 2.01
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker)
-BuildRequires:  perl(lib)
 BuildRequires:  perl(Pod::Find) >= 0.21
 BuildRequires:  perl(Pod::Parser) >= 1.13
-BuildRequires:  perl(strict)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Pod)
+BuildRequires:  perl(base)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Devel::Symdump) >= 2.01
 Requires:       perl(Pod::Find) >= 0.21
 Requires:       perl(Pod::Parser) >= 1.13
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+
 Provides:       perl(Pod::Coverage::CountParents) = %{version}-%{release}
 
 %{?perl_default_filter}
-%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Devel::Symdump\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Find\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Parser\\)$
 
 %description
 Developers hate writing documentation.  They'd hate it even more if their

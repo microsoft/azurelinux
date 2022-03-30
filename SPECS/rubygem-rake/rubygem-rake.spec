@@ -1,32 +1,36 @@
 %global	gem_name      rake
 %global debug_package %{nil}
 
-Summary:	Rake is a Make-like program implemented in Ruby
-Name:		rubygem-%{gem_name}
-Version:    13.0.6
-Release:    1%{?dist}
-License:	MIT
-URL:		https://ruby.github.io/rake/
-Vendor:     Microsoft Corporation
-Distribution: Mariner
-Source0:	https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-BuildRequires:	ruby(release)
-BuildRequires:	rubygems-devel
-BuildRequires:	ruby
+Summary:        Rake is a Make-like program implemented in Ruby
+Name:           rubygem-%{gem_name}
+Version:        13.0.6
+Release:        1%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://ruby.github.io/rake/
+Source0:        https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+
+BuildArch:      noarch
+
+BuildRequires:  ruby
+BuildRequires:  ruby(release)
+BuildRequires:  rubygems-devel
 %if %{with_check}
-BuildRequires:	rubygem(minitest) >= 5
+BuildRequires:  rubygem(minitest) >= 5
 %endif
-BuildArch:	noarch
 
 %description
 Rake is a Make-like program implemented in Ruby. Tasks and dependencies are
 specified in standard Ruby syntax.
 
 %package	doc
-Summary:	Documentation for %{name}
+Summary:        Documentation for %{name}
+
+BuildArch:      noarch
+
 # Directory ownership issue
-Requires:	%{name} = %{version}-%{release}
-BuildArch:	noarch
+Requires:       %{name} = %{version}-%{release}
 
 %description    doc
 Documentation for %{name}.
@@ -71,7 +75,7 @@ popd
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}
-%doc %{_mandir}/man1/*
+%{_mandir}/man1/*
 %exclude %{gem_instdir}/.*
 %exclude %{gem_instdir}/rake.gemspec
 %exclude %{gem_instdir}/bin

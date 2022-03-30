@@ -1,5 +1,6 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+# The source directory.
+%global source_directory 5.2-stable
+
 %ifnarch %{ocaml_native_compiler}
 %global __strip /bin/true
 %global debug_package %{nil}
@@ -17,63 +18,62 @@ Distribution:   Mariner
 # https://github.com/libguestfs/supermin/commit/9bb57e1a8d0f3b57eb09f65dd574f702b67e1c2f
 %bcond_without dietlibc
 
-# The source directory.
-%global source_directory 5.2-stable
+Summary:        Tool for creating supermin appliances
+Name:           supermin
+Version:        5.2.1
+Release:        1%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/libguestfs/supermin
+Source0:        https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
+# For automatic RPM dependency generation.
+# See: http://www.rpm.org/wiki/PackagerDocs/DependencyGenerator
+Source3:        supermin.attr
+Source4:        supermin-find-requires
+Patch0:         %{name}-mariner.patch
 
-Summary:       Tool for creating supermin appliances
-Name:          supermin
-Version:       5.2.1
-Release:       1%{?dist}
-License:       GPLv2+
-URL:           https://github.com/libguestfs/supermin
-Source0:       https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
-Patch0:        %{name}-mariner.patch
-
-BuildRequires: /usr/bin/pod2man
-BuildRequires: /usr/bin/pod2html
-BuildRequires: rpm
-BuildRequires: rpm-devel
-BuildRequires: dnf
-BuildRequires: dnf-plugins-core
-BuildRequires: /usr/sbin/mke2fs
-BuildRequires: e2fsprogs-devel
-BuildRequires: findutils
-%if %{with dietlibc}
-BuildRequires: dietlibc-devel
-%else
-BuildRequires: glibc-static
-%endif
-BuildRequires: ocaml, ocaml-findlib-devel
-
-# These are required only to run the tests.  We could patch out the
-# tests to not require these packages.
-%if %{with_check}
-BuildRequires: augeas hivex kernel tar
-%endif
-
+BuildRequires:  %{_bindir}/pod2html
+BuildRequires:  %{_bindir}/pod2man
+BuildRequires:  %{_sbindir}/mke2fs
+BuildRequires:  dnf
+BuildRequires:  dnf-plugins-core
+BuildRequires:  e2fsprogs-devel
+BuildRequires:  findutils
 # For complicated reasons, this is required so that
 # /bin/kernel-install puts the kernel directly into /boot, instead of
 # into a /boot/<machine-id> subdirectory.  Read the
 # kernel-install script to understand why.
-BuildRequires: grubby
-BuildRequires: systemd-udev
+BuildRequires:  grubby
+BuildRequires:  ocaml
+BuildRequires:  ocaml-findlib-devel
+BuildRequires:  rpm
+BuildRequires:  rpm-devel
+BuildRequires:  systemd-udev
 
-Requires:      rpm
-Requires:      dnf
-Requires:      dnf-plugins-core
-Requires:      util-linux-ng
-Requires:      cpio
-Requires:      tar
-Requires:      /usr/sbin/mke2fs
+%if %{with dietlibc}
+BuildRequires:  dietlibc-devel
+%else
+BuildRequires:  glibc-static
+%endif
+
+%if %{with_check}
+BuildRequires:  augeas
+BuildRequires:  hivex
+BuildRequires:  kernel
+BuildRequires:  tar
+%endif
+
+Requires:       %{_sbindir}/mke2fs
+Requires:       cpio
+Requires:       dnf
+Requires:       dnf-plugins-core
 # RHBZ#771310
-Requires:      e2fsprogs-libs >= 1.42
-Requires:      findutils
-
-# For automatic RPM dependency generation.
-# See: http://www.rpm.org/wiki/PackagerDocs/DependencyGenerator
-Source3:       supermin.attr
-Source4:       supermin-find-requires
-
+Requires:       e2fsprogs-libs >= 1.42
+Requires:       findutils
+Requires:       rpm
+Requires:       tar
+Requires:       util-linux-ng
 
 %description
 Supermin is a tool for building supermin appliances.  These are tiny
@@ -81,19 +81,16 @@ appliances (similar to virtual machines), usually around 100KB in
 size, which get fully instantiated on-the-fly in a fraction of a
 second when you need to boot one of them.
 
-
 %package devel
-Summary:       Development tools for %{name}
-Requires:      %{name} = %{version}-%{release}
-Requires:      rpm-build
-
+Summary:        Development tools for %{name}
+Requires:       %{name} = %{version}-%{release}
+Requires:       rpm-build
 
 %description devel
 %{name}-devel contains development tools for %{name}.
 
 It just contains tools for automatic RPM dependency generation
 from supermin appliances.
-
 
 %prep
 %autosetup -p1
@@ -110,9 +107,9 @@ make %{?_smp_mflags}
 %install
 %make_install
 
-mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/
-install -m 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/
-install -m 0755 %{SOURCE4} $RPM_BUILD_ROOT%{_rpmconfigdir}/
+mkdir -p %{buildroot}%{_rpmconfigdir}/fileattrs/
+install -m 0644 %{SOURCE3} %{buildroot}%{_rpmconfigdir}/fileattrs/
+install -m 0755 %{SOURCE4} %{buildroot}%{_rpmconfigdir}/
 
 %check
 make check || {
