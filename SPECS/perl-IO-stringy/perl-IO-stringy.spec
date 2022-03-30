@@ -1,7 +1,7 @@
 Summary:	I/O on in-core objects like strings and arrays for Perl
 Name:		perl-IO-stringy
 Version:	2.113
-Release:	3%{?dist}
+Release:	4%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,11 +73,7 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license COPYING LICENSE
-%else
-%doc COPYING LICENSE
-%endif
 %doc Changes examples/ README
 %{perl_vendorlib}/IO/
 %{_mandir}/man3/IO::AtomicFile.3*
@@ -90,6 +86,9 @@ make test
 %{_mandir}/man3/IO::WrapTie.3*
 
 %changelog
+* Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.113-4
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.113-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

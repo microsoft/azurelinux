@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Pod-Coverage
 Source0:        https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Pod-Coverage-%{version}.tar.gz#/perl-Pod-Coverage-%{version}.tar.gz
+Source1:        LICENSE.PTR
 # Make pod_cover more secure, CPAN RT#85540
 Patch0:         Pod-Coverage-0.23-Do-not-search-.-lib-by-pod_cover.patch
 BuildArch:      noarch
@@ -50,6 +51,8 @@ module is comprehensive.
 %setup -q -n Pod-Coverage-%{version}
 %patch0 -p1
 
+cp %{SOURCE1} .
+
 %build
 perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
@@ -63,6 +66,7 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes examples
 %{_bindir}/pod_cover
 %{perl_vendorlib}/Pod/

@@ -1,6 +1,6 @@
 Name:           perl-Devel-Symdump
 Version:        2.18
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        A Perl module for inspecting Perl's symbol table
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -62,11 +62,15 @@ find %{buildroot} -type f -name .packlist -delete
 make test %{!?perl_bootstrap:AUTHOR_TEST=1}
 
 %files
+%license README
 %doc Changes README
 %{perl_vendorlib}/Devel/
 %{_mandir}/man3/Devel::Symdump.3*
 
 %changelog
+* Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.18-16
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.18-15
 - Remove epoch
 

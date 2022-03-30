@@ -4,11 +4,11 @@
 
 Name:          ocaml-ocamlbuild
 Version:       0.14.0
-Release:       14%{?dist}
+Release:       15%{?dist}
 
 Summary:       Build tool for OCaml libraries and programs
 
-License:       LGPLv2+ with exceptions
+License:       GPLv2 with exceptions
 
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -126,6 +126,9 @@ rm $RPM_BUILD_ROOT%{_libdir}/ocaml/ocamlbuild/META
 
 
 %changelog
+* Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-15
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-14
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

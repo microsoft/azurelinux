@@ -26,7 +26,7 @@ Distribution:   Mariner
 Summary:	Small libc implementation
 Name:		dietlibc
 Version:	0.34
-Release:	5%{?dist}
+Release:	6%{?dist}
 License:	GPLv2
 URL:		http://www.fefe.de/dietlibc/
 %if !0%{?prerelease:1}
@@ -139,7 +139,8 @@ ulimit -m $[ 128*1024 ] -v $[ 256*1024 ] -d $[ 128*1024 ] -s 512
 
 
 %files
-%doc AUTHOR BUGS CAVEAT CHANGES COPYING FAQ PORTING README*
+%license COPYING
+%doc AUTHOR BUGS CAVEAT CHANGES FAQ PORTING README*
 %doc SECURITY THANKS TODO
 %doc %{_mandir}/*/*
 %{_bindir}/*
@@ -149,6 +150,9 @@ ulimit -m $[ 128*1024 ] -v $[ 256*1024 ] -d $[ 128*1024 ] -s 512
 %pkglibdir
 
 %changelog
+* Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.34-6
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.34-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

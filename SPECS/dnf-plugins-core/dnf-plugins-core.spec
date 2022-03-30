@@ -8,8 +8,8 @@
 Summary:        Core Plugins for DNF
 Name:           dnf-plugins-core
 Version:        4.0.24
-Release:        1%{?dist}
-License:        GPLv2+
+Release:        2%{?dist}
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/dnf-plugins-core

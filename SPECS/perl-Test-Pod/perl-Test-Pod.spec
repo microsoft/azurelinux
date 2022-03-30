@@ -1,6 +1,6 @@
 Name:           perl-Test-Pod
 Version:        1.52
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Test POD files for correctness
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -51,11 +51,15 @@ find %{buildroot} -type f -name '*.bs' -size 0 -delete
 LC_ALL=C make test
 
 %files
+%license README
 %doc Changes README
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::Pod.3pm*
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.52-9
+- Verified license.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.52-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
