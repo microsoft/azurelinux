@@ -146,7 +146,7 @@ archdir="x86"
 %endif
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
+cp %{SOURCE3} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
