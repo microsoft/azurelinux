@@ -1,7 +1,7 @@
-diff -urN libnvidia-container-1.5.1-orig/Makefile libnvidia-container-1.5.1/Makefile
---- libnvidia-container-1.5.1-orig/Makefile	2021-09-27 09:27:48.290511043 -0700
-+++ libnvidia-container-1.5.1/Makefile	2021-09-27 11:20:34.306110214 -0700
-@@ -144,6 +144,9 @@
+diff -urN libnvidia-container-1.9.0-orig/Makefile libnvidia-container-1.9.0/Makefile
+--- libnvidia-container-1.9.0-orig/Makefile	2022-03-18 03:31:56.000000000 -0700
++++ libnvidia-container-1.9.0/Makefile	2022-03-29 15:20:11.362669600 -0700
+@@ -168,6 +168,9 @@
  LIB_CPPFLAGS       += -isystem $(DEPS_DIR)$(includedir)/tirpc -DWITH_TIRPC
  LIB_LDLIBS_STATIC  += -l:libtirpc.a
  LIB_LDLIBS_SHARED  += -lpthread
@@ -11,4 +11,3 @@ diff -urN libnvidia-container-1.5.1-orig/Makefile libnvidia-container-1.5.1/Make
  endif
  ifeq ($(WITH_SECCOMP), yes)
  LIB_CPPFLAGS       += -DWITH_SECCOMP $(shell pkg-config --cflags libseccomp)
- 

@@ -1,7 +1,7 @@
-diff -urN libnvidia-container-1.5.1-orig/mk/common.mk libnvidia-container-1.5.1/mk/common.mk
---- libnvidia-container-1.5.1-orig/mk/common.mk	2021-09-27 09:27:48.290511043 -0700
-+++ libnvidia-container-1.5.1/mk/common.mk	2021-09-27 09:28:29.354285161 -0700
-@@ -26,7 +26,7 @@
+diff -urN libnvidia-container-1.9.0-orig/mk/common.mk libnvidia-container-1.9.0/mk/common.mk
+--- libnvidia-container-1.9.0-orig/mk/common.mk	2022-03-18 03:31:56.000000000 -0700
++++ libnvidia-container-1.9.0/mk/common.mk	2022-03-29 15:16:01.971189500 -0700
+@@ -27,7 +27,7 @@
  else
      DATE := $(shell date -u --iso-8601=minutes)
  endif
@@ -9,4 +9,3 @@ diff -urN libnvidia-container-1.5.1-orig/mk/common.mk libnvidia-container-1.5.1/
 +REVISION = 0
  COMPILER := $(realpath $(shell which $(CC)))
  PLATFORM ?= $(shell uname -m)
- 
