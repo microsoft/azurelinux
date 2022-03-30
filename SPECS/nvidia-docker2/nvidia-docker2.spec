@@ -33,7 +33,7 @@ install -m 644 -t %{buildroot}%{_sysconfdir}/docker daemon.json
 %config %{_sysconfdir}/docker/daemon.json
 
 %changelog
-* Tue Mar 28 2022 Adithya Jayachandran <adjayach@microsoft.com> - 2.10.0-1
+* Mon Mar 28 2022 Adithya Jayachandran <adjayach@microsoft.com> - 2.10.0-1
 - Updating package to v2.10.0
 - Replace nvidia-container-runtime dependence with nvidia-container-toolkit
 - Bump the nvidia-container-toolkit dependency to v1.9.0
