@@ -1,13 +1,15 @@
 Summary:        This package contains programs to find files
 Name:           findutils
 Version:        4.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/findutils
 Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/findutils/%{name}-%{version}.tar.xz
+Requires:       libselinux
+BuildRequires:  libselinux-devel
 Conflicts:      toybox
 
 # Required to unblock automatic BR resolution for some Python packages.
@@ -62,6 +64,8 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Mar 23 2022 Chris PeBenito <chpebeni@microsoft.com> 4.8.0-3
+- Add missing (Build)Requires needed to enable SELinux support.
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> 4.8.0-2
 - Adding "Provides: /usr/bin/find".
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 4.8.0-1
