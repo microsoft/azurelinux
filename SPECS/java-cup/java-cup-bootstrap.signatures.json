@@ -1,0 +1,8 @@
+{
+    "Signatures": {
+     "java-cup-0.11b.tar.gz": "e0e773606e45ce1aa8ad1383e6393d53ed9dcf2861e43efa8194f567e91dbffa",
+     "java-cup-generated-files.tar.xz": "2e0fbaba016eaaf9abca1e4afe2225d952789fc8249183d75f3e8355707859e7",
+     "java-cup.license": "252a94c415df3c72289293888e70e137ffecef2a7c7823d984eae4e0b6287a6e",
+     "java-cup.script": "3114c478070cc3cc3921a0d5e00fc6a10c387c4866631a2f1f821d743bb79060"
+    }
+}

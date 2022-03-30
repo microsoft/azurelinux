@@ -33,12 +33,12 @@ Patch3:         jflex-byaccj-utl.patch
 #PATCH-FIX-OPENSUSE: make AllTests.main empty, code was not compatible with junit 4
 Patch4:         jflex-junit4.patch
 BuildRequires:  ant
-BuildRequires:  java-cup
+BuildRequires:  java-cup-bootstrap
 BuildRequires:  java-devel
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  jflex-bootstrap
 BuildRequires:  junit
-Requires:       java_cup
+Requires:       java-cup
 Requires:       javapackages-tools
 BuildArch:      noarch
 

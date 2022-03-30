@@ -1,0 +1,60 @@
+--- a/build.xml
++++ b/build.xml
+@@ -20,26 +20,6 @@
+     <mkdir dir="${dist}" />
+     <loadfile property="cupversion" srcFile="version.txt" failonerror="false" />
+     <property name="cupversion" value="custombuild" unless:set="cupversion"/>
+-    <exec executable="git" outputproperty="gitversion">
+-      <arg value="log"/>
+-      <arg value="-1"/>
+-      <arg value="--format=%h"/>
+-    </exec>
+-    <exec executable="git" outputproperty="changed">
+-      <arg value="status"/>
+-      <arg value="--porcelain"/>
+-      <redirector>
+-	<outputfilterchain>
+-	<linecontainsregexp>
+-	  <regexp pattern='^M.*'/>
+-	</linecontainsregexp>
+-	<tokenfilter>
+-	  <replaceregex pattern=".*" replace="modifications based on "/>
+-	</tokenfilter>
+-	</outputfilterchain>
+-	</redirector>
+-    </exec>
+-    <property name="svnversion">${changed}${gitversion}</property>
+   </target>
+ 
+   <property environment="env" />
+@@ -76,10 +56,6 @@
+   </target>
+ 
+   <target name="compile" depends="jflex">
+-    <replace file="${java}/java_cup/version.java"
+-       token="+ version_str"
+-       value='+ "v0.11b ${cupversion} (GIT ${svnversion})"'>
+-    </replace>
+     <javac srcdir="${java}" destdir="${classes}" verbose="off" listfiles="off" debug="on" source="10" target="10">
+       <classpath refid="libraries"/>
+       <compilerarg value="-Xlint:unchecked" />
+--- a/src/java/java_cup/version.java
++++ b/src/java/java_cup/version.java
+@@ -30,7 +30,7 @@ public class version {
+   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
+ 
+   /** The update letter. */
+-  public static final String update = "b beta 20140226";
++  public static final String update = "b beta @GIT_DATE@";
+ 
+   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
+ 
+@@ -40,7 +40,7 @@ public class version {
+   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
+ 
+   /** Full title of the system */
+-  public static final String title_str = "CUP " + "v0.11b 20160615 (GIT 3d0ae71)";
++  public static final String title_str = "CUP " + "v0.11b @GIT_DATE@ (GIT @GIT_HASH@)";
+ 
+   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
+ 

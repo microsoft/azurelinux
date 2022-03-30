@@ -20,7 +20,7 @@
 %define pub_date       20160615
 
 Summary:        LALR Parser Generator in Java
-Name:           java-cup
+Name:           java-cup-bootstrap
 Version:        0.11
 Release:        31%{?dist}
 License:        HPND
@@ -28,7 +28,7 @@ Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            http://www2.cs.tum.edu/projects/cup/
-Source0:        http://www2.cs.tum.edu/projects/cup/releases/%{name}-src-%{cvs_version}-%{pub_date}.tar.gz#/%{name}-%{version}b.tar.gz
+Source0:        http://www2.cs.tum.edu/projects/cup/releases/%{name}-src-%{cvs_version}-%{pub_date}.tar.gz#/java-cup-%{version}b.tar.gz
 Source2:        java-cup-generated-files.tar.xz
 # From          http://www2.cs.tum.edu/projects/cup/
 Source3:        java-cup.license
@@ -47,12 +47,9 @@ BuildRequires:  xml-commons-resolver-bootstrap
 #!BuildIgnore:  xerces-j2
 #!BuildIgnore:  xml-commons-apis
 #!BuildIgnore:  xml-commons-resolver
-# Compatibility 
-Obsoletes:      java_cup < %{version}-%{release}
-Obsoletes:      java-cup < %{version}-%{release}
-Provides:       java_cup = %{version}-%{release}
-Provides:       java-cup = %{version}-%{release}
-Conflicts:      java-cup-bootstrap
+Obsoletes:      java-cup-bootstrap < %{version}-%{release}
+Provides:       java-cup-bootstrap = %{version}-%{release}
+Conflicts:      java-cup
 BuildArch:      noarch
 
 %description
@@ -64,24 +61,11 @@ java-cup is a LALR Parser Generator in Java. With v0.11, you can:
    non terminals and terminals
 * have Your own symbol classes
 
-%package manual
-Summary:        LALR Parser Generator in Java
-Group:          Development/Libraries/Java
-
-%description manual
-java-cup is a LALR Parser Generator in Java. With v0.11, you can: 
-* use CUP in an Ant-Target
-* start CUP by a simple command like java -jar java-cup-11a.jar
-   myGrammar.cup
-* use generic parametrized classes (since Java 1.5) as datatypes for
-   non
-* terminals and terminals
-* have Your own symbol classes
-
 %prep
 %setup -q -c
 %patch1 -p1
-%patch3 -p1
+%setup -q -T -D -a 2 -c
+%patch2 -p1
 # remove all binary files
 find -name "*.class" -delete
 find -name "*.jar" -delete
@@ -90,7 +74,7 @@ mkdir -p target/classes
 cp %{SOURCE3} license.txt
 
 %build
-export CLASSPATH=$(build-classpath java-cup jflex)
+export CLASSPATH=
 export OPT_JAR_LIST=:
 ant
 
@@ -116,9 +100,6 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 %doc changelog.txt license.txt
 %attr(0755,root,root) %{_bindir}/%{real_name}
 %{_javadir}/*
-
-%files manual
-%doc manual.html
 
 %changelog
 * Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.11-31
