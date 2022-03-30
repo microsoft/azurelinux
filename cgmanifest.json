@@ -23964,8 +23964,8 @@
         "type": "other",
         "other": {
           "name": "python-remoto",
-          "version": "1.2.0",
-          "downloadUrl": "https://pypi.io/packages/source/r/remoto/remoto-1.2.0.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://pypi.io/packages/source/r/remoto/remoto-1.2.1.tar.gz"
         }
       }
     },
