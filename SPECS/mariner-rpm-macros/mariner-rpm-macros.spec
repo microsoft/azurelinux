@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,38 +18,36 @@ Source3:        default-hardened-ld
 Source4:        default-annobin-cc1
 Source5:        macros.check
 Source6:        macros.python
-Source7:        macros.python2
-Source8:        macros.python3
-Source9:        macros.python-srpm
-Source10:       macros.openblas-srpm
-Source11:       macros.nodejs-srpm
-Source12:       macros.mono-srpm
-Source13:       macros.ocaml-srpm
-Source14:       macros.perl-srpm
-Source15:       gpgverify
-Source16:       pythondist.attr
-Source17:       brp-python-bytecompile
-Source18:       macros.pybytecompile
+Source7:        macros.python3
+Source8:        macros.python-srpm
+Source9:       macros.openblas-srpm
+Source10:       macros.nodejs-srpm
+Source11:       macros.mono-srpm
+Source12:       macros.ocaml-srpm
+Source13:       macros.perl-srpm
+Source14:       gpgverify
+Source15:       pythondist.attr
+Source16:       brp-python-bytecompile
+Source17:       macros.pybytecompile
 # Use an enhanced copy of Python's compileall module for Python >= 3.4
-Source19:       https://github.com/fedora-python/compileall2/raw/v0.7.1/compileall2.py
-Source20:       macros.forge
-Source21:       common.lua
-Source22:       forge.lua
+Source18:       https://github.com/fedora-python/compileall2/raw/v0.7.1/compileall2.py
+Source19:       macros.forge
+Source20:       common.lua
+Source21:       forge.lua
 # macros.rust-srpm is taken from https://pagure.io/fedora-rust/rust2rpm
-Source23:       macros.rust-srpm
+Source22:       macros.rust-srpm
 # macros.fonts is taken from the "fontpackages-devel" package.
-Source24:       macros.fonts
-Source25:       macros.suse
-Source26:       gen-ld-script.sh
-Source27:       generate-package-note.py
-Source28:       verify-package-notes.sh
+Source23:       macros.fonts
+Source24:       macros.suse
+Source25:       gen-ld-script.sh
+Source26:       generate-package-note.py
+Source27:       verify-package-notes.sh
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
 Provides:       perl-srpm-macros
 Provides:       python-srpm-macros
 Provides:       python-rpm-macros
-Provides:       python2-rpm-macros
 Provides:       python3-rpm-macros
 Provides:       rust-srpm-macros
 BuildArch:      noarch
@@ -123,6 +121,10 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Mon Mar 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0-13
+- Remove python2 RPM macros entirely
+- Remove python2-related SRPM macros
+
 * Wed Feb 16 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-12
 - Use _topdir variable with gen-ld-script.sh
 
