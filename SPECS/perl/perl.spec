@@ -17,7 +17,7 @@
 
 %define _unpackaged_files_terminate_build 0
 
-%global perl_version    5.32.0
+%global perl_version    5.34.1
 %global perl_epoch      4
 %global perl_arch_stem -thread-multi
 %global perl_archname %{_arch}-%{_os}%{perl_arch_stem}
@@ -60,7 +60,7 @@ Source7:        gendep.macros
 %include %{SOURCE7}
 %endif
 
-# Provide maybe_command independently
+# Provide maybe_command independently, bug #1129443
 Patch5:         perl-5.22.1-Provide-ExtUtils-MM-methods-as-standalone-ExtUtils-M.patch
 
 # Define SONAME for libperl.so
@@ -69,11 +69,11 @@ Patch8:         perl-5.16.3-create_libperl_soname.patch
 # Install libperl.so to -Dshrpdir value
 Patch9:         perl-5.22.0-Install-libperl.so-to-shrpdir-on-Linux.patch
 
-# Make *DBM_File desctructors thread-safe
-Patch10:        perl-5.18.2-Destroy-GDBM-NDBM-ODBM-SDBM-_File-objects-only-from-.patch
+# Make *DBM_File desctructors thread-safe, bug #1107543, RT#61912
+Patch10:        perl-5.34.0-Destroy-GDBM-NDBM-ODBM-SDBM-_File-objects-only-from-.patch
 
 # Replace ExtUtils::MakeMaker dependency with ExtUtils::MM::Utils.
-# This allows not to require perl-devel.
+# This allows not to require perl-devel. Bug #1129443
 Patch11:        perl-5.22.1-Replace-EU-MM-dependnecy-with-EU-MM-Utils-in-IPC-Cmd.patch
 
 # Link XS modules to pthread library to fix linking with -z defs,
@@ -83,83 +83,10 @@ Patch12:        perl-5.27.8-hints-linux-Add-lphtread-to-lddlflags.patch
 # Pass the correct CFLAGS to dtrace
 Patch13:        perl-5.28.0-Pass-CFLAGS-to-dtrace.patch
 
-# Do not use a C compiler reserved identifiers, in upstream after 5.33.0
-Patch14:        perl-5.33.0-MUTABLE_PTR-Rmv-non-standard-syntax.patch
-
-# Fix SvUV_nomg() macro definition, in upstream after 5.33.0
-Patch15:        perl-5.33.0-sv.h-Wanted-UOK-but-said-IOK.patch 
-
-# Fix SvTRUE() documentation, in upstream after 5.33.0
-Patch16:        perl-5.33.0-Update-pod-for-SvTRUE-to-indicate-single-param-evalu.patch
-
-# Fix ext/XS-APItest/t/utf8_warn_base.pl tests, in upstream after 5.33.0
-Patch17:        perl-5.33.0-ext-XS-APItest-t-utf8_warn_base.pl-Fix-a-couple-test.patch
-
-# Fix IO::Handle::error() to report write errors, GH#6799, in upstream after 5.33.0
-Patch18:        perl-5.33.0-make-fh-error-report-errors-from-both-input-and-outp.patch
-Patch19:        perl-5.33.0-IO-Handle-clear-the-error-on-both-input-and-output-s.patch
-
-# Fix a link to Unicode Technical Standard #18, GH#17881, in upstream after 5.33.0
-Patch20:        perl-5.32.0-Fix-404-and-text-in-New-Unicode-properties-section.patch
-
-# Fix setting a non-blocking mode in IO::Socket::UNIX, GH#17787,
-# in upstream after 5.33.0
-Patch21:        perl-5.33.0-IO-Socket-UNIX-synchronize-behavior-with-module-docu.patch
-
-# Fix running actions after stepping in a debugger, GH#17901,
-# in upstream after 5.33.0
-Patch22:        perl-5.33.0-After-running-an-action-in-the-debugger-turn-it-off.patch
-Patch23:        perl-5.33.0-Clearing-DB-action-at-the-end-is-no-longer-needed.patch
-Patch24:        perl-5.33.0-Add-missing-MANIFEST-entry-from-fix-for-debugger.patch
-
-# Fix a buffer size for asctime_r() and ctime_r() functions,
-# in upstream after 5.33.0
-Patch25:        perl-5.33.0-reentr.c-Buffer-sizes-for-asctime_r-ctime_r-are-smal.patch
-
-# Prevent from an integer overflow in RenewDouble() macro,
-# in upstream after 5.33.0
-Patch26:        perl-5.33.0-reentr.c-Prevent-infinite-looping.patch
-
-# Fix a buffer overread in when reallocating formats, GH#17844,
-# in upstream after 5.33.0
-Patch27:        perl-5.33.0-perl-17844-don-t-update-SvCUR-until-after-we-ve-done.patch
-
-# Fix a number of arguments passed to a BOOT XS subroutine, GH#17755,
-# in upstream after 5.33.0
-Patch28:        perl-5.33.0-XSUB.h-fix-MARK-and-items-variables-inside-BOOT-XSUB.patch
-
-# Fix an IO::Handle spurious error reported for regular file handles,
-# GH#18019, in upstream after 5.33.0
-Patch29:        perl-5.33.0-IO-Handle-Fix-a-spurious-error-reported-for-regular-.patch
-
-# Fix inheritance resolution of lexial objects in a debugger, GH#17661,
-# in upstream after 5.33.0
-Patch30:        perl-5.33.0-fix-C-i-obj-where-obj-is-a-lexical.patch
-
-# Fix a misoptimization when assignig a list in a list context, GH#17816,
-# in upstream after 5.33.0
-Patch31:        perl-5.33.0-list-assign-in-list-context-was-over-optimising.patch
-
-# Fix handling left-hand-side undef when assigning a list, GH#16685,
-# in upstream after 5.33.0
-Patch32:        perl-5.33.0-list-assign-in-list-context-honour-LHS-undef.patch
-
-# Fix a memory leak when compiling a long regular expression, GH#18054,
-# in upstream after 5.33.0
-Patch33:        perl-5.33.0-Fix-leak-GH-18054.patch
-
-# Fix handling exceptions in a global destruction, GH#18063,
-# in upstream after 5.33.1
-Patch34:        perl-5.33.1-die_unwind-global-destruction.patch
-
-# Fix sorting with a block that calls return, GH#18081,
-# in upstream after 5.33.1
-Patch35:        perl-5.33.1-sort-return-foo.patch
-
-# Link XS modules to libperl.so with EU::CBuilder on Linux
+# Link XS modules to libperl.so with EU::CBuilder on Linux, bug #960048
 Patch200:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-CBuilder-on-Li.patch
 
-# Link XS modules to libperl.so with EU::MM on Linux
+# Link XS modules to libperl.so with EU::MM on Linux, bug #960048
 Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.patch
 
 BuildRequires:  zlib-devel
@@ -186,7 +113,7 @@ Requires:  zlib-devel
 
 
 # compat macro needed for rebuild
-%global perl_compat perl(:MODULE_COMPAT_5.32.0)
+%global perl_compat perl(:MODULE_COMPAT_5.34.1)
 
 Requires:       %perl_compat
 Requires:       perl-interpreter%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
@@ -303,6 +230,7 @@ License:        GPL+ or Artistic
 # perl-interpreter denotes a package with the perl executable.
 Version:        %{perl_version}
 Epoch:          %{perl_epoch}
+AutoReqProv:    no
 
 Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 # Require this till perl-interpreter sub-package provides any modules
@@ -431,7 +359,7 @@ RPM macros that are handy when building binary RPM packages.
 Summary:        The Perl test suite
 License:        GPL+ or Artistic
 # right?
-AutoReqProv:    0
+AutoReqProv:    no
 Requires:       %perl_compat
 Requires:       perl
 %if %{defined perl_bootstrap}
@@ -1241,7 +1169,7 @@ BuildArch:      noarch
 Requires:       %perl_compat
 # For perldoc tool
 Recommends:     perl-Pod-Perldoc
-
+AutoReqProv:    no
 
 %description doc
 This is a documentation for Perl language. It's provided in POD and manual
@@ -4055,28 +3983,6 @@ you're not running VMS, this module does nothing.
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
 %patch200 -p1
 %patch201 -p1
 
@@ -4807,249 +4713,7 @@ done
 %{_mandir}/man3/DirHandle.3*
 
 %files doc
-%dir %{privlib}/pod
-%{privlib}/pod/perl5*delta.pod
-%{privlib}/pod/perlaix.pod
-%{privlib}/pod/perlamiga.pod
-%{privlib}/pod/perlandroid.pod
-%{privlib}/pod/perlapi.pod
-%{privlib}/pod/perlapio.pod
-%{privlib}/pod/perlartistic.pod
-%{privlib}/pod/perlbook.pod
-%{privlib}/pod/perlboot.pod
-%{privlib}/pod/perlbot.pod
-%{privlib}/pod/perlbs2000.pod
-%{privlib}/pod/perlcall.pod
-%{privlib}/pod/perlcheat.pod
-%{privlib}/pod/perlclib.pod
-%{privlib}/pod/perlcn.pod
-%{privlib}/pod/perlcommunity.pod
-%{privlib}/pod/perlcygwin.pod
-%{privlib}/pod/perldata.pod
-%{privlib}/pod/perldbmfilter.pod
-%{privlib}/pod/perldebguts.pod
-%{privlib}/pod/perldebtut.pod
-%{privlib}/pod/perldelta.pod
-%{privlib}/pod/perldeprecation.pod
-%{privlib}/pod/perldos.pod
-%{privlib}/pod/perldsc.pod
-%{privlib}/pod/perldtrace.pod
-%{privlib}/pod/perlebcdic.pod
-%{privlib}/pod/perlembed.pod
-%{privlib}/pod/perlexperiment.pod
-%{privlib}/pod/perlfork.pod
-%{privlib}/pod/perlform.pod
-%{privlib}/pod/perlfreebsd.pod
-%{privlib}/pod/perlfunc.pod
-%{privlib}/pod/perlgit.pod
-%{privlib}/pod/perlgpl.pod
-%{privlib}/pod/perlguts.pod
-%{privlib}/pod/perlhack.pod
-%{privlib}/pod/perlhacktips.pod
-%{privlib}/pod/perlhacktut.pod
-%{privlib}/pod/perlhaiku.pod
-%{privlib}/pod/perlhist.pod
-%{privlib}/pod/perlhpux.pod
-%{privlib}/pod/perlhurd.pod
-%{privlib}/pod/perlintern.pod
-%{privlib}/pod/perlinterp.pod
-%{privlib}/pod/perlintro.pod
-%{privlib}/pod/perliol.pod
-%{privlib}/pod/perlipc.pod
-%{privlib}/pod/perlirix.pod
-%{privlib}/pod/perljp.pod
-%{privlib}/pod/perlko.pod
-%{privlib}/pod/perllexwarn.pod
-%{privlib}/pod/perllinux.pod
-%{privlib}/pod/perllocale.pod
-%{privlib}/pod/perllol.pod
-%{privlib}/pod/perlmacos.pod
-%{privlib}/pod/perlmacosx.pod
-%{privlib}/pod/perlmod.pod
-%{privlib}/pod/perlmodinstall.pod
-%{privlib}/pod/perlmodlib.pod
-%{privlib}/pod/perlmodstyle.pod
-%{privlib}/pod/perlmroapi.pod
-%{privlib}/pod/perlnetware.pod
-%{privlib}/pod/perlnewmod.pod
-%{privlib}/pod/perlnumber.pod
-%{privlib}/pod/perlobj.pod
-%{privlib}/pod/perlootut.pod
-%{privlib}/pod/perlop.pod
-%{privlib}/pod/perlopenbsd.pod
-%{privlib}/pod/perlopentut.pod
-%{privlib}/pod/perlos2.pod
-%{privlib}/pod/perlos390.pod
-%{privlib}/pod/perlos400.pod
-%{privlib}/pod/perlpacktut.pod
-%{privlib}/pod/perlperf.pod
-%{privlib}/pod/perlplan9.pod
-%{privlib}/pod/perlpod.pod
-%{privlib}/pod/perlpodspec.pod
-%{privlib}/pod/perlpolicy.pod
-%{privlib}/pod/perlport.pod
-%{privlib}/pod/perlpragma.pod
-%{privlib}/pod/perlqnx.pod
-%{privlib}/pod/perlre.pod
-%{privlib}/pod/perlreapi.pod
-%{privlib}/pod/perlrebackslash.pod
-%{privlib}/pod/perlrecharclass.pod
-%{privlib}/pod/perlref.pod
-%{privlib}/pod/perlreftut.pod
-%{privlib}/pod/perlreguts.pod
-%{privlib}/pod/perlrepository.pod
-%{privlib}/pod/perlrequick.pod
-%{privlib}/pod/perlreref.pod
-%{privlib}/pod/perlretut.pod
-%{privlib}/pod/perlriscos.pod
-%{privlib}/pod/perlsec.pod
-%{privlib}/pod/perlsolaris.pod
-%{privlib}/pod/perlsource.pod
-%{privlib}/pod/perlstyle.pod
-%{privlib}/pod/perlsub.pod
-%{privlib}/pod/perlsymbian.pod
-%{privlib}/pod/perlsyn.pod
-%{privlib}/pod/perlsynology.pod
-%{privlib}/pod/perlthrtut.pod
-%{privlib}/pod/perltie.pod
-%{privlib}/pod/perltoc.pod
-%{privlib}/pod/perltodo.pod
-%{privlib}/pod/perltooc.pod
-%{privlib}/pod/perltoot.pod
-%{privlib}/pod/perltrap.pod
-%{privlib}/pod/perltru64.pod
-%{privlib}/pod/perltw.pod
-%{privlib}/pod/perlunicode.pod
-%{privlib}/pod/perlunicook.pod
-%{privlib}/pod/perlunifaq.pod
-%{privlib}/pod/perluniintro.pod
-%{privlib}/pod/perluniprops.pod
-%{privlib}/pod/perlunitut.pod
-%{privlib}/pod/perlvar.pod
-%{privlib}/pod/perlvms.pod
-%{privlib}/pod/perlvos.pod
-%{privlib}/pod/perlwin32.pod
-%{_mandir}/man1/perl5*delta.*
-%{_mandir}/man1/perlaix.*
-%{_mandir}/man1/perlamiga.*
-%{_mandir}/man1/perlandroid.*
-%{_mandir}/man1/perlapi.*
-%{_mandir}/man1/perlapio.*
-%{_mandir}/man1/perlartistic.*
-%{_mandir}/man1/perlbook.*
-%{_mandir}/man1/perlboot.*
-%{_mandir}/man1/perlbot.*
-%{_mandir}/man1/perlbs2000.*
-%{_mandir}/man1/perlcall.*
-%{_mandir}/man1/perlcheat.*
-%{_mandir}/man1/perlclib.*
-%{_mandir}/man1/perlcn.*
-%{_mandir}/man1/perlcommunity.*
-%{_mandir}/man1/perlcygwin.*
-%{_mandir}/man1/perldata.*
-%{_mandir}/man1/perldbmfilter.*
-%{_mandir}/man1/perldebguts.*
-%{_mandir}/man1/perldebtut.*
-%{_mandir}/man1/perldelta.*
-%{_mandir}/man1/perldeprecation.*
-%{_mandir}/man1/perldos.*
-%{_mandir}/man1/perldsc.*
-%{_mandir}/man1/perldtrace.*
-%{_mandir}/man1/perlebcdic.*
-%{_mandir}/man1/perlembed.*
-%{_mandir}/man1/perlexperiment.*
-%{_mandir}/man1/perlfork.*
-%{_mandir}/man1/perlform.*
-%{_mandir}/man1/perlfreebsd.*
-%{_mandir}/man1/perlfunc.*
-%{_mandir}/man1/perlgit.*
-%{_mandir}/man1/perlgpl.*
-%{_mandir}/man1/perlguts.*
-%{_mandir}/man1/perlhack.*
-%{_mandir}/man1/perlhacktips.*
-%{_mandir}/man1/perlhacktut.*
-%{_mandir}/man1/perlhaiku.*
-%{_mandir}/man1/perlhist.*
-%{_mandir}/man1/perlhpux.*
-%{_mandir}/man1/perlhurd.*
-%{_mandir}/man1/perlintern.*
-%{_mandir}/man1/perlinterp.*
-%{_mandir}/man1/perlintro.*
-%{_mandir}/man1/perliol.*
-%{_mandir}/man1/perlipc.*
-%{_mandir}/man1/perlirix.*
-%{_mandir}/man1/perljp.*
-%{_mandir}/man1/perlko.*
-%{_mandir}/man1/perllexwarn.*
-%{_mandir}/man1/perllinux.*
-%{_mandir}/man1/perllocale.*
-%{_mandir}/man1/perllol.*
-%{_mandir}/man1/perlmacos.*
-%{_mandir}/man1/perlmacosx.*
-%{_mandir}/man1/perlmod.*
-%{_mandir}/man1/perlmodinstall.*
-%{_mandir}/man1/perlmodlib.*
-%{_mandir}/man1/perlmodstyle.*
-%{_mandir}/man1/perlmroapi.*
-%{_mandir}/man1/perlnetware.*
-%{_mandir}/man1/perlnewmod.*
-%{_mandir}/man1/perlnumber.*
-%{_mandir}/man1/perlobj.*
-%{_mandir}/man1/perlootut.*
-%{_mandir}/man1/perlop.*
-%{_mandir}/man1/perlopenbsd.*
-%{_mandir}/man1/perlopentut.*
-%{_mandir}/man1/perlos2.*
-%{_mandir}/man1/perlos390.*
-%{_mandir}/man1/perlos400.*
-%{_mandir}/man1/perlpacktut.*
-%{_mandir}/man1/perlperf.*
-%{_mandir}/man1/perlplan9.*
-%{_mandir}/man1/perlpod.*
-%{_mandir}/man1/perlpodspec.*
-%{_mandir}/man1/perlpolicy.*
-%{_mandir}/man1/perlport.*
-%{_mandir}/man1/perlpragma.*
-%{_mandir}/man1/perlqnx.*
-%{_mandir}/man1/perlre.*
-%{_mandir}/man1/perlreapi.*
-%{_mandir}/man1/perlrebackslash.*
-%{_mandir}/man1/perlrecharclass.*
-%{_mandir}/man1/perlref.*
-%{_mandir}/man1/perlreftut.*
-%{_mandir}/man1/perlreguts.*
-%{_mandir}/man1/perlrepository.*
-%{_mandir}/man1/perlrequick.*
-%{_mandir}/man1/perlreref.*
-%{_mandir}/man1/perlretut.*
-%{_mandir}/man1/perlriscos.*
-%{_mandir}/man1/perlsec.*
-%{_mandir}/man1/perlsolaris.*
-%{_mandir}/man1/perlsource.*
-%{_mandir}/man1/perlstyle.*
-%{_mandir}/man1/perlsub.*
-%{_mandir}/man1/perlsymbian.*
-%{_mandir}/man1/perlsyn.*
-%{_mandir}/man1/perlsynology.*
-%{_mandir}/man1/perlthrtut.*
-%{_mandir}/man1/perltie.*
-%{_mandir}/man1/perltoc.*
-%{_mandir}/man1/perltodo.*
-%{_mandir}/man1/perltooc.*
-%{_mandir}/man1/perltoot.*
-%{_mandir}/man1/perltrap.*
-%{_mandir}/man1/perltru64.*
-%{_mandir}/man1/perltw.*
-%{_mandir}/man1/perlunicode.*
-%{_mandir}/man1/perlunicook.*
-%{_mandir}/man1/perlunifaq.*
-%{_mandir}/man1/perluniintro.*
-%{_mandir}/man1/perluniprops.*
-%{_mandir}/man1/perlunitut.*
-%{_mandir}/man1/perlvar.*
-%{_mandir}/man1/perlvms.*
-%{_mandir}/man1/perlvos.*
-%{_mandir}/man1/perlwin32.*
+
 
 %files Dumpvalue
 %{privlib}/Dumpvalue.pm
