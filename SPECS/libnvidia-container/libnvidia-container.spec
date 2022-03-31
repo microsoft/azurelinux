@@ -131,7 +131,7 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
-* Tue Mar 29 2021 Adithya Jayachandran <adjayach@microsoft.com> - 1.9.0-1
+* Tue Mar 29 2022 Adithya Jayachandran <adjayach@microsoft.com> - 1.9.0-1
 - Updating to libnvidia-container to version 1.9.0
 - Bump nvidia-modprobe to version 495.44 as required
 
