@@ -269,7 +269,6 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		logger.Log.Debugf("Cloning: %s", pkgName)
 		args := []string{
-			"--assumeyes",
 			"--destdir",
 			chrootDownloadDir,
 			pkgName,
@@ -302,7 +301,6 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 	baseArgs := []string{
 		"provides",
 		provideQuery,
-		"--assumeyes",
 		fmt.Sprintf("--disablerepo=%s", allRepoIDs),
 	}
 
@@ -425,7 +423,6 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 		tdnfArgs := []string{
 			"list",
 			"ALL",
-			"--assumeyes",
 			fmt.Sprintf("--disablerepo=%s", allRepoIDs),
 			fmt.Sprintf("--enablerepo=%s", checkedRepoID),
 		}
