@@ -38,10 +38,9 @@
 
 Name:           perl
 License:        GPL+ or Artistic 
-Epoch:          %{perl_epoch}
 Version:        %{perl_version} 
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        465%{?dist}
+Release:        1%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -116,9 +115,9 @@ Requires:  zlib-devel
 %global perl_compat perl(:MODULE_COMPAT_5.34.1)
 
 Requires:       %perl_compat
-Requires:       perl-interpreter%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
-Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
-Requires:       perl-devel%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-interpreter%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-devel%{?_isa} = %{perl_version}-%{release}
 Requires:       perl-macros
 Requires:       perl-utils
 %if %{defined perl_bootstrap}
@@ -229,10 +228,9 @@ Summary:        Standalone executable Perl interpreter
 License:        GPL+ or Artistic
 # perl-interpreter denotes a package with the perl executable.
 Version:        %{perl_version}
-Epoch:          %{perl_epoch}
 AutoReqProv:    no
 
-Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
 # Require this till perl-interpreter sub-package provides any modules
 Requires:       %perl_compat
 Suggests:       perl-doc = %{perl_version}-%{release}
@@ -327,7 +325,7 @@ License:        (GPL+ or Artistic) and UCD
 Requires:       perl(ExtUtils::ParseXS)
 Requires:       %perl_compat
 # Match library and header files when downgrading releases
-Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
 Recommends:     perl-doc = %{perl_version}-%{release}
 # Devel::PPPort for h2xs script
 Requires:       perl(Devel::PPPort)
@@ -380,7 +378,7 @@ Epoch:          0
 Version:        %{perl_version}
 BuildArch:      noarch
 # Match library exactly for perlbug version string
-Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs = %{perl_version}-%{release}
 # Keep /usr/sbin/sendmail and Module::CoreList optional for the perlbug tool
 %if %{defined perl_bootstrap}
 %gendep_perl_utils
@@ -1059,7 +1057,7 @@ Version:        1.37
 BuildArch:      noarch
 Requires:       %perl_compat
 # Match library exactly for diagnostics messages
-Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs = %{perl_version}-%{release}
 Requires:       perl(Getopt::Std)
 %if %{defined perl_bootstrap}
 %gendep_perl_diagnostics
@@ -1341,7 +1339,7 @@ Version:        1.30
 Requires:       %perl_compat
 # Errno.pm bakes in kernel version at build time and compares it against
 # $Config{osvers} at run time. Match exact interpreter build.
-Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Errno
@@ -2954,7 +2952,7 @@ Epoch:          0
 Version:        %{perl_version}
 Requires:       %perl_compat
 # Match header files used when building perl.
-Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
 Requires:       perl(warnings)
 # We deliver this package only for these three files mentioned in
 # a documentation.
@@ -3014,7 +3012,7 @@ Version:        1.13
 BuildArch:      noarch
 Requires:       %perl_compat
 # Match perl the functions come from
-Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs = %{perl_version}-%{release}
 %if %{defined perl_bootstrap}
 %gendep_perl_Pod_Functions
 %endif
@@ -4713,7 +4711,8 @@ done
 %{_mandir}/man3/DirHandle.3*
 
 %files doc
-
+%dir %{privlib}/pod
+# Remove temporarily - build stuck processing auto dependencies
 
 %files Dumpvalue
 %{privlib}/Dumpvalue.pm
@@ -6328,6 +6327,9 @@ done
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Wed Mar 30 2022 Andrew Phelps <anphel@microsoft.com> - 5.34.1-1
+- Upgrade to version 5.34.1
+
 * Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.32.0-465
 - Removed the "perl-DB_File" subpackage.
 - Fixing macro usage.
