@@ -43,7 +43,7 @@
 
 # Optional features
 # Run C++ tests
-%nfnd_without perl_enables_cplusplus_test
+%bcond_without perl_enables_cplusplus_test
 # We can bootstrap without gdbm
 %bcond_without gdbm
 # Support for groff, bug #135101
