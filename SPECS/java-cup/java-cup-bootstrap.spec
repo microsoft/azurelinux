@@ -37,7 +37,6 @@ Patch2:         java-cup-no-cup-no-jflex.patch
 Patch3:         java-cup-classpath.patch
 BuildRequires:  ant
 BuildRequires:  git
-BuildRequires:  java-cup-bootstrap
 BuildRequires:  java-devel
 BuildRequires:  jflex-bootstrap
 BuildRequires:  javapackages-local-bootstrap
@@ -47,8 +46,6 @@ BuildRequires:  xml-commons-resolver-bootstrap
 #!BuildIgnore:  xerces-j2
 #!BuildIgnore:  xml-commons-apis
 #!BuildIgnore:  xml-commons-resolver
-Obsoletes:      java-cup-bootstrap < %{version}-%{release}
-Provides:       java-cup-bootstrap = %{version}-%{release}
 Conflicts:      java-cup
 BuildArch:      noarch
 
