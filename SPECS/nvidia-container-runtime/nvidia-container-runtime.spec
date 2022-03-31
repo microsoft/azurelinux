@@ -2,7 +2,7 @@
 Summary:        NVIDIA container runtime
 Name:           nvidia-container-runtime
 Version:        3.5.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,9 @@ install -m 755 %{name} %{buildroot}%{_bindir}/%{name}
 %{_bindir}/%{name}
 
 %changelog
+* Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 3.5.0-5
+- Bump release to force rebuild with golang 1.16.15
+
 * Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 3.5.0-4
 - Bump release to force rebuild with golang 1.16.14
 

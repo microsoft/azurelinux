@@ -4,7 +4,7 @@
 Summary:        Linux Kernel optimized for Hyper-V
 Name:           kernel-hyperv
 Version:        5.10.102.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Source2:        sha512hmac-openssl.sh
 Source3:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         CVE-2022-24958.patch
+Patch2:         CVE-2022-1016.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -94,6 +95,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 make mrproper
@@ -271,6 +273,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/include/bpf/*
 
 %changelog
+* Fri Mar 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-3
+- Apply CVE-2022-1016.patch
+
+* Fri Mar 18 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-2
+- Disable CONFIG_FW_LOADER_USER_HELPER_FALLBACK
+
 * Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-1
 - Update source to 5.10.102.1
 - Apply CVE-2022-24958.patch

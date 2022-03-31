@@ -1,0 +1,59 @@
+From 0988fb89be06aeb08083ce609f755509d08fa459 Mon Sep 17 00:00:00 2001
+From: Chris Patterson <cpatterson@microsoft.com>
+Date: Tue, 18 Jan 2022 15:45:59 -0500
+Subject: [PATCH] sources/azure: set ovf_is_accessible when OVF is read
+ successfully (#1193)
+
+The if-statement set ovf_is_accessible to True if the OVF is read
+from /dev/sr0, but not from other data sources.  It defaults to
+True, but may get flipped to False while processing an invalid
+source, and never get set back to True when reading from the data
+directory.
+
+Instead, default ovf_is_accessible to False, and only set it to
+True once we've read an OVF successfully (and end the search).
+
+This fixes an error when OVF is read from data_dir and IMDS
+data is unavailable (failing with "No OVF or IMDS available").
+
+[Backport to 21.4]
+Signed-off-by: Anirudh Gopal <angop@microsoft.com>
+---
+ cloudinit/sources/DataSourceAzure.py | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/cloudinit/sources/DataSourceAzure.py b/cloudinit/sources/DataSourceAzure.py
+index 93493fa0..3ff043da 100755
+--- a/cloudinit/sources/DataSourceAzure.py
++++ b/cloudinit/sources/DataSourceAzure.py
+@@ -429,7 +429,7 @@ class DataSourceAzure(sources.DataSource):
+         # the candidate list determines the path to take in order to get the
+         # metadata we need.
+         reprovision = False
+-        ovf_is_accessible = True
++        ovf_is_accessible = False
+         reprovision_after_nic_attach = False
+         metadata_source = None
+         ret = None
+@@ -459,9 +459,9 @@ class DataSourceAzure(sources.DataSource):
+                             ret = util.mount_cb(src, load_azure_ds_dir)
+                         # save the device for ejection later
+                         self.iso_dev = src
+-                        ovf_is_accessible = True
+                     else:
+                         ret = load_azure_ds_dir(src)
++                    ovf_is_accessible = True
+                     metadata_source = src
+                     break
+                 except NonAzureDataSource:
+@@ -473,7 +473,6 @@ class DataSourceAzure(sources.DataSource):
+                     report_diagnostic_event(
+                         '%s was not mountable' % src,
+                         logger_func=LOG.debug)
+-                    ovf_is_accessible = False
+                     empty_md = {'local-hostname': ''}
+                     empty_cfg = dict(
+                         system_info=dict(
+-- 
+2.17.1
+

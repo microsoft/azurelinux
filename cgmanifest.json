@@ -345,8 +345,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.22",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.22/bind-9.16.22.tar.xz"
+          "version": "9.16.27",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.27/bind-9.16.27.tar.xz"
         }
       }
     },
@@ -705,8 +705,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "21.3",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/21.3/+download/cloud-init-21.3.tar.gz"
+          "version": "21.4",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/21.4/+download/cloud-init-21.4.tar.gz"
         }
       }
     },
@@ -1865,8 +1865,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.16.14",
-          "downloadUrl": "https://golang.org/dl/go1.16.14.src.tar.gz"
+          "version": "1.16.15",
+          "downloadUrl": "https://golang.org/dl/go1.16.15.src.tar.gz"
         }
       }
     },
@@ -2115,8 +2115,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.52",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.52.tar.bz2"
+          "version": "2.4.53",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.53.tar.bz2"
         }
       }
     },
@@ -5645,8 +5645,8 @@
         "type": "other",
         "other": {
           "name": "powershell",
-          "version": "7.2.1",
-          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-x64.tar.gz"
+          "version": "7.2.2",
+          "downloadUrl": "https://github.com/PowerShell/PowerShell/releases/download/v7.2.2/powershell-7.2.2-linux-x64.tar.gz"
         }
       }
     },
@@ -6845,8 +6845,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.7.10",
-          "downloadUrl": "https://www.python.org/ftp/python/3.7.10/Python-3.7.10.tar.xz"
+          "version": "3.7.11",
+          "downloadUrl": "https://www.python.org/ftp/python/3.7.11/Python-3.7.11.tar.xz"
         }
       }
     },
@@ -8455,8 +8455,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2021e",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2021e.tar.gz"
+          "version": "2022a",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2022a.tar.gz"
         }
       }
     },
@@ -8605,8 +8605,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4495",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4495.tar.gz"
+          "version": "8.2.4563",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4563.tar.gz"
         }
       }
     },

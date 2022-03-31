@@ -1,17 +1,16 @@
-diff --git a/cloudinit/config/cc_ntp.py b/cloudinit/config/cc_ntp.py
-index 7c371a49..3a3e8a19 100644
---- a/cloudinit/config/cc_ntp.py
-+++ b/cloudinit/config/cc_ntp.py
-@@ -25,7 +25,7 @@ frequency = PER_INSTANCE
+diff -Naur a/cloudinit/config/cc_ntp.py b/cloudinit/config/cc_ntp.py
+--- a/cloudinit/config/cc_ntp.py	2021-11-02 12:35:08.000000000 -0700
++++ b/cloudinit/config/cc_ntp.py	2022-03-12 11:52:21.653428852 -0800
+@@ -25,7 +25,7 @@
  NTP_CONF = '/etc/ntp.conf'
  NR_POOL_SERVERS = 4
- distros = ['almalinux', 'alpine', 'centos', 'debian', 'eurolinux', 'fedora',
--           'opensuse', 'photon', 'rhel', 'rocky', 'sles', 'ubuntu',
-+           'mariner', 'opensuse', 'photon', 'rhel', 'rocky', 'sles', 'ubuntu',
-            'virtuozzo']
+ distros = ['almalinux', 'alpine', 'centos', 'cloudlinux', 'debian',
+-           'eurolinux', 'fedora', 'openEuler', 'opensuse', 'photon',
++           'eurolinux', 'fedora', 'mariner', 'openEuler', 'opensuse', 'photon',
+            'rhel', 'rocky', 'sles', 'ubuntu', 'virtuozzo']
  
  NTP_CLIENT_CONFIG = {
-@@ -81,6 +81,19 @@ DISTRO_CLIENT_CONFIG = {
+@@ -81,6 +81,19 @@
              'confpath': '/etc/chrony/chrony.conf',
          },
      },
@@ -31,11 +30,10 @@ index 7c371a49..3a3e8a19 100644
      'opensuse': {
          'chrony': {
              'service_name': 'chronyd',
-diff --git a/cloudinit/config/cc_resolv_conf.py b/cloudinit/config/cc_resolv_conf.py
-index 648935e4..d315d441 100644
---- a/cloudinit/config/cc_resolv_conf.py
-+++ b/cloudinit/config/cc_resolv_conf.py
-@@ -30,7 +30,7 @@ are configured correctly.
+diff -Naur a/cloudinit/config/cc_resolv_conf.py b/cloudinit/config/cc_resolv_conf.py
+--- a/cloudinit/config/cc_resolv_conf.py	2021-11-02 12:35:08.000000000 -0700
++++ b/cloudinit/config/cc_resolv_conf.py	2022-03-12 11:53:14.265408555 -0800
+@@ -30,7 +30,7 @@
  
  **Module frequency:** per instance
  
@@ -44,7 +42,7 @@ index 648935e4..d315d441 100644
  
  **Config keys**::
  
-@@ -55,7 +55,7 @@ LOG = logging.getLogger(__name__)
+@@ -55,7 +55,7 @@
  
  frequency = PER_INSTANCE
  
@@ -53,46 +51,43 @@ index 648935e4..d315d441 100644
  
  RESOLVE_CONFIG_TEMPLATE_MAP = {
      '/etc/resolv.conf': 'resolv.conf',
-diff --git a/cloudinit/config/cc_yum_add_repo.py b/cloudinit/config/cc_yum_add_repo.py
-index b7a48dcc..92038b4b 100644
---- a/cloudinit/config/cc_yum_add_repo.py
-+++ b/cloudinit/config/cc_yum_add_repo.py
-@@ -18,7 +18,7 @@ entry, the config entry will be skipped.
+diff -Naur a/cloudinit/config/cc_yum_add_repo.py b/cloudinit/config/cc_yum_add_repo.py
+--- a/cloudinit/config/cc_yum_add_repo.py	2021-11-02 12:35:08.000000000 -0700
++++ b/cloudinit/config/cc_yum_add_repo.py	2022-03-12 11:53:50.713393319 -0800
+@@ -19,7 +19,7 @@
+ **Module frequency:** always
  
- **Module frequency:** per always
- 
--**Supported distros:** almalinux, centos, eurolinux, fedora, photon, rhel,
-+**Supported distros:** almalinux, centos, eurolinux, fedora, mariner, photon, rhel,
-                        rocky, virtuozzo
+ **Supported distros:** almalinux, centos, cloudlinux, eurolinux, fedora,
+-                       openEuler, photon, rhel, rocky, virtuozzo
++                       mariner, openEuler, photon, rhel, rocky, virtuozzo
  
  **Config keys**::
-@@ -37,7 +37,7 @@ from configparser import ConfigParser
  
+@@ -38,7 +38,7 @@
  from cloudinit import util
  
--distros = ['almalinux', 'centos', 'eurolinux', 'fedora', 'photon', 'rhel',
-+distros = ['almalinux', 'centos', 'eurolinux', 'fedora', 'mariner', 'photon', 'rhel',
-            'rocky', 'virtuozzo']
+ distros = ['almalinux', 'centos', 'cloudlinux', 'eurolinux', 'fedora',
+-           'openEuler', 'photon', 'rhel', 'rocky', 'virtuozzo']
++           'mariner', 'openEuler', 'photon', 'rhel', 'rocky', 'virtuozzo']
  
  
-diff --git a/cloudinit/distros/__init__.py b/cloudinit/distros/__init__.py
-index a634623a..d6582140 100755
---- a/cloudinit/distros/__init__.py
-+++ b/cloudinit/distros/__init__.py
-@@ -50,7 +50,7 @@ OSFAMILIES = {
+ def _canonicalize_id(repo_id):
+diff -Naur a/cloudinit/distros/__init__.py b/cloudinit/distros/__init__.py
+--- a/cloudinit/distros/__init__.py	2021-11-02 12:35:08.000000000 -0700
++++ b/cloudinit/distros/__init__.py	2022-03-12 11:56:03.765330719 -0800
+@@ -50,7 +50,7 @@
      'freebsd': ['freebsd'],
      'gentoo': ['gentoo'],
-     'redhat': ['almalinux', 'amazon', 'centos', 'eurolinux', 'fedora',
--               'photon', 'rhel', 'rocky', 'virtuozzo'],
-+               'mariner', 'photon', 'rhel', 'rocky', 'virtuozzo'],
+     'redhat': ['almalinux', 'amazon', 'centos', 'cloudlinux', 'eurolinux',
+-               'fedora', 'openEuler', 'photon', 'rhel', 'rocky', 'virtuozzo'],
++               'fedora', 'mariner', 'openEuler', 'photon', 'rhel', 'rocky', 'virtuozzo'],
      'suse': ['opensuse', 'sles'],
  }
  
-diff --git a/cloudinit/distros/mariner.py b/cloudinit/distros/mariner.py
-index e69de29b..a5402285 100644
---- a/cloudinit/distros/mariner.py
-+++ b/cloudinit/distros/mariner.py
-@@ -0,0 +1,142 @@
+diff -Naur a/cloudinit/distros/mariner.py b/cloudinit/distros/mariner.py
+--- a/cloudinit/distros/mariner.py	1969-12-31 16:00:00.000000000 -0800
++++ b/cloudinit/distros/mariner.py	2022-03-16 23:08:10.793139131 -0700
+@@ -0,0 +1,155 @@
 +#!/usr/bin/env python3
 +# vi: ts=4 expandtab
 +#
@@ -111,18 +106,31 @@ index e69de29b..a5402285 100644
 +
 +LOG = logging.getLogger(__name__)
 +
++NETWORK_FILE_HEADER = """\
++# This file is generated from information provided by the datasource. Changes
++# to it will not persist across an instance reboot. To disable cloud-init's
++# network configuration capabilities, write a file
++# /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
++# network: {config: disabled}
++"""
++
 +
 +class Distro(distros.Distro):
 +    systemd_hostname_conf_fn = '/etc/hostname'
 +    network_conf_dir = '/etc/systemd/network/'
 +    systemd_locale_conf_fn = '/etc/locale.conf'
 +    resolve_conf_fn = '/etc/systemd/resolved.conf'
-+
++    network_conf_fn = {
++        "netplan": "/etc/netplan/50-cloud-init.yaml"
++    }
 +    renderer_configs = {
 +        'networkd': {
 +            'resolv_conf_fn': resolve_conf_fn,
 +            'network_conf_dir': network_conf_dir,
-+        }
++        },
++        "netplan": {"netplan_path": network_conf_fn["netplan"],
++                    "netplan_header": NETWORK_FILE_HEADER,
++                    "postcmds": True}
 +    }
 +
 +    # Should be fqdn if we can use it
@@ -235,11 +243,11 @@ index e69de29b..a5402285 100644
 +    def update_package_sources(self):
 +        self._runner.run('update-sources', self.package_command,
 +                         ['makecache'], freq=PER_INSTANCE)
-diff --git a/cloudinit/tests/test_util.py b/cloudinit/tests/test_util.py
-index 9dd01158..f725e085 100644
---- a/cloudinit/tests/test_util.py
-+++ b/cloudinit/tests/test_util.py
-@@ -238,6 +238,17 @@ OS_RELEASE_PHOTON = ("""\
+\ No newline at end of file
+diff -Naur a/cloudinit/tests/test_util.py b/cloudinit/tests/test_util.py
+--- a/cloudinit/tests/test_util.py	2021-11-02 12:35:08.000000000 -0700
++++ b/cloudinit/tests/test_util.py	2022-03-12 11:57:36.113281757 -0800
+@@ -262,6 +262,18 @@
          BUG_REPORT_URL="https://github.com/vmware/photon/issues"
  """)
  
@@ -254,30 +262,14 @@ index 9dd01158..f725e085 100644
 +        BUG_REPORT_URL="https://github.com/microsoft/CBL-Mariner/issues"
 +""")
 +
++
  
  class FakeCloud(object):
  
-@@ -727,6 +738,15 @@ class TestGetLinuxDistro(CiTestCase):
-         self.assertEqual(
-             ('photon', '4.0', 'VMware Photon OS/Linux'), dist)
- 
-+    @mock.patch('cloudinit.util.load_file')
-+    def test_get_linux_mariner_os_release(self, m_os_release, m_path_exists):
-+        """Verify we get the correct name and machine arch on MarinerOS"""
-+        m_os_release.return_value = OS_RELEASE_MARINER
-+        m_path_exists.side_effect = TestGetLinuxDistro.os_release_exists
-+        dist = util.get_linux_distro()
-+        self.assertEqual(
-+            ('mariner', '1.0', ''), dist)
-+
-     @mock.patch('platform.system')
-     @mock.patch('platform.dist', create=True)
-     def test_get_linux_distro_no_data(self, m_platform_dist,
-diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
-index 825deff4..5d4bbd0e 100644
---- a/config/cloud.cfg.tmpl
-+++ b/config/cloud.cfg.tmpl
-@@ -11,14 +11,14 @@ syslog_fix_perms: root:root
+diff -Naur a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+--- a/config/cloud.cfg.tmpl	2021-11-02 12:35:08.000000000 -0700
++++ b/config/cloud.cfg.tmpl	2022-03-12 12:00:54.761164840 -0800
+@@ -11,14 +11,14 @@
  # when a 'default' entry is found it will reference the 'default_user'
  # from the distro configuration specified below
  users:
@@ -294,7 +286,7 @@ index 825deff4..5d4bbd0e 100644
  # VMware guest customization.
  disable_vmware_customization: true
  manage_etc_hosts: false
-@@ -26,7 +26,7 @@ manage_etc_hosts: false
+@@ -26,7 +26,7 @@
  
  # If this is set, 'root' will not be able to ssh in and they
  # will get a message to login instead as the default $user
@@ -303,7 +295,7 @@ index 825deff4..5d4bbd0e 100644
  disable_root: false
  {% else %}
  disable_root: true
-@@ -85,11 +85,11 @@ cloud_init_modules:
+@@ -85,11 +85,11 @@
   - set_hostname
   - update_hostname
   - update_etc_hosts
@@ -317,7 +309,7 @@ index 825deff4..5d4bbd0e 100644
   - ca-certs
  {% endif %}
   - rsyslog
-@@ -105,13 +105,13 @@ cloud_config_modules:
+@@ -105,13 +105,13 @@
   - emit_upstart
   - snap
  {% endif %}
@@ -334,37 +326,46 @@ index 825deff4..5d4bbd0e 100644
   - spacewalk
  {% endif %}
   - yum-add-repo
-@@ -174,7 +174,7 @@ cloud_final_modules:
+@@ -176,7 +176,7 @@
  system_info:
     # This will affect which distro class gets used
- {% if variant in ["almalinux", "alpine", "amazon", "arch", "centos", "debian",
--                  "eurolinux", "fedora", "freebsd", "netbsd", "openbsd",
-+                  "eurolinux", "fedora", "freebsd", "mariner", "netbsd", "openbsd",
+ {% if variant in ["almalinux", "alpine", "amazon", "arch", "centos", "cloudlinux", "debian",
+-                  "eurolinux", "fedora", "freebsd", "netbsd", "openbsd", "openEuler",
++                  "eurolinux", "fedora", "freebsd", "mariner", "netbsd", "openbsd", "openEuler",
                    "photon", "rhel", "rocky", "suse", "ubuntu", "virtuozzo"] %}
     distro: {{ variant }}
  {% elif variant in ["dragonfly"] %}
-@@ -295,7 +295,8 @@ system_info:
-      groups: [wheel]
-      sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-      shell: /bin/ksh
--{% elif variant == "photon" %}
-+{% elif variant in ["mariner", "photon"] %}
-+{% if variant == "photon" %}
-    default_user:
-      name: photon
-      lock_passwd: True
-@@ -303,6 +304,7 @@ system_info:
-      groups: [wheel]
-      sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-      shell: /bin/bash
-+{% endif %}
-    # Other config here will be given to the distro class and/or path classes
-    paths:
-       cloud_dir: /var/lib/cloud/
-diff --git a/systemd/cloud-init.service.tmpl b/systemd/cloud-init.service.tmpl
-index 636f59be..118e44ed 100644
---- a/systemd/cloud-init.service.tmpl
-+++ b/systemd/cloud-init.service.tmpl
+@@ -318,6 +318,27 @@
+    # In Photon, we have default network settings, hence if network settings are
+    # not explicitly given in metadata, don't use fallback network config.
+    disable_fallback_netcfg: true
++{% elif variant == "mariner" %}
++   default_user:
++     name: mariner
++     lock_passwd: True
++     gecos: mariner
++     groups: [wheel]
++     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
++     shell: /bin/bash
++   # Other config here will be given to the distro class and/or path classes
++   paths:
++      cloud_dir: /var/lib/cloud/
++      templates_dir: /etc/cloud/templates/
++   network:
++      renderers: ['networkd']
++
++   ssh_svcname: sshd
++
++   # If set to true, cloud-init will not use fallback network config.
++   # In Mariner, we have default network settings, hence if network settings are
++   # not explicitly given in metadata, don't use fallback network config.
++   disable_fallback_netcfg: true
+ {% endif %}
+ {% if variant in ["freebsd", "netbsd", "openbsd"] %}
+    network:
+diff -Naur a/systemd/cloud-init.service.tmpl b/systemd/cloud-init.service.tmpl
+--- a/systemd/cloud-init.service.tmpl	2021-11-02 12:35:08.000000000 -0700
++++ b/systemd/cloud-init.service.tmpl	2022-03-12 12:01:33.245140731 -0800
 @@ -1,7 +1,7 @@
  ## template:jinja
  [Unit]
@@ -374,10 +375,9 @@ index 636f59be..118e44ed 100644
  DefaultDependencies=no
  {% endif %}
  Wants=cloud-init-local.service
-diff --git a/templates/hosts.mariner.tmpl b/templates/hosts.mariner.tmpl
-index e69de29b..e223939c 100644
---- a/templates/hosts.mariner.tmpl
-+++ b/templates/hosts.mariner.tmpl
+diff -Naur a/templates/hosts.mariner.tmpl b/templates/hosts.mariner.tmpl
+--- a/templates/hosts.mariner.tmpl	1969-12-31 16:00:00.000000000 -0800
++++ b/templates/hosts.mariner.tmpl	2022-03-12 12:02:13.965114759 -0800
 @@ -0,0 +1,22 @@
 +## template:jinja
 +{#
@@ -401,36 +401,22 @@ index e69de29b..e223939c 100644
 +# The following lines are desirable for IPv6 capable hosts
 +::1 {{fqdn}} {{hostname}}
 +::1 localhost6.localdomain6 localhost6
-diff --git a/tests/cloud_tests/util.py b/tests/cloud_tests/util.py
-index 49baadb0..595fd229 100644
---- a/tests/cloud_tests/util.py
-+++ b/tests/cloud_tests/util.py
-@@ -23,7 +23,7 @@ from tests.cloud_tests import LOG
- 
- OS_FAMILY_MAPPING = {
-     'debian': ['debian', 'ubuntu'],
--    'redhat': ['centos', 'photon', 'rhel', 'fedora'],
-+    'redhat': ['centos', 'mariner', 'photon', 'rhel', 'fedora'],
-     'gentoo': ['gentoo'],
-     'freebsd': ['freebsd'],
-     'suse': ['sles'],
-diff --git a/tests/unittests/test_cli.py b/tests/unittests/test_cli.py
-index a39e1d0c..bc1d8b61 100644
---- a/tests/unittests/test_cli.py
-+++ b/tests/unittests/test_cli.py
-@@ -225,7 +225,7 @@ class TestCLI(test_helpers.FilesystemMockingTestCase):
+\ No newline at end of file
+diff -Naur a/tests/unittests/test_cli.py b/tests/unittests/test_cli.py
+--- a/tests/unittests/test_cli.py	2021-11-02 12:35:08.000000000 -0700
++++ b/tests/unittests/test_cli.py	2022-03-12 12:03:16.437074152 -0800
+@@ -225,7 +225,7 @@
          expected_doc_sections = [
              '**Supported distros:** all',
-             ('**Supported distros:** almalinux, alpine, centos, debian, '
--             'eurolinux, fedora, opensuse, photon, rhel, rocky, sles, ubuntu, '
-+             'eurolinux, fedora, mariner, opensuse, photon, rhel, rocky, sles, ubuntu, '
-              'virtuozzo'),
+             ('**Supported distros:** almalinux, alpine, centos, cloudlinux, '
+-             'debian, eurolinux, fedora, openEuler, opensuse, photon, rhel, '
++             'debian, eurolinux, fedora, mariner, openEuler, opensuse, photon, rhel, '
+              'rocky, sles, ubuntu, virtuozzo'),
              '**Config schema**:\n    **resize_rootfs:** (true/false/noblock)',
              '**Examples**::\n\n    runcmd:\n        - [ ls, -l, / ]\n'
-diff --git a/tests/unittests/test_distros/test_mariner.py b/tests/unittests/test_distros/test_mariner.py
-index e69de29b..f9a714a8 100644
---- a/tests/unittests/test_distros/test_mariner.py
-+++ b/tests/unittests/test_distros/test_mariner.py
+diff -Naur a/tests/unittests/test_distros/test_mariner.py b/tests/unittests/test_distros/test_mariner.py
+--- a/tests/unittests/test_distros/test_mariner.py	1969-12-31 16:00:00.000000000 -0800
++++ b/tests/unittests/test_distros/test_mariner.py	2022-03-12 12:03:47.857053404 -0800
 @@ -0,0 +1,68 @@
 +# This file is part of cloud-init. See LICENSE file for license information.
 +
@@ -500,13 +486,13 @@ index e69de29b..f9a714a8 100644
 +        self.distro._cfg[key] = False
 +        assert(self.distro.generate_fallback_config() is not None)
 +        self.assertNotIn(self.expected_log_line, self.logs.getvalue())
-diff --git a/tests/unittests/test_distros/test_netconfig.py b/tests/unittests/test_distros/test_netconfig.py
-index d09e46af..42721abf 100644
---- a/tests/unittests/test_distros/test_netconfig.py
-+++ b/tests/unittests/test_distros/test_netconfig.py
-@@ -909,6 +909,125 @@ class TestNetCfgDistroPhoton(TestNetCfgDistroBase):
-                                expected_cfgs.copy())
- 
+\ No newline at end of file
+diff -Naur a/tests/unittests/test_distros/test_netconfig.py b/tests/unittests/test_distros/test_netconfig.py
+--- a/tests/unittests/test_distros/test_netconfig.py	2021-11-02 12:35:08.000000000 -0700
++++ b/tests/unittests/test_distros/test_netconfig.py	2022-03-12 12:04:32.005023902 -0800
+@@ -912,4 +912,124 @@
+ def get_mode(path, target=None):
+     return os.stat(subp.target_path(target, path)).st_mode & 0o777
  
 +class TestNetCfgDistroMariner(TestNetCfgDistroBase):
 +
@@ -627,14 +613,12 @@ index d09e46af..42721abf 100644
 +                               expected_cfgs.copy())
 +
 +
- def get_mode(path, target=None):
-     return os.stat(subp.target_path(target, path)).st_mode & 0o777
- 
-diff --git a/tests/unittests/test_handler/test_handler_set_hostname.py b/tests/unittests/test_handler/test_handler_set_hostname.py
-index 1a524c7d..c1899b10 100644
---- a/tests/unittests/test_handler/test_handler_set_hostname.py
-+++ b/tests/unittests/test_handler/test_handler_set_hostname.py
-@@ -160,6 +160,46 @@ class TestHostname(t_help.FilesystemMockingTestCase):
++
+ # vi: ts=4 expandtab
+diff -Naur a/tests/unittests/test_handler/test_handler_set_hostname.py b/tests/unittests/test_handler/test_handler_set_hostname.py
+--- a/tests/unittests/test_handler/test_handler_set_hostname.py	2021-11-02 12:35:08.000000000 -0700
++++ b/tests/unittests/test_handler/test_handler_set_hostname.py	2022-03-12 12:05:12.228871110 -0800
+@@ -160,6 +160,47 @@
                                capture=True)
                  ] not in m_subp.call_args_list
  
@@ -678,14 +662,14 @@ index 1a524c7d..c1899b10 100644
 +                              capture=True)
 +                ] not in m_subp.call_args_list
 +
++
      def test_multiple_calls_skips_unchanged_hostname(self):
          """Only new hostname or fqdn values will generate a hostname call."""
          distro = self._fetch_distro('debian')
-diff --git a/tests/unittests/test_render_cloudcfg.py b/tests/unittests/test_render_cloudcfg.py
-index 00d50e66..4ce31876 100644
---- a/tests/unittests/test_render_cloudcfg.py
-+++ b/tests/unittests/test_render_cloudcfg.py
-@@ -10,7 +10,7 @@ from cloudinit import util
+diff -Naur a/tests/unittests/test_render_cloudcfg.py b/tests/unittests/test_render_cloudcfg.py
+--- a/tests/unittests/test_render_cloudcfg.py	2021-11-02 12:35:08.000000000 -0700
++++ b/tests/unittests/test_render_cloudcfg.py	2022-03-12 12:06:03.324577715 -0800
+@@ -10,7 +10,7 @@
  
  # TODO(Look to align with tools.render-cloudcfg or cloudinit.distos.OSFAMILIES)
  DISTRO_VARIANTS = ["amazon", "arch", "centos", "debian", "eurolinux", "fedora",
@@ -694,25 +678,24 @@ index 00d50e66..4ce31876 100644
                     "ubuntu", "unknown"]
  
  
-@@ -33,6 +33,8 @@ class TestRenderCloudCfg:
+@@ -40,7 +40,7 @@
+             system_cfg = util.load_yaml(stream.read())
  
-     @pytest.mark.parametrize('variant', (DISTRO_VARIANTS))
-     def test_variant_sets_default_user_in_cloud_cfg(self, variant, tmpdir):
-+        if variant == 'mariner':
-+            return
-         outfile = tmpdir.join('outcfg').strpath
-         subp.subp(
-             self.cmd + ['--variant', variant, self.tmpl_path, outfile])
-diff --git a/tools/render-cloudcfg b/tools/render-cloudcfg
-index 30f82521..40e0f9a6 100755
---- a/tools/render-cloudcfg
-+++ b/tools/render-cloudcfg
-@@ -5,7 +5,7 @@ import os
+         default_user_exceptions = {
+-            'amazon': 'ec2-user', 'debian': 'ubuntu', 'unknown': 'ubuntu'}
++            'amazon': 'ec2-user', 'debian': 'ubuntu', 'mariner': 'mariner', 'unknown': 'ubuntu'}
+         default_user = system_cfg['system_info']['default_user']['name']
+         assert default_user == default_user_exceptions.get(variant, variant)
+ 
+diff -Naur a/tools/render-cloudcfg b/tools/render-cloudcfg
+--- a/tools/render-cloudcfg	2021-11-02 12:35:08.000000000 -0700
++++ b/tools/render-cloudcfg	2022-03-12 12:06:26.788450226 -0800
+@@ -5,7 +5,7 @@
  import sys
  
- VARIANTS = ["almalinux", "alpine", "amazon", "arch", "centos", "debian",
--            "eurolinux", "fedora", "freebsd", "netbsd", "openbsd", "photon",
-+            "eurolinux", "fedora", "freebsd", "mariner", "netbsd", "openbsd", "photon",
+ VARIANTS = ["almalinux", "alpine", "amazon", "arch", "centos", "cloudlinux", "debian",
+-            "eurolinux", "fedora", "freebsd", "netbsd", "openbsd", "openEuler", "photon",
++            "eurolinux", "fedora", "freebsd", "mariner", "netbsd", "openbsd", "openEuler", "photon",
              "rhel", "suse","rocky", "ubuntu", "unknown", "virtuozzo"]
  
  
