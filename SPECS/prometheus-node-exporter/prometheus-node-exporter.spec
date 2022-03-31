@@ -5,7 +5,7 @@
 Summary:        Exporter for machine metrics
 Name:           prometheus-node-exporter
 Version:        1.3.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 # Upstream license specification: Apache-2.0
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
@@ -60,9 +60,6 @@ LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}      \
          -X github.com/ncabatoff/process-exporter/version.GoVersion=%{go_version}"
 go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o bin/node_exporter
 
-%check
-bin/node_exporter --help && make test
-
 %install
 install -m 0755 -vd %{buildroot}%{_bindir}
 install -m 0755 -vp bin/* %{buildroot}%{_bindir}/
@@ -75,6 +72,9 @@ install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/default/%{name}
 install -Dpm0644 example-rules.yml %{buildroot}%{_datadir}/prometheus/node-exporter/example-rules.yml
 install -Dpm0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus/node-exporter
+
+%check
+bin/node_exporter --help && make test
 
 %pre
 # Steps extracted from Fedora's /usr/lib/rpm/sysusers.generate-pre.sh script.
@@ -107,7 +107,7 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus/node-exporter
 
 %changelog
-* Tue Mar 29 2022 Matthew Torr <matthewtorr@microsoft.com> - 1.3.1-7
+* Thu Mar 31 2022 Matthew Torr <matthewtorr@microsoft.com> - 1.3.1-7
 - Build executable, not ar archive.
 
 * Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.1-6
