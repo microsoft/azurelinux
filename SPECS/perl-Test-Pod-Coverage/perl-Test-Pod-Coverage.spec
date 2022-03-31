@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Pod-Coverage
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Test-Pod-Coverage-%{version}.tar.gz#/perl-Test-Pod-Coverage-%{version}.tar.gz
+Source1:        LICENSE.PTR
 
 BuildArch:      noarch
 
@@ -40,6 +41,8 @@ documented in pod.
 %prep
 %setup -q -n Test-Pod-Coverage-%{version}
 
+cp %{SOURCE1} .
+
 %build
 perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
@@ -53,12 +56,14 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes README
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/*.3pm*
 
 %changelog
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10-18
+- License verified.
 - Updating dependencies.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10-17
