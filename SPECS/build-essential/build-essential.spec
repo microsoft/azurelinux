@@ -1,10 +1,10 @@
 Name:           build-essential
 Summary:        Metapackage to install all build tools
 Version:        0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Requires:       gcc, binutils, make, glibc-devel, kernel-headers, automake
-Requires:       autoconf, libtool, gawk, diffutils, patch, bison
+Requires:       autoconf, libtool, gawk, diffutils, patch, bison, installkernel
 
 %description
 Metapackage to install all build tools
@@ -17,6 +17,8 @@ Metapackage to install all build tools
 %defattr(-,root,root,0755)
 
 %changelog
+* Wed Mar 30 2020 Chris Co <chrco@microsoft.com> - 0.1-5
+- Add installkernel
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 0.1-4
 -   Renaming linux-api-headers to kernel-headers.
 -   Initial CBL-Mariner import from Photon (license: Apache2).
