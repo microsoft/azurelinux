@@ -20,7 +20,11 @@ containers.
 %setup -q
 
 %build
+<<<<<<< HEAD
 make build
+=======
+%make_build build
+>>>>>>> 0b82563a... version changes + remove merge conflict of build
 mkdir -p %{buildroot}%{_bindir}
 cp %{name} %{buildroot}%{_bindir}
 

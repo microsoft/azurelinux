@@ -28,7 +28,7 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         nvidia-container-toolkit-1.5.1.patch
+Patch0:         nvidia-container-toolkit-1.9.0.patch
 BuildRequires:  golang
 Provides:       nvidia-container-runtime-hook
 
