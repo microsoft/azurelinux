@@ -38,7 +38,6 @@ Patch3:         java-cup-classpath.patch
 BuildRequires:  ant
 BuildRequires:  git
 BuildRequires:  java-devel
-BuildRequires:  jflex-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  xml-commons-apis-bootstrap
 BuildRequires:  xml-commons-resolver-bootstrap
