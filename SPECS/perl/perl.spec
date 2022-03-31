@@ -38,9 +38,10 @@
 
 Name:           perl
 License:        GPL+ or Artistic
+Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        1%{?dist}
+Release:        487%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -378,7 +379,7 @@ Epoch:          0
 Version:        %{perl_version}
 BuildArch:      noarch
 # Match library exactly for perlbug version string
-Requires:       perl-libs = %{perl_version}-%{release}
+Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 # Keep /usr/sbin/sendmail and Module::CoreList optional for the perlbug tool
 %if %{defined perl_bootstrap}
 %gendep_perl_utils
@@ -1057,7 +1058,7 @@ Version:        1.37
 BuildArch:      noarch
 Requires:       %perl_compat
 # Match library exactly for diagnostics messages
-Requires:       perl-libs = %{perl_version}-%{release}
+Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl(Getopt::Std)
 %if %{defined perl_bootstrap}
 %gendep_perl_diagnostics
@@ -1167,6 +1168,7 @@ BuildArch:      noarch
 Requires:       %perl_compat
 # For perldoc tool
 Recommends:     perl-Pod-Perldoc
+
 
 %description doc
 This is a documentation for Perl language. It's provided in POD and manual
@@ -6569,8 +6571,8 @@ done
 
 # Old changelog entries are preserved in CVS.
 %changelog
-* Wed Mar 30 2022 Andrew Phelps <anphel@microsoft.com> - 5.34.1-1
-- Upgrade to version 5.34.1
+* Wed Mar 30 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-487
+- Upgrade to version 5.34.1 referencing Fedora 37 (license: MIT)
 
 * Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.32.0-465
 - Removed the "perl-DB_File" subpackage.
