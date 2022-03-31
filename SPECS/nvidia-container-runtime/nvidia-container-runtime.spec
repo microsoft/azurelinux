@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime
 Name:           nvidia-container-runtime
-Version:        3.5.0
-Release:        5%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,10 @@ install -m 755 %{name} %{buildroot}%{_bindir}/%{name}
 %{_bindir}/%{name}
 
 %changelog
+* Wed Mar 30 2022 Adithya Jayachandran <adjayach@microsoft.com> - 3.9.0-1
+- Bumped version to 3.9.0
+- nvidia-container-runtime is officially included in toolkit install, keeping this here if needed
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 3.5.0-5
 - Bump release to force rebuild with golang 1.16.15
 
