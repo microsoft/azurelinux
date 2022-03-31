@@ -37,8 +37,8 @@
 %global perl5_testdir   %{_libexecdir}/perl5-tests
 
 Name:           perl
-License:        GPL+ or Artistic 
-Version:        %{perl_version} 
+License:        GPL+ or Artistic
+Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
 Release:        1%{?dist}
 Summary:        Practical Extraction and Report Language
@@ -115,9 +115,9 @@ Requires:  zlib-devel
 %global perl_compat perl(:MODULE_COMPAT_5.34.1)
 
 Requires:       %perl_compat
-Requires:       perl-interpreter%{?_isa} = %{perl_version}-%{release}
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
-Requires:       perl-devel%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-interpreter%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
+Requires:       perl-devel%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl-macros
 Requires:       perl-utils
 %if %{defined perl_bootstrap}
@@ -201,8 +201,8 @@ Requires:       perl-Unicode-Collate, perl-Unicode-Normalize, perl-Unicode-UCD,
 Requires:       perl-User-pwent,
 Requires:       perl-vars, perl-version, perl-vmsish,
 
-Provides:       perl-core = %{perl_version}-%{release}
-Provides:       perl-core%{?_isa} = %{perl_version}-%{release}
+Provides:       perl-core = %{perl_epoch}:%{perl_version}-%{release}
+Provides:       perl-core%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 # perl was renamed to perl-interpreter and perl-core renamed to perl
 Obsoletes:      perl-core < 5.26.0-395
 
@@ -228,9 +228,9 @@ Summary:        Standalone executable Perl interpreter
 License:        GPL+ or Artistic
 # perl-interpreter denotes a package with the perl executable.
 Version:        %{perl_version}
-AutoReqProv:    no
+Epoch:          %{perl_epoch}
 
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 # Require this till perl-interpreter sub-package provides any modules
 Requires:       %perl_compat
 Suggests:       perl-doc = %{perl_version}-%{release}
@@ -325,7 +325,7 @@ License:        (GPL+ or Artistic) and UCD
 Requires:       perl(ExtUtils::ParseXS)
 Requires:       %perl_compat
 # Match library and header files when downgrading releases
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Recommends:     perl-doc = %{perl_version}-%{release}
 # Devel::PPPort for h2xs script
 Requires:       perl(Devel::PPPort)
@@ -1167,7 +1167,6 @@ BuildArch:      noarch
 Requires:       %perl_compat
 # For perldoc tool
 Recommends:     perl-Pod-Perldoc
-AutoReqProv:    no
 
 %description doc
 This is a documentation for Perl language. It's provided in POD and manual
@@ -1339,7 +1338,7 @@ Version:        1.30
 Requires:       %perl_compat
 # Errno.pm bakes in kernel version at build time and compares it against
 # $Config{osvers} at run time. Match exact interpreter build.
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Errno
@@ -2952,7 +2951,7 @@ Epoch:          0
 Version:        %{perl_version}
 Requires:       %perl_compat
 # Match header files used when building perl.
-Requires:       perl-libs%{?_isa} = %{perl_version}-%{release}
+Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl(warnings)
 # We deliver this package only for these three files mentioned in
 # a documentation.
@@ -3012,7 +3011,7 @@ Version:        1.13
 BuildArch:      noarch
 Requires:       %perl_compat
 # Match perl the functions come from
-Requires:       perl-libs = %{perl_version}-%{release}
+Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 %if %{defined perl_bootstrap}
 %gendep_perl_Pod_Functions
 %endif
@@ -4712,7 +4711,250 @@ done
 
 %files doc
 %dir %{privlib}/pod
+%{privlib}/pod/perl5*delta.pod
+%{privlib}/pod/perlaix.pod
+%{privlib}/pod/perlamiga.pod
+%{privlib}/pod/perlandroid.pod
+%{privlib}/pod/perlapi.pod
+%{privlib}/pod/perlapio.pod
+%{privlib}/pod/perlartistic.pod
+%{privlib}/pod/perlbook.pod
+%{privlib}/pod/perlboot.pod
+%{privlib}/pod/perlbot.pod
+%{privlib}/pod/perlbs2000.pod
+%{privlib}/pod/perlcall.pod
+%{privlib}/pod/perlcheat.pod
+%{privlib}/pod/perlclib.pod
+%{privlib}/pod/perlcn.pod
+%{privlib}/pod/perlcommunity.pod
+%{privlib}/pod/perlcygwin.pod
+%{privlib}/pod/perldata.pod
+%{privlib}/pod/perldbmfilter.pod
+%{privlib}/pod/perldebguts.pod
+%{privlib}/pod/perldebtut.pod
+%{privlib}/pod/perldelta.pod
+%{privlib}/pod/perldeprecation.pod
+%{privlib}/pod/perldos.pod
+%{privlib}/pod/perldsc.pod
+%{privlib}/pod/perldtrace.pod
+%{privlib}/pod/perlebcdic.pod
+%{privlib}/pod/perlembed.pod
+%{privlib}/pod/perlexperiment.pod
+%{privlib}/pod/perlfork.pod
+%{privlib}/pod/perlform.pod
+%{privlib}/pod/perlfreebsd.pod
+%{privlib}/pod/perlfunc.pod
+%{privlib}/pod/perlgit.pod
+%{privlib}/pod/perlgpl.pod
+%{privlib}/pod/perlguts.pod
+%{privlib}/pod/perlhack.pod
+%{privlib}/pod/perlhacktips.pod
+%{privlib}/pod/perlhacktut.pod
+%{privlib}/pod/perlhaiku.pod
+%{privlib}/pod/perlhist.pod
+%{privlib}/pod/perlhpux.pod
+%{privlib}/pod/perlhurd.pod
+%{privlib}/pod/perlintern.pod
+%{privlib}/pod/perlinterp.pod
+%{privlib}/pod/perlintro.pod
+%{privlib}/pod/perliol.pod
+%{privlib}/pod/perlipc.pod
+%{privlib}/pod/perlirix.pod
+%{privlib}/pod/perljp.pod
+%{privlib}/pod/perlko.pod
+%{privlib}/pod/perllexwarn.pod
+%{privlib}/pod/perllinux.pod
+%{privlib}/pod/perllocale.pod
+%{privlib}/pod/perllol.pod
+%{privlib}/pod/perlmacos.pod
+%{privlib}/pod/perlmacosx.pod
+%{privlib}/pod/perlmod.pod
+%{privlib}/pod/perlmodinstall.pod
+%{privlib}/pod/perlmodlib.pod
+%{privlib}/pod/perlmodstyle.pod
+%{privlib}/pod/perlmroapi.pod
+%{privlib}/pod/perlnetware.pod
+%{privlib}/pod/perlnewmod.pod
+%{privlib}/pod/perlnumber.pod
+%{privlib}/pod/perlobj.pod
+%{privlib}/pod/perlootut.pod
+%{privlib}/pod/perlop.pod
+%{privlib}/pod/perlopenbsd.pod
+%{privlib}/pod/perlopentut.pod
+%{privlib}/pod/perlos2.pod
+%{privlib}/pod/perlos390.pod
+%{privlib}/pod/perlos400.pod
+%{privlib}/pod/perlpacktut.pod
+%{privlib}/pod/perlperf.pod
+%{privlib}/pod/perlplan9.pod
+%{privlib}/pod/perlpod.pod
+%{privlib}/pod/perlpodspec.pod
+%{privlib}/pod/perlpolicy.pod
+%{privlib}/pod/perlport.pod
+%{privlib}/pod/perlpragma.pod
+%{privlib}/pod/perlqnx.pod
+%{privlib}/pod/perlre.pod
+%{privlib}/pod/perlreapi.pod
+%{privlib}/pod/perlrebackslash.pod
+%{privlib}/pod/perlrecharclass.pod
+%{privlib}/pod/perlref.pod
+%{privlib}/pod/perlreftut.pod
+%{privlib}/pod/perlreguts.pod
+%{privlib}/pod/perlrepository.pod
+%{privlib}/pod/perlrequick.pod
+%{privlib}/pod/perlreref.pod
+%{privlib}/pod/perlretut.pod
+%{privlib}/pod/perlriscos.pod
+%{privlib}/pod/perlsec.pod
+%{privlib}/pod/perlsolaris.pod
+%{privlib}/pod/perlsource.pod
+%{privlib}/pod/perlstyle.pod
+%{privlib}/pod/perlsub.pod
 # Remove temporarily - build stuck processing auto dependencies
+#%%{privlib}/pod/perlsymbian.pod
+%{privlib}/pod/perlsyn.pod
+%{privlib}/pod/perlsynology.pod
+%{privlib}/pod/perlthrtut.pod
+%{privlib}/pod/perltie.pod
+%{privlib}/pod/perltoc.pod
+%{privlib}/pod/perltodo.pod
+%{privlib}/pod/perltooc.pod
+%{privlib}/pod/perltoot.pod
+%{privlib}/pod/perltrap.pod
+%{privlib}/pod/perltru64.pod
+%{privlib}/pod/perltw.pod
+%{privlib}/pod/perlunicode.pod
+%{privlib}/pod/perlunicook.pod
+%{privlib}/pod/perlunifaq.pod
+%{privlib}/pod/perluniintro.pod
+%{privlib}/pod/perluniprops.pod
+%{privlib}/pod/perlunitut.pod
+%{privlib}/pod/perlvar.pod
+%{privlib}/pod/perlvms.pod
+%{privlib}/pod/perlvos.pod
+%{privlib}/pod/perlwin32.pod
+%{_mandir}/man1/perl5*delta.*
+%{_mandir}/man1/perlaix.*
+%{_mandir}/man1/perlamiga.*
+%{_mandir}/man1/perlandroid.*
+%{_mandir}/man1/perlapi.*
+%{_mandir}/man1/perlapio.*
+%{_mandir}/man1/perlartistic.*
+%{_mandir}/man1/perlbook.*
+%{_mandir}/man1/perlboot.*
+%{_mandir}/man1/perlbot.*
+%{_mandir}/man1/perlbs2000.*
+%{_mandir}/man1/perlcall.*
+%{_mandir}/man1/perlcheat.*
+%{_mandir}/man1/perlclib.*
+%{_mandir}/man1/perlcn.*
+%{_mandir}/man1/perlcommunity.*
+%{_mandir}/man1/perlcygwin.*
+%{_mandir}/man1/perldata.*
+%{_mandir}/man1/perldbmfilter.*
+%{_mandir}/man1/perldebguts.*
+%{_mandir}/man1/perldebtut.*
+%{_mandir}/man1/perldelta.*
+%{_mandir}/man1/perldeprecation.*
+%{_mandir}/man1/perldos.*
+%{_mandir}/man1/perldsc.*
+%{_mandir}/man1/perldtrace.*
+%{_mandir}/man1/perlebcdic.*
+%{_mandir}/man1/perlembed.*
+%{_mandir}/man1/perlexperiment.*
+%{_mandir}/man1/perlfork.*
+%{_mandir}/man1/perlform.*
+%{_mandir}/man1/perlfreebsd.*
+%{_mandir}/man1/perlfunc.*
+%{_mandir}/man1/perlgit.*
+%{_mandir}/man1/perlgpl.*
+%{_mandir}/man1/perlguts.*
+%{_mandir}/man1/perlhack.*
+%{_mandir}/man1/perlhacktips.*
+%{_mandir}/man1/perlhacktut.*
+%{_mandir}/man1/perlhaiku.*
+%{_mandir}/man1/perlhist.*
+%{_mandir}/man1/perlhpux.*
+%{_mandir}/man1/perlhurd.*
+%{_mandir}/man1/perlintern.*
+%{_mandir}/man1/perlinterp.*
+%{_mandir}/man1/perlintro.*
+%{_mandir}/man1/perliol.*
+%{_mandir}/man1/perlipc.*
+%{_mandir}/man1/perlirix.*
+%{_mandir}/man1/perljp.*
+%{_mandir}/man1/perlko.*
+%{_mandir}/man1/perllexwarn.*
+%{_mandir}/man1/perllinux.*
+%{_mandir}/man1/perllocale.*
+%{_mandir}/man1/perllol.*
+%{_mandir}/man1/perlmacos.*
+%{_mandir}/man1/perlmacosx.*
+%{_mandir}/man1/perlmod.*
+%{_mandir}/man1/perlmodinstall.*
+%{_mandir}/man1/perlmodlib.*
+%{_mandir}/man1/perlmodstyle.*
+%{_mandir}/man1/perlmroapi.*
+%{_mandir}/man1/perlnetware.*
+%{_mandir}/man1/perlnewmod.*
+%{_mandir}/man1/perlnumber.*
+%{_mandir}/man1/perlobj.*
+%{_mandir}/man1/perlootut.*
+%{_mandir}/man1/perlop.*
+%{_mandir}/man1/perlopenbsd.*
+%{_mandir}/man1/perlopentut.*
+%{_mandir}/man1/perlos2.*
+%{_mandir}/man1/perlos390.*
+%{_mandir}/man1/perlos400.*
+%{_mandir}/man1/perlpacktut.*
+%{_mandir}/man1/perlperf.*
+%{_mandir}/man1/perlplan9.*
+%{_mandir}/man1/perlpod.*
+%{_mandir}/man1/perlpodspec.*
+%{_mandir}/man1/perlpolicy.*
+%{_mandir}/man1/perlport.*
+%{_mandir}/man1/perlpragma.*
+%{_mandir}/man1/perlqnx.*
+%{_mandir}/man1/perlre.*
+%{_mandir}/man1/perlreapi.*
+%{_mandir}/man1/perlrebackslash.*
+%{_mandir}/man1/perlrecharclass.*
+%{_mandir}/man1/perlref.*
+%{_mandir}/man1/perlreftut.*
+%{_mandir}/man1/perlreguts.*
+%{_mandir}/man1/perlrepository.*
+%{_mandir}/man1/perlrequick.*
+%{_mandir}/man1/perlreref.*
+%{_mandir}/man1/perlretut.*
+%{_mandir}/man1/perlriscos.*
+%{_mandir}/man1/perlsec.*
+%{_mandir}/man1/perlsolaris.*
+%{_mandir}/man1/perlsource.*
+%{_mandir}/man1/perlstyle.*
+%{_mandir}/man1/perlsub.*
+# Remove temporarily - build stuck processing auto dependencies
+#%%{_mandir}/man1/perlsymbian.*
+%{_mandir}/man1/perlsyn.*
+%{_mandir}/man1/perlsynology.*
+%{_mandir}/man1/perlthrtut.*
+%{_mandir}/man1/perltie.*
+%{_mandir}/man1/perltoc.*
+%{_mandir}/man1/perltodo.*
+%{_mandir}/man1/perltooc.*
+%{_mandir}/man1/perltoot.*
+%{_mandir}/man1/perltrap.*
+%{_mandir}/man1/perltru64.*
+%{_mandir}/man1/perltw.*
+%{_mandir}/man1/perlunicode.*
+%{_mandir}/man1/perlunicook.*
+%{_mandir}/man1/perlunifaq.*
+%{_mandir}/man1/perluniintro.*
+%{_mandir}/man1/perluniprops.*
+%{_mandir}/man1/perlunitut.*
+%{_mandir}/man1/perlvar.*
+%{_mandir}/man1/perlvms.*
+%{_mandir}/man1/perlvos.*
+%{_mandir}/man1/perlwin32.*
 
 %files Dumpvalue
 %{privlib}/Dumpvalue.pm
