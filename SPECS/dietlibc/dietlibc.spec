@@ -17,7 +17,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.fefe.de/dietlibc/
 Source0:        https://www.fefe.de/dietlibc/%{name}-%{version}.tar.xz
-Source1:        http://www.fefe.de/dietlibc/%{name}-%{version}.tar.xz.sig
 Patch1:         dietlibc-insecure-defpath.patch
 
 BuildRequires:  gcc
