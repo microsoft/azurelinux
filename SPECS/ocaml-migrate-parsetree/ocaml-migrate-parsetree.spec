@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-migrate-parsetree
 Version:        2.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Convert OCaml parsetrees between different major versions
 
 License:        LGPLv2+ with exceptions
@@ -80,6 +80,9 @@ dune runtest
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-2
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 2.3.0-1
 - Upgrade to latest upstream version
 - License verified

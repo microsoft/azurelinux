@@ -4,7 +4,7 @@
 Summary:        OCaml library for i18n
 Name:           ocaml-gettext
 Version:        0.4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+ with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -152,6 +152,9 @@ rm -rf %{buildroot}%{_prefix}/doc
 %{_libdir}/ocaml/gettext-camomile/*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-2
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.4.2-1
 - Upgrade to latest upstream version
 - Remove RHEL distro check macros

@@ -5,7 +5,7 @@
 
 Name:           ocaml-cppo
 Version:        1.6.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Equivalent of the C preprocessor for OCaml programs
 
 License:        BSD
@@ -70,6 +70,9 @@ make test
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-5
+- Cleaning-up spec. License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-4
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

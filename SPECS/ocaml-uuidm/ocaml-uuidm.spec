@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        0.9.7
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Universally unique identifiers (UUIDs) for OCaml
 
 License:        ISC
@@ -100,6 +100,9 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.7-15
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.7-14
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

@@ -13,7 +13,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        1.0.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        The transitory OCaml software packager
 
 License:        ISC
@@ -132,6 +132,9 @@ ocaml pkg/pkg.ml test
 %doc html/*
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-4
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

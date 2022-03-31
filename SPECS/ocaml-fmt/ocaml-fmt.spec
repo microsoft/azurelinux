@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        0.8.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        OCaml Format pretty-printer combinators
 
 License:        ISC
@@ -105,6 +105,9 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.9-4
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.9-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

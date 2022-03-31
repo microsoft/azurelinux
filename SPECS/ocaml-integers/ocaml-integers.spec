@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           ocaml-integers
 Version:        0.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Various signed and unsigned integer types for OCaml
 
 License:        MIT
@@ -115,6 +115,9 @@ dune runtest
 %endif
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.0-3
+- Cleaning-up spec. License verified.
+
 * Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.0-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Remove docs circular dependency by building docs conditionally

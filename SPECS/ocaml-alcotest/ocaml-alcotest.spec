@@ -10,7 +10,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        1.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Lightweight and colorful test framework for OCaml
 
 License:        ISC
@@ -123,6 +123,9 @@ dune runtest -j 1 -p alcotest
 %{_libdir}/ocaml/%{srcname}/engine/*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.0-3
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.0-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

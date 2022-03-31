@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        0.8.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Alternative String module for OCaml
 
 License:        ISC
@@ -104,6 +104,9 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-6
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-5
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

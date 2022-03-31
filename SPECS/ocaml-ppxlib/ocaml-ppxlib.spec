@@ -12,7 +12,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        0.24.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Base library and tools for ppx rewriters
 
 License:        MIT
@@ -166,6 +166,9 @@ dune runtest
 %endif
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24.0-2
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.24.0-1
 - Upgrade to latest version
 - License verified

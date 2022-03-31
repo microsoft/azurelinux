@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-num
 Version:        1.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Legacy Num library for arbitrary-precision integer and rational arithmetic
 License:        LGPLv2+ with exceptions
 
@@ -99,6 +99,9 @@ find $OCAMLFIND_DESTDIR -name '*.cmti' -delete
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-2
+- Cleaning-up spec. License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-ppx-derivers
 Version:        1.2.1
-Release:        18%{?dist}
+Release:        19%{?dist}
 Summary:        Deriving plugin registry
 
 License:        BSD
@@ -77,6 +77,9 @@ dune runtest
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-19
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-18
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

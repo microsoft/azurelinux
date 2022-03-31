@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        2.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Code coverage for OCaml and Reason
 
 License:        MIT
@@ -112,6 +112,9 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 %{_libdir}/ocaml/%{upname}/runtime/*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.3-3
+- Cleaning-up spec. License verified.
+
 * Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.3-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove test, docs circular dependencies

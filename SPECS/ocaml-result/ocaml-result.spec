@@ -6,7 +6,7 @@ Distribution:   Mariner
 
 Name:           ocaml-result
 Version:        1.5
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Compat result type
 
 %global libname %(echo %{name} | sed -e 's/^ocaml-//')
@@ -76,6 +76,9 @@ dune runtest
 %{_libdir}/ocaml/%{libname}/opam
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-10
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-9
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 

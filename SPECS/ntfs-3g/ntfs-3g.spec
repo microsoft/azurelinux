@@ -12,7 +12,7 @@ Distribution:   Mariner
 Name:		ntfs-3g
 Summary:	Linux NTFS userspace driver
 Version:	2017.3.23
-Release:	15%{?dist}
+Release:	16%{?dist}
 License:	GPLv2+
 Source0:	http://tuxera.com/opensource/%{name}_ntfsprogs-%{version}%{?subver}.tgz
 URL:		http://www.ntfs-3g.org/
@@ -293,6 +293,9 @@ cp -a %{SOURCE1} %{buildroot}%{_datadir}/hal/fdi/policy/10osvendor/
 %exclude %{_mandir}/man8/ntfs-3g*
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2017.3.23-16
+- Cleaning-up spec. License verified.
+
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 2017.3.23-15
 - Remove epoch
 

@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           ocaml-re
 Version:        1.9.0
-Release:        20%{?dist}
+Release:        21%{?dist}
 Summary:        A regular expression library for OCaml
 
 License:        LGPLv2 with exceptions
@@ -85,6 +85,9 @@ cp -aLr _build/install/default/lib/* %{buildroot}%{_libdir}/ocaml/
 %{_libdir}/ocaml/re/*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-21
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-20
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

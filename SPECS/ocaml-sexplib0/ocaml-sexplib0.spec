@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        0.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Definition of S-expressions and some base converters
 
 License:        MIT
@@ -75,6 +75,9 @@ chmod a+x %{buildroot}%{_libdir}/ocaml/%{srcname}/%{srcname}.cmxs
 %{_libdir}/ocaml/%{srcname}/*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.0-2
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest version
 - License verified

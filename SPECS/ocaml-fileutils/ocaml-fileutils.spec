@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-fileutils
 Version:        0.5.2
-Release:        17%{?dist}
+Release:        18%{?dist}
 Summary:        OCaml library for common file and filename operations
 
 License:        LGPLv2 with exceptions
@@ -99,6 +99,9 @@ make test
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.2-18
+- Cleaning-up spec. License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.2-17
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

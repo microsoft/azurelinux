@@ -3,7 +3,7 @@ Distribution:   Mariner
 %global debug_package %{nil} 
 Name:           ocaml-seq
 Version:        0.2.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Compatibility package for OCaml's standard iterator type
 License:        LGPLv2+ with exceptions
 
@@ -73,6 +73,9 @@ rm -fr %{buildroot}%{_prefix}/doc
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.2-7
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.2-6
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 

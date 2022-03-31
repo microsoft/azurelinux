@@ -10,7 +10,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{libname}
 Version:        2.8.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A composable build system for OCaml
 
 # Dune itself is MIT.  Some bundled libraries have a different license:
@@ -224,6 +224,9 @@ cp -ar README.md CHANGES.md MIGRATION.md doc/_build/* %{buildroot}%{_pkgdocdir}/
 %endif
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.5-3
+- Cleaning-up spec. License verified.
+
 * Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 2.8.5-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Remove emacs, menhir support.

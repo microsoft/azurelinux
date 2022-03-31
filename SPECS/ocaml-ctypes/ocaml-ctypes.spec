@@ -3,7 +3,7 @@ Distribution:   Mariner
 
 Name:           ocaml-ctypes
 Version:        0.18.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Combinators for binding to C libraries without writing any C
 
 License:        MIT
@@ -125,6 +125,9 @@ make test
 %doc *.html *.css
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.0-4
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.18.0-3
 - Use direct libffi-devel BR instead of pkgconfig(libffi) due to improper provides
 - License verified

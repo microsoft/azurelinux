@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-lwt
 Version:        5.4.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        OCaml lightweight thread library
 
 # The openssl linking exception is granted.
@@ -259,6 +259,9 @@ dune runtest --profile=release
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.1-8
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.1-7
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 

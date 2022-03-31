@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-ocplib-endian
 Version:        1.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Functions to read/write int16/32/64 from strings, bigarrays
 
 %global libname ocplib-endian
@@ -97,6 +97,9 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-8
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-7
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 

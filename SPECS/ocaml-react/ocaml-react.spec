@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-react
 Version:        1.2.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        OCaml framework for Functional Reactive Programming (FRP)
 
 License:        ISC
@@ -92,6 +92,9 @@ ocaml pkg/pkg.ml test
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-8
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-7
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 

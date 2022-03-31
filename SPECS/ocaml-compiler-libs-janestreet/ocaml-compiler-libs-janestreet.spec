@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 Name:           %{srcname}-janestreet
 Version:        0.12.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        OCaml compiler libraries repackaged
 
 License:        MIT
@@ -107,6 +107,9 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %endif
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.3-4
+- Cleaning-up spec. License verified.
+
 * Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 0.12.3-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Remove test, docs circular dependencies

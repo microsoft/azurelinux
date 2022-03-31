@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-mmap
 Version:        1.1.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 Summary:        File mapping functionality
 
 %global libname mmap
@@ -67,6 +67,9 @@ dune runtest
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-19
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-18
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 

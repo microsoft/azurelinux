@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           ocaml-camomile
 Version:        1.0.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Unicode library for OCaml
 
 # Several files are MIT and UCD licensed, but the overall work is LGPLv2+
@@ -117,6 +117,9 @@ cp _build/install/default/lib/camomile/library/*.mli %{buildroot}%{_libdir}/ocam
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-9
+- Cleaning-up spec. License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-8
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

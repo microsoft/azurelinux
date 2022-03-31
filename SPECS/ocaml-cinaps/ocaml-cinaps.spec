@@ -13,7 +13,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        0.15.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Trivial Metaprogramming tool using the OCaml toplevel
 
 License:        MIT
@@ -97,6 +97,9 @@ help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
 %{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.1-3
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.1-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

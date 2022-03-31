@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Compatibility library to use Stdlib.Bigarray when possible
 
 License:        ISC
@@ -79,6 +79,9 @@ dune runtest
 %{_libdir}/ocaml/bigarray-compat/*.cmt
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 Name:           ocaml-%{srcname}
 Version:        0.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Jane Street standard library for OCaml
 
 License:        MIT
@@ -116,6 +116,9 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %{_libdir}/ocaml/%{srcname}/*/*.mli
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.0-2
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest upstream version
 - Add patch for OCaml 4.13.0 compatibility

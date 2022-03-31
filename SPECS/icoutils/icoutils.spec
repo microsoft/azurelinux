@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           icoutils
 Version:        0.32.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Utility for extracting and converting Microsoft icon and cursor files
 
 License:        GPLv3+
@@ -61,6 +61,9 @@ make install DESTDIR=%{buildroot}
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.32.3-8
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.32.3-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

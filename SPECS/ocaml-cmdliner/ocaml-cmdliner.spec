@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           ocaml-cmdliner
 Version:        1.0.4
-Release:        19%{?dist}
+Release:        20%{?dist}
 Summary:        Declarative definition of command line interfaces for OCaml
 
 # In order for this to work as a "global" macro it has to come after the
@@ -106,6 +106,9 @@ chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/opam
 
 
 %changelog
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-20
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-19
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 
