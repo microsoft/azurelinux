@@ -276,6 +276,14 @@ Patch1229:      CVE-2022-0433.nopatch
 # CVE-2021-4095 - Introducing commit not in stable tree. No fix necessary at this time.
 Patch1230:      CVE-2021-4095.nopatch
 Patch1231:      CVE-2022-24958.nopatch
+Patch1232:      CVE-2021-3772.nopatch
+Patch1233:      CVE-2021-4002.nopatch
+Patch1234:      CVE-2021-45868.nopatch
+Patch1235:      CVE-2022-26490.nopatch
+# CVE-2022-26878 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1236:      CVE-2022-26878.nopatch
+Patch1237:      CVE-2022-26966.nopatch
+Patch1238:      CVE-2022-27223.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -630,6 +638,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Tue Mar 29 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.10.109.1-1
 - Update source to 5.10.109.1
 - Remove CVE-2022-24958.patch and CVE-2022-1016.patch
+- Enable CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY
+- Address CVE-2021-3772, CVE-2021-4002, CVE-2021-45868, CVE-2022-26490,
+  CVE-2022-26878, CVE-2022-26966, CVE-2022-27223
 
 * Fri Mar 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-3
 - Apply CVE-2022-1016.patch
