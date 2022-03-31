@@ -309,8 +309,10 @@ chroot_and_install_rpms gperf
 
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
+copy_rpm_subpackage python-unversioned-command
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3
+chroot_and_install_rpms python-unversioned-command
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
