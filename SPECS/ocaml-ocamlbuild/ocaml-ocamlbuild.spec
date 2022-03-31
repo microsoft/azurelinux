@@ -2,43 +2,34 @@
 %global debug_package %{nil}
 %endif
 
-Name:          ocaml-ocamlbuild
-Version:       0.14.0
-Release:       14%{?dist}
-
-Summary:       Build tool for OCaml libraries and programs
-
-License:       LGPLv2+ with exceptions
-
+Summary:        Build tool for OCaml libraries and programs
+Name:           ocaml-ocamlbuild
+Version:        0.14.0
+Release:        15%{?dist}
+License:        GPLv2 WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:           https://github.com/ocaml/ocamlbuild
-Source0:       https://github.com/ocaml/ocamlbuild/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            https://github.com/ocaml/ocamlbuild
+Source0:        https://github.com/ocaml/ocamlbuild/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires: ocaml >= 4.04.0
-
+BuildRequires:  ocaml >= 4.04.0
 
 %description
 OCamlbuild is a build tool for building OCaml libraries and programs.
 
-
 %package devel
-Summary:       Development files for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains development files for %{name}.
 
-
 %package doc
-Summary:       Documentation for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
+Summary:        Documentation for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description doc
 This package contains the manual for %{name}.
-
 
 %prep
 %setup -q -n ocamlbuild-%{version}
@@ -68,12 +59,12 @@ make \
 
 %install
 make install \
-     DESTDIR=$RPM_BUILD_ROOT \
+     DESTDIR=%{buildroot} \
      CHECK_IF_PREINSTALLED=false
 
 # The install copies ocamlbuild & ocamlbuild.{byte or native}.
 # Symlink them instead.
-pushd $RPM_BUILD_ROOT/usr/bin
+pushd %{buildroot}%{_bindir}
 %ifarch %{ocaml_native_compiler}
 ln -sf ocamlbuild.native ocamlbuild
 %else
@@ -83,12 +74,11 @@ popd
 
 # Install the man page, which for some reason is not copied
 # in by the make install rule above.
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1/
-install -p -m 0644 man/ocamlbuild.1 $RPM_BUILD_ROOT%{_mandir}/man1/
+mkdir -p %{buildroot}%{_mandir}/man1/
+install -p -m 0644 man/ocamlbuild.1 %{buildroot}%{_mandir}/man1/
 
 # Remove the META file.  It will be replaced by ocaml-ocamlfind (findlib).
-rm $RPM_BUILD_ROOT%{_libdir}/ocaml/ocamlbuild/META
-
+rm %{buildroot}%{_libdir}/ocaml/ocamlbuild/META
 
 %files
 %doc Changes Readme.md VERSION
@@ -108,7 +98,6 @@ rm $RPM_BUILD_ROOT%{_libdir}/ocaml/ocamlbuild/META
 %endif
 %exclude %{_libdir}/ocaml/ocamlbuild/*.mli
 
-
 %files devel
 %license LICENSE
 %ifarch %{ocaml_native_compiler}
@@ -119,13 +108,14 @@ rm $RPM_BUILD_ROOT%{_libdir}/ocaml/ocamlbuild/META
 %endif
 %{_libdir}/ocaml/ocamlbuild/*.mli
 
-
 %files doc
 %license LICENSE
 %doc manual/*
 
-
 %changelog
+* Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-15
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-14
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

@@ -3,16 +3,20 @@
 Summary:        Next generation of nicer testing for Python
 Name:           python-%{srcname}
 Version:        0.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://nose2.readthedocs.org
 Source0:        https://github.com/nose-devs/nose2/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+BuildArch:      noarch
+
+BuildRequires:  python%{python3_pkgversion}-coverage
 BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-mock
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-six
-BuildRequires:  python%{python3_pkgversion}-mock
-BuildRequires:  python%{python3_pkgversion}-coverage
-BuildArch:      noarch
 
 %description
 nose2 is the next generation of nicer testing for Python, based on the plugins
@@ -27,12 +31,12 @@ In service of some those goals, some features of nose will not be supported in
 nose2. See the documentation for a thorough rundown.
 
 %package -n python%{python3_pkgversion}-%{srcname}
-Summary:        Next generation of nicer testing for Python
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
+Summary:        Next generation of nicer testing for Python
+
 Requires:       python%{python3_pkgversion}-coverage
 Requires:       python%{python3_pkgversion}-setuptools
 Requires:       python%{python3_pkgversion}-six >= 1.6
-Conflicts:      python2-%{srcname} < 0.7.4-3
 
 %description -n python%{python3_pkgversion}-%{srcname}
 nose2 is the next generation of nicer testing for Python, based on the plugins
@@ -56,7 +60,7 @@ nose2. See the documentation for a thorough rundown.
 %py3_install
 
 %check
-PYTHONPATH=`pwd` %{__python3} -m nose2.__main__ -v
+PYTHONPATH=`pwd` python3 -m nose2.__main__ -v
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license license.txt
@@ -66,6 +70,9 @@ PYTHONPATH=`pwd` %{__python3} -m nose2.__main__ -v
 %{_bindir}/nose2
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.0-2
+- Updating dependencies.
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.10.0-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update source to 0.10.0

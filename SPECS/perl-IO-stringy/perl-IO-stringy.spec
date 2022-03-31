@@ -1,44 +1,50 @@
-Summary:	I/O on in-core objects like strings and arrays for Perl
-Name:		perl-IO-stringy
-Version:	2.113
-Release:	3%{?dist}
-License:	GPL+ or Artistic
+Summary:        I/O on in-core objects like strings and arrays for Perl
+Name:           perl-IO-stringy
+Version:        2.113
+Release:        4%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:		https://metacpan.org/release/IO-stringy
-Source0:	https://cpan.metacpan.org/modules/by-module/IO/IO-Stringy-%{version}.tar.gz#/perl-IO-Stringy-%{version}.tar.gz
-BuildArch:	noarch
+URL:            https://metacpan.org/release/IO-stringy
+Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Stringy-%{version}.tar.gz#/perl-IO-Stringy-%{version}.tar.gz
+
+BuildArch:      noarch
+
 # Module Build
-BuildRequires:	coreutils
-BuildRequires:	findutils
-BuildRequires:	make
-BuildRequires:	perl-generators
-BuildRequires:	perl-interpreter
-BuildRequires:	perl(ExtUtils::MakeMaker)
-# Module Runtime
-BuildRequires:	perl(Carp)
-BuildRequires:	perl(Exporter)
-BuildRequires:	perl(FileHandle)
-BuildRequires:	perl(IO::File)
-BuildRequires:	perl(IO::Handle)
-BuildRequires:	perl(overload)
-BuildRequires:	perl(parent)
-BuildRequires:	perl(strict)
-BuildRequires:	perl(Symbol)
-BuildRequires:	perl(vars)
-BuildRequires:	perl(warnings)
-# Test Suite
-BuildRequires:	perl(File::Spec)
-BuildRequires:	perl(File::Temp)
-BuildRequires:	perl(Test::More) >= 0.88
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  make
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+
 # Optional Tests
-BuildRequires:	perl(CPAN::Meta) >= 2.120900
-BuildRequires:	perl(CPAN::Meta::Prereqs)
+BuildRequires:  perl(CPAN::Meta) >= 2.120900
+BuildRequires:  perl(CPAN::Meta::Prereqs)
+
+# Module Runtime
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+
+# Test Suite
+BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(FileHandle)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(IO::Handle)
+BuildRequires:  perl(Symbol)
+BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(overload)
+BuildRequires:  perl(parent)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+
 # Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 # New upstream maintainer for 2.112 finally got the dist name right
-Provides:	perl-IO-Stringy = %{version}-%{release}
+Provides:       perl-IO-Stringy = %{version}-%{release}
 
 # Avoid doc-file dependency on /usr/bin/perl
 %{?perl_default_filter}
@@ -73,11 +79,7 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license COPYING LICENSE
-%else
-%doc COPYING LICENSE
-%endif
 %doc Changes examples/ README
 %{perl_vendorlib}/IO/
 %{_mandir}/man3/IO::AtomicFile.3*
@@ -90,6 +92,9 @@ make test
 %{_mandir}/man3/IO::WrapTie.3*
 
 %changelog
+* Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.113-4
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.113-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

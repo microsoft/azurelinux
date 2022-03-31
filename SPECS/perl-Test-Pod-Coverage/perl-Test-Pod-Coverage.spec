@@ -1,29 +1,36 @@
+Summary:        Check for pod coverage in your distribution
 Name:           perl-Test-Pod-Coverage
 Version:        1.10
-Release:        17%{?dist}
-Summary:        Check for pod coverage in your distribution
+Release:        18%{?dist}
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Test-Pod-Coverage
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Test-Pod-Coverage-%{version}.tar.gz#/perl-Test-Pod-Coverage-%{version}.tar.gz
+Source1:        LICENSE.PTR
+
 BuildArch:      noarch
-BuildRequires:  perl-interpreter
+
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
+
 # Run-time:
 BuildRequires:  perl(Pod::Coverage)
+BuildRequires:  perl(Pod::Coverage::CountParents)
 BuildRequires:  perl(Test::Builder)
+BuildRequires:  perl(Test::Builder::Tester)
+BuildRequires:  perl(Test::More)
+
+# Optional tests:
+BuildRequires:  perl(Test::Pod) >= 1.14
+
 # Tests:
 BuildRequires:  perl(base)
 BuildRequires:  perl(lib)
-BuildRequires:  perl(Pod::Coverage::CountParents)
-BuildRequires:  perl(Test::Builder::Tester)
-BuildRequires:  perl(Test::More)
-# Optional tests:
-BuildRequires:  perl(Test::Pod) >= 1.14
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
@@ -34,24 +41,31 @@ documented in pod.
 %prep
 %setup -q -n Test-Pod-Coverage-%{version}
 
+cp %{SOURCE1} .
+
 %build
 perl Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
-%{_fixperms} $RPM_BUILD_ROOT/*
+make pure_install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes README
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/*.3pm*
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10-18
+- License verified.
+- Updating dependencies.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

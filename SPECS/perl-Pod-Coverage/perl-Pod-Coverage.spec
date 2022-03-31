@@ -1,42 +1,48 @@
+%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Devel::Symdump\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Find\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Parser\\)$
+
+Summary:        Checks if the documentation of a module is comprehensive
 Name:           perl-Pod-Coverage
 Version:        0.23
-Release:        21%{?dist}
-Summary:        Checks if the documentation of a module is comprehensive
-License:        GPL+ or Artistic
+Release:        22%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Pod-Coverage
 Source0:        https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Pod-Coverage-%{version}.tar.gz#/perl-Pod-Coverage-%{version}.tar.gz
+Source1:        LICENSE.PTR
 # Make pod_cover more secure, CPAN RT#85540
 Patch0:         Pod-Coverage-0.23-Do-not-search-.-lib-by-pod_cover.patch
+
 BuildArch:      noarch
-BuildRequires:  perl-interpreter
+
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(B)
-BuildRequires:  perl(base)
-BuildRequires:  perl(constant)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Devel::Symdump) >= 2.01
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker)
-BuildRequires:  perl(lib)
 BuildRequires:  perl(Pod::Find) >= 0.21
 BuildRequires:  perl(Pod::Parser) >= 1.13
-BuildRequires:  perl(strict)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Pod)
+BuildRequires:  perl(base)
+BuildRequires:  perl(constant)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
+
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Devel::Symdump) >= 2.01
 Requires:       perl(Pod::Find) >= 0.21
 Requires:       perl(Pod::Parser) >= 1.13
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+
 Provides:       perl(Pod::Coverage::CountParents) = %{version}-%{release}
 
 %{?perl_default_filter}
-%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Devel::Symdump\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Find\\)$
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Pod::Parser\\)$
 
 %description
 Developers hate writing documentation.  They'd hate it even more if their
@@ -49,6 +55,8 @@ module is comprehensive.
 %prep
 %setup -q -n Pod-Coverage-%{version}
 %patch0 -p1
+
+cp %{SOURCE1} .
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
@@ -63,6 +71,7 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} \;
 make test
 
 %files
+%license LICENSE.PTR
 %doc Changes examples
 %{_bindir}/pod_cover
 %{perl_vendorlib}/Pod/
@@ -72,6 +81,9 @@ make test
 %{_mandir}/man3/Pod::Coverage::Overloader.3pm*
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.23-22
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.23-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
