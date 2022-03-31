@@ -2499,6 +2499,7 @@
                 "jansi-native",
                 "jarjar",
                 "java-cup",
+                "java-cup-bootstrap",
                 "javacc",
                 "javacc-bootstrap",
                 "javamail",
