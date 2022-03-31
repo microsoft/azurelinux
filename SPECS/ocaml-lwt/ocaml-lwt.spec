@@ -8,7 +8,7 @@ Summary:        OCaml lightweight thread library
 # The openssl linking exception is granted.
 License:        LGPLv2+ with exceptions
 URL:            http://ocsigen.org/lwt
-Source0:        https://github.com/ocsigen/lwt/archive/%{version}/lwt-%{version}.tar.gz
+Source0:        https://github.com/ocsigen/lwt/archive/refs/tags/%{version}.tar.gz#/lwt-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.02.0
 BuildRequires:  ocaml-findlib
