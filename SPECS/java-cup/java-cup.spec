@@ -17,7 +17,7 @@
 
 %define cvs_version    11b
 %define real_name      java-cup
-%define pub_date       20160615
+%define pub_date       20210814
 
 Summary:        LALR Parser Generator in Java
 Name:           java-cup
@@ -28,10 +28,10 @@ Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            http://www2.cs.tum.edu/projects/cup/
-Source0:        http://www2.cs.tum.edu/projects/cup/releases/%{name}-src-%{cvs_version}-%{pub_date}.tar.gz#/%{name}-%{version}b.tar.gz
-Source2:        java-cup-generated-files.tar.xz
+Source0:        http://www2.cs.tum.edu/projects/cup/releases/%{name}-src-%{cvs_version}-%{pub_date}.tar.gz#/%{name}-%{cvs_version}.tar.gz
+Source1:        java-cup-generated-files.tar.xz
+Source2:        java-cup.license
 # From          http://www2.cs.tum.edu/projects/cup/
-Source3:        java-cup.license
 Patch1:         java-cup-no-classpath-in-manifest.patch
 Patch2:         java-cup-no-cup-no-jflex.patch
 Patch3:         java-cup-classpath.patch
@@ -79,7 +79,7 @@ java-cup is a LALR Parser Generator in Java. With v0.11, you can:
 * have Your own symbol classes
 
 %prep
-%setup -q -c
+%setup -q -n cup-master
 %patch1 -p1
 %patch3 -p1
 # remove all binary files
@@ -87,7 +87,7 @@ find -name "*.class" -delete
 find -name "*.jar" -delete
 mkdir -p target/classes
 
-cp %{SOURCE3} license.txt
+cp %{SOURCE2} license.txt
 
 %build
 export CLASSPATH=$(build-classpath java-cup jflex)
@@ -97,8 +97,8 @@ ant
 %install
 # jar
 mkdir -p %{buildroot}%{_javadir}
-cp -a dist/%{real_name}-%{cvs_version}.jar %{buildroot}%{_javadir}/%{real_name}-%{version}.jar
-cp -a dist/%{real_name}-%{cvs_version}-runtime.jar %{buildroot}%{_javadir}/%{real_name}-runtime-%{version}.jar
+cp -a target/dist/%{real_name}-%{cvs_version}.jar %{buildroot}%{_javadir}/%{real_name}-%{version}.jar
+cp -a target/dist/%{real_name}-%{cvs_version}-runtime.jar %{buildroot}%{_javadir}/%{real_name}-runtime-%{version}.jar
 
 pushd %{buildroot}%{_javadir}
 for jar in *-%{version}*; do
@@ -122,7 +122,7 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 
 %changelog
 * Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.11-31
-- Update to version 0.11b, published 20160615
+- Update to version 0.11b, published 20210814
 - Clean up old/deprecated patches 
 - separate into bootstrap and non-bootstrap specs
 - License verified

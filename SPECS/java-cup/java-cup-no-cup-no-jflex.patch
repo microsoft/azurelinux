@@ -1,5 +1,5 @@
 diff --git a/build.xml b/build.xml
-index 91bd60cb..efafb302 100644
+index da94ed35..53f7b430 100644
 --- a/build.xml
 +++ b/build.xml
 @@ -64,18 +64,7 @@
@@ -19,6 +19,6 @@ index 91bd60cb..efafb302 100644
 -
 -  <target name="compile" depends="jflex">
 +  <target name="compile">
-     <copy todir="${java}"><fileset dir="${src}"></fileset></copy>
      <replace file="${java}/java_cup/version.java"
         token="+ version_str"
+        value='+ "v0.11b ${cupversion} (GIT ${svnversion})"'>

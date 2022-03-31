@@ -7812,7 +7812,17 @@
         "other": {
           "name": "java-cup",
           "version": "0.11",
-          "downloadUrl": "http://www2.cs.tum.edu/projects/cup/releases/java-cup-src-11b-20160615.tar.gz"
+          "downloadUrl": "https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "java-cup-bootstrap",
+          "version": "0.11",
+          "downloadUrl": "https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz"
         }
       }
     },
