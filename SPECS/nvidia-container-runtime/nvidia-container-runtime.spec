@@ -21,10 +21,7 @@ containers.
 
 %build
 %make_build build
-
-%install
 mkdir -p %{buildroot}%{_bindir}
-install -m 755 %{name} %{buildroot}%{_bindir}/%{name}
 cp %{name} %{buildroot}%{_bindir}
 
 %install
