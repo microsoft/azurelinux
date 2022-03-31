@@ -21,7 +21,7 @@
 Summary:        Tool for creating supermin appliances
 Name:           supermin
 Version:        5.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -128,6 +128,9 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-2
+- Updating dependencies.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 5.2.1-1
 - Upgrade to latest upstream stable release
 - Enable full mariner support via patch

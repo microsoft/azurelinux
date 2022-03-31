@@ -3,7 +3,7 @@
 Summary:        Next generation of nicer testing for Python
 Name:           python-%{srcname}
 Version:        0.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,6 +70,9 @@ PYTHONPATH=`pwd` python3 -m nose2.__main__ -v
 %{_bindir}/nose2
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.0-2
+- Updating dependencies.
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.10.0-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update source to 0.10.0

@@ -3,7 +3,7 @@
 Summary:        Objective CAML package manager and build helper
 Name:           ocaml-findlib
 Version:        1.8.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -97,6 +97,9 @@ make install \
 %{_libdir}/ocaml/findlib/Makefile.config
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.1-16
+- Updating dependencies.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.1-15
 - Patch stdlib bytes library detection for ocaml 4.13
 - License verified

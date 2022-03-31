@@ -4,7 +4,7 @@
 Summary:        Rake is a Make-like program implemented in Ruby
 Name:           rubygem-%{gem_name}
 Version:        13.0.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -87,6 +87,9 @@ popd
 %doc %{gem_instdir}/*.rdoc
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 13.0.6-2
+- Updating dependencies.
+
 * Fri Mar 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-1
 - Update to v13.0.6.
 - License verified.

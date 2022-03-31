@@ -5,7 +5,7 @@
 Summary:        Checks if the documentation of a module is comprehensive
 Name:           perl-Pod-Coverage
 Version:        0.23
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,6 +81,9 @@ make test
 %{_mandir}/man3/Pod::Coverage::Overloader.3pm*
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.23-22
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.23-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

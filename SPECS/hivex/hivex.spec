@@ -8,7 +8,7 @@
 Summary:        Read and write Windows Registry binary hive files
 Name:           hivex
 Version:        1.3.18
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -247,6 +247,9 @@ fi
 %{ruby_vendorarchdir}/_hivex.so
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.18-24
+- Updating dependencies, conflicts, and provides.
+
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.18-23
 - Removing in-spec verification of source tarballs.
 - License verified.

@@ -1,7 +1,7 @@
 Summary:        Check for pod coverage in your distribution
 Name:           perl-Test-Pod-Coverage
 Version:        1.10
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,9 @@ make test
 %{_mandir}/man3/*.3pm*
 
 %changelog
+* Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10-18
+- Updating dependencies.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
