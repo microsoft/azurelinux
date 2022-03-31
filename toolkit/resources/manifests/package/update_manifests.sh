@@ -36,7 +36,7 @@ generate_toolchain () {
     # This file is a sorted list of all toolchain packages in the tarball.
     tar -ztf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' > "$ToolchainManifest"
     # Now sort the file in place
-    sort -o "$ToolchainManifest" "$ToolchainManifest"
+    LC_COLLATE=C sort -f -o "$ToolchainManifest" "$ToolchainManifest"
 }
 
 # Remove specific packages that are not needed in pkggen_core
