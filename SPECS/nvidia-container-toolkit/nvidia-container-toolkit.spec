@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.5.1
+Version:        1.9.0
 Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
@@ -70,6 +70,10 @@ rm -f %{_bindir}/nvidia-container-runtime-hook
 %{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
 
 %changelog
+* Wed Mar 30 2022 Adithya Jayachandran <adjayach@microsoft.com> - 1.9.0-1
+- Update toolkit version to 1.9.0
+- NVIDIA unified release package
+
 * Tue Sep 28 2021 Adithya Jayachandran <adjayach@microsoft.com> - 1.5.1-1
 - Update toolkit version to 1.5.1
 

@@ -39,7 +39,7 @@ install -m 755 %{name} %{buildroot}%{_bindir}/%{name}
 - Bumped version to 3.9.0
 - nvidia-container-runtime is officially included in toolkit install, keeping this here if needed
 
-* Tue Mar 28 2022 Adithya Jayachandran <adjayach@microsoft.com> - 3.5.0-1
+* Tue Mar 29 2022 Adithya Jayachandran <adjayach@microsoft.com> - 3.5.0-1
 - Ported nvidia container runtime update v3.5.0 to 2.0
 - Added dependence on nvidia-container-toolkit >= 1.5.0
 - Change directory structure for build output
