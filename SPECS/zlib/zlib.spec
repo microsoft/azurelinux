@@ -1,13 +1,14 @@
 Summary:        Compression and decompression routines
 Name:           zlib
 Version:        1.2.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 URL:            http://www.zlib.net/
 License:        zlib
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.zlib.net/%{name}-%{version}.tar.xz
+Patch0: CVE-2018-25032.patch
 %define sha1    zlib=e1cb0d5c92da8e9a8c2635dfa249c341dfd00322
 %description
 Compression and decompression routines
@@ -18,7 +19,7 @@ Requires:   %{name} = %{version}
 It contains the libraries and header files to create applications
 for handling compiled objects.
 %prep
-%setup -q
+%autosetup -p1
 %build
 ./configure \
     --prefix=%{_prefix}
@@ -47,6 +48,8 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
+*   Thu Mar 31 2022 Mariner Autopatcher <cblmargh@microsoft.com> 1.2.11-4
+-   Added patch file(s) CVE-2018-25032.patch
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.11-3
 - Added %%license line automatically
 
