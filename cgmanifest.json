@@ -234,6 +234,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "antlr",
+          "version": "2.7.7",
+          "downloadUrl": "https://www.antlr2.org/download/antlr-2.7.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ant-antunit",
           "version": "1.3",
           "downloadUrl": "http://www.apache.org/dist/ant/antlibs/antunit/source/apache-ant-antunit-1.3-src.tar.bz2"
@@ -7791,8 +7801,28 @@
         "type": "other",
         "other": {
           "name": "javapackages-tools",
-          "version": "5.3.0",
-          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/5.3.0.tar.gz"
+          "version": "6.0.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/6.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "java-cup",
+          "version": "0.11",
+          "downloadUrl": "https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "java-cup-bootstrap",
+          "version": "0.11",
+          "downloadUrl": "https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz"
         }
       }
     },
@@ -8042,7 +8072,7 @@
         "other": {
           "name": "jflex",
           "version": "1.4.3",
-          "downloadUrl": "http://www.jflex.de/jflex-1.4.3.tar.bz2"
+          "downloadUrl": "https://github.com/jflex-de/jflex/archive/refs/tags/release_1_4_3.tar.gz"
         }
       }
     },
@@ -8052,7 +8082,7 @@
         "other": {
           "name": "jflex-bootstrap",
           "version": "1.4.3",
-          "downloadUrl": "http://www.jflex.de/jflex-1.4.3.tar.bz2"
+          "downloadUrl": "https://github.com/jflex-de/jflex/archive/refs/tags/release_1_4_3.tar.gz"
         }
       }
     },
@@ -8121,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "jna",
-          "version": "5.5.0",
-          "downloadUrl": "https://github.com/java-native-access/jna/archive/5.5.0/jna-5.5.0.tar.gz"
+          "version": "5.10.0",
+          "downloadUrl": "https://github.com/java-native-access/jna/archive/5.10.0/jna-5.10.0.tar.gz"
         }
       }
     },
@@ -14665,6 +14695,16 @@
           "name": "ocaml-astring",
           "version": "0.8.5",
           "downloadUrl": "https://github.com/dbuenzli/astring/archive/v0.8.5/astring-0.8.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "objectweb-asm",
+          "version": "7.2",
+          "downloadUrl": "https://gitlab.ow2.org/asm/asm/-/archive/ASM_7_2/asm-ASM_7_2.tar.gz"
         }
       }
     },

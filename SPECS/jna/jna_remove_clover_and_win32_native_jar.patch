@@ -1,15 +1,17 @@
---- jna-5.5.0/build.xml	2019-10-30 17:41:18.000000000 +0100
-+++ jna-5.5.0/build.xml	2020-06-04 08:56:23.649941131 +0200
-@@ -357,7 +357,7 @@
+diff --git a/build.xml b/build.xml
+index ed104c21..d483a971 100644
+--- a/build.xml
++++ b/build.xml
+@@ -369,7 +369,7 @@
    <target name="-setup" depends="-dynamic-properties">
      <path id="compile-test.path">
        <path id="test.libs">
 -        <fileset dir="lib">
-+          <fileset dir="/usr/share/java">
++        <fileset dir="/usr/share/java">
            <include name="junit.jar"/>
            <include name="hamcrest-core-1.3.jar"/>
          </fileset>
-@@ -403,7 +403,7 @@
+@@ -439,7 +439,7 @@
        </srcfiles>
      </uptodate>
    </target>
@@ -18,12 +20,12 @@
            description="Build primary jar">
      <!-- Bundle native components with primary jar to facilitate
           easy distribution to common platforms.
-@@ -436,157 +436,10 @@
-         <!-- Note that no terminal "*" is included in this list,
-              which will force failure on unsupported platforms.
-           -->
--        <attribute name="Bundle-NativeCode"
--                   value="
+@@ -474,83 +474,6 @@
+               <!-- Note that no terminal "*" is included in this list,
+                  which will force failure on unsupported platforms.
+               -->
+-              <attribute name="Bundle-NativeCode"
+-                         value="
 -com/sun/jna/win32-x86/jnidispatch.dll;
 -processor=x86;osname=win32,
 -com/sun/jna/win32-x86-64/jnidispatch.dll;
@@ -32,6 +34,8 @@
 -processor=x86;osname=win,
 -com/sun/jna/win32-x86-64/jnidispatch.dll;
 -processor=x86-64;osname=win,
+-com/sun/jna/win32-aarch64/jnidispatch.dll;
+-processor=aarch64;osname=win,
 -com/sun/jna/w32ce-arm/jnidispatch.dll;
 -processor=arm;osname=wince,
 -
@@ -80,15 +84,27 @@
 -processor=x86;osname=freebsd,
 -com/sun/jna/freebsd-x86-64/libjnidispatch.so;
 -processor=x86-64;osname=freebsd,
+-
 -com/sun/jna/openbsd-x86/libjnidispatch.so;
 -processor=x86;osname=openbsd,
 -com/sun/jna/openbsd-x86-64/libjnidispatch.so;
 -processor=x86-64;osname=openbsd,
 -
--com/sun/jna/darwin/libjnidispatch.jnilib;
--osname=macosx;processor=x86;processor=x86-64;processor=ppc
+-com/sun/jna/darwin-ppc/libjnidispatch.jnilib;
+-osname=macosx;processor=ppc,
+-com/sun/jna/darwin-ppc64/libjnidispatch.jnilib;
+-osname=macosx;processor=ppc64,
+-com/sun/jna/darwin-x86/libjnidispatch.jnilib;
+-osname=macosx;processor=x86,
+-com/sun/jna/darwin-x86-64/libjnidispatch.jnilib;
+-osname=macosx;processor=x86-64,
+-com/sun/jna/darwin-aarch64/libjnidispatch.jnilib;
+-osname=macosx;processor=aarch64
 -"/>
-       </manifest>
+           </manifest>
+           <manifest file="@{target}" mode="update" if:true="@{module-info}">
+               <attribute name="Multi-Release" value="true"/>
+@@ -581,105 +504,6 @@ osname=macosx;processor=aarch64
        <fileset dir="${classes}" excludes="${jar.omitted}">
          <patternset refid="jar-compiled"/>
        </fileset>
@@ -101,9 +117,21 @@
 -      <zipfileset src="${lib.native}/aix-ppc64.jar"
 -                  includes="*jnidispatch*"
 -                  prefix="com/sun/jna/aix-ppc64"/>
--      <zipfileset src="${lib.native}/darwin.jar"
+-      <zipfileset src="${lib.native}/darwin-ppc.jar"
 -                  includes="*jnidispatch*"
--                  prefix="com/sun/jna/darwin"/>
+-                  prefix="com/sun/jna/darwin-ppc"/>
+-      <zipfileset src="${lib.native}/darwin-ppc64.jar"
+-                  includes="*jnidispatch*"
+-                  prefix="com/sun/jna/darwin-ppc64"/>
+-      <zipfileset src="${lib.native}/darwin-x86.jar"
+-                  includes="*jnidispatch*"
+-                  prefix="com/sun/jna/darwin-x86"/>
+-      <zipfileset src="${lib.native}/darwin-x86-64.jar"
+-                  includes="*jnidispatch*"
+-                  prefix="com/sun/jna/darwin-x86-64"/>
+-      <zipfileset src="${lib.native}/darwin-aarch64.jar"
+-                  includes="*jnidispatch*"
+-                  prefix="com/sun/jna/darwin-aarch64"/>
 -      <zipfileset src="${lib.native}/linux-x86.jar"
 -                  includes="*jnidispatch*"
 -                  prefix="com/sun/jna/linux-x86"/>
@@ -140,6 +168,9 @@
 -      <zipfileset src="${lib.native}/linux-s390x.jar"
 -                  includes="*jnidispatch*"
 -                  prefix="com/sun/jna/linux-s390x"/>
+-      <zipfileset src="${lib.native}/linux-riscv64.jar"
+-                  includes="*jnidispatch*"
+-                  prefix="com/sun/jna/linux-riscv64"/>
 -      <zipfileset src="${lib.native}/sunos-x86.jar"
 -                  includes="*jnidispatch*"
 -                  prefix="com/sun/jna/sunos-x86"/>
@@ -167,6 +198,9 @@
 -      <zipfileset src="${lib.native}/win32-x86-64.jar"
 -                  includes="*jnidispatch*"
 -                  prefix="com/sun/jna/win32-x86-64"/>
+-      <zipfileset src="${lib.native}/win32-aarch64.jar"
+-                  includes="*jnidispatch*"
+-                  prefix="com/sun/jna/win32-aarch64"/>
 -      <zipfileset src="${lib.native}/w32ce-arm.jar"
 -                  includes="*jnidispatch*"
 -                  prefix="com/sun/jna/w32ce-arm"/>
@@ -176,7 +210,7 @@
      </jar>
      <zip zipfile="${build}/${minjar}">
        <zipfileset src="${build}/${jar}" excludes="**/*jnidispatch*"/>
-@@ -1059,7 +912,7 @@
+@@ -1177,7 +1001,7 @@ cd ..
      </javac>
    </target>
  
@@ -185,7 +219,7 @@
    	description="Compile all test code">
      <javac classpathref="compile-test.path"
             source="${test.compatibility}"
-@@ -1111,8 +964,6 @@
+@@ -1265,8 +1089,6 @@ cd ..
      <mkdir dir="${build}/jws"/>
      <copy todir="${build}/jws" file="${build}/${jar}"/>
      <copy todir="${build}/jws" file="${build}/${testjar}"/>
@@ -194,7 +228,7 @@
      <jar jarfile="${build}/jws/jnidispatch.jar" createUnicodeExtraFields="never" encoding="UTF-8">
        <fileset dir="${build.native}" includes="*jnidispatch.*"/>
      </jar>
-@@ -1313,7 +1164,6 @@
+@@ -1467,7 +1289,6 @@ cd ..
        <doctitle>JNA API Documentation</doctitle>
        <header>${header}</header>
        <bottom>${footer}</bottom>
@@ -202,7 +236,7 @@
  
        <packageset dir="${src}" defaultexcludes="yes">
          <patternset>
-@@ -1331,13 +1181,14 @@
+@@ -1485,13 +1306,14 @@ cd ..
        <group title="Platform Specific" packages="com.sun.jna.platform.*"/>
  
        <arg value="-notimestamp"/>
@@ -217,11 +251,12 @@
 +  <target name="dist" depends="jar,aar,javadoc,contrib-jars,compile-tests"
            description="Build distribution files">
      <copy todir="${dist}" force="true" overwrite="true">
-       <fileset dir="${build}" includes="${jar},${minjar},${aar}"/>
-Only in jna-5.5.0/native/libffi/src/powerpc: linux64_closure.S.orig
---- jna-5.5.0/native/Makefile	2019-10-30 17:41:18.000000000 +0100
-+++ jna-5.5.0/native/Makefile	2020-06-04 08:53:07.896789270 +0200
-@@ -97,7 +97,7 @@
+       <fileset dir="${build}" includes="${jar},${minjar},${aar},${jar-jpms}"/>
+diff --git a/native/Makefile b/native/Makefile
+index 0c45a85d..a47e8ebd 100644
+--- a/native/Makefile
++++ b/native/Makefile
+@@ -97,7 +97,7 @@ CDEFINES=-D_REENTRANT
  PCFLAGS=-W -Wall -Wno-unused -Wno-parentheses
  CFLAGS=$(PCFLAGS) $(CFLAGS_EXTRA) $(COPT) $(CDEBUG) $(CDEFINES) $(CINCLUDES) \
         -DJNA_JNI_VERSION='"$(JNA_JNI_VERSION)"' -DCHECKSUM='"$(CHECKSUM)"'
@@ -230,11 +265,11 @@ Only in jna-5.5.0/native/libffi/src/powerpc: linux64_closure.S.orig
  ifeq ($(DYNAMIC_LIBFFI),true)
  CFLAGS += $(shell pkg-config --cflags libffi 2>/dev/null || echo)
  LIBS += $(shell pkg-config --libs libffi 2>/dev/null || echo -lffi)
-@@ -337,11 +337,11 @@
+@@ -356,11 +356,11 @@ ifeq ($(CC),gcc)
      GCC_MAJOR_VERSION = $(shell gcc -dumpversion | cut -f 1 -d '.')
      ifneq ($(GCC_MAJOR_VERSION),4)
  	ifneq ($(GCC_MAJOR_VERSION),3)
--	    LOC_CC_OPTS=-Wno-unknown-warning-option -Werror -Wno-clobbered -Wno-unused-variable
+-	    LOC_CC_OPTS=-Wno-unknown-warning-option -Werror -Wno-clobbered -Wno-unused-variable -Wno-alloca-larger-than
 +	    LOC_CC_OPTS=-Wno-error -Wno-clobbered -Wno-unused-variable
  	endif
      endif
@@ -244,7 +279,7 @@ Only in jna-5.5.0/native/libffi/src/powerpc: linux64_closure.S.orig
  endif
  
  # Enable 64-bit builds if the arch demands it
-@@ -457,7 +457,6 @@
+@@ -486,7 +486,6 @@ $(BUILD)/$(JNA_JNI_VERSION).stamp:
  
  $(LIBRARY): $(JNIDISPATCH_OBJS) $(FFI_LIB)
  	$(LD) $(LDFLAGS) $(JNIDISPATCH_OBJS) $(FFI_LIB) $(LIBS)
