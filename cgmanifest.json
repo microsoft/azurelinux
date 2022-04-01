@@ -7460,16 +7460,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ipv6calc",
-          "version": "4.0.1",
-          "downloadUrl": "https://github.com/pbiering/ipv6calc/archive/4.0.1/ipv6calc-4.0.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ipvsadm",
           "version": "1.31",
           "downloadUrl": "https://www.kernel.org/pub/linux/utils/kernel/ipvsadm/ipvsadm-1.31.tar.xz"
