@@ -8,7 +8,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,13 +27,14 @@ BuildRequires:  sqlite-devel
 BuildRequires:  xz-devel
 Requires:       ncurses
 Requires:       openssl
+# The base package and the unversioned python command package are co-requirements.
+Requires:       python-unversioned-command = %{version}-%{release}
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       readline
 Requires:       xz
 Provides:       python
 Provides:       python-sqlite
 Provides:       python(abi)
-Provides:       %{_bindir}/python
 Provides:       /bin/python
 Provides:       /bin/python3
 Provides:       %{name}-docs = %{version}-%{release}
@@ -131,6 +132,13 @@ Requires:       %{name} = %{version}-%{release}
 %description test
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
+%package -n     python-unversioned-command
+Summary:        Unversioned python binary (points to %{name} binary)
+Requires:       %{name} = %{version}-%{release}
+
+%description -n python-unversioned-command
+Contains the unversioned python binary, which is a symlink to %{name}.
+
 %prep
 %autosetup -p1 -n Python-%{version}
 
@@ -185,6 +193,9 @@ popd
 # Install pathfix.py to bindir
 cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{majmin}.py
 ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
+
+# Create unversioned python binary file as a symlink
+ln -s python3 %{buildroot}%{_bindir}/python
 
 # Remove unused stuff
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
@@ -278,7 +289,13 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %files test
 %{_libdir}/python%{majmin}/test/*
 
+%files -n python-unversioned-command
+%{_bindir}/python
+
 %changelog
+* Thu Mar 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.10-2
+- Add unversioned python binary to its own subpackage
+
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 3.9.10-1
 - Upgrade to latest bugfix release for the 3.9 series
 

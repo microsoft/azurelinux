@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        101.0.0
+Version:        101.2.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -17,7 +17,6 @@ BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  python3
 BuildRequires:  python3-pyelftools
-ExclusiveArch:  x86_64
 
 %description
 A core cryptographic library written by Microsoft
@@ -62,6 +61,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Tue Mar 29 2022 Samuel Lee <saml@microsoft.com> - 101.2.0-1
+- Update SymCrypt to v101.2.0 to include FIPS self-tests, certifiable AES-GCM, and fix aarch64 build
+
 * Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
 - Original version for CBL-Mariner
 - Verified license
