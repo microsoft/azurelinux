@@ -1,7 +1,7 @@
 Summary:        Custom installkernel script for installing the Linux kernel
 Name:           installkernel
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,5 +30,8 @@ cp %{SOURCE1} COPYING
 %{_sbindir}/installkernel
 
 %changelog
+* Thu Mar 31 2022 Chris Co <chrco@microsoft.com> - 1.0.0-2
+- Fix mariner.cfg symlink generation
+
 * Mon Mar 29 2021 Chris Co <chrco@microsoft.com> - 1.0.0-1
 - Initial version of the installkernel package
