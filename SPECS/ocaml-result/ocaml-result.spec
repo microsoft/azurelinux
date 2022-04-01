@@ -1,17 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global libname %(echo %{name} | sed -e 's/^ocaml-//')
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
+Summary:        Compat result type
 Name:           ocaml-result
 Version:        1.5
 Release:        10%{?dist}
-Summary:        Compat result type
-
-%global libname %(echo %{name} | sed -e 's/^ocaml-//')
-
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/janestreet/result/
 Source0:        %{URL}/archive/%{version}/%{name}-%{version}.tar.gz
 

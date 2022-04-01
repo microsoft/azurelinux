@@ -1,13 +1,15 @@
 %global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
+
 %if !%{opt}
 %global debug_package %{nil}
 %endif
 
+%define libname %(sed -e 's/^ocaml-//' <<< %{name})
+
+Summary:        Equivalent of the C preprocessor for OCaml programs
 Name:           ocaml-cppo
 Version:        1.6.6
 Release:        5%{?dist}
-Summary:        Equivalent of the C preprocessor for OCaml programs
-
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,14 +17,13 @@ URL:            https://github.com/ocaml-community/cppo
 Source0:        https://github.com/ocaml-community/cppo/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 3.10.0
+BuildRequires:  ocaml-dune
 BuildRequires:  ocaml-findlib
+BuildRequires:  ocaml-ocamlbuild-devel
+
 %if !%{opt}
 Requires:       ocaml >= 3.10.0
 %endif
-BuildRequires:  ocaml-ocamlbuild-devel
-BuildRequires:  ocaml-dune
-
-%define libname %(sed -e 's/^ocaml-//' <<< %{name})
 
 %description
 Cppo is an equivalent of the C preprocessor targeted at the OCaml
@@ -38,36 +39,26 @@ The implementation of cppo relies on the standard library of OCaml and
 on the standard parsing tools Ocamllex and Ocamlyacc, which contribute
 to the robustness of cppo across OCaml versions.
 
-
 %prep
 %setup -q -n %{libname}-%{version}
 sed -i.add-debuginfo \
     's/ocamlopt/ocamlopt -g/;s/ocamlc \(-[co]\)/ocamlc -g \1/' \
     Makefile
 
-
 %build
 make %{?_smp_mflags} all
 
-
 %install
-%{__install} -d $RPM_BUILD_ROOT%{_bindir}
-%{__install} -p _build/install/default/bin/cppo $RPM_BUILD_ROOT%{_bindir}/
-
+install -d %{buildroot}%{_bindir}
+install -p _build/install/default/bin/cppo %{buildroot}%{_bindir}/
 
 %check
-%ifnarch %{arm} %{power64}
-# Fails on armv7hl and ppc64le with:
-# Error: math error
 make test
-%endif
-
 
 %files
 %license LICENSE.md
 %doc Changes README.md
 %{_bindir}/cppo
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-5

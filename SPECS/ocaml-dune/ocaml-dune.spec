@@ -1,18 +1,14 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global libname dune
 
 # Since menhir now requires dune to build, but dune needs menhir only for the
 # tests, build in bootstrap mode to skip the tests and the need for menhir.
 %bcond_with menhir
-
 %bcond_with emacs
 
+Summary:        A composable build system for OCaml
 Name:           ocaml-%{libname}
 Version:        2.8.5
 Release:        3%{?dist}
-Summary:        A composable build system for OCaml
-
 # Dune itself is MIT.  Some bundled libraries have a different license:
 # ISC:
 # - vendor/cmdliner
@@ -21,20 +17,22 @@ Summary:        A composable build system for OCaml
 # LGPLv2 with exceptions:
 # - vendor/opam-file-format
 # - vendor/re
-License:        MIT and LGPLv2 and LGPLv2 with exceptions and ISC
-
+License:        MIT AND LGPLv2 AND LGPLv2 WITH exceptions AND ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://dune.build
 Source0:        https://github.com/ocaml/%{libname}/archive/%{version}/%{libname}-%{version}.tar.gz
 
-%if %{with emacs}
-BuildRequires:  emacs
-%endif
+BuildRequires:  %{py3_dist sphinx-rtd-theme}
+BuildRequires:  %{py3_dist sphinx}
 BuildRequires:  make
 BuildRequires:  ocaml >= 4.08
 BuildRequires:  ocaml-csexp-devel >= 1.3.0
 BuildRequires:  ocaml-findlib
-BuildRequires:  %{py3_dist sphinx}
-BuildRequires:  %{py3_dist sphinx-rtd-theme}
+
+%if %{with emacs}
+BuildRequires:  emacs
+%endif
 
 %if %{with menhir}
 # Required by tests.
@@ -46,15 +44,12 @@ BuildRequires:  ocaml-menhir
 # It seems to be unsupported upstream; the bootstrap process for dune
 # doesn't seem to be able to detect libraries installed systemwide.
 # https://github.com/ocaml/dune/issues/220
-Provides:      bundled(ocaml-build-path-prefix-map) = 0.2
-Provides:      bundled(ocaml-opam-file-format) = 2.0.0
-Provides:      bundled(ocaml-cmdliner) = 1.0.4
-Provides:      bundled(ocaml-re) = 1.9.0
-
-Provides:      dune = %{version}-%{release}
-
-Provides:      jbuilder = %{version}-%{release}
-Obsoletes:     jbuilder < 1.0.1-3
+Provides:       bundled(ocaml-build-path-prefix-map) = 0.2
+Provides:       bundled(ocaml-opam-file-format) = 2.0.0
+Provides:       bundled(ocaml-cmdliner) = 1.0.4
+Provides:       bundled(ocaml-re) = 1.9.0
+Provides:       dune = %{version}-%{release}
+Provides:       jbuilder = %{version}-%{release}
 
 %description
 Dune is a build system designed for OCaml/Reason projects only. It focuses
@@ -69,6 +64,8 @@ productive.
 
 %package        devel
 Summary:        Development files for %{name}
+License:        MIT AND LGPLv2 AND LGPLv2 WITH exceptions AND ISC
+
 Requires:       %{name}%{?isa} = %{version}-%{release}
 Requires:       ocaml-csexp-devel%{?_isa}
 
@@ -78,9 +75,11 @@ signature files for developing applications that use %{name}.
 
 %package        doc
 Summary:        HTML documentation for %{name}
-Requires:       %{name} = %{version}-%{release}
+License:        MIT AND LGPLv2 AND LGPLv2 WITH exceptions AND ISC
 
 BuildArch:      noarch
+
+Requires:       %{name} = %{version}-%{release}
 
 %description    doc
 HTML documentation for dune, a composable build system for OCaml.
@@ -89,9 +88,10 @@ HTML documentation for dune, a composable build system for OCaml.
 %package        emacs
 Summary:        Emacs support for %{name}
 License:        ISC
-Requires:       %{name} = %{version}-%{release}
 
 BuildArch:      noarch
+
+Requires:       %{name} = %{version}-%{release}
 
 %description    emacs
 The %{name}-devel package contains Emacs integration with the dune build

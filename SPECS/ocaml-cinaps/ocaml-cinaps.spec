@@ -1,22 +1,20 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname cinaps
+
 # TESTING NOTE: The ppx_jane module is needed to run the tests.  However,
 # ppx_jane transitively requires this module.  Therefore, we cannot run the
 # tests at all until we are able to add ppx_jane to Fedora, and even then we
 # will only be able to run the tests in non-bootstrap mode.
-
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname cinaps
-
+Summary:        Trivial Metaprogramming tool using the OCaml toplevel
 Name:           ocaml-%{srcname}
 Version:        0.15.1
 Release:        3%{?dist}
-Summary:        Trivial Metaprogramming tool using the OCaml toplevel
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ocaml-ppx/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

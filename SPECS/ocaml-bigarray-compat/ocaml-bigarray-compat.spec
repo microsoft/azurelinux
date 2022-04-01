@@ -1,17 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname bigarray-compat
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname bigarray-compat
-
+Summary:        Compatibility library to use Stdlib.Bigarray when possible
 Name:           ocaml-%{srcname}
 Version:        1.0.0
 Release:        3%{?dist}
-Summary:        Compatibility library to use Stdlib.Bigarray when possible
-
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/mirage/bigarray-compat
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # https://github.com/mirage/bigarray-compat/pull/5

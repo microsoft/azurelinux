@@ -1,28 +1,26 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
+Summary:        Combinators for binding to C libraries without writing any C
 Name:           ocaml-ctypes
 Version:        0.18.0
 Release:        4%{?dist}
-Summary:        Combinators for binding to C libraries without writing any C
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ocamllabs/ocaml-ctypes
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
+BuildRequires:  libffi-devel
 BuildRequires:  make
 BuildRequires:  ocaml >= 4.02.3
 BuildRequires:  ocaml-bigarray-compat-devel
 BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-integers-devel >= 0.3.0
 BuildRequires:  ocaml-ocamldoc
-BuildRequires:  libffi-devel
 
 %if %{with_check}
-BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  ocaml-bisect-ppx-devel
 BuildRequires:  ocaml-lwt-devel >= 3.2.0
 BuildRequires:  ocaml-ounit-devel
+BuildRequires:  pkgconfig(ncurses)
 %endif
 
 %description

@@ -1,23 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname ocaml-compiler-libs
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
 %bcond_with docs
-%global srcname ocaml-compiler-libs
 
+Summary:        OCaml compiler libraries repackaged
 Name:           %{srcname}-janestreet
 Version:        0.12.3
 Release:        4%{?dist}
-Summary:        OCaml compiler libraries repackaged
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/janestreet/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.04.1
 BuildRequires:  ocaml-dune >= 1.5.1
+
 %if %{with docs}
 BuildRequires:  ocaml-odoc
 %endif

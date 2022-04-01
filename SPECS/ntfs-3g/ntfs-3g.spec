@@ -1,106 +1,84 @@
+Summary:        Linux NTFS userspace driver
+Name:           ntfs-3g
+Version:        2017.3.23
+Release:        16%{?dist}
+License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Pass --with externalfuse to compile against system fuse lib
-# Default is internal fuse-lite.
-%global with_externalfuse %{?_with_externalfuse:1}%{!?_with_externalfuse:0}
-
-# For release candidates
-# %%global subver -RC
-
-%global oldrhel 0
-
-Name:		ntfs-3g
-Summary:	Linux NTFS userspace driver
-Version:	2017.3.23
-Release:	16%{?dist}
-License:	GPLv2
-Source0:	http://tuxera.com/opensource/%{name}_ntfsprogs-%{version}%{?subver}.tgz
-URL:		http://www.ntfs-3g.org/
-%if %{with_externalfuse}
-BuildRequires:	fuse-devel
-Requires:	fuse
-%endif
-%if 0%{?fedora}
-Recommends:	ntfs-3g-system-compression
-%endif
-BuildRequires:	libtool, libattr-devel
-# ntfsprogs BuildRequires
-BuildRequires:  libconfig-devel, libgcrypt-devel, gnutls-devel, libuuid-devel
-Provides:	ntfsprogs-fuse = %{version}-%{release}
-Obsoletes:	ntfsprogs-fuse
-Provides:	fuse-ntfs-3g = %{version}-%{release}
-Patch0:		ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch
-Patch1:		check-mftmirr.patch
-Patch2:		ntfs-3g-big-sectors.patch
+URL:            http://www.ntfs-3g.org/
+Source0:        http://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
+Patch0:         ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch
+Patch1:         check-mftmirr.patch
+Patch2:         ntfs-3g-big-sectors.patch
 # Fix for ntfsclone crash.
 # Discussed with upstream developer but not upstream yet, see:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1601146#c4
-Patch3:		ntfsclone-full-clusters-bz1601146.patch
+Patch3:         ntfsclone-full-clusters-bz1601146.patch
 # Upstream fix for CVE-2019-9755
 # https://sourceforge.net/p/ntfs-3g/ntfs-3g/ci/85c1634a26faa572d3c558d4cf8aaaca5202d4e9/
-Patch4:		ntfs-3g-CVE-2019-9755.patch
+Patch4:         ntfs-3g-CVE-2019-9755.patch
+
+BuildRequires:  fuse-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  libattr-devel
+BuildRequires:  libconfig-devel
+BuildRequires:  libgcrypt-devel
+BuildRequires:  libtool
+BuildRequires:  libuuid-devel
+
+Recommends:     ntfs-3g-system-compression
+
+Requires:       fuse
+
+Provides:       ntfsprogs-fuse = %{version}-%{release}
+Provides:       fuse-ntfs-3g = %{version}-%{release}
 
 %description
-NTFS-3G is a stable, open source, GPL licensed, POSIX, read/write NTFS 
-driver for Linux and many other operating systems. It provides safe 
-handling of the Windows XP, Windows Server 2003, Windows 2000, Windows 
-Vista, Windows Server 2008 and Windows 7 NTFS file systems. NTFS-3G can 
-create, remove, rename, move files, directories, hard links, and streams; 
-it can read and write normal and transparently compressed files, including 
-streams and sparse files; it can handle special files like symbolic links, 
-devices, and FIFOs, ACL, extended attributes; moreover it provides full 
+NTFS-3G is a stable, open source, GPL licensed, POSIX, read/write NTFS
+driver for Linux and many other operating systems. It provides safe
+handling of the Windows XP, Windows Server 2003, Windows 2000, Windows
+Vista, Windows Server 2008 and Windows 7 NTFS file systems. NTFS-3G can
+create, remove, rename, move files, directories, hard links, and streams;
+it can read and write normal and transparently compressed files, including
+streams and sparse files; it can handle special files like symbolic links,
+devices, and FIFOs, ACL, extended attributes; moreover it provides full
 file access right and ownership support.
 
 %package devel
-Summary:	Development files and libraries for ntfs-3g
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	pkgconfig
-Provides:	ntfsprogs-devel = %{version}-%{release}
-# ntfsprogs-2.0.0-17 was never built. 2.0.0-16 was the last build for that 
-# standalone package.
-Obsoletes:	ntfsprogs-devel < 2.0.0-17
+Summary:        Development files and libraries for ntfs-3g
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       pkg-config
+
+Provides:       ntfsprogs-devel = %{version}-%{release}
 
 %description devel
 Headers and libraries for developing applications that use ntfs-3g
 functionality.
 
 %package -n ntfsprogs
-Summary:	NTFS filesystem libraries and utilities
-# We don't really provide this. This code is dead and buried now.
-Provides:	ntfsprogs-gnomevfs = %{version}-%{release}
-Obsoletes:	ntfsprogs-gnomevfs
-# Needed to fix multilib issue
-# ntfsprogs-2.0.0-17 was never built. 2.0.0-16 was the last build for that 
-# standalone package.
-Obsoletes:	ntfsprogs < 2.0.0-17
+Summary:        NTFS filesystem libraries and utilities
 
 %description -n ntfsprogs
-The ntfsprogs package currently consists of a library and utilities such as 
-mkntfs, ntfscat, ntfsls, ntfsresize, and ntfsundelete (for a full list of 
+The ntfsprogs package currently consists of a library and utilities such as
+mkntfs, ntfscat, ntfsls, ntfsresize, and ntfsundelete (for a full list of
 included utilities see man 8 ntfsprogs after installation).
 
 %prep
-%setup -q -n %{name}_ntfsprogs-%{version}%{?subver}
+%setup -q -n %{name}_ntfsprogs-%{version}
 %patch0 -p1 -b .unsupported
-%patch1 -p0 -b .check-mftmirr
-%patch2 -p0 -b .big-sectors
-%patch3 -p0 -b .ntfsclone
+%patch1  -b .check-mftmirr
+%patch2  -b .big-sectors
+%patch3  -b .ntfsclone
 %patch4 -p1 -b .CVE-2019-9755
 
 %build
-CFLAGS="$RPM_OPT_FLAGS -D_FILE_OFFSET_BITS=64"
+CFLAGS="%{optflags} -D_FILE_OFFSET_BITS=64"
 %configure \
 	--disable-static \
 	--disable-ldconfig \
-%if 0%{?_with_externalfuse:1}
 	--with-fuse=external \
-%endif
 	--exec-prefix=/ \
-%if %{oldrhel}
-	--bindir=/bin \
-	--sbindir=/sbin \
-	--libdir=/%{_lib} \
-%endif
 	--enable-posix-acls \
 	--enable-xattr-mappings \
 	--enable-crypto \
@@ -110,131 +88,57 @@ make %{?_smp_mflags} LIBTOOL=%{_bindir}/libtool
 
 %install
 make LIBTOOL=`which libtool` DESTDIR=%{buildroot} install
-%if %{oldrhel}
-rm -rf %{buildroot}/%{_lib}/*.la
-rm -rf %{buildroot}/%{_lib}/*.a
-%else
-rm -rf %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}%{_libdir}/*.a
-%endif
 
-%if %{oldrhel}
-rm -rf %{buildroot}/sbin/mount.ntfs-3g
-cp -a %{buildroot}/bin/ntfs-3g %{buildroot}/sbin/mount.ntfs-3g
-%else
 rm -rf %{buildroot}/%{_sbindir}/mount.ntfs-3g
 cp -a %{buildroot}/%{_bindir}/ntfs-3g %{buildroot}/%{_sbindir}/mount.ntfs-3g
-%endif
 
 # Actually make some symlinks for simplicity...
 # ... since we're obsoleting ntfsprogs-fuse
-%if %{oldrhel}
-pushd %{buildroot}/bin
-ln -s ntfs-3g ntfsmount
-popd
-pushd %{buildroot}/sbin
-%else
 pushd %{buildroot}/%{_bindir}
 ln -s ntfs-3g ntfsmount
 popd
 pushd %{buildroot}/%{_sbindir}
-%endif
 ln -s mount.ntfs-3g mount.ntfs-fuse
-# And since there is no other package in Fedora that provides an ntfs 
+# And since there is no other package in Fedora that provides an ntfs
 # mount...
 ln -s mount.ntfs-3g mount.ntfs
 # Need this for fsck to find it
 ln -s ../bin/ntfsck fsck.ntfs
 popd
 
-%if %{oldrhel}
-# Compat symlinks
-mkdir -p %{buildroot}%{_bindir}
-pushd %{buildroot}%{_bindir}
-ln -s /bin/ntfs-3g ntfs-3g
-ln -s /bin/ntfsmount ntfsmount
-popd
-
-# Put the .pc file in the right place.
-mkdir -p %{buildroot}%{_libdir}/pkgconfig/
-mv %{buildroot}/%{_lib}/pkgconfig/libntfs-3g.pc %{buildroot}%{_libdir}/pkgconfig/
-%else
 mv %{buildroot}/sbin/* %{buildroot}/%{_sbindir}
 rmdir %{buildroot}/sbin
-%endif
 
 # We get this on our own, thanks.
 rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
-
-%if %{oldrhel}
-mkdir -p %{buildroot}%{_datadir}/hal/fdi/policy/10osvendor/
-cp -a %{SOURCE1} %{buildroot}%{_datadir}/hal/fdi/policy/10osvendor/
-%endif
 
 %ldconfig_scriptlets
 
 %files
 %doc AUTHORS ChangeLog CREDITS NEWS README
 %license COPYING
-%if %{oldrhel}
-/sbin/mount.ntfs
-/sbin/mount.ntfs-3g
-/sbin/mount.ntfs-fuse
-/sbin/mount.lowntfs-3g
-/bin/ntfs-3g
-/bin/ntfsmount
-#compat symlinks
-%{_bindir}/ntfs-3g
-%{_bindir}/ntfsmount
-%else
 %{_sbindir}/mount.ntfs
 %{_sbindir}/mount.ntfs-3g
 %{_sbindir}/mount.ntfs-fuse
 %{_sbindir}/mount.lowntfs-3g
 %{_bindir}/ntfs-3g
 %{_bindir}/ntfsmount
-%endif
-%if %{oldrhel}
-/bin/ntfs-3g.probe
-/bin/lowntfs-3g
-%else
 %{_bindir}/ntfs-3g.probe
 %{_bindir}/lowntfs-3g
-%endif
-%if %{oldrhel}
-/%{_lib}/libntfs-3g.so.*
-%else
 %{_libdir}/libntfs-3g.so.*
-%endif
 %{_mandir}/man8/mount.lowntfs-3g.*
 %{_mandir}/man8/mount.ntfs-3g.*
 %{_mandir}/man8/ntfs-3g*
-%if %{oldrhel}
-%{_datadir}/hal/fdi/policy/10osvendor/20-ntfs-config-write-policy.fdi
-%endif
 
 %files devel
 %{_includedir}/ntfs-3g/
-%if %{oldrhel}
-/%{_lib}/libntfs-3g.so
-%else
 %{_libdir}/libntfs-3g.so
-%endif
 %{_libdir}/pkgconfig/libntfs-3g.pc
 
 %files -n ntfsprogs
 %doc AUTHORS CREDITS ChangeLog NEWS README
-%if %{oldrhel}
-%doc COPYING
-/bin/ntfscat
-/bin/ntfscluster
-/bin/ntfscmp
-/bin/ntfsfix
-/bin/ntfsinfo
-/bin/ntfsls
-/bin/ntfssecaudit
-/bin/ntfsusermap
-%else
 %license COPYING
 %{_bindir}/ntfscat
 %{_bindir}/ntfscluster
@@ -244,27 +148,7 @@ cp -a %{SOURCE1} %{buildroot}%{_datadir}/hal/fdi/policy/10osvendor/
 %{_bindir}/ntfsls
 %{_bindir}/ntfssecaudit
 %{_bindir}/ntfsusermap
-%endif
 # Extras
-%if %{oldrhel}
-/bin/ntfsck
-/bin/ntfsdecrypt
-/bin/ntfsdump_logfile
-/bin/ntfsfallocate
-/bin/ntfsmftalloc
-/bin/ntfsmove
-/bin/ntfsrecover
-/bin/ntfstruncate
-/bin/ntfswipe
-/sbin/fsck.ntfs
-/sbin/mkfs.ntfs
-/sbin/mkntfs
-/sbin/ntfsclone
-/sbin/ntfscp
-/sbin/ntfslabel
-/sbin/ntfsresize
-/sbin/ntfsundelete
-%else
 %{_bindir}/ntfsck
 %{_bindir}/ntfsdecrypt
 %{_bindir}/ntfsdump_logfile
@@ -282,7 +166,6 @@ cp -a %{SOURCE1} %{buildroot}%{_datadir}/hal/fdi/policy/10osvendor/
 %{_sbindir}/ntfslabel
 %{_sbindir}/ntfsresize
 %{_sbindir}/ntfsundelete
-%endif
 %{_mandir}/man8/mkntfs.8*
 %{_mandir}/man8/mkfs.ntfs.8*
 %{_mandir}/man8/ntfs[^m][^o]*.8*

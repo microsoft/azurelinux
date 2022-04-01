@@ -1,26 +1,25 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %ifarch %{ocaml_native_compiler}
 %global native_compiler 1
 %else
 %global native_compiler 0
 %endif
 
+Summary:        A regular expression library for OCaml
 Name:           ocaml-re
 Version:        1.9.0
 Release:        21%{?dist}
-Summary:        A regular expression library for OCaml
-
-License:        LGPLv2+ with exceptions
+License:        LGPLv2+ WITH exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ocaml/ocaml-re
-Source0:        https://github.com/ocaml/%{name}/archive/%{version}/ocaml-re-%{version}.tar.gz
+Source0:        https://github.com/ocaml/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  ocaml
-BuildRequires:  ocaml-findlib
-BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-ocamlbuild
-BuildRequires:  ocaml-seq-devel
 BuildRequires:  ocaml-dune
+BuildRequires:  ocaml-findlib
+BuildRequires:  ocaml-ocamlbuild
+BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-seq-devel
 
 %description
 A pure OCaml regular expression library. Supports Perl-style regular
@@ -32,6 +31,7 @@ library.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 # https://bugzilla.redhat.com/show_bug.cgi?id=1792031
 Requires:       ocaml-seq-devel
@@ -200,4 +200,3 @@ cp -aLr _build/install/default/lib/* %{buildroot}%{_libdir}/ocaml/
 
 * Thu May 30 2013 David Scott <dave.scott@eu.citrix.com> - 1.2.1-1
 - Initial package
-

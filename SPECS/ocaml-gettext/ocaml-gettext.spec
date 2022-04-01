@@ -1,15 +1,17 @@
 %global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
 %global __ocaml_requires_opts -i Asttypes -i Parsetree
 %global __ocaml_provides_opts -i Pr_gettext
+
 Summary:        OCaml library for i18n
 Name:           ocaml-gettext
 Version:        0.4.2
 Release:        2%{?dist}
-License:        LGPLv2+ with exceptions
+License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/gildor478/ocaml-gettext
 Source0:        https://github.com/gildor478/ocaml-gettext/releases/download/v%{version}/gettext-v%{version}.tbz
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  chrpath
@@ -26,6 +28,7 @@ BuildRequires:  ocaml-fileutils-devel >= 0.4.4-4
 BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
 BuildRequires:  ocaml-ocamldoc
 BuildRequires:  ocaml-ounit-devel
+
 # ocaml-gettext program needs camomile data files
 Requires:       ocaml-camomile-data
 
@@ -42,6 +45,7 @@ Constraints :
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name} = %{version}-%{release}
 # BZ 446919.
 Requires:       ocaml-fileutils-devel >= 0.4.0
@@ -52,6 +56,7 @@ developing applications that use %{name}.
 
 %package        camomile
 Summary:        Parts of %{name} which depend on Camomile
+
 Requires:       %{name} = %{version}-%{release}
 
 %description    camomile
@@ -60,6 +65,7 @@ depend on Camomile.
 
 %package        camomile-devel
 Summary:        Development files for %{name}-camomile
+
 Requires:       %{name}-camomile = %{version}-%{release}
 Requires:       %{name}-devel = %{version}-%{release}
 
@@ -75,15 +81,12 @@ signature files for developing applications that use
 sed -i -e 's/batteries//' test/dune
 sed -i -e 's/batteries//' test/test-stub/dune
 
-
 %build
 make build
-
 
 #check
 # Tests require batteries, so they are disabled at present.
 # Under discussion with upstream.
-
 
 %install
 mkdir -p %{buildroot}%{_libdir}/ocaml
@@ -92,7 +95,6 @@ dune install --destdir=%{buildroot}
 
 # Remove this, we will use our own rules for documentation.
 rm -rf %{buildroot}%{_prefix}/doc
-
 
 %files
 %license LICENSE.txt

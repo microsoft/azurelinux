@@ -1,19 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
 %bcond_with docs
 
+Summary:        Various signed and unsigned integer types for OCaml
 Name:           ocaml-integers
 Version:        0.4.0
 Release:        3%{?dist}
-Summary:        Various signed and unsigned integer types for OCaml
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ocamllabs/%{name}
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.02
 BuildRequires:  ocaml-dune
+
 %if %{with docs}
 BuildRequires:  ocaml-odoc
 %endif
@@ -25,6 +24,7 @@ and `size_t` whose sizes depend on the host platform.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
@@ -34,6 +34,7 @@ files for developing applications that use %{name}.
 %if %{with docs}
 %package        doc
 Summary:        Documentation for %{name}
+
 BuildArch:      noarch
 
 %description    doc

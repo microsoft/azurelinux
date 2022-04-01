@@ -1,15 +1,14 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global libname ocplib-endian
+%global debug_package %{nil}
+
+Summary:        Functions to read/write int16/32/64 from strings, bigarrays
 Name:           ocaml-ocplib-endian
 Version:        1.1
 Release:        8%{?dist}
-Summary:        Functions to read/write int16/32/64 from strings, bigarrays
-
-%global libname ocplib-endian
-%global debug_package %{nil} 
-
 # License is LGPL 2.1 with standard OCaml exceptions
-License:        LGPLv2+ with exceptions
+License:        LGPLv2+ WITH exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/OCamlPro/ocplib-endian
 Source0:        https://github.com/OCamlPro/ocplib-endian/archive/%{version}/ocplib-endian-%{version}.tar.gz
 
@@ -33,6 +32,7 @@ unsafe counter-parts;
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
@@ -76,7 +76,6 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 %{_libdir}/ocaml/%{libname}/bigstring/*.cmxs
 %endif
 
-
 %files devel
 %ifarch %{ocaml_native_compiler}
 %{_libdir}/ocaml/%{libname}/*.a
@@ -94,7 +93,6 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 %{_libdir}/ocaml/%{libname}/bigstring/*.cmti
 %{_libdir}/ocaml/%{libname}/dune-package
 %{_libdir}/ocaml/%{libname}/opam
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-8

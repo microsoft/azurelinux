@@ -1,17 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname sexplib0
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname sexplib0
-
+Summary:        Definition of S-expressions and some base converters
 Name:           ocaml-%{srcname}
 Version:        0.15.0
 Release:        2%{?dist}
-Summary:        Definition of S-expressions and some base converters
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/janestreet/sexplib0
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
@@ -81,6 +80,7 @@ chmod a+x %{buildroot}%{_libdir}/ocaml/%{srcname}/%{srcname}.cmxs
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest version
 - License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-8
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

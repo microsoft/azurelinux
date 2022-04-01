@@ -1,21 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        OCaml framework for Functional Reactive Programming (FRP)
 Name:           ocaml-react
 Version:        1.2.1
 Release:        8%{?dist}
-Summary:        OCaml framework for Functional Reactive Programming (FRP)
-
 License:        ISC
-URL:            http://erratique.ch/software/react
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://erratique.ch/software/react
 Source0:        http://erratique.ch/software/react/releases/react-%{version}.tbz
 
 BuildRequires:  ocaml >= 4.01.0
-BuildRequires:  ocaml-ocamlbuild
 BuildRequires:  ocaml-findlib-devel
+BuildRequires:  ocaml-ocamlbuild
 BuildRequires:  ocaml-ocamldoc
 BuildRequires:  ocaml-topkg-devel >= 0.9.0
-
 
 %description
 React is an OCaml module for functional reactive programming (FRP). It
@@ -29,16 +26,13 @@ the ISC license.
 Given an absolute notion of time Rtime helps you to manage a timeline
 and provides time stamp events, delayed events and delayed signals.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
-
 
 %prep
 %autosetup -n react-%{version}
@@ -46,13 +40,11 @@ developing applications that use %{name}.
 # require debug info
 echo $'\ntrue: debug' >> _tags
 
-
 %build
 ocaml pkg/pkg.ml build --tests true
 
-
 %install
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/ocaml/react
+mkdir -p %{buildroot}%{_libdir}/ocaml/react
 for f in \
   pkg/META \
   opam \
@@ -61,13 +53,11 @@ for f in \
 %endif
   src/*.{a,cma,cmi,mli,cmxa,cmxs}
 do
-  cp -p _build/$f $RPM_BUILD_ROOT%{_libdir}/ocaml/react/
+  cp -p _build/$f %{buildroot}%{_libdir}/ocaml/react/
 done
-
 
 %check
 ocaml pkg/pkg.ml test
-
 
 %files
 %license LICENSE.md
@@ -79,7 +69,6 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/react/*.cmxs
 %endif
 
-
 %files devel
 %doc CHANGES.md README.md
 %ifarch %{ocaml_native_compiler}
@@ -89,7 +78,6 @@ ocaml pkg/pkg.ml test
 %endif
 %{_libdir}/ocaml/react/*.mli
 %{_libdir}/ocaml/react/opam
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-8

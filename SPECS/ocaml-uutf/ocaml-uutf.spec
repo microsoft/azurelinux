@@ -1,17 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname uutf
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname uutf
-
+Summary:        Non-blocking streaming Unicode codec for OCaml
 Name:           ocaml-%{srcname}
 Version:        1.0.2
 Release:        15%{?dist}
-Summary:        Non-blocking streaming Unicode codec for OCaml
-
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://erratique.ch/software/uutf
 Source0:        https://github.com/dbuenzli/uutf/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # The uchar package is a forward compatibility package for OCaml versions prior
@@ -38,6 +37,7 @@ values.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel

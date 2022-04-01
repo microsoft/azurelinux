@@ -1,30 +1,25 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        OCaml library for common file and filename operations
 Name:           ocaml-fileutils
 Version:        0.5.2
 Release:        18%{?dist}
-Summary:        OCaml library for common file and filename operations
-
-License:        LGPLv2 with exceptions
+License:        LGPLv2 WITH exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/gildor478/ocaml-fileutils
 Source0:        https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Set of files from previous sources location allowing us to drop dependency on "ocaml-oasis-devel", which is no longer available.
 # Previous sources used to be available under http://forge.ocamlcore.org/frs/download.php/1695/ocaml-fileutils-0.5.2.tar.gz.
 # Currently still available in Fedora's SRPMs.
-Source1:        old_source_build.tar.gz
-
+Source1:        %{name}-old-sources-build-files.tar.gz
 Patch1:         fileutils-0.5.2-fix-bytes.patch
 # Use ounit2.
 Patch2:         ocaml-fileutils-0.5.2-ounit2.patch
 
 BuildRequires:  ocaml >= 4.00.1
 BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
-BuildRequires:  ocaml-ocamldoc
-
-BuildRequires:  ocaml-ounit-devel
-
 BuildRequires:  ocaml-ocamlbuild
-
+BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-ounit-devel
 
 %description
 This library is intended to provide a basic interface to the most
@@ -36,16 +31,13 @@ It is separated into two modules: SysUtil and SysPath.  The first one
 manipulates real files, the second one is made for manipulating
 abstract filenames.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 
-
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
-
 
 %prep
 %setup -q
@@ -53,29 +45,24 @@ developing applications that use %{name}.
 %autopatch -p1
 
 %build
-ocaml setup.ml -configure --prefix %{_prefix} --destdir $RPM_BUILD_ROOT \
+ocaml setup.ml -configure --prefix %{_prefix} --destdir %{buildroot} \
 	--enable-tests
 make
 
-
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
+export DESTDIR=%{buildroot}
+export OCAMLFIND_DESTDIR=%{buildroot}%{_libdir}/ocaml
 mkdir -p $OCAMLFIND_DESTDIR $OCAMLFIND_DESTDIR/stublibs
 
 # Set htmldir to current directory, then copy the docs (in api/)
 # as a %doc rule.
 make htmldir=. install
 
-
 %check
-%if ! 0%{?rhel} >= 7
 make test
-%endif
-
 
 %files
-%doc COPYING.txt
+%license COPYING.txt
 %{_libdir}/ocaml/fileutils
 %ifarch %{ocaml_native_compiler}
 %exclude %{_libdir}/ocaml/fileutils/*.a
@@ -85,9 +72,9 @@ make test
 %exclude %{_libdir}/ocaml/fileutils/*.ml
 %exclude %{_libdir}/ocaml/fileutils/*.mli
 
-
 %files devel
-%doc COPYING.txt AUTHORS.txt CHANGELOG.txt README.txt TODO.txt
+%license COPYING.txt
+%doc AUTHORS.txt CHANGELOG.txt README.txt TODO.txt
 %ifarch %{ocaml_native_compiler}
 %{_libdir}/ocaml/fileutils/*.a
 %{_libdir}/ocaml/fileutils/*.cmx
@@ -95,7 +82,6 @@ make test
 %endif
 %{_libdir}/ocaml/fileutils/*.ml
 %{_libdir}/ocaml/fileutils/*.mli
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.2-18

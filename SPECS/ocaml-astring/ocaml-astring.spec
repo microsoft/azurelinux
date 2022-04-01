@@ -1,17 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname astring
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname astring
-
+Summary:        Alternative String module for OCaml
 Name:           ocaml-%{srcname}
 Version:        0.8.5
 Release:        6%{?dist}
-Summary:        Alternative String module for OCaml
-
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://erratique.ch/software/astring
 Source0:        https://github.com/dbuenzli/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

@@ -1,17 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname uuidm
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname uuidm
-
+Summary:        Universally unique identifiers (UUIDs) for OCaml
 Name:           ocaml-%{srcname}
 Version:        0.9.7
 Release:        15%{?dist}
-Summary:        Universally unique identifiers (UUIDs) for OCaml
-
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://erratique.ch/software/uuidm
 Source0:        https://github.com/dbuenzli/uuidm/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

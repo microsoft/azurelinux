@@ -1,40 +1,35 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%global debug_package %{nil} 
+%global debug_package %{nil}
+
+Summary:        Compatibility package for OCaml's standard iterator type
 Name:           ocaml-seq
 Version:        0.2.2
 Release:        7%{?dist}
-Summary:        Compatibility package for OCaml's standard iterator type
-License:        LGPLv2+ with exceptions
-
+License:        LGPLv2+ WITH exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/c-cube/seq
 Source0:        %{url}/archive/%{version}/seq-%{version}.tar.gz
 
 BuildRequires:  ocaml
 BuildRequires:  ocaml-dune >= 1.1.0
 
-
 %description
 Compatibility package for OCaml's standard iterator type starting from 4.07.
 
-
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
 
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-
 %prep
 %autosetup -n seq-%{version}
 
-
 %build
 dune build %{?_smp_mflags}
-
 
 %install
 dune install --destdir=%{buildroot}
@@ -44,7 +39,6 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 
 # We install the documentation with the doc macro
 rm -fr %{buildroot}%{_prefix}/doc
-
 
 %files
 %doc README.md
@@ -56,7 +50,6 @@ rm -fr %{buildroot}%{_prefix}/doc
 %ifarch %{ocaml_native_compiler}
 %{_libdir}/ocaml/seq/seq.cmxs
 %endif
-
 
 %files devel
 %license LICENSE
@@ -70,7 +63,6 @@ rm -fr %{buildroot}%{_prefix}/doc
 %{_libdir}/ocaml/seq/seq.cmti
 %{_libdir}/ocaml/seq/dune-package
 %{_libdir}/ocaml/seq/opam
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.2-7

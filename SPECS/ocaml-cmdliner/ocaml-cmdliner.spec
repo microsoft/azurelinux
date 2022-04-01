@@ -1,19 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-Name:           ocaml-cmdliner
-Version:        1.0.4
-Release:        20%{?dist}
-Summary:        Declarative definition of command line interfaces for OCaml
-
 # In order for this to work as a "global" macro it has to come after the
 # definition of Name:, evidently.
 %global libname %(echo %{name} | sed -e 's/^ocaml-//')
 
+Summary:        Declarative definition of command line interfaces for OCaml
+Name:           ocaml-cmdliner
+Version:        1.0.4
+Release:        20%{?dist}
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/dbuenzli/cmdliner/
 Source0:        https://github.com/dbuenzli/%{libname}/archive/v%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires: make
+BuildRequires:  make
 BuildRequires:  ocaml
 BuildRequires:  ocaml-findlib-devel
 BuildRequires:  ocaml-ocamlbuild
@@ -103,7 +102,6 @@ chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/opam
 %{_libdir}/ocaml/%{libname}/*.cmx
 %endif
 %{_libdir}/ocaml/%{libname}/*.mli
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-20

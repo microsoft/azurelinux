@@ -1,18 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # TESTING NOTE: The ppx_jane module is needed to run the tests.  However,
 # ppx_jane transitively requires this module.  Therefore, we cannot run the
 # tests at all until we are able to add ppx_jane to Fedora, and even then we
 # will only be able to run the tests in non-bootstrap mode.
-
 %global srcname base
 
+Summary:        Jane Street standard library for OCaml
 Name:           ocaml-%{srcname}
 Version:        0.15.0
 Release:        2%{?dist}
-Summary:        Jane Street standard library for OCaml
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://opensource.janestreet.com/base/
 Source0:        https://github.com/janestreet/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 Patch0:         %{name}-ocaml413compat.patch
@@ -56,9 +54,9 @@ dune build %{?_smp_mflags}
 # and nothing takes care of separating them and adding ldopt as necessary.  We
 # relink manually to address the problem.
 pushd _build/default/src
-ocamlmklib -g -ldopt "%build_ldflags" -o base_stubs *.o
+ocamlmklib -g -ldopt "%{build_ldflags}" -o base_stubs *.o
 cd ../hash_types/src
-ocamlmklib -g -ldopt "%build_ldflags" -o base_internalhash_types_stubs *.o
+ocamlmklib -g -ldopt "%{build_ldflags}" -o base_internalhash_types_stubs *.o
 popd
 
 %install

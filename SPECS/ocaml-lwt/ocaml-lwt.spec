@@ -1,40 +1,32 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        OCaml lightweight thread library
 Name:           ocaml-lwt
 Version:        5.4.1
 Release:        8%{?dist}
-Summary:        OCaml lightweight thread library
-
 License:        MIT
-URL:            http://ocsigen.org/lwt
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://ocsigen.org/lwt
 Source0:        https://github.com/ocsigen/lwt/archive/refs/tags/%{version}.tar.gz#/lwt-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.02.0
-BuildRequires:  ocaml-findlib
-
 BuildRequires:  dune
-BuildRequires:  ocaml-dune-devel
-BuildRequires:  ocaml-cppo
-BuildRequires:  ocaml-result-devel
-BuildRequires:  ocaml-seq-devel
+BuildRequires:  glib2-devel
+BuildRequires:  libev-devel
+BuildRequires:  ocaml >= 4.02.0
 BuildRequires:  ocaml-bisect-ppx-devel
-
+BuildRequires:  ocaml-cppo
+BuildRequires:  ocaml-dune-devel
+BuildRequires:  ocaml-findlib
+# lwt_luv dependencies.
+BuildRequires:  ocaml-luv-devel
 # lwt.unix dependencies
 BuildRequires:  ocaml-mmap-devel
 BuildRequires:  ocaml-ocplib-endian-devel
-
-# lwt_luv dependencies.
-BuildRequires:  ocaml-luv-devel
-
-# lwt_react dependencies.
-BuildRequires:  ocaml-react-devel
-
 # lwt_ppx dependencies.
 BuildRequires:  ocaml-ppxlib >= 0.16.0
-
-BuildRequires:  glib2-devel
-BuildRequires:  libev-devel
-
+# lwt_react dependencies.
+BuildRequires:  ocaml-react-devel
+BuildRequires:  ocaml-result-devel
+BuildRequires:  ocaml-seq-devel
 
 %description
 Lwt is a lightweight thread library for Objective Caml.  This library
@@ -42,12 +34,13 @@ is part of the Ocsigen project.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       libev-devel%{?_isa}
 Requires:       ocaml-mmap-devel%{?_isa}
 Requires:       ocaml-ocplib-endian-devel%{?_isa}
 Requires:       ocaml-result-devel%{?_isa}
 Requires:       ocaml-seq-devel%{?_isa}
-Requires:       libev-devel%{?_isa}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
@@ -55,6 +48,7 @@ developing applications that use %{name}.
 
 %package        luv
 Summary:        Libuv engine for lwt
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    luv
@@ -63,8 +57,8 @@ This package contains a libuv engine for lwt.
 %package        luv-devel
 Summary:        Development files for ocaml-lwt-luv
 
-Requires:       %{name}-luv%{?_isa} = %{version}-%{release}
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       %{name}-luv%{?_isa} = %{version}-%{release}
 Requires:       ocaml-luv-devel%{?_isa}
 Requires:       ocaml-result-devel%{?_isa}
 
@@ -74,6 +68,7 @@ developing applications that use %{name}-luv.
 
 %package        react
 Summary:        Helpers for using React with Lwt
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    react
@@ -82,8 +77,8 @@ Helpers for using React with Lwt.
 %package        react-devel
 Summary:        Development files for ocaml-lwt-react
 
-Requires:       %{name}-react%{?_isa} = %{version}-%{release}
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       %{name}-react%{?_isa} = %{version}-%{release}
 Requires:       ocaml-react-devel%{?_isa}
 
 %description    react-devel
@@ -92,6 +87,7 @@ developing applications that use %{name}-react.
 
 %package        ppx
 Summary:        PPX syntax for Lwt
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    ppx
@@ -100,8 +96,8 @@ PPX syntax for Lwt, providing something similar to async/await from JavaScript.
 %package        ppx-devel
 Summary:        Development files for ocaml-lwt-ppx
 
-Requires:       %{name}-ppx%{?_isa} = %{version}-%{release}
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       %{name}-ppx%{?_isa} = %{version}-%{release}
 Requires:       ocaml-ppxlib-devel%{?_isa}
 
 %description    ppx-devel
@@ -255,7 +251,6 @@ dune runtest --profile=release
 %{_libdir}/ocaml/lwt_ppx/*.cmti
 %{_libdir}/ocaml/lwt_ppx/*.ml
 %{_libdir}/ocaml/lwt_ppx/*.mli
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.1-8

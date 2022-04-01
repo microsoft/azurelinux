@@ -1,25 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # FIXME: Broken in 1.0.1 for unknown reasons.
 %global debug_package %{nil}
 
+Summary:        Unicode library for OCaml
 Name:           ocaml-camomile
 Version:        1.0.2
 Release:        9%{?dist}
-Summary:        Unicode library for OCaml
-
 # Several files are MIT and UCD licensed, but the overall work is LGPLv2+
 # and the LGPL/GPL supercedes compatible licenses.
 # https://www.redhat.com/archives/fedora-legal-list/2008-March/msg00005.html
 License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/yoriyuki/Camomile
 Source0:        https://github.com/yoriyuki/Camomile/archive/refs/tags/%{version}.tar.gz#/camomile-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 3.12.1-12
-BuildRequires:  ocaml-findlib-devel
-BuildRequires:  ocaml-ocamldoc
 BuildRequires:  ocaml-cppo
 BuildRequires:  ocaml-dune
+BuildRequires:  ocaml-findlib-devel
+BuildRequires:  ocaml-ocamldoc
 
 # The base package requires the data files.  Note that it is possible
 # to install the data files on their own to support other packages
@@ -27,36 +26,30 @@ BuildRequires:  ocaml-dune
 # exactly this.
 Requires:       %{name}-data = %{version}-%{release}
 
-
 %description
 Camomile is a Unicode library for ocaml. Camomile provides Unicode
 character type, UTF-8, UTF-16, UTF-32 strings, conversion to/from
 about 200 encodings, collation and locale-sensitive case mappings, and
 more.
 
-
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
 
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-
 %package        data
 Summary:        Data files for %{name}
-
 
 %description    data
 The %{name}-data package contains data files for developing
 applications that use %{name}.
 
-
 %prep
 %setup -q -n Camomile-%{version}
-
 
 %build
 # This avoids a stack overflow in the OCaml 4.05 compiler on POWER only.
@@ -75,17 +68,15 @@ dune install \
          --profile release
 
 # Remove /usr/doc because we will use %%doc rules instead.
-rm -rf %{buildroot}/usr/doc
+rm -rf %{buildroot}%{_prefix}/doc
 
 # Install the *.mli files by hand.
 cp _build/install/default/lib/camomile/library/*.mli %{buildroot}%{_libdir}/ocaml/camomile/
-
 
 %check
 # Broken in 1.0.2.
 # https://github.com/yoriyuki/Camomile/issues/82
 #jbuilder runtest --profile release
-
 
 %files
 %doc README.md CHANGES.md
@@ -100,7 +91,6 @@ cp _build/install/default/lib/camomile/library/*.mli %{buildroot}%{_libdir}/ocam
 %ifarch %{ocaml_native_compiler}
 %endif
 
-
 %files devel
 %license LICENSE.md
 %ifarch %{ocaml_native_compiler}
@@ -110,11 +100,9 @@ cp _build/install/default/lib/camomile/library/*.mli %{buildroot}%{_libdir}/ocam
 %endif
 %{_libdir}/ocaml/camomile/*.mli
 
-
 %files data
 %license LICENSE.md
 %{_datadir}/camomile/
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-9

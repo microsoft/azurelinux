@@ -1,25 +1,25 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname stdio
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
 %bcond_with docs
 
-%global srcname stdio
-
+Summary:        Jane Street Standard I/O library for OCaml
 Name:           ocaml-%{srcname}
 Version:        0.15.0
 Release:        2%{?dist}
-Summary:        Jane Street Standard I/O library for OCaml
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/janestreet/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.04.2
 BuildRequires:  ocaml-base-devel >= 0.14
 BuildRequires:  ocaml-dune-devel >= 2.0.0
+
 %if %{with docs}
 BuildRequires:  ocaml-odoc
 %endif

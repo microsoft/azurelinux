@@ -1,22 +1,20 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname topkg
+
 # BOOTSTRAP NOTE: currently we do not build the optional topkg-care part.
 # It has dependencies which do not yet exist in Fedora, and which themselves
 # depend on the main part of this package.  Once the dependencies have been
 # added to Fedora, we will build topkg-care in non-bootstrap builds.
-
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname topkg
-
+Summary:        The transitory OCaml software packager
 Name:           ocaml-%{srcname}
 Version:        1.0.3
 Release:        4%{?dist}
-Summary:        The transitory OCaml software packager
-
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://erratique.ch/software/topkg/
 Source0:        https://github.com/dbuenzli/topkg/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

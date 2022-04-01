@@ -1,17 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname fmt
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname fmt
-
+Summary:        OCaml Format pretty-printer combinators
 Name:           ocaml-%{srcname}
 Version:        0.8.9
 Release:        4%{?dist}
-Summary:        OCaml Format pretty-printer combinators
-
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://erratique.ch/software/fmt
 Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # We neither need nor want the stdlib-shims package in Fedora.  It is a forward
@@ -37,6 +36,7 @@ command line support for Fmt depends on Cmdliner.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       ocaml-seq-devel%{?_isa}
 

@@ -1,24 +1,23 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname ppxlib
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
-
-%global srcname ppxlib
 
 # This package is a transitive dependency of odoc, but needs odoc to build its
 # documentation.  Break the circular dependency here.
 %bcond_with doc
 
+Summary:        Base library and tools for ppx rewriters
 Name:           ocaml-%{srcname}
 Version:        0.24.0
 Release:        2%{?dist}
-Summary:        Base library and tools for ppx rewriters
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ocaml-ppx/ppxlib
 Source0:        https://github.com/ocaml-ppx/ppxlib/releases/download/%{version}/%{srcname}-%{version}.tbz
-# Fedora does not have, and does not need, stdlib-shims
+# We do not have 'stdlib-shims'.
 Patch0:         %{name}-stdlib-shims.patch
 
 BuildRequires:  ocaml >= 4.04.1

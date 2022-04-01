@@ -1,18 +1,17 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname bisect-ppx
+
+%global upname  bisect_ppx
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
-%global srcname bisect-ppx
-%global upname  bisect_ppx
-
+Summary:        Code coverage for OCaml and Reason
 Name:           ocaml-%{srcname}
 Version:        2.6.3
 Release:        3%{?dist}
-Summary:        Code coverage for OCaml and Reason
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://aantron.github.io/bisect_ppx/
 Source0:        https://github.com/aantron/%{upname}/archive/%{version}/%{upname}-%{version}.tar.gz
 
@@ -21,7 +20,7 @@ BuildRequires:  ocaml >= 4.02.0
 BuildRequires:  ocaml-cmdliner-devel >= 1.0.0
 BuildRequires:  ocaml-dune >= 2.7.0
 BuildRequires:  ocaml-ppxlib-devel >= 0.21.0
-Obsoletes:      %{name}-doc < 2.5.0-1
+
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description
@@ -38,6 +37,7 @@ files.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       ocaml-ppxlib-devel%{?_isa}
 

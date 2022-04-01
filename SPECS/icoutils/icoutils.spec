@@ -1,14 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Utility for extracting and converting Microsoft icon and cursor files
 Name:           icoutils
 Version:        0.32.3
 Release:        8%{?dist}
-Summary:        Utility for extracting and converting Microsoft icon and cursor files
-
 License:        GPLv3
-URL:            http://www.nongnu.org/icoutils/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.nongnu.org/icoutils/
 Source0:        http://savannah.nongnu.org/download/%{name}/%{name}-%{version}.tar.bz2
-
 # Possible security fix, at minimum it's a DoS.
 # Upstream commit d72956a6de228c91d1fc48fd15448fadea9ab6cf
 Patch1:         0001-wrestool-Fix-get_resource_id_quoted-to-return-heap-a.patch
@@ -16,10 +14,9 @@ Patch1:         0001-wrestool-Fix-get_resource_id_quoted-to-return-heap-a.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
-BuildRequires:  gettext 
+BuildRequires:  gettext
 BuildRequires:  libpng-devel
 BuildRequires:  perl-generators
-
 Provides:       bundled(gnulib)
 
 %description
@@ -38,18 +35,16 @@ autoreconf -i
 for f in AUTHORS NEWS; do
   iconv -f ISO88592 -t UTF8 < $f > $f.utf8 && \
   touch -r $f $f.utf8 && \
-  mv $f.utf8 $f 
+  mv $f.utf8 $f
 done
 
 %build
 %configure
 make %{?_smp_mflags}
 
-
 %install
 make install DESTDIR=%{buildroot}
 %find_lang %{name}
-
 
 %files -f %{name}.lang
 %license COPYING
@@ -59,7 +54,6 @@ make install DESTDIR=%{buildroot}
 %{_bindir}/icotool
 %{_bindir}/wrestool
 %{_mandir}/man1/*.1*
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.32.3-8

@@ -1,19 +1,17 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # BOOTSTRAP NOTE: We currently build only the base alcotest package.  We cannot
 # yet build the async and lwt subpackages, because of missing dependencies.
 # Some of those dependencies require the base alcotest package, either directly
 # or indirectly.  Therefore, we will only be able to build the other two in
 # non-bootstrap mode.
-
 %global srcname alcotest
 
+Summary:        Lightweight and colorful test framework for OCaml
 Name:           ocaml-%{srcname}
 Version:        1.3.0
 Release:        3%{?dist}
-Summary:        Lightweight and colorful test framework for OCaml
-
 License:        ISC
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/mirage/alcotest
 Source0:        %{URL}/archive/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 # We neither need nor want the stdlib-shims package in Fedora.  It is a forward

@@ -1,41 +1,36 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Deriving plugin registry
 Name:           ocaml-ppx-derivers
 Version:        1.2.1
 Release:        19%{?dist}
-Summary:        Deriving plugin registry
-
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ocaml-ppx/ppx_derivers
 Source0:        https://github.com/ocaml-ppx/ppx_derivers/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  ocaml
-BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-dune
+BuildRequires:  ocaml-findlib
 
 %description
 Ppx_derivers is a tiny package whose sole purpose is to allow
 ppx_deriving and ppx_type_conv to inter-operate gracefully when
 linked as part of the same ocaml-migrate-parsetree driver.
 
-
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
 
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-
 %prep
 %setup -q -n ppx_derivers-%{version}
 
-
 %build
 dune build @install
-
 
 %install
 mkdir -p %{buildroot}%{_libdir}/ocaml
@@ -50,7 +45,6 @@ find %{buildroot} -name '*.cmxs' -exec chmod 0755 {} \;
 %check
 dune runtest
 
-
 %files
 %doc README.md CHANGES.md
 %license LICENSE.md
@@ -63,7 +57,6 @@ dune runtest
 %exclude %{_libdir}/ocaml/*/*.mli
 %exclude %{_libdir}/ocaml/*/*.ml
 
-
 %files devel
 %doc README.md CHANGES.md
 %license LICENSE.md
@@ -74,7 +67,6 @@ dune runtest
 %endif
 %{_libdir}/ocaml/*/*.mli
 %{_libdir}/ocaml/*/*.ml
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-19
@@ -135,4 +127,3 @@ dune runtest
 
 * Thu May 16 2019 Andy Li <andy@onthewings.net> - 1.2.1-1
 - Initial RPM release.
-

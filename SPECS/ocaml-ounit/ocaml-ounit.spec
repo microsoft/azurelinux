@@ -1,22 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname ounit
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
-
-%global srcname ounit
 
 # -doc subpackage requires ocaml-odoc which has rather a lot of
 # dependencies.  This flag allows the non-essential subpackage to be
 # enabled.
 %bcond_with doc
 
+Summary:        Unit test framework for OCaml
 Name:           ocaml-%{srcname}
 Version:        2.2.2
 Release:        6%{?dist}
-Summary:        Unit test framework for OCaml
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/gildor478/ounit
 Source0:        %{url}/releases/download/v%{version}/%{srcname}-v%{version}.tbz
 # We neither need nor want the stdlib-shims package in Fedora.  It is a forward
@@ -27,22 +26,22 @@ Patch0:         %{name}-stdlib-shims.patch
 # https://src.fedoraproject.org/rpms/ocaml-ounit/blob/f35/f/ounit-v2.2.4-remove-Thread-kill.patch
 Patch1:         remove-thread-kill.patch
 
+# I believe this is actually caused by a missing Requires in another
+# package (perhaps lwt?).  In any case without this the tests fail to
+# compile with:
+# /usr/bin/ld: cannot find -lev
+BuildRequires:  libev-devel
 BuildRequires:  ocaml >= 4.02.3
 BuildRequires:  ocaml-dune >= 1.11.0
 BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-lwt-devel
 BuildRequires:  ocaml-mmap-devel
 BuildRequires:  ocaml-ocplib-endian-devel
+BuildRequires:  ocaml-result-devel
+
 %if %{with doc}
 BuildRequires:  ocaml-odoc
 %endif
-BuildRequires:  ocaml-result-devel
-
-# I believe this is actually caused by a missing Requires in another
-# package (perhaps lwt?).  In any case without this the tests fail to
-# compile with:
-# /usr/bin/ld: cannot find -lev
-BuildRequires:  libev-devel
 
 # The ounit name is now just an alias for ounit2
 Provides:       %{name}2 = %{version}-%{release}

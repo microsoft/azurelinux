@@ -1,55 +1,48 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Convert OCaml parsetrees between different major versions
 Name:           ocaml-migrate-parsetree
 Version:        2.3.0
 Release:        2%{?dist}
-Summary:        Convert OCaml parsetrees between different major versions
-
-License:        LGPLv2+ with exceptions
+License:        LGPLv2+ WITH exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ocaml-ppx/ocaml-migrate-parsetree
 Source0:        https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v%{version}/%{name}-%{version}.tbz
 
 BuildRequires:  ocaml
-BuildRequires:  ocaml-dune
 BuildRequires:  ocaml-cinaps-devel
+BuildRequires:  ocaml-dune
 
 %description
 This library converts between parsetrees of different OCaml versions.
 For each version, there is a snapshot of the parsetree and conversion
 functions to the next and/or previous version.
 
-
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
 
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and signature
 files for developing applications that use %{name}.
 
-
 %prep
 %autosetup -n %{name}-%{version}
 
-
 %build
 dune build %{?_smp_mflags}
-
 
 %install
 dune install --destdir=%{buildroot}
 
 # These files will be installed using doc and license directives.
-rm -r %{buildroot}/usr/doc
+rm -r %{buildroot}%{_prefix}/doc
 
 # Makes *.cmxs executable such that they will be stripped.
 find %{buildroot} -name '*.cmxs' -exec chmod 0755 {} \;
 
-
 %check
 dune runtest
-
 
 %files
 %doc README.md CHANGES.md
@@ -65,7 +58,6 @@ dune runtest
 %exclude %{_libdir}/ocaml/*/dune-package
 %exclude %{_libdir}/ocaml/*/opam
 
-
 %files devel
 %doc README.md CHANGES.md
 %ifarch %{ocaml_native_compiler}
@@ -77,7 +69,6 @@ dune runtest
 %{_libdir}/ocaml/*/{,*/}*.mli
 %{_libdir}/ocaml/*/dune-package
 %{_libdir}/ocaml/*/opam
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-2

@@ -1,10 +1,8 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname csexp
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
-
-%global srcname csexp
 
 # This package is needed to build dune.  To avoid circular dependencies, this
 # package cannot depend on dune, or any package that depends on dune.
@@ -16,15 +14,15 @@ Distribution:   Mariner
 # If you know what you are doing, build with dune anyway using this conditional.
 %bcond_with dune
 
+Summary:        Parsing and printing of S-expressions in canonical form
 Name:           ocaml-%{srcname}
 Version:        1.3.2
 Release:        4%{?dist}
-Summary:        Parsing and printing of S-expressions in canonical form
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/ocaml-dune/csexp
 Source0:        %{url}/releases/download/%{version}/%{srcname}-%{version}.tbz
-
 # Depend on Stdlib.Result instead of ocaml-result.  See comment above.
 # This patch is not appropriate for upstream, which needs to keep compatibility
 # with older OCaml versions.

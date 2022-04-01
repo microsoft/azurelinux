@@ -1,17 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global srcname luv
+
 # Documentation adds a circular dependency, so by
 # default we build without.
 %bcond_with doc
 
-%global srcname luv
-
+Summary:        OCaml binding to libuv for cross-platform asynchronous I/O
 Name:           ocaml-%{srcname}
 Version:        0.5.10
 Release:        3%{?dist}
-Summary:        OCaml binding to libuv for cross-platform asynchronous I/O
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/aantron/luv
 Source0:        %{url}/releases/download/%{version}/%{srcname}-%{version}.tar.gz
 
@@ -19,11 +18,13 @@ BuildRequires:  ocaml >= 4.02.0
 BuildRequires:  ocaml-alcotest-devel >= 0.8.1
 BuildRequires:  ocaml-ctypes-devel >= 0.14.0
 BuildRequires:  ocaml-dune >= 2.0.0
+BuildRequires:  ocaml-result-devel
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(libuv)
+
 %if %{with doc}
 BuildRequires:  ocaml-odoc
 %endif
-BuildRequires:  ocaml-result-devel
-BuildRequires:  pkgconfig(libuv)
 
 %description
 Luv is a binding to libuv, the cross-platform C library that does
@@ -36,6 +37,7 @@ API, and an alternative to the standard module Unix.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       ocaml-ctypes-devel%{?_isa}
 Requires:       ocaml-result-devel%{?_isa}
@@ -47,6 +49,7 @@ files for developing applications that use %{name}.
 %if %{with doc}
 %package        doc
 Summary:        Documentation for %{name}
+
 BuildArch:      noarch
 
 %description    doc

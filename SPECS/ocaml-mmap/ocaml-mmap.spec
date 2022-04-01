@@ -1,21 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%global libname mmap
+
+Summary:        File mapping functionality
 Name:           ocaml-mmap
 Version:        1.1.0
 Release:        19%{?dist}
-Summary:        File mapping functionality
-
-%global libname mmap
-
 # License is LGPL 2.1 with standard OCaml exceptions
-License:        LGPLv2+ with exceptions
+License:        LGPLv2+ WITH exceptions
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/mirage/mmap
 Source0:        https://github.com/mirage/mmap/archive/v%{version}/mmap-v%{version}.tar.gz
 
 BuildRequires:  ocaml
-BuildRequires:  ocaml-findlib
-
 BuildRequires:  ocaml-dune
+BuildRequires:  ocaml-findlib
 
 %description
 This project provides a Mmap.map_file functions for mapping files
@@ -24,6 +22,7 @@ added in OCaml >= 4.06.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?isa} = %{version}-%{release}
 
 %description    devel
@@ -55,7 +54,6 @@ dune runtest
 %endif
 %exclude %{_libdir}/ocaml/%{libname}/*.mli
 
-
 %files devel
 #license LICENSE
 %ifarch %{ocaml_native_compiler}
@@ -64,7 +62,6 @@ dune runtest
 %{_libdir}/ocaml/%{libname}/*.cmx
 %endif
 %{_libdir}/ocaml/%{libname}/*.mli
-
 
 %changelog
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-19

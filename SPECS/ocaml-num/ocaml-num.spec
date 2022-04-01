@@ -1,28 +1,23 @@
+Summary:        Legacy Num library for arbitrary-precision integer and rational arithmetic
+Name:           ocaml-num
+Version:        1.3
+Release:        1%{?dist}
+License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:           ocaml-num
-Version:        1.4
-Release:        2%{?dist}
-Summary:        Legacy Num library for arbitrary-precision integer and rational arithmetic
-License:        LGPLv2+ with exceptions
-
 URL:            https://github.com/ocaml/num
-#Source0:        https://github.com/ocaml/num/archive/v%%{version}/%%{name}-%%{version}.tar.gz
-Source0:        https://github.com/ocaml/num/archive/v1.3.tar.gz
-
+Source0:        https://github.com/ocaml/num/archive/v%%{version}/%%{name}-%%{version}.tar.gz#/num-%{version}.tar.gz
 # All patches since 1.3 was released.
 Patch1:         0001-Bump-version.patch
 Patch2:         0002-Fix-usage-of-bytes-vs-string.patch
 Patch3:         0003-Get-rid-of-Bytes.unsafe_of_string.patch
-
 # Downstream patches to add -g flag.
 Patch4:         0004-toplevel-Add-g-flag.patch
 Patch5:         0005-src-Add-g-flag-to-mklib.patch
 
-BuildRequires: make
+BuildRequires:  make
 BuildRequires:  ocaml
 BuildRequires:  ocaml-findlib-devel
-
 
 %description
 This library implements arbitrary-precision arithmetic on big integers
@@ -36,40 +31,32 @@ library, and older applications that already use Num are encouraged to
 switch to Zarith. Zarith delivers much better performance than Num and
 has a nicer API.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
-
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-
 %prep
-#%%setup -q -n num-%%{version}
-%setup -q -n num-1.3
+%setup -q -n num-%{version}
 %autopatch -p1
-
 
 %build
 make %{?_smp_mflags} all
 
-
 %check
 make -j1 test
 
-
 %install
-export DESTDIR=$RPM_BUILD_ROOT
-export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
+export DESTDIR=%{buildroot}
+export OCAMLFIND_DESTDIR=%{buildroot}%{_libdir}/ocaml
 mkdir -p $OCAMLFIND_DESTDIR
 mkdir -p $OCAMLFIND_DESTDIR/stublibs
 make install
 
 find $OCAMLFIND_DESTDIR -name '*.cmti' -delete
-
 
 %files
 %doc Changelog README.md
@@ -87,7 +74,6 @@ find $OCAMLFIND_DESTDIR -name '*.cmti' -delete
 %endif
 %exclude %{_libdir}/ocaml/*.mli
 
-
 %files devel
 %license LICENSE
 %ifarch %{ocaml_native_compiler}
@@ -97,9 +83,9 @@ find $OCAMLFIND_DESTDIR -name '*.cmti' -delete
 %endif
 %{_libdir}/ocaml/*.mli
 
-
 %changelog
-* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-2
+* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-1
+- Fixing version number to be consistent with the used source.
 - Cleaning-up spec. License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-1
