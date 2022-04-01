@@ -30,7 +30,10 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         nvidia-container-toolkit-1.9.0.patch
 BuildRequires:  golang
-Provides:       nvidia-container-runtime-hook
+Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook
+Provides: nvidia-container-runtime
+Provides: nvidia-container-runtime-hook
+Requires: libnvidia-container-tools >= 1.9.0, libnvidia-container-tools < 2.0.0
 
 %description
 Provides a OCI hook to enable GPU support in containers.
@@ -41,10 +44,12 @@ tar -xvf %{SOURCE1}
 
 %build
 go build -ldflags "-s -w " -o "nvidia-container-toolkit" ./cmd/nvidia-container-toolkit
+go build -ldflags "-s -w " -o "nvidia-container-runtime" ./cmd/nvidia-container-runtime
 
 %install
 mkdir -p %{buildroot}%{_bindir}
 install -m 755 -t %{buildroot}%{_bindir} nvidia-container-toolkit
+install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime
 
 cp config/config.toml.centos config.toml
 mkdir -p %{buildroot}%{_sysconfdir}/nvidia-container-runtime
@@ -65,6 +70,7 @@ rm -f %{_bindir}/nvidia-container-runtime-hook
 %files
 %license LICENSE
 %{_bindir}/nvidia-container-toolkit
+%{_bindir}/nvidia-container-runtime
 %config %{_sysconfdir}/nvidia-container-runtime/config.toml
 %{_libexecdir}/oci/hooks.d/oci-nvidia-hook
 %{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
