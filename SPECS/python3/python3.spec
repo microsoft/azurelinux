@@ -195,7 +195,7 @@ cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{majmin}.py
 ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
 
 # Create unversioned python binary file as a symlink
-ln -s python3 %{buildroot}{_bindir}/python
+ln -s python3 %{buildroot}%{_bindir}/python
 
 # Remove unused stuff
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
