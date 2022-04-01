@@ -52,6 +52,7 @@ func TestShouldFailParsingMissingPackages_SystemConfig(t *testing.T) {
 
 	missingPackageListConfig := validSystemConfig
 	missingPackageListConfig.PackageLists = []string{}
+	missingPackageListConfig.Packages = []string{}
 
 	err := missingPackageListConfig.IsValid()
 	assert.Error(t, err)
