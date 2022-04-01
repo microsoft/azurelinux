@@ -25,12 +25,6 @@ containers.
 %prep
 %setup -q
 
-
-%build
-%make_build build
-mkdir -p %{buildroot}%{_bindir}
-cp %{name} %{buildroot}%{_bindir}
-
 %install
 
 %files
