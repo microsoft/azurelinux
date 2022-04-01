@@ -10441,8 +10441,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.3.3",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.3.3.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.9.0.tar.gz"
         }
       }
     },
@@ -14583,8 +14583,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-runtime",
-          "version": "3.4.2",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.4.2.tar.gz"
+          "version": "3.9.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.9.0.tar.gz"
         }
       }
     },
@@ -14593,8 +14593,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.4.2",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.4.2.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.9.0.tar.gz"
         }
       }
     },
@@ -14603,8 +14603,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-docker2",
-          "version": "2.6.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-docker/archive/v2.6.0.tar.gz"
+          "version": "2.10.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-docker/archive/v2.10.0.tar.gz"
         }
       }
     },
@@ -14613,8 +14613,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-modprobe",
-          "version": "450.57",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/450.57.tar.gz"
+          "version": "495.44",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-modprobe/archive/495.44.tar.gz"
         }
       }
     },
