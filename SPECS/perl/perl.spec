@@ -56,7 +56,7 @@
 # <> operator uses File::Glob nowadays. CSH is not needed.
 %bcond_with perl_enables_tcsh
 # We can skip %%check phase
-%bcond_without test
+%bcond_with test
 
 # The additional linker flags break binary perl- packages.
 # https://bugzilla.redhat.com/show_bug.cgi?id=2043092
@@ -192,7 +192,6 @@ BuildRequires:  glibc-common
 # Build-require groff tools for populating %%Config correctly, bug #135101
 BuildRequires:  groff-base
 %endif
-BuildRequires:  libdb-devel
 BuildRequires:  make
 %if !%{defined perl_bootstrap}
 BuildRequires:  perl-interpreter
@@ -246,7 +245,7 @@ Requires:       perl-Compress-Raw-Bzip2, perl-Compress-Raw-Zlib,
 Requires:       perl-Config-Extensions, perl-Config-Perl-V, perl-constant,
 Requires:       perl-CPAN, perl-CPAN-Meta, perl-CPAN-Meta-Requirements,
 Requires:       perl-CPAN-Meta-YAML,
-Requires:       perl-Data-Dumper, perl-DB_File, perl-DBM_Filter,
+Requires:       perl-Data-Dumper, perl-DBM_Filter,
 Requires:       perl-debugger, perl-deprecate,
 Requires:       perl-Devel-Peek, perl-Devel-PPPort, perl-Devel-SelfStubber,
 Requires:       perl-diagnostics, perl-Digest, perl-Digest-MD5, perl-Digest-SHA,
@@ -427,8 +426,6 @@ Provides:       perl(unicore::Name)
 # causes loading utf8 and unicore/Heave.pl and unicore/lib files.
 Provides:       perl(utf8_heavy.pl)
 # utf8 and utf8_heavy.pl require Carp, re, strict, warnings, XSLoader
-# For AnyDBM_File
-Suggests:       perl(DB_File)
 # XSLoader requires DynaLoder
 Requires:       perl(DynaLoader)
 # Encode is loaded in BOOT section of PerlIO::encoding
@@ -1066,27 +1063,6 @@ Given a list of scalars or reference variables, writes out their contents
 in perl syntax. The references can also be objects. The content of each
 variable is output in a single Perl statement. Handles self-referential
 structures correctly.
-%endif
-
-%if %{dual_life} || %{rebuild_from_scratch}
-%package DB_File
-Summary:        Perl5 access to Berkeley DB version 1.x
-License:        GPL+ or Artistic
-Epoch:          0
-Version:        1.855
-Requires:       %perl_compat
-Requires:       perl(Fcntl)
-Requires:       perl(XSLoader)
-%if %{defined perl_bootstrap}
-%gendep_perl_DB_File
-%endif
-Conflicts:      perl < 4:5.16.3-264
-
-%description DB_File
-DB_File is a module which allows Perl programs to make use of the facilities
-provided by Berkeley DB version 1.x (if you have a newer version of DB, you
-will be limited to functionality provided by interface of version 1.x). The
-interface defined here mirrors the Berkeley DB interface closely.
 %endif
 
 %package DBM_Filter
@@ -4571,12 +4547,6 @@ rm -rf %{buildroot}%{archlib}/auto/Data
 rm -rf %{buildroot}%{archlib}/Data
 rm %{buildroot}%{_mandir}/man3/Data::Dumper.3*
 
-# DB_File
-rm %{buildroot}%{archlib}/DB_File.pm
-rm %{buildroot}%{archlib}/auto/DB_File/DB_File.so
-rm -rf %{buildroot}%{archlib}/auto/DB_File
-rm %{buildroot}%{_mandir}/man3/DB_File*
-
 # Devel-PPPort
 rm %{buildroot}%{archlib}/Devel/PPPort.pm
 rm %{buildroot}%{_mandir}/man3/Devel::PPPort.3*
@@ -5472,14 +5442,6 @@ popd
 %dir %{archlib}/Data
 %{archlib}/Data/Dumper.pm
 %{_mandir}/man3/Data::Dumper.3*
-%endif
-
-%if %{dual_life} || %{rebuild_from_scratch}
-#%%files DB_File
-#%%{archlib}/DB_File.pm
-#%%dir %{archlib}/auto/DB_File
-#%%{archlib}/auto/DB_File/DB_File.so
-#%%{_mandir}/man3/DB_File*
 %endif
 
 %files DBM_Filter
@@ -6974,7 +6936,7 @@ popd
 - Upgrade to version 5.34.1 referencing Fedora 37 (license: MIT)
 - Removed duplicate requires for perl(:VERSION) from gendep.macros
 - Align Module-CoreList and Module-CoreList-tools to version 5.20220313
-- Switch to bcond_with for perl_enables_groff, perl_enables_turkish_test, perl_enables_systemtap
+- Switch to bcond_with for perl_enables_groff, perl_enables_turkish_test, perl_enables_systemtap, test
 - Remove unncessary sources and patches
 
 * Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.32.0-465
