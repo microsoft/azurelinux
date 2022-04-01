@@ -33,7 +33,7 @@ BuildRequires:  ant
 BuildRequires:  java-cup-bootstrap
 BuildRequires:  java-devel
 BuildRequires:  javapackages-local-bootstrap
-Requires:       java_cup
+Requires:       java-cup-bootstrap
 Requires:       javapackages-tools
 BuildArch:      noarch
 Conflicts:      jflex

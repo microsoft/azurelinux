@@ -1,15 +1,12 @@
+diff --git a/build.xml b/build.xml
+index 705edd6d..b4ec6382 100644
 --- a/build.xml
 +++ b/build.xml
-@@ -67,12 +67,10 @@
-    <jar jarfile="${dist}/java-cup-11b.jar" basedir="${classes}">
+@@ -62,7 +62,6 @@
+    <jar jarfile="${dist}/java-cup-11a.jar" basedir="${classes}">
        <manifest>
          <attribute name="Main-Class" value="java_cup/Main" />
--	<attribute name="Class-Path" value="java-cup-11b-runtime.jar" />
+-	<attribute name="Class-Path" value="java-cup-11a-runtime.jar" />
        </manifest>
      </jar>
-     <jar jarfile="${dist}/java-cup-11b-runtime.jar" basedir="${classes}" includes="java_cup/runtime/**">
-       <manifest>
--	<attribute name="Class-Path" value="commons-jxpath-1.3.jar" />
-       </manifest>
-     </jar>
-    <tar longfile="gnu"  destfile="${dist}/java-cup-bin-11b-${cupversion}.tar.gz" compression="gzip">
+     <jar jarfile="${dist}/java-cup-11a-runtime.jar" basedir="${classes}" includes="java_cup/runtime/*">
