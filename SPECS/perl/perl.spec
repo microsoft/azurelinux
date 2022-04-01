@@ -5476,11 +5476,11 @@ popd
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
-%files DB_File
-%{archlib}/DB_File.pm
-%dir %{archlib}/auto/DB_File
-%{archlib}/auto/DB_File/DB_File.so
-%{_mandir}/man3/DB_File*
+#%%files DB_File
+#%%{archlib}/DB_File.pm
+#%%dir %{archlib}/auto/DB_File
+#%%{archlib}/auto/DB_File/DB_File.so
+#%%{_mandir}/man3/DB_File*
 %endif
 
 %files DBM_Filter

@@ -149,9 +149,9 @@ perl-constant-1.33-465.cm2.noarch.rpm
 perl-if-0.60.800-465.cm2.noarch.rpm
 perl-interpreter-5.34.1-487.cm2.aarch64.rpm
 perl-libs-5.34.1-487.cm2.aarch64.rpm
-perl-locale-1.09-487.cm2.noarch.rpm
+perl-locale-1.10-487.cm2.noarch.rpm
 perl-macros-5.34.1-487.cm2.noarch.rpm
-perl-mro-1.23-487.cm2.aarch64.rpm
+perl-mro-1.25-487.cm2.aarch64.rpm
 perl-overload-1.31-465.cm2.noarch.rpm
 perl-overloading-0.02-465.cm2.noarch.rpm
 perl-parent-0.238-465.cm2.noarch.rpm
