@@ -8,6 +8,10 @@ Summary:        OCaml library for common file and filename operations
 License:        LGPLv2 with exceptions
 URL:            https://github.com/gildor478/ocaml-fileutils
 Source0:        https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Set of files from previous sources location allowing us to drop dependency on "ocaml-oasis-devel", which is no longer available.
+# Previous sources used to be available under http://forge.ocamlcore.org/frs/download.php/1695/ocaml-fileutils-0.5.2.tar.gz.
+# Currently still available in Fedora's SRPMs.
+Source1:        old_source_build.tar.gz
 
 Patch1:         fileutils-0.5.2-fix-bytes.patch
 # Use ounit2.
@@ -45,17 +49,12 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
+%setup -q -T -a 1 -D
 %autopatch -p1
 
-
 %build
-# Disable the tests (RHEL 7 only) since they require ocaml-ounit.
 ocaml setup.ml -configure --prefix %{_prefix} --destdir $RPM_BUILD_ROOT \
-%if 0%{?rhel} >= 7
-	--disable-tests
-%else
 	--enable-tests
-%endif
 make
 
 
