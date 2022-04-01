@@ -27,14 +27,9 @@ Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            http://www2.cs.tum.edu/projects/cup/
-<<<<<<< HEAD
 # TODO the version of our 11a source is no longer published
 Source0:        develop.tar.bz2
 Source1:        java-cup-generated-files.tar.bz2
-=======
-Source0:        https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz#/%{name}-%{cvs_version}.tar.gz
-Source1:        java-cup-generated-files.tar.xz
->>>>>>> c7fa447231aeecda2513fb6e88161e045822d78d
 Source2:        java-cup.license
 # From          http://www2.cs.tum.edu/projects/cup/
 Patch1:         java-cup-no-classpath-in-manifest.patch
