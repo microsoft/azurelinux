@@ -13,7 +13,7 @@ Summary:        Unicode library for OCaml
 # https://www.redhat.com/archives/fedora-legal-list/2008-March/msg00005.html
 License:        LGPLv2+
 URL:            https://github.com/yoriyuki/Camomile
-Source0:        https://github.com/yoriyuki/Camomile/archive/%{version}.tar.gz/camomile-%{version}.tar.gz
+Source0:        https://github.com/yoriyuki/Camomile/archive/refs/tags/%{version}.tar.gz#/camomile-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 3.12.1-12
 BuildRequires:  ocaml-findlib-devel

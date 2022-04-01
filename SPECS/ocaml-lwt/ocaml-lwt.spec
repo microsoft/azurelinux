@@ -5,8 +5,7 @@ Version:        5.4.1
 Release:        8%{?dist}
 Summary:        OCaml lightweight thread library
 
-# The openssl linking exception is granted.
-License:        LGPLv2+ with exceptions
+License:        MIT
 URL:            http://ocsigen.org/lwt
 Source0:        https://github.com/ocsigen/lwt/archive/refs/tags/%{version}.tar.gz#/lwt-%{version}.tar.gz
 

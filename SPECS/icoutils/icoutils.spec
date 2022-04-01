@@ -5,7 +5,7 @@ Version:        0.32.3
 Release:        8%{?dist}
 Summary:        Utility for extracting and converting Microsoft icon and cursor files
 
-License:        GPLv3+
+License:        GPLv3
 URL:            http://www.nongnu.org/icoutils/
 Source0:        http://savannah.nongnu.org/download/%{name}/%{name}-%{version}.tar.bz2
 
@@ -52,7 +52,8 @@ make install DESTDIR=%{buildroot}
 
 
 %files -f %{name}.lang
-%doc README AUTHORS COPYING NEWS TODO ChangeLog
+%license COPYING
+%doc README AUTHORS NEWS TODO ChangeLog
 %{_bindir}/extresso
 %{_bindir}/genresscript
 %{_bindir}/icotool

@@ -13,7 +13,7 @@ Name:		ntfs-3g
 Summary:	Linux NTFS userspace driver
 Version:	2017.3.23
 Release:	16%{?dist}
-License:	GPLv2+
+License:	GPLv2
 Source0:	http://tuxera.com/opensource/%{name}_ntfsprogs-%{version}%{?subver}.tgz
 URL:		http://www.ntfs-3g.org/
 %if %{with_externalfuse}
@@ -175,11 +175,7 @@ cp -a %{SOURCE1} %{buildroot}%{_datadir}/hal/fdi/policy/10osvendor/
 
 %files
 %doc AUTHORS ChangeLog CREDITS NEWS README
-%if %{oldrhel}
-%doc COPYING
-%else
 %license COPYING
-%endif
 %if %{oldrhel}
 /sbin/mount.ntfs
 /sbin/mount.ntfs-3g

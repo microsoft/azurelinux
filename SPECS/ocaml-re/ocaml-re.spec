@@ -11,7 +11,7 @@ Version:        1.9.0
 Release:        21%{?dist}
 Summary:        A regular expression library for OCaml
 
-License:        LGPLv2 with exceptions
+License:        LGPLv2+ with exceptions
 URL:            https://github.com/ocaml/ocaml-re
 Source0:        https://github.com/ocaml/%{name}/archive/%{version}/ocaml-re-%{version}.tar.gz
 

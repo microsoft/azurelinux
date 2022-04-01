@@ -6,8 +6,8 @@ Release:        18%{?dist}
 Summary:        OCaml library for common file and filename operations
 
 License:        LGPLv2 with exceptions
-URL:            https://forge.ocamlcore.org/projects/ocaml-fileutils/
-Source0:        http://forge.ocamlcore.org/frs/download.php/1695/ocaml-fileutils-0.5.2.tar.gz
+URL:            https://github.com/gildor478/ocaml-fileutils
+Source0:        https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Patch1:         fileutils-0.5.2-fix-bytes.patch
 # Use ounit2.
