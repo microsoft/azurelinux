@@ -95,7 +95,8 @@ mkdir -p %{buildroot}%{_bindir}
 install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 
 %files
-%doc changelog.txt license.txt
+%license license.txt
+%doc changelog.txt
 %attr(0755,root,root) %{_bindir}/%{real_name}
 %{_javadir}/*
 
