@@ -28,7 +28,7 @@ Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            http://www2.cs.tum.edu/projects/cup/
-Source0:        http://www2.cs.tum.edu/projects/cup/releases/%{name}-src-%{cvs_version}-%{pub_date}.tar.gz#/%{name}-%{cvs_version}.tar.gz
+Source0:        https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz#/%{name}-%{cvs_version}.tar.gz
 Source1:        java-cup-generated-files.tar.xz
 Source2:        java-cup.license
 # From          http://www2.cs.tum.edu/projects/cup/
