@@ -147,10 +147,10 @@ perl-Unicode-Normalize-1.27-465.cm2.aarch64.rpm
 perl-base-2.27-465.cm2.noarch.rpm
 perl-constant-1.33-465.cm2.noarch.rpm
 perl-if-0.60.800-465.cm2.noarch.rpm
-perl-interpreter-5.32.0-465.cm2.aarch64.rpm
-perl-libs-5.32.0-465.cm2.aarch64.rpm
+perl-interpreter-5.34.1-487.cm2.aarch64.rpm
+perl-libs-5.34.1-487.cm2.aarch64.rpm
 perl-locale-1.09-465.cm2.noarch.rpm
-perl-macros-5.32.0-465.cm2.noarch.rpm
+perl-macros-5.34.1-487.cm2.noarch.rpm
 perl-mro-1.23-465.cm2.aarch64.rpm
 perl-overload-1.31-465.cm2.noarch.rpm
 perl-overloading-0.02-465.cm2.noarch.rpm
@@ -160,7 +160,7 @@ perl-subs-1.03-465.cm2.noarch.rpm
 perl-threads-2.25-465.cm2.aarch64.rpm
 perl-threads-shared-1.61-465.cm2.aarch64.rpm
 perl-vars-1.05-465.cm2.noarch.rpm
-perl-5.32.0-465.cm2.aarch64.rpm
+perl-5.34.1-487.cm2.aarch64.rpm
 texinfo-6.8-1.cm2.aarch64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 autoconf-2.71-3.cm2.noarch.rpm
