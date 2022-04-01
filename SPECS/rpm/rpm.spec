@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,6 +86,16 @@ Provides:       %{name}-sign = %{version}-%{release}
 %description build
 %{summary}
 
+%package        plugin-systemd-inhibit
+Summary:        RPM plugin to prevent systemd reboots during transactions
+Requires:       %{name}-libs = %{version}-%{release}
+
+%description    plugin-systemd-inhibit
+This plugin for RPM prevents the system to enter shutdown, sleep
+or idle mode while there is a rpm transaction running to prevent
+system corruption that can occur if the transaction is
+interrupted by a reboot.
+
 %package lang
 Summary:        Additional language files for rpm
 Group:          Applications/System
@@ -126,7 +136,8 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
     --enable-python \
     --with-cap \
     --disable-silent-rules \
-    --with-selinux
+    --with-selinux \
+    --enable-inhibit-plugin
 
 # Remove manpages translations
 rm -r docs/man/{fr,ja,ko,pl,ru,sk}
@@ -199,6 +210,7 @@ popd
 %{_libdir}/rpm/tgpg
 %{_libdir}/rpm/platform
 %{_libdir}/rpm-plugins/*
+%exclude %{_libdir}/rpm-plugins/systemd_inhibit.so
 %{_libdir}/rpm/pythondistdeps.py
 %{_fileattrsdir}/python.attr
 # Because of no doxygen dependency, we do not produce manpages that require it.
@@ -208,7 +220,6 @@ popd
 # %{_mandir}/man8/rpmgraph.8.gz
 # %{_mandir}/man8/rpmkeys.8.gz
 # %{_mandir}/man8/rpm-misc.8.gz
-# %{_mandir}/man8/rpm-plugin-systemd-inhibit.8.gz
 
 %files libs
 %defattr(-,root,root)
@@ -261,6 +272,11 @@ popd
 %{_libdir}/librpmsign.so
 %{_libdir}/librpmsign.so.*
 
+%files plugin-systemd-inhibit
+%{_libdir}/rpm-plugins/systemd_inhibit.so
+# Because of no doxygen dependency, we do not produce manpages that require it.
+# %{_mandir}/man8/rpm-plugin-systemd-inhibit.8.gz
+
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
@@ -269,6 +285,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Fri Apr 01 2022 Thomas Crain <thcrain@microsoft.com> - 4.17.0-4
+- Build systemd-inhibit plugin and package in plugin-systemd-inhibit subpackage
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.17.0-3
 - Remove manual pkgconfig(*) provides in toolchain specs
 

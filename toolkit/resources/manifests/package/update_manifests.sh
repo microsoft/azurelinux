@@ -190,6 +190,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/python3-rpm/d' $TmpPkgGen
     sed -i '/python3-test/d' $TmpPkgGen
     sed -i '/python3-tools/d' $TmpPkgGen
+    sed -i '/rpm-plugin-systemd-inhibit/d' $TmpPkgGen
     sed -i '/tdnf-python/d' $TmpPkgGen
     sed -i '/util-linux-lang/d' $TmpPkgGen
     sed -i '/wget/d' $TmpPkgGen
