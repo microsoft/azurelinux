@@ -15,9 +15,8 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-%define cvs_version    11b
+%define cvs_version    11a
 %define real_name      java-cup
-%define pub_date       20210814
 
 Summary:        LALR Parser Generator in Java
 Name:           java-cup-bootstrap
@@ -28,18 +27,19 @@ Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Url:            http://www2.cs.tum.edu/projects/cup/
-Source0:        https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz#/java-cup-%{cvs_version}.tar.gz
-Source1:        java-cup-generated-files.tar.xz
+# TODO the version of our 11a source is no longer published
+Source0:        develop.tar.bz2
+Source1:        java-cup-generated-files.tar.bz2
 Source2:        java-cup.license
 # From          http://www2.cs.tum.edu/projects/cup/
 Patch1:         java-cup-no-classpath-in-manifest.patch
 Patch2:         java-cup-no-cup-no-jflex.patch
 Patch3:         java-cup-classpath.patch
+# Missing symbolFactory initialization in lr_parser, causes sinjdoc to crash
+Patch4:         java-cup-lr_parser-constructor.patch
 BuildRequires:  ant
 BuildRequires:  git
-BuildRequires:  java-cup-bootstrap
 BuildRequires:  java-devel
-BuildRequires:  jflex-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  xml-commons-apis-bootstrap
 BuildRequires:  xml-commons-resolver-bootstrap
@@ -47,8 +47,6 @@ BuildRequires:  xml-commons-resolver-bootstrap
 #!BuildIgnore:  xerces-j2
 #!BuildIgnore:  xml-commons-apis
 #!BuildIgnore:  xml-commons-resolver
-Obsoletes:      java-cup-bootstrap < %{version}-%{release}
-Provides:       java-cup-bootstrap = %{version}-%{release}
 Conflicts:      java-cup
 BuildArch:      noarch
 
@@ -62,14 +60,14 @@ java-cup is a LALR Parser Generator in Java. With v0.11, you can:
 * have Your own symbol classes
 
 %prep
-%setup -q -n cup-master
+%setup -q -n develop
 %patch1 -p1
-%setup -q -T -D -a 1 -n cup-master
+%setup -q -T -D -a 1 -n develop
 %patch2 -p1
-# remove all binary files
-find -name "*.class" -delete
-find -name "*.jar" -delete
-mkdir -p target/classes
+%patch4 -p1
+perl -pi -e 's/1\.2/1.6/g' build.xml
+mkdir -p classes dist
+cp %{SOURCE2} license.txt
 
 %build
 export CLASSPATH=
@@ -81,8 +79,8 @@ cp %{SOURCE2} license.txt
 %install
 # jar
 mkdir -p %{buildroot}%{_javadir}
-cp -a target/dist/%{real_name}-%{cvs_version}.jar %{buildroot}%{_javadir}/%{real_name}-%{version}.jar
-cp -a target/dist/%{real_name}-%{cvs_version}-runtime.jar %{buildroot}%{_javadir}/%{real_name}-runtime-%{version}.jar
+cp -a dist/%{real_name}-%{cvs_version}.jar %{buildroot}%{_javadir}/%{real_name}-%{version}.jar
+cp -a dist/%{real_name}-%{cvs_version}-runtime.jar %{buildroot}%{_javadir}/%{real_name}-runtime-%{version}.jar
 
 pushd %{buildroot}%{_javadir}
 for jar in *-%{version}*; do
@@ -97,14 +95,13 @@ mkdir -p %{buildroot}%{_bindir}
 install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 
 %files
-%doc changelog.txt license.txt
+%license license.txt
+%doc changelog.txt
 %attr(0755,root,root) %{_bindir}/%{real_name}
 %{_javadir}/*
 
 %changelog
 * Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.11-31
-- Update to version 0.11b, published 20210814
-- Clean up old/deprecated patches 
 - separate into bootstrap and non-bootstrap specs
 - License verified
 

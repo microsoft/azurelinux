@@ -7812,7 +7812,7 @@
         "other": {
           "name": "java-cup",
           "version": "0.11",
-          "downloadUrl": "https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
         }
       }
     },
@@ -7822,7 +7822,7 @@
         "other": {
           "name": "java-cup-bootstrap",
           "version": "0.11",
-          "downloadUrl": "https://versioncontrolseidl.in.tum.de/parsergenerators/cup/-/archive/master/cup-master.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
         }
       }
     },
