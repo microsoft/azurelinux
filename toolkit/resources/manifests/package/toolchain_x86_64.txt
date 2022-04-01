@@ -279,7 +279,7 @@ pcre-libs-8.45-2.cm2.x86_64.rpm
 perl-5.34.1-487.cm2.x86_64.rpm
 perl-Archive-Tar-2.38-487.cm2.noarch.rpm
 perl-Attribute-Handlers-1.01-465.cm2.noarch.rpm
-perl-autodie-2.32-487.cm2.noarch.rpm
+perl-autodie-2.34-487.cm2.noarch.rpm
 perl-AutoLoader-5.74-465.cm2.noarch.rpm
 perl-AutoSplit-5.74-465.cm2.noarch.rpm
 perl-autouse-1.11-465.cm2.noarch.rpm
@@ -328,7 +328,7 @@ perl-encoding-warnings-0.13-487.cm2.noarch.rpm
 perl-English-1.11-465.cm2.noarch.rpm
 perl-Env-1.04-465.cm2.noarch.rpm
 perl-Errno-1.30-465.cm2.x86_64.rpm
-perl-experimental-0.020-465.cm2.noarch.rpm
+perl-experimental-0.024-487.cm2.noarch.rpm
 perl-Exporter-5.74-465.cm2.noarch.rpm
 perl-ExtUtils-CBuilder-0.280234-465.cm2.noarch.rpm
 perl-ExtUtils-Command-7.44-465.cm2.noarch.rpm
@@ -408,7 +408,7 @@ perl-NEXT-0.67-465.cm2.noarch.rpm
 perl-Object-Accessor-0.48-8.cm2.noarch.rpm
 perl-ODBM_File-1.16-465.cm2.x86_64.rpm
 perl-Opcode-1.47-487.cm2.x86_64.rpm
-perl-open-1.12-465.cm2.noarch.rpm
+perl-open-1.12-487.cm2.noarch.rpm
 perl-overload-1.31-465.cm2.noarch.rpm
 perl-overloading-0.02-465.cm2.noarch.rpm
 perl-Params-Check-0.38-465.cm2.noarch.rpm
@@ -434,7 +434,7 @@ perl-SelectSaver-1.02-465.cm2.noarch.rpm
 perl-SelfLoader-1.26-465.cm2.noarch.rpm
 perl-sigtrap-1.09-487.cm2.noarch.rpm
 perl-Socket-2.029-465.cm2.x86_64.rpm
-perl-sort-2.04-465.cm2.noarch.rpm
+perl-sort-2.04-487.cm2.noarch.rpm
 perl-Storable-3.21-465.cm2.x86_64.rpm
 perl-subs-1.03-465.cm2.noarch.rpm
 perl-Symbol-1.08-465.cm2.noarch.rpm
@@ -458,7 +458,7 @@ perl-Thread-3.05-487.cm2.noarch.rpm
 perl-Thread-Queue-3.14-487.cm2.noarch.rpm
 perl-Thread-Semaphore-2.13-465.cm2.noarch.rpm
 perl-threads-2.26-487.cm2.x86_64.rpm
-perl-threads-shared-1.61-465.cm2.x86_64.rpm
+perl-threads-shared-1.62-487.cm2.x86_64.rpm
 perl-Tie-4.6-465.cm2.noarch.rpm
 perl-Tie-File-1.06-465.cm2.noarch.rpm
 perl-Tie-Memoize-1.1-465.cm2.noarch.rpm
@@ -474,7 +474,7 @@ perl-User-pwent-1.03-465.cm2.noarch.rpm
 perl-utils-5.34.1-487.cm2.noarch.rpm
 perl-vars-1.05-487.cm2.noarch.rpm
 perl-version-0.99.28-487.cm2.noarch.rpm
-perl-vmsish-1.04-465.cm2.noarch.rpm
+perl-vmsish-1.04-487.cm2.noarch.rpm
 perl-XML-Parser-2.46-2.cm2.x86_64.rpm
 perl-XML-Parser-debuginfo-2.46-2.cm2.x86_64.rpm
 pinentry-1.2.0-1.cm2.x86_64.rpm

@@ -103,7 +103,7 @@ libpipeline-devel-1.5.5-2.cm2.aarch64.rpm
 gdbm-1.21-1.cm2.aarch64.rpm
 gdbm-devel-1.21-1.cm2.aarch64.rpm
 gdbm-lang-1.21-1.cm2.aarch64.rpm
-perl-B-1.80-487.cm2.aarch64.rpm
+perl-B-1.82-487.cm2.aarch64.rpm
 perl-Carp-1.50-465.cm2.noarch.rpm
 perl-Class-Struct-0.66-465.cm2.noarch.rpm
 perl-Data-Dumper-2.174-465.cm2.aarch64.rpm
@@ -152,7 +152,7 @@ perl-libs-5.34.1-487.cm2.aarch64.rpm
 perl-locale-1.10-487.cm2.noarch.rpm
 perl-macros-5.34.1-487.cm2.noarch.rpm
 perl-mro-1.25-487.cm2.aarch64.rpm
-perl-overload-1.31-465.cm2.noarch.rpm
+perl-overload-1.33-487.cm2.noarch.rpm
 perl-overloading-0.02-465.cm2.noarch.rpm
 perl-parent-0.238-465.cm2.noarch.rpm
 perl-podlators-4.14-465.cm2.noarch.rpm
