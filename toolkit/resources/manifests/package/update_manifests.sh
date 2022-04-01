@@ -294,6 +294,7 @@ generate_pkggen_core () {
         grep "^dwz-" $TmpPkgGen
         grep "^unzip-" $TmpPkgGen
         grep "^python3-" $TmpPkgGen
+        grep "^python-unversioned-command-" $TmpPkgGen
         grep "^which-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
         grep "^slang-[0-9]" $TmpPkgGen
