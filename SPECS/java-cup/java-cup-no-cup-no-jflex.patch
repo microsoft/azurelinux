@@ -1,8 +1,8 @@
 diff --git a/build.xml b/build.xml
-index da94ed35..53f7b430 100644
+index b4ec6382..d017546f 100644
 --- a/build.xml
 +++ b/build.xml
-@@ -64,18 +64,7 @@
+@@ -40,18 +40,7 @@
      <delete dir="${dist}" />
    </target>
  
@@ -19,6 +19,6 @@ index da94ed35..53f7b430 100644
 -
 -  <target name="compile" depends="jflex">
 +  <target name="compile">
-     <replace file="${java}/java_cup/version.java"
-        token="+ version_str"
-        value='+ "v0.11b ${cupversion} (GIT ${svnversion})"'>
+     <copy todir="${java}"><fileset dir="${src}"></fileset></copy>
+     <javac srcdir="${java}" destdir="${classes}" verbose="off" listfiles="off" debug="on" source="1.2" target="1.2">
+       <classpath refid="libraries"/>
