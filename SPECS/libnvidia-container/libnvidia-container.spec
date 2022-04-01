@@ -21,6 +21,7 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  make
 BuildRequires:  rpcsvc-proto
 BuildRequires:  which
+BuildRequires:  golang
 
 %description
 The nvidia-container library provides an interface to configure GNU/Linux
