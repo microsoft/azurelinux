@@ -131,10 +131,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
 Source3:        macros.perl
-#Systemtap tapset and example that make use of systemtap-sdt-devel
-# build requirement. Written by lberk; Not yet upstream.
-#Source4:        perl.stp
-#Source5:        perl-example.stp
 # Tom Christiansen confirms Pod::Html uses the same license as perl
 Source6:        Pod-Html-license-clarification
 

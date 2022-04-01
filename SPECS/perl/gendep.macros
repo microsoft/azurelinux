@@ -199,7 +199,6 @@ Requires: perl(CPAN::Meta::Requirements) >= 2.121 \
 Requires: perl(CPAN::Meta::Validator) \
 Requires: perl(Carp) \
 Requires: perl(Exporter) \
-Requires: perl(Parse::CPAN::Meta) >= 1.4400 \
 Requires: perl(Parse::CPAN::Meta) >= 1.4414 \
 Requires: perl(Scalar::Util) \
 Requires: perl(strict) \
@@ -236,7 +235,6 @@ Requires: perl(Exporter) \
 Requires: perl(strict) \
 Requires: perl(warnings) \
 Provides: perl(Carp) = 1.52 \
-Provides: perl(Carp::Heavy) = 1.52 \
 Provides: perl(Carp::Heavy) = 1.52 \
 %{nil}
 %global gendep_perl_Class_Struct \
@@ -296,21 +294,6 @@ Provides: perl(DBM_Filter::encode) = 0.03 \
 Provides: perl(DBM_Filter::int32) = 0.03 \
 Provides: perl(DBM_Filter::null) = 0.03 \
 Provides: perl(DBM_Filter::utf8) = 0.03 \
-%{nil}
-%global gendep_perl_DB_File \
-Requires: perl(:VERSION) >= 5.8.3 \
-Requires: perl(Carp) \
-Requires: perl(Exporter) \
-Requires: perl(File::Spec) \
-Requires: perl(Tie::Hash) \
-Requires: perl(strict) \
-Requires: perl(warnings) \
-Provides: perl(DB_File) = 1.855 \
-Provides: perl(DB_File::BTREEINFO) \
-Provides: perl(DB_File::HASHINFO) \
-Provides: perl(DB_File::RECNOINFO) \
-%{nil}
-%global gendep_perl_DB_File_debuginfo \
 %{nil}
 %global gendep_perl_Data_Dumper \
 Requires: perl(:VERSION) >= 5.6.0 \
