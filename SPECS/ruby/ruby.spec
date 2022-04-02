@@ -1,24 +1,27 @@
 # The RubyGems library has to stay out of Ruby directory tree, since the
 # RubyGems should be share by all Ruby implementations.
-%global rubygems_dir %{_datadir}/rubygems
-%global ruby_libdir %{_datadir}/%{name}
-%global bigdecimal_version 3.1.1
-%global io_console_version 0.5.6
-%global irb_version        1.2.6
-%global json_version       2.3.0
-%global minitest_version   5.13.0
-%global rubygems_molinillo_version  0.5.7
-%global openssl_version    2.1.2
-%global power_assert_version  1.1.7
-%global psych_version      3.1.0
-%global rdoc_version       6.2.1.1
-%global rubygems_version   3.1.6
-%global test_unit_version  3.3.4
+%global rubygems_dir  %{_datadir}/rubygems
+%global ruby_libdir   %{_datadir}/%{name}
+
 %global gem_dir %{_libdir}/ruby/gems
+
+%global bigdecimal_version          3.1.1
+%global io_console_version          0.5.6
+%global irb_version                 1.2.6
+%global json_version                2.3.0
+%global minitest_version            5.13.0
+%global openssl_version             2.1.2
+%global power_assert_version        1.1.7
+%global psych_version               3.1.0
+%global rdoc_version                6.2.1.1
+%global rubygems_molinillo_version  0.5.7
+%global rubygems_version            3.1.6
+%global test_unit_version           3.3.4
+
 Summary:        Ruby
 Name:           ruby
 Version:        2.7.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,24 +54,13 @@ Provides:       %{_prefix}/local/bin/ruby
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}(release) = %{version}-%{release}
 Provides:       %{name}-libs = %{version}-%{release}
-Provides:       rubygems = %{version}-%{release}
-Provides:       rubygems-devel = %{version}-%{release}
-Provides:       ruby(rubygems) = %{version}-%{release}
 # TODO: When moving to Ruby 3.X for Mariner 2.0 release, these gemified stdlib
 # provides should be versioned according to the gem version.
 # More info: https://stdgems.org/
-Provides:       rubygem(bigdecimal) = %{version}-%{release}
-Provides:       rubygem(io-console) = %{version}-%{release}
-Provides:       rubygem(psych) = %{version}-%{release}
 Provides:       rubygem(did_you_mean) = %{version}-%{release}
 Provides:       rubygem(irb) = %{version}-%{release}
-Provides:       rubygem(json) = %{version}-%{release}
-Provides:       rubygem-bigdecimal = %{version}-%{release}
-Provides:       rubygem-io-console = %{version}-%{release}
-Provides:       rubygem-psych = %{version}-%{release}
 Provides:       rubygem-irb = %{version}-%{release}
 Provides:       rubygem-did_you_mean = %{version}-%{release}
-Provides:       rubygem-json = %{version}-%{release}
 
 %description
 The Ruby package contains the Ruby development environment.
@@ -81,8 +73,8 @@ License:        Ruby OR MIT
 Requires:       ruby(release)
 Recommends:     rubygem(io-console) >= %{io_console_version}
 Recommends:     rubygem(rdoc) >= %{rdoc_version}
-Provides:       gem = %{version}-%{release}
-Provides:       ruby(rubygems) = %{version}-%{release}
+Provides:       gem = %{rubygems_version}
+Provides:       ruby(rubygems) = %{rubygems_version}
 # https://github.com/rubygems/rubygems/pull/1189#issuecomment-121600910
 Provides:       bundled(rubygem-molinillo) = %{rubygems_molinillo_version}
 BuildArch:      noarch
@@ -95,7 +87,7 @@ libraries.
 Summary:        Macros and development tools for packaging RubyGems
 Version:        %{rubygems_version}
 License:        Ruby OR MIT
-Requires:       ruby(rubygems) >= %{version}-%{release}
+Requires:       ruby(rubygems) >= %{rubygems_version}
 # Needed for RDoc documentation format generation.
 Requires:       rubygem(json) >= %{json_version}
 Requires:       rubygem(rdoc) >= %{rdoc_version}
@@ -110,7 +102,7 @@ Version:        %{bigdecimal_version}
 License:        Ruby OR BSD
 Requires:       ruby(release)
 Requires:       ruby(rubygems) >= %{rubygems_version}
-Provides:       rubygem(bigdecimal) = %{version}-%{release}
+Provides:       rubygem(bigdecimal) = %{bigdecimal_version}
 
 %description -n rubygem-bigdecimal
 Ruby provides built-in support for arbitrary precision integer arithmetic.
@@ -130,7 +122,7 @@ Version:        %{minitest_version}
 License:        MIT
 Requires:       ruby(release)
 Requires:       ruby(rubygems) >= %{rubygems_version}
-Provides:       rubygem(minitest) = %{version}-%{release}
+Provides:       rubygem(minitest) = %{minitest_version}
 BuildArch:      noarch
 
 %description -n rubygem-minitest
@@ -149,7 +141,7 @@ Version:        %{io_console_version}
 License:        BSD-2-Clause OR Ruby
 Requires:       ruby(release)
 Requires:       ruby(rubygems) >= %{rubygems_version}
-Provides:       rubygem(io-console) = %{version}-%{release}
+Provides:       rubygem(io-console) = %{io_console_version}
 
 %description -n rubygem-io-console
 IO/Console provides very simple and portable access to console. It doesn't
@@ -162,7 +154,7 @@ Version:        %{json_version}
 License:        (Ruby OR GPLv2) AND UCD
 Requires:       ruby(release)
 Requires:       ruby(rubygems) >= %{rubygems_version}
-Provides:       rubygem(json) = %{version}-%{release}
+Provides:       rubygem(json) = %{json_version}
 
 %description -n rubygem-json
 This is a implementation of the JSON specification according to RFC 4627.
@@ -176,7 +168,7 @@ Version:        %{openssl_version}
 License:        Ruby OR BSD
 Requires:       ruby(release)
 Requires:       ruby(rubygems) >= %{rubygems_version}
-Provides:       rubygem(openssl) = %{version}-%{release}
+Provides:       rubygem(openssl) = %{openssl_version}
 
 %description -n rubygem-openssl
 OpenSSL provides SSL, TLS and general purpose cryptography. It wraps the
@@ -188,7 +180,7 @@ Version:        %{psych_version}
 License:        MIT
 Requires:       ruby(release)
 Requires:       ruby(rubygems) >= %{rubygems_version}
-Provides:       rubygem(psych) = %{version}-%{release}
+Provides:       rubygem(psych) = %{psych_version}
 
 %description -n rubygem-psych
 Psych is a YAML parser and emitter. Psych leverages
@@ -202,7 +194,7 @@ Version:        %{power_assert_version}
 License:        Ruby OR BSD
 Requires:       ruby(release)
 Requires:       ruby(rubygems) >= %{rubygems_version}
-Provides:       rubygem(power_assert) = %{version}-%{release}
+Provides:       rubygem(power_assert) = %{power_assert_version}
 BuildArch:      noarch
 
 %description -n rubygem-power_assert
@@ -220,9 +212,9 @@ Requires:       ruby(rubygems) >= %{rubygems_version}
 Requires:       rubygem(io-console) >= %{io_console_version}
 Requires:       rubygem(json) >= %{json_version}
 Requires:       rubygem(psych) >= %{psych_version}
-Provides:       rdoc = %{version}-%{release}
-Provides:       ri = %{version}-%{release}
-Provides:       rubygem(rdoc) = %{version}-%{release}
+Provides:       rdoc = %{rdoc_version}
+Provides:       ri = %{rdoc_version}
+Provides:       rubygem(rdoc) = %{rdoc_version}
 BuildArch:      noarch
 
 %description -n rubygem-rdoc
@@ -239,7 +231,7 @@ License:        (Ruby OR BSD) AND (Ruby OR BSD OR Python) AND (Ruby OR BSD OR LG
 Requires:       ruby(release)
 Requires:       ruby(rubygems) >= %{rubygems_version}
 Requires:       rubygem(power_assert)
-Provides:       rubygem(test-unit) = %{version}-%{release}
+Provides:       rubygem(test-unit) = %{test_unit_version}
 BuildArch:      noarch
 
 %description -n rubygem-test-unit
@@ -302,7 +294,7 @@ install -m 755 %{SOURCE6} %{buildroot}%{_rpmconfigdir}
 # Install bigdecimal
 mkdir -p %{buildroot}%{gem_dir}/gems/bigdecimal-%{bigdecimal_version}/lib
 mkdir -p %{buildroot}%{_libdir}/gems/%{name}/bigdecimal-%{bigdecimal_version}/bigdecimal
-mv %{buildroot}%{_libdir}/ruby/bigdecimal %{buildroot}%{gem_dir}/gems/bigdecimal-%{bigdecimal_version}/lib
+mv %{buildroot}%{_libdir}/ruby/bigdecimal %{buildroot}%{gem_dir}/gems/bigdecimal-%{bigd1.0.20220331-1.0ecimal_version}/lib
 touch %{buildroot}%{_libdir}/gems/%{name}/bigdecimal-%{bigdecimal_version}/gem.build_complete
 ln -s %{gem_dir}/gems/bigdecimal-%{bigdecimal_version}/lib/bigdecimal %{buildroot}%{_libdir}/ruby/bigdecimal
 
@@ -459,6 +451,9 @@ sudo -u test make test TESTS="-v"
 %doc %{gem_dir}/gems/test-unit-%{test_unit_version}/doc
 
 %changelog
+* Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-4
+- Fixing "Provides".
+
 * Fri Mar 25 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.7.4-3
 - Build rubygem, openssl, io-console, json, psych rubygems (taken from Fedora 33, license: MIT)
 

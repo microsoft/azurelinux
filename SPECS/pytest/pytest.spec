@@ -1,7 +1,7 @@
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Name:           pytest
 Version:        3.8.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,9 +40,13 @@ pytest framework makes it easy to write small tests, yet scales to support compl
 
 %install
 %py3_install
+
 mv %{buildroot}%{_bindir}/pytest %{buildroot}%{_bindir}/pytest%{python3_version}
+ln -snf pytest%{python3_version} %{buildroot}%{_bindir}/pytest
 ln -snf pytest%{python3_version} %{buildroot}%{_bindir}/pytest3
+
 mv %{buildroot}%{_bindir}/py.test %{buildroot}%{_bindir}/py.test%{python3_version}
+ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test
 ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 
 %check
@@ -51,13 +55,14 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 %files -n python3-pytest
 %defattr(-,root,root,-)
 %license LICENSE
-%{_bindir}/pytest3
-%{_bindir}/pytest%{python3_version}
-%{_bindir}/py.test3
-%{_bindir}/py.test%{python3_version}
+%{_bindir}/pytest*
+%{_bindir}/py.test*
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.2-9
+- Adding missing links to `/usr/bin/pytest' and '/usr/bin/py.test' to fix the '%pytest' macro.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.8.2-8
 - Add license to python3 package
 - Remove python2 package

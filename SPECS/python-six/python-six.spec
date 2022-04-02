@@ -1,43 +1,26 @@
-%{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
+Summary:        Python 2 and 3 compatibility utilities
 Name:           python-six
 Version:        1.16.0
-Release:        1%{?dist}
-Summary:        Python 2 and 3 compatibility utilities
+Release:        2%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
-Url:            https://pypi.org/project/six/
-#Source0:       https://pypi.python.org/packages/source/s/six/six-%{version}.tar.gz
-Source0:        six-%{version}.tar.gz
-
-BuildRequires:  python2
-BuildRequires:  python2-libs
-BuildRequires:  python-setuptools
-BuildRequires:  python3
+URL:            https://pypi.org/project/six/
+Source0:        https://pypi.python.org/packages/source/s/six/six-%{version}.tar.gz
 BuildRequires:  python3-devel
-BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 %if %{with_check}
 BuildRequires:  openssl-devel
 BuildRequires:  curl-devel
 BuildRequires:  python3-pip
 %endif
-Requires:       python2
-Requires:       python2-libs
-
-Provides:       python2-six = %{version}-%{release}
-
 BuildArch:      noarch
 
 %description
 Six is a Python 2 and 3 compatibility library. It provides utility functions for smoothing over the differences between the Python versions with the goal of writing Python code that is compatible on both Python versions. 
 
 %package -n     python3-six
-Summary:        python-six
+Summary:        Python 2 and 3 compatibility utilities
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-six
 
@@ -47,29 +30,25 @@ Python 3 version.
 %setup -n six-%{version}
 
 %build
-python2 setup.py build
-python3 setup.py build
+%py3_build
 
 %install
-python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%py3_install
 
 %check
 export LANG=C.UTF-8
-pip install pytest
+pip3 install pytest
 %pytest test_six.py
 
-
-%files
-%defattr(-,root,root,-)
-%license LICENSE
-%{python2_sitelib}/*
-
 %files -n python3-six
-%defattr(-,root,root,-)
+%license LICENSE
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.16.0-2
+- Remove python2 package
+- Add license file to the python3 subpackage
+
 * Thu Feb 10 2022 Muhammad Falak <mwani@microsft.com>- 1.16.0-1
 - Bump verstion to 1.16.0
 - Add an explicit BR on `pip`

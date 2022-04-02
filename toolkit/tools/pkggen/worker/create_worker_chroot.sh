@@ -22,7 +22,7 @@ chroot_log="$log_path"/$chroot_name.log
 install_one_toolchain_rpm () {
     error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"
 
-    echo "Adding RPM to worker chroot: $1."  | tee -a "$chroot_log"
+    echo "Adding RPM to worker chroot: $1." | tee -a "$chroot_log"
 
     full_rpm_path=$(find "$rpm_path" -name "$1" -type f 2>>"$chroot_log")
     if [ ! $? -eq 0 ] || [ -z "$full_rpm_path" ]
@@ -55,7 +55,7 @@ while read -r package || [ -n "$package" ]; do
 done < "$packages"
 
 TEMP_DB_PATH=/temp_db
-echo "Setting up a clean RPM database before the Berkeley DB -> SQLite conversion under '$TEMP_DB_PATH'."  | tee -a "$chroot_log"
+echo "Setting up a clean RPM database before the Berkeley DB -> SQLite conversion under '$TEMP_DB_PATH'." | tee -a "$chroot_log"
 chroot "$chroot_builder_folder" mkdir -p "$TEMP_DB_PATH"
 chroot "$chroot_builder_folder" rpm --initdb --dbpath="$TEMP_DB_PATH"
 
@@ -64,15 +64,22 @@ while read -r package || [ -n "$package" ]; do
     full_rpm_path=$(find "$rpm_path" -name "$package" -type f 2>>"$chroot_log")
     cp $full_rpm_path $chroot_builder_folder/$package
 
-    echo "Adding RPM DB entry to worker chroot: $package."  | tee -a "$chroot_log"
+    echo "Adding RPM DB entry to worker chroot: $package." | tee -a "$chroot_log"
 
     chroot "$chroot_builder_folder" rpm -i -v --nodeps --noorder --force --dbpath="$TEMP_DB_PATH" --justdb "$package" &>> "$chroot_log"
     chroot "$chroot_builder_folder" rm $package
 done < "$packages"
 
-echo "Overwriting old RPM database with the results of the conversion."  | tee -a "$chroot_log"
+echo "Overwriting old RPM database with the results of the conversion." | tee -a "$chroot_log"
 chroot "$chroot_builder_folder" rm -rf /var/lib/rpm
 chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
+
+echo "Importing CBL-Mariner GPG keys." | tee -a "$chroot_log"
+for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l mariner-repos-shared | grep "rpm-gpg")
+do
+    echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
+    chroot "$chroot_builder_folder" rpm --import "$gpg_key"
+done
 
 HOME=$ORIGINAL_HOME
 
