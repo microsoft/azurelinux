@@ -2,6 +2,7 @@ Name:           perl-IO-Tty
 Version:        1.14
 Release:        4%{?dist}
 Summary:        Perl interface to pseudo tty's
+# Mostly licensed same as Perl. IO-Tty-1.14/Tty.xs is licensed under BSD.
 License:        (GPL+ or Artistic) and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,7 +57,8 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 make test
 
 %files
-%doc ChangeLog README.md
+%license README.md
+%doc ChangeLog
 %{perl_vendorarch}/auto/IO/
 %{perl_vendorarch}/IO/
 %{_mandir}/man3/IO::Pty.3*

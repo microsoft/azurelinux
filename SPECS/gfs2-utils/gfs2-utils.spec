@@ -60,8 +60,8 @@ The gfs2-utils package contains a number of utilities for creating, checking,
 modifying, and correcting inconsistencies in GFS2 file systems.
 
 %files
-%doc doc/COPYING.* doc/COPYRIGHT doc/*.txt
-%doc doc/README.contributing doc/README.licence
+%license doc/COPYING.* doc/README.licence doc/COPYRIGHT
+%doc doc/README.contributing doc/*.txt
 %{_sbindir}/fsck.gfs2
 %{_sbindir}/gfs2_grow
 %{_sbindir}/gfs2_jadd

@@ -38,7 +38,8 @@ make install \
   INSTALL='install -p'
 
 %files
-%doc hexedit-%{version}.lsm COPYING Changes  
+%license COPYING
+%doc hexedit-%{version}.lsm Changes  
 %{_bindir}/hexedit
 %{_mandir}/man1/hexedit.1*
 

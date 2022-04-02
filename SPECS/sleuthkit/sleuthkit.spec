@@ -7,7 +7,7 @@ Version:        4.9.0
 Release:        4%{?dist}
 Summary:        The Sleuth Kit (TSK)
 
-License:        CPL and IBM and GPLv2+
+License:        BSD and CPL and GPLv2+ and IBM and MIT
 URL:            http://www.sleuthkit.org
 Source0:        https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-%{version}/sleuthkit-%{version}.tar.gz
 
@@ -89,8 +89,6 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_bindir}/blkcat
 %{_bindir}/blkls
 %{_bindir}/blkstat
-#{_bindir}/disk_sreset
-#{_bindir}/disk_stat
 #fcat conflicts with freeze fcat
 %exclude %{_bindir}/fcat
 %{_bindir}/ffind
@@ -129,8 +127,6 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_mandir}/man1/blkcat.1*
 %{_mandir}/man1/blkls.1*
 %{_mandir}/man1/blkstat.1*
-#{_mandir}/man1/disk_sreset.1*
-#{_mandir}/man1/disk_stat.1*
 %exclude %{_mandir}/man1/fcat.1*
 %{_mandir}/man1/ffind.1*
 %{_mandir}/man1/fls.1*

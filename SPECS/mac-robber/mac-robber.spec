@@ -5,7 +5,7 @@ Version:        1.02
 Release:        23%{?dist}
 Summary:        Tool to create a timeline of file activity for mounted file systems
 
-License:        GPLv2+
+License:        GPLv2
 URL:            http://sourceforge.net/projects/mac-robber/
 Source0:        http://downloads.sourceforge.net/mac-robber/mac-robber-%{version}.tar.gz
 

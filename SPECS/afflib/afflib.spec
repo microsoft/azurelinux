@@ -5,7 +5,7 @@ Version:        3.7.19
 Release:        6%{?dist}
 Summary:        Library to support the Advanced Forensic Format
 
-License:        BSD with advertising
+License:        BSD with advertising and Public Domain
 URL:            https://github.com/sshock/AFFLIBv3
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

@@ -29,8 +29,8 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 
 %files
-%doc DISCLAIMER COPYING
-%doc README ChangeLog
+%license COPYING
+%doc DISCLAIMER README ChangeLog
 %{_bindir}/scrub
 %{_mandir}/man1/scrub.1*
 

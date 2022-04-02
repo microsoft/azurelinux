@@ -6,9 +6,9 @@ Version:        20140608
 Release:        22%{?dist}
 Summary:        Library for the Expert Witness Compression Format (EWF)
 
-License:        LGPLv3+
-URL:            http://sourceforge.net/projects/libewf/
-Source0:        https://53efc0a7187d0baa489ee347026b8278fe4020f6.googledrive.com/host/0B3fBvzttpiiSMTdoaVExWWNsRjg/%{name}-%{version}.tar.gz
+License:        LGPLv3
+URL:            https://github.com/libyal/libewf
+Source0:        https://github.com/libyal/legacy/raw/main/%{name}/%{name}-%{version}.tar.gz
 
 
 BuildRequires:  make

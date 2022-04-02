@@ -59,11 +59,7 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes README.md examples/ tutorial/
 %{perl_vendorlib}/Expect.pm
 %{_mandir}/man3/Expect.3*
