@@ -14,7 +14,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/mirage/alcotest
 Source0:        %{URL}/archive/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
-# We neither need nor want the stdlib-shims package in Fedora.  It is a forward
+# We neither need nor want the stdlib-shims package.  It is a forward
 # compatibility package for older OCaml installations.  Patch it out instead.
 # Upstream does not want this patch until stdlib-shims is obsolete.
 Patch0:         0001-Drop-the-stdlib-shims-subpackage.patch

@@ -18,7 +18,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/gildor478/ounit
 Source0:        %{url}/releases/download/v%{version}/%{srcname}-v%{version}.tbz
-# We neither need nor want the stdlib-shims package in Fedora.  It is a forward
+# We neither need nor want the stdlib-shims package.  It is a forward
 # compatibility package for older OCaml installations.  Patch it out instead.
 # Upstream does not want this patch until stdlib-shims is obsolete.
 Patch0:         %{name}-stdlib-shims.patch

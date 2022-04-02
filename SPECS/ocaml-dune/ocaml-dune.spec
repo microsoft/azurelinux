@@ -146,7 +146,7 @@ cp -ar README.md CHANGES.md MIGRATION.md doc/_build/* %{buildroot}%{_pkgdocdir}/
 %if %{with menhir}
 %check
 # These are the only tests we can run.  The others require components that
-# either depend on dune themselves or are not available in Fedora at all.
+# either depend on dune themselves or are not available at all.
 %{buildroot}%{_bindir}/dune runtest test/unit-tests
 %endif
 

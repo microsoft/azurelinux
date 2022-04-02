@@ -51,7 +51,7 @@ dune build %{?_smp_mflags}
 dune build %{?_smp_mflags} @doc
 %endif
 
-# Relink the stublib with Fedora flags
+# Relink the stublib with Mariner flags
 cd _build/default/src
 ocamlmklib -g -ldopt "%{build_ldflags}" -o integers_stubs \
   $(ar t libintegers_stubs.a)

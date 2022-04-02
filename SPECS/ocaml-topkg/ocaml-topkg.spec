@@ -1,9 +1,8 @@
 %global srcname topkg
 
 # BOOTSTRAP NOTE: currently we do not build the optional topkg-care part.
-# It has dependencies which do not yet exist in Fedora, and which themselves
-# depend on the main part of this package.  Once the dependencies have been
-# added to Fedora, we will build topkg-care in non-bootstrap builds.
+# It has dependencies which do not yet exist in Mariner, and which themselves
+# depend on the main part of this package.
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif

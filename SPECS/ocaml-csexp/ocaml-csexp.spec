@@ -141,7 +141,7 @@ cat >> %{buildroot}%{_libdir}/ocaml/%{srcname}/dune-package << EOF
 EOF
 %endif
 
-# Cannot do this until ocaml-ppx-expect is available in Fedora.
+# Cannot do this until ocaml-ppx-expect is available.
 #%%if %%{with dune}
 #%%check
 #dune runtest

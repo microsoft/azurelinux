@@ -13,7 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://erratique.ch/software/fmt
 Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%{version}.tar.gz
-# We neither need nor want the stdlib-shims package in Fedora.  It is a forward
+# We neither need nor want the stdlib-shims package.  It is a forward
 # compatibility package for older OCaml installations.  Patch it out instead.
 # Upstream does not want this patch until stdlib-shims is obsolete.
 Patch0:         %{name}-stdlib-shims.patch

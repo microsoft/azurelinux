@@ -14,7 +14,7 @@ Distribution:   Mariner
 URL:            https://erratique.ch/software/uutf
 Source0:        https://github.com/dbuenzli/uutf/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # The uchar package is a forward compatibility package for OCaml versions prior
-# to 4.03.  We have a later OCaml in Fedora; uchar is in the standard library.
+# to 4.03.  We have a later OCaml in Mariner; uchar is in the standard library.
 # Therefore, remove references to the compatibility package.
 Patch0:         %{name}-uchar.patch
 

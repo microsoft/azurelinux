@@ -1,7 +1,6 @@
 # TESTING NOTE: The ppx_jane module is needed to run the tests.  However,
 # ppx_jane transitively requires this module.  Therefore, we cannot run the
-# tests at all until we are able to add ppx_jane to Fedora, and even then we
-# will only be able to run the tests in non-bootstrap mode.
+# tests at all until we are able to add ppx_jane.
 %global srcname base
 
 Summary:        Jane Street standard library for OCaml
