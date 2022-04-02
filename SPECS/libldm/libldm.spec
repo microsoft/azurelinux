@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libldm
 Version:        0.2.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        A tool to manage Windows dynamic disks
 
 License:        LGPLv3+ and GPLv3+
@@ -70,6 +70,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.4-9
+- Cleaning-up spec. License verified.
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.4-8
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.

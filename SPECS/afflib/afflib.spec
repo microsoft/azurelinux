@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           afflib
 Version:        3.7.19
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Library to support the Advanced Forensic Format
 
 License:        BSD with advertising
@@ -141,6 +141,9 @@ cd pyaff
 %{python3_sitearch}/pyaff*
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.19-6
+- Cleaning-up spec. License verified.
+
 * Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.19-5
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove Python 2 support

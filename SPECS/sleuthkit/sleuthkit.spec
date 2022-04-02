@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           sleuthkit
 Version:        4.9.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        The Sleuth Kit (TSK)
 
 License:        CPL and IBM and GPLv2+
@@ -169,6 +169,9 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9.0-4
+- Cleaning-up spec. License verified.
+
 * Wed Nov 03 2021 Muhammad Falak <mwani@microsft.com> - 4.9.0-3
 - Remove epoch
 

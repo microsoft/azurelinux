@@ -3,7 +3,7 @@ Distribution:   Mariner
 
 Name:           libewf
 Version:        20140608
-Release:        21%{?dist}
+Release:        22%{?dist}
 Summary:        Library for the Expert Witness Compression Format (EWF)
 
 License:        LGPLv3+
@@ -96,6 +96,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_mandir}/man3/*.gz
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20140608-22
+- Cleaning-up spec. License verified.
+
 * Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 20140608-21
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove Python 2 support

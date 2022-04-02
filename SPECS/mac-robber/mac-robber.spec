@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           mac-robber
 Version:        1.02
-Release:        22%{?dist}
+Release:        23%{?dist}
 Summary:        Tool to create a timeline of file activity for mounted file systems
 
 License:        GPLv2+
@@ -40,6 +40,9 @@ install -pm 0755 mac-robber %{buildroot}%{_bindir}
 
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.02-23
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.02-22
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 

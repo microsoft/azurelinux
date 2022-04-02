@@ -1,6 +1,6 @@
 Name:           execstack
 Version:        0.5.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 Summary:        Utility to set/clear/query executable stack bit
 
 %global commit 4c79120bcdbde0616f592458ccde7035e92ca3d8
@@ -58,6 +58,9 @@ install -Dm0644 doc/execstack.8 %{buildroot}%{_mandir}/man8/execstack.8
 %{_mandir}/man8/execstack.8.*
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-20
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

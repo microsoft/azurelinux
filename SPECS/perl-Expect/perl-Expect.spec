@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:		perl-Expect
 Version:	1.35
-Release:	12%{?dist}
+Release:	13%{?dist}
 Summary:	Expect for Perl
 License:	GPL+ or Artistic
 URL:		https://metacpan.org/release/Expect
@@ -69,6 +69,9 @@ make test
 %{_mandir}/man3/Expect.3*
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35-13
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

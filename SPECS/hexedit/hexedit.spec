@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: A hexadecimal file viewer and editor
 Name: hexedit
 Version: 1.2.13
-Release: 18%{?dist}
+Release: 19%{?dist}
 License: GPLv2+
 
 URL: http://rigaux.org/hexedit.html
@@ -43,6 +43,9 @@ make install \
 %{_mandir}/man1/hexedit.1*
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.13-19
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.13-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

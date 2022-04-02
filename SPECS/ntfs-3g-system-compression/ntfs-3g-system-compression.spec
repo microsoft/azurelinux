@@ -3,7 +3,7 @@ Distribution:   Mariner
 Name:     ntfs-3g-system-compression
 Summary:  NTFS-3G plugin for reading "system compressed" files
 Version:  1.0
-Release:  4%{?dist}
+Release:  5%{?dist}
 License:  GPLv2+
 URL:      https://github.com/ebiggers/ntfs-3g-system-compression
 Source0:  https://github.com/ebiggers/ntfs-3g-system-compression/archive/v%{version}/ntfs-3g-system-compression-%{version}.tar.gz
@@ -46,6 +46,9 @@ rm -rf %{buildroot}%{_libdir}/ntfs-3g/*.la
 %{_libdir}/ntfs-3g/ntfs-plugin-80000017.so
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-5
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

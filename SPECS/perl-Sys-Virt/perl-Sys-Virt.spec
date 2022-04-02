@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Sys-Virt
 Version:        6.1.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Represent and manage a libvirt hypervisor connection
 License:        GPLv2+ or Artistic
 URL:            https://metacpan.org/release/Sys-Virt
@@ -68,6 +68,9 @@ perl Build.PL installdirs=vendor
 %{_mandir}/man3/*
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-4
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 6.1.0-3
 - Only pull in test dependencies during check builds
 - License verified

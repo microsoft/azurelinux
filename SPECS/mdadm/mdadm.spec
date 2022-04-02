@@ -2,7 +2,7 @@
 Summary:        The mdadm program controls Linux md devices (software RAID arrays)
 Name:           mdadm
 Version:        4.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -96,6 +96,9 @@ install -m644 %{SOURCE6} %{buildroot}%{_sysconfdir}/libreport/events.d
 %endif
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-8
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 4.1-7
 - Disable usage of libreport by default
 - License verified

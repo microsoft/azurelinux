@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary:        Utility to force unused ext2/3/4 inodes and blocks to zero
 Name:           zerofree
 Version:        1.1.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 
 URL:            https://frippery.org/uml/
@@ -61,6 +61,9 @@ install -D -p -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_mandir}/man8/zerofree.8
 
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-7
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -3,7 +3,7 @@ Distribution:   Mariner
 %define _hardened_build 1
 Name:             zfs-fuse
 Version:          0.7.2.2
-Release:          16%{?dist}
+Release:          17%{?dist}
 Summary:          ZFS ported to Linux FUSE
 License:          CDDL
 URL:              https://github.com/gordan-bobic/zfs-fuse
@@ -127,6 +127,9 @@ rm -rf /var/lock/zfs
 %{_mandir}/man8/zstreamdump.8.gz
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2.2-17
+- Cleaning-up spec. License verified.
+
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.2.2-16
 - Remove copying of RPM's config.guess/config.sub into build dir (not shipped by RPM anymore)
 - Update Source0 URL

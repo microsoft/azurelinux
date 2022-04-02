@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:		scrub
 Version:	2.5.2
-Release:	17%{?dist}
+Release:	18%{?dist}
 Summary:	Disk scrubbing program
 License:	GPLv2+
 URL:		https://code.google.com/archive/p/diskscrub
@@ -35,6 +35,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man1/scrub.1*
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.2-18
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.2-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

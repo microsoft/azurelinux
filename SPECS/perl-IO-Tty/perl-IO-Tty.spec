@@ -1,6 +1,6 @@
 Name:           perl-IO-Tty
 Version:        1.14
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Perl interface to pseudo tty's
 License:        (GPL+ or Artistic) and BSD
 Vendor:         Microsoft Corporation
@@ -64,6 +64,9 @@ make test
 %{_mandir}/man3/IO::Tty::Constant.3*
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14-4
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

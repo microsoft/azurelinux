@@ -14,7 +14,7 @@ Distribution:   Mariner
 
 Name: gfs2-utils
 Version: 3.2.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPLv2+ and LGPLv2+
 Summary: Utilities for managing the global file system (GFS2)
 %ifnarch %{arm}
@@ -77,6 +77,9 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 %{_prefix}/lib/udev/rules.d/82-gfs2-withdraw.rules
 
 %changelog
+* Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.0-9
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.0-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
