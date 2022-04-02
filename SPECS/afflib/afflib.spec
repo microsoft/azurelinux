@@ -1,48 +1,38 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Library to support the Advanced Forensic Format
 Name:           afflib
 Version:        3.7.19
 Release:        6%{?dist}
-Summary:        Library to support the Advanced Forensic Format
-
-License:        BSD with advertising and Public Domain
+License:        BSD WITH advertising AND Public Domain
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/sshock/AFFLIBv3
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:  gcc-c++
-BuildRequires:  libtool
-
 BuildRequires:  curl-devel
 BuildRequires:  expat-devel
+BuildRequires:  gcc-c++
+BuildRequires:  libtool
+BuildRequires:  make
 # GPLv2 FOSS incompatible with BSD with advertising
-##BuildRequires:  fuse-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
-# GPLv2 FOSS incompatible with BSD with advertising
-##BuildRequires:  readline-devel
-#BuildRequires:  libedit-devel - good replacement for readline - not supported for now
-BuildRequires:  zlib-devel
-BuildRequires: make
 BuildRequires:  python3
+BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-Cython
-
-
+BuildRequires:  zlib-devel
 
 # Afflib format uses lzma-SDK 443
-Provides: bundled(lzma) = 443
-
-
+Provides:       bundled(lzma) = 443
 
 %description
 AFF® is an open and extensible file format designed to store disk images and
 associated metadata.
 afflib is library for support of the Advanced Forensic Format (AFF).
 
-
 %package -n     afftools
 Summary:        Utilities for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n afftools
@@ -50,34 +40,27 @@ The %{name}-utils package contains utilities for using %{name}.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       openssl-devel
-Requires:       pkgconfig
+Requires:       pkg-config
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %package -n python%{python3_pkgversion}-pyaff
+%{?python_provide:%python_provide python%{python3_pkgversion}-pyaff}
 Summary:        Python3 binding for the AFFLIB
 Group:          Development/Libraries
-%{?python_provide:%python_provide python%{python3_pkgversion}-pyaff}
-
-
 
 %description -n python%{python3_pkgversion}-pyaff
 Python3 bindings for AFFLIB.
 These bindings currently support a read-only file-like interface to AFFLIB and
 basic metadata accessor functions. The binding is not currently complete.
 
-
-
-
-
 %prep
 %autosetup -p1 -n AFFLIBv3-%{version}
-# prevent internal lzma to be built - testing
-#rm -rf lzma443
 
 #fix spurious permissions with lzma443
 find lzma443 -type f -exec chmod 0644 {} ';'
@@ -106,17 +89,14 @@ cd pyaff
 %global py_setup_args build_ext --include-dirs %{_builddir}/AFFLIBv3-%{version}/include --library-dirs %{_builddir}/AFFLIBv3-%{version}/lib/.libs
 %py3_build
 
-
 %install
 %make_install
-find %{buildroot} -name '*.la' -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 cd pyaff
 %py3_install
 
-
 %ldconfig_scriptlets
-
 
 %files
 %doc AUTHORS BUGLIST.txt ChangeLog NEWS README
@@ -445,4 +425,3 @@ cd pyaff
 
 * Fri Nov  2 2007 kwizart < kwizart at gmail.com > - 2.4.0-1
 - Initial package for Fedora
-

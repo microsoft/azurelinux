@@ -1,20 +1,18 @@
+Summary:        A hexadecimal file viewer and editor
+Name:           hexedit
+Version:        1.2.13
+Release:        19%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: A hexadecimal file viewer and editor
-Name: hexedit
-Version: 1.2.13
-Release: 19%{?dist}
-License: GPLv2+
-
-URL: http://rigaux.org/hexedit.html
-Source: http://rigaux.org/%{name}-%{version}.src.tgz
-
-Patch1: hexedit-1.2.13-config.patch
+URL:            http://rigaux.org/hexedit.html
+Source:         http://rigaux.org/%{name}-%{version}.src.tgz
+Patch1:         hexedit-1.2.13-config.patch
 # Document --color option.  Sent upstream 2013-04-05.
-Patch2: hexedit-man-page-color.patch
+Patch2:         hexedit-man-page-color.patch
 
-BuildRequires: ncurses-devel
-BuildRequires: gcc
+BuildRequires:  gcc
+BuildRequires:  ncurses-devel
 
 %description
 Hexedit shows a file both in ASCII and in hexadecimal. The file can be a device
@@ -33,13 +31,13 @@ make %{_smp_mflags}
 
 %install
 make install \
-  mandir=$RPM_BUILD_ROOT%{_mandir} \
-  bindir=$RPM_BUILD_ROOT%{_bindir} \
+  mandir=%{buildroot}%{_mandir} \
+  bindir=%{buildroot}%{_bindir} \
   INSTALL='install -p'
 
 %files
 %license COPYING
-%doc hexedit-%{version}.lsm Changes  
+%doc hexedit-%{version}.lsm Changes
 %{_bindir}/hexedit
 %{_mandir}/man1/hexedit.1*
 

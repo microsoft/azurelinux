@@ -1,21 +1,23 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        A tool to manage Windows dynamic disks
 Name:           libldm
 Version:        0.2.4
 Release:        9%{?dist}
-Summary:        A tool to manage Windows dynamic disks
-
-License:        LGPLv3+ and GPLv3+
-URL:            https://github.com/mdbooth/libldm 
+License:        LGPLv3+ AND GPLv3+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/mdbooth/libldm
 Source0:        https://github.com/mdbooth/libldm/archive/%{name}-%{version}.tar.gz
 
 BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  autoconf, automake, libtool
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  device-mapper-devel >= 1.0
 BuildRequires:  glib2-devel >= 2.26.0
 BuildRequires:  json-glib-devel >= 0.14.0
-BuildRequires:  device-mapper-devel >= 1.0
-BuildRequires:  zlib-devel libuuid-devel readline-devel
-
+BuildRequires:  libtool
+BuildRequires:  libuuid-devel
+BuildRequires:  readline-devel
+BuildRequires:  zlib-devel
 
 %description
 libldm is a library for managing Microsoft Windows dynamic disks, which use
@@ -25,7 +27,6 @@ exposes this functionality as a command-line tool.
 
 libldm is released under LGPLv3+. ldmtool is released under GPLv3+.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -33,7 +34,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
@@ -48,26 +48,21 @@ autoreconf -i
 %configure --disable-static --disable-gtk-doc
 make %{?_smp_mflags} V=1
 
-
 %install
 %make_install
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
-
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
-
 
 %files
 %license COPYING.lgpl COPYING.gpl
 %{_libdir}/*.so.*
 %{_bindir}/ldmtool
 
-
 %files devel
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/ldm-1.0.pc
-
 
 %changelog
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.4-9

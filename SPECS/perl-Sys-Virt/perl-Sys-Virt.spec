@@ -1,12 +1,13 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Represent and manage a libvirt hypervisor connection
 Name:           perl-Sys-Virt
 Version:        6.1.0
 Release:        4%{?dist}
-Summary:        Represent and manage a libvirt hypervisor connection
-License:        GPLv2+ or Artistic
+License:        GPLv2+ OR Artistic
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://metacpan.org/release/Sys-Virt
-Source0:        https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v%{version}.tar.gz#/perl-Sys-Virt-v%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
+
 # Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -16,27 +17,30 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  sed
 BuildRequires:  perl(ExtUtils::CBuilder)
 BuildRequires:  perl(Module::Build)
-BuildRequires:  sed
+BuildRequires:  perl(XSLoader)
+
 # Runtime
 BuildRequires:  perl(overload)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-BuildRequires:  perl(XSLoader)
+
 %if %{with_check}
-# Tests only
-BuildRequires:  perl(base)
 BuildRequires:  perl(Sys::Hostname)
+# Optional tests only
+BuildRequires:  perl(Test::CPAN::Changes)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
 BuildRequires:  perl(Time::HiRes)
 BuildRequires:  perl(XML::XPath)
 BuildRequires:  perl(XML::XPath::XMLParser)
-# Optional tests only
-BuildRequires:  perl(Test::CPAN::Changes)
-BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
+# Tests only
+BuildRequires:  perl(base)
 %endif
+
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 
 %description
@@ -53,9 +57,9 @@ perl Build.PL installdirs=vendor
 ./Build
 
 %install
-./Build install destdir=$RPM_BUILD_ROOT create_packlist=0
+./Build install destdir=%{buildroot} create_packlist=0
 
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{_fixperms} %{buildroot}/*
 
 %check
 ./Build test

@@ -1,40 +1,45 @@
+Summary:        Expect for Perl
+Name:           perl-Expect
+Version:        1.35
+Release:        13%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		perl-Expect
-Version:	1.35
-Release:	13%{?dist}
-Summary:	Expect for Perl
-License:	GPL+ or Artistic
-URL:		https://metacpan.org/release/Expect
-Source0:	https://cpan.metacpan.org/modules/by-module/Expect/Expect-%{version}.tar.gz#/perl-Expect-%{version}.tar.gz
-BuildArch:	noarch
+URL:            https://metacpan.org/release/Expect
+Source0:        https://cpan.metacpan.org/modules/by-module/Expect/Expect-%{version}.tar.gz#/perl-Expect-%{version}.tar.gz
+
+BuildArch:      noarch
+
 # Module Build
-BuildRequires:	coreutils
-BuildRequires:	findutils
-BuildRequires:	make
-BuildRequires:	perl-generators
-BuildRequires:	perl-interpreter
-BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.64
-BuildRequires:	sed
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  make
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  sed
+
 # Module Runtime
-BuildRequires:	perl(Carp)
-BuildRequires:	perl(Errno)
-BuildRequires:	perl(Exporter)
-BuildRequires:	perl(Fcntl)
-BuildRequires:	perl(IO::Handle)
-BuildRequires:	perl(IO::Pty) >= 1.11
-BuildRequires:	perl(IO::Tty) >= 1.11
-BuildRequires:	perl(POSIX)
-BuildRequires:	perl(strict)
-BuildRequires:	perl(vars)
-BuildRequires:	perl(warnings)
+BuildRequires:  perl(Carp)
+
 # Test Suite
-BuildRequires:	perl(Config)
-BuildRequires:	perl(File::Temp)
-BuildRequires:	perl(Test::Builder)
-BuildRequires:	perl(Test::More) >= 0.98
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Errno)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.64
+BuildRequires:  perl(Fcntl)
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(IO::Handle)
+BuildRequires:  perl(IO::Pty) >= 1.11
+BuildRequires:  perl(IO::Tty) >= 1.11
+BuildRequires:  perl(POSIX)
+BuildRequires:  perl(Test::Builder)
+BuildRequires:  perl(Test::More) >= 0.98
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
+
 # Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 This module provides Expect-like functionality to Perl. Expect is

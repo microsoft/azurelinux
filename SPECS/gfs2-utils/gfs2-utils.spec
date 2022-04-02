@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 ###############################################################################
 ###############################################################################
 ##
@@ -11,30 +9,32 @@ Distribution:   Mariner
 ##
 ###############################################################################
 ###############################################################################
+Summary:        Utilities for managing the global file system (GFS2)
+Name:           gfs2-utils
+Version:        3.2.0
+Release:        9%{?dist}
+License:        GPLv2+ AND LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://pagure.io/gfs2-utils
+Source:         https://releases.pagure.org/gfs2-utils/gfs2-utils-%{version}.tar.gz
+Patch0:         0-Fix_libuuid_linking.patch
+Patch1:         1-Fix_more_linking_errors.patch
 
-Name: gfs2-utils
-Version: 3.2.0
-Release: 9%{?dist}
-License: GPLv2+ and LGPLv2+
-Summary: Utilities for managing the global file system (GFS2)
-%ifnarch %{arm}
-%{?fedora:Recommends: kmod(gfs2.ko) kmod(dlm.ko)}
-%endif
-BuildRequires: ncurses-devel
-BuildRequires: kernel-headers
-BuildRequires: automake
-BuildRequires: libtool
-BuildRequires: zlib-devel
-BuildRequires: gettext-devel
-BuildRequires: bison
-BuildRequires: flex
-BuildRequires: libblkid-devel
-BuildRequires: libuuid-devel
-BuildRequires: check-devel
-Source: https://releases.pagure.org/gfs2-utils/gfs2-utils-%{version}.tar.gz
-URL: https://pagure.io/gfs2-utils
-Patch0: 0-Fix_libuuid_linking.patch
-Patch1: 1-Fix_more_linking_errors.patch
+BuildRequires:  automake
+BuildRequires:  bison
+BuildRequires:  check-devel
+BuildRequires:  flex
+BuildRequires:  gettext-devel
+BuildRequires:  kernel-headers
+BuildRequires:  libblkid-devel
+BuildRequires:  libtool
+BuildRequires:  libuuid-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  zlib-devel
+
+Recommends:     kmod(dlm.ko)
+Recommends:     kmod(gfs2.ko)
 
 %prep
 %autosetup -p1
@@ -50,8 +50,8 @@ make check || { cat tests/testsuite.log; exit 1; }
 %install
 make -C gfs2 install DESTDIR=%{buildroot}
 # Don't ship gfs2_{trace,lockcapture} in this package
-rm -f %{buildroot}/usr/sbin/gfs2_trace
-rm -f %{buildroot}/usr/sbin/gfs2_lockcapture
+rm -f %{buildroot}%{_sbindir}/gfs2_trace
+rm -f %{buildroot}%{_sbindir}/gfs2_lockcapture
 rm -f %{buildroot}%{_mandir}/man8/gfs2_trace.8
 rm -f %{buildroot}%{_mandir}/man8/gfs2_lockcapture.8
 
@@ -74,7 +74,7 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 %{_mandir}/man8/*gfs2*
 %{_mandir}/man8/glocktop*
 %{_mandir}/man5/*
-%{_prefix}/lib/udev/rules.d/82-gfs2-withdraw.rules
+%{_libdir}/udev/rules.d/82-gfs2-withdraw.rules
 
 %changelog
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.0-9

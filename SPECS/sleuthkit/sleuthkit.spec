@@ -1,37 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Could be part of http://fedoraproject.org/wiki/LukeMacken/SecurityLiveCD
-
+Summary:        The Sleuth Kit (TSK)
 Name:           sleuthkit
 Version:        4.9.0
 Release:        4%{?dist}
-Summary:        The Sleuth Kit (TSK)
-
-License:        BSD and CPL and GPLv2+ and IBM and MIT
-URL:            http://www.sleuthkit.org
+License:        BSD AND CPL AND GPLv2+ AND IBM AND MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.sleuthkit.org
 Source0:        https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-%{version}/sleuthkit-%{version}.tar.gz
 
-#BuildRequires:  libtool
-
-# afflib - BSD with advertising, GPL incompatible
 BuildRequires:  gcc-c++
-BuildRequires:  afflib-devel >= 3.3.4
-# libewf - Newer versions are plain BSD (older are BSD with advertising)
 BuildRequires:  libewf-devel
 BuildRequires:  perl-generators
 BuildRequires:  sqlite-devel
 
-%{?_with_java:
-BuildRequires:  java-devel >= 1.6.0
-BuildRequires:  jpackage-utils
-
-Requires:       java >= 1.6.0
-Requires:       jpackage-utils
-}
-
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: file
-Requires: mac-robber
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       file
+Requires:       mac-robber
 
 %description
 The Sleuth Kit (TSK) is a collection of UNIX-based command line tools that
@@ -39,13 +23,11 @@ allow you to investigate a computer. The current focus of the tools is the
 file and volume systems and TSK supports FAT, Ext2/3, NTFS, UFS,
 and ISO 9660 file systems
 
-
 %package        libs
 Summary:        Library for %{name}
 
 %description    libs
 The %{name}-libs package contains library for %{name}.
-
 
 %package        devel
 Summary:        Development files for %{name}
@@ -56,15 +38,12 @@ Requires:       sqlite-devel%{?_isa}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %prep
-%setup -q -n %{name}-%{version}
-
+%setup -q
 
 %build
-#export LIBS='-lpthread -ldl'
 %configure --disable-static \
- %{!?_with_java:--disable-java}
+           --disable-java
 
 # remove rpath from libtool
 sed -i.rpath 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
@@ -72,14 +51,11 @@ sed -i.rpath 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 %make_build
 
-
 %install
 %make_install INSTALL="install -p"
-find %{buildroot} -name '*.la' -exec rm -f {} ';'
-
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets libs
-
 
 %files
 %doc ChangeLog.txt NEWS.txt
@@ -162,7 +138,6 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 # CPL and IBM
 %{_includedir}/tsk/
 %{_libdir}/*.so
-
 
 %changelog
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9.0-4
@@ -342,5 +317,3 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 * Mon Oct 29 2007 kwizart < kwizart at gmail.com > - 2.09-1
 - Initial package for Fedora 
   (inspired from Oden Eriksson mdk spec).
-
-

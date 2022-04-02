@@ -1,19 +1,20 @@
+Summary:        NTFS-3G plugin for reading "system compressed" files
+Name:           ntfs-3g-system-compression
+Version:        1.0
+Release:        5%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:     ntfs-3g-system-compression
-Summary:  NTFS-3G plugin for reading "system compressed" files
-Version:  1.0
-Release:  5%{?dist}
-License:  GPLv2+
-URL:      https://github.com/ebiggers/ntfs-3g-system-compression
-Source0:  https://github.com/ebiggers/ntfs-3g-system-compression/archive/v%{version}/ntfs-3g-system-compression-%{version}.tar.gz
+URL:            https://github.com/ebiggers/ntfs-3g-system-compression
+Source0:        https://github.com/ebiggers/ntfs-3g-system-compression/archive/v%{version}/ntfs-3g-system-compression-%{version}.tar.gz
 
-BuildRequires:  gcc
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  libtool
-BuildRequires:  pkgconfig(libntfs-3g) >= 2017.3.23
 BuildRequires:  fuse-devel
+BuildRequires:  gcc
+BuildRequires:  libtool
+BuildRequires:  pkg-config
+BuildRequires:  pkgconfig(libntfs-3g) >= 2017.3.23
 
 %description
 System compression, also known as "Compact OS", is a Windows feature that
@@ -37,7 +38,7 @@ autoreconf -i
 
 %install
 %make_install
-rm -rf %{buildroot}%{_libdir}/ntfs-3g/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %doc README.md

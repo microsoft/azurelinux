@@ -1,35 +1,31 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
+Summary:        Library for the Expert Witness Compression Format (EWF)
 Name:           libewf
 Version:        20140608
 Release:        22%{?dist}
-Summary:        Library for the Expert Witness Compression Format (EWF)
-
 License:        LGPLv3
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/libyal/libewf
 Source0:        https://github.com/libyal/legacy/raw/main/%{name}/%{name}-%{version}.tar.gz
 
-
-BuildRequires:  make
-BuildRequires:  gcc-c++
 BuildRequires:  fuse-devel
+BuildRequires:  gcc-c++
 BuildRequires:  libuuid-devel
+BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 
-
 %description
 Libewf is a library for support of the Expert Witness Compression Format (EWF),
-it support both the SMART format (EWF-S01) and the EnCase format (EWF-E01). 
+it support both the SMART format (EWF-S01) and the EnCase format (EWF-E01).
 Libewf allows you to read and write media information within the EWF files.
-
 
 %package -n     ewftools
 Summary:        Utilities for the Expert Witness Compression Format (EWF)
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 Provides:       %{name}-tools = %{version}-%{release}
-Obsoletes:      %{name}-tools <= %{version}-%{release}
 
 %description -n ewftools
 Several tools for reading and writing EWF files.
@@ -37,18 +33,17 @@ It contains tools to acquire, verify and export EWF files.
 
 %package        devel
 Summary:        Development files for %{name}
+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       pkg-config
 Requires:       zlib-devel
-Requires:       pkgconfig
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %prep
 %setup -q
-
 
 %build
 # FIXME: Package suffers from c11/inline issues
@@ -57,10 +52,10 @@ developing applications that use %{name}.
 %configure --disable-static \
   --enable-wide-character-type \
 %if "%{version}" <= "20140608"
-  CFLAGS="${RPM_OPT_FLAGS} -std=gnu89"
+  CFLAGS="%{optflags} -std=gnu89"
 %endif
 
-# Remove rpath from libtool
+# Remove rpath from libtool
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
@@ -69,15 +64,11 @@ sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 
 %make_build
 
-
 %install
 %make_install
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
-
-
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
-
 
 %files
 %doc AUTHORS NEWS
@@ -252,4 +243,3 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 * Fri Nov  2 2007 kwizart < kwizart at gmail.com > - 0-1.20070512
 - Initial package for Fedora
-

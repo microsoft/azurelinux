@@ -1,27 +1,30 @@
-Name:           execstack
-Version:        0.5.0
-Release:        20%{?dist}
-Summary:        Utility to set/clear/query executable stack bit
-
 %global commit 4c79120bcdbde0616f592458ccde7035e92ca3d8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-License: GPLv2+
+Summary:        Utility to set/clear/query executable stack bit
+Name:           execstack
+Version:        0.5.0
+Release:        20%{?dist}
+License:        GPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 # work around for missing upstream tarball with latest checkin
-Url:     https://github.com/keszybz/prelink
-Source0: https://github.com/keszybz/prelink/archive/%{commit}.tar.gz#/prelink-%{shortcommit}.tar.gz
+URL:            https://github.com/keszybz/prelink
+Source0:        https://github.com/keszybz/prelink/archive/%{commit}.tar.gz#/prelink-%{shortcommit}.tar.gz
+Patch0:         Add-PL_ARCH-for-AArch64.patch
+BuildRequires:  elfutils-libelf-devel
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  git
+BuildRequires:  libselinux-devel
+BuildRequires:  libselinux-utils
 
-Patch0:  Add-PL_ARCH-for-AArch64.patch
-
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: elfutils-libelf-devel
-BuildRequires: libselinux-devel, libselinux-utils
-BuildRequires: git
-Requires: glibc >= 2.2.4-18, coreutils, findutils
-Requires: util-linux, gawk, grep
-
-Obsoletes:     prelink < 0.5.0-8
+Requires:       coreutils
+Requires:       findutils
+Requires:       gawk
+Requires:       glibc >= 2.2.4-18
+Requires:       grep
+Requires:       util-linux
 
 %description
 This package is built from prelink sources but contains just the

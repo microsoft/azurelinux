@@ -1,13 +1,14 @@
+Summary:        Perl interface to pseudo tty's
 Name:           perl-IO-Tty
 Version:        1.14
 Release:        4%{?dist}
-Summary:        Perl interface to pseudo tty's
 # Mostly licensed same as Perl. IO-Tty-1.14/Tty.xs is licensed under BSD.
-License:        (GPL+ or Artistic) and BSD
+License:        (GPL+ OR Artistic) AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/IO-Tty
 Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Tty-%{version}.tar.gz#/perl-IO-Tty-%{version}.tar.gz
+
 # Module Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -16,21 +17,24 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(Config)
-BuildRequires:  perl(Cwd)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(ExtUtils::MakeMaker)
+
 # Module Runtime
 BuildRequires:  perl(Carp)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Cwd)
 BuildRequires:  perl(DynaLoader)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(POSIX)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
+
 # Test Suite
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
+
 # Runtime
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 

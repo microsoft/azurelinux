@@ -1,14 +1,15 @@
+Summary:        Disk scrubbing program
+Name:           scrub
+Version:        2.5.2
+Release:        18%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		scrub
-Version:	2.5.2
-Release:	18%{?dist}
-Summary:	Disk scrubbing program
-License:	GPLv2+
-URL:		https://code.google.com/archive/p/diskscrub
-Source0:	https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/diskscrub/%{name}-%{version}.tar.bz2
+URL:            https://code.google.com/archive/p/diskscrub
+Source0:        https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/diskscrub/%{name}-%{version}.tar.bz2
 
 BuildRequires:  gcc
+
 %description
 Scrub writes patterns on files or disk devices to make
 retrieving the data more difficult.  It operates in one of three

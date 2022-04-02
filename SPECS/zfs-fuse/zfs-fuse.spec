@@ -1,32 +1,46 @@
+%define _hardened_build 1
+
+Summary:        ZFS ported to Linux FUSE
+Name:           zfs-fuse
+Version:        0.7.2.2
+Release:        17%{?dist}
+License:        CDDL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%define _hardened_build 1
-Name:             zfs-fuse
-Version:          0.7.2.2
-Release:          17%{?dist}
-Summary:          ZFS ported to Linux FUSE
-License:          CDDL
-URL:              https://github.com/gordan-bobic/zfs-fuse
-Source00:         http://github.com/gordan-bobic/zfs-fuse/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source01:         zfs-fuse.service
-Source02:         zfs-fuse.scrub
-Source03:         zfs-fuse.sysconfig
-Source04:         zfs-fuse-helper
-Patch0:           zfs-fuse-0.7.2.2-stack.patch
-Patch1:           zfs-fuse-0.7.2.2-python3.patch
-Patch2:           tirpc.patch
-Patch3:           common.patch
-BuildRequires:  gcc
-BuildRequires:    fuse-devel libaio-devel perl-generators scons gcc-c++
-BuildRequires:    zlib-devel openssl-devel libattr-devel lzo-devel bzip2-devel xz-devel
-BuildRequires:    libtirpc-devel
-%ifnarch aarch64 ppc64le
-BuildRequires:    /usr/bin/execstack
-%endif
-BuildRequires:    systemd
-Requires:         fuse >= 2.7.4-1
+URL:            https://github.com/gordan-bobic/zfs-fuse
+Source00:       http://github.com/gordan-bobic/zfs-fuse/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source01:       zfs-fuse.service
+Source02:       zfs-fuse.scrub
+Source03:       zfs-fuse.sysconfig
+Source04:       zfs-fuse-helper
+Patch0:         zfs-fuse-0.7.2.2-stack.patch
+Patch1:         zfs-fuse-0.7.2.2-python3.patch
+Patch2:         tirpc.patch
+Patch3:         common.patch
+
 # (2010 karsten@redhat.com) zfs-fuse doesn't have s390(x) implementations for atomic instructions
-ExcludeArch:      s390 s390x aarch64
+ExcludeArch:    s390 s390x aarch64
+
+BuildRequires:  bzip2-devel
+BuildRequires:  fuse-devel
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libaio-devel
+BuildRequires:  libattr-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  lzo-devel
+BuildRequires:  openssl-devel
+BuildRequires:  perl-generators
+BuildRequires:  scons
+BuildRequires:  systemd
+BuildRequires:  xz-devel
+BuildRequires:  zlib-devel
+
+%ifnarch aarch64 ppc64le
+BuildRequires:  %{_bindir}/execstack
+%endif
+
+Requires:       fuse >= 2.7.4-1
 
 %description
 ZFS is an advanced modern general-purpose filesystem from Sun
@@ -38,10 +52,10 @@ operating system.
 %prep
 %setup -q
 
-%patch0 -p0
+%patch0
 %patch1 -p1
 %patch2 -p1
-%patch3 -p0
+%patch3
 
 f=LICENSE
 mv $f $f.iso88591
@@ -74,14 +88,14 @@ install -Dp -m 0755 %{SOURCE4} %{buildroot}%{_sbindir}/zfs-fuse-helper
 %ifnarch aarch64 ppc64le
 #set stack not executable, BZ 911150
 for i in zdb zfs zfs-fuse zpool ztest; do
-       /usr/bin/execstack -c %{buildroot}%{_sbindir}/$i
+       %{_bindir}/execstack -c %{buildroot}%{_sbindir}/$i
 done
 %endif
 
 %post
 # Move cache if upgrading
-oldcache=/etc/zfs/zpool.cache      # this changed per 0.6.9, only needed when upgrading from earlier versions
-newcache=/var/lib/zfs/zpool.cache
+oldcache=%{_sysconfdir}/zfs/zpool.cache      # this changed per 0.6.9, only needed when upgrading from earlier versions
+newcache=%{_sharedstatedir}/zfs/zpool.cache
 
 if [[ -f $oldcache && ! -e $newcache ]]; then
   echo "Moving existing zpool.cache to new location"
@@ -99,10 +113,10 @@ fi
 %systemd_preun zfs-fuse.service
 
 %postun
-%systemd_postun_with_restart zfs-fuse.service 
+%systemd_postun_with_restart zfs-fuse.service
 echo "Removing files since we removed the last package"
-rm -rf /var/run/zfs
-rm -rf /var/lock/zfs
+rm -rf %{_var}/run/zfs
+rm -rf %{_var}/lock/zfs
 
 %files
 %license LICENSE

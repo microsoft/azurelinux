@@ -1,26 +1,17 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 Summary:        Utility to force unused ext2/3/4 inodes and blocks to zero
 Name:           zerofree
 Version:        1.1.1
 Release:        7%{?dist}
 License:        GPLv2
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://frippery.org/uml/
-
 Source0:        https://frippery.org/uml/%{name}-%{version}.tgz
 Source1:        https://frippery.org/uml/sparsify.c
 Source2:        https://frippery.org/uml/index.html
 
-# zerofree.sgml is the source for the man page from Debian.
-# Unfortunately we cannot build this in Fedora because of an apparent
-# bug in our DocBook tools.  Therefore I also include the generated
-# man page (generated on a Debian system from this source).
-Source3:        zerofree.sgml
-Source4:        zerofree.8
-
-BuildRequires:  gcc, e2fsprogs-devel
-
+BuildRequires:  e2fsprogs-devel
+BuildRequires:  gcc
 
 %description
 zerofree is a utility to set unused filesystem inodes and blocks of an
@@ -34,31 +25,24 @@ WARNING: The filesystem to be processed should be unmounted or mounted
 read-only.  The tool tries to check this before running, but you
 should be careful.
 
-
 %prep
 %setup -q
 cp -p %{SOURCE1} .
 cp -p %{SOURCE2} .
 
-
 %build
-make CC="gcc $RPM_OPT_FLAGS"
-gcc $RPM_OPT_FLAGS sparsify.c -o sparsify -lext2fs
-
+make CC="gcc %{optflags}"
+gcc %{optflags} sparsify.c -o sparsify -lext2fs
 
 %install
-install -D -p -m 755 zerofree $RPM_BUILD_ROOT%{_sbindir}/zerofree
-install -D -p -m 755 sparsify $RPM_BUILD_ROOT%{_sbindir}/sparsify
-install -D -p -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_mandir}/man8/zerofree.8
-
+install -D -p -m 755 zerofree %{buildroot}%{_sbindir}/zerofree
+install -D -p -m 755 sparsify %{buildroot}%{_sbindir}/sparsify
 
 %files
 %license COPYING
 %doc index.html
 %{_sbindir}/zerofree
 %{_sbindir}/sparsify
-%{_mandir}/man8/zerofree.8*
-
 
 %changelog
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-7

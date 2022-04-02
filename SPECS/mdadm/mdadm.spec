@@ -1,4 +1,5 @@
 %bcond_with libreport
+
 Summary:        The mdadm program controls Linux md devices (software RAID arrays)
 Name:           mdadm
 Version:        4.1
@@ -16,14 +17,16 @@ Source5:        mdadm.conf
 Source6:        mdadm_event.conf
 Source7:        raid-check.timer
 Source8:        raid-check.service
-# Build without -Werror.  From Debian.
+# Build without -Werror. From Debian.
 Patch00:        https://sources.debian.org/data/main/m/mdadm/4.1-2/debian/patches/debian-no-Werror.diff#/mdadm-4.1-no-Werror.patch
-# Fedora customization patches
+# Fedora customization patches, keeping in Mariner for now.
 Patch97:        mdadm-3.3-udev.patch
 Patch98:        mdadm-2.5.2-static.patch
+
 BuildRequires:  binutils-devel
 BuildRequires:  gcc
 BuildRequires:  systemd-rpm-macros
+
 Requires(post): coreutils
 Requires(post): systemd
 Requires(postun): coreutils

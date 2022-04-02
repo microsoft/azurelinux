@@ -1,43 +1,35 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Tool to create a timeline of file activity for mounted file systems
 Name:           mac-robber
 Version:        1.02
 Release:        23%{?dist}
-Summary:        Tool to create a timeline of file activity for mounted file systems
-
 License:        GPLv2
-URL:            http://sourceforge.net/projects/mac-robber/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://sourceforge.net/projects/mac-robber/
 Source0:        http://downloads.sourceforge.net/mac-robber/mac-robber-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
 
-
 %description
 mac-robber is a digital forensics and incident response tool that can be used
-with The Sleuth Kit to create a timeline of file activity for mounted 
+with The Sleuth Kit to create a timeline of file activity for mounted
 file systems.
-
 
 %prep
 %setup -q
 
-
 %build
 %make_build GCC_OPT="%{optflags}"
-
 
 %install
 mkdir -p %{buildroot}%{_bindir}
 install -pm 0755 mac-robber %{buildroot}%{_bindir}
 
-
-
 %files
-%doc CHANGES README
 %license COPYING
+%doc CHANGES README
 %{_bindir}/mac-robber
-
 
 %changelog
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.02-23
