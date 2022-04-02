@@ -322,8 +322,6 @@ Requires:       perl-vars, perl-version, perl-vmsish,
 # bug #1464903.
 Provides:       perl-core = %{perl_version}-%{release}
 Provides:       perl-core%{?_isa} = %{perl_version}-%{release}
-# perl was renamed to perl-interpreter and perl-core renamed to perl
-Obsoletes:      perl-core < 5.26.0-395
 
 
 %description
@@ -364,12 +362,6 @@ Suggests:       perl-doc = %{perl_version}-%{release}
 # gets installed before perl-interpreter.
 Requires(post): perl-libs
 
-# suidperl isn't created by upstream since 5.12.0
-Obsoletes:      perl-suidperl <= 4:5.12.2
-# perl was renamed to perl-interpreter and perl-core renamed to perl
-# <https://fedoraproject.org/wiki/Changes/perl_Package_to_Install_Core_Modules>,
-# bug #1464903.
-Obsoletes:      perl < 4:5.26.0-395
 
 %description interpreter
 This is a Perl interpreter as a standalone executable %{_bindir}/perl
@@ -464,10 +456,10 @@ Recommends:     perl-doc = %{perl_version}-%{release}
 # Devel::PPPort for h2xs script
 Requires:       perl(Devel::PPPort)
 # Compiler and linker options stored into perl and used when building XS
-# modules refer to hardering profiles like
-# /usr/lib/rpm/redhat/redhat-hardened-cc1 that are delivered by
-# redhat-rpm-config. Bug #1557667.
-Requires:       redhat-rpm-config
+# modules refer to hardening profiles like
+# /usr/lib/rpm/mariner/default-hardened-cc1 that are delivered by
+# mariner-rpm-macros. Bug #1557667.
+Requires:       mariner-rpm-macros
 # ExtUtils::Embed -e ldopts include libcrypt, bug #1666098
 Requires:       libxcrypt-devel%{?_isa}
 
@@ -2213,7 +2205,6 @@ License:        GPL+ or Artistic
 Epoch:          0
 Version:        2.102
 Requires:       %perl_compat
-Obsoletes:      perl-Compress-Zlib <= 2.020
 Provides:       perl(IO::Uncompress::Bunzip2)
 %if %{defined perl_bootstrap}
 %gendep_perl_IO_Compress
@@ -4185,9 +4176,6 @@ perl -x patchlevel.h \
     'Fedora Patch201: Link XS modules to libperl.so with EU::MM on Linux' \
     %{nil}
 %endif
-
-#copy the example script
-#install -m 0644 %{SOURCE5} .
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
