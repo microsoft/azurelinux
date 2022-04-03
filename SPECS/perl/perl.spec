@@ -361,6 +361,10 @@ Suggests:       perl-doc = %{perl_version}-%{release}
 # We need this to break the dependency loop, and ensure that perl-libs 
 # gets installed before perl-interpreter.
 Requires(post): perl-libs
+# Same as perl-libs. We need macros in basic buildroot.
+Requires(post): perl-macros
+
+Provides: /bin/perl
 
 
 %description interpreter
