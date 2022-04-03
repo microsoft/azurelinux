@@ -294,7 +294,7 @@ install -m 755 %{SOURCE6} %{buildroot}%{_rpmconfigdir}
 # Install bigdecimal
 mkdir -p %{buildroot}%{gem_dir}/gems/bigdecimal-%{bigdecimal_version}/lib
 mkdir -p %{buildroot}%{_libdir}/gems/%{name}/bigdecimal-%{bigdecimal_version}/bigdecimal
-mv %{buildroot}%{_libdir}/ruby/bigdecimal %{buildroot}%{gem_dir}/gems/bigdecimal-%{bigd1.0.20220331-1.0ecimal_version}/lib
+mv %{buildroot}%{_libdir}/ruby/bigdecimal %{buildroot}%{gem_dir}/gems/bigdecimal-%{bigdecimal_version}/lib
 touch %{buildroot}%{_libdir}/gems/%{name}/bigdecimal-%{bigdecimal_version}/gem.build_complete
 ln -s %{gem_dir}/gems/bigdecimal-%{bigdecimal_version}/lib/bigdecimal %{buildroot}%{_libdir}/ruby/bigdecimal
 
