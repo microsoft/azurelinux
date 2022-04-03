@@ -519,7 +519,6 @@ Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 %if %{defined perl_bootstrap}
 %gendep_perl_utils
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description utils
 Several utilities which come with Perl distribution like h2ph, perlbug,
@@ -565,7 +564,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Attribute_Handlers
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description Attribute-Handlers
 This Perl module, when inherited by a package, allows that package's class to
@@ -590,7 +588,6 @@ Requires:       perl(POSIX)
 %if %{defined perl_bootstrap}
 %gendep_perl_autodie
 %endif
-Conflicts:      perl < 4:5.16.2-259
 
 %description autodie
 The "autodie" and "Fatal" pragma provides a convenient way to replace
@@ -612,7 +609,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_AutoLoader
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description AutoLoader
 The AutoLoader module works with the AutoSplit module and the "__END__" token
@@ -631,7 +627,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_AutoSplit
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description AutoSplit
 Split up your program into files that the AutoLoader module can handle. It is
@@ -650,7 +645,6 @@ Requires:       perl(warnings)
 %if %{defined perl_bootstrap}
 %gendep_perl_autouse
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description autouse
 If a module is not loaded yet, then the autouse declaration declares functions
@@ -687,7 +681,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_base
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description base
 "base" module allows you to both load one or more modules, while setting up
@@ -726,7 +719,6 @@ BuildArch:      noarch
 %if %{defined perl_bootstrap}
 %gendep_perl_bignum
 %endif
-Conflicts:      perl < 4:5.22.0-348
 
 %description bignum
 This package attempts to make it easier to write scripts that use BigInts and
@@ -852,7 +844,6 @@ Requires:       %perl_compat
 %gendep_perl_Config_Perl_V
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-347
 
 %description Config-Perl-V
 The command "perl -V" will return you an excerpt from the %%Config::Config
@@ -873,7 +864,6 @@ Requires:       perl(Carp)
 %gendep_perl_constant
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.3-264
 
 %description constant
 This pragma allows you to declare constants at compile-time:
@@ -1110,7 +1100,6 @@ Requires:       perl(warnings)
 %if %{defined perl_bootstrap}
 %gendep_perl_debugger
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description debugger
 This is the perl debugger. It is loaded automatically by Perl when you invoke
@@ -1148,7 +1137,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Devel_Peek
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description Devel-Peek
 Devel::Peek contains functions which allows raw Perl data types to be
@@ -1166,7 +1154,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Devel_PPPort
 %endif
-Conflicts:      perl < 4:5.20.1-310
 
 %description Devel-PPPort
 Perl's API has changed over time, gaining new features, new functions,
@@ -1187,7 +1174,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Devel_SelfStubber
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description Devel-SelfStubber
 Devel::SelfStubber prints the stubs you need to put in the module before the
@@ -1208,7 +1194,6 @@ Requires:       perl(Getopt::Std)
 %if %{defined perl_bootstrap}
 %gendep_perl_diagnostics
 %endif
-Conflicts:      perl-utils < 5.30.1-451
 
 
 %description diagnostics
@@ -1296,7 +1281,6 @@ Requires:       perl(warnings)
 %if %{defined perl_bootstrap}
 %gendep_perl_DirHandle
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description DirHandle
 There is no reason to use this module nowadays. The DirHandle module provides
@@ -1313,7 +1297,6 @@ BuildArch:      noarch
 Requires:       %perl_compat
 # For perldoc tool
 Recommends:     perl-Pod-Perldoc
-Conflicts:      perl < 4:5.30.1-451
 
 %description doc
 This is a documentation for Perl language. It's provided in POD and manual
@@ -1331,7 +1314,6 @@ Recommends:     perl(Devel::Peek)
 %if %{defined perl_bootstrap}
 %gendep_perl_Dumpvalue
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description Dumpvalue
 Dumpvalue module enables you to print a content of variables and other Perl
@@ -1347,7 +1329,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_DynaLoader
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description DynaLoader
 The DynaLoader module defines a standard generic interface to the dynamic
@@ -1365,7 +1346,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Encode
 %endif
-Conflicts:      perl < 4:5.16.2-256
 
 %description Encode
 The Encode module provides the interface between Perl strings and the rest
@@ -1389,7 +1369,6 @@ Requires:       perl(utf8)
 %if %{defined perl_bootstrap}
 %gendep_perl_encoding
 %endif
-Conflicts:      perl-Encode < 2:2.60-314
 
 %description encoding
 With the encoding pragma, you can write your Perl script in any encoding you
@@ -1432,7 +1411,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_encoding_warnings
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description encoding-warnings
 As of Perl 5.26.0, this module has no effect. The internal Perl feature that
@@ -1469,7 +1447,6 @@ Requires:       %perl_compat
 %gendep_perl_Env
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.2-265
 
 %description Env
 Perl maintains environment variables in a special hash named %%ENV. For when
@@ -1490,7 +1467,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Errno
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description Errno
 "Errno" defines and conditionally exports all the error constants defined in
@@ -1508,7 +1484,6 @@ Requires:       %perl_compat
 %gendep_perl_experimental
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.20.0-303
 
 %description experimental
 This pragma provides an easy and convenient way to enable or disable
@@ -1527,7 +1502,6 @@ Requires:       perl(Carp) >= 1.05
 %gendep_perl_Exporter
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.2-265
 
 %description Exporter
 The Exporter module implements an import method which allows a module to
@@ -1593,7 +1567,6 @@ Epoch:          2
 Version:        7.62
 BuildArch:      noarch
 Requires:       %perl_compat
-Conflicts:      perl < 4:5.20.1-312
 Requires:       perl(File::Find)
 %if %{defined perl_bootstrap}
 %gendep_perl_ExtUtils_Command
@@ -1791,7 +1764,6 @@ Requires:       perl(Hash::Util)
 %if %{defined perl_bootstrap}
 %gendep_perl_fields
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description fields
 The "fields" pragma enables compile-time and run-time verified class fields.
@@ -1808,7 +1780,6 @@ Requires:       perl(re)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_Basename
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description File-Basename
 These routines allow you to parse file paths into their directory, file name,
@@ -1826,7 +1797,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_Compare
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description File-Compare
 A File::Compare Perl module provides functions for comparing a content of two
@@ -1844,7 +1814,6 @@ Requires:       perl(File::Basename)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_Copy
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description File-Copy
 A File::Copy module provides two basic functions, copy and move, which are
@@ -1915,7 +1884,6 @@ Requires:       perl(Carp)
 %gendep_perl_File_Path
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.2-265
 
 %description File-Path
 This module provides a convenient way to create directories of arbitrary
@@ -1933,7 +1901,6 @@ Requires:       perl(Symbol)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_stat
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description File-stat
 This module overrides the core stat() and lstat() functions, replacing them
@@ -1954,7 +1921,6 @@ Requires:       perl(POSIX)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_Temp
 %endif
-Conflicts:      perl < 4:5.16.2-265
 
 %description File-Temp
 File::Temp can be used to create and open temporary files in a safe way.
@@ -2010,7 +1976,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_filetest
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description filetest
 The default behavior of file test operators (e.g. "-r") is to use the simple
@@ -2046,7 +2011,6 @@ Epoch:          0
 Version:        0.96
 BuildArch:      noarch
 Requires:       %perl_compat
-Conflicts:      perl < 4:5.20.1-312
 Requires:       perl(Text::Balanced) >= 1.97
 Requires:       perl(warnings)
 %if %{defined perl_bootstrap}
@@ -2193,7 +2157,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_IO
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description IO
 This is a collection of Perl input/output modules.
@@ -2228,7 +2191,6 @@ Requires:       %perl_compat
 %gendep_perl_IO_Socket_IP
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.20.0-303
 
 %description IO-Socket-IP
 This module provides a protocol-independent way to use IPv4 and IPv6
@@ -2314,7 +2276,6 @@ Requires:       perl(DynaLoader)
 %if %{defined perl_bootstrap}
 %gendep_perl_IPC_SysV
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description IPC-SysV
 This is an object interface for System V messages, semaphores, and
@@ -2565,7 +2526,6 @@ Requires:       perl(Carp)
 %gendep_perl_Math_BigInt
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-347
 
 # Do not export unversioned module
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\(Math::BigInt\\)\\s*$
@@ -2584,7 +2544,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Math_BigInt_FastCalc
 %endif
-Conflicts:      perl < 4:5.22.0-348
 
 %description Math-BigInt-FastCalc
 This package provides support for faster big integer calculations.
@@ -2601,7 +2560,6 @@ Requires:       perl(Math::BigInt)
 %gendep_perl_Math_BigRat
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-348
 
 %description Math-BigRat
 Math::BigRat complements Math::BigInt and Math::BigFloat by providing support
@@ -2618,7 +2576,6 @@ Requires:       %perl_compat
 %gendep_perl_Math_Complex
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-348
 
 %description Math-Complex
 This package lets you create and manipulate complex numbers. By default, Perl
@@ -2637,7 +2594,6 @@ Requires:       %perl_compat
 %gendep_perl_Memoize
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-350
 
 %description Memoize
 Memoizing a function makes it faster by trading space for time. It does
@@ -2657,7 +2613,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_meta_notation
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description meta-notation
 Returns a copy of the input string with the nonprintable characters below
@@ -2676,7 +2631,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_MIME_Base64
 %endif
-Conflicts:      perl < 4:5.22.0-347
 
 %description MIME-Base64
 This package contains a Base64 encoder/decoder and a quoted-printable
@@ -2717,7 +2671,6 @@ Requires:       perl-Module-CoreList = %{epoch}:%{version}-%{release}
 %endif
 # The files were distributed with perl.spec's subpackage
 # perl-Module-CoreList <= 1:5.020001-309
-Conflicts:      perl-Module-CoreList < 1:5.020001-310
 BuildArch:      noarch
 
 %description Module-CoreList-tools
@@ -2864,7 +2817,6 @@ Suggests:       perl(Net::Ping::External)
 %gendep_perl_Net_Ping
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-350
 
 %description Net-Ping
 Net::Ping module contains methods to test the reachability of remote hosts on
@@ -3055,7 +3007,6 @@ Requires:       %perl_compat
 %gendep_perl_perlfaq
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-347
 
 %description perlfaq
 The perlfaq comprises several documents that answer the most commonly asked
@@ -3073,7 +3024,6 @@ Requires:       %perl_compat
 %gendep_perl_PerlIO_via_QuotedPrint
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-347
 
 %description PerlIO-via-QuotedPrint
 This module implements a PerlIO layer that works on files encoded in the
@@ -3121,7 +3071,6 @@ Provides:       perl(syscall.ph) = %{perl_version}
 %if %{defined perl_bootstrap}
 %gendep_perl_ph
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description ph
 Contemporary Perl still refers to some Perl header (ph) files although it does
@@ -3175,7 +3124,6 @@ Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 %if %{defined perl_bootstrap}
 %gendep_perl_Pod_Functions
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description Pod-Functions
 This module enumerates the Perl functions that are documented in perlfunc POD.
@@ -3190,7 +3138,6 @@ Requires:       %perl_compat
 %gendep_perl_Pod_Html
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-350
 
 %description Pod-Html
 This package converts files from POD format (see perlpod) to HTML format. It
@@ -3290,7 +3237,6 @@ Requires:       perl(Pod::Simple) >= 3.06
 %if %{defined perl_bootstrap}
 %gendep_perl_podlators
 %endif
-Conflicts:      perl < 4:5.16.1-234
 
 %description podlators
 This package contains Pod::Man and Pod::Text modules which convert POD input
@@ -3377,7 +3323,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_SelectSaver
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description SelectSaver
 A "SelectSaver" object contains a reference to the file handle that was
@@ -3395,7 +3340,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_SelfLoader
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description SelfLoader
 This Perl module tells its users that functions in a package are to be
@@ -3414,7 +3358,6 @@ Requires:       perl(Symbol)
 %if %{defined perl_bootstrap}
 %gendep_perl_sigtrap
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description sigtrap
 The sigtrap pragma is a simple interface for installing signal handlers.
@@ -3450,7 +3393,6 @@ Requires:       perl(warnings)
 %if %{defined perl_bootstrap}
 %gendep_perl_sort
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description sort
 With the "sort" pragma you can control the behavior of the builtin "sort()"
@@ -3472,7 +3414,6 @@ Requires:       perl(IO::File)
 %if %{defined perl_bootstrap}
 %gendep_perl_Storable
 %endif
-Conflicts:      perl < 4:5.16.3-274
 
 %description Storable
 The Storable package brings persistence to your Perl data structures
@@ -3490,7 +3431,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_subs
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description subs
 This will predeclare all the subroutines whose names are in the list,
@@ -3507,7 +3447,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Symbol
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description Symbol
 The Symbol module provides functions for manipulating Perl symbols.
@@ -3540,7 +3479,6 @@ Requires:       perl(XSLoader)
 %if %{defined perl_bootstrap}
 %gendep_perl_Sys_Syslog
 %endif
-Conflicts:      perl < 4:5.16.3-269
 
 %description Sys-Syslog
 Sys::Syslog is an interface to the UNIX syslog(3) function. Call syslog() with
@@ -3559,7 +3497,6 @@ Requires:       perl(Carp)
 %gendep_perl_Term_ANSIColor
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.18.2-302
 
 %description Term-ANSIColor
 This module has two interfaces, one through color() and colored() and the
@@ -3582,7 +3519,6 @@ Requires:       perl(Carp)
 %gendep_perl_Term_Cap
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-347
 
 %description Term-Cap
 These are low-level functions to extract and use capabilities from a terminal
@@ -3634,7 +3570,6 @@ Requires:       perl(File::Temp)
 %gendep_perl_Test
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-351
 
 %description Test
 The Test Perl module simplifies the task of writing test files for Perl modules,
@@ -3701,7 +3636,6 @@ Requires:       %perl_compat
 %gendep_perl_Text_Balanced
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-347
 
 %description Text-Balanced
 These Perl subroutines may be used to extract a delimited substring, possibly
@@ -3720,7 +3654,6 @@ Requires:       perl(Carp)
 %gendep_perl_Text_ParseWords
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.2-256
 
 %description Text-ParseWords
 Parse text into an array of tokens or array of arrays.
@@ -3737,7 +3670,6 @@ Requires:       %perl_compat
 %gendep_perl_Text_Tabs_Wrap
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.20.2-325
 
 %description Text-Tabs+Wrap
 Text::Tabs performs the same job that the UNIX expand(1) and unexpand(1)
@@ -3757,7 +3689,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Thread
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description Thread
 This Thread module served as the front end to the old-style thread model,
@@ -3784,7 +3715,6 @@ Requires:       perl(Carp)
 %gendep_perl_Thread_Queue
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.2-257
 
 %description Thread-Queue
 This module provides thread-safe FIFO queues that can be accessed safely by
@@ -3802,7 +3732,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Tie
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description Tie
 These are Perl modules that helps connecting classes with arrays, hashes,
@@ -3897,7 +3826,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Time_HiRes
 %endif
-Conflicts:      perl < 4:5.16.3-271
 
 %description Time-HiRes
 The Time::HiRes module implements a Perl interface to the usleep, nanosleep,
@@ -3917,7 +3845,6 @@ Requires:       %perl_compat
 %gendep_perl_Time_Local
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.3-262
 
 %description Time-Local
 This module provides functions that are the inverse of built-in perl functions
@@ -4021,7 +3948,6 @@ Requires:       perl(Unicode::Normalize)
 %if %{defined perl_bootstrap}
 %gendep_perl_Unicode_Collate
 %endif
-Conflicts:      perl < 4:5.22.0-347
 
 %description Unicode-Collate
 This package is Perl implementation of Unicode Technical Standard #10 (Unicode
@@ -4040,7 +3966,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Unicode_Normalize
 %endif
-Conflicts:      perl < 4:5.22.0-347
 
 %description Unicode-Normalize
 This package provides Perl functions that can convert strings into various
@@ -4058,7 +3983,6 @@ Requires:       perl(Storable)
 %if %{defined perl_bootstrap}
 %gendep_perl_Unicode_UCD
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description Unicode-UCD
 The Unicode::UCD module offers a series of functions that provide a simple
@@ -4091,7 +4015,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_vars
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description vars
 This pragma will predeclare all the variables whose names are in the
@@ -4131,7 +4054,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_vmsish
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description vmsish
 The "vmsish" pragma control VMS-specific features of the Perl language. If
