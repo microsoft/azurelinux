@@ -460,9 +460,6 @@ Requires:       perl(Devel::PPPort)
 # /usr/lib/rpm/mariner/default-hardened-cc1 that are delivered by
 # mariner-rpm-macros. Bug #1557667.
 Requires:       mariner-rpm-macros
-# ExtUtils::Embed -e ldopts include libcrypt, bug #1666098
-Requires:       libxcrypt-devel%{?_isa}
-
 
 %if %{defined perl_bootstrap}
 %gendep_perl_devel
@@ -668,7 +665,7 @@ Requires:       perl(XSLoader)
 %if %{defined perl_bootstrap}
 %gendep_perl_B
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description B
 The "B" module supplies classes which allow a Perl program to delve into its
@@ -704,7 +701,7 @@ Requires:       %perl_compat
 %gendep_perl_Benchmark
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Benchmark
 The Benchmark module encapsulates a number of routines to help you figure out
@@ -742,7 +739,7 @@ Requires:       %perl_compat
 %gendep_perl_blib
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description blib
 This module looks for MakeMaker-like "blib" directory structure starting in
@@ -787,7 +784,7 @@ Requires:       %perl_compat
 %gendep_perl_Class_Struct
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Class-Struct
 Class::Struct module exports a single function struct(). Given a list of
@@ -834,7 +831,7 @@ Requires:       %perl_compat
 %gendep_perl_Config_Extensions
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Config-Extensions
 The Config::Extensions module provides a hash %%Extensions containing all the
@@ -1065,7 +1062,7 @@ Requires:       perl(Encode)
 %gendep_perl_DBM_Filter
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 # Remove private redefinitions
 # DBM_Filter redefines Tie::Hash, but does not load it.
@@ -1128,7 +1125,7 @@ Requires:       perl(Config)
 %gendep_perl_deprecate
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description deprecate
 "deprecate" pragma simplifies the maintenance of dual-life modules that will no
@@ -1208,7 +1205,7 @@ Requires:       perl(Getopt::Std)
 %gendep_perl_diagnostics
 %endif
 Conflicts:      perl-utils < 5.30.1-451
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description diagnostics
 The diagnostics module extends the terse diagnostics normally emitted by both
@@ -1451,7 +1448,7 @@ Requires:       perl(warnings)
 %gendep_perl_English
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description English
 This module provides aliases for the built-in variables whose names no one
@@ -1575,7 +1572,7 @@ Requires:       perl(Data::Dumper)
 # ExtUtils::Constant::Aaargh56Hash not used on recent Perls
 # FileHandle not used on recent Perls
 # POSIX not used on recent Perls
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 %if %{defined perl_bootstrap}
 %gendep_perl_ExtUtils_Constant
 %endif
@@ -1753,7 +1750,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_ExtUtils_ParseXS
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 BuildArch:      noarch
 
 %description ExtUtils-ParseXS
@@ -1771,7 +1768,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Fcntl
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Fcntl
 Fcntl module provides file operation related options.
@@ -1859,7 +1856,7 @@ Requires:       perl(Text::ParseWords)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_DosGlob
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description File-DosGlob
 This Perl module implements DOS-like globbing with a few enhancements. It
@@ -1896,7 +1893,7 @@ Recommends:     perl(Scalar::Util)
 %gendep_perl_File_Find
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description File-Find
 These are functions for searching through directory trees doing work on each
@@ -1973,7 +1970,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_FileCache
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description FileCache
 The "cacheout" function will make sure that there's a file handle open
@@ -1993,7 +1990,7 @@ Recommends:     perl(Fcntl)
 %if %{defined perl_bootstrap}
 %gendep_perl_FileHandle
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description FileHandle
 This is an object-oriented interface for opening files and performing
@@ -2067,7 +2064,7 @@ Requires:       %perl_compat
 %gendep_perl_FindBin
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description FindBin
 Locates the full path to the script bin directory to allow the use of paths
@@ -2083,7 +2080,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_GDBM_File
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description GDBM_File
 GDBM_File is a module which allows Perl programs to make use of the facilities
@@ -2105,7 +2102,6 @@ Requires:       perl(Pod::Usage) >= 1.14
 %gendep_perl_Getopt_Long
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.3-268
 
 %description Getopt-Long
 The Getopt::Long module implements an extended getopt function called
@@ -2128,7 +2124,7 @@ Requires:       %perl_compat
 %gendep_perl_Getopt_Std
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Getopt-Std
 The Getopt::Std module provides functions for processing single-character
@@ -2146,7 +2142,7 @@ Requires:       perl(XSLoader)
 %if %{defined perl_bootstrap}
 %gendep_perl_Hash_Util
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Hash-Util
 Hash::Util contains special functions for manipulating hashes that don't
@@ -2162,7 +2158,7 @@ Requires:       perl(XSLoader)
 %if %{defined perl_bootstrap}
 %gendep_perl_Hash_Util_FieldHash
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Hash-Util-FieldHash
 Hash::Util::FieldHash offers a number of functions in support of the
@@ -2179,7 +2175,7 @@ Requires:       %perl_compat
 %gendep_perl_if
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description if
 The "if" module is used to conditionally load another module.
@@ -2296,7 +2292,7 @@ Requires:       perl(warnings)
 %gendep_perl_IPC_Open3
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description IPC-Open3
 These are functions that spawn a given command and connects the standard
@@ -2331,7 +2327,7 @@ Requires:       %perl_compat
 %gendep_perl_I18N_Collate
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description I18N-Collate
 This module provides you with objects that will collate according to your
@@ -2347,7 +2343,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_I18N_Langinfo
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description I18N-Langinfo
 The langinfo() function queries various locale information that can be used to
@@ -2367,7 +2363,7 @@ Requires:       perl(warnings)
 %gendep_perl_I18N_LangTags
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description I18N-LangTags
 Language tags are a formalism, described in RFC 3066, for declaring what
@@ -2415,7 +2411,6 @@ Requires:       perl(subs)
 %if %{defined perl_bootstrap}
 %gendep_perl_JSON_PP
 %endif
-Conflicts:      perl-JSON < 2.50
 
 %description JSON-PP
 JSON::XS is the fastest and most proper JSON module on CPAN. It is written by
@@ -2433,7 +2428,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_less
 %endif
-Conflicts:      perl < 4:5.30.1-451
 
 %description less
 "use less ...;" is a Perl user-pragma. If you're very lucky some code you're
@@ -2450,7 +2444,7 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_lib
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description lib
 This module simplifies the manipulation of @INC at compile time.
@@ -2473,7 +2467,6 @@ Requires:       perl(utf8)
 %gendep_perl_libnet
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-347
 
 %description libnet
 This is a collection of Perl modules which provides a simple and
@@ -2491,7 +2484,6 @@ BuildArch:      noarch
 %if %{defined perl_bootstrap}
 %gendep_perl_libnetcfg
 %endif
-Conflicts:      perl-devel < 4:5.22.0-347
 
 %description libnetcfg
 The libnetcfg utility can be used to configure the libnet.
@@ -2508,7 +2500,7 @@ Requires:       perl(POSIX)
 %gendep_perl_locale
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description locale
 This pragma tells the compiler to enable (or disable) the use of POSIX locales
@@ -2528,7 +2520,6 @@ Requires:       %perl_compat
 %gendep_perl_Locale_Maketext
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.16.3-268
 
 %description Locale-Maketext
 It is a common feature of applications (whether run directly, or via the Web)
@@ -2813,7 +2804,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_mro
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description mro
 The "mro" name space provides several utilities for dealing with method
@@ -2829,7 +2820,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_NDBM_File
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description NDBM_File
 NDBM_File establishes a connection between a Perl hash variable and a file in
@@ -2849,7 +2840,7 @@ Requires:       perl(Socket)
 %if %{defined perl_bootstrap}
 %gendep_perl_Net
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Net
 This package provide object-oriented interface to Perl built-in gethost*(),
@@ -2886,7 +2877,7 @@ Requires:       %perl_compat
 %gendep_perl_NEXT
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description NEXT
 The NEXT module adds a pseudo-class named "NEXT" to any program that uses it.
@@ -2903,7 +2894,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_ODBM_File
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description ODBM_File
 ODBM_File establishes a connection between a Perl hash variable and a file in
@@ -2921,7 +2912,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Opcode
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Opcode
 The Opcode module allows you to define an operator mask to be in effect when
@@ -2941,7 +2932,6 @@ Requires:       perl(encoding)
 %if %{defined perl_bootstrap}
 %gendep_perl_open
 %endif
-Conflicts:      perl < 4:5.20.2-326
 BuildArch:      noarch
 
 %description open
@@ -2961,7 +2951,7 @@ Requires:       perl(overloading)
 %if %{defined perl_bootstrap}
 %gendep_perl_overload
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description overload
 The "overload" pragma allows overloading of Perl operators for a class. To
@@ -2979,7 +2969,7 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_overloading
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description overloading
 Overloading pragma allows you to lexically disable or enable overloading.
@@ -3315,7 +3305,7 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_POSIX
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description POSIX
 The POSIX module permits you to access all (or nearly all) the standard POSIX
@@ -3331,7 +3321,7 @@ Requires:       %perl_compat
 %gendep_perl_Safe
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Safe
 The Safe extension module allows the creation of compartments in which Perl
@@ -3367,7 +3357,7 @@ Requires:       perl(feature)
 %gendep_perl_Search_Dict
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Search-Dict
 This module sets file position in a file handle to be first line greater than
@@ -3529,7 +3519,7 @@ Requires:       perl(XSLoader)
 %if %{defined perl_bootstrap}
 %gendep_perl_Sys_Hostname
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Sys-Hostname
 It attempts several methods of getting the system hostname and then caches the
@@ -3605,7 +3595,7 @@ Requires:       %perl_compat
 %gendep_perl_Term_Complete
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Term-Complete
 "Complete" routine provides word completion on a list of words in the array.
@@ -3621,7 +3611,7 @@ Requires:       perl(Term::Cap)
 %gendep_perl_Term_ReadLine
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Term-ReadLine
 This package is just a front end to some other packages. It's a stub to
@@ -3690,7 +3680,7 @@ Requires:       %perl_compat
 %gendep_perl_Text_Abbrev
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Text-Abbrev
 It stores all unambiguous truncations of each element of a list as keys in
@@ -3825,7 +3815,7 @@ Requires:       %perl_compat
 %gendep_perl_Tie_File
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Tie-File
 Tie::File represents a regular text file as a Perl array. Each element in the
@@ -3846,7 +3836,7 @@ Requires:       perl(Tie::ExtraHash)
 %gendep_perl_Tie_Memoize
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Tie-Memoize
 This package allows a tied hash to load its values automatically on the first
@@ -3866,7 +3856,7 @@ Suggests:       perl(Scalar::Util)
 %gendep_perl_Tie_RefHash
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Tie-RefHash
 This module provides the ability to use references as hash keys if you first
@@ -3886,7 +3876,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Time
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Time
 This package provides an object-oriented interface to Perl built-in gmtime()
@@ -3961,7 +3951,7 @@ Requires:       perl(Carp)
 %gendep_perl_Thread_Semaphore
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description Thread-Semaphore
 Semaphores provide a mechanism to regulate access to resources. Unlike locks,
@@ -4080,7 +4070,7 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_User_pwent
 %endif
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description User-pwent
 This package provides an object-oriented interface to Perl build-in getgr*()
