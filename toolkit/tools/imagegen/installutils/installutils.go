@@ -288,7 +288,7 @@ func umount(path string) (err error) {
 	return
 }
 
-// PackageNamesFromSingleSystemConfig goes through the packageslist and packages fields in the systemconfig, extracting
+// PackageNamesFromSingleSystemConfig goes through the "PackageLists" and "Packages" fields in the "SystemConfig" object, extracting
 // from packageList JSONs and packages listed in config itself to create one comprehensive package list.
 // NOTE: the package list contains the versions restrictions for the packages, if present, in the form "[package][condition][version]".
 //       Example: gcc=9.1.0
