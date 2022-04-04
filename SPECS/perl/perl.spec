@@ -4071,28 +4071,6 @@ you're not running VMS, this module does nothing.
 %patch200 -p1
 %patch201 -p1
 
-%if !%{defined perl_bootstrap}
-# Local patch tracking
-perl -x patchlevel.h \
-    'Fedora Patch1: Removes date check, Fedora/RHEL specific' \
-%ifarch %{multilib_64_archs}
-    'Fedora Patch2: support for libdir64' \
-%endif
-    'Fedora Patch3: use libresolv instead of libbind' \
-    'Fedora Patch4: USE_MM_LD_RUN_PATH' \
-    'Fedora Patch5: Provide MM::maybe_command independently (bug #1129443)' \
-    'Fedora Patch6: Dont run one io test due to random builder failures' \
-    'Fedora Patch8: Define SONAME for libperl.so' \
-    'Fedora Patch9: Install libperl.so to -Dshrpdir value' \
-    'Fedora Patch10: Make *DBM_File desctructors thread-safe (RT#61912)' \
-    'Fedora Patch11: Replace EU::MakeMaker dependency with EU::MM::Utils in IPC::Cmd (bug #1129443)' \
-    'Fedora Patch12: Link XS modules to pthread library to fix linking with -z defs' \
-    'Fedora Patch13: Pass the correct CFLAGS to dtrace' \
-    'Fedora Patch200: Link XS modules to libperl.so with EU::CBuilder on Linux' \
-    'Fedora Patch201: Link XS modules to libperl.so with EU::MM on Linux' \
-    %{nil}
-%endif
-
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
 
