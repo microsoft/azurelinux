@@ -236,18 +236,6 @@
     <zip zipfile="${zipfile}" basedir="." includes="${dist}/**" />
   </target>
 
-  <target name="upload.to.sourceforge" depends="zip">
-    <ftp server="upload.sourceforge.net"
-         userid="anonymous"
-         password="saff@mit.edu"
-         remotedir="incoming"
-         >
-      <fileset dir="${dist}" includes="*.jar" />
-      <fileset file="${zipfile}" />
-    </ftp>
-    <echo message="To upload docs, use build/upload_docs.sh" />
-  </target>
-
   <!-- to do automatic build upload, you need the maven ant tasks jar. -->
   <!-- therefore, you must run ant as ant -lib build/lib stage.maven -->
   <macrodef name="push.maven.artifact">

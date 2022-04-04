@@ -9,7 +9,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.15
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,7 +25,6 @@ Source6:        named.empty
 Source7:        named.rfc1912.zones
 Source8:        named.conf.sample
 Source9:        named.root.key
-Source10:       trusted-key.key
 Source11:       setup-named-chroot.sh
 Source12:       generate-rndc-key.sh
 Source13:       named.rwtab
@@ -335,7 +334,6 @@ popd
 # configuration files:
 touch %{buildroot}%{_sysconfdir}/rndc.{key,conf}
 install -m 644 %{SOURCE9} %{buildroot}%{_sysconfdir}/named.root.key
-install -m 644 %{SOURCE10} %{buildroot}%{_sysconfdir}/trusted-key.key
 mkdir -p %{buildroot}%{_sysconfdir}/named
 
 # data files:
@@ -615,6 +613,9 @@ fi;
 %{_tmpfilesdir}/named.conf
 
 %changelog
+* Mon Apr 04 2022 Henry Li <lihl@microsoft.com> - 9.16.15-4
+- Remove trusted-key.key which works with +sigchase, a deprecated feature
+
 * Sat Oct 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.16.15-3
 - Adding missing BR on 'systemd-rpm-macros'.
 
