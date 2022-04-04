@@ -102,7 +102,7 @@
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
 Version:        4.4.27
-Release:        2%{?dist}
+Release:        1%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -116,9 +116,7 @@ BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  libtool
-BuildRequires:  perl
-#BuildRequires:  perl-core
-BuildRequires:  perl-open
+BuildRequires:  perl-core
 # We do not need to keep this forever.
 %if !(0%{?fedora} > 31 || 0%{?rhel} > 10)
 # Inherited from former libcrypt package.
@@ -451,9 +449,6 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
-* Fri Apr 01 2022 Andrew Phelps <anphel@microsoft.com> - 4.4.27-2
-- Fix perl BR
-
 * Wed Jan 27 2022 Henry Li <lihl@microsoft.com> - 4.4.27-1
 - Upgrade to version 4.4.27
 - Remove patches that no longer apply
