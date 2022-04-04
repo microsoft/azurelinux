@@ -1,13 +1,13 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
-Version:        16.0.0
-Release:        8%{?dist}
+Version:        20.14.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
-Source0:        https://files.pythonhosted.org/packages/33/bc/fa0b5347139cd9564f0d44ebd2b147ac97c36b2403943dbee8a25fd74012/virtualenv-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -16,12 +16,14 @@ virtualenv is a tool to create isolated Python environment.
 %package -n     python3-virtualenv
 Summary:        Virtual Python Environment builder
 BuildRequires:  python3-devel
-BuildRequires:  python3-pytest
-BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
+BuildRequires:  python3-wheel
+
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
+
 Requires:       python3
 Provides:       %{name}-doc = %{version}-%{release}
 
@@ -38,15 +40,19 @@ virtualenv is a tool to create isolated Python environment.
 %py3_install
 
 %check
-%{python3} setup.py test
+pip3 install tox
+tox -e py
 
 %files -n python3-virtualenv
 %defattr(-,root,root,-)
-%license LICENSE.txt
+%license LICENSE
 %{python3_sitelib}/*
 %{_bindir}/virtualenv
 
 %changelog
+* Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20.14.0-1
+- Upgrade to 20.14.0
+
 * Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 16.0.0-8
 - Add an explicit BR on `python3-pip` to enable ptest
 

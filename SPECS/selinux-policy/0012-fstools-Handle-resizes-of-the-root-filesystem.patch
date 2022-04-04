@@ -1,0 +1,32 @@
+From ac71bbc2a4632b1f71a08696aee79e50fa216083 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 9 Mar 2022 20:24:42 +0000
+Subject: [PATCH 12/17] fstools: Handle resizes of the root filesystem.
+
+Resize2fs will create a .ismount-test-file temp file in the root of a
+filesystem to resize.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/fstools.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/fstools.te b/policy/modules/system/fstools.te
+index 3abd6b387..4664a01ae 100644
+--- a/policy/modules/system/fstools.te
++++ b/policy/modules/system/fstools.te
+@@ -47,6 +47,9 @@ can_exec(fsadm_t, fsadm_exec_t)
+ allow fsadm_t fsadm_tmp_t:dir manage_dir_perms;
+ allow fsadm_t fsadm_tmp_t:file manage_file_perms;
+ files_tmp_filetrans(fsadm_t, fsadm_tmp_t, { file dir })
++# resize2fs will create a .ismount-test-file temp file
++# in the root of a filesystem to resize
++files_root_filetrans(fsadm_t, fsadm_tmp_t, file)
+ 
+ allow fsadm_t fsadm_run_t:dir manage_dir_perms;
+ allow fsadm_t fsadm_run_t:file manage_file_perms;
+-- 
+2.17.1
+

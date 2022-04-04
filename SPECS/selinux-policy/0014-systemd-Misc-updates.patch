@@ -1,0 +1,124 @@
+From c1cc12aa402674b93ab8450679a6f7ce84e4fb82 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 9 Mar 2022 20:49:54 +0000
+Subject: [PATCH 14/17] systemd: Misc updates.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/terminal.if | 18 ++++++++++++++++++
+ policy/modules/system/init.te     |  3 ++-
+ policy/modules/system/systemd.te  | 11 ++++++++---
+ 3 files changed, 28 insertions(+), 4 deletions(-)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/kernel/terminal.if b/policy/modules/kernel/terminal.if
+index 55c18dffb..adee4e31c 100644
+--- a/policy/modules/kernel/terminal.if
++++ b/policy/modules/kernel/terminal.if
+@@ -1284,6 +1284,24 @@ interface(`term_dontaudit_use_unallocated_ttys',`
+ 	dontaudit $1 tty_device_t:chr_file rw_chr_file_perms;
+ ')
+ 
++########################################
++## <summary>
++##	Watch reads on unallocated ttys.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`term_watch_reads_unallocated_ttys',`
++	gen_require(`
++		type tty_device_t;
++	')
++
++	allow $1 tty_device_t:chr_file watch_reads;
++')
++
+ ########################################
+ ## <summary>
+ ##	Get the attributes of all tty device nodes.
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 01a0eb786..b3137c2bf 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -483,6 +483,7 @@ ifdef(`init_systemd',`
+ 	storage_getattr_removable_dev(init_t)
+ 
+ 	term_relabel_pty_dirs(init_t)
++	term_watch_reads_unallocated_ttys(init_t)
+ 
+ 	auth_manage_var_auth(init_t)
+ 	auth_relabel_login_records(init_t)
+@@ -1040,7 +1041,7 @@ ifdef(`enable_mls',`
+ ')
+ 
+ ifdef(`init_systemd',`
+-	allow initrc_t init_t:system { start status reboot halt reload };
++	allow initrc_t init_t:system { start stop status reboot halt reload };
+ 
+ 	manage_files_pattern(initrc_t, initrc_lock_t, initrc_lock_t)
+ 	files_lock_filetrans(initrc_t, initrc_lock_t, file)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index f7b8e2a00..ea38efb0f 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -497,6 +497,7 @@ kernel_dontaudit_getattr_proc(systemd_generator_t)
+ kernel_dontaudit_search_unlabeled(systemd_generator_t)
+ 
+ storage_raw_read_fixed_disk(systemd_generator_t)
++storage_raw_read_removable_device(systemd_generator_t)
+ 
+ systemd_log_parse_environment(systemd_generator_t)
+ 
+@@ -644,6 +645,7 @@ udev_read_runtime_files(systemd_homework_t)
+ #
+ 
+ allow systemd_hostnamed_t self:capability sys_admin;
++allow systemd_hostnamed_t self:process setfscreate;
+ 
+ kernel_read_kernel_sysctls(systemd_hostnamed_t)
+ kernel_dontaudit_getattr_proc(systemd_hostnamed_t)
+@@ -652,6 +654,8 @@ dev_read_sysfs(systemd_hostnamed_t)
+ 
+ files_read_etc_files(systemd_hostnamed_t)
+ 
++fs_getattr_all_fs(systemd_hostnamed_t)
++
+ selinux_use_status_page(systemd_hostnamed_t)
+ 
+ seutil_read_file_contexts(systemd_hostnamed_t)
+@@ -1351,8 +1355,8 @@ systemd_log_parse_environment(systemd_rfkill_t)
+ 
+ allow systemd_resolved_t self:capability { chown net_raw setgid setpcap setuid };
+ allow systemd_resolved_t self:process { getcap setcap setfscreate signal };
+-
+-allow systemd_resolved_t self:tcp_socket { accept listen };
++allow systemd_resolved_t self:unix_stream_socket create_stream_socket_perms;
++allow systemd_resolved_t self:tcp_socket create_stream_socket_perms;
+ 
+ allow systemd_resolved_t systemd_networkd_runtime_t:dir watch;
+ 
+@@ -1487,7 +1491,7 @@ allow systemd_sysusers_t self:unix_dgram_socket sendto;
+ files_manage_etc_files(systemd_sysusers_t)
+ 
+ fs_getattr_all_fs(systemd_sysusers_t)
+-fs_search_cgroup_dirs(systemd_sysusers_t)
++fs_search_all(systemd_sysusers_t)
+ 
+ kernel_read_kernel_sysctls(systemd_sysusers_t)
+ 
+@@ -1757,6 +1761,7 @@ seutil_libselinux_linked(systemd_user_session_type)
+ 
+ allow systemd_userdbd_t self:capability dac_read_search;
+ allow systemd_userdbd_t self:process signal;
++allow systemd_userdbd_t self:unix_stream_socket create_stream_socket_perms;
+ 
+ stream_connect_pattern(systemd_userdbd_t, systemd_homed_runtime_t, systemd_homed_runtime_t, systemd_homed_t)
+ 
+-- 
+2.17.1
+
