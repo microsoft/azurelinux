@@ -210,7 +210,7 @@ mkdir build-py3
 
 %build
 pushd build-py3
-  %cmake ../ -DPYTHON_DESIRED:FILEPATH=python3 -DWITHOUT_LOCAL:str=0
+  %cmake ../ -DPYTHON_DESIRED:FILEPATH=%python3 -DWITHOUT_LOCAL:str=0
   %make_build
   make doc-man
 popd
