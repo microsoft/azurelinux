@@ -13,8 +13,8 @@ BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl
 BuildRequires:  sed
-BuildRequires:  perl(ExtUtils::MakeMaker)
 %if %{with_check}
+BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::More)
 %endif
 
