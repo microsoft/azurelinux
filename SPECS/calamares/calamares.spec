@@ -219,6 +219,7 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %changelog
 * Mon Apr 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.11-38
 - Fix partioning bug
+- License verified
 
 * Mon Jan 25 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.2.11-37
 - Add "dmroot" flag to encrypted partition
