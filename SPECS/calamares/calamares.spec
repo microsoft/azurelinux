@@ -7,7 +7,7 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.2.11
-Release:        37%{?dist}
+Release:        38%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,7 @@ Source53:       mariner-eula
 Patch0:         calamares-3.2.11-default-settings.patch
 Patch1:         use-single-job-for-progress-bar-value.patch
 Patch2:         navigation-buttons-autodefault.patch
+Patch3:         round-to-full-disk-size.patch
 # Compilation tools
 BuildRequires:  cmake
 BuildRequires:  extra-cmake-modules
@@ -132,6 +133,7 @@ mv %{SOURCE24} src/modules/users/users.conf
 %patch0 -p1 -b .default-settings
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 # delete backup files so they don't get installed
 rm -f src/modules/*/*.conf.default-settings
 
@@ -215,6 +217,9 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Mon Apr 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.11-38
+- Add "dmroot" flag to encrypted partition
+
 * Mon Jan 25 2021 Nicolas Ontiveros <niontive@microsoft.com> - 3.2.11-37
 - Add "dmroot" flag to encrypted partition
 - Hide verity root read only skus
