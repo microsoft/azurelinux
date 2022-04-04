@@ -1,15 +1,22 @@
+%global debug_package %{nil}
 Summary:        NVIDIA container runtime
 Name:           nvidia-container-runtime
-Version:        3.4.2
-Release:        5%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/NVIDIA/nvidia-container-runtime
 #Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  golang
+Obsoletes: nvidia-container-runtime < 2.0.0
+Requires: nvidia-container-toolkit >= 1.9.0, nvidia-container-toolkit < 2.0.0
 Requires:       libseccomp
+# NVIDIA now includes the runtime within the toolkit installs itself.
+# Previously there were independent installs of the runtime and the toolkit
+# but with v3.9.0 and beyond the nvidia-container-runtime package no longer builds.
+#
+# The package is now a meta package that only forces the toolkit installation.
 
 %description
 Provides a modified version of runc allowing users to run GPU enabled
@@ -18,22 +25,29 @@ containers.
 %prep
 %setup -q
 
-%build
-cd src
-%make_build build
-
 %install
-mkdir -p %{buildroot}%{_bindir}
-install -m 755 src/%{name} %{buildroot}%{_bindir}/%{name}
 
 %files
 %license LICENSE
-%{_bindir}/%{name}
+
 
 %changelog
+* Wed Mar 30 2022 Adithya Jayachandran <adjayach@microsoft.com> - 3.9.0-1
+- Bumped version to 3.9.0
+- Package is officially included in toolkit install, this is a meta package
+- Added nvidia-container-toolkit minimum version 1.9.0 dependence
+
+* Tue Mar 29 2022 Adithya Jayachandran <adjayach@microsoft.com> - 3.5.0-1
+- Ported nvidia container runtime update v3.5.0 to 2.0
+- Added dependence on nvidia-container-toolkit >= 1.5.0
+- Change directory structure for build output
+
 * Wed Nov 17 2021 Mateusz Malisz <mateusz.malisz@microsoft.com> 3.4.2-5
 - Move buildroot directory tree creation to install step
 - Use make macros.
+
+* Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.4.2-5
+- Increment release to force republishing using golang 1.16.7.
 
 * Tue Jun 08 2021 Henry Beberman <henry.beberman@microsoft.com> 3.4.2-4
 - Increment release to force republishing using golang 1.15.13.
