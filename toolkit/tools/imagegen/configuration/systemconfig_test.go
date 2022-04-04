@@ -63,26 +63,32 @@ func TestShouldFailParsingMissingPackages_SystemConfig(t *testing.T) {
 	assert.Equal(t, "failed to parse [SystemConfig]: system configuration must provide at least one package list inside the [PackageLists] or one package in the [Packages] field", err.Error())
 }
 
-func TestShouldSucceedParsingMissingPackages_SystemConfig(t *testing.T) {
+func TestShouldSucceedParsingMissingPackageLists_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
 
+	//PackageList field is being wiped, Packages field is still non-empty
 	missingPackageListConfig := validSystemConfig
 	missingPackageListConfig.PackageLists = []string{}
 
-	missingPackagesConfig := validSystemConfig
-	missingPackagesConfig.Packages = []string{}
-
 	assert.NoError(t, missingPackageListConfig.IsValid())
-	assert.NoError(t, missingPackagesConfig.IsValid())
 
 	err := remarshalJSON(missingPackageListConfig, &checkedSystemConfig)
 	assert.NoError(t, err)
 	assert.Equal(t, missingPackageListConfig, checkedSystemConfig)
+}
 
-	err = remarshalJSON(missingPackagesConfig, &checkedSystemConfig)
+func TestShouldSucceedParsingMissingInlinePackages_SystemConfig(t *testing.T) {
+	var checkedSystemConfig SystemConfig
+
+	//Packages field is being wiped, PackageList field is still non-empty
+	missingPackagesConfig := validSystemConfig
+	missingPackagesConfig.Packages = []string{}
+
+	assert.NoError(t, missingPackagesConfig.IsValid())
+
+	err := remarshalJSON(missingPackagesConfig, &checkedSystemConfig)
 	assert.NoError(t, err)
 	assert.Equal(t, missingPackagesConfig, checkedSystemConfig)
-
 }
 
 func TestShouldFailParsingMissingDefaultKernel_SystemConfig(t *testing.T) {
