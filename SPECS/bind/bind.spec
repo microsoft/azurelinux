@@ -615,6 +615,7 @@ fi;
 %changelog
 * Mon Apr 04 2022 Henry Li <lihl@microsoft.com> - 9.16.15-4
 - Remove trusted-key.key which works with +sigchase, a deprecated feature
+- License Verified
 
 * Sat Oct 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.16.15-3
 - Adding missing BR on 'systemd-rpm-macros'.
