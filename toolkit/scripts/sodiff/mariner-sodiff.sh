@@ -42,36 +42,14 @@ function log_to_file {
 # However, created caches accumulate, so creating multiple caches
 # will not overwrite each other and any failures can be safely ignored
 
-# Flag to track running cache creation for the first match of repo header - skip since repo file not created yet
-firstmatch=1
-# Make common options point to the temporary repo file for now
-common_options="-c $temporary_repo_file --releasever $mariner_version"
-# IFS= prevents read from omitting leading/trailing whitespace
-# -r prevents read from interpreting backslash escapes
-while IFS= read -r line
+# Splitting cumulative .repo file into single .repo files.
+csplit -z -f 'repo' -b '_%d.repo' "$repo_file_path" '/^\[/' '{*}'
+
+# Updating cache with each repo info separately.
+for singe_repo_file in repo*.repo
 do
-    # If this is a start of a new repo definition
-    if grep -Eq "^\[[^]]+\]$" <<<"$line" ; then
-        # Do not run the operation on first match - repo file not filled yet
-        if [[ "$firstmatch" -eq 1 ]]; then
-            firstmatch=0
-        else
-            # Execute operation on the previous .repo file before proceeding with new one
-            makecache_with_common
-            echo ""
-        fi
-        log_to_file "Preparing cache for repo $line"
-        # Overwrite line to a repo file
-        printf '%s\n' "$line" > $temporary_repo_file
-    else
-        # Append line to a repo file
-        printf '%s\n' "$line" >> $temporary_repo_file
-    fi
-done < "$repo_file_path"
-# Run operation again for the final repo
-# In case repo file has only one repo definition, the command will
-# run twice on the same repo, but this is fine.
-makecache_with_common
+    makecache_with_common "$single_repo_file"
+done
 
 # Cache created - now we can point to the abridged file.
 common_options="-c $repo_file_path --releasever $mariner_version"
