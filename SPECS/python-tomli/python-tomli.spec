@@ -7,7 +7,7 @@ Tomli is fully compatible with TOML v1.0.0.}
 Summary:        A little TOML parser for Python
 Name:           python-%{pypi_name}
 Version:        2.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,9 +25,6 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-dateutil
-# Upstream test requirements are in tests/requirements.txt,
-# but they're mixed together with coverage ones. Tests only need:
-BuildRequires:  python3-pytest
 %endif
 
 %description %{_description}
@@ -51,7 +48,7 @@ Summary:        %{summary}
 %pyproject_save_files tomli
 
 %check
-pip3 install more_itertools pluggy
+pip3 install more_itertools pluggy pytest
 %py3_check_import tomli
 # assert the properly built package has no runtime requires
 # if it does, we need to change the bootstrap metadata
@@ -65,6 +62,9 @@ test -f %{buildroot}%{python3_sitelib}/tomli-%{version}.dist-info/METADATA
 %license LICENSE
 
 %changelog
+* Mon Apr 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-3
+- Removed BR on "python3-pytest" to break a circular dependency. Replaced with build-time pip3 installation.
+
 * Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
