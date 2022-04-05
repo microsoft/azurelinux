@@ -39,8 +39,8 @@ function log_to_file {
 # Split the abrdiged repo file and process each repo separately
 # because if any of the repos is not accessible,
 # creating cache for the whole .repo file fails.
-# However, created cache combines , so creating multiple caches
-# Will not overwrite each other and any failures can be safely ignored
+# However, created caches accumulate, so creating multiple caches
+# will not overwrite each other and any failures can be safely ignored
 
 # Flag to track running cache creation for the first match of repo header - skip since repo file not created yet
 firstmatch=1
