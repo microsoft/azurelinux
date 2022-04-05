@@ -511,6 +511,7 @@ python3-gpg-1.16.0-1.cm2.aarch64.rpm
 python3-jinja2-3.0.3-2.cm2.noarch.rpm
 python3-libs-3.9.10-1.cm2.aarch64.rpm
 python3-libxml2-2.9.13-1.cm2.aarch64.rpm
+python3-lxml-4.2.4-10.cm2.aarch64.rpm
 python3-magic-5.40-2.cm2.noarch.rpm
 python3-markupsafe-2.1.0-1.cm2.aarch64.rpm
 python3-newt-0.52.21-3.cm2.aarch64.rpm

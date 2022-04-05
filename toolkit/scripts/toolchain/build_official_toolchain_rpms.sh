@@ -432,7 +432,7 @@ build_rpm_in_chroot_no_install gtk-doc
 build_rpm_in_chroot_no_install Cython
 chroot_and_install_rpms python3-Cython
 build_rpm_in_chroot_no_install python-lxml
-chroot_and_install_rpms python-lxml
+chroot_and_install_rpms python3-lxml
 
 # p11-kit, libtasn1 and glib need gtk-doc
 chroot_and_install_rpms gtk-doc
