@@ -52,14 +52,43 @@ func TestShouldFailParsingMissingPackages_SystemConfig(t *testing.T) {
 
 	missingPackageListConfig := validSystemConfig
 	missingPackageListConfig.PackageLists = []string{}
+	missingPackageListConfig.Packages = []string{}
 
 	err := missingPackageListConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "system configuration must provide at least one package list inside the [PackageLists] field", err.Error())
+	assert.Equal(t, "system configuration must provide at least one package list inside the [PackageLists] or one package in the [Packages] field", err.Error())
 
 	err = remarshalJSON(missingPackageListConfig, &checkedSystemConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [SystemConfig]: system configuration must provide at least one package list inside the [PackageLists] field", err.Error())
+	assert.Equal(t, "failed to parse [SystemConfig]: system configuration must provide at least one package list inside the [PackageLists] or one package in the [Packages] field", err.Error())
+}
+
+func TestShouldSucceedParsingMissingPackageLists_SystemConfig(t *testing.T) {
+	var checkedSystemConfig SystemConfig
+
+	//PackageList field is being wiped, Packages field is still non-empty
+	missingPackageListConfig := validSystemConfig
+	missingPackageListConfig.PackageLists = []string{}
+
+	assert.NoError(t, missingPackageListConfig.IsValid())
+
+	err := remarshalJSON(missingPackageListConfig, &checkedSystemConfig)
+	assert.NoError(t, err)
+	assert.Equal(t, missingPackageListConfig, checkedSystemConfig)
+}
+
+func TestShouldSucceedParsingMissingInlinePackages_SystemConfig(t *testing.T) {
+	var checkedSystemConfig SystemConfig
+
+	//Packages field is being wiped, PackageList field is still non-empty
+	missingPackagesConfig := validSystemConfig
+	missingPackagesConfig.Packages = []string{}
+
+	assert.NoError(t, missingPackagesConfig.IsValid())
+
+	err := remarshalJSON(missingPackagesConfig, &checkedSystemConfig)
+	assert.NoError(t, err)
+	assert.Equal(t, missingPackagesConfig, checkedSystemConfig)
 }
 
 func TestShouldFailParsingMissingDefaultKernel_SystemConfig(t *testing.T) {
@@ -70,11 +99,11 @@ func TestShouldFailParsingMissingDefaultKernel_SystemConfig(t *testing.T) {
 
 	err := missingDefaultConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "system configuration must always provide default kernel inside the [KernelOptions] field; remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", err.Error())
+	assert.Equal(t, "system configuration must always provide default kernel inside the [KernelOptions] field; remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", err.Error())
 
 	err = remarshalJSON(missingDefaultConfig, &checkedSystemConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [SystemConfig]: system configuration must always provide default kernel inside the [KernelOptions] field; remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", err.Error())
+	assert.Equal(t, "failed to parse [SystemConfig]: system configuration must always provide default kernel inside the [KernelOptions] field; remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", err.Error())
 }
 
 func TestShouldFailParsingMissingExtraBlankKernel_SystemConfig(t *testing.T) {
@@ -86,11 +115,11 @@ func TestShouldFailParsingMissingExtraBlankKernel_SystemConfig(t *testing.T) {
 
 	err := blankKernelConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", err.Error())
+	assert.Equal(t, "empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", err.Error())
 
 	err = remarshalJSON(blankKernelConfig, &checkedSystemConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [SystemConfig]: empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", err.Error())
+	assert.Equal(t, "failed to parse [SystemConfig]: empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", err.Error())
 }
 
 func TestShouldSucceedParsingMissingDefaultKernelForRootfs_SystemConfig(t *testing.T) {
@@ -119,11 +148,11 @@ func TestShouldFailParsingInvalidKernelForRootfs_SystemConfig(t *testing.T) {
 
 	err := rootfsInvalidKernelConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", err.Error())
+	assert.Equal(t, "empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", err.Error())
 
 	err = remarshalJSON(rootfsInvalidKernelConfig, &checkedSystemConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [SystemConfig]: empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists]", err.Error())
+	assert.Equal(t, "failed to parse [SystemConfig]: empty kernel entry found in the [KernelOptions] field (extra); remember that kernels are FORBIDDEN from appearing in any of the [PackageLists] or [Packages]", err.Error())
 }
 
 func TestShouldFailParsingBadKernelCommandLine_SystemConfig(t *testing.T) {
