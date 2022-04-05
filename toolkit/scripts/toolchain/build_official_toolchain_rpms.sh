@@ -264,7 +264,6 @@ chroot_and_install_rpms perl
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
-build_rpm_in_chroot_no_install mariner-release
 
 # Need to install perl-DBI in order for perl-DBD-SQLite to build
 build_rpm_in_chroot_no_install perl-DBI
