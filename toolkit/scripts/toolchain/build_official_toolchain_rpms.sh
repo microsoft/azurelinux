@@ -293,6 +293,11 @@ build_rpm_in_chroot_no_install perl-Text-Template
 chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
 
+# perl-generators requires perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+chroot_and_install_rpms perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+
 build_rpm_in_chroot_no_install wget
 
 # build and install additional openjdk build dependencies
@@ -334,6 +339,8 @@ build_rpm_in_chroot_no_install grep
 # Lua needs to be installed for RPM to build
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
+
+build_rpm_in_chroot_no_install lua-rpm-macros
 
 # Build tdnf-3.2.2
 build_rpm_in_chroot_no_install kmod
@@ -418,6 +425,11 @@ chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
 chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gtk-doc
+
+# python3-lxml requires python3-Cython and libxslt
+build_rpm_in_chroot_no_install Cython
+chroot_and_install_rpms Cython
+build_rpm_in_chroot_no_install python-lxml
 
 # p11-kit, libtasn1 and glib need gtk-doc
 chroot_and_install_rpms gtk-doc
