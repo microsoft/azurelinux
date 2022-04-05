@@ -13,6 +13,9 @@ Source0:        %{name}-%{version}.tar.gz
 #Source1        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz
 Source1:        jitterentropy-library-3.3.1.tar.gz
 BuildRequires:  cmake
+%ifarch aarch64
+BuildRequires:  clang
+%endif
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  python3
