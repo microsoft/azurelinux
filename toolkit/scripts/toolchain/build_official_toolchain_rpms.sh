@@ -430,7 +430,7 @@ build_rpm_in_chroot_no_install gtk-doc
 
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
-chroot_and_install_rpms Cython
+chroot_and_install_rpms python3-Cython
 build_rpm_in_chroot_no_install python-lxml
 chroot_and_install_rpms python-lxml
 
