@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,14 @@ Patch6:         0006-systemd-ssh-Crypto-sysctl-use.patch
 Patch7:         0007-systemd-Additional-fixes-for-fs-getattrs.patch
 Patch8:         0008-systemd-Updates-for-generators-and-kmod-static-nodes.patch
 Patch9:         0009-Add-containers-policy.patch
+Patch10:        0010-domain-Allow-lockdown-for-all-domains.patch
+Patch11:        0011-systemd-Drop-systemd_detect_virt_t.patch
+Patch12:        0012-fstools-Handle-resizes-of-the-root-filesystem.patch
+Patch13:        0013-mount-Get-the-attributes-of-all-filesystems.patch
+Patch14:        0014-systemd-Misc-updates.patch
+Patch15:        0015-rpm-Add-dnf-and-tdnf-labeling.patch
+Patch16:        0016-logging-Change-to-systemd-interface-for-tmpfilesd.patch
+Patch17:        0017-Add-cloud-init.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -35,6 +43,7 @@ BuildRequires:  python3
 BuildRequires:  python3-xml
 Requires(pre):  coreutils
 Requires(pre):  policycoreutils >= %{POLICYCOREUTILSVER}
+Provides:       selinux-policy-base
 Provides:       selinux-policy-targeted
 BuildArch:      noarch
 
@@ -302,6 +311,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Wed Mar 30 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.20220106-4
+- chpebeni@microsoft.com, 2.20220106-3: Additional policy fixes for enforcing core images.
+
 * Thu Mar 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.20220106-3
 - chpebeni@microsoft.com, 2.20220106-2: Split policy modules to a subpackage. 
   Keep core images supported by base module.
