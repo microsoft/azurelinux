@@ -267,7 +267,7 @@ func TestShouldSucceedSELinuxPackageDefinedInline(t *testing.T) {
 		configDirectory   = "../../imageconfigs/"
 		targetPackage     = "core-efi.json"
 		targetPackageList = "selinux.json"
-		selinuxPkgName     = "selinux-policy"
+		selinuxPkgName    = "selinux-policy"
 	)
 	configFiles, err := ioutil.ReadDir(configDirectory)
 	assert.NoError(t, err)
