@@ -12,6 +12,7 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 	"microsoft.com/pkggen/imagegen/configuration"
+	"microsoft.com/pkggen/imagegen/parse_partition"
 	"microsoft.com/pkggen/imagegen/diskutils"
 	"microsoft.com/pkggen/imagegen/installutils"
 	"microsoft.com/pkggen/internal/exe"
@@ -66,6 +67,10 @@ func main() {
 	// Parse Config
 	config, err := configuration.LoadWithAbsolutePaths(*configFile, *baseDirPath)
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
+
+	// Parse the partition file
+	err = parse_partition.parseKickStartParitionScheme(config)
+	logger.PanicOnError(err, "Failed to build system configuration")
 
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]
