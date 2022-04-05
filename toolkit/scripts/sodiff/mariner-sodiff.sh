@@ -36,7 +36,7 @@ function log_to_file {
     >>$sodiff_log_file echo -- $@
 }
 
-# Split the abrdiged repo file and process each repo separately
+# Split the abridged repo file and process each repo separately
 # because if any of the repos is not accessible,
 # creating cache for the whole .repo file fails.
 # However, created caches accumulate, so creating multiple caches
