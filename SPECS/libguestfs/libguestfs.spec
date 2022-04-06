@@ -1016,7 +1016,8 @@ rm ocaml/html/.gitignore
 
 
 %files -f %{name}.lang
-%doc COPYING README
+%license COPYING COPYING.LIB
+%doc README
 %{_bindir}/libguestfs-test-tool
 %if %{with applicances}
 %{_libdir}/guestfs/
@@ -1153,7 +1154,7 @@ rm ocaml/html/.gitignore
 %endif
 
 %files -n virt-dib
-%doc COPYING README
+%doc README
 %{_bindir}/virt-dib
 %{_mandir}/man1/virt-dib.1*
 %if %{with applicances}
