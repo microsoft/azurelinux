@@ -39,6 +39,7 @@ Distribution:   Mariner
 %bcond_without applicances
 %bcond_with php
 %bcond_with inspect-icons
+%bcond_with man-pages
 
 Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
@@ -87,6 +88,9 @@ BuildRequires: ocaml-hivex-devel
 BuildRequires: perl(Pod::Simple)
 BuildRequires: perl(Pod::Man)
 BuildRequires: /usr/bin/pod2text
+%if %{with man-pages}
+BuildRequires: po4a
+%endif
 BuildRequires: augeas-devel >= 1.7.0
 BuildRequires: readline-devel
 BuildRequires: genisoimage
@@ -111,8 +115,8 @@ BuildRequires: unzip
 BuildRequires: systemd-units
 %if %{with inspect-icons}
 BuildRequires: netpbm-progs
-%endif
 BuildRequires: icoutils
+%endif
 BuildRequires: libvirt-daemon-kvm >= 5.3.0
 BuildRequires: perl(Expect)
 BuildRequires: libacl-devel
@@ -721,7 +725,7 @@ Provides:      golang(libguestfs.org) = %{version}-%{release}
 golang-%{name} contains Go language bindings for %{name}.
 %endif
 
-
+%if %{with man-pages}
 %package man-pages-ja
 Summary:       Japanese (ja) man pages for %{name}
 BuildArch:     noarch
@@ -740,7 +744,7 @@ Requires:      %{name} = %{version}-%{release}
 %description man-pages-uk
 %{name}-man-pages-uk contains Ukrainian (uk) man pages
 for %{name}.
-
+%endif
 
 %prep
 %autosetup -p1
@@ -1254,23 +1258,22 @@ rm ocaml/html/.gitignore
 %{_mandir}/man3/guestfs-golang.3*
 %endif
 
-
+%if %{with man-pages}
 %files man-pages-ja
 %lang(ja) %{_mandir}/ja/man1/*.1*
 %lang(ja) %{_mandir}/ja/man3/*.3*
 %lang(ja) %{_mandir}/ja/man5/*.5*
 
-
 %files man-pages-uk
 %lang(uk) %{_mandir}/uk/man1/*.1*
 %lang(uk) %{_mandir}/uk/man3/*.3*
 %lang(uk) %{_mandir}/uk/man5/*.5*
-
+%endif
 
 %changelog
 * Tue Apr 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44.0-6
 - License verified.
-- Removing BR on "po4a".
+- Making BR on "po4a" conditional.
 - Spec clean-up.
 
 * Sat Feb 05 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-5
