@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"runtime"
 	"sync"
+	"time"
 
 	"github.com/juliangruber/go-intersect"
 	"golang.org/x/sys/unix"
@@ -32,9 +33,11 @@ const (
 // Unlike BuildChannels, schedulerChannels holds bidirectional channels that
 // only the top-level scheduler should have. BuildChannels contains directional channels.
 type schedulerChannels struct {
-	Requests chan *schedulerutils.BuildRequest
-	Results  chan *schedulerutils.BuildResult
-	Cancel   chan struct{}
+	Requests         chan *schedulerutils.BuildRequest
+	PriorityRequests chan *schedulerutils.BuildRequest
+	Results          chan *schedulerutils.BuildResult
+	Cancel           chan struct{}
+	Done             chan struct{}
 }
 
 var (
@@ -223,16 +226,20 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 // channelBufferSize controls how many entries in the channels can be buffered before blocking writes to them.
 func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages []string) (channels *schedulerChannels) {
 	channels = &schedulerChannels{
-		Requests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
-		Results:  make(chan *schedulerutils.BuildResult, channelBufferSize),
-		Cancel:   make(chan struct{}),
+		Requests:         make(chan *schedulerutils.BuildRequest, channelBufferSize),
+		PriorityRequests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
+		Results:          make(chan *schedulerutils.BuildResult, channelBufferSize),
+		Cancel:           make(chan struct{}),
+		Done:             make(chan struct{}),
 	}
 
 	// Downcast the bidirectional scheduler channels into directional channels for the build workers.
 	directionalChannels := &schedulerutils.BuildChannels{
-		Requests: channels.Requests,
-		Results:  channels.Results,
-		Cancel:   channels.Cancel,
+		Requests:         channels.Requests,
+		PriorityRequests: channels.PriorityRequests,
+		Results:          channels.Results,
+		Cancel:           channels.Cancel,
+		Done:             channels.Done,
 	}
 
 	// Start the workers now so they begin working as soon as a new job is queued.
@@ -276,7 +283,28 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, buildState, canUseCache)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
-			channels.Requests <- req
+			// Decide which priority the build should be. Generally we want to get any remote or prebuilt nodes out of the
+			// way as quickly as possible since they may help us optimize the graph early.
+			// Meta nodes may also be blocking somethign we want to examine and give higher priority (priority inheritance from
+			// the hypothetical high priority node hidden further into the tree)
+			switch req.Node.Type {
+			case pkggraph.TypePreBuilt:
+				fallthrough
+			case pkggraph.TypeGoal:
+				fallthrough
+			case pkggraph.TypePureMeta:
+				fallthrough
+			case pkggraph.TypeRun:
+				fallthrough
+			case pkggraph.TypeRemote:
+				channels.PriorityRequests <- req
+
+			// For now all build nodes are of equal priority
+			case pkggraph.TypeBuild:
+				fallthrough
+			default:
+				channels.Requests <- req
+			}
 		}
 		nodesToBuild = nil
 
@@ -355,6 +383,13 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		}
 	}
 
+	// Let the workers know they are done
+	doneBuild(channels)
+	// Give the workers time to finish so they don't mess up the summary we want to print.
+	// Some nodes may still be busy with long running builds we don't care about anymore, so we don't
+	// want to actually block here.
+	time.Sleep(time.Second)
+
 	builtGraph = pkgGraph
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState)
 
@@ -384,6 +419,12 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 	return
 }
 
+func doneBuild(channels *schedulerChannels) {
+	// Close the done channel. The build workers will finish processing any work, then return
+	// upon seeing this channel is closed.
+	close(channels.Done)
+}
+
 // stopBuild will stop all future builds from being scheduled by sending a cancellation signal
 // to the worker pool and draining any outstanding build requests.
 func stopBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuildState) {
@@ -398,6 +439,7 @@ func stopBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuil
 	// requests channel to wake up any build workers waiting on a request to be buffered.
 	// Upon being woken up by a closed requests channel, the build worker will stop.
 	close(channels.Requests)
+	close(channels.PriorityRequests)
 
 	// Drain the request buffer to sync the build state with the new number of outstanding builds.
 	for req := range channels.Requests {

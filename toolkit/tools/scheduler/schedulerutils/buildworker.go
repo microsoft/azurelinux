@@ -20,9 +20,11 @@ import (
 
 // BuildChannels represents the communicate channels used by a build agent.
 type BuildChannels struct {
-	Requests <-chan *BuildRequest
-	Results  chan<- *BuildResult
-	Cancel   <-chan struct{}
+	Requests         <-chan *BuildRequest
+	PriorityRequests <-chan *BuildRequest
+	Results          chan<- *BuildResult
+	Cancel           <-chan struct{}
+	Done             <-chan struct{}
 }
 
 // BuildRequest represents the results of a build agent trying to build a given node.
@@ -44,15 +46,43 @@ type BuildResult struct {
 	UsedCache      bool
 }
 
+//selectNextBuildRequest selects a job based on priority:
+//  1) Bail out if the jobs are cancelled
+//	2) There is something in the priority queue
+//	3) Any job in either normal OR priority queue
+//		OR are the jobs done/cancelled
+func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish bool) {
+	select {
+	case <-channels.Cancel:
+		logger.Log.Warn("Cancellation signal received")
+		return nil, true
+	default:
+		select {
+		case req = <-channels.PriorityRequests:
+			logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
+			return req, false
+		default:
+			select {
+			case req = <-channels.PriorityRequests:
+				logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
+				return req, false
+			case req = <-channels.Requests:
+				logger.Log.Tracef("normal REQUEST: %v", *req)
+				return req, false
+			case <-channels.Cancel:
+				logger.Log.Warn("Cancellation signal received")
+				return nil, true
+			case <-channels.Done:
+				logger.Log.Debug("Worker finished signal received")
+				return nil, true
+			}
+		}
+	}
+}
+
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
 func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, ignoredPackages []string) {
-	for req := range channels.Requests {
-		select {
-		case <-channels.Cancel:
-			logger.Log.Warn("Cancellation signal received")
-			return
-		default:
-		}
+	for req, cancelled := selectNextBuildRequest(channels); !cancelled && req != nil; req, cancelled = selectNextBuildRequest(channels) {
 
 		res := &BuildResult{
 			Node:           req.Node,
