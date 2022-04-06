@@ -18,6 +18,7 @@ import (
 	"microsoft.com/pkggen/internal/pkggraph"
 	"microsoft.com/pkggen/internal/pkgjson"
 	"microsoft.com/pkggen/internal/rpm"
+	"microsoft.com/pkggen/scheduler/schedulerutils"
 )
 
 var (
@@ -34,6 +35,7 @@ var (
 	repoFiles            = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
 	usePreviewRepo       = app.Flag("use-preview-repo", "Pull packages from the upstream preview repo").Bool()
 	disableUpstreamRepos = app.Flag("disable-upstream-repos", "Disables pulling packages from upstream repos").Bool()
+	toolchainManifest    = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
 
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
@@ -59,8 +61,17 @@ func main() {
 		logger.Log.Panicf("Failed to read graph to file. Error: %s", err)
 	}
 
+	var toolchainPackages []string
+	toolchainManifest := *toolchainManifest
+	if len(toolchainManifest) > 0 {
+		toolchainPackages, err = schedulerutils.ReadReservedFilesList(toolchainManifest)
+		if err != nil {
+			logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s", toolchainManifest, err)
+		}
+	}
+
 	if hasUnresolvedNodes(dependencyGraph) {
-		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile, *disableUpstreamRepos, *stopOnFailure)
+		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, *outputSummaryFile, toolchainPackages, *disableUpstreamRepos, *stopOnFailure)
 		if err != nil {
 			logger.Log.Panicf("Failed to resolve graph. Error: %s", err)
 		}
@@ -86,7 +97,7 @@ func hasUnresolvedNodes(graph *pkggraph.PkgGraph) bool {
 
 // resolveGraphNodes scans a graph and for each unresolved node in the graph clones the RPMs needed
 // to satisfy it.
-func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, disableUpstreamRepos, stopOnFailure bool) (err error) {
+func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, toolchainPackages []string, disableUpstreamRepos, stopOnFailure bool) (err error) {
 	// Create the worker environment
 	cloner := rpmrepocloner.New()
 	err = cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *usePreviewRepo, *repoFiles)
@@ -108,9 +119,10 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	if strings.TrimSpace(inputSummaryFile) == "" {
 		// Cache an RPM for each unresolved node in the graph.
 		fetchedPackages := make(map[string]bool)
+		prebuiltPackages := make(map[string]bool)
 		for _, n := range dependencyGraph.AllRunNodes() {
 			if n.State == pkggraph.StateUnresolved {
-				resolveErr := resolveSingleNode(cloner, n, fetchedPackages, *outDir)
+				resolveErr := resolveSingleNode(cloner, n, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
 				// Failing to clone a dependency should not halt a build.
 				// The build should continue and attempt best effort to build as many packages as possible.
 				if resolveErr != nil {
@@ -154,7 +166,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 
 // resolveSingleNode caches the RPM for a single node.
 // It will modify fetchedPackages on a successful package clone.
-func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, fetchedPackages map[string]bool, outDir string) (err error) {
+func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, toolchainPackages []string, fetchedPackages, prebuiltPackages map[string]bool, outDir string) (err error) {
 	const cloneDeps = true
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
@@ -177,20 +189,22 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return fmt.Errorf("failed to find any packages providing '%v'", node.VersionedPkg)
 	}
 
+	preBuilt := false
 	for _, resolvedPackage := range resolvedPackages {
 		if !fetchedPackages[resolvedPackage] {
 			desiredPackage := &pkgjson.PackageVer{
 				Name: resolvedPackage,
 			}
 
-			err = cloner.Clone(cloneDeps, desiredPackage)
+			preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
 			if err != nil {
 				logger.Log.Errorf("Failed to clone '%s' from RPM repo. Error: %s", resolvedPackage, err)
 				return
 			}
 			fetchedPackages[resolvedPackage] = true
+			prebuiltPackages[resolvedPackage] = preBuilt
 
-			logger.Log.Debugf("Fetched '%s' as potential candidate.", resolvedPackage)
+			logger.Log.Debugf("Fetched '%s' as potential candidate (is pre-built: %v).", resolvedPackage, prebuiltPackages[resolvedPackage])
 		}
 	}
 
@@ -200,7 +214,16 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return
 	}
 
-	node.State = pkggraph.StateCached
+	// If a package is  available locally, and it is part of the toolchain, mark it as a prebuilt so the scheduler knows it can use it
+	// immediately (especially for dynamic generator created capabilities)
+	if (preBuilt || prebuiltPackages[node.RpmPath]) && isToolchainPackage(node.RpmPath, toolchainPackages) {
+		logger.Log.Debugf("Using a prebuilt toolchain package to resolve this dependency")
+		prebuiltPackages[node.RpmPath] = true
+		node.State = pkggraph.StateUpToDate
+		node.Type = pkggraph.TypePreBuilt
+	} else {
+		node.State = pkggraph.StateCached
+	}
 
 	logger.Log.Infof("Choosing '%s' to provide '%s'.", filepath.Base(node.RpmPath), node.VersionedPkg.Name)
 
@@ -244,4 +267,14 @@ func rpmPackageToRPMPath(rpmPackage, outDir string) string {
 	// Construct the rpm path of the cloned package.
 	rpmName := fmt.Sprintf("%s.rpm", rpmPackage)
 	return filepath.Join(outDir, rpmName)
+}
+
+func isToolchainPackage(rpmPath string, toolchainRPMs []string) bool {
+	base := filepath.Base(rpmPath)
+	for _, t := range toolchainRPMs {
+		if t == base {
+			return true
+		}
+	}
+	return false
 }

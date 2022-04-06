@@ -1123,6 +1123,7 @@ func (g *PkgGraph) CreateSubGraph(rootNode *PkgNode) (subGraph *PkgGraph, err er
 // The function will lock 'graphMutex' before performing the check if the mutex is not nil.
 func IsSRPMPrebuilt(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (isPrebuilt bool, rpmFiles []string) {
 	rpmFiles = rpmsProvidedBySRPM(srpmPath, pkgGraph, graphMutex)
+	logger.Log.Tracef("Expected RPMs from %s: %v", srpmPath, rpmFiles)
 	isPrebuilt = findAllRPMS(rpmFiles)
 	return
 }
