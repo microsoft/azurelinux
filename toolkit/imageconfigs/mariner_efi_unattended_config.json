@@ -1,197 +1,56 @@
 {
- "Disks": [
-  {
-   "PartitionTableType": "gpt",
-   "MaxSize": 0,
-   "TargetDisk": {
-    "Type": "path",
-    "Value": "/dev/sda"
-   },
-   "Artifacts": null,
-   "Partitions": [
-    {
-     "FsType": "fat32",
-     "ID": "boot",
-     "Name": "",
-     "End": 200,
-     "Start": 1,
-     "Flags": [
-      "esp",
-      "boot"
-     ],
-     "Artifacts": null
-    },
-    {
-     "FsType": "ext4",
-     "ID": "rootfs",
-     "Name": "",
-     "End": 0,
-     "Start": 200,
-     "Flags": null,
-     "Artifacts": null
-    }
-   ],
-   "RawBinaries": null
-  }
- ],
- "SystemConfigs": [
-  {
-   "IsDefault": false,
-   "BootType": "efi",
-   "Hostname": "marineros-client",
-   "Name": "Standard",
-   "PackageLists": [
-    "packagelists/hyperv-packages.json",
-    "packagelists/core-packages-image.json"
-   ],
-   "KernelOptions": {
-    "default": "kernel"
-   },
-   "KernelCommandLine": {
-    "ImaPolicy": null,
-    "ExtraCommandLine": ""
-   },
-   "AdditionalFiles": {},
-   "PartitionSettings": [
-    {
-     "RemoveDocs": false,
-     "ID": "boot",
-     "MountOptions": "umask=0077",
-     "MountPoint": "/boot/efi",
-     "OverlayBaseImage": "",
-     "RdiffBaseImage": ""
-    },
-    {
-     "RemoveDocs": false,
-     "ID": "rootfs",
-     "MountOptions": "",
-     "MountPoint": "/",
-     "OverlayBaseImage": "",
-     "RdiffBaseImage": ""
-    }
-   ],
-   "Groups": null,
-   "Users": [
-    {
-     "Name": "mariner_user",
-     "UID": "",
-     "PasswordHashed": false,
-     "Password": "Mariner@Test9",
-     "PasswordExpiresDays": 0,
-     "SSHPubKeyPaths": null,
-     "PrimaryGroup": "",
-     "SecondaryGroups": null,
-     "StartupCommand": ""
-    },
-    {
-     "Name": "root",
-     "UID": "",
-     "PasswordHashed": false,
-     "Password": "Mariner@Test9",
-     "PasswordExpiresDays": 0,
-     "SSHPubKeyPaths": null,
-     "PrimaryGroup": "",
-     "SecondaryGroups": null,
-     "StartupCommand": ""
-    }
-   ],
-   "Encryption": {
-    "Enable": false,
-    "Password": ""
-   },
-   "RemoveRpmDb": false,
-   "ReadOnlyVerityRoot": {
-    "Enable": false,
-    "Name": "",
-    "ErrorCorrectionEnable": false,
-    "ErrorCorrectionEncodingRoots": 0,
-    "RootHashSignatureEnable": false,
-    "ValidateOnBoot": false,
-    "VerityErrorBehavior": "",
-    "TmpfsOverlays": null,
-    "TmpfsOverlaySize": "",
-    "TmpfsOverlayDebugEnabled": false
-   },
-   "HidepidDisabled": false
-  }
- ],
- "DefaultSystemConfig": {
-  "IsDefault": false,
-  "BootType": "efi",
-  "Hostname": "marineros-client",
-  "Name": "Standard",
-  "PackageLists": [
-    "packagelists/hyperv-packages.json",
-    "packagelists/core-packages-image.json"
+  "Disks": [
+      {
+          "PartitionTableType": "gpt",
+          "MaxSize": 2048,
+          "Artifacts": [
+              {
+                  "Name": "core",
+                  "Type": "vhd"
+              }
+          ],
+          "Partitions": [
+              {
+                  "ID": "boot",
+                  "Flags": [
+                      "grub"
+                  ],
+                  "Start": 1,
+                  "End": 9,
+                  "FsType": "fat32"
+              },
+              {
+                  "ID": "rootfs",
+                  "Start": 9,
+                  "End": 0,
+                  "FsType": "ext4"
+              }
+          ]
+      }
   ],
-  "KernelOptions": {
-   "default": "kernel"
-  },
-  "KernelCommandLine": {
-   "ImaPolicy": null,
-   "ExtraCommandLine": ""
-  },
-  "AdditionalFiles": {},
-  "PartitionSettings": [
-   {
-    "RemoveDocs": false,
-    "ID": "boot",
-    "MountOptions": "umask=0077",
-    "MountPoint": "/boot/efi",
-    "OverlayBaseImage": "",
-    "RdiffBaseImage": ""
-   },
-   {
-    "RemoveDocs": false,
-    "ID": "rootfs",
-    "MountOptions": "",
-    "MountPoint": "/",
-    "OverlayBaseImage": "",
-    "RdiffBaseImage": ""
-   }
-  ],
-  "Groups": null,
-  "Users": [
-   {
-    "Name": "mariner_user",
-    "UID": "",
-    "PasswordHashed": false,
-    "Password": "Mariner@Test9",
-    "PasswordExpiresDays": 0,
-    "SSHPubKeyPaths": null,
-    "PrimaryGroup": "",
-    "SecondaryGroups": null,
-    "StartupCommand": ""
-   },
-   {
-    "Name": "root",
-    "UID": "",
-    "PasswordHashed": false,
-    "Password": "Mariner@Test9",
-    "PasswordExpiresDays": 0,
-    "SSHPubKeyPaths": null,
-    "PrimaryGroup": "",
-    "SecondaryGroups": null,
-    "StartupCommand": ""
-   }
-  ],
-  "Encryption": {
-   "Enable": false,
-   "Password": ""
-  },
-  "RemoveRpmDb": false,
-  "ReadOnlyVerityRoot": {
-   "Enable": false,
-   "Name": "",
-   "ErrorCorrectionEnable": false,
-   "ErrorCorrectionEncodingRoots": 0,
-   "RootHashSignatureEnable": false,
-   "ValidateOnBoot": false,
-   "VerityErrorBehavior": "",
-   "TmpfsOverlays": null,
-   "TmpfsOverlaySize": "",
-   "TmpfsOverlayDebugEnabled": false
-  },
-  "HidepidDisabled": false
- }
+  "SystemConfigs": [
+      {
+          "Name": "Standard",
+          "BootType": "legacy",
+          "PartitionSettings": [
+              {
+                  "ID": "boot",
+                  "MountPoint": ""
+              },
+              {
+                  "ID": "rootfs",
+                  "MountPoint": "/"
+              }
+          ],
+          "PackageLists": [
+              "packagelists/hyperv-packages.json",
+              "packagelists/core-packages-image.json",
+              "packagelists/cloud-init-packages.json"
+          ],
+          "KernelOptions": {
+              "default": "kernel"
+          },
+          "Hostname": "cbl-mariner"
+      }
+  ]
 }

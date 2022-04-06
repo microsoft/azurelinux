@@ -3,7 +3,7 @@
 
 // Utility to create and manipulate disks and partitions
 
-package parse_partition
+package configuration
 
 import (
 	"bufio"
@@ -11,35 +11,41 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
-
-
-	"microsoft.com/pkggen/imagegen/configuration"
-	"microsoft.com/pkggen/internal/logger"
 )
 
-func parseKickStartParitionScheme(config configuration.Config) {
+func ParseKickStartParitionScheme(config Config) (err error) {
 
-	var {
+	var (
 		parseCmd			string
 		partitionFlags		[]string
-		paritionTableType	PartitionTableType
-		curDisk				configuration.Disk
-		curConfig			configuration.SystemConfig
-		diskInfo			map[string]configuration.Disk
-		configInfo			map[string]configuration.SystemConfig
-	}
+		partitionTableType	PartitionTableType
+		curDisk				Disk
+		curConfig			SystemConfig
+		diskInfo			map[string]Disk
+		configInfo			map[string]SystemConfig
+	)
 
 	file, err := os.Open("/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh")
 	if err != nil {
 		fmt.Println("Failed to open file")
+		return
 	}
 	defer file.Close()
 
+	// Check if the file is empty
+	_, err = file.Stat()
+	if err != nil {
+		fmt.Println("File is empty")
+		return
+	}
+
 	scanner := bufio.NewScanner(file)
-	disks := []configuration.Disk{}
+	disks := []Disk{}
 	config.Disks = disks
-	diskInfo = make(map[string]configuration.Disk)
+	diskInfo = make(map[string]Disk)
+	configInfo = make(map[string]SystemConfig)
 	defaultConfigIndex := 0
+	partitionTableType = PartitionTableTypeNone
 
 	for scanner.Scan() {
 		parseCmd = scanner.Text()
@@ -64,33 +70,33 @@ func parseKickStartParitionScheme(config configuration.Config) {
 				if ok {
 					curDisk = val
 					curConfig = configInfo[curDiskInfo]
-				}
-				else {
+				} else {
 					// Create new disk struct and append it into the Disk array
-					curDisk = configuration.Disk{}
+					curDisk = Disk{}
 					diskInfo[curDiskInfo] = curDisk
-					curDisk.PartitionTableType = paritionTableType
+					curDisk.PartitionTableType = partitionTableType
 					disks = append(disks, curDisk)
-					curDisk.Partitions = []configuration.Partition{}
+					curDisk.Partitions = []Partition{}
 					
 					// Create new partitionSetting struct and append it into the sysconfig array
 					curConfig = config.SystemConfigs[defaultConfigIndex]
 					configInfo[curDiskInfo] = curConfig
-					curConfig.PartitionSettings = []configuration.PartitionSetting{}
+					curConfig.PartitionSettings = []PartitionSetting{}
 					defaultConfigIndex++
 				}
 				
 				// Create new Partition and PartionSetting
-				partition := configuration.Partition{}
-				partitionSetting := configuration.PartitionSetting{}
+				partition := Partition{}
+				partitionSetting := PartitionSetting{}
+				
+				// Find Mount Point
+				partitionSetting.MountPoint = partitionFlags[1]
+				if partitionFlags[1] == "biosboot" {
+					partitionSetting.MountPoint = ""
+				}
 
 				// Loop through partition flags to fetch fstype, size etc.
 				for _, partOpt := range partitionFlags {
-					// Find Mount Point
-					partitionSetting.MountPoint = partOpt[1]
-					if partOpt[1] == "biosboot" {
-						partitionSetting.MountPoint = ""
-					}
 
 					// Find fstype
 					if strings.Contains(partOpt, "--fstype") {
@@ -104,16 +110,21 @@ func parseKickStartParitionScheme(config configuration.Config) {
 						partSizeStr := partOpt[7 : len(partOpt)]
 						fmt.Printf("partition size: %s\n", partSizeStr)
 						
-						if len(partitions) == 0 {
+						if len(curDisk.Partitions) == 0 {
 							partition.Start = 1
 						} else {
-							partition.Start = partitions[len(partitions)-1].End
+							partition.Start = curDisk.Partitions[len(curDisk.Partitions)-1].End
 						}
 
 						if strings.Contains(parseCmd, "--grow") {
 							partition.End = 0
 						} else {
-							partition.End = partition.Start + strconv.Atoi(partSizeStr)
+							partitionSize, err := strconv.ParseUint(partSizeStr, 10, 64)
+							if err != nil {
+								fmt.Println("Invalid partition size")
+								return err
+							}
+							partition.End = partition.Start + partitionSize
 						}
 					}
 				}
