@@ -43,7 +43,7 @@ Distribution:   Mariner
 Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Version:       1.44.0
-Release:       5%{?dist}
+Release:       6%{?dist}
 License:       LGPLv2+
 
 # Source and patches.
@@ -87,7 +87,6 @@ BuildRequires: ocaml-hivex-devel
 BuildRequires: perl(Pod::Simple)
 BuildRequires: perl(Pod::Man)
 BuildRequires: /usr/bin/pod2text
-BuildRequires: po4a
 BuildRequires: augeas-devel >= 1.7.0
 BuildRequires: readline-devel
 BuildRequires: genisoimage
@@ -1268,6 +1267,11 @@ rm ocaml/html/.gitignore
 
 
 %changelog
+* Tue Apr 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44.0-6
+- License verified.
+- Removing BR on "po4a".
+- Spec clean-up.
+
 * Sat Feb 05 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-5
 - Add patch to fix UUID parsing with file >= 5.40
 - Downgrade selinux-policy requirement to a recommendation without a version constraint
