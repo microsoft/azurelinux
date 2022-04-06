@@ -9422,7 +9422,7 @@
         "other": {
           "name": "libewf",
           "version": "20140608",
-          "downloadUrl": "https://53efc0a7187d0baa489ee347026b8278fe4020f6.googledrive.com/host/0B3fBvzttpiiSMTdoaVExWWNsRjg/libewf-20140608.tar.gz"
+          "downloadUrl": "https://github.com/libyal/legacy/raw/main/libewf/libewf-20140608.tar.gz"
         }
       }
     },
