@@ -34,11 +34,9 @@ func checkOverlappingePartitions(disk *Disk) (err error) {
 		return partIntervals[i][0] < partIntervals[j][0]
 	})
 	//confirm each partition ends before the next starts
-	for i := 0; i < len(partIntervals); i++ {
-		if i < len(partIntervals)-1 {
-			if partIntervals[i][1] > partIntervals[i+1][0] {
-				return fmt.Errorf("a [Partition] with an end location %d overlaps with a [Partition] with a start location %d", partIntervals[i][1], partIntervals[i+1][0])
-			}
+	for i := 0; i < len(partIntervals)-1; i++ {
+		if partIntervals[i][1] > partIntervals[i+1][0] {
+			return fmt.Errorf("a [Partition] with an end location %d overlaps with a [Partition] with a start location %d", partIntervals[i][1], partIntervals[i+1][0])
 		}
 	}
 	return
