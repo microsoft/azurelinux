@@ -1,6 +1,6 @@
 Name:           perl-Module-Install-AutoLicense
 Version:        0.10
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        Module::Install extension to automatically generate LICENSE files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -18,6 +18,7 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(Config)
 BuildRequires:  perl(Capture::Tiny) >= 0.05
 BuildRequires:  perl(File::Path)
+BuildRequires:  perl(File::Remove)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
@@ -73,6 +74,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Apr 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-13
+- Adding BR on "perl(File::Remove)".
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-12
 - License verified.
 
