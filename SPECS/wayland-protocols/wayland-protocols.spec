@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://wayland.freedesktop.org/
 Source0:        https://wayland.freedesktop.org/releases/%{name}-%{version}.tar.xz
-BuildRequires:  libffi-devel
 BuildRequires:  meson
 BuildRequires:  wayland-devel
 BuildArch:      noarch

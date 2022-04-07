@@ -28,6 +28,7 @@ applications, X servers (rootless or fullscreen) or other display servers.
 
 %package        devel
 Summary:        Development files for %{name}
+Requires:       libffi-devel
 Requires:       libwayland-client%{?_isa} = %{version}-%{release}
 Requires:       libwayland-cursor%{?_isa} = %{version}-%{release}
 Requires:       libwayland-egl%{?_isa} = %{version}-%{release}
