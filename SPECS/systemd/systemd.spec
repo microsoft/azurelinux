@@ -1,7 +1,7 @@
 Summary:        Systemd-239
 Name:           systemd
 Version:        239
-Release:        40%{?dist}
+Release:        41%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,7 @@ Patch103:       103-core-allow-portablectl-to-load-new-services-without-.patch
 Patch104:       104-portablectl-block-when-stopping-a-unit-on-detach-now.patch
 Patch105:       105-portablectl-use-replace-unload-when-stopping-a-servi.patch
 Patch106:       106-portabled-implement-container-host-os-release-interf.patch
+
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -70,6 +71,7 @@ BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
 BuildRequires:  util-linux-devel >= 2.30
 BuildRequires:  xz-devel
+
 Requires:       filesystem >= 1.1
 Requires:       glib
 Requires:       kmod
@@ -78,6 +80,7 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
+
 Obsoletes:      systemd-bootstrap
 
 %description
@@ -85,15 +88,21 @@ Systemd is an init replacement with better process control and security
 
 %package devel
 Summary:        Development headers for systemd
+
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
+
+Obsoletes:      systemd-bootstrap-devel
 
 %description devel
 Development headers for developing applications linking to libsystemd
 
 %package lang
 Summary:        Language pack for systemd
+
 Requires:       %{name} = %{version}-%{release}
+
+Obsoletes:      systemd-bootstrap-lang
 
 %description lang
 Language pack for systemd
@@ -276,6 +285,9 @@ rm -rf %{buildroot}/*
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Apr 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 239-41
+- Making sure to obsolete the bootstrap version of systemd.
+
 * Wed Mar 16 2022 Henry Beberman <henry.beberman@microsoft.com> - 239-40
 - Backport upstream change so dhcp-provided gateway uses dhcp-provided source ip for route.
 
