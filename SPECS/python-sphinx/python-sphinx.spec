@@ -43,9 +43,11 @@ BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 BuildRequires:  python3-test
 BuildRequires:  texinfo
+
 %if %{with imagemagick_tests}
 BuildRequires:  ImageMagick
 %endif
+
 %if %{with latex_tests}
 BuildRequires:  texlive-collection-fontsrecommended
 BuildRequires:  texlive-collection-latex
@@ -77,6 +79,7 @@ BuildRequires:  tex(upquote.sty)
 BuildRequires:  tex(utf8x.def)
 BuildRequires:  tex(wrapfig.sty)
 %endif
+
 %endif
 
 %description
@@ -110,8 +113,10 @@ the Python docs:
 %package -n python%{python3_pkgversion}-sphinx
 Summary:        Python documentation generator
 License:        BSD AND Python AND MIT
+
 Recommends:     ImageMagick
 Recommends:     graphviz
+
 Provides:       bundled(css3-mediaqueries) = 1.0
 
 %description -n python%{python3_pkgversion}-sphinx
