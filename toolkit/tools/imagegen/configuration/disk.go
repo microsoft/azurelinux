@@ -53,7 +53,7 @@ func checkMaxSizeCorrectness(disk *Disk) (err error) {
 	)
 	//MaxSize is not relevant if target disk is specified.
 	if disk.TargetDisk.Type != realDiskType {
-		if disk.MaxSize <= 0 && len(disk.Partitions) !=0 {
+		if disk.MaxSize <= 0 && len(disk.Partitions) != 0 {
 			return fmt.Errorf("a configuration without a defined target disk must have a non-zero MaxSize")
 		}
 		lastPartitionEnd := uint64(0)

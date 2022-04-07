@@ -117,7 +117,7 @@ func TestShouldFailPartitionsOverlapping(t *testing.T) {
 			Start:  uint64(0),
 			End:    uint64(9),
 			FsType: "ext4",
-		},{
+		}, {
 			ID:     "MyThirdRootfs",
 			Start:  uint64(9),
 			End:    uint64(514),
