@@ -1,28 +1,22 @@
-# Initially generated from hpricot-0.6.164.gem by gem2rpm -*- rpm-spec -*-
-%define	gem_name		hpricot
-
+%define	gem_name  hpricot
 # See bug 1402582
 # Currently colm (dependency for ragel) has difficulty on
 # armv7hl
-%global	force_regenerate_from_rl	0
+%global	force_regenerate_from_rl  0
 
-Summary:	A Fast, Enjoyable HTML Parser for Ruby
-Name:		rubygem-%{gem_name}
-Version:	0.8.6
-Release:	34%{?dist}
+Summary:       A Fast, Enjoyable HTML Parser for Ruby
+Name:          rubygem-%{gem_name}
+Version:       0.8.6
+Release:       35%{?dist}
 # ext/fast_xs/FastXsService.java is licensed under ASL 2.0
-License:	MIT AND ASL 2.0
-Vendor:	        Microsoft Corporation
-Distribution:	Mariner
-URL:		http://github.com/hpricot/hpricot
-# Non-free file removed, see Source10
-# Source0:	http://gems.rubyforge.org/gems/%{gem_name}-%{version}.gem
-Source0:	https://src.fedoraproject.org/repo/pkgs/rubygem-hpricot/hpricot-0.8.6-modified.gem/5d737234720f3847cc5def6c0047f2e4/hpricot-0.8.6-modified.gem
-Source10:	rubygem-hpricot-create-free-gem.sh
+License:       MIT AND ASL 2.0
+Vendor:        Microsoft Corporation
+Distribution:  Mariner
+URL:           https://github.com/hpricot/hpricot
+Source0:       https://github.com/hpricot/hpricot/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
-
 BuildRequires:	gcc
 BuildRequires:	rubygems-devel
 # Recompile
@@ -53,24 +47,16 @@ Requires:	ruby(rubygems)
 %description	doc
 This package contains documentation for %{name}.
 
-%package	-n ruby-%{gem_name}
-Summary:	Non-Gem support package for %{gem_name}
-Requires:	%{name} = %{version}-%{release}
-Provides:	ruby(%{gem_name}) = %{version}-%{release}
+%package -n ruby-%{gem_name}
+Summary: Non-Gem support package for %{gem_name}
+Requires: %{name} = %{version}-%{release}
+Provides: ruby(%{gem_name}) = %{version}-%{release}
 
-%description	-n ruby-%{gem_name}
+%description -n ruby-%{gem_name}
 This package provides non-Gem support for %{gem_name}.
 
 %prep
-%setup -q -T -c
-
-# Gem repack
-TOPDIR=$(pwd)
-mkdir tmpunpackdir
-pushd tmpunpackdir
-
-gem unpack %{SOURCE0}
-cd %{gem_name}-%{version}*
+%setup -q -n %{gem_name}-%{version}
 
 # ??
 find . -type f | xargs chmod ugo+r
@@ -85,38 +71,21 @@ rm -f ext/hpricot_scan/*.c
 rake ext/hpricot_scan/extconf.rb
 %endif
 
-gem specification -l --ruby %{SOURCE0} > %{gem_name}.gemspec
-gem build %{gem_name}.gemspec
-mv %{gem_name}-%{version}.gem $TOPDIR
-
-popd
-
-%gem_install
-
-pushd .%{gem_instdir}/test
 # Kill tests related to BOINGBOING, licensed under CC-BY-NC
 grep -rl BOING . | \
 	xargs sed -i '/BOING/s|^\([ \t][ \t]*\)\(.*\)$|\1# This test is intentionally killed\n\1return true\n\1\2|'
-popd
 
 %build
+gem build %{gem_name}
 
 %install
+%gem_install -n %{gem_name}-%{version}.gem
+
 mkdir -p %{buildroot}%{gem_dir}
 cp -a ./%{gem_dir}/* %{buildroot}%{gem_dir}
 
 mkdir -p %{buildroot}%{gem_extdir_mri}/lib
 mv %{buildroot}%{gem_libdir}/*.so %{buildroot}%{gem_extdir_mri}/lib
-
-for f in $(find %{buildroot}%{gem_instdir} -name \*.rb)
-do
-	sed -i -e '/^#!/d' $f
-	chmod 0644 $f
-done
-
-# clean
-rm -rf %{buildroot}%{gem_instdir}/tmp/
-rm -rf %{buildroot}%{_libdir}/ruby/gems/extensions
 
 # Kill unneeded files
 find %{buildroot}%{gem_instdir}/ext \
@@ -125,14 +94,11 @@ find %{buildroot}%{gem_instdir}/ext \
 	-print0 | \
 	xargs -0 rm -f
 rm -f %{buildroot}%{gem_instdir}/.require_paths
+rm -f %{buildroot}%{gem_instdir}/.gitignore
+rm -f %{buildroot}%{gem_instdir}/setup.rb
+rm -f %{buildroot}%{gem_instdir}/%{gem_name}.gemspec
 DIR=%{buildroot}%{gem_libdir}/universal-java*
 [ -d $DIR ] && rmdir $DIR
-
-
-pushd %{buildroot}
-find . -type f '(' -name '[A-Z]*' -or -name '*.java' -or -name '*.rb' -or -name '*gem*' ')' \
-	-print0 | xargs -0 chmod 0644
-popd
 
 %check
 pushd .%{gem_instdir}
@@ -147,20 +113,24 @@ popd
 
 %files
 %{gem_extdir_mri}
-%dir	%{gem_instdir}/
-%doc	%{gem_instdir}/[A-Z]*
+%dir %{gem_instdir}/
+%doc %{gem_instdir}/[A-Z]*
 %exclude %{gem_instdir}/Rakefile
 %{gem_instdir}/[a-l]*/
 %{gem_cache}
 %{gem_spec}
+%exclude %{gem_dir}/extensions/
 
-%files	doc
+%files doc
 %{gem_instdir}/Rakefile
 %{gem_instdir}/extras/
 %{gem_instdir}/test/
 %{gem_docdir}/
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.8.6-35
+- Build from .tar.gz source.
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.8.6-34
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

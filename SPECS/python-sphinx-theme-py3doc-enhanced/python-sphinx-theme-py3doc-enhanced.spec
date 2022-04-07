@@ -5,8 +5,8 @@
 enhancements.
 Summary:        Theme based on the theme of https://docs.python.org/3/
 Name:           python-%{pkgname}
-Version:        2.3.2
-Release:        20%{?dist}
+Version:        2.4.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,9 @@ BuildArch:      noarch
 %{python3_sitelib}/%{pypi_name}/
 
 %changelog
+* Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.0-1
+- Updating to version 2.4.0.
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 2.3.2-20
 - License verified
 

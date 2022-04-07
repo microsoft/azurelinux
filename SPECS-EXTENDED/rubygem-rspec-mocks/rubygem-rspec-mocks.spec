@@ -2,31 +2,24 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 %global	gem_name	rspec-mocks
-
 %global	need_bootstrap_set	0
-
 %undefine __brp_mangle_shebangs
 
-Summary:	RSpec's 'test double' framework (mocks and stubs)
-Name:		rubygem-%{gem_name}
-Version:	3.9.1
-Release:	2%{?dist}
+Summary:  RSpec's 'test double' framework (mocks and stubs)
+Name:     rubygem-%{gem_name}
+Version:  3.9.1
+Release:  3%{?dist}
+License:  MIT
+URL:      https://github.com/rspec/rspec-mocks
+Source0:  https://github.com/rspec/rspec-mocks/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
-License:	MIT
-URL:		http://github.com/rspec/rspec-mocks
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# %%{SOURCE2} %%{name} %%{version}
-Source1:	rubygem-%{gem_name}-%{version}-full.tar.gz
-Source2:	rspec-related-create-full-tarball.sh
-
-#BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 %if 0%{?need_bootstrap_set} < 1
-BuildRequires:	rubygem(rspec)
-BuildRequires:	rubygem(thread_order)
-BuildRequires:	git
+BuildRequires:  rubygem(rspec)
+BuildRequires:  rubygem(thread_order)
+BuildRequires:  git
 %endif
-BuildArch:	noarch
+BuildArch:  noarch
 
 %description
 rspec-mocks provides a test-double framework for rspec including support
@@ -39,22 +32,19 @@ Requires:	%{name} = %{version}-%{release}
 %description	doc
 This package contains documentation for %{name}.
 
-
 %prep
-gem unpack %{SOURCE0}
-
-%setup -q -D -T -n  %{gem_name}-%{version} -b 1
-
-gem specification %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n  %{gem_name}-%{version}
 
 %build
-gem build %{gem_name}.gemspec
+gem build %{gem_name}
 %gem_install
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
 	%{buildroot}%{gem_dir}/
+#add lib files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
 
 # cleanups
 rm -f %{buildroot}%{gem_instdir}/{.document,.yardopts}
@@ -67,21 +57,22 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 %endif
 
 %files
-%dir	%{gem_instdir}
-
-%license	%{gem_instdir}/LICENSE.md
-%doc	%{gem_instdir}/Changelog.md
-%doc	%{gem_instdir}/README.md
-
+%dir %{gem_instdir}
+%license %{gem_instdir}/LICENSE.md
+%doc %{gem_instdir}/Changelog.md
+%doc %{gem_instdir}/README.md
 %{gem_instdir}/lib/
-
-%exclude	%{gem_cache}
 %{gem_spec}
+%exclude %{gem_cache}
 
-%files	doc
+%files doc
 %{gem_docdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.9.1-3
+- License verified.
+- Build from .tar.gz source.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.1-2
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

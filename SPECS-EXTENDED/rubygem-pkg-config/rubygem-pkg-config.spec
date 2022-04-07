@@ -1,42 +1,29 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Generated from pkg-config-1.0.3.gem by gem2rpm -*- rpm-spec -*-
 %global	gem_name	pkg-config
-
-%if 0%{?rhel} == 6
-%global	rubyabi	1.8
-%endif
 
 %undefine        _changelog_trimtime
 %undefine __brp_mangle_shebangs
 
-Summary:	A pkg-config implementation by Ruby
-Name:		rubygem-%{gem_name}
-Version:	1.4.5
-Release:	3%{?dist}
-License:	LGPLv2+
-URL:		http://github.com/rcairo/pkg-config
-
-Source0:	http://rubygems.org/gems/%{gem_name}-%{version}.gem
+Summary:  A pkg-config implementation by Ruby
+Name:     rubygem-%{gem_name}
+Version:  1.4.5
+Release:  4%{?dist}
+License:  LGPLv2+
+URL:      https://github.com/rcairo/pkg-config
+Source0:  https://github.com/ruby-gnome/pkg-config/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Observe test failure on test_cflags test_cflags_only_I
 # with pkgconf 1.4.2
-Patch0:	rubygem-pkg-config-1.4.4-cflags-result-sort.patch
+Patch0:   rubygem-pkg-config-1.4.4-cflags-result-sort.patch
 
-%if 0%{?fedora} || 0%{?rhel} >= 7
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
-%else
-Requires:	ruby(abi) = %{rubyabi}
-Requires:	ruby 
-%endif
 BuildRequires:	rubygems-devel
-# For %%check
-#BuildRequires:	rubygem(rake)
-#BuildRequires:	rubygem(hoe)
+%if %{with_check}
 BuildRequires:	rubygem(test-unit)
-# mkmf.rb requires ruby-devel
 BuildRequires:	ruby-devel
 BuildRequires:	cairo-devel
+%endif
 Requires:	rubygems
 
 BuildArch:	noarch
@@ -53,20 +40,14 @@ Requires:	%{name} = %{version}-%{release}
 This package contains documentation for %{name}.
 
 %prep
-%setup -q -c -T
-
-%gem_install -n %{SOURCE0}
-
-find . -name \*.gem | xargs chmod 0644
-
-pushd .%{gem_instdir}
-%patch0 -p1
-popd
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
+%gem_install
 
 %install
-rm -rf %{buildroot}
+gem install %{gem_name}-%{version}.gem
 
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
@@ -91,21 +72,23 @@ EOF
 ruby -Ilib:test:. ./test.rb
 
 %files
-%license %{gem_instdir}/LGPL-2.1
-%dir	%{gem_instdir}
-%doc	%{gem_instdir}/[A-Z]*
-%exclude	%{gem_instdir}/Rakefile
-%exclude	%{gem_instdir}/setup.rb
+%license LGPL-2.1
+%dir %{gem_instdir}
+%doc %{gem_instdir}/[A-Z]*
+%exclude %{gem_instdir}/Rakefile
+%exclude %{gem_instdir}/setup.rb
 %{gem_libdir}/
-
 %{gem_cache}
 %{gem_spec}
 
-%files	doc
+%files doc
 %{gem_instdir}/test/
 %{gem_docdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.4.5-4
+- Build from .tar.gz source.
+
 * Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.5-3
 - License verified.
 

@@ -1,13 +1,13 @@
 Summary:        WebSocket client for python
 Name:           python-websocket-client
-Version:        0.56.0
-Release:        4%{?dist}
+Version:        1.3.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/websocket-client
-Source0:        https://files.pythonhosted.org/packages/c5/01/8c9c7de6c46f88e70b5a3276c791a2be82ae83d8e0d0cc030525ee2866fd/websocket_client-%{version}.tar.gz
+Source0:        https://github.com/websocket-client/websocket-client/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -22,14 +22,20 @@ Requires:       python3
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-coverage
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-six
 %endif
 
 %description -n python3-websocket-client
 WebSocket client for python3
 
 %prep
-%autosetup -n websocket_client-%{version}
+%autosetup -n websocket-client-%{version}
 
 %build
 %py3_build
@@ -38,19 +44,22 @@ WebSocket client for python3
 %py3_install
 
 %check
-pip3 install six
-pip3 install unittest2==0.8.0
-%python3 setup.py test
+pip3 install \
+    more-itertools \
+    pluggy
+# do not execute 'echo-server' test since it requires python websockets
+# which do not work well from a chroot
+pytest3 -vv websocket/tests -k "not echo-server"
 
 %files -n python3-websocket-client
 %defattr(-,root,root,-)
 %license LICENSE
 %{python3_sitelib}/*
-%{_bindir}/wsdump.py
+%{_bindir}/wsdump
 
 %changelog
-* Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 0.56.0-4
-- Install `six` & `unittest2` to enable ptest.
+* Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.3.1-1
+- Upgrade to 1.3.1
 
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.56.0-3
 - Add license, wsdump.py binary to python3 package

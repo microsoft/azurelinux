@@ -4,24 +4,19 @@ Distribution:   Mariner
 
 Name:           rubygem-%{gem_name}
 Version:        3.26.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Pure-ruby colorizer based on pygments
 License:        MIT and BSD
-
 URL:            http://rouge.jneen.net/
-Source0:        https://rubygems.org/gems/%{gem_name}-%{version}.gem
-
+Source0:        https://github.com/rouge-ruby/rouge/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
 BuildRequires:  ruby >= 2.0
-
 BuildRequires:  help2man
-
 BuildArch:      noarch
 
 %description
 Rouge aims to a be a simple, easy-to-extend drop-in replacement for pygments.
-
 
 %package        doc
 Summary:        Documentation for %{name}
@@ -31,27 +26,21 @@ BuildArch:      noarch
 %description    doc
 Documentation for %{name}.
 
-
 %prep
 %setup -q -n %{gem_name}-%{version}
 
-
 %build
-gem build ../%{gem_name}-%{version}.gemspec
-
+gem build %{gem_name}
 %gem_install
-
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* %{buildroot}%{gem_dir}/
 
-
 mkdir -p %{buildroot}%{_bindir}
 cp -pa .%{_bindir}/* %{buildroot}%{_bindir}/
 
 find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
-
 
 # Generate man page from "rougify --help" output
 export GEM_PATH="%{buildroot}%{gem_dir}:%{gem_dir}"
@@ -61,32 +50,26 @@ mkdir -p %{buildroot}%{_mandir}/man1
 help2man -N -s1 -o %{buildroot}%{_mandir}/man1/rougify.1 \
     %{buildroot}%{_bindir}/rougify
 
-
 %files
 %license %{gem_instdir}/LICENSE
-
 %{_bindir}/rougify
-
 %{_mandir}/man1/rougify.1*
-
 %dir %{gem_instdir}
 %{gem_instdir}/bin
 %exclude %{gem_instdir}/rouge.gemspec
-
 %{gem_libdir}
-
 %exclude %{gem_cache}
-
 %{gem_spec}
-
 
 %files doc
 %doc %{gem_docdir}
-
 %{gem_instdir}/Gemfile
 
-
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.26.0-3
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.26.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,0 +1,25 @@
+diff -ru calamares-3.2.11-orig/src/modules/partition/jobs/CreatePartitionTableJob.cpp calamares-3.2.11/src/modules/partition/jobs/CreatePartitionTableJob.cpp
+--- calamares-3.2.11-orig/src/modules/partition/jobs/CreatePartitionTableJob.cpp	2021-01-28 11:36:44.000000000 -0800
++++ calamares-3.2.11/src/modules/partition/jobs/CreatePartitionTableJob.cpp	2022-04-04 11:26:46.511862556 -0700
+@@ -214,9 +214,18 @@
+         currentPartition[KeyFlags] = QJsonArray::fromStringList(PartitionTable::flagNames(PartitionInfo::flags(x)));
+         currentPartition[KeyStart] = (x->firstByte() / MiBSize);
+ 
+-        // Since Mariner installer does not use the last MiB,
+-        // we have to report additional 1MiB per partition end
+-        currentPartition[KeyEnd] = x->lastByte() / MiBSize + 1;
++        // check if we're almost at capacity and set end to 0 in json (full size)
++        qint64 threshold = m_device->capacity() / 100; // approx 1% of capacity
++        if (x->lastByte() >= m_device->capacity() - threshold)
++        {
++            currentPartition[KeyEnd] = 0;
++        }
++        else
++        {
++            // Since Mariner installer does not use the last MiB,
++            // we have to report additional 1MiB per partition end
++            currentPartition[KeyEnd] = x->lastByte() / MiBSize + 1;
++        }
+         currentPartition[KeyFsType] = x->fileSystem().name();
+ 
+         // Check for root encryption

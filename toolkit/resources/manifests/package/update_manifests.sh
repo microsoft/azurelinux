@@ -36,7 +36,7 @@ generate_toolchain () {
     # This file is a sorted list of all toolchain packages in the tarball.
     tar -ztf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' > "$ToolchainManifest"
     # Now sort the file in place
-    sort -o "$ToolchainManifest" "$ToolchainManifest"
+    LC_COLLATE=C sort -f -o "$ToolchainManifest" "$ToolchainManifest"
 }
 
 # Remove specific packages that are not needed in pkggen_core
@@ -78,6 +78,8 @@ remove_packages_for_pkggen_core () {
     sed -i '/libxslt/d' $TmpPkgGen
     sed -i '/Linux-PAM/d' $TmpPkgGen
     sed -i '/lua-devel/d' $TmpPkgGen
+    sed -i '/lua-rpm/d' $TmpPkgGen
+    sed -i '/lua-srpm/d' $TmpPkgGen
     sed -ri '/mariner-repos-(debuginfo|extended|extras|microsoft)/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
@@ -104,6 +106,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-Env/d' $TmpPkgGen
     sed -i '/perl-experimental/d' $TmpPkgGen
     sed -i '/perl-ExtUtils/d' $TmpPkgGen
+    sed -i '/perl-Fedora-VSP/d' $TmpPkgGen
     sed -i '/perl-fields/d' $TmpPkgGen
     sed -i '/perl-File-Dos/d' $TmpPkgGen
     sed -i '/perl-File-Fetch/d' $TmpPkgGen
@@ -113,6 +116,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-Filter/d' $TmpPkgGen
     sed -i '/perl-Find/d' $TmpPkgGen
     sed -i '/perl-GDBM_File/d' $TmpPkgGen
+    sed -i '/perl-generators/d' $TmpPkgGen
     sed -i '/perl-Hash/d' $TmpPkgGen
     sed -i '/perl-I18N-Collate/d' $TmpPkgGen
     sed -i '/perl-I18N-LangTags/d' $TmpPkgGen
@@ -183,8 +187,10 @@ remove_packages_for_pkggen_core () {
     sed -i '/perl-Text-Template/d' $TmpPkgGen
     sed -i '/python3-audit/d' $TmpPkgGen
     sed -i '/python3-curses/d' $TmpPkgGen
+    sed -i '/python3-Cython/d' $TmpPkgGen
     sed -i '/python3-gpg/d' $TmpPkgGen
     sed -i '/python3-libxml2/d' $TmpPkgGen
+    sed -i '/python3-lxml/d' $TmpPkgGen
     sed -i '/python3-magic/d' $TmpPkgGen
     sed -i '/python3-pip/d' $TmpPkgGen
     sed -i '/python3-rpm/d' $TmpPkgGen
