@@ -101,3 +101,47 @@ func TestShouldFailParsingInvalidDisk_Disk(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, "failed to parse [Disk]: failed to parse [PartitionTableType]: invalid value for PartitionTableType (not_a_partition_type)", err.Error())
 }
+
+func TestShouldFailPartitionsOverlapping(t *testing.T) {
+	var checkedDisk Disk
+	invalidDisk := validDisk
+
+	invalidDisk.Partitions = []Partition{
+		{
+			ID: "MyRootfs",
+			Start:  uint64(0),
+			End:    uint64(514),
+			FsType: "ext4",
+		}, {
+			ID: "MySecondRootfs",
+			Start:  uint64(512),
+			End:    uint64(1024),
+			FsType: "ext4",
+		},
+	}
+
+	err := invalidDisk.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Disk]: a [Partition] with an end location 514 overlaps with a [Partition] with a start location 512", err.Error())
+
+	// remarshal runs IsValid() on [SystemConfig] prior to running it on [Config], so we get a different error message here.
+	err = remarshalJSON(invalidDisk, &checkedDisk)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: a [Partition] with an end location 514 overlaps with a [Partition] with a start location 512", err.Error())
+}
+
+func TestShouldFailMaxSizeInsufficient(t *testing.T) {
+	var checkedDisk Disk
+	invalidDisk := validDisk
+
+	invalidDisk.MaxSize = uint64(512)
+	invalidDisk.TargetDisk.Type = ""
+	err := invalidDisk.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [Disk]: the MaxSize of 512 is not large enough to accomodate defined partitions ending at 1024.", err.Error())
+
+	// remarshal runs IsValid() on [SystemConfig] prior to running it on [Config], so we get a different error message here.
+	err = remarshalJSON(invalidDisk, &checkedDisk)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: the MaxSize of 512 is not large enough to accomodate defined partitions ending at 1024.", err.Error())
+}

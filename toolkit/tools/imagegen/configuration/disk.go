@@ -8,6 +8,8 @@ package configuration
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"sort"
 )
 
 // Disk holds the disk partitioning, formatting and size information.
@@ -21,13 +23,70 @@ type Disk struct {
 	RawBinaries        []RawBinary        `json:"RawBinaries"`
 }
 
+// checkOverlappingPartitions checks that start and end positions of the defined partitions don't overlap.
+func checkOverlappingePartitions(disk *Disk) (err error) {
+	partIntervals := [][]uint64{}
+	//convert  partition entries to array of [start,end] locations
+	for _, part := range disk.Partitions {
+		partIntervals = append(partIntervals, []uint64{part.Start, part.End})
+	}
+	sort.Slice(partIntervals, func(i, j int) bool {
+		return partIntervals[i][0] < partIntervals[j][0]
+	})
+	//confirm each partition ends before the next starts
+	for i:=0; i < len(partIntervals); i++ {
+		if i < len(partIntervals)-1 {
+			if partIntervals[i][1] > partIntervals[i+1][0]{
+				return fmt.Errorf("a [Partition] with an end location %d overlaps with a [Partition] with a start location %d", partIntervals[i][1], partIntervals[i+1][0])
+			}
+		}
+	}
+	return
+}
+
+// checkMaxSizeCorrectness checks that MaxSize is non-zero for cases in which it's used to clear disk space. This check
+// also confirms that the MaxSize defined is large enough to accomodate all partitions. No partition should have an 
+// end position that exceeds the MaxSize
+func checkMaxSizeCorrectness(disk *Disk) (err error) {
+	const (
+		realDiskType = "path"
+	)
+	//MaxSize is not relevant if target disk is specified. 
+	if disk.TargetDisk.Type != realDiskType {
+		if disk.MaxSize <= 0 {
+			return fmt.Errorf("a configuration without target disk must have a non-zero MaxSize")
+		}
+		lastPartitionEnd := 0.0
+		maxSize := float64(disk.MaxSize)
+		//check last parition end location does not surpass MaxSize 
+		for _, part := range disk.Partitions {
+			lastPartitionEnd = math.Max(lastPartitionEnd, float64(part.End))
+			if part.End == 0 {
+				lastPartitionEnd = math.Max(lastPartitionEnd, float64(part.Start))
+			}
+			if maxSize < lastPartitionEnd {
+				return fmt.Errorf("the MaxSize of %d is not large enough to accomodate defined partitions ending at %d.", int(maxSize),  int(lastPartitionEnd))
+			}
+		}
+	}
+	return
+}
+
 // IsValid returns an error if the PartitionTableType is not valid
 func (d *Disk) IsValid() (err error) {
 	if err = d.PartitionTableType.IsValid(); err != nil {
 		return fmt.Errorf("invalid [PartitionTableType]: %w", err)
 	}
 
-	// No limits on disk.MaxSize
+	err = checkOverlappingePartitions(d)
+	if err != nil {
+		return fmt.Errorf("invalid [Disk]: %w", err)
+	}
+
+	err = checkMaxSizeCorrectness(d)
+	if err != nil {
+		return fmt.Errorf("invalid [Disk]: %w", err)
+	}
 
 	// if err = disk.PartitionTableType.IsValid(); err != nil {
 	// 	return
