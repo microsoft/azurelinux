@@ -285,7 +285,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 			buildState.RecordBuildRequest(req)
 			// Decide which priority the build should be. Generally we want to get any remote or prebuilt nodes out of the
 			// way as quickly as possible since they may help us optimize the graph early.
-			// Meta nodes may also be blocking somethign we want to examine and give higher priority (priority inheritance from
+			// Meta nodes may also be blocking something we want to examine and give higher priority (priority inheritance from
 			// the hypothetical high priority node hidden further into the tree)
 			switch req.Node.Type {
 			case pkggraph.TypePreBuilt:
@@ -441,7 +441,10 @@ func stopBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuil
 	close(channels.Requests)
 	close(channels.PriorityRequests)
 
-	// Drain the request buffer to sync the build state with the new number of outstanding builds.
+	// Drain the request buffers to sync the build state with the new number of outstanding builds.
+	for req := range channels.PriorityRequests {
+		buildState.RemoveBuildRequest(req)
+	}
 	for req := range channels.Requests {
 		buildState.RemoveBuildRequest(req)
 	}
