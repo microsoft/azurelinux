@@ -841,10 +841,11 @@ sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
 # "--with-distro=REDHAT" is used to indicate Mariner is "Fedora-like" in package naming
 %configure \
   PYTHON=python3 \
-  --with-distro=REDHAT \
-  --with-supermin-packager-config=$(pwd)/yum.conf \
   --with-default-backend=libvirt \
+  --with-distro=REDHAT \
+  --with-extra="release=%{release},libvirt" \
   --with-qemu="qemu-system-%{_build_arch} qemu" \
+  --with-supermin-packager-config=$(pwd)/yum.conf \
 %if %{without php}
   --disable-php \
 %endif
