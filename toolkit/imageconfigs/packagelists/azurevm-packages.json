@@ -5,8 +5,9 @@
         "cloud-utils-growpart",
         "dhcp-client",
         "hyperv-daemons",
+        "netplan",
         "openssh-server",
-        "python-xml",
+        "python3",
         "rsyslog",
         "WALinuxAgent"
     ]

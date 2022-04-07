@@ -1,0 +1,20 @@
+diff --git a/src/java_cup/runtime/lr_parser.java b/src/java_cup/runtime/lr_parser.java
+index 89068e10..f247dc80 100644
+--- a/src/java_cup/runtime/lr_parser.java
++++ b/src/java_cup/runtime/lr_parser.java
+@@ -121,6 +121,7 @@ public abstract class lr_parser {
+      * Simple constructor. 
+      */
+     public lr_parser() {
++        symbolFactory = new DefaultSymbolFactory();
+     }
+     
+     /** 
+@@ -133,7 +134,6 @@ public abstract class lr_parser {
+      * Constructor that sets the default scanner and a SymbolFactory
+      */
+     public lr_parser(Scanner s, SymbolFactory symfac) {
+-        this(); // in case default constructor someday does something
+         symbolFactory = symfac;
+         setScanner(s);
+     }

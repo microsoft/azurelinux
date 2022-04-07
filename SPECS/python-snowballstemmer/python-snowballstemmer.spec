@@ -1,13 +1,18 @@
+# Note that python-snowballstemmer currently has a package repository on github here: https://github.com/snowballstem/snowball
+# The source on github provides "snowball".  The Snowball source generates snowballstemmer for several languages.  
+# If you clone and run "make dist" one of the output folders, "python_out", contains the python-snowballstemmer source.   
+# This SPEC provides the source from pypi.
+
 Summary:        Python stemming library
 Name:           python-snowballstemmer
-Version:        1.2.1
-Release:        5%{?dist}
-License:        BSD
+Version:        2.2.0
+Release:        1%{?dist}
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-URL:            https://github.com/shibukawa/snowball_py
-Source0:        https://pypi.python.org/packages/20/6b/d2a7cb176d4d664d94a6debf52cd8dbae1f7203c8e42426daa077051d59c/snowballstemmer-%{version}.tar.gz
+URL:            https://snowballstem.org/
+Source0:        https://files.pythonhosted.org/packages/44/7b/af302bebf22c749c56c9c3e8ae13190b5b5db37a33d9068652e8f73b7089/snowballstemmer-%{version}.tar.gz#/snowballstemmer-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -50,14 +55,17 @@ It includes following language algorithms:
 %py3_install
 
 %check
-%make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
+%make_build -k check_python |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %files -n python3-snowballstemmer
 %defattr(-,root,root,-)
-%license LICENSE.rst
+%license COPYING
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 25 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.2.0-1
+- Upgrade to latest version
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-7
 - Add license to python3 package
 - Remove python2 package

@@ -2,7 +2,7 @@
 Summary:        Python API to integrate Sphinx into a web application
 Name:           python-%{pkgname}
 Version:        1.2.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +21,9 @@ BuildRequires:  python3-xml
 %if %{with check}
 BuildRequires:  python3-pip
 %endif
+
 Requires:       python3
+Requires:       python3-sphinxcontrib-serializinghtml
 
 %description -n python3-%{pkgname}
 The python-sphinxcontrib-websupport package provides a Python API to easily integrate Sphinx documentation into your Web application.
@@ -48,6 +50,12 @@ tox
 %{python3_sitelib}/*.pth
 
 %changelog
+<<<<<<< HEAD
+=======
+* Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-2
+- Adding a dependency on "python3-sphinxcontrib-serializinghtml".
+
+>>>>>>> main
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-1
 - Updating to version 1.2.4.
 

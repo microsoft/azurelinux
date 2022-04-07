@@ -1,14 +1,20 @@
 Summary:        Library for displaying tabular data in a visually appealing ASCII format
 Name:           python-prettytable
-Version:        0.7.2
-Release:        9%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-URL:            https://code.google.com/p/prettytable/
-#Source0:       https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/prettytable/prettytable-%{version}.tar.gz
-Source0:        prettytable-%{version}.tar.gz
+URL:            https://github.com/jazzband/prettytable
+Source0:        https://pypi.io/packages/source/p/prettytable/prettytable-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-wcwidth
+%endif
 BuildArch:      noarch
 
 %description
@@ -16,10 +22,8 @@ Library for displaying tabular data in a visually appealing ASCII format
 
 %package -n     python3-prettytable
 Summary:        Library for displaying tabular data in a visually appealing ASCII format
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
+Requires:       python3-wcwidth
 
 %description -n python3-prettytable
 PrettyTable is a simple Python library designed to make it quick and easy to
@@ -33,13 +37,17 @@ specifying a row range.
 %autosetup -n prettytable-%{version}
 
 %build
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %py3_build
 
 %install
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %py3_install
 
 %check
-LANG=en_US.UTF-8 %{python3} prettytable_test.py
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
+pip3 install tox
+tox -e py%{python3_version_nodots} --sitepackages
 
 %files -n python3-prettytable
 %defattr(-,root,root,-)
@@ -47,6 +55,11 @@ LANG=en_US.UTF-8 %{python3} prettytable_test.py
 %{python3_sitelib}/*
 
 %changelog
+* Thu Mar 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.2.0-1
+- Upgrade to latest upstream version
+- Switch tests to tox runner
+- Switch URL/Source0 links to new upstream location
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.2-9
 - Add license to python3 package
 - Remove python2 package

@@ -1,13 +1,13 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
-Version:        1.0.1
+Version:        2.0.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-URL:            https://pypi.python.org/pypi/Werkzeug
-Source0:        https://files.pythonhosted.org/packages/10/27/a33329150147594eff0ea4c33c2036c0eadd933141055be0ff911f7f8d04/Werkzeug-%{version}.tar.gz
+URL:            https://github.com/pallets/werkzeug
+Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -16,24 +16,22 @@ The Swiss Army knife of Python web development
 %package -n     python3-werkzeug
 Summary:        The Swiss Army knife of Python web development
 BuildRequires:  python3-devel
+BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-BuildRequires:  python3-libs
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python3-requests
 BuildRequires:  python3-pip
+BuildRequires:  python3-requests
 %endif
-
 Requires:       python3
-BuildRequires:  python3-libs
 
 %description -n python3-werkzeug
 Werkzeug started as simple collection of various utilities for WSGI applications and has become one of the most advanced WSGI utility modules. It includes a powerful debugger, full featured request and response objects, HTTP utilities to handle entity tags, cache control headers, HTTP dates, cookie handling, file uploads, a powerful URL routing system and a bunch of community contributed addon modules.
 
 %prep
-%autosetup -n Werkzeug-%{version}
+%autosetup -n werkzeug-%{version}
 
 %build
 %py3_build
@@ -51,6 +49,10 @@ LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 2.0.3-1
+- Updated to version 2.0.3
+- Switch to github source and URL
+
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.0.1-1
 - Updated to version 1.0.1
 

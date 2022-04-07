@@ -32,7 +32,6 @@ BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-execnet
 BuildRequires:  python3-greenlet >= 1.0
 BuildRequires:  python3-pip
-BuildRequires:  python3-pluggy
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 
@@ -103,6 +102,7 @@ PYTHONPATH=. python3 -m pytest test --numprocesses=auto
 %changelog
 * Thu Mar 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.32-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Removed unused BR on 'python3-pluggy'.
 - License verified.
 
 * Tue Mar 08 2022 Nils Philippsen <nils@tiptoe.de> - 1.4.32-1
