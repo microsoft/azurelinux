@@ -8,7 +8,6 @@ package configuration
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"sort"
 )
 
@@ -34,9 +33,9 @@ func checkOverlappingePartitions(disk *Disk) (err error) {
 		return partIntervals[i][0] < partIntervals[j][0]
 	})
 	//confirm each partition ends before the next starts
-	for i:=0; i < len(partIntervals); i++ {
+	for i := 0; i < len(partIntervals); i++ {
 		if i < len(partIntervals)-1 {
-			if partIntervals[i][1] > partIntervals[i+1][0]{
+			if partIntervals[i][1] > partIntervals[i+1][0] {
 				return fmt.Errorf("a [Partition] with an end location %d overlaps with a [Partition] with a start location %d", partIntervals[i][1], partIntervals[i+1][0])
 			}
 		}
@@ -45,28 +44,29 @@ func checkOverlappingePartitions(disk *Disk) (err error) {
 }
 
 // checkMaxSizeCorrectness checks that MaxSize is non-zero for cases in which it's used to clear disk space. This check
-// also confirms that the MaxSize defined is large enough to accomodate all partitions. No partition should have an 
+// also confirms that the MaxSize defined is large enough to accomodate all partitions. No partition should have an
 // end position that exceeds the MaxSize
 func checkMaxSizeCorrectness(disk *Disk) (err error) {
 	const (
 		realDiskType = "path"
 	)
-	//MaxSize is not relevant if target disk is specified. 
+	//MaxSize is not relevant if target disk is specified.
 	if disk.TargetDisk.Type != realDiskType {
-		if disk.MaxSize <= 0 {
-			return fmt.Errorf("a configuration without target disk must have a non-zero MaxSize")
+		if disk.MaxSize <= 0 && len(disk.Partitions) !=0 {
+			return fmt.Errorf("a configuration without a defined target disk must have a non-zero MaxSize")
 		}
-		lastPartitionEnd := 0.0
-		maxSize := float64(disk.MaxSize)
-		//check last parition end location does not surpass MaxSize 
+		lastPartitionEnd := uint64(0)
+		maxSize := disk.MaxSize
+		//check last parition end location does not surpass MaxSize
 		for _, part := range disk.Partitions {
-			lastPartitionEnd = math.Max(lastPartitionEnd, float64(part.End))
 			if part.End == 0 {
-				lastPartitionEnd = math.Max(lastPartitionEnd, float64(part.Start))
+				lastPartitionEnd = part.Start
+			} else if part.End > lastPartitionEnd {
+				lastPartitionEnd = part.End
 			}
-			if maxSize < lastPartitionEnd {
-				return fmt.Errorf("the MaxSize of %d is not large enough to accomodate defined partitions ending at %d.", int(maxSize),  int(lastPartitionEnd))
-			}
+		}
+		if maxSize < lastPartitionEnd {
+			return fmt.Errorf("the MaxSize of %d is not large enough to accomodate defined partitions ending at %d.", int(maxSize), int(lastPartitionEnd))
 		}
 	}
 	return
