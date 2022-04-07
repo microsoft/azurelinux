@@ -5,7 +5,7 @@
 Summary:        Exporter for machine metrics
 Name:           prometheus-node-exporter
 Version:        1.3.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 # Upstream license specification: Apache-2.0
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
@@ -58,7 +58,7 @@ LDFLAGS="-X github.com/prometheus/common/version.Version=%{version}      \
          -X github.com/prometheus/common/version.Branch=tarball          \
          -X github.com/prometheus/common/version.BuildDate=%{build_date} \
          -X github.com/ncabatoff/process-exporter/version.GoVersion=%{go_version}"
-go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o bin/node_exporter ./collector
+go build -ldflags "$LDFLAGS" -mod=vendor -v -a -tags "$BUILDTAGS" -o bin/node_exporter
 
 %install
 install -m 0755 -vd %{buildroot}%{_bindir}
@@ -74,7 +74,7 @@ install -Dpm0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus/node-exporter
 
 %check
-make test
+bin/node_exporter --help && make test
 
 %pre
 # Steps extracted from Fedora's /usr/lib/rpm/sysusers.generate-pre.sh script.
@@ -107,6 +107,9 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus/node-exporter
 
 %changelog
+* Thu Mar 31 2022 Matthew Torr <matthewtorr@microsoft.com> - 1.3.1-7
+- Build executable, not ar archive.
+
 * Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.1-6
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

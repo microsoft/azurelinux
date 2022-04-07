@@ -1,0 +1,24 @@
+diff --git a/build.xml b/build.xml
+index b4ec6382..d017546f 100644
+--- a/build.xml
++++ b/build.xml
+@@ -40,18 +40,7 @@
+     <delete dir="${dist}" />
+   </target>
+ 
+-  <taskdef name="cup" classname="java_cup.anttask.CUPTask" classpath="${bin}/java-cup-11.jar" />
+-  <taskdef name="jflex" classname="JFlex.anttask.JFlexTask" classpath="${bin}/JFlex.jar" />
+-
+-  <target name="cup" depends="init">
+-    <cup srcfile="${cup}/parser.cup" interface="on" destdir="${java}" parser="parser" symbols="sym" quiet="false" nonterms="true"/>
+-  </target>
+-
+-  <target name="jflex" depends="cup">
+-    <jflex file="${flex}/Lexer.jflex" destdir="${java}" />
+-  </target>
+-
+-  <target name="compile" depends="jflex">
++  <target name="compile">
+     <copy todir="${java}"><fileset dir="${src}"></fileset></copy>
+     <javac srcdir="${java}" destdir="${classes}" verbose="off" listfiles="off" debug="on" source="1.2" target="1.2">
+       <classpath refid="libraries"/>

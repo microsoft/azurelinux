@@ -1,14 +1,13 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
-Version:        1.25.9
-Release:        3%{?dist}
+Version:        1.26.9
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/urllib3
-Source0:        https://github.com/shazow/urllib3/archive/%{version}/urllib3-%{version}.tar.gz
-Patch0:         CVE-2021-33503.patch
+Source0:        https://github.com/urllib3/urllib3/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -31,8 +30,9 @@ urllib3 is a powerful, sanity-friendly HTTP client for Python. Much of the Pytho
 
 %prep
 %autosetup -p 1 -n urllib3-%{version}
-# Dummyserver tests are failing when running in chroot. So disabling the tests.
+# remove tests that are failing when running in chroot.
 rm -rf test/with_dummyserver/
+rm -rf test/contrib/
 
 %build
 %py3_build
@@ -41,21 +41,9 @@ rm -rf test/with_dummyserver/
 %py3_install
 
 %check
-nofiles=$(ulimit -n)
-ulimit -n 5000
-pip3 install -r dev-requirements.txt
-
-ignoretestslist='not test_select_interrupt_exception and not test_selector_error and not timeout and not test_request_host_header_ignores_fqdn_dot and not test_dotted_fqdn'
-
-PYTHONPATH="%{buildroot}%{$python3_sitelib}" pytest \
-                --ignore=test/appengine \
-                --ignore=test/with_dummyserver/test_proxy_poolmanager.py \
-                --ignore=test/with_dummyserver/test_poolmanager.py \
-                --ignore=test/contrib/test_pyopenssl.py \
-                --ignore=test/contrib/test_securetransport.py \
-                -k "${ignoretestslist}" \
-                urllib3 test
-ulimit -n $nofiles
+pip3 install --user --upgrade nox
+PATH="$PATH:/root/.local/bin/"
+nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
 
 %files -n python3-urllib3
 %defattr(-,root,root,-)
@@ -63,6 +51,9 @@ ulimit -n $nofiles
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.26.9-1
+- Upgrade to 1.26.9
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.25.9-3
 - Add license to python3 package
 - Move python3-pip to check-time build requirements

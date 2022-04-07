@@ -1,18 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Generated from bson-1.3.1.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name bson
-
-Name: rubygem-%{gem_name}
-Version: 4.7.0
-Release: 4%{?dist}
 Summary: Ruby Implementation of the BSON specification
+Name: rubygem-%{gem_name}
+Version: 4.14.1
+Release: 1%{?dist}
 License: ASL 2.0
 # Keep the URL, while different URL is used in the upstream gemspec file.
 # Because there is a basic explanation about the bson
 # that is a beneficial for Fedora user.
-URL: http://bsonspec.org
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+URL: https://bsonspec.org
+Source0: https://github.com/mongodb/bson-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
 Requires: rubygem(bigdecimal)
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel >= 1.3.6
@@ -30,7 +28,6 @@ Obsoletes: rubygem-bson_ext < 4.1.1-1
 %description
 A fully featured BSON specification implementation in Ruby.
 
-
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -40,15 +37,10 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-gem unpack %{SOURCE0}
-
-%setup -q -D -T -n  %{gem_name}-%{version}
-
-gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n %{gem_name}-ruby-%{version}
 
 %build
-# Create the gem as gem install only works on a gem file
-gem build %{gem_name}.gemspec
+gem build %{gem_name}
 
 # %%gem_install compiles any C extensions and installs the gem into ./%%gem_dir
 # by default, so that we can move it into the buildroot in %%install
@@ -88,6 +80,11 @@ popd
 %{gem_instdir}/spec
 
 %changelog
+* Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.14.1-1
+- Update to v4.14.1.
+- License verified.
+- Build from .tar.gz source.
+
 * Thu Mar 11 2021 Henry Li <lihl@microsoft.com> - 4.7.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove unnecessary files that won'be built

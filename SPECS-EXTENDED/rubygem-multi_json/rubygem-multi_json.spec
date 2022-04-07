@@ -4,13 +4,13 @@
 Summary:        A generic swappable back-end for JSON handling
 Name:           rubygem-multi_json
 Version:        1.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
-URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
-Source0:        https://rubygems.org/downloads/%{gem_name}-%{version}.gem
+URL:            http://rdoc.info/projects/intridea/multi_json
+Source0:        https://github.com/intridea/multi_json/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 
 %description
@@ -18,12 +18,13 @@ A common interface to multiple JSON libraries, including Oj, Yajl, the JSON
 gem (with C-extensions), the pure-Ruby JSON gem, NSJSONSerialization, gson.rb, JrJackson, and OkJson.
 
 %prep
-%setup -q -c -T
+%setup -q -n %{gem_name}-%{version}
 
 %build
+gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)
@@ -31,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{SOURCE0}
 %{gemdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.15.0-2
+- Build from .tar.gz source.
+
 * Tue Jan 05 2021 Henry Li <lihl@microsoft.com> - 1.15.0-1
 - License verified
 - Original version for CBL-Mariner

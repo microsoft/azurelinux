@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        8.32
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,7 @@ Patch4:         CVE-2013-0222.nopatch
 Patch5:         CVE-2013-0223.nopatch
 Patch6:         skip_test_if_run_as_root.patch
 BuildRequires:  libselinux-devel
+BuildRequires:  libselinux-utils
 Requires:       gmp
 Requires:       libselinux
 Conflicts:      toybox
@@ -103,6 +104,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Wed Mar 23 2022 Chris PeBenito <chpebeni@microsoft.com> 8.32-3
+- Add missing BuildRequires needed to correctly enable SELinux support.
+
 * Mon Mar 14 2022 Bala <balakumaran.kannan@microsoft.com> - 8.32-2
 - BR perl related packages for PTest
 - Add patch to skip some tests when run as root user

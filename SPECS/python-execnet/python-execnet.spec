@@ -1,21 +1,30 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-
-%bcond_without check
 %define pkgname execnet
-
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
-Version:        1.7.1
-Release:        4%{?dist}
+Version:        1.9.0
+Release:        1%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.io/packages/source/e/%{pkgname}/%{pkgname}-%{version}.tar.gz
-
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-wheel
+%if %{with check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
-%global _description %{expand:
+%description
+Python execution distributor
+
+%package -n python3-%{pkgname}
+Summary:        Python execution distributor
+Requires:       python3
+
+%description -n python3-%{pkgname}
 execnet provides carefully tested means to ad-hoc interact with Python
 interpreters across version, platform and network barriers. It provides
 a minimal and fast API targetting the following uses:
@@ -24,40 +33,18 @@ a minimal and fast API targetting the following uses:
 -write and deploy hybrid multi-process applications
 -write scripts to administer multiple hosts}
 
-%description %_description
-
-%package -n python3-%{pkgname}
-Summary:        Python execution distributor
-
-BuildRequires:  python3-devel
-BuildRequires:  python3-xml
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-setuptools_scm
-Requires:       python3
-# python3-apipkg is provided by python3-py in Mariner
-# Requires:     python3-apipkg
-Requires:       python3-py
-%if %{with check}
-BuildRequires:       python3-pip
-%endif
-
-
-%description -n python3-%{pkgname}  %_description
-
 %prep
-%setup -q -n %{pkgname}-%{version}
+%autosetup -n %{pkgname}-%{version}
 
 %build
-python3 setup.py build
+%py3_build
 
 %install
-python3 setup.py install --root=%{buildroot}
+%py3_install
 
-%if %{with check}
 %check
 pip3 install tox
 LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
-%endif
 
 %files -n python3-%{pkgname}
 %license LICENSE
@@ -65,8 +52,12 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Mar 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.9.0-1
+- Upgrade to latest upstream version
+- Lint spec
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.7.1-4
-- Use `py%{python3_version_nodots}` instead of harcoding `py39`
+- Use `py%%{python3_version_nodots}` instead of harcoding `py39`
 
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.7.1-3
 - Use `py39` instead of `py37` as tox environment to enable ptest
