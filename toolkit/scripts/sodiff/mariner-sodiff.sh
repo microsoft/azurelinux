@@ -10,7 +10,6 @@ mariner_version="$3"
 sodiff_out_dir="$4"
 sodiff_log_file="${sodiff_out_dir}/sodiff.log"
 current_os=$(cat /etc/os-release | grep ^ID | cut -d'=' -f2)
-temporary_repo_file="file.repo"
 
 # Setup output dir
 mkdir -p "$sodiff_out_dir"
@@ -22,14 +21,25 @@ function makecache_with_common {
         # Mariner uses DNF repoquery command
         DNF_COMMAND=dnf
         # Cache RPM metadata
-        >/dev/null dnf $common_options -y makecache
+        >/dev/null dnf -c "$1" --releasever $mariner_version -y makecache
     else
         # Ubuntu uses repoquery command from yum-utils
         DNF_COMMAND=
         # Cache RPM metadata
         # Ubuntu does not come with gpgcheck plugin for yum
-        >/dev/null yum $common_options -y --nogpgcheck makecache
+        >/dev/null yum -c "$1" --releasever $mariner_version -y --nogpgcheck makecache
     fi
+}
+
+function set_common_options {
+    if [[ "$current_os" == mariner ]]; then
+        # Mariner uses DNF repoquery command
+        DNF_COMMAND=dnf
+    else
+        # Ubuntu uses repoquery command from yum-utils
+        DNF_COMMAND=
+    fi
+    common_options="-c $repo_file_path --releasever $mariner_version"
 }
 
 function log_to_file {
@@ -52,7 +62,7 @@ do
 done
 
 # Cache created - now we can point to the abridged file.
-common_options="-c $repo_file_path --releasever $mariner_version"
+set_common_options
 
 log_to_file "Cache created."
 
