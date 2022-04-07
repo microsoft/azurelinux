@@ -29,6 +29,7 @@ func checkOverlappingePartitions(disk *Disk) (err error) {
 	for _, part := range disk.Partitions {
 		partIntervals = append(partIntervals, []uint64{part.Start, part.End})
 	}
+	//sorting paritions by start position
 	sort.Slice(partIntervals, func(i, j int) bool {
 		return partIntervals[i][0] < partIntervals[j][0]
 	})

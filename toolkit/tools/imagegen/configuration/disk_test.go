@@ -108,14 +108,19 @@ func TestShouldFailPartitionsOverlapping(t *testing.T) {
 
 	invalidDisk.Partitions = []Partition{
 		{
-			ID:     "MyRootfs",
-			Start:  uint64(0),
-			End:    uint64(514),
-			FsType: "ext4",
-		}, {
 			ID:     "MySecondRootfs",
 			Start:  uint64(512),
 			End:    uint64(1024),
+			FsType: "ext4",
+		}, {
+			ID:     "MyRootfs",
+			Start:  uint64(0),
+			End:    uint64(9),
+			FsType: "ext4",
+		},{
+			ID:     "MyThirdRootfs",
+			Start:  uint64(9),
+			End:    uint64(514),
 			FsType: "ext4",
 		},
 	}
