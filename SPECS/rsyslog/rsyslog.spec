@@ -1,7 +1,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2108.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -153,6 +153,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Thu Apr 7 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.2108.0-2
+- Bring rsyslog.conf in line with other distros
+-   add /var/log/messages for normal logs
+-   add /var/log/secure for auth and authpriv logs
+-   set file permissions to 640 for log files
+
 * Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2108.0-1
 - Update to version 8.2108.0.
 
