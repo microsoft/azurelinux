@@ -23194,8 +23194,8 @@
         "type": "other",
         "other": {
           "name": "python-msgpack",
-          "version": "0.6.2",
-          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v0.6.2.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v1.0.3.tar.gz"
         }
       }
     },
