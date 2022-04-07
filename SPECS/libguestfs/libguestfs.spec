@@ -203,6 +203,10 @@ BuildRequires:  gettext-devel
 BuildRequires:  libtool
 %endif
 
+%if %{with_check}
+BuildRequires:  git
+%endif
+
 %if %{with man-pages}
 BuildRequires:  po4a
 %endif
@@ -862,16 +866,14 @@ sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
 make -j1 -C builder index-parse.c
 make V=1 INSTALLDIRS=vendor %{?_smp_mflags}
 
-%check
-
 %ifarch %{test_arches}
+%check
 export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
 export LIBVIRT_DEBUG=1
 
 if ! make quickcheck QUICKCHECK_TEST_TOOL_ARGS="-t 1200"; then
-    cat $HOME/.cache/libvirt/qemu/log/*
-    exit 1
+    cat $HOME/.cache/libvirt/qemu/log/* && false
 fi
 %endif
 
@@ -985,10 +987,8 @@ install -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/profile.d
 # Remove the .gitignore file from ocaml/html which will be copied to docdir.
 rm ocaml/html/.gitignore
 
-
 # Find locale files.
 %find_lang %{name}
-
 
 %files -f %{name}.lang
 %license COPYING COPYING.LIB
