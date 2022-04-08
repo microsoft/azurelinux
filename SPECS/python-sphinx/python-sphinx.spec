@@ -117,6 +117,11 @@ License:        BSD AND Python AND MIT
 Requires:       python3-babel
 Requires:       python3-docutils
 Requires:       python3-imagesize
+# Required until we update to at least Python 3.10 due to Sphinx calling into "importlib_metadata.entry_points(group=...)".
+# Pre-Python 3.10 versions provide the "importlib.metadata.entry_points" function WITHOUT the "group" argument.
+# Without "python3-importlib-metadata" Sphinx attempts to use that Python's function and crashes for Python < 3.10.
+# This package provides the newer version of "entry_points", which accepts the "group" argument.
+Requires:       python3-importlib-metadata
 Requires:       python3-jinja2
 Requires:       python3-packaging
 Requires:       python3-pygments

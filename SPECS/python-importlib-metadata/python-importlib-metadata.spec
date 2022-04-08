@@ -20,6 +20,8 @@ BuildRequires:  python3-test
 BuildRequires:  python3dist(pytest)
 %endif
 
+Requires:       python3-zipp
+
 %description
 Library to access the metadata for a Python package.
 This package supplies third-party access to the functionality
@@ -65,6 +67,7 @@ pip3 install pyfakefs
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
 - Replacing BR on "python3-pyfakefs" with a pip3 install during tests.
+- Adding missing dependency on "python3-zipp".
 
 * Mon Mar 14 2022 Lumír Balhar <lbalhar@redhat.com> - 4.11.3-1
 - Update to 4.11.3
