@@ -23914,8 +23914,8 @@
         "type": "other",
         "other": {
           "name": "python-pyvmomi",
-          "version": "6.7.3",
-          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"
+          "version": "7.0.3",
+          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/refs/tags/v7.0.3.tar.gz"
         }
       }
     },
