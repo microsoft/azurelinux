@@ -1,21 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name zipp
 
+Summary:        Backport of pathlib-compatible object wrapper for zip files
 Name:           python-%{pypi_name}
 Version:        3.8.0
 Release:        2%{?dist}
-Summary:        Backport of pathlib-compatible object wrapper for zip files
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/jaraco/zipp
 Source0:        %{pypi_source}
+
 BuildArch:      noarch
 
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-BuildRequires:  pyproject-rpm-macros
 
 %if %{with_check}
 BuildRequires:  python3dist(pytest)
@@ -24,13 +24,11 @@ BuildRequires:  python3dist(pytest)
 %description
 A pathlib-compatible Zipfile object wrapper. A backport of the Path object.
 
-
 %package -n     python3-%{pypi_name}
 Summary:        %{summary}
 
 %description -n python3-%{pypi_name}
 A pathlib-compatible Zipfile object wrapper. A backport of the Path object.
-
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
@@ -39,15 +37,15 @@ sed -i "/import jaraco.itertools/d" test_zipp.py
 # this sed removes two lines - one import and one decorator
 sed -i "/func_timeout/d" test_zipp.py
 
-%generate_buildrequires
-%pyproject_buildrequires -r
+%{generate_buildrequires}
+%{pyproject_buildrequires} -r
 
 %build
-%pyproject_wheel
+%{pyproject_wheel}
 
 %install
-%pyproject_install
-%pyproject_save_files %{pypi_name}
+%{pyproject_install}
+%{pyproject_save_files} %{pypi_name}
 
 %check
 # Skipped test needs jaraco.itertools

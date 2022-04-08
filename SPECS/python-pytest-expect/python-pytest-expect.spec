@@ -1,16 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name pytest-expect
 
+Summary:        py.test plugin to store test expectations and mark tests based on them
 Name:           python-%{pypi_name}
 Version:        1.1.0
 Release:        8%{?dist}
-Summary:        py.test plugin to store test expectations and mark tests based on them
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/gsnedders/pytest-expect
-Source0:        %pypi_source
+Source0:        %{pypi_source}
 Source1:        %{url}/raw/%{version}/LICENSE
+
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
@@ -24,17 +24,15 @@ tests, allowing them to be marked as xfail when running them in future.
 The tests expectations are stored such that they can be distributed alongside
 the tests.
 
-
 %package -n     python3-%{pypi_name}
-Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
+Summary:        %{summary}
 
 %description -n python3-%{pypi_name}
 A py.test plugin that stores test expectations by saving the set of failing
 tests, allowing them to be marked as xfail when running them in future.
 The tests expectations are stored such that they can be distributed alongside
 the tests.
-
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
@@ -43,17 +41,14 @@ cp -p %{SOURCE1} .
 %build
 %py3_build
 
-
 %install
 %py3_install
-
 
 %files -n python3-%{pypi_name}
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/pytest_expect
 %{python3_sitelib}/pytest_expect-%{version}-py?.?.egg-info
-
 
 %changelog
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-8

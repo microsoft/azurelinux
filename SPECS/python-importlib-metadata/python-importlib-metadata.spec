@@ -1,19 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Library to access the metadata for a Python package
 Name:           python-importlib-metadata
 Version:        4.11.3
 Release:        2%{?dist}
-Summary:        Library to access the metadata for a Python package
-
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://importlib-metadata.readthedocs.io/
 Source0:        %{pypi_source importlib_metadata}
+
 BuildArch:      noarch
 
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-BuildRequires:  pyproject-rpm-macros
 
 %if %{with_check}
 BuildRequires:  python3-test
@@ -28,7 +28,6 @@ This package supplies third-party access to the functionality
 of importlib.metadata including improvements added to subsequent
 Python versions.
 
-
 %package -n     python3-importlib-metadata
 Summary:        %{summary}
 
@@ -38,23 +37,22 @@ This package supplies third-party access to the functionality
 of importlib.metadata including improvements added to subsequent
 Python versions.
 
-
 %prep
 %autosetup -n importlib_metadata-%{version}
 
-%generate_buildrequires
-%pyproject_buildrequires -r
+%{generate_buildrequires}
+%{pyproject_buildrequires} -r
 
 %build
-%pyproject_wheel
+%{pyproject_wheel}
 
 %install
-%pyproject_install
-%pyproject_save_files importlib_metadata
+%{pyproject_install}
+%{pyproject_save_files} importlib_metadata
 
 %check
 pip3 install pyfakefs
-# Ignored file uses pytest_perf not available in Fedora
+# Ignored file uses pytest_perf not available in Mariner
 # test_find_local tries to install setuptools from PyPI
 %pytest --ignore exercises.py -k "not test_find_local"
 

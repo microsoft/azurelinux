@@ -1,58 +1,49 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name sphinxcontrib-jsmath
 
-# when bootstrapping sphinx, we cannot run tests yet
-%bcond_without check
-
+Summary:        Sphinx extension for math in HTML via JavaScript
 Name:           python-%{pypi_name}
 Version:        1.0.1
 Release:        15%{?dist}
-Summary:        Sphinx extension for math in HTML via JavaScript
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
+
 BuildArch:      noarch
 
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
-%if %{with check}
+%if %{with_check}
+BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  python%{python3_pkgversion}-sphinx >= 1:2
 %endif
 
 %description
 sphinxcontrib-jsmath is a sphinx extension which renders display math in HTML
 via JavaScript.
 
-
 %package -n     python%{python3_pkgversion}-%{pypi_name}
-Summary:        %{summary}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+Summary:        %{summary}
 
 %description -n python%{python3_pkgversion}-%{pypi_name}
 sphinxcontrib-jsmath is a sphinx extension which renders display math in HTML
 via JavaScript.
 
-
 %prep
 %autosetup -n %{pypi_name}-%{version}
-
 
 %build
 %py3_build
 
-
 %install
 %py3_install
 
-
-%if %{with check}
 %check
-%{__python3} -m pytest
-%endif
-
+pip3 install Sphinx
+python3 -m pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name}
 %license LICENSE
@@ -60,7 +51,6 @@ via JavaScript.
 %{python3_sitelib}/sphinxcontrib/
 %{python3_sitelib}/sphinxcontrib_jsmath-%{version}-py%{python3_version}-*.pth
 %{python3_sitelib}/sphinxcontrib_jsmath-%{version}-py%{python3_version}.egg-info/
-
 
 %changelog
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-15

@@ -1,44 +1,39 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name sphinxcontrib-qthelp
 
-# when bootstrapping sphinx, we cannot run tests yet
-%bcond_without check
-
+Summary:        Sphinx extension for QtHelp documents
 Name:           python-%{pypi_name}
 Version:        1.0.3
 Release:        8%{?dist}
-Summary:        Sphinx extension for QtHelp documents
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
+
 BuildArch:      noarch
 
 BuildRequires:  gettext
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
-%if %{with check}
+%if %{with_check}
+BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  python%{python3_pkgversion}-sphinx >= 1:2
 %endif
 
 %description
 sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp document.
 
-
 %package -n     python%{python3_pkgversion}-%{pypi_name}
-Summary:        %{summary}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+Summary:        %{summary}
 
 %description -n python%{python3_pkgversion}-%{pypi_name}
 sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp document.
 
-
 %prep
 %autosetup -n %{pypi_name}-%{version}
 find -name '*.mo' -delete
-
 
 %build
 for po in $(find -name '*.po'); do
@@ -46,13 +41,12 @@ for po in $(find -name '*.po'); do
 done
 %py3_build
 
-
 %install
 %py3_install
 
 # Move language files to /usr/share
 pushd %{buildroot}%{python3_sitelib}
-for lang in `find sphinxcontrib/qthelp/locales -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -printf "%f "`;
+for lang in `find sphinxcontrib/qthelp/locales -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -printf "%{f} "`;
 do
   test $lang == __pycache__ && continue
   install -d %{buildroot}%{_datadir}/locale/$lang/LC_MESSAGES
@@ -62,15 +56,11 @@ rm -rf sphinxcontrib/qthelp/locales
 ln -s %{_datadir}/locale sphinxcontrib/qthelp/locales
 popd
 
-
 %find_lang sphinxcontrib.qthelp
 
-
-%if %{with check}
 %check
+pip3 install Sphinx
 %pytest
-%endif
-
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.qthelp.lang
 %license LICENSE
@@ -78,7 +68,6 @@ popd
 %{python3_sitelib}/sphinxcontrib/
 %{python3_sitelib}/sphinxcontrib_qthelp-%{version}-py%{python3_version}-*.pth
 %{python3_sitelib}/sphinxcontrib_qthelp-%{version}-py%{python3_version}.egg-info/
-
 
 %changelog
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-8

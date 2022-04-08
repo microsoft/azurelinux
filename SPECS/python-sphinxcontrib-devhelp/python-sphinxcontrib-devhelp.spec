@@ -1,44 +1,39 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name sphinxcontrib-devhelp
 
-# when bootstrapping sphinx, we cannot run tests yet
-%bcond_without check
-
+Summary:        Sphinx extension for Devhelp documents
 Name:           python-%{pypi_name}
 Version:        1.0.2
 Release:        8%{?dist}
-Summary:        Sphinx extension for Devhelp documents
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
+
 BuildArch:      noarch
 
 BuildRequires:  gettext
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
-%if %{with check}
+%if %{with_check}
+BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  python%{python3_pkgversion}-sphinx >= 1:2
 %endif
 
 %description
 sphinxcontrib-devhelp is a sphinx extension which outputs Devhelp document.
 
-
 %package -n     python%{python3_pkgversion}-%{pypi_name}
-Summary:        %{summary}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+Summary:        %{summary}
 
 %description -n python%{python3_pkgversion}-%{pypi_name}
 sphinxcontrib-devhelp is a sphinx extension which outputs Devhelp document.
 
-
 %prep
 %autosetup -n %{pypi_name}-%{version}
 find -name '*.mo' -delete
-
 
 %build
 for po in $(find -name '*.po'); do
@@ -46,13 +41,12 @@ for po in $(find -name '*.po'); do
 done
 %py3_build
 
-
 %install
 %py3_install
 
 # Move language files to /usr/share
 pushd %{buildroot}%{python3_sitelib}
-for lang in `find sphinxcontrib/devhelp/locales -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -printf "%f "`;
+for lang in `find sphinxcontrib/devhelp/locales -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -printf "%{f} "`;
 do
   test $lang == __pycache__ && continue
   install -d %{buildroot}%{_datadir}/locale/$lang/LC_MESSAGES
@@ -62,15 +56,11 @@ rm -rf sphinxcontrib/devhelp/locales
 ln -s %{_datadir}/locale sphinxcontrib/devhelp/locales
 popd
 
-
 %find_lang sphinxcontrib.devhelp
 
-
-%if %{with check}
 %check
+pip3 install Sphinx
 %pytest
-%endif
-
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.devhelp.lang
 %license LICENSE
@@ -78,7 +68,6 @@ popd
 %{python3_sitelib}/sphinxcontrib/
 %{python3_sitelib}/sphinxcontrib_devhelp-%{version}-py%{python3_version}-*.pth
 %{python3_sitelib}/sphinxcontrib_devhelp-%{version}-py%{python3_version}.egg-info/
-
 
 %changelog
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-8

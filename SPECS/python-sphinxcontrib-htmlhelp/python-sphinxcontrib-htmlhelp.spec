@@ -1,45 +1,40 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global pypi_name sphinxcontrib-htmlhelp
 
-# when bootstrapping sphinx, we cannot run tests yet
-%bcond_without check
-
+Summary:        Sphinx extension for HTML help files
 Name:           python-%{pypi_name}
 Version:        2.0.0
 Release:        4%{?dist}
-Summary:        Sphinx extension for HTML help files
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
+
 BuildArch:      noarch
 
 BuildRequires:  gettext
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
-%if %{with check}
-BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  python%{python3_pkgversion}-sphinx >= 1:2
+%if %{with_check}
 BuildRequires:  python%{python3_pkgversion}-html5lib
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 
 %description
 sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files.
 
-
 %package -n     python%{python3_pkgversion}-%{pypi_name}
-Summary:        %{summary}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+Summary:        %{summary}
 
 %description -n python%{python3_pkgversion}-%{pypi_name}
 sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files.
 
-
 %prep
 %autosetup -n %{pypi_name}-%{version}
 find -name '*.mo' -delete
-
 
 %build
 for po in $(find -name '*.po'); do
@@ -47,13 +42,12 @@ for po in $(find -name '*.po'); do
 done
 %py3_build
 
-
 %install
 %py3_install
 
 # Move language files to /usr/share
 pushd %{buildroot}%{python3_sitelib}
-for lang in `find sphinxcontrib/htmlhelp/locales -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -printf "%f "`;
+for lang in `find sphinxcontrib/htmlhelp/locales -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -printf "%{f} "`;
 do
   test $lang == __pycache__ && continue
   install -d %{buildroot}%{_datadir}/locale/$lang/LC_MESSAGES
@@ -63,15 +57,11 @@ rm -rf sphinxcontrib/htmlhelp/locales
 ln -s %{_datadir}/locale sphinxcontrib/htmlhelp/locales
 popd
 
-
 %find_lang sphinxcontrib.htmlhelp
 
-
-%if %{with check}
 %check
-%{__python3} -m pytest
-%endif
-
+pip3 install Sphinx
+python3 -m pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.htmlhelp.lang
 %license LICENSE
@@ -79,7 +69,6 @@ popd
 %{python3_sitelib}/sphinxcontrib/
 %{python3_sitelib}/sphinxcontrib_htmlhelp-%{version}-py%{python3_version}-*.pth
 %{python3_sitelib}/sphinxcontrib_htmlhelp-%{version}-py%{python3_version}.egg-info/
-
 
 %changelog
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-4
