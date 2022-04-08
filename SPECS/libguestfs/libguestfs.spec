@@ -1,3 +1,5 @@
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 # Architectures on which golang works.
 #% global golang_arches aarch64 % {arm} % {ix86} x86_64
 # In theory the above, in practice golang is so often broken that
@@ -29,7 +31,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # Source and patches.
 URL:            https://libguestfs.org/
-Source0:        https://libguestfs.org/download/1.44-stable/%{name}-%{version}.tar.gz
+Source0:        https://libguestfs.org/download/%{majmin}-stable/%{name}-%{version}.tar.gz
 # Replacement README file.
 Source4:        README-replacement.in
 # Guestfish colour prompts.
