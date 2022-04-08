@@ -68,8 +68,11 @@ func main() {
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
 
 	// Parse the partition file
-	err = configuration.ParseKickStartParitionScheme(config)
-	logger.PanicOnError(err, "Failed to build system configuration")
+	err = configuration.ParseKickStartParitionScheme(&config)
+	logger.PanicOnError(err, "Failed to parse partition schema")
+
+	fmt.Printf("Check Disks length: %d\n", len(config.Disks))
+	fmt.Printf("Check artifact length: %d\n", len(config.Disks[0].Artifacts))
 
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]
@@ -328,6 +331,7 @@ func setupDisk(outputDir, diskName string, liveInstallFlag bool, diskConfig conf
 			return
 		}
 	} else {
+		fmt.Printf("ENtering here-----------------------\n")
 		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupLoopDeviceDisk(outputDir, diskName, diskConfig, rootEncryption, readOnlyRootConfig)
 		isLoopDevice = true
 	}
@@ -352,11 +356,16 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 		return
 	}
 
+	fmt.Printf("ENtering checkpoint 1-----------------------\n")
+
 	diskDevPath, err = diskutils.SetupLoopbackDevice(rawDisk)
 	if err != nil {
 		logger.Log.Errorf("Failed to mount raw disk (%s) as a loopback device", rawDisk)
 		return
 	}
+
+	fmt.Printf("ENtering checkpoint 2-----------------------\n")
+	fmt.Printf("Check the value of diskDevPath: %s\n", diskDevPath)
 
 	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisk(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
 	if err != nil {

@@ -82,6 +82,7 @@ func main() {
 	}
 
 	config, err := configuration.Load(*configFile)
+	err = configuration.ParseKickStartParitionScheme(&config)
 	if err != nil {
 		logger.Log.Panicf("Failed loading image configuration. Error: %s", err)
 	}
@@ -106,6 +107,12 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 	}
 
 	numberOfArtifacts := 0
+
+	fmt.Printf("Check partition length here: %d\n", len(config.Disks[0].Partitions))
+
+	//fmt.Printf("Check artifact length here: %d\n", len(config.Disks[0].Artifacts))
+
+
 	for _, disk := range config.Disks {
 		numberOfArtifacts += len(disk.Artifacts)
 		for _, partition := range disk.Partitions {

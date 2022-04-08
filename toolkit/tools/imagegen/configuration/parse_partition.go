@@ -13,16 +13,14 @@ import (
 	"strconv"
 )
 
-func ParseKickStartParitionScheme(config Config) (err error) {
+func ParseKickStartParitionScheme(config *Config) (err error) {
 
 	var (
 		parseCmd			string
 		partitionFlags		[]string
 		partitionTableType	PartitionTableType
-		curDisk				Disk
-		curConfig			SystemConfig
-		diskInfo			map[string]Disk
-		configInfo			map[string]SystemConfig
+		diskInfo			map[string]int
+		configInfo			map[string]int
 	)
 
 	file, err := os.Open("/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh")
@@ -39,12 +37,11 @@ func ParseKickStartParitionScheme(config Config) (err error) {
 		return
 	}
 
-	scanner := bufio.NewScanner(file)
-	disks := []Disk{}
-	config.Disks = disks
-	diskInfo = make(map[string]Disk)
-	configInfo = make(map[string]SystemConfig)
 	defaultConfigIndex := 0
+
+	scanner := bufio.NewScanner(file)
+	diskInfo = make(map[string]int)
+	configInfo = make(map[string]int)
 	partitionTableType = PartitionTableTypeNone
 
 	for scanner.Scan() {
@@ -66,33 +63,47 @@ func ParseKickStartParitionScheme(config Config) (err error) {
 				curDiskInfo = curDiskInfo[9 : len(curDiskInfo)]
 				
 				// Check whether this disk already exists or not
-				val, ok := diskInfo[curDiskInfo]
-				if ok {
-					curDisk = val
-					curConfig = configInfo[curDiskInfo]
-				} else {
+				curIdx, ok := diskInfo[curDiskInfo]
+				if !ok {
+					fmt.Printf("Create new disk object: %s\n", curDiskInfo)
+
 					// Create new disk struct and append it into the Disk array
-					curDisk = Disk{}
-					diskInfo[curDiskInfo] = curDisk
-					curDisk.PartitionTableType = partitionTableType
-					disks = append(disks, curDisk)
-					curDisk.Partitions = []Partition{}
-					
-					// Create new partitionSetting struct and append it into the sysconfig array
-					curConfig = config.SystemConfigs[defaultConfigIndex]
-					configInfo[curDiskInfo] = curConfig
-					curConfig.PartitionSettings = []PartitionSetting{}
+					newDisk := Disk{}
+					newDisk.MaxSize = 2048
+					artifacts := []Artifact{
+						Artifact{
+							Name: "core",
+							Type: "vhd",
+						},
+					}
+					newDisk.Artifacts = artifacts
+
+					diskInfo[curDiskInfo] = defaultConfigIndex
+					configInfo[curDiskInfo] = defaultConfigIndex
+					curIdx = defaultConfigIndex
 					defaultConfigIndex++
+					newDisk.PartitionTableType = partitionTableType
+					config.Disks = append(config.Disks, newDisk)
+					fmt.Printf("Check size of disk array: %d\n", len(config.Disks))
 				}
 				
 				// Create new Partition and PartionSetting
-				partition := Partition{}
-				partitionSetting := PartitionSetting{}
+				partition := new(Partition)
+				partitionSetting := new(PartitionSetting)
+				partitionSetting.MountIdentifier = MountIdentifierDefault
 				
 				// Find Mount Point
 				partitionSetting.MountPoint = partitionFlags[1]
 				if partitionFlags[1] == "biosboot" {
 					partitionSetting.MountPoint = ""
+					partitionSetting.ID = "boot"
+					partition.ID = "boot"
+				} else if partitionFlags[1] == "/" {
+					partitionSetting.ID = "rootfs"
+					partition.ID = "rootfs"
+				} else {
+					partitionSetting.ID = partitionFlags[1]
+					partition.ID = partitionFlags[1]
 				}
 
 				// Loop through partition flags to fetch fstype, size etc.
@@ -110,10 +121,10 @@ func ParseKickStartParitionScheme(config Config) (err error) {
 						partSizeStr := partOpt[7 : len(partOpt)]
 						fmt.Printf("partition size: %s\n", partSizeStr)
 						
-						if len(curDisk.Partitions) == 0 {
+						if len(config.Disks[curIdx].Partitions) == 0 {
 							partition.Start = 1
 						} else {
-							partition.Start = curDisk.Partitions[len(curDisk.Partitions)-1].End
+							partition.Start = config.Disks[curIdx].Partitions[len(config.Disks[curIdx].Partitions)-1].End
 						}
 
 						if strings.Contains(parseCmd, "--grow") {
@@ -121,17 +132,38 @@ func ParseKickStartParitionScheme(config Config) (err error) {
 						} else {
 							partitionSize, err := strconv.ParseUint(partSizeStr, 10, 64)
 							if err != nil {
-								fmt.Println("Invalid partition size")
 								return err
 							}
 							partition.End = partition.Start + partitionSize
 						}
 					}
 				}
-
-				curDisk.Partitions = append(curDisk.Partitions, partition)
-				curConfig.PartitionSettings = append(curConfig.PartitionSettings, partitionSetting)
+				
+				fmt.Printf("Finish parsing line: start appending\n")
+				config.Disks[curIdx].Partitions = append(config.Disks[curIdx].Partitions, *partition)
+				config.SystemConfigs[curIdx].PartitionSettings = append(config.SystemConfigs[curIdx].PartitionSettings, *partitionSetting)
+				fmt.Printf("Check Disk0 partition length: %d\n", len(config.Disks[0].Partitions))
 			} 
+		}
+	}
+
+	// Print our disk and partitionSettings for validation
+	for _, disk := range config.Disks {
+		fmt.Printf("Partition table type: %s\n", disk.PartitionTableType)
+		fmt.Printf("Artifact type: %s\n", disk.Artifacts[0].Type)
+		for _, partition := range disk.Partitions {
+			fmt.Printf("Partition ID: %s\n", partition.ID)
+			fmt.Printf("Partition Start: %d\n", partition.Start)
+			fmt.Printf("Partition End: %d\n", partition.End)
+			fmt.Printf("Partition fstype: %s\n", partition.FsType)
+		}
+	}
+
+	for _, sysconfig := range config.SystemConfigs {
+		fmt.Printf("System config name: %s\n", sysconfig.Name)
+		for _, partitionsetting := range sysconfig.PartitionSettings {
+			fmt.Printf("Partition ID: %s\n", partitionsetting.ID)
+			fmt.Printf("Partition Mount Point: %s\n", partitionsetting.MountPoint)
 		}
 	}
 
