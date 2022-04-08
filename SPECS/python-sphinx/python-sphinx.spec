@@ -1,6 +1,6 @@
 # Unset -s on python shebang to allow RPM-installed sphinx to be used
 # with user-installed modules (#1903763)
-%global py3_shebang_flags %{nil}
+%undefine py3_shebang_flags
 
 # Disabled until we bring "ImageMagick" to Mariner.
 %bcond_with imagemagick_tests
@@ -113,6 +113,23 @@ the Python docs:
 %package -n python%{python3_pkgversion}-sphinx
 Summary:        Python documentation generator
 License:        BSD AND Python AND MIT
+
+Requires:       python3-babel
+Requires:       python3-docutils
+Requires:       python3-imagesize
+Requires:       python3-jinja2
+Requires:       python3-packaging
+Requires:       python3-pygments
+Requires:       python3-requests
+Requires:       python3-six
+Requires:       python3-snowballstemmer
+Requires:       python3-sphinx-theme-alabaster
+Requires:       python3-sphinxcontrib-applehelp
+Requires:       python3-sphinxcontrib-devhelp
+Requires:       python3-sphinxcontrib-htmlhelp
+Requires:       python3-sphinxcontrib-jsmath
+Requires:       python3-sphinxcontrib-qthelp
+Requires:       python3-sphinxcontrib-serializinghtml
 
 Recommends:     ImageMagick
 Recommends:     graphviz

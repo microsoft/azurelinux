@@ -3,7 +3,7 @@
 Summary:        Sphinx extension for serialized HTML
 Name:           python-%{pypi_name}
 Version:        1.1.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,8 +17,8 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 
 %if %{with_check}
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  python3-sphinx
 %endif
 
 %description
@@ -46,6 +46,7 @@ done
 
 
 %install
+pip3 install Sphinx
 %py3_install
 
 # Move language files to /usr/share
@@ -75,6 +76,9 @@ popd
 %{python3_sitelib}/sphinxcontrib_serializinghtml-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Thu Apr 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.5-5
+- Installing 'python3-sphinx' through pip3 during tests to remove cyclic dependency.
+
 * Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.5-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

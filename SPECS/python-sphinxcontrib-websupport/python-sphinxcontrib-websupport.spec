@@ -50,12 +50,9 @@ tox
 %{python3_sitelib}/*.pth
 
 %changelog
-<<<<<<< HEAD
-=======
 * Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-2
 - Adding a dependency on "python3-sphinxcontrib-serializinghtml".
 
->>>>>>> main
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-1
 - Updating to version 1.2.4.
 

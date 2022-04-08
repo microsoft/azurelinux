@@ -78,11 +78,7 @@ rst2html3 --no-datestamp README.rst README.html
 rm -fr %{buildroot}%{python3_sitelib}/%{srcname}/static/css/fonts
 
 %check
-<<<<<<< HEAD
-pip3 install pluggy more-itertools Sphinx==1.8 readthedocs-sphinx-ext
-=======
 pip3 install pluggy more-itertools Sphinx readthedocs-sphinx-ext
->>>>>>> main
 %pytest
 
 %files -n python3-%{srcname}
@@ -91,12 +87,9 @@ pip3 install pluggy more-itertools Sphinx readthedocs-sphinx-ext
 %{python3_sitelib}/%{srcname}*
 
 %changelog
-<<<<<<< HEAD
-=======
 * Mon Apr 04 2022 Bala <balakumaran.kannan@microsoft.com> - 1.0.0-2
 - pip install latest Sphinx for test
 
->>>>>>> main
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
 - Updating to 1.0.0 using Fedora 36 spec (license: MIT) for guidance.
 
