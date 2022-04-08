@@ -1,7 +1,7 @@
 Summary:        Wayland protocols that adds functionality not available in the core protocol
 Name:           wayland-protocols
 Version:        1.25
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ wayland-protocols.
 %{_datadir}/%{name}/
 
 %changelog
+* Thu Apr 07 2022 Hideyuki Nagase <hideyukn@microsoft.com> - 1.25-3
+- Removed "BuildRequires: libffi-devel" and moved to wayland-devel.
+
 * Tue Mar 15 2022 Hideyuki Nagase <hideyukn@microsoft.com> - 1.25-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
