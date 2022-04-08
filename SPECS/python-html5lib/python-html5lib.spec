@@ -3,8 +3,7 @@ Distribution:   Mariner
 Name:           python-html5lib
 Summary:        A python based HTML parser/tokenizer
 Version:        1.1
-Release:        8%{?dist}
-Epoch:          1
+Release:        9%{?dist}
 License:        MIT
 URL:            https://github.com/html5lib/html5lib-python
 Source:         %{pypi_source html5lib}
@@ -67,6 +66,11 @@ sed -i 's/from mock import/from unittest.mock import/' html5lib/tests/test_meta.
 
 
 %changelog
+* Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-9
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Cleaning-up spec. License verified.
+- Removing epoch.
+
 * Mon Jan 31 2022 Miro Hrončok <mhroncok@redhat.com> - 1:1.1-8
 - Use standard library unittest.mock instead of 3rd party mock
 - Add subpackages with Python extras: lxml genshi chardet all

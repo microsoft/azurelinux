@@ -7,7 +7,7 @@ Distribution:   Mariner
 
 Name:           python-%{pypi_name}
 Version:        1.0.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Sphinx extension for Devhelp documents
 License:        BSD
 URL:            http://sphinx-doc.org/
@@ -81,6 +81,10 @@ popd
 
 
 %changelog
+* Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-8
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Cleaning-up spec. License verified.
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 

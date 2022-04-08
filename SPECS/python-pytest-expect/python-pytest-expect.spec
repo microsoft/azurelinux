@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           python-%{pypi_name}
 Version:        1.1.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        py.test plugin to store test expectations and mark tests based on them
 
 License:        MIT
@@ -56,6 +56,9 @@ cp -p %{SOURCE1} .
 
 
 %changelog
+* Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-8
+- Cleaning-up spec. License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

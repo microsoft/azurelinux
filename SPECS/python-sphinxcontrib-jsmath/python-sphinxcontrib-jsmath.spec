@@ -7,7 +7,7 @@ Distribution:   Mariner
 
 Name:           python-%{pypi_name}
 Version:        1.0.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Sphinx extension for math in HTML via JavaScript
 License:        BSD
 URL:            http://sphinx-doc.org/
@@ -63,6 +63,10 @@ via JavaScript.
 
 
 %changelog
+* Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-15
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Cleaning-up spec. License verified.
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.1-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
