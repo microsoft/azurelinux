@@ -22623,6 +22623,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-html5lib",
+          "version": "1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/html5lib/html5lib-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-httplib2",
           "version": "0.18.1",
           "downloadUrl": "https://github.com/httplib2/httplib2/archive/v0.18.1/httplib2-0.18.1.tar.gz"
@@ -22676,6 +22686,16 @@
           "name": "python-imagesize",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/shibukawa/imagesize_py/archive/1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-importlib-metadata",
+          "version": "4.11.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/importlib_metadata/importlib_metadata-4.11.3.tar.gz"
         }
       }
     },
@@ -23803,6 +23823,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pytest-expect",
+          "version": "1.1.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-expect/pytest-expect-1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pytest-flake8",
           "version": "1.0.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-flake8/pytest-flake8-1.0.4.tar.gz"
@@ -24313,9 +24343,59 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sphinxcontrib-applehelp",
+          "version": "1.0.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-applehelp/sphinxcontrib-applehelp-1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinxcontrib-devhelp",
+          "version": "1.0.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-devhelp/sphinxcontrib-devhelp-1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinxcontrib-htmlhelp",
+          "version": "2.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-htmlhelp/sphinxcontrib-htmlhelp-2.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sphinxcontrib-httpdomain",
           "version": "1.7.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-httpdomain/sphinxcontrib-httpdomain-1.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinxcontrib-jsmath",
+          "version": "1.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-jsmath/sphinxcontrib-jsmath-1.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinxcontrib-qthelp",
+          "version": "1.0.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-qthelp/sphinxcontrib-qthelp-1.0.3.tar.gz"
         }
       }
     },
@@ -24726,6 +24806,16 @@
           "name": "python-yubico",
           "version": "1.3.3",
           "downloadUrl": "https://github.com/Yubico/python-yubico/archive/python-yubico-1.3.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-zipp",
+          "version": "3.8.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/z/zipp/zipp-3.8.0.tar.gz"
         }
       }
     },
