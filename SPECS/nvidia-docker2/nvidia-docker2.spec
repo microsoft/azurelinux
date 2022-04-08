@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        nvidia-docker CLI wrapper
 Name:           nvidia-docker2
-Version:        2.6.0
-Release:        2%{?dist}
+Version:        2.10.0
+Release:        1%{?dist}
 License:        ASL2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,7 +10,7 @@ Group:          Development Tools
 URL:            https://github.com/NVIDIA/nvidia-docker
 #Source0:       https://github.com/NVIDIA/nvidia-docker/archive/v%%{version}.tar.gz
 Source0:        nvidia-docker-%{version}.tar.gz
-Requires:       nvidia-container-runtime >= 3.4.2
+Requires:       nvidia-container-toolkit >= 1.9.0
 Conflicts:      nvidia-docker < 2.0.0
 BuildArch:      noarch
 
@@ -33,7 +33,12 @@ install -m 644 -t %{buildroot}%{_sysconfdir}/docker daemon.json
 %config %{_sysconfdir}/docker/daemon.json
 
 %changelog
-* Wed May 19 2021 Joseph Knierman <joknierm@nvidia.com> - 2.6.0-2
+* Mon Mar 28 2022 Adithya Jayachandran <adjayach@microsoft.com> - 2.10.0-1
+- Updating package to v2.10.0
+- Replace nvidia-container-runtime dependence with nvidia-container-toolkit
+- Bump the nvidia-container-toolkit dependency to v1.9.0
+
+* Wed May 19 2021 Joseph Knierman <joknierm@microsoft.com> - 2.6.0-2
 - License verified
 - Initial CBL-Mariner import from NVIDIA (license: ASL 2.0).
 
