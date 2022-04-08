@@ -15,10 +15,18 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-# Test deps
-# Upstream uses requirements-test.txt but it has tox, coverage, mock, flake8 in it
+
+%if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
+BuildRequires:  python3-pytest
+BuildRequires:  python3-six
 BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(pytest-expect)
+%endif
 
 %description
 A python based HTML parser/tokenizer based on the WHATWG HTML5
@@ -40,17 +48,18 @@ specification for maximum compatibility with major desktop web browsers.
 # From https://github.com/html5lib/html5lib-python/pull/536
 sed -i 's/from mock import/from unittest.mock import/' html5lib/tests/test_meta.py
 
-%{generate_buildrequires}
-%{pyproject_buildrequires} -x all
+%generate_buildrequires
+%pyproject_buildrequires -x all
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 %install
-%{pyproject_install}
-%{pyproject_save_files} html5lib
+%pyproject_install
+%pyproject_save_files html5lib
 
 %check
+pip3 install more-itertools umsgpack
 %pytest
 
 %files -n python3-html5lib -f %{pyproject_files}

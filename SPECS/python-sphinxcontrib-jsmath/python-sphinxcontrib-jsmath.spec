@@ -16,8 +16,14 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
 %if %{with_check}
+BuildRequires:  python%{python3_pkgversion}-atomicwrites
+BuildRequires:  python%{python3_pkgversion}-attrs
+BuildRequires:  python%{python3_pkgversion}-docutils
 BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pluggy
+BuildRequires:  python%{python3_pkgversion}-pygments
 BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-six
 %endif
 
 %description
@@ -42,7 +48,7 @@ via JavaScript.
 %py3_install
 
 %check
-pip3 install Sphinx
+pip3 install more-itertools Sphinx
 python3 -m pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name}

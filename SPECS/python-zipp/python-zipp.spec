@@ -18,6 +18,12 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
+BuildRequires:  python3-six
 BuildRequires:  python3dist(pytest)
 %endif
 
@@ -37,17 +43,18 @@ sed -i "/import jaraco.itertools/d" test_zipp.py
 # this sed removes two lines - one import and one decorator
 sed -i "/func_timeout/d" test_zipp.py
 
-%{generate_buildrequires}
-%{pyproject_buildrequires} -r
+%generate_buildrequires
+%pyproject_buildrequires -r
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 %install
-%{pyproject_install}
-%{pyproject_save_files} %{pypi_name}
+%pyproject_install
+%pyproject_save_files %{pypi_name}
 
 %check
+pip3 install more-itertools
 # Skipped test needs jaraco.itertools
 %pytest -k "not test_joinpath_constant_time"
 

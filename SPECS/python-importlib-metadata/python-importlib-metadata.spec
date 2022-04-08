@@ -16,7 +16,14 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
+BuildRequires:  python3-six
 BuildRequires:  python3-test
+BuildRequires:  python3-zipp
 BuildRequires:  python3dist(pytest)
 %endif
 
@@ -40,18 +47,18 @@ Python versions.
 %prep
 %autosetup -n importlib_metadata-%{version}
 
-%{generate_buildrequires}
-%{pyproject_buildrequires} -r
+%generate_buildrequires
+%pyproject_buildrequires -r
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 %install
-%{pyproject_install}
-%{pyproject_save_files} importlib_metadata
+%pyproject_install
+%pyproject_save_files importlib_metadata
 
 %check
-pip3 install pyfakefs
+pip3 install pyfakefs more-itertools
 # Ignored file uses pytest_perf not available in Mariner
 # test_find_local tries to install setuptools from PyPI
 %pytest --ignore exercises.py -k "not test_find_local"

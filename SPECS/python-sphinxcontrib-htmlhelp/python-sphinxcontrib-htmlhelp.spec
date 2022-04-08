@@ -17,9 +17,15 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
 %if %{with_check}
+BuildRequires:  python%{python3_pkgversion}-atomicwrites
+BuildRequires:  python%{python3_pkgversion}-attrs
+BuildRequires:  python%{python3_pkgversion}-docutils
 BuildRequires:  python%{python3_pkgversion}-html5lib
 BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pluggy
+BuildRequires:  python%{python3_pkgversion}-pygments
 BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-six
 %endif
 
 %description
@@ -47,7 +53,7 @@ done
 
 # Move language files to /usr/share
 pushd %{buildroot}%{python3_sitelib}
-for lang in `find sphinxcontrib/htmlhelp/locales -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -printf "%{f} "`;
+for lang in `find sphinxcontrib/htmlhelp/locales -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -printf "%f "`;
 do
   test $lang == __pycache__ && continue
   install -d %{buildroot}%{_datadir}/locale/$lang/LC_MESSAGES
@@ -60,7 +66,7 @@ popd
 %find_lang sphinxcontrib.htmlhelp
 
 %check
-pip3 install Sphinx
+pip3 install more-itertools Sphinx webencodings
 python3 -m pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.htmlhelp.lang
