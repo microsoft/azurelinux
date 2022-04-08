@@ -1,40 +1,41 @@
 %global srcname responses
-Summary:        Reusable django app for collecting and visualizing network topology
+Summary:        A utility library for mocking out the requests Python library.
 Name:           python-%{srcname}
-Version:        0.10.15
+Version:        0.20.0
 Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/getsentry/responses
-Source0:        %{url}/archive/%{version}/%{srcname}-%{version}.tar.gz
-BuildRequires:  python%{python3_pkgversion}-coverage
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-mock
-BuildRequires:  python%{python3_pkgversion}-requests
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-six
-BuildArch:      noarch
+# The 0.20.0 release had a bad manifest file, which caused the sdist file to not include tests.
+# Future releases should be able to use the actual release tarball, but for now we use the GitHub source tarball
+Source0:        https://github.com/getsentry/responses/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 %if %{with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-requests
+BuildRequires:  python3-urllib3
 %endif
+BuildArch:      noarch
 
 %description
 A utility library for mocking out the requests Python library.
 
-%package -n python%{python3_pkgversion}-%{srcname}
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
-Summary:        %{sum}
-%if %{undefined __pythondist_requires}
-Requires:       python%{python3_pkgversion}-requests
-Requires:       python%{python3_pkgversion}-six
-%endif
+%package -n python3-%{srcname}
+%{?python_provide:%python_provide python3-%{srcname}}
+Summary:        A utility library for mocking out the requests Python library.
+Requires:       python3-requests
+Requires:       python3-urllib3
 
-%description -n python%{python3_pkgversion}-%{srcname}
+%description -n python3-%{srcname}
 A utility library for mocking out the requests Python library.
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -n %{srcname}-%{version}
+# Fix manifest for test files. Upstreamed in next release after 0.20.0
+sed -i 's/^include test_responses\.py test_matchers\.py test_registries\.py$/recursive-include responses *\.py/' MANIFEST.in
 
 %build
 %py3_build
@@ -43,24 +44,20 @@ A utility library for mocking out the requests Python library.
 %py3_install
 
 %check
-pip3 install atomicwrites>=1.3.0 \
-    attrs>=19.1.0 \
-    more-itertools>=7.0.0 \
-    pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-localserver
-PATH=%{buildroot}%{_bindir}:${PATH} \
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -v
+pip3 install tox
+tox -e py%{python3_version_nodots} --sitepackages
 
-%files -n python%{python3_pkgversion}-%{srcname}
+%files -n python3-%{srcname}
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info/
-%{python3_sitelib}/%{srcname}.py
-%{python3_sitelib}/__pycache__/%{srcname}.*.pyc
+%{python3_sitelib}/%{srcname}
 
 %changelog
+* Wed Mar 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.20.0-1
+- Upgrade to latest upstream version
+- Use tox to run tests
+
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.10.15-4
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

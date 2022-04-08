@@ -261,3 +261,43 @@ func TestShouldFailMissingSELinuxPackageWithSELinux(t *testing.T) {
 	}
 	assert.Fail(t, "Could not find "+targetPackage+" to test")
 }
+
+func TestShouldSucceedSELinuxPackageDefinedInline(t *testing.T) {
+	const (
+		configDirectory   = "../../imageconfigs/"
+		targetPackage     = "core-efi.json"
+		targetPackageList = "selinux.json"
+		selinuxPkgName    = "selinux-policy"
+	)
+	configFiles, err := ioutil.ReadDir(configDirectory)
+	assert.NoError(t, err)
+
+	// Pick the core-efi config file, then enable SELinux
+	for _, file := range configFiles {
+		if !file.IsDir() && strings.Contains(file.Name(), targetPackage) {
+			configPath := filepath.Join(configDirectory, file.Name())
+
+			fmt.Println("Corrupting ", configPath)
+
+			config, err := configuration.LoadWithAbsolutePaths(configPath, configDirectory)
+			for i, list := range config.SystemConfigs[0].PackageLists {
+				// Delete the packagelist from the config
+				if strings.Contains(list, targetPackageList) {
+					config.SystemConfigs[0].PackageLists = append(config.SystemConfigs[0].PackageLists[:i], config.SystemConfigs[0].PackageLists[i+1:]...)
+				}
+			}
+			assert.NoError(t, err)
+
+			//Add required SELinux package in the inline package definition
+			newPackagesField := []string{selinuxPkgName}
+			config.SystemConfigs[0].Packages = newPackagesField
+
+			config.SystemConfigs[0].KernelCommandLine.SELinux = "enforcing"
+
+			err = ValidateConfiguration(config)
+			assert.NoError(t, err)
+			return
+		}
+	}
+	assert.Fail(t, "Could not find "+targetPackage+" to test")
+}

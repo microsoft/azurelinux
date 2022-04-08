@@ -25,6 +25,10 @@ version_release_matching_groups = [
         "SPECS/ca-certificates/ca-certificates.spec",
         "SPECS/prebuilt-ca-certificates/prebuilt-ca-certificates.spec",
         "SPECS/prebuilt-ca-certificates-base/prebuilt-ca-certificates-base.spec"
+    ]),
+    frozenset([
+        "SPECS/jflex/jflex.spec",
+        "SPECS/jflex/jflex-bootstrap.spec"
     ])
 ]
 
@@ -36,6 +40,10 @@ version_matching_groups = [
     frozenset([
         "SPECS/dbus/dbus.spec",
         "SPECS-EXTENDED/dbus-x11/dbus-x11.spec"
+    ]),
+    frozenset([
+        "SPECS/python-flit/python-flit.spec",
+        "SPECS/python-flit-core/python-flit-core.spec"
     ])
 ]
 

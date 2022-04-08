@@ -78,6 +78,12 @@ USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./coreutils-fix-get-sys_getdents-aarch64.patch", \
        "$LFS/tools/" ]
+
+USER root
+RUN  chown -Rv lfs $LFS/tools && \
+     chown -Rv lfs:lfs /home/lfs/
+
+USER lfs
 RUN /tools/toolchain_build_temp_tools.sh
 
 COPY [ "./toolchain_initial_chroot_setup.sh", \

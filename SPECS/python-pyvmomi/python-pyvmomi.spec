@@ -1,15 +1,20 @@
 Summary:        pyVmomi is the Python SDK for the VMware vSphere API that allows you to manage ESX, ESXi, and vCenter.
 Name:           python-pyvmomi
-Version:        6.7.3
-Release:        4%{?dist}
+Version:        7.0.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/pyvmomi
-#Source0:       https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Patch0:         python-pyvmomi-make-check-fix.patch
+Source0:        https://github.com/vmware/pyvmomi/archive/refs/tags/v7.0.3.tar.gz#/pyvmomi-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-requests
+BuildRequires:  python3-six
+%endif
 BuildArch:      noarch
 
 %description
@@ -17,15 +22,9 @@ pyVmomi is the Python SDK for the VMware vSphere API that allows you to manage E
 
 %package -n     python3-pyvmomi
 Summary:        python-pyvmomi
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-%if %{with_check}
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  python3-pip
-%endif
 Requires:       python3
+Requires:       python3-requests
+Requires:       python3-six
 
 %description -n python3-pyvmomi
 pyVmomi is the Python SDK for the VMware vSphere API that allows you to manage ESX, ESXi, and vCenter.
@@ -40,6 +39,7 @@ pyVmomi is the Python SDK for the VMware vSphere API that allows you to manage E
 %py3_install
 
 %check
+pip3 install -r test-requirements.txt
 %python3 setup.py test
 
 %files -n python3-pyvmomi
@@ -48,6 +48,9 @@ pyVmomi is the Python SDK for the VMware vSphere API that allows you to manage E
 %{python3_sitelib}/*
 
 %changelog
+* Thu Apr 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 7.0.3-1
+- Upgrade to latest upstream version
+
 * Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 6.7.3-4
 - Add an explicit BR on `pip` to fix ptest
 

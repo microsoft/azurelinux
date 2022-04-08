@@ -17,12 +17,16 @@
 
 %define _unpackaged_files_terminate_build 0
 
-%global perl_version    5.32.0
+%global perl_version    5.34.1
 %global perl_epoch      4
 %global perl_arch_stem -thread-multi
 %global perl_archname %{_arch}-%{_os}%{perl_arch_stem}
 
 %global perl_bootstrap 1
+
+%global multilib_64_archs aarch64 x86_64
+%global parallel_tests 1
+%global tapsetdir   %{_datadir}/systemtap/tapset
 
 %global dual_life 0
 %global rebuild_from_scratch %{defined perl_bootstrap}
@@ -36,19 +40,97 @@
 # same as we provide in /usr/lib/rpm/macros.d/macros.perl
 %global perl5_testdir   %{_libexecdir}/perl5-tests
 
+# Optional features
+# Run C++ tests
+%bcond_without perl_enables_cplusplus_test
+# We can bootstrap without gdbm
+%bcond_without gdbm
+# Support for groff, bug #135101
+%bcond_with perl_enables_groff
+# Run Turkish locale tests
+%bcond_with perl_enables_turkish_test
+# Run syslog tests
+%bcond_with perl_enables_syslog_test
+# SystemTap support
+%bcond_with perl_enables_systemtap
+# <> operator uses File::Glob nowadays. CSH is not needed.
+%bcond_with perl_enables_tcsh
+# We can skip %%check phase
+%bcond_with test
+
+# The additional linker flags break binary perl- packages.
+# https://bugzilla.redhat.com/show_bug.cgi?id=2043092
+%undefine _package_note_file
+
 Name:           perl
-License:        GPL+ or Artistic 
+# These are all found licenses. They are distributed among various
+# subpackages.
+# dist/Tie-File/lib/Tie/File.pm:        GPLv2+ or Artistic
+# cpan/Getopt-Long/lib/Getopt/Long.pm:  GPLv2+ or Artistic
+# cpan/Compress-Raw-Zlib/Zlib.xs:       (GPL+ or Artistic) and zlib
+# cpan/Digest-MD5/MD5.xs:               (GPL+ or Artistic) and BSD
+# cpan/Time-Piece/Piece.xs:             (GPL+ or Artistic) and BSD
+# dist/PathTools/Cwd.xs:                (GPL+ or Artistic) and BSD
+# util.c:                               (GPL+ or Artistic) and BSD
+# cpan/perlfaq/lib/perlfaq4.pod:        (GPL+ or Artistic) and Public Domain
+# cpan/Test-Simple/lib/Test/Tutorial.pod:   (GPL+ or Artistic) and
+#                                           Public Domain
+# cpan/MIME-Base64/Base64.xs:           (GPL+ or Artistic) and MIT
+# cpan/Test-Simple/lib/ok.pm:           CC0
+# cpan/Text-Tabs/lib/Text/Wrap.pm:      TTWL
+# cpan/Encode/bin/encguess:             Artistic 2.0
+# cpan/libnet/lib/Net/libnetFAQ.pod:    Artistic    (CPAN RT#117888)
+# cpan/Unicode-Collate/Collate/allkeys.txt:     Unicode
+# inline.h:                             MIT
+# lib/unicore:                          UCD
+# ext/SDBM_File/sdbm.{c,h}:             Public domain
+# regexec.c, regcomp.c:                 HSRL
+# cpan/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm:    MIT (with
+#                                       exception for Perl)
+# time64.c:                             MIT
+# perly.h:                              GPLv3+ with Bison exception
+# pod/perlpodstyle.pod:                 MIT
+# pod/perlunicook.pod:                  (GPL+ or Artistic) and Public Domain
+# pod/perlgpl.pod:                      GPL text
+# pod/perlartistic.pod:                 Artistic text
+# ext/File-Glob/bsd_glob.{c,h}:         BSD
+# Other files:                          GPL+ or Artistic
+## Not in a binary package
+# ebcdic_tables.h:                                  MIT
+# cpan/podlators/t/docs/pod.t:                      MIT
+# cpan/podlators/t/docs/pod-spelling.t:             MIT
+# cpan/podlators/t/docs/spdx-license.t:             MIT
+# cpan/podlators/t/docs/synopsis.t:                 MIT
+# cpan/podlators/t/docs/urls.t :                    MIT
+# cpan/podlators/t/lib/Test/RRA.pm:                 MIT
+# cpan/podlators/t/lib/Test/RRA/Config.pm:          MIT
+# cpan/podlators/t/lib/Test/RRA/ModuleVersion.pm:   MIT
+# cpan/podlators/t/style/minimum-version.t:         MIT
+# cpan/podlators/t/style/module-version.t:          MIT
+# cpan/podlators/t/style/strict.t:                  MIT
+# cpan/Term-ANSIColor/t/lib/Test/RRA/Config.pm:     MIT
+## Unbundled
+# cpan/Compress-Raw-Bzip2/bzip2-src:    BSD
+# cpan/Compress-Raw-Zlib/zlib-src:      zlib
+# perl.h (EBDIC parts)                              MIT
+## perl sub-package notice
+# perluniprops.pod is generated from lib/unicore sources:   UCD
+# uni_keywords.h is generated from lib/unicore sources:     UCD
+#
+# This sub-subpackage doesn't contain any copyrightable material.
+# Nevertheless, it needs a License tag, so we'll use the generic
+# "perl" license.
+License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
-Version:        %{perl_version} 
+Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        465%{?dist}
+Release:        487%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
 Source3:        macros.perl
-
 # Tom Christiansen confirms Pod::Html uses the same license as perl
 Source6:        Pod-Html-license-clarification
 
@@ -60,7 +142,7 @@ Source7:        gendep.macros
 %include %{SOURCE7}
 %endif
 
-# Provide maybe_command independently
+# Provide maybe_command independently, bug #1129443
 Patch5:         perl-5.22.1-Provide-ExtUtils-MM-methods-as-standalone-ExtUtils-M.patch
 
 # Define SONAME for libperl.so
@@ -69,11 +151,11 @@ Patch8:         perl-5.16.3-create_libperl_soname.patch
 # Install libperl.so to -Dshrpdir value
 Patch9:         perl-5.22.0-Install-libperl.so-to-shrpdir-on-Linux.patch
 
-# Make *DBM_File desctructors thread-safe
-Patch10:        perl-5.18.2-Destroy-GDBM-NDBM-ODBM-SDBM-_File-objects-only-from-.patch
+# Make *DBM_File desctructors thread-safe, bug #1107543, RT#61912
+Patch10:        perl-5.34.0-Destroy-GDBM-NDBM-ODBM-SDBM-_File-objects-only-from-.patch
 
 # Replace ExtUtils::MakeMaker dependency with ExtUtils::MM::Utils.
-# This allows not to require perl-devel.
+# This allows not to require perl-devel. Bug #1129443
 Patch11:        perl-5.22.1-Replace-EU-MM-dependnecy-with-EU-MM-Utils-in-IPC-Cmd.patch
 
 # Link XS modules to pthread library to fix linking with -z defs,
@@ -83,110 +165,63 @@ Patch12:        perl-5.27.8-hints-linux-Add-lphtread-to-lddlflags.patch
 # Pass the correct CFLAGS to dtrace
 Patch13:        perl-5.28.0-Pass-CFLAGS-to-dtrace.patch
 
-# Do not use a C compiler reserved identifiers, in upstream after 5.33.0
-Patch14:        perl-5.33.0-MUTABLE_PTR-Rmv-non-standard-syntax.patch
-
-# Fix SvUV_nomg() macro definition, in upstream after 5.33.0
-Patch15:        perl-5.33.0-sv.h-Wanted-UOK-but-said-IOK.patch 
-
-# Fix SvTRUE() documentation, in upstream after 5.33.0
-Patch16:        perl-5.33.0-Update-pod-for-SvTRUE-to-indicate-single-param-evalu.patch
-
-# Fix ext/XS-APItest/t/utf8_warn_base.pl tests, in upstream after 5.33.0
-Patch17:        perl-5.33.0-ext-XS-APItest-t-utf8_warn_base.pl-Fix-a-couple-test.patch
-
-# Fix IO::Handle::error() to report write errors, GH#6799, in upstream after 5.33.0
-Patch18:        perl-5.33.0-make-fh-error-report-errors-from-both-input-and-outp.patch
-Patch19:        perl-5.33.0-IO-Handle-clear-the-error-on-both-input-and-output-s.patch
-
-# Fix a link to Unicode Technical Standard #18, GH#17881, in upstream after 5.33.0
-Patch20:        perl-5.32.0-Fix-404-and-text-in-New-Unicode-properties-section.patch
-
-# Fix setting a non-blocking mode in IO::Socket::UNIX, GH#17787,
-# in upstream after 5.33.0
-Patch21:        perl-5.33.0-IO-Socket-UNIX-synchronize-behavior-with-module-docu.patch
-
-# Fix running actions after stepping in a debugger, GH#17901,
-# in upstream after 5.33.0
-Patch22:        perl-5.33.0-After-running-an-action-in-the-debugger-turn-it-off.patch
-Patch23:        perl-5.33.0-Clearing-DB-action-at-the-end-is-no-longer-needed.patch
-Patch24:        perl-5.33.0-Add-missing-MANIFEST-entry-from-fix-for-debugger.patch
-
-# Fix a buffer size for asctime_r() and ctime_r() functions,
-# in upstream after 5.33.0
-Patch25:        perl-5.33.0-reentr.c-Buffer-sizes-for-asctime_r-ctime_r-are-smal.patch
-
-# Prevent from an integer overflow in RenewDouble() macro,
-# in upstream after 5.33.0
-Patch26:        perl-5.33.0-reentr.c-Prevent-infinite-looping.patch
-
-# Fix a buffer overread in when reallocating formats, GH#17844,
-# in upstream after 5.33.0
-Patch27:        perl-5.33.0-perl-17844-don-t-update-SvCUR-until-after-we-ve-done.patch
-
-# Fix a number of arguments passed to a BOOT XS subroutine, GH#17755,
-# in upstream after 5.33.0
-Patch28:        perl-5.33.0-XSUB.h-fix-MARK-and-items-variables-inside-BOOT-XSUB.patch
-
-# Fix an IO::Handle spurious error reported for regular file handles,
-# GH#18019, in upstream after 5.33.0
-Patch29:        perl-5.33.0-IO-Handle-Fix-a-spurious-error-reported-for-regular-.patch
-
-# Fix inheritance resolution of lexial objects in a debugger, GH#17661,
-# in upstream after 5.33.0
-Patch30:        perl-5.33.0-fix-C-i-obj-where-obj-is-a-lexical.patch
-
-# Fix a misoptimization when assignig a list in a list context, GH#17816,
-# in upstream after 5.33.0
-Patch31:        perl-5.33.0-list-assign-in-list-context-was-over-optimising.patch
-
-# Fix handling left-hand-side undef when assigning a list, GH#16685,
-# in upstream after 5.33.0
-Patch32:        perl-5.33.0-list-assign-in-list-context-honour-LHS-undef.patch
-
-# Fix a memory leak when compiling a long regular expression, GH#18054,
-# in upstream after 5.33.0
-Patch33:        perl-5.33.0-Fix-leak-GH-18054.patch
-
-# Fix handling exceptions in a global destruction, GH#18063,
-# in upstream after 5.33.1
-Patch34:        perl-5.33.1-die_unwind-global-destruction.patch
-
-# Fix sorting with a block that calls return, GH#18081,
-# in upstream after 5.33.1
-Patch35:        perl-5.33.1-sort-return-foo.patch
-
-# Link XS modules to libperl.so with EU::CBuilder on Linux
+# Link XS modules to libperl.so with EU::CBuilder on Linux, bug #960048
 Patch200:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-CBuilder-on-Li.patch
 
-# Link XS modules to libperl.so with EU::MM on Linux
+# Link XS modules to libperl.so with EU::MM on Linux, bug #960048
 Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.patch
 
-BuildRequires:  zlib-devel
+# Update some of the bundled modules
+# see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
+
+BuildRequires:  bash
 BuildRequires:  bzip2-devel
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+%if %{with gdbm}
 BuildRequires:  gdbm-devel
-
-Requires:  bash
-Requires:  bzip2-devel
-Requires:  coreutils
-Requires:  findutils
-Requires:  gcc
-Requires:  gdbm-devel
-
-# glibc-common for iconv
-Requires:  glibc-common
-Requires:  make
-%if !%{defined perl_bootstrap}
-Requires:  perl-interpreter
-Requires:  perl-generators
 %endif
-Requires:  sed
-Requires:  tar
-Requires:  zlib-devel
+# glibc-common for iconv
+BuildRequires:  glibc-common
+%if %{with perl_enables_groff}
+# Build-require groff tools for populating %%Config correctly, bug #135101
+BuildRequires:  groff-base
+%endif
+BuildRequires:  make
+%if !%{defined perl_bootstrap}
+BuildRequires:  perl-interpreter
+BuildRequires:  perl-generators
+%endif
+BuildRequires:  sed
+%if %{with perl_enables_systemtap}
+BuildRequires:  systemtap-sdt-devel
+%endif
+BuildRequires:  tar
+%if %{with perl_enables_tcsh}
+BuildRequires:  tcsh
+%endif
+BuildRequires:  zlib-devel
+
+# For tests
+%if %{with test}
+%if %{with perl_enables_cplusplus_test}
+# An optional ExtUtils-CBuilder's test
+BuildRequires:  gcc-c++
+%endif
+BuildRequires:  procps
+%if %{with perl_enables_turkish_test}
+# An optional t/re/fold_grind_T.t test
+BuildRequires:  glibc-langpack-tr
+%endif
+%if %{with perl_enables_syslog_test}
+BuildRequires:  rsyslog
+%endif
+%endif
 
 
 # compat macro needed for rebuild
-%global perl_compat perl(:MODULE_COMPAT_5.32.0)
+%global perl_compat perl(:MODULE_COMPAT_5.34.1)
 
 Requires:       %perl_compat
 Requires:       perl-interpreter%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
@@ -199,7 +234,7 @@ Requires:       perl-utils
 %endif
 
 Requires:       perl-Archive-Tar, perl-Attribute-Handlers, perl-autodie,
-Requires:       perl-AutoLoader, perl-AutoSplit,
+Requires:       perl-AutoLoader, perl-AutoSplit, perl-autouse,
 Requires:       perl-B, perl-base, perl-Benchmark, perl-bignum, perl-blib,
 Requires:       perl-Carp, perl-Class-Struct,
 Requires:       perl-Compress-Raw-Bzip2, perl-Compress-Raw-Zlib,
@@ -221,7 +256,8 @@ Requires:       perl-ExtUtils-CBuilder, perl-ExtUtils-Constant,
 Requires:       perl-ExtUtils-Command,
 Requires:       perl-ExtUtils-Embed, perl-ExtUtils-Install,
 Requires:       perl-ExtUtils-MakeMaker, perl-ExtUtils-Manifest,
-Requires:       perl-ExtUtils-Miniperl, perl-ExtUtils-ParseXS,
+Requires:       perl-ExtUtils-Miniperl, perl-ExtUtils-MM-Utils,
+Requires:       perl-ExtUtils-ParseXS,
 Requires:       perl-Fcntl, perl-fields,
 Requires:       perl-File-Basename, perl-File-Compare, perl-File-Copy,
 Requires:       perl-File-DosGlob, perl-File-Fetch,
@@ -229,7 +265,9 @@ Requires:       perl-File-Find, perl-File-Path, perl-File-stat, perl-File-Temp,
 Requires:       perl-FileCache, perl-FileHandle, perl-filetest,
 Requires:       perl-Filter, perl-Filter-Simple,
 Requires:       perl-FindBin,
+%if %{with gdbm}
 Requires:       perl-GDBM_File,
+%endif
 Requires:       perl-Getopt-Long, perl-Getopt-Std,
 Requires:       perl-Hash-Util, perl-Hash-Util-FieldHash, perl-HTTP-Tiny,
 Requires:       perl-if, perl-IO, perl-IO-Compress, perl-IO-Socket-IP,
@@ -246,9 +284,13 @@ Requires:       perl-Module-CoreList, perl-Module-CoreList-tools,
 Requires:       perl-Module-Load, perl-Module-Load-Conditional,
 Requires:       perl-Module-Loaded, perl-Module-Metadata,
 Requires:       perl-mro,
+%if %{with gdbm}
 Requires:       perl-NDBM_File,
+%endif
 Requires:       perl-Net, perl-Net-Ping, perl-NEXT,
+%if %{with gdbm}
 Requires:       perl-ODBM_File,
+%endif
 Requires:       perl-Opcode, perl-open, perl-overload, perl-overloading,
 Requires:       perl-parent, perl-PathTools, perl-Params-Check, perl-perlfaq,
 Requires:       perl-PerlIO-via-QuotedPrint, perl-Perl-OSType,
@@ -275,10 +317,11 @@ Requires:       perl-Unicode-Collate, perl-Unicode-Normalize, perl-Unicode-UCD,
 Requires:       perl-User-pwent,
 Requires:       perl-vars, perl-version, perl-vmsish,
 
+# Full EVR is for compatibility with systems that swapped perl and perl-core
+# <https://fedoraproject.org/wiki/Changes/perl_Package_to_Install_Core_Modules>,
+# bug #1464903.
 Provides:       perl-core = %{perl_version}-%{release}
 Provides:       perl-core%{?_isa} = %{perl_version}-%{release}
-# perl was renamed to perl-interpreter and perl-core renamed to perl
-Obsoletes:      perl-core < 5.26.0-395
 
 
 %description
@@ -301,6 +344,9 @@ details on the Perl decomposition into packages.
 Summary:        Standalone executable Perl interpreter
 License:        GPL+ or Artistic
 # perl-interpreter denotes a package with the perl executable.
+# Full EVR is for compatibility with systems that swapped perl and perl-core
+# <https://fedoraproject.org/wiki/Changes/perl_Package_to_Install_Core_Modules>,
+# bug #1464903.
 Version:        %{perl_version}
 Epoch:          %{perl_epoch}
 
@@ -352,6 +398,7 @@ Summary:        The libraries for the perl run-time
 License:        (GPL+ or Artistic) and BSD and HSRL and MIT and UCD and Public domain
 # Compat provides
 Provides:       %perl_compat
+Provides:       perl(:MODULE_COMPAT_5.34.0)
 # Interpreter version to fulfil required genersted from "require 5.006;"
 Provides:       perl(:VERSION) = %{perl_version}
 # Integeres are 64-bit on all platforms
@@ -371,20 +418,26 @@ Provides:       perl(unicore::Name)
 # causes loading utf8 and unicore/Heave.pl and unicore/lib files.
 Provides:       perl(utf8_heavy.pl)
 # utf8 and utf8_heavy.pl require Carp, re, strict, warnings, XSLoader
+# XSLoader requires DynaLoder
+Requires:       perl(DynaLoader)
+# Encode is loaded in BOOT section of PerlIO::encoding
+Requires:       perl(Encode)
 # File::Spec loaded by _charnames.pm that is loaded by \N{}
 Requires:       perl(File::Spec)
+%if %{with gdbm}
 # For AnyDBM_File
 Suggests:       perl(GDBM_File)
 Recommends:     perl(NDBM_File)
 Suggests:       perl(ODBM_File)
+%endif
 # Term::Cap is optional
 %if %{defined perl_bootstrap}
 %gendep_perl_libs
 %endif
 
 # Remove private redefinitions
-# XSLoader redefines DynaLoader name space for compatibility, but does not
-# load the DynaLoader.pm (though the DynaLoader.xs is compiled into libperl).
+# XSLoader redefines DynaLoader name space for compatibility, but it still
+# loads DynaLoader.pm (though DynaLoader.xs is compiled into libperl).
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\((charnames|DynaLoader)\\)$
 
 %description libs
@@ -396,6 +449,9 @@ directories).
 Summary:        Header files for use in perl development
 # l1_char_class_tab.h is generated from lib/unicore sources:    UCD
 License:        (GPL+ or Artistic) and UCD
+%if %{with perl_enables_systemtap}
+Requires:       systemtap-sdt-devel
+%endif
 Requires:       perl(ExtUtils::ParseXS)
 Requires:       %perl_compat
 # Match library and header files when downgrading releases
@@ -403,6 +459,11 @@ Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Recommends:     perl-doc = %{perl_version}-%{release}
 # Devel::PPPort for h2xs script
 Requires:       perl(Devel::PPPort)
+# Compiler and linker options stored into perl and used when building XS
+# modules refer to hardening profiles like
+# /usr/lib/rpm/mariner/default-hardened-cc1 that are delivered by
+# mariner-rpm-macros. Bug #1557667.
+Requires:       mariner-rpm-macros
 
 %if %{defined perl_bootstrap}
 %gendep_perl_devel
@@ -433,6 +494,7 @@ License:        GPL+ or Artistic
 # right?
 AutoReqProv:    0
 Requires:       %perl_compat
+# FIXME - note this will need to change when doing the core/minimal swizzle
 Requires:       perl
 %if %{defined perl_bootstrap}
 %gendep_perl_tests
@@ -458,7 +520,6 @@ Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 %gendep_perl_utils
 %endif
 
-
 %description utils
 Several utilities which come with Perl distribution like h2ph, perlbug,
 perlthanks, and pl2pm. Some utilities are provided by more specific
@@ -469,7 +530,7 @@ packages like perldoc by perl-Pod-Perldoc and splain by perl-diagnostics.
 Summary:        A module for Perl manipulation of .tar files
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.36
+Version:        2.38
 BuildArch:      noarch
 Requires:       %perl_compat
 Requires:       perl(IO::Zlib) >= 1.01
@@ -487,7 +548,7 @@ Requires:       perl(Text::Diff)
 
 %description Archive-Tar
 Archive::Tar provides an object oriented mechanism for handling tar files.  It
-Provides class methods for quick and easy files handling while also allowing
+provides class methods for quick and easy files handling while also allowing
 for the creation of tar file objects for custom manipulation.  If you have the
 IO::Zlib module installed, Archive::Tar will also support compressed or
 gzipped tar files.
@@ -504,7 +565,6 @@ Requires:       %perl_compat
 %gendep_perl_Attribute_Handlers
 %endif
 
-
 %description Attribute-Handlers
 This Perl module, when inherited by a package, allows that package's class to
 define attribute handler subroutines for specific attributes. Variables and
@@ -518,7 +578,7 @@ phases (i.e. in a "BEGIN", "CHECK", "INIT", or "END" block).
 Summary:        Replace functions with ones that succeed or die
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.32
+Version:        2.34
 Requires:       %perl_compat
 BuildArch:      noarch
 Requires:       perl(B)
@@ -528,7 +588,6 @@ Requires:       perl(POSIX)
 %if %{defined perl_bootstrap}
 %gendep_perl_autodie
 %endif
-
 
 %description autodie
 The "autodie" and "Fatal" pragma provides a convenient way to replace
@@ -551,7 +610,6 @@ Requires:       perl(Carp)
 %gendep_perl_AutoLoader
 %endif
 
-
 %description AutoLoader
 The AutoLoader module works with the AutoSplit module and the "__END__" token
 to defer the loading of some subroutines until they are used rather than
@@ -569,7 +627,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_AutoSplit
 %endif
-
 
 %description AutoSplit
 Split up your program into files that the AutoLoader module can handle. It is
@@ -589,7 +646,6 @@ Requires:       perl(warnings)
 %gendep_perl_autouse
 %endif
 
-
 %description autouse
 If a module is not loaded yet, then the autouse declaration declares functions
 in the current package. When these functions are called, they load the package
@@ -599,7 +655,7 @@ and substitute themselves with the correct definitions.
 Summary:        Perl compiler backend
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.80
+Version:        1.82
 Requires:       %perl_compat
 Requires:       perl(Data::Dumper)
 Requires:       perl(overloading)
@@ -625,7 +681,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_base
 %endif
-
 
 %description base
 "base" module allows you to both load one or more modules, while setting up
@@ -665,7 +720,6 @@ BuildArch:      noarch
 %gendep_perl_bignum
 %endif
 
-
 %description bignum
 This package attempts to make it easier to write scripts that use BigInts and
 BigFloats in a transparent way.
@@ -693,8 +747,8 @@ arbitrary scripts against an uninstalled version of a package.
 %package Carp
 Summary:        Alternative warn and die for modules
 Epoch:          0
-# Real version 1.50
-Version:        1.50
+# Real version 1.52
+Version:        1.52
 License:        GPL+ or Artistic
 Requires:       %perl_compat
 Provides:       perl(Carp::Heavy) = %{version}
@@ -738,7 +792,7 @@ Perl 5 class that implements a struct-like data structure.
 Summary:        Low-Level Interface to bzip2 compression library
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.093
+Version:        2.101
 Requires:       perl(Exporter), perl(File::Temp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Compress_Raw_Bzip2
@@ -752,7 +806,7 @@ It is used by IO::Compress::Bzip2.
 Summary:        Low-Level Interface to the zlib compression library
 License:        (GPL+ or Artistic) and zlib
 Epoch:          0
-Version:        2.093
+Version:        2.101
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Compress_Raw_Zlib
@@ -784,13 +838,12 @@ core extensions that were enabled for this perl.
 Summary:        Structured data retrieval of perl -V output
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.32
+Version:        0.33
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Config_Perl_V
 %endif
 BuildArch:      noarch
-
 
 %description Config-Perl-V
 The command "perl -V" will return you an excerpt from the %%Config::Config
@@ -811,7 +864,6 @@ Requires:       perl(Carp)
 %gendep_perl_constant
 %endif
 BuildArch:      noarch
-
 
 %description constant
 This pragma allows you to declare constants at compile-time:
@@ -836,8 +888,17 @@ away if the constant is false.
 Summary:        Query, download and build perl modules from CPAN sites
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.27
+Version:        2.28
 Requires:       make
+Requires:       %perl_compat
+# Some subpackaged modules are not dual-lived. E.g. "open". If a distribution
+# on CPAN declares a dependency on such module, CPAN client will fail,
+# because the only provider is a perl distribution.
+# Another issue is with dual-lived modules whose distribution actually does
+# not declare all needed core dependencies and the installation would also
+# fail.
+# As a result, any CPAN client must run-require the complete perl.
+Requires:       perl
 # Prefer Archive::Tar and Compress::Zlib over tar and gzip
 Requires:       perl(Archive::Tar) >= 1.50
 Requires:       perl(base)
@@ -864,8 +925,8 @@ Requires:       perl(User::pwent)
 %if !%{defined perl_bootstrap}
 Requires:       perl(Archive::Zip)
 Requires:       perl(Compress::Bzip2)
-%endif
 Requires:       perl(CPAN::Meta) >= 2.110350
+%endif
 Requires:       perl(Compress::Zlib)
 Requires:       perl(Digest::MD5)
 # CPAN encourages Digest::SHA strongly because of integrity checks
@@ -874,14 +935,15 @@ Requires:       perl(Dumpvalue)
 Requires:       perl(ExtUtils::CBuilder)
 %if ! %{defined perl_bootstrap}
 # Avoid circular deps local::lib -> Module::Install -> CPAN when bootstraping
-# local::lib recommended by CPAN::FirstTime default choice
+# local::lib recommended by CPAN::FirstTime default choice, bug #1122498
 Requires:       perl(local::lib)
 %endif
-Recommends:     perl(Module::Build)
+%if ! %{defined perl_bootstrap}
+Requires:       perl(Module::Build)
+%endif
 %if ! %{defined perl_bootstrap}
 Requires:       perl(Text::Glob)
 %endif
-Requires:       %perl_compat
 Provides:       cpan = %{version}
 %if %{defined perl_bootstrap}
 %gendep_perl_CPAN
@@ -965,7 +1027,7 @@ used for any other general YAML parsing or generation task.
 Summary:        Stringify perl data structures, suitable for printing and eval
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.174
+Version:        2.179
 Requires:       %perl_compat
 Requires:       perl(B::Deparse)
 Requires:       perl(bytes)
@@ -1008,7 +1070,7 @@ hashes associated with DBM files.
 Summary:        Perl debugger
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.56
+Version:        1.60
 BuildArch:      noarch
 # File provides
 Provides:       perl(dumpvar.pl) = %{perl_version}
@@ -1038,7 +1100,6 @@ Requires:       perl(warnings)
 %if %{defined perl_bootstrap}
 %gendep_perl_debugger
 %endif
-
 
 %description debugger
 This is the perl debugger. It is loaded automatically by Perl when you invoke
@@ -1071,12 +1132,11 @@ module will not break their code.
 Summary:        A data debugging tool for the XS programmer
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.28
+Version:        1.30
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Devel_Peek
 %endif
-
 
 %description Devel-Peek
 Devel::Peek contains functions which allows raw Perl data types to be
@@ -1089,12 +1149,11 @@ should look.
 Summary:        Perl Pollution Portability header generator
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        3.57
+Version:        3.62
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Devel_PPPort
 %endif
-
 
 %description Devel-PPPort
 Perl's API has changed over time, gaining new features, new functions,
@@ -1115,7 +1174,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Devel_SelfStubber
 %endif
-
 
 %description Devel-SelfStubber
 Devel::SelfStubber prints the stubs you need to put in the module before the
@@ -1138,7 +1196,6 @@ Requires:       perl(Getopt::Std)
 %endif
 
 
-
 %description diagnostics
 The diagnostics module extends the terse diagnostics normally emitted by both
 the perl compiler and the perl interpreter (from running perl with a -w switch
@@ -1152,7 +1209,7 @@ Summary:        Modules that calculate message digests
 License:        GPL+ or Artistic
 # Epoch bump for clean upgrade over old standalone package
 Epoch:          0
-Version:        1.17
+Version:        1.19
 BuildArch:      noarch
 Requires:       %perl_compat
 Requires:       perl(MIME::Base64)
@@ -1174,8 +1231,8 @@ Summary:        Perl interface to the MD5 Algorithm
 License:        (GPL+ or Artistic) and BSD
 # Epoch bump for clean upgrade over old standalone package
 Epoch:          0
-# Real version 2.55_01
-Version:        2.55
+# Real version 2.58
+Version:        2.58
 Requires:       %perl_compat
 Requires:       perl(XSLoader)
 # Recommended
@@ -1225,7 +1282,6 @@ Requires:       perl(warnings)
 %gendep_perl_DirHandle
 %endif
 
-
 %description DirHandle
 There is no reason to use this module nowadays. The DirHandle module provides
 an alternative interface to the opendir(), closedir(), readdir(), and
@@ -1241,7 +1297,6 @@ BuildArch:      noarch
 Requires:       %perl_compat
 # For perldoc tool
 Recommends:     perl-Pod-Perldoc
-
 
 %description doc
 This is a documentation for Perl language. It's provided in POD and manual
@@ -1260,7 +1315,6 @@ Recommends:     perl(Devel::Peek)
 %gendep_perl_Dumpvalue
 %endif
 
-
 %description Dumpvalue
 Dumpvalue module enables you to print a content of variables and other Perl
 data structures.
@@ -1269,13 +1323,12 @@ data structures.
 Summary:        Dynamically load C libraries into Perl code
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.47
+Version:        1.50
 Requires:       %perl_compat
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_DynaLoader
 %endif
-
 
 %description DynaLoader
 The DynaLoader module defines a standard generic interface to the dynamic
@@ -1288,12 +1341,11 @@ see XSLoader module.
 Summary:        Character encodings in Perl
 License:        (GPL+ or Artistic) and Artistic 2.0 and UCD
 Epoch:          4
-Version:        3.06
+Version:        3.08
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Encode
 %endif
-
 
 %description Encode
 The Encode module provides the interface between Perl strings and the rest
@@ -1309,7 +1361,7 @@ Version:        3.00
 Requires:       %perl_compat
 Requires:       perl(Carp)
 # Config not needed on perl ≥ 5.008
-# Consider Filter::Util::Call as mandatory
+# Consider Filter::Util::Call as mandatory, bug #1165183, CPAN RT#100427
 Requires:       perl(Filter::Util::Call)
 # I18N::Langinfo is optional
 # PerlIO::encoding is optional
@@ -1317,7 +1369,6 @@ Requires:       perl(utf8)
 %if %{defined perl_bootstrap}
 %gendep_perl_encoding
 %endif
-
 
 %description encoding
 With the encoding pragma, you can write your Perl script in any encoding you
@@ -1329,12 +1380,12 @@ a mechanism provided by perl that is deprecated under 5.18 and higher, and may
 be removed in a future version.
 
 The easiest and the best alternative is to write your script in UTF-8.
- 
+
 %package Encode-devel
 Summary:        Character encodings in Perl
 License:        (GPL+ or Artistic) and UCD
 Epoch:          4
-Version:        3.06
+Version:        3.08
 Requires:       %perl_compat
 Requires:       %{name}-Encode = %{epoch}:%{version}-%{release}
 Recommends:     perl-devel
@@ -1360,7 +1411,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_encoding_warnings
 %endif
-
 
 %description encoding-warnings
 As of Perl 5.26.0, this module has no effect. The internal Perl feature that
@@ -1391,13 +1441,12 @@ seems to like to read.
 Summary:        Perl module that imports environment variables as scalars or arrays
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.04
+Version:        1.05
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Env
 %endif
 BuildArch:      noarch
-
 
 %description Env
 Perl maintains environment variables in a special hash named %%ENV. For when
@@ -1409,16 +1458,15 @@ variables to be treated as scalar or array variables.
 Summary:        System errno constants
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.30
+Version:        1.33
 Requires:       %perl_compat
 # Errno.pm bakes in kernel version at build time and compares it against
-# $Config{osvers} at run time. Match exact interpreter build.
+# $Config{osvers} at run time. Match exact interpreter build. Bug #1393421.
 Requires:       perl-libs%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Errno
 %endif
-
 
 %description Errno
 "Errno" defines and conditionally exports all the error constants defined in
@@ -1430,13 +1478,12 @@ which will export all POSIX defined error numbers.
 Summary:        Experimental features made easy
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.020
+Version:        0.024
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_experimental
 %endif
 BuildArch:      noarch
-
 
 %description experimental
 This pragma provides an easy and convenient way to enable or disable
@@ -1448,14 +1495,13 @@ experimental features.
 Summary:        Implements default import method for modules
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        5.74
+Version:        5.76
 Requires:       %perl_compat
 Requires:       perl(Carp) >= 1.05
 %if %{defined perl_bootstrap}
 %gendep_perl_Exporter
 %endif
 BuildArch:      noarch
-
 
 %description Exporter
 The Exporter module implements an import method which allows a module to
@@ -1471,10 +1517,10 @@ Summary:        Compile and link C code for Perl modules
 License:        GPL+ or Artistic
 # Epoch bump for clean upgrade over old standalone package
 Epoch:          1
-Version:        0.280234
+Version:        0.280236
 BuildArch:      noarch
 # C and C++ compilers are highly recommended because compiling code is the
-# purpose of ExtUtils::CBuilder
+# purpose of ExtUtils::CBuilder, bug #1547165
 Requires:       gcc
 Requires:       gcc-c++
 Requires:       perl-devel
@@ -1518,10 +1564,9 @@ Perl modules to AUTOLOAD constants defined in C library header files.
 Summary:        Perl routines to replace common UNIX commands in Makefiles
 License:        GPL+ or Artistic
 Epoch:          2
-Version:        7.44
+Version:        7.62
 BuildArch:      noarch
 Requires:       %perl_compat
-
 Requires:       perl(File::Find)
 %if %{defined perl_bootstrap}
 %gendep_perl_ExtUtils_Command
@@ -1554,7 +1599,7 @@ Utilities for embedding Perl in C/C++ applications.
 Summary:        Install files from here to there
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.14
+Version:        2.20
 BuildArch:      noarch
 Requires:       %perl_compat
 Requires:       perl(AutoSplit)
@@ -1575,9 +1620,9 @@ pages, etc.
 Summary:        Create a module Makefile
 License:        GPL+ or Artistic
 Epoch:          2
-Version:        7.44
+Version:        7.62
 # These dependencies are weak in order to relieve building noarch
-# packages from perl-devel and gcc.
+# packages from perl-devel and gcc. See bug #1547165.
 # If an XS module is built, the generated Makefile executes gcc.
 Recommends:     gcc
 # If an XS module is built, code generated from XS will be compiled and it
@@ -1617,7 +1662,7 @@ Create a module Makefile.
 Summary:        Utilities to write and check a MANIFEST file
 License:        GPL+ or Artistic
 Epoch:          1
-Version:        1.72
+Version:        1.73
 Requires:       %perl_compat
 Requires:       perl(File::Path)
 %if %{defined perl_bootstrap}
@@ -1633,7 +1678,7 @@ BuildArch:      noarch
 Summary:        Write the C code for perlmain.c
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.09
+Version:        1.10
 Requires:       perl-devel
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
@@ -1677,7 +1722,7 @@ Summary:        Module and a script for converting Perl XS code into C code
 License:        GPL+ or Artistic
 # Epoch bump for clean upgrade over old standalone package
 Epoch:          1
-Version:        3.40
+Version:        3.43
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_ExtUtils_ParseXS
@@ -1695,7 +1740,7 @@ necessary to let Perl access those functions.
 Summary:        File operation options
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.13
+Version:        1.14
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Fcntl
@@ -1720,7 +1765,6 @@ Requires:       perl(Hash::Util)
 %gendep_perl_fields
 %endif
 
-
 %description fields
 The "fields" pragma enables compile-time and run-time verified class fields.
 
@@ -1736,7 +1780,6 @@ Requires:       perl(re)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_Basename
 %endif
-
 
 %description File-Basename
 These routines allow you to parse file paths into their directory, file name,
@@ -1755,7 +1798,6 @@ Requires:       perl(Carp)
 %gendep_perl_File_Compare
 %endif
 
-
 %description File-Compare
 A File::Compare Perl module provides functions for comparing a content of two
 files specified by a file name or a file handle.
@@ -1764,7 +1806,7 @@ files specified by a file name or a file handle.
 Summary:        Copy files or file handles
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.34
+Version:        2.35
 BuildArch:      noarch
 Requires:       %perl_compat
 Requires:       perl(Carp)
@@ -1772,7 +1814,6 @@ Requires:       perl(File::Basename)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_Copy
 %endif
-
 
 %description File-Copy
 A File::Copy module provides two basic functions, copy and move, which are
@@ -1800,7 +1841,7 @@ wild cards in directory components.
 Summary:        Generic file fetching mechanism
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.56
+Version:        1.00
 Requires:       perl(IPC::Cmd) >= 0.36
 Requires:       perl(Module::Load::Conditional) >= 0.04
 Requires:       perl(Params::Check) >= 0.07
@@ -1818,7 +1859,7 @@ File::Fetch is a generic file fetching mechanism.
 Summary:        Traverse a directory tree
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.37
+Version:        1.39
 Requires:       %perl_compat
 Recommends:     perl(Scalar::Util)
 %if %{defined perl_bootstrap}
@@ -1836,14 +1877,13 @@ file found similar to the Unix find command.
 Summary:        Create or remove directory trees
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.16
+Version:        2.18
 Requires:       %perl_compat
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_Path
 %endif
 BuildArch:      noarch
-
 
 %description File-Path
 This module provides a convenient way to create directories of arbitrary
@@ -1862,7 +1902,6 @@ Requires:       perl(Symbol)
 %gendep_perl_File_stat
 %endif
 
-
 %description File-stat
 This module overrides the core stat() and lstat() functions, replacing them
 with versions that return File::stat objects. This object has methods that
@@ -1874,7 +1913,7 @@ Summary:        Return name and handle of a temporary file safely
 License:        GPL+ or Artistic
 Epoch:          1
 # Normalized version
-Version:        0.230.900
+Version:        0.231.100
 Requires:       %perl_compat
 BuildArch:      noarch
 Requires:       perl(File::Path) >= 2.06
@@ -1882,7 +1921,6 @@ Requires:       perl(POSIX)
 %if %{defined perl_bootstrap}
 %gendep_perl_File_Temp
 %endif
-
 
 %description File-Temp
 File::Temp can be used to create and open temporary files in a safe way.
@@ -1939,7 +1977,6 @@ Requires:       %perl_compat
 %gendep_perl_filetest
 %endif
 
-
 %description filetest
 The default behavior of file test operators (e.g. "-r") is to use the simple
 mode bits as returned by the stat() family of system calls. However, many
@@ -1949,6 +1986,7 @@ filetest" may help the permission operators to return results more consistent
 with other tools.
 
 %if %{dual_life} || %{rebuild_from_scratch}
+# FIXME Filter-Simple? version?
 %package Filter
 Summary:        Perl source filters
 License:        GPL+ or Artistic
@@ -1973,7 +2011,6 @@ Epoch:          0
 Version:        0.96
 BuildArch:      noarch
 Requires:       %perl_compat
-
 Requires:       perl(Text::Balanced) >= 1.97
 Requires:       perl(warnings)
 %if %{defined perl_bootstrap}
@@ -1989,7 +2026,7 @@ Filter::Util::Call; one that is sufficient for most common cases.
 Summary:        Locate a directory of an original Perl script
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.51
+Version:        1.52
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_FindBin
@@ -2001,14 +2038,16 @@ BuildArch:      noarch
 Locates the full path to the script bin directory to allow the use of paths
 relative to the bin directory.
 
+%if %{with gdbm}
 %package GDBM_File
 Summary:        Perl5 access to the gdbm library
 License:        GPL+ or Artistic
-Epoch:          0
-Version:        1.18
+Epoch:          1
+Version:        1.19
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_GDBM_File
+%endif
 
 
 %description GDBM_File
@@ -2021,7 +2060,7 @@ provided by the GNU gdbm library.
 Summary:        Extended processing of command line options
 License:        GPLv2+ or Artistic
 Epoch:          1
-Version:        2.51
+Version:        2.52
 Requires:       %perl_compat
 Requires:       perl(overload)
 Requires:       perl(Text::ParseWords)
@@ -2031,7 +2070,6 @@ Requires:       perl(Pod::Usage) >= 1.14
 %gendep_perl_Getopt_Long
 %endif
 BuildArch:      noarch
-
 
 %description Getopt-Long
 The Getopt::Long module implements an extended getopt function called
@@ -2048,7 +2086,7 @@ enabled by default.
 Summary:        Process single-character switches with switch clustering
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.12
+Version:        1.13
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Getopt_Std
@@ -2065,7 +2103,7 @@ containing all switches to be recognized.
 Summary:        General-utility hash subroutines
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.23
+Version:        0.25
 Requires:       %perl_compat
 Requires:       perl(Hash::Util::FieldHash)
 Requires:       perl(XSLoader)
@@ -2082,7 +2120,7 @@ really warrant a keyword.
 Summary:        Support for inside-out classes
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.20
+Version:        1.21
 Requires:       %perl_compat
 Requires:       perl(XSLoader)
 %if %{defined perl_bootstrap}
@@ -2098,8 +2136,8 @@ inside-out technique of class construction.
 Summary:        Use a Perl module if a condition holds
 License:        GPL+ or Artistic
 Epoch:          0
-# Normalized 0.0608
-Version:        0.60.800
+# Normalized 0.0609
+Version:        0.60.900
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_if
@@ -2114,12 +2152,11 @@ The "if" module is used to conditionally load another module.
 Summary:        Perl input/output modules
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.43
+Version:        1.46
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_IO
 %endif
-
 
 %description IO
 This is a collection of Perl input/output modules.
@@ -2129,9 +2166,8 @@ This is a collection of Perl input/output modules.
 Summary:        IO::Compress wrapper for modules
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.093
+Version:        2.102
 Requires:       %perl_compat
-Obsoletes:      perl-Compress-Zlib <= 2.020
 Provides:       perl(IO::Uncompress::Bunzip2)
 %if %{defined perl_bootstrap}
 %gendep_perl_IO_Compress
@@ -2149,13 +2185,12 @@ purpose is to to be sub-classed by IO::Compress modules.
 Summary:        Drop-in replacement for IO::Socket::INET supporting both IPv4 and IPv6
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.39
+Version:        0.41
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_IO_Socket_IP
 %endif
 BuildArch:      noarch
-
 
 %description IO-Socket-IP
 This module provides a protocol-independent way to use IPv4 and IPv6
@@ -2163,13 +2198,20 @@ sockets, as a drop-in replacement for IO::Socket::INET. Most constructor
 arguments and methods are provided in a backward-compatible way.
 %endif
 
+%if %{dual_life} || %{rebuild_from_scratch}
 %package IO-Zlib
 Summary:        Perl IO:: style interface to Compress::Zlib
 License:        GPL+ or Artistic
 # Epoch bump for clean upgrade over old standalone package
 Epoch:          1
-Version:        1.10
-Requires:       perl(Compress::Zlib)
+Version:        1.11
+BuildRequires:  gzip
+# The code defaults to Compress::Zlib, but a user can override it to gzip by
+# importing :gzip_external symbol
+Requires:       gzip
+Requires:       perl(Compress::Zlib) >= 2
+# IO::Handle used if gzip backend is requested
+Requires:       perl(IO::Handle)
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_IO_Zlib
@@ -2177,10 +2219,10 @@ Requires:       %perl_compat
 BuildArch:      noarch
 
 %description IO-Zlib
-This modules provides an IO:: style interface to the Compress::Zlib package.
-The main advantage is that you can use an IO::Zlib object in much the same way
-as an IO::File object so you can have common code that doesn't know which sort
-of file it is using.
+IO::Zlib provides an IO:: style interface to Compress::Zlib and hence to
+gzip/zlib-compressed files. It provides many of the same methods as the
+IO::Handle interface.
+%endif
 
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -2228,13 +2270,12 @@ error output for handling the errors.
 Summary:        Object interface to System V IPC
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.07
+Version:        2.09
 Requires:       %perl_compat
 Requires:       perl(DynaLoader)
 %if %{defined perl_bootstrap}
 %gendep_perl_IPC_SysV
 %endif
-
 
 %description IPC-SysV
 This is an object interface for System V messages, semaphores, and
@@ -2279,7 +2320,7 @@ locale".
 Summary:        Functions for dealing with RFC 3066 language tags
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.44
+Version:        0.45
 Requires:       %perl_compat
 Requires:       perl(integer)
 Requires:       perl(warnings)
@@ -2322,7 +2363,7 @@ resumes after EINTR.
 %package JSON-PP
 Summary:        JSON::XS compatible pure-Perl module
 Epoch:          1
-Version:        4.04
+Version:        4.06
 License:        GPL+ or Artistic
 BuildArch:      noarch
 Requires:       %perl_compat 
@@ -2335,7 +2376,6 @@ Requires:       perl(subs)
 %if %{defined perl_bootstrap}
 %gendep_perl_JSON_PP
 %endif
-
 
 %description JSON-PP
 JSON::XS is the fastest and most proper JSON module on CPAN. It is written by
@@ -2353,7 +2393,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_less
 %endif
-
 
 %description less
 "use less ...;" is a Perl user-pragma. If you're very lucky some code you're
@@ -2380,7 +2419,7 @@ This module simplifies the manipulation of @INC at compile time.
 Summary:        Perl clients for various network protocols
 License:        (GPL+ or Artistic) and Artistic
 Epoch:          0
-Version:        3.11
+Version:        3.13
 Requires:       %perl_compat
 Requires:       perl(File::Basename)
 Requires:       perl(IO::Socket) >= 1.05
@@ -2394,7 +2433,6 @@ Requires:       perl(utf8)
 %endif
 BuildArch:      noarch
 
-
 %description libnet
 This is a collection of Perl modules which provides a simple and
 consistent programming interface (API) to the client side of various
@@ -2404,13 +2442,13 @@ protocols used in the internet community.
 %package libnetcfg
 Summary:        Configure libnet
 License:        GPL+ or Artistic
+Epoch:          %perl_epoch
 Version:        %perl_version
 # Net::Config is optional
 BuildArch:      noarch
 %if %{defined perl_bootstrap}
 %gendep_perl_libnetcfg
 %endif
-
 
 %description libnetcfg
 The libnetcfg utility can be used to configure the libnet.
@@ -2419,7 +2457,7 @@ The libnetcfg utility can be used to configure the libnet.
 Summary:        Pragma to use or avoid POSIX locales for built-in operations
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.09
+Version:        1.10
 Requires:       %perl_compat
 Requires:       perl(Carp)
 Requires:       perl(POSIX)
@@ -2447,7 +2485,6 @@ Requires:       %perl_compat
 %gendep_perl_Locale_Maketext
 %endif
 BuildArch:      noarch
-
 
 %description Locale-Maketext
 It is a common feature of applications (whether run directly, or via the Web)
@@ -2490,7 +2527,6 @@ Requires:       perl(Carp)
 %endif
 BuildArch:      noarch
 
-
 # Do not export unversioned module
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\(Math::BigInt\\)\\s*$
 
@@ -2509,7 +2545,6 @@ Requires:       %perl_compat
 %gendep_perl_Math_BigInt_FastCalc
 %endif
 
-
 %description Math-BigInt-FastCalc
 This package provides support for faster big integer calculations.
 
@@ -2526,7 +2561,6 @@ Requires:       perl(Math::BigInt)
 %endif
 BuildArch:      noarch
 
-
 %description Math-BigRat
 Math::BigRat complements Math::BigInt and Math::BigFloat by providing support
 for arbitrary big rational numbers.
@@ -2542,7 +2576,6 @@ Requires:       %perl_compat
 %gendep_perl_Math_Complex
 %endif
 BuildArch:      noarch
-
 
 %description Math-Complex
 This package lets you create and manipulate complex numbers. By default, Perl
@@ -2561,7 +2594,6 @@ Requires:       %perl_compat
 %gendep_perl_Memoize
 %endif
 BuildArch:      noarch
-
 
 %description Memoize
 Memoizing a function makes it faster by trading space for time. It does
@@ -2582,7 +2614,6 @@ Requires:       %perl_compat
 %gendep_perl_meta_notation
 %endif
 
-
 %description meta-notation
 Returns a copy of the input string with the nonprintable characters below
 0x100 changed into printables. Any ASCII printables or above 0xFF are
@@ -2595,12 +2626,11 @@ Summary:        Encoding and decoding of Base64 and quoted-printable strings
 # Other files:                  GPL+ or Artistic
 License:        (GPL+ or Artistic) and MIT
 Epoch:          0
-Version:        3.15
+Version:        3.16
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_MIME_Base64
 %endif
-
 
 %description MIME-Base64
 This package contains a Base64 encoder/decoder and a quoted-printable
@@ -2613,7 +2643,7 @@ encoder/decoder. These encoding methods are specified in RFC 2045 - MIME
 Summary:        What modules are shipped with versions of perl
 License:        GPL+ or Artistic
 Epoch:          1
-Version:        5.20200620
+Version:        5.20220313
 Requires:       %perl_compat
 Requires:       perl(List::Util)
 Requires:       perl(version) >= 0.88
@@ -2631,7 +2661,7 @@ are shipped with each version of perl.
 Summary:        Tool for listing modules shipped with perl
 License:        GPL+ or Artistic
 Epoch:          1
-Version:        5.20200620
+Version:        5.20220313
 Requires:       %perl_compat
 Requires:       perl(feature)
 Requires:       perl(version) >= 0.88
@@ -2641,7 +2671,6 @@ Requires:       perl-Module-CoreList = %{epoch}:%{version}-%{release}
 %endif
 # The files were distributed with perl.spec's subpackage
 # perl-Module-CoreList <= 1:5.020001-309
-
 BuildArch:      noarch
 
 %description Module-CoreList-tools
@@ -2656,7 +2685,7 @@ Summary:        Runtime require of both modules and files
 License:        GPL+ or Artistic
 # Epoch bump for clean upgrade over old standalone package
 Epoch:          1
-Version:        0.34
+Version:        0.36
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Module_Load
@@ -2674,7 +2703,7 @@ either a file or a module.
 Summary:        Looking up module information / loading at runtime
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.70
+Version:        0.74
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Module_Load_Conditional
@@ -2727,7 +2756,7 @@ Gather package and POD information from perl module files
 Summary:        Method resolution order
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.23
+Version:        1.25
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_mro
@@ -2738,6 +2767,7 @@ Requires:       %perl_compat
 The "mro" name space provides several utilities for dealing with method
 resolution order and method caching in general.
 
+%if %{with gdbm}
 %package NDBM_File
 Summary:        Tied access to ndbm files
 License:        GPL+ or Artistic
@@ -2746,6 +2776,7 @@ Version:        1.15
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_NDBM_File
+%endif
 
 
 %description NDBM_File
@@ -2767,17 +2798,21 @@ Requires:       perl(Socket)
 %gendep_perl_Net
 %endif
 
+
 %description Net
 This package provide object-oriented interface to Perl built-in gethost*(),
 getnet*(), getproto*(), and getserv*() functions.
 
+%if %{dual_life} || %{rebuild_from_scratch}
 %package Net-Ping
 Summary:        Check a remote host for reachability
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.72
+Version:        2.74
 Requires:       %perl_compat
+Requires:       perl(IO::Socket::INET)
 # Keep Net::Ping::External optional
+Suggests:       perl(Net::Ping::External)
 %if %{defined perl_bootstrap}
 %gendep_perl_Net_Ping
 %endif
@@ -2786,12 +2821,13 @@ BuildArch:      noarch
 %description Net-Ping
 Net::Ping module contains methods to test the reachability of remote hosts on
 a network.
+%endif
 
 %package NEXT
 Summary:        Pseudo-class that allows method redispatch
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.67
+Version:        0.68
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_NEXT
@@ -2804,14 +2840,16 @@ The NEXT module adds a pseudo-class named "NEXT" to any program that uses it.
 If a method "m" calls "$self->NEXT::m()", the call to "m" is redispatched as
 if the calling method had not originally been found.
 
+%if %{with gdbm}
 %package ODBM_File
 Summary:        Tied access to odbm files
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.16
+Version:        1.17
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_ODBM_File
+%endif
 
 
 %description ODBM_File
@@ -2825,7 +2863,7 @@ be used the next time your program runs.
 Summary:        Disable named opcodes when compiling a perl code
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.47
+Version:        1.50
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Opcode
@@ -2850,7 +2888,6 @@ Requires:       perl(encoding)
 %if %{defined perl_bootstrap}
 %gendep_perl_open
 %endif
-
 BuildArch:      noarch
 
 %description open
@@ -2861,7 +2898,7 @@ The "open" pragma serves as one of the interfaces to declare default "layers"
 Summary:        Overloading Perl operations
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.31
+Version:        1.33
 BuildArch:      noarch
 Requires:       %perl_compat
 Requires:       perl(mro)
@@ -2942,7 +2979,7 @@ Params::Check is a generic input parsing/checking mechanism.
 Summary:        PathTools Perl module (Cwd, File::Spec)
 License:        (GPL+ or Artistic) and BSD
 Epoch:          0
-Version:        3.78
+Version:        3.80
 Requires:       %perl_compat
 Requires:       perl(Carp)
 Requires:       perl(Errno)
@@ -2964,13 +3001,12 @@ Summary:        Frequently asked questions about Perl
 # Code examples are Public Domain
 License:        (GPL+ or Artistic) and Public Domain
 Epoch:          0
-Version:        5.20200523
+Version:        5.20210411
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_perlfaq
 %endif
 BuildArch:      noarch
-
 
 %description perlfaq
 The perlfaq comprises several documents that answer the most commonly asked
@@ -2982,13 +3018,12 @@ questions about Perl and Perl programming.
 Summary:        PerlIO layer for quoted-printable strings
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        0.08
+Version:        0.09
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_PerlIO_via_QuotedPrint
 %endif
 BuildArch:      noarch
-
 
 %description PerlIO-via-QuotedPrint
 This module implements a PerlIO layer that works on files encoded in the
@@ -3037,7 +3072,6 @@ Provides:       perl(syscall.ph) = %{perl_version}
 %gendep_perl_ph
 %endif
 
-
 %description ph
 Contemporary Perl still refers to some Perl header (ph) files although it does
 not build them anymore. This is a prebuilt collection of the referred files.
@@ -3048,7 +3082,7 @@ package.
 %package Pod-Checker
 Summary:        Check POD documents for syntax errors
 Epoch:          4
-Version:        1.73
+Version:        1.74
 License:        GPL+ or Artistic
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
@@ -3091,7 +3125,6 @@ Requires:       perl-libs = %{perl_epoch}:%{perl_version}-%{release}
 %gendep_perl_Pod_Functions
 %endif
 
-
 %description Pod-Functions
 This module enumerates the Perl functions that are documented in perlfunc POD.
 
@@ -3099,13 +3132,12 @@ This module enumerates the Perl functions that are documented in perlfunc POD.
 Summary:        Convert POD files to HTML
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.25
+Version:        1.27
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Pod_Html
 %endif
 BuildArch:      noarch
-
 
 %description Pod-Html
 This package converts files from POD format (see perlpod) to HTML format. It
@@ -3119,6 +3151,10 @@ License:        GPL+ or Artistic
 Epoch:          0
 # Real version 3.2801
 Version:        3.28.01
+%if %{with perl_enables_groff}
+# Pod::Perldoc::ToMan executes roff
+Requires:       groff-base
+%endif
 Requires:       %perl_compat
 Requires:       perl(File::Temp) >= 0.22
 Requires:       perl(HTTP::Tiny)
@@ -3150,7 +3186,7 @@ Summary:        Framework for parsing POD documentation
 License:        GPL+ or Artistic
 # Epoch bump for clean upgrade over old standalone package
 Epoch:          1
-Version:        3.40
+Version:        3.42
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Pod_Simple
@@ -3168,7 +3204,7 @@ documentation for Perl and for Perl modules.
 Summary:        Print a usage message from embedded pod documentation
 License:        GPL+ or Artistic
 Epoch:          4
-Version:        1.69
+Version:        2.01
 Requires:       %perl_compat
 # Pod::Usage executes perldoc from perl-Pod-Perldoc by default
 Requires:       perl-Pod-Perldoc
@@ -3202,7 +3238,6 @@ Requires:       perl(Pod::Simple) >= 3.06
 %gendep_perl_podlators
 %endif
 
-
 %description podlators
 This package contains Pod::Man and Pod::Text modules which convert POD input
 to *roff source output, suitable for man pages, or plain text.  It also
@@ -3214,7 +3249,7 @@ with various capabilities.
 Summary:        Perl interface to IEEE Std 1003.1
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.94
+Version:        1.97
 Requires:       %perl_compat
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
@@ -3230,7 +3265,7 @@ The POSIX module permits you to access all (or nearly all) the standard POSIX
 Summary:        Compile and execute code in restricted compartments
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.41
+Version:        2.43
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Safe
@@ -3247,7 +3282,7 @@ security purposes.
 %package Scalar-List-Utils
 Summary:        A selection of general-utility scalar and list subroutines
 License:        GPL+ or Artistic
-Epoch:          4
+Epoch:          5
 Version:        1.55
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
@@ -3289,7 +3324,6 @@ Requires:       %perl_compat
 %gendep_perl_SelectSaver
 %endif
 
-
 %description SelectSaver
 A "SelectSaver" object contains a reference to the file handle that was
 selected when it was created. When the object is destroyed, it re-selects the
@@ -3306,7 +3340,6 @@ Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_SelfLoader
 %endif
-
 
 %description SelfLoader
 This Perl module tells its users that functions in a package are to be
@@ -3326,7 +3359,6 @@ Requires:       perl(Symbol)
 %gendep_perl_sigtrap
 %endif
 
-
 %description sigtrap
 The sigtrap pragma is a simple interface for installing signal handlers.
 
@@ -3335,7 +3367,7 @@ The sigtrap pragma is a simple interface for installing signal handlers.
 Summary:        C socket.h defines and structure manipulators
 License:        GPL+ or Artistic
 Epoch:          4
-Version:        2.029
+Version:        2.031
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Socket
@@ -3362,7 +3394,6 @@ Requires:       perl(warnings)
 %gendep_perl_sort
 %endif
 
-
 %description sort
 With the "sort" pragma you can control the behavior of the builtin "sort()"
 function.
@@ -3372,7 +3403,7 @@ function.
 Summary:        Persistence for Perl data structures
 License:        GPL+ or Artistic
 Epoch:          1
-Version:        3.21
+Version:        3.23
 Requires:       %perl_compat
 # Carp substitutes missing Log::Agent
 Requires:       perl(Carp)
@@ -3384,7 +3415,6 @@ Requires:       perl(IO::File)
 %gendep_perl_Storable
 %endif
 
-
 %description Storable
 The Storable package brings persistence to your Perl data structures
 containing scalar, array, hash or reference objects, i.e. anything that
@@ -3395,13 +3425,12 @@ can be conveniently stored to disk and retrieved at a later time.
 Summary:        Perl pragma to predeclare subroutine names
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.03
+Version:        1.04
 BuildArch:      noarch
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_subs
 %endif
-
 
 %description subs
 This will predeclare all the subroutines whose names are in the list,
@@ -3412,13 +3441,12 @@ before they're declared.
 Summary:        Manipulate Perl symbols and their names
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.08
+Version:        1.09
 BuildArch:      noarch
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Symbol
 %endif
-
 
 %description Symbol
 The Symbol module provides functions for manipulating Perl symbols.
@@ -3452,7 +3480,6 @@ Requires:       perl(XSLoader)
 %gendep_perl_Sys_Syslog
 %endif
 
-
 %description Sys-Syslog
 Sys::Syslog is an interface to the UNIX syslog(3) function. Call syslog() with
 a string priority and a list of printf() arguments just like at syslog(3).
@@ -3470,7 +3497,6 @@ Requires:       perl(Carp)
 %gendep_perl_Term_ANSIColor
 %endif
 BuildArch:      noarch
-
 
 %description Term-ANSIColor
 This module has two interfaces, one through color() and colored() and the
@@ -3493,7 +3519,6 @@ Requires:       perl(Carp)
 %gendep_perl_Term_Cap
 %endif
 BuildArch:      noarch
-
 
 %description Term-Cap
 These are low-level functions to extract and use capabilities from a terminal
@@ -3546,7 +3571,6 @@ Requires:       perl(File::Temp)
 %endif
 BuildArch:      noarch
 
-
 %description Test
 The Test Perl module simplifies the task of writing test files for Perl modules,
 such that their output is in the format that Test::Harness expects to see.
@@ -3556,7 +3580,7 @@ such that their output is in the format that Test::Harness expects to see.
 Summary:        Run Perl standard test scripts with statistics
 License:        GPL+ or Artistic
 Epoch:          1
-Version:        3.42
+Version:        3.43
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Test_Harness
@@ -3573,7 +3597,7 @@ Use TAP::Parser, Test::Harness package was whole rewritten.
 Summary:        Basic utilities for writing tests
 License:        (GPL+ or Artistic) and CC0 and Public Domain
 Epoch:          3
-Version:        1.302175
+Version:        1.302183
 Requires:       %perl_compat
 Requires:       perl(Data::Dumper)
 %if %{defined perl_bootstrap}
@@ -3606,13 +3630,12 @@ an associative array. The values are the original list elements.
 Summary:        Extract delimited text sequences from strings
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        2.03
+Version:        2.04
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Text_Balanced
 %endif
 BuildArch:      noarch
-
 
 %description Text-Balanced
 These Perl subroutines may be used to extract a delimited substring, possibly
@@ -3632,7 +3655,6 @@ Requires:       perl(Carp)
 %endif
 BuildArch:      noarch
 
-
 %description Text-ParseWords
 Parse text into an array of tokens or array of arrays.
 %endif
@@ -3648,7 +3670,6 @@ Requires:       %perl_compat
 %gendep_perl_Text_Tabs_Wrap
 %endif
 BuildArch:      noarch
-
 
 %description Text-Tabs+Wrap
 Text::Tabs performs the same job that the UNIX expand(1) and unexpand(1)
@@ -3668,7 +3689,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Thread
 %endif
-
 
 %description Thread
 This Thread module served as the front end to the old-style thread model,
@@ -3696,7 +3716,6 @@ Requires:       perl(Carp)
 %endif
 BuildArch:      noarch
 
-
 %description Thread-Queue
 This module provides thread-safe FIFO queues that can be accessed safely by
 any number of threads.
@@ -3713,7 +3732,6 @@ Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Tie
 %endif
-
 
 %description Tie
 These are Perl modules that helps connecting classes with arrays, hashes,
@@ -3757,11 +3775,12 @@ BuildArch:      noarch
 This package allows a tied hash to load its values automatically on the first
 access, and to use the cached value on the following accesses.
 
+%if %{dual_life} || %{rebuild_from_scratch}
 %package Tie-RefHash
 Summary:        Use references as hash keys
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.39
+Version:        1.40
 Requires:       %perl_compat
 # Scalar::Util || overload
 Requires:       perl(overload)
@@ -3778,6 +3797,7 @@ This module provides the ability to use references as hash keys if you first
 hash itself are preserved as references; to use references as keys in
 hashes-of-hashes, use Tie::RefHash::Nestable, included as part of
 Tie::RefHash.
+%endif
 
 %package Time
 Summary:        By-name interface to Perl built-in time functions
@@ -3799,14 +3819,13 @@ and localtime () functions.
 %package Time-HiRes
 Summary:        High resolution alarm, sleep, gettimeofday, interval timers
 License:        GPL+ or Artistic
-Epoch:          0
-Version:        1.9764
+Epoch:          4
+Version:        1.9767
 Requires:       %perl_compat
 Requires:       perl(Carp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Time_HiRes
 %endif
-
 
 %description Time-HiRes
 The Time::HiRes module implements a Perl interface to the usleep, nanosleep,
@@ -3819,14 +3838,13 @@ high resolution time and timers.
 Summary:        Efficiently compute time from local and GMT time
 License:        GPL+ or Artistic
 Epoch:          2
-# Real version 1.28
-Version:        1.280
+# Real version 1.30
+Version:        1.300
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_Time_Local
 %endif
 BuildArch:      noarch
-
 
 %description Time-Local
 This module provides functions that are the inverse of built-in perl functions
@@ -3880,7 +3898,7 @@ multiple resources at once.
 Summary:        Perl interpreter-based threads
 License:        GPL+ or Artistic
 Epoch:          1
-Version:        2.25
+Version:        2.26
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_threads
@@ -3904,7 +3922,7 @@ variables, you need to also load threads::shared.
 Summary:        Perl extension for sharing data structures between threads
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.61
+Version:        1.62
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_threads_shared
@@ -3924,13 +3942,12 @@ hashes and hash refs.
 Summary:        Unicode Collation Algorithm
 License:        (GPL+ or Artistic) and Unicode
 Epoch:          0
-Version:        1.27
+Version:        1.29
 Requires:       %perl_compat
 Requires:       perl(Unicode::Normalize)
 %if %{defined perl_bootstrap}
 %gendep_perl_Unicode_Collate
 %endif
-
 
 %description Unicode-Collate
 This package is Perl implementation of Unicode Technical Standard #10 (Unicode
@@ -3942,14 +3959,13 @@ Collation Algorithm).
 Summary:        Unicode Normalization Forms
 License:        GPL+ or Artistic
 Epoch:          0
-Version:        1.27
+Version:        1.28
 Requires:       %perl_compat
 # unicore/CombiningClass.pl and unicore/Decomposition.pl from perl, perl is
 # auto-detected.
 %if %{defined perl_bootstrap}
 %gendep_perl_Unicode_Normalize
 %endif
-
 
 %description Unicode-Normalize
 This package provides Perl functions that can convert strings into various
@@ -3967,7 +3983,6 @@ Requires:       perl(Storable)
 %if %{defined perl_bootstrap}
 %gendep_perl_Unicode_UCD
 %endif
-
 
 %description Unicode-UCD
 The Unicode::UCD module offers a series of functions that provide a simple
@@ -4001,7 +4016,6 @@ Requires:       perl(Carp)
 %gendep_perl_vars
 %endif
 
-
 %description vars
 This pragma will predeclare all the variables whose names are in the
 list, allowing you to use them under "use strict", and disabling any
@@ -4017,9 +4031,9 @@ discouraged.
 Summary:        Perl extension for Version Objects
 License:        GPL+ or Artistic
 # Epoch bump for clean upgrade over old standalone package
-Epoch:          7
-# real version 0.9924
-Version:        0.99.24
+Epoch:          8
+# real version 0.9928
+Version:        0.99.28
 Requires:       %perl_compat
 %if %{defined perl_bootstrap}
 %gendep_perl_version
@@ -4041,7 +4055,6 @@ Requires:       %perl_compat
 %gendep_perl_vmsish
 %endif
 
-
 %description vmsish
 The "vmsish" pragma control VMS-specific features of the Perl language. If
 you're not running VMS, this module does nothing.
@@ -4055,28 +4068,6 @@ you're not running VMS, this module does nothing.
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
 %patch200 -p1
 %patch201 -p1
 
@@ -4092,6 +4083,13 @@ recode()
         touch -r "$1" "${1}_"
         mv -f "${1}_" "$1"
 }
+# TODO iconv fail on this one
+##recode README.tw big5
+#recode pod/perlebcdic.pod
+#recode pod/perlhack.pod
+#recode pod/perlhist.pod
+#recode pod/perlthrtut.pod
+#recode AUTHORS
 
 find . -name \*.orig -exec rm -fv {} \;
 
@@ -4105,6 +4103,13 @@ sed -i 's|BUILD_ZLIB      = True|BUILD_ZLIB      = False|
 rm -rf cpan/Compress-Raw-Zlib/zlib-src
 rm -rf cpan/Compress-Raw-Bzip2/bzip2-src
 sed -i '/\(bzip2\|zlib\)-src/d' MANIFEST
+
+%if !%{with gdbm}
+# Do not install anything requiring NDBM_File if NDBM is not available.
+rm -rf 'cpan/Memoize/Memoize/NDBM_File.pm'
+sed -i '\|cpan/Memoize/Memoize/NDBM_File.pm|d' MANIFEST
+%endif
+
 
 %build
 echo "RPM Build arch: %{_arch}"
@@ -4129,8 +4134,10 @@ echo "RPM Build arch: %{_arch}"
         -Dcc='%{__cc}' \
         -Dcf_by='Red Hat, Inc.' \
         -Dprefix=%{_prefix} \
+%if %{without perl_enables_groff}
         -Dman1dir="%{_mandir}/man1" \
         -Dman3dir="%{_mandir}/man3" \
+%endif
         -Dvendorprefix=%{_prefix} \
         -Dsiteprefix=%{_prefix}/local \
         -Dsitelib="%{_prefix}/local/share/perl5/%{perl_abi}" \
@@ -4140,18 +4147,27 @@ echo "RPM Build arch: %{_arch}"
         -Darchlib="%{archlib}" \
         -Dvendorarch="%{perl_vendorarch}" \
         -Darchname=%{perl_archname} \
+%ifarch %{multilib_64_archs}
+        -Dlibpth="/usr/local/lib64 /lib64 %{_prefix}/lib64" \
+%endif
 %ifarch sparc sparcv9
         -Ud_longdbl \
 %endif
         -Duseshrplib \
         -Dusethreads \
         -Duseithreads \
+%if %{with perl_enables_systemtap}
+        -Dusedtrace='/usr/bin/dtrace' \
+%else
         -Uusedtrace \
+%endif
         -Duselargefiles \
         -Dd_semctl_semun \
         -Di_db \
+%if %{with gdbm}
         -Ui_ndbm \
         -Di_gdbm \
+%endif
         -Di_shadow \
         -Di_syslog \
         -Dman3ext=3pm \
@@ -4247,11 +4263,31 @@ ln -s ../../../bin/xsubpp %{build_privlib}/ExtUtils/
 # Don't need the .packlist
 rm %{build_archlib}/.packlist
 
-# Do not distribute File::Spec::VMS as it works on VMS only.
+# Do not distribute File::Spec::VMS as it works on VMS only (bug #973713)
 # We cannot remove it in %%prep because dist/Cwd/t/Spec.t test needs it.
 rm %{build_archlib}/File/Spec/VMS.pm
+rm $RPM_BUILD_ROOT%{_mandir}/man3/File::Spec::VMS.3*
 
-# tests
+# Do not distribute ExtUtils-PL2Bat, it is used only for Windows
+rm %{build_privlib}/ExtUtils/PL2Bat.pm
+rm $RPM_BUILD_ROOT%{_mandir}/man3/ExtUtils::PL2Bat.3*
+
+# Fix some manpages to be UTF-8
+mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1/
+pushd $RPM_BUILD_ROOT%{_mandir}/man1/
+  for i in perl588delta.1 perldelta.1 ; do
+    iconv -f MS-ANSI -t UTF-8 $i --output new-$i
+    rm $i
+    mv new-$i $i
+  done
+popd
+
+# for now, remove Bzip2:
+# Why? Now is missing Bzip2 files and provides
+##find $RPM_BUILD_ROOT -name Bzip2 | xargs rm -r
+##find $RPM_BUILD_ROOT -name '*B*zip2*'| xargs rm
+
+# tests -- FIXME need to validate that this all works as expected
 mkdir -p %{buildroot}%{perl5_testdir}/perl-tests
 
 # "core"
@@ -4269,33 +4305,711 @@ done
     -e 's"\A#!(?:perl|\./perl|/perl|/usr/bin/perl|/usr/bin/env perl)\b"$Config{startperl}"' \
     $(find %{buildroot}%{perl5_testdir}/perl-tests -type f)
 
+%if %{with perl_enables_systemtap}
+# Systemtap tapset install
+mkdir -p %{buildroot}%{tapsetdir}
+%ifarch %{multilib_64_archs}
+%global libperl_stp libperl%{perl_version}-64.stp
+%else
+%global libperl_stp libperl%{perl_version}-32.stp
+%endif
+
+sed \
+  -e "s|LIBRARY_PATH|%{_libdir}/%{soname}|" \
+  %{SOURCE4} \
+  > %{buildroot}%{tapsetdir}/%{libperl_stp}
+%endif
+
+%if ! %{dual_life} && ! %{rebuild_from_scratch}
+# All dual_life files/directories are deleted here instead of %%exclude in
+# %%files. So that debuginfo does not find unpacked binaries and blindly
+# symlinks to them at random packages.
+
+# Archive-Tar
+rm %{buildroot}%{_bindir}/ptar
+rm %{buildroot}%{_bindir}/ptardiff
+rm %{buildroot}%{_bindir}/ptargrep
+rm -rf %{buildroot}%{privlib}/Archive/Tar
+rm %{buildroot}%{privlib}/Archive/Tar.pm
+rm -rf %{buildroot}%{privlib}/Archive
+rm %{buildroot}%{_mandir}/man1/ptar.1*
+rm %{buildroot}%{_mandir}/man1/ptardiff.1*
+rm %{buildroot}%{_mandir}/man1/ptargrep.1*
+rm %{buildroot}%{_mandir}/man3/Archive::Tar*
+
+# autodie
+rm -rf %{buildroot}%{privlib}/autodie/
+rm %{buildroot}%{privlib}/autodie.pm
+rm %{buildroot}%{privlib}/Fatal.pm
+rm %{buildroot}%{_mandir}/man3/autodie.3*
+rm %{buildroot}%{_mandir}/man3/autodie::*
+rm %{buildroot}%{_mandir}/man3/Fatal.3*
+
+# bignum
+rm %{buildroot}%{privlib}/bigint.pm
+rm %{buildroot}%{privlib}/bignum.pm
+rm %{buildroot}%{privlib}/bigrat.pm
+rm -rf %{buildroot}%{privlib}/Math/BigFloat
+rm %{buildroot}%{privlib}/Math/BigInt/Trace.pm
+rm %{buildroot}%{_mandir}/man3/bigint.*
+rm %{buildroot}%{_mandir}/man3/bignum.*
+rm %{buildroot}%{_mandir}/man3/bigrat.*
+
+# Carp
+rm -rf %{buildroot}%{privlib}/Carp
+rm %{buildroot}%{privlib}/Carp.*
+rm %{buildroot}%{_mandir}/man3/Carp.*
+
+# Compress-Raw-Bzip2
+rm %{buildroot}%{archlib}/Compress/Raw/Bzip2.pm
+rm -rf %{buildroot}%{archlib}/auto/Compress/Raw/Bzip2
+rm %{buildroot}%{_mandir}/man3/Compress::Raw::Bzip2*
+
+# Compress-Raw-Zlib
+rm %{buildroot}%{archlib}/Compress/Raw/Zlib.pm
+rm -rf %{buildroot}%{archlib}/Compress/Raw
+rm -rf %{buildroot}%{archlib}/Compress
+rm -rf %{buildroot}%{archlib}/auto/Compress/Raw/Zlib
+rm -rf %{buildroot}%{archlib}/auto/Compress/Raw
+rm -rf %{buildroot}%{archlib}/auto/Compress
+rm %{buildroot}%{_mandir}/man3/Compress::Raw::Zlib*
+
+# Config-Perl-V
+rm -rf %{buildroot}%{privlib}/Config/Perl
+rm %{buildroot}%{_mandir}/man3/Config::Perl::V.*
+
+# constant
+rm %{buildroot}%{privlib}/constant.pm
+rm %{buildroot}%{_mandir}/man3/constant.3*
+
+# CPAN-Meta-Requirements
+rm %{buildroot}%{privlib}/CPAN/Meta/Requirements.pm
+rm %{buildroot}%{_mandir}/man3/CPAN::Meta::Requirements.3*
+
+# CPAN-Meta-YAML
+rm %{buildroot}%{privlib}/CPAN/Meta/YAML.pm
+rm %{buildroot}%{_mandir}/man3/CPAN::Meta::YAML*
+
+# CPAN-Meta
+rm %{buildroot}%{privlib}/CPAN/Meta.pm
+rm %{buildroot}%{privlib}/CPAN/Meta/Converter.pm
+rm %{buildroot}%{privlib}/CPAN/Meta/Feature.pm
+rm -rf %{buildroot}%{privlib}/CPAN/Meta/History
+rm %{buildroot}%{privlib}/CPAN/Meta/History.pm
+rm %{buildroot}%{privlib}/CPAN/Meta/Merge.pm
+rm %{buildroot}%{privlib}/CPAN/Meta/Prereqs.pm
+rm %{buildroot}%{privlib}/CPAN/Meta/Spec.pm
+rm %{buildroot}%{privlib}/CPAN/Meta/Validator.pm
+rm -rf %{buildroot}%{privlib}/CPAN/Meta
+rm %{buildroot}%{privlib}/Parse/CPAN/Meta.pm
+rm -rf %{buildroot}%{privlib}/Parse/CPAN
+rm -rf %{buildroot}%{privlib}/Parse
+rm %{buildroot}%{_mandir}/man3/CPAN::Meta*
+rm %{buildroot}%{_mandir}/man3/Parse::CPAN::Meta.3*
+
+# CPAN
+rm %{buildroot}%{_bindir}/cpan
+rm %{buildroot}%{privlib}/App/Cpan.pm
+rm -rf %{buildroot}%{privlib}/CPAN
+rm %{buildroot}%{privlib}/CPAN.pm
+rm %{buildroot}%{_mandir}/man1/cpan.1*
+rm %{buildroot}%{_mandir}/man3/App::Cpan.*
+rm %{buildroot}%{_mandir}/man3/CPAN.*
+rm %{buildroot}%{_mandir}/man3/CPAN:*
+
+# Data-Dumper
+rm %{buildroot}%{archlib}/auto/Data/Dumper/Dumper.so
+rm %{buildroot}%{archlib}/Data/Dumper.pm
+rm -rf %{buildroot}%{archlib}/auto/Data/Dumper
+rm -rf %{buildroot}%{archlib}/auto/Data
+rm -rf %{buildroot}%{archlib}/Data
+rm %{buildroot}%{_mandir}/man3/Data::Dumper.3*
+
+# Devel-PPPort
+rm %{buildroot}%{archlib}/Devel/PPPort.pm
+rm %{buildroot}%{_mandir}/man3/Devel::PPPort.3*
+
+# Digest
+rm %{buildroot}%{privlib}/Digest.pm
+rm %{buildroot}%{privlib}/Digest/base.pm
+rm %{buildroot}%{privlib}/Digest/file.pm
+rm -rf %{buildroot}%{privlib}/Digest
+rm %{buildroot}%{_mandir}/man3/Digest.3*
+rm %{buildroot}%{_mandir}/man3/Digest::base.3*
+rm %{buildroot}%{_mandir}/man3/Digest::file.3*
+
+# Digest-MD5
+rm %{buildroot}%{archlib}/Digest/MD5.pm
+rm -rf %{buildroot}%{archlib}/auto/Digest/MD5
+rm %{buildroot}%{_mandir}/man3/Digest::MD5.3*
+
+# Digest-SHA
+rm %{buildroot}%{_bindir}/shasum
+rm %{buildroot}%{archlib}/Digest/SHA.pm
+rm -rf %{buildroot}%{archlib}/Digest
+rm -rf %{buildroot}%{archlib}/auto/Digest/SHA
+rm -rf %{buildroot}%{archlib}/auto/Digest
+rm %{buildroot}%{_mandir}/man1/shasum.1*
+rm %{buildroot}%{_mandir}/man3/Digest::SHA.3*
+
+# Encode
+rm %{buildroot}%{_bindir}/encguess
+rm %{buildroot}%{_bindir}/piconv
+rm -rf %{buildroot}%{archlib}/Encode*
+rm -rf %{buildroot}%{archlib}/auto/Encode*
+rm %{buildroot}%{_mandir}/man1/encguess.1*
+rm %{buildroot}%{_mandir}/man1/piconv.1*
+rm %{buildroot}%{_mandir}/man3/Encode*.3*
+
+# encoding
+rm %{buildroot}%{archlib}/encoding.pm
+rm %{buildroot}%{_mandir}/man3/encoding.3*
+
+# Encode-devel
+rm %{buildroot}%{_bindir}/enc2xs
+rm %{buildroot}%{privlib}/Encode/*.e2x
+rm %{buildroot}%{privlib}/Encode/encode.h
+rm -rf %{buildroot}%{privlib}/Encode
+rm %{buildroot}%{_mandir}/man1/enc2xs.1*
+
+# Env
+rm %{buildroot}%{privlib}/Env.pm
+rm %{buildroot}%{_mandir}/man3/Env.3*
+
+# Exporter
+rm -rf %{buildroot}%{privlib}/Exporter*
+rm %{buildroot}%{_mandir}/man3/Exporter*
+
+# experimental
+rm %{buildroot}%{privlib}/experimental*
+rm %{buildroot}%{_mandir}/man3/experimental*
+
+# ExtUtils-CBuilder
+rm %{buildroot}%{privlib}/ExtUtils/CBuilder.pm
+rm -rf %{buildroot}%{privlib}/ExtUtils/CBuilder
+rm %{buildroot}%{_mandir}/man3/ExtUtils::CBuilder*
+
+# ExtUtils-Command
+rm %{buildroot}%{privlib}/ExtUtils/Command.pm
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Command.*
+
+# ExtUtils-Install
+rm %{buildroot}%{privlib}/ExtUtils/Install.pm
+rm %{buildroot}%{privlib}/ExtUtils/Installed.pm
+rm %{buildroot}%{privlib}/ExtUtils/Packlist.pm
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Install.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Installed.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Packlist.3*
+
+# ExtUtils-Manifest
+rm %{buildroot}%{privlib}/ExtUtils/Manifest.pm
+rm %{buildroot}%{privlib}/ExtUtils/MANIFEST.SKIP
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Manifest.3*
+
+# ExtUtils-MakeMaker
+rm %{buildroot}%{_bindir}/instmodsh
+rm -rf %{buildroot}%{privlib}/ExtUtils/Command
+rm -rf %{buildroot}%{privlib}/ExtUtils/Liblist
+rm %{buildroot}%{privlib}/ExtUtils/Liblist.pm
+rm -rf %{buildroot}%{privlib}/ExtUtils/MakeMaker
+rm %{buildroot}%{privlib}/ExtUtils/MakeMaker.pm
+rm %{buildroot}%{privlib}/ExtUtils/MM.pm
+rm %{buildroot}%{privlib}/ExtUtils/MM_*.pm
+rm %{buildroot}%{privlib}/ExtUtils/MY.pm
+rm %{buildroot}%{privlib}/ExtUtils/Mkbootstrap.pm
+rm %{buildroot}%{privlib}/ExtUtils/Mksymlists.pm
+rm %{buildroot}%{privlib}/ExtUtils/testlib.pm
+rm %{buildroot}%{_mandir}/man1/instmodsh.1*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Command::MM*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Liblist.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::MM.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::MM_*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::MY.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::MakeMaker*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Mkbootstrap.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Mksymlists.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::testlib.3*
+
+# ExtUtils-MM-Utils
+rm %{buildroot}%{privlib}/ExtUtils/MM/Utils.pm
+rm -rf %{buildroot}%{privlib}/ExtUtils/MM
+rm %{buildroot}%{_mandir}/man3/ExtUtils::MM::Utils.*
+
+# ExtUtils-ParseXS
+rm %{buildroot}%{privlib}/ExtUtils/ParseXS.pm
+rm %{buildroot}%{privlib}/ExtUtils/ParseXS.pod
+rm %{buildroot}%{privlib}/ExtUtils/ParseXS/Constants.pm
+rm %{buildroot}%{privlib}/ExtUtils/ParseXS/CountLines.pm
+rm %{buildroot}%{privlib}/ExtUtils/ParseXS/Eval.pm
+rm %{buildroot}%{privlib}/ExtUtils/ParseXS/Utilities.pm
+rm -rf %{buildroot}%{privlib}/ExtUtils/ParseXS
+rm %{buildroot}%{privlib}/ExtUtils/Typemaps.pm
+rm %{buildroot}%{privlib}/ExtUtils/Typemaps/Cmd.pm
+rm %{buildroot}%{privlib}/ExtUtils/Typemaps/InputMap.pm
+rm %{buildroot}%{privlib}/ExtUtils/Typemaps/OutputMap.pm
+rm %{buildroot}%{privlib}/ExtUtils/Typemaps/Type.pm
+rm -rf %{buildroot}%{privlib}/ExtUtils/Typemaps
+rm %{buildroot}%{privlib}/ExtUtils/xsubpp
+rm %{buildroot}%{privlib}/pod/perlxs.pod
+rm %{buildroot}%{privlib}/pod/perlxstut.pod
+rm %{buildroot}%{privlib}/pod/perlxstypemap.pod
+rm %{buildroot}%{_bindir}/xsubpp
+rm %{buildroot}%{_mandir}/man1/perlxs*
+rm %{buildroot}%{_mandir}/man1/xsubpp*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::ParseXS.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::ParseXS::Constants.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::ParseXS::Eval.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::ParseXS::Utilities.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Typemaps.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Typemaps::Cmd.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Typemaps::InputMap.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Typemaps::OutputMap.3*
+rm %{buildroot}%{_mandir}/man3/ExtUtils::Typemaps::Type.3*
+
+# File-Fetch
+rm %{buildroot}%{privlib}/File/Fetch.pm
+rm %{buildroot}%{_mandir}/man3/File::Fetch.3*
+
+# File-Path
+rm %{buildroot}%{privlib}/File/Path.pm
+rm %{buildroot}%{_mandir}/man3/File::Path.3*
+
+# File-Temp
+rm %{buildroot}%{privlib}/File/Temp.pm
+rm %{buildroot}%{_mandir}/man3/File::Temp.3*
+
+# Filter
+rm -rf %{buildroot}%{archlib}/auto/Filter/Util
+rm -rf %{buildroot}%{archlib}/auto/Filter
+rm -rf %{buildroot}%{archlib}/Filter/Util
+rm -rf %{buildroot}%{archlib}/Filter
+rm %{buildroot}%{privlib}/pod/perlfilter.pod
+rm %{buildroot}%{_mandir}/man1/perlfilter.*
+rm %{buildroot}%{_mandir}/man3/Filter::Util::*
+
+# Filter-Simple
+rm %{buildroot}%{privlib}/Filter/Simple.pm
+rm -rf %{buildroot}%{privlib}/Filter
+rm %{buildroot}%{_mandir}/man3/Filter::Simple.3*
+
+# Getopt-Long
+rm %{buildroot}%{privlib}/Getopt/Long.pm
+rm %{buildroot}%{_mandir}/man3/Getopt::Long.3*
+
+# IO-Compress
+rm %{buildroot}%{_bindir}/streamzip
+rm %{buildroot}%{_bindir}/zipdetails
+rm %{buildroot}%{privlib}/IO/Compress/FAQ.pod
+rm %{buildroot}%{_mandir}/man1/streamzip.*
+rm %{buildroot}%{_mandir}/man1/zipdetails.*
+rm %{buildroot}%{_mandir}/man3/IO::Compress::FAQ.*
+# Compress-Zlib
+rm %{buildroot}%{privlib}/Compress/Zlib.pm
+rm -rf %{buildroot}%{privlib}/Compress
+rm %{buildroot}%{_mandir}/man3/Compress::Zlib*
+# IO-Compress-Base
+rm %{buildroot}%{privlib}/File/GlobMapper.pm
+rm %{buildroot}%{privlib}/IO/Compress/Base.pm
+rm -rf %{buildroot}%{privlib}/IO/Compress/Base
+rm %{buildroot}%{privlib}/IO/Uncompress/AnyUncompress.pm
+rm %{buildroot}%{privlib}/IO/Uncompress/Base.pm
+rm %{buildroot}%{_mandir}/man3/File::GlobMapper.*
+rm %{buildroot}%{_mandir}/man3/IO::Compress::Base.*
+rm %{buildroot}%{_mandir}/man3/IO::Uncompress::AnyUncompress.*
+rm %{buildroot}%{_mandir}/man3/IO::Uncompress::Base.*
+# IO-Compress-Zlib
+rm %{buildroot}%{privlib}/IO/Compress/Bzip2.pm
+rm %{buildroot}%{privlib}/IO/Compress/Deflate.pm
+rm %{buildroot}%{privlib}/IO/Compress/Gzip.pm
+rm %{buildroot}%{privlib}/IO/Compress/RawDeflate.pm
+rm %{buildroot}%{privlib}/IO/Compress/Zip.pm
+rm -rf %{buildroot}%{privlib}/IO/Compress/Adapter
+rm -rf %{buildroot}%{privlib}/IO/Compress/Gzip
+rm -rf %{buildroot}%{privlib}/IO/Compress/Zip
+rm -rf %{buildroot}%{privlib}/IO/Compress/Zlib
+rm -rf %{buildroot}%{privlib}/IO/Compress
+rm %{buildroot}%{privlib}/IO/Uncompress/AnyInflate.pm
+rm %{buildroot}%{privlib}/IO/Uncompress/Bunzip2.pm
+rm %{buildroot}%{privlib}/IO/Uncompress/Gunzip.pm
+rm %{buildroot}%{privlib}/IO/Uncompress/Inflate.pm
+rm %{buildroot}%{privlib}/IO/Uncompress/RawInflate.pm
+rm %{buildroot}%{privlib}/IO/Uncompress/Unzip.pm
+rm -rf %{buildroot}%{privlib}/IO/Uncompress/Adapter
+rm -rf %{buildroot}%{privlib}/IO/Uncompress
+rm %{buildroot}%{_mandir}/man3/IO::Compress::Deflate*
+rm %{buildroot}%{_mandir}/man3/IO::Compress::Bzip2*
+rm %{buildroot}%{_mandir}/man3/IO::Compress::Gzip*
+rm %{buildroot}%{_mandir}/man3/IO::Compress::RawDeflate*
+rm %{buildroot}%{_mandir}/man3/IO::Compress::Zip*
+rm %{buildroot}%{_mandir}/man3/IO::Uncompress::AnyInflate*
+rm %{buildroot}%{_mandir}/man3/IO::Uncompress::Bunzip2*
+rm %{buildroot}%{_mandir}/man3/IO::Uncompress::Gunzip*
+rm %{buildroot}%{_mandir}/man3/IO::Uncompress::Inflate*
+rm %{buildroot}%{_mandir}/man3/IO::Uncompress::RawInflate*
+rm %{buildroot}%{_mandir}/man3/IO::Uncompress::Unzip*
+
+# IO-Socket-IP
+rm %{buildroot}%{privlib}/IO/Socket/IP.pm
+rm -rf %{buildroot}%{privlib}/IO/Socket
+rm %{buildroot}%{_mandir}/man3/IO::Socket::IP.*
+
+# IO-Zlib
+rm %{buildroot}%{privlib}/IO/Zlib.pm
+rm -rf %{buildroot}%{privlib}/IO
+rm %{buildroot}%{_mandir}/man3/IO::Zlib.*
+
+# HTTP-Tiny
+rm %{buildroot}%{privlib}/HTTP/Tiny.pm
+rm -rf %{buildroot}%{privlib}/HTTP
+rm %{buildroot}%{_mandir}/man3/HTTP::Tiny*
+
+# IPC-Cmd
+rm %{buildroot}%{privlib}/IPC/Cmd.pm
+rm %{buildroot}%{_mandir}/man3/IPC::Cmd.3*
+
+# IPC-SysV
+rm -rf %{buildroot}%{archlib}/auto/IPC
+rm %{buildroot}%{archlib}/IPC/Msg.pm
+rm %{buildroot}%{archlib}/IPC/Semaphore.pm
+rm %{buildroot}%{archlib}/IPC/SharedMem.pm
+rm %{buildroot}%{archlib}/IPC/SysV.pm
+rm -rf %{buildroot}%{archlib}/IPC
+rm %{buildroot}%{_mandir}/man3/IPC::Msg.*
+rm %{buildroot}%{_mandir}/man3/IPC::Semaphore.*
+rm %{buildroot}%{_mandir}/man3/IPC::SharedMem.*
+rm %{buildroot}%{_mandir}/man3/IPC::SysV.*
+
+# JSON-PP
+rm %{buildroot}%{_bindir}/json_pp
+rm %{buildroot}%{privlib}/JSON/PP.pm
+rm -rf %{buildroot}%{privlib}/JSON/PP
+rm -rf %{buildroot}%{privlib}/JSON
+rm %{buildroot}%{_mandir}/man1/json_pp.1*
+rm %{buildroot}%{_mandir}/man3/JSON::PP.3*
+rm %{buildroot}%{_mandir}/man3/JSON::PP::Boolean.3pm*
+
+# libnet
+rm %{buildroot}%{privlib}/Net/Cmd.pm
+rm %{buildroot}%{privlib}/Net/Config.pm
+rm %{buildroot}%{privlib}/Net/Domain.pm
+rm %{buildroot}%{privlib}/Net/FTP.pm
+rm -rf %{buildroot}%{privlib}/Net/FTP
+rm %{buildroot}%{privlib}/Net/libnetFAQ.pod
+rm %{buildroot}%{privlib}/Net/NNTP.pm
+rm %{buildroot}%{privlib}/Net/Netrc.pm
+rm %{buildroot}%{privlib}/Net/POP3.pm
+rm %{buildroot}%{privlib}/Net/SMTP.pm
+rm %{buildroot}%{privlib}/Net/Time.pm
+rm %{buildroot}%{_mandir}/man3/Net::Cmd.*
+rm %{buildroot}%{_mandir}/man3/Net::Config.*
+rm %{buildroot}%{_mandir}/man3/Net::Domain.*
+rm %{buildroot}%{_mandir}/man3/Net::FTP.*
+rm %{buildroot}%{_mandir}/man3/Net::libnetFAQ.*
+rm %{buildroot}%{_mandir}/man3/Net::NNTP.*
+rm %{buildroot}%{_mandir}/man3/Net::Netrc.*
+rm %{buildroot}%{_mandir}/man3/Net::POP3.*
+rm %{buildroot}%{_mandir}/man3/Net::SMTP.*
+rm %{buildroot}%{_mandir}/man3/Net::Time.*
+
+# Locale-Maketext
+rm %{buildroot}%{privlib}/Locale/Maketext.*
+rm %{buildroot}%{privlib}/Locale/Maketext/Cookbook.*
+rm %{buildroot}%{privlib}/Locale/Maketext/Guts.*
+rm %{buildroot}%{privlib}/Locale/Maketext/GutsLoader.*
+rm %{buildroot}%{privlib}/Locale/Maketext/TPJ13.*
+rm %{buildroot}%{_mandir}/man3/Locale::Maketext.*
+rm %{buildroot}%{_mandir}/man3/Locale::Maketext::Cookbook.*
+rm %{buildroot}%{_mandir}/man3/Locale::Maketext::Guts.*
+rm %{buildroot}%{_mandir}/man3/Locale::Maketext::GutsLoader.*
+rm %{buildroot}%{_mandir}/man3/Locale::Maketext::TPJ13.*
+
+# Math-BigInt
+rm %{buildroot}%{privlib}/Math/BigFloat.pm
+rm %{buildroot}%{privlib}/Math/BigInt.pm
+rm %{buildroot}%{privlib}/Math/BigInt/Calc.pm
+rm %{buildroot}%{privlib}/Math/BigInt/Lib.pm
+rm -rf %{buildroot}%{privlib}/Math/BigInt
+rm %{buildroot}%{_mandir}/man3/Math::BigFloat.*
+rm %{buildroot}%{_mandir}/man3/Math::BigInt.*
+rm %{buildroot}%{_mandir}/man3/Math::BigInt::Calc.*
+rm %{buildroot}%{_mandir}/man3/Math::BigInt::Lib.*
+
+# Math-BigInt-FastCalc
+rm -rf %{buildroot}%{archlib}/Math
+rm -rf %{buildroot}%{archlib}/auto/Math
+rm %{buildroot}%{_mandir}/man3/Math::BigInt::FastCalc.*
+
+# Math-BigRat
+rm %{buildroot}%{privlib}/Math/BigRat.pm
+rm %{buildroot}%{_mandir}/man3/Math::BigRat.*
+
+# MIME-Base64
+rm -rf %{buildroot}%{archlib}/auto/MIME
+rm -rf %{buildroot}%{archlib}/MIME
+rm %{buildroot}%{_mandir}/man3/MIME::*
+
+# Module-CoreList
+rm -rf %{buildroot}%{privlib}/Module/CoreList
+rm %{buildroot}%{privlib}/Module/CoreList.pm
+rm %{buildroot}%{privlib}/Module/CoreList.pod
+rm %{buildroot}%{_mandir}/man3/Module::CoreList*
+
+# Module-CoreList-tools
+rm %{buildroot}%{_bindir}/corelist
+rm %{buildroot}%{_mandir}/man1/corelist*
+
+# Module-Load
+rm %{buildroot}%{privlib}/Module/Load.pm
+rm %{buildroot}%{_mandir}/man3/Module::Load.*
+
+# Module-Load-Conditional
+rm -rf %{buildroot}%{privlib}/Module/Load
+rm %{buildroot}%{_mandir}/man3/Module::Load::Conditional*
+
+# Module-Metadata
+rm %{buildroot}%{privlib}/Module/Metadata.pm
+rm %{buildroot}%{_mandir}/man3/Module::Metadata.3pm*
+
+# Net-Ping
+rm %{buildroot}%{privlib}/Net/Ping.pm
+rm %{buildroot}%{_mandir}/man3/Net::Ping.*
+
+# parent
+rm %{buildroot}%{privlib}/parent.pm
+rm %{buildroot}%{_mandir}/man3/parent.3*
+
+# Params-Check
+rm -rf %{buildroot}%{privlib}/Params/
+rm %{buildroot}%{_mandir}/man3/Params::Check*
+
+# PathTools
+rm %{buildroot}%{archlib}/Cwd.pm
+rm -rf %{buildroot}%{archlib}/File/Spec*
+rm -rf %{buildroot}%{archlib}/auto/Cwd/
+rm %{buildroot}%{_mandir}/man3/Cwd*
+rm %{buildroot}%{_mandir}/man3/File::Spec*
+
+# Perl-OSType
+rm %{buildroot}%{privlib}/Perl/OSType.pm
+rm -rf %{buildroot}%{privlib}/Perl
+rm %{buildroot}%{_mandir}/man3/Perl::OSType.3pm*
+
+# perlfaq
+rm %{buildroot}%{privlib}/perlfaq.pm
+rm %{buildroot}%{privlib}/pod/perlfaq*
+rm %{buildroot}%{privlib}/pod/perlglossary.pod
+rm %{buildroot}%{_mandir}/man1/perlfaq*
+rm %{buildroot}%{_mandir}/man1/perlglossary.*
+
+# PerlIO-via-QuotedPrint
+rm -rf %{buildroot}%{privlib}/PerlIO
+rm %{buildroot}%{_mandir}/man3/PerlIO::via::QuotedPrint.*
+
+# Pod-Checker
+rm %{buildroot}%{_bindir}/podchecker
+rm %{buildroot}%{privlib}/Pod/Checker.pm
+rm %{buildroot}%{_mandir}/man1/podchecker.*
+rm %{buildroot}%{_mandir}/man3/Pod::Checker.*
+
+# Pod-Escapes
+rm %{buildroot}%{privlib}/Pod/Escapes.pm
+rm %{buildroot}%{_mandir}/man3/Pod::Escapes.*
+
+# Pod-Perldoc
+rm %{buildroot}%{_bindir}/perldoc
+rm %{buildroot}%{privlib}/pod/perldoc.pod
+rm %{buildroot}%{privlib}/Pod/Perldoc.pm
+rm -rf %{buildroot}%{privlib}/Pod/Perldoc/
+rm %{buildroot}%{_mandir}/man1/perldoc.1*
+rm %{buildroot}%{_mandir}/man3/Pod::Perldoc*
+
+# Pod-Usage
+rm %{buildroot}%{_bindir}/pod2usage
+rm %{buildroot}%{privlib}/Pod/Usage.pm
+rm %{buildroot}%{_mandir}/man1/pod2usage.*
+rm %{buildroot}%{_mandir}/man3/Pod::Usage.*
+
+# podlators
+rm %{buildroot}%{_bindir}/pod2man
+rm %{buildroot}%{_bindir}/pod2text
+rm %{buildroot}%{privlib}/pod/perlpodstyle.pod
+rm %{buildroot}%{privlib}/Pod/Man.pm
+rm %{buildroot}%{privlib}/Pod/ParseLink.pm
+rm %{buildroot}%{privlib}/Pod/Text.pm
+rm -rf %{buildroot}%{privlib}/Pod/Text
+rm %{buildroot}%{_mandir}/man1/pod2man.1*
+rm %{buildroot}%{_mandir}/man1/pod2text.1*
+rm %{buildroot}%{_mandir}/man1/perlpodstyle.1*
+rm %{buildroot}%{_mandir}/man3/Pod::Man*
+rm %{buildroot}%{_mandir}/man3/Pod::ParseLink*
+rm %{buildroot}%{_mandir}/man3/Pod::Text*
+
+# Pod-Simple
+rm %{buildroot}%{privlib}/Pod/Simple.pm
+rm %{buildroot}%{privlib}/Pod/Simple.pod
+rm -rf %{buildroot}%{privlib}/Pod/Simple/
+rm %{buildroot}%{_mandir}/man3/Pod::Simple*
+
+# Scalar-List-Utils
+rm -rf %{buildroot}%{archlib}/List/
+rm -rf %{buildroot}%{archlib}/Scalar/
+rm -rf %{buildroot}%{archlib}/Sub/
+rm -rf %{buildroot}%{archlib}/auto/List/
+rm %{buildroot}%{_mandir}/man3/List::Util*
+rm %{buildroot}%{_mandir}/man3/Scalar::Util*
+rm %{buildroot}%{_mandir}/man3/Sub::Util*
+
+# Socket
+rm %{buildroot}%{archlib}/auto/Socket/Socket.*
+rm -rf %{buildroot}%{archlib}/auto/Socket
+rm %{buildroot}%{archlib}/Socket.pm
+rm %{buildroot}%{_mandir}/man3/Socket.3*
+
+# Storable
+rm %{buildroot}%{archlib}/Storable.pm
+rm -rf %{buildroot}%{archlib}/auto/Storable/
+rm %{buildroot}%{_mandir}/man3/Storable.*
+
+# Sys-Syslog
+# %%dir %%{archlib}/Sys not excluded. It would be removed from the previous package.
+rm %{buildroot}%{archlib}/Sys/Syslog.pm
+# %%dir %%{archlib}/auto/Sys not excluded. It would be removed from the previous package.
+rm -rf %{buildroot}%{archlib}/auto/Sys/Syslog/
+rm %{buildroot}%{_mandir}/man3/Sys::Syslog.*
+
+# Term-ANSIColor
+rm %{buildroot}%{privlib}/Term/ANSIColor.pm
+rm %{buildroot}%{_mandir}/man3/Term::ANSIColor*
+
+# Term-Cap
+rm %{buildroot}%{privlib}/Term/Cap.pm
+rm %{buildroot}%{_mandir}/man3/Term::Cap.*
+
+# Test-Harness
+rm %{buildroot}%{_bindir}/prove
+rm -rf %{buildroot}%{privlib}/App/Prove*
+rm -rf %{buildroot}%{privlib}/App
+rm -rf %{buildroot}%{privlib}/TAP*
+rm %{buildroot}%{privlib}/Test/Harness*
+rm %{buildroot}%{_mandir}/man1/prove.1*
+rm %{buildroot}%{_mandir}/man3/App::Prove*
+rm %{buildroot}%{_mandir}/man3/TAP*
+rm %{buildroot}%{_mandir}/man3/Test::Harness*
+
+# Test-Simple
+rm %{buildroot}%{privlib}/ok*
+rm %{buildroot}%{privlib}/Test/More*
+rm -rf %{buildroot}%{privlib}/Test/Builder*
+rm -rf %{buildroot}%{privlib}/Test/Tester*
+rm %{buildroot}%{privlib}/Test/Simple*
+rm %{buildroot}%{privlib}/Test/Tutorial*
+rm -rf %{buildroot}%{privlib}/Test/use
+rm -rf %{buildroot}%{privlib}/Test
+rm -rf %{buildroot}%{privlib}/Test2*
+rm %{buildroot}%{_mandir}/man3/ok*
+rm %{buildroot}%{_mandir}/man3/Test::More*
+rm %{buildroot}%{_mandir}/man3/Test::Builder*
+rm %{buildroot}%{_mandir}/man3/Test::Tester*
+rm %{buildroot}%{_mandir}/man3/Test::Simple*
+rm %{buildroot}%{_mandir}/man3/Test::Tutorial*
+rm %{buildroot}%{_mandir}/man3/Test::use::*
+rm %{buildroot}%{_mandir}/man3/Test2*
+
+# Text-Balanced
+rm %{buildroot}%{privlib}/Text/Balanced.pm
+rm %{buildroot}%{_mandir}/man3/Text::Balanced.*
+
+# Text-ParseWords
+rm %{buildroot}%{privlib}/Text/ParseWords.pm
+rm %{buildroot}%{_mandir}/man3/Text::ParseWords.*
+
+# Text-Tabs+Wrap
+rm %{buildroot}%{privlib}/Text/Tabs.pm
+rm %{buildroot}%{privlib}/Text/Wrap.pm
+rm %{buildroot}%{_mandir}/man3/Text::Tabs.*
+rm %{buildroot}%{_mandir}/man3/Text::Wrap.*
+
+# Thread-Queue
+rm %{buildroot}%{privlib}/Thread/Queue.pm
+rm %{buildroot}%{_mandir}/man3/Thread::Queue.*
+
+# Tie-RefHash
+rm %{buildroot}%{privlib}/Tie/RefHash.pm
+rm %{buildroot}%{_mandir}/man3/Tie::RefHash.*
+
+# Time-HiRes
+rm %{buildroot}%{archlib}/Time/HiRes.pm
+rm -rf %{buildroot}%{archlib}/auto/Time/HiRes
+rm %{buildroot}%{_mandir}/man3/Time::HiRes.*
+
+# Time-Local
+rm %{buildroot}%{privlib}/Time/Local.pm
+rm %{buildroot}%{_mandir}/man3/Time::Local.*
+
+# threads
+rm %{buildroot}%{archlib}/auto/threads/threads*
+rm %{buildroot}%{archlib}/threads.pm
+rm %{buildroot}%{_mandir}/man3/threads.3*
+
+# threads-shared
+rm -rf %{buildroot}%{archlib}/auto/threads/shared*
+rm -rf %{buildroot}%{archlib}/auto/threads
+rm %{buildroot}%{archlib}/threads/shared*
+rm -rf %{buildroot}%{archlib}/threads
+rm %{buildroot}%{_mandir}/man3/threads::shared*
+
+# Unicode-Collate
+rm -rf %{buildroot}%{archlib}/auto/Unicode/Collate
+rm -rf %{buildroot}%{archlib}/auto/Unicode
+rm %{buildroot}%{archlib}/Unicode/Collate.pm
+rm -rf %{buildroot}%{archlib}/Unicode/Collate
+rm -rf %{buildroot}%{privlib}/Unicode/Collate
+rm %{buildroot}%{_mandir}/man3/Unicode::Collate.*
+rm %{buildroot}%{_mandir}/man3/Unicode::Collate::*
+
+# Unicode-Normalize
+rm -rf %{buildroot}%{archlib}/auto/Unicode/Normalize
+rm %{buildroot}%{archlib}/Unicode/Normalize.pm
+rm -rf %{buildroot}%{archlib}/Unicode
+rm %{buildroot}%{_mandir}/man3/Unicode::Normalize.*
+
+# version
+rm %{buildroot}%{privlib}/version.pm
+rm %{buildroot}%{privlib}/version.pod
+rm -rf %{buildroot}%{privlib}/version/
+rm %{buildroot}%{_mandir}/man3/version.3*
+rm %{buildroot}%{_mandir}/man3/version::Internals.3*
+%endif
+
+
+# TODO: Canonicalize test files (rewrite intrerpreter path, fix permissions)
+# XXX: We cannot rewrite ./perl before %%check phase. Otherwise the test
+# would run against system perl at build-time.
+# See __spec_check_pre global macro in macros.perl.
+#T_FILES=`find %%{buildroot}%%{perl5_testdir} -type f -name '*.t'`
+#%%fix_shbang_line $T_FILES
+#%%{__chmod} +x $T_FILES
+#%%{_fixperms} %%{buildroot}%%{perl5_testdir}
+#
+# lib/perl5db.t will fail if Term::ReadLine::Gnu is available
 %check
+%if %{with test}
+%{new_perl} -I/lib regen/lib_cleanup.pl
+pushd t
+%{new_perl} -I../lib porting/customized.t --regen
+popd
+%if %{parallel_tests}
+    JOBS=$(printf '%%s' "%{?_smp_mflags}" | sed 's/.*-j\([0-9][0-9]*\).*/\1/')
+    LC_ALL=C TEST_JOBS=$JOBS make test_harness
+%else
+    LC_ALL=C make test
+%endif
+%endif
 
 %ldconfig_scriptlets libs
 
 %files
 # Main perl package is an empty meta package.
-%if !(%{dual_life} || %{rebuild_from_scratch})
-# These excludes are here to work around a bug in debuginfo generator
-# <https://github.com/rpm-software-management/rpm/issues/1094> that would
-# otherwise leave debuginfo files in the buildroot tree. It seems that
-# the excludes in noarch files sections are ignorered by the debuginfo
-# generator.
-%exclude %{archlib}/auto/Compress/Raw/Bzip2/Bzip2.so
-%exclude %{archlib}/auto/Compress/Raw/Zlib/Zlib.so
-%exclude %{archlib}/auto/Cwd/Cwd.so
-%exclude %{archlib}/auto/Data/Dumper/Dumper.so
-%exclude %{archlib}/auto/Digest/MD5/MD5.so
-%exclude %{archlib}/auto/Digest/SHA/SHA.so
-%exclude %{archlib}/auto/Filter/Util/Call/Call.so
-%exclude %{archlib}/auto/IPC/SysV/SysV.so
-%exclude %{archlib}/auto/List/Util/Util.so
-%exclude %{archlib}/auto/MIME/Base64/Base64.so
-%exclude %{archlib}/auto/Math/BigInt/FastCalc/FastCalc.so
-%exclude %{archlib}/auto/Socket/Socket.so
-%exclude %{archlib}/auto/Storable/Storable.so
-%exclude %{archlib}/auto/Time/HiRes/HiRes.so
-%endif
 
 %files interpreter
 %{_bindir}/perl
@@ -4391,6 +5105,12 @@ done
 %dir %{privlib}/ExtUtils
 %{privlib}/ExtUtils/typemap
 %{_libdir}/libperl.so
+%if %{with perl_enables_systemtap}
+%dir %{_datadir}/systemtap
+%dir %{_datadir}/systemtap/tapset
+%{tapsetdir}/%{libperl_stp}
+%doc perl-example.stp
+%endif
 
 %files macros
 %{_rpmmacrodir}/macros.perl
@@ -4423,17 +5143,6 @@ done
 %{_mandir}/man1/ptardiff.1*
 %{_mandir}/man1/ptargrep.1*
 %{_mandir}/man3/Archive::Tar* 
-%else
-%exclude %{_bindir}/ptar
-%exclude %{_bindir}/ptardiff
-%exclude %{_bindir}/ptargrep
-%exclude %dir %{privlib}/Archive
-%exclude %{privlib}/Archive/Tar
-%exclude %{privlib}/Archive/Tar.pm
-%exclude %{_mandir}/man1/ptar.1*
-%exclude %{_mandir}/man1/ptardiff.1*
-%exclude %{_mandir}/man1/ptargrep.1*
-%exclude %{_mandir}/man3/Archive::Tar*
 %endif
 
 %files Attribute-Handlers
@@ -4448,13 +5157,6 @@ done
 %{_mandir}/man3/autodie.3*
 %{_mandir}/man3/autodie::*
 %{_mandir}/man3/Fatal.3*
-%else
-%exclude %{privlib}/autodie/
-%exclude %{privlib}/autodie.pm
-%exclude %{privlib}/Fatal.pm
-%exclude %{_mandir}/man3/autodie.3*
-%exclude %{_mandir}/man3/autodie::*
-%exclude %{_mandir}/man3/Fatal.3*
 %endif
 
 %files AutoLoader
@@ -4499,15 +5201,6 @@ done
 %{_mandir}/man3/bigint.*
 %{_mandir}/man3/bignum.*
 %{_mandir}/man3/bigrat.*
-%else
-%exclude %{privlib}/bigint.pm
-%exclude %{privlib}/bignum.pm
-%exclude %{privlib}/bigrat.pm
-%exclude %{privlib}/Math/BigFloat
-%exclude %{privlib}/Math/BigInt/Trace.pm
-%exclude %{_mandir}/man3/bigint.*
-%exclude %{_mandir}/man3/bignum.*
-%exclude %{_mandir}/man3/bigrat.*
 %endif
 
 %files blib
@@ -4519,10 +5212,6 @@ done
 %{privlib}/Carp
 %{privlib}/Carp.*
 %{_mandir}/man3/Carp.*
-%else
-%exclude %{privlib}/Carp
-%exclude %{privlib}/Carp.*
-%exclude %{_mandir}/man3/Carp.*
 %endif
 
 %files Class-Struct
@@ -4538,14 +5227,6 @@ done
 %dir %{archlib}/auto/Compress/Raw
 %{archlib}/auto/Compress/Raw/Bzip2
 %{_mandir}/man3/Compress::Raw::Bzip2*
-%else
-%exclude %dir %{archlib}/Compress
-%exclude %dir %{archlib}/Compress/Raw
-%exclude %{archlib}/Compress/Raw/Bzip2.pm
-%exclude %dir %{archlib}/auto/Compress
-%exclude %dir %{archlib}/auto/Compress/Raw
-%exclude %{archlib}/auto/Compress/Raw/Bzip2
-%exclude %{_mandir}/man3/Compress::Raw::Bzip2*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -4557,14 +5238,6 @@ done
 %dir %{archlib}/auto/Compress/Raw
 %{archlib}/auto/Compress/Raw/Zlib
 %{_mandir}/man3/Compress::Raw::Zlib*
-%else
-%exclude %dir %{archlib}/Compress
-%exclude %dir %{archlib}/Compress/Raw
-%exclude %{archlib}/Compress/Raw/Zlib.pm
-%exclude %dir %{archlib}/auto/Compress
-%exclude %dir %{archlib}/auto/Compress/Raw
-%exclude %{archlib}/auto/Compress/Raw/Zlib
-%exclude %{_mandir}/man3/Compress::Raw::Zlib*
 %endif
 
 %files Config-Extensions
@@ -4577,18 +5250,12 @@ done
 %dir %{privlib}/Config
 %{privlib}/Config/Perl
 %{_mandir}/man3/Config::Perl::V.*
-%else
-%exclude %{privlib}/Config/Perl
-%exclude %{_mandir}/man3/Config::Perl::V.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files constant
 %{privlib}/constant.pm
 %{_mandir}/man3/constant.3*
-%else
-%exclude %{privlib}/constant.pm
-%exclude %{_mandir}/man3/constant.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -4605,16 +5272,6 @@ done
 %exclude %{privlib}/CPAN/Meta/
 %exclude %{privlib}/CPAN/Meta.pm
 %exclude %{_mandir}/man3/CPAN::Meta*
-%else
-%exclude %{_bindir}/cpan
-%exclude %dir %{privlib}/App
-%exclude %{privlib}/App/Cpan.pm
-%exclude %{privlib}/CPAN
-%exclude %{privlib}/CPAN.pm
-%exclude %{_mandir}/man1/cpan.1*
-%exclude %{_mandir}/man3/App::Cpan.*
-%exclude %{_mandir}/man3/CPAN.*
-%exclude %{_mandir}/man3/CPAN:*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -4637,23 +5294,6 @@ done
 %{_mandir}/man3/Parse::CPAN::Meta.3*
 %exclude %{_mandir}/man3/CPAN::Meta::YAML*
 %exclude %{_mandir}/man3/CPAN::Meta::Requirements*
-%else
-%exclude %dir %{privlib}/CPAN
-%exclude %{privlib}/CPAN/Meta.pm
-%exclude %dir %{privlib}/CPAN/Meta
-%exclude %{privlib}/CPAN/Meta/Converter.pm
-%exclude %{privlib}/CPAN/Meta/Feature.pm
-%exclude %dir %{privlib}/CPAN/Meta/History
-%exclude %{privlib}/CPAN/Meta/History.pm
-%exclude %{privlib}/CPAN/Meta/Merge.pm
-%exclude %{privlib}/CPAN/Meta/Prereqs.pm
-%exclude %{privlib}/CPAN/Meta/Spec.pm
-%exclude %{privlib}/CPAN/Meta/Validator.pm
-%exclude %dir %{privlib}/Parse
-%exclude %dir %{privlib}/Parse/CPAN
-%exclude %{privlib}/Parse/CPAN/Meta.pm
-%exclude %{_mandir}/man3/CPAN::Meta*
-%exclude %{_mandir}/man3/Parse::CPAN::Meta.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -4662,11 +5302,6 @@ done
 %dir %{privlib}/CPAN/Meta
 %{privlib}/CPAN/Meta/Requirements.pm
 %{_mandir}/man3/CPAN::Meta::Requirements.3*
-%else
-%exclude %dir %{privlib}/CPAN
-%exclude %dir %{privlib}/CPAN/Meta
-%exclude %{privlib}/CPAN/Meta/Requirements.pm
-%exclude %{_mandir}/man3/CPAN::Meta::Requirements.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -4675,11 +5310,6 @@ done
 %dir %{privlib}/CPAN/Meta
 %{privlib}/CPAN/Meta/YAML.pm
 %{_mandir}/man3/CPAN::Meta::YAML*
-%else
-%exclude %dir %{privlib}/CPAN
-%exclude %dir %{privlib}/CPAN/Meta
-%exclude %{privlib}/CPAN/Meta/YAML.pm
-%exclude %{_mandir}/man3/CPAN::Meta::YAML*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -4690,13 +5320,6 @@ done
 %dir %{archlib}/Data
 %{archlib}/Data/Dumper.pm
 %{_mandir}/man3/Data::Dumper.3*
-%else
-%exclude %dir %{archlib}/auto/Data
-%exclude %dir %{archlib}/auto/Data/Dumper
-%exclude %{archlib}/auto/Data/Dumper/Dumper.so
-%exclude %dir %{archlib}/Data
-%exclude %{archlib}/Data/Dumper.pm
-%exclude %{_mandir}/man3/Data::Dumper.3*
 %endif
 
 %files DBM_Filter
@@ -4730,9 +5353,6 @@ done
 %dir %{archlib}/Devel
 %{archlib}/Devel/PPPort.pm
 %{_mandir}/man3/Devel::PPPort.3*
-%else
-%exclude %{archlib}/Devel/PPPort.pm
-%exclude %{_mandir}/man3/Devel::PPPort.3*
 %endif
 
 %files Devel-SelfStubber
@@ -4758,14 +5378,6 @@ done
 %{_mandir}/man3/Digest.3*
 %{_mandir}/man3/Digest::base.3*
 %{_mandir}/man3/Digest::file.3*
-%else
-%exclude %{privlib}/Digest.pm
-%exclude %dir %{privlib}/Digest
-%exclude %{privlib}/Digest/base.pm
-%exclude %{privlib}/Digest/file.pm
-%exclude %{_mandir}/man3/Digest.3*
-%exclude %{_mandir}/man3/Digest::base.3*
-%exclude %{_mandir}/man3/Digest::file.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -4775,12 +5387,6 @@ done
 %dir %{archlib}/auto/Digest
 %{archlib}/auto/Digest/MD5
 %{_mandir}/man3/Digest::MD5.3*
-%else
-%exclude %dir %{archlib}/Digest
-%exclude %{archlib}/Digest/MD5.pm
-%exclude %dir %{archlib}/auto/Digest
-%exclude %{archlib}/auto/Digest/MD5
-%exclude %{_mandir}/man3/Digest::MD5.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -4792,14 +5398,6 @@ done
 %{archlib}/auto/Digest/SHA
 %{_mandir}/man1/shasum.1*
 %{_mandir}/man3/Digest::SHA.3*
-%else
-%exclude %{_bindir}/shasum
-%exclude %dir %{archlib}/Digest
-%exclude %{archlib}/Digest/SHA.pm
-%exclude %dir %{archlib}/auto/Digest
-%exclude %{archlib}/auto/Digest/SHA
-%exclude %{_mandir}/man1/shasum.1*
-%exclude %{_mandir}/man3/Digest::SHA.3*
 %endif
 
 %files DirHandle
@@ -4831,6 +5429,7 @@ done
 %{privlib}/pod/perldebtut.pod
 %{privlib}/pod/perldelta.pod
 %{privlib}/pod/perldeprecation.pod
+%{privlib}/pod/perldocstyle.pod
 %{privlib}/pod/perldos.pod
 %{privlib}/pod/perldsc.pod
 %{privlib}/pod/perldtrace.pod
@@ -4842,6 +5441,7 @@ done
 %{privlib}/pod/perlfreebsd.pod
 %{privlib}/pod/perlfunc.pod
 %{privlib}/pod/perlgit.pod
+%{privlib}/pod/perlgov.pod
 %{privlib}/pod/perlgpl.pod
 %{privlib}/pod/perlguts.pod
 %{privlib}/pod/perlhack.pod
@@ -4903,11 +5503,11 @@ done
 %{privlib}/pod/perlretut.pod
 %{privlib}/pod/perlriscos.pod
 %{privlib}/pod/perlsec.pod
+%{privlib}/pod/perlsecpolicy.pod
 %{privlib}/pod/perlsolaris.pod
 %{privlib}/pod/perlsource.pod
 %{privlib}/pod/perlstyle.pod
 %{privlib}/pod/perlsub.pod
-%{privlib}/pod/perlsymbian.pod
 %{privlib}/pod/perlsyn.pod
 %{privlib}/pod/perlsynology.pod
 %{privlib}/pod/perlthrtut.pod
@@ -4952,6 +5552,7 @@ done
 %{_mandir}/man1/perldebtut.*
 %{_mandir}/man1/perldelta.*
 %{_mandir}/man1/perldeprecation.*
+%{_mandir}/man1/perldocstyle.*
 %{_mandir}/man1/perldos.*
 %{_mandir}/man1/perldsc.*
 %{_mandir}/man1/perldtrace.*
@@ -4963,6 +5564,7 @@ done
 %{_mandir}/man1/perlfreebsd.*
 %{_mandir}/man1/perlfunc.*
 %{_mandir}/man1/perlgit.*
+%{_mandir}/man1/perlgov.*
 %{_mandir}/man1/perlgpl.*
 %{_mandir}/man1/perlguts.*
 %{_mandir}/man1/perlhack.*
@@ -5024,11 +5626,11 @@ done
 %{_mandir}/man1/perlretut.*
 %{_mandir}/man1/perlriscos.*
 %{_mandir}/man1/perlsec.*
+%{_mandir}/man1/perlsecpolicy.*
 %{_mandir}/man1/perlsolaris.*
 %{_mandir}/man1/perlsource.*
 %{_mandir}/man1/perlstyle.*
 %{_mandir}/man1/perlsub.*
-%{_mandir}/man1/perlsymbian.*
 %{_mandir}/man1/perlsyn.*
 %{_mandir}/man1/perlsynology.*
 %{_mandir}/man1/perlthrtut.*
@@ -5071,24 +5673,12 @@ done
 %{_mandir}/man1/encguess.1*
 %{_mandir}/man1/piconv.1*
 %{_mandir}/man3/Encode*.3*
-%else
-%exclude %{_bindir}/encguess
-%exclude %{_bindir}/piconv
-%exclude %{archlib}/Encode*
-%exclude %{archlib}/auto/Encode*
-%exclude %{privlib}/Encode
-%exclude %{_mandir}/man1/encguess.1*
-%exclude %{_mandir}/man1/piconv.1*
-%exclude %{_mandir}/man3/Encode*.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files encoding
 %{archlib}/encoding.pm
 %{_mandir}/man3/encoding.3*
-%else
-%exclude %{archlib}/encoding.pm
-%exclude %{_mandir}/man3/encoding.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5098,12 +5688,6 @@ done
 %{privlib}/Encode/*.e2x
 %{privlib}/Encode/encode.h
 %{_mandir}/man1/enc2xs.1*
-%else
-%exclude %{_bindir}/enc2xs
-%exclude %dir %{privlib}/Encode
-%exclude %{privlib}/Encode/*.e2x
-%exclude %{privlib}/Encode/encode.h
-%exclude %{_mandir}/man1/enc2xs.1*
 %endif
 
 %files encoding-warnings
@@ -5119,9 +5703,6 @@ done
 %files Env
 %{privlib}/Env.pm
 %{_mandir}/man3/Env.3*
-%else
-%exclude %{privlib}/Env.pm
-%exclude %{_mandir}/man3/Env.3*
 %endif
 
 %files Errno
@@ -5132,18 +5713,12 @@ done
 %files Exporter
 %{privlib}/Exporter*
 %{_mandir}/man3/Exporter*
-%else
-%exclude %{privlib}/Exporter*
-%exclude %{_mandir}/man3/Exporter*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files experimental
 %{privlib}/experimental*
 %{_mandir}/man3/experimental*
-%else
-%exclude %{privlib}/experimental*
-%exclude %{_mandir}/man3/experimental*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5152,13 +5727,10 @@ done
 %{privlib}/ExtUtils/CBuilder
 %{privlib}/ExtUtils/CBuilder.pm
 %{_mandir}/man3/ExtUtils::CBuilder*
-%else
-%exclude %{privlib}/ExtUtils/CBuilder
-%exclude %{privlib}/ExtUtils/CBuilder.pm
-%exclude %{_mandir}/man3/ExtUtils::CBuilder*
 %endif
 
 %files ExtUtils-Constant
+%dir %{privlib}/ExtUtils
 %{privlib}/ExtUtils/Constant
 %{privlib}/ExtUtils/Constant.pm
 %{_mandir}/man3/ExtUtils::Constant::*
@@ -5169,9 +5741,6 @@ done
 %dir %{privlib}/ExtUtils
 %{privlib}/ExtUtils/Command.pm
 %{_mandir}/man3/ExtUtils::Command.*
-%else
-%exclude %{privlib}/ExtUtils/Command.pm
-%exclude %{_mandir}/man3/ExtUtils::Command.*
 %endif
 
 %files ExtUtils-Embed
@@ -5188,13 +5757,6 @@ done
 %{_mandir}/man3/ExtUtils::Install.3*
 %{_mandir}/man3/ExtUtils::Installed.3*
 %{_mandir}/man3/ExtUtils::Packlist.3*
-%else
-%exclude %{privlib}/ExtUtils/Install.pm
-%exclude %{privlib}/ExtUtils/Installed.pm
-%exclude %{privlib}/ExtUtils/Packlist.pm
-%exclude %{_mandir}/man3/ExtUtils::Install.3*
-%exclude %{_mandir}/man3/ExtUtils::Installed.3*
-%exclude %{_mandir}/man3/ExtUtils::Packlist.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5203,10 +5765,6 @@ done
 %{privlib}/ExtUtils/Manifest.pm
 %{privlib}/ExtUtils/MANIFEST.SKIP
 %{_mandir}/man3/ExtUtils::Manifest.3*
-%else
-%exclude %{privlib}/ExtUtils/Manifest.pm
-%exclude %{privlib}/ExtUtils/MANIFEST.SKIP
-%exclude %{_mandir}/man3/ExtUtils::Manifest.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5234,29 +5792,6 @@ done
 %{_mandir}/man3/ExtUtils::Mkbootstrap.3*
 %{_mandir}/man3/ExtUtils::Mksymlists.3*
 %{_mandir}/man3/ExtUtils::testlib.3*
-%else
-%exclude %{_bindir}/instmodsh
-%exclude %{privlib}/ExtUtils/Command
-%exclude %{privlib}/ExtUtils/Liblist
-%exclude %{privlib}/ExtUtils/Liblist.pm
-%exclude %{privlib}/ExtUtils/MakeMaker
-%exclude %{privlib}/ExtUtils/MakeMaker.pm
-%exclude %{privlib}/ExtUtils/MM.pm
-%exclude %{privlib}/ExtUtils/MM_*.pm
-%exclude %{privlib}/ExtUtils/MY.pm
-%exclude %{privlib}/ExtUtils/Mkbootstrap.pm
-%exclude %{privlib}/ExtUtils/Mksymlists.pm
-%exclude %{privlib}/ExtUtils/testlib.pm
-%exclude %{_mandir}/man1/instmodsh.1*
-%exclude %{_mandir}/man3/ExtUtils::Command::MM*
-%exclude %{_mandir}/man3/ExtUtils::Liblist.3*
-%exclude %{_mandir}/man3/ExtUtils::MM.3*
-%exclude %{_mandir}/man3/ExtUtils::MM_*
-%exclude %{_mandir}/man3/ExtUtils::MY.3*
-%exclude %{_mandir}/man3/ExtUtils::MakeMaker*
-%exclude %{_mandir}/man3/ExtUtils::Mkbootstrap.3*
-%exclude %{_mandir}/man3/ExtUtils::Mksymlists.3*
-%exclude %{_mandir}/man3/ExtUtils::testlib.3*
 %endif
 
 %files ExtUtils-Miniperl
@@ -5270,10 +5805,6 @@ done
 %dir %{privlib}/ExtUtils/MM
 %{privlib}/ExtUtils/MM/Utils.pm
 %{_mandir}/man3/ExtUtils::MM::Utils.*
-%else
-%exclude %dir %{privlib}/ExtUtils/MM
-%exclude %{privlib}/ExtUtils/MM/Utils.pm
-%exclude %{_mandir}/man3/ExtUtils::MM::Utils.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5309,36 +5840,6 @@ done
 %{_mandir}/man3/ExtUtils::Typemaps::InputMap.3*
 %{_mandir}/man3/ExtUtils::Typemaps::OutputMap.3*
 %{_mandir}/man3/ExtUtils::Typemaps::Type.3*
-%else
-%exclude %dir %{privlib}/ExtUtils/ParseXS
-%exclude %{privlib}/ExtUtils/ParseXS.pm
-%exclude %{privlib}/ExtUtils/ParseXS.pod
-%exclude %{privlib}/ExtUtils/ParseXS/Constants.pm
-%exclude %{privlib}/ExtUtils/ParseXS/CountLines.pm
-%exclude %{privlib}/ExtUtils/ParseXS/Eval.pm
-%exclude %{privlib}/ExtUtils/ParseXS/Utilities.pm
-%exclude %dir %{privlib}/ExtUtils/Typemaps
-%exclude %{privlib}/ExtUtils/Typemaps.pm
-%exclude %{privlib}/ExtUtils/Typemaps/Cmd.pm
-%exclude %{privlib}/ExtUtils/Typemaps/InputMap.pm
-%exclude %{privlib}/ExtUtils/Typemaps/OutputMap.pm
-%exclude %{privlib}/ExtUtils/Typemaps/Type.pm
-%exclude %{privlib}/ExtUtils/xsubpp
-%exclude %{privlib}/pod/perlxs.pod
-%exclude %{privlib}/pod/perlxstut.pod
-%exclude %{privlib}/pod/perlxstypemap.pod
-%exclude %{_bindir}/xsubpp
-%exclude %{_mandir}/man1/perlxs*
-%exclude %{_mandir}/man1/xsubpp*
-%exclude %{_mandir}/man3/ExtUtils::ParseXS.3*
-%exclude %{_mandir}/man3/ExtUtils::ParseXS::Constants.3*
-%exclude %{_mandir}/man3/ExtUtils::ParseXS::Eval.3*
-%exclude %{_mandir}/man3/ExtUtils::ParseXS::Utilities.3*
-%exclude %{_mandir}/man3/ExtUtils::Typemaps.3*
-%exclude %{_mandir}/man3/ExtUtils::Typemaps::Cmd.3*
-%exclude %{_mandir}/man3/ExtUtils::Typemaps::InputMap.3*
-%exclude %{_mandir}/man3/ExtUtils::Typemaps::OutputMap.3*
-%exclude %{_mandir}/man3/ExtUtils::Typemaps::Type.3*
 %endif
 
 %files Fcntl
@@ -5377,9 +5878,6 @@ done
 %dir %{privlib}/File
 %{privlib}/File/Fetch.pm
 %{_mandir}/man3/File::Fetch.3*
-%else
-%exclude %{privlib}/File/Fetch.pm
-%exclude %{_mandir}/man3/File::Fetch.3*
 %endif
 
 %files File-Find
@@ -5392,9 +5890,6 @@ done
 %dir %{privlib}/File
 %{privlib}/File/Path.pm
 %{_mandir}/man3/File::Path.3*
-%else
-%exclude %{privlib}/File/Path.pm
-%exclude %{_mandir}/man3/File::Path.3*
 %endif
 
 %files File-stat
@@ -5407,10 +5902,6 @@ done
 %dir %{privlib}/File
 %{privlib}/File/Temp.pm
 %{_mandir}/man3/File::Temp.3*
-%else
-%dir %exclude %{privlib}/File
-%exclude %{privlib}/File/Temp.pm
-%exclude %{_mandir}/man3/File::Temp.3*
 %endif
 
 %files FileCache
@@ -5434,14 +5925,6 @@ done
 %{privlib}/pod/perlfilter.pod
 %{_mandir}/man1/perlfilter.*
 %{_mandir}/man3/Filter::Util::*
-%else
-%exclude %dir %{archlib}/auto/Filter
-%exclude %{archlib}/auto/Filter/Util
-%exclude %dir %{archlib}/Filter
-%exclude %{archlib}/Filter/Util
-%exclude %{privlib}/pod/perlfilter.pod
-%exclude %{_mandir}/man1/perlfilter.*
-%exclude %{_mandir}/man3/Filter::Util::*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5449,29 +5932,24 @@ done
 %dir %{privlib}/Filter
 %{privlib}/Filter/Simple.pm
 %{_mandir}/man3/Filter::Simple.3*
-%else
-%exclude %dir %{privlib}/Filter
-%exclude %{privlib}/Filter/Simple.pm
-%exclude %{_mandir}/man3/Filter::Simple.3*
 %endif
 
 %files FindBin
 %{privlib}/FindBin.pm
 %{_mandir}/man3/FindBin.*
 
+%if %{with gdbm}
 %files GDBM_File
 %{archlib}/GDBM_File.pm
 %{archlib}/auto/GDBM_File
 %{_mandir}/man3/GDBM_File.3*
+%endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files Getopt-Long
 %dir %{privlib}/Getopt
 %{privlib}/Getopt/Long.pm
 %{_mandir}/man3/Getopt::Long.3*
-%else
-%exclude %{privlib}/Getopt/Long.pm
-%exclude %{_mandir}/man3/Getopt::Long.3*
 %endif
 
 %files Getopt-Std
@@ -5583,63 +6061,6 @@ done
 %{_mandir}/man3/IO::Uncompress::Inflate*
 %{_mandir}/man3/IO::Uncompress::RawInflate*
 %{_mandir}/man3/IO::Uncompress::Unzip*
-%else
-%exclude %{_bindir}/streamzip
-%exclude %{_bindir}/zipdetails
-%exclude %dir %{privlib}/IO
-%exclude %dir %{privlib}/IO/Compress
-%exclude %{privlib}/IO/Compress/FAQ.pod
-%exclude %{_mandir}/man1/streamzip.*
-%exclude %{_mandir}/man1/zipdetails.*
-%exclude %{_mandir}/man3/IO::Compress::FAQ.*
-# Compress-Zlib
-%exclude %dir %{privlib}/Compress
-%exclude %{privlib}/Compress/Zlib.pm
-%exclude %{_mandir}/man3/Compress::Zlib*
-# IO-Compress-Base
-%exclude %{privlib}/File/GlobMapper.pm
-%exclude %dir %{privlib}/IO
-%exclude %dir %{privlib}/IO/Compress
-%exclude %{privlib}/IO/Compress/Base
-%exclude %{privlib}/IO/Compress/Base.pm
-%exclude %dir %{privlib}/IO/Uncompress
-%exclude %{privlib}/IO/Uncompress/AnyUncompress.pm
-%exclude %{privlib}/IO/Uncompress/Base.pm
-%exclude %{_mandir}/man3/File::GlobMapper.*
-%exclude %{_mandir}/man3/IO::Compress::Base.*
-%exclude %{_mandir}/man3/IO::Uncompress::AnyUncompress.*
-%exclude %{_mandir}/man3/IO::Uncompress::Base.*
-# IO-Compress-Zlib
-%exclude %dir %{privlib}/IO
-%exclude %dir %{privlib}/IO/Compress
-%exclude %{privlib}/IO/Compress/Adapter
-%exclude %{privlib}/IO/Compress/Deflate.pm
-%exclude %{privlib}/IO/Compress/Gzip
-%exclude %{privlib}/IO/Compress/Gzip.pm
-%exclude %{privlib}/IO/Compress/RawDeflate.pm
-%exclude %{privlib}/IO/Compress/Bzip2.pm
-%exclude %{privlib}/IO/Compress/Zip
-%exclude %{privlib}/IO/Compress/Zip.pm
-%exclude %{privlib}/IO/Compress/Zlib
-%exclude %dir %{privlib}/IO/Uncompress
-%exclude %{privlib}/IO/Uncompress/Adapter
-%exclude %{privlib}/IO/Uncompress/AnyInflate.pm
-%exclude %{privlib}/IO/Uncompress/Bunzip2.pm
-%exclude %{privlib}/IO/Uncompress/Gunzip.pm
-%exclude %{privlib}/IO/Uncompress/Inflate.pm
-%exclude %{privlib}/IO/Uncompress/RawInflate.pm
-%exclude %{privlib}/IO/Uncompress/Unzip.pm
-%exclude %{_mandir}/man3/IO::Compress::Deflate*
-%exclude %{_mandir}/man3/IO::Compress::Bzip2*
-%exclude %{_mandir}/man3/IO::Compress::Gzip*
-%exclude %{_mandir}/man3/IO::Compress::RawDeflate*
-%exclude %{_mandir}/man3/IO::Compress::Zip*
-%exclude %{_mandir}/man3/IO::Uncompress::AnyInflate*
-%exclude %{_mandir}/man3/IO::Uncompress::Bunzip2*
-%exclude %{_mandir}/man3/IO::Uncompress::Gunzip*
-%exclude %{_mandir}/man3/IO::Uncompress::Inflate*
-%exclude %{_mandir}/man3/IO::Uncompress::RawInflate*
-%exclude %{_mandir}/man3/IO::Uncompress::Unzip*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5648,27 +6069,20 @@ done
 %dir %{privlib}/IO/Socket
 %{privlib}/IO/Socket/IP.pm
 %{_mandir}/man3/IO::Socket::IP.*
-%else
-%exclude %dir %{privlib}/IO
-%exclude %dir %{privlib}/IO/Socket
-%exclude %{privlib}/IO/Socket/IP.pm
-%exclude %{_mandir}/man3/IO::Socket::IP.*
 %endif
 
+%if %{dual_life} || %{rebuild_from_scratch}
 %files IO-Zlib
 %dir %{privlib}/IO
 %{privlib}/IO/Zlib.pm
 %{_mandir}/man3/IO::Zlib.*
+%endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files HTTP-Tiny
 %dir %{privlib}/HTTP
 %{privlib}/HTTP/Tiny.pm
 %{_mandir}/man3/HTTP::Tiny*
-%else
-%exclude %dir %{privlib}/HTTP
-%exclude %{privlib}/HTTP/Tiny.pm
-%exclude %{_mandir}/man3/HTTP::Tiny*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5676,9 +6090,6 @@ done
 %dir %{privlib}/IPC
 %{privlib}/IPC/Cmd.pm
 %{_mandir}/man3/IPC::Cmd.3*
-%else
-%exclude %{privlib}/IPC/Cmd.pm
-%exclude %{_mandir}/man3/IPC::Cmd.3*
 %endif
 
 %files IPC-Open3
@@ -5700,17 +6111,6 @@ done
 %{_mandir}/man3/IPC::Semaphore.*
 %{_mandir}/man3/IPC::SharedMem.*
 %{_mandir}/man3/IPC::SysV.*
-%else
-%exclude %{archlib}/auto/IPC
-%exclude %dir %{archlib}/IPC
-%exclude %{archlib}/IPC/Msg.pm
-%exclude %{archlib}/IPC/Semaphore.pm
-%exclude %{archlib}/IPC/SharedMem.pm
-%exclude %{archlib}/IPC/SysV.pm
-%exclude %{_mandir}/man3/IPC::Msg.*
-%exclude %{_mandir}/man3/IPC::Semaphore.*
-%exclude %{_mandir}/man3/IPC::SharedMem.*
-%exclude %{_mandir}/man3/IPC::SysV.*
 %endif
 
 %files I18N-Collate
@@ -5739,14 +6139,6 @@ done
 %{_mandir}/man1/json_pp.1*
 %{_mandir}/man3/JSON::PP.3*
 %{_mandir}/man3/JSON::PP::Boolean.3pm*
-%else
-%exclude %{_bindir}/json_pp
-%exclude %dir %{privlib}/JSON
-%exclude %{privlib}/JSON/PP
-%exclude %{privlib}/JSON/PP.pm
-%exclude %{_mandir}/man1/json_pp.1*
-%exclude %{_mandir}/man3/JSON::PP.3*
-%exclude %{_mandir}/man3/JSON::PP::Boolean.3pm*
 %endif
 
 %files less
@@ -5781,28 +6173,6 @@ done
 %{_mandir}/man3/Net::POP3.*
 %{_mandir}/man3/Net::SMTP.*
 %{_mandir}/man3/Net::Time.*
-%else
-%exclude %{privlib}/Net/Cmd.pm
-%exclude %{privlib}/Net/Config.pm
-%exclude %{privlib}/Net/Domain.pm
-%exclude %{privlib}/Net/FTP
-%exclude %{privlib}/Net/FTP.pm
-%exclude %{privlib}/Net/libnetFAQ.pod
-%exclude %{privlib}/Net/NNTP.pm
-%exclude %{privlib}/Net/Netrc.pm
-%exclude %{privlib}/Net/POP3.pm
-%exclude %{privlib}/Net/SMTP.pm
-%exclude %{privlib}/Net/Time.pm
-%exclude %{_mandir}/man3/Net::Cmd.*
-%exclude %{_mandir}/man3/Net::Config.*
-%exclude %{_mandir}/man3/Net::Domain.*
-%exclude %{_mandir}/man3/Net::FTP.*
-%exclude %{_mandir}/man3/Net::libnetFAQ.*
-%exclude %{_mandir}/man3/Net::NNTP.*
-%exclude %{_mandir}/man3/Net::Netrc.*
-%exclude %{_mandir}/man3/Net::POP3.*
-%exclude %{_mandir}/man3/Net::SMTP.*
-%exclude %{_mandir}/man3/Net::Time.*
 %endif
 
 %files libnetcfg
@@ -5827,19 +6197,6 @@ done
 %{_mandir}/man3/Locale::Maketext::Guts.*
 %{_mandir}/man3/Locale::Maketext::GutsLoader.*
 %{_mandir}/man3/Locale::Maketext::TPJ13.*
-%else
-%exclude %dir %{privlib}/Locale
-%exclude %dir %{privlib}/Locale/Maketext
-%exclude %{privlib}/Locale/Maketext.*
-%exclude %{privlib}/Locale/Maketext/Cookbook.*
-%exclude %{privlib}/Locale/Maketext/Guts.*
-%exclude %{privlib}/Locale/Maketext/GutsLoader.*
-%exclude %{privlib}/Locale/Maketext/TPJ13.*
-%exclude %{_mandir}/man3/Locale::Maketext.*
-%exclude %{_mandir}/man3/Locale::Maketext::Cookbook.*
-%exclude %{_mandir}/man3/Locale::Maketext::Guts.*
-%exclude %{_mandir}/man3/Locale::Maketext::GutsLoader.*
-%exclude %{_mandir}/man3/Locale::Maketext::TPJ13.*
 %endif
 
 %files Locale-Maketext-Simple
@@ -5860,16 +6217,6 @@ done
 %{_mandir}/man3/Math::BigInt.*
 %{_mandir}/man3/Math::BigInt::Calc.*
 %{_mandir}/man3/Math::BigInt::Lib.*
-%else
-%exclude %{privlib}/Math/BigFloat.pm
-%exclude %{privlib}/Math/BigInt.pm
-%exclude %dir %exclude %{privlib}/Math/BigInt
-%exclude %{privlib}/Math/BigInt/Calc.pm
-%exclude %{privlib}/Math/BigInt/Lib.pm
-%exclude %{_mandir}/man3/Math::BigFloat.*
-%exclude %{_mandir}/man3/Math::BigInt.*
-%exclude %{_mandir}/man3/Math::BigInt::Calc.*
-%exclude %{_mandir}/man3/Math::BigInt::Lib.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5877,10 +6224,6 @@ done
 %{archlib}/Math
 %{archlib}/auto/Math
 %{_mandir}/man3/Math::BigInt::FastCalc.*
-%else
-%exclude %{archlib}/Math
-%exclude %{archlib}/auto/Math
-%exclude %{_mandir}/man3/Math::BigInt::FastCalc.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5888,9 +6231,6 @@ done
 %dir %{privlib}/Math
 %{privlib}/Math/BigRat.pm
 %{_mandir}/man3/Math::BigRat.*
-%else
-%exclude %{privlib}/Math/BigRat.pm
-%exclude %{_mandir}/man3/Math::BigRat.*
 %endif
 
 %files Math-Complex
@@ -5914,10 +6254,6 @@ done
 %{archlib}/auto/MIME
 %{archlib}/MIME
 %{_mandir}/man3/MIME::*
-%else
-%exclude %{archlib}/auto/MIME
-%exclude %{archlib}/MIME
-%exclude %{_mandir}/man3/MIME::*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5927,21 +6263,12 @@ done
 %{privlib}/Module/CoreList.pm
 %{privlib}/Module/CoreList.pod
 %{_mandir}/man3/Module::CoreList*
-%else
-%exclude %dir %{privlib}/Module
-%exclude %{privlib}/Module/CoreList
-%exclude %{privlib}/Module/CoreList.pm
-%exclude %{privlib}/Module/CoreList.pod
-%exclude %{_mandir}/man3/Module::CoreList*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files Module-CoreList-tools
 %{_bindir}/corelist
 %{_mandir}/man1/corelist*
-%else
-%exclude %{_bindir}/corelist
-%exclude %{_mandir}/man1/corelist*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5949,10 +6276,6 @@ done
 %dir %{privlib}/Module
 %{privlib}/Module/Load.pm
 %{_mandir}/man3/Module::Load.*
-%else
-%exclude %dir %{privlib}/Module
-%exclude %{privlib}/Module/Load.pm
-%exclude %{_mandir}/man3/Module::Load.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -5960,10 +6283,6 @@ done
 %dir %{privlib}/Module
 %{privlib}/Module/Load
 %{_mandir}/man3/Module::Load::Conditional* 
-%else
-%exclude %dir %{privlib}/Module
-%exclude %{privlib}/Module/Load
-%exclude %{_mandir}/man3/Module::Load::Conditional*
 %endif
 
 %files Module-Loaded
@@ -5976,10 +6295,6 @@ done
 %dir %{privlib}/Module
 %{privlib}/Module/Metadata.pm
 %{_mandir}/man3/Module::Metadata.3pm*
-%else
-%exclude %dir %{privlib}/Module
-%exclude %{privlib}/Module/Metadata.pm
-%exclude %{_mandir}/man3/Module::Metadata.3pm*
 %endif
 
 %files mro
@@ -5987,10 +6302,12 @@ done
 %{archlib}/mro.pm
 %{_mandir}/man3/mro.3*
 
+%if %{with gdbm}
 %files NDBM_File
 %{archlib}/NDBM_File.pm
 %{archlib}/auto/NDBM_File
 %{_mandir}/man3/NDBM_File.3*
+%endif
 
 %files Net
 %dir %{privlib}/Net
@@ -6003,19 +6320,23 @@ done
 %{_mandir}/man3/Net::protoent.3*
 %{_mandir}/man3/Net::servent.3*
 
+%if %{dual_life} || %{rebuild_from_scratch}
 %files Net-Ping
 %dir %{privlib}/Net
 %{privlib}/Net/Ping.pm
 %{_mandir}/man3/Net::Ping.*
+%endif
 
 %files NEXT
 %{privlib}/NEXT.pm
 %{_mandir}/man3/NEXT.*
 
+%if %{with gdbm}
 %files ODBM_File
 %{archlib}/ODBM_File.pm
 %{archlib}/auto/ODBM_File
 %{_mandir}/man3/ODBM_File.3*
+%endif
 
 %files open
 %{privlib}/open.pm
@@ -6042,18 +6363,12 @@ done
 %files parent
 %{privlib}/parent.pm
 %{_mandir}/man3/parent.3*
-%else
-%exclude %{privlib}/parent.pm
-%exclude %{_mandir}/man3/parent.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files Params-Check
 %{privlib}/Params/
 %{_mandir}/man3/Params::Check*
-%else
-%exclude %{privlib}/Params/
-%exclude %{_mandir}/man3/Params::Check*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6064,12 +6379,6 @@ done
 %{archlib}/auto/Cwd
 %{_mandir}/man3/Cwd*
 %{_mandir}/man3/File::Spec*
-%else
-%exclude %{archlib}/Cwd.pm
-%exclude %{archlib}/File/Spec*
-%exclude %{archlib}/auto/Cwd/
-%exclude %{_mandir}/man3/Cwd*
-%exclude %{_mandir}/man3/File::Spec*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6077,10 +6386,6 @@ done
 %dir %{privlib}/Perl
 %{privlib}/Perl/OSType.pm
 %{_mandir}/man3/Perl::OSType.3pm*
-%else
-%exclude %dir %{privlib}/Perl
-%exclude %{privlib}/Perl/OSType.pm
-%exclude %{_mandir}/man3/Perl::OSType.3pm*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6091,28 +6396,19 @@ done
 %{privlib}/pod/perlglossary.pod
 %{_mandir}/man1/perlfaq*
 %{_mandir}/man1/perlglossary.*
-%else
-%exclude %{privlib}/perlfaq.pm
-%exclude %{privlib}/pod/perlfaq*
-%exclude %{privlib}/pod/perlglossary.pod
-%exclude %{_mandir}/man1/perlfaq*
-%exclude %{_mandir}/man1/perlglossary.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
 %files PerlIO-via-QuotedPrint
 %{privlib}/PerlIO
 %{_mandir}/man3/PerlIO::via::QuotedPrint.*
-%else
-%exclude %{privlib}/PerlIO
-%exclude %{_mandir}/man3/PerlIO::via::QuotedPrint.*
 %endif
 
 %files ph
 %{archlib}/asm
 %{archlib}/asm-generic
 %{archlib}/bits
-%{archlib}/features.ph
+%{archlib}/features*.ph
 %{archlib}/gnu
 %{archlib}/_h2ph_pre.ph
 %ifnarch ppc64le
@@ -6129,11 +6425,6 @@ done
 %{privlib}/Pod/Checker.pm
 %{_mandir}/man1/podchecker.*
 %{_mandir}/man3/Pod::Checker.*
-%else
-%exclude %{_bindir}/podchecker
-%exclude %{privlib}/Pod/Checker.pm
-%exclude %{_mandir}/man1/podchecker.*
-%exclude %{_mandir}/man3/Pod::Checker.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6141,9 +6432,6 @@ done
 %dir %{privlib}/Pod
 %{privlib}/Pod/Escapes.pm
 %{_mandir}/man3/Pod::Escapes.*
-%else
-%exclude %{privlib}/Pod/Escapes.pm
-%exclude %{_mandir}/man3/Pod::Escapes.*
 %endif
 
 %files Pod-Functions
@@ -6167,13 +6455,6 @@ done
 %{privlib}/Pod/Perldoc.pm
 %{_mandir}/man1/perldoc.1*
 %{_mandir}/man3/Pod::Perldoc*
-%else
-%exclude %{_bindir}/perldoc
-%exclude %{privlib}/pod/perldoc.pod
-%exclude %{privlib}/Pod/Perldoc.pm
-%exclude %{privlib}/Pod/Perldoc/
-%exclude %{_mandir}/man1/perldoc.1*
-%exclude %{_mandir}/man3/Pod::Perldoc*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6183,12 +6464,6 @@ done
 %{privlib}/Pod/Usage.pm
 %{_mandir}/man1/pod2usage.*
 %{_mandir}/man3/Pod::Usage.*
-%else
-%exclude %{_bindir}/pod2usage
-%exclude %dir %{privlib}/Pod
-%exclude %{privlib}/Pod/Usage.pm
-%exclude %{_mandir}/man1/pod2usage.*
-%exclude %{_mandir}/man3/Pod::Usage.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6207,20 +6482,6 @@ done
 %{_mandir}/man3/Pod::Man*
 %{_mandir}/man3/Pod::ParseLink*
 %{_mandir}/man3/Pod::Text*
-%else
-%exclude %{_bindir}/pod2man
-%exclude %{_bindir}/pod2text
-%exclude %{privlib}/pod/perlpodstyle.pod
-%exclude %{privlib}/Pod/Man.pm
-%exclude %{privlib}/Pod/ParseLink.pm
-%exclude %{privlib}/Pod/Text
-%exclude %{privlib}/Pod/Text.pm
-%exclude %{_mandir}/man1/pod2man.1*
-%exclude %{_mandir}/man1/pod2text.1*
-%exclude %{_mandir}/man1/perlpodstyle.1*
-%exclude %{_mandir}/man3/Pod::Man*
-%exclude %{_mandir}/man3/Pod::ParseLink*
-%exclude %{_mandir}/man3/Pod::Text*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6230,11 +6491,6 @@ done
 %{privlib}/Pod/Simple.pm
 %{privlib}/Pod/Simple.pod
 %{_mandir}/man3/Pod::Simple*
-%else
-%exclude %{privlib}/Pod/Simple/
-%exclude %{privlib}/Pod/Simple.pm
-%exclude %{privlib}/Pod/Simple.pod
-%exclude %{_mandir}/man3/Pod::Simple*
 %endif
 
 %files POSIX
@@ -6255,14 +6511,6 @@ done
 %{_mandir}/man3/List::Util*
 %{_mandir}/man3/Scalar::Util*
 %{_mandir}/man3/Sub::Util*
-%else
-%exclude %{archlib}/List/
-%exclude %{archlib}/Scalar/
-%exclude %{archlib}/Sub/
-%exclude %{archlib}/auto/List/
-%exclude %{_mandir}/man3/List::Util*
-%exclude %{_mandir}/man3/Scalar::Util*
-%exclude %{_mandir}/man3/Sub::Util*
 %endif
 
 %files Search-Dict
@@ -6287,11 +6535,6 @@ done
 %{archlib}/auto/Socket/Socket.*
 %{archlib}/Socket.pm
 %{_mandir}/man3/Socket.3*
-%else
-%exclude %dir %{archlib}/auto/Socket
-%exclude %{archlib}/auto/Socket/Socket.*
-%exclude %{archlib}/Socket.pm
-%exclude %{_mandir}/man3/Socket.3*
 %endif
 
 %files sort
@@ -6303,10 +6546,6 @@ done
 %{archlib}/Storable.pm
 %{archlib}/auto/Storable
 %{_mandir}/man3/Storable.*
-%else
-%exclude %{archlib}/Storable.pm
-%exclude %{archlib}/auto/Storable/
-%exclude %{_mandir}/man3/Storable.*
 %endif
 
 %files subs
@@ -6331,12 +6570,6 @@ done
 %dir %{archlib}/auto/Sys
 %{archlib}/auto/Sys/Syslog
 %{_mandir}/man3/Sys::Syslog.*
-%else
-# %%dir %%{archlib}/Sys not excluded. It would be removed from the previous packagge.
-%exclude %{archlib}/Sys/Syslog.pm
-# %%dir %%{archlib}/auto/Sys not excluded. It would be removed from the previous packagge.
-%exclude %{archlib}/auto/Sys/Syslog/
-%exclude %{_mandir}/man3/Sys::Syslog.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6344,9 +6577,6 @@ done
 %dir %{privlib}/Term
 %{privlib}/Term/ANSIColor.pm
 %{_mandir}/man3/Term::ANSIColor*
-%else
-%exclude %{privlib}/Term/ANSIColor.pm
-%exclude %{_mandir}/man3/Term::ANSIColor*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6354,9 +6584,6 @@ done
 %dir %{privlib}/Term
 %{privlib}/Term/Cap.pm
 %{_mandir}/man3/Term::Cap.*
-%else
-%exclude %{privlib}/Term/Cap.pm
-%exclude %{_mandir}/man3/Term::Cap.*
 %endif
 
 %files Term-Complete
@@ -6385,17 +6612,6 @@ done
 %{_mandir}/man3/App::Prove*
 %{_mandir}/man3/TAP*
 %{_mandir}/man3/Test::Harness*
-%else
-%exclude %{_bindir}/prove
-%exclude %dir %{privlib}/App
-%exclude %{privlib}/App/Prove*
-%exclude %{privlib}/TAP*
-%exclude %dir %{privlib}/Test
-%exclude %{privlib}/Test/Harness*
-%exclude %{_mandir}/man1/prove.1*
-%exclude %{_mandir}/man3/App::Prove*
-%exclude %{_mandir}/man3/TAP*
-%exclude %{_mandir}/man3/Test::Harness*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6417,24 +6633,6 @@ done
 %{_mandir}/man3/Test::Tutorial*
 %{_mandir}/man3/Test::use::*
 %{_mandir}/man3/Test2*
-%else
-%exclude %{privlib}/ok*
-%exclude %dir %{privlib}/Test
-%exclude %{privlib}/Test/More*
-%exclude %{privlib}/Test/Builder*
-%exclude %{privlib}/Test/Tester*
-%exclude %{privlib}/Test/Simple*
-%exclude %{privlib}/Test/Tutorial*
-%exclude %{privlib}/Test/use
-%exclude %{privlib}/Test2*
-%exclude %{_mandir}/man3/ok*
-%exclude %{_mandir}/man3/Test::More*
-%exclude %{_mandir}/man3/Test::Builder*
-%exclude %{_mandir}/man3/Test::Tester*
-%exclude %{_mandir}/man3/Test::Simple*
-%exclude %{_mandir}/man3/Test::Tutorial*
-%exclude %{_mandir}/man3/Test::use::*
-%exclude %{_mandir}/man3/Test2*
 %endif
 
 %files Text-Abbrev
@@ -6447,9 +6645,6 @@ done
 %dir %{privlib}/Text
 %{privlib}/Text/Balanced.pm
 %{_mandir}/man3/Text::Balanced.*
-%else
-%exclude %{privlib}/Text/Balanced.pm
-%exclude %{_mandir}/man3/Text::Balanced.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6457,9 +6652,6 @@ done
 %dir %{privlib}/Text
 %{privlib}/Text/ParseWords.pm
 %{_mandir}/man3/Text::ParseWords.*
-%else
-%exclude %{privlib}/Text/ParseWords.pm
-%exclude %{_mandir}/man3/Text::ParseWords.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6469,12 +6661,6 @@ done
 %{privlib}/Text/Wrap.pm
 %{_mandir}/man3/Text::Tabs.*
 %{_mandir}/man3/Text::Wrap.*
-%else
-%exclude %dir %{privlib}/Text
-%exclude %{privlib}/Text/Tabs.pm
-%exclude %{privlib}/Text/Wrap.pm
-%exclude %{_mandir}/man3/Text::Tabs.*
-%exclude %{_mandir}/man3/Text::Wrap.*
 %endif
 
 %files Thread
@@ -6486,9 +6672,6 @@ done
 %dir %{privlib}/Thread
 %{privlib}/Thread/Queue.pm
 %{_mandir}/man3/Thread::Queue.*
-%else
-%exclude %{privlib}/Thread/Queue.pm
-%exclude %{_mandir}/man3/Thread::Queue.*
 %endif
 
 %files Thread-Semaphore
@@ -6519,10 +6702,12 @@ done
 %{privlib}/Tie/Memoize.pm
 %{_mandir}/man3/Tie::Memoize.*
 
+%if %{dual_life} || %{rebuild_from_scratch}
 %files Tie-RefHash
 %dir %{privlib}/Tie
 %{privlib}/Tie/RefHash.pm
 %{_mandir}/man3/Tie::RefHash.*
+%endif
 
 %files Time
 %dir %{privlib}/Time
@@ -6540,12 +6725,6 @@ done
 %dir %{archlib}/auto/Time
 %{archlib}/auto/Time/HiRes
 %{_mandir}/man3/Time::HiRes.*
-%else
-%exclude %dir %{archlib}/Time
-%exclude %{archlib}/Time/HiRes.pm
-%exclude %dir %{archlib}/auto/Time
-%exclude %{archlib}/auto/Time/HiRes
-%exclude %{_mandir}/man3/Time::HiRes.*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6553,10 +6732,6 @@ done
 %dir %{privlib}/Time
 %{privlib}/Time/Local.pm
 %{_mandir}/man3/Time::Local.*
-%else
-%exclude %dir %{privlib}/Time
-%exclude %{privlib}/Time/Local.pm
-%exclude %{_mandir}/man3/Time::Local.*
 %endif
 
 %files Time-Piece
@@ -6574,11 +6749,6 @@ done
 %{archlib}/auto/threads/threads*
 %{archlib}/threads.pm
 %{_mandir}/man3/threads.3*
-%else
-%dir %exclude %{archlib}/auto/threads
-%exclude %{archlib}/auto/threads/threads*
-%exclude %{archlib}/threads.pm
-%exclude %{_mandir}/man3/threads.3*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6588,11 +6758,6 @@ done
 %dir %{archlib}/threads
 %{archlib}/threads/shared*
 %{_mandir}/man3/threads::shared*
-%else
-%exclude %{archlib}/auto/threads/shared*
-%exclude %dir %{archlib}/threads
-%exclude %{archlib}/threads/shared*
-%exclude %{_mandir}/man3/threads::shared*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6606,15 +6771,6 @@ done
 %{privlib}/Unicode/Collate
 %{_mandir}/man3/Unicode::Collate.*
 %{_mandir}/man3/Unicode::Collate::*
-%else
-%dir %exclude %{archlib}/auto/Unicode
-%exclude %{archlib}/auto/Unicode/Collate
-%dir %exclude %{archlib}/Unicode
-%exclude %{archlib}/Unicode/Collate
-%exclude %{archlib}/Unicode/Collate.pm
-%exclude %{privlib}/Unicode/Collate
-%exclude %{_mandir}/man3/Unicode::Collate.*
-%exclude %{_mandir}/man3/Unicode::Collate::*
 %endif
 
 %if %{dual_life} || %{rebuild_from_scratch}
@@ -6624,10 +6780,6 @@ done
 %dir %{archlib}/Unicode
 %{archlib}/Unicode/Normalize.pm
 %{_mandir}/man3/Unicode::Normalize.*
-%else
-%exclude %{archlib}/auto/Unicode/Normalize
-%exclude %{archlib}/Unicode/Normalize.pm
-%exclude %{_mandir}/man3/Unicode::Normalize.*
 %endif
 
 %files Unicode-UCD
@@ -6650,12 +6802,6 @@ done
 %{privlib}/version/
 %{_mandir}/man3/version.3*
 %{_mandir}/man3/version::Internals.3*
-%else
-%exclude %{privlib}/version.pm
-%exclude %{privlib}/version.pod
-%exclude %{privlib}/version/
-%exclude %{_mandir}/man3/version.3*
-%exclude %{_mandir}/man3/version::Internals.3*
 %endif
 
 %files vmsish
@@ -6664,6 +6810,13 @@ done
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Wed Mar 30 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-487
+- Upgrade to version 5.34.1 referencing Fedora 37 (license: MIT)
+- Removed duplicate requires for perl(:VERSION) from gendep.macros
+- Align Module-CoreList and Module-CoreList-tools to version 5.20220313
+- Switch to bcond_with for perl_enables_groff, perl_enables_turkish_test, perl_enables_systemtap, test
+- Remove unncessary sources and patches
+
 * Fri Jan 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.32.0-465
 - Removed the "perl-DB_File" subpackage.
 - Fixing macro usage.

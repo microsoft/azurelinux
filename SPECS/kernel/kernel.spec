@@ -188,6 +188,10 @@ arch="arm64"
 archdir="arm64"
 %endif
 
+# Add CBL-Mariner cert into kernel's trusted keyring
+cp %{SOURCE4} certs/mariner.pem
+sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
+
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=${arch} oldconfig
@@ -206,9 +210,6 @@ if [ -s config_diff ]; then
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
     exit 1
 fi
-
-# Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
 
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
 
@@ -417,6 +418,13 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Update source to 5.15.32.1
 - Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
   2022-1011, 2022-26490
+
+* Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
+- Add Dell devices support
+
+* Mon Mar 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.26.1-3
+- Remove hardcoded mariner.pem from configs and instead insert during
+  the build phase
 
 * Mon Mar 14 2022 Vince Perri <viperri@microsoft.com> - 5.15.26.1-2
 - Add support for compressed firmware

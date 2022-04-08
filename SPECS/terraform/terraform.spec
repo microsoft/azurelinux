@@ -1,7 +1,7 @@
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.1.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,7 +29,7 @@ Source0:        https://github.com/hashicorp/terraform/archive/refs/tags/v%{vers
 Source1:        %{name}-%{version}-vendor.tar.gz
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
-BuildRequires:  golang >= 1.17.2
+BuildRequires:  golang >= 1.17.1
 
 %description
 Terraform is an infrastructure as code deployment management tool
@@ -57,6 +57,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %{_bindir}/terraform
 
 %changelog
+* Tue Mar 29 2022 Andrew Phelps <anphel@microsoft.com> - 1.1.7-2
+- Build with golang >= 1.17.1
+
 * Wed Mar 23 2022 Matthew Torr <matthewtorr@microsoft.com> - 1.1.7-1
 - Original version for CBL-Mariner.
 - License verified.

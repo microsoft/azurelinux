@@ -1,7 +1,7 @@
 Summary:        RPM Perl dependencies generators
 Name:           perl-generators
 Version:        1.11
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,10 +11,14 @@ Source1:        LICENSE.PTR
 
 BuildRequires:  coreutils
 BuildRequires:  make
-BuildRequires:  perl >= 4:5.22.0-351
+BuildRequires:  perl
 BuildRequires:  sed
+%if %{with_check}
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Test::More)
+%endif
 
-Requires:       perl >= 4:5.22.0-351
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # Per Perl packaging guidelines, build-requiring perl-generators should
 # deliver Perl macros
 %if %{defined perl_bootstrap}
@@ -56,6 +60,12 @@ make test
 %{_rpmconfigdir}/fileattrs/perl*.attr
 
 %changelog
+* Fri Apr 01 2022 Andrew Phelps <anphel@microsoft.com> - 1.11-8
+- Fix perl BR
+
+* Tue Mar 20 2022 Muhammad Falak <mwani@microsoft.com> - 1.11-7
+- Add an explicit BR on `perl{(ExtUtils::MakeMaker), (Test::More)}` to fix ptest build
+
 * Mon Aug 30 2021 Bala <balakumaran.kannan@microsoft.com> - 1.11-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified
