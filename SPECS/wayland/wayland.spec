@@ -1,7 +1,7 @@
 Summary:        Wayland Compositor Infrastructure
 Name:           wayland
 Version:        1.20.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ applications, X servers (rootless or fullscreen) or other display servers.
 
 %package        devel
 Summary:        Development files for %{name}
+Requires:       libffi-devel
 Requires:       libwayland-client%{?_isa} = %{version}-%{release}
 Requires:       libwayland-cursor%{?_isa} = %{version}-%{release}
 Requires:       libwayland-egl%{?_isa} = %{version}-%{release}
@@ -118,6 +119,9 @@ Wayland server library
 %{_libdir}/libwayland-server.so.0*
 
 %changelog
+* Thu Apr 07 2022 Hideyuki Nagase <hideyukn@microsoft.com> - 1.20.0-5
+- Added "Requires: libffi-devel" for devel package.
+
 * Tue Mar 15 2022 Hideyuki Nagase <hideyukn@microsoft.com> - 1.20.0-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
