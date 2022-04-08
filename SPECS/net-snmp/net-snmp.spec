@@ -2,7 +2,7 @@
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
 Version:        5.9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,8 +19,8 @@ BuildRequires:  net-tools
 %endif
 Requires:       systemd
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       %{name}-libs = %{version}-%{release}
 Provides:       %{name}-utils = %{version}-%{release}
-Provides:       %{name}-libs = %{version}-%{release}
 Provides:       %{name}-agent-libs = %{version}-%{release}
 
 %description
@@ -34,17 +34,28 @@ Requires:       %{name} = %{version}
 %description devel
 The net-snmp-devel package contains headers and libraries for building SNMP applications.
 
+%package libs
+Summary: The NET-SNMP runtime client libraries
+ 
+%description libs
+The net-snmp-libs package contains the runtime client libraries for shared
+binaries and applications.
+
 %prep
 %autosetup
 
 %build
+MIBS="ucd-snmp/diskio"
+
 %configure \
     --host=ia64-linux \
     --build=i686 \
     --target=ia64-linux \
     --sbindir=/sbin \
+    --enable-ucd-snmp-compatibility \
     --with-sys-location="unknown" \
     --with-logfile=%{_var}/log/net-snmpd.log \
+    --with-mib-modules="$MIBS" \
     --with-persistent-directory=%{_sharedstatedir}/net-snmp \
     --with-perl-modules="INSTALLDIRS=vendor" \
     --with-sys-contact="root@localhost" \
@@ -61,6 +72,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 mkdir -p %{buildroot}/lib/systemd/system
 install -m 0644 %{SOURCE1} %{buildroot}/lib/systemd/system/snmpd.service
 install -m 0644 %{SOURCE2} %{buildroot}/lib/systemd/system/snmptrapd.service
+
+# prepare /var/lib/net-snmp
+install -d %{buildroot}%{_localstatedir}/lib/net-snmp
+install -d %{buildroot}%{_localstatedir}/lib/net-snmp/mib_indexes
+install -d %{buildroot}%{_localstatedir}/lib/net-snmp/cert_indexes
+install -d %{buildroot}%{_localstatedir}/run/net-snmp
 
 %check
 pushd testing
@@ -92,7 +109,20 @@ popd
 %{_libdir}/*.so
 %exclude %{_libdir}/perl5/perllocal.pod
 
+%files libs
+%doc COPYING README FAQ NEWS TODO
+%{_libdir}/libnetsnmp.so.*
+%{_datadir}/snmp
+%{_datadir}/snmp/mibs
+%{_datadir}/snmp/mibs/*
+%{_localstatedir}/lib/net-snmp
+%{_localstatedir}/lib/net-snmp/mib_indexes
+%{_localstatedir}/lib/net-snmp/cert_indexes
+
 %changelog
+* Fri Apr 7 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-2
+- Add net-snmp-lib subpackage and UCD-SNMP
+
 * Fri Mar 4 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-1
 - Upgrade to version 5.9.1
 - Removing the lines that enables snmpd and snmptrapd services by default
