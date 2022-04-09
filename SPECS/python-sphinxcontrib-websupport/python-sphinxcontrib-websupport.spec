@@ -15,12 +15,10 @@ Python API to integrate Sphinx into a web application
 
 %package -n python3-%{pkgname}
 Summary:        %{summary}
-
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-
-%if %{with_check}
+%if %{with check}
 BuildRequires:  python3-pip
 %endif
 
