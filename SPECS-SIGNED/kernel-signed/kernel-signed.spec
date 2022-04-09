@@ -153,7 +153,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
-* Tue Mar 29 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
+* Fri Apr 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
 - Update source to 5.15.32.1
 
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4

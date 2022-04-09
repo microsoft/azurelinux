@@ -415,7 +415,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Tue Mar 29 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
+* Fri Apr 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
 - Update source to 5.15.32.1
 - Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
   2022-1011, 2022-26490, 2021-4002
