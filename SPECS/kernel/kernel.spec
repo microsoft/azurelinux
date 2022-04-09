@@ -66,6 +66,7 @@ Patch1040:      CVE-2022-24958.nopatch
 Patch1041:      CVE-2022-0742.nopatch
 Patch1042:      CVE-2022-1011.nopatch
 Patch1043:      CVE-2022-26490.nopatch
+Patch1044:      CVE-2021-4002.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -417,7 +418,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Tue Mar 29 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
 - Update source to 5.15.32.1
 - Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
-  2022-1011, 2022-26490
+  2022-1011, 2022-26490, 2021-4002
+- Enable MANA driver config
 
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
 - Add Dell devices support

@@ -1,11 +1,11 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt34
+%global rt_version rt39
 %define uname_r %{version}-%{rt_version}-%{release}
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        5.15.26.1
-Release:        4%{?dist}
+Version:        5.15.32.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +19,7 @@ Source3:        cbl-mariner-ca-20211013.pem
 # When updating, make sure to grab the matching patch from 
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
 # Also, remember to bump the global rt_version macro above ^
-Patch0:         patch-5.15.26-%{rt_version}.patch
+Patch0:         patch-5.15.32-%{rt_version}.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -349,6 +349,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Mar 29 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
+- Update source to 5.15.32.1
+
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
 - Add Dell devices support
 
