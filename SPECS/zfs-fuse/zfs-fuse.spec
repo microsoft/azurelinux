@@ -18,8 +18,7 @@ Patch1:         zfs-fuse-0.7.2.2-python3.patch
 Patch2:         tirpc.patch
 Patch3:         common.patch
 
-# (2010 karsten@redhat.com) zfs-fuse doesn't have s390(x) implementations for atomic instructions
-ExcludeArch:    s390 s390x aarch64
+ExclusiveArch:  x86_64
 
 BuildRequires:  bzip2-devel
 BuildRequires:  fuse-devel
@@ -35,10 +34,8 @@ BuildRequires:  scons
 BuildRequires:  systemd
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
-
-%ifnarch aarch64 ppc64le
 BuildRequires:  %{_bindir}/execstack
-%endif
+
 
 Requires:       fuse >= 2.7.4-1
 
@@ -85,12 +82,10 @@ install -Dp -m 0755 %{SOURCE2} %{buildroot}%{_sysconfdir}/cron.weekly/98-%{name}
 install -Dp -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 install -Dp -m 0755 %{SOURCE4} %{buildroot}%{_sbindir}/zfs-fuse-helper
 
-%ifnarch aarch64 ppc64le
 #set stack not executable, BZ 911150
 for i in zdb zfs zfs-fuse zpool ztest; do
        %{_bindir}/execstack -c %{buildroot}%{_sbindir}/$i
 done
-%endif
 
 %post
 # Move cache if upgrading
