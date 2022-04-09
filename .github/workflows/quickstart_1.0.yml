@@ -16,12 +16,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.3.2
+      uses: actions/checkout@v3
       with:
         ref: '1.0-stable'
 
     - name: Set up Go 1.16
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: 1.16
       id: go
@@ -44,12 +44,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.3.2
+      uses: actions/checkout@v3
       with:
         ref: '1.0-stable'
 
     - name: Set up Go 1.16
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: 1.16
       id: go
@@ -71,12 +71,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.3.2
+      uses: actions/checkout@v3
       with:
         ref: '1.0-stable'
 
     - name: Set up Go 1.16
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: 1.16
       id: go

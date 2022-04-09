@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.102.1
-Release:        3%{?dist}
+Version:        5.10.109.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,8 +18,6 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         0001-clocksource-drivers-hyper-v-Re-enable-VDSO_CLOCKMODE.patch
 Patch1:         0003-export-mmput_async.patch
-Patch2:         CVE-2022-24958.patch
-Patch3:         CVE-2022-1016.patch
 # Kernel CVEs are addressed by moving to a newer version of the stable kernel.
 # Since kernel CVEs are filed against the upstream kernel version and not the
 # stable kernel version, our automated tooling will still flag the CVE as not
@@ -277,6 +275,15 @@ Patch1228:      CVE-2021-3732.nopatch
 Patch1229:      CVE-2022-0433.nopatch
 # CVE-2021-4095 - Introducing commit not in stable tree. No fix necessary at this time.
 Patch1230:      CVE-2021-4095.nopatch
+Patch1231:      CVE-2022-24958.nopatch
+Patch1232:      CVE-2021-3772.nopatch
+Patch1233:      CVE-2021-4002.nopatch
+Patch1234:      CVE-2021-45868.nopatch
+Patch1235:      CVE-2022-26490.nopatch
+# CVE-2022-26878 - Introducing commit not in stable tree. No fix necessary at this time.
+Patch1236:      CVE-2022-26878.nopatch
+Patch1237:      CVE-2022-26966.nopatch
+Patch1238:      CVE-2022-27223.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -388,8 +395,6 @@ manipulation of eBPF programs and maps.
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 %build
 make mrproper
@@ -405,6 +410,10 @@ cp %{SOURCE2} .config
 arch="arm64"
 archdir="arm64"
 %endif
+
+# Add CBL-Mariner cert into kernel's trusted keyring
+cp %{SOURCE4} certs/mariner.pem
+sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
@@ -424,9 +433,6 @@ if [ -s config_diff ]; then
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
     exit 1
 fi
-
-# Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
 
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
 make -C tools perf
@@ -630,6 +636,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Apr 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.109.1-2
+- Remove hardcoded mariner.pem from configs and instead insert during
+  the build phase
+
+* Tue Mar 29 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.10.109.1-1
+- Update source to 5.10.109.1
+- Remove CVE-2022-24958.patch and CVE-2022-1016.patch
+- Enable CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY
+- Address CVE-2021-3772, CVE-2021-4002, CVE-2021-45868, CVE-2022-26490,
+  CVE-2022-26878, CVE-2022-26966, CVE-2022-27223
+
 * Fri Mar 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.102.1-3
 - Apply CVE-2022-1016.patch
 

@@ -1,16 +1,22 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime
 Name:           nvidia-container-runtime
-Version:        3.5.0
-Release:        5%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/NVIDIA/nvidia-container-runtime
 #Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  golang
+Obsoletes: nvidia-container-runtime < 2.0.0
+Requires: nvidia-container-toolkit >= 1.9.0, nvidia-container-toolkit < 2.0.0
 Requires:       libseccomp
+# NVIDIA now includes the runtime within the toolkit installs itself.
+# Previously there were independent installs of the runtime and the toolkit
+# but with v3.9.0 and beyond the nvidia-container-runtime package no longer builds.
+#
+# The package is now a meta package that only forces the toolkit installation.
 
 %description
 Provides a modified version of runc allowing users to run GPU enabled
@@ -19,19 +25,18 @@ containers.
 %prep
 %setup -q
 
-%build
-make build
-mkdir -p %{buildroot}%{_bindir}
-cp %{name} %{buildroot}%{_bindir}
-
 %install
-install -m 755 %{name} %{buildroot}%{_bindir}/%{name}
 
 %files
 %license LICENSE
-%{_bindir}/%{name}
+
 
 %changelog
+* Wed Mar 30 2022 Adithya Jayachandran <adjayach@microsoft.com> - 3.9.0-1
+- Bumped version to 3.9.0
+- Package is officially included in toolkit install, this is a meta package
+- Added nvidia-container-toolkit minimum version 1.9.0 dependence
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 3.5.0-5
 - Bump release to force rebuild with golang 1.16.15
 

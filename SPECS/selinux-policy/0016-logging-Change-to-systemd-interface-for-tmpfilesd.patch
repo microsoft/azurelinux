@@ -1,0 +1,47 @@
+From 6ffff5334a4e3ffbb720bfbdc173c289842639a3 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 14 Mar 2022 16:12:04 +0000
+Subject: [PATCH 16/17] logging: Change to systemd interface for tmpfilesd.
+
+Remove explicit rules for systemd-tmpfiles to manage var_log_t and replace
+it with systemd_tmpfilesd_managed().
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/logging.te | 4 ++++
+ policy/modules/system/systemd.te | 2 --
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 768aba5bd..2d16c0d47 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -94,6 +94,10 @@ ifdef(`enable_mls',`
+ 	init_ranged_daemon_domain(syslogd_t, syslogd_exec_t, mls_systemhigh)
+ ')
+ 
++optional_policy(`
++	systemd_tmpfilesd_managed(var_log_t)
++')
++
+ ########################################
+ #
+ # Auditctl local policy
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index ea38efb0f..287e30b51 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1604,8 +1604,6 @@ init_relabel_utmp(systemd_tmpfiles_t)
+ init_relabel_var_lib_dirs(systemd_tmpfiles_t)
+ init_read_runtime_files(systemd_tmpfiles_t)
+ 
+-logging_manage_generic_logs(systemd_tmpfiles_t)
+-logging_manage_generic_log_dirs(systemd_tmpfiles_t)
+ logging_relabel_generic_log_dirs(systemd_tmpfiles_t)
+ logging_relabel_syslogd_tmp_files(systemd_tmpfiles_t)
+ logging_relabel_syslogd_tmp_dirs(systemd_tmpfiles_t)
+-- 
+2.17.1
+
