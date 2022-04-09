@@ -13,7 +13,6 @@ BuildRequires:  SymCrypt
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
-ExclusiveArch:  x86_64
 
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations

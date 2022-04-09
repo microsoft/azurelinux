@@ -17,7 +17,6 @@ BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  python3
 BuildRequires:  python3-pyelftools
-ExclusiveArch:  x86_64
 
 %description
 A core cryptographic library written by Microsoft
