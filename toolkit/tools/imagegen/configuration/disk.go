@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 )
 
 // Disk holds the disk partitioning, formatting and size information.
@@ -51,6 +52,7 @@ func checkMaxSizeCorrectness(disk *Disk) (err error) {
 	)
 	//MaxSize is not relevant if target disk is specified.
 	if disk.TargetDisk.Type != realDiskType {
+		//Complain about 0 maxSize only when partitions are defined.
 		if disk.MaxSize <= 0 && len(disk.Partitions) != 0 {
 			return fmt.Errorf("a configuration without a defined target disk must have a non-zero MaxSize")
 		}
@@ -64,8 +66,10 @@ func checkMaxSizeCorrectness(disk *Disk) (err error) {
 				lastPartitionEnd = part.End
 			}
 		}
+		maxSizeString := strconv.FormatUint(maxSize, 10)
+		lastPartitionEndString := strconv.FormatUint(lastPartitionEnd, 10)
 		if maxSize < lastPartitionEnd {
-			return fmt.Errorf("the MaxSize of %d is not large enough to accomodate defined partitions ending at %d.", int(maxSize), int(lastPartitionEnd))
+			return fmt.Errorf("the MaxSize of %s is not large enough to accomodate defined partitions ending at %s.", maxSizeString, lastPartitionEndString)
 		}
 	}
 	return
