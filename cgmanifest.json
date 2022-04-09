@@ -234,16 +234,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "antlr",
-          "version": "2.7.7",
-          "downloadUrl": "https://www.antlr2.org/download/antlr-2.7.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ant-antunit",
           "version": "1.3",
           "downloadUrl": "http://www.apache.org/dist/ant/antlibs/antunit/source/apache-ant-antunit-1.3-src.tar.bz2"
@@ -267,6 +257,16 @@
           "name": "ant-junit",
           "version": "1.10.11",
           "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "antlr",
+          "version": "2.7.7",
+          "downloadUrl": "https://www.antlr2.org/download/antlr-2.7.7.tar.gz"
         }
       }
     },
@@ -7770,6 +7770,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "java-cup",
+          "version": "0.11",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "java-cup-bootstrap",
+          "version": "0.11",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "javacc",
           "version": "7.0.4",
           "downloadUrl": "https://github.com/javacc/javacc/archive/7.0.4.tar.gz"
@@ -7803,26 +7823,6 @@
           "name": "javapackages-tools",
           "version": "6.0.0",
           "downloadUrl": "https://github.com/fedora-java/javapackages/archive/6.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "java-cup",
-          "version": "0.11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "java-cup-bootstrap",
-          "version": "0.11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
         }
       }
     },
@@ -9432,7 +9432,7 @@
         "other": {
           "name": "libewf",
           "version": "20140608",
-          "downloadUrl": "https://53efc0a7187d0baa489ee347026b8278fe4020f6.googledrive.com/host/0B3fBvzttpiiSMTdoaVExWWNsRjg/libewf-20140608.tar.gz"
+          "downloadUrl": "https://github.com/libyal/legacy/raw/main/libewf/libewf-20140608.tar.gz"
         }
       }
     },
@@ -9692,7 +9692,7 @@
         "other": {
           "name": "libguestfs",
           "version": "1.44.0",
-          "downloadUrl": "http://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
+          "downloadUrl": "https://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
         }
       }
     },
@@ -14662,6 +14662,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "objectweb-asm",
+          "version": "7.2",
+          "downloadUrl": "https://gitlab.ow2.org/asm/asm/-/archive/ASM_7_2/asm-ASM_7_2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "objenesis",
           "version": "3.1",
           "downloadUrl": "https://github.com/easymock/objenesis/archive/3.1.tar.gz"
@@ -14695,16 +14705,6 @@
           "name": "ocaml-astring",
           "version": "0.8.5",
           "downloadUrl": "https://github.com/dbuenzli/astring/archive/v0.8.5/astring-0.8.5.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "objectweb-asm",
-          "version": "7.2",
-          "downloadUrl": "https://gitlab.ow2.org/asm/asm/-/archive/ASM_7_2/asm-ASM_7_2.tar.gz"
         }
       }
     },
@@ -14764,7 +14764,7 @@
         "other": {
           "name": "ocaml-camomile",
           "version": "1.0.2",
-          "downloadUrl": "https://github.com/yoriyuki/Camomile/archive/1.0.2.tar.gz/camomile-1.0.2.tar.gz"
+          "downloadUrl": "https://github.com/yoriyuki/Camomile/archive/refs/tags/1.0.2.tar.gz"
         }
       }
     },
@@ -14874,7 +14874,7 @@
         "other": {
           "name": "ocaml-fileutils",
           "version": "0.5.2",
-          "downloadUrl": "http://forge.ocamlcore.org/frs/download.php/1695/ocaml-fileutils-0.5.2.tar.gz"
+          "downloadUrl": "https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/0.5.2.tar.gz"
         }
       }
     },
@@ -14964,7 +14964,7 @@
         "other": {
           "name": "ocaml-lwt",
           "version": "5.4.1",
-          "downloadUrl": "https://github.com/ocsigen/lwt/archive/5.4.1/lwt-5.4.1.tar.gz"
+          "downloadUrl": "https://github.com/ocsigen/lwt/archive/refs/tags/5.4.1.tar.gz"
         }
       }
     },
@@ -15003,7 +15003,7 @@
         "type": "other",
         "other": {
           "name": "ocaml-num",
-          "version": "1.4",
+          "version": "1.3",
           "downloadUrl": "https://github.com/ocaml/num/archive/v1.3.tar.gz"
         }
       }
@@ -15994,8 +15994,8 @@
         "type": "other",
         "other": {
           "name": "perl",
-          "version": "5.32.0",
-          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz"
+          "version": "5.34.1",
+          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.34.1.tar.xz"
         }
       }
     },
@@ -21704,8 +21704,8 @@
         "type": "other",
         "other": {
           "name": "pygobject3",
-          "version": "3.36.1",
-          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.36/pygobject-3.36.1.tar.xz"
+          "version": "3.42.0",
+          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.42/pygobject-3.42.0.tar.xz"
         }
       }
     },
@@ -23204,8 +23204,8 @@
         "type": "other",
         "other": {
           "name": "python-msgpack",
-          "version": "0.6.2",
-          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v0.6.2.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v1.0.3.tar.gz"
         }
       }
     },
@@ -23924,8 +23924,8 @@
         "type": "other",
         "other": {
           "name": "python-pyvmomi",
-          "version": "6.7.3",
-          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"
+          "version": "7.0.3",
+          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/refs/tags/v7.0.3.tar.gz"
         }
       }
     },

@@ -398,6 +398,9 @@ var expectedConfiguration Config = Config{
 				"path/to/packages.json",
 				"path/to/extraPackages.json",
 			},
+			Packages: []string{
+				"additionalPkgName",
+			},
 			KernelOptions: map[string]string{
 				"default": "kernel",
 			},

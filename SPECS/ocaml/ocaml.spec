@@ -114,7 +114,7 @@ autoconf --force
 #
 # OC_CFLAGS/OC_LDFLAGS control what flags OCaml passes to the linker
 # when doing final linking of OCaml binaries.  Setting these is
-# necessary to ensure that generated binaries have Fedora hardening
+# necessary to ensure that generated binaries have Mariner hardening
 # features.
 %configure \
     OC_CFLAGS="$CFLAGS" \
