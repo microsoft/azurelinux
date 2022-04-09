@@ -19,6 +19,7 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
+BuildRequires:  python3-packaging
 BuildRequires:  python3-pluggy
 BuildRequires:  python3-pygments
 BuildRequires:  python3-six
@@ -59,6 +60,7 @@ Python versions.
 
 %check
 pip3 install pyfakefs more-itertools
+rm -rf .pyproject-builddir
 # Ignored file uses pytest_perf not available in Mariner
 # test_find_local tries to install setuptools from PyPI
 %pytest --ignore exercises.py -k "not test_find_local"

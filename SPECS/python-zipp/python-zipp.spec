@@ -55,6 +55,7 @@ sed -i "/func_timeout/d" test_zipp.py
 
 %check
 pip3 install more-itertools
+rm -rf .pyproject-builddir
 # Skipped test needs jaraco.itertools
 %pytest -k "not test_joinpath_constant_time"
 

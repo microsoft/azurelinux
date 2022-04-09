@@ -59,8 +59,9 @@ sed -i 's/from mock import/from unittest.mock import/' html5lib/tests/test_meta.
 %pyproject_save_files html5lib
 
 %check
-pip3 install more-itertools umsgpack
-%pytest
+pip3 install more-itertools umsgpack webencodings
+# Disabling broken tests, see: https://github.com/html5lib/html5lib-python/issues/433
+%pytest -k "not test_parser_encoding and not test_prescan_encoding"
 
 %files -n python3-html5lib -f %{pyproject_files}
 %doc CHANGES.rst README.rst
