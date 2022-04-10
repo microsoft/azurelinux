@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -257,6 +257,9 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Apr 08 2022 Chris Co <chrco@microsoft.com> - 250.3-4
+- Remove net.ifnames=0 from systemd.cfg
+
 * Thu Mar 24 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-3
 - Add Requires(post) on audit-libs, pam and util-linux-devel
 
