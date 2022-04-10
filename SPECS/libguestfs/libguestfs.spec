@@ -260,7 +260,7 @@ Requires:       systemd-libs
 Requires:       yajl
 
 %ifarch aarch64
-Requires:       edk2-aarch64
+#Requires:       edk2-aarch64
 %endif
 
 Recommends:     libvirt-daemon-config-network
