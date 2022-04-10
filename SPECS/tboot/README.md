@@ -25,7 +25,7 @@ menuentry 'GNU/Linux, with tboot 1.10.2' --class gnu-linux --class gnu --class o
 	if [ -f  $bootprefix/systemd.cfg ]; then
 		load_env -f $bootprefix/systemd.cfg
 	else
-		set systemd_cmdline=net.ifnames=0
+		set systemd_cmdline=
 	fi
 	search --no-floppy --fs-uuid --set=root $bootID
 	echo	'Loading tboot 1.10.2 ...'
