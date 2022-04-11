@@ -157,7 +157,6 @@
         "check-restart",
         "clamav",
         "cloud-hypervisor",
-        "cloud-init-vmware-guestinfo",
         "cockpit",
         "coredns-1.7.0",
         "coredns-1.8.0",
