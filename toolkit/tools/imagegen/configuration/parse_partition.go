@@ -23,9 +23,15 @@ func ParseKickStartParitionScheme(config *Config) (err error) {
 		configInfo			map[string]int
 	)
 
+	// Check whether the config already contains partition schema
+	if len(config.Disks) > 0 && len(config.Disks[0].Partitions) > 0 {
+		fmt.Printf("Partition scheme already exists\n")
+		return
+	} 
+
 	file, err := os.Open("/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh")
 	if err != nil {
-		fmt.Println("Failed to open file")
+		fmt.Printf("Failed to open file")
 		return
 	}
 	defer file.Close()
@@ -33,9 +39,9 @@ func ParseKickStartParitionScheme(config *Config) (err error) {
 	// Check if the file is empty
 	_, err = file.Stat()
 	if err != nil {
-		fmt.Println("File is empty")
+		fmt.Printf("File is empty\n")
 		return
-	}
+	}	
 
 	defaultConfigIndex := 0
 

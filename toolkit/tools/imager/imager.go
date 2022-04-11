@@ -67,12 +67,14 @@ func main() {
 	config, err := configuration.LoadWithAbsolutePaths(*configFile, *baseDirPath)
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
 
+	partitionFile = "/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh"
+	fmt.Printf("Checking tmp file path correct or not\n")
+	fmt.Printf("parse file path: %s\n", *partitionFile)
+
+
 	// Parse the partition file
 	err = configuration.ParseKickStartParitionScheme(&config)
 	logger.PanicOnError(err, "Failed to parse partition schema")
-
-	fmt.Printf("Check Disks length: %d\n", len(config.Disks))
-	fmt.Printf("Check artifact length: %d\n", len(config.Disks[0].Artifacts))
 
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]

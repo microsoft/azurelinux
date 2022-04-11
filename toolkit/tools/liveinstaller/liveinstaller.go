@@ -30,12 +30,12 @@ var (
 
 	// Take in strings for the config and template config file, as they may not exist on disk
 	configFile         = exe.InputStringFlag(app, "Path to the image config file.")
+	partitionFile	   = app.Flag("partition-file", "Path to the partition scheme file.").String()
 	templateConfigFile = app.Flag("template-config", "Path to the template config file.").String()
 	forceAttended      = app.Flag("attended", "Use the attended installer regardless if a config file is present.").Bool()
 	imagerTool         = app.Flag("imager", "Path to the imager tool.").Required().ExistingFile()
 	buildDir           = app.Flag("build-dir", "Directory to store temporary files while building.").Required().ExistingDir()
 	baseDirPath        = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
-	partitionFile	   = app.Flag("partition-file", "Path to the partition scheme file.").String()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -82,6 +82,9 @@ func main() {
 		logLevel:    logger.Log.GetLevel().String(),
 		logFile:     imagerLogFile,
 	}
+
+	fmt.Printf("Temporary config file path: %s\n", *templateConfigFile)
+	fmt.Printf("parse file path: %s\n", *partitionFile)
 
 	installFunc := installerFactory(*forceAttended, *configFile, *templateConfigFile)
 	installationQuit, err := installFunc(args)
@@ -386,7 +389,7 @@ func formatImagerCommand(args imagerArguments) (program string, commandArgs []st
 		fmt.Sprintf("--base-dir=%s", args.baseDirPath),
 		fmt.Sprintf("--log-file=%s", args.logFile),
 		fmt.Sprintf("--log-level=%s", args.logLevel),
-		fmt.Sprintf("--log-level=%s", args.partitionFile),
+		fmt.Sprintf("--partition-file=%s", args.partitionFile),
 	}
 
 	if args.emitProgress {
