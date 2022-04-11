@@ -15,7 +15,7 @@
 
 Name:           openblas
 Version:        0.3.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An optimized BLAS library based on GotoBLAS2
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -33,6 +33,9 @@ Patch3:         openblas-0.3.7-tests.patch
 
 # Fix C++ compatibility (BZ #1820131)
 Patch4:         https://github.com/xianyi/OpenBLAS/commit/ee2e758278b5d82b7242f505ea694f082ef65879.patch
+
+# keep this patch to build from a containerized environment
+Patch5:         No-Fortran-Build.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -230,6 +233,7 @@ cd OpenBLAS-%{version}
 %endif
 %patch3 -p1 -b .tests
 %patch4 -p1 -b .cplusplus
+%patch5 -p1
 
 # Fix source permissions
 find -name \*.f -exec chmod 644 {} \;
@@ -653,6 +657,10 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %endif
 
 %changelog
+* Tue Apr 05 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.3.9-5
+- Do not build Fortran.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.9-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
