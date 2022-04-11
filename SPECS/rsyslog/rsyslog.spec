@@ -155,9 +155,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Thu Apr 7 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.2108.0-2
 - Bring rsyslog.conf in line with other distros
--   add /var/log/messages for normal logs
--   add /var/log/secure for auth and authpriv logs
--   set file permissions to 640 for log files
+- add /var/log/messages for normal logs
+- add /var/log/secure for auth and authpriv logs
+- set file permissions to 640 for log files
 
 * Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2108.0-1
 - Update to version 8.2108.0.
