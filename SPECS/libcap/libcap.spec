@@ -30,11 +30,8 @@ for developing applications that use libcap.
 sed -i 's:LIBDIR:PAM_&:g' pam_cap/Makefile
 make %{?_smp_mflags}
 %install
-make prefix=%{_prefix}	SBINDIR=%{_sbindir} PAM_LIBDIR=%{_libdir} RAISE_SETFCAP=no DESTDIR=%{buildroot} install
-%ifarch aarch64
-mv %{buildroot}%{_libdir} %{buildroot}%{_lib64dir}
-%endif
-chmod -v 755 %{buildroot}%{_lib64dir}/libcap.so
+make prefix=%{_prefix}	SBINDIR=%{_sbindir} PAM_LIBDIR=%{_libdir} RAISE_SETFCAP=no DESTDIR=%{buildroot} LIBDIR=%{_libdir} install
+chmod -v 755 %{buildroot}%{_libdir}/libcap.so
 
 %check
 cd progs
@@ -44,8 +41,8 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %files
 %defattr(-,root,root)
 %license License
-%{_lib64dir}/libcap.so.*
-%{_lib64dir}/libpsx.so.*
+%{_libdir}/libcap.so.*
+%{_libdir}/libpsx.so.*
 %{_mandir}/man1/*
 %{_mandir}/man8/*
 %{_sbindir}/*
@@ -53,11 +50,11 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
-%exclude %{_lib64dir}/libcap.a
-%exclude %{_lib64dir}/libpsx.a
-%{_lib64dir}/pkgconfig/*
-%{_lib64dir}/libcap.so
-%{_lib64dir}/libpsx.so
+%exclude %{_libdir}/libcap.a
+%exclude %{_libdir}/libpsx.a
+%{_libdir}/pkgconfig/*
+%{_libdir}/libcap.so
+%{_libdir}/libpsx.so
 %{_mandir}/man3/*
 
 %changelog
