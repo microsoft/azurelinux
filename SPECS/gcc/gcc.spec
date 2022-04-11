@@ -3,13 +3,14 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
+Patch0:         libgomp_hang_fix.patch
 Requires:       gcc-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
@@ -130,6 +131,7 @@ This package contains development headers and static library for libgomp
 
 %prep
 %setup -q
+%patch0 -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
@@ -268,6 +270,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Mon Apr 11 2022 Andrew Phelps <anphel@microsoft.com> - 11.2.0-3
+- Add libgomp_hang_fix.patch
+
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 11.2.0-2
 - Add provides for libasan, liblsan, libtsan, and libubsan (and their static counterparts) to the main package
 - Remove CVE-2019-15847 nopatch file (not relevant to our version of GCC)

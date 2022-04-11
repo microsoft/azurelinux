@@ -1,0 +1,486 @@
+https://gcc.gnu.org/git/?p=gcc.git;a=patch;h=5ed77fb3ed1ee0289a0ec9499ef52b99b39421f1;hp=bd73d8dd312c759ee505b401d6b4fd7be07a3f1a
+
+From 5ed77fb3ed1ee0289a0ec9499ef52b99b39421f1 Mon Sep 17 00:00:00 2001
+From: Tom de Vries <tdevries@suse.de>
+Date: Tue, 20 Apr 2021 08:47:03 +0200
+Subject: [PATCH 1/1] [libgomp, nvptx] Fix hang in gomp_team_barrier_wait_end
+
+Consider the following omp fragment.
+...
+  #pragma omp target
+  #pragma omp parallel num_threads (2)
+  #pragma omp task
+    ;
+...
+
+This hangs at -O0 for nvptx.
+
+Investigating the behaviour gives us the following trace of events:
+- both threads execute GOMP_task, where they:
+  - deposit a task, and
+  - execute gomp_team_barrier_wake
+- thread 1 executes gomp_team_barrier_wait_end and, not being the last thread,
+  proceeds to wait at the team barrier
+- thread 0 executes gomp_team_barrier_wait_end and, being the last thread, it
+  calls gomp_barrier_handle_tasks, where it:
+  - executes both tasks and marks the team barrier done
+  - executes a gomp_team_barrier_wake which wakes up thread 1
+- thread 1 exits the team barrier
+- thread 0 returns from gomp_barrier_handle_tasks and goes to wait at
+  the team barrier.
+- thread 0 hangs.
+
+To understand why there is a hang here, it's good to understand how things
+are setup for nvptx.  The libgomp/config/nvptx/bar.c implementation is
+a copy of the libgomp/config/linux/bar.c implementation, with uses of both
+futex_wake and do_wait replaced with uses of ptx insn bar.sync:
+...
+  if (bar->total > 1)
+    asm ("bar.sync 1, %0;" : : "r" (32 * bar->total));
+...
+
+The point where thread 0 goes to wait at the team barrier, corresponds in
+the linux implementation with a do_wait.  In the linux case, the call to
+do_wait doesn't hang, because it's waiting for bar->generation to become
+a certain value, and if bar->generation already has that value, it just
+proceeds, without any need for coordination with other threads.
+
+In the nvtpx case, the bar.sync waits until thread 1 joins it in the same
+logical barrier, which never happens: thread 1 is lingering in the
+thread pool at the thread pool barrier (using a different logical barrier),
+waiting to join a new team.
+
+The easiest way to fix this is to revert to the posix implementation for
+bar.{c,h}.  That however falls back on a busy-waiting approach, and
+does not take advantage of the ptx bar.sync insn.
+
+Instead, we revert to the linux implementation for bar.c,
+and implement bar.c local functions futex_wait and futex_wake using the
+bar.sync insn.
+
+The bar.sync insn takes an argument specifying how many threads are
+participating, and that doesn't play well with the futex syntax where it's
+not clear in advance how many threads will be woken up.
+
+This is solved by waking up all waiting threads each time a futex_wait or
+futex_wake happens, and possibly going back to sleep with an updated thread
+count.
+
+Tested libgomp on x86_64 with nvptx accelerator.
+
+libgomp/ChangeLog:
+
+2021-04-20  Tom de Vries  <tdevries@suse.de>
+
+	PR target/99555
+	* config/nvptx/bar.c (generation_to_barrier): New function, copied
+	from config/rtems/bar.c.
+	(futex_wait, futex_wake): New function.
+	(do_spin, do_wait): New function, copied from config/linux/wait.h.
+	(gomp_barrier_wait_end, gomp_barrier_wait_last)
+	(gomp_team_barrier_wake, gomp_team_barrier_wait_end):
+	(gomp_team_barrier_wait_cancel_end, gomp_team_barrier_cancel): Remove
+	and replace with include of config/linux/bar.c.
+	* config/nvptx/bar.h (gomp_barrier_t): Add fields waiters and lock.
+	(gomp_barrier_init): Init new fields.
+	* testsuite/libgomp.c-c++-common/task-detach-6.c: Remove nvptx-specific
+	workarounds.
+	* testsuite/libgomp.c/pr99555-1.c: Same.
+	* testsuite/libgomp.fortran/task-detach-6.f90: Same.
+---
+ libgomp/config/nvptx/bar.c                    | 248 +++++++-----------
+ libgomp/config/nvptx/bar.h                    |   4 +
+ .../libgomp.c-c++-common/task-detach-6.c      |   8 -
+ libgomp/testsuite/libgomp.c/pr99555-1.c       |   8 -
+ .../libgomp.fortran/task-detach-6.f90         |  12 -
+ 5 files changed, 105 insertions(+), 175 deletions(-)
+
+diff --git a/libgomp/config/nvptx/bar.c b/libgomp/config/nvptx/bar.c
+index f5bd2269149..eee21071f47 100644
+--- a/libgomp/config/nvptx/bar.c
++++ b/libgomp/config/nvptx/bar.c
+@@ -30,183 +30,137 @@
+ #include <limits.h>
+ #include "libgomp.h"
+ 
++/* For cpu_relax.  */
++#include "doacross.h"
+ 
+-void
+-gomp_barrier_wait_end (gomp_barrier_t *bar, gomp_barrier_state_t state)
+-{
+-  if (__builtin_expect (state & BAR_WAS_LAST, 0))
+-    {
+-      /* Next time we'll be awaiting TOTAL threads again.  */
+-      bar->awaited = bar->total;
+-      __atomic_store_n (&bar->generation, bar->generation + BAR_INCR,
+-			MEMMODEL_RELEASE);
+-    }
+-  if (bar->total > 1)
+-    asm ("bar.sync 1, %0;" : : "r" (32 * bar->total));
+-}
++/* Assuming ADDR is &bar->generation, return bar.  Copied from
++   rtems/bar.c.  */
+ 
+-void
+-gomp_barrier_wait (gomp_barrier_t *bar)
++static gomp_barrier_t *
++generation_to_barrier (int *addr)
+ {
+-  gomp_barrier_wait_end (bar, gomp_barrier_wait_start (bar));
++  char *bar
++    = (char *) addr - __builtin_offsetof (gomp_barrier_t, generation);
++  return (gomp_barrier_t *)bar;
+ }
+ 
+-/* Like gomp_barrier_wait, except that if the encountering thread
+-   is not the last one to hit the barrier, it returns immediately.
+-   The intended usage is that a thread which intends to gomp_barrier_destroy
+-   this barrier calls gomp_barrier_wait, while all other threads
+-   call gomp_barrier_wait_last.  When gomp_barrier_wait returns,
+-   the barrier can be safely destroyed.  */
++/* Implement futex_wait-like behaviour to plug into the linux/bar.c
++   implementation.  Assumes ADDR is &bar->generation.   */
+ 
+-void
+-gomp_barrier_wait_last (gomp_barrier_t *bar)
++static inline void
++futex_wait (int *addr, int val)
+ {
+-  /* Deferring to gomp_barrier_wait does not use the optimization opportunity
+-     allowed by the interface contract for all-but-last participants.  The
+-     original implementation in config/linux/bar.c handles this better.  */
+-  gomp_barrier_wait (bar);
+-}
++  gomp_barrier_t *bar = generation_to_barrier (addr);
+ 
+-void
+-gomp_team_barrier_wake (gomp_barrier_t *bar, int count)
+-{
+-  if (bar->total > 1)
+-    asm ("bar.sync 1, %0;" : : "r" (32 * bar->total));
+-}
++  if (bar->total < 2)
++    /* A barrier with less than two threads, nop.  */
++    return;
+ 
+-void
+-gomp_team_barrier_wait_end (gomp_barrier_t *bar, gomp_barrier_state_t state)
+-{
+-  unsigned int generation, gen;
++  gomp_mutex_lock (&bar->lock);
+ 
+-  if (__builtin_expect (state & BAR_WAS_LAST, 0))
++  /* Futex semantics: only go to sleep if *addr == val.  */
++  if (__builtin_expect (__atomic_load_n (addr, MEMMODEL_ACQUIRE) != val, 0))
+     {
+-      /* Next time we'll be awaiting TOTAL threads again.  */
+-      struct gomp_thread *thr = gomp_thread ();
+-      struct gomp_team *team = thr->ts.team;
+-
+-      bar->awaited = bar->total;
+-      team->work_share_cancelled = 0;
+-      if (__builtin_expect (team->task_count, 0))
+-	{
+-	  gomp_barrier_handle_tasks (state);
+-	  state &= ~BAR_WAS_LAST;
+-	}
+-      else
+-	{
+-	  state &= ~BAR_CANCELLED;
+-	  state += BAR_INCR - BAR_WAS_LAST;
+-	  __atomic_store_n (&bar->generation, state, MEMMODEL_RELEASE);
+-	  if (bar->total > 1)
+-	    asm ("bar.sync 1, %0;" : : "r" (32 * bar->total));
+-	  return;
+-	}
++      gomp_mutex_unlock (&bar->lock);
++      return;
+     }
+ 
+-  generation = state;
+-  state &= ~BAR_CANCELLED;
+-  do
++  /* Register as waiter.  */
++  unsigned int waiters
++    = __atomic_add_fetch (&bar->waiters, 1, MEMMODEL_ACQ_REL);
++  if (waiters == 0)
++    __builtin_abort ();
++  unsigned int waiter_id = waiters;
++
++  if (waiters > 1)
+     {
+-      if (bar->total > 1)
+-	asm ("bar.sync 1, %0;" : : "r" (32 * bar->total));
+-      gen = __atomic_load_n (&bar->generation, MEMMODEL_ACQUIRE);
+-      if (__builtin_expect (gen & BAR_TASK_PENDING, 0))
+-	{
+-	  gomp_barrier_handle_tasks (state);
+-	  gen = __atomic_load_n (&bar->generation, MEMMODEL_ACQUIRE);
+-	}
+-      generation |= gen & BAR_WAITING_FOR_TASK;
++      /* Wake other threads in bar.sync.  */
++      asm volatile ("bar.sync 1, %0;" : : "r" (32 * waiters));
++
++      /* Ensure that they have updated waiters.  */
++      asm volatile ("bar.sync 1, %0;" : : "r" (32 * waiters));
+     }
+-  while (gen != state + BAR_INCR);
+-}
+ 
+-void
+-gomp_team_barrier_wait (gomp_barrier_t *bar)
+-{
+-  gomp_team_barrier_wait_end (bar, gomp_barrier_wait_start (bar));
+-}
++  gomp_mutex_unlock (&bar->lock);
+ 
+-void
+-gomp_team_barrier_wait_final (gomp_barrier_t *bar)
+-{
+-  gomp_barrier_state_t state = gomp_barrier_wait_final_start (bar);
+-  if (__builtin_expect (state & BAR_WAS_LAST, 0))
+-    bar->awaited_final = bar->total;
+-  gomp_team_barrier_wait_end (bar, state);
++  while (1)
++    {
++      /* Wait for next thread in barrier.  */
++      asm volatile ("bar.sync 1, %0;" : : "r" (32 * (waiters + 1)));
++
++      /* Get updated waiters.  */
++      unsigned int updated_waiters
++	= __atomic_load_n (&bar->waiters, MEMMODEL_ACQUIRE);
++
++      /* Notify that we have updated waiters.  */
++      asm volatile ("bar.sync 1, %0;" : : "r" (32 * (waiters + 1)));
++
++      waiters = updated_waiters;
++
++      if (waiter_id > waiters)
++	/* A wake happened, and we're in the group of woken threads.  */
++	break;
++
++      /* Continue waiting.  */
++    }
+ }
+ 
+-bool
+-gomp_team_barrier_wait_cancel_end (gomp_barrier_t *bar,
+-				   gomp_barrier_state_t state)
++/* Implement futex_wake-like behaviour to plug into the linux/bar.c
++   implementation.  Assumes ADDR is &bar->generation.  */
++
++static inline void
++futex_wake (int *addr, int count)
+ {
+-  unsigned int generation, gen;
++  gomp_barrier_t *bar = generation_to_barrier (addr);
++
++  if (bar->total < 2)
++    /* A barrier with less than two threads, nop.  */
++    return;
+ 
+-  if (__builtin_expect (state & BAR_WAS_LAST, 0))
++  gomp_mutex_lock (&bar->lock);
++  unsigned int waiters = __atomic_load_n (&bar->waiters, MEMMODEL_ACQUIRE);
++  if (waiters == 0)
+     {
+-      /* Next time we'll be awaiting TOTAL threads again.  */
+-      /* BAR_CANCELLED should never be set in state here, because
+-	 cancellation means that at least one of the threads has been
+-	 cancelled, thus on a cancellable barrier we should never see
+-	 all threads to arrive.  */
+-      struct gomp_thread *thr = gomp_thread ();
+-      struct gomp_team *team = thr->ts.team;
+-
+-      bar->awaited = bar->total;
+-      team->work_share_cancelled = 0;
+-      if (__builtin_expect (team->task_count, 0))
+-	{
+-	  gomp_barrier_handle_tasks (state);
+-	  state &= ~BAR_WAS_LAST;
+-	}
+-      else
+-	{
+-	  state += BAR_INCR - BAR_WAS_LAST;
+-	  __atomic_store_n (&bar->generation, state, MEMMODEL_RELEASE);
+-	  if (bar->total > 1)
+-	    asm ("bar.sync 1, %0;" : : "r" (32 * bar->total));
+-	  return false;
+-	}
++      /* No threads to wake.  */
++      gomp_mutex_unlock (&bar->lock);
++      return;
+     }
+ 
+-  if (__builtin_expect (state & BAR_CANCELLED, 0))
+-    return true;
++  if (count == INT_MAX)
++    /* Release all threads.  */
++    __atomic_store_n (&bar->waiters, 0, MEMMODEL_RELEASE);
++  else if (count < bar->total)
++    /* Release count threads.  */
++    __atomic_add_fetch (&bar->waiters, -count, MEMMODEL_ACQ_REL);
++  else
++    /* Count has an illegal value.  */
++    __builtin_abort ();
+ 
+-  generation = state;
+-  do
+-    {
+-      if (bar->total > 1)
+-	asm ("bar.sync 1, %0;" : : "r" (32 * bar->total));
+-      gen = __atomic_load_n (&bar->generation, MEMMODEL_ACQUIRE);
+-      if (__builtin_expect (gen & BAR_CANCELLED, 0))
+-	return true;
+-      if (__builtin_expect (gen & BAR_TASK_PENDING, 0))
+-	{
+-	  gomp_barrier_handle_tasks (state);
+-	  gen = __atomic_load_n (&bar->generation, MEMMODEL_ACQUIRE);
+-	}
+-      generation |= gen & BAR_WAITING_FOR_TASK;
+-    }
+-  while (gen != state + BAR_INCR);
++  /* Wake other threads in bar.sync.  */
++  asm volatile ("bar.sync 1, %0;" : : "r" (32 * (waiters + 1)));
++
++  /* Let them get the updated waiters.  */
++  asm volatile ("bar.sync 1, %0;" : : "r" (32 * (waiters + 1)));
+ 
+-  return false;
++  gomp_mutex_unlock (&bar->lock);
+ }
+ 
+-bool
+-gomp_team_barrier_wait_cancel (gomp_barrier_t *bar)
++/* Copied from linux/wait.h.  */
++
++static inline int do_spin (int *addr, int val)
+ {
+-  return gomp_team_barrier_wait_cancel_end (bar, gomp_barrier_wait_start (bar));
++  /* The current implementation doesn't spin.  */
++  return 1;
+ }
+ 
+-void
+-gomp_team_barrier_cancel (struct gomp_team *team)
++/* Copied from linux/wait.h.  */
++
++static inline void do_wait (int *addr, int val)
+ {
+-  gomp_mutex_lock (&team->task_lock);
+-  if (team->barrier.generation & BAR_CANCELLED)
+-    {
+-      gomp_mutex_unlock (&team->task_lock);
+-      return;
+-    }
+-  team->barrier.generation |= BAR_CANCELLED;
+-  gomp_mutex_unlock (&team->task_lock);
+-  gomp_team_barrier_wake (&team->barrier, INT_MAX);
++  if (do_spin (addr, val))
++    futex_wait (addr, val);
+ }
++
++/* Reuse the linux implementation.  */
++#define GOMP_WAIT_H 1
++#include "../linux/bar.c"
+diff --git a/libgomp/config/nvptx/bar.h b/libgomp/config/nvptx/bar.h
+index 0b3331a28e9..28bf7f4d313 100644
+--- a/libgomp/config/nvptx/bar.h
++++ b/libgomp/config/nvptx/bar.h
+@@ -38,6 +38,8 @@ typedef struct
+   unsigned generation;
+   unsigned awaited;
+   unsigned awaited_final;
++  unsigned waiters;
++  gomp_mutex_t lock;
+ } gomp_barrier_t;
+ 
+ typedef unsigned int gomp_barrier_state_t;
+@@ -57,6 +59,8 @@ static inline void gomp_barrier_init (gomp_barrier_t *bar, unsigned count)
+   bar->awaited = count;
+   bar->awaited_final = count;
+   bar->generation = 0;
++  bar->waiters = 0;
++  gomp_mutex_init (&bar->lock);
+ }
+ 
+ static inline void gomp_barrier_reinit (gomp_barrier_t *bar, unsigned count)
+diff --git a/libgomp/testsuite/libgomp.c-c++-common/task-detach-6.c b/libgomp/testsuite/libgomp.c-c++-common/task-detach-6.c
+index f18b57bf047..e5c2291e6ff 100644
+--- a/libgomp/testsuite/libgomp.c-c++-common/task-detach-6.c
++++ b/libgomp/testsuite/libgomp.c-c++-common/task-detach-6.c
+@@ -2,9 +2,6 @@
+ 
+ #include <omp.h>
+ #include <assert.h>
+-#include <unistd.h> // For 'alarm'.
+-
+-#include "on_device_arch.h"
+ 
+ /* Test tasks with detach clause on an offload device.  Each device
+    thread spawns off a chain of tasks, that can then be executed by
+@@ -12,11 +9,6 @@
+ 
+ int main (void)
+ {
+-  //TODO See '../libgomp.c/pr99555-1.c'.
+-  if (on_device_arch_nvptx ())
+-    alarm (4); /*TODO Until resolved, make sure that we exit quickly, with error status.
+-		 { dg-xfail-run-if "PR99555" { offload_device_nvptx } } */
+-
+   int x = 0, y = 0, z = 0;
+   int thread_count;
+   omp_event_handle_t detach_event1, detach_event2;
+diff --git a/libgomp/testsuite/libgomp.c/pr99555-1.c b/libgomp/testsuite/libgomp.c/pr99555-1.c
+index bd33b93716b..7386e016fd2 100644
+--- a/libgomp/testsuite/libgomp.c/pr99555-1.c
++++ b/libgomp/testsuite/libgomp.c/pr99555-1.c
+@@ -2,16 +2,8 @@
+ 
+ // { dg-additional-options "-O0" }
+ 
+-#include <unistd.h> // For 'alarm'.
+-
+-#include "../libgomp.c-c++-common/on_device_arch.h"
+-
+ int main (void)
+ {
+-  if (on_device_arch_nvptx ())
+-    alarm (4); /*TODO Until resolved, make sure that we exit quickly, with error status.
+-		 { dg-xfail-run-if "PR99555" { offload_device_nvptx } } */
+-
+ #pragma omp target
+ #pragma omp parallel // num_threads(1)
+ #pragma omp task
+diff --git a/libgomp/testsuite/libgomp.fortran/task-detach-6.f90 b/libgomp/testsuite/libgomp.fortran/task-detach-6.f90
+index e4373b4c6f1..03a3b61540d 100644
+--- a/libgomp/testsuite/libgomp.fortran/task-detach-6.f90
++++ b/libgomp/testsuite/libgomp.fortran/task-detach-6.f90
+@@ -1,6 +1,5 @@
+ ! { dg-do run }
+ 
+-! { dg-additional-sources on_device_arch.c }
+   ! { dg-prune-output "command-line option '-fintrinsic-modules-path=.*' is valid for Fortran but not for C" }
+ 
+ ! Test tasks with detach clause on an offload device.  Each device
+@@ -14,17 +13,6 @@ program task_detach_6
+   integer :: x = 0, y = 0, z = 0
+   integer :: thread_count
+ 
+-  interface
+-    integer function on_device_arch_nvptx() bind(C)
+-    end function on_device_arch_nvptx
+-  end interface
+-
+-  !TODO See '../libgomp.c/pr99555-1.c'.
+-  if (on_device_arch_nvptx () /= 0) then
+-     call alarm (4, 0); !TODO Until resolved, make sure that we exit quickly, with error status.
+-     ! { dg-xfail-run-if "PR99555" { offload_device_nvptx } }
+-  end if
+-
+   !$omp target map (tofrom: x, y, z) map (from: thread_count)
+     !$omp parallel private (detach_event1, detach_event2)
+       !$omp single
+-- 
+2.27.0
