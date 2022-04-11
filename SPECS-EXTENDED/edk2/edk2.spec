@@ -603,6 +603,7 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 %changelog
 * Thu Apr 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20200801stable-3
 - Skip enroll that blocks building from containerized environment.
+- License verified.
 
 * Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200801stable-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
