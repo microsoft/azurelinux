@@ -142,7 +142,7 @@ index a646a3f6440f..beb09d74684f 100644
    DEFINE(TI_CPU,		offsetof(struct thread_info, cpu));
    DEFINE(TI_CPU_DOMAIN,		offsetof(struct thread_info, cpu_domain));
 diff --git a/arch/arm/kernel/entry-armv.S b/arch/arm/kernel/entry-armv.S
-index d8e28abd468c..6eef0eb99fe6 100644
+index 46b697dfa4cf..ff9bb5cc4738 100644
 --- a/arch/arm/kernel/entry-armv.S
 +++ b/arch/arm/kernel/entry-armv.S
 @@ -206,11 +206,18 @@ ENDPROC(__dabt_svc)
@@ -235,7 +235,7 @@ index efa402025031..59487ee9fd61 100644
  	return 0;
  }
 diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 0758ea0717f9..ce63a0d3ad42 100644
+index 1a18c9045773..c0d64ae6089b 100644
 --- a/arch/arm64/Kconfig
 +++ b/arch/arm64/Kconfig
 @@ -88,6 +88,7 @@ config ARM64
@@ -263,7 +263,7 @@ index 0758ea0717f9..ce63a0d3ad42 100644
  	select POWER_SUPPLY
  	select SPARSE_IRQ
 diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index 72f95c6a7051..30fe8c324ce6 100644
+index 08363d3cc1da..d2e4bb32eb2a 100644
 --- a/arch/arm64/include/asm/pgtable.h
 +++ b/arch/arm64/include/asm/pgtable.h
 @@ -1001,7 +1001,7 @@ static inline void update_mmu_cache(struct vm_area_struct *vma,
@@ -490,7 +490,7 @@ index c287b9407f28..1d65f2801e13 100644
  				uprobe_notify_resume(regs);
  
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index f9c7e4e61b29..0ff22589ee1c 100644
+index 0b2f684cd8ca..88b671e8afbd 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
 @@ -829,7 +829,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
@@ -1362,10 +1362,10 @@ index a1202536fc57..a26a7c3849f5 100644
  #define orc_warn_current(args...)					\
  ({									\
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 33cb06518124..b0b2122c51a3 100644
+index 61bc54748f22..62597025b6e7 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -8526,6 +8526,14 @@ int kvm_arch_init(void *opaque)
+@@ -8535,6 +8535,14 @@ int kvm_arch_init(void *opaque)
  		goto out;
  	}
  
@@ -1673,7 +1673,7 @@ index d3f2e5364c27..9c4a99757afd 100644
  	return 0;
  }
 diff --git a/drivers/firmware/efi/efi.c b/drivers/firmware/efi/efi.c
-index 9fa86288b78a..7de3f5b6e8d0 100644
+index e3df82d5d37a..5502e176d51b 100644
 --- a/drivers/firmware/efi/efi.c
 +++ b/drivers/firmware/efi/efi.c
 @@ -66,7 +66,7 @@ struct mm_struct efi_mm = {
@@ -5065,7 +5065,7 @@ index 91a43e57a32e..1d099609568d 100644
  }
  
 diff --git a/kernel/fork.c b/kernel/fork.c
-index 28aee1a8875b..29f8781e8a45 100644
+index 89475c994ca9..dc1aa0f71089 100644
 --- a/kernel/fork.c
 +++ b/kernel/fork.c
 @@ -289,7 +289,10 @@ static inline void free_thread_stack(struct task_struct *tsk)
@@ -7539,7 +7539,7 @@ index 4ca6d5b199e8..477ebf6ec712 100644
  	div = div < 0 ? 7 : div > sizeof(long) * 8 - 2 ? sizeof(long) * 8 - 2 : div;
  	bl = max(rdp->blimit, pending >> div);
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index c2dec6ce9809..443fe7f04429 100644
+index a0747eaa2dba..a031f078b084 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
 @@ -74,7 +74,11 @@ __read_mostly int sysctl_resched_latency_warn_once = 1;
@@ -7676,7 +7676,7 @@ index c2dec6ce9809..443fe7f04429 100644
  		}
  	}
  
-@@ -4384,6 +4431,9 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
+@@ -4385,6 +4432,9 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
  	p->on_cpu = 0;
  #endif
  	init_task_preempt_count(p);
@@ -7686,7 +7686,7 @@ index c2dec6ce9809..443fe7f04429 100644
  #ifdef CONFIG_SMP
  	plist_node_init(&p->pushable_tasks, MAX_PRIO);
  	RB_CLEAR_NODE(&p->pushable_dl_tasks);
-@@ -4840,20 +4890,18 @@ static struct rq *finish_task_switch(struct task_struct *prev)
+@@ -4849,20 +4899,18 @@ static struct rq *finish_task_switch(struct task_struct *prev)
  	 */
  	if (mm) {
  		membarrier_mm_sync_core_before_usermode(mm);
@@ -7712,7 +7712,7 @@ index c2dec6ce9809..443fe7f04429 100644
  
  		put_task_struct_rcu_user(prev);
  	}
-@@ -6254,6 +6302,7 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+@@ -6263,6 +6311,7 @@ static void __sched notrace __schedule(unsigned int sched_mode)
  
  	next = pick_next_task(rq, prev, &rf);
  	clear_tsk_need_resched(prev);
@@ -7720,7 +7720,7 @@ index c2dec6ce9809..443fe7f04429 100644
  	clear_preempt_need_resched();
  #ifdef CONFIG_SCHED_DEBUG
  	rq->last_seen_need_resched_ns = 0;
-@@ -6471,6 +6520,30 @@ static void __sched notrace preempt_schedule_common(void)
+@@ -6480,6 +6529,30 @@ static void __sched notrace preempt_schedule_common(void)
  	} while (need_resched());
  }
  
@@ -7751,7 +7751,7 @@ index c2dec6ce9809..443fe7f04429 100644
  #ifdef CONFIG_PREEMPTION
  /*
   * This is the entry point to schedule() from in-kernel preemption
-@@ -6484,7 +6557,8 @@ asmlinkage __visible void __sched notrace preempt_schedule(void)
+@@ -6493,7 +6566,8 @@ asmlinkage __visible void __sched notrace preempt_schedule(void)
  	 */
  	if (likely(!preemptible()))
  		return;
@@ -7761,7 +7761,7 @@ index c2dec6ce9809..443fe7f04429 100644
  	preempt_schedule_common();
  }
  NOKPROBE_SYMBOL(preempt_schedule);
-@@ -6517,6 +6591,9 @@ asmlinkage __visible void __sched notrace preempt_schedule_notrace(void)
+@@ -6526,6 +6600,9 @@ asmlinkage __visible void __sched notrace preempt_schedule_notrace(void)
  	if (likely(!preemptible()))
  		return;
  
@@ -7771,7 +7771,7 @@ index c2dec6ce9809..443fe7f04429 100644
  	do {
  		/*
  		 * Because the function tracer can trace preempt_count_sub()
-@@ -8669,7 +8746,9 @@ void __init init_idle(struct task_struct *idle, int cpu)
+@@ -8678,7 +8755,9 @@ void __init init_idle(struct task_struct *idle, int cpu)
  
  	/* Set the preempt count _outside_ the spinlocks! */
  	init_idle_preempt_count(idle, cpu);
@@ -7782,7 +7782,7 @@ index c2dec6ce9809..443fe7f04429 100644
  	/*
  	 * The idle tasks have their own, simple scheduling class:
  	 */
-@@ -9463,14 +9542,8 @@ void __init sched_init(void)
+@@ -9472,14 +9551,8 @@ void __init sched_init(void)
  }
  
  #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
@@ -7798,7 +7798,7 @@ index c2dec6ce9809..443fe7f04429 100644
  {
  	unsigned int state = get_current_state();
  	/*
-@@ -9484,11 +9557,32 @@ void __might_sleep(const char *file, int line, int preempt_offset)
+@@ -9493,11 +9566,32 @@ void __might_sleep(const char *file, int line, int preempt_offset)
  			(void *)current->task_state_change,
  			(void *)current->task_state_change);
  
@@ -7833,7 +7833,7 @@ index c2dec6ce9809..443fe7f04429 100644
  {
  	/* Ratelimiting timestamp: */
  	static unsigned long prev_jiffy;
-@@ -9498,7 +9592,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
+@@ -9507,7 +9601,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
  	/* WARN_ON_ONCE() by default, no rate limit required: */
  	rcu_sleep_check();
  
@@ -7842,7 +7842,7 @@ index c2dec6ce9809..443fe7f04429 100644
  	     !is_idle_task(current) && !current->non_block_count) ||
  	    system_state == SYSTEM_BOOTING || system_state > SYSTEM_RUNNING ||
  	    oops_in_progress)
-@@ -9511,29 +9605,33 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
+@@ -9520,29 +9614,33 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
  	/* Save this before calling printk(), since that will clobber it: */
  	preempt_disable_ip = get_preempt_disable_ip(current);
  
@@ -8107,7 +8107,7 @@ index 4e8698e62f07..3d0157bd4e14 100644
  
  	rd->visit_gen = 0;
 diff --git a/kernel/signal.c b/kernel/signal.c
-index aea93d6a5520..484a3c046448 100644
+index 6e3dbb3d1217..116f9d38ac32 100644
 --- a/kernel/signal.c
 +++ b/kernel/signal.c
 @@ -1324,6 +1324,34 @@ force_sig_info_to_task(struct kernel_siginfo *info, struct task_struct *t,
@@ -8338,10 +8338,10 @@ index b73e8850e58d..149cc4b08d8e 100644
  }
  
 diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index 618c20ce2479..72e544f77e4f 100644
+index 01002656f1ae..76ea2013135c 100644
 --- a/kernel/trace/trace.c
 +++ b/kernel/trace/trace.c
-@@ -2634,7 +2634,13 @@ unsigned int tracing_gen_ctx_irq_test(unsigned int irqs_status)
+@@ -2636,7 +2636,13 @@ unsigned int tracing_gen_ctx_irq_test(unsigned int irqs_status)
  		trace_flags |= TRACE_FLAG_NEED_RESCHED;
  	if (test_preempt_need_resched())
  		trace_flags |= TRACE_FLAG_PREEMPT_RESCHED;
@@ -8356,7 +8356,7 @@ index 618c20ce2479..72e544f77e4f 100644
  		(min_t(unsigned int, migration_disable_value(), 0xf)) << 4;
  }
  
-@@ -4210,15 +4216,17 @@ unsigned long trace_total_entries(struct trace_array *tr)
+@@ -4212,15 +4218,17 @@ unsigned long trace_total_entries(struct trace_array *tr)
  
  static void print_lat_help_header(struct seq_file *m)
  {
@@ -8383,7 +8383,7 @@ index 618c20ce2479..72e544f77e4f 100644
  }
  
  static void print_event_info(struct array_buffer *buf, struct seq_file *m)
-@@ -4252,14 +4260,16 @@ static void print_func_help_header_irq(struct array_buffer *buf, struct seq_file
+@@ -4254,14 +4262,16 @@ static void print_func_help_header_irq(struct array_buffer *buf, struct seq_file
  
  	print_event_info(buf, m);
  
@@ -9213,11 +9213,11 @@ index abb3432ed744..d5e82e4a57ad 100644
  			kunmap(miter->page);
 diff --git a/localversion-rt b/localversion-rt
 new file mode 100644
-index 000000000000..21988f9ad53f
+index 000000000000..5498386d0d0c
 --- /dev/null
 +++ b/localversion-rt
 @@ -0,0 +1 @@
-+-rt34
++-rt39
 diff --git a/mm/Kconfig b/mm/Kconfig
 index c048dea7e342..88778414465b 100644
 --- a/mm/Kconfig
@@ -9261,7 +9261,7 @@ index 7773bae3b6ed..33ecf2df08d1 100644
  
  /*
 diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-index e8a807c78110..3c5be440ab30 100644
+index 8375eecc55de..f81f11bcce5a 100644
 --- a/mm/vmalloc.c
 +++ b/mm/vmalloc.c
 @@ -1918,11 +1918,12 @@ static void *new_vmap_block(unsigned int order, gfp_t gfp_mask)
@@ -11446,7 +11446,7 @@ index a66398fb2d6d..377f896bdedc 100644
  		return -1;
  	return 0;
 diff --git a/net/sunrpc/svc_xprt.c b/net/sunrpc/svc_xprt.c
-index 6316bd2b8f37..dfc9d12caef8 100644
+index d4b663401be1..e77738621485 100644
 --- a/net/sunrpc/svc_xprt.c
 +++ b/net/sunrpc/svc_xprt.c
 @@ -441,7 +441,7 @@ void svc_xprt_do_enqueue(struct svc_xprt *xprt)

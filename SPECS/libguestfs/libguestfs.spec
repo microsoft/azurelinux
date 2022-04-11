@@ -1,5 +1,5 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 # Architectures on which golang works.
 #% global golang_arches aarch64 % {arm} % {ix86} x86_64
 # In theory the above, in practice golang is so often broken that
@@ -8,301 +8,278 @@ Distribution:   Mariner
 
 # Architectures that we run the basic sanity-check test.
 #
-# The full test suite is done after the package has been built.  Here
-# we only do a sanity check that kernel/qemu/libvirt/appliance is not
-# broken.  To perform the full test suite, see instructions here:
-# https://www.redhat.com/archives/libguestfs/2015-September/msg00078.html
-#
 # Currently the basic sanity check is *broken* on:
 #
-# arm:     times out when running the test
 # aarch64: "MSI is not supported by interrupt controller" (RHBZ#1414081)
-# ppc64:   qemu doesn't work with TCG (RHBZ#1614948)
-# ppc64le: kernel doesn't boot on qemu (RHBZ#1435873)
-# s390x:   qemu TCG cannot emulate enough to boot the kernel
-#            (however KVM would work if it was available in Koji, so this
-#            is not a bug)
 %global test_arches x86_64
 
 # If there are patches which touch autotools files, set this to 1.
 %global patches_touch_autotools 1
 
-# The source directory.
-%global source_directory 1.44-stable
+%bcond_without appliances
+
+%bcond_with php
+%bcond_with inspect-icons
+%bcond_with man-pages
+
+Summary:        Access and modify virtual machine disk images
+Name:           libguestfs
+Version:        1.44.0
+Release:        6%{?dist}
+License:        LGPLv2+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+# Source and patches.
+URL:            https://libguestfs.org/
+Source0:        https://libguestfs.org/download/%{majmin}-stable/%{name}-%{version}.tar.gz
+# Replacement README file.
+Source4:        README-replacement.in
+# Guestfish colour prompts.
+Source5:        guestfish.sh
+# Used to build the supermin appliance in Koji.
+Source6:        yum.conf.in
+# Maintainer script which helps with handling patches.
+Source8:        copy-patches.sh
+# Build cache RPMS configuration for tdnf downloading
+# This is a copy of toolkit/resources/manifests/package/local.repo
+Source9:        tdnf-build-cache.repo
+# Upstream patches not present in 1.44.0
+Patch0:         libguestfs-ocaml413compat.patch
+Patch1:         libguestfs-config-rpm.patch
+Patch2:         libguestfs-file-5.40.patch
+
+BuildRequires:  %{_bindir}/ping
+BuildRequires:  %{_bindir}/pod2text
+BuildRequires:  %{_bindir}/qemu-img
+BuildRequires:  %{_bindir}/wget
+# Build requirements for the appliance.
+#
+# Get the initial list by doing:
+#   for f in $(cat appliance/packagelist); do echo $f; done | sort -u
+# However you have to edit the list down to packages which exist in
+# current Mariner, since supermin ignores non-existent packages.
+BuildRequires:  acl
+BuildRequires:  attr
+BuildRequires:  augeas-devel >= 1.7.0
+BuildRequires:  augeas-libs
+BuildRequires:  bash
+BuildRequires:  bash-completion
+BuildRequires:  binutils
+BuildRequires:  bison
+BuildRequires:  btrfs-progs
+BuildRequires:  bzip2
+BuildRequires:  coreutils
+BuildRequires:  cpio
+BuildRequires:  createrepo_c
+BuildRequires:  cryptsetup
+BuildRequires:  curl
+BuildRequires:  dhclient
+BuildRequires:  diffutils
+BuildRequires:  dosfstools
+BuildRequires:  e2fsprogs
+BuildRequires:  file
+BuildRequires:  file-devel
+BuildRequires:  findutils
+BuildRequires:  flex
+BuildRequires:  fuse
+BuildRequires:  fuse-devel
+BuildRequires:  gawk
+# Basic build requirements for the library and virt tools.
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  gdisk
+BuildRequires:  genisoimage
+BuildRequires:  gfs2-utils
+BuildRequires:  glibc-static
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  gperf
+BuildRequires:  grep
+BuildRequires:  gzip
+BuildRequires:  hivex
+BuildRequires:  hivex-devel >= 1.3.10
+BuildRequires:  iproute
+BuildRequires:  iputils
+BuildRequires:  jansson-devel
+BuildRequires:  kernel
+BuildRequires:  kmod
+BuildRequires:  kpartx
+BuildRequires:  less
+BuildRequires:  libacl-devel
+BuildRequires:  libcap
+BuildRequires:  libcap-devel
+BuildRequires:  libconfig-devel
+BuildRequires:  libdb-utils
+BuildRequires:  libldm
+BuildRequires:  libldm-devel
+BuildRequires:  libselinux
+BuildRequires:  libselinux-devel
+BuildRequires:  libselinux-utils
+BuildRequires:  libtirpc-devel
+BuildRequires:  libvirt-daemon-kvm >= 5.3.0
+BuildRequires:  libvirt-devel
+BuildRequires:  libxml2
+BuildRequires:  libxml2-devel
+BuildRequires:  lsof
+BuildRequires:  lsscsi
+BuildRequires:  lua
+BuildRequires:  lua-devel
+BuildRequires:  lvm2
+BuildRequires:  lzop
+BuildRequires:  make
+BuildRequires:  mdadm
+BuildRequires:  ntfs-3g
+BuildRequires:  ntfs-3g-system-compression
+BuildRequires:  ntfsprogs
+# For language bindings.
+BuildRequires:  ocaml
+BuildRequires:  ocaml-findlib-devel
+BuildRequires:  ocaml-gettext-devel
+BuildRequires:  ocaml-hivex-devel
+BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-ounit-devel
+BuildRequires:  openssh-clients
+BuildRequires:  parted
+BuildRequires:  pciutils
+BuildRequires:  pcre
+BuildRequires:  pcre-devel
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl-libintl-perl
+BuildRequires:  perl-macros
+BuildRequires:  policycoreutils
+BuildRequires:  procps
+BuildRequires:  psmisc
+BuildRequires:  python3-devel
+BuildRequires:  python3-libvirt
+BuildRequires:  qemu-img
+BuildRequires:  qemu-kvm
+BuildRequires:  readline-devel
+BuildRequires:  rpcgen
+BuildRequires:  rsync
+BuildRequires:  ruby-devel
+BuildRequires:  rubygem-rake
+BuildRequires:  scrub
+BuildRequires:  sed
+BuildRequires:  sleuthkit
+BuildRequires:  squashfs-tools
+BuildRequires:  strace
+BuildRequires:  supermin-devel >= 5.1.18
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
+BuildRequires:  systemd-units
+BuildRequires:  tar
+BuildRequires:  tdnf
+BuildRequires:  udev
+BuildRequires:  unzip
+BuildRequires:  util-linux
+BuildRequires:  vala
+BuildRequires:  vim
+BuildRequires:  which
+BuildRequires:  xfsprogs
+BuildRequires:  xz
+BuildRequires:  xz-devel
+BuildRequires:  yajl
+BuildRequires:  zerofree
+BuildRequires:  zip
+BuildRequires:  perl(Expect)
+BuildRequires:  perl(ExtUtils::CBuilder)
+BuildRequires:  perl(Module::Build)
+BuildRequires:  perl(Pod::Man)
+BuildRequires:  perl(Pod::Simple)
+BuildRequires:  perl(Sys::Virt)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
+BuildRequires:  perl(Win::Hivex)
+BuildRequires:  perl(Win::Hivex::Regedit)
+BuildRequires:  rubygem(irb)
+# json is not pulled in automatically, see RHBZ#1325022
+BuildRequires:  rubygem(json)
+BuildRequires:  rubygem(rdoc)
+BuildRequires:  rubygem(test-unit)
+
+%if 0%{patches_touch_autotools}
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gettext-devel
+BuildRequires:  libtool
+%endif
+
+%if %{with_check}
+BuildRequires:  git
+%endif
+
+%if %{with man-pages}
+BuildRequires:  po4a
+%endif
+
+%if %{with inspect-icons}
+BuildRequires:  icoutils
+BuildRequires:  netpbm-progs
+%endif
+
+%if %{with php}
+BuildRequires:  php-devel
+%endif
+
+%ifarch %{golang_arches}
+BuildRequires:  golang
+%endif
+
+%ifarch x86_64
+BuildRequires:  syslinux
+BuildRequires:  syslinux-devel
+%endif
+
+%ifnarch aarch64
+BuildRequires:  zfs-fuse
+%endif
+
+# For core disk-create API.
+Requires:       %{_bindir}/qemu-img
+# The daemon dependencies are not included automatically, because it
+# is buried inside the appliance, so list them here.
+Requires:       augeas-libs >= 1.7.0
+# For core mount-local (FUSE) API.
+Requires:       fuse
+Requires:       hivex >= 1.3.10
+Requires:       libacl
+Requires:       libcap
+# For core inspection API.
+Requires:       libdb-utils
+Requires:       libselinux
+Requires:       libvirt-daemon-driver-qemu
+Requires:       libvirt-daemon-driver-secret
+Requires:       libvirt-daemon-kvm >= 5.3.0
+Requires:       pcre
+# For qemu direct and libvirt backends.
+Requires:       qemu-kvm-core
+# For building the appliance.
+Requires:       supermin >= 5.1.18
+Requires:       systemd-libs
+Requires:       yajl
+
+%ifarch aarch64
+#Requires:       edk2-aarch64
+%endif
+
+Recommends:     libvirt-daemon-config-network
+Recommends:     libvirt-daemon-driver-storage-core
+Recommends:     selinux-policy
+
+Suggests:       qemu-block-curl
+Suggests:       qemu-block-gluster
+Suggests:       qemu-block-iscsi
+Suggests:       qemu-block-rbd
+Suggests:       qemu-block-ssh
+
+Provides:       bundled(gnulib)
 
 # Filter perl provides.
 %{?perl_default_filter}
 
 # Unbreak the linker.
 %undefine _strict_symbol_defs_build
-
-%bcond_without applicances
-%bcond_with php
-%bcond_with inspect-icons
-
-Summary:       Access and modify virtual machine disk images
-Name:          libguestfs
-Version:       1.44.0
-Release:       5%{?dist}
-License:       LGPLv2+
-
-# Source and patches.
-URL:           http://libguestfs.org/
-Source0:       http://libguestfs.org/download/%{source_directory}/%{name}-%{version}.tar.gz
-
-# Replacement README file.
-Source4:       README-replacement.in
-
-# Guestfish colour prompts.
-Source5:       guestfish.sh
-
-# Used to build the supermin appliance in Koji.
-Source6:       yum.conf.in
-
-# Maintainer script which helps with handling patches.
-Source8:       copy-patches.sh
-
-# Build cache RPMS configuration for tdnf downloading
-# This is a copy of toolkit/resources/manifests/package/local.repo
-Source9:       tdnf-build-cache.repo
-
-# Upstream patches not present in 1.44.0
-Patch0:        libguestfs-ocaml413compat.patch
-Patch1:        libguestfs-config-rpm.patch
-Patch2:        libguestfs-file-5.40.patch
-
-%if 0%{patches_touch_autotools}
-BuildRequires: autoconf, automake, libtool, gettext-devel
-%endif
-
-# Basic build requirements for the library and virt tools.
-BuildRequires: gcc, gcc-c++
-BuildRequires: qemu-kvm
-BuildRequires: make
-BuildRequires: rpcgen
-BuildRequires: libtirpc-devel
-BuildRequires: supermin-devel >= 5.1.18
-BuildRequires: hivex-devel >= 1.3.10
-BuildRequires: ocaml-hivex-devel
-BuildRequires: perl(Pod::Simple)
-BuildRequires: perl(Pod::Man)
-BuildRequires: /usr/bin/pod2text
-BuildRequires: po4a
-BuildRequires: augeas-devel >= 1.7.0
-BuildRequires: readline-devel
-BuildRequires: genisoimage
-BuildRequires: libxml2-devel
-BuildRequires: createrepo_c
-BuildRequires: glibc-static
-BuildRequires: libselinux-utils
-BuildRequires: libselinux-devel
-BuildRequires: fuse, fuse-devel
-BuildRequires: pcre-devel
-BuildRequires: file-devel
-BuildRequires: libvirt-devel
-BuildRequires: gperf
-BuildRequires: flex
-BuildRequires: bison
-BuildRequires: libdb-utils
-BuildRequires: cpio
-BuildRequires: libconfig-devel
-BuildRequires: xz-devel
-BuildRequires: zip
-BuildRequires: unzip
-BuildRequires: systemd-units
-%if %{with inspect-icons}
-BuildRequires: netpbm-progs
-%endif
-BuildRequires: icoutils
-BuildRequires: libvirt-daemon-kvm >= 5.3.0
-BuildRequires: perl(Expect)
-BuildRequires: libacl-devel
-BuildRequires: libcap-devel
-BuildRequires: libldm-devel
-BuildRequires: jansson-devel
-BuildRequires: systemd-devel
-BuildRequires: bash-completion
-BuildRequires: /usr/bin/ping
-BuildRequires: /usr/bin/wget
-BuildRequires: curl
-BuildRequires: xz
-BuildRequires: /usr/bin/qemu-img
-BuildRequires: perl(Win::Hivex)
-BuildRequires: perl(Win::Hivex::Regedit)
-BuildRequires: tdnf
-
-# For language bindings.
-BuildRequires: ocaml
-BuildRequires: ocaml-ocamldoc
-BuildRequires: ocaml-findlib-devel
-BuildRequires: ocaml-gettext-devel
-BuildRequires: ocaml-ounit-devel
-BuildRequires: lua
-BuildRequires: lua-devel
-BuildRequires: perl-devel
-BuildRequires: perl-generators
-BuildRequires: perl-macros
-BuildRequires: perl(Sys::Virt)
-BuildRequires: perl(Test::More)
-BuildRequires: perl(Test::Pod) >= 1.00
-BuildRequires: perl(Test::Pod::Coverage) >= 1.00
-BuildRequires: perl(Module::Build)
-BuildRequires: perl(ExtUtils::CBuilder)
-BuildRequires: perl-libintl-perl
-BuildRequires: python3-devel
-BuildRequires: python3-libvirt
-BuildRequires: ruby-devel
-BuildRequires: rubygem-rake
-# json is not pulled in automatically, see RHBZ#1325022
-BuildRequires: rubygem(json)
-BuildRequires: rubygem(rdoc)
-BuildRequires: rubygem(test-unit)
-BuildRequires: rubygem(irb)
-%if %{with php}
-BuildRequires: php-devel
-%endif 
-BuildRequires: gobject-introspection-devel
-#BuildRequires: gjs
-BuildRequires: vala
-%ifarch %{golang_arches}
-BuildRequires: golang
-%endif
-
-# Build requirements for the appliance.
-#
-# Get the initial list by doing:
-#   for f in `cat appliance/packagelist`; do echo $f; done | sort -u
-# However you have to edit the list down to packages which exist in
-# current Fedora, since supermin ignores non-existent packages.
-
-BuildRequires: acl
-BuildRequires: attr
-BuildRequires: augeas-libs
-BuildRequires: bash
-BuildRequires: binutils
-BuildRequires: btrfs-progs
-BuildRequires: bzip2
-BuildRequires: coreutils
-BuildRequires: cpio
-BuildRequires: cryptsetup
-BuildRequires: curl
-BuildRequires: dhclient
-BuildRequires: diffutils
-BuildRequires: dosfstools
-BuildRequires: e2fsprogs
-BuildRequires: file
-BuildRequires: findutils
-BuildRequires: gawk
-BuildRequires: gdisk
-BuildRequires: genisoimage
-BuildRequires: gfs2-utils
-BuildRequires: grep
-BuildRequires: gzip
-BuildRequires: hivex
-BuildRequires: iproute
-BuildRequires: iputils
-BuildRequires: kernel
-BuildRequires: kmod
-BuildRequires: kpartx
-BuildRequires: less
-BuildRequires: libcap
-BuildRequires: libldm
-BuildRequires: libselinux
-BuildRequires: libxml2
-BuildRequires: lsof
-BuildRequires: lsscsi
-BuildRequires: lvm2
-BuildRequires: lzop
-BuildRequires: mdadm
-BuildRequires: ntfs-3g ntfsprogs ntfs-3g-system-compression
-BuildRequires: openssh-clients
-BuildRequires: parted
-BuildRequires: pciutils
-BuildRequires: pcre
-BuildRequires: policycoreutils
-BuildRequires: procps
-BuildRequires: psmisc
-BuildRequires: qemu-img
-BuildRequires: rsync
-BuildRequires: scrub
-BuildRequires: sed
-BuildRequires: sleuthkit
-BuildRequires: squashfs-tools
-BuildRequires: strace
-%ifarch x86_64
-BuildRequires: syslinux
-BuildRequires: syslinux-devel
-%endif
-BuildRequires: systemd
-BuildRequires: tar
-BuildRequires: udev
-BuildRequires: util-linux
-BuildRequires: vim
-BuildRequires: which
-BuildRequires: xfsprogs
-BuildRequires: xz
-BuildRequires: yajl
-BuildRequires: zerofree
-%ifnarch aarch64
-BuildRequires: zfs-fuse
-%endif
-
-# For building the appliance.
-Requires:      supermin >= 5.1.18
-
-# The daemon dependencies are not included automatically, because it
-# is buried inside the appliance, so list them here.
-Requires:      augeas-libs >= 1.7.0
-Requires:      libacl
-Requires:      libcap
-Requires:      hivex >= 1.3.10
-Requires:      pcre
-Requires:      libselinux
-Requires:      systemd-libs
-Requires:      yajl
-
-# For core inspection API.
-Requires:      libdb-utils
-
-# For core mount-local (FUSE) API.
-Requires:      fuse
-
-# For core disk-create API.
-Requires:      /usr/bin/qemu-img
-
-# For qemu direct and libvirt backends.
-Requires:      qemu-kvm-core
-Suggests:      qemu-block-curl
-Suggests:      qemu-block-gluster
-Suggests:      qemu-block-iscsi
-Suggests:      qemu-block-rbd
-Suggests:      qemu-block-ssh
-Recommends:    libvirt-daemon-config-network
-Requires:      libvirt-daemon-driver-qemu
-Requires:      libvirt-daemon-driver-secret
-Recommends:    libvirt-daemon-driver-storage-core
-Requires:      libvirt-daemon-kvm >= 5.3.0
-Recommends:    selinux-policy
-
-%ifarch aarch64
-Requires:      edk2-aarch64
-%endif
-
-# For UML backend (this backend only works on x86).
-# UML has been broken upstream (in the kernel) for a while, so don't
-# include this.  Note that uml_utilities also depends on Perl.
-#% ifarch % {ix86} x86_64
-#Requires:      uml_utilities
-#% endif
-
-# https://fedoraproject.org/wiki/Packaging:No_Bundled_Libraries#Packages_granted_exceptions
-Provides:      bundled(gnulib)
-
-# Someone managed to install libguestfs-winsupport (from RHEL!) on
-# Fedora, which breaks everything.  Thus:
-Conflicts:     libguestfs-winsupport
-
-
 
 %description
 Libguestfs is a library for accessing and modifying virtual machine
@@ -356,77 +333,76 @@ Language bindings:
           ruby-libguestfs  Ruby bindings
           libguestfs-vala  Vala language bindings
 
-
 %package devel
-Summary:       Development tools and libraries for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-Requires:      pkgconfig
+Summary:        Development tools and libraries for %{name}
+License:        LGPLv2+
 
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-tools-c = %{version}-%{release}
+Requires:       pkg-config
 # For libguestfs-make-fixed-appliance.
-Requires:      xz
-Requires:      %{name}-tools-c = %{version}-%{release}
-
+Requires:       xz
 
 %description devel
 %{name}-devel contains development tools and libraries
 for %{name}.
 
-
 %package forensics
-Summary:       Filesystem forensics support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Summary:        Filesystem forensics support for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description forensics
 This adds filesystem forensics support to %{name}.  Install it if you
 want to forensically analyze disk images using The Sleuth Kit.
 
-
 %package gfs2
-Summary:       GFS2 support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Summary:        GFS2 support for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description gfs2
 This adds GFS2 support to %{name}.  Install it if you want to process
 disk images containing GFS2.Exiting due to strict setting
 
-
 %package rescue
-Summary:       Additional tools for virt-rescue
-License:       LGPLv2+
-Requires:      %{name}-tools-c = %{version}-%{release}
+Summary:        Additional tools for virt-rescue
+License:        LGPLv2+
+
+Requires:       %{name}-tools-c = %{version}-%{release}
 
 %description rescue
 This adds additional tools to use inside the virt-rescue shell,
 such as ssh, network utilities, editors and debugging utilities.
 
-
 %package rsync
-Summary:       rsync support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Summary:        rsync support for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description rsync
 This adds rsync support to %{name}.  Install it if you want to use
 rsync to upload or download files into disk images.
 
-
 %package xfs
-Summary:       XFS support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Summary:        XFS support for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description xfs
 This adds XFS support to %{name}.  Install it if you want to process
 disk images containing XFS.
 
-
 %ifnarch aarch64
 %package zfs
-Summary:       ZFS support for %{name}
-License:       LGPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Summary:        ZFS support for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description zfs
 This adds ZFS support to %{name}.  Install it if you want to process
@@ -436,13 +412,14 @@ disk images containing ZFS.
 
 %if %{with inspect-icons}
 %package inspect-icons
-Summary:       Additional dependencies for inspecting guest icons
-License:       LGPLv2+
-BuildArch:     noarch
-Requires:      %{name} = %{version}-%{release}
-Requires:      netpbm-progs
-Requires:      icoutils
+Summary:        Additional dependencies for inspecting guest icons
+License:        LGPLv2+
 
+BuildArch:      noarch
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       icoutils
+Requires:       netpbm-progs
 
 %description inspect-icons
 %{name}-inspect-icons is a metapackage that pulls in additional
@@ -456,32 +433,25 @@ having to depend on Perl.  See https://bugzilla.redhat.com/1194158
 
 
 %package tools-c
-Summary:       System administration tools for virtual machines
-License:       GPLv2+
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Summary:        System administration tools for virtual machines
+License:        GPLv2+
 
-# For guestfish:
-#Requires:      /usr/bin/emacs #theoretically, but too large
-Requires:      /usr/bin/hexedit
-Requires:      /usr/bin/less
-Requires:      /usr/bin/man
-Requires:      /usr/bin/vi
-
+Requires:       %{_bindir}/hexedit
+Requires:       %{_bindir}/less
+Requires:       %{_bindir}/man
+Requires:       %{_bindir}/vi
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       curl
 # For virt-builder:
-Requires:      gnupg2
-Requires:      xz
-#Requires:     nbdkit, nbdkit-plugin-xz
-Requires:      curl
+Requires:       gnupg2
+Requires:       xz
+
+Recommends:     libguestfs-xfs
 
 # For virt-builder-repository:
-Suggests:      osinfo-db
-
-# Some Fedora, and all RHEL 7, use XFS:
-Recommends:    libguestfs-xfs
-
+Suggests:       osinfo-db
 # For virt-edit and virt-customize:
-Suggests:      perl
-
+Suggests:       perl
 
 %description tools-c
 This package contains miscellaneous system administrator command line
@@ -491,14 +461,14 @@ Note that you should install %{name}-tools (which pulls in
 this package).  This package is only used directly when you want
 to avoid dependencies on Perl.
 
-
 %package tools
-Summary:       System administration tools for virtual machines
-License:       GPLv2+
-BuildArch:     noarch
-Requires:      %{name} = %{version}-%{release}
-Requires:      %{name}-tools-c = %{version}-%{release}
+Summary:        System administration tools for virtual machines
+License:        GPLv2+
 
+BuildArch:      noarch
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-tools-c = %{version}-%{release}
 
 %description tools
 This package contains miscellaneous system administrator command line
@@ -579,36 +549,35 @@ for virtual machines.  These replace the deprecated program virt-tar.
 Virt-win-reg lets you look at and modify the Windows Registry of
 Windows virtual machines.
 
-
 %package -n virt-dib
-Summary:       Safe and secure diskimage-builder replacement
-License:       GPLv2+
+Summary:        Safe and secure diskimage-builder replacement
+License:        GPLv2+
 
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n virt-dib
 Virt-dib is a safe and secure alternative to the OpenStack
 diskimage-builder command.  It is compatible with most
 diskimage-builder elements.
 
-
 %package bash-completion
-Summary:       Bash tab-completion scripts for %{name} tools
-BuildArch:     noarch
-Requires:      bash-completion >= 2.0
-Requires:      %{name}-tools-c = %{version}-%{release}
+Summary:        Bash tab-completion scripts for %{name} tools
+License:        LGPLv2+
 
+BuildArch:      noarch
+
+Requires:       %{name}-tools-c = %{version}-%{release}
+Requires:       bash-completion >= 2.0
 
 %description bash-completion
 Install this package if you want intelligent bash tab-completion
 for guestfish, guestmount and various virt-* tools.
 
-
 %package -n ocaml-%{name}
-Summary:       OCaml bindings for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Summary:        OCaml bindings for %{name}
+License:        LGPLv2+
 
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n ocaml-%{name}
 ocaml-%{name} contains OCaml bindings for %{name}.
@@ -616,70 +585,77 @@ ocaml-%{name} contains OCaml bindings for %{name}.
 This is for toplevel and scripting access only.  To compile OCaml
 programs which use %{name} you will also need ocaml-%{name}-devel.
 
-
 %package -n ocaml-%{name}-devel
-Summary:       OCaml bindings for %{name}
-Requires:      ocaml-%{name}%{?_isa} = %{version}-%{release}
+Summary:        OCaml bindings for %{name}
+License:        LGPLv2+
 
+Requires:       ocaml-%{name}%{?_isa} = %{version}-%{release}
 
 %description -n ocaml-%{name}-devel
 ocaml-%{name}-devel contains development libraries
 required to use the OCaml bindings for %{name}.
 
-
 %package -n perl-Sys-Guestfs
-Summary:       Perl bindings for %{name} (Sys::Guestfs)
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-Requires:      perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Summary:        Perl bindings for %{name} (Sys::Guestfs)
+License:        LGPLv2+
 
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description -n perl-Sys-Guestfs
 perl-Sys-Guestfs contains Perl bindings for %{name} (Sys::Guestfs).
 
-
 %package -n python3-%{name}
-Summary:       Python 3 bindings for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
 %{?python_provide:%python_provide python3-%{name}}
+Summary:        Python 3 bindings for %{name}
+License:        LGPLv2+
 
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-%{name}
 python3-%{name} contains Python 3 bindings for %{name}.
 
-
 %package -n ruby-%{name}
-Summary:       Ruby bindings for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-Requires:      ruby(release)
-Requires:      ruby
-Provides:      ruby(guestfs) = %{version}
+Summary:        Ruby bindings for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ruby
+Requires:       ruby(release)
+
+Provides:       ruby(guestfs) = %{version}
 
 %description -n ruby-%{name}
 ruby-%{name} contains Ruby bindings for %{name}.
 
 %if %{with php}
 %package -n php-%{name}
-Summary:       PHP bindings for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-Requires:	php(zend-abi) = %{php_zend_api}
-Requires:	php(api) = %{php_core_api}
+Summary:        PHP bindings for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       php(api) = %{php_core_api}
+Requires:       php(zend-abi) = %{php_zend_api}
 
 %description -n php-%{name}
 php-%{name} contains PHP bindings for %{name}.
 %endif
 
 %package -n lua-guestfs
-Summary:       Lua bindings for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-Requires:      lua
+Summary:        Lua bindings for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       lua
 
 %description -n lua-guestfs
 lua-guestfs contains Lua bindings for %{name}.
 
-
 %package gobject
-Summary:       GObject bindings for %{name}
-Requires:      %{name}%{?_isa} = %{version}-%{release}
+Summary:        GObject bindings for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description gobject
 %{name}-gobject contains GObject bindings for %{name}.
@@ -687,10 +663,11 @@ Requires:      %{name}%{?_isa} = %{version}-%{release}
 To develop software against these bindings, you need to install
 %{name}-gobject-devel.
 
-
 %package gobject-devel
-Summary:       GObject bindings for %{name}
-Requires:      %{name}-gobject = %{version}-%{release}
+Summary:        GObject bindings for %{name}
+License:        LGPLv2+
+
+Requires:       %{name}-gobject = %{version}-%{release}
 
 %description gobject-devel
 %{name}-gobject contains GObject bindings for %{name}.
@@ -698,50 +675,57 @@ Requires:      %{name}-gobject = %{version}-%{release}
 This package is needed if you want to write software using the
 GObject bindings.  It also contains GObject Introspection information.
 
-
 %package vala
-Summary:       Vala for %{name}
-Requires:      %{name}-devel%{?_isa} = %{version}-%{release}
-Requires:      vala
+Summary:        Vala for %{name}
+License:        LGPLv2+
 
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       vala
 
 %description vala
 %{name}-vala contains GObject bindings for %{name}.
 
-
-
 %ifarch %{golang_arches}
 %package -n golang-guestfs
-Summary:       Golang bindings for %{name}
-BuildArch:     noarch
-Requires:      %{name} = %{version}-%{release}
-Requires:      golang
-Provides:      golang(libguestfs.org) = %{version}-%{release}
+Summary:        Golang bindings for %{name}
+License:        LGPLv2+
+
+BuildArch:      noarch
+
+Requires:       %{name} = %{version}-%{release}
+Requires:       golang
+
+Provides:       golang(libguestfs.org) = %{version}-%{release}
 
 %description -n golang-guestfs
 golang-%{name} contains Go language bindings for %{name}.
 %endif
 
-
+%if %{with man-pages}
 %package man-pages-ja
-Summary:       Japanese (ja) man pages for %{name}
-BuildArch:     noarch
-Requires:      %{name} = %{version}-%{release}
+Summary:        Japanese (ja) man pages for %{name}
+License:        LGPLv2+
+
+BuildArch:      noarch
+
+Requires:       %{name} = %{version}-%{release}
 
 %description man-pages-ja
 %{name}-man-pages-ja contains Japanese (ja) man pages
 for %{name}.
 
-
 %package man-pages-uk
-Summary:       Ukrainian (uk) man pages for %{name}
-BuildArch:     noarch
-Requires:      %{name} = %{version}-%{release}
+Summary:        Ukrainian (uk) man pages for %{name}
+License:        LGPLv2+
+
+BuildArch:      noarch
+
+Requires:       %{name} = %{version}-%{release}
 
 %description man-pages-uk
 %{name}-man-pages-uk contains Ukrainian (uk) man pages
 for %{name}.
-
+%endif
 
 %prep
 %autosetup -p1
@@ -765,16 +749,16 @@ mv README README.orig
 sed 's/@VERSION@/%{version}/g' < %{SOURCE4} > README
 
 # Re-enable upstream cache and local repos
-mkdir -pv /etc/yum.repos.d
-cp %{SOURCE9} /etc/yum.repos.d/allrepos.repo
+mkdir -pv %{_sysconfdir}/yum.repos.d
+cp %{SOURCE9} %{_sysconfdir}/yum.repos.d/allrepos.repo
 
 # Download appliance, since our chroot TDNF config does not have `keepcache=1`
 # Must keep in sync with BRs under "Build requirements for the appliance"
 # Download to
-mkdir -pv /var/cache/tdnf
+mkdir -pv %{_var}/cache/tdnf
 tdnf download -y --disablerepo=* \
   --enablerepo=local-repo --enablerepo=upstream-cache-repo \
-  --alldeps --destdir /var/cache/tdnf \
+  --alldeps --destdir %{_var}/cache/tdnf \
     acl \
     attr \
     augeas-libs \
@@ -850,20 +834,20 @@ tdnf download -y --disablerepo=* \
 
 
 mkdir cachedir repo
-find /var/cache/tdnf -type f -name '*.rpm' -print0 | \
+find %{_var}/cache/tdnf -type f -name '*.rpm' -print0 | \
   xargs -0 -n 1 cp -t repo
 createrepo_c repo
 sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
 
-
 %build
 # "--with-distro=REDHAT" is used to indicate Mariner is "Fedora-like" in package naming
-%{configure} \
-  PYTHON=%{__python3} \
-  --with-distro=REDHAT \
-  --with-supermin-packager-config=$(pwd)/yum.conf \
+%configure \
+  PYTHON=python3 \
   --with-default-backend=libvirt \
+  --with-distro=REDHAT \
+  --with-extra="release=%{release},libvirt" \
   --with-qemu="qemu-system-%{_build_arch} qemu" \
+  --with-supermin-packager-config=$(pwd)/yum.conf \
 %if %{without php}
   --disable-php \
 %endif
@@ -871,35 +855,30 @@ sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
   --disable-golang \
 %endif
   --without-java \
-%if %{without applicances}
+%if %{without appliances}
   --enable-appliance=no \
 %endif
   --disable-erlang
-
 
 # Building index-parse.c by hand works around a race condition in the
 # autotools cruft, where two or more copies of yacc race with each
 # other, resulting in a corrupted file.
 #
 # 'INSTALLDIRS' ensures that Perl and Ruby libs are installed in the
-# vendor dir not the site dir.
+# vendor dir, not the site dir.
 make -j1 -C builder index-parse.c
 make V=1 INSTALLDIRS=vendor %{?_smp_mflags}
 
-
-%check
-
 %ifarch %{test_arches}
+%check
 export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
 export LIBVIRT_DEBUG=1
 
 if ! make quickcheck QUICKCHECK_TEST_TOOL_ARGS="-t 1200"; then
-    cat $HOME/.cache/libvirt/qemu/log/*
-    exit 1
+    cat $HOME/.cache/libvirt/qemu/log/* && false
 fi
 %endif
-
 
 %install
 # This file is creeping over 1 MB uncompressed, and since it is
@@ -911,54 +890,54 @@ gzip -9 ChangeLog
 # our own base tarball out of the root filesystem RPM
 mkdir -pv mariner-filesystem
 pushd mariner-filesystem
-rpm2cpio /var/cache/tdnf/filesystem*.rpm | cpio -id
+rpm2cpio %{_var}/cache/tdnf/filesystem*.rpm | cpio -id
 popd
 tar -czvf base.tar.gz mariner-filesystem
 mv base.tar.gz appliance/supermin.d/
 
 # 'INSTALLDIRS' ensures that Perl and Ruby libs are installed in the
-# vendor dir not the site dir.
-make DESTDIR=$RPM_BUILD_ROOT INSTALLDIRS=vendor install
+# vendor dir, not the site dir.
+make DESTDIR=%{buildroot} INSTALLDIRS=vendor install
 
 # Delete static libraries.
-rm $( find $RPM_BUILD_ROOT -name '*.a' | grep -v /ocaml/ )
+rm $( find %{buildroot} -name '*.a' | grep -v /ocaml/ )
 
 # Delete libtool files.
-find $RPM_BUILD_ROOT -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 # Delete some bogus Perl files.
-find $RPM_BUILD_ROOT -name perllocal.pod -delete
-find $RPM_BUILD_ROOT -name .packlist -delete
-find $RPM_BUILD_ROOT -name '*.bs' -delete
-find $RPM_BUILD_ROOT -name 'bindtests.pl' -delete
+find %{buildroot} -name perllocal.pod -delete
+find %{buildroot} -name .packlist -delete
+find %{buildroot} -name '*.bs' -delete
+find %{buildroot} -name 'bindtests.pl' -delete
 
-%if %{with applicances}
+%if %{with appliances}
 # Remove obsolete binaries (RHBZ#1213298).
-rm $RPM_BUILD_ROOT%{_bindir}/virt-list-filesystems
-rm $RPM_BUILD_ROOT%{_bindir}/virt-list-partitions
-rm $RPM_BUILD_ROOT%{_bindir}/virt-tar
-rm $RPM_BUILD_ROOT%{_mandir}/man1/virt-list-filesystems.1*
-rm $RPM_BUILD_ROOT%{_mandir}/man1/virt-list-partitions.1*
-rm $RPM_BUILD_ROOT%{_mandir}/man1/virt-tar.1*
+rm %{buildroot}%{_bindir}/virt-list-filesystems
+rm %{buildroot}%{_bindir}/virt-list-partitions
+rm %{buildroot}%{_bindir}/virt-tar
+rm %{buildroot}%{_mandir}/man1/virt-list-filesystems.1*
+rm %{buildroot}%{_mandir}/man1/virt-list-partitions.1*
+rm %{buildroot}%{_mandir}/man1/virt-tar.1*
 %endif
 
 # golang: Ignore what libguestfs upstream installs, and just copy the
 # source files to %%{_datadir}/gocode/src.
 %ifarch %{golang_arches}
-rm -r $RPM_BUILD_ROOT/usr/lib/golang
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/gocode/src
-cp -a golang/src/libguestfs.org $RPM_BUILD_ROOT%{_datadir}/gocode/src
+rm -r %{buildroot}%{_libdir}/golang
+mkdir -p %{buildroot}%{_datadir}/gocode/src
+cp -a golang/src/libguestfs.org %{buildroot}%{_datadir}/gocode/src
 %endif
 
 # Move installed documentation back to the source directory so
 # we can install it using a %%doc rule.
-mv $RPM_BUILD_ROOT%{_docdir}/libguestfs installed-docs
+mv %{buildroot}%{_docdir}/libguestfs installed-docs
 gzip --best installed-docs/*.xml
 
-%if %{with applicances}
+%if %{with appliances}
 # Split up the monolithic packages file in the supermin appliance so
 # we can install dependencies in subpackages.
-pushd $RPM_BUILD_ROOT%{_libdir}/guestfs/supermin.d
+pushd %{buildroot}%{_libdir}/guestfs/supermin.d
 
 function move_to
 {
@@ -992,34 +971,33 @@ move_to zfs-fuse        zz-packages-zfs
 popd
 %endif
 
-%if %{with applicances}
+%if %{with appliances}
 # If there is a bogus dependency on kernel-*, rename it to 'kernel'
 # instead.  This can happen for various reasons:
 # - DNF picks kernel-debug instead of kernel.
 # - Version of kernel-rt in brew > version of kernel.
 # On all known architectures, depending on 'kernel' should
 # mean "we need a kernel".
-pushd $RPM_BUILD_ROOT%{_libdir}/guestfs/supermin.d
+pushd %{buildroot}%{_libdir}/guestfs/supermin.d
 sed -i 's/^kernel-.*/kernel/' packages
 popd
 %endif
 
 # Guestfish colour prompts.
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
-install -m 0644 %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/profile.d
+mkdir -p %{buildroot}%{_sysconfdir}/profile.d
+install -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/profile.d
 
 # Remove the .gitignore file from ocaml/html which will be copied to docdir.
 rm ocaml/html/.gitignore
 
-
 # Find locale files.
 %find_lang %{name}
 
-
 %files -f %{name}.lang
-%doc COPYING README
+%license COPYING COPYING.LIB
+%doc README
 %{_bindir}/libguestfs-test-tool
-%if %{with applicances}
+%if %{with appliances}
 %{_libdir}/guestfs/
 %exclude %{_libdir}/guestfs/supermin.d/zz-packages-*
 %endif
@@ -1032,13 +1010,12 @@ rm ocaml/html/.gitignore
 %{_mandir}/man1/guestfs-security.1*
 %{_mandir}/man1/libguestfs-test-tool.1*
 
-
 %files devel
 %doc AUTHORS BUGS ChangeLog.gz HACKING TODO README
 %doc examples/*.c
 %doc installed-docs/*
 %{_libdir}/libguestfs.so
-%if %{with applicances}
+%if %{with appliances}
 %{_sbindir}/libguestfs-make-fixed-appliance
 %{_mandir}/man1/libguestfs-make-fixed-appliance.1*
 %endif
@@ -1052,7 +1029,7 @@ rm ocaml/html/.gitignore
 %{_includedir}/guestfs.h
 %{_libdir}/pkgconfig/libguestfs.pc
 
-%if %{with applicances}
+%if %{with appliances}
 %files forensics
 %{_libdir}/guestfs/supermin.d/zz-packages-forensics
 
@@ -1146,7 +1123,7 @@ rm ocaml/html/.gitignore
 %{_bindir}/virt-tar-out
 %{_mandir}/man1/virt-tar-out.1*
 
-%if %{with applicances}
+%if %{with appliances}
 %files tools
 %doc README
 %{_bindir}/virt-win-reg
@@ -1154,10 +1131,10 @@ rm ocaml/html/.gitignore
 %endif
 
 %files -n virt-dib
-%doc COPYING README
+%doc README
 %{_bindir}/virt-dib
 %{_mandir}/man1/virt-dib.1*
-%if %{with applicances}
+%if %{with appliances}
 %{_libdir}/guestfs/supermin.d/zz-packages-dib
 %endif
 
@@ -1169,7 +1146,6 @@ rm ocaml/html/.gitignore
 %{_datadir}/bash-completion/completions/libguestfs-test-tool
 %{_datadir}/bash-completion/completions/virt-*
 
-
 %files -n ocaml-%{name}
 %{_libdir}/ocaml/guestfs
 %exclude %{_libdir}/ocaml/guestfs/*.a
@@ -1179,7 +1155,6 @@ rm ocaml/html/.gitignore
 %{_libdir}/ocaml/stublibs/dllmlguestfs.so
 %{_libdir}/ocaml/stublibs/dllmlguestfs.so.owner
 
-
 %files -n ocaml-%{name}-devel
 %doc ocaml/examples/*.ml ocaml/html
 %{_libdir}/ocaml/guestfs/*.a
@@ -1188,13 +1163,11 @@ rm ocaml/html/.gitignore
 %{_libdir}/ocaml/guestfs/*.mli
 %{_mandir}/man3/guestfs-ocaml.3*
 
-
 %files -n perl-Sys-Guestfs
 %doc perl/examples/*.pl
 %{perl_vendorarch}/*
 %{_mandir}/man3/Sys::Guestfs.3pm*
 %{_mandir}/man3/guestfs-perl.3*
-
 
 %files -n python3-%{name}
 %doc python/examples/*.py
@@ -1202,7 +1175,6 @@ rm ocaml/html/.gitignore
 %{python3_sitearch}/guestfs.py
 %{python3_sitearch}/__pycache__/guestfs*.py*
 %{_mandir}/man3/guestfs-python.3*
-
 
 %files -n ruby-%{name}
 %doc ruby/examples/*.rb
@@ -1221,15 +1193,13 @@ rm ocaml/html/.gitignore
 
 %files -n lua-guestfs
 %doc lua/examples/*.lua
-%doc lua/examples/LICENSE
+%license lua/examples/LICENSE
 %{_libdir}/lua/*/guestfs.so
 %{_mandir}/man3/guestfs-lua.3*
-
 
 %files gobject
 %{_libdir}/libguestfs-gobject-1.0.so.0*
 %{_libdir}/girepository-1.0/Guestfs-1.0.typelib
-
 
 %files gobject-devel
 %{_libdir}/libguestfs-gobject-1.0.so
@@ -1240,34 +1210,36 @@ rm ocaml/html/.gitignore
 %{_libdir}/pkgconfig/libguestfs-gobject-1.0.pc
 %{_mandir}/man3/guestfs-gobject.3*
 
-
 %files vala
 %{_datadir}/vala/vapi/libguestfs-gobject-1.0.deps
 %{_datadir}/vala/vapi/libguestfs-gobject-1.0.vapi
 
-
 %ifarch %{golang_arches}
 %files -n golang-guestfs
 %doc golang/examples/*.go
-%doc golang/examples/LICENSE
+%license golang/examples/LICENSE
 %{_datadir}/gocode/src/libguestfs.org
 %{_mandir}/man3/guestfs-golang.3*
 %endif
 
-
+%if %{with man-pages}
 %files man-pages-ja
 %lang(ja) %{_mandir}/ja/man1/*.1*
 %lang(ja) %{_mandir}/ja/man3/*.3*
 %lang(ja) %{_mandir}/ja/man5/*.5*
 
-
 %files man-pages-uk
 %lang(uk) %{_mandir}/uk/man1/*.1*
 %lang(uk) %{_mandir}/uk/man3/*.3*
 %lang(uk) %{_mandir}/uk/man5/*.5*
-
+%endif
 
 %changelog
+* Tue Apr 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44.0-6
+- License verified.
+- Making BR on "po4a" conditional.
+- Spec clean-up.
+
 * Sat Feb 05 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-5
 - Add patch to fix UUID parsing with file >= 5.40
 - Downgrade selinux-policy requirement to a recommendation without a version constraint
@@ -2054,7 +2026,6 @@ rm ocaml/html/.gitignore
 
 * Thu Jul 09 2015 Richard W.M. Jones <rjones@redhat.com> - 1:1.29.50-1
 - New upstream version 1.29.50.
-
 - Add virt-dib.
 
 * Thu Jul 02 2015 Richard W.M. Jones <rjones@redhat.com> - 1:1.29.49-1

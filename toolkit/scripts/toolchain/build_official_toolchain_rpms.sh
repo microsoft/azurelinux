@@ -264,7 +264,6 @@ chroot_and_install_rpms perl
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
-build_rpm_in_chroot_no_install mariner-release
 
 # Need to install perl-DBI in order for perl-DBD-SQLite to build
 build_rpm_in_chroot_no_install perl-DBI
@@ -292,6 +291,12 @@ chroot_and_install_rpms perl-Test-Warnings
 build_rpm_in_chroot_no_install perl-Text-Template
 chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
+
+# perl-generators requires perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+chroot_and_install_rpms perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+chroot_and_install_rpms perl-generators
 
 build_rpm_in_chroot_no_install wget
 
@@ -334,6 +339,9 @@ build_rpm_in_chroot_no_install grep
 # Lua needs to be installed for RPM to build
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
+
+build_rpm_in_chroot_no_install lua-rpm-macros
+chroot_and_install_rpms lua-rpm-macros
 
 # Build tdnf-3.2.2
 build_rpm_in_chroot_no_install kmod
@@ -418,6 +426,12 @@ chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
 chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gtk-doc
+
+# python3-lxml requires python3-Cython and libxslt
+build_rpm_in_chroot_no_install Cython
+chroot_and_install_rpms python3-Cython
+build_rpm_in_chroot_no_install python-lxml
+chroot_and_install_rpms python3-lxml
 
 # p11-kit, libtasn1 and glib need gtk-doc
 chroot_and_install_rpms gtk-doc

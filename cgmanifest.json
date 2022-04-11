@@ -6600,8 +6600,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.26.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.26.1.tar.gz"
+          "version": "5.15.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.32.1.tar.gz"
         }
       }
     },
@@ -8401,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.26.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.26.1.tar.gz"
+          "version": "5.15.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.32.1.tar.gz"
         }
       }
     },
@@ -8411,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.26.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.26.1.tar.gz"
+          "version": "5.15.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.32.1.tar.gz"
         }
       }
     },
@@ -8421,8 +8421,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "5.15.26.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.26.1.tar.gz"
+          "version": "5.15.32.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.32.1.tar.gz"
         }
       }
     },
@@ -9682,7 +9682,7 @@
         "other": {
           "name": "libguestfs",
           "version": "1.44.0",
-          "downloadUrl": "http://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
+          "downloadUrl": "https://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
         }
       }
     },
@@ -21694,8 +21694,8 @@
         "type": "other",
         "other": {
           "name": "pygobject3",
-          "version": "3.36.1",
-          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.36/pygobject-3.36.1.tar.xz"
+          "version": "3.42.0",
+          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.42/pygobject-3.42.0.tar.xz"
         }
       }
     },
@@ -23194,8 +23194,8 @@
         "type": "other",
         "other": {
           "name": "python-msgpack",
-          "version": "0.6.2",
-          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v0.6.2.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v1.0.3.tar.gz"
         }
       }
     },
@@ -23914,8 +23914,8 @@
         "type": "other",
         "other": {
           "name": "python-pyvmomi",
-          "version": "6.7.3",
-          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"
+          "version": "7.0.3",
+          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/refs/tags/v7.0.3.tar.gz"
         }
       }
     },

@@ -11,7 +11,13 @@ Distribution:   Mariner
 %global softfloat_version 20180726-gitb64af41
 
 # Enable this to skip secureboot enrollment, if problems pop up
+%if %{with_check}
+# keep enroll for testing (non containeried build env)
 %global skip_enroll 0
+%else
+# skip enroll when building that blocks containerized build
+%global skip_enroll 1
+%endif
 
 %define qosb_testing 0
 
@@ -48,11 +54,11 @@ Name:           edk2
 # to use YYYMMDD to avoid needing to bump package epoch
 # due to previous 'git' Version:
 Version:        %{edk2_stable_date}01stable
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        EFI Development Kit II
 
 License:        BSD-2-Clause-Patent
-URL:            http://www.tianocore.org/edk2/
+URL:            https://github.com/tianocore/tianocore.github.io/wiki/EDK-II/
 
 Source0:        https://github.com/tianocore/edk2/archive/%{edk2_stable_str}.tar.gz#/%{edk2_stable_str}.tar.gz
 Source1:        openssl-%{openssl_version}-hobbled.tar.xz
@@ -595,6 +601,10 @@ install qemu-ovmf-secureboot-%{qosb_version}/ovmf-vars-generator %{buildroot}%{_
 
 
 %changelog
+* Thu Apr 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 20200801stable-3
+- Skip enroll that blocks building from containerized environment.
+- License verified.
+
 * Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200801stable-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Turn off cross-compilation.
