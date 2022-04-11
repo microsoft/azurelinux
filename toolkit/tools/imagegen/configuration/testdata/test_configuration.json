@@ -125,6 +125,9 @@
                 "path/to/packages.json",
                 "path/to/extraPackages.json"
             ],
+            "Packages":[
+                "additionalPkgName"
+            ],
             "KernelOptions": {
                 "default": "kernel"
             },

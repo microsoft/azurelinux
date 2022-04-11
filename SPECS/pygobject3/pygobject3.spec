@@ -1,13 +1,13 @@
-Name:           pygobject3
-Version:        3.36.1
-Release:        5%{?dist}
+%define majmin %(echo %{version} | cut -d. -f1-2)
 Summary:        Python bindings for GObject Introspection
-
+Name:           pygobject3
+Version:        3.42.0
+Release:        1%{?dist}
 License:        LGPLv2+
-URL:            https://wiki.gnome.org/Projects/PyGObject
-Source0:        https://download.gnome.org/sources/pygobject/3.36/pygobject-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://wiki.gnome.org/Projects/PyGObject
+Source0:        https://download.gnome.org/sources/pygobject/%{majmin}/pygobject-%{version}.tar.xz
 BuildRequires:  cairo-gobject-devel
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
@@ -17,12 +17,11 @@ BuildRequires:  python3-cairo-devel
 BuildRequires:  glib-schemas
 BuildRequires:  python3-setuptools
 %if %{with_check}
-BuildRequires:  python3-gobject-introspection
-BuildRequires:  python3-test
-BuildRequires:  dbus
 BuildRequires:  curl-devel
+BuildRequires:  dbus
 BuildRequires:  openssl-devel
-BuildRequires:  python3-xml
+BuildRequires:  python3-gobject-introspection
+BuildRequires:  python3-pip
 %endif
 
 
@@ -32,9 +31,9 @@ for use in Python programs.
 
 %package     -n python3-gobject
 Summary:        Python 3 bindings for GObject Introspection
-Requires:       python3-gobject-base%{?_isa} = %{version}-%{release}
+Requires:       python3-gobject-base = %{version}-%{release}
 # The cairo override module depends on this
-Requires:       python3-cairo%{?_isa}
+Requires:       python3-cairo
 
 %description -n python3-gobject
 The python3-gobject package provides a convenient wrapper for the GObject 
@@ -43,7 +42,7 @@ for use in Python 3 programs.
 
 %package     -n python3-gobject-base
 Summary:        Python 3 bindings for GObject Introspection base package
-Requires:       gobject-introspection%{?_isa}
+Requires:       gobject-introspection
 
 %description -n python3-gobject-base
 This package provides the non-cairo specific bits of the GObject Introspection
@@ -51,10 +50,9 @@ library.
 
 %package     -n python3-gobject-devel
 Summary:        Development files for embedding PyGObject introspection support
-Requires:       python3-gobject%{?_isa} = %{version}-%{release}
-Requires:       gobject-introspection-devel%{?_isa}
-# Renamed in F31
-Obsoletes:      pygobject3-devel < 3.34.0-2
+Requires:       python3-gobject = %{version}-%{release}
+Requires:       gobject-introspection-devel
+# Old Fedora name for the package, provided for compatibility purposes
 Provides:       pygobject3-devel = %{version}-%{release}
 
 %description -n python3-gobject-devel
@@ -92,6 +90,10 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
+* Thu Apr 07 2022 Olivia Crain <oliviacrain@microsoft> - 3.42.0-1
+- Upgrade to latest upstream version
+- Lint spec
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-5
 - Replace easy_install usage with pip in %%check sections
 

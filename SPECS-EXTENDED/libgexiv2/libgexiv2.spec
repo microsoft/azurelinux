@@ -2,16 +2,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libgexiv2
 Version:        0.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Gexiv2 is a GObject-based wrapper around the Exiv2 library
 
 License:        GPLv2+
 URL:            https://wiki.gnome.org/Projects/gexiv2
 Source0:        https://download.gnome.org/sources/gexiv2/0.12/gexiv2-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  exiv2-devel
 BuildRequires:  gcc-c++
-BuildRequires:  gtk-doc
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  meson
 BuildRequires:  vala
@@ -43,7 +43,7 @@ This package contains the python3 bindings for %{name}
 
 %build
 %meson \
-  -Dgtk_doc=true \
+  -Dgtk_doc=false \
   -Dpython3_girdir=%{python3_sitearch}/gi/overrides \
   %{nil}
 %meson_build
@@ -73,9 +73,6 @@ This package contains the python3 bindings for %{name}
 %{_libdir}/pkgconfig/gexiv2.pc
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/GExiv2-0.10.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/gexiv2/
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/gexiv2.deps
@@ -86,6 +83,11 @@ This package contains the python3 bindings for %{name}
 %{python3_sitearch}/gi/overrides/__pycache__/GExiv2*
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.1-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

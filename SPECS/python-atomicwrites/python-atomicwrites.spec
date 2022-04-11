@@ -1,14 +1,18 @@
 Summary:        Python Atomic file writes
 Name:           python-atomicwrites
-Version:        1.2.1
-Release:        7%{?dist}
+Version:        1.4.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/untitaker/python-atomicwrites
-#Source0:       https://github.com/untitaker/python-atomicwrites/archive/%{version}.tar.gz
-Source0:        atomicwrites-%{version}.tar.gz
+Source0:        https://github.com/untitaker/python-atomicwrites/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
 %description
@@ -16,24 +20,13 @@ Python Atomic file writes
 
 %package -n     python3-atomicwrites
 Summary:        Python Atomic file writes
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
-%if %{with_check}
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  python3-attrs
-BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
-BuildRequires:  python3-six
-%endif
 
 %description -n python3-atomicwrites
 Python Atomic file writes
 
 %prep
-%autosetup -n atomicwrites-%{version}
+%autosetup
 
 %build
 %py3_build
@@ -42,9 +35,8 @@ Python Atomic file writes
 %py3_install
 
 %check
-pip3 install funcsigs pathlib2 pluggy more-itertools
-cp tests/test_atomicwrites.py .
-%python3 test_atomicwrites.py
+pip3 install pytest
+PYTHONPATH=%{buildroot}%{python3_sitelib} %python3 tests/test_atomicwrites.py
 
 %files -n python3-atomicwrites
 %defattr(-,root,root)
@@ -53,6 +45,10 @@ cp tests/test_atomicwrites.py .
 %{python3_sitelib}/*
 
 %changelog
+* Wed Mar 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.4.0-1
+- Upgrade to latest upstream version
+- Simplify dependencies and self-test invocations
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.1-7
 - Replace easy_install usage with pip in %%check sections
 

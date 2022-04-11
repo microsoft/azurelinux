@@ -8,16 +8,16 @@ Distribution:   Mariner
 
 Name:           libpeas
 Version:        1.26.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Plug-ins implementation convenience library
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/Libpeas
 Source0:        https://download.gnome.org/sources/%{name}/1.26/%{name}-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gcc
 BuildRequires:  gettext
-BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(glib-2.0)
@@ -68,7 +68,7 @@ that are needed to write applications that use libpeas.
 %meson \
   -Ddemos=false \
   -Dvapi=true \
-  -Dgtk_doc=true
+  -Dgtk_doc=false
 
 %meson_build
 
@@ -98,9 +98,6 @@ that are needed to write applications that use libpeas.
 
 %files devel
 %{_includedir}/libpeas-%{apiver}/
-%dir %{_datadir}/gtk-doc/
-%dir %{_datadir}/gtk-doc/html/
-%{_datadir}/gtk-doc/html/libpeas/
 %{_libdir}/libpeas-%{apiver}.so
 %{_libdir}/libpeas-gtk-%{apiver}.so
 %dir %{_datadir}/gir-1.0
@@ -110,6 +107,11 @@ that are needed to write applications that use libpeas.
 %{_libdir}/pkgconfig/libpeas-gtk-%{apiver}.pc
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26.0-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Wed Jul 14 2021 Muhammad Falak Wani <mwani@microsoft.com> - 1.26.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove dependency on gladeui

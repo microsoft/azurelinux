@@ -10,7 +10,7 @@ Name: sblim-sfcb
 Summary: Small Footprint CIM Broker
 URL: http://sblim.wiki.sourceforge.net/
 Version: 1.4.9
-Release: 19%{?dist}
+Release: 20%{?dist}
 License: EPL-1.0
 Source0: http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 Source1: sfcb.service
@@ -45,9 +45,12 @@ Patch9: sblim-sfcb-1.4.9-fix-ppc-optimization-level.patch
 Patch10: sblim-sfcb-1.4.9-docdir-license.patch
 # Patch11: fixes multiple definiton of variables (FTBFS with GCC 10)
 Patch11: sblim-sfcb-1.4.9-fix-multiple-definition.patch
+
 Provides: cim-server = 0
 Requires: cim-schema
+Requires: perl(LWP::UserAgent)
 Requires: sblim-sfcCommon
+
 BuildRequires: libcurl-devel
 BuildRequires: perl-generators
 BuildRequires: zlib-devel
@@ -60,6 +63,7 @@ BuildRequires: systemd
 BuildRequires: sblim-sfcCommon-devel
 BuildRequires: openslp-devel
 BuildRequires: gcc
+
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -144,6 +148,10 @@ fi;
 %files -f _pkg_list
 
 %changelog
+* Tue Mar 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.9-20
+- Explicitly mentioning a run-time dependency on "perl(LWP::UserAgent)".
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.9-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

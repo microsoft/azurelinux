@@ -3,7 +3,7 @@
 #
 # Dockerfile to Mariner toolchain from scratch
 #
-FROM ubuntu:18.04
+FROM mcr.microsoft.com/cbl-mariner/base/core:1.0.20220226
 
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
@@ -14,27 +14,27 @@ COPY [ "./version-check-container.sh", \
        "$LFS/tools/" ]
 
 # Install toolchain build dependencies
-RUN apt-get update -y -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get -yq install \
+RUN tdnf install -y \
     bison \
-    gawk \
-    gcc \
-    g++ \
-    make \
-    patch \
-    python-aptdaemon \
-    rpm \
-    texinfo \
-    sudo \
-    vim \
-    wget \
+    build-essential \
+    byacc \
+    ca-certificates \
+    ccache \
     cpio \
     file \
+    flex \
+    gawk \
+    gcc \
+    make \
+    patch \
+    perl \
+    rpm \
+    sudo \
+    texinfo \
     unzip \
-    zip \
-    ccache \
-    flex && \
-    apt-get clean && \
+    vim \
+    wget \
+    zip && \
     ln    -sf bash /bin/sh && \
     mkdir -pv $LFS/sources && \
     chmod -v a+wt $LFS/sources && \
@@ -55,15 +55,15 @@ COPY [ "./toolchain-sha256sums", \
 # Note: Fetch the kernel sources differently to ensure we rename the source tarball appropriately. The rename is needed to comply with
 # the naming convention of the source cache (convention used to prevent naming collisions).
 WORKDIR $LFS/sources
-RUN wget -nv --no-clobber --timeout=30 --no-check-certificate --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.18.1.tar.gz -O kernel-5.15.18.1.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.15.26.1.tar.gz -O kernel-5.15.26.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
     useradd -s /bin/bash -g lfs -m -k /dev/null lfs && \
-    echo "lfs:lfs" | chpasswd && \
-    adduser lfs sudo && \
+    echo "lfs:lfscblmariner" | chpasswd && \
+    usermod -a -G sudo lfs && \
     chown -v lfs $LFS/tools && \
     chown -v lfs $LFS/sources && \
     chown -Rv lfs $LFS/logs && \
@@ -78,6 +78,12 @@ USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./coreutils-fix-get-sys_getdents-aarch64.patch", \
        "$LFS/tools/" ]
+
+USER root
+RUN  chown -Rv lfs $LFS/tools && \
+     chown -Rv lfs:lfs /home/lfs/
+
+USER lfs
 RUN /tools/toolchain_build_temp_tools.sh
 
 COPY [ "./toolchain_initial_chroot_setup.sh", \

@@ -1,7 +1,7 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
 Version:        1.18.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,9 @@ f=CHANGES ; iconv -f iso-8859-1 -t utf-8 $f -o $f.utf8 ; mv $f.utf8 $f
 autoreconf -if
 %configure --enable-shared \
            --disable-static \
+%if %{with_check}
+	   --enable-tests \
+%endif
            --disable-dependency-tracking
 %make_build
 
@@ -43,7 +46,50 @@ autoreconf -if
 rm -f %{buildroot}/%{_libdir}/libcares.la
 
 %check
-%make_build check
+# Use the test method used by the CI (from github)
+# Reference: https://github.com/c-ares/c-ares/blob/main/ci/test.sh
+check_status=0
+PWD=$(pwd)
+export TEST_FILTER="--gtest_filter=-*LiveSearch*:*FamilyV4ServiceName*"
+TOOLSBIN=${PWD}/src/tools
+TESTDIR=${PWD}/test
+
+${TOOLSBIN}/adig www.google.com
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+
+${TOOLSBIN}/acountry www.google.com
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+
+${TOOLSBIN}/ahost www.google.com
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+
+${TESTDIR}/arestest -4 -v $TEST_FILTER
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+
+${TESTDIR}/aresfuzz ${TESTDIR}/fuzzinput/*
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+
+${TESTDIR}/aresfuzzname ${TESTDIR}/fuzznames/*
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+
+${TESTDIR}/dnsdump ${TESTDIR}/fuzzinput/answer_a ${TESTDIR}/fuzzinput/answer_aaaa
+if [[ $? -ne 0 ]]; then
+	check_status=1
+fi
+
+[[ $check_status -eq 0 ]]
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -67,6 +113,13 @@ rm -f %{buildroot}/%{_libdir}/libcares.la
 %{_mandir}/man3/ares_*
 
 %changelog
+* Mon Mar 21 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.1-4
+- Drop all live DNS lookup from the check section to enable ptest in pipeline
+
+* Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.1-3
+- Add configure option `--enable-tests`
+- Use explicit testing as per official CI to enable ptest
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.1-2
 - Removing the explicit %%clean stage.
 

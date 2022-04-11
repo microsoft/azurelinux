@@ -5,14 +5,14 @@ Distribution:   Mariner
 
 Name:           libdazzle
 Version:        3.36.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Experimental new features for GTK+ and GLib
 
 License:        GPLv3+
 URL:            https://git.gnome.org/browse/libdazzle/
 Source0:        https://download.gnome.org/sources/%{name}/3.36/%{name}-%{version}.tar.xz
 
-BuildRequires:  gtk-doc
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  meson
 BuildRequires:  vala
 
@@ -50,7 +50,7 @@ developing applications that use %{name}.
 
 
 %build
-%meson -D enable_gtk_doc=true
+%meson -D enable_gtk_doc=false
 %meson_build
 
 
@@ -74,9 +74,6 @@ xvfb-run -w 10 ninja test %{__ninja_common_opts} -C %{_vpath_builddir}
 %doc CONTRIBUTING.md examples
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/Dazzle-1.0.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/libdazzle
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/libdazzle-1.0.*
@@ -86,6 +83,11 @@ xvfb-run -w 10 ninja test %{__ninja_common_opts} -C %{_vpath_builddir}
 
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

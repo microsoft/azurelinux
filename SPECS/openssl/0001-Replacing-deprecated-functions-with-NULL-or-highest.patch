@@ -1,6 +1,6 @@
-From 9bdbc863ff07ba7579ea2ba7a62171616cc3652d Mon Sep 17 00:00:00 2001
-From: Pawel <pawelwi@microsoft.com>
-Date: Thu, 30 Jul 2020 06:17:03 -0700
+From c8978b7be6dbe388596fb899ab41a29e414ea5dc Mon Sep 17 00:00:00 2001
+From: Daniel Mihai <Daniel.Mihai@microsoft.com>
+Date: Wed, 28 Jul 2021 14:55:12 -0700
 Subject: [PATCH] Replacing deprecated functions with NULL or highest
  supported.
 
@@ -14,61 +14,21 @@ OpenSSL's build time configuration may skip the 'no-<prot>-method'
 switch, while still not supporting the deprecated protocols disabled
 through the 'no-<prot>' switch.
 
-For deprecated TLS protocol versions behind the scenese we're calling
-into 'TLS_(client_|server_)?method()' set of methods, which
+For deprecated DTLS protocol versions behind the scenes we're calling
+into 'DTLS_(client_|server_)?method()' set of methods, which
 automatically negotiate the highest supported protocol.
 
 For SSLv3 methods we're returning a NULL pointer as there are no
 more supported methods for the SSL protocol.
 ---
- ssl/methods.c | 30 +++++++++++++++++++++---------
- 1 file changed, 21 insertions(+), 9 deletions(-)
+ ssl/methods.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/ssl/methods.c b/ssl/methods.c
-index c5e8898..90327d7 100644
+index c846143277..a7ae074bfd 100644
 --- a/ssl/methods.c
 +++ b/ssl/methods.c
-@@ -193,51 +193,63 @@ const SSL_METHOD *TLSv1_2_client_method(void)
- # ifndef OPENSSL_NO_TLS1_1_METHOD
- const SSL_METHOD *TLSv1_1_method(void)
- {
--    return tlsv1_1_method();
-+    return TLS_method();
- }
- 
- const SSL_METHOD *TLSv1_1_server_method(void)
- {
--    return tlsv1_1_server_method();
-+    return TLS_server_method();
- }
- 
- const SSL_METHOD *TLSv1_1_client_method(void)
- {
--    return tlsv1_1_client_method();
-+    return TLS_client_method();
- }
- # endif
- 
- # ifndef OPENSSL_NO_TLS1_METHOD
- const SSL_METHOD *TLSv1_method(void)
- {
--    return tlsv1_method();
-+    return TLS_method();
- }
- 
- const SSL_METHOD *TLSv1_server_method(void)
- {
--    return tlsv1_server_method();
-+    return TLS_server_method();
- }
- 
- const SSL_METHOD *TLSv1_client_method(void)
- {
--    return tlsv1_client_method();
-+    return TLS_client_method();
- }
- # endif
- 
+@@ -215,17 +215,29 @@ const SSL_METHOD *TLSv1_client_method(void)
  # ifndef OPENSSL_NO_SSL3_METHOD
  const SSL_METHOD *SSLv3_method(void)
  {
@@ -98,7 +58,7 @@ index c5e8898..90327d7 100644
  }
  # endif
  
-@@ -261,17 +273,17 @@ const SSL_METHOD *DTLSv1_2_client_method(void)
+@@ -249,17 +261,17 @@ const SSL_METHOD *DTLSv1_2_client_method(void)
  # ifndef OPENSSL_NO_DTLS1_METHOD
  const SSL_METHOD *DTLSv1_method(void)
  {
@@ -120,5 +80,5 @@ index c5e8898..90327d7 100644
  # endif
  
 -- 
-2.17.1
+2.25.1
 

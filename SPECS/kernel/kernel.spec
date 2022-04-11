@@ -6,15 +6,14 @@
 %endif
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.18.1
-Release:        2%{?dist}
+Version:        5.15.26.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
-Source0:        kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
@@ -37,6 +36,29 @@ Patch1008:      CVE-2021-3564.nopatch
 Patch1009:      CVE-2021-45469.nopatch
 Patch1010:      CVE-2021-45480.nopatch
 Patch1011:      CVE-2021-45095.nopatch
+Patch1012:      CVE-2021-20194.nopatch
+Patch1013:      CVE-2022-24122.nopatch
+Patch1014:      CVE-2022-24448.nopatch
+Patch1015:      CVE-2022-0264.nopatch
+Patch1016:      CVE-2022-24959.nopatch
+Patch1017:      CVE-2021-44879.nopatch
+Patch1018:      CVE-2022-0185.nopatch
+Patch1019:      CVE-2022-0382.nopatch
+Patch1020:      CVE-2021-45402.nopatch
+Patch1021:      CVE-2022-25265.nopatch
+Patch1022:      CVE-2021-4090.nopatch
+Patch1023:      CVE-2022-25258.nopatch
+Patch1024:      CVE-2022-25375.nopatch
+Patch1025:      CVE-2022-0617.nopatch
+Patch1026:      CVE-2022-0847.nopatch
+Patch1027:      CVE-1999-0524.nopatch
+Patch1030:      CVE-2008-4609.nopatch
+Patch1031:      CVE-2010-0298.nopatch
+Patch1032:      CVE-2010-4563.nopatch
+Patch1033:      CVE-2011-0640.nopatch
+Patch1034:      CVE-2022-0492.nopatch
+Patch1035:      CVE-2021-3743.nopatch
+Patch1036:      CVE-2022-26966.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -159,6 +181,10 @@ arch="arm64"
 archdir="arm64"
 %endif
 
+# Add CBL-Mariner cert into kernel's trusted keyring
+cp %{SOURCE4} certs/mariner.pem
+sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
+
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=${arch} oldconfig
@@ -177,9 +203,6 @@ if [ -s config_diff ]; then
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
     exit 1
 fi
-
-# Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
 
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=${arch} %{?_smp_mflags}
 
@@ -384,6 +407,32 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
+- Add Dell devices support
+
+* Mon Mar 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.26.1-3
+- Remove hardcoded mariner.pem from configs and instead insert during
+  the build phase
+
+* Mon Mar 14 2022 Vince Perri <viperri@microsoft.com> - 5.15.26.1-2
+- Add support for compressed firmware
+
+* Tue Mar 08 2022 cameronbaird <cameronbaird@microsoft.com> - 5.15.26.1-1
+- Update source to 5.15.26.1
+- Address CVES: 2022-0617, 2022-25375, 2022-25258, 2021-4090, 2022-25265,
+  2021-45402, 2022-0382, 2022-0185, 2021-44879, 2022-24959, 2022-0264, 
+  2022-24448, 2022-24122, 2021-20194, 2022-0847, 1999-0524, 2008-4609,
+  2010-0298, 2010-4563, 2011-0640, 2022-0492, 2021-3743, 2022-26966
+
+* Mon Mar 07 2022 George Mileka <gmileka@microsoft.com> - 5.15.18.1-5
+- Enabled vfio noiommu.
+
+* Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 5.15.18.1-4
+- Enable CONFIG_DEVMEM, CONFIG_STRICT_DEVMEM and CONFIG_IO_STRICT_DEVMEM
+
+* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-3
+- CONFIG_BPF_UNPRIV_DEFAULT_OFF=y
+
 * Thu Feb 24 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.15.18.1-2
 - Add usbip required kernel configs CONFIG_USBIP_CORE CONFIG_USBIP_VHCI_HCD
 

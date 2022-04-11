@@ -1,7 +1,7 @@
 Summary:        Docutils -- Python Documentation Utilities.
 Name:           python-docutils
 Version:        0.18.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain, PSF-2.0, BSD, GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,7 +41,7 @@ done
 %check
 PATH=%{buildroot}%{_bindir}:${PATH} \
   PYTHONPATH=%{buildroot}%{python3_sitelib} \
- python3 test3/alltests.py
+ python3 test/alltests.py
 
 %files -n python3-docutils
 %defattr(-,root,root)
@@ -97,6 +97,9 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 %{_bindir}/rst2html43.py
 
 %changelog
+* Fri Feb 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.18.1-2
+- Fix test path `s/test3/test/` to enable ptest
+
 * Thu Feb 24 2022 Nick Samson <nisamson@microsoft.com> - 0.18.1-1
 - Updated to 0.18.1
 - Removed unnecessary echo calls in build script.

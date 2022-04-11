@@ -2,15 +2,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           gom
 Version:        0.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        GObject to SQLite object mapper library
 
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/Gom
 Source0:        https://download.gnome.org/sources/gom/0.4/gom-%{version}.tar.xz
 
+BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  pkgconfig(gdk-pixbuf-2.0)
 BuildRequires:  pkgconfig(gio-2.0)
@@ -36,7 +36,7 @@ developing applications that use %{name}.
 %setup -q
 
 %build
-%meson -Denable-gtk-doc=true
+%meson -Denable-gtk-doc=false
 %meson_build
 
 %install
@@ -57,9 +57,13 @@ developing applications that use %{name}.
 %{_libdir}/libgom-1.0.so
 %{_libdir}/pkgconfig/gom-1.0.pc
 %{_datadir}/gir-1.0/Gom-1.0.gir
-%doc %{_datadir}/gtk-doc/
 
 %changelog
+* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-3
+- Adding BR on '%%{_bindir}/xsltproc'.
+- Disabled gtk doc generation to remove network dependency during build-time.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

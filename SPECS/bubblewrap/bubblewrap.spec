@@ -1,6 +1,6 @@
 Summary:        setuid implementation of a subset of user namespaces.
 Name:           bubblewrap
-Version:        0.4.1
+Version:        0.6.1
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -25,7 +25,8 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 %build
 %configure \
     --disable-silent-rules \
-    --with-priv-mode=none
+    --with-priv-mode=none \
+    --disable-man
 %make_build
 
 %install
@@ -39,8 +40,13 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 %license COPYING
 %{_bindir}/bwrap
 %{_datadir}/bash-completion/completions/bwrap
+%{_datadir}/zsh/site-functions/_bwrap
 
 %changelog
+* Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 0.6.1-1
+- Upgrade to version 0.6.1
+- Disable documentation explicitly
+
 * Mon Jul 19 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.1-1
 - Update to latest upstream version
 - Lint spec, modernize with macros

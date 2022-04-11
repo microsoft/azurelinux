@@ -21,22 +21,39 @@
 
 Summary:        Java Native Access
 Name:           jna
-Version:        5.5.0
-Release:        4%{?dist}
+Version:        5.10.0
+Release:        1%{?dist}
+# Most of code is dual-licensed under either LGPL 2.1+ only or Apache
+# License 2.0.  WeakIdentityHashMap.java was taken from Apache CXF,
+# which is pure Apache License 2.0.
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/java-native-access/jna
 Source0:        https://github.com/java-native-access/jna/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         jna_remove_clover_and_win32_native_jar.patch
+# build-ant-tools.xml explicitly asks for ow2 asm-8.0.1.jar
+# this patch makes it instead look for the version we have.
+# the package seems to build fine with our 7.2 version, but
+# we can keep an eye on it and add a minimum version to objectweb-asm 
+# in the specfile if need be (better way to document requirements than in the .xml)
+Patch0:         ant_tools_arbitrary_ow2.patch
+Patch1:         jna_remove_clover_and_win32_native_jar.patch
 BuildRequires:  ant
+BuildRequires:  ant-junit
 BuildRequires:  dos2unix
+BuildRequires:  gcc
+BuildRequires:  hamcrest
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  libffi
-BuildRequires:  libffi-devel
-BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-tools
+BuildRequires:  junit
+BuildRequires:  libffi-devel
+BuildRequires:  libX11-devel
+BuildRequires:  libXt-devel
+BuildRequires:  make
+BuildRequires:  msopenjdk-11
+BuildRequires:  objectweb-asm
+Requires:       libffi
 Requires:       msopenjdk-11
 
 %description
@@ -70,12 +87,17 @@ rm -rf dist
 dos2unix OTHERS
 
 %patch0 -p1
+%patch1 -p1
 
+chmod -Rf a+rX,u+w,g-w,o-w .
 sed -i 's|@LIBDIR@|%{_libdir}/%{name}|' src/com/sun/jna/Native.java
+
+build-jar-repository -s -p lib junit ant objectweb-asm/asm hamcrest/core
+rm test/com/sun/jna/StructureFieldOrderInspector.java
+rm test/com/sun/jna/StructureFieldOrderInspectorTest.java
 
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
-build-jar-repository -s -p lib ant
 ant \
     jar \
     native \
@@ -100,6 +122,7 @@ install -m 755 build/native*/libjnidispatch*.so %{buildroot}%{_libdir}/%{name}/
 install -d -m 755 %{buildroot}%{_jnidir}/%{name}
 install -d -m 755 %{buildroot}%{_javadir}/%{name}
 install -p -m 644 build/jna-min.jar %{buildroot}%{_jnidir}/%{name}.jar
+
 ln -sf ../%{name}.jar %{buildroot}%{_jnidir}/%{name}/%{name}.jar
 ln -sf %{_jnidir}/%{name}.jar %{buildroot}%{_javadir}/%{name}.jar
 install -p -m 644 ./contrib/platform/dist/jna-platform.jar %{buildroot}%{_javadir}/%{name}-platform.jar
@@ -108,6 +131,7 @@ ln -sf ../%{name}-platform.jar %{buildroot}%{_javadir}/%{name}/%{name}-platform.
 install -d -m 755 %{buildroot}%{_mavenpomdir}
 install -p -m 644 pom-jna.xml %{buildroot}/%{_mavenpomdir}/%{name}.pom
 install -p -m 644 pom-jna-platform.xml %{buildroot}/%{_mavenpomdir}/%{name}-platform.pom
+
 %add_maven_depmap %{name}.pom %{name}.jar
 %add_maven_depmap %{name}-platform.pom %{name}-platform.jar -a net.java.dev.jna:platform -f contrib
 
@@ -135,6 +159,12 @@ ant
 %license LICENSE
 
 %changelog
+* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.0-1
+- Update source to v5.10.0
+- Update jna_remove_clover_and_win32_native_jar.patch
+- Patch build .xml files to build with objectweb-asm 7.2
+- Add ant-junit as BR to build check section
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.0-4
 - Removing the explicit %%clean stage.
 

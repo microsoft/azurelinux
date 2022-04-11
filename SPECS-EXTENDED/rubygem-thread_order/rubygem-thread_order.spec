@@ -1,19 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global	gem_name	thread_order
+%global	gem_name thread_order
 
 Name:		rubygem-%{gem_name}
 Version:	1.1.1
-Release:	4%{?dist}
-
+Release:	5%{?dist}
 Summary:	Test helper for ordering threaded code
 License:	MIT
 URL:		https://github.com/JoshCheek/thread_order
-Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source0:	https://github.com/JoshCheek/thread_order/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
 BuildRequires:	rubygem(rspec) >= 3
+BuildRequires:	git
 BuildArch:	noarch
 
 %description
@@ -28,18 +28,21 @@ BuildArch:	noarch
 Documentation for %{name}.
 
 %prep
-gem unpack %{SOURCE0}
-%setup -q -D -T -n %{gem_name}-%{version}
-gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n %{gem_name}-%{version}
 
 %build
-gem build %{gem_name}.gemspec
+gem build %{gem_name}
 %gem_install
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-	%{buildroot}%{gem_dir}/
+cp -a .%{gem_dir}/* %{buildroot}%{gem_dir}/
+cp -a .%{gem_dir}/gems/%{gem_name}-%{version} %{buildroot}%{gem_dir}/gems/
+#add lib files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
+#add License and Readme files to buildroot from Source0
+cp License.txt %{buildroot}%{gem_instdir}/
+cp Readme.md %{buildroot}%{gem_instdir}/
 
 pushd %{buildroot}
 rm -f .%{gem_cache}
@@ -74,17 +77,20 @@ rspec spec/ || \
 popd
 
 %files
-%dir	%{gem_instdir}
-%license	%{gem_instdir}/License.txt
-%doc	%{gem_instdir}/Readme.md
-
+%dir %{gem_instdir}
+%license %{gem_instdir}/License.txt
+%doc %{gem_instdir}/Readme.md
 %{gem_libdir}
 %{gem_spec}
 
 %files doc
-%doc	%{gem_docdir}
+%doc %{gem_docdir}
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.1-5
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

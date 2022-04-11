@@ -1,8 +1,8 @@
 %define pypi_name MarkupSafe
 Summary:        A XML/HTML/XHTML Markup safe string for Python.
 Name:           python-markupsafe
-Version:        1.1.1
-Release:        4%{?dist}
+Version:        2.1.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,9 @@ pip3 install py
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 08 2022 Nick Samson <nisamson@microsoft.com> - 2.1.0-1
+* Upgrade to 2.1.0.
+
 * Mon Dec 06 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1-4
 - Replace easy_install usage with pip in %%check sections
 

@@ -1,13 +1,14 @@
 Summary:        Python C parser
 Name:           python-pycparser
-Version:        2.18
-Release:        5%{?dist}
+Version:        2.21
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/pycparser
-Source0:        https://pypi.python.org/packages/source/p/pycparser/pycparser-%{version}.tar.gz
+Source0:        https://github.com/eliben/pycparser/archive/refs/tags/release_v%{version}.tar.gz#/pycparser-release_v%{version}.tar.gz
+BuildRequires:  python3-devel
 BuildArch:      noarch
 
 %description
@@ -15,14 +16,13 @@ Python C parser
 
 %package -n     python3-pycparser
 Summary:        Python C parser
-BuildRequires:  python3-devel
 Requires:       python3
 
 %description -n python3-pycparser
 pycparser is a complete parser of the C language, written in pure Python using the PLY parsing library. It parses C code into an AST and can serve as a front-end for C compilers or analysis tools.
 
 %prep
-%autosetup -n pycparser-%{version}
+%autosetup -n pycparser-release_v%{version}
 
 %build
 %py3_build
@@ -31,7 +31,7 @@ pycparser is a complete parser of the C language, written in pure Python using t
 %py3_install
 
 %check
-%python3 tests/all_tests.py
+%python3 -m unittest discover
 
 %files -n python3-pycparser
 %defattr(-,root,root,-)
@@ -39,6 +39,10 @@ pycparser is a complete parser of the C language, written in pure Python using t
 %{python3_sitelib}/*
 
 %changelog
+* Tue Mar 15 2022 Thomas Crain <thcrain@microsoft.com> - 2.21-1
+- Upgrade to latest upstream version
+- Switch tests to be automatically discovered by the unittest module
+
 * Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 2.18-5
 - Fix test path `tests/all_tests.py` instead of `all_tests.py` to enable ptest
 - Drop unnecessary `pushd/popd`

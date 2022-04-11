@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global lua_pkg_name lpeg
 
-%global lua_version 5.3
+%global lua_version 5.4
 %global lua_libdir %{_libdir}/lua/%{lua_version}
 %global lua_pkgdir %{_datadir}/lua/%{lua_version}
 
@@ -13,7 +13,7 @@ Distribution:   Mariner
 
 Name:           lua-%{lua_pkg_name}
 Version:        1.0.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Parsing Expression Grammars for Lua
 
 License:        MIT
@@ -86,6 +86,10 @@ lua test.lua
 
 
 %changelog
+* Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-4
+- Fixing run-time dependencies.
+- License verified.
+
 * Fri Jan 08 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove Fedora/RHEL version checks

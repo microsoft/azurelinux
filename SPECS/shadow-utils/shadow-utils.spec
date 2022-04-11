@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,15 +25,19 @@ Patch0:         chkname-allowcase.patch
 Patch1:         libsubid-pam-link.patch
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  autoconf
+BuildRequires:  audit-devel
 BuildRequires:  automake
 BuildRequires:  cracklib
 BuildRequires:  cracklib-devel
+BuildRequires:  itstool
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
 BuildRequires:  libtool
 BuildRequires:  libxslt
 BuildRequires:  pam-devel
+Requires:       audit-libs
 Requires:       cracklib
+Requires:       libpwquality
 Requires:       libselinux
 Requires:       libsemanage
 Requires:       pam
@@ -84,6 +88,7 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-libcrack \
     --with-group-name-max-length=32 \
     --with-selinux \
+    --with-audit \
     --enable-man
 %make_build
 
@@ -155,6 +160,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %config(noreplace) %{_sysconfdir}/limits
 %{_bindir}/*
 %{_sbindir}/*
+%{_mandir}/*
 /bin/passwd
 %config(noreplace) %{_sysconfdir}/pam.d/*
 
@@ -167,6 +173,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Mar 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.9-8
+- Add requires libpwquality
+
+* Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 4.9-7
+- Build with audit-libs
+- Add BR for itstool
+
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 4.9-6
 - Add provides to resolve dynamic dependencies
 

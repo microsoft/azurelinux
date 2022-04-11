@@ -1,7 +1,7 @@
 Summary:        Connects C/C++/Objective C to some high-level programming languages
 Name:           swig
 Version:        4.0.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,15 @@ URL:            https://swig.sourceforge.net/
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  pcre-devel
 Requires:       pcre
+%if %{with_check}
+BuildRequires:  python3
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-libs
+BuildRequires:  python3-setuptools
+BuildRequires:  boost
+BuildRequires:  boost-devel
+%endif
 
 %description
 Simplified Wrapper and Interface Generator (SWIG) is a software
@@ -21,6 +30,9 @@ interpreted programming environments, systems integration, and as a
 tool for building user interfaces
 
 %prep
+%if %{with_check}
+pip3 install 2to3
+%endif
 %autosetup
 
 %build
@@ -42,7 +54,7 @@ mkdir -p %{buildroot}%{_libdir}/ccache
 ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 
 %check
-%make_build check
+%make_build check PY3=y
 
 %files
 %license LICENSE LICENSE-GPL LICENSE-UNIVERSITIES
@@ -51,6 +63,11 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 %{_libdir}/ccache
 
 %changelog
+* Tue Mar 01 2022 Bala <balakumaran.kannan@microsoft.com> - 4.0.2-3
+- BR python related packages and Boost for check
+- Install 2to3 for converting all test files to python3 compatible
+- Pass PY3=y for make check to use Python3
+
 * Thu Aug 05 2021 Thomas Crain <thcrain@microsoft.com> - 4.0.2-2
 - Switch source URL to GitHub version
 - Lint spec

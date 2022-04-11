@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,6 +93,7 @@ meson  --prefix %{_prefix}                                            \
        -Dlibcurl=false                                                \
        -Dpolkit=true                                                  \
        -Dlz4=true                                                     \
+       -Dzstd=false                                                   \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
@@ -226,6 +227,9 @@ systemctl preset-all
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Thu Mar 17 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-2
+- Disable zstd configuration to ensure lz4 compression is used for journal files and coredumps
+
 * Mon Jan 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 250.3-1
 - Update to systemd-stable version 250.3
 - Explicitly disable systemd-homed

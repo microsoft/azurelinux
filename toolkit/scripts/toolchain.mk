@@ -19,6 +19,8 @@ populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
 toolchain_sources_dir = $(populated_toolchain_chroot)/usr/src/mariner/SOURCES
 populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/mariner/RPMS
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
+toolchain_actual_conents = $(toolchain_build_dir)/actual_archive_contents.txt
+toolchain_expected_conents = $(toolchain_build_dir)/expected_archive_contents.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
@@ -169,10 +171,25 @@ $(final_toolchain): $(raw_toolchain) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.f
 .SILENT: $(toolchain_rpms)
 
 ifeq ($(REBUILD_TOOLCHAIN),y)
+
+# Our manifest files should always track the contents of the freshly built archives exactly
+#   Currently non-blocking, to make this a blocking check switch to `print_error` instead of
+#   `print_warning`
+$(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(final_toolchain)
+	@echo Validating contents of toolchain against manifest... && \
+	tar -tzf $(final_toolchain) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_conents) && \
+	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_conents) && \
+	diff="$$( comm -3 $(toolchain_actual_conents) $(toolchain_expected_conents) --check-order )" && \
+	if [ -n "$${diff}" ]; then \
+		echo "ERROR: Missmatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(final_toolchain)':" && \
+		echo "$${diff}"; \
+		$(call print_warning, $@ failed) ; \
+	fi
+
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
 # them into the RPM folder.
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) | $(final_toolchain)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(final_toolchain) $(STATUS_FLAGS_DIR)/toolchain_verify.flag
 	@echo Extracting RPM $@ from toolchain && \
 	if [ ! -f $@ -o $(final_toolchain) -nt $@ ]; then \
 		mkdir -p $(dir $@) && \

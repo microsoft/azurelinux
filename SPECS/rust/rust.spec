@@ -1,19 +1,21 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
+
 # Release date and version of stage 0 compiler can be found in "src/stage0.txt" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2021-09-09
-%define stage0_version 1.55.0
+%define release_date 2022-01-13
+%define stage0_version 1.58.0
+
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.56.1
+Version:        1.59.0
 Release:        1%{?dist}
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
-Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.gz
+Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 # Note: the rust-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh rustc-%%{version}-src.tar.gz
@@ -32,6 +34,7 @@ BuildRequires:  git
 BuildRequires:  glibc
 BuildRequires:  ninja-build
 BuildRequires:  python3
+
 %if %{with_check}
 BuildRequires:  python3-xml
 %endif
@@ -73,12 +76,13 @@ mv %{SOURCE7} "$BUILD_CACHE_DIR"
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
 export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
-sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo"
+sh ./configure --prefix=%{_prefix} --enable-extended --tools="cargo,rustfmt"
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
 USER=root SUDO_USER=root %make_build
 
 %check
+ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 %make_build check
 
 %install
@@ -109,11 +113,21 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %doc src/tools/rustfmt/{README,CHANGELOG,Configurations}.md
 %doc src/tools/clippy/{README.md,CHANGELOG.md}
 %{_bindir}/cargo
+%{_bindir}/cargo-fmt
+%{_bindir}/rustfmt
 %{_datadir}/zsh/*
 %doc %{_docdir}/%{name}/LICENSE-THIRD-PARTY
 %{_sysconfdir}/bash_completion.d/cargo
 
 %changelog
+* Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.59.0-1
+- Updating to version 1.59.0 to fix CVE-2022-21658.
+- Updating build instructions to fix tests.
+
+* Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 1.56.1-2
+- Build rustfmt tool as it is required to run PTest
+- Create softlink for rustfmt in stage0
+
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.56.1-1
 - Updating to version 1.56.1.
 - Switching to building with Python 3.

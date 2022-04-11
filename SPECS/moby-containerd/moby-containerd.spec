@@ -1,19 +1,18 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define upstream_rc 1.6.0-rc.3
-%define commit_hash a9f61ba2c84ac82ca7c4666454f757dda3f590be
+%define commit_hash 10f428dac7cec44c864e1b830a4623af27a9fc70
 
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
-Version: 1.6.0.rc.3
-Release: 1%{?dist}
+Version: 1.6.1
+Release: 3%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
 
-Source0: https://github.com/containerd/containerd/archive/v%{upstream_rc}.tar.gz#/%{name}-%{version}.tar.gz
+Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
 Patch0:  Makefile.patch
@@ -47,7 +46,7 @@ containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{upstream_rc}
+%autosetup -p1 -n %{upstream_name}-%{version}
 
 %build
 export BUILDTAGS="-mod=vendor"
@@ -86,6 +85,12 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Mon Mar 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.1-3
+- Default cgroup to 'systemd'
+* Wed Mar 23 2022 Anirudh Gopal <angop@microsoft.com> - 1.6.1-2
+- Always restart containerd service 
+* Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.1-1
+- Update to version 1.6.1
 * Fri Jan 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.0.rc.3-1
 - Update to version 1.6.0-rc.3
 - Use code from upstream instead of Azure fork.

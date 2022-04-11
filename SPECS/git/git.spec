@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.33.0
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
 Requires:       expat
+Requires:       openssh
 Requires:       openssl
 Requires:       perl-CGI
 Requires:       perl-DBI
@@ -20,6 +21,11 @@ Requires:       perl-interpreter
 Requires:       python3
 Requires:       subversion-perl
 Provides:       git-core = %{version}-%{release}
+%if %{with_check}
+BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(lib)
+%endif
 
 %description
 Git is a free and open source, distributed version control system
@@ -96,7 +102,7 @@ BuildArch:      noarch
 
 %prep
 %setup -q
-%py3_shebang_fix git-p4.py
+%{py3_shebang_fix} git-p4.py
 
 %build
 %configure \
@@ -115,7 +121,8 @@ install -m 0644 contrib/completion/git-completion.bash %{buildroot}%{_datadir}/b
 %{_fixperms} %{buildroot}/*
 
 %check
-%make_build test
+# Skip git-send-email tests as mariner does not ship it
+GIT_SKIP_TESTS='t9001' %make_build test
 
 %post
 if [ $1 -eq 1 ];then
@@ -160,6 +167,13 @@ fi
 %endif
 
 %changelog
+* Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 2.33.0-6
+- Add an explicit BR on `perl{(lib), (IO::File), (Getopt::Long)}`
+- Skip `git-send-email` (t9001) tests to enable ptest
+
+* Tue Mar 1 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.33.0-5
+- Add openssh dependency for git
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.33.0-4
 - Replace python2 depdendency with python3
 - Lint spec

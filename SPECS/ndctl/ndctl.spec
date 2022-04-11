@@ -2,7 +2,7 @@
 Summary:        Manage "libnvdimm" subsystem devices (Non-volatile Memory)
 Name:           ndctl
 Version:        65
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2
 Group:          System Environment/Base
 Url:            https://github.com/pmem/ndctl
@@ -114,6 +114,8 @@ make check
 %{_libdir}/pkgconfig/libdaxctl.pc
 
 %changelog
+*   Wed Mar 16 2022 Andrew Phelps <anphel@microsoft.com> 65-2
+-   License verified.
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 65-1
 -   Update to 65. Remove udev rules reverted in release 63. License fixed.
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 62-2

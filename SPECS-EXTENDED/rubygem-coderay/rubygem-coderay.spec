@@ -3,28 +3,22 @@ Distribution:   Mariner
 %global gem_name coderay
 
 Name: rubygem-%{gem_name}
-Version: 1.1.2
-Release: 8%{?dist}
+Version: 1.1.3
+Release: 1%{?dist}
 Summary: Fast syntax highlighting for selected languages
 License: MIT
 URL: http://coderay.rubychan.de
-Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# git clone https://github.com/rubychan/coderay.git && cd coderay
-# git checkout v1.1.2 && tar czvf coderay-1.1.2-tests.tgz test/
-Source1: %{gem_name}-%{version}-tests.tgz
-# Remove extended Tokens#filter for Ruby 2.6 compatibility.
-# https://github.com/rubychan/coderay/pull/233
-Patch0: rubygem-coderay-1.1.2-remove-Array-filter-for-ruby-2.6.patch
+Source0: https://github.com/rubychan/coderay/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby >= 1.8.6
 BuildRequires: rubygem(test-unit)
+BuildRequires: git
 BuildArch: noarch
 
 %description
 Fast and easy syntax highlighting for selected languages, written in Ruby.
 Comes with RedCloth integration and LOC counter.
-
 
 %package doc
 Summary: Documentation for %{name}
@@ -35,51 +29,44 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
-
-%patch0 -p1
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
-gem build ../%{gem_name}-%{version}.gemspec
-
-%gem_install
+gem build %{gem_name}
 
 %install
-mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* \
-        %{buildroot}%{gem_dir}/
-
-
-mkdir -p %{buildroot}%{_bindir}
-cp -a .%{_bindir}/* \
-        %{buildroot}%{_bindir}/
-
-find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.rc1.gem
+mkdir -p %{buildroot}%{gem_instdir}
+#add lib and bin files to buildroot from Source0
+cp -a lib/ %{buildroot}%{gem_instdir}/
+cp -a bin/ %{buildroot}%{gem_instdir}/
+#add MIT-LICENSE file to buildroot from Source0
+cp MIT-LICENSE %{buildroot}%{gem_instdir}/
 
 %check
-pushd .%{gem_instdir}
-tar xzvf %{SOURCE1}
-# See https://github.com/rubychan/coderay/blob/master/rake_tasks/test.rake
 LANG=C.UTF-8
 ruby ./test/functional/suite.rb
 ruby ./test/functional/for_redcloth.rb
 ruby ./test/unit/suite.rb
-popd
 
 %files
 %dir %{gem_instdir}
-%{_bindir}/coderay
 %license %{gem_instdir}/MIT-LICENSE
 %{gem_instdir}/bin
 %{gem_libdir}
-%exclude %{gem_cache}
-%{gem_spec}
+%exclude /%{gemdir}/cache
+/%{gemdir}/specifications
 
 %files doc
-%doc %{gem_docdir}
-%doc %{gem_instdir}/README_INDEX.rdoc
+%doc /%{gemdir}/doc/
+%doc /%{gemdir}/gems/%{gem_name}-%{version}.rc1/README_INDEX.rdoc
 
 %changelog
+* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.3-1
+- Update to v1.1.3.
+- License verified.
+- Build from .tar.gz source.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.2-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -37,6 +37,9 @@ const (
 	// rpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
 	rpmDependenciesDirectory = "/var/lib/rpm"
 
+	// rpmManifestDirectory is the directory containing manifests of installed packages to support distroless vulnerability scanning tools.
+	rpmManifestDirectory = "/var/lib/rpmmanifest"
+
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0600
 	bootDirectoryDirMode  = 0700
@@ -285,8 +288,8 @@ func umount(path string) (err error) {
 	return
 }
 
-// PackageNamesFromSingleSystemConfig goes through the packageslist field in the systemconfig and extracts the list of packages
-// from each of the packagelists.
+// PackageNamesFromSingleSystemConfig goes through the "PackageLists" and "Packages" fields in the "SystemConfig" object, extracting
+// from packageList JSONs and packages listed in config itself to create one comprehensive package list.
 // NOTE: the package list contains the versions restrictions for the packages, if present, in the form "[package][condition][version]".
 //       Example: gcc=9.1.0
 // - systemConfig is the systemconfig field from the config file
@@ -304,6 +307,10 @@ func PackageNamesFromSingleSystemConfig(systemConfig configuration.SystemConfig)
 		logger.Log.Tracef("packages %v", packages)
 		finalPkgList = append(finalPkgList, packages.Packages...)
 	}
+
+	logger.Log.Tracef("Processing inline packages")
+	finalPkgList = append(finalPkgList, systemConfig.Packages...)
+
 	logger.Log.Tracef("finalPkgList = %v", finalPkgList)
 	return
 }
@@ -470,8 +477,29 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		}
 	}
 
+	if config.RemoveRpmDb {
+		// When the RemoveRpmDb flag is true, generate a list of installed packages since they cannot be queiried at runtime
+		logger.Log.Info("Generating manifest with package information since RemoveRpmDb is enabled.")
+		generateContainerManifests(installChroot)
+	}
+
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
+	return
+}
+
+func generateContainerManifests(installChroot *safechroot.Chroot) {
+	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
+	rpmDir := filepath.Join(installRoot, rpmDependenciesDirectory)
+	rpmManifestDir := filepath.Join(installRoot, rpmManifestDirectory)
+	manifest1Path := filepath.Join(rpmManifestDir, "container-manifest-1")
+	manifest2Path := filepath.Join(rpmManifestDir, "container-manifest-2")
+
+	os.MkdirAll(rpmManifestDir, os.ModePerm)
+
+	shell.ExecuteAndLogToFile(manifest1Path, "rpm", "--dbpath", rpmDir, "-qa")
+	shell.ExecuteAndLogToFile(manifest2Path, "rpm", "--dbpath", rpmDir, "-qa", "--qf", "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\n")
+
 	return
 }
 
@@ -535,7 +563,9 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 		}
 	}
 
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName, "--installroot", installRoot, "--nogpgcheck", "--assumeyes")
+	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation
+	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName,
+		"--installroot", installRoot, "--nogpgcheck", "--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/")
 	if err != nil {
 		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
 	}
@@ -1818,7 +1848,7 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 		ReportActionf("Running post-install script: %s", path.Base(script.Path))
 		logger.Log.Infof("Running post-install script: %s", script.Path)
 		err = installChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", scriptPath, script.Args)
+			err := shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", scriptPath, script.Args))
 
 			if err != nil {
 				return err
@@ -2212,7 +2242,7 @@ func stopGPGAgent(installChroot *safechroot.Chroot) {
 	installChroot.UnsafeRun(func() error {
 		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
 		if err != nil {
-			// This is non-fatal, as there is no guarentee the image has gpg agent started.
+			// This is non-fatal, as there is no guarantee the image has gpg agent started.
 			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
 		}
 

@@ -1,6 +1,6 @@
 Name: pycairo
 Version: 1.18.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Python bindings for the cairo library
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,11 @@ BuildRequires: pkgconfig
 BuildRequires: python3-devel
 BuildRequires: python3-pytest
 BuildRequires: python3-setuptools
+%if %{with_check}
+BuildRequires: python3-pip
+BuildRequires: python3-six
+%endif
+
 
 %description
 Python bindings for the cairo library.
@@ -44,6 +49,7 @@ libraries so that they interoperate with py3cairo.
 %py3_install
 
 %check
+pip3 install attrs>=17.4.0 atomicwrites>=1.0 more-itertools>=4.0.0 pluggy>=0.7
 %{__python3} setup.py test
 
 %files -n python3-cairo
@@ -57,6 +63,10 @@ libraries so that they interoperate with py3cairo.
 %{_libdir}/pkgconfig/py3cairo.pc
 
 %changelog
+* Thu Mar 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.2-6
+- Add an explicit BR on `pip`
+- pip install deps in check section to enable ptest
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.18.2-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.

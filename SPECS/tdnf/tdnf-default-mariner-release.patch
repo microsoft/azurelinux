@@ -1,0 +1,29 @@
+From: Andrew Phelps <anphel@microsoft.com>
+Date: Mon, 25 Nov 2019 04:16:16 +0000
+Subject: [PATCH] Merged PR 253: fix default distroverpkg
+
+fix default distroverpkg to prevent error:
+Error(1022) : distroverpkg config entry is set to a package that is not installed. Check /etc/tdnf/tdnf.conf
+
+Fixes: Bug 24144834: TDNF does not support $basearch and $releasever in .repo files - distroverpkg error
+
+By default, determine $ basearch and $ releasever from this package:
+mariner_user@mariner-aks [ /etc/tdnf ]$ sudo tdnf --refresh list installed | grep mariner
+mariner-release.noarch                      1.0-1.cm1                @System
+
+Workaround: add the following to /etc/tdnf/tdnf.conf
+distroverpkg=mariner-release
+
+diff --git a/client/defines.h b/client/defines.h
+index 7cb16b8..5131040 100644
+--- a/client/defines.h
++++ b/client/defines.h
+@@ -121,7 +121,7 @@ typedef enum
+ // repo defaults
+ #define TDNF_DEFAULT_REPO_LOCATION        "/etc/yum.repos.d"
+ #define TDNF_DEFAULT_CACHE_LOCATION       "/var/cache/tdnf"
+-#define TDNF_DEFAULT_DISTROVERPKG         "system-release"
++#define TDNF_DEFAULT_DISTROVERPKG         "mariner-release"
+ #define TDNF_DEFAULT_DISTROARCHPKG        "x86_64"
+ #define TDNF_RPM_CACHE_DIR_NAME           "rpms"
+ #define TDNF_REPODATA_DIR_NAME            "repodata"

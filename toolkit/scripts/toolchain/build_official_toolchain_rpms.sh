@@ -264,7 +264,6 @@ chroot_and_install_rpms perl
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
-build_rpm_in_chroot_no_install mariner-release
 
 # Need to install perl-DBI in order for perl-DBD-SQLite to build
 build_rpm_in_chroot_no_install perl-DBI
@@ -293,6 +292,12 @@ build_rpm_in_chroot_no_install perl-Text-Template
 chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
 
+# perl-generators requires perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+chroot_and_install_rpms perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+chroot_and_install_rpms perl-generators
+
 build_rpm_in_chroot_no_install wget
 
 # build and install additional openjdk build dependencies
@@ -304,8 +309,6 @@ build_rpm_in_chroot_no_install zip
 chroot_and_install_rpms zip
 build_rpm_in_chroot_no_install unzip
 chroot_and_install_rpms unzip
-build_rpm_in_chroot_no_install alsa-lib
-chroot_and_install_rpms alsa-lib
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
@@ -323,10 +326,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.13%2B8-LTS-4.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/x86_64/msopenjdk-11-11.0.14.1+1-LTS-31207.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.13%2B8-LTS-4.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/preview/Microsoft/aarch64/msopenjdk-11-11.0.14.1+1-LTS-31207.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
@@ -337,7 +340,10 @@ build_rpm_in_chroot_no_install grep
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua
 
-# Build tdnf-2.1.0
+build_rpm_in_chroot_no_install lua-rpm-macros
+chroot_and_install_rpms lua-rpm-macros
+
+# Build tdnf-3.2.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
@@ -421,6 +427,12 @@ chroot_and_install_rpms libxslt
 chroot_and_install_rpms python3
 build_rpm_in_chroot_no_install gtk-doc
 
+# python3-lxml requires python3-Cython and libxslt
+build_rpm_in_chroot_no_install Cython
+chroot_and_install_rpms python3-Cython
+build_rpm_in_chroot_no_install python-lxml
+chroot_and_install_rpms python3-lxml
+
 # p11-kit, libtasn1 and glib need gtk-doc
 chroot_and_install_rpms gtk-doc
 build_rpm_in_chroot_no_install libtasn1
@@ -451,11 +463,12 @@ build_rpm_in_chroot_no_install gnupg2
 chroot_and_install_rpms gnupg2
 build_rpm_in_chroot_no_install gpgme
 
-# tdnf needs python3, gpgme, curl and libsolv
+# tdnf needs python3, gpgme, curl, libmetalink and libsolv
+build_rpm_in_chroot_no_install libmetalink
 chroot_and_install_rpms libsolv
 chroot_and_install_rpms curl
-
 chroot_and_install_rpms gpgme
+chroot_and_install_rpms libmetalink
 build_rpm_in_chroot_no_install pinentry
 
 build_rpm_in_chroot_no_install tdnf
@@ -468,6 +481,13 @@ build_rpm_in_chroot_no_install createrepo_c
 
 build_rpm_in_chroot_no_install libsepol
 
+# audit needs: python3, krb5, swig, e2fsprogs
+build_rpm_in_chroot_no_install audit
+
+# rebuild pam with selinux and audit support
+chroot_and_install_rpms audit
+build_rpm_in_chroot_no_install pam
+
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol
 build_rpm_in_chroot_no_install libselinux
@@ -478,9 +498,6 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
-
-# rebuild pam with selinux support
-build_rpm_in_chroot_no_install pam
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-xml are also needed but already installed

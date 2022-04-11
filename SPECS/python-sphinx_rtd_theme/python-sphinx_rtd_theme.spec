@@ -1,8 +1,8 @@
 %global srcname sphinx_rtd_theme
 Summary:        Sphinx theme for readthedocs.org
 Name:           python-%{srcname}
-Version:        0.4.3
-Release:        12%{?dist}
+Version:        1.0.0
+Release:        2%{?dist}
 License:        MIT AND OFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,10 +11,11 @@ Source0:        https://github.com/rtfd/%{srcname}/archive/%{version}/%{srcname}
 # The koji builders do not have network access, and this file is not included
 # in any Fedora package, so we retrieve it for offline use.
 Source1:        https://docs.readthedocs.io/en/latest/objects.inv#/%{name}-objects.inv
-# Remove deprecated use of script_files.  See:
-# - https://github.com/readthedocs/sphinx_rtd_theme/pull/728
-# - https://github.com/readthedocs/sphinx_rtd_theme/commit/a49a812c8821123091166fae1897d702cdc2d627
-Patch0:         %{name}-script.patch
+# Remove all traces of html5shiv.  We have no interest in supporting ancient
+# versions of Internet Explorer.
+Patch0:         %{name}-html5shiv.patch
+# Unbundle fonts.  Refer to local fonts instead.
+Patch1:         %{name}-unbundle-fonts.patch
 
 BuildArch:      noarch
 
@@ -22,6 +23,10 @@ BuildRequires:  python3-devel
 BuildRequires:  python3dist(docutils)
 BuildRequires:  python3dist(setuptools)
 %if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
+BuildRequires:  python3-six
 BuildRequires:  python3dist(pytest)
 %endif
 
@@ -32,12 +37,12 @@ can be ignored if you're just trying to use it on your project outside
 of that site.
 
 %package -n python3-%{srcname}
+%{?python_provide:%python_provide python3-%{srcname}}
 Summary:        Sphinx theme for readthedocs.org
 Requires:       font(fontawesome)
 Requires:       font(lato)
 Requires:       font(robotoslab)
 Requires:       fontawesome-fonts-web
-%{?python_provide:%python_provide python3-%{srcname}}
 
 %description -n python3-%{srcname}
 This is a prototype mobile-friendly sphinx theme for readthedocs.org.
@@ -46,12 +51,20 @@ can be ignored if you're just trying to use it on your project outside
 of that site.
 
 %prep
-%autosetup -p0 -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 
 # Use local objects.inv for intersphinx
 sed -e "s|\('https://docs\.readthedocs\.io/en/latest/', \)None|\1'%{SOURCE1}'|" \
     -e "s|\('http://www\.sphinx-doc\.org/en/stable/', \)None|\1'%{_docdir}/python-sphinx-doc/html/objects.inv'|" \
     -i docs/conf.py
+
+# We cannot build the Javascript from source at this time, due to many missing
+# dependencies.  Convince the build script to skip building the Javascript and
+# go on to the python.
+mkdir -p build/lib/%{srcname}/static/js
+cp -p sphinx_rtd_theme/static/js/badge_only.js build/lib/%{srcname}/static/js
+cp -p sphinx_rtd_theme/static/js/theme.js build/lib/%{srcname}/static/js
+sed -i "/'build_py'/d" setup.py
 
 %build
 %py3_build
@@ -61,29 +74,12 @@ rst2html3 --no-datestamp README.rst README.html
 %install
 %py3_install
 
-# Link to the required fonts and copy the parts not shipped by Fedora
-pushd %{buildroot}%{python3_sitelib}/%{srcname}/static/fonts
-mkdir Lato RobotoSlab
-rm -f fontawesome-webfont.*
-ln -s %{_datadir}/fonts/fontawesome/fontawesome-webfont.eot .
-ln -s %{_datadir}/fonts/fontawesome/fontawesome-webfont.svg .
-ln -s %{_datadir}/fonts/fontawesome/fontawesome-webfont.ttf .
-ln -s %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff .
-ln -s %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff2 .
-ln -s %{_datadir}/fonts/google-roboto-slab/RobotoSlab-Bold.ttf RobotoSlab/roboto-slab-v7-bold.ttf
-ln -s %{_datadir}/fonts/google-roboto-slab/RobotoSlab-Regular.ttf RobotoSlab/roboto-slab-v7-regular.ttf
-ln -s %{_datadir}/fonts/lato/Lato-Bold.ttf Lato/lato-bold.ttf
-ln -s %{_datadir}/fonts/lato/Lato-BoldItalic.ttf Lato/lato-bolditalic.ttf
-ln -s %{_datadir}/fonts/lato/Lato-Italic.ttf Lato/lato-italic.ttf
-ln -s %{_datadir}/fonts/lato/Lato-Regular.ttf Lato/lato-regular.ttf
-popd
-cp -p fonts/RobotoSlab/*.{eot,woff,woff2} \
-   %{buildroot}%{python3_sitelib}/%{srcname}/static/fonts/RobotoSlab
-cp -p fonts/Lato/*.{eot,woff,woff2} \
-   %{buildroot}%{python3_sitelib}/%{srcname}/static/fonts/Lato
+# Unbundle fonts
+rm -fr %{buildroot}%{python3_sitelib}/%{srcname}/static/css/fonts
 
 %check
-pytest
+pip3 install pluggy more-itertools Sphinx readthedocs-sphinx-ext
+%pytest
 
 %files -n python3-%{srcname}
 %license LICENSE OFL-License.txt
@@ -91,6 +87,16 @@ pytest
 %{python3_sitelib}/%{srcname}*
 
 %changelog
+* Mon Apr 04 2022 Bala <balakumaran.kannan@microsoft.com> - 1.0.0-2
+- pip install latest Sphinx for test
+
+* Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
+- Updating to 1.0.0 using Fedora 36 spec (license: MIT) for guidance.
+
+* Mon Mar 07 2022 Bala <balakumaran.kannan@microsoft.com> - 0.4.3-13
+- BR multiple python packages for when check enabled
+- Pip install dependent packages during check
+
 * Mon Dec 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.3-12
 - Removed documentation build steps.
 - License verified.

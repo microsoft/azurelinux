@@ -1,18 +1,23 @@
 Summary:        Library to enable creation and expansion of ISO-9660 filesystems
 Name:           libisoburn
-Version:        1.4.8
-Release:        4%{?dist}
+Version:        1.5.4
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-URL:            https://libburnia-project.org/
-Source0:        https://files.libburnia-project.org/releases/%{name}-%{version}.tar.gz
+URL:            https://dev.lovelyhq.com/libburnia/libisoburn
+Source0:        https://dev.lovelyhq.com/libburnia/libisoburn/archive/release--%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         libisoburn-1.0.8-multilib.patch
 
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gcc
+BuildRequires:  libtool
 BuildRequires:  libacl-devel
 BuildRequires:  libburn-devel >= %{version}
 BuildRequires:  libisofs-devel >= %{version}
+BuildRequires:	make
 BuildRequires:  readline-devel
 BuildRequires:  zlib-devel
 %if %{with_check}
@@ -61,9 +66,11 @@ supported media: CD-R, CD-RW, DVD-R, DVD-RW, DVD+R, DVD+R DL, DVD+RW,
 DVD-RAM, BD-R and BD-RE.
 
 %prep
-%setup -q
+%setup -q -n %{name}
 %patch0 -p1 -b .multilib
 
+libtoolize --force
+autoreconf --force --install
 
 %build
 %configure --disable-static
@@ -108,14 +115,16 @@ cd releng
 %{_bindir}/xorrecord
 %{_bindir}/xorriso
 %{_bindir}/xorrisofs
+%{_bindir}/xorriso-dd-target
 %{_mandir}/man1/xorrecord.1*
-%{_mandir}/man1/xorriso.1*
-%{_mandir}/man1/xorrisofs.1*
+%{_mandir}/man1/xorriso*.1*
 %{_infodir}/xorrecord.info*
-%{_infodir}/xorriso.info*
-%{_infodir}/xorrisofs.info*
+%{_infodir}/xorriso*.info*
 
 %changelog
+* Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.5.4-1
+- Upgrade to 1.5.4.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.8-4
 - Removing the explicit %%clean stage.
 - License verified.

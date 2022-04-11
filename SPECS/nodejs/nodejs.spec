@@ -1,56 +1,91 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 6.14.13
+%define npm_version 8.3.1
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        14.17.2
-Release:        2%{?dist}
+Version:        16.14.0
+Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/nodejs/node
+# !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball 
+# !!!! because it contains patented algorithms.
+# !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
-Patch0:         patch_tls_nodejs14.patch
+Patch0:         disable-tlsv1-tlsv1-1.patch
 
-BuildRequires:  coreutils >= 8.22, openssl-devel >= 1.0.1
+BuildRequires:  brotli-devel
+BuildRequires:  coreutils >= 8.22
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  ninja-build
+BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
 BuildRequires:  which
+BuildRequires:  zlib-devel
+
+Requires:       brotli
 Requires:       coreutils >= 8.22
-Requires:       openssl >= 1.0.1
+Requires:       openssl >= 1.1.1
 Requires:       python3
 
 Provides:       npm = %{npm_version}.%{version}-%{release}
 
 %description
-Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient. The Node.js package ecosystem, npm, is the largest ecosystem of open source libraries in the world.
+Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
+Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient.
+The Node.js package ecosystem, npm, is the largest ecosystem of open source libraries in the world.
 
 %package        devel
 Summary:        Development files node
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
+Requires:       brotli-devel
+Requires:       openssl-devel >= 1.1.1
+Requires:       zlib-devel
 
 %description    devel
 The nodejs-devel package contains libraries, header files and documentation
 for developing applications that use nodejs.
 
 %prep
-%setup -q -n node-v%{version}
-%patch0 -p1
+%autosetup -p1 -n node-v%{version}
 
 %build
-sh configure --prefix=%{_prefix} \
-           --shared-openssl \
-           --shared-zlib
+# remove unsupported TLSv1.3 cipher:
+#    Mariner's OpenSSL configuration does not allow for this TLSv1.3
+#    cipher. OpenSSL does not like being asked to use TLSv1.3 ciphers
+#    it doesn't support (despite being fine processing similar cipher
+#    requests for TLS < 1.3). This cipher's presence in the default
+#    cipher list causes failures when initializing secure contexts
+#    in the context of Node's TLS library.
+sed -i '/TLS_CHACHA20_POLY1305_SHA256/d' ./src/node_constants.h
 
-make %{?_smp_mflags}
+# remove brotli and zlib source code from deps folder
+# keep the .gyp and .gypi files that are still used during configuration
+find deps/zlib -name *.[ch] -delete
+find deps/brotli -name *.[ch] -delete
+
+python3 configure.py \
+  --prefix=%{_prefix} \
+  --ninja \
+  --shared-openssl \
+  --shared-zlib \
+  --shared-brotli \
+  --with-intl=small-icu \
+  --with-icu-source=deps/icu-small \
+  --without-dtrace \
+  --openssl-use-def-ca-store
+
+JOBS=4 make %{?_smp_mflags} V=0
 
 %install
 
 make %{?_smp_mflags} install DESTDIR=$RPM_BUILD_ROOT
-rm -fr %{buildroot}%{_libdir}/dtrace/  # No systemtap support.
 install -m 755 -d %{buildroot}%{_libdir}/node_modules/
 install -m 755 -d %{buildroot}%{_datadir}/%{name}
 
@@ -80,6 +115,17 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+*   Thu Feb 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 16.14.0-1
+-   Upgrade to 16.14.0.
+*   Thu Nov 18 2021 Thomas Crain <thcrain@microsoft.com> - 14.18.1-1
+-   Update to version 14.18.1 to fix CVE-2021-22959, CVE-2021-22960, CVE-2021-37701,
+    CVE-2021-37712, CVE-2021-37713, CVE-2021-39134, CVE-2021-39135
+-   Add patch to remove problematic cipher from default list
+-   Add config flag to use OpenSSL cert store instead of built-in Mozilla certs
+-   Add script to remove vendored OpenSSL tree from source tarball
+-   Update required OpenSSL version to 1.1.1
+-   Use python configure script directly
+-   Lint spec
 *   Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 14.17.2-2
 -   Adding 'Provides' for 'npm'.
 *   Mon Jul 19 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 14.17.2-1

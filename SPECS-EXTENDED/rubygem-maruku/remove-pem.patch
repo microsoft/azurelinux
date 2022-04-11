@@ -1,0 +1,14 @@
+diff -ruN a/maruku.gemspec b/maruku.gemspec
+--- a/maruku.gemspec	2014-05-26 14:18:54.000000000 -0700
++++ b/maruku.gemspec	2022-02-21 18:42:44.880863694 -0800
+@@ -22,10 +22,6 @@
+   s.bindir = 'bin'
+   s.executables = ['maruku','marutex']
+ 
+-  # Sign the gem - http://docs.rubygems.org/read/chapter/21
+-  s.cert_chain  = ['certs/bhollis.pem']
+-  s.signing_key = File.expand_path("~/.gem/private_key.pem") if $0 =~ /gem\z/
+-
+   s.require_path = 'lib'
+ 
+   s.required_ruby_version = '>= 1.8.7'

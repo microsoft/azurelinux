@@ -1,0 +1,50 @@
+From c517d496d6b633307875115cc31b9efd2221f812 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 9 Mar 2022 20:50:22 +0000
+Subject: [PATCH 17/17] Add cloud-init.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/corecommands.fc |  1 +
+ policy/modules/system/systemd.te      | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+)
+
+MSFT_TAG: not upstreamable
+
+diff --git a/policy/modules/kernel/corecommands.fc b/policy/modules/kernel/corecommands.fc
+index 4c18154ce..1257de820 100644
+--- a/policy/modules/kernel/corecommands.fc
++++ b/policy/modules/kernel/corecommands.fc
+@@ -173,6 +173,7 @@ ifdef(`distro_gentoo',`
+ /usr/lib/bluetooth/.*		--	gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/bridge-utils/.*\.sh	--	gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/ccache/bin(/.*)?		gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/cloud-init(/.*)?		gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/dhcpcd/dhcpcd-hooks(/.*)?	gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/dhcpcd/dhcpcd-run-hooks --	gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/dovecot/.+			gen_context(system_u:object_r:bin_t,s0)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 287e30b51..64f09b7fc 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1849,3 +1849,17 @@ userdom_relabelto_user_runtime_dirs(systemd_user_runtime_dir_t)
+ optional_policy(`
+ 	dbus_system_bus_client(systemd_user_runtime_dir_t)
+ ')
++
++
++# Temporary rules until cloud-init policy is implemented.
++allow mount_t initrc_runtime_t:dir mounton;
++allow rpm_script_t initrc_t:fd use;
++allow rpm_script_t initrc_t:fifo_file rw_inherited_fifo_file_perms;
++allow systemd_generator_t var_lib_t:lnk_file read_lnk_file_perms;
++allow systemd_generator_t var_run_t:dir manage_dir_perms;
++allow systemd_generator_t var_run_t:file manage_file_perms;
++allow systemd_hostnamed_t initrc_t:dbus send_msg;
++allow systemd_logind_t initrc_t:dir search_dir_perms;
++allow systemd_logind_t initrc_t:file read_file_perms;
++allow systemd_networkd_t init_runtime_t:dir list_dir_perms;
++allow udev_t init_runtime_t:dir read;
+-- 
+2.17.1
+
