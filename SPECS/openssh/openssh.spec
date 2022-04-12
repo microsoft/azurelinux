@@ -44,6 +44,9 @@ BuildRequires:  krb5-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
+BuildRequires:  kernel-headers
+BuildRequires:  autoconf
+BuildRequires:  make
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
