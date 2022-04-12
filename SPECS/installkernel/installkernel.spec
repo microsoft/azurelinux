@@ -32,6 +32,7 @@ cp %{SOURCE1} COPYING
 %changelog
 * Thu Mar 31 2022 Chris Co <chrco@microsoft.com> - 1.0.0-2
 - Fix mariner.cfg symlink generation
+- License verified
 
 * Mon Mar 29 2021 Chris Co <chrco@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner.
