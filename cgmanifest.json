@@ -9422,7 +9422,7 @@
         "other": {
           "name": "libewf",
           "version": "20140608",
-          "downloadUrl": "https://53efc0a7187d0baa489ee347026b8278fe4020f6.googledrive.com/host/0B3fBvzttpiiSMTdoaVExWWNsRjg/libewf-20140608.tar.gz"
+          "downloadUrl": "https://github.com/libyal/legacy/raw/main/libewf/libewf-20140608.tar.gz"
         }
       }
     },
@@ -9682,7 +9682,7 @@
         "other": {
           "name": "libguestfs",
           "version": "1.44.0",
-          "downloadUrl": "http://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
+          "downloadUrl": "https://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
         }
       }
     },
@@ -15984,8 +15984,8 @@
         "type": "other",
         "other": {
           "name": "perl",
-          "version": "5.32.0",
-          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz"
+          "version": "5.34.1",
+          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.34.1.tar.xz"
         }
       }
     },
@@ -21694,8 +21694,8 @@
         "type": "other",
         "other": {
           "name": "pygobject3",
-          "version": "3.36.1",
-          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.36/pygobject-3.36.1.tar.xz"
+          "version": "3.42.0",
+          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.42/pygobject-3.42.0.tar.xz"
         }
       }
     },
@@ -23194,8 +23194,8 @@
         "type": "other",
         "other": {
           "name": "python-msgpack",
-          "version": "0.6.2",
-          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v0.6.2.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v1.0.3.tar.gz"
         }
       }
     },
@@ -23914,8 +23914,8 @@
         "type": "other",
         "other": {
           "name": "python-pyvmomi",
-          "version": "6.7.3",
-          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/6.7.3.tar.gz"
+          "version": "7.0.3",
+          "downloadUrl": "https://github.com/vmware/pyvmomi/archive/refs/tags/v7.0.3.tar.gz"
         }
       }
     },

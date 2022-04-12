@@ -1,4 +1,4 @@
-%global libname %(echo %{name} | sed -e 's/^ocaml-//')
+%define libname %(echo %{name} | sed -e 's/^ocaml-//')
 
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}

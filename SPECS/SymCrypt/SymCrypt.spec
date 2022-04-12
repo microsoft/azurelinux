@@ -2,7 +2,7 @@
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
 Version:        101.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,9 @@ Source0:        %{name}-%{version}.tar.gz
 #Source1        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz
 Source1:        jitterentropy-library-3.3.1.tar.gz
 BuildRequires:  cmake
+%ifarch aarch64
+BuildRequires:  clang
+%endif
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  python3
@@ -61,6 +64,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Tue Apr 05 2022 Cameron Baird <cameronbaird@microsoft.com> - 101.2.0-2
+- BuildRequires clang in aarch64 builds
+
 * Tue Mar 29 2022 Samuel Lee <saml@microsoft.com> - 101.2.0-1
 - Update SymCrypt to v101.2.0 to include FIPS self-tests, certifiable AES-GCM, and fix aarch64 build
 

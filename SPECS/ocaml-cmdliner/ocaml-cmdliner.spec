@@ -1,6 +1,4 @@
-# In order for this to work as a "global" macro it has to come after the
-# definition of Name:, evidently.
-%global libname %(echo %{name} | sed -e 's/^ocaml-//')
+%define libname %(echo %{name} | sed -e 's/^ocaml-//')
 
 Summary:        Declarative definition of command line interfaces for OCaml
 Name:           ocaml-cmdliner

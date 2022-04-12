@@ -6,7 +6,9 @@ License:        LGPLv2 WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/gildor478/ocaml-fileutils
-Source0:        https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# NOTE: the "_2" suffix was added to avoid conflicts with an older source tarball for the same version of the sources.
+#       Please remove it during a version update.
+Source0:        https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/%{version}.tar.gz#/%{name}_2-%{version}.tar.gz
 # Set of files from previous sources location allowing us to drop dependency on "ocaml-oasis-devel", which is no longer available.
 # Previous sources used to be available under http://forge.ocamlcore.org/frs/download.php/1695/ocaml-fileutils-0.5.2.tar.gz.
 # Currently still available in Fedora's SRPMs.

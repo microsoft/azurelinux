@@ -1,24 +1,26 @@
 %global debug_package %{nil}
 Summary:        MessagePack (de)serializer.
 Name:           python-msgpack
-Version:        0.6.2
-Release:        3%{?dist}
+Version:        1.0.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
-URL:            http://msgpack.org/
-#Source0:       https://github.com/msgpack/msgpack-python/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+URL:            https://msgpack.org/
+Source0:        https://github.com/msgpack/msgpack-python/archive/v%{version}.tar.gz#/msgpack-python-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-Cython
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 MessagePack (de)serializer.
 
 %package -n     python3-msgpack
 Summary:        MessagePack (de)serializer.
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
 
 %description -n python3-msgpack
@@ -34,7 +36,10 @@ MessagePack is a fast, compact binary serialization format, suitable for similar
 %py3_install
 
 %check
-%python3 setup.py test
+# v1.0.3 does not have a tox env for newer versions of python, so we add it ourselves
+sed -i 's/    {py35,py36,py37,py38}-{c,pure},/    {py35,py36,py37,py38,py%{python3_version_nodots}}-{c,pure},/g' tox.ini
+pip3 install tox
+tox -e py%{python3_version_nodots}-c,py%{python3_version_nodots}-pure
 
 %files -n python3-msgpack
 %defattr(-,root,root)
@@ -42,6 +47,10 @@ MessagePack is a fast, compact binary serialization format, suitable for similar
 %{python3_sitelib}/*
 
 %changelog
+* Thu Apr 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.3-1
+- Upgrade to latest upstream version
+- Use tox as test runner
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.2-3
 - Add license to python3 package
 - Remove python2 package
