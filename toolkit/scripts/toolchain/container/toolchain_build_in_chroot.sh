@@ -197,14 +197,14 @@ set -e
 echo End sanity check - raw toolchain - adjusting the toolchain
 touch /logs/status_adjusting_toolchain_complete
 
-echo Zlib-1.2.11
-tar xf zlib-1.2.11.tar.xz
-pushd zlib-1.2.11
+echo Zlib-1.2.12
+tar xf zlib-1.2.12.tar.gz
+pushd zlib-1.2.12
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf zlib-1.2.11
+rm -rf zlib-1.2.12
 touch /logs/status_zlib_complete
 
 echo File-5.40
