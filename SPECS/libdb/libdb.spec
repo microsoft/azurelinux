@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          System/Libraries
 URL:            https://oss.oracle.com/berkeley-db.html
 Source0:        http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
+Patch0:         CVE-2019-2708.patch
 Obsoletes:      db
 
 %description
@@ -42,7 +43,7 @@ transactions, locking, logging, shared memory caching, and database
 recovery. DB supports C, C++, Java and Perl APIs.
 
 %prep
-%setup -q -n db-%{version}
+%autosetup -p1 -n db-%{version}
 
 %build
 cd build_unix
@@ -94,6 +95,11 @@ install -D -m755 README %{buildroot}/%{_datadir}/licenses/README
 %{_bindir}/db*_tuner
 
 %changelog
+* Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 5.3.28-7
+- Align with CBL-Mariner 1.0 to address following CVEs:
+- Patch CVE-2019-2708
+- Nopatch CVE-2017-3604 to CVE-2017-3617 and CVE-2020-2981
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.3.28-6
 - Removing the explicit %%clean stage.
 - License verified.
