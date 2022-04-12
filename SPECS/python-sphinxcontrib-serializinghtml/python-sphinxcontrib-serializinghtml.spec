@@ -37,16 +37,13 @@ HTML files (json and pickle).
 %autosetup -n %{pypi_name}-%{version}
 find -name '*.mo' -delete
 
-
 %build
 for po in $(find -name '*.po'); do
   msgfmt --output-file=${po%.po}.mo ${po}
 done
 %py3_build
 
-
 %install
-pip3 install Sphinx
 %py3_install
 
 # Move language files to /usr/share
@@ -61,11 +58,10 @@ rm -rf sphinxcontrib/serializinghtml/locales
 ln -s %{_datadir}/locale sphinxcontrib/serializinghtml/locales
 popd
 
-
 %find_lang sphinxcontrib.serializinghtml
 
-
 %check
+pip3 install Sphinx
 %pytest
 
 %files -n python3-%{pypi_name} -f sphinxcontrib.serializinghtml.lang
