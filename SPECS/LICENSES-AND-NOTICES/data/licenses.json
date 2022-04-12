@@ -2285,7 +2285,6 @@
                 "cert-manager",
                 "clamav",
                 "cloud-hypervisor",
-                "cloud-init-vmware-guestinfo",
                 "cmake-fedora",
                 "coredns-1.7.0",
                 "coredns-1.8.0",
