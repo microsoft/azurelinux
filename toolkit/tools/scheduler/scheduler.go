@@ -384,7 +384,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 	}
 
 	// Let the workers know they are done
-	doneBuild(channels)
+	doneBuild(channels, buildState)
 	// Give the workers time to finish so they don't mess up the summary we want to print.
 	// Some nodes may still be busy with long running builds we don't care about anymore, so we don't
 	// want to actually block here.
@@ -419,22 +419,7 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 	return
 }
 
-func doneBuild(channels *schedulerChannels) {
-	// Close the done channel. The build workers will finish processing any work, then return
-	// upon seeing this channel is closed.
-	close(channels.Done)
-}
-
-// stopBuild will stop all future builds from being scheduled by sending a cancellation signal
-// to the worker pool and draining any outstanding build requests.
-func stopBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuildState) {
-	logger.Log.Error("Stopping build")
-
-	// Close the cancel channel to prevent and buffered requests from being built.
-	// Upon seeing the cancel channel is closed, the build worker will stop instead
-	// of processing a new request.
-	close(channels.Cancel)
-
+func drainChannels(channels *schedulerChannels, buildState *schedulerutils.GraphBuildState) {
 	// For any workers that are current parked with no buffered requests, close the
 	// requests channel to wake up any build workers waiting on a request to be buffered.
 	// Upon being woken up by a closed requests channel, the build worker will stop.
@@ -448,4 +433,25 @@ func stopBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuil
 	for req := range channels.Requests {
 		buildState.RemoveBuildRequest(req)
 	}
+}
+
+func doneBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuildState) {
+	// Close the done channel. The build workers will finish processing any work, then return
+	// upon seeing this channel is closed.
+	close(channels.Done)
+
+	drainChannels(channels, buildState)
+}
+
+// stopBuild will stop all future builds from being scheduled by sending a cancellation signal
+// to the worker pool and draining any outstanding build requests.
+func stopBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuildState) {
+	logger.Log.Error("Stopping build")
+
+	// Close the cancel channel to prevent and buffered requests from being built.
+	// Upon seeing the cancel channel is closed, the build worker will stop instead
+	// of processing a new request.
+	close(channels.Cancel)
+
+	drainChannels(channels, buildState)
 }
