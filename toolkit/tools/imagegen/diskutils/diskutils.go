@@ -557,10 +557,10 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 		if err != nil {
 			err = fmt.Errorf("Could not format partition with type %v after %v retries", fsType, totalAttempts)
 		}
-		
+
 		_, stderr, err  := shell.Execute("swapon", partDevPath)
 		if err != nil {
-			logger.Log.Warnf("Failed to execute swapon after swap partition initialization: %v", stderr)
+			logger.Log.Warnf("Failed to execute swapon: %v", stderr)
 			return "", err
 		}
 	case "":
