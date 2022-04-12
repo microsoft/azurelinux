@@ -4,7 +4,7 @@ Summary: 		Common SGML catalog and DTD files
 Name: 			sgml-common
 Version: 		0.6.3
 Release: 		57%{?dist}
-License: 		GPL+
+License: 		GPLv3
 
 BuildArch: 		noarch
 
@@ -196,6 +196,7 @@ fi
 %changelog
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.3-57
 - Fixing invalid source URL.
+- License verified.
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.6.3-56
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)

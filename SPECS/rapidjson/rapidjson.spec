@@ -54,6 +54,7 @@ make test
 %changelog
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-7
 - Fixing invalid source URL.
+- License verified.
 
 * Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.1.0-6
 - Update Source0
