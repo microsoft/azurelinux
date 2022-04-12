@@ -30,6 +30,7 @@ Metapackage to install all build tools
 %changelog
 * Wed Mar 30 2022 Chris Co <chrco@microsoft.com> - 0.1-5
 - Add installkernel
+- License verified
 
 * Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> - 0.1-4
 - Renaming linux-api-headers to kernel-headers.
