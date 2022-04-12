@@ -197,8 +197,9 @@ sed -i '/typed_ast/d' setup.py
 
 # For backwards compatibility. Remove with care, if at all
 for i in sphinx-{apidoc,autogen,build,quickstart}; do
+    ln -s %{_bindir}/$i %{buildroot}%{_bindir}/$i%{python3_pkgversion}
     ln -s %{_bindir}/$i %{buildroot}%{_bindir}/$i-%{python3_version}
-    ln -s %{_bindir}/$i %{buildroot}%{_bindir}/$i-3
+    ln -s %{_bindir}/$i %{buildroot}%{_bindir}/$i-%{python3_pkgversion}
 done
 
 # Clean up non-python files
