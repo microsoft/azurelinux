@@ -1,11 +1,11 @@
-%global         underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
+%define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 # Do not create debuginfo sub-package because there is no binary executable
 %global debug_package %{nil}
 
 Summary:        Compiler built-ins
 Name:           libecb
 Version:        9.30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,6 +72,9 @@ install -m 0644 -t %{buildroot}%{_mandir}/man3 *.3
 %{_mandir}/man3/*
 
 %changelog
+* Tue Apr 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.30-2
+- Fixing "%%underscore_version" macro definition.
+
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.30-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Switching to using CVS revision tag as version.

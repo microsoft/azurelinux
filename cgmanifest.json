@@ -3399,7 +3399,7 @@
         "other": {
           "name": "expat",
           "version": "2.4.3",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_$(echo"
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_4_3/expat-2.4.3.tar.bz2"
         }
       }
     },
@@ -5271,7 +5271,7 @@
         "other": {
           "name": "harfbuzz",
           "version": "3.4.0",
-          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/3.3.2/harfbuzz-3.4.0.tar.xz"
+          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/3.4.0/harfbuzz-3.4.0.tar.xz"
         }
       }
     },
