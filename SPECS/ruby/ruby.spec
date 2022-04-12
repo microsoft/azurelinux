@@ -21,7 +21,7 @@
 Summary:        Ruby
 Name:           ruby
 Version:        2.7.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -244,6 +244,13 @@ writing tests, checking results and automated testing in Ruby.
 %autosetup -p1
 
 %build
+# Remove GCC specs and build environment linker scripts
+# from the flags used when compiling outside of an RPM environment
+export XCFLAGS="%{build_cflags}"
+export XLDFLAGS="%{build_ldflags}"
+export CFLAGS="%{extension_cflags}"
+export LDFLAGS="%{extension_ldflags}"
+
 autoconf
 
 %configure \
@@ -451,6 +458,9 @@ sudo -u test make test TESTS="-v"
 %doc %{gem_dir}/gems/test-unit-%{test_unit_version}/doc
 
 %changelog
+* Mon Apr 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.7.4-5
+- Specify which flags should be stored for extension building
+
 * Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-4
 - Fixing "Provides".
 
