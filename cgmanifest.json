@@ -4969,6 +4969,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "GSL",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/microsoft/GSL/archive/v4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gsm",
           "version": "1.0.19",
           "downloadUrl": "http://www.quut.com/gsm/gsm-1.0.19.tar.gz"
