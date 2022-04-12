@@ -3,20 +3,22 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
+Requires:       binutils
 Requires:       gcc-c++ = %{version}-%{release}
+Requires:       glibc-devel
 Requires:       gmp
+Requires:       kernel-headers
 Requires:       libgcc-atomic = %{version}-%{release}
 Requires:       libgcc-devel = %{version}-%{release}
 Requires:       libgomp-devel = %{version}-%{release}
 Requires:       libmpc
-Requires:       libstdc++-devel = %{version}-%{release}
 Provides:       cpp = %{version}-%{release}
 Provides:       gcc-plugin-devel = %{version}-%{release}
 Provides:       libasan = %{version}-%{release}
@@ -268,6 +270,9 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Tue Apr 12 2022 Andy Caldwell <andycaldwell@microsoft.com> - 11.2.0-3
+- Add minimal sensible dependencies to allow `gcc` to work out the box (`binutils`, `glibc-devel` and `kernel-headers`)
+
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 11.2.0-2
 - Add provides for libasan, liblsan, libtsan, and libubsan (and their static counterparts) to the main package
 - Remove CVE-2019-15847 nopatch file (not relevant to our version of GCC)
