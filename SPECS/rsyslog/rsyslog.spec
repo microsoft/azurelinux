@@ -153,7 +153,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_docdir}/%{name}/html
 
 %changelog
-* Thu Apr 7 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.2108.0-2
+* Thu Apr 07 2022 Daniel McIlvaney <damcilva@microsoft.com> - 8.2108.0-2
 - Bring rsyslog.conf in line with other distros
 - add /var/log/messages for normal logs
 - add /var/log/secure for auth and authpriv logs
