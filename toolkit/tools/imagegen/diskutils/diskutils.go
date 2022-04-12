@@ -545,7 +545,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 		if err != nil {
 			err = fmt.Errorf("could not format partition with type %v after %v retries", fsType, totalAttempts)
 		}
-	case "linux-swap": 
+	case "linux-swap":
 		err = retry.Run(func() error {
 			_, stderr, err := shell.Execute("mkswap", partDevPath)
 			if err != nil {
@@ -558,7 +558,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 			err = fmt.Errorf("Could not format partition with type %v after %v retries", fsType, totalAttempts)
 		}
 
-		_, stderr, err  := shell.Execute("swapon", partDevPath)
+		_, stderr, err := shell.Execute("swapon", partDevPath)
 		if err != nil {
 			logger.Log.Warnf("Failed to execute swapon: %v", stderr)
 			return "", err
