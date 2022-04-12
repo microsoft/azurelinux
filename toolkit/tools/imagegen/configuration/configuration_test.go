@@ -445,6 +445,15 @@ var expectedConfiguration Config = Config{
 					StartupCommand: "/usr/bin/somescript",
 				},
 			},
+			PreInstallScripts: []PreInstallScript{
+				{
+					Path: "arglessPreScript.sh",
+				},
+				{
+					Path: "PreScriptWithArguments.sh",
+					Args: "--input abc --output cba",
+				},
+			},
 			PostInstallScripts: []PostInstallScript{
 				{
 					Path: "arglessScript.sh",

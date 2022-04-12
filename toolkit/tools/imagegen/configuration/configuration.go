@@ -38,6 +38,13 @@ type TargetDisk struct {
 	Value string `json:"Value"`
 }
 
+// PreInstallScript defines a script to be run before installation
+// starts and provides a way to pass parameters to it.
+type PreInstallScript struct {
+	Args string `json:"Args"`
+	Path string `json:"Path"`
+}
+
 // PostInstallScript defines a script to be ran after other installation
 // steps are finished and provides a way to pass parameters to it.
 type PostInstallScript struct {
@@ -301,6 +308,7 @@ func (c *Config) convertToAbsolutePaths(baseDirPath string) {
 
 		convertAdditionalFilesPath(baseDirPath, systemConfig)
 		convertPackageListPaths(baseDirPath, systemConfig)
+		convertPreInstallScriptsPaths(baseDirPath, systemConfig)
 		convertPostInstallScriptsPaths(baseDirPath, systemConfig)
 		convertSSHPubKeys(baseDirPath, systemConfig)
 	}
@@ -324,6 +332,12 @@ func convertAdditionalFilesPath(baseDirPath string, systemConfig *SystemConfig) 
 func convertPackageListPaths(baseDirPath string, systemConfig *SystemConfig) {
 	for i, packageListPath := range systemConfig.PackageLists {
 		systemConfig.PackageLists[i] = file.GetAbsPathWithBase(baseDirPath, packageListPath)
+	}
+}
+
+func convertPreInstallScriptsPaths(baseDirPath string, systemConfig *SystemConfig) {
+	for i, preInstallScript := range systemConfig.PreInstallScripts {
+		systemConfig.PreInstallScripts[i].Path = file.GetAbsPathWithBase(baseDirPath, preInstallScript.Path)
 	}
 }
 

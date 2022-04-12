@@ -1829,6 +1829,27 @@ func cleanupRpmDatabase(rootPrefix string) (err error) {
 	return
 }
 
+func RunPreInstallScripts(config configuration.SystemConfig) (err error) {
+	const squashErrors = false
+
+	for _, script := range config.PreInstallScripts {
+		ReportActionf("Running pre-install script: %s", path.Base(script.Path))
+		logger.Log.Infof("Running pre-install script: %s", script.Path)
+		
+		err = shell.ExecuteLive(squashErrors, "chmod", "a+x", script.Path)
+		if err != nil {
+			return
+		}
+		
+		err = shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", script.Path, script.Args))
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 func runPostInstallScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
 	const squashErrors = false
 
