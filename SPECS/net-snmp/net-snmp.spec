@@ -114,7 +114,8 @@ popd
 %exclude %{_libdir}/perl5/perllocal.pod
 
 %files libs
-%doc COPYING README FAQ NEWS TODO
+%license COPYING
+%doc README FAQ NEWS TODO
 %{_libdir}/libnetsnmp.so.*
 %{_datadir}/snmp
 %{_datadir}/snmp/mibs
