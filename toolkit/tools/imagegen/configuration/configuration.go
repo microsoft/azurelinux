@@ -38,16 +38,9 @@ type TargetDisk struct {
 	Value string `json:"Value"`
 }
 
-// PreInstallScript defines a script to be run before installation
-// starts and provides a way to pass parameters to it.
-type PreInstallScript struct {
-	Args string `json:"Args"`
-	Path string `json:"Path"`
-}
-
-// PostInstallScript defines a script to be ran after other installation
-// steps are finished and provides a way to pass parameters to it.
-type PostInstallScript struct {
+// InstallScript defines a script to be run before or after other installation
+// steps and provides a way to pass parameters to it.
+type InstallScript struct {
 	Args string `json:"Args"`
 	Path string `json:"Path"`
 }
