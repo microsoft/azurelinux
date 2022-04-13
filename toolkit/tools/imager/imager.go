@@ -119,8 +119,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		return
 	}
 
-	logger.Log.Infof("Length of partition setting: %d", len(systemConfig.PartitionSettings))
-
 	isRootFS = len(systemConfig.PartitionSettings) == 0
 	if isRootFS {
 		logger.Log.Infof("Creating rootfs")
@@ -143,8 +141,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
 		}
 	} else {
-		logger.Log.Infof("Partition setting ID: %s", systemConfig.PartitionSettings[0].ID)
-
 		logger.Log.Info("Creating raw disk in build directory")
 		diskConfig := disks[defaultDiskIndex]
 		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, isLoopDevice, encryptedRoot, readOnlyRoot, err = setupDisk(buildDir, defaultTempDiskName, *liveInstallFlag, diskConfig, systemConfig.Encryption, systemConfig.ReadOnlyVerityRoot)
@@ -330,7 +326,6 @@ func setupDisk(outputDir, diskName string, liveInstallFlag bool, diskConfig conf
 			return
 		}
 	} else {
-		fmt.Printf("ENtering here-----------------------\n")
 		diskDevPath, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupLoopDeviceDisk(outputDir, diskName, diskConfig, rootEncryption, readOnlyRootConfig)
 		isLoopDevice = true
 	}
@@ -355,16 +350,11 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 		return
 	}
 
-	fmt.Printf("ENtering checkpoint 1-----------------------\n")
-
 	diskDevPath, err = diskutils.SetupLoopbackDevice(rawDisk)
 	if err != nil {
 		logger.Log.Errorf("Failed to mount raw disk (%s) as a loopback device", rawDisk)
 		return
 	}
-
-	fmt.Printf("ENtering checkpoint 2-----------------------\n")
-	fmt.Printf("Check the value of diskDevPath: %s\n", diskDevPath)
 
 	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = setupRealDisk(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
 	if err != nil {
