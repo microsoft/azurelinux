@@ -2,19 +2,6 @@
 %global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
-# support openssl-1.1 -> mariner currently DOES NOT support it.
-%if 0%{?fedora} > 26
-%global openssl11 1
-%endif
-%global openssl -openssl-linked
-
-# workaround https://bugzilla.redhat.com/show_bug.cgi?id=1668865
-# for current stable releases
-%if 0%{?fedora} && 0%{?fedora} < 30
-%global no_feature_statx -no-feature-statx
-%global no_feature_renameat2 -no-feature-renameat2
-%endif
-
 # support qtchooser (adds qtchooser .conf file)
 %global qtchooser 1
 %if 0%{?qtchooser}
@@ -41,8 +28,8 @@
 
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
-Version:      5.12.5
-Release:      6%{?dist}
+Version:      5.15.3
+Release:      1%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -90,9 +77,6 @@ Source10: macros.qt5-qtbase
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
 
-# fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
-Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
-
 # borrowed from opensuse
 # track private api via properly versioned symbols
 # downside: binaries produced with these differently-versioned symbols are no longer
@@ -121,19 +105,23 @@ Patch53: qtbase-everywhere-src-5.12.1-qt5gui_cmake_isystem_includes.patch
 # respect QMAKE_LFLAGS_RELEASE when building qmake
 Patch54: qtbase-qmake_LFLAGS.patch
 
+# don't use relocatable heuristics to guess prefix when using -no-feature-relocatable
+Patch55: qtbase-everywhere-src-5.14.2-no_relocatable.patch
+
+# fix FTBFS against libglvnd-1.3.4+
+Patch56: qtbase-everywhere-src-5.15.2-libglvnd.patch
+
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
 # support firebird version 3.x
-Patch64: qt5-qtbase-5.12.1-firebird.patch
+Patch63: qt5-qtbase-5.12.1-firebird.patch
+
+# support firebird version 4.x
+Patch64: qt5-qtbase-5.12.1-firebird-4.0.0.patch
 
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
-
-# use categorized logging for xcb log entries
-# https://bugreports.qt.io/browse/QTBUG-55167
-# https://bugzilla.redhat.com/show_bug.cgi?id=1497564
-Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 
 # python3
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
@@ -142,7 +130,15 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1732129
 Patch80: qtbase-use-wayland-on-gnome.patch
 
+# gcc-11
+Patch90: %{name}-gcc11.patch
+
 ## upstream patches
+# https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
+# git diff v5.15.3-lts-lgpl..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
+# patch100 in lookaside cache due to large'ish size -- rdieter
+Patch100: kde-5.15-rollup-20220304.patch.gz
+Patch102: qtbase-everywhere-src-5.15.2-CVE-2022-2525.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -217,10 +213,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 # debating whether to do 1 subpkg per library or not -- rex
 %package gui
 Summary: Qt5 GUI-related libraries
-#Requires: %{name}%{?_isa} = %{version}-%{release}
-%if 0%{?fedora} > 20
 Recommends: mesa-dri-drivers
-%endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
 # for Source6: 10-qt5-check-opengl2.sh:
@@ -280,9 +273,6 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
  bin/syncqt.pl \
  mkspecs/features/data/unix/findclasslist.pl
 
-# gcc 11 requires <limits> to be explicitly included for std::numeric_limits
-sed -i 's/#  include <utility>/#  include <utility>\n#  include <limits>/g' src/corelib/global/qglobal.h
-
 %build
 ## FIXME/TODO:
 # * for %%ix86, add sse2 enabled builds for Qt5Gui, Qt5Core, QtNetwork, see also:
@@ -339,7 +329,7 @@ ls /usr/bin/
   %{?ibase} \
   -icu \
   -optimized-qmake \
-  %{?openssl} \
+  -openssl-linked \
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
   -no-pch \
@@ -355,8 +345,6 @@ ls /usr/bin/
   %{?xkbcommon} \
   -zlib \
   %{?use_gold_linker} \
-  %{?no_feature_renameat2} \
-  %{?no_feature_statx} \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}"
@@ -764,6 +752,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.3-1
+- Updating to version 5.15.3 using Fedora 36 spec (license: MIT) for guidance.
+
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.5-6
 - Fix gcc11 build issue
 

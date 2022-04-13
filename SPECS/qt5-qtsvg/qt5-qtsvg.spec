@@ -10,11 +10,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.qt.io
 Source0:        https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-opensource-src-%{version}.tar.xz
-# Upstream fixes from https://download.qt.io/official_releases/qt/5.15/:
-Patch1:         CVE-2022-25255.diff
-Patch2:         CVE-2022-25634.diff
-Patch3:         CVE-2018-25032.diff
-Patch4:         CVE-2022-1096.diff
+# upstream fix
+Patch0: qtsvg-5.15.2-clamp-parsed-doubles-to-float-representtable-values.patch
+Patch1: qtsvg-5.15.2-do-strict-error-checking-when-parsing-path-nodes.patch
 
 BuildRequires:  qt5-qtbase-devel >= %{version}
 BuildRequires:  qt5-qtbase-private-devel

@@ -1,0 +1,15 @@
+diff -up qtbase-everywhere-src-5.15.2/src/gui/configure.json.libglvnd qtbase-everywhere-src-5.15.2/src/gui/configure.json
+--- qtbase-everywhere-src-5.15.2/src/gui/configure.json.libglvnd	2020-10-27 03:02:11.000000000 -0500
++++ qtbase-everywhere-src-5.15.2/src/gui/configure.json	2021-09-10 10:05:53.610312223 -0500
+@@ -847,9 +847,9 @@
+                 ],
+                 "include": [ "EGL/egl.h", "X11/Xlib.h" ],
+                 "main": [
+-                    "Display *dpy = EGL_DEFAULT_DISPLAY;",
++                    "Display *dpy = reinterpret_cast<Display *>(EGL_DEFAULT_DISPLAY);",
+                     "EGLNativeDisplayType egldpy = XOpenDisplay(\"\");",
+-                    "dpy = egldpy;",
++                    "dpy = reinterpret_cast<Display *>(egldpy);",
+                     "EGLNativeWindowType w = XCreateWindow(dpy, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);",
+                     "XDestroyWindow(dpy, w);",
+                     "XCloseDisplay(dpy);"

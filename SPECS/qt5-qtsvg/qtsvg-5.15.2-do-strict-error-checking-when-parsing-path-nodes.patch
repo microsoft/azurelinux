@@ -1,0 +1,198 @@
+diff --git a/src/svg/qsvghandler.cpp b/src/svg/qsvghandler.cpp
+index b3d9aaf..402a71f 100644
+--- a/src/svg/qsvghandler.cpp
++++ b/src/svg/qsvghandler.cpp
+@@ -1614,6 +1614,7 @@ static void pathArc(QPainterPath &path,
+
+ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+ {
++    const int maxElementCount = 0x7fff; // Assume file corruption if more path elements than this
+     qreal x0 = 0, y0 = 0;              // starting point
+     qreal x = 0, y = 0;                // current point
+     char lastMode = 0;
+@@ -1621,7 +1622,8 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+     const QChar *str = dataStr.constData();
+     const QChar *end = str + dataStr.size();
+
+-    while (str != end) {
++    bool ok = true;
++    while (ok && str != end) {
+         while (str->isSpace() && (str + 1) != end)
+             ++str;
+         QChar pathElem = *str;
+@@ -1635,14 +1637,13 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             arg.append(0);//dummy
+         const qreal *num = arg.constData();
+         int count = arg.count();
+-        while (count > 0) {
++        while (ok && count > 0) {
+             qreal offsetX = x;        // correction offsets
+             qreal offsetY = y;        // for relative commands
+             switch (pathElem.unicode()) {
+             case 'm': {
+                 if (count < 2) {
+-                    num++;
+-                    count--;
++                    ok = false;
+                     break;
+                 }
+                 x = x0 = num[0] + offsetX;
+@@ -1659,8 +1660,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+                 break;
+             case 'M': {
+                 if (count < 2) {
+-                    num++;
+-                    count--;
++                    ok = false;
+                     break;
+                 }
+                 x = x0 = num[0];
+@@ -1686,8 +1686,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+                 break;
+             case 'l': {
+                 if (count < 2) {
+-                    num++;
+-                    count--;
++                    ok = false;
+                     break;
+                 }
+                 x = num[0] + offsetX;
+@@ -1700,8 +1699,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+                 break;
+             case 'L': {
+                 if (count < 2) {
+-                    num++;
+-                    count--;
++                    ok = false;
+                     break;
+                 }
+                 x = num[0];
+@@ -1741,8 +1739,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+                 break;
+             case 'c': {
+                 if (count < 6) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 QPointF c1(num[0] + offsetX, num[1] + offsetY);
+@@ -1758,8 +1755,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+             case 'C': {
+                 if (count < 6) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 QPointF c1(num[0], num[1]);
+@@ -1775,8 +1771,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+             case 's': {
+                 if (count < 4) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 QPointF c1;
+@@ -1797,8 +1792,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+             case 'S': {
+                 if (count < 4) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 QPointF c1;
+@@ -1819,8 +1813,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+             case 'q': {
+                 if (count < 4) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 QPointF c(num[0] + offsetX, num[1] + offsetY);
+@@ -1835,8 +1828,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+             case 'Q': {
+                 if (count < 4) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 QPointF c(num[0], num[1]);
+@@ -1851,8 +1843,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+             case 't': {
+                 if (count < 2) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 QPointF e(num[0] + offsetX, num[1] + offsetY);
+@@ -1872,8 +1863,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+             case 'T': {
+                 if (count < 2) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 QPointF e(num[0], num[1]);
+@@ -1893,8 +1883,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+             case 'a': {
+                 if (count < 7) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 qreal rx = (*num++);
+@@ -1916,8 +1905,7 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+                 break;
+             case 'A': {
+                 if (count < 7) {
+-                    num += count;
+-                    count = 0;
++                    ok = false;
+                     break;
+                 }
+                 qreal rx = (*num++);
+@@ -1938,12 +1926,15 @@ static bool parsePathDataFast(const QStringRef &dataStr, QPainterPath &path)
+             }
+                 break;
+             default:
+-                return false;
++                ok = false;
++                break;
+             }
+             lastMode = pathElem.toLatin1();
++            if (path.elementCount() > maxElementCount)
++                ok = false;
+         }
+     }
+-    return true;
++    return ok;
+ }
+
+ static bool parseStyle(QSvgNode *node,
+@@ -2979,8 +2970,8 @@ static QSvgNode *createPathNode(QSvgNode *parent,
+
+     QPainterPath qpath;
+     qpath.setFillRule(Qt::WindingFill);
+-    //XXX do error handling
+-    parsePathDataFast(data, qpath);
++    if (!parsePathDataFast(data, qpath))
++        qCWarning(lcSvgHandler, "Invalid path data; path truncated.");
+
+     QSvgNode *path = new QSvgPath(parent, qpath);
+     return path;
