@@ -1,24 +1,25 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
-Summary:      Qt5 - Support for rendering and displaying SVG
-Name:         qt5-qtsvg
-Version:      5.15.3
-Release:      1%{?dist}
-Vendor:       Microsoft Corporation
-Distribution: Mariner
+Summary:        Qt5 - Support for rendering and displaying SVG
+Name:           qt5-qtsvg
+Version:        5.15.3
+Release:        1%{?dist}
 # See LICENSE.GPL3-EXCEPT for exception details
-License: GFDL AND GPLv2+ with exceptions AND LGPLv2.1+
-Url:     http://www.qt.io
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-opensource-src-%{version}.tar.xz
+License:        GFDL AND GPLv2+ WITH exceptions AND LGPLv2.1+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.qt.io
+Source0:        https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-opensource-src-%{version}.tar.xz
 # Upstream fixes from https://download.qt.io/official_releases/qt/5.15/:
-Patch1:  CVE-2022-25255.diff
-Patch2:  CVE-2022-25634.diff
-Patch3:  CVE-2018-25032.diff
-Patch4:  CVE-2022-1096.diff
+Patch1:         CVE-2022-25255.diff
+Patch2:         CVE-2022-25634.diff
+Patch3:         CVE-2018-25032.diff
+Patch4:         CVE-2022-1096.diff
 
-BuildRequires: qt5-qtbase-devel >= %{version}
-BuildRequires: zlib-devel
-BuildRequires: qt5-qtbase-private-devel
+BuildRequires:  qt5-qtbase-devel >= %{version}
+BuildRequires:  qt5-qtbase-private-devel
+BuildRequires:  zlib-devel
+
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
 %description
@@ -27,18 +28,18 @@ two-dimensional vector graphics. Qt provides classes for rendering and
 displaying SVG drawings in widgets and on other paint devices.
 
 %package devel
-Summary: Development files for %{name}
+Summary:        Development files for %{name}
 
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: qt5-qtbase-devel%{?_isa}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       qt5-qtbase-devel%{?_isa}
 
 %description devel
 %{summary}.
 
 %package examples
-Summary: Programming examples for %{name}
+Summary:        Programming examples for %{name}
 
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description examples
 %{summary}.
@@ -86,7 +87,6 @@ popd
 
 %files examples
 %{_qt5_examplesdir}/
-
 
 %changelog
 * Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.3-1
