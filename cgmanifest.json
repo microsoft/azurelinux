@@ -8580,6 +8580,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ksh",
+          "version": "1.0.0~beta.1",
+          "downloadUrl": "https://github.com/ksh93/ksh/archive/v1.0.0-beta.1/ksh-1.0.0-beta.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kured",
           "version": "1.9.1",
           "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.9.1.tar.gz"
