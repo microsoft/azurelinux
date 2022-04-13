@@ -14534,7 +14534,7 @@
         "other": {
           "name": "ntfs-3g",
           "version": "2021.8.22",
-          "downloadUrl": "http://tuxera.com/opensource/ntfs-3g_ntfsprogs-2021.8.22.tgz"
+          "downloadUrl": "https://tuxera.com/opensource/ntfs-3g_ntfsprogs-2021.8.22.tgz"
         }
       }
     },

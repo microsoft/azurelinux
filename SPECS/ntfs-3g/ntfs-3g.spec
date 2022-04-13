@@ -6,7 +6,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.ntfs-3g.org/
-Source0:        http://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
+Source0:        https://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
 Patch0:         ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch
 
 BuildRequires:  fuse-devel
