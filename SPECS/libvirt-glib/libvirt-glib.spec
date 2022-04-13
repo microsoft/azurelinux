@@ -108,7 +108,6 @@ managing virtualization host objects
 %{_includedir}/libvirt-glib-1.0/libvirt-glib/libvirt-glib.h
 %{_includedir}/libvirt-glib-1.0/libvirt-glib/libvirt-glib-*.h
 %{_datadir}/gir-1.0/LibvirtGLib-1.0.gir
-%{_datadir}/gtk-doc/html/Libvirt-glib
 %{_datadir}/vala/vapi/libvirt-glib-1.0.deps
 %{_datadir}/vala/vapi/libvirt-glib-1.0.vapi
 
@@ -121,7 +120,6 @@ managing virtualization host objects
 %{_includedir}/libvirt-gconfig-1.0/libvirt-gconfig/libvirt-gconfig.h
 %{_includedir}/libvirt-gconfig-1.0/libvirt-gconfig/libvirt-gconfig-*.h
 %{_datadir}/gir-1.0/LibvirtGConfig-1.0.gir
-%{_datadir}/gtk-doc/html/Libvirt-gconfig
 %{_datadir}/vala/vapi/libvirt-gconfig-1.0.deps
 %{_datadir}/vala/vapi/libvirt-gconfig-1.0.vapi
 
