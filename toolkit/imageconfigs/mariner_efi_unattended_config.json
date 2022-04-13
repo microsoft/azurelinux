@@ -8,6 +8,11 @@
               "packagelists/core-packages-image.json",
               "packagelists/cloud-init-packages.json"
           ],
+          "PreInstallScripts": [
+            {
+                "Path": "additionalconfigs/test-image.sh"
+            }
+          ],
           "KernelOptions": {
               "default": "kernel"
           },

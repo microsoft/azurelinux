@@ -13,7 +13,7 @@ import (
 	"strconv"
 )
 
-func ParseKickStartParitionScheme(config *Config) (err error) {
+func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err error) {
 
 	var (
 		parseCmd			string
@@ -29,7 +29,7 @@ func ParseKickStartParitionScheme(config *Config) (err error) {
 		return
 	} 
 
-	file, err := os.Open("/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh")
+	file, err := os.Open(partitionFile)
 	if err != nil {
 		fmt.Printf("Failed to open file")
 		return
