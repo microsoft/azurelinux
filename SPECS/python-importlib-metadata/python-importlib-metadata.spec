@@ -28,8 +28,6 @@ BuildRequires:  python3-zipp
 BuildRequires:  python3dist(pytest)
 %endif
 
-Requires:       python3-zipp
-
 %description
 Library to access the metadata for a Python package.
 This package supplies third-party access to the functionality
@@ -38,6 +36,8 @@ Python versions.
 
 %package -n     python3-importlib-metadata
 Summary:        %{summary}
+
+Requires:       python3-zipp
 
 %description -n python3-importlib-metadata
 Library to access the metadata for a Python package.
