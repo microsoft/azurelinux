@@ -32,7 +32,6 @@ var (
 	outputDir       = app.Flag("output-dir", "Path to directory to place final image.").ExistingDir()
 	liveInstallFlag = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
 	emitProgress    = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
-	partitionFile   = app.Flag("partition-file", "Path to the partition scheme file.").String()
 	logFile         = exe.LogFileFlag(app)
 	logLevel        = exe.LogLevelFlag(app)
 )
@@ -67,14 +66,12 @@ func main() {
 	config, err := configuration.LoadWithAbsolutePaths(*configFile, *baseDirPath)
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
 
-	partitionFile = "/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh"
-	fmt.Printf("Checking tmp file path correct or not\n")
-	fmt.Printf("parse file path: %s\n", *partitionFile)
-
-
 	// Parse the partition file
 	err = configuration.ParseKickStartParitionScheme(&config)
 	logger.PanicOnError(err, "Failed to parse partition schema")
+
+	logger.Log.Infof("Check disk flag: %s", config.Disks[0].Partitions[0].Flags[0])
+
 
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]
