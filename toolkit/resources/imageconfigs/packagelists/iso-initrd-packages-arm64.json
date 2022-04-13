@@ -34,6 +34,7 @@
         "libcap",
         "libgcc",
         "libstdc++",
+        "linux-firmware",
         "lvm2",
         "lua",
         "lz4",
