@@ -7,7 +7,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.32.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -313,6 +313,9 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
+# Remove trace (symlink to perf). This file causes creates duplicate identical debug symbols
+rm -vf %{buildroot}%{_bindir}/trace
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -385,6 +388,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files tools
 %defattr(-,root,root)
 %{_libexecdir}
+%exclude %dir %{_libdir}/debug
 %ifarch x86_64
 %{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
@@ -415,6 +419,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
+- Remove trace symlink from _bindir
+- Exclude files and directories under the debug folder from tools subpackage.
+
 * Fri Apr 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
 - Update source to 5.15.32.1
 - Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
