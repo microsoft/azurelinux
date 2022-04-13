@@ -35,7 +35,7 @@ Requires:       %{name} = %{version}
 The net-snmp-devel package contains headers and libraries for building SNMP applications.
 
 %package libs
-Summary: The NET-SNMP runtime client libraries
+Summary:        The NET-SNMP runtime client libraries
  
 %description libs
 The net-snmp-libs package contains the runtime client libraries for shared
@@ -97,7 +97,11 @@ popd
 /lib/systemd/system/snmpd.service
 /lib/systemd/system/snmptrapd.service
 %{_bindir}/*
-%{_libdir}/*.so.*
+%{_libdir}/libnetsnmpagent.so.*
+%{_libdir}/libnetsnmphelpers.so.*
+%{_libdir}/libnetsnmpmibs.so.*
+%{_libdir}/libnetsnmptrapd.so.*
+%{_libdir}/libsnmp.so.*
 /sbin/*
 
 %files devel
@@ -118,12 +122,13 @@ popd
 %{_localstatedir}/lib/net-snmp
 %{_localstatedir}/lib/net-snmp/mib_indexes
 %{_localstatedir}/lib/net-snmp/cert_indexes
+%{_localstatedir}/run/net-snmp
 
 %changelog
-* Fri Apr 7 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-2
+* Fri Apr 07 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-2
 - Add net-snmp-lib subpackage and UCD-SNMP
 
-* Fri Mar 4 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-1
+* Fri Mar 04 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-1
 - Upgrade to version 5.9.1
 - Removing the lines that enables snmpd and snmptrapd services by default
 
