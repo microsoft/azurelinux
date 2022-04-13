@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,10 @@ Source0:        https://github.com/%{name}/%{name}-stable/archive/v%{version}.ta
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
+# Upstream fix for journald-audit issue 
+# https://github.com/systemd/systemd/commit/df4ec48f45f518b6926e02ef4d77c8ed1a8b4e2c 
+# No longer needed when upgrading to v251+ 
+Patch0:         fix-journald-audit-logging.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -257,6 +261,10 @@ systemctl preset-all
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Apr 13 2022 Cameron Baird <cameronbaird@microsoft.com> - 250.3-4
+- Bring in an upstream change as patch fix-journald-audit-logging.patch
+- to prevent many-fielded audit messages from crashing systemd-journal
+
 * Thu Mar 24 2022 Andrew Phelps <anphel@microsoft.com> - 250.3-3
 - Add Requires(post) on audit-libs, pam and util-linux-devel
 
