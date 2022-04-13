@@ -1,7 +1,7 @@
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.33.0
-Release:        6%{?dist}
+Version:        2.33.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -167,6 +167,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 13 2022 Muhammad Falak <mwani@microsoft.com> - 2.33.2-1
+- Bump version to 2.33.2 to address CVE-2022-24765
+
 * Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 2.33.0-6
 - Add an explicit BR on `perl{(lib), (IO::File), (Getopt::Long)}`
 - Skip `git-send-email` (t9001) tests to enable ptest
