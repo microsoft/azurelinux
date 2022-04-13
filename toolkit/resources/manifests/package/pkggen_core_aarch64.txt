@@ -95,9 +95,9 @@ elfutils-libelf-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-devel-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-devel-static-0.186-1.cm2.aarch64.rpm
 elfutils-libelf-lang-0.186-1.cm2.aarch64.rpm
-expat-2.4.3-1.cm2.aarch64.rpm
-expat-devel-2.4.3-1.cm2.aarch64.rpm
-expat-libs-2.4.3-1.cm2.aarch64.rpm
+expat-2.4.3-2.cm2.aarch64.rpm
+expat-devel-2.4.3-2.cm2.aarch64.rpm
+expat-libs-2.4.3-2.cm2.aarch64.rpm
 libpipeline-1.5.5-2.cm2.aarch64.rpm
 libpipeline-devel-1.5.5-2.cm2.aarch64.rpm
 gdbm-1.21-1.cm2.aarch64.rpm
@@ -171,8 +171,8 @@ openssl-devel-1.1.1k-13.cm2.aarch64.rpm
 openssl-libs-1.1.1k-13.cm2.aarch64.rpm
 openssl-perl-1.1.1k-13.cm2.aarch64.rpm
 openssl-static-1.1.1k-13.cm2.aarch64.rpm
-libcap-2.26-2.cm2.aarch64.rpm
-libcap-devel-2.26-2.cm2.aarch64.rpm
+libcap-2.60-1.cm2.aarch64.rpm
+libcap-devel-2.60-1.cm2.aarch64.rpm
 debugedit-5.0-1.cm2.aarch64.rpm
 libarchive-3.6.0-1.cm2.aarch64.rpm
 libarchive-devel-3.6.0-1.cm2.aarch64.rpm

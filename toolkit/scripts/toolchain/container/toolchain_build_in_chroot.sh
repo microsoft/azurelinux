@@ -482,17 +482,17 @@ popd
 rm -rf ncurses-6.2
 touch /logs/status_ncurses_complete
 
-echo Libcap-2.26
-tar xf libcap-2.26.tar.xz
-pushd libcap-2.26
+echo libcap-2.60
+tar xf libcap-2.60.tar.xz
+pushd libcap-2.60
 sed -i '/install.*STALIBNAME/d' libcap/Makefile
 make -j$(nproc)
 make RAISE_SETFCAP=no lib=lib prefix=/usr install
-chmod -v 755 /usr/lib/libcap.so.2.26
+chmod -v 755 /usr/lib/libcap.so.2.60
 #mv -v /usr/lib/libcap.so.* /lib
 #ln -sfv ../../lib/$(readlink /usr/lib/libcap.so) /usr/lib/libcap.so
 popd
-rm -rf libcap-2.26
+rm -rf libcap-2.60
 touch /logs/status_libcap_complete
 
 echo Sed-4.8
