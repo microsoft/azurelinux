@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,7 +54,6 @@ Requires:       bzip2-libs
 Requires:       elfutils-libelf
 Requires:       libcap
 Requires:       libgcc
-Requires:       mariner-rpm-macros
 Requires:       popt
 Requires:       xz-libs
 Requires:       zlib
@@ -78,6 +77,7 @@ Requires:       cpio
 Requires:       elfutils-devel
 Requires:       elfutils-libelf
 Requires:       gzip
+Requires:       mariner-rpm-macros
 Requires:       tar
 Requires:       unzip
 Requires:       xz
@@ -269,6 +269,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.17.0-4
+- Update required dependecies for rpm-libs and rpm-build sub-packages.
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.17.0-3
 - Remove manual pkgconfig(*) provides in toolchain specs
 
