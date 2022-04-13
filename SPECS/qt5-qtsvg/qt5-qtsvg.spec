@@ -11,7 +11,6 @@ License: GFDL AND GPLv2+ with exceptions AND LGPLv2.1+
 Url:     http://www.qt.io
 Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-opensource-src-%{version}.tar.xz
 # Upstream fixes from https://download.qt.io/official_releases/qt/5.15/:
-Patch0:  qprocess5-15.diff
 Patch1:  CVE-2022-25255.diff
 Patch2:  CVE-2022-25634.diff
 Patch3:  CVE-2018-25032.diff
