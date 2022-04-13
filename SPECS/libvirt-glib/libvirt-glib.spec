@@ -1,7 +1,7 @@
 Summary:        libvirt glib integration for events
 Name:           libvirt-glib
 Version:        4.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,7 +12,6 @@ Patch1:         %{name}-%{version}-cast-align.patch
 BuildRequires:  gettext
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gtk-doc
 BuildRequires:  libvirt-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  meson
@@ -67,7 +66,7 @@ managing virtualization host objects
 %autosetup -p1
 
 %build
-%meson -Drpath=disabled
+%meson -Ddocs=disabled -Drpath=disabled
 %meson_build
 
 %install
@@ -135,11 +134,13 @@ managing virtualization host objects
 %{_includedir}/libvirt-gobject-1.0/libvirt-gobject/libvirt-gobject.h
 %{_includedir}/libvirt-gobject-1.0/libvirt-gobject/libvirt-gobject-*.h
 %{_datadir}/gir-1.0/LibvirtGObject-1.0.gir
-%{_datadir}/gtk-doc/html/Libvirt-gobject
 %{_datadir}/vala/vapi/libvirt-gobject-1.0.deps
 %{_datadir}/vala/vapi/libvirt-gobject-1.0.vapi
 
 %changelog
+* Tue Apr 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.0-5
+- Removing gtk docs.
+
 * Wed Jan 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.0-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
