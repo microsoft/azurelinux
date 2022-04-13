@@ -7,7 +7,7 @@ License:        zlib
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://www.zlib.net/%{name}-%{version}.tar.gz
+Source0:        https://www.zlib.net/%{name}-%{version}.tar.xz
 %description
 Compression and decompression routines
 %package    devel
