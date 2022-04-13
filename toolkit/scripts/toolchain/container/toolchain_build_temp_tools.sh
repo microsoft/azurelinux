@@ -125,9 +125,9 @@ rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.32.1
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
-echo glibc-2.34
-tar xf glibc-2.34.tar.xz
-pushd glibc-2.34
+echo glibc-2.35
+tar xf glibc-2.35.tar.xz
+pushd glibc-2.35
 mkdir -v build
 cd       build
 ../configure                             \
@@ -158,7 +158,7 @@ rm -v dummy.c a.out
 set -e
 echo End sanity check - temptoolchain - glibc
 popd
-rm -rf glibc-2.34
+rm -rf glibc-2.35
 
 touch $LFS/logs/temptoolchain/status_glibc_complete
 

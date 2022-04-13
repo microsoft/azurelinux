@@ -6,8 +6,8 @@
 
 Summary:        Main C library
 Name:           glibc
-Version:        2.34
-Release:        3%{?dist}
+Version:        2.35
+Release:        1%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,7 @@ URL:            https://www.gnu.org/software/libc
 Source0:        https://ftp.gnu.org/gnu/glibc/%{name}-%{version}.tar.xz
 Source1:        locale-gen.sh
 Source2:        locale-gen.conf
-Patch0:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.34-fhs-1.patch
+Patch0:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.35-fhs-1.patch
 #Patch1:         glibc-2.24-bindrsvport-blacklist.patch
 #Patch2:         0002-malloc-arena-fix.patch
 #Patch3:         glibc-2.28-CVE-2018-19591.patch
@@ -312,6 +312,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 2.35-1
+- Upgrade to version 2.35
+
 * Wed Mar 02 2022 Andy Caldwell <andycaldwell@microsoft.com> - 2.34-3
 - Add support for building `-static-pie` binaries against `glibc`
 - Add additional BuildRequires
