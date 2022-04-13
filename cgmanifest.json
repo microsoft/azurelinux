@@ -4459,6 +4459,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "glide",
+          "version": "0.13.3",
+          "downloadUrl": "https://github.com/Masterminds/glide/archive/v0.13.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "glm",
           "version": "0.9.9.6",
           "downloadUrl": "https://github.com/g-truc/glm/releases/download/0.9.9.6/glm-0.9.9.6.zip"
@@ -21656,6 +21666,16 @@
           "name": "puppet",
           "version": "7.12.1",
           "downloadUrl": "https://downloads.puppetlabs.com/puppet/puppet-7.12.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "pwgen",
+          "version": "2.08",
+          "downloadUrl": "http://download.sf.net/pwgen/pwgen-2.08.tar.gz"
         }
       }
     },
