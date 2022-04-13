@@ -1,79 +1,108 @@
-%global srcname html5lib
-Name:           python-%{srcname}
 Summary:        A python based HTML parser/tokenizer
-Version:        1.0.1
-Release:        10%{?dist}
+Name:           python-html5lib
+Version:        1.1
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/html5lib/html5lib-python
-Source0:        %pypi_source
-Patch0:         %{url}/pull/403.patch#/collections-abc.patch
-#{url}/pull/414.patch#/pytest4.patch (tox.ini hunk fails)
-Patch1:         pytest4.patch
+Source:         %{pypi_source html5lib}
+# Fix compatibility with pytest 6
+Patch0:         %{url}/pull/506.patch
 
 BuildArch:      noarch
 
-%?python_enable_dependency_generator
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+
+%if %{with_check}
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-attrs
+BuildRequires:  python3-docutils
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pygments
+BuildRequires:  python3-pytest
+BuildRequires:  python3-six
+BuildRequires:  python3dist(pytest)
+BuildRequires:  python3dist(pytest-expect)
+%endif
 
 %description
-A python based HTML parser/tokenizer based on the WHATWG HTML5 
+A python based HTML parser/tokenizer based on the WHATWG HTML5
 specification for maximum compatibility with major desktop web browsers.
 
+%package -n python3-html5lib
+Summary:        %{summary}
 
-%package -n python3-%{srcname}
-Summary:        %summary
-BuildRequires:    python3-devel
-BuildRequires:    python3-setuptools
-
-# Test deps
-BuildRequires:  python3-mock
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-expect
-BuildRequires:  python3-six
-BuildRequires:  python3-webencodings
-
-# Optional test deps:
-BuildRequires:  python3-chardet
-BuildRequires:  python3-genshi
-BuildRequires:  python3-lxml
-
-%{?python_provide:%python_provide python3-%{srcname}}
-
-%description -n python3-%{srcname}
-A python based HTML parser/tokenizer based on the WHATWG HTML5 
+%description -n python3-html5lib
+A python based HTML parser/tokenizer based on the WHATWG HTML5
 specification for maximum compatibility with major desktop web browsers.
 
+%{pyproject_extras_subpkg} -n python3-html5lib lxml genshi chardet all
 
 %prep
-%autosetup -p1 -n %{srcname}-%{version}
+%autosetup -p1 -n html5lib-%{version}
+
+# Use standard library unittest.mock instead of 3rd party mock
+# From https://github.com/html5lib/html5lib-python/pull/536
+sed -i 's/from mock import/from unittest.mock import/' html5lib/tests/test_meta.py
+
+%generate_buildrequires
+%pyproject_buildrequires -x all
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
-
+%pyproject_install
+%pyproject_save_files html5lib
 
 %check
-# XXX figure out the failure in test_encoding
-%{__python3} -m pytest -k "not test_encoding"
+pip3 install more-itertools umsgpack webencodings
+# Disabling broken tests, see: https://github.com/html5lib/html5lib-python/issues/433
+%pytest -k "not test_parser_encoding and not test_prescan_encoding"
 
-
-%files -n python3-%{srcname}
-%license LICENSE 
+%files -n python3-html5lib -f %{pyproject_files}
 %doc CHANGES.rst README.rst
-%{python3_sitelib}/%{srcname}-*.egg-info/
-%{python3_sitelib}/%{srcname}/
-
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.0.1-10
-- Remove epoch
+* Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-9
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Cleaning-up spec. License verified.
+- Removing epoch.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:1.0.1-9
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Jan 31 2022 Miro Hrončok <mhroncok@redhat.com> - 1:1.1-8
+- Use standard library unittest.mock instead of 3rd party mock
+- Add subpackages with Python extras: lxml genshi chardet all
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 1:1.1-5
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Aug 10 2020 Miro Hrončok <mhroncok@redhat.com> - 1:1.1-3
+- Fix compatibility with pytest 6
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 01 2020 Charalampos Stratakis <cstratak@redhat.com> - 1:1.1-1
+- Update to 1.1 (#1849837)
+- Use pytest 5
+
+* Sat May 30 2020 Miro Hrončok <mhroncok@redhat.com> - 1:1.0.1-10
+- Use pytest 4
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 1:1.0.1-9
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
