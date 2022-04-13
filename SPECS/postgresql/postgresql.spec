@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        12.7
-Release:        2%{?dist}
+Version:        12.10
+Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -165,6 +165,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Wed Apr 13 2022 Henry Beberman <henry.beberman@microsoft.com> - 12.10-1
+- Update package version to resolve CVE-2021-23214 and CVE-2021-23222
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.7-2
 - Removing the explicit %%clean stage.
 
