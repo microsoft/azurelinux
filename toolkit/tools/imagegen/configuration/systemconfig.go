@@ -25,7 +25,8 @@ type SystemConfig struct {
 	KernelCommandLine  KernelCommandLine   `json:"KernelCommandLine"`
 	AdditionalFiles    map[string]string   `json:"AdditionalFiles"`
 	PartitionSettings  []PartitionSetting  `json:"PartitionSettings"`
-	PostInstallScripts []PostInstallScript `json:"PostInstallScripts"`
+	PreInstallScripts  []InstallScript     `json:"PreInstallScripts"`
+	PostInstallScripts []InstallScript     `json:"PostInstallScripts"`
 	Groups             []Group             `json:"Groups"`
 	Users              []User              `json:"Users"`
 	Encryption         RootEncryption      `json:"Encryption"`
