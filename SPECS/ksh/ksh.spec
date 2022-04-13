@@ -1,31 +1,36 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global       verBetaPrefix 1.0.0
 %global       verBetaSuffix 1
 %global       verBetaFull %{verBetaPrefix}-beta.%{verBetaSuffix}
 
-Name:         ksh
-Summary:      The Original ATT Korn Shell
-URL:          http://www.kornshell.com/
-License:      EPL-1.0
-Version:      %{verBetaPrefix}~beta.%{verBetaSuffix}
-Release:      4%{?dist}
-Source0:      https://github.com/ksh93/%{name}/archive/v%{verBetaFull}/%{name}-%{verBetaFull}.tar.gz
-Source1:      kshcomp.conf
-Source2:      kshrc.rhs
-Source3:      dotkshrc
-
+Summary:        The Original ATT Korn Shell
+Name:           ksh
+Version:        %{verBetaPrefix}~beta.%{verBetaSuffix}
+Release:        4%{?dist}
+License:        EPL-1.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.kornshell.com/
+Source0:        https://github.com/ksh93/%{name}/archive/v%{verBetaFull}/%{name}-%{verBetaFull}.tar.gz
+Source1:        kshcomp.conf
+Source2:        kshrc.rhs
+Source3:        dotkshrc
 # temporary commenting out failing tests
-Patch1:       %{name}-%{verBetaFull}-regre-tests.patch
+Patch1:         %{name}-%{verBetaFull}-regre-tests.patch
 # in some build commands relocate "-lm" flag
-Patch2:       %{name}-%{verBetaFull}-fix-build.patch
+Patch2:         %{name}-%{verBetaFull}-fix-build.patch
 
-Requires: coreutils, diffutils
-BuildRequires: gcc
-BuildRequires: bison
+BuildRequires:  bison
+BuildRequires:  gcc
 # regression test suite uses 'ps' from procps
-BuildRequires: procps
-Requires(post): grep, coreutils, systemd
+BuildRequires:  procps
+
+Requires:       coreutils
+Requires:       diffutils
+
+Requires(post): coreutils
+Requires(post): grep
+Requires(post): systemd
+
 Requires(postun): sed
 
 %description
@@ -50,7 +55,7 @@ for f in -Wno-unknown-pragmas -Wno-missing-braces -Wno-unused-result -Wno-return
 do
   $CC $f -E - </dev/null >/dev/null 2>&1 && XTRAFLAGS="$XTRAFLAGS $f"
 done
-export CCFLAGS="$RPM_OPT_FLAGS $RPM_LD_FLAGS -fno-strict-aliasing $XTRAFLAGS"
+export CCFLAGS="%{optflags} $RPM_LD_FLAGS -fno-strict-aliasing $XTRAFLAGS"
 ./bin/package make -S
 
 %install
@@ -73,13 +78,13 @@ touch %{buildroot}%{_mandir}/man1/rksh.1.gz
 ./bin/shtests --compile
 
 %post
-for s in /bin/ksh /bin/rksh /usr/bin/ksh /usr/bin/rksh
+for s in /bin/ksh /bin/rksh %{_bindir}/ksh %{_bindir}/rksh
 do
-  if [ ! -f /etc/shells ]; then
-        echo "$s" > /etc/shells
+  if [ ! -f %{_sysconfdir}/shells ]; then
+        echo "$s" > %{_sysconfdir}/shells
   else
-        if ! grep -q '^'"$s"'$' /etc/shells ; then
-                echo "$s" >> /etc/shells
+        if ! grep -q '^'"$s"'$' %{_sysconfdir}/shells ; then
+                echo "$s" >> %{_sysconfdir}/shells
         fi
   fi
 done
@@ -97,17 +102,17 @@ done
 #so replace with symlink and set alternatives
 if [ ! -L %{_bindir}/ksh ]; then
         %{_sbindir}/alternatives --auto ksh
-        ln -sf /etc/alternatives/ksh %{_bindir}/ksh
-        ln -sf /etc/alternatives/ksh-man %{_mandir}/man1/ksh.1.gz
+        ln -sf %{_sysconfdir}/alternatives/ksh %{_bindir}/ksh
+        ln -sf %{_sysconfdir}/alternatives/ksh-man %{_mandir}/man1/ksh.1.gz
 fi
 
 /bin/systemctl try-restart systemd-binfmt.service >/dev/null 2>&1 || :
 
 %postun
-for s in /bin/ksh /bin/rksh /usr/bin/ksh /usr/bin/rksh
+for s in /bin/ksh /bin/rksh %{_bindir}/ksh %{_bindir}/rksh
 do
   if [ ! -f $s ]; then
-        sed -i '\|^'"$s"'$|d' /etc/shells
+        sed -i '\|^'"$s"'$|d' %{_sysconfdir}/shells
   fi
 done
 
@@ -117,16 +122,16 @@ if [ $1 = 0 ]; then
 fi
 
 %verifyscript
-echo -n "Looking for ksh in /etc/shells... "
-if ! grep '^/bin/ksh$' /etc/shells > /dev/null; then
+echo -n "Looking for ksh in %{_sysconfdir}/shells... "
+if ! grep '^/bin/ksh$' %{_sysconfdir}/shells > /dev/null; then
     echo "missing"
-    echo "ksh missing from /etc/shells" >&2
+    echo "ksh missing from %{_sysconfdir}/shells" >&2
 else
     echo "found"
 fi
 
-%files 
-%doc src/cmd/ksh93/COMPATIBILITY src/cmd/ksh93/RELEASE src/cmd/ksh93/TYPES 
+%files
+%doc src/cmd/ksh93/COMPATIBILITY src/cmd/ksh93/RELEASE src/cmd/ksh93/TYPES
 %license LICENSE.md
 %{_bindir}/ksh93
 %ghost %{_bindir}/ksh
@@ -721,4 +726,3 @@ fi
 
 * Fri May 28 2004 Karsten Hopp <karsten@redhat.de> 20040229-1 
 - initial version
-
