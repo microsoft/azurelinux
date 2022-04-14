@@ -1,22 +1,13 @@
 Summary:        Linux NTFS userspace driver
 Name:           ntfs-3g
-Version:        2017.3.23
-Release:        16%{?dist}
+Version:        2021.8.22
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.ntfs-3g.org/
-Source0:        http://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
+Source0:        https://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
 Patch0:         ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch
-Patch1:         check-mftmirr.patch
-Patch2:         ntfs-3g-big-sectors.patch
-# Fix for ntfsclone crash.
-# Discussed with upstream developer but not upstream yet, see:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1601146#c4
-Patch3:         ntfsclone-full-clusters-bz1601146.patch
-# Upstream fix for CVE-2019-9755
-# https://sourceforge.net/p/ntfs-3g/ntfs-3g/ci/85c1634a26faa572d3c558d4cf8aaaca5202d4e9/
-Patch4:         ntfs-3g-CVE-2019-9755.patch
 
 BuildRequires:  fuse-devel
 BuildRequires:  gnutls-devel
@@ -28,6 +19,7 @@ BuildRequires:  libuuid-devel
 
 Recommends:     ntfs-3g-system-compression
 
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       fuse
 
 Provides:       ntfsprogs-fuse = %{version}-%{release}
@@ -56,6 +48,12 @@ Provides:       ntfsprogs-devel = %{version}-%{release}
 Headers and libraries for developing applications that use ntfs-3g
 functionality.
 
+%package libs
+Summary:        Runtime libraries for ntfs-3g
+
+%description libs
+Libraries for applications to use ntfs-3g functionality.
+
 %package -n ntfsprogs
 Summary:        NTFS filesystem libraries and utilities
 
@@ -65,12 +63,7 @@ mkntfs, ntfscat, ntfsls, ntfsresize, and ntfsundelete (for a full list of
 included utilities see man 8 ntfsprogs after installation).
 
 %prep
-%setup -q -n %{name}_ntfsprogs-%{version}
-%patch0 -p1 -b .unsupported
-%patch1  -b .check-mftmirr
-%patch2  -b .big-sectors
-%patch3  -b .ntfsclone
-%patch4 -p1 -b .CVE-2019-9755
+%autosetup -n %{name}_ntfsprogs-%{version} -p1
 
 %build
 CFLAGS="%{optflags} -D_FILE_OFFSET_BITS=64"
@@ -84,10 +77,12 @@ CFLAGS="%{optflags} -D_FILE_OFFSET_BITS=64"
 	--enable-crypto \
 	--enable-extras \
 	--enable-quarantined
-make %{?_smp_mflags} LIBTOOL=%{_bindir}/libtool
+
+%make_build LIBTOOL=%{_bindir}/libtool
 
 %install
-make LIBTOOL=`which libtool` DESTDIR=%{buildroot} install
+%make_install LIBTOOL=%{_bindir}/libtool
+
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}%{_libdir}/*.a
 
@@ -114,7 +109,7 @@ rmdir %{buildroot}/sbin
 # We get this on our own, thanks.
 rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 
-%ldconfig_scriptlets
+%ldconfig_scriptlets libs
 
 %files
 %doc AUTHORS ChangeLog CREDITS NEWS README
@@ -127,10 +122,13 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 %{_bindir}/ntfsmount
 %{_bindir}/ntfs-3g.probe
 %{_bindir}/lowntfs-3g
-%{_libdir}/libntfs-3g.so.*
 %{_mandir}/man8/mount.lowntfs-3g.*
 %{_mandir}/man8/mount.ntfs-3g.*
 %{_mandir}/man8/ntfs-3g*
+
+%files libs
+%license COPYING
+%{_libdir}/libntfs-3g.so.*
 
 %files devel
 %{_includedir}/ntfs-3g/
@@ -172,6 +170,10 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 %exclude %{_mandir}/man8/ntfs-3g*
 
 %changelog
+* Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2021.8.22-1
+- Updating to 2021.8.22.
+- Splitting out the "*-libs" subpackage using Fedora 36 spec (license: MIT) for guidance.
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2017.3.23-16
 - Cleaning-up spec. License verified.
 
