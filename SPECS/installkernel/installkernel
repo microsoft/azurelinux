@@ -57,6 +57,6 @@ sed -i "s/mariner_linux=.*$/mariner_linux=${FINAL_KERNEL_IMAGE}/" "$FINAL_LINUX_
 sed -i "s/mariner_initrd=.*$/mariner_initrd=${FINAL_INITRD}/" "$FINAL_LINUX_CFG_PATH"
 
 # Update mariner.cfg symlink so grub boots this configuration now
-ln -sf "$DEST_DIR"/linux-"$KERNEL_VERSION".cfg "$DEST_DIR"/mariner.cfg
+ln -sf linux-"$KERNEL_VERSION".cfg "$DEST_DIR"/mariner.cfg
 
 exit 0

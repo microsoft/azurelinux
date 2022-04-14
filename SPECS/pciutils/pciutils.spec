@@ -1,12 +1,14 @@
+%global debug_package   %{nil}
+
 Summary:        System utilities to list pci devices
 Name:           pciutils
 Version:        3.7.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/System Utilities
-URL:            https://www.kernel.org/pub/software/utils/pciutils/
+URL:            https://mj.ucw.cz/sw/pciutils
 Source0:        https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz
 Requires:       %{name}-libs = %{version}-%{release}
 
@@ -42,9 +44,9 @@ make DESTDIR=%{buildroot} \
     SHAREDIR=%{_datadir}/misc \
     SHARED=yes \
     install install-lib
-chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 
 %files
+%doc README ChangeLog pciutils.lsm
 %defattr(-,root,root)
 %{_sbindir}/*
 %{_datadir}/misc/*
@@ -52,15 +54,18 @@ chmod -v 766 %{buildroot}%{_libdir}/libpci.so
 
 %files libs
 %license COPYING
-%{_libdir}/libpci.so.3*
+%{_libdir}/libpci.so.*
 
 %files devel
 %defattr(-,root,root)
 %{_libdir}/pkgconfig/*
-%{_libdir}/*.so
+%{_libdir}/libpci.so
 %{_includedir}/*
 
 %changelog
+* Thu Apr 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.7.0-3
+- Do not change libpci.so rights during install
+
 * Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 3.7.0-2
 - Require libs subpackage from main package
 - Remove libraries from main package

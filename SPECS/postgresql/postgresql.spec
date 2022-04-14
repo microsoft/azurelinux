@@ -1,7 +1,7 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        12.7
-Release:        2%{?dist}
+Version:        14.2
+Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -99,6 +99,7 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %license COPYRIGHT
 %{_bindir}/initdb
 %{_bindir}/oid2name
+%{_bindir}/pg_amcheck
 %{_bindir}/pg_archivecleanup
 %{_bindir}/pg_basebackup
 %{_bindir}/pg_checksums
@@ -110,10 +111,10 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_bindir}/pg_resetwal
 %{_bindir}/pg_resetxlog
 %{_bindir}/pg_rewind
-%{_bindir}/pg_standby
 %{_bindir}/pg_test_fsync
 %{_bindir}/pg_test_timing
 %{_bindir}/pg_upgrade
+%{_bindir}/pg_verifybackup
 %{_bindir}/pg_waldump
 %{_bindir}/pg_xlogdump
 %{_bindir}/pgbench
@@ -165,6 +166,10 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Wed Apr 13 2022 Henry Beberman <henry.beberman@microsoft.com> - 14.2-1
+- Update package version to resolve CVE-2021-23214 and CVE-2021-23222
+- Add pg_verifybackup and pg_amcheck, remove pg_standby
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.7-2
 - Removing the explicit %%clean stage.
 

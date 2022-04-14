@@ -19,6 +19,8 @@ function clean_up {
 }
 trap clean_up EXIT SIGINT SIGTERM
 
+echo "Will download to '$TEMP_DIR':"
+
 OUTPUT_DIR="$(pwd)/downloaded_sources"
 
 for spec in "${@:2}"
@@ -34,8 +36,10 @@ do
 done
 
 mkdir -p "$OUTPUT_DIR"
+echo
+echo "Extracting sources into '$OUTPUT_DIR':"
 for archive in "$TEMP_DIR"/*
 do
-    echo "Extracting '$archive' into '$OUTPUT_DIR'."
+    printf "%s, SHA256: %s\n" "$(basename "$archive")" "$(sha256sum "$archive" | cut -d' ' -f1)"
     tar -xf "$archive" -C "$OUTPUT_DIR"
 done
