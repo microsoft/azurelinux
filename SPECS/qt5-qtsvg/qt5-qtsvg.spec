@@ -4,8 +4,8 @@ Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
 Version:        5.12.11
 Release:        3%{?dist}
-# See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
-License:        LGPLv2 WITH exceptions OR GPLv3 WITH exceptions
+# See LICENSE.GPL3-EXCEPT.txt, for exception details
+License:        GFDL AND GPLv2+ with exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.qt.io
@@ -87,6 +87,7 @@ popd
 %changelog
 * Fri Mar 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
 - Adding a nopatch for CVE-2022-25634 - vulnerability limited to the Windows OS.
+- License verified.
 
 * Thu Sep 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-2
 - Add nopatches for CVE-2021-38593 and CVE-2018-21035.
