@@ -2,7 +2,7 @@
  "Signatures": {
   "macros.qt5-qtbase": "a2a2f8f341f17493bcba3cef1c5c6c32072648f981bc0aefde68055aab74a31b",
   "qconfig-multilib.h": "2d01cdbfd11a887a1729f1ce2c4e0ad0c080509cc009279090bd68521845be93",
-  "qtbase-everywhere-src-5.12.5.tar.xz": "fc8abffbbda9da3e593d8d62b56bc17dbaab13ff71b72915ddda11dabde4d625",
+  "qtbase-everywhere-src-5.12.11.tar.xz": "1c1b4e33137ca77881074c140d54c3c9747e845a31338cfe8680f171f0bc3a39",
   "qtlogging.ini": "7493edc0df47c1bb9040331694922d4500b897b30515d698ec482c866ee5d9d3"
  }
 }
