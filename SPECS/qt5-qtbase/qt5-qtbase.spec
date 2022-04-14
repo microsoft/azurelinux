@@ -3,9 +3,7 @@
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
 # support openssl-1.1 -> mariner currently DOES NOT support it.
-%if 0%{?fedora} > 26
-%global openssl11 1
-%endif
+%global openssl11 0
 %global openssl -openssl-linked
 
 # support qtchooser (adds qtchooser .conf file)
@@ -205,10 +203,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 # debating whether to do 1 subpkg per library or not -- rex
 %package gui
 Summary: Qt5 GUI-related libraries
-#Requires: %{name}%{?_isa} = %{version}-%{release}
-%if 0%{?fedora} > 20
 Recommends: mesa-dri-drivers
-%endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
 # for Source6: 10-qt5-check-opengl2.sh:
@@ -234,14 +229,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch54 -p1 -b .qmake_LFLAGS
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
-%if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
-%endif
 %patch68 -p1
 
-%if 0%{?fedora} > 30
 %patch80 -p1 -b .use-wayland-on-gnome.patch
-%endif
 
 ## upstream patches
 
@@ -721,10 +712,6 @@ fi
 %{_qt5_plugindir}/generic/libqevdevmouseplugin.so
 %{_qt5_plugindir}/generic/libqevdevtabletplugin.so
 %{_qt5_plugindir}/generic/libqevdevtouchplugin.so
-%if 0%{?fedora}
-%{_qt5_plugindir}/generic/libqlibinputplugin.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake
-%endif
 %{_qt5_plugindir}/generic/libqtuiotouchplugin.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake
@@ -754,6 +741,7 @@ fi
 * Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
 - Migrating CVE fixes from Mariner's 1.0 version.
 - Switching to Fedora 36' (license: MIT) patch for GCC 11 build issues.
+- Removing Fedora-specific macros.
 
 * Mon Aug 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.11-2
 - Fix version number in Qt5.pc
