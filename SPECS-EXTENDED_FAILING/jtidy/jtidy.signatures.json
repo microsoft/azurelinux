@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "build.xml": "3d0dc374b73697277f33da5332298980a3880bd49d95172507f42f10e8ea4942",
-  "jtidy-r813.tar.bz2": "ef3a8d5094281ce419aaabd16474971e8b656c9056dac5d4eedb608fb44d9712",
-  "jtidy.jtidy.script": "e0ac56a85eb11c20a2b3abd27072b84b5da4af108852b341840d2ff8e0e49fed",
-  "maven-build.properties": "aa55c81591c1379770ec96bdac30da5ff966925ccfa392117b5c236c913894ab",
-  "maven-build.xml": "6d2be5301ac3489ee1c2e18244a3a1421378fdc2261db3f2082de840d2c1006e"
- }
-}
