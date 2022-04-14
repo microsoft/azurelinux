@@ -32,7 +32,6 @@ Requires:       debugedit
 Requires:       libarchive
 Requires:       libselinux
 Requires:       lua
-Requires:       rpm-libs = %{version}-%{release}
 
 Patch0: remove-docs-from-makefile.patch
 Patch1: define-RPM_LD_FLAGS.patch
@@ -269,7 +268,7 @@ popd
 
 %changelog
 * Mon Mar 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.17.0-4
-- Remove runtime requries for rpm-build
+- Remove runtime requries for rpm-build and rpm-libs
 
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.17.0-3
 - Remove manual pkgconfig(*) provides in toolchain specs
