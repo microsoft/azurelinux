@@ -1,4 +1,4 @@
-%global majmin %(echo %{version} | cut -d. -f1-2)
+%define majmin %(echo %{version} | cut -d. -f1-2)
 
 Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
