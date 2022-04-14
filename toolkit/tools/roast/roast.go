@@ -56,7 +56,7 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
-
+	logger.Log.Infof("Entering roast")
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
 	}
@@ -80,6 +80,8 @@ func main() {
 	if err != nil {
 		logger.Log.Panicf("Error when creating output directory. Error: %s", err)
 	}
+
+	logger.Log.Infof("Cehck point check --------------------")
 
 	config, err := configuration.Load(*configFile)
 	err = configuration.ParseKickStartPartitionScheme(&config, "/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh")
