@@ -67,7 +67,7 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 
 				// Create new disk struct and append it into the Disk array
 				newDisk := Disk{}
-				newDisk.MaxSize = 2048
+				newDisk.MaxSize = 4096
 				artifacts := []Artifact{
 					Artifact{
 						Name: "core",
@@ -112,7 +112,11 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 				// Find fstype
 				if strings.Contains(partOpt, "--fstype") {
 					fstype := partOpt[9 : len(partOpt)]
-					partition.FsType = fstype
+					if fstype == "biosboot" {
+						partition.FsType = "fat32"
+					} else {
+						partition.FsType = fstype
+					}
 					fmt.Printf("fstype: %s\n", fstype)
 				}
 

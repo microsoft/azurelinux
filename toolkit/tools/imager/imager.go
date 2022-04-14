@@ -65,19 +65,17 @@ func main() {
 	// Parse Config
 	config, err := configuration.LoadWithAbsolutePaths(*configFile, *baseDirPath)
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
+	
+	// Run Preinstallation script
+	err = installutils.RunPreInstallScripts(config)
+	logger.PanicOnError(err, "Failed to run pre installation script")
+
+	// Parse the partition file
+	err = configuration.ParseKickStartPartitionScheme(&config, "/tmp/part-include")
+	logger.PanicOnError(err, "Failed to parse partition schema")
 
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]
-	
-	// Run Preinstallation script
-	// err = installutils.RunPreInstallScripts(systemConfig)
-	// logger.PanicOnError(err, "Failed to run pre installation script")
-
-	// Parse the partition file
-	err = configuration.ParseKickStartPartitionScheme(&config, "/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh")
-	logger.PanicOnError(err, "Failed to parse partition schema")
-
-	logger.Log.Infof("Check disk flag: %s", config.Disks[0].Partitions[0].Flags[0])
 
 	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
 	logger.PanicOnError(err, "Failed to build system configuration")

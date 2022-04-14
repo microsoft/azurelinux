@@ -1829,21 +1829,23 @@ func cleanupRpmDatabase(rootPrefix string) (err error) {
 	return
 }
 
-func RunPreInstallScripts(config configuration.SystemConfig) (err error) {
+func RunPreInstallScripts(config configuration.Config) (err error) {
 	const squashErrors = false
 
-	for _, script := range config.PreInstallScripts {
-		ReportActionf("Running pre-install script: %s", path.Base(script.Path))
-		logger.Log.Infof("Running pre-install script: %s", script.Path)
-
-		err = shell.ExecuteLive(squashErrors, "chmod", "a+x", script.Path)
-		if err != nil {
-			return
-		}
-
-		err = shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", script.Path, script.Args))
-		if err != nil {
-			return
+	for _, sysConfig := range config.SystemConfigs {
+		for _, script := range sysConfig.PreInstallScripts {
+			ReportActionf("Running pre-install script: %s", path.Base(script.Path))
+			logger.Log.Infof("Running pre-install script: %s", script.Path)
+	
+			err = shell.ExecuteLive(squashErrors, "chmod", "a+x", script.Path)
+			if err != nil {
+				return
+			}
+	
+			err = shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", script.Path, script.Args))
+			if err != nil {
+				return
+			}
 		}
 	}
 

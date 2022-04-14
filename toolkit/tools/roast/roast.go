@@ -84,7 +84,7 @@ func main() {
 	logger.Log.Infof("Cehck point check --------------------")
 
 	config, err := configuration.Load(*configFile)
-	err = configuration.ParseKickStartPartitionScheme(&config, "/home/henry/git/CBL-Mariner/toolkit/tools/imagegen/configuration/parse.sh")
+	err = configuration.ParseKickStartPartitionScheme(&config, "/tmp/part-include")
 	if err != nil {
 		logger.Log.Panicf("Failed loading image configuration. Error: %s", err)
 	}
