@@ -11,9 +11,6 @@ Source0:        https://github.com/%{name}/%{name}-stable/archive/v%{version}.ta
 Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
-# Upstream fix for journald-audit issue 
-# https://github.com/systemd/systemd/commit/df4ec48f45f518b6926e02ef4d77c8ed1a8b4e2c 
-# No longer needed when upgrading to v251+ 
 Patch0:         fix-journald-audit-logging.patch
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
