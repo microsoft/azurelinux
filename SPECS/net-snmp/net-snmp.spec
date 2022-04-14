@@ -97,11 +97,6 @@ popd
 /lib/systemd/system/snmpd.service
 /lib/systemd/system/snmptrapd.service
 %{_bindir}/*
-%{_libdir}/libnetsnmpagent.so.*
-%{_libdir}/libnetsnmphelpers.so.*
-%{_libdir}/libnetsnmpmibs.so.*
-%{_libdir}/libnetsnmptrapd.so.*
-%{_libdir}/libsnmp.so.*
 /sbin/*
 
 %files devel
@@ -116,7 +111,7 @@ popd
 %files libs
 %license COPYING
 %doc README FAQ NEWS TODO
-%{_libdir}/libnetsnmp.so.*
+%{_libdir}/*.so.*
 %{_datadir}/snmp
 %{_datadir}/snmp/mibs
 %{_datadir}/snmp/mibs/*
