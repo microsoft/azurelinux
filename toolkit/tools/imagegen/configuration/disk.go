@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+
+	"microsoft.com/pkggen/internal/logger"
 )
 
 // Disk holds the disk partitioning, formatting and size information.
@@ -71,6 +73,8 @@ func checkMaxSizeCorrectness(disk *Disk) (err error) {
 		if maxSize < lastPartitionEnd {
 			return fmt.Errorf("the MaxSize of %s is not large enough to accomodate defined partitions ending at %s.", maxSizeString, lastPartitionEndString)
 		}
+	} else if disk.MaxSize != 0 {
+		logger.Log.Warnf("defining both a maxsize and target disk in the same config should be avoided as maxsize value will not be used")
 	}
 	return
 }
