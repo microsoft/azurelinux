@@ -59,15 +59,21 @@ func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish 
 	default:
 		select {
 		case req = <-channels.PriorityRequests:
-			logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
+			if req != nil {
+				logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
+			}
 			return req, false
 		default:
 			select {
 			case req = <-channels.PriorityRequests:
-				logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
+				if req != nil {
+					logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
+				}
 				return req, false
 			case req = <-channels.Requests:
-				logger.Log.Tracef("normal REQUEST: %v", *req)
+				if req != nil {
+					logger.Log.Tracef("normal REQUEST: %v", *req)
+				}
 				return req, false
 			case <-channels.Cancel:
 				logger.Log.Warn("Cancellation signal received")
