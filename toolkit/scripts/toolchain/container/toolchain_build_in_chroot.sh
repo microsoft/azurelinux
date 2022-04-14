@@ -198,7 +198,7 @@ echo End sanity check - raw toolchain - adjusting the toolchain
 touch /logs/status_adjusting_toolchain_complete
 
 echo Zlib-1.2.12
-tar xf zlib-1.2.12.tar.gz
+tar xf zlib-1.2.12.tar.xz
 pushd zlib-1.2.12
 ./configure --prefix=/usr
 make -j$(nproc)
