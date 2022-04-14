@@ -21414,8 +21414,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.7",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.7/postgresql-12.7.tar.bz2"
+          "version": "14.2",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.2/postgresql-14.2.tar.bz2"
         }
       }
     },
@@ -29387,8 +29387,8 @@
         "type": "other",
         "other": {
           "name": "vsftpd",
-          "version": "3.0.3",
-          "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.3.tar.gz"
+          "version": "3.0.5",
+          "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.5.tar.gz"
         }
       }
     },
