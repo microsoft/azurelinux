@@ -1,13 +1,21 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
+Patch0:         CVE-2022-0561.patch
+Patch1:         CVE-2022-0562.patch
+Patch2:         CVE-2022-0865.patch
+Patch3:         CVE-2022-0891.patch
+Patch4:         CVE-2022-0907.patch
+Patch5:         CVE-2022-0908.patch
+Patch6:         CVE-2022-0909.patch
+Patch7:         CVE-2022-0924.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
@@ -27,7 +35,7 @@ Requires:       libjpeg-turbo-devel
 It contains the libraries and header files to create applications
 
 %prep
-%autosetup -n libtiff-v%{version}
+%autosetup -p1 -n libtiff-v%{version}
 
 %build
 export CFLAGS="%{optflags} -fno-strict-aliasing"
@@ -62,6 +70,10 @@ make %{?_smp_mflags} -k check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Apr 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.3.0-2
+- Patch CVE-2022-0561, CVE-2022-0562, CVE-2022-0865, CVE-2022-0891, CVE-2022-0907, CVE-2022-0908,
+- CVE-2022-0909, CVE-2022-0924
+
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 4.3.0-1
 - Upgrade to 4.3.0
 - Remove patches that no longer apply
