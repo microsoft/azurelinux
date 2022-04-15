@@ -43,11 +43,11 @@ func main() {
 					"/etc/resolv.conf": "/etc/resolv.conf",
 					"/root/.bashrc":    "/root/.bashrc",
 				},
-				PostInstallScripts: []configuration.PostInstallScript{
-					configuration.PostInstallScript{
+				PostInstallScripts: []configuration.InstallScript{
+					configuration.InstallScript{
 						Path: "arglessScript.sh",
 					},
-					configuration.PostInstallScript{
+					configuration.InstallScript{
 						Path: "thisOneNeedsArguments.sh",
 						Args: "--input abc --output cba",
 					},
@@ -67,11 +67,11 @@ func main() {
 					"/etc/resolv.conf": "/etc/resolv.conf",
 					"/root/.bashrc":    "/root/.bashrc",
 				},
-				PostInstallScripts: []configuration.PostInstallScript{
-					configuration.PostInstallScript{
+				PostInstallScripts: []configuration.InstallScript{
+					configuration.InstallScript{
 						Path: "arglessScript.sh",
 					},
-					configuration.PostInstallScript{
+					configuration.InstallScript{
 						Path: "thisOneNeedsArguments.sh",
 						Args: "--input abc --output cba",
 					},
@@ -92,11 +92,11 @@ func main() {
 					"/root/.bashrc":    "/root/.bashrc",
 				},
 				ReadOnlyVerityRoot: verityConfig,
-				PostInstallScripts: []configuration.PostInstallScript{
-					configuration.PostInstallScript{
+				PostInstallScripts: []configuration.InstallScript{
+					configuration.InstallScript{
 						Path: "arglessScript.sh",
 					},
-					configuration.PostInstallScript{
+					configuration.InstallScript{
 						Path: "thisOneNeedsArguments.sh",
 						Args: "--input abc --output cba",
 					},

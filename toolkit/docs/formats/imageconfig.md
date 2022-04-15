@@ -184,6 +184,27 @@ A sample PackageLists entry pointing to three files containing package lists:
     "packagelists/cloud-init-packages.json"
 ],
 ```
+### PreInstallScripts
+
+There are customer requests that would like to use a Kickstart file to install Mariner OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig).
+
+**NOTE**: currently, Mariner's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Mariner's image building tools.
+
+PreInstallScripts is an array of file paths and the corresponding input arguments. Mariner tooling currently has the capability to execute the preinstall script and parse the partitioning commands inside /tmp/part-include.
+
+A sample PreInstallScripts entry pointing to two install scripts where one has input arguments and the other doesn't:
+``` json
+"PreInstallScripts":[
+    {
+        "Path": "arglessPreScript.sh"
+    },
+    {
+        "Path": "PreScriptWithArguments.sh",
+        "Args": "--input abc --output cba"
+    }
+],
+```
+
 ### RemoveRpmDb
 
 RemoveRpmDb triggers RPM database removal after the packages have been installed.

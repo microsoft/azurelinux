@@ -2540,8 +2540,6 @@
                 "python-atomicwrites",
                 "python-attrs",
                 "python-bcrypt",
-                "python-boto3",
-                "python-botocore",
                 "python-certifi",
                 "python-cffi",
                 "python-chardet",

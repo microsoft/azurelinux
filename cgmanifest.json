@@ -3640,8 +3640,8 @@
         "type": "other",
         "other": {
           "name": "glibc",
-          "version": "2.34",
-          "downloadUrl": "https://ftp.gnu.org/gnu/glibc/glibc-2.34.tar.xz"
+          "version": "2.35",
+          "downloadUrl": "https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.xz"
         }
       }
     },
@@ -19154,8 +19154,8 @@
         "type": "other",
         "other": {
           "name": "python-asn1crypto",
-          "version": "0.24.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/fc/f1/8db7daa71f414ddabfa056c4ef792e1461ff655c2ae2928a2b675bfed6b4/asn1crypto-0.24.0.tar.gz"
+          "version": "1.5.1",
+          "downloadUrl": "https://github.com/wbond/asn1crypto/archive/refs/tags/1.5.1.tar.gz"
         }
       }
     },
@@ -19194,8 +19194,8 @@
         "type": "other",
         "other": {
           "name": "python-attrs",
-          "version": "18.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/0f/9e/26b1d194aab960063b266170e53c39f73ea0d0d3f5ce23313e0ec8ee9bdf/attrs-18.2.0.tar.gz"
+          "version": "21.4.0",
+          "downloadUrl": "https://github.com/python-attrs/attrs/archive/refs/tags/21.4.0.tar.gz"
         }
       }
     },
@@ -19514,8 +19514,8 @@
         "type": "other",
         "other": {
           "name": "python-daemon",
-          "version": "2.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-daemon/python-daemon-2.2.0.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-daemon/python-daemon-2.3.0.tar.gz"
         }
       }
     },
