@@ -128,6 +128,7 @@ touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 echo glibc-2.35
 tar xf glibc-2.35.tar.xz
 pushd glibc-2.35
+patch -Np1 -i ../glibc-2.35-fhs-1.patch
 mkdir -v build
 cd       build
 ../configure                             \
