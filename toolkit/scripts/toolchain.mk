@@ -247,6 +247,6 @@ endif
 .PHONY: toolchain-force-restore
 toolchain-force-restore:
 	for f in $(toolchain_rpms); do \
-		rm -f $$f; \
+		rm -vf $$f; \
 	done
 	$(MAKE) toolchain
