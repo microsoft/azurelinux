@@ -1,7 +1,7 @@
 Summary:        The Berkley DB database library for C
 Name:           libdb
 Version:        5.3.28
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
