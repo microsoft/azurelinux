@@ -388,13 +388,13 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 
 	// Currently assumes we only make primary partitions.
 	if end == 0 {
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fillToEndOption)
+		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType.String(), fmt.Sprintf(mibFmt, start), fillToEndOption)
 		if err != nil {
 			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
 			return "", err
 		}
 	} else {
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType, fmt.Sprintf(mibFmt, start), fmt.Sprintf(mibFmt, end))
+		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", "primary", fsType.String(), fmt.Sprintf(mibFmt, start), fmt.Sprintf(mibFmt, end))
 		if err != nil {
 			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
 			return "", err
@@ -523,7 +523,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 		retryDuration = time.Second
 	)
 
-	fsType = partition.FsType
+	fsType = partition.FsType.String()
 
 	// Note: It is possible for the format partition command to fail with error "The file does not exist and no size was specified".
 	// This is due to a possible race condition in Linux/parted where the partition may not actually be ready after being newly created.

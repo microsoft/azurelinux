@@ -174,7 +174,7 @@ func encryptRootPartition(partDevPath string, partition configuration.Partition,
 	}
 
 	// Create the file system
-	_, stderr, err = shell.Execute("mkfs", "-t", partition.FsType, fullMappedPath)
+	_, stderr, err = shell.Execute("mkfs", "-t", partition.FsType.String(), fullMappedPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to mkfs for partition %v. Error: %v", partDevPath, stderr)
 	}

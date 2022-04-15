@@ -19,7 +19,7 @@ import (
 // partition's start offset or the value defined by "MaxSize", if this is the last
 // partition on the disk.
 type Partition struct {
-	FsType    string          `json:"FsType"`
+	FsType    FsType          `json:"FsType"`
 	ID        string          `json:"ID"`
 	Name      string          `json:"Name"`
 	End       uint64          `json:"End"`
@@ -65,6 +65,11 @@ func (p *Partition) IsValid() (err error) {
 		if err = f.IsValid(); err != nil {
 			return
 		}
+	}
+
+	err = p.FsType.IsValid()
+	if err != nil {
+		return err
 	}
 
 	err = nameCheck(p.Name)
