@@ -1,8 +1,7 @@
 {
  "Signatures": {
   "apache-cassandra-4.0.3-src.tar.gz": "51213da3fdcef012410d410c679723443d0d03981558c2cdbbfc111d9d3f4a36",
-  "cassandra.service": "6dec7dc13d2d8b53627936bf0c66fbb202045331eeec2edcc7fa0527817258d2",
   "cassandra-build-cache-4.0.3.tar.gz": "723c6d30cdcb9e0366242cf6ac2a16448c6d9a48d653e73566c822441653dd29",
-  "Readme": "f713bb2bb561333f33081be992a4b48327b9e2cc585d4cff039821dda8300bb7"
+  "cassandra.service": "6dec7dc13d2d8b53627936bf0c66fbb202045331eeec2edcc7fa0527817258d2"
  }
 }

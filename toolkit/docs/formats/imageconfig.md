@@ -42,6 +42,8 @@ partition on the disk.
 
 Note that Partitions do not have to be provided; the resulting image is going to be a rootfs.
 
+Supported partition FsTypes: fat32, fat16, vfat, ext2, ext3, ext4, linux-swap.
+
 Sample partitions entry, specifying a boot partition and a root partition:
 
 ``` json
