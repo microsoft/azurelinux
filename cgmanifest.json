@@ -23284,6 +23284,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-rspec",
+          "version": "3.9.0",
+          "downloadUrl": "https://github.com/rspec/rspec-metagem/archive/refs/tags/v3.9.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-ruby-kafka",
           "version": "1.0.0",
           "downloadUrl": "https://rubygems.org/downloads/ruby-kafka-1.0.0.gem"
