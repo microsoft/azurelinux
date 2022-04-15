@@ -22304,8 +22304,8 @@
         "type": "other",
         "other": {
           "name": "python-daemon",
-          "version": "2.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-daemon/python-daemon-2.2.0.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-daemon/python-daemon-2.3.0.tar.gz"
         }
       }
     },
