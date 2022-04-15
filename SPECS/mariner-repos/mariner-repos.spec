@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -104,10 +104,8 @@ Summary:        Directories and files needed by all %{name} configurations.
 Group:          System Environment/Base
 
 Requires(post): gpgme
-Requires(post): rpm
 
 Requires(preun): gpgme
-Requires(preun): rpm
 
 %description shared
 %{summary}
@@ -188,6 +186,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0-6
+- Update required dependecies for mariner-repos-shared sub-package.
+
 * Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-5
 - Moving away from using 'debuginfo' in a custom package to avoid confusion.
 
