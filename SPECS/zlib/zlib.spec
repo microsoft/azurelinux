@@ -49,6 +49,7 @@ make  %{?_smp_mflags} check
 %changelog
 * Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.2.12-1
 - Upgrade to 1.12.2 to fix CVE-2018-25032
+- License verified
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.11-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
