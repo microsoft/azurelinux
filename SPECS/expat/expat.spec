@@ -1,8 +1,8 @@
-%global         underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
+%define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
 Version:        2.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,6 +65,9 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Tue Apr 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.3-2
+- Fixing "%%underscore_version" macro definition.
+
 * Sun Jan 16 2022 Rachel Menge <rachelmenge@microsoft.com> - 2.4.3-1
 - Update source to 2.4.3 to address CVE-2021-46143, CVE-2021-45960,
   CVE-2022-22822 to CVE-2022-22827

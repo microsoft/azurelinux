@@ -2,12 +2,11 @@
 Summary:        Manage "libnvdimm" subsystem devices (Non-volatile Memory)
 Name:           ndctl
 Version:        65
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2
 Group:          System Environment/Base
 Url:            https://github.com/pmem/ndctl
-Source0:        https://github.com/pmem/%{name}/archive/ndctl-%{version}.tar.gz
-#Source0:        https://github.com/pmem/%{name}/archive/v%{version}.tar.gz
+Source0:        https://github.com/pmem/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
@@ -114,6 +113,8 @@ make check
 %{_libdir}/pkgconfig/libdaxctl.pc
 
 %changelog
+*   Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 65-3
+-   Fixing invalid source URL.
 *   Wed Mar 16 2022 Andrew Phelps <anphel@microsoft.com> 65-2
 -   License verified.
 *   Tue Mar 17 2020 Henry Beberman <henry.beberman@microsoft.com> 65-1

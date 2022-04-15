@@ -3,8 +3,8 @@
 Summary: 		Common SGML catalog and DTD files
 Name: 			sgml-common
 Version: 		0.6.3
-Release: 		56%{?dist}
-License: 		GPL+
+Release: 		57%{?dist}
+License: 		GPLv3
 
 BuildArch: 		noarch
 
@@ -14,7 +14,7 @@ BuildArch: 		noarch
 URL: 			http://www.w3.org/2003/entities/
 Vendor: 		Microsoft Corporation
 Distribution: 	Mariner
-Source0: 		ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/%{name}-%{version}.tgz
+Source0: 		https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/%{name}-%{version}.tgz
 # Following 4 from openjade/pubtext - same maintainer as in SGML-common, so up2date:
 Source1: 		xml.dcl
 Source2: 		xml.soc
@@ -194,6 +194,10 @@ fi
 %{_datadir}/xml/datatypes.dtd
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.3-57
+- Fixing invalid source URL.
+- License verified.
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.6.3-56
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 

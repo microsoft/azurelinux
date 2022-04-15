@@ -172,6 +172,15 @@
                     "StartupCommand": "/usr/bin/somescript"
                 }
             ],
+            "PreInstallScripts":[
+                {
+                    "Path": "arglessPreScript.sh"
+                },
+                {
+                    "Path": "PreScriptWithArguments.sh",
+                    "Args": "--input abc --output cba"
+                }
+            ],
             "PostInstallScripts":[
                 {
                     "Path": "arglessScript.sh"
