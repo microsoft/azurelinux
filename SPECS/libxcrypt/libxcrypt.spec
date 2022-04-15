@@ -47,7 +47,7 @@
 # Required for proper ELF symbol versioning support.
 %global _ld_strict_symbol_defs 1
 # override_glibc and glibcversion are temporary to make libxcrypt install on top of glibc
-%define glibcversion 2.34
+%define glibcversion 2.35
 %bcond_without override_glibc
 # Build the static library?
 %bcond_with new_api
@@ -449,6 +449,9 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
+* Thu Apr 14 2021 Andrew Phelps <anphel@microsoft.com> - 4.4.27-2
+- Update glibcversion variable to 2.35
+
 * Wed Jan 27 2022 Henry Li <lihl@microsoft.com> - 4.4.27-1
 - Upgrade to version 4.4.27
 - Remove patches that no longer apply
