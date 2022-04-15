@@ -12044,7 +12044,7 @@
         "other": {
           "name": "netpbm",
           "version": "10.90.00",
-          "downloadUrl": "https://svn.code.sf.net/p/netpbm/code/advanced"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/netpbm-10.90.00.tar.xz"
         }
       }
     },
