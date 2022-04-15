@@ -85,10 +85,10 @@ popd
 rm -rf man-pages-5.02
 touch /logs/status_man_pages_complete
 
-echo glibc-2.34
-tar xf glibc-2.34.tar.xz
-pushd glibc-2.34
-patch -Np1 -i ../glibc-2.34-fhs-1.patch
+echo glibc-2.35
+tar xf glibc-2.35.tar.xz
+pushd glibc-2.35
+patch -Np1 -i ../glibc-2.35-fhs-1.patch
 ln -sfv /tools/lib/gcc /usr/lib
 ls -la /usr/lib/gcc/
 case $(uname -m) in
@@ -129,7 +129,7 @@ include /etc/ld.so.conf.d/*.conf
 EOF
 mkdir -pv /etc/ld.so.conf.d
 popd
-rm -rf glibc-2.34
+rm -rf glibc-2.35
 
 touch /logs/status_glibc_complete
 
