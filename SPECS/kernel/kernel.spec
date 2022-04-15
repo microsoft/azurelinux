@@ -84,7 +84,6 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
-BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
@@ -422,6 +421,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
 - Remove trace symlink from _bindir
 - Exclude files and directories under the debug folder from tools subpackage.
+- Remove BR for xerces-c-devel
 
 * Fri Apr 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
 - Update source to 5.15.32.1
