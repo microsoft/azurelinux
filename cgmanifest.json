@@ -6600,16 +6600,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "java-atk-wrapper",
-          "version": "0.38.0",
-          "downloadUrl": "https://download.gnome.org/sources/java-atk-wrapper/0.38/java-atk-wrapper-0.38.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "java-cup",
           "version": "0.11",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/develop.tar.bz2"
@@ -19713,16 +19703,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-factory-boy",
-          "version": "2.12.0",
-          "downloadUrl": "https://github.com/rbarrois/factory_boy/archive/2.12.0/factory_boy-2.12.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-faker",
           "version": "4.0.0",
           "downloadUrl": "https://github.com/joke2k/faker/archive/v4.0.0/faker-4.0.0.tar.gz"
@@ -19906,16 +19886,6 @@
           "name": "python-html5lib",
           "version": "1.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/h/html5lib/html5lib-1.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-httplib2",
-          "version": "0.18.1",
-          "downloadUrl": "https://github.com/httplib2/httplib2/archive/v0.18.1/httplib2-0.18.1.tar.gz"
         }
       }
     },
@@ -20513,16 +20483,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-oslo-i18n",
-          "version": "3.24.0",
-          "downloadUrl": "https://tarballs.openstack.org/oslo.i18n/oslo.i18n-3.24.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-oslo-sphinx",
           "version": "4.18.0",
           "downloadUrl": "https://tarballs.openstack.org/oslosphinx/oslosphinx-4.18.0.tar.gz"
@@ -20896,16 +20856,6 @@
           "name": "python-pytest-mock",
           "version": "3.7.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/96/e1/fb53b62056e6840a36d9a4beb4e42726155594c567b574103435a7131c60/pytest-mock-3.7.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-pytest-randomly",
-          "version": "3.4.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-randomly/pytest-randomly-3.4.1.tar.gz"
         }
       }
     },
