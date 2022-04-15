@@ -26339,7 +26339,7 @@
         "other": {
           "name": "xml-commons-apis",
           "version": "1.4.01",
-          "downloadUrl": "https://svn.apache.org/repos/asf/xerces/xml-commons/tags/xml-commons-external-1_4_01/java/external"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xml-commons-apis-1.4.01.tar.gz"
         }
       }
     },
