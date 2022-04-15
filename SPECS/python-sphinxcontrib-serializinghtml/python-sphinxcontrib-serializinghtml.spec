@@ -3,7 +3,7 @@
 Summary:        Sphinx extension for serialized HTML
 Name:           python-%{pypi_name}
 Version:        1.1.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,8 +17,8 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 
 %if %{with_check}
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  python3-sphinx
 %endif
 
 %description
@@ -37,13 +37,11 @@ HTML files (json and pickle).
 %autosetup -n %{pypi_name}-%{version}
 find -name '*.mo' -delete
 
-
 %build
 for po in $(find -name '*.po'); do
   msgfmt --output-file=${po%.po}.mo ${po}
 done
 %py3_build
-
 
 %install
 %py3_install
@@ -60,11 +58,10 @@ rm -rf sphinxcontrib/serializinghtml/locales
 ln -s %{_datadir}/locale sphinxcontrib/serializinghtml/locales
 popd
 
-
 %find_lang sphinxcontrib.serializinghtml
 
-
 %check
+pip3 install Sphinx
 %pytest
 
 %files -n python3-%{pypi_name} -f sphinxcontrib.serializinghtml.lang
@@ -75,6 +72,9 @@ popd
 %{python3_sitelib}/sphinxcontrib_serializinghtml-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Thu Apr 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.5-5
+- Installing 'python3-sphinx' through pip3 during tests to remove cyclic dependency.
+
 * Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.5-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

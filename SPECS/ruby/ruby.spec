@@ -21,7 +21,7 @@
 Summary:        Ruby
 Name:           ruby
 Version:        2.7.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -458,6 +458,9 @@ sudo -u test make test TESTS="-v"
 %doc %{gem_dir}/gems/test-unit-%{test_unit_version}/doc
 
 %changelog
+* Tue Apr 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-6
+- Adding "gemdir" macro for compatibility with older specs.
+
 * Mon Apr 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.7.4-5
 - Specify which flags should be stored for extension building
 

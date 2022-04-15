@@ -2,6 +2,9 @@
 %gem_dir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %gem_archdir %{_libdir}/gems
 
+# For compatibility with some older specs.
+%gemdir %{gem_dir}
+
 # Common gem locations and files.
 %gem_instdir %{gem_dir}/gems/%{gem_name}-%{version}%{?prerelease}
 %gem_extdir_mri %{gem_archdir}/%{name}/%{gem_name}-%{version}%{?prerelease}

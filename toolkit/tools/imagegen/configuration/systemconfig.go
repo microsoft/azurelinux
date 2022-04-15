@@ -15,23 +15,24 @@ import (
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
-	IsDefault          bool                `json:"IsDefault"`
-	BootType           string              `json:"BootType"`
-	Hostname           string              `json:"Hostname"`
-	Name               string              `json:"Name"`
-	PackageLists       []string            `json:"PackageLists"`
-	Packages           []string            `json:"Packages"`
-	KernelOptions      map[string]string   `json:"KernelOptions"`
-	KernelCommandLine  KernelCommandLine   `json:"KernelCommandLine"`
-	AdditionalFiles    map[string]string   `json:"AdditionalFiles"`
-	PartitionSettings  []PartitionSetting  `json:"PartitionSettings"`
-	PostInstallScripts []PostInstallScript `json:"PostInstallScripts"`
-	Groups             []Group             `json:"Groups"`
-	Users              []User              `json:"Users"`
-	Encryption         RootEncryption      `json:"Encryption"`
-	RemoveRpmDb        bool                `json:"RemoveRpmDb"`
-	ReadOnlyVerityRoot ReadOnlyVerityRoot  `json:"ReadOnlyVerityRoot"`
-	HidepidDisabled    bool                `json:"HidepidDisabled"`
+	IsDefault          bool               `json:"IsDefault"`
+	BootType           string             `json:"BootType"`
+	Hostname           string             `json:"Hostname"`
+	Name               string             `json:"Name"`
+	PackageLists       []string           `json:"PackageLists"`
+	Packages           []string           `json:"Packages"`
+	KernelOptions      map[string]string  `json:"KernelOptions"`
+	KernelCommandLine  KernelCommandLine  `json:"KernelCommandLine"`
+	AdditionalFiles    map[string]string  `json:"AdditionalFiles"`
+	PartitionSettings  []PartitionSetting `json:"PartitionSettings"`
+	PreInstallScripts  []InstallScript    `json:"PreInstallScripts"`
+	PostInstallScripts []InstallScript    `json:"PostInstallScripts"`
+	Groups             []Group            `json:"Groups"`
+	Users              []User             `json:"Users"`
+	Encryption         RootEncryption     `json:"Encryption"`
+	RemoveRpmDb        bool               `json:"RemoveRpmDb"`
+	ReadOnlyVerityRoot ReadOnlyVerityRoot `json:"ReadOnlyVerityRoot"`
+	HidepidDisabled    bool               `json:"HidepidDisabled"`
 }
 
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which

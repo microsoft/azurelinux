@@ -1,13 +1,13 @@
 Summary:        Console-based network traffic monitor
 Name:           vnstat
 Version:        2.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://humdi.net/vnstat/
-Source0:        https://github.com/vergoh/vnstat/archive/%{name}-%{version}.tar.gz
+Source0:        https://github.com/vergoh/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  systemd
@@ -46,6 +46,9 @@ mkdir -p %{buildroot}%{_unitdir}/
 %{_mandir}/*
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-2
+- Fixing invalid source URL.
+
 * Tue Jan 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.7-1
 - Update to version 2.7
 

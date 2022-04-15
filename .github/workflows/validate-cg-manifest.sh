@@ -125,10 +125,11 @@ do
     else
       # Try a few times to download the source listed in the manifest
       mkdir -p ./cgmanifest_test_dir
-      for _ in {1..10}
+      for attempt in {1..10}
       do
         wget --quiet -P ./cgmanifest_test_dir "$manifesturl" && touch ./cgmanifest_test_dir/WORKED && break
-        sleep 30
+        echo "Failed attempt number $attempt to download from '$manifesturl'."
+        sleep 5
       done
       [[ -f ./cgmanifest_test_dir/WORKED ]] || echo "Registration for \"$name\":\"$version\" has invalid URL '$manifesturl' (could not download)"  >> bad_registrations.txt
       rm -rf ./cgmanifest_test_dir/
