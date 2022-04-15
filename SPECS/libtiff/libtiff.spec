@@ -17,6 +17,7 @@ Patch5:         CVE-2022-0908.patch
 Patch6:         CVE-2022-0909.patch
 Patch7:         CVE-2022-0924.patch
 Patch8:         CVE-2022-22844.patch
+Patch9:         CVE-2022-1056.nopatch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
