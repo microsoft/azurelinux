@@ -171,53 +171,50 @@ $(final_toolchain): $(raw_toolchain) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.f
 .SILENT: $(toolchain_rpms)
 
 ifeq ($(REBUILD_TOOLCHAIN),y)
+# We know how to build this archive from scratch
+selected_toolchain_archive = $(final_toolchain)
+else
+# This may be an empty string, that is fine. If its empty we will try to use online packages
+selected_toolchain_archive = $(TOOLCHAIN_ARCHIVE)
+endif
 
+# Extract RPMs from an archive if available, download them from online otherwise.
+ifneq (,$(selected_toolchain_archive))
 # Our manifest files should always track the contents of the freshly built archives exactly
 #   Currently non-blocking, to make this a blocking check switch to `print_error` instead of
 #   `print_warning`
-$(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(final_toolchain)
-	@echo Validating contents of toolchain against manifest... && \
-	tar -tzf $(final_toolchain) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_contents) && \
-	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_contents) && \
-	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
-	echo Toolchain manifest validation complete. && \
+$(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_toolchain_archive)
+	@echo Validating contents of toolchain against manifest...
+	tar -I $(ARCHIVE_TOOL) -tf $(selected_toolchain_archive) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_conents) && \
+	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_conents) && \
+	diff="$$( comm -3 $(toolchain_actual_conents) $(toolchain_expected_conents) --check-order )" && \
 	if [ -n "$${diff}" ]; then \
-		echo "ERROR: Missmatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(final_toolchain)':" && \
+		echo "ERROR: Missmatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(selected_toolchain_archive)':" && \
 		echo "$${diff}"; \
 		$(call print_warning, $@ failed) ; \
-	fi
+	fi && \
 	touch $@
+	@echo Done validating toolchain
 
+# Extract a set of RPMS from an archive instead of building them from scratch.
+$(toolchain_local_temp): ;
+$(toolchain_local_temp)%: ;
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
 # them into the RPM folder.
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) | $(final_toolchain)
-	@echo Extracting RPM $@ from toolchain && \
-	if [ ! -f $@ -o $(final_toolchain) -nt $@ ]; then \
-		mkdir -p $(dir $@) && \
-		tar -I $(ARCHIVE_TOOL) -xvf $(final_toolchain) -C $(dir $@) --strip-components 1 built_rpms_all/$(notdir $@) && \
-		touch $@ ; \
-	fi || $(call print_error, $@ failed) ; \
-	touch $@
-else
-ifneq (,$(TOOLCHAIN_ARCHIVE))
-# Extract a set of RPMS from an archive instead of building them from scratch.
-$(toolchain_local_temp): $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag
-	@touch $@
-
-$(toolchain_local_temp)%: ;
-$(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(TOOLCHAIN_ARCHIVE) $(shell find $(toolchain_local_temp)/* 2>/dev/null)
-	mkdir -p $(BUILD_DIR)/toolchain_temp/ && \
-	tar -I $(ARCHIVE_TOOL) -xvf $(TOOLCHAIN_ARCHIVE) -C $(BUILD_DIR)/toolchain_temp/ --strip-components 1 && \
+$(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(shell find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag
+	mkdir -p $(toolchain_local_temp) && \
+	rm -f $(toolchain_local_temp)/* && \
+	tar -I $(ARCHIVE_TOOL) -xf $(selected_toolchain_archive) -C $(toolchain_local_temp) --strip-components 1 && \
 	touch $(BUILD_DIR)/toolchain_temp/* && \
 	touch $@
 
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(toolchain_local_temp)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag
 	tempFile=$(toolchain_local_temp)/$(notdir $@) && \
-	if [ ! -f $@ -o $(TOOLCHAIN_ARCHIVE) -nt $@ ]; then \
+	if [ ! -f $@ -o $(selected_toolchain_archive) -nt $@ ]; then \
 		echo Extracting RPM $@ from toolchain && \
 		mkdir -p $(dir $@) && \
-		mv $$tempFile $(dir $@) && \
+		cp $$tempFile $(dir $@) && \
 		touch $@ ; \
 	fi || $(call print_error, $@ failed) ; \
 	touch $@
@@ -243,5 +240,4 @@ $(toolchain_rpms):
 		tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
 		$(call print_error,\nToolchain download failed. See above errors for more details.) \
 	}
-endif
 endif
