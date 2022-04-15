@@ -1,14 +1,18 @@
 Summary:        A fast, pure Python library for parsing and serializing ASN.1 structures.
 Name:           python-asn1crypto
-Version:        0.24.0
-Release:        4%{?dist}
+Version:        1.5.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/wbond/asn1crypto
-#Source0:       https://files.pythonhosted.org/packages/fc/f1/8db7daa71f414ddabfa056c4ef792e1461ff655c2ae2928a2b675bfed6b4/asn1crypto-0.24.0.tar.gz
-Source0:        asn1crypto-%{version}.tar.gz
+Source0:        https://github.com/wbond/asn1crypto/archive/refs/tags/%{version}.tar.gz#/asn1crypto-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
 %description
@@ -16,9 +20,6 @@ A fast, pure Python library for parsing and serializing ASN.1 structures.
 
 %package -n     python3-asn1crypto
 Summary:        A fast, pure Python library for parsing and serializing ASN.1 structures.
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
 
 %description -n python3-asn1crypto
@@ -33,8 +34,9 @@ A fast, pure Python library for parsing and serializing ASN.1 structures.
 %install
 %py3_install
 
-# %%check
-# Commented out %check due to no test existence
+%check
+pip3 install tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-asn1crypto
 %defattr(-,root,root,-)
@@ -42,6 +44,10 @@ A fast, pure Python library for parsing and serializing ASN.1 structures.
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 13 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.5.1-1
+- Upgrade to latest upstream version
+- Add tests using tox-based runner
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.24.0-4
 - Remove python2 package
 - Add license to python3 package

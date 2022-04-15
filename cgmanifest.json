@@ -21924,8 +21924,8 @@
         "type": "other",
         "other": {
           "name": "python-asn1crypto",
-          "version": "0.24.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/fc/f1/8db7daa71f414ddabfa056c4ef792e1461ff655c2ae2928a2b675bfed6b4/asn1crypto-0.24.0.tar.gz"
+          "version": "1.5.1",
+          "downloadUrl": "https://github.com/wbond/asn1crypto/archive/refs/tags/1.5.1.tar.gz"
         }
       }
     },
