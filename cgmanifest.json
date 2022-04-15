@@ -8300,6 +8300,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jtidy",
+          "version": "8.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jtidy-r813.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libidn2",
           "version": "2.3.0",
           "downloadUrl": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz"

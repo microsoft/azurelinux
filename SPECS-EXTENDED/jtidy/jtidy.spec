@@ -27,7 +27,7 @@ Distribution:   Mariner
 %bcond_with             maven
 Name:           jtidy
 Version:        8.0
-Release:        30%{?dist}
+Release:        31%{?dist}
 Summary:        HTML syntax checker and pretty printer
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
@@ -35,7 +35,7 @@ URL:            http://jtidy.sourceforge.net/
 # svn export -r813 http://svn.sourceforge.net/svnroot/jtidy/trunk/jtidy/ jtidy
 # # bnc#501764
 # rm jtidy/src/config/clover.license
-Source0:        jtidy-r813.tar.bz2
+Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/jtidy-r813.tar.bz2
 Source1:        %{name}.jtidy.script
 Source2:        build.xml
 Source3:        maven-build.properties
@@ -149,6 +149,9 @@ EOF
 %{_bindir}/*
 
 %changelog
+* Fri Apr 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0-31
+- Updating source URL.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0-30
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
