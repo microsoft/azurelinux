@@ -296,6 +296,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files
 %defattr(-,root,root)
 %license COPYING
+%exclude %dir %{_libdir}/debug
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
@@ -354,7 +355,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
 - Remove trace symlink from _bindir
-- Exclude files and directories under the debug folder from tools subpackage.
+- Exclude files and directories under the debug folder from kernel and kernel-tools packages
 - Remove BR for xerces-c-devel
 
 * Fri Apr 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1

@@ -277,7 +277,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Thu May 20 2021 Nicolas Ontiveros <niontive@microsoft.com> - 5.10.32.1-4
 - Recalculate sha512hmac on signed kernel binary
 
-* Tue May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
+* Mon May 17 2021 Andrew Phelps <anphel@microsoft.com> - 5.10.32.1-3
 - Update to kernel release 5.10.32.1-3
 
 * Thu May 13 2021 Rachel Menge <rachelmenge@microsoft.com> - 5.10.32.1-2
