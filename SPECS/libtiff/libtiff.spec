@@ -16,6 +16,7 @@ Patch4:         CVE-2022-0907.patch
 Patch5:         CVE-2022-0908.patch
 Patch6:         CVE-2022-0909.patch
 Patch7:         CVE-2022-0924.patch
+Patch8:         CVE-2022-22844.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
@@ -72,7 +73,7 @@ make %{?_smp_mflags} -k check
 %changelog
 * Fri Apr 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.3.0-2
 - Patch CVE-2022-0561, CVE-2022-0562, CVE-2022-0865, CVE-2022-0891, CVE-2022-0907, CVE-2022-0908,
-- CVE-2022-0909, CVE-2022-0924
+- CVE-2022-0909, CVE-2022-0924, CVE-2022-22844
 
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 4.3.0-1
 - Upgrade to 4.3.0
