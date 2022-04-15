@@ -536,6 +536,7 @@ These are the useful build targets:
 | raw-toolchain                    | Build the initial toolchain bootstrap stage.
 | toolchain                        | Ensure all toolchain RPMs are present.
 | toolchain_stage2                 | Perform the second stage bootstrap.
+| toolchain-force-restore          | Forcibly reset the toolchain packages back to a pristine state
 | validate-image-config            | Validate the selected image config.
 | workplan                         | Create the package build workplan.
 

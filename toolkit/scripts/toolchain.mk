@@ -242,3 +242,11 @@ $(toolchain_rpms):
 	}
 endif
 endif
+
+# This will forcibly remove the existing toolchain RPMs and regenerate them
+.PHONY: toolchain-force-restore
+toolchain-force-restore:
+	for f in $(toolchain_rpms); do \
+		rm -f $$f; \
+	done
+	$(MAKE) toolchain
