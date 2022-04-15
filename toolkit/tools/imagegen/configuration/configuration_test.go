@@ -185,8 +185,8 @@ func TestShouldFailDuplicatedIDs(t *testing.T) {
 	// First on the same disk
 	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
 	testConfig.Disks[0].Partitions = append([]Partition{}, expectedConfiguration.Disks[0].Partitions...)
-	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID"})
-	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID"})
+	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID", FsType: "fat32"})
+	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID", FsType: "fat32"})
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
@@ -200,8 +200,8 @@ func TestShouldFailDuplicatedIDs(t *testing.T) {
 	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
 	testConfig.Disks[0].Partitions = append([]Partition{}, expectedConfiguration.Disks[0].Partitions...)
 	testConfig.Disks[1].Partitions = append([]Partition{}, expectedConfiguration.Disks[1].Partitions...)
-	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID"})
-	testConfig.Disks[1].Partitions = append(testConfig.Disks[1].Partitions, Partition{ID: "duplicatedID"})
+	testConfig.Disks[0].Partitions = append(testConfig.Disks[0].Partitions, Partition{ID: "duplicatedID", FsType: "fat32"})
+	testConfig.Disks[1].Partitions = append(testConfig.Disks[1].Partitions, Partition{ID: "duplicatedID", FsType: "fat32"})
 
 	err = testConfig.IsValid()
 	assert.Error(t, err)

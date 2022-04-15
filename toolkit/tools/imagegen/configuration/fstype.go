@@ -21,6 +21,7 @@ const (
 	FsTypeExt3 FsType = "ext3"
 	FsTypeExt4 FsType = "ext4"
 	FsTypeSwap FsType = "linux-swap"
+	FsTypeEmpty FsType = ""
 )
 
 func (f FsType) String() string {
@@ -38,6 +39,7 @@ func (f *FsType) GetValidFsType() (types []FsType) {
 		FsTypeExt3,
 		FsTypeExt4,
 		FsTypeSwap,
+		FsTypeEmpty,
 	}
 }
 

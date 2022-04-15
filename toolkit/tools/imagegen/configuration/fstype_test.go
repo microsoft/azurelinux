@@ -20,6 +20,7 @@ var (
 		FsType("ext3"),
 		FsType("ext4"),
 		FsType("linux-swap"),
+		FsType(""),
 	}
 	invalidFsType    = FsType("bad_FsType")
 	validFsTypeJSON   = `"fat32"`

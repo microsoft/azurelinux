@@ -567,7 +567,7 @@ func (mp *ManualPartitionWidget) unmarshalPartitionTable() (err error) {
 		partitionSettings[i].ID = partitions[i].ID
 		partitions[i].Name = partitions[i].ID
 
-		partitions[i].FsType = mp.partitionTable.GetCell(currentRow, formatColumn).Text
+		partitions[i].FsType = configuration.FsType(mp.partitionTable.GetCell(currentRow, formatColumn).Text)
 		partitionSettings[i].MountPoint = mp.partitionTable.GetCell(currentRow, mountpointColumn).Text
 
 		nextCursor := diskCursor + partitionSize
