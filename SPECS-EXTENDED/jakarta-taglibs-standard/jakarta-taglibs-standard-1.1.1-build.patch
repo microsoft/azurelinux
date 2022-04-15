@@ -1,0 +1,19 @@
+--- standard/build.xml
++++ standard/build.xml
+@@ -164,14 +164,11 @@
+   <!-- Build the tag library itself -->
+   <target name="library-build" depends="prepare-build">  
+     
+-    <!-- Compile the taglib.
+-         Need to override xalan classes if using J2SE 1.4, that's why we
+-         use bootclasspath. Works with J2SE 1.3 as well. -->
++    <!-- Compile the taglib.  -->
+     <javac 
+       srcdir="${library.src}" 
+       destdir="${build.library}/classes"
+-      bootclasspath="${xalan.jar}:${java.home}/lib/rt.jar"
+-      classpath="${servlet24.jar}:${jsp20.jar}:${jdbc2_0-stdext.jar}:${jaxp-api.jar}:${dom.jar}:${sax.jar}"
++      classpath="${xalan.jar}:${servlet24.jar}:${jsp20.jar}:${jdbc2_0-stdext.jar}:${jaxp-api.jar}:${dom.jar}:${sax.jar}"
+       excludes="org/apache/taglibs/standard/lang/jstl/parser/jsp20/* org/apache/taglibs/standard/lang/jpath/** org/apache/taglibs/standard/lang/spel/**"
+       debug="${compile.debug}"
+       deprecation="${compile.deprecation}"

@@ -1,0 +1,26 @@
+Index: jakarta-taglibs-standard-1.1.1-src/standard/src/org/apache/taglibs/standard/tag/common/sql/DataSourceWrapper.java
+===================================================================
+--- jakarta-taglibs-standard-1.1.1-src.orig/standard/src/org/apache/taglibs/standard/tag/common/sql/DataSourceWrapper.java	2012-06-13 09:25:20.976324079 +0200
++++ jakarta-taglibs-standard-1.1.1-src/standard/src/org/apache/taglibs/standard/tag/common/sql/DataSourceWrapper.java	2012-06-15 09:24:56.340327868 +0200
+@@ -20,6 +20,10 @@
+ import java.sql.Connection;
+ import java.sql.DriverManager;
+ import java.sql.SQLException;
++import java.sql.SQLException;
++import java.sql.SQLFeatureNotSupportedException;
++
++import java.util.logging.Logger;
+ 
+ import javax.sql.DataSource;
+ 
+@@ -119,5 +123,10 @@
+     public boolean isWrapperFor(Class<?> iface) throws SQLException {
+         throw new SQLException(Resources.getMessage("NOT_SUPPORTED"));
+     }
++
++    // Java7 Build
++    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
++        throw new SQLFeatureNotSupportedException(Resources.getMessage("NOT_SUPPORTED"));
++    }
+     
+ }

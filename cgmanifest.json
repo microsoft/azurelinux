@@ -1226,6 +1226,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cassandra",
+          "version": "4.0.3",
+          "downloadUrl": "https://archive.apache.org/dist/cassandra/4.0.3/apache-cassandra-4.0.3-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "catatonit",
           "version": "0.1.7",
           "downloadUrl": "https://github.com/openSUSE/catatonit/archive/v0.1.7.tar.gz"
@@ -6753,6 +6763,16 @@
           "name": "jitterentropy-library",
           "version": "3.3.1",
           "downloadUrl": "https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jlex",
+          "version": "1.2.6",
+          "downloadUrl": "http://www.cs.princeton.edu/~appel/modern/java/JLex/Archive/1.2.5/Main.java"
         }
       }
     },
@@ -25747,6 +25767,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xalan-j2",
+          "version": "2.7.2",
+          "downloadUrl": "http://www.apache.org/dist/xalan/xalan-j/source/xalan-j_2_7_2-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "Xaw3d",
           "version": "1.6.3",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXaw3d-1.6.3.tar.bz2"
@@ -25934,6 +25964,16 @@
           "name": "xerces-c",
           "version": "3.2.3",
           "downloadUrl": "https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xerces-j2",
+          "version": "2.12.0",
+          "downloadUrl": "https://archive.apache.org/dist/xerces/j/source/Xerces-J-src.2.12.0.tar.gz"
         }
       }
     },
@@ -26236,6 +26276,16 @@
     {
       "component": {
         "type": "other",
+        "other": {
+          "name": "xmlunit",
+          "version": "1.5",
+          "downloadUrl": "http://download.sourceforge.net/xmlunit/xmlunit-1.5-src.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
         "other": {
           "name": "xmodmap",
@@ -26341,6 +26391,16 @@
           "name": "xorg-x11-xtrans-devel",
           "version": "1.4.0",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.4.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xpp2",
+          "version": "2.1.10",
+          "downloadUrl": "http://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/PullParser2.1.10.tar.bz2"
         }
       }
     },
