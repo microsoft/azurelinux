@@ -449,7 +449,7 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
-* Thu Apr 14 2021 Andrew Phelps <anphel@microsoft.com> - 4.4.27-2
+* Thu Apr 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.4.27-2
 - Update glibcversion variable to 2.35
 
 * Wed Jan 27 2022 Henry Li <lihl@microsoft.com> - 4.4.27-1
