@@ -284,6 +284,8 @@ Patch1235:      CVE-2022-26490.nopatch
 Patch1236:      CVE-2022-26878.nopatch
 Patch1237:      CVE-2022-26966.nopatch
 Patch1238:      CVE-2022-27223.nopatch
+Patch1239:      CVE-2022-1055.nopatch
+Patch1240:      CVE-2022-27666.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
