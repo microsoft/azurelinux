@@ -66,7 +66,7 @@ func main() {
 		logger.Log.Fatalf("Invalid max depth '%d', valid ranges are -1, >=1", *maxDepth)
 	}
 
-	// We can colour the entries when using --tree, or limit the output in all modes with --rpm-filter
+	// We can color the entries when using --tree, or limit the output in all modes with --rpm-filter
 	configureFilterFiles(filterFile, filter)
 	if len(*filterFile) > 0 && (*filter || *printTree) {
 		logger.Log.Infof("Applying package filter from '%s'", *filterFile)
@@ -226,8 +226,8 @@ func buildDependsOnGraph(graphIn *pkggraph.PkgGraph, nodeList []*pkggraph.PkgNod
 }
 
 const (
-	colourReset = "\033[0m"
-	colourRed   = "\033[31m"
+	colorReset = "\033[0m"
+	colorRed   = "\033[31m"
 )
 
 var (
@@ -348,7 +348,7 @@ func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, 
 	if isFilteredFile(n.RpmPath, filterFile) {
 		// Highlight nodes that are in the filter file list in red, and add them to the list
 		if generateStrings {
-			lines = append(lines, "__"+colourRed+thisNode+colourReset)
+			lines = append(lines, "__"+colorRed+thisNode+colorReset)
 		}
 		if n.Type == pkggraph.TypeRun {
 			// We only want to record run nodes for the purposes of listing packages in non-tree mode
