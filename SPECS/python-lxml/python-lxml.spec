@@ -53,7 +53,7 @@ make test
 
 %changelog
 * Thu Apr 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.2.4-11
-- Disable the debuginfo package here since it is not being build in the toolchain
+- Disable the debuginfo package here since it is not being built in the toolchain
 
 * Wed Feb 16 2022 Thomas Crain <thcrain@microsoft.com> - 4.2.4-10
 - Remove %%files section for main package to avoid outputting an empty RPM
