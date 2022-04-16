@@ -1,13 +1,18 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
-Version:        18.2.0
-Release:        10%{?dist}
+Version:        21.4.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/attrs
-Source0:        https://files.pythonhosted.org/packages/0f/9e/26b1d194aab960063b266170e53c39f73ea0d0d3f5ce23313e0ec8ee9bdf/attrs-%{version}.tar.gz
+Source0:        https://github.com/%{name}/attrs/archive/refs/tags/%{version}.tar.gz#/attrs-%{version}.tar.gz
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 BuildArch:      noarch
 
 %description
@@ -15,15 +20,6 @@ Attributes without boilerplate.
 
 %package -n     python3-attrs
 Summary:        Attributes without boilerplate.
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-%if %{with_check}
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-zope-interface
-%endif
 Requires:       python3
 
 %description -n python3-attrs
@@ -39,8 +35,7 @@ Attributes without boilerplate.
 %py3_install
 
 %check
-# Tests are only supported with Python3
-pip3 install pytest hypothesis==4.38.0 tox
+pip3 install tox
 LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 %files -n python3-attrs
@@ -49,6 +44,10 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 13 2022 Olivia Crain <oliviacrain@microsoft.com> - 21.4.0-1
+- Upgrade to latest upstream version
+- Simplify test setup and requirements
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 18.2.0-10
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 

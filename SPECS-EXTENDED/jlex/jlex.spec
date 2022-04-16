@@ -21,7 +21,7 @@ Distribution:   Mariner
 %define section		free
 Name:           jlex
 Version:        1.2.6
-Release:        284%{?dist}
+Release:        285%{?dist}
 Summary:        A Lexical Analyzer Generator for Java
 License:        MIT
 Group:          Development/Libraries/Java
@@ -31,6 +31,7 @@ Source1:        %{name}-%{version}.build.xml
 Patch0:         %{name}-%{version}.static.patch
 BuildRequires:  ant
 BuildRequires:  java-devel
+BuildRequires:  javapackages-tools
 BuildRequires:  xml-commons-apis-bootstrap
 #!BuildIgnore:  xerces-j2
 #!BuildIgnore:  xml-commons
@@ -64,6 +65,9 @@ install -m 644 dist/lib/%{name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.j
 %{_javadir}/*
 
 %changelog
+* Tue Apr 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.6-285
+- Adding missing BR on 'javapackages-tools'.
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.6-284
 - License verified
 

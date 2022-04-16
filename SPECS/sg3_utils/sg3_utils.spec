@@ -1,14 +1,13 @@
 Summary:        Tools and Utilities for interaction with SCSI devices.
 Name:           sg3_utils
 Version:        1.46
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-#Source0:        https://github.com/hreinecke/sg3_utils/archive/v%{version}.tar.gz
 Group:          System/Tools.
 URL:            http://sg.danny.cz/sg/sg3_utils.html
-Source0:        https://github.com/hreinecke/sg3_utils/archive/%{name}-%{version}.tar.gz
+Source0:        https://github.com/hreinecke/sg3_utils/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Provides:       sg_utils.
 Provides:       %{name}-libs
 
@@ -56,6 +55,9 @@ install -m 755 scripts/rescan-scsi-bus.sh %{buildroot}/%{_bindir}
 %{_includedir}/scsi/*
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.46-2
+- Fixing invalid source URL.
+
 * Tue Jan 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.46-1
 - Update to version 1.46
 

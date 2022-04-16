@@ -1,7 +1,0 @@
-/var/log/jetty/jetty-console.log {
-    copytruncate
-    weekly
-    rotate 52
-    compress
-    missingok
-}

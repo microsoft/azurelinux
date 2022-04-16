@@ -6,8 +6,8 @@
 %endif
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.26.1
-Release:        4%{?dist}
+Version:        5.15.32.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,14 @@ Patch1033:      CVE-2011-0640.nopatch
 Patch1034:      CVE-2022-0492.nopatch
 Patch1035:      CVE-2021-3743.nopatch
 Patch1036:      CVE-2022-26966.nopatch
+Patch1037:      CVE-2022-0516.nopatch
+Patch1038:      CVE-2022-26878.nopatch
+Patch1039:      CVE-2022-27223.nopatch
+Patch1040:      CVE-2022-24958.nopatch
+Patch1041:      CVE-2022-0742.nopatch
+Patch1042:      CVE-2022-1011.nopatch
+Patch1043:      CVE-2022-26490.nopatch
+Patch1044:      CVE-2021-4002.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -76,7 +84,6 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
-BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
@@ -305,6 +312,9 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
+# Remove trace (symlink to perf). This file causes duplicate identical debug symbols
+rm -vf %{buildroot}%{_bindir}/trace
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -339,6 +349,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files
 %defattr(-,root,root)
 %license COPYING
+%exclude %dir /usr/lib/debug
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
@@ -352,10 +363,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
-%ifarch aarch64
-%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
-%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux
-%endif
 
 %files docs
 %defattr(-,root,root)
@@ -377,6 +384,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files tools
 %defattr(-,root,root)
 %{_libexecdir}
+%exclude %dir %{_libdir}/debug
 %ifarch x86_64
 %{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
@@ -407,6 +415,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
+- Remove trace symlink from _bindir
+- Exclude files and directories under the debug folder from kernel and kernel-tools packages
+- Remove BR for xerces-c-devel
+
+* Fri Apr 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
+- Update source to 5.15.32.1
+- Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
+  2022-1011, 2022-26490, 2021-4002
+- Enable MANA driver config
+
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
 - Add Dell devices support
 

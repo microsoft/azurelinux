@@ -545,6 +545,24 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 		if err != nil {
 			err = fmt.Errorf("could not format partition with type %v after %v retries", fsType, totalAttempts)
 		}
+	case "linux-swap":
+		err = retry.Run(func() error {
+			_, stderr, err := shell.Execute("mkswap", partDevPath)
+			if err != nil {
+				logger.Log.Warnf("Failed to format swap partition using mkswap: %v", stderr)
+				return err
+			}
+			return err
+		}, totalAttempts, retryDuration)
+		if err != nil {
+			err = fmt.Errorf("could not format partition with type %v after %v retries", fsType, totalAttempts)
+		}
+
+		_, stderr, err := shell.Execute("swapon", partDevPath)
+		if err != nil {
+			logger.Log.Warnf("Failed to execute swapon: %v", stderr)
+			return "", err
+		}
 	case "":
 		logger.Log.Debugf("No filesystem type specified. Ignoring for partition: %v", partDevPath)
 	default:

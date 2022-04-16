@@ -67,14 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.26.1 API Headers
-tar xf kernel-5.15.26.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
+echo Linux-5.15.32.1 API Headers
+tar xf kernel-5.15.32.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.32.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.32.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -85,10 +85,10 @@ popd
 rm -rf man-pages-5.02
 touch /logs/status_man_pages_complete
 
-echo glibc-2.34
-tar xf glibc-2.34.tar.xz
-pushd glibc-2.34
-patch -Np1 -i ../glibc-2.34-fhs-1.patch
+echo glibc-2.35
+tar xf glibc-2.35.tar.xz
+pushd glibc-2.35
+patch -Np1 -i ../glibc-2.35-fhs-1.patch
 ln -sfv /tools/lib/gcc /usr/lib
 ls -la /usr/lib/gcc/
 case $(uname -m) in
@@ -129,7 +129,7 @@ include /etc/ld.so.conf.d/*.conf
 EOF
 mkdir -pv /etc/ld.so.conf.d
 popd
-rm -rf glibc-2.34
+rm -rf glibc-2.35
 
 touch /logs/status_glibc_complete
 
@@ -482,17 +482,17 @@ popd
 rm -rf ncurses-6.2
 touch /logs/status_ncurses_complete
 
-echo Libcap-2.26
-tar xf libcap-2.26.tar.xz
-pushd libcap-2.26
+echo libcap-2.60
+tar xf libcap-2.60.tar.xz
+pushd libcap-2.60
 sed -i '/install.*STALIBNAME/d' libcap/Makefile
 make -j$(nproc)
 make RAISE_SETFCAP=no lib=lib prefix=/usr install
-chmod -v 755 /usr/lib/libcap.so.2.26
+chmod -v 755 /usr/lib/libcap.so.2.60
 #mv -v /usr/lib/libcap.so.* /lib
 #ln -sfv ../../lib/$(readlink /usr/lib/libcap.so) /usr/lib/libcap.so
 popd
-rm -rf libcap-2.26
+rm -rf libcap-2.60
 touch /logs/status_libcap_complete
 
 echo Sed-4.8

@@ -1,7 +1,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,7 +37,6 @@ Requires:       curl
 Requires:       libmetalink
 Requires:       libsolv
 Requires:       openssl-libs
-Requires:       rpm
 Requires:       rpm-libs
 Requires:       tdnf-cli-libs = %{version}-%{release}
 Obsoletes:      yum
@@ -185,6 +184,9 @@ done
 %{_bindir}/tdnf-automatic
 
 %changelog
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.2.2-3
+- Update required dependecies for tdnf package which needs rpm-libs.
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-2
 - Installing Mariner GPG keys when present/installed.
 

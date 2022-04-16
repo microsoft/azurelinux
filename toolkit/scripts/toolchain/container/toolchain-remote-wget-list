@@ -33,8 +33,8 @@ https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.s
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
 https://www.linuxfromscratch.org/patches/downloads/lua/lua-5.4.3-shared_library-1.patch
 https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
-https://ftp.gnu.org/gnu/glibc/glibc-2.34.tar.xz
-https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.34-fhs-1.patch
+https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.xz
+https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.35-fhs-1.patch
 https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz
 https://ftp.gnu.org/gnu/tar/tar-1.34.tar.xz
 http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz
@@ -52,7 +52,7 @@ http://ftp.gnu.org/gnu/gettext/gettext-0.19.8.1.tar.xz
 https://ftp.gnu.org/gnu/grep/grep-3.7.tar.xz
 http://ftp.gnu.org/gnu/groff/groff-1.22.3.tar.gz
 https://ftp.gnu.org/gnu/gzip/gzip-1.11.tar.xz
-https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.26.tar.xz
+https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.60.tar.xz
 http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz
 https://download.savannah.gnu.org/releases/man-db/man-db-2.10.1.tar.xz
 https://archive.mozilla.org/pub/nspr/releases/v4.21/src/nspr-4.21.tar.gz

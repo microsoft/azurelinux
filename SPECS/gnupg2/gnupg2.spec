@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.3.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,14 @@ S/MIME.  It has a different design philosophy that splits
 functionality up into several modules. The S/MIME and smartcard functionality
 is provided by the gnupg2-smime package.
 
+%package  lang
+Summary:  Additional language files for gnupg2
+Group:    Applications/Cryptography
+Requires: %{name} = %{version}-%{release}
+
+%description lang
+These are the additional language files of gnupg2
+
 %prep
 %autosetup -n gnupg-%{version}
 
@@ -55,6 +63,8 @@ ln -s gpg2 gpg
 ln -s gpgv2 gpgv
 popd
 
+%find_lang %{name}
+
 %check
 # The package is built with option `gpg-is-gpg2` & few tests explicity expect `gpg2`
 # softlink `gpg2 -> gpg` to enable check section
@@ -66,7 +76,6 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %license COPYING COPYING.CC0 COPYING.GPL2 COPYING.LGPL3 COPYING.LGPL21 COPYING.other
 %{_bindir}/*
 %{_sbindir}/*
-%{_datadir}/locale/*/*/*
 %{_mandir}/man1/*
 %{_mandir}/man7/*
 %{_mandir}/man8/*
@@ -76,7 +85,13 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %exclude %{_infodir}/dir
 %exclude /usr/share/doc/*
 
+%files -f %{name}.lang lang
+%defattr(-,root,root)
+
 %changelog
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.3.3-3
+- Create lang sub package for locales
+
 * Wed Feb 23 2022 Muhammad Falak <mwani@microsoft.com> - 2.3.3-2
 - Add an explict softlink `gpg2 -> gpg` in check section to enable ptest
 
