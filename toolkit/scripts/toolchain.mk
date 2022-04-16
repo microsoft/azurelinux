@@ -182,7 +182,7 @@ $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(final_toolcha
 	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
 	echo Toolchain manifest validation complete. && \
 	if [ -n "$${diff}" ]; then \
-		echo "ERROR: Missmatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(final_toolchain)':" && \
+		echo "ERROR: Mismatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(final_toolchain)':" && \
 		echo "$${diff}"; \
 		$(call print_warning, $@ failed) ; \
 	fi
@@ -190,9 +190,9 @@ $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(final_toolcha
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
 # them into the RPM folder.
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) | $(final_toolchain)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(final_toolchain) $(STATUS_FLAGS_DIR)/toolchain_verify.flag
 	@echo Extracting RPM $@ from toolchain && \
-	if [ ! -f $@ -o $(final_toolchain) -nt $@ ]; then \
+	if [ ! -f $@ ]; then \
 		mkdir -p $(dir $@) && \
 		tar -I $(ARCHIVE_TOOL) -xvf $(final_toolchain) -C $(dir $@) --strip-components 1 built_rpms_all/$(notdir $@) && \
 		touch $@ ; \
