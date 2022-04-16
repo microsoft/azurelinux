@@ -1,7 +1,9 @@
+%global debug_package   %{nil}
+
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.2.4
-Release:        10%{?dist}
+Release:        11%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
 URL:            https://lxml.de
@@ -50,6 +52,9 @@ make test
 %{python3_sitelib}/*
 
 %changelog
+* Thu Apr 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.2.4-11
+- Disable the debuginfo package here since it is not being build in the toolchain
+
 * Wed Feb 16 2022 Thomas Crain <thcrain@microsoft.com> - 4.2.4-10
 - Remove %%files section for main package to avoid outputting an empty RPM
 
