@@ -289,7 +289,9 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 			// the hypothetical high priority node hidden further into the tree)
 			switch req.Node.Type {
 			case pkggraph.TypePreBuilt:
-				fallthrough
+				channels.PriorityRequests <- req
+
+				// For now all build nodes are of equal priority
 			case pkggraph.TypeGoal:
 				fallthrough
 			case pkggraph.TypePureMeta:
@@ -297,9 +299,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 			case pkggraph.TypeRun:
 				fallthrough
 			case pkggraph.TypeRemote:
-				channels.PriorityRequests <- req
-
-			// For now all build nodes are of equal priority
+				fallthrough
 			case pkggraph.TypeBuild:
 				fallthrough
 			default:
