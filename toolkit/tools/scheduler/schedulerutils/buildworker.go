@@ -122,8 +122,10 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
 func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
+	var missingFiles []string
+
 	baseSrpmName := node.SRPMFileName()
-	usedCache, builtFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
+	usedCache, builtFiles, missingFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
 	skipped = sliceutils.Contains(ignoredPackages, node.SpecName(), sliceutils.StringMatch)
 
 	if skipped {
@@ -134,6 +136,11 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	if canUseCache && usedCache {
 		logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
 		return
+	}
+
+	// Print a message if a package is partially built but needs to be regenerated because its missing something.
+	if len(missingFiles) > 0 && len(builtFiles) != len(missingFiles) {
+		logger.Log.Infof("SRPM '%s' is being rebuilt due to partially missing components: %v", node.SrpmPath, missingFiles)
 	}
 
 	usedCache = false

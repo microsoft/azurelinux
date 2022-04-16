@@ -1121,10 +1121,11 @@ func (g *PkgGraph) CreateSubGraph(rootNode *PkgNode) (subGraph *PkgGraph, err er
 
 // IsSRPMPrebuilt checks if an SRPM is prebuilt, returning true if so along with a slice of corresponding prebuilt RPMs.
 // The function will lock 'graphMutex' before performing the check if the mutex is not nil.
-func IsSRPMPrebuilt(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (isPrebuilt bool, rpmFiles []string) {
-	rpmFiles = rpmsProvidedBySRPM(srpmPath, pkgGraph, graphMutex)
-	logger.Log.Tracef("Expected RPMs from %s: %v", srpmPath, rpmFiles)
-	isPrebuilt = findAllRPMS(rpmFiles)
+func IsSRPMPrebuilt(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (isPrebuilt bool, expectedFiles, missingFiles []string) {
+	expectedFiles = rpmsProvidedBySRPM(srpmPath, pkgGraph, graphMutex)
+	logger.Log.Tracef("Expected RPMs from %s: %v", srpmPath, expectedFiles)
+	isPrebuilt, missingFiles = findAllRPMS(expectedFiles)
+	logger.Log.Tracef("Missing RPMs from %s: %v", srpmPath, missingFiles)
 	return
 }
 
@@ -1324,7 +1325,7 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 		// 2. Every build cycle must contain at least one edge between a build node and a run node from different SRPMs.
 		//    These edges represent the 'BuildRequires' from the .spec file. If the cycle is breakable, the run node comes from a pre-built SRPM.
 		buildToRunEdge := previousNode.Type == TypeBuild && currentNode.Type == TypeRun
-		if isPrebuilt, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); buildToRunEdge && isPrebuilt {
+		if isPrebuilt, _, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); buildToRunEdge && isPrebuilt {
 			logger.Log.Debugf("Cycle contains pre-built SRPM '%s'. Replacing edges from build nodes associated with '%s' with an edge to a new 'PreBuilt' node.",
 				currentNode.SrpmPath, previousNode.SrpmPath)
 
@@ -1412,15 +1413,17 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 }
 
 // findAllRPMS returns true if all RPMs requested are found on disk.
-func findAllRPMS(rpmsToFind []string) bool {
+//	Also returns a list of all missing files
+func findAllRPMS(rpmsToFind []string) (foundAllRpms bool, missingRpms []string) {
 	for _, rpm := range rpmsToFind {
 		isFile, _ := file.IsFile(rpm)
 
 		if !isFile {
 			logger.Log.Debugf("Did not find (%s)", rpm)
-			return false
+			missingRpms = append(missingRpms, "rpm")
 		}
 	}
+	foundAllRpms = len(missingRpms) == 0
 
-	return true
+	return
 }
