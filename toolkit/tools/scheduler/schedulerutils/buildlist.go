@@ -4,6 +4,9 @@
 package schedulerutils
 
 import (
+	"bufio"
+	"os"
+
 	"microsoft.com/pkggen/imagegen/configuration"
 	"microsoft.com/pkggen/imagegen/installutils"
 	"microsoft.com/pkggen/internal/logger"
@@ -96,4 +99,27 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inpu
 	}
 
 	return
+}
+
+// ReadReservedFilesList updates the list of reserved files from the manifest file passed in.
+func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
+	file, err := os.Open(path)
+	if err != nil {
+		logger.Log.Errorf("Failed to open file manifest %s with error %s", path, err)
+		return nil, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		reservedFiles = append(reservedFiles, scanner.Text())
+	}
+
+	err = scanner.Err()
+	if err != nil {
+		logger.Log.Errorf("Failed to scan file manifest %s with error %s", path, err)
+		return nil, err
+	}
+
+	return reservedFiles, nil
 }
