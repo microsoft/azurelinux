@@ -121,7 +121,8 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 	packageVersionsInConfig = append(packageVersionsInConfig, installutils.GetRequiredPackagesForInstall()...)
 
 	logger.Log.Infof("Cloning: %v", packageVersionsInConfig)
-	err = cloner.Clone(cloneDeps, packageVersionsInConfig...)
+	// The image tools don't care if a package was created locally or not, just that it exists. Disregard if it is prebuilt or not.
+	_, err = cloner.Clone(cloneDeps, packageVersionsInConfig...)
 	return
 }
 

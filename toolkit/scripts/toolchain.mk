@@ -186,6 +186,7 @@ $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(final_toolcha
 		echo "$${diff}"; \
 		$(call print_warning, $@ failed) ; \
 	fi
+	touch $@
 
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
@@ -196,7 +197,8 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) | $(final_toolchain)
 		mkdir -p $(dir $@) && \
 		tar -I $(ARCHIVE_TOOL) -xvf $(final_toolchain) -C $(dir $@) --strip-components 1 built_rpms_all/$(notdir $@) && \
 		touch $@ ; \
-	fi || $(call print_error, $@ failed) ;
+	fi || $(call print_error, $@ failed) ; \
+	touch $@
 else
 ifneq (,$(TOOLCHAIN_ARCHIVE))
 # Extract a set of RPMS from an archive instead of building them from scratch.
@@ -217,7 +219,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(toolchain_local_temp)
 		mkdir -p $(dir $@) && \
 		mv $$tempFile $(dir $@) && \
 		touch $@ ; \
-	fi || $(call print_error, $@ failed) && \
+	fi || $(call print_error, $@ failed) ; \
 	touch $@
 else
 # Download from online package server

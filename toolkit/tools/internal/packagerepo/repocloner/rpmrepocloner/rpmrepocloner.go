@@ -263,7 +263,8 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // Clone clones the provided list of packages.
 // If cloneDeps is set, package dependencies will also be cloned.
 // It will automatically resolve packages that describe a provide or file from a package.
-func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (err error) {
+// The cloner will mark any package that locally built by setting preBuilt = true
+func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
 	for _, pkg := range packagesToClone {
 		pkgName := convertPackageVersionToTdnfArg(pkg)
 
@@ -281,9 +282,11 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		}
 
 		err = r.chroot.Run(func() (err error) {
+			var chrootErr error
 			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
 			repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
-			return r.clonePackage(args, repoOrderList...)
+			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
+			return chrootErr
 		})
 
 		if err != nil {
@@ -444,7 +447,7 @@ func (r *RpmRepoCloner) Close() error {
 
 // clonePackage clones a given package using prepopulated arguments.
 // It will gradually enable more repos to consider using enabledRepoOrder until the package is found.
-func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...string) (err error) {
+func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...string) (preBuilt bool, err error) {
 	const (
 		unresolvedOutputPrefix  = "No package"
 		toyboxConflictsPrefix   = "toybox conflicts"
@@ -452,7 +455,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 	)
 
 	if len(enabledRepoOrder) == 0 {
-		return fmt.Errorf("enabledRepoOrder cannot be empty")
+		return false, fmt.Errorf("enabledRepoOrder cannot be empty")
 	}
 
 	// Disable all repos first so we can gradually enable them below.
@@ -509,6 +512,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		}
 
 		if err == nil {
+			preBuilt = (repoID == builtRepoID)
 			break
 		}
 	}

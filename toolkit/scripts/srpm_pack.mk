@@ -13,6 +13,8 @@
 # update  - Check signatures and updating any mismatches in the signatures file
 SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 
+SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
+
 local_specs = $(shell find $(SPECS_DIR)/ -type f -name '*.spec')
 local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
 local_sources = $(shell find $(SPECS_DIR)/ -name '*')
@@ -21,7 +23,7 @@ toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
-$(call create_folder,$(BUILD_DIR)/SRPM_packaging)
+$(call create_folder,$(SRPM_BUILD_CHROOT_DIR))
 
 # General targets
 .PHONY: toolchain-input-srpms input-srpms clean-input-srpms
@@ -32,7 +34,9 @@ clean: clean-input-srpms
 clean-input-srpms:
 	rm -rf $(BUILD_SRPMS_DIR)
 	rm -rf $(STATUS_FLAGS_DIR)/build_srpms.flag
-	rm -rf $(BUILD_DIR)/SRPM_packaging
+	@echo Verifying no mountpoints present in $(SRPM_BUILD_CHROOT_DIR)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(SRPM_BUILD_CHROOT_DIR)" && \
+	rm -rf $(SRPM_BUILD_CHROOT_DIR)
 
 # The directory freshness is tracked with a status flag. The status flag is only updated when all SRPMs have been
 # updated.
@@ -73,7 +77,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--ca-cert=$(CA_CERT) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
-		--build-dir=$(BUILD_DIR)/SRPM_packaging \
+		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
@@ -90,7 +94,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--ca-cert=$(CA_CERT) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
-		--build-dir=$(BUILD_DIR)/SRPM_packaging \
+		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--pack-list=$(toolchain_spec_list) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
