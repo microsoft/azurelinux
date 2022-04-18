@@ -1,0 +1,43 @@
+%global debug_package %{nil}
+%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
+%global gem_name power_assert
+Summary:        Power Assert for Ruby
+Name:           rubygem-power_assert
+Version:        2.0.1
+Release:        1%{?dist}
+License:        BSD-2-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Group:          Development/Languages
+URL:            https://github.com/ruby/power_assert/
+Source0:        https://github.com/ruby/power_assert/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+BuildRequires:  git
+BuildRequires:  ruby
+
+%description
+Power Assert shows each value of variables and method calls in the expression.
+It is useful for testing, providing which value wasn't correct when the
+condition is not satisfied.
+
+%prep
+%setup -q -n %{gem_name}-%{version}
+
+%build
+gem build %{gem_name}
+
+%install
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
+#add BSDL and COPYING files to buildroot from Source0
+cp BSDL %{buildroot}%{gem_instdir}/
+cp COPYING %{buildroot}%{gem_instdir}/
+
+%files
+%defattr(-,root,root,-)
+%license %{gemdir}/gems/%{gem_name}-%{version}/BSDL
+%license %{gemdir}/gems/%{gem_name}-%{version}/COPYING
+%{gemdir}
+
+%changelog
+* Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-1
+- License verified
+- Original version for CBL-Mariner

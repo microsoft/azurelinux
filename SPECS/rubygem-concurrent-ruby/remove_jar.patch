@@ -1,0 +1,13 @@
+diff -ruN a/concurrent-ruby.gemspec b/concurrent-ruby.gemspec
+--- a/concurrent-ruby.gemspec	2022-03-21 16:22:30.000000000 -0700
++++ b/concurrent-ruby.gemspec	2022-04-14 14:46:32.256961408 -0700
+@@ -16,8 +16,7 @@
+   s.files            = [*Dir['lib/concurrent-ruby/**/*.rb'] & git_files,
+                         *Dir['ext/concurrent-ruby/**/*'] & git_files,
+                         'Rakefile',
+-                        'Gemfile',
+-                        'lib/concurrent-ruby/concurrent/concurrent_ruby.jar'
++                        'Gemfile'
+   ]
+   s.extra_rdoc_files = Dir['README*', 'LICENSE*', 'CHANGELOG*']
+   s.require_paths    = ['lib/concurrent-ruby']
