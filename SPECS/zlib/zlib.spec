@@ -1,13 +1,13 @@
 Summary:        Compression and decompression routines
 Name:           zlib
-Version:        1.2.11
-Release:        5%{?dist}
-URL:            http://www.zlib.net/
+Version:        1.2.12
+Release:        1%{?dist}
+URL:            https://www.zlib.net/
 License:        zlib
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        http://www.zlib.net/%{name}-%{version}.tar.xz
+Source0:        https://www.zlib.net/%{name}-%{version}.tar.xz
 %description
 Compression and decompression routines
 %package    devel
@@ -47,6 +47,10 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
+* Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.2.12-1
+- Upgrade to 1.12.2 to fix CVE-2018-25032
+- License verified
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.2.11-5
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
