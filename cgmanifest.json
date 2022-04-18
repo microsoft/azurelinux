@@ -8625,8 +8625,8 @@
         "type": "other",
         "other": {
           "name": "vsftpd",
-          "version": "3.0.3",
-          "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.3.tar.gz"
+          "version": "3.0.5",
+          "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.5.tar.gz"
         }
       }
     },
