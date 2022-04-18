@@ -2,7 +2,7 @@
 Summary:        The PyPA recommended tool for installing Python packages.
 Name:           python-pip
 Version:        19.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source0:        https://files.pythonhosted.org/packages/41/13/b6e68eae78405af6e4
 # git clone https://github.com/pypa/pip && cd pip
 # git checkout 19.2 && tar -czvf ../pip-tests-19.2.tar.gz tests/
 Source1:        pip-tests-%{version}.tar.gz
+Patch0:         CVE-2021-3572.patch
 BuildRequires:  python-setuptools
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -33,7 +34,7 @@ BuildRequires:  python-xml
 The PyPA recommended tool for installing Python packages.
 
 %prep
-%setup -q -n pip-%{version}
+%autosetup -n pip-%{version}
 tar -xf %{SOURCE1}
 
 %build
@@ -56,6 +57,9 @@ python setup.py test
 %{_bindir}/*
 
 %changelog
+*   Mon Apr 18 2022 Henry Beberman <henry.beberman@microsoft.com> 19.2-2
+-   Backport patch for CVE-2021-3572
+
 *   Tue Dec 22 2020 Rachel Menge <rachelmenge@microsoft.com> 19.2-1
 -   Update to version 19.2 to fix CVE-2019-20916
 
