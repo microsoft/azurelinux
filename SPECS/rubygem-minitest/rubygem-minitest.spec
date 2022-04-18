@@ -15,6 +15,7 @@ Source0:        %{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
+BuildArch:      noarch
 
 %description
 minitest/unit is a small and incredibly fast unit testing framework.
@@ -45,4 +46,5 @@ cp README.rdoc %{buildroot}%{gem_instdir}/
 %changelog
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.13.0-1
 - License verified
+- Included descriptions from Fedora 36 spec (license: MIT).
 - Original version for CBL-Mariner

@@ -37,4 +37,5 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %changelog
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-1
 - License verified
+- Included descriptions from Fedora 36 spec (license: MIT).
 - Original version for CBL-Mariner

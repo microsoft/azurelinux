@@ -13,6 +13,7 @@ URL:            https://mocha.jamesmead.org/
 Source0:        https://github.com/freerange/mocha/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+BuildArch:      noarch
 
 %description
 Mocking and stubbing library with JMock/SchMock syntax, which allows mocking
@@ -39,4 +40,5 @@ cp COPYING.md %{buildroot}%{gem_instdir}/
 %changelog
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.0-1
 - License verified
+- Included descriptions from Fedora 36 spec (license: MIT).
 - Original version for CBL-Mariner

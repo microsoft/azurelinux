@@ -13,7 +13,8 @@ URL:            https://test-unit.github.io/
 Source0:        https://github.com/test-unit/test-unit/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
-Requires:       rubygem(power_assert)
+Requires:       rubygem-power_assert
+BuildArch:      noarch
 
 %description
 Test::Unit (test-unit) is unit testing framework for Ruby, based on xUnit
@@ -44,4 +45,5 @@ cp PSFL %{buildroot}%{gem_instdir}/
 %changelog
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-1
 - License verified
+- Included descriptions from Fedora 36 spec (license: MIT).
 - Original version for CBL-Mariner

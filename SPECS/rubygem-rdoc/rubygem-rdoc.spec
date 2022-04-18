@@ -19,6 +19,7 @@ Requires:       rubygem-json
 Requires:       rubygem-psych
 Provides:       rdoc = %{version}-%{release}
 Provides:       ri = %{version}-%{release}
+BuildArch:      noarch
 
 %description
 RDoc produces HTML and command-line documentation for Ruby projects.  RDoc
@@ -46,4 +47,5 @@ cp LEGAL.rdoc %{buildroot}%{gem_instdir}/
 %changelog
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.4.0-1
 - License verified
+- Included descriptions from Fedora 36 spec (license: MIT).
 - Original version for CBL-Mariner

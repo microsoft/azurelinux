@@ -37,4 +37,5 @@ cp LICENSE.txt %{buildroot}%{gem_instdir}/
 %changelog
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.5.11-1
 - License verified
+- Included descriptions from Fedora 33 spec (license: MIT).
 - Original version for CBL-Mariner

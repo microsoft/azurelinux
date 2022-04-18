@@ -13,6 +13,7 @@ URL:            https://github.com/ruby/power_assert/
 Source0:        https://github.com/ruby/power_assert/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+BuildArch:      noarch
 
 %description
 Power Assert shows each value of variables and method calls in the expression.
@@ -40,4 +41,5 @@ cp COPYING %{buildroot}%{gem_instdir}/
 %changelog
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-1
 - License verified
+- Included descriptions from Fedora 36 spec (license: MIT).
 - Original version for CBL-Mariner
