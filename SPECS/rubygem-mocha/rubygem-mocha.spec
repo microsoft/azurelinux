@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name mocha
-Summary:        BLAH
+Summary:        Mocking and stubbing library
 Name:           rubygem-mocha
 Version:        1.13.0
 Release:        1%{?dist}
@@ -15,7 +15,8 @@ BuildRequires:  git
 BuildRequires:  ruby
 
 %description
-BLAH.
+Mocking and stubbing library with JMock/SchMock syntax, which allows mocking
+and stubbing of methods on real (non-mock) classes.
 
 %prep
 %setup -q -n %{gem_name}-%{version}

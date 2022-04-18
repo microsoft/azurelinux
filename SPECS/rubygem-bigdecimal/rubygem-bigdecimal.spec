@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/ruby/bigdecimal
-Source0:        https://github.com/ruby/bigdecimal/archive/refs/tags/v%{version}.tar.gz#/downloads/%{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/ruby/bigdecimal/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)

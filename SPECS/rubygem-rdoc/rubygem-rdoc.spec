@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 %global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 %global gem_name rdoc
-Summary:        Modern concurrency tools for Ruby
+Summary:        RDoc produces HTML and command-line documentation for Ruby projects
 Name:           rubygem-rdoc
 Version:        6.4.0
 Release:        1%{?dist}
