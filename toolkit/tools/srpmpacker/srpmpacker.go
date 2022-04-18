@@ -457,7 +457,6 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, outDir string, nestedSourcesDir, repackAll, runCheck bool) {
 	const (
 		queryFormat         = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
-		queryExclusiveArch  = "%{ARCH}\n[%{EXCLUSIVEARCH}]\n"
 		nestedSourceDirName = "SOURCES"
 	)
 
@@ -523,7 +522,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 		}
 
 		// Sanity check that SRPMS is meant to be built for the machine architecture
-		isCompatible, err := rpm.SpecExclusiveArchIsCompatible(specFile, sourceDir, defines)
+		isCompatible, err := rpm.SpecArchIsCompatible(specFile, sourceDir, defines)
 		if err != nil {
 			result.err = err
 			results <- result
