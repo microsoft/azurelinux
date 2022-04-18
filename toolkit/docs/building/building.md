@@ -210,7 +210,7 @@ To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTAL
 
 ```bash
 # Build the standard ISO with unattended installer
-sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y UNATTENDED_INSTALLER=y
+sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyperv.json REBUILD_TOOLS=y UNATTENDED_INSTALLER=y
 ```
 
 # Further Reading
