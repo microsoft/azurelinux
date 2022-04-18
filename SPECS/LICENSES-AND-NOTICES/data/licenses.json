@@ -2109,6 +2109,7 @@
                 "bcel",
                 "bea-stax",
                 "beust-jcommander",
+                "boringssl",
                 "byaccj",
                 "cal10n",
                 "cglib",
