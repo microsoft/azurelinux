@@ -4,7 +4,7 @@
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 Version:        1.20.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        nginx-njs-0.2.1.tar.gz
 Patch0:         CVE-2009-4487.nopatch
+Patch1:         CVE-2021-3618.patch
 
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
@@ -109,6 +110,9 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Apr 18 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.20.1-3
+- Backport upstream patch for CVE-2021-3618
+
 * Wed Oct 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.1-2
 - Split out "nginx-filesystem" using Fedora 34 spec (license: MIT) as guidance.
 - Removing conflicts with "nginx-mimetypes" over "mime.types".
