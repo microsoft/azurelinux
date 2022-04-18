@@ -151,9 +151,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
 %exclude /module_info.ld
-%ifarch aarch64
-%exclude %{_libdir}/debug/.build-id
-%endif
 
 %changelog
 * Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
