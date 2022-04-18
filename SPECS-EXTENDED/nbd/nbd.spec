@@ -73,6 +73,7 @@ sed -i -e 's/sleep 1/sleep 10/' tests/run/simple_test
 %changelog
 * Sun Apr 17 2022 Muhammad Falak <mwani@microsoft.com> - 3.20-4
 - Disable tests as they hang the ptest pipeline
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.20-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
