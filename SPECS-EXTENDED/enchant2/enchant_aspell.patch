@@ -1,0 +1,29 @@
+diff -rupN --no-dereference enchant-2.2.14/configure.ac enchant-2.2.14-new/configure.ac
+--- enchant-2.2.14/configure.ac	2020-12-11 08:31:29.000000000 +0100
++++ enchant-2.2.14-new/configure.ac	2020-12-14 09:46:17.135973638 +0100
+@@ -210,7 +210,7 @@ build_providers=
+ dnl Standard providers
+ ENCHANT_CHECK_PKG_CONFIG_PROVIDER([hunspell], [HUNSPELL])
+ ENCHANT_CHECK_PKG_CONFIG_PROVIDER([nuspell], [NUSPELL])
+-ENCHANT_CHECK_LIB_PROVIDER([aspell], [ASPELL], [get_aspell_dict_info_list])
++ENCHANT_CHECK_PKG_CONFIG_PROVIDER([aspell], [ASPELL])
+ ENCHANT_CHECK_LIB_PROVIDER([hspell], [HSPELL], [hspell_get_dictionary_path],, [-lz])
+ ENCHANT_CHECK_PKG_CONFIG_PROVIDER([voikko], [VOIKKO], [libvoikko])
+ dnl FIXME: The test below assumes GCC(-compatible) ObjC++ compiler, but
+diff -rupN --no-dereference enchant-2.2.14/providers/Makefile.am enchant-2.2.14-new/providers/Makefile.am
+--- enchant-2.2.14/providers/Makefile.am	2020-02-27 14:05:18.000000000 +0100
++++ enchant-2.2.14-new/providers/Makefile.am	2020-12-14 09:46:17.135973638 +0100
+@@ -12,6 +12,7 @@ AM_LDFLAGS = -module -avoid-version -no-
+ if WITH_ASPELL
+ provider_LTLIBRARIES += enchant_aspell.la
+ endif
++enchant_aspell_la_LIBADD = $(ASPELL_LIBS)
+ 
+ if WITH_HSPELL
+ provider_LTLIBRARIES += enchant_hspell.la
+diff -rupN --no-dereference enchant-2.2.14/tests/test.pwl.orig enchant-2.2.14-new/tests/test.pwl.orig
+--- enchant-2.2.14/tests/test.pwl.orig	2017-02-04 18:34:34.000000000 +0100
++++ enchant-2.2.14-new/tests/test.pwl.orig	1970-01-01 01:00:00.000000000 +0100
+@@ -1,2 +0,0 @@
+-hello
+-tag
