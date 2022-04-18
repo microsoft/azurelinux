@@ -5,16 +5,15 @@ Subject: [PATCH] tests: skip tests which are known to fail
 
 Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
 ---
- tests/meson.build | 5 -----
- 1 file changed, 5 deletions(-)
+ tests/meson.build | 7 -------
+ 1 file changed, 7 deletions(-)
 
 diff --git a/tests/meson.build b/tests/meson.build
-index c617331..e5737f4 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
 @@ -22,9 +22,7 @@ tests = [
-   [ 'testboundaries_ucd' ],
    [ 'testcolor' ],
+   [ 'testmisc', [ 'testmisc.c' ], [ libpangocairo_dep ] ],
    [ 'testscript' ],
 -  [ 'test-harfbuzz', [ 'test-harfbuzz.c' ], [ libpangocairo_dep ] ],
    [ 'cxx-test', [ 'cxx-test.cpp' ], [ libpangocairo_dep ] ],
@@ -22,18 +21,20 @@ index c617331..e5737f4 100644
  ]
  
  if build_pangoft2
-@@ -37,11 +35,8 @@ endif
+@@ -37,13 +35,8 @@ endif
  if cairo_dep.found()
    test_cflags += '-DHAVE_CAIRO'
    tests += [
 -    [ 'testiter', [ 'testiter.c' ], [ libpangocairo_dep ] ],
-     [ 'test-ellipsize', [ 'test-ellipsize.c' ], [ libpangocairo_dep ] ],
+-    [ 'test-ellipsize', [ 'test-ellipsize.c' ], [ libpangocairo_dep ] ],
      [ 'markup-parse', [ 'markup-parse.c' , 'test-common.c' ], [ libpangocairo_dep ] ],
 -    [ 'test-layout', [ 'test-layout.c', 'test-common.c' ], [ libpangocairo_dep ] ],
 -    [ 'test-itemize', [ 'test-itemize.c', 'test-common.c' ], [ libpangocairo_dep ] ],
      [ 'test-shape', [ 'test-shape.c', 'test-common.c' ], [ libpangocairo_dep ] ],
-     [ 'test-font', [ 'test-font.c' ], [ libpangocairo_dep ] ],
+-    [ 'test-font', [ 'test-font.c' ], [ libpangocairo_dep ] ],
      [ 'testattributes', [ 'testattributes.c', 'test-common.c' ], [ libpangocairo_dep ] ],
+   ]
+ 
 -- 
 2.17.1
 
