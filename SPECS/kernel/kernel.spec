@@ -425,6 +425,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
   2022-1011, 2022-26490, 2021-4002
 - Enable MANA driver config
+- Address CVEs 2022-0995, 2022-1055, 2022-27666
 
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
 - Add Dell devices support
