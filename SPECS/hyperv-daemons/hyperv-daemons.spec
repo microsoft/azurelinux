@@ -103,7 +103,7 @@ BuildArch:      noarch
 Contains tools and scripts useful for Hyper-V guests.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
 %build
 pushd tools/hv
