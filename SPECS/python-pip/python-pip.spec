@@ -34,7 +34,7 @@ BuildRequires:  python-xml
 The PyPA recommended tool for installing Python packages.
 
 %prep
-%autosetup -n pip-%{version}
+%autosetup -p1 -n pip-%{version}
 tar -xf %{SOURCE1}
 
 %build
