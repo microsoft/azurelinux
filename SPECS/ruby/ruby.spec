@@ -60,8 +60,8 @@ Summary:        The Ruby standard for packaging ruby libraries
 Version:        %{rubygems_version}
 License:        Ruby OR MIT
 Requires:       ruby(release)
-Recommends:     rubygem(io-console)
-Recommends:     rubygem(rdoc)
+Recommends:     rubygem-io-console
+Recommends:     rubygem-rdoc
 Provides:       gem = %{rubygems_version}
 Provides:       ruby(rubygems) = %{rubygems_version}
 # https://github.com/rubygems/rubygems/pull/1189#issuecomment-121600910
@@ -78,8 +78,8 @@ Version:        %{rubygems_version}
 License:        Ruby OR MIT
 Requires:       ruby(rubygems) >= %{rubygems_version}
 # Needed for RDoc documentation format generation.
-Requires:       rubygem(json)
-Requires:       rubygem(rdoc)
+Requires:       rubygem-json
+Requires:       rubygem-rdoc
 BuildArch:      noarch
 
 %description -n rubygems-devel
