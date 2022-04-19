@@ -311,7 +311,7 @@ func ResolveCompetingPackages(rpmPaths ...string) (resolvedRPMs []string, err er
 	return
 }
 
-// SpecExclusiveArchIsCompatible verifies ExclusiveArch tag is compatible with the current machine's architecture.
+// SpecExclusiveArchIsCompatible verifies the "ExclusiveArch" tag is compatible with the current machine's architecture.
 func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
 	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH} ]\n"
 
@@ -337,6 +337,47 @@ func SpecExclusiveArchIsCompatible(specfile, sourcedir string, defines map[strin
 	if strings.Contains(exclusiveArchList[exclusiveArchField], exclusiveArchList[machineArchField]) {
 		isCompatible = true
 		return
+	}
+
+	return
+}
+
+// SpecExcludeArchIsCompatible verifies the "ExcludeArch" tag is compatible with the current machine's architecture.
+func SpecExcludeArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
+	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUDEARCH} ]\n"
+
+	const (
+		machineArchField   = iota
+		excludeArchField   = iota
+		minimumFieldsCount = iota
+	)
+
+	excludedArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArch, defines, QueryHeaderArgument)
+	if err != nil {
+		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
+		return
+	}
+
+	// If the list does not return enough lines then there is no excluded architectures set.
+	if len(excludedArchList) < minimumFieldsCount {
+		isCompatible = true
+		return
+	}
+
+	isCompatible = !strings.Contains(excludedArchList[excludeArchField], excludedArchList[machineArchField])
+
+	return
+}
+
+// SpecArchIsCompatible verifies the spec is buildable on the current machine's architecture.
+func SpecArchIsCompatible(specfile, sourcedir string, defines map[string]string) (isCompatible bool, err error) {
+	isCompatible, err = SpecExclusiveArchIsCompatible(specfile, sourcedir, defines)
+	if err != nil {
+		return
+	}
+
+	if isCompatible {
+		return SpecExcludeArchIsCompatible(specfile, sourcedir, defines)
 	}
 
 	return

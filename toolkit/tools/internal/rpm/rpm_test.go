@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestShouldSucceedForSupportedArchitectures(t *testing.T) {
+func TestExclusiveArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "supported_unsupported_architectures.spec")
 
 	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
@@ -32,7 +32,7 @@ func TestShouldSucceedForSupportedArchitectures(t *testing.T) {
 	assert.True(t, matches)
 }
 
-func TestShouldSucceedForNoExclusiveArch(t *testing.T) {
+func TestExclusiveArchCheckShouldSucceedForNoExclusiveArch(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "no_exclusive_architecture.spec")
 
 	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
@@ -40,10 +40,58 @@ func TestShouldSucceedForNoExclusiveArch(t *testing.T) {
 	assert.True(t, matches)
 }
 
-func TestShouldFailForUnsupportedArchitectures(t *testing.T) {
+func TestExclusiveArchCheckShouldFailForUnsupportedArchitectures(t *testing.T) {
 	specFilePath := filepath.Join(specsDir, "unsupported_architectures.spec")
 
 	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, defines)
+	assert.NoError(t, err)
+	assert.False(t, matches)
+}
+
+func TestExcludedArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "supported_unsupported_architectures.spec")
+
+	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, defines)
+	assert.NoError(t, err)
+	assert.True(t, matches)
+}
+
+func TestExcludedArchShouldSucceedForNoExcludedArch(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "no_exclusive_architecture.spec")
+
+	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, defines)
+	assert.NoError(t, err)
+	assert.True(t, matches)
+}
+
+func TestExcludedArchShouldFailForExcludedArchitectures(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "unsupported_architectures.spec")
+
+	matches, err := SpecExcludeArchIsCompatible(specFilePath, specsDir, defines)
+	assert.NoError(t, err)
+	assert.False(t, matches)
+}
+
+func TestArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "supported_unsupported_architectures.spec")
+
+	matches, err := SpecArchIsCompatible(specFilePath, specsDir, defines)
+	assert.NoError(t, err)
+	assert.True(t, matches)
+}
+
+func TestArchShouldSucceedForNoExcludedArch(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "no_exclusive_architecture.spec")
+
+	matches, err := SpecArchIsCompatible(specFilePath, specsDir, defines)
+	assert.NoError(t, err)
+	assert.True(t, matches)
+}
+
+func TestArchShouldFailForExcludedArchitectures(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "unsupported_architectures.spec")
+
+	matches, err := SpecArchIsCompatible(specFilePath, specsDir, defines)
 	assert.NoError(t, err)
 	assert.False(t, matches)
 }
