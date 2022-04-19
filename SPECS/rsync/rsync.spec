@@ -63,7 +63,7 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/rsyncd.conf
 
 %changelog
-* Wed Apr 14 2022 Chris Co <chrco@microsoft.com> - 3.2.3-2
+* Thu Apr 14 2022 Chris Co <chrco@microsoft.com> - 3.2.3-2
 - Add patch for CVE-2020-14387
 
 * Tue Jan 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2.3-1
