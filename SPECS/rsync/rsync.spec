@@ -8,13 +8,13 @@ Distribution:   Mariner
 Group:          Appication/Internet
 URL:            https://rsync.samba.org/
 Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz
+Patch0:         CVE-2020-14387.patch
 BuildRequires:  lz4-devel
 BuildRequires:  systemd
 BuildRequires:  zlib-devel
 Requires:       lz4
 Requires:       systemd
 Requires:       zlib
-Patch0:         CVE-2020-14387.patch
 
 %description
 Rsync is a fast and extraordinarily versatile file copying tool. It can copy locally, to/from another host over any remote shell, or to/from a remote rsync daemon. It offers a large number of options that control every aspect of its behavior and permit very flexible specification of the set of files to be copied. It is famous for its delta-transfer algorithm, which reduces the amount of data sent over the network by sending only the differences between the source files and the existing files in the destination. Rsync is widely used for backups and mirroring and as an improved copy command for everyday use.
