@@ -1,13 +1,14 @@
 Summary:        C++ xml parser.
 Name:           xerces-c
 Version:        3.2.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            http://xerces.apache.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://archive.apache.org/dist/xerces/c/3/sources/%{name}-%{version}.tar.gz
+Patch0:         CVE-2018-1311.patch
 
 Requires:       libstdc++
 %description
@@ -22,7 +23,8 @@ Requires:       %{name} = %{version}-%{release}
 This package contains development headers and static library for xml parser.
 
 %prep
-%setup -q
+%autosetup -p1
+
 %build
 ./configure --prefix=/usr
 make %{?_smp_mflags}
@@ -48,6 +50,8 @@ make %{?_smp_mflags} check
 %{_libdir}/*.la
 
 %changelog
+*   Mon Apr 18 2022 Henry Beberman <henry.beberman@microsoft.com> 3.2.3-2
+-   Patch CVE-2018-1311 by disabling the Janitor for DTD
 *   Thu May 28 2020 Andrew Phelps <anphel@microsoft.com> 3.2.3-1
 -   Update to version 3.2.3 to fix CVE-2018-1311
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.2.2-2
