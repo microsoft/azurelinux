@@ -379,7 +379,6 @@ build_rpm_in_chroot_no_install cracklib
 
 # pam needs cracklib
 chroot_and_install_rpms cracklib
-
 build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
@@ -392,10 +391,8 @@ build_rpm_in_chroot_no_install libxslt
 chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
 
-# gtest needs cmake
+# libsolv needs cmake
 chroot_and_install_rpms cmake
-build_rpm_in_chroot_no_install gtest
-
 build_rpm_in_chroot_no_install libsolv
 
 # glib needs perl-XML-Parser, python3-xml, gtk-doc, meson, libselinux
@@ -405,8 +402,6 @@ chroot_and_install_rpms perl-XML-Parser
 chroot_and_install_rpms python3-libxml2
 build_rpm_in_chroot_no_install itstool
 
-# ninja-build requires gtest
-chroot_and_install_rpms gtest
 build_rpm_in_chroot_no_install ninja-build
 
 # meson requires ninja-build, gettext
@@ -474,7 +469,7 @@ build_rpm_in_chroot_no_install pinentry
 build_rpm_in_chroot_no_install tdnf
 
 # Build createrepo_c
-# createrepo_c needs file, glib
+# createrepo_c needs cmake, file, glib
 chroot_and_install_rpms file
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
