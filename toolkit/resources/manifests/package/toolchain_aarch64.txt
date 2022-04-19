@@ -27,6 +27,7 @@ check-0.15.2-1.cm2.aarch64.rpm
 check-debuginfo-0.15.2-1.cm2.aarch64.rpm
 chkconfig-1.20-3.cm2.aarch64.rpm
 chkconfig-debuginfo-1.20-3.cm2.aarch64.rpm
+chkconfig-lang-1.20-3.cm2.aarch64.rpm
 cmake-3.21.4-2.cm2.aarch64.rpm
 cmake-debuginfo-3.21.4-2.cm2.aarch64.rpm
 coreutils-8.32-3.cm2.aarch64.rpm
@@ -116,6 +117,7 @@ gmp-debuginfo-6.2.1-2.cm2.aarch64.rpm
 gmp-devel-6.2.1-2.cm2.aarch64.rpm
 gnupg2-2.3.3-3.cm2.aarch64.rpm
 gnupg2-debuginfo-2.3.3-3.cm2.aarch64.rpm
+gnupg2-lang-2.3.3-3.cm2.aarch64.rpm
 gperf-3.1-4.cm2.aarch64.rpm
 gperf-debuginfo-3.1-4.cm2.aarch64.rpm
 gpgme-1.16.0-1.cm2.aarch64.rpm
@@ -251,6 +253,7 @@ ncurses-term-6.2-5.cm2.aarch64.rpm
 newt-0.52.21-4.cm2.aarch64.rpm
 newt-debuginfo-0.52.21-4.cm2.aarch64.rpm
 newt-devel-0.52.21-4.cm2.aarch64.rpm
+newt-lang-0.52.21-4.cm2.aarch64.rpm
 ninja-build-1.10.2-1.cm2.aarch64.rpm
 ninja-build-debuginfo-1.10.2-1.cm2.aarch64.rpm
 npth-1.6-4.cm2.aarch64.rpm
