@@ -284,8 +284,6 @@ Patch1235:      CVE-2022-26490.nopatch
 Patch1236:      CVE-2022-26878.nopatch
 Patch1237:      CVE-2022-26966.nopatch
 Patch1238:      CVE-2022-27223.nopatch
-Patch1239:      CVE-2022-1055.nopatch
-Patch1240:      CVE-2022-27666.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -641,6 +639,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Fri Apr 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.109.1-2
 - Remove hardcoded mariner.pem from configs and instead insert during
   the build phase
+- Address CVE-2022-1055, CVE-2022-27666, CVE-2022-0955, CVE-2022-44879
 
 * Tue Mar 29 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.10.109.1-1
 - Update source to 5.10.109.1
