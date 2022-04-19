@@ -303,8 +303,8 @@ generate_pkggen_core () {
         grep "^which-" $TmpPkgGen
         grep "^libselinux-" $TmpPkgGen
         grep "^slang-[0-9]" $TmpPkgGen
-        grep "^newt-[0-9]" $TmpPkgGen
-        grep "^chkconfig-[0-9]" $TmpPkgGen
+        grep "^newt-" $TmpPkgGen
+        grep "^chkconfig-" $TmpPkgGen
         grep "^msopenjdk-" $TmpPkgGen
         grep "^pyproject-" $TmpPkgGen
         grep "^audit-" $TmpPkgGen
