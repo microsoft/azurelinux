@@ -13464,8 +13464,8 @@
         "type": "other",
         "other": {
           "name": "pango",
-          "version": "1.44.7",
-          "downloadUrl": "https://download.gnome.org/sources/pango/1.44/pango-1.44.7.tar.xz"
+          "version": "1.45.5",
+          "downloadUrl": "https://download.gnome.org/sources/pango/1.45/pango-1.45.5.tar.xz"
         }
       }
     },
