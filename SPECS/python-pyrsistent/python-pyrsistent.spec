@@ -1,52 +1,35 @@
-%{!?python3_sitearch: %define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-%{!?py3_build: %define py3_build CFLAGS="%{optflags}" %{__python3} setup.py build}
-%{!?py3_install: %define py3_install %{__python3} setup.py install --skip-build --root %{buildroot}}
-
 %global pypi_name pyrsistent
+Summary:        Persistent/Functional/Immutable data structures
+Name:           python-%{pypi_name}
+Version:        0.18.1
+Release:        1%{?dist}
+License:        MIT
+Vendor:         Microsoft
+Distribution:   Mariner
+URL:            https://github.com/tobgu/pyrsistent/
+Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 
-%global common_description %{expand:
+%description
+Persistent/Functional/Immutable data structures
+
+%package -n     python3-%{pypi_name}
+%{?python_provide:%python_provide python3-%{pypi_name}}
+Summary:        Persistent/Functional/Immutable data structures
+
+%description -n python3-%{pypi_name}
 Pyrsistent is a number of persistent collections (by some referred to as
 functional data structures). Persistent in the sense that they are
 immutable.
 
 All methods on a data structure that would normally mutate it instead
 return a new copy of the structure containing the requested updates. The
-original structure is left untouched.}
-
-Name:           python-%{pypi_name}
-Summary:        Persistent/Functional/Immutable data structures
-Version:        0.17.3
-Release:        2%{?dist}
-License:        MIT
-URL:            http://github.com/tobgu/pyrsistent/
-Vendor:         Microsoft
-Distribution:   Mariner
-Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-# relax dependencies specified in setup.py
-Patch0:         00-relax-dependencies.patch
-BuildRequires:  gcc
-BuildRequires:  python3-devel
-BuildRequires:  python3-hypothesis
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-runner
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
-BuildRequires:  python3-xml
-
-%description %{common_description}
-
-%package -n     python3-%{pypi_name}
-Summary:        %{summary}
-
-%{?python_provide:%python_provide python3-%{pypi_name}}
-
-%description -n python3-%{pypi_name} %{common_description}
+original structure is left untouched.
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1
-
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
@@ -57,20 +40,26 @@ rm -rf %{pypi_name}.egg-info
 %py3_install
 
 %check
-%{__python3} setup.py test
+pip3 install tox
+tox -e py%{python3_version_nodots}
 
 %files -n python3-%{pypi_name}
 %doc README.rst
-%license LICENCE.mit
-
+%license LICENSE.mit
 %{python3_sitearch}/_pyrsistent_version.py
 %{python3_sitearch}/__pycache__/*
-
 %{python3_sitearch}/%{pypi_name}/
 %{python3_sitearch}/pvectorc.cpython-3*.so
 %{python3_sitearch}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.18.1-1
+- Upgrade to latest upstream version
+- Use tox to run tests and pull test dependencies from PyPI
+- Promoted to Mariner Core
+- License verified
+- Lint spec
+
 * Thu Oct 22 2020 Steve Laughman <steve.laughman@microsoft.com> - 0.17.3-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 

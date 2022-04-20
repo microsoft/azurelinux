@@ -1,7 +1,7 @@
 Summary:        An implementation of JSON Schema validation for Python
 Name:           python-jsonschema
-Version:        2.6.0
-Release:        6%{?dist}
+Version:        4.4.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,15 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jsonschema
 Source0:        https://pypi.python.org/packages/source/j/jsonschema/jsonschema-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-wheel
+%if %{with_check}
+BuildRequires:  python3-attrs
+BuildRequires:  python3-pip
+BuildRequires:  python3-pyrsistent
+%endif
 
 %description
 jsonschema is JSON Schema validator currently based on
@@ -16,11 +25,9 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 
 %package -n     python3-jsonschema
 Summary:        An implementation of JSON Schema validation for Python
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-vcversioner
-BuildRequires:  python3-xml
 Requires:       python3
+Requires:       python3-attrs
+Requires:       python3-pyrsistent
 
 %description -n python3-jsonschema
 jsonschema is JSON Schema validator currently based on
@@ -30,14 +37,15 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 %autosetup -n jsonschema-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 
 %check
-%python3 setup test
+pip3 install tox
+tox --sitepackages -e py%{python3_version_nodots} 
 
 %files -n python3-jsonschema
 %defattr(-,root,root)
@@ -47,6 +55,10 @@ ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 %{_bindir}/jsonschema3
 
 %changelog
+* Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.4.0-1
+- Upgrade to latest upstream version
+- Use tox to run tests
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
 - Remove python2 package
 - Lint spec

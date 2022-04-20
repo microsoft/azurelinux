@@ -20114,8 +20114,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonschema",
-          "version": "2.6.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
+          "version": "4.4.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-4.4.0.tar.gz"
         }
       }
     },
@@ -20804,8 +20804,8 @@
         "type": "other",
         "other": {
           "name": "python-pyrsistent",
-          "version": "0.17.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyrsistent/pyrsistent-0.17.3.tar.gz"
+          "version": "0.18.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyrsistent/pyrsistent-0.18.1.tar.gz"
         }
       }
     },
