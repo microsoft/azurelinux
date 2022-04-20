@@ -2536,7 +2536,6 @@
                 "polkit",
                 "popt",
                 "postgresql",
-                "powershell",
                 "procps-ng",
                 "protobuf",
                 "protobuf-c",
