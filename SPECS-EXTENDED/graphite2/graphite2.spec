@@ -88,6 +88,7 @@ ctest
 %changelog
 * Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.14-3
 - Add an explicit BR on pip to enable ptest
+- License verified
 
 * Tue Mar 30 2021 Henry Li <lihl@microsoft.com> - 1.3.14-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
