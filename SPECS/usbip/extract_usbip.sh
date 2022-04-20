@@ -1,10 +1,10 @@
 #!/bin/sh
 if [ "q$1" == "q" ]; then
-	echo "Usage: $0 <kernel version>"
+	echo "Usage: $0 <kernel tar path>"
 	exit 1
 fi
 echo "Extracting linux source"
-tar -xvf "$1".tar.gz
+tar -xvf $1
 if [ "$?" -ne "0" ]; then
 	echo "Error extracting kernel source"
 	exit 1
