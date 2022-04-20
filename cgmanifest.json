@@ -18984,8 +18984,8 @@
         "type": "other",
         "other": {
           "name": "pycairo",
-          "version": "1.18.2",
-          "downloadUrl": "https://github.com/pygobject/pycairo/releases/download/v1.18.2/pycairo-1.18.2.tar.gz"
+          "version": "1.21.0",
+          "downloadUrl": "https://github.com/pygobject/pycairo/releases/download/v1.21.0/pycairo-1.21.0.tar.gz"
         }
       }
     },
