@@ -1,13 +1,13 @@
 Summary:        library for laying out and rendering of text.
 Name:           pango
-Version:        1.44.7
-Release:        3%{?dist}
+Version:        1.45.5
+Release:        1%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://pango.org
-Source0:        https://download.gnome.org/sources/pango/1.44/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/pango/1.45/%{name}-%{version}.tar.xz
 Patch0:         0001-skip-tests-which-are-known-to-fail.patch
 BuildRequires:  cairo-devel
 BuildRequires:  fontconfig
@@ -66,6 +66,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Apr 17 2022 Muhammad Falak <mwani@microsoft.com> - 1.45.5-1
+- Bump version to 1.45.5 to address CVE-2019-1010238
+
 * Thu Feb 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.44.7-3
 - Use 'meson test' instead of 'make check'
 - Introduce patch to skip tests that are known to fail
