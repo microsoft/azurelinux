@@ -135,6 +135,7 @@ rmdir $RPM_BUILD_ROOT%{_libdir}
 %changelog
 * Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.9.6-5
 - Skip broken test to enable ptest
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.9.6-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
