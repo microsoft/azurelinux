@@ -53,7 +53,7 @@ make test
 %{python3_sitelib}/*
 
 %changelog
-* Wed Apr 13 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.8.0-1
+* Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.8.0-1
 - Upgrade to latest upstream version
 - Fixes CVE-2018-19787, CVE-2020-27783, CVE-2021-28957, CVE-2021-43818
 
