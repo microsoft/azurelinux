@@ -11954,7 +11954,7 @@
         "other": {
           "name": "ncurses",
           "version": "6.2",
-          "downloadUrl": "ftp://ftp.invisible-island.net/ncurses/ncurses-6.2.tar.gz"
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/ncurses-6.2.tar.gz"
         }
       }
     },
