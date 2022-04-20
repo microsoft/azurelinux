@@ -25,8 +25,8 @@ Release:        30%{?dist}
 Summary:        Public interfaces useful for applications to support RELAX Core
 License:        Apache-2.0 AND MIT
 Group:          Development/Libraries/Java
-URL:            http://iso-relax.sourceforge.net/
-Source0:        %{name}.%{cvsversion}.zip
+URL:            https://iso-relax.sourceforge.net/
+Source0:        https://sourceforge.net/projects/iso-relax/files/package/2004_11_11/%{name}.%{cvsversion}.zip
 Source1:        %{name}-build.xml
 Source2:        isorelax-maven-project.xml
 Source3:        isorelax-maven-project.xsd

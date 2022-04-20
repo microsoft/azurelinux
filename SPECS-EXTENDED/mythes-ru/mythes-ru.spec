@@ -7,7 +7,7 @@ Version: 0.%{upstreamid}
 Release: 22%{?dist}
 # Below source link is dead now
 # Source: http://download.i-rs.ru/pub/openoffice/dict/thes_ru_RU_v2.zip
-Source: thes_ru_RU_v2.zip
+Source: https://cblmarinerstorage.blob.core.windows.net/sources/core/thes_ru_RU_v2.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries
 BuildRequires: unzip
 License: LGPLv2+

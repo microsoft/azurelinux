@@ -7,8 +7,7 @@ Version: 7.5.3
 Release: 3%{?dist}
 License: MIT
 URL: http://www.logwatch.org/
-Source0: logwatch-%{version}.tar.gz
-#Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0: https://sourceforge.net/projects/%{name}/files/%{name}-%{version}/%{name}-%{version}.tar.gz
 # Temporary fix for update to DNF 4.4
 Source1: dnf-rpm.conf
 BuildRequires: perl-generators

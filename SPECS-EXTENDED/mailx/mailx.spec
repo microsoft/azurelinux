@@ -12,7 +12,7 @@ License: BSD with advertising and MPLv1.1
 URL: http://heirloom.sourceforge.net/mailx.html
 # Mailx's upstream provides only the CVS method of downloading source code.
 # Use get-upstream-tarball.sh script to download current version of mailx.
-Source0: mailx-%{version}.tar.xz
+Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/mailx-%{version}.tar.xz
 Source1: get-upstream-tarball.sh
 
 Patch0: nail-11.25-config.patch

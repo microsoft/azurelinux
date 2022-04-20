@@ -28,7 +28,7 @@ License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            http://stax.codehaus.org/Home
 # http://dist.codehaus.org/stax/distributions/stax-src-%{version}.zip
-Source0:        stax-src-%{version}.zip
+Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/stax-src-%{version}.zip
 # http://dist.codehaus.org/stax/jars/stax-%{version}.pom
 Source1:        stax-%{version}.pom
 # http://dist.codehaus.org/stax/jars/stax-api-%{apiver}.pom

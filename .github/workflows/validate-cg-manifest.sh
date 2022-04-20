@@ -11,12 +11,25 @@
 
 # $@ - Paths to spec files to check
 
+# List of ignored specs due to no source tarball to scan.
+ignore_no_source_tarball=" \
+  ca-certificates \
+  core-packages \
+  ghc-srpm-macros \
+  hunspell-nl \
+  hunspell-ru \
+  hyphen-grc \
+  hyphen-hsb \
+  hyphen-lt \
+  hyphen-mn \
+  lua-rpm-macros \
+  mariner-repos \
+  mariner-rpm-macros"
+
 # Ignore some specs, mostly those with Source0 files that are not from an external source, or have very odd URLs
 ignore_list=" \
   appstream-data \
   byacc \
-  ca-certificates \
-  core-packages \
   Cython \
   dbus-x11 \
   geronimo-specs \
@@ -31,9 +44,6 @@ ignore_list=" \
   kernel-signed-x86_64 \
   kf5 \
   lcms2 \
-  lua-rpm-macros \
-  mariner-repos \
-  mariner-rpm-macros \
   moby-buildx \
   moby-containerd \
   multilib-rpm-config \
@@ -86,7 +96,7 @@ do
   fi
 
   # Some specs don't make sense to add, ignore them
-  if echo "$ignore_list" | grep -w "$name" > /dev/null
+  if echo "$ignore_list $ignore_no_source_tarball" | grep -w "$name" > /dev/null
   then
     echo "    $name is being ignored, skipping"
     continue

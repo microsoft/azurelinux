@@ -1,15 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+%global upstream_commit cec10c6cad4804d391df31d0be8e429e2231feb5
 %global upstreamid 20110915
 
 Name: hyphen-sa
 Summary: Sanskrit hyphenation rules
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
-#Source0: http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-sa.tex?view=co
-Source0: hyph-sa.tex
+Source0: https://github.com/hyphenation/tex-hyphen/blob/%{upstream_commit}/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-sa.tex
 Source1: %{name}-LICENSE.txt
-URL: http://tug.org/tex-hyphen
+URL: https://github.com/hyphenation/tex-hyphen
 License: LPPL
 BuildArch: noarch
 BuildRequires: hyphen-devel

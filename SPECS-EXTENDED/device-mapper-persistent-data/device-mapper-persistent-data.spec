@@ -10,8 +10,9 @@ Version: 0.8.5
 Release: 4%{?dist}
 License: GPLv3+
 URL: https://github.com/jthornber/thin-provisioning-tools
-#Source0: https://github.com/jthornber/thin-provisioning-tools/archive/thin-provisioning-tools-% {version}.tar.gz
-Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Upstream source's hash is different from the Mariner one.
+# Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}.tar.gz
+Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.gz
 Patch0: device-mapper-persistent-data-avoid-strip.patch
 
 BuildRequires: autoconf, expat-devel, libaio-devel, libstdc++-devel, boost-devel, gcc-c++

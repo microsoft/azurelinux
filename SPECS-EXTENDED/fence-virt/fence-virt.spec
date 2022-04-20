@@ -18,7 +18,7 @@ Version: 1.0.0
 Release: 2%{?dist}
 License: GPLv2+
 URL:     https://github.com/ClusterLabs/fence-virt
-Source0: %{name}-%{version}%{?rcver:%{rcver}}%{?numcomm:.%{numcomm}}%{?alphatag:-%{alphatag}}%{?dirty:-%{dirty}}.tar.bz2
+Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.bz2
 
 %if 0%{?suse_version}
 %define nss_devel mozilla-nss-devel

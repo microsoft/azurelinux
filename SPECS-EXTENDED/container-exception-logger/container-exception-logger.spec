@@ -12,7 +12,7 @@ URL: https://github.com/abrt/container-exception-logger
 # source is created by:
 # git clone https://github.com/abrt/container-exception-logger
 # cd container-exception-logger; tito build --tgz
-Source0: %{name}-%{version}.tar.gz
+Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: asciidoc

@@ -6,7 +6,9 @@ Release:	24%{?dist}
 Summary:	Libraries to parse configuration files
 License:	LGPLv2
 URL:		https://github.com/williamh/dotconf/
-Source:		%{name}-%{version}.tar.gz
+# Upstream source's hash different from the Mariner one.
+# Source: https://github.com/williamh/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:		https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.gz
  
 BuildRequires:	findutils
 BuildRequires:	gcc

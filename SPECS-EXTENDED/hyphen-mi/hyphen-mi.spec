@@ -7,7 +7,7 @@ Version: 0.%{upstreamid}
 Release: 21%{?dist}
 # Source is dead now
 # Source: http://packages.papakupu.maori.nz/hunspell-hyphen/hunspell-hyphen-mi-0.1.%%{upstreamid}-beta.tar.gz
-Source: hunspell-hyphen-mi-0.1.%{upstreamid}-beta.tar.gz
+Source: https://cblmarinerstorage.blob.core.windows.net/sources/core/hunspell-hyphen-mi-0.1.%{upstreamid}-beta.tar.gz
 URL: http://papakupu.maori.nz/
 License: GPLv3+
 BuildArch: noarch

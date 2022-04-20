@@ -8,12 +8,12 @@ License: GPLv3+ and LGPLv2+ and GPLv2+
 URL: http://www.gnu.org/software/enscript
 # Tarball exists nowhere. You have to obtain it via:
 # $ git clone git://git.savannah.gnu.org/enscript.git
-# $ git archive --format=tar --prefix=enscript-1.6.4/ v1.6.4 |gzip > enscript-1.6.4.tar.gz
-Source0: enscript-%{version}.tar.gz
-Source1: enscript-ruby-1.6.4.tar.gz
+# $ git archive --format=tar --prefix=%%{name}-%%{version}/ v%%{version} | gzip > %%{name}-%%{version}.tar.gz
+Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.gz
 #http://neugierig.org/software/ruby/ruby-enscript.tar.gz
-Source2: enscript-php-1.6.4.st
+Source1: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-ruby-1.6.4.tar.gz
 #http://home.raxnet.net/downloads/viewcvs/php.st
+Source2: enscript-php-1.6.4.st
 
 # RH #61294
 Patch3: enscript-1.6.1-locale.patch

@@ -1,13 +1,13 @@
+%global upstream_commit ee22323218150388abdeb36184ad5861e3669b65
+%global upstreamid 20110620
+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: hyphen-tk
 Summary: Turkmen hyphenation rules
-%global upstreamid 20110620
 Version: 0.%{upstreamid}
 Release: 17%{?dist}
-#? in a url causes trouble
-#http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex?view=co
-Source: hyph-tk.tex
+Source: https://github.com/hyphenation/tex-hyphen/blob/%{upstream_commit}/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex
 URL: http://tug.org/tex-hyphen
 License: Public Domain
 BuildArch: noarch

@@ -26,9 +26,9 @@ License:        MIT
 Group:          Development/Libraries/Java
 URL:            http://jsoup.org/
 # ./generate-tarball.sh
-Source0:        %{name}-%{version}.tar.gz
-Source1:        %{name}-build.xml
 # The sources contain non-free scraped web pages as test data
+Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.gz
+Source1:        %{name}-build.xml
 Source100:      generate-tarball.sh
 BuildRequires:  ant
 BuildRequires:  fdupes

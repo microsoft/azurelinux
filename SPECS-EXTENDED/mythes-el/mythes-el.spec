@@ -8,7 +8,7 @@ Release: 24%{?dist}
 # below links are dead and can't find any mirror for it
 # please don't report any FTBFS bugs
 #Source: http://www.ellak.gr/pub/oo_extras/th_el.zip
-Source: th_el.zip
+Source: https://cblmarinerstorage.blob.core.windows.net/sources/core/th_el.zip
 URL: wiki.services.openoffice.org/wiki/Dictionaries
 License: GPLv2+
 BuildArch: noarch

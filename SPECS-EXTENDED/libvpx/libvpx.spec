@@ -10,7 +10,6 @@ Summary:		VP8/VP9 Video Codec SDK
 Version:		1.8.2
 Release:		3%{?dist}
 License:		BSD
-#Source0:		http://downloads.webmproject.org/releases/webm/%{name}-%{version}.tar.bz2
 Source0:		https://github.com/webmproject/libvpx/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:		vpx_config.h
 # Thanks to debian.

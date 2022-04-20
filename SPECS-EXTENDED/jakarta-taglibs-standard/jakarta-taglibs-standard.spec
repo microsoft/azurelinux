@@ -26,7 +26,9 @@ Summary:        Open Source Implementation of the JSP Standard Tag Library
 License:        Apache-2.0
 Group:          Development/Libraries/Java
 Url:            http://tomcat.apache.org/taglibs/
-Source0:        jakarta-taglibs-standard-%{version}-src.tar.bz2
+# Need to switch to upstream's source tarball:
+# https://archive.apache.org/dist/jakarta/taglibs/standard/source/jakarta-taglibs-standard-1.1.1-src.tar.gz
+Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/jakarta-taglibs-standard-%{version}-src.tar.bz2
 Patch0:         %{name}-%{version}-build.patch
 Patch1:         %{name}-java6-compatibility.patch
 Patch2:         %{name}-%{version}-remove-enums.patch
