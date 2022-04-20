@@ -4,7 +4,7 @@
 Summary:        OpenSSL provides SSL, TLS and general purpose cryptography
 Name:           rubygem-openssl
 Version:        3.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +13,6 @@ URL:            https://github.com/ruby/openssl
 Source0:        https://github.com/ruby/openssl/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
-Provides:       rubygem-openssl = %{version}-%{release}
 Provides:       rubygem(openssl) = %{version}-%{release}
 
 %description
@@ -37,6 +36,9 @@ cp LICENSE.txt %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.0-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.0-1
 - License verified
 - Included descriptions from Fedora 33 spec (license: MIT).

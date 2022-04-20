@@ -4,7 +4,7 @@
 Summary:        An xUnit family unit testing framework for Ruby
 Name:           rubygem-test-unit
 Version:        3.5.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,6 @@ Source0:        https://github.com/test-unit/test-unit/archive/refs/tags/%{versi
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-power_assert
-Provides:       rubygem-test-unit = %{version}-%{release}
 Provides:       rubygem(test-unit) = %{version}-%{release}
 BuildArch:      noarch
 
@@ -45,6 +44,9 @@ cp PSFL %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-1
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).

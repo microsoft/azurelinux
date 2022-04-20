@@ -4,7 +4,7 @@
 Summary:        Minitest provides a complete suite of testing facilities
 Name:           rubygem-minitest
 Version:        5.13.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,6 @@ Source0:        %{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
-Provides:       rubygem-minitest = %{version}-%{release}
 Provides:       rubygem(minitest) = %{version}-%{release}
 BuildArch:      noarch
 
@@ -46,6 +45,9 @@ cp README.rdoc %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.13.0-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.13.0-1
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).

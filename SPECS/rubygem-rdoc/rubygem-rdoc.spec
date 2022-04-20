@@ -4,7 +4,7 @@
 Summary:        RDoc produces HTML and command-line documentation for Ruby projects
 Name:           rubygem-rdoc
 Version:        6.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ cp LEGAL.rdoc %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.4.0-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.4.0-1
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).

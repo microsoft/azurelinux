@@ -4,7 +4,7 @@
 Summary:        Power Assert for Ruby
 Name:           rubygem-power_assert
 Version:        2.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +13,6 @@ URL:            https://github.com/ruby/power_assert/
 Source0:        https://github.com/ruby/power_assert/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
-Provides:       rubygem-power_assert = %{version}-%{release}
 Provides:       rubygem(power_assert) = %{version}-%{release}
 BuildArch:      noarch
 
@@ -41,6 +40,9 @@ cp COPYING %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-1
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).

@@ -4,7 +4,7 @@
 Summary:        Mocking and stubbing library
 Name:           rubygem-mocha
 Version:        1.13.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +13,6 @@ URL:            https://mocha.jamesmead.org/
 Source0:        https://github.com/freerange/mocha/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
-Provides:       rubygem-mocha = %{version}-%{release}
 Provides:       rubygem(mocha) = %{version}-%{release}
 BuildArch:      noarch
 
@@ -40,6 +39,9 @@ cp COPYING.md %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.0-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.0-1
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).

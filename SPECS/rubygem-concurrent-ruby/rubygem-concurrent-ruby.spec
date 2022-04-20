@@ -4,7 +4,7 @@
 Summary:        Modern concurrency tools for Ruby
 Name:           rubygem-concurrent-ruby
 Version:        1.1.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,6 @@ Source0:        https://github.com/ruby-concurrency/concurrent-ruby/archive/refs
 Patch0:         remove_jar.patch
 BuildRequires:  git
 BuildRequires:  ruby
-Provides:       rubygem-concurrent-ruby = %{version}-%{release}
 Provides:       rubygem(concurrent-ruby) = %{version}-%{release}
 
 %description
@@ -37,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.10-1
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).

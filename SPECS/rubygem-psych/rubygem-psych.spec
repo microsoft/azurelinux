@@ -4,7 +4,7 @@
 Summary:        A libyaml wrapper for Ruby
 Name:           rubygem-psych
 Version:        3.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,7 +13,6 @@ URL:            https://github.com/ruby/psych
 Source0:        https://github.com/ruby/psych/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
-Provides:       rubygem-psych = %{version}-%{release}
 Provides:       rubygem(psych) = %{version}-%{release}
 
 %description
@@ -36,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.0-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.0-1
 - License verified
 - Included descriptions from Fedora 33 spec (license: MIT).
