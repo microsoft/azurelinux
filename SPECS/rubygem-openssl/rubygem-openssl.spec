@@ -13,6 +13,7 @@ URL:            https://github.com/ruby/openssl
 Source0:        https://github.com/ruby/openssl/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       openssl = %{version}-%{release}
 Provides:       rubygem(openssl) = %{version}-%{release}
 
 %description

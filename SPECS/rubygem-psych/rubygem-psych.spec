@@ -13,6 +13,7 @@ URL:            https://github.com/ruby/psych
 Source0:        https://github.com/ruby/psych/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       psych = %{version}-%{release}
 Provides:       rubygem(psych) = %{version}-%{release}
 
 %description

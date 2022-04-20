@@ -13,6 +13,7 @@ URL:            https://github.com/ruby/power_assert/
 Source0:        https://github.com/ruby/power_assert/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       power_assert = %{version}-%{release}
 Provides:       rubygem(power_assert) = %{version}-%{release}
 BuildArch:      noarch
 
