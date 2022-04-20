@@ -268,10 +268,15 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 	for _, pkg := range packagesToClone {
 		pkgName := convertPackageVersionToTdnfArg(pkg)
 
+		downloadDir := chrootDownloadDir
+		if !buildpipeline.IsRegularBuild() {
+			downloadDir = cacheRepoDir
+		}
+
 		logger.Log.Debugf("Cloning: %s", pkgName)
 		args := []string{
 			"--destdir",
-			chrootDownloadDir,
+			downloadDir,
 			pkgName,
 		}
 
