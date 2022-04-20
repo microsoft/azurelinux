@@ -14,6 +14,7 @@ Source0:        https://github.com/test-unit/test-unit/archive/refs/tags/%{versi
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-power_assert
+Provides:       rubygem(test-unit) = %{version}-%{release}
 BuildArch:      noarch
 
 %description

@@ -13,6 +13,7 @@ URL:            https://mocha.jamesmead.org/
 Source0:        https://github.com/freerange/mocha/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(mocha) = %{version}-%{release}
 BuildArch:      noarch
 
 %description

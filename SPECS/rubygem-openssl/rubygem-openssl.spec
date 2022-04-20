@@ -13,6 +13,7 @@ URL:            https://github.com/ruby/openssl
 Source0:        https://github.com/ruby/openssl/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(openssl) = %{version}-%{release}
 
 %description
 OpenSSL provides SSL, TLS and general purpose cryptography. It wraps the

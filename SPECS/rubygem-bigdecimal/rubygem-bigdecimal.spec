@@ -14,6 +14,7 @@ Source0:        https://github.com/ruby/bigdecimal/archive/refs/tags/v%{version}
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
+Provides:       rubygem(bigdecimal) = %{version}-%{release}
 
 %description
 Ruby provides built-in support for arbitrary precision integer arithmetic.

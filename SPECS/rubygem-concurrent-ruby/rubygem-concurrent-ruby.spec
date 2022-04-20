@@ -14,6 +14,7 @@ Source0:        https://github.com/ruby-concurrency/concurrent-ruby/archive/refs
 Patch0:         remove_jar.patch
 BuildRequires:  git
 BuildRequires:  ruby
+Provides:       rubygem(concurrent-ruby) = %{version}-%{release}
 
 %description
 Modern concurrency tools including agents, futures, promises,

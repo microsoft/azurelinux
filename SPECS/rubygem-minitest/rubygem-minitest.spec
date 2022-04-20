@@ -15,6 +15,7 @@ Source0:        %{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
+Provides:       rubygem(minitest) = %{version}-%{release}
 BuildArch:      noarch
 
 %description

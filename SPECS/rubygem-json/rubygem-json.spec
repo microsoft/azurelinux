@@ -14,6 +14,7 @@ Source0:        https://github.com/flori/json/archive/refs/tags/v%{version}.tar.
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
+Provides:       rubygem(json) = %{version}-%{release}
 
 %description
 This is a implementation of the JSON specification according to RFC 4627.

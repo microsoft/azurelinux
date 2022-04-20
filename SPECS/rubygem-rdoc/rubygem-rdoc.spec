@@ -19,6 +19,8 @@ Requires:       rubygem-json
 Requires:       rubygem-psych
 Provides:       rdoc = %{version}-%{release}
 Provides:       ri = %{version}-%{release}
+Provides:       rubygem(rdoc) = %{version}-%{release}
+Provides:       rubygem(ri) = %{version}-%{release}
 BuildArch:      noarch
 
 %description
