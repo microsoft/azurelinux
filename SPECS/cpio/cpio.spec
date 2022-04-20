@@ -1,7 +1,7 @@
 Summary:        cpio-2.13
 Name:           cpio
 Version:        2.13
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/cpio/
 Group:          System Environment/System utilities
@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
 Patch0:         cpio_extern_nocommon.patch
+Patch1:         CVE-2021-38185.patch
 
 Conflicts:      toybox
 
@@ -60,6 +61,8 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> 2.13-4
+- Add patch for CVE-2021-38185
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> 2.13-3
 - Add patch for gcc 11 compatability
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.13-2

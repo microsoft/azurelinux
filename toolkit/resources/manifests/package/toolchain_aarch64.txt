@@ -33,9 +33,9 @@ cmake-debuginfo-3.21.4-2.cm2.aarch64.rpm
 coreutils-8.32-3.cm2.aarch64.rpm
 coreutils-debuginfo-8.32-3.cm2.aarch64.rpm
 coreutils-lang-8.32-3.cm2.aarch64.rpm
-cpio-2.13-3.cm2.aarch64.rpm
-cpio-debuginfo-2.13-3.cm2.aarch64.rpm
-cpio-lang-2.13-3.cm2.aarch64.rpm
+cpio-2.13-4.cm2.aarch64.rpm
+cpio-debuginfo-2.13-4.cm2.aarch64.rpm
+cpio-lang-2.13-4.cm2.aarch64.rpm
 cracklib-2.9.7-4.cm2.aarch64.rpm
 cracklib-debuginfo-2.9.7-4.cm2.aarch64.rpm
 cracklib-devel-2.9.7-4.cm2.aarch64.rpm
@@ -514,7 +514,7 @@ python3-gpg-1.16.0-1.cm2.aarch64.rpm
 python3-jinja2-3.0.3-2.cm2.noarch.rpm
 python3-libs-3.9.10-1.cm2.aarch64.rpm
 python3-libxml2-2.9.13-1.cm2.aarch64.rpm
-python3-lxml-4.2.4-11.cm2.aarch64.rpm
+python3-lxml-4.8.0-1.cm2.aarch64.rpm
 python3-magic-5.40-2.cm2.noarch.rpm
 python3-markupsafe-2.1.0-1.cm2.aarch64.rpm
 python3-newt-0.52.21-4.cm2.aarch64.rpm
