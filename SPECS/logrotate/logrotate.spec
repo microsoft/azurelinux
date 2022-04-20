@@ -68,7 +68,6 @@ install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
 - Update to version 3.18.1
 - Add default logrotate systemd service and logrotate.conf
 
-- Add default logrotate systemd service and logrotate.conf
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.16.0-2
 - Added %%license line automatically
 
