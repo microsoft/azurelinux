@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "etcd-3.5.1.tar.gz": "499c3adca699199981cd46e1267dccdd4c34bbc111fc9166dc555cbf9ca91918",
+  "etcd.service": "4550a4967ba35670051cbfd9b4edf1fc57c0f1d7a07e51f88351ac44c76d8066"
+ }
+}
