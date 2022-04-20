@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        7.76.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,11 @@ Patch7:         CVE-2021-22926.nopatch
 Patch8:         CVE-2021-22945.patch
 Patch9:         CVE-2021-22946.patch
 Patch10:        CVE-2021-22947.patch
+Patch11:        CVE-2022-22576.patch
+Patch12:        CVE-2022-27774.patch
+Patch13:        CVE-2022-27775.patch
+Patch14:        CVE-2022-27776.patch
+Patch15:        CVE-2022-27776-supplemental.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -98,6 +103,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.4*
 
 %changelog
+* Tue Apr 26 2022 Henry Beberman <henry.beberman@microsoft.com> - 7.76.0-9
+- Backport upstream patches for CVE-2022-22576, CVE-2022-27774, CVE-2022-27775, CVE-2022-27776
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 7.76.0-8
 - Bump release to build and republish with mariner-rpm-macros fix to filter out references to module_info.ld in pkgconfig files
 
