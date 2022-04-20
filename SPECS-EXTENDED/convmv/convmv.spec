@@ -12,7 +12,9 @@ Patch0: convmv-2.0-preserve-timestamps.patch
 BuildArch: noarch
 BuildRequires: perl-generators
 BuildRequires: perl(Getopt::Long)
+%if %{with_check}
 BuildRequires: perl(File::Find)
+%endif
 
 %description
 This package contains the tool convmv with which you can convert the encodings
@@ -41,6 +43,7 @@ make PREFIX=%{_prefix} DESTDIR=%{buildroot} install
 %changelog
 * Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 2.05-7
 - Add an explicit BR on `perl(File::Find)` to enable ptest
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.05-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
