@@ -1,6 +1,7 @@
 Summary:        Logrotate
 Name:           logrotate
 Version:        3.18.1
+# Add back https://github.com/microsoft/CBL-Mariner/pull/2792 after GA
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
