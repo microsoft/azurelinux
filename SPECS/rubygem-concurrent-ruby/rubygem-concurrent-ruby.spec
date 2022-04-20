@@ -14,7 +14,7 @@ Source0:        https://github.com/ruby-concurrency/concurrent-ruby/archive/refs
 Patch0:         remove_jar.patch
 BuildRequires:  git
 BuildRequires:  ruby
-Provides:       concurrent-ruby = %{version}-%{release}
+Provides:       rubygem-concurrent-ruby = %{version}-%{release}
 Provides:       rubygem(concurrent-ruby) = %{version}-%{release}
 
 %description

@@ -13,7 +13,7 @@ URL:            https://github.com/ruby/io-console
 Source0:        https://github.com/ruby/io-console/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
-Provides:       io-console = %{version}-%{release}
+Provides:       rubygem-io-console = %{version}-%{release}
 Provides:       rubygem(io-console) = %{version}-%{release}
 
 %description

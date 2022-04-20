@@ -14,7 +14,7 @@ Source0:        https://github.com/ruby/bigdecimal/archive/refs/tags/v%{version}
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
-Provides:       bigdecimal = %{version}-%{release}
+Provides:       rubygem-bigdecimal = %{version}-%{release}
 Provides:       rubygem(bigdecimal) = %{version}-%{release}
 
 %description

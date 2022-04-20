@@ -14,7 +14,7 @@ Source0:        https://github.com/flori/json/archive/refs/tags/v%{version}.tar.
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
-Provides:       json = %{version}-%{release}
+Provides:       rubygem-json = %{version}-%{release}
 Provides:       rubygem(json) = %{version}-%{release}
 
 %description
