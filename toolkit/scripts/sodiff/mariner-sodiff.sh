@@ -17,29 +17,30 @@ mkdir -p "$sodiff_out_dir"
 echo > "$sodiff_log_file"
 
 function makecache_with_common {
-    if [[ "$current_os" == mariner ]]; then
-        # Mariner uses DNF repoquery command
-        DNF_COMMAND=dnf
+    cur_os="$1"
+    release_version="$2"
+    if [[ "$cur_os" == mariner ]]; then
         # Cache RPM metadata
-        >/dev/null dnf -c "$1" --releasever $mariner_version -y makecache
+        >/dev/null dnf -c "$3" --releasever $release_version -y makecache
     else
-        # Ubuntu uses repoquery command from yum-utils
-        DNF_COMMAND=
         # Cache RPM metadata
         # Ubuntu does not come with gpgcheck plugin for yum
-        >/dev/null yum -c "$1" --releasever $mariner_version -y --nogpgcheck makecache
+        >/dev/null yum -c "$3" --releasever $release_version -y --nogpgcheck makecache
     fi
 }
 
 function set_common_options {
-    if [[ "$current_os" == mariner ]]; then
+    cur_os="$1"
+    release_version="$2"
+    file_path="$3"
+    if [[ "$cur_os" == mariner ]]; then
         # Mariner uses DNF repoquery command
         DNF_COMMAND=dnf
     else
         # Ubuntu uses repoquery command from yum-utils
         DNF_COMMAND=
     fi
-    common_options="-c $repo_file_path --releasever $mariner_version"
+    common_options="-c $file_path --releasever $release_version"
 }
 
 function log_to_file {
@@ -58,11 +59,11 @@ csplit -z -f 'repo' -b '_%d.repo' "$repo_file_path" '/^\[/' '{*}'
 # Updating cache with each repo info separately.
 for singe_repo_file in repo*.repo
 do
-    makecache_with_common "$single_repo_file"
+    makecache_with_common "$current_os" "$mariner_version" "$single_repo_file"
 done
 
 # Cache created - now we can point to the abridged file.
-set_common_options
+set_common_options "$current_os" "$mariner_version" "$repo_file_path"
 
 log_to_file "Cache created."
 
