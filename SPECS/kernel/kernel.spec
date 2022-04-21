@@ -638,6 +638,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Tue Apr 19 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.111.1-1
 - Update source to 5.10.111.1
+- Enable CONFIG_BPF_UNPRIV_DEFAULT_OFF
 - Address CVE-2021-4023, CVE-2021-4157, CVE-2022-0435, CVE-2022-0998
   CVE-2022-28356, CVE-2022-28388, CVE-2022-28389, CVE-2022-28390, 
   CVE-2021-4203, CVE-2022-0322, CVE-2022-27950, CVE-2021-4148, 
