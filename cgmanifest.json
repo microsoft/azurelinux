@@ -9300,6 +9300,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libsafec",
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/rurban/safeclib/releases/download/v3.7.1/safeclib-3.7.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libsass",
           "version": "3.6.3",
           "downloadUrl": "https://github.com/sass/libsass/archive/3.6.3/libsass-3.6.3.tar.gz"
