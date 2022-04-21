@@ -9,8 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://avahi.org
 Source0:        https://github.com/lathiat/avahi/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-3468.patch
-Patch1:         CVE-2021-3502.patch
+Patch0:         %{name}-libevent-pc-fix.patch
+Patch1:         CVE-2021-3468.patch
+Patch2:         CVE-2021-3502.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
