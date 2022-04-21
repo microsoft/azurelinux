@@ -15,7 +15,7 @@ Distribution:   Mariner
 
 Name:           perl-B-Debug
 Version:        1.26
-Release:        424%{?dist}
+Release:        425%{?dist}
 Summary:        Walk Perl syntax tree, print debug information about op-codes
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/B-Debug
@@ -25,6 +25,7 @@ BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(deprecate)
 # Run-time:
 BuildRequires:  perl(B)
 # B::Asmdata not used
@@ -69,6 +70,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Apr 21 2022 Muhammad Falak <mwani@microsoft.com> - 1.26-425
+- Add an explicit BR on `perl(deprecate)` to enable ptest
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-424
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
