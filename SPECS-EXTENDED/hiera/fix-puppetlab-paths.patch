@@ -1,0 +1,120 @@
+diff -uNr hiera-3.6.0.ORIG/lib/hiera/util.rb hiera-3.6.0/lib/hiera/util.rb
+--- hiera-3.6.0.ORIG/lib/hiera/util.rb	2019-11-13 09:43:32.600045630 +0100
++++ hiera-3.6.0/lib/hiera/util.rb	2019-11-13 09:43:46.007065887 +0100
+@@ -20,7 +20,7 @@
+       if microsoft_windows?
+          File.join(common_appdata, 'PuppetLabs', 'puppet', 'etc')
+       else
+-        '/etc/puppetlabs/puppet'
++        '/etc/puppet'
+       end
+     end
+ 
+@@ -28,7 +28,7 @@
+       if microsoft_windows?
+         File.join(common_appdata, 'PuppetLabs', 'code')
+       else
+-        '/etc/puppetlabs/code'
++        '/etc/puppet/code'
+       end
+     end
+ 
+diff -uNr hiera-3.6.0.ORIG/lib/hiera/util.rb.orig hiera-3.6.0/lib/hiera/util.rb.orig
+--- hiera-3.6.0.ORIG/lib/hiera/util.rb.orig	1970-01-01 01:00:00.000000000 +0100
++++ hiera-3.6.0/lib/hiera/util.rb.orig	2019-10-14 09:59:36.000000000 +0200
+@@ -0,0 +1,65 @@
++class Hiera
++
++  # Matches a key that is quoted using a matching pair of either single or double quotes.
++  QUOTED_KEY = /^(?:"([^"]+)"|'([^']+)')$/
++  QUOTES = /[",]/
++
++  module Util
++    module_function
++
++    def posix?
++      require 'etc'
++      Etc.getpwuid(0) != nil
++    end
++
++    def microsoft_windows?
++      !!file_alt_separator
++    end
++
++    def config_dir
++      if microsoft_windows?
++         File.join(common_appdata, 'PuppetLabs', 'puppet', 'etc')
++      else
++        '/etc/puppetlabs/puppet'
++      end
++    end
++
++    def code_dir
++      if microsoft_windows?
++        File.join(common_appdata, 'PuppetLabs', 'code')
++      else
++        '/etc/puppetlabs/code'
++      end
++    end
++
++    def var_dir
++      File.join(code_dir, 'environments' , '%{environment}' , 'hieradata')
++    end
++
++    def file_alt_separator
++      File::ALT_SEPARATOR
++    end
++
++    def common_appdata
++      @common_appdata ||= Hiera::Util::Win32.get_common_appdata()
++    end
++
++    def split_key(key)
++      segments = key.split(/(?:"([^"]+)"|'([^']+)'|([^'".]+))/)
++      if segments.empty?
++        # Only happens if the original key was an empty string
++        ''
++      elsif segments.shift == ''
++        count = segments.size
++        raise yield('Syntax error') unless count > 0
++
++        segments.keep_if { |seg| seg != '.' }
++        raise yield('Syntax error') unless segments.size * 2 == count + 1
++        segments
++      else
++        raise yield('Syntax error')
++      end
++    end
++  end
++end
++
+diff -uNr hiera-3.6.0.ORIG/spec/unit/util_spec.rb hiera-3.6.0/spec/unit/util_spec.rb
+--- hiera-3.6.0.ORIG/spec/unit/util_spec.rb	2019-11-13 09:43:32.601045631 +0100
++++ hiera-3.6.0/spec/unit/util_spec.rb	2019-11-13 09:44:42.269091590 +0100
+@@ -23,7 +23,7 @@
+   describe 'Hiera::Util.config_dir' do
+     it 'should return the correct path for posix systems' do
+       Hiera::Util.expects(:file_alt_separator).returns(nil)
+-      expect(Hiera::Util.config_dir).to eq('/etc/puppetlabs/puppet')
++      expect(Hiera::Util.config_dir).to eq('/etc/puppet')
+     end
+ 
+     it 'should return the correct path for microsoft windows systems' do
+@@ -36,7 +36,7 @@
+   describe 'Hiera::Util.code_dir' do
+     it 'should return the correct path for posix systems' do
+       Hiera::Util.expects(:file_alt_separator).returns(nil)
+-      expect(Hiera::Util.code_dir).to eq('/etc/puppetlabs/code')
++      expect(Hiera::Util.code_dir).to eq('/etc/puppet/code')
+     end
+ 
+     it 'should return the correct path for microsoft windows systems' do
+@@ -49,7 +49,7 @@
+   describe 'Hiera::Util.var_dir' do
+     it 'should return the correct path for posix systems' do
+       Hiera::Util.expects(:file_alt_separator).returns(nil)
+-      expect(Hiera::Util.var_dir).to eq('/etc/puppetlabs/code/environments/%{environment}/hieradata')
++      expect(Hiera::Util.var_dir).to eq('/etc/puppet/code/environments/%{environment}/hieradata')
+     end
+ 
+     it 'should return the correct path for microsoft windows systems' do
