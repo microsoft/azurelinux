@@ -22994,6 +22994,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-hpricot",
+          "version": "0.8.6",
+          "downloadUrl": "https://github.com/hpricot/hpricot/archive/refs/tags/0.8.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-http_parser.rb",
           "version": "0.6.0",
           "downloadUrl": "https://rubygems.org/downloads/http_parser.rb-0.6.0.gem"
@@ -23327,6 +23337,16 @@
           "name": "rubygem-rake",
           "version": "13.0.6",
           "downloadUrl": "https://github.com/ruby/rake/archive/refs/tags/v13.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-rake-compiler",
+          "version": "1.1.9",
+          "downloadUrl": "https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v1.1.9.tar.gz"
         }
       }
     },
