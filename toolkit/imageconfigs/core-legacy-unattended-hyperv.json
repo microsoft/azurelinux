@@ -6,12 +6,6 @@
                 "Type": "path",
                 "Value": "/dev/sda"
             },
-            "Artifacts": [
-                {
-                    "Name": "core",
-                    "Type": "vhd"
-                }
-            ],
             "Partitions": [
                 {
                     "ID": "boot",
