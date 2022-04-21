@@ -22,7 +22,7 @@
 Summary:        L7 proxy and communication bus
 Name:           envoy
 Version:        1.14.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,16 @@ Patch1:         0002-build-update-several-go-dependencies-11581.patch
 Patch2:         0003-build-Add-explicit-requirement-on-rules_cc.patch
 Patch3:         0004-build-Use-new-bazel.patch
 Patch4:         0005-fix-gcc11-compiler-issue.patch
+Patch5:         CVE-2020-35470.patch
+Patch6:         CVE-2020-35471.patch
+Patch7:         CVE-2021-29492.patch
+Patch8:         CVE-2021-43824.patch
+Patch9:         CVE-2021-43825.patch
+Patch10:        CVE-2021-43826.patch
+Patch11:        CVE-2022-21654.patch
+Patch12:        CVE-2022-21655.patch
+Patch13:        CVE-2022-21656.patch
+Patch14:        CVE-2022-21657.patch
 BuildRequires:  bazel
 BuildRequires:  bazel-workspaces
 BuildRequires:  c-ares-devel
