@@ -45,6 +45,7 @@ Patch22:        openssl-1.1.1-fips-SymCrypt.patch
 Patch23:        CVE-2021-3711.patch
 Patch24:        CVE-2021-3712.patch
 Patch25:        CVE-2022-0778.patch
+Patch26:        CVE-2021-4160.nopatch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
