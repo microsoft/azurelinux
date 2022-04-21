@@ -7,7 +7,7 @@ Image configuration consists of two sections - Disks and SystemConfigs - that de
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 
 ## TargetDisk
-Defines the physical disk, to which Mariner should be installed. This entry has to be specified and the Type field needs to be set to "path" if intending to build an unattended ISO.
+Required when building unattended ISO installer. This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
 
 ### Artifacts
 Artifact (non-ISO image building only) defines the name, type and optional compression of the output CBL-Mariner image.
