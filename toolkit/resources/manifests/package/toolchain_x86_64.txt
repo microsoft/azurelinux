@@ -1,8 +1,8 @@
 asciidoc-9.1.0-1.cm2.noarch.rpm
-audit-3.0.6-4.cm2.x86_64.rpm
-audit-debuginfo-3.0.6-4.cm2.x86_64.rpm
-audit-devel-3.0.6-4.cm2.x86_64.rpm
-audit-libs-3.0.6-4.cm2.x86_64.rpm
+audit-3.0.6-5.cm2.x86_64.rpm
+audit-debuginfo-3.0.6-5.cm2.x86_64.rpm
+audit-devel-3.0.6-5.cm2.x86_64.rpm
+audit-libs-3.0.6-5.cm2.x86_64.rpm
 autoconf-2.71-3.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
 bash-5.1.8-1.cm2.x86_64.rpm
