@@ -1,14 +1,14 @@
-%global nm_dispatcher_dir %{_prefix}/lib/NetworkManager
+%global nm_dispatcher_dir %{_libdir}/NetworkManager
 %global puppet_libdir %{ruby_vendorlibdir}
 %global puppet_vendor_mod_dir %{_datadir}/%{name}/vendor_modules
 
+Summary:        Network tool for managing many disparate systems
 Name:           puppet
 Version:        7.12.1
 Release:        2%{?dist}
-Summary:        Network tool for managing many disparate systems
 License:        ASL 2.0
-Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://puppet.com
 Source0:        https://downloads.puppetlabs.com/puppet/%{name}-%{version}.tar.gz
 # Get these by checking out the right tag from https://github.com/puppetlabs/puppet-agent and:
@@ -27,31 +27,32 @@ Source13:       puppet-nm-dispatcher.systemd
 Source14:       start-puppet-wrapper
 Source15:       logrotate
 
-BuildArch: noarch
+BuildArch:      noarch
 
+BuildRequires:  facter
+BuildRequires:  gnupg2
+BuildRequires:  hiera
 # ruby-devel does not require the base package, but requires -libs instead
-BuildRequires: ruby
-BuildRequires: ruby-devel
-BuildRequires: rubygem-json
-BuildRequires: facter
-BuildRequires: hiera
-BuildRequires: systemd
-BuildRequires: gnupg2
-BuildRequires: which
+BuildRequires:  ruby
+BuildRequires:  ruby-devel
+BuildRequires:  rubygem-json
+BuildRequires:  systemd
+BuildRequires:  which
 
-Requires:      hiera >= 3.3.1
-Requires:      facter >= 3.9.6
-Requires:      rubygem(concurrent-ruby) >= 1.0.5
-Requires:      rubygem(deep_merge) >= 1.0
-Requires:      rubygem(facter) >= 3.9.6
-Requires:      rubygem(multi_json) >= 1.10
-Requires:      rubygem(puppet-resource_api) >= 1.5
-Requires:      rubygem(semantic_puppet) >= 1.0.2
-Requires:      ruby-augeas >= 0.5.0
-Requires:      augeas >= 1.10.1
-Requires:      augeas-libs >= 1.10.1
-Requires:      cpp-hocon >= 0.2.1
-Requires:      ruby libselinux-utils
+Requires:       augeas >= 1.10.1
+Requires:       augeas-libs >= 1.10.1
+Requires:       cpp-hocon >= 0.2.1
+Requires:       facter >= 3.9.6
+Requires:       hiera >= 3.3.1
+Requires:       libselinux-utils
+Requires:       ruby
+Requires:       ruby-augeas >= 0.5.0
+Requires:       rubygem(concurrent-ruby) >= 1.0.5
+Requires:       rubygem(deep_merge) >= 1.0
+Requires:       rubygem(facter) >= 3.9.6
+Requires:       rubygem(multi_json) >= 1.10
+Requires:       rubygem(puppet-resource_api) >= 1.5
+Requires:       rubygem(semantic_puppet) >= 1.0.2
 
 %description
 Puppet lets you centrally manage every important aspect of your system using a
@@ -100,7 +101,7 @@ done
 
 install -Dp -m0644 %{SOURCE15} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
-%{__install} -d -m0755 %{buildroot}%{_unitdir}
+install -d -m0755 %{buildroot}%{_unitdir}
 install -Dp -m0644 ext/systemd/puppet.service %{buildroot}%{_unitdir}/%{name}.service
 
 # Note(hguemar): Conflicts with config file from hiera package
@@ -132,6 +133,18 @@ echo "D %{_rundir}/%{name} 0755 %{name} %{name} -" > \
 # some other things were removed with the patch
 rm -r %{buildroot}%{_datadir}/%{name}/ext/{debian,osx,solaris,suse,windows,systemd,redhat}
 rm %{buildroot}%{_datadir}/%{name}/ext/{build_defaults.yaml,project_data.yaml}
+
+%pre
+getent group puppet &>/dev/null || groupadd -r puppet -g 52 &>/dev/null
+getent passwd puppet &>/dev/null || \
+useradd -r -u 52 -g puppet -s /sbin/nologin \
+ -c "Puppet" puppet &>/dev/null
+
+%post
+%systemd_post %{name}.service
+
+%postun
+%systemd_postun_with_restart %{name}.service
 
 %files
 %attr(-, puppet, puppet) %{_localstatedir}/log/%{name}
@@ -193,18 +206,6 @@ rm %{buildroot}%{_datadir}/%{name}/ext/{build_defaults.yaml,project_data.yaml}
 %config(noreplace) %attr(644, root, root) %{_sysconfdir}/logrotate.d/%{name}
 
 %ghost %attr(755, puppet, puppet) %{_rundir}/%{name}
-
-%pre
-getent group puppet &>/dev/null || groupadd -r puppet -g 52 &>/dev/null
-getent passwd puppet &>/dev/null || \
-useradd -r -u 52 -g puppet -s /sbin/nologin \
- -c "Puppet" puppet &>/dev/null
-
-%post
-%systemd_post %{name}.service
-
-%postun
-%systemd_postun_with_restart %{name}.service
 
 %changelog
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.12.1-2
