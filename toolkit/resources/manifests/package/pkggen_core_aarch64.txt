@@ -146,7 +146,7 @@ libltdl-devel-2.4.6-8.cm1.aarch64.rpm
 pcre-8.44-2.cm1.aarch64.rpm
 pcre-libs-8.44-2.cm1.aarch64.rpm
 krb5-1.18.4-2.cm1.aarch64.rpm
-lua-5.3.5-8.cm1.aarch64.rpm
+lua-5.3.5-9.cm1.aarch64.rpm
 mariner-rpm-macros-1.0-8.cm1.noarch.rpm
 mariner-check-macros-1.0-8.cm1.noarch.rpm
 libassuan-2.5.1-3.cm1.aarch64.rpm
