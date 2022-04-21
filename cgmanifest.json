@@ -7875,8 +7875,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-yajl-ruby",
-          "version": "1.4.1",
-          "downloadUrl": "https://rubygems.org/downloads/yajl-ruby-1.4.1.gem"
+          "version": "1.4.2",
+          "downloadUrl": "https://rubygems.org/downloads/yajl-ruby-1.4.2.gem"
         }
       }
     },
