@@ -5,7 +5,7 @@
 Summary:        Network tool for managing many disparate systems
 Name:           puppet
 Version:        7.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -208,6 +208,9 @@ useradd -r -u 52 -g puppet -s /sbin/nologin \
 %ghost %attr(755, puppet, puppet) %{_rundir}/%{name}
 
 %changelog
+* Thu Apr 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.12.1-3
+- Spec clean-up.
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 7.12.1-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

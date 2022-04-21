@@ -1,7 +1,7 @@
 Summary:        A simple hierarchical database supporting plugin data sources
 Name:           hiera
 Version:        3.7.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,9 @@ rspec -Ilib spec
 %config(noreplace) %{_sysconfdir}/puppet/hiera.yaml
 
 %changelog
+* Thu Apr 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-4
+- Spec clean-up.
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.7.0-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified
