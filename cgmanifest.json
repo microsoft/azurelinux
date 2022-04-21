@@ -16455,7 +16455,7 @@
         "other": {
           "name": "perl-Net-SSLeay",
           "version": "1.92",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Net/Net-SSLeay-1.88.tar.gz"
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Net/Net-SSLeay-1.92.tar.gz"
         }
       }
     },
