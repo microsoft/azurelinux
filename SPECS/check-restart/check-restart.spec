@@ -41,6 +41,7 @@ install -m644 %{SOURCE1} %{buildroot}%{_bindir}/%{name}.sh
 %changelog
 * Tue Jan 04 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-2
 - Update timer and service to avoid starting service on system reboot.
+- License verified
 
 * Mon Aug 02 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner.
