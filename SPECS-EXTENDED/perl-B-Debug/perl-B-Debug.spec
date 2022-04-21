@@ -72,6 +72,7 @@ make test
 %changelog
 * Thu Apr 21 2022 Muhammad Falak <mwani@microsoft.com> - 1.26-425
 - Add an explicit BR on `perl(deprecate)` to enable ptest
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-424
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
