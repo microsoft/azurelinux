@@ -2,10 +2,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: python-linux-procfs
 Version: 0.6.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPLv2
 Summary: Linux /proc abstraction classes
-Source: https://git.kernel.org/pub/scm/libs/python/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.xz
+Source: https://git.kernel.org/pub/scm/libs/python/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.gz
 URL: https://rt.wiki.kernel.org/index.php/Tuna
 BuildArch: noarch
 BuildRequires: python3-devel
@@ -43,6 +43,9 @@ rm -rf %{buildroot}
 %license COPYING
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-9
+- Fixing invalid source URL.
+
 * Mon Jan 31 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.6.1-8
 - Move to SPECS
 - License verified

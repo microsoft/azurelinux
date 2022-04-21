@@ -15,12 +15,12 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-%global         underscore_version $(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
+%define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 
 Summary:        APIs for DOM, SAX, and JAXP
 Name:           xml-commons-apis
 Version:        1.4.01
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0 AND W3C AND SUSE-Public-Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -114,6 +114,9 @@ rm -rf build/docs/javadoc
 %{_javadir}/*
 
 %changelog
+* Tue Apr 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.01-7
+- Fixing "%%underscore_version" macro definition.
+
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.4.01-6
 - Move to SPECS
 

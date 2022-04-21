@@ -1,12 +1,12 @@
 Summary:        Development Libraries and headers for EFI
 Name:           gnu-efi
 Version:        3.0.9
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 URL:            https://sourceforge.net/projects/gnu-efi
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source:         https://pilotfiber.dl.sourceforge.net/project/%{name}/%{name}-%{version}.tar.bz2
+Source:         https://sourceforge.net/projects/%{name}/files/%{name}-%{version}.tar.bz2
 Source1:        LICENSE.PTR
 
 BuildRequires: gcc
@@ -74,6 +74,9 @@ mv %{buildroot}/%{_libdir}/*.lds %{buildroot}/%{_libdir}/*.o %{buildroot}/%{_lib
 %{_includedir}/efi
 
 %changelog
+* Wed Mar 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-10
+- Updating 'Source' URL.
+
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-9
 - Changing `Source0` URL to a working HTTPS one.
 

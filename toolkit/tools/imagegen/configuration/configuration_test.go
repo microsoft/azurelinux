@@ -135,15 +135,15 @@ func TestShouldFailDeviceMapperWithMultipleRoots(t *testing.T) {
 				"dmroot",
 			},
 			Start:  uint64(0),
-			End:    uint64(1024),
+			End:    uint64(512),
 			FsType: "ext4",
 		}, {
 			ID: "MySecondRootfs",
 			Flags: []PartitionFlag{
 				"dmroot",
 			},
-			Start:  uint64(1024),
-			End:    uint64(2048),
+			Start:  uint64(512),
+			End:    uint64(1024),
 			FsType: "ext4",
 		},
 	}

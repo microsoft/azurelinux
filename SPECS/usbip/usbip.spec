@@ -2,7 +2,7 @@
 
 Name:		   usbip
 Summary:	   USB/IP user-space
-Version:	   5.15.18.1
+Version:	   5.15.32.1
 Release:	   1%{?dist}
 License:	   GPLv2+
 Vendor:            Microsoft Corporation
@@ -91,6 +91,9 @@ install -pm 644 %{SOURCE2} %{buildroot}%{_unitdir}
 %{_libdir}/*.so
 
 %changelog
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.15.32.1-1
+- Update version to 5.15.32.1
+
 * Thu Feb 24 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.15.18.1-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

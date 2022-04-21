@@ -1,13 +1,13 @@
 Summary:        Library to enable creation and expansion of ISO-9660 filesystems
 Name:           libisoburn
 Version:        1.5.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://dev.lovelyhq.com/libburnia/libisoburn
-Source0:        https://dev.lovelyhq.com/libburnia/libisoburn/archive/release--%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://dev.lovelyhq.com/libburnia/libisoburn/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         libisoburn-1.0.8-multilib.patch
 
 BuildRequires:  autoconf
@@ -122,6 +122,9 @@ cd releng
 %{_infodir}/xorriso*.info*
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.4-2
+- Fixing a typo in the source URL.
+
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.5.4-1
 - Upgrade to 1.5.4.
 

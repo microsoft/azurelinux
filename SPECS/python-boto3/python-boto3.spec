@@ -1,14 +1,13 @@
 Summary:        The AWS SDK for Python
 Name:           python-boto3
 Version:        1.10.21
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/boto/boto3
-#Source0:       https://github.com/boto/boto3/archive/%{version}.tar.gz
-Source0:        https://github.com/boto/boto3/archive/boto3-%{version}.tar.gz
+Source0:        https://github.com/boto/boto3/archive/%{version}.tar.gz#/boto3-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -47,6 +46,9 @@ Amazon S3 and Amazon EC2
 %{python3_sitelib}/*
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.21-4
+- Fixing invalid source URL.
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.21-3
 - Add license to python3 package
 - Remove python2 package

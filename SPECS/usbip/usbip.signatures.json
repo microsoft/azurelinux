@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "usbip-5.15.18.1.tar.xz": "a918cd42c6e3e3b0eb328b8892aeddbd20c31a2d90f4e509a8dc3754425c5b0d",
+  "usbip-5.15.32.1.tar.xz": "0965adc9a16c1579eaec920d5ffe8af244b23ffd36a2333b65b202bdd8c79ac0",
   "usbip-server.service": "68a727d13e270564b5e2c97cad5ccdb97086c4d1065b6ef70205b54769260b0f",
   "usbip-client.service": "7b83311e550793014a897b43fe7b4e5339f114924b3d5f52cceb58787fc65008",
   "extract_usbip.sh": "08c63ca9002df5e5e9f068719cc8b2e8e3b2c5abd077fab94521bf4117aaaa77"

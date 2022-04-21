@@ -22,9 +22,9 @@ Distribution:   Mariner
 %define full_name	jakarta-%{base_name}
 Name:           servletapi5
 Version:        5.0.18
-Release:        287%{?dist}
+Release:        288%{?dist}
 Summary:        Java servlet and JSP implementation classes
-License:        Apache-2.0
+License:        ASL 1.1
 Group:          Development/Libraries/Java
 Url:            http://jakarta.apache.org/tomcat/
 Source:         %{full_name}-5-src.tar.gz
@@ -32,6 +32,7 @@ Source:         %{full_name}-5-src.tar.gz
 #!BuildIgnore:  xml-commons-jaxp-1.3-apis
 BuildRequires:  ant
 BuildRequires:  java-devel
+BuildRequires:  javapackages-tools
 BuildRequires:  xml-commons-apis-bootstrap
 Requires(post): update-alternatives
 Provides:       servlet = %{version}
@@ -88,6 +89,10 @@ fi
 %ghost %{_sysconfdir}/alternatives/servlet.jar
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0.18-288
+- Adding BR on "javapackages-tools" to provide missing "%%{_javadir}" macro.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0.18-287
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

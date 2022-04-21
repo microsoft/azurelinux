@@ -2,10 +2,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: tuna
 Version: 0.14.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Summary: Application tuning GUI & command line utility
-Source: https://git.kernel.org/pub/scm/utils/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.xz
+Source: https://git.kernel.org/pub/scm/utils/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.gz
 URL: https://rt.wiki.kernel.org/index.php/Tuna
 BuildArch: noarch
 BuildRequires: python3-devel, gettext
@@ -67,6 +67,9 @@ done
 %{_datadir}/polkit-1/actions/org.tuna.policy
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.1-4
+- Fixing invalid source URL.
+
 * Thu Jan 27 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.14.1-3
 - Move to SPECS
 - Remove oscilloscope subpackage
