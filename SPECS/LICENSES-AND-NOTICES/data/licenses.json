@@ -1987,6 +1987,7 @@
                 "libconfuse",
                 "libmaxminddb",
                 "libmetalink",
+                "libsafec",
                 "libuv",
                 "libxml++",
                 "lld",
