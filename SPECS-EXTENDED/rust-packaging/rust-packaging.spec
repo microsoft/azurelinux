@@ -72,7 +72,7 @@ py.test -vv test.py
 %{python3_sitelib}/rust2rpm/
 
 %changelog
-* Fir Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 14-4
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 14-4
 - Drop BR on pytest & pip install compatible pytest & six
 - Use py.test instead of py.test-3.9 to enable ptest
 - License verified
