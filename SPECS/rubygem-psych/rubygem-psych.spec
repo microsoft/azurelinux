@@ -35,7 +35,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
-* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.0.3-2
+* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.0.3-1
 - Update to v4.0.3
 
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.0-2
