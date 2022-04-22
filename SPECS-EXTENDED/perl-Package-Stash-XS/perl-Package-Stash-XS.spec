@@ -7,7 +7,7 @@
 
 Name:		perl-Package-Stash-XS
 Version:	0.29
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Faster and more correct implementation of the Package::Stash API
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -35,6 +35,7 @@ BuildRequires:	perl(File::Spec)
 BuildRequires:	perl(IO::Handle)
 BuildRequires:	perl(IPC::Open3)
 BuildRequires:	perl(lib)
+BuildRequires:	perl(blib)
 BuildRequires:	perl(Scalar::Util)
 BuildRequires:	perl(Symbol)
 BuildRequires:	perl(Test::Fatal)
@@ -87,6 +88,10 @@ make test
 %{_mandir}/man3/Package::Stash::XS.3*
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.29-7
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.29-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
