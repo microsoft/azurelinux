@@ -63,7 +63,6 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 - Remove clean section
 - License verified
 
-
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.8.4-4
 - Bump release to force rebuild with golang 1.16.15
 
