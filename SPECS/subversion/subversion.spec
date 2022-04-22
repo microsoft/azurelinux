@@ -1,7 +1,7 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,8 @@ URL:            https://subversion.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 
 Patch0:         CVE-2020-17525.patch
+Patch1:         CVE-2021-28544.patch
+Patch2:         CVE-2022-24070.patch
 
 BuildRequires:  apr-devel
 BuildRequires:  apr-util
@@ -108,6 +110,9 @@ sudo -u test make check && userdel test -r -f
 %exclude %{_libdir}/perl5/*/*/perllocal.pod
 
 %changelog
+* Thu Apr 21 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.14.0-5
+- Patch CVE-2021-28544 and CVE-2022-24070.
+
 * Wed Mar 24 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.14.0-4
 - Patch CVE-2020-17525.
 
