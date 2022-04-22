@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Error
 Version:        0.17029
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Error/exception handling in an OO-ish way
 License:        (GPL+ or Artistic) and MIT
 URL:            https://metacpan.org/release/Error
@@ -29,6 +29,7 @@ BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(Test::More)
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -74,7 +75,11 @@ make test
 %{_mandir}/man3/Error::Simple.3*
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.17029-3
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.17029-4
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
+* Mon Nov 01 2021 Muhammad Falak <mwani@microsoft.com> - 0.17029-3
 - Remove epoch
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.17029-2
