@@ -1,18 +1,17 @@
 %global	gem_name      rake
 %global debug_package %{nil}
+%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 
 Summary:        Rake is a Make-like program implemented in Ruby
 Name:           rubygem-%{gem_name}
 Version:        13.0.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ruby.github.io/rake/
 Source0:        https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-
 BuildArch:      noarch
-
 BuildRequires:  ruby
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
@@ -42,16 +41,7 @@ Documentation for %{name}.
 gem build %{gem_name}
 
 %install
-gem install %{gem_name}-%{version}.gem
-mkdir -p %{buildroot}%{gem_dir}
-cp -a /%{gem_dir}/bin %{buildroot}%{gem_dir}/
-mkdir -p %{buildroot}%{gem_dir}/cache
-cp -a /%{gem_dir}/cache/%{gem_name}-%{version}.gem %{buildroot}%{gem_dir}/cache
-cp -a /%{gem_dir}/doc/%{gem_name}-%{version} %{buildroot}%{gem_dir}/doc/
-cp -a /%{gem_dir}/extensions %{buildroot}%{gem_dir}/gems/
-mkdir -p %{buildroot}%{gem_dir}/specifications
-cp -a /%{gem_dir}/specifications/%{gem_name}-%{version}.gemspec %{buildroot}%{gem_dir}/specifications
-cp -a /%{gem_dir}/gems/%{gem_name}-%{version} %{buildroot}%{gem_dir}/gems/
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 # Install man pages into appropriate place.
 mkdir -p %{buildroot}%{_mandir}/man1
@@ -78,8 +68,7 @@ popd
 %{_mandir}/man1/*
 %exclude %{gem_instdir}/.*
 %exclude %{gem_instdir}/rake.gemspec
-%exclude %{gem_instdir}/bin
-%{gem_dir}/bin/rake
+%exclude /usr/lib/ruby/gems/3.1.0/bin/rake
 
 %files doc
 %doc %{gem_dir}/doc/
@@ -87,6 +76,9 @@ popd
 %doc %{gem_instdir}/*.rdoc
 
 %changelog
+* Fri Apr 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 13.0.6-3
+- Remove files not building.
+
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 13.0.6-2
 - Updating dependencies.
 
