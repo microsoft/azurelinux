@@ -4,7 +4,7 @@
 Summary:        This is a JSON implementation as a Ruby extension in C
 Name:           rubygem-json
 Version:        2.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Source0:        https://github.com/flori/json/archive/refs/tags/v%{version}.tar.
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
+Provides:       rubygem(json) = %{version}-%{release}
 
 %description
 This is a implementation of the JSON specification according to RFC 4627.
@@ -38,6 +39,9 @@ cp LICENSE %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.6.1-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.6.1-1
 - License verified
 - Included descriptions from Fedora 33 spec (license: MIT).

@@ -4,16 +4,18 @@
 Summary:        An xUnit family unit testing framework for Ruby
 Name:           rubygem-test-unit
 Version:        3.5.3
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        PSF AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://test-unit.github.io/
 Source0:        https://github.com/test-unit/test-unit/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         remove-missing-devdeps.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-power_assert
+Provides:       rubygem(test-unit) = %{version}-%{release}
 BuildArch:      noarch
 
 %description
@@ -23,7 +25,7 @@ programming software development methodology, for Smalltalk's SUnit. It allows
 writing tests, checking results and automated testing in Ruby.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
@@ -43,6 +45,12 @@ cp PSFL %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-3
+- Adding patch to remove missing development_dependencies from .gemspec
+
+* Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-2
+- Add provides
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-1
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).
