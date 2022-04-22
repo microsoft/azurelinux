@@ -1,6 +1,6 @@
 Name:		perl-ExtUtils-Config
 Version:	0.008
-Release:	18%{?dist}
+Release:	19%{?dist}
 Summary:	A wrapper for perl's configuration
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -19,6 +19,7 @@ BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.30
 BuildRequires:	perl(Config)
 BuildRequires:	perl(Data::Dumper)
 # Test Suite
+BuildRequires:	perl(blib)
 BuildRequires:	perl(File::Find)
 BuildRequires:	perl(File::Temp)
 BuildRequires:	perl(Test::More) >= 0.88
@@ -54,6 +55,10 @@ make test
 %{_mandir}/man3/ExtUtils::Config.3*
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.008-19
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.008-18
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
