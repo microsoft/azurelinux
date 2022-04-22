@@ -2,7 +2,7 @@
 
 Name:           python-%{srcname}
 Version:        0.4.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Python libraries for interacting with windows remote management
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
@@ -12,8 +12,8 @@ Source0:        https://github.com/diyan/pywinrm/archive/v%{version}/%{srcname}-
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3dist(setuptools)
-BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(mock)
 BuildRequires:  python3dist(xmltodict)
 BuildRequires:  python3dist(requests) >= 2.9.1
@@ -43,6 +43,7 @@ Python 3 version.
 %py3_install
 
 %check
+pip3 install pytest
 %python3 -m pytest -vv winrm/tests
 
 %files -n python3-%{srcname}
@@ -52,6 +53,9 @@ Python 3 version.
 %{python3_sitelib}/winrm/
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.4.1-6
+- Drop BR on `python3dist(pytest)` & pip install pytest to enable ptest
+
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.4.1-5
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
