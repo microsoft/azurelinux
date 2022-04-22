@@ -6,5 +6,6 @@ ignoredisk --only-use=/dev/sda
 part biosboot --fstype=biosboot --size=1 --ondisk=/dev/sda
 part / --fstype=ext4 --size=2048 --ondisk=/dev/sda
 part /var --fstype=ext4 --size=800 --ondisk=/dev/sda
+part swap --fstype=swap --size=800 --ondisk=/dev/sda
 part /export --fstype=ext4 --size=1 --grow --ondisk=/dev/sda
 EOF

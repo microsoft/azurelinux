@@ -56,7 +56,7 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
-	logger.Log.Infof("Entering roast")
+
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
 	}
@@ -81,10 +81,7 @@ func main() {
 		logger.Log.Panicf("Error when creating output directory. Error: %s", err)
 	}
 
-	logger.Log.Infof("Cehck point check --------------------")
-
 	config, err := configuration.Load(*configFile)
-	err = configuration.ParseKickStartPartitionScheme(&config, "/tmp/part-include")
 	if err != nil {
 		logger.Log.Panicf("Failed loading image configuration. Error: %s", err)
 	}
@@ -109,12 +106,6 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 	}
 
 	numberOfArtifacts := 0
-
-	fmt.Printf("Check partition length here: %d\n", len(config.Disks[0].Partitions))
-
-	//fmt.Printf("Check artifact length here: %d\n", len(config.Disks[0].Artifacts))
-
-
 	for _, disk := range config.Disks {
 		numberOfArtifacts += len(disk.Artifacts)
 		for _, partition := range disk.Partitions {

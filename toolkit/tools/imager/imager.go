@@ -65,10 +65,10 @@ func main() {
 	// Parse Config
 	config, err := configuration.LoadWithAbsolutePaths(*configFile, *baseDirPath)
 	logger.PanicOnError(err, "Failed to load configuration file (%s) with base directory (%s)", *configFile, *baseDirPath)
-	
+
 	// Run Preinstallation script
 	err = installutils.RunPreInstallScripts(config)
-	logger.PanicOnError(err, "Failed to run pre installation script")
+	logger.PanicOnError(err, "Failed to preinstall scripts")
 
 	// Parse the partition file
 	err = configuration.ParseKickStartPartitionScheme(&config, "/tmp/part-include")

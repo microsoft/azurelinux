@@ -10,13 +10,21 @@
           ],
           "PreInstallScripts": [
             {
-                "Path": "additionalconfigs/test-image.sh"
+                "Path": "preinstallscripts/test-image.sh"
             }
           ],
           "KernelOptions": {
               "default": "kernel"
           },
-          "Hostname": "cbl-mariner"
+          "Hostname": "cbl-mariner",
+          "Users": [
+            {
+                "Name": "root",
+                "Password": "$6$20m6y6nwlU1K$hKgyNYjVSKPJOTFaAzAf/fwACUV/dZ1NPy5cGNkhvRzKJiKDBKofuvDpdl81Jak4ep756DnZmVm7JfGRMO/n90",
+                "PasswordHashed": true,
+                "_comment": "The password is 'p@ssw0rd', this should be regenerated with 'openssl passwd -6 -salt <YOUR_SALT> <YOUR_PASSWORD>', or use the json key 'SSHPubKeyPaths' to use an SSH key for login"
+            }
+        ]
       }
   ]
 }

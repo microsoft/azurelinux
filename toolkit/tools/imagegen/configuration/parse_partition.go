@@ -8,9 +8,10 @@ package configuration
 import (
 	"bufio"
 	"os"
-	"fmt"
 	"strings"
 	"strconv"
+
+	"microsoft.com/pkggen/internal/logger"
 )
 
 func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err error) {
@@ -20,18 +21,22 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 		partitionFlags		[]string
 		partitionTableType	PartitionTableType
 		diskInfo			map[string]int
-		configInfo			map[string]int
 	)
 
 	// Check whether the config already contains partition schema
 	if len(config.Disks) > 0 && len(config.Disks[0].Partitions) > 0 {
-		fmt.Printf("Partition scheme already exists\n")
+		logger.Log.Infof("Partition scheme already exists")
 		return
-	} 
+	}
+
+	// Check whether the incoming config is for initrd
+	if config.SystemConfigs[0].Name == "ISO initrd" {
+		return
+	}
 
 	file, err := os.Open(partitionFile)
 	if err != nil {
-		fmt.Printf("Failed to open file")
+		logger.Log.Errorf("Failed to open file (%s)", partitionFile)
 		return
 	}
 	defer file.Close()
@@ -39,50 +44,42 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 	// Check if the file is empty
 	_, err = file.Stat()
 	if err != nil {
-		fmt.Printf("File is empty\n")
+		logger.Log.Errorf("Empty partition file (%s)", partitionFile)
 		return
 	}	
 
-	defaultConfigIndex := 0
+	defaultDiskIndex := 0
 
 	scanner := bufio.NewScanner(file)
 	diskInfo = make(map[string]int)
-	configInfo = make(map[string]int)
-	partitionTableType = PartitionTableTypeNone
+	partitionTableType = PartitionTableTypeGpt
 
 	for scanner.Scan() {
 		parseCmd = scanner.Text()
-		fmt.Printf("Parse Commands: %s\n", parseCmd)
+		//fmt.Printf("Parse Commands: %s\n", parseCmd)
 
-		// Check disk information
+		// Find disk information
 		if strings.Contains(parseCmd, "--ondisk") {
 			partitionFlags = strings.Split(parseCmd, " ")
 			curDiskInfo := partitionFlags[len(partitionFlags)-1]
 			curDiskInfo = curDiskInfo[9 : len(curDiskInfo)]
 				
-			// Check whether this disk already exists or not
+			// Check whether this disk has already been parsed or not
 			curIdx, ok := diskInfo[curDiskInfo]
 			if !ok {
-				fmt.Printf("Create new disk object: %s\n", curDiskInfo)
-
 				// Create new disk struct and append it into the Disk array
 				newDisk := Disk{}
-				newDisk.MaxSize = 4096
-				artifacts := []Artifact{
-					Artifact{
-						Name: "core",
-						Type: "vhd",
-					},
-				}
-				newDisk.Artifacts = artifacts
-
-				diskInfo[curDiskInfo] = defaultConfigIndex
-				configInfo[curDiskInfo] = defaultConfigIndex
-				curIdx = defaultConfigIndex
-				defaultConfigIndex++
 				newDisk.PartitionTableType = partitionTableType
+
+				// Set TargetDisk and TargetDiskType for unattended installation
+				newDisk.TargetDisk.Type = "path"
+				newDisk.TargetDisk.Value = curDiskInfo
+
+				diskInfo[curDiskInfo] = defaultDiskIndex
+				curIdx = defaultDiskIndex
+				defaultDiskIndex++
+				
 				config.Disks = append(config.Disks, newDisk)
-				fmt.Printf("Check size of disk array: %d\n", len(config.Disks))
 			}
 				
 			// Create new Partition and PartionSetting
@@ -114,16 +111,17 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 					fstype := partOpt[9 : len(partOpt)]
 					if fstype == "biosboot" {
 						partition.FsType = "fat32"
+					} else if fstype == "swap" {
+						partition.FsType = "linux-swap"
+						partitionSetting.MountPoint = ""
 					} else {
 						partition.FsType = fstype
 					}
-					fmt.Printf("fstype: %s\n", fstype)
 				}
 
 				// Find partition size
 				if strings.Contains(partOpt, "--size") {
 					partSizeStr := partOpt[7 : len(partOpt)]
-					fmt.Printf("partition size: %s\n", partSizeStr)
 						
 					if len(config.Disks[curIdx].Partitions) == 0 {
 						partition.Start = 1
@@ -143,31 +141,9 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 				}
 			}
 				
-			fmt.Printf("Finish parsing line: start appending\n")
 			config.Disks[curIdx].Partitions = append(config.Disks[curIdx].Partitions, *partition)
 			config.SystemConfigs[curIdx].PartitionSettings = append(config.SystemConfigs[curIdx].PartitionSettings, *partitionSetting)
-			fmt.Printf("Check Disk0 partition length: %d\n", len(config.Disks[0].Partitions))
 		} 
-	}
-
-	// Print our disk and partitionSettings for validation
-	for _, disk := range config.Disks {
-		fmt.Printf("Partition table type: %s\n", disk.PartitionTableType)
-		fmt.Printf("Artifact type: %s\n", disk.Artifacts[0].Type)
-		for _, partition := range disk.Partitions {
-			fmt.Printf("Partition ID: %s\n", partition.ID)
-			fmt.Printf("Partition Start: %d\n", partition.Start)
-			fmt.Printf("Partition End: %d\n", partition.End)
-			fmt.Printf("Partition fstype: %s\n", partition.FsType)
-		}
-	}
-
-	for _, sysconfig := range config.SystemConfigs {
-		fmt.Printf("System config name: %s\n", sysconfig.Name)
-		for _, partitionsetting := range sysconfig.PartitionSettings {
-			fmt.Printf("Partition ID: %s\n", partitionsetting.ID)
-			fmt.Printf("Partition Mount Point: %s\n", partitionsetting.MountPoint)
-		}
 	}
 
 	return
