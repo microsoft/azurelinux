@@ -11,7 +11,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ruby.github.io/rake/
 Source0:        https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+
 BuildArch:      noarch
+
 BuildRequires:  ruby
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
@@ -41,7 +43,11 @@ Documentation for %{name}.
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
+gem install -V --local --force --install-dir %{buildroot}%{gemdir} %{gem_name}-%{version}.gem
+
+# Moving the installed binary to standard bin directory.
+mkdir -p %{buildroot}%{_bindir}
+mv %{buildroot}%{_libdir}/ruby/gems/bin/rake %{buildroot}%{_bindir}/rake
 
 # Install man pages into appropriate place.
 mkdir -p %{buildroot}%{_mandir}/man1
@@ -68,7 +74,7 @@ popd
 %{_mandir}/man1/*
 %exclude %{gem_instdir}/.*
 %exclude %{gem_instdir}/rake.gemspec
-%exclude /usr/lib/ruby/gems/3.1.0/bin/rake
+%{_bindir}/rake
 
 %files doc
 %doc %{gem_dir}/doc/
