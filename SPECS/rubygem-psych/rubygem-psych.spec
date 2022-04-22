@@ -3,8 +3,8 @@
 %global gem_name psych
 Summary:        A libyaml wrapper for Ruby
 Name:           rubygem-psych
-Version:        3.0.0
-Release:        2%{?dist}
+Version:        4.0.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.0.3-2
+- Update to v4.0.3
+
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0.0-2
 - Add provides
 
