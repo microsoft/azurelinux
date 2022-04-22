@@ -2777,16 +2777,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "envoy",
-          "version": "1.14.4",
-          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.14.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "eppic",
           "version": "e8844d3793471163ae4a56d8f95897be9e5bd554",
           "downloadUrl": "https://github.com/lucchouina/eppic/archive/e8844d3793471163ae4a56d8f95897be9e5bd554/eppic-e8844d3.tar.gz"
