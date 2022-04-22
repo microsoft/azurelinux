@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        8.2.4743
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,7 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
-Provides:       vi = %{release}-%{version}
+Provides:       vi = %{version}-%{release}
 Provides:       %{name}-minimal = %{version}-%{release}
 
 %description
@@ -192,6 +192,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Fri Apr 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.2.4743-2
+- Fix invalid vi provide with reversed %%{release}-%%{version} EVR
+
 * Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 8.2.4743-1
 - Update version to 8.2.4743 to fix CVE-2022-0408,CVE-2022-0413,CVE-2022-0417,CVE-2022-0443,
 - CVE-2022-0554,CVE-2022-0572,CVE-2022-0629,CVE-2022-0685,CVE-2022-0729,CVE-2022-1160
