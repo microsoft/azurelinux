@@ -24,8 +24,6 @@ Summary:        Development files for %{name}
 
 Requires:       %{name} = %{version}-%{release}
 
-Provides:       pkgconfig(xdamage) = %{version}-%{release}
-
 %description devel
 X.Org X11 libXdamage development package.
 
