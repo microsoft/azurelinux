@@ -1,7 +1,7 @@
 Summary:        A system tool for maintaining the %{_sysconfdir}/rc*.d hierarchy
 Name:           chkconfig
 Version:        1.20
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,14 @@ manipulating the numerous symbolic links in /etc/rc.d). Unless you
 specify a runlevel or runlevels on the command line (see the man
 page), ntsysv configures the current runlevel (5 if you're using X).
 
+%package  lang
+Summary:  Additional language files for chkconfig
+Group:    System Environment/Base
+Requires: %{name} = %{version}-%{release}
+
+%description lang
+These are the additional language files of chkconfig
+
 %prep
 %setup -q
 
@@ -70,7 +78,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 
 %find_lang %{name}
 
-%files -f %{name}.lang
+%files
 %defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
 %license COPYING
@@ -96,7 +104,13 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 %{_sbindir}/ntsysv
 %{_mandir}/*/ntsysv.8*
 
+%files -f %{name}.lang lang
+%defattr(-,root,root)
+
 %changelog
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.20-3
+- Create lang sub package for locales
+
 * Thu Jan 20 2022 Muhammad Falak <mwani@microsoft.com> - 1.20-2
 - Mask `check` section which depends on `beakerlib`
 

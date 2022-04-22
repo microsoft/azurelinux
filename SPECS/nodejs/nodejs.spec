@@ -1,11 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 8.3.1
+%define npm_version 8.5.0
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        16.14.0
+Version:        16.14.2
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Group:          Applications/System
@@ -115,6 +115,8 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+*   Tue Apr 19 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 16.14.2-1
+-   Update to 16.14.2.
 *   Thu Feb 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 16.14.0-1
 -   Upgrade to 16.14.0.
 *   Thu Nov 18 2021 Thomas Crain <thcrain@microsoft.com> - 14.18.1-1

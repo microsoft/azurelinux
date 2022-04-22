@@ -1831,8 +1831,7 @@ func cleanupRpmDatabase(rootPrefix string) (err error) {
 
 func RunPreInstallScripts(config configuration.Config) (err error) {
 	const squashErrors = false
-	logger.Log.Infof("Entered here to execute preinstall scripts")
-	logger.Log.Infof("Any system configs: %d", len(config.SystemConfigs[0].PreInstallScripts))
+
 	for _, sysConfig := range config.SystemConfigs {
 		for _, script := range sysConfig.PreInstallScripts {
 			ReportActionf("Running pre-install script: %s", path.Base(script.Path))
@@ -1842,7 +1841,6 @@ func RunPreInstallScripts(config configuration.Config) (err error) {
 	
 			err = shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", script.Path, script.Args))
 			if err != nil {
-				logger.Log.Infof("Having issue executing the script??????")
 				return
 			}
 		}

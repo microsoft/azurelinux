@@ -1,49 +1,45 @@
 %global openssh_ver 8.8p1
-
 %global pam_ssh_agent_ver 0.10.3
-
-%define systemd_units_rel 20191026
-
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openssh.com/
 Source0:        https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/%{name}-%{openssh_ver}.tar.gz
-Source1:        http://www.linuxfromscratch.org/blfs/downloads/stable-systemd/blfs-systemd-units-%{systemd_units_rel}.tar.xz
-Source2:        sshd.service
-Source3:        sshd-keygen.service
-Source4:        https://prdownloads.sourceforge.net/pamsshagentauth/pam_ssh_agent_auth/pam_ssh_agent_auth-%{pam_ssh_agent_ver}.tar.bz2
-Source5:        pam_ssh_agent-rmheaders
-Patch0:         blfs_systemd_fixes.patch
+Source1:        sshd.service
+Source2:        sshd-keygen.service
+Source3:        https://prdownloads.sourceforge.net/pamsshagentauth/pam_ssh_agent_auth/pam_ssh_agent_auth-%{pam_ssh_agent_ver}.tar.bz2
+Source4:        pam_ssh_agent-rmheaders
 # Nopatches section
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
-
 # --- pam_ssh-agent ---
 # make it build reusing the openssh sources
-Patch300: pam_ssh_agent_auth-0.9.3-build.patch
+Patch300:       pam_ssh_agent_auth-0.9.3-build.patch
 # check return value of seteuid()
 # https://sourceforge.net/p/pamsshagentauth/bugs/23/
-Patch301: pam_ssh_agent_auth-0.10.3-seteuid.patch
+Patch301:       pam_ssh_agent_auth-0.10.3-seteuid.patch
 # explicitly make pam callbacks visible
-Patch302: pam_ssh_agent_auth-0.9.2-visibility.patch
+Patch302:       pam_ssh_agent_auth-0.9.2-visibility.patch
 # update to current version of agent structure
-Patch305: pam_ssh_agent_auth-0.9.3-agent_structure.patch
+Patch305:       pam_ssh_agent_auth-0.9.3-agent_structure.patch
 # remove prefixes to be able to build against current openssh library
-Patch306: pam_ssh_agent_auth-0.10.2-compat.patch
+Patch306:       pam_ssh_agent_auth-0.10.2-compat.patch
 # Fix NULL dereference from getpwuid() return value
 # https://sourceforge.net/p/pamsshagentauth/bugs/22/
-Patch307: pam_ssh_agent_auth-0.10.2-dereference.patch
-
+Patch307:       pam_ssh_agent_auth-0.10.2-dereference.patch
 BuildRequires:  audit-devel
+BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
+BuildRequires:  kernel-headers
 BuildRequires:  krb5-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
@@ -51,7 +47,6 @@ BuildRequires:  systemd
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
-BuildRequires:  libselinux-devel
 Requires:       audit-libs
 Requires:       openssh-clients = %{openssh_ver}-%{release}
 Requires:       openssh-server = %{openssh_ver}-%{release}
@@ -83,10 +78,9 @@ Requires(pre):  %{_sbindir}/useradd
 This provides the ssh server daemons, utilities, configuration and service files.
 
 %package -n pam_ssh_agent_auth
-Summary: PAM module for authentication with ssh-agent
-Version: %{pam_ssh_agent_ver}
-Release: 11%{?dist}
-License: BSD
+Summary:        PAM module for authentication with ssh-agent
+Version:        %{pam_ssh_agent_ver}
+Release:        11%{?dist}
 
 %description -n pam_ssh_agent_auth
 This package contains a PAM module which can be used to authenticate
@@ -97,9 +91,7 @@ remote ssh-agent instance.
 The module is most useful for su and sudo service stacks.
 
 %prep
-%setup -q -a 4
-tar xf %{SOURCE1} --no-same-owner
-%patch0
+%setup -q -a 3
 
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch300 -p2 -b .psaa-build
@@ -109,7 +101,7 @@ pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch305 -p2 -b .psaa-agent
 %patch307 -p2 -b .psaa-deref
 # Remove duplicate headers and library files
-rm -f $(cat %{SOURCE5})
+rm -f $(cat %{SOURCE4})
 autoreconf
 popd
 
@@ -152,13 +144,8 @@ sed -i 's/#PrintMotd yes/PrintMotd no/' %{buildroot}%{_sysconfdir}/ssh/sshd_conf
 sed -i 's/#PermitUserEnvironment no/PermitUserEnvironment no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 120/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 
-#   Install daemon script
-pushd blfs-systemd-units-%{systemd_units_rel}
-make DESTDIR=%{buildroot} install-sshd
-popd
-
-install -m644 %{SOURCE2} %{buildroot}/lib/systemd/system/sshd.service
-install -m644 %{SOURCE3} %{buildroot}/lib/systemd/system/sshd-keygen.service
+install -D -m644 %{SOURCE1} %{buildroot}/lib/systemd/system/sshd.service
+install -D -m644 %{SOURCE2} %{buildroot}/lib/systemd/system/sshd-keygen.service
 install -m755 contrib/ssh-copy-id %{buildroot}/%{_bindir}/
 install -m644 contrib/ssh-copy-id.1 %{buildroot}/%{_mandir}/man1/
 
@@ -182,8 +169,8 @@ useradd test -G root -m
 sudo -u test -s /bin/bash -c "PATH=$PATH TEST_SSH_UNSAFE_PERMISSIONS=1 make tests"
 
 %pre server
-getent group sshd >/dev/null || groupadd -g 50 sshd
-getent passwd sshd >/dev/null || useradd -c 'sshd PrivSep' -d %{_sharedstatedir}/sshd -g sshd -s /bin/false -u 50 sshd
+getent group sshd >/dev/null || groupadd --system sshd
+getent passwd sshd >/dev/null || useradd --system --comment 'Privilege Separated SSH' --home-dir %{_sharedstatedir}/sshd --gid sshd --shell /bin/false sshd
 
 %preun server
 %systemd_preun sshd.service sshd-keygen.service
@@ -221,8 +208,6 @@ fi
 %attr(700,root,sys) %{_sharedstatedir}/sshd
 /lib/systemd/system/sshd-keygen.service
 /lib/systemd/system/sshd.service
-/lib/systemd/system/sshd.socket
-/lib/systemd/system/sshd@.service
 %{_sbindir}/sshd
 %{_libexecdir}/sftp-server
 %{_mandir}/man5/sshd_config.5.gz
@@ -259,6 +244,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Mon Apr 11 2022 Andy Caldwell <andycaldwell@microsoft.com> - 8.8p1-5
+- Remove socket-triggering for SSHd due to conflicts with non-triggered service and potential DoS vector
+
 * Fri Mar 04 2022 Andrew Phelps <anphel@microsoft.com> - 8.8p1-4
 - Build with audit support
 

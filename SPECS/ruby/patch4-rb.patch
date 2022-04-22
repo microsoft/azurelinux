@@ -1,0 +1,54 @@
+From d11bc592494529f8732a4a40defaf18f600c261d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Mon, 4 Apr 2022 11:18:51 +0200
+Subject: [PATCH] Install the previously build gem extensions.
+
+Install the pre-build gem binary extensions and attempt to build them
+during `gem install` phase only when they are not available for whatever
+reason.
+---
+ tool/rbinstall.rb | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/tool/rbinstall.rb b/tool/rbinstall.rb
+index 259792ad878c..4e42133bc1ce 100755
+--- a/tool/rbinstall.rb
++++ b/tool/rbinstall.rb
+@@ -896,6 +896,18 @@ def write_default_spec
+       super unless $dryrun
+       $installed_list.puts(without_destdir(default_spec_file)) if $installed_list
+     end
++
++    def build_extensions
++      return if spec.extensions.empty?
++
++      ext = "#$extout/.bundle/gems/#{CONFIG['arch']}/#{spec.full_name}"
++
++      # Call `install_recursive` with global binding, so it correctly use
++      # the global `install`
++      Object.__send__ :install_recursive, ext, without_destdir(spec.extension_dir)
++
++      super unless File.exist? spec.gem_build_complete_path
++    end
+   end
+ 
+   class GemInstaller
+@@ -1042,7 +1054,6 @@ def install_default_gem(dir, srcdir, bindir)
+     :wrappers => true,
+     :format_executable => true,
+   }
+-  gem_ext_dir = "#$extout/.bundle/gems/#{CONFIG['arch']}"
+   extensions_dir = with_destdir(Gem::StubSpecification.gemspec_stub("", gem_dir, gem_dir).extensions_dir)
+ 
+   File.foreach("#{srcdir}/gems/bundled_gems") do |name|
+@@ -1071,10 +1082,6 @@ def install_default_gem(dir, srcdir, bindir)
+     unless $dryrun
+       File.chmod($data_mode, File.join(install_dir, "specifications", "#{spec.full_name}.gemspec"))
+     end
+-    unless spec.extensions.empty?
+-      ext = "#{gem_ext_dir}/#{spec.full_name}"
+-      install_recursive(ext, without_destdir(spec.extension_dir))
+-    end
+     installed_gems[spec.full_name] = true
+   end
+   installed_gems, gems = Dir.glob(srcdir+'/gems/*.gem').partition {|gem| installed_gems.key?(File.basename(gem, '.gem'))}

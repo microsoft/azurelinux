@@ -283,7 +283,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 		srpmPath := filepath.Join(srpmsDir, srpmResults[0])
 
-		isCompatible, err := rpm.SpecExclusiveArchIsCompatible(specfile, sourcedir, defines)
+		isCompatible, err := rpm.SpecArchIsCompatible(specfile, sourcedir, defines)
 		if err != nil {
 			result.err = err
 			results <- result
