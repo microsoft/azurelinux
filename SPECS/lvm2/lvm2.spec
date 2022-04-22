@@ -93,7 +93,6 @@ License:        LGPLv2
 Group:          Development/Libraries
 Requires:       device-mapper = %{version}-%{release}
 Requires:       libselinux-devel
-Provides:       pkgconfig(devmapper)
 
 %description -n device-mapper-devel
 This package contains files needed to develop applications that use
@@ -338,6 +337,7 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %changelog
 * Thu Apr 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.03.15-2
 - Fix double-packaging of dbusd files in main package
+- Remove manual pkgconfig provide
 
 * Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.03.15-1
 - Upgrading to newest version 2.03.15
