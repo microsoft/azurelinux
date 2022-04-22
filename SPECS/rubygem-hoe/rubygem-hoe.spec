@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/seattlerb/hoe
-Source0:        https://github.com/seattlerb/hoe/archive/refs/tags/v3.18.0.tar.gz#/%{gem_name}-%{version}.tar.gz
+Source0:        https://github.com/seattlerb/hoe/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Source1:        hoe.gemspec
 BuildRequires:  git
 BuildRequires:  ruby
