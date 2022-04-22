@@ -1,6 +1,6 @@
 Name:           perl-FreezeThaw
 Version:        0.5001
-Release:        29%{?dist}
+Release:        30%{?dist}
 Summary:        Convert Perl structures to strings and back
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ URL:            https://metacpan.org/release/FreezeThaw
 Source0:        https://cpan.metacpan.org/authors/id/I/IL/ILYAZ/modules/FreezeThaw-%{version}.tar.gz#/perl-FreezeThaw-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl-generators
+BuildRequires:  perl(dumpvar.pl)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker)
@@ -44,6 +45,10 @@ make test
 %{_mandir}/man3/*.3pm*
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.5001-30
+- Add an explict BR on `perl(dumpvar.pl)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5001-29
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
