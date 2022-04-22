@@ -209,8 +209,8 @@ sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
 To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerDemo#image-config-file) that only specifies a _single_ SystemConfig.
 
 ```bash
-# Build the standard ISO with unattended installer
-sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y UNATTENDED_INSTALLER=y
+# Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM
+sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyperv.json REBUILD_TOOLS=y UNATTENDED_INSTALLER=y
 ```
 
 # Further Reading

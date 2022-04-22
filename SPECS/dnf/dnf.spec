@@ -3,7 +3,7 @@
 Summary:        Python 3 version of the DNF package manager.
 Name:           dnf
 Version:        4.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ OR GPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,7 @@ Systemd units that can periodically download package upgrades and apply them.
 
 %prep
 %setup -q
+sed -i "s/emit_via = stdio/emit_via = motd/g" etc/dnf/automatic.conf
 mkdir build
 cd build
 %cmake .. -DPYTHON_DESIRED:FILEPATH="3" -DWITH_MAN=0
@@ -82,6 +83,14 @@ rm -f %{buildroot}%{confdir}/%{name}-strict.conf
 %check
 cd build
 ctest -VV
+
+%post automatic
+%systemd_post dnf-automatic-notifyonly.timer
+%systemd_post dnf-makecache.timer
+
+%postun automatic
+%systemd_preun dnf-automatic-notifyonly.timer
+%systemd_preun dnf-makecache.timer
 
 %files -f %{name}.lang
 %{_bindir}/%{name}
@@ -137,6 +146,10 @@ ctest -VV
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Thu Apr 14 2022 Chris Co <chrco@microsoft.com> - 4.8.0-2
+- Emit dnf-automatic messages through motd
+- Start dnf-automatic-notifyonly timer
+
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-1
 - Upgrade to latest upstream version
 - Lint spec
