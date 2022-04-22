@@ -1,7 +1,7 @@
 Name:           pyxattr
 Summary:        Extended attributes library wrapper for Python
 Version:        0.7.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,9 @@ BuildRequires:  gcc
 BuildRequires:  libattr-devel
 BuildRequires:  python3-devel
 BuildRequires:  gnupg2
-BuildRequires:  %{py3_dist pytest}
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description %{expand:
 Python extension module wrapper for libattr. It allows to query, list,
@@ -44,6 +46,7 @@ export TEST_IGNORE_XATTRS=security.selinux
 # the module is just a C extension => need to add the installed destination to
 # PYTHONPATH, otherwise it won't be found
 export PYTHONPATH=%{buildroot}%{python3_sitearch}:$PYTHONPATH
+pip3 install pytest six
 python3 -m pytest test
 
 %files -n python3-%{name}
@@ -53,6 +56,10 @@ python3 -m pytest test
 %doc NEWS README.md
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.7.1-5
+- Drop BR on `pytest` & pip install latest deps to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
