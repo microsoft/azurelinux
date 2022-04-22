@@ -60,6 +60,8 @@ csplit -z -f 'repo' -b '_%d.repo' "$repo_file_path" '/^\[/' '{*}'
 for singe_repo_file in repo*.repo
 do
     makecache_with_common "$current_os" "$mariner_version" "$single_repo_file"
+    # Clean up as we go
+    rm -f "$single_repo_file"
 done
 
 # Cache created - now we can point to the abridged file.
