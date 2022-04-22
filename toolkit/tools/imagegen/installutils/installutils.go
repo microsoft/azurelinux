@@ -1836,9 +1836,9 @@ func RunPreInstallScripts(config configuration.Config) (err error) {
 		for _, script := range sysConfig.PreInstallScripts {
 			ReportActionf("Running pre-install script: %s", path.Base(script.Path))
 			logger.Log.Infof("Running pre-install script: %s", script.Path)
-	
+
 			shell.ExecuteLive(squashErrors, "chmod", "a+x", script.Path)
-	
+
 			err = shell.ExecuteLive(squashErrors, shell.ShellProgram, "-c", fmt.Sprintf("%s %s", script.Path, script.Args))
 			if err != nil {
 				return

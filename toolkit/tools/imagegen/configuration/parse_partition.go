@@ -8,8 +8,8 @@ package configuration
 import (
 	"bufio"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 
 	"microsoft.com/pkggen/internal/logger"
 )
@@ -23,10 +23,10 @@ import (
 func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err error) {
 
 	var (
-		parseCmd			string
-		partitionFlags		[]string
-		partitionTableType	PartitionTableType
-		diskInfo			map[string]int
+		parseCmd           string
+		partitionFlags     []string
+		partitionTableType PartitionTableType
+		diskInfo           map[string]int
 	)
 
 	// Check whether the config already contains partition schema
@@ -52,14 +52,14 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 	if err != nil {
 		logger.Log.Errorf("Empty partition file (%s)", partitionFile)
 		return
-	}	
+	}
 
 	defaultDiskIndex := 0
 
 	scanner := bufio.NewScanner(file)
 
 	// Create a mapping between the disk path and the index of the disk in the
-	// Disk array so that when we parse through the partition commands, we can 
+	// Disk array so that when we parse through the partition commands, we can
 	// determine which disk the parition instruction is targeted
 	diskInfo = make(map[string]int)
 	partitionTableType = PartitionTableTypeGpt
@@ -72,8 +72,8 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 		if strings.Contains(parseCmd, "--ondisk") {
 			partitionFlags = strings.Split(parseCmd, " ")
 			curDiskInfo := partitionFlags[len(partitionFlags)-1]
-			curDiskInfo = curDiskInfo[9 : len(curDiskInfo)]
-				
+			curDiskInfo = curDiskInfo[9:len(curDiskInfo)]
+
 			// Check whether this disk has already been parsed or not
 			curIdx, ok := diskInfo[curDiskInfo]
 			if !ok {
@@ -88,15 +88,15 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 				diskInfo[curDiskInfo] = defaultDiskIndex
 				curIdx = defaultDiskIndex
 				defaultDiskIndex++
-				
+
 				config.Disks = append(config.Disks, newDisk)
 			}
-				
+
 			// Create new Partition and PartionSetting
 			partition := new(Partition)
 			partitionSetting := new(PartitionSetting)
 			partitionSetting.MountIdentifier = MountIdentifierDefault
-				
+
 			// Find Mount Point
 			partitionSetting.MountPoint = partitionFlags[1]
 			if partitionFlags[1] == "biosboot" {
@@ -118,13 +118,13 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 
 				// Find fstype
 				if strings.Contains(partOpt, "--fstype") {
-					fstype := partOpt[9 : len(partOpt)]
+					fstype := partOpt[9:len(partOpt)]
 					if fstype == "biosboot" {
 						partition.FsType = "fat32"
 					} else if fstype == "swap" {
 						partition.FsType = "linux-swap"
-						
-						// swap partition does not have a mount point 
+
+						// swap partition does not have a mount point
 						partitionSetting.MountPoint = ""
 					} else {
 						partition.FsType = fstype
@@ -133,8 +133,8 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 
 				// Find partition size
 				if strings.Contains(partOpt, "--size") {
-					partSizeStr := partOpt[7 : len(partOpt)]
-						
+					partSizeStr := partOpt[7:len(partOpt)]
+
 					if len(config.Disks[curIdx].Partitions) == 0 {
 						partition.Start = 1
 					} else {
@@ -153,10 +153,10 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 					}
 				}
 			}
-				
+
 			config.Disks[curIdx].Partitions = append(config.Disks[curIdx].Partitions, *partition)
 			config.SystemConfigs[curIdx].PartitionSettings = append(config.SystemConfigs[curIdx].PartitionSettings, *partitionSetting)
-		} 
+		}
 	}
 
 	return
