@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Patch0:         export-demangle-header.patch
 # Patch1 Source https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=6b86da53d5ee2022b9065f445d23356190380746
 Patch1:         linker-script-readonly-keyword-support.patch
 Patch2:         thin_archive_descriptor.patch
+Patch3:         CVE-2021-45078.patch
 Provides:       bundled(libiberty)
 
 %description
@@ -128,6 +129,9 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
+* Wed Apr 20 2022 Andrew Phelps <anphel@microsoft.com> - 2.37-3
+- Add patch to fix CVE-2021-45078
+
 * Fri Dec 03 2021 Andrew Phelps <anphel@microsoft.com> - 2.37-2
 - Add thin_archive_descriptor.patch to fix nodejs build issue
 

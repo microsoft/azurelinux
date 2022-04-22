@@ -12,8 +12,8 @@ zlib-devel-1.2.12-1.cm2.aarch64.rpm
 file-5.40-2.cm2.aarch64.rpm
 file-devel-5.40-2.cm2.aarch64.rpm
 file-libs-5.40-2.cm2.aarch64.rpm
-binutils-2.37-2.cm2.aarch64.rpm
-binutils-devel-2.37-2.cm2.aarch64.rpm
+binutils-2.37-3.cm2.aarch64.rpm
+binutils-devel-2.37-3.cm2.aarch64.rpm
 gmp-6.2.1-2.cm2.aarch64.rpm
 gmp-devel-6.2.1-2.cm2.aarch64.rpm
 mpfr-4.1.0-1.cm2.aarch64.rpm
@@ -33,11 +33,11 @@ libpkgconf-1.8.0-2.cm2.aarch64.rpm
 pkgconf-1.8.0-2.cm2.aarch64.rpm
 pkgconf-m4-1.8.0-2.cm2.noarch.rpm
 pkgconf-pkg-config-1.8.0-2.cm2.aarch64.rpm
-ncurses-6.2-5.cm2.aarch64.rpm
-ncurses-compat-6.2-5.cm2.aarch64.rpm
-ncurses-devel-6.2-5.cm2.aarch64.rpm
-ncurses-libs-6.2-5.cm2.aarch64.rpm
-ncurses-term-6.2-5.cm2.aarch64.rpm
+ncurses-6.2-6.cm2.aarch64.rpm
+ncurses-compat-6.2-6.cm2.aarch64.rpm
+ncurses-devel-6.2-6.cm2.aarch64.rpm
+ncurses-libs-6.2-6.cm2.aarch64.rpm
+ncurses-term-6.2-6.cm2.aarch64.rpm
 readline-8.1-1.cm2.aarch64.rpm
 readline-devel-8.1-1.cm2.aarch64.rpm
 coreutils-8.32-3.cm2.aarch64.rpm

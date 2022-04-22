@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "check-restart.service": "5beb9ec5cd944bf4effb31d699775fa074b2a0bc3920687b75ca50895efc6b42",
+  "check-restart.sh": "b0a6bb06f7856ad6c591a084ebd9967ac41697f162ed38b9522997beb3287fd6",
+  "check-restart.timer": "2ba9ddcd621aec19e3c87a30cdd078e9934b5613f0228c56940d2009d55fee7e"
+ }
+}
