@@ -1,6 +1,6 @@
 Name:           perl-Devel-CheckLib
 Version:        1.14
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Check that a library is available
 
 License:        GPL+ or Artistic
@@ -26,6 +26,7 @@ BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(Capture::Tiny)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(Test::More) >= 0.88
 # Optional tests
 BuildRequires:  perl(Mock::Config)
@@ -59,6 +60,10 @@ make test
 
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.14-4
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
