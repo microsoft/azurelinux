@@ -52,17 +52,17 @@ make
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/%{name}
 
 %changelog
-* Wed Apr 20 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.8.6-1
+* Fri Apr 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.6-1
 - Update to version  "1.8.6".
+- Remove clean section
+- License verified
+
 
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.8.4-4
 - Bump release to force rebuild with golang 1.16.15
