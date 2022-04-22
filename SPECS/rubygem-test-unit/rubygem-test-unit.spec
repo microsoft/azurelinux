@@ -45,7 +45,7 @@ cp PSFL %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
-* Wed Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-3
+* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-3
 - Adding patch to remove missing development_dependencies from .gemspec
 
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.3-2

@@ -41,7 +41,7 @@ cp COPYING %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
-* Wed Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-3
+* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-3
 - Adding patch to remove missing development_dependencies from .gemspec
 
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-2
