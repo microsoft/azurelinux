@@ -1,0 +1,11 @@
+diff -ruN a/test-unit.gemspec b/test-unit.gemspec
+--- a/test-unit.gemspec	2021-12-19 11:52:04.000000000 -0800
++++ b/test-unit.gemspec	2022-04-21 16:37:16.185675777 -0700
+@@ -38,7 +38,4 @@
+   spec.add_runtime_dependency("power_assert")
+   spec.add_development_dependency("bundler")
+   spec.add_development_dependency("rake")
+-  spec.add_development_dependency("yard")
+-  spec.add_development_dependency("kramdown")
+-  spec.add_development_dependency("packnga")
+ end

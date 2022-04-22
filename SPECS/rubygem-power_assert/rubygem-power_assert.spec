@@ -4,13 +4,14 @@
 Summary:        Power Assert for Ruby
 Name:           rubygem-power_assert
 Version:        2.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/ruby/power_assert/
 Source0:        https://github.com/ruby/power_assert/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         remove-missing-devdeps.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(power_assert) = %{version}-%{release}
@@ -22,7 +23,7 @@ It is useful for testing, providing which value wasn't correct when the
 condition is not satisfied.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
@@ -40,6 +41,9 @@ cp COPYING %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-3
+- Adding patch to remove missing development_dependencies from .gemspec
+
 * Wed Apr 20 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.1-2
 - Add provides
 

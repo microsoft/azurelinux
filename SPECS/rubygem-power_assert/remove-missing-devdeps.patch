@@ -1,0 +1,15 @@
+diff -ruN a/power_assert.gemspec b/power_assert.gemspec
+--- a/power_assert.gemspec	2021-08-28 19:32:29.000000000 -0700
++++ b/power_assert.gemspec	2022-04-21 16:42:49.085541636 -0700
+@@ -20,11 +20,7 @@
+   s.require_paths = ['lib']
+   s.add_development_dependency 'test-unit'
+   s.add_development_dependency 'rake'
+-  s.add_development_dependency 'simplecov'
+   s.add_development_dependency 'bundler'
+-  s.add_development_dependency 'irb', '>= 1.3.1'
+-  s.add_development_dependency 'byebug'
+-  s.add_development_dependency 'benchmark-ips'
+   s.extra_rdoc_files = ['README.md']
+   s.rdoc_options     = ['--main', 'README.md']
+   s.licenses         = ['BSD-2-Clause', "Ruby"]
