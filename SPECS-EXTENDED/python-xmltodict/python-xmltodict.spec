@@ -2,7 +2,7 @@
 
 Name:               python-xmltodict
 Version:            0.12.0
-Release:            14%{?dist}
+Release:            15%{?dist}
 Summary:            Python to transform XML to JSON
 Vendor:		    Microsoft Corporation
 Distribution:	    Mariner
@@ -10,6 +10,9 @@ License:            MIT
 URL:                https://github.com/martinblech/xmltodict
 Source0:            %{url}/archive/v%{version}/%{pypi_name}-%{version}.tar.gz
 BuildArch:          noarch
+%if %{with_check}
+BuildRequires:          python3-pip
+%endif
 
 %description
 xmltodict is a Python module that makes working with XML feel like you are
@@ -40,6 +43,7 @@ Wikipedia.
 %py3_install
 
 %check
+pip3 install nose
 %{__python3} -m nose
 
 %files -n python3-%{pypi_name}
@@ -50,6 +54,9 @@ Wikipedia.
 %{python3_sitelib}/__pycache__/%{pypi_name}*
 
 %changelog
+* Thu Apr 21 2022 Muhammad Falak <mwani@microsoft.com> - 0.12.0-15
+- Add an explicit BR on pip to enable ptest
+
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.12.0-14
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

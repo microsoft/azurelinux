@@ -16,6 +16,7 @@ ignore_list=" \
   appstream-data \
   byacc \
   ca-certificates \
+  check-restart \
   core-packages \
   Cython \
   dbus-x11 \
