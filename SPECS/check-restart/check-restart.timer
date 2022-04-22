@@ -1,0 +1,9 @@
+[Unit]
+Description=Checks if system needs to be restarted due to recent version updates
+
+[Timer]
+Unit=check-restart.service
+OnCalendar=*-*-* 08:00:00
+
+[Install]
+WantedBy=timers.target

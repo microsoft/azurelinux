@@ -1947,6 +1947,7 @@
                 "bpftrace",
                 "ccache",
                 "cert-manager",
+                "check-restart",
                 "clamav",
                 "cloud-hypervisor",
                 "cmake-fedora",
