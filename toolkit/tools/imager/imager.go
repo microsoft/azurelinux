@@ -81,10 +81,6 @@ func main() {
 	// Currently only process 1 system config
 	systemConfig := config.SystemConfigs[defaultSystemConfig]
 
-	// Run Preinstallation script
-	err = installutils.RunPreInstallScripts(systemConfig)
-	logger.PanicOnError(err, "Failed to run pre installation script")
-
 	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
 	logger.PanicOnError(err, "Failed to build system configuration")
 
