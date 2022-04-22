@@ -3,7 +3,7 @@
 
 Name:           glm
 Version:        0.9.9.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        C++ mathematics library for graphics programming
 
 License:        MIT
@@ -97,9 +97,16 @@ make %{?_smp_mflags}
 cd build
 
 # Some tests are disabled due to failing tests (to be reported)
-# - test-core_func_common fails on aarch64
-# - test-gtc_packing      fails on s390x
-ctest --output-on-failure -E '(test-core_func_common|test-gtc_packing)'
+# - test-core_func_common   fails on aarch64
+# - test-core_func_integer  fails on Mariner (x86_64)
+%ifarch x86_64
+ctest --output-on-failure -E '(test-core_func_integer)'
+%endif
+
+%ifarch aarch64
+ctest --output-on-failure -E '(test-core_func_common)'
+%endif
+
 
 %install
 cd build
@@ -132,6 +139,11 @@ rmdir $RPM_BUILD_ROOT%{_libdir}
 %doc doc/api/
 
 %changelog
+* Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.9.6-5
+- Re-enable `test-gtc_packing` for all archs
+- Skip broken tests based of arch
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.9.6-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

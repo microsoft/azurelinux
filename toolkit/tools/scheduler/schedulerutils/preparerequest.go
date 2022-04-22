@@ -81,6 +81,7 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pac
 		dependency := dependencies.Node().(*pkggraph.PkgNode)
 
 		if !buildState.IsNodeCached(dependency) {
+			logger.Log.Debugf("Can't use cached version of %v because %v is rebuilding", node.FriendlyName(), dependency.FriendlyName())
 			canUseCache = false
 			break
 		}

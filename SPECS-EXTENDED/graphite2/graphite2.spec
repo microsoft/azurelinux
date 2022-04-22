@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           graphite2
 Version:        1.3.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Font rendering capabilities for complex non-Roman writing systems
 License:        (LGPLv2+ or GPLv2+ or MPLv1.1) and (Netscape or GPLv2+ or LGPLv2+)
 
@@ -19,6 +19,9 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 
 BuildRequires:  freetype-devel
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 Graphite2 is a project within SIL’s Non-Roman Script Initiative and Language
@@ -56,6 +59,7 @@ find %{buildroot} -type f -name "*.la" -print -delete
 
 
 %check
+pip3 install fonttools
 ctest
 
 
@@ -82,6 +86,10 @@ ctest
 
 
 %changelog
+* Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.14-3
+- Add an explicit BR on pip to enable ptest
+- License verified
+
 * Tue Mar 30 2021 Henry Li <lihl@microsoft.com> - 1.3.14-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove texlive-related dependencies.

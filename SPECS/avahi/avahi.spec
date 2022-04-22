@@ -2,16 +2,16 @@
 %{?!WITH_COMPAT_HOWL:   %global WITH_COMPAT_HOWL  1}
 Summary:        Local network service discovery
 Name:           avahi
-Version:        0.7
-Release:        26%{?dist}
+Version:        0.8
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://avahi.org
 Source0:        https://github.com/lathiat/avahi/releases/download/v%{version}/%{name}-%{version}.tar.gz
-## downstream patches
-Patch100:       avahi-0.6.30-mono-libdir.patch
-Patch101:       0001-Add-support-to-advertise-local-services-localhost-on.patch
+Patch0:         %{name}-libevent-pc-fix.patch
+Patch1:         CVE-2021-3468.patch
+Patch2:         CVE-2021-3502.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
@@ -23,6 +23,7 @@ BuildRequires:  glib2-devel
 BuildRequires:  intltool
 BuildRequires:  libcap-devel
 BuildRequires:  libdaemon-devel >= 0.11
+BuildRequires:  libevent-devel
 BuildRequires:  libtool
 BuildRequires:  perl-XML-Parser
 BuildRequires:  pkg-config
@@ -168,12 +169,11 @@ local LAN. This is useful for configuring unicast DNS servers in a DHCP-like
 fashion with mDNS.
 
 %prep
-%autosetup -n %{name}-%{version}%{?beta:-%{beta}} -p1
+%autosetup -p1
 rm -fv docs/INSTALL
 
 %build
-# patch100 requires autogen
-# and kills rpaths a bonus
+# Use autogen to kill rpaths
 rm -fv missing
 NOCONFIGURE=1 ./autogen.sh
 
@@ -200,6 +200,7 @@ NOCONFIGURE=1 ./autogen.sh
 %endif
         --disable-qt3 \
         --disable-qt4 \
+        --disable-qt5 \
         --disable-gtk \
         --disable-gtk3 \
         --disable-mono \
@@ -348,17 +349,21 @@ exit 0
 %{_libdir}/libavahi-common.so
 %{_libdir}/libavahi-core.so
 %{_libdir}/libavahi-client.so
+%{_libdir}/libavahi-libevent.so
 %{_includedir}/avahi-client
 %{_includedir}/avahi-common
 %{_includedir}/avahi-core
+%{_includedir}/avahi-libevent
 %{_libdir}/pkgconfig/avahi-core.pc
 %{_libdir}/pkgconfig/avahi-client.pc
+%{_libdir}/pkgconfig/avahi-libevent.pc
 
 %files libs
 %doc README
 %license LICENSE
 %{_libdir}/libavahi-common.so.*
 %{_libdir}/libavahi-client.so.*
+%{_libdir}/libavahi-libevent.so.*
 
 %files glib
 %{_libdir}/libavahi-glib.so.*
@@ -400,6 +405,14 @@ exit 0
 %endif
 
 %changelog
+* Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8-1
+- Upgrade to latest upstream version to fix CVE-2017-6519
+- Add upstream patch to fix CVE-2021-3502
+- Add security researcher's patch to fix CVE-2021-3468
+- Add nopatch for CVE-2021-26720
+- Remove mono patch- we don't build with mono.
+- Remove local services patch- upstreamed
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7-26
 - License verified
 - Lint spec

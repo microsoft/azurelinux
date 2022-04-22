@@ -5,7 +5,7 @@
 
 Name:           python-whoosh
 Version:        2.7.4
-Release:        19%{?dist}
+Release:        20%{?dist}
 Summary:        Fast, pure-Python full text indexing, search, and spell checking library 
 
 License:        BSD 
@@ -15,6 +15,10 @@ URL:            http://pythonhosted.org/Whoosh/
 Source0:        https://pypi.python.org/packages/source/W/%{mod_name}/%{mod_name}-%{version}.tar.gz#/python-%{mod_name}-%{version}.tar.gz
 
 BuildArch:      noarch
+
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %if %{with docs}
 BuildRequires:  python%{python3_pkgversion}-sphinx
@@ -70,6 +74,10 @@ rm -rf docs/html/.doctrees
 %{python3_sitelib}/*.egg-info/
 
 %changelog
+* Thu Apr 21 2022 Muhammad Falak <mwani@microsoft.com> - 2.7.4-20
+- Add an explicit BR on `pip` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

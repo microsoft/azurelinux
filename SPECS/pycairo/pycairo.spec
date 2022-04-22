@@ -1,39 +1,37 @@
-Name: pycairo
-Version: 1.18.2
-Release: 6%{?dist}
-Summary: Python bindings for the cairo library
+Summary:        Python bindings for the cairo library
+Name:           pycairo
+Version:        1.21.0
+Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-License: MPLv1.1 or LGPLv2
-URL: https://cairographics.org/pycairo
-Source0: https://github.com/pygobject/pycairo/releases/download/v%{version}/pycairo-%{version}.tar.gz
-
-BuildRequires: cairo-devel
-BuildRequires: gcc
-BuildRequires: pkgconfig
-BuildRequires: python3-devel
-BuildRequires: python3-pytest
-BuildRequires: python3-setuptools
+License:        MPLv1.1 or LGPLv2
+URL:            https://cairographics.org/pycairo
+Source0:        https://github.com/pygobject/pycairo/releases/download/v%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  cairo-devel
+BuildRequires:  gcc
+BuildRequires:  pkgconfig
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 %if %{with_check}
-BuildRequires: python3-pip
-BuildRequires: python3-six
+BuildRequires:  python3-pip
 %endif
-
 
 %description
 Python bindings for the cairo library.
 
-%package -n python3-cairo
-Summary: Python 3 bindings for the cairo library
+%package -n     python3-cairo
 %{?python_provide:%python_provide python3-cairo}
+Summary:        Python 3 bindings for the cairo library
+Requires:       python3
 
 %description -n python3-cairo
 Python 3 bindings for the cairo library.
 
-%package -n python3-cairo-devel
-Summary: Libraries and headers for py3cairo
-Requires: python3-cairo%{?_isa} = %{version}-%{release}
-Requires: python3-devel
+%package -n     python3-cairo-devel
+Summary:        Libraries and headers for py3cairo
+Requires:       python3-cairo = %{version}-%{release}
+Requires:       python3-devel
 
 %description -n python3-cairo-devel
 This package contains files required to build wrappers for cairo add-on
@@ -49,11 +47,11 @@ libraries so that they interoperate with py3cairo.
 %py3_install
 
 %check
-pip3 install attrs>=17.4.0 atomicwrites>=1.0 more-itertools>=4.0.0 pluggy>=0.7
-%{__python3} setup.py test
+pip3 install pytest
+%python3 setup.py test
 
 %files -n python3-cairo
-%license COPYING*
+%license COPYING COPYING-LGPL-2.1 COPYING-MPL-1.1
 %{python3_sitearch}/cairo/
 %{python3_sitearch}/pycairo*.egg-info
 
@@ -63,6 +61,11 @@ pip3 install attrs>=17.4.0 atomicwrites>=1.0 more-itertools>=4.0.0 pluggy>=0.7
 %{_libdir}/pkgconfig/py3cairo.pc
 
 %changelog
+* Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.21.0-1
+- Upgrade to latest upstream version
+- Switch python3-pytest BR to check-time 
+- Lint spec
+
 * Thu Mar 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.2-6
 - Add an explicit BR on `pip`
 - pip install deps in check section to enable ptest

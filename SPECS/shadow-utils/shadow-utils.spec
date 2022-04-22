@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -150,6 +150,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %post
 %{_sbindir}/pwconv
 %{_sbindir}/grpconv
+chmod 000 %{_sysconfdir}/shadow
 
 %files -f shadow.lang
 %defattr(-,root,root)
@@ -163,6 +164,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/*
 /bin/passwd
 %config(noreplace) %{_sysconfdir}/pam.d/*
+%attr(0000,root,root) %config(noreplace,missingok) %ghost %{_sysconfdir}/shadow
 
 %files subid
 %license COPYING
@@ -173,6 +175,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libsubid.so
 
 %changelog
+* Mon Apr 18 2022 Minghe Ren <mingheren@microsoft.com> - 4.9-9
+- Change /etc/shadow file permission to 000 and make it trackable by shadow-utils
+
 * Fri Mar 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.9-8
 - Add requires libpwquality
 

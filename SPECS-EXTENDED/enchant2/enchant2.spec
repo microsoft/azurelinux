@@ -1,66 +1,64 @@
+Summary:        An Enchanting Spell Checking Library
+Name:           enchant2
+Version:        2.2.14
+Release:        3%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:          enchant2
-Version:       2.2.14
-Release:       2%{?dist}
-Summary:       An Enchanting Spell Checking Library
-
-License:       LGPLv2+
-URL:           https://github.com/AbiWord/enchant
-Source0:       https://github.com/AbiWord/enchant/releases/download/v%{version}/enchant-%{version}.tar.gz
-
+URL:            https://github.com/AbiWord/enchant
+Source0:        https://github.com/AbiWord/enchant/releases/download/v%{version}/enchant-%{version}.tar.gz
 # Look for aspell using pkg-config, instead of AC_CHECK_LIB which adds -laspell
 # to the global LIBS and over-links libenchant (#1574893)
-Patch0:        enchant_aspell.patch
+Patch0:         enchant_aspell.patch
 
-BuildRequires: automake autoconf libtool
+BuildRequires:  aspell-devel
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gcc-c++
+BuildRequires:  glib2-devel
+BuildRequires:  hunspell-devel
+BuildRequires:  libtool
+BuildRequires:  libvoikko-devel
+BuildRequires:  make
 
-BuildRequires: gcc-c++
-BuildRequires: glib2-devel
-BuildRequires: aspell-devel
-BuildRequires: hunspell-devel
-BuildRequires: libvoikko-devel
-BuildRequires: make
-
-Provides:      bundled(gnulib)
-
+Provides:       bundled(gnulib)
 
 %description
 A library that wraps other spell checking backends.
 
-
 %package aspell
-Summary:       Integration with aspell for libenchant
-Requires:      enchant2%{?_isa} = %{version}-%{release}
+Summary:        Integration with aspell for libenchant
+
+Requires:       enchant2%{?_isa} = %{version}-%{release}
 
 %description aspell
 Libraries necessary to integrate applications using libenchant with aspell.
 
 %package voikko
-Summary:       Integration with voikko for libenchant
-Requires:      enchant2%{?_isa} = %{version}-%{release}
-Supplements:   (enchant2 and langpacks-fi)
+Summary:        Integration with voikko for libenchant
+
+Requires:       enchant2%{?_isa} = %{version}-%{release}
+
+Supplements:    (enchant2 and langpacks-fi)
 
 %description voikko
 Libraries necessary to integrate applications using libenchant with voikko.
 
-
 %package devel
-Summary:       Development files for %{name}
-Requires:      enchant2%{?_isa} = %{version}-%{release}
-Requires:      glib2-devel
+Summary:        Development files for %{name}
+
+Requires:       enchant2%{?_isa} = %{version}-%{release}
+Requires:       glib2-devel
 
 %description devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
 
 %prep
 %autosetup -p1 -n enchant-%{version}
 
 # Needed for Patch0
 autoreconf -ifv
-
 
 %build
 %configure \
@@ -72,14 +70,11 @@ sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g;
         s|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 %make_build pkgdatadir=%{_datadir}/enchant-2
 
-
 %install
 %make_install pkgdatadir=%{_datadir}/enchant-2
-find %{buildroot} -name '*.la' -delete
-
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
-
 
 %files
 %doc AUTHORS NEWS README
@@ -103,8 +98,10 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/pkgconfig/enchant-2.pc
 %{_includedir}/enchant-2
 
-
 %changelog
+* Mon Apr 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.14-3
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.14-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

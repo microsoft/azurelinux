@@ -19,8 +19,8 @@ populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
 toolchain_sources_dir = $(populated_toolchain_chroot)/usr/src/mariner/SOURCES
 populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/mariner/RPMS
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
-toolchain_actual_conents = $(toolchain_build_dir)/actual_archive_contents.txt
-toolchain_expected_conents = $(toolchain_build_dir)/expected_archive_contents.txt
+toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
+toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
@@ -177,25 +177,28 @@ ifeq ($(REBUILD_TOOLCHAIN),y)
 #   `print_warning`
 $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(final_toolchain)
 	@echo Validating contents of toolchain against manifest... && \
-	tar -tzf $(final_toolchain) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_conents) && \
-	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_conents) && \
-	diff="$$( comm -3 $(toolchain_actual_conents) $(toolchain_expected_conents) --check-order )" && \
+	tar -tzf $(final_toolchain) | grep -oP "[^/]+rpm$$" | sort > $(toolchain_actual_contents) && \
+	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_contents) && \
+	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
+	echo Toolchain manifest validation complete. && \
 	if [ -n "$${diff}" ]; then \
 		echo "ERROR: Missmatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(final_toolchain)':" && \
 		echo "$${diff}"; \
 		$(call print_warning, $@ failed) ; \
 	fi
+	touch $@
 
 # The basic set of RPMs can always be produced by bootstrapping the toolchain.
 # Try to skip extracting individual RPMS if the toolchain step has already placed
 # them into the RPM folder.
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(final_toolchain) $(STATUS_FLAGS_DIR)/toolchain_verify.flag
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) | $(final_toolchain)
 	@echo Extracting RPM $@ from toolchain && \
 	if [ ! -f $@ -o $(final_toolchain) -nt $@ ]; then \
 		mkdir -p $(dir $@) && \
 		tar -I $(ARCHIVE_TOOL) -xvf $(final_toolchain) -C $(dir $@) --strip-components 1 built_rpms_all/$(notdir $@) && \
 		touch $@ ; \
-	fi || $(call print_error, $@ failed) ;
+	fi || $(call print_error, $@ failed) ; \
+	touch $@
 else
 ifneq (,$(TOOLCHAIN_ARCHIVE))
 # Extract a set of RPMS from an archive instead of building them from scratch.
@@ -216,7 +219,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(toolchain_local_temp)
 		mkdir -p $(dir $@) && \
 		mv $$tempFile $(dir $@) && \
 		touch $@ ; \
-	fi || $(call print_error, $@ failed) && \
+	fi || $(call print_error, $@ failed) ; \
 	touch $@
 else
 # Download from online package server

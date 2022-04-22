@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"runtime"
 	"sync"
+	"time"
 
 	"github.com/juliangruber/go-intersect"
 	"golang.org/x/sys/unix"
@@ -32,9 +33,11 @@ const (
 // Unlike BuildChannels, schedulerChannels holds bidirectional channels that
 // only the top-level scheduler should have. BuildChannels contains directional channels.
 type schedulerChannels struct {
-	Requests chan *schedulerutils.BuildRequest
-	Results  chan *schedulerutils.BuildResult
-	Cancel   chan struct{}
+	Requests         chan *schedulerutils.BuildRequest
+	PriorityRequests chan *schedulerutils.BuildRequest
+	Results          chan *schedulerutils.BuildResult
+	Cancel           chan struct{}
+	Done             chan struct{}
 }
 
 var (
@@ -63,6 +66,7 @@ var (
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache              = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure        = app.Flag("stop-on-failure", "Stop on failed build").Bool()
+	reservedFileListFile = app.Flag("reserved-file-list-file", "Path to a list of files which should not be generated during a build").ExistingFile()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -94,6 +98,7 @@ func main() {
 	}
 
 	ignoredPackages := exe.ParseListArgument(*ignoredPackages)
+	reservedFileListFile := *reservedFileListFile
 
 	// Generate the list of packages that need to be built.
 	// If none are requested then all packages will be built.
@@ -108,6 +113,14 @@ func main() {
 	packageVersToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild, *inputGraphFile, *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Unable to generate package build list, error: %s", err)
+	}
+
+	var reservedFiles []string
+	if len(reservedFileListFile) > 0 {
+		reservedFiles, err = schedulerutils.ReadReservedFilesList(reservedFileListFile)
+		if err != nil {
+			logger.Log.Fatalf("unable to read reserved file list %s: %s", reservedFileListFile, err)
+		}
 	}
 
 	// Setup a build agent to handle build requests from the scheduler.
@@ -150,7 +163,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *stopOnFailure, !*noCache, packageVersToBuild, packagesNamesToRebuild, ignoredPackages, reservedFiles)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s", err)
 	}
@@ -178,7 +191,7 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild, ignoredPackages []string) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, stopOnFailure, canUseCache bool, packagesToBuild []*pkgjson.PackageVer, packagesNamesToRebuild, ignoredPackages, reservedFiles []string) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -194,7 +207,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels)
+	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesNamesToRebuild, pkgGraph, &graphMutex, goalNode, channels, reservedFiles)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -213,16 +226,20 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 // channelBufferSize controls how many entries in the channels can be buffered before blocking writes to them.
 func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages []string) (channels *schedulerChannels) {
 	channels = &schedulerChannels{
-		Requests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
-		Results:  make(chan *schedulerutils.BuildResult, channelBufferSize),
-		Cancel:   make(chan struct{}),
+		Requests:         make(chan *schedulerutils.BuildRequest, channelBufferSize),
+		PriorityRequests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
+		Results:          make(chan *schedulerutils.BuildResult, channelBufferSize),
+		Cancel:           make(chan struct{}),
+		Done:             make(chan struct{}),
 	}
 
 	// Downcast the bidirectional scheduler channels into directional channels for the build workers.
 	directionalChannels := &schedulerutils.BuildChannels{
-		Requests: channels.Requests,
-		Results:  channels.Results,
-		Cancel:   channels.Cancel,
+		Requests:         channels.Requests,
+		PriorityRequests: channels.PriorityRequests,
+		Results:          channels.Results,
+		Cancel:           channels.Cancel,
+		Done:             channels.Done,
 	}
 
 	// Start the workers now so they begin working as soon as a new job is queued.
@@ -243,7 +260,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, chann
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNamesToRebuild []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNamesToRebuild []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, reservedFiles []string) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
@@ -256,7 +273,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
-	buildState := schedulerutils.NewGraphBuildState()
+	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
@@ -266,7 +283,28 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesNamesToRebuild, buildState, canUseCache)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
-			channels.Requests <- req
+			// Decide which priority the build should be. Generally we want to get any remote or prebuilt nodes out of the
+			// way as quickly as possible since they may help us optimize the graph early.
+			// Meta nodes may also be blocking something we want to examine and give higher priority (priority inheritance from
+			// the hypothetical high priority node hidden further into the tree)
+			switch req.Node.Type {
+			case pkggraph.TypePreBuilt:
+				channels.PriorityRequests <- req
+
+				// For now all build nodes are of equal priority
+			case pkggraph.TypeGoal:
+				fallthrough
+			case pkggraph.TypePureMeta:
+				fallthrough
+			case pkggraph.TypeRun:
+				fallthrough
+			case pkggraph.TypeRemote:
+				fallthrough
+			case pkggraph.TypeBuild:
+				fallthrough
+			default:
+				channels.Requests <- req
+			}
 		}
 		nodesToBuild = nil
 
@@ -345,6 +383,13 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesNa
 		}
 	}
 
+	// Let the workers know they are done
+	doneBuild(channels, buildState)
+	// Give the workers time to finish so they don't mess up the summary we want to print.
+	// Some nodes may still be busy with long running builds we don't care about anymore, so we don't
+	// want to actually block here.
+	time.Sleep(time.Second)
+
 	builtGraph = pkgGraph
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState)
 
@@ -374,6 +419,30 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 	return
 }
 
+func drainChannels(channels *schedulerChannels, buildState *schedulerutils.GraphBuildState) {
+	// For any workers that are current parked with no buffered requests, close the
+	// requests channel to wake up any build workers waiting on a request to be buffered.
+	// Upon being woken up by a closed requests channel, the build worker will stop.
+	close(channels.Requests)
+	close(channels.PriorityRequests)
+
+	// Drain the request buffers to sync the build state with the new number of outstanding builds.
+	for req := range channels.PriorityRequests {
+		buildState.RemoveBuildRequest(req)
+	}
+	for req := range channels.Requests {
+		buildState.RemoveBuildRequest(req)
+	}
+}
+
+func doneBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuildState) {
+	// Close the done channel. The build workers will finish processing any work, then return
+	// upon seeing this channel is closed.
+	close(channels.Done)
+
+	drainChannels(channels, buildState)
+}
+
 // stopBuild will stop all future builds from being scheduled by sending a cancellation signal
 // to the worker pool and draining any outstanding build requests.
 func stopBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuildState) {
@@ -384,13 +453,5 @@ func stopBuild(channels *schedulerChannels, buildState *schedulerutils.GraphBuil
 	// of processing a new request.
 	close(channels.Cancel)
 
-	// For any workers that are current parked with no buffered requests, close the
-	// requests channel to wake up any build workers waiting on a request to be buffered.
-	// Upon being woken up by a closed requests channel, the build worker will stop.
-	close(channels.Requests)
-
-	// Drain the request buffer to sync the build state with the new number of outstanding builds.
-	for req := range channels.Requests {
-		buildState.RemoveBuildRequest(req)
-	}
+	drainChannels(channels, buildState)
 }
