@@ -14,6 +14,12 @@ import (
 	"microsoft.com/pkggen/internal/logger"
 )
 
+// In kickstart installation, the kickstart file will include a file (/tmp/part-include)
+// that includes the partitioning commands populated by executing the preinstall script.
+// This function aims to parse the partitioning instruction from this kickstart partition file
+// and fill up the required Disk and PartitionSetting information.
+
+// Sample partition configuration for reference: https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/
 func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err error) {
 
 	var (
@@ -51,6 +57,10 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 	defaultDiskIndex := 0
 
 	scanner := bufio.NewScanner(file)
+
+	// Create a mapping between the disk path and the index of the disk in the
+	// Disk array so that when we parse through the partition commands, we can 
+	// determine which disk the parition instruction is targeted
 	diskInfo = make(map[string]int)
 	partitionTableType = PartitionTableTypeGpt
 
@@ -113,6 +123,8 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 						partition.FsType = "fat32"
 					} else if fstype == "swap" {
 						partition.FsType = "linux-swap"
+						
+						// swap partition does not have a mount point 
 						partitionSetting.MountPoint = ""
 					} else {
 						partition.FsType = fstype
@@ -130,6 +142,7 @@ func ParseKickStartPartitionScheme(config *Config, partitionFile string) (err er
 					}
 
 					if strings.Contains(parseCmd, "--grow") {
+						// Fill out the rest of the space
 						partition.End = 0
 					} else {
 						partitionSize, err := strconv.ParseUint(partSizeStr, 10, 64)

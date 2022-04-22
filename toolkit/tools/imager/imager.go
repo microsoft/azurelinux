@@ -48,6 +48,10 @@ const (
 	// sshPubKeysTempDirectory is the directory where installutils expects to pick up ssh public key files to add into
 	// the install directory
 	sshPubKeysTempDirectory = "/tmp/sshpubkeys"
+
+	// kickstartPartitionFile is the file that includes the partitioning schema used by
+	// kickstart installation
+	kickstartPartitionFile = "/tmp/part-include"
 )
 
 func main() {
@@ -70,8 +74,8 @@ func main() {
 	err = installutils.RunPreInstallScripts(config)
 	logger.PanicOnError(err, "Failed to preinstall scripts")
 
-	// Parse the partition file
-	err = configuration.ParseKickStartPartitionScheme(&config, "/tmp/part-include")
+	// Parse the kickstart partition file
+	err = configuration.ParseKickStartPartitionScheme(&config, kickstartPartitionFile)
 	logger.PanicOnError(err, "Failed to parse partition schema")
 
 	// Currently only process 1 system config
