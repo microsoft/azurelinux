@@ -4399,6 +4399,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hiera",
+          "version": "3.7.0",
+          "downloadUrl": "http://downloads.puppetlabs.com/hiera/hiera-3.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "highlight",
           "version": "3.54",
           "downloadUrl": "http://www.andre-simon.de/zip/highlight-3.54.tar.bz2"
@@ -18943,6 +18953,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "puppet",
+          "version": "7.12.1",
+          "downloadUrl": "https://downloads.puppetlabs.com/puppet/puppet-7.12.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pwgen",
           "version": "2.08",
           "downloadUrl": "http://download.sf.net/pwgen/pwgen-2.08.tar.gz"
@@ -23114,16 +23134,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-minitest",
-          "version": "5.13.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/minitest-5.13.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-mocha",
           "version": "1.13.0",
           "downloadUrl": "https://github.com/freerange/mocha/archive/refs/tags/v1.13.0.tar.gz"
@@ -23244,16 +23254,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-power_assert",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/ruby/power_assert/archive/refs/tags/v2.0.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-prometheus-client",
           "version": "0.9.0",
           "downloadUrl": "https://rubygems.org/downloads/prometheus-client-0.9.0.gem"
@@ -23337,16 +23337,6 @@
           "name": "rubygem-quantile",
           "version": "0.2.1",
           "downloadUrl": "https://rubygems.org/downloads/quantile-0.2.1.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-rake",
-          "version": "13.0.6",
-          "downloadUrl": "https://github.com/ruby/rake/archive/refs/tags/v13.0.6.tar.gz"
         }
       }
     },
@@ -23547,16 +23537,6 @@
           "name": "rubygem-td-logger",
           "version": "0.3.27",
           "downloadUrl": "https://rubygems.org/downloads/td-logger-0.3.27.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-test-unit",
-          "version": "3.5.3",
-          "downloadUrl": "https://github.com/test-unit/test-unit/archive/refs/tags/3.5.3.tar.gz"
         }
       }
     },
