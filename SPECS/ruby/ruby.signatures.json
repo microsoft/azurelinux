@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "macros.ruby": "fc26a1eeb3f507c65619a2760a6cf9e1cfb6468731c2a75ab164c577bf632083",
+  "macros.ruby": "81ddf84b69c4833462425460e1360b9c547839acaea14eef1169c01b551f573b",
   "macros.rubygems": "ab73aa910f59cb8041ca942d0031fe0b03c0385014e5c5e64c686c48ec5faa54",
   "operating_system.rb": "91bb8c3c6742392dc18838b6c762c9ba2a39b7558afc9160239e946540207a51",
   "ruby-3.1.2.tar.xz": "ca10d017f8a1b6d247556622c841fc56b90c03b1803f87198da1e4fd3ec3bf2a",

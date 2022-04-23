@@ -4,9 +4,11 @@
 %global ruby_libdir   %{_datadir}/%{name}
 
 %global gem_dir %{_libdir}/ruby/gems
-%global rubygems_molinillo_version  0.5.7
-%global rubygems_version            3.1.6
-%global rubygems_rake_version       13.0.6
+%global rubygems_molinillo_version    0.5.7
+%global rubygems_version              3.1.6
+%global rubygems_power_assert_version 2.0.1
+%global rubygems_rake_version         13.0.6
+%global rubygems_test_unit_version    3.5.3
 
 Summary:        Ruby
 Name:           ruby
@@ -54,9 +56,16 @@ Provides:       rubygem(did_you_mean) = %{version}-%{release}
 Provides:       rubygem(irb) = %{version}-%{release}
 Provides:       rubygem-irb = %{version}-%{release}
 Provides:       rubygem-did_you_mean = %{version}-%{release}
+
 Provides:       rubygem(rake) = %{rubygems_rake_version}
 Provides:       rubygem-rake = %{rubygems_rake_version}
 Provides:       rubygem-rake-doc = %{rubygems_rake_version}
+
+Provides:       rubygem(power_assert) = %{rubygems_power_assert_version}
+Provides:       rubygem-power_assert = %{rubygems_power_assert_version}
+
+Provides:       rubygem(test-unit) = %{rubygems_test_unit_version}
+Provides:       rubygem-test-unit = %{rubygems_test_unit_version}
 
 %description
 The Ruby package contains the Ruby development environment.
@@ -197,7 +206,8 @@ sudo -u test make test TESTS="-v"
 
 %changelog
 * Fri Apr 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.2-2
-- Adding "Provides" for bundled "rubygem-rake" components.
+- Adding "Provides" for bundled gems: "power_assert", "rake", and "test-unit".
+- Updated vendor macros.
 
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-1
 - Update to v3.1.2.

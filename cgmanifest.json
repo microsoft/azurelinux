@@ -23244,16 +23244,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-power_assert",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/ruby/power_assert/archive/refs/tags/v2.0.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-prometheus-client",
           "version": "0.9.0",
           "downloadUrl": "https://rubygems.org/downloads/prometheus-client-0.9.0.gem"
@@ -23537,16 +23527,6 @@
           "name": "rubygem-td-logger",
           "version": "0.3.27",
           "downloadUrl": "https://rubygems.org/downloads/td-logger-0.3.27.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-test-unit",
-          "version": "3.5.3",
-          "downloadUrl": "https://github.com/test-unit/test-unit/archive/refs/tags/3.5.3.tar.gz"
         }
       }
     },
