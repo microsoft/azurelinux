@@ -1,0 +1,20 @@
+diff -ruN a/mocha.gemspec b/mocha.gemspec
+--- a/mocha.gemspec	2021-06-25 06:50:55.000000000 -0700
++++ b/mocha.gemspec	2022-04-21 16:39:36.331306234 -0700
+@@ -40,16 +40,8 @@
+     s.add_development_dependency 'rake'
+   end
+ 
+-  s.add_development_dependency('introspection', '~> 0.0.1')
+   if RUBY_VERSION >= '2.2.0'
+     # No test libraries in standard library
+     s.add_development_dependency('minitest')
+   end
+-  if RUBY_VERSION >= '2.2.0'
+-    s.add_development_dependency('rubocop', '<= 0.58.2')
+-  end
+-  if ENV['MOCHA_GENERATE_DOCS']
+-    s.add_development_dependency('redcarpet')
+-    s.add_development_dependency('yard')
+-  end
+ end

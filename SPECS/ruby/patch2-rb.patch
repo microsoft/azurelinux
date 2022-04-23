@@ -1,0 +1,22 @@
+From 8c57deb09dbd9005ebc872c3c9147d6c2924e208 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 31 Mar 2022 19:22:15 +0200
+Subject: [PATCH] Re-enable building gem extensions.
+
+This reverts commit bac6e8ca5d8f6bc45984d12ddad55d3d876d4324.
+---
+ template/configure-ext.mk.tmpl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/template/configure-ext.mk.tmpl b/template/configure-ext.mk.tmpl
+index 6636a7759c54..8ba6b963e3ec 100644
+--- a/template/configure-ext.mk.tmpl
++++ b/template/configure-ext.mk.tmpl
+@@ -27,7 +27,7 @@ SCRIPT_ARGS = <%=script_args.gsub("#", "\\#")%>
+ EXTMK_ARGS = $(SCRIPT_ARGS) --gnumake=$(gnumake) --extflags="$(EXTLDFLAGS)" \
+ 	   --make-flags="MINIRUBY='$(MINIRUBY)'"
+ 
+-all: exts # gems
++all: exts gems
+ exts:
+ gems:

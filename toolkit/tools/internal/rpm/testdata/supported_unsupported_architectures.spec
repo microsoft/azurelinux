@@ -8,8 +8,11 @@ Group:          Test
 Vendor:         Microsoft
 Distribution:   Mariner
 
+# Must contain only architectures not supported by CBL-Mariner!
+ExcludeArch:    i686
+
 # Must contain an architecture for each of the supported builds of CBL-Mariner!
-ExclusiveArch: x86_64 aarch64
+ExclusiveArch:  x86_64 aarch64
 
 %description
 Test spec. Make sure "ExclusiveArch" contains an entry for each architecture supported by CBL-Mariner!

@@ -44,7 +44,7 @@
 %endif
 Name:           graphviz
 Version:        2.42.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Graph Visualization Tools
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
@@ -54,6 +54,7 @@ Source0:        https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-
 # rhbz#1505230
 Patch0:         graphviz-2.42.2-dotty-menu-fix.patch
 Patch1:         graphviz-2.42.2-coverity-scan-fixes.patch
+Patch2:         CVE-2020-18032.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -513,6 +514,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Thu Apr 21 2022 Minghe Ren <mingheren@microsoft.com> - 2.42.4-6
+- Add patch for CVE-2020-18032
+
 * Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.42.4-5
 - Remove option to build with python2
 

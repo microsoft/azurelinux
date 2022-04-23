@@ -20,9 +20,11 @@ import (
 
 // BuildChannels represents the communicate channels used by a build agent.
 type BuildChannels struct {
-	Requests <-chan *BuildRequest
-	Results  chan<- *BuildResult
-	Cancel   <-chan struct{}
+	Requests         <-chan *BuildRequest
+	PriorityRequests <-chan *BuildRequest
+	Results          chan<- *BuildResult
+	Cancel           <-chan struct{}
+	Done             <-chan struct{}
 }
 
 // BuildRequest represents the results of a build agent trying to build a given node.
@@ -44,15 +46,49 @@ type BuildResult struct {
 	UsedCache      bool
 }
 
+//selectNextBuildRequest selects a job based on priority:
+//  1) Bail out if the jobs are cancelled
+//	2) There is something in the priority queue
+//	3) Any job in either normal OR priority queue
+//		OR are the jobs done/cancelled
+func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish bool) {
+	select {
+	case <-channels.Cancel:
+		logger.Log.Warn("Cancellation signal received")
+		return nil, true
+	default:
+		select {
+		case req = <-channels.PriorityRequests:
+			if req != nil {
+				logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
+			}
+			return req, false
+		default:
+			select {
+			case req = <-channels.PriorityRequests:
+				if req != nil {
+					logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
+				}
+				return req, false
+			case req = <-channels.Requests:
+				if req != nil {
+					logger.Log.Tracef("normal REQUEST: %v", *req)
+				}
+				return req, false
+			case <-channels.Cancel:
+				logger.Log.Warn("Cancellation signal received")
+				return nil, true
+			case <-channels.Done:
+				logger.Log.Debug("Worker finished signal received")
+				return nil, true
+			}
+		}
+	}
+}
+
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
 func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, ignoredPackages []string) {
-	for req := range channels.Requests {
-		select {
-		case <-channels.Cancel:
-			logger.Log.Warn("Cancellation signal received")
-			return
-		default:
-		}
+	for req, cancelled := selectNextBuildRequest(channels); !cancelled && req != nil; req, cancelled = selectNextBuildRequest(channels) {
 
 		res := &BuildResult{
 			Node:           req.Node,
@@ -86,8 +122,10 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
 func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []string) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
+	var missingFiles []string
+
 	baseSrpmName := node.SRPMFileName()
-	usedCache, builtFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
+	usedCache, builtFiles, missingFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
 	skipped = sliceutils.Contains(ignoredPackages, node.SpecName(), sliceutils.StringMatch)
 
 	if skipped {
@@ -98,6 +136,11 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	if canUseCache && usedCache {
 		logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
 		return
+	}
+
+	// Print a message if a package is partially built but needs to be regenerated because its missing something.
+	if len(missingFiles) > 0 && len(builtFiles) != len(missingFiles) {
+		logger.Log.Infof("SRPM '%s' is being rebuilt due to partially missing components: %v", node.SrpmPath, missingFiles)
 	}
 
 	usedCache = false

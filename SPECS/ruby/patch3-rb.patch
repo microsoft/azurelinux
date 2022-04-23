@@ -1,0 +1,35 @@
+From ee6a16eed10c3ab6e4cc8285ca137e83964e0f5c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 1 Apr 2022 16:26:04 +0200
+Subject: [PATCH] Trust that .gemspec correctly declare their extensions.
+
+Do not judge the extension availability by the available extension
+build. This is already assumed on other places anyway:
+
+https://github.com/ruby/ruby/blob/d1d48cb690fdad855da94b2a2d11721428bc06ba/tool/rbinstall.rb#L1062
+---
+ tool/rbinstall.rb | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/tool/rbinstall.rb b/tool/rbinstall.rb
+index 8c8a14193ec9..259792ad878c 100755
+--- a/tool/rbinstall.rb
++++ b/tool/rbinstall.rb
+@@ -1064,9 +1064,6 @@ def install_default_gem(dir, srcdir, bindir)
+       next
+     end
+     spec.extension_dir = "#{extensions_dir}/#{spec.full_name}"
+-    if File.directory?(ext = "#{gem_ext_dir}/#{spec.full_name}")
+-      spec.extensions[0] ||= "-"
+-    end
+     package = RbInstall::DirPackage.new spec
+     ins = RbInstall::UnpackedInstaller.new(package, options)
+     puts "#{INDENT}#{spec.name} #{spec.version}"
+@@ -1075,6 +1072,7 @@ def install_default_gem(dir, srcdir, bindir)
+       File.chmod($data_mode, File.join(install_dir, "specifications", "#{spec.full_name}.gemspec"))
+     end
+     unless spec.extensions.empty?
++      ext = "#{gem_ext_dir}/#{spec.full_name}"
+       install_recursive(ext, without_destdir(spec.extension_dir))
+     end
+     installed_gems[spec.full_name] = true

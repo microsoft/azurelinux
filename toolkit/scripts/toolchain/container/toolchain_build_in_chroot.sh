@@ -197,14 +197,14 @@ set -e
 echo End sanity check - raw toolchain - adjusting the toolchain
 touch /logs/status_adjusting_toolchain_complete
 
-echo Zlib-1.2.11
-tar xf zlib-1.2.11.tar.xz
-pushd zlib-1.2.11
+echo Zlib-1.2.12
+tar xf zlib-1.2.12.tar.xz
+pushd zlib-1.2.12
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf zlib-1.2.11
+rm -rf zlib-1.2.12
 touch /logs/status_zlib_complete
 
 echo File-5.40
@@ -586,17 +586,17 @@ popd
 rm -rf gperf-3.1
 touch /logs/status_gperf_complete
 
-echo Expat-2.4.1
-tar xf expat-2.4.1.tar.bz2
-pushd expat-2.4.1
+echo Expat-2.4.8
+tar xf expat-2.4.8.tar.bz2
+pushd expat-2.4.8
 sed -i 's|usr/bin/env |bin/|' run.sh.in
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/expat-2.4.1
+            --docdir=/usr/share/doc/expat-2.4.8
 make -j$(nproc)
 make install
 popd
-rm -rf expat-2.4.1
+rm -rf expat-2.4.8
 touch /logs/status_expat_complete
 
 echo Perl-5.32.0
@@ -993,6 +993,7 @@ cd /sources
 echo sqlite-autoconf-3360000
 tar xf sqlite-autoconf-3360000.tar.gz
 pushd sqlite-autoconf-3360000
+patch -Np1 -i /tools/CVE-2021-36690.patch
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \

@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -126,7 +126,8 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
     --enable-python \
     --with-cap \
     --disable-silent-rules \
-    --with-selinux
+    --with-selinux \
+    --with-audit=no
 
 # Remove manpages translations
 rm -r docs/man/{fr,ja,ko,pl,ru,sk}
@@ -269,6 +270,10 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Apr 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.17.0-5
+- rpm-libs needs to run in container environments without systemd, audit was being
+-   pulled in as an automatic dependency. Explicitly disable the audit config.
+
 * Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.17.0-4
 - Update required dependecies for rpm-libs and rpm-build sub-packages.
 

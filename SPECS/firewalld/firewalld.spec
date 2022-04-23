@@ -3,7 +3,7 @@
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
 Version:        1.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,16 +41,6 @@ Requires(preun): systemd
 
 Suggests:       iptables-nft
 
-Conflicts:      cockpit-ws < 173-2
-Conflicts:      selinux-policy < 3.14.1-28
-
-# Remove old config subpackages
-Obsoletes:      firewalld-config-standard <= 0.3.15
-Obsoletes:      firewalld-config-cloud <= 0.3.15
-Obsoletes:      firewalld-config-server <= 0.3.15
-Obsoletes:      firewalld-config-workstation <= 0.3.15
-Obsoletes:      firewalld-selinux < 0.4.4.2-2
-
 Provides:       variant_config(Server)
 Provides:       variant_config(Workstation)
 
@@ -67,9 +57,6 @@ Summary:        Python3 bindings for firewalld
 Requires:       python3-dbus
 Requires:       python3-gobject-base
 Requires:       python3-nftables
-
-Obsoletes:      python-firewall < 0.5.2-2
-Obsoletes:      python2-firewall < 0.5.2-2
 
 %description -n python3-firewall
 Python3 bindings for firewalld.
@@ -316,6 +303,9 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
+* Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.3-2
+- Drop Obsoletes/Conflicts that don't apply to Mariner
+
 * Fri Jan 21 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.0.3-1
 - Update to 1.0.3
 - Add firewalld-test subpackage

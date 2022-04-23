@@ -7,7 +7,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.32.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -263,7 +263,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M lockdown=integrity
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -415,6 +415,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 19 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.32.1-3
+- Remove kernel lockdown config from grub envblock
+
 * Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
 - Remove trace symlink from _bindir
 - Exclude files and directories under the debug folder from kernel and kernel-tools packages
@@ -425,6 +428,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
   2022-1011, 2022-26490, 2021-4002
 - Enable MANA driver config
+- Address CVEs 2022-0995, 2022-1055, 2022-27666
 
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
 - Add Dell devices support
