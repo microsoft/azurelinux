@@ -6,7 +6,7 @@ Distribution:   Mariner
 
 Name:           rust-packaging
 Version:        14
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        RPM macros for building Rust packages on various architectures
 
 License:        MIT
@@ -31,7 +31,7 @@ Summary:        Convert Rust packages to RPM
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if %{with check}
-BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
 BuildRequires:  cargo
 %endif
 Requires:       cargo
@@ -54,7 +54,8 @@ install -D -p -m 0644 -t %{buildroot}%{_fileattrsdir} data/cargo.attr
 
 %if %{with check}
 %check
-py.test-%{python3_version} -vv test.py
+pip3 install pytest six
+py.test -vv test.py
 %endif
 
 %files
@@ -71,7 +72,12 @@ py.test-%{python3_version} -vv test.py
 %{python3_sitelib}/rust2rpm/
 
 %changelog
-* Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 14-3
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 14-4
+- Drop BR on pytest & pip install compatible pytest & six
+- Use py.test instead of py.test-3.9 to enable ptest
+- License verified
+
+* Fri Oct 29 2021 Muhammad Falak <mwani@microsoft.com> - 14-3
 - Remove epoch
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 14-2
