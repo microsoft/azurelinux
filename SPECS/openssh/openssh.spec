@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -144,6 +144,13 @@ sed -i 's/#PrintMotd yes/PrintMotd no/' %{buildroot}%{_sysconfdir}/ssh/sshd_conf
 sed -i 's/#PermitUserEnvironment no/PermitUserEnvironment no/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 120/' %{buildroot}%{_sysconfdir}/ssh/sshd_config
 
+# Configure to use strong MACs
+echo "MACs hmac-sha2-512,hmac-sha2-256" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
+echo "MACs hmac-sha2-512,hmac-sha2-256" >> %{buildroot}%{_sysconfdir}/ssh/ssh_config
+# Configure to use strong encryption ciphers
+echo "Ciphers aes256-ctr,aes192-ctr,aes128-ctr" >> %{buildroot}%{_sysconfdir}/ssh/sshd_config
+echo "Ciphers aes256-ctr,aes192-ctr,aes128-ctr" >> %{buildroot}%{_sysconfdir}/ssh/ssh_config
+
 install -D -m644 %{SOURCE1} %{buildroot}/lib/systemd/system/sshd.service
 install -D -m644 %{SOURCE2} %{buildroot}/lib/systemd/system/sshd-keygen.service
 install -m755 contrib/ssh-copy-id %{buildroot}/%{_bindir}/
@@ -244,6 +251,10 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Fri Apr 22 2022 Chris Co <chrco@microsoft.com> - 8.8p1-6
+- Use strong MACs for ssh and sshd
+- Use strong encryption ciphers for ssh and sshd
+
 * Mon Apr 11 2022 Andy Caldwell <andycaldwell@microsoft.com> - 8.8p1-5
 - Remove socket-triggering for SSHd due to conflicts with non-triggered service and potential DoS vector
 
