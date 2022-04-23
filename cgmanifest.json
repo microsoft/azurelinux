@@ -23114,16 +23114,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-minitest",
-          "version": "5.13.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/minitest-5.13.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-mocha",
           "version": "1.13.0",
           "downloadUrl": "https://github.com/freerange/mocha/archive/refs/tags/v1.13.0.tar.gz"
