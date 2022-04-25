@@ -22446,7 +22446,7 @@
         "other": {
           "name": "rpm-mpi-hooks",
           "version": "6",
-          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/blob/rawhide/f/mpi.attr"
+          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/rawhide/f/mpi.attr"
         }
       }
     },
