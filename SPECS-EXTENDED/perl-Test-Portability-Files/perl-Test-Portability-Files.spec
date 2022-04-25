@@ -1,6 +1,6 @@
 Name:           perl-Test-Portability-Files
 Version:        0.10
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Check file names portability
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -28,6 +28,7 @@ BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More) >= 0.88
 BuildRequires:  perl(utf8)
+BuildRequires:  perl(blib)
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
@@ -58,6 +59,10 @@ make test
 %{_mandir}/man3/Test::Portability::Files.3*
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.10-7
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
