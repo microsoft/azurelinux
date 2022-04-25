@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Class-ISA
 Version:        0.36
-Release:        1029%{?dist}
+Release:        1030%{?dist}
 Summary:        Report the search path for a class's ISA tree
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Class-ISA
@@ -11,6 +11,7 @@ BuildArch:      noarch
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test)
+BuildRequires:  perl(deprecate)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
@@ -39,6 +40,10 @@ make test
 %{perl_vendorlib}/*
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.36-1030
+- Add an explicit BR on `perl(deprecate)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.36-1029
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
