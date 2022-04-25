@@ -1,6 +1,6 @@
 Name:           perl-Test-Warn
 Version:        0.36
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Perl extension to test methods for warnings
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -25,6 +25,7 @@ BuildRequires:  perl(Test::Builder) >= 0.13
 BuildRequires:  perl(warnings)
 # Test Suite
 BuildRequires:  perl(constant)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::Builder::Tester) >= 1.02
 BuildRequires:  perl(Test::More)
@@ -63,6 +64,10 @@ make test
 %{_mandir}/man3/Test::Warn.3*
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.36-9
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.36-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
