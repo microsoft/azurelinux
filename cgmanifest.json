@@ -19983,6 +19983,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-hwdata",
+          "version": "2.3.7",
+          "downloadUrl": "https://github.com/xsuchy/python-hwdata/archive/python-hwdata-2.3.7-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-hyperlink",
           "version": "21.0.0",
           "downloadUrl": "https://github.com/python-hyper/hyperlink/archive/refs/tags/v21.0.0.tar.gz"
