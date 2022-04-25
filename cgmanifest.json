@@ -14023,6 +14023,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Class-Data-Inheritable",
+          "version": "0.08",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TM/TMTM/Class-Data-Inheritable-0.08.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Class-Factory-Util",
           "version": "1.7",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Class-Factory-Util-1.7.tar.gz"
