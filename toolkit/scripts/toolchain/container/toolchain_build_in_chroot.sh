@@ -1157,6 +1157,11 @@ install -p pythondistdeps.py /usr/lib/rpm/pythondistdeps.py
 install -p pythondeps.sh /usr/lib/rpm/pythondeps.sh
 install -p python.attr /usr/lib/rpm/fileattrs/python.attr
 
+# Install bootstrapped systemd macros, so toolchain specs can use systemd service macros.
+# We don't need systemd to be installed for these macros- we just want the macros to
+# be able to expand at RPM build-time
+install -p macros.systemd-250.3 /usr/lib/rpm/macros.d/macros.systemd
+
 touch /logs/status_rpm_complete
 
 # Cleanup
