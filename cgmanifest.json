@@ -22444,6 +22444,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rpm-mpi-hooks",
+          "version": "6",
+          "downloadUrl": "https://src.fedoraproject.org/rpms/rpm-mpi-hooks/blob/rawhide/f/mpi.attr"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rpm-ostree",
           "version": "2022.1",
           "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2022.1/rpm-ostree-2022.1.tar.xz"
@@ -23774,6 +23784,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "sblim-cmpi-syslog",
+          "version": "0.9.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sblim-cmpi-syslog-0.9.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sblim-indication_helper",
           "version": "0.5.0",
           "downloadUrl": "http://downloads.sourceforge.net/sblim/sblim-indication_helper-0.5.0.tar.bz2"
@@ -23953,6 +23973,26 @@
     {
       "component": {
         "type": "other",
+        "other": {
+          "name": "servletapi4",
+          "version": "4.0.4",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jakarta-servletapi-4-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "servletapi5",
+          "version": "5.0.18",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jakarta-servletapi-5-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-server-utils' package, version 7.7",
         "other": {
           "name": "sessreg",
@@ -24004,6 +24044,16 @@
     {
       "component": {
         "type": "other",
+        "other": {
+          "name": "setuptool",
+          "version": "1.19.11",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/setuptool-1.19.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-xkb-utils' package, version 7.7",
         "other": {
           "name": "setxkbmap",
@@ -24029,6 +24079,16 @@
           "name": "sgabios",
           "version": "0.20180715git",
           "downloadUrl": "https://gitlab.com/qemu-project/sgabios/-/archive/72f39d48bedf044e202fd51fecf3e2218fc2ae66/sgabios-72f39d48bedf044e202fd51fecf3e2218fc2ae66.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sgpio",
+          "version": "1.2.0.10",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sgpio-1.2-0.10-src.tar.gz"
         }
       }
     },
@@ -24379,6 +24439,16 @@
           "name": "spirv-tools",
           "version": "2022.1",
           "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/v2022.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "splix",
+          "version": "2.0.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/splix-2.0.1.20130902svn.tar.bz2"
         }
       }
     },
@@ -25136,6 +25206,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ttmkfdir",
+          "version": "3.0.9",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/ttmkfdir-3.0.9.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tuna",
           "version": "0.14.1",
           "downloadUrl": "https://git.kernel.org/pub/scm/utils/tuna/tuna.git/snapshot/tuna-0.14.1.tar.gz"
@@ -25616,6 +25696,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "virt-who",
+          "version": "0.22.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/virt-who-0.22.1-1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "vitess",
           "version": "8.0.0",
           "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v8.0.0.tar.gz"
@@ -25849,6 +25939,16 @@
           "name": "wpebackend-fdo",
           "version": "1.6.0",
           "downloadUrl": "https://github.com/Igalia/wpebackend-fdo/archive/1.6.0/wpebackend-fdo-1.6.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "wsmancli",
+          "version": "2.6.0",
+          "downloadUrl": "https://github.com/Openwsman/wsmancli/archive/v2.6.0.tar.gz"
         }
       }
     },
@@ -26185,6 +26285,16 @@
     {
       "component": {
         "type": "other",
+          "other": {
+          "name": "xhtml",
+          "version": "1.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xhtml1-dtds-20020801.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
         "other": {
           "name": "xinetd",
           "version": "2.3.15",
@@ -26340,6 +26450,16 @@
           "name": "xml-commons-resolver",
           "version": "1.2",
           "downloadUrl": "http://www.apache.org/dist/xerces/xml-commons/xml-commons-resolver-1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xmldb-api",
+          "version": "0.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xmldb-xapi-20041010-src.tar.bz2"
         }
       }
     },
@@ -26575,6 +26695,16 @@
           "name": "xrefresh",
           "version": "1.0.6",
           "downloadUrl": "https://www.x.org/pub/individual/app/xrefresh-1.0.6.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xrestop",
+          "version": "0.4",
+          "downloadUrl": "http://downloads.yoctoproject.org/releases/xrestop/xrestop-0.4.tar.gz"
         }
       }
     },
