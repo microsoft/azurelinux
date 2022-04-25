@@ -9,13 +9,16 @@ Distribution:   Mariner
 
 Name:             python-%{modname}
 Version:          3.7.7
-Release:          8%{?dist}
+Release:          9%{?dist}
 Summary:          Python code checking using pyflakes, pycodestyle, and mccabe
 
 License:          MIT
 URL:              https://gitlab.com/pycqa/flake8
 Source0:          https://files.pythonhosted.org/packages/source/f/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
 BuildArch:        noarch
+%if %{with_check}
+BuildRequires:    python3-pip
+%endif
 
 %description
 Flake8 is a wrapper around PyFlakes, pycodestyle, and Ned's McCabe
@@ -45,7 +48,6 @@ BuildRequires:    python%{python3_pkgversion}-mccabe %{mccabe_dep}
 BuildRequires:    python%{python3_pkgversion}-pycodestyle %{pycodestyle_dep}
 BuildRequires:    python%{python3_pkgversion}-pyflakes %{pyflakes_dep}
 BuildRequires:    python%{python3_pkgversion}-mock
-BuildRequires:    python%{python3_pkgversion}-pytest
 
 %description -n python%{python3_pkgversion}-%{modname}
 Flake8 is a wrapper around PyFlakes, pycodestyle, and Ned's McCabe
@@ -77,8 +79,8 @@ ln -s flake8 %{buildroot}%{_bindir}/python3-flake8
 
 
 %check
-export PYTHONPATH=%{buildroot}%{python3_sitelib}
-export PATH=%{buildroot}%{_bindir}:$PATH
+pip3 install pytest
+pip3 install .
 %{__python3} -m pytest tests -v
 
 
@@ -93,6 +95,11 @@ export PATH=%{buildroot}%{_bindir}:$PATH
 
 
 %changelog
+* Tue Apr 26 2022 Muhammad Falak <mwani@microsoft.com> - 3.7.7-9
+- Drop BR on `pytest` and add an explict BR pip
+- pip install latest deps to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.7-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
