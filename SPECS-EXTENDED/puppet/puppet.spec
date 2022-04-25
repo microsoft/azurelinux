@@ -5,7 +5,7 @@
 Summary:        Network tool for managing many disparate systems
 Name:           puppet
 Version:        7.12.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -165,13 +165,13 @@ useradd -r -u 52 -g puppet -s /sbin/nologin \
 
 %doc README.md examples
 %license LICENSE
-%{_libdir}/ruby/vendor_ruby/hiera
-%{_libdir}/ruby/vendor_ruby/hiera_puppet.rb
-%{_libdir}/ruby/vendor_ruby/puppet
-%{_libdir}/ruby/vendor_ruby/puppet_pal.rb
-%{_libdir}/ruby/vendor_ruby/puppet.rb
-%{_libdir}/ruby/vendor_ruby/puppet_x.rb
-%{_libdir}/ruby/vendor_ruby/puppet
+%{ruby_vendorlibdir}/hiera
+%{ruby_vendorlibdir}/hiera_puppet.rb
+%{ruby_vendorlibdir}/puppet
+%{ruby_vendorlibdir}/puppet_pal.rb
+%{ruby_vendorlibdir}/puppet.rb
+%{ruby_vendorlibdir}/puppet_x.rb
+%{ruby_vendorlibdir}/puppet
 %dir %{_sharedstatedir}/%{name}
 %dir %{_sharedstatedir}/%{name}/public
 %{_bindir}/puppet
@@ -208,6 +208,9 @@ useradd -r -u 52 -g puppet -s /sbin/nologin \
 %ghost %attr(755, puppet, puppet) %{_rundir}/%{name}
 
 %changelog
+* Sun Apr 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.12.1-4
+- Updating Ruby vendor lib path macro.
+
 * Thu Apr 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.12.1-3
 - Spec clean-up.
 
