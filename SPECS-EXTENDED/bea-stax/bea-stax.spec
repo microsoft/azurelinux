@@ -22,7 +22,7 @@ Distribution:   Mariner
 %global apiver  1.0.1
 Name:           bea-stax
 Version:        1.2.0
-Release:        38%{?dist}
+Release:        39%{?dist}
 Summary:        Streaming API for XML
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -106,6 +106,9 @@ install -p -m 0644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-api-%{version}
 %endif
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-39
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-38
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

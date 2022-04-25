@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 1.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 URL: http://bcache.evilpiepirate.org/
 VCS: git://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git
@@ -107,6 +107,9 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %{dracutlibdir}/modules.d/90bcache
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-2
+- Updating source URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

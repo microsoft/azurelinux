@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: A plain ASCII to PostScript converter
 Name: enscript
 Version: 1.6.6
-Release: 23%{?dist}
+Release: 24%{?dist}
 License: GPLv3+ and LGPLv2+ and GPLv2+
 URL: http://www.gnu.org/software/enscript
 # Tarball exists nowhere. You have to obtain it via:
@@ -114,6 +114,9 @@ done
 %config(noreplace) %{_sysconfdir}/enscript.cfg
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-24
+- Updating source URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

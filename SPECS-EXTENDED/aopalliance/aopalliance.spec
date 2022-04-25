@@ -20,7 +20,7 @@ Distribution:   Mariner
 
 Name:           aopalliance
 Version:        1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Java/J2EE AOP standards
 License:        Public Domain
 Group:          Development/Libraries/Java
@@ -87,6 +87,9 @@ cp -pr build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-3
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

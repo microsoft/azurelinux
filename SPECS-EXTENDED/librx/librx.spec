@@ -1,7 +1,7 @@
 Summary: POSIX regexp functions
 Name: librx
 Version: 1.5
-Release: 36%{?dist}
+Release: 37%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,9 @@ chmod -x ${RPM_BUILD_ROOT}%{_includedir}/rxposix.h
 %{_libdir}/*.so
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-37
+- Updating source URLs.
+
 * Fri Dec 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.5-36
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Update installation directories to Mariner's location.

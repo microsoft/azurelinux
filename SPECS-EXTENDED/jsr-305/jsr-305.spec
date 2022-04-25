@@ -22,7 +22,7 @@ Distribution:   Mariner
 %global svn_date 20130910
 Name:           jsr-305
 Version:        0.1+%{svn_date}
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Correctness annotations for Java code
 # The majority of code is BSD-licensed, but some Java sources
 # are licensed under CC-BY license, see: $ grep -r Creative .
@@ -103,6 +103,9 @@ cp -pr ri/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1+20130910-6
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1+20130910-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

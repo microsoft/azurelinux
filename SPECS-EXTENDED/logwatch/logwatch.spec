@@ -4,7 +4,7 @@ Distribution:   Mariner
 Summary: A log file analysis program
 Name: logwatch
 Version: 7.5.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT
 URL: http://www.logwatch.org/
 Source0: https://sourceforge.net/projects/%{name}/files/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -126,6 +126,9 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %{_unitdir}/logwatch.timer
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-4
+- Updating source URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name: container-exception-logger
 Version: 1.0.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Logging from a container to a host
 
 License: GPLv3+
@@ -42,6 +42,9 @@ cp man/container-exception-logger.1 %{buildroot}/%{_mandir}/man1/container-excep
 %license COPYING
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-6
+- Updating source URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

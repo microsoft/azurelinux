@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary: A mouse server for the Linux console
 Name: gpm
 Version: 1.20.7
-Release: 22%{?dist}
+Release: 23%{?dist}
 License: GPLv2 and GPLv2+ with exceptions and GPLv3+ and Verbatim and Copyright only
 URL: http://www.nico.schottelius.org/software/gpm/
 #URL2 : http://freecode.com/projects/gpm
@@ -159,6 +159,9 @@ rm -rf %{buildroot}%{_mandir}
 %{_libdir}/libgpm.a
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-23
+- Updating source URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

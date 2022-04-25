@@ -20,7 +20,7 @@ Distribution:   Mariner
 
 Name:           jsoup
 Version:        1.11.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Java library for working with HTML
 License:        MIT
 Group:          Development/Libraries/Java
@@ -91,6 +91,9 @@ install -pdm 0755 target/site/apidocs %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.3-3
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.3-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

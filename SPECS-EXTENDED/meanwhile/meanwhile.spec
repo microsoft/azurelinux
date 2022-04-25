@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           meanwhile
 Version:        1.1.0
-Release:        29%{?dist}
+Release:        30%{?dist}
 Summary:        Lotus Sametime Community Client library
 License:        LGPLv2+
 URL:            http://%{name}.sourceforge.net
@@ -91,6 +91,9 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %doc docs/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-30
+- Updating source URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-29
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

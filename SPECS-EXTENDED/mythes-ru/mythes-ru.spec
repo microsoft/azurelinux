@@ -4,7 +4,7 @@ Name: mythes-ru
 Summary: Russian thesaurus
 %global upstreamid 20070613
 Version: 0.%{upstreamid}
-Release: 22%{?dist}
+Release: 23%{?dist}
 # Below source link is dead now
 # Source: http://download.i-rs.ru/pub/openoffice/dict/thes_ru_RU_v2.zip
 Source: https://cblmarinerstorage.blob.core.windows.net/sources/core/thes_ru_RU_v2.zip
@@ -39,6 +39,9 @@ done
 %{_datadir}/mythes/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20070613-23
+- Updating source URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20070613-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

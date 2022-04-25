@@ -23,7 +23,7 @@ Distribution:   Mariner
 %global git_version 20100611git1f74ea7
 Name:           atinject
 Version:        %{base_version}+%{git_version}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Dependency injection specification for Java (JSR-330)
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -117,6 +117,9 @@ cp -pr  build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1+20100611git1f74ea7-3
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1+20100611git1f74ea7-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:		dotconf
 Version:	1.3
-Release:	24%{?dist}
+Release:	25%{?dist}
 Summary:	Libraries to parse configuration files
 License:	LGPLv2
 URL:		https://github.com/williamh/dotconf/
@@ -64,6 +64,9 @@ mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/* __tmp_doc
 %{_libdir}/pkgconfig/dotconf.pc
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-25
+- Updating source URLs.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

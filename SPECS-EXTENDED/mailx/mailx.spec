@@ -6,7 +6,7 @@ Distribution:   Mariner
 Summary: Enhanced implementation of the mailx command
 Name: mailx
 Version: 12.5
-Release: 34%{?dist}
+Release: 35%{?dist}
 # MPLv1.1 .. nss.c, nsserr.c
 License: BSD with advertising and MPLv1.1
 URL: http://heirloom.sourceforge.net/mailx.html
@@ -164,6 +164,9 @@ popd
 
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.5-35
+- Updating source URLs.
+
 * Wed Jan 06 2021 Joe Schmitt <joschmit@microsoft.com> - 12.5-34
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Use nss

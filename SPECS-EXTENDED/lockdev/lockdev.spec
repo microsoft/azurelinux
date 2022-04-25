@@ -12,7 +12,7 @@ Distribution:   Mariner
 Summary: A library for locking devices
 Name: lockdev
 Version: 1.0.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPLv2
 URL: https://github.com/definesat/lockdev
 
@@ -113,6 +113,9 @@ fi
 %{_includedir}/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-2
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

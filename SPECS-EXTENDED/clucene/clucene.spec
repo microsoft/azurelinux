@@ -8,7 +8,7 @@ Distribution:   Mariner
 Summary:	A C++ port of Lucene
 Name:		clucene
 Version:	2.3.3.4
-Release:	37%{?dist}
+Release:	38%{?dist}
 License:	LGPLv2+ or ASL 2.0
 URL:		http://www.sourceforge.net/projects/clucene
 %if 0%{?snap}
@@ -142,6 +142,9 @@ time make -C %{_target_platform} test ARGS="--timeout 300 --output-on-failure" |
 
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3.4-38
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3.4-37
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

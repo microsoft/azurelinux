@@ -15,7 +15,7 @@ Distribution:   Mariner
 Name:    fence-virt
 Summary: A pluggable fencing framework for virtual machines
 Version: 1.0.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2+
 URL:     https://github.com/ClusterLabs/fence-virt
 Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.bz2
@@ -166,6 +166,9 @@ are located on corosync cluster nodes.
 %{_libdir}/%{name}/cpg.so
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

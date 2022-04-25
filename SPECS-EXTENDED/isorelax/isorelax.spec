@@ -21,7 +21,7 @@ Distribution:   Mariner
 %define	cvsversion	20041111
 Name:           isorelax
 Version:        0.1
-Release:        30%{?dist}
+Release:        31%{?dist}
 Summary:        Public interfaces useful for applications to support RELAX Core
 License:        Apache-2.0 AND MIT
 Group:          Development/Libraries/Java
@@ -94,6 +94,9 @@ install -m 644 %{SOURCE4} %{buildroot}%{_mavenpomdir}/%{name}-%{version}.pom
 %endif
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-31
+- Updating source URLs.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-30
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
