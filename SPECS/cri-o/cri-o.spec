@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.21.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -114,24 +114,6 @@ cd $HOME/go/src/%{project}
 # Build crio
 GO_BUILD="go build -mod vendor" make
 
-%pre
-%service_add_pre crio.service
-
-%post
-%service_add_post crio.service
-# This is the additional directory where cri-o is going to look up for CNI
-# plugins installed by DaemonSets running on Kubernetes (i.e. Cilium).
-mkdir -p /opt/cni/bin
-
-%post kubeadm-criconfig
-%fillup_only -n kubelet
-
-%preun
-%service_del_preun crio.service
-
-%postun
-%service_del_postun crio.service
-
 %install
 cd $HOME/go/src/%{project}
 
@@ -166,6 +148,21 @@ install -d -m 0755 %{buildroot}%{_sbindir}
 ln -sf service %{buildroot}%{_sbindir}/rccrio
 
 %fdupes %{buildroot}/%{_prefix}
+
+%post
+%systemd_post crio.service
+# This is the additional directory where cri-o is going to look up for CNI
+# plugins installed by DaemonSets running on Kubernetes (i.e. Cilium).
+mkdir -p /opt/cni/bin
+
+%post kubeadm-criconfig
+%fillup_only -n kubelet
+
+%preun
+%systemd_preun crio.service
+
+%postun
+%systemd_postun_with_restart crio.service
 
 %files
 # Binaries
@@ -206,6 +203,9 @@ ln -sf service %{buildroot}%{_sbindir}/rccrio
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Mon Apr 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.21.2-4
+- Replace openSUSE systemd macros with upstream systemd macros
+
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.21.2-3
 - Added missing BR on "systemd-rpm-macros".
 
