@@ -21693,6 +21693,17 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-trio",
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/python-trio/trio/archive/v0.16.0.tar.gz"
+        }
+      }
+    },
+    
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-twisted",
           "version": "22.2.0",
           "downloadUrl": "https://github.com/twisted/twisted/archive/refs/tags/twisted-22.2.0.tar.gz"
