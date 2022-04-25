@@ -1,6 +1,6 @@
 Name:           perl-Pod-Markdown
 Version:        3.200
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Convert POD to Markdown
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -29,6 +29,7 @@ BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(Symbol)
 BuildRequires:  perl(Test::Differences)
 BuildRequires:  perl(Test::More) >= 0.88
@@ -61,6 +62,10 @@ make test
 %{_bindir}/*
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 3.200-4
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.200-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

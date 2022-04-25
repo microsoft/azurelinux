@@ -1,0 +1,21 @@
+From 366e3798bdbd6b7bf24e59379f4a9a51af575ce9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tomasz=20Pawe=C5=82=20Gajc?= <tpgxyz@gmail.com>
+Date: Thu, 20 Feb 2020 16:09:40 +0100
+Subject: [PATCH] fix requires in pc file
+
+---
+ avahi-libevent.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/avahi-libevent.pc.in b/avahi-libevent.pc.in
+index a1dca01b8..3356b0b39 100644
+--- a/avahi-libevent.pc.in
++++ b/avahi-libevent.pc.in
+@@ -6,6 +6,6 @@ includedir=${prefix}/include
+ Name: avahi-libevent
+ Description: Avahi Multicast DNS Responder (libevent Support)
+ Version: @PACKAGE_VERSION@
+-Requires: libevent-2.1.5
++Requires: libevent >= 2.1.5
+ Libs: -L${libdir} -lavahi-libevent
+ Cflags: -D_REENTRANT -I${includedir}

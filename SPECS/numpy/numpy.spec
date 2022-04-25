@@ -1,6 +1,6 @@
 Summary:        Array processing for numbers, strings, records, and objects
 Name:           numpy
-Version:        1.22.0
+Version:        1.22.3
 Release:        1%{?dist}
 # The custom license is inside numpy/core/src/multiarray/dragon4.c.
 License:        BSD AND ZLIB custom
@@ -9,17 +9,13 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://numpy.org/
 Source0:        https://github.com/numpy/numpy/releases/download/v%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  gcc-c++
+BuildRequires:  gcc-gfortran
 BuildRequires:  lapack-devel
-BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-BuildRequires:  python3-libs
-BuildRequires:  unzip
 BuildRequires:  python3-Cython >= 0.29.24
 %if %{with_check}
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
 BuildRequires:  python3-pip
 %endif
 
@@ -29,7 +25,6 @@ NumPy is a general-purpose array-processing package designed to efficiently mani
 %package -n     python3-numpy
 Summary:        python-numpy
 Requires:       python3
-Requires:       python3-libs
 
 %description -n python3-numpy
 Python 3 version.
@@ -54,15 +49,13 @@ This package includes a version of f2py that works properly with NumPy.
 
 %check
 pip3 install nose pytest
-pushd test
-PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} python3 -c "import numpy; numpy.test()"
-popd
-rm -rf test
+mkdir -pv test
+cd test
+PYTHONPATH=%{buildroot}%{python3_sitelib} PATH=$PATH:%{buildroot}%{_bindir} %python3 -c "import numpy; numpy.test()"
 
 %files -n python3-numpy
 %license LICENSE.txt
 %{python3_sitelib}/*
-%{_bindir}/f2py3
 
 %files -n python3-numpy-f2py
 %{_bindir}/f2py
@@ -70,6 +63,13 @@ rm -rf test
 %{_bindir}/f2py%{python3_version}
 
 %changelog
+* Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.22.3-1
+- Upgrade to latest upstream version
+- Consolidate python requirements
+- Add specific requirements on gcc-c++, gcc-gfortran
+- Fix test invocation so we actually catch failures
+- Remove f2py3 binary from python3-numpy package (doubly packaged)
+
 * Thu Jan 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.22.0-1
 - Update version to 1.22.0 fix CVE-2021-34141.
 

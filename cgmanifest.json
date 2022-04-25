@@ -715,8 +715,8 @@
         "type": "other",
         "other": {
           "name": "avahi",
-          "version": "0.7",
-          "downloadUrl": "https://github.com/lathiat/avahi/releases/download/v0.7/avahi-0.7.tar.gz"
+          "version": "0.8",
+          "downloadUrl": "https://github.com/lathiat/avahi/releases/download/v0.8/avahi-0.8.tar.gz"
         }
       }
     },
@@ -1747,16 +1747,6 @@
         "type": "other",
         "other": {
           "name": "coredns",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.7.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "coredns",
           "version": "1.8.0",
           "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.0.tar.gz"
         }
@@ -1769,6 +1759,16 @@
           "name": "coredns",
           "version": "1.8.4",
           "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coredns",
+          "version": "1.8.6",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.6.tar.gz"
         }
       }
     },
@@ -2867,16 +2867,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "envoy",
-          "version": "1.14.4",
-          "downloadUrl": "https://github.com/envoyproxy/envoy/archive/refs/tags/v1.14.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "eppic",
           "version": "e8844d3793471163ae4a56d8f95897be9e5bd554",
           "downloadUrl": "https://github.com/lucchouina/eppic/archive/e8844d3793471163ae4a56d8f95897be9e5bd554/eppic-e8844d3.tar.gz"
@@ -2918,8 +2908,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.4.13",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.4.13.tar.gz"
+          "version": "3.5.0",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.0.tar.gz"
         }
       }
     },
@@ -2928,8 +2918,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.0",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.0.tar.gz"
+          "version": "3.5.1",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.1.tar.gz"
         }
       }
     },
@@ -4522,6 +4512,16 @@
           "name": "hicolor-icon-theme",
           "version": "0.17",
           "downloadUrl": "https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.17.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hiera",
+          "version": "3.7.0",
+          "downloadUrl": "http://downloads.puppetlabs.com/hiera/hiera-3.7.0.tar.gz"
         }
       }
     },
@@ -9520,6 +9520,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libsafec",
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/rurban/safeclib/releases/download/v3.7.1/safeclib-3.7.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libsass",
           "version": "3.6.3",
           "downloadUrl": "https://github.com/sass/libsass/archive/3.6.3/libsass-3.6.3.tar.gz"
@@ -12244,7 +12254,7 @@
         "other": {
           "name": "ncurses",
           "version": "6.2",
-          "downloadUrl": "ftp://ftp.invisible-island.net/ncurses/ncurses-6.2.tar.gz"
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/ncurses-6.2.tar.gz"
         }
       }
     },
@@ -12653,8 +12663,8 @@
         "type": "other",
         "other": {
           "name": "numpy",
-          "version": "1.22.0",
-          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.22.0/numpy-1.22.0.tar.gz"
+          "version": "1.22.3",
+          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.22.3/numpy-1.22.3.tar.gz"
         }
       }
     },
@@ -19233,6 +19243,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "puppet",
+          "version": "7.12.1",
+          "downloadUrl": "https://downloads.puppetlabs.com/puppet/puppet-7.12.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pwgen",
           "version": "2.08",
           "downloadUrl": "http://download.sf.net/pwgen/pwgen-2.08.tar.gz"
@@ -23274,9 +23294,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-hoe",
+          "version": "3.18.0",
+          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v3.18.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-hocon",
           "version": "1.3.1",
           "downloadUrl": "https://github.com/puppetlabs/ruby-hocon/archive/refs/tags/1.3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-hpricot",
+          "version": "0.8.6",
+          "downloadUrl": "https://github.com/hpricot/hpricot/archive/refs/tags/0.8.6.tar.gz"
         }
       }
     },
@@ -23377,16 +23417,6 @@
           "name": "rubygem-mini_portile2",
           "version": "2.5.0",
           "downloadUrl": "https://rubygems.org/downloads/mini_portile2-2.5.0.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-minitest",
-          "version": "5.13.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/minitest-5.13.0.tar.gz"
         }
       }
     },
@@ -23514,16 +23544,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-power_assert",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/ruby/power_assert/archive/refs/tags/v2.0.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-prometheus-client",
           "version": "0.9.0",
           "downloadUrl": "https://rubygems.org/downloads/prometheus-client-0.9.0.gem"
@@ -23575,8 +23595,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-psych",
-          "version": "3.0.0",
-          "downloadUrl": "https://github.com/ruby/psych/archive/refs/tags/v3.0.0.tar.gz"
+          "version": "4.0.3",
+          "downloadUrl": "https://github.com/ruby/psych/archive/refs/tags/v4.0.3.tar.gz"
         }
       }
     },
@@ -23614,9 +23634,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-rake",
-          "version": "13.0.6",
-          "downloadUrl": "https://github.com/ruby/rake/archive/refs/tags/v13.0.6.tar.gz"
+          "name": "rubygem-rake-compiler",
+          "version": "1.1.9",
+          "downloadUrl": "https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v1.1.9.tar.gz"
         }
       }
     },
@@ -23754,6 +23774,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-stringio",
+          "version": "3.0.1",
+          "downloadUrl": "https://github.com/ruby/stringio/archive/refs/tags/v3.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-strptime",
           "version": "0.2.5",
           "downloadUrl": "https://rubygems.org/downloads/strptime-0.2.5.gem"
@@ -23797,16 +23827,6 @@
           "name": "rubygem-td-logger",
           "version": "0.3.27",
           "downloadUrl": "https://rubygems.org/downloads/td-logger-0.3.27.gem"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-test-unit",
-          "version": "3.5.3",
-          "downloadUrl": "https://github.com/test-unit/test-unit/archive/refs/tags/3.5.3.tar.gz"
         }
       }
     },

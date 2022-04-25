@@ -14,6 +14,7 @@
 # List of ignored specs due to no source tarball to scan.
 ignore_no_source_tarball=" \
   ca-certificates \
+  check-restart \
   core-packages \
   ghc-srpm-macros \
   hunspell-nl \

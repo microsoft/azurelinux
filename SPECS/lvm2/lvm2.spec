@@ -3,7 +3,7 @@
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 AND BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,7 +93,6 @@ License:        LGPLv2
 Group:          Development/Libraries
 Requires:       device-mapper = %{version}-%{release}
 Requires:       libselinux-devel
-Provides:       pkgconfig(devmapper)
 
 %description -n device-mapper-devel
 This package contains files needed to develop applications that use
@@ -312,6 +311,7 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %{_sbindir}/blkdeactivate
 %{_sbindir}/fsadm
 %{_sbindir}/lv*
+%exclude %{_sbindir}/lvmdbusd
 %{_sbindir}/pv*
 %{_sbindir}/vg*
 %{_mandir}/man5/lvm.conf.5.gz
@@ -319,10 +319,12 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %{_mandir}/man8/blkdeactivate.8.gz
 %{_mandir}/man8/fsadm.8.gz
 %{_mandir}/man8/lv*
+%exclude %{_mandir}/man8/lvmdbusd.8.gz
 %{_mandir}/man8/pv*
 %{_mandir}/man8/vg*
 %{_unitdir}/blk-availability.service
 %{_unitdir}/lvm2-*
+%exclude %{_unitdir}/lvm2-lvmdbusd.service
 %{_libdir}/systemd/system-preset/50-lvm2.preset
 %{_libdir}/tmpfiles.d/lvm2.conf
 %dir %{_sysconfdir}/lvm
@@ -333,6 +335,10 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Thu Apr 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.03.15-2
+- Fix double-packaging of dbusd files in main package
+- Remove manual pkgconfig provide
+
 * Wed Feb 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.03.15-1
 - Upgrading to newest version 2.03.15
 

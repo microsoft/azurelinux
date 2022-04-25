@@ -7,7 +7,7 @@
 
 Name:		perl-Package-Stash
 Version:	0.38
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Routines for manipulating stashes
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -42,6 +42,7 @@ BuildRequires:	perl(base)
 BuildRequires:	perl(IO::Handle)
 BuildRequires:	perl(IPC::Open3)
 BuildRequires:	perl(lib)
+BuildRequires:	perl(blib)
 BuildRequires:	perl(Test::Fatal)
 BuildRequires:	perl(Test::More) >= 0.88
 BuildRequires:	perl(Test::Requires)
@@ -92,6 +93,10 @@ make test
 %{_mandir}/man3/Package::Stash::PP.3*
 
 %changelog
+* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.38-7
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.38-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
