@@ -18303,6 +18303,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-XML-SAX",
+          "version": "1.02",
+          "downloadUrl": "http://www.cpan.org/authors/id/G/GR/GRANTM/XML-SAX-1.02.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-XML-SAX-Base",
           "version": "1.09",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-Base-1.09.tar.gz"
