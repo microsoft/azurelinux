@@ -4,18 +4,12 @@
 %global ruby_libdir   %{_datadir}/%{name}
 
 %global gem_dir %{_libdir}/ruby/gems
-%global rubygems_molinillo_version    0.5.7
 %global rubygems_version              3.1.6
-
-%global rubygems_minitest_version     5.15.0
-%global rubygems_power_assert_version 2.0.1
-%global rubygems_rake_version         13.0.6
-%global rubygems_test_unit_version    3.5.3
 
 Summary:        Ruby
 Name:           ruby
 Version:        3.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,19 +53,6 @@ Provides:       rubygem(irb) = %{version}-%{release}
 Provides:       rubygem-irb = %{version}-%{release}
 Provides:       rubygem-did_you_mean = %{version}-%{release}
 
-Provides:       rubygem(minitest) = %{rubygems_minitest_version}
-Provides:       rubygem-minitest = %{rubygems_minitest_version}
-
-Provides:       rubygem(power_assert) = %{rubygems_power_assert_version}
-Provides:       rubygem-power_assert = %{rubygems_power_assert_version}
-
-Provides:       rubygem(rake) = %{rubygems_rake_version}
-Provides:       rubygem-rake = %{rubygems_rake_version}
-Provides:       rubygem-rake-doc = %{rubygems_rake_version}
-
-Provides:       rubygem(test-unit) = %{rubygems_test_unit_version}
-Provides:       rubygem-test-unit = %{rubygems_test_unit_version}
-
 %description
 The Ruby package contains the Ruby development environment.
 This is useful for object-oriented scripting.
@@ -108,6 +89,10 @@ Macros and development tools for packaging RubyGems.
 
 %prep
 %autosetup -p1
+pushd gems
+rm *
+echo "# gem-name version-to-bundle repository-url [optional-commit-hash-to-test-or-defaults-to-v-version]" > bundled_gems
+popd
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -132,6 +117,7 @@ autoconf
         --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(uname -m) \
         --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(uname -m) \
         --with-rubygemsdir=%{rubygems_dir} \
+        --disable-rubygems \
         --enable-shared \
         --with-compress-debug-sections=no \
         --docdir=%{_docdir}/%{name}-%{version}
@@ -210,6 +196,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.2-3
+- Remove bundled gems from ruby.
+
 * Fri Apr 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.2-2
 - Adding "Provides" for bundled gems: "minitest", "power_assert", "rake", and "test-unit".
 - Updated vendor macros.
