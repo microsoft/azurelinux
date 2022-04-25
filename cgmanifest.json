@@ -12222,6 +12222,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nodejs-nodemon",
+          "version": "2.0.3",
+          "downloadUrl": "https://github.com/remy/nodemon/archive/v2.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nodejs-packaging",
           "version": "25",
           "downloadUrl": "https://releases.pagure.org/nodejs-packaging/nodejs-packaging-fedora-25.tar.xz"
