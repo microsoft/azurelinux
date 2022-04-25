@@ -371,7 +371,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Clean up nopatches in Patch list, no longer needed for CVE automation
 - Nopatch CVE-2022-28390, CVE-2022-28389, CVE-2022-28388, CVE-2022-28356, CVE-2022-0435,
     CVE-2021-4202, CVE-2022-27950, CVE-2022-0433, CVE-2022-0494, CVE-2022-0330, CVE-2022-0854, 
-    CVE-2021-4197
+    CVE-2021-4197, CVE-2022-29156
 
 * Tue Apr 19 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.32.1-3
 - Remove kernel lockdown config from grub envblock
