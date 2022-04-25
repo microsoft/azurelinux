@@ -224,6 +224,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "aopalliance",
+          "version": "1.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aopalliance-src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "apache-commons-cli",
           "version": "1.4",
           "downloadUrl": "http://www.apache.org/dist/commons/cli/source/commons-cli-1.4-src.tar.gz"
@@ -554,6 +564,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "atinject",
+          "version": "1+20100611git1f74ea7",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/atinject-1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "atk",
           "version": "2.36.0",
           "downloadUrl": "https://download.gnome.org/sources/atk/2.36/atk-2.36.0.tar.xz"
@@ -854,6 +874,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "bcache-tools",
+          "version": "1.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/bcache-tools-1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bcc",
           "version": "0.24.0",
           "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.24.0/bcc-src-with-submodule.tar.gz"
@@ -889,6 +919,16 @@
           "name": "bdftopcf",
           "version": "1.1",
           "downloadUrl": "https://www.x.org/pub/individual/app/bdftopcf-1.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "bea-stax",
+          "version": "1.2.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/stax-src-1.2.0.zip"
         }
       }
     },
@@ -1516,6 +1556,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "clucene",
+          "version": "2.3.3.4",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/clucene-core-2.3.3.4-e8e3d20.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cmake",
           "version": "3.21.4",
           "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
@@ -1649,6 +1699,16 @@
           "name": "console-setup",
           "version": "1.194",
           "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/c/console-setup/console-setup_1.194.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "container-exception-logger",
+          "version": "1.0.3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/container-exception-logger-1.0.3.tar.gz"
         }
       }
     },
@@ -2147,6 +2207,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "device-mapper-persistent-data",
+          "version": "0.8.5",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/device-mapper-persistent-data-0.8.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dhcp",
           "version": "4.4.2",
           "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.2/dhcp-4.4.2.tar.gz"
@@ -2420,6 +2490,16 @@
           "name": "dosfstools",
           "version": "4.2",
           "downloadUrl": "https://github.com/dosfstools/dosfstools/archive/v4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dotconf",
+          "version": "1.3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/dotconf-1.3.tar.gz"
         }
       }
     },
@@ -2767,6 +2847,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "enscript",
+          "version": "1.6.6",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/enscript-1.6.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "environment-modules",
           "version": "4.4.1",
           "downloadUrl": "http://downloads.sourceforge.net/modules/modules-4.4.1.tar.bz2"
@@ -3000,6 +3090,16 @@
           "name": "fdupes",
           "version": "2.1.2",
           "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.2/fdupes-2.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fence-virt",
+          "version": "1.0.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/fence-virt-1.0.0.tar.bz2"
         }
       }
     },
@@ -3382,6 +3482,16 @@
           "name": "future",
           "version": "0.18.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/f/future/future-0.18.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fxload",
+          "version": "2008_10_13",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/fxload-2008_10_13-noa3load.tar.gz"
         }
       }
     },
@@ -4002,6 +4112,16 @@
           "name": "gphoto2",
           "version": "2.5.27",
           "downloadUrl": "http://downloads.sourceforge.net/gphoto/gphoto2-2.5.27.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gpm",
+          "version": "1.20.7",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/gpm-1.20.7.tar.xz"
         }
       }
     },
@@ -5799,6 +5919,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hyphen-hu",
+          "version": "0.20090612",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/nagybence-huhyphn-aa3fc85.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hyphen-ia",
           "version": "0.20050628",
           "downloadUrl": "http://www.ctan.org/get/language/hyphenation/iahyphen.tex"
@@ -5862,6 +5992,16 @@
           "name": "hyphen-lt",
           "version": "0.20100531",
           "downloadUrl": "http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-lt.tex?view=co"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hyphen-mi",
+          "version": "0.20080630",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/hunspell-hyphen-mi-0.1.20080630-beta.tar.gz"
         }
       }
     },
@@ -5969,6 +6109,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hyphen-sa",
+          "version": "0.20110915",
+          "downloadUrl": "https://github.com/hyphenation/tex-hyphen/blob/cec10c6cad4804d391df31d0be8e429e2231feb5/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-sa.tex"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hyphen-sk",
           "version": "0.20031227",
           "downloadUrl": "http://download.services.openoffice.org/contrib/dictionaries/hyph_sk_SK.zip"
@@ -6012,6 +6162,16 @@
           "name": "hyphen-te",
           "version": "0.7.0",
           "downloadUrl": "http://download.savannah.gnu.org/releases/smc/hyphenation/patterns/hyphen-te-0.7.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hyphen-tk",
+          "version": "0.20110620",
+          "downloadUrl": "https://github.com/hyphenation/tex-hyphen/blob/ee22323218150388abdeb36184ad5861e3669b65/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex"
         }
       }
     },
@@ -6540,6 +6700,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "isorelax",
+          "version": "0.1",
+          "downloadUrl": "https://sourceforge.net/projects/iso-relax/files/package/2004_11_11/isorelax.20041111.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "itstool",
           "version": "2.0.6",
           "downloadUrl": "http://files.itstool.org/itstool/itstool-2.0.6.tar.bz2"
@@ -6573,6 +6743,16 @@
           "name": "jabberpy",
           "version": "0.5",
           "downloadUrl": "http://downloads.sf.net/sourceforge/jabberpy/jabberpy-0.5-0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jakarta-taglibs-standard",
+          "version": "1.1.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jakarta-taglibs-standard-1.1.1-src.tar.bz2"
         }
       }
     },
@@ -6883,6 +7063,36 @@
           "name": "jsoncpp",
           "version": "1.9.2",
           "downloadUrl": "https://github.com/open-source-parsers/jsoncpp/archive/1.9.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jsoup",
+          "version": "1.11.3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jsoup-1.11.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jsr-305",
+          "version": "0.1+20130910",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jsr-305-20130910svn.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jtidy",
+          "version": "8.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jtidy-r813.tar.bz2"
         }
       }
     },
@@ -8300,16 +8510,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "jtidy",
-          "version": "8.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/jtidy-r813.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libidn2",
           "version": "2.3.0",
           "downloadUrl": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz"
@@ -9303,6 +9503,16 @@
           "name": "librsync",
           "version": "2.3.2",
           "downloadUrl": "https://github.com/librsync/librsync/archive/v2.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "librx",
+          "version": "1.5",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/rx-1.5.tar.bz2"
         }
       }
     },
@@ -10490,6 +10700,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lockdev",
+          "version": "1.0.4",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/lockdev-1.0.4.20111007git.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "log4cpp",
           "version": "1.1.3",
           "downloadUrl": "https://sourceforge.net/projects/log4cpp/files/log4cpp-1.1.x%20%28new%29/log4cpp-1.1/log4cpp-1.1.3.tar.gz"
@@ -10523,6 +10743,16 @@
           "name": "logrus",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/sirupsen/logrus/archive/v1.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "logwatch",
+          "version": "7.5.3",
+          "downloadUrl": "https://sourceforge.net/projects/logwatch/files/logwatch-7.5.3/logwatch-7.5.3.tar.gz"
         }
       }
     },
@@ -10840,6 +11070,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mailx",
+          "version": "12.5",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/mailx-12.5.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "make",
           "version": "4.3",
           "downloadUrl": "https://ftp.gnu.org/gnu/make/make-4.3.tar.gz"
@@ -11133,6 +11373,16 @@
           "name": "mdds",
           "version": "1.5.0",
           "downloadUrl": "http://kohei.us/files/mdds/src/mdds-1.5.0.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "meanwhile",
+          "version": "1.1.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/meanwhile-1.1.0.tar.gz"
         }
       }
     },
@@ -11772,6 +12022,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mythes-el",
+          "version": "0.20070412",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/th_el.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mythes-eo",
           "version": "0.20180330",
           "downloadUrl": "http://esperanto.mv.ru/Download/dict-eo.oxt"
@@ -11822,6 +12082,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mythes-mi",
+          "version": "0.20080630",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/mythes-mi-0.1.20080630-beta.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mythes-ne",
           "version": "1.1",
           "downloadUrl": "http://download.services.openoffice.org/contrib/dictionaries/thes_ne_NP_v2.zip"
@@ -11865,6 +12135,16 @@
           "name": "mythes-ro",
           "version": "3.3",
           "downloadUrl": "http://downloads.sourceforge.net/rospell/th_ro_RO.3.3.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mythes-ru",
+          "version": "0.20070613",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/thes_ru_RU_v2.zip"
         }
       }
     },
