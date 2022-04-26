@@ -30,7 +30,7 @@ Group:          Development/Libraries/Java
 URL:            http://javax-inject.github.io/javax-inject/
 # git clone --bare git@github.com:javax-inject/javax-inject
 # git --git-dir=javax-inject.git archive --prefix %{name}-%{base_version}/ --format tar %{git_tag} | xz >%{name}-%{base_version}.tar.xz
-Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{base_version}.tar.xz
+Source0:        %{_mariner_sources_url}/%{name}-%{base_version}.tar.xz
 # These manifests based on the ones shipped by eclipse.org
 Source1:        MANIFEST.MF
 Source2:        MANIFEST-TCK.MF
