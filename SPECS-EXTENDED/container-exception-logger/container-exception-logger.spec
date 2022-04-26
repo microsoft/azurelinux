@@ -44,6 +44,7 @@ cp man/container-exception-logger.1 %{buildroot}/%{_mandir}/man1/container-excep
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-6
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

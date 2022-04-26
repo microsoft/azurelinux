@@ -4,7 +4,7 @@ Summary: A mouse server for the Linux console
 Name: gpm
 Version: 1.20.7
 Release: 23%{?dist}
-License: GPLv2 and GPLv2+ with exceptions and GPLv3+ and Verbatim and Copyright only
+License: GPLv2
 URL: http://www.nico.schottelius.org/software/gpm/
 #URL2 : http://freecode.com/projects/gpm
 
@@ -137,7 +137,8 @@ rm -rf %{buildroot}%{_mandir}
 %ldconfig_scriptlets libs
 
 %files
-%doc COPYING README TODO
+%license COPYING
+%doc README TODO
 %doc doc/README* doc/FAQ doc/Announce doc/changelog
 %{_infodir}/*
 %ifnarch s390 s390x
@@ -161,6 +162,7 @@ rm -rf %{buildroot}%{_mandir}
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-23
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

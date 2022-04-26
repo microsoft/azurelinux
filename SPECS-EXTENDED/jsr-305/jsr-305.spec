@@ -26,7 +26,7 @@ Release:        6%{?dist}
 Summary:        Correctness annotations for Java code
 # The majority of code is BSD-licensed, but some Java sources
 # are licensed under CC-BY license, see: $ grep -r Creative .
-License:        BSD-3-Clause
+License:        BSD and CC-BY
 Group:          Development/Libraries/Java
 URL:            https://code.google.com/archive/p/jsr-305
 # There has been no official release yet.  This is a snapshot of the Subversion
@@ -105,6 +105,7 @@ cp -pr ri/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1+20130910-6
 - Updating source URLs.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1+20130910-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.

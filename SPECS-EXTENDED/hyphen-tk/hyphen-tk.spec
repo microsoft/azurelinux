@@ -43,6 +43,7 @@ cp -p hyph_tk_TM.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20110620-18
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20110620-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

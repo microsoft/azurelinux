@@ -95,7 +95,8 @@ fi
 Fencing agent for virtual machines.
 
 %files
-%doc COPYING TODO README
+%license COPYING
+%doc TODO README
 %{_sbindir}/fence_virt
 %{_sbindir}/fence_xvm
 %{_mandir}/man8/fence_virt.*
@@ -168,6 +169,7 @@ are located on corosync cluster nodes.
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3
 - Updating source URLs.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

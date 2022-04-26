@@ -89,6 +89,7 @@ cp -pr build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-3
 - Updating source URLs.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.

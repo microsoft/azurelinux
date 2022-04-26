@@ -4,7 +4,7 @@ Name:           meanwhile
 Version:        1.1.0
 Release:        30%{?dist}
 Summary:        Lotus Sametime Community Client library
-License:        LGPLv2+
+License:        GPLv2+
 URL:            http://%{name}.sourceforge.net
 
 # The source for this package was pulled from upstream's vcs.  Use the following commands to generate the tarball:
@@ -79,7 +79,8 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %ldconfig_scriptlets libs
 
 %files
-%doc AUTHORS ChangeLog COPYING README TODO LICENSE
+%license COPYING LICENSE
+%doc AUTHORS ChangeLog README TODO
 %{_libdir}/lib%{name}.so.*
 
 %files devel
@@ -93,6 +94,7 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-30
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-29
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

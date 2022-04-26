@@ -40,7 +40,8 @@ make %{?_smp_mflags} V=
 make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
 
 %files
-%doc COPYING README.md
+%license COPYING
+%doc README.md
 %{_mandir}/man8/cache_check.8.gz
 %{_mandir}/man8/cache_dump.8.gz
 %{_mandir}/man8/cache_metadata_size.8.gz
@@ -85,6 +86,7 @@ make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-5
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

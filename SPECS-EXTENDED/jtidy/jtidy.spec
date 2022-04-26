@@ -29,7 +29,7 @@ Name:           jtidy
 Version:        8.0
 Release:        31%{?dist}
 Summary:        HTML syntax checker and pretty printer
-License:        BSD-3-Clause
+License:        BSD
 Group:          Development/Libraries/Java
 URL:            http://jtidy.sourceforge.net/
 # svn export -r813 http://svn.sourceforge.net/svnroot/jtidy/trunk/jtidy/ jtidy
@@ -151,6 +151,7 @@ EOF
 %changelog
 * Fri Apr 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0-31
 - Updating source URL.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0-30
 - Converting the 'Release' tag to the '[number].[distribution]' format.

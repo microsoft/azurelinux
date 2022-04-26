@@ -29,12 +29,14 @@ cp -p mi.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_mi_NZ.dic
 
 
 %files
-%doc mi.LICENSE mi.README
+%license mi.LICENSE
+%doc mi.README
 %{_datadir}/hyphen/*
 
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-22
 - Updating source URLs.
+- License verified.
 
 * Mon Jan 25 2021 Joe Schmitt <joschmit@microsoft.com> - 0.20080630-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

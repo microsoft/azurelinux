@@ -13,7 +13,7 @@ Summary: A library for locking devices
 Name: lockdev
 Version: 1.0.4
 Release: 2%{?dist}
-License: LGPLv2
+License: LGPLv2.1
 URL: https://github.com/definesat/lockdev
 
 # This is a nightly snapshot downloaded via
@@ -98,7 +98,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %files
-%{license} COPYING
+%license COPYING
 %doc AUTHORS
 %ghost %dir %attr(0775,root,lock) %{_lockdir}
 %attr(2711,root,lock)  %{_sbindir}/lockdev
@@ -115,6 +115,7 @@ fi
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-2
 - Updating source URLs.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

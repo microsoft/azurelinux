@@ -89,7 +89,8 @@ echo "# Configuration overrides for specific logfiles/services may be placed her
 install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 
 %files
-%doc README HOWTO-Customize-LogWatch LICENSE
+%license LICENSE
+%doc README HOWTO-Customize-LogWatch
 %dir %{_var}/cache/logwatch
 %dir %{_sysconfdir}/logwatch
 %dir %{_sysconfdir}/logwatch/scripts
@@ -128,6 +129,7 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/logwatch/dist.conf/logfiles
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-4
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

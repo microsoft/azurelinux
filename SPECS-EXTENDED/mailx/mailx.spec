@@ -7,8 +7,10 @@ Summary: Enhanced implementation of the mailx command
 Name: mailx
 Version: 12.5
 Release: 35%{?dist}
+# MIT .. base64.c
 # MPLv1.1 .. nss.c, nsserr.c
-License: BSD with advertising and MPLv1.1
+# RSA .. md5.h, md5.c
+License: BSD with advertising and MIT and MPLv1.1 and RSA
 URL: http://heirloom.sourceforge.net/mailx.html
 # Mailx's upstream provides only the CVS method of downloading source code.
 # Use get-upstream-tarball.sh script to download current version of mailx.
@@ -157,7 +159,8 @@ popd
 
 
 %files
-%doc COPYING AUTHORS README
+%license COPYING
+%doc AUTHORS README
 %config(noreplace) %{mailrc}
 %{_bindir}/*
 %{_mandir}/*/*
@@ -166,6 +169,7 @@ popd
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.5-35
 - Updating source URLs.
+- License verified.
 
 * Wed Jan 06 2021 Joe Schmitt <joschmit@microsoft.com> - 12.5-34
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

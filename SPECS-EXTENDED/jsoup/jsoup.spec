@@ -93,6 +93,7 @@ install -pdm 0755 target/site/apidocs %{buildroot}%{_javadocdir}/%{name}
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.3-3
 - Updating source URLs.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.3-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.

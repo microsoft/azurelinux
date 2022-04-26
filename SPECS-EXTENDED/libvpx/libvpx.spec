@@ -234,6 +234,7 @@ rm -rf %{buildroot}%{_prefix}/src
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-4
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

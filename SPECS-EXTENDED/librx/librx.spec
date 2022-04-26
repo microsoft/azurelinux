@@ -65,6 +65,7 @@ chmod -x ${RPM_BUILD_ROOT}%{_includedir}/rxposix.h
 %{_libdir}/*.so.*
 
 %files devel
+%license COPYING
 %doc ANNOUNCE BUILDING COOKOFF rx/ChangeLog
 %{_includedir}/*
 %{_infodir}/*
@@ -73,6 +74,7 @@ chmod -x ${RPM_BUILD_ROOT}%{_includedir}/rxposix.h
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-37
 - Updating source URLs.
+- License verified.
 
 * Fri Dec 11 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.5-36
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

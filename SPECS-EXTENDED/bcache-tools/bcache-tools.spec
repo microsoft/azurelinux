@@ -95,7 +95,8 @@ rm %{buildroot}%{_datarootdir}/initramfs-tools/hooks/bcache
 install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 
 %files
-%doc README COPYING
+%license COPYING
+%doc README
 %{_udevrulesdir}/*
 %{_mandir}/man8/*
 %{_udevlibdir}/bcache-register
@@ -109,6 +110,7 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-2
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-1
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).

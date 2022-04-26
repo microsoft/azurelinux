@@ -24,7 +24,7 @@ Name:           bea-stax
 Version:        1.2.0
 Release:        39%{?dist}
 Summary:        Streaming API for XML
-License:        Apache-2.0
+License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            http://stax.codehaus.org/Home
 # http://dist.codehaus.org/stax/distributions/stax-src-%{version}.zip
@@ -108,6 +108,7 @@ install -p -m 0644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-api-%{version}
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-39
 - Updating source URLs.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-38
 - Converting the 'Release' tag to the '[number].[distribution]' format.

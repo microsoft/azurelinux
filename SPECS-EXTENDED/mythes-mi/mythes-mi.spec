@@ -29,12 +29,14 @@ cp -p mi.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_mi_NZ_v2.idx
 
 
 %files
+%license mi.LICENSE
 %doc mi.AUTHORS mi.README mi.LICENSE
 %{_datadir}/mythes/*
 
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-23
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

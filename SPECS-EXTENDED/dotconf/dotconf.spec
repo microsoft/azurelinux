@@ -4,7 +4,7 @@ Name:		dotconf
 Version:	1.3
 Release:	25%{?dist}
 Summary:	Libraries to parse configuration files
-License:	LGPLv2
+License:	LGPLv2.1
 URL:		https://github.com/williamh/dotconf/
 # Upstream source's hash different from the Mariner one.
 # Source: https://github.com/williamh/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -66,6 +66,7 @@ mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/* __tmp_doc
 %changelog
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-25
 - Updating source URLs.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
