@@ -20036,7 +20036,7 @@
         "other": {
           "name": "python-hwdata",
           "version": "2.3.7",
-          "downloadUrl": "https://github.com/xsuchy/python-hwdata/archive/python-hwdata-2.3.7-1.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-hwdata-2.3.7.tar.gz"
         }
       }
     },

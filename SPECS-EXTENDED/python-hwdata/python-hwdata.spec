@@ -17,7 +17,7 @@ URL:		https://github.com/xsuchy/python-hwdata
 # git clone https://github.com/xsuchy/python-hwdata.git
 # cd python-hwdata
 # tito build --tgz
-Source0:	https://github.com/xsuchy/python-hwdata/archive/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+Source0:	https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.gz
 
 %description
 Provide python interface to database stored in hwdata package.
