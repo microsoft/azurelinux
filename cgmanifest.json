@@ -19004,6 +19004,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "publicsuffix",
+          "version": "20201026",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/publicsuffix-20201026.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "publicsuffix-list",
           "version": "20190417",
           "downloadUrl": "https://publicsuffix.org/list/public_suffix_list.dat"
