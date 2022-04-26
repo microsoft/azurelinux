@@ -21,11 +21,10 @@ detect which async library your code is running under.
 Summary:        Sniff out which async library your code is running under
 Name:           python-%{pkgname}
 Version:        1.1.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT or ASL 2.0
 URL:            https://github.com/python-trio/sniffio
-#Source0:       https://files.pythonhosted.org/packages/source/s/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/source/s/%{pypi_name}/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/s/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{_description}
@@ -60,6 +59,9 @@ py.test-%{python3_version} --verbose
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.1.0-10
+- Updated source URL
+- License verified
 * Tue Jan 12 2021 Steve Laughman <steve.laughman@microsoft.com> - 1.1.0-9
 - Correction to files declaration
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 1.1.0-8
