@@ -308,8 +308,8 @@ perl-CPAN-Meta-2.150010-487.cm2.noarch.rpm
 perl-CPAN-Meta-Requirements-2.140-487.cm2.noarch.rpm
 perl-CPAN-Meta-YAML-0.018-487.cm2.noarch.rpm
 perl-Data-Dumper-2.179-487.cm2.aarch64.rpm
-perl-DBD-SQLite-1.62-6.cm2.aarch64.rpm
-perl-DBD-SQLite-debuginfo-1.62-6.cm2.aarch64.rpm
+perl-DBD-SQLite-1.70-1.cm2.aarch64.rpm
+perl-DBD-SQLite-debuginfo-1.70-1.cm2.aarch64.rpm
 perl-DBI-1.641-6.cm2.aarch64.rpm
 perl-DBI-debuginfo-1.641-6.cm2.aarch64.rpm
 perl-DBIx-Simple-1.37-5.cm2.noarch.rpm
