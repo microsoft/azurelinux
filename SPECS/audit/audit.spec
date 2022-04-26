@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}.tar.gz
 Patch0:         refuse-manual-stop.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel
+BuildRequires:  systemd-bootstrap-rpm-macros
 BuildRequires:  swig
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       gawk
@@ -137,6 +138,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Mon Apr 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.0.6-6
+- Add BR on systemd-bootstrap-rpm-macros for correctness
+
 * Wed Apr 20 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.0.6-5
 - Return audit logs to their normal location without the use of a symlink
 

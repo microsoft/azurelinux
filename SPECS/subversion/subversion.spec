@@ -1,7 +1,7 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,7 @@ sudo -u test make check && userdel test -r -f
 %{_libdir}/libsvn_*.so.*
 %{_mandir}/man[158]/*
 %{_datadir}/locale/*
+%exclude %{_libdir}/libsvn_swig_perl*so*
 
 %files devel
 %{_includedir}/*
@@ -102,6 +103,9 @@ sudo -u test make check && userdel test -r -f
 %{_mandir}/man3/SVN*
 
 %changelog
+* Mon Apr 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.14.1-3
+- Fix duplicate packaging of libsvn_swig_perl so
+
 * Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 1.14.1-2
 - Use python3 during %%check section instead of python2
 
