@@ -72,6 +72,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} --verbose -
 %changelog
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.4-4
 - Updated source URL.
+- License verified.
 * Tue Jan 12 2021 Steve Laughman <steve.laughman@microsoft.com> - 1.4-3
 - Correction to files declaration
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 1.4-2

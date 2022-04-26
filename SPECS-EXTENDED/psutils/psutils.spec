@@ -85,6 +85,7 @@ sed -i -e 's,/usr/bin/env perl,%{__perl},' \
 %changelog
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.23-19
 - Updated source URL.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.23-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
