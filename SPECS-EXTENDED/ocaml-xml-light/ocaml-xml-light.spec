@@ -7,7 +7,7 @@ Distribution:   Mariner
 
 Name:           ocaml-xml-light
 Version:        2.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Minimal XML parser and printer for OCaml
 
 License:        LGPLv2+
@@ -25,7 +25,7 @@ URL:            http://tech.motion-twin.com/xmllight.html
 #       cd ocamllibs/xml-light/
 #       tar -zcf /tmp/xml-light-NNN.tar.gz --xform='s,^\.,xml-light-NNN,' .
 #         (where NNN is the svnrev above)
-Source0:        xml-light-%{svnrev}.tar.gz
+Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/xml-light-%{svnrev}.tar.gz
 
 
 BuildRequires:  ocaml >= 4.00.1
@@ -114,6 +114,9 @@ ocamlfind install xml-light META *.mli *.cmi *.cma \
 
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3-2
+- Updated source URL.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-1
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

@@ -12978,6 +12978,17 @@
         }
       }
     },
+    
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-xml-light",
+          "version": "2.3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xml-light-234.tar.gz"
+        }
+      }
+    },
     {
       "component": {
         "type": "other",
