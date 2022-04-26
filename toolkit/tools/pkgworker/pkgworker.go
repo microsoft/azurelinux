@@ -257,7 +257,7 @@ func tdnfInstall(packages []string) (err error) {
 		packages[i] = filepath.Base(strings.TrimSuffix(packages[i], ".rpm"))
 	}
 
-	installArgs := []string{"install", "-y"}
+	installArgs := []string{"install", "-y", "--releasever", "2.0"}
 	installArgs = append(installArgs, packages...)
 	stdout, stderr, err := shell.Execute("tdnf", installArgs...)
 	foundNoMatchingPackages := false

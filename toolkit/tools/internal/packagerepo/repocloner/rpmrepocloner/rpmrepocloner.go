@@ -310,6 +310,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		"provides",
 		provideQuery,
 		fmt.Sprintf("--disablerepo=%s", allRepoIDs),
+		fmt.Sprintf("--releasever=%s", "2.0"),
 	}
 
 	foundPackages := make(map[string]bool)
@@ -433,6 +434,7 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 			"ALL",
 			fmt.Sprintf("--disablerepo=%s", allRepoIDs),
 			fmt.Sprintf("--enablerepo=%s", checkedRepoID),
+			fmt.Sprintf("--releasever=%s", "2.0"),
 		}
 		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)
 	})
@@ -467,6 +469,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 	// TDNF processes enable/disable repo requests in the order that they are passed.
 	// So if `--disablerepo=foo` and then `--enablerepo=foo` are passed, `foo` will be enabled.
 	baseArgs = append(baseArgs, "--disablerepo=*")
+	baseArgs = append(baseArgs, "--releasever=2.0")
 
 	var enabledRepoArgs []string
 	for _, repoID := range enabledRepoOrder {
