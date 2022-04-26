@@ -9,8 +9,7 @@ Summary: Allows using distutils2-like setup.cfg files with setup.py
 License: BSD
 
 URL: http://pypi.python.org/pypi/d2to1
-#Source0: http://pypi.python.org/packages/source/d/d2to1/%{srcname}-%{version}.tar.gz
-Source0: https://pypi.python.org/packages/source/d/d2to1/d2to1-0.2.12.post1.tar.gz#/python-d2to1-0.2.12.post1.tar.gz
+Source0: https://pypi.python.org/packages/source/d/%{srcname}/%{srcname}-%{version}.post1.tar.gz#/%{name}-%{version}.post1.tar.gz
 
 BuildArch: noarch
 
