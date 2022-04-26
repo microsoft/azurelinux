@@ -20,12 +20,12 @@ Distribution:   Mariner
 
 Name:           objectweb-anttask
 Version:        1.2
-Release:        265%{?dist}
+Release:        266%{?dist}
 Summary:        ObjectWeb Ant task
 License:        LGPLv2+
 Group:          Development/Languages/Java
 Url:            http://forge.objectweb.org/projects/monolog/
-Source0:        ow_util_ant_tasks_1.2.zip
+Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/ow_util_ant_tasks_1.2.zip
 Source1:        %{name}-LICENSE.txt
 Patch1:         objectweb-anttask-ant17.patch
 Patch2:         objectweb-anttask-java5.patch
@@ -69,6 +69,9 @@ popd
 %{_javadir}/*
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.2-266
+- Updated source URL.
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.2-265
 - License verified
 

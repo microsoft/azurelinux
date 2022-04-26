@@ -12482,6 +12482,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "objectweb-anttask",
+          "version": "1.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/ow_util_ant_tasks_1.2.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "objenesis",
           "version": "3.1",
           "downloadUrl": "https://github.com/easymock/objenesis/archive/3.1.tar.gz"
