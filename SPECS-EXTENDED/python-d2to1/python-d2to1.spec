@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name: python-%{srcname}
 Version: 0.2.12
-Release: 17%{?dist}
+Release: 18%{?dist}
 Summary: Allows using distutils2-like setup.cfg files with setup.py
 License: BSD
 
@@ -49,6 +49,10 @@ find . -name '*.py' | xargs sed -i '1s|^#!python|#!%{__python3}|'
 
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.2.12-18
+- Updated source URL.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.12-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
