@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 Name:		python-hwdata
 Version:	2.3.7
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	Python bindings to hwdata package
 BuildArch:  noarch
 License:	GPLv2
@@ -17,7 +17,7 @@ URL:		https://github.com/xsuchy/python-hwdata
 # git clone https://github.com/xsuchy/python-hwdata.git
 # cd python-hwdata
 # tito build --tgz
-Source0:	%{name}-%{version}.tar.gz
+Source0:	https://github.com/xsuchy/python-hwdata/archive/%{name}-%{version}-1.tar.gz
 
 %description
 Provide python interface to database stored in hwdata package.
@@ -111,6 +111,9 @@ pylint-3 hwdata.py example.py || :
 %endif # with python3
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3.7-10
+- Updated source URL.
+
 * Fri Mar 05 2021 Henry Li <lihl@microsoft.com> - 2.3.7-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fix distro checking to enable python3 build and disable python2 build
