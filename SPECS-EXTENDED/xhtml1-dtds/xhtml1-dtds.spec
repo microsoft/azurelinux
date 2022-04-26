@@ -39,6 +39,7 @@ the foundation for future extensibility of XHTML.
 %patch0 -p0
 %patch1 -p1
 cp -p %{SOURCE1} DTD/catalog.xml
+cp %{SOURCE2} .
 
 %build
 
