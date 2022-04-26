@@ -2,13 +2,13 @@
 
 Name:		   usbip
 Summary:	   USB/IP user-space
-Version:	   5.15.32.1
+Version:	   5.15.34.1
 Release:	   1%{?dist}
 License:	   GPLv2+
 Vendor:            Microsoft Corporation
 Distribution:      Mariner
 Group:             System/Kernel
-#Source:	   https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/%{version}.tar.gz
+#Source:	   https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz
 # In the interests of keeping the source rpm from being ridiculously large,
 # download the Linux kernel from above and run `extract_usbip.sh <version>`
 # in the SOURCE directory.
@@ -91,6 +91,9 @@ install -pm 644 %{SOURCE2} %{buildroot}%{_unitdir}
 %{_libdir}/*.so
 
 %changelog
+* Wed Apr 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.34.1-1
+- Update version to 5.15.34.1
+
 * Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.15.32.1-1
 - Update version to 5.15.32.1
 
