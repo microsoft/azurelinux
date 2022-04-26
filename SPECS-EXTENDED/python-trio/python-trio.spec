@@ -31,8 +31,7 @@ Release:        3%{?dist}
 Summary:        A friendly Python library for async concurrency and I/O
 License:        MIT or ASL 2.0
 URL:            https://github.com/python-trio/trio
-#Source0:       https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-Source0:        https://github.com/%{pypi_name}/%{name}/archive/v%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}

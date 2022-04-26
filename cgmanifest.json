@@ -21746,7 +21746,7 @@
         "other": {
           "name": "python-trio",
           "version": "0.16.0",
-          "downloadUrl": "https://github.com/python-trio/trio/archive/v0.16.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trio/trio-0.16.0.tar.gz"
         }
       }
     },
