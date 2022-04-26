@@ -18626,7 +18626,7 @@
         "other": {
           "name": "plexus-component-api",
           "version": "1.0~alpha15",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/plexus-component-api-1.0-alpha15.tar.xz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/plexus-component-api-1.0-alpha-15.tar.xz"
         }
       }
     },
