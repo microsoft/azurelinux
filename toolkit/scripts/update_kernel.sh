@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 set -x
 set -e
 
@@ -189,7 +192,10 @@ function usage() {
     echo "v : Version you are updating to (ex. 5.10.37.1)" 
     echo "u : Your name"
     echo "e : Your email"
-    echo "w : Absoulte patch to your workspace for your update - no quotes"
+    echo "w : Absoulte path to your workspace for your update - no quotes\n"
+
+    echo "example usage: ./toolkit/update_kernel.sh -v 5.15.34.1 -u 'Cameron Baird' -e 'cameronbaird@microsoft.com' -w \$(pwd)"
+
     exit 1 
 }
 
@@ -200,6 +206,7 @@ function usage() {
 # error checking : bad tag on cbl-mariner-linux-kernel,
 # trigger build or config checker?
 # replace old version
+# handle kernel-rt patch automatically
 
 # Take arguments
 #WORKSPACE=~/repos/CBL-Mariner-Kernel
@@ -273,3 +280,5 @@ update_toolchain
 update_cgmanifest
 print_metadata
 #clean
+
+echo "WARNING: update is not complete; this script does not update the rt patch in kernel-rt.spec, you must do this manually!"
