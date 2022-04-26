@@ -79,7 +79,7 @@ npm run test
 %{_bindir}/nodemon
 
 %changelog
-* Mon Apr 25 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.3-3
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.3-3
 - Updated source URL.
 - License verified.
 
