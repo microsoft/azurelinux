@@ -32,7 +32,7 @@ Version:        1.4
 Release:        4%{?dist}
 License:        BSD
 URL:            https://github.com/dabeaz/curio
-Source0:        https://files.pythonhosted.org/packages/source/c/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/c/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{_description}
