@@ -18624,6 +18624,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "plexus-component-api",
+          "version": "1.0~alpha15",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/plexus-component-api-1.0~alpha15.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "plexus-interpolation",
           "version": "1.26",
           "downloadUrl": "https://github.com/codehaus-plexus/plexus-interpolation/archive/plexus-interpolation-1.26/plexus-interpolation-1.26.tar.gz"
