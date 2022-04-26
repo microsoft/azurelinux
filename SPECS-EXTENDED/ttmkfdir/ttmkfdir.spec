@@ -9,7 +9,7 @@ License: LGPLv2+
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
-Source0: %{name}-%{version}.tar.bz2
+Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.bz2
 Source1: %{name}-LICENSE.txt
 Patch: ttmkfdir-3.0.9-cpp.patch
 Patch1: ttmkfdir-3.0.9-zlib.patch
@@ -55,6 +55,9 @@ cp -p %{SOURCE10} %{buildroot}%{_mandir}/man1/
 %{_mandir}/man1/ttmkfdir.1*
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 3.0.9-61
+- Update Source0
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.0.9-60
 - License verified
 
@@ -95,7 +98,7 @@ cp -p %{SOURCE10} %{buildroot}%{_mandir}/man1/
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
 * Tue Feb 23 2016 Pravin Satpute <psatpute@redhat.com> - 3.0.9-48
-- Removed ttmkfdir-3.0.9-freetype-header-fix.patch 
+- Removed ttmkfdir-3.0.9-freetype-header-fix.patch
 - Resolves #1308197: ttmkfdir: FTBFS in rawhide
 
 * Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.9-47
@@ -273,10 +276,10 @@ cp -p %{SOURCE10} %{buildroot}%{_mandir}/man1/
 
 * Mon Jan 13 2003 Yu Shao <yshao@redhat.com> 3.0.6-1
 - added iso8859-13 support from Nerijus Baliunas #77289
-- added README 
+- added README
 
 * Wed Jan 8 2003 Yu Shao <yshao@redhat.com> 3.0.5-1
-- encoding.l fix and ttc support patch 
+- encoding.l fix and ttc support patch
 - default read system encodings.dir instead of the one
 - in current directory
 
@@ -284,7 +287,7 @@ cp -p %{SOURCE10} %{buildroot}%{_mandir}/man1/
 - make ttmkfdir keep silent with FIRSTINDEX. #61769
 
 * Wed Dec 18 2002 Yu Shao <yshao@redhat.com> 3.0.3-1
-- Applied new patches to make ttmkfdir provide more infomation when meets 
+- Applied new patches to make ttmkfdir provide more infomation when meets
 - bad fonts
 
 * Mon Dec  9 2002 Mike A. Harris <mharris@devel.capslock.lan> 3.0.2-1

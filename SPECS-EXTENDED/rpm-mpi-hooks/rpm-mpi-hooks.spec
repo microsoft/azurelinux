@@ -1,6 +1,6 @@
 Name:           rpm-mpi-hooks
 Version:        6
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        RPM dependency generator hooks for MPI packages
 
 License:        MIT
@@ -8,7 +8,7 @@ BuildArch:      noarch
 URL:            https://src.fedoraproject.org/rpms/rpm-mpi-hooks
 # uncompressed sources are available below
 # Source0:      https://src.fedoraproject.org/rpms/rpm-mpi-hooks/tree/rawhide
-Source0:        mpi.attr
+Source0:        https://src.fedoraproject.org/rpms/rpm-mpi-hooks/blob/rawhide/f/mpi.attr
 Source1:        mpilibsymlink.attr
 Source2:        mpi.prov
 Source3:        mpi.req
@@ -48,6 +48,9 @@ install -Dpm 0755 %{SOURCE3} %{buildroot}%{_rpmconfigdir}/mpi.req
 
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 6-7
+- Update Source0
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

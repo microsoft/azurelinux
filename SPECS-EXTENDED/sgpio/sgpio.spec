@@ -3,10 +3,10 @@ Distribution:   Mariner
 Summary: SGPIO captive backplane tool
 Name: sgpio
 Version: 1.2.0.10
-Release: 26%{?dist}
+Release: 27%{?dist}
 License: GPLv2+
 URL: http://sources.redhat.com/lvm2/wiki/DMRAID_Eventing
-Source: sgpio-1.2-0.10-src.tar.gz
+Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}-src.tar.gz
 # there is no official download link for the latest package
 #Source: http://sources.redhat.com/lvm2/wiki/DMRAID_Eventing?action=AttachFile&do=get&target=sgpio-1.2.tgz
 Patch0: sgpio-1.2-makefile.patch
@@ -39,6 +39,9 @@ make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT SBIN_DIR=$RPM_BUI
 %{_mandir}/man1/sgpio.*
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.0.10-27
+- Update Source0
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0.10-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -115,7 +118,7 @@ make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT SBIN_DIR=$RPM_BUI
 - rebuild for F12
 
 * Tue Apr 14 2009  Jiri Moskovcak <jmoskovc@redhat.com> 1.2.0.10-2
-- move the EOL conversion and the removal of 
+- move the EOL conversion and the removal of
   executable bits from %%install to %%prep section
 
 * Wed Dec 10 2008 Jiri Moskovcak <jmoskovc@redhat.com> 1.2.0_10-1

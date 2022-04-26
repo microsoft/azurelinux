@@ -22,12 +22,12 @@ Distribution:   Mariner
 %define full_name	jakarta-%{base_name}
 Name:           servletapi4
 Version:        4.0.4
-Release:        300%{?dist}
+Release:        301%{?dist}
 Summary:        Java servlet and JSP implementation classes
 License:        Apache-1.1
 Group:          Development/Libraries/Java
 Url:            http://jakarta.apache.org/tomcat/
-Source:         %{full_name}-4-src.tar.gz
+Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/%{full_name}-4-src.tar.gz
 Patch160:       java160_build.patch
 BuildRequires:  ant
 BuildRequires:  ant >= 1.2
@@ -95,6 +95,9 @@ fi
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 4.0.4-301
+- Update Source0
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.4-300
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

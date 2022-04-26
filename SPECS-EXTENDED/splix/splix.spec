@@ -5,14 +5,14 @@ Distribution:   Mariner
 Summary: Driver for QPDL/SPL2 printers (Samsung and several Xerox printers)
 Name: splix
 Version: 2.0.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 URL: http://splix.sourceforge.net/
 
 # This is a SVN snapshot downloaded via 'Download Snapshot' from
 # https://sourceforge.net/p/splix/code/315/tree/
 # and renamed to follow naming guidelines
-Source0: splix-%{version}.%{checkout}.tar.bz2
+Source0: https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.%{checkout}.tar.bz2
 
 # IEEE 1284 Device IDs
 Patch0:  splix-deviceID.patch
@@ -72,6 +72,9 @@ make install DRV_ONLY=1 CUPSDRV=%{_datadir}/cups/drv/splix DESTDIR=%{buildroot}
 %{_datadir}/cups/drv/splix
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.0.1-2
+- Update Source0
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

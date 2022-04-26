@@ -25697,8 +25697,8 @@
         "type": "other",
         "other": {
           "name": "virt-who",
-          "version": "0.22.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/virt-who-0.22.1-1.tar.gz"
+          "version": "0.24.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/virt-who-0.24.2.tar.gz"
         }
       }
     },

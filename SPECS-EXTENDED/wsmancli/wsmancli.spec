@@ -2,12 +2,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           wsmancli
 Version:        2.6.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Url:            http://www.openwsman.org/
-# You can get this tarball here:
-# https://github.com/Openwsman/wsmancli/archive/v%{version}.tar.gz
-Source:         wsmancli-%{version}.tar.gz
+Source0:        https://github.com/Openwsman/wsmancli/archive/v%{version}.tar.gz
 Source1:        COPYING
 Source2:        README
 Source3:        AUTHORS
@@ -18,17 +16,17 @@ Patch0:         missing-pthread-symbols.patch
 Summary:        WS-Management-Command line Interface
 
 %description
-Command line interface for managing 
+Command line interface for managing
 systems using Web Services Management protocol.
 
 %prep
-%setup -q 
+%setup -q
 %patch0 -p1
 cp -fp %SOURCE1 %SOURCE2 %SOURCE3 .;
 
 %build
 ./bootstrap
-%configure --disable-more-warnings 
+%configure --disable-more-warnings
 make %{?_smp_flags}
 
 %install
@@ -42,6 +40,10 @@ make DESTDIR=%{buildroot} install
 %doc COPYING README AUTHORS
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.6.0-13
+- Update Source0
+- Improve formatting
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.0-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -140,4 +142,3 @@ make DESTDIR=%{buildroot} install
 
 * Tue Sep 30 2008  <srinivas_ramanatha@dell.com> - 2.1.0-1%{?dist}
 - Modified the spec file to adhere to fedora packaging guidelines.
-
