@@ -1,7 +1,7 @@
 Summary:        X.Org X11 libxkbfile runtime library
 Name:           libxkbfile
 Version:        1.1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
