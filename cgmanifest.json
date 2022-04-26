@@ -14025,7 +14025,7 @@
         "other": {
           "name": "perl-Class-Data-Inheritable",
           "version": "0.08",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TM/TMTM/Class-Data-Inheritable-0.08.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/Class-Data-Inheritable-0.08-clean.tar.gz"
         }
       }
     },
