@@ -60,9 +60,6 @@ SBLIM Base Syslog Testcase Files for SBLIM Testsuite
 %patch2 -p1 -b .prov-reg-sfcb-systemd
 %patch3 -p1 -b .format-security
 %patch4 -p1 -b .buffer-overflow-remove-tmpnam
-# removing COPYING, because it's misleading
-rm -f COPYING
-# ./autoconfiscate.sh
 
 %build
 %ifarch s390 s390x ppc ppc64
