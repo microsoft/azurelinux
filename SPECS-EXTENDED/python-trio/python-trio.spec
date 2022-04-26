@@ -27,12 +27,12 @@ right.}
 
 Name:           python-%{pkgname}
 Version:        0.16.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A friendly Python library for async concurrency and I/O
 License:        MIT or ASL 2.0
 URL:            https://github.com/python-trio/trio
 #Source0:       https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/%{pypi_name}/%{name}/archive/v%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
@@ -78,6 +78,8 @@ rm -rf %{eggname}.egg-info
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.16.0-3
+- Updated source URL.
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 0.16.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - Disable tests by default
