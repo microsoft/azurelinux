@@ -11,7 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.w3.org/TR/2002/REC-xhtml1-%{date}/
 # Source0 generated with Source99, see comments in the script
-Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{date}.tar.xz
+Source0:        %{_mariner_sources_url}/%{name}-%{date}.tar.xz
 Source1:        %{name}.catalog.xml
 Source99:       %{name}-prepare-tarball.sh
 Patch0:         %{name}-sgml-catalog.patch

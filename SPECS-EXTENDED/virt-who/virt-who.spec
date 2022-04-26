@@ -23,7 +23,7 @@ Release:        3%{?dist}
 Summary:        Agent for reporting virtual guest IDs to subscription-manager
 License:        GPLv2+
 URL:            https://github.com/candlepin/virt-who
-Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  %{python_ver}-devel
 BuildRequires:  %{python_ver}-setuptools
