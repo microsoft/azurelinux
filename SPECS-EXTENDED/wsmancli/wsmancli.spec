@@ -33,16 +33,20 @@ make %{?_smp_flags}
 make DESTDIR=%{buildroot} install
 
 %files
+%license COPYING
+%doc README AUTHORS
 %{_bindir}/wsman
 %{_bindir}/wseventmgr
 %{_mandir}/man1/wsman*
 %{_mandir}/man1/wseventmgr*
-%doc COPYING README AUTHORS
+
 
 %changelog
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.6.0-13
 - Update Source0
 - Improve formatting
+- Added %%license
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.0-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

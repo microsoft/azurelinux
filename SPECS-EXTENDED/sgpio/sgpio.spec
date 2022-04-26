@@ -41,6 +41,7 @@ make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT SBIN_DIR=$RPM_BUI
 %changelog
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.0.10-27
 - Update Source0
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0.10-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

@@ -34,7 +34,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %find_lang setup
 
 %files -f setup.lang
-%doc README COPYING
+%license COPYING
+%doc README
 %{_bindir}/setup
 %config(noreplace) %{_sysconfdir}/pam.d/setup
 %config(noreplace) %{_sysconfdir}/security/console.apps/setup
@@ -49,6 +50,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.19.11-22
 - Update Source0
 - Improve formatting
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.19.11-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

@@ -13,6 +13,7 @@ URL:            http://www.w3.org/TR/2002/REC-xhtml1-%{date}/
 # Source0 generated with Source99, see comments in the script
 Source0:        %{_mariner_sources_url}/%{name}-%{date}.tar.xz
 Source1:        %{name}.catalog.xml
+Source2:        LICENSE.PTR
 Source99:       %{name}-prepare-tarball.sh
 Patch0:         %{name}-sgml-catalog.patch
 Patch1:         %{name}-sgml-dcl.patch
@@ -102,6 +103,7 @@ cd - >/dev/null
 
 
 %files
+%license LICENSE.PTR
 %ghost %{_sysconfdir}/sgml/%{name}-%{version}-%{release}.soc
 %{_sysconfdir}/sgml/%{name}.soc
 %{_sysconfdir}/xml/%{name}*.xml
@@ -111,7 +113,9 @@ cd - >/dev/null
 %changelog
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-20020803
 - Update Source0
-- Improve formatting
+- Improved formatting
+- Added LICENSE.PTR to clarify the package's license
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-20020802
 - Switching to using full number for the 'Release' tag.

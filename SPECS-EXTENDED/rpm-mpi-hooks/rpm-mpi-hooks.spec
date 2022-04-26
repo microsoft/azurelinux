@@ -50,6 +50,7 @@ install -Dpm 0755 %{SOURCE3} %{buildroot}%{_rpmconfigdir}/mpi.req
 %changelog
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 6-7
 - Update Source0
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

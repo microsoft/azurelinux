@@ -97,6 +97,8 @@ $RPM_BUILD_ROOT/%{_datadir}/sblim-testsuite/system/linux/msglogtest.sh \
 $RPM_BUILD_ROOT/%{_datadir}/sblim-testsuite/system/linux/messagelog.sh
 
 %files
+%license COPYING
+%doc AUTHORS ChangeLog INSTALL NEWS README
 %{_bindir}/syslog-service.sh
 %{provider_dir}/lib[Ss]yslog*.so*
 %{_datadir}/%{name}
@@ -131,6 +133,8 @@ $RPM_BUILD_ROOT/%{_datadir}/sblim-testsuite/system/linux/messagelog.sh
 %changelog
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.9.0-19
 - Update Source0
+- Add %%doc and %%license
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

@@ -32,7 +32,8 @@ rm -rf "$RPM_BUILD_ROOT"
 make DESTDIR="$RPM_BUILD_ROOT" install
 
 %files
-%doc AUTHORS COPYING NEWS README
+%license COPYING
+%doc AUTHORS NEWS README
 %{_bindir}/xrestop
 %{_mandir}/man1/xrestop.1*
 
@@ -40,7 +41,8 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.4-27
 - Update Source0
 - Improve formatting
--
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

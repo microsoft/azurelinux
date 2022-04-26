@@ -132,7 +132,8 @@ fi
 %endif
 
 %files
-%doc README.md LICENSE README.hyperv
+%license LICENSE
+%doc README.md README.hyperv
 %{_bindir}/virt-who
 %{_bindir}/virt-who-password
 %{python_sitelib}/*
@@ -156,6 +157,7 @@ fi
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.24.2-3
 - Update Source0
 - Improve formatting
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24.2-2
 - Switching to using full number for the 'Release' tag.

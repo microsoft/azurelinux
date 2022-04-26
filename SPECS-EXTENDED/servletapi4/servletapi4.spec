@@ -17,14 +17,13 @@ Distribution:   Mariner
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
-
-%define	base_name	servletapi
-%define full_name	jakarta-%{base_name}
+%define base_name       servletapi
+%define full_name       jakarta-%{base_name}
 Name:           servletapi4
 Version:        4.0.4
 Release:        301%{?dist}
 Summary:        Java servlet and JSP implementation classes
-License:        Apache-1.1
+License:        ASL 1.1
 Group:          Development/Libraries/Java
 Url:            http://jakarta.apache.org/tomcat/
 Source0:        %{_mariner_sources_url}/%{full_name}-4-src.tar.gz
@@ -85,7 +84,8 @@ fi
 
 %files
 %defattr(-,root,root)
-%doc LICENSE README.txt
+%license LICENSE
+%doc README.txt
 %{_javadir}/*
 %{_javadir}/servlet.jar
 %ghost %{_sysconfdir}/alternatives/servlet.jar
@@ -97,6 +97,7 @@ fi
 %changelog
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 4.0.4-301
 - Update Source0
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.4-300
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).

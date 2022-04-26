@@ -120,7 +120,8 @@ cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
 
 %files
 %defattr(0644,root,root,0755)
-%doc src/{AUTHORS,LICENSE,README,config.xml}
+%license src/LICENSE
+%doc src/{AUTHORS,README,config.xml}
 %{_javadir}/%{name}-%{version}.jar
 %{_javadir}/%{name}.jar
 
@@ -142,6 +143,7 @@ cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.1-28
 - Update Source0
 - Improve formatting
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-27
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).

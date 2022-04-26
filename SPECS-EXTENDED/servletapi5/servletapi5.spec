@@ -18,8 +18,8 @@ Distribution:   Mariner
 #
 
 
-%define	base_name	servletapi
-%define full_name	jakarta-%{base_name}
+%define base_name       servletapi
+%define full_name       jakarta-%{base_name}
 Name:           servletapi5
 Version:        5.0.18
 Release:        289%{?dist}
@@ -83,7 +83,7 @@ fi
 
 %files
 %defattr(-,root,root)
-%doc LICENSE
+%license LICENSE
 %{_javadir}/*
 %{_javadir}/servlet.jar
 %ghost %{_sysconfdir}/alternatives/servlet.jar
@@ -91,6 +91,7 @@ fi
 %changelog
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 5.0.18-289
 - Update Source0
+- License verified.
 
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0.18-288
 - Adding BR on "javapackages-tools" to provide missing "%%{_javadir}" macro.
