@@ -12224,7 +12224,7 @@
         "other": {
           "name": "nodejs-nodemon",
           "version": "2.0.3",
-          "downloadUrl": "https://github.com/remy/nodemon/archive/v2.0.3.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
         }
       }
     },
