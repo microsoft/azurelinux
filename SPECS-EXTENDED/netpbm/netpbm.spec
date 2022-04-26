@@ -1,7 +1,7 @@
 Summary:         A library for handling different graphics file formats
 Name:            netpbm
 Version:         10.90.00
-Release:         3%{?dist}
+Release:         4%{?dist}
 # See copyright_summary for details
 License:         BSD and GPLv2 and IJG and MIT and Public Domain
 Vendor:         Microsoft Corporation
@@ -12,7 +12,7 @@ URL: http://netpbm.sourceforge.net/
 # svn checkout https://svn.code.sf.net/p/netpbm/code/userguide netpbm-%%{version}/userguide
 # svn checkout https://svn.code.sf.net/p/netpbm/code/trunk/test netpbm-%%{version}/test
 # and removing the .svn directories ( find -name "\.svn" -type d -print0 | xargs -0 rm -rf )
-Source0:         https://svn.code.sf.net/p/netpbm/code/advanced#/%{name}-%{version}.tar.xz
+Source0:         %{_mariner_sources_url}/%{name}-%{version}.tar.xz
 Patch0:          netpbm-security-scripts.patch
 Patch1:          netpbm-security-code.patch
 Patch2:          netpbm-ppmfadeusage.patch
@@ -224,6 +224,9 @@ popd
 %doc userguide/*
 
 %changelog
+* Fri Apr 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-4
+- Updating source URL.
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.90.00-3
 - Removing dependency on 'ghostscript'.
 - License verified.
