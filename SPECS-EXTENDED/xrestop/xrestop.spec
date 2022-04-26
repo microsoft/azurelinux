@@ -1,15 +1,18 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: X Resource Monitor
-Name: xrestop
-Version: 0.4
-Release: 26%{?dist}
-License: GPLv2+
-URL: http://www.freedesktop.org/Software/xrestop
-Source0: %{name}-%{version}.tar.gz
+Summary:        X Resource Monitor
+Name:           xrestop
+Version:        0.4
+Release:        27%{?dist}
+License:        GPLv2+
+URL:            http://www.freedesktop.org/Software/xrestop
+Source0:        http://downloads.yoctoproject.org/releases/%{name}/%{name}-%{version}.tar.gz
 
-BuildRequires:  gcc
-BuildRequires: ncurses-devel libXres-devel libXext-devel libX11-devel
+BuildRequires: gcc
+BuildRequires: ncurses-devel
+BuildRequires: libXres-devel
+BuildRequires: libXext-devel
+BuildRequires: libX11-devel
 BuildRequires: libXau-devel
 
 %description
@@ -23,19 +26,23 @@ for tracking down application X resource usage leaks.
 %build
 %configure
 make
-# SUBDIRS=
 
 %install
 rm -rf "$RPM_BUILD_ROOT"
 make DESTDIR="$RPM_BUILD_ROOT" install
-#SUBDIRS=
 
 %files
-%doc AUTHORS COPYING NEWS README
+%license COPYING
+%doc AUTHORS NEWS README
 %{_bindir}/xrestop
 %{_mandir}/man1/xrestop.1*
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.4-27
+- Update Source0
+- Improve formatting
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -144,5 +151,3 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 
 * Tue Mar  9 2004 Mike A. Harris <mharris@redhat.com> 0.2-1
 - Initial Red Hat RPM package.
-
-
