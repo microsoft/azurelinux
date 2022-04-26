@@ -79,6 +79,7 @@ rm -rf %{eggname}.egg-info
 %changelog
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.16.0-3
 - Updated source URL.
+- License verified.
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 0.16.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - Disable tests by default

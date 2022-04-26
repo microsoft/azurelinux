@@ -68,6 +68,7 @@ make test
 %changelog
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.08-36
 - Updated source URL.
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-35
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

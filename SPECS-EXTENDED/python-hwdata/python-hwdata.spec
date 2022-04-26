@@ -113,6 +113,7 @@ pylint-3 hwdata.py example.py || :
 %changelog
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3.7-10
 - Updated source URL.
+- License verified.
 
 * Fri Mar 05 2021 Henry Li <lihl@microsoft.com> - 2.3.7-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

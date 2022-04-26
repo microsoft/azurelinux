@@ -63,6 +63,7 @@ install -m 644 -p -D public_suffix_list.dafsa \
 %changelog
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 20201026-3
 - Updated source URL.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201026-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
