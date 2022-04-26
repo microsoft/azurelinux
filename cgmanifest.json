@@ -26286,7 +26286,7 @@
       "component": {
         "type": "other",
           "other": {
-          "name": "xhtml",
+          "name": "xhtml1-dtds",
           "version": "1.0",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xhtml1-dtds-20020801.tar.xz"
         }
