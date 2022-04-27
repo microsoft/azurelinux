@@ -25,7 +25,7 @@ Release:        3%{?dist}
 Summary:        Cross-vendor public domain suffix database
 License:        MPL-2.0
 URL:            https://publicsuffix.org/
-Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires:  psl-make-dafsa
 BuildArch:      noarch
 

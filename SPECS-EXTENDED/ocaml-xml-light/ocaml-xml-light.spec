@@ -25,7 +25,7 @@ URL:            http://tech.motion-twin.com/xmllight.html
 #       cd ocamllibs/xml-light/
 #       tar -zcf /tmp/xml-light-NNN.tar.gz --xform='s,^\.,xml-light-NNN,' .
 #         (where NNN is the svnrev above)
-Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/xml-light-%{svnrev}.tar.gz
+Source0:        %{_mariner_sources_url}/xml-light-%{svnrev}.tar.gz
 Source1:        LICENSE.PTR
 
 BuildRequires:  ocaml >= 4.00.1

@@ -30,7 +30,7 @@ Group:          Development/Libraries/Java
 URL:            https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-component-api
 #svn export http://svn.codehaus.org/plexus/plexus-containers/tags/plexus-containers-1.0-alpha-15/plexus-component-api/ plexus-component-api-1.0-alpha-15
 #tar cJf plexus-component-api-1.0-alpha-15.tar.xz plexus-component-api-1.0-alpha-15/
-Source0:        https://cblmarinerstorage.blob.core.windows.net/sources/core/%{name}-%{project_version}.tar.xz
+Source0:        %{_mariner_sources_url}/%{name}-%{project_version}.tar.xz
 Source1:        %{name}-build.xml
 Source2:        %{name}-LICENSE.txt
 BuildRequires:  ant

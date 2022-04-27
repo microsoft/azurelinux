@@ -10,7 +10,7 @@ License: psutils
 # and use upstream tarball for building because ./bootstrap downloads gnulib.
 # wget https://github.com/rrthomas/psutils/archive/master.zip && unzip master.zip && cd psutils-master/
 # ./bootstrap && autoreconf -vfi && ./configure && make dist-xz
-Source: https://cblmarinerstorage.blob.core.windows.net/sources/core/psutils-%{version}.tar.xz
+Source: %{_mariner_sources_url}/psutils-%{version}.tar.xz
 URL:    https://github.com/rrthomas/psutils
 
 # BZ#1072371
