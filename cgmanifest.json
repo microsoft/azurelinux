@@ -12512,6 +12512,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nodejs-nodemon",
+          "version": "2.0.3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nodejs-packaging",
           "version": "25",
           "downloadUrl": "https://releases.pagure.org/nodejs-packaging/nodejs-packaging-fedora-25.tar.xz"
@@ -12745,6 +12755,16 @@
           "name": "oath-toolkit",
           "version": "2.6.7",
           "downloadUrl": "https://download.savannah.gnu.org/releases/oath-toolkit/oath-toolkit-2.6.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "objectweb-anttask",
+          "version": "1.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/ow_util_ant_tasks_1.2.zip"
         }
       }
     },
@@ -13255,6 +13275,16 @@
           "name": "ocaml-uutf",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/dbuenzli/uutf/archive/v1.0.2/uutf-1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-xml-light",
+          "version": "2.3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xml-light-234.tar.gz"
         }
       }
     },
@@ -14296,6 +14326,16 @@
           "name": "perl-Class-C3-XS",
           "version": "0.14",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Class-C3-XS-0.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-Class-Data-Inheritable",
+          "version": "0.08",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/Class-Data-Inheritable-0.08-clean.tar.gz"
         }
       }
     },
@@ -18573,6 +18613,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-XML-SAX",
+          "version": "1.02",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/XML-SAX-1.02-nopatents.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-XML-SAX-Base",
           "version": "1.09",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-Base-1.09.tar.gz"
@@ -18856,6 +18906,16 @@
           "name": "plexus-classworlds",
           "version": "2.5.2",
           "downloadUrl": "https://github.com/sonatype/plexus-classworlds/archive/plexus-classworlds-2.5.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "plexus-component-api",
+          "version": "1.0~alpha15",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/plexus-component-api-1.0-alpha-15.tar.xz"
         }
       }
     },
@@ -19213,9 +19273,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "psutils",
+          "version": "1.23",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/psutils-1.23.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pth",
           "version": "2.0.7",
           "downloadUrl": "https://ftp.gnu.org/gnu/pth/pth-2.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "publicsuffix",
+          "version": "20201026",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/publicsuffix-20201026.tar.gz"
         }
       }
     },
@@ -19803,6 +19883,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-curio",
+          "version": "1.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/curio/curio-1.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-cytoolz",
           "version": "0.11.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cytoolz/cytoolz-0.11.0.tar.gz"
@@ -20226,6 +20316,16 @@
           "name": "python-humanize",
           "version": "0.5.1",
           "downloadUrl": "https://github.com/jmoiron/humanize/archive/0.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-hwdata",
+          "version": "2.3.7",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-hwdata-2.3.7.tar.gz"
         }
       }
     },
@@ -21583,6 +21683,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sniffio",
+          "version": "1.1.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sniffio/sniffio-1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-snowballstemmer",
           "version": "2.2.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/44/7b/af302bebf22c749c56c9c3e8ae13190b5b5db37a33d9068652e8f73b7089/snowballstemmer-2.2.0.tar.gz"
@@ -21916,6 +22026,16 @@
           "name": "python-tqdm",
           "version": "4.63.1",
           "downloadUrl": "https://github.com/tqdm/tqdm/archive/refs/tags/v4.63.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-trio",
+          "version": "0.16.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trio/trio-0.16.0.tar.gz"
         }
       }
     },
@@ -23304,9 +23424,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-hoe",
-          "version": "3.18.0",
-          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v3.18.0.tar.gz"
+          "name": "rubygem-hocon",
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/puppetlabs/ruby-hocon/archive/refs/tags/1.3.1.tar.gz"
         }
       }
     },
@@ -23314,9 +23434,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-hocon",
-          "version": "1.3.1",
-          "downloadUrl": "https://github.com/puppetlabs/ruby-hocon/archive/refs/tags/1.3.1.tar.gz"
+          "name": "rubygem-hoe",
+          "version": "3.18.0",
+          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v3.18.0.tar.gz"
         }
       }
     },

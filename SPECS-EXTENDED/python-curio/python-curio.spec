@@ -29,11 +29,10 @@ many of its ideas have influenced other libraries with similar functionality.
 Summary:        Building blocks for performing concurrent I/O
 Name:           python-%{pkgname}
 Version:        1.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 URL:            https://github.com/dabeaz/curio
-#Source0:       https://files.pythonhosted.org/packages/source/c/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/source/c/%{pypi_name}/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/c/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description %{_description}
@@ -71,6 +70,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} --verbose -
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.4-4
+- Updated source URL.
+- License verified.
 * Tue Jan 12 2021 Steve Laughman <steve.laughman@microsoft.com> - 1.4-3
 - Correction to files declaration
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 1.4-2
