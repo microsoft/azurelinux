@@ -1,0 +1,58 @@
+From 7b223e38603de3a75602e14914d26f9d4baf52eb Mon Sep 17 00:00:00 2001
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Wed, 9 Feb 2022 12:14:56 +0100
+Subject: [PATCH 1/2] tools/virtiofsd: Add rseq syscall to the seccomp
+ allowlist
+
+The virtiofsd currently crashes when used with glibc 2.35.
+That is due to the rseq system call being added to every thread
+creation [1][2].
+
+[1]: https://www.efficios.com/blog/2019/02/08/linux-restartable-sequences/
+[2]: https://sourceware.org/pipermail/libc-alpha/2022-February/136040.html
+
+This happens not at daemon start, but when a guest connects
+
+    /usr/lib/qemu/virtiofsd -f --socket-path=/tmp/testvfsd -o sandbox=chroot \
+        -o source=/var/guests/j-virtiofs --socket-group=kvm
+    virtio_session_mount: Waiting for vhost-user socket connection...
+    # start ok, now guest will connect
+    virtio_session_mount: Received vhost-user socket connection
+    virtio_loop: Entry
+    fv_queue_set_started: qidx=0 started=1
+    fv_queue_set_started: qidx=1 started=1
+    Bad system call (core dumped)
+
+We have to put rseq on the seccomp allowlist to avoid that the daemon
+is crashing in this case.
+
+Reported-by: Michael Hudson-Doyle <michael.hudson@canonical.com>
+Signed-off-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-id: 20220209111456.3328420-1-christian.ehrhardt@canonical.com
+
+[Moved rseq to its alphabetically ordered position in the seccomp
+allowlist.
+--Stefan]
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tools/virtiofsd/passthrough_seccomp.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/virtiofsd/passthrough_seccomp.c b/tools/virtiofsd/passthrough_seccomp.c
+index a3ce9f898d..2bc0127b69 100644
+--- a/tools/virtiofsd/passthrough_seccomp.c
++++ b/tools/virtiofsd/passthrough_seccomp.c
+@@ -91,6 +91,9 @@ static const int syscall_allowlist[] = {
+     SCMP_SYS(renameat2),
+     SCMP_SYS(removexattr),
+     SCMP_SYS(restart_syscall),
++#ifdef __NR_rseq
++    SCMP_SYS(rseq), /* required since glibc 2.35 */
++#endif
+     SCMP_SYS(rt_sigaction),
+     SCMP_SYS(rt_sigprocmask),
+     SCMP_SYS(rt_sigreturn),
+-- 
+2.35.1
+
