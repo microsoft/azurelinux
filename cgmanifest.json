@@ -18325,7 +18325,7 @@
         "other": {
           "name": "perl-XML-SAX",
           "version": "1.02",
-          "downloadUrl": "http://www.cpan.org/authors/id/G/GR/GRANTM/XML-SAX-1.02.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/XML-SAX-1.02-nopatents.tar.gz"
         }
       }
     },
