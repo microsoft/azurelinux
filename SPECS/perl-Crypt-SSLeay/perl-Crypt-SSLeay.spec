@@ -19,6 +19,7 @@ BuildRequires:  perl-generators
 BuildRequires:  openssl-devel
 BuildRequires:  perl-Path-Class
 BuildRequires:  perl-Try-Tiny
+BuildRequires:  perl(ExtUtils::CBuilder)
 
 Provides:       perl(Crypt::SSLeay) = %{version}-%{release}
 Provides:       perl(Crypt::SSLeay::CTX) = %{version}-%{release}
@@ -52,8 +53,7 @@ make %{?_smp_mflags}
 
 %install
 make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f \( -name .packlist -o \
-            -name '*.bs' -size 0 \) -exec rm -f {} ';'
+find "%{buildroot}" -type f \( -name .packlist -o -name '*.bs' -size 0 \) -exec rm -f {} ';'
 
 %check
 make test
@@ -66,6 +66,7 @@ make test
 %changelog
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.73_06
 - Update to 0.73_06
+- Add missing requires for ExtUtils::CBuilder.
 
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.72-8
 - Adding 'BuildRequires: perl-generators'.
