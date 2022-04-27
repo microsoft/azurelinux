@@ -7,6 +7,7 @@ Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://github.com/crash-utility/crash
 Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.
 Source1:       https://ftp.gnu.org/gnu/gdb/gdb-10.2.tar.gz
 License:       GPLv3+
 BuildRequires: binutils
@@ -14,7 +15,6 @@ BuildRequires: glibc-devel
 BuildRequires: ncurses-devel
 BuildRequires: zlib-devel
 Requires:      binutils
-BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 
 %description
 The core analysis suite is a self-contained tool that can be used to investigate either live systems, kernel core dumps created from the netdump, diskdump and kdump packages from Red Hat Linux, the mcore kernel patch offered by Mission Critical Linux, or the LKCD kernel patch.
