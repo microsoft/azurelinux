@@ -11,11 +11,19 @@
 
 # $@ - Paths to spec files to check
 
+# Specs, which contain multiple source files and are split into many entries inside 'cgmanifest.json'.
+ignore_multiple_sources=" \
+  xorg-x11-apps \
+  xorg-x11-font-utils \
+  xorg-x11-server-utils \
+  xorg-x11-xkb-utils"
+
 # List of ignored specs due to no source tarball to scan.
 ignore_no_source_tarball=" \
   ca-certificates \
   check-restart \
   core-packages \
+  dbus-x11 \
   ghc-srpm-macros \
   hunspell-nl \
   hunspell-ru \
@@ -23,57 +31,30 @@ ignore_no_source_tarball=" \
   hyphen-hsb \
   hyphen-lt \
   hyphen-mn \
-  lua-rpm-macros \
-  mariner-repos \
-  mariner-rpm-macros"
-
-# Ignore some specs, mostly those with Source0 files that are not from an external source, or have very odd URLs
-ignore_list=" \
-  appstream-data \
-  byacc \
-  Cython \
-  dbus-x11 \
-  geronimo-specs \
-  grub2-efi-binary-signed-aarch64 \
-  grub2-efi-binary-signed-x86_64 \
-  grubby \
   initramfs \
   installkernel \
   javapackages-tools-meta \
   kde-filesystem \
-  kernel-signed-aarch64 \
-  kernel-signed-x86_64 \
   kf5 \
-  lcms2 \
-  moby-buildx \
-  moby-containerd \
+  lua-rpm-macros \
+  mariner-repos \
+  mariner-rpm-macros \
   multilib-rpm-config \
   opencl-filesystem \
-  openjdk8 \
   patterns-ceph-containers \
   pyproject-rpm-macros \
-  python-markupsafe \
-  python-nocasedict \
-  python-pywbem \
-  python-repoze-lru \
-  python-requests \
-  python-sphinxcontrib-websupport \
-  python-yamlloader \
-  python-zope-interface \
   qt5-rpm-macros \
-  rt-setup
-  rtctl
-  runc \
-  sgabios \
-  shim \
   verity-read-only-root \
-  usbip \
   web-assets \
-  xmvn \
-  xorg-x11-apps \
-  xorg-x11-font-utils \
-  xorg-x11-server-utils \
-  xorg-x11-xkb-utils"
+  "
+
+# Specs for signed packages. Their unsigned versions should already be included in the manifest.
+ignore_signed_package=" \
+  grub2-efi-binary-signed-aarch64 \
+  grub2-efi-binary-signed-x86_64 \
+  kernel-signed-aarch64 \
+  kernel-signed-x86_64 \
+  shim"
 
 rm -f bad_registrations.txt
 rm -rf ./cgmanifest_test_dir/
@@ -97,7 +78,7 @@ do
   fi
 
   # Some specs don't make sense to add, ignore them
-  if echo "$ignore_list $ignore_no_source_tarball" | grep -w "$name" > /dev/null
+  if echo "$ignore_multiple_sources $ignore_signed_package $ignore_no_source_tarball" | grep -w "$name" > /dev/null
   then
     echo "    $name is being ignored, skipping"
     continue

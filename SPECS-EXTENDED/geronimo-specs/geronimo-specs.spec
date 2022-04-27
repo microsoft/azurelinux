@@ -21,12 +21,12 @@ Distribution:   Mariner
 %define bname geronimo
 Name:           geronimo-specs
 Version:        1.2
-Release:        38%{?dist}
+Release:        39%{?dist}
 Summary:        Geronimo J2EE server J2EE specifications
 License:        ASL 2.0
 Group:          Development/Languages/Java
 URL:            http://geronimo.apache.org
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 # STEPS TO CREATE THE SOURCE FILE
 # mkdir geronimo-specs-1.2
 # cd geronimo-specs-1.2
@@ -732,6 +732,9 @@ install -m 0644 geronimo-ws-metadata_2.0_spec-1.1.1/pom.xml \
 %license geronimo-ws-metadata_2.0_spec-1.1.1/LICENSE.txt
 
 %changelog
+* Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-39
+- Updating source URL.
+
 * Wed Feb 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-38
 - Removing following components due to incompatibility with Java 11:
   - commonj;

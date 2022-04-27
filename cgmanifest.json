@@ -3639,6 +3639,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "geronimo-specs",
+          "version": "1.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/geronimo-specs-1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gettext",
           "version": "0.21",
           "downloadUrl": "https://ftp.gnu.org/gnu/gettext/gettext-0.21.tar.xz"
@@ -7471,8 +7481,8 @@
         "type": "other",
         "other": {
           "name": "lcms2",
-          "version": "2.9",
-          "downloadUrl": "https://www.littlecms.com/lcms2-2.9.tar.gz"
+          "version": "2.13.1",
+          "downloadUrl": "https://github.com/mm2/Little-CMS/archive/refs/tags/lcms2.13.1.tar.gz"
         }
       }
     },
@@ -21415,7 +21425,7 @@
         "other": {
           "name": "python-repoze-lru",
           "version": "0.7",
-          "downloadUrl": "https://pypi.io/packages/source/r/remoto/remoto-0.7.tar.gz"
+          "downloadUrl": "https://pypi.io/packages/source/r/repoze.lru/repoze.lru-0.7.tar.gz"
         }
       }
     },
@@ -22944,9 +22954,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rt-setup",
+          "version": "2.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/rt-setup-2.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rt-tests",
           "version": "1.8",
           "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rtctl",
+          "version": "1.13",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/rtctl-1.13.tar.bz2"
         }
       }
     },
@@ -24508,17 +24538,7 @@
         "other": {
           "name": "sgabios",
           "version": "0.20180715git",
-          "downloadUrl": "https://gitlab.com/qemu-project/sgabios/-/archive/72f39d48bedf044e202fd51fecf3e2218fc2ae66/sgabios-72f39d48bedf044e202fd51fecf3e2218fc2ae66.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "sgpio",
-          "version": "1.2.0.10",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sgpio-1.2-0.10-src.tar.gz"
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sgabios-20180715-git72f39d4.tar.xz"
         }
       }
     },
@@ -24529,6 +24549,16 @@
           "name": "sgml-common",
           "version": "0.6.3",
           "downloadUrl": "https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/sgml-common-0.6.3.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "sgpio",
+          "version": "1.2.0.10",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sgpio-1.2-0.10-src.tar.gz"
         }
       }
     },
@@ -25896,6 +25926,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "usbip",
+          "version": "5.15.34.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/usbip-5.15.34.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "usbmuxd",
           "version": "1.1.0",
           "downloadUrl": "http://www.libimobiledevice.org/downloads/usbmuxd-1.1.0.tar.bz2"
@@ -26715,7 +26755,7 @@
     {
       "component": {
         "type": "other",
-          "other": {
+        "other": {
           "name": "xhtml1-dtds",
           "version": "1.0",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/xhtml1-dtds-20020801.tar.xz"

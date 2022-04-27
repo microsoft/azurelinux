@@ -1,14 +1,12 @@
 Summary:        Color Management Engine
 Name:           lcms2
-Version:        2.9
-Release:        9%{?dist}
+Version:        2.13.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.littlecms.com/
-Source0:        https://www.littlecms.com/lcms2-%{version}.tar.gz
-## upstream patches
-Patch17:        0017-Upgrade-Visual-studio-2017-15.8.patch
+Source0:        https://github.com/mm2/Little-CMS/archive/refs/tags/lcms%{version}.tar.gz#/Little-CMS-lcms%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  libjpeg-devel
 BuildRequires:  libtiff-devel
@@ -35,7 +33,7 @@ Provides:       littlecms-devel = %{version}-%{release}
 Development files for LittleCMS.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n Little-CMS-lcms%{version}
 
 %build
 %configure \
@@ -53,11 +51,6 @@ sed -i.rpath 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 find %{buildroot} -type f -name "*.la" -delete -print
 
-# rename docs (for use with %%doc below)
-cp -alf doc/LittleCMS2.?\ API.pdf api.pdf
-cp -alf doc/LittleCMS2.?\ Plugin\ API.pdf plugin-api.pdf
-cp -alf doc/LittleCMS2.?\ tutorial.pdf tutorial.pdf
-
 %check
 %make_build check -k ||:
 
@@ -73,12 +66,15 @@ cp -alf doc/LittleCMS2.?\ tutorial.pdf tutorial.pdf
 %{_mandir}/man1/*
 
 %files devel
-%doc api.pdf plugin-api.pdf tutorial.pdf
 %{_includedir}/lcms2*.h
 %{_libdir}/liblcms2.so
 %{_libdir}/pkgconfig/lcms2.pc
 
 %changelog
+* Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13.1-1
+- Updating to 2.13.1.
+- Fixing source URL.
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.9-9
 - License verified
 - Lint spec
