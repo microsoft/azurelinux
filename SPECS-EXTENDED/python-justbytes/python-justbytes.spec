@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           python-%{srcname}
 Version:        0.11
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Library for handling computation with address ranges in bytes
 
 License:        GPLv2+
@@ -12,6 +12,7 @@ URL:            http://pypi.python.org/pypi/justbytes
 Source0:        https://pypi.io/packages/source/%(n=%{srcname}; echo ${n:0:1})/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
+BuildRequires:  python3-pip
 
 %global _description \
 A library for handling computations with address ranges. The library also offers\
@@ -24,7 +25,6 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-pytest
 BuildRequires:  python3-hypothesis
 BuildRequires:  python3-justbases
 BuildRequires:  python3-six
@@ -46,7 +46,9 @@ rm -rf justbytes.egg-info
 %py3_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} -v tests
+pip3 install pytest sortedcontainers
+pip3 install .
+py.test -v tests
 
 %files -n python3-%{srcname}
 %license LICENSE
@@ -55,6 +57,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} -v tests
 %{python3_sitelib}/justbytes-%{version}-*.egg-info/
 
 %changelog
+* Wed Apr 27 2022 Muhammad Falak <mwani@microsoft.com> - 0.11-12
+- Drop BR on pytest & pip install latest deps
+- Use `py.test` instead of `py.test-3` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
