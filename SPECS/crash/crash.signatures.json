@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "crash-7.2.9.tar.gz": "6c07634f7357906dcb21ff3decd1760d7b0b1a11c01472cd17aba2e67f3ce16e",
-  "gdb-7.6.tar.gz": "8070389a5dcc104eb0be483d582729f98ed4d761ad19cedd3f17b5d2502faa36"
+  "crash-8.0.1.tar.gz": "233208b1433a49e1d5a063fa88e6fc9772b99fbb7b30ae79a2115d1b8f0dfc52",
+  "gdb-10.2.tar.gz": "b33ad58d687487a821ec8d878daab0f716be60d0936f2e3ac5cf08419ce70350"
  }
 }
