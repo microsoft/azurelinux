@@ -1,25 +1,3 @@
-License text from the "xml-light/README" file:
-
-Xml Light is distributed under the terms of the GNU Library General
-Public License, with the special exception on linking described
-below. (This is the OCaml library licence.)
-
-As a special exception to the GNU Library General Public License, you
-may link, statically or dynamically, a "work that uses the Library"
-with a publicly distributed version of the Library to produce an
-executable file containing portions of the Library, and distribute
-that executable file under terms of your choice, without any of the
-additional requirements listed in clause 6 of the GNU Library General
-Public License. By "a publicly distributed version of the Library", we
-mean either the unmodified Library as distributed by INRIA, or a
-modified version of the Library that is distributed under the
-conditions defined in clause 3 of the GNU Library General Public
-License. This exception does not however invalidate any other reasons
-why the executable file might be covered by the GNU Library General
-Public License.
-
-Credits
--------
-(c)2003-2005 Nicolas Cannasse (ncannasse@motion-twin.com)
-(c)2003-2005 Motion-Twin
-Some parts of this code source has an additionnal copyright to Jacques Garrigue
+The license for this package is inferred to be LGPLv2.1 based on the README file located at "ocaml/xml-light."
+The README file specifies that the license being used is LGPLv2.1 (OCaml library licence).
+Refer to https://ocaml.org/docs/license.html for license docs.
