@@ -121,7 +121,7 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/imager.log \
 		--local-repo $(local_and_external_rpm_cache) \
-		--tdnf-worker $(BUILD_DIR)/worker/worker_chroot.tar.gz \
+		--tdnf-worker $(chroot_worker) \
 		--repo-file=$(imggen_local_repo) \
 		--assets $(assets_dir) \
 		--output-dir $(imager_disk_output_dir) && \
