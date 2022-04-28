@@ -14104,8 +14104,8 @@
         "type": "other",
         "other": {
           "name": "perl-Archive-Zip",
-          "version": "1.67",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PH/PHRED/Archive-Zip-1.67.tar.gz"
+          "version": "1.68",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PH/PHRED/Archive-Zip-1.68.tar.gz"
         }
       }
     },
