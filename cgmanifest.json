@@ -18724,8 +18724,8 @@
         "type": "other",
         "other": {
           "name": "perl-YAML",
-          "version": "1.26",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-1.26.tar.gz"
+          "version": "1.30",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-1.30.tar.gz"
         }
       }
     },
