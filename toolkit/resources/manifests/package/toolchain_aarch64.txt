@@ -110,8 +110,6 @@ glibc-iconv-2.35-1.cm2.aarch64.rpm
 glibc-lang-2.35-1.cm2.aarch64.rpm
 glibc-nscd-2.35-1.cm2.aarch64.rpm
 glibc-tools-2.35-1.cm2.aarch64.rpm
-gmock-1.11.0-2.cm2.aarch64.rpm
-gmock-devel-1.11.0-2.cm2.aarch64.rpm
 gmp-6.2.1-2.cm2.aarch64.rpm
 gmp-debuginfo-6.2.1-2.cm2.aarch64.rpm
 gmp-devel-6.2.1-2.cm2.aarch64.rpm
@@ -126,9 +124,6 @@ gpgme-devel-1.16.0-1.cm2.aarch64.rpm
 grep-3.7-2.cm2.aarch64.rpm
 grep-debuginfo-3.7-2.cm2.aarch64.rpm
 grep-lang-3.7-2.cm2.aarch64.rpm
-gtest-1.11.0-2.cm2.aarch64.rpm
-gtest-debuginfo-1.11.0-2.cm2.aarch64.rpm
-gtest-devel-1.11.0-2.cm2.aarch64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 gzip-1.11-1.cm2.aarch64.rpm
 gzip-debuginfo-1.11-1.cm2.aarch64.rpm
@@ -256,8 +251,8 @@ newt-0.52.21-4.cm2.aarch64.rpm
 newt-debuginfo-0.52.21-4.cm2.aarch64.rpm
 newt-devel-0.52.21-4.cm2.aarch64.rpm
 newt-lang-0.52.21-4.cm2.aarch64.rpm
-ninja-build-1.10.2-1.cm2.aarch64.rpm
-ninja-build-debuginfo-1.10.2-1.cm2.aarch64.rpm
+ninja-build-1.10.2-2.cm2.aarch64.rpm
+ninja-build-debuginfo-1.10.2-2.cm2.aarch64.rpm
 npth-1.6-4.cm2.aarch64.rpm
 npth-debuginfo-1.6-4.cm2.aarch64.rpm
 npth-devel-1.6-4.cm2.aarch64.rpm

@@ -62,10 +62,8 @@ remove_packages_for_pkggen_core () {
     sed -i '/glib-devel/d' $TmpPkgGen
     sed -i '/glib-schemas/d' $TmpPkgGen
     sed -i '/glib-doc/d' $TmpPkgGen
-    sed -i '/gmock/d' $TmpPkgGen
     sed -i '/gperf/d' $TmpPkgGen
     sed -i '/gpgme-[[:alpha:]]/d' $TmpPkgGen
-    sed -i '/gtest/d' $TmpPkgGen
     sed -i '/kbd/d' $TmpPkgGen
     sed -i '/kmod/d' $TmpPkgGen
     sed -i '/krb5-[[:alpha:]]/d' $TmpPkgGen
