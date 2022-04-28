@@ -11,7 +11,7 @@ Distribution:   Mariner
 
 Name:           python-%{srcname}
 Version:        0.6.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Implements JWK, JWS, JWE specifications using python-cryptography
 
 License:        LGPLv3+
@@ -30,7 +30,9 @@ BuildRequires:  python2-pytest
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-cryptography >= 1.5
-BuildRequires:  python%{python3_pkgversion}-pytest
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 %endif
 
 %description
@@ -77,6 +79,7 @@ Implements JWK, JWS, JWE specifications using python-cryptography
 %{__python2} -bb -m pytest %{srcname}/test*.py
 %endif
 %if 0%{?with_python3}
+pip3 install pytest
 %{__python3} -bb -m pytest %{srcname}/test*.py
 %endif
 
@@ -117,6 +120,10 @@ rm -rf %{buildroot}%{python3_sitelib}/%{srcname}/__pycache__/tests{,-cookbook}.*
 
 
 %changelog
+* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.6.0-9
+- Add a BR on pip to enable ptest
+- License verified
+
 * Thu Mar 02 2021 Henry Li <lihl@microsoft.com> - 0.6.0-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Enable python3 and disable python2 build
