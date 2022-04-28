@@ -5,15 +5,9 @@ Distribution:   Mariner
 
 %global _docdir_fmt %{name}
 
-%if 0%{?rhel} >= 8
-%bcond_with pytests
-%else
-%bcond_without pytests
-%endif
-
 Name:           python-%{modname}
 Version:        3.0.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        Simple python library to deal with URI Templates (RFC 6570)
 
 License:        BSD
@@ -21,6 +15,10 @@ URL:            https://%{modname}.readthedocs.io
 Source0:        https://github.com/sigmavirus24/%{modname}/archive/%{version}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
 
 BuildArch:      noarch
+
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description
 %{summary}.
@@ -32,9 +30,7 @@ Conflicts:      python3-uri-templates
 %{?python_provide:%python_provide python3-%{altname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with pytests}
-BuildRequires:  python3-pytest
-%endif
+
 
 %description -n python3-%{modname}
 %{summary}.
@@ -50,11 +46,10 @@ Python 3 version.
 %install
 %py3_install
 
-%if %{with pytests}
 %check
-#py.test-%{python3_version} -v
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} -v
-%endif
+pip3 install pytest
+pip3 install .
+py.test -v
 
 %files -n python3-%{modname}
 %license LICENSE
@@ -63,6 +58,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} -v
 %{python3_sitelib}/%{modname}/
 
 %changelog
+* Tue Apr 26 2022 Muhammad Falak <mwani@microsoft.com> - 3.0.0-13
+- Enable tests by removing build gates
+- Drop BR on pytest & pip install latest deps to enable pytest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
