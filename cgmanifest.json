@@ -15684,8 +15684,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-Which",
-          "version": "1.22",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.22.tar.gz"
+          "version": "1.27",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.27.tar.gz"
         }
       }
     },
