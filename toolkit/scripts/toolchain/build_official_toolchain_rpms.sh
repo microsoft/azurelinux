@@ -25,6 +25,7 @@ set -x
 
 export LFS=$MARINER_BUILD_DIR/toolchain/populated_toolchain
 TOPDIR=/usr/src/mariner
+CHROOT_BUILDROOT_DIR=$LFS$TOPDIR/BUILDROOT
 CHROOT_SOURCES_DIR=$LFS$TOPDIR/SOURCES
 CHROOT_SPECS_DIR=$LFS$TOPDIR/SPECS
 CHROOT_SRPMS_DIR=$LFS$TOPDIR/SRPMS
@@ -59,8 +60,10 @@ mkdir -pv $CHROOT_INSTALL_RPM_DIR
 mkdir -pv $TOOLCHAIN_LOGS
 mkdir -pv $CHROOT_RPMS_DIR
 
+# Remove artifacts from previous toolchain builds
 sudo rm -f $TOOLCHAIN_BUILD_LIST
 sudo rm -f $TOOLCHAIN_FAILURES
+sudo rm -rf $CHROOT_BUILDROOT_DIR
 touch $TOOLCHAIN_FAILURES
 
 chroot_mount () {
