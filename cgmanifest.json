@@ -15554,8 +15554,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-HomeDir",
-          "version": "1.004",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-HomeDir-1.004.tar.gz"
+          "version": "1.006",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-HomeDir-1.006.tar.gz"
         }
       }
     },
