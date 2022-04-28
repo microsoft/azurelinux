@@ -14504,8 +14504,8 @@
         "type": "other",
         "other": {
           "name": "perl-common-sense",
-          "version": "3.74",
-          "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-3.74.tar.gz"
+          "version": "3.75",
+          "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-3.75.tar.gz"
         }
       }
     },
