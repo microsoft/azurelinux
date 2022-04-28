@@ -22284,8 +22284,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.10",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tar.xz"
+          "version": "3.9.12",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.12/Python-3.9.12.tar.xz"
         }
       }
     },

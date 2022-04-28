@@ -2,12 +2,12 @@
 %global __brp_python_bytecompile %{nil}
 %global majmin 3.9
 # See Lib/ensurepip/__init__.py in Source0 for these version numbers
-%global pip_version 21.2.4
+%global pip_version 22.0.4
 %global setuptools_version 58.1.0
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.9.10
+Version:        3.9.12
 Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
@@ -117,7 +117,7 @@ Summary:        Download, build, install, upgrade, and uninstall Python packages
 Group:          Development/Tools
 Requires:       %{name} = %{version}-%{release}
 Provides:       python3dist(setuptools) = %{version}-%{release}
-Provides:       python3.9dist(setuptools) = %{version}-%{release}
+Provides:       python%{majmin}dist(setuptools) = %{version}-%{release}
 BuildArch:      noarch
 
 %description    setuptools
@@ -279,6 +279,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Apr 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.12-1
+- Upgrade to latest maintenance release for the 3.9 series
+
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 3.9.10-1
 - Upgrade to latest bugfix release for the 3.9 series
 
