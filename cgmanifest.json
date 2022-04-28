@@ -15014,8 +15014,8 @@
         "type": "other",
         "other": {
           "name": "perl-DBD-SQLite",
-          "version": "1.62",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-1.62.tar.gz"
+          "version": "1.70",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-1.70.tar.gz"
         }
       }
     },
