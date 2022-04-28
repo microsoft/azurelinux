@@ -7,10 +7,10 @@ Distribution:   Mariner
 
 Name:           ocaml-xml-light
 Version:        2.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Minimal XML parser and printer for OCaml
 
-License:        LGPLv2+
+License:        LGPLv2.1
 URL:            http://tech.motion-twin.com/xmllight.html
 
 # Upstream does not have releases (or rather, it did up to version 2.2
@@ -25,14 +25,13 @@ URL:            http://tech.motion-twin.com/xmllight.html
 #       cd ocamllibs/xml-light/
 #       tar -zcf /tmp/xml-light-NNN.tar.gz --xform='s,^\.,xml-light-NNN,' .
 #         (where NNN is the svnrev above)
-Source0:        xml-light-%{svnrev}.tar.gz
-
+Source0:        %{_mariner_sources_url}/xml-light-%{svnrev}.tar.gz
+Source1:        LICENSE.PTR
 
 BuildRequires:  ocaml >= 4.00.1
 BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
 BuildRequires:  ocaml-ocamldoc
 BuildRequires:  gawk
-
 
 %description
 Xml-Light is a minimal XML parser & printer for OCaml. It provides
@@ -41,20 +40,17 @@ with it, and print it back to an XML document. It support also DTD
 parsing and checking, and is entirely written in OCaml, hence it does
 not require additional C library.
 
-
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
-
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-
 %prep
 %setup -n xml-light-%{svnrev}
-
+cp %{SOURCE1} .
 
 %build
 # Build breaks if parallelized.
@@ -65,7 +61,6 @@ make doc
 make opt
 %endif
 sed -e 's/@VERSION@/%{VERSION}/' < META.in > META
-
 
 %check
 ./test.exe <<EOF
@@ -80,7 +75,6 @@ EOF
 EOF
 %endif
 
-
 %install
 export DESTDIR=$RPM_BUILD_ROOT
 export OCAMLFIND_DESTDIR=$RPM_BUILD_ROOT%{_libdir}/ocaml
@@ -91,10 +85,10 @@ ocamlfind install xml-light META *.mli *.cmi *.cma \
 *.a *.cmxa *.cmx
 %endif
 
-
 %files
 %doc README
 %{_libdir}/ocaml/xml-light
+%license LICENSE.PTR README
 %if %opt
 %exclude %{_libdir}/ocaml/xml-light/*.a
 %exclude %{_libdir}/ocaml/xml-light/*.cmxa
@@ -102,9 +96,9 @@ ocamlfind install xml-light META *.mli *.cmi *.cma \
 %endif
 %exclude %{_libdir}/ocaml/xml-light/*.mli
 
-
 %files devel
 %doc README doc/*
+%license LICENSE.PTR README
 %if %opt
 %{_libdir}/ocaml/xml-light/*.a
 %{_libdir}/ocaml/xml-light/*.cmxa
@@ -112,8 +106,13 @@ ocamlfind install xml-light META *.mli *.cmi *.cma \
 %endif
 %{_libdir}/ocaml/xml-light/*.mli
 
-
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3-2
+- Updated source URL.
+- Improved formatting.
+- Added LICENSE.PTR to clarify the package's license.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-1
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

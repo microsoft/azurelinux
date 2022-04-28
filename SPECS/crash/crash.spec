@@ -1,22 +1,20 @@
 Name:          crash
-Version:       7.2.9
-Release:       3%{?dist}
+Version:       8.0.1
+Release:       1%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://github.com/crash-utility/crash
-# Source0:     https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz
-Source0:       %{name}-%{version}.tar.gz
-Source1:       https://ftp.gnu.org/gnu/gdb/gdb-7.6.tar.gz
-Patch0:        crash-printk-fix.patch
+Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.
+Source1:       https://ftp.gnu.org/gnu/gdb/gdb-10.2.tar.gz
 License:       GPLv3+
 BuildRequires: binutils
 BuildRequires: glibc-devel
 BuildRequires: ncurses-devel
 BuildRequires: zlib-devel
 Requires:      binutils
-BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 
 %description
 The core analysis suite is a self-contained tool that can be used to investigate either live systems, kernel core dumps created from the netdump, diskdump and kdump packages from Red Hat Linux, the mcore kernel patch offered by Mission Critical Linux, or the LKCD kernel patch.
@@ -34,7 +32,6 @@ This package contains libraries and header files need for development.
 %prep
 %setup -q -n %{name}-%{version}
 cp %{SOURCE1} .
-%patch0 -p1
 
 %build
 make RPMPKG=%{version}-%{release}
@@ -61,6 +58,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+* Wed Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 8.0.1-1
+- Update to 8.0.1
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.2.9-3
 - Removing the explicit %%clean stage.
 

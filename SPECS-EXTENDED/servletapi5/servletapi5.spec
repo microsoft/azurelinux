@@ -18,16 +18,16 @@ Distribution:   Mariner
 #
 
 
-%define	base_name	servletapi
-%define full_name	jakarta-%{base_name}
+%define base_name       servletapi
+%define full_name       jakarta-%{base_name}
 Name:           servletapi5
 Version:        5.0.18
-Release:        288%{?dist}
+Release:        289%{?dist}
 Summary:        Java servlet and JSP implementation classes
 License:        ASL 1.1
 Group:          Development/Libraries/Java
 Url:            http://jakarta.apache.org/tomcat/
-Source:         %{full_name}-5-src.tar.gz
+Source0:        %{_mariner_sources_url}/%{full_name}-5-src.tar.gz
 #!BuildIgnore:  xml-commons xml-commons-resolver xerces-j2 xml-commons-apis
 #!BuildIgnore:  xml-commons-jaxp-1.3-apis
 BuildRequires:  ant
@@ -83,12 +83,16 @@ fi
 
 %files
 %defattr(-,root,root)
-%doc LICENSE
+%license LICENSE
 %{_javadir}/*
 %{_javadir}/servlet.jar
 %ghost %{_sysconfdir}/alternatives/servlet.jar
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 5.0.18-289
+- Update Source0
+- License verified.
+
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0.18-288
 - Adding BR on "javapackages-tools" to provide missing "%%{_javadir}" macro.
 - License verified.

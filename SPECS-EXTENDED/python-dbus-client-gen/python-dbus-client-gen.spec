@@ -13,6 +13,9 @@ URL:            https://github.com/stratis-storage/dbus-client-gen
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description \
 This library contains a few methods that consume an XML specification\
@@ -28,7 +31,6 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-pytest
 BuildRequires:  python3-hypothesis
 BuildRequires:  python3-hs-dbus-signature
 
@@ -46,7 +48,9 @@ Python 3 version.
 %py3_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} -v tests
+pip3 install pytest sortedcontainers
+pip3 install .
+py.test -v tests
 
 %files -n python3-%{srcname}
 %license LICENSE
@@ -55,6 +59,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} -v tests
 %{python3_sitelib}/dbus_client_gen-*.egg-info/
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.4-8
+- Drop BR on pytest & pip install latest deps to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

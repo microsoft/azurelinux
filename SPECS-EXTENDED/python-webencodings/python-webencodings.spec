@@ -4,7 +4,7 @@
 
 Name: python-%{srcname}
 Version: 0.5.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 BuildArch: noarch
 
 License: BSD
@@ -15,8 +15,10 @@ URL: https://github.com/gsnedders/python-%{srcname}
 Source0: %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires: python3-devel
-BuildRequires: python3-pytest
 BuildRequires: python3-sphinx
+%if %{with_check}
+BuildRequires: python3-pip
+%endif
 
 
 %description
@@ -62,7 +64,8 @@ rm -rf docs/_build/.doctrees
 
 
 %check
-py.test-3
+pip3 install pytest
+py.test
 
 
 %files doc
@@ -78,6 +81,11 @@ py.test-3
 
 
 %changelog
+* Thu Apr 21 2022 Muhammad Falak <mwani@microsoft.com> - 0.5.1-13
+- Drop BR on pytest & pip install latest version
+- Use py.test instead of py.test-3 to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.1-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

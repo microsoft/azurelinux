@@ -4,10 +4,10 @@ Name: hyphen-mi
 Summary: Maori hyphenation rules
 %global upstreamid 20080630
 Version: 0.%{upstreamid}
-Release: 21%{?dist}
+Release: 22%{?dist}
 # Source is dead now
 # Source: http://packages.papakupu.maori.nz/hunspell-hyphen/hunspell-hyphen-mi-0.1.%%{upstreamid}-beta.tar.gz
-Source: hunspell-hyphen-mi-0.1.%{upstreamid}-beta.tar.gz
+Source: %{_mariner_sources_url}/hunspell-hyphen-mi-0.1.%{upstreamid}-beta.tar.gz
 URL: http://papakupu.maori.nz/
 License: GPLv3+
 BuildArch: noarch
@@ -29,10 +29,15 @@ cp -p mi.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_mi_NZ.dic
 
 
 %files
-%doc mi.LICENSE mi.README
+%license mi.LICENSE
+%doc mi.README
 %{_datadir}/hyphen/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-22
+- Updating source URLs.
+- License verified.
+
 * Mon Jan 25 2021 Joe Schmitt <joschmit@microsoft.com> - 0.20080630-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fix source macro expansion

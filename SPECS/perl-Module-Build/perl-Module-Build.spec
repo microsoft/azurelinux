@@ -5,8 +5,8 @@
 
 Summary:        Build and install Perl modules
 Name:           perl-Module-Build
-Version:        0.4224
-Release:        5%{?dist}
+Version:        0.4231
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Build/
@@ -82,6 +82,9 @@ LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.4231-1
+- Update to 0.4231
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4224-5
 - Adding 'BuildRequires: perl-generators'.
 - License verified.

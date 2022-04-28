@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        JSON serializing/deserializing, done correctly and fast
 Name:           perl-JSON-XS
-Version:        3.04
-Release:        6%{?dist}
+Version:        4.03
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/JSON-XS/
@@ -54,6 +54,9 @@ make test
 %{_mandir}/man[13]/*
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 4.03-1
+- Update to version 4.03
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.04-6
 - Removing epoch.
 

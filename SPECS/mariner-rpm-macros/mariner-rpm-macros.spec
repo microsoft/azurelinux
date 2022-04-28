@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,7 +20,7 @@ Source5:        macros.check
 Source6:        macros.python
 Source7:        macros.python3
 Source8:        macros.python-srpm
-Source9:       macros.openblas-srpm
+Source9:        macros.openblas-srpm
 Source10:       macros.nodejs-srpm
 Source11:       macros.mono-srpm
 Source12:       macros.ocaml-srpm
@@ -121,6 +121,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Tue Apr 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-14
+- Adding the "_mariner_sources_url" macro.
+
 * Mon Mar 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0-13
 - Remove python2 RPM macros entirely
 - Remove python2-related SRPM macros

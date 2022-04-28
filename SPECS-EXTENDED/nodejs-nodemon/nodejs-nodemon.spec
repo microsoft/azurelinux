@@ -8,11 +8,11 @@ Distribution:   Mariner
 
 Name:          nodejs-%{npm_name}
 Version:       2.0.3
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Simple monitor script for use during development of a node.js app
 License:       MIT
 URL:           https://github.com/remy/nodemon
-Source0:       %{npm_name}-v%{version}-bundled.tar.gz
+Source0:       %{_mariner_sources_url}/%{npm_name}-v%{version}-bundled.tar.gz
 
 BuildRequires: nodejs-devel
 BuildRequires: nodejs-packaging
@@ -79,6 +79,10 @@ npm run test
 %{_bindir}/nodemon
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.3-3
+- Updated source URL.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.3-2
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
 

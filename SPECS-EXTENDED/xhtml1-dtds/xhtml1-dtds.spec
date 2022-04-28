@@ -1,19 +1,19 @@
 %global date    20020801
 
-Name:           xhtml1-dtds
-Version:        1.0
-Release:        20020802%{?dist}
-Summary:        XHTML 1.0 document type definitions
-
 # W3C Software License for DTDs etc:
 # http://www.w3.org/Consortium/Legal/IPR-FAQ-20000620#DTD
+Name:           xhtml1-dtds
+Version:        1.0
+Release:        20020803%{?dist}
+Summary:        XHTML 1.0 document type definitions
 License:        W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.w3.org/TR/2002/REC-xhtml1-%{date}/
 # Source0 generated with Source99, see comments in the script
-Source0:        %{name}-%{date}.tar.xz
+Source0:        %{_mariner_sources_url}/%{name}-%{date}.tar.xz
 Source1:        %{name}.catalog.xml
+Source2:        LICENSE.PTR
 Source99:       %{name}-prepare-tarball.sh
 Patch0:         %{name}-sgml-catalog.patch
 Patch1:         %{name}-sgml-dcl.patch
@@ -39,10 +39,9 @@ the foundation for future extensibility of XHTML.
 %patch0 -p0
 %patch1 -p1
 cp -p %{SOURCE1} DTD/catalog.xml
-
+cp %{SOURCE2} .
 
 %build
-
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -83,8 +82,6 @@ touch %{name}-%{version}-%{release}.soc
 ln -s %{name}-%{version}-%{release}.soc %{name}.soc
 cd -
 
-
-
 %post
 cd %{_sysconfdir}/xml
 [ -e catalog ] || /usr/bin/xmlcatalog --noout --create catalog
@@ -107,6 +104,7 @@ cd - >/dev/null
 
 
 %files
+%license LICENSE.PTR
 %ghost %{_sysconfdir}/sgml/%{name}-%{version}-%{release}.soc
 %{_sysconfdir}/sgml/%{name}.soc
 %{_sysconfdir}/xml/%{name}*.xml
@@ -114,6 +112,12 @@ cd - >/dev/null
 
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-20020803
+- Update Source0
+- Improved formatting
+- Added LICENSE.PTR to clarify the package's license
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-20020802
 - Switching to using full number for the 'Release' tag.
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
