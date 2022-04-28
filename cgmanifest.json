@@ -17034,8 +17034,8 @@
         "type": "other",
         "other": {
           "name": "perl-Parse-PMFile",
-          "version": "0.42",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/Parse-PMFile-0.42.tar.gz"
+          "version": "0.43",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/Parse-PMFile-0.43.tar.gz"
         }
       }
     },
