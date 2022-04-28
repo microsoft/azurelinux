@@ -85,11 +85,6 @@
 %endif
 %define requires_audio_alsa Requires: %{name}-audio-alsa = %{evr}
 %define requires_audio_oss Requires: %{name}-audio-oss = %{evr}
-%if %{with sdl}
-%define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
-%else
-%define requires_audio_sdl %{nil}
-%endif
 %if %{with brltty}
 %define requires_char_baum Requires: %{name}-char-baum = %{evr}
 %else
@@ -121,8 +116,10 @@
 %endif
 %if %{with sdl}
 %define sdl_drv sdl,
+%define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
 %define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
 %else
+%define requires_audio_sdl %{nil}
 %define requires_ui_sdl %{nil}
 %endif
 %if %{have_virgl}
@@ -2279,8 +2276,8 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 %changelog
 * Wed Apr 20 2022 Daniel McIlvaney <damcilva@microsoft.com> - 6.2.0-1
 - Updated to match Fedora 36 (license: MIT)
-- Patched CVE-2022-0358
-
+- Patched CVE-2022-0358, CVE-2021-20225, CVE-2022-1050
+- Backported patch for CVE-2022-26354
 
 * Mon Jan 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-14
 - Disabling 'qemu-system-x86*' subpackages build for non-AMD64 architectures.
