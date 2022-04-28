@@ -14774,8 +14774,8 @@
         "type": "other",
         "other": {
           "name": "perl-Crypt-SSLeay",
-          "version": "0.72",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NA/NANIS/Crypt-SSLeay-0.72.tar.gz"
+          "version": "0.73_06",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NA/NANIS/Crypt-SSLeay-0.73_06.tar.gz"
         }
       }
     },

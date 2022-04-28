@@ -1,7 +1,7 @@
 Summary:        Cross-platform path specification manipulation for Perl
 Name:           perl-Path-Class
 Version:        0.37
-Release:        7%{?dist}
+Release:        8%{?dist}
 URL:            http://search.cpan.org/~kwilliams/Path-Class-0.37/
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -12,6 +12,7 @@ Source:         http://search.cpan.org/CPAN/authors/id/K/KW/KWILLIAMS/Path-Class
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::MakeMaker)
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::Copy)
@@ -47,6 +48,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.37-8
+- Add missing BuildRequires for ExtUtils::MakeMaker
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.37-7
 - Adding 'BuildRequires: perl-generators'.
 - License verified.
