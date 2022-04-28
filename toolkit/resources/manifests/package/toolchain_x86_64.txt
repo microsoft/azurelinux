@@ -459,7 +459,7 @@ perl-Term-ReadLine-1.17-487.cm2.noarch.rpm
 perl-Test-1.31-487.cm2.noarch.rpm
 perl-Test-Harness-3.43-487.cm2.noarch.rpm
 perl-Test-Simple-1.302183-487.cm2.noarch.rpm
-perl-Test-Warnings-0.028-5.cm2.noarch.rpm
+perl-Test-Warnings-0.031-1.cm2.noarch.rpm
 perl-tests-5.34.1-487.cm2.x86_64.rpm
 perl-Text-Abbrev-1.02-487.cm2.noarch.rpm
 perl-Text-Balanced-2.04-487.cm2.noarch.rpm
