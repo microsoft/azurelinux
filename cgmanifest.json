@@ -16154,8 +16154,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-XS",
-          "version": "3.04",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-3.04.tar.gz"
+          "version": "4.03",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-4.03.tar.gz"
         }
       }
     },
