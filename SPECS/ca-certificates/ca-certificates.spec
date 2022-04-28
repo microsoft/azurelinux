@@ -44,7 +44,7 @@ Name:           ca-certificates
 
 # When updating, "Version" AND "Release" tags must be updated in the "prebuilt-ca-certificates" package as well.
 Version:        20200720
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,10 @@ Requires(post): %{name}-tools = %{version}-%{release}
 Requires(post): coreutils
 Requires(postun): %{name}-tools = %{version}-%{release}
 
+# ca-certificates-microsoft was folded into the base package in 20200720-19
+# Obsolete all published versions of the separate ca-certificates-microsoft package
+# Otherwise, those with old versions of ca-certificates-microsoft can't upgrade
+Obsoletes:      ca-certificates-microsoft <= 20200720-18
 Provides:       ca-certificates-microsoft = %{version}-%{release}
 Provides:       ca-certificates-mozilla = %{version}-%{release}
 
@@ -317,6 +321,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Thu Apr 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 20200720-23
+- Have base package obsolete published versions of separate ca-certificates-microsoft package 
+
 * Mon Apr 04 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-22
 - Updating Microsoft trusted root CAs.
 

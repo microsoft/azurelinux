@@ -2,7 +2,7 @@
 Summary:        Prebuilt version of ca-certificates package.
 Name:           prebuilt-ca-certificates
 Version:        20200720
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,9 @@ rm %{buildroot}%{_sysconfdir}/pki/rpm-gpg/*
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Thu Apr 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 20200720-23
+- Bump release to match ca-certificates
+
 * Mon Apr 04 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 20200720-22
 - Making 'Release' match with 'ca-certificates'.
 
