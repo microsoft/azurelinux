@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        Provide the stuff missing in List::Util
 Name:           perl-List-MoreUtils
-Version:        0.428
-Release:        8%{?dist}
+Version:        0.430
+Release:        1%{?dist}
 License:        ASL 2.0 AND (GPLv1 OR Artistic)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/List-MoreUtils/
@@ -54,6 +54,9 @@ make test
 %{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
+* Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.430-1
+- Update to 0.430
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.428-8
 - Adding 'BuildRequires: perl-generators'.
 

@@ -16214,8 +16214,8 @@
         "type": "other",
         "other": {
           "name": "perl-List-MoreUtils",
-          "version": "0.428",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-0.428.tar.gz"
+          "version": "0.430",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-0.430.tar.gz"
         }
       }
     },
