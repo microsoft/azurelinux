@@ -4395,8 +4395,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.28",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.28.tar.gz"
+          "version": "8.0.29",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.29.tar.gz"
         }
       }
     },
@@ -8615,8 +8615,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4763",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4763.tar.gz"
+          "version": "8.2.4774",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4774.tar.gz"
         }
       }
     },
