@@ -3,8 +3,8 @@
 Summary:        Python WBEM client interface and related utilities
 Name:           python-%{pkgname}
 Version:        1.0.1
-Release:        5%{?dist}
-License:        LGPLv2
+Release:        6%{?dist}
+License:        LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pywbem/pywbem
@@ -73,6 +73,9 @@ rm -rf %{buildroot}%{_bindir}/*.bat
 %doc README.rst
 
 %changelog
+* Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-6
+- License verified.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-5
 - Updating source URL.
 
