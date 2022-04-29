@@ -815,16 +815,6 @@
         "type": "other",
         "other": {
           "name": "coredns",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.7.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "coredns",
           "version": "1.8.0",
           "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.0.tar.gz"
         }
@@ -837,6 +827,16 @@
           "name": "coredns",
           "version": "1.8.4",
           "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "coredns",
+          "version": "1.8.6",
+          "downloadUrl": "https://github.com/coredns/coredns/archive/v1.8.6.tar.gz"
         }
       }
     },
@@ -1407,6 +1407,16 @@
           "name": "etcd",
           "version": "3.5.0",
           "downloadUrl": "https://github.com/etcd-io/etcd/archive/refs/tags/v3.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "etcd",
+          "version": "3.5.1",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.1.tar.gz"
         }
       }
     },
@@ -2125,8 +2135,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.109.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.109.1.tar.gz"
+          "version": "5.10.111.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.111.1.tar.gz"
         }
       }
     },
@@ -2455,8 +2465,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.109.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.109.1.tar.gz"
+          "version": "5.10.111.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.111.1.tar.gz"
         }
       }
     },
@@ -2465,8 +2475,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.109.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.109.1.tar.gz"
+          "version": "5.10.111.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.111.1.tar.gz"
         }
       }
     },
@@ -2475,8 +2485,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.109.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.109.1.tar.gz"
+          "version": "5.10.111.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.111.1.tar.gz"
         }
       }
     },
@@ -7875,8 +7885,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-yajl-ruby",
-          "version": "1.4.1",
-          "downloadUrl": "https://rubygems.org/downloads/yajl-ruby-1.4.1.gem"
+          "version": "1.4.2",
+          "downloadUrl": "https://rubygems.org/downloads/yajl-ruby-1.4.2.gem"
         }
       }
     },
@@ -8605,8 +8615,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "8.2.4563",
-          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4563.tar.gz"
+          "version": "8.2.4763",
+          "downloadUrl": "https://github.com/vim/vim/archive/v8.2.4763.tar.gz"
         }
       }
     },
@@ -8625,8 +8635,8 @@
         "type": "other",
         "other": {
           "name": "vsftpd",
-          "version": "3.0.3",
-          "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.3.tar.gz"
+          "version": "3.0.5",
+          "downloadUrl": "https://security.appspot.com/downloads/vsftpd-3.0.5.tar.gz"
         }
       }
     },
