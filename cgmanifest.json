@@ -1906,16 +1906,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "crash-ptdump-command",
-          "version": "1.0.7",
-          "downloadUrl": "https://github.com/crash-utility/crash-extensions/blob/master/ptdump-1.0.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "createrepo_c",
           "version": "0.17.5",
           "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.17.5.tar.gz"
@@ -2370,16 +2360,6 @@
           "name": "docbook-dtds",
           "version": "1.0",
           "downloadUrl": "http://www.oasis-open.org/docbook/sgml/3.0/docbk30.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "docbook-simple",
-          "version": "1.1",
-          "downloadUrl": "http://www.docbook.org/xml/simple/1.1/docbook-simple-1.1.zip"
         }
       }
     },
@@ -4222,16 +4202,6 @@
           "name": "gsettings-desktop-schemas",
           "version": "3.36.1",
           "downloadUrl": "https://download.gnome.org/sources/gsettings-desktop-schemas/3.36/gsettings-desktop-schemas-3.36.1.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "gsl",
-          "version": "2.6",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz"
         }
       }
     },
@@ -7140,16 +7110,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "junitperf",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/clarkware/junitperf/archive/refs/tags/1.9.1.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "jzlib",
           "version": "1.1.3",
           "downloadUrl": "https://github.com/ymnk/jzlib/archive/1.1.3.tar.gz"
@@ -9943,16 +9903,6 @@
           "name": "libunistring",
           "version": "0.9.10",
           "downloadUrl": "http://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libunwind",
-          "version": "1.6.2",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/libunwind/libunwind-1.6.2.tar.gz"
         }
       }
     },
@@ -19773,16 +19723,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-cliff",
-          "version": "2.16.0",
-          "downloadUrl": "https://pypi.io/packages/source/c/cliff/cliff-2.16.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-cmd2",
           "version": "0.9.16",
           "downloadUrl": "https://files.pythonhosted.org/packages/ef/77/7a13dbfc91018ad4d7ad07345c636e374a7655a17ac5b3c8c1248c4e722c/cmd2-0.9.16.tar.gz"
@@ -22794,16 +22734,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rhnlib",
-          "version": "2.8.6",
-          "downloadUrl": "https://github.com/spacewalkproject/spacewalk/archive/refs/tags/rhnlib-2.8.6-1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ripgrep",
           "version": "13.0.0",
           "downloadUrl": "https://github.com/BurntSushi/ripgrep/archive/13.0.0/ripgrep-13.0.0.tar.gz"
@@ -24819,16 +24749,6 @@
           "name": "sparsehash",
           "version": "2.0.3",
           "downloadUrl": "https://github.com/sparsehash/sparsehash/archive/sparsehash-2.0.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "spausedd",
-          "version": "20201112",
-          "downloadUrl": "https://github.com/jfriesse/spausedd/releases/download/20201112/spausedd-20201112.tar.gz"
         }
       }
     },
