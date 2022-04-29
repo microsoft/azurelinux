@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.16.15
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,7 +24,6 @@ Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 # Patch for CVE-2021-29923 is available upstream in v1.17
 Patch1:         CVE-2021-29923.patch
-Patch2:         CVE-2022-24675.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 
@@ -40,7 +39,6 @@ mv -v go go-bootstrap
 # Setup go source and patch
 %setup -q -n go
 %patch1 -p1
-%patch2 -p1
 
 %build
 # Build go 1.4 bootstrap
@@ -121,9 +119,6 @@ fi
 %{_bindir}/*
 
 %changelog
-* Fri Apr 29 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.16.15-2
-- Fix for CVE-2022-24675.
-
 * Thu Mar 17 2022 Muhammad Falak <mwani@microsoft.com> - 1.16.15-1
 - Bump version to 1.16.15 to address CVE-2022-24921
 
