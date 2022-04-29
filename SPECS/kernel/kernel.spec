@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.10.109.1
-Release:        2%{?dist}
+Version:        5.10.111.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -636,9 +636,19 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 19 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.111.1-1
+- Update source to 5.10.111.1
+- Enable CONFIG_BPF_UNPRIV_DEFAULT_OFF
+- Address CVE-2021-4023, CVE-2021-4157, CVE-2022-0435, CVE-2022-0998
+  CVE-2022-28356, CVE-2022-28388, CVE-2022-28389, CVE-2022-28390, 
+  CVE-2021-4203, CVE-2022-0322, CVE-2022-27950, CVE-2021-4148, 
+  CVE-2021-4149, CVE-2022-28796, CVE-2022-29156, CVE-2021-4202,
+  CVE-2022-0500
+
 * Fri Apr 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.10.109.1-2
 - Remove hardcoded mariner.pem from configs and instead insert during
   the build phase
+- Address CVE-2022-1055, CVE-2022-27666, CVE-2022-0995, CVE-2021-44879
 
 * Tue Mar 29 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.10.109.1-1
 - Update source to 5.10.109.1

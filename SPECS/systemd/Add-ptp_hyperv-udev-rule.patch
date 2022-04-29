@@ -1,0 +1,14 @@
+Backport upstream udev rule so that the ptp time source from Hyper-V enumerates as /dev/ptp_hyperv
+
+Signed-off-by: Henry Beberman <henry.beberman@microsoft.com>
+
+diff -Naur a/rules/50-udev-default.rules.in b/rules/50-udev-default.rules.in
+--- a/rules/50-udev-default.rules.in	2018-06-22 04:11:49.000000000 -0700
++++ b/rules/50-udev-default.rules.in	2022-04-11 13:37:22.954292197 -0700
+@@ -83,4 +83,6 @@
+ 
+ SUBSYSTEM=="ptp", ATTR{clock_name}=="KVM virtual PTP", SYMLINK += "ptp_kvm"
+ 
++SUBSYSTEM=="ptp", ATTR{clock_name}=="hyperv", SYMLINK += "ptp_hyperv"
++
+ LABEL="default_end"
