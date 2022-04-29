@@ -1,14 +1,13 @@
 Summary:        Compressed file format
 Name:           zchunk
 Version:        1.1.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD 2-Clause AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/zchunk/zchunk
-#Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz
-Source0:        https://github.com/zchunk/zchunk/archive/%{name}-%{version}.tar.gz
+Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  curl-devel
 BuildRequires:  meson
 BuildRequires:  openssl-devel
@@ -88,6 +87,9 @@ DESTDIR=%{buildroot}/ ninja install
 %{_includedir}/zck.h
 
 %changelog
+* Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.16-2
+- Fixing invalid source URL.
+
 * Thu Jan 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.16-1
 - Update to version 1.1.16.
 - License verified.

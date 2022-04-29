@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           python-%{srcname}
 Version:        0.7
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Python Library for Generating dbus-python Client Code
 
 License:        MPLv2.0
@@ -12,6 +12,9 @@ URL:            https://github.com/stratis-storage/dbus-python-client-gen
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description \
 %{summary}.
@@ -23,7 +26,6 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-pytest
 BuildRequires:  python3-dbus
 BuildRequires:  python3-into-dbus-python >= 0.06
 Requires:       python3-dbus
@@ -43,7 +45,8 @@ Python 3 version.
 %py3_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} -v tests
+pip3 install pytest
+py.test -v tests
 
 %files -n python3-%{srcname}
 %license LICENSE
@@ -52,6 +55,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version} -v tests
 %{python3_sitelib}/dbus_python_client_gen-*.egg-info/
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.7-9
+- Use py.test instead of py.test-3 to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

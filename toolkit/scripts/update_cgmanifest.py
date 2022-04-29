@@ -188,9 +188,9 @@ WARNING! NO 'SOURCE' TAG: {spec_path}
 
     if not validators.url(source_url):
         print(f"""
-WARNING! 'SOURCE'/'SOURCE0' TAG IS NOT A VALID URL: {spec_path}
+WARNING! 'SOURCE'/'SOURCE0' TAG IS NOT A VALID URL: {source_url}
 
-        Failed to retrieve the URL of the source tarball - the 'Source'/'Source0' tag ({source_url}) is not a valid URL.
+        Failed to retrieve the URL of the source tarball inside '{spec_path}'.
         Please make sure the 'Source'/'Source0' tag contains a valid URL to the source tarball required to build that package.
         If the tag is correct and the package build doesn't rely on any source tarballs, you must ignore the spec inside the '.github/workflows/validate-cg-manifest.sh' script.
 """)

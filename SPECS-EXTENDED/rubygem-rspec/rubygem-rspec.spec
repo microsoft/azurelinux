@@ -1,3 +1,5 @@
+%global debug_package %{nil}
+%global gemdir %(IFS=: R=($(gem env gempath)); echo ${R[${#R[@]}-1]})
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 %global	gem_name	rspec
@@ -5,7 +7,7 @@ Distribution:   Mariner
 Summary:  Behaviour driven development (BDD) framework for Ruby
 Name:     rubygem-%{gem_name}
 Version:  3.9.0
-Release:  4%{?dist}
+Release:  6%{?dist}
 License:  MIT
 URL:      https://rspec.info
 Source0:  https://github.com/rspec/rspec-metagem/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-metagem-%{version}.tar.gz
@@ -38,19 +40,27 @@ gem build %{gem_name}
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* %{buildroot}%{gem_dir}/
+#add lib folder to buildroot from Source0
+cp -r lib/ %{buildroot}%{gem_instdir}/
 
 %files
-%dir	%{gem_instdir}
+%dir %{gem_instdir}
 %{gem_instdir}/lib
-%license	%{gem_instdir}/LICENSE.md
-%doc	%{gem_instdir}/README.md
+%license %{gem_instdir}/LICENSE.md
+%doc %{gem_instdir}/README.md
 %exclude %{gem_cache}
 %{gem_spec}
 
-%files	doc
-%doc	%{gem_docdir}
+%files doc
+%doc %{gem_docdir}
 
 %changelog
+* Mon Apr 18 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.9.0-6
+- Add lib from source.
+
+* Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.0-5
+- Fixing the %%files section.
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.9.0-4
 - License verified.
 - Build from .tar.gz source.

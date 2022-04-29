@@ -1,19 +1,21 @@
+Summary:        A simple hierarchical database supporting plugin data sources
 Name:           hiera
 Version:        3.7.0
-Release:        3%{?dist}
-Summary:        A simple hierarchical database supporting plugin data sources
-Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Release:        4%{?dist}
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/puppetlabs/hiera
 Source0:        http://downloads.puppetlabs.com/hiera/%{name}-%{version}.tar.gz
 # Use /etc/puppet rather than /etc/puppetlabs/puppet
 Patch0:         fix-puppetlab-paths.patch
+
 BuildArch:      noarch
-BuildRequires:  rubygem(rspec)
-BuildRequires:  rubygem(mocha)
-BuildRequires:  rubygem(json)
+
 BuildRequires:  ruby-devel
+BuildRequires:  rubygem(json)
+BuildRequires:  rubygem(mocha)
+BuildRequires:  rubygem(rspec)
 
 %description
 A simple hierarchical database supporting plugin data sources.
@@ -26,7 +28,6 @@ A simple hierarchical database supporting plugin data sources.
 # Nothing to build
 
 %install
-rm -rf %{buildroot}
 mkdir -p %{buildroot}%{ruby_vendorlibdir}
 mkdir -p %{buildroot}%{_sysconfdir}/puppet
 mkdir -p %{buildroot}%{_bindir}
@@ -34,22 +35,25 @@ cp -pr lib/hiera %{buildroot}%{ruby_vendorlibdir}
 cp -pr lib/hiera.rb %{buildroot}%{ruby_vendorlibdir}
 install -p -m0755 bin/hiera %{buildroot}%{_bindir}
 install -p -m0644 ext/hiera.yaml %{buildroot}%{_sysconfdir}/puppet
-mkdir -p %{buildroot}%{_var}/lib/hiera
+mkdir -p %{buildroot}%{_sharedstatedir}/hiera
 
 %check
 rspec -Ilib spec
 
 %files
+%license COPYING LICENSE
+%doc README.md
 %{_bindir}/hiera
 %{ruby_vendorlibdir}/hiera.rb
 %{ruby_vendorlibdir}/hiera
-%dir %{_var}/lib/hiera
+%dir %{_sharedstatedir}/hiera
 %dir %{_sysconfdir}/puppet
 %config(noreplace) %{_sysconfdir}/puppet/hiera.yaml
-%doc COPYING README.md 
-%license LICENSE
 
 %changelog
+* Thu Apr 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-4
+- Spec clean-up.
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.7.0-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified
@@ -169,4 +173,3 @@ rspec -Ilib spec
 
 * Thu May 03 2012 Matthaus Litteken <matthaus@puppetlabs.com> - 0.3.0.28-1
 - Initial Hiera Packaging. Upstream version 0.3.0.28
-

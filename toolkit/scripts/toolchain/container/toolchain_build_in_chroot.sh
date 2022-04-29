@@ -67,14 +67,14 @@ set -e
 #
 cd /sources
 
-echo Linux-5.15.26.1 API Headers
-tar xf kernel-5.15.26.1.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
+echo Linux-5.15.34.1 API Headers
+tar xf kernel-5.15.34.1.tar.gz
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.34.1
 make mrproper
 make headers
 cp -rv usr/include/* /usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-5.15.26.1
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-5.15.34.1
 touch /logs/status_kernel_headers_complete
 
 echo 6.8. Man-pages-5.02
@@ -85,10 +85,10 @@ popd
 rm -rf man-pages-5.02
 touch /logs/status_man_pages_complete
 
-echo glibc-2.34
-tar xf glibc-2.34.tar.xz
-pushd glibc-2.34
-patch -Np1 -i ../glibc-2.34-fhs-1.patch
+echo glibc-2.35
+tar xf glibc-2.35.tar.xz
+pushd glibc-2.35
+patch -Np1 -i ../glibc-2.35-fhs-1.patch
 ln -sfv /tools/lib/gcc /usr/lib
 ls -la /usr/lib/gcc/
 case $(uname -m) in
@@ -129,7 +129,7 @@ include /etc/ld.so.conf.d/*.conf
 EOF
 mkdir -pv /etc/ld.so.conf.d
 popd
-rm -rf glibc-2.34
+rm -rf glibc-2.35
 
 touch /logs/status_glibc_complete
 
@@ -197,14 +197,14 @@ set -e
 echo End sanity check - raw toolchain - adjusting the toolchain
 touch /logs/status_adjusting_toolchain_complete
 
-echo Zlib-1.2.11
-tar xf zlib-1.2.11.tar.xz
-pushd zlib-1.2.11
+echo Zlib-1.2.12
+tar xf zlib-1.2.12.tar.xz
+pushd zlib-1.2.12
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf zlib-1.2.11
+rm -rf zlib-1.2.12
 touch /logs/status_zlib_complete
 
 echo File-5.40
@@ -482,17 +482,17 @@ popd
 rm -rf ncurses-6.2
 touch /logs/status_ncurses_complete
 
-echo Libcap-2.26
-tar xf libcap-2.26.tar.xz
-pushd libcap-2.26
+echo libcap-2.60
+tar xf libcap-2.60.tar.xz
+pushd libcap-2.60
 sed -i '/install.*STALIBNAME/d' libcap/Makefile
 make -j$(nproc)
 make RAISE_SETFCAP=no lib=lib prefix=/usr install
-chmod -v 755 /usr/lib/libcap.so.2.26
+chmod -v 755 /usr/lib/libcap.so.2.60
 #mv -v /usr/lib/libcap.so.* /lib
 #ln -sfv ../../lib/$(readlink /usr/lib/libcap.so) /usr/lib/libcap.so
 popd
-rm -rf libcap-2.26
+rm -rf libcap-2.60
 touch /logs/status_libcap_complete
 
 echo Sed-4.8
@@ -586,17 +586,17 @@ popd
 rm -rf gperf-3.1
 touch /logs/status_gperf_complete
 
-echo Expat-2.4.1
-tar xf expat-2.4.1.tar.bz2
-pushd expat-2.4.1
+echo Expat-2.4.8
+tar xf expat-2.4.8.tar.bz2
+pushd expat-2.4.8
 sed -i 's|usr/bin/env |bin/|' run.sh.in
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/expat-2.4.1
+            --docdir=/usr/share/doc/expat-2.4.8
 make -j$(nproc)
 make install
 popd
-rm -rf expat-2.4.1
+rm -rf expat-2.4.8
 touch /logs/status_expat_complete
 
 echo Perl-5.32.0
@@ -776,9 +776,9 @@ popd
 rm -rf openssl-1.1.1k
 touch /logs/status_openssl_complete
 
-echo Python-3.9.10
-tar xf Python-3.9.10.tar.xz
-pushd Python-3.9.10
+echo Python-3.9.12
+tar xf Python-3.9.12.tar.xz
+pushd Python-3.9.12
 ./configure --prefix=/usr       \
             --with-platlibdir=lib \
             --enable-shared     \
@@ -791,7 +791,7 @@ chmod -v 755 /usr/lib/libpython3.9.so.1.0
 chmod -v 755 /usr/lib/libpython3.so
 ln -sfv pip3.9 /usr/bin/pip3
 popd
-rm -rf Python-3.9.10
+rm -rf Python-3.9.12
 touch /logs/status_python399_complete
 
 echo Coreutils-8.32
@@ -993,6 +993,7 @@ cd /sources
 echo sqlite-autoconf-3360000
 tar xf sqlite-autoconf-3360000.tar.gz
 pushd sqlite-autoconf-3360000
+patch -Np1 -i /tools/CVE-2021-36690.patch
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \

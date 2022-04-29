@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.17.0
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,7 +52,6 @@ Requires:       bzip2-libs
 Requires:       elfutils-libelf
 Requires:       libcap
 Requires:       libgcc
-Requires:       mariner-rpm-macros
 Requires:       popt
 Requires:       xz-libs
 Requires:       zlib
@@ -76,6 +75,7 @@ Requires:       cpio
 Requires:       elfutils-devel
 Requires:       elfutils-libelf
 Requires:       gzip
+Requires:       mariner-rpm-macros
 Requires:       tar
 Requires:       unzip
 Requires:       xz
@@ -124,7 +124,8 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
     --enable-python \
     --with-cap \
     --disable-silent-rules \
-    --with-selinux
+    --with-selinux \
+    --with-audit=no
 
 # Remove manpages translations
 rm -r docs/man/{fr,ja,ko,pl,ru,sk}
@@ -267,8 +268,15 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Mon Mar 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.17.0-4
+* Mon Mar 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.17.0-6
 - Remove runtime requries for rpm-build and rpm-libs
+
+* Thu Apr 21 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.17.0-5
+- rpm-libs needs to run in container environments without systemd, audit was being
+-   pulled in as an automatic dependency. Explicitly disable the audit config.
+
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.17.0-4
+- Update required dependecies for rpm-libs and rpm-build sub-packages.
 
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.17.0-3
 - Remove manual pkgconfig(*) provides in toolchain specs

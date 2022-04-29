@@ -1,8 +1,8 @@
 Summary:        File-Which
 Name:           perl-File-Which
-Version:        1.22
-Release:        7%{?dist}
-License:        GPL+ OR Artistic 
+Version:        1.27
+Release:        1%{?dist}
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
@@ -57,6 +57,9 @@ find %{buildroot} -name 'perllocal.pod' -delete
 
 
 %changelog
+* Tue Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.27-1
+- Update to 1.27
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22-7
 - Adding 'BuildRequires: perl-generators'.
 

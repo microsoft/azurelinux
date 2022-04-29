@@ -6,8 +6,8 @@
 %endif
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.26.1
-Release:        4%{?dist}
+Version:        5.15.34.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,47 +18,6 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
-# Kernel CVEs are addressed by moving to a newer version of the stable kernel.
-# Since kernel CVEs are filed against the upstream kernel version and not the
-# stable kernel version, our automated tooling will still flag the CVE as not
-# fixed.
-# To indicate a kernel CVE is fixed to our automated tooling, add nopatch files
-# but do not apply them as a real patch. Each nopatch file should contain
-# information on why the CVE nopatch was applied.
-Patch1001:      CVE-2020-25672.nopatch
-Patch1002:      CVE-2018-16880.nopatch
-Patch1003:      CVE-2018-1000026.nopatch
-Patch1004:      CVE-2019-3016.nopatch
-Patch1005:      CVE-2019-3819.nopatch
-Patch1006:      CVE-2019-3887.nopatch
-Patch1007:      CVE-2010-0309.nopatch
-Patch1008:      CVE-2021-3564.nopatch
-Patch1009:      CVE-2021-45469.nopatch
-Patch1010:      CVE-2021-45480.nopatch
-Patch1011:      CVE-2021-45095.nopatch
-Patch1012:      CVE-2021-20194.nopatch
-Patch1013:      CVE-2022-24122.nopatch
-Patch1014:      CVE-2022-24448.nopatch
-Patch1015:      CVE-2022-0264.nopatch
-Patch1016:      CVE-2022-24959.nopatch
-Patch1017:      CVE-2021-44879.nopatch
-Patch1018:      CVE-2022-0185.nopatch
-Patch1019:      CVE-2022-0382.nopatch
-Patch1020:      CVE-2021-45402.nopatch
-Patch1021:      CVE-2022-25265.nopatch
-Patch1022:      CVE-2021-4090.nopatch
-Patch1023:      CVE-2022-25258.nopatch
-Patch1024:      CVE-2022-25375.nopatch
-Patch1025:      CVE-2022-0617.nopatch
-Patch1026:      CVE-2022-0847.nopatch
-Patch1027:      CVE-1999-0524.nopatch
-Patch1030:      CVE-2008-4609.nopatch
-Patch1031:      CVE-2010-0298.nopatch
-Patch1032:      CVE-2010-4563.nopatch
-Patch1033:      CVE-2011-0640.nopatch
-Patch1034:      CVE-2022-0492.nopatch
-Patch1035:      CVE-2021-3743.nopatch
-Patch1036:      CVE-2022-26966.nopatch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -76,7 +35,6 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
-BuildRequires:  xerces-c-devel
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
@@ -164,7 +122,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 
 %build
 make mrproper
@@ -256,7 +214,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M lockdown=integrity
+mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=128M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -305,6 +263,9 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
+# Remove trace (symlink to perf). This file causes duplicate identical debug symbols
+rm -vf %{buildroot}%{_bindir}/trace
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -339,6 +300,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files
 %defattr(-,root,root)
 %license COPYING
+%exclude %dir /usr/lib/debug
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
@@ -352,10 +314,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
-%ifarch aarch64
-%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
-%exclude /usr/lib/debug/lib/modules/%{uname_r}/vmlinux
-%endif
 
 %files docs
 %defattr(-,root,root)
@@ -377,6 +335,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %files tools
 %defattr(-,root,root)
 %{_libexecdir}
+%exclude %dir %{_libdir}/debug
 %ifarch x86_64
 %{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
@@ -407,6 +366,28 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Apr 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.34.1-1
+- Update source to 5.15.34.1
+- Clean up nopatches in Patch list, no longer needed for CVE automation
+- Nopatch CVE-2022-28390, CVE-2022-28389, CVE-2022-28388, CVE-2022-28356, CVE-2022-0435,
+    CVE-2021-4202, CVE-2022-27950, CVE-2022-0433, CVE-2022-0494, CVE-2022-0330, CVE-2022-0854, 
+    CVE-2021-4197, CVE-2022-29156
+
+* Tue Apr 19 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.32.1-3
+- Remove kernel lockdown config from grub envblock
+
+* Tue Apr 12 2022 Andrew Phelps <anphel@microsoft.com> - 5.15.32.1-2
+- Remove trace symlink from _bindir
+- Exclude files and directories under the debug folder from kernel and kernel-tools packages
+- Remove BR for xerces-c-devel
+
+* Fri Apr 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
+- Update source to 5.15.32.1
+- Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
+  2022-1011, 2022-26490, 2021-4002
+- Enable MANA driver config
+- Address CVEs 2022-0995, 2022-1055, 2022-27666
+
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
 - Add Dell devices support
 

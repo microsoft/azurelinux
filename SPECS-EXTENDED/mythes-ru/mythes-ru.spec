@@ -4,10 +4,10 @@ Name: mythes-ru
 Summary: Russian thesaurus
 %global upstreamid 20070613
 Version: 0.%{upstreamid}
-Release: 22%{?dist}
+Release: 23%{?dist}
 # Below source link is dead now
 # Source: http://download.i-rs.ru/pub/openoffice/dict/thes_ru_RU_v2.zip
-Source: thes_ru_RU_v2.zip
+Source: %{_mariner_sources_url}/thes_ru_RU_v2.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries
 BuildRequires: unzip
 License: LGPLv2+
@@ -39,6 +39,10 @@ done
 %{_datadir}/mythes/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20070613-23
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20070613-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

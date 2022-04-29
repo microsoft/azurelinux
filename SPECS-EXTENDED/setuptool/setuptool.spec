@@ -2,12 +2,17 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: setuptool
 Version: 1.19.11
-Release: 21%{?dist}
+Release: 22%{?dist}
 Summary: A text mode system configuration tool
 License: GPLv2+
 Url: http://git.fedorahosted.org/git/?p=setuptool.git
-Source: setuptool-%{version}.tar.gz
-BuildRequires: newt-devel, gettext, perl-XML-Parser, glib2-devel, intltool, gcc
+Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+BuildRequires: newt-devel
+BuildRequires: gettext
+BuildRequires: perl-XML-Parser
+BuildRequires: glib2-devel
+BuildRequires: intltool
+BuildRequires: gcc
 Requires: usermode
 
 %description
@@ -16,7 +21,7 @@ to access all of the text mode configuration programs included in the
 operating system distribution.
 
 %prep
-%setup -q 
+%setup -q
 
 %build
 %configure
@@ -29,7 +34,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %find_lang setup
 
 %files -f setup.lang
-%doc README COPYING
+%license COPYING
+%doc README
 %{_bindir}/setup
 %config(noreplace) %{_sysconfdir}/pam.d/setup
 %config(noreplace) %{_sysconfdir}/security/console.apps/setup
@@ -41,6 +47,11 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_mandir}/man1/setup.1.gz
 
 %changelog
+* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.19.11-22
+- Update Source0
+- Improve formatting
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.19.11-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -232,7 +243,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 * Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com> 1.13-2.1
 - rebuilt
-  
+
 * Sat Jul 12 2003 Nalin Dahyabhai <nalin@redhat.com> 1.13-2
 - rebuild
 

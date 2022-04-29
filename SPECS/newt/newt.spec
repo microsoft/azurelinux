@@ -1,7 +1,7 @@
 Summary:        A library for text mode user interfaces
 Name:           newt
 Version:        0.52.21
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,14 @@ Provides:       snack = %{version}-%{release}
 The python3-newt package contains the Python 3 bindings for the newt library
 providing a python API for creating text mode interfaces.
 
+%package  lang
+Summary:  Additional language files for newt
+Group:    Development/Languages
+Requires: %{name} = %{version}-%{release}
+
+%description lang
+These are the additional language files of newt
+
 %prep
 %setup -q
 
@@ -60,6 +68,8 @@ providing a python API for creating text mode interfaces.
 find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -name '*.a' -delete
 
+%find_lang %{name}
+
 %check
 make %{?_smp_mflags} test
 
@@ -68,7 +78,7 @@ make %{?_smp_mflags} test
 %license COPYING
 %{_libdir}/libnewt.so.0*
 %{_bindir}/*
-%{_datadir}/*
+%{_mandir}/man1/whiptail.1.gz
 
 %files devel
 %{_includedir}/*
@@ -81,7 +91,13 @@ make %{?_smp_mflags} test
 %{python3_sitearch}/*.py*
 %{python3_sitearch}/__pycache__/*.py*
 
+%files -f %{name}.lang lang
+%defattr(-,root,root)
+
 %changelog
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.52.21-4
+- Create lang sub package for locales
+
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.52.21-3
 - Added CBL-Mariner macros to the build steps.
 - License verified.

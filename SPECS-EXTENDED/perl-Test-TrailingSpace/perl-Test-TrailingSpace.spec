@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           perl-Test-TrailingSpace
 Version:        0.0302
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Test for trailing space in source files
 License:        MIT
 URL:            https://metacpan.org/release/Test-TrailingSpace
@@ -27,6 +27,7 @@ BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(Test::Builder::Tester)
 # Dependencies:
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -56,6 +57,10 @@ make test
 %{_mandir}/man3/Test::TrailingSpace.3*
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.0302-4
+- Add an explicit BR on `perl(blib)` to enable ptest
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0302-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

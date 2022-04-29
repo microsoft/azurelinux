@@ -1,6 +1,6 @@
 Name:           perl-Archive-Zip
-Version:        1.67
-Release:        4%{?dist}
+Version:        1.68
+Release:        1%{?dist}
 Summary:        Perl library for accessing Zip archives
 # lib/Archive/Zip/Member.pm:    (GPL+ or Artistic) and BSD
 #                               (The _mapPermissionsToUnix() comments are
@@ -100,6 +100,9 @@ make pure_install DESTDIR=$RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.68-1
+- Update to 1.68
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.67-4
 - Adding 'BuildRequires: perl-generators'.
 

@@ -3,8 +3,8 @@ Distribution:   Mariner
 Summary: A mouse server for the Linux console
 Name: gpm
 Version: 1.20.7
-Release: 22%{?dist}
-License: GPLv2 and GPLv2+ with exceptions and GPLv3+ and Verbatim and Copyright only
+Release: 23%{?dist}
+License: GPLv2
 URL: http://www.nico.schottelius.org/software/gpm/
 #URL2 : http://freecode.com/projects/gpm
 
@@ -17,7 +17,7 @@ URL: http://www.nico.schottelius.org/software/gpm/
 # 4.] rm -rf %{name}-%{version}/doc/specs
 # 5.] tar cJf %{name}-%{version}.tar.xz %{name}-%{version}
 
-Source: %{name}-%{version}.tar.xz
+Source: %{_mariner_sources_url}/%{name}-%{version}.tar.xz
 Source1: gpm.service
 Patch0: https://github.com/telmich/gpm/compare/1.20.7...4a938233fbe6de7af05aabc74891b68d4bae40f8.diff
 # https://github.com/telmich/gpm/pull/37/
@@ -137,7 +137,8 @@ rm -rf %{buildroot}%{_mandir}
 %ldconfig_scriptlets libs
 
 %files
-%doc COPYING README TODO
+%license COPYING
+%doc README TODO
 %doc doc/README* doc/FAQ doc/Announce doc/changelog
 %{_infodir}/*
 %ifnarch s390 s390x
@@ -159,6 +160,10 @@ rm -rf %{buildroot}%{_mandir}
 %{_libdir}/libgpm.a
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-23
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-22
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

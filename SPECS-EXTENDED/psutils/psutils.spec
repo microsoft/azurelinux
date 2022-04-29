@@ -3,14 +3,14 @@ Distribution:   Mariner
 Summary: PostScript Utilities
 Name:    psutils
 Version: 1.23
-Release: 18%{?dist}
+Release: 19%{?dist}
 License: psutils
 
 # We can't follow https://fedoraproject.org/wiki/Packaging:SourceURL#Github
 # and use upstream tarball for building because ./bootstrap downloads gnulib.
 # wget https://github.com/rrthomas/psutils/archive/master.zip && unzip master.zip && cd psutils-master/
 # ./bootstrap && autoreconf -vfi && ./configure && make dist-xz
-Source: psutils-%{version}.tar.xz
+Source: %{_mariner_sources_url}/psutils-%{version}.tar.xz
 URL:    https://github.com/rrthomas/psutils
 
 # BZ#1072371
@@ -83,6 +83,10 @@ sed -i -e 's,/usr/bin/env perl,%{__perl},' \
 
 
 %changelog
+* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.23-19
+- Updated source URL.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.23-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

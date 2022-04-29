@@ -10,12 +10,15 @@
 Summary:        Simple wrapper around optparse for powerful command line utilities
 Name:           python-%{pypi_name}
 Version:        7.1.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 URL:            https://github.com/mitsuhiko/click
 #Source0:       https://github.com/mitsuhiko/click/archive/%{version}/%{pypi_name}-%{version}.tar.gz
 Source0:        https://github.com/mitsuhiko/click/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+%if %{with_check}
+BuildRequires:  python3-pip
+%endif
 
 %global _description \
 click is a Python package for creating beautiful command line\
@@ -30,7 +33,6 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-pytest
 
 %description -n python%{python3_pkgversion}-%{pypi_name} %{_description}
 
@@ -44,7 +46,9 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 %py3_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version} -v tests
+pip3 install pytest
+pip3 install .
+pytest -v tests
 
 %files -n python%{python3_pkgversion}-%{pypi_name}
 %license LICENSE.rst
@@ -53,6 +57,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version} -v tests
 %{python3_sitelib}/%{pypi_name}-*.egg-info/
 
 %changelog
+* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 7.1.2-5
+- Drop BR on pytest & pip install latest deps to enable ptest
+- License verified
+
 * Tue Dec 08 2020 Steve Laughman <steve.laughman@microsoft.com> - 7.1.2-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.2-3

@@ -110,7 +110,7 @@ ifeq ($(STOP_ON_FETCH_FAIL),y)
 graphpkgfetcher_extra_flags += --stop-on-failure
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(shell find $(CACHED_RPMS_DIR)/) $(pkggen_rpms) $(TOOLCHAIN_MANIFEST)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
@@ -118,6 +118,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(cache_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
+		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST),--repo-file=$(repo) ) \
@@ -135,6 +136,7 @@ $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 		$(logging_command) \
 		--output=$@ && \
 	touch $@
+
 ######## PACKAGE BUILD ########
 
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
@@ -191,6 +193,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
+		--reserved-file-list-file="$(TOOLCHAIN_MANIFEST)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \

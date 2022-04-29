@@ -3,17 +3,8 @@
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
 # support openssl-1.1 -> mariner currently DOES NOT support it.
-%if 0%{?fedora} > 26
-%global openssl11 1
-%endif
+%global openssl11 0
 %global openssl -openssl-linked
-
-# workaround https://bugzilla.redhat.com/show_bug.cgi?id=1668865
-# for current stable releases
-%if 0%{?fedora} && 0%{?fedora} < 30
-%global no_feature_statx -no-feature-statx
-%global no_feature_renameat2 -no-feature-renameat2
-%endif
 
 # support qtchooser (adds qtchooser .conf file)
 %global qtchooser 1
@@ -41,8 +32,8 @@
 
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
-Version:      5.12.5
-Release:      6%{?dist}
+Version:      5.12.11
+Release:      3%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -130,11 +121,6 @@ Patch64: qt5-qtbase-5.12.1-firebird.patch
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 
-# use categorized logging for xcb log entries
-# https://bugreports.qt.io/browse/QTBUG-55167
-# https://bugzilla.redhat.com/show_bug.cgi?id=1497564
-Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
-
 # python3
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 
@@ -217,10 +203,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 # debating whether to do 1 subpkg per library or not -- rex
 %package gui
 Summary: Qt5 GUI-related libraries
-#Requires: %{name}%{?_isa} = %{version}-%{release}
-%if 0%{?fedora} > 20
 Recommends: mesa-dri-drivers
-%endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
 # for Source6: 10-qt5-check-opengl2.sh:
@@ -246,16 +229,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch54 -p1 -b .qmake_LFLAGS
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
-%if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
-%endif
-# FIXME/REBASE
-#patch67 -p1 -b .xcberror_filter
 %patch68 -p1
 
-%if 0%{?fedora} > 30
 %patch80 -p1 -b .use-wayland-on-gnome.patch
-%endif
 
 ## upstream patches
 
@@ -282,6 +259,7 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
 
 # gcc 11 requires <limits> to be explicitly included for std::numeric_limits
 sed -i 's/#  include <utility>/#  include <utility>\n#  include <limits>/g' src/corelib/global/qglobal.h
+
 
 %build
 ## FIXME/TODO:
@@ -400,7 +378,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.12.5
+Version: %{version}
 EOF
 
 # rpm macros
@@ -531,7 +509,7 @@ fi
 %license LICENSE.FDL
 %license LICENSE.GPL*
 %license LICENSE.LGPL*
-%license LICENSE.QT-LICENSE-AGREEMENT-4.0
+%license LICENSE.QT-LICENSE-AGREEMENT-4.2
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
@@ -734,10 +712,6 @@ fi
 %{_qt5_plugindir}/generic/libqevdevmouseplugin.so
 %{_qt5_plugindir}/generic/libqevdevtabletplugin.so
 %{_qt5_plugindir}/generic/libqevdevtouchplugin.so
-%if 0%{?fedora}
-%{_qt5_plugindir}/generic/libqlibinputplugin.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake
-%endif
 %{_qt5_plugindir}/generic/libqtuiotouchplugin.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake
@@ -764,8 +738,16 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
-* Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.5-6
-- Fix gcc11 build issue
+* Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.11-3
+- Migrating CVE fixes from Mariner's 1.0 version.
+- Switching to Fedora 36' (license: MIT) patch for GCC 11 build issues.
+- Removing Fedora-specific macros.
+
+* Mon Aug 09 2021 Andrew Phelps <anphel@microsoft.com> - 5.12.11-2
+- Fix version number in Qt5.pc
+
+* Wed Aug 04 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 5.12.11-1
+- Move to version 5.12.11 to address CVE-2015-9541, CVE-2020-0570 and CVE-2020-13962.
 
 * Fri Apr 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.5-5
 - Added explicit 'Requires' on 'icu'.

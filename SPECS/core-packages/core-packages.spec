@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,19 +20,33 @@ Requires:       chrony
 Requires:       cpio
 Requires:       cracklib-dicts
 Requires:       cryptsetup
+Requires:       curl
 Requires:       dbus
+Requires:       e2fsprogs
 Requires:       file
 Requires:       gdbm
+Requires:       grep
+Requires:       gzip
 Requires:       iana-etc
+Requires:       libtool
 Requires:       iproute
 Requires:       iptables
 Requires:       iputils
 Requires:       irqbalance
 Requires:       lvm2
+Requires:       lz4
+Requires:       mariner-rpm-macros
+Requires:       net-tools
 Requires:       openssh-clients
+Requires:       pkg-config
 Requires:       procps-ng
 Requires:       rpm
+Requires:       sed
+Requires:       sudo
+Requires:       systemd
+Requires:       tar
 Requires:       tzdata
+Requires:       util-linux
 Requires:       which
 
 %description    base-image
@@ -43,41 +57,23 @@ Summary:        Metapackage to install the basic set of packages used all image 
 Requires:       bash
 Requires:       bzip2
 Requires:       ca-certificates-base
-Requires:       curl
-Requires:       e2fsprogs
 Requires:       elfutils-libelf
 Requires:       expat
 Requires:       filesystem
 Requires:       findutils
-Requires:       grep
-Requires:       gzip
-Requires:       libtool
-Requires:       lz4
 Requires:       mariner-release
-Requires:       mariner-repos-preview
-Requires:       mariner-repos-extended-preview
-Requires:       mariner-repos-extras-preview
-%ifarch x86_64
-# Temporarily exclude aarch64 from including the microsoft repo until content is available in the repo
-Requires:       mariner-repos-microsoft-preview
-%endif
-Requires:       mariner-rpm-macros
+Requires:       mariner-repos
+Requires:       mariner-repos-extras
+Requires:       mariner-repos-microsoft
 Requires:       ncurses-libs
-Requires:       net-tools
 Requires:       nspr
 Requires:       nss-libs
 Requires:       openssl
-Requires:       pkg-config
 Requires:       readline
 Requires:       rpm-libs
-Requires:       sed
 Requires:       sqlite-libs
-Requires:       sudo
-Requires:       systemd
-Requires:       tar
 Requires:       tdnf
 Requires:       tdnf-plugin-repogpgcheck
-Requires:       util-linux
 Requires:       xz
 Requires:       zlib
 
@@ -93,6 +89,12 @@ Requires:       zlib
 %files container
 
 %changelog
+* Tue Apr 19 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.0-4
+- Provision official Repos for Official Release
+
+* Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0-3
+- Reduce container image size
+
 * Wed Feb 23 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0-2
 - Update Mariner Core base and container images to remove dnf vim wget by default.
 - License verified

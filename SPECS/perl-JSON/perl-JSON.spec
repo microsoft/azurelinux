@@ -2,14 +2,13 @@
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(JSON::(backportPP|backportPP::Boolean)\\)
 Summary:        Parse and convert to JSON (JavaScript Object Notation)
 Name:           perl-JSON
-Version:        4.02
-Release:        8%{?dist}
+Version:        4.05
+Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/JSON
-#Source0:       https://cpan.metacpan.org/modules/by-module/JSON/JSON-%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/JSON/JSON-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
@@ -46,7 +45,7 @@ Summary:        Tests for %{name}
 Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       coreutils
 Requires:       perl-Test-Harness
- 
+
 %description tests
 Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
@@ -67,7 +66,7 @@ make %{?_smp_mflags}
 make pure_install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} -c %{buildroot}
-	
+
 # Install tests
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
 cp -a t %{buildroot}%{_libexecdir}/%{name}
@@ -93,11 +92,15 @@ make test
 %doc Changes
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
-	
+
 %files tests
 %{_libexecdir}/%{name}
 
 %changelog
+* Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 4.05-1
+- Update to 4.05
+- Update Source0
+
 * Wed Mar 02 2022 Muhammad Falak <mwani@microsoft.com> - 4.02-8
 - Add an explicit BR on `perl(Tie::Array)` to enable ptest
 

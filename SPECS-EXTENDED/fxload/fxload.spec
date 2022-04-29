@@ -2,12 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: fxload
 Version: 2008_10_13
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary: A helper program to download firmware into FX and FX2 EZ-USB devices
 
 License: GPLv2+
 URL: http://linux-hotplug.sourceforge.net/
-Source0: fxload-%{version}-noa3load.tar.gz
+Source0: %{_mariner_sources_url}/fxload-%{version}-noa3load.tar.gz
 # The above file is derived from:
 # http://downloads.sourceforge.net/project/linux-hotplug/fxload/2008_10_13/fxload-2008_10_13.tar.gz
 # This file contains code that is copyright Cypress Semiconductor Inc,
@@ -44,12 +44,16 @@ mkdir -p -m 755 %{buildroot}/%{_mandir}/man8/
 install -m 644 fxload.8 %{buildroot}/%{_mandir}/man8/
 
 %files
-%doc COPYING
+%license COPYING
 %doc README.txt
 %attr(0755, root, root) /sbin/fxload
 %{_mandir}/*/*
 
 %changelog
+* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2008_10_13-16
+- Updating source URLs.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2008_10_13-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
