@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.8.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ rm -rf %{buildroot}/*
 %{_bindir}/%{name}
 
 %changelog
+* Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 1.8.4-5
+- Bumping 'Release' to rebuild with updated Golang version 1.16.15-2.
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.8.4-4
 - Bump release to force rebuild with golang 1.16.15
 

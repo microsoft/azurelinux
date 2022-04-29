@@ -3,7 +3,7 @@
 Summary: Industry-standard container runtime
 Name: moby-containerd
 Version: 1.5.9+azure
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -134,6 +134,9 @@ fi
 %{_mandir}/*/*
 
 %changelog
+* Fri Apr 29 2022 chalamalasetty <chalamalasetty@live.com> - 1.5.9+azure-6
+- Bumping 'Release' to rebuild with updated Golang version 1.16.15-2.
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.9+azure-5
 - Bump release to force rebuild with golang 1.16.15
 
